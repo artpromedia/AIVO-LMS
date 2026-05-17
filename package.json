@@ -25,7 +25,8 @@
     "repo:health": "node scripts/repo-health-check.mjs",
     "brand:check": "node scripts/brand-asset-check.mjs",
     "consent:audit": "node scripts/consent-gate-audit.mjs",
-    "auth:audit": "node scripts/auth-mode-audit.mjs"
+    "auth:audit": "node scripts/auth-mode-audit.mjs",
+    "curriculum:validate": "node scripts/curriculum-validate.mjs"
   },
   "devDependencies": {
     "eas-cli": "^18.6.0",

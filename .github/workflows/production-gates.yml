@@ -51,6 +51,9 @@ jobs:
       - name: consent:audit
         run: pnpm consent:audit
 
+      - name: curriculum:validate
+        run: pnpm curriculum:validate
+
       - name: prod:no-demo scan
         run: pnpm prod:no-demo
 
