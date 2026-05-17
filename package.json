@@ -21,7 +21,10 @@
     "api:check": "pnpm api:generate && git diff --exit-code -- packages/api-client/openapi packages/api-client/src",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,mjs,cjs,json,md,mdx,yml,yaml,css,scss,html}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mjs,cjs,json,md,mdx,yml,yaml,css,scss,html}\"",
-    "lint:fleet": "eslint --max-warnings=Infinity \"services/**/*.{ts,tsx,js,mjs,cjs}\" \"packages/db/**/*.{ts,tsx,js,mjs,cjs}\" \"packages/events/**/*.{ts,tsx,js,mjs,cjs}\""
+    "lint:fleet": "eslint --max-warnings=Infinity \"services/**/*.{ts,tsx,js,mjs,cjs}\" \"packages/db/**/*.{ts,tsx,js,mjs,cjs}\" \"packages/events/**/*.{ts,tsx,js,mjs,cjs}\"",
+    "repo:health": "node scripts/repo-health-check.mjs",
+    "brand:check": "node scripts/brand-asset-check.mjs",
+    "consent:audit": "node scripts/consent-gate-audit.mjs"
   },
   "devDependencies": {
     "eas-cli": "^18.6.0",
