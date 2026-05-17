@@ -78,6 +78,9 @@ jobs:
       - name: comms:audit
         run: pnpm comms:audit
 
+      - name: ai-safety:audit
+        run: pnpm ai-safety:audit
+
       - name: prod:no-demo scan
         run: pnpm prod:no-demo
 

@@ -34,7 +34,8 @@
     "marketing:audit": "node scripts/marketing-audit.mjs",
     "billing:audit": "node scripts/billing-audit.mjs",
     "rostering:audit": "node scripts/rostering-audit.mjs",
-    "comms:audit": "node scripts/comms-audit.mjs"
+    "comms:audit": "node scripts/comms-audit.mjs",
+    "ai-safety:audit": "node scripts/ai-safety-audit.mjs"
   },
   "devDependencies": {
     "eas-cli": "^18.6.0",
