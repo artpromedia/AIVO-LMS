@@ -63,6 +63,9 @@ jobs:
       - name: route:audit
         run: pnpm route:audit
 
+      - name: mobile:audit
+        run: pnpm mobile:audit
+
       - name: prod:no-demo scan
         run: pnpm prod:no-demo
 
