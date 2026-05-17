@@ -60,6 +60,9 @@ jobs:
       - name: lessonrun:audit
         run: pnpm lessonrun:audit
 
+      - name: route:audit
+        run: pnpm route:audit
+
       - name: prod:no-demo scan
         run: pnpm prod:no-demo
 

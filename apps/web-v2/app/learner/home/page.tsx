@@ -170,7 +170,7 @@ export default async function LearnerHome({
           <p className="mt-1 text-aivo-ink-soft">{today.mission.learnerReason}</p>
           <form action={startMissionAction} className="mt-4">
             <input type="hidden" name="learnerId" value={learnerId} />
-            <Button type="submit" size="lg">
+            <Button type="submit" size="lg" data-primary-cta="todays-mission">
               {today.mission.existingRunId
                 ? "Resume lesson"
                 : "Start today's lesson"}
