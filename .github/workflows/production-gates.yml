@@ -57,6 +57,9 @@ jobs:
       - name: onboarding:audit
         run: pnpm onboarding:audit
 
+      - name: lessonrun:audit
+        run: pnpm lessonrun:audit
+
       - name: prod:no-demo scan
         run: pnpm prod:no-demo
 
