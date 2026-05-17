@@ -75,6 +75,9 @@ jobs:
       - name: rostering:audit
         run: pnpm rostering:audit
 
+      - name: comms:audit
+        run: pnpm comms:audit
+
       - name: prod:no-demo scan
         run: pnpm prod:no-demo
 
