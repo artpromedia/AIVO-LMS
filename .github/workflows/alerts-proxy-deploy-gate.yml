@@ -1,0 +1,40 @@
+# Deploy gate for alerts-proxy-svc (#174).
+#
+# Called as a reusable workflow from deploy-production.yml after the rollout
+# step but before traffic cutover. Hits the just-rolled pod's /api/alerts/health
+# and fails the deploy if Slack, PagerDuty, or Opsgenie are not all reported in
+# the `channels` array.
+name: alerts-proxy deploy gate
+
+on:
+  workflow_call:
+    inputs:
+      target_url:
+        description: "https URL of the just-rolled alerts-proxy pod (port-forward or internal LB)"
+        required: true
+        type: string
+      retries:
+        required: false
+        type: string
+        default: "5"
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.26.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: install
+        run: pnpm install --frozen-lockfile --filter @aivo/alerts-proxy-svc...
+      - name: smoke test alerts-proxy /api/alerts/health
+        env:
+          SMOKE_TARGET_URL: ${{ inputs.target_url }}
+          SMOKE_RETRIES: ${{ inputs.retries }}
+        run: pnpm --filter @aivo/alerts-proxy-svc smoke

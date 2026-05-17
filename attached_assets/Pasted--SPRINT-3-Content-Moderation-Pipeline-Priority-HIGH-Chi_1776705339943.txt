@@ -1,0 +1,125 @@
+🟠 SPRINT 3 — Content Moderation Pipeline
+Priority: HIGH — Child safety requires human-in-the-loop
+Estimated effort: 4–5 days
+
+Prompt 3.1 — Database Schema for Content Moderation
+Code
+The admin moderation page (apps/web/src/app/dashboard/admin/ai/moderation/page.tsx)
+displays hardcoded SAMPLE_ITEMS (line 25). No backend table or API exists to store
+flagged content. The quality gate catches unsafe content but has no persistence or
+escalation path.
+
+Files to create/modify:
+- packages/db/src/schema/moderation.ts (new)
+- packages/db/src/schema/index.ts (add export)
+- packages/db/src/migrations/ (new migration)
+
+Task:
+1. Create a new schema file with two tables:
+
+   content_moderation_log — every AI output that triggers safety gate:
+   id, tenantId, learnerId, sessionId, contentType ("ai_response"|"lesson_content"|
+   "homework_help"), content, flagReason ("safety_regex"|"semantic_unsafe"|"pii_leak"),
+   flagConfidence, gateResults (jsonb), tutorSku, modelUsed, status (enum: PENDING|
+   APPROVED|REJECTED|ESCALATED), reviewedBy, reviewedAt, reviewNotes, createdAt.
+
+   moderation_policies — configurable rules:
+   id, tenantId, name, patterns (jsonb), action ("flag"|"block"|"alert"),
+   enabled (boolean), createdAt.
+
+2. Add enum: moderationStatusEnum = pgEnum("moderation_status",
+   ["PENDING", "APPROVED", "REJECTED", "ESCALATED"]).
+3. Export from packages/db/src/schema/index.ts.
+4. Generate and run migration.
+
+Acceptance criteria:
+- pnpm db:generate succeeds.
+- Tables exist in dev database.
+- Schema exports available in @aivo/db.
+Prompt 3.2 — Moderation Logging in AI Service
+Code
+When the quality gate in ai-svc catches unsafe content, it returns a failure response
+but does not persist the incident for human review.
+
+Files to modify:
+- services/ai-svc/src/ai_svc/services/quality_gate.py
+- services/ai-svc/src/ai_svc/routes/generate.py
+
+Task:
+1. When _gate_safety() returns passed: false, log to content_moderation_log:
+   - Call a new internal endpoint on admin-svc (or directly insert via shared DB).
+   - Include: content snippet (first 500 chars), flag reason, confidence, gate
+     results, tutor SKU, model used.
+2. When the semantic safety layer (added in Sprint 1) flags content, log similarly
+   with flag_reason: "semantic_unsafe".
+3. Even for content that passes the safety gate but has a score below 0.7, log as
+   status: "LOW_CONFIDENCE" for periodic batch review.
+
+Acceptance criteria:
+- After a safety gate failure, a row exists in content_moderation_log.
+- The AI response is still blocked (existing behavior preserved).
+- A low-confidence pass (score 0.5–0.7) is logged but content is still delivered.
+Prompt 3.3 — Admin Moderation API (CRUD)
+Code
+The admin UI needs real data. Create the API layer.
+
+Files to create/modify:
+- services/admin-svc/src/routes/moderation.ts (new)
+- services/admin-svc/src/index.ts (register routes)
+
+Task:
+1. GET /api/admin-svc/moderation — List flagged content with pagination, filterable
+   by status, contentType, tutorSku, date range.
+2. GET /api/admin-svc/moderation/:id — Single record with full content.
+3. PATCH /api/admin-svc/moderation/:id — Update status (APPROVED, REJECTED,
+   ESCALATED), set reviewedBy, reviewedAt, reviewNotes.
+4. GET /api/admin-svc/moderation/stats — Counts by status, by flag reason, by tutor.
+5. All routes require PLATFORM_ADMIN role via JWT verification.
+
+Acceptance criteria:
+- All 4 endpoints return correct data from DB.
+- Non-admin roles receive 403.
+- Pagination works with page and perPage query params.
+Prompt 3.4 — Wire Admin Moderation UI to Real API
+Code
+apps/web/src/app/dashboard/admin/ai/moderation/page.tsx shows SAMPLE_ITEMS
+(hardcoded, line 25-28). Replace with real API calls.
+
+File to modify: apps/web/src/app/dashboard/admin/ai/moderation/page.tsx
+
+Task:
+1. Remove SAMPLE_ITEMS constant entirely.
+2. Fetch from GET /api/admin-svc/moderation?status=${filter} on mount and filter change.
+3. Wire handleAction() to PATCH /api/admin-svc/moderation/${id} with the action status.
+4. Add a stats banner at the top showing pending/approved/rejected/escalated counts
+   from the /stats endpoint.
+5. Add a review notes textarea that submits with the PATCH.
+6. Add real-time refresh: poll every 30 seconds or use a "Refresh" button.
+
+Acceptance criteria:
+- Page loads real data from API (or empty state if no records).
+- Admin can approve/reject/escalate items.
+- Review notes are persisted.
+- SAMPLE_ITEMS is gone from the file.
+Prompt 3.5 — Alert on High-Severity Flags
+Code
+When a truly dangerous output is flagged (confidence > 0.9, category = safety_concern),
+the platform should immediately notify a platform admin rather than wait for manual
+queue review.
+
+Files to modify:
+- services/ai-svc/src/ai_svc/services/quality_gate.py
+- services/comms-svc/ (add internal notification endpoint if not exists)
+
+Task:
+1. After logging a high-confidence safety flag, call comms-svc to send an internal
+   alert (email to admin distribution list and/or push notification).
+2. The alert should include: timestamp, tutor SKU, learner ID (anonymized), content
+   snippet, flag reason.
+3. Add a circuit breaker: if >5 high-severity flags in 10 minutes from the same
+   model, temporarily disable that model and fall back to the next in the LLM chain.
+
+Acceptance criteria:
+- High-severity flag triggers admin notification.
+- Circuit breaker disables model after threshold and logs the action.
+- Alert includes actionable information.

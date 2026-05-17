@@ -1,0 +1,75 @@
+Run pnpm build
+
+> aivo-ai-learning@ build /home/runner/work/aivo-ai-learning/aivo-ai-learning
+> turbo build
+
+
+Attention:
+Turborepo now collects completely anonymous telemetry regarding usage.
+This information is used to shape the Turborepo roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://turborepo.dev/docs/telemetry
+
+
+   • Packages in scope: @aivo/admin-svc, @aivo/assessment-svc, @aivo/billing-svc, @aivo/brand, @aivo/comms-svc, @aivo/db, @aivo/engagement-svc, @aivo/events, @aivo/family-svc, @aivo/i18n-svc, @aivo/identity-svc, @aivo/integrations-svc, @aivo/learner-ui, @aivo/learning-svc, @aivo/marketing, @aivo/mobile, @aivo/mobile-ui, @aivo/observability, @aivo/research-svc, @aivo/security, @aivo/status-page-svc, @aivo/tutor-svc, @aivo/web
+   • Running build in 23 packages
+   • Remote caching disabled
+
+@aivo/events:build
+@aivo/brand:build
+@aivo/observability:build
+@aivo/security:build
+@aivo/learner-ui:build
+@aivo/db:build
+@aivo/research-svc:build
+@aivo/i18n-svc:build
+@aivo/billing-svc:build
+@aivo/learning-svc:build
+@aivo/assessment-svc:build
+@aivo/comms-svc:build
+@aivo/integrations-svc:build
+@aivo/tutor-svc:build
+@aivo/status-page-svc:build
+@aivo/admin-svc:build
+@aivo/identity-svc:build
+@aivo/family-svc:build
+@aivo/engagement-svc:build
+@aivo/web:build
+cache miss, executing ae1c676e24961f2d
+
+> @aivo/web@1.0.0 build /home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web
+> next build
+
+⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+   ▲ Next.js 15.5.15
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 96s
+   Linting and checking validity of types ...
+
+ ⚠ The Next.js plugin was not detected in your ESLint configuration. See https://nextjs.org/docs/app/api-reference/config/eslint#migrating-existing-config
+
+Failed to compile.
+
+./src/app/dashboard/parent/components/LearnerSummaryCard.tsx
+111:9  Error: Non-interactive elements should not be assigned mouse or keyboard event listeners.  jsx-a11y/no-noninteractive-element-interactions
+
+./src/components/CommandPalette.tsx
+87:5  Error: Non-interactive elements should not be assigned mouse or keyboard event listeners.  jsx-a11y/no-noninteractive-element-interactions
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+ ELIFECYCLE  Command failed with exit code 1.
+@aivo/marketing:build
+
+ Tasks:    19 successful, 21 total
+Cached:    0 cached, 21 total
+  Time:    2m20.132s 
+Failed:    @aivo/web#build
+
+ ELIFECYCLE  Command failed with exit code 1.
+Error: Process completed with exit code 1.

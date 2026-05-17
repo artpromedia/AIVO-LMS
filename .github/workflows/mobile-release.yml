@@ -1,0 +1,207 @@
+name: Mobile App Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*-mobile'
+      - 'v*.*.*-ios'
+      - 'v*.*.*-android'
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to build'
+        required: true
+        type: choice
+        options:
+          - both
+          - ios
+          - android
+      track:
+        description: 'Release track'
+        required: true
+        type: choice
+        options:
+          - preview
+          - beta
+          - production
+      version:
+        description: 'Release version (e.g. 1.2.3)'
+        required: true
+        type: string
+
+concurrency:
+  group: mobile-release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  validate:
+    name: Validate Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      build-number: ${{ steps.build.outputs.number }}
+
+    steps:
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "push" ]; then
+            VERSION=${GITHUB_REF#refs/tags/v}
+            VERSION=${VERSION%-mobile}
+            VERSION=${VERSION%-ios}
+            VERSION=${VERSION%-android}
+          else
+            VERSION="${{ inputs.version }}"
+          fi
+          if ! echo "$VERSION" | grep -Pq '^\d+\.\d+\.\d+$'; then
+            echo "::error::Invalid version format: $VERSION (expected: X.Y.Z)"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Compute build number
+        id: build
+        run: echo "number=${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+
+  ios-build:
+    name: iOS Build & Deploy
+    runs-on: macos-14
+    timeout-minutes: 60
+    needs: validate
+    if: |
+      (github.event_name == 'push' && (contains(github.ref, '-mobile') || contains(github.ref, '-ios'))) ||
+      (github.event_name == 'workflow_dispatch' && (inputs.platform == 'ios' || inputs.platform == 'both'))
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build iOS
+        working-directory: apps/mobile
+        run: |
+          PROFILE="${{ inputs.track || 'preview' }}"
+          eas build --platform ios --profile "$PROFILE" --non-interactive
+        env:
+          EXPO_APPLE_ID: ${{ secrets.APPLE_ID }}
+          EXPO_APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+
+      - name: Submit to App Store (production only)
+        if: inputs.track == 'production'
+        working-directory: apps/mobile
+        run: eas submit --platform ios --non-interactive || true
+
+  android-build:
+    name: Android Build & Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: validate
+    if: |
+      (github.event_name == 'push' && (contains(github.ref, '-mobile') || contains(github.ref, '-android'))) ||
+      (github.event_name == 'workflow_dispatch' && (inputs.platform == 'android' || inputs.platform == 'both'))
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build Android
+        working-directory: apps/mobile
+        run: |
+          PROFILE="${{ inputs.track || 'preview' }}"
+          eas build --platform android --profile "$PROFILE" --non-interactive
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
+      - name: Submit to Play Store (production only)
+        if: inputs.track == 'production'
+        working-directory: apps/mobile
+        run: eas submit --platform android --non-interactive || true
+        env:
+          GOOGLE_PLAY_JSON_KEY: ${{ secrets.GOOGLE_PLAY_JSON_KEY }}
+
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [validate, ios-build, android-build]
+    if: always() && needs.validate.result == 'success' && (needs.ios-build.result == 'success' || needs.android-build.result == 'success')
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="v${{ needs.validate.outputs.version }}"
+          TRACK="${{ inputs.track || 'preview' }}"
+
+          cat > /tmp/release-notes.md << EOMD
+          ## Mobile Release $VERSION
+
+          **Build Number:** ${{ needs.validate.outputs.build-number }}
+          **Track:** $TRACK
+          **Date:** $(date -u +"%Y-%m-%d %H:%M UTC")
+
+          ### Platform Status
+          - iOS: ${{ needs.ios-build.result }}
+          - Android: ${{ needs.android-build.result }}
+
+          ### Distribution
+          - **iOS**: Available on TestFlight / App Store
+          - **Android**: Available on Play Store ($TRACK track)
+          EOMD
+
+          git tag -a "$VERSION-mobile" -m "Mobile release $VERSION" || true
+          git push origin "$VERSION-mobile" 2>/dev/null || true
+
+          gh release create "$VERSION-mobile" \
+            --title "Mobile $VERSION" \
+            --notes-file /tmp/release-notes.md \
+            --target "$GITHUB_SHA" || true

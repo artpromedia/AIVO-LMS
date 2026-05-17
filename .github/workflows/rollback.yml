@@ -1,0 +1,152 @@
+name: Manual Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      services:
+        description: "Comma-separated service names to rollback (leave empty for all services)"
+        required: false
+        type: string
+      helm_revision:
+        description: "Specific Helm revision number to rollback to (e.g. 5) — leave empty for previous revision"
+        required: false
+        type: string
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+        default: staging
+
+concurrency:
+  group: deploy-${{ inputs.environment }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  CHART_PATH: infra/helm/aivo-service
+
+jobs:
+  approval:
+    name: Rollback Approval
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: inputs.environment == 'production'
+    environment: production-approval
+
+    steps:
+      - name: Approval confirmed
+        run: |
+          echo "Production rollback approved"
+          echo "Initiated by: ${{ github.actor }}"
+          echo "Services: ${{ inputs.services || 'ALL' }}"
+          echo "Helm revision: ${{ inputs.helm_revision || 'previous' }}"
+
+  rollback:
+    name: "Rollback ${{ inputs.environment }}"
+    runs-on: [self-hosted, hetzner, production]
+    timeout-minutes: 15
+    needs: [approval]
+    if: |
+      always() &&
+      (needs.approval.result == 'success' || needs.approval.result == 'skipped')
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify cluster reachable
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+
+      - name: Setup Helm
+        run: |
+          if ! command -v helm &>/dev/null; then
+            curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+          fi
+          helm version
+
+      - name: Determine services and namespace
+        id: config
+        run: |
+          if [ "${{ inputs.environment }}" = "production" ]; then
+            NS="aivo"
+          else
+            NS="aivo-staging"
+          fi
+          echo "namespace=$NS" >> "$GITHUB_OUTPUT"
+
+          if [ -n "${{ inputs.services }}" ]; then
+            echo "services=${{ inputs.services }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "services=identity-svc,assessment-svc,brain-svc,ai-svc,learning-svc,tutor-svc,family-svc,engagement-svc,billing-svc,comms-svc,i18n-svc,integrations-svc,admin-svc,status-page-svc,research-svc,curriculum-svc" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Show current state
+        run: |
+          NS="${{ steps.config.outputs.namespace }}"
+          IFS=',' read -ra SERVICES <<< "${{ steps.config.outputs.services }}"
+
+          echo "=== Current Helm Releases ==="
+          for svc in "${SERVICES[@]}"; do
+            svc=$(echo "$svc" | xargs)
+            echo "--- $svc ---"
+            helm history "$svc" -n "$NS" --max 3 2>/dev/null || echo "  No release found"
+          done
+
+          echo ""
+          echo "=== Current Pod Status ==="
+          kubectl get pods -n "$NS" --no-headers 2>/dev/null | head -30
+
+      - name: Rollback services
+        run: |
+          set -euo pipefail
+          NS="${{ steps.config.outputs.namespace }}"
+          REVISION="${{ inputs.helm_revision || '0' }}"
+          IFS=',' read -ra SERVICES <<< "${{ steps.config.outputs.services }}"
+
+          FAILED=0
+          for svc in "${SERVICES[@]}"; do
+            svc=$(echo "$svc" | xargs)
+            echo ""
+            echo "═══ Rolling back $svc (revision: ${REVISION:-previous}) ═══"
+            if helm rollback "$svc" "$REVISION" -n "$NS" --timeout 5m --wait 2>/dev/null; then
+              echo "  ✅ $svc rolled back"
+            else
+              echo "  ⚠  $svc rollback failed or no previous revision"
+              FAILED=$((FAILED + 1))
+            fi
+          done
+
+          echo ""
+          echo "════════════════════════════════════════════════"
+          echo "  Rollback complete: $((${#SERVICES[@]} - FAILED))/${#SERVICES[@]} successful"
+          echo "════════════════════════════════════════════════"
+
+          if [ "$FAILED" -gt 0 ]; then
+            echo "::warning::$FAILED service(s) failed to rollback"
+          fi
+
+      - name: Verify rollback
+        run: |
+          NS="${{ steps.config.outputs.namespace }}"
+          echo "=== Post-Rollback Pod Status ==="
+          kubectl get pods -n "$NS" --sort-by=.metadata.name -o wide
+          echo ""
+          kubectl get deployments -n "$NS"
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Manual Rollback — ${{ inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Initiated by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Services:** \`${{ steps.config.outputs.services }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Helm revision:** \`${{ inputs.helm_revision || 'previous' }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp:** $(date -u +'%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY

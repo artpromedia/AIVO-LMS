@@ -1,0 +1,134 @@
+🟠 SPRINT 2 — CI/CD Hardening & Test Foundation
+Priority: HIGH — Quality gates must actually block bad code
+Estimated effort: 3–4 days
+
+Prompt 2.1 — Make CI Lint & TypeCheck Blocking
+Code
+.github/workflows/ci.yml lines 37 and 41 set continue-on-error: true on both
+pnpm lint and pnpm build (type-check). Lines 114, 191, 197, 204 repeat this
+pattern for security scans. This means type errors, lint violations, and even critical
+security findings do not block pull request merges.
+
+File to change: .github/workflows/ci.yml
+
+Task:
+1. Remove continue-on-error: true from the Lint step (line 37).
+2. Remove continue-on-error: true from the Type check step (line 41).
+3. For the security scan steps (lines 114, 191, 197, 204), keep
+   continue-on-error: true but add a summary step at the end of the job that
+   checks exit codes and posts a PR comment with findings.
+4. Add a job-level if: always() on a new ci-summary job that collects and reports
+   the status of all upstream jobs.
+
+Acceptance criteria:
+- A PR with a TypeScript error fails CI.
+- A PR with an ESLint error fails CI.
+- Security scan findings appear in PR comments but do not block merge.
+- Existing passing PRs remain green.
+Prompt 2.2 — Unit Tests for Brain Clone Pipeline
+Code
+services/brain-svc/src/brain_svc/services/clone_pipeline.py contains the most
+critical business logic in the platform — it computes mastery levels, disability
+signals, XAI explanations, visual identity, and episodic memory. It has zero tests.
+
+File to create: services/brain-svc/tests/test_clone_pipeline.py
+
+Write pytest tests covering:
+
+1. _compute_mastery_from_discovery() (line 56-73)
+   - Happy path: discovery results with varying correct/total/difficulty → verify
+     mastery scores are clamped 0.0–1.0 and difficulty multiplier applied correctly.
+   - Edge: total = 0 → mastery stays at template default.
+   - Edge: domain that doesn't match any mastery key → no crash.
+
+2. _build_disability_signals() (line 75-88)
+   - Verbal parent → empty signals.
+   - Non-verbal parent with AAC, attention issues, diagnoses → all signals populated.
+   - None parent data → empty dict.
+
+3. _build_xai_explanation() (line 90-182)
+   - Verify all decision arrays populated for each input type.
+   - Verify RAI compliance fields are always present.
+
+4. _compute_visual_identity() (line 203-237)
+   - All-zero mastery → still returns valid identity with primary hue.
+   - High mastery → growth particles populated.
+
+5. clone_brain() (line 276-401)
+   - Mock DB calls. Verify brain_states INSERT includes correct fields.
+   - Verify snapshot INSERT is created.
+   - Verify approval_status is pending_parent_review.
+   - Verify duplicate learner returns error.
+
+Acceptance criteria:
+- pytest services/brain-svc/tests/test_clone_pipeline.py -v → all pass.
+- Coverage for clone_pipeline.py ≥ 80%.
+- Tests added to CI brain-svc job.
+Prompt 2.3 — Unit Tests for Quality Gate
+Code
+The quality gate (services/ai-svc/src/ai_svc/services/quality_gate.py) has zero tests.
+Sprint 1 expands it significantly — this sprint adds the test harness.
+
+File to create: services/ai-svc/tests/test_quality_gate.py
+
+Write pytest tests covering:
+
+1. Safety gate: ≥15 positive cases (unsafe content) + ≥10 negative cases (safe content
+   that contains partial matches, e.g., "drug store" is safe).
+2. Readability gate: Content at each delivery_level (PRE_K through SIXTH_PLUS).
+   Verify score thresholds.
+3. Compliance gate: Content for each functioning level. Verify length limits for
+   LOW_VERBAL/NON_VERBAL/PRE_SYMBOLIC. Verify exclamation mark check for visual hyper.
+4. Integration: run_quality_gate() with content that passes all gates vs. content
+   that fails each gate individually.
+
+Acceptance criteria:
+- ≥40 test cases total.
+- pytest services/ai-svc/tests/test_quality_gate.py -v → all pass.
+- Tests added to CI.
+Prompt 2.4 — Unit Tests for Prompt Builder
+Code
+services/ai-svc/src/ai_svc/services/prompt_builder.py constructs multi-layered system
+prompts for all 14 tutors. A bug in prompt construction could cause a tutor to ignore
+accommodations, use wrong language level, or miss IEP goals. Zero tests exist.
+
+File to create: services/ai-svc/tests/test_prompt_builder.py
+
+Task:
+1. Test build_system_prompt() for each functioning level (STANDARD through PRE_SYMBOLIC):
+   - STANDARD → contains "Socratic method", no picture-based instructions.
+   - NON_VERBAL → contains "partner-assisted", "icons only", AAC references.
+   - PRE_SYMBOLIC → contains "parent coaching mode".
+2. Test accommodation injection: when active_accommodations includes "text_to_speech",
+   the prompt includes relevant instructions.
+3. Test IEP goal injection: when iep_profile.goals has entries, they appear in prompt.
+4. Test sensory profile injection: hyper-visual → prompt includes "muted colors,
+   minimal animations".
+5. Test curriculum alignment: when curriculum_alignment.framework is "CCSS", the prompt
+   references Common Core.
+
+Acceptance criteria:
+- ≥25 test cases.
+- pytest services/ai-svc/tests/test_prompt_builder.py -v → all pass.
+Prompt 2.5 — Expand A11y Test Coverage
+Code
+Only 3 Playwright a11y test files exist (login.spec.ts, signup.spec.ts,
+dashboards.spec.ts). The platform has 30+ pages.
+
+Files to create:
+- apps/web/tests/a11y/parent-dashboard.spec.ts
+- apps/web/tests/a11y/learner-stage.spec.ts
+
+Task:
+1. Parent dashboard tests: Navigate to /dashboard/parent, run axe-core, verify
+   no violations. Test the add-learner form for label associations.
+2. Learner stage tests: Navigate to a tutor lesson page, verify:
+   - Break cloud dialog has correct ARIA roles.
+   - Choice buttons have accessible labels.
+   - Progress indicators use role="progressbar".
+3. Add these test files to the a11y-tests.yml workflow.
+
+Acceptance criteria:
+- 2 new test files with ≥5 test cases each.
+- npx playwright test tests/a11y/ --reporter=list → all pass (or skip if backend
+  not available, with clear skip reason).

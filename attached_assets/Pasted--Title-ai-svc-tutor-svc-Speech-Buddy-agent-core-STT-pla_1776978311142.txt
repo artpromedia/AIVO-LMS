@@ -1,0 +1,30 @@
+## Title
+[ai-svc + tutor-svc] Speech Buddy agent core: STT, planner, dialogue, TTS, safety filter
+
+## Context
+Implement the minimum viable interactive loop end-to-end behind the feature flag. No UI yet—exercised by integration tests and a CLI harness.
+
+## Tasks
+1. **Audio pipeline** in `ai-svc`:
+   - STT adapter interface with a provider (e.g., Whisper-compatible) + on-device fallback plan documented.
+   - TTS adapter with child-friendly voice options per age band and a "slow-talk" mode (reduced WPM, extra pauses).
+   - Barge-in + VAD (voice activity detection) so the child can interrupt the buddy.
+2. **Agent orchestrator** (LangGraph-style state machine, framework-agnostic wrapper):
+   - States: `greet → pickScenario → roleplayTurn* → reflect → assignQuest → farewell`.
+   - Tools: `pickScenario(ageBand, skillTag)`, `getScaffold(skillTag)`, `scoreTurn(transcript)`, `logSkillEvidence()`, `escalateSafety(reason)`.
+   - Planner selects skills based on recent session evidence stored by `engagement-svc`.
+3. **Safety filter** runs on BOTH input (child utterance) and output (buddy utterance):
+   - Multi-layer: regex blocklist → classifier → LLM judge with the safety policy.
+   - On hard flag: suppress output, run crisis script, emit `safety.flag.raised` event, notify guardian channel.
+   - Every decision logged with a correlation ID; never log raw audio; transcripts encrypted at rest.
+4. **Session API** in `tutor-svc`:
+   - `POST /speech-buddy/sessions` (child context, ageBand, consentStatus check).
+   - `WS /speech-buddy/sessions/:id/stream` (bidirectional audio frames + event channel).
+   - `POST /speech-buddy/sessions/:id/end` returns structured reflection + skill-evidence JSON.
+5. Latency budget: median **< 1.2s** child-end-of-utterance → first TTS audio byte. Add tracing spans for each stage.
+
+## Acceptance criteria
+- Golden-path integration test: 3-turn roleplay "starting a conversation at recess" completes with correct state transitions, safety-clean output, and skill-evidence entries persisted.
+- Red-team test suite (≥ 50 prompts covering self-harm, bullying, adult-content bait, PII fishing) — 100% blocked or safely redirected; reviewed by a child-safety SME checklist in PR.
+- p50 latency meets budget on staging; p95 documented.
+- No raw audio written to any persistent store; only derived transcripts + features.

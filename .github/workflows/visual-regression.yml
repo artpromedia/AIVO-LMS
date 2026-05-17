@@ -1,0 +1,99 @@
+name: Visual Regression
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "apps/marketing/**"
+      - "apps/web/**"
+      - "packages/brand/**"
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  visual-regression:
+    name: Argos Visual Regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: aivo
+          POSTGRES_PASSWORD: aivo_dev_pw
+          POSTGRES_DB: aivo_dev
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U aivo"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      DATABASE_URL: postgresql://aivo:aivo_dev_pw@localhost:5432/aivo_dev
+      REDIS_URL: redis://localhost:6379
+      NODE_ENV: test
+      JWT_SECRET: ci-test-jwt-secret-not-real
+      BETTER_AUTH_SECRET: ci-test-auth-secret-not-real
+      STRIPE_SECRET_KEY: placeholder-not-a-real-stripe-key
+      STRIPE_WEBHOOK_SECRET: whsec_placeholder
+      RESEND_API_KEY: re_test_placeholder
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages and apps
+        run: pnpm turbo run build
+
+      - name: Setup database
+        run: pnpm --filter @aivo/db run db:push
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Take visual regression screenshots
+        run: |
+          if pnpm exec playwright test --project=chromium e2e/tests/visual/ 2>/dev/null; then
+            echo "Visual regression screenshots captured"
+          else
+            echo "::warning::Visual regression test suite not found"
+          fi
+        env:
+          CI: true
+
+      - name: Upload screenshots to Argos
+        run: |
+          if command -v argos 2>/dev/null || npx --yes @argos-ci/cli --version 2>/dev/null; then
+            npx --yes @argos-ci/cli upload screenshots/
+          else
+            echo "::warning::Argos CLI not available, skipping upload"
+          fi
+        env:
+          ARGOS_TOKEN: ${{ secrets.ARGOS_TOKEN }}

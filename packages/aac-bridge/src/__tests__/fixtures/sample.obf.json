@@ -1,0 +1,36 @@
+{
+  "format": "open-board-0.1",
+  "id": "test-board-1",
+  "name": "Test Board",
+  "locale": "en",
+  "buttons": [
+    {
+      "id": "btn1",
+      "label": "Hello",
+      "image_id": "img1",
+      "background_color": "#ff0000",
+      "border_color": "#000000"
+    },
+    {
+      "id": "btn2",
+      "label": "Yes",
+      "image_id": "img2"
+    },
+    {
+      "id": "btn3",
+      "label": "No"
+    }
+  ],
+  "images": [
+    { "id": "img1", "url": "https://cdn.example.com/hello.png", "content_type": "image/png" },
+    { "id": "img2", "url": "https://cdn.example.com/yes.png", "content_type": "image/png" }
+  ],
+  "grid": {
+    "rows": 2,
+    "columns": 3,
+    "order": [
+      ["btn1", "btn2", null],
+      ["btn3", null, null]
+    ]
+  }
+}

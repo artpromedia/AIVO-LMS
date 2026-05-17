@@ -1,0 +1,96 @@
+Annotations
+47 errors and 8 warnings
+Build (billing-svc)
+Process completed with exit code 2.
+Build (billing-svc)
+Cannot find module '@aivo/security' or its corresponding type declarations.
+Build (billing-svc)
+Cannot find module '@aivo/db' or its corresponding type declarations.
+Build (billing-svc)
+Cannot find module '@aivo/observability' or its corresponding type declarations.
+Build (comms-svc)
+Process completed with exit code 2.
+Build (comms-svc)
+Cannot find module '@aivo/db' or its corresponding type declarations.
+Build (comms-svc)
+Cannot find module '@aivo/db' or its corresponding type declarations.
+Build (comms-svc)
+Cannot find module '@aivo/db' or its corresponding type declarations.
+Build (comms-svc)
+Cannot find module '@aivo/observability' or its corresponding type declarations.
+Build (comms-svc)
+Cannot find module '@aivo/security' or its corresponding type declarations.
+Build (comms-svc)
+Cannot find module '@aivo/observability' or its corresponding type declarations.
+Build (comms-svc)
+Cannot find module '@aivo/db' or its corresponding type declarations.
+Build (comms-svc)
+Cannot find module '@aivo/observability' or its corresponding type declarations.
+Build (integrations-svc)
+Process completed with exit code 2.
+Build (integrations-svc)
+Cannot find module '@aivo/db' or its corresponding type declarations.
+Build (integrations-svc)
+Cannot find module '@aivo/security' or its corresponding type declarations.
+Build (integrations-svc)
+Cannot find module '@aivo/db' or its corresponding type declarations.
+Build (integrations-svc)
+Cannot find module '@aivo/observability' or its corresponding type declarations.
+Build (assessment-svc)
+Cannot find module '@aivo/security' or its corresponding type declarations.
+Build (assessment-svc)
+Cannot find module '@aivo/db' or its corresponding type declarations.
+Build (assessment-svc)
+Cannot find module '@aivo/security' or its corresponding type declarations.
+Build (assessment-svc)
+Cannot find module '@aivo/db' or its corresponding type declarations.
+Build (assessment-svc)
+Cannot find module '@aivo/security' or its corresponding type declarations.
+Build (assessment-svc)
+Cannot find module '@aivo/db' or its corresponding type declarations.
+Build (assessment-svc)
+Cannot find module '@aivo/security' or its corresponding type declarations.
+Build (assessment-svc)
+Cannot find module '@aivo/db' or its corresponding type declarations.
+Build (assessment-svc)
+Cannot find module '@aivo/db' or its corresponding type declarations.
+Build (assessment-svc)
+Cannot find module '@aivo/observability' or its corresponding type declarations.
+Build (learning-svc)
+Process completed with exit code 2.
+Build (learning-svc)
+Cannot find module '@aivo/scoring' or its corresponding type declarations.
+Build (learning-svc)
+Cannot find module '@aivo/scoring' or its corresponding type declarations.
+Build (learning-svc)
+Cannot find module '@aivo/brand' or its corresponding type declarations.
+Build (learning-svc)
+Cannot find module '@aivo/db' or its corresponding type declarations.
+Build (learning-svc)
+Cannot find module '@aivo/security' or its corresponding type declarations.
+Build (learning-svc)
+Cannot find module '@aivo/db' or its corresponding type declarations.
+Build (learning-svc)
+Cannot find module '@aivo/db' or its corresponding type declarations.
+Build (learning-svc)
+Cannot find module '@aivo/observability' or its corresponding type declarations.
+Build (identity-svc)
+Cannot find module '@aivo/security' or its corresponding type declarations.
+Build (identity-svc)
+Cannot find module '@aivo/db' or its corresponding type declarations.
+Build (identity-svc)
+Cannot find module '@aivo/security' or its corresponding type declarations.
+Build (identity-svc)
+Cannot find module '@aivo/db' or its corresponding type declarations.
+Build (identity-svc)
+Cannot find module '@aivo/security' or its corresponding type declarations.
+Build (identity-svc)
+Cannot find module '@aivo/security' or its corresponding type declarations.
+Build (identity-svc)
+Cannot find module '@aivo/security' or its corresponding type declarations.
+Build (identity-svc)
+Cannot find module '@aivo/db' or its corresponding type declarations.
+Build (identity-svc)
+Cannot find module '@aivo/observability' or its corresponding type declarations.
+Build (identity-svc)
+Cannot find module '@aivo/security' or its corresponding type declarations.

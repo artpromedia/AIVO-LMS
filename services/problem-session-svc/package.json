@@ -1,0 +1,38 @@
+{
+  "name": "@aivo/problem-session-svc",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aivo/audit-svc": "workspace:*",
+    "@aivo/db": "workspace:*",
+    "@aivo/enterprise-core": "workspace:*",
+    "@aivo/events": "workspace:*",
+    "@aivo/feature-flags": "workspace:*",
+    "@aivo/observability": "workspace:*",
+    "@fastify/cors": "^11.0.0",
+    "drizzle-orm": "^0.45.2",
+    "fastify": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.7.3",
+    "vitest": "^2.0.0"
+  }
+}

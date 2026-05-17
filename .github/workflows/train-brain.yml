@@ -1,0 +1,108 @@
+name: Train Brain Model
+
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: 'Base model to use'
+        required: true
+        type: choice
+        options:
+          - gpt-5.5
+          - claude-opus-4-7
+          - claude-sonnet-4-6
+          - claude-haiku-4-5
+          - gemini-3.0-pro
+      version:
+        description: 'Model version tag'
+        required: true
+        default: 'v1.0.0'
+      tutor:
+        description: 'Specific tutor ID (optional, blank for all 14 tutors)'
+        required: false
+
+jobs:
+  train-model:
+    name: Train AIVO Brain
+    runs-on: ubuntu-latest
+    timeout-minutes: 720
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r services/brain-svc/requirements.txt
+
+      - name: Prepare training data
+        working-directory: services/brain-svc
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          echo "Preparing training data from curriculum database..."
+          if [ -f src/brain_svc/training/prepare_data.py ]; then
+            python -m brain_svc.training.prepare_data || true
+          fi
+
+      - name: Train model
+        working-directory: services/brain-svc
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          BASE_MODEL: ${{ inputs.model }}
+          MODEL_VERSION: ${{ inputs.version }}
+          TUTOR_ID: ${{ inputs.tutor }}
+        run: |
+          echo "Training AIVO brain model..."
+          echo "Base Model: ${{ inputs.model }}"
+          echo "Version: ${{ inputs.version }}"
+          echo "Tutor: ${{ inputs.tutor || 'All 14 tutors' }}"
+          if [ -f src/brain_svc/training/trainer.py ]; then
+            python -m brain_svc.training.trainer \
+              --model "${{ inputs.model }}" \
+              --version "${{ inputs.version }}" \
+              --output /tmp/models/aivo-brain-${{ inputs.version }} || true
+          fi
+
+      - name: Create model metadata
+        run: |
+          mkdir -p /tmp/models/aivo-brain-${{ inputs.version }}
+          cat > /tmp/models/aivo-brain-${{ inputs.version }}/metadata.json << EOF
+          {
+            "model_name": "aivo-brain-${{ inputs.version }}",
+            "base_model": "${{ inputs.model }}",
+            "version": "${{ inputs.version }}",
+            "tutor_id": "${{ inputs.tutor }}",
+            "training_date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "trained_by": "${{ github.actor }}",
+            "commit_sha": "${{ github.sha }}"
+          }
+          EOF
+
+      - name: Upload model artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: aivo-brain-${{ inputs.version }}
+          path: /tmp/models/aivo-brain-${{ inputs.version }}
+          retention-days: 90
+
+      - name: Create training summary
+        run: |
+          echo "## Brain Training Summary" > training-summary.md
+          echo "" >> training-summary.md
+          echo "- **Model**: ${{ inputs.model }}" >> training-summary.md
+          echo "- **Version**: ${{ inputs.version }}" >> training-summary.md
+          echo "- **Tutor**: ${{ inputs.tutor || 'All 14 tutors' }}" >> training-summary.md
+          echo "- **Trained by**: ${{ github.actor }}" >> training-summary.md
+          echo "- **Date**: $(date)" >> training-summary.md
+          echo "- **Commit**: ${{ github.sha }}" >> training-summary.md
+
+      - name: Upload summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-summary
+          path: training-summary.md

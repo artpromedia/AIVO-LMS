@@ -1,0 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --trusted-navy: 210 73% 15%; /* #0a2540 */
+  --trusted-green: 159 80% 40%; /* #14b87f */
+  --trusted-green-hover: 159 80% 35%;
+  --trusted-periwinkle: 230 40% 96%;
+  --trusted-bg: 0 0% 99%;
+
+  --trusted-heading: 'Fraunces', serif;
+  --trusted-body: 'Inter', sans-serif;
+}
+
+.trusted-theme {
+  --background: var(--trusted-bg);
+  --foreground: var(--trusted-navy);
+  --primary: var(--trusted-navy);
+  --primary-foreground: 0 0% 100%;
+  --secondary: var(--trusted-green);
+  --secondary-foreground: 0 0% 100%;
+  --accent: var(--trusted-periwinkle);
+  --accent-foreground: var(--trusted-navy);
+  --muted: 210 20% 90%;
+  --muted-foreground: 210 20% 40%;
+  --card: 0 0% 100%;
+  --card-foreground: var(--trusted-navy);
+  --border: 210 20% 90%;
+  --ring: var(--trusted-green);
+
+  font-family: var(--trusted-body);
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+.trusted-theme h1,
+.trusted-theme h2,
+.trusted-theme h3,
+.trusted-theme h4,
+.trusted-theme h5,
+.trusted-theme h6 {
+  font-family: var(--trusted-heading);
+}

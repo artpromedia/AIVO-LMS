@@ -1,0 +1,58 @@
+# AIVO Code Owners
+#
+# Code owners are automatically requested for review when a pull request
+# touches the matching paths. The repository's branch protection rules
+# may also require approval from owners before a PR can be merged.
+#
+# Order matters: the LAST matching pattern takes precedence.
+# See https://docs.github.com/en/repositories/managing-your-repositories-settings-and-customizations/customizing-your-repository/about-code-owners
+#
+# Replace the placeholder team handles below with the real GitHub team
+# slugs (e.g. @artpromedia/security, @artpromedia/platform). Until those
+# teams exist, the @artpromedia/maintainers fallback ensures every PR
+# still gets an owner.
+
+# Default owners — every file ultimately requires a review from this set.
+*                                              @artpromedia/maintainers
+
+# Documentation
+/docs/                                         @artpromedia/maintainers
+/README.md                                     @artpromedia/maintainers
+/CONTRIBUTING.md                               @artpromedia/maintainers
+/CODE_OF_CONDUCT.md                            @artpromedia/maintainers
+
+# CI / build / release infrastructure
+/.github/                                      @artpromedia/maintainers
+/.github/workflows/                            @artpromedia/maintainers
+/turbo.json                                    @artpromedia/maintainers
+/pnpm-workspace.yaml                           @artpromedia/maintainers
+/docker/                                       @artpromedia/maintainers
+/infra/                                        @artpromedia/maintainers
+/.github/dependabot.yml                        @artpromedia/maintainers
+
+# Security-critical code — require security review
+/SECURITY.md                                   @artpromedia/maintainers
+/.gitleaks.toml                                @artpromedia/maintainers
+/packages/security/                            @artpromedia/maintainers
+/services/identity-svc/                        @artpromedia/maintainers
+/services/admin-svc/                           @artpromedia/maintainers
+/.github/workflows/security-scan.yml           @artpromedia/maintainers
+/.github/workflows/zap-baseline.yml            @artpromedia/maintainers
+/.github/workflows/codeql.yml                  @artpromedia/maintainers
+
+# Database schema & migrations — require DB owner review
+/packages/db/                                  @artpromedia/maintainers
+
+# AI / ML safety surface — require AI safety review
+/services/ai-svc/src/ai_svc/speech_buddy/      @artpromedia/maintainers
+/services/ai-svc/src/ai_svc/services/quality_gate.py    @artpromedia/maintainers
+/services/ai-svc/src/ai_svc/services/budget_caps.py     @artpromedia/maintainers
+/services/brain-svc/src/brain_svc/services/llm_gateway.py @artpromedia/maintainers
+
+# Compliance / legal pages on the public marketing site
+/apps/marketing/src/app/privacy-policy/        @artpromedia/maintainers
+/apps/marketing/src/app/terms-of-service/      @artpromedia/maintainers
+/apps/marketing/src/app/coppa-compliance/      @artpromedia/maintainers
+/apps/marketing/src/app/ferpa-compliance/      @artpromedia/maintainers
+/apps/marketing/src/components/marketing/TrustStrip.tsx @artpromedia/maintainers
+/LICENSE                                       @artpromedia/maintainers

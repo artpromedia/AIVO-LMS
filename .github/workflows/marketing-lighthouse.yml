@@ -1,0 +1,35 @@
+name: Marketing Lighthouse
+
+on:
+  pull_request:
+    paths:
+      - "apps/marketing/**"
+      - "packages/brand/**"
+      - "packages/ui/**"
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build marketing site
+        run: pnpm --filter @aivo/marketing build
+
+      - name: Run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli
+          lhci autorun || true
+        continue-on-error: true

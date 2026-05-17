@@ -1,0 +1,101 @@
+name: Infrastructure Deploy
+
+on:
+  push:
+    branches: [master, main]
+    paths:
+      - "infra/helm/**"
+  workflow_dispatch:
+
+concurrency:
+  group: infra-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  NAMESPACE: aivo
+  CHART_PATH: infra/helm/aivo-service
+  VALUES_FILE: infra/helm/values/hetzner.yaml
+  IMAGE_PREFIX: ghcr.io/artpromedia
+
+jobs:
+  deploy:
+    name: Deploy Services to Hetzner K3s
+    runs-on: [self-hosted, hetzner, production]
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify cluster reachable
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+          echo "Cluster is reachable"
+
+      - name: Setup Helm
+        run: |
+          if ! command -v helm &>/dev/null; then
+            curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+          fi
+          helm version
+
+      - name: Deploy all services
+        run: |
+          set -euo pipefail
+          NS="${{ env.NAMESPACE }}"
+
+          kubectl create namespace "$NS" --dry-run=client -o yaml | kubectl apply -f -
+
+          SERVICES=(
+            identity-svc assessment-svc brain-svc ai-svc learning-svc
+            tutor-svc family-svc engagement-svc billing-svc comms-svc
+            i18n-svc integrations-svc admin-svc status-page-svc research-svc
+            curriculum-svc
+          )
+
+          PYTHON_SERVICES=(brain-svc ai-svc)
+
+          FAILED=0
+          for svc in "${SERVICES[@]}"; do
+            PORT=3000
+            for ps in "${PYTHON_SERVICES[@]}"; do
+              if [ "$svc" = "$ps" ]; then
+                PORT=8000
+                break
+              fi
+            done
+
+            echo ""
+            echo "═══ Deploying $svc ═══"
+            helm upgrade --install "$svc" "${{ env.CHART_PATH }}" \
+              -f "${{ env.VALUES_FILE }}" \
+              --set serviceName="$svc" \
+              --set image.repository="${{ env.IMAGE_PREFIX }}" \
+              --set service.port=$PORT \
+              --set service.targetPort=$PORT \
+              -n "$NS" \
+              --timeout 5m \
+              --wait 2>&1 || {
+                echo "⚠  $svc deploy incomplete"
+                FAILED=$((FAILED + 1))
+              }
+          done
+
+          echo ""
+          echo "════════════════════════════════════════════════"
+          echo "  Deploy complete: $((${#SERVICES[@]} - FAILED))/${#SERVICES[@]} successful"
+          echo "════════════════════════════════════════════════"
+
+          if [ "$FAILED" -gt 0 ]; then
+            echo "::warning::$FAILED service(s) failed to deploy"
+          fi
+
+      - name: Verify rollout
+        run: |
+          kubectl -n ${{ env.NAMESPACE }} get pods --sort-by=.metadata.name -o wide
+          echo ""
+          kubectl -n ${{ env.NAMESPACE }} get deployments

@@ -1,0 +1,27 @@
+{
+  "name": "@aivo/tenant-svc",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aivo/audit-svc": "workspace:*",
+    "@aivo/enterprise-core": "workspace:*",
+    "@aivo/feature-flags": "workspace:*",
+    "@aivo/observability": "workspace:*",
+    "@fastify/cors": "^11.0.0",
+    "fastify": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.7.3",
+    "vitest": "^2.0.0"
+  }
+}

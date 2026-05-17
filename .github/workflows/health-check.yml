@@ -1,0 +1,89 @@
+name: Production Health Check
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # actions: read is kept for any future previous-run lookup tooling we add.
+  # lookup that decides whether a current success is a recovery worth
+  # announcing.
+  actions: read
+  # Needed by the "Create incident issue" step below — without this an
+  # explicit permissions: block would silently strip the default
+  # issues: write permission and the step would fail (masked by its
+  # continue-on-error).
+  issues: write
+
+jobs:
+  health-check:
+    name: Check Production Health
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Prepare reason capture
+        run: |
+          mkdir -p /tmp/healthcheck
+          : > /tmp/healthcheck/reason.txt
+
+      - name: Check Brain Service
+        id: brain_check
+        run: |
+          set -o pipefail
+          if [ -n "${{ secrets.BRAIN_SVC_URL }}" ]; then
+            response=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.BRAIN_SVC_URL }}/health" --max-time 10)
+            if [ "$response" != "200" ]; then
+              echo "Brain Service health check failed (HTTP $response)" | tee -a /tmp/healthcheck/reason.txt
+              exit 1
+            fi
+            echo "Brain Service is healthy"
+          else
+            echo "BRAIN_SVC_URL not configured, skipping"
+          fi
+
+      - name: Check Identity Service
+        id: identity_check
+        run: |
+          set -o pipefail
+          if [ -n "${{ secrets.IDENTITY_SVC_URL }}" ]; then
+            response=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.IDENTITY_SVC_URL }}/health" --max-time 10)
+            if [ "$response" != "200" ]; then
+              echo "Identity Service health check failed (HTTP $response)" | tee -a /tmp/healthcheck/reason.txt
+              exit 1
+            fi
+            echo "Identity Service is healthy"
+          else
+            echo "IDENTITY_SVC_URL not configured, skipping"
+          fi
+
+      - name: Check API endpoints
+        run: |
+          if [ -n "${{ secrets.API_BASE_URL }}" ]; then
+            for endpoint in "/health" "/api/status"; do
+              response=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.API_BASE_URL }}${endpoint}" --max-time 10)
+              if [ "$response" != "200" ]; then
+                echo "Endpoint ${endpoint} returned HTTP $response"
+              else
+                echo "Endpoint ${endpoint} is healthy"
+              fi
+            done
+          else
+            echo "API_BASE_URL not configured, skipping"
+          fi
+
+      - name: Create incident issue
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'Production Health Check Failed',
+              body: 'Automated health check detected issues in production. Immediate attention required.\n\nWorkflow: ' + context.workflow + '\nRun: ' + context.runId,
+              labels: ['incident', 'production', 'critical']
+            })
+        continue-on-error: true

@@ -1,0 +1,39 @@
+{
+  "name": "@aivo/tutor-svc",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@aivo/billing-entitlements": "workspace:*",
+    "@aivo/brand": "workspace:*",
+    "@aivo/content-pack": "workspace:*",
+    "@aivo/db": "workspace:*",
+    "@aivo/events": "workspace:*",
+    "@aivo/executive-function": "workspace:*",
+    "@aivo/observability": "workspace:*",
+    "@aivo/ops-alerts": "workspace:*",
+    "@aivo/pedagogy": "workspace:*",
+    "@aivo/scoring": "workspace:*",
+    "@aivo/security": "workspace:*",
+    "@aivo/skill-graphs": "workspace:*",
+    "@aivo/special-interest-engine": "workspace:*",
+    "@aivo/tutor-runtime": "workspace:*",
+    "@aivo/tutor-sdk": "workspace:*",
+    "@fastify/cors": "^11.0.0",
+    "@fastify/rate-limit": "^10.3.0",
+    "@fastify/swagger": "^9.6.0",
+    "@fastify/swagger-ui": "^5.2.2",
+    "@fastify/websocket": "^11.2.0",
+    "drizzle-orm": "^0.44.2",
+    "fastify": "^5.3.3"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.4",
+    "typescript": "^5.7.3"
+  }
+}

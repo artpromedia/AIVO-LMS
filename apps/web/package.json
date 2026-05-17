@@ -1,0 +1,45 @@
+{
+  "name": "@aivo/web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 5000 --turbopack",
+    "build": "node ../../scripts/next-build-with-ca.mjs",
+    "start": "next start",
+    "lint": "eslint src/ --ext .ts,.tsx",
+    "test": "tsx --test tests/unit/*.test.ts src/components/stage/__tests__/*.test.tsx src/components/homework/__tests__/*.test.tsx src/components/recommendations/__tests__/*.test.tsx"
+  },
+  "dependencies": {
+    "@aivo/billing-entitlements": "workspace:*",
+    "@aivo/brand": "workspace:*",
+    "@aivo/learner-surfaces": "workspace:*",
+    "@aivo/learner-ui": "workspace:*",
+    "@aivo/stage-runtime": "workspace:*",
+    "@aivo/stage-ui": "workspace:*",
+    "@aivo/tutor-surface-protocol": "workspace:*",
+    "@simplewebauthn/browser": "^11.0.0",
+    "lucide-react": "^0.513.0",
+    "next": "^15.3.3",
+    "next-intl": "^4.9.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.10.1",
+    "@csstools/postcss-color-mix-function": "^4.0.3",
+    "@csstools/postcss-oklab-function": "^5.0.3",
+    "@next/eslint-plugin-next": "^16.2.4",
+    "@tailwindcss/postcss": "^4.1.8",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.1.4",
+    "@types/react-dom": "^19.1.5",
+    "eslint": "^10.2.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "postcss": "^8.5.9",
+    "tailwindcss": "^4.1.8",
+    "tsx": "^4.19.4",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.58.2"
+  }
+}

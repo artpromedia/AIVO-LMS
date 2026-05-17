@@ -1,0 +1,95 @@
+{
+  "expo": {
+    "name": "AIVO Learning",
+    "slug": "aivo-learning",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./assets/images/icon.png",
+    "scheme": "aivo",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "backgroundColor": "#7C3AED",
+      "resizeMode": "contain"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "requireFullScreen": false,
+      "bundleIdentifier": "com.artpromedia.aivo",
+      "config": {
+        "usesNonExemptEncryption": false
+      },
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Aivo uses the microphone so learners can answer homework questions and language activities by speaking instead of typing."
+      },
+      "splash": {
+        "image": "./assets/images/splash-icon.png",
+        "backgroundColor": "#7C3AED",
+        "resizeMode": "contain"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#7C3AED"
+      },
+      "package": "com.artpromedia.aivo",
+      "splash": {
+        "image": "./assets/images/splash-icon.png",
+        "backgroundColor": "#7C3AED",
+        "resizeMode": "contain"
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/images/icon.png",
+      "splash": {
+        "image": "./assets/images/splash-icon.png",
+        "backgroundColor": "#7C3AED",
+        "resizeMode": "contain"
+      }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "backgroundColor": "#7C3AED",
+          "imageWidth": 200
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow AIVO to access your camera for homework capture and IEP uploads."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#7C3AED"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "0354260e-2cdf-4290-b00d-3847ef9513ba"
+      }
+    },
+    "owner": "iamofemeofem"
+  }
+}

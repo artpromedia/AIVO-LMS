@@ -1,0 +1,35 @@
+7s
+Run pnpm --filter @aivo/web lint
+.                                        |  WARN  Unsupported engine: wanted: {"node":">=22"} (current: {"node":"v20.20.2","pnpm":"10.26.1"})
+
+> @aivo/web@1.0.0 lint /home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web
+> eslint src/ --ext .ts,.tsx
+
+
+/home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web/src/app/dashboard/admin/compliance/evidence/page.tsx
+Error:   65:29  error  Definition for rule 'react-hooks/exhaustive-deps' was not found  react-hooks/exhaustive-deps
+
+/home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web/src/app/dashboard/district/settings/admins/page.tsx
+Error:   287:9  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+Error:   293:9  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+
+/home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web/src/app/dashboard/district/settings/branding/page.tsx
+Error:   191:16  error  Definition for rule '@next/next/no-img-element' was not found  @next/next/no-img-element
+Error:   214:15  error  Definition for rule '@next/next/no-img-element' was not found  @next/next/no-img-element
+
+/home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web/src/app/dashboard/district/usage/page.tsx
+Warning:   173:9   warning  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+Warning:   173:9   warning  Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+Warning:   174:11  warning  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+Error:   174:11  error    Non-interactive elements should not be assigned mouse or keyboard event listeners                                                                                                                  jsx-a11y/no-noninteractive-element-interactions
+
+/home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web/src/components/admin/StepUpModal.tsx
+Error:   189:17  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+Error:   210:17  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+
+✖ 11 problems (8 errors, 3 warnings)
+
+/home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @aivo/web@1.0.0 lint: `eslint src/ --ext .ts,.tsx`
+Exit status 1
+Error: Process completed with exit code 1.

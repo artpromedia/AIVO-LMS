@@ -1,0 +1,2278 @@
+AIVO Learning v2 — Granular Sprint Plan
+Global Build Rules for Every Sprint
+
+Every sprint must satisfy these rules before it is accepted:
+
+No dead buttons.
+No placeholder routes.
+No primary route returns 404.
+Every form has validation.
+Every API response uses the BFF success/failure shape.
+Every user-facing error has a retry or recovery path.
+Every route has loading, empty, error, and success states.
+Every protected route checks role, tenantId, and learner scope.
+Every new feature includes unit, integration, and Playwright coverage.
+Every learner-facing screen supports keyboard navigation and screen-reader labels.
+Every AI-generated object is validated before being persisted.
+
+Recommended stack:
+
+Frontend:
+Next.js App Router
+React
+TypeScript
+Tailwind
+shadcn-style components
+React Hook Form
+Zod
+TanStack Query or equivalent client data layer
+
+Backend/BFF:
+Next.js route handlers under /api/bff/*
+Service adapters behind the BFF
+Prisma or Drizzle ORM
+PostgreSQL
+Redis for generation/job state
+Object storage for IEP uploads
+
+AI:
+AI provider abstraction
+Prompt contracts
+JSON schema validation
+Retry/fallback handling
+Generation telemetry
+
+Testing:
+Vitest
+React Testing Library
+Playwright
+axe accessibility checks
+API contract tests
+Sprint 0 — Repository, Tooling, and Engineering Foundation
+Goal
+
+Create a clean production-grade foundation for building the full AIVO Learning v2 app.
+
+Build Scope
+Initialize monorepo or single-app repository.
+Set up Next.js App Router with TypeScript.
+Set up Tailwind and base design tokens.
+Set up linting, formatting, type checking, and test commands.
+Set up environment variable validation.
+Set up CI pipeline.
+Set up database client.
+Set up seed system.
+Set up logging and requestId middleware.
+Set up global error boundary.
+Set up not-found handling.
+Required Folders
+/apps/web
+/apps/web/app
+/apps/web/app/api/bff
+/apps/web/components
+/apps/web/components/ui
+/apps/web/components/layout
+/apps/web/components/forms
+/apps/web/lib
+/apps/web/lib/auth
+/apps/web/lib/bff
+/apps/web/lib/db
+/apps/web/lib/ai
+/apps/web/lib/validators
+/apps/web/lib/observability
+/apps/web/tests
+/apps/web/e2e
+Core Commands
+pnpm install
+pnpm dev
+pnpm build
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm e2e
+pnpm test:a11y
+Acceptance Criteria
+App boots locally.
+App builds successfully.
+CI runs lint, typecheck, unit tests, and Playwright smoke tests.
+Root page loads.
+Global 404 page exists.
+Global error page exists.
+Environment validation fails loudly when required variables are missing.
+Sprint 1 — Design System and App Shell
+Goal
+
+Build the visual and interaction foundation for parent, learner, teacher, and admin experiences.
+
+Build Scope
+Create global layout.
+Create authenticated app shell.
+Create role-aware navigation shell.
+Create parent shell.
+Create learner shell.
+Create teacher shell.
+Create admin shell.
+Create responsive layout system.
+Create base reusable UI components.
+Create accessibility preferences foundation.
+Components
+Button
+Card
+Badge
+Input
+Textarea
+Select
+Checkbox
+RadioGroup
+Progress
+Stepper
+Tabs
+Dialog
+Drawer
+Toast
+Skeleton
+EmptyState
+ErrorState
+RetryPanel
+PageHeader
+SectionHeader
+RoleNav
+LearnerAvatar
+SubjectIcon
+TutorBadge
+MissionCard
+LessonStepCard
+Routes
+/
+ /login
+ /signup
+ /parent/home
+ /learner/home
+ /teacher/home
+ /admin/school
+ /admin/district
+ /admin/platform
+ /settings/accessibility
+Acceptance Criteria
+Every listed route renders a complete screen.
+Each shell has navigation appropriate to the role.
+All navigation links point to real routes.
+App supports desktop, tablet, and mobile widths.
+Base components pass accessibility checks.
+Sprint 2 — Auth, Roles, Tenant Model, and Route Protection
+Goal
+
+Implement identity, role routing, tenant resolution, and protected access.
+
+Data Models
+User
+Tenant
+TenantMembership
+Role
+SessionProfile
+Required Roles
+parent
+learner
+teacher
+school_admin
+district_admin
+platform_admin
+BFF Routes
+GET /api/bff/me
+GET /api/bff/session
+POST /api/bff/auth/mock-login
+POST /api/bff/auth/logout
+
+Use mock auth for local development, but structure the code so Clerk/Auth.js/custom auth can be swapped in cleanly.
+
+Behavior
+Authenticated parent routes to /parent/home.
+Authenticated learner routes to /learner/home.
+Authenticated teacher routes to /teacher/home.
+School admin routes to /admin/school.
+District admin routes to /admin/district.
+Platform admin routes to /admin/platform.
+Unauthenticated users redirect to /login.
+Users cannot access routes outside their role.
+Acceptance Criteria
+Role routing works.
+Tenant resolution works.
+Unauthorized access is blocked.
+BFF returns userId, tenantId, role, and permissions.
+No route relies on client-only authorization.
+Sprint 3 — Core Database Schema and BFF Contract Layer
+Goal
+
+Implement the core data architecture before building learning workflows.
+
+Data Models
+User
+Tenant
+TenantMembership
+LearnerProfile
+ParentLearnerRelationship
+ParentAssessment
+IEPDocument
+AccommodationSummary
+LearnerBrainProfile
+AccessibilityPreferences
+Subject
+Skill
+MasteryMap
+SkillMastery
+BaselineAssessment
+BaselineQuestion
+BaselineAttempt
+LessonRun
+GeneratedLessonPlan
+LessonInteraction
+ParentProgressSummary
+QuestWorld
+QuestChapter
+QuestProgress
+HomeworkHelpSession
+TeacherAssignment
+AuditLog
+AiGenerationJob
+BillingAccount
+SupportTicket
+BFF Contract
+
+Every BFF route must return:
+
+type BffSuccess<T> = {
+  ok: true;
+  data: T;
+  requestId: string;
+};
+
+type BffFailure = {
+  ok: false;
+  error: {
+    code: string;
+    message: string;
+    userMessage: string;
+    retryable: boolean;
+  };
+  requestId: string;
+};
+Build Scope
+Create shared BFF response helpers.
+Create error normalization.
+Create requestId propagation.
+Create auth guard helper.
+Create tenant guard helper.
+Create learner scope guard helper.
+Create audit event helper.
+Create database seed script.
+Seed subjects and starter skills.
+Acceptance Criteria
+All models migrate successfully.
+Seed data loads.
+BFF helper is used by every existing API route.
+Errors are normalized.
+Audit helper can record user action, tenantId, learnerId, and metadata.
+Sprint 4 — Parent Home and Learner Management
+Goal
+
+Allow a parent to create and manage multiple learner profiles.
+
+Routes
+/parent/home
+/parent/learners
+/parent/learners/new
+/parent/learners/[learnerId]
+/parent/learners/[learnerId]/settings
+BFF Routes
+GET /api/bff/learners
+POST /api/bff/learners
+GET /api/bff/learners/:learnerId
+PATCH /api/bff/learners/:learnerId
+DELETE /api/bff/learners/:learnerId
+GET /api/bff/learners/:learnerId/readiness
+Learner Fields
+firstName
+preferredName
+ageRange
+gradeBand
+schoolContext
+primaryLanguage
+readingComfort
+mathComfort
+knownStrengths
+knownChallenges
+accessibilityDefaults
+Parent Home Should Show
+Learner cards
+Readiness state for each learner
+Next setup step
+Recent activity placeholder only when real data exists
+Add learner button
+Readiness States
+profile_created
+assessment_needed
+iep_optional
+baseline_needed
+ready_for_today_mission
+active_learning
+Acceptance Criteria
+Parent can create multiple learners.
+learnerId is distinct from userId.
+Every learner is attached to tenantId.
+Parent cannot access another tenant’s learner.
+Readiness state updates after learner creation.
+No learner management button is dead.
+Sprint 5 — Parent Assessment Flow
+Goal
+
+Collect learning context in a plain-language, non-clinical assessment.
+
+Routes
+/parent/learners/[learnerId]/assessment
+/parent/learners/[learnerId]/assessment/review
+BFF Routes
+GET /api/bff/learners/:learnerId/parent-assessment
+POST /api/bff/learners/:learnerId/parent-assessment
+PATCH /api/bff/learners/:learnerId/parent-assessment
+POST /api/bff/learners/:learnerId/parent-assessment/submit
+Assessment Sections
+Learning goals
+Grade and subject confidence
+Reading confidence
+Math confidence
+Attention and focus
+Communication style
+Sensory preferences
+Homework habits
+Frustration triggers
+Motivation preferences
+Known accommodations
+Preferred learning pace
+Parent concerns
+UX Requirements
+Multi-step wizard.
+Autosave after each step.
+Resume support.
+Progress indicator.
+Review screen before submit.
+Parent-friendly language.
+No diagnosis required.
+Acceptance Criteria
+Assessment can be started, saved, resumed, reviewed, and submitted.
+Assessment updates learner context.
+Parent sees the next step after completion.
+No clinical diagnosis is required.
+Answers persist after refresh.
+Sprint 6 — IEP Upload and Accommodation Summary
+Goal
+
+Support optional IEP/accommodation upload while protecting sensitive information.
+
+Routes
+/parent/learners/[learnerId]/iep
+/parent/learners/[learnerId]/iep/review
+BFF Routes
+POST /api/bff/learners/:learnerId/iep-upload
+GET /api/bff/learners/:learnerId/iep-upload
+DELETE /api/bff/learners/:learnerId/iep-upload
+POST /api/bff/learners/:learnerId/iep-upload/extract
+POST /api/bff/learners/:learnerId/iep-upload/skip
+Extraction Fields
+accommodations
+serviceAreas
+learningGoals
+assistiveTechnologyNeeds
+extendedTime
+readingSupport
+writingSupport
+behavioralSupport
+sensorySupport
+communicationSupport
+learnerSafeSummary
+parentSummary
+teacherSummary
+Safety Rules
+Raw IEP text must never appear in learner UI.
+Learner-facing language must be supportive and non-diagnostic.
+IEP upload must be optional.
+Parents can skip and continue to baseline.
+Files must be type-checked and size-limited.
+Acceptance Criteria
+Parent can upload PDF or document.
+Parent can skip IEP.
+Accommodation summary is generated or marked unavailable.
+Raw IEP text is protected.
+Learner-safe summary is separate from parent/teacher summaries.
+Readiness advances after upload or skip.
+Sprint 7 — Learner Brain Profile Generation
+Goal
+
+Create the personalization object used by baseline and lesson generation.
+
+Data Object
+LearnerBrainProfile:
+  learnerProfileSnapshot
+  parentAssessmentSummary
+  accommodationSummary
+  sensoryProfile
+  attentionProfile
+  readingComfort
+  mathComfort
+  preferredModalities
+  motivationProfile
+  frustrationTriggers
+  accessibilityPreferences
+  supportDefaults
+  masteryOverview
+  confidenceSignals
+  tutorPersonaRecommendation
+  updatedAt
+BFF Routes
+GET /api/bff/learners/:learnerId/context
+POST /api/bff/learners/:learnerId/context/generate
+GET /api/bff/learners/:learnerId/brain-profile
+POST /api/bff/learners/:learnerId/brain-profile/regenerate
+Build Scope
+Create AI profile-generation adapter.
+Create deterministic fallback profile when AI fails.
+Validate AI output with schema.
+Persist profile snapshots.
+Display parent-readable profile summary.
+Create support defaults from parent assessment and IEP data.
+Acceptance Criteria
+Brain profile is generated after assessment and IEP skip/upload.
+Profile includes learner context, support needs, and accessibility preferences.
+AI output is schema-validated.
+Failure state allows retry.
+Two different learners produce meaningfully different profiles.
+Sprint 8 — Personalized Baseline Generation
+Goal
+
+Generate a baseline assessment from learner profile, parent assessment, IEP/accommodations, grade band, and subject.
+
+Routes
+/learner/baseline
+/learner/baseline/[baselineId]
+/parent/learners/[learnerId]/baseline
+BFF Routes
+POST /api/bff/learners/:learnerId/baseline
+GET /api/bff/learners/:learnerId/baseline
+GET /api/bff/learners/:learnerId/baseline/:baselineId
+POST /api/bff/learners/:learnerId/baseline/:baselineId/start
+POST /api/bff/learners/:learnerId/baseline/:baselineId/answer
+POST /api/bff/learners/:learnerId/baseline/:baselineId/complete
+Baseline Requirements
+Questions must not be generic mock questions.
+Questions must reflect grade band and learner profile.
+Questions must honor accommodations.
+Question count should be short enough for low-friction onboarding.
+Baseline should cover initial reading/math or selected starting subject.
+Baseline should estimate mastery, confidence, and support needs.
+Baseline Question Shape
+type BaselineQuestion = {
+  id: string;
+  subjectId: string;
+  skillId: string;
+  prompt: string;
+  choices?: string[];
+  expectedAnswer?: string;
+  hint?: string;
+  readAloudText?: string;
+  difficulty: "foundational" | "approaching" | "grade_level" | "stretch";
+  accommodationTags: string[];
+};
+Acceptance Criteria
+Baseline generation target supports 2–15 second path where possible.
+Generation failure has retry.
+Baseline is personalized using brain profile.
+Baseline can be started, answered, completed, and scored.
+Results update mastery map.
+Results update learner readiness.
+Parent can see baseline completion summary.
+Sprint 9 — Mastery Map and Personalized Learning Path
+Goal
+
+Convert baseline results into a usable mastery model and next-step learning path.
+
+Data Models
+MasteryMap
+SkillMastery
+LearningPath
+LearningPathNode
+ReviewSchedule
+BFF Routes
+GET /api/bff/learners/:learnerId/mastery
+GET /api/bff/learners/:learnerId/learning-path
+POST /api/bff/learners/:learnerId/learning-path/generate
+GET /api/bff/learners/:learnerId/subjects
+GET /api/bff/learners/:learnerId/subjects/:subjectId
+Build Scope
+Create mastery scoring service.
+Map baseline responses to skills.
+Generate first learning path.
+Identify first recommended skill.
+Identify review candidates.
+Store mastery confidence score.
+Store recommended tutor persona per subject.
+Subject Pages
+Math
+Reading
+Writing
+Science
+Social Studies
+Homework Helper
+
+Each subject page must show:
+
+Current level
+Next skill
+Recent progress
+Recommended lesson
+Mastery status
+Tutor assigned
+Start lesson button
+Acceptance Criteria
+Baseline completion creates mastery map.
+Learning path exists before Today’s Mission.
+Subject pages show real learner-specific state.
+No subject Start button creates a lesson without learnerId and tenantId.
+Sprint 10 — LessonRun Core Engine
+Goal
+
+Implement the core learning unit that powers Today’s Mission, quests, homework, review, and assignments.
+
+Data Object
+LessonRun:
+  id
+  tenantId
+  learnerId
+  subjectId
+  source
+  sourceRefId
+  tutorPersona
+  learnerContextSnapshot
+  masterySnapshot
+  accommodationSnapshot
+  lessonPlan
+  status
+  startedAt
+  completedAt
+  createdAt
+  updatedAt
+Sources
+today_mission
+quest
+homework
+baseline_followup
+parent_assigned
+teacher_assigned
+review
+subject_path
+Statuses
+generating
+ready
+in_progress
+completed
+failed
+abandoned
+BFF Routes
+GET /api/bff/learners/:learnerId/lesson-runs
+POST /api/bff/learners/:learnerId/lesson-runs
+GET /api/bff/learners/:learnerId/lesson-runs/:lessonRunId
+POST /api/bff/learners/:learnerId/lesson-runs/:lessonRunId/start
+POST /api/bff/learners/:learnerId/lesson-runs/:lessonRunId/step
+POST /api/bff/learners/:learnerId/lesson-runs/:lessonRunId/complete
+POST /api/bff/learners/:learnerId/lesson-runs/:lessonRunId/retry
+Acceptance Criteria
+Every lesson starts from a LessonRun.
+No lesson starts without learnerId.
+No lesson starts without tenantId.
+LessonRun stores learner, mastery, and accommodation snapshots.
+LessonRun can be resumed after refresh.
+Failed LessonRun can retry.
+Sprint 11 — AI Tutor Lesson Generation
+Goal
+
+Generate personalized tutor-led lessons using learner context, accommodations, mastery history, and subject goals.
+
+Lesson Plan Shape
+type GeneratedLessonPlan = {
+  title: string;
+  objective: string;
+  estimatedMinutes: number;
+  tutorPersona: string;
+  tutorGreeting: string;
+  storyHook: string;
+  microLesson: string;
+  example: {
+    prompt: string;
+    explanation: string;
+  };
+  guidedPractice: Array<{
+    prompt: string;
+    expectedAnswer?: string;
+    choices?: string[];
+    hint: string;
+    scaffold: string;
+    skillId: string;
+  }>;
+  checksForUnderstanding: Array<{
+    prompt: string;
+    expectedAnswer?: string;
+    choices?: string[];
+    supportIfWrong: string;
+  }>;
+  accessibilitySupports: string[];
+  encouragement: string;
+  parentSummary: string;
+  nextRecommendedStep: string;
+};
+Build Scope
+Create tutor generation prompt contract.
+Create AI adapter interface.
+Create local mock AI provider.
+Create production AI provider adapter.
+Create JSON schema validation.
+Create repair/retry flow for malformed AI output.
+Persist generated lesson plan.
+Record AI latency, success, failure, retry count, and token metadata where available.
+Acceptance Criteria
+Lesson generation uses brain profile.
+Lesson generation uses mastery map.
+Lesson generation uses accommodation snapshot.
+Lesson generation produces valid lesson JSON.
+Invalid lesson output is rejected and retried.
+Generated lessons differ for learners with different profiles.
+Sprint 12 — Learner Profile Selection and Learner Home
+Goal
+
+Create the learner entry experience centered on the next best action.
+
+Routes
+/learner/select
+/learner/home
+/learner/subjects
+/learner/progress
+BFF Routes
+GET /api/bff/active-learner
+POST /api/bff/active-learner
+GET /api/bff/learners/:learnerId/today
+POST /api/bff/learners/:learnerId/today/start
+Learner Home Must Show
+Today’s Mission
+Tutor
+Subject
+Goal
+Estimated time
+Why this lesson matters
+Start or continue button
+Secondary links to subjects, quests, homework helper, and progress
+Today’s Mission Priority
+1. Resume in-progress lesson.
+2. Continue active quest lesson.
+3. Address baseline weakness.
+4. Continue next unmastered skill.
+5. Schedule review.
+6. Parent-assigned lesson.
+7. Teacher-assigned lesson.
+Acceptance Criteria
+Learner can select profile.
+Active learner persists.
+Learner home always shows one clear next action.
+Today’s Mission creates or resumes a LessonRun.
+Learner cannot access another learner’s data.
+Sprint 13 — Lesson Player
+Goal
+
+Build the core learner-facing lesson experience.
+
+Route
+/learner/lesson-runs/[lessonRunId]
+Lesson Flow
+Welcome
+Goal
+Story hook
+Micro-lesson
+Example
+Guided practice
+Hint/scaffold
+Check understanding
+Celebration
+Progress update
+Next step
+UX Requirements
+One step at a time.
+Large buttons.
+Read-aloud support.
+Hint button.
+Clear progress.
+Low clutter.
+Friendly tutor presence.
+Keyboard accessibility.
+Reduced-motion support.
+High-contrast support.
+Dyslexia-friendly text option.
+Break button.
+Resume after refresh.
+Interaction Events
+lesson_started
+lesson_step_viewed
+hint_requested
+scaffold_used
+answer_submitted
+answer_correct
+answer_incorrect
+lesson_completed
+lesson_abandoned
+Acceptance Criteria
+Learner can complete a generated lesson.
+Hint and scaffold buttons work.
+Progress autosaves.
+Refresh resumes the same step.
+Completion updates LessonRun status.
+Completion updates mastery.
+Completion creates parent summary.
+Sprint 14 — Progress, Mastery Updates, and Parent Summary
+Goal
+
+Update learning state after lessons and make progress understandable to parents.
+
+Routes
+/parent/learners/[learnerId]/progress
+/parent/learners/[learnerId]/lessons
+/parent/learners/[learnerId]/summary
+/learner/progress
+BFF Routes
+GET /api/bff/learners/:learnerId/progress
+GET /api/bff/learners/:learnerId/progress/recent-lessons
+GET /api/bff/learners/:learnerId/progress/summary
+GET /api/bff/learners/:learnerId/progress/subjects
+POST /api/bff/learners/:learnerId/progress/recalculate
+Parent Dashboard Should Show
+What child worked on
+What child practiced
+What went well
+Where child needed help
+What supports AIVO used
+Recommended next step
+Subject progress
+Lesson history
+IEP/accommodation alignment
+Parent-Friendly Language Examples
+AIVO gave shorter steps today.
+AIVO used read-aloud support.
+Your child needed one extra hint on subtraction.
+A short review tomorrow may help.
+Acceptance Criteria
+Parent sees real completed lesson history.
+Parent sees plain-language summary.
+Parent does not see raw technical AI data.
+Parent does not see raw IEP text in progress view.
+Mastery updates after completed LessonRun.
+Next recommendation updates after completion.
+Sprint 15 — Accessibility Preferences and Adaptive Supports
+Goal
+
+Make accessibility and neurodiversity support part of the core product, not a settings afterthought.
+
+Routes
+/parent/learners/[learnerId]/accessibility
+/learner/settings/accessibility
+BFF Routes
+GET /api/bff/learners/:learnerId/accessibility
+PATCH /api/bff/learners/:learnerId/accessibility
+POST /api/bff/learners/:learnerId/accessibility/reset
+Preferences
+readAloud
+largeText
+dyslexiaFriendlyFont
+highContrast
+reducedMotion
+shorterSteps
+extraHints
+visualSupports
+breakReminders
+keyboardOptimized
+Acceptance Criteria
+Accessibility settings affect learner UI.
+Accessibility settings are used in lesson generation.
+Settings persist.
+Parent can adjust learner settings.
+Learner can adjust safe display preferences.
+Lesson player honors reduced motion, large text, and high contrast.
+Sprint 16 — Quest Worlds and Gamified Learning
+Goal
+
+Build quests as a motivational wrapper around real personalized LessonRuns.
+
+Routes
+/learner/quests
+/learner/quests/[worldId]
+/learner/quests/[worldId]/chapters/[chapterId]
+BFF Routes
+GET /api/bff/learners/:learnerId/quests
+GET /api/bff/learners/:learnerId/quests/:worldId
+POST /api/bff/learners/:learnerId/quests/:worldId/chapters/:chapterId/start
+POST /api/bff/learners/:learnerId/quests/:worldId/chapters/:chapterId/complete
+GET /api/bff/learners/:learnerId/quests/:worldId/progress
+Build Scope
+Create quest world list.
+Create quest chapter map.
+Seed starter quest worlds.
+Connect chapter start to LessonRun creation.
+Create boss challenge unlock logic.
+Award XP and coins after real lesson completion.
+Update quest progress only from completed LessonRun.
+Acceptance Criteria
+Quest chapter creates LessonRun.
+Quest progress depends on lesson completion.
+No fake Complete Activity button exists.
+Boss challenge unlocks only after required chapters.
+XP and coins are awarded only after real completion.
+Sprint 17 — Homework Helper
+Goal
+
+Let learners or parents enter a homework problem and receive guided help without simply giving answers.
+
+Routes
+/learner/homework
+/learner/homework/[sessionId]
+/parent/learners/[learnerId]/homework
+BFF Routes
+POST /api/bff/learners/:learnerId/homework
+GET /api/bff/learners/:learnerId/homework/:sessionId
+POST /api/bff/learners/:learnerId/homework/:sessionId/message
+POST /api/bff/learners/:learnerId/homework/:sessionId/complete
+Behavior
+Identify subject.
+Ask clarifying question if needed.
+Explain concept.
+Guide step-by-step.
+Adapt to learner profile.
+Avoid simply giving final answer.
+Save helpful learning insight.
+Optionally create follow-up LessonRun.
+Acceptance Criteria
+Homework Helper creates a session.
+Tutor responds using learner profile.
+Tutor guides rather than simply answers.
+Session can be resumed.
+Helpful learning insight is saved.
+Parent can see that homework support occurred.
+Sprint 18 — Teacher Dashboard and Assignments
+Goal
+
+Give teachers visibility into assigned learners, progress, support usage, and assignment tools.
+
+Routes
+/teacher/home
+/teacher/learners
+/teacher/learners/[learnerId]
+/teacher/assignments
+/teacher/assignments/new
+BFF Routes
+GET /api/bff/teacher/learners
+GET /api/bff/teacher/learners/:learnerId
+GET /api/bff/teacher/learners/:learnerId/progress
+POST /api/bff/teacher/assignments
+GET /api/bff/teacher/assignments
+PATCH /api/bff/teacher/assignments/:assignmentId
+DELETE /api/bff/teacher/assignments/:assignmentId
+Teacher Views
+Assigned learners
+Recent lessons
+Skill gaps
+Mastery progress
+Lesson history
+Support used
+Assignment creation
+Class trends
+Privacy Rules
+Teacher sees support needs relevant to instruction.
+Teacher does not see unnecessary raw IEP content.
+Teacher access is scoped by tenant and roster.
+Teacher assignment must create a valid source for LessonRun.
+Acceptance Criteria
+Teacher can view assigned learners.
+Teacher can view learner progress.
+Teacher can create an assignment.
+Learner can receive teacher-assigned lesson as Today’s Mission priority.
+Teacher cannot access unauthorized learners.
+Sprint 19 — School, District, and Platform Admin
+Goal
+
+Build operational administration for tenants, users, monitoring, billing overview, and support.
+
+Routes
+/admin/school
+/admin/school/users
+/admin/school/learners
+/admin/school/reports
+/admin/district
+/admin/district/schools
+/admin/district/reports
+/admin/platform
+/admin/platform/tenants
+/admin/platform/users
+/admin/platform/ai-generation
+/admin/platform/audit-logs
+/admin/platform/billing
+/admin/platform/support
+/admin/platform/system-health
+BFF Routes
+GET /api/bff/admin/tenants
+POST /api/bff/admin/tenants
+PATCH /api/bff/admin/tenants/:tenantId
+GET /api/bff/admin/users
+PATCH /api/bff/admin/users/:userId
+GET /api/bff/admin/audit-logs
+GET /api/bff/admin/ai-generation
+GET /api/bff/admin/billing
+GET /api/bff/admin/support
+GET /api/bff/admin/system-health
+Admin Features
+Tenant management
+User management
+School/district hierarchy
+Audit logs
+Billing overview
+AI generation monitoring
+Safety monitoring
+Support tooling
+System health
+Usage metrics
+Acceptance Criteria
+Admins can view data scoped to their role.
+Platform admin can view all tenants.
+School admin cannot view other schools.
+District admin can view schools in district.
+AI generation failures are visible.
+Audit logs capture key events.
+Sprint 20 — Observability, Safety, and AI Governance
+Goal
+
+Make the system observable, debuggable, and safe enough for child-centered learning.
+
+Metrics
+lesson_generation_success_rate
+lesson_generation_latency
+lesson_generation_failure_count
+lesson_generation_retry_count
+baseline_generation_latency
+baseline_completion_rate
+lesson_completion_rate
+hint_usage_rate
+drop_off_step
+quest_completion_rate
+homework_helper_usage
+parent_onboarding_completion
+Safety Controls
+Tutor language guardrails
+Age-appropriate responses
+No diagnostic labeling in learner UI
+No raw IEP exposure in learner UI
+AI schema validation
+AI prompt/version logging
+Generation retry policy
+Admin visibility into failures
+Build Scope
+Create event tracking service.
+Create generation telemetry records.
+Create safety validator for generated lessons.
+Create admin AI monitoring views.
+Create request tracing across BFF and services.
+Create structured logs.
+Acceptance Criteria
+Every AI generation has status, latency, prompt version, and result state.
+Failed generations appear in admin monitoring.
+Lesson safety validation runs before persistence.
+Unsafe or malformed lesson output is blocked.
+Tutor language remains supportive and non-diagnostic.
+Sprint 21 — Billing, Subscription Readiness, and Account Settings
+Goal
+
+Prepare the product for family, school, and district account operations.
+
+Routes
+/parent/settings
+/parent/settings/billing
+/parent/settings/account
+/admin/platform/billing
+/admin/school/billing
+/admin/district/billing
+Build Scope
+Create billing account model.
+Create plan model.
+Create subscription status model.
+Create parent account settings.
+Create tenant billing overview.
+Create mock payment state for development.
+Create upgrade/downgrade-ready service abstraction.
+Billing States
+trial
+active
+past_due
+paused
+cancelled
+school_paid
+district_paid
+platform_grant
+Acceptance Criteria
+Parent can view account settings.
+Billing status can be represented.
+School/district paid status can be represented.
+Billing does not block core local development.
+Billing hooks can later connect to Stripe or equivalent provider.
+Sprint 22 — End-to-End QA, Route Audit, and Dead Button Elimination
+Goal
+
+Verify that the entire application works from scratch across primary user journeys.
+
+E2E Journeys
+Parent signs up.
+Parent creates learner.
+Parent completes assessment.
+Parent skips IEP.
+System generates brain profile.
+System generates baseline.
+Learner selects profile.
+Learner completes baseline.
+System creates mastery map.
+Learner starts Today’s Mission.
+LessonRun is generated.
+Learner completes lesson.
+Parent sees progress summary.
+Learner starts quest chapter.
+Quest chapter creates LessonRun.
+Quest progress updates after lesson completion.
+Teacher creates assignment.
+Learner receives teacher-assigned mission.
+Admin views AI generation logs.
+Automated Audits
+Route audit
+Button/link audit
+Form validation audit
+Role access audit
+Tenant isolation audit
+Accessibility audit
+AI failure/retry audit
+Refresh/resume audit
+Acceptance Criteria
+No primary route returns 404.
+No primary button is dead.
+All primary journeys pass Playwright.
+All role protections pass.
+All tenant isolation tests pass.
+Lesson resume works after refresh.
+Generation failure retry works.
+Accessibility checks pass for primary learner and parent routes.
+Sprint 23 — Performance, Hardening, and Production Release
+Goal
+
+Prepare the application for production deployment.
+
+Performance Targets
+Learner home loads within 2 seconds.
+Cached lesson opens within 1 second.
+New lesson generation target supports 2–15 seconds where provider latency allows.
+Baseline generation target supports 2–15 seconds where provider latency allows.
+BFF routes return normalized errors under failure.
+Build Scope
+Optimize bundle size.
+Add route-level loading states.
+Add caching for learner home, subject state, and ready LessonRuns.
+Add generation timeout handling.
+Add retry backoff.
+Add database indexes.
+Add rate limits on AI routes.
+Add file upload limits.
+Add production environment checks.
+Add security headers.
+Add deployment documentation.
+Acceptance Criteria
+Production build passes.
+Database indexes exist for learnerId, tenantId, lessonRun status, and generation jobs.
+AI generation timeout is handled gracefully.
+File upload abuse is limited.
+Protected routes remain protected in production mode.
+Smoke test passes on deployed environment.
+Final Release Gate
+
+AIVO Learning v2 is ready for release only when this full path works without manual intervention:
+
+Parent creates learner
+Parent completes assessment
+Parent uploads or skips IEP
+AIVO creates learner brain profile
+AIVO generates personalized baseline
+Learner completes baseline
+AIVO creates mastery map
+Learner receives Today’s Mission
+AIVO creates LessonRun
+Tutor generates personalized lesson
+Learner completes lesson
+AIVO updates mastery and progress
+Parent sees plain-language summary
+Learner can continue through subjects, quests, homework, and review
+Teacher can assign lessons
+Admin can monitor users, tenants, audit logs, and AI generation
+
+Non-negotiable release rules:
+
+No mock baseline questions in production learner flow.
+No static fake lesson completion.
+No quest progress without real LessonRun completion.
+No raw IEP text in learner UI.
+No session.user.id used as learnerId.
+No generated lesson without learner context.
+No unhandled AI failure.
+No primary user journey blocked by a dead route, button, or form.
+Short answer: Almost, but not quite. The plan is unusually thorough and would produce a working v2 if executed faithfully — the global build rules, BFF contract, LessonRun-centric data model, and the explicit "no dead buttons / no mock baselines / no fake quest progress" gates are exactly what's needed to avoid the typical demo-ware trap. The core loop (parent → assessment → IEP → brain profile → baseline → mastery → LessonRun → Today's Mission → progress) is fully specified end-to-end.
+
+What's missing or under-specified, in rough priority:
+
+Auth is hand-waved. Sprint 2 says "mock auth, swap in Clerk/Auth.js later." That swap is never scheduled, and real auth (password reset, email verification, parent↔learner consent, COPPA/FERPA flows for under-13 learners) is a sprint of its own, not a footnote.
+Compliance & data governance. No sprint covers COPPA, FERPA, GDPR/CCPA, data retention, parental consent records, data export/deletion (DSAR), or the legal basis for storing IEP documents. For a K-12 product with IEPs, this is a blocker, not a polish item.
+Content/curriculum source of truth. Subjects and skills are "seeded" in Sprint 3, but there's no sprint for the standards alignment (CCSS, NGSS, state standards), the skill graph itself, or how curriculum is authored/versioned. The AI can't generate grade-appropriate lessons against a skill tree that doesn't exist.
+Voice / read-aloud / TTS infrastructure. Read-aloud is referenced repeatedly (baseline, lesson player, accessibility) but never built — no TTS provider, no audio caching, no pronunciation handling.
+Real-time / sync. Lesson resume after refresh is covered, but multi-device sync, offline mode, and the "learner on iPad while parent watches on phone" scenario aren't.
+Notifications. Parent progress summaries, teacher assignment alerts, streak reminders — no email/push/SMS sprint.
+Rostering & SIS integration. Teacher dashboards assume rosters exist; Clever/ClassLink/OneRoster import isn't scheduled. School/district sales will demand it.
+Safety/abuse specifics. Sprint 20 lists "tutor language guardrails" as a bullet, but there's no sprint defining the moderation pipeline, prompt-injection defense for Homework Helper (learner-pasted text is untrusted input to an LLM), self-harm/crisis escalation paths, or human-in-the-loop review.
+Billing is a stub. Sprint 21 explicitly defers Stripe. Real subscription, proration, seat management for schools, and PO/invoicing for districts is its own multi-sprint effort.
+Migration/seed for existing v1 users, if any, is absent.
+Cost controls on AI. No per-tenant generation budgets, caching of similar lessons, or provider failover beyond "retry."
+Also worth flagging: the "2–15 second" generation target in Sprints 8/11/23 is aspirational for a multi-section lesson plan from a frontier model — plan for streaming UI and a "preparing your lesson" experience, not a hard latency SLO.
+
+Bottom line: as written, you'll ship a complete, demonstrable core loop. To ship a product schools and parents can actually pay for and trust with kids, add sprints for auth+consent, compliance, curriculum/standards, TTS, rostering, notifications, AI safety pipeline, and real billing — call it Sprints 24–30. Want me to draft those?
+
+I’ll extend the plan with the missing production-grade sprints rather than replacing the original sequence. I’ll also treat compliance, consent, curriculum, safety, and school operations as release-blocking workstreams, not post-launch polish.
+
+Thought for 32s
+
+Yes. I would add these as Sprints 24–30 before final production release, then move the earlier “Performance, Hardening, and Production Release” sprint to the end.
+
+The original sprint plan already covers the core AIVO v2 learning loop from the PRD: parent setup, learner profile, IEP/accommodations, brain profile, personalized baseline, mastery map, LessonRun, Today’s Mission, lesson player, parent progress, quests, teacher/admin workflows.
+
+These additional sprints make it school-ready, parent-trustworthy, and commercially deployable.
+
+Sprint 24 — Real Auth, Identity, Consent, and Under-13 Flows
+Goal
+
+Replace mock auth with production authentication, verified parent identity, learner consent handling, and role-safe account creation.
+
+COPPA applies to operators of online services directed to children under 13 or services with actual knowledge that they collect personal information from children under 13, so AIVO must treat child account creation, parent consent, and data collection as core product infrastructure.
+
+Build Scope
+Replace mock auth with production auth.
+Implement email/password login.
+Implement social login only if compliant with child-data policy.
+Implement email verification.
+Implement password reset.
+Implement MFA-ready account model.
+Implement parent account verification.
+Implement learner profile activation by parent.
+Implement child account linking.
+Implement consent records.
+Implement role-safe onboarding.
+Implement session expiration and refresh.
+Implement account recovery.
+Required Data Models
+AuthAccount
+VerifiedEmail
+PasswordResetToken
+ParentVerification
+LearnerAccountLink
+ConsentRecord
+ConsentVersion
+TermsAcceptance
+PrivacyPolicyAcceptance
+AgeGateRecord
+SessionAudit
+Required Consent Types
+parent_account_terms
+parent_privacy_policy
+child_data_collection
+iep_document_storage
+ai_personalization
+school_roster_import
+teacher_access
+marketing_opt_in
+data_export_request
+data_deletion_request
+Routes
+/signup
+/login
+/verify-email
+/forgot-password
+/reset-password
+/parent/consent
+/parent/consent/[learnerId]
+/parent/account/security
+/learner/activation
+BFF Routes
+POST /api/bff/auth/signup
+POST /api/bff/auth/login
+POST /api/bff/auth/logout
+POST /api/bff/auth/verify-email
+POST /api/bff/auth/request-password-reset
+POST /api/bff/auth/reset-password
+
+GET /api/bff/consent
+POST /api/bff/consent
+GET /api/bff/learners/:learnerId/consent
+POST /api/bff/learners/:learnerId/consent
+POST /api/bff/learners/:learnerId/link-account
+Acceptance Criteria
+No production route depends on mock auth.
+Parent email verification is required before learner data collection.
+Every learner has a parent/guardian consent state.
+Consent version is stored.
+Consent timestamp, IP hash, user agent, and policy version are recorded.
+Learner cannot self-create a full under-13 account without parent consent.
+Parent can revoke optional consents.
+Revoked consent disables affected features without deleting required audit records.
+Sprint 25 — Privacy, Compliance, Data Governance, and DSAR
+Goal
+
+Implement the legal and operational data controls required for a child-centered K–12 platform.
+
+FERPA protects education records, and the U.S. Department of Education describes education records as records directly related to a student and maintained by an educational agency, institution, or a party acting for it. FERPA also requires records of certain requests for access to and disclosures of personally identifiable information from education records.
+
+For broader privacy readiness, GDPR includes data subject rights such as access, rectification, erasure, restriction, portability, objection, and rights related to automated decision-making; California’s CCPA gives California consumers rights over personal information collected by businesses.
+
+Build Scope
+Create data inventory.
+Classify all data types.
+Create privacy policy versioning.
+Create data retention rules.
+Create data export workflow.
+Create data deletion workflow.
+Create FERPA disclosure log.
+Create IEP document governance.
+Create child data access controls.
+Create data minimization checks.
+Create school data processing agreement support.
+Create parent data request dashboard.
+Create admin compliance console.
+Data Classification
+public
+account_data
+parent_data
+learner_profile_data
+education_record
+iep_sensitive_document
+ai_generated_learning_data
+usage_telemetry
+billing_data
+support_data
+security_audit_data
+Required Data Models
+DataInventoryItem
+DataRetentionPolicy
+DataProcessingPurpose
+DisclosureLog
+DataExportRequest
+DataDeletionRequest
+PrivacyRequest
+IEPDocumentAccessLog
+PolicyVersion
+DPARecord
+SubprocessorRecord
+Routes
+/parent/privacy
+/parent/privacy/data-export
+/parent/privacy/delete-data
+/admin/platform/compliance
+/admin/platform/compliance/data-inventory
+/admin/platform/compliance/disclosures
+/admin/platform/compliance/retention
+/admin/platform/compliance/dsar
+BFF Routes
+GET /api/bff/privacy/data-inventory
+POST /api/bff/privacy/export-request
+GET /api/bff/privacy/export-request/:requestId
+POST /api/bff/privacy/delete-request
+GET /api/bff/privacy/delete-request/:requestId
+
+GET /api/bff/admin/compliance/disclosures
+POST /api/bff/admin/compliance/disclosures
+GET /api/bff/admin/compliance/retention
+PATCH /api/bff/admin/compliance/retention
+Acceptance Criteria
+Every sensitive data object has a classification.
+Every IEP document access is logged.
+Parent can request data export.
+Parent can request deletion.
+Admin can review DSAR status.
+FERPA-style disclosure log exists.
+Retention policy can be configured by data type.
+Raw IEP files can be deleted while preserving lawful audit metadata.
+Subprocessor list can be maintained.
+Sprint 26 — Curriculum Source of Truth, Standards Alignment, and Skill Graph
+Goal
+
+Build the academic backbone that AI generation depends on.
+
+AIVO cannot reliably generate grade-appropriate lessons unless there is a structured curriculum source of truth. Common Core provides math and English language arts standards, NGSS defines K–12 science content expectations, and many states maintain their own academic standards; AIVO should support standards alignment rather than relying only on generic subject labels.
+
+Build Scope
+Create standards framework model.
+Create standards import pipeline.
+Create subject-skill graph.
+Create grade-band progression.
+Create prerequisite mapping.
+Create skill versioning.
+Create lesson objective templates.
+Create assessment blueprint templates.
+Create curriculum admin screens.
+Create AI generation constraints based on skill graph.
+Required Data Models
+StandardsFramework
+StandardDocument
+Standard
+Subject
+Domain
+Skill
+SkillPrerequisite
+GradeBand
+SkillVersion
+CurriculumMap
+LessonObjectiveTemplate
+AssessmentBlueprint
+CurriculumImportJob
+Supported Frameworks for Initial Build
+Common Core Math
+Common Core ELA
+NGSS Science
+State standards placeholder framework
+AIVO proprietary skill extensions
+Routes
+/admin/platform/curriculum
+/admin/platform/curriculum/frameworks
+/admin/platform/curriculum/subjects
+/admin/platform/curriculum/skills
+/admin/platform/curriculum/import
+/admin/platform/curriculum/versioning
+BFF Routes
+GET /api/bff/curriculum/frameworks
+POST /api/bff/curriculum/frameworks
+GET /api/bff/curriculum/subjects
+POST /api/bff/curriculum/subjects
+GET /api/bff/curriculum/skills
+POST /api/bff/curriculum/skills
+PATCH /api/bff/curriculum/skills/:skillId
+POST /api/bff/curriculum/import
+GET /api/bff/curriculum/import/:jobId
+AI Generation Rules
+Every baseline question must reference a skillId.
+Every lesson objective must reference a skillId.
+Every LessonRun must reference subjectId and skillId.
+Every skill must map to grade band.
+Every generated lesson must stay within allowed skill scope.
+Every generated assessment must include expected mastery signal.
+Acceptance Criteria
+Subjects are no longer only static seed rows.
+Skill graph exists.
+Skills have prerequisites.
+Skills map to grade bands.
+Skills can map to standards.
+Baseline generation uses assessment blueprints.
+Lesson generation uses skill objectives.
+Admin can view and update curriculum records.
+AI cannot generate a lesson without a valid skill target.
+Sprint 27 — AI Safety, Moderation, Prompt-Injection Defense, and Crisis Handling
+Goal
+
+Create a real AI safety pipeline for tutoring, homework help, child interaction, and uploaded or pasted user content.
+
+Homework Helper is especially sensitive because learner-pasted text is untrusted input. It can contain prompt injection, unsafe content, personally identifying information, or crisis language.
+
+Build Scope
+Create moderation pipeline.
+Create prompt-injection scanner.
+Create unsafe-content classifier.
+Create self-harm and crisis escalation flow.
+Create child-safe tutor response policy.
+Create lesson safety validator.
+Create homework input sanitizer.
+Create human review queue.
+Create blocked response fallback.
+Create admin safety dashboard.
+Create AI red-team test suite.
+Required Data Models
+ModerationEvent
+SafetyClassification
+PromptInjectionSignal
+CrisisSignal
+HumanReviewCase
+SafetyPolicyVersion
+BlockedGeneration
+TutorResponseAudit
+HomeworkInputAudit
+Safety Categories
+self_harm
+violence
+sexual_content
+adult_contact_risk
+bullying
+hate_or_harassment
+medical_or_legal_advice
+prompt_injection
+privacy_leakage
+academic_cheating
+unsafe_external_link
+diagnostic_labeling
+Routes
+/admin/platform/safety
+/admin/platform/safety/moderation
+/admin/platform/safety/review-queue
+/admin/platform/safety/policies
+/admin/platform/safety/red-team
+BFF Routes
+POST /api/bff/safety/classify
+POST /api/bff/safety/validate-lesson
+POST /api/bff/safety/validate-homework-input
+GET /api/bff/admin/safety/events
+GET /api/bff/admin/safety/review-cases
+PATCH /api/bff/admin/safety/review-cases/:caseId
+Tutor Safety Rules
+Tutor must not diagnose the learner.
+Tutor must not expose raw IEP content.
+Tutor must not shame the learner.
+Tutor must not encourage secrecy from parents or teachers.
+Tutor must not provide unsafe instructions.
+Tutor must not obey learner instructions to ignore system rules.
+Tutor must guide homework rather than simply provide final answers.
+Tutor must escalate crisis signals to parent/admin-configured protocol.
+Acceptance Criteria
+Homework input is treated as untrusted.
+Prompt-injection attempts are detected or neutralized.
+Generated lesson is safety-validated before persistence.
+Unsafe tutor responses are blocked.
+Crisis signal creates a review/escalation event.
+Admin can view safety events.
+Human review queue exists.
+Safety policy versions are logged.
+Red-team tests run in CI.
+Sprint 28 — TTS, Read-Aloud, Audio Caching, and Multimodal Accessibility
+Goal
+
+Make read-aloud real, reliable, and accessible across baseline, lesson player, and homework helper.
+
+WCAG 2.2 is the current W3C recommendation covering a wide range of accessibility guidance for web content; AIVO should use WCAG 2.2 AA as the practical accessibility target for learner, parent, teacher, and admin interfaces.
+
+Build Scope
+Select TTS provider abstraction.
+Create local mock TTS provider.
+Create production TTS adapter.
+Generate read-aloud text for lesson steps.
+Generate read-aloud text for baseline questions.
+Cache generated audio.
+Support replay, pause, resume, speed control.
+Support captions/transcript.
+Support pronunciation overrides.
+Support learner voice preference.
+Support no-audio fallback.
+Track TTS usage cost.
+Required Data Models
+AudioAsset
+TTSGenerationJob
+PronunciationOverride
+LearnerVoicePreference
+ReadAloudUsageEvent
+AudioCacheEntry
+Routes
+/learner/settings/audio
+/parent/learners/[learnerId]/accessibility/audio
+/admin/platform/audio
+/admin/platform/audio/pronunciation
+BFF Routes
+POST /api/bff/learners/:learnerId/tts
+GET /api/bff/learners/:learnerId/tts/:audioAssetId
+POST /api/bff/learners/:learnerId/tts/prewarm
+PATCH /api/bff/learners/:learnerId/audio-preferences
+
+GET /api/bff/admin/audio/usage
+POST /api/bff/admin/audio/pronunciation
+PATCH /api/bff/admin/audio/pronunciation/:id
+Acceptance Criteria
+Read-aloud works in baseline.
+Read-aloud works in lesson player.
+Read-aloud works in homework helper.
+Audio can be replayed.
+Audio has transcript fallback.
+Audio is cached.
+Failed TTS does not block lesson completion.
+Parent can enable or disable read-aloud.
+Learner can adjust safe playback preferences.
+TTS usage appears in admin cost dashboard.
+Sprint 29 — Rostering, SIS Integration, Multi-Device Sync, and Notifications
+Goal
+
+Support school/district deployment and real-world family usage across devices.
+
+For school integrations, OneRoster is a widely used standard for securely exchanging roster information, course materials, and grades; 1EdTech notes that OneRoster supports CSV exchange and REST web services, with OneRoster 1.2 listed as the most recent version on its standards page.
+
+Build Scope
+Create roster import model.
+Support CSV roster import.
+Create OneRoster-ready abstraction.
+Create Clever/ClassLink adapter placeholders.
+Create teacher-class-learner relationships.
+Create multi-device lesson sync.
+Create parent live progress presence state.
+Create notification preferences.
+Create email notifications.
+Create in-app notifications.
+Create push-ready notification model.
+Create digest scheduler.
+Required Data Models
+School
+Classroom
+Course
+Enrollment
+RosterImportJob
+RosterImportError
+SISConnection
+ExternalRosterMapping
+DeviceSession
+LessonSyncState
+Notification
+NotificationPreference
+NotificationDelivery
+DigestSchedule
+Routes
+/admin/school/rostering
+/admin/school/rostering/import
+/admin/school/classes
+/admin/school/classes/[classId]
+/teacher/classes
+/teacher/classes/[classId]
+/parent/notifications
+/learner/notifications
+BFF Routes
+POST /api/bff/admin/rostering/import
+GET /api/bff/admin/rostering/import/:jobId
+GET /api/bff/admin/classes
+POST /api/bff/admin/classes
+PATCH /api/bff/admin/classes/:classId
+
+GET /api/bff/lesson-sync/:lessonRunId
+POST /api/bff/lesson-sync/:lessonRunId
+
+GET /api/bff/notifications
+POST /api/bff/notifications/mark-read
+GET /api/bff/notification-preferences
+PATCH /api/bff/notification-preferences
+Notification Types
+parent_progress_summary
+baseline_completed
+lesson_completed
+teacher_assignment_created
+teacher_assignment_due
+streak_reminder
+quest_unlocked
+iep_extraction_ready
+data_request_completed
+billing_notice
+safety_review_required
+Acceptance Criteria
+School admin can import roster CSV.
+Roster errors are visible and fixable.
+Teacher dashboard uses real class enrollment.
+Teacher assignment can notify learner and parent.
+Learner progress syncs across two active sessions.
+Parent can see near-real-time lesson status where permitted.
+Parent can configure notification preferences.
+Email notifications send through provider abstraction.
+In-app notifications work.
+No notification exposes sensitive IEP content.
+Sprint 30 — Real Billing, AI Cost Controls, Migration, and Commercial Launch Readiness
+Goal
+
+Make AIVO commercially deployable for parents, schools, districts, and existing users.
+
+Build Scope
+Implement real billing provider abstraction.
+Integrate Stripe or equivalent payment provider.
+Support family subscriptions.
+Support school seat licensing.
+Support district contracts.
+Support invoices and purchase orders.
+Support coupons, trials, and grants.
+Support subscription cancellation.
+Support seat assignment.
+Support usage limits.
+Implement AI cost budget controls.
+Implement provider failover.
+Implement lesson caching strategy.
+Implement v1 migration framework.
+Create launch readiness dashboard.
+Required Data Models
+Plan
+Price
+Subscription
+Invoice
+PaymentMethod
+SchoolContract
+DistrictContract
+SeatLicense
+SeatAssignment
+Coupon
+GrantAccess
+UsageMeter
+AIBudget
+AICostEvent
+ProviderFailoverRule
+MigrationJob
+MigrationRecord
+LaunchReadinessCheck
+Billing Routes
+/parent/settings/billing
+/parent/settings/billing/checkout
+/parent/settings/billing/manage
+/admin/school/billing
+/admin/district/billing
+/admin/platform/billing
+/admin/platform/billing/plans
+/admin/platform/billing/invoices
+AI Cost Routes
+/admin/platform/ai-costs
+/admin/platform/ai-costs/budgets
+/admin/platform/ai-costs/providers
+/admin/platform/ai-costs/cache
+Migration Routes
+/admin/platform/migration
+/admin/platform/migration/jobs
+/admin/platform/migration/jobs/[jobId]
+AI Cost Controls
+Per-tenant monthly AI budget.
+Per-learner generation limits.
+Per-feature usage caps.
+Lesson generation cache.
+Baseline generation cache where safe.
+TTS cache.
+Provider fallback.
+Provider circuit breaker.
+Admin override.
+Cost anomaly alert.
+Billing Acceptance Criteria
+Parent can start paid subscription.
+Parent can cancel subscription.
+Billing status controls access according to plan.
+School can assign seats.
+District contract can represent multiple schools.
+Invoices can be viewed.
+Payment failure creates notification.
+Trial expiration is handled.
+Billing webhooks are idempotent.
+Migration Acceptance Criteria
+Existing v1 users can be mapped to v2 users.
+Existing learners can be mapped to LearnerProfile.
+Migration preserves tenantId.
+Migration does not confuse userId with learnerId.
+Migration logs every migrated record.
+Failed records can be retried.
+Migration can run in dry-run mode.
+Launch Acceptance Criteria
+AI costs are visible by tenant, learner, feature, and provider.
+Generation budgets can be enforced.
+Provider failover works.
+Billing is production-ready.
+Migration framework works.
+Launch readiness dashboard shows blockers.
+No commercial tenant can exceed configured AI budget without admin override.
+Revised Final Release Order
+
+The production order should become:
+
+Sprint 0–23:
+Core product, learning loop, parent/learner/teacher/admin experience
+
+Sprint 24:
+Real auth, identity, consent, under-13 flows
+
+Sprint 25:
+Privacy, compliance, data governance, DSAR
+
+Sprint 26:
+Curriculum source of truth and standards alignment
+
+Sprint 27:
+AI safety, moderation, prompt-injection defense
+
+Sprint 28:
+TTS, read-aloud, multimodal accessibility
+
+Sprint 29:
+Rostering, SIS integration, sync, notifications
+
+Sprint 30:
+Billing, AI cost controls, migration, commercial launch readiness
+
+Final Sprint:
+Performance, hardening, penetration testing, production release
+Updated Non-Negotiable Release Gate
+No mock auth in production.
+No child data collection without appropriate parent/guardian consent.
+No learner account activation without consent state.
+No raw IEP text in learner UI.
+No IEP access without audit log.
+No generated lesson without valid skillId.
+No baseline question without curriculum alignment.
+No AI response persisted without safety validation.
+No Homework Helper input trusted without moderation.
+No read-aloud claim without working TTS or accessible transcript fallback.
+No teacher dashboard without real roster relationship.
+No school deployment without roster import path.
+No paid launch without billing webhooks, seat controls, and invoice support.
+No AI launch without budget limits and cost visibility.
+No migration without dry-run, retry, and audit logs.
+
+This turns the original sprint plan from a strong working v2 build into a credible school-ready, parent-trustworthy, commercially shippable platform.
+
+Much closer. Sprints 24–30 plug the biggest gaps I called out, and the revised release gate is the right shape — auth, consent, curriculum alignment, safety pipeline, TTS, rostering, and real billing are now first-class instead of footnotes. With this addition, the plan would credibly produce a school-ready, parent-trustworthy product, not just a working demo.
+
+That said, a few things I'd still tighten before calling it complete:
+
+1. **Sprint ordering has a load-bearing dependency problem.** Sprint 26 (curriculum/skill graph) is a prerequisite for Sprints 8 (baseline), 9 (mastery), 11 (lesson generation), and 16 (quests) — the release gate even says "no baseline question without curriculum alignment." Building those sprints first against seeded stub skills means rewriting them after Sprint 26 lands. Same with Sprint 24 (real auth) — every BFF guard, audit log, and consent check in Sprints 4–23 assumes an identity model that doesn't exist yet. Move 24 and 26 earlier (right after Sprint 3) or accept that Sprints 4–23 are a throwaway prototype.
+
+2. **Sprint 27 (AI safety) should also shift left.** It's gating Sprints 8, 11, 13, and 17, which all generate or accept AI content. Building the validator/moderation pipeline alongside the first AI sprint is far cheaper than retrofitting safety into eight already-shipped features.
+
+3. **Security review is still missing as a discrete sprint.** Pen testing is mentioned in passing in "Final Sprint" but there's no scope for: SOC 2 readiness, threat modeling, secrets management, key rotation, dependency/SBOM scanning, vulnerability disclosure policy, or incident response runbooks. For a platform holding IEPs and child data, schools will ask for SOC 2 Type II and a signed DPA before signing — that's a multi-month effort, not a checkbox.
+
+4. **State-level student privacy laws.** FERPA + COPPA isn't the full picture. SOPIPA (California), New York Ed Law 2-d, Illinois SOPPA, Colorado, Connecticut, and ~25 others impose operator obligations distinct from FERPA. The Student Privacy Pledge is table stakes for K-12 sales. Sprint 25 should explicitly enumerate which laws you're covering and where the gaps are.
+
+5. **Observability for AI quality, not just AI cost.** Sprint 30 covers cost. Sprint 20 covers latency and failure. Neither covers *output quality* — eval harness for lesson plans, regression tests when prompts/models change, A/B framework, learner outcome metrics tied back to generation strategy. Without it, a model swap can silently degrade pedagogy and you won't know until churn shows up.
+
+6. **Accessibility verification is named but not scoped.** "WCAG 2.2 AA" appears in Sprint 28's intro but the acceptance criteria are TTS-specific. WCAG covers a lot more (focus management, ARIA, color contrast across the whole app, keyboard traps, motion). Add an explicit audit + remediation sprint, ideally with a third-party VPAT — schools will ask.
+
+7. **Incident response and operational maturity.** No sprint for: on-call rotation, status page, customer-facing incident communication, data breach notification workflow (legally required under most state privacy laws within fixed windows), backup/restore drills, disaster recovery RPO/RTO targets.
+
+8. **Teacher/parent communication boundaries.** Sprint 29 adds notifications and Sprint 18 has teacher dashboards, but there's no policy sprint for *what* a teacher can see vs. what stays parent-only — especially for IEP-derived data. This is both a FERPA question (the teacher has a legitimate educational interest, but how much) and a parent-trust question.
+
+9. **Localization & i18n.** "primaryLanguage" appears on the learner profile in Sprint 4 but nothing in the plan actually translates the UI, the tutor voice, or the TTS. If you're selling to districts with EL populations, this is a real ask.
+
+10. **The "Final Sprint" is doing too much work.** Performance + hardening + pen test + prod release as one sprint understates the effort. Pen test alone usually means 2–4 weeks of external engagement plus remediation.
+
+**Bottom line:** with Sprints 24–30 added, you've covered the *product surface area* required to ship to schools. What's still under-budgeted is the *operational, security, and quality-assurance surface area* — SOC 2, state privacy laws, AI quality evals, accessibility audit, incident response, i18n, and a real pen-test cycle. Add a Sprint 31 (security & compliance certification) and Sprint 32 (quality, accessibility audit, i18n, ops readiness), and reorder 24/26/27 earlier in the plan, and this becomes a genuinely shippable enterprise K-12 platform plan rather than a strong outline.
+
+Want me to draft 31 and 32, or sketch the reordered dependency graph?
+
+I’ll do both: first correct the dependency graph so the plan is no longer prototype-first, then add Sprints 31 and 32 as discrete enterprise-readiness workstreams.
+
+Thought for 31s
+
+Agreed. The correct fix is not only to add Sprints 31 and 32. The bigger fix is to move auth, curriculum, and AI safety left so the core learning loop is not built on disposable scaffolding.
+
+Below is the corrected dependency order, followed by Sprints 31 and 32.
+
+Revised Dependency Graph
+
+The original PRD’s core product loop remains the anchor: parent setup, learner profile, IEP/accommodations, learner brain profile, personalized baseline, mastery map, LessonRun, Today’s Mission, lesson player, parent progress, quests, teacher/admin compatibility.
+
+The corrected order should be:
+
+Sprint 0  — Repository, tooling, engineering foundation
+Sprint 1  — Design system and app shell
+Sprint 2  — Real auth, identity, role routing, consent foundation
+Sprint 3  — Core database schema and BFF contract layer
+Sprint 4  — Compliance data model, privacy ledger, audit foundation
+Sprint 5  — Curriculum source of truth, standards, and skill graph
+Sprint 6  — AI safety foundation, moderation, validation, prompt-injection defense
+Sprint 7  — Parent home and learner management
+Sprint 8  — Parent assessment flow
+Sprint 9  — IEP upload and accommodation summary
+Sprint 10 — Learner brain profile generation
+Sprint 11 — Personalized baseline generation
+Sprint 12 — Mastery map and personalized learning path
+Sprint 13 — LessonRun core engine
+Sprint 14 — AI tutor lesson generation
+Sprint 15 — Learner profile selection and learner home
+Sprint 16 — Lesson player
+Sprint 17 — Progress, mastery updates, and parent summary
+Sprint 18 — Accessibility preferences and adaptive supports
+Sprint 19 — Quest Worlds
+Sprint 20 — Homework Helper
+Sprint 21 — Teacher dashboard and assignments
+Sprint 22 — School, district, and platform admin
+Sprint 23 — Observability, safety monitoring, and AI governance
+Sprint 24 — TTS, read-aloud, audio caching, and multimodal accessibility
+Sprint 25 — Rostering, SIS integration, multi-device sync, and notifications
+Sprint 26 — Real billing, subscriptions, seat licensing, and AI cost controls
+Sprint 27 — Migration and v1-to-v2 transition readiness
+Sprint 28 — End-to-end QA, route audit, and dead-button elimination
+Sprint 29 — Performance, scalability, and production infrastructure
+Sprint 30 — Commercial launch readiness
+Sprint 31 — Security, SOC 2 readiness, privacy law matrix, and incident response
+Sprint 32 — AI quality, accessibility audit, i18n, operational readiness, and external validation
+Sprint 33 — External penetration test, remediation, release candidate, and production launch
+
+The major correction is this:
+
+Real auth moves before parent/learner workflows.
+Compliance data model moves before IEP and child-data workflows.
+Curriculum/skill graph moves before baseline, mastery, lessons, and quests.
+AI safety moves before any AI-generated learner-facing feature.
+Security and operational readiness are separated from generic launch hardening.
+Why the Reorder Matters
+
+COPPA requires covered operators to obtain verifiable parental consent before collecting, using, or disclosing personal information from children under 13, so auth and consent cannot be deferred until after the learner workflows exist.
+
+FERPA also creates student-record and disclosure-accountability expectations for education records, including maintaining records of certain disclosures of personally identifiable information from education records, so the audit and disclosure model must exist before school-facing use.
+
+For K–12 sales, federal privacy law is not enough. California SOPIPA restricts uses of covered student information, New York Education Law 2-d protects student PII and gives parents rights regarding their child’s PII, Illinois SOPPA regulates covered student information held by schools and vendors, and Colorado’s Student Data Transparency and Security Act protects student personal information collected by state and local education providers.
+
+SOC 2 readiness also needs its own sprint because the AICPA frames SOC 2 around controls relevant to security, availability, processing integrity, confidentiality, and privacy. That is not the same as “run a pen test before launch.”
+
+Sprint 31 — Security, SOC 2 Readiness, Privacy Law Matrix, and Incident Response
+Goal
+
+Turn AIVO from a functional product into a procurement-ready K–12 platform with documented controls, evidence collection, incident response, state privacy coverage, and school-facing trust artifacts.
+
+This sprint should start before commercial pilots and run in parallel with late product sprints because SOC 2 Type II requires operating evidence over time, not just a final checklist.
+
+Build Scope
+Create security control framework.
+Create SOC 2 readiness workspace.
+Map controls to Trust Services Criteria.
+Create evidence collection pipeline.
+Create vendor/subprocessor inventory.
+Create secrets management policy.
+Create key rotation process.
+Create vulnerability management workflow.
+Create SBOM generation and retention.
+Create dependency scanning.
+Create container scanning.
+Create infrastructure scanning.
+Create threat model.
+Create security architecture review.
+Create data breach response workflow.
+Create incident response runbooks.
+Create customer-facing status page.
+Create vulnerability disclosure policy.
+Create DPA packet.
+Create state student privacy law matrix.
+Create security questionnaire response library.
+Compliance and Trust Targets
+SOC 2 Type I readiness
+SOC 2 Type II evidence preparation
+FERPA-aligned school data handling
+COPPA parental consent evidence
+California SOPIPA controls
+New York Education Law 2-d controls
+Illinois SOPPA controls
+Colorado student data privacy controls
+Student Privacy Pledge alignment
+DPA-ready contract packet
+Subprocessor disclosure packet
+Accessibility conformance packet dependency
+
+The Student Privacy Pledge is not a replacement for law, but it remains a recognizable K–12 trust signal because it was designed around baseline commitments for transparency and student privacy by school service providers.
+
+Required Data Models
+SecurityControl
+SecurityControlEvidence
+RiskRegister
+ThreatModel
+SecurityException
+Vendor
+Subprocessor
+VendorRiskAssessment
+DPARecord
+StatePrivacyRequirement
+StatePrivacyControlMapping
+Incident
+IncidentTimelineEvent
+BreachNotification
+VulnerabilityReport
+VulnerabilityDisclosurePolicy
+KeyRotationRecord
+SecretInventory
+SBOMRecord
+DependencyVulnerability
+SecurityQuestionnaireResponse
+Required Routes
+/admin/platform/security
+/admin/platform/security/controls
+/admin/platform/security/evidence
+/admin/platform/security/risks
+/admin/platform/security/vendors
+/admin/platform/security/subprocessors
+/admin/platform/security/incidents
+/admin/platform/security/vulnerabilities
+/admin/platform/security/state-privacy
+/admin/platform/security/soc2
+/admin/platform/security/dpa
+/admin/platform/security/questionnaires
+/status
+/security
+/privacy/subprocessors
+Required BFF Routes
+GET /api/bff/admin/security/controls
+POST /api/bff/admin/security/controls
+PATCH /api/bff/admin/security/controls/:controlId
+
+GET /api/bff/admin/security/evidence
+POST /api/bff/admin/security/evidence
+
+GET /api/bff/admin/security/risks
+POST /api/bff/admin/security/risks
+PATCH /api/bff/admin/security/risks/:riskId
+
+GET /api/bff/admin/security/vendors
+POST /api/bff/admin/security/vendors
+PATCH /api/bff/admin/security/vendors/:vendorId
+
+GET /api/bff/admin/security/subprocessors
+POST /api/bff/admin/security/subprocessors
+PATCH /api/bff/admin/security/subprocessors/:subprocessorId
+
+GET /api/bff/admin/security/incidents
+POST /api/bff/admin/security/incidents
+PATCH /api/bff/admin/security/incidents/:incidentId
+
+GET /api/bff/admin/security/vulnerabilities
+POST /api/bff/admin/security/vulnerabilities
+PATCH /api/bff/admin/security/vulnerabilities/:vulnId
+
+GET /api/bff/admin/security/state-privacy
+POST /api/bff/admin/security/state-privacy/mappings
+PATCH /api/bff/admin/security/state-privacy/mappings/:mappingId
+Security Controls to Implement
+Access control policy
+Least privilege roles
+Admin MFA enforcement
+Privileged access review
+Audit log immutability
+Tenant isolation tests
+Encryption at rest
+Encryption in transit
+Secrets management
+Key rotation
+Backup encryption
+Production access logging
+Security event monitoring
+Dependency vulnerability scanning
+Container vulnerability scanning
+SBOM generation
+Infrastructure-as-code scanning
+Security headers
+Rate limiting
+File upload malware scanning
+IEP document access logging
+Data deletion workflow controls
+Data export workflow controls
+Subprocessor approval workflow
+Vendor risk assessment
+Incident response runbooks
+Breach notification workflow
+Threat Modeling Scope
+Parent account takeover
+Learner impersonation
+Teacher over-access
+Tenant boundary failure
+Raw IEP leakage
+Prompt-injection through homework input
+Prompt-injection through uploaded documents
+Unsafe AI output persistence
+AI provider data retention risk
+Rostering import poisoning
+Notification data leakage
+Payment webhook spoofing
+Privilege escalation
+Broken object-level authorization
+Insecure direct object reference
+File upload abuse
+Secrets exposure
+Misconfigured storage bucket
+Incident Response Requirements
+
+NIST’s incident handling guidance emphasizes that incident response requires planning, resources, detection, analysis, containment, eradication, recovery, and coordination with internal and external stakeholders.
+
+Define severity levels.
+Define incident commander role.
+Define legal/privacy escalation.
+Define customer communication owner.
+Define school/district notification workflow.
+Define regulator notification workflow.
+Define breach evidence preservation.
+Define post-incident review process.
+Define RPO and RTO targets.
+Run tabletop exercise.
+Run backup restore drill.
+Run production access review.
+Vulnerability Disclosure
+
+CISA describes vulnerability disclosure policy as an essential element of enterprise vulnerability management, so AIVO should publish a responsible disclosure page before school launch.
+
+Publish /security page.
+Define safe-harbor language.
+Define reporting email.
+Define triage SLA.
+Define severity scoring.
+Define researcher communication workflow.
+Define remediation tracking.
+Acceptance Criteria
+SOC 2 control inventory exists.
+Every control has owner, status, evidence requirement, and review cadence.
+State privacy law matrix exists for launch states.
+DPA packet exists.
+Subprocessor page exists.
+Vendor risk workflow exists.
+Incident response runbooks exist.
+Breach notification workflow exists.
+Backup restore drill completed.
+Threat model completed and reviewed.
+SBOM generated in CI.
+Dependency and container scans run in CI.
+Critical vulnerabilities block release.
+Tenant isolation tests pass.
+IEP access logs are immutable.
+Admin access review completed.
+Security questionnaire library exists.
+Responsible disclosure page is published.
+Sprint 32 — AI Quality, Accessibility Audit, i18n, Operational Readiness, and External Validation
+Goal
+
+Prove that AIVO is not only secure and compliant, but also instructionally reliable, accessible, multilingual-ready, supportable, and operationally mature.
+
+This sprint closes four gaps: AI quality assurance, accessibility verification, localization/i18n, and production operations.
+
+Part A — AI Quality Evaluation and Pedagogical Regression Testing
+Build Scope
+Create lesson quality eval harness.
+Create baseline question quality eval harness.
+Create prompt regression suite.
+Create model change evaluation workflow.
+Create rubric-based scoring.
+Create human review workflow.
+Create golden learner profiles.
+Create synthetic learner scenarios.
+Create curriculum alignment checker.
+Create accommodation alignment checker.
+Create hallucination detector.
+Create inappropriate difficulty detector.
+Create A/B testing framework.
+Create outcome tracking model.
+AI Quality Dimensions
+Curriculum alignment
+Grade appropriateness
+Skill specificity
+Accommodation alignment
+Tutor tone
+Scaffold quality
+Hint usefulness
+Cognitive load
+Reading level
+Math correctness
+Answer correctness
+Safety compliance
+Parent summary clarity
+Next-step quality
+Differentiation across learner profiles
+Required Data Models
+AIQualityEval
+AIQualityRubric
+AIQualityScore
+PromptVersion
+ModelVersion
+GoldenLearnerProfile
+SyntheticScenario
+LessonEvalResult
+BaselineEvalResult
+HumanReviewRating
+Experiment
+ExperimentAssignment
+LearningOutcomeMetric
+Required Routes
+/admin/platform/ai-quality
+/admin/platform/ai-quality/evals
+/admin/platform/ai-quality/rubrics
+/admin/platform/ai-quality/prompt-versions
+/admin/platform/ai-quality/model-versions
+/admin/platform/ai-quality/golden-profiles
+/admin/platform/ai-quality/experiments
+AI Quality Acceptance Criteria
+Every production prompt has a version.
+Every production model has a version.
+Prompt changes run regression tests.
+Model changes run regression tests.
+Golden learner profile suite exists.
+Lesson plan evals score curriculum alignment.
+Baseline evals score grade appropriateness.
+Accommodation alignment is evaluated.
+Human review queue exists for low-confidence outputs.
+A/B framework can compare generation strategies.
+AI quality dashboard shows trend over time.
+A model swap cannot deploy without passing eval gates.
+Part B — Accessibility Audit, Remediation, and VPAT/ACR
+Build Scope
+Run automated accessibility checks.
+Run keyboard-only audit.
+Run screen-reader audit.
+Run color contrast audit.
+Run focus management audit.
+Run cognitive-load audit for learner UI.
+Run reduced-motion audit.
+Run form error announcement audit.
+Run modal/dialog accessibility audit.
+Run mobile touch-target audit.
+Remediate violations.
+Prepare Accessibility Conformance Report.
+Prepare VPAT-style documentation.
+Create accessibility statement.
+
+WCAG 2.2 covers a wide range of recommendations for making web content more accessible, and WCAG 2.2 added additional success criteria beyond WCAG 2.1.
+
+An Accessibility Conformance Report helps buyers assess how an ICT product conforms to accessibility standards, and the VPAT/ACR format is commonly used in procurement contexts.
+
+Accessibility Acceptance Criteria
+WCAG 2.2 AA audit completed.
+Critical learner flows pass keyboard-only navigation.
+Critical parent flows pass keyboard-only navigation.
+Critical teacher flows pass keyboard-only navigation.
+Screen-reader labels are verified.
+No keyboard traps remain.
+Focus order is logical.
+Dialog focus is managed correctly.
+Color contrast passes.
+Form errors are announced.
+Reduced-motion mode works.
+Read-aloud has transcript fallback.
+Accessibility statement is published.
+VPAT/ACR draft exists.
+Third-party audit findings are tracked to closure.
+Part C — Localization and Internationalization
+Build Scope
+Implement i18n framework.
+Externalize all UI strings.
+Support locale-aware formatting.
+Support translated parent summaries.
+Support translated tutor messages.
+Support translated lesson shell labels.
+Support language-specific TTS voices.
+Support primaryLanguage on learner profile.
+Support multilingual notification templates.
+Create translation management workflow.
+Create fallback-language behavior.
+Initial Language Strategy
+English as default.
+Spanish as first district-sales language.
+French-ready architecture.
+Yoruba/Igbo/Hausa-ready architecture if West Africa expansion is planned.
+Language stored per user and learner.
+Tutor language can differ from parent dashboard language.
+i18n Acceptance Criteria
+No hardcoded user-facing strings in primary app routes.
+Parent can set preferred language.
+Learner can set learning language where permitted.
+Tutor can generate in selected language.
+TTS voice matches selected language where supported.
+Fallback behavior is defined when translation is missing.
+Email and in-app notifications use language preference.
+Admin can see untranslated string coverage.
+Part D — Operational Readiness
+Build Scope
+Define on-call process.
+Define escalation matrix.
+Create runbooks.
+Create status page workflow.
+Create support triage workflow.
+Create customer incident communication templates.
+Create school admin onboarding checklist.
+Create launch checklist.
+Create backup/restore drill schedule.
+Create disaster recovery plan.
+Create RPO/RTO targets.
+Create production monitoring dashboards.
+Create synthetic uptime checks.
+Create SLO and error-budget policy.
+Operational Targets
+RPO target defined.
+RTO target defined.
+Uptime target defined.
+AI generation failure budget defined.
+P1 response process defined.
+School notification timeline defined.
+Parent support escalation defined.
+Data restore procedure tested.
+Ops Acceptance Criteria
+On-call owner exists.
+Escalation matrix exists.
+Runbooks exist for auth outage, AI outage, database outage, TTS outage, payment outage, roster import failure, and data incident.
+Status page workflow exists.
+Support team has issue taxonomy.
+Backup restore drill completed.
+Disaster recovery plan approved.
+Synthetic uptime checks are running.
+Production dashboards exist.
+Customer incident templates exist.
+Launch checklist is complete.
+Sprint 33 — External Pen Test, Remediation, Release Candidate, and Production Launch
+
+The earlier “Final Sprint” should be split out as Sprint 33 because external penetration testing and remediation should not be bundled casually with performance work.
+
+Build Scope
+Engage external penetration tester.
+Freeze release candidate.
+Run black-box test.
+Run gray-box test.
+Run authenticated role-based test.
+Run tenant isolation test.
+Run file upload security test.
+Run AI prompt-injection test.
+Run payment webhook test.
+Run roster import test.
+Run API authorization test.
+Review findings.
+Remediate critical/high findings.
+Retest remediated findings.
+Complete release readiness review.
+Launch controlled production pilot.
+Acceptance Criteria
+External pen test completed.
+Critical findings remediated.
+High findings remediated or formally risk-accepted.
+Tenant isolation validated.
+IEP document access validated.
+BFF authorization validated.
+AI prompt-injection controls tested.
+Payment webhook security tested.
+Roster import security tested.
+Production release candidate approved.
+Pilot launch approved.
+Updated Final Release Gate
+No mock auth in production.
+No child data collection without appropriate consent.
+No learner account activation without consent state.
+No raw IEP text in learner UI.
+No IEP access without immutable audit logging.
+No baseline question without curriculum alignment.
+No lesson without valid skillId.
+No AI output persisted without safety validation.
+No Homework Helper input trusted without moderation.
+No model or prompt change without eval regression.
+No read-aloud claim without working TTS or transcript fallback.
+No teacher access without legitimate roster relationship.
+No school deployment without roster import path.
+No paid launch without billing, seat controls, invoices, and webhook safety.
+No AI launch without tenant-level budget and cost controls.
+No production launch without threat model.
+No production launch without incident response runbooks.
+No production launch without backup restore drill.
+No production launch without accessibility audit.
+No production launch without state privacy law matrix.
+No production launch without external pen test and remediation.
+Final Assessment
+
+With the reorder plus Sprints 31–33, the plan is no longer just a strong product build plan. It becomes a credible enterprise K–12 platform delivery plan.
+
+The real structure should be:
+
+Build the identity, consent, compliance, curriculum, and AI safety foundation first.
+Then build the learner product loop.
+Then build school operations, billing, rostering, TTS, and notifications.
+Then prove security, accessibility, AI quality, and operational readiness.
+Then run external pen test and launch a controlled production pilot.

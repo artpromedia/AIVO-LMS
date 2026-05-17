@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap');
+
+:root {
+  --background: 40 33% 98%; /* #fdfbf7 warm off-white */
+  --foreground: 215 25% 27%; /* #334155 slate-700 */
+  --card: 0 0% 100%;
+  --card-foreground: 215 25% 27%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 215 25% 27%;
+  --primary: 215 16% 47%; /* #64748b slate-500 */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 25 50% 64%; /* #d4a373 muted terracotta */
+  --secondary-foreground: 0 0% 100%;
+  --muted: 40 20% 95%;
+  --muted-foreground: 215 16% 47%;
+  --accent: 40 20% 95%;
+  --accent-foreground: 215 25% 27%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 214 32% 91%; /* #e2e8f0 slate-200 */
+  --input: 214 32% 91%;
+  --ring: 214 32% 91%;
+  --radius: 215 25% 27%;
+
+  --font-sans: 'DM Sans', sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  line-height: 1.6;
+}
+
+/* Enforce thin hairline borders, no heavy shadows */
+* {
+  box-shadow: none !important;
+}
+
+.calm-border {
+  border: 1px solid hsl(var(--border));
+}
+
+.calm-divider {
+  height: 1px;
+  background-color: hsl(var(--border));
+  width: 100%;
+}

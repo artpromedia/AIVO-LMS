@@ -1,0 +1,51 @@
+# Build / generated output
+**/node_modules/**
+**/dist/**
+**/build/**
+**/.next/**
+**/.turbo/**
+**/out/**
+**/coverage/**
+
+# Python virtualenvs / caches
+**/.venv/**
+**/venv/**
+**/__pycache__/**
+**/.ruff_cache/**
+
+# Generated artifacts
+packages/api-client/openapi/**
+packages/api-client/src/_generated/**
+**/*.snap
+**/_generated/**
+
+# Lockfiles — managed by package managers
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+poetry.lock
+
+# Vendored upstream
+**/vendor/**
+
+# Binary-ish content
+**/*.svg
+**/*.ico
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.gif
+**/*.webp
+**/*.woff
+**/*.woff2
+**/*.ttf
+**/*.otf
+
+# Environment files (often sensitive, often hand-formatted)
+**/.env
+**/.env.*
+!**/.env.example
+
+# Charts / Helm have their own formatters
+infra/helm/**
+charts/**

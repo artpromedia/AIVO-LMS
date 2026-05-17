@@ -1,0 +1,35 @@
+name: paging url leak guardrail
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+  # actions: read is kept for any future previous-run lookup tooling we add.
+  # lookup.
+  actions: read
+
+jobs:
+  scan:
+    name: scan source for hard-coded paging URLs
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: scan
+        id: scan
+        run: |
+          set -o pipefail
+          mkdir -p /tmp/paging
+          node scripts/check-paging-url-leaks.mjs 2>&1 | tee /tmp/paging/output.log
+      - name: self-test the guardrail itself
+        id: selftest
+        run: |
+          set -o pipefail
+          node scripts/check-paging-url-leaks.test.mjs 2>&1 | tee -a /tmp/paging/output.log

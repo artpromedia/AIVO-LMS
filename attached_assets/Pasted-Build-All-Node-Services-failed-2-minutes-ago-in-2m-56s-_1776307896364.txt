@@ -1,0 +1,83 @@
+Build All Node Services
+failed 2 minutes ago in 2m 56s
+Search logs
+4s
+3s
+2s
+14s
+9s
+2m 20s
+Run pnpm build
+
+> aivo-ai-learning@ build /home/runner/work/aivo-ai-learning/aivo-ai-learning
+> turbo build
+
+
+Attention:
+Turborepo now collects completely anonymous telemetry regarding usage.
+This information is used to shape the Turborepo roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://turborepo.dev/docs/telemetry
+
+
+   • Packages in scope: @aivo/admin-svc, @aivo/assessment-svc, @aivo/billing-svc, @aivo/brand, @aivo/comms-svc, @aivo/db, @aivo/engagement-svc, @aivo/events, @aivo/family-svc, @aivo/i18n-svc, @aivo/identity-svc, @aivo/integrations-svc, @aivo/learner-ui, @aivo/learning-svc, @aivo/marketing, @aivo/mobile, @aivo/mobile-ui, @aivo/observability, @aivo/research-svc, @aivo/security, @aivo/status-page-svc, @aivo/tutor-svc, @aivo/web
+   • Running build in 23 packages
+   • Remote caching disabled
+
+@aivo/events:build
+@aivo/brand:build
+@aivo/observability:build
+@aivo/security:build
+@aivo/learner-ui:build
+@aivo/db:build
+@aivo/billing-svc:build
+@aivo/assessment-svc:build
+@aivo/research-svc:build
+@aivo/learning-svc:build
+@aivo/integrations-svc:build
+@aivo/identity-svc:build
+@aivo/engagement-svc:build
+@aivo/family-svc:build
+@aivo/status-page-svc:build
+@aivo/i18n-svc:build
+@aivo/admin-svc:build
+@aivo/comms-svc:build
+@aivo/tutor-svc:build
+@aivo/web:build
+cache miss, executing 7143d715035b4f31
+
+> @aivo/web@1.0.0 build /home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web
+> next build
+
+⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+   ▲ Next.js 15.5.15
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 101s
+   Linting and checking validity of types ...
+
+ ⚠ The Next.js plugin was not detected in your ESLint configuration. See https://nextjs.org/docs/app/api-reference/config/eslint#migrating-existing-config
+
+Failed to compile.
+
+./src/app/dashboard/caregiver/observations/page.tsx
+172:17  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+ ELIFECYCLE  Command failed with exit code 1.
+Error: @aivo/web#build: command (/home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web) /home/runner/setup-pnpm/node_modules/.bin/pnpm run build exited (1)
+@aivo/marketing:build
+
+ Tasks:    19 successful, 21 total
+Cached:    0 cached, 21 total
+  Time:    2m18.914s 
+Failed:    @aivo/web#build
+
+ ERROR  run failed: command  exited (1)
+ ELIFECYCLE  Command failed with exit code 1.
+Error: Process completed with exit code 1.

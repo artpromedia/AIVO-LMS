@@ -1,0 +1,333 @@
+# Aivo Parent Assessment — Design Framework
+
+A modular parent assessment designed to generate a baseline profile of a child across cognitive, communication, social-emotional, sensory, motor, adaptive, and interest/strength domains. Built to feed a downstream "child baseline" used for personalization, goal-setting, and progress tracking.
+
+---
+
+## 1. Design Principles
+
+These should drive every question-level decision:
+
+1. **Strengths-first, not deficit-first.** Parents are more engaged, more honest, and more accurate when the form doesn't feel like a clinical evaluation. Open with interests and strengths before concerns.
+2. **Parent-friendly language.** No jargon. Not "receptive language," but "understanding what others say." Not "executive function," but "planning and finishing tasks."
+3. **Observable behavior only.** Ask what the parent *sees*, not what they think it *means*. "How often does your child follow a 2-step instruction?" — not "Does your child have working memory issues?"
+4. **Concrete frequency, not abstract severity.** Replace "mild/moderate/severe" with "Never / Rarely / Sometimes / Often / Always" or specific frequencies ("fewer than 1×/week," "daily").
+5. **Age-banded branching.** One assessment cannot cover a 3-year-old and a 14-year-old. Use age bands to drive which items appear.
+6. **Chunked and resumable.** Target ~20–30 minutes total, split into 5–7 sections the parent can complete across sittings. Autosave always.
+7. **Explain the "why."** A one-line rationale above each section ("This helps us understand how your child communicates so we can match content to their level") dramatically improves completion and data quality.
+8. **Culturally inclusive.** Don't assume two-parent, English-first, or neurotypical family norms. Allow "caregiver" framing, multilingual environments, and varied family structures.
+9. **Dignity for the child.** Parents often share this screen with their child. Avoid language a child would find hurtful if they read it.
+
+---
+
+## 2. Assessment Structure Overview
+
+A 7-section modular design. Sections can be reordered or made optional based on your platform's focus.
+
+| # | Section | Time | Purpose |
+|---|---------|------|---------|
+| 0 | Welcome & Consent | 1 min | Set expectations, get consent, explain data use |
+| 1 | Child Basics & Family Context | 2 min | Demographics, language environment, household |
+| 2 | Strengths, Interests & Motivations | 3–4 min | Positive anchor; informs content personalization |
+| 3 | Developmental & Medical History | 3–5 min | Milestones, health, prior services |
+| 4 | Current Functioning (core domains) | 10–15 min | The bulk of the baseline data |
+| 5 | Learning Style & School Context | 3 min | How they learn, school setting |
+| 6 | Parent Priorities & Goals | 2–3 min | What matters most to this family right now |
+| 7 | Wrap-up & Next Steps | 1 min | Summary, confirmation, what happens next |
+
+**Section 4 ("Current Functioning") is the core.** It contains sub-modules for each domain — Communication, Social-Emotional, Behavior & Regulation, Sensory, Motor, Adaptive/Daily Living, and Cognitive/Academic. Which sub-modules are required vs. optional depends on your platform focus (see Section 8 of this doc).
+
+---
+
+## 3. Section-by-Section Design
+
+### Section 0 — Welcome & Consent
+
+Single screen. Three elements:
+- A warm 2–3 sentence intro from aivo in plain language.
+- Estimated time ("About 25 minutes — you can save and come back anytime").
+- Consent checkboxes: data use, storage, who sees results, ability to delete.
+
+### Section 1 — Child Basics & Family Context
+
+Keep this short and functional. Examples:
+
+- Child's first name (or nickname they prefer)
+- Date of birth (drives age-band branching)
+- Pronouns / gender (optional, inclusive options)
+- Who is completing this? (parent, grandparent, foster parent, other caregiver — free text allowed)
+- Languages spoken in the home (multi-select + primary)
+- Who lives with the child? (structured but flexible)
+- Any siblings? Ages? (useful context, not required)
+
+### Section 2 — Strengths, Interests & Motivations
+
+This section should feel *fun* for the parent. It's also where you get your richest personalization data.
+
+Sample items:
+- "What are 3 things your child loves to do?" (open text, chips)
+- "What topics, characters, or activities can they talk about endlessly?" (open text)
+- "What makes your child laugh?" (open text)
+- "What are they naturally good at?" (multi-select: art, music, memory, puzzles, sports, numbers, storytelling, building, caring for others, animals, noticing details, comforting others, negotiating, inventing games, other — and free text)
+- "How does your child best receive praise?" (single-select: words, hugs/physical, treats, alone time, shared activity, earned privilege)
+- "What usually motivates them to try something hard?" (multi-select)
+
+**Baseline outputs from this section:** interest tags for content matching, reinforcement style, strength domains.
+
+### Section 3 — Developmental & Medical History
+
+Ask only what you'll actually use. Recommendations:
+
+- Age-banded milestone questions (only show relevant to child's age):
+  - Under 5: first words, walking, toilet training, pointing/gestures
+  - 5–8: reading onset, forming sentences with peers, fine motor (drawing, scissors)
+  - 9+: these are usually not useful — replace with "were there any developmental concerns in early childhood?" single question
+- Any diagnoses? (multi-select with "prefer not to say" and free-text "other"; include categories like ADHD, autism, learning differences, anxiety, depression, speech/language, hearing, vision, chronic medical, none)
+- Any current therapies or services? (OT, PT, speech, ABA, counseling, tutoring, IEP/504, none, other)
+- Any medications that affect attention, mood, or learning? (yes/no, optional details)
+- Sleep — hours per night, quality
+- Vision & hearing — last checked, any known issues
+
+**Design note:** Make diagnosis questions explicitly optional. Many parents skip or abandon assessments when forced to disclose.
+
+### Section 4 — Current Functioning
+
+This is where most of the baseline is built. Organized as sub-modules. Use a consistent 5-point frequency scale throughout: **Never / Rarely / Sometimes / Often / Always** plus "Not sure / Haven't observed."
+
+#### 4a. Communication & Language
+
+- Understands simple instructions (age-appropriate examples given inline)
+- Understands multi-step instructions
+- Uses full sentences to express needs
+- Tells you about something that happened earlier in the day
+- Has back-and-forth conversations (3+ turns)
+- Asks questions to learn new things
+- Understands jokes, sarcasm, or figures of speech (for older children)
+- Reads body language and facial expressions
+- Open: "Is there anything specific about how your child communicates we should know?"
+
+#### 4b. Social-Emotional
+
+- Seeks out other children to play with
+- Plays cooperatively (takes turns, shares)
+- Has one or more close friendships
+- Recovers from disappointment within a reasonable time
+- Can name what they're feeling
+- Shows empathy when someone else is upset
+- Handles transitions between activities
+- Copes with losing a game or being told "no"
+- Open: "What are your biggest social or emotional concerns right now, if any?"
+
+#### 4c. Behavior & Regulation
+
+- Follows rules at home
+- Follows rules at school
+- Waits their turn
+- Finishes tasks they start
+- Can sit and focus for [age-appropriate window]
+- Has meltdowns or big emotional reactions
+- Becomes aggressive (hits, kicks, throws) when upset
+- Hurts themselves when upset
+- Open: "What helps your child calm down when they're upset?"
+- Open: "What seems to trigger big reactions?"
+
+*Note: Self-harm and aggression items should trigger a soft alert in your system — not punitive, but routed for human review + resource suggestions.*
+
+#### 4d. Sensory Profile
+
+- Covers ears, hides from, or gets upset by loud or sudden sounds
+- Seems bothered by lights, screens, or visually busy places
+- Avoids certain textures (clothing tags, foods, surfaces)
+- Seeks out movement (spinning, jumping, rocking)
+- Seeks out deep pressure (tight hugs, weighted things)
+- Has a strong reaction to smells or tastes
+- Notices small details most people miss
+- Open: "Are there sensory things that calm or dysregulate your child?"
+
+#### 4e. Motor
+
+- Fine motor (age-banded): holds pencil, uses scissors, buttons, ties shoes, types
+- Gross motor: runs, jumps, climbs, catches, rides bike, balance
+- Handwriting legibility (for school-age)
+- Stamina for physical activity
+- Open: "Any motor skills that are harder for your child than peers?"
+
+#### 4f. Adaptive / Daily Living
+
+Age-banded. Examples for ages 5–10:
+- Dresses self
+- Manages bathroom needs independently
+- Brushes teeth independently
+- Eats a variety of foods
+- Packs their own bag / remembers belongings
+- Tells time / manages simple schedules
+- Handles small amounts of money
+- Knows personal info (name, phone, address) in case of emergency
+
+#### 4g. Cognitive / Academic
+
+This overlaps with school context (Section 5). Keep it focused on *how they think*, not grade-level performance (which parents often don't know accurately):
+- Curious — asks lots of questions
+- Remembers things from a long time ago
+- Notices patterns
+- Problem-solves when things don't go as expected
+- Sticks with tasks that are hard
+- Pretends, imagines, tells stories
+- Understands cause and effect
+- Open: "When has your child surprised you with how smart they are?"
+
+### Section 5 — Learning Style & School Context
+
+- Current school setting (public, private, homeschool, microschool, not in school, other)
+- Grade level
+- Currently has IEP / 504 / ILP? (with opt-in to upload document)
+- How your child learns best (multi-select: watching, doing, reading, listening, talking it through, teaching someone else, moving while learning, being alone, working with others)
+- Attention span for non-preferred tasks (age-banded minutes)
+- Attention span for preferred tasks
+- What time of day are they sharpest?
+- Open: "What's a recent learning win we should know about?"
+- Open: "Where does learning break down for them?"
+
+### Section 6 — Parent Priorities & Goals
+
+End with this — not the start. It hits different after a parent has reflected on their child for 20 minutes.
+
+- "If aivo could help with ONE thing over the next 3 months, what would it be?" (open)
+- Rank top 3 priorities (drag-and-drop): academic skills, confidence, social skills, independence, emotional regulation, communication, motor skills, focus/attention, creativity, specific interest exploration, family harmony, other
+- "What does success look like for your child in the next year?" (open)
+- "What do you worry about?" (open, optional)
+- "What are you hopeful about?" (open)
+
+### Section 7 — Wrap-up & Next Steps
+
+- Summary of what was submitted (plain-language recap)
+- What aivo will do with it (generate baseline, suggest starting points, etc.)
+- When they'll see results
+- Invitation to add anything they feel was missed (one final open box — consistently the highest-signal field in assessments like this)
+- Option to invite a co-parent or teacher to add their perspective
+
+---
+
+## 4. Question Format Guidelines
+
+| Format | When to use |
+|--------|-------------|
+| 5-point frequency Likert | Any behavior/skill you're measuring across a population |
+| Multi-select with "other" text | Interests, strengths, diagnoses, supports |
+| Single-select | Mutually exclusive attributes (setting, primary language) |
+| Rank / drag-and-drop | Priorities, preferences |
+| Age-banded yes/no | Developmental milestones |
+| Sliders | Avoid for clinical items — parents anchor differently; use discrete scales |
+| Open text (short) | One per sub-section — captures what structured items miss |
+| Open text (long) | Only at end of major sections; always optional |
+
+Every Likert item should include a **"Not sure / Haven't observed"** option. Forcing parents to guess degrades data more than missing values do.
+
+---
+
+## 5. Generating the Baseline from Responses
+
+The assessment should feed a **multi-domain baseline profile** — not a single score. Suggested output structure:
+
+```
+Baseline Profile
+├── Interest Graph          (tags + weights from Section 2)
+├── Communication Level     (composite from 4a, age-normed)
+├── Social-Emotional Level  (composite from 4b)
+├── Regulation Profile      (from 4c + 4d: strengths, triggers, supports)
+├── Sensory Profile         (from 4d: seeker/avoider patterns)
+├── Motor Profile           (from 4e)
+├── Adaptive Level          (from 4f, age-normed)
+├── Cognitive/Learning Profile (from 4g + 5)
+├── Environmental Context   (from 1, 3, 5)
+├── Flags for Human Review  (safety items from 4c, specific concerns)
+└── Priority Goals          (from 6, top 3 ranked)
+```
+
+**Scoring approach for Likert composites:**
+- Map Never→0, Rarely→1, Sometimes→2, Often→3, Always→4
+- Within each sub-domain, average relevant items (reverse-coding concern-framed items)
+- Convert to a 1–5 level *for that age band* (age-normed, not raw)
+- Never surface a number to the parent — translate to plain language ("Kai's communication profile suggests they're comfortable with back-and-forth conversation but may benefit from support on multi-step instructions.")
+
+**Handling "Not sure":**
+- Exclude from composite
+- If >30% of a sub-domain is "Not sure," mark that domain as low-confidence in the baseline and avoid making strong recommendations from it.
+
+**Handling safety flags (self-harm, aggression):**
+- Do NOT score numerically — always route to a human review queue
+- Surface resources to the parent immediately (not after review)
+
+---
+
+## 6. Parent Experience (UX) Requirements
+
+These make or break completion rates:
+
+- **Progress bar** with section titles, not just percentage
+- **Autosave** on every field blur
+- **Resume link** emailed after first drop-off (not just in-app)
+- **Time estimates** per section, not just total
+- **Skip buttons** on every optional section, with a small prompt ("You can always add this later")
+- **Co-parent invite** — send a link for a second caregiver to complete their own version; compare perspectives
+- **Mobile-first** — the majority of completions will happen on phones, often in waiting rooms
+- **Plain-language preview** of what the baseline will look like *before* they start, so they know what they're getting
+- **Edit-after-submit** — parents' view of their child changes; let them revisit and update
+
+---
+
+## 7. Implementation Notes
+
+### Branching logic
+- **Age band** is the most important branch. Define 4 bands: 2–4, 5–8, 9–12, 13+. Each sub-module has a different item set per band.
+- **Diagnosis-aware branching** (optional): if a parent indicates autism, ADHD, speech/language, etc., surface a few diagnosis-specific follow-ups — but don't require them.
+- **Concern-driven branching**: if a parent marks "Often" or "Always" on a concern item, ask one follow-up ("When this happens, what usually helps?") rather than many.
+
+### Validation
+- No hard required fields except DOB and consent. Everything else is soft-required with a "I'd rather not say" escape.
+- Validate sanity (DOB is not in the future, age matches milestone items), not completeness.
+
+### Internationalization
+- Write items in English first but avoid idioms.
+- Flag items that reference culturally specific norms (eye contact, sleep arrangements, independence expectations) for localization review.
+
+### Data ethics
+- Be explicit about: who sees this, how long it's stored, whether it's used for model training, how to delete.
+- Parents should be able to export their responses as a PDF for their own records or to share with a clinician.
+
+---
+
+## 8. Configuring for Your Platform Focus
+
+The sub-modules in Section 4 should be weighted differently depending on what aivo is primarily for. A few common configurations:
+
+- **General K–12 learning platform:** emphasize 4a (communication), 4g (cognitive), Section 5 (learning style). Make 4d (sensory) and 4f (adaptive) optional.
+- **Neurodivergent-focused platform:** all sub-modules of Section 4 are required; add diagnosis-specific branching in Section 3.
+- **Special education / IEP support:** add an IEP/504 document upload in Section 5; expand 4f (adaptive) and add present-levels alignment.
+- **Early childhood (ages 2–6):** heavily weight milestones (Section 3), motor (4e), and adaptive (4f); reduce 4g (cognitive) to observational items only.
+- **Social-emotional / mental health focus:** expand 4b and 4c; add a validated short screen (e.g., adapted PSC-17 items) with appropriate licensing.
+
+---
+
+## 9. What I'd Build First (MVP Cut)
+
+If I were shipping v1 tomorrow, I'd cut to:
+
+1. Sections 0, 1, 2, 6, 7 in full (framing, context, strengths, goals, wrap-up)
+2. Section 3: diagnoses + services only (skip milestones)
+3. Section 4: only 4a (communication), 4b (social-emotional), 4g (cognitive)
+4. Section 5: just the learning style multi-select + one open text
+
+Target: 12–15 minutes. Then layer in sensory, motor, adaptive, and branching logic in v2 once you see completion data.
+
+---
+
+## 10. Open Design Questions for Your Team
+
+Worth deciding before build:
+
+1. Are you collecting this once (baseline) or recurring (monthly/quarterly re-assessment)? The design changes meaningfully for longitudinal tracking.
+2. Will there be a corresponding child-facing assessment, or teacher version? If yes, design for triangulation.
+3. What's your position on surfacing "levels" or "scores" to parents? Strong recommendation: translate everything to plain language, never show a raw number.
+4. How will you handle co-parents with different answers? Store both, flag disagreements for the baseline generator?
+5. What happens when answers suggest a need aivo can't meet (e.g., acute mental health)? Have a referral pathway ready before launch.

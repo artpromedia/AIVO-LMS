@@ -1,0 +1,30 @@
+{
+  "name": "@aivo/level-transforms",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Functioning-level content transforms (STANDARD ↔ SUPPORTED ↔ LOW_VERBAL ↔ NON_VERBAL ↔ PRE_SYMBOLIC). Adapts authored content-pack activities to a learner's functioning level so a single pack covers the whole tier ladder (§9.3 Extract 4–6w).",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "package.json"],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "tsc",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@aivo/content-pack": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.3",
+    "vitest": "^2.0.0"
+  }
+}

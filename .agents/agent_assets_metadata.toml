@@ -1,0 +1,343 @@
+uploads = []
+
+[[generated]]
+id = "Hsn2y3sDFMbxWxdpX8f7c"
+uri = "file://apps/web/public/assets/shop/astronaut-helmet.png"
+type = "image"
+title = "astronaut helmet shop item"
+
+[[generated]]
+id = "ebOvh9gKM8qtQHn-eGvVt"
+uri = "file://apps/web/public/assets/shop/rainbow-cape.png"
+type = "image"
+title = "rainbow cape shop item"
+
+[[generated]]
+id = "hOTE4egBeDJ6iycqU1mrb"
+uri = "file://apps/web/public/assets/shop/dragon-wings.png"
+type = "image"
+title = "dragon wings shop item"
+
+[[generated]]
+id = "jBNy3ZiP8lr0w0nYaSkDG"
+uri = "file://apps/web/public/assets/shop/neon-sneakers.png"
+type = "image"
+title = "neon sneakers shop item"
+
+[[generated]]
+id = "pQRsmI_tXEL2cPcOeooeD"
+uri = "file://apps/web/public/assets/shop/star-trail.png"
+type = "image"
+title = "star trail effect item"
+
+[[generated]]
+id = "q7DLiCrVosUXCuvPqz5Iq"
+uri = "file://apps/web/public/assets/shop/spiky-purple-hair.png"
+type = "image"
+title = "spiky purple hair item"
+
+[[generated]]
+id = "cW5isKerSjp2jRGWm_nOv"
+uri = "file://apps/web/public/assets/shop/galaxy-outfit.png"
+type = "image"
+title = "galaxy outfit shop item"
+
+[[generated]]
+id = "WhDiuVgOmTrR4gNq4aOlG"
+uri = "file://apps/web/public/assets/shop/sparkle-effect.png"
+type = "image"
+title = "sparkle effect item"
+
+[[generated]]
+id = "12z5ffPs6-myDUvjgSlEg"
+uri = "file://apps/web/public/images/tutors/nova.png"
+type = "image"
+title = "Nova math tutor avatar"
+
+[[generated]]
+id = "xxy8LUNEpT5nC3l-h3Min"
+uri = "file://apps/web/public/images/tutors/sage.png"
+type = "image"
+title = "Sage ELA tutor avatar"
+
+[[generated]]
+id = "pT7qFvGwnXoIqidSnY7E5"
+uri = "file://apps/web/public/images/tutors/spark.png"
+type = "image"
+title = "Spark science tutor avatar"
+
+[[generated]]
+id = "nv6Q7Esh0CZ-3xGFmSAwU"
+uri = "file://apps/web/public/images/tutors/chrono.png"
+type = "image"
+title = "Chrono history tutor avatar"
+
+[[generated]]
+id = "oqJ3vJgExOXuTlk7hsDVK"
+uri = "file://apps/web/public/images/tutors/pixel.png"
+type = "image"
+title = "Pixel coding tutor avatar"
+
+[[generated]]
+id = "sBZIbkaTjQBZ5C4I9rEWq"
+uri = "file://apps/web/public/images/tutors/echo.png"
+type = "image"
+title = "Echo speech tutor avatar"
+
+[[generated]]
+id = "wgJe_ASknijxDVOYMVHwb"
+uri = "file://apps/web/public/images/tutors/harmony.png"
+type = "image"
+title = "Harmony SEL tutor avatar"
+
+[[generated]]
+id = "NvNli9AbE257daP5OAG_5"
+uri = "file://apps/web/public/images/tutors/atlas.png"
+type = "image"
+title = "Atlas geography tutor avatar"
+
+[[generated]]
+id = "8-aUAo8v_bz4OLS0z4wb9"
+uri = "file://apps/web/public/images/tutors/cadence.png"
+type = "image"
+title = "Cadence music tutor avatar"
+
+[[generated]]
+id = "78z-Qs5QXBd_Aa1xxSjW7"
+uri = "file://apps/web/public/images/tutors/vigor.png"
+type = "image"
+title = "Vigor PE tutor avatar"
+
+[[generated]]
+id = "_6Dtds_drYoDcy-d2Q9I0"
+uri = "file://apps/web/public/images/tutors/lingua.png"
+type = "image"
+title = "Lingua language tutor avatar"
+
+[[generated]]
+id = "P7dZWXY-06Rc5_oJPksyj"
+uri = "file://apps/web/public/images/tutors/forge.png"
+type = "image"
+title = "Forge vocational tutor avatar"
+
+[[generated]]
+id = "WBeL2tvDJaUS5myCCX2hZ"
+uri = "file://apps/web/public/images/tutors/compass.png"
+type = "image"
+title = "Compass life skills tutor avatar"
+
+[[generated]]
+id = "80ypvbJlrnjI9Z7htDgzE"
+uri = "file://apps/web/public/images/tutors/muse.png"
+type = "image"
+title = "Muse art tutor avatar"
+
+[[generated]]
+id = "z3pFl-MJvbU0b_DwQI4Qf"
+uri = "file://apps/mobile/assets/images/splash-icon.png"
+type = "image"
+title = "AIVO splash screen logo"
+
+[[generated]]
+id = "hT2MyJ9C6HL2JojaPUA1F"
+uri = "file://artifacts/mockup-sandbox/public/images/nd-visual-hero.png"
+type = "image"
+title = "Hero inclusive child with tablet"
+
+[[generated]]
+id = "oT20Xz4GfbaIL1XITMBy6"
+uri = "file://artifacts/mockup-sandbox/public/images/nd-visual-feature-1.png"
+type = "image"
+title = "Brain clone personalized AI"
+
+[[generated]]
+id = "UE3aG_6mXQJY7N5-Yfety"
+uri = "file://artifacts/mockup-sandbox/public/images/nd-visual-feature-2.png"
+type = "image"
+title = "Friendly robot tutors"
+
+[[generated]]
+id = "erWXCxOb4gdlVCdl9lvNQ"
+uri = "file://artifacts/mockup-sandbox/public/images/nd-visual-feature-3.png"
+type = "image"
+title = "Sensory friendly environment"
+
+[[generated]]
+id = "GdNiOVftht_gMyuyqfcxE"
+uri = "file://artifacts/mockup-sandbox/public/images/nd-focused-hero.png"
+type = "image"
+title = "Hero image neurodiverse child"
+
+[[generated]]
+id = "0iGwPgcXER9WDWopLCnh1"
+uri = "file://artifacts/mockup-sandbox/public/images/nd-focused-tutor-1.png"
+type = "image"
+title = "Friendly AI Tutor Atlas"
+
+[[generated]]
+id = "zckdqdodOCNkGCAgsxthD"
+uri = "file://artifacts/mockup-sandbox/public/images/nd-focused-tutor-2.png"
+type = "image"
+title = "Friendly AI Tutor Spark"
+
+[[generated]]
+id = "5FiArV6B1O397sEcRG_j3"
+uri = "file://artifacts/mockup-sandbox/public/images/nd-focused-tutor-3.png"
+type = "image"
+title = "Friendly AI Tutor Muse"
+
+[[generated]]
+id = "RjhCYZ7vZ263J-oijPoxR"
+uri = "file://artifacts/mockup-sandbox/public/images/nd-focused-tutor-4.png"
+type = "image"
+title = "Friendly AI Tutor Nova"
+
+[[generated]]
+id = "5zf-0U7Zuphzwia8rgD-l"
+uri = "file://artifacts/mockup-sandbox/public/images/nd-focused-avatar.png"
+type = "image"
+title = "Child Avatar"
+
+[[generated]]
+id = "fYdE7a46u3qMiNa3XtKGp"
+uri = "file://artifacts/mockup-sandbox/public/images/nd-calm-hero.png"
+type = "image"
+title = "calm child learning"
+
+[[generated]]
+id = "-iQ2-L0CAV-p7TcH865xg"
+uri = "file://artifacts/mockup-sandbox/public/images/nd-calm-avatar.png"
+type = "image"
+title = "child avatar"
+
+[[generated]]
+id = "T0nOC9lF-kQsfVEMAmWiG"
+uri = "file://artifacts/mockup-sandbox/public/images/nd-calm-testimonial-1.png"
+type = "image"
+title = "parent testimonial avatar"
+
+[[generated]]
+id = "9rB8o5l9HDiNQYIacW6ZF"
+uri = "file://artifacts/mockup-sandbox/public/images/nd-calm-testimonial-2.png"
+type = "image"
+title = "parent testimonial avatar"
+
+[[generated]]
+id = "pcw30K1KPCsXnnoFNJJcI"
+uri = "file://artifacts/mockup-sandbox/public/images/nd-visual-avatar.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "U1pQuitKXG69FgTVUhG5_"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-calm/hero.png"
+type = "image"
+title = "Soft watercolor hero illustration"
+
+[[generated]]
+id = "PDl06YaWjZPqmQIa3upl_"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-calm/brainclone.png"
+type = "image"
+title = "Brain clone companion illustration"
+
+[[generated]]
+id = "J6EqIdThNz5eW9rPCcP9K"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-calm/tutors.png"
+type = "image"
+title = "Friendly AI tutors illustration"
+
+[[generated]]
+id = "-vADcF0LwEZeDRYaKqu4b"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-calm/avatar-bear.png"
+type = "image"
+title = "Bear avatar for learner"
+
+[[generated]]
+id = "6QveQzyFDtZ2iaZ18YLD0"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-calm/avatar-owl.png"
+type = "image"
+title = "Owl avatar for learner"
+
+[[generated]]
+id = "kKjM7pkO1PlQiHAF411uH"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-trusted/hero-learner.png"
+type = "image"
+title = "Boy looking at tablet"
+
+[[generated]]
+id = "GpGIr10sRP0RYSCbXkwZB"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-trusted/auth-learner.png"
+type = "image"
+title = "Girl reading a book"
+
+[[generated]]
+id = "UkxsnbK0QUn6s04ubXZhh"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-trusted/parent-1.png"
+type = "image"
+title = "Friendly mother portrait"
+
+[[generated]]
+id = "mkLr5XKTjVPNXb5pX4XYV"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-friendly/hero-mascots.png"
+type = "image"
+title = "playful tutor mascots"
+
+[[generated]]
+id = "pT5tDFOggoEkMQ_P6ZTmU"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-friendly/brainclone.png"
+type = "image"
+title = "brainclone mascot"
+
+[[generated]]
+id = "LFpcYMideVKyI8pTVxv3R"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-friendly/auth-mascot.png"
+type = "image"
+title = "auth mascot peeking"
+
+[[generated]]
+id = "dXvdoJifvJZfTbj7GNx03"
+uri = "file://apps/marketing/public/images/hero/girl-laptop.png"
+type = "image"
+title = "girl_laptop_hero"
+
+[[generated]]
+id = "jBS3MfFoNr8jSlqd-B_IU"
+uri = "file://apps/marketing/public/images/hero/boy-tablet.png"
+type = "image"
+title = "boy_tablet_hero"
+
+[[generated]]
+id = "8aBDdjM079CGwCu-eaiIN"
+uri = "file://apps/marketing/public/images/hero/girl-reading.png"
+type = "image"
+title = "girl_reading_hero"
+
+[[outputs]]
+id = "0e7lRmti5tdoSwrX0-ySG"
+uri = "file://.local/preview/marketing-hero.jpg"
+type = "image"
+title = "Marketing site — hero (current)"
+
+[[outputs]]
+id = "Zi5vokNhnMNYB7TDg8_GM"
+uri = "file://.local/preview/marketing-fullpage.jpg"
+type = "image"
+title = "Marketing site — full page (current)"
+
+[[outputs]]
+id = "TkAz73eqcMHGHwBYQch_l"
+uri = "file://.local/preview/vi-login.jpg"
+type = "image"
+title = "V&I login page (T018)"
+
+[[outputs]]
+id = "0gUajev2DuV3SJfcfg67O"
+uri = "file://.local/preview/vi-signup.jpg"
+type = "image"
+title = "V&I signup page (T018)"
+
+[[outputs]]
+id = "bP6_v1-24oBejDBufWBm0"
+uri = "file://.local/preview/marketing-hero-fixed.jpg"
+type = "image"
+title = "Marketing site — Sign In button now visible"

@@ -1,0 +1,19 @@
+# =============================================================================
+# AIVO Service - Helm Chart
+# =============================================================================
+# Generic Helm chart for deploying AIVO microservices to Kubernetes
+# =============================================================================
+
+apiVersion: v2
+name: aivo-service
+description: A Helm chart for AIVO microservices
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - aivo
+  - microservice
+  - nestjs
+maintainers:
+  - name: AIVO Platform Team
+    email: platform@aivolearning.com

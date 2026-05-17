@@ -1,0 +1,265 @@
+name: Deploy Staging
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "22"
+  NAMESPACE: aivo-staging
+  CHART_PATH: infra/helm/aivo-service
+  VALUES_FILE: infra/helm/values/staging.yaml
+  IMAGE_PREFIX: ghcr.io/artpromedia
+
+jobs:
+  build-node:
+    name: Build All Node Services
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all packages and services
+        run: pnpm build
+
+  build-python:
+    name: Validate Python Services
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate brain-svc
+        run: |
+          pip install -r services/brain-svc/requirements.txt
+          cd services/brain-svc && python -m py_compile src/brain_svc/main.py
+
+      - name: Validate ai-svc
+        run: |
+          if [ -f services/ai-svc/requirements.txt ]; then
+            pip install -r services/ai-svc/requirements.txt
+          fi
+          if [ -f services/ai-svc/src/main.py ]; then
+            cd services/ai-svc && python -m py_compile src/main.py
+          fi
+
+      - name: Validate curriculum-svc
+        run: |
+          pip install -r services/curriculum-svc/requirements.txt
+          cd services/curriculum-svc && python -m py_compile src/curriculum_svc/main.py
+
+  build-push-python-images:
+    name: Build & Push Python Images
+    runs-on: [self-hosted, hetzner, production]
+    timeout-minutes: 20
+    needs: build-python
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and push Python service images
+        env:
+          IMAGE_PREFIX: ${{ env.IMAGE_PREFIX }}
+        run: |
+          set -euo pipefail
+          PYTHON_SERVICES=(brain-svc ai-svc curriculum-svc)
+          for svc in "${PYTHON_SERVICES[@]}"; do
+            echo "═══ Building $svc ═══"
+            DOCKER_BUILDKIT=0 docker build \
+              -f docker/Dockerfile.python-service \
+              --build-arg SERVICE_NAME="$svc" \
+              -t "${IMAGE_PREFIX}/$svc:latest" \
+              . 2>&1 | tail -5
+            echo "═══ Pushing $svc ═══"
+            docker push "${IMAGE_PREFIX}/$svc:latest" 2>&1 | tail -3
+          done
+
+  build-push-node-services:
+    name: Build & Push Node Service Images
+    runs-on: [self-hosted, hetzner, production]
+    timeout-minutes: 60
+    needs: build-node
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and push Node service images
+        env:
+          IMAGE_PREFIX: ${{ env.IMAGE_PREFIX }}
+        run: |
+          set -euo pipefail
+          NODE_SERVICES=(
+            identity-svc assessment-svc learning-svc tutor-svc
+            family-svc engagement-svc billing-svc comms-svc
+            i18n-svc integrations-svc admin-svc status-page-svc research-svc
+          )
+          GIT_COMMIT="${GITHUB_SHA}"
+          for svc in "${NODE_SERVICES[@]}"; do
+            echo "═══ Building $svc ═══"
+            DOCKER_BUILDKIT=0 docker build \
+              -f docker/Dockerfile.service \
+              --build-arg SERVICE_NAME="$svc" \
+              --build-arg GIT_COMMIT="$GIT_COMMIT" \
+              -t "${IMAGE_PREFIX}/$svc:latest" \
+              . 2>&1 | tail -10
+            echo "═══ Pushing $svc ═══"
+            docker push "${IMAGE_PREFIX}/$svc:latest" 2>&1 | tail -3
+          done
+
+  deploy:
+    name: Deploy to Staging
+    runs-on: [self-hosted, hetzner, production]
+    timeout-minutes: 20
+    needs: [build-node, build-push-python-images, build-push-node-services]
+    environment: staging
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify cluster reachable
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+
+      - name: Setup Helm
+        run: |
+          if ! command -v helm &>/dev/null; then
+            curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+          fi
+          helm version
+
+      - name: Deploy all services to staging
+        run: |
+          set -euo pipefail
+          NS="${{ env.NAMESPACE }}"
+
+          kubectl create namespace "$NS" --dry-run=client -o yaml | kubectl apply -f -
+
+          # Staging uses private GHCR images and shared runtime secrets.
+          # Sync missing secrets from production namespace to avoid pull/config failures.
+          for sec in ghcr-pull-secret aivo-common-env db-secrets identity-secrets jwt-secrets; do
+            if ! kubectl -n "$NS" get secret "$sec" >/dev/null 2>&1; then
+              kubectl -n aivo get secret "$sec" -o yaml \
+                | sed "s/namespace: aivo$/namespace: $NS/" \
+                | kubectl -n "$NS" apply -f -
+            fi
+          done
+
+          # Some services resolve NATS as `nats` by default.
+          # Bridge staging DNS to the production NATS service.
+          cat <<EOF | kubectl apply -f -
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: nats
+            namespace: $NS
+            labels:
+              app.kubernetes.io/managed-by: github-actions
+          spec:
+            type: ExternalName
+            externalName: nats.aivo.svc.cluster.local
+          EOF
+
+          SERVICES=(
+            identity-svc assessment-svc brain-svc ai-svc learning-svc
+            tutor-svc family-svc engagement-svc billing-svc comms-svc
+            i18n-svc integrations-svc admin-svc status-page-svc research-svc
+            curriculum-svc
+            alerts-proxy-svc
+          )
+
+          adopt() {
+            local kind="$1" name="$2" svc="$3"
+            kubectl -n "$NS" get "$kind" "$name" >/dev/null 2>&1 || return 0
+            kubectl -n "$NS" label "$kind" "$name" app.kubernetes.io/managed-by=Helm --overwrite >/dev/null
+            kubectl -n "$NS" annotate "$kind" "$name" meta.helm.sh/release-name="$svc" --overwrite >/dev/null
+            kubectl -n "$NS" annotate "$kind" "$name" meta.helm.sh/release-namespace="$NS" --overwrite >/dev/null
+          }
+
+          clear_pending_release() {
+            local svc="$1"
+            local status
+            status=$(helm status "$svc" -n "$NS" 2>/dev/null | awk -F': ' '/^STATUS:/{print $2}' || true)
+            if [[ "$status" == pending-* ]]; then
+              echo "⚠  $svc has pending Helm state ($status); uninstalling stale release"
+              helm uninstall "$svc" -n "$NS" || true
+            fi
+          }
+
+          helm_apply() {
+            local svc="$1" port="$2"
+            helm upgrade --install "$svc" "${{ env.CHART_PATH }}" \
+              -f "${{ env.VALUES_FILE }}" \
+              --set serviceName="$svc" \
+              --set image.repository="${{ env.IMAGE_PREFIX }}" \
+              --set image.tag="latest" \
+              --set imagePullSecrets[0].name=ghcr-pull-secret \
+              --set env.NODE_ENV=production \
+              --set envFrom[0].secretRef.name=aivo-common-env \
+              --set envFrom[1].secretRef.name=db-secrets \
+              --set envFrom[2].secretRef.name=identity-secrets \
+              --set envFrom[3].secretRef.name=jwt-secrets \
+              --set service.port=$port \
+              --set service.targetPort=$port \
+              --set replicaCount=1 \
+              -n "$NS" --timeout 3m --wait
+          }
+
+          FAILED=0
+          for svc in "${SERVICES[@]}"; do
+            PORT=3000
+
+            clear_pending_release "$svc"
+            adopt serviceaccount "$svc" "$svc"
+            adopt service "$svc" "$svc"
+            adopt deployment "$svc" "$svc"
+            adopt configmap "$svc" "$svc"
+
+            echo "═══ Deploying $svc (staging) ═══"
+            set +e
+            OUT=$(helm_apply "$svc" "$PORT" 2>&1)
+            RC=$?
+            set -e
+
+            if [ $RC -ne 0 ]; then
+              echo "$OUT"
+              if echo "$OUT" | grep -q "field is immutable"; then
+                echo "⚠  Immutable selector conflict for $svc; deleting Deployment and retrying"
+                kubectl -n "$NS" delete deployment "$svc" --ignore-not-found=true >/dev/null 2>&1 || true
+                if ! helm_apply "$svc" "$PORT"; then
+                  echo "⚠  $svc deploy incomplete"
+                  FAILED=$((FAILED + 1))
+                fi
+              else
+                echo "⚠  $svc deploy incomplete"
+                FAILED=$((FAILED + 1))
+              fi
+            fi
+          done
+
+          echo ""
+          echo "═══ Staging deploy complete: $((${#SERVICES[@]} - FAILED))/${#SERVICES[@]} successful ═══"
+
+      - name: Verify rollout
+        run: |
+          kubectl -n ${{ env.NAMESPACE }} get pods --sort-by=.metadata.name -o wide

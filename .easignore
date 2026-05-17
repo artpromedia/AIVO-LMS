@@ -1,0 +1,21 @@
+node_modules/
+.git/
+.expo/
+dist/
+*.log
+__tests__/
+coverage/
+.local/
+attached_assets/
+docs/
+infra/
+
+# Exclude other apps - mobile build only
+apps/web/
+apps/marketing/
+
+# Exclude all backend services (not needed for mobile)
+services/
+
+# Exclude python/scripts not needed for mobile (top-level only)
+/scripts/

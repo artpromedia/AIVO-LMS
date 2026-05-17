@@ -1,0 +1,189 @@
+@import "tailwindcss";
+
+@theme {
+  --color-aivo-ink: oklch(0.22 0.04 270);
+  --color-aivo-ink-soft: oklch(0.42 0.03 270);
+  --color-aivo-muted: oklch(0.62 0.02 270);
+  --color-aivo-surface: oklch(0.99 0.005 270);
+  --color-aivo-surface-2: oklch(0.97 0.01 270);
+  --color-aivo-border: oklch(0.92 0.01 270);
+  --color-aivo-primary: oklch(0.58 0.18 265);
+  --color-aivo-primary-fg: oklch(0.99 0.005 270);
+  --color-aivo-primary-soft: oklch(0.94 0.04 265);
+  --color-aivo-accent: oklch(0.72 0.18 60);
+  --color-aivo-success: oklch(0.65 0.14 155);
+  --color-aivo-warning: oklch(0.78 0.15 75);
+  --color-aivo-danger: oklch(0.62 0.20 25);
+  --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fredoka", ui-sans-serif, system-ui, sans-serif;
+  --radius-card: 14px;
+  /* Sidebar/page chrome — overridden per role theme. */
+  --color-aivo-sidebar-bg: var(--color-aivo-surface);
+  --color-aivo-sidebar-fg: var(--color-aivo-ink);
+  --color-aivo-sidebar-muted: var(--color-aivo-muted);
+  --color-aivo-sidebar-border: var(--color-aivo-border);
+  --color-aivo-page-bg: oklch(0.97 0.01 270 / 0.4);
+  --aivo-density-card-pad: 1.25rem;
+  --aivo-density-base-font: 1rem;
+  --aivo-density-h1-font: 1.875rem;
+}
+
+html,
+body {
+  background: var(--color-aivo-surface);
+  color: var(--color-aivo-ink);
+  font-family: var(--font-sans);
+}
+
+*:focus-visible {
+  outline: 3px solid var(--color-aivo-primary);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 8px;
+}
+.skip-link:focus {
+  left: 8px;
+  background: var(--color-aivo-ink);
+  color: var(--color-aivo-primary-fg);
+  padding: 8px 12px;
+  border-radius: 8px;
+  z-index: 100;
+}
+
+/* =====================================================================
+   Role-specific themes
+   Each [data-theme="…"] block overrides the AIVO design tokens for an
+   entire dashboard subtree without touching individual pages.
+   Mapped from session.role in components/layout/app-shell.tsx.
+   ===================================================================== */
+
+/* PARENT — warm, calm, trustworthy. Slight cream tint, current primary,
+   gentler page background. Closest to the original AIVO look. */
+[data-theme="parent"] {
+  --color-aivo-surface: oklch(0.995 0.008 80);
+  --color-aivo-surface-2: oklch(0.965 0.018 75);
+  --color-aivo-primary: oklch(0.56 0.14 265);
+  --color-aivo-primary-soft: oklch(0.94 0.04 75);
+  --color-aivo-accent: oklch(0.74 0.16 55);
+  --color-aivo-page-bg: oklch(0.965 0.018 75);
+  --color-aivo-sidebar-bg: oklch(0.99 0.012 75);
+  --radius-card: 16px;
+}
+
+/* LEARNER — playful, kid-safe, neurodiversity-aware. Bigger radius, brighter
+   sunny primary, larger base font, Fredoka used everywhere for friendliness,
+   higher-contrast surface. One-task density. */
+[data-theme="learner"] {
+  --color-aivo-ink: oklch(0.18 0.05 280);
+  --color-aivo-surface: oklch(0.995 0.01 240);
+  --color-aivo-surface-2: oklch(0.96 0.04 230);
+  --color-aivo-border: oklch(0.88 0.04 240);
+  --color-aivo-primary: oklch(0.65 0.22 30);
+  --color-aivo-primary-soft: oklch(0.93 0.08 30);
+  --color-aivo-accent: oklch(0.78 0.18 145);
+  --color-aivo-page-bg: oklch(0.96 0.04 230);
+  --color-aivo-sidebar-bg: oklch(0.65 0.22 30);
+  --color-aivo-sidebar-fg: oklch(0.99 0.01 30);
+  --color-aivo-sidebar-muted: oklch(0.95 0.05 30 / 0.85);
+  --color-aivo-sidebar-border: oklch(0.55 0.22 30);
+  --font-sans: "Fredoka", "Nunito", ui-sans-serif, system-ui, sans-serif;
+  --radius-card: 28px;
+  --aivo-density-card-pad: 1.75rem;
+  --aivo-density-base-font: 1.0625rem;
+  --aivo-density-h1-font: 2.25rem;
+}
+
+/* TEACHER — instructional, denser, more grayscale. Smaller radius, more
+   data-tabular feel, calmer cool-teal primary. */
+[data-theme="teacher"] {
+  --color-aivo-ink: oklch(0.20 0.02 220);
+  --color-aivo-ink-soft: oklch(0.40 0.02 220);
+  --color-aivo-surface: oklch(0.99 0.003 220);
+  --color-aivo-surface-2: oklch(0.96 0.006 220);
+  --color-aivo-border: oklch(0.90 0.006 220);
+  --color-aivo-primary: oklch(0.52 0.10 210);
+  --color-aivo-primary-soft: oklch(0.94 0.025 210);
+  --color-aivo-page-bg: oklch(0.965 0.005 220);
+  --color-aivo-sidebar-bg: oklch(0.99 0.003 220);
+  --radius-card: 10px;
+  --aivo-density-card-pad: 1rem;
+  --aivo-density-base-font: 0.9375rem;
+  --aivo-density-h1-font: 1.625rem;
+}
+
+/* ADMIN (school + district) — businesslike, slate, compact. */
+[data-theme="admin"] {
+  --color-aivo-ink: oklch(0.22 0.015 250);
+  --color-aivo-ink-soft: oklch(0.42 0.015 250);
+  --color-aivo-surface: oklch(0.99 0.003 250);
+  --color-aivo-surface-2: oklch(0.96 0.006 250);
+  --color-aivo-border: oklch(0.89 0.008 250);
+  --color-aivo-primary: oklch(0.45 0.08 250);
+  --color-aivo-primary-soft: oklch(0.93 0.02 250);
+  --color-aivo-page-bg: oklch(0.96 0.006 250);
+  --color-aivo-sidebar-bg: oklch(0.98 0.005 250);
+  --radius-card: 10px;
+  --aivo-density-card-pad: 1rem;
+  --aivo-density-base-font: 0.9375rem;
+  --aivo-density-h1-font: 1.625rem;
+}
+
+/* PLATFORM ADMIN — utilitarian, dashboardy, dark sidebar, monospace IDs.
+   Internal-facing; density over warmth. */
+[data-theme="platform"] {
+  --color-aivo-ink: oklch(0.20 0.02 240);
+  --color-aivo-ink-soft: oklch(0.40 0.02 240);
+  --color-aivo-surface: oklch(0.99 0.004 240);
+  --color-aivo-surface-2: oklch(0.95 0.008 240);
+  --color-aivo-border: oklch(0.88 0.01 240);
+  --color-aivo-primary: oklch(0.50 0.15 220);
+  --color-aivo-primary-soft: oklch(0.94 0.03 220);
+  --color-aivo-accent: oklch(0.72 0.18 195);
+  --color-aivo-page-bg: oklch(0.95 0.008 240);
+  --color-aivo-sidebar-bg: oklch(0.22 0.04 250);
+  --color-aivo-sidebar-fg: oklch(0.96 0.01 240);
+  --color-aivo-sidebar-muted: oklch(0.70 0.03 240);
+  --color-aivo-sidebar-border: oklch(0.32 0.04 250);
+  --radius-card: 8px;
+  --aivo-density-card-pad: 1rem;
+  --aivo-density-base-font: 0.9375rem;
+  --aivo-density-h1-font: 1.625rem;
+}
+
+/* Apply density tokens to the themed subtree so we don't have to edit every
+   PageHeader / Card. The h1 selector targets the PageHeader title; the body
+   font-size targets readable copy across the shell. */
+[data-theme] {
+  font-size: var(--aivo-density-base-font);
+}
+[data-theme] h1 {
+  font-size: var(--aivo-density-h1-font);
+}
+[data-theme] main {
+  background: transparent;
+}
+
+/* Sidebar nav links — pick up sidebar-fg tokens so dark sidebars (learner,
+   platform) read legibly. Active state still uses primary-soft pill but with
+   higher-contrast text on dark sidebars. */
+.aivo-nav-link {
+  color: color-mix(in oklch, var(--color-aivo-sidebar-fg) 75%, transparent);
+}
+.aivo-nav-link:hover {
+  background: color-mix(in oklch, var(--color-aivo-sidebar-fg) 8%, transparent);
+  color: var(--color-aivo-sidebar-fg);
+}
+.aivo-nav-link--active {
+  background: var(--color-aivo-primary-soft);
+  color: var(--color-aivo-primary);
+}
+[data-theme="learner"] .aivo-nav-link--active,
+[data-theme="platform"] .aivo-nav-link--active {
+  background: color-mix(in oklch, var(--color-aivo-sidebar-fg) 18%, transparent);
+  color: var(--color-aivo-sidebar-fg);
+}

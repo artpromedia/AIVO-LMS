@@ -1,0 +1,232 @@
+
+
+I'll start by exploring all six repositories to understand the Aivo platform's architecture, components, and capabilities before developing a comprehensive PRD.Now let me explore the directory structures and README files of each repo to understand their architectures:Now let me fetch the key READMEs and architecture documents to understand the platform deeply:Now let me fetch the key README files and architecture documents to understand what each repo does:Now let me fetch the key README files to understand each repo's purpose and architecture:Now let me fetch the key README files and architecture documents to understand the platform deeply.Now let me fetch the key README and architecture documents from the most relevant repos.Now let me fetch the key README files to understand each repo's purpose:Now I have a comprehensive picture of all six repositories. Let me fetch the key README files and architecture documents to understand the platform deeply before drafting the PRD.Now I have a comprehensive understanding of all six repositories. Let me fetch the key README files to understand the architecture and capabilities more deeply.# AIVO Platform Admin Dashboard — Product Requirements Document (PRD)
+
+Based on my deep review of all six repositories, here is a comprehensive PRD synthesizing the architecture, capabilities, and gaps across your entire AIVO ecosystem.
+
+---
+
+## 1. Executive Summary
+
+The **AIVO Platform Admin Dashboard** is an enterprise-ready, centralized management console that provides full operational control over the entire AIVO ecosystem — spanning AI/ML services, learning applications, mobile apps, billing, compliance, multi-tenant school/district management, and infrastructure monitoring. It consolidates the scattered admin touchpoints found across your six repositories into a single, unified control plane.
+
+---
+
+## 2. Platform Inventory (From Repository Analysis)
+
+| Repository | Role | Tech Stack |
+|---|---|---|
+| **aivo** | Core monorepo — auth, design system, parent/school/district dashboards, security (MFA, RBAC, step-up auth) | Python 62%, TypeScript 31%, Next.js |
+| **aivo-agentic-ai-platform** | Agentic AI engine — SEL, IEP, learning sessions, content generation, emotion recognition, COPPA compliance | Python 53%, TypeScript 34%, PLpgSQL 10% |
+| **aivo-agentic-ai-learning-app** | Learner-facing app — multi-portal (admin, parent, teacher, district, super-admin), baseline assessments, AI brain, mobile | TypeScript/Next.js + Python backend |
+| **aivo-v5** | v5 iteration — monorepo with backend services, mobile (React Native), k8s, Prisma, observability, load tests, e2e | TypeScript 70%, Python 13%, Dart 13% |
+| **aivo-platform** | Production consolidation — Hetzner deployment, billing/M-Pesa, trust scores, sprint-based QA audits, i18n | Python 54%, TypeScript 33%, Dart 9%, Cython |
+| **aivolearning** | Unified monorepo (latest) — turborepo with apps/packages/infra/e2e/docs, Hetzner deployment | TypeScript 60%, Python 20%, Dart 17% |
+
+---
+
+## 3. Problem Statement
+
+Currently, the AIVO platform has:
+- **6 separate repositories** with overlapping admin functionality (admin portals in `aivo-agentic-ai-learning-app`, district portals in `aivo`, super-admin in `aivo-platform`)
+- **No unified operational dashboard** for platform-wide health, tenant management, or AI model governance
+- **Fragmented billing/licensing** (M-Pesa in `aivo-platform`, licensing vault in `aivo-agentic-ai-learning-app`)
+- **Distributed compliance controls** (COPPA in `aivo-agentic-ai-platform`, security audits in `aivo`, data deletion spread across repos)
+- **No centralized observability** — monitoring configs exist in `aivo-v5` but aren't unified
+
+---
+
+## 4. Goals & Success Metrics
+
+| Goal | Metric |
+|---|---|
+| Single pane of glass for all platform operations | 100% of admin functions accessible from one dashboard |
+| Reduce time-to-resolve operational issues | Mean time to detect (MTTD) < 5 min |
+| Multi-tenant management at scale | Support 500+ districts, 10K+ schools |
+| Compliance audit readiness | Pass SOC2/FERPA/COPPA audit within 30 days of launch |
+| AI model governance | 100% of deployed models trackable with drift/performance metrics |
+
+---
+
+## 5. Functional Requirements
+
+### 5.1 Identity & Access Management (IAM)
+*Sources: `aivo` (S2E-01 through S2E-12 implementation docs), `aivo-agentic-ai-learning-app` (RBAC, Auth integration docs)*
+
+- **Multi-role RBAC**: Super Admin, Platform Admin, District Admin, School Admin, Support Agent
+- **MFA enforcement** with recovery flows (already implemented in `aivo`)
+- **Step-up authentication** for sensitive operations (implemented in `aivo`)
+- **User impersonation** for support workflows (exists in `aivo-agentic-ai-learning-app`)
+- **SSO/SAML** for enterprise district onboarding
+- **Audit trail** for all admin actions
+
+### 5.2 Tenant Management
+*Sources: `aivo` (F1-N15-08 School/District Integration), `aivo-agentic-ai-learning-app` (District Portal docs), `aivo-platform` (SERVICE_CONSOLIDATION_MAP)*
+
+- **District lifecycle**: Create → Configure → Onboard → Monitor → Archive
+- **School management** within districts (hierarchy)
+- **License/seat management** per tenant (connects to billing)
+- **Custom branding/white-label** per district
+- **Curriculum assignment** and approval workflows
+- **District-level data isolation** and access controls
+
+### 5.3 AI & Model Management
+*Sources: `aivo-agentic-ai-platform` (AI-MODEL-MONITORING, AI-CONTENT-GENERATION), `aivo-agentic-ai-learning-app` (AGENTIC_AI_BRAIN, PERSONALIZED_BRAIN, MULTI_PROVIDER docs), `aivo-platform` (SPRINT_4_TASK_2_MODEL_MONITORING)*
+
+- **Model registry**: Track all deployed AI models (Agentic Brain, inference engines, reasoning engines)
+- **Multi-provider management**: OpenAI, Google Gemini, local models — with failover config
+- **Model performance dashboard**: Accuracy, latency, cost-per-inference, drift detection
+- **Trust Score monitoring** (implemented in `aivo-platform` Sprint 5)
+- **Content generation oversight**: Review/approve AI-generated learning content
+- **Brain training management**: Global and per-learner model training status
+
+### 5.4 Learning Platform Operations
+*Sources: `aivo-agentic-ai-learning-app` (ALL_PORTALS docs, BASELINE_ASSESSMENT docs), `aivo-agentic-ai-platform` (LEARNING-SESSION-SYSTEM, SEL-FRAMEWORK)*
+
+- **Portal health status**: Admin, Parent, Teacher, District, Learner — all portal uptimes
+- **Assessment management**: Baseline assessments, dynamic assessments, IEP tracking
+- **Curriculum management**: District curriculum assignment, content library administration
+- **Learning session monitoring**: Active sessions, completion rates, engagement metrics
+- **SEL (Social Emotional Learning) program management**
+
+### 5.5 Billing & Licensing
+*Sources: `aivo-platform` (BILLING_CREDIT_PROCESSING, SPRINT_4_TASK_3_MPESA), `aivo-agentic-ai-learning-app` (PROMPT_64_LICENSING_VAULT)*
+
+- **Subscription management**: Plans, tiers, seat counts per tenant
+- **Payment gateway admin**: Stripe, M-Pesa, credit processing
+- **Licensing vault**: License key generation, activation, expiry management
+- **Usage metering**: AI API calls, storage, compute per tenant
+- **Invoice generation** and payment history
+
+### 5.6 Compliance & Security
+*Sources: `aivo` (SECURITY docs, RISK_CONTROLS), `aivo-agentic-ai-platform` (COPPA-CONSENT, DATA-DELETION), `aivo-platform` (SECURITY_AUDIT_REPORT, COMPLIANCE_TEST_REPORT)*
+
+- **COPPA consent management**: Parental consent status, data processing records
+- **FERPA compliance dashboard**: Student data access logs, breach notifications
+- **Data deletion requests**: GDPR/CCPA subject access request workflow
+- **Security audit log viewer**: All admin actions, API access patterns
+- **Vulnerability scanning status**: Integration with existing gitleaks/trufflehog configs
+
+### 5.7 Infrastructure & Observability
+*Sources: `aivo-v5` (docker-compose, k8s/, observability/), `aivo-platform` (OBSERVABILITY_OPERATIONAL_READINESS, HETZNER_DEPLOYMENT_GUIDE), `aivolearning` (infra/)*
+
+- **Service health dashboard**: All microservices status (real-time)
+- **Database health checks** (implemented in `aivo-platform` Sprint 4)
+- **Deployment management**: Hetzner/K8s deployment status and rollback controls
+- **Log aggregation viewer**: Centralized logs from all services
+- **Performance metrics**: Response times, error rates, throughput per service
+- **Load test results viewer** (infrastructure exists in `aivo-v5`)
+
+### 5.8 Mobile App Management
+*Sources: `aivo-platform` (MOBILE_APPS_PRODUCTION_READINESS, MOBILE_CRITICAL_BLOCKERS), `aivo-agentic-ai-learning-app` (MOBILE_APP docs, AIVO_PAD_MDM_UPDATE)*
+
+- **MDM (Mobile Device Management)** integration for AIVO Pad
+- **Mobile app version management**: Push updates, feature flags
+- **Offline sync monitoring**: Learner device sync status
+- **App crash/performance analytics dashboard**
+
+---
+
+## 6. Non-Functional Requirements
+
+| Category | Requirement |
+|---|---|
+| **Performance** | Dashboard loads < 2s, real-time data refresh ≤ 5s |
+| **Scalability** | Support 1,000 concurrent admin users |
+| **Availability** | 99.9% uptime SLA |
+| **Accessibility** | WCAG 2.1 AA (neurodiverse UI patterns already exist in `aivo`) |
+| **Internationalization** | Multi-language support (i18n framework exists in `aivo-platform`) |
+| **Security** | SOC2 Type II, end-to-end encryption, zero-trust architecture |
+| **Browser Support** | Chrome, Safari, Firefox, Edge (last 2 versions) |
+
+---
+
+## 7. Recommended Technical Architecture
+
+```
+┌─────────────────────────────────────────────────┐
+│              Admin Dashboard (Next.js)           │
+│   TypeScript · React · Tailwind · shadcn/ui      │
+├─────────────────────────────────────────────────┤
+│                 API Gateway (BFF)                │
+│         Express/Fastify · GraphQL/REST           │
+├──────────┬──────────┬──────────┬────────────────┤
+│ Auth Svc │ Tenant   │ AI Mgmt  │ Billing Svc    │
+│ (exists) │ Svc (new)│ Svc (new)│ (exists)       │
+├──────────┼──────────┼──────────┼────────────────┤
+│ Observ.  │ Complian.│ Learning │ Mobile Mgmt    │
+│ Svc (ext)│ Svc (new)│ Ops (ext)│ Svc (new)      │
+├──────────┴──────────┴──────────┴────────────────┤
+│           PostgreSQL · Redis · S3                │
+│        Prometheus · Grafana · Loki               │
+└─────────────────────────────────────────────────┘
+```
+
+**Key decisions:**
+- **Next.js frontend** — consistent with `aivo-v5` and `aivo-agentic-ai-learning-app` (both TypeScript-heavy)
+- **Monorepo placement** — add as a workspace in `aivolearning` (your latest unified turborepo)
+- **Reuse existing**: Auth (from `aivo`), Design System (from `aivo`), Prisma schemas (from `aivo-v5`), Observability stack (from `aivo-v5`)
+- **Database**: Extend existing PLpgSQL schemas in `aivo-agentic-ai-platform` for audit logs and tenant config
+
+---
+
+## 8. Phased Delivery Roadmap
+
+### Phase 1 — Foundation (Weeks 1–4)
+- [ ] IAM with existing RBAC/MFA (port from `aivo`)
+- [ ] Service health dashboard (connect to `aivo-v5` observability)
+- [ ] Basic tenant (district/school) CRUD
+- [ ] Admin action audit logging
+
+### Phase 2 — Core Operations (Weeks 5–8)
+- [ ] AI model registry + performance dashboard
+- [ ] Billing/licensing management integration
+- [ ] Portal health monitoring (all 5 portals)
+- [ ] Compliance dashboard (COPPA/FERPA status)
+
+### Phase 3 — Advanced (Weeks 9–12)
+- [ ] AI content generation oversight + approval workflows
+- [ ] Advanced tenant analytics (usage, engagement per district)
+- [ ] Mobile device management integration
+- [ ] Data deletion/subject access request workflows
+- [ ] Load testing + deployment management UI
+
+### Phase 4 — Enterprise Polish (Weeks 13–16)
+- [ ] White-label/custom branding per tenant
+- [ ] Full i18n (leverage `aivo-platform` i18n sprint work)
+- [ ] SSO/SAML enterprise integration
+- [ ] SOC2 audit evidence automation
+- [ ] Public API + developer portal for district integrations
+
+---
+
+## 9. Risks & Mitigations
+
+| Risk | Mitigation |
+|---|---|
+| Data model inconsistency across 6 repos | Define canonical schemas in `aivolearning` monorepo; use shared `packages/` |
+| Auth fragmentation (different implementations per repo) | Consolidate on `aivo` auth service as single source of truth |
+| Stub services in `aivo-platform` not production-ready | Reference STUB_SERVICES_DEEP_AUDIT_REPORT and complete before Phase 2 |
+| Mobile MDM complexity | Start with read-only monitoring; write operations in Phase 4 |
+| Compliance scope creep | Scope Phase 2 to COPPA/FERPA only; add GDPR/CCPA in Phase 4 |
+
+---
+
+## 10. Dependencies on Existing Work
+
+| Dependency | Source Repo | Status |
+|---|---|---|
+| RBAC + MFA + Step-up Auth | `aivo` | ✅ Implemented |
+| Design System | `aivo` | ✅ Implemented |
+| AI Model Monitoring | `aivo-platform` | ✅ Sprint 4 complete |
+| Trust Score System | `aivo-platform` | ✅ Sprint 5 complete |
+| Billing/M-Pesa | `aivo-platform` | ✅ Sprint 4 complete |
+| Observability Stack | `aivo-v5` | ✅ Docker compose ready |
+| E2E Test Infrastructure | `aivo-v5`, `aivolearning` | ✅ Playwright configured |
+| Stub Service Completion | `aivo-platform` | ⚠️ Needs completion per audit |
+| Frontend/Backend Parity | `aivo-platform` | ⚠️ Roadmap to 100% in progress |
+| Production Build Fixes | `aivo-platform` | ⚠️ Multiple fix reports tracked |
+
+---
+
+This PRD gives you a foundation to begin building the Admin Dashboard in your `aivolearning` turborepo as a new `apps/admin-dashboard` workspace, leveraging the massive amount of existing infrastructure across your six repositories. Want me to dive deeper into any specific section, create implementation tickets, or scaffold the initial project structure?

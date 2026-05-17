@@ -1,0 +1,53 @@
+Lint & Type Check
+failed now in 58s
+Search logs
+1s
+3s
+1s
+2s
+24s
+24s
+Run pnpm lint
+
+> aivo-ai-learning@ lint /home/runner/work/aivo-ai-learning/aivo-ai-learning
+> turbo lint
+
+
+Attention:
+Turborepo now collects completely anonymous telemetry regarding usage.
+This information is used to shape the Turborepo roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://turborepo.dev/docs/telemetry
+
+
+   • Packages in scope: @aivo/admin-svc, @aivo/assessment-svc, @aivo/billing-svc, @aivo/brand, @aivo/comms-svc, @aivo/db, @aivo/engagement-svc, @aivo/events, @aivo/family-svc, @aivo/i18n-svc, @aivo/identity-svc, @aivo/integrations-svc, @aivo/learner-ui, @aivo/learning-svc, @aivo/marketing, @aivo/mobile, @aivo/mobile-ui, @aivo/observability, @aivo/research-svc, @aivo/scoring, @aivo/security, @aivo/status-page-svc, @aivo/tutor-svc, @aivo/web
+   • Running lint in 24 packages
+   • Remote caching disabled
+
+@aivo/brand:build
+@aivo/events:build
+@aivo/scoring:build
+@aivo/security:build
+@aivo/observability:build
+@aivo/learner-ui:build
+@aivo/db:build
+@aivo/mobile:lint
+cache miss, executing 1b67ad588b208d9e
+
+> @aivo/mobile@1.0.0 lint /home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/mobile
+> expo lint
+
+sh: 1: eslint: not found
+ ELIFECYCLE  Command failed.
+@aivo/web:lint
+Error: @aivo/mobile#lint: command (/home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/mobile) /home/runner/setup-pnpm/node_modules/.bin/pnpm run lint exited (1)
+ ERROR  @aivo/mobile#lint: command (/home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/mobile) /home/runner/setup-pnpm/node_modules/.bin/pnpm run lint exited (1)
+
+ Tasks:    7 successful, 9 total
+Cached:    0 cached, 9 total
+  Time:    24.061s 
+Failed:    @aivo/mobile#lint
+
+ ERROR  run failed: command  exited (1)
+ ELIFECYCLE  Command failed with exit code 1.
+Error: Process completed with exit code 1.

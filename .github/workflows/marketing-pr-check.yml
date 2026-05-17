@@ -1,0 +1,73 @@
+name: Marketing PR Check
+
+# Pre-merge guardrail for the marketing site.
+#
+# Runs on every PR that touches apps/marketing/** (or the shared marker
+# source / verification scripts) and iterates every (path, markers) pair
+# defined in scripts/marketing-markers.sh, asserting the rendered HTML of
+# each path still contains every required substring. Today that covers:
+#   /                  Hero "Learning adventures" + Footer COPPA/FERPA/SOC 2
+#   /privacy-policy    COPPA/FERPA + "Children's Online Privacy Protection"
+#   /coppa-compliance  compliance@aivolearning.com + verifiable parental consent
+#   /ferpa-compliance  "FERPA Compliance Statement" + "SOC 2 Type II"
+#
+# This catches a broken Hero/Footer redesign OR a silently-blanked legal
+# page (e.g. an i18n key rename on /privacy-policy or /coppa-compliance)
+# BEFORE it merges to main and ships to https://aivolearning.com — instead
+# of after, when the post-deploy Marketing Smoke Test (Production)
+# workflow would surface it but real visitors are already seeing the
+# broken / compliance-exposed page.
+#
+# New routes are picked up automatically: extending MARKETING_ROUTES (and
+# the per-route case in marketing_markers_for) in scripts/marketing-markers.sh
+# is enough — this workflow does not need to change.
+#
+# The check fails the PR if any marker is missing on any covered page.
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "apps/marketing/**"
+      - "scripts/marketing-markers.sh"
+      - "scripts/verify-marketing-build.sh"
+      - "scripts/verify-marketing-deploy.sh"
+      - ".github/workflows/marketing-pr-check.yml"
+      - ".github/workflows/marketing-deploy-staging.yml"
+      - ".github/workflows/marketing-smoke-test.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: marketing-pr-check-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  build-and-verify:
+    name: Build marketing & verify homepage markers
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build marketing site, start it, and assert homepage markers
+        env:
+          PORT: "4173"
+          STARTUP_TIMEOUT: "120"
+        run: bash scripts/verify-marketing-build.sh

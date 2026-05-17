@@ -1,0 +1,203 @@
+name: Deploy Production
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Image tag to deploy (e.g. v1.2.0, latest)'
+        required: false
+        type: string
+        default: 'latest'
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "22"
+  NAMESPACE: aivo
+  CHART_PATH: infra/helm/aivo-service
+  VALUES_FILE: infra/helm/values/hetzner.yaml
+  IMAGE_PREFIX: ghcr.io/artpromedia
+
+jobs:
+  build-node:
+    name: Build All Node Services
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all packages and services
+        run: pnpm build
+
+  build-python:
+    name: Validate Python Services
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate brain-svc
+        run: |
+          pip install -r services/brain-svc/requirements.txt
+          cd services/brain-svc && python -m py_compile src/brain_svc/main.py
+
+      - name: Validate ai-svc
+        run: |
+          if [ -f services/ai-svc/requirements.txt ]; then
+            pip install -r services/ai-svc/requirements.txt
+          fi
+          if [ -f services/ai-svc/src/main.py ]; then
+            cd services/ai-svc && python -m py_compile src/main.py
+          fi
+
+  deploy:
+    name: Deploy to Production
+    runs-on: [self-hosted, hetzner, production]
+    timeout-minutes: 25
+    needs: [build-node, build-python]
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            VERSION="${{ github.event.release.tag_name }}"
+          else
+            VERSION="${{ inputs.version || 'latest' }}"
+          fi
+          echo "tag=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Deploying version: $VERSION"
+
+      - name: Verify cluster reachable
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+
+      - name: Setup Helm
+        run: |
+          if ! command -v helm &>/dev/null; then
+            curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+          fi
+          helm version
+
+      - name: Deploy all services
+        run: |
+          set -euo pipefail
+          NS="${{ env.NAMESPACE }}"
+          VERSION="${{ steps.version.outputs.tag }}"
+
+          kubectl create namespace "$NS" --dry-run=client -o yaml | kubectl apply -f -
+
+          SERVICES=(
+            identity-svc assessment-svc brain-svc ai-svc learning-svc
+            tutor-svc family-svc engagement-svc billing-svc comms-svc
+            i18n-svc integrations-svc admin-svc status-page-svc research-svc
+            curriculum-svc
+            alerts-proxy-svc
+          )
+
+          PYTHON_SERVICES=(brain-svc ai-svc)
+
+          FAILED=0
+          for svc in "${SERVICES[@]}"; do
+            PORT=3000
+            for ps in "${PYTHON_SERVICES[@]}"; do
+              if [ "$svc" = "$ps" ]; then
+                PORT=8000
+                break
+              fi
+            done
+
+            echo ""
+            echo "═══ Deploying $svc ($VERSION) ═══"
+            helm upgrade --install "$svc" "${{ env.CHART_PATH }}" \
+              -f "${{ env.VALUES_FILE }}" \
+              --set serviceName="$svc" \
+              --set image.repository="${{ env.IMAGE_PREFIX }}" \
+              --set image.tag="$VERSION" \
+              --set service.port=$PORT \
+              --set service.targetPort=$PORT \
+              -n "$NS" \
+              --timeout 8m \
+              --wait 2>&1 || {
+                echo "⚠  $svc deploy incomplete — dumping diagnostics"
+                echo "--- deployment ---"
+                kubectl -n "$NS" describe deployment "$svc" 2>&1 | tail -40 || true
+                echo "--- replicaset events ---"
+                kubectl -n "$NS" get events --field-selector involvedObject.kind=ReplicaSet --sort-by=.lastTimestamp 2>&1 | grep "$svc" | tail -10 || true
+                echo "--- pods ---"
+                kubectl -n "$NS" get pods -l "app.kubernetes.io/name=$svc" -o wide 2>&1 || true
+                echo "--- pod describe (first failing) ---"
+                POD=$(kubectl -n "$NS" get pods -l "app.kubernetes.io/name=$svc" --field-selector=status.phase!=Running -o name 2>/dev/null | head -1)
+                if [ -n "$POD" ]; then
+                  kubectl -n "$NS" describe "$POD" 2>&1 | tail -50 || true
+                  echo "--- pod logs (last 50 lines) ---"
+                  kubectl -n "$NS" logs "$POD" --tail=50 --all-containers 2>&1 || true
+                fi
+                FAILED=$((FAILED + 1))
+              }
+          done
+
+          echo ""
+          echo "════════════════════════════════════════════════"
+          echo "  Production deploy complete: $((${#SERVICES[@]} - FAILED))/${#SERVICES[@]} successful"
+          echo "════════════════════════════════════════════════"
+
+          if [ "$FAILED" -gt 3 ]; then
+            echo "::error::Too many failures ($FAILED) — consider rollback"
+            exit 1
+          fi
+
+      - name: Verify rollout
+        run: |
+          kubectl -n ${{ env.NAMESPACE }} get pods --sort-by=.metadata.name -o wide
+          echo ""
+          kubectl -n ${{ env.NAMESPACE }} get deployments
+          echo ""
+          echo "═══ Production deployment complete ═══"
+
+      # Deploy gate (#174): the alerts-proxy must report Slack/PagerDuty/Opsgenie
+      # all configured before traffic is allowed to depend on it. We port-forward
+      # to the just-rolled service and exercise /api/alerts/health via the
+      # smoke-test script. A miss here exits non-zero and fails the deploy.
+      - name: alerts-proxy deploy gate
+        run: |
+          set -euo pipefail
+          NS="${{ env.NAMESPACE }}"
+          kubectl -n "$NS" rollout status deployment/alerts-proxy-svc --timeout=2m
+          kubectl -n "$NS" port-forward svc/alerts-proxy-svc 13016:3016 &
+          PF_PID=$!
+          trap "kill $PF_PID || true" EXIT
+          # Wait for port-forward to be ready before smoke test.
+          for _ in $(seq 1 20); do
+            if curl -fs --max-time 2 "http://127.0.0.1:13016/api/alerts/health" >/dev/null; then
+              break
+            fi
+            sleep 1
+          done
+          SMOKE_TARGET_URL="http://127.0.0.1:13016" SMOKE_RETRIES="3" \
+            pnpm --filter @aivo/alerts-proxy-svc smoke

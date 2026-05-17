@@ -1,0 +1,30 @@
+{
+  "name": "@aivo/db",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "prepare": "tsc",
+    "test": "vitest run",
+    "db:push": "drizzle-kit push",
+    "db:migrate": "tsx src/migrate.ts",
+    "db:seed": "tsx src/seed.ts",
+    "db:studio": "drizzle-kit studio",
+    "check:schema-drift": "tsx scripts/check-schema-drift.ts"
+  },
+  "dependencies": {
+    "@aivo/security": "workspace:*",
+    "argon2": "^0.44.0",
+    "drizzle-orm": "^0.45.2",
+    "postgres": "^3.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "drizzle-kit": "^0.30.5",
+    "tsx": "^4.19.4",
+    "typescript": "^5.7.3",
+    "vitest": "^2.0.0"
+  }
+}

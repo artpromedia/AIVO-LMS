@@ -1,0 +1,77 @@
+Deploy to Production
+failed 27 minutes ago in 15s
+Search logs
+1s
+2s
+0s
+0s
+0s
+7s
+Run set -euo pipefail
+namespace/aivo unchanged
+
+═══ Deploying identity-svc (latest) ═══
+Error: UPGRADE FAILED: cannot patch "identity-svc" with kind Deployment: Deployment.apps "identity-svc" is invalid: spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels: Invalid value: "{{ .Values.serviceName }}": a valid label must be an empty string or consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyValue',  or 'my_value',  or '12345', regex used for validation is '(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?')
+⚠  identity-svc deploy incomplete
+
+═══ Deploying assessment-svc (latest) ═══
+Error: UPGRADE FAILED: cannot patch "assessment-svc" with kind Deployment: Deployment.apps "assessment-svc" is invalid: spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels: Invalid value: "{{ .Values.serviceName }}": a valid label must be an empty string or consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyValue',  or 'my_value',  or '12345', regex used for validation is '(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?')
+⚠  assessment-svc deploy incomplete
+
+═══ Deploying brain-svc (latest) ═══
+Error: UPGRADE FAILED: cannot patch "brain-svc" with kind Deployment: Deployment.apps "brain-svc" is invalid: spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels: Invalid value: "{{ .Values.serviceName }}": a valid label must be an empty string or consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyValue',  or 'my_value',  or '12345', regex used for validation is '(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?')
+⚠  brain-svc deploy incomplete
+
+═══ Deploying ai-svc (latest) ═══
+Error: UPGRADE FAILED: cannot patch "ai-svc" with kind Deployment: Deployment.apps "ai-svc" is invalid: spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels: Invalid value: "{{ .Values.serviceName }}": a valid label must be an empty string or consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyValue',  or 'my_value',  or '12345', regex used for validation is '(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?')
+⚠  ai-svc deploy incomplete
+
+═══ Deploying learning-svc (latest) ═══
+Error: UPGRADE FAILED: cannot patch "learning-svc" with kind Deployment: Deployment.apps "learning-svc" is invalid: spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels: Invalid value: "{{ .Values.serviceName }}": a valid label must be an empty string or consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyValue',  or 'my_value',  or '12345', regex used for validation is '(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?')
+⚠  learning-svc deploy incomplete
+
+═══ Deploying tutor-svc (latest) ═══
+Error: UPGRADE FAILED: cannot patch "tutor-svc" with kind Deployment: Deployment.apps "tutor-svc" is invalid: spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels: Invalid value: "{{ .Values.serviceName }}": a valid label must be an empty string or consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyValue',  or 'my_value',  or '12345', regex used for validation is '(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?')
+⚠  tutor-svc deploy incomplete
+
+═══ Deploying family-svc (latest) ═══
+Error: UPGRADE FAILED: cannot patch "family-svc" with kind Deployment: Deployment.apps "family-svc" is invalid: spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels: Invalid value: "{{ .Values.serviceName }}": a valid label must be an empty string or consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyValue',  or 'my_value',  or '12345', regex used for validation is '(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?')
+⚠  family-svc deploy incomplete
+
+═══ Deploying engagement-svc (latest) ═══
+Error: UPGRADE FAILED: cannot patch "engagement-svc" with kind Deployment: Deployment.apps "engagement-svc" is invalid: spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels: Invalid value: "{{ .Values.serviceName }}": a valid label must be an empty string or consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyValue',  or 'my_value',  or '12345', regex used for validation is '(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?')
+⚠  engagement-svc deploy incomplete
+
+═══ Deploying billing-svc (latest) ═══
+Error: UPGRADE FAILED: cannot patch "billing-svc" with kind Deployment: Deployment.apps "billing-svc" is invalid: spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels: Invalid value: "{{ .Values.serviceName }}": a valid label must be an empty string or consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyValue',  or 'my_value',  or '12345', regex used for validation is '(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?')
+⚠  billing-svc deploy incomplete
+
+═══ Deploying comms-svc (latest) ═══
+Error: UPGRADE FAILED: cannot patch "comms-svc" with kind Deployment: Deployment.apps "comms-svc" is invalid: spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels: Invalid value: "{{ .Values.serviceName }}": a valid label must be an empty string or consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyValue',  or 'my_value',  or '12345', regex used for validation is '(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?')
+⚠  comms-svc deploy incomplete
+
+═══ Deploying i18n-svc (latest) ═══
+Error: UPGRADE FAILED: cannot patch "i18n-svc" with kind Deployment: Deployment.apps "i18n-svc" is invalid: spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels: Invalid value: "{{ .Values.serviceName }}": a valid label must be an empty string or consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyValue',  or 'my_value',  or '12345', regex used for validation is '(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?')
+⚠  i18n-svc deploy incomplete
+
+═══ Deploying integrations-svc (latest) ═══
+Error: UPGRADE FAILED: cannot patch "integrations-svc" with kind Deployment: Deployment.apps "integrations-svc" is invalid: spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels: Invalid value: "{{ .Values.serviceName }}": a valid label must be an empty string or consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyValue',  or 'my_value',  or '12345', regex used for validation is '(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?')
+⚠  integrations-svc deploy incomplete
+
+═══ Deploying admin-svc (latest) ═══
+Error: UPGRADE FAILED: cannot patch "admin-svc" with kind Deployment: Deployment.apps "admin-svc" is invalid: spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels: Invalid value: "{{ .Values.serviceName }}": a valid label must be an empty string or consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyValue',  or 'my_value',  or '12345', regex used for validation is '(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?')
+⚠  admin-svc deploy incomplete
+
+═══ Deploying status-page-svc (latest) ═══
+Error: UPGRADE FAILED: cannot patch "status-page-svc" with kind Deployment: Deployment.apps "status-page-svc" is invalid: spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels: Invalid value: "{{ .Values.serviceName }}": a valid label must be an empty string or consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyValue',  or 'my_value',  or '12345', regex used for validation is '(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?')
+⚠  status-page-svc deploy incomplete
+
+═══ Deploying research-svc (latest) ═══
+Error: UPGRADE FAILED: cannot patch "research-svc" with kind Deployment: Deployment.apps "research-svc" is invalid: spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchLabels: Invalid value: "{{ .Values.serviceName }}": a valid label must be an empty string or consist of alphanumeric characters, '-', '_' or '.', and must start and end with an alphanumeric character (e.g. 'MyValue',  or 'my_value',  or '12345', regex used for validation is '(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])?')
+⚠  research-svc deploy incomplete
+
+════════════════════════════════════════════════
+  Production deploy complete: 0/15 successful
+════════════════════════════════════════════════
+Error: Too many failures (15) — consider rollback
+Error: Process completed with exit code 1.

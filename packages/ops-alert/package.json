@@ -1,0 +1,26 @@
+{
+  "name": "@aivo/ops-alert",
+  "version": "1.0.1",
+  "private": true,
+  "deprecated": "v2.1 §9.1 dedup: use @aivo/ops-alerts (durable outbox + alerts-proxy-svc). For drop-in legacy callers, use LegacyOpsAlertClient from @aivo/ops-alerts.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "package.json"],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "tsc",
+    "test": "tsc -p tsconfig.test.json && node --test dist-test/tests/*.test.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.3"
+  }
+}

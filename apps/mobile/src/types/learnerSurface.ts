@@ -1,0 +1,18 @@
+/**
+ * Learner surface specs — minimal mobile-side mirror of
+ * packages/learner-surfaces. Sprints 03–05 expand these.
+ */
+
+export type LearnerSurfaceKind =
+  | "geometry_workspace"
+  | "scratchpad"
+  | "number_line"
+  | "fraction_bar"
+  | "chart"
+  | "text_response";
+
+export interface LearnerSurfaceSpec {
+  kind: LearnerSurfaceKind;
+  /** Free-form, surface-specific config bag. */
+  config?: Record<string, unknown>;
+}

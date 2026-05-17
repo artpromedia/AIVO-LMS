@@ -1,0 +1,37 @@
+A11y Lint Check
+failed 1 hour ago in 38s
+Search logs
+2s
+3s
+2s
+11s
+9s
+9s
+Run pnpm --filter @aivo/web lint
+.                                        |  WARN  Unsupported engine: wanted: {"node":">=22"} (current: {"node":"v20.20.2","pnpm":"10.26.1"})
+
+> @aivo/web@1.0.0 lint /home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web
+> eslint src/ --ext .ts,.tsx
+
+
+/home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web/src/app/dashboard/district/usage/page.tsx
+Warning:   173:9   warning  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+Warning:   173:9   warning  Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+Warning:   175:11  warning  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+
+/home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web/src/app/dashboard/learner/LearnerHome/TopBar.tsx
+Error:   32:8  error  Definition for rule '@next/next/no-img-element' was not found  @next/next/no-img-element
+
+/home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web/src/app/dashboard/parent/layout.tsx
+Error:   190:18  error  Definition for rule '@next/next/no-img-element' was not found  @next/next/no-img-element
+Error:   276:18  error  Definition for rule '@next/next/no-img-element' was not found  @next/next/no-img-element
+
+✖ 6 problems (3 errors, 3 warnings)
+
+/home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @aivo/web@1.0.0 lint: `eslint src/ --ext .ts,.tsx`
+Exit status 1
+Error: Process completed with exit code 1.
+0s
+0s
+0s

@@ -1,0 +1,230 @@
+modules = ["nodejs-20", "python-3.12", "web", "bash"]
+[agent]
+expertMode = true
+stack = "BEST_EFFORT_FALLBACK"
+
+[nix]
+channel = "stable-25_05"
+packages = ["cargo", "libiconv", "libxcrypt", "nats-server", "openssl", "pkg-config", "postgresql", "rustc"]
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Brain Service"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Identity Service"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Web App"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Marketing Site"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Mockup Sandbox"
+
+[[workflows.workflow]]
+name = "Brain Service"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd services/brain-svc && pip install -q -r requirements.txt 2>/dev/null; PYTHONPATH=src python3 -m uvicorn brain_svc.main:app --host 0.0.0.0 --port 3002"
+waitForPort = 3002
+
+[[workflows.workflow]]
+name = "Identity Service"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd /home/runner/workspace && bash scripts/start-services.sh"
+waitForPort = 3001
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[workflows.workflow]]
+name = "Web App"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd apps/web-v2 && exec ./node_modules/.bin/next dev --port 5000 --hostname 0.0.0.0 --turbopack"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "Marketing Site"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "bash scripts/start-marketing.sh"
+waitForPort = 5173
+
+[[workflows.workflow]]
+name = "Mockup Sandbox"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "console"
+isCanvasWorkflow = true
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd artifacts/mockup-sandbox && PORT=8000 BASE_PATH=/mockup-canvas/ exec ./node_modules/.bin/vite --config vite.config.ts --host 0.0.0.0 --port 8000"
+waitForPort = 8000
+
+[[ports]]
+localPort = 3001
+externalPort = 3001
+
+[[ports]]
+localPort = 3002
+externalPort = 3002
+
+[[ports]]
+localPort = 3003
+externalPort = 3003
+
+[[ports]]
+localPort = 3004
+externalPort = 5173
+
+[[ports]]
+localPort = 3005
+externalPort = 6000
+
+[[ports]]
+localPort = 3006
+externalPort = 4200
+
+[[ports]]
+localPort = 3007
+externalPort = 8099
+
+[[ports]]
+localPort = 3008
+externalPort = 8080
+
+[[ports]]
+localPort = 3009
+externalPort = 9000
+
+[[ports]]
+localPort = 3010
+externalPort = 8008
+
+[[ports]]
+localPort = 3011
+externalPort = 8081
+
+[[ports]]
+localPort = 3012
+externalPort = 5000
+
+[[ports]]
+localPort = 3013
+externalPort = 6800
+
+[[ports]]
+localPort = 3014
+externalPort = 8000
+
+[[ports]]
+localPort = 4222
+externalPort = 3003
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[[ports]]
+localPort = 6379
+externalPort = 3000
+exposeLocalhost = true
+
+[[ports]]
+localPort = 8222
+externalPort = 3002
+
+[userenv]
+
+[userenv.development]
+AUTH_SECRET = "aivo-dev-secret-key-that-is-at-least-32-characters-long"
+JWT_PRIVATE_KEY = """
+-----BEGIN PRIVATE KEY-----
+MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDoannYgXJsK52b
+G4+zHFl0ofSQ8d61Gbc8DUVEke5eJCwrRfdKjIwGUVn8ktZ/8IrE14MijOIeEfEW
+OyhMA9w7U9kA4XKAEBtWDS8fwqvwFyGRAZBshXfll+6dvr1hixgFC8M4cInk0T1t
+tX8q3C5AlS+3fEv92VFTv1LisATJhXxUMvVEOkUxXA7lnklAQD06APhjmIupOqj4
+ifWJaI+XR0DEH65pJb+4oxz9a/E/ieTxJcpfnuKpUh2czkw4K259oSNxNCDdPgtH
+tmw1G8XrAjqRTHJ0LiIJmMKvedtGESMoVdx506UQzo0p5KN9U7JBrDfF+aQIQNKj
+1TrUghZ9AgMBAAECggEAHCgcyi78hsBN9WbvD3rwF3eGIoflkY55ABciJ37VIFCa
+N+/frVy+RgcAXjSyid4WtxGI5dxS3zkQj79A+tyTh23Ot2hDWo0Y/WGBg66DmAWl
+X7o5yKaZckDoJpzfYqba6m7qCrdk7UoFes9nMEZr0A/YL7l+QgBcSvITKjq63xLy
+yVTYBhzOPaFT06/aMH0Y4NytV7DNsDA8OHKer+cUuj/yDwvjum3hfCMXx/ZZTzk0
+HBXX4Ia9lCsqAmv+oYEAXkO1d+nQU/mR6I57d+ZNYbdbOep27l0JFzDF8CJRQlNe
+J9eOGTjamrGYHQTUc4aaGS5JjE8vA0i1zeBShG5vfQKBgQD28Q9WOupNOgmKOk9i
+J7bhpxgvCOapgsXlWm79kfG1dCzPs6Ev86xgWcHvkcZ+pQhrlZCg0qUgsSiyeyQ5
+Ugfw+SHw5E9VVr/ATlCWoPWRWvQr4G4yE3HsUTqdUGh7IBonJRy8O+3IDlPQf/3C
+jRq/S9UoH1b+7CuyFFLLtFXVFwKBgQDw8QKgAUzRoux0MUR1vUd2W8bvdC8KBken
+S/y1nWfkdzx7AZ71mQ0Jy/NKO71PQd/Oi64kJ3cHnhfqWtpUU2atricNoiTEt9bj
+3gLAD2lZF/fi/hx8WE9f4E+JInxH/7nFeM1DgyLiPKaExvnuEkT/pk4k1kGi6a9E
+p24LMMeViwKBgENTfeb4sSDVDfzN4Q7V3Rqwv/sy5hCZQvNBMLmZrNjYD8+hHfVA
+7mJmlmWGzSOCQ0VxxbjTNYowQvRGdp3aK6gbhJF07dxKhoUb1QT8ZXd34NKFogWt
+H4Zaryxs28+V9QtvJuJ7RF0i6t8RxlHgvsYhGsCRqtpd8ZvfxqMbS7uJAoGBAL3y
+ItGldLwoJyUK2h/AEqB6hgCspZDPlpmLTDSZXRg98A5BHuIbwK2ifbBeHEZpdllM
+wQJ7olj9B3mYGls0TNRLYTpcQ4RaMiz+D0j+XV0BikkHb8mPjTPWkJ1Z9ISGVBwb
+uiapMU0N53DxtIM9H+wzXZOo3aHjfGsxW42y7QU1AoGBAMMguDW36nrBlQ1hw86g
+Vq8BuCF7HwJOnPOhTgqmcVeTz2S7F/oCffqVVCYPqruuoe5k144LXBgTaKUqZrvF
+Ozt6/YLKVRIdeiwrdhpIzTs2sdVoTKjW+zsuL/J8BwhnTU7v3ORbDbAv8nsQucur
+vfRr0/b9q3VJ0GvJyZQZTQS/
+-----END PRIVATE KEY-----"""
+JWT_PUBLIC_KEY = """
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6Gp52IFybCudmxuPsxxZ
+dKH0kPHetRm3PA1FRJHuXiQsK0X3SoyMBlFZ/JLWf/CKxNeDIoziHhHxFjsoTAPc
+O1PZAOFygBAbVg0vH8Kr8BchkQGQbIV35Zfunb69YYsYBQvDOHCJ5NE9bbV/Ktwu
+QJUvt3xL/dlRU79S4rAEyYV8VDL1RDpFMVwO5Z5JQEA9OgD4Y5iLqTqo+In1iWiP
+l0dAxB+uaSW/uKMc/WvxP4nk8SXKX57iqVIdnM5MOCtufaEjcTQg3T4LR7ZsNRvF
+6wI6kUxydC4iCZjCr3nbRhEjKFXcedOlEM6NKeSjfVOyQaw3xfmkCEDSo9U61IIW
+fQIDAQAB
+-----END PUBLIC KEY-----"""
+IDENTITY_SVC_PORT = "3001"
+
+[userenv.shared]
+EXPO_TOKEN = "eIZhSgu6Y1mA3weH6rR0Lc2n-f9ZraRJekRuAL_F"
+POSTMARK_API_TOKEN = "58d0ac3c-420b-40a2-b061-bacc755d5196"
+GOOGLE_CLIENT_ID = "373030578076-ftkmofvss349u7qecvsjmiqavq4mt3hs.apps.googleusercontent.com"
+EXPO_ROUTER_APP_ROOT = "app"
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["bash", "start.sh"]
+build = ["bash", "-c", "rm -rf node_modules && pnpm install --frozen-lockfile --prefer-offline --filter \"@aivo/marketing...\" --reporter=append-only && pnpm --filter @aivo/brand run build && pnpm --filter @aivo/marketing run build && find apps -mindepth 1 -maxdepth 1 -type d ! -name marketing -exec rm -rf {} + && find packages -mindepth 1 -maxdepth 1 -type d ! -name brand -exec rm -rf {} + && rm -rf services artifacts infra e2e docs scripts .git .turbo"]
+
+[postMerge]
+path = "scripts/post-merge.sh"
+timeoutMs = 1500000

@@ -1,0 +1,112 @@
+/**
+ * Sprint 13: Lesson Player route.
+ *
+ * Server component loads the LessonRun + GeneratedLessonPlan + accessibility
+ * prefs, performs role/tenant/learner authz, and renders the client-side
+ * `LessonPlayer` for beat-by-beat interaction. The route URL is canonical
+ * (`/learner/lesson-runs/[lessonRunId]`) — older `/learner/lesson/[id]` links
+ * have been migrated.
+ */
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import { requirePageRole } from "@/lib/auth/server";
+import { readActiveLearnerFromCookies } from "@/lib/auth/active-learner";
+import { AppShell } from "@/components/layout/app-shell";
+import { LEARNER_NAV } from "@/components/layout/role-shells";
+import { PageHeader } from "@/components/layout/page-header";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  getAccessibilityPrefs,
+  getLearner,
+  getLessonRun,
+  parentCanAccessLearner,
+} from "@/lib/db/repos";
+import { LessonPlayer } from "./lesson-player";
+
+export const dynamic = "force-dynamic";
+
+type RouteParams = { params: Promise<{ lessonRunId: string }> };
+
+export default async function LearnerLessonRunPage({ params }: RouteParams) {
+  const { lessonRunId } = await params;
+  const session = await requirePageRole(["learner", "parent"]);
+  const found = getLessonRun(lessonRunId, session.tenantId);
+  if (!found) redirect("/learner/home");
+  const { lessonRun, plan } = found;
+  const learner = getLearner(lessonRun.learnerId, session.tenantId);
+  if (!learner) redirect("/learner/home");
+  // Tenant scope is already enforced by getLessonRun. Now enforce
+  // learner-level scope to prevent SSR IDOR — a parent in the same tenant
+  // must own the learner, and a learner can only open their own run.
+  if (session.role === "learner") {
+    if (learner.id !== session.learnerId) redirect("/learner/home");
+  } else {
+    // Parent (or other shadowing role): require ownership + active-learner
+    // cookie match so a parent can only play under the learner they've
+    // explicitly switched to.
+    if (!parentCanAccessLearner(session.userId, learner.id, session.tenantId)) {
+      redirect("/learner/select");
+    }
+    const active = await readActiveLearnerFromCookies(session);
+    if (active !== learner.id) redirect("/learner/select");
+  }
+  const a11y = getAccessibilityPrefs(learner.id, session.tenantId);
+
+  // When the plan is still generating or has failed, we can't run the player.
+  if (!plan || lessonRun.status === "generating" || lessonRun.status === "failed") {
+    return (
+      <AppShell
+        role={session.role === "learner" ? "learner" : "parent"}
+        roleLabel={session.role === "learner" ? "Learner" : "Parent · Learner view"}
+        navItems={LEARNER_NAV}
+        user={{ displayName: session.displayName, email: session.email }}
+      >
+        <PageHeader
+          eyebrow="Lesson"
+          title={
+            lessonRun.status === "failed"
+              ? "We hit a snag preparing this lesson"
+              : "Getting your lesson ready…"
+          }
+          description={
+            lessonRun.status === "failed"
+              ? "Try again — your tutor will rebuild it from scratch."
+              : "Hang tight — your tutor is preparing the lesson."
+          }
+        />
+        <Card className="p-[var(--aivo-density-card-pad)]">
+          <Badge tone={lessonRun.status === "failed" ? "warning" : "neutral"}>
+            {lessonRun.status}
+          </Badge>
+          {lessonRun.failureReason && (
+            <p className="mt-2 text-sm text-red-700">{lessonRun.failureReason}</p>
+          )}
+          <div className="mt-4 flex gap-2">
+            <Button asChild variant="soft">
+              <Link href="/learner/home">Back to today</Link>
+            </Button>
+          </div>
+        </Card>
+      </AppShell>
+    );
+  }
+
+  return (
+    <AppShell
+      role={session.role === "learner" ? "learner" : "parent"}
+      roleLabel={session.role === "learner" ? "Learner" : "Parent · Learner view"}
+      navItems={LEARNER_NAV}
+      user={{ displayName: session.displayName, email: session.email }}
+    >
+      <LessonPlayer
+        learnerId={learner.id}
+        lessonRunId={lessonRun.id}
+        plan={plan}
+        accessibility={a11y}
+        initialStatus={lessonRun.status}
+      />
+    </AppShell>
+  );
+}

@@ -1,0 +1,218 @@
+# =============================================================================
+# AIVO Platform  Hetzner Ingress (NGINX Ingress Controller)
+# =============================================================================
+# NGINX Ingress for K3s on Hetzner bare-metal servers.
+# TLS handled by self-signed origin certificate (Cloudflare "Full" SSL mode).
+# Cloudflare sits in front for CDN/WAF/DDoS protection.
+# =============================================================================
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: aivo-api-ingress
+  namespace: aivo-prod
+  annotations:
+    # NGINX Ingress
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "10"
+    # Rate limiting (per-IP)
+    nginx.ingress.kubernetes.io/limit-rps: "50"
+    nginx.ingress.kubernetes.io/limit-burst-multiplier: "5"
+    # CORS
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://aivolearning.com,https://app.aivolearning.com,https://parent.aivolearning.com,https://teacher.aivolearning.com,https://admin.aivolearning.com"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Accept, Authorization, Content-Type, X-Request-ID, X-Tenant-ID"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-max-age: "3600"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - api.aivolearning.com
+      secretName: cloudflare-origin-tls
+  rules:
+    - host: api.aivolearning.com
+      http:
+        paths:
+          # Authentication & User Management
+          - path: /api/v1/auth
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-svc
+                port:
+                  number: 3000
+          - path: /api/v1/sessions
+            pathType: Prefix
+            backend:
+              service:
+                name: session-svc
+                port:
+                  number: 3000
+          - path: /api/v1/consent
+            pathType: Prefix
+            backend:
+              service:
+                name: consent-svc
+                port:
+                  number: 3000
+          - path: /api/v1/profile
+            pathType: Prefix
+            backend:
+              service:
+                name: profile-svc
+                port:
+                  number: 3000
+          # Content & Learning
+          - path: /api/v1/content
+            pathType: Prefix
+            backend:
+              service:
+                name: content-svc
+                port:
+                  number: 3000
+          - path: /api/v1/assessments
+            pathType: Prefix
+            backend:
+              service:
+                name: assessment-svc
+                port:
+                  number: 3000
+          - path: /api/v1/personalization
+            pathType: Prefix
+            backend:
+              service:
+                name: personalization-svc
+                port:
+                  number: 3000
+          - path: /api/v1/life-skills
+            pathType: Prefix
+            backend:
+              service:
+                name: life-skills-svc
+                port:
+                  number: 3000
+          # AI & Analytics
+          - path: /api/v1/ai
+            pathType: Prefix
+            backend:
+              service:
+                name: ai-orchestrator
+                port:
+                  number: 3000
+          - path: /api/v1/analytics
+            pathType: Prefix
+            backend:
+              service:
+                name: analytics-svc
+                port:
+                  number: 3000
+          # Communication
+          - path: /api/v1/notifications
+            pathType: Prefix
+            backend:
+              service:
+                name: notify-svc
+                port:
+                  number: 3000
+          - path: /api/v1/messages
+            pathType: Prefix
+            backend:
+              service:
+                name: messaging-svc
+                port:
+                  number: 3000
+          # Goal & Focus
+          - path: /api/v1/goals
+            pathType: Prefix
+            backend:
+              service:
+                name: goal-svc
+                port:
+                  number: 3000
+          - path: /api/v1/focus
+            pathType: Prefix
+            backend:
+              service:
+                name: focus-svc
+                port:
+                  number: 3000
+          # Billing & Payments
+          - path: /api/v1/billing
+            pathType: Prefix
+            backend:
+              service:
+                name: billing-svc
+                port:
+                  number: 3000
+          - path: /api/v1/payments
+            pathType: Prefix
+            backend:
+              service:
+                name: payments-svc
+                port:
+                  number: 3000
+          # Parent Portal
+          - path: /api/v1/parent
+            pathType: Prefix
+            backend:
+              service:
+                name: parent-svc
+                port:
+                  number: 3000
+          - path: /api/v1/baseline
+            pathType: Prefix
+            backend:
+              service:
+                name: baseline-svc
+                port:
+                  number: 3000
+          # Health check
+          - path: /health
+            pathType: Exact
+            backend:
+              service:
+                name: auth-svc
+                port:
+                  number: 3000
+---
+# WebSocket Ingress for real-time services (messaging, notifications)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: aivo-realtime-ingress
+  namespace: aivo-prod
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/upstream-hash-by: "$remote_addr"
+    nginx.ingress.kubernetes.io/websocket-services: "messaging-svc,notify-svc"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - ws.aivolearning.com
+      secretName: cloudflare-origin-tls
+  rules:
+    - host: ws.aivolearning.com
+      http:
+        paths:
+          - path: /ws/messages
+            pathType: Prefix
+            backend:
+              service:
+                name: messaging-svc
+                port:
+                  number: 3000
+          - path: /ws/notifications
+            pathType: Prefix
+            backend:
+              service:
+                name: notify-svc
+                port:
+                  number: 3000

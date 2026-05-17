@@ -1,0 +1,66 @@
+PROPRIETARY SOFTWARE LICENSE
+
+Copyright (c) 2024-2026 Aivo AI Learning Technologies Inc. All rights reserved.
+
+This source code and all associated files (the "Software") are the
+proprietary and confidential property of Aivo AI Learning Technologies
+Inc. ("AIVO"). The Software is licensed, not sold.
+
+NOTICE
+======
+
+No license, express or implied, is granted by this file. Unless you have
+a separate written agreement with AIVO that explicitly grants you rights
+to the Software, you may NOT:
+
+  * Copy, reproduce, modify, adapt, translate, or create derivative works
+    based on the Software, in whole or in part.
+  * Distribute, sublicense, lease, rent, sell, or otherwise transfer the
+    Software or any portion of it.
+  * Reverse engineer, decompile, disassemble, or otherwise attempt to
+    derive the source code of any compiled portions of the Software,
+    except to the limited extent expressly permitted by applicable law
+    notwithstanding this restriction.
+  * Use the Software to provide any service to third parties, including
+    but not limited to software-as-a-service, hosted services, or
+    consulting services.
+  * Remove, alter, or obscure any proprietary notices, including
+    copyright, trademark, and patent notices, on or in the Software.
+
+PERMITTED USE
+=============
+
+Authorized AIVO employees, contractors, and partners with a valid
+written agreement may access, use, and modify the Software solely for
+the purpose of developing, testing, deploying, and operating AIVO's
+products and services, in accordance with the terms of that agreement.
+
+THIRD-PARTY COMPONENTS
+======================
+
+The Software incorporates third-party open-source components, each of
+which is governed by its own license. Those licenses are reproduced in
+the corresponding package metadata and node_modules / site-packages
+directories. Nothing in this LICENSE file overrides the terms of any
+third-party open-source license that applies to a third-party component.
+
+NO WARRANTY
+===========
+
+THE SOFTWARE IS PROVIDED "AS IS" AND WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+IN NO EVENT SHALL AIVO BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE,
+ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+CONTACT
+=======
+
+For licensing inquiries, contact:
+
+  Aivo AI Learning Technologies Inc.
+  1400 Van Buren Street S, Suite 200
+  Minneapolis, MN, United States
+  legal@aivolearning.com

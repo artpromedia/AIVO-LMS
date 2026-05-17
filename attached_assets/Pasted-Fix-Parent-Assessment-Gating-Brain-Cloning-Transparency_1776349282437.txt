@@ -1,0 +1,155 @@
+Fix: Parent Assessment Gating, Brain Cloning Transparency & COPPA-Compliant Parental Consent Flow
+Context
+Aivo is an adaptive learning platform for children. The onboarding flow involves three phases:
+
+Parent Assessment — parent answers questions about the learner (communication mode, device interaction, diagnoses, etc.), which determines the learner's functioningLevel
+Baseline Assessment (Discovery Adventure) — the child takes an adaptive multi-chapter assessment; questions are personalized based on the parent assessment results
+Brain Cloning — the system builds a cognitive "Brain" model for the learner from both the parent assessment data and baseline assessment results. The parent reviews, approves/amends/declines the brain before learning begins.
+Current Problems
+There are four critical issues in the current implementation:
+
+Problem 1: No Gating — Child Can Start Baseline Without Parent Assessment
+What's wrong: The baseline assessment page (apps/web/src/app/dashboard/learner/assessment/page.tsx) fetches the learner's status at line 78 via GET /api/assessments/learner/discovery/{learnerId}/status, but it only checks baselineCompleted (line 83) to redirect away. It never checks parentAssessmentCompleted. The child can navigate directly to /dashboard/learner/assessment?learnerId=X and start the baseline even if the parent has never completed the parent assessment.
+
+On the backend: The route handler in services/assessment-svc/src/routes/learner-baseline.ts already returns parentAssessmentCompleted in the status response (line 88), but the frontend ignores it. The chapter generation endpoint (line 94) also silently falls back to default parameters if no parent assessment exists (line 135-137), meaning the baseline runs without personalization — defeating the purpose of the parent assessment.
+
+What needs to happen:
+
+Frontend (apps/web/src/app/dashboard/learner/assessment/page.tsx): After fetching the status (line 78), if statusData.parentAssessmentCompleted is false, block the child from starting the assessment. Show a friendly, age-appropriate waiting screen that says something like "Your parent needs to finish setting things up first! Ask them to complete the Parent Assessment so we can make your adventure just right for you." Provide a button for the parent to navigate to the parent assessment page.
+Backend (services/assessment-svc/src/routes/learner-baseline.ts): Add a server-side guard on the POST /api/assessments/learner/discovery/:learnerId/chapter endpoint (around line 128). Before generating a chapter, check if a completed parent assessment exists. If not, return 403 with { error: "parent_assessment_required", message: "Parent assessment must be completed before baseline assessment can begin" }. This prevents the child from bypassing the UI gate.
+Backend: Also add the same guard on POST /api/assessments/learner/discovery/:learnerId/complete — the baseline cannot be completed/submitted if no parent assessment exists.
+Problem 2: Brain Cloning UI Is an Opaque "Spinning Blackhole" — Needs Step-by-Step Transparency (RAI/XAI)
+What's wrong: When the child finishes the baseline, the Finale.tsx component (apps/web/src/components/discovery/Finale.tsx) triggers buildBrain() at line 47, which calls onSubmitResults(). While the brain is being cloned, the child sees a vague "Something amazing is happening..." message with bouncing dots (lines 72-83). Then the Awakening.tsx component shows an elaborate canvas animation with orbs converging into a sphere — visually stunning but tells the user nothing about what the AI is actually doing. It's a black box.
+
+After Awakening, the parent eventually reaches the Brain Review page (apps/web/src/app/dashboard/parent/learner/[id]/brain-review/page.tsx) which shows a BrainBuildingSequence (apps/web/src/components/brain/BrainBuildingSequence.tsx). This sequence has 7 stages (template → domains → accommodations → goals → activation → tutors → complete) and auto-advances on timers. But this is shown AFTER the brain is already cloned. It's purely cosmetic replay — it doesn't show what the AI actually did in real time and the parent has no ability to intervene before the brain is created.
+
+What needs to happen — RAI/XAI compliant transparency:
+
+The brain cloning process should be transparent and explainable. Instead of cloning the brain silently on baseline completion and showing a decorative animation, the flow should be restructured:
+
+A. Pre-Clone Consent Screen (NEW — before brain clone happens):
+After the baseline assessment is complete and results are submitted, do NOT automatically trigger the brain clone (remove the auto-call at learner-baseline.ts lines 239-284 and Finale.tsx lines 44-48). Instead:
+
+Save the baseline assessment attempt as currently done (lines 210-230 in learner-baseline.ts), but return the results WITHOUT triggering the clone.
+The child sees a simplified completion screen (congratulations, scores, badge).
+The parent receives a notification/prompt to review the assessment results and authorize the brain clone.
+Create a new page or modify the existing brain-review page to show a Pre-Clone Review screen that includes:
+Summary of the parent assessment results (functioning level, communication mode, etc.)
+Summary of the baseline assessment results (domain scores, strengths, growth areas)
+A clear explanation: "Based on these two data sources, AIVO will now build [Learner Name]'s Brain Model. Here is what will happen step by step:"
+Step 1: Select a brain template matching the functioning level (STANDARD, SUPPORTED, etc.)
+Step 2: Map assessment scores to domain mastery levels
+Step 3: Apply accommodations from the functioning level template
+Step 4: Build disability signals from parent-reported data
+Step 5: Assign AI tutors calibrated to the learner's levels
+Step 6: Create the learner's visual identity (brain colors based on strengths)
+Step 7: Initialize learning paths for each subject
+Parent actions: "Approve & Build", "Add Context First", or "Decline & Reassess"
+B. Transparent Real-Time Build (replace current BrainBuildingSequence):
+When the parent clicks "Approve & Build", the brain clone process should happen with a real-time step-by-step progress display that explains each step as it executes. This requires:
+
+Modify the brain clone endpoint (services/brain-svc/src/brain_svc/services/clone_pipeline.py — clone_brain() function) to either:
+Return the intermediate results of each step, OR
+Use a streaming/SSE endpoint that sends progress updates, OR
+(Simplest approach) Return the full XAI explanation which already contains all the decisions, and have the frontend render each decision sequentially with real explanations
+In the frontend, replace the timed animation in BrainBuildingSequence.tsx with actual data-driven steps that show:
+"Selecting [SUPPORTED] template based on [learner]'s functioning level..." → show the template details
+"Mapping assessment scores..." → show each domain: "Reading: scored 4/5 (80%) on easy difficulty → 64% mastery" (this data already exists in xai_explanation.mastery_decisions)
+"Applying accommodations..." → show each one with reasoning: "Extended Time — Standard accommodation for Supported functioning level learners"
+"Building learner signals from parent assessment..." → show each signal
+"Assigning AI tutors..." → show each tutor with why they were selected
+"Creating visual identity..." → show the brain colors and what they represent
+Each step should complete in real time as the backend processes, not on arbitrary timers.
+C. Post-Clone Parent Review (modify existing brain-review page):
+The existing brain-review page at apps/web/src/app/dashboard/parent/learner/[id]/brain-review/page.tsx already has a good 6-tab review interface with XAI explanations. Keep this, but ensure the parent sees it immediately after the build completes (not on a separate page visit). The parent's three options (Approve / Add Context & Rebuild / Start Over) should remain, but the flow should make it clear that learning will not begin until the parent explicitly approves.
+
+Problem 3: Brain Is Cloned Automatically Without COPPA-Required Parental Consent
+What's wrong: Currently, the brain clone is triggered automatically when the child completes the baseline (learner-baseline.ts line 267). This means an AI-generated cognitive profile of a child is created without explicit parental consent, violating COPPA principles. The parent only reviews the brain after it already exists.
+
+What needs to happen (COPPA compliance):
+
+Explicit opt-in consent: The parent must explicitly authorize the brain clone BEFORE it executes. Add a consent mechanism to the Pre-Clone Review Screen (Problem 2A above):
+Clear, plain-language explanation of what data is being used (parent assessment responses + child's baseline performance)
+What the brain model will contain (mastery levels, disability signals, accommodations, tutor assignments)
+How it will be used (to personalize learning content, difficulty, and tutoring)
+Data retention policy statement
+A checkbox or explicit "I authorize AIVO to build my child's learning brain model based on the assessment data described above"
+The "Approve & Build" button should be disabled until consent is given
+Record consent: Store the parent's consent timestamp, consent version, and IP in the brain_states record or a separate consent table.
+Post-clone parental control: The existing Approve/Amend/Decline flow in brain-review is good COPPA alignment. Keep it, but add:
+Ability for parent to modify specific mastery levels before approving (e.g., "I know my child's reading is better than 30% — they were tired during that section")
+Ability for parent to toggle individual accommodations on/off before approving
+Ability for parent to remove or add tutors before approving
+All modifications should be recorded in the XAI explanation as parent amendments
+Problem 4: Parent Cannot Modify Assessment Recommendations Before Cloning
+What's wrong: The current "Add Context & Rebuild" flow on the brain-review page (lines 182-208) only lets the parent add free-text context (learning context, clinical context, assessment concerns, missing info). It does NOT let them directly modify the actual recommendations (mastery levels, accommodations, tutors). The parent is a passive reviewer, not an active participant.
+
+What needs to happen:
+Enhance the Pre-Clone Review Screen (Problem 2A) and the Post-Clone Review (existing brain-review page) to allow parents to:
+
+Adjust mastery levels: For each domain, show a slider or +/- control that lets the parent say "I think this should be higher/lower." When adjusted, show the original AI-recommended value alongside the parent's override with a note like "AI recommended 45% based on assessment. Parent adjusted to 60%."
+Toggle accommodations: Each accommodation should have an on/off toggle. Parents can disable recommended accommodations or request additional ones from a predefined list.
+Select/deselect tutors: Each tutor should have a toggle. Show what subject/domain each tutor covers so parents can make informed decisions.
+Add context per decision: Each mastery/accommodation/tutor card should have an optional "Add a note" field where the parent can explain why they're modifying the recommendation.
+Track all modifications: All parent modifications must be recorded in the xai_explanation under a new parent_modifications array, with entries like: { field: "mastery_levels.ela", original_value: 0.45, parent_value: 0.60, parent_note: "She reads at grade level at home", modified_at: "..." }.
+Backend support: Modify the POST /api/brain/{learnerId}/approve endpoint (in services/brain-svc/src/brain_svc/routes/brain.py) to accept optional modifications in the request body. Apply these modifications to the brain state before finalizing the approval.
+Key Files to Modify
+Frontend:
+
+apps/web/src/app/dashboard/learner/assessment/page.tsx — Add parent assessment gate
+apps/web/src/components/discovery/Finale.tsx — Remove auto brain clone trigger; show simple completion
+apps/web/src/components/discovery/Awakening.tsx — Simplify or remove; no brain animation before parent consent
+apps/web/src/components/brain/BrainBuildingSequence.tsx — Replace timed animation with real data-driven transparent steps
+apps/web/src/app/dashboard/parent/learner/[id]/brain-review/page.tsx — Add pre-clone consent, inline modification controls, COPPA consent checkbox
+apps/web/src/components/discovery/useDiscoveryEngine.ts — Modify submitResults to NOT trigger brain clone
+Backend:
+
+services/assessment-svc/src/routes/learner-baseline.ts — Add parent assessment gate on chapter/complete endpoints; remove auto brain clone from completion
+services/brain-svc/src/brain_svc/services/clone_pipeline.py — Accept parent modifications; record in XAI explanation
+services/brain-svc/src/brain_svc/routes/brain.py — Modify approve endpoint to accept modifications; add consent recording
+Database (if needed):
+
+packages/db/src/schema/brain.ts — Add consent fields to brain_states or create consent table
+packages/db/src/schema/assessments.ts — No changes expected
+Summary of Flow After Fix
+Parent Assessment (REQUIRED, gated)
+    ↓ determines functioningLevel
+    ↓ results stored
+Baseline Assessment (BLOCKED until parent assessment complete)
+    ↓ uses parent assessment to personalize questions
+    ↓ results stored (brain NOT cloned yet)
+Pre-Clone Review (PARENT sees assessment summary + step-by-step plan)
+    ↓ parent can modify recommendations
+    ↓ parent gives COPPA consent
+    ↓ parent clicks "Approve & Build"
+Transparent Brain Building (real-time, step-by-step, data-driven)
+    ↓ each step explained as it happens
+    ↓ parent sees exactly what the AI decided and why
+Post-Build Review (existing 6-tab review enhanced with modification controls)
+    ↓ parent can still Approve / Amend / Decline
+    ↓ if Approve → learning begins
+    ↓ if Amend → context added, brain updated
+    ↓ if Decline → brain deleted, baseline retaken
+
+Non-Negotiable Requirements
+Child CANNOT start baseline without completed parent assessment
+Brain CANNOT be created without explicit parental consent
+Every AI decision must be explained in plain language (RAI/XAI)
+Parent must be able to modify any recommendation before AND after the brain is built
+All parent modifications and consent must be recorded and auditable
+The brain clone status pending_parent_review must block ALL learning activities until resolved
+That's the complete prompt. It covers every file, every line number, every flow, and every required change with specific technical details your pair programmer needs to implement the fix.
+
+
+1 step
+1 step
+
+The background research agents have completed. The prompt I provided above is already comprehensive and ready for you to copy. It incorporates findings from all three research passes across the codebase.
+
+To summarize what the prompt covers:
+
+Problem 1 — No gating: Child can bypass parent assessment entirely. Fix adds frontend + backend guards.
+Problem 2 — Opaque brain cloning: Replace cosmetic animations with real-time, data-driven step-by-step transparency (RAI/XAI).
+Problem 3 — No COPPA consent: Brain is auto-cloned without parental authorization. Fix requires explicit opt-in before clone executes.
+Problem 4 — Parent can't modify: Parent is passive reviewer. Fix adds inline controls to adjust mastery levels, toggle accommodations, and select/deselect tutors.
+Every file path, line number, endpoint, and data flow is specified so your pair programmer can get straight to work.

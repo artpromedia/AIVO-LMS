@@ -1,0 +1,62 @@
+#7 - Marketing Site Conversion & SEO Optimization
+What & Why
+The marketing site at apps/marketing needs to drive conversions for aivolearning.com. Currently CTAs link to redirect pages, there's no analytics tracking, SEO metadata is minimal, and there's no sitemap or robots.txt.
+
+Done looks like
+Every CTA button links to a real destination: B2C CTAs to signup with plan pre-selected, B2B CTAs to contact/demo form
+Pricing section plan buttons link to registration with plan parameter
+Contact page form submits to a real backend endpoint (not just mailto links)
+Demo request form captures company, role, email, school/district size
+Newsletter/waitlist signup connected to backend storage
+GA4 analytics integrated with conversion events on CTA clicks, form submissions, pricing selection, signup initiation
+Every page has proper title, meta description, Open Graph tags, Twitter Card tags, canonical URLs
+Organization JSON-LD structured data on landing page
+sitemap.xml generated via Next.js sitemap.ts
+robots.txt present
+All 10+ pages have unique, keyword-rich meta descriptions
+No placeholder content (Lorem ipsum, TODO, TBD) remains
+Mobile responsive: hamburger menu, stacking grids, 44px touch targets
+Images use Next.js Image component with proper dimensions and priority
+Fonts loaded via next/font
+Out of scope
+Facebook/Meta Pixel (can be added later)
+Full blog CMS integration
+A/B testing infrastructure
+Tasks
+Wire all CTA buttons — Connect Hero, StickyHeader, CTASection, pricing plan buttons to real destinations. B2C CTAs go to signup on apps/web with plan pre-selected. B2B/district CTAs go to contact/demo form.
+
+Build contact & demo forms — Replace mailto links on the contact page with a real form that submits to a backend endpoint. Create POST endpoint in comms-svc or admin-svc for contact submissions and demo requests. Store submissions in DB.
+
+Newsletter/waitlist capture — Add email capture in footer or CTA section, connected to a backend endpoint that stores email subscriptions.
+
+GA4 analytics integration — Add Google Analytics 4 via next/script in root layout. Add conversion tracking events on CTA clicks, form submissions, pricing plan selection, and signup initiation.
+
+SEO metadata — Add unique title, meta description, OG tags, Twitter Card tags, and canonical URLs to every page via Next.js metadata exports. Add Organization JSON-LD to the landing page.
+
+Sitemap & robots.txt — Create sitemap.ts and robots.txt in apps/marketing/src/app/.
+
+Placeholder content cleanup — Search all marketing pages for Lorem ipsum, TODO, TBD, empty paragraphs, and test data. Replace with real copy.
+
+Mobile responsiveness audit — Verify responsive breakpoints, hamburger menu, stacking grids on mobile, and 44px touch targets on all CTAs.
+
+Performance optimization — Ensure all images use Next.js Image with proper dimensions/priority. Verify fonts loaded via next/font for optimal LCP. Add lazy loading for below-fold sections.
+
+Relevant files
+apps/marketing/src/app/layout.tsx
+apps/marketing/src/app/page.tsx
+apps/marketing/src/app/contact/page.tsx
+apps/marketing/src/app/about/page.tsx
+apps/marketing/src/app/blog/page.tsx
+apps/marketing/src/app/careers/page.tsx
+apps/marketing/src/app/press-kit/page.tsx
+apps/marketing/src/app/login/page.tsx
+apps/marketing/src/app/signup/page.tsx
+apps/marketing/src/app/privacy-policy/page.tsx
+apps/marketing/src/app/terms-of-service/page.tsx
+apps/marketing/src/app/coppa-compliance/page.tsx
+apps/marketing/src/app/ferpa-compliance/page.tsx
+apps/marketing/src/app/accessibility/page.tsx
+apps/marketing/src/components/marketing/StickyHeader.tsx
+apps/marketing/src/components/marketing/CTASection.tsx
+apps/marketing/src/components/marketing/Footer.tsx
+apps/marketing/src/i18n/messages/en.json

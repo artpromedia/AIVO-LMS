@@ -1,0 +1,125 @@
+
+Build All Node Services
+failed 5 minutes ago in 1m 21s
+Search logs
+1s
+3s
+2s
+11s
+10s
+52s
+Run pnpm build
+
+> aivo-ai-learning@ build /home/runner/work/aivo-ai-learning/aivo-ai-learning
+> turbo build
+
+
+Attention:
+Turborepo now collects completely anonymous telemetry regarding usage.
+This information is used to shape the Turborepo roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://turborepo.dev/docs/telemetry
+
+
+   • Packages in scope: @aivo/admin-svc, @aivo/assessment-svc, @aivo/billing-svc, @aivo/brand, @aivo/comms-svc, @aivo/db, @aivo/engagement-svc, @aivo/events, @aivo/family-svc, @aivo/i18n-svc, @aivo/identity-svc, @aivo/integrations-svc, @aivo/learner-ui, @aivo/learning-svc, @aivo/marketing, @aivo/mobile, @aivo/mobile-ui, @aivo/observability, @aivo/research-svc, @aivo/security, @aivo/status-page-svc, @aivo/tutor-svc, @aivo/web
+   • Running build in 23 packages
+   • Remote caching disabled
+
+@aivo/brand:build
+@aivo/events:build
+@aivo/observability:build
+@aivo/security:build
+@aivo/learner-ui:build
+@aivo/db:build
+@aivo/status-page-svc:build
+@aivo/research-svc:build
+@aivo/learning-svc:build
+@aivo/integrations-svc:build
+@aivo/comms-svc:build
+@aivo/assessment-svc:build
+cache miss, executing a93ff3d3e6efc65f
+
+> @aivo/assessment-svc@1.0.0 build /home/runner/work/aivo-ai-learning/aivo-ai-learning/services/assessment-svc
+> tsc
+
+Error: src/index.ts(35,30): error TS2345: Argument of type 'FastifyInstance<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, Logger<...>, FastifyTypeProviderDefault> & PromiseLike<...> & { ...; }' is not assignable to parameter of type 'FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, FastifyTypeProviderDefault>'.
+  The types of 'withTypeProvider().route' are incompatible between these types.
+    Type '<RouteGeneric extends RouteGenericInterface = RouteGenericInterface, ContextConfig = unknown, const SchemaCompiler extends FastifySchema = FastifySchema>(opts: RouteOptions<Server<typeof IncomingMessage, typeof ServerResponse>, ... 6 more ..., Logger<...>>) => FastifyInstance<...>' is not assignable to type '<RouteGeneric extends RouteGenericInterface = RouteGenericInterface, ContextConfig = unknown, const SchemaCompiler extends FastifySchema = FastifySchema>(opts: RouteOptions<RawServerDefault, IncomingMessage, ... 5 more ..., FastifyBaseLogger>) => FastifyInstance<...>'.
+      Types of parameters 'opts' and 'opts' are incompatible.
+        Type 'RouteOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, any, any, any, any, FastifyBaseLogger>' is not assignable to type 'RouteOptions<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, ... 4 more ..., Logger<...>>'.
+          Types of property 'childLoggerFactory' are incompatible.
+            Type 'FastifyChildLoggerFactory<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, any> | undefined' is not assignable to type 'FastifyChildLoggerFactory<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, Logger<...>, any> | undefined'.
+              Type 'FastifyChildLoggerFactory<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, any>' is not assignable to type 'FastifyChildLoggerFactory<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, Logger<...>, any>'.
+                Type 'FastifyBaseLogger' is not assignable to type 'Logger<never, boolean>'.
+                  Property 'msgPrefix' is missing in type 'FastifyBaseLogger' but required in type 'BaseLogger'.
+Error: src/index.ts(36,40): error TS2345: Argument of type 'FastifyInstance<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, Logger<...>, FastifyTypeProviderDefault> & PromiseLike<...> & { ...; }' is not assignable to parameter of type 'FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, FastifyTypeProviderDefault>'.
+  The types of 'withTypeProvider().route' are incompatible between these types.
+    Type '<RouteGeneric extends RouteGenericInterface = RouteGenericInterface, ContextConfig = unknown, const SchemaCompiler extends FastifySchema = FastifySchema>(opts: RouteOptions<Server<typeof IncomingMessage, typeof ServerResponse>, ... 6 more ..., Logger<...>>) => FastifyInstance<...>' is not assignable to type '<RouteGeneric extends RouteGenericInterface = RouteGenericInterface, ContextConfig = unknown, const SchemaCompiler extends FastifySchema = FastifySchema>(opts: RouteOptions<RawServerDefault, IncomingMessage, ... 5 more ..., FastifyBaseLogger>) => FastifyInstance<...>'.
+      Types of parameters 'opts' and 'opts' are incompatible.
+        Type 'RouteOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, any, any, any, any, FastifyBaseLogger>' is not assignable to type 'RouteOptions<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, ... 4 more ..., Logger<...>>'.
+          Types of property 'childLoggerFactory' are incompatible.
+            Type 'FastifyChildLoggerFactory<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, any> | undefined' is not assignable to type 'FastifyChildLoggerFactory<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, Logger<...>, any> | undefined'.
+              Type 'FastifyChildLoggerFactory<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, any>' is not assignable to type 'FastifyChildLoggerFactory<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, Logger<...>, any>'.
+                Type 'FastifyBaseLogger' is not assignable to type 'Logger<never, boolean>'.
+                  Property 'msgPrefix' is missing in type 'FastifyBaseLogger' but required in type 'BaseLogger'.
+Error: src/index.ts(37,34): error TS2345: Argument of type 'FastifyInstance<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, Logger<...>, FastifyTypeProviderDefault> & PromiseLike<...> & { ...; }' is not assignable to parameter of type 'FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, FastifyTypeProviderDefault>'.
+  The types of 'withTypeProvider().route' are incompatible between these types.
+    Type '<RouteGeneric extends RouteGenericInterface = RouteGenericInterface, ContextConfig = unknown, const SchemaCompiler extends FastifySchema = FastifySchema>(opts: RouteOptions<Server<typeof IncomingMessage, typeof ServerResponse>, ... 6 more ..., Logger<...>>) => FastifyInstance<...>' is not assignable to type '<RouteGeneric extends RouteGenericInterface = RouteGenericInterface, ContextConfig = unknown, const SchemaCompiler extends FastifySchema = FastifySchema>(opts: RouteOptions<RawServerDefault, IncomingMessage, ... 5 more ..., FastifyBaseLogger>) => FastifyInstance<...>'.
+      Types of parameters 'opts' and 'opts' are incompatible.
+        Type 'RouteOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, any, any, any, any, FastifyBaseLogger>' is not assignable to type 'RouteOptions<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, ... 4 more ..., Logger<...>>'.
+          Types of property 'childLoggerFactory' are incompatible.
+            Type 'FastifyChildLoggerFactory<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, any> | undefined' is not assignable to type 'FastifyChildLoggerFactory<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, Logger<...>, any> | undefined'.
+              Type 'FastifyChildLoggerFactory<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, any>' is not assignable to type 'FastifyChildLoggerFactory<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, Logger<...>, any>'.
+                Type 'FastifyBaseLogger' is not assignable to type 'Logger<never, boolean>'.
+                  Property 'msgPrefix' is missing in type 'FastifyBaseLogger' but required in type 'BaseLogger'.
+Error: src/index.ts(38,27): error TS2345: Argument of type 'FastifyInstance<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, Logger<...>, FastifyTypeProviderDefault> & PromiseLike<...> & { ...; }' is not assignable to parameter of type 'FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, FastifyTypeProviderDefault>'.
+  The types of 'withTypeProvider().route' are incompatible between these types.
+    Type '<RouteGeneric extends RouteGenericInterface = RouteGenericInterface, ContextConfig = unknown, const SchemaCompiler extends FastifySchema = FastifySchema>(opts: RouteOptions<Server<typeof IncomingMessage, typeof ServerResponse>, ... 6 more ..., Logger<...>>) => FastifyInstance<...>' is not assignable to type '<RouteGeneric extends RouteGenericInterface = RouteGenericInterface, ContextConfig = unknown, const SchemaCompiler extends FastifySchema = FastifySchema>(opts: RouteOptions<RawServerDefault, IncomingMessage, ... 5 more ..., FastifyBaseLogger>) => FastifyInstance<...>'.
+      Types of parameters 'opts' and 'opts' are incompatible.
+        Type 'RouteOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, any, any, any, any, FastifyBaseLogger>' is not assignable to type 'RouteOptions<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, ... 4 more ..., Logger<...>>'.
+          Types of property 'childLoggerFactory' are incompatible.
+            Type 'FastifyChildLoggerFactory<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, any> | undefined' is not assignable to type 'FastifyChildLoggerFactory<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, Logger<...>, any> | undefined'.
+              Type 'FastifyChildLoggerFactory<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, any>' is not assignable to type 'FastifyChildLoggerFactory<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, Logger<...>, any>'.
+                Type 'FastifyBaseLogger' is not assignable to type 'Logger<never, boolean>'.
+                  Property 'msgPrefix' is missing in type 'FastifyBaseLogger' but required in type 'BaseLogger'.
+Error: src/index.ts(39,39): error TS2345: Argument of type 'FastifyInstance<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, Logger<...>, FastifyTypeProviderDefault> & PromiseLike<...> & { ...; }' is not assignable to parameter of type 'FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, FastifyTypeProviderDefault>'.
+  The types of 'withTypeProvider().route' are incompatible between these types.
+    Type '<RouteGeneric extends RouteGenericInterface = RouteGenericInterface, ContextConfig = unknown, const SchemaCompiler extends FastifySchema = FastifySchema>(opts: RouteOptions<Server<typeof IncomingMessage, typeof ServerResponse>, ... 6 more ..., Logger<...>>) => FastifyInstance<...>' is not assignable to type '<RouteGeneric extends RouteGenericInterface = RouteGenericInterface, ContextConfig = unknown, const SchemaCompiler extends FastifySchema = FastifySchema>(opts: RouteOptions<RawServerDefault, IncomingMessage, ... 5 more ..., FastifyBaseLogger>) => FastifyInstance<...>'.
+      Types of parameters 'opts' and 'opts' are incompatible.
+        Type 'RouteOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, any, any, any, any, FastifyBaseLogger>' is not assignable to type 'RouteOptions<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, ... 4 more ..., Logger<...>>'.
+          Types of property 'childLoggerFactory' are incompatible.
+            Type 'FastifyChildLoggerFactory<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, any> | undefined' is not assignable to type 'FastifyChildLoggerFactory<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, Logger<...>, any> | undefined'.
+              Type 'FastifyChildLoggerFactory<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, any>' is not assignable to type 'FastifyChildLoggerFactory<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, Logger<...>, any>'.
+                Type 'FastifyBaseLogger' is not assignable to type 'Logger<never, boolean>'.
+                  Property 'msgPrefix' is missing in type 'FastifyBaseLogger' but required in type 'BaseLogger'.
+Error: src/index.ts(40,38): error TS2345: Argument of type 'FastifyInstance<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, Logger<...>, FastifyTypeProviderDefault> & PromiseLike<...> & { ...; }' is not assignable to parameter of type 'FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, FastifyTypeProviderDefault>'.
+  The types of 'withTypeProvider().route' are incompatible between these types.
+    Type '<RouteGeneric extends RouteGenericInterface = RouteGenericInterface, ContextConfig = unknown, const SchemaCompiler extends FastifySchema = FastifySchema>(opts: RouteOptions<Server<typeof IncomingMessage, typeof ServerResponse>, ... 6 more ..., Logger<...>>) => FastifyInstance<...>' is not assignable to type '<RouteGeneric extends RouteGenericInterface = RouteGenericInterface, ContextConfig = unknown, const SchemaCompiler extends FastifySchema = FastifySchema>(opts: RouteOptions<RawServerDefault, IncomingMessage, ... 5 more ..., FastifyBaseLogger>) => FastifyInstance<...>'.
+      Types of parameters 'opts' and 'opts' are incompatible.
+        Type 'RouteOptions<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, any, any, any, any, FastifyBaseLogger>' is not assignable to type 'RouteOptions<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, ... 4 more ..., Logger<...>>'.
+          Types of property 'childLoggerFactory' are incompatible.
+            Type 'FastifyChildLoggerFactory<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, any> | undefined' is not assignable to type 'FastifyChildLoggerFactory<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, Logger<...>, any> | undefined'.
+              Type 'FastifyChildLoggerFactory<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, any>' is not assignable to type 'FastifyChildLoggerFactory<Server<typeof IncomingMessage, typeof ServerResponse>, IncomingMessage, ServerResponse<IncomingMessage>, Logger<...>, any>'.
+                Type 'FastifyBaseLogger' is not assignable to type 'Logger<never, boolean>'.
+                  Property 'msgPrefix' is missing in type 'FastifyBaseLogger' but required in type 'BaseLogger'.
+ ELIFECYCLE  Command failed with exit code 2.
+@aivo/i18n-svc:build
+@aivo/admin-svc:build
+@aivo/tutor-svc:build
+@aivo/engagement-svc:build
+@aivo/family-svc:build
+@aivo/billing-svc:build
+@aivo/marketing:build
+@aivo/web:build
+@aivo/identity-svc:build
+Error: @aivo/assessment-svc#build: command (/home/runner/work/aivo-ai-learning/aivo-ai-learning/services/assessment-svc) /home/runner/setup-pnpm/node_modules/.bin/pnpm run build exited (2)
+ ERROR  @aivo/assessment-svc#build: command (/home/runner/work/aivo-ai-learning/aivo-ai-learning/services/assessment-svc) /home/runner/setup-pnpm/node_modules/.bin/pnpm run build exited (2)
+
+ Tasks:    11 successful, 21 total
+Cached:    0 cached, 21 total
+  Time:    51.04s 
+Failed:    @aivo/assessment-svc#build
+
+ ERROR  run failed: command  exited (2)
+ ELIFECYCLE  Command failed with exit code 2.
+Error: Process completed with exit code 2.

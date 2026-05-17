@@ -1,0 +1,96 @@
+# External liveness monitor for alerts-proxy-svc (#173).
+#
+# Lives in a separate namespace (`platform-ops`) so a failure of the
+# `aivo-prod` namespace (network policies, RBAC, scheduling) does not also
+# kill the monitor. Pages PagerDuty and Opsgenie DIRECTLY — never through
+# the alerts-proxy.
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: platform-ops
+  labels:
+    purpose: out-of-band-monitoring
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ops-alerts-direct-paging
+  namespace: platform-ops
+type: Opaque
+stringData:
+  # Populate via external-secrets / sealed-secrets — never commit real values.
+  PAGERDUTY_DIRECT_ROUTING_KEY: "REPLACE_ME"
+  OPSGENIE_DIRECT_API_KEY: "REPLACE_ME"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ops-alerts-monitor-script
+  namespace: platform-ops
+data:
+  monitor.mjs: |
+    // Source of truth lives at scripts/ops-alerts-external-monitor.mjs in the
+    // aivo-ai-learning repo; keep this ConfigMap in sync via CI.
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: alerts-proxy-liveness
+  namespace: platform-ops
+spec:
+  # Every 60 seconds. PD/Opsgenie dedup_key suppresses duplicate pages while
+  # the proxy stays down.
+  schedule: "* * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      ttlSecondsAfterFinished: 300
+      template:
+        spec:
+          restartPolicy: Never
+          # Schedule away from the prod app nodes so a node failure that takes
+          # the proxy down does not also take the monitor down.
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: role
+                        operator: NotIn
+                        values: ["app"]
+          containers:
+            - name: monitor
+              image: node:22-alpine
+              command: ["node", "/scripts/monitor.mjs"]
+              env:
+                - name: ALERTS_PROXY_HEALTH_URL
+                  value: "http://alerts-proxy-svc.aivo-prod.svc.cluster.local:3016/api/alerts/health"
+                - name: PAGERDUTY_DIRECT_ROUTING_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: ops-alerts-direct-paging
+                      key: PAGERDUTY_DIRECT_ROUTING_KEY
+                - name: OPSGENIE_DIRECT_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: ops-alerts-direct-paging
+                      key: OPSGENIE_DIRECT_API_KEY
+                - name: ALERT_PROXY_DEDUP_KEY
+                  value: "alerts-proxy-down-prod"
+                - name: PROBE_TIMEOUT_MS
+                  value: "5000"
+              volumeMounts:
+                - name: script
+                  mountPath: /scripts
+              resources:
+                requests: { cpu: "10m", memory: "32Mi" }
+                limits: { cpu: "100m", memory: "128Mi" }
+          volumes:
+            - name: script
+              configMap:
+                name: ops-alerts-monitor-script
+                defaultMode: 0755

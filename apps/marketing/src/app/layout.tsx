@@ -1,0 +1,172 @@
+import type { Metadata } from "next";
+import { Fredoka, Nunito } from "next/font/google";
+import "./globals.css";
+import { I18nProvider } from "@/providers/i18n-provider";
+import enMessages from "@/i18n/messages/en.json";
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+
+const fredoka = Fredoka({
+  subsets: ["latin"],
+  variable: "--font-fredoka",
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+});
+
+const nunito = Nunito({
+  subsets: ["latin"],
+  variable: "--font-nunito",
+  display: "swap",
+  weight: ["400", "500", "600", "700", "800"],
+});
+
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://aivolearning.com";
+
+export const metadata: Metadata = {
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: "AIVO Learning – AI-Powered Adaptive Learning for Every Child",
+    template: "%s | AIVO Learning",
+  },
+  description:
+    "AIVO Learning uses AI-powered Brain Clone technology to create personalized learning experiences for children of all abilities, including those with autism and special needs. 14 AI tutors, 5 functioning levels, designed to support COPPA and FERPA.",
+  keywords: [
+    "AI learning",
+    "adaptive learning",
+    "special education",
+    "autism education",
+    "personalized learning",
+    "AI tutors",
+    "Brain Clone",
+    "IEP tracking",
+    "COPPA",
+    "FERPA",
+    "edtech",
+    "K-12 education",
+  ],
+  icons: { icon: "/images/favicon-192.png" },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: BASE_URL,
+    siteName: "AIVO Learning",
+    title: "AIVO Learning – AI-Powered Adaptive Learning for Every Child",
+    description:
+      "Personalized AI tutors that adapt to every child's unique learning style. 14 specialized tutors, 5 functioning levels, built for all abilities.",
+    images: [
+      {
+        url: `${BASE_URL}/images/aivo-logo-purple.png`,
+        width: 1200,
+        height: 630,
+        alt: "AIVO Learning Platform",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AIVO Learning – AI-Powered Adaptive Learning for Every Child",
+    description:
+      "Personalized AI tutors that adapt to every child's unique learning style. Built for all abilities, designed to support COPPA and FERPA.",
+    images: [`${BASE_URL}/images/aivo-logo-purple.png`],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: BASE_URL,
+    // Note: locales are runtime-switched (no per-locale URLs), so we only
+    // declare x-default + en. When per-locale paths ship (e.g. /es, /fr),
+    // expand this map to include the rest of `locales`.
+    languages: {
+      "x-default": BASE_URL,
+      en: BASE_URL,
+    },
+  },
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" className={`${fredoka.variable} ${nunito.variable}`} suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "AIVO Learning",
+              url: BASE_URL,
+              logo: `${BASE_URL}/images/aivo-logo-purple.png`,
+              description:
+                "AI-powered adaptive learning platform for children of all abilities, featuring Brain Clone technology, 14 AI tutors, and 5 functioning levels.",
+              foundingDate: "2024",
+              founders: [
+                { "@type": "Person", name: "Dr. Ikechukwu Osuji" },
+                { "@type": "Person", name: "Ofem Ekapong Ofem" },
+                { "@type": "Person", name: "Nnamdi Uzokwe" },
+              ],
+              address: {
+                "@type": "PostalAddress",
+                addressLocality: "Washington",
+                addressRegion: "DC",
+                addressCountry: "US",
+              },
+              contactPoint: {
+                "@type": "ContactPoint",
+                email: "hello@aivolearning.com",
+                contactType: "customer service",
+              },
+              sameAs: [],
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "AIVO Learning",
+              url: BASE_URL,
+              potentialAction: {
+                "@type": "SearchAction",
+                target: `${BASE_URL}/blog?q={search_term_string}`,
+                "query-input": "required name=search_term_string",
+              },
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              name: "AIVO Learning",
+              applicationCategory: "EducationalApplication",
+              operatingSystem: "Web, iOS, Android",
+              description:
+                "AI-powered adaptive learning platform with Brain Clone technology, 14 specialized AI tutors, and 5 functioning levels — designed to support COPPA and FERPA workflows for families and schools.",
+              offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+              audience: { "@type": "EducationalAudience", educationalRole: "student" },
+              url: BASE_URL,
+            }),
+          }}
+        />
+      </head>
+      <body className="font-body antialiased bg-white text-slate-800">
+        <GoogleAnalytics />
+        <I18nProvider initialMessages={enMessages}>
+          {children}
+        </I18nProvider>
+      </body>
+    </html>
+  );
+}

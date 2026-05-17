@@ -1,0 +1,91 @@
+name: ZAP Baseline (weekly)
+
+# Sprint 11 — Authenticated OWASP ZAP baseline scan against the
+# admin + district portals. Runs weekly on Sundays at 08:00 UTC and
+# on-demand via workflow_dispatch. Findings are uploaded as a workflow
+# artifact and (when configured) as a SARIF file to GitHub Security.
+on:
+  schedule:
+    - cron: "0 8 * * 0"
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Target URL (defaults to admin.aivolearning.com)"
+        required: false
+        default: "https://admin.aivolearning.com"
+
+permissions:
+  contents: read
+  issues: write
+  security-events: write
+
+jobs:
+  zap-admin:
+    name: ZAP baseline — admin portal
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: ZAP Baseline Scan (admin)
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: ${{ github.event.inputs.target || 'https://admin.aivolearning.com' }}
+          # Authenticated session — provide the bearer in repo secrets.
+          # Empty string falls through to an unauthenticated baseline.
+          cmd_options: >-
+            -a
+            -j
+            -m 5
+            -T 60
+            -z "-config replacer.full_list(0).description=auth
+                -config replacer.full_list(0).enabled=true
+                -config replacer.full_list(0).matchtype=REQ_HEADER
+                -config replacer.full_list(0).matchstr=Authorization
+                -config replacer.full_list(0).regex=false
+                -config replacer.full_list(0).replacement='Bearer ${{ secrets.ZAP_ADMIN_BEARER }}'"
+          fail_action: false
+          allow_issue_writing: true
+          artifact_name: zap-admin-report
+      - name: Upload ZAP report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-admin-report
+          path: |
+            report_html.html
+            report_md.md
+            report_json.json
+          if-no-files-found: ignore
+
+  zap-district:
+    name: ZAP baseline — district portal
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: ZAP Baseline Scan (district)
+        uses: zaproxy/action-baseline@v0.12.0
+        with:
+          target: https://district.aivolearning.com
+          cmd_options: >-
+            -a
+            -j
+            -m 5
+            -T 60
+            -z "-config replacer.full_list(0).description=auth
+                -config replacer.full_list(0).enabled=true
+                -config replacer.full_list(0).matchtype=REQ_HEADER
+                -config replacer.full_list(0).matchstr=Authorization
+                -config replacer.full_list(0).regex=false
+                -config replacer.full_list(0).replacement='Bearer ${{ secrets.ZAP_DISTRICT_BEARER }}'"
+          fail_action: false
+          allow_issue_writing: true
+          artifact_name: zap-district-report
+      - name: Upload ZAP report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zap-district-report
+          path: |
+            report_html.html
+            report_md.md
+            report_json.json
+          if-no-files-found: ignore

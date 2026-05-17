@@ -1,0 +1,131 @@
+name: Backup Restore Verification
+
+on:
+  schedule:
+    - cron: "0 3 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # actions: read is kept for any future previous-run lookup tooling we add.
+  # lookup.
+  actions: read
+
+jobs:
+  verify-restore:
+    name: Verify Backup Restore
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: aivo
+          POSTGRES_PASSWORD: aivo_verify
+          POSTGRES_DB: aivo_verify
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U aivo -d aivo_verify"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare reason capture
+        run: |
+          mkdir -p /tmp/backup
+          : > /tmp/backup/reason.txt
+
+      - name: Configure AWS CLI
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+
+      - name: Download latest backup from S3
+        id: download
+        run: |
+          set -o pipefail
+          BUCKET="${{ secrets.S3_BACKUP_BUCKET }}"
+          LATEST=$(aws s3 ls "s3://${BUCKET}/backups/pg-" --recursive | sort | tail -1 | awk '{print $4}')
+
+          if [ -z "$LATEST" ]; then
+            echo "No backups found in S3 bucket s3://${BUCKET}/backups/pg-" | tee -a /tmp/backup/reason.txt
+            echo "::error::No backups found in S3 bucket"
+            exit 1
+          fi
+
+          echo "Downloading: $LATEST" | tee -a /tmp/backup/reason.txt
+          aws s3 cp "s3://${BUCKET}/${LATEST}" /tmp/backup.sql.gz 2>&1 | tee -a /tmp/backup/reason.txt
+
+          echo "Backup size: $(du -h /tmp/backup.sql.gz | cut -f1)"
+          echo "backup_file=$LATEST" >> $GITHUB_ENV
+
+      - name: Restore backup to test database
+        env:
+          DATABASE_URL: postgresql://aivo:aivo_verify@localhost:5433/aivo_verify
+        run: |
+          set -o pipefail
+          echo "Restoring backup..." | tee -a /tmp/backup/reason.txt
+          gunzip -c /tmp/backup.sql.gz | psql "$DATABASE_URL" --quiet --no-psqlrc 2>&1 | tail -n 50 | tee -a /tmp/backup/reason.txt
+          echo "Restore completed"
+
+      - name: Validate restored data
+        env:
+          DATABASE_URL: postgresql://aivo:aivo_verify@localhost:5433/aivo_verify
+        run: |
+          set -o pipefail
+          {
+            echo "=== Backup Restore Validation ==="
+
+            TABLE_COUNT=$(psql "$DATABASE_URL" --no-psqlrc --tuples-only --no-align -c "
+              SELECT count(*) FROM pg_stat_user_tables WHERE schemaname = 'public';
+            ")
+
+            echo "Tables found: $TABLE_COUNT"
+
+            if [ "${TABLE_COUNT:-0}" -lt 10 ]; then
+              echo "Expected at least 10 tables, found $TABLE_COUNT" | tee -a /tmp/backup/reason.txt
+              echo "::error::Expected at least 10 tables, found $TABLE_COUNT"
+              exit 1
+            fi
+
+            echo ""
+            echo "Table row counts:"
+            psql "$DATABASE_URL" --no-psqlrc --tuples-only --no-align -c "
+              SELECT tablename || ': ' || n_live_tup
+              FROM pg_stat_user_tables
+              WHERE schemaname = 'public'
+              ORDER BY n_live_tup DESC
+              LIMIT 20;
+            "
+
+            CRITICAL_TABLES="users learners brain_states"
+            for tbl in $CRITICAL_TABLES; do
+              COUNT=$(psql "$DATABASE_URL" --no-psqlrc --tuples-only --no-align -c "
+                SELECT count(*) FROM \"$tbl\";
+              " 2>/dev/null || echo "0")
+              echo "Critical table '$tbl': $COUNT rows"
+              if [ "${COUNT:-0}" -eq 0 ]; then
+                echo "::warning::Critical table '$tbl' has zero rows"
+              fi
+            done
+
+            echo ""
+            echo "=== Backup restore verification PASSED ==="
+          } 2>&1 | tee -a /tmp/backup/reason.txt
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Backup Restore Verification" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Backup:** \`${{ env.backup_file }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp:** $(date -u +'%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY

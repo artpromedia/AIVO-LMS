@@ -1,0 +1,160 @@
+api/auth/session:1  Failed to load resource: the server responded with a status of 401 ()
+feature_collector.js:23 using deprecated parameters for the initialization function; pass a single object instead
+U @ feature_collector.js:23
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+api/learners:1  Failed to load resource: the server responded with a status of 500 ()
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+parent:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+parent:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+parent:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+parent:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+parent:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+parent:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+api/districts/lookup?zip=55449:1  Failed to load resource: the server responded with a status of 500 ()
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+api/learners:1  Failed to load resource: the server responded with a status of 500 ()
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1
+796-89dd679462280536.js:1 WebSocket connection to 'wss://app.aivolearning.com/comms/ws/?EIO=4&transport=websocket' failed: 
+createSocket @ 796-89dd679462280536.js:1

@@ -1,0 +1,166 @@
+# =============================================================================
+# AIVO Service - Production Environment Values
+# =============================================================================
+# Use: helm install <service> ./aivo-service -f values-production.yaml --set serviceName=<name>
+# =============================================================================
+
+image:
+  tag: ""  # Must be set during deployment (release version)
+
+replicaCount: 3
+
+# Production resources
+resources:
+  limits:
+    cpu: "2"
+    memory: "2Gi"
+  requests:
+    cpu: "200m"
+    memory: "512Mi"
+
+# Production HPA
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 75
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 10
+          periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 15
+        - type: Pods
+          value: 4
+          periodSeconds: 15
+      selectPolicy: Max
+
+# Environment variables for production
+env:
+  NODE_ENV: production
+  PORT: "3000"
+  LOG_LEVEL: info
+  LOG_FORMAT: json
+  OTEL_ENABLED: "true"
+  OTEL_SERVICE_NAME: "{{ .Values.serviceName }}"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector.monitoring:4317"
+  RATE_LIMIT_ENABLED: "true"
+  CACHE_TTL: "3600"
+
+# External secrets for production
+externalSecrets:
+  enabled: true
+  refreshInterval: "5m"  # More frequent refresh for production
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: k8s-secret-store
+  data:
+    - secretKey: DATABASE_URL
+      remoteRef:
+        key: aivo-prod/database-url
+    - secretKey: REDIS_URL
+      remoteRef:
+        key: aivo-prod/redis-url
+    - secretKey: NATS_URL
+      remoteRef:
+        key: aivo-prod/nats-url
+    - secretKey: JWT_SECRET
+      remoteRef:
+        key: aivo-prod/jwt-secret
+    - secretKey: ENCRYPTION_KEY
+      remoteRef:
+        key: aivo-prod/encryption-key
+    - secretKey: SENTRY_DSN
+      remoteRef:
+        key: aivo-prod/sentry-dsn
+
+# Ingress for production
+ingress:
+  enabled: false  # Using Kong gateway instead
+
+# Strict network policy for production
+networkPolicy:
+  enabled: true
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: aivo-prod
+        - namespaceSelector:
+            matchLabels:
+              name: kong
+      ports:
+        - protocol: TCP
+          port: 3000
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: aivo-prod
+        - namespaceSelector:
+            matchLabels:
+              name: kong
+    - to:
+        - ipBlock:
+            cidr: 10.0.0.0/8  # Internal GCP network
+      ports:
+        - protocol: TCP
+          port: 5432  # PostgreSQL
+        - protocol: TCP
+          port: 6379  # Redis
+        - protocol: TCP
+          port: 4222  # NATS
+
+# Pod disruption budget (strict for production)
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 2
+
+# Anti-affinity for HA — auto-injected by deployment template with resolved serviceName
+affinity: {}
+
+# Datadog for production
+datadog:
+  enabled: true
+  env: production
+
+# Prometheus alerts for production
+prometheusRule:
+  enabled: true
+  rules:
+    - alert: HighErrorRate
+      expr: |
+        sum(rate(http_requests_total{status=~"5..", service="{{ .Values.serviceName }}"}[5m])) /
+        sum(rate(http_requests_total{service="{{ .Values.serviceName }}"}[5m])) > 0.01
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "High error rate on {{ .Values.serviceName }}"
+        description: "Error rate is above 1% for the past 5 minutes"
+    - alert: HighLatency
+      expr: |
+        histogram_quantile(0.99, rate(http_request_duration_seconds_bucket{service="{{ .Values.serviceName }}"}[5m])) > 1
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High latency on {{ .Values.serviceName }}"
+        description: "P99 latency is above 1 second"
+    - alert: PodNotReady
+      expr: |
+        kube_pod_status_ready{namespace="aivo-prod", pod=~"{{ .Values.serviceName }}.*"} == 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Pod not ready for {{ .Values.serviceName }}"
+        description: "Pod has been not ready for more than 5 minutes"

@@ -1,0 +1,44 @@
+# Netplan configuration for Hetzner bastion `aivo-app1` (95.216.245.40).
+#
+# Installed at: /etc/netplan/01-netcfg.yaml (mode 0600)
+# Renderer:     systemd-networkd
+#
+# The `vlans.eno1.4000` stanza is REQUIRED for k3s. Without it the control-plane
+# crash-loops after reboot with:
+#   level=fatal msg="Error: unable to find interface eno1.4000: route ip+net:
+#                   no such network interface"
+# because k3s.service is launched with
+#   --flannel-iface=eno1.4000 --node-ip=10.0.0.2 --advertise-address=10.0.0.2
+# and the Hetzner vswitch VLAN (id 4000) is not auto-created by installimage.
+#
+# To apply on the bastion:
+#   sudo install -m 600 aivo-app1-01-netcfg.yaml /etc/netplan/01-netcfg.yaml
+#   sudo netplan generate && sudo netplan apply
+#
+### Hetzner Online GmbH installimage
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eno1:
+      addresses:
+        - 95.216.245.40/32
+        - 2a01:4f9:2b:2741::2/64
+      routes:
+        - on-link: true
+          to: 0.0.0.0/0
+          via: 95.216.245.1
+        - to: default
+          via: fe80::1
+      nameservers:
+        addresses:
+          - 185.12.64.1
+          - 2a01:4ff:ff00::add:2
+          - 185.12.64.2
+          - 2a01:4ff:ff00::add:1
+  vlans:
+    eno1.4000:
+      id: 4000
+      link: eno1
+      addresses:
+        - 10.0.0.2/24

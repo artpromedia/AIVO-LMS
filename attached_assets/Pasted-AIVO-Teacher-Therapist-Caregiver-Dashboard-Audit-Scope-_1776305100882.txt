@@ -1,0 +1,648 @@
+AIVO Teacher / Therapist / Caregiver Dashboard Audit
+Scope: apps/web/src/app/dashboard/{teacher,therapist,caregiver}/**
+Date: April 16, 2026
+Branch: claude/accessible-learner-dashboard-orcMr
+
+Files reviewed (1,334 LOC total)
+File	Lines
+dashboard/teacher/layout.tsx	103
+dashboard/teacher/page.tsx	156
+dashboard/teacher/reports/page.tsx	114
+dashboard/teacher/lesson-plans/page.tsx	26 (stub)
+dashboard/teacher/settings/page.tsx	78
+dashboard/therapist/layout.tsx	103
+dashboard/therapist/page.tsx	166
+dashboard/therapist/reports/page.tsx	100
+dashboard/therapist/sessions/page.tsx	26 (stub)
+dashboard/therapist/settings/page.tsx	73
+dashboard/caregiver/layout.tsx	103
+dashboard/caregiver/page.tsx	161
+dashboard/caregiver/observations/page.tsx	26 (stub)
+dashboard/caregiver/sessions/page.tsx	26 (stub)
+dashboard/caregiver/settings/page.tsx	73
+1. Cross-cutting findings (all 3 dashboards)
+1.1 Near-duplicate layouts — 3× copy-paste drift
+The three layout.tsx files are nearly identical (103 lines each) differing only by accent color (blue/pink/green), nav items, and role label. This is 309 lines of code that should be one shared CareTeamLayout component in packages/shared-ui (or apps/web/src/components/layouts/). Any a11y fix must be applied three times today.
+
+1.2 "Save Preferences" does not save
+teacher/settings/page.tsx:18-21 — handleSaveSettings only flips a local settingsSaved state and sets a 3-second timeout. No API call. Same pattern in therapist/settings/page.tsx and caregiver/settings/page.tsx. This is a user-trust regression: a parent/therapist changes alert preferences, sees "Settings saved!", and nothing persists.
+
+1.3 Four "Coming Soon" stubs shipped to production routes
+teacher/lesson-plans/page.tsx (26 lines)
+therapist/sessions/page.tsx (26 lines)
+caregiver/observations/page.tsx (26 lines)
+caregiver/sessions/page.tsx (26 lines)
+All four are navigable from the sidebar but do nothing. This is worse than hiding them — users click, lose trust, and don't come back. Either implement (preferred) or feature-flag and hide from nav.
+
+1.4 Wrong i18n namespace (real bug)
+therapist/page.tsx:26 → useTranslations("caregiver") (should be "therapist")
+therapist/reports/page.tsx:25 → useTranslations("caregiver") (should be "therapist")
+Therapist dashboard is silently reading caregiver translations. Will mis-translate on every locale.
+
+1.5 Mobile is effectively broken
+The sidebar is w-64 or w-16 with no mobile hamburger, no breakpoint collapse, and no overlay mode. On a ~375px viewport, the sidebar consumes 68% of width and content overflows. None of the three dashboards has a responsive nav pattern.
+
+1.6 atRiskCount declared, never computed
+teacher/page.tsx:47-53 builds ClassroomGroup with atRiskCount: 0 but never populates it, and the UI never reads it. Either delete the field or implement the logic — half-built data shapes are confusing.
+
+1.7 Hardcoded "Active" status
+teacher/reports/page.tsx:103 renders every learner with a green "Active" pill regardless of actual status. Misleading; fails the visual source-of-truth test.
+
+1.8 Expand-card pattern has a11y gaps
+Teacher (page.tsx:126-131) and Therapist (page.tsx:114-120) both use a <div role="button" tabIndex={0} onClick ... onKeyDown> pattern. Issues:
+
+No visible focus ring in Tailwind classes — relies on browser default which is often invisible on white cards.
+onClick fires on the full card including its inner brain-viz area; clicking inside the expanded viz collapses the card.
+Semantic: a real <button> inside the card wrapping only the header region is better.
+1.9 No retry on fetch errors
+All three pages show <p>Please try refreshing the page.</p> — no actual Retry button. Poor UX and fails the "no dead ends" principle.
+
+1.10 No empty-state CTA
+When learners.length === 0, all three dashboards render an explanatory paragraph but no link/button. Therapist for example reads "Parents can invite you to their learner's care team from the Collaboration page in their dashboard." — the therapist cannot act. They need at minimum: a copyable invite-code entry field, or a link to /dashboard/notifications to see pending invites.
+
+1.11 BrainVisualization re-fetches on every expand
+BrainVisualization learnerId={l.id} is mounted fresh each time a card expands, causing a new API call. With a teacher of 30 learners clicking around, that's 30+ redundant /api/brain/:learnerId calls per session. Needs memoization or move to a data layer cache (SWR/React Query).
+
+1.12 No search / sort / filter
+Teacher page with 40 students — no way to find one. Therapist caseload — no category/goal-status filter. Caregiver with multiple kids — only a raw <select>.
+
+1.13 No communication / collaboration affordances
+None of the three dashboards let these users:
+
+Message the parent
+Add a note to a learner's record
+Request an observation
+Upload a document (IEP, assessment, progress report)
+The platform has family-svc and comms-svc for exactly this. It's a gap, not an absence of capability.
+
+1.14 No quick actions on learner card
+No "view gradebook", "open brain profile in new tab", "see recent sessions", "schedule a session". Each learner card is a dead-end once expanded.
+
+1.15 Loading is opacity-pulse, not skeleton
+animate-pulse text-slate-500 for all loading states. A skeleton would communicate structure and reduce perceived wait.
+
+2. Teacher-specific findings
+2.1 Grade-group logic is fragile
+teacher/page.tsx:46-53 buckets learners by gradeLevel string. An "Unassigned" grade merges with learners whose gradeLevel is missing; 1st vs. 1st grade vs. "1" won't merge. Needs normalization (normalizeGrade()).
+
+2.2 Reports table lacks accessible table structure
+teacher/reports/page.tsx:82-110:
+
+No <caption> (therapist reports has one, this one doesn't).
+<th> elements lack scope="col".
+No row headers via <th scope="row"> on learner name.
+2.3 Reports "cards" are not interactive despite looking clickable
+Lines 34-75 — four report cards have hover effects (hover:shadow-sm hover:border-blue-300) that suggest clickability, but they're plain <div>s with no links or onClick. Users click and nothing happens. Either make them real links (where do they go?) or strip hover affordance.
+
+2.4 No class/grade-level actions
+Teacher sees grade groups but can't:
+
+Create a lesson plan for an entire group
+Run an activity across a group
+Export a grade-level report
+The lesson-plans stub promises "AI-powered lesson plan generation based on your learners' Brain Clone profiles" — but there's no entry point from the group header.
+
+3. Therapist-specific findings
+3.1 Goals display is capped at 2 with no "expand to see all" affordance
+therapist/page.tsx:134 — goals.slice(0, isExpanded ? undefined : 2) works, but collapsed state shows "+N more goals" as a paragraph, not a button. User tapping the "+N more" text triggers the card expand, which is implicit and confusing.
+
+3.2 No goal category taxonomy
+Goals are grouped only by learner, never by category (speech, OT, PT, SEL). A therapist with a caseload of 15 wants to see "all speech-articulation goals" across clients.
+
+3.3 No progress trend
+Goal progress shows a bar but no sparkline, no "last updated", no "at what rate". Therapy goals demand trend visualization — this is the core clinical value.
+
+3.4 Session tracking is a stub
+therapist/sessions/page.tsx is "Coming Soon" but session tracking is fundamental to therapy billing and progress documentation. This is the most critical gap in the therapist surface.
+
+3.5 No SOAP/DAP note capability
+Therapists document every session. No structured note entry, no template library.
+
+3.6 Reports table progress bar is thin
+therapist/reports/page.tsx:79-81 — h-1.5 progress bar. At 96dpi that's ~2px. Too thin for aging eyes; harder to hit visually for low-vision users.
+
+4. Caregiver-specific findings
+4.1 Single-learner model is implicit
+caregiver/page.tsx:47 auto-selects the first learner. Mental model is "I'm viewing one kid at a time" — but there's no visual anchor showing the active learner at the top of the layout. The H1 is generic {t("dashboard")}, learner name appears only in a stat card.
+
+4.2 Multi-learner switcher is a raw <select>
+caregiver/page.tsx:63-70 uses a native <select> with only aria-label="Select learner". No visible label. For caregivers supporting multiple children (common — foster care, sibling groups), a segmented card switcher would be clearer.
+
+4.3 IEP goals card truncates at 4 with no "view all"
+caregiver/page.tsx:126 — learnerGoals.slice(0, 4) hides the rest. No affordance to view them.
+
+4.4 No observation submission capability
+caregiver/observations/page.tsx is a stub, but observation submission is the caregiver's #1 contribution to the brain clone's episodic memory. This is a critical missing path.
+
+4.5 No daily log / behavior journal
+Caregivers need a low-effort "how was today?" log. Today there's nothing.
+
+4.6 No home-strategy recommendations
+The Brain clone generates accommodations. Parents see them. Caregivers should see an age-appropriate, home-context distilled version: "Today, Ada benefits from a 10-minute movement break before homework." This surface doesn't exist.
+
+5. Accessibility summary (all three)
+Issue	WCAG	Severity	Affected files
+Expand-card lacks visible focus ring	2.4.7	High	teacher/page.tsx, therapist/page.tsx
+<div role="button"> should be <button>	4.1.2	Medium	teacher/page.tsx:126, therapist/page.tsx:114
+Teacher reports table missing scope/caption	1.3.1	High	teacher/reports/page.tsx:84-90
+No responsive nav (fails at mobile)	1.4.10	High	all 3 layouts
+Loading spinner is animate-pulse on text (respects reduced-motion? partially)	2.3.3	Low	all 3 pages
+Hardcoded "Active" status in teacher reports misleads SR users	1.3.1	Medium	teacher/reports/page.tsx:103
+Native <select> in caregiver with only aria-label	3.3.2	Low	caregiver/page.tsx:64
+Settings toggles exist and use AccessibleToggle — good	—	—	—
+SkipLink present on all three layouts — good	—	—	—
+role="navigation", aria-label, aria-current on nav — good	—	—	—
+id="main-content" tabIndex={-1} on main — good	—	—	—
+Collapse button has dynamic aria-label — good	—	—	—
+6. Summary of what works (don't break these)
+SkipLink wired on all three layouts.
+All decorative emojis use aria-hidden="true".
+Sidebar has role="navigation", aria-label, aria-current="page" on active link.
+Collapse toggle has dynamic aria-label per WCAG.
+<main id="main-content" tabIndex={-1}> is present.
+Progress bars use role="progressbar" with aria-valuenow/min/max/label.
+AccessibleToggle is used in settings.
+Empty states and error states use role="alert" and role="status" correctly.
+Therapist reports table already has <caption className="sr-only"> and scope="col" — use as the template for fixing the teacher table.
+Fix Prompts (ready to paste into a coding agent)
+Each block below is a self-contained agent prompt. They're ordered by priority. Pick a branch name per prompt (suggested: claude/care-team-fix-<n>).
+
+Prompt 1 — Shared CareTeamLayout (kills 309 lines of duplication)
+## Task
+Extract the duplicated layout code in `apps/web/src/app/dashboard/{teacher,therapist,caregiver}/layout.tsx` into a shared `CareTeamLayout` component and replace each role layout with a thin wrapper.
+
+## Context
+All three files are nearly identical (~103 lines each). They differ only by:
+- `accent` color (blue / pink / green)
+- `NAV_ITEMS` list
+- `roleLabel` ("Teacher" / "Therapist" / "Caregiver")
+- `allowedRoles` array (used in the RBAC redirect)
+- `basePath`
+
+309 lines of code for what is essentially one component with four props. Any a11y fix must be applied 3x today.
+
+## Required changes
+1. Create `apps/web/src/components/layouts/CareTeamLayout.tsx` with this signature:
+   ```ts
+   interface CareTeamLayoutProps {
+     children: React.ReactNode;
+     accent: "blue" | "pink" | "green";
+     roleLabel: string;          // "Teacher" | "Therapist" | "Caregiver"
+     allowedRoles: string[];     // ["TEACHER", "PLATFORM_ADMIN"] etc.
+     basePath: string;           // "/dashboard/teacher"
+     navItems: { href: string; label: string; icon: string }[];
+   }
+   ```
+2. Move all the layout markup (sidebar, SkipLink, DashboardHeader, main) into `CareTeamLayout`. Use a Tailwind accent map:
+   ```ts
+   const ACCENT_CLASSES = {
+     blue: { bg: "bg-gradient-to-br from-blue-500 to-blue-600", text: "text-blue-600", activeBg: "bg-blue-100", activeText: "text-blue-700" },
+     pink: { ... },
+     green: { ... },
+   };
+   ```
+3. Replace each of the three `layout.tsx` files with a 10-15 line wrapper that imports `CareTeamLayout`, defines its `NAV_ITEMS` constant, and renders:
+   ```tsx
+   <CareTeamLayout accent="blue" roleLabel="Teacher" allowedRoles={["TEACHER","PLATFORM_ADMIN"]} basePath="/dashboard/teacher" navItems={NAV_ITEMS}>
+     {children}
+   </CareTeamLayout>
+   ```
+4. Preserve existing a11y attributes exactly: `SkipLink`, `role="navigation"`, `aria-label={`${roleLabel} sidebar`}`, `aria-current`, `aria-label` on collapse toggle, `id="main-content" tabIndex={-1}`, `aria-label="Sign out"`.
+
+## Constraints
+- Do NOT change visible behavior. Pixel-identical output per role.
+- Do NOT touch page components — only the three `layout.tsx` files.
+- Keep `useTranslations` usage unchanged.
+- Run `pnpm --filter web typecheck` and `pnpm --filter web lint` before completing.
+
+## Acceptance
+- Three `layout.tsx` files are each ≤ 25 lines.
+- Visual snapshot of `/dashboard/teacher`, `/dashboard/therapist`, `/dashboard/caregiver` unchanged.
+- All existing Playwright a11y tests still pass.
+
+Prompt 2 — Real settings persistence + fix i18n namespace bug
+## Task
+Fix two issues:
+1. Settings pages for teacher/therapist/caregiver fake-save — they set a local state and show "Settings saved!" but never call an API.
+2. `apps/web/src/app/dashboard/therapist/page.tsx:26` and `apps/web/src/app/dashboard/therapist/reports/page.tsx:25` both call `useTranslations("caregiver")` — should be `"therapist"`.
+
+## Context
+Current teacher/settings code at `apps/web/src/app/dashboard/teacher/settings/page.tsx:18-21`:
+```ts
+const handleSaveSettings = () => {
+  setSettingsSaved(true);
+  setTimeout(() => setSettingsSaved(false), 3000);
+};
+```
+Therapist and caregiver settings files mirror this pattern.
+
+## Required changes
+1. Add a new user-preferences endpoint in `services/identity-svc` (or reuse the existing user PATCH if present):
+   - `PATCH /api/users/me/preferences` — accepts `{ emailNotifs, weeklyDigest, atRiskAlerts }` (or the role-specific keys) and persists per-user.
+   - `GET /api/users/me/preferences` — returns the stored object.
+2. Add the route to the Next.js rewrite config if needed.
+3. In each settings page:
+   - Load preferences on mount via `GET /api/users/me/preferences`.
+   - On "Save Preferences" click: `PATCH` the endpoint, show `role="status"` success *after* the network call resolves, show `role="alert"` on error.
+   - Disable the button + set `aria-busy={true}` while saving.
+4. Fix the therapist i18n bug:
+   - `dashboard/therapist/page.tsx:26`: change `useTranslations("caregiver")` → `useTranslations("therapist")`
+   - `dashboard/therapist/reports/page.tsx:25`: same fix.
+   - Verify `apps/web/src/i18n/messages/en.json` has a `therapist` namespace with the keys used (`dashboard`, `iep_goals`). If missing, add them in all 10 locales matching the existing caregiver keys.
+
+## Acceptance
+- Settings persist across page reload.
+- Button shows loading state.
+- Error surface on network failure.
+- Therapist dashboard renders English "therapist" namespace strings (not "caregiver").
+- i18n parity check green across all 10 locales.
+
+Prompt 3 — Replace "Coming Soon" stubs with real features
+## Task
+Implement actual functionality for four routes that are currently 26-line "Coming Soon" stubs:
+- `apps/web/src/app/dashboard/teacher/lesson-plans/page.tsx`
+- `apps/web/src/app/dashboard/therapist/sessions/page.tsx`
+- `apps/web/src/app/dashboard/caregiver/observations/page.tsx`
+- `apps/web/src/app/dashboard/caregiver/sessions/page.tsx`
+
+Each is linked from the sidebar but does nothing, which is a trust regression.
+
+## Context
+- There is a `POST /api/engagement/lesson-plans/create` endpoint already live (see `replit.md` API list).
+- `family-svc` supports observations via `POST /api/engagement/sel/checkin` and `POST /api/engagement/break/log` (look for existing endpoints under engagement-svc).
+- Session-logging for tutor sessions is tracked via `POST /api/learning/sessions/:id/complete`.
+
+## Required changes (pick either implement-or-hide per stub)
+
+### Option A — Implement (preferred for critical paths)
+
+**teacher/lesson-plans**
+- Use existing `/api/engagement/lesson-plans/teacher` to list plans.
+- "Create Plan" button that posts to `/api/engagement/lesson-plans/create` with a form: title, learner(s), subject, objectives, activities, duration.
+- Render plan cards with status chips.
+
+**caregiver/observations** (HIGHEST PRIORITY)
+- Form with: learner selector, observation type (behavioral, academic, sensory, social), text area, date, severity (1-5).
+- POST to a new `/api/family/observations` endpoint (add to `family-svc` if not present — coordinate with backend).
+- List below: recent observations the caregiver submitted with edit/delete.
+
+**therapist/sessions**
+- List past sessions from `GET /api/learning/sessions?clientId=<id>&role=therapist` (add endpoint if needed).
+- "Log Session" button: session date, duration, learner, SOAP note (S/O/A/P text areas), attached goals.
+- POST to `/api/family/therapy-sessions` (new endpoint).
+
+**caregiver/sessions**
+- Read-only timeline of the connected learner's completed tutor sessions with score + duration. Reuse `GET /api/learning/sessions?learnerId=<id>` filtered to the selected learner.
+
+### Option B — Hide (acceptable only if Option A is out of scope)
+- Remove the stub pages.
+- Remove corresponding items from `NAV_ITEMS` in each layout.
+- Do NOT leave them behind a `FLAG_*` unless you also add the flag.
+
+## Acceptance
+- No "Coming Soon" pulse-dot cards remain in production.
+- Each implemented route has: empty state, loading state, error state with retry, and a clear primary action.
+- All new surfaces pass axe-core.
+- i18n strings added to all 10 locales.
+
+Prompt 4 — Fix expand-card a11y + focus visibility
+## Task
+Replace the `<div role="button">` expand-card pattern in teacher and therapist dashboards with proper semantic buttons and add visible focus rings.
+
+## Context
+Current teacher code at `apps/web/src/app/dashboard/teacher/page.tsx:124-148`:
+```tsx
+<div key={l.id}
+  className="..."
+  onClick={() => setExpandedLearner(...)}
+  role="button"
+  tabIndex={0}
+  aria-expanded={expandedLearner === l.id}
+  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setExpandedLearner(...); } }}>
+  
+    
+  
+
+```
+
+Same pattern in `therapist/page.tsx:113-121`.
+
+## Problems
+1. No visible focus ring — browser default on white background is often invisible.
+2. Click on the inside of the expanded content bubbles up and collapses the card.
+3. Semantics: a real `<button>` is preferred over `<div role="button">` when structure allows.
+
+## Required changes
+1. Restructure the card so only the **header region** is the clickable button, not the whole card:
+   ```tsx
+   <div className="rounded-xl border transition ...">
+     <button
+       type="button"
+       onClick={() => setExpandedLearner(...)}
+       aria-expanded={expandedLearner === l.id}
+       aria-controls={`learner-details-${l.id}`}
+       className="w-full text-left p-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-xl"
+     >
+       {/* name + level chip */}
+     </button>
+     {expandedLearner === l.id && (
+       <div id={`learner-details-${l.id}`} className="px-4 pb-4 border-t border-slate-100">
+         <BrainVisualization ... />
+       </div>
+     )}
+   </div>
+   ```
+2. Use `focus-visible:ring-blue-500` for teacher (matches accent), `focus-visible:ring-pink-500` for therapist.
+3. Remove the manual `onKeyDown` Enter/Space handler — native `<button>` handles both.
+4. Add `aria-controls` and matching `id` on the disclosure target.
+5. Ensure clicking inside the expanded region does NOT collapse the card.
+
+## Acceptance
+- Keyboard Tab lands on each learner's header button; Enter or Space toggles expansion.
+- Focus ring is visible at 200% zoom and in high-contrast mode.
+- Clicking inside the expanded brain-viz region does not trigger collapse.
+- Playwright a11y tests pass.
+- axe-core scan on `/dashboard/teacher` and `/dashboard/therapist` returns zero violations.
+
+Prompt 5 — Responsive mobile nav for care-team dashboards
+## Task
+Add a responsive hamburger navigation pattern to `CareTeamLayout` so the sidebar works on mobile (< 768px).
+
+## Context
+Today, all three dashboards use a fixed-width sidebar (`w-64` or collapsed `w-16`) with no mobile breakpoint. On 375px viewports the sidebar consumes 68% of screen width and content overflows. There is no hamburger toggle.
+
+## Required changes
+1. (Depends on Prompt 1 — shared `CareTeamLayout` exists.) Add mobile behavior:
+   - Sidebar is `fixed inset-y-0 left-0` + `-translate-x-full md:translate-x-0` by default.
+   - Transforms to `translate-x-0` when mobile-open state is true.
+   - Backdrop overlay (`fixed inset-0 bg-slate-900/30`) on mobile-open.
+2. Add a hamburger `<button>` to `DashboardHeader` visible only below `md`. Accessibility:
+   - `aria-label="Open navigation menu"` / `"Close navigation menu"`
+   - `aria-expanded` bound to mobile-open state
+   - `aria-controls="care-team-sidebar"` and matching `id` on the `<aside>`
+3. Close the mobile sidebar on route change and on backdrop click.
+4. Trap focus inside the sidebar when mobile-open (use `react-focus-lock` or manual Tab management).
+5. On `md+` the existing collapse button still works as it does today.
+
+## Acceptance
+- Lighthouse mobile a11y score 100 on all three routes.
+- Cypress/Playwright viewport test at 375×667 can open sidebar, navigate to a link, and close.
+- `prefers-reduced-motion: reduce` disables the slide transition.
+- No horizontal overflow at 320px, 375px, 414px viewports.
+
+Prompt 6 — Fix teacher reports table semantics + remove misleading "Active" pill
+## Task
+Fix accessibility gaps in the teacher reports table and remove the hardcoded "Active" status pill.
+
+## Context
+File: `apps/web/src/app/dashboard/teacher/reports/page.tsx`
+- Line 83-90: `<table>` has no `<caption>` and `<th>` cells have no `scope` attribute.
+- Line 103: Every learner gets a hardcoded `<span>Active</span>` regardless of actual status.
+
+Reference: `apps/web/src/app/dashboard/therapist/reports/page.tsx:57-66` uses the correct pattern — copy it.
+
+## Required changes
+1. Add `<caption className="sr-only">Learner roster and functioning-level summary</caption>` to the `<table>` element.
+2. Add `scope="col"` to every `<th>` in `<thead>`.
+3. Wrap the learner name cell in `<th scope="row">` instead of `<td>`:
+   ```tsx
+   <th scope="row" className="py-3 px-4 font-medium text-slate-900 text-left">{l.name}</th>
+   ```
+4. Remove the hardcoded "Active" pill. Replace with real learner status from the API. If the backend doesn't return a status field yet, add one to `/api/family/collaboration/connected-learners` (`status: "active" | "paused" | "onboarding" | "pending_approval"`) and render accordingly. If the field is not yet available, render `—` with an `aria-label="Status unavailable"` rather than falsely claiming active.
+5. Strip the hover effect on the four "report category" cards (lines 35-75) OR make them actual links to real routes. They currently look interactive but do nothing.
+
+## Acceptance
+- axe-core reports zero table-related issues on `/dashboard/teacher/reports`.
+- Screen reader announces the table caption on entry.
+- Row navigation by learner name via SR `th`-walk works.
+- No hardcoded status strings remain.
+
+Prompt 7 — Retry button + skeleton loaders + empty-state CTA
+## Task
+Replace the three "please refresh the page" error states and the `animate-pulse` text loaders with: (a) retry buttons, (b) real skeleton loaders, and (c) actionable empty-state CTAs.
+
+## Context
+All three dashboards (`teacher/page.tsx`, `therapist/page.tsx`, `caregiver/page.tsx`) share three identical patterns that need upgrading:
+
+**Current loading:**
+```tsx
+
+  Loading...
+
+```
+
+**Current error:**
+```tsx
+
+  Unable to load ...
+  Please try refreshing the page.
+
+```
+
+**Current empty:**
+```tsx
+
+  📚
+  No learners connected yet
+  Parents can invite you to their learner's team...
+
+```
+
+## Required changes
+1. Create three shared components in `apps/web/src/components/states/`:
+   - `LearnerCardSkeleton.tsx` — skeleton grid matching the real learner card dimensions (avatar, name, FL pill, progress line). Respect `prefers-reduced-motion` (no pulse if reduced).
+   - `FetchErrorState.tsx` — props: `{ title, message, onRetry }`. Visible "Retry" button. Keep `role="alert"`.
+   - `EmptyLearnerState.tsx` — props: `{ icon, title, description, cta: { label, onClick | href } }`. Always renders a primary CTA.
+2. Refactor each of the three dashboards' three states to use these components.
+3. For `onRetry`, expose a `fetchLearners()` callback from the existing `useEffect` and wire it to the Retry button.
+4. For the empty-state CTA, use:
+   - Teacher: "Check pending invites" → `/dashboard/notifications`
+   - Therapist: "Check pending invites" → `/dashboard/notifications`
+   - Caregiver: "Check pending invites" → `/dashboard/notifications`
+   (Use the existing `/api/family/collaboration/pending-invites` endpoint.)
+
+## Acceptance
+- No `animate-pulse` text-only loaders remain on care-team pages.
+- Every error state has a keyboard-reachable Retry button.
+- Every empty state has exactly one primary CTA.
+- Skeleton respects reduced-motion.
+- axe-core clean.
+
+Prompt 8 — Therapist dashboard: session logging + SOAP notes + category filters
+## Task
+Upgrade the therapist dashboard from "list clients and their goals" to a real clinical workspace: session logging, SOAP/DAP notes, goal category filter, and trend sparklines.
+
+## Context
+Current therapist surface (`dashboard/therapist/page.tsx`, `dashboard/therapist/reports/page.tsx`, `dashboard/therapist/sessions/page.tsx`) shows:
+- A list of clients with functioning level chips.
+- Up to 2 therapy goals per client with a progress bar.
+- A "sessions" stub that says "Coming Soon".
+
+Therapists need to *do work* here, not just view data.
+
+## Required changes
+
+### 8.1 Caseload page — goal category filter + trend
+- Add a filter bar above the client grid: category chips (Speech, OT, PT, SEL, AAC, Academic). Multi-select. Default: all selected.
+- Each goal row gains a sparkline (SVG polyline from last 10 data points) showing progress trend. Reuse `components/BrainVisualization` approach or add a lightweight `<Sparkline data={...}/>` component.
+- Add `lastUpdated` label on each goal.
+
+### 8.2 Session log page (replaces the stub)
+- Table/timeline of past therapy sessions for the therapist (all clients).
+- Filters: date range, client, category.
+- "Log Session" primary button → opens a side panel/modal:
+  - Client (dropdown)
+  - Date, Duration
+  - Modality (in-person, telehealth, hybrid)
+  - Linked goals (multi-select from the client's goals)
+  - SOAP note fields: Subjective, Objective, Assessment, Plan (each a textarea with character counter)
+  - Attachments (file upload, optional)
+- POST to `/api/family/therapy-sessions` (add endpoint in family-svc).
+- List entries show: client name, date, duration, linked goals, first line of SOAP Assessment.
+
+### 8.3 Reports page — progress bar height
+- Bump progress bars from `h-1.5` to `h-2.5`. Document why in an inline comment (≤4.5:1 visual height for low-vision users).
+
+### 8.4 Accessibility
+- All new forms: every input has a visible `<label htmlFor>`, errors use `role="alert"`, submit uses `aria-busy`.
+- SOAP textareas: `aria-describedby` linking to character counter.
+- Modal: focus trap, Esc closes, returns focus to trigger.
+
+## Acceptance
+- Therapist can log a session and see it in the list without a page reload.
+- Goal categories filter the caseload view in under 16ms (client-side filter).
+- Every new surface passes axe-core.
+- Zero hardcoded data; everything reads from APIs.
+
+Prompt 9 — Caregiver dashboard: observation journal + daily log
+## Task
+Replace the caregiver "Observations" stub with a real observation journal, and add a "Today" daily-log surface to the caregiver overview.
+
+## Context
+Caregiver is a first-class role with seat allocation (2 per learner) and is responsible for home-context observations that feed the Brain Clone. Today the observation submission route (`dashboard/caregiver/observations/page.tsx`) is a 26-line "Coming Soon" stub — this is a critical gap.
+
+## Required changes
+
+### 9.1 Observation journal (`dashboard/caregiver/observations/page.tsx`)
+- Form (replaces stub):
+  - Learner selector (only connected learners visible)
+  - Observation type chips: Behavioral, Academic, Sensory, Social, Medical, Meltdown, Win
+  - Date (default today), time of day chip (morning/afternoon/evening)
+  - Text area (min 10 chars, max 2000)
+  - Severity / intensity: 1-5 scale with descriptive labels
+  - Trigger / antecedent (optional text)
+  - Response / intervention used (optional text)
+  - Submit → `POST /api/family/observations` (new endpoint to add to family-svc)
+- Below the form: caregiver's recent submissions, newest first, edit-within-24h, delete-within-24h, read-only after.
+- Each observation card shows: timestamp, type chip, severity, truncated text with "Read more" disclosure.
+
+### 9.2 "Today" strip on caregiver overview
+- Add a "Today" card at the top of `dashboard/caregiver/page.tsx` (above the stat grid):
+  - Mood from most recent learner SEL check-in (if any today)
+  - Streak
+  - Session count today
+  - "Add an observation" primary CTA → routes to the observations form
+  - "Log something quick" inline mini-buttons: "Meltdown", "Win", "Refusal", "Breakthrough" (one-click, opens the journal pre-filled)
+
+### 9.3 Home strategies card
+- Add a card that reads the learner's Brain Clone accommodations via `GET /api/brain/:learnerId/context` and renders a caregiver-friendly summary: "Today's strategies", 3-5 bullet points in plain language. This is a read-only consumption surface of existing data.
+
+### 9.4 Accessibility
+- Form uses real `<label htmlFor>` on every input, `aria-describedby` on help text, `aria-invalid` on validation errors, `role="alert"` on error summary.
+- Type chips are proper `<button>`s with `aria-pressed`.
+- Edit/delete affordances on recent cards are real buttons with `aria-label` including observation type + date.
+
+## Acceptance
+- Caregiver can submit an observation in ≤ 5 keystrokes of effort (chip + textarea + submit).
+- Submissions appear in the caregiver's `observations` list and in the learner's brain episodic memory (verify via existing brain context endpoint).
+- All new surfaces axe-clean.
+- i18n across 10 locales.
+
+Prompt 10 — Teacher dashboard: search, group actions, lesson plan generator
+## Task
+Add learner search, group-level actions, and wire the lesson-plans page to the existing generator endpoint.
+
+## Context
+Teacher overview (`dashboard/teacher/page.tsx`) groups learners by grade but has:
+- No search across learners
+- No group-level actions (assign lesson, export report, generate plan)
+- `atRiskCount: 0` is declared but never computed (line 49)
+- Lesson-plans route is a 26-line stub despite `POST /api/engagement/lesson-plans/create` already existing
+
+## Required changes
+
+### 10.1 Search + sort on caseload
+- Above the classroom grid, add a search input (`<input type="search" aria-label="Search learners">`) that client-side filters by name, grade, or functioning level.
+- Sort toggle: A-Z, Grade, FL level, Last active.
+
+### 10.2 Compute `atRiskCount` or remove it
+- Add a simple heuristic: a learner is "at risk" if their most-recent mastery score is ≥ 15% below their 30-day average on any domain. Use existing brain context.
+- Render an amber pill on the group header: `{atRiskCount > 0 && <span>{atRiskCount} need attention</span>}`.
+- Clicking the pill filters the grid to at-risk learners in that group.
+- If implementing the heuristic is out of scope, delete the field from `ClassroomGroup` entirely — do not leave it as `0`.
+
+### 10.3 Group-header actions
+- Each grade-group header (line 113 area) gets a "Group actions" menu:
+  - "Create lesson plan for this group" → opens `dashboard/teacher/lesson-plans` with group pre-selected
+  - "Export roster CSV" → downloads a CSV of learners in the group
+  - "View group report" → links to filtered reports
+
+### 10.4 Lesson plan generator (replaces stub)
+- List existing plans from `GET /api/engagement/lesson-plans/teacher`.
+- "Create Plan" button opens a side panel with:
+  - Title, target learners (multi-select, pre-filled if arrived from group action), subject/tutor, objectives (chips), activities (list), duration
+  - "Generate with AI" button calls a new `POST /api/engagement/lesson-plans/generate` that wraps `ai-svc` with learner brain context
+  - Save draft / Publish buttons
+- List entries: title, learners, status, created date, edit/delete.
+
+### 10.5 Accessibility
+- Search input has visible label or accompanying `<label>` hidden with `sr-only`.
+- Group-action menus are real `<button>` with `aria-haspopup="menu"` and proper keyboard nav (Home/End/Arrow).
+- Plan form uses `AccessibleToggle` for status, real labels on every input.
+
+## Acceptance
+- Teacher with 30 learners can find a learner in < 3 seconds.
+- Group action menu keyboard-accessible per WAI-ARIA menu pattern.
+- Lesson plan creation roundtrips through the API (no local-only state).
+- axe-core clean.
+
+Prompt 11 — Memoize BrainVisualization fetches across the care-team grid
+## Task
+Prevent `BrainVisualization` from re-fetching `/api/brain/:learnerId` every time a care-team card expands.
+
+## Context
+In `dashboard/teacher/page.tsx:142`, `dashboard/therapist/page.tsx:155`, and `dashboard/caregiver/page.tsx:116`, the `<BrainVisualization />` component is mounted fresh on every expand. For a teacher with 30 learners clicking around to compare, that's 30+ redundant API calls per session.
+
+## Required changes
+1. Introduce SWR (already a workspace pattern? check `package.json`) or a thin module-level cache in `apps/web/src/hooks/useBrainState.ts`:
+   ```ts
+   const cache = new Map<string, BrainState>();
+   const inflight = new Map<string, Promise<BrainState>>();
+   export function useBrainState(learnerId: string, accessToken: string) {
+     // Reads cache first, dedupes in-flight by learnerId, revalidates on window focus.
+   }
+   ```
+2. Refactor `BrainVisualization` to consume `useBrainState` instead of fetching inline.
+3. Add a 5-minute stale-while-revalidate: serve cached, refetch in background.
+4. Respect `prefers-reduced-motion` for any loading animation inside the viz.
+
+## Acceptance
+- Expanding and collapsing the same learner card 5 times results in exactly 1 network call on the first expand.
+- Network tab shows no duplicate `/api/brain/:learnerId` calls within 5 minutes.
+- `pnpm --filter web typecheck` green.
+- Existing snapshot tests pass.
+
+Rollup recommendations
+If you can only run a subset, here's the priority order:
+
+Prompt 2 (settings persistence + i18n bug) — real bugs hurting users now.
+Prompt 1 (shared CareTeamLayout) — unlocks every subsequent fix as a one-line change.
+Prompt 6 (teacher reports table) — two hard-gate a11y fixes + removes misleading UI.
+Prompt 4 (expand-card focus + semantics) — accessibility gate.
+Prompt 7 (skeleton + retry + empty CTA) — cross-cutting UX baseline.
+Prompt 5 (responsive nav) — unblocks mobile usage entirely.
+Prompt 9 (caregiver observations) — closes the biggest feature gap.
+Prompt 8 (therapist sessions + SOAP) — closes the biggest clinical gap.
+Prompt 10 (teacher search + lesson plans) — closes the biggest pedagogical gap.
+Prompt 11 (brain state caching) — performance polish.
+Prompt 3 (implement-or-hide stubs) — subsumed by 8/9/10 if those ship; otherwise run as cleanup.

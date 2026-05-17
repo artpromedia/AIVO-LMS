@@ -1,0 +1,12 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+  - "services/*"
+  - "tests/integration"
+
+onlyBuiltDependencies:
+  - esbuild
+  - argon2
+  - "@parcel/watcher"
+  - "@swc/core"
+  - sharp

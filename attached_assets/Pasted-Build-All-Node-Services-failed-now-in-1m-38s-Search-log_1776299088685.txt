@@ -1,0 +1,66 @@
+Build All Node Services
+failed now in 1m 38s
+Search logs
+1s
+2s
+1s
+11s
+8s
+1m 13s
+Run pnpm build
+
+> aivo-ai-learning@ build /home/runner/work/aivo-ai-learning/aivo-ai-learning
+> turbo build
+
+
+Attention:
+Turborepo now collects completely anonymous telemetry regarding usage.
+This information is used to shape the Turborepo roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://turborepo.dev/docs/telemetry
+
+
+   • Packages in scope: @aivo/admin-svc, @aivo/assessment-svc, @aivo/billing-svc, @aivo/brand, @aivo/comms-svc, @aivo/db, @aivo/engagement-svc, @aivo/events, @aivo/family-svc, @aivo/i18n-svc, @aivo/identity-svc, @aivo/integrations-svc, @aivo/learner-ui, @aivo/learning-svc, @aivo/marketing, @aivo/mobile, @aivo/mobile-ui, @aivo/observability, @aivo/research-svc, @aivo/security, @aivo/status-page-svc, @aivo/tutor-svc, @aivo/web
+   • Running build in 23 packages
+   • Remote caching disabled
+
+@aivo/brand:build
+@aivo/events:build
+@aivo/observability:build
+@aivo/security:build
+@aivo/learner-ui:build
+@aivo/db:build
+@aivo/status-page-svc:build
+@aivo/i18n-svc:build
+@aivo/admin-svc:build
+@aivo/research-svc:build
+@aivo/integrations-svc:build
+@aivo/tutor-svc:build
+@aivo/engagement-svc:build
+@aivo/family-svc:build
+cache miss, executing 792be4f8b0b00efa
+
+> @aivo/family-svc@1.0.0 build /home/runner/work/aivo-ai-learning/aivo-ai-learning/services/family-svc
+> tsc
+
+Error: src/routes/parent-dashboard.ts(120,43): error TS7006: Parameter 'l' implicitly has an 'any' type.
+Error: src/routes/parent-dashboard.ts(129,32): error TS7006: Parameter 'item' implicitly has an 'any' type.
+Error: src/routes/parent-dashboard.ts(129,85): error TS7006: Parameter 'l' implicitly has an 'any' type.
+Error: src/routes/parent-dashboard.ts(179,74): error TS7006: Parameter 'l' implicitly has an 'any' type.
+ ELIFECYCLE  Command failed with exit code 2.
+@aivo/identity-svc:build
+@aivo/web:build
+@aivo/assessment-svc:build
+@aivo/comms-svc:build
+@aivo/marketing:build
+@aivo/learning-svc:build
+@aivo/billing-svc:build
+
+ Tasks:    13 successful, 21 total
+Cached:    0 cached, 21 total
+  Time:    1m12.718s 
+Failed:    @aivo/family-svc#build
+
+ ERROR  run failed: command  exited (2)
+ ELIFECYCLE  Command failed with exit code 2.
+Error: Process completed with exit code 2.

@@ -1,0 +1,77 @@
+Lint & Type Check
+failed 1 minute ago in 1m 9s
+Search logs
+2s
+4s
+2s
+1s
+33s
+23s
+Run pnpm lint
+
+> aivo-ai-learning@ lint /home/runner/work/aivo-ai-learning/aivo-ai-learning
+> turbo lint
+
+
+Attention:
+Turborepo now collects completely anonymous telemetry regarding usage.
+This information is used to shape the Turborepo roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://turborepo.dev/docs/telemetry
+
+
+   • Packages in scope: @aivo/admin-svc, @aivo/assessment-svc, @aivo/billing-svc, @aivo/brand, @aivo/comms-svc, @aivo/db, @aivo/engagement-svc, @aivo/events, @aivo/family-svc, @aivo/i18n-svc, @aivo/identity-svc, @aivo/integrations-svc, @aivo/learner-ui, @aivo/learning-svc, @aivo/marketing, @aivo/mobile, @aivo/mobile-ui, @aivo/observability, @aivo/research-svc, @aivo/scoring, @aivo/security, @aivo/sso, @aivo/status-page-svc, @aivo/tutor-svc, @aivo/web
+   • Running lint in 25 packages
+   • Remote caching disabled
+
+@aivo/events:build
+@aivo/brand:build
+@aivo/scoring:build
+@aivo/observability:build
+@aivo/learner-ui:build
+@aivo/security:build
+@aivo/sso:build
+@aivo/mobile:lint
+@aivo/db:build
+Error: @aivo/web#lint: command (/home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web) /home/runner/setup-pnpm/node_modules/.bin/pnpm run lint exited (1)
+@aivo/web:lint
+ ERROR  @aivo/web#lint: command (/home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web) /home/runner/setup-pnpm/node_modules/.bin/pnpm run lint exited (1)
+cache miss, executing 4e0b6e7358e9ff67
+
+> @aivo/web@1.0.0 lint /home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web
+> eslint src/ --ext .ts,.tsx
+
+
+/home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web/src/app/dashboard/admin/compliance/evidence/page.tsx
+Error:   65:29  error  Definition for rule 'react-hooks/exhaustive-deps' was not found  react-hooks/exhaustive-deps
+
+/home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web/src/app/dashboard/district/settings/admins/page.tsx
+Error:   287:9  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+Error:   293:9  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+
+/home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web/src/app/dashboard/district/settings/branding/page.tsx
+Error:   191:16  error  Definition for rule '@next/next/no-img-element' was not found  @next/next/no-img-element
+Error:   214:15  error  Definition for rule '@next/next/no-img-element' was not found  @next/next/no-img-element
+
+/home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web/src/app/dashboard/district/usage/page.tsx
+Warning:   173:9   warning  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+Warning:   173:9   warning  Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element  jsx-a11y/no-static-element-interactions
+Warning:   174:11  warning  Visible, non-interactive elements with click handlers must have at least one keyboard listener                                                                                                     jsx-a11y/click-events-have-key-events
+Error:   174:11  error    Non-interactive elements should not be assigned mouse or keyboard event listeners                                                                                                                  jsx-a11y/no-noninteractive-element-interactions
+
+/home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web/src/components/admin/StepUpModal.tsx
+Error:   189:17  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+Error:   210:17  error  A form label must be associated with a control  jsx-a11y/label-has-associated-control
+
+✖ 11 problems (8 errors, 3 warnings)
+
+ ELIFECYCLE  Command failed with exit code 1.
+
+ Tasks:    9 successful, 10 total
+Cached:    0 cached, 10 total
+  Time:    22.046s 
+Failed:    @aivo/web#lint
+
+ ERROR  run failed: command  exited (1)
+ ELIFECYCLE  Command failed with exit code 1.
+Error: Process completed with exit code 1.

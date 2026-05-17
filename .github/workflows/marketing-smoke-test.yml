@@ -1,0 +1,68 @@
+name: Marketing Smoke Test (Production)
+
+# Smoke-checks https://aivolearning.com after every Replit publish (and on a
+# safety-net schedule) by running scripts/verify-marketing-deploy.sh, which
+# iterates every (path, markers) pair defined in scripts/marketing-markers.sh
+# and asserts HTTP 200 + every required substring on each page. Today that
+# covers the homepage Hero/Footer ("Learning adventures", "COPPA", "FERPA",
+# "SOC 2") AND the compliance pages /privacy-policy, /coppa-compliance,
+# /ferpa-compliance — so an i18n-key rename or section drop that silently
+# blanks a legal page pages the on-call human instead of shipping unnoticed
+# to real parents, schools, and FTC-compliance reviewers.
+#
+# New routes are picked up automatically: extending MARKETING_ROUTES (and
+# the per-route case in marketing_markers_for) in scripts/marketing-markers.sh
+# is enough — this workflow does not need to change.
+#
+# Triggers:
+#   - workflow_run on Marketing Deploy Production succeeding (post-publish)
+#   - schedule every 30 minutes (catches silent custom-domain regressions
+#     even when nobody publishes)
+#   - workflow_dispatch for on-demand re-verification
+#
+# On failure the workflow run is marked failed in GitHub Actions and the
+# tail of scripts/verify-marketing-deploy.sh is captured in /tmp/smoke/
+# for inspection in the run logs.
+
+on:
+  workflow_run:
+    workflows: ["Marketing Deploy Production"]
+    types:
+      - completed
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Override target URL (default: https://aivolearning.com/)"
+        required: false
+        type: string
+
+concurrency:
+  group: marketing-smoke-test
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  # Needed for the `gh run list` lookup that decides whether this success
+  # is a recovery from a previous failure (and therefore worth announcing).
+  actions: read
+
+jobs:
+  smoke:
+    name: Verify aivolearning.com
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # For workflow_run, only run when the upstream deploy actually succeeded.
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run marketing smoke check
+        id: smoke
+        env:
+          MARKETING_URL: ${{ inputs.url || 'https://aivolearning.com/' }}
+        run: |
+          set -o pipefail
+          mkdir -p /tmp/smoke
+          bash scripts/verify-marketing-deploy.sh 2>&1 | tee /tmp/smoke/output.log

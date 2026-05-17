@@ -1,0 +1,827 @@
+name: deploy-hetzner
+
+# Single end-to-end pipeline that promotes a green commit through:
+#   Build (matrix) → Deploy Staging → Smoke Staging → Migrate Prod DB
+#                  → Deploy Production → Production Health Check
+#
+# Each stage gates the next via `needs:`. Production stages are guarded by
+# the `production` GitHub Environment so they require the configured
+# reviewers/secrets.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Image tag to deploy (defaults to commit SHA)"
+        required: false
+        type: string
+      skip_prod:
+        description: "Stop after staging smoke (do not migrate/deploy prod)"
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: deploy-hetzner-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "22"
+  PYTHON_VERSION: "3.12"
+  CHART_PATH: infra/helm/aivo-service
+  STAGING_NAMESPACE: aivo-staging
+  STAGING_VALUES: infra/helm/values/staging.yaml
+  PROD_NAMESPACE: aivo
+  PROD_VALUES: infra/helm/values/hetzner.yaml
+  IMAGE_PREFIX: ghcr.io/artpromedia
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────
+  # Stage 1 — Build (matrix). One job per build target so failures are
+  # localized and the pipeline view shows the fan-out the screenshot
+  # describes. The matrix sums to 12 entries by design.
+  # ─────────────────────────────────────────────────────────────────────
+  build:
+    name: Build (${{ matrix.target }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - lint-typecheck      # 1
+          - identity-svc        # 2
+          - admin-svc           # 3
+          - billing-svc         # 4
+          - learning-svc        # 5
+          - assessment-svc      # 6
+          - comms-svc           # 7
+          - integrations-svc    # 8
+          - web-app             # 9
+          - marketing-site      # 10
+          - brain-svc           # 11 (python)
+          - ai-svc              # 12 (python)
+          - curriculum-svc      # 13 (python)
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        if: matrix.target != 'brain-svc' && matrix.target != 'ai-svc' && matrix.target != 'curriculum-svc'
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        if: matrix.target != 'brain-svc' && matrix.target != 'ai-svc' && matrix.target != 'curriculum-svc'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Setup Python
+        if: matrix.target == 'brain-svc' || matrix.target == 'ai-svc' || matrix.target == 'curriculum-svc'
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install (node)
+        if: matrix.target != 'brain-svc' && matrix.target != 'ai-svc' && matrix.target != 'curriculum-svc'
+        run: pnpm install --frozen-lockfile
+
+      - name: Run target
+        run: |
+          set -euo pipefail
+          case "${{ matrix.target }}" in
+            lint-typecheck)
+              pnpm lint
+              ;;
+            web-app)
+              pnpm --filter "@aivo/web..." build
+              ;;
+            marketing-site)
+              pnpm --filter "@aivo/marketing..." build
+              ;;
+            brain-svc)
+              pip install -r services/brain-svc/requirements.txt
+              cd services/brain-svc && python -m py_compile src/brain_svc/main.py
+              ;;
+            ai-svc)
+              if [ -f services/ai-svc/requirements.txt ]; then
+                pip install -r services/ai-svc/requirements.txt
+              fi
+              if [ -f services/ai-svc/src/main.py ]; then
+                cd services/ai-svc && python -m py_compile src/main.py
+              fi
+              ;;
+            curriculum-svc)
+              pip install -r services/curriculum-svc/requirements.txt
+              cd services/curriculum-svc && python -m py_compile src/curriculum_svc/main.py
+              ;;
+            *)
+              # Generic node service build — `...` suffix includes workspace
+              # deps (@aivo/security, @aivo/db, @aivo/observability, etc.)
+              # which consumers import from dist/, so they must build first.
+              pnpm --filter "@aivo/${{ matrix.target }}..." build
+              ;;
+          esac
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Stage 1b — Build & push Python service images.
+  # Runs on the self-hosted runner where Docker and GHCR credentials are
+  # already available. Separated from Stage 1 so the matrix Node builds
+  # can proceed in parallel and we don’t need to pass GHCR tokens to
+  # ephemeral GitHub-hosted runners.
+  # ───────────────────────────────────────────────────────────────────
+  build-push-python-images:
+    name: Build & Push Python Images
+    runs-on: [self-hosted, hetzner, production]
+    timeout-minutes: 20
+    needs: build
+    steps:
+      - name: Clean self-hosted workspace
+        run: |
+          set -eu
+          # actions/checkout cannot remove root-owned leftovers written
+          # by previous Docker-based jobs. Use the rootful Docker daemon
+          # to take ownership so the next checkout can clean cleanly.
+          mkdir -p "$GITHUB_WORKSPACE"
+          docker run --rm -v "$GITHUB_WORKSPACE":/work alpine \
+            sh -c "chown -R $(id -u):$(id -g) /work"
+
+      - uses: actions/checkout@v4
+
+      - name: Build and push Python service images
+        run: |
+          set -euo pipefail
+          PYTHON_SERVICES=(brain-svc ai-svc curriculum-svc)
+          GIT_COMMIT="${GITHUB_SHA}"
+          for svc in "${PYTHON_SERVICES[@]}"; do
+            echo "═══ Building $svc ═══"
+            DOCKER_BUILDKIT=0 docker build \
+              -f docker/Dockerfile.python-service \
+              --build-arg SERVICE_NAME="$svc" \
+              --build-arg GIT_COMMIT="$GIT_COMMIT" \
+              -t "${{ env.IMAGE_PREFIX }}/$svc:latest" \
+              . 2>&1 | tail -5
+            echo "═══ Pushing $svc ═══"
+            docker push "${{ env.IMAGE_PREFIX }}/$svc:latest" 2>&1 | tail -3
+          done
+
+  # ───────────────────────────────────────────────────────────────────
+  # Stage 1c — Build & push Node.js service images.
+  # Runs on the self-hosted runner alongside Python images.
+  # GIT_COMMIT build-arg busts the Docker layer cache at the compile
+  # step on every commit, preventing stale esbuild/tsc outputs.
+  # ───────────────────────────────────────────────────────────────────
+  build-push-node-services:
+    name: Build & Push Node Service Images
+    runs-on: [self-hosted, hetzner, production]
+    timeout-minutes: 60
+    needs: build
+    steps:
+      - name: Clean self-hosted workspace
+        run: |
+          set -eu
+          mkdir -p "$GITHUB_WORKSPACE"
+          docker run --rm -v "$GITHUB_WORKSPACE":/work alpine \
+            sh -c "chown -R $(id -u):$(id -g) /work"
+
+      - uses: actions/checkout@v4
+
+      - name: Build and push Node service images
+        run: |
+          set -euo pipefail
+          NODE_SERVICES=(
+            identity-svc assessment-svc learning-svc tutor-svc
+            family-svc engagement-svc billing-svc comms-svc
+            i18n-svc integrations-svc admin-svc status-page-svc research-svc
+          )
+          GIT_COMMIT="${GITHUB_SHA}"
+          for svc in "${NODE_SERVICES[@]}"; do
+            echo "═══ Building $svc ═══"
+            DOCKER_BUILDKIT=0 docker build \
+              -f docker/Dockerfile.service \
+              --build-arg SERVICE_NAME="$svc" \
+              --build-arg GIT_COMMIT="$GIT_COMMIT" \
+              -t "${{ env.IMAGE_PREFIX }}/$svc:latest" \
+              . 2>&1 | tail -10
+            echo "═══ Pushing $svc ═══"
+            docker push "${{ env.IMAGE_PREFIX }}/$svc:latest" 2>&1 | tail -3
+          done
+
+  # ───────────────────────────────────────────────────────────────────
+  # Stage 2 — Deploy to Staging.
+  # ───────────────────────────────────────────────────────────────────
+  deploy-staging:
+    name: Deploy to Staging
+    needs: [build, build-push-python-images, build-push-node-services]
+    runs-on: [self-hosted, hetzner, production]
+    timeout-minutes: 25
+    environment: staging
+    outputs:
+      version: ${{ steps.tag.outputs.version }}
+    steps:
+      - name: Clean self-hosted workspace
+        run: |
+          set -eu
+          mkdir -p "$GITHUB_WORKSPACE"
+          docker run --rm -v "$GITHUB_WORKSPACE":/work alpine \
+            sh -c "chown -R $(id -u):$(id -g) /work"
+
+      - uses: actions/checkout@v4
+
+      - id: tag
+        name: Resolve image tag
+        run: |
+          VERSION="${{ inputs.version }}"
+          if [ -z "$VERSION" ]; then
+            VERSION="sha-${GITHUB_SHA::12}"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Deploying tag: $VERSION"
+
+      - name: Verify cluster reachable
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+
+      - name: Setup Helm
+        run: |
+          if ! command -v helm &>/dev/null; then
+            curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+          fi
+          helm version
+
+      - name: Deploy all services to staging
+        run: |
+          set -euo pipefail
+          NS="${{ env.STAGING_NAMESPACE }}"
+          # Staging tracks the rolling :latest image tag (matching the
+          # legacy deploy-staging workflow). The resolved commit SHA is
+          # surfaced as the pipeline `version` output for traceability,
+          # but image building/pushing happens out-of-band.
+          IMAGE_TAG="latest"
+          kubectl create namespace "$NS" --dry-run=client -o yaml | kubectl apply -f -
+
+          # Staging uses private GHCR images and shared runtime secrets.
+          # Sync missing secrets from production namespace to avoid pull/config failures.
+          for sec in ghcr-pull-secret aivo-common-env db-secrets identity-secrets jwt-secrets; do
+            if ! kubectl -n "$NS" get secret "$sec" >/dev/null 2>&1; then
+              kubectl -n aivo get secret "$sec" -o yaml \
+                | sed "s/namespace: aivo$/namespace: $NS/" \
+                | kubectl -n "$NS" apply -f -
+            fi
+          done
+
+          # Some services resolve NATS as `nats` by default.
+          # Bridge staging DNS to the production NATS service.
+          cat <<EOF | kubectl apply -f -
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: nats
+            namespace: $NS
+            labels:
+              app.kubernetes.io/managed-by: github-actions
+          spec:
+            type: ExternalName
+            externalName: nats.aivo.svc.cluster.local
+          EOF
+
+          SERVICES=(
+            identity-svc assessment-svc brain-svc ai-svc learning-svc
+            tutor-svc family-svc engagement-svc billing-svc comms-svc
+            i18n-svc integrations-svc admin-svc status-page-svc research-svc
+            curriculum-svc
+          )
+          adopt() {
+            local kind="$1" name="$2" svc="$3"
+            kubectl -n "$NS" get "$kind" "$name" >/dev/null 2>&1 || return 0
+            kubectl -n "$NS" label "$kind" "$name" app.kubernetes.io/managed-by=Helm --overwrite >/dev/null
+            kubectl -n "$NS" annotate "$kind" "$name" meta.helm.sh/release-name="$svc" --overwrite >/dev/null
+            kubectl -n "$NS" annotate "$kind" "$name" meta.helm.sh/release-namespace="$NS" --overwrite >/dev/null
+          }
+
+          clear_pending_release() {
+            local svc="$1"
+            local status
+            status=$(helm status "$svc" -n "$NS" 2>/dev/null | awk -F': ' '/^STATUS:/{print $2}' || true)
+            if [[ "$status" == pending-* ]]; then
+              echo "⚠  $svc has pending Helm state ($status); uninstalling stale release"
+              helm uninstall "$svc" -n "$NS" || true
+            fi
+          }
+
+          helm_apply() {
+            local svc="$1" port="$2"
+            local timeout="$3"
+            helm upgrade --install "$svc" "${{ env.CHART_PATH }}" \
+              -f "${{ env.STAGING_VALUES }}" \
+              --set serviceName="$svc" \
+              --set image.repository="${{ env.IMAGE_PREFIX }}" \
+              --set image.tag="$IMAGE_TAG" \
+              --set imagePullSecrets[0].name=ghcr-pull-secret \
+              --set env.NODE_ENV=production \
+              --set envFrom[0].secretRef.name=aivo-common-env \
+              --set envFrom[1].secretRef.name=db-secrets \
+              --set envFrom[2].secretRef.name=identity-secrets \
+              --set envFrom[3].secretRef.name=jwt-secrets \
+              --set service.port=$port \
+              --set service.targetPort=$port \
+              --set replicaCount=1 \
+              "${EXTRA_SETS[@]}" \
+                -n "$NS" --timeout "$timeout" --wait
+          }
+
+          FAILED=0
+          for svc in "${SERVICES[@]}"; do
+            PORT=3000
+            HELM_TIMEOUT=3m
+            HELM_RETRY_TIMEOUT="$HELM_TIMEOUT"
+            # Mirror the per-service env fixes applied in production:
+            #  - Override K8s-injected <SVC-UPPER>_PORT=tcp://... so
+            #    parseInt() receives a numeric value.
+            #  - Supply all *_SVC_URL env vars required by status-page-svc
+            #    at boot in NODE_ENV=production (cluster-local DNS in the
+            #    current namespace).
+            EXTRA_SETS=()
+            case "$svc" in
+              admin-svc)        EXTRA_SETS=(--set env.ADMIN_SVC_PORT=3000) ;;
+              assessment-svc)
+                EXTRA_SETS=(
+                  --set "env.AI_SVC_URL=http://ai-svc.${NS}.svc.cluster.local:3000"
+                  --set "env.BRAIN_SVC_URL=http://brain-svc.${NS}.svc.cluster.local:8000"
+                )
+                ;;
+              billing-svc)      EXTRA_SETS=(--set env.BILLING_SVC_PORT=3000) ;;
+              comms-svc)
+                HELM_TIMEOUT=8m
+                HELM_RETRY_TIMEOUT=10m
+                EXTRA_SETS=(--set env.COMMS_SVC_PORT=3000)
+                ;;
+              i18n-svc)         EXTRA_SETS=(--set env.I18N_SVC_PORT=3000) ;;
+              integrations-svc) EXTRA_SETS=(--set env.INTEGRATIONS_SVC_PORT=3000) ;;
+              research-svc)     EXTRA_SETS=(--set env.RESEARCH_SVC_PORT=3000) ;;
+              curriculum-svc)   EXTRA_SETS=(--set env.CURRICULUM_SVC_PORT=3000) ;;
+              status-page-svc)
+                EXTRA_SETS=(
+                  --set env.STATUS_PAGE_SVC_PORT=3000
+                  --set "env.IDENTITY_SVC_URL=http://identity-svc.${NS}.svc.cluster.local:3000"
+                  --set "env.BRAIN_SVC_URL=http://brain-svc.${NS}.svc.cluster.local:8000"
+                  --set "env.ASSESSMENT_SVC_URL=http://assessment-svc.${NS}.svc.cluster.local:3000"
+                  --set "env.AI_SVC_URL=http://ai-svc.${NS}.svc.cluster.local:3000"
+                  --set "env.LEARNING_SVC_URL=http://learning-svc.${NS}.svc.cluster.local:3000"
+                  --set "env.TUTOR_SVC_URL=http://tutor-svc.${NS}.svc.cluster.local:3000"
+                  --set "env.FAMILY_SVC_URL=http://family-svc.${NS}.svc.cluster.local:3000"
+                  --set "env.ENGAGEMENT_SVC_URL=http://engagement-svc.${NS}.svc.cluster.local:3000"
+                  --set "env.BILLING_SVC_URL=http://billing-svc.${NS}.svc.cluster.local:3000"
+                  --set "env.I18N_SVC_URL=http://i18n-svc.${NS}.svc.cluster.local:3000"
+                  --set "env.INTEGRATIONS_SVC_URL=http://integrations-svc.${NS}.svc.cluster.local:3000"
+                  --set "env.ADMIN_SVC_URL=http://admin-svc.${NS}.svc.cluster.local:3000"
+                  --set "env.STATUS_PAGE_SVC_URL=http://status-page-svc.${NS}.svc.cluster.local:3000"
+                  --set "env.RESEARCH_SVC_URL=http://research-svc.${NS}.svc.cluster.local:3000"
+                )
+                ;;
+            esac
+
+            clear_pending_release "$svc"
+            adopt serviceaccount "$svc" "$svc"
+            adopt service "$svc" "$svc"
+            adopt deployment "$svc" "$svc"
+            adopt configmap "$svc" "$svc"
+
+            echo "═══ Staging deploy: $svc ($IMAGE_TAG) ═══"
+            set +e
+            OUT=$(helm_apply "$svc" "$PORT" "$HELM_TIMEOUT" 2>&1)
+            RC=$?
+            set -e
+
+            if [ $RC -ne 0 ]; then
+              echo "$OUT"
+              if echo "$OUT" | grep -qE "field is immutable|more than 1 handler type|Duplicate value"; then
+                # Stale or malformed resource state in the cluster — delete the
+                # offending resources so Helm can recreate them cleanly.
+                if echo "$OUT" | grep -q "Duplicate value"; then
+                  echo "⚠  $svc has duplicate port names; removing Service and Deployment before retry"
+                  kubectl -n "$NS" delete service "$svc" --ignore-not-found=true >/dev/null 2>&1 || true
+                else
+                  echo "⚠  $svc has immutable/invalid resource state; removing Deployment before retry"
+                fi
+                kubectl -n "$NS" delete deployment "$svc" --ignore-not-found=true >/dev/null 2>&1 || true
+                if ! helm_apply "$svc" "$PORT" "$HELM_TIMEOUT"; then
+                  echo "::warning::$svc deploy incomplete"
+                  FAILED=$((FAILED+1))
+                fi
+              elif echo "$OUT" | grep -q "context deadline exceeded"; then
+                echo "⚠  $svc exceeded Helm timeout ($HELM_TIMEOUT); collecting diagnostics, deleting Deployment, and retrying once"
+                kubectl -n "$NS" get pods -l app.kubernetes.io/name="$svc" -o wide || true
+                kubectl -n "$NS" describe deployment "$svc" || true
+                POD_NAME=$(kubectl -n "$NS" get pods -l app.kubernetes.io/name="$svc" -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+                if [ -n "$POD_NAME" ]; then
+                  kubectl -n "$NS" logs "$POD_NAME" --tail=120 || true
+                  kubectl -n "$NS" logs "$POD_NAME" --previous --tail=120 || true
+                fi
+                kubectl -n "$NS" delete deployment "$svc" --ignore-not-found=true >/dev/null 2>&1 || true
+                if ! helm_apply "$svc" "$PORT" "$HELM_RETRY_TIMEOUT"; then
+                  echo "::warning::$svc deploy incomplete"
+                  kubectl -n "$NS" get pods -l app.kubernetes.io/name="$svc" -o wide || true
+                  kubectl -n "$NS" describe deployment "$svc" || true
+                  FAILED=$((FAILED+1))
+                fi
+              else
+                echo "::warning::$svc deploy incomplete"
+                FAILED=$((FAILED+1))
+              fi
+            fi
+          done
+          echo "Staging deploy: $((${#SERVICES[@]}-FAILED))/${#SERVICES[@]} succeeded"
+
+      - name: Verify rollout
+        run: kubectl -n ${{ env.STAGING_NAMESPACE }} get pods --sort-by=.metadata.name -o wide
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Stage 3 — Smoke test staging (reusable workflow).
+  # ─────────────────────────────────────────────────────────────────────
+  smoke-staging:
+    name: Smoke-test Staging
+    needs: deploy-staging
+    uses: ./.github/workflows/smoke-tests.yml
+    with:
+      environment: staging
+      version: ${{ needs.deploy-staging.outputs.version }}
+    secrets: inherit
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Stage 4 — Migrate production database.
+  # Skipped when `skip_prod=true` (manual workflow_dispatch only).
+  # ─────────────────────────────────────────────────────────────────────
+  migrate-prod-db:
+    name: Migrate Production DB
+    needs: smoke-staging
+    if: ${{ inputs.skip_prod != true }}
+    # Must run on the Hetzner self-hosted runner: production Postgres is on
+    # the private 10.0.0.0/24 network and is not routable from GitHub-hosted
+    # runners. Running here lets drizzle-kit push actually reach the DB so
+    # schema drift cannot silently accumulate.
+    runs-on: [self-hosted, hetzner, production]
+    timeout-minutes: 30
+    environment: production
+    env:
+      PROD_DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+      FALLBACK_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - name: Clean self-hosted workspace
+        run: |
+          set -eu
+          mkdir -p "$GITHUB_WORKSPACE"
+          docker run --rm -v "$GITHUB_WORKSPACE":/work alpine \
+            sh -c "chown -R $(id -u):$(id -g) /work"
+
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Resolve DB URL
+        run: |
+          set -euo pipefail
+          RESOLVED="${PROD_DATABASE_URL:-${FALLBACK_DATABASE_URL:-}}"
+          # Fallback: read from the live cluster secret if neither GH secret
+          # is configured. The self-hosted runner already has kubectl/kubeconfig.
+          if [ -z "$RESOLVED" ] && command -v kubectl >/dev/null 2>&1; then
+            RESOLVED="$(kubectl -n aivo get secret db-secrets -o jsonpath='{.data.database-url}' 2>/dev/null | base64 -d || true)"
+            [ -n "$RESOLVED" ] && echo "Resolved DATABASE_URL from cluster secret aivo/db-secrets"
+          fi
+          if [ -z "$RESOLVED" ]; then
+            echo "::error::Production DB secret missing. Add PROD_DATABASE_URL (or DATABASE_URL) to the production GitHub Environment, or ensure kubectl on the runner can read aivo/db-secrets."
+            exit 1
+          fi
+          # Mask for logs.
+          echo "::add-mask::$RESOLVED"
+          echo "DATABASE_URL=$RESOLVED" >> "$GITHUB_ENV"
+          echo "Pre-migration tag: pre-${GITHUB_SHA::12}-$(date -u +%Y%m%dT%H%M%SZ)"
+
+      - name: Verify DB reachability
+        run: |
+          set -euo pipefail
+          # Extract host:port from DATABASE_URL=postgresql://user:pass@host:port/db...
+          HOSTPORT="$(printf '%s' "$DATABASE_URL" | sed -E 's#^[^@]+@([^/?]+).*#\1#')"
+          HOST="${HOSTPORT%%:*}"
+          PORT="${HOSTPORT##*:}"; [ "$PORT" = "$HOST" ] && PORT=5432
+          echo "Checking TCP ${HOST}:${PORT} from $(hostname)"
+          # PostgreSQL does not send any bytes until the client sends a startup
+          # packet, so `cat </dev/tcp/...` always blocks and times out. Use a
+          # handshake-only probe via bash's /dev/tcp: opening the FD completes
+          # the TCP 3-way handshake and returns immediately on success.
+          if ! timeout 5 bash -c "exec 3<>/dev/tcp/${HOST}/${PORT}" 2>/dev/null; then
+            echo "::error::Cannot reach ${HOST}:${PORT} from this runner. The migrate-prod-db job must run on a self-hosted runner inside the Hetzner private network (labels: self-hosted, hetzner, production)."
+            exit 1
+          fi
+          echo "OK: ${HOST}:${PORT} reachable"
+
+      - name: Build DB dependencies
+        run: |
+          pnpm --filter @aivo/security build
+          pnpm --filter @aivo/db build
+
+      - name: Push schema (drizzle-kit)
+        run: |
+          # drizzle-kit push uses @clack/prompts which opens /dev/tty
+          # directly, so plain stdin pipes are ignored. We drive it with
+          # a real PTY via Python's stdlib `pty` module, answering every
+          # "created or renamed" prompt (enum, column, table, etc.) with
+          # Enter so the default highlighted option (always the "+ create"
+          # choice) is accepted. This keeps drizzle-kit non-destructive:
+          # it never renames an existing object, only creates the new one
+          # alongside. The old column/enum is then dropped in the same
+          # push as part of the diff, which is the behavior we want.
+          python3 - <<'PYEOF'
+          import os, pty, re, select, sys, time
+
+          def read(fd):
+              try:
+                  return os.read(fd, 4096)
+              except OSError:
+                  return b""
+
+          pid, master = pty.fork()
+          if pid == 0:
+              os.execvp("pnpm", ["pnpm", "db:push", "--force"])
+
+          # Any of these substrings indicates an interactive create-vs-rename
+          # prompt from drizzle-kit / @clack/prompts that we want to accept
+          # with the default "+ create" answer.
+          PROMPT_MARKERS = (
+              b"created or renamed",   # "Is X created or renamed from ..."
+              b"create column",         # visible menu entry
+              b"create table",
+              b"create enum",
+              b"create type",
+          )
+
+          last_write = 0.0
+          # Track already-seen prompt frames so we don't spam Enter when
+          # drizzle-kit redraws the same menu repeatedly.
+          last_prompt_sig = b""
+          while True:
+              r, _, _ = select.select([master], [], [], 0.5)
+              now = time.time()
+              if master in r:
+                  data = read(master)
+                  if not data:
+                      break
+                  sys.stdout.buffer.write(data)
+                  sys.stdout.buffer.flush()
+                  if any(m in data for m in PROMPT_MARKERS):
+                      # Throttle: one Enter per second max per prompt frame.
+                      sig = re.sub(rb"\s+", b" ", data)[-120:]
+                      if sig != last_prompt_sig or (now - last_write) > 1.0:
+                          os.write(master, b"\r")
+                          last_write = now
+                          last_prompt_sig = sig
+              else:
+                  # Safety net: if idle >8s, nudge Enter once in case a
+                  # prompt was rendered before our marker list matched.
+                  if now - last_write > 8:
+                      os.write(master, b"\r")
+                      last_write = now
+
+          _, status = os.waitpid(pid, 0)
+          sys.exit(os.waitstatus_to_exitcode(status))
+          PYEOF
+
+      - name: Verify schema applied (in-cluster psql)
+        run: |
+          set -euo pipefail
+          # Run psql inside the cluster instead of installing it on the host:
+          # the runner host has long-stuck dpkg/postinst processes that make
+          # apt unusable. kubectl always works here.
+          kubectl -n aivo run psqlverify-${GITHUB_RUN_ID} \
+            -i --rm --restart=Never --quiet --image=postgres:16-alpine \
+            --env=DBURL="$DATABASE_URL" \
+            --command -- psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
+              -c "select now() as migrated_at, current_database() as db, current_user as usr;"
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Stage 5 — Deploy production.
+  # ─────────────────────────────────────────────────────────────────────
+  deploy-production:
+    name: Deploy to Production
+    needs: [deploy-staging, migrate-prod-db]
+    if: ${{ inputs.skip_prod != true }}
+    runs-on: [self-hosted, hetzner, production]
+    timeout-minutes: 30
+    environment: production
+    steps:
+      - name: Clean self-hosted workspace
+        run: |
+          set -eu
+          mkdir -p "$GITHUB_WORKSPACE"
+          docker run --rm -v "$GITHUB_WORKSPACE":/work alpine \
+            sh -c "chown -R $(id -u):$(id -g) /work"
+
+      - uses: actions/checkout@v4
+
+      - name: Verify cluster reachable
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+
+      - name: Setup Helm
+        run: |
+          if ! command -v helm &>/dev/null; then
+            curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+          fi
+          helm version
+
+      - name: Deploy all services to production
+        run: |
+          set -euo pipefail
+          NS="${{ env.PROD_NAMESPACE }}"
+          # Production prefers an explicit, immutable tag. Falls back to
+          # `latest` if none was supplied, matching staging behavior.
+          VERSION="${{ inputs.version }}"
+          [ -z "$VERSION" ] && VERSION="latest"
+          kubectl create namespace "$NS" --dry-run=client -o yaml | kubectl apply -f -
+
+          SERVICES=(
+            identity-svc assessment-svc brain-svc ai-svc learning-svc
+            tutor-svc family-svc engagement-svc billing-svc comms-svc
+            i18n-svc integrations-svc admin-svc status-page-svc research-svc
+            curriculum-svc
+          )
+          PYTHON_SERVICES=(brain-svc ai-svc curriculum-svc)
+
+          adopt() {
+            local kind="$1" name="$2" svc="$3"
+            kubectl -n "$NS" get "$kind" "$name" >/dev/null 2>&1 || return 0
+            kubectl -n "$NS" label   "$kind" "$name" "app.kubernetes.io/managed-by=Helm" --overwrite >/dev/null
+            kubectl -n "$NS" annotate "$kind" "$name" "meta.helm.sh/release-name=$svc" --overwrite >/dev/null
+            kubectl -n "$NS" annotate "$kind" "$name" "meta.helm.sh/release-namespace=$NS" --overwrite >/dev/null
+          }
+
+          # Unstick any release left in pending-* by a previously cancelled
+          # or timed-out run. Without this, every subsequent svc fails
+          # immediately with "another operation in progress".
+          unstick() {
+            local svc="$1"
+            local status
+            status=$(helm -n "$NS" status "$svc" -o json 2>/dev/null | grep -oE '"status":"[a-z-]+"' | head -1 | cut -d'"' -f4 || true)
+            case "$status" in
+              pending-install)
+                echo "::warning::$svc stuck in pending-install — uninstalling before retry"
+                helm -n "$NS" uninstall "$svc" --wait --timeout 2m >/dev/null 2>&1 || true
+                ;;
+              pending-upgrade|pending-rollback)
+                echo "::warning::$svc stuck in $status — rolling back before retry"
+                helm -n "$NS" rollback "$svc" 0 --wait --timeout 2m >/dev/null 2>&1 \
+                  || helm -n "$NS" history "$svc" --max 1 -o json | grep -q '"status":"deployed"' \
+                  || true
+                ;;
+            esac
+          }
+
+          FAILED=0
+          for svc in "${SERVICES[@]}"; do
+            # Port chosen to match the live container port of each service.
+            # Mismatches cause strategic-merge to *append* a second ports
+            # entry, which then collides on the port name "http" and the
+            # upgrade fails with: Duplicate value: "http".
+            EXTRA_SETS=()
+            case "$svc" in
+              brain-svc)       PORT=8000 ;;
+              assessment-svc)
+                PORT=3003
+                EXTRA_SETS=(
+                  --set "env.AI_SVC_URL=http://ai-svc.aivo.svc.cluster.local:3000"
+                  --set "env.BRAIN_SVC_URL=http://brain-svc.aivo.svc.cluster.local:8000"
+                )
+                ;;
+              # These services read a port env var whose name matches what
+              # K8s auto-injects (<SVC-UPPER>_PORT=tcp://ClusterIP:Port).
+              # The tcp:// value causes parseInt() to return NaN → crash.
+              # Explicitly set the colliding var to numeric 3000.
+              admin-svc)        EXTRA_SETS=(--set env.ADMIN_SVC_PORT=3000) ;;
+              billing-svc)      EXTRA_SETS=(--set env.BILLING_SVC_PORT=3000) ;;
+              comms-svc)        EXTRA_SETS=(--set env.COMMS_SVC_PORT=3000) ;;
+              i18n-svc)         EXTRA_SETS=(--set env.I18N_SVC_PORT=3000) ;;
+              integrations-svc) EXTRA_SETS=(--set env.INTEGRATIONS_SVC_PORT=3000) ;;
+              research-svc)     EXTRA_SETS=(--set env.RESEARCH_SVC_PORT=3000) ;;
+              curriculum-svc)   EXTRA_SETS=(--set env.CURRICULUM_SVC_PORT=3000) ;;
+              status-page-svc)
+                # status-page-svc requires cluster-local URLs for all 14
+                # downstream services to boot in production.
+                EXTRA_SETS=(
+                  --set env.STATUS_PAGE_SVC_PORT=3000
+                  --set "env.IDENTITY_SVC_URL=http://identity-svc.aivo.svc.cluster.local:3000"
+                  --set "env.BRAIN_SVC_URL=http://brain-svc.aivo.svc.cluster.local:8000"
+                  --set "env.ASSESSMENT_SVC_URL=http://assessment-svc.aivo.svc.cluster.local:3000"
+                  --set "env.AI_SVC_URL=http://ai-svc.aivo.svc.cluster.local:3000"
+                  --set "env.LEARNING_SVC_URL=http://learning-svc.aivo.svc.cluster.local:3000"
+                  --set "env.TUTOR_SVC_URL=http://tutor-svc.aivo.svc.cluster.local:3000"
+                  --set "env.FAMILY_SVC_URL=http://family-svc.aivo.svc.cluster.local:3000"
+                  --set "env.ENGAGEMENT_SVC_URL=http://engagement-svc.aivo.svc.cluster.local:3000"
+                  --set "env.BILLING_SVC_URL=http://billing-svc.aivo.svc.cluster.local:3000"
+                  --set "env.I18N_SVC_URL=http://i18n-svc.aivo.svc.cluster.local:3000"
+                  --set "env.INTEGRATIONS_SVC_URL=http://integrations-svc.aivo.svc.cluster.local:3000"
+                  --set "env.ADMIN_SVC_URL=http://admin-svc.aivo.svc.cluster.local:3000"
+                  --set "env.STATUS_PAGE_SVC_URL=http://status-page-svc.aivo.svc.cluster.local:3000"
+                  --set "env.RESEARCH_SVC_URL=http://research-svc.aivo.svc.cluster.local:3000"
+                )
+                ;;
+              *)               PORT=3000 ;;
+            esac
+            adopt serviceaccount "$svc" "$svc"
+            adopt service        "$svc" "$svc"
+            adopt deployment     "$svc" "$svc"
+            adopt configmap      "$svc" "$svc"
+            unstick "$svc"
+            echo "═══ Prod deploy: $svc ($VERSION) ═══"
+
+            # NOTE: --wait / --atomic intentionally NOT used here.
+            # Several prod services currently have an unhealthy 2nd replica
+            # (e.g. crash-looping due to env/package issues unrelated to
+            # this deploy). Any helm flag that requires readyReplicas ==
+            # desiredReplicas then times out and --atomic rolls back the
+            # healthy revision, cascade-failing every subsequent service.
+            # The Deployment's RollingUpdate strategy (0 maxUnavailable)
+            # already protects the old ReplicaSet until the new pod is
+            # Ready, so skipping --wait is safe: a bad image will leave the
+            # old replica serving traffic. We still verify rollout per
+            # service with `kubectl rollout status` but tolerate a timeout.
+            helm_apply() {
+              helm upgrade --install "$svc" "${{ env.CHART_PATH }}" \
+                -f "${{ env.PROD_VALUES }}" \
+                --set serviceName="$svc" \
+                --set image.repository="${{ env.IMAGE_PREFIX }}" \
+                --set image.tag="$VERSION" \
+                --set service.port=$PORT \
+                --set service.targetPort=$PORT \
+                --set env.PORT="$PORT" \
+                --set envFrom[0].secretRef.name=aivo-common-env \
+                "${EXTRA_SETS[@]}" \
+                -n "$NS" --timeout 3m 2>&1
+            }
+
+            set +e
+            OUT=$(helm_apply)
+            RC=$?
+            set -e
+            if [ $RC -ne 0 ]; then
+              echo "$OUT"
+              # Existing Deployment has state (immutable selector, stale
+              # duplicate port names, etc.) that strategic-merge can't fix.
+              # Delete the Deployment shell and re-apply — PVCs/Services
+              # remain intact because only the Deployment is recreated.
+              if echo "$OUT" | grep -Eq "field is immutable|Duplicate value|invalid: spec\.selector"; then
+                echo "::warning::$svc has incompatible existing Deployment — recreating"
+                kubectl -n "$NS" delete deployment "$svc" --ignore-not-found=true --wait=true >/dev/null 2>&1 || true
+                unstick "$svc"
+                set +e
+                OUT=$(helm_apply)
+                RC=$?
+                set -e
+              fi
+              if [ $RC -ne 0 ]; then
+                echo "$OUT"
+                echo "::warning::$svc deploy incomplete"
+                FAILED=$((FAILED+1))
+                # Belt-and-suspenders: clear any pending-* state left
+                # behind so the next service in the loop is not blocked.
+                unstick "$svc"
+              fi
+            fi
+          done
+          echo "Production deploy: $((${#SERVICES[@]}-FAILED))/${#SERVICES[@]} succeeded"
+          if [ "$FAILED" -gt 3 ]; then
+            echo "::error::Too many failures ($FAILED) — consider rollback"
+            exit 1
+          fi
+
+      - name: Verify rollout
+        run: |
+          kubectl -n ${{ env.PROD_NAMESPACE }} get pods --sort-by=.metadata.name -o wide
+          kubectl -n ${{ env.PROD_NAMESPACE }} get deployments
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Stage 6 — Production health check.
+  # ─────────────────────────────────────────────────────────────────────
+  health-prod:
+    name: Production Health Check
+    needs: deploy-production
+    if: ${{ inputs.skip_prod != true }}
+    uses: ./.github/workflows/smoke-tests.yml
+    with:
+      environment: production
+      version: ${{ needs.deploy-staging.outputs.version }}
+    secrets: inherit

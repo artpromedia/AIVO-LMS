@@ -1,0 +1,188 @@
+name: Marketing Deploy Staging
+
+# Builds and ships the marketing site (apps/marketing) to a hosted Vercel
+# staging environment on every push to `develop` that touches apps/marketing/**.
+#
+# Why Vercel: the marketing site is Next.js 15 with `output: "standalone"`,
+# Vercel is the de facto host for that stack, and each deploy yields a
+# deterministic preview URL we can hand straight to the post-deploy marker
+# check below — so the "Verify staging marketing markers" step stops being
+# skipped (the original placeholder echo deploy left it warning-and-no-op'ing).
+#
+# Production still ships from the Replit autoscale deployment of
+# `aivolearning.com` (see the "Production Deployment (Replit Autoscale)"
+# section in replit.md). Vercel here is staging-only — a third independent
+# line of defense behind the PR-time build check (marketing-pr-check.yml) and
+# the production smoke check (marketing-smoke-test.yml), and a real preview
+# environment QA can poke before `Marketing Deploy Production` is dispatched.
+#
+# Required GitHub configuration on the `staging` environment:
+#   Secrets:
+#     VERCEL_TOKEN       Vercel CLI token (https://vercel.com/account/tokens).
+#     VERCEL_ORG_ID      Org/team id from the Vercel project's
+#                        .vercel/project.json (run `vercel link` locally
+#                        inside apps/marketing once to generate it).
+#     VERCEL_PROJECT_ID  Project id from the same .vercel/project.json.
+#   Variables (optional):
+#     MARKETING_STAGING_URL  Stable alias hostname (e.g.
+#                            staging.aivolearning.com). When set, the latest
+#                            deployment is aliased to it and the marker check
+#                            runs against the alias instead of the per-deploy
+#                            URL — gives QA a stable URL to bookmark.
+#
+# Vercel project must be configured with:
+#   Framework preset:  Next.js
+#   Root Directory:    apps/marketing
+#   Install Command:   pnpm install --frozen-lockfile
+#   Build Command:     pnpm --filter @aivo/marketing build
+#   (Vercel auto-detects pnpm workspaces; @aivo/brand is pulled transitively.)
+
+on:
+  push:
+    branches: [develop]
+    paths:
+      - "apps/marketing/**"
+  workflow_dispatch:
+
+concurrency:
+  group: marketing-deploy-staging
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy Marketing (Staging)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: staging
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      # Lockfile sanity check at the monorepo level — fast-fails if the
+      # pnpm-lock.yaml is out of sync before we burn Vercel build minutes.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Local Next.js build — same fast-fail the production deploy workflow
+      # does. Catches `next build` regressions (typescript errors, missing
+      # env vars referenced at build time, etc.) before talking to Vercel.
+      - name: Build marketing site (sanity check)
+        run: pnpm --filter @aivo/marketing build
+
+      # Preflight: surface a clear actionable error if the `staging`
+      # environment hasn't been wired up yet, instead of a cryptic
+      # `vercel pull` "missing token" failure.
+      - name: Verify Vercel credentials are configured
+        run: |
+          set -euo pipefail
+          missing=()
+          [[ -z "${VERCEL_TOKEN:-}" ]] && missing+=("VERCEL_TOKEN")
+          [[ -z "${VERCEL_ORG_ID:-}" ]] && missing+=("VERCEL_ORG_ID")
+          [[ -z "${VERCEL_PROJECT_ID:-}" ]] && missing+=("VERCEL_PROJECT_ID")
+          if (( ${#missing[@]} > 0 )); then
+            cat >&2 <<EOF
+          ERROR: Marketing staging deploy is not configured.
+          Missing required secrets on the GitHub "staging" environment: ${missing[*]}
+
+          To fix:
+            1. Create a Vercel project pointed at apps/marketing
+               (Framework: Next.js, Root Directory: apps/marketing,
+               Install: \`pnpm install --frozen-lockfile\`,
+               Build:   \`pnpm --filter @aivo/marketing build\`).
+            2. Generate a Vercel token at https://vercel.com/account/tokens.
+            3. Run \`vercel link\` inside apps/marketing locally and copy the
+               orgId / projectId values out of .vercel/project.json.
+            4. Add VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID as secrets
+               on the GitHub repo's "staging" environment.
+            5. Optionally set vars.MARKETING_STAGING_URL on the same
+               environment to a stable alias hostname (e.g.
+               staging.aivolearning.com).
+          EOF
+            exit 1
+          fi
+
+      - name: Install Vercel CLI
+        run: pnpm add --global vercel@latest
+
+      # Pull the project's preview environment + project link. Writes
+      # .vercel/project.json (already linked via env vars) and
+      # .vercel/.env.preview.local so `vercel build` knows what to build.
+      - name: Pull Vercel preview environment
+        run: vercel pull --yes --environment=preview
+
+      # Build inside the runner so `vercel deploy --prebuilt` ships an
+      # already-built bundle — Vercel just uploads + activates, no remote
+      # build step. Cuts deploy time in half and removes a class of
+      # "works locally, fails on Vercel" surprises.
+      - name: Build for Vercel
+        run: vercel build
+
+      # Deploy. STDOUT is the deployment URL
+      # (https://<project>-<hash>-<scope>.vercel.app). We capture it for the
+      # post-deploy marker check below — no manual MARKETING_STAGING_URL
+      # variable required.
+      - name: Deploy to Vercel (staging)
+        id: deploy
+        env:
+          STAGING_ALIAS: ${{ vars.MARKETING_STAGING_URL }}
+        run: |
+          set -euo pipefail
+          deployment_url="$(vercel deploy --prebuilt)"
+          echo "Deployment URL: ${deployment_url}"
+          echo "deployment_url=${deployment_url}" >> "$GITHUB_OUTPUT"
+
+          # If a stable alias is configured (e.g. staging.aivolearning.com),
+          # promote this deployment to it and verify against the alias.
+          # Otherwise verify against the per-deploy URL Vercel just printed.
+          if [[ -n "${STAGING_ALIAS:-}" ]]; then
+            alias_host="${STAGING_ALIAS#http://}"
+            alias_host="${alias_host#https://}"
+            alias_host="${alias_host%/}"
+            echo "Aliasing ${deployment_url} -> https://${alias_host}"
+            vercel alias set "${deployment_url}" "${alias_host}"
+            echo "verify_url=https://${alias_host}/" >> "$GITHUB_OUTPUT"
+          else
+            echo "verify_url=${deployment_url}/" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Post-deploy smoke check against the just-published URL. Reuses the
+      # same marker assertions as production (scripts/verify-marketing-deploy.sh
+      # sources scripts/marketing-markers.sh, the single source-of-truth
+      # shared with the PR-time build check). Fails the deploy if the
+      # staging site is missing any "Friendly Universe" marker, so a broken
+      # Hero/Footer redesign that snuck past the PR check cannot be promoted
+      # from staging to production.
+      - name: Verify staging marketing markers
+        env:
+          MARKETING_URL: ${{ steps.deploy.outputs.verify_url }}
+        run: bash scripts/verify-marketing-deploy.sh
+
+      - name: Summarize deploy
+        if: always()
+        env:
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment_url }}
+          VERIFY_URL: ${{ steps.deploy.outputs.verify_url }}
+        run: |
+          {
+            echo "## Marketing Staging Deploy"
+            echo
+            echo "- Per-deploy URL: ${DEPLOYMENT_URL:-<deploy step did not run>}"
+            echo "- Verified against: ${VERIFY_URL:-<verify step did not run>}"
+          } >> "$GITHUB_STEP_SUMMARY"

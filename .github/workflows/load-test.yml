@@ -1,0 +1,205 @@
+name: Load Test (k6)
+
+on:
+  workflow_dispatch:
+    inputs:
+      vus:
+        description: "Number of virtual users"
+        required: false
+        default: "50"
+        type: string
+      duration:
+        description: "Test duration (e.g. 2m, 5m)"
+        required: false
+        default: "2m"
+        type: string
+      scenario:
+        description: "Scenario to run"
+        required: false
+        default: "all"
+        type: choice
+        options:
+          - all
+          - auth-flow
+          - learner-dashboard
+  schedule:
+    - cron: "0 2 * * 0" # Every Sunday at 02:00 UTC
+
+concurrency:
+  group: load-test
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: "22"
+  K6_VERSION: "0.52.0"
+
+jobs:
+  load-test:
+    name: k6 Load Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: aivo
+          POSTGRES_PASSWORD: aivo_dev_pw
+          POSTGRES_DB: aivo_dev
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U aivo"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      DATABASE_URL: postgresql://aivo:aivo_dev_pw@localhost:5432/aivo_dev
+      REDIS_URL: redis://localhost:6379
+      NODE_ENV: test
+      JWT_SECRET: ci-test-jwt-secret-not-real
+      BETTER_AUTH_SECRET: ci-test-auth-secret-not-real
+      STRIPE_SECRET_KEY: placeholder-not-a-real-stripe-key
+      STRIPE_WEBHOOK_SECRET: whsec_placeholder
+      RESEND_API_KEY: re_test_placeholder
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install k6 v${{ env.K6_VERSION }}
+        run: |
+          curl -sL "https://github.com/grafana/k6/releases/download/v${K6_VERSION}/k6-v${K6_VERSION}-linux-amd64.tar.gz" | tar xz
+          sudo mv k6-v${K6_VERSION}-linux-amd64/k6 /usr/local/bin/
+          k6 version
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm turbo run build --filter='./packages/*'
+
+      - name: Push database schema and seed
+        run: |
+          pnpm --filter @aivo/db run db:push
+          if pnpm --filter @aivo/db run ci:setup 2>/dev/null; then
+            echo "Database seeded via ci:setup"
+          else
+            echo "Schema pushed via db:push"
+          fi
+
+      - name: Start identity-svc
+        run: |
+          cd services/identity-svc
+          pnpm dev &
+          echo "Waiting for identity-svc on :3001..."
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3001/health > /dev/null 2>&1; then
+              echo "identity-svc is ready"
+              break
+            fi
+            sleep 2
+          done
+
+      - name: Start learning-svc
+        run: |
+          cd services/learning-svc
+          pnpm dev &
+          echo "Waiting for learning-svc on :3003..."
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3003/health > /dev/null 2>&1; then
+              echo "learning-svc is ready"
+              break
+            fi
+            sleep 2
+          done
+
+      - name: Start engagement-svc
+        run: |
+          cd services/engagement-svc
+          pnpm dev &
+          echo "Waiting for engagement-svc on :3004..."
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3004/health > /dev/null 2>&1; then
+              echo "engagement-svc is ready"
+              break
+            fi
+            sleep 2
+          done
+
+      - name: Determine k6 parameters
+        id: params
+        run: |
+          VUS="${{ inputs.vus || '50' }}"
+          DURATION="${{ inputs.duration || '2m' }}"
+          SCENARIO="${{ inputs.scenario || 'all' }}"
+
+          echo "vus=$VUS" >> "$GITHUB_OUTPUT"
+          echo "duration=$DURATION" >> "$GITHUB_OUTPUT"
+          echo "scenario=$SCENARIO" >> "$GITHUB_OUTPUT"
+
+          echo "VUs: $VUS, Duration: $DURATION, Scenario: $SCENARIO"
+
+      - name: Run k6 — auth-flow
+        if: steps.params.outputs.scenario == 'auth-flow' || steps.params.outputs.scenario == 'all'
+        run: |
+          k6 run e2e/load/k6/auth-flow.js \
+            --vus "${{ steps.params.outputs.vus }}" \
+            --duration "${{ steps.params.outputs.duration }}" \
+            --out json=k6-auth-flow-results.json \
+            --env BASE_URL=http://localhost:3001 \
+            --summary-trend-stats "avg,min,med,max,p(90),p(95),p(99)"
+        continue-on-error: true
+
+      - name: Run k6 — learner-dashboard
+        if: steps.params.outputs.scenario == 'learner-dashboard' || steps.params.outputs.scenario == 'all'
+        run: |
+          k6 run e2e/load/k6/learner-dashboard.js \
+            --vus "${{ steps.params.outputs.vus }}" \
+            --duration "${{ steps.params.outputs.duration }}" \
+            --out json=k6-learner-dashboard-results.json \
+            --env IDENTITY_URL=http://localhost:3001 \
+            --env LEARNING_URL=http://localhost:3003 \
+            --env ENGAGEMENT_URL=http://localhost:3004 \
+            --summary-trend-stats "avg,min,med,max,p(90),p(95),p(99)"
+        continue-on-error: true
+
+      - name: Generate summary
+        if: always()
+        run: |
+          echo "## k6 Load Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**VUs:** ${{ steps.params.outputs.vus }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Duration:** ${{ steps.params.outputs.duration }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Scenario:** ${{ steps.params.outputs.scenario }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Results uploaded as artifacts." >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload k6 results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-results-${{ github.run_id }}
+          path: k6-*.json
+          retention-days: 14
+          if-no-files-found: ignore

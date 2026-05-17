@@ -1,0 +1,88 @@
+# =============================================================================
+# AIVO Service - Staging Environment Values
+# =============================================================================
+# Use: helm install <service> ./aivo-service -f values-staging.yaml --set serviceName=<name>
+# =============================================================================
+
+image:
+  tag: "main-latest"
+
+replicaCount: 2
+
+# Staging resources (smaller than production)
+resources:
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+  requests:
+    cpu: "50m"
+    memory: "128Mi"
+
+# Reduced HPA for staging
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+
+# Environment variables for staging
+env:
+  NODE_ENV: staging
+  PORT: "3000"
+  LOG_LEVEL: debug
+  LOG_FORMAT: json
+  OTEL_ENABLED: "true"
+  OTEL_SERVICE_NAME: "{{ .Values.serviceName }}"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector.monitoring:4317"
+
+# External secrets for staging
+externalSecrets:
+  enabled: true
+  refreshInterval: "1h"
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: k8s-secret-store
+  data:
+    - secretKey: DATABASE_URL
+      remoteRef:
+        key: aivo-staging/database-url
+    - secretKey: REDIS_URL
+      remoteRef:
+        key: aivo-staging/redis-url
+    - secretKey: NATS_URL
+      remoteRef:
+        key: aivo-staging/nats-url
+    - secretKey: JWT_SECRET
+      remoteRef:
+        key: aivo-staging/jwt-secret
+
+# Ingress for staging
+ingress:
+  enabled: false  # Using Kong gateway instead
+
+# Network policy for staging (more permissive)
+networkPolicy:
+  enabled: true
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: aivo-staging
+        - namespaceSelector:
+            matchLabels:
+              name: kong
+      ports:
+        - protocol: TCP
+          port: 3000
+  egress:
+    - {}  # Allow all egress in staging
+
+# Pod disruption budget (less strict for staging)
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 0
+
+# Datadog for staging
+datadog:
+  enabled: true
+  env: staging

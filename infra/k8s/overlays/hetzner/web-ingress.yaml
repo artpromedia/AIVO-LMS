@@ -1,0 +1,171 @@
+# =============================================================================
+# AIVO Platform  Web Frontend Ingress (NGINX Ingress Controller)
+# =============================================================================
+# Ingress rules for all web frontend applications.
+# Each app gets its own subdomain under aivolearning.com.
+# TLS handled by Cloudflare origin certificate ("Full" SSL mode).
+# =============================================================================
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: aivo-web-ingress
+  namespace: aivo-prod
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "20m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "10"
+    # Cache static assets at the ingress level
+    nginx.ingress.kubernetes.io/proxy-buffering: "on"
+    # NOTE: configuration-snippet is disabled on this cluster
+    # (allow-snippet-annotations: "false" in ingress-nginx ConfigMap).
+    # Security headers (HSTS, X-Content-Type-Options, X-Frame-Options)
+    # are set by the Next.js apps in their next.config.js headers config.
+    # ModSecurity / OWASP CRS — block obvious admin-surface attacks at the edge.
+    # Sprint 1 (Enterprise Admin Hardening): enable WAF for admin & district
+    # subdomains. Other tenants share the same Ingress object, so this applies
+    # platform-wide; if a learner/parent route trips a CRS rule we will tune it.
+    nginx.ingress.kubernetes.io/enable-modsecurity: "true"
+    nginx.ingress.kubernetes.io/enable-owasp-core-rules: "true"
+    nginx.ingress.kubernetes.io/modsecurity-snippet: |
+      SecRuleEngine On
+      SecRequestBodyAccess On
+      SecAuditEngine RelevantOnly
+      SecAuditLogParts ABIJDEFHZ
+      SecAction "id:900110,phase:1,nolog,pass,t:none,setvar:tx.inbound_anomaly_score_threshold=10,setvar:tx.outbound_anomaly_score_threshold=10"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - aivolearning.com
+        - www.aivolearning.com
+        - app.aivolearning.com
+        - teacher.aivolearning.com
+        - parent.aivolearning.com
+        - admin.aivolearning.com
+        - district.aivolearning.com
+        - author.aivolearning.com
+        - creator.aivolearning.com
+        - docs.aivolearning.com
+      secretName: cloudflare-origin-tls
+  rules:
+    # Marketing site — aivolearning.com + www
+    - host: aivolearning.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-marketing
+                port:
+                  number: 3000
+    - host: www.aivolearning.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-marketing
+                port:
+                  number: 3000
+
+    # Student/Learner app
+    - host: app.aivolearning.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-learner
+                port:
+                  number: 3000
+
+    # Teacher dashboard
+    - host: teacher.aivolearning.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-teacher
+                port:
+                  number: 3000
+
+    # Parent/caregiver portal
+    - host: parent.aivolearning.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-parent
+                port:
+                  number: 3000
+
+    # Platform admin panel
+    - host: admin.aivolearning.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-platform-admin
+                port:
+                  number: 3000
+
+    # District administrator dashboard
+    - host: district.aivolearning.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-district
+                port:
+                  number: 3000
+
+    # Content authoring tool
+    - host: author.aivolearning.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-author
+                port:
+                  number: 3000
+
+    # Content creation studio
+    - host: creator.aivolearning.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-creator
+                port:
+                  number: 3000
+
+    # Developer documentation portal
+    - host: docs.aivolearning.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web-dev-portal
+                port:
+                  number: 3000

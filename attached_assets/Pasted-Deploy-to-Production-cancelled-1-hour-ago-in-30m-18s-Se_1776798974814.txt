@@ -1,0 +1,157 @@
+Deploy to Production
+cancelled 1 hour ago in 30m 18s
+Search logs
+2s
+1s
+0s
+0s
+30m 10s
+Run set -euo pipefail
+  set -euo pipefail
+  NS="aivo"
+  # Production prefers an explicit, immutable tag. Falls back to
+  # `latest` if none was supplied, matching staging behavior.
+  VERSION=""
+  [ -z "$VERSION" ] && VERSION="latest"
+  kubectl create namespace "$NS" --dry-run=client -o yaml | kubectl apply -f -
+  
+  SERVICES=(
+    identity-svc assessment-svc brain-svc ai-svc learning-svc
+    tutor-svc family-svc engagement-svc billing-svc comms-svc
+    i18n-svc integrations-svc admin-svc status-page-svc research-svc
+  )
+  PYTHON_SERVICES=(brain-svc ai-svc)
+  
+  adopt() {
+    local kind="$1" name="$2" svc="$3"
+    kubectl -n "$NS" get "$kind" "$name" >/dev/null 2>&1 || return 0
+    kubectl -n "$NS" label   "$kind" "$name" "app.kubernetes.io/managed-by=Helm" --overwrite >/dev/null
+    kubectl -n "$NS" annotate "$kind" "$name" "meta.helm.sh/release-name=$svc" --overwrite >/dev/null
+    kubectl -n "$NS" annotate "$kind" "$name" "meta.helm.sh/release-namespace=$NS" --overwrite >/dev/null
+  }
+  
+  FAILED=0
+  for svc in "${SERVICES[@]}"; do
+    # Port chosen to match the live container port of each service.
+    # Mismatches cause strategic-merge to *append* a second ports
+    # entry, which then collides on the port name "http" and the
+    # upgrade fails with: Duplicate value: "http".
+    case "$svc" in
+      brain-svc)       PORT=8000 ;;
+      assessment-svc)  PORT=3003 ;;
+      *)               PORT=3000 ;;
+    esac
+    adopt serviceaccount "$svc" "$svc"
+    adopt service        "$svc" "$svc"
+    adopt deployment     "$svc" "$svc"
+    adopt configmap      "$svc" "$svc"
+    echo "═══ Prod deploy: $svc ($VERSION) ═══"
+  
+    helm_apply() {
+      helm upgrade --install "$svc" "infra/helm/aivo-service" \
+        -f "infra/helm/values/hetzner.yaml" \
+        --set serviceName="$svc" \
+        --set image.repository="ghcr.io/artpromedia" \
+        --set image.tag="$VERSION" \
+        --set service.port=$PORT \
+        --set service.targetPort=$PORT \
+        --set env.PORT="$PORT" \
+        --set envFrom[0].secretRef.name=aivo-common-env \
+        -n "$NS" --timeout 8m --wait 2>&1
+    }
+  
+    set +e
+    OUT=$(helm_apply)
+    RC=$?
+    set -e
+    if [ $RC -ne 0 ]; then
+      echo "$OUT"
+      # Existing Deployment has state (immutable selector, stale
+      # duplicate port names, etc.) that strategic-merge can't fix.
+      # Delete the Deployment shell and re-apply — PVCs/Services
+      # remain intact because only the Deployment is recreated.
+      if echo "$OUT" | grep -Eq "field is immutable|Duplicate value|invalid: spec\.selector"; then
+        echo "::warning::$svc has incompatible existing Deployment — recreating"
+        kubectl -n "$NS" delete deployment "$svc" --ignore-not-found=true --wait=true >/dev/null 2>&1 || true
+        set +e
+        OUT=$(helm_apply)
+        RC=$?
+        set -e
+      fi
+      if [ $RC -ne 0 ]; then
+        echo "$OUT"
+        echo "::warning::$svc deploy incomplete"
+        FAILED=$((FAILED+1))
+      fi
+    fi
+  done
+  echo "Production deploy: $((${#SERVICES[@]}-FAILED))/${#SERVICES[@]} succeeded"
+  if [ "$FAILED" -gt 3 ]; then
+    echo "::error::Too many failures ($FAILED) — consider rollback"
+    exit 1
+  fi
+  shell: /usr/bin/bash -e {0}
+  env:
+    NODE_VERSION: 22
+    PYTHON_VERSION: 3.12
+    CHART_PATH: infra/helm/aivo-service
+    STAGING_NAMESPACE: aivo-staging
+    STAGING_VALUES: infra/helm/values/staging.yaml
+    PROD_NAMESPACE: aivo
+    PROD_VALUES: infra/helm/values/hetzner.yaml
+    IMAGE_PREFIX: ghcr.io/artpromedia
+namespace/aivo unchanged
+═══ Prod deploy: identity-svc (latest) ═══
+Error: UPGRADE FAILED: context deadline exceeded
+Error: UPGRADE FAILED: context deadline exceeded
+Warning: identity-svc deploy incomplete
+═══ Prod deploy: assessment-svc (latest) ═══
+Error: UPGRADE FAILED: context deadline exceeded
+Error: UPGRADE FAILED: context deadline exceeded
+Warning: assessment-svc deploy incomplete
+═══ Prod deploy: brain-svc (latest) ═══
+Error: UPGRADE FAILED: context deadline exceeded
+Error: UPGRADE FAILED: context deadline exceeded
+Warning: brain-svc deploy incomplete
+═══ Prod deploy: ai-svc (latest) ═══
+Error: UPGRADE FAILED: another operation (install/upgrade/rollback) is in progress
+Error: UPGRADE FAILED: another operation (install/upgrade/rollback) is in progress
+Warning: ai-svc deploy incomplete
+═══ Prod deploy: learning-svc (latest) ═══
+Error: UPGRADE FAILED: another operation (install/upgrade/rollback) is in progress
+Error: UPGRADE FAILED: another operation (install/upgrade/rollback) is in progress
+Warning: learning-svc deploy incomplete
+═══ Prod deploy: tutor-svc (latest) ═══
+Error: UPGRADE FAILED: another operation (install/upgrade/rollback) is in progress
+Error: UPGRADE FAILED: another operation (install/upgrade/rollback) is in progress
+Warning: tutor-svc deploy incomplete
+═══ Prod deploy: family-svc (latest) ═══
+Error: UPGRADE FAILED: another operation (install/upgrade/rollback) is in progress
+Error: UPGRADE FAILED: another operation (install/upgrade/rollback) is in progress
+Warning: family-svc deploy incomplete
+═══ Prod deploy: engagement-svc (latest) ═══
+Error: UPGRADE FAILED: another operation (install/upgrade/rollback) is in progress
+Error: UPGRADE FAILED: another operation (install/upgrade/rollback) is in progress
+Warning: engagement-svc deploy incomplete
+═══ Prod deploy: billing-svc (latest) ═══
+Error: UPGRADE FAILED: another operation (install/upgrade/rollback) is in progress
+Error: UPGRADE FAILED: another operation (install/upgrade/rollback) is in progress
+Warning: billing-svc deploy incomplete
+═══ Prod deploy: comms-svc (latest) ═══
+Error: The operation was canceled.
+0s
+0s
+Post job cleanup.
+/usr/bin/git version
+git version 2.43.0
+Temporarily overriding HOME='/opt/github-runner-aivo-ai-learning/_work/_temp/05930137-4681-4f4b-aa7f-bc598c64b40c' before making global git config changes
+Adding repository directory to the temporary git global config as a safe directory
+/usr/bin/git config --global --add safe.directory /opt/github-runner-aivo-ai-learning/_work/aivo-ai-learning/aivo-ai-learning
+/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+http.https://github.com/.extraheader
+/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url

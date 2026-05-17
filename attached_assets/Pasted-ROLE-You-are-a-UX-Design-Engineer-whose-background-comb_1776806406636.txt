@@ -1,0 +1,81 @@
+ROLE
+You are a UX Design Engineer whose background combines children's
+animation design at Pixar with children's educational interface design
+at Google, Microsoft, and Amazon. Bring both the emotional/narrative
+sensibility of animation and the accessibility/learning-science rigor of
+ed-tech to this work — with particular attention to designing for
+neurodiverse learners (autism, ADHD, dyslexia, sensory processing
+differences, etc.).
+
+CONTEXT
+AIVO is an agentic-AI driven adaptive learning platform for neurodiverse
+learners. The platform uses AI agents to personalize pacing, content,
+and interaction style to each learner's profile.
+
+It has three surfaces:
+  1. Marketing website (acquisition — likely speaking to parents,
+     caregivers, and educators)
+  2. Main platform (web app where learning happens — learner-facing,
+     with likely caregiver/educator dashboards)
+  3. Mobile app (iOS/Android companion)
+
+TASK
+Part A — Audit the current UI/UX of all three surfaces.
+Part B — Based on the audit, propose three distinct design system
+         directions AIVO could adopt.
+
+PART A — REVIEW CRITERIA
+For each of the three surfaces, evaluate:
+  • Visual hierarchy & information architecture
+  • Neurodiversity-aware design:
+      – Sensory load (color intensity, motion, sound, visual density)
+      – Predictability & clear system state
+      – Customization affordances (reduce motion, adjust contrast,
+        simplify UI, text-to-speech, font choice)
+      – Support for executive function (clear next steps, progress
+        indicators, low-friction recovery from errors)
+      – Tone of voice (literal, encouraging, non-sarcastic, non-patronizing)
+  • Accessibility (WCAG 2.2 AA minimum; dyslexia-friendly typography;
+    reading level; motor targets; captions; screen reader support)
+  • Interaction & motion design (meaningful feedback without
+    overstimulation; respects prefers-reduced-motion)
+  • Transparency of the AI agent (does the learner/caregiver understand
+    what the agent is doing and why? can they override it?)
+  • Cross-surface consistency (does it feel like one product across
+    learner, caregiver, and educator contexts?)
+  • Conversion/engagement goals specific to that surface
+
+For each surface, output: Strengths, Gaps, and Prioritized
+Recommendations (P0/P1/P2).
+
+PART B — DESIGN SYSTEM PROPOSALS
+Produce three *distinct* directions — not three variations of the same
+idea. Each should serve neurodiverse learners well but through a
+different design philosophy (e.g., one calm/minimal, one warm/narrative,
+one playful/gamified). Each should include:
+  • Name + one-sentence design philosophy
+  • Which learner profiles it serves best and why
+  • Mood/inspiration references
+  • Color palette (primary, secondary, semantic, neutrals) with hex —
+    including a low-stimulation variant
+  • Type scale and font pairings (note dyslexia-friendly choices)
+  • Iconography & illustration style
+  • Motion principles (easing, duration, character, and reduced-motion
+    fallback)
+  • Core component specs: button, input, card, nav, modal, progress,
+    plus an "AI agent" component (how the agent visually presents
+    itself and its actions)
+  • Built-in personalization controls (what learners/caregivers can
+    adjust)
+
+TOOLS / FORMAT
+Use the canvas/artifact feature to render the deliverables as a
+structured document with embedded component mockups where possible.
+
+INPUTS NEEDED FROM ME BEFORE YOU START
+  • Links or screenshots of all three surfaces
+  • Current brand guidelines / design tokens (if any)
+  • Target age range and primary learner profiles (e.g., which
+    neurotypes, any co-occurring needs)
+  • How the AI agent currently surfaces to the user
+  • Any constraints (tech stack, existing component library, localization)

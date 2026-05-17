@@ -1,0 +1,1267 @@
+Now let me also examine the integrations service to understand the full backend picture:Now I have a thorough understanding of the entire district admin panel codebase — all 8 pages, the layout, the backend APIs it consumes, the data-scoping gaps, and the integrations system. Let me produce the comprehensive PRD.
+
+---
+
+# 📋 Product Requirements Document (PRD)
+# AIVO Learning — District Admin Panel v2.0
+
+---
+
+## Document Information
+
+| Field | Value |
+|---|---|
+| **Product** | AIVO Learning Platform — District Administration |
+| **Repository** | `artpromedia/aivo-ai-learning` |
+| **Document Version** | 2.0 |
+| **Author** | @artpromedia |
+| **Date** | 2026-04-15 |
+| **Status** | Draft |
+| **Frontend Stack** | Next.js 15, React 19, Tailwind v4, next-intl |
+| **Backend Stack** | Fastify 5 (identity-svc :3001, admin-svc :3013, integrations-svc :3012, research-svc :3015), Drizzle ORM, PostgreSQL 16 |
+| **Auth** | JWT RS256 via `@aivo/security`, RBAC (`DISTRICT_ADMIN` role) |
+| **Design Accent** | Violet (`violet-500` / `violet-600`) — distinct from Platform Admin's purple |
+
+---
+
+## 1. Executive Summary
+
+### 1.1 Purpose
+
+This PRD defines the complete requirements for transforming the AIVO District Admin Panel from its current MVP state into a production-ready, enterprise-grade control center for school district administrators. District admins are B2B enterprise customers who manage hundreds to thousands of learners, dozens of teachers and therapists, multiple schools, and need deep reporting for IEP compliance, state reporting, and board presentations.
+
+The District Admin Panel is the **primary daily interface** for district IT administrators, special education coordinators, curriculum directors, and principals. It must deliver:
+1. **Complete tenant-scoped operations** — all data filtered to the admin's own district
+2. **School hierarchy management** — districts contain schools, schools contain classrooms
+3. **Staff lifecycle management** — invite, onboard, assign, evaluate, and offboard educators
+4. **Learner oversight** — IEP tracking, progress monitoring, intervention management
+5. **Actionable analytics** — state reporting, board presentations, AYP tracking
+6. **Self-service configuration** — SSO, branding, notification preferences, integration management
+
+### 1.2 Current State Assessment — Deep Dive
+
+The existing district panel at `/dashboard/district/` has **8 pages** across 5 sidebar sections:
+
+| Page | Route | Current State | Critical Gaps |
+|---|---|---|---|
+| **Dashboard** | `/dashboard/district` | ✅ Functional — 4 metric cards (learners, teachers, parents, total users), 4 action cards, tenant info, learner preview table | **🔴 CRITICAL:** Calls platform-wide `/api/admin/stats` and `/api/admin/learners` — returns ALL platform data, not tenant-scoped. District admin sees data from other tenants. No school breakdown. No time-based trends |
+| **Schools** | `/dashboard/district/schools` | ⚠️ Minimal — Lists tenants filtered client-side by `user.tenantId`. Cards show name/slug/date only | **🔴 CRITICAL:** No school hierarchy (district→school). Currently shows only the district's own tenant record, not schools under it. No enrollment counts, no school detail view, no ability to add schools. No school-level metrics |
+| **Learners** | `/dashboard/district/learners` | ⚠️ Functional but broken scope — Table with search, pagination, 5-level color coding | **🔴 CRITICAL:** Calls `/api/admin/learners` without tenant filter — returns ALL platform learners. No functioning level filter. No school filter. No learner detail drilldown. No IEP status column. No progress/mastery info |
+| **Staff & Teachers** | `/dashboard/district/staff` | ⚠️ Functional but broken scope — Fetches TEACHER, THERAPIST, CAREGIVER roles separately, role filter cards, search | **🔴 CRITICAL:** Calls `/api/admin/users?role=X` without tenant filter — returns ALL platform staff. No school assignment. No classroom assignment. No invite flow. No professional development tracking |
+| **Analytics & Reports** | `/dashboard/district/analytics` | ⚠️ Scaffold with wrong data — 3 stat cards, bar chart (FL distribution), role distribution, 3 static "Quick Insights" cards | **🔴 CRITICAL:** Calls platform-wide `/api/admin/stats` and `/api/admin/learners`. Quick Insights are hardcoded static text, not real data. No time range selectors. No mastery tracking. No school comparison. No exportable reports |
+| **Usage & Limits** | `/dashboard/district/usage` | ⚠️ Static limits — 4 usage cards with hardcoded limits (500 users, 200 learners, 50 teachers, 10 tenants), AI usage section shows all zeroes | **🔴 CRITICAL:** Limits are hardcoded in the component, not from the tenant's subscription. AI usage values are all `0`. No real usage tracking backend |
+| **Integrations** | `/dashboard/district/integrations` | ✅ Well-built — Full OAuth/API-key flow, connector catalog (Google Classroom, Clever, ClassLink, Canvas, Schoology, PowerSchool), connection management, sync logs, disconnect | **✅ BEST PAGE.** Connected to real `integrations-svc` APIs. Has proper tenant-scoping via `user.tenantId`. Only needs minor enhancements (scheduled sync, field mapping) |
+| **Settings** | `/dashboard/district/settings` | ⚠️ Read-only — Displays tenant info, admin account info, notification toggle preferences (client-side only, not persisted) | **🔴 CRITICAL:** No edit capability. Toggle preferences use local `useState` only — lost on page refresh. No SSO config. No branding. No notification preference persistence |
+
+### 1.3 The #1 Systemic Problem: No Tenant Data Isolation
+
+**This is a launch-blocking security vulnerability.** Every API call from the district dashboard hits platform-wide admin endpoints:
+
+| Frontend Call | Backend Endpoint | What It Returns | What It Should Return |
+|---|---|---|---|
+| `GET /api/admin/stats` | `identity-svc` → queries all users/learners/tenants globally | Platform-wide totals | Only this district's users/learners |
+| `GET /api/admin/learners` | `identity-svc` → queries all learners globally | ALL learners on the platform | Only learners within this district's tenant |
+| `GET /api/admin/users?role=TEACHER` | `identity-svc` → queries all users by role globally | ALL teachers platform-wide | Only teachers assigned to this district |
+| `GET /api/admin/tenants` | `identity-svc` → queries all tenants globally | ALL tenants on the platform | Only this district's tenant and its child schools |
+
+The `requireAdmin` middleware in `identity-svc/src/routes/admin.ts` allows both `PLATFORM_ADMIN` and `DISTRICT_ADMIN` through, but **never applies a tenant filter** (`WHERE tenantId = ?`). The frontend does some client-side filtering (e.g., schools page filters `all.filter(t => t.id === user.tenantId)`), but the data has already been sent over the network.
+
+**This must be the first thing fixed before any feature work.**
+
+---
+
+## 2. Goals & Success Metrics
+
+### 2.1 Goals
+
+| # | Goal | Priority |
+|---|---|---|
+| G1 | **Implement complete tenant-scoped data isolation** — every API returns only the district's own data | P0 (Security) |
+| G2 | **Build school hierarchy management** — districts contain schools, schools contain classrooms, each with enrollment data | P0 |
+| G3 | **Enable full staff lifecycle** — invite, assign to schools/classrooms, manage caseloads, offboard | P0 |
+| G4 | **Deliver learner oversight** — IEP tracking, progress monitoring, intervention alerts, parent communication | P0 |
+| G5 | **Provide actionable analytics** — time-ranged, school-comparable, exportable reports for boards and state agencies | P1 |
+| G6 | **Enable district self-service** — SSO config, branding, notification preferences, all persisted | P1 |
+| G7 | **Make usage tracking real** — actual limits from subscription, actual consumption from usage data | P1 |
+| G8 | **Enhance integrations** — scheduled sync, field mapping configuration, auto-provisioning from roster sync | P2 |
+
+### 2.2 Success Metrics
+
+| Metric | Target | Measurement |
+|---|---|---|
+| Tenant data isolation | 0 cross-tenant data leaks in any API response | Automated integration tests with multi-tenant fixtures |
+| District admin task completion | < 3 clicks to find any learner's IEP status | UX testing with district IT admins |
+| Report generation | < 10 seconds to generate district-wide performance report | End-to-end timing |
+| Staff onboarding time | < 2 minutes to invite a teacher and assign to a school | UX flow timing |
+| Accessibility | ≥ 90 axe-core score on all district pages | Automated a11y testing |
+| Settings persistence | 100% of toggle/preference changes survive page refresh | Integration test |
+| API calls eliminated | 0 calls to platform-wide admin endpoints from district UI | Frontend code audit |
+
+---
+
+## 3. User Personas & Permission Model
+
+### 3.1 Primary: District IT Administrator
+
+- **Who:** Technology director, systems administrator for a school district
+- **Daily tasks:** Monitor enrollment numbers, check integration sync status, add/remove staff accounts, review usage limits
+- **Technical skill:** Moderate — comfortable with dashboards, not a developer
+- **Access pattern:** Desktop browser, during business hours, multiple times per day
+
+### 3.2 Secondary: Special Education Coordinator
+
+- **Who:** District special education director, IEP compliance officer
+- **Daily tasks:** Review learner progress, check IEP goal status, identify students needing intervention, generate compliance reports
+- **Access pattern:** Desktop + tablet, may need to present data in meetings
+
+### 3.3 Tertiary: Curriculum Director / Principal
+
+- **Who:** District curriculum lead, school principal given district-level view access
+- **Daily tasks:** Review mastery data by subject/grade, compare school performance, identify PD needs
+- **Access pattern:** Weekly, primarily analytics and reports
+
+### 3.4 Permission Matrix
+
+| Capability | PLATFORM_ADMIN | DISTRICT_ADMIN | Notes |
+|---|---|---|---|
+| View own district's data | ✅ (all districts) | ✅ (own only) | Tenant-scoped |
+| View other districts' data | ✅ | ❌ | Strict isolation |
+| Add schools to district | ✅ | ✅ | District admin can grow their own org |
+| Invite staff (Teacher/Therapist/Caregiver) | ✅ (any tenant) | ✅ (own tenant only) | Role-limited creation |
+| Invite parents | ❌ | ✅ (own tenant only) | Parents self-register or are invited |
+| View learner profiles | ✅ (all) | ✅ (own tenant only) | Read-only for district admin |
+| View/download learner brain state | ❌ | ❌ | Parent-only |
+| Modify learner accommodations | ❌ | ❌ | Teacher/Therapist only |
+| View analytics & reports | ✅ (platform-wide) | ✅ (own tenant only) | Scoped data |
+| Export reports | ✅ | ✅ (own tenant data only) | FERPA-compliant |
+| Manage integrations | ✅ (all tenants) | ✅ (own tenant only) | Already working |
+| Configure SSO | ❌ (Platform configures) | ✅ (own domain) | New capability |
+| Manage subscription/billing | ❌ | ❌ (view only) | Contact platform admin |
+| Set district preferences | ✅ (any) | ✅ (own) | Persisted settings |
+| Manage feature flags | ✅ | ❌ | Platform-level only |
+| Delete users | ✅ | ✅ (own tenant staff only) | Soft-delete with audit |
+
+---
+
+## 4. Information Architecture
+
+### 4.1 Revised Sidebar Navigation
+
+Update `apps/web/src/app/dashboard/district/layout.tsx` NAV_SECTIONS:
+
+```
+Overview
+  ├── Dashboard (home)                    /dashboard/district
+  └── Notifications [NEW]                /dashboard/district/notifications
+
+Schools & Classrooms
+  ├── Schools                             /dashboard/district/schools
+  │   └── School Detail [NEW]            /dashboard/district/schools/[id]
+  └── Classrooms [NEW]                   /dashboard/district/classrooms
+
+People
+  ├── Learners                            /dashboard/district/learners
+  │   └── Learner Profile [NEW]          /dashboard/district/learners/[id]
+  ├── Staff & Teachers                    /dashboard/district/staff
+  │   └── Staff Profile [NEW]            /dashboard/district/staff/[id]
+  └── Parents & Families [NEW]           /dashboard/district/families
+
+Teaching & Learning
+  ├── IEP Management [NEW]               /dashboard/district/iep
+  ├── Curriculum & Standards [NEW]       /dashboard/district/curriculum
+  └── Intervention Tracker [NEW]         /dashboard/district/interventions
+
+Insights
+  ├── Analytics & Reports                 /dashboard/district/analytics
+  │   ├── School Comparison [NEW]        /dashboard/district/analytics/compare
+  │   └── Saved Reports [NEW]            /dashboard/district/analytics/reports
+  └── Usage & Limits                      /dashboard/district/usage
+
+Connect
+  └── Integrations                        /dashboard/district/integrations
+
+Admin
+  ├── District Settings                   /dashboard/district/settings
+  │   ├── SSO Configuration [NEW]        /dashboard/district/settings/sso
+  │   ├── Branding [NEW]                 /dashboard/district/settings/branding
+  │   └── Notifications [NEW]            /dashboard/district/settings/notifications
+  └── Activity Log [NEW]                 /dashboard/district/activity
+```
+
+---
+
+## 5. Feature Specifications
+
+### 5.1 Module: Tenant-Scoped Backend API Layer (P0 — MUST be first)
+
+#### 5.1.1 New District-Scoped API Endpoints
+
+Create a new file: `services/identity-svc/src/routes/district.ts`
+
+All endpoints use a new `requireDistrictAdmin` middleware that:
+1. Verifies JWT
+2. Confirms role is `DISTRICT_ADMIN` (or `PLATFORM_ADMIN` with `?tenantId=` override)
+3. Extracts `tenantId` from the JWT payload
+4. Automatically applies `WHERE tenantId = ?` to all queries
+
+```typescript
+// New middleware
+async function requireDistrictAdmin(req, reply) {
+  const payload = await verifyJWT(token);
+  if (!["DISTRICT_ADMIN", "PLATFORM_ADMIN"].includes(payload.role)) {
+    return reply.status(403).send({ error: "District admin access required" });
+  }
+  // For PLATFORM_ADMIN, allow optional tenantId query param to scope
+  req.tenantId = payload.role === "PLATFORM_ADMIN" 
+    ? (req.query.tenantId || payload.tenantId)
+    : payload.tenantId;
+  
+  if (!req.tenantId) {
+    return reply.status(400).send({ error: "No tenant context" });
+  }
+  req.user = payload;
+}
+```
+
+**New API endpoints (all tenant-scoped):**
+
+| Endpoint | Method | Description | Response |
+|---|---|---|---|
+| `/api/district/stats` | GET | District-scoped stats | `{ totalUsers, totalLearners, totalStaff, totalSchools, roleCounts[], recentActivity[] }` |
+| `/api/district/tenant` | GET | Current district's tenant info | `{ id, name, type, slug, settings, subscription, createdAt }` |
+| `/api/district/schools` | GET | Schools within this district | `[{ id, name, address, enrollmentCount, staffCount, createdAt }]` |
+| `/api/district/schools` | POST | Create a new school under district | `{ school, admin? }` |
+| `/api/district/schools/:id` | GET | School detail with enrollment/staff | `{ school, learners, staff, stats }` |
+| `/api/district/schools/:id` | PUT | Update school info | `{ school }` |
+| `/api/district/learners` | GET | Learners in this district | `[{ id, name, fl, grade, school, iepStatus, parentName, brainStatus }]` |
+| `/api/district/learners/:id` | GET | Learner profile (district view) | `{ learner, parent, team, iep, progress, sessions }` |
+| `/api/district/staff` | GET | Staff in this district | `[{ id, name, email, role, school, classrooms, caseloadCount }]` |
+| `/api/district/staff` | POST | Invite new staff member | `{ user, temporaryPassword }` |
+| `/api/district/staff/:id` | GET | Staff profile (district view) | `{ user, school, classrooms, caseload, activity }` |
+| `/api/district/staff/:id` | PUT | Update staff (school assignment, etc.) | `{ user }` |
+| `/api/district/staff/:id` | DELETE | Offboard staff (soft-delete) | `{ success }` |
+| `/api/district/families` | GET | Parents/families in this district | `[{ id, name, email, learnerCount, joinedAt }]` |
+| `/api/district/analytics/engagement` | GET | Tenant-scoped engagement metrics | `{ sessions, avgDuration, completionRate, bySchool[] }` |
+| `/api/district/analytics/mastery` | GET | Tenant-scoped mastery data | `{ bySubject[], byGrade[], bySchool[], byLevel[] }` |
+| `/api/district/analytics/cohorts` | GET | Tenant-scoped FL distribution | `[{ level, count, pct }]` |
+| `/api/district/analytics/compare` | GET | School-vs-school comparison | `{ schools: [{ name, metrics }] }` |
+| `/api/district/analytics/export` | GET | Download CSV/PDF report | Binary file download |
+| `/api/district/usage` | GET | Real usage vs subscription limits | `{ users: {used, limit}, learners: {used, limit}, ... }` |
+| `/api/district/settings` | GET | District preferences | `{ notifications: {}, sso: {}, branding: {} }` |
+| `/api/district/settings` | PUT | Update district preferences | `{ settings }` |
+| `/api/district/activity` | GET | District audit log | `[{ action, actor, resource, timestamp, details }]` |
+| `/api/district/iep/summary` | GET | IEP status across district | `{ total, active, dueForReview, overdue }` |
+| `/api/district/iep/learners` | GET | Learners with IEP details | `[{ learner, iepStatus, reviewDate, goals }]` |
+| `/api/district/interventions` | GET | Active interventions | `[{ learner, type, startDate, status, progress }]` |
+| `/api/district/notifications` | GET | Admin's notifications | `[{ id, type, message, read, createdAt }]` |
+
+#### 5.1.2 Database Schema Changes
+
+```sql
+-- Schools table (new — child entities under B2B_DISTRICT tenants)
+CREATE TABLE schools (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id),
+  name VARCHAR(255) NOT NULL,
+  address TEXT,
+  city VARCHAR(100),
+  state VARCHAR(50),
+  zip VARCHAR(20),
+  phone VARCHAR(50),
+  principal_name VARCHAR(255),
+  principal_email VARCHAR(255),
+  enrollment_capacity INT,
+  grade_levels VARCHAR(50)[],             -- e.g. {"K", "1", "2", "3", "4", "5"}
+  status VARCHAR(20) DEFAULT 'active',    -- active, inactive
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX idx_schools_tenant ON schools(tenant_id);
+
+-- Classrooms table (new)
+CREATE TABLE classrooms (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  school_id UUID NOT NULL REFERENCES schools(id),
+  name VARCHAR(255) NOT NULL,             -- e.g. "Room 204 — Mrs. Johnson's 3rd Grade"
+  grade_level VARCHAR(20),
+  subject VARCHAR(100),
+  teacher_id UUID REFERENCES users(id),
+  capacity INT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX idx_classrooms_school ON classrooms(school_id);
+
+-- Classroom enrollment (new — many-to-many: learners in classrooms)
+CREATE TABLE classroom_enrollments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  classroom_id UUID NOT NULL REFERENCES classrooms(id),
+  learner_id UUID NOT NULL REFERENCES learners(id),
+  enrolled_at TIMESTAMPTZ DEFAULT NOW(),
+  removed_at TIMESTAMPTZ,
+  UNIQUE(classroom_id, learner_id)
+);
+
+-- Staff-school assignment (new — a staff member can be assigned to one or more schools)
+CREATE TABLE staff_assignments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id),
+  school_id UUID NOT NULL REFERENCES schools(id),
+  role_at_school VARCHAR(50),             -- e.g. "lead_teacher", "sped_coordinator"
+  assigned_at TIMESTAMPTZ DEFAULT NOW(),
+  removed_at TIMESTAMPTZ,
+  UNIQUE(user_id, school_id)
+);
+
+-- IEP tracking (new)
+CREATE TABLE iep_records (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  learner_id UUID NOT NULL REFERENCES learners(id),
+  status VARCHAR(50) NOT NULL DEFAULT 'active', -- active, expired, draft, revoked
+  start_date DATE NOT NULL,
+  review_date DATE NOT NULL,              -- annual review due date
+  expiry_date DATE,                       -- triennial re-evaluation
+  case_manager_id UUID REFERENCES users(id),
+  disability_category VARCHAR(100),       -- e.g. "Autism", "SLD", "OHI"
+  placement VARCHAR(100),                 -- e.g. "General Ed + Resource", "Self-contained"
+  accommodations JSONB DEFAULT '[]',
+  goals JSONB DEFAULT '[]',               -- [{ area, goal, baseline, target, progress, notes }]
+  services JSONB DEFAULT '[]',            -- [{ type, minutes_per_week, provider }]
+  documents_url TEXT[],
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX idx_iep_learner ON iep_records(learner_id);
+CREATE INDEX idx_iep_review ON iep_records(review_date);
+
+-- Intervention tracking (new)
+CREATE TABLE interventions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  learner_id UUID NOT NULL REFERENCES learners(id),
+  type VARCHAR(50) NOT NULL,              -- "academic", "behavioral", "social_emotional", "speech"
+  tier INT NOT NULL DEFAULT 2,            -- RTI Tier 2 or 3
+  description TEXT,
+  start_date DATE NOT NULL,
+  end_date DATE,
+  status VARCHAR(50) DEFAULT 'active',    -- active, completed, discontinued
+  assigned_by UUID REFERENCES users(id),
+  progress_notes JSONB DEFAULT '[]',      -- [{ date, note, dataPoint }]
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX idx_interventions_learner ON interventions(learner_id);
+
+-- District notification preferences (new)
+CREATE TABLE district_settings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL UNIQUE REFERENCES tenants(id),
+  notification_prefs JSONB DEFAULT '{}',
+  sso_config JSONB DEFAULT '{}',          -- { provider, entityId, ssoUrl, certificate, enabled }
+  branding JSONB DEFAULT '{}',            -- { logoUrl, primaryColor, districtName }
+  feature_overrides JSONB DEFAULT '{}',   -- district-level feature toggles
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- District activity log (new — scoped audit trail)
+CREATE TABLE district_activity_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id),
+  action VARCHAR(100) NOT NULL,
+  actor_id UUID NOT NULL REFERENCES users(id),
+  actor_name VARCHAR(255),
+  resource_type VARCHAR(50) NOT NULL,
+  resource_id VARCHAR(255),
+  details JSONB,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX idx_district_activity_tenant ON district_activity_log(tenant_id, created_at DESC);
+
+-- Add school assignment to users (modify existing)
+ALTER TABLE users ADD COLUMN school_id UUID REFERENCES schools(id);
+
+-- Add school assignment to learners (modify existing)
+ALTER TABLE learners ADD COLUMN school_id UUID REFERENCES schools(id);
+```
+
+---
+
+### 5.2 Module: Enhanced Dashboard Overview
+
+**Route:** `/dashboard/district` (update `apps/web/src/app/dashboard/district/page.tsx`)
+
+#### 5.2.1 Metric Cards — Real Tenant-Scoped Data
+
+Replace current 4 cards with 6 smart cards, all calling `GET /api/district/stats`:
+
+| Card | Value | Trend | Icon |
+|---|---|---|---|
+| Active Learners | Count within tenant | `+N this week` | 🎓 |
+| Staff Members | Teachers + Therapists + Caregivers in tenant | `+N this month` | 👩‍🏫 |
+| Schools | Schools under this district | Total count | 🏫 |
+| Families | Parent accounts in tenant | `+N this month` | 👨‍👩‍👧 |
+| Active IEPs | Learners with active IEP records | IEPs due for review this month (amber warning) | 📋 |
+| Avg. Mastery Growth | Platform-computed mastery trend | `↑ X%` last 30 days | 📈 |
+
+#### 5.2.2 Alert Banner Section
+
+Show important notifications at top of dashboard:
+- 🔴 **IEP Reviews Due:** "5 IEP annual reviews due within 30 days" → link to `/dashboard/district/iep`
+- 🟡 **Sync Errors:** "Google Classroom sync failed 2 hours ago" → link to `/dashboard/district/integrations`
+- 🟡 **Usage Warning:** "85% of learner seats used" → link to `/dashboard/district/usage`
+- 🟢 **New enrollments:** "12 new learners enrolled this week"
+
+Data source: `GET /api/district/notifications?unread=true&limit=5`
+
+#### 5.2.3 Quick Actions Grid
+
+Keep existing 4 action cards but add 2 more:
+- **IEP Dashboard** — "Track IEP compliance, upcoming reviews, and goal progress" → `/dashboard/district/iep`
+- **Run Reports** — "Generate district-wide or school-level reports" → `/dashboard/district/analytics/reports`
+
+#### 5.2.4 School Performance Snapshot
+
+New section below action cards: mini-table of schools with key metrics:
+
+| School | Learners | Staff | Avg. Mastery | Active IEPs | Status |
+|---|---|---|---|---|---|
+| Lincoln Elementary | 145 | 12 | 67% | 23 | ✅ |
+| Washington Middle | 210 | 18 | 72% | 31 | ✅ |
+| Jefferson High | 95 | 8 | 58% | 15 | ⚠️ (below target) |
+
+Data source: `GET /api/district/schools?include=metrics`
+
+#### 5.2.5 Recent Activity Timeline
+
+Replace the current static learner table with a live activity feed:
+- "Dr. Smith invited as Teacher at Lincoln Elementary" — 2h ago
+- "Emily R. completed baseline assessment — classified as SUPPORTED" — 5h ago
+- "Google Classroom sync completed — 34 records updated" — 1d ago
+
+Data source: `GET /api/district/activity?limit=10`
+
+---
+
+### 5.3 Module: School Hierarchy Management
+
+**Routes:** `/dashboard/district/schools` (update) + `/dashboard/district/schools/[id]` (new) + `/dashboard/district/classrooms` (new)
+
+#### 5.3.1 Schools List Page — Complete Rebuild
+
+Replace current minimal tenant-card display with a full school management interface:
+
+**Header Actions:**
+- "Add School" button → opens Create School modal
+- Search bar → filter schools by name
+- View toggle: Card view / Table view
+
+**School Cards (Card View):**
+Each school card displays:
+- School name, address
+- Grade levels served (badges: `K-5`, `6-8`, `9-12`)
+- Enrollment: `145 / 200 capacity` with progress bar
+- Staff count
+- Active IEPs count
+- Average mastery score (colored indicator)
+- Principal name
+- Last sync date (from integrations)
+- Actions: View Details, Edit, Deactivate
+
+**Create School Modal:**
+- School name (required)
+- Address, city, state, zip
+- Grade levels served (multi-select)
+- Enrollment capacity
+- Principal name and email (optional — can assign later)
+- "Create School" → `POST /api/district/schools`
+
+#### 5.3.2 School Detail Page (New)
+
+**Route:** `/dashboard/district/schools/[id]`
+**File:** `apps/web/src/app/dashboard/district/schools/[id]/page.tsx`
+
+**Layout:** Tabbed interface within school context
+
+**Tab 1: Overview**
+- School info card (name, address, principal, contact)
+- 4 metric cards: Enrollment, Staff, Active IEPs, Avg Mastery
+- Enrollment trend chart (last 12 months)
+- Functioning level distribution bar chart (same as district analytics, but school-scoped)
+
+**Tab 2: Learners**
+- Paginated table of all learners enrolled at this school
+- Columns: Name, Grade, Functioning Level, IEP Status, Brain Status, Last Session
+- Filters: grade, functioning level, IEP status
+- Click → navigates to `/dashboard/district/learners/[id]`
+
+**Tab 3: Staff**
+- All staff assigned to this school
+- Columns: Name, Role, Classrooms, Caseload Size, Joined
+- "Assign Staff" button → modal to assign existing district staff to this school
+- "Invite New Staff" → opens invite flow
+
+**Tab 4: Classrooms**
+- List of classrooms at this school
+- Columns: Name, Grade, Teacher, Students Enrolled
+- "Create Classroom" → modal
+- Click classroom → view students + teacher
+
+**Tab 5: Performance**
+- School-level analytics: mastery by subject, engagement metrics, completion rates
+- Comparison to district average (visual bar comparison)
+
+#### 5.3.3 Classrooms Page (New)
+
+**Route:** `/dashboard/district/classrooms`
+
+- District-wide view of all classrooms across all schools
+- Filter by school, grade level, teacher
+- Show: classroom name, school, teacher, enrolled students, subject
+- Quick stats: total classrooms, avg class size, classes without assigned teacher
+
+---
+
+### 5.4 Module: Complete Staff Management
+
+**Routes:** `/dashboard/district/staff` (update) + `/dashboard/district/staff/[id]` (new)
+
+#### 5.4.1 Staff List Page — Rebuild
+
+Update `apps/web/src/app/dashboard/district/staff/page.tsx`:
+
+**Critical fix:** Replace `fetch("/api/admin/users?role=X")` with `fetch("/api/district/staff")` (tenant-scoped).
+
+**Enhancements:**
+
+| Feature | Current | Required |
+|---|---|---|
+| Data source | Platform-wide `/api/admin/users` | Tenant-scoped `/api/district/staff` |
+| Roles shown | TEACHER, THERAPIST, CAREGIVER | Add: SCHOOL_ADMIN (principal), SPED_COORDINATOR |
+| School column | ❌ None | Show assigned school(s) |
+| Caseload | ❌ None | Show number of learners in their caseload |
+| Invite flow | ❌ None | "Invite Staff" button → invite modal |
+| Pagination | ❌ None (loads all) | Server-side pagination |
+| Export | ❌ None | Export staff roster as CSV |
+| Bulk actions | ❌ None | Bulk assign to school, bulk role change |
+
+**Invite Staff Modal:**
+- Full name (required)
+- Email (required)
+- Role: select from TEACHER, THERAPIST, CAREGIVER, SCHOOL_ADMIN
+- School assignment (optional — select from district's schools)
+- "Send Invite" → `POST /api/district/staff` → creates user with temp password, sends welcome email via comms-svc
+- Result screen: shows temp credentials with "Copy" button + "These credentials will be sent via email"
+
+#### 5.4.2 Staff Profile Page (New)
+
+**Route:** `/dashboard/district/staff/[id]`
+**File:** `apps/web/src/app/dashboard/district/staff/[id]/page.tsx`
+
+**Sections:**
+1. **Profile Header** — Name, email, role badge, school assignment, joined date, status (active/inactive)
+2. **School & Classroom Assignments** — List of schools and classrooms assigned, with "Add Assignment" / "Remove" actions
+3. **Caseload** — List of learners in this staff member's caseload (for teachers: students in their classrooms; for therapists: learners they serve)
+4. **Learner Progress Summary** — Aggregate mastery/engagement data for their caseloaded learners
+5. **Session Activity** — Recent tutoring sessions involving their students
+6. **Professional Development** (P2) — Certifications, training history, PD hours logged
+7. **Admin Actions** — Edit profile, change school assignment, reset password, deactivate account
+
+---
+
+### 5.5 Module: Complete Learner Management
+
+**Routes:** `/dashboard/district/learners` (update) + `/dashboard/district/learners/[id]` (new)
+
+#### 5.5.1 Learner List Page — Rebuild
+
+Update `apps/web/src/app/dashboard/district/learners/page.tsx`:
+
+**Critical fix:** Replace `fetch("/api/admin/learners")` with `fetch("/api/district/learners")` (tenant-scoped).
+
+**Enhancements:**
+
+| Feature | Current | Required |
+|---|---|---|
+| Data source | Platform-wide `/api/admin/learners` | Tenant-scoped `/api/district/learners` |
+| Columns | Name, Grade, FL, Curriculum, Enrolled | Add: School, IEP Status, Brain Status, Parent, Last Active |
+| Filters | Name search only | Add: School, Grade, FL, IEP Status, Brain Status |
+| Pagination | Client-side | Server-side |
+| Learner link | ❌ None (rows are not clickable) | Click → `/dashboard/district/learners/[id]` |
+| Export | ❌ None | Export filtered list as CSV (de-identified option for FERPA) |
+| Bulk actions | ❌ None | Bulk assign to school, bulk export |
+
+**New Columns Detail:**
+
+| Column | Source | Display |
+|---|---|---|
+| School | `learners.school_id` → `schools.name` | School name badge |
+| IEP Status | `iep_records.status` WHERE `learner_id` | Badge: Active (green), Due for Review (amber), Expired (red), None (grey) |
+| Brain Status | `brain_states.status` WHERE `learner_id` | Badge: Active, Pending Review, Not Started |
+| Parent | `users` WHERE `id = learner.parentId` | Parent name (link) |
+| Last Active | Last session timestamp | Relative time ("2d ago") |
+
+#### 5.5.2 Learner Profile Page (New)
+
+**Route:** `/dashboard/district/learners/[id]`
+**File:** `apps/web/src/app/dashboard/district/learners/[id]/page.tsx`
+
+**Important:** District admins see an **administrative view** of the learner, NOT the parent's detailed brain view. They see progress data and IEP info, but not the full brain state configuration (that's the parent's domain per COPPA).
+
+**Tabbed Layout:**
+
+**Tab 1: Overview**
+- Learner header: name, age, grade, school, functioning level badge, brain status
+- Parent info card: parent name, email, contact
+- Team: assigned teacher(s), therapist(s), caregiver(s)
+- Quick metrics: total sessions, avg session length, mastery growth trend, days since last session
+
+**Tab 2: Progress & Mastery**
+- Mastery by subject area: bar chart comparing this learner to school average and district average
+- Mastery growth over time: line chart (last 30/60/90 days, selectable)
+- Session history: table of recent tutoring sessions (date, tutor, subject, duration, engagement score)
+- Subject strengths and gaps identified by AI
+
+**Tab 3: IEP**
+- If IEP exists: full IEP summary card
+  - Status badge, start date, annual review date, triennial re-eval date
+  - Disability category, placement type
+  - Goals list: each goal with current progress percentage, target, baseline
+  - Services: speech therapy X min/week, OT Y min/week, etc.
+  - Accommodations list
+  - Case manager info
+  - Document links
+- If no IEP: "No IEP record. This learner is in general education."
+- **Admin Actions:** "Add IEP Record" → form to create IEP entry, "Edit IEP" → update goals/services
+- **Compliance Alert:** If annual review date is within 30 days, show amber warning. If overdue, show red alert.
+
+**Tab 4: Accommodations**
+- Current AIVO accommodation settings (read-only for district admin):
+  - Read-aloud enabled, simplified UI, extended time, visual supports, etc.
+- How these were determined: link to brain state version + XAI explanation
+- District admin can add a note requesting an accommodation change (sent to parent for approval)
+
+**Tab 5: Interventions**
+- Active interventions for this learner
+- Each intervention: type, tier, start date, assigned by, progress notes timeline
+- "Add Intervention" → form to create new intervention record
+- "Log Progress Note" → add dated observation to existing intervention
+
+**Tab 6: Attendance & Engagement**
+- AIVO session attendance: days active in the last 30/60/90 days
+- Engagement patterns: time of day usage, session duration trends
+- Alerts: "No sessions in 14 days" → may need outreach
+
+---
+
+### 5.6 Module: Parents & Families (New)
+
+**Route:** `/dashboard/district/families`
+**File:** `apps/web/src/app/dashboard/district/families/page.tsx`
+
+- List all parent accounts within the district's tenant
+- Columns: Parent Name, Email, Learner(s), Joined Date, Last Active, Consent Status
+- Consent Status: shows whether COPPA parental consent is active for each linked learner
+- Search by name or email
+- Click parent → shows their linked learners (read-only, no access to parent's private data)
+- "Invite Family" → send invitation email to a parent to join the district and enroll their child
+- **Privacy boundary:** District admin can see parent's name/email and their learners' names, but CANNOT see the parent's portal content (messages to AIVO, brain review details, etc.)
+
+---
+
+### 5.7 Module: IEP Management Dashboard (New)
+
+**Route:** `/dashboard/district/iep`
+**File:** `apps/web/src/app/dashboard/district/iep/page.tsx`
+
+This is the **killer feature for enterprise district sales**. No competing platform offers integrated IEP tracking with AI-adaptive learning.
+
+#### 5.7.1 IEP Overview
+
+**Top-level stats:**
+- Total Active IEPs across district
+- Reviews Due This Month (amber if >0)
+- Overdue Reviews (red if >0)
+- Triennials Due This Year
+- Avg Goal Progress (% across all active goals)
+
+**Visual: IEP Calendar / Timeline**
+- Calendar or Gantt-style view showing upcoming review dates
+- Color-coded: green (>60 days), amber (30-60 days), red (<30 days / overdue)
+- Click date → shows learner name and review details
+
+#### 5.7.2 IEP Learner List
+
+- All learners with active IEP records
+- Columns: Learner, School, Grade, FL, Disability Category, IEP Status, Annual Review Date, Case Manager, Goal Progress
+- Filters: school, status (active/due/overdue), disability category
+- Sort by review date (soonest first is default — shows urgency)
+- Export: IEP compliance report CSV for state reporting
+
+#### 5.7.3 Goal Progress Tracking
+
+- For each learner's IEP, show goals with progress bars
+- Goals are entered by district admin or synced from external SIS
+- AI-generated suggestions: "Based on AIVO session data, Learner X has shown 15% mastery improvement in reading comprehension — consider updating IEP goal target from 70% to 85%"
+- Progress data populated from AIVO's actual mastery tracking (auto-linked to IEP goal areas)
+
+#### 5.7.4 IEP Compliance Report Generator
+
+- Select date range and scope (district-wide or per school)
+- Generate PDF report showing:
+  - Total IEPs, on-time vs late reviews
+  - Services delivered vs required
+  - Goal progress summaries
+  - Students approaching transition age (14+)
+- Download or email to admin
+
+---
+
+### 5.8 Module: Intervention Tracker (New)
+
+**Route:** `/dashboard/district/interventions`
+**File:** `apps/web/src/app/dashboard/district/interventions/page.tsx`
+
+#### 5.8.1 RTI/MTSS Dashboard
+
+Multi-Tiered System of Supports view:
+
+- **Tier 1** (Universal): All learners count, mastery data
+- **Tier 2** (Targeted): Learners receiving group interventions
+- **Tier 3** (Intensive): Learners receiving individualized interventions
+- Visual: pyramid or funnel showing tier distribution
+
+#### 5.8.2 Active Interventions List
+
+- Columns: Learner, School, Type (academic/behavioral/social-emotional/speech), Tier, Start Date, Weeks Active, Progress Trend, Assigned By
+- Filters: school, type, tier, status
+- Click → intervention detail with progress notes timeline
+- "Create Intervention" → form with learner selection, type, tier, description
+
+#### 5.8.3 Progress Monitoring
+
+- For each intervention: line chart of data points over time
+- Decision rules: if X data points below aim line → "Consider moving to Tier 3" alert
+- AIVO data integration: automatically populate data points from relevant mastery scores
+
+---
+
+### 5.9 Module: Analytics & Reports — Complete Rebuild
+
+**Routes:** `/dashboard/district/analytics` (update) + `/dashboard/district/analytics/compare` (new) + `/dashboard/district/analytics/reports` (new)
+
+#### 5.9.1 Analytics Overview — Rebuild
+
+Update `apps/web/src/app/dashboard/district/analytics/page.tsx`:
+
+**Critical fix:** Replace all `fetch("/api/admin/...")` calls with `fetch("/api/district/analytics/...")`.
+
+**Replace static "Quick Insights" cards** with real data-driven insights:
+
+**Time Range Selector:**
+- Last 7 days, Last 30 days, Last 90 days, This School Year, Custom Range
+- All charts respond to selected range
+- URL parameter: `?from=2025-09-01&to=2026-04-15`
+
+**Interactive Charts (using `recharts`):**
+
+1. **Engagement Over Time** — Line chart: daily active learners, sessions completed
+2. **Mastery by Subject** — Grouped bar chart: Math, Reading, Writing, Science, Social Studies, Life Skills — with district average line
+3. **Functioning Level Distribution** — Replace current basic bar chart with stacked area chart over time (shows how cohorts grow/shift)
+4. **Mastery Growth by FL** — Bar chart comparing mastery growth rate across the 5 functioning levels
+5. **Top Performing Subjects** — Ranked list with sparklines
+6. **Learners Needing Attention** — Table of learners with declining mastery or low engagement (auto-generated alert list)
+
+#### 5.9.2 School Comparison Page (New)
+
+**Route:** `/dashboard/district/analytics/compare`
+
+- Side-by-side or overlay comparison of 2-4 schools
+- Metrics: avg mastery, engagement rate, session completion, IEP compliance
+- Each metric shows bar chart with schools color-coded
+- Useful for board presentations and resource allocation decisions
+
+#### 5.9.3 Saved Reports / Report Builder (New)
+
+**Route:** `/dashboard/district/analytics/reports`
+
+**Pre-built Reports:**
+- **Board Presentation Report** — Executive summary with key metrics, charts, trends, exportable as PDF
+- **State Compliance Report** — IEP compliance, FERPA data handling, service delivery tracking
+- **School Performance Report** — Per-school breakdown of all metrics
+- **Special Education Report** — All IEP/intervention data, functioning level analysis, accommodation usage
+- **Engagement Report** — Session frequency, duration, tutors used, subject coverage
+
+**Each report:**
+- Date range selector
+- Scope: district-wide or per-school
+- Preview in browser
+- Download as PDF or CSV
+- Schedule: "Send this report every Monday to district-admins@fairfax.edu"
+
+---
+
+### 5.10 Module: Usage & Limits — Real Data
+
+**Route:** `/dashboard/district/usage` (update `apps/web/src/app/dashboard/district/usage/page.tsx`)
+
+**Critical fix:** Replace hardcoded limits with real subscription data.
+
+#### 5.10.1 Real Usage from Backend
+
+Replace current component with data from `GET /api/district/usage`:
+
+```typescript
+interface DistrictUsage {
+  users: { used: number; limit: number };
+  learners: { used: number; limit: number };
+  teachers: { used: number; limit: number };
+  schools: { used: number; limit: number };
+  storage: { usedMb: number; limitMb: number };
+  aiCalls: { used: number; limit: number; period: "daily" | "monthly" };
+  tutorSessions: { used: number; limit: number; period: "daily" | "monthly" };
+  integrations: { used: number; limit: number };
+}
+```
+
+Where limits come from: `tenants.settings.subscription.limits` (set by platform admin when creating/upgrading the district).
+
+#### 5.10.2 Usage Trend Chart
+
+- Line chart showing daily usage over last 30 days for key metrics (sessions, AI calls)
+- Horizontal line showing the limit
+- Visual alert when approaching limit (>80%)
+
+#### 5.10.3 Billing Summary (Read-Only)
+
+- Current plan name (e.g., "Enterprise — 500 Learner Seats")
+- Plan renewal date
+- Monthly cost (if visible to district admin)
+- "Contact Platform Admin to Upgrade" CTA
+
+---
+
+### 5.11 Module: District Settings — Full Build
+
+**Routes:** `/dashboard/district/settings` (update) + sub-pages (new)
+
+#### 5.11.1 Settings Overview — Persist Preferences
+
+Update `apps/web/src/app/dashboard/district/settings/page.tsx`:
+
+**Critical fix:** Replace client-side-only toggle state with persisted settings:
+- All toggles call `PUT /api/district/settings` on change
+- On page load, `GET /api/district/settings` populates current values
+- Toast notification: "Settings saved" on successful update
+
+**Add "Edit" capability for tenant info:**
+- District name → editable inline
+- Admin email → editable
+- Contact phone → new field
+
+#### 5.11.2 SSO Configuration (New)
+
+**Route:** `/dashboard/district/settings/sso`
+
+**Self-service SSO setup for SAML 2.0:**
+1. Select Identity Provider: Azure AD, Google Workspace, Okta, OneLogin, Custom SAML
+2. Configuration form:
+   - Entity ID / Issuer URL
+   - SSO Login URL
+   - Certificate (file upload or paste PEM)
+   - Email domain(s) to auto-route (e.g., `@fairfax.edu`)
+3. "Test Connection" → validates IdP metadata
+4. "Enable SSO" → activates for all users in the district
+5. Fallback: "Allow password login as backup" toggle
+6. **Backend:** `PUT /api/district/settings` with `sso_config` payload → stores encrypted cert in DB
+
+#### 5.11.3 Branding (New)
+
+**Route:** `/dashboard/district/settings/branding`
+
+- Upload district logo (displayed in learner/parent portals for this tenant)
+- Set primary accent color (replaces AIVO violet with district's brand color)
+- Set district display name (shown in headers and emails)
+- Preview: see how the parent portal would look with applied branding
+- **Backend:** Logo uploaded to storage bucket, URL stored in `district_settings.branding`
+
+#### 5.11.4 Notification Preferences (New)
+
+**Route:** `/dashboard/district/settings/notifications`
+
+Persisted notification settings for the district admin:
+
+| Notification | Default | Options |
+|---|---|---|
+| New enrollment alerts | ✅ On | Email, In-App, Both, Off |
+| IEP review due reminders | ✅ On | 30 days, 60 days, 90 days before |
+| Weekly performance digest | ✅ On | Monday / Friday, Email only |
+| Integration sync failures | ✅ On | Immediate email alert |
+| Usage limit warnings | ✅ On | At 80%, 90%, 100% threshold |
+| Staff invitation accepted | ✅ On | Email, In-App |
+| Learner inactivity alert | ✅ On | After 7 / 14 / 30 days of no sessions |
+
+All saved to `district_settings.notification_prefs` via `PUT /api/district/settings`.
+
+---
+
+### 5.12 Module: Activity Log (New)
+
+**Route:** `/dashboard/district/activity`
+**File:** `apps/web/src/app/dashboard/district/activity/page.tsx`
+
+District-scoped audit trail of all actions within the tenant:
+
+**Actions Logged:**
+- Staff invited, staff deactivated
+- School created, school updated
+- Learner enrolled (via integration sync or manual)
+- IEP record created/updated
+- Intervention created
+- Settings changed (SSO, branding, preferences)
+- Integration connected/disconnected/synced
+- Report generated/exported
+
+**UI:**
+- Chronological list with infinite scroll
+- Filters: by action type, by actor, by date range
+- Each entry: action badge, actor name, description, timestamp
+- Expandable to show `details` JSON
+
+**Data source:** `GET /api/district/activity?limit=50&page=1`
+
+---
+
+### 5.13 Module: Curriculum & Standards (New — P2)
+
+**Route:** `/dashboard/district/curriculum`
+
+- View and configure which curriculum frameworks are used across the district
+- Map AIVO's learning domains to district/state standards (e.g., Common Core, NGSS, state-specific)
+- Show mastery data aligned to these standards
+- Useful for curriculum directors planning PD and resource allocation
+
+---
+
+### 5.14 Module: Notification Center (New)
+
+**Route:** `/dashboard/district/notifications`
+
+- Central inbox for all district admin notifications
+- Unread count shown as badge on sidebar nav
+- Notification types: IEP reminders, sync alerts, usage warnings, enrollment notifications, system announcements
+- Mark as read, mark all read, snooze
+- Each notification links to relevant page
+
+**Also add to DashboardHeader:** notification bell icon with unread count badge.
+
+---
+
+## 6. Frontend Migration Plan
+
+### 6.1 API Call Replacement Map
+
+Every district page must be migrated from platform-wide APIs to district-scoped APIs:
+
+| Page | Current API Calls | Replace With |
+|---|---|---|
+| Dashboard (`page.tsx`) | `/api/admin/tenants`, `/api/admin/stats`, `/api/admin/learners` | `/api/district/tenant`, `/api/district/stats`, `/api/district/learners?limit=5` |
+| Schools (`schools/page.tsx`) | `/api/admin/tenants` (filtered client-side) | `/api/district/schools` |
+| Learners (`learners/page.tsx`) | `/api/admin/learners` | `/api/district/learners?page=1&pageSize=15` |
+| Staff (`staff/page.tsx`) | `/api/admin/users?role=TEACHER` × 3 | `/api/district/staff` |
+| Analytics (`analytics/page.tsx`) | `/api/admin/stats`, `/api/admin/learners` | `/api/district/analytics/engagement`, `/api/district/analytics/mastery`, `/api/district/analytics/cohorts` |
+| Usage (`usage/page.tsx`) | `/api/admin/stats` | `/api/district/usage` |
+| Settings (`settings/page.tsx`) | `/api/admin/tenants` | `/api/district/tenant`, `/api/district/settings` |
+| Integrations | Already uses `/api/integrations/*` with `tenantId` | ✅ No change needed |
+
+---
+
+## 7. Non-Functional Requirements
+
+### 7.1 Performance
+
+| Requirement | Target |
+|---|---|
+| Dashboard first contentful paint | < 2s |
+| Learner list with 500 records | < 1s (server-side paginated) |
+| Analytics charts render | < 3s with 1000+ learner dataset |
+| Report PDF generation | < 15s for district-wide report |
+| Search results | < 500ms |
+
+### 7.2 Security
+
+| Requirement | Implementation |
+|---|---|
+| Tenant data isolation | Server-side `WHERE tenantId = ?` on EVERY query — zero client-side filtering |
+| JWT tenant claim validation | Backend verifies `tenantId` in JWT matches the requested data scope |
+| FERPA compliance | All data exports are de-identifiable; student PII protected |
+| COPPA compliance | District admin cannot see parent-child private conversations or brain review content |
+| Session management | District admin sessions expire after 8 hours of inactivity |
+| Rate limiting | 60 req/min per district admin |
+| Audit logging | All district admin write actions logged to `district_activity_log` |
+
+### 7.3 Accessibility
+
+| Requirement | Standard |
+|---|---|
+| WCAG 2.1 AA compliance | All pages |
+| Keyboard navigation | Complete — all actions, modals, tabs, filters |
+| Screen reader support | Proper headings hierarchy, table captions, ARIA labels |
+| Color contrast | 4.5:1 minimum for text, 3:1 for large text and UI components |
+| Focus management | Modal focus trap, skip links (already exists in layout) |
+| Reduced motion | Respect `prefers-reduced-motion` for all animations |
+| Existing compliance | Maintain `SkipLink`, `aria-label`, `aria-current`, `role="navigation"` from layout |
+
+### 7.4 Internationalization
+
+| Requirement | Implementation |
+|---|---|
+| All text uses `next-intl` | ✅ Existing — uses `useTranslations("districtAdmin")` |
+| New pages follow same pattern | All new strings added to `districtAdmin` namespace |
+| Date/time formatting | Use `next-intl` formatters, respect locale |
+| Number formatting | Use `Intl.NumberFormat` for enrollment counts, percentages |
+
+### 7.5 Neurodiverse-Friendly UX
+
+The district panel serves administrators who manage learners with diverse needs. The panel itself should be exemplary:
+
+| Guideline | Implementation |
+|---|---|
+| Clear visual hierarchy | Consistent heading sizes, predictable layout patterns |
+| Minimal cognitive load | Progressive disclosure — summary views first, detail on click |
+| Consistent navigation | Same sidebar structure across all pages, breadcrumbs for drill-down |
+| Status indicators | Always use both color AND icon/text (never color-alone for status) |
+| Data density control | Toggle between summary/detailed views |
+| Predictable interactions | Same patterns for tables, filters, modals across all pages |
+| Loading states | Skeleton placeholders for all async content (already used consistently) |
+
+---
+
+## 8. Implementation Phases
+
+### Phase 1: Security Foundation — Tenant Isolation (Weeks 1–2) — P0
+
+| Task | Type | Files |
+|---|---|---|
+| Create `services/identity-svc/src/routes/district.ts` with tenant-scoped middleware | Backend | New file |
+| Implement `GET /api/district/stats` (tenant-scoped) | Backend | `district.ts` |
+| Implement `GET /api/district/tenant` | Backend | `district.ts` |
+| Implement `GET /api/district/learners` (tenant-scoped, server-paginated) | Backend | `district.ts` |
+| Implement `GET /api/district/staff` (tenant-scoped) | Backend | `district.ts` |
+| Create `schools` table + Drizzle schema | Backend | `packages/db/` |
+| Implement `GET/POST /api/district/schools` | Backend | `district.ts` |
+| Migrate Dashboard page to `/api/district/*` endpoints | Frontend | `page.tsx` |
+| Migrate Learners page to `/api/district/learners` | Frontend | `learners/page.tsx` |
+| Migrate Staff page to `/api/district/staff` | Frontend | `staff/page.tsx` |
+| Migrate Analytics page to `/api/district/analytics/*` | Frontend | `analytics/page.tsx` |
+| Migrate Schools page to `/api/district/schools` | Frontend | `schools/page.tsx` |
+| Migrate Settings page to `/api/district/tenant` + `/api/district/settings` | Frontend | `settings/page.tsx` |
+| Migrate Usage page to `/api/district/usage` | Frontend | `usage/page.tsx` |
+| Write integration tests verifying tenant isolation | Test | New test files |
+
+### Phase 2: School Hierarchy + Staff Lifecycle (Weeks 3–4) — P0
+
+| Task | Type | Files |
+|---|---|---|
+| Create `classrooms`, `classroom_enrollments`, `staff_assignments` tables | Backend | `packages/db/` |
+| Implement `GET /api/district/schools/:id` (full detail) | Backend | `district.ts` |
+| Implement `PUT /api/district/schools/:id` | Backend | `district.ts` |
+| Implement `POST /api/district/staff` (invite flow) | Backend | `district.ts` |
+| Implement `GET /api/district/staff/:id` (profile) | Backend | `district.ts` |
+| Implement `PUT/DELETE /api/district/staff/:id` | Backend | `district.ts` |
+| Build School Detail page (`/dashboard/district/schools/[id]`) | Frontend | New file |
+| Build Create School modal | Frontend | `schools/page.tsx` |
+| Enhance Staff page with invite flow, school column, pagination | Frontend | `staff/page.tsx` |
+| Build Staff Profile page (`/dashboard/district/staff/[id]`) | Frontend | New file |
+| Build Classrooms page (`/dashboard/district/classrooms`) | Frontend | New file |
+| Implement `GET /api/district/families` | Backend | `district.ts` |
+| Build Families page (`/dashboard/district/families`) | Frontend | New file |
+
+### Phase 3: Learner Profiles + IEP System (Weeks 5–7) — P0
+
+| Task | Type | Files |
+|---|---|---|
+| Create `iep_records`, `interventions` tables | Backend | `packages/db/` |
+| Implement `GET /api/district/learners/:id` (full profile) | Backend | `district.ts` |
+| Implement `GET /api/district/iep/summary` | Backend | `district.ts` |
+| Implement `GET /api/district/iep/learners` | Backend | `district.ts` |
+| Implement IEP CRUD: `POST/PUT /api/district/iep` | Backend | `district.ts` |
+| Implement `GET /api/district/interventions` + CRUD | Backend | `district.ts` |
+| Build Learner Profile page (`/dashboard/district/learners/[id]`) — all 6 tabs | Frontend | New file |
+| Enhance Learners list with IEP status, school, brain status columns | Frontend | `learners/page.tsx` |
+| Build IEP Management Dashboard (`/dashboard/district/iep`) | Frontend | New file |
+| Build Intervention Tracker (`/dashboard/district/interventions`) | Frontend | New file |
+
+### Phase 4: Analytics, Reports & Settings (Weeks 8–10) — P1
+
+| Task | Type | Files |
+|---|---|---|
+| Implement `GET /api/district/analytics/engagement` (tenant-scoped, time-ranged) | Backend | `district.ts` or research-svc |
+| Implement `GET /api/district/analytics/mastery` (tenant-scoped) | Backend | Same |
+| Implement `GET /api/district/analytics/compare` (school comparison) | Backend | Same |
+| Implement `GET /api/district/analytics/export` (PDF/CSV) | Backend | Same |
+| Install recharts, rebuild Analytics page with interactive charts | Frontend | `analytics/page.tsx` |
+| Build School Comparison page (`/analytics/compare`) | Frontend | New file |
+| Build Saved Reports page (`/analytics/reports`) | Frontend | New file |
+| Implement real `GET /api/district/usage` from subscription data | Backend | `district.ts` |
+| Rebuild Usage page with real limits | Frontend | `usage/page.tsx` |
+| Implement `GET/PUT /api/district/settings` (persist preferences) | Backend | `district.ts` |
+| Rebuild Settings page — editable fields, persisted toggles | Frontend | `settings/page.tsx` |
+| Create `district_settings` table | Backend | `packages/db/` |
+| Build SSO Configuration page | Frontend | `settings/sso/page.tsx` |
+| Build Branding page | Frontend | `settings/branding/page.tsx` |
+| Build Notification Preferences page | Frontend | `settings/notifications/page.tsx` |
+| Build Activity Log page | Frontend | `activity/page.tsx` |
+| Build Notification Center page | Frontend | `notifications/page.tsx` |
+
+### Phase 5: Polish, Compliance & P2 Features (Weeks 11–12) — P2
+
+| Task | Type | Files |
+|---|---|---|
+| Dashboard alert banner system | Frontend | `page.tsx` |
+| Notification bell in DashboardHeader | Frontend | `DashboardHeader.tsx` |
+| IEP compliance report generator (PDF) | Backend + Frontend | `iep/` |
+| Curriculum & Standards page | Frontend | `curriculum/page.tsx` |
+| Integration enhancements: scheduled sync, field mapping | Frontend + Backend | `integrations/` |
+| Full a11y audit and fix pass on all district pages | Frontend | All pages |
+| Add all new i18n keys to locale files | Frontend | `messages/*.json` |
+| Playwright a11y + e2e tests for critical district flows | Test | New test files |
+| Performance testing with 1000+ learner dataset | Test | Load testing |
+
+---
+
+## 9. Testing Strategy
+
+### 9.1 Tenant Isolation Tests (Critical)
+
+```typescript
+// Test: District admin A cannot see District B's data
+describe("Tenant Isolation", () => {
+  it("GET /api/district/learners returns only own tenant's learners", async () => {
+    // Setup: Create 2 districts, each with learners
+    // Act: District A admin calls GET /api/district/learners
+    // Assert: Only District A's learners returned
+    // Assert: District B's learners NOT in response
+  });
+
+  it("GET /api/district/staff returns only own tenant's staff", async () => { ... });
+  it("GET /api/district/schools returns only own district's schools", async () => { ... });
+  it("District admin cannot access another district's learner by ID", async () => { ... });
+  it("District admin cannot modify another district's school", async () => { ... });
+});
+```
+
+### 9.2 Frontend Tests
+
+| Layer | Tool | Coverage |
+|---|---|---|
+| Component tests | React Testing Library | All new components, modals, forms |
+| a11y tests | Playwright + axe-core | Every district route |
+| E2E critical flows | Playwright | Invite staff → assign to school → view caseload |
+| E2E IEP flow | Playwright | Create IEP → add goals → track progress → generate report |
+
+### 9.3 Acceptance Criteria
+
+Each module is complete when:
+1. All API calls are tenant-scoped — zero platform-wide data leakage
+2. All data comes from real APIs — zero hardcoded/mock data
+3. Settings changes persist across page refreshes
+4. Page passes axe-core with zero WCAG AA violations
+5. All text uses `next-intl` translation keys
+6. Playwright test exists and passes
+
+---
+
+## 10. Risk Assessment
+
+| Risk | Likelihood | Impact | Mitigation |
+|---|---|---|---|
+| Tenant isolation bypass via API manipulation | Low (if implemented correctly) | Critical | Backend-enforced scoping on every query; integration tests; security review |
+| Performance with large districts (5000+ learners) | Medium | High | Server-side pagination everywhere; database indexes; materialized views for analytics |
+| IEP data sensitivity (PII + medical) | High | Critical | Field-level encryption for disability categories; strict FERPA handling; audit logging |
+| SSO configuration complexity | Medium | Medium | Pre-built IdP templates (Azure AD, Google); step-by-step wizard; "Test Connection" before activation |
+| Report generation timeout for large datasets | Medium | Medium | Async report generation with progress indicator; pre-computed analytics views |
+| Integration sync creates duplicate learners | Medium | High | Deduplication logic in sync handler; merge UI for district admin to resolve conflicts |
+| District admins expecting real-time data | Low | Medium | Clear "last updated" timestamps; polling for analytics (not websocket) |
+
+---
+
+## 11. Dependencies
+
+| Dependency | Owner | Required By |
+|---|---|---|
+| `comms-svc` email sending for staff invitations | Backend | Phase 2 (staff invite) |
+| `research-svc` tenant-scoped analytics endpoints | Backend | Phase 4 (analytics) |
+| `brain-svc` mastery data per learner | Backend | Phase 3 (learner profiles) |
+| PDF generation library (e.g., `@react-pdf/renderer` or `puppeteer`) | Frontend/Backend | Phase 5 (IEP reports) |
+| `recharts` npm package | Frontend | Phase 4 (analytics charts) |
+| Storage bucket for branding logos | DevOps | Phase 4 (branding) |
+| SAML library (e.g., `passport-saml` or `@node-saml/node-saml`) | Backend | Phase 4 (SSO) |
+| `integrations-svc` scheduled sync capability | Backend | Phase 5 (integration enhancements) |
+
+---
+
+## 12. API Endpoint Summary
+
+### 12.1 Complete District API Surface
+
+| Method | Endpoint | Phase | Description |
+|---|---|---|---|
+| GET | `/api/district/stats` | 1 | Dashboard metrics (tenant-scoped) |
+| GET | `/api/district/tenant` | 1 | Current tenant info + subscription |
+| GET | `/api/district/schools` | 1 | List schools in district |
+| POST | `/api/district/schools` | 2 | Create school |
+| GET | `/api/district/schools/:id` | 2 | School detail + metrics |
+| PUT | `/api/district/schools/:id` | 2 | Update school |
+| GET | `/api/district/classrooms` | 2 | List classrooms |
+| POST | `/api/district/classrooms` | 2 | Create classroom |
+| GET | `/api/district/learners` | 1 | List learners (paginated, filtered) |
+| GET | `/api/district/learners/:id` | 3 | Learner profile |
+| GET | `/api/district/staff` | 1 | List staff (paginated, filtered) |
+| POST | `/api/district/staff` | 2 | Invite staff |
+| GET | `/api/district/staff/:id` | 2 | Staff profile |
+| PUT | `/api/district/staff/:id` | 2 | Update staff |
+| DELETE | `/api/district/staff/:id` | 2 | Offboard staff |
+| GET | `/api/district/families` | 2 | List parent accounts |
+| POST | `/api/district/families/invite` | 2 | Invite a family |
+| GET | `/api/district/iep/summary` | 3 | IEP overview stats |
+| GET | `/api/district/iep/learners` | 3 | Learners with IEP data |
+| POST | `/api/district/iep` | 3 | Create IEP record |
+| PUT | `/api/district/iep/:id` | 3 | Update IEP record |
+| GET | `/api/district/interventions` | 3 | List interventions |
+| POST | `/api/district/interventions` | 3 | Create intervention |
+| PUT | `/api/district/interventions/:id` | 3 | Update intervention |
+| POST | `/api/district/interventions/:id/notes` | 3 | Add progress note |
+| GET | `/api/district/analytics/engagement` | 4 | Engagement metrics |
+| GET | `/api/district/analytics/mastery` | 4 | Mastery data |
+| GET | `/api/district/analytics/cohorts` | 4 | FL distribution |
+| GET | `/api/district/analytics/compare` | 4 | School comparison |
+| GET | `/api/district/analytics/export` | 4 | Report download |
+| GET | `/api/district/usage` | 4 | Real usage vs limits |
+| GET | `/api/district/settings` | 4 | District preferences |
+| PUT | `/api/district/settings` | 4 | Update preferences |
+| GET | `/api/district/activity` | 4 | Activity log |
+| GET | `/api/district/notifications` | 5 | Notification inbox |
+| PUT | `/api/district/notifications/:id/read` | 5 | Mark notification read |
+
+**Total: 34 new endpoints** (replacing 7 platform-wide calls that currently leak cross-tenant data).
+
+---
+
+## 13. Glossary
+
+| Term | Definition |
+|---|---|
+| **Tenant** | Organizational unit in AIVO — for districts, type = `B2B_DISTRICT` |
+| **School** | A child entity under a district tenant — represents a physical school building |
+| **Classroom** | A grouping within a school — has a teacher, grade level, enrolled learners |
+| **IEP** | Individualized Education Program — federal mandate for students with disabilities |
+| **Triennial** | Every 3 years, students with IEPs must be re-evaluated |
+| **RTI/MTSS** | Response to Intervention / Multi-Tiered System of Supports — framework for identifying and supporting struggling learners |
+| **Functioning Level** | AIVO's 5-tier classification: Standard, Supported, Low Verbal, Non-Verbal, Pre-Symbolic |
+| **Brain Clone** | AIVO's adaptive learning profile per learner |
+| **Caseload** | The set of learners assigned to a specific teacher, therapist, or caregiver |
+| **AYP** | Adequate Yearly Progress — state-mandated academic growth metric |
+| **SIS** | Student Information System — district's existing student database (PowerSchool, Infinite Campus, etc.) |
+| **Roster Sync** | Automatic import of students, teachers, and classes from SIS via integrations (Clever, ClassLink, etc.) |
+
+---
+
+*This PRD is a living document. Update version number and date with each revision. All feature specifications are subject to design review, security review, and technical feasibility assessment before implementation begins. Phase 1 (tenant isolation) is a hard prerequisite for all subsequent phases.*

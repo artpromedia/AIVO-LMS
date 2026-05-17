@@ -1,0 +1,177 @@
+🟢 SPRINT 7 — Production Readiness & Polish
+Priority: NORMAL — Final items for market launch
+Estimated effort: 3–5 days
+
+Prompt 7.1 — eslint-plugin-jsx-a11y Integration
+Code
+docs/launch-readiness.md line 51 lists "eslint-plugin-jsx-a11y integration in web app"
+as a remaining item. The accessibility guidelines reference it but it's not in the
+ESLint config.
+
+Files to modify:
+- apps/web/package.json (add dependency)
+- eslint.config.mjs or apps/web/.eslintrc.* (add plugin)
+
+Task:
+1. Install eslint-plugin-jsx-a11y as a devDependency.
+2. Add the plugin to the web app's ESLint configuration with recommended rules.
+3. Run pnpm lint and fix any new violations. Document any rules that need to be
+   disabled with justification.
+4. Ensure CI lint step (now blocking from Sprint 2) catches a11y violations.
+
+Acceptance criteria:
+- eslint-plugin-jsx-a11y in devDependencies.
+- pnpm lint includes a11y rules.
+- Zero a11y lint violations (or documented exceptions).
+Prompt 7.2 — Observability & Health Monitoring
+Code
+Services have /health endpoints but there's no structured observability beyond
+Langfuse for AI calls. Production needs structured logging, health check aggregation,
+and metric dashboards.
+
+Files to check/modify:
+- packages/observability/ (if exists)
+- services/status-page-svc/src/routes/status.ts
+
+Task:
+1. Health check service: The status-page-svc already pings all services. Add:
+   - Response time tracking and threshold alerts
+   - If health check takes >2s, log a warning
+   - If service down for >3 consecutive checks, call comms-svc to alert admins
+
+2. Structured logging: Verify all services use @aivo/observability logger. Add:
+   - Generate x-request-id header at API gateway (identity-svc)
+   - Propagate through all inter-service calls
+   - Include in all log entries for distributed tracing
+
+3. Key metrics to log (structured JSON):
+   - AI generation latency (prompt → response)
+   - Quality gate pass/fail rate
+   - Session start/complete ratio (abandonment rate)
+   - Mastery score distribution per functioning level
+
+Acceptance criteria:
+- All services log with request ID correlation.
+- Status page shows response times.
+- Slow/down services trigger admin alerts.
+- AI metrics logged in structured format.
+Prompt 7.3 — Integration Connectors Completion
+Code
+services/integrations-svc/src/routes/connectors.ts lines 56 and 67 show two
+connectors marked as "coming soon":
+- Schoology / PowerSchool Learning
+- Direct PowerSchool SIS
+
+File to modify: services/integrations-svc/src/routes/connectors.ts
+
+Task:
+1. For "coming soon" connectors, add proper status: "coming_soon" field to the
+   connector metadata instead of putting it in the description string.
+2. Add a POST /api/integrations/waitlist endpoint where districts can register
+   interest in a specific connector:
+   { "connectorId": "powerschool_sis", "districtId": "...", "contactEmail": "..." }
+3. Store waitlist entries in a simple table or JSON file.
+4. Update the district integrations UI to show a "Notify me when available" button
+   for coming-soon connectors instead of the connect button.
+
+Acceptance criteria:
+- Coming-soon connectors clearly marked with status field.
+- Waitlist endpoint collects interest.
+- UI shows appropriate CTA for unavailable connectors.
+Prompt 7.4 — End-to-End Smoke Test Suite
+Code
+Only 3 a11y test files exist. No E2E tests verify the core user flows work together.
+
+Files to create:
+- apps/web/tests/e2e/parent-onboarding.spec.ts
+- apps/web/tests/e2e/learner-session.spec.ts
+- apps/web/tests/e2e/brain-review.spec.ts
+
+Task:
+1. Parent onboarding E2E:
+   - Sign up as parent
+   - Add a learner (name, grade, functioning level)
+   - Verify learner appears on dashboard
+   - Navigate to learner detail pages
+
+2. Learner session E2E:
+   - Start a tutor session (with mocked AI response)
+   - Send a message, receive response
+   - Complete session
+   - Verify gradebook updated
+
+3. Brain review E2E:
+   - Navigate to brain review page
+   - Verify XAI explanation sections load
+   - Modify an accommodation
+   - Approve the brain clone
+   - Verify status changes to "approved"
+
+4. Add to the e2e-module-gate.yml workflow.
+
+Acceptance criteria:
+- 3 E2E test files, each with ≥3 test cases.
+- Tests run against a local dev stack (or with API mocks).
+- Tests pass in CI.
+Prompt 7.5 — Documentation Audit & Launch Checklist Update
+Code
+docs/launch-readiness.md hasn't been updated since the initial accessibility pass.
+Multiple sprints of work need to be reflected.
+
+Files to modify: docs/launch-readiness.md
+Files to create:
+- docs/architecture-overview.md
+- docs/api-reference.md (or verify Swagger UI works)
+
+Task:
+1. Update launch readiness checklist with all sprint items:
+   Sprint 1: Multi-tenant, safety gate, CORS
+   Sprint 2: CI blocking, test coverage
+   Sprint 3: Content moderation pipeline
+   Sprint 4: Adaptive learning paths
+   Sprint 5: Parent dashboard pages
+   Sprint 6: Security hardening
+   Sprint 7: This sprint's items
+
+2. Architecture overview: A single-page document showing:
+   - Service diagram (text-based, e.g., Mermaid)
+   - Data flow: Parent → Identity → Brain → AI → Tutor → Learner
+   - Key design decisions (Brain Clone, 5-tier functioning levels, XAI)
+
+3. API reference: Verify Swagger UI or create consolidated API reference doc.
+
+4. COPPA Safe Harbor verification note: Add a task to verify the marketing claim
+   is accurate. If not yet enrolled, add enrollment as a pre-launch requirement.
+
+Acceptance criteria:
+- Launch readiness checklist reflects current state.
+- Architecture overview document exists.
+- API reference is accessible.
+- Safe Harbor claim verified or flagged as pre-launch requirement.
+Prompt 7.6 — Mobile App Parity Check
+Code
+The mobile app (apps/mobile/) has hooks for brain, sensory, tutors, etc. but the
+completeness relative to the web app is unclear.
+
+This is an audit task, not a code task.
+
+Task:
+1. Compare mobile app screens against web app routes:
+
+   | Web Route            | Mobile Screen | Status |
+   |----------------------|--------------|--------|
+   | Parent dashboard     | ?            | ?      |
+   | Brain profile        | ?            | ?      |
+   | Brain review         | ?            | ?      |
+   | IEP tracking         | ?            | ?      |
+   | Sensory settings     | ?            | ?      |
+   | Tutor session        | ?            | ?      |
+   | Learner lesson stage | ?            | ?      |
+   | Discovery Adventure  | ?            | ?      |
+
+2. For each missing screen, create a ticket/issue describing what needs to be built.
+3. Document the findings in docs/mobile-parity.md.
+
+Acceptance criteria:
+- Parity matrix documented.
+- Missing screens identified with ticket references.

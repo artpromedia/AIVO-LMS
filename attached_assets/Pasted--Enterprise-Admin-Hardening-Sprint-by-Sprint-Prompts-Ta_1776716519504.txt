@@ -1,0 +1,612 @@
+# Enterprise Admin Hardening — Sprint-by-Sprint Prompts
+
+> Target repo: `artpromedia/aivo-ai-learning`
+> Scope: Super Admin (`PLATFORM_ADMIN`) and District Admin (`DISTRICT_ADMIN`) consoles + supporting services (`identity-svc`, `admin-svc`, `packages/db`, `packages/security`, `apps/web`).
+> Each sprint is a **self-contained prompt** that can be pasted into a coding agent. Prompts assume no prior context.
+> Reference audit findings are tagged inline (A1, B1, C3, …) and map to `docs/audits/admin-enterprise-audit.md`.
+
+---
+
+## Sprint 0 — Pre-flight (1 day)
+
+### Prompt 0.1 — Baseline & Feature Flags
+```
+You are working in the monorepo `artpromedia/aivo-ai-learning` (pnpm + turbo).
+
+Create a shared feature-flag module at `packages/security/src/flags.ts` exporting:
+  ADMIN_ENTERPRISE = {
+    STRONG_MFA: env("ADMIN_STRONG_MFA", false),
+    STEP_UP_AUTH: env("ADMIN_STEP_UP", false),
+    DISTRICT_SSO: env("DISTRICT_SSO", false),
+    AUDIT_IMMUTABLE: env("ADMIN_AUDIT_IMMUTABLE", false),
+    ADMIN_SESSION_IDLE: env("ADMIN_SESSION_IDLE_MIN", 240),
+  }
+
+Add Vitest coverage. Wire the flags into `identity-svc` and `admin-svc` bootstrap logs
+(print the resolved values at startup for ops visibility).
+
+Update `.env.example` with all new variables. Do NOT change any existing behavior —
+all flags default OFF so subsequent sprints can land behind gates.
+```
+
+---
+
+## Sprint 1 — Split Admin & District Auth Surfaces (1 week) · Findings A1, A2, E1, E2
+
+### Prompt 1.1 — Dedicated District Admin Login Page
+```
+Goal: District admins must no longer land on the consumer `/login` page.
+
+1. Create `apps/web/src/app/district/login/page.tsx`. Use the visual language of
+   `apps/web/src/app/admin/login/page.tsx` (dark panel, AIVO logo + "District" kicker)
+   but with the violet district palette.
+
+2. The form posts to a NEW endpoint `POST /api/auth/district-login` (add to
+   `services/identity-svc/src/routes/auth.ts`). That endpoint:
+   - Accepts `{ email, password }` OR `{ samlResponse }` (future — stub for now).
+   - Only allows roles in `DISTRICT_ROLES = ["DISTRICT_ADMIN", "PLATFORM_ADMIN"]`.
+   - Enforces MFA exactly like `/api/auth/admin-login`.
+   - On success, returns the same payload shape (`user`, `accessToken`, or `mfaPending`).
+
+3. Update `apps/web/src/app/dashboard/district/layout.tsx` so that
+   unauthenticated users are pushed to `/district/login` (not `/login`).
+
+4. Hide from the consumer login: remove any "District Admin" role affordances
+   from `apps/web/src/app/login/page.tsx` and `apps/web/src/app/signup/page.tsx`.
+
+5. Add Playwright e2e at `e2e/tests/district-login.spec.ts` covering:
+   - District admin logs in, sees MFA prompt, completes it, lands on `/dashboard/district`.
+   - Consumer `/login` rejects a DISTRICT_ADMIN account with a "Use district.aivolearning.com" notice.
+
+Do not modify the consumer auth-provider shape.
+```
+
+### Prompt 1.2 — Edge Middleware for Admin/District Routes
+```
+Next.js middleware (absent today) must enforce RBAC before SSR.
+
+1. Create `apps/web/src/middleware.ts`.
+2. For request paths matching `/dashboard/admin/**` OR `/admin/**`:
+   - If no `refreshToken` cookie, 302 → `/admin/login?returnTo=<path>`.
+   - Decode the JWT in the `accessToken` header (pass-through from the
+     `auth-provider`) — if absent, fall through to client redirect.
+3. For `/dashboard/district/**` OR `/district/**`:
+   - Redirect to `/district/login` if unauthenticated.
+4. Block `/admin/login` and `/dashboard/admin/**` from being served on
+   `app.aivolearning.com` by checking `req.headers.host`. Allow-list:
+     admin console   → admin.aivolearning.com + localhost
+     district console → district.aivolearning.com + admin.aivolearning.com + localhost
+5. Add unit tests using `next/experimental/testmode` for middleware.
+6. Update `infra/k8s/overlays/hetzner/web-ingress.yaml` to add a
+   ModSecurity annotation blocking non-allowlisted hosts at the edge as defense-in-depth.
+
+Ship behind no flag — this is pure redirect hardening.
+```
+
+### Prompt 1.3 — Split into Dedicated Next.js Apps (optional, behind flag)
+```
+Create two new turborepo apps that re-export the admin and district surfaces:
+
+  apps/admin-web     → only /admin/login + /dashboard/admin/** + /verify-mfa
+  apps/district-web  → only /district/login + /dashboard/district/** + /verify-mfa
+
+Both apps share `@aivo/ui`, `@aivo/brand`, and the existing auth-provider via
+a new `packages/auth-client` package. Update `pnpm-workspace.yaml`,
+`turbo.json`, `infra/k8s/overlays/hetzner/web-ingress.yaml` to point
+admin.aivolearning.com → web-platform-admin (new) and
+district.aivolearning.com → web-district (new).
+
+Keep the routes inside `apps/web` for one release cycle (dual-serve) so we
+can roll back. Behind ADMIN_ENTERPRISE.SPLIT_APPS flag.
+```
+
+---
+
+## Sprint 2 — Phishing-Resistant MFA (1.5 weeks) · Findings B1, B2, B6, B7, B9
+
+### Prompt 2.1 — TOTP Authenticator App Support
+```
+Extend MFA from email-only to email + TOTP.
+
+1. In `packages/db/src/schema/users.ts`:
+   - Widen `mfaMethod` enum to `'email' | 'totp' | 'webauthn'`.
+   - Add `mfaSecret TEXT` (nullable, stores encrypted TOTP seed).
+   - Add migration in `packages/db/drizzle/`.
+
+2. Add `packages/security/src/totp.ts` using `otpauth` (npm). Functions:
+   - `generateTotpSecret()` → { secret, otpauthUrl }
+   - `verifyTotp(secret, code, window=1)`
+   - Encrypt/decrypt secret with `MFA_ENCRYPTION_KEY` (already provisioned in
+     HETZNER_DEPLOYMENT_GUIDE.md but unused — wire it up; fail hard in prod if missing).
+
+3. New routes in `services/identity-svc/src/routes/auth.ts`:
+   - `POST /api/auth/mfa/totp/enroll` → returns otpauthUrl + QR dataURI
+   - `POST /api/auth/mfa/totp/confirm` { code } → activates TOTP, disables email fallback
+   - `POST /api/auth/verify-mfa` → accept TOTP code when user.mfaMethod='totp'
+
+4. UI in `apps/web/src/components/settings/MfaSettings.tsx`: add
+   "Use an authenticator app" tab with QR code render (`qrcode.react`).
+   Forced-MFA roles must switch to TOTP within 30 days (soft warning for now).
+
+5. Rate-limit: 5 failed TOTP codes in 10 min locks the user — use the existing
+   `mfa_codes.attempts` column or a new `mfa_lockouts` table.
+
+Tests: unit (TOTP verify), integration (full enroll → login flow), Playwright
+(admin enables TOTP and logs in with it).
+```
+
+### Prompt 2.2 — WebAuthn / Passkeys for PLATFORM_ADMIN
+```
+Add passkey (WebAuthn L2) support, marked as the PREFERRED method for
+PLATFORM_ADMIN per NIST 800-63 AAL3.
+
+1. Use `@simplewebauthn/server` on identity-svc, `@simplewebauthn/browser` on web.
+2. New table `webauthn_credentials` (userId, credentialId, publicKey, counter,
+   transports, deviceName, createdAt, lastUsedAt).
+3. Routes:
+   - POST /api/auth/webauthn/register/options
+   - POST /api/auth/webauthn/register/verify
+   - POST /api/auth/webauthn/login/options
+   - POST /api/auth/webauthn/login/verify
+4. On login, if user has a registered credential, prefer WebAuthn over OTP.
+   Email OTP becomes the fallback only if no passkey is present.
+5. Settings UI: list registered passkeys, rename, revoke.
+6. Gate behind `ADMIN_ENTERPRISE.STRONG_MFA`.
+
+RP ID: set to `aivolearning.com` in prod; `localhost` in dev. Document in
+`docs/security-architecture.md` §1.2.
+```
+
+### Prompt 2.3 — Backup / Recovery Codes
+```
+Generate 10 single-use recovery codes at MFA enrollment.
+
+1. Table `mfa_recovery_codes` (id, userId, codeHash, usedAt, createdAt).
+2. Hash with argon2id at rest — never store plaintext.
+3. UI: one-time download as .txt and print view after enrollment; show count
+   of remaining codes in settings with a "regenerate" action (invalidates old).
+4. `/api/auth/verify-mfa` accepts a 10-char recovery code if the user cannot
+   access their primary factor. Each consumes one code and triggers an email
+   alert to the admin.
+5. Audit-log every recovery-code use as action `MFA_RECOVERY_USED`.
+```
+
+### Prompt 2.4 — Hash Stored OTP Codes (B7)
+```
+Refactor `services/identity-svc/src/services/mfa.ts`:
+- Store `mfa_codes.code` as SHA-256 (or argon2id for defense-in-depth, but SHA-256
+  is acceptable given 10-minute TTL) rather than plaintext.
+- `verifyMFACode()` compares hashes.
+- Add migration + backfill script (truncate existing unused codes is acceptable
+  since TTL is 10 min).
+Run the existing test suite and add a regression test asserting the DB column
+never contains a plaintext 6-digit string.
+```
+
+---
+
+## Sprint 3 — Step-Up Authentication for Sensitive Ops (1 week) · Finding B3
+
+### Prompt 3.1 — Step-Up Token Flow
+```
+Today `/dashboard/admin/compliance` claims "Step-Up Authentication" = true.
+Make this real.
+
+1. Add `packages/security/src/stepUp.ts`:
+   - `issueStepUpChallenge(userId, scope)` → stores a pending challenge
+     (scope examples: "tenant:delete", "user:impersonate", "brain:reset",
+      "data:export", "role:change").
+   - `verifyStepUp(userId, scope, code)` → consumes challenge, returns a
+     short-lived (5-min) `stepUpToken` JWT with `{ sub, scope, jti }`.
+
+2. Backend enforcement: create a Fastify preHandler `requireStepUp(scope)` that
+   verifies the `x-step-up-token` header against the route's scope. Apply to:
+     POST /api/admin/impersonate                       → scope "user:impersonate"
+     DELETE /api/admin/users/:id                       → scope "user:delete"
+     PUT  /api/admin/users/:id (when role changes)     → scope "role:change"
+     PUT  /api/admin/tenants/:id (status=suspended)    → scope "tenant:suspend"
+     DELETE /api/admin/tenants/:id                     → scope "tenant:delete"
+     POST /api/admin/learners/:id/reset-brain          → scope "brain:reset"
+     GET  /api/research/export/anonymized              → scope "data:export"
+     PUT  /api/admin-svc/config                        → scope "config:update"
+
+3. UI: create `apps/web/src/components/admin/StepUpModal.tsx` that intercepts
+   destructive actions. Modal challenges for the user's strongest enrolled
+   factor (passkey → TOTP → email). On success, adds the returned token to the
+   next request.
+
+4. Update `/dashboard/admin/compliance/page.tsx` so the "Step-Up Auth" badge
+   is driven by a runtime probe (GET /api/admin-svc/compliance/controls) that
+   returns real status.
+
+5. Tests: e2e covers "admin tries to delete tenant → modal → wrong code → retry →
+   correct code → deletion succeeds, audit log contains STEP_UP_VERIFIED + TENANT_DELETED".
+```
+
+### Prompt 3.2 — Runtime Compliance Probes
+```
+Replace the hardcoded boolean array in `apps/web/src/app/dashboard/admin/compliance/page.tsx`
+with `GET /api/admin-svc/compliance/controls`. The endpoint returns each control's:
+  - id, label, category, status ("pass"|"warn"|"fail")
+  - evidenceUrl (link to log/dashboard proving it)
+  - lastCheckedAt
+
+Controls to probe at runtime (not hardcoded):
+  - JWT RS256 signing (inspect `packages/security` loaded keys)
+  - MFA adoption rate (count users with mfaEnabled / INTERNAL_ROLES)
+  - Step-Up enforcement (reflect ADMIN_ENTERPRISE.STEP_UP_AUTH flag + route count that uses requireStepUp)
+  - Tenant isolation (count of 403s on mismatched tenant in last 24h)
+  - HTTPS (probe ingress on startup)
+  - AES-256 at rest (probe Postgres `pg_settings` for `ssl` + check disk encryption flag file)
+  - Audit immutability (check DB privilege for `admin_audit_log`)
+  - Rate limiting (reflect @fastify/rate-limit registration)
+  - Secret scanning (check gitleaks CI status via GitHub API, cached hourly)
+
+If a probe fails, render the card red with a link to the runbook.
+```
+
+---
+
+## Sprint 4 — Audit Immutability + Impersonation Logging (4 days) · Findings C2, C3, C6
+
+### Prompt 4.1 — Append-Only Audit Log
+```
+Make `admin_audit_log` and `district_activity_log` append-only at the DB layer.
+
+1. Add a Drizzle migration that:
+   - Creates a Postgres role `aivo_audit_writer`.
+   - GRANTS INSERT, SELECT on both tables to `aivo_audit_writer`.
+   - REVOKES UPDATE, DELETE, TRUNCATE from `aivo_app` (the runtime role).
+   - Adds a `BEFORE UPDATE OR DELETE` trigger that RAISES EXCEPTION.
+
+2. Add a scheduled cryptographic chain: each new row computes
+   `prevHash = previous row's hash`, `hash = sha256(prevHash || row_payload)`.
+   Expose `GET /api/admin-svc/audit-log/verify` that walks the chain and
+   returns `{ valid: true, verifiedUpTo: <id> }`.
+
+3. Document the restoration runbook in `docs/runbooks/audit-restore.md`
+   (because true append-only means a bad INSERT can't be rolled back).
+
+4. Tests: attempt UPDATE/DELETE via aivo_app connection → expect 42501 error.
+```
+
+### Prompt 4.2 — Full Impersonation Audit Trail
+```
+Today `POST /api/admin/impersonate` in services/identity-svc/src/routes/admin.ts
+returns an impersonation JWT but logs nothing.
+
+1. Call `logAuditEvent()` for action `IMPERSONATION_STARTED` with:
+   { adminId, adminEmail, targetUserId, targetRole, targetTenantId, ip, ua }
+
+2. Add `POST /api/admin/impersonate/end` → logs `IMPERSONATION_ENDED`
+   with duration. The `auth-provider.exitImpersonation()` method must call it.
+
+3. Middleware: on any request where the JWT has `impersonatedBy`, inject both
+   actor IDs into every subsequent audit log entry (`actorId` = real admin,
+   `onBehalfOfId` = impersonated user). Add a nullable `on_behalf_of_id` UUID
+   column to `admin_audit_log`.
+
+4. UI: `/dashboard/admin/compliance/audit-log` renders impersonation entries
+   with a distinct orange badge and shows both identities.
+
+5. IP allowlisting (C6): new env `ADMIN_IP_ALLOWLIST` (CIDR list, empty=off).
+   Enforce in a Fastify `onRequest` hook on `/api/admin/**` and `/api/admin-svc/**`.
+```
+
+---
+
+## Sprint 5 — Session Hygiene (3 days) · Findings B4, B5, B10
+
+### Prompt 5.1 — Admin Idle Timeout + Periodic Re-MFA
+```
+1. Add `adminSessions` table (userId, sessionId, lastActivityAt, mfaVerifiedAt,
+   deviceFingerprint).
+
+2. For roles in INTERNAL_ROLES:
+   - Refresh token TTL shortened from 30d → 12h.
+   - Inactivity timeout: configurable via ADMIN_ENTERPRISE.ADMIN_SESSION_IDLE
+     (default 240 min). `POST /api/auth/refresh` rejects with 401 if
+     `now - lastActivityAt > idleMin`.
+   - Re-MFA every 12h: refresh returns `mfaPending` instead of a new access
+     token if `now - mfaVerifiedAt > 12h`.
+
+3. Client-side: `apps/web/src/providers/auth-provider.tsx` adds an activity
+   listener (mousemove/keydown/throttled to every 60s) that pings
+   `PUT /api/auth/session/heartbeat`. If idle > 5min before timeout, show a
+   warning modal.
+
+4. Device fingerprint: hash (UA + Accept-Language + sec-ch-ua) at login and
+   on subsequent refreshes. Mismatch → force re-MFA.
+
+5. Tests: simulate 241-minute idle → refresh rejected; pass → granted.
+```
+
+---
+
+## Sprint 6 — SAML 2.0 SSO + SCIM 2.0 (2 weeks) · Findings B8, D1
+
+### Prompt 6.1 — SAML 2.0 Service Provider for District SSO
+```
+Use `@node-saml/node-saml` (maintained fork, no node-saml vulnerabilities).
+
+1. Add `packages/sso` with SamlStrategy wrapping node-saml. Config per tenant
+   stored in `district_settings.ssoConfig` (already exists as jsonb):
+     { entryPoint, issuer, cert, identifierFormat, emailAttribute,
+       nameAttribute, roleAttribute, emailDomains: [] }
+
+2. Routes in identity-svc:
+   - GET  /api/auth/saml/:tenantId/metadata  → SP metadata XML
+   - GET  /api/auth/saml/:tenantId/login     → SAMLRequest redirect
+   - POST /api/auth/saml/:tenantId/acs       → ACS callback (HTTP-POST)
+   - POST /api/auth/saml/:tenantId/slo       → single-logout
+
+3. On ACS success, find-or-provision the user (role = DISTRICT_ADMIN if the IdP
+   asserts it, else map via `roleAttribute`). Issue the usual session cookie.
+
+4. Email-domain routing: `POST /api/auth/discover { email }` returns
+   `{ mode: "password" | "sso", ssoLoginUrl }`. The `/district/login` page
+   uses this to show either the password form or a "Continue with <IdP>" button.
+
+5. Self-service UI at `/dashboard/district/settings/sso`:
+   - Choose IdP preset (Azure AD / Google Workspace / Okta / OneLogin / Custom).
+   - Paste metadata URL OR upload metadata XML.
+   - "Test Connection" runs a dry-run SAMLRequest and reports errors.
+   - Toggle "Require SSO (disable password login for this district)".
+
+6. Fallback: PLATFORM_ADMIN can always log in with password + MFA (never via
+   district SSO) for break-glass.
+
+7. Encrypt `ssoConfig.cert` and any IdP secret at rest with MFA_ENCRYPTION_KEY.
+
+Tests: integration test against SimpleSAMLphp container in Docker Compose.
+```
+
+### Prompt 6.2 — SCIM 2.0 Provisioning Endpoint
+```
+Implement SCIM 2.0 Core Schema so districts can auto-provision users from their IdP.
+
+1. New service OR new routes under identity-svc at /scim/v2/*:
+   - GET /ServiceProviderConfig, /Schemas, /ResourceTypes
+   - GET /Users, GET /Users/:id, POST /Users, PUT /Users/:id, PATCH, DELETE
+   - GET /Groups (maps AIVO roles → groups)
+
+2. Auth: bearer token per tenant, stored hashed in a new `scim_tokens` table.
+   Rotation UI in /dashboard/district/settings/sso.
+
+3. Scope: only create users with role DISTRICT_ADMIN, TEACHER, CAREGIVER, or
+   THERAPIST within the tenant. Reject attempts to provision PLATFORM_ADMIN.
+
+4. Filter support: emails eq, userName eq, active eq true, and + or operators.
+5. Respect `active=false` (deactivate, don't delete — sets `deactivatedAt`).
+
+Document in `docs/integrations/scim.md` with Azure AD and Okta setup guides.
+```
+
+---
+
+## Sprint 7 — Password & Credential Hygiene (3 days) · Section 5 findings
+
+### Prompt 7.1 — Enterprise Password Policy
+```
+1. Add `packages/security/src/password-policy.ts`:
+   - Min length 14 for INTERNAL_ROLES, 12 for others.
+   - Reject zxcvbn score < 3.
+   - Check against HaveIBeenPwned `/range/` API (k-anonymity, no password sent).
+   - Reject last 5 passwords per user (new `password_history` table with
+     argon2 hashes).
+
+2. Apply at registration, password reset, and password change endpoints.
+
+3. Force password rotation every 365 days for INTERNAL_ROLES; banner at 335
+   days, enforce at 365. Store `passwordChangedAt` on users.
+
+4. First-login password change for team members created via
+   `POST /api/admin/create-team-member` — issue a temp password flagged
+   `mustChangePassword: true`.
+
+5. UI: new page `/reset-password` already exists; add the strength meter and
+   breach-check inline feedback.
+```
+
+### Prompt 7.2 — API Key Rotation UX
+```
+The page `/dashboard/admin/settings/api-keys` exists — wire it up.
+
+1. Table `api_keys` already in schema. Confirm columns: id, name, prefix,
+   hash (argon2id), createdBy, createdAt, lastUsedAt, expiresAt, revokedAt, scopes.
+
+2. Routes in admin-svc:
+   - GET  /api/admin-svc/api-keys              (list, masked)
+   - POST /api/admin-svc/api-keys              (create — returns plaintext ONCE)
+   - POST /api/admin-svc/api-keys/:id/rotate   (issue new hash, 24h grace window)
+   - DELETE /api/admin-svc/api-keys/:id        (revoke)
+
+3. Enforce 90-day auto-expiry per AIVO build guide. Banner at 75 days.
+
+4. Audit-log every create/rotate/revoke.
+```
+
+---
+
+## Sprint 8 — Delegated District Admin Management (1 week) · Finding D3, D7
+
+### Prompt 8.1 — District Admin Invites Peer Admins
+```
+1. New routes in identity-svc/routes/district.ts:
+   - GET    /api/district/admins                (list DISTRICT_ADMIN users in tenant)
+   - POST   /api/district/admins/invite         { email, name } → sends email + creates user
+   - POST   /api/district/admins/:id/deactivate
+   - POST   /api/district/admins/:id/reactivate
+   - POST   /api/district/admins/:id/reset-password
+
+2. Guardrails:
+   - Cannot deactivate last active district admin in tenant.
+   - Role can only ever be set to DISTRICT_ADMIN via this endpoint.
+   - Every action goes through requireStepUp("district:admin-mgmt").
+   - All actions logged to district_activity_log AND admin_audit_log.
+
+3. UI: new page `/dashboard/district/settings/admins` listing peers with
+   invite modal, deactivate button, "resend invite" action.
+
+4. Update `apps/web/src/app/dashboard/district/layout.tsx` NAV_SECTIONS "Admin"
+   group to include "Administrators".
+
+5. District MFA compliance widget (D7): on settings page, show
+   "MFA adoption: 7 / 12 staff (58%)" with a "Force MFA for all district staff"
+   toggle that writes `district_settings.featureOverrides.forceMfa = true`.
+   When true, identity-svc treats every user in the tenant as MFA_FORCED.
+```
+
+### Prompt 8.2 — Tenant-Scope Auto-Enforcement (D5)
+```
+Fastify hook approach instead of per-route preHandler.
+
+1. In services/identity-svc/src/index.ts, after route registration, add a
+   global onRequest hook that:
+   - Runs for paths matching `/api/district/**`.
+   - Requires a valid JWT with role in ["DISTRICT_ADMIN","PLATFORM_ADMIN"].
+   - Injects `req.tenantId` per the current requireDistrictAdmin logic.
+   - Fails closed if ANY district route forgets to use the hook (registration
+     check at boot).
+
+2. Write a route-coverage test: iterate app.printRoutes() and assert every
+   /api/district/* path has the tenant-scope hook applied.
+
+3. Add linting rule `eslint-plugin-local/require-tenant-scope.ts` that errors
+   if a new district route omits requireDistrictAdmin.
+```
+
+---
+
+## Sprint 9 — District Branding + Seat Management (1 week) · Findings D2, D4, D6
+
+### Prompt 9.1 — District Branding UI
+```
+1. Backend: PUT /api/district/settings already exists. Add:
+   - POST /api/district/settings/branding/logo (multipart; stores in S3, URL in
+     district_settings.branding.logoUrl)
+   - Accept primaryColor, displayName, supportEmail in branding jsonb.
+
+2. UI at /dashboard/district/settings/branding:
+   - Logo uploader (PNG/SVG ≤ 200KB, min 512×128).
+   - Color picker validated for WCAG AA contrast vs white text.
+   - Live preview of a sample parent portal card with applied theme.
+
+3. Parent/learner portals read `district_settings.branding` when a user's tenant
+   has a logo, and render it in the header. Fallback to AIVO violet/logo.
+
+4. Cache: CDN-invalidate when branding updates.
+```
+
+### Prompt 9.2 — Seat / License Self-Service
+```
+1. Extend `/dashboard/district/usage` page:
+   - Show current plan tier, contracted seats, used seats, renewal date.
+   - "Request more seats" button → creates a record in a new `seat_requests`
+     table AND emails billing@aivolearning.com via comms-svc.
+   - Download-CSV of current roster vs contracted seats.
+
+2. Activity log export (D6): add
+   GET /api/district/activity/export?from=&to=&format=csv|json
+   Streams NDJSON or CSV with correct MIME type, audit-logged as DATA_EXPORT
+   and requires requireStepUp("data:export").
+```
+
+---
+
+## Sprint 10 — Consolidate Admin APIs + Persist Config (4 days) · Finding C1
+
+### Prompt 10.1 — Deprecate Duplicated Routes
+```
+Target the duplication called out in the PRD:
+
+1. In services/admin-svc, implement real handlers for:
+   - GET  /api/admin-svc/stats    (proxies identity-svc internally)
+   - GET  /api/admin-svc/users    (proxies identity-svc with forwarded auth)
+   - GET  /api/admin-svc/learners (proxies)
+   - GET  /api/admin-svc/tenants  (proxies)
+
+2. Keep identity-svc owning WRITE paths (create user, create district).
+
+3. Add `Deprecation: true` + `Sunset: <+90d>` headers on the old
+   identity-svc `/api/admin/stats`, `/api/admin/users`, `/api/admin/learners`,
+   `/api/admin/tenants` GET endpoints.
+
+4. Update frontend `apps/web/src/app/dashboard/admin/**` to call
+   admin-svc paths. Remove duplicated fetch calls.
+
+5. Fix the stub `PUT /api/admin-svc/config` — persist to `platform_config`
+   table (already in schema). Every update writes a new row (append-only
+   config history); expose `GET /api/admin-svc/config/history`.
+```
+
+---
+
+## Sprint 11 — Pentest, SOC 2 Evidence, Docs (1 week)
+
+### Prompt 11.1 — Pentest Checklist + Fix Cycle
+```
+Run OWASP ASVS L2 checklist against admin.aivolearning.com and
+district.aivolearning.com with Burp + ZAP authenticated scans. Produce:
+
+1. `docs/security/pentest-YYYY-MM.md` documenting findings & remediations.
+2. Fix all High/Critical before sprint close.
+3. Add the scan to CI (scheduled weekly workflow `.github/workflows/zap-baseline.yml`).
+```
+
+### Prompt 11.2 — SOC 2 Evidence Automation
+```
+1. Nightly cron in admin-svc exports:
+   - Access review CSV (all INTERNAL_ROLES users + their last login + MFA status)
+   - Audit log Merkle root hash + row count
+   - Config history diff
+   - Backup verification proof
+   Uploads to an S3 bucket with object-lock (WORM).
+
+2. UI: /dashboard/admin/compliance/evidence lists the last 30 days of bundles
+   with download links and hash verification.
+```
+
+### Prompt 11.3 — Docs Refresh
+```
+Update:
+- docs/security-architecture.md §1.2 to describe TOTP + WebAuthn + recovery codes.
+- docs/security-architecture.md §1.5 (new) for Step-Up Auth.
+- docs/security-architecture.md §1.6 (new) for SAML/SCIM.
+- docs/runbooks/admin-break-glass.md (new).
+- docs/runbooks/audit-restore.md (from Sprint 4).
+- README badges for SOC 2 readiness / MFA posture.
+```
+
+---
+
+## Cross-Sprint Acceptance Gates
+
+Each sprint is DONE only when:
+
+- [ ] All new endpoints have OpenAPI schemas registered on Fastify Swagger.
+- [ ] Unit + integration tests ≥ 85% line coverage on new files.
+- [ ] Playwright e2e covers the happy path and one failure path.
+- [ ] `docs/security-architecture.md` updated.
+- [ ] Feature flag defaulted OFF in prod, ON in staging, verified in the flag-audit log.
+- [ ] `admin_audit_log` contains entries for every new write path.
+- [ ] Threat-model diff reviewed in the sprint demo.
+
+## Suggested Sequencing
+
+```
+Week 1       Sprint 0 + Sprint 1
+Week 2–3     Sprint 2
+Week 4       Sprint 3 + Sprint 4
+Week 5       Sprint 5
+Week 6–7     Sprint 6
+Week 8       Sprint 7
+Week 9       Sprint 8
+Week 10      Sprint 9
+Week 11      Sprint 10
+Week 12      Sprint 11 (pentest + SOC 2 close-out)
+```
+
+Total: **~12 weeks** to move from current posture to enterprise-ready
+(SOC 2 Type II attestation-friendly, NIST 800-63 AAL2 baseline with AAL3 path
+for PLATFORM_ADMIN).

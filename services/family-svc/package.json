@@ -1,0 +1,33 @@
+{
+  "name": "@aivo/family-svc",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "pnpm --filter @aivo/db run build && tsx --test test/*.test.ts"
+  },
+  "dependencies": {
+    "@aivo/db": "workspace:*",
+    "@aivo/brand": "workspace:*",
+    "@aivo/events": "workspace:*",
+    "@aivo/observability": "workspace:*",
+    "@aivo/scoring": "workspace:*",
+    "@aivo/ops-alerts": "workspace:*",
+    "@aivo/security": "workspace:*",
+    "@aivo/special-interest-engine": "workspace:*",
+    "@fastify/cors": "^11.0.0",
+    "@fastify/rate-limit": "^10.3.0",
+    "@fastify/swagger": "^9.6.0",
+    "@fastify/swagger-ui": "^5.2.2",
+    "drizzle-orm": "^0.44.2",
+    "fastify": "^5.3.3",
+    "@aivo/aac-bridge": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.4",
+    "typescript": "^5.7.3"
+  }
+}

@@ -1,0 +1,48 @@
+# =============================================================================
+# AIVO Enterprise services — kustomize image patch
+# =============================================================================
+# Image registrations for the 11 enterprise services introduced in
+# sprints 02-10. Merge with the main kustomization.yaml `images:` block
+# or include from a separate kustomization (this file is a list of
+# image transformations).
+#
+# CI/CD sets the tag at deploy time:
+#   kustomize edit set image aivo/<svc>=ghcr.io/artpromedia/aivo-<svc>:<tag>
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Component
+
+images:
+  - name: aivo/problem-session-svc
+    newName: ghcr.io/artpromedia/aivo-problem-session-svc
+    newTag: latest
+  - name: aivo/math-recognizer-svc
+    newName: ghcr.io/artpromedia/aivo-math-recognizer-svc
+    newTag: latest
+  - name: aivo/science-solver-svc
+    newName: ghcr.io/artpromedia/aivo-science-solver-svc
+    newTag: latest
+  - name: aivo/subject-brain-svc
+    newName: ghcr.io/artpromedia/aivo-subject-brain-svc
+    newTag: latest
+  - name: aivo/homework-svc
+    newName: ghcr.io/artpromedia/aivo-homework-svc
+    newTag: latest
+  - name: aivo/recommendation-svc
+    newName: ghcr.io/artpromedia/aivo-recommendation-svc
+    newTag: latest
+  - name: aivo/tenant-svc
+    newName: ghcr.io/artpromedia/aivo-tenant-svc
+    newTag: latest
+  - name: aivo/integration-svc
+    newName: ghcr.io/artpromedia/aivo-integration-svc
+    newTag: latest
+  - name: aivo/audit-svc
+    newName: ghcr.io/artpromedia/aivo-audit-svc
+    newTag: latest
+  - name: aivo/data-governance-svc
+    newName: ghcr.io/artpromedia/aivo-data-governance-svc
+    newTag: latest
+  - name: aivo/responsible-ai-svc
+    newName: ghcr.io/artpromedia/aivo-responsible-ai-svc
+    newTag: latest

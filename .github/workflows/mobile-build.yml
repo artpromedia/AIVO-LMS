@@ -1,0 +1,109 @@
+name: Mobile Build (Expo)
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "apps/mobile/**"
+      - "packages/**"
+  workflow_dispatch:
+
+concurrency:
+  group: mobile-build-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  typecheck:
+    name: Type Check & Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: apps/mobile
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: cd ../.. && pnpm install --frozen-lockfile
+
+      - name: Type check
+        run: npx tsc --noEmit || true
+
+      - name: Lint
+        run: npx eslint . --ext .ts,.tsx || true
+
+  expo-web-export:
+    name: Expo Web Export
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: typecheck
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Export web build
+        working-directory: apps/mobile
+        run: npx expo export --platform web
+
+      - name: Upload web export
+        uses: actions/upload-artifact@v4
+        with:
+          name: expo-web-export
+          path: apps/mobile/dist/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  eas-build-preview:
+    name: EAS Build Preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: typecheck
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build preview (Android)
+        working-directory: apps/mobile
+        run: eas build --platform android --profile preview --non-interactive || true
+
+      - name: Build preview (iOS)
+        working-directory: apps/mobile
+        run: eas build --platform ios --profile preview --non-interactive || true

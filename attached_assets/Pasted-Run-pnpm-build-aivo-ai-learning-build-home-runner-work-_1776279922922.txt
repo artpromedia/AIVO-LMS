@@ -1,0 +1,133 @@
+Run pnpm build
+> aivo-ai-learning@ build /home/runner/work/aivo-ai-learning/aivo-ai-learning
+> turbo build
+Attention:
+Turborepo now collects completely anonymous telemetry regarding usage.
+This information is used to shape the Turborepo roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://turborepo.dev/docs/telemetry
+   • Packages in scope: @aivo/admin-svc, @aivo/assessment-svc, @aivo/billing-svc, @aivo/brand, @aivo/comms-svc, @aivo/db, @aivo/engagement-svc, @aivo/events, @aivo/family-svc, @aivo/i18n-svc, @aivo/identity-svc, @aivo/integrations-svc, @aivo/learning-svc, @aivo/marketing, @aivo/mobile, @aivo/mobile-ui, @aivo/observability, @aivo/research-svc, @aivo/security, @aivo/status-page-svc, @aivo/tutor-svc, @aivo/web
+   • Running build in 22 packages
+   • Remote caching disabled
+@aivo/events:build
+@aivo/brand:build
+@aivo/observability:build
+@aivo/security:build
+@aivo/db:build
+  
+@aivo/status-page-svc:build
+  
+@aivo/i18n-svc:build
+  
+@aivo/research-svc:build
+  cache miss, executing 421d0bead2d6a7e0
+  > @aivo/research-svc@1.0.0 build /home/runner/work/aivo-ai-learning/aivo-ai-learning/services/research-svc
+  > tsc
+@aivo/admin-svc:build
+@aivo/billing-svc:build
+  
+@aivo/comms-svc:build
+  
+@aivo/identity-svc:build
+  
+@aivo/engagement-svc:build
+  
+@aivo/family-svc:build
+  
+@aivo/learning-svc:build
+  
+@aivo/integrations-svc:build
+@aivo/assessment-svc:build
+  
+@aivo/tutor-svc:build
+  
+@aivo/web:build
+cache miss, executing 5d2aeaaffcb89f2d
+> @aivo/web@1.0.0 build /home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web
+> next build
+⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+   ▲ Next.js 15.5.15
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 99s
+   Linting and checking validity of types ...
+ ⚠ The Next.js plugin was not detected in your ESLint configuration. See https://nextjs.org/docs/app/api-reference/config/eslint#migrating-existing-config
+Failed to compile.
+./src/app/dashboard/admin/services/page.tsx
+221:15  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+226:15  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+./src/app/dashboard/admin/tenants/page.tsx
+151:15  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+157:15  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+163:15  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+./src/app/dashboard/admin/users/page.tsx
+146:7  Warning: Visible, non-interactive elements with click handlers must have at least one keyboard listener.  jsx-a11y/click-events-have-key-events
+146:7  Warning: Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.  jsx-a11y/no-static-element-interactions
+185:15  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+197:15  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+209:15  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+229:17  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+./src/app/dashboard/district/integrations/page.tsx
+585:17  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+597:15  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+./src/app/dashboard/learner/homework/page.tsx
+197:11  Warning: Visible, non-interactive elements with click handlers must have at least one keyboard listener.  jsx-a11y/click-events-have-key-events
+197:11  Warning: Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.  jsx-a11y/no-static-element-interactions
+./src/app/dashboard/learner/quests/page.tsx
+75:13  Warning: Visible, non-interactive elements with click handlers must have at least one keyboard listener.  jsx-a11y/click-events-have-key-events
+75:13  Warning: Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.  jsx-a11y/no-static-element-interactions
+./src/app/dashboard/learner/settings/page.tsx
+61:15  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+68:15  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+75:15  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+88:15  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+95:15  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+102:15  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+./src/app/dashboard/notifications/page.tsx
+136:15  Warning: Visible, non-interactive elements with click handlers must have at least one keyboard listener.  jsx-a11y/click-events-have-key-events
+136:15  Warning: Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.  jsx-a11y/no-static-element-interactions
+./src/app/dashboard/parent/learner/[id]/settings/page.tsx
+77:15  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+84:15  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+91:15  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+98:15  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+125:15  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+132:15  Error: A form label must be associated with a control.  jsx-a11y/label-has-associated-control
+./src/components/DashboardHeader.tsx
+90:15  Warning: Visible, non-interactive elements with click handlers must have at least one keyboard listener.  jsx-a11y/click-events-have-key-events
+90:15  Warning: Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.  jsx-a11y/no-static-element-interactions
+./src/components/discovery/Awakening.tsx
+455:3  Error: Definition for rule 'react-hooks/exhaustive-deps' was not found.  react-hooks/exhaustive-deps
+./src/components/stage/ResponseZone.tsx
+124:15  Warning: Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.  jsx-a11y/no-static-element-interactions
+141:15  Warning: Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.  jsx-a11y/no-static-element-interactions
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+ ELIFECYCLE  Command failed with exit code 1.
+@aivo/marketing:build
+ Tasks:    18 successful, 20 total
+Cached:    0 cached, 20 total
+  Time:    2m6.732s 
+Failed:    @aivo/web#build
+ ELIFECYCLE  Command failed with exit code 1.
+Error: Process completed with exit code 1.
+0s
+0s
+Post job cleanup.
+Pruning is unnecessary.
+11s
+Post job cleanup.
+/usr/bin/git version
+git version 2.53.0
+Temporarily overriding HOME='/home/runner/work/_temp/5a28243f-c384-4f4f-a934-5a395c8d3ec7' before making global git config changes
+Adding repository directory to the temporary git global config as a safe directory
+/usr/bin/git config --global --add safe.directory /home/runner/work/aivo-ai-learning/aivo-ai-learning
+/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+http.https://github.com/.extraheader
+/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:

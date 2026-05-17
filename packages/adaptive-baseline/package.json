@@ -1,0 +1,27 @@
+{
+  "name": "@aivo/adaptive-baseline",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Adaptive multimodal baseline assessment. Adjusts item difficulty in real time (1-PL Elo-style θ), supports visual / auditory / kinesthetic / reading-light item modalities, and emits a LearningProfile (modality fit, attention pattern, frustration tolerance, processing speed) alongside the grade-level placement so reading-difficulty / slow-processing / test-anxious learners are not disadvantaged.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "package.json"],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "tsc",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.3",
+    "vitest": "^2.0.0"
+  }
+}

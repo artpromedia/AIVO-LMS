@@ -1,0 +1,40 @@
+name: Marketing Deploy Production
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: marketing-deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy Marketing (Production)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build marketing site
+        run: pnpm --filter @aivo/marketing build
+
+      - name: Deploy to production
+        run: echo "Add production deployment steps for your hosting provider"

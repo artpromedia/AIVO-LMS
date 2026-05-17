@@ -1,0 +1,1364 @@
+AIVO Brand + Marketing Website Sprint Prompt Suite
+Sprint Sequence
+Sprint MKT-00 — Brand Asset Audit and Migration Plan
+Sprint MKT-01 — Copy Existing Brand Assets into the New Build
+Sprint MKT-02 — Brand Token System, Logo Usage, Favicons, and Metadata
+Sprint MKT-03 — Marketing Website Foundation and App Architecture
+Sprint MKT-04 — Conversion Strategy, Sitemap, and Page-Level Funnels
+Sprint MKT-05 — Homepage: High-Converting Above-the-Fold Experience
+Sprint MKT-06 — Parent Landing Page
+Sprint MKT-07 — Schools, Teachers, and Districts Landing Pages
+Sprint MKT-08 — Special Education, IEP, and Neurodiverse Learner Page
+Sprint MKT-09 — Product Feature Pages: Today’s Mission, LessonRun, Homework Helper
+Sprint MKT-10 — Pricing, Demo Request, Waitlist, and Lead Capture
+Sprint MKT-11 — Trust, Privacy, Security, Accessibility, and Compliance Pages
+Sprint MKT-12 — SEO, Content System, Blog, Schema, and Social Sharing
+Sprint MKT-13 — Analytics, Conversion Tracking, CRM/Event Capture, and A/B Readiness
+Sprint MKT-14 — Performance, Accessibility, QA, and Launch Readiness
+Global Rules for Every Marketing Sprint
+# Global AIVO Marketing Website Rules
+
+You are building the AIVO Learning marketing website and brand implementation layer for the new AIVO build.
+
+AIVO is an agentic K–12 learning platform that creates personalized learning paths for learners using parent input, optional IEP/accommodation context, baseline assessment, mastery history, and learner-specific LessonRuns.
+
+The marketing website must not feel like a generic AI tutoring landing page.
+
+It must clearly communicate:
+- Personalized learning for each child
+- Parent-guided setup
+- IEP/accommodation-aware support where provided
+- Today’s Mission as the learner’s next-best-action
+- LessonRun as the core personalized learning unit
+- Parent progress clarity
+- Teacher and school visibility
+- Privacy, safety, accessibility, and trust
+
+Brand constraints:
+- Brand name: AIVO Learning
+- Wordmark text: AIVO LEARNING
+- Do not use “Agentic AI” as the wordmark.
+- Use the existing AIVO brain icon unchanged.
+- Do not modify the icon shape, stroke, geometry, proportions, or gradient.
+- Do not crop the logo or allow the logo to render outside its frame.
+- All logo files must support transparent backgrounds.
+- Primary brand purple: #7C3AED
+- Supporting colors may include:
+  - Purple dark: #6D28D9
+  - Purple light: #8B5CF6
+  - Tech blue: #2563EB
+  - Teal: #0891B2
+  - Emerald: #059669
+  - Navy: #1A1A2E
+  - Slate 900: #0F172A
+  - Slate 50: #F8FAFC
+  - White: #FFFFFF
+  - Black: #000000
+- Typography: Inter or an Inter-compatible rounded, readable SaaS typography system.
+- Use a calm, warm, trustworthy, accessible design language.
+
+Technical assumptions:
+- Use Next.js App Router.
+- Use TypeScript.
+- Use Tailwind CSS.
+- Use shadcn-style components where appropriate.
+- Use accessible semantic HTML.
+- Use production-ready responsive layouts.
+- No broken links.
+- No dead buttons.
+- No fake testimonials.
+- No unsupported compliance claims.
+- No “SOC 2 certified,” “FERPA compliant,” “COPPA certified,” or similar claims unless the company has the evidence.
+- Use “designed for,” “built with,” or “supports” where certification is not yet complete.
+- Every form must validate, submit, show success, show error, and prevent duplicate submission.
+- Every page must have SEO metadata, Open Graph metadata, and mobile-responsive layout.
+
+Required outputs per sprint:
+- Files changed
+- Routes created
+- Components created
+- Copy written
+- Data/config created
+- Acceptance criteria
+- QA checklist
+Sprint MKT-00 — Brand Asset Audit and Migration Plan
+# Sprint MKT-00: Brand Asset Audit and Migration Plan
+
+You are auditing the existing AIVO brand assets and preparing a migration plan for the new AIVO build.
+
+Your goal is to identify every existing logo, icon, favicon, app icon, image, screenshot, brand token, and marketing asset that must be copied into the new build without damaging the brand.
+
+Audit the current repository and asset folders for:
+- AIVO logos
+- AIVO brain icon
+- AIVO LEARNING wordmark
+- Horizontal logo
+- Stacked logo
+- Icon-only logo
+- White logo variants
+- Black logo variants
+- Gradient logo variants
+- PNG fallbacks
+- SVG source files
+- Favicons
+- PWA icons
+- Splash logos
+- Social sharing images
+- Hero images
+- App screenshots
+- Product mockups
+- Brand color tokens
+- Typography tokens
+- Existing marketing copy
+- Existing metadata
+- Existing favicon configuration
+- Existing manifest configuration
+
+Brand asset constraints:
+- The existing brain icon must not be redrawn.
+- The wordmark must say “AIVO LEARNING.”
+- Transparent background must be preserved.
+- No logo should be cropped.
+- No exported SVG should have fixed width/height without viewBox.
+- Do not rasterize SVGs unnecessarily.
+- Preserve source assets separately from optimized delivery assets.
+
+Create a migration plan with:
+1. Source asset inventory
+2. Target asset inventory
+3. Missing asset list
+4. Duplicate asset list
+5. Broken/cropped asset list
+6. Asset naming convention
+7. Target folder structure
+8. Brand token mapping
+9. Logo usage matrix
+10. Favicon/PWA icon plan
+11. Social image plan
+12. QA checklist
+
+Recommended target folder structure:
+
+/public/brand/aivo/
+  /logos/
+  /icons/
+  /favicons/
+  /app-icons/
+  /social/
+  /hero/
+  /screenshots/
+  /mockups/
+
+/src/brand/aivo/
+  brand.tokens.ts
+  brand.assets.ts
+  logo-usage.ts
+  metadata.ts
+
+Deliver:
+- Brand audit report
+- Migration checklist
+- Target folder structure
+- Asset manifest plan
+- Missing asset list
+- QA plan
+
+Acceptance criteria:
+- Every current AIVO brand asset is inventoried.
+- Existing logo source files are identified.
+- Existing icon source files are identified.
+- Cropped or damaged logo files are flagged.
+- Target folder structure is defined.
+- Asset naming convention is defined.
+- Migration can proceed without guessing.
+Sprint MKT-01 — Copy Existing Brand Assets into the New Build
+# Sprint MKT-01: Copy Existing Brand Assets into the New Build
+
+You are now migrating the AIVO brand assets into the new AIVO build.
+
+Do not redesign the logo.
+Do not alter the AIVO brain icon.
+Do not change the AIVO LEARNING wordmark.
+Do not crop assets.
+Do not replace existing approved assets with approximations.
+
+Copy the approved AIVO assets from the source build into the new build.
+
+Required logo set:
+- aivo-logo-full-gradient.svg
+- aivo-logo-full-white.svg
+- aivo-logo-full-black.svg
+- aivo-logo-horizontal-gradient.svg
+- aivo-logo-horizontal-white.svg
+- aivo-logo-horizontal-black.svg
+- aivo-logo-stacked-gradient.svg
+- aivo-logo-stacked-white.svg
+- aivo-logo-stacked-black.svg
+- aivo-icon-gradient.svg
+- aivo-icon-white.svg
+- aivo-icon-black.svg
+
+Required PNG fallbacks:
+- aivo-logo.png
+- aivo-icon.png
+- aivo-logo-horizontal.png
+- aivo-logo-stacked.png
+
+Required favicon and app assets:
+- favicon.ico
+- favicon-16.png
+- favicon-32.png
+- favicon-192.png
+- favicon-512.png
+- apple-touch-icon.png
+- maskable-icon-192.png
+- maskable-icon-512.png
+- splash-logo.png
+- splash-logo-dark.png
+
+Copy assets into:
+
+/public/brand/aivo/logos/
+/public/brand/aivo/icons/
+/public/brand/aivo/favicons/
+/public/brand/aivo/app-icons/
+/public/brand/aivo/social/
+
+Create an asset manifest:
+
+/src/brand/aivo/brand.assets.ts
+
+The manifest must export:
+- logo paths
+- icon paths
+- favicon paths
+- app icon paths
+- social image paths
+- alt text
+- recommended usage
+- width/height where known
+- file type
+- dark/light suitability
+
+Example manifest structure:
+
+export const aivoBrandAssets = {
+  logos: {
+    fullGradient: "/brand/aivo/logos/aivo-logo-full-gradient.svg",
+    horizontalGradient: "/brand/aivo/logos/aivo-logo-horizontal-gradient.svg",
+    stackedGradient: "/brand/aivo/logos/aivo-logo-stacked-gradient.svg",
+    iconGradient: "/brand/aivo/icons/aivo-icon-gradient.svg"
+  },
+  alt: {
+    fullLogo: "AIVO Learning logo",
+    icon: "AIVO Learning brain icon"
+  }
+};
+
+Add documentation:
+
+/docs/brand/aivo-asset-manifest.md
+
+The documentation must explain:
+- Which logo to use on light backgrounds
+- Which logo to use on dark backgrounds
+- Which logo to use in navbars
+- Which icon to use for favicons
+- Which logo to use in social previews
+- Minimum clear space
+- Minimum size
+- What not to do
+
+Acceptance criteria:
+- All approved assets are copied.
+- No logo is cropped.
+- No icon geometry is changed.
+- Transparent backgrounds are preserved.
+- Asset manifest exists.
+- Brand documentation exists.
+- Navbar can import logo path from manifest.
+- Metadata can import favicon and social image paths from manifest.
+Sprint MKT-02 — Brand Token System, Logo Usage, Favicons, and Metadata
+# Sprint MKT-02: Brand Token System, Logo Usage, Favicons, and Metadata
+
+Implement AIVO’s brand token system in the new build.
+
+Create:
+
+/src/brand/aivo/brand.tokens.ts
+/src/brand/aivo/logo-usage.ts
+/src/brand/aivo/metadata.ts
+/src/styles/brand.css
+
+Brand token requirements:
+
+Colors:
+- primaryPurple: #7C3AED
+- purpleDark: #6D28D9
+- purpleLight: #8B5CF6
+- techBlue: #2563EB
+- teal: #0891B2
+- emerald: #059669
+- navy: #1A1A2E
+- slate900: #0F172A
+- slate50: #F8FAFC
+- white: #FFFFFF
+- black: #000000
+
+Gradients:
+- primaryGradient: linear-gradient(135deg, #7C3AED 0%, #2563EB 100%)
+- softHeroGradient
+- learnerCardGradient
+- parentTrustGradient
+
+Typography:
+- fontSans: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif
+- heading weights: 600/700
+- body weights: 400/500
+- button weight: 600
+
+Create reusable components:
+
+/src/components/brand/AivoLogo.tsx
+/src/components/brand/AivoIcon.tsx
+/src/components/brand/BrandGradient.tsx
+
+AivoLogo requirements:
+- Supports variant: full, horizontal, stacked, icon
+- Supports tone: gradient, white, black
+- Supports size: sm, md, lg, xl
+- Uses asset manifest
+- Preserves aspect ratio
+- Never crops
+- Has accessible alt text
+- Allows priority loading for navbar
+
+Configure:
+- favicon metadata
+- apple touch icon
+- manifest icons
+- Open Graph default image
+- Twitter/X card image
+- theme-color
+- PWA manifest branding
+
+Create social image placeholder using existing brand assets:
+- /public/brand/aivo/social/og-default.png
+- /public/brand/aivo/social/og-home.png
+- /public/brand/aivo/social/og-schools.png
+- /public/brand/aivo/social/og-parents.png
+
+Do not create unsupported marketing claims in social images.
+
+Acceptance criteria:
+- Brand tokens are centralized.
+- Components use brand manifest paths.
+- Favicon works.
+- Apple touch icon works.
+- Web manifest uses AIVO icons.
+- Metadata uses AIVO brand.
+- Logo component renders without cropping.
+- Dark and light background logo variants work.
+- No hardcoded logo paths outside the brand manifest.
+Sprint MKT-03 — Marketing Website Foundation and App Architecture
+# Sprint MKT-03: Marketing Website Foundation and App Architecture
+
+Build the marketing website foundation for AIVO Learning.
+
+Use Next.js App Router, TypeScript, Tailwind CSS, and accessible React components.
+
+Create the marketing route group:
+
+/app/(marketing)/
+  layout.tsx
+  page.tsx
+  parents/page.tsx
+  schools/page.tsx
+  districts/page.tsx
+  teachers/page.tsx
+  special-education/page.tsx
+  features/todays-mission/page.tsx
+  features/lessonrun/page.tsx
+  features/homework-helper/page.tsx
+  pricing/page.tsx
+  demo/page.tsx
+  contact/page.tsx
+  about/page.tsx
+  security/page.tsx
+  privacy/page.tsx
+  accessibility/page.tsx
+  terms/page.tsx
+
+Create marketing components:
+
+/src/components/marketing/
+  MarketingHeader.tsx
+  MarketingFooter.tsx
+  HeroSection.tsx
+  CTASection.tsx
+  FeatureGrid.tsx
+  AudienceCard.tsx
+  ProductFlow.tsx
+  TestimonialSection.tsx
+  TrustBar.tsx
+  PricingCard.tsx
+  DemoRequestForm.tsx
+  NewsletterForm.tsx
+  FAQSection.tsx
+  StatCard.tsx
+  ScreenshotFrame.tsx
+  ComplianceNote.tsx
+
+Marketing layout requirements:
+- Sticky header on desktop
+- Accessible mobile menu
+- Clear CTA buttons
+- Role-based nav links
+- Footer with trust links
+- No dead nav links
+- Responsive design
+- Fast-loading pages
+- SEO metadata per page
+- Shared design tokens from AIVO brand system
+
+Header nav:
+- Parents
+- Schools
+- Special Education
+- Features
+- Pricing
+- Resources
+- Request Demo
+
+Primary CTAs:
+- Request a Demo
+- Start Parent Setup
+- Join the Waitlist
+- See How It Works
+
+Use final CTA wording consistently. Do not create buttons that route nowhere.
+
+Acceptance criteria:
+- Marketing route group exists.
+- Header and footer exist.
+- All nav links route to real pages.
+- Mobile menu works.
+- Brand logo appears correctly.
+- Marketing pages inherit correct metadata.
+- No dead buttons.
+- No placeholder pages.
+Sprint MKT-04 — Conversion Strategy, Sitemap, and Page-Level Funnels
+# Sprint MKT-04: Conversion Strategy, Sitemap, and Page-Level Funnels
+
+Create the conversion strategy and page-level funnel architecture for the AIVO marketing website.
+
+Audience segments:
+1. Parents
+2. Learners
+3. Teachers
+4. School leaders
+5. District leaders
+6. Special education coordinators
+7. Investors/partners
+
+Primary conversion actions:
+- Request school demo
+- Start parent setup
+- Join waitlist
+- Contact sales
+- Download school packet
+- Read privacy/security overview
+- View product walkthrough
+
+Build a page-level funnel map.
+
+For every page, define:
+- Target audience
+- Primary message
+- Conversion goal
+- Primary CTA
+- Secondary CTA
+- Objections addressed
+- Trust proof needed
+- Product proof needed
+- SEO keyword theme
+- Internal links
+- Required components
+
+Required sitemap:
+
+/
+  Homepage
+
+/parents
+  Parent landing page
+
+/schools
+  School landing page
+
+/districts
+  District landing page
+
+/teachers
+  Teacher landing page
+
+/special-education
+  IEP/accommodations/neurodiverse learner page
+
+/features/todays-mission
+  Today’s Mission feature page
+
+/features/lessonrun
+  LessonRun feature page
+
+/features/homework-helper
+  Homework Helper feature page
+
+/pricing
+  Pricing and plans
+
+/demo
+  Request demo
+
+/contact
+  Contact
+
+/security
+  Security and privacy posture
+
+/accessibility
+  Accessibility commitment
+
+/about
+  About AIVO Learning
+
+/resources
+  Content hub
+
+/blog
+  Blog index
+
+Design funnel rules:
+- Homepage must segment quickly by audience.
+- Parent page must reduce anxiety and explain the learning loop.
+- School page must emphasize classroom visibility and safe deployment.
+- District page must emphasize procurement, privacy, scale, and rostering.
+- Special education page must be careful, evidence-friendly, and non-clinical.
+- Feature pages must show product workflow, not abstract AI claims.
+- Pricing page must support both family and school/district buying paths.
+- Demo page must be friction-light and high-converting.
+
+Acceptance criteria:
+- Sitemap is complete.
+- Every page has a conversion goal.
+- Every page has primary and secondary CTA.
+- Every page has an SEO theme.
+- Every page addresses objections.
+- No marketing route exists without a conversion purpose.
+Sprint MKT-05 — Homepage: High-Converting Above-the-Fold Experience
+# Sprint MKT-05: Homepage High-Converting Build
+
+Build the AIVO Learning homepage.
+
+The homepage must communicate the product clearly within 5 seconds.
+
+Above-the-fold message:
+AIVO Learning gives every child a personalized next lesson, guided by parent input, learning needs, baseline results, and real progress.
+
+Hero section requirements:
+- AIVO logo in header
+- Clear headline
+- Clear subheadline
+- Primary CTA: Request a Demo
+- Secondary CTA: See How It Works
+- Visual product mockup showing Today’s Mission or LessonRun
+- Trust-oriented microcopy
+- Parent/school audience selector
+
+Suggested hero headline options:
+1. “Personalized learning that knows what your child should do next.”
+2. “The next-best lesson for every learner.”
+3. “AIVO turns learning needs into a daily personalized mission.”
+
+Suggested subheadline:
+“AIVO Learning helps parents, teachers, and schools support each learner with personalized baselines, adaptive LessonRuns, IEP-aware supports, and plain-language progress.”
+
+Homepage sections:
+1. Hero
+2. Audience selector: Parents, Schools, Districts
+3. How AIVO Works
+4. Core product loop
+5. Today’s Mission preview
+6. LessonRun preview
+7. Parent progress clarity
+8. Teacher/school visibility
+9. Support for diverse learning needs
+10. Trust, privacy, and accessibility strip
+11. Pricing/demo CTA
+12. FAQ
+13. Final CTA
+
+How AIVO Works steps:
+1. Create learner profile
+2. Complete parent assessment
+3. Add IEP/accommodation context if available
+4. Complete personalized baseline
+5. Start Today’s Mission
+6. Learn through LessonRuns
+7. Track progress clearly
+
+Design requirements:
+- Beautiful, calm, premium SaaS feel
+- Purple/blue brand gradient
+- Parent-trust copy
+- Product UI mockups
+- No clutter
+- No unsupported claims
+- Responsive mobile layout
+- Fast-loading hero media
+- Accessible contrast
+
+Acceptance criteria:
+- Homepage is complete.
+- Hero has one clear primary CTA.
+- Product loop is easy to understand.
+- Audience paths are clear.
+- Every CTA routes to a real page or form.
+- Mobile homepage is excellent.
+- SEO metadata exists.
+- Open Graph image exists.
+Sprint MKT-06 — Parent Landing Page
+# Sprint MKT-06: Parent Landing Page
+
+Build the AIVO parent landing page at /parents.
+
+Target audience:
+Parents and guardians who want personalized learning support for their child.
+
+Core parent message:
+AIVO helps parents understand where their child is, what they need next, and how learning support is being personalized.
+
+Parent page sections:
+1. Parent-specific hero
+2. Pain points
+3. AIVO learning loop
+4. Parent assessment explanation
+5. Optional IEP/accommodation support
+6. Personalized baseline
+7. Today’s Mission
+8. Parent progress summaries
+9. Accessibility/read-aloud supports
+10. Safety and privacy reassurance
+11. FAQ
+12. CTA
+
+Parent pain points:
+- “I do not know where my child is struggling.”
+- “Generic tutoring does not adapt enough.”
+- “I want progress updates I can understand.”
+- “My child needs support without shame.”
+- “I want learning to feel less overwhelming.”
+
+Parent CTA options:
+- Start Parent Setup
+- Join the Parent Waitlist
+- Request Early Access
+
+Copy rules:
+- Use plain language.
+- Avoid clinical overreach.
+- Do not promise diagnosis.
+- Do not claim guaranteed academic outcomes.
+- Do not expose raw IEP language.
+- Emphasize support, clarity, and next steps.
+
+Required product proof:
+- Learner profile card
+- Parent assessment preview
+- Today’s Mission preview
+- Parent summary preview
+- Progress snapshot
+
+Acceptance criteria:
+- Parent page is complete.
+- Parent value proposition is obvious.
+- Parent learning loop is clear.
+- Optional IEP support is explained safely.
+- Parent CTA is clear.
+- Page is responsive.
+- SEO metadata exists.
+Sprint MKT-07 — Schools, Teachers, and Districts Landing Pages
+# Sprint MKT-07: Schools, Teachers, and Districts Landing Pages
+
+Build three school-facing landing pages:
+
+/schools
+/teachers
+/districts
+
+These pages must support institutional buying, teacher adoption, and district procurement.
+
+## /schools
+
+Target:
+School leaders, principals, instructional coordinators.
+
+Message:
+AIVO gives schools personalized learning support with teacher visibility, learner progress, and privacy-aware implementation.
+
+Sections:
+- School hero
+- Why personalized learning fails without workflow
+- AIVO school workflow
+- Teacher dashboard preview
+- Roster and class support
+- Progress visibility
+- Special education support
+- Privacy/security overview
+- Demo CTA
+
+## /teachers
+
+Target:
+Classroom teachers and intervention specialists.
+
+Message:
+AIVO helps teachers see what learners are working on, where they need support, and what to assign next.
+
+Sections:
+- Teacher hero
+- Class dashboard preview
+- Skill gap view
+- Assignment creation
+- Recent LessonRuns
+- Instructional support summaries
+- Privacy-aware accommodation view
+- CTA
+
+## /districts
+
+Target:
+District leaders, technology directors, curriculum leaders, procurement teams.
+
+Message:
+AIVO is designed for scalable, privacy-aware personalized learning across schools.
+
+Sections:
+- District hero
+- Deployment overview
+- Rostering/SIS readiness
+- Seat licensing
+- Privacy/security posture
+- Accessibility posture
+- Reporting overview
+- DPA/security packet CTA
+- Request demo CTA
+
+Copy rules:
+- Do not overclaim integrations unless built.
+- Use “OneRoster-ready” only if architecture exists.
+- Use “designed for FERPA/COPPA-aware workflows,” not unsupported certification claims.
+- Avoid fake case studies.
+- Do not imply live district adoption unless true.
+
+Acceptance criteria:
+- /schools page is complete.
+- /teachers page is complete.
+- /districts page is complete.
+- Each page has a distinct audience and CTA.
+- Each page includes product proof.
+- Each page includes trust/security copy.
+- Each page has SEO metadata.
+Sprint MKT-08 — Special Education, IEP, and Neurodiverse Learner Page
+# Sprint MKT-08: Special Education, IEP, and Neurodiverse Learner Page
+
+Build /special-education.
+
+This page must be careful, trustworthy, parent-sensitive, and school-appropriate.
+
+Do not make medical, diagnostic, or guaranteed outcome claims.
+
+Core message:
+AIVO can use parent-provided learning context and optional IEP/accommodation information to help personalize support, pacing, scaffolds, read-aloud, and lesson structure.
+
+Sections:
+1. Hero
+2. “Support should meet the learner where they are”
+3. How AIVO uses learning context
+4. Optional IEP/accommodation upload explanation
+5. What AIVO may adapt:
+   - Step length
+   - Reading support
+   - Read-aloud
+   - Hints
+   - Scaffolded examples
+   - Break reminders
+   - Reduced cognitive load
+   - Progress summaries
+6. Parent view vs learner view privacy boundary
+7. Teacher-safe support summaries
+8. Accessibility features
+9. Privacy and consent reassurance
+10. FAQ
+11. CTA
+
+Required copy boundaries:
+- Do not say AIVO diagnoses learners.
+- Do not say AIVO replaces teachers, therapists, IEP teams, or specialists.
+- Do not show raw IEP text in marketing mockups.
+- Do not promise compliance certification.
+- Use “supports,” “helps,” “can adapt,” and “designed to assist.”
+
+Mockup requirements:
+- Parent accommodation summary card
+- Learner lesson card with shorter steps
+- Read-aloud control
+- Hint/scaffold preview
+- Teacher-safe support summary
+
+Acceptance criteria:
+- Page is sensitive and trust-building.
+- Page explains IEP/accommodation support clearly.
+- Learner privacy boundary is explicit.
+- Teacher access boundary is explicit.
+- No unsupported clinical claims exist.
+- SEO metadata exists.
+- CTA works.
+Sprint MKT-09 — Product Feature Pages: Today’s Mission, LessonRun, Homework Helper
+# Sprint MKT-09: Product Feature Pages
+
+Build three product feature pages:
+
+/features/todays-mission
+/features/lessonrun
+/features/homework-helper
+
+Each feature page must show how the product works, who it helps, and why it matters.
+
+## Today’s Mission Page
+
+Message:
+Today’s Mission gives each learner one clear next-best learning action.
+
+Sections:
+- Feature hero
+- Problem: learners get lost in dashboards
+- AIVO solution: one next action
+- Mission priority logic
+- Product mockup
+- Parent/teacher visibility
+- CTA
+
+Required mockup:
+- Today’s Mission card with subject, tutor, goal, estimated time, and Start button.
+
+## LessonRun Page
+
+Message:
+LessonRun is the personalized learning unit behind every AIVO lesson.
+
+Sections:
+- Feature hero
+- LessonRun flow
+- Tutor-guided learning
+- Hints and scaffolds
+- Read-aloud
+- Break mode
+- Mastery update
+- Parent summary
+- CTA
+
+Required mockup:
+- Lesson player with tutor, step card, hint, read-aloud, progress.
+
+## Homework Helper Page
+
+Message:
+Homework Helper guides learners step by step without simply dumping answers.
+
+Sections:
+- Feature hero
+- Problem input
+- Clarifying question
+- Guided help
+- Scaffolded explanation
+- Follow-up lesson recommendation
+- Safety and anti-answer-dumping explanation
+- CTA
+
+Required mockup:
+- Homework Helper chat/help screen.
+
+Acceptance criteria:
+- All three feature pages exist.
+- Each feature page has product-specific copy.
+- Each feature page has product proof.
+- Each feature page has CTA.
+- No generic AI filler copy.
+- SEO metadata exists for each page.
+Sprint MKT-10 — Pricing, Demo Request, Waitlist, and Lead Capture
+# Sprint MKT-10: Pricing, Demo Request, Waitlist, and Lead Capture
+
+Build high-converting commercial pages and lead capture flows.
+
+Routes:
+- /pricing
+- /demo
+- /contact
+- /thank-you
+- /waitlist
+
+Pricing page requirements:
+- Family plan section
+- School plan section
+- District plan section
+- Clear “request quote” for school/district if pricing is not final
+- No fake prices unless confirmed
+- No unsupported feature claims
+- CTA for parent waitlist
+- CTA for school demo
+
+Suggested pricing architecture:
+1. Family
+2. School
+3. District
+
+Each plan card must include:
+- Audience
+- Core benefit
+- Included features
+- CTA
+- Notes
+
+Demo request form:
+Fields:
+- Name
+- Work email
+- Organization
+- Role
+- School/district size
+- Interest area
+- Message
+- Consent checkbox
+- Submit button
+
+Parent waitlist form:
+Fields:
+- Parent name
+- Email
+- Learner grade band
+- Interest area
+- Optional message
+- Consent checkbox
+
+Contact form:
+Fields:
+- Name
+- Email
+- Reason
+- Message
+
+Form behavior:
+- Client-side validation
+- Server-side validation
+- Loading state
+- Success state
+- Error state
+- Duplicate submission prevention
+- Spam protection
+- Accessible error messages
+- Thank-you redirect or inline confirmation
+- Event tracking
+
+Create:
+- LeadCaptureForm component
+- DemoRequestForm component
+- WaitlistForm component
+- ContactForm component
+- FormSuccessPanel component
+- FormErrorPanel component
+
+Acceptance criteria:
+- Pricing page is complete.
+- Demo form works.
+- Waitlist form works.
+- Contact form works.
+- All forms validate.
+- All forms have success and error states.
+- No dead CTAs.
+- Leads are captured through a provider abstraction or local persistence layer.
+Sprint MKT-11 — Trust, Privacy, Security, Accessibility, and Compliance Pages
+# Sprint MKT-11: Trust, Privacy, Security, Accessibility, and Compliance Pages
+
+Build the trust center surfaces for AIVO Learning.
+
+Routes:
+- /security
+- /privacy
+- /accessibility
+- /terms
+- /trust
+- /subprocessors
+
+These pages must be accurate, careful, and procurement-friendly.
+
+Do not overclaim certifications.
+
+Security page sections:
+- Security overview
+- Data protection approach
+- Encryption posture
+- Access controls
+- Audit logging
+- Vendor/subprocessor transparency
+- Vulnerability reporting
+- School procurement contact CTA
+
+Privacy page sections:
+- Parent and learner data
+- Consent
+- IEP/accommodation document handling
+- Data export request
+- Data deletion request
+- School data handling
+- Contact
+
+Accessibility page sections:
+- Accessibility commitment
+- WCAG 2.2 AA design target
+- Read-aloud
+- Keyboard support
+- High contrast
+- Reduced motion
+- Large text
+- Dyslexia-friendly support
+- Contact for accessibility feedback
+
+Trust page sections:
+- Product safety principles
+- Learner data boundaries
+- Parent controls
+- Teacher access boundaries
+- AI safety posture
+- Human support/contact
+
+Subprocessors page:
+- Table of subprocessors
+- Purpose
+- Data category
+- Region if known
+- Status
+- Last updated
+
+Compliance copy rules:
+- Use “designed to support” instead of unsupported compliance guarantees.
+- Do not claim SOC 2 certification unless achieved.
+- Do not claim FERPA/COPPA compliance as a certification.
+- Avoid legal conclusions.
+- Keep language procurement-friendly and evidence-ready.
+
+Acceptance criteria:
+- Trust pages exist.
+- Copy is careful and accurate.
+- No unsupported compliance claims.
+- Accessibility page exists.
+- Security page exists.
+- Subprocessors page exists.
+- Footer links to all trust pages.
+Sprint MKT-12 — SEO, Content System, Blog, Schema, and Social Sharing
+# Sprint MKT-12: SEO, Content System, Blog, Schema, and Social Sharing
+
+Implement SEO and content infrastructure for the AIVO marketing site.
+
+Create:
+- Global SEO config
+- Page-level metadata
+- Open Graph images
+- Twitter/X card metadata
+- Canonical URLs
+- Sitemap.xml
+- Robots.txt
+- JSON-LD schema
+- Blog/content system
+- Resource hub
+
+Routes:
+- /resources
+- /blog
+- /blog/[slug]
+- /guides/[slug]
+
+Suggested content categories:
+- Parent guides
+- Personalized learning
+- Special education support
+- AI in education
+- Teacher workflows
+- School implementation
+- Accessibility
+- Privacy and safety
+
+Initial blog/resource articles:
+1. What Is Personalized Learning?
+2. How Parents Can Understand Learning Progress Without Jargon
+3. What Is a Baseline Assessment?
+4. How Read-Aloud and Scaffolds Support Learners
+5. What Schools Should Ask Before Buying AI Learning Tools
+6. How AIVO Thinks About Privacy and Learner Data
+
+SEO keyword themes:
+- personalized learning platform
+- AI learning platform for schools
+- AI tutor for K–12
+- IEP-aware learning support
+- parent learning progress dashboard
+- adaptive lesson platform
+- AI homework helper
+- special education learning support
+
+Schema:
+- Organization
+- WebSite
+- SoftwareApplication
+- FAQPage
+- Article
+- BreadcrumbList
+
+Acceptance criteria:
+- Sitemap exists.
+- Robots.txt exists.
+- Page metadata exists.
+- OG metadata exists.
+- Blog system exists.
+- Resource hub exists.
+- JSON-LD schema exists.
+- No duplicate titles/descriptions.
+- All marketing pages have canonical URLs.
+Sprint MKT-13 — Analytics, Conversion Tracking, CRM/Event Capture, and A/B Readiness
+# Sprint MKT-13: Analytics, Conversion Tracking, CRM/Event Capture, and A/B Readiness
+
+Implement analytics and conversion measurement for the AIVO marketing website.
+
+Track events:
+- Page viewed
+- CTA clicked
+- Demo request started
+- Demo request submitted
+- Waitlist started
+- Waitlist submitted
+- Contact submitted
+- Pricing viewed
+- Parent page viewed
+- School page viewed
+- District page viewed
+- Special education page viewed
+- Feature page viewed
+- Trust page viewed
+- Mobile menu opened
+- Form validation failed
+- Form submission failed
+- Thank-you page viewed
+
+Create analytics abstraction:
+
+/src/lib/analytics/
+  analytics.ts
+  events.ts
+  providers.ts
+
+Event structure:
+- eventName
+- page
+- audience
+- CTA label
+- source route
+- timestamp
+- anonymousId
+- userId if known
+- organization if provided
+- form type
+
+Conversion requirements:
+- Track primary CTAs.
+- Track secondary CTAs.
+- Track form starts and completions.
+- Track failure reasons without exposing sensitive data.
+- Do not track raw learner data.
+- Do not track IEP content.
+- Respect cookie/privacy settings.
+
+A/B readiness:
+- Create experiment config
+- Support hero headline variants
+- Support CTA label variants
+- Support pricing CTA variants
+- Do not activate experiments unless configured
+- Keep default deterministic behavior
+
+Acceptance criteria:
+- Analytics abstraction exists.
+- CTA events fire.
+- Form events fire.
+- Conversion events are documented.
+- No sensitive child data is tracked.
+- No IEP content is tracked.
+- A/B testing architecture exists but does not create unstable UX.
+Sprint MKT-14 — Performance, Accessibility, QA, and Launch Readiness
+# Sprint MKT-14: Performance, Accessibility, QA, and Launch Readiness
+
+Run final QA and launch readiness for the AIVO marketing website.
+
+Performance requirements:
+- Lighthouse performance target 90+
+- Accessibility target 95+
+- SEO target 95+
+- Best practices target 95+
+- Optimized images
+- Lazy-loaded non-critical media
+- Preloaded critical logo/hero assets
+- No layout shift from logo loading
+- No oversized unused JavaScript
+- No blocking third-party scripts
+
+Accessibility QA:
+- Keyboard navigation works.
+- Focus states are visible.
+- Mobile menu is accessible.
+- Forms announce errors.
+- Color contrast passes.
+- Images have meaningful alt text.
+- Decorative images are hidden from screen readers.
+- Headings are ordered logically.
+- CTAs are descriptive.
+- Reduced motion is respected.
+
+Brand QA:
+- Logo is not cropped.
+- Logo renders on light and dark backgrounds.
+- Favicon works.
+- Apple touch icon works.
+- Social preview image works.
+- Brand colors match tokens.
+- No off-brand colors are introduced.
+
+Conversion QA:
+- Every CTA routes correctly.
+- Demo form submits.
+- Waitlist form submits.
+- Contact form submits.
+- Thank-you state works.
+- Error states work.
+- Mobile CTAs are visible.
+- Sticky header does not block content.
+
+Content QA:
+- No fake testimonials.
+- No unsupported compliance claims.
+- No placeholder copy.
+- No lorem ipsum.
+- No dead links.
+- No empty pages.
+- No broken metadata.
+- No missing Open Graph images.
+
+Technical QA:
+- TypeScript passes.
+- Lint passes.
+- Build passes.
+- Unit tests pass where present.
+- Playwright smoke tests pass.
+- Sitemap generated.
+- Robots.txt correct.
+- 404 page exists.
+- 500/error page exists.
+
+Create launch checklist:
+- Domain ready
+- Environment variables configured
+- Analytics configured
+- Forms configured
+- Email notifications configured
+- Metadata verified
+- Social previews verified
+- Mobile tested
+- Accessibility tested
+- Performance tested
+
+Acceptance criteria:
+- Marketing site is launch-ready.
+- Brand assets are correctly installed.
+- Homepage and all landing pages are complete.
+- All forms work.
+- No dead buttons.
+- No placeholder content.
+- Lighthouse targets are met or documented.
+- Site can be deployed.
+Final Brand + Marketing Website Approval Gate
+# AIVO Brand + Marketing Website Final Approval Gate
+
+The work is complete only when:
+
+Brand Assets:
+- Approved AIVO brand assets are copied into the new build.
+- AIVO brain icon is unchanged.
+- AIVO LEARNING wordmark is preserved.
+- Transparent backgrounds are preserved.
+- Logos are not cropped.
+- SVGs use proper viewBox behavior.
+- PNG fallbacks exist.
+- Favicons exist.
+- App icons exist.
+- Social preview images exist.
+- Brand asset manifest exists.
+- Brand token file exists.
+- Logo component exists.
+
+Marketing Website:
+- Homepage exists.
+- Parent page exists.
+- Schools page exists.
+- Teachers page exists.
+- Districts page exists.
+- Special Education page exists.
+- Today’s Mission page exists.
+- LessonRun page exists.
+- Homework Helper page exists.
+- Pricing page exists.
+- Demo page exists.
+- Contact page exists.
+- Trust/security/privacy/accessibility pages exist.
+- Blog/resource infrastructure exists.
+- Sitemap exists.
+- Robots.txt exists.
+- Metadata exists.
+
+Conversion:
+- Primary CTA is clear.
+- Demo form works.
+- Waitlist form works.
+- Contact form works.
+- Form validation works.
+- Form success state works.
+- Form error state works.
+- Analytics events fire.
+- No CTA is dead.
+- No page is a placeholder.
+
+Trust:
+- No unsupported compliance claims.
+- No fake testimonials.
+- No fake district logos.
+- No raw IEP content in marketing mockups.
+- No clinical overreach.
+- Privacy and accessibility pages are clear.
+
+Quality:
+- Site is responsive.
+- Mobile navigation works.
+- Accessibility QA passes.
+- Performance QA passes.
+- SEO QA passes.
+- Build passes.
+- Lint passes.
+- No broken routes.
+- No broken assets.

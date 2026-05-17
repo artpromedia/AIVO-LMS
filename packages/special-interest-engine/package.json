@@ -1,0 +1,27 @@
+{
+  "name": "@aivo/special-interest-engine",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Learner special-interest tracking + content theming. Maps a learner's strong interests (dinosaurs, trains, space, ocean, music, ...) onto authored activities so prompts and assets pull from the catalog the learner is most engaged with (§9.3 Greenfield 4–6w, autism-strengths-first pedagogy).",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "package.json"],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "tsc",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.3",
+    "vitest": "^2.0.0"
+  }
+}

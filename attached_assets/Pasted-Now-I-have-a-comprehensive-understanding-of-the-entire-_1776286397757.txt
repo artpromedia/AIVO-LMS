@@ -1,0 +1,1005 @@
+Now I have a comprehensive understanding of the entire existing admin panel — its frontend pages, backend APIs, layout structure, capabilities, and gaps. Here's the detailed PRD:
+
+---
+
+# 📋 Product Requirements Document (PRD)
+# AIVO Learning — Platform Super Admin Panel v2.0
+
+---
+
+## Document Information
+
+| Field | Value |
+|---|---|
+| **Product** | AIVO Learning Platform |
+| **Repository** | `artpromedia/aivo-ai-learning` |
+| **Document Version** | 2.0 |
+| **Author** | @artpromedia |
+| **Date** | 2026-04-15 |
+| **Status** | Draft |
+| **Frontend Stack** | Next.js 15, React 19, Tailwind 4, next-intl |
+| **Backend Stack** | Fastify 5 (admin-svc :3013, identity-svc :3001, status-page-svc :3014), Drizzle ORM, PostgreSQL 16 |
+| **Auth** | JWT RS256 via `@aivo/security`, RBAC (PLATFORM_ADMIN role) |
+
+---
+
+## 1. Executive Summary
+
+### 1.1 Purpose
+
+This PRD defines the complete requirements for evolving the AIVO Platform Super Admin Panel from its current v1 state — a functional but limited administrative dashboard — into a robust, enterprise-grade platform control center. The Super Admin Panel is the single pane of glass through which `PLATFORM_ADMIN` users operate, monitor, and govern the entire AIVO ecosystem across 15 microservices, 13 user roles, 14 AI tutors, multi-tenant architecture, and global compliance requirements.
+
+### 1.2 Current State Assessment
+
+The existing admin panel at `/dashboard/admin/` has **10 sub-pages** served from a well-structured Next.js layout:
+
+| Page | Route | Current State | Gap Assessment |
+|---|---|---|---|
+| **Overview** | `/dashboard/admin` | ✅ Functional — stat cards, role chart, service health, recent users, 30-day uptime | Missing: real-time websocket updates, global search, activity feed timeline |
+| **Users & Roles** | `/dashboard/admin/users` | ✅ Functional — CRUD, role filter, search, pagination, impersonation, create modal | Missing: edit/delete user, role change, password reset, bulk ops, export, detailed user profile view |
+| **Learners** | `/dashboard/admin/learners` | ✅ Functional — list with filtering by functioning level, pagination | Missing: learner detail drilldown, brain state viewer, parent linkage, assessment history |
+| **Tenants & Districts** | `/dashboard/admin/tenants` | ✅ Functional — list with type filter, create district form | Missing: tenant detail view, edit, school management under districts, license management, usage dashboard per tenant |
+| **Services & Health** | `/dashboard/admin/services` | ✅ Functional — 15 services listed with real-time polling (15s), incidents, uptime | Missing: service logs viewer, restart capability, dependency graph, alerting config |
+| **Analytics & Research** | `/dashboard/admin/analytics` | ✅ Functional — engagement metrics, mastery by subject, cohort breakdown, export | Missing: time-range selectors, charts/graphs, trend analysis, comparison tools, scheduled reports |
+| **AI & Brain Models** | `/dashboard/admin/ai` | ✅ Functional — brain overview, LLM providers, pipeline visualization, tutor grid, safety checks | Missing: prompt playground, model cost tracking, token usage, A/B test management, content moderation queue |
+| **Billing & Licensing** | `/dashboard/admin/billing` | ⚠️ Scaffold — plan cards, gateway list, usage metering placeholders with `"—"` values | Missing: real Stripe integration dashboard, invoice history, revenue analytics, coupon management, churn tracking |
+| **Compliance & Audit** | `/dashboard/admin/compliance` | ⚠️ Partially static — compliance checks are **hardcoded arrays** not from API, audit log is **mock data** | Missing: real audit log API integration, data request workflow, compliance scan automation, consent management CRUD |
+| **Platform Settings** | `/dashboard/admin/settings` | ✅ Functional — feature flags, system limits, save to API | Missing: environment management, email template config, notification settings, webhook management, API key management |
+
+### 1.3 Backend API Assessment
+
+Admin operations are split across **two backend services**:
+
+1. **`identity-svc` (:3001)** — `services/identity-svc/src/routes/admin.ts` (311 lines)
+   - `GET /api/admin/stats` — dashboard stats
+   - `GET /api/admin/users` — user listing
+   - `GET /api/admin/tenants` — tenant listing
+   - `GET /api/admin/learners` — learner listing
+   - `POST /api/admin/create-team-member` — create user with any of 13 roles
+   - `POST /api/admin/create-district` — create district with admin account
+   - Auth guards: `requireAdmin` (PLATFORM_ADMIN + DISTRICT_ADMIN), `requirePlatformAdmin` (PLATFORM_ADMIN only)
+
+2. **`admin-svc` (:3013)** — `services/admin-svc/src/routes/platform.ts` (77 lines)
+   - `GET /api/admin-svc/stats` — duplicate stats endpoint
+   - `GET /api/admin-svc/users` — duplicate user listing
+   - `GET /api/admin-svc/learners` — duplicate learner listing
+   - `GET /api/admin-svc/tenants` — duplicate tenant listing
+   - `GET /api/admin-svc/config` — feature flags and limits
+   - `PUT /api/admin-svc/config` — update config (stub — returns input without persisting)
+
+**Key Backend Gap:** The `admin-svc` largely duplicates `identity-svc` admin routes. The config PUT endpoint is a stub. No audit logging, no user update/delete, no tenant update, no real-time events, no data export endpoints.
+
+---
+
+## 2. Goals & Success Metrics
+
+### 2.1 Goals
+
+| # | Goal | Priority |
+|---|---|---|
+| G1 | Eliminate all hardcoded/mock data — every admin panel element must be powered by real API data | P0 |
+| G2 | Provide complete CRUD operations for all entities (users, learners, tenants) | P0 |
+| G3 | Implement real audit logging with immutable append-only records | P0 |
+| G4 | Deliver operational intelligence — real-time monitoring, alerting, trend analysis | P1 |
+| G5 | Enable financial operations — real billing data, revenue analytics, license management | P1 |
+| G6 | Support AI governance — prompt playground, content moderation, model cost tracking | P1 |
+| G7 | Provide self-service compliance — automated scans, data request workflows, consent audit | P2 |
+| G8 | Enable platform configuration without code deploys — feature flags, email templates, webhooks | P2 |
+
+### 2.2 Success Metrics
+
+| Metric | Target | Measurement |
+|---|---|---|
+| Admin task completion time | < 30s for any standard CRUD operation | UX testing |
+| Zero mock data | 0 hardcoded arrays remaining in admin pages | Code audit |
+| Audit log coverage | 100% of admin write operations logged | Unit test coverage |
+| Page load time | < 2s first contentful paint on all admin pages | Lighthouse |
+| Accessibility score | ≥ 90 on all admin routes | axe-core |
+| API endpoint coverage | Every UI action backed by a real persisted API | Integration test |
+
+---
+
+## 3. User Personas & Permissions
+
+### 3.1 Primary User: Platform Super Admin (`PLATFORM_ADMIN`)
+
+- **Who:** AIVO founding team, CTO, Head of Engineering, Head of Operations
+- **Access Level:** Full read/write across all platform entities, all tenants, all services
+- **Daily Tasks:** Monitor service health, review new signups, manage districts, review compliance, check revenue, review AI safety, impersonate users for support
+- **Capabilities:** Everything — no restrictions
+
+### 3.2 Secondary User: District Admin (`DISTRICT_ADMIN`)
+
+- **Who:** District IT administrators, school principals
+- **Access Level:** Read/write within their tenant only
+- **Admin Panel Access:** Should **NOT** see the Super Admin panel — they have their own `/dashboard/district` panel. However, some admin APIs serve both roles (stats, users within tenant scope). The PRD scope is exclusively the Super Admin experience.
+
+### 3.3 Permission Matrix
+
+| Capability | PLATFORM_ADMIN | DISTRICT_ADMIN |
+|---|---|---|
+| View all users across tenants | ✅ | ❌ (own tenant only) |
+| Create user with any role | ✅ | ❌ (limited roles) |
+| Edit/delete any user | ✅ | ❌ |
+| Impersonate any user | ✅ | ❌ |
+| Create/edit tenants | ✅ | ❌ |
+| View all learner data | ✅ | ❌ (own tenant only) |
+| Manage feature flags | ✅ | ❌ |
+| View billing/revenue | ✅ | ❌ |
+| Access audit logs | ✅ | ❌ |
+| Manage incidents | ✅ | ❌ |
+| Manage AI models | ✅ | ❌ |
+| Manage compliance | ✅ | ❌ |
+| View service health | ✅ | ❌ |
+| Generate reports | ✅ | ❌ (limited) |
+
+---
+
+## 4. Information Architecture
+
+### 4.1 Revised Sidebar Navigation
+
+Update `apps/web/src/app/dashboard/admin/layout.tsx` NAV_SECTIONS:
+
+```
+Platform
+  ├── Overview (home)               /dashboard/admin
+  ├── Services & Health             /dashboard/admin/services
+  ├── Analytics & Research          /dashboard/admin/analytics
+  └── Activity Feed  [NEW]         /dashboard/admin/activity
+
+Management
+  ├── Users & Roles                 /dashboard/admin/users
+  │   └── User Detail [NEW]        /dashboard/admin/users/[id]
+  ├── Learners                      /dashboard/admin/learners
+  │   └── Learner Detail [NEW]     /dashboard/admin/learners/[id]
+  ├── Tenants & Districts           /dashboard/admin/tenants
+  │   └── Tenant Detail [NEW]      /dashboard/admin/tenants/[id]
+  └── Schools [NEW]                /dashboard/admin/schools
+
+AI & Learning
+  ├── AI & Brain Models             /dashboard/admin/ai
+  ├── Content Moderation [NEW]     /dashboard/admin/moderation
+  └── Prompt Playground [NEW]      /dashboard/admin/ai/playground
+
+Operations
+  ├── Billing & Revenue             /dashboard/admin/billing
+  │   ├── Invoices [NEW]           /dashboard/admin/billing/invoices
+  │   └── Revenue [NEW]            /dashboard/admin/billing/revenue
+  ├── Compliance & Audit            /dashboard/admin/compliance
+  │   ├── Audit Log [NEW]          /dashboard/admin/compliance/audit-log
+  │   └── Data Requests [NEW]      /dashboard/admin/compliance/data-requests
+  ├── Platform Settings             /dashboard/admin/settings
+  │   ├── Email Templates [NEW]    /dashboard/admin/settings/emails
+  │   ├── Webhooks [NEW]           /dashboard/admin/settings/webhooks
+  │   └── API Keys [NEW]           /dashboard/admin/settings/api-keys
+  └── Environments [NEW]           /dashboard/admin/environments
+```
+
+---
+
+## 5. Feature Specifications
+
+### 5.1 Module: Enhanced Overview Dashboard
+
+**Route:** `/dashboard/admin` (update existing `apps/web/src/app/dashboard/admin/page.tsx`)
+
+#### 5.1.1 Global Command Palette / Search
+
+- **Trigger:** `Cmd+K` / `Ctrl+K` or search icon in header
+- **Searches across:** Users (by name/email), Learners (by name), Tenants (by name), Pages (admin routes)
+- **Results:** Grouped by entity type, click navigates to detail page
+- **Backend API:** `GET /api/admin/search?q={query}` — returns top 5 per entity type
+
+#### 5.1.2 Real-Time Activity Feed
+
+- Replace hardcoded `recentAudit` array in compliance page with live data
+- Show last 20 admin actions in real-time on overview: user created, role changed, config updated, impersonation started, incident created
+- **Backend API:** `GET /api/admin/activity?limit=20` — returns recent audit entries from the `admin_audit_log` table (new)
+- **WebSocket:** `ws://admin-svc:3013/ws/activity` — pushes new audit entries as they occur
+- **UI:** Timeline with actor avatars, action badges, relative timestamps, and entity links
+
+#### 5.1.3 Enhanced Stat Cards
+
+Add to existing cards:
+- **Growth indicators:** Each card shows `+N this week` or `↑ X%` compared to last period
+- **Sparkline charts:** Mini 7-day trend line inside each card (use a lightweight chart lib like `recharts` or inline SVG)
+- **Backend API:** `GET /api/admin/stats?include=trends` — returns stats with `weeklyGrowth` and `dailyCounts[7]` arrays
+
+#### 5.1.4 System Alert Banner
+
+- If any service is degraded/down, show a persistent amber/red banner at top of all admin pages
+- If maintenance mode is enabled, show a purple banner with "Maintenance Mode Active"
+- Dismiss-able but re-appears on page change if condition persists
+- Data source: existing `/api/status/overview` + existing feature flags config
+
+---
+
+### 5.2 Module: Complete User Management
+
+**Routes:** `/dashboard/admin/users` (update existing) + `/dashboard/admin/users/[id]` (new)
+
+#### 5.2.1 User List Enhancements
+
+Update `apps/web/src/app/dashboard/admin/users/page.tsx`:
+
+| Feature | Current | Required |
+|---|---|---|
+| Search | ✅ Client-side name/email | Upgrade to server-side search: `GET /api/admin/users?search={q}` |
+| Pagination | ✅ Client-side (loads 200) | Upgrade to server-side: `GET /api/admin/users?page=1&pageSize=20` |
+| Sort | ❌ None | Add sortable columns: name, email, role, created date. `?sort=createdAt&order=desc` |
+| Bulk Actions | ❌ None | Multi-select checkboxes → bulk assign role, bulk deactivate, bulk export |
+| Export | ❌ None | "Export CSV" button → `GET /api/admin/users/export?format=csv&role={filter}` |
+| Edit User | ❌ None | Inline or modal: change name, email, role, tenant assignment |
+| Deactivate/Delete User | ❌ None | Soft-delete (deactivate) with confirmation dialog. Hard-delete only for PLATFORM_ADMIN with MFA step-up |
+| Password Reset | ❌ None | "Reset Password" button → generates temp password, displays once, sends email via comms-svc |
+| User Status | ❌ None | Show active/deactivated/locked badge. Filter by status |
+| Last Login | ❌ None | Show last login timestamp. `GET /api/admin/users` should include `lastLoginAt` |
+| Tenant Name | ❌ Shows tenantId | Resolve to tenant name via join or lookup |
+
+#### 5.2.2 User Detail Page (New)
+
+**Route:** `/dashboard/admin/users/[id]`
+**File:** `apps/web/src/app/dashboard/admin/users/[id]/page.tsx`
+
+**Sections:**
+1. **Profile Header** — Avatar (initials), name, email, role badge, tenant badge, created date, last login, status
+2. **Account Actions** — Edit Profile, Change Role, Reset Password, Impersonate, Deactivate, Delete
+3. **Activity Timeline** — All audit log entries for this user (logged in, changed settings, etc.)
+4. **Associated Entities:**
+   - If PARENT: list of linked learners with brain status
+   - If LEARNER: parent info, functioning level, brain clone status, assessment status
+   - If TEACHER/THERAPIST/CAREGIVER: list of connected learners via collaboration
+   - If DISTRICT_ADMIN: tenant info, schools under district
+5. **Session History** — Recent login sessions (IP, user agent, timestamp)
+6. **Subscription Info** — If PARENT: active tutor subscriptions, billing plan
+
+**Backend APIs (New):**
+- `GET /api/admin/users/:id` — full user profile with related entities
+- `PUT /api/admin/users/:id` — update user fields (name, email, role, tenantId)
+- `DELETE /api/admin/users/:id` — soft-delete (set `deactivatedAt` timestamp)
+- `POST /api/admin/users/:id/reset-password` — generate temp password, send email
+- `GET /api/admin/users/:id/activity` — audit log entries for this user
+- `GET /api/admin/users/:id/sessions` — login session history
+
+---
+
+### 5.3 Module: Complete Learner Management
+
+**Routes:** `/dashboard/admin/learners` (update existing) + `/dashboard/admin/learners/[id]` (new)
+
+#### 5.3.1 Learner List Enhancements
+
+- Add server-side search by name
+- Add filter by grade level (in addition to existing functioning level filter)
+- Add filter by tenant
+- Add "View Brain" quick action link per row
+- Show parent name column (resolve from `parentId`)
+- Show brain clone status column (active / pending_parent_review / none)
+
+#### 5.3.2 Learner Detail Page (New)
+
+**Route:** `/dashboard/admin/learners/[id]`
+**File:** `apps/web/src/app/dashboard/admin/learners/[id]/page.tsx`
+
+**Sections:**
+1. **Learner Header** — Name, age/grade, functioning level badge, brain status, tenant, parent link
+2. **Brain Clone Summary** — Current version, status, last updated, mastery overview (mini brain visualization component reuse from `BrainVisualization.tsx`)
+3. **Brain Version History** — List of all brain state versions with timestamps, approval status, changes
+4. **Assessment History** — Baseline assessment results, dynamic assessment scores over time
+5. **Sensory Profile** — Visual/Auditory/Tactile/Vestibular/Proprioceptive settings (read-only for admin)
+6. **IEP Goals** — If IEP is configured, show goals and progress
+7. **Session Activity** — Recent tutoring sessions: tutor used, duration, engagement score
+8. **Team** — Parent, teachers, therapists, caregivers connected via collaboration
+9. **Accommodations** — Current accommodation settings (read-aloud, simplified UI, etc.)
+10. **Admin Actions** — Reset brain clone, force re-assessment, delink from parent (emergency ops)
+
+**Backend APIs (New):**
+- `GET /api/admin/learners/:id` — full learner profile with brain summary, parent info, team
+- `GET /api/admin/learners/:id/brain-history` — versioned brain state list
+- `GET /api/admin/learners/:id/sessions` — recent tutoring sessions
+- `POST /api/admin/learners/:id/reset-brain` — reset brain clone to force re-assessment (PLATFORM_ADMIN only, audited)
+
+---
+
+### 5.4 Module: Complete Tenant Management
+
+**Routes:** `/dashboard/admin/tenants` (update existing) + `/dashboard/admin/tenants/[id]` (new)
+
+#### 5.4.1 Tenant List Enhancements
+
+- Add search by tenant name
+- Add column: user count, learner count, plan/license type
+- Add "Edit" action per row
+
+#### 5.4.2 Tenant Detail Page (New)
+
+**Route:** `/dashboard/admin/tenants/[id]`
+**File:** `apps/web/src/app/dashboard/admin/tenants/[id]/page.tsx`
+
+**Sections:**
+1. **Tenant Header** — Name, type badge (B2C_FAMILY / B2B_SCHOOL / B2B_DISTRICT), created date, status
+2. **Tenant Stats** — Users in tenant, learners, active subscriptions, monthly revenue contribution
+3. **User List** — All users in this tenant, with role badges, searchable
+4. **Learner List** — All learners in this tenant, with functioning levels
+5. **Schools** (if district) — List of schools under this district
+6. **License / Subscription** — Current plan, billing status, features enabled
+7. **Integrations** — Connected third-party integrations (Clever, ClassLink, etc.)
+8. **Settings** — Tenant-specific overrides (custom branding, SSO config, feature flags)
+9. **Admin Actions** — Edit name, change type, suspend tenant, delete tenant (with data retention policy)
+
+**Backend APIs (New):**
+- `GET /api/admin/tenants/:id` — full tenant profile with stats
+- `PUT /api/admin/tenants/:id` — update tenant fields
+- `DELETE /api/admin/tenants/:id` — soft-delete tenant
+- `GET /api/admin/tenants/:id/users` — users scoped to tenant
+- `GET /api/admin/tenants/:id/learners` — learners scoped to tenant
+- `GET /api/admin/tenants/:id/schools` — schools under district tenant
+- `POST /api/admin/tenants/:id/schools` — add school to district
+
+---
+
+### 5.5 Module: Real Audit Logging System
+
+**Routes:** `/dashboard/admin/compliance/audit-log` (new) + update `/dashboard/admin/compliance`
+
+#### 5.5.1 Database Schema
+
+```sql
+CREATE TABLE admin_audit_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  action VARCHAR(100) NOT NULL,           -- e.g. USER_CREATED, ROLE_CHANGED, CONFIG_UPDATED
+  actor_id UUID NOT NULL REFERENCES users(id),
+  actor_email VARCHAR(255) NOT NULL,
+  actor_role VARCHAR(50) NOT NULL,
+  resource_type VARCHAR(50) NOT NULL,     -- User, Learner, Tenant, Config, Session
+  resource_id VARCHAR(255),
+  details JSONB,                          -- structured payload of what changed
+  ip_address INET,
+  user_agent TEXT,
+  tenant_id UUID REFERENCES tenants(id),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_audit_log_actor ON admin_audit_log(actor_id);
+CREATE INDEX idx_audit_log_action ON admin_audit_log(action);
+CREATE INDEX idx_audit_log_resource ON admin_audit_log(resource_type, resource_id);
+CREATE INDEX idx_audit_log_created ON admin_audit_log(created_at DESC);
+```
+
+#### 5.5.2 Actions to Log
+
+Every admin write operation must create an audit entry:
+
+| Action Code | Trigger | Details Payload |
+|---|---|---|
+| `USER_CREATED` | `POST /api/admin/create-team-member` | `{ userId, name, email, role, tenantId }` |
+| `USER_UPDATED` | `PUT /api/admin/users/:id` | `{ userId, changes: { before, after } }` |
+| `USER_DEACTIVATED` | `DELETE /api/admin/users/:id` | `{ userId, name, email }` |
+| `USER_PASSWORD_RESET` | `POST /api/admin/users/:id/reset-password` | `{ userId, email }` |
+| `ROLE_CHANGED` | `PUT /api/admin/users/:id` (role field changed) | `{ userId, oldRole, newRole }` |
+| `IMPERSONATION_STARTED` | Impersonate action | `{ targetUserId, targetRole }` |
+| `IMPERSONATION_ENDED` | Return to admin | `{ targetUserId, duration }` |
+| `TENANT_CREATED` | `POST /api/admin/create-district` | `{ tenantId, name, type }` |
+| `TENANT_UPDATED` | `PUT /api/admin/tenants/:id` | `{ tenantId, changes }` |
+| `TENANT_SUSPENDED` | Suspend action | `{ tenantId, reason }` |
+| `CONFIG_UPDATED` | `PUT /api/admin-svc/config` | `{ changes: { flagName: { before, after } } }` |
+| `INCIDENT_CREATED` | `POST /api/status/incidents` | `{ incidentId, title, severity }` |
+| `INCIDENT_RESOLVED` | `PUT /api/status/incidents/:id` | `{ incidentId, resolvedAt }` |
+| `BRAIN_RESET` | `POST /api/admin/learners/:id/reset-brain` | `{ learnerId, learnerName, reason }` |
+| `DATA_EXPORT` | `GET /api/research/export/anonymized` | `{ format, scope }` |
+| `DATA_REQUEST_PROCESSED` | GDPR/CCPA request workflow | `{ requestType, subjectId }` |
+| `LOGIN` | Admin login | `{ ip, userAgent }` |
+| `LOGIN_FAILED` | Failed admin login attempt | `{ email, ip, reason }` |
+
+#### 5.5.3 Audit Log UI
+
+**Dedicated Page:** `/dashboard/admin/compliance/audit-log`
+- Infinite scroll or paginated list of audit entries
+- Filters: by action type, by actor, by resource type, by date range
+- Search: by actor email, resource ID, details text
+- Each entry expandable to show full `details` JSON
+- Export: CSV download of filtered audit log
+- **Backend API:** `GET /api/admin/audit-log?action={}&actor={}&resource={}&from={}&to={}&page=1&pageSize=50`
+
+#### 5.5.4 Replace Mock Data in Compliance Page
+
+Remove the hardcoded `recentAudit` array from `apps/web/src/app/dashboard/admin/compliance/page.tsx` and replace with real data from `GET /api/admin/audit-log?limit=10`.
+
+Replace the hardcoded `complianceChecks` array with a backend endpoint: `GET /api/admin/compliance/status` that runs actual checks against the database/config and returns real pass/fail status for each framework item.
+
+---
+
+### 5.6 Module: Real Billing & Revenue Dashboard
+
+**Routes:** `/dashboard/admin/billing` (update existing) + `/dashboard/admin/billing/invoices` + `/dashboard/admin/billing/revenue` (new)
+
+#### 5.6.1 Replace Placeholder Data
+
+The current billing page shows `"—"` for AI API Calls, Storage, and Sessions in usage metering. Replace with real data:
+
+**Backend APIs (New):**
+- `GET /api/admin/billing/overview` — MRR, ARR, total customers, churn rate, active subscriptions count
+- `GET /api/admin/billing/revenue?period=30d` — daily revenue array for charts
+- `GET /api/admin/billing/invoices?page=1&status=all` — paginated invoice list from Stripe
+- `GET /api/admin/billing/usage` — AI API call count, storage bytes, session count (from engagement-svc + ai-svc metrics)
+- `GET /api/admin/billing/plans` — current pricing plans with subscriber counts (from billing-svc/Stripe)
+
+#### 5.6.2 Revenue Analytics Page (New)
+
+- MRR/ARR chart (line graph, 12-month trend)
+- Revenue breakdown by plan type (pie chart)
+- Revenue breakdown by tenant type (B2C vs B2B)
+- Churn rate over time
+- New subscriptions vs cancellations
+- Lifetime value (LTV) per cohort
+- Average revenue per user (ARPU)
+
+#### 5.6.3 Invoice Management Page (New)
+
+- List of all Stripe invoices with status (paid, pending, failed, refunded)
+- Filter by status, date range, tenant
+- Click to view invoice detail (amount, line items, payment method, Stripe link)
+- Refund action (with audit log entry)
+- Retry failed payment action
+
+#### 5.6.4 Coupon & Promotion Management (New)
+
+- Create/edit/deactivate discount codes
+- Set percentage or fixed amount discounts
+- Set validity periods and usage limits
+- Track redemption count
+- **Backend:** Proxy to Stripe Coupon API via billing-svc
+
+---
+
+### 5.7 Module: AI Governance & Operations
+
+**Routes:** `/dashboard/admin/ai` (update existing) + `/dashboard/admin/ai/playground` + `/dashboard/admin/moderation` (new)
+
+#### 5.7.1 Model Cost Tracking
+
+Add to existing AI page:
+- **Token Usage:** Daily/weekly/monthly token consumption per LLM provider (Claude, Gemini, GPT-4o)
+- **Cost Breakdown:** Estimated cost per provider per period
+- **Cost per Learner:** Average AI cost per active learner per month
+- **Backend API:** `GET /api/admin/ai/usage?period=30d` — token counts, estimated costs, per-provider breakdown
+- Data source: ai-svc should log token usage per request to a `ai_usage_log` table
+
+#### 5.7.2 Prompt Playground (New)
+
+**Route:** `/dashboard/admin/ai/playground`
+
+- Select a tutor persona (any of the 14)
+- Select a functioning level (any of the 5)
+- Configure sensory profile overrides
+- Enter a test prompt
+- See the full constructed system prompt (from `prompt_builder.py` logic)
+- Execute against any of the 3 LLM providers and see the response
+- Compare side-by-side responses from different providers
+- **Backend API:** `POST /api/admin/ai/playground` — `{ tutor, level, sensoryProfile, userPrompt, provider }` → returns `{ response, tokens, latency, fullSystemPrompt }`
+- **Safety:** Playground outputs pass through the same content safety filter as production
+
+#### 5.7.3 Content Moderation Queue (New)
+
+**Route:** `/dashboard/admin/moderation`
+
+- List of AI-generated content flagged by safety filters
+- Each entry shows: tutor, learner (anonymized for admin), the flagged content, the flag reason (bias, safety, quality), timestamp
+- Actions: Approve (false positive), Confirm Flag (true positive), Escalate
+- Stats: total flagged, approved rate, flag rate by tutor, flag rate by provider
+- **Backend API:**
+  - `GET /api/admin/moderation/queue?status=pending`
+  - `PUT /api/admin/moderation/:id` — `{ action: "approve" | "confirm" | "escalate" }`
+  - `GET /api/admin/moderation/stats`
+
+#### 5.7.4 A/B Test Management (New)
+
+- Configure experiments: e.g., "Claude vs Gemini for math tutoring" or "Simplified UI vs Standard for Supported level"
+- Define cohort split percentages
+- View experiment metrics: completion rate, engagement, mastery gain
+- End experiment and pick winner
+- **Backend API:** CRUD on `experiments` table in research-svc
+
+---
+
+### 5.8 Module: Compliance Automation
+
+**Routes:** Update `/dashboard/admin/compliance` + `/dashboard/admin/compliance/data-requests` (new)
+
+#### 5.8.1 Real Compliance Status
+
+Replace hardcoded `complianceChecks` array with automated checks:
+
+| Check | How to Verify | API |
+|---|---|---|
+| COPPA: Parental consent before data | Query: all learners have a parent with consent timestamp | `GET /api/admin/compliance/checks/coppa` |
+| FERPA: Access controls | Verify RBAC config + tenant isolation | `GET /api/admin/compliance/checks/ferpa` |
+| GDPR: Right to deletion | Verify data-request endpoint exists and processes within SLA | `GET /api/admin/compliance/checks/gdpr` |
+| SOC2: Audit evidence | Verify audit log table has entries, no gaps > 24h | `GET /api/admin/compliance/checks/soc2` |
+
+Each check returns `{ framework, status: "compliant" | "warning" | "failing", items: [{ label, passed, detail }], lastChecked }`.
+
+#### 5.8.2 Data Request Workflow (New)
+
+**Route:** `/dashboard/admin/compliance/data-requests`
+
+- Intake form for GDPR/CCPA data access, deletion, or export requests
+- Request states: `submitted` → `in_review` → `processing` → `completed` / `rejected`
+- For deletion requests: show what data will be affected (learner records, brain states, session history)
+- Confirmation step with admin notes
+- Track SLA compliance (GDPR requires response within 30 days)
+- **Backend APIs:**
+  - `GET /api/admin/compliance/data-requests?status=pending`
+  - `POST /api/admin/compliance/data-requests` — create request
+  - `PUT /api/admin/compliance/data-requests/:id` — update status, add notes
+  - `POST /api/admin/compliance/data-requests/:id/execute` — execute deletion/export
+
+---
+
+### 5.9 Module: Platform Configuration Expansion
+
+**Routes:** Update `/dashboard/admin/settings` + new sub-pages
+
+#### 5.9.1 Fix Config Persistence
+
+The current `PUT /api/admin-svc/config` endpoint is a **stub** — it returns the input without saving. Implement actual persistence:
+
+- Store config in a `platform_config` table or use the existing PostgreSQL JSONB pattern
+- Version config changes (keep history of who changed what when)
+- Each config change creates an audit log entry
+
+#### 5.9.2 Email Template Management (New)
+
+**Route:** `/dashboard/admin/settings/emails`
+
+- List all transactional email templates: welcome, password reset, learner added, brain ready, subscription confirmation, etc.
+- Edit templates with a rich text editor (subject, body, variables)
+- Preview with sample data
+- Test send to admin's email
+- **Backend API:** CRUD on `email_templates` table in comms-svc
+
+#### 5.9.3 Webhook Management (New)
+
+**Route:** `/dashboard/admin/settings/webhooks`
+
+- Create webhooks: URL, events to subscribe (user.created, learner.assessed, brain.updated, subscription.changed)
+- List active webhooks with last delivery status
+- View delivery log with request/response for debugging
+- Toggle active/inactive
+- **Backend API:** CRUD on `webhooks` table in admin-svc, delivery via events system
+
+#### 5.9.4 API Key Management (New)
+
+**Route:** `/dashboard/admin/settings/api-keys`
+
+- Generate API keys for programmatic access (e.g., district IT systems)
+- Scope keys to specific permissions (read-only, learner data, billing)
+- Set expiry dates
+- Show last used timestamp
+- Revoke keys
+- **Backend API:** CRUD on `api_keys` table in identity-svc
+
+---
+
+### 5.10 Module: Enhanced Analytics & Reporting
+
+**Route:** Update `/dashboard/admin/analytics`
+
+#### 5.10.1 Time Range Selectors
+
+Replace current "no time range" view with selectable periods:
+- Last 7 days, Last 30 days, Last 90 days, Last 12 months, Custom range
+- All charts and metrics respond to the selected time range
+- URL parameter: `?from=2026-01-01&to=2026-04-15`
+
+#### 5.10.2 Interactive Charts
+
+Replace text-only metrics with interactive `recharts` visualizations:
+- **Engagement:** Line chart of daily active learners, session count, avg duration
+- **Mastery:** Grouped bar chart of mastery by subject over time
+- **Cohorts:** Stacked area chart of learners by functioning level over time (growth tracking)
+- **Retention:** Cohort retention table (week 1, week 2, week 4, week 8 retention)
+- **Geography:** Map or table of users by country/region (from learner location data)
+
+#### 5.10.3 Scheduled Reports (New)
+
+- Configure automated reports: daily executive summary, weekly engagement digest, monthly compliance report
+- Recipients: admin email addresses
+- Format: PDF or CSV
+- **Backend:** Cron job in admin-svc that generates and sends reports via comms-svc
+
+#### 5.10.4 Custom Report Builder (New — P2)
+
+- Select dimensions: time, tenant, functioning level, grade, subject, tutor
+- Select metrics: sessions, mastery, engagement, completion rate
+- Generate table or chart
+- Save report configs for reuse
+- Export as CSV/PDF
+
+---
+
+### 5.11 Module: Enhanced Service Monitoring
+
+**Route:** Update `/dashboard/admin/services`
+
+#### 5.11.1 Service Dependency Graph (New)
+
+- Visual node graph showing all 15 services and their dependencies
+- Click a service to see: upstream callers, downstream dependencies, health, latency
+- Useful for understanding blast radius during incidents
+
+#### 5.11.2 Service Log Viewer (New — P2)
+
+- Select a service → see recent log entries (streamed from structured logging)
+- Filter by log level (info, warn, error)
+- Search log text
+- **Backend:** Requires log aggregation (could proxy to existing observability stack or read from `@aivo/observability` logger output)
+
+#### 5.11.3 Alerting Configuration (New — P2)
+
+- Define alert rules: "If identity-svc latency > 500ms for 5 minutes, notify admin"
+- Alert channels: email, Slack webhook, PagerDuty
+- Alert history with resolved/unresolved status
+
+---
+
+## 6. Backend API Consolidation Strategy
+
+### 6.1 Problem
+
+Admin routes are currently split between `identity-svc` and `admin-svc` with significant duplication. Both have `/api/admin/stats`, user listing, learner listing, and tenant listing.
+
+### 6.2 Recommendation
+
+**Consolidate all admin API endpoints into `admin-svc`** as the single entry point. `admin-svc` should make internal service calls to `identity-svc`, `billing-svc`, `engagement-svc`, etc. to aggregate data.
+
+| Current | Target |
+|---|---|
+| `identity-svc: GET /api/admin/stats` | Deprecate → `admin-svc: GET /api/admin-svc/stats` (calls identity-svc internally) |
+| `identity-svc: GET /api/admin/users` | Deprecate → `admin-svc: GET /api/admin-svc/users` |
+| `identity-svc: POST /api/admin/create-team-member` | Keep (identity-svc owns user creation) |
+| `identity-svc: POST /api/admin/create-district` | Keep (identity-svc owns tenant creation) |
+| `admin-svc: PUT /api/admin-svc/config` | Fix — implement real persistence |
+| New audit-log, billing, moderation, compliance APIs | Add to `admin-svc` |
+
+**During migration:** Support both old and new API paths. Frontend switches to admin-svc paths. Mark identity-svc admin routes as deprecated with sunset header.
+
+---
+
+## 7. Non-Functional Requirements
+
+### 7.1 Performance
+
+| Requirement | Target |
+|---|---|
+| Admin page first contentful paint | < 2s |
+| API response time (list endpoints) | < 500ms for up to 200 records |
+| API response time (detail endpoints) | < 300ms |
+| Real-time update latency (WebSocket) | < 2s from event to UI update |
+| Service health poll interval | 15s (existing, keep) |
+| Search results | < 1s for command palette |
+
+### 7.2 Security
+
+| Requirement | Implementation |
+|---|---|
+| All admin APIs require valid JWT | ✅ Existing `requireAdmin` / `requirePlatformAdmin` middleware |
+| Step-up authentication for destructive actions | New: user deletion, tenant deletion, brain reset require MFA re-verification |
+| Rate limiting on admin APIs | 100 req/min per admin (existing config) |
+| Audit logging is immutable | Append-only table, no UPDATE/DELETE on `admin_audit_log` |
+| IP allowlisting (optional) | P2: configurable IP whitelist for admin access |
+| Session timeout | Admin sessions expire after 4 hours of inactivity |
+
+### 7.3 Accessibility
+
+| Requirement | Standard |
+|---|---|
+| All admin pages pass axe-core | WCAG 2.1 AA, zero violations |
+| Keyboard navigation | All admin actions achievable via keyboard only |
+| Screen reader compatibility | All data tables have proper `<th>` headers, `<caption>`, `role` attributes |
+| Color contrast | All text meets 4.5:1 minimum ratio |
+| Focus management | Modals trap focus, dialogs auto-focus first field |
+| Existing compliance | Maintain `aria-label`, `aria-current`, `SkipLink`, `role="navigation"` from current layout |
+
+### 7.4 Internationalization
+
+| Requirement | Implementation |
+|---|---|
+| All admin UI text uses `next-intl` | ✅ Existing (uses `useTranslations("platformAdmin")`) |
+| New pages use the same pattern | All new string literals must be added to `apps/web/src/i18n/messages/{locale}.json` under `platformAdmin` namespace |
+| Translation keys for all 7+ locales | At minimum: `en.json`. Other locales can show English keys as fallback until translated |
+
+---
+
+## 8. Database Schema Changes
+
+### 8.1 New Tables
+
+```sql
+-- Audit logging (Section 5.5)
+CREATE TABLE admin_audit_log ( ... );  -- as defined in 5.5.1
+
+-- Email templates (Section 5.9.2)
+CREATE TABLE email_templates (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  key VARCHAR(100) UNIQUE NOT NULL,      -- e.g. "welcome", "password_reset"
+  subject VARCHAR(500) NOT NULL,
+  body_html TEXT NOT NULL,
+  body_text TEXT,
+  variables JSONB DEFAULT '[]',          -- e.g. ["userName", "resetLink"]
+  active BOOLEAN DEFAULT TRUE,
+  updated_by UUID REFERENCES users(id),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Webhooks (Section 5.9.3)
+CREATE TABLE webhooks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  url VARCHAR(2048) NOT NULL,
+  events VARCHAR(100)[] NOT NULL,        -- e.g. {"user.created", "brain.updated"}
+  secret VARCHAR(255) NOT NULL,          -- HMAC signing secret
+  active BOOLEAN DEFAULT TRUE,
+  tenant_id UUID REFERENCES tenants(id), -- null = platform-wide
+  created_by UUID REFERENCES users(id),
+  last_delivery_at TIMESTAMPTZ,
+  last_delivery_status VARCHAR(20),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE webhook_deliveries (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  webhook_id UUID NOT NULL REFERENCES webhooks(id),
+  event VARCHAR(100) NOT NULL,
+  payload JSONB NOT NULL,
+  response_status INT,
+  response_body TEXT,
+  delivered_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- API Keys (Section 5.9.4)
+CREATE TABLE api_keys (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  key_hash VARCHAR(255) NOT NULL,        -- bcrypt hash of the key
+  key_prefix VARCHAR(10) NOT NULL,       -- first 8 chars for identification
+  name VARCHAR(255) NOT NULL,
+  scopes VARCHAR(50)[] NOT NULL,         -- e.g. {"read:users", "read:learners"}
+  tenant_id UUID REFERENCES tenants(id),
+  created_by UUID REFERENCES users(id),
+  expires_at TIMESTAMPTZ,
+  last_used_at TIMESTAMPTZ,
+  revoked_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Data requests (Section 5.8.2)
+CREATE TABLE data_requests (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  type VARCHAR(50) NOT NULL,             -- "access", "deletion", "export"
+  status VARCHAR(50) NOT NULL DEFAULT 'submitted',
+  subject_id UUID REFERENCES users(id),
+  subject_email VARCHAR(255),
+  requester_id UUID REFERENCES users(id),
+  notes TEXT,
+  admin_notes TEXT,
+  sla_deadline TIMESTAMPTZ,
+  completed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- AI usage tracking (Section 5.7.1)
+CREATE TABLE ai_usage_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  provider VARCHAR(50) NOT NULL,         -- "anthropic", "google", "openai"
+  model VARCHAR(100) NOT NULL,
+  input_tokens INT NOT NULL,
+  output_tokens INT NOT NULL,
+  latency_ms INT NOT NULL,
+  estimated_cost_usd DECIMAL(10, 6),
+  learner_id UUID,
+  tutor_key VARCHAR(50),
+  session_id UUID,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_ai_usage_created ON ai_usage_log(created_at DESC);
+CREATE INDEX idx_ai_usage_provider ON ai_usage_log(provider, created_at DESC);
+
+-- Content moderation (Section 5.7.3)
+CREATE TABLE content_moderation_queue (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  content TEXT NOT NULL,
+  content_type VARCHAR(50) NOT NULL,     -- "tutor_response", "generated_problem", "explanation"
+  flag_reason VARCHAR(100) NOT NULL,     -- "bias", "safety", "quality", "off_topic"
+  flag_confidence DECIMAL(3, 2),
+  tutor_key VARCHAR(50),
+  provider VARCHAR(50),
+  learner_id UUID,                       -- anonymized in admin view
+  status VARCHAR(50) NOT NULL DEFAULT 'pending',
+  reviewer_id UUID REFERENCES users(id),
+  reviewer_action VARCHAR(50),           -- "approved", "confirmed", "escalated"
+  reviewed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Platform config versioning (Section 5.9.1)
+CREATE TABLE platform_config (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  config JSONB NOT NULL,
+  changed_by UUID REFERENCES users(id),
+  change_description TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### 8.2 Schema Modifications to Existing Tables
+
+```sql
+-- Add to users table
+ALTER TABLE users ADD COLUMN deactivated_at TIMESTAMPTZ;
+ALTER TABLE users ADD COLUMN last_login_at TIMESTAMPTZ;
+ALTER TABLE users ADD COLUMN last_login_ip INET;
+
+-- Add to tenants table
+ALTER TABLE tenants ADD COLUMN status VARCHAR(20) DEFAULT 'active'; -- active, suspended, deleted
+ALTER TABLE tenants ADD COLUMN suspended_at TIMESTAMPTZ;
+ALTER TABLE tenants ADD COLUMN suspension_reason TEXT;
+```
+
+---
+
+## 9. Implementation Phases
+
+### Phase 1: Foundation (Weeks 1–2) — P0
+
+**Focus:** Fix backend gaps, implement audit logging, consolidate APIs
+
+| Task | Backend/Frontend | Files |
+|---|---|---|
+| Create `admin_audit_log` table + Drizzle schema | Backend | `packages/db/src/schema/` |
+| Implement audit logging middleware in admin-svc | Backend | `services/admin-svc/src/middleware/audit.ts` |
+| Add `PUT /api/admin/users/:id` (update user) | Backend | `services/identity-svc/src/routes/admin.ts` |
+| Add `DELETE /api/admin/users/:id` (soft-delete) | Backend | `services/identity-svc/src/routes/admin.ts` |
+| Add `POST /api/admin/users/:id/reset-password` | Backend | `services/identity-svc/src/routes/admin.ts` |
+| Add `GET /api/admin/users/:id` (full profile) | Backend | `services/identity-svc/src/routes/admin.ts` |
+| Add `GET /api/admin/users/:id/activity` | Backend | `services/admin-svc/src/routes/audit.ts` |
+| Fix `PUT /api/admin-svc/config` to persist | Backend | `services/admin-svc/src/routes/platform.ts` |
+| Create `platform_config` table | Backend | `packages/db/src/schema/` |
+| Add `users.deactivated_at`, `users.last_login_at` columns | Backend | DB migration |
+| Server-side pagination for users/learners/tenants | Backend | All admin list endpoints |
+| Replace hardcoded `recentAudit` in compliance page | Frontend | `apps/web/src/app/dashboard/admin/compliance/page.tsx` |
+| Add user edit modal to Users page | Frontend | `apps/web/src/app/dashboard/admin/users/page.tsx` |
+| Add user deactivate/delete actions | Frontend | Same file |
+
+### Phase 2: Detail Pages + CRUD (Weeks 3–4) — P0
+
+| Task | Backend/Frontend | Files |
+|---|---|---|
+| Create User Detail page | Frontend | `apps/web/src/app/dashboard/admin/users/[id]/page.tsx` |
+| Create Learner Detail page | Frontend | `apps/web/src/app/dashboard/admin/learners/[id]/page.tsx` |
+| Create Tenant Detail page | Frontend | `apps/web/src/app/dashboard/admin/tenants/[id]/page.tsx` |
+| Add `GET /api/admin/learners/:id` full profile | Backend | `services/identity-svc/src/routes/admin.ts` |
+| Add `GET /api/admin/tenants/:id` full profile | Backend | `services/identity-svc/src/routes/admin.ts` |
+| Add `PUT /api/admin/tenants/:id` (update) | Backend | `services/identity-svc/src/routes/admin.ts` |
+| Dedicated Audit Log page | Frontend | `apps/web/src/app/dashboard/admin/compliance/audit-log/page.tsx` |
+| Add `GET /api/admin/audit-log` with filters | Backend | `services/admin-svc/src/routes/audit.ts` |
+| Global Command Palette component | Frontend | `apps/web/src/components/admin/CommandPalette.tsx` |
+| Add `GET /api/admin/search?q=` | Backend | `services/admin-svc/src/routes/search.ts` |
+
+### Phase 3: Billing & Analytics (Weeks 5–6) — P1
+
+| Task | Backend/Frontend | Files |
+|---|---|---|
+| Replace billing placeholder data with real Stripe data | Backend + Frontend | `apps/web/src/app/dashboard/admin/billing/page.tsx` |
+| Create Revenue analytics page | Frontend | `apps/web/src/app/dashboard/admin/billing/revenue/page.tsx` |
+| Create Invoice management page | Frontend | `apps/web/src/app/dashboard/admin/billing/invoices/page.tsx` |
+| Add `GET /api/admin/billing/overview` | Backend | `services/billing-svc/` or `admin-svc` |
+| Add `GET /api/admin/billing/invoices` (Stripe proxy) | Backend | Same |
+| Install recharts, build analytics charts | Frontend | `apps/web/src/app/dashboard/admin/analytics/page.tsx` |
+| Add time range selector to analytics | Frontend | Same |
+| Add `ai_usage_log` table + tracking | Backend | `services/ai-svc/` |
+| Add AI cost dashboard section | Frontend | `apps/web/src/app/dashboard/admin/ai/page.tsx` |
+
+### Phase 4: AI Governance & Settings (Weeks 7–8) — P1
+
+| Task | Backend/Frontend | Files |
+|---|---|---|
+| Prompt Playground page | Frontend | `apps/web/src/app/dashboard/admin/ai/playground/page.tsx` |
+| Add `POST /api/admin/ai/playground` | Backend | `services/ai-svc/` |
+| Content Moderation Queue page | Frontend | `apps/web/src/app/dashboard/admin/moderation/page.tsx` |
+| Add `content_moderation_queue` table + APIs | Backend | `services/ai-svc/` + `admin-svc` |
+| Email Template management page | Frontend | `apps/web/src/app/dashboard/admin/settings/emails/page.tsx` |
+| Webhook management page | Frontend | `apps/web/src/app/dashboard/admin/settings/webhooks/page.tsx` |
+| API Key management page | Frontend | `apps/web/src/app/dashboard/admin/settings/api-keys/page.tsx` |
+| Create `webhooks`, `api_keys`, `email_templates` tables | Backend | `packages/db/` + `services/admin-svc/` |
+
+### Phase 5: Compliance Automation & Polish (Weeks 9–10) — P2
+
+| Task | Backend/Frontend | Files |
+|---|---|---|
+| Automated compliance check endpoints | Backend | `services/admin-svc/src/routes/compliance.ts` |
+| Replace hardcoded `complianceChecks` | Frontend | `apps/web/src/app/dashboard/admin/compliance/page.tsx` |
+| Data Request workflow page | Frontend | `apps/web/src/app/dashboard/admin/compliance/data-requests/page.tsx` |
+| Add `data_requests` table + CRUD APIs | Backend | `packages/db/` + `services/admin-svc/` |
+| Service dependency graph visualization | Frontend | `apps/web/src/app/dashboard/admin/services/page.tsx` |
+| WebSocket real-time activity feed | Backend + Frontend | `admin-svc` + overview page |
+| Scheduled reports config page | Frontend + Backend | `settings/reports/` |
+| Full a11y audit and fix pass on all admin pages | Frontend | All admin pages |
+| Add all new i18n keys to all 7 locale files | Frontend | `apps/web/src/i18n/messages/*.json` |
+| Write Playwright a11y tests for all new admin routes | Test | `apps/web/tests/a11y/admin-*.spec.ts` |
+
+---
+
+## 10. Testing Strategy
+
+### 10.1 Backend Testing
+
+| Layer | Tool | Coverage Target |
+|---|---|---|
+| Unit tests for audit logger | Vitest | 100% of audit log actions |
+| Integration tests for all new API endpoints | Vitest + Supertest | Every endpoint, happy + error paths |
+| Database migration tests | Drizzle Kit | All migrations run forward and backward cleanly |
+
+### 10.2 Frontend Testing
+
+| Layer | Tool | Coverage Target |
+|---|---|---|
+| Component tests for new pages | React Testing Library | All new components |
+| a11y tests | Playwright + axe-core | Every admin route |
+| E2E critical flows | Playwright | Create user → edit → impersonate → deactivate |
+
+### 10.3 Acceptance Criteria (per module)
+
+Each module in Section 5 is considered complete when:
+1. All listed backend APIs are implemented and return correct data
+2. Frontend page renders data from APIs (zero hardcoded mock data)
+3. All admin write actions create audit log entries
+4. Page passes axe-core with zero WCAG AA violations
+5. All text uses `next-intl` translation keys
+6. Playwright test exists and passes
+
+---
+
+## 11. Risk Assessment
+
+| Risk | Likelihood | Impact | Mitigation |
+|---|---|---|---|
+| API consolidation breaks existing admin flows | Medium | High | Feature-flag new APIs, keep old paths during migration, run both in parallel |
+| Stripe billing API integration complexity | Medium | Medium | Start with read-only Stripe data, add write operations later |
+| Audit log table grows very large | High | Low | Implement partition by month, add retention policy (2 years), consider archival to cold storage |
+| Prompt Playground could be abused for free LLM access | Low | Medium | Rate limit playground to 50 requests/day per admin, log all usage |
+| Real compliance checks may reveal actual non-compliance | Medium | High | Run automated checks in staging first, create remediation plan before showing in production |
+| Performance degradation from detail page aggregation queries | Medium | Medium | Use database views or materialized views for heavy aggregation queries, add Redis caching layer |
+
+---
+
+## 12. Dependencies
+
+| Dependency | Owner | Required By |
+|---|---|---|
+| Stripe API keys configured in billing-svc | DevOps | Phase 3 (billing) |
+| `@aivo/observability` logger writes to queryable store | DevOps | Phase 5 (log viewer) |
+| `comms-svc` email sending capability | Backend | Phase 4 (email templates, password reset emails) |
+| `@aivo/events` package for webhook delivery | Backend | Phase 4 (webhooks) |
+| `ai-svc` token counting per request | AI team | Phase 3 (cost tracking) |
+| Content safety filter outputs to moderation queue | AI team | Phase 4 (moderation) |
+
+---
+
+## 13. Glossary
+
+| Term | Definition |
+|---|---|
+| **Brain Clone** | AIVO's proprietary adaptive learning profile — a versioned state per learner capturing mastery levels, accommodations, and tutor configuration |
+| **Functioning Level** | 5-tier classification: Standard → Supported → Low Verbal → Non-Verbal → Pre-Symbolic |
+| **Tenant** | An organizational unit — can be B2C_FAMILY (individual family), B2B_SCHOOL, or B2B_DISTRICT |
+| **Impersonation** | Admin ability to login as any user to see their experience for support purposes |
+| **XAI** | Explainable AI — transparent reasoning shown to parents about why AIVO made learning decisions |
+| **Brain Review** | Parent-facing page where they approve/modify the AI-generated Brain Clone |
+| **The Stage** | AIVO's main learning environment where learners interact with AI tutors |
+
+---
+
+*This PRD is a living document. Update version number and date with each revision. All feature specifications are subject to design review and technical feasibility assessment before implementation begins.*

@@ -1,0 +1,88 @@
+title = "AIVO Learning Platform — Gitleaks Config"
+
+[extend]
+# Use default gitleaks rules as base
+useDefault = true
+
+# ─────────────────────────────────────────────
+# Custom rules for AIVO-specific patterns
+# ─────────────────────────────────────────────
+
+[[rules]]
+id = "aivo-api-key"
+description = "AIVO internal API key"
+regex = '''(?i)aivo[_-]?api[_-]?key\s*[:=]\s*['"]([a-zA-Z0-9_\-]{20,})['"]'''
+tags = ["key", "aivo"]
+
+[[rules]]
+id = "jwt-secret-hardcoded"
+description = "Hardcoded JWT secret"
+regex = '''(?i)jwt[_-]?secret\s*[:=]\s*['"]([a-zA-Z0-9_\-!@#$%^&*]{16,})['"]'''
+tags = ["key", "jwt"]
+[rules.allowlist]
+regexTarget = "match"
+regexes = [
+  '''ci-test-jwt-secret-not-real''',
+]
+
+[[rules]]
+id = "database-url-with-password"
+description = "Database URL with embedded password"
+regex = '''postgres(?:ql)?:\/\/[^:]+:([^@\s]{8,})@[^\s]+'''
+tags = ["database", "password"]
+[rules.allowlist]
+regexTarget = "match"
+regexes = [
+  '''aivo_test_pw''',
+  '''aivo_dev_pw''',
+  '''localhost''',
+  '''127\.0\.0\.1''',
+]
+
+# ─────────────────────────────────────────────
+# Global allowlist — CI placeholder secrets
+# ─────────────────────────────────────────────
+[allowlist]
+description = "Global allowlist for CI placeholder values, dev configs, test fixtures, and build artifacts"
+commits = [
+  "4493c3a",
+  "63b452a",
+  "14fcfd8",
+  "a8fa12b",
+  "1113c5f",
+  "754e6b5",
+  "7786b4b",
+  "128485c",
+  "cf63213",
+  "df2aefd",
+  "9f0849b",
+]
+paths = [
+  '''\.gitleaks\.toml$''',
+  '''\.github/workflows/.*\.yml$''',
+  '''\.env\.example$''',
+  '''\.env\.test$''',
+  '''tests?/.*fixtures?/''',
+  '''__tests__/''',
+  '''Podfile\.lock$''',
+  '''HETZNER_DEPLOYMENT_GUIDE\.md$''',
+  '''e2e/docker-compose\.test\.yml$''',
+  '''docker-compose\.dev\.yml$''',
+  '''\.next/''',
+  '''tests?/test_.*\.py$''',
+]
+regexTarget = "match"
+regexes = [
+  '''placeholder-not-a-real-stripe-key''',
+  '''whsec_placeholder''',
+  '''re_test_placeholder''',
+  '''ci-test-jwt-secret-not-real''',
+  '''ci-test-auth-secret-not-real''',
+  '''aivo_test_pw''',
+  '''aivo_dev_pw''',
+  '''CHANGE_ME_STRONG_PASSWORD''',
+  '''GENERATE_RANDOM_KEY''',
+  '''e2e-test-secret-key-at-least-32-characters-long''',
+  '''aivo_dev''',
+  '''test-secret-key-for-hs256''',
+]

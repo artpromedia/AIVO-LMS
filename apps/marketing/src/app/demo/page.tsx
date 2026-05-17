@@ -1,0 +1,70 @@
+import type { Metadata } from "next";
+import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
+import { DemoRequestForm } from "@/components/marketing/forms";
+import { SITE_URL } from "@/lib/constants";
+
+export const metadata: Metadata = {
+  title: "Request a demo — AIVO Learning",
+  description:
+    "See AIVO in action with a walkthrough tailored to your role and rollout goals. A member of our team will reach out within one business day.",
+  alternates: { canonical: `${SITE_URL}/demo` },
+};
+
+export default function DemoPage() {
+  return (
+    <LandingPageLayout
+      badge="Demo"
+      title="See AIVO in action."
+      subtitle="A 30-minute walkthrough tailored to your role — teacher, special education lead, principal, or district. We'll show you Today's Mission, LessonRun, the parent view, and how rostering works."
+      breadcrumbs={[{ name: "Demo", href: "/demo" }]}
+      finalCta={{
+        title: "Not ready for a demo?",
+        body: "Read about how AIVO works for schools, or join the waitlist as a family.",
+        primary: { label: "For schools", href: "/for-schools" },
+        secondary: { label: "Join the waitlist", href: "/waitlist" },
+      }}
+    >
+      <section
+        aria-labelledby="demo-form-heading"
+        className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8"
+      >
+        <h2 id="demo-form-heading" className="font-heading text-2xl font-bold text-slate-900">
+          Tell us a little about your setting
+        </h2>
+        <p className="mt-1 mb-6 font-body text-slate-600">
+          The more we know, the more useful the walkthrough. Required fields are marked.
+        </p>
+        <DemoRequestForm />
+      </section>
+
+      <section
+        aria-labelledby="demo-what-happens-heading"
+        className="mt-10 rounded-3xl border border-slate-200 bg-slate-50/60 p-6 md:p-8"
+      >
+        <h2 id="demo-what-happens-heading" className="font-heading text-xl font-bold text-slate-900">
+          What happens next
+        </h2>
+        <ol className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+          <li className="rounded-2xl border border-slate-200 bg-white p-5">
+            <span className="font-heading text-sm font-bold text-purple-700">Step 1 · Within 1 business day</span>
+            <p className="mt-1 font-body text-slate-700">
+              A team member emails to confirm your goals and pick a time.
+            </p>
+          </li>
+          <li className="rounded-2xl border border-slate-200 bg-white p-5">
+            <span className="font-heading text-sm font-bold text-purple-700">Step 2 · 30-minute walkthrough</span>
+            <p className="mt-1 font-body text-slate-700">
+              We show learner, parent, and teacher views — and answer your questions live.
+            </p>
+          </li>
+          <li className="rounded-2xl border border-slate-200 bg-white p-5">
+            <span className="font-heading text-sm font-bold text-purple-700">Step 3 · Pilot or proposal</span>
+            <p className="mt-1 font-body text-slate-700">
+              If it's a fit, we scope a short pilot or send a written proposal — no pressure.
+            </p>
+          </li>
+        </ol>
+      </section>
+    </LandingPageLayout>
+  );
+}

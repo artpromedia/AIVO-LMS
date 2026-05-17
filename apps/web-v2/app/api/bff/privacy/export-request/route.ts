@@ -1,0 +1,79 @@
+import { NextResponse } from "next/server";
+import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
+import { ERRORS } from "@/lib/bff/errors";
+import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
+import { audit } from "@/lib/bff/audit";
+import {
+  createDataExportRequest,
+  listDataExportRequestsForUser,
+} from "@/lib/db/repos";
+import { z } from "zod";
+
+export const dynamic = "force-dynamic";
+
+const bodySchema = z.object({
+  learnerId: z.string().min(1).max(64).nullable().optional(),
+  notes: z.string().max(2000).optional(),
+});
+
+export async function GET(req: Request): Promise<NextResponse> {
+  const requestId = getRequestId(req);
+  try {
+    const { session, response } = await requireSession(req, requestId);
+    if (response) return response;
+    const roleErr = requireRole(session!, ["parent"], requestId);
+    if (roleErr) return roleErr;
+    const items = listDataExportRequestsForUser(
+      session!.userId,
+      session!.tenantId,
+    );
+    return ok({ requests: items }, requestId);
+  } catch (e) {
+    return failFromUnknown(e, requestId);
+  }
+}
+
+export async function POST(req: Request): Promise<NextResponse> {
+  const requestId = getRequestId(req);
+  try {
+    const { session, response } = await requireSession(req, requestId);
+    if (response) return response;
+    const roleErr = requireRole(session!, ["parent"], requestId);
+    if (roleErr) return roleErr;
+
+    let body: unknown = {};
+    try {
+      body = await req.json();
+    } catch {
+      body = {};
+    }
+    const parsed = bodySchema.safeParse(body);
+    if (!parsed.success) {
+      return fail(
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid request body.",
+        },
+        requestId,
+      );
+    }
+    const learnerId = parsed.data.learnerId ?? null;
+    if (learnerId) {
+      const scope = requireLearnerScope(session!, learnerId, requestId);
+      if (scope) return scope;
+    }
+    const rec = createDataExportRequest({
+      tenantId: session!.tenantId,
+      parentUserId: session!.userId,
+      learnerId,
+      notes: parsed.data.notes ?? null,
+    });
+    audit(session!, "privacy.export_request.created", requestId, {
+      learnerId,
+      metadata: { requestId: rec.id },
+    });
+    return ok({ request: rec }, requestId);
+  } catch (e) {
+    return failFromUnknown(e, requestId);
+  }
+}

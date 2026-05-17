@@ -1,0 +1,71 @@
+/* artifacts/mockup-sandbox/src/components/mockups/nd-focused/_group.css */
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap');
+
+:root {
+  --background: 0 0% 98%;
+  --foreground: 240 10% 15%;
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 15%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 15%;
+  --primary: 250 80% 50%; /* Deep Blue/Purple for focus */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 5% 90%;
+  --secondary-foreground: 240 10% 15%;
+  --muted: 240 5% 96%;
+  --muted-foreground: 240 5% 45%;
+  --accent: 250 80% 50%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 240 5% 90%;
+  --input: 240 5% 90%;
+  --ring: 250 80% 50%;
+  --radius: 1rem;
+  
+  --font-sans: 'Geist', sans-serif;
+}
+
+.dark {
+  --background: 240 10% 15%;
+  --foreground: 0 0% 98%;
+  --card: 240 10% 10%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 10%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 250 80% 60%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 10% 25%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 240 10% 20%;
+  --muted-foreground: 240 5% 70%;
+  --accent: 250 80% 60%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 62% 30%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 10% 25%;
+  --input: 240 10% 25%;
+  --ring: 250 80% 60%;
+}
+
+* {
+  font-family: var(--font-sans);
+}
+
+/* Scroll snap utilities */
+.scroll-snap-y {
+  scroll-snap-type: y mandatory;
+}
+.snap-start {
+  scroll-snap-align: start;
+}
+
+/* Focus mode transitions */
+.focus-transition {
+  transition: opacity 0.3s ease, transform 0.3s ease, filter 0.3s ease;
+}
+.out-of-focus {
+  opacity: 0.3;
+  filter: grayscale(100%);
+  pointer-events: none;
+}

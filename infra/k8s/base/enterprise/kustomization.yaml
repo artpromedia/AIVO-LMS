@@ -1,0 +1,24 @@
+# =============================================================================
+# AIVO Enterprise services — k8s base
+# =============================================================================
+# Base manifests for the 11 enterprise services introduced in sprints
+# 02-10. Each service follows the same deployment shape; the per-service
+# YAMLs in this directory inherit from `enterprise-service-template.yaml`
+# via kustomize patches.
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - feature-flags-configmap.yaml
+  - problem-session-svc.yaml
+  - math-recognizer-svc.yaml
+  - science-solver-svc.yaml
+  - subject-brain-svc.yaml
+  - homework-svc.yaml
+  - recommendation-svc.yaml
+  - tenant-svc.yaml
+  - integration-svc.yaml
+  - audit-svc.yaml
+  - data-governance-svc.yaml
+  - responsible-ai-svc.yaml

@@ -1,0 +1,27 @@
+{
+  "name": "@aivo/item-bank",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Assessment item-bank primitives — versioned items, cohort A/B routing, defect tracking. Lets the assessment service ship multiple variants of an item, route a learner to a deterministic variant per cohort, and retire an item when defects accumulate (§9.3 Greenfield 6–8w).",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "package.json"],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "tsc",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.3",
+    "vitest": "^2.0.0"
+  }
+}

@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: integration-svc
+  labels:
+    app: integration-svc
+    app.kubernetes.io/part-of: aivo-enterprise
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: integration-svc }
+  template:
+    metadata:
+      labels: { app: integration-svc }
+    spec:
+      containers:
+        - name: app
+          image: aivo/integration-svc:latest
+          ports: [{ name: http, containerPort: 3068 }]
+          env:
+            - { name: NODE_ENV, value: production }
+            - { name: PORT, value: "3068" }
+            - { name: INTEGRATION_PORT, value: "3068" }
+            - name: AIVO_FEATURE_SIS_SYNC
+              valueFrom:
+                configMapKeyRef: { name: aivo-enterprise-flags, key: AIVO_FEATURE_SIS_SYNC, optional: true }
+            - name: AIVO_FEATURE_LTI_13
+              valueFrom:
+                configMapKeyRef: { name: aivo-enterprise-flags, key: AIVO_FEATURE_LTI_13, optional: true }
+          readinessProbe: { httpGet: { path: /healthz, port: http }, initialDelaySeconds: 5 }
+          livenessProbe: { httpGet: { path: /healthz, port: http }, initialDelaySeconds: 15 }
+          resources:
+            requests: { cpu: 50m, memory: 128Mi }
+            limits: { cpu: 500m, memory: 512Mi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: integration-svc
+spec:
+  selector: { app: integration-svc }
+  ports: [{ name: http, port: 3068, targetPort: http }]

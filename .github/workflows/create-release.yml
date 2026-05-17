@@ -1,0 +1,263 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (semver, e.g. 1.2.3)"
+        required: true
+        type: string
+      source_sha:
+        description: "Source commit SHA (defaults to HEAD)"
+        required: false
+        type: string
+      prerelease:
+        description: "Mark as pre-release"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  IMAGE_PREFIX: ghcr.io/artpromedia
+  ALL_SERVICES: >-
+    identity-svc,billing-svc,family-svc,integrations-svc,admin-svc,
+    learning-svc,engagement-svc,comms-svc,i18n-svc,tutor-svc,
+    status-page-svc,research-svc,assessment-svc,ai-svc,brain-svc,curriculum-svc,web,marketing
+
+jobs:
+  # ─────────────────────────────────────────────
+  # Validate Release Inputs
+  # ─────────────────────────────────────────────
+  validate:
+    name: Validate Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.validate.outputs.version }}
+      source-tag: ${{ steps.validate.outputs.source-tag }}
+      sha-short: ${{ steps.validate.outputs.sha-short }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate semver and check tag
+        id: validate
+        run: |
+          VERSION="${{ inputs.version }}"
+
+          # Validate semver format
+          if ! echo "$VERSION" | grep -Pq '^\d+\.\d+\.\d+(-[a-zA-Z0-9.]+)?$'; then
+            echo "::error::Invalid semver format: $VERSION (expected: X.Y.Z or X.Y.Z-prerelease)"
+            exit 1
+          fi
+          echo "Valid semver: $VERSION"
+
+          # Check tag doesn't already exist
+          if git rev-parse "v${VERSION}" >/dev/null 2>&1; then
+            echo "::error::Tag v${VERSION} already exists"
+            exit 1
+          fi
+          echo "Tag v${VERSION} does not exist (OK)"
+
+          # Determine source SHA
+          SOURCE_SHA="${{ inputs.source_sha || github.sha }}"
+          SHA_SHORT="${SOURCE_SHA::7}"
+          SOURCE_TAG="main-${SHA_SHORT}"
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "source-tag=$SOURCE_TAG" >> "$GITHUB_OUTPUT"
+          echo "sha-short=$SHA_SHORT" >> "$GITHUB_OUTPUT"
+
+          echo "Version:    v$VERSION"
+          echo "Source SHA: $SOURCE_SHA"
+          echo "Source tag: $SOURCE_TAG"
+
+  # ─────────────────────────────────────────────
+  # Verify All Images Exist in GHCR
+  # ─────────────────────────────────────────────
+  verify-images:
+    name: Verify Source Images
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: validate
+
+    steps:
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.AIVO_GHCR_PUSH }}
+
+      - name: Verify all 15 images exist
+        run: |
+          SOURCE_TAG="${{ needs.validate.outputs.source-tag }}"
+          echo "Verifying images with tag: $SOURCE_TAG"
+          echo ""
+
+          SERVICES="identity-svc billing-svc family-svc integrations-svc admin-svc \
+            learning-svc engagement-svc comms-svc i18n-svc tutor-svc \
+            status-page-svc research-svc assessment-svc ai-svc brain-svc curriculum-svc web marketing"
+
+          MISSING=0
+          for svc in $SERVICES; do
+            IMAGE="${{ env.IMAGE_PREFIX }}/$svc:$SOURCE_TAG"
+            if docker manifest inspect "$IMAGE" > /dev/null 2>&1; then
+              echo "OK: $svc"
+            else
+              echo "MISSING: $svc ($IMAGE)"
+              MISSING=$((MISSING + 1))
+            fi
+          done
+
+          echo ""
+          if [ "$MISSING" -gt 0 ]; then
+            echo "::error::$MISSING image(s) not found for tag $SOURCE_TAG"
+            exit 1
+          fi
+          echo "All 15 images verified for tag $SOURCE_TAG"
+
+  # ─────────────────────────────────────────────
+  # Re-tag All Images (matrix, max-parallel: 10)
+  # ─────────────────────────────────────────────
+  retag-images:
+    name: "Re-tag: ${{ matrix.service }}"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [validate, verify-images]
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        service:
+          - identity-svc
+          - billing-svc
+          - family-svc
+          - integrations-svc
+          - admin-svc
+          - learning-svc
+          - engagement-svc
+          - comms-svc
+          - i18n-svc
+          - tutor-svc
+          - status-page-svc
+          - research-svc
+          - assessment-svc
+          - ai-svc
+          - brain-svc
+          - curriculum-svc
+          - web
+          - marketing
+
+    steps:
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.AIVO_GHCR_PUSH }}
+
+      - name: Re-tag image
+        run: |
+          SOURCE="${{ env.IMAGE_PREFIX }}/${{ matrix.service }}:${{ needs.validate.outputs.source-tag }}"
+          TARGET="${{ env.IMAGE_PREFIX }}/${{ matrix.service }}:v${{ needs.validate.outputs.version }}"
+
+          echo "Source: $SOURCE"
+          echo "Target: $TARGET"
+
+          docker pull "$SOURCE"
+          docker tag "$SOURCE" "$TARGET"
+          docker push "$TARGET"
+
+          echo "Re-tagged ${{ matrix.service }}: ${{ needs.validate.outputs.source-tag }} → v${{ needs.validate.outputs.version }}"
+
+  # ─────────────────────────────────────────────
+  # Create GitHub Release
+  # ─────────────────────────────────────────────
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [validate, retag-images]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create release tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          VERSION="v${{ needs.validate.outputs.version }}"
+          git tag -a "$VERSION" -m "Release $VERSION"
+          git push origin "$VERSION"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="v${{ needs.validate.outputs.version }}"
+          SOURCE_TAG="${{ needs.validate.outputs.source-tag }}"
+          PRERELEASE=${{ inputs.prerelease && '--prerelease' || '' }}
+
+          # Generate changelog
+          PREV_TAG=$(git describe --tags --abbrev=0 "${VERSION}^" 2>/dev/null || echo "")
+
+          if [ -n "$PREV_TAG" ]; then
+            CHANGELOG=$(git log "$PREV_TAG".."$VERSION" --pretty=format:"- %s (%h)" --no-merges)
+          else
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" --no-merges -30)
+          fi
+
+          cat > /tmp/release-notes.md << EOMD
+          ## Release ${VERSION}
+
+          **Source:** \`${SOURCE_TAG}\` → \`${VERSION}\`
+          **Date:** $(date -u +"%Y-%m-%d %H:%M UTC")
+
+          ### Changes
+
+          ${CHANGELOG}
+
+          ### Docker Images
+
+          All 17 service images re-tagged as \`${VERSION}\` on GHCR:
+
+          | Service | Image |
+          |---------|-------|
+          | identity-svc | \`${{ env.IMAGE_PREFIX }}/identity-svc:${VERSION}\` |
+          | billing-svc | \`${{ env.IMAGE_PREFIX }}/billing-svc:${VERSION}\` |
+          | family-svc | \`${{ env.IMAGE_PREFIX }}/family-svc:${VERSION}\` |
+          | integrations-svc | \`${{ env.IMAGE_PREFIX }}/integrations-svc:${VERSION}\` |
+          | admin-svc | \`${{ env.IMAGE_PREFIX }}/admin-svc:${VERSION}\` |
+          | learning-svc | \`${{ env.IMAGE_PREFIX }}/learning-svc:${VERSION}\` |
+          | engagement-svc | \`${{ env.IMAGE_PREFIX }}/engagement-svc:${VERSION}\` |
+          | comms-svc | \`${{ env.IMAGE_PREFIX }}/comms-svc:${VERSION}\` |
+          | i18n-svc | \`${{ env.IMAGE_PREFIX }}/i18n-svc:${VERSION}\` |
+          | tutor-svc | \`${{ env.IMAGE_PREFIX }}/tutor-svc:${VERSION}\` |
+          | status-page-svc | \`${{ env.IMAGE_PREFIX }}/status-page-svc:${VERSION}\` |
+          | research-svc | \`${{ env.IMAGE_PREFIX }}/research-svc:${VERSION}\` |
+          | assessment-svc | \`${{ env.IMAGE_PREFIX }}/assessment-svc:${VERSION}\` |
+          | ai-svc | \`${{ env.IMAGE_PREFIX }}/ai-svc:${VERSION}\` |
+          | brain-svc | \`${{ env.IMAGE_PREFIX }}/brain-svc:${VERSION}\` |
+          | curriculum-svc | \`${{ env.IMAGE_PREFIX }}/curriculum-svc:${VERSION}\` |
+          | web | \`${{ env.IMAGE_PREFIX }}/web:${VERSION}\` |
+          | marketing | \`${{ env.IMAGE_PREFIX }}/marketing:${VERSION}\` |
+          EOMD
+
+          gh release create "$VERSION" \
+            --title "Release ${VERSION}" \
+            --notes-file /tmp/release-notes.md \
+            $PRERELEASE \
+            --target "$GITHUB_SHA"
+
+          echo "Created release: $VERSION"

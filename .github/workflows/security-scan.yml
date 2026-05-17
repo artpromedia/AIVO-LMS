@@ -1,0 +1,164 @@
+name: Security Scan
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  pnpm-audit:
+    name: pnpm audit (high+)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Run pnpm audit (fail on high+)
+        run: pnpm audit --audit-level=high
+
+  pip-audit:
+    name: pip audit (Python services)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pip-audit
+        run: |
+          python -m pip install --upgrade pip
+          pip install pip-audit
+      - name: Audit brain-svc (fail on high+)
+        run: |
+          cd services/brain-svc
+          pip install -r requirements.txt
+          pip-audit --strict --vulnerability-service osv --ignore-vuln CVE-2026-3219
+      - name: Audit ai-svc (fail on high+)
+        run: |
+          if [ -f services/ai-svc/requirements.txt ]; then
+            cd services/ai-svc
+            pip install -r requirements.txt
+            pip-audit --strict --vulnerability-service osv --ignore-vuln CVE-2026-3219
+          fi
+
+  trivy-scan:
+    name: Trivy vulnerability scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Trivy (table, fail on CRITICAL)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: CRITICAL
+          exit-code: "1"
+          ignore-unfixed: true
+          format: table
+      - name: Run Trivy (SARIF for code-scanning)
+        if: always()
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: CRITICAL,HIGH
+          format: sarif
+          output: trivy-results.sarif
+      - name: Upload SARIF to GitHub Security
+        if: always()
+        continue-on-error: true
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy-results.sarif
+
+  secret-detection:
+    name: Secret detection (TruffleHog, verified)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: TruffleHog secret scan (fail on verified findings)
+        uses: trufflesecurity/trufflehog@main
+        with:
+          extra_args: --results=verified,unknown
+
+  python-sast:
+    name: Python SAST (Bandit, fail on HIGH severity+confidence)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install bandit
+        run: pip install bandit
+      - name: Scan brain-svc
+        run: bandit -r services/brain-svc/src --severity-level high --confidence-level high
+      - name: Scan ai-svc
+        run: |
+          if [ -d services/ai-svc/src ]; then
+            bandit -r services/ai-svc/src --severity-level high --confidence-level high
+          fi
+
+  python-lint:
+    name: Python lint (Ruff F,E9 — blocking)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install ruff
+        run: pip install ruff
+      # Blocking subset: pyflakes (F) catches dead code, undefined names,
+      # unused imports/variables; E9 catches syntax/parse errors. The wider
+      # rule set in pyproject.toml is intentionally advisory until the
+      # backlog is cleared.
+      - name: Ruff check (F,E9)
+        run: |
+          ruff check --select=F,E9 \
+            services/brain-svc/src \
+            services/ai-svc/src \
+            services/curriculum-svc/src
+
+  security-summary:
+    name: Security summary
+    runs-on: ubuntu-latest
+    needs: [pnpm-audit, pip-audit, trivy-scan, secret-detection, python-sast, python-lint]
+    if: always()
+    steps:
+      - name: Aggregate results
+        run: |
+          echo "## Security Scan Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Check | Status |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| pnpm audit (high+) | ${{ needs.pnpm-audit.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| pip audit (Python) | ${{ needs.pip-audit.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Trivy (CRITICAL) | ${{ needs.trivy-scan.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Secret detection | ${{ needs.secret-detection.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Python SAST (Bandit) | ${{ needs.python-sast.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Python lint (Ruff F,E9) | ${{ needs.python-lint.result }} |" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ needs.pnpm-audit.result }}" != "success" ] || \
+             [ "${{ needs.pip-audit.result }}" != "success" ] || \
+             [ "${{ needs.trivy-scan.result }}" != "success" ] || \
+             [ "${{ needs.secret-detection.result }}" != "success" ] || \
+             [ "${{ needs.python-sast.result }}" != "success" ] || \
+             [ "${{ needs.python-lint.result }}" != "success" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo ":x: One or more security checks failed. Review the failing job above before merging." >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo ":white_check_mark: All security checks passed." >> "$GITHUB_STEP_SUMMARY"

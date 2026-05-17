@@ -1,0 +1,106 @@
+🔴 SPRINT 1 — Critical Safety & Multi-Tenant Fixes
+Priority: BLOCKER — Must ship before any production traffic
+Estimated effort: 3–5 days
+
+Prompt 1.1 — Eliminate Hardcoded Tenant ID
+Code
+Seven call-sites across learning-svc and tutor-svc insert rows with a hardcoded
+tenantId: "00000000-0000-0000-0000-000000000001" instead of deriving it from the
+authenticated user's JWT or the learner's record. In a multi-tenant deployment every
+session, gradebook entry, and learning path created by those routes would be silently
+mis-assigned to a single tenant.
+
+Files to change:
+- services/learning-svc/src/routes/sessions.ts (lines 31, 164, 203, 230)
+- services/tutor-svc/src/routes/chat.ts (line 55)
+- services/tutor-svc/src/routes/store.ts (lines 79, 113)
+
+Task:
+1. Add a shared helper (or reuse existing JWT verification from @aivo/security) to
+   extract tenantId from the request's Authorization header in both services.
+2. For learning-svc, look up the learner's tenantId from the learners table as a
+   fallback when the request originates from an internal service call that carries no JWT.
+3. Replace every hardcoded UUID with the resolved tenant ID.
+4. Add a 400 guard: if no tenantId can be resolved, return an error rather than
+   silently defaulting.
+5. Write at least one integration-style test per service that verifies the stored
+   tenantId matches the authenticated user's tenant.
+
+Acceptance criteria:
+- grep -rn "00000000-0000-0000-0000-000000000001" services/ returns zero results
+  (excluding seed scripts and test fixtures).
+- All existing API routes still function (no regression).
+- A request with a JWT for Tenant-A creates records with Tenant-A's UUID.
+Prompt 1.2 — Replace Hardcoded localhost in Brain Service
+Code
+The Python brain-svc calls http://localhost:3005 to notify the learning-svc. In
+Kubernetes / Docker Compose this resolves to the wrong container or fails entirely.
+
+Files to change:
+- services/brain-svc/src/brain_svc/routes/brain.py (lines 386, 481)
+- services/brain-svc/src/brain_svc/services/clone_pipeline.py (line 381)
+
+Task:
+1. Add LEARNING_SVC_URL to the brain-svc config, read from
+   os.environ.get("LEARNING_SVC_URL", "http://localhost:3005").
+2. Replace all three hardcoded strings with the config variable.
+3. Add LEARNING_SVC_URL to .env.example (verify brain-svc reads it).
+4. Update docker-compose.dev.yml (if present) to pass
+   LEARNING_SVC_URL=http://learning-svc:3005 to the brain-svc container.
+
+Acceptance criteria:
+- grep -rn "localhost:3005" services/brain-svc/ returns zero results.
+- Brain clone → learning path init works in Docker Compose with service hostnames.
+Prompt 1.3 — Upgrade Content Safety Gate
+Code
+services/ai-svc/src/ai_svc/services/quality_gate.py lines 7-11 has only 3 regex
+patterns covering ~15 keywords. For a platform serving children — including non-verbal
+children who cannot self-report harmful content — this is critically insufficient.
+
+File to change: services/ai-svc/src/ai_svc/services/quality_gate.py
+
+Task:
+1. Expand the regex wordlist to cover at minimum:
+   - Profanity / vulgar language (mild + severe)
+   - Bullying / harassment language
+   - Self-harm variations (cutting, ED, etc.)
+   - Substance abuse (alcohol, vaping, specific drug names)
+   - Personally identifiable information patterns (SSN, phone, email-in-output)
+   - Age-inappropriate romantic/dating content
+2. Add a semantic safety layer: after the regex pass, call the LLM's own moderation
+   endpoint (if using OpenAI) or a lightweight classifier. Use the existing
+   llm_gateway.py to make a "moderation" call with a purpose-built prompt:
+   "Is the following content safe for a child aged 3-18 with developmental differences?
+   Respond SAFE or UNSAFE with reason."
+3. Add a PII-leak detector: regex for patterns like \b\d{3}-\d{2}-\d{4}\b (SSN),
+   phone numbers, email addresses appearing in generated content.
+4. Log every safety gate failure to a new content_moderation_log table (or an
+   append-only JSON log) for later human review.
+5. Write unit tests for each new pattern category — at least 30 test cases covering
+   true positives and false negatives.
+
+Acceptance criteria:
+- Quality gate catches at minimum: "Let me tell you about dangerous chemicals",
+  "You're so stupid", "Here's my phone number 555-1234", mild profanity.
+- All existing tests still pass.
+- New test file: services/ai-svc/tests/test_quality_gate.py with ≥30 cases.
+Prompt 1.4 — Lock Down CORS for Production
+Code
+services/identity-svc/src/index.ts line 31 sets origin: true which allows any
+origin in production. The .env.example already has a CORS_ORIGINS variable but
+identity-svc doesn't read it.
+
+File to change: services/identity-svc/src/index.ts (lines 30-33)
+
+Task:
+1. Read CORS_ORIGINS from process.env. If present, split by comma into an array and
+   pass to @fastify/cors as origin: allowedOrigins.
+2. If CORS_ORIGINS is not set and NODE_ENV !== 'development', default to
+   [process.env.APP_URL] (single origin).
+3. Only fall back to origin: true when NODE_ENV === 'development'.
+4. Add a startup log line: logger.info("CORS origins", { origins }).
+
+Acceptance criteria:
+- In production (NODE_ENV=production) without CORS_ORIGINS set, only APP_URL is allowed.
+- In development, behavior unchanged (allow all).
+- Cross-origin request from an unlisted domain receives a CORS error.

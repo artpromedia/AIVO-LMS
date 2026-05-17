@@ -1,0 +1,30 @@
+{
+  "name": "@aivo/feature-flags",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Feature flag registry for AIVO enterprise capabilities. Flags default off and parse from env so legacy learner, parent, baseline, tutor, and dashboard flows remain unchanged unless explicitly enabled.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "package.json"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "tsc",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.3",
+    "vitest": "^2.0.0"
+  }
+}

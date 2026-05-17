@@ -1,0 +1,43 @@
+Build (web-app)
+failed 1 hour ago in 1m 23s
+Search logs
+3s
+4s
+2s
+13s
+0s
+10s
+47s
+Run set -euo pipefail
+Scope: 3 of 26 workspace projects
+packages/brand build$ tsc
+packages/brand build: Done
+packages/learner-ui build$ tsc
+packages/learner-ui build: Done
+apps/web build$ next build
+apps/web build: ⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache
+apps/web build: Attention: Next.js now collects completely anonymous telemetry regarding usage.
+apps/web build: This information is used to shape Next.js' roadmap and prioritize features.
+apps/web build: You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+apps/web build: https://nextjs.org/telemetry
+apps/web build:    ▲ Next.js 15.5.15
+apps/web build:    Creating an optimized production build ...
+apps/web build:  ✓ Compiled successfully in 28.7s
+apps/web build:    Linting and checking validity of types ...
+apps/web build:  ⚠ The Next.js plugin was not detected in your ESLint configuration. See https://nextjs.org/docs/app/api-reference/config/eslint#migrating-existing-config
+apps/web build: Failed to compile.
+apps/web build: ./src/app/dashboard/district/usage/page.tsx
+apps/web build: 173:9  Warning: Visible, non-interactive elements with click handlers must have at least one keyboard listener.  jsx-a11y/click-events-have-key-events
+apps/web build: 173:9  Warning: Avoid non-native interactive elements. If using native HTML is not possible, add an appropriate role and support for tabbing, mouse, keyboard, and touch inputs to an interactive content element.  jsx-a11y/no-static-element-interactions
+apps/web build: 175:11  Warning: Visible, non-interactive elements with click handlers must have at least one keyboard listener.  jsx-a11y/click-events-have-key-events
+apps/web build: ./src/app/dashboard/learner/LearnerHome/TopBar.tsx
+apps/web build: 32:8  Error: Definition for rule '@next/next/no-img-element' was not found.  @next/next/no-img-element
+apps/web build: ./src/app/dashboard/parent/layout.tsx
+apps/web build: 190:18  Error: Definition for rule '@next/next/no-img-element' was not found.  @next/next/no-img-element
+apps/web build: 276:18  Error: Definition for rule '@next/next/no-img-element' was not found.  @next/next/no-img-element
+apps/web build: info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+apps/web build: Failed
+/home/runner/work/aivo-ai-learning/aivo-ai-learning/apps/web:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @aivo/web@1.0.0 build: `next build`
+Exit status 1
+Error: Process completed with exit code 1.

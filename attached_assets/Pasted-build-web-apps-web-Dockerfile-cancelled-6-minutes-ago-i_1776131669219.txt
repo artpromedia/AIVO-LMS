@@ -1,0 +1,142 @@
+build (web, ., apps/web/Dockerfile)
+cancelled 6 minutes ago in 36s
+Search logs
+2s
+9s
+1s
+5s
+12s
+Run docker/build-push-action@v5
+GitHub Actions runtime token ACs
+Docker info
+Proxy configuration
+Buildx version
+Builder info
+/usr/bin/docker buildx build --cache-from type=gha --cache-to type=gha,mode=max --file apps/web/Dockerfile --iidfile /home/runner/work/_temp/docker-actions-toolkit-yxx9Bx/build-iidfile-84b734015c.txt --attest type=provenance,mode=max,builder-id=https://github.com/artpromedia/OONRU-ERP-SAAS/actions/runs/24376491468 --tag ghcr.io/artpromedia/oonru-saas/web:latest --tag ghcr.io/artpromedia/oonru-saas/web:5618496178909e4563fb2b1d2fcb2aa28c3dfb96 --metadata-file /home/runner/work/_temp/docker-actions-toolkit-yxx9Bx/build-metadata-9252ad21dc.json --push .
+#0 building with "builder-edcf14c4-68b2-4e33-89ec-4a024abc61c9" instance using docker-container driver
+
+#1 [internal] load build definition from Dockerfile
+#1 DONE 0.0s
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 2.46kB done
+#1 DONE 0.0s
+
+#2 [auth] library/node:pull token for registry-1.docker.io
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/node:20-alpine
+#3 DONE 0.4s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 422B done
+#4 DONE 0.0s
+
+#5 importing cache manifest from gha:8961953798491416227
+#5 DONE 0.0s
+
+#6 [deps  1/10] FROM docker.io/library/node:20-alpine@sha256:f598378b5240225e6beab68fa9f356db1fb8efe55173e6d4d8153113bb8f333c
+#6 resolve docker.io/library/node:20-alpine@sha256:f598378b5240225e6beab68fa9f356db1fb8efe55173e6d4d8153113bb8f333c done
+#6 sha256:c7734204880fafbd6297ce1844e07c137d82ee814ac8b5fa6ac1a3659101d503 446B / 446B 0.1s done
+#6 sha256:62e0e1181d88da8ed0e2fda221e9446ad0f09a004a375193ad7a38e31ec4eab4 1.26MB / 1.26MB 0.1s done
+#6 sha256:d7f6aca05b78f475975eeac3898b7ef0a618937174c469650e05e81cbf8c5f46 0B / 43.23MB 0.2s
+#6 sha256:589002ba0eaed121a1dbf42f6648f29e5be55d5c8a6ee0f8eaa0285cc21ac153 2.10MB / 3.86MB 0.2s
+#6 ...
+
+#7 [internal] load build context
+#7 transferring context: 1.09MB 0.2s done
+#7 DONE 0.2s
+
+#6 [deps  1/10] FROM docker.io/library/node:20-alpine@sha256:f598378b5240225e6beab68fa9f356db1fb8efe55173e6d4d8153113bb8f333c
+#6 sha256:589002ba0eaed121a1dbf42f6648f29e5be55d5c8a6ee0f8eaa0285cc21ac153 3.86MB / 3.86MB 0.2s done
+#6 extracting sha256:589002ba0eaed121a1dbf42f6648f29e5be55d5c8a6ee0f8eaa0285cc21ac153 0.1s done
+#6 sha256:d7f6aca05b78f475975eeac3898b7ef0a618937174c469650e05e81cbf8c5f46 26.21MB / 43.23MB 0.5s
+#6 sha256:d7f6aca05b78f475975eeac3898b7ef0a618937174c469650e05e81cbf8c5f46 38.80MB / 43.23MB 0.6s
+#6 sha256:d7f6aca05b78f475975eeac3898b7ef0a618937174c469650e05e81cbf8c5f46 43.23MB / 43.23MB 0.7s done
+#6 extracting sha256:d7f6aca05b78f475975eeac3898b7ef0a618937174c469650e05e81cbf8c5f46
+#6 extracting sha256:d7f6aca05b78f475975eeac3898b7ef0a618937174c469650e05e81cbf8c5f46 0.9s done
+#6 DONE 1.6s
+
+#6 [deps  1/10] FROM docker.io/library/node:20-alpine@sha256:f598378b5240225e6beab68fa9f356db1fb8efe55173e6d4d8153113bb8f333c
+#6 extracting sha256:62e0e1181d88da8ed0e2fda221e9446ad0f09a004a375193ad7a38e31ec4eab4 0.0s done
+#6 extracting sha256:c7734204880fafbd6297ce1844e07c137d82ee814ac8b5fa6ac1a3659101d503 done
+#6 DONE 1.6s
+
+#8 [deps  2/10] WORKDIR /app
+#8 DONE 0.1s
+
+#9 [runner 3/6] RUN addgroup --system --gid 1001 nodejs &&     adduser  --system --uid 1001 nextjs
+#9 DONE 0.1s
+
+#10 [deps  3/10] RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
+#10 0.236 Preparing pnpm@9.15.4 for immediate activation...
+#10 ...
+
+#11 [builder  3/14] RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
+#11 0.234 Preparing pnpm@9.15.4 for immediate activation...
+#11 DONE 1.6s
+
+#10 [deps  3/10] RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
+#10 DONE 1.6s
+
+#12 [deps  4/10] COPY package.json pnpm-workspace.yaml ./
+#12 DONE 0.0s
+
+#13 [deps  5/10] COPY pnpm-lock.yaml* ./
+#13 DONE 0.0s
+
+#14 [deps  6/10] COPY packages/tsconfig/package.json  ./packages/tsconfig/
+#14 DONE 0.0s
+
+#15 [deps  7/10] COPY packages/shared/package.json    ./packages/shared/
+#15 DONE 0.0s
+
+#16 [deps  8/10] COPY packages/ui/package.json        ./packages/ui/
+#16 DONE 0.0s
+
+#17 [deps  9/10] COPY apps/web/package.json           ./apps/web/
+#17 DONE 0.0s
+
+#18 [deps 10/10] RUN pnpm install --frozen-lockfile
+#18 0.579 Scope: all 5 workspace projects
+#18 0.721 Lockfile is up to date, resolution step is skipped
+#18 0.805 Progress: resolved 1, reused 0, downloaded 0, added 0
+#18 0.886 Packages: +262
+#18 0.886 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#18 1.127 
+#18 1.127    ╭───────────────────────────────────────────────────────────────────╮
+#18 1.127    │                                                                   │
+#18 1.127    │                Update available! 9.15.4 → 10.33.0.                │
+#18 1.127    │   Changelog: https://github.com/pnpm/pnpm/releases/tag/v10.33.0   │
+#18 1.127    │         Run "corepack install -g pnpm@10.33.0" to update.         │
+#18 1.127    │                                                                   │
+#18 1.127    ╰───────────────────────────────────────────────────────────────────╯
+#18 1.127 
+#18 1.808 Progress: resolved 262, reused 0, downloaded 129, added 123
+#18 2.807 Progress: resolved 262, reused 0, downloaded 153, added 143
+#18 3.809 Progress: resolved 262, reused 0, downloaded 176, added 162
+#18 4.810 Progress: resolved 262, reused 0, downloaded 255, added 252
+#18 5.290 Progress: resolved 262, reused 0, downloaded 262, added 262, done
+#18 5.559 .../sharp@0.34.5/node_modules/sharp install$ node install/check.js || npm run build
+#18 5.561 .../esbuild@0.21.5/node_modules/esbuild postinstall$ node install.js
+#18 5.645 .../esbuild@0.21.5/node_modules/esbuild postinstall: Done
+#18 5.669 .../sharp@0.34.5/node_modules/sharp install: Done
+#18 5.783 
+#18 5.783 devDependencies:
+#18 5.783 + @typescript-eslint/eslint-plugin 7.18.0
+#18 5.783 + @typescript-eslint/parser 7.18.0
+#18 5.783 + eslint 8.57.1
+#18 5.783 + eslint-config-prettier 9.1.2
+#18 5.783 + prettier 3.8.1
+#18 5.783 + turbo 2.8.21
+#18 5.783 + typescript 5.9.3
+#18 5.783 
+#18 5.814 Done in 5.6s
+#18 DONE 5.9s
+
+#19 [builder  4/14] COPY --from=deps /app/node_modules                  ./node_modules
+#19 CACHED
+
+#20 [builder  5/14] COPY --from=deps /app/packages/tsconfig/node_modules ./packages/tsconfig/node_modules
+#20 ERROR: failed to calculate checksum of ref ufobgspemt2e65qk0gluyeeyd::jusukv5r2zbbamsh1k9rzqmxb: "/app/packages/tsconfig/node_modules": not found
+Error: The operation was canceled.

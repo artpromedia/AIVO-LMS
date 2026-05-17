@@ -1,0 +1,254 @@
+Here's your sprint prompt — copy everything below the line:
+
+---
+
+# 🚀 AIVO Learning — Sprint: Platform Completeness & MFA Implementation
+
+## Repository
+`artpromedia/aivo-ai-learning` (monorepo, pnpm + turborepo)
+
+## Architecture Context
+- **Frontend**: `apps/web` (Next.js 15 + Tailwind v4), `apps/marketing` (standalone Next.js), `apps/mobile` (React Native Expo)
+- **Backend**: Fastify 5 microservices in `services/` — identity-svc (port 3001), comms-svc (port 3010), admin-svc (port 3013), etc.
+- **DB**: PostgreSQL 16 + Drizzle ORM, schema in `packages/db`
+- **Email**: Postmark SDK already integrated in `services/comms-svc/src/lib/postmark.ts` — `sendEmail()`, `sendTemplateEmail()`, `sendBatchEmails()` all working
+- **Auth**: JWT RS256 via `@aivo/security` (jose library), refresh tokens in cookies, PIN login for learners, Google OAuth
+- **Shared UI**: `packages/learner-ui` (learner components), `packages/brand` (design tokens)
+- **i18n**: `next-intl`, message files at `apps/web/src/i18n/messages/{locale}.json` and `apps/marketing/src/i18n/messages/{locale}.json`
+
+---
+
+## TASK 1: Implement Email-Based MFA via Postmark
+
+### Current State
+- MFA is **NOT implemented** anywhere in the codebase despite the compliance dashboard (`apps/web/src/app/dashboard/admin/compliance/page.tsx`) claiming `{ label: "Multi-Factor Authentication (MFA)", status: true }` — this is false
+- Login routes at `services/identity-svc/src/routes/auth.ts` (`/api/auth/login`, `/api/auth/admin-login`, `/api/auth/google`) issue JWT immediately after password check — no second factor
+- The `users` table has no `mfa_enabled` or `mfa_method` columns
+- Postmark is fully operational in `services/comms-svc/src/lib/postmark.ts` with `POSTMARK_API_TOKEN` configured
+- The Hetzner deployment guide references `mfa-encryption-key` in secrets but it's never consumed
+- i18n has `"two_factor": "Two-Factor Authentication"` string in settings namespace but no UI uses it
+
+### Requirements
+
+#### 1.1 Database Changes (packages/db)
+- Add columns to `users` table: `mfa_enabled BOOLEAN DEFAULT false`, `mfa_method VARCHAR(20) DEFAULT 'email'`
+- Create new `mfa_codes` table:
+  - `id` UUID PK
+  - `user_id` UUID FK → users.id ON DELETE CASCADE
+  - `code` VARCHAR(6) NOT NULL
+  - `purpose` VARCHAR(20) — 'login' | 'step_up' | 'setup'
+  - `expires_at` TIMESTAMPTZ NOT NULL
+  - `used_at` TIMESTAMPTZ (null = unused)
+  - `attempts` INT DEFAULT 0
+  - `created_at` TIMESTAMPTZ DEFAULT NOW()
+- Add indexes on `user_id` and `expires_at`
+- Create and run Drizzle migration
+
+#### 1.2 MFA Service (services/identity-svc/src/services/mfa.ts)
+- `generateOTP()` — cryptographically secure 6-digit code using `crypto.randomInt(100000, 999999)`
+- `createMFACode(db, userId, purpose)` — invalidate prior unused codes for same user+purpose, insert new code with 10-minute expiry, return code string
+- `verifyMFACode(db, userId, code, purpose)` — find valid unused unexpired code, enforce max 5 attempts, increment attempts on wrong code, mark used on success, return `{ valid, error? }`
+
+#### 1.3 MFA Email Template (services/comms-svc)
+- Create `services/comms-svc/src/lib/templates/mfa-code.ts` — renders branded HTML email with the 6-digit code, AIVO purple (#7C3AED), Fredoka heading, Nunito body, 10-minute expiry notice
+- Put the code in subject line: `"${code} is your AIVO verification code"`
+- Register internal endpoint `POST /api/comms/internal/mfa-code` secured by `x-internal-key` header matching `process.env.INTERNAL_API_KEY` — accepts `{ to, code, name }`, calls `sendEmail()` with rendered template and tag `"mfa-verification"`
+
+#### 1.4 Identity Service Routes (services/identity-svc/src/routes/auth.ts)
+Modify existing login flow and add new endpoints:
+
+**Modify `/api/auth/login`:**
+- After successful password verification, check `user.mfaEnabled`
+- If MFA enabled: generate code via `createMFACode()`, send via comms-svc internal endpoint, issue short-lived `mfaToken` JWT (15min, payload: `{ sub: user.id, purpose: "mfa" }`), return `{ mfaPending: true, mfaToken, mfaMethod: "email" }` — do NOT issue access token
+- If MFA disabled: existing behavior (issue access token immediately)
+
+**Modify `/api/auth/admin-login`:**
+- **Force MFA for all admin roles** (PLATFORM_ADMIN, DISTRICT_ADMIN, SALES, MARKETING, CUSTOMER_CARE, SUPPORT, FINANCE, DEVOPS)
+- If user doesn't have `mfaEnabled`, auto-enable it: `UPDATE users SET mfa_enabled = true`
+- Always go through MFA flow — generate code, send email, return `mfaPending`
+
+**New `POST /api/auth/verify-mfa`:**
+- Body: `{ mfaToken: string, code: string }`
+- Verify mfaToken JWT (check `purpose === "mfa"`, check not expired)
+- Call `verifyMFACode()` with the code
+- On success: issue real accessToken with `mfaVerified: true` in payload, create session, set refreshToken cookie (same pattern as existing login)
+- On failure: return 401 with error message
+
+**New `POST /api/auth/mfa/enable`:**
+- Requires valid Bearer token
+- Sends setup verification code to user's email
+- Returns `{ message: "Verification code sent", mfaMethod: "email" }`
+
+**New `POST /api/auth/mfa/confirm-enable`:**
+- Body: `{ code: string }`
+- Requires valid Bearer token
+- Verifies code with purpose "setup"
+- Sets `mfa_enabled = true` on user record
+
+**New `POST /api/auth/mfa/disable`:**
+- Body: `{ password: string }`
+- Requires valid Bearer token
+- Verifies password before disabling
+- Sets `mfa_enabled = false`
+
+**New `POST /api/auth/mfa/resend`:**
+- Body: `{ mfaToken: string }`
+- Validates mfaToken, generates new code, sends via Postmark
+- Rate limit: max 3 resends per mfaToken session
+
+#### 1.5 Frontend — Web App MFA Flow (apps/web)
+- **Login page** (`apps/web/src/app/(auth)/login/page.tsx` or similar): After login API returns `{ mfaPending: true }`, navigate to MFA verification screen
+- **MFA Verification page**: 6-digit code input (individual digit boxes, auto-advance), countdown timer showing expiry, "Resend code" button (disabled for 30s after send), "Use a different method" placeholder for future TOTP, calls `POST /api/auth/verify-mfa`, on success store token and redirect to dashboard
+- **Settings Security section**: Add MFA toggle in the security settings page, wire to `/api/auth/mfa/enable` → code entry → `/api/auth/mfa/confirm-enable`, wire disable to `/api/auth/mfa/disable` with password confirmation modal
+- **Admin login page**: Same MFA verification flow, always shown after password step
+
+#### 1.6 Frontend — Mobile MFA Flow (apps/mobile)
+- After login returns `mfaPending`, navigate to MFA verification screen
+- Same 6-digit input UX adapted for React Native
+- Settings screen MFA toggle
+
+#### 1.7 Fix Compliance Dashboard
+- In `apps/web/src/app/dashboard/admin/compliance/page.tsx`, the `securityControls` array has `{ label: "Multi-Factor Authentication (MFA)", status: true }` — this should dynamically reflect actual MFA adoption rate or at minimum only show `true` after implementation ships
+
+#### 1.8 Cleanup Cron
+- Add a scheduled job (can be a simple setInterval in identity-svc or a DB-level pg_cron) to delete expired mfa_codes older than 1 hour: `DELETE FROM mfa_codes WHERE expires_at < NOW() - INTERVAL '1 hour'`
+
+---
+
+## TASK 2: Platform Button & Interactive Element Audit + Fixes
+
+Audit every button, link, and interactive element across `apps/web`, `apps/mobile`, and `packages/learner-ui`. For each, verify the onClick/onPress/href is wired to a real implementation. Fix all of the following categories:
+
+### 2.1 Stub/Placeholder Handlers
+- Search all `.tsx` files in `apps/web/src` and `packages/learner-ui/src` for: `onClick={() => {}}`, `onClick={()=>{}}`, `href="#"`, `href=""`, `// TODO`, `// FIXME`, `console.log("clicked")`, `alert(`, handlers that only call `console.log` or `console.warn`
+- For each found: implement the real intended behavior or remove the element if it shouldn't exist yet
+- Pay special attention to:
+  - Navigation links in sidebar/header — must use Next.js `<Link>` or `router.push()` to real routes
+  - Form submit buttons — must call actual API endpoints
+  - Modal open/close triggers — must properly toggle state
+  - "Coming Soon" or disabled features — should have proper disabled state with tooltip explaining why
+
+### 2.2 Dead Routes
+- Cross-reference all `<Link href="...">` and `router.push("...")` calls in `apps/web` against actual page files in `apps/web/src/app/`
+- Any link pointing to a route that has no corresponding `page.tsx` must either: get a page created, get redirected to the correct page, or be removed/disabled with "Coming Soon"
+
+### 2.3 API Integration Gaps
+- Find all `fetch()` / `apiFetch()` calls in the frontend that hit backend endpoints
+- Verify each endpoint exists in the corresponding service's routes
+- Any frontend calling a non-existent backend endpoint needs either: the backend endpoint implemented, or the frontend call removed/stubbed with proper UI feedback
+
+### 2.4 Settings Pages
+- The settings i18n keys suggest these sections exist: General, Notifications, Security, Billing & Subscription, Accessibility, Language Preferences
+- Verify each settings section has a working page with forms that actually persist changes via API calls
+- The "Two-Factor Authentication" toggle in Security settings must wire to the new MFA endpoints from Task 1
+
+### 2.5 Learner UI Components (packages/learner-ui)
+- `PrimarySlot` — verify `onStart` and `onBreak` callbacks are properly consumed by the web app
+- `TabsRail` — verify tab switching works and each tab renders content
+- `BreakCloud` — verify break activities are functional
+- `Celebration` — verify animation triggers correctly on XP/level events
+- All buttons in learner-facing pages should have proper `aria-label` attributes
+
+---
+
+## TASK 3: Marketing Website Conversion Optimization Audit + Fixes
+
+The marketing site is at `apps/marketing` and should be a **conversion driver** for aivolearning.com.
+
+### 3.1 CTA Button Audit
+- Every CTA button on the marketing site ("Get Started", "Start Free Trial", "Request Demo", "Contact Sales", pricing plan buttons) must link to a real destination:
+  - B2C CTAs → sign-up page on `apps/web` (e.g., `https://app.aivolearning.com/register` or appropriate URL)
+  - B2B/District CTAs → contact form or demo request page
+  - "Learn More" buttons → appropriate section anchors or detail pages
+- Check the Hero section, Features section, Pricing section, and Footer for CTAs
+- No button should link to `#` or have an empty `onClick`
+
+### 3.2 Pricing Section
+- Verify the 3 B2C plans + B2B district CTA in the pricing section have functional "Choose Plan" / "Get Started" / "Contact Sales" buttons
+- Buttons should link to registration with plan pre-selected (e.g., `/register?plan=starter`) or to Stripe checkout
+- Verify pricing amounts are real (not placeholder $0 or $XX)
+
+### 3.3 Lead Capture & Forms
+- **Contact page**: Form must submit to a real endpoint (either comms-svc or a form service). Check if there's a `POST /api/comms/contact` or similar
+- **Newsletter/waitlist signup**: If present in footer or CTA section, must be connected to a real email list (Postmark, Mailchimp, or DB storage)
+- **Demo request form**: Must capture company name, role, email, school/district size and submit to backend
+- If any forms are missing backend endpoints, create them in the appropriate service
+
+### 3.4 Analytics & Tracking
+- Check if `apps/marketing` has Google Analytics (GA4), Google Tag Manager, or any analytics integration
+- If missing, add:
+  - GA4 with `next/script` component in the root layout
+  - Conversion tracking events on: CTA clicks, form submissions, pricing plan selection, sign-up initiation
+  - Facebook/Meta Pixel if planned for paid acquisition
+- Check for `<Script>` tags or analytics provider components in `apps/marketing/src/app/layout.tsx`
+
+### 3.5 SEO Implementation
+- Verify every page in `apps/marketing` has:
+  - Proper `<title>` and `<meta name="description">` (via Next.js `metadata` export)
+  - Open Graph tags (`og:title`, `og:description`, `og:image`, `og:url`)
+  - Twitter Card tags
+  - Canonical URLs
+  - Structured data (JSON-LD) for Organization schema at minimum
+- Check for `sitemap.xml` generation (Next.js `sitemap.ts`)
+- Check for `robots.txt`
+- Verify all 10 pages have unique, keyword-rich meta descriptions: landing, about, blog, careers, contact, press-kit, privacy-policy, terms-of-service, coppa-compliance, ferpa-compliance, accessibility
+
+### 3.6 Placeholder Content
+- Search all marketing pages for: "Lorem ipsum", "TODO", "FIXME", "placeholder", "coming soon", "TBD", empty `<p>` tags, hardcoded example data that looks like test content
+- Replace with real copy or remove sections that aren't ready
+
+### 3.7 Mobile Responsiveness
+- Verify the marketing site uses responsive Tailwind classes throughout (responsive breakpoints: `sm:`, `md:`, `lg:`, `xl:`)
+- Check the sticky header works on mobile (hamburger menu?)
+- Check the tutor carousel, pricing table, and testimonials grid stack properly on small screens
+- Ensure CTAs are tap-friendly (min 44x44px touch targets)
+
+### 3.8 Performance & Core Web Vitals
+- Images should use Next.js `<Image>` component with proper `width`, `height`, `priority` for above-fold
+- Check for lazy loading on below-fold sections
+- Verify fonts (Fredoka, Nunito) are loaded via `next/font` for optimal LCP
+
+---
+
+## TASK 4: Cross-Cutting Fixes
+
+### 4.1 i18n Completeness
+- Any new UI strings added in Tasks 1-3 must be added to both `apps/web/src/i18n/messages/en.json` and `apps/marketing/src/i18n/messages/en.json` under appropriate namespaces
+- Add MFA-related strings: verification code prompt, resend code, code expired, MFA enabled/disabled confirmations
+
+### 4.2 Error Handling
+- All new API calls must have proper error handling with user-friendly messages
+- MFA code entry should show clear errors: "Invalid code", "Code expired", "Too many attempts"
+- Network failures should show retry options
+
+### 4.3 Testing
+- Add integration tests for the MFA flow: login → receive mfaPending → verify code → receive tokens
+- Add tests for edge cases: expired codes, max attempts, resend limits, admin forced MFA
+- Add tests for MFA enable/disable flows
+
+---
+
+## Priority Order
+1. **Task 1 (MFA)** — Security critical, compliance docs already claim it's done
+2. **Task 2.1-2.3 (Broken buttons/dead routes/API gaps)** — User-facing bugs
+3. **Task 3.1-3.3 (CTAs, pricing, lead capture)** — Revenue critical
+4. **Task 3.4-3.5 (Analytics, SEO)** — Growth critical
+5. **Remaining tasks** — Polish
+
+## Files You'll Primarily Touch
+```
+packages/db/src/schema/           — mfa_codes table, users table migration
+services/identity-svc/src/        — routes/auth.ts (modify), routes/mfa.ts (new), services/mfa.ts (new)
+services/comms-svc/src/           — lib/templates/mfa-code.ts (new), routes/ (internal MFA endpoint)
+apps/web/src/app/(auth)/          — login modification, MFA verify page (new)
+apps/web/src/app/dashboard/       — settings security section, compliance fix
+apps/web/src/i18n/messages/       — en.json MFA strings
+apps/marketing/src/app/           — all page files (SEO, CTAs, forms)
+apps/marketing/src/components/    — marketing section components (CTA wiring)
+apps/marketing/src/app/layout.tsx — analytics scripts, structured data
+apps/mobile/app/(auth)/           — MFA verify screen (new)
+```
+
+---
+
+Copy everything above this line into your pair programmer session.

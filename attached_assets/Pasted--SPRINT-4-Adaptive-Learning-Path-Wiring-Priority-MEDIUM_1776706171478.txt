@@ -1,0 +1,304 @@
+🟡 SPRINT 4 — Adaptive Learning Path Wiring
+Priority: MEDIUM — Core AI-driven differentiation is built but disconnected
+Estimated effort: 4–5 days
+
+Prompt 4.1 — Wire Curriculum Engine into Learning Path Init
+Code
+services/learning-svc/src/routes/sessions.ts (line 206, 227) calls getDefaultTopics()
+which returns a static hardcoded list of topics per subject. Meanwhile, a full
+LLM-powered curriculum engine exists at services/brain-svc/src/brain_svc/services/
+curriculum_engine.py → generate_topic_sequence_for_path() that can produce personalized
+topic sequences aligned to the learner's curriculum framework, grade level, mastery,
+and functioning level. This engine is never called from the learning-svc session flow.
+
+Files to modify:
+- services/learning-svc/src/routes/sessions.ts
+- services/learning-svc/src/services/content-generator.ts
+
+Task:
+1. In the POST /api/learning/path/:learnerId/:subject/init handler (line 216-239):
+   - After creating the path with default topics, make an async call to brain-svc's
+     curriculum engine endpoint to request personalized topics.
+   - When the brain-svc response arrives, update the topicSequence on the learning path.
+   - If brain-svc is unavailable, fall back silently to the existing getDefaultTopics().
+
+2. Add a new route POST /api/learning/path/:learnerId/:subject/refresh-topics:
+   - Fetches current brain state (mastery, completed topics, functioning level).
+   - Calls the curriculum engine to regenerate the next 10 topics.
+   - Updates the learning path's topicSequence.
+
+3. In content-generator.ts, add a fetchPersonalizedTopics() function that calls:
+   POST brain-svc/api/brain/curriculum/topic-sequence
+   { framework, subject, grade_level, current_mastery,
+     functioning_level, completed_topics }
+
+Acceptance criteria:
+- New learning paths attempt personalized topic generation before falling back to static.
+- refresh-topics endpoint exists and returns updated topic sequence.
+- Static fallback still works when brain-svc is down.
+- No change to existing API contracts.
+Prompt 4.2 — Replace Simplistic XP & Quality Calculations
+Code
+services/tutor-svc/src/routes/chat.ts line 127-130:
+  xpEarned: xpEarned || Math.min(messages.length * 5, 50),
+  completionQuality: Math.min(1.0, messages.length / 10),
+These are pure proxy metrics — XP is literally message count × 5, quality is
+message count / 10. Neither reflects actual learning quality.
+
+Files to modify:
+- services/tutor-svc/src/routes/chat.ts (session complete handler, line 115-134)
+- services/learning-svc/src/routes/sessions.ts (lesson session complete, line 87-131)
+
+Task:
+1. Tutor session XP: Replace with a formula that considers:
+   - Number of correct answers (from interaction beats)
+   - Session duration (diminishing returns after 20 min)
+   - Mastery improvement (delta between session start and end mastery)
+   - Functioning level multiplier (PRE_SYMBOLIC earns XP for engagement, not correctness)
+   Formula:
+   base_xp = correct_answers * 10
+   duration_bonus = min(duration_minutes * 2, 20)
+   mastery_bonus = mastery_delta * 50
+   level_engagement_bonus = (functioning_level_weight) * engagement_beats
+   total = min(base_xp + duration_bonus + mastery_bonus + level_engagement_bonus, 100)
+
+2. Completion quality: Replace with multi-signal score:
+   - Completion rate (beats completed / total beats)
+   - Correctness rate (correct / attempted)
+   - Engagement signals (didn't skip, used breaks appropriately)
+   - Time-on-task ratio (not too fast = guessing, not too slow = disengaged)
+
+3. For lesson sessions, apply similar quality-aware XP in the
+   POST /api/learning/sessions/:sessionId/complete handler.
+
+4. Document the formula in docs/xp-quality-metrics.md.
+
+Acceptance criteria:
+- XP calculation uses ≥3 signals beyond message count.
+- CompletionQuality is a multi-dimensional score between 0.0 and 1.0.
+- A session with 2 messages but 100% correctness earns more XP than one with
+  10 messages and 0% correctness.
+- PRE_SYMBOLIC sessions earn XP for engagement, not just correctness.
+Prompt 4.3 — Mastery-Based Progression Logic
+Code
+The learning path has a topicSequence and completedTopics but there is no logic to
+gate topic advancement on mastery. A learner could theoretically advance through all
+topics without demonstrating understanding.
+
+File to modify: services/learning-svc/src/routes/sessions.ts
+
+Task:
+1. Add a POST /api/learning/path/:learnerId/:subject/advance endpoint:
+   - Checks current topic's mastery score from gradebook.
+   - If mastery ≥ threshold (configurable per functioning level: STANDARD=0.7,
+     SUPPORTED=0.6, LOW_VERBAL=0.5, NON_VERBAL=0.4, PRE_SYMBOLIC=0.3):
+     → Move topic to completedTopics, return next topic.
+   - If below threshold: → Return current topic with a "needs more practice" flag.
+
+2. Add mastery thresholds to a config object:
+   const MASTERY_THRESHOLDS: Record<string, number> = {
+     STANDARD: 0.70,
+     SUPPORTED: 0.60,
+     LOW_VERBAL: 0.50,
+     NON_VERBAL: 0.40,
+     PRE_SYMBOLIC: 0.30,
+   };
+
+3. When a topic is completed, check if the learning path needs a topic refresh
+   (trigger the refresh-topics call from Prompt 4.1).
+
+Acceptance criteria:
+- Learner at 0.3 mastery on STANDARD level cannot advance.
+- Learner at 0.4 mastery on NON_VERBAL level can advance.
+- Topic advancement triggers next-topic refresh.
+- Endpoint returns clear status: "advanced", "needs_practice", or "path_complete".
+Prompt 4.4 — Scaffolding & Remediation in AI Prompts
+Code
+When a learner struggles with a topic (low mastery, multiple attempts), the tutor should
+shift to scaffolding mode. The prompt builder should adapt based on attempt count and
+mastery trend.
+
+File to modify: services/ai-svc/src/ai_svc/services/prompt_builder.py
+
+Task:
+1. Accept new parameters in build_system_prompt():
+   - attempts_on_current_topic: int
+   - mastery_trend: str — "improving", "stable", "declining"
+
+2. Add scaffolding instructions based on attempt count:
+   - Attempts ≤ 2: Standard instruction
+   - Attempts 3-4: "The learner has struggled with this topic. Break it into smaller
+     steps. Use concrete examples before abstract concepts. Check understanding at
+     each micro-step."
+   - Attempts ≥ 5: "This topic requires significant scaffolding. Start with prerequisite
+     skills. Use manipulatives and visual models. Celebrate small wins."
+
+3. Add mastery trend modifiers:
+   - Declining: "The learner's mastery is declining. This may indicate confusion,
+     fatigue, or a gap in prerequisite knowledge. Gently assess what they remember
+     from previous sessions before introducing new content."
+   - Stable at low: "The learner is not making progress. Try a completely different
+     teaching approach."
+
+Acceptance criteria:
+- Prompt for a learner on attempt 5 includes scaffolding language.
+- Prompt for a declining mastery trend includes regression-aware language.
+- Prompt for a first attempt has no scaffolding overhead.
+- ≥10 new test cases in test_prompt_builder.py.
+🟡 SPRINT 5 — Parent Dashboard Completion
+Priority: MEDIUM — Missing UI features that parents expect
+Estimated effort: 4–5 days
+
+Prompt 5.1 — Build Real Progress Page (Replace Redirect Stub)
+Code
+apps/web/src/app/dashboard/parent/learner/[id]/progress/page.tsx is a 9-line file
+that just redirects to /gradebook:
+  export default function ProgressPage() {
+    redirect(`/dashboard/parent/learner/${learnerId}/gradebook`);
+  }
+
+Parents need a dedicated progress overview showing a holistic view of their child's
+learning journey over time.
+
+File to replace: apps/web/src/app/dashboard/parent/learner/[id]/progress/page.tsx
+
+Build a progress dashboard page that shows:
+
+1. Progress Timeline — A chronological feed of learning milestones:
+   - Lessons completed (subject, topic, date)
+   - Mastery thresholds crossed (e.g., "Math reached 70% mastery")
+   - IEP goals met
+   - Tutor sessions count by week
+
+2. Mastery Trends Chart — A line chart showing mastery scores per domain over the
+   last 30/60/90 days.
+   Data source: GET /api/learning/gradebook/:learnerId (already exists)
+   Show trend direction with color: green=improving, yellow=stable, red=declining.
+
+3. Weekly Summary Card — Sessions this week, XP earned, time spent, subjects covered.
+   Data source: GET /api/learning/sessions?learnerId=... + aggregate.
+
+4. Engagement Indicators:
+   - Break usage (how often the child uses BreakCloud)
+   - Session duration trends
+   - Preferred tutor/subject
+
+5. Follow existing design patterns: use vi-card, vi-text, IconWell, useTranslations.
+
+Acceptance criteria:
+- Progress page shows real data from existing APIs.
+- At minimum: timeline feed, mastery trends, weekly summary.
+- Page uses i18n translations (add keys to en.ts and es.ts).
+- No redirect to gradebook — this is a standalone page.
+- Responsive layout (mobile-friendly).
+Prompt 5.2 — Transition Planning UI
+Code
+The database has a complete transition_plans table (packages/db/src/schema/learners.ts
+line 92-109) with fields for vocational interests, independent living, community
+participation, self-advocacy, and post-secondary planning. The Compass tutor has
+detailed transition planning prompts for learners 14+. No parent UI exists for
+viewing or managing transition plans.
+
+File to create: apps/web/src/app/dashboard/parent/learner/[id]/transition/page.tsx
+
+APIs needed (create in family-svc if not present):
+- GET /api/family/transition/:learnerId
+- PUT /api/family/transition/:learnerId
+
+Task:
+1. Create the page with tabs or sections for each transition domain:
+   - Vocational Interests — careers, aptitude assessments
+   - Independent Living — daily living skills, self-care milestones
+   - Community Participation — social participation, recreation, volunteering
+   - Self-Advocacy — communication of needs, self-determination goals
+   - Post-Secondary Planning — education/training goals, supported employment
+
+2. Each section: current goals, status indicators, "Add Goal" form, connection to
+   relevant Compass tutor sessions.
+
+3. Show age gate: "Transition planning is available for learners aged 14 and older"
+   if under 14. If over 14 and no plan exists, show "Initialize Transition Plan" CTA.
+
+4. Add navigation link from the parent sidebar.
+
+Acceptance criteria:
+- Page at /dashboard/parent/learner/[id]/transition.
+- 5 transition domains with editable goals.
+- Age-gated with appropriate messaging.
+- Linked from parent navigation sidebar.
+Prompt 5.3 — Causal Analysis UI for Parents
+Code
+The causal_analyses table (packages/db/src/schema/brain.ts line 93-107) stores
+regression detections with hypotheses, correlated factors, and confidence scores.
+Parents can log events in parent_reported_events. No UI connects these two —
+parents can't see why mastery dropped or what events correlated with changes.
+
+File to create: apps/web/src/app/dashboard/parent/learner/[id]/insights/page.tsx
+
+APIs needed:
+- GET /api/brain/:learnerId/analyses
+- GET /api/brain/:learnerId/events
+
+Task:
+1. Create an "Insights" page showing:
+
+   Regression Alerts (from causal_analyses):
+   - Domain, mastery drop amount, previous → current mastery
+   - AI hypothesis in plain language
+   - Confidence indicator (high/medium/low)
+   - Correlated factors listed
+   - Resolution status (DETECTED / INVESTIGATING / RESOLVED)
+
+   Event Timeline (from parent_reported_events):
+   - Show events alongside mastery changes
+   - Visual correlation: "Mastery dropped 2 days after 'Bad week at school'"
+   - "Log an Event" button
+
+   AI Summary (from POST /api/brain/:learnerId/ai-summary):
+   - Strengths, support areas, recommendations
+   - Neurodiversity-affirming language
+
+2. Use a visual timeline layout where events and mastery changes are plotted together.
+3. Add navigation link from parent sidebar.
+
+Acceptance criteria:
+- Page at /dashboard/parent/learner/[id]/insights.
+- Shows causal analyses with plain-language hypotheses.
+- Event timeline with event logging form.
+- AI summary section.
+- Linked from parent navigation sidebar.
+Prompt 5.4 — Brain Snapshot History View
+Code
+The brain_state_snapshots table stores version history of the Brain Clone with typed
+triggers (initial_clone, parent_approved, mastery_threshold, rebaseline, etc.). No UI
+exists for parents to view how the Brain has evolved over time.
+
+File to create: apps/web/src/app/dashboard/parent/learner/[id]/brain-history/page.tsx
+
+API: GET /api/brain/:learnerId/snapshots — returns all snapshots ordered by version
+
+Task:
+1. Create a timeline view of Brain snapshots:
+   - Each entry: version number, trigger type (human-readable label), date
+   - Expandable detail: mastery levels, accommodations active, tutors active
+   - Visual diff between consecutive versions: "Math mastery: 45% → 62%",
+     "Added accommodation: text_to_speech"
+
+2. Use trigger enum labels:
+   - initial_clone → "Initial Brain Created"
+   - parent_approved → "Parent Approved Changes"
+   - parent_amended → "Parent Modified Brain"
+   - mastery_threshold → "Mastery Milestone Reached"
+   - rebaseline → "Re-Assessment Completed"
+   - main_brain_upgrade → "Brain Model Upgraded"
+
+3. For each snapshot, show a mini brain visualization (reuse BrainVisualization
+   component in compact mode).
+
+4. Add a link from the main Brain Profile page to this history.
+
+Acceptance criteria:
+- Page at /dashboard/parent/learner/[id]/brain-history.
+- Snapshots in reverse-chronological order.
+- Diff between versions highlights changes.
+- Linked from Brain Profile page.

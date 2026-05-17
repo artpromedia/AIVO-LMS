@@ -1,0 +1,1379 @@
+Now I have a comprehensive view of every page, every learner sub-page, the APIs they call, the components they use, and the full architecture. Let me compile the complete PRD.
+
+---
+
+# 📋 Product Requirements Document (PRD)
+# AIVO Learning — Parent Dashboard v2.0
+### *"A Warm, Empowering Command Center for Families of Neurodiverse Learners"*
+
+---
+
+## Document Information
+
+| Field | Value |
+|---|---|
+| **Product** | AIVO Learning Platform — Parent Dashboard |
+| **Repository** | `artpromedia/aivo-ai-learning` |
+| **Version** | 2.0 |
+| **Author** | @artpromedia |
+| **Date** | 2026-04-15 |
+| **Status** | Draft |
+| **Frontend Stack** | Next.js 15, React 19, Tailwind v4, next-intl, `@aivo/brand` |
+| **Backend Services** | identity-svc :3001, brain-svc :3002, assessment-svc :3003, ai-svc :3004, family-svc :3005, learning-svc :3006, engagement-svc :3009, tutor-svc :3010, comms-svc :3011 |
+| **Auth** | JWT RS256 via `@aivo/security`, RBAC (`PARENT` role), COPPA parental consent |
+| **Design Accent** | Purple primary (`#6C5CE7`), gradient `from-purple-50 via-white to-cyan-50` |
+
+---
+
+## 1. Executive Summary
+
+### 1.1 Purpose
+
+This PRD defines the complete redesign of the AIVO Parent Dashboard — the **most emotionally critical interface** in the entire platform. Parents of children with autism, learning disabilities, and other neurodivergences arrive at AIVO in a state of vulnerability: exhausted from advocating, overwhelmed by data, and desperately seeking clarity about their child's progress.
+
+The parent dashboard must be:
+- 🫶 **Emotionally intelligent** — warmth-first design that reduces anxiety, celebrates growth, and never overwhelms
+- 🧠 **Cognitively accessible** — parents themselves may be neurodivergent; the UI must work for everyone
+- 📊 **Clarity over complexity** — translate AI/brain data into plain-language insights a grandparent could understand
+- 📱 **Mobile-first** — most parents access AIVO on phones during school pickup, therapy waiting rooms, or late at night
+- 🔒 **Trust-building** — COPPA-compliant, transparent about what data exists and how AI decisions are made
+
+### 1.2 Current State Assessment — Deep Audit
+
+The parent dashboard at `/dashboard/parent/` currently has **~20 pages** across multiple route structures:
+
+#### Main Dashboard (`page.tsx` — 25,592 bytes / ~700 lines)
+This is the **largest single page** in the entire codebase — a monolithic component handling:
+- Learner card rendering with conditional brain/assessment/review status
+- Inline "Add Learner" onboarding wizard (multi-step form)
+- Brain visualization compact views per learner
+- Curriculum auto-detection via ZIP code
+- Country, language, grade, and functioning level selection
+- COPPA consent acknowledgment
+
+**Current strengths:**
+- ✅ Real API integration: `/api/users/learners`, `/api/brain/{id}/review`, `/api/assessments/learner/discovery/{id}/status`
+- ✅ Conditional navigation buttons (brain review, assessment, brain profile, sensory)
+- ✅ Internationalization throughout (`useTranslations("parent")`)
+- ✅ BrainVisualization component integration
+
+**Current problems:**
+- 🔴 **Monolithic**: 700+ lines in one file — impossible to maintain, slow to render
+- 🔴 **No layout shell**: No sidebar, no persistent navigation, no header consistency
+- 🔴 **Information overload**: Every learner card tries to show everything at once
+- 🔴 **No at-a-glance summary**: Parent has to scroll through each learner card individually
+- 🔴 **Onboarding buried**: "Add Learner" is a complex inline form, not a guided wizard
+- 🔴 **No celebration of progress**: No streaks, no milestones, no "your child improved!" moments
+- 🔴 **No notification/inbox system**: No way to see what's new or needs attention
+- 🔴 **No activity timeline**: No sense of what happened since last visit
+
+#### Learner Profile Hub (`learner/[id]/page.tsx`)
+
+| Feature | Status | Issue |
+|---|---|---|
+| Profile header with avatar, name, FL badge, curriculum | ✅ Good | Static — no real-time data |
+| BrainVisualization — rendered TWICE (compact + full) | ⚠️ Bug | Duplicate render wastes performance and confuses |
+| 12-item navigation grid (emoji cards) | ⚠️ Overwhelming | 12 equal-weight cards with no hierarchy or guidance |
+| Subscribed tutors row | ⚠️ Broken links | Links go to `/dashboard/learner/lesson/[key]` — this is the learner's own route, not parent's |
+| No breadcrumbs | 🔴 Missing | Parent loses context navigating deep pages |
+
+#### Sub-Pages Assessment (12 pages total)
+
+| Page | Route | Status | Issues |
+|---|---|---|---|
+| **Overview** | `learner/[id]/overview` | ⚠️ Functional | Horizontal tab nav overflows on mobile; 3 stat cards too sparse; duplicate of profile hub |
+| **Brain Profile** | `learner/[id]/brain` | ✅ Good | BrainVisualization works; info cards helpful; related pages linked |
+| **Brain Review** | `learner/[id]/brain-review` | ✅ Good | Approval/decline workflow exists |
+| **Assessment** | `learner/[id]/assessment` | ✅ Good | 49-question assessment with 11 categories |
+| **Gradebook** | `learner/[id]/gradebook` | ✅ Good | Mastery bars, sessions, learning paths — 3 tabs |
+| **Sensory Profile** | `learner/[id]/sensory` | ✅ Good | 5 modalities with hyper/typical/hypo selection — functional and accessible |
+| **IEP Goals** | `learner/[id]/iep` | ⚠️ Not audited | Exists as route, page content unknown |
+| **Tutors** | `learner/[id]/tutors` | ⚠️ Read-only | Shows tutors and active/inactive status, but can't launch sessions from here |
+| **Learning Team** | `learner/[id]/collaboration` | ✅ Good | Invite teacher/caregiver/therapist; seat counting |
+| **Recommendations** | `learner/[id]/recommendations` | ✅ Excellent | Full inbox with approve/adjust/decline, conflict detection |
+| **Homework** | `[learnerId]/homework` | ⚠️ Inconsistent route | Lives under `[learnerId]` not `learner/[id]` — breaks navigation pattern |
+| **Settings** | `learner/[id]/settings` | 🔴 Broken | Toggle state is **client-side only** (`useState`) — all settings lost on page refresh. `handleSave` is a fake: `setSaved(true); setTimeout(() => setSaved(false), 3000)` — writes NOTHING to API |
+
+#### Account-Level Pages
+
+| Page | Route | Status | Issues |
+|---|---|---|---|
+| **Settings** | `settings/` | ⚠️ Partial | Has notification save that calls an API, but limited scope |
+| **Billing** | `billing/` | ⚠️ Complex | Tutor add-on management, subscription display |
+| **Store** | `store/` | ⚠️ Functional | Tutor bundles + individual subscribe |
+
+### 1.3 Top 10 Critical Problems to Solve
+
+| # | Problem | Severity | Impact |
+|---|---|---|---|
+| 1 | **Learner settings don't save** — `handleSave` is fake; all accommodation toggles, daily goals, notification preferences lost on refresh | 🔴 P0 | Parents think they've configured their child's experience — they haven't |
+| 2 | **No persistent layout/navigation** — every sub-page renders its own header, creating inconsistent UX and navigation dead-ends | 🔴 P0 | Parents get lost navigating between learner pages |
+| 3 | **Monolithic dashboard page (700+ lines)** — onboarding wizard, learner cards, brain status all in one component | 🟡 P1 | Slow render, impossible to maintain, poor code splitting |
+| 4 | **BrainVisualization rendered twice** on learner profile hub — compact AND full in same view | 🟡 P1 | Performance waste, confusing visual hierarchy |
+| 5 | **No "what's new" mechanism** — parent has no inbox, no unread badges, no timeline of changes since last visit | 🟡 P1 | Parents don't know their child improved or that action is needed |
+| 6 | **12-card navigation grid with no hierarchy** — all 12 nav items shown with equal weight on learner profile hub | 🟡 P1 | Cognitive overload; parents don't know where to start |
+| 7 | **Homework page has inconsistent route** — `/dashboard/parent/[learnerId]/homework` vs all other pages at `/dashboard/parent/learner/[id]/*` | 🟡 P1 | Broken back-navigation, URL pattern inconsistency |
+| 8 | **No progress celebrations or emotional engagement** — no streaks, milestones, growth badges, encouraging messages | 🟡 P1 | Misses biggest opportunity: parents need hope |
+| 9 | **No mobile-optimized experience** — pages use `max-w-5xl` with `px-8` — fine on desktop, cramped on mobile | 🟡 P1 | Most parents access on phones |
+| 10 | **Tutor links on profile hub are broken** — links go to `/dashboard/learner/lesson/[key]` (learner's session route, not parent's view) | 🔴 P0 | Clicking any tutor avatar = 404 or wrong dashboard |
+
+---
+
+## 2. Design Philosophy
+
+### 2.1 The "Warm Clarity" Principle
+
+Every screen the parent sees must answer three questions immediately:
+1. **How is my child doing?** (the emotional need)
+2. **What should I do next?** (the action need)
+3. **Is everything okay?** (the reassurance need)
+
+### 2.2 Emotional Design Guidelines
+
+| Emotion | Design Response | Implementation |
+|---|---|---|
+| **Anxiety** ("Is my child falling behind?") | Lead with growth, never deficits. Show "improved by 12%" before "at 45% mastery" | Green-first color coding; growth arrows before absolute numbers |
+| **Overwhelm** ("There's so much data") | Progressive disclosure. Summary first, detail on tap | Collapsible cards, "Learn More" expandable sections |
+| **Hope** ("Is this working?") | Celebrate every win. Micro-milestones, streaks, XP celebrations | Confetti on milestones, warm toast notifications, "Weekly Win" feature |
+| **Frustration** ("I don't understand this brain thing") | Plain language. No jargon. Tooltip explanations on every technical term | Hover/tap tooltips, "What does this mean?" links, XAI explanations |
+| **Guilt** ("I haven't logged in in 2 weeks") | No guilt messaging. Welcome back warmly. Show what was accomplished while away | "While you were away, [Child] completed 5 sessions and earned 230 XP!" |
+| **Pride** ("My child did something amazing") | Shareable moments. Progress snapshots. "Brag Board" | Download/share progress summary cards for social or IEP meetings |
+
+### 2.3 Neurodiversity-First Interface Design
+
+Parents of neurodiverse children are themselves often neurodivergent (ADHD, autism, dyslexia have strong hereditary components). The dashboard MUST accommodate:
+
+| Need | Implementation |
+|---|---|
+| **ADHD (attention regulation)** | Clear visual hierarchy, immediate feedback, minimal distractors, completion indicators, no walls of text |
+| **Autism (predictability)** | Consistent patterns, predictable navigation, no surprise modals, routines honored |
+| **Dyslexia (reading ease)** | Minimum 16px body text, sans-serif fonts, adequate line spacing (1.5x), left-aligned text, no justified text |
+| **Anxiety (cognitive load)** | Maximum 3 actions per view, clear "safe" exits, never trap users in flows |
+| **Executive function (planning)** | Visual timelines, step indicators, "what's next" prompts, calendar integration |
+| **Sensory sensitivity** | Respect `prefers-reduced-motion`, `prefers-color-scheme`, `prefers-contrast`; no auto-playing media, no flashing |
+
+---
+
+## 3. User Personas
+
+### 3.1 Primary: The Advocate Parent (80% of users)
+
+- **Who:** Parent of a child with autism, ADHD, learning disability, or developmental delay. Aged 28–50.
+- **Context:** Manages IEP meetings, therapy appointments, school communications. Constantly advocating for their child.
+- **Emotional state:** Exhausted but determined. Needs tools that reduce their burden, not add to it.
+- **Tech skill:** Moderate. Uses iPhone, occasionally laptop. Comfortable with apps, not dashboards.
+- **Access pattern:** 5–10 minute sessions, usually on phone. Checks at morning (before school), evening (reviewing day), and weekend (planning).
+- **Top questions:** "How did my child do today?" / "Is the tutoring actually working?" / "What do I show at the IEP meeting?"
+
+### 3.2 Secondary: The Multi-Child Parent
+
+- **Who:** Parent managing 2–4 children on the platform, possibly with different support needs.
+- **Key need:** Quick switching between children. At-a-glance comparison. Unified notifications.
+- **Pain point:** Current dashboard requires scrolling through all children; no quick-switch.
+
+### 3.3 Tertiary: The Co-Parenting Family
+
+- **Who:** Separated/divorced parents sharing AIVO access. Or grandparent as primary caregiver.
+- **Key need:** Both parents see same data. Activity log shows who did what. No conflicting settings.
+- **Pain point:** Currently only one parent account per learner.
+
+### 3.4 Quaternary: The First-Time-Tech Parent
+
+- **Who:** Parent who isn't tech-savvy. Possibly elderly grandparent as caregiver.
+- **Key need:** Extremely simple interface. Big buttons. No hidden menus. Step-by-step guidance.
+- **Pain point:** 12-card navigation grid is overwhelming. Technical terms (functioning level, brain state) are confusing.
+
+---
+
+## 4. Information Architecture — Complete Redesign
+
+### 4.1 New Persistent Layout Shell
+
+**The #1 structural change:** Create a proper `layout.tsx` for the parent dashboard with persistent navigation.
+
+```
+/dashboard/parent/layout.tsx (NEW — persistent shell)
+├── Mobile: Bottom tab bar (5 tabs)
+├── Desktop: Slim left sidebar + top header
+├── Learner context switcher (dropdown/tabs when >1 child)
+├── Notification bell with unread count
+└── Account menu (settings, billing, logout)
+```
+
+**Bottom Tab Bar (Mobile) / Sidebar (Desktop):**
+
+| Tab | Icon | Route | Purpose |
+|---|---|---|---|
+| **Home** | 🏠 | `/dashboard/parent` | Family overview dashboard |
+| **[Child]** | 🧒 | `/dashboard/parent/learner/[id]` | Active learner's hub (switches if multi-child) |
+| **Progress** | 📊 | `/dashboard/parent/learner/[id]/progress` | Gradebook + mastery + sessions (consolidated) |
+| **Inbox** | 💬 | `/dashboard/parent/inbox` | Recommendations + alerts + team messages |
+| **More** | ☰ | — | Settings, billing, store, support |
+
+### 4.2 Revised Route Structure
+
+```
+/dashboard/parent
+├── layout.tsx                        ← NEW persistent shell with nav
+├── page.tsx                          ← Family home (summary cards per child)
+│
+├── inbox/                            ← NEW unified inbox
+│   └── page.tsx                      ← Recommendations + alerts + team messages
+│
+├── learner/[id]/
+│   ├── layout.tsx                    ← NEW learner-context layout (name/FL in header)
+│   ├── page.tsx                      ← Learner hub (redesigned — guided, not 12-grid)
+│   │
+│   ├── progress/                     ← RENAMED from gradebook (parent-friendly term)
+│   │   └── page.tsx                  ← Mastery + Sessions + Paths (existing gradebook, enhanced)
+│   │
+│   ├── brain/
+│   │   └── page.tsx                  ← Brain visualization (keep, enhance)
+│   │
+│   ├── brain-review/
+│   │   └── page.tsx                  ← Brain approval workflow (keep)
+│   │
+│   ├── overview/
+│   │   └── page.tsx                  ← Detailed overview with stats (keep, enhance)
+│   │
+│   ├── assessment/
+│   │   └── page.tsx                  ← 49-question parent assessment (keep)
+│   │
+│   ├── sensory/
+│   │   └── page.tsx                  ← Sensory profile questionnaire (keep)
+│   │
+│   ├── iep/
+│   │   └── page.tsx                  ← IEP goals viewer/tracker (enhance)
+│   │
+│   ├── team/                         ← RENAMED from collaboration (parent-friendly)
+│   │   └── page.tsx                  ← Learning team management (keep, enhance)
+│   │
+│   ├── recommendations/
+│   │   └── page.tsx                  ← Recommendation inbox (keep — excellent)
+│   │
+│   ├── tutors/
+│   │   └── page.tsx                  ← Tutor management + session launch (enhance)
+│   │
+│   ├── homework/                     ← MOVED from [learnerId]/homework to fix route
+│   │   └── page.tsx                  ← Homework history (relocated)
+│   │
+│   ├── milestones/                   ← NEW celebration page
+│   │   └── page.tsx                  ← Achievement timeline, badges, shareable moments
+│   │
+│   └── settings/
+│       └── page.tsx                  ← Per-learner settings (FIX: persist to API)
+│
+├── settings/
+│   └── page.tsx                      ← Account settings (keep, enhance)
+│
+├── billing/
+│   └── page.tsx                      ← Subscription + billing (keep)
+│
+├── store/
+│   └── page.tsx                      ← Tutor store (keep)
+│
+└── help/                             ← NEW
+    └── page.tsx                      ← Help center, FAQs, contact support
+```
+
+---
+
+## 5. Feature Specifications
+
+### 5.1 Module: Persistent Layout Shell (P0)
+
+**File:** `apps/web/src/app/dashboard/parent/layout.tsx` (NEW)
+
+#### 5.1.1 Desktop Layout (≥1024px)
+
+```
+┌─────────────────────────────────────────────────────┐
+│  AIVO logo    [Learner Switcher ▾]   🔔(3) [Avatar] │  ← Top bar
+├──────┬──────────────────────────────────────────────┤
+│ 🏠   │                                              │
+│ Home │                                              │
+│      │                                              │
+│ 🧒   │           Main Content Area                  │
+│ Alex │           (children routes)                  │
+│      │                                              │
+│ 📊   │                                              │
+│ Prog │                                              │
+│      │                                              │
+│ 💬   │                                              │
+│ Inbox│                                              │
+│      │                                              │
+│ ─────│                                              │
+│ ⚙️ ☰ │                                              │
+└──────┴──────────────────────────────────────────────┘
+```
+
+**Sidebar (64px collapsed, 220px expanded on hover):**
+- AIVO logo (links to `/dashboard/parent`)
+- If parent has ≥2 learners: Learner avatar switcher (circular thumbnails, click to switch context)
+- Nav items with icons + labels (labels hidden when collapsed)
+- Bottom: Settings gear, Account avatar
+
+**Top Bar:**
+- Breadcrumb trail: `Home / Alex / Progress / Mastery`
+- Learner context indicator (if on a learner page): child name + FL badge
+- Notification bell with unread count (red dot)
+- Parent avatar + name dropdown (settings, billing, logout)
+
+#### 5.1.2 Mobile Layout (<1024px)
+
+```
+┌──────────────────────────────────────┐
+│  AIVO    Alex (Grade 3) ▾     🔔(3) │  ← Compact top bar
+├──────────────────────────────────────┤
+│                                      │
+│          Main Content Area           │
+│          (scrollable)                │
+│                                      │
+│                                      │
+├──────────────────────────────────────┤
+│   🏠    🧒    📊    💬     ☰       │  ← Bottom tab bar (fixed)
+│  Home  Child Progress Inbox  More   │
+└──────────────────────────────────────┘
+```
+
+**Bottom Tab Bar:**
+- 5 tabs, 44px height minimum tap targets
+- Active tab: purple fill + label
+- Inactive: grey outline
+- Inbox tab shows red badge count when unread items
+
+**Learner Switcher (mobile):**
+- Tap child name in top bar → dropdown sheet
+- Shows learner avatars (first initial in colored circle) + names
+- Quick switch without navigating away
+
+#### 5.1.3 Learner Context Layout
+
+**File:** `apps/web/src/app/dashboard/parent/learner/[id]/layout.tsx` (NEW)
+
+When navigating within a specific learner's pages, add a **contextual sub-header**:
+
+```
+┌─────────────────────────────��────────────────────────┐
+│  ← Back    Alex    Grade 3 · SUPPORTED · 🧠 Active  │
+├──────────────────────────────────────────────────────┤
+│  [Hub] [Progress] [Brain] [Team] [IEP] [Settings]   │  ← Horizontal tab/pill nav
+└──────────────────────────────────────────────────────┘
+```
+
+- Learner name + quick stats always visible
+- Horizontal scrollable tab navigation (replaces the 12-card grid)
+- Back button returns to family home
+- Tab selection persists as parent navigates
+
+---
+
+### 5.2 Module: Family Home Dashboard — Complete Redesign (P0)
+
+**File:** `apps/web/src/app/dashboard/parent/page.tsx` — REWRITE (break 700-line monolith into components)
+
+#### 5.2.1 Component Decomposition
+
+Break the monolithic `page.tsx` into:
+
+```
+page.tsx (orchestrator — ~100 lines)
+├── components/WelcomeHero.tsx              ← Personalized greeting + "what's new"
+├── components/LearnerSummaryCard.tsx       ← One per child — compact, actionable
+├── components/WhileYouWereAway.tsx         ← Activity since last visit
+├── components/WeeklyWin.tsx               ← Celebration feature
+├── components/QuickActions.tsx            ← Contextual next-step suggestions
+├── components/OnboardLearnerWizard.tsx    ← Extracted from inline form → full-screen wizard
+└── components/FamilyCalendar.tsx          ← Upcoming: IEP meetings, review dates
+```
+
+#### 5.2.2 Welcome Hero Section
+
+Top of page. Warm, personalized, changes by time of day:
+
+| Time | Greeting | Subtext |
+|---|---|---|
+| 5am–12pm | "Good morning, Sarah ☀️" | "Here's how Alex and Emma are doing today." |
+| 12pm–5pm | "Good afternoon, Sarah 🌤️" | "Alex had a great tutoring session earlier!" |
+| 5pm–9pm | "Good evening, Sarah 🌙" | "Let's see what happened today." |
+| 9pm–5am | "Hey Sarah 🌟" | "Quick check-in — everything's on track." |
+
+**Underneath greeting:** "What's New" count badge — "3 items need your attention" → links to inbox.
+
+#### 5.2.3 Learner Summary Cards — Redesigned
+
+One card per child. Maximum density: 3 children visible without scrolling on mobile.
+
+**Single-child card layout:**
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  🧑 Alex                    Grade 3 · SUPPORTED         │
+│  ──────────────────────────────────────────────────────  │
+│                                                          │
+│  🔥 7-day streak    ⭐ 1,240 XP    📈 +12% this week    │
+│                                                          │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐                │
+│  │ Math     │ │ Reading  │ │ Speech   │                │
+│  │ ████░░   │ │ █████░   │ │ ███░░░   │                │
+│  │ 67%  ↑3% │ │ 82%  ↑5% │ │ 45%  ↑1% │                │
+│  └──────────┘ └──────────┘ └──────────┘                │
+│                                                          │
+│  💡 1 recommendation pending    📋 IEP review in 23 days│
+│                                                          │
+│  [View Progress]  [Open Brain]  [View Full Profile →]   │
+└──────────────────────────────────────────────────────────┘
+```
+
+**Card data sources:**
+- Streak: `GET /api/engagement/streaks/{learnerId}` (NEW endpoint)
+- XP: `GET /api/learning/sessions?learnerId={id}` → sum `xpEarned`
+- Subject mastery mini-bars: `GET /api/learning/gradebook/{learnerId}` → top 3 subjects
+- Growth percentage: Compare last 7 days mastery average to prior 7 days
+- Pending recommendations count: `GET /api/family/recommendations/{learnerId}` → filter `status === "PENDING"`
+- IEP review countdown: `GET /api/family/iep/{learnerId}` → `reviewDate` minus today
+
+**Status indicators on card (non-color-only):**
+- 🟢 + "On track" = mastery growth positive
+- 🟡 + "Needs attention" = no sessions in 7+ days OR recommendation pending
+- 🔴 + "Action needed" = brain review pending OR IEP overdue
+- Each uses both emoji/icon AND text label (accessibility)
+
+**Card actions:**
+- Tap card body → navigates to learner hub
+- "View Progress" → `/dashboard/parent/learner/[id]/progress`
+- "Open Brain" → `/dashboard/parent/learner/[id]/brain`
+
+#### 5.2.4 "While You Were Away" Section
+
+Shows activity since parent's last login (stored in `localStorage` or `lastSeenAt` on user record):
+
+```
+📣 While you were away (3 days):
+  🎯 Alex completed 5 tutoring sessions and earned 230 XP
+  📈 Emma's math mastery improved from 52% to 61%
+  💡 AIVO recommends adjusting Alex's speech accommodation — review now →
+  🤝 Ms. Johnson (Teacher) joined Alex's learning team
+```
+
+**Data source:** New `GET /api/family/activity-feed/{parentId}?since={timestamp}` endpoint.
+
+If no new activity: "Everything's running smoothly! [Child] is on track. 💚"
+
+#### 5.2.5 "Weekly Win" Celebration Card
+
+Highlights the biggest achievement of the week. Rotates across children.
+
+```
+┌────────────────────────────────────────────────────┐
+│  🏆 Weekly Win                                     │
+│                                                    │
+│  Alex mastered "2-Digit Addition" this week!       │
+│  That's 3 new skills mastered this month.          │
+│                                                    │
+│  [Share This Win 📤]  [See All Milestones →]       │
+└────────────────────────────────────────────────────┘
+```
+
+**"Share This Win"** generates a beautiful, de-identified shareable card (PNG) that parent can:
+- Save to camera roll
+- Share to social media
+- Attach to IEP meeting notes
+- Text to co-parent or grandparent
+
+The card shows: "🏆 [Child's first name] mastered [skill] on AIVO Learning!" with AIVO branding. No PII beyond first name.
+
+#### 5.2.6 Quick Actions — Contextual Next Steps
+
+Instead of dumping 12 navigation cards, show **3 personalized suggestions** based on current state:
+
+| State | Suggested Actions |
+|---|---|
+| New learner, no assessment done | "Step 1: Complete Alex's assessment (10 min) →" |
+| Assessment done, no brain yet | "Alex's brain is being built! We'll notify you when it's ready." |
+| Brain pending review | "🧠 Review Alex's brain profile before tutoring begins →" |
+| Active learner, no sessions this week | "Alex hasn't had a session this week. Start a quick one?" |
+| Recommendation pending | "💡 AIVO has a suggestion for Alex — review now →" |
+| IEP review approaching | "📋 Alex's IEP review is in 18 days — download progress report →" |
+| Everything good | "All caught up! Alex is on track. 🎉" |
+
+**Implementation:** Priority-based queue of actions — always show max 3, highest priority first.
+
+#### 5.2.7 Add Learner — Extracted to Guided Wizard
+
+**REMOVE** the inline onboarding form from the dashboard page.
+
+**REPLACE** with: "Add a Child" button → opens full-screen guided wizard.
+
+**File:** `apps/web/src/app/dashboard/parent/onboard/page.tsx` (NEW)
+
+**Wizard Steps (5 screens, progress bar at top):**
+
+1. **Child's Info** — Name, date of birth, preferred name/nickname
+2. **Education** — Grade level, school name (optional), country, ZIP code (auto-detects curriculum)
+3. **Language** — Preferred language, additional languages, communication preferences
+4. **Consent** — COPPA parental consent acknowledgment, data usage explanation, privacy policy
+5. **Done!** — Celebration screen, "Next: Complete the assessment to personalize Alex's learning →"
+
+Each step: large fonts, clear labels, one question per viewport on mobile, back/next navigation, save progress to allow return later.
+
+---
+
+### 5.3 Module: Learner Hub — Redesigned (P0)
+
+**File:** `apps/web/src/app/dashboard/parent/learner/[id]/page.tsx` — REWRITE
+
+#### 5.3.1 Replace 12-Card Grid with Guided Sections
+
+The current profile hub shows 12 equal-weight emoji cards. Replace with a **guided, visually hierarchical layout**:
+
+**Section 1: Learner Header**
+- Large avatar (first initial or uploaded photo)
+- Name, grade, FL badge, curriculum badge
+- Quick stats row: Streak, Total XP, Sessions this week, Member since
+- **Remove:** Duplicate BrainVisualization (currently rendered twice — keep only the "Brain" page)
+
+**Section 2: "Right Now" — What Needs Attention**
+Dynamic cards based on state (same logic as Quick Actions on home, but learner-specific):
+
+- Brain review pending → "Review Alex's Brain Profile" (amber card)
+- Recommendation pending → "1 recommendation needs your response" (blue card)
+- No sessions in 7 days → "Start a session with Alex's tutor" (green card)
+- IEP review upcoming → "IEP review in 23 days — prepare your report" (purple card)
+- Everything good → "Alex is on track! Keep it up 🎉" (green card)
+
+**Section 3: Progress Snapshot (Mini-Gradebook)**
+Top 4 subjects with mastery bars (same as learner summary card on home, but expanded):
+- Subject name, mastery %, trend arrow, last assessed date
+- "See Full Progress →" link to `/learner/[id]/progress`
+
+**Section 4: My Learning Team**
+Mini avatars of connected team members (teacher, therapist, caregiver):
+- Show first 3, "+2 more" badge
+- "Manage Team →" link to `/learner/[id]/team`
+
+**Section 5: Active Tutors**
+Subscribed tutor characters with avatars:
+- **FIX broken links**: Change from `/dashboard/learner/lesson/[key]` to proper parent-accessible route or "Start Session" button that opens learner portal
+- Show last session date per tutor
+- "Visit Tutor Store →" link
+
+**Section 6: Explore (Replaces 12-Grid)**
+Grouped, hierarchical navigation:
+
+```
+📚 Learning & Assessment
+  ├── Gradebook & Progress
+  ├── Assessments
+  └── Homework History
+
+🧠 Brain & Accommodations
+  ├── Brain Profile
+  ├── Sensory Profile
+  └── Settings & Accommodations
+
+🎯 IEP & Support
+  ├── IEP Goals
+  ├── Recommendations
+  └── Learning Team
+
+🏆 Achievements
+  └── Milestones & Badges
+```
+
+Grouped sections with headers — parent can quickly scan categories. Max 4 groups × 3 items = 12 items organized vs. 12 flat cards.
+
+---
+
+### 5.4 Module: Unified Inbox (NEW — P0)
+
+**File:** `apps/web/src/app/dashboard/parent/inbox/page.tsx` (NEW)
+
+Parents need ONE place to see everything that needs attention. Currently, recommendations live on a per-learner page, brain reviews require navigating to the brain page, and there's no central notification system.
+
+#### 5.4.1 Inbox Items
+
+| Source | Item Type | Urgency | Action |
+|---|---|---|---|
+| Recommendations | Brain profile review, path adjustment, accommodation suggestion | Medium | Approve / Adjust / Decline |
+| Brain Review | New brain version pending parent approval | High | Review & Approve |
+| IEP | Review date approaching (30/15/7 days) | Varies | Download report, prep for meeting |
+| Team | Teacher joined team, caregiver sent message | Low | View |
+| Progress | Milestone achieved, mastery level up, new skill mastered | Low (celebratory) | Celebrate / Share |
+| System | Subscription renewal, new features, maintenance | Low | Dismiss |
+| Alerts | Regression detected, no activity in 14 days | High | View details |
+
+#### 5.4.2 Inbox UI
+
+**Tabs:** All | Action Needed | Celebrations | Archive
+
+**Each inbox item:**
+```
+┌────────────────────────────────────────────────────────────┐
+│  🧠 Brain Profile Update — Alex                  2h ago   │
+│  AIVO updated Alex's brain profile based on recent        │
+│  tutoring data. Review to approve the changes.            │
+│                                                           │
+│  [Review Now →]                              [Dismiss]    │
+└────────────────────────────────────────────────────────────┘
+```
+
+- Unread items: bold title, left purple border
+- Grouped by child if parent has multiple children
+- Each item deep-links to the relevant page
+- "Mark all as read" bulk action
+- Swipe-to-dismiss on mobile
+
+#### 5.4.3 Backend
+
+**New endpoint:** `GET /api/family/inbox/{parentId}?limit=50&filter=unread`
+
+Aggregates from:
+- `GET /api/family/recommendations/{learnerId}` (for each child)
+- `GET /api/brain/{learnerId}/review` → pending reviews
+- `GET /api/family/iep/{learnerId}` → upcoming reviews
+- `GET /api/family/activity-feed/{parentId}` → milestones, team changes
+- New `parent_notifications` table for system notifications
+
+**New endpoint:** `PUT /api/family/inbox/{notificationId}/read`
+
+---
+
+### 5.5 Module: Progress Center — Enhanced Gradebook (P1)
+
+**File:** `apps/web/src/app/dashboard/parent/learner/[id]/progress/page.tsx` — ENHANCED
+
+**Rename "Gradebook"** to "Progress" — parents don't think in terms of gradebooks; they think in terms of progress.
+
+#### 5.5.1 Keep Existing 3-Tab Structure (Enhanced)
+
+The current gradebook has 3 excellent tabs. Enhance each:
+
+**Tab 1: Mastery (existing — enhance)**
+- Current: Subject groups with mastery bars ✅
+- Add: **Trend sparklines** next to each skill (mini line chart showing last 30 days)
+- Add: **"Plain English" summary** per subject: "Alex is strong in addition and subtraction. Multiplication is still growing — he's at 45% and improving every week."
+- Add: **Growth badge** when mastery crosses 25/50/75/100% thresholds
+- Add: **Time filter**: Last 7 days / Last 30 days / All time
+
+**Tab 2: Sessions (existing — enhance)**
+- Current: List of sessions with status, XP, date ✅
+- Add: **Calendar heatmap** (GitHub-style) showing session activity per day — dark squares = active days
+- Add: **Session duration trend** chart — are sessions getting longer (engagement growing)?
+- Add: **Subject distribution pie chart** — which subjects are getting the most time?
+- Add: **Tutor avatar** per session — show which tutor character was used
+
+**Tab 3: Learning Paths (existing — enhance)**
+- Current: Subject paths with progress bars and topic pills ✅
+- Add: **Visual journey map** — horizontal scrolling path with nodes (completed = green, current = pulsing purple, upcoming = grey)
+- Add: **Estimated completion** — "At this pace, Alex will complete this path in ~3 weeks"
+- Add: **Recommendations** — "AIVO suggests focusing on [topic] next based on Alex's brain profile"
+
+#### 5.5.2 NEW Tab 4: Growth Report
+
+Downloadable/printable progress report for IEP meetings, co-parents, or personal records:
+
+**Report Contents:**
+- Child name, grade, functioning level, date range
+- Overall mastery growth (% change)
+- Per-subject mastery with before/after comparison
+- Total sessions, total time, engagement metrics
+- Skills mastered list
+- Skills in progress list
+- AI-generated summary paragraph (plain English)
+- Accommodation effectiveness notes
+
+**Formats:** View in browser / Download PDF / Email to self / Share link (expires in 7 days)
+
+**Data source:** `GET /api/family/progress-report/{learnerId}?from=DATE&to=DATE` (NEW)
+
+---
+
+### 5.6 Module: Milestones & Celebrations (NEW — P1)
+
+**File:** `apps/web/src/app/dashboard/parent/learner/[id]/milestones/page.tsx` (NEW)
+
+This is AIVO's emotional differentiator. No competing platform celebrates neurodiverse learner achievements this way.
+
+#### 5.6.1 Achievement Timeline
+
+Vertical timeline showing all significant moments:
+
+```
+🏆 Today — Mastered "2-Digit Addition"
+   "Alex answered 10 consecutive questions correctly!"
+
+⭐ 3 days ago — Reached 1,000 XP
+   "A major milestone! Alex has earned 1,000 experience points."
+
+🔥 1 week ago — 7-Day Streak
+   "Alex used AIVO every day for a week!"
+
+📈 2 weeks ago — Math mastery crossed 50%
+   "Alex is now above 50% mastery in Mathematics!"
+
+🧠 3 weeks ago — Brain Profile Created
+   "Alex's personalized AI brain was activated."
+
+📝 1 month ago — Joined AIVO
+   "Welcome to the AIVO family!"
+```
+
+#### 5.6.2 Badge Collection
+
+Visual badge grid:
+
+| Badge | Criteria | Visual |
+|---|---|---|
+| 🌟 First Session | Complete first tutoring session | Gold star |
+| 🔥 On Fire | 7-day streak | Flame icon |
+| 🧠 Brain Activated | Brain profile approved | Brain glow |
+| 📚 Bookworm | 10 sessions completed | Stacked books |
+| 🏆 Mastery Champion | Any subject above 75% | Trophy |
+| 🎯 Goal Getter | IEP goal met | Target with checkmark |
+| 💬 Team Player | Full learning team (teacher + therapist + caregiver) | Connected people |
+| 🌈 Multi-Subject | Active in 3+ subjects | Rainbow arc |
+| ⚡ Speed Learner | Complete session in top 25% time | Lightning bolt |
+| 🌍 Explorer | Completed topics in all available subjects | Globe |
+
+Unearned badges shown as greyed outlines with "?" — creates aspirational motivation.
+
+#### 5.6.3 Shareable Moment Cards
+
+"Share This Win" generates a beautiful card:
+
+```
+┌──────────────────────────────────────┐
+│         🏆 Achievement Unlocked!     │
+│                                      │
+│    Alex mastered 2-Digit Addition    │
+│                                      │
+│    📈 67% Math Mastery               │
+│    🔥 7-Day Streak                   │
+│    ⭐ 1,240 Total XP                 │
+│                                      │
+│    Powered by AIVO Learning          │
+└──────────────────────────────────────┘
+```
+
+Generated as PNG via `@react-pdf/renderer` or canvas API. No PII beyond first name. Suitable for:
+- Texting to family members
+- Posting on social media
+- Emailing to school team
+- Including in IEP meeting documentation
+
+---
+
+### 5.7 Module: Learner Settings — Fix Persistence (P0 — CRITICAL)
+
+**File:** `apps/web/src/app/dashboard/parent/learner/[id]/settings/page.tsx` — FIX
+
+#### 5.7.1 Current Bug
+
+The save handler is **fake**:
+```typescript
+const handleSave = () => { setSaved(true); setTimeout(() => setSaved(false), 3000); };
+```
+
+All settings (readAloud, simplifiedUI, extendedTime, breakReminders, dailyGoalMinutes, notifyOnMilestone, notifyOnStruggle) exist only in `useState` — lost on refresh.
+
+#### 5.7.2 Fix: Create Backend Endpoint + Persist
+
+**New endpoint:** `GET /api/family/learner-settings/{learnerId}`
+```typescript
+// Returns:
+{
+  accommodations: {
+    readAloud: boolean,
+    simplifiedUI: boolean,
+    extendedTime: boolean,
+    breakReminders: boolean,
+    visualSupports: boolean,     // NEW
+    reducedAnimations: boolean,  // NEW
+    highContrast: boolean,       // NEW
+    fontSize: "normal" | "large" | "extra_large",  // NEW
+  },
+  learningGoals: {
+    dailyGoalMinutes: number,
+    weeklySessionTarget: number,  // NEW
+    preferredSessionTime: "morning" | "afternoon" | "evening",  // NEW
+  },
+  notifications: {
+    milestoneAlerts: boolean,
+    struggleAlerts: boolean,
+    weeklyDigest: boolean,        // NEW
+    sessionReminders: boolean,    // NEW
+    iepReminders: boolean,        // NEW
+  },
+  tutorPreferences: {            // NEW
+    preferredTutorKey: string | null,
+    sessionLengthPreference: "short" | "medium" | "long",
+    musicDuringSessions: boolean,
+    celebrationAnimations: boolean,
+  }
+}
+```
+
+**New endpoint:** `PUT /api/family/learner-settings/{learnerId}`
+
+**New DB table:**
+```sql
+CREATE TABLE learner_settings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  learner_id UUID NOT NULL UNIQUE REFERENCES learners(id),
+  accommodations JSONB DEFAULT '{}',
+  learning_goals JSONB DEFAULT '{}',
+  notifications JSONB DEFAULT '{}',
+  tutor_preferences JSONB DEFAULT '{}',
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_by UUID REFERENCES users(id)
+);
+```
+
+**Frontend fix:**
+1. On page load: `GET /api/family/learner-settings/{learnerId}` → populate all toggles
+2. On any toggle change: debounced auto-save (300ms) → `PUT /api/family/learner-settings/{learnerId}`
+3. Show subtle "Saved ✓" toast — no big Save button needed (auto-save is more intuitive)
+4. If API fails: show error toast, revert toggle
+
+#### 5.7.3 New Accommodation Options
+
+Add to the settings page:
+
+| Setting | Description | Impact |
+|---|---|---|
+| **Visual supports** | Show picture symbols alongside text in tutor sessions | Helpful for non-verbal/pre-symbolic learners |
+| **Reduced animations** | Minimize motion in UI and tutor sessions | Respects sensory sensitivities |
+| **High contrast mode** | Increase contrast ratios beyond AA to AAA | Helps visual processing |
+| **Font size** | Normal / Large / Extra Large | Supports visual needs and dyslexia |
+| **Session length preference** | Short (10 min) / Medium (20 min) / Long (30 min) | Controls cognitive load |
+| **Celebration animations** | Enable/disable confetti and celebration effects | Some learners find these overstimulating |
+| **Music during sessions** | Enable/disable background music | Auditory sensitivity control |
+
+#### 5.7.4 Settings Organization — 4 Sections
+
+**Section 1: Accessibility & Accommodations** (with explanatory text per toggle)
+**Section 2: Learning Goals** (daily minutes slider, weekly target, preferred time)
+**Section 3: Notification Preferences** (per-learner notification controls)
+**Section 4: Tutor Session Preferences** (session length, music, celebrations)
+
+Each section in its own card with clear heading.
+
+---
+
+### 5.8 Module: Brain Profile — Enhanced Explainability (P1)
+
+**File:** `apps/web/src/app/dashboard/parent/learner/[id]/brain/page.tsx` — ENHANCE
+
+#### 5.8.1 Keep: BrainVisualization Component ✅
+
+The existing `BrainVisualization` component is AIVO's visual signature. Keep and enhance.
+
+#### 5.8.2 Add: "What This Means" Plain-Language Section
+
+Below the brain visualization, add AI-generated plain-language explanation:
+
+```
+┌────────────────────────────────────────────────────────────┐
+│  💬 What This Means for Alex                               │
+│                                                            │
+│  Alex's brain profile shows he learns best with:           │
+│  • Visual aids and picture supports                        │
+│  • Short activity segments (8-10 minutes)                  │
+│  • Predictable structure with clear transitions            │
+│  • Positive reinforcement after each step                  │
+│                                                            │
+│  Areas where AIVO is providing extra support:              │
+│  • Reading comprehension — Alex benefits from text         │
+│    being broken into smaller chunks                        │
+│  • Math word problems — AIVO uses visual diagrams          │
+│    to support understanding                                │
+│                                                            │
+│  [How does AIVO know this? →]                              │
+└────────────────────────────────────────────────────────────┘
+```
+
+**"How does AIVO know this?"** → XAI (Explainable AI) modal showing:
+- Assessment data sources (parent questionnaire, baseline assessment, tutoring session data)
+- Confidence level per brain dimension
+- How recent the data is
+- "We update Alex's brain profile every [X] sessions to keep it accurate"
+
+Data source: `GET /api/brain/{learnerId}/explain` (NEW endpoint from brain-svc)
+
+#### 5.8.3 Add: Brain History / Version Timeline
+
+Show how the brain has evolved:
+
+```
+Brain Profile History:
+  v3 — Updated Apr 10, 2026 (current)
+    "Improved reading accommodation after 15 tutoring sessions"
+  v2 — Updated Mar 15, 2026
+    "Added speech therapy supports based on sensory profile"
+  v1 — Created Feb 20, 2026 (baseline)
+    "Initial brain profile from parent assessment"
+```
+
+Data source: `GET /api/brain/{learnerId}/snapshots` (existing endpoint)
+
+---
+
+### 5.9 Module: IEP Goals — Enhanced for Parents (P1)
+
+**File:** `apps/web/src/app/dashboard/parent/learner/[id]/iep/page.tsx` — ENHANCE
+
+#### 5.9.1 IEP Dashboard for Parents
+
+Parents at IEP meetings need to show their child's AI-tracked progress. This page should be their **secret weapon**.
+
+**If IEP exists:**
+
+```
+┌────────────────────────────────────────────────────────────┐
+│  🎯 Alex's IEP Goals                                      │
+│                                                            │
+│  Annual Review: May 15, 2026 (30 days) ⚠️                 │
+│  Case Manager: Dr. Thompson                                │
+│                                                            │
+│  Goal 1: Reading Comprehension                             │
+│  "Alex will answer comprehension questions at 75% accuracy"│
+│  ████████████░░░░░░  67% → Target: 75%                    │
+│  📈 Trending up — on pace to meet goal by review date     │
+│                                                            │
+│  Goal 2: Social Communication                              │
+│  "Alex will initiate peer interactions 3x daily"           │
+│  █████░░░░░░░░░░░░░  30% → Target: 75%                    │
+│  ⚠️ Below pace — AIVO recommends increasing SEL sessions   │
+│                                                            │
+│  [Download IEP Progress Report (PDF) →]                    │
+│  [Share Progress Summary with Team →]                      │
+└────────────────────────────────────────────────────────────┘
+```
+
+**If no IEP:** "Alex doesn't have an IEP on file. If Alex has an IEP, you can add goals here to track progress with AIVO's tutoring data."
+
+**Key features:**
+- Visual goal progress bars connected to actual AIVO mastery data
+- Pace indicator: "on track" / "ahead" / "behind" vs. review date
+- AI recommendation: If behind pace, suggest specific tutor/subject focus
+- **IEP Progress Report PDF**: auto-generated document with:
+  - Goal progress with evidence (session data, mastery scores)
+  - Accommodation usage report
+  - AI-generated narrative summary
+  - Charts suitable for IEP meeting presentation
+
+---
+
+### 5.10 Module: Help Center (NEW — P2)
+
+**File:** `apps/web/src/app/dashboard/parent/help/page.tsx` (NEW)
+
+#### 5.10.1 Searchable FAQ
+
+- "How does the brain profile work?"
+- "What is a functioning level?"
+- "How do I prepare for my IEP meeting with AIVO data?"
+- "Can my child's teacher see their data?"
+- "How do I add another child?"
+- "What does COPPA consent mean?"
+- "How do I cancel my subscription?"
+
+#### 5.10.2 Video Tutorials (Embedded)
+
+Short (<2 min) walkthrough videos:
+- "Getting Started: Your First Week on AIVO"
+- "Understanding Your Child's Brain Profile"
+- "How to Read the Progress Report"
+- "Preparing for IEP Meetings with AIVO"
+- "Setting Up Your Child's Learning Team"
+
+#### 5.10.3 Contact Support
+
+- Email support form
+- Expected response time indicator
+- Link to community forum (future)
+
+---
+
+### 5.11 Module: Mobile-First Responsive Overhaul (P1)
+
+#### 5.11.1 Responsive Breakpoints
+
+| Breakpoint | Layout | Navigation |
+|---|---|---|
+| < 640px (phone) | Single column, full-width cards, bottom tab bar | 5-tab bottom bar |
+| 640–1024px (tablet) | 2-column grid for cards, slim sidebar | Collapsible sidebar |
+| > 1024px (desktop) | 2–3 column grid, expanded sidebar | Full sidebar |
+
+#### 5.11.2 Touch Target Standards
+
+- All interactive elements: minimum 44×44px tap targets (WCAG 2.5.5)
+- Buttons: minimum 48px height on mobile
+- Spacing between interactive elements: minimum 8px
+- Toggle switches: 44×24px minimum (current `w-11 h-6` = 44×24 ✅ — keep)
+
+#### 5.11.3 Mobile-Specific Features
+
+- **Pull-to-refresh** on home dashboard
+- **Swipe gestures** on inbox items (swipe right = archive, swipe left = action)
+- **Bottom sheet** modals instead of centered modals on mobile
+- **Sticky learner header** while scrolling within learner pages
+- **Haptic feedback** on milestone celebrations (if supported)
+
+---
+
+## 6. Backend API Requirements
+
+### 6.1 New Endpoints
+
+| Method | Endpoint | Service | Description |
+|---|---|---|---|
+| GET | `/api/family/inbox/{parentId}` | family-svc | Aggregated notification inbox |
+| PUT | `/api/family/inbox/{notificationId}/read` | family-svc | Mark notification as read |
+| GET | `/api/family/activity-feed/{parentId}` | family-svc | Activity timeline since last visit |
+| GET | `/api/family/learner-settings/{learnerId}` | family-svc | Per-learner settings (accommodations, goals, notifications) |
+| PUT | `/api/family/learner-settings/{learnerId}` | family-svc | Update per-learner settings |
+| GET | `/api/family/progress-report/{learnerId}` | family-svc + learning-svc | Downloadable progress report |
+| GET | `/api/family/milestones/{learnerId}` | engagement-svc | Achievement timeline + badges |
+| GET | `/api/family/weekly-win/{parentId}` | engagement-svc | Top achievement this week |
+| GET | `/api/family/shareable-card/{milestoneId}` | engagement-svc | Generate shareable PNG card |
+| GET | `/api/brain/{learnerId}/explain` | brain-svc | Plain-language brain explanation |
+| GET | `/api/engagement/streaks/{learnerId}` | engagement-svc | Current streak data |
+| GET | `/api/family/iep/{learnerId}/progress-report` | family-svc | IEP progress report PDF |
+| GET | `/api/family/summary/{parentId}` | family-svc | Family-wide summary (for home dashboard) |
+
+### 6.2 New Database Tables
+
+```sql
+-- Per-learner settings (FIX: currently client-side only)
+CREATE TABLE learner_settings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  learner_id UUID NOT NULL UNIQUE REFERENCES learners(id),
+  accommodations JSONB DEFAULT '{}',
+  learning_goals JSONB DEFAULT '{}',
+  notifications JSONB DEFAULT '{}',
+  tutor_preferences JSONB DEFAULT '{}',
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_by UUID REFERENCES users(id)
+);
+
+-- Parent notifications / inbox
+CREATE TABLE parent_notifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  parent_id UUID NOT NULL REFERENCES users(id),
+  learner_id UUID REFERENCES learners(id),
+  type VARCHAR(50) NOT NULL,
+  title VARCHAR(500) NOT NULL,
+  body TEXT,
+  action_url VARCHAR(500),
+  urgency VARCHAR(20) DEFAULT 'normal',     -- low, normal, high, critical
+  read_at TIMESTAMPTZ,
+  dismissed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX idx_parent_notif ON parent_notifications(parent_id, read_at, created_at DESC);
+
+-- Achievement / milestone records
+CREATE TABLE learner_milestones (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  learner_id UUID NOT NULL REFERENCES learners(id),
+  type VARCHAR(50) NOT NULL,                -- skill_mastered, streak, xp_milestone, badge_earned, etc.
+  title VARCHAR(500) NOT NULL,
+  description TEXT,
+  metadata JSONB DEFAULT '{}',              -- { subject, skill, xpAmount, streakDays, badgeKey }
+  shared BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX idx_milestones_learner ON learner_milestones(learner_id, created_at DESC);
+
+-- Streaks
+CREATE TABLE learner_streaks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  learner_id UUID NOT NULL UNIQUE REFERENCES learners(id),
+  current_streak INT DEFAULT 0,
+  longest_streak INT DEFAULT 0,
+  last_active_date DATE,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Badges earned
+CREATE TABLE learner_badges (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  learner_id UUID NOT NULL REFERENCES learners(id),
+  badge_key VARCHAR(50) NOT NULL,           -- first_session, on_fire, brain_activated, etc.
+  earned_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(learner_id, badge_key)
+);
+
+-- Last visit tracking (for "while you were away")
+ALTER TABLE users ADD COLUMN last_dashboard_visit TIMESTAMPTZ;
+```
+
+---
+
+## 7. Non-Functional Requirements
+
+### 7.1 Performance
+
+| Requirement | Target |
+|---|---|
+| Family home dashboard load (with 3 children) | < 2s FCP |
+| Learner hub load | < 1.5s FCP |
+| Progress page load with 6 months of data | < 2s |
+| Inbox load (50 items) | < 1s |
+| Shareable card generation | < 3s |
+| Progress report PDF generation | < 10s |
+| Image optimization | All avatars/tutors served via `next/image` with lazy loading |
+
+### 7.2 Accessibility
+
+| Requirement | Standard |
+|---|---|
+| WCAG 2.1 AA compliance | All parent pages |
+| Color contrast | 4.5:1 text, 3:1 UI components — with AAA option via high contrast setting |
+| Touch targets | Minimum 44×44px (WCAG 2.5.5) |
+| Screen reader | All images have alt text, all interactive elements labeled, live regions for async updates |
+| Keyboard navigation | Full keyboard access, visible focus indicators, no keyboard traps |
+| Reduced motion | Honor `prefers-reduced-motion` — disable all transitions, animations, confetti |
+| Color independence | **Never** convey information through color alone — always pair with icon + text |
+| Font scaling | UI remains functional up to 200% browser zoom |
+| Text spacing | Support WCAG 1.4.12 text spacing overrides without breaking layout |
+| Error identification | Form errors announced by screen reader, visually marked with icon + text |
+
+### 7.3 COPPA Compliance
+
+| Requirement | Implementation |
+|---|---|
+| Parental consent required before data collection | Consent flow in onboarding wizard |
+| Parent can delete child's data | "Delete Data" option in learner settings → `DELETE /api/family/data-export/{learnerId}` |
+| Parent can export all data | "Download All Data" → `GET /api/family/data-export/{learnerId}` (existing) |
+| No direct marketing to children | AIVO tutors never show ads; no email sent to children |
+| Parent controls data sharing | Learning team page shows who has access; parent can revoke |
+
+### 7.4 Internationalization
+
+| Requirement | Implementation |
+|---|---|
+| All text via `next-intl` | ✅ Already in place throughout |
+| New pages follow same pattern | Use `useTranslations("parent")` namespace |
+| Date/time formatting | Respect locale via `Intl.DateTimeFormat` |
+| Number formatting | Use `Intl.NumberFormat` for percentages, XP |
+| RTL support (future) | Use logical CSS properties (`margin-inline-start` vs `margin-left`) |
+| Add new i18n keys for all new text | Badge names, milestone descriptions, plain-language summaries |
+
+---
+
+## 8. Implementation Phases
+
+### Phase 1: Foundation — Layout Shell + Settings Fix + Routing (Weeks 1–2) — P0
+
+| Task | Type | Files |
+|---|---|---|
+| Create `layout.tsx` with persistent sidebar (desktop) + bottom tabs (mobile) | Frontend | NEW `layout.tsx` |
+| Create `learner/[id]/layout.tsx` with learner context header + tab nav | Frontend | NEW `learner/[id]/layout.tsx` |
+| Create `learner_settings` table + Drizzle schema | Backend | `packages/db/` |
+| Implement `GET/PUT /api/family/learner-settings/{learnerId}` | Backend | `family-svc` |
+| **FIX learner settings page** — load from API, auto-save on change | Frontend | `settings/page.tsx` |
+| Move homework from `[learnerId]/homework` to `learner/[id]/homework` | Frontend | Route move + redirect |
+| Fix broken tutor links on learner profile hub | Frontend | `learner/[id]/page.tsx` |
+| Remove duplicate BrainVisualization from learner profile hub | Frontend | `learner/[id]/page.tsx` |
+| Add breadcrumbs to all sub-pages via learner layout | Frontend | `learner/[id]/layout.tsx` |
+
+### Phase 2: Family Home Redesign + Component Decomposition (Weeks 3–4) — P0
+
+| Task | Type | Files |
+|---|---|---|
+| Decompose 700-line `page.tsx` into component files | Frontend | `page.tsx` → 7 components |
+| Build `WelcomeHero` with time-of-day greetings | Frontend | NEW component |
+| Build `LearnerSummaryCard` with mastery mini-bars, streak, XP, status | Frontend | NEW component |
+| Build `QuickActions` with priority-based contextual suggestions | Frontend | NEW component |
+| Extract onboarding wizard to `/dashboard/parent/onboard/page.tsx` | Frontend | NEW page |
+| Create `parent_notifications` table | Backend | `packages/db/` |
+| Implement `GET /api/family/summary/{parentId}` | Backend | `family-svc` |
+| Implement `GET /api/family/activity-feed/{parentId}` | Backend | `family-svc` |
+| Build `WhileYouWereAway` component | Frontend | NEW component |
+| Add `last_dashboard_visit` to users table + update on login | Backend | `identity-svc` |
+
+### Phase 3: Unified Inbox + Learner Hub Redesign (Weeks 5–6) — P0
+
+| Task | Type | Files |
+|---|---|---|
+| Implement `GET /api/family/inbox/{parentId}` (aggregated) | Backend | `family-svc` |
+| Implement `PUT /api/family/inbox/{notificationId}/read` | Backend | `family-svc` |
+| Build Inbox page (`/dashboard/parent/inbox`) with tabs + item cards | Frontend | NEW page |
+| Add notification bell with unread count to layout header | Frontend | `layout.tsx` |
+| Redesign learner hub — replace 12-grid with guided sections | Frontend | `learner/[id]/page.tsx` |
+| Build "Right Now" contextual action cards | Frontend | NEW component |
+| Build grouped "Explore" navigation (4 groups × 3 items) | Frontend | NEW component |
+
+### Phase 4: Milestones, Celebrations & Progress Enhancement (Weeks 7–9) — P1
+
+| Task | Type | Files |
+|---|---|---|
+| Create `learner_milestones`, `learner_streaks`, `learner_badges` tables | Backend | `packages/db/` |
+| Implement streak tracking logic (update on session complete) | Backend | `engagement-svc` |
+| Implement milestone detection (mastery threshold, session count, etc.) | Backend | `engagement-svc` |
+| Implement `GET /api/family/milestones/{learnerId}` | Backend | `engagement-svc` |
+| Implement `GET /api/engagement/streaks/{learnerId}` | Backend | `engagement-svc` |
+| Implement `GET /api/family/weekly-win/{parentId}` | Backend | `engagement-svc` |
+| Build Milestones page (`learner/[id]/milestones`) | Frontend | NEW page |
+| Build badge collection grid with earned/unearned states | Frontend | NEW component |
+| Build shareable card generator (`GET /api/family/shareable-card/{milestoneId}`) | Backend + Frontend | `engagement-svc` + canvas |
+| Build `WeeklyWin` component for home dashboard | Frontend | NEW component |
+| Enhance progress/gradebook with sparklines + calendar heatmap | Frontend | `progress/page.tsx` |
+| Add Growth Report tab (Tab 4) with PDF generation | Frontend + Backend | `progress/page.tsx` + `family-svc` |
+| Add "Plain English" AI summaries to mastery tab | Backend + Frontend | `brain-svc` + `progress/page.tsx` |
+
+### Phase 5: Brain XAI, IEP Enhancement & Help Center (Weeks 10–11) — P1
+
+| Task | Type | Files |
+|---|---|---|
+| Implement `GET /api/brain/{learnerId}/explain` (plain-language explanation) | Backend | `brain-svc` |
+| Add "What This Means" section to brain profile page | Frontend | `brain/page.tsx` |
+| Add brain version history timeline to brain page | Frontend | `brain/page.tsx` |
+| Enhance IEP page with goal progress bars + pace indicators | Frontend | `iep/page.tsx` |
+| Implement `GET /api/family/iep/{learnerId}/progress-report` (PDF) | Backend | `family-svc` |
+| Add IEP Progress Report download to IEP page | Frontend | `iep/page.tsx` |
+| Build Help Center page (`/dashboard/parent/help`) | Frontend | NEW page |
+| Add new accommodation options to settings (visual supports, font size, etc.) | Frontend | `settings/page.tsx` |
+
+### Phase 6: Mobile Polish, a11y Audit & Final QA (Week 12) — P1
+
+| Task | Type | Files |
+|---|---|---|
+| Mobile responsive pass — all pages tested 320px to 1440px | Frontend | All pages |
+| Touch target audit — all interactive elements ≥ 44×44px | Frontend | All pages |
+| `prefers-reduced-motion` implementation across all pages | Frontend | All pages |
+| axe-core automated accessibility scan — fix all violations | Frontend | All pages |
+| Screen reader testing (VoiceOver + NVDA) on critical flows | QA | Manual testing |
+| Add all new i18n keys to `messages/en.json` + `messages/es.json` | Frontend | Locale files |
+| Playwright E2E tests for critical parent flows | Testing | NEW test files |
+| Performance profiling — lighthouse score ≥ 90 on all pages | Frontend | All pages |
+| Pull-to-refresh on mobile home | Frontend | `page.tsx` |
+| Swipe gestures on inbox items | Frontend | `inbox/page.tsx` |
+
+---
+
+## 9. Testing Strategy
+
+### 9.1 Critical User Flows to E2E Test
+
+| Flow | Steps | Acceptance |
+|---|---|---|
+| First-time parent journey | Register → Add child → Complete assessment → Brain created → First session | End-to-end works without dead ends |
+| Settings persistence | Toggle accommodation → Refresh page → Verify toggle state persists | Settings saved to API and restored |
+| Inbox workflow | Recommendation arrives → Parent opens inbox → Reviews → Approves → Item moves to archive | Full approval workflow |
+| Multi-child switching | Parent has 2 children → Switches between them → Data is correct per child | No data bleed between children |
+| Progress report download | Open progress page → Select date range → Download PDF → Verify contents | PDF generates with correct data |
+| Milestone celebration | Child completes milestone → Parent sees it on home dashboard → Shares card | Full celebration flow |
+
+### 9.2 Accessibility Testing
+
+| Layer | Tool | Coverage |
+|---|---|---|
+| Automated scan | axe-core via Playwright | Every page route |
+| Color contrast | axe-core + manual spot-check | All text, all states (hover, active, disabled) |
+| Screen reader | Manual VoiceOver (Mac) + NVDA (Windows) | Critical flows: home, inbox, progress, settings |
+| Keyboard only | Manual testing | Complete flows without mouse |
+| Reduced motion | `prefers-reduced-motion: reduce` in Playwright | All pages — no animation occurs |
+| Zoom 200% | Manual browser zoom test | Layout remains functional, no overflow |
+
+### 9.3 Emotional UX Testing
+
+| Test | Method | Metric |
+|---|---|---|
+| "First impression" | Show parent dashboard to 5 parents of neurodiverse children | Qualitative feedback on warmth, clarity, anxiety reduction |
+| "Find your child's progress" | Task-based usability test | Time to find mastery score (target: < 15 seconds) |
+| "What should I do?" | Parent asked "what does AIVO want you to do?" | Parent can identify next action without prompting |
+| "IEP meeting prep" | Parent generates progress report | Time to download PDF (target: < 30 seconds) |
+
+---
+
+## 10. Risk Assessment
+
+| Risk | Likelihood | Impact | Mitigation |
+|---|---|---|---|
+| Parents confused by layout change (redesign anxiety) | Medium | Medium | Opt-in "Try new dashboard" toggle for 2 weeks; fallback to old |
+| Milestone/badge system feels patronizing | Low | Medium | User testing with parents; make celebrations toggleable |
+| Progress report data inaccuracy | Medium | High | Cross-reference gradebook data with session data; show data freshness timestamps |
+| Settings migration (from lost client-side to persisted) | Low | Low | Default values for all settings; no data to migrate since it was never saved |
+| Mobile bottom tab bar interferes with iOS safe area | Medium | Medium | Use `env(safe-area-inset-bottom)` padding |
+| Inbox notification overload | Medium | Medium | Smart grouping (combine 5 mastery milestones into "Alex had a great week!"); configurable frequency |
+| Shareable cards contain PII | Low | High | Only include first name; no school, grade, diagnosis, or FL in shareable output |
+| PDF generation slow for large data sets | Medium | Medium | Async generation with progress indicator; cache generated reports for 24h |
+
+---
+
+## 11. Design Tokens & Visual Consistency
+
+### 11.1 Color Palette (Parent Dashboard)
+
+| Token | Value | Usage |
+|---|---|---|
+| `--parent-primary` | `#6C5CE7` (purple) | CTA buttons, active states, accent |
+| `--parent-secondary` | `#00CEC9` (cyan) | Secondary actions, assessment theme |
+| `--parent-success` | `#00B894` (green) | Growth indicators, positive trends |
+| `--parent-warning` | `#FDCB6E` (amber) | Attention needed, upcoming deadlines |
+| `--parent-danger` | `#E17055` (coral) | Regression alerts, errors (NEVER for mastery scores) |
+| `--parent-bg` | Gradient `from-purple-50 via-white to-cyan-50` | Page background |
+| `--parent-card` | `#FFFFFF` with `border-slate-100` | Card backgrounds |
+| `--parent-text` | `#1A1A2E` (near-black) | Body text |
+| `--parent-text-muted` | `#64748B` (slate-500) | Secondary text |
+
+### 11.2 Typography
+
+| Element | Font | Size | Weight | Spacing |
+|---|---|---|---|---|
+| Page heading (H1) | `font-heading` (Nunito) | `text-2xl` (24px) / `text-3xl` (30px) mobile | Bold (800) | `leading-tight` |
+| Section heading (H2) | `font-heading` (Nunito) | `text-lg` (18px) | Bold (700) | `leading-snug` |
+| Card title (H3) | `font-heading` (Nunito) | `text-base` (16px) | Semibold (600) | `leading-normal` |
+| Body text | `font-body` (Inter) | `text-sm` (14px) min | Regular (400) | `leading-relaxed` (1.625) |
+| Small text | `font-body` (Inter) | `text-xs` (12px) | Medium (500) | `leading-normal` |
+| Badge/pill text | `font-body` (Inter) | `text-xs` (12px) | Bold (700) | `tracking-wide` |
+
+### 11.3 Card Design System
+
+```css
+/* Standard card */
+.parent-card {
+  @apply bg-white rounded-2xl border border-slate-100 shadow-sm 
+         hover:shadow-md hover:border-purple-200 transition-all;
+}
+
+/* Celebration card */
+.parent-card-celebration {
+  @apply bg-gradient-to-br from-purple-50 to-cyan-50 rounded-2xl 
+         border border-purple-200 shadow-sm;
+}
+
+/* Alert card */
+.parent-card-alert {
+  @apply bg-amber-50 rounded-2xl border border-amber-200 shadow-sm;
+}
+```
+
+---
+
+## 12. Glossary (Parent-Friendly Terms)
+
+| Technical Term | Parent-Friendly Term | Used Where |
+|---|---|---|
+| Brain State | Brain Profile | All parent pages |
+| Functioning Level | Support Level | Badges, cards |
+| Mastery Score | Progress | Gradebook, summary cards |
+| Assessment Attempt | Practice Session | Gradebook |
+| Brain Clone | Brain Activation | Onboarding, milestones |
+| XP (Experience Points) | Learning Points / XP | Gamification, milestones |
+| Regression Check | Progress Check | Alerts, recommendations |
+| Gradebook | Progress Report | Navigation, tabs |
+| Collaboration | Learning Team | Navigation, team page |
+| Sensory Profile | Sensory Needs | Navigation, settings |
+| Accommodation | Learning Support | Settings page |
+| Pre-Symbolic | Emerging Communication | FL badge |
+
+All i18n keys should use parent-friendly terms. Technical terms should only appear in code-facing contexts.
+
+---
+
+*This PRD is a living document. The parent dashboard is the heart of AIVO — it's where trust is built, hope is sustained, and families feel empowered to advocate for their children. Every pixel should serve that mission.*

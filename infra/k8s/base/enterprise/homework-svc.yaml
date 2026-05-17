@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homework-svc
+  labels:
+    app: homework-svc
+    app.kubernetes.io/part-of: aivo-enterprise
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: homework-svc }
+  template:
+    metadata:
+      labels: { app: homework-svc }
+    spec:
+      containers:
+        - name: app
+          image: aivo/homework-svc:latest
+          ports: [{ name: http, containerPort: 3065 }]
+          env:
+            - { name: NODE_ENV, value: production }
+            - { name: PORT, value: "3065" }
+            - { name: HOMEWORK_PORT, value: "3065" }
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef: { name: aivo-common-env, key: DATABASE_URL }
+            - name: AIVO_FEATURE_SELF_REGULATION_HUB
+              valueFrom:
+                configMapKeyRef: { name: aivo-enterprise-flags, key: AIVO_FEATURE_SELF_REGULATION_HUB, optional: true }
+          readinessProbe: { httpGet: { path: /healthz, port: http }, initialDelaySeconds: 5 }
+          livenessProbe: { httpGet: { path: /healthz, port: http }, initialDelaySeconds: 15 }
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { cpu: "1", memory: 1Gi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: homework-svc
+spec:
+  selector: { app: homework-svc }
+  ports: [{ name: http, port: 3065, targetPort: http }]

@@ -1,0 +1,699 @@
+# =============================================================================
+# AIVO Platform  Hetzner Production Overlay
+# =============================================================================
+# Kustomize overlay for Hetzner K3s deployment (3 bare-metal servers).
+# Images come from GHCR (ghcr.io/artpromedia/aivo-*) instead of GCR.
+# Database runs on Server 1 (10.0.0.1)  not in-cluster.
+# =============================================================================
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+  - ingress.yaml
+  - web-ingress.yaml
+
+namespace: aivo-prod
+
+# NOTE: commonLabels injects into spec.selector.matchLabels.
+# Existing TS deployments already have these in their selectors, so we
+# MUST keep commonLabels for consistency. New deployments must be created
+# via kustomize (not base YAMLs) or deleted+recreated to match.
+commonLabels:
+  environment: production
+  platform: hetzner
+  app.kubernetes.io/environment: production
+  app.kubernetes.io/managed-by: kustomize
+  app.kubernetes.io/part-of: aivo-platform
+
+commonAnnotations:
+  deployment.kubernetes.io/environment: production
+  deployment.kubernetes.io/platform: hetzner
+  prometheus.io/scrape: "true"
+
+#  Images: GHCR instead of GCR 
+# Tags are set dynamically by CI/CD:
+#   kustomize edit set image aivo/<svc>=ghcr.io/artpromedia/aivo-<svc>:<tag>
+images:
+  # Authentication & User Management
+  - name: aivo/auth-svc
+    newName: ghcr.io/artpromedia/aivo-auth-svc
+    newTag: latest
+  - name: aivo/session-svc
+    newName: ghcr.io/artpromedia/aivo-session-svc
+    newTag: latest
+  - name: aivo/consent-svc
+    newName: ghcr.io/artpromedia/aivo-consent-svc
+    newTag: latest
+  - name: aivo/profile-svc
+    newName: ghcr.io/artpromedia/aivo-profile-svc
+    newTag: latest
+  # Content & Learning
+  - name: aivo/content-svc
+    newName: ghcr.io/artpromedia/aivo-content-svc
+    newTag: latest
+  - name: aivo/assessment-svc
+    newName: ghcr.io/artpromedia/aivo-assessment-svc
+    newTag: latest
+  - name: aivo/personalization-svc
+    newName: ghcr.io/artpromedia/aivo-personalization-svc
+    newTag: latest
+  - name: aivo/life-skills-svc
+    newName: ghcr.io/artpromedia/aivo-life-skills-svc
+    newTag: latest
+  # AI & Analytics
+  - name: aivo/ai-orchestrator
+    newName: ghcr.io/artpromedia/aivo-ai-orchestrator
+    newTag: latest
+  - name: aivo/analytics-svc
+    newName: ghcr.io/artpromedia/aivo-analytics-svc
+    newTag: latest
+  # Communication
+  - name: aivo/notify-svc
+    newName: ghcr.io/artpromedia/aivo-notify-svc
+    newTag: latest
+  - name: aivo/messaging-svc
+    newName: ghcr.io/artpromedia/aivo-messaging-svc
+    newTag: latest
+  # Goal & Focus
+  - name: aivo/goal-svc
+    newName: ghcr.io/artpromedia/aivo-goal-svc
+    newTag: latest
+  - name: aivo/focus-svc
+    newName: ghcr.io/artpromedia/aivo-focus-svc
+    newTag: latest
+  # Billing & Payments
+  - name: aivo/billing-svc
+    newName: ghcr.io/artpromedia/aivo-billing-svc
+    newTag: latest
+  - name: aivo/payments-svc
+    newName: ghcr.io/artpromedia/aivo-payments-svc
+    newTag: latest
+  # Parent Portal
+  - name: aivo/parent-svc
+    newName: ghcr.io/artpromedia/aivo-parent-svc
+    newTag: latest
+  - name: aivo/baseline-svc
+    newName: ghcr.io/artpromedia/aivo-baseline-svc
+    newTag: latest
+  # Multi-tenancy & Integrations
+  - name: aivo/tenant-svc
+    newName: ghcr.io/artpromedia/aivo-tenant-svc
+    newTag: latest
+  - name: aivo/sis-sync-svc
+    newName: ghcr.io/artpromedia/aivo-sis-sync-svc
+    newTag: latest
+  - name: aivo/iep-svc
+    newName: ghcr.io/artpromedia/aivo-iep-svc
+    newTag: latest
+  # Communication (additional)
+  - name: aivo/realtime-svc
+    newName: ghcr.io/artpromedia/aivo-realtime-svc
+    newTag: latest
+  # Compliance, Audit & Reporting
+  - name: aivo/audit-svc
+    newName: ghcr.io/artpromedia/aivo-audit-svc
+    newTag: latest
+  - name: aivo/reports-svc
+    newName: ghcr.io/artpromedia/aivo-reports-svc
+    newTag: latest
+  - name: aivo/compliance-svc
+    newName: ghcr.io/artpromedia/aivo-compliance-svc
+    newTag: latest
+  # Gamification
+  - name: aivo/gamification-svc
+    newName: ghcr.io/artpromedia/aivo-gamification-svc
+    newTag: latest
+
+  #  Python AI/ML Services 
+  #  Heavy (large model loading)
+  - name: aivo/training-svc
+    newName: ghcr.io/artpromedia/aivo-training-svc
+    newTag: latest
+  - name: aivo/vision-analysis-svc
+    newName: ghcr.io/artpromedia/aivo-vision-analysis-svc
+    newTag: latest
+  - name: aivo/accessibility-ai-svc
+    newName: ghcr.io/artpromedia/aivo-accessibility-ai-svc
+    newTag: latest
+  - name: aivo/question-generation-svc
+    newName: ghcr.io/artpromedia/aivo-question-generation-svc
+    newTag: latest
+  #  Medium (smaller models)
+  - name: aivo/ml-recommendation-svc
+    newName: ghcr.io/artpromedia/aivo-ml-recommendation-svc
+    newTag: latest
+  - name: aivo/speech-analysis-svc
+    newName: ghcr.io/artpromedia/aivo-speech-analysis-svc
+    newTag: latest
+  - name: aivo/writing-assessment-svc
+    newName: ghcr.io/artpromedia/aivo-writing-assessment-svc
+    newTag: latest
+  - name: aivo/content-intelligence-svc
+    newName: ghcr.io/artpromedia/aivo-content-intelligence-svc
+    newTag: latest
+  - name: aivo/knowledge-graph-svc
+    newName: ghcr.io/artpromedia/aivo-knowledge-graph-svc
+    newTag: latest
+  - name: aivo/multimodal-analytics-svc
+    newName: ghcr.io/artpromedia/aivo-multimodal-analytics-svc
+    newTag: latest
+  - name: aivo/document-intelligence-svc
+    newName: ghcr.io/artpromedia/aivo-document-intelligence-svc
+    newTag: latest
+  - name: aivo/peer-learning-svc
+    newName: ghcr.io/artpromedia/aivo-peer-learning-svc
+    newTag: latest
+  - name: aivo/grading-engine
+    newName: ghcr.io/artpromedia/aivo-grading-engine
+    newTag: latest
+  #  Light (API proxies, math only)
+  - name: aivo/ai-inference-svc
+    newName: ghcr.io/artpromedia/aivo-ai-inference-svc
+    newTag: latest
+  - name: aivo/brain-engine
+    newName: ghcr.io/artpromedia/aivo-brain-engine
+    newTag: latest
+  - name: aivo/python-api-gateway
+    newName: ghcr.io/artpromedia/aivo-python-api-gateway
+    newTag: latest
+  - name: aivo/specialized-support-svc
+    newName: ghcr.io/artpromedia/aivo-specialized-support-svc
+    newTag: latest
+  - name: aivo/rl-tutoring-svc
+    newName: ghcr.io/artpromedia/aivo-rl-tutoring-svc
+    newTag: latest
+  - name: aivo/cognitive-load-svc
+    newName: ghcr.io/artpromedia/aivo-cognitive-load-svc
+    newTag: latest
+  - name: aivo/curriculum-py-svc
+    newName: ghcr.io/artpromedia/aivo-curriculum-py-svc
+    newTag: latest
+
+  #  Web Frontend Applications 
+  - name: aivo/web-learner
+    newName: ghcr.io/artpromedia/aivo-web-learner
+    newTag: latest
+  - name: aivo/web-teacher
+    newName: ghcr.io/artpromedia/aivo-web-teacher
+    newTag: latest
+  - name: aivo/web-marketing
+    newName: ghcr.io/artpromedia/aivo-web-marketing
+    newTag: latest
+  - name: aivo/web-parent
+    newName: ghcr.io/artpromedia/aivo-web-parent
+    newTag: latest
+  - name: aivo/web-district
+    newName: ghcr.io/artpromedia/aivo-web-district
+    newTag: latest
+  - name: aivo/web-platform-admin
+    newName: ghcr.io/artpromedia/aivo-web-platform-admin
+    newTag: latest
+  - name: aivo/web-author
+    newName: ghcr.io/artpromedia/aivo-web-author
+    newTag: latest
+  - name: aivo/web-creator
+    newName: ghcr.io/artpromedia/aivo-web-creator
+    newTag: latest
+  - name: aivo/web-dev-portal
+    newName: ghcr.io/artpromedia/aivo-web-dev-portal
+    newTag: latest
+
+patches:
+  #  ConfigMap: NODE_ENV=production 
+  - target:
+      kind: ConfigMap
+    patch: |-
+      - op: replace
+        path: /data/NODE_ENV
+        value: "production"
+
+  #  All services: imagePullSecrets for GHCR 
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: add
+        path: /spec/template/spec/imagePullSecrets
+        value:
+          - name: ghcr-pull-secret
+
+  #  Resource limits (right-sized for i7-8700 servers) 
+  # Default: conservative for most services
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: "50m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: "128Mi"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "500m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: "512Mi"
+
+  #  AI Orchestrator: more resources (handles LLM response streaming) 
+  - target:
+      kind: Deployment
+      name: ai-orchestrator
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: "200m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: "512Mi"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "1000m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: "2Gi"
+
+  #  Replica counts 
+  - target:
+      kind: Deployment
+      name: auth-svc
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+  - target:
+      kind: Deployment
+      name: content-svc
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+  - target:
+      kind: Deployment
+      name: session-svc
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+  - target:
+      kind: Deployment
+      name: ai-orchestrator
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+
+  #  Web Frontend Replicas (high-traffic apps get 2 replicas) 
+  - target:
+      kind: Deployment
+      name: web-learner
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+  - target:
+      kind: Deployment
+      name: web-teacher
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+  - target:
+      kind: Deployment
+      name: web-marketing
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+
+  # 
+  # Python AI/ML Services  Tiered Resource Allocation
+  # 
+  #
+  #  HEAVY: Load large models (PyTorch, transformers)  pin to i9-9900K
+  #  MEDIUM: Smaller models (scikit-learn, sentence-transformers)
+  #  LIGHT: API proxies and math-only services
+  #
+  # Total Python budget: ~5.5 CPU cores, ~23.5 Gi RAM (requests)
+  # Both app servers have 8+ cores and 128GB RAM  plenty of headroom.
+
+  #   HEAVY: training-svc (DKT LSTM + phi-2 LoRA fine-tuning ~5GB) 
+  - target:
+      kind: Deployment
+      name: training-svc
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: "1000m"
+            memory: "6Gi"
+          limits:
+            cpu: "4000m"
+            memory: "8Gi"
+  - target:
+      kind: Deployment
+      name: training-svc
+    patch: |-
+      - op: add
+        path: /spec/template/spec/nodeSelector
+        value:
+          aivo.ai/workload: ml-heavy
+
+  #   HEAVY: vision-analysis-svc (TrOCR + EasyOCR + MediaPipe) 
+  - target:
+      kind: Deployment
+      name: vision-analysis-svc
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: "500m"
+            memory: "3Gi"
+          limits:
+            cpu: "2000m"
+            memory: "6Gi"
+  - target:
+      kind: Deployment
+      name: vision-analysis-svc
+    patch: |-
+      - op: add
+        path: /spec/template/spec/nodeSelector
+        value:
+          aivo.ai/workload: ml-heavy
+
+  #   HEAVY: accessibility-ai-svc (local Whisper + Coqui TTS) 
+  - target:
+      kind: Deployment
+      name: accessibility-ai-svc
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: "500m"
+            memory: "2Gi"
+          limits:
+            cpu: "2000m"
+            memory: "4Gi"
+  - target:
+      kind: Deployment
+      name: accessibility-ai-svc
+    patch: |-
+      - op: add
+        path: /spec/template/spec/nodeSelector
+        value:
+          aivo.ai/workload: ml-heavy
+
+  #   HEAVY: question-generation-svc (T5 + Bloom classifier) 
+  - target:
+      kind: Deployment
+      name: question-generation-svc
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: "500m"
+            memory: "2Gi"
+          limits:
+            cpu: "2000m"
+            memory: "4Gi"
+  - target:
+      kind: Deployment
+      name: question-generation-svc
+    patch: |-
+      - op: add
+        path: /spec/template/spec/nodeSelector
+        value:
+          aivo.ai/workload: ml-heavy
+
+  #   MEDIUM: speech-analysis-svc (CNN+BiLSTM PyTorch) 
+  - target:
+      kind: Deployment
+      name: speech-analysis-svc
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: "250m"
+            memory: "1Gi"
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
+
+  #   MEDIUM: writing-assessment-svc 
+  - target:
+      kind: Deployment
+      name: writing-assessment-svc
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: "250m"
+            memory: "1Gi"
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
+
+  #   MEDIUM: content-intelligence-svc 
+  - target:
+      kind: Deployment
+      name: content-intelligence-svc
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: "250m"
+            memory: "1Gi"
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
+
+  #   MEDIUM: knowledge-graph-svc 
+  - target:
+      kind: Deployment
+      name: knowledge-graph-svc
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: "250m"
+            memory: "1Gi"
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
+
+  #   MEDIUM: multimodal-analytics-svc 
+  - target:
+      kind: Deployment
+      name: multimodal-analytics-svc
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: "250m"
+            memory: "1Gi"
+          limits:
+            cpu: "1500m"
+            memory: "3Gi"
+
+  #   MEDIUM: ml-recommendation-svc 
+  - target:
+      kind: Deployment
+      name: ml-recommendation-svc
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: "200m"
+            memory: "512Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
+
+  #   MEDIUM: document-intelligence-svc 
+  - target:
+      kind: Deployment
+      name: document-intelligence-svc
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: "200m"
+            memory: "512Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
+
+  #   MEDIUM: peer-learning-svc 
+  - target:
+      kind: Deployment
+      name: peer-learning-svc
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: "200m"
+            memory: "512Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
+
+  #   MEDIUM: grading-engine 
+  - target:
+      kind: Deployment
+      name: grading-engine
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: "200m"
+            memory: "512Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
+
+  #   LIGHT: ai-inference-svc (external API proxy only) 
+  - target:
+      kind: Deployment
+      name: ai-inference-svc
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+
+  #   LIGHT: brain-engine (numpy/scipy math) 
+  - target:
+      kind: Deployment
+      name: brain-engine
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+
+  #   LIGHT: python-api-gateway 
+  - target:
+      kind: Deployment
+      name: python-api-gateway
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+
+  #   LIGHT: specialized-support-svc 
+  - target:
+      kind: Deployment
+      name: specialized-support-svc
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+
+  #   LIGHT: rl-tutoring-svc 
+  - target:
+      kind: Deployment
+      name: rl-tutoring-svc
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+
+  #   LIGHT: cognitive-load-svc 
+  - target:
+      kind: Deployment
+      name: cognitive-load-svc
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: "100m"
+            memory: "512Mi"
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
+
+  #   LIGHT: curriculum-py-svc 
+  - target:
+      kind: Deployment
+      name: curriculum-py-svc
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources
+        value:
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+
+  #  Schedule TypeScript app pods on app/ml nodes (not database node) 
+  # Python ML services already have nodeSelector targeting aivo-ml1
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: add
+        path: /spec/template/spec/affinity
+        value:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - key: role
+                      operator: In
+                      values:
+                        - app
+                        - ml
+
+# Production config
+configMapGenerator:
+  - name: hetzner-production-config
+    literals:
+      - NODE_ENV=production
+      - LOG_LEVEL=info
+      - LOG_FORMAT=json
+      - ENABLE_METRICS=true
+      - ENABLE_TRACING=true

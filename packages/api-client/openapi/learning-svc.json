@@ -1,0 +1,1103 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "AIVO Learning Service",
+    "version": "1.0.0"
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {}
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "learningHealthRoot",
+        "summary": "Service health probe (root)",
+        "tags": [
+          "Health"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "service",
+                    "timestamp"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "service": {
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/learning/health": {
+      "get": {
+        "operationId": "learningHealth",
+        "summary": "Service health probe",
+        "tags": [
+          "Health"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "service",
+                    "timestamp"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "service": {
+                      "type": "string"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/learning/sessions": {
+      "post": {
+        "operationId": "createLearningSession",
+        "summary": "Start a learning session",
+        "tags": [
+          "Learning"
+        ],
+        "description": "Creates a lesson session for a learner. When `contentType` is `THERAPY_SESSION` the row is short-circuited as a manual therapist log; otherwise content generation is invoked and the response carries the generated lesson body.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "learnerId",
+                  "tutorSku"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                  "learnerId": {
+                    "type": "string"
+                  },
+                  "tutorSku": {
+                    "type": "string"
+                  },
+                  "topic": {
+                    "type": "string"
+                  },
+                  "contentType": {
+                    "type": "string"
+                  },
+                  "sessionDate": {
+                    "type": "string"
+                  },
+                  "durationMinutes": {
+                    "type": [
+                      "number",
+                      "string"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "sessionId",
+                    "status"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "sessionId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "content": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "qualityScore": {
+                      "type": [
+                        "null",
+                        "number"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "qualityScore": {
+                      "type": [
+                        "null",
+                        "number"
+                      ]
+                    },
+                    "qualityGateLog": {
+                      "type": [
+                        "null",
+                        "object",
+                        "array"
+                      ],
+                      "additionalProperties": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "listLearningSessions",
+        "summary": "List recent sessions for a learner",
+        "tags": [
+          "Learning"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "learnerId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "tenantId": {
+                        "type": "string"
+                      },
+                      "learnerId": {
+                        "type": "string"
+                      },
+                      "tutorSku": {
+                        "type": "string"
+                      },
+                      "subject": {
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string"
+                      },
+                      "contentType": {
+                        "type": "string"
+                      },
+                      "functioningLevel": {
+                        "type": [
+                          "null",
+                          "string"
+                        ]
+                      },
+                      "durationSeconds": {
+                        "type": "integer"
+                      },
+                      "xpEarned": {
+                        "type": [
+                          "null",
+                          "number"
+                        ]
+                      },
+                      "startedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "completedAt": {
+                        "type": [
+                          "null",
+                          "string"
+                        ],
+                        "format": "date-time"
+                      },
+                      "sessionData": {
+                        "type": [
+                          "null",
+                          "object"
+                        ],
+                        "additionalProperties": true
+                      },
+                      "masteryAfter": {
+                        "type": [
+                          "null",
+                          "object"
+                        ],
+                        "additionalProperties": true
+                      },
+                      "brainContextSnapshot": {
+                        "type": [
+                          "null",
+                          "object"
+                        ],
+                        "additionalProperties": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/learning/sessions/{sessionId}/complete": {
+      "post": {
+        "operationId": "completeLearningSession",
+        "summary": "Complete a learning session",
+        "tags": [
+          "Learning"
+        ],
+        "description": "Marks a lesson session COMPLETED, computes XP and completion quality from per-beat signals, and rolls mastery updates into the gradebook.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true,
+                "properties": {
+                  "masteryUpdates": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "number"
+                    }
+                  },
+                  "xpEarned": {
+                    "type": "number"
+                  },
+                  "beatsCompleted": {
+                    "type": "integer"
+                  },
+                  "beatsTotal": {
+                    "type": "integer"
+                  },
+                  "correctAnswers": {
+                    "type": "integer"
+                  },
+                  "attemptedAnswers": {
+                    "type": "integer"
+                  },
+                  "engagementBeats": {
+                    "type": "integer"
+                  },
+                  "breaksUsed": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "sessionId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "sessionId"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "sessionId": {
+                      "type": "string"
+                    },
+                    "xpEarned": {
+                      "type": "number"
+                    },
+                    "completionQuality": {
+                      "type": [
+                        "null",
+                        "number"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/learning/gradebook/update": {
+      "post": {
+        "operationId": "updateGradebook",
+        "summary": "Upsert a single gradebook skill",
+        "tags": [
+          "Learning"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "learnerId",
+                  "skill"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                  "learnerId": {
+                    "type": "string"
+                  },
+                  "skill": {
+                    "type": "string"
+                  },
+                  "masteryScore": {
+                    "type": "number"
+                  },
+                  "sessionType": {
+                    "type": "string"
+                  },
+                  "xpEarned": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "skill"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "skill": {
+                      "type": "string"
+                    },
+                    "masteryScore": {
+                      "type": [
+                        "null",
+                        "number"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/learning/gradebook/{learnerId}": {
+      "get": {
+        "operationId": "getGradebook",
+        "summary": "Fetch gradebook entries for a learner",
+        "tags": [
+          "Learning"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "learnerId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "tenantId": {
+                        "type": "string"
+                      },
+                      "learnerId": {
+                        "type": "string"
+                      },
+                      "subject": {
+                        "type": "string"
+                      },
+                      "skill": {
+                        "type": "string"
+                      },
+                      "masteryScore": {
+                        "type": [
+                          "null",
+                          "number"
+                        ]
+                      },
+                      "attemptsCount": {
+                        "type": [
+                          "null",
+                          "integer"
+                        ]
+                      },
+                      "trend": {
+                        "type": [
+                          "null",
+                          "string"
+                        ]
+                      },
+                      "lastAssessedAt": {
+                        "type": [
+                          "null",
+                          "string"
+                        ],
+                        "format": "date-time"
+                      },
+                      "updatedAt": {
+                        "type": [
+                          "null",
+                          "string"
+                        ],
+                        "format": "date-time"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/learning/path/{learnerId}/{subject}": {
+      "get": {
+        "operationId": "getLearningPath",
+        "summary": "Get (or initialize) a subject learning path",
+        "tags": [
+          "Learning"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "learnerId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "subject",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "tenantId": {
+                      "type": "string"
+                    },
+                    "learnerId": {
+                      "type": "string"
+                    },
+                    "subject": {
+                      "type": "string"
+                    },
+                    "topicSequence": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "completedTopics": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "currentTopic": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "masteryMap": {
+                      "type": "object",
+                      "additionalProperties": true
+                    },
+                    "updatedAt": {
+                      "type": [
+                        "null",
+                        "string"
+                      ],
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/learning/path/{learnerId}/{subject}/init": {
+      "post": {
+        "operationId": "initLearningPath",
+        "summary": "Initialize a subject learning path",
+        "tags": [
+          "Learning"
+        ],
+        "description": "Idempotent: returns the existing path with `status: \"already_exists\"` if one is present, otherwise creates one with default topics and best-effort upgrades to LLM-personalized topics.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "learnerId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "subject",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "path"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "already_exists",
+                        "created"
+                      ]
+                    },
+                    "path": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "learnerId": {
+                          "type": "string"
+                        },
+                        "subject": {
+                          "type": "string"
+                        },
+                        "topicSequence": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "completedTopics": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "currentTopic": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "masteryMap": {
+                          "type": "object",
+                          "additionalProperties": true
+                        },
+                        "updatedAt": {
+                          "type": [
+                            "null",
+                            "string"
+                          ],
+                          "format": "date-time"
+                        }
+                      }
+                    },
+                    "personalized": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/learning/path/{learnerId}/{subject}/refresh-topics": {
+      "post": {
+        "operationId": "refreshLearningPathTopics",
+        "summary": "Refresh a learning path's topic sequence from the curriculum engine",
+        "tags": [
+          "Learning"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "learnerId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "subject",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "path",
+                    "topicCount"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "path": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "tenantId": {
+                          "type": "string"
+                        },
+                        "learnerId": {
+                          "type": "string"
+                        },
+                        "subject": {
+                          "type": "string"
+                        },
+                        "topicSequence": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "completedTopics": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "currentTopic": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "masteryMap": {
+                          "type": "object",
+                          "additionalProperties": true
+                        },
+                        "updatedAt": {
+                          "type": [
+                            "null",
+                            "string"
+                          ],
+                          "format": "date-time"
+                        }
+                      }
+                    },
+                    "topicCount": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "topicSequence": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/learning/path/{learnerId}/{subject}/advance": {
+      "post": {
+        "operationId": "advanceLearningPath",
+        "summary": "Advance a learner along their subject learning path",
+        "tags": [
+          "Learning"
+        ],
+        "description": "Returns one of `advanced`, `path_complete`, or `needs_practice` based on the learner's current mastery vs. the functioning-level threshold for the next topic.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "learnerId",
+            "required": true
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "subject",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "previousTopic": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "nextTopic": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "currentTopic": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "masteryScore": {
+                      "type": "number"
+                    },
+                    "thresholdRequired": {
+                      "type": "number"
+                    },
+                    "functioningLevel": {
+                      "type": "string"
+                    },
+                    "subject": {
+                      "type": "string"
+                    },
+                    "completedCount": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3005"
+    }
+  ]
+}

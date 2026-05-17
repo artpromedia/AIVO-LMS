@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aivo-enterprise-flags
+  labels:
+    app.kubernetes.io/part-of: aivo-enterprise
+# All flags default to "false" so legacy flows are unaffected.
+# Flip individual flags in this ConfigMap (or in an overlay patch) to
+# turn on the enterprise behaviors.
+data:
+  AIVO_FEATURE_PROBLEM_SESSION_LEDGER: "false"
+  AIVO_FEATURE_TUTOR_SURFACE_PROTOCOL: "false"
+  AIVO_FEATURE_PROFILE_RECOMMENDATIONS_V2: "false"
+  AIVO_FEATURE_DISTRICT_ENTERPRISE_MODE: "false"
+  AIVO_FEATURE_SIS_SYNC: "false"
+  AIVO_FEATURE_LTI_13: "false"
+  AIVO_FEATURE_DATA_GOVERNANCE_CENTER: "false"
+  AIVO_FEATURE_RESPONSIBLE_AI_GUARDRAILS: "false"
+  AIVO_FEATURE_ADVANCED_CONTENT_GENERATORS: "false"
+  AIVO_FEATURE_SELF_REGULATION_HUB: "false"

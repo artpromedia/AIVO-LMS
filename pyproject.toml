@@ -1,0 +1,73 @@
+# Root pyproject.toml — shared tooling configuration for AIVO Python services.
+#
+# This file does NOT define a Python package or dependencies; each service
+# under `services/<name>/` keeps its own `requirements.txt` and module layout.
+# The sole purpose here is to give all contributors and editors a single,
+# discoverable Ruff configuration so `ruff check` / `ruff format` behave the
+# same way locally and in CI.
+#
+# Ruff is currently NOT a blocking CI gate – fixing pre-existing findings is
+# tracked separately. Once the backlog is cleared, a `ruff check` job can be
+# wired into `.github/workflows/security-scan.yml` (or its own workflow) with
+# `--exit-non-zero-on-fix` to enforce.
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+# Only lint our own service code; ignore vendored, generated, and virtualenv
+# trees so contributors don't get drowned in noise.
+extend-exclude = [
+    "**/.venv",
+    "**/venv",
+    "**/__pycache__",
+    "**/migrations/versions",
+    "**/build",
+    "**/dist",
+    "**/node_modules",
+    "**/_generated",
+]
+
+[tool.ruff.lint]
+# Curated rule set – security & correctness first, style second. Keep this
+# list intentionally tight: each new family should be added with a follow-up
+# PR that also clears any backlog it surfaces.
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "W",   # pycodestyle warnings
+    "I",   # isort (import ordering)
+    "B",   # flake8-bugbear (likely-bug patterns)
+    "S",   # flake8-bandit (security)
+    "UP",  # pyupgrade (modern syntax)
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+    "PL",  # pylint (subset)
+    "RUF", # ruff-specific rules
+]
+
+# Pragmatic ignores that match how the FastAPI services already read.
+ignore = [
+    "E501",    # line length is enforced by formatter, not the linter
+    "PLR0913", # too many arguments – common with FastAPI route deps
+    "PLR2004", # magic-value – noisy in test fixtures
+    "S101",    # asserts are fine in tests
+    "S104",    # binding to 0.0.0.0 is intentional inside containers
+    "SIM108",  # ternary nags can hurt readability
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests are allowed to use looser security/style rules.
+"**/tests/**" = ["S", "PLR", "B011"]
+"**/test_*.py" = ["S", "PLR", "B011"]
+"**/conftest.py" = ["S", "PLR"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["brain_svc", "ai_svc", "curriculum_svc"]
+combine-as-imports = true
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+docstring-code-format = true

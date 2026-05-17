@@ -1,0 +1,29 @@
+# VCS
+.git
+.gitignore
+.github
+
+# Dependencies and build caches
+node_modules
+**/node_modules
+.turbo
+**/.turbo
+
+# Local environments
+.venv
+**/.venv
+
+# Env files
+.env
+.env.*
+
+# Build outputs
+**/dist
+**/build
+**/.next
+**/.dart_tool
+
+# Misc
+.DS_Store
+*.log
+.agents

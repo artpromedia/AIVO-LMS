@@ -1,0 +1,24 @@
+{
+  "name": "@aivo/integration-tests",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run --config vitest.enterprise.config.ts"
+  },
+  "dependencies": {
+    "@aivo/audit-svc": "workspace:*",
+    "@aivo/data-governance-svc": "workspace:*",
+    "@aivo/enterprise-core": "workspace:*",
+    "@aivo/feature-flags": "workspace:*",
+    "@aivo/homework-svc": "workspace:*",
+    "@aivo/problem-session-svc": "workspace:*",
+    "@aivo/recommendation-svc": "workspace:*",
+    "@aivo/responsible-ai-svc": "workspace:*",
+    "@aivo/tutor-surface-protocol": "workspace:*"
+  },
+  "devDependencies": {
+    "fastify": "^5.3.3",
+    "vitest": "^2.0.0"
+  }
+}

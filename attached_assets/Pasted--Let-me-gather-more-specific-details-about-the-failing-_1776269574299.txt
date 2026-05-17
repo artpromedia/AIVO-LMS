@@ -1,0 +1,554 @@
+
+
+Let me gather more specific details about the failing workflows and the exact state of the codebase to make the sprint plan maximally actionable.Now I have a comprehensive picture of every gap, the root cause of each CI failure, and the full codebase structure. Here's the detailed sprint-by-sprint prompt:
+
+---
+
+# 🏗️ AIVO Learning — Launch Readiness Fix: Complete Sprint-by-Sprint Prompt
+
+> **Copy this entire prompt into your AI coding assistant, Copilot workspace, or development workflow. Each sprint is a self-contained block of work. Total timeline: 5 sprints (5 weeks at ~1 sprint/week).**
+
+---
+
+## Context for All Sprints
+
+**Repository:** `artpromedia/aivo-ai-learning`
+**Monorepo structure:** pnpm workspace + Turborepo
+**Apps:** `apps/web` (Next.js 15, React 19, Tailwind 4), `apps/mobile` (Expo 54, React Native 0.81), `apps/marketing` (Next.js 15)
+**Services (15):** identity-svc, ai-svc, brain-svc, assessment-svc, learning-svc, tutor-svc, family-svc, billing-svc, comms-svc, engagement-svc, admin-svc, i18n-svc, integrations-svc, research-svc, status-page-svc
+**Shared packages (6):** brand, db, events, mobile-ui, observability, security
+**Stack:** TypeScript, Python (ai-svc), Drizzle ORM, next-intl, Stripe, multi-LLM routing
+**Node:** >=22, pnpm 10.6.5
+
+**Current failing workflows on `main`:**
+1. **`ci.yml` (AIVO CI/CD Pipeline)** — `@aivo/web#build` fails: "Error occurred prerendering page `/dashboard/parent/store`" — the `TutorStorePage` uses `useSearchParams()` without a `<Suspense>` boundary, causing Next.js static prerender to crash.
+2. **`security-scan.yml`** — Trivy SARIF upload fails: "Resource not accessible by integration" — the workflow has `permissions: security-events: write` but the GitHub token lacks the `actions: read` permission needed by `github/codeql-action/upload-sarif@v4`.
+3. **`marketing-deploy.yml`** — "Artifact not found for name: marketing-build" — the deploy-staging job tries to download the `marketing-build` artifact but the CI pipeline build for `@aivo/web` fails first and cancels the run before the marketing build artifact is uploaded. This is a cascading failure from issue #1.
+
+**Known gaps from internal AIVO-ENT evaluations (scored 4/10 for accessibility):**
+- `apps/web` has **zero automated accessibility testing** (marketing site has axe-core + Lighthouse on 20+ routes)
+- No skip-links, no focus-trap, no keyboard navigation tests
+- No ARIA strategy documented
+- Dashboard nav links use emoji icons without `aria-label`
+- Small text (`text-[10px]`, `text-[11px]`) likely fails WCAG AA contrast
+- No `role` attributes on custom toggle/switch components
+- Custom toggle buttons (teacher, parent settings) lack `role="switch"` and `aria-checked`
+
+**Repo hygiene issues:**
+- `gitleaks-report.json` (34KB) committed to `main` — contains detected secret leak data
+- 5 `tmp_*.sql` files in repo root: `tmp_check_baseline.sql`, `tmp_create_baseline.sql`, `tmp_fix_baseline.sql`, `tmp_fix_iep.sql`, `tmp_fix_notnull.sql`, `tmp_verify.sql`
+- `tmp_test_assess.sh` in repo root
+
+**Dashboard completeness gaps:**
+- Teacher dashboard (`apps/web/src/app/dashboard/teacher/page.tsx`) — monolithic 345-line single file with inline tabs (overview/reports/settings). No sub-routes. No lesson plan generator page.
+- Therapist dashboard (`apps/web/src/app/dashboard/therapist/page.tsx`) — monolithic single file. No HIPAA report generation sub-page.
+- Caregiver dashboard (`apps/web/src/app/dashboard/caregiver/page.tsx`) — monolithic single file. No observation submission sub-page.
+
+---
+
+## SPRINT 1: CI/CD Fixes + Repo Hygiene (Emergency — Days 1–3)
+
+**Goal:** Get all 5 GitHub Actions workflows passing green on `main`. Clean up committed secrets and temp files.
+
+### Task 1.1: Fix `apps/web/src/app/dashboard/parent/store/page.tsx` prerender crash
+
+The page uses `useSearchParams()` at the top level of the component. Next.js 15 requires `useSearchParams()` to be wrapped in a `<Suspense>` boundary during static prerendering.
+
+**Fix:** In `apps/web/src/app/dashboard/parent/store/page.tsx`:
+- Rename the current `TutorStorePage` export to `TutorStoreContent`
+- Create a new default export that wraps `TutorStoreContent` in `<Suspense fallback={<LoadingSkeleton />}>`
+- Create a simple `LoadingSkeleton` component that matches the page layout (animated pulse skeleton)
+- Alternatively, add `export const dynamic = "force-dynamic"` at the top of the file if the page should never be statically prerendered
+
+**Test:** Run `pnpm --filter @aivo/web build` — it must complete without prerender errors on `/dashboard/parent/store`.
+
+### Task 1.2: Fix `security-scan.yml` Trivy SARIF upload permissions
+
+In `.github/workflows/security-scan.yml`, the `trivy-scan` job's SARIF upload step fails because `github/codeql-action/upload-sarif@v4` requires `actions: read` permission in addition to `security-events: write`.
+
+**Fix:** Update the top-level `permissions` block in `.github/workflows/security-scan.yml` from:
+```yaml
+permissions:
+  contents: read
+  security-events: write
+```
+to:
+```yaml
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+```
+
+**Test:** Push to a branch, open a PR to `main`, verify the Security Scan workflow passes.
+
+### Task 1.3: Verify `marketing-deploy.yml` cascade fix
+
+The marketing deploy failure is a cascade from the CI build failure. Once Task 1.1 is fixed and `@aivo/web#build` succeeds, the Turborepo pipeline will complete and the `marketing-build` artifact will be uploaded correctly.
+
+**Test:** After merging Tasks 1.1 and 1.2, verify that the marketing-deploy workflow picks up the `marketing-build` artifact and the deploy-staging job runs.
+
+### Task 1.4: Remove committed secrets and temp files
+
+**Files to delete from `main`:**
+- `gitleaks-report.json` — contains secret detection data that should never be in source control
+- `tmp_check_baseline.sql`
+- `tmp_create_baseline.sql`
+- `tmp_fix_baseline.sql`
+- `tmp_fix_iep.sql`
+- `tmp_fix_notnull.sql`
+- `tmp_verify.sql`
+- `tmp_test_assess.sh`
+
+**Add to `.gitignore`:**
+```
+gitleaks-report.json
+tmp_*.sql
+tmp_*.sh
+```
+
+**Post-delete action:** Audit the secrets listed in `gitleaks-report.json` before deleting it. Rotate any API keys, tokens, or credentials that were detected. Document which secrets were rotated and when in a private operations document (not in the repo).
+
+### Task 1.5: Verify all 5 workflows pass
+
+After merging Sprint 1, verify these workflows all pass on `main`:
+- `ci.yml` (AIVO CI/CD Pipeline) ✅
+- `security-scan.yml` (Security Scan) ✅
+- `marketing-deploy.yml` (Marketing Deploy) ✅
+- Workflow `259548513` (verify its name — was already passing) ✅
+- Workflow `260398440` (verify its name — was already passing) ✅
+
+**Sprint 1 Definition of Done:** All GitHub Actions workflows on `main` are green. No temp files or leak reports in the repo root. All flagged secrets rotated.
+
+---
+
+## SPRINT 2: Core Accessibility Infrastructure (Days 4–10)
+
+**Goal:** Build the foundational accessibility layer across `apps/web` — skip links, focus management, ARIA attributes, accessible components, and color contrast fixes.
+
+### Task 2.1: Create `SkipLink` component
+
+Create `apps/web/src/components/a11y/SkipLink.tsx`:
+- Renders an `<a href="#main-content">Skip to main content</a>` that is visually hidden but appears on focus
+- Uses `sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-white focus:text-slate-900 focus:rounded-lg focus:shadow-lg focus:border focus:border-purple-500 focus:font-semibold`
+- Import and render this component at the top of every dashboard layout file:
+  - `apps/web/src/app/dashboard/admin/layout.tsx`
+  - `apps/web/src/app/dashboard/district/layout.tsx`
+  - `apps/web/src/app/dashboard/internal/layout.tsx`
+  - `apps/web/src/app/dashboard/parent/page.tsx` (parent doesn't have a separate layout — add one)
+  - `apps/web/src/app/dashboard/learner/page.tsx` (same)
+  - `apps/web/src/app/dashboard/teacher/page.tsx`
+  - `apps/web/src/app/dashboard/therapist/page.tsx`
+  - `apps/web/src/app/dashboard/caregiver/page.tsx`
+- Add `id="main-content"` and `tabIndex={-1}` to the `<main>` element in each layout
+
+### Task 2.2: Fix all navigation links — add `aria-label` to icon-only elements
+
+In every dashboard layout sidebar, each nav link uses an emoji icon + text label. When the sidebar is collapsed, only the emoji shows. These collapsed-state links need `aria-label`.
+
+**Files to update:**
+- `apps/web/src/app/dashboard/admin/layout.tsx` — every `<Link>` in the sidebar nav: add `aria-label={item.label}` 
+- `apps/web/src/app/dashboard/district/layout.tsx` — same pattern
+- `apps/web/src/app/dashboard/internal/layout.tsx` — same pattern
+- All sidebar collapse/expand `<button>` elements currently show `→` or `←` text — add `aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}`
+- All logout buttons that show `🚪` when collapsed — add `aria-label="Sign out"`
+
+### Task 2.3: Create accessible `Toggle` / `Switch` component
+
+The codebase has inline toggle buttons (teacher settings, parent learner settings) that are raw `<button>` elements styled as switches. These need proper ARIA semantics.
+
+Create `apps/web/src/components/a11y/AccessibleToggle.tsx`:
+```tsx
+interface AccessibleToggleProps {
+  value: boolean;
+  onChange: (value: boolean) => void;
+  label: string;
+  description?: string;
+  id: string;
+}
+```
+- Renders a `<button>` with `role="switch"`, `aria-checked={value}`, `aria-labelledby` pointing to the label
+- Includes focus-visible ring styling: `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2`
+
+**Replace inline toggles in:**
+- `apps/web/src/app/dashboard/teacher/page.tsx` (lines 302–331: emailNotifs, weeklyDigest, atRiskAlerts toggles)
+- `apps/web/src/app/dashboard/parent/learner/[id]/settings/page.tsx` (readAloud, simplifiedUI, extendedTime, breakReminders toggles)
+- Any other file using the same inline toggle pattern
+
+### Task 2.4: Fix color contrast failures
+
+Audit and fix all small text that likely fails WCAG AA (4.5:1 ratio for normal text, 3:1 for large text):
+
+| Current Class | Problem | Fix |
+|---|---|---|
+| `text-[10px] text-slate-400` | ~10px slate-400 on white ≈ 3.0:1 | Change to `text-xs text-slate-500` (minimum) or `text-slate-600` |
+| `text-[10px] text-violet-700` | Might pass but 10px is too small | Change to `text-xs` (12px minimum) |
+| `text-[11px] text-violet-700` | Same — too small | Change to `text-xs` |
+| `text-white/40` | White at 40% opacity on dark bg ≈ 2.5:1 | Change to `text-white/60` minimum |
+| `text-white/50` | Similar | Change to `text-white/70` minimum |
+| `text-slate-400` on stat labels | ≈ 3.0:1 on white | Change to `text-slate-500` |
+
+**Scope:** Apply these fixes across ALL files in `apps/web/src/app/dashboard/`. Use find-and-replace but verify each case contextually.
+
+### Task 2.5: Add focus-visible styles globally
+
+In `apps/web/src/app/globals.css` (or equivalent Tailwind base layer), add:
+```css
+@layer base {
+  *:focus-visible {
+    outline: 2px solid #8b5cf6;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+```
+
+Verify that all interactive elements (buttons, links, inputs, selects) show a visible focus ring when navigated with Tab key.
+
+### Task 2.6: Create `docs/accessibility-guidelines.md`
+
+Create this file at the repo root with:
+- ARIA attribute strategy (when to use `aria-label`, `aria-labelledby`, `aria-describedby`, `role`)
+- Component-specific rules (toggles must use `role="switch"`, modals must use focus-trap, etc.)
+- Color contrast minimums (reference WCAG 2.1 AA: 4.5:1 normal text, 3:1 large text)
+- Keyboard navigation requirements (all interactive elements must be Tab-reachable, Escape closes modals, Enter/Space activates buttons)
+- Testing requirements (axe-core in Playwright, Lighthouse CI)
+- PR review checklist for a11y (add as a checkbox section to `.github/PULL_REQUEST_TEMPLATE.md` if it exists, or create one)
+
+**Sprint 2 Definition of Done:** Skip links on every dashboard. All nav links have `aria-label`. Toggles use `role="switch"`. Color contrast passes 4.5:1. Focus-visible ring on all interactive elements. Accessibility guidelines doc committed.
+
+---
+
+## SPRINT 3: Automated Accessibility Testing + Dashboard Decomposition (Days 11–17)
+
+**Goal:** Add Playwright axe-core a11y tests for all dashboard routes. Break monolithic dashboards into sub-routes.
+
+### Task 3.1: Set up Playwright a11y testing infrastructure
+
+Install in `apps/web`:
+```bash
+pnpm --filter @aivo/web add -D @axe-core/playwright @playwright/test
+```
+
+Create `apps/web/playwright.config.ts` if it doesn't exist, with:
+- `baseURL: "http://localhost:5000"` (or whatever the web app dev server port is)
+- `testDir: "./tests/a11y"`
+- `use: { headless: true }`
+
+Create `apps/web/tests/a11y/helpers.ts` with:
+- `checkA11y(page)` function that runs `axe-core` scan and asserts zero violations at WCAG AA level
+- Helper to login as each role (parent, learner, teacher, caregiver, therapist, admin, district admin, internal roles)
+- Configurable `AxeBuilder` with rules: `wcag2a`, `wcag2aa`, `wcag21aa`
+
+### Task 3.2: Write a11y tests for all 9 dashboard routes
+
+Create test files in `apps/web/tests/a11y/`:
+
+**`parent-dashboard.spec.ts`** — Tests:
+- `/dashboard/parent` — main parent home
+- `/dashboard/parent/billing` — billing page
+- `/dashboard/parent/settings` — parent settings
+- `/dashboard/parent/store` — tutor store
+- `/dashboard/parent/learner/[id]` — learner detail
+- `/dashboard/parent/learner/[id]/overview`
+- `/dashboard/parent/learner/[id]/brain`
+- `/dashboard/parent/learner/[id]/brain-review`
+- `/dashboard/parent/learner/[id]/assessment`
+- `/dashboard/parent/learner/[id]/iep`
+- `/dashboard/parent/learner/[id]/sensory`
+- `/dashboard/parent/learner/[id]/settings`
+- `/dashboard/parent/learner/[id]/tutors`
+- `/dashboard/parent/learner/[id]/recommendations`
+- `/dashboard/parent/learner/[id]/collaboration`
+- `/dashboard/parent/learner/[id]/gradebook`
+
+**`learner-dashboard.spec.ts`** — Tests:
+- `/dashboard/learner` — learner home
+- `/dashboard/learner/assessment`
+- `/dashboard/learner/badges`
+- `/dashboard/learner/challenges`
+- `/dashboard/learner/homework`
+- `/dashboard/learner/leaderboard`
+- `/dashboard/learner/lesson`
+- `/dashboard/learner/profile`
+- `/dashboard/learner/quests`
+- `/dashboard/learner/settings`
+- `/dashboard/learner/shop`
+- `/dashboard/learner/tutors`
+
+**`admin-dashboard.spec.ts`** — Tests for all `/dashboard/admin/*` routes (page, users, learners, analytics, billing, compliance, services, settings, tenants, ai)
+
+**`district-dashboard.spec.ts`** — Tests for all `/dashboard/district/*` routes (page, analytics, integrations, learners, schools, staff, settings, usage)
+
+**`teacher-dashboard.spec.ts`** — Test `/dashboard/teacher` (and sub-routes once Task 3.4 is done)
+
+**`therapist-dashboard.spec.ts`** — Test `/dashboard/therapist`
+
+**`caregiver-dashboard.spec.ts`** — Test `/dashboard/caregiver`
+
+**`internal-dashboard.spec.ts`** — Tests for all `/dashboard/internal/*` routes (sales, marketing, customer-care, support, finance, devops)
+
+**`notifications.spec.ts`** — Test `/dashboard/notifications`
+
+Each test should:
+1. Login as the appropriate role
+2. Navigate to the route
+3. Wait for content to load (no loading skeletons visible)
+4. Run `checkA11y(page)` — assert zero axe-core violations
+
+### Task 3.3: Add keyboard navigation tests
+
+Create `apps/web/tests/a11y/keyboard-navigation.spec.ts`:
+- Test Tab order through parent dashboard sidebar — verify all nav links are reachable
+- Test Tab order through admin dashboard sidebar
+- Test that Escape key closes any open modals/dropdowns
+- Test that Enter/Space activates buttons
+- Test that the Skip Link works: Tab once from page load → focus should be on "Skip to main content" → Enter → focus moves to `#main-content`
+- Test the LanguageSwitcher dropdown: Tab to it, Enter to open, arrow keys to navigate, Enter to select
+
+### Task 3.4: Decompose Teacher dashboard into sub-routes
+
+Refactor `apps/web/src/app/dashboard/teacher/page.tsx` (currently 345 lines with inline tabs):
+
+Create:
+- `apps/web/src/app/dashboard/teacher/layout.tsx` — shared layout with sidebar (matching pattern of admin/district/internal layouts), skip link, proper ARIA
+- `apps/web/src/app/dashboard/teacher/page.tsx` — overview tab content only (connected learners, classroom groups, stat cards)
+- `apps/web/src/app/dashboard/teacher/reports/page.tsx` — reports tab content
+- `apps/web/src/app/dashboard/teacher/settings/page.tsx` — settings tab content
+- `apps/web/src/app/dashboard/teacher/lesson-plans/page.tsx` — new page (can be placeholder with "Coming soon" message for MVP)
+
+### Task 3.5: Decompose Therapist dashboard into sub-routes
+
+Create:
+- `apps/web/src/app/dashboard/therapist/layout.tsx` — shared layout with sidebar
+- `apps/web/src/app/dashboard/therapist/page.tsx` — overview (connected learners, brain summaries)
+- `apps/web/src/app/dashboard/therapist/reports/page.tsx` — HIPAA-formatted reports
+- `apps/web/src/app/dashboard/therapist/sessions/page.tsx` — session logs
+- `apps/web/src/app/dashboard/therapist/settings/page.tsx` — settings
+
+### Task 3.6: Decompose Caregiver dashboard into sub-routes
+
+Create:
+- `apps/web/src/app/dashboard/caregiver/layout.tsx` — shared layout with sidebar
+- `apps/web/src/app/dashboard/caregiver/page.tsx` — overview (brain summary, accommodations, IEP goals)
+- `apps/web/src/app/dashboard/caregiver/observations/page.tsx` — observation submission
+- `apps/web/src/app/dashboard/caregiver/sessions/page.tsx` — session logs
+- `apps/web/src/app/dashboard/caregiver/settings/page.tsx` — settings
+
+### Task 3.7: Add a11y CI workflow
+
+Create `.github/workflows/a11y-tests.yml`:
+```yaml
+name: Accessibility Tests
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "apps/web/**"
+  push:
+    branches: [main]
+    paths:
+      - "apps/web/**"
+
+jobs:
+  a11y:
+    name: axe-core a11y audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @aivo/web build
+      - run: npx playwright install --with-deps chromium
+      - name: Run a11y tests
+        run: pnpm --filter @aivo/web test:a11y
+```
+
+Add `"test:a11y": "playwright test --config playwright.config.ts"` to `apps/web/package.json` scripts.
+
+**Sprint 3 Definition of Done:** Playwright axe-core tests exist for every dashboard route. Keyboard navigation tests pass. Teacher/Therapist/Caregiver dashboards are decomposed into sub-routes with proper layouts. A11y test CI workflow runs on every PR.
+
+---
+
+## SPRINT 4: Screen Reader Polish + Learner-Facing Accessibility (Days 18–24)
+
+**Goal:** Deep screen-reader compatibility for the learner-facing experience (The Stage, tutor sessions, assessments). ARIA live regions for dynamic content.
+
+### Task 4.1: Add ARIA live regions for dynamic content
+
+In `apps/web/src/components/stage/StageLayout.tsx`:
+- The tutor's speech text updates dynamically — wrap the speech display in `aria-live="polite"` so screen readers announce new tutor utterances
+- The progress indicator (ProgressPath) should have `aria-label="Lesson progress: step {currentStep} of {totalSteps}"`
+- The pause button already has `aria-label="Pause / Take a break"` ✅
+
+In `apps/web/src/components/stage/TutorCharacter.tsx` (or wherever speech text is rendered):
+- If subtitles are visible, mark them with `role="status"` and `aria-live="polite"`
+- If subtitles are hidden (screen reader only), add an `sr-only` element with `aria-live="polite"` that mirrors the speech text
+
+### Task 4.2: Make The Stage interaction zones accessible
+
+In `apps/web/src/components/stage/ResponseZone.tsx` (or equivalent):
+- Multiple choice interactions: ensure each choice button has `role="radio"` within a `role="radiogroup"` with `aria-label="Answer choices"`
+- Drag-and-drop interactions: provide a keyboard alternative — allow Tab to select items, Enter/Space to pick up, arrow keys to move, Enter to drop. Add `aria-grabbed`, `aria-dropeffect` attributes. Consider a "keyboard mode" toggle that shows a list-based selection UI instead of drag-and-drop for screen reader users
+- Voice interaction: ensure the microphone button has `aria-label="Record voice answer"` and status updates ("Listening...", "Processing...") are in `aria-live="assertive"` regions
+
+### Task 4.3: Assessment flow accessibility
+
+In `apps/web/src/app/dashboard/learner/assessment/` and `apps/web/src/app/dashboard/parent/learner/[id]/assessment/`:
+- Each assessment question should be in a `<fieldset>` with a `<legend>` containing the question text
+- Progress through the assessment should be announced: `aria-live="polite"` region with "Question {n} of {total}"
+- Required questions should have `aria-required="true"` on the input
+- Multi-select questions (`questionType: "multi_select"` in `apps/web/src/lib/assessment-questions.ts`) should use `role="group"` with checkboxes, not radio buttons
+- Help text should be linked via `aria-describedby`
+
+### Task 4.4: Sensory profile page accessibility
+
+In `apps/web/src/app/dashboard/parent/learner/[id]/sensory/page.tsx`:
+- The hyper/typical/hypo slider for each modality should use a proper `<input type="range">` or `role="slider"` with `aria-label="{modality} sensitivity"`, `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, `aria-valuetext` (e.g., "Auditory sensitivity: hyper-sensitive")
+- Each modality section should have a heading (`<h2>` or `<h3>`) for screen reader navigation
+- The descriptions (hyperDesc, hypoDesc) should be linked to the slider via `aria-describedby`
+
+### Task 4.5: Brain visualization accessibility
+
+In `apps/web/src/components/BrainVisualization.tsx`:
+- The brain visualization is likely a canvas/SVG element — make it `role="img"` with a descriptive `aria-label` that summarizes the data (e.g., "Brain profile showing mastery levels: Reading 72%, Math 65%, Science 58%")
+- Provide a text-based data table as an accessible alternative, toggled via a "View as table" button
+- XAI brain-review page: ensure all mastery decisions, accommodation reasoning, and bias mitigations are in properly structured `<table>` elements with `<th>` headers and `<caption>`
+
+### Task 4.6: Login and onboarding accessibility
+
+In `apps/web/src/app/login/page.tsx`:
+- The tab switcher between "Parent Login" and "Learner Login" should use `role="tablist"` with `role="tab"` and `role="tabpanel"`
+- Form error messages should be linked to inputs via `aria-describedby` and announced with `aria-live="assertive"`
+- The PIN input for learner login should have `aria-label="Enter your 6-digit PIN"` and `inputMode="numeric"`
+
+In `apps/web/src/app/signup/page.tsx`:
+- Same form error pattern
+- The password visibility toggle should have `aria-label="Show password"` / `aria-label="Hide password"`
+- The terms checkbox should have `aria-required="true"`
+
+### Task 4.7: BreakActivity accessibility
+
+In `apps/web/src/components/discovery/BreakActivity.tsx`:
+- The breathing exercise animations should respect `prefers-reduced-motion` media query
+- The word game input should have `aria-label="Type your answer to the word puzzle"`
+- Exercise steps should be announced via `aria-live="polite"`: "Exercise 2 of 5: Arm Circles"
+- The "Break Complete!" message should be `aria-live="assertive"`
+
+**Sprint 4 Definition of Done:** Screen reader users can complete a full tutor session on The Stage with narrated interactions. Assessment flows are fully keyboard-accessible. Brain visualization has text alternative. Login/signup/onboarding forms pass axe-core. All Sprint 4 changes covered by Playwright a11y tests.
+
+---
+
+## SPRINT 5: Mobile Accessibility + Final QA + Launch Preparation (Days 25–31)
+
+**Goal:** Mobile app accessibility. Full regression. PR review checklist. Documentation. Launch sign-off.
+
+### Task 5.1: Mobile app accessibility audit
+
+In `apps/mobile/`:
+- Verify every interactive element has `accessibilityLabel`, `accessibilityRole`, and `accessibilityHint` (the spec mentions this in the build specification document — verify it's actually implemented in the code, not just specified)
+- Verify `AccessibilityInfo.announceForAccessibility()` is called when tutors speak
+- Verify The Stage's Skia canvas elements have accessible RN View overlays
+- Test with VoiceOver (iOS) and TalkBack (Android) on actual devices or simulators
+
+### Task 5.2: Add `eslint-plugin-jsx-a11y` to the web app
+
+Install and configure:
+```bash
+pnpm --filter @aivo/web add -D eslint-plugin-jsx-a11y
+```
+
+Update `eslint.config.mjs` to include the a11y plugin with "strict" config. Fix any new lint errors. This prevents a11y regressions going forward.
+
+### Task 5.3: Create/update PR review template
+
+Create or update `.github/PULL_REQUEST_TEMPLATE.md` to include:
+```markdown
+## Accessibility Checklist
+- [ ] All interactive elements are keyboard-accessible (Tab, Enter, Space, Escape)
+- [ ] New components have appropriate ARIA attributes (labels, roles, states)
+- [ ] Color contrast meets WCAG AA (4.5:1 normal text, 3:1 large text)
+- [ ] Dynamic content uses `aria-live` regions for screen reader announcements
+- [ ] Custom controls (toggles, sliders, dropdowns) have proper ARIA roles
+- [ ] Images and icons have meaningful `alt` text or `aria-label`
+- [ ] Focus order is logical and visible
+- [ ] No autoplaying audio/video without user control
+- [ ] Reduced motion preference is respected (`prefers-reduced-motion`)
+- [ ] axe-core Playwright tests pass for affected routes
+```
+
+### Task 5.4: Full Lighthouse CI audit
+
+Run Lighthouse programmatically on all critical user-facing routes and record baseline scores:
+- `/login`, `/signup`
+- `/dashboard/parent`
+- `/dashboard/learner`
+- `/dashboard/teacher`
+- `/dashboard/admin`
+- `/dashboard/district`
+- Marketing site: `/`, `/accessibility`, `/pricing`
+
+Target: **Accessibility score ≥ 90** on all routes. Document any known exceptions.
+
+Add a Lighthouse CI step to `.github/workflows/ci.yml` or create a new `lighthouse.yml` workflow.
+
+### Task 5.5: Internationalization accessibility
+
+Verify that:
+- The `<html lang="">` attribute is set correctly based on the user's selected locale in `apps/web/src/app/layout.tsx`
+- All `<img>` alt text is translatable (uses `t()` from `next-intl`, not hardcoded English)
+- Date/number formatting respects locale (already using `next-intl` so likely fine, but verify)
+- RTL language support: if Arabic or Hebrew are planned future locales, ensure the layout can flip. At minimum, add `dir="auto"` or `dir="ltr"` to the `<html>` tag.
+
+### Task 5.6: Final security cleanup verification
+
+- Confirm `gitleaks-report.json` is no longer in the repo (Sprint 1 task)
+- Run `gitleaks detect --source . --report-path /dev/null` locally and confirm zero new findings
+- Verify all previously leaked secrets have been rotated (check with the team)
+- Run `pnpm audit` and confirm no high/critical vulnerabilities remain unaddressed
+
+### Task 5.7: Launch readiness checklist sign-off
+
+Create `docs/LAUNCH_READINESS.md` with status of every item:
+
+| Category | Requirement | Status |
+|---|---|---|
+| CI/CD | All 5+ workflows green on `main` | ✅/❌ |
+| A11y | axe-core tests on all dashboard routes | ✅/❌ |
+| A11y | Lighthouse accessibility ≥ 90 on all routes | ✅/❌ |
+| A11y | Skip links on all dashboards | ✅/❌ |
+| A11y | Keyboard navigation tested | ✅/❌ |
+| A11y | Screen reader tested (The Stage, assessments, login) | ✅/❌ |
+| A11y | Color contrast WCAG AA compliant | ✅/❌ |
+| A11y | `eslint-plugin-jsx-a11y` enforced | ✅/❌ |
+| UX | Teacher dashboard decomposed | ✅/❌ |
+| UX | Therapist dashboard decomposed | ✅/❌ |
+| UX | Caregiver dashboard decomposed | ✅/❌ |
+| Security | No secrets in repo | ✅/❌ |
+| Security | All leaked secrets rotated | ✅/❌ |
+| Security | `pnpm audit` clean | ✅/❌ |
+| Docs | `docs/accessibility-guidelines.md` committed | ✅/❌ |
+| Docs | PR review template with a11y checklist | ✅/❌ |
+| Mobile | VoiceOver/TalkBack tested | ✅/❌ |
+| i18n | `<html lang>` set per locale | ✅/❌ |
+
+**Sprint 5 Definition of Done:** All items in the launch readiness checklist are ✅. Lighthouse accessibility scores ≥ 90. Mobile VoiceOver/TalkBack basic smoke test passes. PR template enforces a11y review. Platform is ready for launch.
+
+---
+
+## Summary Timeline
+
+| Sprint | Focus | Duration | Key Deliverable |
+|---|---|---|---|
+| **Sprint 1** | CI/CD Fixes + Repo Hygiene | Days 1–3 | All workflows green, repo clean |
+| **Sprint 2** | Core Accessibility Infrastructure | Days 4–10 | Skip links, ARIA, contrast, focus, toggle components, guidelines doc |
+| **Sprint 3** | A11y Testing + Dashboard Decomposition | Days 11–17 | Playwright axe-core on all routes, Teacher/Therapist/Caregiver sub-routes, a11y CI |
+| **Sprint 4** | Screen Reader + Learner-Facing A11y | Days 18–24 | Stage, assessments, brain viz, login/signup fully accessible |
+| **Sprint 5** | Mobile A11y + Final QA + Launch Prep | Days 25–31 | Mobile audit, Lighthouse CI, eslint a11y, launch readiness doc |
+
+**Post-launch:** Continue to monitor Lighthouse scores in CI, run axe-core on every PR, conduct quarterly accessibility audits with assistive technology users, and expand to WCAG 2.2 AA compliance.

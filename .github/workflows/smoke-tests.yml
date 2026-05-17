@@ -1,0 +1,257 @@
+name: Post-Deploy Smoke Tests
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: "Target environment (staging or production)"
+        required: true
+        type: string
+      version:
+        description: "Deployed version"
+        required: false
+        type: string
+        default: "unknown"
+
+jobs:
+  smoke:
+    name: "Smoke Tests (${{ inputs.environment }})"
+    runs-on: [self-hosted, hetzner, production]
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure kubectl
+        run: |
+          # Prefer explicit kubeconfig when provided; otherwise use runner's
+          # existing cluster context.
+          if [ -n "${{ secrets.KUBE_CONFIG }}" ]; then
+            mkdir -p ~/.kube
+            echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > ~/.kube/config
+            chmod 600 ~/.kube/config
+          fi
+
+      - name: Verify cluster reachable
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+
+      - name: Wait for stabilization (30s)
+        run: sleep 30
+
+      - name: Run health checks
+        run: |
+          if [ "${{ inputs.environment }}" = "staging" ]; then
+            NS="aivo-staging"
+          else
+            NS="aivo"
+          fi
+
+          # If the target namespace has no deployments at all (e.g. staging
+          # not yet provisioned), soft-skip rather than fail the pipeline.
+          DEPLOY_COUNT=$(kubectl get deploy -n "$NS" --no-headers 2>/dev/null | wc -l | tr -d ' ')
+          if [ "${DEPLOY_COUNT:-0}" -eq 0 ]; then
+            echo "::warning::Namespace '$NS' has no deployments — skipping smoke tests for ${{ inputs.environment }}"
+            echo "SMOKE_SKIPPED=1" >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          # Services that should warn but not fail staging smoke.
+          # status-page-svc: publishes to NATS JetStream at startup; if the
+          # stream isn't pre-provisioned on the staging NATS cluster the
+          # first publish returns 503 and the process exits. K8s restarts
+          # the pod and it stabilizes, but the restart races with the
+          # smoke gate. Treat as non-blocking until JetStream streams are
+          # provisioned via IaC (tracked separately).
+          NON_BLOCKING_SERVICES=""
+          if [ "${{ inputs.environment }}" = "staging" ]; then
+            NON_BLOCKING_SERVICES="comms-svc status-page-svc"
+          fi
+
+          echo "=== Post-Deploy Smoke Tests ==="
+          echo "Environment: ${{ inputs.environment }}"
+          echo "Version: ${{ inputs.version }}"
+          echo "Namespace: $NS"
+          echo ""
+
+          SERVICES=(
+            identity-svc billing-svc family-svc integrations-svc admin-svc
+            learning-svc engagement-svc comms-svc i18n-svc tutor-svc
+            status-page-svc research-svc assessment-svc curriculum-svc
+            ai-svc brain-svc web marketing
+          )
+
+          FAIL=0
+          for svc in "${SERVICES[@]}"; do
+            DESIRED=$(kubectl get deploy -n "$NS" "$svc" -o jsonpath='{.spec.replicas}' 2>/dev/null || true)
+            UPDATED=$(kubectl get deploy -n "$NS" "$svc" -o jsonpath='{.status.updatedReplicas}' 2>/dev/null || true)
+            AVAILABLE=$(kubectl get deploy -n "$NS" "$svc" -o jsonpath='{.status.availableReplicas}' 2>/dev/null || true)
+
+            DESIRED=${DESIRED:-0}
+            UPDATED=${UPDATED:-0}
+            AVAILABLE=${AVAILABLE:-0}
+
+            STATUS="OK"
+            BLOCKING=1
+            if echo " $NON_BLOCKING_SERVICES " | grep -q " $svc "; then
+              BLOCKING=0
+            fi
+
+            if [ "$DESIRED" -eq 0 ]; then
+              STATUS="SKIPPED"
+            elif [ "$AVAILABLE" -lt 1 ]; then
+              # No pod is serving traffic — always a blocker.
+              STATUS="UNAVAILABLE"
+              if [ "$BLOCKING" -eq 1 ]; then
+                FAIL=1
+              fi
+            elif [ "$AVAILABLE" -lt "$DESIRED" ] && [ "$UPDATED" -lt "$DESIRED" ]; then
+              # Rollout still in progress AND below desired replicas.
+              # Treat as degraded (warn) rather than fail: the old ReplicaSet
+              # is still serving, and the new ReplicaSet hasn't finished
+              # scaling up yet. Only fail if there's literally no pod
+              # available (handled above).
+              STATUS="DEGRADED"
+            fi
+
+            MODE="blocking"
+            if [ "$BLOCKING" -eq 0 ]; then
+              MODE="non-blocking"
+            fi
+
+            printf "%-25s desired=%s updated=%s available=%s [%s|%s]\n" \
+              "$svc" "$DESIRED" "$UPDATED" "$AVAILABLE" "$STATUS" "$MODE"
+          done
+
+          echo ""
+          if [ "$FAIL" -eq 1 ]; then
+            echo "::error::Smoke tests FAILED — one or more services unhealthy"
+            exit 1
+          fi
+          echo "All services healthy"
+
+      - name: Verify critical endpoints via port-forward
+        run: |
+          if [ "${{ inputs.environment }}" = "staging" ]; then
+            NS="aivo-staging"
+          else
+            NS="aivo"
+          fi
+
+          # If a previous step already determined the namespace is empty,
+          # or identity-svc isn't deployed, soft-skip endpoint checks.
+          if [ "${SMOKE_SKIPPED:-0}" = "1" ]; then
+            echo "::warning::Skipping endpoint checks — namespace '$NS' has no deployments"
+            exit 0
+          fi
+          if ! kubectl get deploy -n "$NS" identity-svc >/dev/null 2>&1; then
+            echo "::warning::Skipping endpoint checks — identity-svc not deployed in '$NS'"
+            exit 0
+          fi
+
+          # Wait for at least one ready endpoint before port-forwarding.
+          echo "Waiting for identity-svc rollout in $NS..."
+          kubectl rollout status -n "$NS" deploy/identity-svc --timeout=120s || true
+          for i in $(seq 1 30); do
+            READY=$(kubectl get endpoints -n "$NS" identity-svc \
+              -o jsonpath='{.subsets[*].addresses[*].ip}' 2>/dev/null || true)
+            if [ -n "$READY" ]; then
+              echo "identity-svc has ready endpoints: $READY"
+              break
+            fi
+            echo "  attempt $i/30: no ready endpoints yet, sleeping 2s..."
+            sleep 2
+          done
+
+          kubectl port-forward -n "$NS" svc/identity-svc 13001:3000 \
+            > /tmp/pf-identity.log 2>&1 &
+          PF_PID=$!
+
+          # Wait until the port is actually listening.
+          PF_READY=0
+          for i in $(seq 1 20); do
+            if curl -s -o /dev/null --max-time 2 "http://localhost:13001/health" \
+                 -w "%{http_code}" 2>/dev/null | grep -qE '^[0-9]{3}$'; then
+              # got any HTTP response, port-forward is up
+              PF_READY=1
+              break
+            fi
+            sleep 1
+          done
+          if [ "$PF_READY" -ne 1 ]; then
+            echo "::warning::port-forward did not become ready in time"
+            echo "--- port-forward log ---"
+            cat /tmp/pf-identity.log || true
+            echo "--- pod status ---"
+            kubectl get pods -n "$NS" -l app=identity-svc -o wide || true
+          fi
+
+          FAIL=0
+
+          has_expected_status() {
+            local status="$1" expected_csv="$2"
+            IFS=',' read -r -a expected_codes <<< "$expected_csv"
+            for code in "${expected_codes[@]}"; do
+              if [ "$status" = "$code" ]; then
+                return 0
+              fi
+            done
+            return 1
+          }
+
+          check_required() {
+            local name="$1" url="$2" expected_csv="$3"
+            local STATUS=000
+            for i in 1 2 3 4 5; do
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$url" 2>/dev/null || true)
+              STATUS=${STATUS:-000}
+              if has_expected_status "$STATUS" "$expected_csv"; then
+                echo "OK: $name → HTTP $STATUS (attempt $i)"
+                return 0
+              fi
+              sleep 2
+            done
+            echo "FAIL: $name → HTTP $STATUS (expected one of: $expected_csv)"
+            FAIL=1
+          }
+
+          check_optional() {
+            local name="$1" url="$2" expected_csv="$3"
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$url" 2>/dev/null || true)
+            STATUS=${STATUS:-000}
+            if has_expected_status "$STATUS" "$expected_csv"; then
+              echo "OK: $name → HTTP $STATUS"
+            else
+              echo "WARN: $name → HTTP $STATUS (expected one of: $expected_csv)"
+            fi
+          }
+
+          check_required "health" "http://localhost:13001/health" "200"
+          # identity-svc does not implement a generic /csrf-token endpoint —
+          # CSRF is handled per-session elsewhere. Keep as optional diagnostic
+          # so a future route addition shows up, but never fail the pipeline.
+          check_optional "csrf" "http://localhost:13001/csrf-token" "200,204,404"
+
+          kill $PF_PID 2>/dev/null || true
+
+          if [ "$FAIL" -eq 1 ]; then
+            echo "--- port-forward log ---"
+            cat /tmp/pf-identity.log || true
+            echo "--- identity-svc pods ---"
+            kubectl get pods -n "$NS" -l app=identity-svc -o wide || true
+            kubectl describe pods -n "$NS" -l app=identity-svc | tail -60 || true
+            echo "::error::Endpoint smoke tests failed"
+            exit 1
+          fi
+          echo "All endpoint checks passed"
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Smoke Tests — ${{ inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** \`${{ inputs.version }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp:** $(date -u +'%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY

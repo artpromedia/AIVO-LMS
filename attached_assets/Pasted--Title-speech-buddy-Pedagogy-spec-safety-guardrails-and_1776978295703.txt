@@ -1,0 +1,26 @@
+## Title
+[speech-buddy] Pedagogy spec, safety guardrails, and service scaffolding
+
+## Context
+Repo: artpromedia/aivo-ai-learning. Create a new vertical that spans `services/ai-svc`, `services/tutor-svc`, `services/engagement-svc`, `services/family-svc`, and the web/mobile apps.
+
+## Tasks
+1. Author `docs/products/speech-buddy/README.md` covering:
+   - Target ages **6–9, 10–12, 13–15** with separate persona tones and vocabulary bands.
+   - SEL skill map (self-awareness, self-management, social-awareness, relationship skills, responsible decision-making) → concrete micro-skills (e.g., "ask an open question", "name a feeling", "repair a rupture").
+   - Session format: **Warm-up (30s) → Scenario roleplay (3–6 min) → Reflection (1–2 min) → Mini-quest for real life**.
+2. `docs/products/speech-buddy/safety.md`:
+   - Hard-blocked topics (self-harm, abuse disclosure, romantic/sexual content, violence, medical/PII) with routed responses + human-in-the-loop escalation to a guardian/moderator via `family-svc` + `comms-svc`.
+   - PII minimization: the child's real name is never stored in prompts; use nickname tokens.
+   - Crisis protocol: if distress or abuse signals are detected, agent switches to a pre-approved script and triggers a parental/educator alert.
+3. Scaffold new modules (no LLM wiring yet):
+   - `services/ai-svc/src/speechBuddy/` — agent orchestrator interfaces.
+   - `services/tutor-svc/src/modes/speechBuddy.ts` — session lifecycle (`start`, `turn`, `reflect`, `end`) and transcript storage with per-tenant encryption.
+   - `services/engagement-svc/src/speechBuddy/` — streaks, quests, badges schema.
+   - Shared types in `packages/*` for `SpeechBuddySession`, `TurnEvent`, `SafetyFlag`, `SkillTag`.
+4. Feature flag `speech_buddy.enabled` (per-tenant, per-age-band).
+
+## Acceptance criteria
+- Pedagogy + safety docs reviewed and merged.
+- Service scaffolds compile, are covered by stub tests, and are wired into the OpenAPI output without functional endpoints yet.
+- A threat model document `docs/products/speech-buddy/threat-model.md` exists covering STRIDE + child-specific risks.

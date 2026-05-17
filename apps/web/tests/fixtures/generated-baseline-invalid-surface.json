@@ -1,0 +1,31 @@
+{
+  "generated": true,
+  "source": "ai",
+  "chapterId": "math_invalid_geometry_01",
+  "rejectedActivities": [],
+  "activities": {
+    "easy": [
+      {
+        "id": "math_invalid_geometry_01",
+        "domain": "math",
+        "difficulty": "easy",
+        "interaction": "geometry_workspace",
+        "prompt": "Find the area.",
+        "feedbackMode": "delayed_after_item",
+        "brainMeasures": ["geometry_reasoning"],
+        "scoring": { "mode": "exact", "correctAnswer": 32 },
+        "surface": {
+          "id": "surface_invalid",
+          "type": "geometry_workspace",
+          "prompt": "Find the area.",
+          "diagram": { "canvasMode": "svg", "shapes": [] },
+          "capture": { "finalAnswer": true },
+          "scoring": { "mode": "exact" },
+          "accessibility": { "altText": "", "reduceMotionSafe": true, "keyboardAlternative": true }
+        }
+      }
+    ],
+    "medium": [],
+    "hard": []
+  }
+}

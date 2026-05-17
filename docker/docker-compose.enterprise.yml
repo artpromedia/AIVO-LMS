@@ -1,0 +1,211 @@
+# =============================================================================
+# AIVO Enterprise services — local dev compose
+# =============================================================================
+# Brings up the 11 new enterprise services from sprints 02-10 plus a
+# shared Postgres for the persistence-backed ones. Stateless analytical
+# services (math-recognizer, science-solver, subject-brain,
+# responsible-ai) do not require the database.
+#
+# Usage:
+#   docker compose -f docker/docker-compose.enterprise.yml up --build
+#
+# Each service is built from docker/Dockerfile.service with the
+# SERVICE_NAME build arg set appropriately.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: aivo
+      POSTGRES_PASSWORD: aivo
+      POSTGRES_DB: aivo
+    ports:
+      - "55432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aivo"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  problem-session-svc:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_NAME: problem-session-svc
+    environment:
+      NODE_ENV: production
+      PORT: "3061"
+      PROBLEM_SESSION_PORT: "3061"
+      DATABASE_URL: postgresql://aivo:aivo@postgres:5432/aivo
+      AUDIT_SVC_URL: http://audit-svc:3069
+      AIVO_FEATURE_PROBLEM_SESSION_LEDGER: ${AIVO_FEATURE_PROBLEM_SESSION_LEDGER:-false}
+      AIVO_FEATURE_DATA_GOVERNANCE_CENTER: ${AIVO_FEATURE_DATA_GOVERNANCE_CENTER:-false}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3061:3061"
+
+  math-recognizer-svc:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_NAME: math-recognizer-svc
+    environment:
+      NODE_ENV: production
+      PORT: "3062"
+      MATH_RECOGNIZER_PORT: "3062"
+    ports:
+      - "3062:3062"
+
+  science-solver-svc:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_NAME: science-solver-svc
+    environment:
+      NODE_ENV: production
+      PORT: "3063"
+      SCIENCE_SOLVER_PORT: "3063"
+    ports:
+      - "3063:3063"
+
+  subject-brain-svc:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_NAME: subject-brain-svc
+    environment:
+      NODE_ENV: production
+      PORT: "3064"
+      SUBJECT_BRAIN_PORT: "3064"
+    ports:
+      - "3064:3064"
+
+  homework-svc:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_NAME: homework-svc
+    environment:
+      NODE_ENV: production
+      PORT: "3065"
+      HOMEWORK_PORT: "3065"
+      DATABASE_URL: postgresql://aivo:aivo@postgres:5432/aivo
+      AIVO_FEATURE_SELF_REGULATION_HUB: ${AIVO_FEATURE_SELF_REGULATION_HUB:-false}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3065:3065"
+
+  recommendation-svc:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_NAME: recommendation-svc
+    environment:
+      NODE_ENV: production
+      PORT: "3066"
+      RECOMMENDATION_PORT: "3066"
+      DATABASE_URL: postgresql://aivo:aivo@postgres:5432/aivo
+      AUDIT_SVC_URL: http://audit-svc:3069
+      AIVO_FEATURE_PROFILE_RECOMMENDATIONS_V2: ${AIVO_FEATURE_PROFILE_RECOMMENDATIONS_V2:-false}
+      AIVO_FEATURE_DATA_GOVERNANCE_CENTER: ${AIVO_FEATURE_DATA_GOVERNANCE_CENTER:-false}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3066:3066"
+
+  tenant-svc:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_NAME: tenant-svc
+    environment:
+      NODE_ENV: production
+      PORT: "3067"
+      TENANT_PORT: "3067"
+      DATABASE_URL: postgresql://aivo:aivo@postgres:5432/aivo
+      AUDIT_SVC_URL: http://audit-svc:3069
+      AIVO_FEATURE_DISTRICT_ENTERPRISE_MODE: ${AIVO_FEATURE_DISTRICT_ENTERPRISE_MODE:-false}
+      AIVO_FEATURE_DATA_GOVERNANCE_CENTER: ${AIVO_FEATURE_DATA_GOVERNANCE_CENTER:-false}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3067:3067"
+
+  integration-svc:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_NAME: integration-svc
+    environment:
+      NODE_ENV: production
+      PORT: "3068"
+      INTEGRATION_PORT: "3068"
+      AIVO_FEATURE_SIS_SYNC: ${AIVO_FEATURE_SIS_SYNC:-false}
+      AIVO_FEATURE_LTI_13: ${AIVO_FEATURE_LTI_13:-false}
+    ports:
+      - "3068:3068"
+
+  audit-svc:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_NAME: audit-svc
+    environment:
+      NODE_ENV: production
+      PORT: "3069"
+      AUDIT_PORT: "3069"
+      DATABASE_URL: postgresql://aivo:aivo@postgres:5432/aivo
+      AIVO_FEATURE_DATA_GOVERNANCE_CENTER: ${AIVO_FEATURE_DATA_GOVERNANCE_CENTER:-false}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3069:3069"
+
+  data-governance-svc:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_NAME: data-governance-svc
+    environment:
+      NODE_ENV: production
+      PORT: "3070"
+      DATA_GOVERNANCE_PORT: "3070"
+      DATABASE_URL: postgresql://aivo:aivo@postgres:5432/aivo
+      AUDIT_SVC_URL: http://audit-svc:3069
+      AIVO_FEATURE_DATA_GOVERNANCE_CENTER: ${AIVO_FEATURE_DATA_GOVERNANCE_CENTER:-false}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3070:3070"
+
+  responsible-ai-svc:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_NAME: responsible-ai-svc
+    environment:
+      NODE_ENV: production
+      PORT: "3071"
+      RESPONSIBLE_AI_PORT: "3071"
+      AIVO_FEATURE_RESPONSIBLE_AI_GUARDRAILS: ${AIVO_FEATURE_RESPONSIBLE_AI_GUARDRAILS:-false}
+    ports:
+      - "3071:3071"
