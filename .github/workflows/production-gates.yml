@@ -1,0 +1,107 @@
+name: Production Gates
+
+# Runs the release-discipline gates on every PR and on push to main:
+# repo:health, brand:check, prod:check, prod:no-demo,
+# prod:surface-contract, and test:production-readiness.
+#
+# Sprint 02 ownership. Keep this workflow free of project-specific
+# logic — it should only invoke root scripts that exist in package.json.
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: production-gates-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  gates:
+    name: Release-discipline gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: repo:health
+        run: pnpm repo:health
+
+      - name: brand:check
+        run: pnpm brand:check
+
+      - name: prod:no-demo scan
+        run: pnpm prod:no-demo
+
+      - name: prod:surface-contract scan
+        run: pnpm prod:surface-contract
+
+      - name: prod:check
+        run: pnpm prod:check
+
+      - name: test:production-readiness
+        run: pnpm test:production-readiness
+        env:
+          DATABASE_URL: ${{ secrets.TEST_DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/aivo_test' }}
+
+  api-client-drift-gate:
+    name: API client drift (advisory)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Stays advisory until every service in scripts/dump-openapi.mjs
+    # has typed body/querystring/params/response on every public route
+    # (see comment in .github/workflows/api-client-drift.yml).
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: api:check
+        run: pnpm api:check
+
+  summary:
+    name: Gates summary
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - gates
+    steps:
+      - name: Report
+        env:
+          GATES: ${{ needs.gates.result }}
+        run: |
+          {
+            echo "## Production Gates"
+            echo ""
+            echo "| Gate | Result |"
+            echo "| --- | --- |"
+            echo "| repo:health, brand:check, prod:* | $GATES |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$GATES" != "success" ]; then
+            echo "::error::Production gates failed — see job logs."
+            exit 1
+          fi
