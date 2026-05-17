@@ -30,7 +30,8 @@
     "onboarding:audit": "node scripts/onboarding-audit.mjs",
     "lessonrun:audit": "node scripts/lessonrun-audit.mjs",
     "route:audit": "node scripts/route-audit.mjs",
-    "mobile:audit": "node scripts/mobile-unified-audit.mjs"
+    "mobile:audit": "node scripts/mobile-unified-audit.mjs",
+    "marketing:audit": "node scripts/marketing-audit.mjs"
   },
   "devDependencies": {
     "eas-cli": "^18.6.0",

@@ -66,6 +66,9 @@ jobs:
       - name: mobile:audit
         run: pnpm mobile:audit
 
+      - name: marketing:audit
+        run: pnpm marketing:audit
+
       - name: prod:no-demo scan
         run: pnpm prod:no-demo
 
