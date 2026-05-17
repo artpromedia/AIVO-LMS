@@ -45,6 +45,9 @@ jobs:
       - name: brand:check
         run: pnpm brand:check
 
+      - name: auth:audit
+        run: pnpm auth:audit
+
       - name: prod:no-demo scan
         run: pnpm prod:no-demo
 

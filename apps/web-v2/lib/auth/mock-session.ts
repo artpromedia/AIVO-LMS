@@ -1,7 +1,17 @@
 import { cookies } from "next/headers";
+import { serverEnv } from "@/lib/env";
 import type { Role, SessionProfile } from "@/lib/auth/types";
 
 const COOKIE_NAME = "aivo_mock_session";
+
+// Sprint 03 production guard. The env validator already refuses
+// AUTH_MODE=mock in production, but a misconfigured deployment or a
+// future caller that bypasses env.ts must still hit a hard NO before any
+// mock session is materialized. Returning null here is correct — the
+// session-required helpers redirect to /login.
+function mockAuthAllowed(): boolean {
+  return serverEnv.AUTH_MODE === "mock";
+}
 
 // Mock users so role routing can be exercised end-to-end without a real
 // identity provider. Replaced by Clerk/Auth.js/custom auth in a later sprint.
@@ -65,6 +75,7 @@ function parseRole(value: string | undefined): Role | null {
 
 /** Server-component / route-handler session reader. */
 export async function readMockSessionFromCookies(): Promise<SessionProfile | null> {
+  if (!mockAuthAllowed()) return null;
   const jar = await cookies();
   const role = parseRole(jar.get(COOKIE_NAME)?.value);
   return role ? MOCK_USERS[role] : null;
@@ -72,6 +83,7 @@ export async function readMockSessionFromCookies(): Promise<SessionProfile | nul
 
 /** Edge-friendly variant for middleware / Request-based callers. */
 export async function getMockSession(req: Request): Promise<SessionProfile | null> {
+  if (!mockAuthAllowed()) return null;
   const header = req.headers.get("cookie") ?? "";
   const match = header.split(/;\s*/).find((c) => c.startsWith(`${COOKIE_NAME}=`));
   const role = parseRole(match?.split("=")[1]);
@@ -79,3 +91,8 @@ export async function getMockSession(req: Request): Promise<SessionProfile | nul
 }
 
 export const MOCK_COOKIE_NAME = COOKIE_NAME;
+
+/** Exposed for the mock-login route handler to refuse cleanly. */
+export function isMockAuthAllowed(): boolean {
+  return mockAuthAllowed();
+}

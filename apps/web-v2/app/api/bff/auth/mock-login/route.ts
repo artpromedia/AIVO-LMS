@@ -2,7 +2,11 @@ import { cookies } from "next/headers";
 import { z } from "zod";
 import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
-import { MOCK_COOKIE_NAME, MOCK_USERS } from "@/lib/auth/mock-session";
+import {
+  MOCK_COOKIE_NAME,
+  MOCK_USERS,
+  isMockAuthAllowed,
+} from "@/lib/auth/mock-session";
 import { ROLE_HOME, type Role } from "@/lib/auth/types";
 
 export const dynamic = "force-dynamic";
@@ -21,6 +25,21 @@ const BodySchema = z.object({
 export async function POST(req: Request) {
   const requestId = getRequestId(req);
   try {
+    // Sprint 03 production guard. AUTH_MODE != "mock" means a real
+    // identity provider is configured; refuse to set a mock session
+    // cookie under any circumstances.
+    if (!isMockAuthAllowed()) {
+      return fail(
+        {
+          code: "MOCK_AUTH_DISABLED",
+          status: 404,
+          message: "Mock auth is disabled when AUTH_MODE is not 'mock'.",
+          userMessage: "This endpoint is not available.",
+          retryable: false,
+        },
+        requestId,
+      );
+    }
     const json = await req.json().catch(() => ({}));
     const parsed = BodySchema.safeParse(json);
     if (!parsed.success) {

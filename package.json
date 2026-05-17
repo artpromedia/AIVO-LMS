@@ -24,7 +24,8 @@
     "lint:fleet": "eslint --max-warnings=Infinity \"services/**/*.{ts,tsx,js,mjs,cjs}\" \"packages/db/**/*.{ts,tsx,js,mjs,cjs}\" \"packages/events/**/*.{ts,tsx,js,mjs,cjs}\"",
     "repo:health": "node scripts/repo-health-check.mjs",
     "brand:check": "node scripts/brand-asset-check.mjs",
-    "consent:audit": "node scripts/consent-gate-audit.mjs"
+    "consent:audit": "node scripts/consent-gate-audit.mjs",
+    "auth:audit": "node scripts/auth-mode-audit.mjs"
   },
   "devDependencies": {
     "eas-cli": "^18.6.0",
