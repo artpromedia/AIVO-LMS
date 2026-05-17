@@ -1,3 +1,7 @@
+export * from "./tokens.js";
+export * from "./assets.js";
+export * from "./role-themes.js";
+
 export const BRAND = {
   name: "AIVO",
   tagline: "AI-Powered Adaptive Learning for Every Child",
