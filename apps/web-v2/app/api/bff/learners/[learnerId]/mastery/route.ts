@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
+import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import { getMasteryMap } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
@@ -21,6 +22,8 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
+    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    if (consentErr) return consentErr;
 
     const result = getMasteryMap(learnerId, session!.tenantId);
     return ok(result, requestId);

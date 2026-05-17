@@ -8,6 +8,7 @@ import { NextResponse } from "next/server";
 import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
+import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import { audit } from "@/lib/bff/audit";
 import { getLearner, resetAccessibilityPrefs } from "@/lib/db/repos";
 
@@ -25,6 +26,8 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
+    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    if (consentErr) return consentErr;
     if (!getLearner(learnerId, session!.tenantId)) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
     }

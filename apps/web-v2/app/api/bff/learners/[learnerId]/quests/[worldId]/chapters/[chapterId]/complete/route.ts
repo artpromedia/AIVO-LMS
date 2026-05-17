@@ -6,6 +6,7 @@ import {
   requireRole,
   requireLearnerScope,
 } from "@/lib/bff/guards";
+import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import { getQuestProgress, getQuestWorld } from "@/lib/db/repos";
 import { getStore } from "@/lib/db/store";
 
@@ -36,6 +37,8 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
+    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection", "ai_personalization"], requestId);
+    if (consentErr) return consentErr;
 
     const world = getQuestWorld(worldId);
     if (!world) {

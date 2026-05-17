@@ -48,6 +48,9 @@ jobs:
       - name: auth:audit
         run: pnpm auth:audit
 
+      - name: consent:audit
+        run: pnpm consent:audit
+
       - name: prod:no-demo scan
         run: pnpm prod:no-demo
 

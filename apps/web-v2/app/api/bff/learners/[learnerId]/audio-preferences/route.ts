@@ -3,6 +3,7 @@ import { z } from "zod";
 import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireLearnerScope } from "@/lib/bff/guards";
+import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import { audit } from "@/lib/bff/audit";
 import {
   getLearnerVoicePreference,
@@ -30,6 +31,8 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (response) return response;
     const scopeErr = requireLearnerScope(session!, learnerId, requestId);
     if (scopeErr) return scopeErr;
+    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    if (consentErr) return consentErr;
     const pref = getLearnerVoicePreference(learnerId);
     return ok({ preference: pref }, requestId);
   } catch (e) {
@@ -45,6 +48,8 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
     if (response) return response;
     const scopeErr = requireLearnerScope(session!, learnerId, requestId);
     if (scopeErr) return scopeErr;
+    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    if (consentErr) return consentErr;
     // Only parents and admins may toggle `enabled`; learners can change voice
     // and speed within the constraints their parent already accepted.
     let body: unknown = {};

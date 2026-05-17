@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
+import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import { audit } from "@/lib/bff/audit";
 import {
   deleteIEPForLearner,
@@ -30,6 +31,8 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
+    const consentErr = requireLearnerConsent(session!, learnerId, ["iep_document_storage", "child_data_collection"], requestId);
+    if (consentErr) return consentErr;
     const doc = getIEPForLearner(learnerId, session!.tenantId);
     if (doc) {
       logIepAccess({
@@ -56,6 +59,8 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
+    const consentErr = requireLearnerConsent(session!, learnerId, ["iep_document_storage", "child_data_collection"], requestId);
+    if (consentErr) return consentErr;
 
     // Multipart-only: the route derives metadata from the actual file stream
     // so a client can't claim "I have a 10 MB IEP" without sending the bytes.
@@ -132,6 +137,8 @@ export async function DELETE(req: Request, { params }: Params): Promise<NextResp
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
+    const consentErr = requireLearnerConsent(session!, learnerId, ["iep_document_storage", "child_data_collection"], requestId);
+    if (consentErr) return consentErr;
     const existing = getIEPForLearner(learnerId, session!.tenantId);
     const removed = deleteIEPForLearner(learnerId, session!.tenantId);
     if (!removed) {

@@ -6,6 +6,7 @@ import {
   requireRole,
   requireLearnerScope,
 } from "@/lib/bff/guards";
+import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import { getHomeworkSession } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
@@ -23,6 +24,8 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
+    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection", "ai_personalization"], requestId);
+    if (consentErr) return consentErr;
 
     const hw = getHomeworkSession(sessionId, session!.tenantId);
     if (!hw || hw.learnerId !== learnerId) {

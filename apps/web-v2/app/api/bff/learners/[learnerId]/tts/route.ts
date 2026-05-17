@@ -3,6 +3,7 @@ import { z } from "zod";
 import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireLearnerScope } from "@/lib/bff/guards";
+import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import { audit } from "@/lib/bff/audit";
 import {
   generateTTS,
@@ -33,6 +34,8 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (response) return response;
     const scopeErr = requireLearnerScope(session!, learnerId, requestId);
     if (scopeErr) return scopeErr;
+    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    if (consentErr) return consentErr;
     const pref = getLearnerVoicePreference(learnerId);
     if (pref && !pref.enabled) {
       return fail(

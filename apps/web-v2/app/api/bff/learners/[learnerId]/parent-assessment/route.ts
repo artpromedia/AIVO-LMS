@@ -3,6 +3,7 @@ import { z } from "zod";
 import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
+import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import { audit } from "@/lib/bff/audit";
 import {
   getOrCreateParentAssessment,
@@ -35,6 +36,8 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
+    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    if (consentErr) return consentErr;
     const assessment = getOrCreateParentAssessment(learnerId, session!.tenantId);
     return ok({ assessment }, requestId);
   } catch (e) {
@@ -49,6 +52,8 @@ async function applyPatch(req: Request, learnerId: string, requestId: string): P
   if (roleErr) return roleErr;
   const scope = requireLearnerScope(session!, learnerId, requestId);
   if (scope) return scope;
+    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    if (consentErr) return consentErr;
 
   const body = await req.json().catch(() => ({}));
   const parsed = PatchBody.safeParse(body);

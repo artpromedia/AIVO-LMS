@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
+import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import { audit } from "@/lib/bff/audit";
 import { LessonStepInput } from "@/lib/validators/lesson";
 import { getLessonRun, recordLessonStep } from "@/lib/db/repos";
@@ -20,6 +21,8 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
+    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection", "ai_personalization"], requestId);
+    if (consentErr) return consentErr;
     const body = await req.json().catch(() => null);
     const parsed = LessonStepInput.safeParse(body);
     if (!parsed.success) {
