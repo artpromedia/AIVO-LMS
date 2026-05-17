@@ -72,6 +72,9 @@ jobs:
       - name: billing:audit
         run: pnpm billing:audit
 
+      - name: rostering:audit
+        run: pnpm rostering:audit
+
       - name: prod:no-demo scan
         run: pnpm prod:no-demo
 
