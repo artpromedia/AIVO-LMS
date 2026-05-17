@@ -69,6 +69,9 @@ jobs:
       - name: marketing:audit
         run: pnpm marketing:audit
 
+      - name: billing:audit
+        run: pnpm billing:audit
+
       - name: prod:no-demo scan
         run: pnpm prod:no-demo
 
