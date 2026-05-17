@@ -54,6 +54,9 @@ jobs:
       - name: curriculum:validate
         run: pnpm curriculum:validate
 
+      - name: onboarding:audit
+        run: pnpm onboarding:audit
+
       - name: prod:no-demo scan
         run: pnpm prod:no-demo
 
