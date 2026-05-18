@@ -24,9 +24,8 @@ const queryClient = new QueryClient({
 });
 
 export default function RootLayout() {
-  // Inclusive-warm typography: Fredoka (display, pending TTF drop) +
-  // Nunito (body, already bundled). See `constants/typography.ts` for
-  // the swap-point note.
+  // Inclusive-warm typography: Fredoka (display) + Nunito (body), both
+  // bundled. See `constants/typography.ts` for the swap-point note.
   const [fontsLoaded, fontError] = useFonts(FONT_ASSETS);
 
   const authState = useAuthState();

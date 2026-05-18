@@ -5,44 +5,32 @@
 // `useFonts()` and screens can reference `fontFamilies.*` instead of
 // stringly-typed `"Nunito-Bold"` literals.
 //
-// DEFERRED SCOPE — Fredoka asset bundling (tracked as follow-up #8):
-//   The inclusive-warm spec calls for Fredoka as the display family,
-//   but the Fredoka .ttf files are intentionally NOT bundled in this
-//   change (license + designer review pending). This is explicitly
-//   deferred scope — see follow-up task #8 "Bundle Fredoka TTFs into
-//   apps/mobile/assets/fonts/" for the tracking item.
+// Fredoka (display) is bundled alongside Nunito (body). Every consumer
+// reads from `fontFamilies.*` (no `"Fredoka-..."` string literals
+// anywhere in the app), so weight or family swaps remain a one-file
+// change in the block below.
 //
-//   Until those assets ship, `fontFamilies.display*` aliases to the
-//   already-bundled `Nunito-*` family so screens render at the right
-//   weight/silhouette without crashing on a missing asset. Every
-//   consumer reads from `fontFamilies.*` (no `"Fredoka-..."` string
-//   literals anywhere in the app), so the Fredoka swap is a one-file
-//   change: flip the constants in the `// FREDOKA SWAP POINT` block
-//   below and uncomment the matching entries in `FONT_ASSETS`. No
-//   screen-level changes will be required.
+// The Fredoka-*.ttf files were generated from the upstream variable
+// font (`ofl/fredoka/Fredoka[wdth,wght].ttf` in google/fonts, OFL
+// licensed) by instancing at wdth=100 + wght={400,500,600,700} via
+// fontTools. Regenerate them the same way if upstream ships an update.
 
 // FREDOKA SWAP POINT ─────────────────────────────────────────────────
-// const DISPLAY_REGULAR = "Fredoka-Regular";
-// const DISPLAY_MEDIUM = "Fredoka-Medium";
-// const DISPLAY_SEMIBOLD = "Fredoka-SemiBold";
-// const DISPLAY_BOLD = "Fredoka-Bold";
-const DISPLAY_REGULAR = "Nunito-SemiBold";
-const DISPLAY_MEDIUM = "Nunito-Bold";
-const DISPLAY_SEMIBOLD = "Nunito-Bold";
-const DISPLAY_BOLD = "Nunito-ExtraBold";
+const DISPLAY_REGULAR = "Fredoka-Regular";
+const DISPLAY_MEDIUM = "Fredoka-Medium";
+const DISPLAY_SEMIBOLD = "Fredoka-SemiBold";
+const DISPLAY_BOLD = "Fredoka-Bold";
 // ─────────────────────────────────────────────────────────────────────
 
 export const FONT_ASSETS = {
-  // Bundled today:
   "Nunito-Regular": require("@/assets/fonts/Nunito-Regular.ttf"),
   "Nunito-SemiBold": require("@/assets/fonts/Nunito-SemiBold.ttf"),
   "Nunito-Bold": require("@/assets/fonts/Nunito-Bold.ttf"),
   "Nunito-ExtraBold": require("@/assets/fonts/Nunito-ExtraBold.ttf"),
-  // Pending Fredoka TTFs (see swap-point note above):
-  // "Fredoka-Regular": require("@/assets/fonts/Fredoka-Regular.ttf"),
-  // "Fredoka-Medium": require("@/assets/fonts/Fredoka-Medium.ttf"),
-  // "Fredoka-SemiBold": require("@/assets/fonts/Fredoka-SemiBold.ttf"),
-  // "Fredoka-Bold": require("@/assets/fonts/Fredoka-Bold.ttf"),
+  "Fredoka-Regular": require("@/assets/fonts/Fredoka-Regular.ttf"),
+  "Fredoka-Medium": require("@/assets/fonts/Fredoka-Medium.ttf"),
+  "Fredoka-SemiBold": require("@/assets/fonts/Fredoka-SemiBold.ttf"),
+  "Fredoka-Bold": require("@/assets/fonts/Fredoka-Bold.ttf"),
 } as const;
 
 /** Canonical font-family names. Use these everywhere instead of
