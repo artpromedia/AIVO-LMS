@@ -158,6 +158,31 @@ export const INCLUSIVE_WARM_PALETTE = {
   // any inline SVG that needs to match the logo.
   gradientStart: "#3b82f6",
   gradientEnd: "#a78bfa",
+
+  // Semantic status colors. Same hex across all three sensory modes —
+  // status meaning shouldn't shift with mode. Sourced from the
+  // tokens/semantic JSON so web + RN share a single source of truth.
+  success: "#16a34a",
+  successSoft: "#d1fae5",
+  warning: "#f59e0b",
+  warningSoft: "#fef3c7",
+  danger: "#dc2626",
+  dangerSoft: "#fee2e2",
+  info: "#3b82f6",
+  infoSoft: "#dbeafe",
+
+  // Visual-domain accents — used by the tutor world map and the
+  // 4-quadrant subject icons. Kept stable across sensory modes.
+  visualMath: "#3b82f6",
+  visualReading: "#7c3aed",
+  visualScience: "#10b981",
+  visualSel: "#f59e0b",
+
+  // Dark capsule chrome (bottom nav, modal overlays, brand wordmark
+  // dark variant). The `#1a1c23` ink-near-black is intentionally
+  // unaffected by sensory mode — it's a brand surface, not a content
+  // surface.
+  darkSurface: "#1a1c23",
 } as const;
 
 export type InclusiveWarmColor = keyof typeof INCLUSIVE_WARM_PALETTE;

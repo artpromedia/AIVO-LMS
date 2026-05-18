@@ -1,43 +1,62 @@
 import React from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet, RefreshControl } from "react-native";
-import { router } from "expo-router";
+import { router, type Href } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
 import { useConnectedLearners } from "@/hooks/useFamily";
-import { AivoCard, EmptyState, LoadingState } from "@aivo/mobile-ui";
-import { colors, spacing } from "@/constants/colors";
+import { EmptyState, LoadingState } from "@aivo/mobile-ui";
+import { INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
+import { spacing } from "@/constants/colors";
+import { fontFamilies } from "@/constants/typography";
+import { useSensoryPalette } from "@/context/SensoryModeProvider";
+import { Card, SensoryToggle, HeaderUserChip } from "@/components/ui";
 
 export default function CaregiverDashboard() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { user, logout } = useAuth();
   const { data: children, isLoading, refetch } = useConnectedLearners();
+  const palette = useSensoryPalette();
 
   if (isLoading) return <LoadingState />;
 
   return (
     <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 32 }}
+      style={{ flex: 1, backgroundColor: palette.bgPage }}
+      contentContainerStyle={{
+        paddingTop: insets.top + 16,
+        paddingBottom: 32,
+        paddingHorizontal: spacing.md,
+      }}
       refreshControl={
-        <RefreshControl refreshing={false} onRefresh={refetch} colors={[colors.primary]} />
+        <RefreshControl refreshing={false} onRefresh={refetch} colors={[palette.primary]} />
       }
     >
       <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>{t("caregiver.greeting", { name: user?.name })}</Text>
-          <Text style={styles.subGreeting}>{t("caregiver.assignedChildren")}</Text>
+        <HeaderUserChip
+          name={user?.name || t("caregiver.title")}
+          subtitle={t("caregiver.assignedChildren")}
+          onPress={() => router.push("/(caregiver)/settings" as Href)}
+        />
+        <View style={styles.headerActions}>
+          <SensoryToggle variant="icon" />
+          <Pressable onPress={logout} accessibilityLabel="Log out" hitSlop={12}>
+            <Ionicons name="log-out-outline" size={22} color={palette.inkMuted} />
+          </Pressable>
         </View>
-        <Pressable onPress={logout}>
-          <Ionicons name="log-out-outline" size={22} color={colors.textSecondary} />
-        </Pressable>
       </View>
+
+      <Text
+        style={[styles.greeting, { color: palette.ink, fontFamily: fontFamilies.displayBold }]}
+      >
+        {t("caregiver.greeting", { name: user?.name })}
+      </Text>
 
       {!children?.length ? (
         <EmptyState
-          icon={<Ionicons name="people-outline" size={48} color={colors.textSecondary} />}
+          icon={<Ionicons name="people-outline" size={48} color={palette.inkMuted} />}
           title={t("caregiver.noChildrenTitle")}
           message={t("caregiver.noChildrenMessage")}
         />
@@ -45,52 +64,70 @@ export default function CaregiverDashboard() {
         children.map((child: any) => (
           <Pressable
             key={child.id}
-            onPress={() => router.push(`/(caregiver)/child/${child.id}` as any)}
+            onPress={() => router.push(`/(caregiver)/child/${child.id}` as Href)}
+            style={{ marginBottom: spacing.md }}
           >
-            <AivoCard style={styles.childCard}>
+            <Card>
               <View style={styles.childRow}>
-                <View style={styles.childAvatar}>
-                  <Text style={styles.childInitial}>{child.firstName?.[0] || "C"}</Text>
+                <View
+                  style={[
+                    styles.childAvatar,
+                    { backgroundColor: INCLUSIVE_WARM_PALETTE.primarySoft },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.childInitial,
+                      { color: palette.primary, fontFamily: fontFamilies.bodyBold },
+                    ]}
+                  >
+                    {child.firstName?.[0] || "C"}
+                  </Text>
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.childName}>
+                  <Text
+                    style={[
+                      styles.childName,
+                      { color: palette.ink, fontFamily: fontFamilies.bodyBold },
+                    ]}
+                  >
                     {child.firstName} {child.lastName}
                   </Text>
-                  <Text style={styles.childGrade}>Grade {child.gradeLevel}</Text>
+                  <Text style={[styles.childGrade, { color: palette.inkMuted }]}>
+                    Grade {child.gradeLevel}
+                  </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+                <Ionicons name="chevron-forward" size={20} color={palette.inkMuted} />
               </View>
-              <View style={styles.quickLinks}>
-                <Pressable
-                  style={styles.linkBtn}
-                  onPress={() => router.push(`/(caregiver)/child/${child.id}/brain` as any)}
-                >
-                  <Ionicons name="bulb-outline" size={16} color={colors.primary} />
-                  <Text style={styles.linkText}>{t("caregiver.brain")}</Text>
-                </Pressable>
-                <Pressable
-                  style={styles.linkBtn}
-                  onPress={() => router.push(`/(caregiver)/child/${child.id}/iep-goals` as any)}
-                >
-                  <Ionicons name="flag-outline" size={16} color={colors.info} />
-                  <Text style={styles.linkText}>{t("caregiver.iep")}</Text>
-                </Pressable>
-                <Pressable
-                  style={styles.linkBtn}
-                  onPress={() => router.push(`/(caregiver)/child/${child.id}/sessions` as any)}
-                >
-                  <Ionicons name="time-outline" size={16} color={colors.secondary} />
-                  <Text style={styles.linkText}>{t("caregiver.sessions")}</Text>
-                </Pressable>
-                <Pressable
-                  style={styles.linkBtn}
-                  onPress={() => router.push(`/(caregiver)/child/${child.id}/observation` as any)}
-                >
-                  <Ionicons name="create-outline" size={16} color={colors.accent} />
-                  <Text style={styles.linkText}>{t("caregiver.note")}</Text>
-                </Pressable>
+              <View style={[styles.quickLinks, { borderTopColor: palette.border }]}>
+                <QuickLink
+                  icon="bulb-outline"
+                  label={t("caregiver.brain")}
+                  tint={palette.primary}
+                  onPress={() => router.push(`/(caregiver)/child/${child.id}/brain` as Href)}
+                />
+                <QuickLink
+                  icon="flag-outline"
+                  label={t("caregiver.iep")}
+                  tint={INCLUSIVE_WARM_PALETTE.info}
+                  onPress={() => router.push(`/(caregiver)/child/${child.id}/iep-goals` as Href)}
+                />
+                <QuickLink
+                  icon="time-outline"
+                  label={t("caregiver.sessions")}
+                  tint={palette.warm}
+                  onPress={() => router.push(`/(caregiver)/child/${child.id}/sessions` as Href)}
+                />
+                <QuickLink
+                  icon="create-outline"
+                  label={t("caregiver.note")}
+                  tint={palette.accent}
+                  onPress={() =>
+                    router.push(`/(caregiver)/child/${child.id}/observation` as Href)
+                  }
+                />
               </View>
-            </AivoCard>
+            </Card>
           </Pressable>
         ))
       )}
@@ -98,43 +135,58 @@ export default function CaregiverDashboard() {
   );
 }
 
+function QuickLink({
+  icon,
+  label,
+  tint,
+  onPress,
+}: {
+  icon: React.ComponentProps<typeof Ionicons>["name"];
+  label: string;
+  tint: string;
+  onPress: () => void;
+}) {
+  const palette = useSensoryPalette();
+  return (
+    <Pressable style={styles.linkBtn} onPress={onPress} accessibilityRole="button">
+      <Ionicons name={icon} size={16} color={tint} />
+      <Text
+        style={[styles.linkText, { color: palette.inkMuted, fontFamily: fontFamilies.bodySemiBold }]}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: spacing.md },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
   },
-  greeting: { fontSize: 24, fontFamily: "Nunito-ExtraBold", color: colors.text },
-  subGreeting: {
-    fontSize: 14,
-    fontFamily: "Nunito-Regular",
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  childCard: { marginBottom: spacing.md },
+  headerActions: { flexDirection: "row", alignItems: "center", gap: 12 },
+  greeting: { fontSize: 28, marginBottom: spacing.md, letterSpacing: -0.5 },
   childRow: { flexDirection: "row", alignItems: "center" },
   childAvatar: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: colors.primaryLight + "30",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
   },
-  childInitial: { fontSize: 18, fontFamily: "Nunito-Bold", color: colors.primary },
-  childName: { fontSize: 16, fontFamily: "Nunito-Bold", color: colors.text },
-  childGrade: { fontSize: 13, fontFamily: "Nunito-Regular", color: colors.textSecondary },
+  childInitial: { fontSize: 18 },
+  childName: { fontSize: 16 },
+  childGrade: { fontSize: 13, fontFamily: "Nunito-Regular" },
   quickLinks: {
     flexDirection: "row",
     marginTop: spacing.md,
     paddingTop: spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
     justifyContent: "space-around",
   },
   linkBtn: { alignItems: "center", gap: 4 },
-  linkText: { fontSize: 11, fontFamily: "Nunito-SemiBold", color: colors.textSecondary },
+  linkText: { fontSize: 11 },
 });

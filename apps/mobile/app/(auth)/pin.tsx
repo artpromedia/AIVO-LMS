@@ -13,17 +13,36 @@ import { router } from "expo-router";
 import { useTranslation } from "@/hooks/useTranslation";
 import * as Haptics from "expo-haptics";
 import { useAuth } from "@/hooks/useAuth";
-import { colors, spacing } from "@/constants/colors";
+import { spacing } from "@/constants/colors";
+import { INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
+import { fontFamilies } from "@/constants/typography";
+import { useSensoryPalette, useSensoryMode } from "@/context/SensoryModeProvider";
+import { Button, SensoryToggle } from "@/components/ui";
+
+// The learner PIN screen keeps the dark capsule chrome by design
+// (it's a kid-friendly lock screen), but the *accent* color, dot
+// fill, and key-press feedback now flow from the active sensory
+// palette so calm + high-contrast modes still re-skin the surface.
 
 export default function PinScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const palette = useSensoryPalette();
+  const { mode } = useSensoryMode();
   const { loginWithPin } = useAuth();
   const [parentId, setParentId] = useState("");
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
   const [attempts, setAttempts] = useState(0);
   const [step, setStep] = useState<"parent" | "pin">("parent");
+
+  // In calm mode the haptics are noisier than the user wants; suppress
+  // to "light" only. High-contrast keeps the medium feedback.
+  const tapHaptic = useCallback(() => {
+    Haptics.impactAsync(
+      mode === "calm" ? Haptics.ImpactFeedbackStyle.Light : Haptics.ImpactFeedbackStyle.Medium,
+    );
+  }, [mode]);
 
   const handleParentSubmit = useCallback(() => {
     if (!parentId.trim()) {
@@ -36,7 +55,7 @@ export default function PinScreen() {
 
   const handlePress = useCallback(
     async (digit: string) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      tapHaptic();
       const newPin = pin + digit;
       setPin(newPin);
       setError("");
@@ -57,15 +76,20 @@ export default function PinScreen() {
         }
       }
     },
-    [pin, attempts, loginWithPin, parentId, t],
+    [pin, attempts, loginWithPin, parentId, t, tapHaptic],
   );
 
   const handleDelete = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    tapHaptic();
     setPin((prev) => prev.slice(0, -1));
-  }, []);
+  }, [tapHaptic]);
 
   const digits = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "del"];
+
+  // Accent color used for dots/keypress/avatar bubble. In high-contrast
+  // mode the palette.primary already swaps to the higher-contrast token.
+  const accent = palette.primary;
+  const errorTint = INCLUSIVE_WARM_PALETTE.danger;
 
   if (step === "parent") {
     return (
@@ -74,15 +98,20 @@ export default function PinScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <View style={[styles.container, { paddingTop: insets.top + 40 }]}>
-          <Pressable onPress={() => router.back()} style={styles.back}>
-            <Text style={styles.backText}>{t("common.back")}</Text>
-          </Pressable>
+          <View style={styles.topRow}>
+            <Pressable onPress={() => router.back()} style={styles.back} hitSlop={12}>
+              <Text style={styles.backText}>{t("common.back")}</Text>
+            </Pressable>
+            <SensoryToggle variant="icon" />
+          </View>
 
           <View style={styles.header}>
-            <View style={styles.avatarCircle}>
+            <View style={[styles.avatarCircle, { backgroundColor: accent }]}>
               <Text style={styles.avatarEmoji}>🎓</Text>
             </View>
-            <Text style={styles.title}>{t("auth.learnerLogin")}</Text>
+            <Text style={[styles.title, { fontFamily: fontFamilies.displayBold }]}>
+              {t("auth.learnerLogin")}
+            </Text>
             <Text style={styles.subtitle}>{t("auth.enterParentEmail")}</Text>
           </View>
 
@@ -97,14 +126,15 @@ export default function PinScreen() {
               keyboardType="email-address"
               autoComplete="email"
             />
-            {error ? <Text style={styles.error}>{error}</Text> : null}
-            <Pressable
-              style={[styles.continueBtn, !parentId.trim() && styles.continueBtnDisabled]}
+            {error ? <Text style={[styles.error, { color: errorTint }]}>{error}</Text> : null}
+            <Button
+              title={t("auth.continueToPin")}
               onPress={handleParentSubmit}
               disabled={!parentId.trim()}
-            >
-              <Text style={styles.continueBtnText}>{t("auth.continueToPin")}</Text>
-            </Pressable>
+              size="lg"
+              fullWidth
+              style={{ marginTop: 16 }}
+            />
           </View>
         </View>
       </KeyboardAvoidingView>
@@ -113,23 +143,29 @@ export default function PinScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + 40 }]}>
-      <Pressable
-        onPress={() => {
-          setStep("parent");
-          setPin("");
-          setError("");
-        }}
-        style={styles.back}
-      >
-        <Text style={styles.backText}>{t("common.back")}</Text>
-      </Pressable>
+      <View style={styles.topRow}>
+        <Pressable
+          onPress={() => {
+            setStep("parent");
+            setPin("");
+            setError("");
+          }}
+          style={styles.back}
+          hitSlop={12}
+        >
+          <Text style={styles.backText}>{t("common.back")}</Text>
+        </Pressable>
+        <SensoryToggle variant="icon" />
+      </View>
 
       <View style={styles.header}>
-        <View style={styles.avatarCircle}>
+        <View style={[styles.avatarCircle, { backgroundColor: accent }]}>
           <Text style={styles.avatarEmoji}>🎓</Text>
         </View>
-        <Text style={styles.title}>{t("auth.enterYourPin")}</Text>
-        {error ? <Text style={styles.error}>{error}</Text> : null}
+        <Text style={[styles.title, { fontFamily: fontFamilies.displayBold }]}>
+          {t("auth.enterYourPin")}
+        </Text>
+        {error ? <Text style={[styles.error, { color: errorTint }]}>{error}</Text> : null}
       </View>
 
       <View style={styles.dotsRow}>
@@ -138,8 +174,8 @@ export default function PinScreen() {
             key={i}
             style={[
               styles.dot,
-              pin.length > i && styles.dotFilled,
-              error && pin.length === 0 && styles.dotError,
+              pin.length > i && { backgroundColor: accent, borderColor: accent },
+              error && pin.length === 0 && { borderColor: errorTint },
             ]}
           />
         ))}
@@ -152,9 +188,13 @@ export default function PinScreen() {
             return (
               <Pressable
                 key={i}
-                style={({ pressed }) => [styles.padKey, pressed && styles.padKeyPressed]}
+                style={({ pressed }) => [
+                  styles.padKey,
+                  pressed && { backgroundColor: accent, transform: [{ scale: 0.95 }] },
+                ]}
                 onPress={handleDelete}
                 disabled={pin.length === 0}
+                accessibilityLabel="Delete"
               >
                 <Text style={[styles.padKeyText, { fontSize: 20 }]}>⌫</Text>
               </Pressable>
@@ -163,9 +203,13 @@ export default function PinScreen() {
           return (
             <Pressable
               key={i}
-              style={({ pressed }) => [styles.padKey, pressed && styles.padKeyPressed]}
+              style={({ pressed }) => [
+                styles.padKey,
+                pressed && { backgroundColor: accent, transform: [{ scale: 0.95 }] },
+              ]}
               onPress={() => handlePress(d)}
               disabled={pin.length >= 4}
+              accessibilityLabel={`Digit ${d}`}
             >
               <Text style={styles.padKeyText}>{d}</Text>
             </Pressable>
@@ -179,14 +223,18 @@ export default function PinScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1A1A2E",
+    backgroundColor: INCLUSIVE_WARM_PALETTE.darkSurface,
     alignItems: "center",
     paddingHorizontal: spacing.lg,
   },
-  back: {
-    alignSelf: "flex-start",
+  topRow: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 20,
   },
+  back: {},
   backText: {
     color: "rgba(255,255,255,0.7)",
     fontSize: 16,
@@ -200,7 +248,6 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 16,
@@ -210,7 +257,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontFamily: "Nunito-ExtraBold",
     color: "#FFFFFF",
   },
   subtitle: {
@@ -220,7 +266,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   error: {
-    color: colors.error,
     fontSize: 14,
     fontFamily: "Nunito-Regular",
     marginTop: 8,
@@ -240,21 +285,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.2)",
   },
-  continueBtn: {
-    backgroundColor: colors.primary,
-    borderRadius: 16,
-    padding: 16,
-    alignItems: "center",
-    marginTop: 16,
-  },
-  continueBtnDisabled: {
-    opacity: 0.5,
-  },
-  continueBtnText: {
-    fontSize: 16,
-    fontFamily: "Nunito-Bold",
-    color: "#FFFFFF",
-  },
   dotsRow: {
     flexDirection: "row",
     gap: 16,
@@ -266,13 +296,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 2,
     borderColor: "rgba(255,255,255,0.4)",
-  },
-  dotFilled: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  dotError: {
-    borderColor: colors.error,
   },
   pad: {
     flexDirection: "row",
@@ -288,10 +311,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.1)",
     alignItems: "center",
     justifyContent: "center",
-  },
-  padKeyPressed: {
-    backgroundColor: colors.primary,
-    transform: [{ scale: 0.95 }],
   },
   padKeyText: {
     fontSize: 28,

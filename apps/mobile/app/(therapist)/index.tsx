@@ -1,43 +1,62 @@
 import React from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet, RefreshControl } from "react-native";
-import { router } from "expo-router";
+import { router, type Href } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
 import { useConnectedLearners } from "@/hooks/useFamily";
-import { AivoCard, EmptyState, LoadingState } from "@aivo/mobile-ui";
-import { colors, spacing } from "@/constants/colors";
+import { EmptyState, LoadingState } from "@aivo/mobile-ui";
+import { INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
+import { spacing } from "@/constants/colors";
+import { fontFamilies } from "@/constants/typography";
+import { useSensoryPalette } from "@/context/SensoryModeProvider";
+import { Card, SensoryToggle, HeaderUserChip } from "@/components/ui";
 
 export default function TherapistDashboard() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { user, logout } = useAuth();
   const { data: clients, isLoading, refetch } = useConnectedLearners();
+  const palette = useSensoryPalette();
 
   if (isLoading) return <LoadingState />;
 
   return (
     <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 32 }}
+      style={{ flex: 1, backgroundColor: palette.bgPage }}
+      contentContainerStyle={{
+        paddingTop: insets.top + 16,
+        paddingBottom: 32,
+        paddingHorizontal: spacing.md,
+      }}
       refreshControl={
-        <RefreshControl refreshing={false} onRefresh={refetch} colors={[colors.primary]} />
+        <RefreshControl refreshing={false} onRefresh={refetch} colors={[palette.primary]} />
       }
     >
       <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>{t("therapist.greeting", { name: user?.name })}</Text>
-          <Text style={styles.subGreeting}>{t("therapist.caseload")}</Text>
+        <HeaderUserChip
+          name={user?.name || t("therapist.title")}
+          subtitle={t("therapist.caseload")}
+          onPress={() => router.push("/(therapist)/settings" as Href)}
+        />
+        <View style={styles.headerActions}>
+          <SensoryToggle variant="icon" />
+          <Pressable onPress={logout} accessibilityLabel="Log out" hitSlop={12}>
+            <Ionicons name="log-out-outline" size={22} color={palette.inkMuted} />
+          </Pressable>
         </View>
-        <Pressable onPress={logout}>
-          <Ionicons name="log-out-outline" size={22} color={colors.textSecondary} />
-        </Pressable>
       </View>
+
+      <Text
+        style={[styles.greeting, { color: palette.ink, fontFamily: fontFamilies.displayBold }]}
+      >
+        {t("therapist.greeting", { name: user?.name })}
+      </Text>
 
       {!clients?.length ? (
         <EmptyState
-          icon={<Ionicons name="medkit-outline" size={48} color={colors.textSecondary} />}
+          icon={<Ionicons name="medkit-outline" size={48} color={palette.inkMuted} />}
           title={t("therapist.noClientsTitle")}
           message={t("therapist.noClientsMessage")}
         />
@@ -45,47 +64,62 @@ export default function TherapistDashboard() {
         clients.map((client: any) => (
           <Pressable
             key={client.id}
-            onPress={() => router.push(`/(therapist)/client/${client.id}` as any)}
+            onPress={() => router.push(`/(therapist)/client/${client.id}` as Href)}
+            style={{ marginBottom: spacing.md }}
           >
-            <AivoCard style={styles.clientCard}>
+            <Card>
               <View style={styles.clientRow}>
-                <View style={styles.clientAvatar}>
-                  <Text style={styles.clientInitial}>{client.firstName?.[0] || "C"}</Text>
+                <View
+                  style={[
+                    styles.clientAvatar,
+                    { backgroundColor: INCLUSIVE_WARM_PALETTE.primarySoft },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.clientInitial,
+                      { color: palette.primary, fontFamily: fontFamilies.bodyBold },
+                    ]}
+                  >
+                    {client.firstName?.[0] || "C"}
+                  </Text>
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.clientName}>
+                  <Text
+                    style={[
+                      styles.clientName,
+                      { color: palette.ink, fontFamily: fontFamilies.bodyBold },
+                    ]}
+                  >
                     {client.firstName} {client.lastName}
                   </Text>
-                  <Text style={styles.clientInfo}>
+                  <Text style={[styles.clientInfo, { color: palette.inkMuted }]}>
                     Grade {client.gradeLevel} | {client.functioningLevel}
                   </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+                <Ionicons name="chevron-forward" size={20} color={palette.inkMuted} />
               </View>
-              <View style={styles.quickActions}>
-                <Pressable
-                  style={styles.actionBtn}
-                  onPress={() => router.push(`/(therapist)/client/${client.id}/goals` as any)}
-                >
-                  <Ionicons name="flag-outline" size={16} color={colors.primary} />
-                  <Text style={styles.actionText}>{t("therapist.goals")}</Text>
-                </Pressable>
-                <Pressable
-                  style={styles.actionBtn}
-                  onPress={() => router.push(`/(therapist)/client/${client.id}/notes` as any)}
-                >
-                  <Ionicons name="create-outline" size={16} color={colors.info} />
-                  <Text style={styles.actionText}>{t("therapist.notes")}</Text>
-                </Pressable>
-                <Pressable
-                  style={styles.actionBtn}
-                  onPress={() => router.push(`/(therapist)/client/${client.id}/reports` as any)}
-                >
-                  <Ionicons name="document-text-outline" size={16} color={colors.success} />
-                  <Text style={styles.actionText}>{t("therapist.reports")}</Text>
-                </Pressable>
+              <View style={[styles.quickActions, { borderTopColor: palette.border }]}>
+                <ActionLink
+                  icon="flag-outline"
+                  label={t("therapist.goals")}
+                  tint={palette.primary}
+                  onPress={() => router.push(`/(therapist)/client/${client.id}/goals` as Href)}
+                />
+                <ActionLink
+                  icon="create-outline"
+                  label={t("therapist.notes")}
+                  tint={INCLUSIVE_WARM_PALETTE.info}
+                  onPress={() => router.push(`/(therapist)/client/${client.id}/notes` as Href)}
+                />
+                <ActionLink
+                  icon="document-text-outline"
+                  label={t("therapist.reports")}
+                  tint={INCLUSIVE_WARM_PALETTE.success}
+                  onPress={() => router.push(`/(therapist)/client/${client.id}/reports` as Href)}
+                />
               </View>
-            </AivoCard>
+            </Card>
           </Pressable>
         ))
       )}
@@ -93,43 +127,58 @@ export default function TherapistDashboard() {
   );
 }
 
+function ActionLink({
+  icon,
+  label,
+  tint,
+  onPress,
+}: {
+  icon: React.ComponentProps<typeof Ionicons>["name"];
+  label: string;
+  tint: string;
+  onPress: () => void;
+}) {
+  const palette = useSensoryPalette();
+  return (
+    <Pressable style={styles.actionBtn} onPress={onPress} accessibilityRole="button">
+      <Ionicons name={icon} size={16} color={tint} />
+      <Text
+        style={[styles.actionText, { color: palette.inkMuted, fontFamily: fontFamilies.bodySemiBold }]}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: spacing.md },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: spacing.lg,
+    marginBottom: spacing.md,
   },
-  greeting: { fontSize: 24, fontFamily: "Nunito-ExtraBold", color: colors.text },
-  subGreeting: {
-    fontSize: 14,
-    fontFamily: "Nunito-Regular",
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  clientCard: { marginBottom: spacing.md },
+  headerActions: { flexDirection: "row", alignItems: "center", gap: 12 },
+  greeting: { fontSize: 28, marginBottom: spacing.md, letterSpacing: -0.5 },
   clientRow: { flexDirection: "row", alignItems: "center" },
   clientAvatar: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: colors.primaryLight + "30",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
   },
-  clientInitial: { fontSize: 18, fontFamily: "Nunito-Bold", color: colors.primary },
-  clientName: { fontSize: 16, fontFamily: "Nunito-Bold", color: colors.text },
-  clientInfo: { fontSize: 13, fontFamily: "Nunito-Regular", color: colors.textSecondary },
+  clientInitial: { fontSize: 18 },
+  clientName: { fontSize: 16 },
+  clientInfo: { fontSize: 13, fontFamily: "Nunito-Regular" },
   quickActions: {
     flexDirection: "row",
     marginTop: spacing.md,
     paddingTop: spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
     justifyContent: "space-around",
   },
   actionBtn: { alignItems: "center", gap: 4 },
-  actionText: { fontSize: 11, fontFamily: "Nunito-SemiBold", color: colors.textSecondary },
+  actionText: { fontSize: 11 },
 });

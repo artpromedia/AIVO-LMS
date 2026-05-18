@@ -52,6 +52,14 @@ export const sensoryProfiles = pgTable("sensory_profiles", {
   tactile: varchar("tactile", { length: 20 }).default("typical"),
   vestibular: varchar("vestibular", { length: 20 }).default("typical"),
   proprioceptive: varchar("proprioceptive", { length: 20 }).default("typical"),
+  // Global UI sensory mode from the "Inclusive Lab — Warm" rollout.
+  // One of "standard" | "calm" | "high-contrast". Mirrors the
+  // `data-sensory-mode` attribute the web app sets on <html>; on
+  // mobile this is read by `SensoryModeProvider` so the learner's
+  // choice follows them across devices. Distinct from the per-channel
+  // sensitivities above — those describe the learner, this describes
+  // their currently preferred UI tone.
+  mode: varchar("mode", { length: 20 }).default("standard"),
   notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

@@ -8,6 +8,8 @@ import * as SplashScreen from "expo-splash-screen";
 import "@/lib/i18n";
 import { AuthContext, useAuthState } from "@/hooks/useAuth";
 import { colors } from "@/constants/colors";
+import { FONT_ASSETS } from "@/constants/typography";
+import { SensoryModeProvider } from "@/context/SensoryModeProvider";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -22,12 +24,10 @@ const queryClient = new QueryClient({
 });
 
 export default function RootLayout() {
-  const [fontsLoaded, fontError] = useFonts({
-    "Nunito-Regular": require("@/assets/fonts/Nunito-Regular.ttf"),
-    "Nunito-Bold": require("@/assets/fonts/Nunito-Bold.ttf"),
-    "Nunito-SemiBold": require("@/assets/fonts/Nunito-SemiBold.ttf"),
-    "Nunito-ExtraBold": require("@/assets/fonts/Nunito-ExtraBold.ttf"),
-  });
+  // Inclusive-warm typography: Fredoka (display, pending TTF drop) +
+  // Nunito (body, already bundled). See `constants/typography.ts` for
+  // the swap-point note.
+  const [fontsLoaded, fontError] = useFonts(FONT_ASSETS);
 
   const authState = useAuthState();
 
@@ -41,26 +41,37 @@ export default function RootLayout() {
     return null;
   }
 
+  // The sensory-mode provider is mounted inside the auth context
+  // (as a child of AuthContext.Provider) so it can read learnerId
+  // from the resolved auth state — learners get per-account backend
+  // sync; signed-out / parent flows just use local AsyncStorage.
+  // `learnerId` is `null` until auth hydrates, which the provider
+  // tolerates (local-only mode until an id arrives).
+  const learnerId =
+    authState.user?.role === "LEARNER" ? authState.user.id : null;
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <QueryClientProvider client={queryClient}>
           <AuthContext.Provider value={authState}>
-            <Stack
-              screenOptions={{
-                headerShown: false,
-                contentStyle: { backgroundColor: colors.background },
-              }}
-            >
-              <Stack.Screen name="index" />
-              <Stack.Screen name="accept-invite" />
-              <Stack.Screen name="(auth)" options={{ animation: "fade" }} />
-              <Stack.Screen name="(parent)" />
-              <Stack.Screen name="(learner)" />
-              <Stack.Screen name="(teacher)" />
-              <Stack.Screen name="(caregiver)" />
-              <Stack.Screen name="(therapist)" />
-            </Stack>
+            <SensoryModeProvider learnerId={learnerId}>
+              <Stack
+                screenOptions={{
+                  headerShown: false,
+                  contentStyle: { backgroundColor: colors.background },
+                }}
+              >
+                <Stack.Screen name="index" />
+                <Stack.Screen name="accept-invite" />
+                <Stack.Screen name="(auth)" options={{ animation: "fade" }} />
+                <Stack.Screen name="(parent)" />
+                <Stack.Screen name="(learner)" />
+                <Stack.Screen name="(teacher)" />
+                <Stack.Screen name="(caregiver)" />
+                <Stack.Screen name="(therapist)" />
+              </Stack>
+            </SensoryModeProvider>
           </AuthContext.Provider>
         </QueryClientProvider>
       </SafeAreaProvider>

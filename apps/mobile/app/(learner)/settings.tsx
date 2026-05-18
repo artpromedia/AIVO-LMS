@@ -6,8 +6,10 @@ import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
-import { AivoCard, AivoButton } from "@aivo/mobile-ui";
-import { colors, spacing, radius } from "@/constants/colors";
+import { spacing, radius } from "@/constants/colors";
+import { fontFamilies } from "@/constants/typography";
+import { useSensoryPalette } from "@/context/SensoryModeProvider";
+import { Card, Button, SensoryToggle } from "@/components/ui";
 
 const STORAGE_KEY = "aivo_learner_prefs_v1";
 
@@ -15,24 +17,21 @@ interface LearnerPrefs {
   soundEffects: boolean;
   music: boolean;
   animations: boolean;
-  highContrast: boolean;
   largeText: boolean;
-  reducedMotion: boolean;
 }
 
 const DEFAULT_PREFS: LearnerPrefs = {
   soundEffects: true,
   music: true,
   animations: true,
-  highContrast: false,
   largeText: false,
-  reducedMotion: false,
 };
 
 export default function LearnerSettingsScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const { user } = useAuth();
+  const palette = useSensoryPalette();
   const [prefs, setPrefs] = useState<LearnerPrefs>(DEFAULT_PREFS);
   const [loaded, setLoaded] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -45,7 +44,7 @@ export default function LearnerSettingsScreen() {
             const parsed = JSON.parse(raw) as Partial<LearnerPrefs>;
             setPrefs({ ...DEFAULT_PREFS, ...parsed });
           } catch {
-            // ignore parse errors and use defaults
+            /* ignore */
           }
         }
       })
@@ -65,16 +64,19 @@ export default function LearnerSettingsScreen() {
   if (!loaded) return null;
 
   const renderToggleRow = (key: keyof LearnerPrefs, titleKey: string, descKey: string) => (
-    <View style={styles.toggleRow} key={key}>
+    <View
+      style={[styles.toggleRow, { borderBottomColor: palette.border }]}
+      key={key}
+    >
       <View style={{ flex: 1, paddingRight: spacing.sm }}>
-        <Text style={styles.toggleTitle}>{t(titleKey)}</Text>
-        <Text style={styles.toggleDesc}>{t(descKey)}</Text>
+        <Text style={[styles.toggleTitle, { color: palette.ink }]}>{t(titleKey)}</Text>
+        <Text style={[styles.toggleDesc, { color: palette.inkMuted }]}>{t(descKey)}</Text>
       </View>
       <Switch
         value={prefs[key]}
         onValueChange={(v) => update(key, v)}
-        trackColor={{ false: colors.border, true: colors.primary }}
-        thumbColor={colors.card}
+        trackColor={{ false: palette.border, true: palette.primary }}
+        thumbColor={palette.bgRaised}
         accessibilityLabel={t(titleKey)}
       />
     </View>
@@ -82,8 +84,12 @@ export default function LearnerSettingsScreen() {
 
   return (
     <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 32 }}
+      style={[styles.container, { backgroundColor: palette.bgPage }]}
+      contentContainerStyle={{
+        paddingTop: insets.top + 16,
+        paddingBottom: 32,
+        paddingHorizontal: spacing.md,
+      }}
     >
       <View style={styles.header}>
         <Pressable
@@ -91,29 +97,56 @@ export default function LearnerSettingsScreen() {
           accessibilityRole="button"
           accessibilityLabel={t("common.back")}
           hitSlop={8}
+          style={[
+            styles.backBtn,
+            { backgroundColor: palette.bgRaised, borderColor: palette.border },
+          ]}
         >
-          <Ionicons name="chevron-back" size={24} color={colors.text} />
+          <Ionicons name="chevron-back" size={22} color={palette.ink} />
         </Pressable>
-        <Text style={styles.title}>{t("learnerSettings.title")}</Text>
-        <View style={{ width: 24 }} />
+        <Text style={[styles.title, { color: palette.ink }]}>
+          {t("learnerSettings.title")}
+        </Text>
+        <View style={{ width: 44 }} />
       </View>
 
-      <AivoCard style={styles.card}>
-        <Text style={styles.sectionTitle}>{t("learnerSettings.profile")}</Text>
-        <View style={styles.profileRow}>
-          <Text style={styles.profileLabel}>{t("learnerSettings.name")}</Text>
-          <Text style={styles.profileValue}>{user?.name ?? "—"}</Text>
+      <Card tone="raised" style={styles.card}>
+        <Text style={[styles.sectionTitle, { color: palette.ink }]}>
+          {t("learnerSettings.profile")}
+        </Text>
+        <View style={[styles.profileRow, { borderBottomColor: palette.border }]}>
+          <Text style={[styles.profileLabel, { color: palette.inkMuted }]}>
+            {t("learnerSettings.name")}
+          </Text>
+          <Text style={[styles.profileValue, { color: palette.ink }]}>{user?.name ?? "—"}</Text>
         </View>
-        <View style={styles.profileRow}>
-          <Text style={styles.profileLabel}>{t("learnerSettings.role")}</Text>
-          <Text style={[styles.profileValue, { color: colors.primary }]}>
+        <View style={[styles.profileRow, { borderBottomColor: palette.border }]}>
+          <Text style={[styles.profileLabel, { color: palette.inkMuted }]}>
+            {t("learnerSettings.role")}
+          </Text>
+          <Text style={[styles.profileValue, { color: palette.primary }]}>
             {t("learnerSettings.learner")}
           </Text>
         </View>
-      </AivoCard>
+      </Card>
 
-      <AivoCard style={styles.card}>
-        <Text style={styles.sectionTitle}>{t("learnerSettings.soundAndMotion")}</Text>
+      {/* Sensory mode — the headline accessibility control for the
+          inclusive-warm rollout. Lives at the top of accessibility so
+          it surfaces ahead of legacy toggles. */}
+      <Card tone="raised" style={styles.card}>
+        <Text style={[styles.sectionTitle, { color: palette.ink }]}>
+          Sensory mode
+        </Text>
+        <Text style={[styles.toggleDesc, { color: palette.inkMuted, marginBottom: 12 }]}>
+          Switch between standard, calm, and high-contrast at any time. Your choice syncs across devices.
+        </Text>
+        <SensoryToggle variant="segmented" />
+      </Card>
+
+      <Card tone="raised" style={styles.card}>
+        <Text style={[styles.sectionTitle, { color: palette.ink }]}>
+          {t("learnerSettings.soundAndMotion")}
+        </Text>
         {renderToggleRow(
           "soundEffects",
           "learnerSettings.soundEffects",
@@ -125,33 +158,32 @@ export default function LearnerSettingsScreen() {
           "learnerSettings.animations",
           "learnerSettings.animationsDesc",
         )}
-      </AivoCard>
+      </Card>
 
-      <AivoCard style={styles.card}>
-        <Text style={styles.sectionTitle}>{t("learnerSettings.accessibility")}</Text>
-        {renderToggleRow(
-          "highContrast",
-          "learnerSettings.highContrast",
-          "learnerSettings.highContrastDesc",
-        )}
+      <Card tone="raised" style={styles.card}>
+        <Text style={[styles.sectionTitle, { color: palette.ink }]}>
+          {t("learnerSettings.accessibility")}
+        </Text>
         {renderToggleRow("largeText", "learnerSettings.largeText", "learnerSettings.largeTextDesc")}
-        {renderToggleRow(
-          "reducedMotion",
-          "learnerSettings.reducedMotion",
-          "learnerSettings.reducedMotionDesc",
-        )}
-      </AivoCard>
+      </Card>
 
       {saved && (
-        <View style={styles.savedBanner}>
-          <Ionicons name="checkmark-circle" size={18} color={colors.success} />
+        <View
+          style={[
+            styles.savedBanner,
+            { backgroundColor: "rgba(22, 163, 74, 0.10)" },
+          ]}
+        >
+          <Ionicons name="checkmark-circle" size={18} color="#16a34a" />
           <Text style={styles.savedText}>{t("learnerSettings.saved")}</Text>
         </View>
       )}
 
-      <AivoButton
+      <Button
         title={t("learnerSettings.saveChanges")}
         onPress={handleSave}
+        fullWidth
+        size="lg"
         style={{ marginTop: spacing.md }}
       />
     </ScrollView>
@@ -159,19 +191,26 @@ export default function LearnerSettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: spacing.md },
+  container: { flex: 1 },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: spacing.md,
   },
-  title: { fontSize: 22, fontFamily: "Nunito-ExtraBold", color: colors.text },
+  backBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  title: { fontSize: 22, fontFamily: fontFamilies.displayBold },
   card: { marginBottom: spacing.md },
   sectionTitle: {
     fontSize: 16,
-    fontFamily: "Nunito-Bold",
-    color: colors.text,
+    fontFamily: fontFamilies.displayBold,
     marginBottom: spacing.sm,
   },
   profileRow: {
@@ -180,39 +219,34 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   profileLabel: {
     fontSize: 12,
-    fontFamily: "Nunito-SemiBold",
-    color: colors.textSecondary,
+    fontFamily: fontFamilies.bodySemiBold,
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
-  profileValue: { fontSize: 14, fontFamily: "Nunito-Bold", color: colors.text },
+  profileValue: { fontSize: 14, fontFamily: fontFamilies.bodyBold },
   toggleRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
-  toggleTitle: { fontSize: 14, fontFamily: "Nunito-Bold", color: colors.text },
+  toggleTitle: { fontSize: 14, fontFamily: fontFamilies.bodyBold },
   toggleDesc: {
     fontSize: 12,
-    fontFamily: "Nunito-Regular",
-    color: colors.textSecondary,
+    fontFamily: fontFamilies.bodyRegular,
     marginTop: 2,
   },
   savedBanner: {
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    padding: 10,
-    backgroundColor: colors.success + "1A",
-    borderRadius: radius.md,
+    padding: 12,
+    borderRadius: radius.lg,
     marginTop: spacing.sm,
   },
-  savedText: { fontSize: 13, fontFamily: "Nunito-SemiBold", color: colors.success },
+  savedText: { fontSize: 13, fontFamily: fontFamilies.bodyBold, color: "#16a34a" },
 });

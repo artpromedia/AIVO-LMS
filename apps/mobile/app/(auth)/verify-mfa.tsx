@@ -7,18 +7,22 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  Image,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
-import { colors, spacing, radius } from "@/constants/colors";
-import { AivoButton } from "@aivo/mobile-ui";
+import { spacing, radius } from "@/constants/colors";
+import { INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
+import { fontFamilies } from "@/constants/typography";
+import { useSensoryPalette } from "@/context/SensoryModeProvider";
+import { Button, Card, SensoryToggle } from "@/components/ui";
+import { AivoLogo } from "@/components/AivoLogo";
 
 export default function VerifyMfaScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const palette = useSensoryPalette();
   const { verifyMfa, resendMfa } = useAuth();
   const { mfaToken } = useLocalSearchParams<{ mfaToken: string }>();
 
@@ -105,17 +109,22 @@ export default function VerifyMfaScreen() {
 
   if (!mfaToken) {
     return (
-      <View style={[styles.container, { paddingTop: insets.top + 40 }]}>
-        <View style={styles.card}>
-          <Text style={styles.subtitle}>
+      <View
+        style={[
+          styles.container,
+          { paddingTop: insets.top + 40, backgroundColor: palette.bgPage },
+        ]}
+      >
+        <Card>
+          <Text style={[styles.subtitle, { color: palette.inkMuted }]}>
             {t("auth.sessionExpired") || "Your session has expired."}
           </Text>
           <Pressable onPress={() => router.replace("/(auth)/login")} style={styles.backBtn}>
-            <Text style={[styles.backText, { color: colors.primary, fontFamily: "Nunito-Bold" }]}>
+            <Text style={[styles.backText, { color: palette.primary, fontFamily: "Nunito-Bold" }]}>
               {t("auth.backToLogin")}
             </Text>
           </Pressable>
-        </View>
+        </Card>
       </View>
     );
   }
@@ -125,23 +134,50 @@ export default function VerifyMfaScreen() {
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <View style={[styles.container, { paddingTop: insets.top + 40 }]}>
-        <View style={styles.logoContainer}>
-          <Image
-            source={require("@/assets/images/aivo-logo-purple.png")}
-            style={styles.logo}
-            resizeMode="contain"
-          />
+      <View
+        style={[
+          styles.container,
+          { paddingTop: insets.top + 40, backgroundColor: palette.bgPage },
+        ]}
+      >
+        <View style={styles.topRow}>
+          <View style={{ flex: 1 }} />
+          <SensoryToggle variant="icon" />
         </View>
 
-        <View style={styles.card}>
+        <View style={styles.logoContainer}>
+          <AivoLogo width={140} variant="purple" />
+        </View>
+
+        <Card>
           <View style={styles.iconContainer}>
             <Text style={styles.icon}>✉️</Text>
           </View>
-          <Text style={styles.title}>{t("auth.checkEmail")}</Text>
-          <Text style={styles.subtitle}>{t("auth.codeSentDesc")}</Text>
+          <Text
+            style={[
+              styles.title,
+              { color: palette.ink, fontFamily: fontFamilies.displayBold },
+            ]}
+          >
+            {t("auth.checkEmail")}
+          </Text>
+          <Text style={[styles.subtitle, { color: palette.inkMuted }]}>
+            {t("auth.codeSentDesc")}
+          </Text>
 
-          {error ? <Text style={styles.error}>{error}</Text> : null}
+          {error ? (
+            <Text
+              style={[
+                styles.error,
+                {
+                  color: INCLUSIVE_WARM_PALETTE.danger,
+                  backgroundColor: INCLUSIVE_WARM_PALETTE.dangerSoft,
+                },
+              ]}
+            >
+              {error}
+            </Text>
+          ) : null}
           {resendMsg ? <Text style={styles.success}>{resendMsg}</Text> : null}
 
           <View style={styles.codeRow}>
@@ -151,7 +187,14 @@ export default function VerifyMfaScreen() {
                 ref={(el) => {
                   inputRefs.current[i] = el;
                 }}
-                style={styles.codeInput}
+                style={[
+                  styles.codeInput,
+                  {
+                    color: palette.ink,
+                    backgroundColor: palette.bgPage,
+                    borderColor: digit ? palette.primary : palette.border,
+                  },
+                ]}
                 value={digit}
                 onChangeText={(value) => handleChange(i, value)}
                 onKeyPress={({ nativeEvent }) => handleKeyPress(i, nativeEvent.key)}
@@ -162,12 +205,13 @@ export default function VerifyMfaScreen() {
             ))}
           </View>
 
-          <AivoButton
+          <Button
             title={loading ? t("auth.verifying") : t("auth.verifyCode")}
             onPress={() => handleSubmit()}
             loading={loading}
             disabled={code.some((d) => !d)}
             size="lg"
+            fullWidth
             style={{ marginTop: spacing.md }}
           />
 
@@ -177,7 +221,11 @@ export default function VerifyMfaScreen() {
             style={styles.resendBtn}
           >
             <Text
-              style={[styles.resendText, (resending || resendCooldown > 0) && { opacity: 0.5 }]}
+              style={[
+                styles.resendText,
+                { color: palette.primary },
+                (resending || resendCooldown > 0) && { opacity: 0.5 },
+              ]}
             >
               {resending
                 ? t("auth.resending")
@@ -188,11 +236,15 @@ export default function VerifyMfaScreen() {
           </Pressable>
 
           <Pressable onPress={() => router.back()} style={styles.backBtn}>
-            <Text style={styles.backText}>{t("auth.backToLogin")}</Text>
+            <Text style={[styles.backText, { color: palette.inkMuted }]}>
+              {t("auth.backToLogin")}
+            </Text>
           </Pressable>
-        </View>
+        </Card>
 
-        <Text style={styles.expireNote}>{t("auth.codeExpires")}</Text>
+        <Text style={[styles.expireNote, { color: palette.inkMuted }]}>
+          {t("auth.codeExpires")}
+        </Text>
       </View>
     </KeyboardAvoidingView>
   );
@@ -202,26 +254,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: spacing.lg,
-    backgroundColor: colors.background,
     justifyContent: "center",
+  },
+  topRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
   },
   logoContainer: {
     alignItems: "center",
     marginBottom: 24,
-  },
-  logo: {
-    width: 140,
-    height: 44,
-  },
-  card: {
-    backgroundColor: colors.card,
-    borderRadius: radius.xxl,
-    padding: spacing.lg,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
   },
   iconContainer: {
     alignItems: "center",
@@ -231,36 +274,32 @@ const styles = StyleSheet.create({
     fontSize: 40,
   },
   title: {
-    fontSize: 22,
-    fontFamily: "Nunito-ExtraBold",
-    color: colors.text,
+    fontSize: 24,
     textAlign: "center",
+    letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 14,
     fontFamily: "Nunito-Regular",
-    color: colors.textSecondary,
     textAlign: "center",
     marginTop: 4,
     marginBottom: 20,
   },
   error: {
-    color: colors.error,
     fontSize: 13,
     fontFamily: "Nunito-Regular",
     textAlign: "center",
     marginBottom: 12,
-    backgroundColor: colors.error + "10",
     padding: 8,
     borderRadius: radius.md,
   },
   success: {
-    color: "#16a34a",
+    color: INCLUSIVE_WARM_PALETTE.success,
     fontSize: 13,
     fontFamily: "Nunito-Regular",
     textAlign: "center",
     marginBottom: 12,
-    backgroundColor: "#dcfce7",
+    backgroundColor: INCLUSIVE_WARM_PALETTE.successSoft,
     padding: 8,
     borderRadius: radius.md,
   },
@@ -273,13 +312,10 @@ const styles = StyleSheet.create({
     width: 48,
     height: 56,
     borderWidth: 2,
-    borderColor: colors.border,
     borderRadius: radius.lg,
     textAlign: "center",
     fontSize: 24,
     fontFamily: "Nunito-ExtraBold",
-    color: colors.text,
-    backgroundColor: colors.surface,
   },
   resendBtn: {
     marginTop: spacing.md,
@@ -288,7 +324,6 @@ const styles = StyleSheet.create({
   resendText: {
     fontSize: 14,
     fontFamily: "Nunito-SemiBold",
-    color: colors.primary,
   },
   backBtn: {
     marginTop: spacing.sm,
@@ -297,12 +332,10 @@ const styles = StyleSheet.create({
   backText: {
     fontSize: 13,
     fontFamily: "Nunito-Regular",
-    color: colors.textSecondary,
   },
   expireNote: {
     fontSize: 12,
     fontFamily: "Nunito-Regular",
-    color: colors.textSecondary,
     textAlign: "center",
     marginTop: spacing.md,
   },

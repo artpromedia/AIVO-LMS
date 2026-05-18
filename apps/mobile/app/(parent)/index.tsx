@@ -1,14 +1,18 @@
 import React from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet, RefreshControl } from "react-native";
-import { router } from "expo-router";
+import { router, type Href } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
 import { useLearners } from "@/hooks/useLearners";
 import { useParentInbox } from "@/hooks/useParentInbox";
-import { AivoCard, StatCard, AivoButton, EmptyState } from "@aivo/mobile-ui";
-import { colors, spacing, radius } from "@/constants/colors";
+import { EmptyState } from "@aivo/mobile-ui";
+import { spacing, radius } from "@/constants/colors";
+import { INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
+import { fontFamilies } from "@/constants/typography";
+import { useSensoryPalette } from "@/context/SensoryModeProvider";
+import { Card, Button, SensoryToggle } from "@/components/ui";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { CONTENT_MAX_WIDTH, pickBySizeClass } from "@/src/design/responsive";
 import { TabletScaffold } from "@/src/components/layout/TabletScaffold";
@@ -21,6 +25,7 @@ export default function ParentDashboard() {
   const unreadCount = inbox?.unreadCount ?? 0;
   const [refreshing, setRefreshing] = React.useState(false);
   const { t } = useTranslation();
+  const palette = useSensoryPalette();
   const { sizeClass, isTablet, width: winWidth } = useWindowSizeClass();
   const hPad = pickBySizeClass(sizeClass, {
     compact: spacing.md,
@@ -38,32 +43,32 @@ export default function ParentDashboard() {
       label: t("tabs.home"),
       icon: "home" as const,
       active: true,
-      onPress: () => router.push("/(parent)" as any),
+      onPress: () => router.push("/(parent)" as Href),
     },
     {
       key: "inbox",
       label: t("tabs.inbox"),
       icon: "mail" as const,
       badge: unreadCount,
-      onPress: () => router.push("/(parent)/recommendations" as any),
+      onPress: () => router.push("/(parent)/recommendations" as Href),
     },
     {
       key: "tutors",
       label: t("tabs.tutors"),
       icon: "school" as const,
-      onPress: () => router.push("/(parent)/tutors" as any),
+      onPress: () => router.push("/(parent)/tutors" as Href),
     },
     {
       key: "billing",
       label: t("parent.billing"),
       icon: "card-outline" as const,
-      onPress: () => router.push("/(parent)/billing" as any),
+      onPress: () => router.push("/(parent)/billing" as Href),
     },
     {
       key: "settings",
       label: t("tabs.settings"),
       icon: "settings" as const,
-      onPress: () => router.push("/(parent)/settings" as any),
+      onPress: () => router.push("/(parent)/settings" as Href),
     },
   ];
 
@@ -75,80 +80,114 @@ export default function ParentDashboard() {
 
   const body = (
     <ScrollView
-      style={[styles.container, { paddingHorizontal: hPad }]}
+      style={[styles.container, { backgroundColor: palette.bgPage }]}
       contentContainerStyle={{
-        paddingTop: isTablet ? spacing.lg : insets.top + 16,
+        paddingHorizontal: hPad,
+        paddingTop: isTablet ? spacing.lg : insets.top + 12,
         paddingBottom: 32,
         alignItems: "center",
       }}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[colors.primary]} />
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={[palette.primary]}
+          tintColor={palette.primary}
+        />
       }
     >
       <View style={{ width: contentWidth }}>
         <View style={styles.header}>
-          <View>
-            <Text style={styles.greeting}>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.greeting, { color: palette.ink }]}>
               {t("parent.greeting", { name: user?.name || "Parent" })}
             </Text>
-            <Text style={styles.subGreeting}>{t("parent.learningOverview")}</Text>
+            <Text style={[styles.subGreeting, { color: palette.inkMuted }]}>
+              {t("parent.learningOverview")}
+            </Text>
           </View>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+          <View style={styles.headerActions}>
+            <SensoryToggle variant="icon" />
             <Pressable
-              onPress={() => router.push("/(parent)/inbox" as any)}
-              style={styles.logoutBtn}
+              onPress={() => router.push("/(parent)/inbox" as Href)}
+              style={[
+                styles.iconBtn,
+                { backgroundColor: palette.bgRaised, borderColor: palette.border },
+              ]}
               accessibilityRole="button"
               accessibilityLabel={t("parentInbox.title")}
             >
-              <View>
-                <Ionicons name="mail-outline" size={22} color={colors.textSecondary} />
-                {unreadCount > 0 ? (
-                  <View style={styles.unreadBadge}>
-                    <Text style={styles.unreadBadgeText}>
-                      {unreadCount > 9 ? "9+" : String(unreadCount)}
-                    </Text>
-                  </View>
-                ) : null}
-              </View>
+              <Ionicons name="mail-outline" size={20} color={palette.inkMuted} />
+              {unreadCount > 0 ? (
+                <View style={styles.unreadBadge}>
+                  <Text style={styles.unreadBadgeText}>
+                    {unreadCount > 9 ? "9+" : String(unreadCount)}
+                  </Text>
+                </View>
+              ) : null}
             </Pressable>
-            <Pressable onPress={logout} style={styles.logoutBtn}>
-              <Ionicons name="log-out-outline" size={22} color={colors.textSecondary} />
+            <Pressable
+              onPress={logout}
+              style={[
+                styles.iconBtn,
+                { backgroundColor: palette.bgRaised, borderColor: palette.border },
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel={t("common.logout") || "Log out"}
+            >
+              <Ionicons name="log-out-outline" size={20} color={palette.inkMuted} />
             </Pressable>
           </View>
         </View>
 
+        {/* Stats row */}
         <View style={styles.statsRow}>
-          <StatCard
+          <StatTile
             label={t("parent.children")}
             value={learners?.length || 0}
-            icon={<Ionicons name="people" size={20} color={colors.primary} />}
+            icon="people"
+            tint={palette.primary}
+            tintSoft={INCLUSIVE_WARM_PALETTE.primarySoft}
           />
-          <View style={{ width: 8 }} />
-          <StatCard
+          <StatTile
             label={t("parent.activeTutors")}
             value={7}
-            icon={<Ionicons name="school" size={20} color={colors.secondary} />}
-            color={colors.secondary}
+            icon="school"
+            tint={palette.accent}
+            tintSoft={palette.accentSoft}
           />
-          <View style={{ width: 8 }} />
-          <StatCard
+          <StatTile
             label={t("parent.sessions")}
             value={24}
-            icon={<Ionicons name="book" size={20} color={colors.success} />}
-            color={colors.success}
+            icon="book"
+            tint={palette.warm}
+            tintSoft={palette.warmSoft}
           />
         </View>
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>{t("parent.yourChildren")}</Text>
-          <Pressable onPress={() => router.push("/(parent)/onboard")}>
-            <Ionicons name="add-circle" size={28} color={colors.primary} />
+          <Text style={[styles.sectionTitle, { color: palette.ink }]}>
+            {t("parent.yourChildren")}
+          </Text>
+          <Pressable
+            onPress={() => router.push("/(parent)/onboard")}
+            accessibilityRole="button"
+            accessibilityLabel={t("parent.addChild")}
+          >
+            <View
+              style={[
+                styles.addChildBtn,
+                { backgroundColor: palette.primary },
+              ]}
+            >
+              <Ionicons name="add" size={22} color={palette.primaryFg} />
+            </View>
           </Pressable>
         </View>
 
         {!learners || learners.length === 0 ? (
           <EmptyState
-            icon={<Ionicons name="people-outline" size={48} color={colors.textSecondary} />}
+            icon={<Ionicons name="people-outline" size={48} color={palette.inkMuted} />}
             title={t("parent.noChildrenTitle")}
             message={t("parent.noChildrenMessage")}
             actionLabel={t("parent.addChild")}
@@ -158,83 +197,109 @@ export default function ParentDashboard() {
           learners.map((learner) => (
             <Pressable
               key={learner.id}
-              onPress={() => router.push(`/(parent)/brain/${learner.id}` as any)}
+              onPress={() => router.push(`/(parent)/brain/${learner.id}` as Href)}
+              accessibilityRole="button"
+              accessibilityLabel={`${learner.firstName} ${learner.lastName}`}
             >
-              <AivoCard style={styles.childCard}>
+              <Card tone="raised" style={styles.childCard}>
                 <View style={styles.childRow}>
-                  <View style={styles.childAvatar}>
-                    <Text style={styles.childInitial}>{learner.firstName[0]}</Text>
+                  <View
+                    style={[styles.childAvatar, { backgroundColor: palette.accentSoft }]}
+                  >
+                    <Text
+                      style={[styles.childInitial, { color: palette.accent }]}
+                    >
+                      {learner.firstName[0]}
+                    </Text>
                   </View>
                   <View style={styles.childInfo}>
-                    <Text style={styles.childName}>
+                    <Text style={[styles.childName, { color: palette.ink }]}>
                       {learner.firstName} {learner.lastName}
                     </Text>
-                    <Text style={styles.childGrade}>
+                    <Text style={[styles.childGrade, { color: palette.inkMuted }]}>
                       {t("common.grade", { grade: learner.gradeLevel })}
                     </Text>
-                    <View style={styles.levelBadge}>
-                      <Text style={styles.levelText}>{learner.functioningLevel}</Text>
+                    <View
+                      style={[
+                        styles.levelBadge,
+                        { backgroundColor: palette.accentSoft },
+                      ]}
+                    >
+                      <Text
+                        style={[styles.levelText, { color: palette.accent }]}
+                      >
+                        {learner.functioningLevel}
+                      </Text>
                     </View>
                   </View>
-                  <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+                  <Ionicons name="chevron-forward" size={20} color={palette.inkMuted} />
                 </View>
-                <View style={styles.childActions}>
-                  <Pressable
-                    style={styles.actionBtn}
-                    onPress={() => router.push(`/(parent)/brain/${learner.id}` as any)}
-                  >
-                    <Ionicons name="bulb-outline" size={18} color={colors.primary} />
-                    <Text style={styles.actionText}>{t("parent.brain")}</Text>
-                  </Pressable>
-                  <Pressable
-                    style={styles.actionBtn}
-                    onPress={() => router.push(`/(parent)/progress/${learner.id}` as any)}
-                  >
-                    <Ionicons name="trending-up-outline" size={18} color={colors.success} />
-                    <Text style={styles.actionText}>{t("parent.progress")}</Text>
-                  </Pressable>
-                  <Pressable
-                    style={styles.actionBtn}
-                    onPress={() => router.push(`/(parent)/iep/${learner.id}` as any)}
-                  >
-                    <Ionicons name="document-outline" size={18} color={colors.info} />
-                    <Text style={styles.actionText}>{t("parent.iep")}</Text>
-                  </Pressable>
-                  <Pressable
-                    style={styles.actionBtn}
-                    onPress={() => router.push(`/(parent)/team/${learner.id}` as any)}
-                  >
-                    <Ionicons name="people-outline" size={18} color={colors.accent} />
-                    <Text style={styles.actionText}>{t("parent.team")}</Text>
-                  </Pressable>
-                  <Pressable
-                    style={styles.actionBtn}
-                    onPress={() => router.push(`/(parent)/milestones/${learner.id}` as any)}
-                  >
-                    <Ionicons name="trophy-outline" size={18} color={colors.visualSel} />
-                    <Text style={styles.actionText}>{t("parentMilestones.open")}</Text>
-                  </Pressable>
+                <View
+                  style={[
+                    styles.childActions,
+                    { borderTopColor: palette.border },
+                  ]}
+                >
+                  <ChildAction
+                    icon="bulb-outline"
+                    label={t("parent.brain")}
+                    tint={palette.primary}
+                    onPress={() => router.push(`/(parent)/brain/${learner.id}` as Href)}
+                  />
+                  <ChildAction
+                    icon="trending-up-outline"
+                    label={t("parent.progress")}
+                    tint={"#16a34a"}
+                    onPress={() =>
+                      router.push(`/(parent)/progress/${learner.id}` as Href)
+                    }
+                  />
+                  <ChildAction
+                    icon="document-outline"
+                    label={t("parent.iep")}
+                    tint={palette.primary}
+                    onPress={() => router.push(`/(parent)/iep/${learner.id}` as Href)}
+                  />
+                  <ChildAction
+                    icon="people-outline"
+                    label={t("parent.team")}
+                    tint={palette.accent}
+                    onPress={() => router.push(`/(parent)/team/${learner.id}` as Href)}
+                  />
+                  <ChildAction
+                    icon="trophy-outline"
+                    label={t("parentMilestones.open")}
+                    tint={palette.warm}
+                    onPress={() =>
+                      router.push(`/(parent)/milestones/${learner.id}` as Href)
+                    }
+                  />
                 </View>
-              </AivoCard>
+              </Card>
             </Pressable>
           ))
         )}
 
         <View style={styles.quickActions}>
-          <AivoButton
-            title={t("parent.tutorStore")}
-            onPress={() => router.push("/(parent)/tutors")}
-            variant="outline"
-            icon={<Ionicons name="storefront-outline" size={18} color={colors.primary} />}
-            style={{ flex: 1, marginRight: 8 }}
-          />
-          <AivoButton
-            title={t("parent.billing")}
-            onPress={() => router.push("/(parent)/billing")}
-            variant="outline"
-            icon={<Ionicons name="card-outline" size={18} color={colors.primary} />}
-            style={{ flex: 1 }}
-          />
+          <View style={{ flex: 1 }}>
+            <Button
+              title={t("parent.tutorStore")}
+              onPress={() => router.push("/(parent)/tutors")}
+              variant="outline"
+              fullWidth
+              iconLeft={<Ionicons name="storefront-outline" size={18} color={palette.primary} />}
+            />
+          </View>
+          <View style={{ width: 8 }} />
+          <View style={{ flex: 1 }}>
+            <Button
+              title={t("parent.billing")}
+              onPress={() => router.push("/(parent)/billing")}
+              variant="outline"
+              fullWidth
+              iconLeft={<Ionicons name="card-outline" size={18} color={palette.primary} />}
+            />
+          </View>
         </View>
       </View>
     </ScrollView>
@@ -243,27 +308,89 @@ export default function ParentDashboard() {
   return <TabletScaffold destinations={railDestinations}>{body}</TabletScaffold>;
 }
 
+function StatTile({
+  label,
+  value,
+  icon,
+  tint,
+  tintSoft,
+}: {
+  label: string;
+  value: number | string;
+  icon: keyof typeof Ionicons.glyphMap;
+  tint: string;
+  tintSoft: string;
+}) {
+  const palette = useSensoryPalette();
+  return (
+    <View
+      style={[
+        styles.statTile,
+        {
+          backgroundColor: palette.bgRaised,
+          borderColor: palette.border,
+        },
+      ]}
+    >
+      <View style={[styles.statTileIcon, { backgroundColor: tintSoft }]}>
+        <Ionicons name={icon} size={18} color={tint} />
+      </View>
+      <Text style={[styles.statTileValue, { color: palette.ink }]}>{value}</Text>
+      <Text style={[styles.statTileLabel, { color: palette.inkMuted }]} numberOfLines={1}>
+        {label}
+      </Text>
+    </View>
+  );
+}
+
+function ChildAction({
+  icon,
+  label,
+  tint,
+  onPress,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  tint: string;
+  onPress: () => void;
+}) {
+  const palette = useSensoryPalette();
+  return (
+    <Pressable onPress={onPress} style={styles.actionBtn} accessibilityRole="button">
+      <Ionicons name={icon} size={18} color={tint} />
+      <Text style={[styles.actionText, { color: palette.inkMuted }]}>{label}</Text>
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+  container: { flex: 1 },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
     marginBottom: spacing.lg,
+    gap: 8,
   },
-  greeting: { fontSize: 24, fontFamily: "Nunito-ExtraBold", color: colors.text },
+  headerActions: { flexDirection: "row", alignItems: "center", gap: 8 },
+  greeting: { fontSize: 24, fontFamily: fontFamilies.displayBold },
   subGreeting: {
     fontSize: 14,
-    fontFamily: "Nunito-Regular",
-    color: colors.textSecondary,
+    fontFamily: fontFamilies.bodyRegular,
     marginTop: 2,
   },
-  logoutBtn: { padding: 8 },
+  iconBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   unreadBadge: {
     position: "absolute",
-    top: -4,
-    right: -6,
-    backgroundColor: colors.error,
+    top: 6,
+    right: 6,
+    backgroundColor: "#dc2626",
     borderRadius: 9,
     minWidth: 16,
     height: 16,
@@ -272,51 +399,71 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   unreadBadgeText: {
-    color: colors.white,
+    color: "#fff",
     fontSize: 10,
-    fontFamily: "Nunito-Bold",
+    fontFamily: fontFamilies.bodyBold,
     lineHeight: 12,
   },
-  statsRow: { flexDirection: "row", marginBottom: spacing.lg },
+  statsRow: { flexDirection: "row", gap: 8, marginBottom: spacing.lg },
+  statTile: {
+    flex: 1,
+    padding: 14,
+    borderRadius: radius.xl,
+    borderWidth: 1,
+    gap: 6,
+  },
+  statTileIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  statTileValue: { fontFamily: fontFamilies.displayBold, fontSize: 20 },
+  statTileLabel: { fontFamily: fontFamilies.bodySemiBold, fontSize: 11 },
   sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: spacing.md,
   },
-  sectionTitle: { fontSize: 18, fontFamily: "Nunito-Bold", color: colors.text },
+  sectionTitle: { fontSize: 18, fontFamily: fontFamilies.displayBold },
+  addChildBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   childCard: { marginBottom: spacing.md },
   childRow: { flexDirection: "row", alignItems: "center" },
   childAvatar: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: colors.primaryLight + "30",
     alignItems: "center",
     justifyContent: "center",
   },
-  childInitial: { fontSize: 20, fontFamily: "Nunito-ExtraBold", color: colors.primary },
+  childInitial: { fontSize: 20, fontFamily: fontFamilies.displayBold },
   childInfo: { flex: 1, marginLeft: 12 },
-  childName: { fontSize: 16, fontFamily: "Nunito-Bold", color: colors.text },
-  childGrade: { fontSize: 13, fontFamily: "Nunito-Regular", color: colors.textSecondary },
+  childName: { fontSize: 16, fontFamily: fontFamilies.bodyBold },
+  childGrade: { fontSize: 13, fontFamily: fontFamilies.bodyRegular },
   levelBadge: {
-    backgroundColor: colors.primary + "15",
     paddingHorizontal: 8,
     paddingVertical: 2,
-    borderRadius: radius.full,
+    borderRadius: 9999,
     alignSelf: "flex-start",
     marginTop: 4,
   },
-  levelText: { fontSize: 11, fontFamily: "Nunito-SemiBold", color: colors.primary },
+  levelText: { fontSize: 11, fontFamily: fontFamilies.bodyBold },
   childActions: {
     flexDirection: "row",
     marginTop: spacing.md,
     paddingTop: spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
     justifyContent: "space-around",
   },
   actionBtn: { alignItems: "center", gap: 4 },
-  actionText: { fontSize: 12, fontFamily: "Nunito-SemiBold", color: colors.textSecondary },
+  actionText: { fontSize: 11, fontFamily: fontFamilies.bodySemiBold },
   quickActions: { flexDirection: "row", marginTop: spacing.md },
 });

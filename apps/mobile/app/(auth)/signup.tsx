@@ -9,7 +9,6 @@ import {
   Platform,
   ScrollView,
   Switch,
-  Image,
   ActivityIndicator,
 } from "react-native";
 import { router } from "expo-router";
@@ -21,7 +20,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { apiFetch } from "@/lib/api";
 import { API } from "@/constants/api";
 import { colors, spacing, radius } from "@/constants/colors";
-import { AivoButton } from "@aivo/mobile-ui";
+import { INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
+import { fontFamilies } from "@/constants/typography";
+import { useSensoryPalette } from "@/context/SensoryModeProvider";
+import { Button as InclusiveButton, SensoryToggle } from "@/components/ui";
+import { AivoLogo } from "@/components/AivoLogo";
 
 async function getAsyncStorage(): Promise<any> {
   try {
@@ -40,6 +43,7 @@ const GOOGLE_CLIENT_ID = "373030578076-ftkmofvss349u7qecvsjmiqavq4mt3hs.apps.goo
 export default function SignupScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const palette = useSensoryPalette();
   const { signup, loginWithGoogle } = useAuth();
   const [form, setForm] = useState({
     name: "",
@@ -187,23 +191,34 @@ export default function SignupScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
-        contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}
+        contentContainerStyle={[
+          styles.container,
+          { paddingTop: insets.top + 20, backgroundColor: palette.bgPage },
+        ]}
         keyboardShouldPersistTaps="handled"
       >
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backText}>{t("common.back")}</Text>
-        </Pressable>
-
-        <View style={styles.logoContainer}>
-          <Image
-            source={require("@/assets/images/aivo-logo-purple.png")}
-            style={styles.logo}
-            resizeMode="contain"
-          />
+        <View style={styles.topRow}>
+          <Pressable onPress={() => router.back()} style={styles.backButton} hitSlop={12}>
+            <Text style={[styles.backText, { color: palette.primary }]}>{t("common.back")}</Text>
+          </Pressable>
+          <SensoryToggle variant="icon" />
         </View>
 
-        <Text style={styles.title}>{t("auth.createAccount")}</Text>
-        <Text style={styles.subtitle}>{t("auth.createAccountSubtitle")}</Text>
+        <View style={styles.logoContainer}>
+          <AivoLogo width={160} variant="purple" />
+        </View>
+
+        <Text
+          style={[
+            styles.title,
+            { color: palette.ink, fontFamily: fontFamilies.displayBold },
+          ]}
+        >
+          {t("auth.createAccount")}
+        </Text>
+        <Text style={[styles.subtitle, { color: palette.inkMuted }]}>
+          {t("auth.createAccountSubtitle")}
+        </Text>
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
@@ -224,7 +239,12 @@ export default function SignupScreen() {
           <View style={styles.dividerLine} />
         </View>
 
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            { backgroundColor: palette.bgRaised, borderColor: palette.border },
+          ]}
+        >
           <View style={styles.inputGroup}>
             <Text style={styles.label}>{t("auth.fullName")}</Text>
             <TextInput
@@ -348,11 +368,11 @@ export default function SignupScreen() {
             </View>
           )}
 
-          <AivoButton
+          <InclusiveButton
             title={t("auth.createAccountBtn")}
             onPress={handleSignup}
             loading={loading}
-            size="lg"
+            variant="primary"
             style={{ marginTop: spacing.md }}
           />
         </View>
@@ -371,34 +391,30 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: spacing.lg,
-    backgroundColor: colors.background,
   },
-  backButton: {
+  topRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: spacing.md,
   },
+  backButton: {},
   backText: {
     fontSize: 16,
     fontFamily: "Nunito-SemiBold",
-    color: colors.primary,
   },
   logoContainer: {
     alignItems: "center",
     marginBottom: 16,
   },
-  logo: {
-    width: 160,
-    height: 48,
-  },
   title: {
-    fontSize: 26,
-    fontFamily: "Nunito-ExtraBold",
-    color: colors.text,
+    fontSize: 28,
     textAlign: "center",
+    letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 14,
     fontFamily: "Nunito-Regular",
-    color: colors.textSecondary,
     textAlign: "center",
     marginTop: 4,
     marginBottom: 20,
@@ -457,14 +473,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 12,
   },
   card: {
-    backgroundColor: colors.card,
     borderRadius: radius.xxl,
     padding: spacing.lg,
+    borderWidth: 1,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 2,
   },
   row: {
     flexDirection: "row",
@@ -531,8 +547,8 @@ const styles = StyleSheet.create({
     marginTop: 6,
     fontSize: 13,
     fontFamily: "Nunito-SemiBold",
-    color: "#059669",
-    backgroundColor: "#d1fae5",
+    color: INCLUSIVE_WARM_PALETTE.success,
+    backgroundColor: INCLUSIVE_WARM_PALETTE.successSoft,
     padding: 8,
     borderRadius: radius.md,
   },
@@ -540,8 +556,8 @@ const styles = StyleSheet.create({
     marginTop: 6,
     fontSize: 13,
     fontFamily: "Nunito-SemiBold",
-    color: "#e11d48",
-    backgroundColor: "#ffe4e6",
+    color: INCLUSIVE_WARM_PALETTE.danger,
+    backgroundColor: INCLUSIVE_WARM_PALETTE.dangerSoft,
     padding: 8,
     borderRadius: radius.md,
   },

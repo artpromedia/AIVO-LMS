@@ -10,7 +10,6 @@ import {
   ScrollView,
   Modal,
   Switch,
-  Image,
 } from "react-native";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -18,8 +17,11 @@ import { useTranslation } from "@/hooks/useTranslation";
 import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import { useAuth } from "@/hooks/useAuth";
-import { colors, spacing, radius } from "@/constants/colors";
-import { AivoButton } from "@aivo/mobile-ui";
+import { spacing, radius } from "@/constants/colors";
+import { fontFamilies } from "@/constants/typography";
+import { useSensoryPalette } from "@/context/SensoryModeProvider";
+import { Button } from "@/components/ui";
+import { AivoLogo } from "@/components/AivoLogo";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -29,6 +31,7 @@ export default function LoginScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const { login, loginWithGoogle } = useAuth();
+  const palette = useSensoryPalette();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -47,7 +50,7 @@ export default function LoginScreen() {
       scopes: ["openid", "profile", "email"],
       responseType: AuthSession.ResponseType.IdToken,
       redirectUri: AuthSession.makeRedirectUri({ scheme: "aivo" }),
-      usePKCE: false, // implicit flow (IdToken) does not support PKCE
+      usePKCE: false,
     },
     discovery,
   );
@@ -59,7 +62,7 @@ export default function LoginScreen() {
         handleGoogleResponse(idToken);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- handleGoogleResponse is intentionally invoked only when response changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [response]);
 
   const handleGoogleResponse = async (
@@ -109,38 +112,69 @@ export default function LoginScreen() {
     setLoading(false);
   };
 
+  const inputStyle = {
+    height: 52,
+    borderWidth: 1.5,
+    borderColor: palette.border,
+    borderRadius: 9999,
+    paddingHorizontal: spacing.lg,
+    fontSize: 16,
+    fontFamily: fontFamilies.bodyRegular,
+    color: palette.ink,
+    backgroundColor: palette.bgRaised,
+  } as const;
+
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: palette.bgPage }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
-        contentContainerStyle={[styles.container, { paddingTop: insets.top + 40 }]}
+        contentContainerStyle={[styles.container, { paddingTop: insets.top + 32 }]}
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.logoContainer}>
-          <Image
-            source={require("@/assets/images/aivo-logo-purple.png")}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-          <Text style={styles.tagline}>{t("auth.aiPoweredLearning")}</Text>
+          <AivoLogo variant="dark" width={160} />
+          <Text style={[styles.tagline, { color: palette.inkMuted }]}>
+            {t("auth.aiPoweredLearning")}
+          </Text>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.title}>{t("auth.welcomeBack")}</Text>
-          <Text style={styles.subtitle}>{t("auth.signInSubtitle")}</Text>
+        <View
+          style={[
+            styles.card,
+            {
+              backgroundColor: palette.bgRaised,
+              borderColor: palette.border,
+            },
+          ]}
+        >
+          <Text style={[styles.title, { color: palette.ink }]}>
+            {t("auth.welcomeBack")}
+          </Text>
+          <Text style={[styles.subtitle, { color: palette.inkMuted }]}>
+            {t("auth.signInSubtitle")}
+          </Text>
 
-          {error ? <Text style={styles.error}>{error}</Text> : null}
+          {error ? (
+            <View
+              style={[
+                styles.errorBox,
+                { backgroundColor: "rgba(220, 38, 38, 0.08)" },
+              ]}
+            >
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          ) : null}
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>{t("auth.email")}</Text>
+            <Text style={[styles.label, { color: palette.ink }]}>{t("auth.email")}</Text>
             <TextInput
-              style={styles.input}
+              style={inputStyle}
               value={email}
               onChangeText={setEmail}
               placeholder={t("auth.emailPlaceholder")}
-              placeholderTextColor={colors.textSecondary}
+              placeholderTextColor={palette.inkMuted}
               keyboardType="email-address"
               autoCapitalize="none"
               autoComplete="email"
@@ -148,87 +182,122 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>{t("auth.password")}</Text>
+            <Text style={[styles.label, { color: palette.ink }]}>{t("auth.password")}</Text>
             <TextInput
-              style={styles.input}
+              style={inputStyle}
               value={password}
               onChangeText={setPassword}
               placeholder={t("auth.passwordPlaceholder")}
-              placeholderTextColor={colors.textSecondary}
+              placeholderTextColor={palette.inkMuted}
               secureTextEntry
               autoComplete="password"
             />
           </View>
 
           <Pressable onPress={() => router.push("/(auth)/forgot-password")}>
-            <Text style={styles.forgotLink}>{t("auth.forgotPassword")}</Text>
+            <Text style={[styles.forgotLink, { color: palette.primary }]}>
+              {t("auth.forgotPassword")}
+            </Text>
           </Pressable>
 
-          <AivoButton
+          <Button
             title={t("auth.signIn")}
             onPress={handleLogin}
             loading={loading}
             size="lg"
-            style={{ marginTop: spacing.md }}
+            fullWidth
+            style={{ marginTop: spacing.sm }}
           />
 
           <View style={styles.dividerRow}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>{t("common.or")}</Text>
-            <View style={styles.dividerLine} />
+            <View style={[styles.dividerLine, { backgroundColor: palette.border }]} />
+            <Text style={[styles.dividerText, { color: palette.inkMuted }]}>
+              {t("common.or")}
+            </Text>
+            <View style={[styles.dividerLine, { backgroundColor: palette.border }]} />
           </View>
 
           <Pressable
-            style={styles.googleButton}
+            style={[
+              styles.googleButton,
+              { borderColor: palette.border, backgroundColor: palette.bgRaised },
+            ]}
             onPress={() => promptAsync()}
             disabled={!request || googleLoading}
+            accessibilityRole="button"
           >
             <Text style={styles.googleIcon}>G</Text>
-            <Text style={styles.googleButtonText}>
+            <Text style={[styles.googleButtonText, { color: palette.ink }]}>
               {googleLoading ? t("auth.signingIn") : t("auth.continueWithGoogle")}
             </Text>
           </Pressable>
 
-          <Pressable style={styles.pinButton} onPress={() => router.push("/(auth)/pin")}>
-            <Text style={styles.pinButtonText}>{t("auth.learnerPinLogin")}</Text>
+          <Pressable
+            style={[
+              styles.pinButton,
+              { borderColor: palette.accent },
+            ]}
+            onPress={() => router.push("/(auth)/pin")}
+            accessibilityRole="button"
+          >
+            <Text style={[styles.pinButtonText, { color: palette.accent }]}>
+              {t("auth.learnerPinLogin")}
+            </Text>
           </Pressable>
         </View>
 
         <Pressable onPress={() => router.push("/(auth)/signup")} style={styles.signupLink}>
-          <Text style={styles.signupText}>
-            {t("auth.noAccount")} <Text style={styles.signupBold}>{t("auth.signUp")}</Text>
+          <Text style={[styles.signupText, { color: palette.inkMuted }]}>
+            {t("auth.noAccount")}{" "}
+            <Text style={[styles.signupBold, { color: palette.primary }]}>
+              {t("auth.signUp")}
+            </Text>
           </Text>
         </Pressable>
       </ScrollView>
 
       <Modal visible={consentModal} transparent animationType="slide">
         <View style={styles.modalOverlay}>
-          <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>{t("auth.consentTitle")}</Text>
-            <Text style={styles.modalSubtitle}>{t("auth.consentSubtitle")}</Text>
+          <View
+            style={[
+              styles.modalCard,
+              { backgroundColor: palette.bgRaised },
+            ]}
+          >
+            <Text style={[styles.modalTitle, { color: palette.ink }]}>
+              {t("auth.consentTitle")}
+            </Text>
+            <Text style={[styles.modalSubtitle, { color: palette.inkMuted }]}>
+              {t("auth.consentSubtitle")}
+            </Text>
             <View style={styles.switchRow}>
               <Switch
                 value={coppaConsent}
                 onValueChange={setCoppaConsent}
-                trackColor={{ false: colors.border, true: colors.primaryLight }}
-                thumbColor={coppaConsent ? colors.primary : "#f4f3f4"}
+                trackColor={{ false: palette.border, true: palette.accentSoft }}
+                thumbColor={coppaConsent ? palette.primary : "#f4f3f4"}
               />
-              <Text style={styles.switchLabel}>{t("auth.coppaConsent")}</Text>
+              <Text style={[styles.switchLabel, { color: palette.inkMuted }]}>
+                {t("auth.coppaConsent")}
+              </Text>
             </View>
             <View style={styles.switchRow}>
               <Switch
                 value={termsAccepted}
                 onValueChange={setTermsAccepted}
-                trackColor={{ false: colors.border, true: colors.primaryLight }}
-                thumbColor={termsAccepted ? colors.primary : "#f4f3f4"}
+                trackColor={{ false: palette.border, true: palette.accentSoft }}
+                thumbColor={termsAccepted ? palette.primary : "#f4f3f4"}
               />
-              <Text style={styles.switchLabel}>{t("auth.termsConsent")}</Text>
+              <Text style={[styles.switchLabel, { color: palette.inkMuted }]}>
+                {t("auth.termsConsent")}
+              </Text>
             </View>
-            <AivoButton
+            <Button
               title={t("auth.continue")}
               onPress={handleConsentConfirm}
               disabled={!coppaConsent || !termsAccepted}
               size="lg"
+              fullWidth
               style={{ marginTop: spacing.md }}
             />
             <Pressable
@@ -238,7 +307,9 @@ export default function LoginScreen() {
               }}
               style={{ marginTop: spacing.sm, alignItems: "center" }}
             >
-              <Text style={styles.forgotLink}>{t("common.cancel")}</Text>
+              <Text style={[styles.forgotLink, { color: palette.primary }]}>
+                {t("common.cancel")}
+              </Text>
             </Pressable>
           </View>
         </View>
@@ -251,80 +322,54 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: spacing.lg,
-    backgroundColor: colors.background,
   },
   logoContainer: {
     alignItems: "center",
     marginBottom: 32,
   },
-  logo: {
-    width: 180,
-    height: 60,
-  },
   tagline: {
     fontSize: 14,
-    color: colors.textSecondary,
-    fontFamily: "Nunito-Regular",
+    fontFamily: fontFamilies.bodyRegular,
     marginTop: 8,
   },
   card: {
-    backgroundColor: colors.card,
     borderRadius: radius.xxl,
+    borderWidth: 1,
     padding: spacing.lg,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
   },
   title: {
-    fontSize: 24,
-    fontFamily: "Nunito-ExtraBold",
-    color: colors.text,
+    fontSize: 26,
+    fontFamily: fontFamilies.displayBold,
     textAlign: "center",
   },
   subtitle: {
     fontSize: 14,
-    fontFamily: "Nunito-Regular",
-    color: colors.textSecondary,
+    fontFamily: fontFamilies.bodyRegular,
     textAlign: "center",
     marginTop: 4,
     marginBottom: 20,
   },
-  error: {
-    color: colors.error,
-    fontSize: 13,
-    fontFamily: "Nunito-Regular",
-    textAlign: "center",
-    marginBottom: 12,
-    backgroundColor: colors.error + "10",
-    padding: 8,
-    borderRadius: radius.md,
-  },
-  inputGroup: {
-    marginBottom: spacing.md,
-  },
-  label: {
-    fontSize: 14,
-    fontFamily: "Nunito-SemiBold",
-    color: colors.text,
-    marginBottom: 6,
-  },
-  input: {
-    height: 48,
-    borderWidth: 1.5,
-    borderColor: colors.border,
+  errorBox: {
+    padding: 10,
     borderRadius: radius.lg,
-    paddingHorizontal: spacing.md,
-    fontSize: 16,
-    fontFamily: "Nunito-Regular",
-    color: colors.text,
-    backgroundColor: colors.surface,
+    marginBottom: 12,
+  },
+  errorText: {
+    color: "#dc2626",
+    fontSize: 13,
+    fontFamily: fontFamilies.bodySemiBold,
+    textAlign: "center",
+  },
+  inputGroup: { marginBottom: spacing.md },
+  label: {
+    fontSize: 13,
+    fontFamily: fontFamilies.bodyBold,
+    marginBottom: 6,
+    marginLeft: 4,
   },
   forgotLink: {
     fontSize: 13,
-    color: colors.primary,
-    fontFamily: "Nunito-SemiBold",
+    fontFamily: fontFamilies.bodyBold,
     textAlign: "right",
     marginBottom: 8,
   },
@@ -333,50 +378,41 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginVertical: spacing.md,
   },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: colors.border,
-  },
+  dividerLine: { flex: 1, height: 1 },
   dividerText: {
-    fontSize: 13,
-    fontFamily: "Nunito-Regular",
-    color: colors.textSecondary,
+    fontSize: 12,
+    fontFamily: fontFamilies.bodySemiBold,
     marginHorizontal: 12,
   },
   googleButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 12,
-    borderRadius: radius.xl,
+    height: 52,
+    borderRadius: 9999,
     borderWidth: 1.5,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
     gap: 10,
   },
   googleIcon: {
-    fontSize: 20,
-    fontFamily: "Nunito-ExtraBold",
+    fontSize: 18,
+    fontFamily: fontFamilies.displayBold,
     color: "#4285F4",
   },
   googleButtonText: {
     fontSize: 15,
-    fontFamily: "Nunito-SemiBold",
-    color: colors.text,
+    fontFamily: fontFamilies.bodyBold,
   },
   pinButton: {
     marginTop: spacing.md,
     alignItems: "center",
-    paddingVertical: 12,
-    borderRadius: radius.xl,
+    justifyContent: "center",
+    height: 52,
+    borderRadius: 9999,
     borderWidth: 1.5,
-    borderColor: colors.secondary,
   },
   pinButtonText: {
     fontSize: 15,
-    fontFamily: "Nunito-Bold",
-    color: colors.secondary,
+    fontFamily: fontFamilies.bodyBold,
   },
   modalOverlay: {
     flex: 1,
@@ -385,20 +421,17 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   modalCard: {
-    backgroundColor: colors.card,
     borderRadius: radius.xxl,
     padding: spacing.lg,
   },
   modalTitle: {
     fontSize: 22,
-    fontFamily: "Nunito-ExtraBold",
-    color: colors.text,
+    fontFamily: fontFamilies.displayBold,
     textAlign: "center",
   },
   modalSubtitle: {
     fontSize: 14,
-    fontFamily: "Nunito-Regular",
-    color: colors.textSecondary,
+    fontFamily: fontFamilies.bodyRegular,
     textAlign: "center",
     marginTop: 4,
     marginBottom: 20,
@@ -412,20 +445,9 @@ const styles = StyleSheet.create({
   switchLabel: {
     flex: 1,
     fontSize: 13,
-    fontFamily: "Nunito-Regular",
-    color: colors.textSecondary,
+    fontFamily: fontFamilies.bodyRegular,
   },
-  signupLink: {
-    marginTop: spacing.lg,
-    alignItems: "center",
-  },
-  signupText: {
-    fontSize: 14,
-    fontFamily: "Nunito-Regular",
-    color: colors.textSecondary,
-  },
-  signupBold: {
-    fontFamily: "Nunito-Bold",
-    color: colors.primary,
-  },
+  signupLink: { marginTop: spacing.lg, alignItems: "center" },
+  signupText: { fontSize: 14, fontFamily: fontFamilies.bodyRegular },
+  signupBold: { fontFamily: fontFamilies.bodyBold },
 });

@@ -8,7 +8,7 @@ import {
   Alert,
   AppState,
 } from "react-native";
-import { useLocalSearchParams, router } from "expo-router";
+import { useLocalSearchParams, router, type Href } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -18,6 +18,7 @@ import { apiFetch } from "@/lib/api";
 import { API } from "@/constants/api";
 import { spacing } from "@/constants/colors";
 import { useTierTheme } from "@aivo/mobile-ui";
+import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { ScratchPad } from "@/src/components/learning/ScratchPad";
 import { MobileSessionHeader } from "@/src/components/learning/MobileSessionHeader";
@@ -140,7 +141,27 @@ export default function StageScreen() {
   const { data: learners } = useLearners();
   const learnerId = user?.role === "LEARNER" ? user.id : learners?.[0]?.id || "";
 
-  const { tier, theme } = useTierTheme();
+  const { tier, theme: tierTheme } = useTierTheme();
+  const palette = useSensoryPalette();
+  // Overlay the active sensory-mode palette on top of the tier theme so
+  // calm / high-contrast modes actually re-skin the Stage chrome, not just
+  // the role dashboards. Tier still drives the tone (EARLY/MIDDLE/HIGH),
+  // sensory mode drives the surface colors and contrast.
+  const theme = useMemo(
+    () => ({
+      ...tierTheme,
+      colors: {
+        ...tierTheme.colors,
+        bg: palette.bgPage,
+        surface: palette.bgRaised,
+        text: palette.ink,
+        textMuted: palette.inkMuted,
+        primary: palette.primary,
+        border: palette.border,
+      },
+    }),
+    [tierTheme, palette],
+  );
   const voice = TIER_VOICE[tier];
   const { isTablet } = useWindowSizeClass();
 
@@ -388,7 +409,7 @@ export default function StageScreen() {
                   borderColor: theme.colors.primary,
                 },
               ]}
-              onPress={() => router.replace("/(learner)" as any)}
+              onPress={() => router.replace("/(learner)" as Href)}
               accessibilityRole="button"
               accessibilityLabel="Back to home"
             >
