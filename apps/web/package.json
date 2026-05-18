@@ -17,7 +17,7 @@
     "@aivo/stage-runtime": "workspace:*",
     "@aivo/stage-ui": "workspace:*",
     "@aivo/tutor-surface-protocol": "workspace:*",
-    "@simplewebauthn/browser": "^11.0.0",
+    "@simplewebauthn/browser": "^13.3.0",
     "lucide-react": "^0.513.0",
     "next": "^15.3.3",
     "next-intl": "^4.9.1",
