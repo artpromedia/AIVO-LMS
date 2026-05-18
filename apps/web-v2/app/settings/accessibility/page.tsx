@@ -8,7 +8,15 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Settings } from "lucide-react";
 import { ROLE_LABEL } from "@/lib/auth/types";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { SensoryModeToggle } from "@/components/system/sensory-mode-provider";
+import { SENSORY_MODE_LABELS, SENSORY_MODES } from "@/lib/sensory-mode/constants";
 
 const NAV = [
   {
@@ -35,15 +43,42 @@ export default async function AccessibilitySettings() {
         description="These defaults flow into every learner experience and can be overridden per learner."
       />
 
-      <Card>
+      {/* Sensory mode — promoted to the top of the page because it is the
+          load-bearing differentiator of the Inclusive-Warm rollout. */}
+      <Card variant="elevated">
         <CardHeader>
-          <CardTitle>Text and reading</CardTitle>
+          <CardTitle>Sensory mode</CardTitle>
         </CardHeader>
-        <CardContent className="grid gap-5">
+        <CardContent className="grid gap-4">
+          <p className="text-sm text-iw-ink-muted">
+            Choose how the whole app looks and moves. Your choice is saved on this browser; we
+            don&apos;t sync it across devices yet.
+          </p>
+          <SensoryModeToggle />
+          <dl className="grid gap-2 sm:grid-cols-3">
+            {SENSORY_MODES.map((m) => (
+              <div key={m} className="rounded-iw-card border border-iw-border bg-iw-raised p-3">
+                <dt className="text-sm font-semibold text-iw-ink">
+                  {SENSORY_MODE_LABELS[m].label}
+                </dt>
+                <dd className="mt-1 text-xs text-iw-ink-muted">
+                  {SENSORY_MODE_LABELS[m].description}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </CardContent>
+      </Card>
+
+      <SectionHeader className="mt-10" title="Text and reading" />
+      <Card>
+        <CardContent className="grid gap-5 pt-5">
           <fieldset className="grid gap-2 sm:max-w-md">
             <Label>Age mode</Label>
             <Select defaultValue="spark">
-              <SelectTrigger><SelectValue placeholder="Choose age mode" /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue placeholder="Choose age mode" />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="sprout">Sprout (4–7)</SelectItem>
                 <SelectItem value="spark">Spark (8–12)</SelectItem>
@@ -54,7 +89,9 @@ export default async function AccessibilitySettings() {
           <fieldset className="grid gap-2 sm:max-w-md">
             <Label>Theme</Label>
             <Select defaultValue="light">
-              <SelectTrigger><SelectValue placeholder="Choose theme" /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue placeholder="Choose theme" />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="light">Light</SelectItem>
                 <SelectItem value="dark">Dark</SelectItem>
@@ -68,7 +105,7 @@ export default async function AccessibilitySettings() {
               {(["small", "medium", "large"] as const).map((s) => (
                 <label
                   key={s}
-                  className="flex cursor-pointer items-center gap-2 rounded-lg border border-aivo-border p-2 capitalize"
+                  className="flex cursor-pointer items-center gap-2 rounded-full border border-iw-border bg-iw-raised p-2 capitalize"
                 >
                   <RadioGroupItem value={s} id={`size-${s}`} />
                   <span>{s}</span>
@@ -78,23 +115,25 @@ export default async function AccessibilitySettings() {
           </fieldset>
           <fieldset className="flex flex-col gap-2">
             <Label>Other</Label>
-              {[
-                { id: "high-contrast", label: "High contrast" },
-                { id: "reduce-motion", label: "Reduce motion" },
-                { id: "read-aloud", label: "Read aloud by default" },
-                { id: "dyslexia-font", label: "Dyslexia-friendly font (OpenDyslexic)" },
-                { id: "captions", label: "Always show captions" },
-              ].map((opt) => (
-                <label key={opt.id} className="flex items-center gap-3 text-sm">
-                  <Checkbox id={opt.id} />
-                  {opt.label}
-                </label>
-              ))}
-            </fieldset>
+            {[
+              { id: "high-contrast", label: "High contrast" },
+              { id: "reduce-motion", label: "Reduce motion" },
+              { id: "read-aloud", label: "Read aloud by default" },
+              { id: "dyslexia-font", label: "Dyslexia-friendly font (OpenDyslexic)" },
+              { id: "captions", label: "Always show captions" },
+            ].map((opt) => (
+              <label key={opt.id} className="flex items-center gap-3 text-sm">
+                <Checkbox id={opt.id} />
+                {opt.label}
+              </label>
+            ))}
+          </fieldset>
           <fieldset className="grid gap-2 sm:max-w-md">
             <Label>Language</Label>
             <Select defaultValue="en-US">
-              <SelectTrigger><SelectValue placeholder="Choose language" /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue placeholder="Choose language" />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="en-US">English (US)</SelectItem>
                 <SelectItem value="es-ES">Español</SelectItem>
@@ -102,18 +141,6 @@ export default async function AccessibilitySettings() {
               </SelectContent>
             </Select>
           </fieldset>
-        </CardContent>
-      </Card>
-
-      <SectionHeader
-        className="mt-10"
-        title="Sensory"
-        description="Coming alongside the learner profile in Sprint 7."
-      />
-      <Card>
-        <CardContent className="p-5 text-sm text-aivo-ink-soft">
-          Sensory profile controls (sound intensity, animation tempo, color temperature) will land
-          once the learner brain profile is generated.
         </CardContent>
       </Card>
     </AppShell>

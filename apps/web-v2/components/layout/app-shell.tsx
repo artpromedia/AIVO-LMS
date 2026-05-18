@@ -2,6 +2,7 @@ import * as React from "react";
 import Link from "next/link";
 import { RoleNav, type RoleNavItem } from "@/components/layout/role-nav";
 import { logoutAction } from "@/lib/auth/actions";
+import { SensoryModeToggle } from "@/components/system/sensory-mode-provider";
 import { cn } from "@/lib/utils";
 
 /**
@@ -20,46 +21,39 @@ function roleToTheme(role: string): "parent" | "learner" | "teacher" | "admin" |
 
 /**
  * Per-theme chrome overrides for things that can't be expressed as pure
- * CSS variables — copy tone, logo glyph, and the sidebar header treatment.
- * Keeping these in one map (rather than five forks of AppShell) keeps the
- * single source of truth for layout intact.
+ * CSS variables — copy tone and the sidebar header treatment.
+ *
+ * In the Inclusive-Warm rollout, all five themes share the same purple
+ * wordmark mark in the top bar (drawn from `INCLUSIVE_WARM_LOGOS.purple`).
+ * Only the eyebrow copy and the sidebar contrast tone change per role.
  */
 const THEME_CHROME: Record<
   ReturnType<typeof roleToTheme>,
-  { logoGlyph: string; logoBg: string; eyebrow: string; sidebarTone: "light" | "dark" }
+  { eyebrow: string; sidebarTone: "light" | "dark" }
 > = {
-  parent: {
-    logoGlyph: "A",
-    logoBg: "bg-aivo-primary text-aivo-primary-fg",
-    eyebrow: "Family workspace",
-    sidebarTone: "light",
-  },
-  learner: {
-    logoGlyph: "★",
-    logoBg: "bg-white text-aivo-primary",
-    eyebrow: "Today's adventure",
-    sidebarTone: "dark",
-  },
-  teacher: {
-    logoGlyph: "A",
-    logoBg: "bg-aivo-primary text-aivo-primary-fg",
-    eyebrow: "Classroom console",
-    sidebarTone: "light",
-  },
-  admin: {
-    logoGlyph: "A",
-    logoBg: "bg-aivo-primary text-aivo-primary-fg",
-    eyebrow: "School operations",
-    sidebarTone: "light",
-  },
-  platform: {
-    logoGlyph: "A",
-    logoBg: "bg-aivo-primary text-aivo-primary-fg",
-    eyebrow: "Platform ops",
-    sidebarTone: "dark",
-  },
+  parent: { eyebrow: "Family workspace", sidebarTone: "light" },
+  learner: { eyebrow: "Today's adventure", sidebarTone: "dark" },
+  teacher: { eyebrow: "Classroom console", sidebarTone: "light" },
+  admin: { eyebrow: "School operations", sidebarTone: "light" },
+  platform: { eyebrow: "Platform ops", sidebarTone: "dark" },
 };
 
+/**
+ * App shell for every signed-in dashboard.
+ *
+ * Layout:
+ *   ┌──────────────────────────────────────────────────────────────┐
+ *   │  Top bar: AIVO wordmark · eyebrow · sensory toggle · user    │
+ *   ├────────────┬─────────────────────────────────────────────────┤
+ *   │  Sidebar   │  <main id="main">  …page content…  </main>      │
+ *   │  RoleNav   │                                                 │
+ *   └────────────┴─────────────────────────────────────────────────┘
+ *
+ * The Inclusive-Warm chrome is intentionally driven by `iw-*` Tailwind
+ * tokens so the sensory toggle in the top bar repaints the whole shell
+ * (page bg, card surfaces, ring focus, etc.) the moment the user clicks
+ * it — no per-page wiring required.
+ */
 export function AppShell({
   role,
   roleLabel,
@@ -78,73 +72,110 @@ export function AppShell({
   const isDarkSidebar = chrome.sidebarTone === "dark";
 
   return (
-    <div
-      data-theme={theme}
-      data-role={role}
-      className="min-h-screen"
-      style={{ background: "var(--color-aivo-page-bg)" }}
-    >
+    <div data-theme={theme} data-role={role} className="min-h-screen bg-iw-bg text-iw-ink">
       <a href="#main" className="skip-link">
         Skip to main content
       </a>
+
+      {/* Top bar — present on every dashboard. */}
+      <header
+        className="sticky top-0 z-40 border-b border-iw-border bg-iw-raised/85 backdrop-blur"
+        aria-label="Application header"
+      >
+        <div
+          className={cn(
+            "mx-auto flex h-16 items-center gap-4 px-4 sm:px-6",
+            theme === "learner" ? "max-w-[1200px]" : "max-w-[1400px]",
+          )}
+        >
+          <Link href="/" className="flex items-center gap-2.5">
+            <span
+              aria-hidden
+              className="grid h-9 w-9 place-items-center rounded-full bg-iw-brand text-base font-bold text-iw-primary-fg shadow"
+            >
+              A
+            </span>
+            <span className="font-iw-display text-lg font-bold tracking-tight text-iw-ink">
+              Aivo Learning
+            </span>
+          </Link>
+
+          <span
+            className="hidden text-[10px] font-semibold uppercase tracking-[0.16em] text-iw-ink-muted sm:inline"
+            aria-hidden
+          >
+            · {chrome.eyebrow}
+          </span>
+
+          <div className="ml-auto flex items-center gap-3">
+            <SensoryModeToggle size="sm" />
+            <span className="hidden text-right sm:block">
+              <span className="block text-sm font-semibold leading-tight text-iw-ink">
+                {user.displayName}
+              </span>
+              <span className="block text-[11px] leading-tight text-iw-ink-muted">{roleLabel}</span>
+            </span>
+            <span
+              aria-hidden
+              className="grid h-9 w-9 place-items-center rounded-full bg-iw-accent-soft text-sm font-bold text-iw-accent"
+              title={user.displayName}
+            >
+              {user.displayName.charAt(0).toUpperCase()}
+            </span>
+          </div>
+        </div>
+      </header>
+
       <div
         className={cn(
-          "mx-auto grid grid-cols-1 gap-6 px-4 py-6 lg:grid-cols-[260px_1fr]",
-          // Learner mode trades width for one-task focus per UX guidelines.
+          "mx-auto grid grid-cols-1 gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[260px_1fr]",
           theme === "learner" ? "max-w-[1200px]" : "max-w-[1400px]",
         )}
       >
         <aside
           aria-label={`${roleLabel} navigation`}
           className={cn(
-            "rounded-[var(--radius-card)] p-4 shadow-sm h-fit lg:sticky lg:top-6",
+            "h-fit rounded-iw-card p-4 shadow-sm lg:sticky lg:top-[88px]",
             isDarkSidebar
-              ? "border border-[var(--color-aivo-sidebar-border)]"
-              : "border border-aivo-border",
+              ? "border border-[color:var(--color-aivo-sidebar-border)]"
+              : "border border-iw-border bg-iw-card",
           )}
-          style={{
-            background: "var(--color-aivo-sidebar-bg)",
-            color: "var(--color-aivo-sidebar-fg)",
-          }}
+          style={
+            isDarkSidebar
+              ? {
+                  background: "var(--color-aivo-sidebar-bg)",
+                  color: "var(--color-aivo-sidebar-fg)",
+                }
+              : undefined
+          }
         >
-          <Link href="/" className="flex items-center gap-2 px-2 pb-4">
-            <span
-              aria-hidden
-              className={cn(
-                "grid place-items-center rounded-full font-bold",
-                theme === "learner" ? "h-10 w-10 text-xl" : "h-8 w-8",
-                chrome.logoBg,
-              )}
-            >
-              {chrome.logoGlyph}
-            </span>
-            <span className="font-display text-lg font-semibold">AIVO</span>
-          </Link>
           <p
-            className="px-2 text-[10px] font-semibold uppercase tracking-[0.12em]"
-            style={{ color: "var(--color-aivo-sidebar-muted)" }}
+            className="px-2 pb-3 text-[10px] font-semibold uppercase tracking-[0.16em]"
+            style={isDarkSidebar ? { color: "var(--color-aivo-sidebar-muted)" } : undefined}
           >
-            {chrome.eyebrow}
+            {roleLabel}
           </p>
-          <p className="px-2 text-xs font-semibold uppercase tracking-wide">{roleLabel}</p>
-          <div className="mt-2">
-            <RoleNav items={navItems} ariaLabel={`${roleLabel} sections`} />
-          </div>
+          <RoleNav items={navItems} ariaLabel={`${roleLabel} sections`} />
           <div
             className="mt-6 border-t pt-4"
-            style={{ borderColor: "var(--color-aivo-sidebar-border)" }}
+            style={{
+              borderColor: isDarkSidebar ? "var(--color-aivo-sidebar-border)" : undefined,
+            }}
           >
             <p className="px-2 text-sm font-medium">{user.displayName}</p>
-            <p className="px-2 text-xs" style={{ color: "var(--color-aivo-sidebar-muted)" }}>
+            <p
+              className="px-2 text-xs"
+              style={isDarkSidebar ? { color: "var(--color-aivo-sidebar-muted)" } : undefined}
+            >
               {user.email}
             </p>
             <Link
               href="/settings/accessibility"
               className={cn(
-                "mt-2 block rounded-lg px-2 py-1 text-xs hover:bg-aivo-surface-2",
-                isDarkSidebar && "hover:bg-white/10",
+                "mt-2 block rounded-lg px-2 py-1 text-xs",
+                isDarkSidebar ? "hover:bg-white/10" : "text-iw-ink-muted hover:bg-iw-raised",
               )}
-              style={{ color: "var(--color-aivo-sidebar-muted)" }}
+              style={isDarkSidebar ? { color: "var(--color-aivo-sidebar-muted)" } : undefined}
             >
               Accessibility settings
             </Link>
@@ -152,20 +183,33 @@ export function AppShell({
               <button
                 type="submit"
                 className={cn(
-                  "mt-1 block w-full rounded-lg px-2 py-1 text-left text-xs hover:bg-aivo-surface-2",
-                  isDarkSidebar && "hover:bg-white/10",
+                  "mt-1 block w-full rounded-lg px-2 py-1 text-left text-xs",
+                  isDarkSidebar ? "hover:bg-white/10" : "text-iw-ink-muted hover:bg-iw-raised",
                 )}
-                style={{ color: "var(--color-aivo-sidebar-muted)" }}
+                style={isDarkSidebar ? { color: "var(--color-aivo-sidebar-muted)" } : undefined}
               >
                 Sign out
               </button>
             </form>
           </div>
         </aside>
+
         <main id="main" data-role={role} className="min-w-0">
           {children}
         </main>
       </div>
+
+      <footer className="border-t border-iw-border bg-iw-raised">
+        <div
+          className={cn(
+            "mx-auto flex flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-iw-ink-muted sm:px-6",
+            theme === "learner" ? "max-w-[1200px]" : "max-w-[1400px]",
+          )}
+        >
+          <span>© Aivo Learning. Personalized adventures for every child.</span>
+          <span>COPPA · FERPA · SOC 2</span>
+        </div>
+      </footer>
     </div>
   );
 }
