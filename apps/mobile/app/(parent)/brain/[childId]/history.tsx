@@ -4,6 +4,7 @@ import { useLocalSearchParams, router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useResponsiveType } from "@/src/design/useResponsiveType";
 import { EmptyState } from "@aivo/mobile-ui";
 import { colors, spacing } from "@/constants/colors";
 
@@ -12,6 +13,7 @@ export default function BrainHistoryScreen() {
   const { childId: _childId } = useLocalSearchParams<{ childId: string }>();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const type = useResponsiveType();
 
   return (
     <ScrollView
@@ -23,7 +25,7 @@ export default function BrainHistoryScreen() {
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
 
-      <Text style={styles.title}>{t("parentBrain.brainHistory")}</Text>
+      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>{t("parentBrain.brainHistory")}</Text>
       <Text style={styles.subtitle}>{t("parentBrain.historySubtitle")}</Text>
 
       <EmptyState

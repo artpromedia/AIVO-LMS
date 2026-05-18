@@ -15,6 +15,7 @@ import { useLocalSearchParams, router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useResponsiveType } from "@/src/design/useResponsiveType";
 import {
   useIEPGoals,
   useIEPTimeline,
@@ -35,6 +36,7 @@ export default function IEPScreen() {
   const { childId } = useLocalSearchParams<{ childId: string }>();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const type = useResponsiveType();
 
   const { data: goals, isLoading: goalsLoading } = useIEPGoals(childId);
   const { data: timeline, isLoading: timelineLoading } = useIEPTimeline(childId);
@@ -229,7 +231,7 @@ export default function IEPScreen() {
 
       <View style={styles.titleRow}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.title}>{t("parentIEP.title")}</Text>
+          <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>{t("parentIEP.title")}</Text>
           <Text style={styles.subtitle}>{t("parentIEP.subtitle")}</Text>
         </View>
         <Pressable style={styles.prefsBtn} onPress={() => setPrefsModalOpen(true)}>

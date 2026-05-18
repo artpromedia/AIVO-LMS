@@ -15,6 +15,7 @@ import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { Card, HeaderUserChip, SensoryToggle, DarkCapsuleNav } from "@/components/ui";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { CONTENT_MAX_WIDTH, gridColumns, pickBySizeClass } from "@/src/design/responsive";
+import { useResponsiveType } from "@/src/design/useResponsiveType";
 
 export default function LearnerWorldMap() {
   const insets = useSafeAreaInsets();
@@ -24,6 +25,7 @@ export default function LearnerWorldMap() {
   const { sizeClass, width: winWidth, isTablet } = useWindowSizeClass();
   const { isTutorEntitled } = useLearnerEntitlements(user?.tenantId);
   const palette = useSensoryPalette();
+  const type = useResponsiveType();
 
   const coreTutors = Object.entries(TUTORS).filter(([, t]) => t.tier === "core");
 
@@ -113,7 +115,18 @@ export default function LearnerWorldMap() {
               >
                 <Text style={styles.companionEmoji}>🧠</Text>
               </View>
-              <Text style={[styles.heroGreeting, { color: palette.ink }]}>
+              <Text
+                style={[
+                  styles.heroGreeting,
+                  {
+                    color: palette.ink,
+                    // Preserve the 24pt phone baseline; useResponsiveType
+                    // amplifies h1 on medium/expanded tablets.
+                    fontSize: Math.max(styles.heroGreeting.fontSize, type.h1.fontSize),
+                    lineHeight: Math.max(styles.heroGreeting.lineHeight, type.h1.lineHeight),
+                  },
+                ]}
+              >
                 {t("learner.greeting", { name: user?.name || "Alex" })}
               </Text>
               <Text style={[styles.heroSub, { color: palette.inkMuted }]}>

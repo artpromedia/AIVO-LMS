@@ -4,6 +4,7 @@ import { useLocalSearchParams, router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useResponsiveType } from "@/src/design/useResponsiveType";
 import { useLearner } from "@/hooks/useLearners";
 import { useBrainDomains, labelForDomain } from "@/hooks/useBrain";
 import { AivoCard, LoadingState } from "@aivo/mobile-ui";
@@ -20,6 +21,7 @@ export default function DomainDrillDown() {
     enrolledGrade: learner?.gradeLevel ?? null,
   });
   const { t } = useTranslation();
+  const type = useResponsiveType();
 
   const targetLabel = useMemo(() => labelForDomain(domain || ""), [domain]);
   const domainData = domains.find((d) => d.domain.toLowerCase() === targetLabel.toLowerCase());
@@ -36,7 +38,7 @@ export default function DomainDrillDown() {
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
 
-      <Text style={styles.title}>{targetLabel}</Text>
+      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>{targetLabel}</Text>
       <Text style={styles.subtitle}>Grade Ladder & Skill Breakdown</Text>
 
       <AivoCard style={styles.ladderCard}>

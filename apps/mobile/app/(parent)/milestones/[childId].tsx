@@ -4,6 +4,7 @@ import { useLocalSearchParams, router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useResponsiveType } from "@/src/design/useResponsiveType";
 import { useLearnerMilestones, type Milestone } from "@/hooks/useLearnerMilestones";
 import { AivoCard } from "@aivo/mobile-ui";
 import { colors, spacing, radius } from "@/constants/colors";
@@ -63,6 +64,7 @@ function formatRelative(iso: string): string {
 export default function MilestonesScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const type = useResponsiveType();
   const { childId } = useLocalSearchParams<{ childId: string }>();
   const learnerId = childId ?? "";
   const { data, isLoading } = useLearnerMilestones(learnerId);
@@ -86,7 +88,7 @@ export default function MilestonesScreen() {
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
 
-      <Text style={styles.title}>{t("parentMilestones.title")}</Text>
+      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>{t("parentMilestones.title")}</Text>
 
       {streak ? (
         <View style={styles.streakRow}>

@@ -4,11 +4,13 @@ import { useLocalSearchParams, router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useResponsiveType } from "@/src/design/useResponsiveType";
 import { AivoCard, AivoButton } from "@aivo/mobile-ui";
 import { colors, spacing, radius } from "@/constants/colors";
 
 export default function SubmitInsightScreen() {
   const { t } = useTranslation();
+  const type = useResponsiveType();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- route param reserved for future use
   const { id: _id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
@@ -24,7 +26,7 @@ export default function SubmitInsightScreen() {
         <Ionicons name="arrow-back" size={20} color={colors.primary} />
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
-      <Text style={styles.title}>{t("teacherInsight.title")}</Text>
+      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>{t("teacherInsight.title")}</Text>
       <Text style={styles.subtitle}>{t("teacherInsight.subtitle")}</Text>
 
       <AivoCard>

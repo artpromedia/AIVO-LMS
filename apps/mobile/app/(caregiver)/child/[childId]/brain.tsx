@@ -4,6 +4,7 @@ import { useLocalSearchParams, router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useResponsiveType } from "@/src/design/useResponsiveType";
 import { useBrainDomains } from "@/hooks/useBrain";
 import { useLearner } from "@/hooks/useLearners";
 import { AivoCard, LoadingState } from "@aivo/mobile-ui";
@@ -11,6 +12,7 @@ import { colors, spacing } from "@/constants/colors";
 
 export default function CaregiverBrainScreen() {
   const { t } = useTranslation();
+  const type = useResponsiveType();
   const { childId } = useLocalSearchParams<{ childId: string }>();
   const insets = useSafeAreaInsets();
   const { data: learner } = useLearner(childId);
@@ -28,7 +30,7 @@ export default function CaregiverBrainScreen() {
         <Ionicons name="arrow-back" size={20} color={colors.primary} />
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
-      <Text style={styles.title}>{t("caregiverBrain.title")}</Text>
+      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>{t("caregiverBrain.title")}</Text>
       <Text style={styles.subtitle}>{t("caregiverBrain.subtitle")}</Text>
 
       {domains.map((d) => (

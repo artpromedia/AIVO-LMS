@@ -4,12 +4,14 @@ import { useLocalSearchParams, router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useResponsiveType } from "@/src/design/useResponsiveType";
 import { useIEPGoals } from "@/hooks/useFamily";
 import { AivoCard, LoadingState, EmptyState } from "@aivo/mobile-ui";
 import { colors, spacing, radius } from "@/constants/colors";
 
 export default function CaregiverIEPGoals() {
   const { t } = useTranslation();
+  const type = useResponsiveType();
   const { childId } = useLocalSearchParams<{ childId: string }>();
   const insets = useSafeAreaInsets();
   const { data: goals, isLoading } = useIEPGoals(childId);
@@ -24,7 +26,7 @@ export default function CaregiverIEPGoals() {
         <Ionicons name="arrow-back" size={20} color={colors.primary} />
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
-      <Text style={styles.title}>{t("caregiverIEP.title")}</Text>
+      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>{t("caregiverIEP.title")}</Text>
       <Text style={styles.subtitle}>{t("caregiverIEP.subtitle")}</Text>
 
       {!goals?.length ? (

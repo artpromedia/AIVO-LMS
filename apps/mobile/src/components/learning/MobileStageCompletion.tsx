@@ -14,6 +14,7 @@ import { Card, Button, DarkCapsuleNav, type DarkCapsuleNavItem } from "@/compone
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { fontFamilies } from "@/constants/typography";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useResponsiveType } from "@/src/design/useResponsiveType";
 
 interface Props {
   tier: "EARLY" | "MIDDLE" | "HIGH";
@@ -43,6 +44,7 @@ export function MobileStageCompletion({
   const score = total > 0 ? Math.round((correctCount / total) * 100) : 0;
   const palette = useSensoryPalette();
   const { t } = useTranslation();
+  const type = useResponsiveType();
   return (
     <View style={[styles.container, { backgroundColor: palette.bgPage, paddingTop }]}>
       <Card tone="hero" style={styles.card}>
@@ -52,7 +54,20 @@ export function MobileStageCompletion({
           ) : (
             <Ionicons name="checkmark-circle" size={72} color={palette.primary} />
           )}
-          <Text style={[styles.title, { color: palette.ink }]}>{title}</Text>
+          <Text
+            style={[
+              styles.title,
+              {
+                color: palette.ink,
+                // Preserve the 26pt phone baseline; only step up on tablet
+                // where useResponsiveType amplifies h1 past it.
+                fontSize: Math.max(styles.title.fontSize, type.h1.fontSize),
+                lineHeight: Math.max(styles.title.fontSize + 6, type.h1.lineHeight),
+              },
+            ]}
+          >
+            {title}
+          </Text>
           <Text style={[styles.line, { color: palette.ink }]}>
             {t("learnerStage.completion.score", { correct: correctCount, total, score })}
           </Text>

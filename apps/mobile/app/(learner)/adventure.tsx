@@ -6,10 +6,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
 import { AivoButton } from "@aivo/mobile-ui";
 import { colors, spacing } from "@/constants/colors";
+import { useResponsiveType } from "@/src/design/useResponsiveType";
 
 export default function AdventureScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const type = useResponsiveType();
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + 16 }]}>
@@ -19,7 +21,19 @@ export default function AdventureScreen() {
       </Pressable>
 
       <View style={styles.content}>
-        <Text style={styles.title}>{t("learnerAdventure.title")}</Text>
+        <Text
+          style={[
+            styles.title,
+            {
+              // Preserve the 28pt phone baseline; only step up on tablet
+              // where useResponsiveType amplifies h1 past it.
+              fontSize: Math.max(styles.title.fontSize, type.h1.fontSize),
+              lineHeight: Math.max(styles.title.fontSize + 4, type.h1.lineHeight),
+            },
+          ]}
+        >
+          {t("learnerAdventure.title")}
+        </Text>
         <Text style={styles.subtitle}>{t("learnerAdventure.subtitle")}</Text>
 
         <View style={styles.chapters}>

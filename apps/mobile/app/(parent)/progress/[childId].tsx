@@ -4,6 +4,7 @@ import { useLocalSearchParams, router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useResponsiveType } from "@/src/design/useResponsiveType";
 import { useLearner } from "@/hooks/useLearners";
 import { useBrainDomains } from "@/hooks/useBrain";
 import { AivoCard, StatCard, LoadingState } from "@aivo/mobile-ui";
@@ -17,6 +18,7 @@ export default function ProgressScreen() {
     enrolledGrade: learner?.gradeLevel ?? null,
   });
   const { t } = useTranslation();
+  const type = useResponsiveType();
 
   if (isLoading) return <LoadingState />;
 
@@ -30,7 +32,7 @@ export default function ProgressScreen() {
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
 
-      <Text style={styles.title}>
+      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>
         {t("parentProgress.title", { name: learner?.firstName || "" })}
       </Text>
       <Text style={styles.subtitle}>{t("parentProgress.subtitle")}</Text>

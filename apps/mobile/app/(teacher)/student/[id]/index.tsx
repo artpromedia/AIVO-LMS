@@ -4,6 +4,7 @@ import { useLocalSearchParams, router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useResponsiveType } from "@/src/design/useResponsiveType";
 import { useLearner } from "@/hooks/useLearners";
 import { AivoCard, AivoButton } from "@aivo/mobile-ui";
 import BrainCloneCard from "@/src/components/brain/BrainCloneCard";
@@ -11,6 +12,7 @@ import { colors, spacing } from "@/constants/colors";
 
 export default function StudentBrainProfile() {
   const { t } = useTranslation();
+  const type = useResponsiveType();
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const { data: learner } = useLearner(id);
@@ -26,7 +28,7 @@ export default function StudentBrainProfile() {
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
 
-      <Text style={styles.title}>
+      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>
         {t("teacherStudent.brain", { name: learner?.firstName || "Student" })}
       </Text>
       <Text style={styles.subtitle}>{t("teacherStudent.readOnlyProfile")}</Text>

@@ -4,6 +4,7 @@ import { useLocalSearchParams, router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useResponsiveType } from "@/src/design/useResponsiveType";
 import {
   useCollaboration,
   useInviteMember,
@@ -24,6 +25,7 @@ export default function TeamScreen() {
   const [credentials, setCredentials] = useState("");
   const [relationship, setRelationship] = useState("");
   const { t } = useTranslation();
+  const type = useResponsiveType();
 
   const handleInvite = async () => {
     const email = inviteEmail.trim();
@@ -100,7 +102,7 @@ export default function TeamScreen() {
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
 
-      <Text style={styles.title}>{t("parentTeam.title")}</Text>
+      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>{t("parentTeam.title")}</Text>
       <Text style={styles.subtitle}>{t("parentTeam.subtitle", { name: "" })}</Text>
 
       <View style={styles.seatCards}>
