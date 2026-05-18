@@ -1,0 +1,170 @@
+{
+  "schemaVersion": "2026-05-18.k8-authoring.v1",
+  "metadata": {
+    "name": "AIVO K-8 Authoring Sample Pack",
+    "version": "0.1.0",
+    "academicYear": "2026-2027",
+    "publisher": "AIVO Curriculum Team",
+    "sourceNotes": "Small sample pack for validating authoring workflow only; not a complete K-8 curriculum.",
+    "expertReviews": [
+      {
+        "status": "sme_approved",
+        "reviewerRole": "math_curriculum_designer",
+        "reviewedBy": "Sample Math SME",
+        "reviewedAt": "2026-05-18T00:00:00.000Z",
+        "notes": "Sample approval used to exercise validation gates. Replace with real SME record before production use."
+      },
+      {
+        "status": "sme_approved",
+        "reviewerRole": "sped_specialist",
+        "reviewedBy": "Sample SPED Reviewer",
+        "reviewedAt": "2026-05-18T00:00:00.000Z",
+        "notes": "Sample approval used to exercise accessibility/accommodation validation gates."
+      }
+    ]
+  },
+  "standards": [
+    {
+      "code": "K.CC.A.1",
+      "framework": "CCSS-Math",
+      "jurisdiction": "US",
+      "strand": "Counting and Cardinality",
+      "description": "Count to 100 by ones and by tens."
+    },
+    {
+      "code": "K.CC.B.4",
+      "framework": "CCSS-Math",
+      "jurisdiction": "US",
+      "strand": "Counting and Cardinality",
+      "description": "Understand the relationship between numbers and quantities and connect counting to cardinality."
+    }
+  ],
+  "skills": [
+    {
+      "id": "ccss.math.k.cc.a.1",
+      "subject": "math",
+      "gradeBand": "K",
+      "domain": "Counting and Cardinality",
+      "strand": "Number sequence",
+      "title": "Count by ones",
+      "description": "I can count forward by ones in the correct order.",
+      "standardCodes": ["K.CC.A.1"],
+      "prerequisiteSkillIds": [],
+      "masteryCriteria": { "minAccuracy": 0.8, "minOpportunities": 5, "retentionWindowDays": 14 },
+      "accessibilitySupports": [
+        { "category": "presentation", "support": "Provide visual number line and audio directions.", "preservesConstruct": true },
+        { "category": "response", "support": "Allow pointing, tapping, or verbal response.", "preservesConstruct": true }
+      ],
+      "review": {
+        "status": "sme_approved",
+        "reviewerRole": "math_curriculum_designer",
+        "reviewedBy": "Sample Math SME",
+        "reviewedAt": "2026-05-18T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "ccss.math.k.cc.b.4",
+      "subject": "math",
+      "gradeBand": "K",
+      "domain": "Counting and Cardinality",
+      "strand": "Cardinality",
+      "title": "Connect counting to quantity",
+      "description": "I can count objects and say how many objects are in the group.",
+      "standardCodes": ["K.CC.B.4"],
+      "prerequisiteSkillIds": ["ccss.math.k.cc.a.1"],
+      "masteryCriteria": { "minAccuracy": 0.8, "minOpportunities": 5, "retentionWindowDays": 14 },
+      "accessibilitySupports": [
+        { "category": "presentation", "support": "Use manipulatives or clear object images with adequate spacing.", "preservesConstruct": true },
+        { "category": "executive_function", "support": "Permit one-at-a-time object highlighting.", "preservesConstruct": true }
+      ],
+      "review": {
+        "status": "sme_approved",
+        "reviewerRole": "math_curriculum_designer",
+        "reviewedBy": "Sample Math SME",
+        "reviewedAt": "2026-05-18T00:00:00.000Z"
+      }
+    }
+  ],
+  "templates": [
+    {
+      "id": "k.math.counting-cardinality.sample",
+      "name": "Kindergarten Counting and Cardinality Sample",
+      "description": "A minimal sample template that demonstrates unit, lesson, standards, skill, and accessibility metadata for curriculum ingestion.",
+      "subject": "math",
+      "gradeBand": "K",
+      "baseStandards": ["K.CC.A.1", "K.CC.B.4"],
+      "tags": ["sample", "counting", "cardinality", "not-complete-curriculum"],
+      "unitBlueprints": [
+        {
+          "title": "Counting and Quantity Foundations",
+          "description": "Learners practice counting forward and connecting the last counted number to the quantity in a set.",
+          "essentialQuestions": ["How do numbers help us describe how many objects are in a group?"],
+          "bigIdeas": ["Counting follows a stable order and the last number counted names the quantity of the set."],
+          "durationDays": 10,
+          "skillIds": ["ccss.math.k.cc.a.1", "ccss.math.k.cc.b.4"],
+          "standardCodes": ["K.CC.A.1", "K.CC.B.4"],
+          "lessonTopics": [
+            {
+              "title": "Count objects in a small set",
+              "objectives": ["Count objects one by one and identify the total number in the set."],
+              "durationMin": 20,
+              "lessonType": "guided-practice",
+              "materials": ["digital counters", "number line", "audio prompt"],
+              "skillIds": ["ccss.math.k.cc.a.1", "ccss.math.k.cc.b.4"],
+              "standardCodes": ["K.CC.A.1", "K.CC.B.4"],
+              "accessibilitySupports": [
+                { "category": "timing", "support": "Allow extended wait time before answer submission.", "preservesConstruct": true }
+              ],
+              "review": {
+                "status": "sme_approved",
+                "reviewerRole": "math_curriculum_designer",
+                "reviewedBy": "Sample Math SME",
+                "reviewedAt": "2026-05-18T00:00:00.000Z"
+              }
+            }
+          ],
+          "review": {
+            "status": "sme_approved",
+            "reviewerRole": "math_curriculum_designer",
+            "reviewedBy": "Sample Math SME",
+            "reviewedAt": "2026-05-18T00:00:00.000Z"
+          }
+        }
+      ],
+      "review": {
+        "status": "sme_approved",
+        "reviewerRole": "math_curriculum_designer",
+        "reviewedBy": "Sample Math SME",
+        "reviewedAt": "2026-05-18T00:00:00.000Z"
+      }
+    }
+  ],
+  "itemBankItems": [
+    {
+      "id": "k.math.counting.001",
+      "skillId": "ccss.math.k.cc.b.4",
+      "subject": "math",
+      "gradeBand": "K",
+      "standardCodes": ["K.CC.B.4"],
+      "questionType": "multiple-choice",
+      "prompt": "Count the three stars. How many stars are there?",
+      "choices": [
+        { "id": "A", "text": "2", "isCorrect": false },
+        { "id": "B", "text": "3", "isCorrect": true },
+        { "id": "C", "text": "4", "isCorrect": false }
+      ],
+      "correctAnswer": "B",
+      "cognitiveLevel": "apply",
+      "difficulty": 0.2,
+      "accessibilitySupports": [
+        { "category": "presentation", "support": "Read prompt aloud and provide high-contrast object images.", "preservesConstruct": true }
+      ],
+      "review": {
+        "status": "sme_approved",
+        "reviewerRole": "assessment_specialist",
+        "reviewedBy": "Sample Assessment SME",
+        "reviewedAt": "2026-05-18T00:00:00.000Z"
+      }
+    }
+  ]
+}
