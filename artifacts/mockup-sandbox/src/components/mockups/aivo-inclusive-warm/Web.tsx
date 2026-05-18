@@ -29,13 +29,12 @@ export function Web() {
       <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-xl border-b border-border/50">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-10">
-            <a href="#" className="flex items-center" aria-label="AIVO home">
-              <span
-                className="aivo-display text-3xl font-bold tracking-tight bg-clip-text text-transparent"
-                style={{ backgroundImage: "linear-gradient(135deg, #3b82f6 0%, #a78bfa 100%)" }}
-              >
-                AIVO
-              </span>
+            <a href="#" className="flex items-center" aria-label="Aivo Learning home">
+              <img
+                src="/__mockup/images/aivo-inclusive-warm/brand/aivo-logo-purple.png"
+                alt="Aivo Learning"
+                className="h-10 w-auto"
+              />
             </a>
             <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
               <a href="#" className="hover:text-foreground transition-colors">Platform</a>
@@ -297,12 +296,11 @@ export function Web() {
         <div className="container mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
           <div>
             <div className="flex items-center mb-6">
-              <span
-                className="aivo-display text-2xl font-bold tracking-tight bg-clip-text text-transparent"
-                style={{ backgroundImage: "linear-gradient(135deg, #3b82f6 0%, #a78bfa 100%)" }}
-              >
-                AIVO
-              </span>
+              <img
+                src="/__mockup/images/aivo-inclusive-warm/brand/aivo-logo-purple.png"
+                alt="Aivo Learning"
+                className="h-9 w-auto"
+              />
             </div>
             <p className="text-sm text-muted-foreground font-medium leading-relaxed">
               Engineered for the margins.<br/>
