@@ -450,6 +450,24 @@ uri = "file://artifacts/mockup-sandbox/public/images/aivo-inclusive-lab/companio
 type = "image"
 title = "Abstract geometric companion"
 
+[[generated]]
+id = "_r0ZzA9cCuKqePCt-moYa"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-inclusive-warm/hero-3d.png"
+type = "image"
+title = "3D child exploring a book"
+
+[[generated]]
+id = "g7R5102oYKewuwfYbqqOQ"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-inclusive-warm/parent-child-3d.png"
+type = "image"
+title = "3D parent and child together"
+
+[[generated]]
+id = "qiJwgNFtzWYUkiP3HxjaU"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-inclusive-warm/companion-3d.png"
+type = "image"
+title = "3D friendly companion figure"
+
 [[outputs]]
 id = "0e7lRmti5tdoSwrX0-ySG"
 uri = "file://.local/preview/marketing-hero.jpg"
