@@ -32,7 +32,9 @@ export default async function Page({ params }: Params) {
       <Card className="p-[var(--aivo-density-card-pad)]">
         <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">Roster</p>
         {learners.length === 0 ? (
-          <p className="mt-2 text-sm text-aivo-muted">No learners yet. Ask your school admin to assign learners or run a roster import.</p>
+          <p className="mt-2 text-sm text-aivo-muted">
+            No learners yet. Ask your school admin to assign learners or run a roster import.
+          </p>
         ) : (
           <ul className="mt-2 space-y-1 text-sm">
             {learners.map((e) => (

@@ -54,19 +54,19 @@ jobs:
       fail-fast: false
       matrix:
         target:
-          - lint-typecheck      # 1
-          - identity-svc        # 2
-          - admin-svc           # 3
-          - billing-svc         # 4
-          - learning-svc        # 5
-          - assessment-svc      # 6
-          - comms-svc           # 7
-          - integrations-svc    # 8
-          - web-app             # 9
-          - marketing-site      # 10
-          - brain-svc           # 11 (python)
-          - ai-svc              # 12 (python)
-          - curriculum-svc      # 13 (python)
+          - lint-typecheck # 1
+          - identity-svc # 2
+          - admin-svc # 3
+          - billing-svc # 4
+          - learning-svc # 5
+          - assessment-svc # 6
+          - comms-svc # 7
+          - integrations-svc # 8
+          - web-app # 9
+          - marketing-site # 10
+          - brain-svc # 11 (python)
+          - ai-svc # 12 (python)
+          - curriculum-svc # 13 (python)
     steps:
       - uses: actions/checkout@v4
 

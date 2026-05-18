@@ -8,7 +8,7 @@ AIVO automatically — there is no nightly CSV import to maintain.
 ## Quick start
 
 1. **Issue a SCIM bearer token** in the AIVO district console under
-   *Settings → Single Sign-On → SCIM provisioning tokens*. Copy the token
+   _Settings → Single Sign-On → SCIM provisioning tokens_. Copy the token
    immediately — AIVO never shows it again.
 2. **Note your endpoints**:
    - Base URL: `https://app.aivolearning.com/scim/v2`
@@ -22,17 +22,17 @@ AIVO automatically — there is no nightly CSV import to maintain.
 
 ## Supported features
 
-| Feature | Status |
-| --- | --- |
-| Users — create, read, update, replace, deactivate | ✅ |
-| Users — hard delete | ✅ (treated as deactivate) |
-| Filter `userName eq "..."` | ✅ |
-| Filter `emails[type eq "work"].value eq "..."` | ✅ |
-| Boolean filters with `and` / `or` | ✅ |
-| Pagination (`startIndex`, `count`) | ✅ |
-| PATCH operations (`replace`, `add`, `remove`) | ✅ |
-| Groups — read, list (membership read-only) | ✅ |
-| Groups — create / write membership | ❌ Use SAML role mapping instead |
+| Feature                                           | Status                           |
+| ------------------------------------------------- | -------------------------------- |
+| Users — create, read, update, replace, deactivate | ✅                               |
+| Users — hard delete                               | ✅ (treated as deactivate)       |
+| Filter `userName eq "..."`                        | ✅                               |
+| Filter `emails[type eq "work"].value eq "..."`    | ✅                               |
+| Boolean filters with `and` / `or`                 | ✅                               |
+| Pagination (`startIndex`, `count`)                | ✅                               |
+| PATCH operations (`replace`, `add`, `remove`)     | ✅                               |
+| Groups — read, list (membership read-only)        | ✅                               |
+| Groups — create / write membership                | ❌ Use SAML role mapping instead |
 
 > **Roles:** Provisioning is restricted to `DISTRICT_ADMIN`, `TEACHER`,
 > `CAREGIVER`, and `THERAPIST`. Requests that try to provision a
@@ -41,34 +41,34 @@ AIVO automatically — there is no nightly CSV import to maintain.
 
 ## Microsoft Entra ID (Azure AD)
 
-1. In Entra → *Enterprise applications* → *New application* → search for
+1. In Entra → _Enterprise applications_ → _New application_ → search for
    "Non-gallery application" and create it as **AIVO**.
-2. Open *Provisioning* → set mode to **Automatic**.
-3. Under *Admin Credentials*, paste:
+2. Open _Provisioning_ → set mode to **Automatic**.
+3. Under _Admin Credentials_, paste:
    - **Tenant URL:** `https://app.aivolearning.com/scim/v2`
    - **Secret Token:** the bearer token from the AIVO console
 4. Click **Test Connection** — Entra issues a `GET /Users?count=1`. You
-   should see *"The supplied credentials are authorized..."*.
-5. Under *Mappings → Provision Microsoft Entra ID Users*, leave the
+   should see _"The supplied credentials are authorized..."_.
+5. Under _Mappings → Provision Microsoft Entra ID Users_, leave the
    default attribute mappings. Confirm `userPrincipalName → userName`,
    `mail → emails[type eq "work"].value`, and that the SCIM
    `urn:ietf:params:scim:schemas:extension:enterprise:2.0:User` attributes
    are mapped if you want manager / department metadata.
-6. Set the **Scope** to *Sync only assigned users and groups*, assign the
+6. Set the **Scope** to _Sync only assigned users and groups_, assign the
    group of staff who should appear in AIVO, and click **Save** → **Start
    provisioning**.
 
 ### Role mapping with Entra
 
-AIVO reads the SAML attribute named in *Settings → SSO → Advanced →
-Role attribute* (default `https://aivo/role`). To send roles from Entra:
+AIVO reads the SAML attribute named in _Settings → SSO → Advanced →
+Role attribute_ (default `https://aivo/role`). To send roles from Entra:
 
-1. In *Single sign-on → User Attributes & Claims*, add a new claim:
+1. In _Single sign-on → User Attributes & Claims_, add a new claim:
    - **Name:** `https://aivo/role`
    - **Source:** `user.assignedroles`
 2. Define app roles for AIVO (`aivo-district-admin`, `aivo-teacher`,
    `aivo-caregiver`, `aivo-therapist`).
-3. Map them in the AIVO console under *Advanced → Role map*:
+3. Map them in the AIVO console under _Advanced → Role map_:
    ```
    aivo-district-admin=DISTRICT_ADMIN
    aivo-teacher=TEACHER
@@ -78,27 +78,27 @@ Role attribute* (default `https://aivo/role`). To send roles from Entra:
 
 ## Okta
 
-1. In Okta → *Applications* → *Create App Integration* → choose **SAML 2.0**
+1. In Okta → _Applications_ → _Create App Integration_ → choose **SAML 2.0**
    (or use the AIVO catalog entry once published).
 2. Configure SAML: paste the ACS URL and Entity ID from the AIVO SSO
    settings page; upload the SP metadata if Okta requires it.
-3. Open the new app's *Provisioning* tab → **Configure API Integration**:
-   - Check *Enable API integration*.
+3. Open the new app's _Provisioning_ tab → **Configure API Integration**:
+   - Check _Enable API integration_.
    - **Base URL:** `https://app.aivolearning.com/scim/v2`
    - **API Token:** AIVO bearer token
    - Click **Test API Credentials** → save.
-4. Under *Provisioning → To App*, enable **Create Users**, **Update User
+4. Under _Provisioning → To App_, enable **Create Users**, **Update User
    Attributes**, and **Deactivate Users**.
-5. Under *Profile Editor*, ensure the `aivoRole` attribute exists (string)
+5. Under _Profile Editor_, ensure the `aivoRole` attribute exists (string)
    and is mapped from your Okta directory or assigned per-group.
 6. Assign the AIVO app to the staff group and save.
 
 ### Role mapping with Okta
 
-In *Sign On → SAML 2.0 → Edit attribute statements*, add:
+In _Sign On → SAML 2.0 → Edit attribute statements_, add:
 
-| Name | Name format | Value |
-| --- | --- | --- |
+| Name                | Name format   | Value              |
+| ------------------- | ------------- | ------------------ |
 | `https://aivo/role` | URI Reference | `appuser.aivoRole` |
 
 Then populate `aivoRole` either per-user or via Okta group rules.
@@ -126,7 +126,7 @@ empty result set rather than 400 — file a ticket if your IdP needs them.
   configured; SCIM only sets up the account, SAML is what authenticates
   the session.
 - **Deactivated user reactivated unexpectedly** — Entra sends `active:
-  true` on every sync if the user is still in the assigned group. AIVO
+true` on every sync if the user is still in the assigned group. AIVO
   honours that — to truly remove access, unassign the user from the AIVO
   group in the IdP.
 

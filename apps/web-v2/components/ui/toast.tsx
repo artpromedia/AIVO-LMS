@@ -26,10 +26,7 @@ export const Toast = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitive.Root
     ref={ref}
-    className={cn(
-      "rounded-lg border border-aivo-border bg-aivo-surface p-4 shadow-md",
-      className,
-    )}
+    className={cn("rounded-lg border border-aivo-border bg-aivo-surface p-4 shadow-md", className)}
     {...props}
   />
 ));

@@ -20,8 +20,7 @@ export default async function Page() {
   const settings = getTenantSettings(session.tenantId);
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const stats = getDistrictStats(tenants.map((t) => t.id));
-  const districtName =
-    settings.branding.displayName ?? tenant?.name ?? "District";
+  const districtName = settings.branding.displayName ?? tenant?.name ?? "District";
 
   const subPages: Array<{
     href: string;
@@ -41,10 +40,8 @@ export default async function Page() {
     {
       href: "/admin/district/settings/sso",
       title: "SSO & SCIM",
-      description:
-        "SAML/OIDC sign-in and SCIM provisioning for staff and learner directory sync.",
-      badge:
-        settings.sso.mode === "off" ? "Not configured" : settings.sso.mode.toUpperCase(),
+      description: "SAML/OIDC sign-in and SCIM provisioning for staff and learner directory sync.",
+      badge: settings.sso.mode === "off" ? "Not configured" : settings.sso.mode.toUpperCase(),
       Icon: ShieldCheck,
     },
     {
@@ -92,9 +89,7 @@ export default async function Page() {
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-aivo-ink-soft">Support email</dt>
-              <dd className="font-medium">
-                {settings.branding.supportEmail ?? "—"}
-              </dd>
+              <dd className="font-medium">{settings.branding.supportEmail ?? "—"}</dd>
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-aivo-ink-soft">Last update</dt>
@@ -122,9 +117,7 @@ export default async function Page() {
                   </span>
                   <Badge tone="neutral">{badge}</Badge>
                 </div>
-                <p className="mt-3 font-display text-lg font-semibold">
-                  {title}
-                </p>
+                <p className="mt-3 font-display text-lg font-semibold">{title}</p>
                 <p className="mt-1 text-sm text-aivo-ink-soft">{description}</p>
                 <p className="mt-3 inline-flex items-center text-sm font-medium text-aivo-primary">
                   Manage <ArrowRight className="ml-1 h-3.5 w-3.5" />

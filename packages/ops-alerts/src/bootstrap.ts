@@ -43,7 +43,9 @@ export interface OpsAlertBootstrap {
  *   OPS_ALERTS_AUTOFLUSH_MS, OPS_ALERTS_SHUTDOWN_WINDOW_MS,
  *   OPS_ALERTS_SHUTDOWN_PERSIST_PATH, INTERNAL_SERVICE_TOKEN.
  */
-export async function bootstrapOpsAlerts(opts: OpsAlertBootstrapOptions): Promise<OpsAlertBootstrap> {
+export async function bootstrapOpsAlerts(
+  opts: OpsAlertBootstrapOptions,
+): Promise<OpsAlertBootstrap> {
   const proxyUrl = process.env.ALERTS_PROXY_URL || "http://alerts-proxy-svc:3016";
   const { store, pgRequestedButUnwired } = await opsAlertOutboxStoreFromEnv({
     service: opts.service,
@@ -58,7 +60,8 @@ export async function bootstrapOpsAlerts(opts: OpsAlertBootstrapOptions): Promis
   });
   client.startAutoFlush();
 
-  const persistPath = opts.shutdownPersistPath ?? process.env.OPS_ALERTS_SHUTDOWN_PERSIST_PATH ?? undefined;
+  const persistPath =
+    opts.shutdownPersistPath ?? process.env.OPS_ALERTS_SHUTDOWN_PERSIST_PATH ?? undefined;
   const durableStore: OpsAlertOutboxStore | undefined =
     persistPath && store.kind === "memory" ? new FileOpsAlertOutboxStore(persistPath) : undefined;
 

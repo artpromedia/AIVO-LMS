@@ -28,9 +28,7 @@ export interface FreshnessWatchdogDiscoveryStore {
   list(): Promise<FreshnessWatchdogDiscovery[]>;
 }
 
-export function makeFreshnessWatchdogDiscoveryStore(
-  db: any,
-): FreshnessWatchdogDiscoveryStore {
+export function makeFreshnessWatchdogDiscoveryStore(db: any): FreshnessWatchdogDiscoveryStore {
   return {
     async recordSeen(jobName, now = new Date()) {
       const [row] = await db

@@ -4,9 +4,21 @@ import { useRouter, useParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import {
-  ArrowLeft, ChevronLeft, ChevronRight, Check, Heart, HelpCircle,
-  Sparkles, Compass, CheckCircle2, Save, Cloud, CloudOff, GripVertical,
-  ShieldCheck, ListChecks,
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  Check,
+  Heart,
+  HelpCircle,
+  Sparkles,
+  Compass,
+  CheckCircle2,
+  Save,
+  Cloud,
+  CloudOff,
+  GripVertical,
+  ShieldCheck,
+  ListChecks,
 } from "lucide-react";
 import { IconWell } from "@/components/discovery/_vi";
 import SectionJourneyGraphic from "@/components/SectionJourneyGraphic";
@@ -74,21 +86,14 @@ function isAnswered(q: AssessmentQuestion, value: AnswerValue): boolean {
   return true;
 }
 
-function countAnswered(
-  section: AssessmentSection,
-  answers: Answers,
-  band: AgeBand | null,
-): number {
+function countAnswered(section: AssessmentSection, answers: Answers, band: AgeBand | null): number {
   return visibleQuestions(section, band).reduce(
     (n, q) => n + (isAnswered(q, answers[q.id] ?? null) ? 1 : 0),
     0,
   );
 }
 
-function countTotal(
-  section: AssessmentSection,
-  band: AgeBand | null,
-): number {
+function countTotal(section: AssessmentSection, band: AgeBand | null): number {
   return visibleQuestions(section, band).length;
 }
 
@@ -238,12 +243,16 @@ export default function ParentAssessmentPage() {
       try {
         const [learnersRes, statusRes, baselineRes] = await Promise.all([
           fetch("/api/users/learners", { headers: { Authorization: `Bearer ${accessToken}` } }),
-          fetch(`/api/assessments/parent/${learnerId}/status`, { headers: { Authorization: `Bearer ${accessToken}` } }),
+          fetch(`/api/assessments/parent/${learnerId}/status`, {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          }),
           // Also probe the learner's baseline (discovery) status so the
           // already-completed screen can hide the "Start Baseline" CTA
           // when both intake and baseline are already done (e.g. when a
           // newly-invited caregiver lands here for an existing learner).
-          fetch(`/api/assessments/learner/discovery/${learnerId}/status`, { headers: { Authorization: `Bearer ${accessToken}` } }),
+          fetch(`/api/assessments/learner/discovery/${learnerId}/status`, {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          }),
         ]);
         if (learnersRes.ok) {
           const learners: any[] = await learnersRes.json();
@@ -261,20 +270,26 @@ export default function ParentAssessmentPage() {
           const bs = await baselineRes.json();
           if (bs?.baselineCompleted) setBaselineCompleted(true);
         }
-      } catch { /* swallow — status check is best-effort */ }
+      } catch {
+        /* swallow — status check is best-effort */
+      }
 
       // Restore draft from localStorage (framework §6: resumable across sittings)
       try {
-        const raw = typeof window !== "undefined" ? localStorage.getItem(draftKey(learnerId)) : null;
+        const raw =
+          typeof window !== "undefined" ? localStorage.getItem(draftKey(learnerId)) : null;
         if (raw) {
           const draft = JSON.parse(raw);
           if (draft?.answers) setAnswers(draft.answers);
           if (draft?.otherText) setOtherText(draft.otherText);
-          if (typeof draft?.currentSectionIdx === "number") setCurrentSectionIdx(draft.currentSectionIdx);
+          if (typeof draft?.currentSectionIdx === "number")
+            setCurrentSectionIdx(draft.currentSectionIdx);
           if (draft?.consentGiven) setScreen("section");
           setDraftRestored(true);
         }
-      } catch { /* ignore corrupt drafts */ }
+      } catch {
+        /* ignore corrupt drafts */
+      }
 
       setCheckingStatus(false);
     })();
@@ -302,8 +317,18 @@ export default function ParentAssessmentPage() {
         setSaveStatus("idle");
       }
     }, 600);
-    return () => { if (saveTimer.current) clearTimeout(saveTimer.current); };
-  }, [answers, otherText, currentSectionIdx, learnerId, checkingStatus, alreadyCompleted, submitted]);
+    return () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+    };
+  }, [
+    answers,
+    otherText,
+    currentSectionIdx,
+    learnerId,
+    checkingStatus,
+    alreadyCompleted,
+    submitted,
+  ]);
 
   // ── Answer setters ──────────────────────────────────────────────────────
   const setAnswer = useCallback((id: string, value: AnswerValue) => {
@@ -395,7 +420,8 @@ export default function ParentAssessmentPage() {
       );
       // Scroll the missing field into view on next paint.
       setTimeout(() => {
-        const el = typeof document !== "undefined" ? document.getElementById(`q-${first.questionId}`) : null;
+        const el =
+          typeof document !== "undefined" ? document.getElementById(`q-${first.questionId}`) : null;
         el?.scrollIntoView({ behavior: "smooth", block: "center" });
       }, 100);
       return;
@@ -446,7 +472,11 @@ export default function ParentAssessmentPage() {
         const data = await res.json();
         setResult(data);
         setSubmitted(true);
-        try { localStorage.removeItem(draftKey(learnerId)); } catch { /* ignore */ }
+        try {
+          localStorage.removeItem(draftKey(learnerId));
+        } catch {
+          /* ignore */
+        }
       } else if (res.status === 401) {
         setSubmitError(t("session_expired_retry"));
       } else {
@@ -462,23 +492,29 @@ export default function ParentAssessmentPage() {
   // ── Render guards ───────────────────────────────────────────────────────
   if (loading || !user || checkingStatus) return null;
 
-  if (alreadyCompleted && !submitted) return <AlreadyCompletedScreen
-    learnerName={learnerName}
-    learnerFunctioningLevel={learnerFunctioningLevel}
-    baselineCompleted={baselineCompleted}
-    onStartBaseline={() => router.push(`/dashboard/learner/assessment?learnerId=${learnerId}`)}
-    onViewBrain={() => router.push(`/dashboard/parent/learner/${learnerId}/brain`)}
-    onBackToProfile={() => router.push(`/dashboard/parent/learner/${learnerId}`)}
-    onBackToDashboard={() => router.push("/dashboard/parent")}
-    t={t}
-  />;
+  if (alreadyCompleted && !submitted)
+    return (
+      <AlreadyCompletedScreen
+        learnerName={learnerName}
+        learnerFunctioningLevel={learnerFunctioningLevel}
+        baselineCompleted={baselineCompleted}
+        onStartBaseline={() => router.push(`/dashboard/learner/assessment?learnerId=${learnerId}`)}
+        onViewBrain={() => router.push(`/dashboard/parent/learner/${learnerId}/brain`)}
+        onBackToProfile={() => router.push(`/dashboard/parent/learner/${learnerId}`)}
+        onBackToDashboard={() => router.push("/dashboard/parent")}
+        t={t}
+      />
+    );
 
-  if (submitted && result) return <SubmittedScreen
-    result={result}
-    onContinue={() => router.push(`/dashboard/parent`)}
-    onContinueToBrain={() => router.push(`/dashboard/parent/learner/${learnerId}/brain-review`)}
-    t={t}
-  />;
+  if (submitted && result)
+    return (
+      <SubmittedScreen
+        result={result}
+        onContinue={() => router.push(`/dashboard/parent`)}
+        onContinueToBrain={() => router.push(`/dashboard/parent/learner/${learnerId}/brain-review`)}
+        t={t}
+      />
+    );
 
   // ── Welcome screen (Section 0) ──────────────────────────────────────────
   if (screen === "welcome") {
@@ -525,16 +561,29 @@ export default function ParentAssessmentPage() {
         />
         <main className="max-w-2xl mx-auto px-4 sm:px-6 py-6 space-y-5">
           <SectionJourneyGraphic
-            sections={REAL_SECTIONS.map((s) => ({ key: s.key, label: s.label, shortLabel: s.shortLabel, icon: s.icon }))}
+            sections={REAL_SECTIONS.map((s) => ({
+              key: s.key,
+              label: s.label,
+              shortLabel: s.shortLabel,
+              icon: s.icon,
+            }))}
             currentIdx={REAL_SECTIONS.length}
-            completed={REAL_SECTIONS.map((s) => countAnswered(s, answers, currentBand) === countTotal(s, currentBand))}
-            onJump={(i) => { setScreen("section"); goToSection(i); }}
+            completed={REAL_SECTIONS.map(
+              (s) => countAnswered(s, answers, currentBand) === countTotal(s, currentBand),
+            )}
+            onJump={(i) => {
+              setScreen("section");
+              goToSection(i);
+            }}
           />
           <SectionProgressChips
             currentIdx={REAL_SECTIONS.length}
             answers={answers}
             band={currentBand}
-            onJump={(i) => { setScreen("section"); goToSection(i); }}
+            onJump={(i) => {
+              setScreen("section");
+              goToSection(i);
+            }}
           />
           <WrapUpScreen
             section={WRAP_UP}
@@ -543,7 +592,10 @@ export default function ParentAssessmentPage() {
             learnerId={learnerId}
             accessToken={accessToken}
             onAnswer={setAnswer}
-            onBack={() => { setScreen("section"); goToSection(REAL_SECTIONS.length - 1); }}
+            onBack={() => {
+              setScreen("section");
+              goToSection(REAL_SECTIONS.length - 1);
+            }}
             onSubmit={submit}
             submitting={submitting}
             submitError={submitError}
@@ -567,18 +619,25 @@ export default function ParentAssessmentPage() {
       <Header
         learnerName={learnerName}
         totalAnswered={totalAnswered}
-          totalVisible={visibleTotal}
+        totalVisible={visibleTotal}
         overallPct={overallPct}
         saveStatus={saveStatus}
         onBack={() => router.push("/dashboard/parent")}
         tc={tc}
-          t={t}
+        t={t}
       />
       <main className="max-w-2xl mx-auto px-4 sm:px-6 py-6 space-y-5">
         <SectionJourneyGraphic
-          sections={REAL_SECTIONS.map((s) => ({ key: s.key, label: s.label, shortLabel: s.shortLabel, icon: s.icon }))}
+          sections={REAL_SECTIONS.map((s) => ({
+            key: s.key,
+            label: s.label,
+            shortLabel: s.shortLabel,
+            icon: s.icon,
+          }))}
           currentIdx={currentSectionIdx}
-          completed={REAL_SECTIONS.map((s) => countAnswered(s, answers, currentBand) === countTotal(s, currentBand))}
+          completed={REAL_SECTIONS.map(
+            (s) => countAnswered(s, answers, currentBand) === countTotal(s, currentBand),
+          )}
           onJump={goToSection}
         />
         <SectionProgressChips
@@ -601,7 +660,11 @@ export default function ParentAssessmentPage() {
         {submitError && (
           <div
             className="vi-card p-3 text-sm font-semibold text-center"
-            style={{ background: "hsl(0 72% 51% / 0.06)", borderColor: "hsl(0 72% 51% / 0.3)", color: "hsl(0 72% 51%)" }}
+            style={{
+              background: "hsl(0 72% 51% / 0.06)",
+              borderColor: "hsl(0 72% 51% / 0.3)",
+              color: "hsl(0 72% 51%)",
+            }}
           >
             {submitError}
           </div>
@@ -626,7 +689,14 @@ export default function ParentAssessmentPage() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function Header({
-  learnerName, totalAnswered, totalVisible, overallPct, saveStatus, onBack, tc, t,
+  learnerName,
+  totalAnswered,
+  totalVisible,
+  overallPct,
+  saveStatus,
+  onBack,
+  tc,
+  t,
 }: {
   learnerName: string;
   totalAnswered: number;
@@ -648,11 +718,17 @@ function Header({
           <ArrowLeft className="w-4 h-4" /> {tc("back")}
         </button>
         <div className="hidden sm:flex items-center gap-2 min-w-0">
-          <IconWell color="primary" size="sm"><Sparkles className="w-4 h-4" strokeWidth={2.5} /></IconWell>
+          <IconWell color="primary" size="sm">
+            <Sparkles className="w-4 h-4" strokeWidth={2.5} />
+          </IconWell>
           <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-wider vi-text-muted opacity-70 truncate">{t("header_eyebrow")}</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider vi-text-muted opacity-70 truncate">
+              {t("header_eyebrow")}
+            </p>
             <p className="text-sm font-extrabold vi-text truncate">
-              {learnerName ? t("header_title_with_name", { name: learnerName }) : t("header_title_default")}
+              {learnerName
+                ? t("header_title_with_name", { name: learnerName })
+                : t("header_title_default")}
             </p>
           </div>
         </div>
@@ -673,7 +749,13 @@ function Header({
   );
 }
 
-function SaveIndicator({ status, t }: { status: "idle" | "saving" | "saved"; t: ReturnType<typeof useTranslations> }) {
+function SaveIndicator({
+  status,
+  t,
+}: {
+  status: "idle" | "saving" | "saved";
+  t: ReturnType<typeof useTranslations>;
+}) {
   if (status === "idle") return null;
   const isSaving = status === "saving";
   return (
@@ -681,7 +763,11 @@ function SaveIndicator({ status, t }: { status: "idle" | "saving" | "saved"; t: 
       className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-bold vi-text-muted whitespace-nowrap"
       aria-live="polite"
     >
-      {isSaving ? <Cloud className="w-3.5 h-3.5 animate-pulse" /> : <CloudOff className="w-3.5 h-3.5 opacity-60" />}
+      {isSaving ? (
+        <Cloud className="w-3.5 h-3.5 animate-pulse" />
+      ) : (
+        <CloudOff className="w-3.5 h-3.5 opacity-60" />
+      )}
       {isSaving ? t("save_saving") : t("save_saved")}
     </span>
   );
@@ -692,7 +778,12 @@ function SaveIndicator({ status, t }: { status: "idle" | "saving" | "saved"; t: 
 // ─────────────────────────────────────────────────────────────────────────────
 
 function WelcomeScreen({
-  learnerName, consentGiven, draftRestored, onConsentChange, onBegin, t,
+  learnerName,
+  consentGiven,
+  draftRestored,
+  onConsentChange,
+  onBegin,
+  t,
 }: {
   learnerName: string;
   consentGiven: boolean;
@@ -703,15 +794,27 @@ function WelcomeScreen({
 }) {
   return (
     <section className="vi-card p-6 sm:p-8 relative overflow-hidden">
-      <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-[hsl(43_100%_50%/0.18)] blur-2xl" aria-hidden />
-      <div className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-[hsl(262_83%_58%/0.18)] blur-2xl" aria-hidden />
+      <div
+        className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-[hsl(43_100%_50%/0.18)] blur-2xl"
+        aria-hidden
+      />
+      <div
+        className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-[hsl(262_83%_58%/0.18)] blur-2xl"
+        aria-hidden
+      />
       <div className="relative space-y-5">
         <div className="flex items-start gap-3">
-          <IconWell color="primary" size="lg"><Heart className="w-7 h-7" strokeWidth={2.5} /></IconWell>
+          <IconWell color="primary" size="lg">
+            <Heart className="w-7 h-7" strokeWidth={2.5} />
+          </IconWell>
           <div className="flex-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[hsl(262_83%_58%)] mb-1">{t("welcome_eyebrow")}</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[hsl(262_83%_58%)] mb-1">
+              {t("welcome_eyebrow")}
+            </p>
             <h1 className="text-2xl sm:text-3xl font-extrabold vi-text leading-tight">
-              {learnerName ? t("header_title_with_name", { name: learnerName }) : t("header_title_default")}
+              {learnerName
+                ? t("header_title_with_name", { name: learnerName })
+                : t("header_title_default")}
             </h1>
             <p className="vi-text-muted mt-2 text-sm sm:text-base leading-relaxed">
               {t("welcome_intro")}
@@ -720,7 +823,10 @@ function WelcomeScreen({
         </div>
 
         {draftRestored && (
-          <div className="vi-card p-3 flex items-center gap-2 text-sm" style={{ background: "hsl(142 71% 45% / 0.08)", borderColor: "hsl(142 71% 45% / 0.3)" }}>
+          <div
+            className="vi-card p-3 flex items-center gap-2 text-sm"
+            style={{ background: "hsl(142 71% 45% / 0.08)", borderColor: "hsl(142 71% 45% / 0.3)" }}
+          >
             <Save className="w-4 h-4 text-[hsl(142_71%_45%)] flex-shrink-0" />
             <span className="vi-text">{t("welcome_draft_restored")}</span>
           </div>
@@ -733,7 +839,9 @@ function WelcomeScreen({
         </div>
 
         <div className="vi-card p-4 vi-surface-soft text-left">
-          <p className="text-xs font-extrabold uppercase tracking-wider text-[hsl(262_83%_58%)] mb-2">{t("welcome_what_we_ask")}</p>
+          <p className="text-xs font-extrabold uppercase tracking-wider text-[hsl(262_83%_58%)] mb-2">
+            {t("welcome_what_we_ask")}
+          </p>
           <ul className="text-sm vi-text space-y-1.5">
             <li>• {t("welcome_bullet_strengths")}</li>
             <li>• {t("welcome_bullet_communicate")}</li>
@@ -742,7 +850,10 @@ function WelcomeScreen({
           </ul>
         </div>
 
-        <label className="vi-card p-4 flex items-start gap-3 cursor-pointer transition-all" style={{ borderColor: consentGiven ? "hsl(262 83% 58% / 0.5)" : undefined }}>
+        <label
+          className="vi-card p-4 flex items-start gap-3 cursor-pointer transition-all"
+          style={{ borderColor: consentGiven ? "hsl(262 83% 58% / 0.5)" : undefined }}
+        >
           <input
             type="checkbox"
             checked={consentGiven}
@@ -751,7 +862,8 @@ function WelcomeScreen({
           />
           <span className="text-sm vi-text flex-1">
             <ShieldCheck className="inline w-4 h-4 mr-1 text-[hsl(262_83%_58%)]" />
-            <span className="font-bold">{t("welcome_consent_understand")}</span>{t("welcome_consent_text")}
+            <span className="font-bold">{t("welcome_consent_understand")}</span>
+            {t("welcome_consent_text")}
           </span>
         </label>
 
@@ -761,11 +873,10 @@ function WelcomeScreen({
           className="w-full inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[hsl(262_83%_58%)] text-white font-extrabold shadow-xl shadow-[hsl(262_83%_58%/0.3)] hover:scale-[1.01] active:scale-95 transition-transform disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
           style={{ minHeight: "52px" }}
         >
-          {draftRestored ? t("welcome_continue") : t("welcome_begin")} <ChevronRight className="w-5 h-5" />
+          {draftRestored ? t("welcome_continue") : t("welcome_begin")}{" "}
+          <ChevronRight className="w-5 h-5" />
         </button>
-        <p className="text-xs vi-text-muted text-center opacity-70">
-          {t("welcome_skip_note")}
-        </p>
+        <p className="text-xs vi-text-muted text-center opacity-70">{t("welcome_skip_note")}</p>
       </div>
     </section>
   );
@@ -785,7 +896,10 @@ function Stat({ icon, label }: { icon: string; label: string }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function SectionProgressChips({
-  currentIdx, answers, band, onJump,
+  currentIdx,
+  answers,
+  band,
+  onJump,
 }: {
   currentIdx: number;
   answers: Answers;
@@ -815,12 +929,16 @@ function SectionProgressChips({
                   : "bg-[hsl(var(--visual-surface))] vi-border vi-text-muted",
             ].join(" ")}
           >
-            <span className="text-base leading-none" aria-hidden>{s.icon}</span>
+            <span className="text-base leading-none" aria-hidden>
+              {s.icon}
+            </span>
             <span className="whitespace-nowrap">{s.shortLabel}</span>
             {isComplete ? (
               <Check className="w-3.5 h-3.5" strokeWidth={3} aria-hidden />
             ) : (
-              <span className="text-[10px] tabular-nums opacity-70">{answered}/{total}</span>
+              <span className="text-[10px] tabular-nums opacity-70">
+                {answered}/{total}
+              </span>
             )}
           </button>
         );
@@ -834,7 +952,13 @@ function SectionProgressChips({
 // ─────────────────────────────────────────────────────────────────────────────
 
 function SectionView({
-  section, answers, band, otherText, onAnswer, onToggleMulti, onOtherChange,
+  section,
+  answers,
+  band,
+  otherText,
+  onAnswer,
+  onToggleMulti,
+  onOtherChange,
 }: {
   section: AssessmentSection;
   answers: Answers;
@@ -859,9 +983,13 @@ function SectionView({
         <div className="flex-1 min-w-0">
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[hsl(262_83%_58%)] mb-1">
             {t("section_header", { number: section.number, minutes: section.estimatedMinutes })}
-            {section.optional && <span className="ml-2 text-[hsl(43_100%_50%)]">· {t("question_optional")}</span>}
+            {section.optional && (
+              <span className="ml-2 text-[hsl(43_100%_50%)]">· {t("question_optional")}</span>
+            )}
           </p>
-          <h2 className="text-xl sm:text-2xl font-extrabold vi-text leading-tight">{section.label}</h2>
+          <h2 className="text-xl sm:text-2xl font-extrabold vi-text leading-tight">
+            {section.label}
+          </h2>
           <p className="vi-text-muted text-sm mt-1.5 leading-relaxed">{section.rationale}</p>
         </div>
       </div>
@@ -886,7 +1014,13 @@ function SectionView({
 }
 
 function QuestionBlock({
-  question: q, questionNumber, value, otherValue, onAnswer, onToggleMulti, onOtherChange,
+  question: q,
+  questionNumber,
+  value,
+  otherValue,
+  onAnswer,
+  onToggleMulti,
+  onOtherChange,
 }: {
   question: AssessmentQuestion;
   questionNumber: number;
@@ -901,13 +1035,27 @@ function QuestionBlock({
   return (
     <div>
       <div className="flex items-baseline gap-2 mb-2">
-        <span className="text-xs font-extrabold tabular-nums vi-text-muted opacity-70 w-5 flex-shrink-0" aria-hidden>
+        <span
+          className="text-xs font-extrabold tabular-nums vi-text-muted opacity-70 w-5 flex-shrink-0"
+          aria-hidden
+        >
           {questionNumber}.
         </span>
-        <h3 id={labelId} className="text-base sm:text-lg font-extrabold vi-text leading-snug flex-1">
+        <h3
+          id={labelId}
+          className="text-base sm:text-lg font-extrabold vi-text leading-snug flex-1"
+        >
           {q.text}
-          {q.required && <span className="ml-1.5 text-[hsl(0_72%_51%)]" aria-label={t("question_required_aria")}>*</span>}
-          {!q.required && <span className="ml-2 text-[10px] font-bold uppercase tracking-wider vi-text-muted opacity-60">{t("question_optional")}</span>}
+          {q.required && (
+            <span className="ml-1.5 text-[hsl(0_72%_51%)]" aria-label={t("question_required_aria")}>
+              *
+            </span>
+          )}
+          {!q.required && (
+            <span className="ml-2 text-[10px] font-bold uppercase tracking-wider vi-text-muted opacity-60">
+              {t("question_optional")}
+            </span>
+          )}
         </h3>
       </div>
       {q.helpText && (
@@ -936,7 +1084,13 @@ function QuestionBlock({
 // ─────────────────────────────────────────────────────────────────────────────
 
 function QuestionInput({
-  q, labelId, value, otherValue, onAnswer, onToggleMulti, onOtherChange,
+  q,
+  labelId,
+  value,
+  otherValue,
+  onAnswer,
+  onToggleMulti,
+  onOtherChange,
 }: {
   q: AssessmentQuestion;
   labelId: string;
@@ -1069,7 +1223,12 @@ function QuestionInput({
 
 // ─── Single-select (radio-style) ────────────────────────────────────────────
 function SingleSelect({
-  options, value, onChange, allowOther, otherValue, onOtherChange,
+  options,
+  value,
+  onChange,
+  allowOther,
+  otherValue,
+  onOtherChange,
 }: {
   options: string[];
   value: string | null;
@@ -1132,7 +1291,12 @@ function OtherInput({ value, onChange }: { value: string; onChange: (t: string) 
 
 // ─── Multi-select (checkbox-style) ──────────────────────────────────────────
 function MultiSelect({
-  options, values, onToggle, allowOther, otherValue, onOtherChange,
+  options,
+  values,
+  onToggle,
+  allowOther,
+  otherValue,
+  onOtherChange,
 }: {
   options: string[];
   values: string[];
@@ -1182,7 +1346,9 @@ function MultiSelect({
 
 // ─── 5-point frequency Likert with mandatory "Not sure" escape hatch ────────
 function LikertFiveWithUnsure({
-  labelledBy, value, onChange,
+  labelledBy,
+  value,
+  onChange,
 }: {
   labelledBy: string;
   value: string | null;
@@ -1246,7 +1412,10 @@ function LikertFiveWithUnsure({
 
 // ─── Rank top three (drag-and-drop with arrow controls as fallback) ─────────
 function RankTopThree({
-  labelledBy, options, value, onChange,
+  labelledBy,
+  options,
+  value,
+  onChange,
 }: {
   labelledBy: string;
   options: string[];
@@ -1280,7 +1449,10 @@ function RankTopThree({
       {picked.length > 0 && (
         <div className="vi-card p-3 vi-surface-soft space-y-2">
           {picked.map((p, i) => (
-            <div key={p} className="flex items-center gap-2 vi-card p-2 bg-[hsl(var(--visual-surface))]">
+            <div
+              key={p}
+              className="flex items-center gap-2 vi-card p-2 bg-[hsl(var(--visual-surface))]"
+            >
               <GripVertical className="w-4 h-4 vi-text-muted opacity-40" />
               <span className="w-6 h-6 rounded-full bg-[hsl(262_83%_58%)] text-white text-xs font-extrabold flex items-center justify-center flex-shrink-0">
                 {i + 1}
@@ -1348,7 +1520,13 @@ function RankTopThree({
 // ─────────────────────────────────────────────────────────────────────────────
 
 function SectionFooterNav({
-  isFirst, isLast, isOptional, onPrev, onNext, onSkip, t,
+  isFirst,
+  isLast,
+  isOptional,
+  onPrev,
+  onNext,
+  onSkip,
+  t,
 }: {
   isFirst: boolean;
   isLast: boolean;
@@ -1395,7 +1573,13 @@ function SectionFooterNav({
 // ─────────────────────────────────────────────────────────────────────────────
 
 function InviteCoParentWidget({
-  question, questionNumber, value, onAnswer, learnerId, accessToken, t,
+  question,
+  questionNumber,
+  value,
+  onAnswer,
+  learnerId,
+  accessToken,
+  t,
 }: {
   question: AssessmentQuestion;
   questionNumber: number;
@@ -1446,7 +1630,10 @@ function InviteCoParentWidget({
   };
 
   return (
-    <div className="vi-card p-5 space-y-4" style={{ background: "hsl(262 83% 58% / 0.04)", borderColor: "hsl(262 83% 58% / 0.25)" }}>
+    <div
+      className="vi-card p-5 space-y-4"
+      style={{ background: "hsl(262 83% 58% / 0.04)", borderColor: "hsl(262 83% 58% / 0.25)" }}
+    >
       <div className="flex items-start gap-2">
         <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[hsl(262_83%_58%)] text-white text-xs font-extrabold flex-shrink-0">
           {questionNumber}
@@ -1483,10 +1670,10 @@ function InviteCoParentWidget({
               {t("invite_role_label")}
             </label>
             <div className="grid grid-cols-2 gap-2">
-              {([
+              {[
                 { key: "coparent" as const, label: t("invite_role_coparent") },
                 { key: "teacher" as const, label: t("invite_role_teacher") },
-              ]).map(({ key, label }) => {
+              ].map(({ key, label }) => {
                 const selected = role === key;
                 return (
                   <button
@@ -1509,7 +1696,10 @@ function InviteCoParentWidget({
           </div>
 
           <div>
-            <label htmlFor="wu-coparent-email" className="block text-xs font-bold uppercase tracking-wider vi-text-muted mb-1.5">
+            <label
+              htmlFor="wu-coparent-email"
+              className="block text-xs font-bold uppercase tracking-wider vi-text-muted mb-1.5"
+            >
               {t("invite_email_label")}
             </label>
             <div className="flex flex-col sm:flex-row gap-2">
@@ -1554,7 +1744,8 @@ function InviteCoParentWidget({
                   <Check className="w-3.5 h-3.5" strokeWidth={3} />
                   <span>
                     {t("invite_sent_to", {
-                      role: s.role === "teacher" ? t("invite_role_teacher") : t("invite_role_coparent"),
+                      role:
+                        s.role === "teacher" ? t("invite_role_teacher") : t("invite_role_coparent"),
                       email: s.email,
                     })}
                   </span>
@@ -1575,8 +1766,18 @@ function InviteCoParentWidget({
 // ─────────────────────────────────────────────────────────────────────────────
 
 function WrapUpScreen({
-  section, answers, learnerName, learnerId, accessToken, onAnswer, onBack, onSubmit, submitting, submitError,
-  sectionsAnsweredSummary, t,
+  section,
+  answers,
+  learnerName,
+  learnerId,
+  accessToken,
+  onAnswer,
+  onBack,
+  onSubmit,
+  submitting,
+  submitError,
+  sectionsAnsweredSummary,
+  t,
 }: {
   section: AssessmentSection;
   answers: Answers;
@@ -1597,13 +1798,22 @@ function WrapUpScreen({
 
   return (
     <section className="vi-card p-6 sm:p-8 space-y-5 relative overflow-hidden">
-      <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-[hsl(43_100%_50%/0.18)] blur-2xl" aria-hidden />
+      <div
+        className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-[hsl(43_100%_50%/0.18)] blur-2xl"
+        aria-hidden
+      />
       <div className="relative space-y-5">
         <div className="flex items-start gap-3">
-          <IconWell color="sel" size="lg"><Sparkles className="w-7 h-7" strokeWidth={2.5} /></IconWell>
+          <IconWell color="sel" size="lg">
+            <Sparkles className="w-7 h-7" strokeWidth={2.5} />
+          </IconWell>
           <div className="flex-1">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[hsl(43_100%_50%)] mb-1">{t("wrap_up_eyebrow")}</p>
-            <h2 className="text-2xl sm:text-3xl font-extrabold vi-text leading-tight">{section.label}</h2>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[hsl(43_100%_50%)] mb-1">
+              {t("wrap_up_eyebrow")}
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-extrabold vi-text leading-tight">
+              {section.label}
+            </h2>
             <p className="vi-text-muted mt-2 text-sm leading-relaxed">{section.rationale}</p>
           </div>
         </div>
@@ -1616,7 +1826,10 @@ function WrapUpScreen({
             <div className="text-3xl font-extrabold vi-text tabular-nums">{pct}%</div>
             <div className="flex-1">
               <div className="h-2 vi-surface-soft rounded-full overflow-hidden bg-[hsl(var(--visual-border))]">
-                <div className="h-full bg-[hsl(142_71%_45%)] transition-all" style={{ width: `${pct}%` }} />
+                <div
+                  className="h-full bg-[hsl(142_71%_45%)] transition-all"
+                  style={{ width: `${pct}%` }}
+                />
               </div>
               <p className="text-[11px] vi-text-muted mt-1">
                 {t("wrap_up_summary_progress", { answered: totalAnswered, total: totalQs })}
@@ -1632,10 +1845,18 @@ function WrapUpScreen({
                   key={s.label}
                   className={[
                     "flex items-center gap-1.5 text-[11px] font-bold px-2 py-1 rounded-md",
-                    complete ? "text-[hsl(142_71%_45%)]" : partial ? "vi-text" : "vi-text-muted opacity-60",
+                    complete
+                      ? "text-[hsl(142_71%_45%)]"
+                      : partial
+                        ? "vi-text"
+                        : "vi-text-muted opacity-60",
                   ].join(" ")}
                 >
-                  {complete ? <Check className="w-3 h-3" strokeWidth={3} /> : <span className="w-3 h-3" />}
+                  {complete ? (
+                    <Check className="w-3 h-3" strokeWidth={3} />
+                  ) : (
+                    <span className="w-3 h-3" />
+                  )}
                   <span className="truncate">{s.label}</span>
                 </li>
               );
@@ -1668,8 +1889,12 @@ function WrapUpScreen({
                 value={answers[q.id] ?? null}
                 otherValue=""
                 onAnswer={(v) => onAnswer(q.id, v)}
-                onToggleMulti={() => { /* not used in wrap-up */ }}
-                onOtherChange={() => { /* not used in wrap-up */ }}
+                onToggleMulti={() => {
+                  /* not used in wrap-up */
+                }}
+                onOtherChange={() => {
+                  /* not used in wrap-up */
+                }}
               />
             );
           })}
@@ -1678,13 +1903,20 @@ function WrapUpScreen({
         {submitError && (
           <div
             className="vi-card p-3 text-sm font-semibold text-center"
-            style={{ background: "hsl(0 72% 51% / 0.06)", borderColor: "hsl(0 72% 51% / 0.3)", color: "hsl(0 72% 51%)" }}
+            style={{
+              background: "hsl(0 72% 51% / 0.06)",
+              borderColor: "hsl(0 72% 51% / 0.3)",
+              color: "hsl(0 72% 51%)",
+            }}
           >
             {submitError}
           </div>
         )}
 
-        <div className="vi-card p-3 flex items-start gap-2 text-xs vi-text" style={{ background: "hsl(43 100% 50% / 0.06)", borderColor: "hsl(43 100% 50% / 0.3)" }}>
+        <div
+          className="vi-card p-3 flex items-start gap-2 text-xs vi-text"
+          style={{ background: "hsl(43 100% 50% / 0.06)", borderColor: "hsl(43 100% 50% / 0.3)" }}
+        >
           <ShieldCheck className="w-4 h-4 text-[hsl(43_100%_50%)] flex-shrink-0 mt-0.5" />
           <span>
             {learnerName
@@ -1707,7 +1939,13 @@ function WrapUpScreen({
             className="inline-flex items-center justify-center gap-1.5 px-7 py-3 rounded-full bg-[hsl(142_71%_45%)] text-white font-extrabold text-sm shadow-lg shadow-[hsl(142_71%_45%/0.3)] hover:scale-105 active:scale-95 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ minHeight: "48px" }}
           >
-            {submitting ? t("wrap_up_submitting") : <>{t("wrap_up_submit")} <Check className="w-4 h-4" strokeWidth={3} /></>}
+            {submitting ? (
+              t("wrap_up_submitting")
+            ) : (
+              <>
+                {t("wrap_up_submit")} <Check className="w-4 h-4" strokeWidth={3} />
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -1720,7 +1958,14 @@ function WrapUpScreen({
 // ─────────────────────────────────────────────────────────────────────────────
 
 function AlreadyCompletedScreen({
-  learnerName, learnerFunctioningLevel, baselineCompleted, onStartBaseline, onViewBrain, onBackToProfile, onBackToDashboard, t,
+  learnerName,
+  learnerFunctioningLevel,
+  baselineCompleted,
+  onStartBaseline,
+  onViewBrain,
+  onBackToProfile,
+  onBackToDashboard,
+  t,
 }: {
   learnerName: string;
   learnerFunctioningLevel: string;
@@ -1735,50 +1980,101 @@ function AlreadyCompletedScreen({
     <div className="min-h-screen vi-bg flex items-center justify-center px-4 py-8">
       <div className="max-w-lg w-full">
         <section className="vi-card p-8 md:p-10 text-center relative overflow-hidden">
-          <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-[hsl(43_100%_50%/0.18)] blur-2xl" aria-hidden />
-          <div className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-[hsl(262_83%_58%/0.18)] blur-2xl" aria-hidden />
+          <div
+            className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-[hsl(43_100%_50%/0.18)] blur-2xl"
+            aria-hidden
+          />
+          <div
+            className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-[hsl(262_83%_58%/0.18)] blur-2xl"
+            aria-hidden
+          />
           <div className="relative space-y-5">
             <div className="mx-auto inline-flex">
-              <IconWell color="science" size="lg"><CheckCircle2 className="w-10 h-10" strokeWidth={2.5} /></IconWell>
+              <IconWell color="science" size="lg">
+                <CheckCircle2 className="w-10 h-10" strokeWidth={2.5} />
+              </IconWell>
             </div>
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[hsl(142_71%_45%)] mb-2">{t("already_done_eyebrow")}</p>
-              <h1 className="text-2xl font-extrabold vi-text">{baselineCompleted ? t("all_assessments_complete_title") : t("already_complete_title")}</h1>
-              <p className="vi-text-muted mt-2">{baselineCompleted ? t("all_assessments_complete_desc", { name: learnerName || t("this_learner") }) : t("already_complete_desc", { name: learnerName || t("this_learner") })}</p>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[hsl(142_71%_45%)] mb-2">
+                {t("already_done_eyebrow")}
+              </p>
+              <h1 className="text-2xl font-extrabold vi-text">
+                {baselineCompleted
+                  ? t("all_assessments_complete_title")
+                  : t("already_complete_title")}
+              </h1>
+              <p className="vi-text-muted mt-2">
+                {baselineCompleted
+                  ? t("all_assessments_complete_desc", { name: learnerName || t("this_learner") })
+                  : t("already_complete_desc", { name: learnerName || t("this_learner") })}
+              </p>
             </div>
             {learnerFunctioningLevel && (
               <div className="vi-card p-4 text-left">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-[hsl(262_83%_58%)]">{t("functioning_level_label")}</p>
+                <p className="text-[11px] font-bold uppercase tracking-wider text-[hsl(262_83%_58%)]">
+                  {t("functioning_level_label")}
+                </p>
                 <p className="text-lg font-extrabold vi-text mt-1">
-                  {learnerFunctioningLevel.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())}
+                  {learnerFunctioningLevel
+                    .replace(/_/g, " ")
+                    .toLowerCase()
+                    .replace(/\b\w/g, (c) => c.toUpperCase())}
                 </p>
               </div>
             )}
             {!baselineCompleted && (
-              <div className="vi-card p-4 text-left" style={{ background: "hsl(43 100% 50% / 0.06)", borderColor: "hsl(43 100% 50% / 0.3)" }}>
+              <div
+                className="vi-card p-4 text-left"
+                style={{
+                  background: "hsl(43 100% 50% / 0.06)",
+                  borderColor: "hsl(43 100% 50% / 0.3)",
+                }}
+              >
                 <div className="flex items-start gap-3">
-                  <IconWell color="sel" size="sm"><Compass className="w-5 h-5" strokeWidth={2.5} /></IconWell>
+                  <IconWell color="sel" size="sm">
+                    <Compass className="w-5 h-5" strokeWidth={2.5} />
+                  </IconWell>
                   <div className="flex-1">
-                    <p className="text-sm font-extrabold text-[hsl(43_100%_50%)]">{t("next_step_baseline")}</p>
-                    <p className="text-xs vi-text-muted mt-1">{t("baseline_child_desc", { name: learnerName || t("your_child") })}</p>
+                    <p className="text-sm font-extrabold text-[hsl(43_100%_50%)]">
+                      {t("next_step_baseline")}
+                    </p>
+                    <p className="text-xs vi-text-muted mt-1">
+                      {t("baseline_child_desc", { name: learnerName || t("your_child") })}
+                    </p>
                   </div>
                 </div>
               </div>
             )}
             <div className="flex flex-col gap-3 pt-2">
               {baselineCompleted ? (
-                <button onClick={onViewBrain} className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[hsl(43_100%_50%)] text-white font-extrabold shadow-xl shadow-[hsl(43_100%_50%/0.3)] hover:scale-105 active:scale-95 transition-transform" style={{ minHeight: "48px" }}>
+                <button
+                  onClick={onViewBrain}
+                  className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[hsl(43_100%_50%)] text-white font-extrabold shadow-xl shadow-[hsl(43_100%_50%/0.3)] hover:scale-105 active:scale-95 transition-transform"
+                  style={{ minHeight: "48px" }}
+                >
                   <Compass className="w-4 h-4" /> {t("view_brain_profile")}
                 </button>
               ) : (
-                <button onClick={onStartBaseline} className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[hsl(43_100%_50%)] text-white font-extrabold shadow-xl shadow-[hsl(43_100%_50%/0.3)] hover:scale-105 active:scale-95 transition-transform" style={{ minHeight: "48px" }}>
+                <button
+                  onClick={onStartBaseline}
+                  className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[hsl(43_100%_50%)] text-white font-extrabold shadow-xl shadow-[hsl(43_100%_50%/0.3)] hover:scale-105 active:scale-95 transition-transform"
+                  style={{ minHeight: "48px" }}
+                >
                   <Compass className="w-4 h-4" /> {t("start_baseline")}
                 </button>
               )}
-              <button onClick={onBackToProfile} className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full bg-[hsl(262_83%_58%)] text-white font-extrabold shadow-lg hover:scale-105 active:scale-95 transition-transform" style={{ minHeight: "48px" }}>
+              <button
+                onClick={onBackToProfile}
+                className="inline-flex items-center justify-center gap-2 px-7 py-3 rounded-full bg-[hsl(262_83%_58%)] text-white font-extrabold shadow-lg hover:scale-105 active:scale-95 transition-transform"
+                style={{ minHeight: "48px" }}
+              >
                 {t("back_to_profile")}
               </button>
-              <button onClick={onBackToDashboard} className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[hsl(var(--visual-surface))] border-2 vi-border vi-text font-extrabold hover:border-[hsl(var(--visual-primary)/0.3)] transition-colors" style={{ minHeight: "48px" }}>
+              <button
+                onClick={onBackToDashboard}
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[hsl(var(--visual-surface))] border-2 vi-border vi-text font-extrabold hover:border-[hsl(var(--visual-primary)/0.3)] transition-colors"
+                style={{ minHeight: "48px" }}
+              >
                 {t("back_to_dashboard")}
               </button>
             </div>
@@ -1790,7 +2086,10 @@ function AlreadyCompletedScreen({
 }
 
 function SubmittedScreen({
-  result, onContinue, onContinueToBrain, t,
+  result,
+  onContinue,
+  onContinueToBrain,
+  t,
 }: {
   result: any;
   onContinue: () => void;
@@ -1801,25 +2100,41 @@ function SubmittedScreen({
     <div className="min-h-screen vi-bg flex items-center justify-center px-4 py-8">
       <div className="max-w-lg w-full">
         <section className="vi-card p-8 md:p-10 text-center relative overflow-hidden">
-          <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-[hsl(43_100%_50%/0.18)] blur-2xl" aria-hidden />
-          <div className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-[hsl(262_83%_58%/0.18)] blur-2xl" aria-hidden />
+          <div
+            className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-[hsl(43_100%_50%/0.18)] blur-2xl"
+            aria-hidden
+          />
+          <div
+            className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-[hsl(262_83%_58%/0.18)] blur-2xl"
+            aria-hidden
+          />
           <div className="relative space-y-5">
             <div className="mx-auto inline-flex">
-              <IconWell color="science" size="lg"><CheckCircle2 className="w-10 h-10" strokeWidth={2.5} /></IconWell>
+              <IconWell color="science" size="lg">
+                <CheckCircle2 className="w-10 h-10" strokeWidth={2.5} />
+              </IconWell>
             </div>
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[hsl(142_71%_45%)] mb-2">{t("thank_you_eyebrow")}</p>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[hsl(142_71%_45%)] mb-2">
+                {t("thank_you_eyebrow")}
+              </p>
               <h1 className="text-2xl font-extrabold vi-text">{t("assessment_complete_title")}</h1>
               <p className="vi-text-muted mt-2">{t("assessment_thank_you")}</p>
             </div>
             {result.functioningLevel && (
               <div className="vi-card p-4 text-left">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-[hsl(262_83%_58%)]">{t("recommended_level")}</p>
+                <p className="text-[11px] font-bold uppercase tracking-wider text-[hsl(262_83%_58%)]">
+                  {t("recommended_level")}
+                </p>
                 <p className="text-lg font-extrabold vi-text mt-1">
-                  {(result.functioningLevel.level || "").replace(/_/g, " ").toLowerCase().replace(/\b\w/g, (c: string) => c.toUpperCase())}
+                  {(result.functioningLevel.level || "")
+                    .replace(/_/g, " ")
+                    .toLowerCase()
+                    .replace(/\b\w/g, (c: string) => c.toUpperCase())}
                 </p>
                 <p className="text-xs vi-text-muted mt-1">
-                  {t("confidence")}: {(() => {
+                  {t("confidence")}:{" "}
+                  {(() => {
                     const c = Number(result.functioningLevel.confidence) || 0;
                     const pct = c <= 1 ? c * 100 : c;
                     return `${Math.round(pct)}%`;
@@ -1831,13 +2146,24 @@ function SubmittedScreen({
                 "next step" copy with an actionable bridge into the very
                 next thing the parent should do, since the assessment they
                 just completed is the input to the brain-clone flow. */}
-            <div className="vi-card p-5 text-left" style={{ background: "hsl(262 83% 58% / 0.06)", borderColor: "hsl(262 83% 58% / 0.3)" }}>
+            <div
+              className="vi-card p-5 text-left"
+              style={{
+                background: "hsl(262 83% 58% / 0.06)",
+                borderColor: "hsl(262 83% 58% / 0.3)",
+              }}
+            >
               <div className="flex items-start gap-3">
-                <IconWell color="primary" size="sm"><Compass className="w-5 h-5" strokeWidth={2.5} /></IconWell>
+                <IconWell color="primary" size="sm">
+                  <Compass className="w-5 h-5" strokeWidth={2.5} />
+                </IconWell>
                 <div className="flex-1">
-                  <p className="text-sm font-extrabold text-[hsl(262_83%_58%)]">Thanks — here&apos;s what we&apos;ll do next</p>
+                  <p className="text-sm font-extrabold text-[hsl(262_83%_58%)]">
+                    Thanks — here&apos;s what we&apos;ll do next
+                  </p>
                   <p className="text-xs vi-text-muted mt-1 leading-relaxed">
-                    We&apos;ll use what you just shared to clone a starting Brain for your child, then walk you through reviewing and approving it. Should take about a minute.
+                    We&apos;ll use what you just shared to clone a starting Brain for your child,
+                    then walk you through reviewing and approving it. Should take about a minute.
                   </p>
                 </div>
               </div>

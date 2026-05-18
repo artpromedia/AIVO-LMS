@@ -29,9 +29,7 @@ const STATUS_STYLE: Record<RecommendationDecision["status"], string> = {
 export function RecommendationDecisionHistory({ decisions }: RecommendationDecisionHistoryProps) {
   if (decisions.length === 0) {
     return (
-      <p className="rounded border border-dashed p-3 text-sm text-gray-600">
-        No decisions yet.
-      </p>
+      <p className="rounded border border-dashed p-3 text-sm text-gray-600">No decisions yet.</p>
     );
   }
   return (

@@ -124,7 +124,11 @@ export async function fetchWithStepUp(url: string, opts: FetchOpts): Promise<Res
   const ct = res.headers.get("content-type") || "";
   if (!ct.includes("application/json")) return res;
   let body: any;
-  try { body = await res.clone().json(); } catch { return res; }
+  try {
+    body = await res.clone().json();
+  } catch {
+    return res;
+  }
   if (body?.code !== "STEP_UP_REQUIRED" || !body?.scope) return res;
   const stepUpToken = await requireStepUp(body.scope as StepUpScope, accessToken);
   res = await fetch(url, {

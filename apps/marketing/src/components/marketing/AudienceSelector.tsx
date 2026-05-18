@@ -53,9 +53,7 @@ export function AudienceSelector() {
               >
                 {c.audience}
               </span>
-              <h3 className="mt-4 font-heading text-xl font-bold text-slate-900">
-                {c.headline}
-              </h3>
+              <h3 className="mt-4 font-heading text-xl font-bold text-slate-900">{c.headline}</h3>
               <p className="mt-2 flex-1 text-slate-600">{c.blurb}</p>
               <span className="mt-6 inline-flex items-center gap-1 font-semibold text-purple-700 transition-all group-hover:gap-2">
                 {c.cta} <span aria-hidden>→</span>

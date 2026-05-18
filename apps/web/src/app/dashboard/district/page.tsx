@@ -46,8 +46,8 @@ export default function DistrictDashboardPage() {
     const headers = { Authorization: `Bearer ${accessToken}` };
 
     Promise.all([
-      fetch("/api/district/stats", { headers }).then((r) => r.ok ? r.json() : null),
-      fetch("/api/district/tenant", { headers }).then((r) => r.ok ? r.json() : null),
+      fetch("/api/district/stats", { headers }).then((r) => (r.ok ? r.json() : null)),
+      fetch("/api/district/tenant", { headers }).then((r) => (r.ok ? r.json() : null)),
     ])
       .then(([statsData, tenantData]) => {
         setStats(statsData);
@@ -63,10 +63,14 @@ export default function DistrictDashboardPage() {
         <div className="animate-pulse space-y-6">
           <div className="h-8 bg-slate-200 rounded-lg w-64" />
           <div className="grid grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((i) => <div key={i} className="h-28 bg-slate-200 rounded-2xl" />)}
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-28 bg-slate-200 rounded-2xl" />
+            ))}
           </div>
           <div className="grid grid-cols-2 gap-4">
-            {[1, 2, 3, 4].map((i) => <div key={i} className="h-40 bg-slate-200 rounded-2xl" />)}
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-40 bg-slate-200 rounded-2xl" />
+            ))}
           </div>
         </div>
       </div>
@@ -95,32 +99,89 @@ export default function DistrictDashboardPage() {
             )}
           </div>
           <p className="text-sm vi-text-muted">
-            Manage your district&apos;s learners, teachers, and content. View progress reports and coordinate accommodations.
+            Manage your district&apos;s learners, teachers, and content. View progress reports and
+            coordinate accommodations.
           </p>
         </div>
       </header>
 
       <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <MetricCard label="Active Learners" value={stats?.totalLearners ?? 0} helper="Students enrolled" Icon={GraduationCap} accent="bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]" />
-        <MetricCard label="Staff" value={stats?.totalStaff ?? 0} helper="Teachers, therapists, caregivers" Icon={UserCog} accent="bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]" />
-        <MetricCard label="Schools" value={stats?.totalSchools ?? 0} helper="Active campuses" Icon={School} accent="bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]" />
-        <MetricCard label="Active IEPs" value={stats?.activeIeps ?? 0} helper="Individualized plans" Icon={ClipboardList} accent="bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]" />
+        <MetricCard
+          label="Active Learners"
+          value={stats?.totalLearners ?? 0}
+          helper="Students enrolled"
+          Icon={GraduationCap}
+          accent="bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]"
+        />
+        <MetricCard
+          label="Staff"
+          value={stats?.totalStaff ?? 0}
+          helper="Teachers, therapists, caregivers"
+          Icon={UserCog}
+          accent="bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]"
+        />
+        <MetricCard
+          label="Schools"
+          value={stats?.totalSchools ?? 0}
+          helper="Active campuses"
+          Icon={School}
+          accent="bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]"
+        />
+        <MetricCard
+          label="Active IEPs"
+          value={stats?.activeIeps ?? 0}
+          helper="Individualized plans"
+          Icon={ClipboardList}
+          accent="bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]"
+        />
       </section>
 
       <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <MetricCard label="Parents" value={stats?.totalParents ?? 0} helper="Family accounts" Icon={Users} accent="bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]" />
-        <MetricCard label="Total Users" value={stats?.totalUsers ?? 0} helper="All platform users" Icon={Users} accent="vi-surface-soft vi-text-muted" />
-        {stats?.roleCounts?.filter(r => r.role === "TEACHER").map(r => (
-          <MetricCard key="teachers" label="Teachers" value={Number(r.count)} helper="Educators on platform" Icon={BookOpen} accent="bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]" />
-        ))}
-        {stats?.roleCounts?.filter(r => r.role === "THERAPIST").map(r => (
-          <MetricCard key="therapists" label="Therapists" value={Number(r.count)} helper="Specialists on platform" Icon={Brain} accent="bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]" />
-        ))}
+        <MetricCard
+          label="Parents"
+          value={stats?.totalParents ?? 0}
+          helper="Family accounts"
+          Icon={Users}
+          accent="bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]"
+        />
+        <MetricCard
+          label="Total Users"
+          value={stats?.totalUsers ?? 0}
+          helper="All platform users"
+          Icon={Users}
+          accent="vi-surface-soft vi-text-muted"
+        />
+        {stats?.roleCounts
+          ?.filter((r) => r.role === "TEACHER")
+          .map((r) => (
+            <MetricCard
+              key="teachers"
+              label="Teachers"
+              value={Number(r.count)}
+              helper="Educators on platform"
+              Icon={BookOpen}
+              accent="bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]"
+            />
+          ))}
+        {stats?.roleCounts
+          ?.filter((r) => r.role === "THERAPIST")
+          .map((r) => (
+            <MetricCard
+              key="therapists"
+              label="Therapists"
+              value={Number(r.count)}
+              helper="Specialists on platform"
+              Icon={Brain}
+              accent="bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]"
+            />
+          ))}
       </section>
 
       {flCounts.length > 0 && (
         <section className="vi-card p-6">
-          <h2 className="text-lg font-heading font-semibold vi-text mb-4">Functioning Level Distribution</h2>
+          <h2 className="text-lg font-heading font-semibold vi-text mb-4">
+            Functioning Level Distribution
+          </h2>
           <div className="flex items-end gap-4 h-48">
             {flCounts.map((d) => (
               <div key={d.level} className="flex-1 flex flex-col items-center gap-2">
@@ -129,7 +190,9 @@ export default function DistrictDashboardPage() {
                   className="w-full rounded-t-lg bg-[hsl(var(--visual-primary))] transition-all"
                   style={{ height: `${Math.max(8, (Number(d.count) / maxFL) * 100)}%` }}
                 />
-                <span className="text-[10px] vi-text-muted font-medium text-center">{String(d.level).replace(/_/g, " ")}</span>
+                <span className="text-[10px] vi-text-muted font-medium text-center">
+                  {String(d.level).replace(/_/g, " ")}
+                </span>
               </div>
             ))}
           </div>
@@ -137,10 +200,38 @@ export default function DistrictDashboardPage() {
       )}
 
       <section className="grid gap-4 md:grid-cols-2">
-        <ActionCard title="Schools" description="View and manage schools within your district, their enrollment numbers, and staff assignments." href="/dashboard/district/schools" buttonLabel="Manage Schools" Icon={School} color="science" />
-        <ActionCard title="Learner Management" description="Browse enrolled learners, view progress summaries, manage IEPs and accommodations." href="/dashboard/district/learners" buttonLabel="View Learners" Icon={GraduationCap} color="primary" />
-        <ActionCard title="IEP Management" description="Track individualized education programs, review dates, and compliance status." href="/dashboard/district/iep" buttonLabel="View IEPs" Icon={ClipboardList} color="sel" />
-        <ActionCard title="Staff & Teachers" description="Manage teacher assignments, view school placements, and invite new staff members." href="/dashboard/district/staff" buttonLabel="Manage Staff" Icon={UserCog} color="reading" />
+        <ActionCard
+          title="Schools"
+          description="View and manage schools within your district, their enrollment numbers, and staff assignments."
+          href="/dashboard/district/schools"
+          buttonLabel="Manage Schools"
+          Icon={School}
+          color="science"
+        />
+        <ActionCard
+          title="Learner Management"
+          description="Browse enrolled learners, view progress summaries, manage IEPs and accommodations."
+          href="/dashboard/district/learners"
+          buttonLabel="View Learners"
+          Icon={GraduationCap}
+          color="primary"
+        />
+        <ActionCard
+          title="IEP Management"
+          description="Track individualized education programs, review dates, and compliance status."
+          href="/dashboard/district/iep"
+          buttonLabel="View IEPs"
+          Icon={ClipboardList}
+          color="sel"
+        />
+        <ActionCard
+          title="Staff & Teachers"
+          description="Manage teacher assignments, view school placements, and invite new staff members."
+          href="/dashboard/district/staff"
+          buttonLabel="Manage Staff"
+          Icon={UserCog}
+          color="reading"
+        />
       </section>
 
       {tenant && (
@@ -158,8 +249,18 @@ export default function DistrictDashboardPage() {
   );
 }
 
-function MetricCard({ label, value, helper, Icon, accent }: {
-  label: string; value: number; helper: string; Icon: LucideIcon; accent: string;
+function MetricCard({
+  label,
+  value,
+  helper,
+  Icon,
+  accent,
+}: {
+  label: string;
+  value: number;
+  helper: string;
+  Icon: LucideIcon;
+  accent: string;
 }) {
   return (
     <div className="vi-card p-5 transition-all hover:shadow-md hover:border-[hsl(var(--visual-primary)/0.3)]">
@@ -175,8 +276,20 @@ function MetricCard({ label, value, helper, Icon, accent }: {
   );
 }
 
-function ActionCard({ title, description, href, buttonLabel, Icon, color }: {
-  title: string; description: string; href: string; buttonLabel: string; Icon: LucideIcon; color: string;
+function ActionCard({
+  title,
+  description,
+  href,
+  buttonLabel,
+  Icon,
+  color,
+}: {
+  title: string;
+  description: string;
+  href: string;
+  buttonLabel: string;
+  Icon: LucideIcon;
+  color: string;
 }) {
   return (
     <div className="vi-card p-6 transition-all hover:shadow-md hover:border-[hsl(var(--visual-primary)/0.3)] flex flex-col">
@@ -187,7 +300,10 @@ function ActionCard({ title, description, href, buttonLabel, Icon, color }: {
         <h3 className="text-base font-semibold vi-text">{title}</h3>
       </div>
       <p className="text-sm vi-text-muted flex-1">{description}</p>
-      <Link href={href} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))] transition">
+      <Link
+        href={href}
+        className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))] transition"
+      >
         {buttonLabel} <span>→</span>
       </Link>
     </div>

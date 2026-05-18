@@ -12,16 +12,16 @@
  *  - empty    → friendly "Brain not built yet" prompt with CTA
  *  - ready    → the interactive brain
  */
-import React, { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { apiFetch } from '@/lib/api';
-import { API } from '@/constants/api';
-import { colors, radius, spacing } from '@/constants/colors';
+import React, { useEffect, useMemo, useState } from "react";
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { apiFetch } from "@/lib/api";
+import { API } from "@/constants/api";
+import { colors, radius, spacing } from "@/constants/colors";
 import BrainCloneInteractive, {
   type BrainCloneMetrics,
   type BrainRegionDatum,
-} from './BrainCloneInteractive';
+} from "./BrainCloneInteractive";
 
 interface BrainState {
   masteryLevels?: Record<string, number>;
@@ -61,7 +61,7 @@ export interface BrainCloneCardProps {
   learnerId: string;
   learnerName: string;
   enrolledGrade?: string | number | null;
-  variant?: 'card' | 'full';
+  variant?: "card" | "full";
   /** Optional pre-computed summary so callers can pass in cached
    *  streak/XP without an extra round-trip. */
   summary?: SummaryStats;
@@ -73,36 +73,33 @@ export interface BrainCloneCardProps {
 }
 
 const DOMAIN_LABELS: Record<string, string> = {
-  ela: 'Reading',
-  english: 'Reading',
-  reading: 'Reading',
-  math: 'Math',
-  mathematics: 'Math',
-  science: 'Science',
-  sel: 'Social-Emotional',
-  social_emotional: 'Social-Emotional',
-  social: 'Social-Emotional',
-  speech: 'Communication',
-  communication: 'Communication',
-  language: 'Communication',
-  executive_function: 'Executive Function',
-  ef: 'Executive Function',
-  exec: 'Executive Function',
+  ela: "Reading",
+  english: "Reading",
+  reading: "Reading",
+  math: "Math",
+  mathematics: "Math",
+  science: "Science",
+  sel: "Social-Emotional",
+  social_emotional: "Social-Emotional",
+  social: "Social-Emotional",
+  speech: "Communication",
+  communication: "Communication",
+  language: "Communication",
+  executive_function: "Executive Function",
+  ef: "Executive Function",
+  exec: "Executive Function",
 };
 
 function labelFor(domain: string): string {
-  const key = domain.toLowerCase().replace(/[\s-]+/g, '_');
-  return (
-    DOMAIN_LABELS[key] ||
-    domain.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-  );
+  const key = domain.toLowerCase().replace(/[\s-]+/g, "_");
+  return DOMAIN_LABELS[key] || domain.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export default function BrainCloneCard({
   learnerId,
   learnerName,
   enrolledGrade,
-  variant = 'card',
+  variant = "card",
   summary,
   onOpenFull,
   onBuildBrain,
@@ -157,8 +154,7 @@ export default function BrainCloneCard({
   const regions: BrainRegionDatum[] = useMemo(() => {
     if (!state) return [];
     const mastery = state.masteryLevels ?? {};
-    const accommodationDecisions =
-      state.xaiExplanation?.accommodation_decisions ?? [];
+    const accommodationDecisions = state.xaiExplanation?.accommodation_decisions ?? [];
     const tutorDecisions = state.xaiExplanation?.tutor_decisions ?? [];
 
     const accomByDomain: Record<string, string[]> = {};
@@ -189,12 +185,7 @@ export default function BrainCloneCard({
       label: labelFor(domain),
       // Mastery is normally 0..1 but legacy code paths may emit 0..100.
       // Anything > 1 is treated as a percentage and divided.
-      mastery:
-        typeof score === 'number'
-          ? score > 1
-            ? score / 100
-            : score
-          : 0,
+      mastery: typeof score === "number" ? (score > 1 ? score / 100 : score) : 0,
       lastActivity: state.updatedAt ?? null,
       accommodations: accomByDomain[domain.toLowerCase()] ?? [],
       tutors: tutorByDomain[domain.toLowerCase()] ?? [],
@@ -215,7 +206,7 @@ export default function BrainCloneCard({
   if (loading) {
     return (
       <View
-        style={[styles.skeleton, variant === 'full' && styles.skeletonFull]}
+        style={[styles.skeleton, variant === "full" && styles.skeletonFull]}
         accessibilityLabel="Loading brain visualization"
       >
         <ActivityIndicator color={colors.primary} />
@@ -231,7 +222,8 @@ export default function BrainCloneCard({
         </View>
         <Text style={styles.emptyTitle}>Brain not built yet</Text>
         <Text style={styles.emptyBody}>
-          Once {learnerName} finishes the baseline adventure, their personalized Brain Clone will appear here.
+          Once {learnerName} finishes the baseline adventure, their personalized Brain Clone will
+          appear here.
         </Text>
         {onBuildBrain && (
           <Pressable onPress={onBuildBrain} style={styles.emptyBtn}>
@@ -250,7 +242,7 @@ export default function BrainCloneCard({
       enrolledGrade={enrolledGrade}
       regions={regions}
       metrics={metrics}
-      onOpenFull={variant === 'card' ? onOpenFull : undefined}
+      onOpenFull={variant === "card" ? onOpenFull : undefined}
     />
   );
 }
@@ -262,8 +254,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     padding: spacing.lg,
   },
   skeletonFull: { minHeight: 360 },
@@ -273,45 +265,45 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     backgroundColor: colors.surface,
     padding: spacing.lg,
-    alignItems: 'center',
+    alignItems: "center",
   },
   emptyIcon: {
     width: 48,
     height: 48,
     borderRadius: radius.lg,
-    backgroundColor: colors.primary + '24',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: colors.primary + "24",
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: spacing.sm,
   },
   emptyTitle: {
     fontSize: 16,
-    fontFamily: 'Nunito-ExtraBold',
+    fontFamily: "Nunito-ExtraBold",
     color: colors.text,
     marginBottom: 4,
   },
   emptyBody: {
     fontSize: 13,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.textSecondary,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: spacing.md,
     lineHeight: 18,
   },
   emptyBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     paddingHorizontal: spacing.md,
     paddingVertical: 6,
     borderRadius: radius.full,
-    backgroundColor: colors.primary + '14',
+    backgroundColor: colors.primary + "14",
     borderWidth: 1,
-    borderColor: colors.primary + '60',
+    borderColor: colors.primary + "60",
   },
   emptyBtnText: {
     fontSize: 12,
-    fontFamily: 'Nunito-Bold',
+    fontFamily: "Nunito-Bold",
     color: colors.primary,
   },
 });

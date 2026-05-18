@@ -131,7 +131,10 @@ export function playCorrectCue(): void {
 /** Soft "incorrect" cue — descending minor third, gentle, never punitive. */
 export function playIncorrectCue(): void {
   playChime({ frequency: 392, duration: 0.18, volume: 0.14, type: "triangle" }); // G4
-  setTimeout(() => playChime({ frequency: 329.63, duration: 0.34, volume: 0.16, type: "triangle" }), 110); // E4
+  setTimeout(
+    () => playChime({ frequency: 329.63, duration: 0.34, volume: 0.16, type: "triangle" }),
+    110,
+  ); // E4
 }
 
 /**
@@ -207,7 +210,10 @@ function chunkForSpeech(input: string, maxLen = 180): string[] {
   // Greedy split on sentence-final punctuation, keeping the punctuation.
   const sentences = text.match(/[^.!?]+[.!?]+(?:["')\]]+)?\s*|[^.!?]+$/g) || [text];
   let buf = "";
-  const flush = () => { if (buf.trim()) out.push(buf.trim()); buf = ""; };
+  const flush = () => {
+    if (buf.trim()) out.push(buf.trim());
+    buf = "";
+  };
   for (const raw of sentences) {
     const s = raw.trim();
     if (!s) continue;
@@ -252,7 +258,9 @@ function chunkForSpeech(input: string, maxLen = 180): string[] {
  */
 function startKeepAlive(): () => void {
   if (typeof window === "undefined" || typeof window.speechSynthesis === "undefined") {
-    return () => { /* no-op */ };
+    return () => {
+      /* no-op */
+    };
   }
   const id = window.setInterval(() => {
     try {
@@ -283,10 +291,11 @@ function startKeepAlive(): () => void {
  */
 export function speakUtterance(
   text: string,
-  opts: { rate?: number; pitch?: number; lang?: string } = {}
+  opts: { rate?: number; pitch?: number; lang?: string } = {},
 ): () => void {
   if (isAudioMuted()) return () => {};
-  if (typeof window === "undefined" || typeof window.speechSynthesis === "undefined") return () => {};
+  if (typeof window === "undefined" || typeof window.speechSynthesis === "undefined")
+    return () => {};
   const chunks = chunkForSpeech(text || "");
   if (chunks.length === 0) return () => {};
   try {

@@ -1,11 +1,7 @@
 import { NextResponse } from "next/server";
 import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
-import {
-  requireSession,
-  requireRole,
-  requireLearnerScope,
-} from "@/lib/bff/guards";
+import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
 import { audit } from "@/lib/bff/audit";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/bff/rate-limit";
 import { requireLearnerConsent } from "@/lib/bff/consent-guard";

@@ -23,7 +23,10 @@ export function extractToken(request: FastifyRequest): string | null {
   return null;
 }
 
-export async function authenticateRequest(request: FastifyRequest, reply: FastifyReply): Promise<AuthUser | null> {
+export async function authenticateRequest(
+  request: FastifyRequest,
+  reply: FastifyReply,
+): Promise<AuthUser | null> {
   const token = extractToken(request);
   if (!token) {
     reply.code(401).send({ error: "Authentication required" });
@@ -41,13 +44,14 @@ export async function authenticateRequest(request: FastifyRequest, reply: Fastif
 export async function verifyParentOwnership(
   db: ReturnType<typeof import("@aivo/db").createDb>,
   userSub: string,
-  learnerId: string
+  learnerId: string,
 ): Promise<boolean> {
   if (!isUuid(userSub) || !isUuid(learnerId)) {
     return false;
   }
-  const result = await db.select().from(learners).where(
-    and(eq(learners.id, learnerId), eq(learners.parentId, userSub))
-  );
+  const result = await db
+    .select()
+    .from(learners)
+    .where(and(eq(learners.id, learnerId), eq(learners.parentId, userSub)));
   return result.length > 0;
 }

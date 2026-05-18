@@ -22,17 +22,30 @@ const STATE_EMOJIS: Record<TutorState, string> = {
   pointing: "👉",
 };
 
-export function TutorCharacter({ tutorKey, state, speechText, showSubtitles, adaptations }: TutorCharacterProps) {
+export function TutorCharacter({
+  tutorKey,
+  state,
+  speechText,
+  showSubtitles,
+  adaptations,
+}: TutorCharacterProps) {
   const tutor = TUTORS[tutorKey];
   const theme = TUTOR_THEMES[tutorKey];
 
   const animationClass =
-    state === "idle" ? "animate-breathe" :
-    state === "speaking" ? "animate-speak" :
-    state === "celebrating" ? "animate-celebrate" :
-    state === "thinking" ? "animate-think" :
-    state === "encouraging" ? "animate-encourage" :
-    state === "pointing" ? "animate-point" : "";
+    state === "idle"
+      ? "animate-breathe"
+      : state === "speaking"
+        ? "animate-speak"
+        : state === "celebrating"
+          ? "animate-celebrate"
+          : state === "thinking"
+            ? "animate-think"
+            : state === "encouraging"
+              ? "animate-encourage"
+              : state === "pointing"
+                ? "animate-point"
+                : "";
 
   const stateReaction = STATE_EMOJIS[state];
 
@@ -55,16 +68,12 @@ export function TutorCharacter({ tutorKey, state, speechText, showSubtitles, ada
             boxShadow: `0 0 30px ${theme?.accentColor || tutor.color}40`,
           }}
         >
-          <Image
-            src={tutor.avatar}
-            alt={tutor.name}
-            fill
-            className="object-cover"
-            priority
-          />
+          <Image src={tutor.avatar} alt={tutor.name} fill className="object-cover" priority />
           {state === "speaking" && (
-            <div className="absolute inset-0 rounded-full border-4 animate-ping-slow opacity-30"
-              style={{ borderColor: theme?.accentColor || tutor.color }} />
+            <div
+              className="absolute inset-0 rounded-full border-4 animate-ping-slow opacity-30"
+              style={{ borderColor: theme?.accentColor || tutor.color }}
+            />
           )}
         </div>
 
@@ -80,7 +89,9 @@ export function TutorCharacter({ tutorKey, state, speechText, showSubtitles, ada
           style={{ borderLeft: `4px solid ${theme?.accentColor || tutor.color}` }}
         >
           <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white/95 rotate-45 rounded-sm" />
-          <p className="text-slate-800 text-sm font-body leading-relaxed relative z-10">{speechText}</p>
+          <p className="text-slate-800 text-sm font-body leading-relaxed relative z-10">
+            {speechText}
+          </p>
         </div>
       )}
     </div>

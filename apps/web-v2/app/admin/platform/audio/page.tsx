@@ -5,11 +5,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import {
-  listAudioAssets,
-  listReadAloudUsage,
-  summarizeAudioUsage,
-} from "@/lib/db/repos";
+import { listAudioAssets, listReadAloudUsage, summarizeAudioUsage } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
 
@@ -115,7 +111,10 @@ export default async function Page() {
           <ul className="mt-2 divide-y text-sm">
             {assets.map((a) => (
               <li key={a.id} className="py-2 flex items-center justify-between gap-2">
-                <span className="truncate">{a.text.slice(0, 80)}{a.text.length > 80 ? "…" : ""}</span>
+                <span className="truncate">
+                  {a.text.slice(0, 80)}
+                  {a.text.length > 80 ? "…" : ""}
+                </span>
                 <span className="text-[11px] text-aivo-muted whitespace-nowrap">
                   {a.voiceId} · {(a.durationMs / 1000).toFixed(1)}s · {fmtUsd(a.costMicroUsd)}
                 </span>

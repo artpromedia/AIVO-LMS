@@ -7,7 +7,11 @@ const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://aivolearning.com";
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
-  const staticPages: { path: string; priority: number; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] }[] = [
+  const staticPages: {
+    path: string;
+    priority: number;
+    changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"];
+  }[] = [
     { path: "/", priority: 1.0, changeFrequency: "weekly" },
     { path: "/about", priority: 0.8, changeFrequency: "monthly" },
     { path: "/contact", priority: 0.8, changeFrequency: "monthly" },
@@ -38,7 +42,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/blog/parent-progress-without-jargon", priority: 0.6, changeFrequency: "monthly" },
     { path: "/blog/what-is-a-baseline-assessment", priority: 0.6, changeFrequency: "monthly" },
     { path: "/blog/read-aloud-and-scaffolds", priority: 0.6, changeFrequency: "monthly" },
-    { path: "/guides/school-buying-checklist-ai-learning", priority: 0.6, changeFrequency: "monthly" },
+    {
+      path: "/guides/school-buying-checklist-ai-learning",
+      priority: 0.6,
+      changeFrequency: "monthly",
+    },
     { path: "/guides/how-aivo-thinks-about-privacy", priority: 0.6, changeFrequency: "monthly" },
   ];
 

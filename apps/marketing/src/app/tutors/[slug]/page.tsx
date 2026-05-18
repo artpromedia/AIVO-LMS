@@ -67,13 +67,18 @@ export default async function TutorPage({ params }: Props) {
           <ul className="space-y-2 mb-6">
             {tutor.bullets.map((b) => (
               <li key={b} className="flex items-start gap-3 text-slate-700 font-body">
-                <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" aria-hidden="true" />
+                <CheckCircle2
+                  className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0"
+                  aria-hidden="true"
+                />
                 <span>{b}</span>
               </li>
             ))}
           </ul>
           <p className="text-slate-600 font-body leading-relaxed">
-            {tutor.name} works alongside the other 13 AIVO tutors and your child's Brain Clone — sharing context across every session so {tutor.name} always picks up where the last lesson left off.
+            {tutor.name} works alongside the other 13 AIVO tutors and your child's Brain Clone —
+            sharing context across every session so {tutor.name} always picks up where the last
+            lesson left off.
           </p>
         </div>
       </div>
@@ -83,38 +88,44 @@ export default async function TutorPage({ params }: Props) {
           Built for every learner
         </h2>
         <p className="text-slate-600 font-body leading-relaxed">
-          {tutor.name} adapts across all 5 functioning levels — from grade-aligned content for Standard learners to AAC- and switch-accessible interactions for Exploratory and Pre-Symbolic learners. Sensory profiles, reduced visual clutter, and optional partner-assisted modes are all available.
+          {tutor.name} adapts across all 5 functioning levels — from grade-aligned content for
+          Standard learners to AAC- and switch-accessible interactions for Exploratory and
+          Pre-Symbolic learners. Sensory profiles, reduced visual clutter, and optional
+          partner-assisted modes are all available.
         </p>
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">
-          Other AIVO tutors
-        </h2>
+        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">Other AIVO tutors</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {TUTORS.filter((t) => t.name !== tutor.name).slice(0, 6).map((t) => (
-            <Link
-              key={t.name}
-              href={`/tutors/${t.name.toLowerCase()}`}
-              className="rounded-2xl border border-slate-100 bg-white p-3 flex items-center gap-3 hover:border-purple-200 hover:shadow-md transition"
-            >
-              <div
-                className="w-10 h-10 rounded-xl shrink-0 overflow-hidden"
-                style={{ backgroundColor: `${t.color}15` }}
+          {TUTORS.filter((t) => t.name !== tutor.name)
+            .slice(0, 6)
+            .map((t) => (
+              <Link
+                key={t.name}
+                href={`/tutors/${t.name.toLowerCase()}`}
+                className="rounded-2xl border border-slate-100 bg-white p-3 flex items-center gap-3 hover:border-purple-200 hover:shadow-md transition"
               >
-                <Image src={t.img} alt="" width={40} height={40} className="w-full h-full object-cover" />
-              </div>
-              <div className="min-w-0">
-                <p className="font-heading font-bold text-slate-900 text-sm truncate">{t.name}</p>
-                <p className="text-xs text-slate-500 truncate">{t.domain}</p>
-              </div>
-            </Link>
-          ))}
+                <div
+                  className="w-10 h-10 rounded-xl shrink-0 overflow-hidden"
+                  style={{ backgroundColor: `${t.color}15` }}
+                >
+                  <Image
+                    src={t.img}
+                    alt=""
+                    width={40}
+                    height={40}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-heading font-bold text-slate-900 text-sm truncate">{t.name}</p>
+                  <p className="text-xs text-slate-500 truncate">{t.domain}</p>
+                </div>
+              </Link>
+            ))}
         </div>
-        <Link
-          href="/tutors"
-          className="inline-block mt-4 text-primary font-bold hover:underline"
-        >
+        <Link href="/tutors" className="inline-block mt-4 text-primary font-bold hover:underline">
           See all 14 tutors →
         </Link>
       </section>

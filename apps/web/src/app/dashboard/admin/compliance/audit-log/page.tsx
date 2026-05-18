@@ -46,7 +46,9 @@ export default function AuditLogPage() {
   const [data, setData] = useState<AuditResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
-  const [chainStatus, setChainStatus] = useState<{ ok: boolean; chains: ChainSummary[] } | null>(null);
+  const [chainStatus, setChainStatus] = useState<{ ok: boolean; chains: ChainSummary[] } | null>(
+    null,
+  );
 
   const initial = useMemo(() => readWindowSearchParams(), []);
   const [search, setSearch] = useState(() => readParamString(initial, "search"));
@@ -57,7 +59,14 @@ export default function AuditLogPage() {
   const [page, setPage] = useState(() => readParamNumber(initial, "page", 1));
   const pageSize = 50;
 
-  useSyncFiltersToUrl({ search, action, resourceType, from, to, page: page === 1 ? undefined : page });
+  useSyncFiltersToUrl({
+    search,
+    action,
+    resourceType,
+    from,
+    to,
+    page: page === 1 ? undefined : page,
+  });
 
   const fetchData = useCallback(() => {
     if (!accessToken) return;
@@ -105,7 +114,15 @@ export default function AuditLogPage() {
 
   const handleExport = () => {
     if (!data || data.entries.length === 0) return;
-    const headers = ["Timestamp", "Actor", "Role", "Action", "Resource Type", "Resource ID", "IP Address"];
+    const headers = [
+      "Timestamp",
+      "Actor",
+      "Role",
+      "Action",
+      "Resource Type",
+      "Resource ID",
+      "IP Address",
+    ];
     const rows = data.entries.map((e) => [
       new Date(e.createdAt).toISOString(),
       e.actorEmail,
@@ -115,7 +132,9 @@ export default function AuditLogPage() {
       e.resourceId,
       e.ipAddress || "",
     ]);
-    const csv = [headers, ...rows].map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const csv = [headers, ...rows]
+      .map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(","))
+      .join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -145,17 +164,22 @@ export default function AuditLogPage() {
           </IconWell>
           <div>
             <h1 className="text-2xl font-heading font-bold vi-text">Audit Log</h1>
-            <p className="text-sm vi-text-muted mt-1">Searchable record of every admin action and security event.</p>
+            <p className="text-sm vi-text-muted mt-1">
+              Searchable record of every admin action and security event.
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           {chainStatus && (
             <span
-              title={chainStatus.chains.map((c) => `${c.table}: ${c.ok ? "ok" : `broken@${c.brokenAtSeq}`} (${c.totalRows} rows)`).join("\n")}
+              title={chainStatus.chains
+                .map(
+                  (c) =>
+                    `${c.table}: ${c.ok ? "ok" : `broken@${c.brokenAtSeq}`} (${c.totalRows} rows)`,
+                )
+                .join("\n")}
               className={`px-3 py-1.5 text-xs font-semibold rounded-full ${
-                chainStatus.ok
-                  ? "bg-green-100 text-green-800"
-                  : "bg-red-100 text-red-800"
+                chainStatus.ok ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
               }`}
             >
               {chainStatus.ok ? "✓ Audit chain verified" : "⚠ Audit chain broken"}
@@ -176,12 +200,18 @@ export default function AuditLogPage() {
             type="text"
             placeholder="Search..."
             value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
             className="px-3 py-2 text-sm rounded-lg border vi-border vi-bg focus:outline-none focus:ring-2 focus:ring-purple-500 w-48"
           />
           <select
             value={action}
-            onChange={(e) => { setAction(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setAction(e.target.value);
+              setPage(1);
+            }}
             className="px-3 py-2 text-sm rounded-lg border vi-border vi-bg focus:outline-none focus:ring-2 focus:ring-purple-500"
           >
             <option value="">All Actions</option>
@@ -197,7 +227,10 @@ export default function AuditLogPage() {
           </select>
           <select
             value={resourceType}
-            onChange={(e) => { setResourceType(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setResourceType(e.target.value);
+              setPage(1);
+            }}
             className="px-3 py-2 text-sm rounded-lg border vi-border vi-bg focus:outline-none focus:ring-2 focus:ring-purple-500"
           >
             <option value="">All Resources</option>
@@ -210,13 +243,19 @@ export default function AuditLogPage() {
           <input
             type="date"
             value={from}
-            onChange={(e) => { setFrom(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setFrom(e.target.value);
+              setPage(1);
+            }}
             className="px-3 py-2 text-sm rounded-lg border vi-border vi-bg focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
           <input
             type="date"
             value={to}
-            onChange={(e) => { setTo(e.target.value); setPage(1); }}
+            onChange={(e) => {
+              setTo(e.target.value);
+              setPage(1);
+            }}
             className="px-3 py-2 text-sm rounded-lg border vi-border vi-bg focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
           <button
@@ -264,11 +303,13 @@ export default function AuditLogPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <span className={`px-2 py-0.5 text-xs rounded font-semibold ${
-                          entry.action.startsWith("IMPERSONATION_")
-                            ? "bg-yellow-100 text-yellow-900"
-                            : "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]"
-                        }`}>
+                        <span
+                          className={`px-2 py-0.5 text-xs rounded font-semibold ${
+                            entry.action.startsWith("IMPERSONATION_")
+                              ? "bg-yellow-100 text-yellow-900"
+                              : "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]"
+                          }`}
+                        >
                           {entry.action.replace(/_/g, " ")}
                         </span>
                         {entry.onBehalfOfId && (
@@ -281,11 +322,15 @@ export default function AuditLogPage() {
                         <span className="text-sm vi-text">{entry.resourceType}</span>
                         <span className="text-xs vi-text-muted ml-1">#{entry.resourceId}</span>
                       </td>
-                      <td className="px-4 py-3 text-xs vi-text-muted font-mono">{entry.ipAddress || "—"}</td>
+                      <td className="px-4 py-3 text-xs vi-text-muted font-mono">
+                        {entry.ipAddress || "—"}
+                      </td>
                       <td className="px-4 py-3">
                         {entry.details ? (
                           <button
-                            onClick={() => setExpandedRow(expandedRow === entry.id ? null : entry.id)}
+                            onClick={() =>
+                              setExpandedRow(expandedRow === entry.id ? null : entry.id)
+                            }
                             className="text-xs text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))] font-medium transition"
                           >
                             {expandedRow === entry.id ? "Hide" : "View"}
@@ -303,11 +348,7 @@ export default function AuditLogPage() {
             {data.entries.some((e) => expandedRow === e.id && e.details) && (
               <div className="px-4 py-3 vi-bg border-t vi-border">
                 <pre className="text-xs vi-text-muted overflow-auto max-h-48 p-3 bg-white rounded-lg border vi-border">
-                  {JSON.stringify(
-                    data.entries.find((e) => e.id === expandedRow)?.details,
-                    null,
-                    2
-                  )}
+                  {JSON.stringify(data.entries.find((e) => e.id === expandedRow)?.details, null, 2)}
                 </pre>
               </div>
             )}

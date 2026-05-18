@@ -14,9 +14,7 @@ function requireUrl(name: string, devDefault: string): string {
   return devDefault;
 }
 const AI_SVC_URL = requireUrl("AI_SVC_URL", "http://localhost:3005");
-const INTERNAL_KEY =
-  process.env.INTERNAL_SERVICE_KEY ||
-  (IS_PROD ? "" : "aivo-internal-dev-key");
+const INTERNAL_KEY = process.env.INTERNAL_SERVICE_KEY || (IS_PROD ? "" : "aivo-internal-dev-key");
 
 interface OwnerCtx {
   tenantId: string;
@@ -31,7 +29,10 @@ function ownerHeaders(owner?: OwnerCtx): Record<string, string> {
   };
 }
 
-async function call<T>(path: string, init: RequestInit & { method: "GET" | "POST"; signal?: AbortSignal }): Promise<T> {
+async function call<T>(
+  path: string,
+  init: RequestInit & { method: "GET" | "POST"; signal?: AbortSignal },
+): Promise<T> {
   const res = await fetch(`${AI_SVC_URL}${path}`, {
     ...init,
     headers: {
@@ -137,25 +138,37 @@ export const aiSvc = {
     owner?: OwnerCtx,
     opts?: { signal?: AbortSignal },
   ) {
-    return call<TurnResponse>(`/api/ai/speech-buddy/sessions/${encodeURIComponent(sessionId)}/turn`, {
-      method: "POST",
-      body: JSON.stringify(body),
-      headers: ownerHeaders(owner),
-      signal: opts?.signal,
-    });
+    return call<TurnResponse>(
+      `/api/ai/speech-buddy/sessions/${encodeURIComponent(sessionId)}/turn`,
+      {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: ownerHeaders(owner),
+        signal: opts?.signal,
+      },
+    );
   },
   endSession(sessionId: string, reason: string, owner?: OwnerCtx) {
-    return call<EndSessionResponse>(`/api/ai/speech-buddy/sessions/${encodeURIComponent(sessionId)}/end`, {
-      method: "POST",
-      body: JSON.stringify({ reason }),
-      headers: ownerHeaders(owner),
-    });
+    return call<EndSessionResponse>(
+      `/api/ai/speech-buddy/sessions/${encodeURIComponent(sessionId)}/end`,
+      {
+        method: "POST",
+        body: JSON.stringify({ reason }),
+        headers: ownerHeaders(owner),
+      },
+    );
   },
   getSession(sessionId: string, owner?: OwnerCtx) {
-    return call<{ sessionId: string; state: string; ageBand: string; locale: string; targetedSkills: string[] }>(
-      `/api/ai/speech-buddy/sessions/${encodeURIComponent(sessionId)}`,
-      { method: "GET", headers: ownerHeaders(owner) },
-    );
+    return call<{
+      sessionId: string;
+      state: string;
+      ageBand: string;
+      locale: string;
+      targetedSkills: string[];
+    }>(`/api/ai/speech-buddy/sessions/${encodeURIComponent(sessionId)}`, {
+      method: "GET",
+      headers: ownerHeaders(owner),
+    });
   },
 };
 export type { OwnerCtx };

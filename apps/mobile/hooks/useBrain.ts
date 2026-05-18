@@ -19,10 +19,10 @@
  * parent dashboard. Both services talk to the same `brainRecommendations`
  * table.
  */
-import { useMemo } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { apiFetch } from '@/lib/api';
-import { API } from '@/constants/api';
+import { useMemo } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { apiFetch } from "@/lib/api";
+import { API } from "@/constants/api";
 
 export interface AccommodationDecision {
   accommodation: string;
@@ -54,7 +54,7 @@ export interface BrainState {
   learnerId?: string;
   tenantId?: string;
   version?: number;
-  approvalStatus?: 'pending' | 'approved' | 'declined' | string;
+  approvalStatus?: "pending" | "approved" | "declined" | string;
   masteryLevels?: Record<string, number>;
   activeAccommodations?: string[];
   activeTutors?: string[];
@@ -71,7 +71,7 @@ export interface BrainRecommendation {
   learnerId: string;
   tenantId: string;
   type: string;
-  status: 'PENDING' | 'APPROVED' | 'DECLINED' | 'ADJUSTED' | string;
+  status: "PENDING" | "APPROVED" | "DECLINED" | "ADJUSTED" | string;
   title: string;
   description?: string | null;
   payload?: Record<string, unknown> | null;
@@ -99,15 +99,13 @@ export interface BrainDomain {
 
 export function useBrain(learnerId: string) {
   return useQuery<BrainState>({
-    queryKey: ['brain', learnerId],
+    queryKey: ["brain", learnerId],
     queryFn: async () => {
       const res = await apiFetch(API.BRAIN, `/api/brain/${learnerId}`);
-      if (!res.ok) throw new Error('Failed to fetch brain state');
+      if (!res.ok) throw new Error("Failed to fetch brain state");
       const data: BrainState = await res.json();
       const nested = data?.state;
-      const hasTopLevel = Boolean(
-        data && (data.masteryLevels || data.version || data.updatedAt),
-      );
+      const hasTopLevel = Boolean(data && (data.masteryLevels || data.version || data.updatedAt));
       const hasNested = Boolean(
         nested && (nested.masteryLevels || nested.version || nested.updatedAt),
       );
@@ -121,29 +119,26 @@ export function useBrain(learnerId: string) {
 }
 
 const DOMAIN_LABELS: Record<string, string> = {
-  ela: 'Reading',
-  english: 'Reading',
-  reading: 'Reading',
-  math: 'Math',
-  mathematics: 'Math',
-  science: 'Science',
-  sel: 'Social-Emotional',
-  social_emotional: 'Social-Emotional',
-  social: 'Social-Emotional',
-  speech: 'Communication',
-  communication: 'Communication',
-  language: 'Communication',
-  executive_function: 'Executive Function',
-  ef: 'Executive Function',
-  exec: 'Executive Function',
+  ela: "Reading",
+  english: "Reading",
+  reading: "Reading",
+  math: "Math",
+  mathematics: "Math",
+  science: "Science",
+  sel: "Social-Emotional",
+  social_emotional: "Social-Emotional",
+  social: "Social-Emotional",
+  speech: "Communication",
+  communication: "Communication",
+  language: "Communication",
+  executive_function: "Executive Function",
+  ef: "Executive Function",
+  exec: "Executive Function",
 };
 
 export function labelForDomain(domain: string): string {
-  const key = domain.toLowerCase().replace(/[\s-]+/g, '_');
-  return (
-    DOMAIN_LABELS[key] ||
-    domain.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-  );
+  const key = domain.toLowerCase().replace(/[\s-]+/g, "_");
+  return DOMAIN_LABELS[key] || domain.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 /** Reshape a `BrainState` plus the learner's enrolled grade into the
@@ -156,7 +151,7 @@ export function deriveDomains(
 ): BrainDomain[] {
   if (!brain?.masteryLevels) return [];
   const enrolledNum = parseGrade(enrolledGrade);
-  const enrolledStr = String(enrolledGrade ?? '');
+  const enrolledStr = String(enrolledGrade ?? "");
 
   const accomByDomain: Record<string, string[]> = {};
   for (const a of brain.xaiExplanation?.accommodation_decisions ?? []) {
@@ -179,17 +174,13 @@ export function deriveDomains(
   }
 
   return Object.entries(brain.masteryLevels).map(([domain, raw]) => {
-    const norm =
-      typeof raw === 'number' ? (raw > 1 ? raw / 100 : raw) : 0;
+    const norm = typeof raw === "number" ? (raw > 1 ? raw / 100 : raw) : 0;
     const masteryPercent = Math.round(Math.max(0, Math.min(1, norm)) * 100);
-    const functioningNum = enrolledNum
-      ? Math.max(0.5, +(norm * enrolledNum).toFixed(1))
-      : null;
+    const functioningNum = enrolledNum ? Math.max(0.5, +(norm * enrolledNum).toFixed(1)) : null;
     return {
       domain: labelForDomain(domain),
-      enrolledGrade: enrolledStr || '—',
-      functioningGrade:
-        functioningNum != null ? String(functioningNum) : '—',
+      enrolledGrade: enrolledStr || "—",
+      functioningGrade: functioningNum != null ? String(functioningNum) : "—",
       masteryPercent,
       accommodations: accomByDomain[domain.toLowerCase()] ?? [],
       tutors: tutorByDomain[domain.toLowerCase()] ?? [],
@@ -198,11 +189,11 @@ export function deriveDomains(
 }
 
 function parseGrade(grade: string | number | null | undefined): number | null {
-  if (grade == null || grade === '') return null;
-  if (typeof grade === 'number') return grade;
+  if (grade == null || grade === "") return null;
+  if (typeof grade === "number") return grade;
   const s = grade.toLowerCase().trim();
-  if (s === 'k' || s === 'kindergarten' || s === 'kg') return 0;
-  if (s === 'pre-k' || s === 'prek' || s === 'pk') return -1;
+  if (s === "k" || s === "kindergarten" || s === "kg") return 0;
+  if (s === "pre-k" || s === "prek" || s === "pk") return -1;
   const m = s.match(/-?\d+(?:\.\d+)?/);
   return m ? Number(m[0]) : null;
 }
@@ -222,20 +213,17 @@ export function useBrainDomains(
 
 export function useBrainRecommendations(learnerId: string) {
   return useQuery<BrainRecommendation[]>({
-    queryKey: ['brain', learnerId, 'recommendations'],
+    queryKey: ["brain", learnerId, "recommendations"],
     queryFn: async () => {
-      const res = await apiFetch(
-        API.FAMILY,
-        `/api/family/recommendations/${learnerId}`,
-      );
-      if (!res.ok) throw new Error('Failed to fetch recommendations');
+      const res = await apiFetch(API.FAMILY, `/api/family/recommendations/${learnerId}`);
+      if (!res.ok) throw new Error("Failed to fetch recommendations");
       return res.json();
     },
     enabled: !!learnerId,
   });
 }
 
-export type RecommendationAction = 'approve' | 'decline' | 'adjust';
+export type RecommendationAction = "approve" | "decline" | "adjust";
 
 export interface RecommendationAmendedPayload {
   accommodation?: string;
@@ -265,35 +253,31 @@ export function useRecommendationAction() {
       amendedPayload?: RecommendationAmendedPayload;
     }) => {
       const apiAction =
-        action === 'approve'
-          ? 'APPROVED'
-          : action === 'adjust'
-          ? 'ADJUSTED'
-          : 'DECLINED';
+        action === "approve" ? "APPROVED" : action === "adjust" ? "ADJUSTED" : "DECLINED";
       const body: Record<string, unknown> = {
         action: apiAction,
         notes: parentNotes,
       };
-      if (action === 'adjust' && amendedPayload) {
+      if (action === "adjust" && amendedPayload) {
         body.amendedPayload = amendedPayload;
       }
       const res = await apiFetch(
         API.FAMILY,
         `/api/family/recommendations/${learnerId}/${recommendationId}/respond`,
         {
-          method: 'POST',
+          method: "POST",
           body: JSON.stringify(body),
         },
       );
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail || err.error || 'Action failed');
+        throw new Error(err.detail || err.error || "Action failed");
       }
       return res.json();
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ['brain', variables.learnerId, 'recommendations'],
+        queryKey: ["brain", variables.learnerId, "recommendations"],
       });
     },
   });

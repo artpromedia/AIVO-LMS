@@ -36,11 +36,16 @@ interface IepGoal {
 }
 
 const LEVEL_STYLES: Record<string, string> = {
-  STANDARD:     "bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))] border-[hsl(var(--visual-science)/0.3)]",
-  SUPPORTED:    "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))] border-[hsl(var(--visual-reading)/0.3)]",
-  LOW_VERBAL:   "bg-[hsl(var(--visual-sel)/0.16)] text-[hsl(var(--visual-sel))] border-[hsl(var(--visual-sel)/0.3)]",
-  NON_VERBAL:   "bg-[hsl(var(--visual-sel)/0.16)] text-[hsl(var(--visual-sel))] border-[hsl(var(--visual-sel)/0.3)]",
-  PRE_SYMBOLIC: "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))] border-[hsl(var(--visual-math)/0.3)]",
+  STANDARD:
+    "bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))] border-[hsl(var(--visual-science)/0.3)]",
+  SUPPORTED:
+    "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))] border-[hsl(var(--visual-reading)/0.3)]",
+  LOW_VERBAL:
+    "bg-[hsl(var(--visual-sel)/0.16)] text-[hsl(var(--visual-sel))] border-[hsl(var(--visual-sel)/0.3)]",
+  NON_VERBAL:
+    "bg-[hsl(var(--visual-sel)/0.16)] text-[hsl(var(--visual-sel))] border-[hsl(var(--visual-sel)/0.3)]",
+  PRE_SYMBOLIC:
+    "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))] border-[hsl(var(--visual-math)/0.3)]",
 };
 
 export default function CaregiverOverviewPage() {
@@ -153,9 +158,7 @@ export default function CaregiverOverviewPage() {
                 <StatIconWell color="science" className="mb-3">
                   <User size={22} strokeWidth={2.5} aria-hidden="true" />
                 </StatIconWell>
-                <p className="text-xl font-black vi-text leading-tight">
-                  {activeLearner.name}
-                </p>
+                <p className="text-xl font-black vi-text leading-tight">{activeLearner.name}</p>
                 <p className="text-xs vi-text-muted font-bold uppercase tracking-wide mt-1.5">
                   Grade {activeLearner.gradeLevel || "—"}
                 </p>
@@ -240,9 +243,7 @@ export default function CaregiverOverviewPage() {
                     {learnerGoals.slice(0, 4).map((g) => (
                       <div key={g.id}>
                         <div className="flex items-center justify-between mb-1.5">
-                          <p className="text-sm font-bold text-slate-800 truncate">
-                            {g.title}
-                          </p>
+                          <p className="text-sm font-bold text-slate-800 truncate">{g.title}</p>
                           <span className="text-xs text-[hsl(var(--visual-science))] font-black ml-2 shrink-0">
                             {g.progressPct}%
                           </span>
@@ -300,12 +301,9 @@ export default function CaregiverOverviewPage() {
                             {l.name.charAt(0)}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="font-bold vi-text truncate">
-                              {l.name}
-                            </p>
+                            <p className="font-bold vi-text truncate">{l.name}</p>
                             <p className="text-xs vi-text-muted font-semibold mt-0.5 truncate">
-                              Grade {l.gradeLevel || "—"} ·{" "}
-                              {l.functioningLevel || "Pending"}
+                              Grade {l.gradeLevel || "—"} · {l.functioningLevel || "Pending"}
                             </p>
                           </div>
                         </div>

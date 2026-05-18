@@ -70,15 +70,7 @@ const SKIP_FILE_PATTERNS = [
   /\.snap$/i,
 ];
 
-const SCANNED_EXTENSIONS = new Set([
-  ".ts",
-  ".tsx",
-  ".js",
-  ".jsx",
-  ".mjs",
-  ".cjs",
-  ".py",
-]);
+const SCANNED_EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".py"]);
 
 /**
  * Rules: each rule has an id, severity, regex, and an allowlist test that
@@ -96,8 +88,7 @@ const RULES = [
     id: "generate-demo-beats",
     description: "generateDemoBeats() used outside an explicit dev/demo flag",
     pattern: /generateDemoBeats\s*\(/,
-    allow: (line) =>
-      /__DEV__|AIVO_MOBILE_DEMO_STAGE|isDev|isDemo|@allow-demo/.test(line),
+    allow: (line) => /__DEV__|AIVO_MOBILE_DEMO_STAGE|isDev|isDemo|@allow-demo/.test(line),
   },
   {
     id: "mock-question-fallback",
@@ -186,8 +177,7 @@ function stripCommentLine(line, ext) {
   if (ext === ".py") {
     if (trimmed.startsWith("#")) return "";
   } else {
-    if (trimmed.startsWith("//") || trimmed.startsWith("*") || trimmed.startsWith("/*"))
-      return "";
+    if (trimmed.startsWith("//") || trimmed.startsWith("*") || trimmed.startsWith("/*")) return "";
   }
   return line;
 }

@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { theme } from './theme';
-import { AivoButton } from './AivoButton';
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { theme } from "./theme";
+import { AivoButton } from "./AivoButton";
 
 interface EmptyStateProps {
   icon?: React.ReactNode;
@@ -27,8 +27,8 @@ export function EmptyState({ icon, title, message, actionLabel, onAction }: Empt
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     padding: theme.spacing.xl,
   },
   iconContainer: {
@@ -38,14 +38,14 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: theme.fonts.heading,
     color: theme.colors.text,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 8,
   },
   message: {
     fontSize: 14,
     fontFamily: theme.fonts.body,
     color: theme.colors.textSecondary,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 20,
   },
 });

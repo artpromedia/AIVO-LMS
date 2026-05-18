@@ -74,9 +74,7 @@ function StatusBadge({ status }: { status: string }) {
         ? "bg-amber-100 text-amber-800"
         : "bg-rose-100 text-rose-800";
   return (
-    <span className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${cls}`}>
-      {status}
-    </span>
+    <span className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${cls}`}>{status}</span>
   );
 }
 
@@ -126,9 +124,7 @@ export default function DailyBatchPage() {
   function toggleStatus(s: string) {
     setFilters((f) => ({
       ...f,
-      statuses: f.statuses.includes(s)
-        ? f.statuses.filter((x) => x !== s)
-        : [...f.statuses, s],
+      statuses: f.statuses.includes(s) ? f.statuses.filter((x) => x !== s) : [...f.statuses, s],
     }));
   }
 
@@ -165,7 +161,9 @@ export default function DailyBatchPage() {
             </div>
             <div className="md:col-span-2">
               <dt className="text-xs text-gray-500">Last started</dt>
-              <dd>{data.latest.lastRunAt ? new Date(data.latest.lastRunAt).toLocaleString() : "—"}</dd>
+              <dd>
+                {data.latest.lastRunAt ? new Date(data.latest.lastRunAt).toLocaleString() : "—"}
+              </dd>
             </div>
             <div className="md:col-span-2">
               <dt className="text-xs text-gray-500">Last finished</dt>
@@ -178,7 +176,9 @@ export default function DailyBatchPage() {
             {data.latest.lastError && (
               <div className="md:col-span-4">
                 <dt className="text-xs text-gray-500">Last error</dt>
-                <dd className="text-rose-700 whitespace-pre-wrap break-all">{data.latest.lastError}</dd>
+                <dd className="text-rose-700 whitespace-pre-wrap break-all">
+                  {data.latest.lastError}
+                </dd>
               </div>
             )}
           </dl>
@@ -204,7 +204,9 @@ export default function DailyBatchPage() {
             </div>
           </div>
           <div>
-            <label htmlFor="daily-batch-from" className="block text-xs text-gray-600 mb-1">From</label>
+            <label htmlFor="daily-batch-from" className="block text-xs text-gray-600 mb-1">
+              From
+            </label>
             <input
               id="daily-batch-from"
               type="datetime-local"
@@ -214,7 +216,9 @@ export default function DailyBatchPage() {
             />
           </div>
           <div>
-            <label htmlFor="daily-batch-to" className="block text-xs text-gray-600 mb-1">To</label>
+            <label htmlFor="daily-batch-to" className="block text-xs text-gray-600 mb-1">
+              To
+            </label>
             <input
               id="daily-batch-to"
               type="datetime-local"
@@ -277,7 +281,9 @@ export default function DailyBatchPage() {
                 </td>
                 <td className="px-3 py-2">{row.sent ?? "—"}</td>
                 <td className="px-3 py-2">{row.failed ?? "—"}</td>
-                <td className="px-3 py-2">{row.durationMs != null ? `${row.durationMs}ms` : "—"}</td>
+                <td className="px-3 py-2">
+                  {row.durationMs != null ? `${row.durationMs}ms` : "—"}
+                </td>
                 <td className="px-3 py-2 font-mono text-xs">{row.replicaId ?? "—"}</td>
                 <td className="px-3 py-2 text-rose-700 break-all">{row.error ?? ""}</td>
               </tr>

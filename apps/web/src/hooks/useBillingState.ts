@@ -99,8 +99,14 @@ interface Args {
   accessToken: string | undefined | null;
 }
 
-async function fetchJson<T>(url: string, token: string | undefined | null): Promise<{ ok: true; data: T } | { ok: false; status: number }> {
-  const res = await fetch(url, token ? { headers: { Authorization: `Bearer ${token}` } } : undefined);
+async function fetchJson<T>(
+  url: string,
+  token: string | undefined | null,
+): Promise<{ ok: true; data: T } | { ok: false; status: number }> {
+  const res = await fetch(
+    url,
+    token ? { headers: { Authorization: `Bearer ${token}` } } : undefined,
+  );
   if (!res.ok) return { ok: false, status: res.status };
   return { ok: true, data: (await res.json()) as T };
 }
@@ -128,7 +134,9 @@ export function useBillingState({ tenantId, accessToken }: Args): BillingState {
       // Forbidden on any tenant-scoped call surfaces as access-denied
       // overall — the parent can't see their own data, so the whole
       // screen is unusable.
-      const forbidden = [subRes, usageRes, invoicesRes, entRes].some((r) => !r.ok && r.status === 403);
+      const forbidden = [subRes, usageRes, invoicesRes, entRes].some(
+        (r) => !r.ok && r.status === 403,
+      );
       if (forbidden) {
         setStatus("forbidden");
         return;
@@ -148,7 +156,10 @@ export function useBillingState({ tenantId, accessToken }: Args): BillingState {
 
   const refreshEntitlements = useCallback(async () => {
     if (!tenantId) return;
-    const res = await fetchJson<BillingEntitlements>(`/api/billing/entitlements/${tenantId}`, accessToken);
+    const res = await fetchJson<BillingEntitlements>(
+      `/api/billing/entitlements/${tenantId}`,
+      accessToken,
+    );
     if (res.ok) setEntitlements(res.data);
   }, [tenantId, accessToken]);
 

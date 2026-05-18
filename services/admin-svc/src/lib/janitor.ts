@@ -30,8 +30,9 @@ export async function runJanitorOnce(db: any): Promise<JobOutcome & { deletedRow
   const namesResult = (await db.execute(sql`
     SELECT DISTINCT job_name FROM periodic_job_runs
   `)) as { rows?: Array<{ job_name: string }> } | Array<{ job_name: string }>;
-  const periodicNames = (Array.isArray(namesResult) ? namesResult : (namesResult.rows ?? []))
-    .map((r) => r.job_name);
+  const periodicNames = (Array.isArray(namesResult) ? namesResult : (namesResult.rows ?? [])).map(
+    (r) => r.job_name,
+  );
 
   for (const jobName of periodicNames) {
     const result = (await db.execute(sql`
@@ -56,9 +57,8 @@ export async function runJanitorOnce(db: any): Promise<JobOutcome & { deletedRow
   const billingNamesResult = (await db.execute(sql`
     SELECT DISTINCT job_name FROM billing_daily_job_runs
   `)) as { rows?: Array<{ job_name: string }> } | Array<{ job_name: string }>;
-  const billingNames = (Array.isArray(billingNamesResult)
-    ? billingNamesResult
-    : (billingNamesResult.rows ?? [])
+  const billingNames = (
+    Array.isArray(billingNamesResult) ? billingNamesResult : (billingNamesResult.rows ?? [])
   ).map((r) => r.job_name);
   for (const jobName of billingNames) {
     const result = (await db.execute(sql`

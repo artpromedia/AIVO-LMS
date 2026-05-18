@@ -29,8 +29,8 @@ export default function ParentLearnerOverviewPage() {
   useEffect(() => {
     if (!accessToken || !learnerId) return;
     fetch("/api/users/learners", { headers: { Authorization: `Bearer ${accessToken}` } })
-      .then(r => r.ok ? r.json() : [])
-      .then(data => {
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => {
         const found = (Array.isArray(data) ? data : []).find((l: any) => l.id === learnerId);
         if (found) setLearner(found);
       })
@@ -56,8 +56,12 @@ export default function ParentLearnerOverviewPage() {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="vi-card p-5">
-          <p className="text-xs vi-text-muted font-semibold uppercase mb-1">{t("functioning_level")}</p>
-          <p className="text-xl font-bold text-[hsl(var(--visual-primary))]">{learner.functioningLevel || t("pending_assessment")}</p>
+          <p className="text-xs vi-text-muted font-semibold uppercase mb-1">
+            {t("functioning_level")}
+          </p>
+          <p className="text-xl font-bold text-[hsl(var(--visual-primary))]">
+            {learner.functioningLevel || t("pending_assessment")}
+          </p>
         </div>
         <div className="vi-card p-5">
           <p className="text-xs vi-text-muted font-semibold uppercase mb-1">{t("grade")}</p>
@@ -65,43 +69,62 @@ export default function ParentLearnerOverviewPage() {
         </div>
         <div className="vi-card p-5">
           <p className="text-xs vi-text-muted font-semibold uppercase mb-1">{t("member_since")}</p>
-          <p className="text-xl font-bold vi-text">{new Date(learner.createdAt).toLocaleDateString()}</p>
+          <p className="text-xl font-bold vi-text">
+            {new Date(learner.createdAt).toLocaleDateString()}
+          </p>
         </div>
       </div>
 
       <div className="vi-card p-6">
         <h2 className="font-heading font-bold text-lg vi-text mb-4">{t("brain_preview")}</h2>
         {accessToken && (
-          <BrainVisualization learnerId={learnerId} learnerName={learner.name} accessToken={accessToken} compact />
+          <BrainVisualization
+            learnerId={learnerId}
+            learnerName={learner.name}
+            accessToken={accessToken}
+            compact
+          />
         )}
-        <Link href={`/dashboard/parent/learner/${learnerId}/brain`}
-          className="mt-4 text-sm text-[hsl(var(--visual-primary))] font-semibold hover:underline inline-block">{t("view_full_brain")}</Link>
+        <Link
+          href={`/dashboard/parent/learner/${learnerId}/brain`}
+          className="mt-4 text-sm text-[hsl(var(--visual-primary))] font-semibold hover:underline inline-block"
+        >
+          {t("view_full_brain")}
+        </Link>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Link href={`/dashboard/parent/learner/${learnerId}/assessment`}
-          className="vi-card p-5 hover:shadow-md hover:border-[hsl(var(--visual-primary)/0.4)] transition text-center">
+        <Link
+          href={`/dashboard/parent/learner/${learnerId}/assessment`}
+          className="vi-card p-5 hover:shadow-md hover:border-[hsl(var(--visual-primary)/0.4)] transition text-center"
+        >
           <span className="w-11 h-11 mx-auto rounded-2xl bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))] flex items-center justify-center">
             <ClipboardList size={22} strokeWidth={2.5} aria-hidden="true" />
           </span>
           <p className="text-sm font-semibold vi-text mt-2">{t("assessments")}</p>
         </Link>
-        <Link href={`/dashboard/parent/learner/${learnerId}/gradebook`}
-          className="vi-card p-5 hover:shadow-md hover:border-[hsl(var(--visual-primary)/0.4)] transition text-center">
+        <Link
+          href={`/dashboard/parent/learner/${learnerId}/gradebook`}
+          className="vi-card p-5 hover:shadow-md hover:border-[hsl(var(--visual-primary)/0.4)] transition text-center"
+        >
           <span className="w-11 h-11 mx-auto rounded-2xl bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))] flex items-center justify-center">
             <BarChart3 size={22} strokeWidth={2.5} aria-hidden="true" />
           </span>
           <p className="text-sm font-semibold vi-text mt-2">Progress</p>
         </Link>
-        <Link href={`/dashboard/parent/learner/${learnerId}/iep`}
-          className="vi-card p-5 hover:shadow-md hover:border-[hsl(var(--visual-primary)/0.4)] transition text-center">
+        <Link
+          href={`/dashboard/parent/learner/${learnerId}/iep`}
+          className="vi-card p-5 hover:shadow-md hover:border-[hsl(var(--visual-primary)/0.4)] transition text-center"
+        >
           <span className="w-11 h-11 mx-auto rounded-2xl bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))] flex items-center justify-center">
             <Target size={22} strokeWidth={2.5} aria-hidden="true" />
           </span>
           <p className="text-sm font-semibold vi-text mt-2">{t("iep_goals")}</p>
         </Link>
-        <Link href={`/dashboard/parent/learner/${learnerId}/recommendations`}
-          className="vi-card p-5 hover:shadow-md hover:border-[hsl(var(--visual-primary)/0.4)] transition text-center">
+        <Link
+          href={`/dashboard/parent/learner/${learnerId}/recommendations`}
+          className="vi-card p-5 hover:shadow-md hover:border-[hsl(var(--visual-primary)/0.4)] transition text-center"
+        >
           <span className="w-11 h-11 mx-auto rounded-2xl bg-[hsl(var(--visual-sel)/0.12)] text-[hsl(var(--visual-sel))] flex items-center justify-center">
             <Lightbulb size={22} strokeWidth={2.5} aria-hidden="true" />
           </span>

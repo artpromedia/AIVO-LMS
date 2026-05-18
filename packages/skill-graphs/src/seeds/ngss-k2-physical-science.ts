@@ -21,14 +21,16 @@ export const ngssK2PhysicalScience: SkillGraph = {
     {
       id: "ngss.K-PS2-1",
       title: "Plan investigations of pushes and pulls",
-      description: "I can plan a way to test how strong or weak a push or pull changes the way an object moves.",
+      description:
+        "I can plan a way to test how strong or weak a push or pull changes the way an object moves.",
       subject: "science",
       gradeBand: "K",
       frameworkRefs: [
         {
           framework: "NGSS",
           code: "K-PS2-1",
-          label: "Plan and conduct an investigation to compare the effects of different strengths or different directions of pushes and pulls on the motion of an object.",
+          label:
+            "Plan and conduct an investigation to compare the effects of different strengths or different directions of pushes and pulls on the motion of an object.",
         },
       ],
       prerequisites: [],
@@ -43,7 +45,8 @@ export const ngssK2PhysicalScience: SkillGraph = {
         {
           framework: "NGSS",
           code: "K-PS2-2",
-          label: "Analyze data to determine if a design solution works as intended to change the speed or direction of an object with a push or pull.",
+          label:
+            "Analyze data to determine if a design solution works as intended to change the speed or direction of an object with a push or pull.",
         },
       ],
       prerequisites: ["ngss.K-PS2-1"],
@@ -75,7 +78,8 @@ export const ngssK2PhysicalScience: SkillGraph = {
         {
           framework: "NGSS",
           code: "K-PS3-2",
-          label: "Use tools and materials to design and build a structure that will reduce the warming effect of sunlight on an area.",
+          label:
+            "Use tools and materials to design and build a structure that will reduce the warming effect of sunlight on an area.",
         },
       ],
       prerequisites: ["ngss.K-PS3-1"],
@@ -85,14 +89,16 @@ export const ngssK2PhysicalScience: SkillGraph = {
     {
       id: "ngss.1-PS4-1",
       title: "Vibrations make sound",
-      description: "I can show that things that make sound shake (vibrate), and that sound can make things shake.",
+      description:
+        "I can show that things that make sound shake (vibrate), and that sound can make things shake.",
       subject: "science",
       gradeBand: "1",
       frameworkRefs: [
         {
           framework: "NGSS",
           code: "1-PS4-1",
-          label: "Plan and conduct investigations to provide evidence that vibrating materials can make sound and that sound can make materials vibrate.",
+          label:
+            "Plan and conduct investigations to provide evidence that vibrating materials can make sound and that sound can make materials vibrate.",
         },
       ],
       prerequisites: [],
@@ -107,7 +113,8 @@ export const ngssK2PhysicalScience: SkillGraph = {
         {
           framework: "NGSS",
           code: "1-PS4-2",
-          label: "Make observations to construct an evidence-based account that objects can be seen only when illuminated.",
+          label:
+            "Make observations to construct an evidence-based account that objects can be seen only when illuminated.",
         },
       ],
       prerequisites: [],
@@ -122,7 +129,8 @@ export const ngssK2PhysicalScience: SkillGraph = {
         {
           framework: "NGSS",
           code: "1-PS4-3",
-          label: "Plan and conduct investigations to determine the effect of placing objects made with different materials in the path of a beam of light.",
+          label:
+            "Plan and conduct investigations to determine the effect of placing objects made with different materials in the path of a beam of light.",
         },
       ],
       prerequisites: ["ngss.1-PS4-2"],
@@ -137,7 +145,8 @@ export const ngssK2PhysicalScience: SkillGraph = {
         {
           framework: "NGSS",
           code: "1-PS4-4",
-          label: "Use tools and materials to design and build a device that uses light or sound to solve the problem of communicating over a distance.",
+          label:
+            "Use tools and materials to design and build a device that uses light or sound to solve the problem of communicating over a distance.",
         },
       ],
       prerequisites: ["ngss.1-PS4-1", "ngss.1-PS4-2"],
@@ -154,7 +163,8 @@ export const ngssK2PhysicalScience: SkillGraph = {
         {
           framework: "NGSS",
           code: "2-PS1-1",
-          label: "Plan and conduct an investigation to describe and classify different kinds of materials by their observable properties.",
+          label:
+            "Plan and conduct an investigation to describe and classify different kinds of materials by their observable properties.",
         },
       ],
       prerequisites: [],
@@ -169,7 +179,8 @@ export const ngssK2PhysicalScience: SkillGraph = {
         {
           framework: "NGSS",
           code: "2-PS1-2",
-          label: "Analyze data obtained from testing different materials to determine which materials have the properties that are best suited for an intended purpose.",
+          label:
+            "Analyze data obtained from testing different materials to determine which materials have the properties that are best suited for an intended purpose.",
         },
       ],
       prerequisites: ["ngss.2-PS1-1"],
@@ -177,14 +188,16 @@ export const ngssK2PhysicalScience: SkillGraph = {
     {
       id: "ngss.2-PS1-3",
       title: "Take small pieces and build something new",
-      description: "I can show that a small set of pieces can be put together to make many different things.",
+      description:
+        "I can show that a small set of pieces can be put together to make many different things.",
       subject: "science",
       gradeBand: "2",
       frameworkRefs: [
         {
           framework: "NGSS",
           code: "2-PS1-3",
-          label: "Make observations to construct an evidence-based account of how an object made of a small set of pieces can be disassembled and made into a new object.",
+          label:
+            "Make observations to construct an evidence-based account of how an object made of a small set of pieces can be disassembled and made into a new object.",
         },
       ],
       prerequisites: ["ngss.2-PS1-1"],
@@ -199,7 +212,8 @@ export const ngssK2PhysicalScience: SkillGraph = {
         {
           framework: "NGSS",
           code: "2-PS1-4",
-          label: "Construct an argument with evidence that some changes caused by heating or cooling can be reversed and some cannot.",
+          label:
+            "Construct an argument with evidence that some changes caused by heating or cooling can be reversed and some cannot.",
         },
       ],
       prerequisites: ["ngss.2-PS1-1"],

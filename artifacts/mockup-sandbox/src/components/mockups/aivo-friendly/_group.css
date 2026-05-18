@@ -1,47 +1,73 @@
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap");
 
 .aivo-friendly {
   /* AIVO real brand palette */
-  --primary: 262 83% 58%;            /* #7C3AED */
+  --primary: 262 83% 58%; /* #7C3AED */
   --primary-foreground: 0 0% 100%;
-  --primary-light: 262 88% 95%;      /* #EDE3FE */
-  --primary-dark: 262 75% 42%;       /* #5B21B6 */
-  --secondary: 199 89% 48%;          /* #0DA2E7 */
+  --primary-light: 262 88% 95%; /* #EDE3FE */
+  --primary-dark: 262 75% 42%; /* #5B21B6 */
+  --secondary: 199 89% 48%; /* #0DA2E7 */
   --secondary-foreground: 222 47% 11%;
-  --accent: 42 100% 50%;             /* #FFB700 */
+  --accent: 42 100% 50%; /* #FFB700 */
   --accent-foreground: 222 47% 11%;
-  --success: 142 71% 45%;            /* #21C45D */
-  --error: 340 82% 52%;              /* #E91E63 */
+  --success: 142 71% 45%; /* #21C45D */
+  --error: 340 82% 52%; /* #E91E63 */
   --background: 0 0% 100%;
-  --foreground: 218 22% 20%;         /* #292F3D */
-  --muted: 210 40% 98%;              /* #FAFAFA */
-  --muted-foreground: 220 9% 46%;    /* #6B7280 */
-  --border: 220 13% 91%;             /* #E2E4E9 */
+  --foreground: 218 22% 20%; /* #292F3D */
+  --muted: 210 40% 98%; /* #FAFAFA */
+  --muted-foreground: 220 9% 46%; /* #6B7280 */
+  --border: 220 13% 91%; /* #E2E4E9 */
 
-  --font-heading: 'Fredoka', sans-serif;
-  --font-body: 'Nunito', sans-serif;
+  --font-heading: "Fredoka", sans-serif;
+  --font-body: "Nunito", sans-serif;
 }
 
 .aivo-friendly * {
   font-family: var(--font-body);
 }
 
-.aivo-friendly h1, .aivo-friendly h2, .aivo-friendly h3, .aivo-friendly h4, .aivo-friendly h5, .aivo-friendly h6, .aivo-friendly .font-heading {
+.aivo-friendly h1,
+.aivo-friendly h2,
+.aivo-friendly h3,
+.aivo-friendly h4,
+.aivo-friendly h5,
+.aivo-friendly h6,
+.aivo-friendly .font-heading {
   font-family: var(--font-heading);
 }
 
-.aivo-friendly .hide-scrollbar::-webkit-scrollbar { display: none; }
-.aivo-friendly .hide-scrollbar { scrollbar-width: none; }
+.aivo-friendly .hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.aivo-friendly .hide-scrollbar {
+  scrollbar-width: none;
+}
 
 @keyframes aivo-float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
-.aivo-friendly .aivo-float { animation: aivo-float 4s ease-in-out infinite; }
+.aivo-friendly .aivo-float {
+  animation: aivo-float 4s ease-in-out infinite;
+}
 
 @keyframes aivo-blob {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -40px) scale(1.05); }
-  66% { transform: translate(-20px, 20px) scale(0.95); }
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -40px) scale(1.05);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.95);
+  }
 }
-.aivo-friendly .aivo-blob { animation: aivo-blob 18s ease-in-out infinite; }
+.aivo-friendly .aivo-blob {
+  animation: aivo-blob 18s ease-in-out infinite;
+}

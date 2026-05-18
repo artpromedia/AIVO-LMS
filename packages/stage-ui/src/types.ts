@@ -1,10 +1,28 @@
 /** Minimal shared stage types extracted from apps/web/src/components/stage/types.ts */
 
-export type FunctioningLevel = "STANDARD" | "SUPPORTED" | "LOW_VERBAL" | "NON_VERBAL" | "PRE_SYMBOLIC";
+export type FunctioningLevel =
+  | "STANDARD"
+  | "SUPPORTED"
+  | "LOW_VERBAL"
+  | "NON_VERBAL"
+  | "PRE_SYMBOLIC";
 export type SensoryLevel = "hyper" | "hypo" | "typical";
-export type TutorState = "idle" | "speaking" | "celebrating" | "thinking" | "encouraging" | "pointing";
+export type TutorState =
+  | "idle"
+  | "speaking"
+  | "celebrating"
+  | "thinking"
+  | "encouraging"
+  | "pointing";
 export type InteractionType = "multiple_choice" | "drag_drop" | "voice" | "draw" | "tap" | "match";
-export type SessionPhase = "loading" | "opening" | "warmup" | "core" | "check" | "celebration" | "complete";
+export type SessionPhase =
+  | "loading"
+  | "opening"
+  | "warmup"
+  | "core"
+  | "check"
+  | "celebration"
+  | "complete";
 
 export interface SensoryProfile {
   visual: SensoryLevel;

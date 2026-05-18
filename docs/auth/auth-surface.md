@@ -13,41 +13,41 @@ must route to identity-svc via the BFF rewrites in
 
 ## Endpoints (identity-svc, `apps/services/identity-svc/src/routes/auth.ts`)
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET  | `/api/auth/public-key` | JWT verification public key |
-| POST | `/api/auth/register` | Parent / user signup |
-| POST | `/api/auth/login` | Password login |
-| POST | `/api/auth/admin-login` | Internal admin login |
-| POST | `/api/auth/district-login` | District admin login |
-| POST | `/api/auth/google` | Google SSO exchange (uses `email_verified` claim) |
-| POST | `/api/auth/pin-login` | Learner PIN unlock |
-| POST | `/api/auth/refresh` | Refresh access token |
-| PUT  | `/api/auth/session/heartbeat` | Extend live session |
-| POST | `/api/auth/logout` | Logout / revoke session |
-| POST | `/api/auth/forgot-password` | Request reset email |
-| POST | `/api/auth/reset-password` | Submit reset token + new password |
-| PUT  | `/api/auth/password` | Authenticated password change |
-| PUT  | `/api/auth/profile` | Authenticated profile update |
-| DELETE | `/api/auth/account` | Self-service account deletion |
-| DELETE | `/api/auth/learner/:learnerId` | Remove a learner record |
-| POST | `/api/auth/verify-mfa` | Verify a step-up MFA challenge |
-| POST | `/api/auth/mfa/resend` | Resend MFA code |
-| POST | `/api/auth/mfa/enable` | Enable MFA |
-| POST | `/api/auth/mfa/confirm-enable` | Confirm MFA enrollment |
-| POST | `/api/auth/mfa/disable` | Disable MFA |
-| GET  | `/api/auth/mfa/status` | Current MFA state |
-| POST | `/api/auth/mfa/totp/enroll` | Start TOTP enrollment |
-| POST | `/api/auth/mfa/totp/confirm` | Confirm TOTP |
-| POST | `/api/auth/mfa/totp/disable` | Remove TOTP |
-| POST | `/api/auth/mfa/webauthn/register/options` | WebAuthn enroll options |
-| POST | `/api/auth/mfa/webauthn/register/verify` | WebAuthn enroll verify |
-| GET  | `/api/auth/mfa/webauthn/credentials` | List WebAuthn credentials |
-| DELETE | `/api/auth/mfa/webauthn/credentials/:id` | Remove a WebAuthn credential |
-| POST | `/api/auth/mfa/webauthn/login/options` | WebAuthn login challenge |
-| POST | `/api/auth/mfa/webauthn/login/verify` | WebAuthn login verify |
-| GET  | `/api/auth/mfa/recovery/status` | MFA recovery codes status |
-| POST | `/api/auth/mfa/recovery/regenerate` | Regenerate MFA recovery codes |
+| Method | Path                                      | Purpose                                           |
+| ------ | ----------------------------------------- | ------------------------------------------------- |
+| GET    | `/api/auth/public-key`                    | JWT verification public key                       |
+| POST   | `/api/auth/register`                      | Parent / user signup                              |
+| POST   | `/api/auth/login`                         | Password login                                    |
+| POST   | `/api/auth/admin-login`                   | Internal admin login                              |
+| POST   | `/api/auth/district-login`                | District admin login                              |
+| POST   | `/api/auth/google`                        | Google SSO exchange (uses `email_verified` claim) |
+| POST   | `/api/auth/pin-login`                     | Learner PIN unlock                                |
+| POST   | `/api/auth/refresh`                       | Refresh access token                              |
+| PUT    | `/api/auth/session/heartbeat`             | Extend live session                               |
+| POST   | `/api/auth/logout`                        | Logout / revoke session                           |
+| POST   | `/api/auth/forgot-password`               | Request reset email                               |
+| POST   | `/api/auth/reset-password`                | Submit reset token + new password                 |
+| PUT    | `/api/auth/password`                      | Authenticated password change                     |
+| PUT    | `/api/auth/profile`                       | Authenticated profile update                      |
+| DELETE | `/api/auth/account`                       | Self-service account deletion                     |
+| DELETE | `/api/auth/learner/:learnerId`            | Remove a learner record                           |
+| POST   | `/api/auth/verify-mfa`                    | Verify a step-up MFA challenge                    |
+| POST   | `/api/auth/mfa/resend`                    | Resend MFA code                                   |
+| POST   | `/api/auth/mfa/enable`                    | Enable MFA                                        |
+| POST   | `/api/auth/mfa/confirm-enable`            | Confirm MFA enrollment                            |
+| POST   | `/api/auth/mfa/disable`                   | Disable MFA                                       |
+| GET    | `/api/auth/mfa/status`                    | Current MFA state                                 |
+| POST   | `/api/auth/mfa/totp/enroll`               | Start TOTP enrollment                             |
+| POST   | `/api/auth/mfa/totp/confirm`              | Confirm TOTP                                      |
+| POST   | `/api/auth/mfa/totp/disable`              | Remove TOTP                                       |
+| POST   | `/api/auth/mfa/webauthn/register/options` | WebAuthn enroll options                           |
+| POST   | `/api/auth/mfa/webauthn/register/verify`  | WebAuthn enroll verify                            |
+| GET    | `/api/auth/mfa/webauthn/credentials`      | List WebAuthn credentials                         |
+| DELETE | `/api/auth/mfa/webauthn/credentials/:id`  | Remove a WebAuthn credential                      |
+| POST   | `/api/auth/mfa/webauthn/login/options`    | WebAuthn login challenge                          |
+| POST   | `/api/auth/mfa/webauthn/login/verify`     | WebAuthn login verify                             |
+| GET    | `/api/auth/mfa/recovery/status`           | MFA recovery codes status                         |
+| POST   | `/api/auth/mfa/recovery/regenerate`       | Regenerate MFA recovery codes                     |
 
 ### Known gaps to close in S03 follow-ups
 
@@ -75,28 +75,28 @@ real code, not stubs.
 
 ### `apps/web` (legacy shell)
 
-| Path | Status |
-|---|---|
-| `/login` | present |
-| `/signup` | present |
-| `/forgot-password` | present |
-| `/reset-password` | present |
-| `/verify-mfa` | present |
-| `/accept-invite` | present |
-| **/verify-email** | **missing** — Sprint 03b |
+| Path                  | Status                   |
+| --------------------- | ------------------------ |
+| `/login`              | present                  |
+| `/signup`             | present                  |
+| `/forgot-password`    | present                  |
+| `/reset-password`     | present                  |
+| `/verify-mfa`         | present                  |
+| `/accept-invite`      | present                  |
+| **/verify-email**     | **missing** — Sprint 03b |
 | **/account-recovery** | **missing** — Sprint 03b |
 
 ### `apps/web-v2` (role-grouped shell)
 
-| Path | Status |
-|---|---|
-| `/login` | present, currently mock-only |
-| `/signup` | present, currently mock-only |
-| `/forgot-password` | missing |
-| `/reset-password` | missing |
-| `/verify-mfa` | missing |
-| `/verify-email` | missing |
-| `/account-recovery` | missing |
+| Path                | Status                       |
+| ------------------- | ---------------------------- |
+| `/login`            | present, currently mock-only |
+| `/signup`           | present, currently mock-only |
+| `/forgot-password`  | missing                      |
+| `/reset-password`   | missing                      |
+| `/verify-mfa`       | missing                      |
+| `/verify-email`     | missing                      |
+| `/account-recovery` | missing                      |
 
 web-v2's auth glue is `lib/auth/*`. It is mock-only by design until
 Sprint 03b chooses one of `clerk` / `authjs` / `custom` to wire to
@@ -104,15 +104,15 @@ identity-svc.
 
 ### `apps/mobile`
 
-| Screen | Status |
-|---|---|
-| `(auth)/login.tsx` | present |
-| `(auth)/signup.tsx` | present |
-| `(auth)/forgot-password.tsx` | present |
-| `(auth)/reset-password.tsx` | present |
-| `(auth)/change-password.tsx` | present |
-| `(auth)/verify-mfa.tsx` | present |
-| `(auth)/pin.tsx` | present |
+| Screen                        | Status                   |
+| ----------------------------- | ------------------------ |
+| `(auth)/login.tsx`            | present                  |
+| `(auth)/signup.tsx`           | present                  |
+| `(auth)/forgot-password.tsx`  | present                  |
+| `(auth)/reset-password.tsx`   | present                  |
+| `(auth)/change-password.tsx`  | present                  |
+| `(auth)/verify-mfa.tsx`       | present                  |
+| `(auth)/pin.tsx`              | present                  |
 | **`(auth)/verify-email.tsx`** | **missing** — Sprint 03b |
 
 ## Mock auth in web-v2 (production safety)

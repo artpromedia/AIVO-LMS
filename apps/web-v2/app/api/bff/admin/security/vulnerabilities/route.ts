@@ -25,7 +25,14 @@ const createSchema = z.object({
   title: z.string().min(1).max(200),
   cveId: z.string().max(40).nullable().optional(),
   severity: z.enum(["low", "medium", "high", "critical"]),
-  source: z.enum(["dependency_scan", "container_scan", "iac_scan", "pen_test", "external_report", "internal"]),
+  source: z.enum([
+    "dependency_scan",
+    "container_scan",
+    "iac_scan",
+    "pen_test",
+    "external_report",
+    "internal",
+  ]),
   affectedComponent: z.string().min(1).max(120),
   fixedIn: z.string().max(80).nullable().optional(),
 });
@@ -40,7 +47,13 @@ export async function POST(req: Request): Promise<NextResponse> {
     const body = await req.json().catch(() => null);
     const parsed = createSchema.safeParse(body);
     if (!parsed.success) {
-      return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." }, requestId);
+      return fail(
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
+        requestId,
+      );
     }
     const rec = createVulnerability({
       title: parsed.data.title,
@@ -51,7 +64,9 @@ export async function POST(req: Request): Promise<NextResponse> {
       affectedComponent: parsed.data.affectedComponent,
       fixedIn: parsed.data.fixedIn ?? null,
     });
-    audit(session!, "security.vulnerability.recorded", requestId, { metadata: { vulnId: rec.id, severity: rec.severity } });
+    audit(session!, "security.vulnerability.recorded", requestId, {
+      metadata: { vulnId: rec.id, severity: rec.severity },
+    });
     return ok({ vulnerability: rec }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
@@ -75,12 +90,21 @@ export async function PATCH(req: Request): Promise<NextResponse> {
     const body = await req.json().catch(() => null);
     const parsed = patchSchema.safeParse(body);
     if (!parsed.success) {
-      return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." }, requestId);
+      return fail(
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
+        requestId,
+      );
     }
     const { vulnId, ...patch } = parsed.data;
     const updated = updateVulnerability(vulnId, { ...patch, fixedIn: patch.fixedIn ?? undefined });
-    if (!updated) return fail({ ...ERRORS.NOT_FOUND, message: "Vulnerability not found." }, requestId);
-    audit(session!, "security.vulnerability.updated", requestId, { metadata: { vulnId, status: updated.status } });
+    if (!updated)
+      return fail({ ...ERRORS.NOT_FOUND, message: "Vulnerability not found." }, requestId);
+    audit(session!, "security.vulnerability.updated", requestId, {
+      metadata: { vulnId, status: updated.status },
+    });
     return ok({ vulnerability: updated }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

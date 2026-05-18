@@ -44,9 +44,7 @@ describe("tutorTools clients (Phase 5)", () => {
       await assert.rejects(
         requestCodeRun(tutor, { language: "python", source: "print(1)" }),
         (err: unknown) =>
-          err instanceof ToolCallError &&
-          err.capability === "code_run" &&
-          err.status === 400,
+          err instanceof ToolCallError && err.capability === "code_run" && err.status === 400,
       );
     });
 
@@ -108,8 +106,7 @@ describe("tutorTools clients (Phase 5)", () => {
       const tutor = makeTutor(["chat"]);
       await assert.rejects(
         requestImageOut(tutor, { prompt: "a friendly dragon" }),
-        (err: unknown) =>
-          err instanceof ToolCallError && err.capability === "image_out",
+        (err: unknown) => err instanceof ToolCallError && err.capability === "image_out",
       );
     });
 
@@ -142,8 +139,7 @@ describe("tutorTools clients (Phase 5)", () => {
       const tutor = makeTutor(["chat"]);
       await assert.rejects(
         requestAudioOut(tutor, { prompt: "4-beat clap pattern" }),
-        (err: unknown) =>
-          err instanceof ToolCallError && err.capability === "voice_out",
+        (err: unknown) => err instanceof ToolCallError && err.capability === "voice_out",
       );
     });
 

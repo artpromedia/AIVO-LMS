@@ -36,9 +36,7 @@ export default async function Page() {
 
   const active = keys.filter((k) => k.status === "active");
   const idle = active.filter(
-    (k) =>
-      !k.lastUsedAt ||
-      Date.now() - new Date(k.lastUsedAt).getTime() > 30 * 86400_000,
+    (k) => !k.lastUsedAt || Date.now() - new Date(k.lastUsedAt).getTime() > 30 * 86400_000,
   );
 
   const stats = [
@@ -63,9 +61,7 @@ export default async function Page() {
       <div className="grid gap-4 md:grid-cols-3">
         {stats.map((s) => (
           <Card key={s.k} className="p-[var(--aivo-density-card-pad)]">
-            <p className="text-xs uppercase tracking-wide text-aivo-ink-soft">
-              {s.k}
-            </p>
+            <p className="text-xs uppercase tracking-wide text-aivo-ink-soft">{s.k}</p>
             <p className="mt-2 font-display text-3xl font-semibold">{s.v}</p>
           </Card>
         ))}
@@ -112,11 +108,7 @@ export default async function Page() {
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <Badge
-                        tone={k.status === "active" ? "success" : "neutral"}
-                      >
-                        {k.status}
-                      </Badge>
+                      <Badge tone={k.status === "active" ? "success" : "neutral"}>{k.status}</Badge>
                     </td>
                     <td className="px-4 py-3 text-xs text-aivo-ink-soft">
                       {creator?.displayName ?? creator?.email ?? "—"}

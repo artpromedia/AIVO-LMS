@@ -7,8 +7,16 @@ import { DISTRICT_NAV } from "@/components/layout/role-shells";
 
 const DOCS = [
   { k: "Data Privacy Addendum", desc: "Signed and on file with district legal.", state: "active" },
-  { k: "COPPA verification flow", desc: "Required for every under-13 learner created under district schools.", state: "active" },
-  { k: "FERPA records access", desc: "Parent self-service export available through Support.", state: "active" },
+  {
+    k: "COPPA verification flow",
+    desc: "Required for every under-13 learner created under district schools.",
+    state: "active",
+  },
+  {
+    k: "FERPA records access",
+    desc: "Parent self-service export available through Support.",
+    state: "active",
+  },
   { k: "Annual SOC 2 letter", desc: "Latest letter shared with district CIO.", state: "active" },
 ];
 

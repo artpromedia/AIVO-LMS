@@ -13,11 +13,7 @@
  * The runtime can use the recommended action to choose a corrective beat
  * (re-teach vs reinforce vs differentiate).
  */
-export type ErrorCategory =
-  | "guess"
-  | "near_miss"
-  | "category_error"
-  | "process_error";
+export type ErrorCategory = "guess" | "near_miss" | "category_error" | "process_error";
 
 export interface ErrorCorrectionInput {
   expected: string;
@@ -82,7 +78,10 @@ export function correctError(input: ErrorCorrectionInput): ErrorCorrectionDecisi
     }
   }
 
-  if (input.actual.trim().length > 0 && input.actual.trim().length < input.expected.trim().length / 2) {
+  if (
+    input.actual.trim().length > 0 &&
+    input.actual.trim().length < input.expected.trim().length / 2
+  ) {
     return {
       category: "process_error",
       recommendation: "reteach",

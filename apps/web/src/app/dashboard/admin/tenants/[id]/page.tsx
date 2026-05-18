@@ -37,18 +37,56 @@ interface TenantDetail {
   learnerCount: number;
 }
 
-const TYPE_CONFIG: Record<string, { label: string; Icon: LucideIcon; color: string; well: string }> = {
-  B2C_FAMILY: { label: "Family", Icon: Users, color: "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]", well: "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]" },
-  B2B_SCHOOL: { label: "School", Icon: School, color: "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]", well: "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]" },
-  B2B_DISTRICT: { label: "District", Icon: Building2, color: "bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]", well: "bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]" },
+const TYPE_CONFIG: Record<
+  string,
+  { label: string; Icon: LucideIcon; color: string; well: string }
+> = {
+  B2C_FAMILY: {
+    label: "Family",
+    Icon: Users,
+    color: "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]",
+    well: "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]",
+  },
+  B2B_SCHOOL: {
+    label: "School",
+    Icon: School,
+    color: "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]",
+    well: "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]",
+  },
+  B2B_DISTRICT: {
+    label: "District",
+    Icon: Building2,
+    color: "bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]",
+    well: "bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]",
+  },
 };
 
 const LEVEL_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  STANDARD: { label: "Standard", color: "text-[hsl(var(--visual-science))]", bg: "bg-[hsl(var(--visual-science)/0.14)]" },
-  SUPPORTED: { label: "Supported", color: "text-[hsl(var(--visual-reading))]", bg: "bg-[hsl(var(--visual-reading)/0.12)]" },
-  LOW_VERBAL: { label: "Low Verbal", color: "text-[hsl(var(--visual-sel))]", bg: "bg-[hsl(var(--visual-sel)/0.18)]" },
-  NON_VERBAL: { label: "Non-Verbal", color: "text-[hsl(var(--visual-sel))]", bg: "bg-[hsl(var(--visual-sel)/0.18)]" },
-  PRE_SYMBOLIC: { label: "Pre-Symbolic", color: "text-[hsl(var(--visual-math))]", bg: "bg-[hsl(var(--visual-math)/0.12)]" },
+  STANDARD: {
+    label: "Standard",
+    color: "text-[hsl(var(--visual-science))]",
+    bg: "bg-[hsl(var(--visual-science)/0.14)]",
+  },
+  SUPPORTED: {
+    label: "Supported",
+    color: "text-[hsl(var(--visual-reading))]",
+    bg: "bg-[hsl(var(--visual-reading)/0.12)]",
+  },
+  LOW_VERBAL: {
+    label: "Low Verbal",
+    color: "text-[hsl(var(--visual-sel))]",
+    bg: "bg-[hsl(var(--visual-sel)/0.18)]",
+  },
+  NON_VERBAL: {
+    label: "Non-Verbal",
+    color: "text-[hsl(var(--visual-sel))]",
+    bg: "bg-[hsl(var(--visual-sel)/0.18)]",
+  },
+  PRE_SYMBOLIC: {
+    label: "Pre-Symbolic",
+    color: "text-[hsl(var(--visual-math))]",
+    bg: "bg-[hsl(var(--visual-math)/0.12)]",
+  },
 };
 
 export default function TenantDetailPage() {
@@ -135,8 +173,7 @@ export default function TenantDetailPage() {
       });
       if (!res.ok) throw new Error("Failed to update status");
       fetchTenant();
-    } catch {
-    }
+    } catch {}
     setSuspending(false);
   };
 
@@ -157,7 +194,10 @@ export default function TenantDetailPage() {
   if (error || !tenant) {
     return (
       <div className="p-8 space-y-4">
-        <Link href="/dashboard/admin/tenants" className="text-sm text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))] font-medium">
+        <Link
+          href="/dashboard/admin/tenants"
+          className="text-sm text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))] font-medium"
+        >
           ← Back to Tenants
         </Link>
         <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-red-600">
@@ -167,32 +207,52 @@ export default function TenantDetailPage() {
     );
   }
 
-  const typeConfig = TYPE_CONFIG[tenant.type] || { label: tenant.type, Icon: ClipboardList, color: "vi-surface-soft vi-text-muted", well: "vi-surface-soft vi-text-muted" };
+  const typeConfig = TYPE_CONFIG[tenant.type] || {
+    label: tenant.type,
+    Icon: ClipboardList,
+    color: "vi-surface-soft vi-text-muted",
+    well: "vi-surface-soft vi-text-muted",
+  };
   const HeroIcon = typeConfig.Icon;
   const isSuspended = tenant.status === "suspended";
 
   return (
     <div className="p-8 space-y-6">
-      <Link href="/dashboard/admin/tenants" className="text-sm text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))] font-medium inline-flex items-center gap-1">
+      <Link
+        href="/dashboard/admin/tenants"
+        className="text-sm text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))] font-medium inline-flex items-center gap-1"
+      >
         ← Back to Tenants
       </Link>
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className={`w-14 h-14 rounded-full flex items-center justify-center ${typeConfig.well}`}>
+          <div
+            className={`w-14 h-14 rounded-full flex items-center justify-center ${typeConfig.well}`}
+          >
             <HeroIcon size={26} strokeWidth={2.5} aria-hidden="true" />
           </div>
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-heading font-bold vi-text">{tenant.name}</h1>
-              <span className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${typeConfig.color}`}>{typeConfig.label}</span>
+              <span
+                className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${typeConfig.color}`}
+              >
+                {typeConfig.label}
+              </span>
               {isSuspended ? (
-                <span className="px-2.5 py-0.5 text-xs rounded-full font-semibold bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]">Suspended</span>
+                <span className="px-2.5 py-0.5 text-xs rounded-full font-semibold bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]">
+                  Suspended
+                </span>
               ) : (
-                <span className="px-2.5 py-0.5 text-xs rounded-full font-semibold bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]">Active</span>
+                <span className="px-2.5 py-0.5 text-xs rounded-full font-semibold bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]">
+                  Active
+                </span>
               )}
             </div>
-            <p className="text-sm vi-text-muted mt-0.5">Created {new Date(tenant.createdAt).toLocaleDateString()}</p>
+            <p className="text-sm vi-text-muted mt-0.5">
+              Created {new Date(tenant.createdAt).toLocaleDateString()}
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -226,7 +286,11 @@ export default function TenantDetailPage() {
             </div>
             <div className="flex justify-between">
               <span className="vi-text-muted">Type</span>
-              <span className={`px-2 py-0.5 text-xs rounded-full font-semibold ${typeConfig.color}`}>{typeConfig.label}</span>
+              <span
+                className={`px-2 py-0.5 text-xs rounded-full font-semibold ${typeConfig.color}`}
+              >
+                {typeConfig.label}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="vi-text-muted">Users</span>
@@ -238,7 +302,9 @@ export default function TenantDetailPage() {
             </div>
             <div className="flex justify-between">
               <span className="vi-text-muted">Updated</span>
-              <span className="font-medium vi-text">{new Date(tenant.updatedAt).toLocaleDateString()}</span>
+              <span className="font-medium vi-text">
+                {new Date(tenant.updatedAt).toLocaleDateString()}
+              </span>
             </div>
           </div>
         </div>
@@ -262,7 +328,9 @@ export default function TenantDetailPage() {
               </div>
               <div>
                 <span className="text-red-500">Reason</span>
-                <p className="mt-1 text-[hsl(var(--visual-math))] font-medium">{tenant.suspensionReason || "No reason provided"}</p>
+                <p className="mt-1 text-[hsl(var(--visual-math))] font-medium">
+                  {tenant.suspensionReason || "No reason provided"}
+                </p>
               </div>
             </div>
           </div>
@@ -287,7 +355,10 @@ export default function TenantDetailPage() {
             {tenant.users.map((u) => (
               <tr key={u.id} className="border-b vi-border hover:vi-bg/50 transition">
                 <td className="px-5 py-3">
-                  <Link href={`/dashboard/admin/users/${u.id}`} className="font-medium text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))]">
+                  <Link
+                    href={`/dashboard/admin/users/${u.id}`}
+                    className="font-medium text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))]"
+                  >
                     {u.name}
                   </Link>
                 </td>
@@ -297,11 +368,17 @@ export default function TenantDetailPage() {
                     {u.role.replace(/_/g, " ")}
                   </span>
                 </td>
-                <td className="px-5 py-3 vi-text-muted">{new Date(u.createdAt).toLocaleDateString()}</td>
+                <td className="px-5 py-3 vi-text-muted">
+                  {new Date(u.createdAt).toLocaleDateString()}
+                </td>
               </tr>
             ))}
             {tenant.users.length === 0 && (
-              <tr><td colSpan={4} className="px-5 py-10 text-center vi-text-muted">No users found</td></tr>
+              <tr>
+                <td colSpan={4} className="px-5 py-10 text-center vi-text-muted">
+                  No users found
+                </td>
+              </tr>
             )}
           </tbody>
         </table>
@@ -323,24 +400,41 @@ export default function TenantDetailPage() {
           </thead>
           <tbody>
             {tenant.learners.map((l) => {
-              const lc = LEVEL_CONFIG[l.functioningLevel || ""] || { label: "N/A", color: "vi-text-muted", bg: "vi-surface-soft" };
+              const lc = LEVEL_CONFIG[l.functioningLevel || ""] || {
+                label: "N/A",
+                color: "vi-text-muted",
+                bg: "vi-surface-soft",
+              };
               return (
                 <tr key={l.id} className="border-b vi-border hover:vi-bg/50 transition">
                   <td className="px-5 py-3">
-                    <Link href={`/dashboard/admin/learners/${l.id}`} className="font-medium text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))]">
+                    <Link
+                      href={`/dashboard/admin/learners/${l.id}`}
+                      className="font-medium text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))]"
+                    >
                       {l.name}
                     </Link>
                   </td>
                   <td className="px-5 py-3">
-                    <span className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${lc.bg} ${lc.color}`}>{lc.label}</span>
+                    <span
+                      className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${lc.bg} ${lc.color}`}
+                    >
+                      {lc.label}
+                    </span>
                   </td>
                   <td className="px-5 py-3 vi-text-muted">{l.gradeLevel || "—"}</td>
-                  <td className="px-5 py-3 vi-text-muted">{new Date(l.createdAt).toLocaleDateString()}</td>
+                  <td className="px-5 py-3 vi-text-muted">
+                    {new Date(l.createdAt).toLocaleDateString()}
+                  </td>
                 </tr>
               );
             })}
             {tenant.learners.length === 0 && (
-              <tr><td colSpan={4} className="px-5 py-10 text-center vi-text-muted">No learners found</td></tr>
+              <tr>
+                <td colSpan={4} className="px-5 py-10 text-center vi-text-muted">
+                  No learners found
+                </td>
+              </tr>
             )}
           </tbody>
         </table>
@@ -351,12 +445,21 @@ export default function TenantDetailPage() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-heading font-bold vi-text">Edit Tenant</h2>
-              <button onClick={() => setShowEdit(false)} className="vi-text-muted hover:vi-text-muted text-xl">×</button>
+              <button
+                onClick={() => setShowEdit(false)}
+                className="vi-text-muted hover:vi-text-muted text-xl"
+              >
+                ×
+              </button>
             </div>
-            {saveError && <div className="mb-4 p-3 rounded-lg bg-red-50 text-red-600 text-sm">{saveError}</div>}
+            {saveError && (
+              <div className="mb-4 p-3 rounded-lg bg-red-50 text-red-600 text-sm">{saveError}</div>
+            )}
             <form onSubmit={handleSave} className="space-y-4">
               <div>
-                <label htmlFor="edit-name" className="block text-sm font-medium vi-text mb-1">Name</label>
+                <label htmlFor="edit-name" className="block text-sm font-medium vi-text mb-1">
+                  Name
+                </label>
                 <input
                   id="edit-name"
                   type="text"
@@ -367,7 +470,9 @@ export default function TenantDetailPage() {
                 />
               </div>
               <div>
-                <label htmlFor="edit-settings" className="block text-sm font-medium vi-text mb-1">Settings (JSON)</label>
+                <label htmlFor="edit-settings" className="block text-sm font-medium vi-text mb-1">
+                  Settings (JSON)
+                </label>
                 <textarea
                   id="edit-settings"
                   value={editSettings}

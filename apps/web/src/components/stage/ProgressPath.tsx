@@ -11,7 +11,13 @@ interface ProgressPathProps {
 
 const LANDMARKS: LucideIcon[] = [Sprout, Leaf, TreePine, Star, Trophy];
 
-export function ProgressPath({ progress, totalSteps, currentStep, accentColor, beatsUntilBreak }: ProgressPathProps) {
+export function ProgressPath({
+  progress,
+  totalSteps,
+  currentStep,
+  accentColor,
+  beatsUntilBreak,
+}: ProgressPathProps) {
   const steps = Math.min(totalSteps, 5);
   const points = Array.from({ length: steps }, (_, i) => ({
     x: (i / (steps - 1 || 1)) * 100,
@@ -37,14 +43,22 @@ export function ProgressPath({ progress, totalSteps, currentStep, accentColor, b
           >
             <div
               className={`w-6 h-6 rounded-full flex items-center justify-center text-xs transition-all duration-500 ${
-                p.current ? "scale-125 animate-pulse" : p.active ? "scale-100" : "scale-75 opacity-50"
+                p.current
+                  ? "scale-125 animate-pulse"
+                  : p.active
+                    ? "scale-100"
+                    : "scale-75 opacity-50"
               }`}
               style={{
                 backgroundColor: p.active ? accentColor : "rgba(255,255,255,0.2)",
                 boxShadow: p.current ? `0 0 12px ${accentColor}` : "none",
               }}
             >
-              <p.Icon className={`w-3.5 h-3.5 ${p.active ? "text-white" : "text-white/60"}`} strokeWidth={2.5} aria-hidden />
+              <p.Icon
+                className={`w-3.5 h-3.5 ${p.active ? "text-white" : "text-white/60"}`}
+                strokeWidth={2.5}
+                aria-hidden
+              />
             </div>
           </div>
         ))}

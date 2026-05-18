@@ -25,7 +25,12 @@ export async function POST(req: Request, ctx: Params): Promise<NextResponse> {
     const { learnerId } = await ctx.params;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["ai_personalization", "child_data_collection"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["ai_personalization", "child_data_collection"],
+      requestId,
+    );
     if (consentErr) return consentErr;
     // Delegate — generate already audits, validates and upserts (which resets
     // approvedByParent on regenerate).

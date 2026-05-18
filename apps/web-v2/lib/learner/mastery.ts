@@ -42,9 +42,7 @@ type MasteryInputs = {
 };
 
 /** Score each skill that has at least one attempt; emit SkillMastery rows. */
-export function computeSkillMasteryFromBaseline(
-  input: MasteryInputs,
-): SkillMastery[] {
+export function computeSkillMasteryFromBaseline(input: MasteryInputs): SkillMastery[] {
   const { learnerId, tenantId, questions, attempts, skills } = input;
   const questionsById = new Map(questions.map((q) => [q.id, q]));
   const skillsById = new Map(skills.map((s) => [s.id, s]));
@@ -134,8 +132,7 @@ export function buildBaselineSummary(input: {
     if (!subj) continue;
     const agg = perSubjectAgg.get(q.subjectId);
     const accuracy = agg && agg.answered > 0 ? agg.correct / agg.answered : 0;
-    const weighted =
-      agg && agg.totalWeight > 0 ? agg.weightedScore / agg.totalWeight : 0;
+    const weighted = agg && agg.totalWeight > 0 ? agg.weightedScore / agg.totalWeight : 0;
     perSubject.push({
       subjectId: q.subjectId,
       subjectName: subj.name,
@@ -196,8 +193,7 @@ export function buildBaselineSummary(input: {
     }
   }
 
-  const overall =
-    totalAnswered > 0 ? Math.round((correctCount / totalAnswered) * 100) : 0;
+  const overall = totalAnswered > 0 ? Math.round((correctCount / totalAnswered) * 100) : 0;
   const parentSummary =
     totalAnswered === 0
       ? `${learnerName} hasn't answered any baseline questions yet.`
@@ -231,18 +227,13 @@ export function generateLearningPath(input: {
   skills: Skill[];
   recommendedStartSkillId: string | null;
 }): LearningPath {
-  const { learnerId, tenantId, basedOnMasteryMapId, skillMasteries, skills } =
-    input;
+  const { learnerId, tenantId, basedOnMasteryMapId, skillMasteries, skills } = input;
   const skillsById = new Map(skills.map((s) => [s.id, s]));
   const masteryById = new Map(skillMasteries.map((m) => [m.skillId, m]));
   const nodes: LearningPathNode[] = [];
 
   const used = new Set<string>();
-  const pushNode = (
-    skillId: string,
-    kind: LearningPathNode["kind"],
-    reason: string,
-  ) => {
+  const pushNode = (skillId: string, kind: LearningPathNode["kind"], reason: string) => {
     if (used.has(skillId)) return;
     const skill = skillsById.get(skillId);
     if (!skill) return;
@@ -290,11 +281,7 @@ export function generateLearningPath(input: {
     .sort((a, b) => b.score - a.score)
     .find((m) => m.needsReview && !used.has(m.skillId));
   if (reviewCandidate) {
-    pushNode(
-      reviewCandidate.skillId,
-      "review",
-      "Quick review to keep this fresh.",
-    );
+    pushNode(reviewCandidate.skillId, "review", "Quick review to keep this fresh.");
   }
 
   // Add one stretch goal: highest-scoring skill where the learner did well.
@@ -303,11 +290,7 @@ export function generateLearningPath(input: {
     .sort((a, b) => b.score - a.score)
     .find((m) => m.score >= 0.65 && !used.has(m.skillId));
   if (stretchCandidate) {
-    pushNode(
-      stretchCandidate.skillId,
-      "stretch",
-      "Ready for a small challenge here.",
-    );
+    pushNode(stretchCandidate.skillId, "stretch", "Ready for a small challenge here.");
   }
 
   return {

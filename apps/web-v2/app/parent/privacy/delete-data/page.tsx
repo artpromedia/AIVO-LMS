@@ -4,10 +4,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PARENT_NAV } from "@/components/layout/role-shells";
-import {
-  listDataDeletionRequestsForUser,
-  listLearnersForParent,
-} from "@/lib/db/repos";
+import { listDataDeletionRequestsForUser, listLearnersForParent } from "@/lib/db/repos";
 import { DeleteRequestForm } from "./form";
 
 export const dynamic = "force-dynamic";
@@ -32,9 +29,9 @@ export default async function Page() {
 
       <Card className="p-[var(--aivo-density-card-pad)] border-l-4 border-l-amber-500">
         <p className="text-sm">
-          <strong>Deletion is permanent.</strong> Once approved, learner progress, lesson history, and
-          IEP files are removed. We keep the minimum legally required audit records (when the request was
-          made, that consent was withdrawn) so the deletion itself can be proven later.
+          <strong>Deletion is permanent.</strong> Once approved, learner progress, lesson history,
+          and IEP files are removed. We keep the minimum legally required audit records (when the
+          request was made, that consent was withdrawn) so the deletion itself can be proven later.
         </p>
       </Card>
 

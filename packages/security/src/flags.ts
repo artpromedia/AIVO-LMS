@@ -101,9 +101,7 @@ function parseBandList(raw: string | undefined): Set<SpeechBuddyAgeBand> {
   return out;
 }
 
-function parseTenantBands(
-  raw: string | undefined,
-): Map<string, Set<SpeechBuddyAgeBand>> {
+function parseTenantBands(raw: string | undefined): Map<string, Set<SpeechBuddyAgeBand>> {
   const out = new Map<string, Set<SpeechBuddyAgeBand>>();
   if (!raw) return out;
   for (const entry of raw.split(";")) {
@@ -118,9 +116,7 @@ function parseTenantBands(
   return out;
 }
 
-export function loadSpeechBuddyFlags(
-  env: NodeJS.ProcessEnv = process.env,
-): SpeechBuddyFlags {
+export function loadSpeechBuddyFlags(env: NodeJS.ProcessEnv = process.env): SpeechBuddyFlags {
   return {
     globalBands: parseBandList(env.SPEECH_BUDDY_ENABLED_GLOBAL),
     perTenantBands: parseTenantBands(env.SPEECH_BUDDY_ENABLED_TENANTS),

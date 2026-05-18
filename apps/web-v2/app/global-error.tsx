@@ -9,7 +9,9 @@ export default function GlobalError({
 }) {
   return (
     <html lang="en">
-      <body style={{ fontFamily: "system-ui, sans-serif", padding: "4rem 1.5rem", textAlign: "center" }}>
+      <body
+        style={{ fontFamily: "system-ui, sans-serif", padding: "4rem 1.5rem", textAlign: "center" }}
+      >
         <h1 style={{ fontSize: "1.75rem", fontWeight: 700 }}>Something went very wrong.</h1>
         <p style={{ marginTop: "0.75rem", color: "#555" }}>
           Please try again. If this keeps happening, contact support.

@@ -32,8 +32,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     const roleErr = requireRole(session!, ["teacher"], requestId);
     if (roleErr) return roleErr;
     const learner = getLearner(learnerId, session!.tenantId);
-    if (!learner)
-      return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found." }, requestId);
+    if (!learner) return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found." }, requestId);
     const recentRuns = listLessonRunsForLearner(learnerId, session!.tenantId, {
       limit: 10,
     });

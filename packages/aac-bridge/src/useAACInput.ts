@@ -13,10 +13,7 @@ export interface UseAACInputResult {
   currentEvent: AACEvent | null;
 }
 
-export function useAACInput(
-  config: AACSessionConfig,
-  items: SymbolItem[],
-): UseAACInputResult {
+export function useAACInput(config: AACSessionConfig, items: SymbolItem[]): UseAACInputResult {
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
   const [currentEvent, setCurrentEvent] = useState<AACEvent | null>(null);
   const controllerRef = useRef<SwitchScanController | null>(null);

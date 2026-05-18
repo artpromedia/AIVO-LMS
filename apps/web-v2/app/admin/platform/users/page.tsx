@@ -6,10 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import {
-  listUsersForTenants,
-  scopeTenantsForSession,
-} from "@/lib/db/repos";
+import { listUsersForTenants, scopeTenantsForSession } from "@/lib/db/repos";
 import type { Role } from "@/lib/auth/types";
 
 const ROLE_LABEL: Record<Role, string> = {
@@ -68,8 +65,7 @@ export default async function Page() {
         description="Every user across every tenant on the platform."
         actions={
           <Badge tone="neutral">
-            {uniqueUsers.toLocaleString()} unique ·{" "}
-            {users.length.toLocaleString()} memberships
+            {uniqueUsers.toLocaleString()} unique · {users.length.toLocaleString()} memberships
           </Badge>
         }
       />
@@ -121,13 +117,9 @@ export default async function Page() {
                           {u.user.displayName}
                         </Link>
                       </td>
-                      <td className="px-4 py-3 text-aivo-ink-soft">
-                        {u.user.email}
-                      </td>
+                      <td className="px-4 py-3 text-aivo-ink-soft">{u.user.email}</td>
                       <td className="px-4 py-3">
-                        <Badge tone={ROLE_TONE[u.role]}>
-                          {ROLE_LABEL[u.role]}
-                        </Badge>
+                        <Badge tone={ROLE_TONE[u.role]}>{ROLE_LABEL[u.role]}</Badge>
                       </td>
                       <td className="px-4 py-3 text-aivo-ink-soft">
                         {tenant ? (

@@ -37,9 +37,7 @@ export function LessonStepCard({
           Step {index}
         </p>
         <p className="mt-0.5 font-medium">{title}</p>
-        {description ? (
-          <p className="mt-1 text-sm text-aivo-ink-soft">{description}</p>
-        ) : null}
+        {description ? <p className="mt-1 text-sm text-aivo-ink-soft">{description}</p> : null}
       </div>
     </div>
   );

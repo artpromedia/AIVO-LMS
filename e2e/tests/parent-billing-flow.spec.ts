@@ -52,7 +52,11 @@ async function isBillingTestModeOn(): Promise<boolean> {
   }
 }
 
-async function seedParent(): Promise<{ tenantId: string; userId: string; accessToken: string } | null> {
+async function seedParent(): Promise<{
+  tenantId: string;
+  userId: string;
+  accessToken: string;
+} | null> {
   try {
     const ctx = await pwRequest.newContext({ baseURL: IDENTITY_BASE });
     const res = await ctx.post("/api/__test__/seed-parent", {
@@ -162,7 +166,9 @@ test.describe("parent billing flow", () => {
     await expect(page.getByText(/Trial ends in/i)).toBeVisible();
   });
 
-  test("locked tutor on learner home is aria-disabled and surfaces error in lesson page", async ({ page }) => {
+  test("locked tutor on learner home is aria-disabled and surfaces error in lesson page", async ({
+    page,
+  }) => {
     // Free plan → Coding is locked.
     await page.addInitScript((authToken) => {
       try {
@@ -177,7 +183,11 @@ test.describe("parent billing flow", () => {
     // Going directly to the lesson page for a locked tutor should
     // bail out with the tutor-locked error rather than running the stage.
     await page.goto(`${WEB_BASE}/dashboard/learner/lesson/pixel`);
-    await page.getByRole("button", { name: /play|start/i }).first().click({ trial: true }).catch(() => {});
+    await page
+      .getByRole("button", { name: /play|start/i })
+      .first()
+      .click({ trial: true })
+      .catch(() => {});
     // The page surfaces lessonError state when start returns 403.
     // We don't assert the exact button click path because the lesson
     // page sometimes auto-starts based on profile mode; either way the

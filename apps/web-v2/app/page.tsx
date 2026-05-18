@@ -33,8 +33,16 @@ const ROLE_CARDS: { role: Role; title: string; body: string }[] = [
   { role: "parent", title: "Parents", body: "Set up learners, review readiness, follow growth." },
   { role: "learner", title: "Learners", body: "Today's mission, your tutor, your streak." },
   { role: "teacher", title: "Teachers", body: "Class rosters, assignments, learner progress." },
-  { role: "school_admin", title: "School admin", body: "Manage staff, classes, and school-level reporting." },
-  { role: "district_admin", title: "District admin", body: "Cross-school oversight and rostering." },
+  {
+    role: "school_admin",
+    title: "School admin",
+    body: "Manage staff, classes, and school-level reporting.",
+  },
+  {
+    role: "district_admin",
+    title: "District admin",
+    body: "Cross-school oversight and rostering.",
+  },
   { role: "platform_admin", title: "Platform", body: "Tenant operations and system health." },
 ];
 
@@ -51,16 +59,14 @@ export default async function Home() {
           Learning adventures, built around your child.
         </h1>
         <p className="mt-4 max-w-2xl text-lg text-aivo-ink-soft">
-          A calmer, more personal way to learn — with AI tutors that adapt to
-          how each learner thinks, focuses, and grows.
+          A calmer, more personal way to learn — with AI tutors that adapt to how each learner
+          thinks, focuses, and grows.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           {session ? (
             <>
               <Button asChild size="lg">
-                <Link href={ROLE_HOME[session.role]}>
-                  Continue as {ROLE_LABEL[session.role]}
-                </Link>
+                <Link href={ROLE_HOME[session.role]}>Continue as {ROLE_LABEL[session.role]}</Link>
               </Button>
               <Button asChild size="lg" variant="outline">
                 <Link href="/login">Switch role</Link>
@@ -112,7 +118,9 @@ export default async function Home() {
                     type="submit"
                     className="text-sm font-medium text-aivo-primary hover:underline focus-visible:underline"
                   >
-                    {isActive ? `Open ${card.title.toLowerCase()} →` : `Enter as ${card.title.toLowerCase()} →`}
+                    {isActive
+                      ? `Open ${card.title.toLowerCase()} →`
+                      : `Enter as ${card.title.toLowerCase()} →`}
                   </button>
                 </form>
               </Card>

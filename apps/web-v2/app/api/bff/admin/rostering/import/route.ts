@@ -11,7 +11,10 @@ export const dynamic = "force-dynamic";
 const bodySchema = z.object({
   schoolId: z.string().min(1),
   source: z.enum(["csv", "oneroster_v1p1", "oneroster_v1p2", "clever", "classlink"]),
-  csvText: z.string().min(1).max(2 * 1024 * 1024), // 2 MB cap on the raw text
+  csvText: z
+    .string()
+    .min(1)
+    .max(2 * 1024 * 1024), // 2 MB cap on the raw text
   dryRun: z.boolean().default(false),
 });
 
@@ -33,7 +36,10 @@ export async function POST(req: Request): Promise<NextResponse> {
     const parsed = bodySchema.safeParse(body);
     if (!parsed.success) {
       return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." },
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
         requestId,
       );
     }

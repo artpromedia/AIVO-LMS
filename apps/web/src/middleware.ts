@@ -102,7 +102,9 @@ function constantTimeEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
-async function verifySurfaceCookie(value: string | undefined): Promise<{ role: string; exp: number } | null> {
+async function verifySurfaceCookie(
+  value: string | undefined,
+): Promise<{ role: string; exp: number } | null> {
   if (!value) return null;
   const secret = getSurfaceSecret();
   if (!secret) return null;
@@ -119,10 +121,10 @@ async function verifySurfaceCookie(value: string | undefined): Promise<{ role: s
     enc.encode(secret),
     { name: "HMAC", hash: "SHA-256" },
     false,
-    ["sign"]
+    ["sign"],
   );
   const expectedBytes = new Uint8Array(
-    await crypto.subtle.sign("HMAC", key, enc.encode(`${role}.${exp}`))
+    await crypto.subtle.sign("HMAC", key, enc.encode(`${role}.${exp}`)),
   );
   const expected = b64urlEncode(expectedBytes);
   if (!constantTimeEqual(sig, expected)) return null;
@@ -186,5 +188,11 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/district/:path*", "/dashboard/admin/:path*", "/dashboard/district/:path*", "/dashboard/internal/:path*"],
+  matcher: [
+    "/admin/:path*",
+    "/district/:path*",
+    "/dashboard/admin/:path*",
+    "/dashboard/district/:path*",
+    "/dashboard/internal/:path*",
+  ],
 };

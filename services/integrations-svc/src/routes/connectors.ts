@@ -131,8 +131,11 @@ function assertTenantAccess(user: any, targetTenantId: string): boolean {
 }
 
 async function assertConnectionAccess(db: any, user: any, connectionId: string) {
-  const [connection] = await db.select().from(integrationConnections)
-    .where(eq(integrationConnections.id, connectionId)).limit(1);
+  const [connection] = await db
+    .select()
+    .from(integrationConnections)
+    .where(eq(integrationConnections.id, connectionId))
+    .limit(1);
   if (!connection) return null;
   if (!assertTenantAccess(user, connection.tenantId)) return null;
   return connection;
@@ -190,298 +193,414 @@ export function registerConnectorRoutes(app: FastifyInstance, db: any) {
     return { connectors: CONNECTORS };
   });
 
-  app.post("/api/integrations/waitlist", { schema: joinWaitlistSchema, preHandler: requireAuth }, async (request, reply) => {
-    const user = (request as any).user;
-    const { connectorId, districtId: bodyDistrictId, contactEmail } = (request.body as any) || {};
-    const districtId = user.role === "PLATFORM_ADMIN" ? (bodyDistrictId || user.tenantId) : user.tenantId;
-    if (!connectorId || !districtId || !contactEmail) {
-      return reply.code(400).send({ error: "connectorId, contactEmail required" });
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail)) {
-      return reply.code(400).send({ error: "Invalid contactEmail" });
-    }
-    const connector = CONNECTORS.find((c) => c.id === connectorId);
-    if (!connector) return reply.code(404).send({ error: "Connector not found" });
-    if (connector.status !== "coming_soon") {
-      return reply.code(400).send({ error: "This connector is already available" });
-    }
-
-    const existing = waitlistStore.find(
-      (e) => e.connectorId === connectorId && e.districtId === districtId && e.contactEmail.toLowerCase() === contactEmail.toLowerCase(),
-    );
-    if (existing) return { entry: existing, deduped: true };
-
-    const entry: WaitlistEntry = {
-      id: crypto.randomUUID(),
-      connectorId,
-      districtId,
-      contactEmail,
-      createdAt: new Date().toISOString(),
-    };
-    waitlistStore.push(entry);
-    app.log.info({ connectorId, districtId }, "waitlist_signup");
-    return { entry };
-  });
-
-  app.get("/api/integrations/waitlist", { schema: listWaitlistSchema, preHandler: requireAdmin }, async (request) => {
-    const user = (request as any).user;
-    const entries = user.role === "PLATFORM_ADMIN"
-      ? waitlistStore
-      : waitlistStore.filter((e) => e.districtId === user.tenantId);
-    return { entries, total: entries.length };
-  });
-
-  app.get("/api/integrations/connectors/:connectorId", { schema: getConnectorSchema }, async (request, reply) => {
-    const { connectorId } = request.params as any;
-    const connector = CONNECTORS.find((c) => c.id === connectorId);
-    if (!connector) return reply.code(404).send({ error: "Connector not found" });
-    return connector;
-  });
-
-  app.get("/api/integrations/oauth/:connectorId/authorize", { schema: oauthAuthorizeSchema, preHandler: requireAdmin }, async (request, reply) => {
-    const { connectorId } = request.params as any;
-    const { tenantId, redirectUri } = request.query as any;
-    const config = getOAuthConfig(connectorId);
-    if (!config) return reply.code(400).send({ error: "OAuth not supported for this connector" });
-    if (!config.clientId) return reply.code(500).send({ error: `OAuth client not configured for ${connectorId}. Set environment variables.` });
-
-    const state = Buffer.from(JSON.stringify({ tenantId, connectorId })).toString("base64url");
-    const params = new URLSearchParams({
-      client_id: config.clientId,
-      redirect_uri: redirectUri || `${APP_URL}/api/integrations/oauth/callback`,
-      response_type: "code",
-      scope: config.scopes.join(" "),
-      state,
-      access_type: "offline",
-      prompt: "consent",
-    });
-
-    return { authorizationUrl: `${config.authUrl}?${params.toString()}` };
-  });
-
-  app.get("/api/integrations/oauth/callback", { schema: oauthCallbackSchema }, async (request, reply) => {
-    const { code, state, error: oauthError } = request.query as any;
-    if (oauthError) return reply.redirect(`/dashboard/district/integrations?error=${oauthError}`);
-
-    try {
-      const { tenantId, connectorId } = JSON.parse(Buffer.from(state, "base64url").toString());
-      const config = getOAuthConfig(connectorId);
-      if (!config) return reply.redirect("/dashboard/district/integrations?error=invalid_connector");
-
-      const tokenRes = await fetch(config.tokenUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-          code,
-          client_id: config.clientId,
-          client_secret: config.clientSecret,
-          redirect_uri: `${APP_URL}/api/integrations/oauth/callback`,
-          grant_type: "authorization_code",
-        }),
-      });
-
-      if (!tokenRes.ok) {
-        const err = await tokenRes.text();
-        app.log.error(`OAuth token exchange failed for ${connectorId}: ${err}`);
-        return reply.redirect(`/dashboard/district/integrations?error=token_exchange_failed`);
+  app.post(
+    "/api/integrations/waitlist",
+    { schema: joinWaitlistSchema, preHandler: requireAuth },
+    async (request, reply) => {
+      const user = (request as any).user;
+      const { connectorId, districtId: bodyDistrictId, contactEmail } = (request.body as any) || {};
+      const districtId =
+        user.role === "PLATFORM_ADMIN" ? bodyDistrictId || user.tenantId : user.tenantId;
+      if (!connectorId || !districtId || !contactEmail) {
+        return reply.code(400).send({ error: "connectorId, contactEmail required" });
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail)) {
+        return reply.code(400).send({ error: "Invalid contactEmail" });
+      }
+      const connector = CONNECTORS.find((c) => c.id === connectorId);
+      if (!connector) return reply.code(404).send({ error: "Connector not found" });
+      if (connector.status !== "coming_soon") {
+        return reply.code(400).send({ error: "This connector is already available" });
       }
 
-      const tokens = await tokenRes.json() as any;
-      const connector = CONNECTORS.find((c) => c.id === connectorId);
+      const existing = waitlistStore.find(
+        (e) =>
+          e.connectorId === connectorId &&
+          e.districtId === districtId &&
+          e.contactEmail.toLowerCase() === contactEmail.toLowerCase(),
+      );
+      if (existing) return { entry: existing, deduped: true };
 
-      const [connection] = await db.insert(integrationConnections).values({
-        tenantId,
+      const entry: WaitlistEntry = {
+        id: crypto.randomUUID(),
         connectorId,
-        connectorName: connector?.name || connectorId,
-        connectorType: connector?.category || "lms",
-        status: "authorized",
-        credentials: {
-          accessToken: tokens.access_token,
-          refreshToken: tokens.refresh_token,
-          expiresAt: tokens.expires_in ? new Date(Date.now() + tokens.expires_in * 1000).toISOString() : null,
-          tokenType: tokens.token_type,
-        },
-        connectedAt: new Date(),
-      }).returning();
+        districtId,
+        contactEmail,
+        createdAt: new Date().toISOString(),
+      };
+      waitlistStore.push(entry);
+      app.log.info({ connectorId, districtId }, "waitlist_signup");
+      return { entry };
+    },
+  );
 
-      return reply.redirect(`/dashboard/district/integrations?connected=${connection.id}`);
-    } catch (err: any) {
-      app.log.error(`OAuth callback error: ${err.message}`);
-      return reply.redirect(`/dashboard/district/integrations?error=callback_failed`);
-    }
-  });
+  app.get(
+    "/api/integrations/waitlist",
+    { schema: listWaitlistSchema, preHandler: requireAdmin },
+    async (request) => {
+      const user = (request as any).user;
+      const entries =
+        user.role === "PLATFORM_ADMIN"
+          ? waitlistStore
+          : waitlistStore.filter((e) => e.districtId === user.tenantId);
+      return { entries, total: entries.length };
+    },
+  );
 
-  app.post("/api/integrations/connect", { schema: connectIntegrationSchema, preHandler: requireAdmin }, async (request, reply) => {
-    const { tenantId, connectorId, credentials, config: connConfig } = request.body as any;
-    if (!tenantId || !connectorId) return reply.code(400).send({ error: "tenantId and connectorId required" });
+  app.get(
+    "/api/integrations/connectors/:connectorId",
+    { schema: getConnectorSchema },
+    async (request, reply) => {
+      const { connectorId } = request.params as any;
+      const connector = CONNECTORS.find((c) => c.id === connectorId);
+      if (!connector) return reply.code(404).send({ error: "Connector not found" });
+      return connector;
+    },
+  );
 
-    const user = (request as any).user;
-    if (!assertTenantAccess(user, tenantId)) {
-      return reply.status(403).send({ error: "You can only manage integrations for your own tenant" });
-    }
+  app.get(
+    "/api/integrations/oauth/:connectorId/authorize",
+    { schema: oauthAuthorizeSchema, preHandler: requireAdmin },
+    async (request, reply) => {
+      const { connectorId } = request.params as any;
+      const { tenantId, redirectUri } = request.query as any;
+      const config = getOAuthConfig(connectorId);
+      if (!config) return reply.code(400).send({ error: "OAuth not supported for this connector" });
+      if (!config.clientId)
+        return reply.code(500).send({
+          error: `OAuth client not configured for ${connectorId}. Set environment variables.`,
+        });
 
-    const connector = CONNECTORS.find((c) => c.id === connectorId);
-    if (!connector) return reply.code(404).send({ error: "Connector not found" });
-    if (connector.status === "coming_soon") return reply.code(400).send({ error: "This connector is not yet available" });
+      const state = Buffer.from(JSON.stringify({ tenantId, connectorId })).toString("base64url");
+      const params = new URLSearchParams({
+        client_id: config.clientId,
+        redirect_uri: redirectUri || `${APP_URL}/api/integrations/oauth/callback`,
+        response_type: "code",
+        scope: config.scopes.join(" "),
+        state,
+        access_type: "offline",
+        prompt: "consent",
+      });
 
-    const existing = await db.select().from(integrationConnections)
-      .where(and(
-        eq(integrationConnections.tenantId, tenantId),
-        eq(integrationConnections.connectorId, connectorId),
-        eq(integrationConnections.status, "active"),
-      )).limit(1);
+      return { authorizationUrl: `${config.authUrl}?${params.toString()}` };
+    },
+  );
 
-    if (existing.length > 0) {
-      return reply.code(409).send({ error: "This integration is already connected for this tenant" });
-    }
+  app.get(
+    "/api/integrations/oauth/callback",
+    { schema: oauthCallbackSchema },
+    async (request, reply) => {
+      const { code, state, error: oauthError } = request.query as any;
+      if (oauthError) return reply.redirect(`/dashboard/district/integrations?error=${oauthError}`);
 
-    const [connection] = await db.insert(integrationConnections).values({
-      tenantId,
-      connectorId,
-      connectorName: connector.name,
-      connectorType: connector.category,
-      status: connector.authType === "api_key" ? "active" : "pending",
-      credentials: credentials || {},
-      config: connConfig || {},
-      connectedBy: user.sub || user.userId,
-      connectedAt: new Date(),
-    }).returning();
+      try {
+        const { tenantId, connectorId } = JSON.parse(Buffer.from(state, "base64url").toString());
+        const config = getOAuthConfig(connectorId);
+        if (!config)
+          return reply.redirect("/dashboard/district/integrations?error=invalid_connector");
 
-    return { connection };
-  });
+        const tokenRes = await fetch(config.tokenUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            code,
+            client_id: config.clientId,
+            client_secret: config.clientSecret,
+            redirect_uri: `${APP_URL}/api/integrations/oauth/callback`,
+            grant_type: "authorization_code",
+          }),
+        });
 
-  app.get("/api/integrations/connections/:tenantId", { schema: listConnectionsSchema, preHandler: requireAuth }, async (request, reply) => {
-    const { tenantId } = request.params as any;
-    const user = (request as any).user;
-    if (user.tenantId !== tenantId && !["PLATFORM_ADMIN", "DISTRICT_ADMIN"].includes(user.role)) {
-      return reply.status(403).send({ error: "Access denied" });
-    }
+        if (!tokenRes.ok) {
+          const err = await tokenRes.text();
+          app.log.error(`OAuth token exchange failed for ${connectorId}: ${err}`);
+          return reply.redirect(`/dashboard/district/integrations?error=token_exchange_failed`);
+        }
 
-    const connections = await db.select().from(integrationConnections)
-      .where(eq(integrationConnections.tenantId, tenantId))
-      .orderBy(desc(integrationConnections.createdAt));
+        const tokens = (await tokenRes.json()) as any;
+        const connector = CONNECTORS.find((c) => c.id === connectorId);
 
-    const safeConnections = connections.map((c: any) => ({
-      ...c,
-      credentials: undefined,
-      hasCredentials: !!c.credentials && Object.keys(c.credentials).length > 0,
-    }));
+        const [connection] = await db
+          .insert(integrationConnections)
+          .values({
+            tenantId,
+            connectorId,
+            connectorName: connector?.name || connectorId,
+            connectorType: connector?.category || "lms",
+            status: "authorized",
+            credentials: {
+              accessToken: tokens.access_token,
+              refreshToken: tokens.refresh_token,
+              expiresAt: tokens.expires_in
+                ? new Date(Date.now() + tokens.expires_in * 1000).toISOString()
+                : null,
+              tokenType: tokens.token_type,
+            },
+            connectedAt: new Date(),
+          })
+          .returning();
 
-    return { tenantId, connections: safeConnections };
-  });
+        return reply.redirect(`/dashboard/district/integrations?connected=${connection.id}`);
+      } catch (err: any) {
+        app.log.error(`OAuth callback error: ${err.message}`);
+        return reply.redirect(`/dashboard/district/integrations?error=callback_failed`);
+      }
+    },
+  );
 
-  app.get("/api/integrations/connection/:connectionId", { schema: getConnectionSchema, preHandler: requireAuth }, async (request, reply) => {
-    const { connectionId } = request.params as any;
-    const [connection] = await db.select().from(integrationConnections)
-      .where(eq(integrationConnections.id, connectionId)).limit(1);
+  app.post(
+    "/api/integrations/connect",
+    { schema: connectIntegrationSchema, preHandler: requireAdmin },
+    async (request, reply) => {
+      const { tenantId, connectorId, credentials, config: connConfig } = request.body as any;
+      if (!tenantId || !connectorId)
+        return reply.code(400).send({ error: "tenantId and connectorId required" });
 
-    if (!connection) return reply.code(404).send({ error: "Connection not found" });
+      const user = (request as any).user;
+      if (!assertTenantAccess(user, tenantId)) {
+        return reply
+          .status(403)
+          .send({ error: "You can only manage integrations for your own tenant" });
+      }
 
-    const user = (request as any).user;
-    if (user.tenantId !== connection.tenantId && !["PLATFORM_ADMIN", "DISTRICT_ADMIN"].includes(user.role)) {
-      return reply.status(403).send({ error: "Access denied" });
-    }
+      const connector = CONNECTORS.find((c) => c.id === connectorId);
+      if (!connector) return reply.code(404).send({ error: "Connector not found" });
+      if (connector.status === "coming_soon")
+        return reply.code(400).send({ error: "This connector is not yet available" });
 
-    return {
-      ...connection,
-      credentials: undefined,
-      hasCredentials: !!connection.credentials && Object.keys(connection.credentials as any).length > 0,
-    };
-  });
+      const existing = await db
+        .select()
+        .from(integrationConnections)
+        .where(
+          and(
+            eq(integrationConnections.tenantId, tenantId),
+            eq(integrationConnections.connectorId, connectorId),
+            eq(integrationConnections.status, "active"),
+          ),
+        )
+        .limit(1);
 
-  app.delete("/api/integrations/disconnect/:connectionId", { schema: disconnectIntegrationSchema, preHandler: requireAdmin }, async (request, reply) => {
-    const { connectionId } = request.params as any;
-    const user = (request as any).user;
+      if (existing.length > 0) {
+        return reply
+          .code(409)
+          .send({ error: "This integration is already connected for this tenant" });
+      }
 
-    const connection = await assertConnectionAccess(db, user, connectionId);
-    if (!connection) return reply.code(404).send({ error: "Connection not found or access denied" });
+      const [connection] = await db
+        .insert(integrationConnections)
+        .values({
+          tenantId,
+          connectorId,
+          connectorName: connector.name,
+          connectorType: connector.category,
+          status: connector.authType === "api_key" ? "active" : "pending",
+          credentials: credentials || {},
+          config: connConfig || {},
+          connectedBy: user.sub || user.userId,
+          connectedAt: new Date(),
+        })
+        .returning();
 
-    await db.update(integrationConnections)
-      .set({ status: "disconnected", disconnectedAt: new Date(), updatedAt: new Date(), credentials: {} })
-      .where(eq(integrationConnections.id, connectionId));
+      return { connection };
+    },
+  );
 
-    return { status: "disconnected", connectionId };
-  });
+  app.get(
+    "/api/integrations/connections/:tenantId",
+    { schema: listConnectionsSchema, preHandler: requireAuth },
+    async (request, reply) => {
+      const { tenantId } = request.params as any;
+      const user = (request as any).user;
+      if (user.tenantId !== tenantId && !["PLATFORM_ADMIN", "DISTRICT_ADMIN"].includes(user.role)) {
+        return reply.status(403).send({ error: "Access denied" });
+      }
 
-  app.post("/api/integrations/sync/:connectionId", { schema: triggerSyncSchema, preHandler: requireAdmin }, async (request, reply) => {
-    const { connectionId } = request.params as any;
-    const { syncType = "full" } = request.body as any || {};
-    const user = (request as any).user;
+      const connections = await db
+        .select()
+        .from(integrationConnections)
+        .where(eq(integrationConnections.tenantId, tenantId))
+        .orderBy(desc(integrationConnections.createdAt));
 
-    const connection = await assertConnectionAccess(db, user, connectionId);
-    if (!connection) return reply.code(404).send({ error: "Connection not found or access denied" });
-    if (connection.status !== "active" && connection.status !== "authorized") {
-      return reply.code(400).send({ error: `Cannot sync connection with status: ${connection.status}` });
-    }
-    const [syncLog] = await db.insert(integrationSyncLogs).values({
-      connectionId,
-      syncType,
-      status: "running",
-      triggeredBy: user.sub || user.userId,
-    }).returning();
+      const safeConnections = connections.map((c: any) => ({
+        ...c,
+        credentials: undefined,
+        hasCredentials: !!c.credentials && Object.keys(c.credentials).length > 0,
+      }));
 
-    await db.update(integrationConnections)
-      .set({ status: "syncing", updatedAt: new Date() })
-      .where(eq(integrationConnections.id, connectionId));
+      return { tenantId, connections: safeConnections };
+    },
+  );
 
-    runSyncInBackground(db, connection, syncLog.id).catch((err: any) => {
-      app.log.error(`Sync failed for ${connectionId}: ${err.message}`);
-    });
+  app.get(
+    "/api/integrations/connection/:connectionId",
+    { schema: getConnectionSchema, preHandler: requireAuth },
+    async (request, reply) => {
+      const { connectionId } = request.params as any;
+      const [connection] = await db
+        .select()
+        .from(integrationConnections)
+        .where(eq(integrationConnections.id, connectionId))
+        .limit(1);
 
-    return {
-      status: "sync_started",
-      connectionId,
-      syncId: syncLog.id,
-      startedAt: syncLog.startedAt,
-    };
-  });
+      if (!connection) return reply.code(404).send({ error: "Connection not found" });
 
-  app.get("/api/integrations/sync-logs/:connectionId", { schema: listSyncLogsSchema, preHandler: requireAuth }, async (request, reply) => {
-    const { connectionId } = request.params as any;
-    const user = (request as any).user;
+      const user = (request as any).user;
+      if (
+        user.tenantId !== connection.tenantId &&
+        !["PLATFORM_ADMIN", "DISTRICT_ADMIN"].includes(user.role)
+      ) {
+        return reply.status(403).send({ error: "Access denied" });
+      }
 
-    const connection = await assertConnectionAccess(db, user, connectionId);
-    if (!connection) return reply.code(404).send({ error: "Connection not found or access denied" });
+      return {
+        ...connection,
+        credentials: undefined,
+        hasCredentials:
+          !!connection.credentials && Object.keys(connection.credentials as any).length > 0,
+      };
+    },
+  );
 
-    const logs = await db.select().from(integrationSyncLogs)
-      .where(eq(integrationSyncLogs.connectionId, connectionId))
-      .orderBy(desc(integrationSyncLogs.startedAt))
-      .limit(20);
+  app.delete(
+    "/api/integrations/disconnect/:connectionId",
+    { schema: disconnectIntegrationSchema, preHandler: requireAdmin },
+    async (request, reply) => {
+      const { connectionId } = request.params as any;
+      const user = (request as any).user;
 
-    return { logs };
-  });
+      const connection = await assertConnectionAccess(db, user, connectionId);
+      if (!connection)
+        return reply.code(404).send({ error: "Connection not found or access denied" });
 
-  app.get("/api/integrations/sync/:syncId/status", { schema: getSyncStatusSchema, preHandler: requireAuth }, async (request, reply) => {
-    const { syncId } = request.params as any;
-    const [log] = await db.select().from(integrationSyncLogs)
-      .where(eq(integrationSyncLogs.id, syncId)).limit(1);
+      await db
+        .update(integrationConnections)
+        .set({
+          status: "disconnected",
+          disconnectedAt: new Date(),
+          updatedAt: new Date(),
+          credentials: {},
+        })
+        .where(eq(integrationConnections.id, connectionId));
 
-    if (!log) return reply.code(404).send({ error: "Sync log not found" });
-    return log;
-  });
+      return { status: "disconnected", connectionId };
+    },
+  );
 
-  app.get("/api/integrations/roster-mappings/:connectionId", { schema: listRosterMappingsSchema, preHandler: requireAuth }, async (request, reply) => {
-    const { connectionId } = request.params as any;
-    const { type } = request.query as any;
-    const user = (request as any).user;
+  app.post(
+    "/api/integrations/sync/:connectionId",
+    { schema: triggerSyncSchema, preHandler: requireAdmin },
+    async (request, reply) => {
+      const { connectionId } = request.params as any;
+      const { syncType = "full" } = (request.body as any) || {};
+      const user = (request as any).user;
 
-    const connection = await assertConnectionAccess(db, user, connectionId);
-    if (!connection) return reply.code(404).send({ error: "Connection not found or access denied" });
+      const connection = await assertConnectionAccess(db, user, connectionId);
+      if (!connection)
+        return reply.code(404).send({ error: "Connection not found or access denied" });
+      if (connection.status !== "active" && connection.status !== "authorized") {
+        return reply
+          .code(400)
+          .send({ error: `Cannot sync connection with status: ${connection.status}` });
+      }
+      const [syncLog] = await db
+        .insert(integrationSyncLogs)
+        .values({
+          connectionId,
+          syncType,
+          status: "running",
+          triggeredBy: user.sub || user.userId,
+        })
+        .returning();
 
-    let query = db.select().from(integrationRosterMappings)
-      .where(eq(integrationRosterMappings.connectionId, connectionId));
+      await db
+        .update(integrationConnections)
+        .set({ status: "syncing", updatedAt: new Date() })
+        .where(eq(integrationConnections.id, connectionId));
 
-    if (type) {
-      query = db.select().from(integrationRosterMappings)
-        .where(and(
-          eq(integrationRosterMappings.connectionId, connectionId),
-          eq(integrationRosterMappings.externalType, type),
-        ));
-    }
+      runSyncInBackground(db, connection, syncLog.id).catch((err: any) => {
+        app.log.error(`Sync failed for ${connectionId}: ${err.message}`);
+      });
 
-    const mappings = await query.orderBy(desc(integrationRosterMappings.lastSyncedAt)).limit(100);
-    return { mappings };
-  });
+      return {
+        status: "sync_started",
+        connectionId,
+        syncId: syncLog.id,
+        startedAt: syncLog.startedAt,
+      };
+    },
+  );
+
+  app.get(
+    "/api/integrations/sync-logs/:connectionId",
+    { schema: listSyncLogsSchema, preHandler: requireAuth },
+    async (request, reply) => {
+      const { connectionId } = request.params as any;
+      const user = (request as any).user;
+
+      const connection = await assertConnectionAccess(db, user, connectionId);
+      if (!connection)
+        return reply.code(404).send({ error: "Connection not found or access denied" });
+
+      const logs = await db
+        .select()
+        .from(integrationSyncLogs)
+        .where(eq(integrationSyncLogs.connectionId, connectionId))
+        .orderBy(desc(integrationSyncLogs.startedAt))
+        .limit(20);
+
+      return { logs };
+    },
+  );
+
+  app.get(
+    "/api/integrations/sync/:syncId/status",
+    { schema: getSyncStatusSchema, preHandler: requireAuth },
+    async (request, reply) => {
+      const { syncId } = request.params as any;
+      const [log] = await db
+        .select()
+        .from(integrationSyncLogs)
+        .where(eq(integrationSyncLogs.id, syncId))
+        .limit(1);
+
+      if (!log) return reply.code(404).send({ error: "Sync log not found" });
+      return log;
+    },
+  );
+
+  app.get(
+    "/api/integrations/roster-mappings/:connectionId",
+    { schema: listRosterMappingsSchema, preHandler: requireAuth },
+    async (request, reply) => {
+      const { connectionId } = request.params as any;
+      const { type } = request.query as any;
+      const user = (request as any).user;
+
+      const connection = await assertConnectionAccess(db, user, connectionId);
+      if (!connection)
+        return reply.code(404).send({ error: "Connection not found or access denied" });
+
+      let query = db
+        .select()
+        .from(integrationRosterMappings)
+        .where(eq(integrationRosterMappings.connectionId, connectionId));
+
+      if (type) {
+        query = db
+          .select()
+          .from(integrationRosterMappings)
+          .where(
+            and(
+              eq(integrationRosterMappings.connectionId, connectionId),
+              eq(integrationRosterMappings.externalType, type),
+            ),
+          );
+      }
+
+      const mappings = await query.orderBy(desc(integrationRosterMappings.lastSyncedAt)).limit(100);
+      return { mappings };
+    },
+  );
 }
 
 async function runSyncInBackground(db: any, connection: any, syncLogId: string) {
@@ -532,9 +651,15 @@ async function runSyncInBackground(db: any, connection: any, syncLogId: string) 
     }
 
     const durationMs = Date.now() - startTime;
-    const finalStatus = errors.length > 0 && recordsSynced === 0 ? "failed" : errors.length > 0 ? "partial" : "completed";
+    const finalStatus =
+      errors.length > 0 && recordsSynced === 0
+        ? "failed"
+        : errors.length > 0
+          ? "partial"
+          : "completed";
 
-    await db.update(integrationSyncLogs)
+    await db
+      .update(integrationSyncLogs)
       .set({
         status: finalStatus,
         recordsSynced,
@@ -546,16 +671,17 @@ async function runSyncInBackground(db: any, connection: any, syncLogId: string) 
       })
       .where(eq(integrationSyncLogs.id, syncLogId));
 
-    await db.update(integrationConnections)
+    await db
+      .update(integrationConnections)
       .set({
         status: "active",
         lastSyncAt: new Date(),
         updatedAt: new Date(),
       })
       .where(eq(integrationConnections.id, connection.id));
-
   } catch (err: any) {
-    await db.update(integrationSyncLogs)
+    await db
+      .update(integrationSyncLogs)
       .set({
         status: "failed",
         errors: [{ message: err.message }],
@@ -564,7 +690,8 @@ async function runSyncInBackground(db: any, connection: any, syncLogId: string) 
       })
       .where(eq(integrationSyncLogs.id, syncLogId));
 
-    await db.update(integrationConnections)
+    await db
+      .update(integrationConnections)
       .set({ status: "error", updatedAt: new Date() })
       .where(eq(integrationConnections.id, connection.id));
   }
@@ -574,55 +701,74 @@ async function syncGoogleClassroom(db: any, connection: any, creds: any) {
   const result = { synced: 0, failed: 0, skipped: 0, errors: [] as any[] };
 
   try {
-    const coursesRes = await fetch("https://classroom.googleapis.com/v1/courses?courseStates=ACTIVE", {
-      headers: { Authorization: `Bearer ${creds.accessToken}` },
-    });
+    const coursesRes = await fetch(
+      "https://classroom.googleapis.com/v1/courses?courseStates=ACTIVE",
+      {
+        headers: { Authorization: `Bearer ${creds.accessToken}` },
+      },
+    );
 
     if (!coursesRes.ok) {
       if (coursesRes.status === 401) {
-        result.errors.push({ message: "Google Classroom access token expired. Re-authorize the connection." });
+        result.errors.push({
+          message: "Google Classroom access token expired. Re-authorize the connection.",
+        });
         return result;
       }
       result.errors.push({ message: `Failed to fetch courses: ${coursesRes.status}` });
       return result;
     }
 
-    const coursesData = await coursesRes.json() as any;
+    const coursesData = (await coursesRes.json()) as any;
     const courses = coursesData.courses || [];
 
     for (const course of courses) {
       try {
-        await db.insert(integrationRosterMappings).values({
-          connectionId: connection.id,
-          externalId: course.id,
-          externalType: "class",
-          aivoType: "class",
-          externalData: { name: course.name, section: course.section, descriptionHeading: course.descriptionHeading, courseState: course.courseState },
-          lastSyncedAt: new Date(),
-        }).onConflictDoNothing();
+        await db
+          .insert(integrationRosterMappings)
+          .values({
+            connectionId: connection.id,
+            externalId: course.id,
+            externalType: "class",
+            aivoType: "class",
+            externalData: {
+              name: course.name,
+              section: course.section,
+              descriptionHeading: course.descriptionHeading,
+              courseState: course.courseState,
+            },
+            lastSyncedAt: new Date(),
+          })
+          .onConflictDoNothing();
         result.synced++;
 
-        const studentsRes = await fetch(`https://classroom.googleapis.com/v1/courses/${course.id}/students`, {
-          headers: { Authorization: `Bearer ${creds.accessToken}` },
-        });
+        const studentsRes = await fetch(
+          `https://classroom.googleapis.com/v1/courses/${course.id}/students`,
+          {
+            headers: { Authorization: `Bearer ${creds.accessToken}` },
+          },
+        );
 
         if (studentsRes.ok) {
-          const studentsData = await studentsRes.json() as any;
+          const studentsData = (await studentsRes.json()) as any;
           for (const student of studentsData.students || []) {
             try {
-              await db.insert(integrationRosterMappings).values({
-                connectionId: connection.id,
-                externalId: student.userId,
-                externalType: "student",
-                aivoType: "learner",
-                externalData: {
-                  name: student.profile?.name?.fullName,
-                  email: student.profile?.emailAddress,
-                  courseId: course.id,
-                  courseName: course.name,
-                },
-                lastSyncedAt: new Date(),
-              }).onConflictDoNothing();
+              await db
+                .insert(integrationRosterMappings)
+                .values({
+                  connectionId: connection.id,
+                  externalId: student.userId,
+                  externalType: "student",
+                  aivoType: "learner",
+                  externalData: {
+                    name: student.profile?.name?.fullName,
+                    email: student.profile?.emailAddress,
+                    courseId: course.id,
+                    courseName: course.name,
+                  },
+                  lastSyncedAt: new Date(),
+                })
+                .onConflictDoNothing();
               result.synced++;
             } catch {
               result.failed++;
@@ -630,27 +776,33 @@ async function syncGoogleClassroom(db: any, connection: any, creds: any) {
           }
         }
 
-        const teachersRes = await fetch(`https://classroom.googleapis.com/v1/courses/${course.id}/teachers`, {
-          headers: { Authorization: `Bearer ${creds.accessToken}` },
-        });
+        const teachersRes = await fetch(
+          `https://classroom.googleapis.com/v1/courses/${course.id}/teachers`,
+          {
+            headers: { Authorization: `Bearer ${creds.accessToken}` },
+          },
+        );
 
         if (teachersRes.ok) {
-          const teachersData = await teachersRes.json() as any;
+          const teachersData = (await teachersRes.json()) as any;
           for (const teacher of teachersData.teachers || []) {
             try {
-              await db.insert(integrationRosterMappings).values({
-                connectionId: connection.id,
-                externalId: teacher.userId,
-                externalType: "teacher",
-                aivoType: "teacher",
-                externalData: {
-                  name: teacher.profile?.name?.fullName,
-                  email: teacher.profile?.emailAddress,
-                  courseId: course.id,
-                  courseName: course.name,
-                },
-                lastSyncedAt: new Date(),
-              }).onConflictDoNothing();
+              await db
+                .insert(integrationRosterMappings)
+                .values({
+                  connectionId: connection.id,
+                  externalId: teacher.userId,
+                  externalType: "teacher",
+                  aivoType: "teacher",
+                  externalData: {
+                    name: teacher.profile?.name?.fullName,
+                    email: teacher.profile?.emailAddress,
+                    courseId: course.id,
+                    courseName: course.name,
+                  },
+                  lastSyncedAt: new Date(),
+                })
+                .onConflictDoNothing();
               result.synced++;
             } catch {
               result.failed++;
@@ -688,23 +840,26 @@ async function syncClever(db: any, connection: any, creds: any) {
     });
 
     if (studentsRes.ok) {
-      const studentsData = await studentsRes.json() as any;
+      const studentsData = (await studentsRes.json()) as any;
       for (const student of studentsData.data || []) {
         try {
-          await db.insert(integrationRosterMappings).values({
-            connectionId: connection.id,
-            externalId: student.data?.id || student.id,
-            externalType: "student",
-            aivoType: "learner",
-            externalData: {
-              name: `${student.data?.name?.first || ""} ${student.data?.name?.last || ""}`.trim(),
-              email: student.data?.email,
-              grade: student.data?.grade,
-              school: student.data?.school,
-              sisId: student.data?.sis_id,
-            },
-            lastSyncedAt: new Date(),
-          }).onConflictDoNothing();
+          await db
+            .insert(integrationRosterMappings)
+            .values({
+              connectionId: connection.id,
+              externalId: student.data?.id || student.id,
+              externalType: "student",
+              aivoType: "learner",
+              externalData: {
+                name: `${student.data?.name?.first || ""} ${student.data?.name?.last || ""}`.trim(),
+                email: student.data?.email,
+                grade: student.data?.grade,
+                school: student.data?.school,
+                sisId: student.data?.sis_id,
+              },
+              lastSyncedAt: new Date(),
+            })
+            .onConflictDoNothing();
           result.synced++;
         } catch {
           result.failed++;
@@ -717,22 +872,25 @@ async function syncClever(db: any, connection: any, creds: any) {
     });
 
     if (teachersRes.ok) {
-      const teachersData = await teachersRes.json() as any;
+      const teachersData = (await teachersRes.json()) as any;
       for (const teacher of teachersData.data || []) {
         try {
-          await db.insert(integrationRosterMappings).values({
-            connectionId: connection.id,
-            externalId: teacher.data?.id || teacher.id,
-            externalType: "teacher",
-            aivoType: "teacher",
-            externalData: {
-              name: `${teacher.data?.name?.first || ""} ${teacher.data?.name?.last || ""}`.trim(),
-              email: teacher.data?.email,
-              school: teacher.data?.school,
-              sisId: teacher.data?.sis_id,
-            },
-            lastSyncedAt: new Date(),
-          }).onConflictDoNothing();
+          await db
+            .insert(integrationRosterMappings)
+            .values({
+              connectionId: connection.id,
+              externalId: teacher.data?.id || teacher.id,
+              externalType: "teacher",
+              aivoType: "teacher",
+              externalData: {
+                name: `${teacher.data?.name?.first || ""} ${teacher.data?.name?.last || ""}`.trim(),
+                email: teacher.data?.email,
+                school: teacher.data?.school,
+                sisId: teacher.data?.sis_id,
+              },
+              lastSyncedAt: new Date(),
+            })
+            .onConflictDoNothing();
           result.synced++;
         } catch {
           result.failed++;
@@ -745,24 +903,27 @@ async function syncClever(db: any, connection: any, creds: any) {
     });
 
     if (sectionsRes.ok) {
-      const sectionsData = await sectionsRes.json() as any;
+      const sectionsData = (await sectionsRes.json()) as any;
       for (const section of sectionsData.data || []) {
         try {
-          await db.insert(integrationRosterMappings).values({
-            connectionId: connection.id,
-            externalId: section.data?.id || section.id,
-            externalType: "section",
-            aivoType: "class",
-            externalData: {
-              name: section.data?.name,
-              subject: section.data?.subject,
-              course: section.data?.course,
-              grade: section.data?.grade,
-              students: section.data?.students,
-              teacher: section.data?.teacher,
-            },
-            lastSyncedAt: new Date(),
-          }).onConflictDoNothing();
+          await db
+            .insert(integrationRosterMappings)
+            .values({
+              connectionId: connection.id,
+              externalId: section.data?.id || section.id,
+              externalType: "section",
+              aivoType: "class",
+              externalData: {
+                name: section.data?.name,
+                subject: section.data?.subject,
+                course: section.data?.course,
+                grade: section.data?.grade,
+                students: section.data?.students,
+                teacher: section.data?.teacher,
+              },
+              lastSyncedAt: new Date(),
+            })
+            .onConflictDoNothing();
           result.synced++;
         } catch {
           result.failed++;
@@ -790,26 +951,33 @@ async function syncClassLink(db: any, connection: any, creds: any) {
       return result;
     }
 
-    const users = await usersRes.json() as any[];
-    for (const user of (Array.isArray(users) ? users : [])) {
+    const users = (await usersRes.json()) as any[];
+    for (const user of Array.isArray(users) ? users : []) {
       try {
-        const role = user.Role === "Student" ? "student" : user.Role === "Teacher" ? "teacher" : "other";
-        if (role === "other") { result.skipped++; continue; }
+        const role =
+          user.Role === "Student" ? "student" : user.Role === "Teacher" ? "teacher" : "other";
+        if (role === "other") {
+          result.skipped++;
+          continue;
+        }
 
-        await db.insert(integrationRosterMappings).values({
-          connectionId: connection.id,
-          externalId: user.UserId || user.SourcedId,
-          externalType: role,
-          aivoType: role === "student" ? "learner" : "teacher",
-          externalData: {
-            name: `${user.FirstName || ""} ${user.LastName || ""}`.trim(),
-            email: user.Email,
-            role: user.Role,
-            org: user.OrgName,
-            grade: user.Grade,
-          },
-          lastSyncedAt: new Date(),
-        }).onConflictDoNothing();
+        await db
+          .insert(integrationRosterMappings)
+          .values({
+            connectionId: connection.id,
+            externalId: user.UserId || user.SourcedId,
+            externalType: role,
+            aivoType: role === "student" ? "learner" : "teacher",
+            externalData: {
+              name: `${user.FirstName || ""} ${user.LastName || ""}`.trim(),
+              email: user.Email,
+              role: user.Role,
+              org: user.OrgName,
+              grade: user.Grade,
+            },
+            lastSyncedAt: new Date(),
+          })
+          .onConflictDoNothing();
         result.synced++;
       } catch {
         result.failed++;
@@ -821,22 +989,25 @@ async function syncClassLink(db: any, connection: any, creds: any) {
     });
 
     if (classesRes.ok) {
-      const classes = await classesRes.json() as any[];
-      for (const cls of (Array.isArray(classes) ? classes : [])) {
+      const classes = (await classesRes.json()) as any[];
+      for (const cls of Array.isArray(classes) ? classes : []) {
         try {
-          await db.insert(integrationRosterMappings).values({
-            connectionId: connection.id,
-            externalId: cls.SourcedId || cls.ClassId,
-            externalType: "class",
-            aivoType: "class",
-            externalData: {
-              name: cls.Title || cls.ClassName,
-              subject: cls.Subject,
-              grade: cls.Grade,
-              course: cls.CourseTitle,
-            },
-            lastSyncedAt: new Date(),
-          }).onConflictDoNothing();
+          await db
+            .insert(integrationRosterMappings)
+            .values({
+              connectionId: connection.id,
+              externalId: cls.SourcedId || cls.ClassId,
+              externalType: "class",
+              aivoType: "class",
+              externalData: {
+                name: cls.Title || cls.ClassName,
+                subject: cls.Subject,
+                grade: cls.Grade,
+                course: cls.CourseTitle,
+              },
+              lastSyncedAt: new Date(),
+            })
+            .onConflictDoNothing();
           result.synced++;
         } catch {
           result.failed++;
@@ -856,62 +1027,84 @@ async function syncCanvasLMS(db: any, connection: any, creds: any) {
   const apiToken = creds.apiToken || creds.accessToken;
 
   if (!baseUrl) {
-    result.errors.push({ message: "Canvas URL not configured. Set the Canvas instance URL in connection config." });
+    result.errors.push({
+      message: "Canvas URL not configured. Set the Canvas instance URL in connection config.",
+    });
     return result;
   }
 
   try {
-    const coursesRes = await fetch(`${baseUrl}/api/v1/courses?enrollment_state=active&per_page=100`, {
-      headers: { Authorization: `Bearer ${apiToken}` },
-    });
+    const coursesRes = await fetch(
+      `${baseUrl}/api/v1/courses?enrollment_state=active&per_page=100`,
+      {
+        headers: { Authorization: `Bearer ${apiToken}` },
+      },
+    );
 
     if (!coursesRes.ok) {
       result.errors.push({ message: `Canvas API failed: ${coursesRes.status}` });
       return result;
     }
 
-    const courses = await coursesRes.json() as any[];
+    const courses = (await coursesRes.json()) as any[];
     for (const course of courses) {
       try {
-        await db.insert(integrationRosterMappings).values({
-          connectionId: connection.id,
-          externalId: String(course.id),
-          externalType: "class",
-          aivoType: "class",
-          externalData: {
-            name: course.name,
-            courseCode: course.course_code,
-            enrollments: course.total_students,
-          },
-          lastSyncedAt: new Date(),
-        }).onConflictDoNothing();
+        await db
+          .insert(integrationRosterMappings)
+          .values({
+            connectionId: connection.id,
+            externalId: String(course.id),
+            externalType: "class",
+            aivoType: "class",
+            externalData: {
+              name: course.name,
+              courseCode: course.course_code,
+              enrollments: course.total_students,
+            },
+            lastSyncedAt: new Date(),
+          })
+          .onConflictDoNothing();
         result.synced++;
 
-        const enrollmentsRes = await fetch(`${baseUrl}/api/v1/courses/${course.id}/enrollments?per_page=100`, {
-          headers: { Authorization: `Bearer ${apiToken}` },
-        });
+        const enrollmentsRes = await fetch(
+          `${baseUrl}/api/v1/courses/${course.id}/enrollments?per_page=100`,
+          {
+            headers: { Authorization: `Bearer ${apiToken}` },
+          },
+        );
 
         if (enrollmentsRes.ok) {
-          const enrollments = await enrollmentsRes.json() as any[];
+          const enrollments = (await enrollmentsRes.json()) as any[];
           for (const enrollment of enrollments) {
-            const type = enrollment.type === "StudentEnrollment" ? "student" : enrollment.type === "TeacherEnrollment" ? "teacher" : null;
-            if (!type) { result.skipped++; continue; }
+            const type =
+              enrollment.type === "StudentEnrollment"
+                ? "student"
+                : enrollment.type === "TeacherEnrollment"
+                  ? "teacher"
+                  : null;
+            if (!type) {
+              result.skipped++;
+              continue;
+            }
 
             try {
-              await db.insert(integrationRosterMappings).values({
-                connectionId: connection.id,
-                externalId: String(enrollment.user_id),
-                externalType: type,
-                aivoType: type === "student" ? "learner" : "teacher",
-                externalData: {
-                  name: enrollment.user?.name,
-                  email: enrollment.user?.login_id,
-                  courseId: String(course.id),
-                  courseName: course.name,
-                  enrollmentState: enrollment.enrollment_state,
-                },
-                lastSyncedAt: new Date(),
-              }).onConflictDoNothing();
+              await db
+                .insert(integrationRosterMappings)
+                .values({
+                  connectionId: connection.id,
+                  externalId: String(enrollment.user_id),
+                  externalType: type,
+                  aivoType: type === "student" ? "learner" : "teacher",
+                  externalData: {
+                    name: enrollment.user?.name,
+                    email: enrollment.user?.login_id,
+                    courseId: String(course.id),
+                    courseName: course.name,
+                    enrollmentState: enrollment.enrollment_state,
+                  },
+                  lastSyncedAt: new Date(),
+                })
+                .onConflictDoNothing();
               result.synced++;
             } catch {
               result.failed++;

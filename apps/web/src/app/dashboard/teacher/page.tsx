@@ -34,11 +34,16 @@ interface ClassroomGroup {
 }
 
 const LEVEL_STYLES: Record<string, string> = {
-  STANDARD: "bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))] border-[hsl(var(--visual-science)/0.3)]",
-  SUPPORTED: "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))] border-[hsl(var(--visual-reading)/0.3)]",
-  LOW_VERBAL: "bg-[hsl(var(--visual-sel)/0.12)] text-[hsl(var(--visual-sel))] border-[hsl(var(--visual-sel)/0.3)]",
-  NON_VERBAL: "bg-[hsl(var(--visual-sel)/0.16)] text-[hsl(var(--visual-sel))] border-[hsl(var(--visual-sel)/0.3)]",
-  PRE_SYMBOLIC: "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))] border-[hsl(var(--visual-math)/0.3)]",
+  STANDARD:
+    "bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))] border-[hsl(var(--visual-science)/0.3)]",
+  SUPPORTED:
+    "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))] border-[hsl(var(--visual-reading)/0.3)]",
+  LOW_VERBAL:
+    "bg-[hsl(var(--visual-sel)/0.12)] text-[hsl(var(--visual-sel))] border-[hsl(var(--visual-sel)/0.3)]",
+  NON_VERBAL:
+    "bg-[hsl(var(--visual-sel)/0.16)] text-[hsl(var(--visual-sel))] border-[hsl(var(--visual-sel)/0.3)]",
+  PRE_SYMBOLIC:
+    "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))] border-[hsl(var(--visual-math)/0.3)]",
 };
 
 export default function TeacherOverviewPage() {
@@ -102,9 +107,7 @@ export default function TeacherOverviewPage() {
           <h1 className="text-2xl lg:text-3xl font-heading font-bold vi-text leading-tight">
             {t("my_classes")}
           </h1>
-          <p className="text-sm vi-text-muted font-medium mt-1">
-            Your classroom at a glance.
-          </p>
+          <p className="text-sm vi-text-muted font-medium mt-1">Your classroom at a glance.</p>
         </div>
       </header>
 
@@ -187,10 +190,7 @@ export default function TeacherOverviewPage() {
       ) : (
         <div className="space-y-6">
           {classrooms.map((group) => (
-            <div
-              key={group.grade}
-              className="vi-card overflow-hidden"
-            >
+            <div key={group.grade} className="vi-card overflow-hidden">
               <div className="px-6 py-4 border-b vi-border vi-surface-soft flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <span
@@ -200,9 +200,7 @@ export default function TeacherOverviewPage() {
                     {group.grade.replace(/[^0-9KkPp]/g, "").toUpperCase() || "?"}
                   </span>
                   <div>
-                    <h3 className="font-heading font-bold vi-text">
-                      Grade {group.grade}
-                    </h3>
+                    <h3 className="font-heading font-bold vi-text">Grade {group.grade}</h3>
                     <p className="text-xs vi-text-muted font-bold uppercase tracking-wide">
                       {group.learners.length} learner
                       {group.learners.length !== 1 ? "s" : ""}
@@ -235,9 +233,7 @@ export default function TeacherOverviewPage() {
                               {l.name.charAt(0)}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className="font-bold vi-text truncate">
-                                {l.name}
-                              </h4>
+                              <h4 className="font-bold vi-text truncate">{l.name}</h4>
                               {l.gradeLevel && (
                                 <p className="text-xs vi-text-muted font-semibold">
                                   Grade {l.gradeLevel}
@@ -263,11 +259,7 @@ export default function TeacherOverviewPage() {
                           <span
                             className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-[11px] rounded-full font-bold border ${LEVEL_STYLES[l.functioningLevel] || "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))] border-[hsl(var(--visual-primary)/0.3)]"}`}
                           >
-                            <Target
-                              size={10}
-                              strokeWidth={3}
-                              aria-hidden="true"
-                            />
+                            <Target size={10} strokeWidth={3} aria-hidden="true" />
                             {l.functioningLevel || "Pending"}
                           </span>
                         </button>

@@ -16,28 +16,29 @@ export default function FerpaCompliancePage() {
           title: "1. Operator Information",
           content: [
             "The operator of the Services for purposes of this FERPA Compliance Statement is Aivo AI Learning Technologies Inc., a Delaware corporation with its principal place of business at 1400 Van Buren Street S, Suite 200, Minneapolis, MN, United States.",
-            "Our Compliance Office handles all FERPA matters, including school authorizations, parent and eligible-student requests, and inquiries from the U.S. Department of Education's Student Privacy Policy Office (SPPO). You can reach us at compliance@aivolearning.com, by phone at +1 (612) 555-0102 between 9:00 a.m. and 6:00 p.m. Eastern Time on business days, or by postal mail at the address above marked \"Attention: Compliance Office\".",
+            'Our Compliance Office handles all FERPA matters, including school authorizations, parent and eligible-student requests, and inquiries from the U.S. Department of Education\'s Student Privacy Policy Office (SPPO). You can reach us at compliance@aivolearning.com, by phone at +1 (612) 555-0102 between 9:00 a.m. and 6:00 p.m. Eastern Time on business days, or by postal mail at the address above marked "Attention: Compliance Office".',
           ],
         },
         {
           title: "2. Scope of This Statement",
           content: [
-            "This statement applies whenever AIVO is used in connection with a school, school district, college, university, or other \"educational agency or institution\" subject to FERPA — whether the institution is using AIVO under a written District Agreement, a school-administered free deployment, or a teacher-initiated classroom integration.",
+            'This statement applies whenever AIVO is used in connection with a school, school district, college, university, or other "educational agency or institution" subject to FERPA — whether the institution is using AIVO under a written District Agreement, a school-administered free deployment, or a teacher-initiated classroom integration.',
             "It also applies to information AIVO receives directly from a parent of a student attending a FERPA-covered institution, when that information is then incorporated into the student's educational record at AIVO.",
             "This statement does not apply to consumer (non-school) accounts created directly by a parent for a learner who is not enrolled in a FERPA-covered institution. Those accounts are governed by our Privacy Policy and, where applicable, our COPPA Compliance Statement.",
           ],
         },
         {
-          title: "3. AIVO's Role: \"School Official\" Designation",
+          title: '3. AIVO\'s Role: "School Official" Designation',
           content: [
-            "When an educational agency or institution permits AIVO to receive personally identifiable information from education records, AIVO acts as a \"school official\" with a \"legitimate educational interest\" under 34 C.F.R. § 99.31(a)(1)(i)(B). In that role we (a) perform an institutional service or function for which the school would otherwise use its own employees; (b) are under the direct control of the school with respect to the use and maintenance of education records; and (c) are subject to the requirements in 34 C.F.R. § 99.33(a) governing the use and re-disclosure of personally identifiable information from education records.",
+            'When an educational agency or institution permits AIVO to receive personally identifiable information from education records, AIVO acts as a "school official" with a "legitimate educational interest" under 34 C.F.R. § 99.31(a)(1)(i)(B). In that role we (a) perform an institutional service or function for which the school would otherwise use its own employees; (b) are under the direct control of the school with respect to the use and maintenance of education records; and (c) are subject to the requirements in 34 C.F.R. § 99.33(a) governing the use and re-disclosure of personally identifiable information from education records.',
             "Each school or district authorizing AIVO is responsible for designating AIVO as a school official in its Annual FERPA Notification (the notice required by 34 C.F.R. § 99.7) or in another disclosure that meets FERPA's notice requirements. We supply schools with model language they can include in their annual notification.",
             "AIVO does not sell personally identifiable information from education records, does not use education records for targeted advertising, and does not use education records to train any third-party AI foundation model.",
           ],
         },
         {
-          title: "4. What Constitutes an \"Education Record\" at AIVO",
-          content: "Under FERPA, an \"education record\" is any record (in any medium) that is directly related to a student and maintained by an educational agency or institution or by a party acting for the agency or institution. The following categories of information that AIVO maintains on behalf of a school constitute education records:",
+          title: '4. What Constitutes an "Education Record" at AIVO',
+          content:
+            'Under FERPA, an "education record" is any record (in any medium) that is directly related to a student and maintained by an educational agency or institution or by a party acting for the agency or institution. The following categories of information that AIVO maintains on behalf of a school constitute education records:',
           list: [
             "Student rostering data provided by the school (name, grade level, class enrollment, school identifier, teacher of record).",
             "Brain-Clone learner profiles, mastery models, and the underlying signals (item-level responses, time-on-task, hint usage, error patterns) generated through school-authorized use.",
@@ -50,13 +51,14 @@ export default function FerpaCompliancePage() {
         {
           title: "5. Directory Information",
           content: [
-            "FERPA permits a school to designate certain categories of personally identifiable information as \"directory information\" that may be disclosed without parental consent unless the parent (or eligible student) has opted out. Directory information typically includes a student's name, grade level, photograph, dates of attendance, and similar items.",
+            'FERPA permits a school to designate certain categories of personally identifiable information as "directory information" that may be disclosed without parental consent unless the parent (or eligible student) has opted out. Directory information typically includes a student\'s name, grade level, photograph, dates of attendance, and similar items.',
             "AIVO does not designate or publish directory information on behalf of a school. We will only treat data as directory information if the school has classified it as such in its own annual FERPA notification and has explicitly authorized AIVO to disclose it (for example, in connection with a class roster shared with another classroom tool). In all other cases AIVO treats every field associated with a student as a non-directory education record.",
           ],
         },
         {
           title: "6. Information We Collect From Students Through School Accounts",
-          content: "We follow a strict data-minimization principle: we collect only what is necessary to provide the educational service that the school has authorized. Through a School Account we may collect:",
+          content:
+            "We follow a strict data-minimization principle: we collect only what is necessary to provide the educational service that the school has authorized. Through a School Account we may collect:",
           list: [
             "Roster information from the school's Student Information System (SIS) or rostering provider (Clever, ClassLink, Google Classroom, OneRoster), including the student's name or username, grade, class assignment, teacher of record, and a school-issued identifier.",
             "Authentication tokens issued by the school's identity provider (SSO), used only to sign the student in.",
@@ -68,7 +70,8 @@ export default function FerpaCompliancePage() {
         },
         {
           title: "7. How We Use Education Records",
-          content: "AIVO uses education records only for the educational purposes the school has authorized — that is, to provide and improve the Services for the benefit of the school and its students. Specifically, we use education records to:",
+          content:
+            "AIVO uses education records only for the educational purposes the school has authorized — that is, to provide and improve the Services for the benefit of the school and its students. Specifically, we use education records to:",
           list: [
             "Personalize each student's learning experience through the Brain-Clone adaptive engine.",
             "Generate progress, mastery, and engagement reports for the student's authorized teachers, paraprofessionals, school administrators, and (where authorized by the school) the student's parents.",
@@ -89,7 +92,7 @@ export default function FerpaCompliancePage() {
         {
           title: "9. Parent and Eligible-Student Rights",
           content: [
-            "FERPA grants parents — and \"eligible students,\" defined as students who have reached 18 years of age or are attending a postsecondary institution — the following rights with respect to education records held by the school. AIVO supports the school in honoring each of these rights.",
+            'FERPA grants parents — and "eligible students," defined as students who have reached 18 years of age or are attending a postsecondary institution — the following rights with respect to education records held by the school. AIVO supports the school in honoring each of these rights.',
             "Right to inspect and review. Parents and eligible students may inspect and review the student's education records within 45 days of the day the school receives a request. AIVO will provide the school with a complete export of the student's records (in a portable JSON or CSV format, plus a human-readable PDF summary) within 10 business days of the school's request, so the school can satisfy the 45-day requirement.",
             "Right to request amendment. Parents and eligible students may ask the school to amend a record they believe is inaccurate, misleading, or in violation of the student's privacy rights. AIVO will implement an amendment within 10 business days of the school's instruction.",
             "Right to consent to disclosure. Except for FERPA's enumerated exceptions, the school must obtain written consent from the parent or eligible student before disclosing personally identifiable information from the student's education records. AIVO will not disclose information outside the scope of the school's authorization unless we receive a copy of that consent or a court order or subpoena.",
@@ -106,7 +109,8 @@ export default function FerpaCompliancePage() {
         },
         {
           title: "11. Data Access Controls",
-          content: "AIVO enforces least-privilege access to education records through technical and administrative controls. These include:",
+          content:
+            "AIVO enforces least-privilege access to education records through technical and administrative controls. These include:",
           list: [
             "Role-based access control with thirteen distinct roles and granular permissions; teachers see only the records of students assigned to them; school administrators see only the records of their school; district administrators see only the records of their district.",
             "Single sign-on and multi-factor authentication for all internal access by AIVO personnel.",
@@ -142,7 +146,7 @@ export default function FerpaCompliancePage() {
           title: "15. State Student-Privacy Laws",
           content: [
             "AIVO complies with the student-privacy laws of every U.S. state in which our school customers operate. Where required, the District Agreement is supplemented with state-specific exhibits.",
-            "California — the Student Online Personal Information Protection Act (SOPIPA, Cal. Bus. & Prof. Code § 22584) and the California \"Eraser Law\" (§ 22581).",
+            'California — the Student Online Personal Information Protection Act (SOPIPA, Cal. Bus. & Prof. Code § 22584) and the California "Eraser Law" (§ 22581).',
             "New York — Education Law § 2-d, including the Parents' Bill of Rights, Data Security and Privacy Plan, and Supplemental Information for Contracts.",
             "Connecticut — Connecticut General Statutes § 10-234aa through § 10-234ff.",
             "Illinois — the Student Online Personal Protection Act (SOPPA, 105 ILCS 85/).",
@@ -162,11 +166,13 @@ export default function FerpaCompliancePage() {
         },
         {
           title: "17. Self-Regulatory Programs and Certifications",
-          content: "AIVO participates in industry programs that strengthen our FERPA compliance, including the iKeepSafe FERPA certification, the Future of Privacy Forum's Student Privacy Pledge 2020, the Student Data Privacy Consortium, and the 1EdTech (formerly IMS Global) TrustEd Apps program. Our compliance is independently audited annually, and audit summaries are available on request to current and prospective school customers under NDA.",
+          content:
+            "AIVO participates in industry programs that strengthen our FERPA compliance, including the iKeepSafe FERPA certification, the Future of Privacy Forum's Student Privacy Pledge 2020, the Student Data Privacy Consortium, and the 1EdTech (formerly IMS Global) TrustEd Apps program. Our compliance is independently audited annually, and audit summaries are available on request to current and prospective school customers under NDA.",
         },
         {
           title: "18. Changes to This Statement",
-          content: "We may update this FERPA Compliance Statement from time to time to reflect changes in the law, in our practices, or in the categories of education records we maintain. When we make a material change that may affect a school's or district's rights, we will provide written notice through the email address on file in the District Agreement at least thirty days before the change takes effect. The \"Last updated\" date at the top of this page reflects the most recent material revision.",
+          content:
+            "We may update this FERPA Compliance Statement from time to time to reflect changes in the law, in our practices, or in the categories of education records we maintain. When we make a material change that may affect a school's or district's rights, we will provide written notice through the email address on file in the District Agreement at least thirty days before the change takes effect. The \"Last updated\" date at the top of this page reflects the most recent material revision.",
         },
         {
           title: "19. Contact the Compliance Office",

@@ -42,7 +42,11 @@ const subjects: Subject[] = [
     regionClass: styles.regionOverall,
     description:
       "The overall profile combines active subject performance, learner engagement, assessment history, and adaptive learning behavior.",
-    strengths: ["Consistent engagement", "Strong pattern recognition", "Responds well to visual scaffolds"],
+    strengths: [
+      "Consistent engagement",
+      "Strong pattern recognition",
+      "Responds well to visual scaffolds",
+    ],
     support: ["Longer independent practice", "More multi-step explanation work"],
     recommendation: "Continue balanced adaptive practice across Reading, Math, and Science.",
   },
@@ -59,7 +63,8 @@ const subjects: Subject[] = [
       "Science reflects concept mastery, observation, cause-and-effect reasoning, and use of grade-level science vocabulary.",
     strengths: ["Concept recognition", "Visual science activities", "Cause-and-effect reasoning"],
     support: ["Scientific explanation writing", "Vocabulary precision"],
-    recommendation: "Continue grade-level science practice with visual simulations and short explanation prompts.",
+    recommendation:
+      "Continue grade-level science practice with visual simulations and short explanation prompts.",
   },
   {
     id: "math",
@@ -74,7 +79,8 @@ const subjects: Subject[] = [
       "Math reflects number sense, procedural fluency, reasoning, and multi-step problem solving.",
     strengths: ["Computation fluency", "Pattern recognition", "Multi-step problem solving"],
     support: ["Explaining reasoning in writing", "Checking work before submission"],
-    recommendation: "Move Jayden into enrichment practice with applied word problems and challenge tasks.",
+    recommendation:
+      "Move Jayden into enrichment practice with applied word problems and challenge tasks.",
   },
   {
     id: "reading",
@@ -128,7 +134,11 @@ const subjects: Subject[] = [
 
 const raiItems = [
   ["COPPA Compliance", "Parental consent verified", "Consent checkpoint active"],
-  ["Content Safety Gate", "Responses pass safety and quality filters", "Age-appropriate output only"],
+  [
+    "Content Safety Gate",
+    "Responses pass safety and quality filters",
+    "Age-appropriate output only",
+  ],
   ["Bias Detection", "Content checked for cultural sensitivity", "Inclusive examples enabled"],
   ["Data Encryption", "Brain state encrypted at rest and in transit", "AES-256 · TLS"],
   ["Parent Approval Loop", "Level changes require parent approval", "No silent grade jumps"],
@@ -256,7 +266,7 @@ function BrainTab() {
 
   const selected = useMemo(
     () => subjects.find((subject) => subject.id === selectedId) ?? subjects[0],
-    [selectedId]
+    [selectedId],
   );
 
   const activeSubjects = subjects.filter((subject) => subject.level !== null);
@@ -265,11 +275,11 @@ function BrainTab() {
     activeSubjects.length;
 
   const strongest = activeSubjects.reduce((best, subject) =>
-    Number(subject.level) > Number(best.level) ? subject : best
+    Number(subject.level) > Number(best.level) ? subject : best,
   );
 
   const focus = activeSubjects.reduce((lowest, subject) =>
-    Number(subject.level) < Number(lowest.level) ? subject : lowest
+    Number(subject.level) < Number(lowest.level) ? subject : lowest,
   );
 
   const progress =

@@ -66,11 +66,16 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 const TYPE_COLORS: Record<string, string> = {
-  regression_alert: "bg-[hsl(var(--visual-math)/0.06)] border-[hsl(var(--visual-math)/0.3)] text-[hsl(var(--visual-math))]",
-  brain_upgrade: "bg-[hsl(var(--visual-science)/0.06)] border-[hsl(var(--visual-science)/0.3)] text-[hsl(var(--visual-science))]",
-  iep_goal_met: "bg-[hsl(var(--visual-science)/0.06)] border-[hsl(var(--visual-science)/0.3)] text-[hsl(var(--visual-science))]",
-  accommodation_add: "bg-[hsl(var(--visual-reading)/0.06)] border-[hsl(var(--visual-reading)/0.3)] text-[hsl(var(--visual-reading))]",
-  goal_suggestion: "bg-[hsl(var(--visual-primary)/0.06)] border-[hsl(var(--visual-primary)/0.3)] text-[hsl(var(--visual-primary))]",
+  regression_alert:
+    "bg-[hsl(var(--visual-math)/0.06)] border-[hsl(var(--visual-math)/0.3)] text-[hsl(var(--visual-math))]",
+  brain_upgrade:
+    "bg-[hsl(var(--visual-science)/0.06)] border-[hsl(var(--visual-science)/0.3)] text-[hsl(var(--visual-science))]",
+  iep_goal_met:
+    "bg-[hsl(var(--visual-science)/0.06)] border-[hsl(var(--visual-science)/0.3)] text-[hsl(var(--visual-science))]",
+  accommodation_add:
+    "bg-[hsl(var(--visual-reading)/0.06)] border-[hsl(var(--visual-reading)/0.3)] text-[hsl(var(--visual-reading))]",
+  goal_suggestion:
+    "bg-[hsl(var(--visual-primary)/0.06)] border-[hsl(var(--visual-primary)/0.3)] text-[hsl(var(--visual-primary))]",
 };
 
 // Which payload field the parent can edit when amending each recommendation type.
@@ -116,8 +121,12 @@ export default function RecommendationsPage() {
     if (!accessToken || !learnerId) return;
     try {
       const [recsRes, conflictsRes] = await Promise.all([
-        fetch(`/api/family/recommendations/${learnerId}`, { headers: { Authorization: `Bearer ${accessToken}` } }),
-        fetch(`/api/family/recommendations/${learnerId}/conflicts`, { headers: { Authorization: `Bearer ${accessToken}` } }),
+        fetch(`/api/family/recommendations/${learnerId}`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }),
+        fetch(`/api/family/recommendations/${learnerId}/conflicts`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }),
       ]);
       if (recsRes.ok) setRecs(await recsRes.json());
       if (conflictsRes.ok) {
@@ -129,7 +138,9 @@ export default function RecommendationsPage() {
     }
   };
 
-  useEffect(() => { fetchData(); }, [accessToken, learnerId]);
+  useEffect(() => {
+    fetchData();
+  }, [accessToken, learnerId]);
 
   const startResponding = (rec: Recommendation) => {
     setRespondingTo(rec.id);
@@ -140,7 +151,10 @@ export default function RecommendationsPage() {
     setAmendValue(initial != null ? String(initial) : "");
   };
 
-  const respondToRec = async (rec: Recommendation, action: "APPROVED" | "DECLINED" | "ADJUSTED") => {
+  const respondToRec = async (
+    rec: Recommendation,
+    action: "APPROVED" | "DECLINED" | "ADJUSTED",
+  ) => {
     setSubmitting(true);
     setSubmitError(null);
     try {
@@ -179,8 +193,8 @@ export default function RecommendationsPage() {
 
   if (loading || !user) return null;
 
-  const pendingRecs = recs.filter(r => r.status === "PENDING");
-  const resolvedRecs = recs.filter(r => r.status !== "PENDING");
+  const pendingRecs = recs.filter((r) => r.status === "PENDING");
+  const resolvedRecs = recs.filter((r) => r.status !== "PENDING");
 
   return (
     <div className="space-y-6">
@@ -191,10 +205,15 @@ export default function RecommendationsPage() {
 
       {conflicts.length > 0 && (
         <div className="rounded-2xl p-5 border bg-[hsl(var(--visual-sel)/0.08)] border-[hsl(var(--visual-sel)/0.3)]">
-          <h3 className="font-heading font-bold text-[hsl(var(--visual-sel))] mb-2">{t("conflicts_detected")}</h3>
+          <h3 className="font-heading font-bold text-[hsl(var(--visual-sel))] mb-2">
+            {t("conflicts_detected")}
+          </h3>
           <p className="text-sm text-[hsl(var(--visual-sel))] mb-3">{t("conflicts_desc")}</p>
           {conflicts.map((c, i) => (
-            <div key={i} className="p-3 rounded-xl bg-[hsl(var(--visual-sel)/0.12)] mb-2 text-sm text-[hsl(var(--visual-sel))]">
+            <div
+              key={i}
+              className="p-3 rounded-xl bg-[hsl(var(--visual-sel)/0.12)] mb-2 text-sm text-[hsl(var(--visual-sel))]"
+            >
               <span className="font-bold">{c.domain}:</span> {c.description}
             </div>
           ))}
@@ -202,12 +221,16 @@ export default function RecommendationsPage() {
       )}
 
       <div className="flex gap-2 border-b vi-border pb-1">
-        <button onClick={() => setActiveTab("pending")}
-          className={`px-4 py-2 text-sm font-bold rounded-t-lg transition ${activeTab === "pending" ? "bg-white border vi-border border-b-white text-[hsl(var(--visual-primary))] -mb-[1px]" : "vi-text-muted hover:vi-text"}`}>
+        <button
+          onClick={() => setActiveTab("pending")}
+          className={`px-4 py-2 text-sm font-bold rounded-t-lg transition ${activeTab === "pending" ? "bg-white border vi-border border-b-white text-[hsl(var(--visual-primary))] -mb-[1px]" : "vi-text-muted hover:vi-text"}`}
+        >
           {t("pending_count", { count: pendingRecs.length })}
         </button>
-        <button onClick={() => setActiveTab("history")}
-          className={`px-4 py-2 text-sm font-bold rounded-t-lg transition ${activeTab === "history" ? "bg-white border vi-border border-b-white text-[hsl(var(--visual-primary))] -mb-[1px]" : "vi-text-muted hover:vi-text"}`}>
+        <button
+          onClick={() => setActiveTab("history")}
+          className={`px-4 py-2 text-sm font-bold rounded-t-lg transition ${activeTab === "history" ? "bg-white border vi-border border-b-white text-[hsl(var(--visual-primary))] -mb-[1px]" : "vi-text-muted hover:vi-text"}`}
+        >
           {t("history_count", { count: resolvedRecs.length })}
         </button>
       </div>
@@ -217,16 +240,21 @@ export default function RecommendationsPage() {
           {pendingRecs.length === 0 ? (
             <div className="vi-card p-12 text-center">
               <div className="flex justify-center mb-3">
-                <IconWell color="science" size="lg"><CheckCircle2 className="w-10 h-10" /></IconWell>
+                <IconWell color="science" size="lg">
+                  <CheckCircle2 className="w-10 h-10" />
+                </IconWell>
               </div>
               <p className="vi-text-muted font-semibold">{t("no_pending")}</p>
             </div>
           ) : (
-            pendingRecs.map(rec => {
+            pendingRecs.map((rec) => {
               const amendField = AMEND_FIELD[rec.type];
               const canAmend = amendField !== null && amendField !== undefined;
               return (
-                <div key={rec.id} className={`rounded-2xl p-5 border shadow-sm ${TYPE_COLORS[rec.type] || "vi-card"}`}>
+                <div
+                  key={rec.id}
+                  className={`rounded-2xl p-5 border shadow-sm ${TYPE_COLORS[rec.type] || "vi-card"}`}
+                >
                   <div className="flex items-start justify-between mb-2">
                     <div>
                       <span className="text-xs font-bold uppercase tracking-wide opacity-70">
@@ -234,29 +262,50 @@ export default function RecommendationsPage() {
                       </span>
                       <h3 className="font-heading font-bold text-lg mt-1">{rec.title}</h3>
                     </div>
-                    <span className="text-xs vi-text-muted">{new Date(rec.createdAt).toLocaleDateString()}</span>
+                    <span className="text-xs vi-text-muted">
+                      {new Date(rec.createdAt).toLocaleDateString()}
+                    </span>
                   </div>
                   {rec.description && <p className="text-sm mb-3 opacity-80">{rec.description}</p>}
 
                   {rec.payload && (
                     <div className="text-xs mb-3 grid grid-cols-1 sm:grid-cols-2 gap-2 p-3 rounded-xl bg-white/40">
                       {rec.payload.targetField && (
-                        <div><span className="font-bold opacity-70">Field:</span> {rec.payload.targetField}</div>
+                        <div>
+                          <span className="font-bold opacity-70">Field:</span>{" "}
+                          {rec.payload.targetField}
+                        </div>
                       )}
-                      {rec.payload.currentValue !== undefined && rec.payload.currentValue !== null && (
-                        <div><span className="font-bold opacity-70">Current:</span> {formatValue(rec.payload.currentValue)}</div>
-                      )}
-                      {rec.payload.proposedValue !== undefined && rec.payload.proposedValue !== null && (
-                        <div><span className="font-bold opacity-70">Proposed:</span> {formatValue(rec.payload.proposedValue)}</div>
-                      )}
+                      {rec.payload.currentValue !== undefined &&
+                        rec.payload.currentValue !== null && (
+                          <div>
+                            <span className="font-bold opacity-70">Current:</span>{" "}
+                            {formatValue(rec.payload.currentValue)}
+                          </div>
+                        )}
+                      {rec.payload.proposedValue !== undefined &&
+                        rec.payload.proposedValue !== null && (
+                          <div>
+                            <span className="font-bold opacity-70">Proposed:</span>{" "}
+                            {formatValue(rec.payload.proposedValue)}
+                          </div>
+                        )}
                       {rec.payload.reason && (
-                        <div className="sm:col-span-2"><span className="font-bold opacity-70">Why:</span> {rec.payload.reason}</div>
+                        <div className="sm:col-span-2">
+                          <span className="font-bold opacity-70">Why:</span> {rec.payload.reason}
+                        </div>
                       )}
                       {rec.confidence != null && (
-                        <div><span className="font-bold opacity-70">Confidence:</span> {(rec.confidence * 100).toFixed(0)}%</div>
+                        <div>
+                          <span className="font-bold opacity-70">Confidence:</span>{" "}
+                          {(rec.confidence * 100).toFixed(0)}%
+                        </div>
                       )}
                       {rec.sourceSignals && rec.sourceSignals.length > 0 && (
-                        <div className="sm:col-span-2"><span className="font-bold opacity-70">Signals:</span> {rec.sourceSignals.map((s) => String(s)).join(", ")}</div>
+                        <div className="sm:col-span-2">
+                          <span className="font-bold opacity-70">Signals:</span>{" "}
+                          {rec.sourceSignals.map((s) => String(s)).join(", ")}
+                        </div>
                       )}
                     </div>
                   )}
@@ -281,52 +330,63 @@ export default function RecommendationsPage() {
                             placeholder={String(rec.payload?.proposedValue ?? "")}
                             className="w-full px-4 py-2.5 rounded-xl border vi-border outline-none text-sm font-body"
                           />
-                          <p className="text-xs vi-text-muted mt-1">
-                            {t("adjust_value_help")}
-                          </p>
+                          <p className="text-xs vi-text-muted mt-1">{t("adjust_value_help")}</p>
                         </div>
                       )}
-                      <textarea value={responseNotes} onChange={(e) => setResponseNotes(e.target.value)}
+                      <textarea
+                        value={responseNotes}
+                        onChange={(e) => setResponseNotes(e.target.value)}
                         placeholder={t("add_notes")}
-                        className="w-full px-4 py-2.5 rounded-xl border vi-border outline-none text-sm font-body resize-none h-20" />
+                        className="w-full px-4 py-2.5 rounded-xl border vi-border outline-none text-sm font-body resize-none h-20"
+                      />
                       {submitError && (
                         <div className="text-xs p-2 rounded bg-[hsl(var(--visual-math)/0.1)] text-[hsl(var(--visual-math))]">
                           {submitError}
                         </div>
                       )}
                       <div className="flex gap-2 flex-wrap">
-                        <button onClick={() => respondToRec(rec, "APPROVED")}
+                        <button
+                          onClick={() => respondToRec(rec, "APPROVED")}
                           disabled={submitting}
                           className="px-4 py-2 rounded-full bg-[hsl(var(--visual-science))] text-white font-bold text-sm hover:bg-[hsl(var(--visual-science)/0.9)] transition disabled:opacity-50"
-                          style={{ minHeight: 44 }}>
+                          style={{ minHeight: 44 }}
+                        >
                           {t("approve")}
                         </button>
                         {canAmend && (
-                          <button onClick={() => respondToRec(rec, "ADJUSTED")}
+                          <button
+                            onClick={() => respondToRec(rec, "ADJUSTED")}
                             disabled={submitting || !amendValue.trim()}
                             className="px-4 py-2 rounded-full bg-[hsl(var(--visual-sel))] text-white font-bold text-sm hover:bg-[hsl(var(--visual-sel)/0.9)] transition disabled:opacity-50"
-                            style={{ minHeight: 44 }}>
+                            style={{ minHeight: 44 }}
+                          >
                             {t("adjust")}
                           </button>
                         )}
-                        <button onClick={() => respondToRec(rec, "DECLINED")}
+                        <button
+                          onClick={() => respondToRec(rec, "DECLINED")}
                           disabled={submitting}
                           className="px-4 py-2 rounded-full bg-[hsl(var(--visual-math))] text-white font-bold text-sm hover:bg-[hsl(var(--visual-math)/0.9)] transition disabled:opacity-50"
-                          style={{ minHeight: 44 }}>
+                          style={{ minHeight: 44 }}
+                        >
                           {t("decline")}
                         </button>
-                        <button onClick={() => setRespondingTo(null)}
+                        <button
+                          onClick={() => setRespondingTo(null)}
                           disabled={submitting}
                           className="px-4 py-2 rounded-full vi-surface-soft vi-text-muted font-bold text-sm hover:bg-[hsl(var(--visual-border))] transition"
-                          style={{ minHeight: 44 }}>
+                          style={{ minHeight: 44 }}
+                        >
                           {tCommon("cancel")}
                         </button>
                       </div>
                     </div>
                   ) : (
-                    <button onClick={() => startResponding(rec)}
+                    <button
+                      onClick={() => startResponding(rec)}
                       className="px-5 py-2 rounded-full bg-[hsl(var(--visual-primary))] text-white font-heading font-black uppercase tracking-wider text-sm hover:bg-[hsl(var(--visual-primary)/0.9)] transition"
-                      style={{ minHeight: 44 }}>
+                      style={{ minHeight: 44 }}
+                    >
                       {t("respond")}
                     </button>
                   )}
@@ -342,29 +402,49 @@ export default function RecommendationsPage() {
           {resolvedRecs.length === 0 ? (
             <div className="vi-card p-12 text-center">
               <div className="flex justify-center mb-3">
-                <IconWell color="primary" size="lg"><ClipboardList className="w-10 h-10" /></IconWell>
+                <IconWell color="primary" size="lg">
+                  <ClipboardList className="w-10 h-10" />
+                </IconWell>
               </div>
               <p className="vi-text-muted font-semibold">{t("no_resolved")}</p>
             </div>
           ) : (
-            resolvedRecs.map(rec => (
+            resolvedRecs.map((rec) => (
               <div key={rec.id} className="vi-card p-4 flex items-center justify-between">
                 <div>
-                  <span className="text-xs vi-text-muted font-bold uppercase">{TYPE_LABELS[rec.type] || rec.type}</span>
+                  <span className="text-xs vi-text-muted font-bold uppercase">
+                    {TYPE_LABELS[rec.type] || rec.type}
+                  </span>
                   <div className="font-heading font-bold text-slate-800">{rec.title}</div>
-                  {rec.parentNotes && <p className="text-xs vi-text-muted mt-1">{t("note_label")}: {rec.parentNotes}</p>}
+                  {rec.parentNotes && (
+                    <p className="text-xs vi-text-muted mt-1">
+                      {t("note_label")}: {rec.parentNotes}
+                    </p>
+                  )}
                   {rec.appliedPayload && rec.status !== "DECLINED" && (
                     <p className="text-xs vi-text-muted mt-1">
-                      Applied: {formatValue(rec.appliedPayload.proposedValue ?? rec.appliedPayload.accommodation ?? rec.appliedPayload.tutor ?? rec.appliedPayload.level)}
+                      Applied:{" "}
+                      {formatValue(
+                        rec.appliedPayload.proposedValue ??
+                          rec.appliedPayload.accommodation ??
+                          rec.appliedPayload.tutor ??
+                          rec.appliedPayload.level,
+                      )}
                     </p>
                   )}
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={`px-3 py-1 text-xs rounded-full font-bold ${
-                    rec.status === "APPROVED" ? "bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))]" :
-                    rec.status === "DECLINED" ? "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]" :
-                    "bg-[hsl(var(--visual-sel)/0.16)] text-[hsl(var(--visual-sel))]"
-                  }`}>{rec.status}</span>
+                  <span
+                    className={`px-3 py-1 text-xs rounded-full font-bold ${
+                      rec.status === "APPROVED"
+                        ? "bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))]"
+                        : rec.status === "DECLINED"
+                          ? "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]"
+                          : "bg-[hsl(var(--visual-sel)/0.16)] text-[hsl(var(--visual-sel))]"
+                    }`}
+                  >
+                    {rec.status}
+                  </span>
                   <span className="text-xs vi-text-muted">
                     {rec.resolvedAt ? new Date(rec.resolvedAt).toLocaleDateString() : ""}
                   </span>

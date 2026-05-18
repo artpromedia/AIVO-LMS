@@ -2,11 +2,7 @@ import { z } from "zod";
 import { fail, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { readMockSessionFromCookies } from "@/lib/auth/mock-session";
-import {
-  getTenantSettings,
-  updateTenantSettings,
-  recordAudit,
-} from "@/lib/db/repos";
+import { getTenantSettings, updateTenantSettings, recordAudit } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
 
@@ -54,18 +50,12 @@ async function requireDistrictAdmin(req: Request) {
   const session = await readMockSessionFromCookies();
   if (!session) {
     return {
-      err: fail(
-        { ...ERRORS.UNAUTHENTICATED, message: "No session cookie" },
-        requestId,
-      ),
+      err: fail({ ...ERRORS.UNAUTHENTICATED, message: "No session cookie" }, requestId),
     };
   }
   if (session.role !== "district_admin") {
     return {
-      err: fail(
-        { ...ERRORS.FORBIDDEN_ROLE, message: "district_admin required" },
-        requestId,
-      ),
+      err: fail({ ...ERRORS.FORBIDDEN_ROLE, message: "district_admin required" }, requestId),
     };
   }
   return { session, requestId };
@@ -106,9 +96,7 @@ export async function PATCH(req: Request) {
   }
 
   // SCIM rotation is a flag; translate into the lastScimRotationAt write.
-  let ssoPatch:
-    | Parameters<typeof updateTenantSettings>[1]["sso"]
-    | undefined;
+  let ssoPatch: Parameters<typeof updateTenantSettings>[1]["sso"] | undefined;
   if (parsed.data.sso) {
     const { rotateScim, ...rest } = parsed.data.sso;
     ssoPatch = {

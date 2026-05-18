@@ -84,20 +84,134 @@ const SECONDARY_TIERS = ["MIDDLE", "HIGH"] as const;
  * surfaces that intentionally list every tutor regardless of grade.
  */
 export const TUTORS = {
-  nova:    { name: "Nova",    domain: "Mathematics",                      icon: "🔢", color: "#7C3AED", tier: "core",      tiers: ALL_TIERS,       avatar: "/images/tutors/nova.png" },
-  sage:    { name: "Sage",    domain: "English Language Arts",            icon: "📚", color: "#10B981", tier: "core",      tiers: ALL_TIERS,       avatar: "/images/tutors/sage.png" },
-  spark:   { name: "Spark",   domain: "Science",                          icon: "🔬", color: "#F59E0B", tier: "core",      tiers: ALL_TIERS,       avatar: "/images/tutors/spark.png" },
-  chrono:  { name: "Chrono",  domain: "History & Social Studies",         icon: "🏛️", color: "#6366F1", tier: "core",      tiers: SECONDARY_TIERS, avatar: "/images/tutors/chrono.png" },
-  pixel:   { name: "Pixel",   domain: "Coding & Computational Thinking",  icon: "💻", color: "#06B6D4", tier: "core",      tiers: ALL_TIERS,       avatar: "/images/tutors/pixel.png" },
-  echo:    { name: "Echo",    domain: "Speech & Language Therapy",        icon: "🗣️", color: "#EC4899", tier: "core",      tiers: ALL_TIERS,       avatar: "/images/tutors/echo.png" },
-  harmony: { name: "Harmony", domain: "Social-Emotional Learning",        icon: "💜", color: "#8B5CF6", tier: "core",      tiers: ALL_TIERS,       avatar: "/images/tutors/harmony.png" },
-  atlas:   { name: "Atlas",   domain: "Geography & World Cultures",       icon: "🌍", color: "#14B8A6", tier: "expansion", tiers: ALL_TIERS,       avatar: "/images/tutors/atlas.png" },
-  cadence: { name: "Cadence", domain: "Music & Rhythm",                   icon: "🎵", color: "#D946EF", tier: "expansion", tiers: ALL_TIERS,       avatar: "/images/tutors/cadence.png" },
-  vigor:   { name: "Vigor",   domain: "Physical Education & Health",      icon: "🏃", color: "#22C55E", tier: "expansion", tiers: ALL_TIERS,       avatar: "/images/tutors/vigor.png", tracks: ["fitness", "health", "dape"] as const, subDomains: { dape: "Adapted Physical Education (DAPE)" } },
-  lingua:  { name: "Lingua",  domain: "World Languages",                  icon: "🌐", color: "#0EA5E9", tier: "expansion", tiers: SECONDARY_TIERS, avatar: "/images/tutors/lingua.png" },
-  forge:   { name: "Forge",   domain: "STEM & Engineering",               icon: "⚙️", color: "#EF4444", tier: "expansion", tiers: SECONDARY_TIERS, avatar: "/images/tutors/forge.png" },
-  compass: { name: "Compass", domain: "Life Skills & Executive Function", icon: "🧭", color: "#F97316", tier: "expansion", tiers: SECONDARY_TIERS, avatar: "/images/tutors/compass.png" },
-  muse:    { name: "Muse",    domain: "Creative Arts & Expression",       icon: "🎨", color: "#A855F7", tier: "expansion", tiers: ALL_TIERS,       avatar: "/images/tutors/muse.png" },
+  nova: {
+    name: "Nova",
+    domain: "Mathematics",
+    icon: "🔢",
+    color: "#7C3AED",
+    tier: "core",
+    tiers: ALL_TIERS,
+    avatar: "/images/tutors/nova.png",
+  },
+  sage: {
+    name: "Sage",
+    domain: "English Language Arts",
+    icon: "📚",
+    color: "#10B981",
+    tier: "core",
+    tiers: ALL_TIERS,
+    avatar: "/images/tutors/sage.png",
+  },
+  spark: {
+    name: "Spark",
+    domain: "Science",
+    icon: "🔬",
+    color: "#F59E0B",
+    tier: "core",
+    tiers: ALL_TIERS,
+    avatar: "/images/tutors/spark.png",
+  },
+  chrono: {
+    name: "Chrono",
+    domain: "History & Social Studies",
+    icon: "🏛️",
+    color: "#6366F1",
+    tier: "core",
+    tiers: SECONDARY_TIERS,
+    avatar: "/images/tutors/chrono.png",
+  },
+  pixel: {
+    name: "Pixel",
+    domain: "Coding & Computational Thinking",
+    icon: "💻",
+    color: "#06B6D4",
+    tier: "core",
+    tiers: ALL_TIERS,
+    avatar: "/images/tutors/pixel.png",
+  },
+  echo: {
+    name: "Echo",
+    domain: "Speech & Language Therapy",
+    icon: "🗣️",
+    color: "#EC4899",
+    tier: "core",
+    tiers: ALL_TIERS,
+    avatar: "/images/tutors/echo.png",
+  },
+  harmony: {
+    name: "Harmony",
+    domain: "Social-Emotional Learning",
+    icon: "💜",
+    color: "#8B5CF6",
+    tier: "core",
+    tiers: ALL_TIERS,
+    avatar: "/images/tutors/harmony.png",
+  },
+  atlas: {
+    name: "Atlas",
+    domain: "Geography & World Cultures",
+    icon: "🌍",
+    color: "#14B8A6",
+    tier: "expansion",
+    tiers: ALL_TIERS,
+    avatar: "/images/tutors/atlas.png",
+  },
+  cadence: {
+    name: "Cadence",
+    domain: "Music & Rhythm",
+    icon: "🎵",
+    color: "#D946EF",
+    tier: "expansion",
+    tiers: ALL_TIERS,
+    avatar: "/images/tutors/cadence.png",
+  },
+  vigor: {
+    name: "Vigor",
+    domain: "Physical Education & Health",
+    icon: "🏃",
+    color: "#22C55E",
+    tier: "expansion",
+    tiers: ALL_TIERS,
+    avatar: "/images/tutors/vigor.png",
+    tracks: ["fitness", "health", "dape"] as const,
+    subDomains: { dape: "Adapted Physical Education (DAPE)" },
+  },
+  lingua: {
+    name: "Lingua",
+    domain: "World Languages",
+    icon: "🌐",
+    color: "#0EA5E9",
+    tier: "expansion",
+    tiers: SECONDARY_TIERS,
+    avatar: "/images/tutors/lingua.png",
+  },
+  forge: {
+    name: "Forge",
+    domain: "STEM & Engineering",
+    icon: "⚙️",
+    color: "#EF4444",
+    tier: "expansion",
+    tiers: SECONDARY_TIERS,
+    avatar: "/images/tutors/forge.png",
+  },
+  compass: {
+    name: "Compass",
+    domain: "Life Skills & Executive Function",
+    icon: "🧭",
+    color: "#F97316",
+    tier: "expansion",
+    tiers: SECONDARY_TIERS,
+    avatar: "/images/tutors/compass.png",
+  },
+  muse: {
+    name: "Muse",
+    domain: "Creative Arts & Expression",
+    icon: "🎨",
+    color: "#A855F7",
+    tier: "expansion",
+    tiers: ALL_TIERS,
+    avatar: "/images/tutors/muse.png",
+  },
 } as const;
 
 /**
@@ -110,9 +224,9 @@ export const TUTORS = {
  */
 export function getTutorsForTier(
   tier: AgeTier | null | undefined,
-): Array<[keyof typeof TUTORS, typeof TUTORS[keyof typeof TUTORS]]> {
+): Array<[keyof typeof TUTORS, (typeof TUTORS)[keyof typeof TUTORS]]> {
   const entries = Object.entries(TUTORS) as Array<
-    [keyof typeof TUTORS, typeof TUTORS[keyof typeof TUTORS]]
+    [keyof typeof TUTORS, (typeof TUTORS)[keyof typeof TUTORS]]
   >;
   if (!tier) return entries;
   return entries.filter(([, t]) => (t.tiers as readonly AgeTier[]).includes(tier));

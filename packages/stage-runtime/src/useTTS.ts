@@ -73,7 +73,10 @@ function chunkForSpeech(input: string, maxLen = 180): string[] {
   const out: string[] = [];
   const sentences = text.match(/[^.!?]+[.!?]+(?:["')\]]+)?\s*|[^.!?]+$/g) || [text];
   let buf = "";
-  const flush = () => { if (buf.trim()) out.push(buf.trim()); buf = ""; };
+  const flush = () => {
+    if (buf.trim()) out.push(buf.trim());
+    buf = "";
+  };
   for (const raw of sentences) {
     const s = raw.trim();
     if (!s) continue;
@@ -139,91 +142,94 @@ export function useTTS(
     };
   }, []);
 
-  const speak = useCallback((text: string): Promise<void> => {
-    return new Promise((resolve) => {
-      if (typeof window === "undefined" || !window.speechSynthesis) {
-        resolve();
-        return;
-      }
-      const chunks = chunkForSpeech(text || "");
-      if (chunks.length === 0) {
-        resolve();
-        return;
-      }
-      window.speechSynthesis.cancel();
-      cancelledRef.current = false;
-      utterancesRef.current = [];
-
-      // Resolve voice once for the whole queue.
-      const voices = window.speechSynthesis.getVoices();
-      const langTag = voicePrefs.lang.toLowerCase();
-      const baseLang = langTag.split("-")[0];
-      let exactNatural: SpeechSynthesisVoice | undefined;
-      let exact: SpeechSynthesisVoice | undefined;
-      let baseRegion: SpeechSynthesisVoice | undefined;
-      let base: SpeechSynthesisVoice | undefined;
-      for (const v of voices) {
-        const vLang = v.lang.toLowerCase();
-        if (vLang === langTag) {
-          if (v.name.toLowerCase().includes("natural")) {
-            exactNatural ??= v;
-            break;
-          }
-          exact ??= v;
-        } else if (vLang.startsWith(baseLang + "-")) {
-          baseRegion ??= v;
-        } else if (vLang.startsWith(baseLang)) {
-          base ??= v;
-        }
-      }
-      const preferred = exactNatural || exact || baseRegion || base;
-
-      // Chrome silently halts speech after ~15s. pause/resume on a
-      // 10s interval defeats the cutoff for the lifetime of the queue.
-      if (keepAliveRef.current !== null) {
-        window.clearInterval(keepAliveRef.current);
-      }
-      keepAliveRef.current = window.setInterval(() => {
-        try {
-          if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
-            window.speechSynthesis.pause();
-            window.speechSynthesis.resume();
-          }
-        } catch {
-          /* best-effort */
-        }
-      }, 10_000);
-
-      const finish = () => {
-        if (keepAliveRef.current !== null) {
-          window.clearInterval(keepAliveRef.current);
-          keepAliveRef.current = null;
-        }
-        setIsSpeaking(false);
-        resolve();
-      };
-
-      const speakIndex = (i: number) => {
-        if (cancelledRef.current || i >= chunks.length) {
-          finish();
+  const speak = useCallback(
+    (text: string): Promise<void> => {
+      return new Promise((resolve) => {
+        if (typeof window === "undefined" || !window.speechSynthesis) {
+          resolve();
           return;
         }
-        const utterance = new SpeechSynthesisUtterance(chunks[i]);
-        utterance.pitch = voicePrefs.pitch;
-        utterance.rate = voicePrefs.rate;
-        utterance.volume = adaptations.volumeLevel;
-        utterance.lang = voicePrefs.lang;
-        if (preferred) utterance.voice = preferred;
-        if (i === 0) utterance.onstart = () => setIsSpeaking(true);
-        utterance.onend = () => speakIndex(i + 1);
-        utterance.onerror = () => speakIndex(i + 1);
-        utterancesRef.current.push(utterance);
-        window.speechSynthesis.speak(utterance);
-      };
+        const chunks = chunkForSpeech(text || "");
+        if (chunks.length === 0) {
+          resolve();
+          return;
+        }
+        window.speechSynthesis.cancel();
+        cancelledRef.current = false;
+        utterancesRef.current = [];
 
-      speakIndex(0);
-    });
-  }, [voicePrefs, adaptations.volumeLevel]);
+        // Resolve voice once for the whole queue.
+        const voices = window.speechSynthesis.getVoices();
+        const langTag = voicePrefs.lang.toLowerCase();
+        const baseLang = langTag.split("-")[0];
+        let exactNatural: SpeechSynthesisVoice | undefined;
+        let exact: SpeechSynthesisVoice | undefined;
+        let baseRegion: SpeechSynthesisVoice | undefined;
+        let base: SpeechSynthesisVoice | undefined;
+        for (const v of voices) {
+          const vLang = v.lang.toLowerCase();
+          if (vLang === langTag) {
+            if (v.name.toLowerCase().includes("natural")) {
+              exactNatural ??= v;
+              break;
+            }
+            exact ??= v;
+          } else if (vLang.startsWith(baseLang + "-")) {
+            baseRegion ??= v;
+          } else if (vLang.startsWith(baseLang)) {
+            base ??= v;
+          }
+        }
+        const preferred = exactNatural || exact || baseRegion || base;
+
+        // Chrome silently halts speech after ~15s. pause/resume on a
+        // 10s interval defeats the cutoff for the lifetime of the queue.
+        if (keepAliveRef.current !== null) {
+          window.clearInterval(keepAliveRef.current);
+        }
+        keepAliveRef.current = window.setInterval(() => {
+          try {
+            if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+              window.speechSynthesis.pause();
+              window.speechSynthesis.resume();
+            }
+          } catch {
+            /* best-effort */
+          }
+        }, 10_000);
+
+        const finish = () => {
+          if (keepAliveRef.current !== null) {
+            window.clearInterval(keepAliveRef.current);
+            keepAliveRef.current = null;
+          }
+          setIsSpeaking(false);
+          resolve();
+        };
+
+        const speakIndex = (i: number) => {
+          if (cancelledRef.current || i >= chunks.length) {
+            finish();
+            return;
+          }
+          const utterance = new SpeechSynthesisUtterance(chunks[i]);
+          utterance.pitch = voicePrefs.pitch;
+          utterance.rate = voicePrefs.rate;
+          utterance.volume = adaptations.volumeLevel;
+          utterance.lang = voicePrefs.lang;
+          if (preferred) utterance.voice = preferred;
+          if (i === 0) utterance.onstart = () => setIsSpeaking(true);
+          utterance.onend = () => speakIndex(i + 1);
+          utterance.onerror = () => speakIndex(i + 1);
+          utterancesRef.current.push(utterance);
+          window.speechSynthesis.speak(utterance);
+        };
+
+        speakIndex(0);
+      });
+    },
+    [voicePrefs, adaptations.volumeLevel],
+  );
 
   const stop = useCallback(() => {
     cancelledRef.current = true;

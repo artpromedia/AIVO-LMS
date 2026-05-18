@@ -21,9 +21,7 @@ function requireUrl(name: string, devDefault: string): string {
   return devDefault;
 }
 const FAMILY_SVC_URL = requireUrl("FAMILY_SVC_URL", "http://localhost:3007");
-const INTERNAL_KEY =
-  process.env.INTERNAL_SERVICE_KEY ||
-  (IS_PROD ? "" : "aivo-internal-dev-key");
+const INTERNAL_KEY = process.env.INTERNAL_SERVICE_KEY || (IS_PROD ? "" : "aivo-internal-dev-key");
 
 export class ConsentError extends Error {
   status: number;
@@ -123,20 +121,14 @@ export async function verifyTutorConsent(args: {
     );
   }
   if (res.status === 404) {
-    throw new ConsentError(
-      `No consent on file for tutor "${args.tutorKey}".`,
-      403,
-    );
+    throw new ConsentError(`No consent on file for tutor "${args.tutorKey}".`, 403);
   }
   if (!res.ok) {
     throw new ConsentError(`Consent check failed (status ${res.status})`, 502);
   }
   const body = (await res.json()) as { consentRecordId?: string; granted?: boolean };
   if (!body.granted || !body.consentRecordId) {
-    throw new ConsentError(
-      `Consent for tutor "${args.tutorKey}" has been revoked.`,
-      403,
-    );
+    throw new ConsentError(`Consent for tutor "${args.tutorKey}" has been revoked.`, 403);
   }
   return body.consentRecordId;
 }

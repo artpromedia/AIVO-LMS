@@ -8,10 +8,7 @@
  * pure sign/verify helpers for unit tests and other call-sites.
  */
 import type { FastifyReply } from "fastify";
-import {
-  SURFACE_COOKIE_NAME,
-  signSurfaceCookieValue,
-} from "@aivo/security";
+import { SURFACE_COOKIE_NAME, signSurfaceCookieValue } from "@aivo/security";
 
 export {
   SURFACE_COOKIE_NAME,

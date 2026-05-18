@@ -29,9 +29,7 @@ if (!existsSync(templatesPath)) {
   const src = readFileSync(templatesPath, "utf8");
 
   // 1. AVAILABLE_TEMPLATES export + parse template ids.
-  const m = src.match(
-    /export const AVAILABLE_TEMPLATES\s*=\s*\[([\s\S]*?)\];/,
-  );
+  const m = src.match(/export const AVAILABLE_TEMPLATES\s*=\s*\[([\s\S]*?)\];/);
   if (!m) {
     errors.push("templates.ts: AVAILABLE_TEMPLATES export not found.");
   } else {

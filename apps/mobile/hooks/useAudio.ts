@@ -1,5 +1,5 @@
-import { useCallback, useRef, useState } from 'react';
-import { Audio } from 'expo-av';
+import { useCallback, useRef, useState } from "react";
+import { Audio } from "expo-av";
 
 export function useAudio() {
   const soundRef = useRef<Audio.Sound | null>(null);

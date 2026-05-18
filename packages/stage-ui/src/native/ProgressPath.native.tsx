@@ -12,7 +12,12 @@ export interface ProgressPathProps {
   reducedMotion?: boolean;
 }
 
-export function ProgressPath({ current, total, xpEarned, reducedMotion = false }: ProgressPathProps) {
+export function ProgressPath({
+  current,
+  total,
+  xpEarned,
+  reducedMotion = false,
+}: ProgressPathProps) {
   const progress = total > 0 ? Math.min(1, current / total) : 0;
   const widthAnim = useRef(new Animated.Value(0)).current;
 
@@ -42,9 +47,7 @@ export function ProgressPath({ current, total, xpEarned, reducedMotion = false }
       accessibilityLabel={`Progress: ${current} of ${total} beats completed. ${xpEarned} XP earned.`}
     >
       <View style={styles.track}>
-        <Animated.View
-          style={[styles.fill, { width: widthInterpolated }]}
-        />
+        <Animated.View style={[styles.fill, { width: widthInterpolated }]} />
       </View>
       <Text style={styles.label} accessibilityElementsHidden>
         {current}/{total} · {xpEarned} XP

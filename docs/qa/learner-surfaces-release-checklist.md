@@ -34,7 +34,7 @@ production:
 
 - [ ] Single retry occurs before fallback when AI generation fails.
 - [ ] Fallback banner is visible and labels the experience as
-      *warm-up*, not personalised.
+      _warm-up_, not personalised.
 - [ ] Fallback reason is logged to the dev console.
 - [ ] Learner must take an explicit action to continue with the
       fallback warm-up.

@@ -6,8 +6,12 @@ import { users } from "./users.js";
 
 export const assessmentAttempts = pgTable("assessment_attempts", {
   id: uuid("id").defaultRandom().primaryKey(),
-  tenantId: uuid("tenant_id").references(() => tenants.id).notNull(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
   type: varchar("type", { length: 50 }).notNull(),
   mode: assessmentModeEnum("mode").notNull().default("STANDARD"),
   status: assessmentStatusEnum("status").notNull().default("NOT_STARTED"),
@@ -20,7 +24,9 @@ export const assessmentAttempts = pgTable("assessment_attempts", {
 
 export const assessmentResponses = pgTable("assessment_responses", {
   id: uuid("id").defaultRandom().primaryKey(),
-  attemptId: uuid("attempt_id").references(() => assessmentAttempts.id).notNull(),
+  attemptId: uuid("attempt_id")
+    .references(() => assessmentAttempts.id)
+    .notNull(),
   questionId: varchar("question_id", { length: 100 }).notNull(),
   domain: varchar("domain", { length: 100 }),
   response: jsonb("response").notNull(),
@@ -32,8 +38,12 @@ export const assessmentResponses = pgTable("assessment_responses", {
 
 export const parentAssessments = pgTable("parent_assessments", {
   id: uuid("id").defaultRandom().primaryKey(),
-  tenantId: uuid("tenant_id").references(() => tenants.id).notNull(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
   // Nullable on purpose: legacy rows pre-date caregiver attribution.
   // When present, `submittedBy` lets the baseline generator distinguish
   // parent from co-parent submissions and surface BOTH perspectives to
@@ -58,8 +68,12 @@ export const parentAssessments = pgTable("parent_assessments", {
  */
 export const teacherAssessments = pgTable("teacher_assessments", {
   id: uuid("id").defaultRandom().primaryKey(),
-  tenantId: uuid("tenant_id").references(() => tenants.id).notNull(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
   submittedBy: uuid("submitted_by").references(() => users.id),
   /** Free-text role label, e.g. "Special Ed Teacher", "General Ed Teacher". */
   teacherRole: varchar("teacher_role", { length: 100 }),
@@ -84,7 +98,9 @@ export const teacherAssessments = pgTable("teacher_assessments", {
 
 export const observationalAssessments = pgTable("observational_assessments", {
   id: uuid("id").defaultRandom().primaryKey(),
-  attemptId: uuid("attempt_id").references(() => assessmentAttempts.id).notNull(),
+  attemptId: uuid("attempt_id")
+    .references(() => assessmentAttempts.id)
+    .notNull(),
   observerId: uuid("observer_id"),
   checklist: jsonb("checklist").default({}),
   notes: text("notes"),
@@ -102,8 +118,13 @@ export const observationalAssessments = pgTable("observational_assessments", {
  */
 export const learnerProfiles = pgTable("learner_profiles", {
   id: uuid("id").defaultRandom().primaryKey(),
-  tenantId: uuid("tenant_id").references(() => tenants.id).notNull(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull().unique(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull()
+    .unique(),
   /** Source attempt that produced this profile. */
   attemptId: uuid("attempt_id").references(() => assessmentAttempts.id),
   /** Final θ on the same logit scale as item difficulty. */
@@ -121,7 +142,9 @@ export const learnerProfiles = pgTable("learner_profiles", {
   /** Items the learner sustained before the first frustration signal. */
   attentionRunLength: integer("attention_run_length").notNull().default(0),
   /** "low" / "moderate" / "high" — derived from frustrationRate. */
-  frustrationTolerance: varchar("frustration_tolerance", { length: 16 }).notNull().default("moderate"),
+  frustrationTolerance: varchar("frustration_tolerance", { length: 16 })
+    .notNull()
+    .default("moderate"),
   /** Items administered to produce this profile. */
   itemsAdministered: integer("items_administered").notNull().default(0),
   baselineCompletedAt: timestamp("baseline_completed_at").defaultNow().notNull(),
@@ -136,8 +159,12 @@ export const learnerProfiles = pgTable("learner_profiles", {
  */
 export const adaptiveBaselineSessions = pgTable("adaptive_baseline_sessions", {
   id: uuid("id").defaultRandom().primaryKey(),
-  tenantId: uuid("tenant_id").references(() => tenants.id).notNull(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
   /** "in_progress" | "completed" | "abandoned". */
   status: varchar("status", { length: 16 }).notNull().default("in_progress"),
   /** Serialized BaselineState (theta, infoSum, administered[], coveredSkills[]). */

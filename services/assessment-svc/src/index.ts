@@ -71,7 +71,9 @@ export async function buildApp(db = createDb(process.env.DATABASE_URL ?? "")) {
       info: { title: "AIVO Assessment Service", version: "1.0.0" },
       servers: process.env.SWAGGER_SERVER_URL
         ? [{ url: process.env.SWAGGER_SERVER_URL }]
-        : (process.env.NODE_ENV === "production" ? [] : [{ url: `http://localhost:${PORT}` }]),
+        : process.env.NODE_ENV === "production"
+          ? []
+          : [{ url: `http://localhost:${PORT}` }],
       components: {
         securitySchemes: { bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" } },
       },
@@ -111,17 +113,26 @@ async function start() {
   // (catches anything missed while the service was down) and then daily.
   // Idempotent at the row level, so multiple instances racing is safe.
   setTimeout(() => {
-    checkReviewReminders(db).catch((err) => logger.error("Initial reminder run failed", { err: err?.message || String(err) }));
+    checkReviewReminders(db).catch((err) =>
+      logger.error("Initial reminder run failed", { err: err?.message || String(err) }),
+    );
   }, 30_000);
-  setInterval(() => {
-    checkReviewReminders(db).catch((err) => logger.error("Daily reminder run failed", { err: err?.message || String(err) }));
-  }, 24 * 60 * 60 * 1000);
+  setInterval(
+    () => {
+      checkReviewReminders(db).catch((err) =>
+        logger.error("Daily reminder run failed", { err: err?.message || String(err) }),
+      );
+    },
+    24 * 60 * 60 * 1000,
+  );
 }
 
 const isMain = (() => {
   try {
     return process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 })();
 if (isMain) {
   start().catch((err) => {

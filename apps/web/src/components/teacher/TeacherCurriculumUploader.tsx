@@ -7,8 +7,18 @@ interface ConnectedLearner {
   name: string;
 }
 
-const SUBJECTS = ["math", "ela", "science", "history", "coding", "speech", "sel", "art", "other"] as const;
-type Subject = typeof SUBJECTS[number];
+const SUBJECTS = [
+  "math",
+  "ela",
+  "science",
+  "history",
+  "coding",
+  "speech",
+  "sel",
+  "art",
+  "other",
+] as const;
+type Subject = (typeof SUBJECTS)[number];
 
 const MAX_FILE_BYTES = 5 * 1024 * 1024;
 
@@ -363,7 +373,10 @@ export default function TeacherCurriculumUploader({
                   return grouped.slice(0, 10).map((g) => {
                     const first = g.entries[0];
                     return (
-                      <li key={g.key} className="py-2 flex items-start justify-between gap-3 text-xs">
+                      <li
+                        key={g.key}
+                        className="py-2 flex items-start justify-between gap-3 text-xs"
+                      >
                         <div className="min-w-0">
                           <div className="font-medium vi-text truncate">
                             {first.title || t("untitled")}
@@ -437,7 +450,10 @@ export default function TeacherCurriculumUploader({
                     onChange={(e) =>
                       setPreview({
                         ...preview,
-                        [field]: e.target.value.split(",").map((s) => s.trim()).filter(Boolean),
+                        [field]: e.target.value
+                          .split(",")
+                          .map((s) => s.trim())
+                          .filter(Boolean),
                       })
                     }
                     placeholder={t("comma_separated")}

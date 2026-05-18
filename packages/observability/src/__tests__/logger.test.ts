@@ -40,7 +40,10 @@ describe("sanitize()", () => {
   });
 
   it("handles arrays by sanitising each element", () => {
-    const input = [{ apiKey: "k1", x: 1 }, { apiKey: "k2", x: 2 }];
+    const input = [
+      { apiKey: "k1", x: 1 },
+      { apiKey: "k2", x: 2 },
+    ];
     const result = sanitize(input) as any[];
     expect(result[0].apiKey).toBe("[REDACTED]");
     expect(result[0].x).toBe(1);

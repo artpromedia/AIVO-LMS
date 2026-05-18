@@ -24,7 +24,12 @@ test.describe("parent onboarding", () => {
       route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify({ id: "parent-1", email: "p@example.com", role: "PARENT", tenantId: "t1" }),
+        body: JSON.stringify({
+          id: "parent-1",
+          email: "p@example.com",
+          role: "PARENT",
+          tenantId: "t1",
+        }),
       }),
     );
 
@@ -33,7 +38,12 @@ test.describe("parent onboarding", () => {
         return route.fulfill({
           status: 201,
           contentType: "application/json",
-          body: JSON.stringify({ id: "learner-1", name: "Test Kid", grade: "3", functioningLevel: 3 }),
+          body: JSON.stringify({
+            id: "learner-1",
+            name: "Test Kid",
+            grade: "3",
+            functioningLevel: 3,
+          }),
         });
       }
       return route.fulfill({
@@ -56,14 +66,20 @@ test.describe("parent onboarding", () => {
     const response = await page.goto("/dashboard/parent");
     expect(response?.status()).toBeLessThan(500);
     await expect(page).toHaveURL(/\/dashboard\/parent/);
-    const body = await page.locator("body").innerText().catch(() => "");
+    const body = await page
+      .locator("body")
+      .innerText()
+      .catch(() => "");
     expect(body).not.toMatch(/Application error|Internal Server Error/i);
   });
 
   test("learner detail route resolves", async ({ page }) => {
     const response = await page.goto("/dashboard/parent/learner/learner-1/overview");
     expect(response?.status()).toBeLessThan(500);
-    const body = await page.locator("body").innerText().catch(() => "");
+    const body = await page
+      .locator("body")
+      .innerText()
+      .catch(() => "");
     expect(body).not.toMatch(/Application error|Internal Server Error/i);
   });
 });

@@ -21,7 +21,8 @@ export function TodaysMissionPreview() {
               One clear next-best lesson, every day
             </h2>
             <p className="mt-4 text-lg text-slate-600">
-              No endless dashboards. AIVO selects the single most important thing for your learner to do today — adapted to their level, energy, and accommodation context.
+              No endless dashboards. AIVO selects the single most important thing for your learner
+              to do today — adapted to their level, energy, and accommodation context.
             </p>
             <ul className="mt-6 space-y-3 text-slate-700">
               {[
@@ -52,15 +53,9 @@ export function TodaysMissionPreview() {
           </div>
           <ProductMockupFrame title="Today's Mission · Maya, Grade 3">
             <div className="rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 p-5 text-white">
-              <p className="text-xs uppercase tracking-wider text-purple-100">
-                Today's mission
-              </p>
-              <h3 className="mt-1 font-heading text-2xl font-bold">
-                Multiplying by 3s
-              </h3>
-              <p className="mt-1 text-sm text-purple-100">
-                With Atlas · ~15 minutes
-              </p>
+              <p className="text-xs uppercase tracking-wider text-purple-100">Today's mission</p>
+              <h3 className="mt-1 font-heading text-2xl font-bold">Multiplying by 3s</h3>
+              <p className="mt-1 text-sm text-purple-100">With Atlas · ~15 minutes</p>
             </div>
             <div className="mt-4 grid grid-cols-3 gap-3 text-center">
               {[
@@ -72,12 +67,8 @@ export function TodaysMissionPreview() {
                   key={s.label}
                   className="rounded-lg border border-slate-200 bg-slate-50/60 p-3"
                 >
-                  <p className="text-[10px] uppercase tracking-wider text-slate-500">
-                    {s.label}
-                  </p>
-                  <p className="mt-1 font-heading text-sm font-bold text-slate-900">
-                    {s.value}
-                  </p>
+                  <p className="text-[10px] uppercase tracking-wider text-slate-500">{s.label}</p>
+                  <p className="mt-1 font-heading text-sm font-bold text-slate-900">{s.value}</p>
                 </div>
               ))}
             </div>

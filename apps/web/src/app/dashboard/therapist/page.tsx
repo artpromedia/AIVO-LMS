@@ -38,11 +38,16 @@ interface TherapyGoal {
 }
 
 const LEVEL_STYLES: Record<string, string> = {
-  STANDARD: "bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))] border-[hsl(var(--visual-science)/0.3)]",
-  SUPPORTED: "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))] border-[hsl(var(--visual-reading)/0.3)]",
-  LOW_VERBAL: "bg-[hsl(var(--visual-sel)/0.16)] text-[hsl(var(--visual-sel))] border-[hsl(var(--visual-sel)/0.3)]",
-  NON_VERBAL: "bg-[hsl(var(--visual-sel)/0.16)] text-[hsl(var(--visual-sel))] border-[hsl(var(--visual-sel)/0.3)]",
-  PRE_SYMBOLIC: "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))] border-[hsl(var(--visual-math)/0.3)]",
+  STANDARD:
+    "bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))] border-[hsl(var(--visual-science)/0.3)]",
+  SUPPORTED:
+    "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))] border-[hsl(var(--visual-reading)/0.3)]",
+  LOW_VERBAL:
+    "bg-[hsl(var(--visual-sel)/0.16)] text-[hsl(var(--visual-sel))] border-[hsl(var(--visual-sel)/0.3)]",
+  NON_VERBAL:
+    "bg-[hsl(var(--visual-sel)/0.16)] text-[hsl(var(--visual-sel))] border-[hsl(var(--visual-sel)/0.3)]",
+  PRE_SYMBOLIC:
+    "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))] border-[hsl(var(--visual-math)/0.3)]",
 };
 
 export default function TherapistCaseloadPage() {
@@ -89,18 +94,13 @@ export default function TherapistCaseloadPage() {
   const activeGoals = therapyGoals.filter(
     (g) => g.status === "active" || g.status === "in_progress",
   );
-  const completedGoals = therapyGoals.filter(
-    (g) => g.status === "completed" || g.status === "met",
-  );
+  const completedGoals = therapyGoals.filter((g) => g.status === "completed" || g.status === "met");
 
-  const levelDistribution = learners.reduce(
-    (acc: Record<string, number>, l) => {
-      const level = l.functioningLevel || "Pending";
-      acc[level] = (acc[level] || 0) + 1;
-      return acc;
-    },
-    {},
-  );
+  const levelDistribution = learners.reduce((acc: Record<string, number>, l) => {
+    const level = l.functioningLevel || "Pending";
+    acc[level] = (acc[level] || 0) + 1;
+    return acc;
+  }, {});
 
   return (
     <div className="p-6 lg:p-8 space-y-6 lg:space-y-8 max-w-7xl mx-auto vi-bg">
@@ -112,9 +112,7 @@ export default function TherapistCaseloadPage() {
           <h1 className="text-2xl lg:text-3xl font-heading font-bold vi-text leading-tight">
             {t("dashboard")}
           </h1>
-          <p className="text-sm vi-text-muted font-medium mt-1">
-            Your caseload at a glance.
-          </p>
+          <p className="text-sm vi-text-muted font-medium mt-1">Your caseload at a glance.</p>
         </div>
       </header>
 
@@ -261,9 +259,7 @@ export default function TherapistCaseloadPage() {
                         {goals.slice(0, isExpanded ? undefined : 2).map((g) => (
                           <div key={g.id} className="flex items-center gap-3">
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-bold text-slate-800 truncate">
-                                {g.title}
-                              </p>
+                              <p className="text-sm font-bold text-slate-800 truncate">{g.title}</p>
                               <div
                                 className="w-full vi-surface-soft rounded-full h-3 mt-1.5 overflow-hidden"
                                 role="progressbar"
@@ -294,10 +290,7 @@ export default function TherapistCaseloadPage() {
                 </button>
 
                 {isExpanded && accessToken && (
-                  <div
-                    id={`client-details-${l.id}`}
-                    className="px-6 pb-6 border-t vi-border"
-                  >
+                  <div id={`client-details-${l.id}`} className="px-6 pb-6 border-t vi-border">
                     <p className="text-xs vi-text-muted font-bold uppercase tracking-wide mt-4 mb-3 flex items-center gap-1.5">
                       <Brain
                         size={12}

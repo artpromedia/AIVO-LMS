@@ -1,13 +1,29 @@
-import { pgTable, uuid, varchar, timestamp, integer, jsonb, text, real, uniqueIndex } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  uuid,
+  varchar,
+  timestamp,
+  integer,
+  jsonb,
+  text,
+  real,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
 import { functioningLevelEnum } from "./enums.js";
 import { users } from "./users.js";
 import { tenants } from "./tenants.js";
 
 export const learners = pgTable("learners", {
   id: uuid("id").defaultRandom().primaryKey(),
-  tenantId: uuid("tenant_id").references(() => tenants.id).notNull(),
-  userId: uuid("user_id").references(() => users.id).notNull(),
-  parentId: uuid("parent_id").references(() => users.id).notNull(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
+  userId: uuid("user_id")
+    .references(() => users.id)
+    .notNull(),
+  parentId: uuid("parent_id")
+    .references(() => users.id)
+    .notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   dateOfBirth: timestamp("date_of_birth"),
   gradeLevel: varchar("grade_level", { length: 20 }),
@@ -28,7 +44,9 @@ export const learners = pgTable("learners", {
 
 export const sensoryProfiles = pgTable("sensory_profiles", {
   id: uuid("id").defaultRandom().primaryKey(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
   visual: varchar("visual", { length: 20 }).default("typical"),
   auditory: varchar("auditory", { length: 20 }).default("typical"),
   tactile: varchar("tactile", { length: 20 }).default("typical"),
@@ -41,7 +59,9 @@ export const sensoryProfiles = pgTable("sensory_profiles", {
 
 export const iepDocuments = pgTable("iep_documents", {
   id: uuid("id").defaultRandom().primaryKey(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
   fileName: varchar("file_name", { length: 255 }).notNull(),
   fileUrl: text("file_url"),
   parsedData: jsonb("parsed_data"),
@@ -51,7 +71,9 @@ export const iepDocuments = pgTable("iep_documents", {
 
 export const iepProfiles = pgTable("iep_profiles", {
   id: uuid("id").defaultRandom().primaryKey(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
   disabilityCategories: jsonb("disability_categories").default([]),
   accommodations: jsonb("accommodations").default([]),
   goals: jsonb("goals").default([]),
@@ -81,7 +103,8 @@ export const iepProfiles = pgTable("iep_profiles", {
 export const iepPresentLevels = pgTable("iep_present_levels", {
   id: uuid("id").defaultRandom().primaryKey(),
   iepProfileId: uuid("iep_profile_id")
-    .references(() => iepProfiles.id, { onDelete: "cascade" }).notNull(),
+    .references(() => iepProfiles.id, { onDelete: "cascade" })
+    .notNull(),
   area: varchar("area", { length: 30 }).notNull(),
   narrative: text("narrative"),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -90,7 +113,8 @@ export const iepPresentLevels = pgTable("iep_present_levels", {
 export const iepServices = pgTable("iep_services", {
   id: uuid("id").defaultRandom().primaryKey(),
   iepProfileId: uuid("iep_profile_id")
-    .references(() => iepProfiles.id, { onDelete: "cascade" }).notNull(),
+    .references(() => iepProfiles.id, { onDelete: "cascade" })
+    .notNull(),
   serviceType: varchar("service_type", { length: 60 }).notNull(),
   providerRole: varchar("provider_role", { length: 60 }),
   minutesPerWeek: integer("minutes_per_week"),
@@ -103,9 +127,10 @@ export const iepServices = pgTable("iep_services", {
 
 export const iepGoals = pgTable("iep_goals", {
   id: uuid("id").defaultRandom().primaryKey(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
-  iepProfileId: uuid("iep_profile_id")
-    .references(() => iepProfiles.id, { onDelete: "cascade" }),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
+  iepProfileId: uuid("iep_profile_id").references(() => iepProfiles.id, { onDelete: "cascade" }),
   goalText: text("goal_text").notNull(),
   domain: varchar("domain", { length: 100 }),
   baseline: varchar("baseline", { length: 255 }),
@@ -118,9 +143,15 @@ export const iepGoals = pgTable("iep_goals", {
 
 export const iepEvaluations = pgTable("iep_evaluations", {
   id: uuid("id").defaultRandom().primaryKey(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
-  tenantId: uuid("tenant_id").references(() => tenants.id).notNull(),
-  initiatedByUserId: uuid("initiated_by_user_id").references(() => users.id).notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
+  initiatedByUserId: uuid("initiated_by_user_id")
+    .references(() => users.id)
+    .notNull(),
   // Widened from 20 → 40 to fit "eligibility_determined" (23 chars). The
   // 0009 migration created this as varchar(20); 0012 widens it in place so
   // the decision handler can actually persist the terminal status.
@@ -149,7 +180,9 @@ export const iepEvaluations = pgTable("iep_evaluations", {
 
 export const learnerFunctioningLevels = pgTable("learner_functioning_levels", {
   id: uuid("id").defaultRandom().primaryKey(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
   level: functioningLevelEnum("level").notNull(),
   determinedBy: varchar("determined_by", { length: 50 }).notNull(),
   parentSignals: jsonb("parent_signals").default({}),
@@ -160,8 +193,12 @@ export const learnerFunctioningLevels = pgTable("learner_functioning_levels", {
 
 export const transitionPlans = pgTable("transition_plans", {
   id: uuid("id").defaultRandom().primaryKey(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
-  tenantId: uuid("tenant_id").references(() => tenants.id).notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
   vocationalInterests: jsonb("vocational_interests").default([]),
   vocationalAptitude: jsonb("vocational_aptitude").default({}),
   independentLiving: jsonb("independent_living").default({}),
@@ -179,7 +216,9 @@ export const transitionPlans = pgTable("transition_plans", {
 
 export const languageProfiles = pgTable("language_profiles", {
   id: uuid("id").defaultRandom().primaryKey(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
   primaryLanguage: varchar("primary_language", { length: 50 }).notNull(),
   secondaryLanguages: jsonb("secondary_languages").default([]),
   dominanceByDomain: jsonb("dominance_by_domain").default({}),
@@ -191,24 +230,41 @@ export const languageProfiles = pgTable("language_profiles", {
 });
 
 // Phase C: IEP team collaboration & e-signatures.
-export const iepTeamMembers = pgTable("iep_team_members", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  iepProfileId: uuid("iep_profile_id").references(() => iepProfiles.id).notNull(),
-  userId: uuid("user_id").references(() => users.id).notNull(),
-  role: varchar("role", { length: 30 }).notNull(),
-  addedBy: uuid("added_by").references(() => users.id).notNull(),
-  addedAt: timestamp("added_at").defaultNow().notNull(),
-}, (t) => ({
-  unique: uniqueIndex("iep_team_members_profile_user_role_uidx")
-    .on(t.iepProfileId, t.userId, t.role),
-}));
+export const iepTeamMembers = pgTable(
+  "iep_team_members",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    iepProfileId: uuid("iep_profile_id")
+      .references(() => iepProfiles.id)
+      .notNull(),
+    userId: uuid("user_id")
+      .references(() => users.id)
+      .notNull(),
+    role: varchar("role", { length: 30 }).notNull(),
+    addedBy: uuid("added_by")
+      .references(() => users.id)
+      .notNull(),
+    addedAt: timestamp("added_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    unique: uniqueIndex("iep_team_members_profile_user_role_uidx").on(
+      t.iepProfileId,
+      t.userId,
+      t.role,
+    ),
+  }),
+);
 
 export const iepComments = pgTable("iep_comments", {
   id: uuid("id").defaultRandom().primaryKey(),
-  iepProfileId: uuid("iep_profile_id").references(() => iepProfiles.id).notNull(),
+  iepProfileId: uuid("iep_profile_id")
+    .references(() => iepProfiles.id)
+    .notNull(),
   section: varchar("section", { length: 30 }).notNull(),
   goalId: uuid("goal_id"),
-  authorId: uuid("author_id").references(() => users.id).notNull(),
+  authorId: uuid("author_id")
+    .references(() => users.id)
+    .notNull(),
   body: text("body").notNull(),
   mentions: jsonb("mentions").default([]),
   parentCommentId: uuid("parent_comment_id"),
@@ -218,10 +274,14 @@ export const iepComments = pgTable("iep_comments", {
 
 export const iepRevisions = pgTable("iep_revisions", {
   id: uuid("id").defaultRandom().primaryKey(),
-  iepProfileId: uuid("iep_profile_id").references(() => iepProfiles.id).notNull(),
+  iepProfileId: uuid("iep_profile_id")
+    .references(() => iepProfiles.id)
+    .notNull(),
   section: varchar("section", { length: 30 }).notNull(),
   snapshot: jsonb("snapshot").notNull(),
-  authorId: uuid("author_id").references(() => users.id).notNull(),
+  authorId: uuid("author_id")
+    .references(() => users.id)
+    .notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -234,10 +294,16 @@ export const iepRevisions = pgTable("iep_revisions", {
 // the cron job an idempotency key per (profile, threshold).
 export const iepProgressNotes = pgTable("iep_progress_notes", {
   id: uuid("id").defaultRandom().primaryKey(),
-  iepProfileId: uuid("iep_profile_id").references(() => iepProfiles.id).notNull(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
+  iepProfileId: uuid("iep_profile_id")
+    .references(() => iepProfiles.id)
+    .notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
   goalId: uuid("goal_id"),
-  authorId: uuid("author_id").references(() => users.id).notNull(),
+  authorId: uuid("author_id")
+    .references(() => users.id)
+    .notNull(),
   body: text("body").notNull(),
   attachmentUrl: text("attachment_url"),
   // 'parent' visible to family in the timeline; 'team' restricted to IEP
@@ -248,13 +314,19 @@ export const iepProgressNotes = pgTable("iep_progress_notes", {
 
 export const iepProgressReports = pgTable("iep_progress_reports", {
   id: uuid("id").defaultRandom().primaryKey(),
-  iepProfileId: uuid("iep_profile_id").references(() => iepProfiles.id).notNull(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
+  iepProfileId: uuid("iep_profile_id")
+    .references(() => iepProfiles.id)
+    .notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
   period: varchar("period", { length: 30 }).notNull(),
   narrative: text("narrative"),
   aiSummary: jsonb("ai_summary"),
   status: varchar("status", { length: 20 }).default("draft").notNull(),
-  createdBy: uuid("created_by").references(() => users.id).notNull(),
+  createdBy: uuid("created_by")
+    .references(() => users.id)
+    .notNull(),
   sentBy: uuid("sent_by").references(() => users.id),
   sentAt: timestamp("sent_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -263,13 +335,19 @@ export const iepProgressReports = pgTable("iep_progress_reports", {
 
 export const iepAmendments = pgTable("iep_amendments", {
   id: uuid("id").defaultRandom().primaryKey(),
-  iepProfileId: uuid("iep_profile_id").references(() => iepProfiles.id).notNull(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
+  iepProfileId: uuid("iep_profile_id")
+    .references(() => iepProfiles.id)
+    .notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
   summary: text("summary").notNull(),
   proposedChanges: jsonb("proposed_changes").default({}).notNull(),
   // proposed → acknowledged → merged, or proposed → objected.
   status: varchar("status", { length: 20 }).default("proposed").notNull(),
-  proposedBy: uuid("proposed_by").references(() => users.id).notNull(),
+  proposedBy: uuid("proposed_by")
+    .references(() => users.id)
+    .notNull(),
   acknowledgedBy: uuid("acknowledged_by").references(() => users.id),
   acknowledgedAt: timestamp("acknowledged_at"),
   parentResponse: text("parent_response"),
@@ -278,17 +356,23 @@ export const iepAmendments = pgTable("iep_amendments", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const parentNotificationPreferences = pgTable("parent_notification_preferences", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  parentId: uuid("parent_id").references(() => users.id).notNull(),
-  // Per-category prefs: { progress_notes: {email,inApp}, reports:..., amendments:..., reminders:... }
-  // Defaults are opt-in for legally significant items (reports, amendments,
-  // reminders); parents can mute progress_notes only.
-  prefs: jsonb("prefs").default({}).notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-}, (t) => ({
-  unique: uniqueIndex("parent_notification_preferences_parent_uidx").on(t.parentId),
-}));
+export const parentNotificationPreferences = pgTable(
+  "parent_notification_preferences",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    parentId: uuid("parent_id")
+      .references(() => users.id)
+      .notNull(),
+    // Per-category prefs: { progress_notes: {email,inApp}, reports:..., amendments:..., reminders:... }
+    // Defaults are opt-in for legally significant items (reports, amendments,
+    // reminders); parents can mute progress_notes only.
+    prefs: jsonb("prefs").default({}).notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    unique: uniqueIndex("parent_notification_preferences_parent_uidx").on(t.parentId),
+  }),
+);
 
 // In-app notifications for parents. Created alongside (or instead of)
 // emails when a parent has `inApp: true` for the relevant category in
@@ -296,7 +380,9 @@ export const parentNotificationPreferences = pgTable("parent_notification_prefer
 // an unread badge; marked-read when the parent opens the Updates tab.
 export const parentInAppNotifications = pgTable("parent_in_app_notifications", {
   id: uuid("id").defaultRandom().primaryKey(),
-  parentId: uuid("parent_id").references(() => users.id).notNull(),
+  parentId: uuid("parent_id")
+    .references(() => users.id)
+    .notNull(),
   learnerId: uuid("learner_id").references(() => learners.id),
   // One of the keys in DEFAULT_PREFS in iep-updates.ts
   // (progress_notes | reports | amendments | reminders).
@@ -310,17 +396,25 @@ export const parentInAppNotifications = pgTable("parent_in_app_notifications", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const iepReviewReminders = pgTable("iep_review_reminders", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  iepProfileId: uuid("iep_profile_id").references(() => iepProfiles.id).notNull(),
-  // Days-out threshold the reminder is for: 90, 60, 30.
-  threshold: integer("threshold").notNull(),
-  reviewDate: timestamp("review_date").notNull(),
-  sentAt: timestamp("sent_at").defaultNow().notNull(),
-}, (t) => ({
-  unique: uniqueIndex("iep_review_reminders_profile_threshold_uidx")
-    .on(t.iepProfileId, t.threshold),
-}));
+export const iepReviewReminders = pgTable(
+  "iep_review_reminders",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    iepProfileId: uuid("iep_profile_id")
+      .references(() => iepProfiles.id)
+      .notNull(),
+    // Days-out threshold the reminder is for: 90, 60, 30.
+    threshold: integer("threshold").notNull(),
+    reviewDate: timestamp("review_date").notNull(),
+    sentAt: timestamp("sent_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    unique: uniqueIndex("iep_review_reminders_profile_threshold_uidx").on(
+      t.iepProfileId,
+      t.threshold,
+    ),
+  }),
+);
 
 // Phase D — Parent share links for finalised IEPs.
 // Parents sometimes need to share the finalised IEP with someone outside
@@ -334,44 +428,61 @@ export const iepReviewReminders = pgTable("iep_review_reminders", {
 // kill access if a recipient should no longer have the link. The token
 // itself is hashed before storage so leaking the table doesn't leak the
 // shareable URL.
-export const iepParentShareLinks = pgTable("iep_parent_share_links", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  iepProfileId: uuid("iep_profile_id")
-    .references(() => iepProfiles.id, { onDelete: "cascade" }).notNull(),
-  // Sha-256 of the random token. The plaintext token is shown to the
-  // issuer once at creation time and never persisted server-side.
-  tokenHash: varchar("token_hash", { length: 64 }).notNull(),
-  // Optional human label so the parent can recognise which link they're
-  // revoking ("Tutor — Mrs. Reyes"). Free-form, not used for auth.
-  label: varchar("label", { length: 120 }),
-  issuedByUserId: uuid("issued_by_user_id").references(() => users.id).notNull(),
-  expiresAt: timestamp("expires_at").notNull(),
-  revokedAt: timestamp("revoked_at"),
-  // Last successful redemption — surfaced in the issuer's UI so parents
-  // can tell whether anyone has actually opened the link.
-  lastAccessedAt: timestamp("last_accessed_at"),
-  accessCount: integer("access_count").default(0).notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-}, (t) => ({
-  uniqueTokenHash: uniqueIndex("iep_parent_share_links_token_hash_uidx").on(t.tokenHash),
-}));
+export const iepParentShareLinks = pgTable(
+  "iep_parent_share_links",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    iepProfileId: uuid("iep_profile_id")
+      .references(() => iepProfiles.id, { onDelete: "cascade" })
+      .notNull(),
+    // Sha-256 of the random token. The plaintext token is shown to the
+    // issuer once at creation time and never persisted server-side.
+    tokenHash: varchar("token_hash", { length: 64 }).notNull(),
+    // Optional human label so the parent can recognise which link they're
+    // revoking ("Tutor — Mrs. Reyes"). Free-form, not used for auth.
+    label: varchar("label", { length: 120 }),
+    issuedByUserId: uuid("issued_by_user_id")
+      .references(() => users.id)
+      .notNull(),
+    expiresAt: timestamp("expires_at").notNull(),
+    revokedAt: timestamp("revoked_at"),
+    // Last successful redemption — surfaced in the issuer's UI so parents
+    // can tell whether anyone has actually opened the link.
+    lastAccessedAt: timestamp("last_accessed_at"),
+    accessCount: integer("access_count").default(0).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => ({
+    uniqueTokenHash: uniqueIndex("iep_parent_share_links_token_hash_uidx").on(t.tokenHash),
+  }),
+);
 
-export const iepSignatures = pgTable("iep_signatures", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  iepProfileId: uuid("iep_profile_id").references(() => iepProfiles.id).notNull(),
-  signerUserId: uuid("signer_user_id").references(() => users.id).notNull(),
-  signerRole: varchar("signer_role", { length: 30 }).notNull(),
-  typedName: varchar("typed_name", { length: 255 }).notNull(),
-  signedAt: timestamp("signed_at").defaultNow().notNull(),
-  ipHash: varchar("ip_hash", { length: 64 }),
-  status: varchar("status", { length: 20 }).default("signed").notNull(),
-}, (t) => ({
-  // One active signature per (profile, user, role) — guards against duplicate
-  // signs racing past the in-app idempotency check.
-  unique: uniqueIndex("iep_signatures_profile_user_role_uidx")
-    .on(t.iepProfileId, t.signerUserId, t.signerRole),
-}));
-
+export const iepSignatures = pgTable(
+  "iep_signatures",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    iepProfileId: uuid("iep_profile_id")
+      .references(() => iepProfiles.id)
+      .notNull(),
+    signerUserId: uuid("signer_user_id")
+      .references(() => users.id)
+      .notNull(),
+    signerRole: varchar("signer_role", { length: 30 }).notNull(),
+    typedName: varchar("typed_name", { length: 255 }).notNull(),
+    signedAt: timestamp("signed_at").defaultNow().notNull(),
+    ipHash: varchar("ip_hash", { length: 64 }),
+    status: varchar("status", { length: 20 }).default("signed").notNull(),
+  },
+  (t) => ({
+    // One active signature per (profile, user, role) — guards against duplicate
+    // signs racing past the in-app idempotency check.
+    unique: uniqueIndex("iep_signatures_profile_user_role_uidx").on(
+      t.iepProfileId,
+      t.signerUserId,
+      t.signerRole,
+    ),
+  }),
+);
 
 /**
  * Learner special-interest signals — caregiver intake, IEP signals, self-
@@ -385,8 +496,12 @@ export const iepSignatures = pgTable("iep_signatures", {
  */
 export const learnerInterestSignals = pgTable("learner_interest_signals", {
   id: uuid("id").defaultRandom().primaryKey(),
-  tenantId: uuid("tenant_id").references(() => tenants.id).notNull(),
-  learnerId: uuid("learner_id").references(() => learners.id, { onDelete: "cascade" }).notNull(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id, { onDelete: "cascade" })
+    .notNull(),
   /** Slug from the engine's catalog (e.g. "minecraft", "dinosaurs"). */
   slug: varchar("slug", { length: 64 }).notNull(),
   /** caregiver_intake | iep_signal | self_report | engagement | system. */
@@ -412,8 +527,12 @@ export const learnerInterestSignals = pgTable("learner_interest_signals", {
  */
 export const efTaskBreakdowns = pgTable("ef_task_breakdowns", {
   id: uuid("id").defaultRandom().primaryKey(),
-  tenantId: uuid("tenant_id").references(() => tenants.id).notNull(),
-  learnerId: uuid("learner_id").references(() => learners.id, { onDelete: "cascade" }).notNull(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id, { onDelete: "cascade" })
+    .notNull(),
   /** Free-form id of the parent task (lesson id, homework id, etc.). */
   taskId: varchar("task_id", { length: 128 }).notNull(),
   /** Human-readable task title. */
@@ -433,7 +552,9 @@ export const efTaskBreakdowns = pgTable("ef_task_breakdowns", {
  */
 export const efTaskStepProgress = pgTable("ef_task_step_progress", {
   id: uuid("id").defaultRandom().primaryKey(),
-  breakdownId: uuid("breakdown_id").references(() => efTaskBreakdowns.id, { onDelete: "cascade" }).notNull(),
+  breakdownId: uuid("breakdown_id")
+    .references(() => efTaskBreakdowns.id, { onDelete: "cascade" })
+    .notNull(),
   stepId: varchar("step_id", { length: 64 }).notNull(),
   completedAt: timestamp("completed_at").defaultNow().notNull(),
   /** Optional ms the learner spent on this step before completing. */
@@ -449,8 +570,12 @@ export const efTaskStepProgress = pgTable("ef_task_step_progress", {
  */
 export const efSessionOutcomes = pgTable("ef_session_outcomes", {
   id: uuid("id").defaultRandom().primaryKey(),
-  tenantId: uuid("tenant_id").references(() => tenants.id).notNull(),
-  learnerId: uuid("learner_id").references(() => learners.id, { onDelete: "cascade" }).notNull(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id, { onDelete: "cascade" })
+    .notNull(),
   /** Wall-clock start of the session (TZ-aware ISO from the host). */
   startedAt: timestamp("started_at").notNull(),
   /** "early-morning" | "morning" | "midday" | "afternoon" | "evening". */

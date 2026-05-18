@@ -95,8 +95,7 @@ export default async function NewLearnerPage({
       <Card className="max-w-2xl p-6">
         {params.error === "invalid" ? (
           <p className="mb-4 rounded-md border border-aivo-danger bg-aivo-danger/5 px-3 py-2 text-sm text-aivo-danger">
-            Please double-check the form — at minimum we need a first name and a valid
-            birth year.
+            Please double-check the form — at minimum we need a first name and a valid birth year.
           </p>
         ) : null}
         <form action={addLearnerAction} className="grid gap-4 sm:grid-cols-2">
@@ -106,7 +105,12 @@ export default async function NewLearnerPage({
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="preferredName">Preferred name (optional)</Label>
-            <Input id="preferredName" name="preferredName" maxLength={80} placeholder="Nickname AIVO should use" />
+            <Input
+              id="preferredName"
+              name="preferredName"
+              maxLength={80}
+              placeholder="Nickname AIVO should use"
+            />
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="birthYear">Birth year</Label>
@@ -171,7 +175,12 @@ export default async function NewLearnerPage({
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="primaryLanguage">Primary language</Label>
-            <Input id="primaryLanguage" name="primaryLanguage" maxLength={60} placeholder="English" />
+            <Input
+              id="primaryLanguage"
+              name="primaryLanguage"
+              maxLength={60}
+              placeholder="English"
+            />
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="readingComfort">Reading comfort</Label>
@@ -204,7 +213,9 @@ export default async function NewLearnerPage({
             </select>
           </div>
           <div className="flex flex-col gap-1.5 sm:col-span-2">
-            <Label htmlFor="knownStrengths">Known strengths (one per line or comma-separated)</Label>
+            <Label htmlFor="knownStrengths">
+              Known strengths (one per line or comma-separated)
+            </Label>
             <Textarea
               id="knownStrengths"
               name="knownStrengths"

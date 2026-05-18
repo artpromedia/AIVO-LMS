@@ -50,18 +50,22 @@ const ESCALATION_COOLDOWN_MS = 30 * 60 * 1000;
 // from the same *_SVC_URL env vars used by the existing service-health
 // dashboard so a single deploy doesn't have to touch two configs.
 const DEFAULT_SOURCE_KEYS: Array<{ service: string; envKey: string; devDefault: string }> = [
-  { service: "identity-svc",     envKey: "IDENTITY_SVC_URL",     devDefault: "http://localhost:3001" },
-  { service: "assessment-svc",   envKey: "ASSESSMENT_SVC_URL",   devDefault: "http://localhost:3003" },
-  { service: "learning-svc",     envKey: "LEARNING_SVC_URL",     devDefault: "http://localhost:3005" },
-  { service: "tutor-svc",        envKey: "TUTOR_SVC_URL",        devDefault: "http://localhost:3006" },
-  { service: "family-svc",       envKey: "FAMILY_SVC_URL",       devDefault: "http://localhost:3007" },
-  { service: "engagement-svc",   envKey: "ENGAGEMENT_SVC_URL",   devDefault: "http://localhost:3008" },
-  { service: "billing-svc",      envKey: "BILLING_SVC_URL",      devDefault: "http://localhost:3009" },
-  { service: "comms-svc",        envKey: "COMMS_SVC_URL",        devDefault: "http://localhost:3010" },
-  { service: "i18n-svc",         envKey: "I18N_SVC_URL",         devDefault: "http://localhost:3011" },
-  { service: "integrations-svc", envKey: "INTEGRATIONS_SVC_URL", devDefault: "http://localhost:3012" },
-  { service: "admin-svc",        envKey: "ADMIN_SVC_URL",        devDefault: "http://localhost:3013" },
-  { service: "research-svc",     envKey: "RESEARCH_SVC_URL",     devDefault: "http://localhost:3015" },
+  { service: "identity-svc", envKey: "IDENTITY_SVC_URL", devDefault: "http://localhost:3001" },
+  { service: "assessment-svc", envKey: "ASSESSMENT_SVC_URL", devDefault: "http://localhost:3003" },
+  { service: "learning-svc", envKey: "LEARNING_SVC_URL", devDefault: "http://localhost:3005" },
+  { service: "tutor-svc", envKey: "TUTOR_SVC_URL", devDefault: "http://localhost:3006" },
+  { service: "family-svc", envKey: "FAMILY_SVC_URL", devDefault: "http://localhost:3007" },
+  { service: "engagement-svc", envKey: "ENGAGEMENT_SVC_URL", devDefault: "http://localhost:3008" },
+  { service: "billing-svc", envKey: "BILLING_SVC_URL", devDefault: "http://localhost:3009" },
+  { service: "comms-svc", envKey: "COMMS_SVC_URL", devDefault: "http://localhost:3010" },
+  { service: "i18n-svc", envKey: "I18N_SVC_URL", devDefault: "http://localhost:3011" },
+  {
+    service: "integrations-svc",
+    envKey: "INTEGRATIONS_SVC_URL",
+    devDefault: "http://localhost:3012",
+  },
+  { service: "admin-svc", envKey: "ADMIN_SVC_URL", devDefault: "http://localhost:3013" },
+  { service: "research-svc", envKey: "RESEARCH_SVC_URL", devDefault: "http://localhost:3015" },
 ];
 
 function loadSources(): OutboxSource[] {
@@ -81,7 +85,9 @@ function loadSources(): OutboxSource[] {
     .map((entry) => {
       const [service, url] = entry.split("=");
       if (!service || !url) {
-        throw new Error(`OPS_ALERT_OUTBOX_SOURCES: invalid entry "${entry}", expected "service=url"`);
+        throw new Error(
+          `OPS_ALERT_OUTBOX_SOURCES: invalid entry "${entry}", expected "service=url"`,
+        );
       }
       return { service: service.trim(), url: url.trim().replace(/\/$/, "") };
     });
@@ -184,7 +190,10 @@ async function escalate(tile: OutboxTile, consecutive: number) {
   const commsUrl = process.env.COMMS_SVC_URL || (IS_PROD ? "" : "http://localhost:3010");
   const token = process.env.INTERNAL_SERVICE_TOKEN;
   if (!token || !commsUrl) {
-    logger.error({ service: tile.service, consecutive }, "ops_alerts_outbox.escalation_skipped_no_token_or_url");
+    logger.error(
+      { service: tile.service, consecutive },
+      "ops_alerts_outbox.escalation_skipped_no_token_or_url",
+    );
     return;
   }
   try {
@@ -204,7 +213,10 @@ async function escalate(tile: OutboxTile, consecutive: number) {
     });
     logger.info({ service: tile.service, consecutive }, "ops_alerts_outbox.escalation_fired");
   } catch (err: any) {
-    logger.error({ service: tile.service, err: err.message }, "ops_alerts_outbox.escalation_failed");
+    logger.error(
+      { service: tile.service, err: err.message },
+      "ops_alerts_outbox.escalation_failed",
+    );
   }
 }
 

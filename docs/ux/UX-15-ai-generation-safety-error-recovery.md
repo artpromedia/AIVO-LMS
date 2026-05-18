@@ -18,12 +18,12 @@ These three states all share one property: **the learner is waiting on AIVO, not
 
 Every AI-backed surface (lesson generation, baseline generation, brain profile build, homework helper turn, IEP extraction) resolves to one of four states:
 
-| State | Meaning | Surface treatment |
-|---|---|---|
-| **Ready** | Content is generated, validated, ready to render | Render normally |
-| **Generating** | Model is producing content; no result yet | Calm "thinking" state — see §3 |
+| State              | Meaning                                                                                       | Surface treatment                          |
+| ------------------ | --------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| **Ready**          | Content is generated, validated, ready to render                                              | Render normally                            |
+| **Generating**     | Model is producing content; no result yet                                                     | Calm "thinking" state — see §3             |
 | **Safety-blocked** | Content was produced but failed a safety check, or the request itself was blocked by a policy | Honest "we can't show this" state — see §4 |
-| **Failed** | Model errored, timed out, or rate-limited | Friendly retry state — see §5 |
+| **Failed**         | Model errored, timed out, or rate-limited                                                     | Friendly retry state — see §5              |
 
 The state is **server-resolved at the boundary** (BFF) and persisted on the record itself — `LessonRun.status`, `Baseline.status`, `IEPDocument.extractionStatus`, etc. The client never guesses.
 
@@ -36,6 +36,7 @@ The state is **server-resolved at the boundary** (BFF) and persisted on the reco
 **Web today** (lesson player): `lesson-runs/[lessonRunId]/page.tsx` lines 57–86 — when `lessonRun.status === "generating"`, the page renders a Card with the lesson title, a Badge with the status, and a copy block. ✅ shipped.
 
 **Improvements** (⬜ planned):
+
 - **Calm copy.** "Your tutor is getting your lesson ready" — never a percentage, never "almost done", never a fake progress bar. (A real progress bar invites the learner to read it as an unfulfilled promise.)
 - **Estimated time, only if confident.** Show "Usually 10–20 seconds" only when we have a real distribution. Otherwise no number.
 - **`aria-live="polite"`** on the status copy so SR users hear the change.
@@ -44,6 +45,7 @@ The state is **server-resolved at the boundary** (BFF) and persisted on the reco
 - **Parent-side mirror.** `/parent/learners/[id]/lessons` shows the same status: parents see "generating" on the day's run, not silence.
 
 **Triggers.**
+
 - `startMissionAction` → `createLessonRun` → fires `generateLessonPlanWithRetry`; until it returns, status = `generating`.
 - Quest chapter start → same.
 - Baseline runner completion that auto-generates the first lesson → same.
@@ -58,25 +60,28 @@ The state is **server-resolved at the boundary** (BFF) and persisted on the reco
 **The contract.** Tell the truth without exposing policy internals, and offer a path forward that doesn't require the learner to figure out what went wrong.
 
 **Where it happens.** `lib/ai/safety.ts` is the central guard. It's invoked on every model output before persistence:
+
 - Lesson plan generation — checked before `GeneratedLessonPlan` is written to the run.
 - Homework helper turn — checked before the assistant message is appended.
 - Tutor freeform output (rare; most outputs are templated) — checked.
 - IEP extraction — checked (to ensure the extracted accommodations text contains no policy violation).
 
 **States:**
+
 - `unsafe_content` — the model output failed a content check. Don't show it.
 - `unsafe_request` — the learner's input was flagged (e.g., self-harm signals). Route to support flow, not silent block.
 - `policy_blocked` — administrative policy says no (e.g., a topic the district has disabled).
 
 **Surface treatments.**
 
-| State | Learner copy | Parent copy (notification) | Action |
-|---|---|---|---|
-| `unsafe_content` (model output blocked) | "Your tutor wants to try a different way of teaching this. Hold on a moment." | Optional, only if it happens more than 2× / week | Auto-retry once with a tightened prompt; if it fails again, route to **Failed** state |
-| `unsafe_request` (learner safety signal) | Soft Card: "It sounds like something might be hard right now. Would you like to talk to a grown-up?" with a button that pings the parent | **Immediate** push to parent: "Your child may need a moment. Open the app to see." | Pause the Stage; surface parent-support resources from `comms-svc` config |
-| `policy_blocked` (district policy) | "This topic isn't part of your class right now. Let's try something else." | None | Offer an alternate mission |
+| State                                    | Learner copy                                                                                                                             | Parent copy (notification)                                                         | Action                                                                                |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `unsafe_content` (model output blocked)  | "Your tutor wants to try a different way of teaching this. Hold on a moment."                                                            | Optional, only if it happens more than 2× / week                                   | Auto-retry once with a tightened prompt; if it fails again, route to **Failed** state |
+| `unsafe_request` (learner safety signal) | Soft Card: "It sounds like something might be hard right now. Would you like to talk to a grown-up?" with a button that pings the parent | **Immediate** push to parent: "Your child may need a moment. Open the app to see." | Pause the Stage; surface parent-support resources from `comms-svc` config             |
+| `policy_blocked` (district policy)       | "This topic isn't part of your class right now. Let's try something else."                                                               | None                                                                               | Offer an alternate mission                                                            |
 
 **Never:**
+
 - Never log a policy error code to the learner.
 - Never say "blocked" or "violation" or "unsafe" to a learner.
 - Never silently swallow an `unsafe_request` — that is the one place a parent **must** be notified in real time.
@@ -93,15 +98,16 @@ The state is **server-resolved at the boundary** (BFF) and persisted on the reco
 
 **Failure taxonomy.**
 
-| Cause | Surfaced as | Auto-retry? |
-|---|---|---|
-| Network timeout from model provider | "We had trouble reaching your tutor. Let's try again." | Yes, once at the provider layer; surface to UI only if all three fallbacks fail |
-| Rate limit hit (`RATE_LIMITS.AI_GENERATION`) | "AIVO is a little busy right now — try again in a minute." | No — exposing user-level rate limit is correct |
-| Malformed model output (validation failure on `GeneratedLessonPlan`) | "Your tutor's plan didn't come together — let's try once more." | Yes, once with a stricter prompt; otherwise surface |
-| All-providers-failed | Same as network timeout copy | No further auto-retry; surface |
-| Database / persistence error | "Something on our side hiccuped. Try again." | No |
+| Cause                                                                | Surfaced as                                                     | Auto-retry?                                                                     |
+| -------------------------------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Network timeout from model provider                                  | "We had trouble reaching your tutor. Let's try again."          | Yes, once at the provider layer; surface to UI only if all three fallbacks fail |
+| Rate limit hit (`RATE_LIMITS.AI_GENERATION`)                         | "AIVO is a little busy right now — try again in a minute."      | No — exposing user-level rate limit is correct                                  |
+| Malformed model output (validation failure on `GeneratedLessonPlan`) | "Your tutor's plan didn't come together — let's try once more." | Yes, once with a stricter prompt; otherwise surface                             |
+| All-providers-failed                                                 | Same as network timeout copy                                    | No further auto-retry; surface                                                  |
+| Database / persistence error                                         | "Something on our side hiccuped. Try again."                    | No                                                                              |
 
 **UI requirements** (⬜ where not shipped):
+
 - One primary CTA: **Try again**. ✅ shipped.
 - One secondary CTA: **Take a break** (returns the learner to home with no shame). ⬜.
 - For the parent: the failed status is visible on `/parent/learners/[id]/lessons` so they know to check in.
@@ -116,14 +122,14 @@ The state is **server-resolved at the boundary** (BFF) and persisted on the reco
 
 The same friendly-error contract applies to non-AI failures (BFF errors, validation, permission, consent):
 
-| Class | Surfacing | Recovery |
-|---|---|---|
-| Validation (4xx) | Inline error under the field, `aria-describedby` linkage, never toast-only | Fix and resubmit |
-| Permission (`requirePageRole` / scope) | Per-route-group `error.tsx` (⬜ planned per UX-00 DD-01) with role-appropriate copy + a "Go home" CTA | Sign in / switch role |
-| Consent (`requireConsent`) | Card explaining the missing consent + a CTA into `/parent/consent` | Grant and return |
-| Rate limit (429) | Inline banner with reset time | Wait |
-| Network (offline) | Banner at top + queued writes | Reconnect |
-| Unknown 5xx | Per-group `error.tsx` with a "Try again" button + a request id the user can paste into Support | Retry, then contact support |
+| Class                                  | Surfacing                                                                                             | Recovery                    |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------- | --------------------------- |
+| Validation (4xx)                       | Inline error under the field, `aria-describedby` linkage, never toast-only                            | Fix and resubmit            |
+| Permission (`requirePageRole` / scope) | Per-route-group `error.tsx` (⬜ planned per UX-00 DD-01) with role-appropriate copy + a "Go home" CTA | Sign in / switch role       |
+| Consent (`requireConsent`)             | Card explaining the missing consent + a CTA into `/parent/consent`                                    | Grant and return            |
+| Rate limit (429)                       | Inline banner with reset time                                                                         | Wait                        |
+| Network (offline)                      | Banner at top + queued writes                                                                         | Reconnect                   |
+| Unknown 5xx                            | Per-group `error.tsx` with a "Try again" button + a request id the user can paste into Support        | Retry, then contact support |
 
 **Never** render a stack trace, a SQL fragment, or a model-provider error string to any user surface. Those go to logs only.
 
@@ -133,11 +139,11 @@ The same friendly-error contract applies to non-AI failures (BFF errors, validat
 
 Every "AIVO is doing something" surface uses one of three primitives, all defined in `components/ui/*`:
 
-| Primitive | Purpose | A11y |
-|---|---|---|
-| `<GenerationStatus>` (⬜ planned) | The "thinking" state from §3 | `role="status" aria-live="polite"` |
-| `<RetryPanel>` | The "try again" state from §5 | `role="alert"` for first render; focus the Retry button |
-| `<ConsentGate>` / `<PermissionGate>` | The "you can't do this yet" states | `role="status"`; linked CTA |
+| Primitive                            | Purpose                            | A11y                                                    |
+| ------------------------------------ | ---------------------------------- | ------------------------------------------------------- |
+| `<GenerationStatus>` (⬜ planned)    | The "thinking" state from §3       | `role="status" aria-live="polite"`                      |
+| `<RetryPanel>`                       | The "try again" state from §5      | `role="alert"` for first render; focus the Retry button |
+| `<ConsentGate>` / `<PermissionGate>` | The "you can't do this yet" states | `role="status"`; linked CTA                             |
 
 Three primitives, three contracts. No ad-hoc "Loading…" text. No bare `<Toast type="error">` for AI failures.
 
@@ -147,15 +153,15 @@ Three primitives, three contracts. No ad-hoc "Loading…" text. No bare `<Toast 
 
 Every state transition emits an event to the observability layer:
 
-| Event | Where |
-|---|---|
-| `ai.generation.started` | `createLessonRun` (and equivalents) |
-| `ai.generation.completed` | On success in `generateLessonPlanWithRetry` |
-| `ai.generation.failed` | On final failure, with provider chain + last error |
-| `ai.safety.blocked` | On `safety.ts` rejection, with policy id |
-| `ai.retry.invoked` | `/retry` BFF |
-| `error.rendered` | Any role-group `error.tsx` render |
-| `consent.gate.shown` | `<ConsentGate>` mount |
+| Event                     | Where                                              |
+| ------------------------- | -------------------------------------------------- |
+| `ai.generation.started`   | `createLessonRun` (and equivalents)                |
+| `ai.generation.completed` | On success in `generateLessonPlanWithRetry`        |
+| `ai.generation.failed`    | On final failure, with provider chain + last error |
+| `ai.safety.blocked`       | On `safety.ts` rejection, with policy id           |
+| `ai.retry.invoked`        | `/retry` BFF                                       |
+| `error.rendered`          | Any role-group `error.tsx` render                  |
+| `consent.gate.shown`      | `<ConsentGate>` mount                              |
 
 These power `/admin/platform/ai-generation`, `/admin/platform/ai-costs`, `/admin/platform/ai/moderation`, and the Admin-Lite "AI failures" tab (UX-13 §5).
 

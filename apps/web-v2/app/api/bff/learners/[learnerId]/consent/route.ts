@@ -3,11 +3,7 @@ import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
 import { audit } from "@/lib/bff/audit";
 import { hashIpFromRequest } from "@/lib/bff/consent-guard";
-import {
-  getAgeGateForLearner,
-  listConsentsForLearner,
-  recordConsent,
-} from "@/lib/db/repos";
+import { getAgeGateForLearner, listConsentsForLearner, recordConsent } from "@/lib/db/repos";
 import { CONSENT_TYPES, type ConsentType } from "@/lib/db/types";
 
 export const dynamic = "force-dynamic";

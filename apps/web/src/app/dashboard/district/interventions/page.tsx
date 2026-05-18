@@ -32,8 +32,10 @@ export default function DistrictInterventionsPage() {
   useEffect(() => {
     if (!accessToken) return;
     const qs = statusFilter ? `?status=${statusFilter}` : "";
-    fetch(`/api/district/interventions${qs}`, { headers: { Authorization: `Bearer ${accessToken}` } })
-      .then((r) => r.ok ? r.json() : { interventions: [] })
+    fetch(`/api/district/interventions${qs}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+      .then((r) => (r.ok ? r.json() : { interventions: [] }))
       .then((data) => setInterventions(data.interventions || []))
       .catch(() => setInterventions([]))
       .finally(() => setLoading(false));
@@ -48,7 +50,9 @@ export default function DistrictInterventionsPage() {
     <div className="p-8 space-y-6">
       <header>
         <h1 className="text-2xl font-heading font-bold vi-text">Interventions</h1>
-        <p className="text-sm vi-text-muted mt-1">Track academic and behavioral interventions across the district.</p>
+        <p className="text-sm vi-text-muted mt-1">
+          Track academic and behavioral interventions across the district.
+        </p>
       </header>
 
       <div className="grid gap-3 md:grid-cols-3">
@@ -77,7 +81,9 @@ export default function DistrictInterventionsPage() {
 
       {loading ? (
         <div className="animate-pulse space-y-3">
-          {[1, 2, 3].map((i) => <div key={i} className="h-14 bg-slate-200 rounded-xl" />)}
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-14 bg-slate-200 rounded-xl" />
+          ))}
         </div>
       ) : (
         <div className="vi-card overflow-hidden">
@@ -96,16 +102,23 @@ export default function DistrictInterventionsPage() {
               {interventions.map((iv) => (
                 <tr key={iv.id} className="border-b vi-border hover:vi-surface-soft transition">
                   <td className="px-5 py-3">
-                    <Link href={`/dashboard/district/learners/${iv.learnerId}`} className="font-medium vi-text hover:text-[hsl(var(--visual-primary))]">
+                    <Link
+                      href={`/dashboard/district/learners/${iv.learnerId}`}
+                      className="font-medium vi-text hover:text-[hsl(var(--visual-primary))]"
+                    >
                       {iv.learnerName}
                     </Link>
                   </td>
                   <td className="px-5 py-3 vi-text-muted">{iv.type}</td>
                   <td className="px-5 py-3">
-                    <span className="px-2 py-0.5 text-xs rounded-full bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))] font-semibold">Tier {iv.tier}</span>
+                    <span className="px-2 py-0.5 text-xs rounded-full bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))] font-semibold">
+                      Tier {iv.tier}
+                    </span>
                   </td>
                   <td className="px-5 py-3">
-                    <span className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${STATUS_COLORS[iv.status] || "vi-surface-soft vi-text-muted"}`}>
+                    <span
+                      className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${STATUS_COLORS[iv.status] || "vi-surface-soft vi-text-muted"}`}
+                    >
                       {iv.status}
                     </span>
                   </td>
@@ -114,7 +127,11 @@ export default function DistrictInterventionsPage() {
                 </tr>
               ))}
               {interventions.length === 0 && (
-                <tr><td colSpan={6} className="px-5 py-10 text-center vi-text-muted">No interventions found</td></tr>
+                <tr>
+                  <td colSpan={6} className="px-5 py-10 text-center vi-text-muted">
+                    No interventions found
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>

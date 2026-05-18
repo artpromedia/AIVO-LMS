@@ -46,10 +46,18 @@ export interface ForwarderDeps {
   opsgenieUrl?: string;
 }
 
-export type Forwarder = (envelope: OpsAlertEnvelope, secret: string, deps: ForwarderDeps) => Promise<ForwardResult>;
+export type Forwarder = (
+  envelope: OpsAlertEnvelope,
+  secret: string,
+  deps: ForwarderDeps,
+) => Promise<ForwardResult>;
 
 function severityIcon(sev: OpsAlertEnvelope["severity"]): string {
-  return sev === "critical" ? ":rotating_light:" : sev === "warning" ? ":warning:" : ":information_source:";
+  return sev === "critical"
+    ? ":rotating_light:"
+    : sev === "warning"
+      ? ":warning:"
+      : ":information_source:";
 }
 
 function pdSeverity(sev: OpsAlertEnvelope["severity"]): "critical" | "warning" | "info" {
@@ -83,7 +91,9 @@ export const slackForwarder: Forwarder = async (env, secret, deps) => {
         text: { type: "mrkdwn", text: `*service:* ${env.service}  *severity:* ${env.severity}` },
       },
       { type: "section", text: { type: "mrkdwn", text: env.message.slice(0, 2900) } },
-      ...(fields ? [{ type: "section", text: { type: "mrkdwn", text: fields.slice(0, 2900) } }] : []),
+      ...(fields
+        ? [{ type: "section", text: { type: "mrkdwn", text: fields.slice(0, 2900) } }]
+        : []),
     ],
   };
   try {

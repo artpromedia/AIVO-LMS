@@ -5,10 +5,7 @@ import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireLearnerScope } from "@/lib/bff/guards";
 import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import { audit } from "@/lib/bff/audit";
-import {
-  getLearnerVoicePreference,
-  upsertLearnerVoicePreference,
-} from "@/lib/db/repos";
+import { getLearnerVoicePreference, upsertLearnerVoicePreference } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +13,14 @@ type Params = { params: Promise<{ learnerId: string }> };
 
 const patchSchema = z.object({
   voiceId: z
-    .enum(["warm_female", "warm_male", "calm_neutral", "kid_friendly", "narrator_low", "narrator_high"])
+    .enum([
+      "warm_female",
+      "warm_male",
+      "calm_neutral",
+      "kid_friendly",
+      "narrator_low",
+      "narrator_high",
+    ])
     .optional(),
   speed: z.number().min(0.5).max(2).optional(),
   enabled: z.boolean().optional(),
@@ -31,7 +35,12 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (response) return response;
     const scopeErr = requireLearnerScope(session!, learnerId, requestId);
     if (scopeErr) return scopeErr;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection"],
+      requestId,
+    );
     if (consentErr) return consentErr;
     const pref = getLearnerVoicePreference(learnerId);
     return ok({ preference: pref }, requestId);
@@ -48,7 +57,12 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
     if (response) return response;
     const scopeErr = requireLearnerScope(session!, learnerId, requestId);
     if (scopeErr) return scopeErr;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection"],
+      requestId,
+    );
     if (consentErr) return consentErr;
     // Only parents and admins may toggle `enabled`; learners can change voice
     // and speed within the constraints their parent already accepted.
@@ -61,7 +75,10 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
     const parsed = patchSchema.safeParse(body);
     if (!parsed.success) {
       return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." },
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
         requestId,
       );
     }

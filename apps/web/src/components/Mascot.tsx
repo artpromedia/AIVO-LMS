@@ -28,12 +28,7 @@ const PALETTE: Record<MascotMood, { body: string; accent: string }> = {
   idle: { body: "var(--tier-primary-soft, #EDE3FE)", accent: "var(--tier-primary, #7C3AED)" },
 };
 
-export default function Mascot({
-  mood = "idle",
-  size = 96,
-  label,
-  className = "",
-}: MascotProps) {
+export default function Mascot({ mood = "idle", size = 96, label, className = "" }: MascotProps) {
   const [reducedMotion, setReducedMotion] = useState(false);
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
@@ -71,7 +66,10 @@ export default function Mascot({
           fill="url(#mascot-glow)"
           style={
             animate && mood === "cheer"
-              ? { animation: "mascot-pulse calc(1.6s * var(--tier-pace, 1)) ease-in-out infinite", transformOrigin: "50% 50%" }
+              ? {
+                  animation: "mascot-pulse calc(1.6s * var(--tier-pace, 1)) ease-in-out infinite",
+                  transformOrigin: "50% 50%",
+                }
               : undefined
           }
         />
@@ -81,9 +79,16 @@ export default function Mascot({
           style={
             animate
               ? mood === "cheer"
-                ? { animation: "mascot-bounce calc(1s * var(--tier-pace, 1)) ease-in-out infinite", transformOrigin: "50% 70%" }
+                ? {
+                    animation: "mascot-bounce calc(1s * var(--tier-pace, 1)) ease-in-out infinite",
+                    transformOrigin: "50% 70%",
+                  }
                 : mood === "idle"
-                  ? { animation: "mascot-sway calc(2.6s * var(--tier-pace, 1)) ease-in-out infinite", transformOrigin: "50% 70%" }
+                  ? {
+                      animation:
+                        "mascot-sway calc(2.6s * var(--tier-pace, 1)) ease-in-out infinite",
+                      transformOrigin: "50% 70%",
+                    }
                   : undefined
               : undefined
           }
@@ -109,16 +114,33 @@ export default function Mascot({
       </svg>
       <style jsx>{`
         @keyframes mascot-bounce {
-          0%, 100% { transform: translateY(0) scale(1); }
-          50% { transform: translateY(-6%) scale(1.04); }
+          0%,
+          100% {
+            transform: translateY(0) scale(1);
+          }
+          50% {
+            transform: translateY(-6%) scale(1.04);
+          }
         }
         @keyframes mascot-sway {
-          0%, 100% { transform: rotate(-3deg); }
-          50% { transform: rotate(3deg); }
+          0%,
+          100% {
+            transform: rotate(-3deg);
+          }
+          50% {
+            transform: rotate(3deg);
+          }
         }
         @keyframes mascot-pulse {
-          0%, 100% { transform: scale(1); opacity: 0.8; }
-          50% { transform: scale(1.12); opacity: 1; }
+          0%,
+          100% {
+            transform: scale(1);
+            opacity: 0.8;
+          }
+          50% {
+            transform: scale(1.12);
+            opacity: 1;
+          }
         }
       `}</style>
     </div>

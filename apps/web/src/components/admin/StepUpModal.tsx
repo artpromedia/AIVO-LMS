@@ -40,45 +40,52 @@ export function StepUpModal() {
   const dialogRef = useRef<HTMLDivElement>(null);
   const firstFocusRef = useRef<HTMLButtonElement | null>(null);
 
-  useEffect(() => subscribeStepUp((p) => {
-    if (!p) {
-      setPending(null);
-      setPhase("init");
-      setChallenge(null);
-      setCode("");
-      setRecovery("");
-      setErr(null);
-      return;
-    }
-    setPending({ scope: p.scope, accessToken: p.accessToken });
-  }), []);
+  useEffect(
+    () =>
+      subscribeStepUp((p) => {
+        if (!p) {
+          setPending(null);
+          setPhase("init");
+          setChallenge(null);
+          setCode("");
+          setRecovery("");
+          setErr(null);
+          return;
+        }
+        setPending({ scope: p.scope, accessToken: p.accessToken });
+      }),
+    [],
+  );
 
-  const initiate = useCallback(async (factor?: "webauthn" | "totp" | "email") => {
-    if (!pending) return;
-    setErr(null);
-    setPhase("init");
-    try {
-      const r = await fetch("/api/auth/step-up/initiate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${pending.accessToken}`,
-        },
-        body: JSON.stringify({ scope: pending.scope, ...(factor ? { factor } : {}) }),
-      });
-      const data = await r.json();
-      if (!r.ok) {
-        setErr(data.error || "Failed to start step-up");
+  const initiate = useCallback(
+    async (factor?: "webauthn" | "totp" | "email") => {
+      if (!pending) return;
+      setErr(null);
+      setPhase("init");
+      try {
+        const r = await fetch("/api/auth/step-up/initiate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${pending.accessToken}`,
+          },
+          body: JSON.stringify({ scope: pending.scope, ...(factor ? { factor } : {}) }),
+        });
+        const data = await r.json();
+        if (!r.ok) {
+          setErr(data.error || "Failed to start step-up");
+          setPhase("error");
+          return;
+        }
+        setChallenge(data);
+        setPhase("ready");
+      } catch (e: any) {
+        setErr(e?.message || "Network error");
         setPhase("error");
-        return;
       }
-      setChallenge(data);
-      setPhase("ready");
-    } catch (e: any) {
-      setErr(e?.message || "Network error");
-      setPhase("error");
-    }
-  }, [pending]);
+    },
+    [pending],
+  );
 
   useEffect(() => {
     if (pending && phase === "init") {
@@ -162,13 +169,11 @@ export function StepUpModal() {
           Confirm it&apos;s you
         </h2>
         <p className="mt-1 text-sm text-slate-600">
-          You&apos;re about to {SCOPE_LABEL[pending.scope] ?? pending.scope}. Please re-verify with your
-          strongest sign-in method.
+          You&apos;re about to {SCOPE_LABEL[pending.scope] ?? pending.scope}. Please re-verify with
+          your strongest sign-in method.
         </p>
 
-        {phase === "init" && (
-          <p className="mt-4 text-sm text-slate-500">Preparing challenge…</p>
-        )}
+        {phase === "init" && <p className="mt-4 text-sm text-slate-500">Preparing challenge…</p>}
 
         {challenge && (phase === "ready" || phase === "verifying" || phase === "error") && (
           <div className="mt-4 space-y-3">
@@ -204,9 +209,7 @@ export function StepUpModal() {
 
             {challenge.factor === "email" && (
               <div className="space-y-2">
-                <p className="text-xs text-slate-500">
-                  Code sent to {challenge.email?.sentTo}
-                </p>
+                <p className="text-xs text-slate-500">Code sent to {challenge.email?.sentTo}</p>
                 <label className="block text-sm font-medium text-slate-700">
                   <span>Email code</span>
                   <input
@@ -225,7 +228,9 @@ export function StepUpModal() {
 
             {challenge.factor !== "webauthn" && (
               <details className="rounded-lg border border-slate-200 p-2 text-sm">
-                <summary className="cursor-pointer text-slate-600">Use a recovery code instead</summary>
+                <summary className="cursor-pointer text-slate-600">
+                  Use a recovery code instead
+                </summary>
                 <input
                   type="text"
                   value={recovery}

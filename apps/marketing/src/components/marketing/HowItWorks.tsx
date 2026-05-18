@@ -21,9 +21,7 @@ export function HowItWorks() {
           <h2 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 mb-4 leading-tight">
             {t("title")}
           </h2>
-          <p className="text-lg text-slate-600 font-body">
-            {t("subtitle")}
-          </p>
+          <p className="text-lg text-slate-600 font-body">{t("subtitle")}</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -38,9 +36,7 @@ export function HowItWorks() {
               <h3 className="font-heading font-bold text-lg text-slate-900 mb-2">
                 {t(step.titleKey)}
               </h3>
-              <p className="text-sm text-slate-600 font-body leading-relaxed">
-                {t(step.descKey)}
-              </p>
+              <p className="text-sm text-slate-600 font-body leading-relaxed">{t(step.descKey)}</p>
             </div>
           ))}
         </div>

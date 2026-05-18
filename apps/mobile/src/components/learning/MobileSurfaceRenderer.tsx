@@ -21,19 +21,15 @@ export function MobileSurfaceRenderer({ theme, beat, disabled, onSubmit }: Props
   const styles = createStyles(theme);
   return (
     <View style={styles.wrap}>
-      <Text style={styles.title}>
-        {beat.surface.kind.replace(/_/g, " ")}
-      </Text>
+      <Text style={styles.title}>{beat.surface.kind.replace(/_/g, " ")}</Text>
       {beat.text ? <Text style={styles.body}>{beat.text}</Text> : null}
-      <Text style={styles.note}>
-        This surface will be interactive in the next mobile release.
-      </Text>
+      <Text style={styles.note}>This surface will be interactive in the next mobile release.</Text>
       <Pressable
         onPress={() => onSubmit({})}
         disabled={disabled}
         style={[styles.submit, disabled && styles.submitDisabled]}
       >
-        <Text style={styles.submitText}>I'm done</Text>
+        <Text style={styles.submitText}>I&apos;m done</Text>
       </Pressable>
     </View>
   );
@@ -42,7 +38,12 @@ export function MobileSurfaceRenderer({ theme, beat, disabled, onSubmit }: Props
 function createStyles(theme: TierThemeMobile) {
   return StyleSheet.create({
     wrap: { padding: 16, gap: 12 },
-    title: { color: theme.colors.text, fontSize: 18, fontWeight: "700", textTransform: "capitalize" },
+    title: {
+      color: theme.colors.text,
+      fontSize: 18,
+      fontWeight: "700",
+      textTransform: "capitalize",
+    },
     body: { color: theme.colors.text, fontSize: 18 },
     note: { color: theme.colors.text, opacity: 0.7, fontStyle: "italic" },
     submit: {

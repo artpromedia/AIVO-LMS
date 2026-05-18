@@ -62,10 +62,7 @@ export function schedule(input: SpacedRepetitionInput): SpacedRepetitionDecision
   const now = input.now ? new Date(input.now) : new Date();
 
   // SM-2 ease-factor update.
-  const easeNext = Math.max(
-    MIN_EASE,
-    cur.easeFactor + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)),
-  );
+  const easeNext = Math.max(MIN_EASE, cur.easeFactor + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)));
 
   let reps: number;
   let intervalDays: number;

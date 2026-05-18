@@ -11,11 +11,7 @@ import {
   uploadIEPDocument,
   logIepAccess,
 } from "@/lib/db/repos";
-import {
-  IEP_ALLOWED_MIME_TYPES,
-  IEP_MAX_BYTES,
-  iepUploadMetaSchema,
-} from "@/lib/validators/iep";
+import { IEP_ALLOWED_MIME_TYPES, IEP_MAX_BYTES, iepUploadMetaSchema } from "@/lib/validators/iep";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +27,12 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["iep_document_storage", "child_data_collection"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["iep_document_storage", "child_data_collection"],
+      requestId,
+    );
     if (consentErr) return consentErr;
     const doc = getIEPForLearner(learnerId, session!.tenantId);
     if (doc) {
@@ -59,7 +60,12 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["iep_document_storage", "child_data_collection"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["iep_document_storage", "child_data_collection"],
+      requestId,
+    );
     if (consentErr) return consentErr;
 
     // Multipart-only: the route derives metadata from the actual file stream
@@ -137,7 +143,12 @@ export async function DELETE(req: Request, { params }: Params): Promise<NextResp
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["iep_document_storage", "child_data_collection"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["iep_document_storage", "child_data_collection"],
+      requestId,
+    );
     if (consentErr) return consentErr;
     const existing = getIEPForLearner(learnerId, session!.tenantId);
     const removed = deleteIEPForLearner(learnerId, session!.tenantId);

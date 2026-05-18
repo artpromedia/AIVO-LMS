@@ -148,9 +148,7 @@ function checkRootScripts() {
     }
   }
   if (pkg.packageManager && !pkg.packageManager.startsWith("pnpm@10.")) {
-    warnings.push(
-      `packageManager is ${pkg.packageManager}; roadmap pins pnpm@10.26.1`,
-    );
+    warnings.push(`packageManager is ${pkg.packageManager}; roadmap pins pnpm@10.26.1`);
   }
   const nodeEngine = pkg.engines?.node ?? "";
   if (!nodeEngine.includes(">=22")) {

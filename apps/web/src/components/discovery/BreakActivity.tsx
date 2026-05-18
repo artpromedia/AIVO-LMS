@@ -37,7 +37,12 @@ const WORD_GAME_WORDS = [
   { scrambled: "OMNO", answer: "MOON", hint: "You see it at night" },
 ];
 
-export default function BreakActivity({ chapterNumber, onBreakComplete, functioningLevel = "STANDARD", parentMinDurationSec = 0 }: BreakActivityProps) {
+export default function BreakActivity({
+  chapterNumber,
+  onBreakComplete,
+  functioningLevel = "STANDARD",
+  parentMinDurationSec = 0,
+}: BreakActivityProps) {
   const [selectedBreak, setSelectedBreak] = useState<BreakType | null>(null);
   const [show, setShow] = useState(false);
   const [exerciseIdx, setExerciseIdx] = useState(0);
@@ -69,7 +74,7 @@ export default function BreakActivity({ chapterNumber, onBreakComplete, function
   useEffect(() => {
     if (!selectedBreak) return;
     timerRef.current = setInterval(() => {
-      setElapsedSec(t => t + 1);
+      setElapsedSec((t) => t + 1);
     }, 1000);
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
@@ -79,7 +84,7 @@ export default function BreakActivity({ chapterNumber, onBreakComplete, function
   useEffect(() => {
     if (!selectedBreak || selectedBreak !== "exercise") return;
     const interval = setInterval(() => {
-      setExerciseIdx(i => (i + 1) % EXERCISES.length);
+      setExerciseIdx((i) => (i + 1) % EXERCISES.length);
     }, 6000);
     return () => clearInterval(interval);
   }, [selectedBreak]);
@@ -87,19 +92,21 @@ export default function BreakActivity({ chapterNumber, onBreakComplete, function
   useEffect(() => {
     if (!selectedBreak || selectedBreak !== "music") return;
     const interval = setInterval(() => {
-      setMusicNoteIdx(i => (i + 1) % MUSIC_VISUALS.length);
+      setMusicNoteIdx((i) => (i + 1) % MUSIC_VISUALS.length);
     }, 800);
     return () => clearInterval(interval);
   }, [selectedBreak]);
 
   const breakOptions = isTextFree
-    ? BREAK_OPTIONS.filter(o => o.type !== "word_game")
+    ? BREAK_OPTIONS.filter((o) => o.type !== "word_game")
     : BREAK_OPTIONS;
 
   if (!selectedBreak) {
     return (
       <div className="fixed inset-0 vi-bg tier-scene-bg flex items-center justify-center px-4">
-        <div className={`max-w-md w-full text-center transition-all duration-700 ${show ? "opacity-100 scale-100" : "opacity-0 scale-90"}`}>
+        <div
+          className={`max-w-md w-full text-center transition-all duration-700 ${show ? "opacity-100 scale-100" : "opacity-0 scale-90"}`}
+        >
           <div className="text-5xl mb-4">🎉</div>
           {!isTextFree && (
             <>
@@ -111,9 +118,7 @@ export default function BreakActivity({ chapterNumber, onBreakComplete, function
               </p>
             </>
           )}
-          {isTextFree && (
-            <div className="mb-8" />
-          )}
+          {isTextFree && <div className="mb-8" />}
 
           <div className="space-y-3">
             {breakOptions.map((option) => (
@@ -129,7 +134,9 @@ export default function BreakActivity({ chapterNumber, onBreakComplete, function
                 </div>
                 {!isTextFree && (
                   <div className="flex-1">
-                    <p className="font-heading font-extrabold text-slate-900 text-lg">{option.label}</p>
+                    <p className="font-heading font-extrabold text-slate-900 text-lg">
+                      {option.label}
+                    </p>
                     <p className="vi-text-muted text-sm font-body">{option.description}</p>
                   </div>
                 )}
@@ -159,8 +166,12 @@ export default function BreakActivity({ chapterNumber, onBreakComplete, function
             <div className="text-6xl mb-4 animate-pulse">🎵</div>
             {!isTextFree && (
               <>
-                <h2 className="text-2xl font-heading font-extrabold text-slate-900 mb-2">Relax & Listen</h2>
-                <p className="vi-text-muted font-body mb-6">Close your eyes and enjoy the moment...</p>
+                <h2 className="text-2xl font-heading font-extrabold text-slate-900 mb-2">
+                  Relax & Listen
+                </h2>
+                <p className="vi-text-muted font-body mb-6">
+                  Close your eyes and enjoy the moment...
+                </p>
               </>
             )}
             <div className="vi-card p-6 flex justify-center gap-4 h-32 items-end">
@@ -182,7 +193,10 @@ export default function BreakActivity({ chapterNumber, onBreakComplete, function
                   key={i}
                   className="text-3xl transition-all duration-300"
                   style={{
-                    transform: i === musicNoteIdx % MUSIC_VISUALS.length ? "scale(1.5) translateY(-8px)" : "scale(1)",
+                    transform:
+                      i === musicNoteIdx % MUSIC_VISUALS.length
+                        ? "scale(1.5) translateY(-8px)"
+                        : "scale(1)",
                     opacity: i === musicNoteIdx % MUSIC_VISUALS.length ? 1 : 0.4,
                   }}
                 >
@@ -196,7 +210,9 @@ export default function BreakActivity({ chapterNumber, onBreakComplete, function
         {selectedBreak === "word_game" && (
           <div className="space-y-6">
             <div className="text-6xl mb-4">🔤</div>
-            <h2 className="text-2xl font-heading font-extrabold text-slate-900 mb-2">Word Scramble!</h2>
+            <h2 className="text-2xl font-heading font-extrabold text-slate-900 mb-2">
+              Word Scramble!
+            </h2>
             <p className="vi-text-muted font-body mb-2">Unscramble the letters to find the word</p>
             <div className="vi-card p-6">
               <div className="flex justify-center gap-2 mb-4">
@@ -212,7 +228,10 @@ export default function BreakActivity({ chapterNumber, onBreakComplete, function
               </div>
               <p className="vi-text-muted text-sm mb-4">Hint: {WORD_GAME_WORDS[wordIdx].hint}</p>
               {wordSolved ? (
-                <div className="font-heading font-extrabold text-lg" style={{ color: "hsl(var(--visual-science))" }}>
+                <div
+                  className="font-heading font-extrabold text-lg"
+                  style={{ color: "hsl(var(--visual-science))" }}
+                >
                   Correct! Great job! 🎉
                 </div>
               ) : (
@@ -262,7 +281,8 @@ export default function BreakActivity({ chapterNumber, onBreakComplete, function
                     i === exerciseIdx ? "scale-125" : ""
                   }`}
                   style={{
-                    backgroundColor: i === exerciseIdx ? "hsl(var(--visual-sel))" : "hsl(var(--visual-border))",
+                    backgroundColor:
+                      i === exerciseIdx ? "hsl(var(--visual-sel))" : "hsl(var(--visual-border))",
                   }}
                 />
               ))}

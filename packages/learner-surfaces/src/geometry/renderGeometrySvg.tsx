@@ -21,8 +21,22 @@ function renderBackground(diagram: GeometryDiagramSpec, width: number, height: n
         ))}
         {diagram.coordinateSystem === "cartesian" ? (
           <>
-            <line x1={0} y1={height / 2} x2={width} y2={height / 2} stroke="#94a3b8" strokeWidth={1.5} />
-            <line x1={width / 2} y1={0} x2={width / 2} y2={height} stroke="#94a3b8" strokeWidth={1.5} />
+            <line
+              x1={0}
+              y1={height / 2}
+              x2={width}
+              y2={height / 2}
+              stroke="#94a3b8"
+              strokeWidth={1.5}
+            />
+            <line
+              x1={width / 2}
+              y1={0}
+              x2={width / 2}
+              y2={height}
+              stroke="#94a3b8"
+              strokeWidth={1.5}
+            />
           </>
         ) : null}
       </g>
@@ -64,15 +78,33 @@ function renderAngle(shape: Extract<GeometryShape, { kind: "angle" }>) {
 
   return (
     <g>
-      <line x1={shape.vertex.x} y1={shape.vertex.y} x2={shape.armA.x} y2={shape.armA.y} stroke={shape.stroke ?? "#1f2937"} strokeWidth={2} />
-      <line x1={shape.vertex.x} y1={shape.vertex.y} x2={shape.armB.x} y2={shape.armB.y} stroke={shape.stroke ?? "#1f2937"} strokeWidth={2} />
+      <line
+        x1={shape.vertex.x}
+        y1={shape.vertex.y}
+        x2={shape.armA.x}
+        y2={shape.armA.y}
+        stroke={shape.stroke ?? "#1f2937"}
+        strokeWidth={2}
+      />
+      <line
+        x1={shape.vertex.x}
+        y1={shape.vertex.y}
+        x2={shape.armB.x}
+        y2={shape.armB.y}
+        stroke={shape.stroke ?? "#1f2937"}
+        strokeWidth={2}
+      />
       <path
         d={`M ${startX} ${startY} A ${radius} ${radius} 0 0 ${sweepFlag} ${endX} ${endY}`}
         fill="none"
         stroke={shape.stroke ?? "#1f2937"}
         strokeWidth={2}
       />
-      {shape.label ? <text x={shape.vertex.x + radius + 6} y={shape.vertex.y - 6}>{shape.label}</text> : null}
+      {shape.label ? (
+        <text x={shape.vertex.x + radius + 6} y={shape.vertex.y - 6}>
+          {shape.label}
+        </text>
+      ) : null}
     </g>
   );
 }
@@ -113,7 +145,16 @@ function renderShape(shape: GeometryShape, width: number, height: number) {
         />
       );
     case "segment":
-      return <line x1={shape.start.x} y1={shape.start.y} x2={shape.end.x} y2={shape.end.y} stroke={shape.stroke ?? "#1f2937"} strokeWidth={2} />;
+      return (
+        <line
+          x1={shape.start.x}
+          y1={shape.start.y}
+          x2={shape.end.x}
+          y2={shape.end.y}
+          stroke={shape.stroke ?? "#1f2937"}
+          strokeWidth={2}
+        />
+      );
     case "ray":
       return renderRay(shape, width, height);
     case "angle":
@@ -121,7 +162,12 @@ function renderShape(shape: GeometryShape, width: number, height: number) {
   }
 }
 
-export function renderGeometrySvg({ diagram, accessibility, className, style }: RenderGeometrySvgProps) {
+export function renderGeometrySvg({
+  diagram,
+  accessibility,
+  className,
+  style,
+}: RenderGeometrySvgProps) {
   const width = diagram.width ?? 480;
   const height = diagram.height ?? 320;
   const title = accessibility.altText;
@@ -149,7 +195,13 @@ export function renderGeometrySvg({ diagram, accessibility, className, style }: 
         </text>
       ))}
       {(diagram.measurements ?? []).map((measurement) => (
-        <text key={measurement.id} x={measurement.position.x} y={measurement.position.y} fill="#1d4ed8" fontSize={13}>
+        <text
+          key={measurement.id}
+          x={measurement.position.x}
+          y={measurement.position.y}
+          fill="#1d4ed8"
+          fontSize={13}
+        >
           {measurement.text}
         </text>
       ))}

@@ -10,15 +10,7 @@ export const assessmentSectionSchemas = {
     timeline: z.enum(["weeks", "this_term", "this_year", "long_term"]).optional(),
   }),
   grade_subject: z.object({
-    gradeBand: z.enum([
-      "preK",
-      "K",
-      "1-2",
-      "3-5",
-      "6-8",
-      "9-12",
-      "post_secondary",
-    ]),
+    gradeBand: z.enum(["preK", "K", "1-2", "3-5", "6-8", "9-12", "post_secondary"]),
     focusSubjects: z.array(z.string().max(40)).min(1).max(7),
   }),
   reading: z.object({
@@ -40,9 +32,7 @@ export const assessmentSectionSchemas = {
     notes: z.string().max(500).optional(),
   }),
   sensory: z.object({
-    sensitivities: z.array(
-      z.enum(["sound", "light", "touch", "movement", "smell", "taste"]),
-    ),
+    sensitivities: z.array(z.enum(["sound", "light", "touch", "movement", "smell", "taste"])),
     seekingOrAvoiding: z.enum(["seeking", "avoiding", "mixed", "neutral"]).optional(),
   }),
   homework: z.object({
@@ -93,18 +83,10 @@ export const assessmentSectionSchemas = {
     services: z.array(z.string().max(80)).max(15).optional(),
   }),
   learning_profile: z.object({
-    communicationMode: z
-      .enum(["verbal", "sign", "aac", "non_verbal"])
-      .optional(),
-    deviceInteraction: z
-      .enum(["independent", "with_prompts", "hand_over_hand"])
-      .optional(),
-    responseMethod: z
-      .enum(["touch", "voice", "switch", "eye_gaze"])
-      .optional(),
-    attentionSpanBucket: z
-      .enum(["under_5", "5_10", "10_20", "20_plus"])
-      .optional(),
+    communicationMode: z.enum(["verbal", "sign", "aac", "non_verbal"]).optional(),
+    deviceInteraction: z.enum(["independent", "with_prompts", "hand_over_hand"]).optional(),
+    responseMethod: z.enum(["touch", "voice", "switch", "eye_gaze"]).optional(),
+    attentionSpanBucket: z.enum(["under_5", "5_10", "10_20", "20_plus"]).optional(),
     bestModes: z
       .array(z.enum(["visual", "auditory", "kinesthetic", "reading_writing"]))
       .max(4)

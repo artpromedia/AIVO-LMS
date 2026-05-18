@@ -99,22 +99,25 @@ export function usePointerInk({
     [commit, disabled, onEvent, strokes, surfaceId, tool],
   );
 
-  const onPointerMove = useCallback((event: PointerEvent<HTMLDivElement>) => {
-    if (disabled) {
-      return;
-    }
-
-    setActiveByPointer((current) => {
-      const stroke = current[event.pointerId];
-      if (!stroke) {
-        return current;
+  const onPointerMove = useCallback(
+    (event: PointerEvent<HTMLDivElement>) => {
+      if (disabled) {
+        return;
       }
-      return {
-        ...current,
-        [event.pointerId]: appendStrokePoint(stroke, pointFromEvent(event)),
-      };
-    });
-  }, [disabled]);
+
+      setActiveByPointer((current) => {
+        const stroke = current[event.pointerId];
+        if (!stroke) {
+          return current;
+        }
+        return {
+          ...current,
+          [event.pointerId]: appendStrokePoint(stroke, pointFromEvent(event)),
+        };
+      });
+    },
+    [disabled],
+  );
 
   const finishPointer = useCallback(
     (event: PointerEvent<HTMLDivElement>) => {
@@ -131,7 +134,12 @@ export function usePointerInk({
         const finished = appendStrokePoint(stroke, pointFromEvent(event));
         const nextStrokes = addStroke(strokes, finished);
         commit(nextStrokes);
-        onEvent?.(createSurfaceEvent(surfaceId, "ink_completed", { tool: finished.tool, points: finished.points.length }));
+        onEvent?.(
+          createSurfaceEvent(surfaceId, "ink_completed", {
+            tool: finished.tool,
+            points: finished.points.length,
+          }),
+        );
 
         const { [event.pointerId]: _removed, ...rest } = current;
         return rest;

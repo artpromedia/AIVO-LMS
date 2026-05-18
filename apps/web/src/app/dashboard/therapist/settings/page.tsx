@@ -19,18 +19,24 @@ export default function TherapistSettingsPage() {
   const fetchPreferences = useCallback(async () => {
     if (!accessToken || !user) return;
     try {
-      const res = await fetch(`/api/comms/preferences/${user.id}`, { headers: { Authorization: `Bearer ${accessToken}` } });
+      const res = await fetch(`/api/comms/preferences/${user.id}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
       if (res.ok) {
         const data = await res.json();
         if (data.email !== undefined) setEmailNotifs(data.email);
         if (data.sessionReminders !== undefined) setSessionReminders(data.sessionReminders);
         if (data.goalAlerts !== undefined) setGoalAlerts(data.goalAlerts);
       }
-    } catch { /* use defaults */ }
+    } catch {
+      /* use defaults */
+    }
     setLoadingPrefs(false);
   }, [accessToken, user]);
 
-  useEffect(() => { fetchPreferences(); }, [fetchPreferences]);
+  useEffect(() => {
+    fetchPreferences();
+  }, [fetchPreferences]);
 
   if (loading || !user) return null;
 
@@ -77,38 +83,92 @@ export default function TherapistSettingsPage() {
         <h2 className="font-heading font-bold text-lg vi-text mb-4">{tc("details")}</h2>
         {loadingPrefs ? (
           <div className="space-y-4">
-            {[1, 2, 3].map(i => <div key={i} className="h-12 vi-surface-soft rounded-xl animate-pulse motion-reduce:animate-none" />)}
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="h-12 vi-surface-soft rounded-xl animate-pulse motion-reduce:animate-none"
+              />
+            ))}
           </div>
         ) : (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold vi-text" id="email-notifs-label">Email Notifications</p>
-                <p className="text-xs vi-text-muted" id="email-notifs-desc">Receive email updates about your clients</p>
+                <p className="text-sm font-semibold vi-text" id="email-notifs-label">
+                  Email Notifications
+                </p>
+                <p className="text-xs vi-text-muted" id="email-notifs-desc">
+                  Receive email updates about your clients
+                </p>
               </div>
-              <AccessibleToggle id="email-notifs" value={emailNotifs} onChange={setEmailNotifs} label="Email Notifications" description="Receive email updates about your clients" color="bg-[hsl(var(--visual-math))]" />
+              <AccessibleToggle
+                id="email-notifs"
+                value={emailNotifs}
+                onChange={setEmailNotifs}
+                label="Email Notifications"
+                description="Receive email updates about your clients"
+                color="bg-[hsl(var(--visual-math))]"
+              />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold vi-text" id="session-reminders-label">Session Reminders</p>
-                <p className="text-xs vi-text-muted" id="session-reminders-desc">Reminders before scheduled therapy sessions</p>
+                <p className="text-sm font-semibold vi-text" id="session-reminders-label">
+                  Session Reminders
+                </p>
+                <p className="text-xs vi-text-muted" id="session-reminders-desc">
+                  Reminders before scheduled therapy sessions
+                </p>
               </div>
-              <AccessibleToggle id="session-reminders" value={sessionReminders} onChange={setSessionReminders} label="Session Reminders" description="Reminders before scheduled therapy sessions" color="bg-[hsl(var(--visual-math))]" />
+              <AccessibleToggle
+                id="session-reminders"
+                value={sessionReminders}
+                onChange={setSessionReminders}
+                label="Session Reminders"
+                description="Reminders before scheduled therapy sessions"
+                color="bg-[hsl(var(--visual-math))]"
+              />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold vi-text" id="goal-alerts-label">Goal Progress Alerts</p>
-                <p className="text-xs vi-text-muted" id="goal-alerts-desc">Notification when client goals reach milestones</p>
+                <p className="text-sm font-semibold vi-text" id="goal-alerts-label">
+                  Goal Progress Alerts
+                </p>
+                <p className="text-xs vi-text-muted" id="goal-alerts-desc">
+                  Notification when client goals reach milestones
+                </p>
               </div>
-              <AccessibleToggle id="goal-alerts" value={goalAlerts} onChange={setGoalAlerts} label="Goal Progress Alerts" description="Notification when client goals reach milestones" color="bg-[hsl(var(--visual-math))]" />
+              <AccessibleToggle
+                id="goal-alerts"
+                value={goalAlerts}
+                onChange={setGoalAlerts}
+                label="Goal Progress Alerts"
+                description="Notification when client goals reach milestones"
+                color="bg-[hsl(var(--visual-math))]"
+              />
             </div>
           </div>
         )}
-        {saveStatus === "success" && <p className="text-sm text-[hsl(var(--visual-science))] mt-3 font-medium" role="status" aria-live="polite">Settings saved!</p>}
-        {saveStatus === "error" && <p className="text-sm text-[hsl(var(--visual-math))] mt-3 font-medium" role="alert">Failed to save settings. Please try again.</p>}
-        <button onClick={handleSaveSettings} disabled={saving} aria-busy={saving}
+        {saveStatus === "success" && (
+          <p
+            className="text-sm text-[hsl(var(--visual-science))] mt-3 font-medium"
+            role="status"
+            aria-live="polite"
+          >
+            Settings saved!
+          </p>
+        )}
+        {saveStatus === "error" && (
+          <p className="text-sm text-[hsl(var(--visual-math))] mt-3 font-medium" role="alert">
+            Failed to save settings. Please try again.
+          </p>
+        )}
+        <button
+          onClick={handleSaveSettings}
+          disabled={saving}
+          aria-busy={saving}
           style={{ minHeight: "44px" }}
-          className="mt-4 px-6 py-2.5 rounded-xl bg-[hsl(var(--visual-math))] text-white font-heading font-black uppercase tracking-wider text-sm hover:bg-[hsl(var(--visual-math)/0.9)] transition disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--visual-math))] focus-visible:ring-offset-2">
+          className="mt-4 px-6 py-2.5 rounded-xl bg-[hsl(var(--visual-math))] text-white font-heading font-black uppercase tracking-wider text-sm hover:bg-[hsl(var(--visual-math)/0.9)] transition disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--visual-math))] focus-visible:ring-offset-2"
+        >
           {saving ? "Saving..." : "Save Preferences"}
         </button>
       </div>

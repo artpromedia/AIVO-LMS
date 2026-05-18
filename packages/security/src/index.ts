@@ -106,7 +106,8 @@ export async function initKeys() {
     return;
   }
 
-  const keyDir = process.env.JWT_KEY_DIR || path.resolve(process.cwd(), "..", "..", ".local", "jwt-keys");
+  const keyDir =
+    process.env.JWT_KEY_DIR || path.resolve(process.cwd(), "..", "..", ".local", "jwt-keys");
   const privPath = path.join(keyDir, "private.pem");
   const pubPath = path.join(keyDir, "public.pem");
 
@@ -120,7 +121,9 @@ export async function initKeys() {
     }
   } catch {}
 
-  const { privateKey: priv, publicKey: pub } = await jose.generateKeyPair("RS256", { extractable: true });
+  const { privateKey: priv, publicKey: pub } = await jose.generateKeyPair("RS256", {
+    extractable: true,
+  });
   privateKey = priv;
   publicKey = pub;
 

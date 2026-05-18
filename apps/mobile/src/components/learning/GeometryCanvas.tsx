@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { StyleSheet, View, ViewStyle } from 'react-native';
+import React, { useMemo } from "react";
+import { StyleSheet, View, ViewStyle } from "react-native";
 import Svg, {
   Circle,
   G,
@@ -9,19 +9,55 @@ import Svg, {
   Polyline,
   Rect,
   Text as SvgText,
-} from 'react-native-svg';
-import { colors, radius } from '@/constants/colors';
+} from "react-native-svg";
+import { colors, radius } from "@/constants/colors";
 
 export type GeometryShape =
-  | { kind: 'line'; x1: number; y1: number; x2: number; y2: number; label?: string; color?: string }
-  | { kind: 'segment'; from: [number, number]; to: [number, number]; color?: string; dashed?: boolean }
-  | { kind: 'circle'; cx: number; cy: number; r: number; color?: string; fill?: string; label?: string }
-  | { kind: 'rect'; x: number; y: number; width: number; height: number; color?: string; fill?: string; label?: string }
-  | { kind: 'polygon'; points: [number, number][]; color?: string; fill?: string; label?: string }
-  | { kind: 'angle'; vertex: [number, number]; a: [number, number]; b: [number, number]; label?: string }
-  | { kind: 'numberLine'; min: number; max: number; step: number; marks?: number[]; highlight?: number }
-  | { kind: 'point'; x: number; y: number; label?: string; color?: string }
-  | { kind: 'text'; x: number; y: number; text: string; color?: string; fontSize?: number };
+  | { kind: "line"; x1: number; y1: number; x2: number; y2: number; label?: string; color?: string }
+  | {
+      kind: "segment";
+      from: [number, number];
+      to: [number, number];
+      color?: string;
+      dashed?: boolean;
+    }
+  | {
+      kind: "circle";
+      cx: number;
+      cy: number;
+      r: number;
+      color?: string;
+      fill?: string;
+      label?: string;
+    }
+  | {
+      kind: "rect";
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      color?: string;
+      fill?: string;
+      label?: string;
+    }
+  | { kind: "polygon"; points: [number, number][]; color?: string; fill?: string; label?: string }
+  | {
+      kind: "angle";
+      vertex: [number, number];
+      a: [number, number];
+      b: [number, number];
+      label?: string;
+    }
+  | {
+      kind: "numberLine";
+      min: number;
+      max: number;
+      step: number;
+      marks?: number[];
+      highlight?: number;
+    }
+  | { kind: "point"; x: number; y: number; label?: string; color?: string }
+  | { kind: "text"; x: number; y: number; text: string; color?: string; fontSize?: number };
 
 export interface GeometryCanvasProps {
   width: number;
@@ -51,7 +87,7 @@ export function GeometryCanvas({
   shapes,
   grid = false,
   axes = false,
-  background = '#FFFFFF',
+  background = "#FFFFFF",
   style,
 }: GeometryCanvasProps) {
   const gridLines = useMemo(() => {
@@ -59,10 +95,14 @@ export function GeometryCanvas({
     const step = 20;
     const lines: React.ReactNode[] = [];
     for (let x = 0; x <= width; x += step) {
-      lines.push(<Line key={`vx-${x}`} x1={x} y1={0} x2={x} y2={height} stroke="#E5E7EB" strokeWidth={1} />);
+      lines.push(
+        <Line key={`vx-${x}`} x1={x} y1={0} x2={x} y2={height} stroke="#E5E7EB" strokeWidth={1} />,
+      );
     }
     for (let y = 0; y <= height; y += step) {
-      lines.push(<Line key={`hy-${y}`} x1={0} y1={y} x2={width} y2={y} stroke="#E5E7EB" strokeWidth={1} />);
+      lines.push(
+        <Line key={`hy-${y}`} x1={0} y1={y} x2={width} y2={y} stroke="#E5E7EB" strokeWidth={1} />,
+      );
     }
     if (axes) {
       const midX = Math.round(width / 2);
@@ -87,7 +127,7 @@ export function GeometryCanvas({
 
 function renderShape(shape: GeometryShape, key: number): React.ReactNode {
   switch (shape.kind) {
-    case 'line':
+    case "line":
       return (
         <G key={key}>
           <Line
@@ -111,7 +151,7 @@ function renderShape(shape: GeometryShape, key: number): React.ReactNode {
           ) : null}
         </G>
       );
-    case 'segment':
+    case "segment":
       return (
         <Line
           key={key}
@@ -121,10 +161,10 @@ function renderShape(shape: GeometryShape, key: number): React.ReactNode {
           y2={shape.to[1]}
           stroke={shape.color || colors.primary}
           strokeWidth={2}
-          strokeDasharray={shape.dashed ? '6,4' : undefined}
+          strokeDasharray={shape.dashed ? "6,4" : undefined}
         />
       );
-    case 'circle':
+    case "circle":
       return (
         <G key={key}>
           <Circle
@@ -133,7 +173,7 @@ function renderShape(shape: GeometryShape, key: number): React.ReactNode {
             r={shape.r}
             stroke={shape.color || colors.primary}
             strokeWidth={2}
-            fill={shape.fill || 'transparent'}
+            fill={shape.fill || "transparent"}
           />
           {shape.label ? (
             <SvgText
@@ -149,7 +189,7 @@ function renderShape(shape: GeometryShape, key: number): React.ReactNode {
           ) : null}
         </G>
       );
-    case 'rect':
+    case "rect":
       return (
         <G key={key}>
           <Rect
@@ -159,7 +199,7 @@ function renderShape(shape: GeometryShape, key: number): React.ReactNode {
             height={shape.height}
             stroke={shape.color || colors.primary}
             strokeWidth={2}
-            fill={shape.fill || 'transparent'}
+            fill={shape.fill || "transparent"}
           />
           {shape.label ? (
             <SvgText
@@ -175,17 +215,17 @@ function renderShape(shape: GeometryShape, key: number): React.ReactNode {
           ) : null}
         </G>
       );
-    case 'polygon':
+    case "polygon":
       return (
         <Polygon
           key={key}
-          points={shape.points.map(([x, y]) => `${x},${y}`).join(' ')}
+          points={shape.points.map(([x, y]) => `${x},${y}`).join(" ")}
           stroke={shape.color || colors.primary}
           strokeWidth={2}
-          fill={shape.fill || 'transparent'}
+          fill={shape.fill || "transparent"}
         />
       );
-    case 'angle': {
+    case "angle": {
       const { vertex, a, b, label } = shape;
       return (
         <G key={key}>
@@ -196,19 +236,14 @@ function renderShape(shape: GeometryShape, key: number): React.ReactNode {
             fill="none"
           />
           {label ? (
-            <SvgText
-              x={vertex[0] + 12}
-              y={vertex[1] - 4}
-              fontSize={12}
-              fill={colors.text}
-            >
+            <SvgText x={vertex[0] + 12} y={vertex[1] - 4} fontSize={12} fill={colors.text}>
               {label}
             </SvgText>
           ) : null}
         </G>
       );
     }
-    case 'numberLine': {
+    case "numberLine": {
       const { min, max, step, marks, highlight } = shape;
       const padding = 20;
       // Use an inline viewport-relative coordinate system: callers may
@@ -222,8 +257,23 @@ function renderShape(shape: GeometryShape, key: number): React.ReactNode {
         const x = xAt(v);
         const isMark = marks?.includes(v);
         ticks.push(
-          <Line key={`t-${v}`} x1={x} y1={y - 6} x2={x} y2={y + 6} stroke={colors.text} strokeWidth={isMark ? 2 : 1} />,
-          <SvgText key={`tx-${v}`} x={x} y={y + 22} fontSize={10} fill={colors.text} textAnchor="middle">
+          <Line
+            key={`t-${v}`}
+            x1={x}
+            y1={y - 6}
+            x2={x}
+            y2={y + 6}
+            stroke={colors.text}
+            strokeWidth={isMark ? 2 : 1}
+          />,
+          <SvgText
+            key={`tx-${v}`}
+            x={x}
+            y={y + 22}
+            fontSize={10}
+            fill={colors.text}
+            textAnchor="middle"
+          >
             {v}
           </SvgText>,
         );
@@ -238,7 +288,7 @@ function renderShape(shape: GeometryShape, key: number): React.ReactNode {
         </G>
       );
     }
-    case 'point':
+    case "point":
       return (
         <G key={key}>
           <Circle cx={shape.x} cy={shape.y} r={5} fill={shape.color || colors.primary} />
@@ -249,7 +299,7 @@ function renderShape(shape: GeometryShape, key: number): React.ReactNode {
           ) : null}
         </G>
       );
-    case 'text':
+    case "text":
       return (
         <SvgText
           key={key}
@@ -269,7 +319,7 @@ function renderShape(shape: GeometryShape, key: number): React.ReactNode {
 const styles = StyleSheet.create({
   container: {
     borderRadius: radius.xl,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
     borderColor: colors.border,
   },

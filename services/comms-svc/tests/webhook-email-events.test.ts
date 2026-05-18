@@ -79,11 +79,10 @@ test("verifies Mailgun timestamp+token signature", () => {
   const secret = "key-mg";
   const timestamp = "1700000000";
   const token = "tok-abc";
-  const signature = createHmac("sha256", secret).update(timestamp + token).digest("hex");
-  assert.equal(
-    verifyMailgunSignature({ timestamp, token, signature }, secret),
-    true,
-  );
+  const signature = createHmac("sha256", secret)
+    .update(timestamp + token)
+    .digest("hex");
+  assert.equal(verifyMailgunSignature({ timestamp, token, signature }, secret), true);
   assert.equal(
     verifyMailgunSignature({ timestamp, token, signature: "0".repeat(64) }, secret),
     false,

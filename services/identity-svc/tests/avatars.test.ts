@@ -10,12 +10,8 @@ import sharp from "sharp";
 const tmpRoot = await fs.mkdtemp(path.join(os.tmpdir(), "avatar-test-"));
 process.env.AVATAR_STORAGE_DIR = tmpRoot;
 
-const {
-  processAndStoreAvatar,
-  deleteAvatarsFor,
-  AvatarValidationError,
-  AVATAR_MAX_BYTES,
-} = await import("../src/lib/avatar-storage.ts");
+const { processAndStoreAvatar, deleteAvatarsFor, AvatarValidationError, AVATAR_MAX_BYTES } =
+  await import("../src/lib/avatar-storage.ts");
 
 async function makePngBuffer(size = 400) {
   return await sharp({
@@ -94,8 +90,7 @@ test("processAndStoreAvatar rejects non-image bytes", async () => {
       buffer: Buffer.from("this is not an image, just text"),
       mimetype: "image/png",
     }),
-    (err: any) =>
-      err instanceof AvatarValidationError && err.code === "invalid_image",
+    (err: any) => err instanceof AvatarValidationError && err.code === "invalid_image",
   );
 });
 

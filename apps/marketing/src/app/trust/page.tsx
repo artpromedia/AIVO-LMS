@@ -22,7 +22,8 @@ export default function TrustPage() {
       sections={[
         {
           title: "Product safety principles",
-          content: "AIVO is built for children, including learners under 13. Safety is not a feature — it is the operating constraint.",
+          content:
+            "AIVO is built for children, including learners under 13. Safety is not a feature — it is the operating constraint.",
           list: [
             "We never show third-party advertisements on learner surfaces.",
             "We do not sell or rent learner or family data to anyone.",

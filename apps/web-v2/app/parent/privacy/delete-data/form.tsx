@@ -21,7 +21,7 @@ export function DeleteRequestForm({ learners }: { learners: LearnerOpt[] }) {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (confirm !== "DELETE") {
-      setError('Type DELETE to confirm.');
+      setError("Type DELETE to confirm.");
       return;
     }
     setBusy(true);

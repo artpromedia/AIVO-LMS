@@ -49,14 +49,7 @@ export type ReadinessState =
   | "active_learning";
 
 export type ComfortLevel = "new" | "growing" | "confident" | "advanced";
-export type GradeBand =
-  | "preK"
-  | "K"
-  | "1-2"
-  | "3-5"
-  | "6-8"
-  | "9-12"
-  | "post_secondary";
+export type GradeBand = "preK" | "K" | "1-2" | "3-5" | "6-8" | "9-12" | "post_secondary";
 export type AgeRange = "3-5" | "5-7" | "7-9" | "9-11" | "11-13" | "13-15" | "15-18";
 
 export type LearnerAccessibilityDefaults = {
@@ -261,12 +254,7 @@ export type LearnerBrainProfileState = {
    * planner. Mirrors `brain-svc` enum (STANDARD, SUPPORTED, LOW_VERBAL,
    * NON_VERBAL, PRE_SYMBOLIC).
    */
-  functioningLevel:
-    | "STANDARD"
-    | "SUPPORTED"
-    | "LOW_VERBAL"
-    | "NON_VERBAL"
-    | "PRE_SYMBOLIC";
+  functioningLevel: "STANDARD" | "SUPPORTED" | "LOW_VERBAL" | "NON_VERBAL" | "PRE_SYMBOLIC";
   /** Per-subject mastery as a normalised score in [0, 1]. Keyed by subjectId. */
   masteryLevels: Record<string, number>;
   /** Raw, parent-/IEP-reported signals fed into the clone. */
@@ -323,10 +311,7 @@ export type BrainProfileCloneStage = "pre_clone" | "cloned" | "approved";
  *   amended               — parent accepted with overrides; their overrides
  *                           are persisted on top of the original clone.
  */
-export type BrainProfileApprovalStatus =
-  | "pending_parent_review"
-  | "approved"
-  | "amended";
+export type BrainProfileApprovalStatus = "pending_parent_review" | "approved" | "amended";
 
 export type LearnerBrainProfile = {
   id: ID;
@@ -435,11 +420,7 @@ export type SkillMastery = {
 };
 
 // ===== Baseline (Sprint 8) =====
-export type BaselineDifficulty =
-  | "foundational"
-  | "approaching"
-  | "grade_level"
-  | "stretch";
+export type BaselineDifficulty = "foundational" | "approaching" | "grade_level" | "stretch";
 
 export type BaselineAssessment = {
   id: ID;
@@ -501,11 +482,7 @@ export type BaselineAttempt = {
 };
 
 // ===== Learning Path (Sprint 9) =====
-export type LearningPathNodeKind =
-  | "first_skill"
-  | "next_unmastered"
-  | "review"
-  | "stretch";
+export type LearningPathNodeKind = "first_skill" | "next_unmastered" | "review" | "stretch";
 
 export type LearningPathNode = {
   id: ID;
@@ -565,17 +542,8 @@ export type LessonContextSnapshot = {
   ageRange: AgeRange | null;
   gradeBand: GradeBand | null;
   primaryLanguage: string | null;
-  preferredModalities: (
-    | "visual"
-    | "auditory"
-    | "kinesthetic"
-    | "reading_writing"
-  )[];
-  tutorStyle:
-    | "warm_coach"
-    | "playful_friend"
-    | "calm_guide"
-    | "structured_mentor";
+  preferredModalities: ("visual" | "auditory" | "kinesthetic" | "reading_writing")[];
+  tutorStyle: "warm_coach" | "playful_friend" | "calm_guide" | "structured_mentor";
 };
 
 export type LessonMasterySnapshot = {
@@ -1026,12 +994,7 @@ export type DisclosureLog = {
 };
 
 export type PrivacyRequestKind = "export" | "delete" | "rectify" | "restrict";
-export type PrivacyRequestStatus =
-  | "pending"
-  | "approved"
-  | "in_progress"
-  | "completed"
-  | "denied";
+export type PrivacyRequestStatus = "pending" | "approved" | "in_progress" | "completed" | "denied";
 
 export type DataExportRequest = {
   id: ID;
@@ -1449,12 +1412,7 @@ export type AudioAsset = {
   createdAt: ISODate;
 };
 
-export type TTSGenerationJobStatus =
-  | "queued"
-  | "running"
-  | "completed"
-  | "failed"
-  | "cached_hit";
+export type TTSGenerationJobStatus = "queued" | "running" | "completed" | "failed" | "cached_hit";
 
 export type TTSGenerationJob = {
   id: ID;
@@ -1594,7 +1552,12 @@ export type Enrollment = {
   createdAt: ISODate;
 };
 
-export type RosterImportSource = "csv" | "oneroster_v1p1" | "oneroster_v1p2" | "clever" | "classlink";
+export type RosterImportSource =
+  | "csv"
+  | "oneroster_v1p1"
+  | "oneroster_v1p2"
+  | "clever"
+  | "classlink";
 export type RosterImportStatus = "queued" | "running" | "completed" | "failed" | "dry_run";
 
 export type RosterImportJob = {
@@ -1881,7 +1844,12 @@ export type MigrationRecord = {
 
 // ===== Sprint 31: Security / SOC 2 / Privacy law matrix / Incident response =====
 
-export type TrustServicesCriterion = "security" | "availability" | "processing_integrity" | "confidentiality" | "privacy";
+export type TrustServicesCriterion =
+  | "security"
+  | "availability"
+  | "processing_integrity"
+  | "confidentiality"
+  | "privacy";
 export type ControlStatus = "implemented" | "partial" | "not_started" | "not_applicable";
 export type SecurityControl = {
   id: ID;
@@ -1957,7 +1925,14 @@ export type VendorRiskTier = "tier1" | "tier2" | "tier3";
 export type Vendor = {
   id: ID;
   name: string;
-  category: "llm_provider" | "tts_provider" | "infra" | "analytics" | "support" | "billing" | "other";
+  category:
+    | "llm_provider"
+    | "tts_provider"
+    | "infra"
+    | "analytics"
+    | "support"
+    | "billing"
+    | "other";
   /** Where the vendor processes data, e.g. "US", "EU", "Global". */
   dataResidency: string;
   /** True if the vendor processes learner data. Drives subprocessor disclosure. */
@@ -2013,7 +1988,13 @@ export type VulnerabilityReport = {
   severity: VulnerabilitySeverity;
   status: VulnerabilityStatus;
   /** Where the finding came from. */
-  source: "dependency_scan" | "container_scan" | "iac_scan" | "pen_test" | "external_report" | "internal";
+  source:
+    | "dependency_scan"
+    | "container_scan"
+    | "iac_scan"
+    | "pen_test"
+    | "external_report"
+    | "internal";
   affectedComponent: string;
   /** Free-form, e.g. ">=1.2.3" or "patched in 4.5.0". */
   fixedIn: string | null;
@@ -2104,12 +2085,7 @@ export type Coupon = {
   createdAt: ISODate;
 };
 
-export type DailyBillingBatchStatus =
-  | "scheduled"
-  | "running"
-  | "success"
-  | "partial"
-  | "failed";
+export type DailyBillingBatchStatus = "scheduled" | "running" | "success" | "partial" | "failed";
 
 export type DailyBillingBatch = {
   id: ID;
@@ -2210,12 +2186,7 @@ export type LearnerBadge = {
   earnedAt: ISODate;
 };
 
-export type SensoryModality =
-  | "visual"
-  | "auditory"
-  | "tactile"
-  | "vestibular"
-  | "proprioception";
+export type SensoryModality = "visual" | "auditory" | "tactile" | "vestibular" | "proprioception";
 
 export type SensoryResponse = "hyper" | "neutral" | "hypo" | "unknown";
 

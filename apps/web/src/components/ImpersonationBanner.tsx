@@ -19,7 +19,9 @@ export function ImpersonationBanner() {
       <Eye className="w-4 h-4" strokeWidth={2.5} aria-hidden />
       <span>
         Viewing as <strong>{user.name}</strong> ({user.role.replace(/_/g, " ")})
-        {originalAdmin && <span className="opacity-80"> &middot; Logged in as {originalAdmin.name}</span>}
+        {originalAdmin && (
+          <span className="opacity-80"> &middot; Logged in as {originalAdmin.name}</span>
+        )}
       </span>
       <button
         onClick={handleExit}

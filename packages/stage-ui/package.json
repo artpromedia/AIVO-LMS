@@ -17,7 +17,10 @@
       "default": "./dist/native/index.js"
     }
   },
-  "files": ["dist", "package.json"],
+  "files": [
+    "dist",
+    "package.json"
+  ],
   "scripts": {
     "build": "tsc",
     "prepare": "tsc"
@@ -28,8 +31,12 @@
     "lucide-react": ">=0.400.0"
   },
   "peerDependenciesMeta": {
-    "react-native": { "optional": true },
-    "lucide-react": { "optional": true }
+    "react-native": {
+      "optional": true
+    },
+    "lucide-react": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/react": "^18.3.0",

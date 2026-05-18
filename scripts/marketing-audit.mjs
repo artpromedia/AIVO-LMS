@@ -94,13 +94,7 @@ if (!existsSync(layoutPath)) {
   errors.push("apps/marketing/src/app/layout.tsx missing.");
 } else {
   const src = readFileSync(layoutPath, "utf8");
-  for (const required of [
-    "metadata",
-    "metadataBase",
-    "openGraph",
-    "twitter",
-    "alternates",
-  ]) {
+  for (const required of ["metadata", "metadataBase", "openGraph", "twitter", "alternates"]) {
     const re = new RegExp(`${required}\\s*:`);
     if (!re.test(src)) {
       errors.push(`layout.tsx: metadata.${required} not declared.`);

@@ -1,16 +1,16 @@
-import { Platform } from 'react-native';
+import { Platform } from "react-native";
 
-const TOKEN_KEY = 'aivo_access_token';
-const MUST_CHANGE_PASSWORD_KEY = 'aivo_must_change_password';
+const TOKEN_KEY = "aivo_access_token";
+const MUST_CHANGE_PASSWORD_KEY = "aivo_must_change_password";
 
-let SecureStore: typeof import('expo-secure-store') | null = null;
-if (Platform.OS !== 'web') {
+let SecureStore: typeof import("expo-secure-store") | null = null;
+if (Platform.OS !== "web") {
   // eslint-disable-next-line @typescript-eslint/no-require-imports -- conditional native module load on non-web platforms
-  SecureStore = require('expo-secure-store');
+  SecureStore = require("expo-secure-store");
 }
 
 export async function getToken(): Promise<string | null> {
-  if (Platform.OS === 'web') {
+  if (Platform.OS === "web") {
     try {
       return localStorage.getItem(TOKEN_KEY);
     } catch {
@@ -21,7 +21,7 @@ export async function getToken(): Promise<string | null> {
 }
 
 export async function setToken(token: string): Promise<void> {
-  if (Platform.OS === 'web') {
+  if (Platform.OS === "web") {
     try {
       localStorage.setItem(TOKEN_KEY, token);
     } catch {}
@@ -31,7 +31,7 @@ export async function setToken(token: string): Promise<void> {
 }
 
 export async function clearTokens(): Promise<void> {
-  if (Platform.OS === 'web') {
+  if (Platform.OS === "web") {
     try {
       localStorage.removeItem(TOKEN_KEY);
       localStorage.removeItem(MUST_CHANGE_PASSWORD_KEY);
@@ -48,8 +48,8 @@ export async function clearTokens(): Promise<void> {
  * derived from the JWT) because the JWT does not carry this claim.
  */
 export async function setMustChangePassword(value: boolean): Promise<void> {
-  const v = value ? '1' : '0';
-  if (Platform.OS === 'web') {
+  const v = value ? "1" : "0";
+  if (Platform.OS === "web") {
     try {
       localStorage.setItem(MUST_CHANGE_PASSWORD_KEY, v);
     } catch {}
@@ -59,15 +59,15 @@ export async function setMustChangePassword(value: boolean): Promise<void> {
 }
 
 export async function getMustChangePassword(): Promise<boolean> {
-  if (Platform.OS === 'web') {
+  if (Platform.OS === "web") {
     try {
-      return localStorage.getItem(MUST_CHANGE_PASSWORD_KEY) === '1';
+      return localStorage.getItem(MUST_CHANGE_PASSWORD_KEY) === "1";
     } catch {
       return false;
     }
   }
   const v = await SecureStore!.getItemAsync(MUST_CHANGE_PASSWORD_KEY);
-  return v === '1';
+  return v === "1";
 }
 
 interface FetchOptions extends RequestInit {
@@ -98,12 +98,12 @@ let inFlightRefresh: Promise<string | null> | null = null;
 export async function refreshAccessToken(): Promise<string | null> {
   if (inFlightRefresh) return inFlightRefresh;
   // Lazy import to avoid a circular dep with @/constants/api at module init.
-  const { API } = await import('@/constants/api');
+  const { API } = await import("@/constants/api");
   inFlightRefresh = (async () => {
     try {
       const res = await fetch(`${API.IDENTITY}/api/auth/refresh`, {
-        method: 'POST',
-        credentials: 'include',
+        method: "POST",
+        credentials: "include",
       });
       if (!res.ok) {
         // Refresh failed — clear any stale local state so the next render
@@ -123,7 +123,7 @@ export async function refreshAccessToken(): Promise<string | null> {
       await setToken(data.accessToken);
       // Mirror the login/verify-mfa flows — keep the SecureStore-backed
       // mustChangePassword flag in sync with the latest server response.
-      if (typeof data.mustChangePassword === 'boolean') {
+      if (typeof data.mustChangePassword === "boolean") {
         await setMustChangePassword(data.mustChangePassword);
       }
       return data.accessToken;
@@ -139,7 +139,7 @@ export async function refreshAccessToken(): Promise<string | null> {
 export async function apiFetch(
   baseUrl: string,
   path: string,
-  options: FetchOptions = {}
+  options: FetchOptions = {},
 ): Promise<Response> {
   const { skipAuth, skipRefreshRetry, ...fetchOptions } = options;
   const callerHeaders = (fetchOptions.headers as Record<string, string>) || {};
@@ -152,18 +152,17 @@ export async function apiFetch(
   // overwritten by `application/json`).
   const hasBody = fetchOptions.body != null;
   const hasContentTypeHeader = Object.keys(callerHeaders).some(
-    (k) => k.toLowerCase() === 'content-type'
+    (k) => k.toLowerCase() === "content-type",
   );
-  const isFormData =
-    typeof FormData !== 'undefined' && fetchOptions.body instanceof FormData;
+  const isFormData = typeof FormData !== "undefined" && fetchOptions.body instanceof FormData;
   if (hasBody && !hasContentTypeHeader && !isFormData) {
-    headers['Content-Type'] = 'application/json';
+    headers["Content-Type"] = "application/json";
   }
 
   if (!skipAuth) {
     const token = await getToken();
     if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+      headers["Authorization"] = `Bearer ${token}`;
     }
   }
 
@@ -191,10 +190,10 @@ export async function apiFetch(
 
 export function decodeJWT(token: string): Record<string, unknown> | null {
   try {
-    const parts = token.split('.');
+    const parts = token.split(".");
     if (parts.length !== 3) return null;
     const payload = parts[1];
-    const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+    const decoded = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
     return JSON.parse(decoded);
   } catch {
     return null;

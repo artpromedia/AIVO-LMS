@@ -31,7 +31,10 @@ test("issueStepUpChallenge produces a verifiable challenge token bound to user+s
 test("verifyStepUpChallengeToken rejects subject mismatch", async () => {
   const { challengeToken } = await issueStepUpChallenge(USER, "tenant:suspend", "email");
   await assert.rejects(
-    verifyStepUpChallengeToken(challengeToken, { sub: "00000000-0000-0000-0000-000000000000", scope: "tenant:suspend" }),
+    verifyStepUpChallengeToken(challengeToken, {
+      sub: "00000000-0000-0000-0000-000000000000",
+      scope: "tenant:suspend",
+    }),
     /subject mismatch/i,
   );
 });
@@ -60,8 +63,13 @@ test("requireStepUp is a no-op when ADMIN_ENTERPRISE_STEP_UP_AUTH=false", async 
   const handler = requireStepUp("user:delete");
   let statusCalled = false;
   const reply = {
-    status() { statusCalled = true; return this; },
-    send() { return this; },
+    status() {
+      statusCalled = true;
+      return this;
+    },
+    send() {
+      return this;
+    },
   };
   const req: any = { headers: {}, user: { sub: USER.sub } };
   await handler(req, reply);
@@ -79,8 +87,14 @@ test("requireStepUp rejects when flag is on, no header is present", async () => 
     const handler = requireStepUp("user:delete");
     let captured: { status?: number; body?: any } = {};
     const reply = {
-      status(s: number) { captured.status = s; return this; },
-      send(b: any) { captured.body = b; return this; },
+      status(s: number) {
+        captured.status = s;
+        return this;
+      },
+      send(b: any) {
+        captured.body = b;
+        return this;
+      },
     };
     const req: any = { headers: {}, user: { sub: USER.sub } };
     await handler(req, reply);
@@ -101,8 +115,13 @@ test("requireStepUp accepts a valid step-up token with matching scope+sub", asyn
     const handler = requireStepUp("tenant:suspend");
     let statusCalled = false;
     const reply = {
-      status() { statusCalled = true; return this; },
-      send() { return this; },
+      status() {
+        statusCalled = true;
+        return this;
+      },
+      send() {
+        return this;
+      },
     };
     const req: any = {
       headers: { "x-step-up-token": stepUpToken },
@@ -125,8 +144,14 @@ test("requireStepUp rejects token issued for a different scope", async () => {
     const handler = requireStepUp("tenant:suspend");
     let captured: { status?: number; body?: any } = {};
     const reply = {
-      status(s: number) { captured.status = s; return this; },
-      send(b: any) { captured.body = b; return this; },
+      status(s: number) {
+        captured.status = s;
+        return this;
+      },
+      send(b: any) {
+        captured.body = b;
+        return this;
+      },
     };
     const req: any = {
       headers: { "x-step-up-token": stepUpToken },
@@ -149,8 +174,14 @@ test("requireStepUp rejects token issued for a different subject", async () => {
     const handler = requireStepUp("user:delete");
     let captured: { status?: number; body?: any } = {};
     const reply = {
-      status(s: number) { captured.status = s; return this; },
-      send(b: any) { captured.body = b; return this; },
+      status(s: number) {
+        captured.status = s;
+        return this;
+      },
+      send(b: any) {
+        captured.body = b;
+        return this;
+      },
     };
     const req: any = {
       headers: { "x-step-up-token": stepUpToken },
@@ -166,10 +197,18 @@ test("requireStepUp rejects token issued for a different subject", async () => {
 
 test("selectFactor returns null for missing user (smoke against fake db)", async () => {
   const fakeDb = {
-    select() { return this; },
-    from() { return this; },
-    where() { return this; },
-    async limit() { return []; },
+    select() {
+      return this;
+    },
+    from() {
+      return this;
+    },
+    where() {
+      return this;
+    },
+    async limit() {
+      return [];
+    },
   };
   const f = await selectFactor(fakeDb as any, "missing-user");
   assert.equal(f, null);

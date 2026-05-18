@@ -1,11 +1,7 @@
 import type { Metadata } from "next";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { SITE_URL } from "@/lib/constants";
-import {
-  NumberedSteps,
-  CalloutCard,
-  MockupShowcase,
-} from "@/components/marketing/sections";
+import { NumberedSteps, CalloutCard, MockupShowcase } from "@/components/marketing/sections";
 
 const TITLE = "LessonRun · The personalized learning unit behind every AIVO lesson";
 const DESCRIPTION =
@@ -25,11 +21,17 @@ export const metadata: Metadata = {
 };
 
 const FLOW = [
-  { title: "Intro", body: "Tutor greets the learner, sets the goal, and frames the run in plain language." },
+  {
+    title: "Intro",
+    body: "Tutor greets the learner, sets the goal, and frames the run in plain language.",
+  },
   { title: "Step", body: "Short, focused instructional step — sized for working memory." },
   { title: "Check", body: "A small check for understanding, never a high-stakes quiz item." },
   { title: "Adapt", body: "Hints, scaffolds, or a re-teach appear based on the check result." },
-  { title: "Mastery update", body: "The learner's mastery state updates — feeding Today's Mission and the parent summary." },
+  {
+    title: "Mastery update",
+    body: "The learner's mastery state updates — feeding Today's Mission and the parent summary.",
+  },
 ];
 
 export default function Page() {
@@ -69,7 +71,10 @@ export default function Page() {
         mockup={
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <div className="h-7 w-7 rounded-full bg-gradient-to-br from-purple-600 to-blue-600" aria-hidden />
+              <div
+                className="h-7 w-7 rounded-full bg-gradient-to-br from-purple-600 to-blue-600"
+                aria-hidden
+              />
               <p className="text-sm font-bold text-slate-900">Atlas</p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3 text-sm text-slate-700">
@@ -104,8 +109,7 @@ export default function Page() {
         mockup={
           <div className="space-y-3">
             <div className="rounded-xl bg-purple-50 p-3 text-sm text-slate-700 border border-purple-100">
-              Try counting on your fingers: 3 · 6 · ? — what number comes
-              three more than 6?
+              Try counting on your fingers: 3 · 6 · ? — what number comes three more than 6?
             </div>
             <div className="flex justify-between text-xs text-slate-500">
               <span>🔊 Read this aloud</span>
@@ -130,15 +134,13 @@ export default function Page() {
         body={
           <>
             <p>
-              When a learner needs a moment, Break Mode steps in with a calm
-              transition screen. No timer pressure, no scolding, no “you
-              lost your streak.” The LessonRun pauses cleanly and resumes
-              where the learner left off.
+              When a learner needs a moment, Break Mode steps in with a calm transition screen. No
+              timer pressure, no scolding, no “you lost your streak.” The LessonRun pauses cleanly
+              and resumes where the learner left off.
             </p>
             <p className="mt-3 text-sm text-slate-600">
-              Break Mode can be auto-triggered by the learner's profile,
-              suggested by AIVO when signals call for it, or chosen by the
-              learner at any time.
+              Break Mode can be auto-triggered by the learner's profile, suggested by AIVO when
+              signals call for it, or chosen by the learner at any time.
             </p>
           </>
         }
@@ -201,10 +203,7 @@ export default function Page() {
                 "Reading · used read-aloud 12 min",
                 "Took 1 break · returned to finish",
               ].map((r) => (
-                <div
-                  key={r}
-                  className="rounded-lg bg-slate-50 p-2 text-xs text-slate-700"
-                >
+                <div key={r} className="rounded-lg bg-slate-50 p-2 text-xs text-slate-700">
                   {r}
                 </div>
               ))}

@@ -21,7 +21,8 @@ const schemaDir = path.join(repoDb, "src", "schema");
 const migrationsDir = path.join(repoDb, "drizzle");
 
 function listFiles(dir: string, ext: string): string[] {
-  return fs.readdirSync(dir)
+  return fs
+    .readdirSync(dir)
     .filter((f) => f.endsWith(ext))
     .map((f) => path.join(dir, f));
 }
@@ -67,14 +68,20 @@ function main(): void {
   const corpus = loadMigrationCorpus();
   const missing = declared.filter((d) => !migrationHasCreateTable(corpus, d.name));
   if (missing.length === 0) {
-    console.log(`[check:schema-drift] OK — ${declared.length} pgTable() declarations all have a CREATE TABLE in packages/db/drizzle/.`);
+    console.log(
+      `[check:schema-drift] OK — ${declared.length} pgTable() declarations all have a CREATE TABLE in packages/db/drizzle/.`,
+    );
     return;
   }
-  console.error("[check:schema-drift] FAIL — these tables are declared in packages/db/src/schema/ but never created by a migration:");
+  console.error(
+    "[check:schema-drift] FAIL — these tables are declared in packages/db/src/schema/ but never created by a migration:",
+  );
   for (const m of missing) {
     console.error(`  - ${m.name}  (declared in ${m.schemaFile})`);
   }
-  console.error("\nFix by adding the table to a migration (drizzle-kit generate) or by removing the unused pgTable() declaration.");
+  console.error(
+    "\nFix by adding the table to a migration (drizzle-kit generate) or by removing the unused pgTable() declaration.",
+  );
   process.exit(1);
 }
 

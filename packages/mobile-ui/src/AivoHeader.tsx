@@ -1,8 +1,8 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { theme } from './theme';
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { theme } from "./theme";
 
 interface AivoHeaderProps {
   title: string;
@@ -22,8 +22,14 @@ export function AivoHeader({ title, subtitle, rightAction, leftAction }: AivoHea
       <View style={styles.row}>
         {leftAction && <View style={styles.action}>{leftAction}</View>}
         <View style={styles.titleContainer}>
-          <Text style={styles.title} numberOfLines={1}>{title}</Text>
-          {subtitle && <Text style={styles.subtitle} numberOfLines={1}>{subtitle}</Text>}
+          <Text style={styles.title} numberOfLines={1}>
+            {title}
+          </Text>
+          {subtitle && (
+            <Text style={styles.subtitle} numberOfLines={1}>
+              {subtitle}
+            </Text>
+          )}
         </View>
         {rightAction && <View style={styles.action}>{rightAction}</View>}
       </View>
@@ -37,8 +43,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.md,
   },
   row: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   titleContainer: {
     flex: 1,
@@ -46,12 +52,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontFamily: theme.fonts.heading,
-    color: '#FFFFFF',
+    color: "#FFFFFF",
   },
   subtitle: {
     fontSize: 14,
     fontFamily: theme.fonts.body,
-    color: 'rgba(255,255,255,0.8)',
+    color: "rgba(255,255,255,0.8)",
     marginTop: 2,
   },
   action: {

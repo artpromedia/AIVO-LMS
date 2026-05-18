@@ -24,9 +24,7 @@ const validGeometry = {
     prompt: "Find the area of the rectangle.",
     diagram: {
       canvasMode: "svg" as const,
-      shapes: [
-        { id: "rect1", kind: "rectangle" as const, x: 100, y: 80, width: 320, height: 180 },
-      ],
+      shapes: [{ id: "rect1", kind: "rectangle" as const, x: 100, y: 80, width: 320, height: 180 }],
     },
     capture: { finalAnswer: true, inkStrokes: true },
     scoring: { mode: "exact" as const, correctAnswer: 32 },
@@ -76,7 +74,11 @@ test("validateDiscoveryActivity rejects draw activity without ink capture", () =
       prompt: "Draw a line",
       capture: { finalAnswer: true, inkStrokes: false },
       scoring: { mode: "process" as const },
-      accessibility: { altText: "blank surface", reduceMotionSafe: true, keyboardAlternative: true },
+      accessibility: {
+        altText: "blank surface",
+        reduceMotionSafe: true,
+        keyboardAlternative: true,
+      },
     },
   };
   const result = validateDiscoveryActivity(draw);

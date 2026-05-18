@@ -3,13 +3,13 @@ name: Mobile App Release
 on:
   push:
     tags:
-      - 'v*.*.*-mobile'
-      - 'v*.*.*-ios'
-      - 'v*.*.*-android'
+      - "v*.*.*-mobile"
+      - "v*.*.*-ios"
+      - "v*.*.*-android"
   workflow_dispatch:
     inputs:
       platform:
-        description: 'Platform to build'
+        description: "Platform to build"
         required: true
         type: choice
         options:
@@ -17,7 +17,7 @@ on:
           - ios
           - android
       track:
-        description: 'Release track'
+        description: "Release track"
         required: true
         type: choice
         options:
@@ -25,7 +25,7 @@ on:
           - beta
           - production
       version:
-        description: 'Release version (e.g. 1.2.3)'
+        description: "Release version (e.g. 1.2.3)"
         required: true
         type: string
 

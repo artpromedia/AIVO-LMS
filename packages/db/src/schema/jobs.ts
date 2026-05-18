@@ -95,13 +95,10 @@ export type PeriodicJobRun = typeof periodicJobRuns.$inferSelect;
  *   - `lastSeenAt` is bumped on every observation via
  *     `onConflictDoUpdate({ target: jobName, set: { lastSeenAt: now } })`.
  */
-export const freshnessWatchdogDiscoveries = pgTable(
-  "freshness_watchdog_discoveries",
-  {
-    jobName: varchar("job_name", { length: 100 }).primaryKey(),
-    firstSeenAt: timestamp("first_seen_at", { withTimezone: true }).defaultNow().notNull(),
-    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).defaultNow().notNull(),
-  },
-);
+export const freshnessWatchdogDiscoveries = pgTable("freshness_watchdog_discoveries", {
+  jobName: varchar("job_name", { length: 100 }).primaryKey(),
+  firstSeenAt: timestamp("first_seen_at", { withTimezone: true }).defaultNow().notNull(),
+  lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).defaultNow().notNull(),
+});
 
 export type FreshnessWatchdogDiscovery = typeof freshnessWatchdogDiscoveries.$inferSelect;

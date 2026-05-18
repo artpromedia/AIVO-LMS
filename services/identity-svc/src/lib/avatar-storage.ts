@@ -27,8 +27,8 @@ import type { Readable } from "node:stream";
  * S3-compatible bucket later is a one-file change.
  */
 
-const STORAGE_ROOT = process.env.AVATAR_STORAGE_DIR
-  || path.resolve(process.cwd(), "../../data/avatars");
+const STORAGE_ROOT =
+  process.env.AVATAR_STORAGE_DIR || path.resolve(process.cwd(), "../../data/avatars");
 
 const PUBLIC_URL_PREFIX = process.env.AVATAR_PUBLIC_URL_PREFIX || "/api/avatars";
 
@@ -63,11 +63,7 @@ export const AVATAR_STORAGE_ROOT = STORAGE_ROOT;
 export const AVATAR_MAX_BYTES = 5 * 1024 * 1024;
 export const AVATAR_MAIN_SIZE = 256;
 export const AVATAR_THUMB_SIZE = 64;
-export const ALLOWED_MIME = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-]);
+export const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 export class AvatarValidationError extends Error {
   statusCode: number;
@@ -139,11 +135,7 @@ export async function processAndStoreAvatar(opts: {
     pipeline = sharp(buffer, { failOn: "error" }).rotate();
     await pipeline.metadata();
   } catch {
-    throw new AvatarValidationError(
-      "invalid_image",
-      "Uploaded file is not a valid image.",
-      400,
-    );
+    throw new AvatarValidationError("invalid_image", "Uploaded file is not a valid image.", 400);
   }
 
   const main = await sharp(buffer)
@@ -164,30 +156,31 @@ export async function processAndStoreAvatar(opts: {
     .webp({ quality: 80 })
     .toBuffer();
 
-  const hash = createHash("sha1")
-    .update(main)
-    .digest("hex")
-    .slice(0, 16);
+  const hash = createHash("sha1").update(main).digest("hex").slice(0, 16);
   const mainName = `${hash}.webp`;
   const thumbName = `${hash}-thumb.webp`;
 
   const userDir = path.join(STORAGE_ROOT, userId);
   if (S3_ENABLED) {
     const s3 = getS3();
-    await s3.send(new PutObjectCommand({
-      Bucket: S3_BUCKET,
-      Key: `${userId}/${mainName}`,
-      Body: main,
-      ContentType: "image/webp",
-      CacheControl: "public, max-age=604800",
-    }));
-    await s3.send(new PutObjectCommand({
-      Bucket: S3_BUCKET,
-      Key: `${userId}/${thumbName}`,
-      Body: thumb,
-      ContentType: "image/webp",
-      CacheControl: "public, max-age=604800",
-    }));
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: S3_BUCKET,
+        Key: `${userId}/${mainName}`,
+        Body: main,
+        ContentType: "image/webp",
+        CacheControl: "public, max-age=604800",
+      }),
+    );
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: S3_BUCKET,
+        Key: `${userId}/${thumbName}`,
+        Body: thumb,
+        ContentType: "image/webp",
+        CacheControl: "public, max-age=604800",
+      }),
+    );
   } else {
     await ensureDir(userDir);
     await fs.writeFile(path.join(userDir, mainName), main);
@@ -213,16 +206,20 @@ export async function deleteAvatarsFor(userId: string): Promise<void> {
   if (S3_ENABLED) {
     const s3 = getS3();
     try {
-      const list = await s3.send(new ListObjectsV2Command({
-        Bucket: S3_BUCKET,
-        Prefix: `${userId}/`,
-      }));
+      const list = await s3.send(
+        new ListObjectsV2Command({
+          Bucket: S3_BUCKET,
+          Prefix: `${userId}/`,
+        }),
+      );
       const keys = (list.Contents || []).map((o) => ({ Key: o.Key! })).filter((k) => k.Key);
       if (keys.length > 0) {
-        await s3.send(new DeleteObjectsCommand({
-          Bucket: S3_BUCKET,
-          Delete: { Objects: keys, Quiet: true },
-        }));
+        await s3.send(
+          new DeleteObjectsCommand({
+            Bucket: S3_BUCKET,
+            Delete: { Objects: keys, Quiet: true },
+          }),
+        );
       }
     } catch {
       // best-effort
@@ -257,8 +254,14 @@ export async function deletePreviousAvatarUrl(
   if (S3_ENABLED) {
     const s3 = getS3();
     await Promise.all([
-      s3.send(new DeleteObjectCommand({ Bucket: S3_BUCKET, Key: `${userId}/${file}` })).catch(() => undefined),
-      s3.send(new DeleteObjectCommand({ Bucket: S3_BUCKET, Key: `${userId}/${baseName}-thumb.webp` })).catch(() => undefined),
+      s3
+        .send(new DeleteObjectCommand({ Bucket: S3_BUCKET, Key: `${userId}/${file}` }))
+        .catch(() => undefined),
+      s3
+        .send(
+          new DeleteObjectCommand({ Bucket: S3_BUCKET, Key: `${userId}/${baseName}-thumb.webp` }),
+        )
+        .catch(() => undefined),
     ]);
     return;
   }
@@ -266,9 +269,7 @@ export async function deletePreviousAvatarUrl(
     path.join(STORAGE_ROOT, userId, file),
     path.join(STORAGE_ROOT, userId, `${baseName}-thumb.webp`),
   ];
-  await Promise.all(
-    targets.map((p) => fs.rm(p, { force: true }).catch(() => undefined)),
-  );
+  await Promise.all(targets.map((p) => fs.rm(p, { force: true }).catch(() => undefined)));
 }
 
 /**
@@ -282,10 +283,12 @@ export async function getAvatarObjectFromS3(
   if (!S3_ENABLED) return null;
   if (file.includes("..") || file.includes("/")) return null;
   try {
-    const out = await getS3().send(new GetObjectCommand({
-      Bucket: S3_BUCKET,
-      Key: `${userId}/${file}`,
-    }));
+    const out = await getS3().send(
+      new GetObjectCommand({
+        Bucket: S3_BUCKET,
+        Key: `${userId}/${file}`,
+      }),
+    );
     return {
       body: out.Body as Readable,
       contentType: out.ContentType || "image/webp",

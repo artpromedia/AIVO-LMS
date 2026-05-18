@@ -78,9 +78,7 @@ export default async function Page() {
                 {t.icon}
                 {t.label}
               </div>
-              <p className="mt-1 font-display text-3xl font-bold">
-                {t.v.toLocaleString()}
-              </p>
+              <p className="mt-1 font-display text-3xl font-bold">{t.v.toLocaleString()}</p>
             </Card>
           </Link>
         ))}

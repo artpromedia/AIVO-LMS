@@ -63,7 +63,12 @@ export const getAdminUsersByIdSchema = {
   tags: ["Identity"],
   operationId: "getAdminUsersById",
   summary: "GET /api/admin/users/:id",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
 
@@ -71,7 +76,12 @@ export const updateAdminUsersByIdSchema = {
   tags: ["Identity"],
   operationId: "updateAdminUsersById",
   summary: "PUT /api/admin/users/:id",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   body: passthroughObject,
   response: { 200: passthroughObject, 400: errorResponse, 404: errorResponse },
 } as const;
@@ -80,7 +90,12 @@ export const deleteAdminUsersByIdSchema = {
   tags: ["Identity"],
   operationId: "deleteAdminUsersById",
   summary: "DELETE /api/admin/users/:id",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject, 400: errorResponse, 404: errorResponse },
 } as const;
 
@@ -88,7 +103,12 @@ export const adminUsersByIdReactivateSchema = {
   tags: ["Identity"],
   operationId: "adminUsersByIdReactivate",
   summary: "POST /api/admin/users/:id/reactivate",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject, 400: errorResponse, 404: errorResponse },
 } as const;
 
@@ -96,7 +116,12 @@ export const adminUsersByIdResetPasswordSchema = {
   tags: ["Identity"],
   operationId: "adminUsersByIdResetPassword",
   summary: "POST /api/admin/users/:id/reset-password",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
 
@@ -112,7 +137,12 @@ export const getAdminLearnersByIdSchema = {
   tags: ["Identity"],
   operationId: "getAdminLearnersById",
   summary: "GET /api/admin/learners/:id",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
 
@@ -128,7 +158,12 @@ export const getAdminTenantsByIdSchema = {
   tags: ["Identity"],
   operationId: "getAdminTenantsById",
   summary: "GET /api/admin/tenants/:id",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
 
@@ -136,7 +171,12 @@ export const updateAdminTenantsByIdSchema = {
   tags: ["Identity"],
   operationId: "updateAdminTenantsById",
   summary: "PUT /api/admin/tenants/:id",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   body: passthroughObject,
   response: { 200: passthroughObject, 400: errorResponse, 404: errorResponse },
 } as const;
@@ -166,7 +206,12 @@ export const getBrandingPublicByTenantIdSchema = {
   tags: ["Identity"],
   operationId: "getBrandingPublicByTenantId",
   summary: "GET /api/branding/public/:tenantId",
-  params: { type: "object", required: ["tenantId"], additionalProperties: true, properties: { tenantId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["tenantId"],
+    additionalProperties: true,
+    properties: { tenantId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
 
@@ -189,7 +234,12 @@ export const districtAdminsInvitesByIdResendSchema = {
   tags: ["Identity"],
   operationId: "districtAdminsInvitesByIdResend",
   summary: "POST /api/district/admins/invites/:id/resend",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject, 400: errorResponse, 404: errorResponse },
 } as const;
 
@@ -197,7 +247,12 @@ export const deleteDistrictAdminsInvitesByIdSchema = {
   tags: ["Identity"],
   operationId: "deleteDistrictAdminsInvitesById",
   summary: "DELETE /api/district/admins/invites/:id",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject, 400: errorResponse, 404: errorResponse },
 } as const;
 
@@ -205,7 +260,12 @@ export const districtAdminsByIdDeactivateSchema = {
   tags: ["Identity"],
   operationId: "districtAdminsByIdDeactivate",
   summary: "POST /api/district/admins/:id/deactivate",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject, 400: errorResponse, 404: errorResponse },
 } as const;
 
@@ -213,7 +273,12 @@ export const districtAdminsByIdReactivateSchema = {
   tags: ["Identity"],
   operationId: "districtAdminsByIdReactivate",
   summary: "POST /api/district/admins/:id/reactivate",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject, 400: errorResponse, 404: errorResponse },
 } as const;
 
@@ -221,7 +286,12 @@ export const districtAdminsByIdResetPasswordSchema = {
   tags: ["Identity"],
   operationId: "districtAdminsByIdResetPassword",
   summary: "POST /api/district/admins/:id/reset-password",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
 
@@ -274,7 +344,12 @@ export const getDistrictSchoolsByIdSchema = {
   tags: ["Identity"],
   operationId: "getDistrictSchoolsById",
   summary: "GET /api/district/schools/:id",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
 
@@ -282,7 +357,12 @@ export const updateDistrictSchoolsByIdSchema = {
   tags: ["Identity"],
   operationId: "updateDistrictSchoolsById",
   summary: "PUT /api/district/schools/:id",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   body: passthroughObject,
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
@@ -299,7 +379,12 @@ export const getDistrictLearnersByIdSchema = {
   tags: ["Identity"],
   operationId: "getDistrictLearnersById",
   summary: "GET /api/district/learners/:id",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
 
@@ -323,7 +408,12 @@ export const getDistrictStaffByIdSchema = {
   tags: ["Identity"],
   operationId: "getDistrictStaffById",
   summary: "GET /api/district/staff/:id",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
 
@@ -331,7 +421,12 @@ export const updateDistrictStaffByIdSchema = {
   tags: ["Identity"],
   operationId: "updateDistrictStaffById",
   summary: "PUT /api/district/staff/:id",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   body: passthroughObject,
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
@@ -340,7 +435,12 @@ export const deleteDistrictStaffByIdSchema = {
   tags: ["Identity"],
   operationId: "deleteDistrictStaffById",
   summary: "DELETE /api/district/staff/:id",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse, 404: errorResponse },
 } as const;
 
@@ -550,7 +650,12 @@ export const getScimV2UsersByIdSchema = {
   tags: ["Identity"],
   operationId: "getScimV2UsersById",
   summary: "GET /scim/v2/Users/:id",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject },
 } as const;
 
@@ -566,7 +671,12 @@ export const updateScimV2UsersByIdSchema = {
   tags: ["Identity"],
   operationId: "updateScimV2UsersById",
   summary: "PUT /scim/v2/Users/:id",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   body: passthroughObject,
   response: { 200: passthroughObject },
 } as const;
@@ -575,7 +685,12 @@ export const patchScimV2UsersByIdSchema = {
   tags: ["Identity"],
   operationId: "patchScimV2UsersById",
   summary: "PATCH /scim/v2/Users/:id",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   body: passthroughObject,
   response: { 200: passthroughObject },
 } as const;
@@ -584,7 +699,12 @@ export const deleteScimV2UsersByIdSchema = {
   tags: ["Identity"],
   operationId: "deleteScimV2UsersById",
   summary: "DELETE /scim/v2/Users/:id",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject, 204: errorResponse },
 } as const;
 
@@ -599,7 +719,12 @@ export const getScimV2GroupsByIdSchema = {
   tags: ["Identity"],
   operationId: "getScimV2GroupsById",
   summary: "GET /scim/v2/Groups/:id",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject },
 } as const;
 
@@ -607,7 +732,12 @@ export const getSsoSamlBySlugMetadataSchema = {
   tags: ["Identity"],
   operationId: "getSsoSamlBySlugMetadata",
   summary: "GET /api/sso/saml/:slug/metadata",
-  params: { type: "object", required: ["slug"], additionalProperties: true, properties: { slug: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["slug"],
+    additionalProperties: true,
+    properties: { slug: { type: "string" } },
+  },
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
 
@@ -615,7 +745,12 @@ export const getSsoSamlBySlugLoginSchema = {
   tags: ["Identity"],
   operationId: "getSsoSamlBySlugLogin",
   summary: "GET /api/sso/saml/:slug/login",
-  params: { type: "object", required: ["slug"], additionalProperties: true, properties: { slug: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["slug"],
+    additionalProperties: true,
+    properties: { slug: { type: "string" } },
+  },
   querystring: { type: "object", additionalProperties: true, properties: {} },
   response: { 200: passthroughObject, 404: errorResponse, 502: errorResponse },
 } as const;
@@ -624,16 +759,33 @@ export const ssoSamlBySlugAcsSchema = {
   tags: ["Identity"],
   operationId: "ssoSamlBySlugAcs",
   summary: "POST /api/sso/saml/:slug/acs",
-  params: { type: "object", required: ["slug"], additionalProperties: true, properties: { slug: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["slug"],
+    additionalProperties: true,
+    properties: { slug: { type: "string" } },
+  },
   body: passthroughObject,
-  response: { 200: passthroughObject, 400: errorResponse, 401: errorResponse, 403: errorResponse, 404: errorResponse, 409: errorResponse },
+  response: {
+    200: passthroughObject,
+    400: errorResponse,
+    401: errorResponse,
+    403: errorResponse,
+    404: errorResponse,
+    409: errorResponse,
+  },
 } as const;
 
 export const getSsoSamlBySlugSloSchema = {
   tags: ["Identity"],
   operationId: "getSsoSamlBySlugSlo",
   summary: "GET /api/sso/saml/:slug/slo",
-  params: { type: "object", required: ["slug"], additionalProperties: true, properties: { slug: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["slug"],
+    additionalProperties: true,
+    properties: { slug: { type: "string" } },
+  },
   response: { 200: passthroughObject },
 } as const;
 
@@ -641,7 +793,12 @@ export const ssoSamlBySlugSloSchema = {
   tags: ["Identity"],
   operationId: "ssoSamlBySlugSlo",
   summary: "POST /api/sso/saml/:slug/slo",
-  params: { type: "object", required: ["slug"], additionalProperties: true, properties: { slug: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["slug"],
+    additionalProperties: true,
+    properties: { slug: { type: "string" } },
+  },
   response: { 200: passthroughObject },
 } as const;
 
@@ -657,7 +814,12 @@ export const getTestLastMfaCodeByEmailSchema = {
   tags: ["Identity"],
   operationId: "getTestLastMfaCodeByEmail",
   summary: "GET /api/__test__/last-mfa-code/:email",
-  params: { type: "object", required: ["email"], additionalProperties: true, properties: { email: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["email"],
+    additionalProperties: true,
+    properties: { email: { type: "string" } },
+  },
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
 

@@ -31,7 +31,9 @@ export function MfaSettings(_props: { accentColor?: string } = {}) {
   const refresh = useCallback(async () => {
     if (!accessToken) return;
     try {
-      const r = await fetch("/api/auth/mfa/status", { headers: { Authorization: `Bearer ${accessToken}` } });
+      const r = await fetch("/api/auth/mfa/status", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
       const d = await r.json();
       if (r.ok) {
         setStatus({
@@ -46,7 +48,9 @@ export function MfaSettings(_props: { accentColor?: string } = {}) {
     } catch {}
   }, [accessToken]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   const onRecoveryCodes = (codes: string[]) => {
     setPendingCodes(codes);
@@ -55,38 +59,70 @@ export function MfaSettings(_props: { accentColor?: string } = {}) {
 
   const activeMethod = status?.mfaMethod ?? "email";
   const methodLabel =
-    activeMethod === "webauthn" ? "Passkey" :
-    activeMethod === "totp" ? "Authenticator app" :
-    status?.mfaEnabled ? "Email code" : "Off";
-  const methodTone =
-    !status?.mfaEnabled ? "bg-slate-100 text-slate-500" :
-    activeMethod === "webauthn" ? "bg-emerald-100 text-emerald-700" :
-    activeMethod === "totp" ? "bg-violet-100 text-violet-700" :
-    "bg-amber-100 text-amber-700";
+    activeMethod === "webauthn"
+      ? "Passkey"
+      : activeMethod === "totp"
+        ? "Authenticator app"
+        : status?.mfaEnabled
+          ? "Email code"
+          : "Off";
+  const methodTone = !status?.mfaEnabled
+    ? "bg-slate-100 text-slate-500"
+    : activeMethod === "webauthn"
+      ? "bg-emerald-100 text-emerald-700"
+      : activeMethod === "totp"
+        ? "bg-violet-100 text-violet-700"
+        : "bg-amber-100 text-amber-700";
 
   return (
     <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
       <div className="flex items-start justify-between mb-4 gap-3">
         <div>
-          <h2 className="font-heading font-bold text-lg text-slate-900">Two-factor authentication</h2>
-          <p className="text-sm text-slate-500">Protect your account with a second factor at sign-in.</p>
+          <h2 className="font-heading font-bold text-lg text-slate-900">
+            Two-factor authentication
+          </h2>
+          <p className="text-sm text-slate-500">
+            Protect your account with a second factor at sign-in.
+          </p>
         </div>
-        <span className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${methodTone}`}>
+        <span
+          className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${methodTone}`}
+        >
           {methodLabel}
         </span>
       </div>
 
       {status?.mfaForced && (
-        <div role="note" className="flex items-start gap-2 p-3 mb-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800">
-          <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+        <div
+          role="note"
+          className="flex items-start gap-2 p-3 mb-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800"
+        >
+          <svg
+            className="w-4 h-4 mt-0.5 flex-shrink-0"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+            />
           </svg>
-          <p className="text-xs font-semibold">Two-factor authentication is required for your role and cannot be turned off.</p>
+          <p className="text-xs font-semibold">
+            Two-factor authentication is required for your role and cannot be turned off.
+          </p>
         </div>
       )}
 
-      <div role="tablist" aria-label="MFA settings" className="flex gap-1 border-b border-slate-200 mb-4 overflow-x-auto">
-        {(Object.keys(TAB_LABELS) as Tab[]).map(t => (
+      <div
+        role="tablist"
+        aria-label="MFA settings"
+        className="flex gap-1 border-b border-slate-200 mb-4 overflow-x-auto"
+      >
+        {(Object.keys(TAB_LABELS) as Tab[]).map((t) => (
           <button
             key={t}
             role="tab"
@@ -100,10 +136,14 @@ export function MfaSettings(_props: { accentColor?: string } = {}) {
           >
             {TAB_LABELS[t]}
             {t === "passkeys" && status && status.webauthnCount > 0 && (
-              <span className="ml-2 px-1.5 py-0.5 rounded-full text-[10px] bg-slate-100 text-slate-700">{status.webauthnCount}</span>
+              <span className="ml-2 px-1.5 py-0.5 rounded-full text-[10px] bg-slate-100 text-slate-700">
+                {status.webauthnCount}
+              </span>
             )}
             {t === "recovery" && status && (
-              <span className="ml-2 px-1.5 py-0.5 rounded-full text-[10px] bg-slate-100 text-slate-700">{status.recoveryRemaining}</span>
+              <span className="ml-2 px-1.5 py-0.5 rounded-full text-[10px] bg-slate-100 text-slate-700">
+                {status.recoveryRemaining}
+              </span>
             )}
           </button>
         ))}

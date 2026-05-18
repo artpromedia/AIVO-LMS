@@ -39,7 +39,14 @@ export default function Home() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-cyan-50">
       <div>
-        <Image src="/images/aivo-logo-purple.png" alt="AIVO" width={200} height={60} priority style={{ width: "auto", height: "auto" }} />
+        <Image
+          src="/images/aivo-logo-purple.png"
+          alt="AIVO"
+          width={200}
+          height={60}
+          priority
+          style={{ width: "auto", height: "auto" }}
+        />
       </div>
     </div>
   );

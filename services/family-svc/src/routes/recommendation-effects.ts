@@ -106,7 +106,7 @@ async function writeSnapshot(
   recId: string,
   recType: string,
   payload: EffectPayload,
-  patch: Record<string, unknown>
+  patch: Record<string, unknown>,
 ): Promise<string> {
   const snap = {
     masteryLevels: asObject(state.masteryLevels),
@@ -169,9 +169,19 @@ export async function applyRecommendationEffect(args: ApplyArgs): Promise<Effect
         .update(brainStates)
         .set({ activeAccommodations: accommodations, version: newVersion, updatedAt: new Date() })
         .where(eq(brainStates.id, state.id));
-      const snapshotId = await writeSnapshot(db, state, learnerId, newVersion, trigger, recId, recType, payload, {
-        activeAccommodations: accommodations,
-      });
+      const snapshotId = await writeSnapshot(
+        db,
+        state,
+        learnerId,
+        newVersion,
+        trigger,
+        recId,
+        recType,
+        payload,
+        {
+          activeAccommodations: accommodations,
+        },
+      );
       return { applied: true, changedFields: ["active_accommodations"], snapshotId };
     }
     case "accommodation_remove": {
@@ -183,9 +193,19 @@ export async function applyRecommendationEffect(args: ApplyArgs): Promise<Effect
         .update(brainStates)
         .set({ activeAccommodations: next, version: newVersion, updatedAt: new Date() })
         .where(eq(brainStates.id, state.id));
-      const snapshotId = await writeSnapshot(db, state, learnerId, newVersion, trigger, recId, recType, payload, {
-        activeAccommodations: next,
-      });
+      const snapshotId = await writeSnapshot(
+        db,
+        state,
+        learnerId,
+        newVersion,
+        trigger,
+        recId,
+        recType,
+        payload,
+        {
+          activeAccommodations: next,
+        },
+      );
       return { applied: true, changedFields: ["active_accommodations"], snapshotId };
     }
     case "tutor_suggestion": {
@@ -197,9 +217,19 @@ export async function applyRecommendationEffect(args: ApplyArgs): Promise<Effect
         .update(brainStates)
         .set({ activeTutors: tutors, version: newVersion, updatedAt: new Date() })
         .where(eq(brainStates.id, state.id));
-      const snapshotId = await writeSnapshot(db, state, learnerId, newVersion, trigger, recId, recType, payload, {
-        activeTutors: tutors,
-      });
+      const snapshotId = await writeSnapshot(
+        db,
+        state,
+        learnerId,
+        newVersion,
+        trigger,
+        recId,
+        recType,
+        payload,
+        {
+          activeTutors: tutors,
+        },
+      );
       return { applied: true, changedFields: ["active_tutors"], snapshotId };
     }
     case "functioning_level_change": {
@@ -214,16 +244,26 @@ export async function applyRecommendationEffect(args: ApplyArgs): Promise<Effect
         .update(brainStates)
         .set({ functioningLevelProfile: profile, version: newVersion, updatedAt: new Date() })
         .where(eq(brainStates.id, state.id));
-      const snapshotId = await writeSnapshot(db, state, learnerId, newVersion, trigger, recId, recType, payload, {
-        functioningLevelProfile: profile,
-      });
+      const snapshotId = await writeSnapshot(
+        db,
+        state,
+        learnerId,
+        newVersion,
+        trigger,
+        recId,
+        recType,
+        payload,
+        {
+          functioningLevelProfile: profile,
+        },
+      );
       return { applied: true, changedFields: ["functioning_level_profile"], snapshotId };
     }
     case "curriculum_shift": {
       const alignment = asObject(state.curriculumAlignment);
       const subject = String(payload.subject ?? payload.domain ?? "general");
       alignment[subject] = {
-        ...(asObject(alignment[subject])),
+        ...asObject(alignment[subject]),
         curriculumId: payload.curriculumId ?? payload.proposedValue ?? null,
         previousCurriculumId: payload.currentValue ?? null,
         shiftedAt: new Date().toISOString(),
@@ -232,9 +272,19 @@ export async function applyRecommendationEffect(args: ApplyArgs): Promise<Effect
         .update(brainStates)
         .set({ curriculumAlignment: alignment, version: newVersion, updatedAt: new Date() })
         .where(eq(brainStates.id, state.id));
-      const snapshotId = await writeSnapshot(db, state, learnerId, newVersion, trigger, recId, recType, payload, {
-        curriculumAlignment: alignment,
-      });
+      const snapshotId = await writeSnapshot(
+        db,
+        state,
+        learnerId,
+        newVersion,
+        trigger,
+        recId,
+        recType,
+        payload,
+        {
+          curriculumAlignment: alignment,
+        },
+      );
       return { applied: true, changedFields: ["curriculum_alignment"], snapshotId };
     }
     case "path_adjustment": {
@@ -257,9 +307,19 @@ export async function applyRecommendationEffect(args: ApplyArgs): Promise<Effect
         .update(brainStates)
         .set({ curriculumAlignment: alignment, version: newVersion, updatedAt: new Date() })
         .where(eq(brainStates.id, state.id));
-      const snapshotId = await writeSnapshot(db, state, learnerId, newVersion, trigger, recId, recType, payload, {
-        curriculumAlignment: alignment,
-      });
+      const snapshotId = await writeSnapshot(
+        db,
+        state,
+        learnerId,
+        newVersion,
+        trigger,
+        recId,
+        recType,
+        payload,
+        {
+          curriculumAlignment: alignment,
+        },
+      );
       return { applied: true, changedFields: ["curriculum_alignment"], snapshotId };
     }
     case "rebaseline": {
@@ -279,9 +339,19 @@ export async function applyRecommendationEffect(args: ApplyArgs): Promise<Effect
         .update(brainStates)
         .set({ functioningLevelProfile: profile, version: newVersion, updatedAt: new Date() })
         .where(eq(brainStates.id, state.id));
-      const snapshotId = await writeSnapshot(db, state, learnerId, newVersion, trigger, recId, recType, payload, {
-        functioningLevelProfile: profile,
-      });
+      const snapshotId = await writeSnapshot(
+        db,
+        state,
+        learnerId,
+        newVersion,
+        trigger,
+        recId,
+        recType,
+        payload,
+        {
+          functioningLevelProfile: profile,
+        },
+      );
       return { applied: true, changedFields: ["functioning_level_profile"], snapshotId };
     }
     case "regression_alert":
@@ -304,9 +374,19 @@ export async function applyRecommendationEffect(args: ApplyArgs): Promise<Effect
         .update(brainStates)
         .set({ xaiExplanation: xai, version: newVersion, updatedAt: new Date() })
         .where(eq(brainStates.id, state.id));
-      const snapshotId = await writeSnapshot(db, state, learnerId, newVersion, trigger, recId, recType, payload, {
-        xaiExplanation: xai,
-      });
+      const snapshotId = await writeSnapshot(
+        db,
+        state,
+        learnerId,
+        newVersion,
+        trigger,
+        recId,
+        recType,
+        payload,
+        {
+          xaiExplanation: xai,
+        },
+      );
       return { applied: true, changedFields: ["xai_explanation"], snapshotId };
     }
     default:

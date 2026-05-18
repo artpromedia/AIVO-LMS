@@ -1,7 +1,4 @@
-import {
-  ENTERPRISE_SERVICE_URLS,
-  buildEnterpriseProxyHandlers,
-} from "@/lib/enterprise-proxy";
+import { ENTERPRISE_SERVICE_URLS, buildEnterpriseProxyHandlers } from "@/lib/enterprise-proxy";
 
 export const dynamic = "force-dynamic";
 

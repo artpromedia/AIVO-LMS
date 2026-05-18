@@ -19,10 +19,7 @@ const EMPTY_DIAGRAM = {
   shapes: [],
 };
 
-function pointFromEvent(
-  event: React.PointerEvent<SVGSVGElement>,
-  svg: SVGSVGElement,
-): Point {
+function pointFromEvent(event: React.PointerEvent<SVGSVGElement>, svg: SVGSVGElement): Point {
   const rect = svg.getBoundingClientRect();
   const vbWidth = svg.viewBox.baseVal.width || rect.width;
   const vbHeight = svg.viewBox.baseVal.height || rect.height;
@@ -34,7 +31,12 @@ function pointFromEvent(
   };
 }
 
-export function GeometrySurface({ surface, disabled = false, onSubmit, onEvent }: GeometrySurfaceProps) {
+export function GeometrySurface({
+  surface,
+  disabled = false,
+  onSubmit,
+  onEvent,
+}: GeometrySurfaceProps) {
   const [answer, setAnswer] = useState("");
   const [strokes, setStrokes] = useState<InkStroke[]>([]);
   const [tool, setTool] = useState<"pencil" | "highlighter" | "eraser">("pencil");

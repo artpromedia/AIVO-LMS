@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter:wght@400;500;600;700&display=swap");
 
 :root {
   --trusted-navy: 210 73% 15%; /* #0a2540 */
@@ -7,8 +7,8 @@
   --trusted-periwinkle: 230 40% 96%;
   --trusted-bg: 0 0% 99%;
 
-  --trusted-heading: 'Fraunces', serif;
-  --trusted-body: 'Inter', sans-serif;
+  --trusted-heading: "Fraunces", serif;
+  --trusted-body: "Inter", sans-serif;
 }
 
 .trusted-theme {

@@ -57,7 +57,6 @@ function SignupInner() {
 
   useEffect(() => {
     if (invitedEmail && !email) setEmail(invitedEmail);
-     
   }, [invitedEmail]);
 
   useEffect(() => {
@@ -118,10 +117,30 @@ function SignupInner() {
   };
 
   const VALUE_PROPS = [
-    { Icon: Brain, key: "signup_feature_brain_clone" as const, color: "text-violet-600", bg: "bg-violet-100" },
-    { Icon: Users, key: "signup_feature_tutors" as const, color: "text-cyan-600", bg: "bg-cyan-100" },
-    { Icon: Zap, key: "signup_feature_levels" as const, color: "text-amber-600", bg: "bg-amber-100" },
-    { Icon: ShieldCheck, key: "signup_feature_coppa" as const, color: "text-emerald-600", bg: "bg-emerald-100" },
+    {
+      Icon: Brain,
+      key: "signup_feature_brain_clone" as const,
+      color: "text-violet-600",
+      bg: "bg-violet-100",
+    },
+    {
+      Icon: Users,
+      key: "signup_feature_tutors" as const,
+      color: "text-cyan-600",
+      bg: "bg-cyan-100",
+    },
+    {
+      Icon: Zap,
+      key: "signup_feature_levels" as const,
+      color: "text-amber-600",
+      bg: "bg-amber-100",
+    },
+    {
+      Icon: ShieldCheck,
+      key: "signup_feature_coppa" as const,
+      color: "text-emerald-600",
+      bg: "bg-emerald-100",
+    },
   ];
 
   return (
@@ -130,8 +149,14 @@ function SignupInner() {
 
       <div aria-hidden="true" className="absolute inset-0 pointer-events-none -z-0">
         <div className="absolute -top-20 -left-20 w-[45vw] h-[45vw] bg-violet-300/40 rounded-full blur-3xl animate-blob motion-reduce:animate-none" />
-        <div className="absolute -bottom-20 -right-20 w-[40vw] h-[40vw] bg-amber-200/50 rounded-full blur-3xl animate-blob motion-reduce:animate-none" style={{ animationDelay: "5s" }} />
-        <div className="absolute top-1/3 right-10 w-64 h-64 bg-cyan-200/40 rounded-full blur-3xl animate-blob motion-reduce:animate-none" style={{ animationDelay: "2s" }} />
+        <div
+          className="absolute -bottom-20 -right-20 w-[40vw] h-[40vw] bg-amber-200/50 rounded-full blur-3xl animate-blob motion-reduce:animate-none"
+          style={{ animationDelay: "5s" }}
+        />
+        <div
+          className="absolute top-1/3 right-10 w-64 h-64 bg-cyan-200/40 rounded-full blur-3xl animate-blob motion-reduce:animate-none"
+          style={{ animationDelay: "2s" }}
+        />
       </div>
 
       <header className="relative z-30 flex items-center justify-between p-6">
@@ -163,15 +188,18 @@ function SignupInner() {
               <h1 className="text-3xl font-heading font-bold text-slate-900 leading-tight">
                 {t("create_account")}
               </h1>
-              <p className="text-slate-500 font-body mt-1.5">
-                {t("signup_subtitle")}
-              </p>
+              <p className="text-slate-500 font-body mt-1.5">{t("signup_subtitle")}</p>
             </div>
 
             <div className="grid grid-cols-2 gap-3 mb-7">
               {VALUE_PROPS.map(({ Icon, key, color, bg }) => (
-                <div key={key} className="flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50 border border-slate-100">
-                  <div className={`w-9 h-9 rounded-xl ${bg} ${color} flex items-center justify-center shrink-0`}>
+                <div
+                  key={key}
+                  className="flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50 border border-slate-100"
+                >
+                  <div
+                    className={`w-9 h-9 rounded-xl ${bg} ${color} flex items-center justify-center shrink-0`}
+                  >
                     <Icon className="w-4.5 h-4.5" size={18} strokeWidth={2.5} aria-hidden="true" />
                   </div>
                   <p className="text-xs font-bold text-slate-700 leading-snug">{t(key)}</p>
@@ -194,11 +222,17 @@ function SignupInner() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
-                <label htmlFor="signup-name" className="block text-sm font-bold text-slate-700 ml-1">
+                <label
+                  htmlFor="signup-name"
+                  className="block text-sm font-bold text-slate-700 ml-1"
+                >
                   {t("full_name")}
                 </label>
                 <div className="relative">
-                  <User className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" aria-hidden="true" />
+                  <User
+                    className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"
+                    aria-hidden="true"
+                  />
                   <input
                     id="signup-name"
                     type="text"
@@ -214,11 +248,17 @@ function SignupInner() {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="signup-email" className="block text-sm font-bold text-slate-700 ml-1">
+                <label
+                  htmlFor="signup-email"
+                  className="block text-sm font-bold text-slate-700 ml-1"
+                >
                   {t("email")}
                 </label>
                 <div className="relative">
-                  <Mail className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" aria-hidden="true" />
+                  <Mail
+                    className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"
+                    aria-hidden="true"
+                  />
                   <input
                     id="signup-email"
                     type="email"
@@ -234,11 +274,17 @@ function SignupInner() {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="signup-password" className="block text-sm font-bold text-slate-700 ml-1">
+                <label
+                  htmlFor="signup-password"
+                  className="block text-sm font-bold text-slate-700 ml-1"
+                >
                   {t("password")}
                 </label>
                 <div className="relative">
-                  <Lock className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" aria-hidden="true" />
+                  <Lock
+                    className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"
+                    aria-hidden="true"
+                  />
                   <input
                     id="signup-password"
                     type={showPassword ? "text" : "password"}
@@ -260,77 +306,92 @@ function SignupInner() {
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
-              <p className="text-xs text-slate-500 font-body mt-1.5 ml-1">
-                {t("password_hint")}
-              </p>
-            </div>
+                <p className="text-xs text-slate-500 font-body mt-1.5 ml-1">{t("password_hint")}</p>
+              </div>
 
-            {/* Coupon / Access Code */}
-            <div>
-              <button
-                type="button"
-                onClick={() => setCouponExpanded((v) => !v)}
-                className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-[hsl(var(--visual-primary))] transition"
-              >
-                <Tag className="w-4 h-4" aria-hidden="true" />
-                {t("coupon_toggle")}
-                {couponExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-              </button>
-
-              {couponExpanded && (
-                <div className="mt-3 space-y-2">
-                  <div className="relative">
-                    <Tag className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" aria-hidden="true" />
-                    <input
-                      id="signup-coupon"
-                      type="text"
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                      autoCapitalize="characters"
-                      autoComplete="off"
-                      style={{ minHeight: 44 }}
-                      className="w-full h-14 pl-12 pr-12 rounded-2xl bg-slate-50 border-2 border-slate-100 text-slate-900 font-body focus:bg-white focus:border-[hsl(var(--visual-primary))] focus:ring-4 focus:ring-[hsl(var(--visual-primary)/0.15)] outline-none transition uppercase tracking-widest"
-                      placeholder={t("coupon_placeholder")}
-                    />
-                    {couponChecking && (
-                      <Loader2 className="w-5 h-5 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 motion-safe:animate-spin" aria-hidden="true" />
-                    )}
-                  </div>
-
-                  {couponState && !couponChecking && (
-                    couponState.valid ? (
-                      <div className="flex items-start gap-2 px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-bold">
-                        <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
-                        <span>
-                          {couponCode}
-                          {couponState.description ? ` — ${couponState.description}` : ""}
-                          {couponState.couponType === "DISCOUNT" && couponState.discountPct
-                            ? ` — ${couponState.discountPct}% off your subscription`
-                            : ""}
-                          {couponState.couponType === "PROVISIONING" && !couponState.description
-                            ? ` — ${t("coupon_valid_provisioning")}`
-                            : ""}
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="flex items-start gap-2 px-3 py-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-bold">
-                        <XCircle className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
-                        <span>
-                          {couponState.reason === "not_found" && t("coupon_invalid_not_found")}
-                          {couponState.reason === "expired" && t("coupon_invalid_expired")}
-                          {couponState.reason === "exhausted" && t("coupon_invalid_exhausted")}
-                          {couponState.reason === "inactive" && t("coupon_invalid_inactive")}
-                          {couponState.reason === "network_error" && t("coupon_invalid_network_error")}
-                          {!["not_found","expired","exhausted","inactive","network_error"].includes(couponState.reason ?? "") && t("coupon_invalid_generic")}
-                        </span>
-                      </div>
-                    )
+              {/* Coupon / Access Code */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setCouponExpanded((v) => !v)}
+                  className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-[hsl(var(--visual-primary))] transition"
+                >
+                  <Tag className="w-4 h-4" aria-hidden="true" />
+                  {t("coupon_toggle")}
+                  {couponExpanded ? (
+                    <ChevronUp className="w-4 h-4" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4" />
                   )}
-                </div>
-              )}
-            </div>
+                </button>
 
-            <button
+                {couponExpanded && (
+                  <div className="mt-3 space-y-2">
+                    <div className="relative">
+                      <Tag
+                        className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"
+                        aria-hidden="true"
+                      />
+                      <input
+                        id="signup-coupon"
+                        type="text"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                        autoCapitalize="characters"
+                        autoComplete="off"
+                        style={{ minHeight: 44 }}
+                        className="w-full h-14 pl-12 pr-12 rounded-2xl bg-slate-50 border-2 border-slate-100 text-slate-900 font-body focus:bg-white focus:border-[hsl(var(--visual-primary))] focus:ring-4 focus:ring-[hsl(var(--visual-primary)/0.15)] outline-none transition uppercase tracking-widest"
+                        placeholder={t("coupon_placeholder")}
+                      />
+                      {couponChecking && (
+                        <Loader2
+                          className="w-5 h-5 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 motion-safe:animate-spin"
+                          aria-hidden="true"
+                        />
+                      )}
+                    </div>
+
+                    {couponState &&
+                      !couponChecking &&
+                      (couponState.valid ? (
+                        <div className="flex items-start gap-2 px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-bold">
+                          <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
+                          <span>
+                            {couponCode}
+                            {couponState.description ? ` — ${couponState.description}` : ""}
+                            {couponState.couponType === "DISCOUNT" && couponState.discountPct
+                              ? ` — ${couponState.discountPct}% off your subscription`
+                              : ""}
+                            {couponState.couponType === "PROVISIONING" && !couponState.description
+                              ? ` — ${t("coupon_valid_provisioning")}`
+                              : ""}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex items-start gap-2 px-3 py-2 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-bold">
+                          <XCircle className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
+                          <span>
+                            {couponState.reason === "not_found" && t("coupon_invalid_not_found")}
+                            {couponState.reason === "expired" && t("coupon_invalid_expired")}
+                            {couponState.reason === "exhausted" && t("coupon_invalid_exhausted")}
+                            {couponState.reason === "inactive" && t("coupon_invalid_inactive")}
+                            {couponState.reason === "network_error" &&
+                              t("coupon_invalid_network_error")}
+                            {![
+                              "not_found",
+                              "expired",
+                              "exhausted",
+                              "inactive",
+                              "network_error",
+                            ].includes(couponState.reason ?? "") && t("coupon_invalid_generic")}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+
+              <button
                 type="submit"
                 disabled={loading}
                 aria-busy={loading}
@@ -339,7 +400,12 @@ function SignupInner() {
               >
                 {loading ? (
                   <>
-                    <Loader2 size={20} strokeWidth={2.5} className="motion-safe:animate-spin" aria-hidden="true" />
+                    <Loader2
+                      size={20}
+                      strokeWidth={2.5}
+                      className="motion-safe:animate-spin"
+                      aria-hidden="true"
+                    />
                     {t("signing_up")}
                   </>
                 ) : (
@@ -364,11 +430,17 @@ function SignupInner() {
 
             <p className="text-xs text-slate-500 text-center mt-4 font-body leading-relaxed">
               {t("agree_terms_prefix")}{" "}
-              <Link href="/terms-of-service" className="text-[hsl(var(--visual-primary))] hover:underline font-bold">
+              <Link
+                href="/terms-of-service"
+                className="text-[hsl(var(--visual-primary))] hover:underline font-bold"
+              >
                 {t("terms")}
               </Link>{" "}
               {t("and")}{" "}
-              <Link href="/privacy-policy" className="text-[hsl(var(--visual-primary))] hover:underline font-bold">
+              <Link
+                href="/privacy-policy"
+                className="text-[hsl(var(--visual-primary))] hover:underline font-bold"
+              >
                 {t("privacy")}
               </Link>
             </p>
@@ -376,12 +448,18 @@ function SignupInner() {
 
           <div className="text-center mt-7">
             <div className="inline-flex items-center gap-2 text-sm font-bold text-slate-600 bg-white/70 backdrop-blur px-4 py-2 rounded-full border border-slate-200">
-              <ShieldCheck className="w-4 h-4 text-[hsl(var(--visual-primary))]" aria-hidden="true" />
+              <ShieldCheck
+                className="w-4 h-4 text-[hsl(var(--visual-primary))]"
+                aria-hidden="true"
+              />
               {t("compliance_badge") ?? "COPPA · FERPA · SOC 2 Compliant"}
             </div>
             <p className="text-sm font-medium text-slate-500 mt-5">
               {t("have_account")}{" "}
-              <Link href="/login" className="text-[hsl(var(--visual-primary))] font-bold hover:underline">
+              <Link
+                href="/login"
+                className="text-[hsl(var(--visual-primary))] font-bold hover:underline"
+              >
                 {t("sign_in")}
               </Link>
             </p>
@@ -394,11 +472,17 @@ function SignupInner() {
           {t("privacy")}
         </Link>
         <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-        <Link href="/terms-of-service" className="hover:text-[hsl(var(--visual-primary))] transition">
+        <Link
+          href="/terms-of-service"
+          className="hover:text-[hsl(var(--visual-primary))] transition"
+        >
           {t("terms")}
         </Link>
         <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-        <Link href="/coppa-compliance" className="hover:text-[hsl(var(--visual-primary))] transition">
+        <Link
+          href="/coppa-compliance"
+          className="hover:text-[hsl(var(--visual-primary))] transition"
+        >
           COPPA
         </Link>
       </footer>

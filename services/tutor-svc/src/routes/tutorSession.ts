@@ -43,13 +43,14 @@ import type { MasteryRecord, AnswerOutcome } from "@aivo/pedagogy";
 import type { LearnerInterestProfile } from "@aivo/special-interest-engine";
 import type { DapeProfileSummary } from "@aivo/scoring";
 import { getTutorDefinition, listTutorDefinitions } from "../modes/registry.js";
-import {
-  buildLearnerContext,
-  negotiateFunctioningLevel,
-} from "../lib/learnerContext.js";
+import { buildLearnerContext, negotiateFunctioningLevel } from "../lib/learnerContext.js";
 import { getStarterContentPack } from "../content-packs/index.js";
 import { ConsentError, verifyTutorConsent } from "../lib/familyConsent.js";
-import { getTutorsSchema, getTutorsByTutorKeySchema, tutorsByTutorKeyPlanSchema } from "./schemas.js";
+import {
+  getTutorsSchema,
+  getTutorsByTutorKeySchema,
+  tutorsByTutorKeyPlanSchema,
+} from "./schemas.js";
 
 interface PlanBody {
   learnerId?: string;
@@ -127,7 +128,8 @@ export function registerTutorSessionRoutes(app: FastifyInstance): void {
   // ── GET /api/tutors/:tutorKey ─────────────────────────────────────
   app.get<{ Params: { tutorKey: string } }>(
     "/api/tutors/:tutorKey",
-    { schema: getTutorsByTutorKeySchema }, async (req: FastifyRequest<{ Params: { tutorKey: string } }>, reply: FastifyReply) => {
+    { schema: getTutorsByTutorKeySchema },
+    async (req: FastifyRequest<{ Params: { tutorKey: string } }>, reply: FastifyReply) => {
       const def = getTutorDefinition(req.params.tutorKey);
       if (!def) {
         return reply.code(404).send({ error: `unknown tutor "${req.params.tutorKey}"` });
@@ -139,7 +141,8 @@ export function registerTutorSessionRoutes(app: FastifyInstance): void {
   // ── POST /api/tutors/:tutorKey/plan ───────────────────────────────
   app.post<{ Params: { tutorKey: string }; Body: PlanBody }>(
     "/api/tutors/:tutorKey/plan",
-    { schema: tutorsByTutorKeyPlanSchema }, async (
+    { schema: tutorsByTutorKeyPlanSchema },
+    async (
       req: FastifyRequest<{ Params: { tutorKey: string }; Body: PlanBody }>,
       reply: FastifyReply,
     ) => {
@@ -162,9 +165,7 @@ export function registerTutorSessionRoutes(app: FastifyInstance): void {
       if (!contentPack || !Array.isArray(contentPack.activities)) {
         const starter = getStarterContentPack(tutorKey);
         if (!starter) {
-          return reply
-            .code(400)
-            .send({ error: "contentPack with activities[] is required" });
+          return reply.code(400).send({ error: "contentPack with activities[] is required" });
         }
         contentPack = starter;
         contentPackSource = "starter";

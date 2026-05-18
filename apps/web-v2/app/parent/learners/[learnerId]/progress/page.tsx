@@ -50,9 +50,7 @@ export default async function ParentProgressPage({
   const bySubject = subjects
     .map((subject) => {
       const subjectSkills = skills.filter((s) => s.subjectId === subject.id);
-      const ms = skillMasteries.filter((m) =>
-        subjectSkills.some((s) => s.id === m.skillId),
-      );
+      const ms = skillMasteries.filter((m) => subjectSkills.some((s) => s.id === m.skillId));
       if (ms.length === 0) return null;
       const avg = ms.reduce((acc, m) => acc + m.score, 0) / ms.length;
       const mastered = ms.filter(
@@ -66,11 +64,7 @@ export default async function ParentProgressPage({
     if (!r.completedAt || !r.startedAt) return acc;
     return (
       acc +
-      Math.round(
-        (new Date(r.completedAt).getTime() -
-          new Date(r.startedAt).getTime()) /
-          60000,
-      )
+      Math.round((new Date(r.completedAt).getTime() - new Date(r.startedAt).getTime()) / 60000)
     );
   }, 0);
 
@@ -113,7 +107,10 @@ export default async function ParentProgressPage({
         <Card className="p-4">
           <p className="text-xs uppercase text-aivo-ink-soft">Mastered</p>
           <p className="text-2xl font-semibold">
-            {skillMasteries.filter((m) => m.level === "on_grade_level" || m.level === "stretching").length}
+            {
+              skillMasteries.filter((m) => m.level === "on_grade_level" || m.level === "stretching")
+                .length
+            }
           </p>
         </Card>
       </div>

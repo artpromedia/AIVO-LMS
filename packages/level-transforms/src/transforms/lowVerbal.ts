@@ -17,7 +17,10 @@ export function transformToLowVerbal(a: Activity): Activity {
   let next: Activity = { ...a };
 
   if (a.type === "voice" && a.expectedAnswer) {
-    const variants = a.expectedAnswer.split("|").map((s) => s.trim()).filter(Boolean);
+    const variants = a.expectedAnswer
+      .split("|")
+      .map((s) => s.trim())
+      .filter(Boolean);
     if (variants.length > 0) {
       const correct = variants[0];
       const distractors = variants.slice(1, 2); // keep at most one alt as a wrong choice (we still mark only `correct` as correct)

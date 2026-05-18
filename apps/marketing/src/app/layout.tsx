@@ -163,9 +163,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="font-body antialiased bg-white text-slate-800">
         <GoogleAnalytics />
-        <I18nProvider initialMessages={enMessages}>
-          {children}
-        </I18nProvider>
+        <I18nProvider initialMessages={enMessages}>{children}</I18nProvider>
       </body>
     </html>
   );

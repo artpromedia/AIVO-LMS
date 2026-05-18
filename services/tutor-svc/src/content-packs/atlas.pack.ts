@@ -23,7 +23,8 @@ export const atlasStarterPack: ContentPack = {
       title: "What is a map?",
       skillId: "ncge.k2.S1.1",
       type: "narration",
-      prompt: "A map is a picture from above. It shows where places are. Let's explore the map of our school.",
+      prompt:
+        "A map is a picture from above. It shows where places are. Let's explore the map of our school.",
       difficulty: "intro",
     },
     {

@@ -122,8 +122,7 @@ const SERVICES = [
 const STUB_ENV = {
   NODE_ENV: "test",
   DATABASE_URL:
-    process.env.DATABASE_URL ||
-    "postgres://stub:stub@127.0.0.1:5432/stub?sslmode=disable",
+    process.env.DATABASE_URL || "postgres://stub:stub@127.0.0.1:5432/stub?sslmode=disable",
   // 32-byte hex key satisfies @aivo/security/mfa-crypto assertions.
   MFA_AT_REST_KEY:
     process.env.MFA_AT_REST_KEY ||

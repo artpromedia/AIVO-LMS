@@ -32,7 +32,12 @@ function makeMemoryLedger(): JobLedger & { rows: Map<string, any>; history: any[
       return rows.get(jobName)?.lastRunAt ?? null;
     },
     async markStarted({ jobName, runAt, replicaId }) {
-      rows.set(jobName, { ...(rows.get(jobName) ?? {}), lastRunAt: runAt, replicaId, status: "running" });
+      rows.set(jobName, {
+        ...(rows.get(jobName) ?? {}),
+        lastRunAt: runAt,
+        replicaId,
+        status: "running",
+      });
     },
     async markFinished({ jobName, finishedAt, status, sent, failed, error }) {
       const cur = rows.get(jobName) ?? {};
@@ -57,15 +62,16 @@ test("isDue returns false within the period", () => {
 test("isDue returns true at the period boundary minus jitter", () => {
   const now = new Date("2026-04-01T12:00:00Z");
   const last = new Date("2026-04-01T11:00:00Z");
-  assert.equal(
-    isDue({ lastRunAt: last, now, periodMs: 60 * 60 * 1000, jitterMs: 60_000 }),
-    true,
-  );
+  assert.equal(isDue({ lastRunAt: last, now, periodMs: 60 * 60 * 1000, jitterMs: 60_000 }), true);
 });
 
 test("computeFreshness reports never_run when no last run", () => {
   const r = computeFreshness({
-    jobName: "x", periodMs: 1000, lastRunAt: null, lastFinishedAt: null, lastStatus: null,
+    jobName: "x",
+    periodMs: 1000,
+    lastRunAt: null,
+    lastFinishedAt: null,
+    lastStatus: null,
   });
   assert.equal(r.status, "never_run");
 });
@@ -83,7 +89,11 @@ test("computeFreshness reports stale beyond 1.5x period", () => {
 test("computeFreshness flags failed status even when fresh", () => {
   const now = new Date();
   const r = computeFreshness({
-    jobName: "x", periodMs: 60_000, lastRunAt: now, lastFinishedAt: now, lastStatus: "failed",
+    jobName: "x",
+    periodMs: 60_000,
+    lastRunAt: now,
+    lastFinishedAt: now,
+    lastStatus: "failed",
   });
   assert.equal(r.failed, true);
   assert.equal(r.status, "fresh");

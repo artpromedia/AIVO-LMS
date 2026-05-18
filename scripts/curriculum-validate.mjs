@@ -57,21 +57,15 @@ for (const file of seedFiles) {
 
 // --- 2. SEED_GRAPHS must register every seed export ---------------------
 
-const seedGraphsBlock = indexSrc.match(
-  /export const SEED_GRAPHS:[^=]*=\s*\[([\s\S]*?)\];/,
-);
+const seedGraphsBlock = indexSrc.match(/export const SEED_GRAPHS:[^=]*=\s*\[([\s\S]*?)\];/);
 if (!seedGraphsBlock) {
-  errors.push(
-    "packages/skill-graphs/src/index.ts: SEED_GRAPHS export not found.",
-  );
+  errors.push("packages/skill-graphs/src/index.ts: SEED_GRAPHS export not found.");
 } else {
   const listed = [...seedGraphsBlock[1].matchAll(/(\w+),?/g)].map((m) => m[1]);
   const exportRe = /export \{ (\w+) \} from "\.\/seeds\//g;
   for (const m of indexSrc.matchAll(exportRe)) {
     if (!listed.includes(m[1])) {
-      errors.push(
-        `seed ${m[1]} is re-exported but missing from SEED_GRAPHS aggregate.`,
-      );
+      errors.push(`seed ${m[1]} is re-exported but missing from SEED_GRAPHS aggregate.`);
     }
   }
 }
@@ -104,9 +98,7 @@ for (const file of seedFiles) {
   const src = readFileSync(full, "utf8");
   const skills = parseSkillObjects(src);
   if (skills.length === 0) {
-    errors.push(
-      `seed ${file}: parser found no Skill literals — file empty or schema mismatch.`,
-    );
+    errors.push(`seed ${file}: parser found no Skill literals — file empty or schema mismatch.`);
     continue;
   }
   for (const skill of skills) {
@@ -129,9 +121,7 @@ for (const file of seedFiles) {
 
 for (const required of REQUIRED_SUBJECTS) {
   if (!subjectsSeen.has(required)) {
-    errors.push(
-      `Sprint 05 launch requirement: no seed graph covers subject "${required}".`,
-    );
+    errors.push(`Sprint 05 launch requirement: no seed graph covers subject "${required}".`);
   }
 }
 
@@ -178,9 +168,7 @@ if (warnings.length) {
 }
 if (errors.length) {
   for (const e of errors) console.error(`error: ${e}`);
-  console.error(
-    `\ncurriculum:validate FAILED with ${errors.length} error(s).`,
-  );
+  console.error(`\ncurriculum:validate FAILED with ${errors.length} error(s).`);
   process.exit(1);
 }
 

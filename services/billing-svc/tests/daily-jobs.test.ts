@@ -54,13 +54,16 @@ async function bootstrap() {
   registerDailyJobsRoutes(app, db);
   await app.ready();
 
-  const [admin] = await db.insert(users).values({
-    email: `daily-jobs-admin-${Date.now()}@aivo.dev`,
-    name: "Daily Jobs Admin",
-    role: "PLATFORM_ADMIN",
-    passwordHash:
-      "$argon2id$v=19$m=65536,t=3,p=4$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-  } as any).returning();
+  const [admin] = await db
+    .insert(users)
+    .values({
+      email: `daily-jobs-admin-${Date.now()}@aivo.dev`,
+      name: "Daily Jobs Admin",
+      role: "PLATFORM_ADMIN",
+      passwordHash:
+        "$argon2id$v=19$m=65536,t=3,p=4$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    } as any)
+    .returning();
   const token = await signJWT({
     sub: admin.id,
     role: "PLATFORM_ADMIN",
@@ -79,8 +82,12 @@ async function bootstrap() {
 }
 
 async function seedHistory(db: any, sql: any) {
-  await db.execute(sql`DELETE FROM billing_daily_job_runs WHERE job_name = 'billing.daily-expiry-reminders'`);
-  await db.execute(sql`DELETE FROM daily_job_runs WHERE job_name = 'billing.daily-expiry-reminders'`);
+  await db.execute(
+    sql`DELETE FROM billing_daily_job_runs WHERE job_name = 'billing.daily-expiry-reminders'`,
+  );
+  await db.execute(
+    sql`DELETE FROM daily_job_runs WHERE job_name = 'billing.daily-expiry-reminders'`,
+  );
   await db.execute(sql`
     INSERT INTO daily_job_runs (job_name, last_run_at, last_finished_at, last_replica_id, last_status, last_sent, last_failed)
     VALUES ('billing.daily-expiry-reminders', NOW(), NOW(), 'r1', 'ok', 7, 0)

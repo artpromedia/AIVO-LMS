@@ -40,7 +40,5 @@ export const FUNCTIONING_LEVEL_ORDER: readonly FunctioningLevel[] = [
  * PRE_SYMBOLIC is the most accessible. Transforms only run downhill.
  */
 export function isDownhill(from: FunctioningLevel, to: FunctioningLevel): boolean {
-  return (
-    FUNCTIONING_LEVEL_ORDER.indexOf(from) < FUNCTIONING_LEVEL_ORDER.indexOf(to)
-  );
+  return FUNCTIONING_LEVEL_ORDER.indexOf(from) < FUNCTIONING_LEVEL_ORDER.indexOf(to);
 }

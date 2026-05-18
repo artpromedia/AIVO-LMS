@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useWindowSizeClass } from '../../design/useWindowSizeClass';
-import { ScratchPad, type ScratchStroke } from './ScratchPad';
-import { colors, radius, spacing } from '@/constants/colors';
+import React, { useState } from "react";
+import { Pressable, StyleSheet, Text, View, ViewStyle } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useWindowSizeClass } from "../../design/useWindowSizeClass";
+import { ScratchPad, type ScratchStroke } from "./ScratchPad";
+import { colors, radius, spacing } from "@/constants/colors";
 
 export interface LearningWorkspaceProps {
   /**
@@ -71,7 +71,7 @@ export function LearningWorkspace({
 
   const bg = { backgroundColor: background ?? colors.background };
 
-  if (sizeClass === 'expanded') {
+  if (sizeClass === "expanded") {
     return (
       <View style={[styles.flex, bg, style]}>
         {header}
@@ -93,7 +93,7 @@ export function LearningWorkspace({
     );
   }
 
-  if (sizeClass === 'medium') {
+  if (sizeClass === "medium") {
     return (
       <View style={[styles.flex, bg, style]}>
         {header}
@@ -151,9 +151,9 @@ export function LearningWorkspace({
           onPress={() => setScratchOpen((s) => !s)}
           style={styles.scratchFab}
           accessibilityRole="button"
-          accessibilityLabel={scratchOpen ? 'Close scratchpad' : 'Open scratchpad'}
+          accessibilityLabel={scratchOpen ? "Close scratchpad" : "Open scratchpad"}
         >
-          <Ionicons name={scratchOpen ? 'close' : 'pencil'} size={22} color="#FFF" />
+          <Ionicons name={scratchOpen ? "close" : "pencil"} size={22} color="#FFF" />
         </Pressable>
       ) : null}
 
@@ -176,60 +176,87 @@ export function LearningWorkspace({
 const styles = StyleSheet.create({
   flex: { flex: 1 },
 
-  threePane: { flex: 1, flexDirection: 'row', padding: spacing.md, gap: spacing.md },
-  pane: { backgroundColor: colors.card, borderRadius: radius.xl, padding: spacing.md, overflow: 'hidden' },
+  threePane: { flex: 1, flexDirection: "row", padding: spacing.md, gap: spacing.md },
+  pane: {
+    backgroundColor: colors.card,
+    borderRadius: radius.xl,
+    padding: spacing.md,
+    overflow: "hidden",
+  },
   problemPane: { width: 380 },
-  scratchPane: { flex: 1, padding: 0, backgroundColor: 'transparent' },
+  scratchPane: { flex: 1, padding: 0, backgroundColor: "transparent" },
   tutorPane: { width: 360 },
 
-  twoPane: { flex: 1, flexDirection: 'row', padding: spacing.md, gap: spacing.md },
+  twoPane: { flex: 1, flexDirection: "row", padding: spacing.md, gap: spacing.md },
   problemPaneMedium: { flex: 1.1 },
-  rightStackMedium: { flex: 1, padding: 0, backgroundColor: 'transparent', gap: spacing.md },
+  rightStackMedium: { flex: 1, padding: 0, backgroundColor: "transparent", gap: spacing.md },
   scratchPaneMedium: { flex: 1.2 },
-  tutorPaneMedium: { flex: 1, backgroundColor: colors.card, borderRadius: radius.xl, padding: spacing.md, overflow: 'hidden' },
+  tutorPaneMedium: {
+    flex: 1,
+    backgroundColor: colors.card,
+    borderRadius: radius.xl,
+    padding: spacing.md,
+    overflow: "hidden",
+  },
 
   compactBody: { flex: 1, padding: spacing.md, gap: spacing.md },
-  compactProblem: { flex: 1, backgroundColor: colors.card, borderRadius: radius.xl, padding: spacing.md, overflow: 'hidden' },
-  compactTutor: { maxHeight: 260, backgroundColor: colors.card, borderRadius: radius.xl, padding: spacing.md },
-  compactTutorHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.xs },
-  compactTutorTitle: { fontSize: 14, fontFamily: 'Nunito-Bold', color: colors.text },
+  compactProblem: {
+    flex: 1,
+    backgroundColor: colors.card,
+    borderRadius: radius.xl,
+    padding: spacing.md,
+    overflow: "hidden",
+  },
+  compactTutor: {
+    maxHeight: 260,
+    backgroundColor: colors.card,
+    borderRadius: radius.xl,
+    padding: spacing.md,
+  },
+  compactTutorHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: spacing.xs,
+  },
+  compactTutorTitle: { fontSize: 14, fontFamily: "Nunito-Bold", color: colors.text },
   compactTutorPeek: {
-    flexDirection: 'row',
-    alignSelf: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignSelf: "center",
+    alignItems: "center",
     gap: 8,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: radius.full,
-    backgroundColor: colors.primary + '14',
+    backgroundColor: colors.primary + "14",
   },
-  compactTutorPeekText: { fontSize: 13, fontFamily: 'Nunito-Bold', color: colors.primary },
+  compactTutorPeekText: { fontSize: 13, fontFamily: "Nunito-Bold", color: colors.primary },
 
   scratchFab: {
-    position: 'absolute',
+    position: "absolute",
     right: spacing.md,
     bottom: spacing.md,
     width: 52,
     height: 52,
     borderRadius: 26,
     backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     elevation: 4,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.2,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 3 },
   },
   scratchOverlay: {
-    position: 'absolute',
+    position: "absolute",
     left: spacing.md,
     right: spacing.md,
     top: spacing.md,
     bottom: 80,
     backgroundColor: colors.card,
     borderRadius: radius.xl,
-    overflow: 'hidden',
+    overflow: "hidden",
     elevation: 6,
   },
 });

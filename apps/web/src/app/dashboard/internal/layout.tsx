@@ -20,15 +20,53 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-const INTERNAL_ROLES = ["PLATFORM_ADMIN", "SALES", "MARKETING", "CUSTOMER_CARE", "SUPPORT", "FINANCE", "DEVOPS"];
+const INTERNAL_ROLES = [
+  "PLATFORM_ADMIN",
+  "SALES",
+  "MARKETING",
+  "CUSTOMER_CARE",
+  "SUPPORT",
+  "FINANCE",
+  "DEVOPS",
+];
 
 const NAV_ITEMS: { href: string; label: string; Icon: LucideIcon; roles: string[] }[] = [
-  { href: "/dashboard/internal/sales", label: "Sales", Icon: Briefcase, roles: ["SALES", "PLATFORM_ADMIN"] },
-  { href: "/dashboard/internal/marketing", label: "Marketing", Icon: Megaphone, roles: ["MARKETING", "PLATFORM_ADMIN"] },
-  { href: "/dashboard/internal/customer-care", label: "Customer Care", Icon: MessageCircle, roles: ["CUSTOMER_CARE", "PLATFORM_ADMIN"] },
-  { href: "/dashboard/internal/support", label: "Support", Icon: Wrench, roles: ["SUPPORT", "PLATFORM_ADMIN"] },
-  { href: "/dashboard/internal/finance", label: "Finance", Icon: BarChart3, roles: ["FINANCE", "PLATFORM_ADMIN"] },
-  { href: "/dashboard/internal/devops", label: "DevOps", Icon: Settings, roles: ["DEVOPS", "PLATFORM_ADMIN"] },
+  {
+    href: "/dashboard/internal/sales",
+    label: "Sales",
+    Icon: Briefcase,
+    roles: ["SALES", "PLATFORM_ADMIN"],
+  },
+  {
+    href: "/dashboard/internal/marketing",
+    label: "Marketing",
+    Icon: Megaphone,
+    roles: ["MARKETING", "PLATFORM_ADMIN"],
+  },
+  {
+    href: "/dashboard/internal/customer-care",
+    label: "Customer Care",
+    Icon: MessageCircle,
+    roles: ["CUSTOMER_CARE", "PLATFORM_ADMIN"],
+  },
+  {
+    href: "/dashboard/internal/support",
+    label: "Support",
+    Icon: Wrench,
+    roles: ["SUPPORT", "PLATFORM_ADMIN"],
+  },
+  {
+    href: "/dashboard/internal/finance",
+    label: "Finance",
+    Icon: BarChart3,
+    roles: ["FINANCE", "PLATFORM_ADMIN"],
+  },
+  {
+    href: "/dashboard/internal/devops",
+    label: "DevOps",
+    Icon: Settings,
+    roles: ["DEVOPS", "PLATFORM_ADMIN"],
+  },
 ];
 
 export default function InternalLayout({ children }: { children: React.ReactNode }) {
@@ -57,7 +95,9 @@ export default function InternalLayout({ children }: { children: React.ReactNode
         return;
       }
       if (user.role !== "PLATFORM_ADMIN") {
-        const matchedRoute = Object.entries(ROUTE_ROLE_MAP).find(([path]) => pathname.startsWith(path));
+        const matchedRoute = Object.entries(ROUTE_ROLE_MAP).find(([path]) =>
+          pathname.startsWith(path),
+        );
         if (matchedRoute && matchedRoute[1] !== user.role) {
           const allowedSlug = user.role.toLowerCase().replace(/_/g, "-");
           router.push(`/dashboard/internal/${allowedSlug}`);
@@ -68,8 +108,8 @@ export default function InternalLayout({ children }: { children: React.ReactNode
 
   if (loading || !user) return null;
 
-  const visibleNav = NAV_ITEMS.filter((item) =>
-    user.role === "PLATFORM_ADMIN" || item.roles.includes(user.role)
+  const visibleNav = NAV_ITEMS.filter(
+    (item) => user.role === "PLATFORM_ADMIN" || item.roles.includes(user.role),
   );
 
   const isActive = (href: string) => pathname.startsWith(href);
@@ -84,9 +124,22 @@ export default function InternalLayout({ children }: { children: React.ReactNode
       >
         <div className="p-4 border-b vi-border flex items-center justify-between">
           {!collapsed && (
-            <Link href={user.role === "PLATFORM_ADMIN" ? "/dashboard/admin" : `/dashboard/internal/${user.role.toLowerCase().replace(/_/g, "-")}`} className="flex items-center gap-3">
+            <Link
+              href={
+                user.role === "PLATFORM_ADMIN"
+                  ? "/dashboard/admin"
+                  : `/dashboard/internal/${user.role.toLowerCase().replace(/_/g, "-")}`
+              }
+              className="flex items-center gap-3"
+            >
               <div className="w-9 h-9 bg-[hsl(var(--visual-primary))] rounded-2xl flex items-center justify-center">
-                <Image src="/images/aivo-logo-white.png" alt="AIVO" width={22} height={22} style={{ height: "auto" }} />
+                <Image
+                  src="/images/aivo-logo-white.png"
+                  alt="AIVO"
+                  width={22}
+                  height={22}
+                  style={{ height: "auto" }}
+                />
               </div>
               <div>
                 <p className="font-bold vi-text text-sm">AIVO</p>
@@ -101,7 +154,11 @@ export default function InternalLayout({ children }: { children: React.ReactNode
             className="vi-text-muted hover:vi-text p-1 transition"
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            {collapsed ? <ChevronRight size={16} strokeWidth={2.5} /> : <ChevronLeft size={16} strokeWidth={2.5} />}
+            {collapsed ? (
+              <ChevronRight size={16} strokeWidth={2.5} />
+            ) : (
+              <ChevronLeft size={16} strokeWidth={2.5} />
+            )}
           </button>
         </div>
 
@@ -109,7 +166,9 @@ export default function InternalLayout({ children }: { children: React.ReactNode
           {user.role === "PLATFORM_ADMIN" && (
             <div className="mb-3">
               {!collapsed && (
-                <p className="px-4 text-xs font-bold vi-text-muted uppercase tracking-wider mb-1">Admin</p>
+                <p className="px-4 text-xs font-bold vi-text-muted uppercase tracking-wider mb-1">
+                  Admin
+                </p>
               )}
               <Link
                 href="/dashboard/admin"
@@ -124,7 +183,9 @@ export default function InternalLayout({ children }: { children: React.ReactNode
           )}
 
           {!collapsed && (
-            <p className="px-4 text-xs font-bold vi-text-muted uppercase tracking-wider mb-1">Teams</p>
+            <p className="px-4 text-xs font-bold vi-text-muted uppercase tracking-wider mb-1">
+              Teams
+            </p>
           )}
           {visibleNav.map((item) => {
             const Icon = item.Icon;

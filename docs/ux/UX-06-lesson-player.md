@@ -5,6 +5,7 @@
 **Scope**: the AIVO Lesson Player at `/learner/lesson-runs/[lessonRunId]` — the most important learner-facing screen in the product. Every lesson is backed by an existing `LessonRun` (the run is created upstream by `startMissionAction`, quest-chapter start, baseline follow-up, or teacher assignment; **no run is ever created on this URL**).
 
 **Source of truth (today)**:
+
 - Server entry: `app/learner/lesson-runs/[lessonRunId]/page.tsx` — role/tenant guard, parent active-learner cookie match, loads `LessonRun + GeneratedLessonPlan + AccessibilityPreferences`, renders one of two views: the in-flight `<LessonPlayer>` client component, or the "generating / failed" status Card.
 - Client player: `app/learner/lesson-runs/[lessonRunId]/lesson-player.tsx` — beat-by-beat state machine over a `GeneratedLessonPlan`.
 - Plan + outcome types: `lib/db/types.ts` → `GeneratedLessonPlan`, `LessonStepKind`, `LessonInteraction`, `LessonOutcome`, `ParentLessonSummary`.
@@ -31,18 +32,18 @@ Status legend: ✅ shipped · 🟡 partial · ⬜ planned.
 
 ## 2. Beat sequence (canonical — matches `buildBeats()` in `lesson-player.tsx`)
 
-| # | Beat `kind` | Source | Required actions | Notes |
-|---|---|---|---|---|
-| 1 | `welcome` | `plan.tutorGreeting` | Continue | Tutor entry; carries `<TutorBadge>`. |
-| 2 | `goal` | `plan.objective` | Continue | One-sentence goal in plain language. |
-| 3 | `story` | `plan.storyHook` | Continue | **Dropped when `shorterSteps` accommodation is on.** |
-| 4 | `micro` | `plan.microLesson` | Continue | The teaching moment. |
-| 5 | `example` | `plan.example.prompt + .explanation` | Continue | Worked example. |
-| 6..N | `guided` (per item) | `plan.guidedPractice[i]` | Submit answer + (optional) Hint + Scaffold | Choices radio OR free-text. `isCorrect` compared via `normalizeAnswer()`. No skip on guided beats today. |
-| N+1..M | `check` (per item) | `plan.checksForUnderstanding[i]` | Check (single-shot) + Next | After a wrong answer, `supportIfWrong` shown inline ("Close — …"); the Check button is then disabled (no retry today). Next advances. |
-| M+1 | `celebrate` | `plan.encouragement` | Continue | Confetti gated by `!reducedMotion`. |
-| M+2 | `progress` | `plan.parentSummary` (rendered learner-safe) | Continue | Show what was mastered + 1-line take-away. |
-| M+3 | `next` | `plan.nextRecommendedStep` | "I'm done" → `POST /complete` | Final beat; submission carries `LessonOutcome`. |
+| #      | Beat `kind`         | Source                                       | Required actions                           | Notes                                                                                                                                 |
+| ------ | ------------------- | -------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| 1      | `welcome`           | `plan.tutorGreeting`                         | Continue                                   | Tutor entry; carries `<TutorBadge>`.                                                                                                  |
+| 2      | `goal`              | `plan.objective`                             | Continue                                   | One-sentence goal in plain language.                                                                                                  |
+| 3      | `story`             | `plan.storyHook`                             | Continue                                   | **Dropped when `shorterSteps` accommodation is on.**                                                                                  |
+| 4      | `micro`             | `plan.microLesson`                           | Continue                                   | The teaching moment.                                                                                                                  |
+| 5      | `example`           | `plan.example.prompt + .explanation`         | Continue                                   | Worked example.                                                                                                                       |
+| 6..N   | `guided` (per item) | `plan.guidedPractice[i]`                     | Submit answer + (optional) Hint + Scaffold | Choices radio OR free-text. `isCorrect` compared via `normalizeAnswer()`. No skip on guided beats today.                              |
+| N+1..M | `check` (per item)  | `plan.checksForUnderstanding[i]`             | Check (single-shot) + Next                 | After a wrong answer, `supportIfWrong` shown inline ("Close — …"); the Check button is then disabled (no retry today). Next advances. |
+| M+1    | `celebrate`         | `plan.encouragement`                         | Continue                                   | Confetti gated by `!reducedMotion`.                                                                                                   |
+| M+2    | `progress`          | `plan.parentSummary` (rendered learner-safe) | Continue                                   | Show what was mastered + 1-line take-away.                                                                                            |
+| M+3    | `next`              | `plan.nextRecommendedStep`                   | "I'm done" → `POST /complete`              | Final beat; submission carries `LessonOutcome`.                                                                                       |
 
 Sequence length is dynamic — guided practice + checks counts come from the plan. Typical run = ~12–18 beats. `welcome → next` is the canonical order; `shorterSteps` is the only short-circuit today.
 
@@ -60,10 +61,10 @@ if (!plan || lessonRun.status === "generating" || lessonRun.status === "failed")
 }
 ```
 
-| `LessonRun.status` (or plan state) | Server renders today |
-|---|---|
-| `generating` (or plan absent) | ✅ "Getting your lesson ready…" Card + `Back to today` button. No auto-refresh; parent reloads manually. |
-| `failed` | ✅ "We hit a snag preparing this lesson" Card + `failureReason` (red) + `Back to today`. ⬜ Retry — `POST /retry` BFF exists but no UI button surfaces it; today the only escape is back-home and re-pick (§8.2). |
+| `LessonRun.status` (or plan state)                  | Server renders today                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `generating` (or plan absent)                       | ✅ "Getting your lesson ready…" Card + `Back to today` button. No auto-refresh; parent reloads manually.                                                                                                                                                                                                                                                                                                                                                                                        |
+| `failed`                                            | ✅ "We hit a snag preparing this lesson" Card + `failureReason` (red) + `Back to today`. ⬜ Retry — `POST /retry` BFF exists but no UI button surfaces it; today the only escape is back-home and re-pick (§8.2).                                                                                                                                                                                                                                                                               |
 | `ready` / `in_progress` / `completed` / `abandoned` | All four fall into the `<LessonPlayer>` else-branch. The client component reads `?step=` to restore beat index for in-progress runs. `completed` and `abandoned` runs **today are not explicitly handled by the server page** — they render the player with `initialStatus` set, and the player walks beats from the URL `?step=` (or 0). 🟡 Cleanup: server page should branch on `completed` (show celebration-only view) and `abandoned` (redirect to `/learner/home` with a banner) — §8.6. |
 
 ---
@@ -92,6 +93,7 @@ if (!plan || lessonRun.status === "generating" || lessonRun.status === "failed")
 ### 4.3 Check-for-understanding beat
 
 Same shape as guided practice except:
+
 - **No hint button** (a check is a check).
 - **Check is single-shot**: the Check button becomes `disabled` once `feedback !== null`. There is no `Try again` button today — the result is final for `LessonOutcome.checksCorrect / checksTotal`. The Next button then unlocks. On `incorrect`, the beat's `supportIfWrong` copy appears inline as the support framing before moving on.
 - Adding a true retry loop (or a "review and retry" affordance) on a wrong check is ⬜ — today the brief's "Incorrect answer with support" state is partially shipped (supportive copy yes, retry on the same question no — the lesson moves forward with the wrong answer recorded).
@@ -107,25 +109,25 @@ Same shape as guided practice except:
 
 ## 5. State matrix (Lesson Player)
 
-| State | UI behavior | Recovery |
-|---|---|---|
-| **Lesson generating** | Server: status Card "Getting your lesson ready…" + Back-to-today. Auto-refresh ⬜ (today the parent reloads). | `Back to today` |
-| **Lesson ready** | Player renders `welcome` beat, `?step=` defaults to 0. | n/a |
-| **Lesson in progress** | Player restores beat via `?step=` URL param. | n/a (refresh-safe) |
-| **Step complete** | Beat advances; `POST /step` audit. | n/a |
-| **Incorrect answer with support** | 🟡 On guided: rose-tinted inline line "Not quite — try again or use the hint. {beat.scaffold}" — the **scaffold** copy is what's inlined; the beat's `hint` text only appears if the learner explicitly opens the separate Hint button. Check stays enabled so the learner can edit the answer + Check again before Next unlocks. On check beats: inline "Close — {supportIfWrong}" + Check button is disabled (single-shot); the wrong answer is recorded for `checksCorrect/Total` and Next advances the lesson. ⬜ A true "review and retry" loop on a wrong check is not shipped. |
-| **Hint opened** | ✅ Inline "Hint: …" line appears under the prompt; Hint button becomes disabled; `hintsUsed++`. Hint stays visible until the next beat. |
-| **Scaffold opened** | ✅ Inline scaffold copy appears; `scaffoldsUsed++`. Stays visible until the next beat. |
-| **Read-aloud active** | ⬜ Not rendered today — no Read-aloud button, no TTS wiring. The beat container has `aria-live` so screen readers announce it. |
-| **Break mode** | ✅ Full-card Break view (eyebrow "Break", calm copy, "I'm ready to keep going" CTA + a "Take a break and leave" CTA that posts `complete({abandoned: true})`). Break is **client-only state** (`setOnBreak`) — no separate step-post fires when entering or leaving break; the `secondsActive` timer and the per-beat step-post `useEffect` are gated by `!onBreak`. |
-| **Connection interrupted** | 🟡 today **asymmetric**: per-beat `POST /step` calls (and the per-action hint/scaffold step posts) are fire-and-forget (`.catch(() => {})`) — failures are silent and the learner continues. Only `POST /complete` surfaces an error (`completeError` state). Break is local state and never hits the network. ⬜ Planned: a friendly banner "Hang on — we lost our connection. We'll save your spot." with retry-aware step posts. | for /complete: retry inline. For /step: nothing today. |
-| **Autosaving** | Beat enter fires `POST /step` (fire-and-forget); ⬜ visible "Saved" pip planned, and a real retry/queue when offline. | n/a |
-| **Resume available** | URL-driven; no UI prompt needed today. | n/a |
-| **Lesson completed** | Final beat → `I'm done` → `/learner/home`. | n/a |
-| **Lesson failed with retry** | Server status Card + `failureReason` (red) + `Back to today`. ⬜ "Try again" button hitting `POST /retry` BFF is not yet wired in UI — §8.2. | currently: back to home + parent triggers re-pick |
-| **Offline resume unavailable** | ⬜ planned — service-worker cache of last-fetched plan + queue of beats; today web is online-only. | manual retry on reconnect |
-| **Mobile role interrupted** | ⬜ unified mobile (UX-12 + UX-13) — parent receiving a notification mid-lesson must not auto-switch the learner out of the Stage. | role-switch confirmation |
-| **Parent lock required for leaving learner mode** | ⬜ unified mobile — exit-learner-mode requires a PIN / face-unlock. | enter PIN |
+| State                                             | UI behavior                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Recovery                                               |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| **Lesson generating**                             | Server: status Card "Getting your lesson ready…" + Back-to-today. Auto-refresh ⬜ (today the parent reloads).                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | `Back to today`                                        |
+| **Lesson ready**                                  | Player renders `welcome` beat, `?step=` defaults to 0.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | n/a                                                    |
+| **Lesson in progress**                            | Player restores beat via `?step=` URL param.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | n/a (refresh-safe)                                     |
+| **Step complete**                                 | Beat advances; `POST /step` audit.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | n/a                                                    |
+| **Incorrect answer with support**                 | 🟡 On guided: rose-tinted inline line "Not quite — try again or use the hint. {beat.scaffold}" — the **scaffold** copy is what's inlined; the beat's `hint` text only appears if the learner explicitly opens the separate Hint button. Check stays enabled so the learner can edit the answer + Check again before Next unlocks. On check beats: inline "Close — {supportIfWrong}" + Check button is disabled (single-shot); the wrong answer is recorded for `checksCorrect/Total` and Next advances the lesson. ⬜ A true "review and retry" loop on a wrong check is not shipped. |
+| **Hint opened**                                   | ✅ Inline "Hint: …" line appears under the prompt; Hint button becomes disabled; `hintsUsed++`. Hint stays visible until the next beat.                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| **Scaffold opened**                               | ✅ Inline scaffold copy appears; `scaffoldsUsed++`. Stays visible until the next beat.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| **Read-aloud active**                             | ⬜ Not rendered today — no Read-aloud button, no TTS wiring. The beat container has `aria-live` so screen readers announce it.                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| **Break mode**                                    | ✅ Full-card Break view (eyebrow "Break", calm copy, "I'm ready to keep going" CTA + a "Take a break and leave" CTA that posts `complete({abandoned: true})`). Break is **client-only state** (`setOnBreak`) — no separate step-post fires when entering or leaving break; the `secondsActive` timer and the per-beat step-post `useEffect` are gated by `!onBreak`.                                                                                                                                                                                                                  |
+| **Connection interrupted**                        | 🟡 today **asymmetric**: per-beat `POST /step` calls (and the per-action hint/scaffold step posts) are fire-and-forget (`.catch(() => {})`) — failures are silent and the learner continues. Only `POST /complete` surfaces an error (`completeError` state). Break is local state and never hits the network. ⬜ Planned: a friendly banner "Hang on — we lost our connection. We'll save your spot." with retry-aware step posts.                                                                                                                                                   | for /complete: retry inline. For /step: nothing today. |
+| **Autosaving**                                    | Beat enter fires `POST /step` (fire-and-forget); ⬜ visible "Saved" pip planned, and a real retry/queue when offline.                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | n/a                                                    |
+| **Resume available**                              | URL-driven; no UI prompt needed today.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | n/a                                                    |
+| **Lesson completed**                              | Final beat → `I'm done` → `/learner/home`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | n/a                                                    |
+| **Lesson failed with retry**                      | Server status Card + `failureReason` (red) + `Back to today`. ⬜ "Try again" button hitting `POST /retry` BFF is not yet wired in UI — §8.2.                                                                                                                                                                                                                                                                                                                                                                                                                                          | currently: back to home + parent triggers re-pick      |
+| **Offline resume unavailable**                    | ⬜ planned — service-worker cache of last-fetched plan + queue of beats; today web is online-only.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | manual retry on reconnect                              |
+| **Mobile role interrupted**                       | ⬜ unified mobile (UX-12 + UX-13) — parent receiving a notification mid-lesson must not auto-switch the learner out of the Stage.                                                                                                                                                                                                                                                                                                                                                                                                                                                     | role-switch confirmation                               |
+| **Parent lock required for leaving learner mode** | ⬜ unified mobile — exit-learner-mode requires a PIN / face-unlock.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | enter PIN                                              |
 
 ---
 
@@ -133,29 +135,29 @@ Same shape as guided practice except:
 
 Per UX-06 brief + the codebase's existing tutor copy.
 
-| Context | Bad | Good |
-|---|---|---|
-| Incorrect check | "Wrong." / "Incorrect." | "Let's try another way." (rendered via `supportIfWrong`) |
-| Offering hint | "Need help?" | "Here's a hint." |
-| Effort framing | "You got 6 of 10 right." | "You're building this skill." |
-| Encouragement on celebrate | "Done." | "Great effort." |
-| Transition to next | "Click next." | "Ready for the next step?" |
-| Hint not punitive | "You couldn't solve it without help." | "Hints are part of learning — you used the right tool." |
-| Skip | "Question skipped." | "We'll come back to that one." |
-| Break | "Lesson paused." | "Take a breath. We'll wait for you." |
-| Resume after refresh | "Resuming session." | "Welcome back — picking up where you left off." |
-| Lesson failed (server) | "Lesson generation failed: model_error" | "We hit a snag preparing this lesson. Try again." (already shipped) |
+| Context                    | Bad                                     | Good                                                                |
+| -------------------------- | --------------------------------------- | ------------------------------------------------------------------- |
+| Incorrect check            | "Wrong." / "Incorrect."                 | "Let's try another way." (rendered via `supportIfWrong`)            |
+| Offering hint              | "Need help?"                            | "Here's a hint."                                                    |
+| Effort framing             | "You got 6 of 10 right."                | "You're building this skill."                                       |
+| Encouragement on celebrate | "Done."                                 | "Great effort."                                                     |
+| Transition to next         | "Click next."                           | "Ready for the next step?"                                          |
+| Hint not punitive          | "You couldn't solve it without help."   | "Hints are part of learning — you used the right tool."             |
+| Skip                       | "Question skipped."                     | "We'll come back to that one."                                      |
+| Break                      | "Lesson paused."                        | "Take a breath. We'll wait for you."                                |
+| Resume after refresh       | "Resuming session."                     | "Welcome back — picking up where you left off."                     |
+| Lesson failed (server)     | "Lesson generation failed: model_error" | "We hit a snag preparing this lesson. Try again." (already shipped) |
 
 ---
 
 ## 7. Layout per breakpoint
 
-| Breakpoint | Treatment |
-|---|---|
-| **Tablet (primary, 768–1280)** | Single column. Active beat Card spans full width minus 32px gutter. Persistent footer (Hint · Scaffold · Read-aloud · Break) is bottom-anchored with 56px buttons. Progress bar at top. |
-| **Desktop (≥ 1280)** | Center the Card at max-width 720px (reading-line constraint — long lines hurt comprehension); progress bar at top spans full content width. |
-| **Mobile web (≤ 480)** | Single column; Card is edge-to-edge with 16px gutter; footer becomes a 2×2 grid of accommodation buttons. CTA is full-width sticky at bottom. |
-| **Unified mobile Learner Mode** (UX-12+13) | Same client component embedded in the native shell; native back-gesture intercepted with a "Leave lesson?" confirm. |
+| Breakpoint                                 | Treatment                                                                                                                                                                               |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Tablet (primary, 768–1280)**             | Single column. Active beat Card spans full width minus 32px gutter. Persistent footer (Hint · Scaffold · Read-aloud · Break) is bottom-anchored with 56px buttons. Progress bar at top. |
+| **Desktop (≥ 1280)**                       | Center the Card at max-width 720px (reading-line constraint — long lines hurt comprehension); progress bar at top spans full content width.                                             |
+| **Mobile web (≤ 480)**                     | Single column; Card is edge-to-edge with 16px gutter; footer becomes a 2×2 grid of accommodation buttons. CTA is full-width sticky at bottom.                                           |
+| **Unified mobile Learner Mode** (UX-12+13) | Same client component embedded in the native shell; native back-gesture intercepted with a "Leave lesson?" confirm.                                                                     |
 
 ---
 

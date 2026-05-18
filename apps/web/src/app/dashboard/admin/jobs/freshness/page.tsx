@@ -33,7 +33,7 @@ function formatAge(ms: number | null): string {
 
 export default function JobFreshnessPage() {
   const accessToken =
-    typeof window !== "undefined" ? window.localStorage.getItem("accessToken") ?? "" : "";
+    typeof window !== "undefined" ? (window.localStorage.getItem("accessToken") ?? "") : "";
   const [data, setData] = useState<FreshnessResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,8 +55,8 @@ export default function JobFreshnessPage() {
       <header className="mb-6">
         <h1 className="text-2xl font-bold">Background Job Freshness</h1>
         <p className="text-sm text-gray-600">
-          Single-pane view of every monitored job. Red tiles also page the on-call channel via
-          the watchdog.
+          Single-pane view of every monitored job. Red tiles also page the on-call channel via the
+          watchdog.
         </p>
       </header>
 
@@ -106,10 +106,9 @@ export default function JobFreshnessPage() {
                   </div>
                   <div className="font-mono text-xs break-all">{r.jobName}</div>
                   <div className="text-xs text-gray-600 mt-1">
-                    Last finish: {r.lastFinishedAt
-                      ? new Date(r.lastFinishedAt).toLocaleString()
-                      : "never"}{" "}
-                    ({formatAge(r.ageMs)} ago)
+                    Last finish:{" "}
+                    {r.lastFinishedAt ? new Date(r.lastFinishedAt).toLocaleString() : "never"} (
+                    {formatAge(r.ageMs)} ago)
                   </div>
                 </div>
               );

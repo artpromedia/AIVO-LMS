@@ -15,7 +15,10 @@ const patchSchema = z.object({
   status: z.enum(["implemented", "partial", "not_started", "not_applicable"]).optional(),
 });
 
-export async function PATCH(req: Request, ctx: { params: Promise<{ controlId: string }> }): Promise<NextResponse> {
+export async function PATCH(
+  req: Request,
+  ctx: { params: Promise<{ controlId: string }> },
+): Promise<NextResponse> {
   const requestId = getRequestId(req);
   try {
     const { session, response } = await requireSession(req, requestId);
@@ -29,7 +32,13 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ controlId: st
     const body = await req.json().catch(() => null);
     const parsed = patchSchema.safeParse(body);
     if (!parsed.success) {
-      return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." }, requestId);
+      return fail(
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
+        requestId,
+      );
     }
     const updated = updateSecurityControl(controlId, parsed.data);
     audit(session!, "security.control.updated", requestId, { metadata: { controlId } });

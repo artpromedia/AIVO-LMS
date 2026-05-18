@@ -23,31 +23,31 @@
 
 ## Surfaces to verify
 
-| Role | Surface | Status | Notes |
-|------|---------|--------|-------|
-| Learner | Today's Mission home          | ⚫ TBD | must center mission card |
-| Learner | Lesson player                  | ⚫ TBD | one-task layout, tutor panel, hint/scaffold, read-aloud |
-| Learner | Quests / progress path         | ⚫ TBD | no fake progress |
-| Learner | Homework Helper                | ⚫ TBD | |
-| Learner | Subjects                       | ⚫ TBD | |
-| Parent  | Dashboard                      | ⚫ TBD | learner readiness, progress, support-used, next-step, privacy/consent |
-| Parent  | Learner detail                 | ⚫ TBD | |
-| Parent  | Consent / privacy center       | ⚫ TBD | |
-| Parent  | Billing                        | ⚫ TBD | |
-| Teacher | Roster                         | ⚫ TBD | standards-aware |
-| Teacher | Needs-attention                | ⚫ TBD | |
-| Teacher | Assignment builder             | ⚫ TBD | standards-aligned objectives |
-| Teacher | Learner detail (safe summary)  | ⚫ TBD | no raw IEP |
-| Admin   | Audit tables                   | ⚫ TBD | |
-| Admin   | AI safety queue                | ⚫ TBD | |
-| Admin   | Billing / seats                | ⚫ TBD | |
-| Admin   | Roster import health           | ⚫ TBD | |
-| Admin   | Incident / status              | ⚫ TBD | |
-| Mobile  | Role chooser                   | ⚫ TBD | |
-| Mobile  | Learner Mode                   | ⚫ TBD | parent lock for protected actions |
-| Mobile  | Parent Mode                    | ⚫ TBD | |
-| Mobile  | Teacher Mode                   | ⚫ TBD | roster-scoped |
-| Mobile  | Admin-Lite Mode                | ⚫ TBD | |
+| Role    | Surface                       | Status | Notes                                                                 |
+| ------- | ----------------------------- | ------ | --------------------------------------------------------------------- |
+| Learner | Today's Mission home          | ⚫ TBD | must center mission card                                              |
+| Learner | Lesson player                 | ⚫ TBD | one-task layout, tutor panel, hint/scaffold, read-aloud               |
+| Learner | Quests / progress path        | ⚫ TBD | no fake progress                                                      |
+| Learner | Homework Helper               | ⚫ TBD |                                                                       |
+| Learner | Subjects                      | ⚫ TBD |                                                                       |
+| Parent  | Dashboard                     | ⚫ TBD | learner readiness, progress, support-used, next-step, privacy/consent |
+| Parent  | Learner detail                | ⚫ TBD |                                                                       |
+| Parent  | Consent / privacy center      | ⚫ TBD |                                                                       |
+| Parent  | Billing                       | ⚫ TBD |                                                                       |
+| Teacher | Roster                        | ⚫ TBD | standards-aware                                                       |
+| Teacher | Needs-attention               | ⚫ TBD |                                                                       |
+| Teacher | Assignment builder            | ⚫ TBD | standards-aligned objectives                                          |
+| Teacher | Learner detail (safe summary) | ⚫ TBD | no raw IEP                                                            |
+| Admin   | Audit tables                  | ⚫ TBD |                                                                       |
+| Admin   | AI safety queue               | ⚫ TBD |                                                                       |
+| Admin   | Billing / seats               | ⚫ TBD |                                                                       |
+| Admin   | Roster import health          | ⚫ TBD |                                                                       |
+| Admin   | Incident / status             | ⚫ TBD |                                                                       |
+| Mobile  | Role chooser                  | ⚫ TBD |                                                                       |
+| Mobile  | Learner Mode                  | ⚫ TBD | parent lock for protected actions                                     |
+| Mobile  | Parent Mode                   | ⚫ TBD |                                                                       |
+| Mobile  | Teacher Mode                  | ⚫ TBD | roster-scoped                                                         |
+| Mobile  | Admin-Lite Mode               | ⚫ TBD |                                                                       |
 
 ## Required UX states (every surface, every role)
 

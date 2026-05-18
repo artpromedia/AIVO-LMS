@@ -7,9 +7,7 @@ import { exportToOBF } from "../obf/OBFExporter.js";
 import type { SymbolBoard } from "../types.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const fixture = JSON.parse(
-  readFileSync(join(__dirname, "fixtures/sample.obf.json"), "utf-8"),
-);
+const fixture = JSON.parse(readFileSync(join(__dirname, "fixtures/sample.obf.json"), "utf-8"));
 
 describe("OBFExporter", () => {
   it("exportToOBF produces a valid OBF document (zero validation errors)", () => {

@@ -8,20 +8,20 @@
 
 ## 1. Three admin roles, three jobs
 
-| Role | Scope | Primary job |
-|---|---|---|
-| `school_admin` | one school (tenant) | manage staff, classes, school‑level compliance reports |
-| `district_admin` | many schools (tenant‑group) | cross‑school oversight, rostering, district reporting |
-| `platform_admin` | every tenant | system health, safety review, billing, AI costs, audit trail |
+| Role             | Scope                       | Primary job                                                  |
+| ---------------- | --------------------------- | ------------------------------------------------------------ |
+| `school_admin`   | one school (tenant)         | manage staff, classes, school‑level compliance reports       |
+| `district_admin` | many schools (tenant‑group) | cross‑school oversight, rostering, district reporting        |
+| `platform_admin` | every tenant                | system health, safety review, billing, AI costs, audit trail |
 
 They share an `AppShell` chrome but **the navigation is role‑specific** (separate `SCHOOL_NAV`, `DISTRICT_NAV`, `PLATFORM_NAV` arrays in `components/layout/role-shells.tsx` and the local files at `app/admin/{school,district,platform}/page.tsx`).
 
 ## 2. Principles
 
-1. **No write actions on the overview.** Overview pages are *signal only*. Every state‑changing action lives on a dedicated detail page with its own server action + audit entry.
+1. **No write actions on the overview.** Overview pages are _signal only_. Every state‑changing action lives on a dedicated detail page with its own server action + audit entry.
 2. **Tenant scoping is the law.** Even platform admins act through `scopeTenantsForSession(role, tenantId)` (`audit-logs/page.tsx:15`) — never a raw cross‑tenant query.
 3. **Audit everything.** Every admin BFF that writes data calls `audit(session, action, …)`. The action vocabulary is the contract the audit log page renders.
-4. **Honesty over polish.** Where data is placeholder, the card carries a *Demo data* badge (see `admin/school/page.tsx:39`). Do not paint over placeholders with chartjunk.
+4. **Honesty over polish.** Where data is placeholder, the card carries a _Demo data_ badge (see `admin/school/page.tsx:39`). Do not paint over placeholders with chartjunk.
 
 ## 3. Sitemap (shipped today)
 
@@ -71,7 +71,7 @@ Platform admin (PLATFORM_NAV)
 
 ### Honest summary
 
-The admin **section breadth is large** — well over twenty routes. The depth ranges from *real and shippable* (audit logs, review queue, AI costs, school/district reports, school/district billing) to *signal‑only placeholders* (school/district/platform overview pages). Every overview page is the same anti‑pattern: hardcoded demo KPIs instead of a one‑line call to `computeSystemHealth` or a `listX().length`. Fixing the three overviews is the single highest‑ROI sprint in the admin app.
+The admin **section breadth is large** — well over twenty routes. The depth ranges from _real and shippable_ (audit logs, review queue, AI costs, school/district reports, school/district billing) to _signal‑only placeholders_ (school/district/platform overview pages). Every overview page is the same anti‑pattern: hardcoded demo KPIs instead of a one‑line call to `computeSystemHealth` or a `listX().length`. Fixing the three overviews is the single highest‑ROI sprint in the admin app.
 
 ## 4. School Admin
 
@@ -79,9 +79,9 @@ The admin **section breadth is large** — well over twenty routes. The depth ra
 
 Source: `admin/school/page.tsx` (49 lines). Renders:
 
-- Page header: *Westbrook Elementary* + *"Staff, classes, and school-level reporting."* — **the school name is hardcoded.** First sprint task is to call `getTenantById(session.tenantId).name`.
-- Three KPI cards: Staff 42, Classes 18, Active learners 411 — all literals with *Demo data* badges.
-- Compliance section: *"All systems nominal. Detailed reports arrive in Sprint 23."* (Sprint 23 has shipped — strip the reference.)
+- Page header: _Westbrook Elementary_ + _"Staff, classes, and school-level reporting."_ — **the school name is hardcoded.** First sprint task is to call `getTenantById(session.tenantId).name`.
+- Three KPI cards: Staff 42, Classes 18, Active learners 411 — all literals with _Demo data_ badges.
+- Compliance section: _"All systems nominal. Detailed reports arrive in Sprint 23."_ (Sprint 23 has shipped — strip the reference.)
 
 ### What `/admin/school` should be (⬜ → 🟡)
 
@@ -102,13 +102,13 @@ Each maps cleanly to existing repo helpers. The work is UI, not data.
 
 ### `/admin/district` (🟡)
 
-Source: `admin/district/page.tsx` (46 lines). Identical pattern to school: hardcoded *"Maple Hill USD"* + four demo KPI cards (Schools 12, Staff 584, Learners 5 206, IEPs on file 612).
+Source: `admin/district/page.tsx` (46 lines). Identical pattern to school: hardcoded _"Maple Hill USD"_ + four demo KPI cards (Schools 12, Staff 584, Learners 5 206, IEPs on file 612).
 
 ### What it should be (⬜ → 🟡)
 
 District admins coordinate **across** schools. Their pages need:
 
-1. **Schools list** — each row links to the school admin view for that tenant (district admins legitimately need cross‑tenant access *within their district*).
+1. **Schools list** — each row links to the school admin view for that tenant (district admins legitimately need cross‑tenant access _within their district_).
 2. **Rostering pane** — Google Classroom / Clever / ClassLink / Canvas LMS hooks. Today these are placeholder cards on the teacher home; the district admin is the right surface for them.
 3. **Cross‑school reports** — funnel from invitation → first lesson, IEPs‑per‑school, mastery growth by school.
 4. **Bulk procurement** — district‑level seat counts, billing pointer (read‑only — billing actions are platform‑admin only).
@@ -121,7 +121,7 @@ A district admin's `session.tenantId` is the district tenant, but `scopeTenantsF
 
 ### `/admin/platform` (🟡)
 
-Source: `admin/platform/page.tsx` (45 lines). Three hardcoded KPI cards (Tenants 37, Learners 82 114, Active sessions 1 202), all green *Healthy* badges.
+Source: `admin/platform/page.tsx` (45 lines). Three hardcoded KPI cards (Tenants 37, Learners 82 114, Active sessions 1 202), all green _Healthy_ badges.
 
 ### What it should be (⬜ → 🟡)
 
@@ -166,49 +166,49 @@ Static page describing AIVO's data residency posture. No interactive controls to
 
 ### `/admin/platform/compliance/dsar` (🟡)
 
-Data Subject Access Request queue. **List view only — there is no `[requestId]` per-request detail route today.** The fulfillment actions (export learner data, delete learner data) are not surfaced in the UI; whether they exist as BFFs at all needs verification. Decision needed: does fulfillment happen in‑app or by ticket to a human operator? **Block any "marketing-ready" claim until this is resolved end‑to‑end** — at minimum, add a `[requestId]/page.tsx` with the request payload + a *Mark fulfilled / Export / Delete* action set scoped to platform admins.
+Data Subject Access Request queue. **List view only — there is no `[requestId]` per-request detail route today.** The fulfillment actions (export learner data, delete learner data) are not surfaced in the UI; whether they exist as BFFs at all needs verification. Decision needed: does fulfillment happen in‑app or by ticket to a human operator? **Block any "marketing-ready" claim until this is resolved end‑to‑end** — at minimum, add a `[requestId]/page.tsx` with the request payload + a _Mark fulfilled / Export / Delete_ action set scoped to platform admins.
 
 ## 7. Cross‑role chrome — AppShell
 
-All admin pages render through `AppShell` (`components/layout/app-shell.tsx`) with role‑specific nav arrays. The shell auto‑renders the *role label* in the corner (e.g. *Platform admin*), which is the only persistent reminder of which scope the user is operating in. That reminder matters — confusing your district admin role with your platform admin role is one Postmortem away.
+All admin pages render through `AppShell` (`components/layout/app-shell.tsx`) with role‑specific nav arrays. The shell auto‑renders the _role label_ in the corner (e.g. _Platform admin_), which is the only persistent reminder of which scope the user is operating in. That reminder matters — confusing your district admin role with your platform admin role is one Postmortem away.
 
 ### Proposed reminder microcopy (⬜)
 
-For platform admins specifically, add a small persistent *"Acting as: Platform admin · {tenantCount} tenants"* line in the header. Prevents the "I thought I was scoped to one school" class of incident.
+For platform admins specifically, add a small persistent _"Acting as: Platform admin · {tenantCount} tenants"_ line in the header. Prevents the "I thought I was scoped to one school" class of incident.
 
 ## 8. Microcopy bank
 
-| Surface | String | Notes |
-|---|---|---|
-| Admin role label | *"School admin"* / *"District admin"* / *"Platform"* | Set on the AppShell |
-| Audit empty | *"No audit events yet"* | EmptyState |
-| Review queue empty | *"No review cases yet."* | inline card |
-| KPI placeholder badge | *"Demo data"* | drop once wired |
-| Compliance placeholder | *"All systems nominal. Detailed reports arrive in Sprint 23."* | strip — Sprint 23 shipped |
+| Surface                | String                                                         | Notes                     |
+| ---------------------- | -------------------------------------------------------------- | ------------------------- |
+| Admin role label       | _"School admin"_ / _"District admin"_ / _"Platform"_           | Set on the AppShell       |
+| Audit empty            | _"No audit events yet"_                                        | EmptyState                |
+| Review queue empty     | _"No review cases yet."_                                       | inline card               |
+| KPI placeholder badge  | _"Demo data"_                                                  | drop once wired           |
+| Compliance placeholder | _"All systems nominal. Detailed reports arrive in Sprint 23."_ | strip — Sprint 23 shipped |
 
 ## 9. State matrix
 
-| Page | State | UX |
-|---|---|---|
-| Any overview | No data yet | Real `0` with a non‑demo badge — never *"Demo data"* once we've moved off placeholders |
-| Audit logs | 0 events | `EmptyState` *"No audit events yet"* |
-| Review queue | 0 cases | Inline card *"No review cases yet."* |
-| Review queue | Open case | Status badge + `<ReviewActions>` row |
-| Review queue | Resolved case | Status badge + *"Resolution: {text}"* footer |
-| DSAR detail | Awaiting export | (🟡) Currently shows status only — needs an explicit *"Export in progress"* visual once the pipeline is wired |
-| AI costs | Threshold exceeded | Banner with link to the offending tenant |
-| Cross‑tenant access attempt | platform admin clicks into a tenant | `audit(session, "platform.tenant.view", { tenantId })` |
+| Page                        | State                               | UX                                                                                                            |
+| --------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Any overview                | No data yet                         | Real `0` with a non‑demo badge — never _"Demo data"_ once we've moved off placeholders                        |
+| Audit logs                  | 0 events                            | `EmptyState` _"No audit events yet"_                                                                          |
+| Review queue                | 0 cases                             | Inline card _"No review cases yet."_                                                                          |
+| Review queue                | Open case                           | Status badge + `<ReviewActions>` row                                                                          |
+| Review queue                | Resolved case                       | Status badge + _"Resolution: {text}"_ footer                                                                  |
+| DSAR detail                 | Awaiting export                     | (🟡) Currently shows status only — needs an explicit _"Export in progress"_ visual once the pipeline is wired |
+| AI costs                    | Threshold exceeded                  | Banner with link to the offending tenant                                                                      |
+| Cross‑tenant access attempt | platform admin clicks into a tenant | `audit(session, "platform.tenant.view", { tenantId })`                                                        |
 
 ## 10. Engineering handoff
 
-| Concern | Where |
-|---|---|
-| Role nav arrays | `components/layout/role-shells.tsx` + per‑page local arrays in `app/admin/{school,district,platform}/page.tsx` |
-| Tenant scoping helper | `scopeTenantsForSession(role, tenantId)` in `lib/db/repos.ts` |
-| Audit | `lib/bff/audit.ts` — action vocabulary listed under `/admin/platform/audit-logs` |
-| Moderation pipeline | `lib/db/repos.ts` (`listHumanReviewCases`, `getModerationEvent`, `resolveReviewCase`) + `app/admin/platform/safety/review-queue/actions.ts` |
-| AI cost data | `AiGenerationJob` in `lib/db/types.ts:765-774` |
-| DSAR pipeline | `app/admin/platform/compliance/dsar/**` — verify fulfillment end‑to‑end before claiming ready |
+| Concern               | Where                                                                                                                                       |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Role nav arrays       | `components/layout/role-shells.tsx` + per‑page local arrays in `app/admin/{school,district,platform}/page.tsx`                              |
+| Tenant scoping helper | `scopeTenantsForSession(role, tenantId)` in `lib/db/repos.ts`                                                                               |
+| Audit                 | `lib/bff/audit.ts` — action vocabulary listed under `/admin/platform/audit-logs`                                                            |
+| Moderation pipeline   | `lib/db/repos.ts` (`listHumanReviewCases`, `getModerationEvent`, `resolveReviewCase`) + `app/admin/platform/safety/review-queue/actions.ts` |
+| AI cost data          | `AiGenerationJob` in `lib/db/types.ts:765-774`                                                                                              |
+| DSAR pipeline         | `app/admin/platform/compliance/dsar/**` — verify fulfillment end‑to‑end before claiming ready                                               |
 
 ## 11. Acceptance criteria — honest
 

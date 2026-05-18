@@ -2,20 +2,20 @@
 
 ## Today vs. target
 
-| | Today (legacy) | Target (unified) |
-|---|---|---|
-| Shell | Per-role: `app/(parent)`, `(learner)`, `(teacher)`, `(caregiver)`, `(therapist)` | Single `app/(app)/_layout.tsx` |
-| Role switching | Re-login required | Two-tap switcher; same identity |
-| Server hint | none | `x-aivo-active-role: <role>` on every request |
-| Authorization | Per-role; cross-role data leaks possible if the wrong shell renders | Server enforces against token role claims; header is a hint only |
-| Offline | n/a | Lesson responses queue; flush on reconnect; dedupe by `idempotencyKey` |
+|                | Today (legacy)                                                                   | Target (unified)                                                       |
+| -------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Shell          | Per-role: `app/(parent)`, `(learner)`, `(teacher)`, `(caregiver)`, `(therapist)` | Single `app/(app)/_layout.tsx`                                         |
+| Role switching | Re-login required                                                                | Two-tap switcher; same identity                                        |
+| Server hint    | none                                                                             | `x-aivo-active-role: <role>` on every request                          |
+| Authorization  | Per-role; cross-role data leaks possible if the wrong shell renders              | Server enforces against token role claims; header is a hint only       |
+| Offline        | n/a                                                                              | Lesson responses queue; flush on reconnect; dedupe by `idempotencyKey` |
 
 ## Feature flag
 
 Defined in `apps/mobile/lib/feature-flags.ts`:
 
 ```ts
-MOBILE_UNIFIED_APP = process.env.EXPO_PUBLIC_MOBILE_UNIFIED_APP ?? false
+MOBILE_UNIFIED_APP = process.env.EXPO_PUBLIC_MOBILE_UNIFIED_APP ?? false;
 ```
 
 Defaults to `false`. Flip in the same commit that removes the legacy
@@ -25,11 +25,11 @@ role-group directories. The flag is read once at app start.
 
 `apps/mobile/lib/role-context.tsx` exports:
 
-| Symbol | Purpose |
-|---|---|
-| `RoleProvider` | Wraps the unified shell; owns active-role state |
-| `useRole()` | Hook for screens / chrome to read `availableRoles`, `activeRole`, `lastPathByRole`, `activeLearner` |
-| `ACTIVE_ROLE_HEADER` | The string constant `x-aivo-active-role` — keep in lock-step with `apps/mobile/lib/api.ts` |
+| Symbol               | Purpose                                                                                             |
+| -------------------- | --------------------------------------------------------------------------------------------------- |
+| `RoleProvider`       | Wraps the unified shell; owns active-role state                                                     |
+| `useRole()`          | Hook for screens / chrome to read `availableRoles`, `activeRole`, `lastPathByRole`, `activeLearner` |
+| `ACTIVE_ROLE_HEADER` | The string constant `x-aivo-active-role` — keep in lock-step with `apps/mobile/lib/api.ts`          |
 
 State invariants:
 
@@ -79,6 +79,7 @@ incrementally land the unified shell. The order:
    removed entirely.
 
 No screen is moved without a parity test that exercises:
+
 - read flows in the new shell match the legacy flow
 - write flows on the same data store
 - role switch preserves `lastPathByRole`

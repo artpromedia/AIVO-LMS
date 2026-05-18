@@ -21,13 +21,7 @@ function initialFor(name?: string | null) {
   return trimmed.charAt(0).toUpperCase();
 }
 
-export function UserAvatar({
-  avatarUrl,
-  name,
-  size = 32,
-  className = "",
-  bust,
-}: UserAvatarProps) {
+export function UserAvatar({ avatarUrl, name, size = 32, className = "", bust }: UserAvatarProps) {
   const dim = size;
   const fontPx = Math.max(10, Math.round(size * 0.4));
   const wrapperBase =
@@ -36,10 +30,7 @@ export function UserAvatar({
   if (avatarUrl) {
     const src = bust ? `${avatarUrl}?v=${encodeURIComponent(String(bust))}` : avatarUrl;
     return (
-      <span
-        className={`${wrapperBase} ${className}`}
-        style={{ width: dim, height: dim }}
-      >
+      <span className={`${wrapperBase} ${className}`} style={{ width: dim, height: dim }}>
         <Image
           src={src}
           alt={name ? `${name} profile photo` : "Profile photo"}

@@ -26,7 +26,10 @@ export { SurfaceHost, type SurfaceHostProps } from "./SurfaceHost.js";
 export { ScratchpadSurface, type ScratchpadSurfaceProps } from "./surfaces/ScratchpadSurface.js";
 export { GeometrySurface, type GeometrySurfaceProps } from "./surfaces/GeometrySurface.js";
 export { ChoiceGridSurface, type ChoiceGridSurfaceProps } from "./surfaces/ChoiceGridSurface.js";
-export { MathExpressionSurface, type MathExpressionSurfaceProps } from "./surfaces/MathExpressionSurface.js";
+export {
+  MathExpressionSurface,
+  type MathExpressionSurfaceProps,
+} from "./surfaces/MathExpressionSurface.js";
 
 export { InkCanvas, type InkCanvasProps } from "./ink/InkCanvas.js";
 export {

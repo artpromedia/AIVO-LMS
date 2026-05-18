@@ -29,9 +29,7 @@ function requireUrl(name: string, devDefault: string): string {
 }
 
 const AI_SVC_URL = requireUrl("AI_SVC_URL", "http://localhost:3005");
-const INTERNAL_KEY =
-  process.env.INTERNAL_SERVICE_KEY ||
-  (IS_PROD ? "" : "aivo-internal-dev-key");
+const INTERNAL_KEY = process.env.INTERNAL_SERVICE_KEY || (IS_PROD ? "" : "aivo-internal-dev-key");
 
 export class ToolCallError extends Error {
   status: number;
@@ -44,16 +42,9 @@ export class ToolCallError extends Error {
   }
 }
 
-function assertCapability(
-  tutor: TutorDefinition,
-  cap: TutorCapability,
-): void {
+function assertCapability(tutor: TutorDefinition, cap: TutorCapability): void {
   if (!tutor.capabilities.includes(cap)) {
-    throw new ToolCallError(
-      `Tutor "${tutor.id}" does not declare capability "${cap}".`,
-      cap,
-      400,
-    );
+    throw new ToolCallError(`Tutor "${tutor.id}" does not declare capability "${cap}".`, cap, 400);
   }
 }
 
@@ -134,17 +125,9 @@ export async function requestCodeRun(
     throw new ToolCallError("code_run: source is required", "code_run", 400);
   }
   if (body.source.length > 8 * 1024) {
-    throw new ToolCallError(
-      "code_run: source must be under 8 KB",
-      "code_run",
-      400,
-    );
+    throw new ToolCallError("code_run: source must be under 8 KB", "code_run", 400);
   }
-  return postTool<CodeRunRequest, CodeRunResponse>(
-    "/api/ai/tools/code-run",
-    body,
-    "code_run",
-  );
+  return postTool<CodeRunRequest, CodeRunResponse>("/api/ai/tools/code-run", body, "code_run");
 }
 
 // ── image_out ──────────────────────────────────────────────────────
@@ -178,11 +161,7 @@ export async function requestImageOut(
   if (typeof body.prompt !== "string" || body.prompt.trim().length === 0) {
     throw new ToolCallError("image_out: prompt is required", "image_out", 400);
   }
-  return postTool<ImageOutRequest, ImageOutResponse>(
-    "/api/ai/tools/image-out",
-    body,
-    "image_out",
-  );
+  return postTool<ImageOutRequest, ImageOutResponse>("/api/ai/tools/image-out", body, "image_out");
 }
 
 // ── voice_out (audio generation) ───────────────────────────────────
@@ -214,17 +193,9 @@ export async function requestAudioOut(
     throw new ToolCallError("voice_out: prompt is required", "voice_out", 400);
   }
   if (body.durationMs !== undefined && body.durationMs > 30_000) {
-    throw new ToolCallError(
-      "voice_out: durationMs must be ≤ 30000",
-      "voice_out",
-      400,
-    );
+    throw new ToolCallError("voice_out: durationMs must be ≤ 30000", "voice_out", 400);
   }
-  return postTool<AudioOutRequest, AudioOutResponse>(
-    "/api/ai/tools/audio-out",
-    body,
-    "voice_out",
-  );
+  return postTool<AudioOutRequest, AudioOutResponse>("/api/ai/tools/audio-out", body, "voice_out");
 }
 
 export const __testing = { AI_SVC_URL, INTERNAL_KEY, assertCapability, postTool };

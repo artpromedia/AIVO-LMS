@@ -21,7 +21,12 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection", "ai_personalization"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection", "ai_personalization"],
+      requestId,
+    );
     if (consentErr) return consentErr;
     const body = await req.json().catch(() => null);
     const parsed = LessonStepInput.safeParse(body);
@@ -35,10 +40,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (!found || found.lessonRun.learnerId !== learnerId) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Lesson run not found" }, requestId);
     }
-    if (
-      found.lessonRun.status !== "ready" &&
-      found.lessonRun.status !== "in_progress"
-    ) {
+    if (found.lessonRun.status !== "ready" && found.lessonRun.status !== "in_progress") {
       return fail(
         {
           ...ERRORS.PRECONDITION_FAILED,

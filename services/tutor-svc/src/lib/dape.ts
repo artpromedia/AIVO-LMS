@@ -13,10 +13,7 @@ import { eq } from "drizzle-orm";
 import { iepGoals, iepProfiles, iepServices } from "@aivo/db";
 import { buildDapeProfileSummary, type DapeProfileSummary } from "@aivo/scoring";
 
-export async function loadDapeProfile(
-  db: any,
-  learnerId: string,
-): Promise<DapeProfileSummary> {
+export async function loadDapeProfile(db: any, learnerId: string): Promise<DapeProfileSummary> {
   const goals = await db
     .select({ id: iepGoals.id, domain: iepGoals.domain, goalText: iepGoals.goalText })
     .from(iepGoals)

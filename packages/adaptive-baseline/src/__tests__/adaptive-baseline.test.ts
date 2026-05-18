@@ -10,14 +10,70 @@ import {
 } from "../index.js";
 
 const bank: BaselineItem[] = [
-  { id: "i1", skillId: "math.add.k", difficulty: -1.0, modalities: ["visual"], lightReading: true, gradeBand: "K" },
-  { id: "i2", skillId: "math.add.k", difficulty: -0.5, modalities: ["visual", "auditory"], lightReading: true, gradeBand: "K" },
-  { id: "i3", skillId: "math.add.1", difficulty: 0, modalities: ["reading"], lightReading: false, gradeBand: "1" },
-  { id: "i4", skillId: "math.sub.1", difficulty: 0.5, modalities: ["visual"], lightReading: true, gradeBand: "1" },
-  { id: "i5", skillId: "math.sub.2", difficulty: 1.0, modalities: ["reading"], lightReading: false, gradeBand: "2" },
-  { id: "i6", skillId: "math.mul.2", difficulty: 1.5, modalities: ["auditory"], lightReading: true, gradeBand: "2" },
-  { id: "i7", skillId: "math.mul.3", difficulty: 2.0, modalities: ["kinesthetic"], lightReading: true, gradeBand: "3" },
-  { id: "i8", skillId: "ela.read.k", difficulty: -0.7, modalities: ["auditory"], lightReading: true, gradeBand: "K" },
+  {
+    id: "i1",
+    skillId: "math.add.k",
+    difficulty: -1.0,
+    modalities: ["visual"],
+    lightReading: true,
+    gradeBand: "K",
+  },
+  {
+    id: "i2",
+    skillId: "math.add.k",
+    difficulty: -0.5,
+    modalities: ["visual", "auditory"],
+    lightReading: true,
+    gradeBand: "K",
+  },
+  {
+    id: "i3",
+    skillId: "math.add.1",
+    difficulty: 0,
+    modalities: ["reading"],
+    lightReading: false,
+    gradeBand: "1",
+  },
+  {
+    id: "i4",
+    skillId: "math.sub.1",
+    difficulty: 0.5,
+    modalities: ["visual"],
+    lightReading: true,
+    gradeBand: "1",
+  },
+  {
+    id: "i5",
+    skillId: "math.sub.2",
+    difficulty: 1.0,
+    modalities: ["reading"],
+    lightReading: false,
+    gradeBand: "2",
+  },
+  {
+    id: "i6",
+    skillId: "math.mul.2",
+    difficulty: 1.5,
+    modalities: ["auditory"],
+    lightReading: true,
+    gradeBand: "2",
+  },
+  {
+    id: "i7",
+    skillId: "math.mul.3",
+    difficulty: 2.0,
+    modalities: ["kinesthetic"],
+    lightReading: true,
+    gradeBand: "3",
+  },
+  {
+    id: "i8",
+    skillId: "ela.read.k",
+    difficulty: -0.7,
+    modalities: ["auditory"],
+    lightReading: true,
+    gradeBand: "K",
+  },
 ];
 
 describe("adaptive-baseline", () => {
@@ -78,10 +134,7 @@ describe("adaptive-baseline", () => {
     for (let i = 0; i < 20; i++) {
       s = {
         ...s,
-        administered: [
-          ...s.administered,
-          { itemId: `x${i}`, correct: true, responseTimeMs: 1000 },
-        ],
+        administered: [...s.administered, { itemId: `x${i}`, correct: true, responseTimeMs: 1000 }],
       };
     }
     expect(shouldStop(s).stop).toBe(true);
@@ -93,10 +146,7 @@ describe("adaptive-baseline", () => {
     for (let i = 0; i < 6; i++) {
       s = {
         ...s,
-        administered: [
-          ...s.administered,
-          { itemId: `x${i}`, correct: true, responseTimeMs: 1000 },
-        ],
+        administered: [...s.administered, { itemId: `x${i}`, correct: true, responseTimeMs: 1000 }],
       };
     }
     s = { ...s, infoSum: 10 };

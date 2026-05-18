@@ -211,8 +211,7 @@ const BANK: BankItem[] = [
     choices: ["Laugh at them", "Offer to share yours", "Walk away"],
     expectedAnswer: "Offer to share yours",
     hint: "Think about what would make them feel better.",
-    readAloudText:
-      "Your friend dropped their ice cream and looks sad. What is kind to do?",
+    readAloudText: "Your friend dropped their ice cream and looks sad. What is kind to do?",
   },
   {
     skillSlug: "name-feelings",
@@ -221,8 +220,7 @@ const BANK: BankItem[] = [
     choices: ["Excited", "Upset", "Tired"],
     expectedAnswer: "Upset",
     hint: "Crossed arms and a frown usually mean a hard feeling.",
-    readAloudText:
-      "Someone is crossing their arms and frowning. They probably feel what?",
+    readAloudText: "Someone is crossing their arms and frowning. They probably feel what?",
   },
   // Speech & Language (Echo's Sound Studio)
   {
@@ -260,14 +258,12 @@ const BANK: BankItem[] = [
     choices: ["Red", "Green", "Yellow"],
     expectedAnswer: "Red",
     hint: "The pattern goes red then blue, over and over.",
-    readAloudText:
-      "What comes next in the pattern: red, blue, red, blue, blank?",
+    readAloudText: "What comes next in the pattern: red, blue, red, blue, blank?",
   },
   {
     skillSlug: "memory-sequence",
     difficulty: "approaching",
-    prompt:
-      "I show you: cat, hat, bat. Which word was in the middle?",
+    prompt: "I show you: cat, hat, bat. Which word was in the middle?",
     choices: ["Cat", "Hat", "Bat"],
     expectedAnswer: "Hat",
     hint: "First, middle, last — the middle one.",
@@ -276,8 +272,7 @@ const BANK: BankItem[] = [
   {
     skillSlug: "multi-step-plan",
     difficulty: "stretch",
-    prompt:
-      "You have 30 minutes to get ready, eat, and walk to the bus. What do you do first?",
+    prompt: "You have 30 minutes to get ready, eat, and walk to the bus. What do you do first?",
     choices: ["Walk to the bus", "Get ready", "Take a nap"],
     expectedAnswer: "Get ready",
     hint: "Think about what has to happen before everything else.",
@@ -346,9 +341,7 @@ export type GenerateBaselineInput = {
  * default). Returns 2–3 questions per subject, ordered foundational → harder,
  * keeping the total tight enough for low-friction onboarding.
  */
-export function generateBaselineQuestions(
-  input: GenerateBaselineInput,
-): BaselineQuestion[] {
+export function generateBaselineQuestions(input: GenerateBaselineInput): BaselineQuestion[] {
   const { baselineId, learner, brainProfile, subjects, skills } = input;
   const accTags = accommodationTagsFor(brainProfile);
   const readingBias = comfortToBias(learner.readingComfort);
@@ -367,12 +360,9 @@ export function generateBaselineQuestions(
     const subjSkills = skillsBySubject.get(subject.id) ?? [];
     if (subjSkills.length === 0) continue;
     const bias =
-      subject.slug === "reading" ||
-      subject.slug === "writing" ||
-      subject.slug === "speech"
+      subject.slug === "reading" || subject.slug === "writing" || subject.slug === "speech"
         ? readingBias
-        : subject.slug === "math" ||
-            subject.slug === "executive-function"
+        : subject.slug === "math" || subject.slug === "executive-function"
           ? mathBias
           : 0;
     const wantedDiffs = pickDifficulties(bias);
@@ -386,9 +376,8 @@ export function generateBaselineQuestions(
     const picked: BankItem[] = [];
     for (const diff of wantedDiffs) {
       const match =
-        candidates.find(
-          (c) => c.difficulty === diff && !picked.includes(c),
-        ) ?? candidates.find((c) => !picked.includes(c));
+        candidates.find((c) => c.difficulty === diff && !picked.includes(c)) ??
+        candidates.find((c) => !picked.includes(c));
       if (match) picked.push(match);
     }
     if (picked.length === 0) picked.push(candidates[0]!);
@@ -419,12 +408,5 @@ export function generateBaselineQuestions(
 /** Default subjects covered by an onboarding baseline. Six Discovery
  *  Adventure domains, mirroring the legacy chapter set. */
 export function defaultBaselineSubjectSlugs(): string[] {
-  return [
-    "reading",
-    "math",
-    "science",
-    "social",
-    "speech",
-    "executive-function",
-  ];
+  return ["reading", "math", "science", "social", "speech", "executive-function"];
 }

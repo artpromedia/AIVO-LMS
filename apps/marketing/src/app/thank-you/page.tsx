@@ -61,7 +61,10 @@ export default function ThankYouPage() {
                 href={s.href}
                 className="mt-4 inline-flex w-fit items-center font-bold text-purple-700 hover:text-purple-800"
               >
-                {s.label} <span aria-hidden="true" className="ml-1">→</span>
+                {s.label}{" "}
+                <span aria-hidden="true" className="ml-1">
+                  →
+                </span>
               </Link>
             </li>
           ))}

@@ -5,11 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DISTRICT_NAV } from "@/components/layout/role-shells";
-import {
-  listBillingForTenants,
-  scopeTenantsForSession,
-  getTenantById,
-} from "@/lib/db/repos";
+import { listBillingForTenants, scopeTenantsForSession, getTenantById } from "@/lib/db/repos";
 
 export default async function Page() {
   const session = await requirePageRole(["district_admin"]);
@@ -50,7 +46,15 @@ export default async function Page() {
                     <td className="p-3 text-aivo-ink-soft">{t?.type ?? "?"}</td>
                     <td className="p-3 text-aivo-ink-soft">{a.plan}</td>
                     <td className="p-3">
-                      <Badge tone={a.status === "active" ? "success" : a.status === "past_due" ? "danger" : "warning"}>
+                      <Badge
+                        tone={
+                          a.status === "active"
+                            ? "success"
+                            : a.status === "past_due"
+                              ? "danger"
+                              : "warning"
+                        }
+                      >
                         {a.status}
                       </Badge>
                     </td>

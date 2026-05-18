@@ -48,7 +48,8 @@ export default async function Page() {
             <div>
               <p className="font-display text-lg font-semibold">{sub.planId}</p>
               <p className="text-sm text-aivo-ink-soft">
-                Period {new Date(sub.currentPeriodStartAt).toLocaleDateString()} – {new Date(sub.currentPeriodEndAt).toLocaleDateString()}
+                Period {new Date(sub.currentPeriodStartAt).toLocaleDateString()} –{" "}
+                {new Date(sub.currentPeriodEndAt).toLocaleDateString()}
               </p>
             </div>
             <Badge tone={STATUS_TONE[sub.status] ?? "neutral"} className="ml-auto">
@@ -57,7 +58,10 @@ export default async function Page() {
           </div>
         </Card>
       ) : (
-        <EmptyState title="No subscription" description="Contact platform billing to provision a school subscription." />
+        <EmptyState
+          title="No subscription"
+          description="Contact platform billing to provision a school subscription."
+        />
       )}
 
       <h2 className="mb-3 font-display text-lg font-semibold">Seat licenses</h2>
@@ -95,7 +99,9 @@ export default async function Page() {
                         <tr key={a.id} className="border-t border-aivo-border">
                           <td className="p-3 font-medium">{a.subjectId}</td>
                           <td className="p-3 text-aivo-ink-soft">{a.subjectKind}</td>
-                          <td className="p-3 text-aivo-ink-soft">{new Date(a.assignedAt).toLocaleDateString()}</td>
+                          <td className="p-3 text-aivo-ink-soft">
+                            {new Date(a.assignedAt).toLocaleDateString()}
+                          </td>
                           <td className="p-3 text-right">
                             <RevokeSeatButton assignmentId={a.id} />
                           </td>
@@ -129,11 +135,20 @@ export default async function Page() {
                 <tr key={i.id} className="border-t border-aivo-border">
                   <td className="p-3 font-medium">{i.number}</td>
                   <td className="p-3 text-aivo-ink-soft">
-                    {new Date(i.periodStartAt).toLocaleDateString()} – {new Date(i.periodEndAt).toLocaleDateString()}
+                    {new Date(i.periodStartAt).toLocaleDateString()} –{" "}
+                    {new Date(i.periodEndAt).toLocaleDateString()}
                   </td>
                   <td className="p-3">${(i.amountCents / 100).toFixed(2)}</td>
                   <td className="p-3">
-                    <Badge tone={i.status === "paid" ? "success" : i.status === "open" ? "warning" : "neutral"}>
+                    <Badge
+                      tone={
+                        i.status === "paid"
+                          ? "success"
+                          : i.status === "open"
+                            ? "warning"
+                            : "neutral"
+                      }
+                    >
                       {i.status}
                     </Badge>
                   </td>

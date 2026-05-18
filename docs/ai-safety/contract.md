@@ -54,14 +54,14 @@ plan still satisfies `GeneratedLessonPlanSchema`.
 
 ## Evaluator catalog (responsible-ai-svc)
 
-| Evaluator | Concern |
-|---|---|
-| `prompt-injection-detector` | adversarial prompts in learner / homework input |
-| `age-appropriateness-evaluator` | grade-band fit |
-| `homework-integrity-evaluator` | no final answer before learner attempt |
-| `profile-adherence-evaluator` | output respects the brain profile + accommodations |
+| Evaluator                       | Concern                                                                              |
+| ------------------------------- | ------------------------------------------------------------------------------------ |
+| `prompt-injection-detector`     | adversarial prompts in learner / homework input                                      |
+| `age-appropriateness-evaluator` | grade-band fit                                                                       |
+| `homework-integrity-evaluator`  | no final answer before learner attempt                                               |
+| `profile-adherence-evaluator`   | output respects the brain profile + accommodations                                   |
 | `surface-requirement-evaluator` | rejects raw HTML/SVG; speech-required commands gated by profile (Sprint 07 contract) |
-| `escalation-policy` | self-harm / crisis → human review queue |
+| `escalation-policy`             | self-harm / crisis → human review queue                                              |
 
 Add a new evaluator by implementing the `EvaluateInput → ViolationReport[]`
 shape in `services/responsible-ai-svc/src/services/types.ts` and
@@ -86,12 +86,12 @@ wiring it into `routes/evaluate.ts`.
 
 ## Cost controls
 
-| Budget | Owner |
-|---|---|
-| Per-tenant monthly | admin-svc |
+| Budget              | Owner                                       |
+| ------------------- | ------------------------------------------- |
+| Per-tenant monthly  | admin-svc                                   |
 | Per-learner monthly | family-svc (deducts from family plan share) |
-| Per-feature daily | feature flags (`feature-flags` package) |
-| Per-request timeout | provider abstraction (configurable) |
+| Per-feature daily   | feature flags (`feature-flags` package)     |
+| Per-request timeout | provider abstraction (configurable)         |
 
 Reusable lesson scaffolds are cached by `(tutorPersona, skillId,
 gradeBand, accommodationProfileHash)` so a parent who regenerates

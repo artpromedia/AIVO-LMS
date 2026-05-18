@@ -12,18 +12,18 @@ the same PR and run `pnpm consent:audit`.
 
 ## Consent types
 
-| Key | Audience | Required before | Revocable | Notes |
-|---|---|---|---|---|
-| `parent_account_terms` | parent | account creation | yes | terms of service acceptance |
-| `parent_privacy_policy` | parent | account creation | yes | privacy policy acceptance |
-| `child_data_collection` | parent | any persistence of learner profile, assessment responses, lesson history, or chat transcripts | yes | COPPA verifiable parental consent equivalent |
-| `iep_document_storage` | parent | IEP upload, parse, or storage; any IEP-derived accommodations | yes | extra audit event on grant + revoke |
-| `ai_personalization` | parent | LLM-personalized lessons, recommendations, brain profile, Today's Mission | yes | grace-period downgrade to non-personalized content on revoke |
-| `school_roster_import` | parent (per-learner) | a school admin can attach the learner to a class | yes | school cannot import without parent grant; deferred to Sprint 12 wiring |
-| `teacher_access` | parent | teacher can view learner's classroom progress | yes | scoped per teacher / per class |
-| `marketing_opt_in` | parent | marketing email, push notification, SMS | yes | default OFF; never gates product functionality |
-| `data_export_request` | parent | parent can request DSAR export | yes | one-shot consent per request; audit logged |
-| `data_deletion_request` | parent | parent can request right-to-delete | yes | one-shot consent per request; legal retention holds still apply |
+| Key                     | Audience             | Required before                                                                               | Revocable | Notes                                                                   |
+| ----------------------- | -------------------- | --------------------------------------------------------------------------------------------- | --------- | ----------------------------------------------------------------------- |
+| `parent_account_terms`  | parent               | account creation                                                                              | yes       | terms of service acceptance                                             |
+| `parent_privacy_policy` | parent               | account creation                                                                              | yes       | privacy policy acceptance                                               |
+| `child_data_collection` | parent               | any persistence of learner profile, assessment responses, lesson history, or chat transcripts | yes       | COPPA verifiable parental consent equivalent                            |
+| `iep_document_storage`  | parent               | IEP upload, parse, or storage; any IEP-derived accommodations                                 | yes       | extra audit event on grant + revoke                                     |
+| `ai_personalization`    | parent               | LLM-personalized lessons, recommendations, brain profile, Today's Mission                     | yes       | grace-period downgrade to non-personalized content on revoke            |
+| `school_roster_import`  | parent (per-learner) | a school admin can attach the learner to a class                                              | yes       | school cannot import without parent grant; deferred to Sprint 12 wiring |
+| `teacher_access`        | parent               | teacher can view learner's classroom progress                                                 | yes       | scoped per teacher / per class                                          |
+| `marketing_opt_in`      | parent               | marketing email, push notification, SMS                                                       | yes       | default OFF; never gates product functionality                          |
+| `data_export_request`   | parent               | parent can request DSAR export                                                                | yes       | one-shot consent per request; audit logged                              |
+| `data_deletion_request` | parent               | parent can request right-to-delete                                                            | yes       | one-shot consent per request; legal retention holds still apply         |
 
 ## UI gates (web)
 
@@ -32,17 +32,17 @@ checks the corresponding consent. Pages should render an explicit
 "consent required" empty state with a link to `/parent/consent`, not a
 silent no-op.
 
-| Surface | Gate |
-|---|---|
-| `/parent/learners/new` | `parent_account_terms`, `parent_privacy_policy`, `child_data_collection` (collected during onboarding) |
-| `/parent/learners/[id]/iep` | `iep_document_storage` |
-| `/parent/learners/[id]/brain-profile` | `ai_personalization` |
-| `/learner/missions` | `child_data_collection`, `ai_personalization` |
-| `/learner/baseline` | `child_data_collection` |
-| `/learner/lesson-runs/...` | `child_data_collection`, `ai_personalization` |
-| `/teacher/learners/[id]` | `teacher_access` (per-learner) |
-| `/parent/notifications` | settings honor `marketing_opt_in` |
-| `/parent/privacy` | DSAR / deletion request CTAs gated on respective one-shot consents |
+| Surface                               | Gate                                                                                                   |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `/parent/learners/new`                | `parent_account_terms`, `parent_privacy_policy`, `child_data_collection` (collected during onboarding) |
+| `/parent/learners/[id]/iep`           | `iep_document_storage`                                                                                 |
+| `/parent/learners/[id]/brain-profile` | `ai_personalization`                                                                                   |
+| `/learner/missions`                   | `child_data_collection`, `ai_personalization`                                                          |
+| `/learner/baseline`                   | `child_data_collection`                                                                                |
+| `/learner/lesson-runs/...`            | `child_data_collection`, `ai_personalization`                                                          |
+| `/teacher/learners/[id]`              | `teacher_access` (per-learner)                                                                         |
+| `/parent/notifications`               | settings honor `marketing_opt_in`                                                                      |
+| `/parent/privacy`                     | DSAR / deletion request CTAs gated on respective one-shot consents                                     |
 
 ## BFF gates (web-v2)
 
@@ -53,17 +53,17 @@ before returning the response. The audit script
 `apps/web-v2/app/api/bff/learners/**` and reports any route that
 touches a learnerId but lacks a `requireLearnerConsent` call.
 
-| Path pattern | Required consents |
-|---|---|
-| `bff/learners/[learnerId]/iep/*` | `iep_document_storage`, `child_data_collection` |
-| `bff/learners/[learnerId]/brain-profile/*` | `ai_personalization`, `child_data_collection` |
-| `bff/learners/[learnerId]/lesson-runs/*` | `child_data_collection`, `ai_personalization` |
-| `bff/learners/[learnerId]/missions/*` | `child_data_collection`, `ai_personalization` |
-| `bff/learners/[learnerId]/baseline/*` | `child_data_collection` |
-| `bff/learners/[learnerId]/assessment/*` | `child_data_collection` |
-| `bff/learners/[learnerId]/homework/*` | `child_data_collection` |
-| `bff/learners/[learnerId]/consent/*` | (no recursive consent — these manage consent) |
-| `bff/learners/[learnerId]` (profile read/write) | `child_data_collection` |
+| Path pattern                                    | Required consents                               |
+| ----------------------------------------------- | ----------------------------------------------- |
+| `bff/learners/[learnerId]/iep/*`                | `iep_document_storage`, `child_data_collection` |
+| `bff/learners/[learnerId]/brain-profile/*`      | `ai_personalization`, `child_data_collection`   |
+| `bff/learners/[learnerId]/lesson-runs/*`        | `child_data_collection`, `ai_personalization`   |
+| `bff/learners/[learnerId]/missions/*`           | `child_data_collection`, `ai_personalization`   |
+| `bff/learners/[learnerId]/baseline/*`           | `child_data_collection`                         |
+| `bff/learners/[learnerId]/assessment/*`         | `child_data_collection`                         |
+| `bff/learners/[learnerId]/homework/*`           | `child_data_collection`                         |
+| `bff/learners/[learnerId]/consent/*`            | (no recursive consent — these manage consent)   |
+| `bff/learners/[learnerId]` (profile read/write) | `child_data_collection`                         |
 
 ## Server-side enforcement contract
 

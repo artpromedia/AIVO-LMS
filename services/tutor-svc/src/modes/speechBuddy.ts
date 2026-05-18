@@ -10,13 +10,7 @@
  *   - docs/products/speech-buddy/safety.md  (consent + safety gating)
  */
 
-import type {
-  AgeBand,
-  SafetyFlag,
-  SkillTag,
-  SpeechBuddySession,
-  TurnEvent,
-} from "@aivo/events";
+import type { AgeBand, SafetyFlag, SkillTag, SpeechBuddySession, TurnEvent } from "@aivo/events";
 
 export interface StartSessionInput {
   tenantId: string;
@@ -53,19 +47,13 @@ export interface SessionEndResult {
   turnCount: number;
   reflection: ReflectionResult;
   questAssigned?: { quest: string; skill: SkillTag };
-  endedReason:
-    | "completed"
-    | "child_paused"
-    | "child_called_grownup"
-    | "safety_hard_flag";
+  endedReason: "completed" | "child_paused" | "child_called_grownup" | "safety_hard_flag";
   /** Hard-flag summary if the session ended on one (no transcript text). */
   terminalSafetyFlag?: SafetyFlag;
 }
 
 /** Start a new Speech Buddy session. Implementation in agent-core task. */
-export type StartSpeechBuddySession = (
-  input: StartSessionInput,
-) => Promise<SpeechBuddySession>;
+export type StartSpeechBuddySession = (input: StartSessionInput) => Promise<SpeechBuddySession>;
 
 /** Run one child→buddy turn. Implementation in agent-core task. */
 export type RunSpeechBuddyTurn = (input: TurnInput) => Promise<TurnOutput>;

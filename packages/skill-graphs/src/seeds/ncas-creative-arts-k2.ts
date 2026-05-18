@@ -19,7 +19,8 @@ export const ncasCreativeArtsK2: SkillGraph = {
     {
       id: "ncas.arts.k2.create.imagine",
       title: "Generate ideas for a creative work",
-      description: "I can come up with ideas for a story, drawing, or song using prompts and my imagination.",
+      description:
+        "I can come up with ideas for a story, drawing, or song using prompts and my imagination.",
       subject: "creative_arts",
       gradeBand: "K",
       frameworkRefs: [{ framework: "NCAS", code: "VA:Cr1.1.K" }],
@@ -37,7 +38,8 @@ export const ncasCreativeArtsK2: SkillGraph = {
     {
       id: "ncas.arts.k2.create.revise",
       title: "Revise my work after feedback",
-      description: "I can change part of my work after I look at it again or hear ideas from a friend.",
+      description:
+        "I can change part of my work after I look at it again or hear ideas from a friend.",
       subject: "creative_arts",
       gradeBand: "K",
       frameworkRefs: [{ framework: "NCAS", code: "VA:Cr3.1.K" }],

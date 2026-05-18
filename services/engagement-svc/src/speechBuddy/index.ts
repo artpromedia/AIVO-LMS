@@ -54,10 +54,6 @@ export type GrantFriendshipToken = (
   amount?: number,
 ) => Promise<FriendshipToken>;
 
-export type GetSpeechBuddyStreak = (
-  learnerId: string,
-) => Promise<SpeechBuddyStreak>;
+export type GetSpeechBuddyStreak = (learnerId: string) => Promise<SpeechBuddyStreak>;
 
-export type ListActiveWeeklyQuests = (
-  learnerId: string,
-) => Promise<WeeklyQuest[]>;
+export type ListActiveWeeklyQuests = (learnerId: string) => Promise<WeeklyQuest[]>;

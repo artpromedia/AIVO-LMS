@@ -8,8 +8,16 @@ import { SCHOOL_NAV } from "@/components/layout/role-shells";
 const ITEMS = [
   { k: "COPPA", desc: "Verifiable parental consent on every family signup.", state: "active" },
   { k: "FERPA", desc: "Education-record handling and parent-access workflow.", state: "active" },
-  { k: "SOC 2 Type II", desc: "Annual audit covering security, availability, confidentiality.", state: "active" },
-  { k: "State data privacy addendum", desc: "Signed by district legal — file lives in district admin.", state: "active" },
+  {
+    k: "SOC 2 Type II",
+    desc: "Annual audit covering security, availability, confidentiality.",
+    state: "active",
+  },
+  {
+    k: "State data privacy addendum",
+    desc: "Signed by district legal — file lives in district admin.",
+    state: "active",
+  },
 ];
 
 export default async function Page() {

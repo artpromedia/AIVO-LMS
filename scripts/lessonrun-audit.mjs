@@ -119,10 +119,16 @@ if (!existsSync(tutorPath)) {
     if (!f.endsWith(".ts") && !f.endsWith(".tsx")) continue;
     if (f === tutorPath) continue;
     const fsrc = readFileSync(f, "utf8");
-    if (/generateDeterministicLessonPlan/.test(fsrc) && !/export.*generateDeterministicLessonPlan/.test(fsrc)) {
+    if (
+      /generateDeterministicLessonPlan/.test(fsrc) &&
+      !/export.*generateDeterministicLessonPlan/.test(fsrc)
+    ) {
       // Permit the module that DEFINES the function. Flag any other
       // direct caller.
-      if (!/from ".\/deterministic-lesson-plan"/.test(fsrc) || /generateDeterministicLessonPlan\s*\(/.test(fsrc)) {
+      if (
+        !/from ".\/deterministic-lesson-plan"/.test(fsrc) ||
+        /generateDeterministicLessonPlan\s*\(/.test(fsrc)
+      ) {
         if (f.endsWith("deterministic-lesson-plan.ts")) continue;
         errors.push(
           `${f.replace(repoRoot + "/", "")}: only generateLessonPlanWithRetry may invoke generateDeterministicLessonPlan; reach the orchestrator instead.`,

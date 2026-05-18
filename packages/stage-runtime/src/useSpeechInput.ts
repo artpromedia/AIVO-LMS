@@ -44,12 +44,7 @@ const MAX_RECORDED_BYTES = 5 * 1024 * 1024;
 
 function pickRecorderMime(): string | undefined {
   if (typeof window === "undefined" || typeof MediaRecorder === "undefined") return undefined;
-  const candidates = [
-    "audio/webm;codecs=opus",
-    "audio/webm",
-    "audio/ogg;codecs=opus",
-    "audio/mp4",
-  ];
+  const candidates = ["audio/webm;codecs=opus", "audio/webm", "audio/ogg;codecs=opus", "audio/mp4"];
   for (const m of candidates) {
     try {
       if (MediaRecorder.isTypeSupported(m)) return m;
@@ -93,15 +88,18 @@ export function useSpeechInput(opts: UseSpeechInputOptions = {}): SpeechInputApi
   const cancelledRef = useRef(false);
   const mountedRef = useRef(true);
 
-  const recorderSupported = typeof window !== "undefined"
-    && typeof MediaRecorder !== "undefined"
-    && !!navigator.mediaDevices?.getUserMedia;
+  const recorderSupported =
+    typeof window !== "undefined" &&
+    typeof MediaRecorder !== "undefined" &&
+    !!navigator.mediaDevices?.getUserMedia;
   const webSpeechSupported = !!getWebSpeech();
   const isSupported = webSpeechSupported || recorderSupported;
 
   const cleanupAudio = useCallback(() => {
     if (recorderRef.current && recorderRef.current.state !== "inactive") {
-      try { recorderRef.current.stop(); } catch {}
+      try {
+        recorderRef.current.stop();
+      } catch {}
     }
     recorderRef.current = null;
     if (streamRef.current) {
@@ -116,30 +114,38 @@ export function useSpeechInput(opts: UseSpeechInputOptions = {}): SpeechInputApi
       mountedRef.current = false;
       cleanupAudio();
       if (recognitionRef.current) {
-        try { recognitionRef.current.abort(); } catch {}
+        try {
+          recognitionRef.current.abort();
+        } catch {}
         recognitionRef.current = null;
       }
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, [cleanupAudio]);
 
-  const safeSet = useCallback(<T,>(setter: (v: T) => void, v: T) => {
+  const safeSet = useCallback(<T>(setter: (v: T) => void, v: T) => {
     if (mountedRef.current) setter(v);
   }, []);
 
-  const fail = useCallback((kind: SpeechInputError) => {
-    safeSet(setStatus, "error" as SpeechInputStatus);
-    safeSet(setError, kind);
-    onError?.(kind);
-  }, [onError, safeSet]);
+  const fail = useCallback(
+    (kind: SpeechInputError) => {
+      safeSet(setStatus, "error" as SpeechInputStatus);
+      safeSet(setError, kind);
+      onError?.(kind);
+    },
+    [onError, safeSet],
+  );
 
-  const finish = useCallback((text: string) => {
-    safeSet(setTranscript, text);
-    safeSet(setStatus, "idle" as SpeechInputStatus);
-    if (text) onResult?.(text);
-    else onError?.("no_speech");
-    if (!text) safeSet(setError, "no_speech" as SpeechInputError);
-  }, [onError, onResult, safeSet]);
+  const finish = useCallback(
+    (text: string) => {
+      safeSet(setTranscript, text);
+      safeSet(setStatus, "idle" as SpeechInputStatus);
+      if (text) onResult?.(text);
+      else onError?.("no_speech");
+      if (!text) safeSet(setError, "no_speech" as SpeechInputError);
+    },
+    [onError, onResult, safeSet],
+  );
 
   const startWebSpeech = useCallback((): boolean => {
     const Ctor = getWebSpeech();
@@ -173,7 +179,9 @@ export function useSpeechInput(opts: UseSpeechInputOptions = {}): SpeechInputApi
       rec.start();
       safeSet(setStatus, "listening" as SpeechInputStatus);
       timeoutRef.current = setTimeout(() => {
-        try { rec.stop(); } catch {}
+        try {
+          rec.stop();
+        } catch {}
       }, maxDurationMs);
       return true;
     } catch {
@@ -213,7 +221,9 @@ export function useSpeechInput(opts: UseSpeechInputOptions = {}): SpeechInputApi
       chunksRef.current.push(e.data);
       recordedBytes += e.data.size;
       if (recordedBytes >= MAX_RECORDED_BYTES && recorder.state === "recording") {
-        try { recorder.stop(); } catch {}
+        try {
+          recorder.stop();
+        } catch {}
       }
     };
     recorder.onstop = async () => {
@@ -267,7 +277,9 @@ export function useSpeechInput(opts: UseSpeechInputOptions = {}): SpeechInputApi
     }
     timeoutRef.current = setTimeout(() => {
       if (recorderRef.current && recorderRef.current.state === "recording") {
-        try { recorderRef.current.stop(); } catch {}
+        try {
+          recorderRef.current.stop();
+        } catch {}
       }
     }, maxDurationMs);
   }, [cleanupAudio, fail, finish, locale, maxDurationMs, recorderSupported, safeSet, authToken]);
@@ -284,10 +296,14 @@ export function useSpeechInput(opts: UseSpeechInputOptions = {}): SpeechInputApi
   const stop = useCallback(() => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     if (recognitionRef.current) {
-      try { recognitionRef.current.stop(); } catch {}
+      try {
+        recognitionRef.current.stop();
+      } catch {}
     }
     if (recorderRef.current && recorderRef.current.state === "recording") {
-      try { recorderRef.current.stop(); } catch {}
+      try {
+        recorderRef.current.stop();
+      } catch {}
     }
   }, []);
 
@@ -295,7 +311,9 @@ export function useSpeechInput(opts: UseSpeechInputOptions = {}): SpeechInputApi
     cancelledRef.current = true;
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     if (recognitionRef.current) {
-      try { recognitionRef.current.abort(); } catch {}
+      try {
+        recognitionRef.current.abort();
+      } catch {}
     }
     cleanupAudio();
     safeSet(setStatus, "idle" as SpeechInputStatus);

@@ -34,11 +34,7 @@ const ROLE_TONE: Record<Role, "primary" | "success" | "neutral" | "warning"> = {
   platform_admin: "warning",
 };
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await requirePageRole(["platform_admin"]);
   const user = getUserById(id);
@@ -47,9 +43,7 @@ export default async function Page({
   // Only show memberships inside the caller's visible tenant scope.
   const visibleTenants = scopeTenantsForSession(session.role, session.tenantId);
   const visibleIds = new Set(visibleTenants.map((t) => t.id));
-  const memberships = listMembershipsForUser(user.id).filter((m) =>
-    visibleIds.has(m.tenantId),
-  );
+  const memberships = listMembershipsForUser(user.id).filter((m) => visibleIds.has(m.tenantId));
   if (memberships.length === 0) notFound();
 
   const tenantById = new Map(visibleTenants.map((t) => [t.id, t]));
@@ -79,23 +73,18 @@ export default async function Page({
         description={user.email}
         actions={
           <Badge tone="neutral">
-            {memberships.length}{" "}
-            {memberships.length === 1 ? "membership" : "memberships"}
+            {memberships.length} {memberships.length === 1 ? "membership" : "memberships"}
           </Badge>
         }
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            User ID
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">User ID</p>
           <p className="mt-1 font-mono text-sm">{user.id}</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            Created
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">Created</p>
           <p className="mt-1 text-sm font-medium">
             {new Date(user.createdAt).toLocaleDateString()}
           </p>
@@ -141,18 +130,12 @@ export default async function Page({
                           {t?.name ?? m.tenantId}
                         </Link>
                       </td>
-                      <td className="px-4 py-3 text-aivo-ink-soft">
-                        {t?.type ?? "—"}
-                      </td>
+                      <td className="px-4 py-3 text-aivo-ink-soft">{t?.type ?? "—"}</td>
                       <td className="px-4 py-3">
-                        <Badge tone={ROLE_TONE[m.role]}>
-                          {ROLE_LABEL[m.role]}
-                        </Badge>
+                        <Badge tone={ROLE_TONE[m.role]}>{ROLE_LABEL[m.role]}</Badge>
                       </td>
                       <td className="px-4 py-3 text-xs text-aivo-ink-soft">
-                        {m.permissions.length === 0
-                          ? "—"
-                          : m.permissions.join(", ")}
+                        {m.permissions.length === 0 ? "—" : m.permissions.join(", ")}
                       </td>
                       <td className="px-4 py-3 text-xs text-aivo-ink-soft">
                         {new Date(m.createdAt).toLocaleDateString()}
@@ -169,9 +152,7 @@ export default async function Page({
       {managedLearners.length > 0 ? (
         <Card className="mt-6 overflow-hidden">
           <div className="border-b border-aivo-border px-4 py-3">
-            <p className="font-display text-lg font-semibold">
-              Managed learners
-            </p>
+            <p className="font-display text-lg font-semibold">Managed learners</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -187,9 +168,7 @@ export default async function Page({
                 {managedLearners.map((l) => (
                   <tr key={l.id}>
                     <td className="px-4 py-3 font-medium">{l.displayName}</td>
-                    <td className="px-4 py-3 text-aivo-ink-soft">
-                      {l.gradeBand ?? "—"}
-                    </td>
+                    <td className="px-4 py-3 text-aivo-ink-soft">{l.gradeBand ?? "—"}</td>
                     <td className="px-4 py-3 text-aivo-ink-soft">
                       {tenantById.get(l.tenantId)?.name ?? l.tenantId}
                     </td>

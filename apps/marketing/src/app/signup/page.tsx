@@ -21,10 +21,25 @@ import {
 } from "lucide-react";
 
 const VALUE_PROPS = [
-  { Icon: Brain, label: "Brain Clone learning model", color: "text-violet-600", bg: "bg-violet-100" },
+  {
+    Icon: Brain,
+    label: "Brain Clone learning model",
+    color: "text-violet-600",
+    bg: "bg-violet-100",
+  },
   { Icon: Users, label: "14 specialist AI tutors", color: "text-cyan-600", bg: "bg-cyan-100" },
-  { Icon: Zap, label: "5 functioning levels, auto-tuned", color: "text-amber-600", bg: "bg-amber-100" },
-  { Icon: ShieldCheck, label: "Designed to support COPPA & FERPA", color: "text-emerald-600", bg: "bg-emerald-100" },
+  {
+    Icon: Zap,
+    label: "5 functioning levels, auto-tuned",
+    color: "text-amber-600",
+    bg: "bg-amber-100",
+  },
+  {
+    Icon: ShieldCheck,
+    label: "Designed to support COPPA & FERPA",
+    color: "text-emerald-600",
+    bg: "bg-emerald-100",
+  },
 ];
 
 function SignupInner() {
@@ -50,8 +65,14 @@ function SignupInner() {
     <div className="min-h-screen bg-gradient-to-br from-violet-100 via-white to-amber-50 flex flex-col relative overflow-hidden">
       <div aria-hidden="true" className="absolute inset-0 pointer-events-none -z-0">
         <div className="absolute -top-20 -left-20 w-[45vw] h-[45vw] bg-violet-300/40 rounded-full blur-3xl animate-blob motion-reduce:animate-none" />
-        <div className="absolute -bottom-20 -right-20 w-[40vw] h-[40vw] bg-amber-200/50 rounded-full blur-3xl animate-blob motion-reduce:animate-none" style={{ animationDelay: "5s" }} />
-        <div className="absolute top-1/3 right-10 w-64 h-64 bg-cyan-200/40 rounded-full blur-3xl animate-blob motion-reduce:animate-none" style={{ animationDelay: "2s" }} />
+        <div
+          className="absolute -bottom-20 -right-20 w-[40vw] h-[40vw] bg-amber-200/50 rounded-full blur-3xl animate-blob motion-reduce:animate-none"
+          style={{ animationDelay: "5s" }}
+        />
+        <div
+          className="absolute top-1/3 right-10 w-64 h-64 bg-cyan-200/40 rounded-full blur-3xl animate-blob motion-reduce:animate-none"
+          style={{ animationDelay: "2s" }}
+        />
       </div>
 
       <header className="relative z-30 flex items-center justify-between p-6">
@@ -85,8 +106,13 @@ function SignupInner() {
 
             <div className="grid grid-cols-2 gap-3 mb-7">
               {VALUE_PROPS.map(({ Icon, label, color, bg }) => (
-                <div key={label} className="flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50 border border-slate-100">
-                  <div className={`w-9 h-9 rounded-xl ${bg} ${color} flex items-center justify-center shrink-0`}>
+                <div
+                  key={label}
+                  className="flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50 border border-slate-100"
+                >
+                  <div
+                    className={`w-9 h-9 rounded-xl ${bg} ${color} flex items-center justify-center shrink-0`}
+                  >
                     <Icon size={18} strokeWidth={2.5} aria-hidden="true" />
                   </div>
                   <p className="text-xs font-bold text-slate-700 leading-snug">{label}</p>
@@ -122,11 +148,17 @@ function SignupInner() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
-                <label htmlFor="signup-name" className="block text-sm font-bold text-slate-700 ml-1">
+                <label
+                  htmlFor="signup-name"
+                  className="block text-sm font-bold text-slate-700 ml-1"
+                >
                   Full name
                 </label>
                 <div className="relative">
-                  <User className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" aria-hidden="true" />
+                  <User
+                    className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"
+                    aria-hidden="true"
+                  />
                   <input
                     id="signup-name"
                     type="text"
@@ -142,11 +174,17 @@ function SignupInner() {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="signup-email" className="block text-sm font-bold text-slate-700 ml-1">
+                <label
+                  htmlFor="signup-email"
+                  className="block text-sm font-bold text-slate-700 ml-1"
+                >
                   Email
                 </label>
                 <div className="relative">
-                  <Mail className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" aria-hidden="true" />
+                  <Mail
+                    className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"
+                    aria-hidden="true"
+                  />
                   <input
                     id="signup-email"
                     type="email"
@@ -162,11 +200,17 @@ function SignupInner() {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="signup-password" className="block text-sm font-bold text-slate-700 ml-1">
+                <label
+                  htmlFor="signup-password"
+                  className="block text-sm font-bold text-slate-700 ml-1"
+                >
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" aria-hidden="true" />
+                  <Lock
+                    className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"
+                    aria-hidden="true"
+                  />
                   <input
                     id="signup-password"
                     type={showPassword ? "text" : "password"}
@@ -202,7 +246,12 @@ function SignupInner() {
               >
                 {loading ? (
                   <>
-                    <Loader2 size={20} strokeWidth={2.5} className="motion-safe:animate-spin" aria-hidden="true" />
+                    <Loader2
+                      size={20}
+                      strokeWidth={2.5}
+                      className="motion-safe:animate-spin"
+                      aria-hidden="true"
+                    />
                     Creating account...
                   </>
                 ) : (
@@ -227,11 +276,17 @@ function SignupInner() {
 
             <p className="text-xs text-slate-500 text-center mt-4 font-body leading-relaxed">
               By creating an account you agree to our{" "}
-              <Link href="/terms-of-service" className="text-[hsl(var(--visual-primary))] hover:underline font-bold">
+              <Link
+                href="/terms-of-service"
+                className="text-[hsl(var(--visual-primary))] hover:underline font-bold"
+              >
                 Terms
               </Link>{" "}
               and{" "}
-              <Link href="/privacy-policy" className="text-[hsl(var(--visual-primary))] hover:underline font-bold">
+              <Link
+                href="/privacy-policy"
+                className="text-[hsl(var(--visual-primary))] hover:underline font-bold"
+              >
                 Privacy Policy
               </Link>
               .
@@ -240,12 +295,18 @@ function SignupInner() {
 
           <div className="text-center mt-7">
             <div className="inline-flex items-center gap-2 text-sm font-bold text-slate-600 bg-white/70 backdrop-blur px-4 py-2 rounded-full border border-slate-200">
-              <ShieldCheck className="w-4 h-4 text-[hsl(var(--visual-primary))]" aria-hidden="true" />
+              <ShieldCheck
+                className="w-4 h-4 text-[hsl(var(--visual-primary))]"
+                aria-hidden="true"
+              />
               Designed to support COPPA &amp; FERPA
             </div>
             <p className="text-sm font-medium text-slate-500 mt-5">
               Already have an account?{" "}
-              <Link href="/login" className="text-[hsl(var(--visual-primary))] font-bold hover:underline">
+              <Link
+                href="/login"
+                className="text-[hsl(var(--visual-primary))] font-bold hover:underline"
+              >
                 Sign in
               </Link>
             </p>
@@ -258,11 +319,17 @@ function SignupInner() {
           Privacy
         </Link>
         <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-        <Link href="/terms-of-service" className="hover:text-[hsl(var(--visual-primary))] transition">
+        <Link
+          href="/terms-of-service"
+          className="hover:text-[hsl(var(--visual-primary))] transition"
+        >
           Terms
         </Link>
         <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-        <Link href="/coppa-compliance" className="hover:text-[hsl(var(--visual-primary))] transition">
+        <Link
+          href="/coppa-compliance"
+          className="hover:text-[hsl(var(--visual-primary))] transition"
+        >
           COPPA
         </Link>
       </footer>

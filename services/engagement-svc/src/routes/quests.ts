@@ -46,13 +46,17 @@ import {
 
 export function registerQuestRoutes(
   app: FastifyInstance,
-  db: ReturnType<typeof import("@aivo/db").createDb>
+  db: ReturnType<typeof import("@aivo/db").createDb>,
 ) {
-  app.get("/api/engagement/quests/worlds", { schema: getQuestsWorldsSchema }, async (request, reply) => {
-    const claims = await authenticateRequest(request, reply);
-    if (!claims) return;
-    return QUEST_WORLDS;
-  });
+  app.get(
+    "/api/engagement/quests/worlds",
+    { schema: getQuestsWorldsSchema },
+    async (request, reply) => {
+      const claims = await authenticateRequest(request, reply);
+      if (!claims) return;
+      return QUEST_WORLDS;
+    },
+  );
 
   app.get(
     "/api/engagement/quests/worlds/:slug",
@@ -130,151 +134,166 @@ export function registerQuestRoutes(
     },
   );
 
-  app.post("/api/engagement/quests/start", { schema: questsStartSchema }, async (request, reply) => {
-    const claims = await authenticateRequest(request, reply);
-    if (!claims) return;
+  app.post(
+    "/api/engagement/quests/start",
+    { schema: questsStartSchema },
+    async (request, reply) => {
+      const claims = await authenticateRequest(request, reply);
+      if (!claims) return;
 
-    const { learnerId: rawLearnerId, questId } = request.body as { learnerId: string; questId: string };
-    if (!rawLearnerId || !questId) {
-      return (reply as any).status(400).send({ error: "learnerId and questId required" });
-    }
-
-    const learnerId = await resolveLearnerId(db, rawLearnerId, claims.sub);
-    if (!learnerId) {
-      return (reply as any).status(404).send({ error: "learner_not_found" });
-    }
-
-    const [quest] = await db.select().from(quests).where(eq(quests.id, questId));
-    if (!quest) {
-      return (reply as any).status(404).send({ error: "quest_not_found", questId });
-    }
-
-    const [existing] = await db
-      .select()
-      .from(questProgress)
-      .where(and(eq(questProgress.learnerId, learnerId), eq(questProgress.questId, questId)));
-
-    if (existing) {
-      // Re-entering an in-progress quest is allowed and idempotent;
-      // re-entering a completed quest just returns the completion row so
-      // the client can route to the world detail without an error.
-      return { progress: existing, quest };
-    }
-
-    const [progress] = await db
-      .insert(questProgress)
-      .values({ learnerId, questId, status: "IN_PROGRESS" })
-      .returning();
-
-    return { progress, quest };
-  });
-
-  app.post("/api/engagement/quests/complete", { schema: questsCompleteSchema }, async (request, reply) => {
-    const claims = await authenticateRequest(request, reply);
-    if (!claims) return;
-
-    const { learnerId: rawLearnerId, questId, score } = request.body as {
-      learnerId: string;
-      questId: string;
-      score: number;
-    };
-
-    if (!rawLearnerId || !questId) {
-      return (reply as any).status(400).send({ error: "learnerId and questId required" });
-    }
-    if (typeof score !== "number" || score < 0 || score > 100) {
-      return (reply as any).status(400).send({ error: "score must be 0-100" });
-    }
-
-    const learnerId = await resolveLearnerId(db, rawLearnerId, claims.sub);
-    if (!learnerId) {
-      return (reply as any).status(404).send({ error: "learner_not_found" });
-    }
-
-    const [quest] = await db.select().from(quests).where(eq(quests.id, questId));
-    if (!quest) {
-      return (reply as any).status(404).send({ error: "quest_not_found", questId });
-    }
-
-    const [existing] = await db
-      .select()
-      .from(questProgress)
-      .where(and(eq(questProgress.learnerId, learnerId), eq(questProgress.questId, questId)));
-
-    if (!existing) {
-      return (reply as any).status(400).send({ error: "quest_not_started" });
-    }
-
-    // Idempotent: if already completed, return the existing record without
-    // double-awarding XP/coins.
-    if (existing.status === "COMPLETED") {
-      return {
-        completed: true,
-        score: existing.score ?? score,
-        xpAwarded: 0,
-        coinAwarded: 0,
-        alreadyCompleted: true,
+      const { learnerId: rawLearnerId, questId } = request.body as {
+        learnerId: string;
+        questId: string;
       };
-    }
+      if (!rawLearnerId || !questId) {
+        return (reply as any).status(400).send({ error: "learnerId and questId required" });
+      }
 
-    await db
-      .update(questProgress)
-      .set({
-        status: "COMPLETED",
-        score,
-        completedAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .where(and(eq(questProgress.learnerId, learnerId), eq(questProgress.questId, questId)));
+      const learnerId = await resolveLearnerId(db, rawLearnerId, claims.sub);
+      if (!learnerId) {
+        return (reply as any).status(404).send({ error: "learner_not_found" });
+      }
 
-    const xpAmount = quest.xpReward ?? 50;
-    const coinAmount = quest.coinReward ?? 10;
-    const tenantId = claims.tenantId || claims.sub;
+      const [quest] = await db.select().from(quests).where(eq(quests.id, questId));
+      if (!quest) {
+        return (reply as any).status(404).send({ error: "quest_not_found", questId });
+      }
 
-    await db.insert(xpEvents).values({
-      tenantId,
-      learnerId,
-      eventType: "quest_completed",
-      xpAmount,
-      metadata: { questId, worldKey: quest.worldKey, chapterNumber: quest.chapterNumber, score },
-    });
-
-    if (coinAmount > 0) {
-      const [wallet] = await db
+      const [existing] = await db
         .select()
-        .from(virtualCurrency)
-        .where(eq(virtualCurrency.learnerId, learnerId));
-      if (wallet) {
-        await db
-          .update(virtualCurrency)
-          .set({
-            coins: sql`${virtualCurrency.coins} + ${coinAmount}`,
-            totalCoinsEarned: sql`${virtualCurrency.totalCoinsEarned} + ${coinAmount}`,
-            updatedAt: new Date(),
-          })
+        .from(questProgress)
+        .where(and(eq(questProgress.learnerId, learnerId), eq(questProgress.questId, questId)));
+
+      if (existing) {
+        // Re-entering an in-progress quest is allowed and idempotent;
+        // re-entering a completed quest just returns the completion row so
+        // the client can route to the world detail without an error.
+        return { progress: existing, quest };
+      }
+
+      const [progress] = await db
+        .insert(questProgress)
+        .values({ learnerId, questId, status: "IN_PROGRESS" })
+        .returning();
+
+      return { progress, quest };
+    },
+  );
+
+  app.post(
+    "/api/engagement/quests/complete",
+    { schema: questsCompleteSchema },
+    async (request, reply) => {
+      const claims = await authenticateRequest(request, reply);
+      if (!claims) return;
+
+      const {
+        learnerId: rawLearnerId,
+        questId,
+        score,
+      } = request.body as {
+        learnerId: string;
+        questId: string;
+        score: number;
+      };
+
+      if (!rawLearnerId || !questId) {
+        return (reply as any).status(400).send({ error: "learnerId and questId required" });
+      }
+      if (typeof score !== "number" || score < 0 || score > 100) {
+        return (reply as any).status(400).send({ error: "score must be 0-100" });
+      }
+
+      const learnerId = await resolveLearnerId(db, rawLearnerId, claims.sub);
+      if (!learnerId) {
+        return (reply as any).status(404).send({ error: "learner_not_found" });
+      }
+
+      const [quest] = await db.select().from(quests).where(eq(quests.id, questId));
+      if (!quest) {
+        return (reply as any).status(404).send({ error: "quest_not_found", questId });
+      }
+
+      const [existing] = await db
+        .select()
+        .from(questProgress)
+        .where(and(eq(questProgress.learnerId, learnerId), eq(questProgress.questId, questId)));
+
+      if (!existing) {
+        return (reply as any).status(400).send({ error: "quest_not_started" });
+      }
+
+      // Idempotent: if already completed, return the existing record without
+      // double-awarding XP/coins.
+      if (existing.status === "COMPLETED") {
+        return {
+          completed: true,
+          score: existing.score ?? score,
+          xpAwarded: 0,
+          coinAwarded: 0,
+          alreadyCompleted: true,
+        };
+      }
+
+      await db
+        .update(questProgress)
+        .set({
+          status: "COMPLETED",
+          score,
+          completedAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(and(eq(questProgress.learnerId, learnerId), eq(questProgress.questId, questId)));
+
+      const xpAmount = quest.xpReward ?? 50;
+      const coinAmount = quest.coinReward ?? 10;
+      const tenantId = claims.tenantId || claims.sub;
+
+      await db.insert(xpEvents).values({
+        tenantId,
+        learnerId,
+        eventType: "quest_completed",
+        xpAmount,
+        metadata: { questId, worldKey: quest.worldKey, chapterNumber: quest.chapterNumber, score },
+      });
+
+      if (coinAmount > 0) {
+        const [wallet] = await db
+          .select()
+          .from(virtualCurrency)
           .where(eq(virtualCurrency.learnerId, learnerId));
-      } else {
-        await db.insert(virtualCurrency).values({
+        if (wallet) {
+          await db
+            .update(virtualCurrency)
+            .set({
+              coins: sql`${virtualCurrency.coins} + ${coinAmount}`,
+              totalCoinsEarned: sql`${virtualCurrency.totalCoinsEarned} + ${coinAmount}`,
+              updatedAt: new Date(),
+            })
+            .where(eq(virtualCurrency.learnerId, learnerId));
+        } else {
+          await db.insert(virtualCurrency).values({
+            learnerId,
+            coins: coinAmount,
+            totalCoinsEarned: coinAmount,
+          });
+        }
+        await db.insert(currencyTransactions).values({
           learnerId,
-          coins: coinAmount,
-          totalCoinsEarned: coinAmount,
+          currencyType: "coins",
+          amount: coinAmount,
+          reason: "quest_completed",
+          referenceId: questId,
         });
       }
-      await db.insert(currencyTransactions).values({
-        learnerId,
-        currencyType: "coins",
-        amount: coinAmount,
-        reason: "quest_completed",
-        referenceId: questId,
-      });
-    }
 
-    return {
-      completed: true,
-      score,
-      xpAwarded: xpAmount,
-      coinAwarded: coinAmount,
-      alreadyCompleted: false,
-    };
-  });
+      return {
+        completed: true,
+        score,
+        xpAwarded: xpAmount,
+        coinAwarded: coinAmount,
+        alreadyCompleted: false,
+      };
+    },
+  );
 }

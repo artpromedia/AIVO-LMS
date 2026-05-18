@@ -32,12 +32,14 @@ export function LearnerCard({
     default: "bg-white rounded-2xl border border-slate-100 shadow-sm",
     elevated: "bg-white rounded-2xl shadow-lg",
     bordered: "bg-white rounded-2xl border-2",
-    interactive: "bg-white rounded-2xl border-2 border-transparent hover:shadow-xl cursor-pointer transition-all focus-visible:ring-[3px] focus-visible:ring-offset-2",
+    interactive:
+      "bg-white rounded-2xl border-2 border-transparent hover:shadow-xl cursor-pointer transition-all focus-visible:ring-[3px] focus-visible:ring-offset-2",
   };
 
-  const accentStyle = accentColor && (variant === "bordered" || variant === "interactive")
-    ? { borderColor: accentColor }
-    : undefined;
+  const accentStyle =
+    accentColor && (variant === "bordered" || variant === "interactive")
+      ? { borderColor: accentColor }
+      : undefined;
 
   const Component = onClick ? "button" : "div";
 

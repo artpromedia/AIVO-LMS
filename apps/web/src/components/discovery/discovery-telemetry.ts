@@ -21,7 +21,10 @@ export interface DiscoveryEvent {
   payload: Record<string, unknown>;
 }
 
-export function emitDiscoveryEvent(name: DiscoveryEventName, payload: Record<string, unknown> = {}): DiscoveryEvent {
+export function emitDiscoveryEvent(
+  name: DiscoveryEventName,
+  payload: Record<string, unknown> = {},
+): DiscoveryEvent {
   const event: DiscoveryEvent = {
     name,
     occurredAt: new Date().toISOString(),

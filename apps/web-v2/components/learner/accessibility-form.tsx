@@ -20,19 +20,84 @@ const TOGGLES: Array<{
   help: string;
   group: "reading" | "motion" | "support";
 }> = [
-  { key: "readAloud", label: "Read aloud", help: "Announces lesson text for screen readers and assistive tools.", group: "reading" },
-  { key: "largeText", label: "Larger text", help: "Bigger type and looser line spacing.", group: "reading" },
-  { key: "dyslexiaFriendlyFont", label: "Dyslexia-friendly font", help: "Switches the lesson font to a wider, evenly-spaced face.", group: "reading" },
-  { key: "highContrast", label: "High contrast", help: "Higher contrast colors for better visibility.", group: "reading" },
-  { key: "captionsAlwaysOn", label: "Captions on", help: "Show captions whenever the tutor speaks.", group: "reading" },
-  { key: "reducedMotion", label: "Reduce motion", help: "Skips background animation and transitions.", group: "motion" },
-  { key: "hapticsEnabled", label: "Haptic feedback", help: "Small vibration on mobile when a choice is selected.", group: "motion" },
-  { key: "shorterSteps", label: "Shorter steps", help: "Trims the lesson to the essentials.", group: "support" },
-  { key: "extraHints", label: "Extra hints", help: "More guidance during practice.", group: "support" },
-  { key: "visualSupports", label: "Visual supports", help: "Add icons and diagrams where helpful.", group: "support" },
-  { key: "breakReminders", label: "Break reminders", help: "Gentle prompts to take a break.", group: "support" },
-  { key: "audioFirst", label: "Audio first", help: "Lead with audio before showing text.", group: "support" },
-  { key: "keyboardOptimized", label: "Keyboard-friendly", help: "Tune controls for keyboard navigation.", group: "support" },
+  {
+    key: "readAloud",
+    label: "Read aloud",
+    help: "Announces lesson text for screen readers and assistive tools.",
+    group: "reading",
+  },
+  {
+    key: "largeText",
+    label: "Larger text",
+    help: "Bigger type and looser line spacing.",
+    group: "reading",
+  },
+  {
+    key: "dyslexiaFriendlyFont",
+    label: "Dyslexia-friendly font",
+    help: "Switches the lesson font to a wider, evenly-spaced face.",
+    group: "reading",
+  },
+  {
+    key: "highContrast",
+    label: "High contrast",
+    help: "Higher contrast colors for better visibility.",
+    group: "reading",
+  },
+  {
+    key: "captionsAlwaysOn",
+    label: "Captions on",
+    help: "Show captions whenever the tutor speaks.",
+    group: "reading",
+  },
+  {
+    key: "reducedMotion",
+    label: "Reduce motion",
+    help: "Skips background animation and transitions.",
+    group: "motion",
+  },
+  {
+    key: "hapticsEnabled",
+    label: "Haptic feedback",
+    help: "Small vibration on mobile when a choice is selected.",
+    group: "motion",
+  },
+  {
+    key: "shorterSteps",
+    label: "Shorter steps",
+    help: "Trims the lesson to the essentials.",
+    group: "support",
+  },
+  {
+    key: "extraHints",
+    label: "Extra hints",
+    help: "More guidance during practice.",
+    group: "support",
+  },
+  {
+    key: "visualSupports",
+    label: "Visual supports",
+    help: "Add icons and diagrams where helpful.",
+    group: "support",
+  },
+  {
+    key: "breakReminders",
+    label: "Break reminders",
+    help: "Gentle prompts to take a break.",
+    group: "support",
+  },
+  {
+    key: "audioFirst",
+    label: "Audio first",
+    help: "Lead with audio before showing text.",
+    group: "support",
+  },
+  {
+    key: "keyboardOptimized",
+    label: "Keyboard-friendly",
+    help: "Tune controls for keyboard navigation.",
+    group: "support",
+  },
 ];
 
 const GROUP_LABEL: Record<"reading" | "motion" | "support", string> = {
@@ -58,9 +123,7 @@ export function AccessibilityForm({ learnerId, initial }: Props) {
   }
 
   function save() {
-    const patch = Object.fromEntries(
-      TOGGLES.map((t) => [t.key, prefs[t.key]]),
-    );
+    const patch = Object.fromEntries(TOGGLES.map((t) => [t.key, prefs[t.key]]));
     startSaving(async () => {
       const res = await fetch(`/api/bff/learners/${learnerId}/accessibility`, {
         method: "PATCH",
@@ -80,10 +143,9 @@ export function AccessibilityForm({ learnerId, initial }: Props) {
 
   function reset() {
     startSaving(async () => {
-      const res = await fetch(
-        `/api/bff/learners/${learnerId}/accessibility/reset`,
-        { method: "POST" },
-      );
+      const res = await fetch(`/api/bff/learners/${learnerId}/accessibility/reset`, {
+        method: "POST",
+      });
       if (res.ok) {
         const data = await res.json();
         setPrefs(data.data.accessibility);
@@ -104,7 +166,10 @@ export function AccessibilityForm({ learnerId, initial }: Props) {
           <p className="mb-3 font-semibold">{GROUP_LABEL[g]}</p>
           <ul className="grid gap-3 sm:grid-cols-2">
             {TOGGLES.filter((t) => t.group === g).map((t) => (
-              <li key={t.key} className="flex items-start gap-3 rounded-md border border-aivo-line p-3">
+              <li
+                key={t.key}
+                className="flex items-start gap-3 rounded-md border border-aivo-line p-3"
+              >
                 <Checkbox
                   id={t.key}
                   checked={Boolean(prefs[t.key])}

@@ -17,10 +17,7 @@
  * responsible for wiring those in.
  */
 import type { Activity, ContentPack } from "@aivo/content-pack";
-import type {
-  TutorDefinition,
-  TutorFunctioningLevel,
-} from "@aivo/tutor-sdk";
+import type { TutorDefinition, TutorFunctioningLevel } from "@aivo/tutor-sdk";
 import { assertValidTutorDefinition } from "@aivo/tutor-sdk";
 import type { MasteryRecord, AnswerOutcome } from "@aivo/pedagogy";
 import { retrieve, scaffold, schedule } from "@aivo/pedagogy";
@@ -68,7 +65,10 @@ export interface SessionPlan {
 }
 
 export class TutorPolicyError extends Error {
-  constructor(public readonly code: string, message: string) {
+  constructor(
+    public readonly code: string,
+    message: string,
+  ) {
     super(message);
     this.name = "TutorPolicyError";
   }
@@ -81,10 +81,7 @@ export interface SessionPreconditions {
   learnerAgeYears?: number;
 }
 
-export function checkPolicy(
-  def: TutorDefinition,
-  pre: SessionPreconditions,
-): void {
+export function checkPolicy(def: TutorDefinition, pre: SessionPreconditions): void {
   if (def.policy.requiresConsent && !pre.consentRecordId) {
     throw new TutorPolicyError(
       "consent_missing",
@@ -134,13 +131,10 @@ export function planSession(
   const rng = opts.rng ?? Math.random;
   const retrievalSlots = Math.floor(max / 2);
 
-  const masteryByLast = ctx.masteryRecords.reduce<Map<string, MasteryRecord>>(
-    (acc, m) => {
-      acc.set(m.skillId, m);
-      return acc;
-    },
-    new Map(),
-  );
+  const masteryByLast = ctx.masteryRecords.reduce<Map<string, MasteryRecord>>((acc, m) => {
+    acc.set(m.skillId, m);
+    return acc;
+  }, new Map());
 
   const retrieval = retrieve({
     catalog: ctx.masteryRecords,
@@ -177,9 +171,7 @@ export function planSession(
 
   // Pick a special-interest theme once per session — keeps activity
   // theming consistent and predictable for the learner.
-  const theme: InterestTheme | null = ctx.interestProfile
-    ? pickTheme(ctx.interestProfile)
-    : null;
+  const theme: InterestTheme | null = ctx.interestProfile ? pickTheme(ctx.interestProfile) : null;
 
   const activities: Activity[] = [];
   for (const sc of skillsToCover.slice(0, max)) {
@@ -222,11 +214,7 @@ export { schedule, scaffold, retrieve } from "@aivo/pedagogy";
  * the original id, skillId, difficulty, and choice ids; only display
  * strings are rewritten so analytics keep working.
  */
-function applyInterestTheme(
-  activity: Activity,
-  theme: InterestTheme,
-  rng: () => number,
-): Activity {
+function applyInterestTheme(activity: Activity, theme: InterestTheme, rng: () => number): Activity {
   const themePlaceholderRe = /\{\{(?:noun|verb)\}\}/;
   const titleHas = themePlaceholderRe.test(activity.title);
   const promptHas = themePlaceholderRe.test(activity.prompt);
@@ -238,9 +226,7 @@ function applyInterestTheme(
     prompt: promptHas ? applyTheme(activity.prompt, theme, rng) : activity.prompt,
     choices: activity.choices?.map((c) => ({
       ...c,
-      label: themePlaceholderRe.test(c.label)
-        ? applyTheme(c.label, theme, rng)
-        : c.label,
+      label: themePlaceholderRe.test(c.label) ? applyTheme(c.label, theme, rng) : c.label,
     })),
     tags: [...(activity.tags ?? []), `themed:${theme.slug}`],
   };

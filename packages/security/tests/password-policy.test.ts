@@ -49,8 +49,10 @@ test("evaluatePassword: penalizes scores when email local-part is embedded", asy
     email: "bob@example.org",
   });
   // The personal-info penalty must reduce the score (or at minimum not raise it).
-  assert.ok(withEmail.strengthScore <= withoutEmail.strengthScore,
-    `email-embedded score (${withEmail.strengthScore}) must not exceed neutral score (${withoutEmail.strengthScore})`);
+  assert.ok(
+    withEmail.strengthScore <= withoutEmail.strengthScore,
+    `email-embedded score (${withEmail.strengthScore}) must not exceed neutral score (${withoutEmail.strengthScore})`,
+  );
 });
 
 test("evaluatePassword: requires 3 character classes for internal roles", async () => {
@@ -66,7 +68,10 @@ test("evaluatePassword: invokes historyVerifier and reports reuse", async () => 
   let called = false;
   const r = await evaluatePassword("Tr0pical-Yak#whispers!Galaxy", {
     skipBreachCheck: true,
-    historyVerifier: async () => { called = true; return true; },
+    historyVerifier: async () => {
+      called = true;
+      return true;
+    },
   });
   assert.equal(called, true);
   assert.ok(r.reasons.includes("reused"));
@@ -76,7 +81,9 @@ test("evaluatePassword: invokes historyVerifier and reports reuse", async () => 
 test("evaluatePassword: history failure does not block", async () => {
   const r = await evaluatePassword("Tr0pical-Yak#whispers!Galaxy", {
     skipBreachCheck: true,
-    historyVerifier: async () => { throw new Error("db down"); },
+    historyVerifier: async () => {
+      throw new Error("db down");
+    },
   });
   assert.equal(r.ok, true);
 });

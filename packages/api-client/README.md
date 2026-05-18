@@ -37,9 +37,9 @@ const errorResponse = {
 } as const;
 
 export const createFooSchema = {
-  tags: ["Foo"],                       // groups the swagger UI surface
-  operationId: "createFoo",            // names the generated `operations` entry
-  summary: "Create a foo",             // becomes the JSDoc on `paths[...]`
+  tags: ["Foo"], // groups the swagger UI surface
+  operationId: "createFoo", // names the generated `operations` entry
+  summary: "Create a foo", // becomes the JSDoc on `paths[...]`
   body: {
     type: "object",
     required: ["name"],
@@ -50,7 +50,7 @@ export const createFooSchema = {
     200: {
       type: "object",
       required: ["id", "name"],
-      additionalProperties: true,      // do NOT strip extra fields
+      additionalProperties: true, // do NOT strip extra fields
       properties: {
         id: { type: "string" },
         name: { type: "string" },
@@ -76,7 +76,7 @@ Conventions:
    Fastify's response serializer (`fast-json-stringify`) drops
    undeclared fields by default. With drizzle row spreads or
    sessionData blobs in the response, that silently breaks callers.
-   Declare the *minimum* fields you want documented in `properties`,
+   Declare the _minimum_ fields you want documented in `properties`,
    then leave `additionalProperties: true` to let the rest flow
    through.
 2. **Tag every public route.** Pick one tag per service surface (e.g.
@@ -130,11 +130,11 @@ apps/web, apps/mobile
 
 Root scripts:
 
-| Command              | Purpose                                                         |
-| -------------------- | --------------------------------------------------------------- |
-| `pnpm api:dump`      | Boot each registered service in-process, write `openapi/*.json` |
-| `pnpm api:generate`  | Run `api:dump`, then `openapi-typescript` per spec              |
-| `pnpm api:check`     | Run `api:generate`, fail if `git diff` is non-empty             |
+| Command             | Purpose                                                         |
+| ------------------- | --------------------------------------------------------------- |
+| `pnpm api:dump`     | Boot each registered service in-process, write `openapi/*.json` |
+| `pnpm api:generate` | Run `api:dump`, then `openapi-typescript` per spec              |
+| `pnpm api:check`    | Run `api:generate`, fail if `git diff` is non-empty             |
 
 `api:check` is the CI gate.
 
@@ -146,7 +146,7 @@ Once a service has been onboarded:
 import type { paths } from "@aivo/api-client/identity-svc";
 
 type LoginBody = paths["/api/auth/login"]["post"]["requestBody"]["content"]["application/json"];
-type LoginRes  = paths["/api/auth/login"]["post"]["responses"]["200"]["content"]["application/json"];
+type LoginRes = paths["/api/auth/login"]["post"]["responses"]["200"]["content"]["application/json"];
 
 const res = await apiFetch("/api/auth/login", { method: "POST", body: JSON.stringify(body) });
 const data: LoginRes = await res.json();
@@ -162,7 +162,7 @@ No runtime is shipped: `apiFetch` continues to live in each app.
    `start()`/`listen()` call must not happen at module top level.
 2. **Register `@fastify/swagger` + `@fastify/swagger-ui`** if missing.
 3. **Add per-route schemas** (`schema: { body, params, querystring,
-   response }`) following the pattern documented above. Without these,
+response }`) following the pattern documented above. Without these,
    the dump emits an empty path object. `learning-svc` is the canonical
    reference — copy `services/learning-svc/src/routes/schemas.ts` as a
    starting point.

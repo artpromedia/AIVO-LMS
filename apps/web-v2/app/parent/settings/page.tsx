@@ -45,15 +45,10 @@ export default async function Page() {
             </div>
             <p className="mt-2 text-sm text-aivo-ink-soft">
               {tenant?.name ?? "Your family"} ·{" "}
-              {billing
-                ? `${billing.plan} (${billing.status})`
-                : "no plan provisioned"}
+              {billing ? `${billing.plan} (${billing.status})` : "no plan provisioned"}
             </p>
             {billing ? (
-              <Badge
-                tone={billing.status === "active" ? "success" : "warning"}
-                className="mt-3"
-              >
+              <Badge tone={billing.status === "active" ? "success" : "warning"} className="mt-3">
                 {billing.status}
               </Badge>
             ) : null}

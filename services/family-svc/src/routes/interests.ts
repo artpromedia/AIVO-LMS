@@ -22,7 +22,11 @@ import {
   type LearnerInterestProfile,
 } from "@aivo/special-interest-engine";
 import { authenticateRequest, verifyParentOwnership } from "../auth.js";
-import { getInterestsByLearnerIdSchema, interestsByLearnerIdSchema, deleteInterestsByLearnerIdBySignalIdSchema } from "./schemas.js";
+import {
+  getInterestsByLearnerIdSchema,
+  interestsByLearnerIdSchema,
+  deleteInterestsByLearnerIdBySignalIdSchema,
+} from "./schemas.js";
 
 const VALID_SOURCES = new Set([
   "caregiver_intake",
@@ -56,119 +60,126 @@ function rateLimit(subject: string, now: number): boolean {
 export async function registerInterestRoutes(app: FastifyInstance) {
   const db = (app as any).db;
 
-  app.get("/api/family/interests/:learnerId", { schema: getInterestsByLearnerIdSchema }, async (req: any, reply: any) => {
-    const auth = await authenticateRequest(req, reply);
-    if (!auth) return;
-    const { learnerId } = req.params as { learnerId: string };
-    const owns = await verifyParentOwnership(db, auth.sub, learnerId);
-    if (!owns) return reply.code(403).send({ error: "Forbidden" });
+  app.get(
+    "/api/family/interests/:learnerId",
+    { schema: getInterestsByLearnerIdSchema },
+    async (req: any, reply: any) => {
+      const auth = await authenticateRequest(req, reply);
+      if (!auth) return;
+      const { learnerId } = req.params as { learnerId: string };
+      const owns = await verifyParentOwnership(db, auth.sub, learnerId);
+      if (!owns) return reply.code(403).send({ error: "Forbidden" });
 
-    const rows = await db
-      .select()
-      .from(learnerInterestSignals)
-      .where(eq(learnerInterestSignals.learnerId, learnerId))
-      .orderBy(desc(learnerInterestSignals.observedAt));
+      const rows = await db
+        .select()
+        .from(learnerInterestSignals)
+        .where(eq(learnerInterestSignals.learnerId, learnerId))
+        .orderBy(desc(learnerInterestSignals.observedAt));
 
-    const signals: LearnerInterestSignal[] = rows.map((r: any) => ({
-      slug: r.slug,
-      source: r.source,
-      polarity: r.polarity,
-      confidence: r.confidence,
-      observedAt: (r.observedAt instanceof Date
-        ? r.observedAt.toISOString()
-        : r.observedAt) as string,
-    }));
-    const profile: LearnerInterestProfile = { learnerId, signals };
-    const scored = scoreInterests(profile);
-    const topTheme = pickTheme(profile);
-
-    return {
-      learnerId,
-      signals: rows.map((r: any) => ({
-        id: r.id,
+      const signals: LearnerInterestSignal[] = rows.map((r: any) => ({
         slug: r.slug,
         source: r.source,
         polarity: r.polarity,
         confidence: r.confidence,
-        observedAt: r.observedAt,
-        note: r.note,
-      })),
-      scored,
-      topTheme: topTheme ? { slug: topTheme.slug, label: topTheme.label } : null,
-    };
-  });
+        observedAt: (r.observedAt instanceof Date
+          ? r.observedAt.toISOString()
+          : r.observedAt) as string,
+      }));
+      const profile: LearnerInterestProfile = { learnerId, signals };
+      const scored = scoreInterests(profile);
+      const topTheme = pickTheme(profile);
 
-  app.post("/api/family/interests/:learnerId", { schema: interestsByLearnerIdSchema }, async (req: any, reply: any) => {
-    const auth = await authenticateRequest(req, reply);
-    if (!auth) return;
-    if (!rateLimit(auth.sub, Date.now())) {
-      return reply.code(429).send({ error: "Too many requests" });
-    }
-    const { learnerId } = req.params as { learnerId: string };
-    const owns = await verifyParentOwnership(db, auth.sub, learnerId);
-    if (!owns) return reply.code(403).send({ error: "Forbidden" });
-
-    const body = (req.body ?? {}) as {
-      slug?: string;
-      source?: string;
-      polarity?: number;
-      confidence?: number;
-      note?: string;
-    };
-
-    const slug = typeof body.slug === "string" ? body.slug.toLowerCase().trim() : "";
-    if (!SLUG_REGEX.test(slug)) {
-      return reply.code(400).send({ error: "Invalid slug" });
-    }
-    const source = body.source ?? "caregiver_intake";
-    if (!VALID_SOURCES.has(source)) {
-      return reply.code(400).send({ error: "Invalid source" });
-    }
-    const polarity = body.polarity ?? 1;
-    if (polarity !== -1 && polarity !== 0 && polarity !== 1) {
-      return reply.code(400).send({ error: "Polarity must be -1, 0, or 1" });
-    }
-    const confidence =
-      typeof body.confidence === "number" && body.confidence >= 0 && body.confidence <= 1
-        ? body.confidence
-        : 1;
-    // Cap free-text note length so a single signal cannot bloat the row.
-    const note =
-      typeof body.note === "string" && body.note.length > 0
-        ? body.note.slice(0, 500)
-        : null;
-
-    const [row] = await db
-      .insert(learnerInterestSignals)
-      .values({
-        // Pull tenantId via the learner the parent already passed
-        // ownership against; verifyParentOwnership has loaded it.
-        tenantId: (await getLearnerTenantId(db, learnerId)) as string,
+      return {
         learnerId,
-        slug,
-        source,
-        polarity,
-        confidence,
-        observedAt: new Date(),
-        note,
-        recordedBy: auth.sub,
-      })
-      .returning();
+        signals: rows.map((r: any) => ({
+          id: r.id,
+          slug: r.slug,
+          source: r.source,
+          polarity: r.polarity,
+          confidence: r.confidence,
+          observedAt: r.observedAt,
+          note: r.note,
+        })),
+        scored,
+        topTheme: topTheme ? { slug: topTheme.slug, label: topTheme.label } : null,
+      };
+    },
+  );
 
-    return reply.code(201).send({
-      id: row.id,
-      slug: row.slug,
-      source: row.source,
-      polarity: row.polarity,
-      confidence: row.confidence,
-      observedAt: row.observedAt,
-      note: row.note,
-    });
-  });
+  app.post(
+    "/api/family/interests/:learnerId",
+    { schema: interestsByLearnerIdSchema },
+    async (req: any, reply: any) => {
+      const auth = await authenticateRequest(req, reply);
+      if (!auth) return;
+      if (!rateLimit(auth.sub, Date.now())) {
+        return reply.code(429).send({ error: "Too many requests" });
+      }
+      const { learnerId } = req.params as { learnerId: string };
+      const owns = await verifyParentOwnership(db, auth.sub, learnerId);
+      if (!owns) return reply.code(403).send({ error: "Forbidden" });
+
+      const body = (req.body ?? {}) as {
+        slug?: string;
+        source?: string;
+        polarity?: number;
+        confidence?: number;
+        note?: string;
+      };
+
+      const slug = typeof body.slug === "string" ? body.slug.toLowerCase().trim() : "";
+      if (!SLUG_REGEX.test(slug)) {
+        return reply.code(400).send({ error: "Invalid slug" });
+      }
+      const source = body.source ?? "caregiver_intake";
+      if (!VALID_SOURCES.has(source)) {
+        return reply.code(400).send({ error: "Invalid source" });
+      }
+      const polarity = body.polarity ?? 1;
+      if (polarity !== -1 && polarity !== 0 && polarity !== 1) {
+        return reply.code(400).send({ error: "Polarity must be -1, 0, or 1" });
+      }
+      const confidence =
+        typeof body.confidence === "number" && body.confidence >= 0 && body.confidence <= 1
+          ? body.confidence
+          : 1;
+      // Cap free-text note length so a single signal cannot bloat the row.
+      const note =
+        typeof body.note === "string" && body.note.length > 0 ? body.note.slice(0, 500) : null;
+
+      const [row] = await db
+        .insert(learnerInterestSignals)
+        .values({
+          // Pull tenantId via the learner the parent already passed
+          // ownership against; verifyParentOwnership has loaded it.
+          tenantId: (await getLearnerTenantId(db, learnerId)) as string,
+          learnerId,
+          slug,
+          source,
+          polarity,
+          confidence,
+          observedAt: new Date(),
+          note,
+          recordedBy: auth.sub,
+        })
+        .returning();
+
+      return reply.code(201).send({
+        id: row.id,
+        slug: row.slug,
+        source: row.source,
+        polarity: row.polarity,
+        confidence: row.confidence,
+        observedAt: row.observedAt,
+        note: row.note,
+      });
+    },
+  );
 
   app.delete(
     "/api/family/interests/:learnerId/:signalId",
-    { schema: deleteInterestsByLearnerIdBySignalIdSchema }, async (req: any, reply: any) => {
+    { schema: deleteInterestsByLearnerIdBySignalIdSchema },
+    async (req: any, reply: any) => {
       const auth = await authenticateRequest(req, reply);
       if (!auth) return;
       if (!rateLimit(auth.sub, Date.now())) {

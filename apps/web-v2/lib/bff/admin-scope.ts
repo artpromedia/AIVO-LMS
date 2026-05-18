@@ -18,8 +18,4 @@ export function adminScopeForSession(session: SessionProfile): {
   };
 }
 
-export const ADMIN_ROLES = [
-  "school_admin",
-  "district_admin",
-  "platform_admin",
-] as const;
+export const ADMIN_ROLES = ["school_admin", "district_admin", "platform_admin"] as const;

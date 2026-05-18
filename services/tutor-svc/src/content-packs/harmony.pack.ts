@@ -23,7 +23,8 @@ export const harmonyStarterPack: ContentPack = {
       title: "Name the feeling",
       skillId: "casel.k2.self_awareness.feelings",
       type: "narration",
-      prompt: "Feelings are normal. Today we'll learn to name some of them — happy, sad, angry, calm.",
+      prompt:
+        "Feelings are normal. Today we'll learn to name some of them — happy, sad, angry, calm.",
       difficulty: "intro",
     },
     {

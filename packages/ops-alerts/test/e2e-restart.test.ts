@@ -18,11 +18,9 @@ interface RunResult {
 
 function runWorker(action: "queue" | "drain", env: Record<string, string>): Promise<RunResult> {
   return new Promise((resolve, reject) => {
-    const child = spawn(
-      "node",
-      ["--import", "tsx", workerPath, action],
-      { env: { ...process.env, ...env } },
-    );
+    const child = spawn("node", ["--import", "tsx", workerPath, action], {
+      env: { ...process.env, ...env },
+    });
     let stdout = "";
     let stderr = "";
     child.stdout.on("data", (c) => (stdout += c.toString("utf8")));
@@ -119,7 +117,10 @@ describe("e2e: alert survives container restart (#208)", () => {
     }
     // The worker may emit multiple lines (e.g. logger output then result JSON).
     // Pick the last non-empty line, which is the JSON result.
-    const lines = drainResult.stdout.trim().split("\n").filter((l) => l.length > 0);
+    const lines = drainResult.stdout
+      .trim()
+      .split("\n")
+      .filter((l) => l.length > 0);
     const parsed = JSON.parse(lines[lines.length - 1]);
     assert.equal(parsed.drained, 1, "expected 1 envelope drained");
     assert.equal(parsed.remaining, 0);

@@ -15,11 +15,7 @@
  * same logic, same shape. When an LLM adapter is wired in (Sprint 22+) it
  * should write back into this signature without changing callers.
  */
-import type {
-  IEPExtraction,
-  LearnerProfile,
-  ParentAssessment,
-} from "@/lib/db/types";
+import type { IEPExtraction, LearnerProfile, ParentAssessment } from "@/lib/db/types";
 import { nowIso } from "@/lib/db/store";
 
 type ExtractInput = {
@@ -42,29 +38,15 @@ function pickAnswer<T = unknown>(
 export function buildIEPExtraction(input: ExtractInput): IEPExtraction {
   const { learner, assessment, hasUploadedDocument } = input;
 
-  const knownAccommodations =
-    pickAnswer<string[]>(assessment, "accommodations", "known") ?? [];
-  const extendedTime = Boolean(
-    pickAnswer<boolean>(assessment, "accommodations", "extendedTime"),
-  );
-  const readAloud = Boolean(
-    pickAnswer<boolean>(assessment, "accommodations", "readAloud"),
-  );
-  const speechToText = Boolean(
-    pickAnswer<boolean>(assessment, "accommodations", "speechToText"),
-  );
-  const movementHelps = Boolean(
-    pickAnswer<boolean>(assessment, "attention", "movementHelps"),
-  );
-  const sensitivities =
-    pickAnswer<string[]>(assessment, "sensory", "sensitivities") ?? [];
-  const communicationStyle =
-    pickAnswer<string>(assessment, "communication", "style") ?? "mixed";
-  const aacUsed = Boolean(
-    pickAnswer<boolean>(assessment, "communication", "aacUsed"),
-  );
-  const triggers =
-    pickAnswer<string[]>(assessment, "frustration", "triggers") ?? [];
+  const knownAccommodations = pickAnswer<string[]>(assessment, "accommodations", "known") ?? [];
+  const extendedTime = Boolean(pickAnswer<boolean>(assessment, "accommodations", "extendedTime"));
+  const readAloud = Boolean(pickAnswer<boolean>(assessment, "accommodations", "readAloud"));
+  const speechToText = Boolean(pickAnswer<boolean>(assessment, "accommodations", "speechToText"));
+  const movementHelps = Boolean(pickAnswer<boolean>(assessment, "attention", "movementHelps"));
+  const sensitivities = pickAnswer<string[]>(assessment, "sensory", "sensitivities") ?? [];
+  const communicationStyle = pickAnswer<string>(assessment, "communication", "style") ?? "mixed";
+  const aacUsed = Boolean(pickAnswer<boolean>(assessment, "communication", "aacUsed"));
+  const triggers = pickAnswer<string[]>(assessment, "frustration", "triggers") ?? [];
 
   const accommodations = Array.from(
     new Set<string>([
@@ -80,18 +62,14 @@ export function buildIEPExtraction(input: ExtractInput): IEPExtraction {
     ]),
   ).slice(0, 20);
 
-  const learningGoals = (
-    pickAnswer<string[]>(assessment, "goals", "goals") ?? []
-  ).slice(0, 10);
+  const learningGoals = (pickAnswer<string[]>(assessment, "goals", "goals") ?? []).slice(0, 10);
 
   const serviceAreas = Array.from(
     new Set<string>([
       ...(learner.readingComfort && learner.readingComfort !== "advanced"
         ? ["Reading support"]
         : []),
-      ...(learner.mathComfort && learner.mathComfort !== "advanced"
-        ? ["Math support"]
-        : []),
+      ...(learner.mathComfort && learner.mathComfort !== "advanced" ? ["Math support"] : []),
       ...(triggers.length ? ["Behavioral / regulation support"] : []),
       ...(communicationStyle !== "spoken" && communicationStyle !== "mixed"
         ? ["Communication support"]
@@ -104,11 +82,8 @@ export function buildIEPExtraction(input: ExtractInput): IEPExtraction {
       ...(readAloud ? ["Text-to-speech reader"] : []),
       ...(speechToText ? ["Speech-to-text dictation"] : []),
       ...(aacUsed ? ["AAC device / app compatibility"] : []),
-      ...(learner.accessibilityDefaults.largeText
-        ? ["Adjustable text size and spacing"]
-        : []),
-      ...(learner.accessibilityDefaults.highContrast
-        ? ["High-contrast visual themes"] : []),
+      ...(learner.accessibilityDefaults.largeText ? ["Adjustable text size and spacing"] : []),
+      ...(learner.accessibilityDefaults.highContrast ? ["High-contrast visual themes"] : []),
     ]),
   );
 

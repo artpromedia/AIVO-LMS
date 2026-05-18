@@ -3,10 +3,7 @@ import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
 import { audit } from "@/lib/bff/audit";
-import {
-  createDataDeletionRequest,
-  listDataDeletionRequestsForUser,
-} from "@/lib/db/repos";
+import { createDataDeletionRequest, listDataDeletionRequestsForUser } from "@/lib/db/repos";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -26,10 +23,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     if (roleErr) return roleErr;
     return ok(
       {
-        requests: listDataDeletionRequestsForUser(
-          session!.userId,
-          session!.tenantId,
-        ),
+        requests: listDataDeletionRequestsForUser(session!.userId, session!.tenantId),
       },
       requestId,
     );
@@ -65,10 +59,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     const learnerId = parsed.data.learnerId ?? null;
 
     // learner / iep_only scope requires a real learnerId the parent owns.
-    if (
-      (parsed.data.scope === "learner" || parsed.data.scope === "iep_only") &&
-      !learnerId
-    ) {
+    if ((parsed.data.scope === "learner" || parsed.data.scope === "iep_only") && !learnerId) {
       return fail(
         {
           ...ERRORS.VALIDATION_FAILED,

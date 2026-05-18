@@ -5,11 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DISTRICT_NAV } from "@/components/layout/role-shells";
-import {
-  scopeTenantsForSession,
-  listDistrictLearners,
-  getDistrictStats,
-} from "@/lib/db/repos";
+import { scopeTenantsForSession, listDistrictLearners, getDistrictStats } from "@/lib/db/repos";
 
 export default async function Page() {
   const session = await requirePageRole(["district_admin"]);
@@ -18,14 +14,9 @@ export default async function Page() {
   const stats = getDistrictStats(tenantIds);
   const rows = listDistrictLearners(tenantIds);
 
-  const pct =
-    stats.learners > 0
-      ? Math.round((stats.ieps / stats.learners) * 100)
-      : 0;
+  const pct = stats.learners > 0 ? Math.round((stats.ieps / stats.learners) * 100) : 0;
 
-  const decisionTone = (
-    d: "uploaded" | "skipped" | null,
-  ): "success" | "neutral" | "warning" =>
+  const decisionTone = (d: "uploaded" | "skipped" | null): "success" | "neutral" | "warning" =>
     d === "uploaded" ? "success" : d === "skipped" ? "neutral" : "warning";
 
   const decisionLabel = (d: "uploaded" | "skipped" | null) =>
@@ -59,12 +50,8 @@ export default async function Page() {
           },
         ].map((s) => (
           <Card key={s.k} className="p-[var(--aivo-density-card-pad)]">
-            <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-              {s.k}
-            </p>
-            <p className="mt-1 font-display text-3xl font-bold">
-              {s.v.toLocaleString()}
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{s.k}</p>
+            <p className="mt-1 font-display text-3xl font-bold">{s.v.toLocaleString()}</p>
             <p className="mt-1 text-xs text-aivo-ink-soft">{s.helper}</p>
           </Card>
         ))}
@@ -92,18 +79,10 @@ export default async function Page() {
             <tbody className="divide-y divide-aivo-border">
               {rows.map((r) => (
                 <tr key={r.learner.id}>
-                  <td className="px-4 py-3 font-medium">
-                    {r.learner.displayName}
-                  </td>
-                  <td className="px-4 py-3 text-aivo-ink-soft">
-                    {r.schoolName ?? "—"}
-                  </td>
-                  <td className="px-4 py-3 text-aivo-ink-soft">
-                    {r.familyName}
-                  </td>
-                  <td className="px-4 py-3 text-aivo-ink-soft">
-                    {r.learner.gradeBand ?? "—"}
-                  </td>
+                  <td className="px-4 py-3 font-medium">{r.learner.displayName}</td>
+                  <td className="px-4 py-3 text-aivo-ink-soft">{r.schoolName ?? "—"}</td>
+                  <td className="px-4 py-3 text-aivo-ink-soft">{r.familyName}</td>
+                  <td className="px-4 py-3 text-aivo-ink-soft">{r.learner.gradeBand ?? "—"}</td>
                   <td className="px-4 py-3">
                     <Badge tone={decisionTone(r.learner.iepDecision)}>
                       {decisionLabel(r.learner.iepDecision)}

@@ -39,14 +39,30 @@ export async function POST(req: Request): Promise<NextResponse> {
     const roleErr = requireRole(session!, ["platform_admin"], requestId);
     if (roleErr) return roleErr;
     let body: unknown = {};
-    try { body = await req.json(); } catch { body = {}; }
+    try {
+      body = await req.json();
+    } catch {
+      body = {};
+    }
     const parsed = postSchema.safeParse(body);
     if (!parsed.success) {
-      return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." }, requestId);
+      return fail(
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
+        requestId,
+      );
     }
     const job = runMigrationJob({ ...parsed.data, createdByUserId: session!.userId });
     audit(session!, "migration.job.run", requestId, {
-      metadata: { jobId: job.id, kind: job.kind, dryRun: job.dryRun ? "1" : "0", success: String(job.successRecords), failed: String(job.failedRecords) },
+      metadata: {
+        jobId: job.id,
+        kind: job.kind,
+        dryRun: job.dryRun ? "1" : "0",
+        success: String(job.successRecords),
+        failed: String(job.failedRecords),
+      },
     });
     return ok({ job }, requestId);
   } catch (e) {

@@ -19,7 +19,9 @@ export default async function Page() {
         user={{ displayName: session.displayName, email: session.email }}
       >
         <PageHeader title="Audio" />
-        <Card className="p-[var(--aivo-density-card-pad)] text-aivo-muted">Sign in as a learner to view audio settings.</Card>
+        <Card className="p-[var(--aivo-density-card-pad)] text-aivo-muted">
+          Sign in as a learner to view audio settings.
+        </Card>
       </AppShell>
     );
   }
@@ -44,11 +46,7 @@ export default async function Page() {
         description="Pick a voice and playback speed. Your grown-up controls whether read-aloud is turned on."
       />
       <Card className="p-[var(--aivo-density-card-pad)]">
-        <AudioPrefForm
-          learnerId={session.learnerId}
-          initial={pref}
-          canToggleEnabled={false}
-        />
+        <AudioPrefForm learnerId={session.learnerId} initial={pref} canToggleEnabled={false} />
       </Card>
     </AppShell>
   );

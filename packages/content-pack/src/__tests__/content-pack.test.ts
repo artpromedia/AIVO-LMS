@@ -1,9 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  validateContentPack,
-  isContentPackValid,
-  type ContentPack,
-} from "../index.js";
+import { validateContentPack, isContentPackValid, type ContentPack } from "../index.js";
 
 function basePack(overrides: Partial<ContentPack> = {}): ContentPack {
   return {
@@ -58,9 +54,9 @@ describe("validateContentPack", () => {
 
   it("rejects missing required pack fields", () => {
     const issues = validateContentPack(basePack({ license: "" }));
-    expect(issues.some(
-      (i) => i.code === "missing_required_field" && i.detail.includes("license"),
-    )).toBe(true);
+    expect(
+      issues.some((i) => i.code === "missing_required_field" && i.detail.includes("license")),
+    ).toBe(true);
   });
 
   it("rejects duplicate activity ids", () => {
@@ -107,26 +103,30 @@ describe("validateContentPack", () => {
 
   it("flags multiple_choice with no correct answer", () => {
     const pack = basePack({
-      activities: [{
-        ...basePack().activities[0],
-        choices: [
-          { id: "c1", label: "2", correct: false },
-          { id: "c2", label: "3", correct: false },
-        ],
-      }],
+      activities: [
+        {
+          ...basePack().activities[0],
+          choices: [
+            { id: "c1", label: "2", correct: false },
+            { id: "c2", label: "3", correct: false },
+          ],
+        },
+      ],
     });
     expect(validateContentPack(pack).some((i) => i.code === "no_correct_choice")).toBe(true);
   });
 
   it("flags multiple_choice with multiple correct answers", () => {
     const pack = basePack({
-      activities: [{
-        ...basePack().activities[0],
-        choices: [
-          { id: "c1", label: "2", correct: true },
-          { id: "c2", label: "3", correct: true },
-        ],
-      }],
+      activities: [
+        {
+          ...basePack().activities[0],
+          choices: [
+            { id: "c1", label: "2", correct: true },
+            { id: "c2", label: "3", correct: true },
+          ],
+        },
+      ],
     });
     expect(
       validateContentPack(pack).some((i) => i.code === "multiple_correct_in_single_choice"),
@@ -135,28 +135,36 @@ describe("validateContentPack", () => {
 
   it("voice activity must define expectedAnswer (empty string allowed for free practice)", () => {
     const missing = basePack({
-      activities: [{
-        id: "v1",
-        title: "Say it",
-        skillId: "ccss-math.K.CC.A.1",
-        type: "voice",
-        prompt: "Say a number you know",
-        difficulty: "intro",
-      }],
+      activities: [
+        {
+          id: "v1",
+          title: "Say it",
+          skillId: "ccss-math.K.CC.A.1",
+          type: "voice",
+          prompt: "Say a number you know",
+          difficulty: "intro",
+        },
+      ],
     });
-    expect(validateContentPack(missing).some((i) => i.code === "voice_missing_expected")).toBe(true);
+    expect(validateContentPack(missing).some((i) => i.code === "voice_missing_expected")).toBe(
+      true,
+    );
 
     const present = basePack({
-      activities: [{
-        id: "v2",
-        title: "Say it",
-        skillId: "ccss-math.K.CC.A.1",
-        type: "voice",
-        prompt: "Say a number you know",
-        difficulty: "intro",
-        expectedAnswer: "", // explicit empty = talking practice
-      }],
+      activities: [
+        {
+          id: "v2",
+          title: "Say it",
+          skillId: "ccss-math.K.CC.A.1",
+          type: "voice",
+          prompt: "Say a number you know",
+          difficulty: "intro",
+          expectedAnswer: "", // explicit empty = talking practice
+        },
+      ],
     });
-    expect(validateContentPack(present).some((i) => i.code === "voice_missing_expected")).toBe(false);
+    expect(validateContentPack(present).some((i) => i.code === "voice_missing_expected")).toBe(
+      false,
+    );
   });
 });

@@ -12,30 +12,42 @@
  * The back gesture is disabled in `(auth)/_layout.tsx` so the user
  * can't bypass the gate by swiping away.
  */
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from "react";
 import {
-  View, Text, TextInput, StyleSheet, KeyboardAvoidingView, Platform, ScrollView,
-} from 'react-native';
-import { router } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useAuth } from '@/hooks/useAuth';
-import { apiFetch } from '@/lib/api';
-import { API } from '@/constants/api';
-import { colors, spacing, radius } from '@/constants/colors';
-import { estimatePasswordStrength } from '@/lib/passwordStrength';
-import { AivoButton } from '@aivo/mobile-ui';
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from "react-native";
+import { router } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useAuth } from "@/hooks/useAuth";
+import { apiFetch } from "@/lib/api";
+import { API } from "@/constants/api";
+import { colors, spacing, radius } from "@/constants/colors";
+import { estimatePasswordStrength } from "@/lib/passwordStrength";
+import { AivoButton } from "@aivo/mobile-ui";
 
-const STRENGTH_COLORS = ['#ef4444', '#f97316', '#f59e0b', '#84cc16', '#10b981'];
+const STRENGTH_COLORS = ["#ef4444", "#f97316", "#f59e0b", "#84cc16", "#10b981"];
 
 function reasonText(r: string, t: (k: string) => string): string {
   switch (r) {
-    case 'too_short': return t('auth.changePasswordReasonTooShort');
-    case 'too_weak': return t('auth.changePasswordReasonTooWeak');
-    case 'breached': return t('auth.changePasswordReasonBreached');
-    case 'reused': return t('auth.changePasswordReasonReused');
-    case 'missing_diversity': return t('auth.changePasswordReasonMissingDiversity');
-    default: return r;
+    case "too_short":
+      return t("auth.changePasswordReasonTooShort");
+    case "too_weak":
+      return t("auth.changePasswordReasonTooWeak");
+    case "breached":
+      return t("auth.changePasswordReasonBreached");
+    case "reused":
+      return t("auth.changePasswordReasonReused");
+    case "missing_diversity":
+      return t("auth.changePasswordReasonMissingDiversity");
+    default:
+      return r;
   }
 }
 
@@ -44,36 +56,36 @@ export default function ChangePasswordScreen() {
   const { t } = useTranslation();
   const { logout } = useAuth();
 
-  const [current, setCurrent] = useState('');
-  const [next, setNext] = useState('');
-  const [confirm, setConfirm] = useState('');
-  const [error, setError] = useState('');
+  const [current, setCurrent] = useState("");
+  const [next, setNext] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const { score, reasons } = useMemo(() => estimatePasswordStrength(next), [next]);
 
   const handleSubmit = async () => {
-    setError('');
+    setError("");
     if (!current || !next || !confirm) {
-      setError(t('auth.changePasswordFillAll'));
+      setError(t("auth.changePasswordFillAll"));
       return;
     }
     if (next !== confirm) {
-      setError(t('auth.passwordsMismatch'));
+      setError(t("auth.passwordsMismatch"));
       return;
     }
     setLoading(true);
     try {
-      const res = await apiFetch(API.IDENTITY, '/api/auth/password', {
-        method: 'PUT',
+      const res = await apiFetch(API.IDENTITY, "/api/auth/password", {
+        method: "PUT",
         body: JSON.stringify({ currentPassword: current, newPassword: next }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         if (Array.isArray(data.reasons) && data.reasons.length) {
-          setError(data.reasons.map((r: string) => reasonText(r, t)).join(' • '));
+          setError(data.reasons.map((r: string) => reasonText(r, t)).join(" • "));
         } else {
-          setError(data.error || t('auth.changePasswordFailed'));
+          setError(data.error || t("auth.changePasswordFailed"));
         }
         setLoading(false);
         return;
@@ -81,9 +93,9 @@ export default function ChangePasswordScreen() {
       // Server invalidated all sessions on success — wipe local tokens
       // and bounce to login so the user re-authenticates.
       await logout();
-      router.replace('/(auth)/login');
+      router.replace("/(auth)/login");
     } catch {
-      setError(t('auth.somethingWentWrong'));
+      setError(t("auth.somethingWentWrong"));
       setLoading(false);
     }
   };
@@ -91,7 +103,7 @@ export default function ChangePasswordScreen() {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
         style={styles.container}
@@ -99,18 +111,18 @@ export default function ChangePasswordScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.card}>
-          <Text style={styles.title}>{t('auth.changePasswordTitle')}</Text>
-          <Text style={styles.subtitle}>{t('auth.changePasswordSubtitle')}</Text>
+          <Text style={styles.title}>{t("auth.changePasswordTitle")}</Text>
+          <Text style={styles.subtitle}>{t("auth.changePasswordSubtitle")}</Text>
 
           {error ? <Text style={styles.error}>{error}</Text> : null}
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>{t('auth.changePasswordCurrent')}</Text>
+            <Text style={styles.label}>{t("auth.changePasswordCurrent")}</Text>
             <TextInput
               style={styles.input}
               value={current}
               onChangeText={setCurrent}
-              placeholder={t('auth.passwordPlaceholder')}
+              placeholder={t("auth.passwordPlaceholder")}
               placeholderTextColor={colors.textSecondary}
               secureTextEntry
               autoCapitalize="none"
@@ -120,12 +132,12 @@ export default function ChangePasswordScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>{t('auth.changePasswordNew')}</Text>
+            <Text style={styles.label}>{t("auth.changePasswordNew")}</Text>
             <TextInput
               style={styles.input}
               value={next}
               onChangeText={setNext}
-              placeholder={t('auth.changePasswordNewPlaceholder')}
+              placeholder={t("auth.changePasswordNewPlaceholder")}
               placeholderTextColor={colors.textSecondary}
               secureTextEntry
               autoCapitalize="none"
@@ -149,19 +161,17 @@ export default function ChangePasswordScreen() {
               </View>
             )}
             {reasons.length > 0 && (
-              <Text style={styles.hint}>
-                {reasons.map((r) => reasonText(r, t)).join(' • ')}
-              </Text>
+              <Text style={styles.hint}>{reasons.map((r) => reasonText(r, t)).join(" • ")}</Text>
             )}
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>{t('auth.confirmPassword')}</Text>
+            <Text style={styles.label}>{t("auth.confirmPassword")}</Text>
             <TextInput
               style={styles.input}
               value={confirm}
               onChangeText={setConfirm}
-              placeholder={t('auth.confirmPasswordPlaceholder')}
+              placeholder={t("auth.confirmPasswordPlaceholder")}
               placeholderTextColor={colors.textSecondary}
               secureTextEntry
               autoCapitalize="none"
@@ -171,7 +181,7 @@ export default function ChangePasswordScreen() {
           </View>
 
           <AivoButton
-            title={t('auth.changePasswordSubmit')}
+            title={t("auth.changePasswordSubmit")}
             onPress={handleSubmit}
             loading={loading}
             size="lg"
@@ -193,7 +203,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderRadius: radius.xxl,
     padding: spacing.lg,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
@@ -201,15 +211,15 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
-    fontFamily: 'Nunito-ExtraBold',
+    fontFamily: "Nunito-ExtraBold",
     color: colors.text,
-    textAlign: 'center',
+    textAlign: "center",
   },
   subtitle: {
     fontSize: 14,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.textSecondary,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 4,
     marginBottom: spacing.lg,
     lineHeight: 20,
@@ -217,17 +227,17 @@ const styles = StyleSheet.create({
   error: {
     color: colors.error,
     fontSize: 13,
-    fontFamily: 'Nunito-SemiBold',
-    textAlign: 'center',
+    fontFamily: "Nunito-SemiBold",
+    textAlign: "center",
     marginBottom: 12,
-    backgroundColor: colors.error + '10',
+    backgroundColor: colors.error + "10",
     padding: 10,
     borderRadius: radius.md,
   },
   inputGroup: { marginBottom: spacing.md },
   label: {
     fontSize: 14,
-    fontFamily: 'Nunito-SemiBold',
+    fontFamily: "Nunito-SemiBold",
     color: colors.text,
     marginBottom: 6,
   },
@@ -238,12 +248,12 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     paddingHorizontal: spacing.md,
     fontSize: 16,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.text,
     backgroundColor: colors.surface,
   },
   strengthRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 4,
     marginTop: 8,
   },
@@ -255,7 +265,7 @@ const styles = StyleSheet.create({
   hint: {
     marginTop: 6,
     fontSize: 12,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.textSecondary,
   },
 });

@@ -86,13 +86,7 @@ export interface AssessmentSection {
 }
 
 /** Likert anchor labels — same across every frequency item. */
-export const LIKERT5_LABELS = [
-  "Never",
-  "Rarely",
-  "Sometimes",
-  "Often",
-  "Always",
-] as const;
+export const LIKERT5_LABELS = ["Never", "Rarely", "Sometimes", "Often", "Always"] as const;
 /** The escape hatch — never include this in scoring composites. */
 export const NOT_SURE_VALUE = "not_sure";
 export const NOT_SURE_LABEL = "Not sure / Haven't observed";
@@ -128,8 +122,7 @@ export const PARENT_ASSESSMENT_SECTIONS: AssessmentSection[] = [
       {
         id: "consent-1",
         sectionKey: "welcome",
-        text:
-          "I understand my answers will be used to personalize learning for my child. I can edit, export, or delete this anytime.",
+        text: "I understand my answers will be used to personalize learning for my child. I can edit, export, or delete this anytime.",
         type: "consent_checkbox",
         required: true,
       },
@@ -143,8 +136,7 @@ export const PARENT_ASSESSMENT_SECTIONS: AssessmentSection[] = [
     label: "About your child",
     shortLabel: "Basics",
     icon: "🌱",
-    rationale:
-      "Quick context so we can age-appropriate everything. Most fields are optional.",
+    rationale: "Quick context so we can age-appropriate everything. Most fields are optional.",
     estimatedMinutes: 2,
     questions: [
       {
@@ -183,7 +175,17 @@ export const PARENT_ASSESSMENT_SECTIONS: AssessmentSection[] = [
         sectionKey: "basics",
         text: "Languages spoken in your home",
         type: "multi_select",
-        options: ["English", "Spanish", "Mandarin", "French", "Arabic", "Hindi", "Tagalog", "Vietnamese", "Korean"],
+        options: [
+          "English",
+          "Spanish",
+          "Mandarin",
+          "French",
+          "Arabic",
+          "Hindi",
+          "Tagalog",
+          "Vietnamese",
+          "Korean",
+        ],
         allowOther: true,
       },
       {
@@ -232,9 +234,20 @@ export const PARENT_ASSESSMENT_SECTIONS: AssessmentSection[] = [
         text: "What are they naturally good at?",
         type: "multi_select",
         options: [
-          "Art & drawing", "Music", "Memory", "Puzzles", "Sports", "Numbers",
-          "Storytelling", "Building", "Caring for others", "Animals",
-          "Noticing details", "Comforting others", "Negotiating", "Inventing games",
+          "Art & drawing",
+          "Music",
+          "Memory",
+          "Puzzles",
+          "Sports",
+          "Numbers",
+          "Storytelling",
+          "Building",
+          "Caring for others",
+          "Animals",
+          "Noticing details",
+          "Comforting others",
+          "Negotiating",
+          "Inventing games",
         ],
         allowOther: true,
       },
@@ -243,7 +256,14 @@ export const PARENT_ASSESSMENT_SECTIONS: AssessmentSection[] = [
         sectionKey: "strengths",
         text: "How does your child best receive praise?",
         type: "single_select",
-        options: ["Words", "Hugs / physical", "Treats", "Alone time", "Shared activity", "Earned privilege"],
+        options: [
+          "Words",
+          "Hugs / physical",
+          "Treats",
+          "Alone time",
+          "Shared activity",
+          "Earned privilege",
+        ],
       },
       {
         id: "st-motivates",
@@ -251,9 +271,14 @@ export const PARENT_ASSESSMENT_SECTIONS: AssessmentSection[] = [
         text: "What usually motivates them to try something hard?",
         type: "multi_select",
         options: [
-          "Earning something they want", "Beating their own time / score",
-          "Helping someone else", "Surprise / mystery", "Story or character",
-          "Being the expert", "Doing it with a parent", "Just figuring it out themselves",
+          "Earning something they want",
+          "Beating their own time / score",
+          "Helping someone else",
+          "Surprise / mystery",
+          "Story or character",
+          "Being the expert",
+          "Doing it with a parent",
+          "Just figuring it out themselves",
         ],
         allowOther: true,
       },
@@ -302,8 +327,14 @@ export const PARENT_ASSESSMENT_SECTIONS: AssessmentSection[] = [
         text: "Any current therapies or services?",
         type: "multi_select",
         options: [
-          "None", "Occupational therapy", "Physical therapy", "Speech therapy",
-          "ABA", "Counseling / mental health", "Tutoring", "IEP / 504",
+          "None",
+          "Occupational therapy",
+          "Physical therapy",
+          "Speech therapy",
+          "ABA",
+          "Counseling / mental health",
+          "Tutoring",
+          "IEP / 504",
         ],
         allowOther: true,
       },
@@ -355,13 +386,13 @@ export const PARENT_ASSESSMENT_SECTIONS: AssessmentSection[] = [
       {
         id: "co-simple-instructions",
         sectionKey: "communication",
-        text: "Follows simple instructions (e.g. \"please put your shoes on\").",
+        text: 'Follows simple instructions (e.g. "please put your shoes on").',
         type: "likert5_with_unsure",
       },
       {
         id: "co-multi-step",
         sectionKey: "communication",
-        text: "Follows multi-step instructions (e.g. \"brush your teeth then bring me your bag\").",
+        text: 'Follows multi-step instructions (e.g. "brush your teeth then bring me your bag").',
         type: "likert5_with_unsure",
       },
       {
@@ -442,14 +473,13 @@ export const PARENT_ASSESSMENT_SECTIONS: AssessmentSection[] = [
       {
         id: "se-loses-game",
         sectionKey: "social_emotional",
-        text: "Copes with losing a game or being told \"no\".",
+        text: 'Copes with losing a game or being told "no".',
         type: "likert5_with_unsure",
       },
       {
         id: "se-open",
         sectionKey: "social_emotional",
-        text:
-          "What are your biggest social or emotional concerns right now, if any? (optional)",
+        text: "What are your biggest social or emotional concerns right now, if any? (optional)",
         type: "open_long",
       },
     ],
@@ -533,7 +563,14 @@ export const PARENT_ASSESSMENT_SECTIONS: AssessmentSection[] = [
         sectionKey: "learning",
         text: "Current school setting",
         type: "single_select",
-        options: ["Public school", "Private school", "Homeschool", "Microschool", "Not in school", "Other"],
+        options: [
+          "Public school",
+          "Private school",
+          "Homeschool",
+          "Microschool",
+          "Not in school",
+          "Other",
+        ],
         allowOther: true,
       },
       {
@@ -541,14 +578,37 @@ export const PARENT_ASSESSMENT_SECTIONS: AssessmentSection[] = [
         sectionKey: "learning",
         text: "Grade level",
         type: "single_select",
-        options: ["Pre-K", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "Post-12 / Other"],
+        options: [
+          "Pre-K",
+          "K",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "10",
+          "11",
+          "12",
+          "Post-12 / Other",
+        ],
       },
       {
         id: "lr-iep",
         sectionKey: "learning",
         text: "Currently has an IEP, 504, or ILP?",
         type: "single_select",
-        options: ["No", "Yes — IEP", "Yes — 504", "Yes — ILP", "Currently being evaluated", "Not sure"],
+        options: [
+          "No",
+          "Yes — IEP",
+          "Yes — 504",
+          "Yes — ILP",
+          "Currently being evaluated",
+          "Not sure",
+        ],
       },
       {
         id: "lr-best-modes",
@@ -556,8 +616,15 @@ export const PARENT_ASSESSMENT_SECTIONS: AssessmentSection[] = [
         text: "How does your child learn best?",
         type: "multi_select",
         options: [
-          "Watching", "Doing / hands-on", "Reading", "Listening", "Talking it through",
-          "Teaching someone else", "Moving while learning", "Working alone", "Working with others",
+          "Watching",
+          "Doing / hands-on",
+          "Reading",
+          "Listening",
+          "Talking it through",
+          "Teaching someone else",
+          "Moving while learning",
+          "Working alone",
+          "Working with others",
         ],
       },
       {
@@ -580,7 +647,14 @@ export const PARENT_ASSESSMENT_SECTIONS: AssessmentSection[] = [
         sectionKey: "learning",
         text: "When are they sharpest?",
         type: "single_select",
-        options: ["Early morning", "Late morning", "Early afternoon", "Late afternoon", "Evening", "Varies"],
+        options: [
+          "Early morning",
+          "Late morning",
+          "Early afternoon",
+          "Late afternoon",
+          "Evening",
+          "Varies",
+        ],
       },
       {
         id: "lr-breakdown",
@@ -640,8 +714,7 @@ export const PARENT_ASSESSMENT_SECTIONS: AssessmentSection[] = [
       {
         id: "pr-one-thing",
         sectionKey: "priorities",
-        text:
-          "If aivo could help with ONE thing in the next 3 months, what would it be?",
+        text: "If aivo could help with ONE thing in the next 3 months, what would it be?",
         type: "open_long",
       },
       {
@@ -650,9 +723,17 @@ export const PARENT_ASSESSMENT_SECTIONS: AssessmentSection[] = [
         text: "Pick your top 3 priorities (drag to reorder)",
         type: "rank_top_three",
         options: [
-          "Academic skills", "Confidence", "Social skills", "Independence",
-          "Emotional regulation", "Communication", "Motor skills", "Focus / attention",
-          "Creativity", "Specific interest exploration", "Family harmony",
+          "Academic skills",
+          "Confidence",
+          "Social skills",
+          "Independence",
+          "Emotional regulation",
+          "Communication",
+          "Motor skills",
+          "Focus / attention",
+          "Creativity",
+          "Specific interest exploration",
+          "Family harmony",
         ],
       },
       {
@@ -710,17 +791,12 @@ export const PARENT_ASSESSMENT_SECTIONS: AssessmentSection[] = [
 /** Real (non-special) sections — the ones whose questions count toward
  *  progress. Section 0 (welcome consent) and Section 7 (wrap-up) render as
  *  their own bespoke screens and are excluded from the denominator. */
-export const REAL_SECTIONS = PARENT_ASSESSMENT_SECTIONS.filter(
-  (s) => !s.isSpecial,
-);
+export const REAL_SECTIONS = PARENT_ASSESSMENT_SECTIONS.filter((s) => !s.isSpecial);
 
 /** Total questions across all real (non-special) sections — used as the
  *  denominator for the overall progress meter. Stays in sync with the
  *  numerator computed in the page (which also iterates REAL_SECTIONS only). */
-export const TOTAL_QUESTIONS = REAL_SECTIONS.reduce(
-  (sum, s) => sum + s.questions.length,
-  0,
-);
+export const TOTAL_QUESTIONS = REAL_SECTIONS.reduce((sum, s) => sum + s.questions.length, 0);
 
 // ─── Age-band derivation ───────────────────────────────────────────────────
 /** Map a child's age in years to the framework's 4 age bands (§7).
@@ -749,10 +825,7 @@ export function bandFromDob(dobIso: string | null | undefined): AgeBand | null {
  *  is unknown (parent hasn't entered DOB yet) we show all questions — the
  *  framework's "don't hide things from someone who hasn't told us their age yet"
  *  default. */
-export function isQuestionVisible(
-  q: AssessmentQuestion,
-  band: AgeBand | null,
-): boolean {
+export function isQuestionVisible(q: AssessmentQuestion, band: AgeBand | null): boolean {
   if (!q.ageBands || q.ageBands.length === 0) return true;
   if (band === null) return true;
   return q.ageBands.includes(band);

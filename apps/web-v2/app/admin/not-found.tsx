@@ -10,9 +10,7 @@ export default function AdminNotFound() {
       <p className="text-sm font-medium uppercase tracking-wide text-aivo-muted">
         Admin console · 404
       </p>
-      <h1 className="mt-2 font-display text-4xl font-bold">
-        That page is not here.
-      </h1>
+      <h1 className="mt-2 font-display text-4xl font-bold">That page is not here.</h1>
       <p className="mt-3 text-aivo-ink-soft">
         It may have been moved or the resource has been removed.
       </p>

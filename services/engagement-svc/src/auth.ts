@@ -12,7 +12,7 @@ let initialized = false;
 
 export async function authenticateRequest(
   request: FastifyRequest,
-  reply: FastifyReply
+  reply: FastifyReply,
 ): Promise<AuthUser | null> {
   const authHeader = request.headers.authorization;
   if (!authHeader?.startsWith("Bearer ")) {
@@ -43,7 +43,11 @@ export function requireRole(claims: AuthUser, ...roles: string[]): boolean {
   return roles.includes(claims.role);
 }
 
-export function requireSelfOrRole(claims: AuthUser, learnerId: string, ...roles: string[]): boolean {
+export function requireSelfOrRole(
+  claims: AuthUser,
+  learnerId: string,
+  ...roles: string[]
+): boolean {
   if (claims.sub === learnerId) return true;
   return roles.includes(claims.role);
 }

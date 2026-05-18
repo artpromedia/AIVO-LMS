@@ -5,7 +5,10 @@ import crypto from "crypto";
 
 async function seed() {
   const url = process.env.DATABASE_URL;
-  if (!url) { console.error("DATABASE_URL not set"); process.exit(1); }
+  if (!url) {
+    console.error("DATABASE_URL not set");
+    process.exit(1);
+  }
   const db = createDb(url);
 
   const existing = await db.select().from(tenants).limit(1);
@@ -14,10 +17,13 @@ async function seed() {
     process.exit(0);
   }
 
-  const [tenant] = await db.insert(tenants).values({
-    name: "AIVO Demo Family",
-    type: "B2C_FAMILY",
-  }).returning();
+  const [tenant] = await db
+    .insert(tenants)
+    .values({
+      name: "AIVO Demo Family",
+      type: "B2C_FAMILY",
+    })
+    .returning();
 
   const passwordHash = crypto.createHash("sha256").update("admin123").digest("hex");
 

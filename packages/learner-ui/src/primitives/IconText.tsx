@@ -25,7 +25,9 @@ export function IconText({
 
   return (
     <span className={`inline-flex items-center ${sizeClasses[size]} ${className}`}>
-      <span aria-hidden="true" className="shrink-0">{icon}</span>
+      <span aria-hidden="true" className="shrink-0">
+        {icon}
+      </span>
       {hideText ? (
         <span className="sr-only">{text}</span>
       ) : (

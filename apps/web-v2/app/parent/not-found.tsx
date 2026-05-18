@@ -10,12 +10,10 @@ export default function ParentNotFound() {
       <p className="text-sm font-medium uppercase tracking-wide text-aivo-muted">
         Parent area · 404
       </p>
-      <h1 className="mt-2 font-display text-4xl font-bold">
-        We couldn't find that page.
-      </h1>
+      <h1 className="mt-2 font-display text-4xl font-bold">We couldn't find that page.</h1>
       <p className="mt-3 text-aivo-ink-soft">
-        The link may have moved or the learner is no longer linked to your
-        account. Let's get you back to your home.
+        The link may have moved or the learner is no longer linked to your account. Let's get you
+        back to your home.
       </p>
       <div className="mt-6 flex gap-3">
         <Button asChild>

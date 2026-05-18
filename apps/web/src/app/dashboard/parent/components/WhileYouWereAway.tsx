@@ -26,10 +26,7 @@ interface WhileYouWereAwayProps {
   lastVisit: string | null;
 }
 
-const TYPE_VISUAL: Record<
-  string,
-  { Icon: LucideIcon; color: string; bg: string }
-> = {
+const TYPE_VISUAL: Record<string, { Icon: LucideIcon; color: string; bg: string }> = {
   skill_mastered: {
     Icon: Target,
     color: "text-[hsl(var(--visual-science))]",
@@ -104,15 +101,11 @@ export function WhileYouWereAway({ activities, lastVisit }: WhileYouWereAwayProp
               </span>
               <div className="min-w-0 flex-1">
                 <p className="text-sm vi-text leading-snug">
-                  {a.learnerName && (
-                    <span className="font-bold vi-text">{a.learnerName}: </span>
-                  )}
+                  {a.learnerName && <span className="font-bold vi-text">{a.learnerName}: </span>}
                   <span className="font-medium">{a.title}</span>
                 </p>
                 {a.description && (
-                  <p className="text-xs vi-text-muted mt-0.5 font-medium">
-                    {a.description}
-                  </p>
+                  <p className="text-xs vi-text-muted mt-0.5 font-medium">{a.description}</p>
                 )}
               </div>
             </li>

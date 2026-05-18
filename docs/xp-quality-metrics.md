@@ -15,18 +15,18 @@ Both formulas take the following signals. Anything not supplied falls back to a
 defensible default so the formulas degrade gracefully when upstream telemetry is
 sparse.
 
-| Signal              | Type     | Source                                 |
-| ------------------- | -------- | -------------------------------------- |
-| `durationSeconds`   | number   | session start → complete                |
-| `functioningLevel`  | string   | brain state                            |
-| `messageCount`      | number   | tutor session message log              |
-| `beatsCompleted`    | number?  | interaction beats from the lesson UI   |
-| `beatsTotal`        | number?  | interaction beats from the lesson UI   |
-| `correctAnswers`    | number?  | per-beat grading                       |
-| `attemptedAnswers`  | number?  | per-beat grading                       |
-| `engagementBeats`   | number?  | distinct learner responses             |
-| `breaksUsed`        | number?  | BreakCloud telemetry                   |
-| `masteryDelta`      | number?  | mean(after − before) across skills     |
+| Signal             | Type    | Source                               |
+| ------------------ | ------- | ------------------------------------ |
+| `durationSeconds`  | number  | session start → complete             |
+| `functioningLevel` | string  | brain state                          |
+| `messageCount`     | number  | tutor session message log            |
+| `beatsCompleted`   | number? | interaction beats from the lesson UI |
+| `beatsTotal`       | number? | interaction beats from the lesson UI |
+| `correctAnswers`   | number? | per-beat grading                     |
+| `attemptedAnswers` | number? | per-beat grading                     |
+| `engagementBeats`  | number? | distinct learner responses           |
+| `breaksUsed`       | number? | BreakCloud telemetry                 |
+| `masteryDelta`     | number? | mean(after − before) across skills   |
 
 ## XP formula
 
@@ -66,8 +66,8 @@ This means a PRE_SYMBOLIC learner who participates for 5 engagement beats earns
 
 ### Examples
 
-| Scenario                                     | XP  |
-| -------------------------------------------- | --- |
+| Scenario                                        | XP  |
+| ----------------------------------------------- | --- |
 | 2 messages, 100% correct (2/2), 8 min, STANDARD | ~40 |
 | 10 messages, 0% correct (0/2), 8 min, STANDARD  | ~22 |
 | 5 engagement beats, 12 min, PRE_SYMBOLIC        | ~94 |
@@ -79,12 +79,12 @@ session beats a long, incorrect one.
 
 `completionQuality` is a weighted sum of four signals, all in `[0, 1]`:
 
-| Signal           | Weight | Definition                                            |
-| ---------------- | ------ | ----------------------------------------------------- |
-| `completionRate` | 0.30   | `beatsCompleted / beatsTotal` (or `messageCount / 6`) |
-| `correctnessRate`| 0.35   | `correctAnswers / attemptedAnswers`                   |
-| `engagementScore`| 0.15   | `clamp(1 − 0.1 * breaksUsed, 0.3, 1)`                 |
-| `timeOnTaskScore`| 0.20   | bucketed below                                        |
+| Signal            | Weight | Definition                                            |
+| ----------------- | ------ | ----------------------------------------------------- |
+| `completionRate`  | 0.30   | `beatsCompleted / beatsTotal` (or `messageCount / 6`) |
+| `correctnessRate` | 0.35   | `correctAnswers / attemptedAnswers`                   |
+| `engagementScore` | 0.15   | `clamp(1 − 0.1 * breaksUsed, 0.3, 1)`                 |
+| `timeOnTaskScore` | 0.20   | bucketed below                                        |
 
 `timeOnTaskScore` buckets:
 

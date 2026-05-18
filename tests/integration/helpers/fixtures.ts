@@ -39,9 +39,16 @@ export async function createTenant(): Promise<{ tenantId: string; adminTokens: A
     }),
   });
   if (!res.ok) throw new Error(`createTenant failed: ${await res.text()}`);
-  const data = await res.json() as { tenantId: string; accessToken: string; refreshToken?: string };
+  const data = (await res.json()) as {
+    tenantId: string;
+    accessToken: string;
+    refreshToken?: string;
+  };
   _tenantId = data.tenantId;
-  return { tenantId: data.tenantId, adminTokens: { accessToken: data.accessToken, refreshToken: data.refreshToken } };
+  return {
+    tenantId: data.tenantId,
+    adminTokens: { accessToken: data.accessToken, refreshToken: data.refreshToken },
+  };
 }
 
 export function getLastTenantId(): string {
@@ -65,7 +72,7 @@ export async function createUser(
     body: JSON.stringify({ email, password, name: `Test ${role}`, role, tenantId }),
   });
   if (!res.ok) throw new Error(`createUser(${role}) failed: ${await res.text()}`);
-  const data = await res.json() as { id: string; accessToken: string; refreshToken?: string };
+  const data = (await res.json()) as { id: string; accessToken: string; refreshToken?: string };
   return {
     id: data.id,
     email,
@@ -94,7 +101,12 @@ export async function createLearner(
     }),
   });
   if (!res.ok) throw new Error(`createLearner failed: ${await res.text()}`);
-  const data = await res.json() as { id: string; name: string; tenantId: string; parentId: string };
+  const data = (await res.json()) as {
+    id: string;
+    name: string;
+    tenantId: string;
+    parentId: string;
+  };
   return { id: data.id, name: data.name, tenantId: data.tenantId, parentId: data.parentId };
 }
 
@@ -113,7 +125,7 @@ export async function createBrainState(
     body: JSON.stringify({ learnerId, tenantId }),
   });
   if (!res.ok) throw new Error(`createBrainState failed: ${await res.text()}`);
-  const data = await res.json() as { brainStateId: string };
+  const data = (await res.json()) as { brainStateId: string };
   return { brainStateId: data.brainStateId };
 }
 

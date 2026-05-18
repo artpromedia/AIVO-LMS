@@ -75,7 +75,10 @@ export async function POST(req: Request): Promise<NextResponse> {
     const parsed = bodySchema.safeParse(body);
     if (!parsed.success) {
       return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." },
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
         requestId,
       );
     }

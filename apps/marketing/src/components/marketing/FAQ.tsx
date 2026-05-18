@@ -44,9 +44,7 @@ export function FAQ() {
           <h2 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 mb-4">
             {t("title")}
           </h2>
-          <p className="text-lg text-slate-500 font-body">
-            {t("subtitle")}
-          </p>
+          <p className="text-lg text-slate-500 font-body">{t("subtitle")}</p>
         </div>
 
         <div className="space-y-3" role="list">
@@ -75,7 +73,12 @@ export function FAQ() {
                     stroke="currentColor"
                     aria-hidden="true"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 </button>
                 <div
@@ -85,9 +88,7 @@ export function FAQ() {
                   hidden={!isOpen}
                   className={`overflow-hidden transition-all duration-300 motion-reduce:transition-none ${isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}
                 >
-                  <p className="px-6 pb-6 text-slate-500 font-body leading-relaxed">
-                    {t(faq.a)}
-                  </p>
+                  <p className="px-6 pb-6 text-slate-500 font-body leading-relaxed">{t(faq.a)}</p>
                 </div>
               </div>
             );

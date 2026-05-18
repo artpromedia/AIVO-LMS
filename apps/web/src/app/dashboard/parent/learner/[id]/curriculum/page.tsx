@@ -4,8 +4,18 @@ import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 
-const SUBJECTS = ["math", "ela", "science", "history", "coding", "speech", "sel", "art", "other"] as const;
-type Subject = typeof SUBJECTS[number];
+const SUBJECTS = [
+  "math",
+  "ela",
+  "science",
+  "history",
+  "coding",
+  "speech",
+  "sel",
+  "art",
+  "other",
+] as const;
+type Subject = (typeof SUBJECTS)[number];
 
 interface CurriculumUpload {
   id: string;
@@ -452,7 +462,9 @@ export default function ParentLearnerCurriculumPage() {
         ) : activeUploads.length === 0 ? (
           <div className="vi-card p-6 text-center vi-text-muted">{t("active_empty")}</div>
         ) : (
-          activeUploads.map((u) => <UploadCard key={u.id} upload={u} onDelete={handleDelete} t={t} />)
+          activeUploads.map((u) => (
+            <UploadCard key={u.id} upload={u} onDelete={handleDelete} t={t} />
+          ))
         )}
       </section>
 
@@ -483,7 +495,9 @@ function UploadCard({
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs uppercase tracking-wide vi-text-muted">{t(`subject.${upload.subject}`)}</span>
+            <span className="text-xs uppercase tracking-wide vi-text-muted">
+              {t(`subject.${upload.subject}`)}
+            </span>
             {upload.status === "ACTIVE" && (
               <span className="text-xs rounded-full bg-green-100 text-green-800 px-2 py-0.5">
                 {t("status_active")}
@@ -517,7 +531,10 @@ function UploadCard({
           <p className="text-xs font-semibold vi-text-muted mb-1">{t("topics")}</p>
           <div className="flex flex-wrap gap-1.5">
             {(focus.topics ?? []).map((tp, i) => (
-              <span key={i} className="text-xs bg-[hsl(var(--visual-surface))] vi-text rounded-full px-2 py-1">
+              <span
+                key={i}
+                className="text-xs bg-[hsl(var(--visual-surface))] vi-text rounded-full px-2 py-1"
+              >
                 {tp}
               </span>
             ))}
@@ -539,9 +556,7 @@ function UploadCard({
         </div>
       )}
 
-      {upload.notes && (
-        <p className="text-xs vi-text-muted italic">"{upload.notes}"</p>
-      )}
+      {upload.notes && <p className="text-xs vi-text-muted italic">"{upload.notes}"</p>}
     </div>
   );
 }

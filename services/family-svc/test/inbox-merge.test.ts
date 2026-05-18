@@ -29,7 +29,11 @@ async function bootstrap() {
 
 async function teardown(app: any, db: any) {
   await app.close();
-  try { await (db as any).$client?.end?.({ timeout: 2 }); } catch { /* ignore */ }
+  try {
+    await (db as any).$client?.end?.({ timeout: 2 });
+  } catch {
+    /* ignore */
+  }
 }
 
 interface Fixture {
@@ -42,35 +46,50 @@ interface Fixture {
 async function seed(db: any): Promise<Fixture> {
   const { tenants, users, learners } = await import("@aivo/db");
   const stamp = Date.now();
-  const [t] = await db.insert(tenants).values({
-    name: `inbox-merge-${stamp}`, type: "B2B_DISTRICT",
-  } as any).returning();
+  const [t] = await db
+    .insert(tenants)
+    .values({
+      name: `inbox-merge-${stamp}`,
+      type: "B2B_DISTRICT",
+    } as any)
+    .returning();
   const mkUser = async (role: string, name: string) => {
-    const [u] = await db.insert(users).values({
-      tenantId: t.id, name, role, email: `${name}-${stamp}@test.local`,
-    } as any).returning();
+    const [u] = await db
+      .insert(users)
+      .values({
+        tenantId: t.id,
+        name,
+        role,
+        email: `${name}-${stamp}@test.local`,
+      } as any)
+      .returning();
     return u.id as string;
   };
-  const parentA      = await mkUser("PARENT", "im-parent-a");
-  const parentB      = await mkUser("PARENT", "im-parent-b");
-  const learnerUser  = await mkUser("LEARNER", "im-luser");
-  const [learner] = await db.insert(learners).values({
-    tenantId: t.id, userId: learnerUser, parentId: parentA,
-    name: "Inbox Merge Learner",
-  } as any).returning();
+  const parentA = await mkUser("PARENT", "im-parent-a");
+  const parentB = await mkUser("PARENT", "im-parent-b");
+  const learnerUser = await mkUser("LEARNER", "im-luser");
+  const [learner] = await db
+    .insert(learners)
+    .values({
+      tenantId: t.id,
+      userId: learnerUser,
+      parentId: parentA,
+      name: "Inbox Merge Learner",
+    } as any)
+    .returning();
   return { tenantA: t.id, parentA, parentB, learnerA: learner.id };
 }
 
 async function cleanup(db: any, f: Fixture) {
   const { eq, inArray } = await import("drizzle-orm");
-  const { tenants, users, learners, parentNotifications, parentInAppNotifications }
-    = await import("@aivo/db");
-  await db.delete(parentNotifications).where(
-    inArray(parentNotifications.parentId, [f.parentA, f.parentB]),
-  );
-  await db.delete(parentInAppNotifications).where(
-    inArray(parentInAppNotifications.parentId, [f.parentA, f.parentB]),
-  );
+  const { tenants, users, learners, parentNotifications, parentInAppNotifications } =
+    await import("@aivo/db");
+  await db
+    .delete(parentNotifications)
+    .where(inArray(parentNotifications.parentId, [f.parentA, f.parentB]));
+  await db
+    .delete(parentInAppNotifications)
+    .where(inArray(parentInAppNotifications.parentId, [f.parentA, f.parentB]));
   await db.delete(learners).where(eq(learners.id, f.learnerA));
   await db.delete(users).where(eq(users.tenantId, f.tenantA));
   await db.delete(tenants).where(eq(tenants.id, f.tenantA));
@@ -81,59 +100,82 @@ async function tokenFor(sub: string, role: string, tenantId: string) {
   return signJWT({ sub, role, tenantId }, "5m");
 }
 
-async function seedLegacyRow(db: any, parentId: string, opts: { title: string; type?: string; readAt?: Date }) {
+async function seedLegacyRow(
+  db: any,
+  parentId: string,
+  opts: { title: string; type?: string; readAt?: Date },
+) {
   const { parentNotifications } = await import("@aivo/db");
-  const [row] = await db.insert(parentNotifications).values({
-    parentId, type: opts.type || "milestone",
-    title: opts.title, body: "legacy body", urgency: "normal",
-    readAt: opts.readAt || null,
-  } as any).returning();
+  const [row] = await db
+    .insert(parentNotifications)
+    .values({
+      parentId,
+      type: opts.type || "milestone",
+      title: opts.title,
+      body: "legacy body",
+      urgency: "normal",
+      readAt: opts.readAt || null,
+    } as any)
+    .returning();
   return row.id as string;
 }
 
-async function seedIepRow(db: any, parentId: string, learnerId: string, opts: { title: string; readAt?: Date }) {
+async function seedIepRow(
+  db: any,
+  parentId: string,
+  learnerId: string,
+  opts: { title: string; readAt?: Date },
+) {
   const { parentInAppNotifications } = await import("@aivo/db");
-  const [row] = await db.insert(parentInAppNotifications).values({
-    parentId, learnerId,
-    category: "progress_notes",
-    template: "iep_progress_note",
-    title: opts.title,
-    body: "iep body",
-    link: `/dashboard/parent/learner/${learnerId}/iep`,
-    readAt: opts.readAt || null,
-  } as any).returning();
+  const [row] = await db
+    .insert(parentInAppNotifications)
+    .values({
+      parentId,
+      learnerId,
+      category: "progress_notes",
+      template: "iep_progress_note",
+      title: opts.title,
+      body: "iep body",
+      link: `/dashboard/parent/learner/${learnerId}/iep`,
+      readAt: opts.readAt || null,
+    } as any)
+    .returning();
   return row.id as string;
 }
 
-test("inbox: merged feed contains both legacy and IEP rows, sorted newest-first", { skip: SKIP }, async () => {
-  const { app, db } = await bootstrap();
-  const f = await seed(db);
-  try {
-    await seedLegacyRow(db, f.parentA, { title: "Legacy oldest" });
-    await new Promise(r => setTimeout(r, 5));
-    await seedIepRow(db, f.parentA, f.learnerA, { title: "IEP middle" });
-    await new Promise(r => setTimeout(r, 5));
-    await seedLegacyRow(db, f.parentA, { title: "Legacy newest" });
+test(
+  "inbox: merged feed contains both legacy and IEP rows, sorted newest-first",
+  { skip: SKIP },
+  async () => {
+    const { app, db } = await bootstrap();
+    const f = await seed(db);
+    try {
+      await seedLegacyRow(db, f.parentA, { title: "Legacy oldest" });
+      await new Promise((r) => setTimeout(r, 5));
+      await seedIepRow(db, f.parentA, f.learnerA, { title: "IEP middle" });
+      await new Promise((r) => setTimeout(r, 5));
+      await seedLegacyRow(db, f.parentA, { title: "Legacy newest" });
 
-    const token = await tokenFor(f.parentA, "PARENT", f.tenantA);
-    const res = await app.inject({
-      method: "GET",
-      url: `/api/family/inbox/${f.parentA}`,
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    assert.equal(res.statusCode, 200);
-    const body = res.json();
-    const titles = (body.items as Array<{ title: string }>).map((i) => i.title);
-    assert.deepEqual(titles, ["Legacy newest", "IEP middle", "Legacy oldest"]);
-    assert.equal(body.unreadCount, 3, "all three rows are unread");
+      const token = await tokenFor(f.parentA, "PARENT", f.tenantA);
+      const res = await app.inject({
+        method: "GET",
+        url: `/api/family/inbox/${f.parentA}`,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      assert.equal(res.statusCode, 200);
+      const body = res.json();
+      const titles = (body.items as Array<{ title: string }>).map((i) => i.title);
+      assert.deepEqual(titles, ["Legacy newest", "IEP middle", "Legacy oldest"]);
+      assert.equal(body.unreadCount, 3, "all three rows are unread");
 
-    const sources = (body.items as Array<{ source: string }>).map((i) => i.source);
-    assert.deepEqual(sources, ["family", "iep", "family"]);
-  } finally {
-    await cleanup(db, f);
-    await teardown(app, db);
-  }
-});
+      const sources = (body.items as Array<{ source: string }>).map((i) => i.source);
+      assert.deepEqual(sources, ["family", "iep", "family"]);
+    } finally {
+      await cleanup(db, f);
+      await teardown(app, db);
+    }
+  },
+);
 
 test("inbox: unreadCount sums BOTH tables", { skip: SKIP }, async () => {
   const { app, db } = await bootstrap();
@@ -196,7 +238,9 @@ test("mark-read: works for IEP rows by id (no source param needed)", { skip: SKI
 
     const { parentInAppNotifications } = await import("@aivo/db");
     const { eq } = await import("drizzle-orm");
-    const [row] = await db.select().from(parentInAppNotifications)
+    const [row] = await db
+      .select()
+      .from(parentInAppNotifications)
       .where(eq(parentInAppNotifications.id, iepId));
     assert.ok(row.readAt instanceof Date, "readAt must be set");
   } finally {
@@ -220,7 +264,9 @@ test("mark-read: parent B cannot mark parent A's IEP rows", { skip: SKIP }, asyn
 
     const { parentInAppNotifications } = await import("@aivo/db");
     const { eq } = await import("drizzle-orm");
-    const [row] = await db.select().from(parentInAppNotifications)
+    const [row] = await db
+      .select()
+      .from(parentInAppNotifications)
       .where(eq(parentInAppNotifications.id, iepId));
     assert.equal(row.readAt, null, "row must remain unread after a forbidden attempt");
   } finally {
@@ -229,49 +275,65 @@ test("mark-read: parent B cannot mark parent A's IEP rows", { skip: SKIP }, asyn
   }
 });
 
-test("dismiss: IEP rows have no dismissed_at column, so dismiss falls back to mark-read", { skip: SKIP }, async () => {
-  const { app, db } = await bootstrap();
-  const f = await seed(db);
-  try {
-    const iepId = await seedIepRow(db, f.parentA, f.learnerA, { title: "IEP to dismiss" });
-    const token = await tokenFor(f.parentA, "PARENT", f.tenantA);
-    const res = await app.inject({
-      method: "PUT",
-      url: `/api/family/inbox/${iepId}/dismiss`,
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    assert.equal(res.statusCode, 200);
+test(
+  "dismiss: IEP rows have no dismissed_at column, so dismiss falls back to mark-read",
+  { skip: SKIP },
+  async () => {
+    const { app, db } = await bootstrap();
+    const f = await seed(db);
+    try {
+      const iepId = await seedIepRow(db, f.parentA, f.learnerA, { title: "IEP to dismiss" });
+      const token = await tokenFor(f.parentA, "PARENT", f.tenantA);
+      const res = await app.inject({
+        method: "PUT",
+        url: `/api/family/inbox/${iepId}/dismiss`,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      assert.equal(res.statusCode, 200);
 
-    const { parentInAppNotifications } = await import("@aivo/db");
-    const { eq } = await import("drizzle-orm");
-    const [row] = await db.select().from(parentInAppNotifications)
-      .where(eq(parentInAppNotifications.id, iepId));
-    assert.ok(row.readAt instanceof Date,
-      "dismiss on an IEP row must at least mark it read so it leaves the unread feed");
-  } finally {
-    await cleanup(db, f);
-    await teardown(app, db);
-  }
-});
+      const { parentInAppNotifications } = await import("@aivo/db");
+      const { eq } = await import("drizzle-orm");
+      const [row] = await db
+        .select()
+        .from(parentInAppNotifications)
+        .where(eq(parentInAppNotifications.id, iepId));
+      assert.ok(
+        row.readAt instanceof Date,
+        "dismiss on an IEP row must at least mark it read so it leaves the unread feed",
+      );
+    } finally {
+      await cleanup(db, f);
+      await teardown(app, db);
+    }
+  },
+);
 
-test("inbox: IEP rows expose actionUrl that links to the learner's IEP page", { skip: SKIP }, async () => {
-  const { app, db } = await bootstrap();
-  const f = await seed(db);
-  try {
-    await seedIepRow(db, f.parentA, f.learnerA, { title: "Linkable" });
-    const token = await tokenFor(f.parentA, "PARENT", f.tenantA);
-    const res = await app.inject({
-      method: "GET",
-      url: `/api/family/inbox/${f.parentA}`,
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const items = res.json().items as Array<{ source: string; actionUrl: string; learnerId: string }>;
-    const iep = items.find((i) => i.source === "iep");
-    assert.ok(iep);
-    assert.equal(iep!.learnerId, f.learnerA);
-    assert.match(iep!.actionUrl, /\/dashboard\/parent\/learner\/[0-9a-f-]+\/iep$/);
-  } finally {
-    await cleanup(db, f);
-    await teardown(app, db);
-  }
-});
+test(
+  "inbox: IEP rows expose actionUrl that links to the learner's IEP page",
+  { skip: SKIP },
+  async () => {
+    const { app, db } = await bootstrap();
+    const f = await seed(db);
+    try {
+      await seedIepRow(db, f.parentA, f.learnerA, { title: "Linkable" });
+      const token = await tokenFor(f.parentA, "PARENT", f.tenantA);
+      const res = await app.inject({
+        method: "GET",
+        url: `/api/family/inbox/${f.parentA}`,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const items = res.json().items as Array<{
+        source: string;
+        actionUrl: string;
+        learnerId: string;
+      }>;
+      const iep = items.find((i) => i.source === "iep");
+      assert.ok(iep);
+      assert.equal(iep!.learnerId, f.learnerA);
+      assert.match(iep!.actionUrl, /\/dashboard\/parent\/learner\/[0-9a-f-]+\/iep$/);
+    } finally {
+      await cleanup(db, f);
+      await teardown(app, db);
+    }
+  },
+);

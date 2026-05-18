@@ -28,26 +28,40 @@ export function TutorShelf({ onSelectTutor, recentTutorKey }: TutorShelfProps) {
 
   const visibleTutors = (() => {
     switch (profile.tutorShelfMode) {
-      case "scroll": return allTutors;
-      case "paged": return allTutors.slice(0, 6);
-      case "limited": return allTutors.slice(0, 4);
-      case "single": return recentTutorKey ? allTutors.filter(([k]) => k === recentTutorKey).slice(0, 1) : allTutors.slice(0, 1);
-      default: return allTutors;
+      case "scroll":
+        return allTutors;
+      case "paged":
+        return allTutors.slice(0, 6);
+      case "limited":
+        return allTutors.slice(0, 4);
+      case "single":
+        return recentTutorKey
+          ? allTutors.filter(([k]) => k === recentTutorKey).slice(0, 1)
+          : allTutors.slice(0, 1);
+      default:
+        return allTutors;
     }
   })();
 
   const sortedTutors = recentTutorKey
-    ? [...visibleTutors.filter(([k]) => k === recentTutorKey), ...visibleTutors.filter(([k]) => k !== recentTutorKey)]
+    ? [
+        ...visibleTutors.filter(([k]) => k === recentTutorKey),
+        ...visibleTutors.filter(([k]) => k !== recentTutorKey),
+      ]
     : visibleTutors;
 
   return (
     <section className="px-4 md:px-8" aria-label={t("tutors_shelf_label")}>
-      <h2 className={`font-extrabold text-slate-900 mb-4 ${isLow ? "text-2xl text-center" : "text-lg"}`}>
+      <h2
+        className={`font-extrabold text-slate-900 mb-4 ${isLow ? "text-2xl text-center" : "text-lg"}`}
+      >
         {isLow ? t("pick_a_friend") : t("your_tutors")}
       </h2>
       <div
         className={`flex gap-4 pb-2 ${
-          profile.tutorShelfMode === "scroll" ? "overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200" : "flex-wrap justify-center"
+          profile.tutorShelfMode === "scroll"
+            ? "overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200"
+            : "flex-wrap justify-center"
         }`}
       >
         {sortedTutors.map(([key, tutor]) => {
@@ -70,10 +84,12 @@ export function TutorShelf({ onSelectTutor, recentTutorKey }: TutorShelfProps) {
                 ${isLow ? "p-6 w-36" : "p-4 w-28"}
                 ${!entitled ? "opacity-60" : ""}
               `}
-              style={{
-                transitionDuration: "var(--learner-motion-ms, 300ms)",
-                ["--tw-ring-color" as string]: tutor.color,
-              } as React.CSSProperties}
+              style={
+                {
+                  transitionDuration: "var(--learner-motion-ms, 300ms)",
+                  ["--tw-ring-color" as string]: tutor.color,
+                } as React.CSSProperties
+              }
               onMouseEnter={(e) => (e.currentTarget.style.borderColor = tutor.color)}
               onMouseLeave={(e) => (e.currentTarget.style.borderColor = "transparent")}
             >
@@ -89,13 +105,24 @@ export function TutorShelf({ onSelectTutor, recentTutorKey }: TutorShelfProps) {
                 className={`relative rounded-3xl overflow-hidden shadow-sm group-hover:scale-110 transition-transform border-4 ${isLow ? "w-20 h-20" : "w-14 h-14"} ${!entitled ? "grayscale" : ""}`}
                 style={{ borderColor: tutor.color }}
               >
-                <Image src={tutor.avatar} alt={`${tutor.name} — ${tutor.domain}`} fill className="object-cover object-top" sizes={isLow ? "80px" : "56px"} />
+                <Image
+                  src={tutor.avatar}
+                  alt={`${tutor.name} — ${tutor.domain}`}
+                  fill
+                  className="object-cover object-top"
+                  sizes={isLow ? "80px" : "56px"}
+                />
               </div>
-              <span className={`font-extrabold ${isLow ? "text-lg" : "text-sm"}`} style={{ color: tutor.color }}>
+              <span
+                className={`font-extrabold ${isLow ? "text-lg" : "text-sm"}`}
+                style={{ color: tutor.color }}
+              >
                 {tutor.name}
               </span>
               {!isLow && (
-                <span className="text-[11px] text-slate-500 font-semibold text-center leading-tight">{tutor.domain}</span>
+                <span className="text-[11px] text-slate-500 font-semibold text-center leading-tight">
+                  {tutor.domain}
+                </span>
               )}
             </button>
           );

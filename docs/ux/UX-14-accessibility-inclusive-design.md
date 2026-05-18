@@ -16,14 +16,15 @@ AIVO's primary audience is neurodiverse learners. Accessibility is the product, 
 
 ## 2. WCAG 2.2 AA conformance summary
 
-| Principle | Status | Where covered |
-|---|---|---|
-| **Perceivable** — text alternatives, captions, contrast, resize, reflow | 🟡 | Per-role themes meet 4.5:1 body / 3:1 large; captions default-on planned (DD-13) |
-| **Operable** — keyboard, focus visible, no seizure risk, skip links, page titled, focus order, link purpose | 🟡 | Global `:focus-visible` token shipped; skip link claimed in `replit.md` but not present in `components/layout` (gap) |
-| **Understandable** — language, predictable, input assistance, error identification + suggestion | 🟡 | `next-intl` shipped 10 locales; inline form errors are toast-only on most settings forms (gap) |
-| **Robust** — name/role/value, status messages, parsing | 🟡 | Primitives wrap Radix where used; `aria-live` is inconsistent (UX-00 §6 a11y risk) |
+| Principle                                                                                                   | Status | Where covered                                                                                                        |
+| ----------------------------------------------------------------------------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------- |
+| **Perceivable** — text alternatives, captions, contrast, resize, reflow                                     | 🟡     | Per-role themes meet 4.5:1 body / 3:1 large; captions default-on planned (DD-13)                                     |
+| **Operable** — keyboard, focus visible, no seizure risk, skip links, page titled, focus order, link purpose | 🟡     | Global `:focus-visible` token shipped; skip link claimed in `replit.md` but not present in `components/layout` (gap) |
+| **Understandable** — language, predictable, input assistance, error identification + suggestion             | 🟡     | `next-intl` shipped 10 locales; inline form errors are toast-only on most settings forms (gap)                       |
+| **Robust** — name/role/value, status messages, parsing                                                      | 🟡     | Primitives wrap Radix where used; `aria-live` is inconsistent (UX-00 §6 a11y risk)                                   |
 
 **Headline gaps** (from UX-00 §6 + this audit):
+
 - A1. **Skip link is not actually rendered** in `app/layout.tsx` / `components/layout/app-shell.tsx`. `replit.md` mentions it but the component file is absent. P0.
 - A2. `aria-live` regions for AI generation, save status, and toast are inconsistent. P0 — see UX-15.
 - A3. Form-error association (`aria-describedby` → inline error id) is missing on most settings forms; errors live in a toast only. P1.
@@ -37,15 +38,15 @@ AIVO's primary audience is neurodiverse learners. Accessibility is the product, 
 
 AIVO ships modes a learner / parent / teacher can toggle. Each mode is a **persistent preference** (web: cookie + `apps/web-v2/lib/learner/accessibility-prefs.ts`; mobile: device storage).
 
-| Mode | Toggle path (web) | Implementation | Status |
-|---|---|---|---|
-| Large text scale | `/learner/settings/accessibility` and `/settings/accessibility` | Adds `data-text-scale="large"` on `<html>`; primitives respect via CSS var | ✅ wired, ⬜ planned scale variants beyond default/large |
-| Dyslexia-friendly font | same | Loads OpenDyslexic via `@font-face`; toggles `data-font="dyslexic"` | ⬜ planned (DD-13) |
-| Reduced motion | same | `data-motion="reduced"` honored by Stage / quest animations | ⬜ planned (DD-13); CSS `@media (prefers-reduced-motion: reduce)` is honored by base primitives |
-| High contrast | same | Per-theme variant (DD-14, P2) | ⬜ planned |
-| Captions default on | per-learner preference at `/parent/learners/[id]/accessibility` | Any media component reads the preference | 🟡 preference stored, ⬜ no media components yet |
-| TTS read-aloud | `/parent/learners/[id]/accessibility/audio` | `audioPreferences.ttsVoice`, `ttsRate`, `readAloudDefaults` | 🟡 (preferences shipped; TTS playback ⬜) |
-| Switch / AAC input | per-learner preference | Tap-anywhere mode in Stage | ⬜ |
+| Mode                   | Toggle path (web)                                               | Implementation                                                             | Status                                                                                          |
+| ---------------------- | --------------------------------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Large text scale       | `/learner/settings/accessibility` and `/settings/accessibility` | Adds `data-text-scale="large"` on `<html>`; primitives respect via CSS var | ✅ wired, ⬜ planned scale variants beyond default/large                                        |
+| Dyslexia-friendly font | same                                                            | Loads OpenDyslexic via `@font-face`; toggles `data-font="dyslexic"`        | ⬜ planned (DD-13)                                                                              |
+| Reduced motion         | same                                                            | `data-motion="reduced"` honored by Stage / quest animations                | ⬜ planned (DD-13); CSS `@media (prefers-reduced-motion: reduce)` is honored by base primitives |
+| High contrast          | same                                                            | Per-theme variant (DD-14, P2)                                              | ⬜ planned                                                                                      |
+| Captions default on    | per-learner preference at `/parent/learners/[id]/accessibility` | Any media component reads the preference                                   | 🟡 preference stored, ⬜ no media components yet                                                |
+| TTS read-aloud         | `/parent/learners/[id]/accessibility/audio`                     | `audioPreferences.ttsVoice`, `ttsRate`, `readAloudDefaults`                | 🟡 (preferences shipped; TTS playback ⬜)                                                       |
+| Switch / AAC input     | per-learner preference                                          | Tap-anywhere mode in Stage                                                 | ⬜                                                                                              |
 
 The accessibility settings page itself is a model for the contract: every field has an explicit label, every group is a `<fieldset>` with `<legend>`, every change posts immediately (no "Save" button — autosave with a status pill). See `components/learner/accessibility-form.tsx`.
 
@@ -69,16 +70,16 @@ When a primitive doesn't yet meet the contract, the gap is tracked in `docs/ux/a
 
 ## 5. Per-surface a11y notes
 
-| Surface | Special considerations |
-|---|---|
-| Parent assessment wizard | `<RadioGroup>` is `<fieldset>` + `<legend>`; `<Progress>` for step count has `aria-label="Step X of Y"` (UX-04 §4.5) |
-| IEP upload | File input is keyboard-reachable; drop zone has `role="button" tabIndex={0}` + Enter/Space activation |
-| Brain profile | Read-only card; `xaiExplanation` paragraph wrapped in `<p>` not `<div>` for screen-reader semantics; "Regenerate" disclosure uses `<details>` |
-| Baseline runner | One question full-width, large text by default; hint Card is keyboard-reachable; "Submit answer" button keeps focus until next question is announced via `aria-live` (UX-07 §3) |
-| Lesson Player (Stage) | Skip link to "Exit lesson"; beat transitions announced via `aria-live="polite"`; no auto-advancing content (WCAG 2.2.1); reduced-motion gates beat animations |
-| Homework Helper | Chat thread is a `role="log" aria-live="polite"`; input retains focus after send; thinking indicator is text not animation |
-| Admin tables | Header cells `scope="col"`; row actions reachable in tab order; filter chips are buttons with `aria-pressed`; pagination announces "Page X of Y" |
-| Notifications | Toast container `role="status"`; unread badge has accessible text (e.g., "3 unread") |
+| Surface                  | Special considerations                                                                                                                                                          |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Parent assessment wizard | `<RadioGroup>` is `<fieldset>` + `<legend>`; `<Progress>` for step count has `aria-label="Step X of Y"` (UX-04 §4.5)                                                            |
+| IEP upload               | File input is keyboard-reachable; drop zone has `role="button" tabIndex={0}` + Enter/Space activation                                                                           |
+| Brain profile            | Read-only card; `xaiExplanation` paragraph wrapped in `<p>` not `<div>` for screen-reader semantics; "Regenerate" disclosure uses `<details>`                                   |
+| Baseline runner          | One question full-width, large text by default; hint Card is keyboard-reachable; "Submit answer" button keeps focus until next question is announced via `aria-live` (UX-07 §3) |
+| Lesson Player (Stage)    | Skip link to "Exit lesson"; beat transitions announced via `aria-live="polite"`; no auto-advancing content (WCAG 2.2.1); reduced-motion gates beat animations                   |
+| Homework Helper          | Chat thread is a `role="log" aria-live="polite"`; input retains focus after send; thinking indicator is text not animation                                                      |
+| Admin tables             | Header cells `scope="col"`; row actions reachable in tab order; filter chips are buttons with `aria-pressed`; pagination announces "Page X of Y"                                |
+| Notifications            | Toast container `role="status"`; unread badge has accessible text (e.g., "3 unread")                                                                                            |
 
 ---
 
@@ -98,11 +99,13 @@ WCAG covers visual / motor / auditory. AIVO's audience also needs explicit suppo
 ## 7. Automated coverage in CI
 
 Existing:
+
 - `pnpm i18n:audit` — locale-file parity, fails CI on missing keys.
 - ESLint rule `jsx-a11y/*` — runs on every PR (verify in `eslint.config.js`).
 - Lighthouse a11y score budget on the marketing site (⬜ planned for `apps/web-v2` per DD-10).
 
 Planned (this sprint):
+
 - **`pnpm a11y:audit`** — runs `@axe-core/cli` against the running dev server on a representative route set (one per role × one per state). Fails on any "serious" or "critical" violation.
 - **`scripts/check-skip-link.mjs`** — asserts `<SkipLink href="#main">` is rendered before any role shell.
 - **`scripts/check-aria-live.mjs`** — asserts every page that mounts a Toast also has a polite live region.

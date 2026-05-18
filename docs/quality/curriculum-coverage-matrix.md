@@ -17,21 +17,21 @@ Plus: every item declares `skillId`, `standardId`, `gradeBand`, `difficulty`,
 
 ## Actual seeded coverage at snapshot
 
-| Subject | K | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | Item-bank entries |
-|---------|---|---|---|---|---|---|---|---|---|-------------------|
-| math    | ✅ | — | — | — | — | — | — | — | — | 0 |
-| ela     | ✅ | — | — | — | — | — | — | — | — | 0 |
-| science | ✅ | ✅ | ✅ | — | — | — | — | — | — | 0 |
-| writing | — | — | — | — | — | — | — | — | — | 0 |
+| Subject | K   | 1   | 2   | 3   | 4   | 5   | 6   | 7   | 8   | Item-bank entries |
+| ------- | --- | --- | --- | --- | --- | --- | --- | --- | --- | ----------------- |
+| math    | ✅  | —   | —   | —   | —   | —   | —   | —   | —   | 0                 |
+| ela     | ✅  | —   | —   | —   | —   | —   | —   | —   | —   | 0                 |
+| science | ✅  | ✅  | ✅  | —   | —   | —   | —   | —   | —   | 0                 |
+| writing | —   | —   | —   | —   | —   | —   | —   | —   | —   | 0                 |
 
 ## Gap analysis
 
-| Subject | Missing grades | Item bank deficit |
-|---------|----------------|-------------------|
-| math    | 1, 2, 3, 4, 5, 6, 7, 8 (8 of 9) | 20 / 20 |
-| ela     | 1, 2, 3, 4, 5, 6, 7, 8 (8 of 9) | 20 / 20 |
-| science | 3, 4, 5, 6, 7, 8 (6 of 9)       | 20 / 20 |
-| writing | K through 8 — no separate Writing seed exists; ELA pack subsumes it | 20 / 20 |
+| Subject | Missing grades                                                      | Item bank deficit |
+| ------- | ------------------------------------------------------------------- | ----------------- |
+| math    | 1, 2, 3, 4, 5, 6, 7, 8 (8 of 9)                                     | 20 / 20           |
+| ela     | 1, 2, 3, 4, 5, 6, 7, 8 (8 of 9)                                     | 20 / 20           |
+| science | 3, 4, 5, 6, 7, 8 (6 of 9)                                           | 20 / 20           |
+| writing | K through 8 — no separate Writing seed exists; ELA pack subsumes it | 20 / 20           |
 
 ## Additional seeded subjects (informational — not required for GREEN-03)
 

@@ -10,7 +10,7 @@
 
 ## 1. Why these five surfaces share a sprint
 
-They're the operational connective tissue around the learning core: how AIVO reaches users (notifications), how districts get learners *into* AIVO (rostering), how they pay (billing), how every role tunes their experience (settings), and how the whole product speaks the user's language (i18n). None of them is a single screen — each is a cross-role contract — and each one needs the same kind of treatment: per-role surface · BFF chain · empty/loading/error · consent + permission gate · accessibility.
+They're the operational connective tissue around the learning core: how AIVO reaches users (notifications), how districts get learners _into_ AIVO (rostering), how they pay (billing), how every role tunes their experience (settings), and how the whole product speaks the user's language (i18n). None of them is a single screen — each is a cross-role contract — and each one needs the same kind of treatment: per-role surface · BFF chain · empty/loading/error · consent + permission gate · accessibility.
 
 ---
 
@@ -18,30 +18,30 @@ They're the operational connective tissue around the learning core: how AIVO rea
 
 ### 2.1 Surfaces today
 
-| Surface | Path | Status |
-|---|---|---|
-| Parent notification center | `app/parent/notifications/page.tsx` | ✅ |
-| Learner notification chip | `app/learner/notifications/page.tsx` | 🟡 (chip only; full center planned) |
-| Teacher notification center | ⬜ | planned |
-| Admin alert feed | ⬜ (separate from learner notifications) | planned per UX-13 §5 |
-| Notification BFFs | `app/api/bff/notifications/**` | ✅ |
+| Surface                     | Path                                     | Status                              |
+| --------------------------- | ---------------------------------------- | ----------------------------------- |
+| Parent notification center  | `app/parent/notifications/page.tsx`      | ✅                                  |
+| Learner notification chip   | `app/learner/notifications/page.tsx`     | 🟡 (chip only; full center planned) |
+| Teacher notification center | ⬜                                       | planned                             |
+| Admin alert feed            | ⬜ (separate from learner notifications) | planned per UX-13 §5                |
+| Notification BFFs           | `app/api/bff/notifications/**`           | ✅                                  |
 
 Comms-svc backs delivery: email (Postmark), in-app, and — for the mobile shell — push (⬜). The same event-typed catalog feeds all three channels.
 
 ### 2.2 Notification taxonomy
 
-| Class | Examples | Default channels | Quiet hours respected? |
-|---|---|---|---|
-| **Safety-critical** | `unsafe_request` parent page (UX-15 §4), consent expiration imminent | in-app + email + push | **No** — bypasses |
-| **Action-required** | New consent needed, IEP re-review, baseline blocked | in-app + email | Yes |
-| **Activity** | Lesson summary, weekly digest, milestone reached | in-app (digest on email) | Yes |
-| **Marketing** | New feature, tutor news | email opt-in only | Yes |
+| Class               | Examples                                                             | Default channels         | Quiet hours respected? |
+| ------------------- | -------------------------------------------------------------------- | ------------------------ | ---------------------- |
+| **Safety-critical** | `unsafe_request` parent page (UX-15 §4), consent expiration imminent | in-app + email + push    | **No** — bypasses      |
+| **Action-required** | New consent needed, IEP re-review, baseline blocked                  | in-app + email           | Yes                    |
+| **Activity**        | Lesson summary, weekly digest, milestone reached                     | in-app (digest on email) | Yes                    |
+| **Marketing**       | New feature, tutor news                                              | email opt-in only        | Yes                    |
 
 Every notification carries an `eventType` from `lib/db/types.ts` notification enum + a recipient role; the role determines copy (parent-voice vs teacher-voice vs learner-voice) and the in-app deep-link.
 
 ### 2.3 Per-role contract
 
-**Parent.** Notification center has three tabs — *Inbox* (action-required), *Activity* (summaries), *Settings* (channels). One row per item with a single CTA matching `nextStepFor()` from UX-04. Unread badge in the global header. Quiet hours configurable per learner; safety-critical bypass clearly disclosed in Settings.
+**Parent.** Notification center has three tabs — _Inbox_ (action-required), _Activity_ (summaries), _Settings_ (channels). One row per item with a single CTA matching `nextStepFor()` from UX-04. Unread badge in the global header. Quiet hours configurable per learner; safety-critical bypass clearly disclosed in Settings.
 
 **Learner.** Notification chip only — never a stream. Surface only "your tutor said hi" + "you reached a new word in [subject]". No streak-shame copy. No teacher/parent activity in this feed.
 
@@ -70,13 +70,13 @@ Every notification carries an `eventType` from `lib/db/types.ts` notification en
 
 ### 3.1 Surfaces today
 
-| Surface | Path | Status |
-|---|---|---|
-| School-admin rostering home | `app/admin/school/rostering/page.tsx` | 🟡 (scaffold) |
-| Import page | `app/admin/school/rostering/import/page.tsx` + `roster-import-form.tsx` | ✅ form + BFF wired |
-| Import BFF | `app/api/bff/admin/rostering/import/route.ts` | ✅ |
-| Per-job status BFF | `app/api/bff/admin/rostering/import/[jobId]/route.ts` | ✅ |
-| District rostering | ⬜ web route; admin BFF only | planned |
+| Surface                     | Path                                                                    | Status              |
+| --------------------------- | ----------------------------------------------------------------------- | ------------------- |
+| School-admin rostering home | `app/admin/school/rostering/page.tsx`                                   | 🟡 (scaffold)       |
+| Import page                 | `app/admin/school/rostering/import/page.tsx` + `roster-import-form.tsx` | ✅ form + BFF wired |
+| Import BFF                  | `app/api/bff/admin/rostering/import/route.ts`                           | ✅                  |
+| Per-job status BFF          | `app/api/bff/admin/rostering/import/[jobId]/route.ts`                   | ✅                  |
+| District rostering          | ⬜ web route; admin BFF only                                            | planned             |
 
 ### 3.2 Provider matrix
 
@@ -84,13 +84,13 @@ Per `replit.md` external dependencies: Google Classroom, Clever, ClassLink, Canv
 
 ### 3.3 The five-state import flow
 
-| State | UX |
-|---|---|
-| **Idle** | Picker Card + "Last sync" timestamp + per-provider status chip |
-| **Authenticating** | Spinner + provider name; never expose tokens; reduced-motion safe |
+| State              | UX                                                                                                                                        |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| **Idle**           | Picker Card + "Last sync" timestamp + per-provider status chip                                                                            |
+| **Authenticating** | Spinner + provider name; never expose tokens; reduced-motion safe                                                                         |
 | **Preview (diff)** | Read-only table: + new learners, + changed sections, − removed learners; **explicit "Apply" gate** — never auto-apply destructive changes |
-| **Applying** | Per-row progress (apply is async via job id); `aria-live` updates the visible status |
-| **Done** | Summary Card: N learners added, M moved, K errors; per-row drill-in to errors |
+| **Applying**       | Per-row progress (apply is async via job id); `aria-live` updates the visible status                                                      |
+| **Done**           | Summary Card: N learners added, M moved, K errors; per-row drill-in to errors                                                             |
 
 ### 3.4 States
 
@@ -114,13 +114,13 @@ Per `replit.md` external dependencies: Google Classroom, Clever, ClassLink, Canv
 
 ### 4.1 Surfaces today
 
-| Surface | Path | Status |
-|---|---|---|
-| Parent billing | `app/parent/settings/billing/page.tsx` | 🟡 |
-| School billing | `app/admin/school/billing/page.tsx` | 🟡 |
+| Surface                     | Path                                                                | Status                     |
+| --------------------------- | ------------------------------------------------------------------- | -------------------------- |
+| Parent billing              | `app/parent/settings/billing/page.tsx`                              | 🟡                         |
+| School billing              | `app/admin/school/billing/page.tsx`                                 | 🟡                         |
 | Platform billing dashboards | `app/admin/platform/billing/{coupons,daily-batch,invoices,revenue}` | 🟡 (added in last refresh) |
-| Parent billing BFF | `app/api/bff/billing/**` | 🟡 |
-| Admin billing BFF | `app/api/bff/admin/billing/**` | 🟡 |
+| Parent billing BFF          | `app/api/bff/billing/**`                                            | 🟡                         |
+| Admin billing BFF           | `app/api/bff/admin/billing/**`                                      | 🟡                         |
 
 ### 4.2 Per-role contract
 
@@ -152,13 +152,13 @@ Per `replit.md` external dependencies: Google Classroom, Clever, ClassLink, Canv
 
 ### 5.1 Per-role groups
 
-| Role | Surface root | Categories |
-|---|---|---|
-| Parent | `app/parent/settings/**` | Account · Billing · Accessibility · Language · Consent · Privacy · Notifications |
-| Learner | `app/learner/settings/**` | Accessibility · Audio · Language · Avatar (planned) |
-| Teacher | `app/teacher/settings/**` | Account · Classes · Notifications · Language |
-| School admin | `app/admin/school/settings/**` | Admins · Branding · SSO |
-| Platform admin | `app/admin/platform/settings/{api-keys,emails,webhooks}` | API keys · Email templates · Webhooks |
+| Role           | Surface root                                             | Categories                                                                       |
+| -------------- | -------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Parent         | `app/parent/settings/**`                                 | Account · Billing · Accessibility · Language · Consent · Privacy · Notifications |
+| Learner        | `app/learner/settings/**`                                | Accessibility · Audio · Language · Avatar (planned)                              |
+| Teacher        | `app/teacher/settings/**`                                | Account · Classes · Notifications · Language                                     |
+| School admin   | `app/admin/school/settings/**`                           | Admins · Branding · SSO                                                          |
+| Platform admin | `app/admin/platform/settings/{api-keys,emails,webhooks}` | API keys · Email templates · Webhooks                                            |
 
 ### 5.2 The settings page contract
 
@@ -173,14 +173,14 @@ Every settings page in AIVO follows the same shape — listed once here so we ne
 
 ### 5.3 Cross-role concerns
 
-| Concern | Lives at | Notes |
-|---|---|---|
-| Accessibility modes | per-role settings (text size, dyslexia font, reduced motion, high contrast) | UX-14 §3 |
-| Audio prefs | per-learner under parent (TTS voice / rate / read-aloud default) | not in learner-self settings — parent owns |
-| Language | per-role settings | UX-16 §6 |
-| Consent | parent only (`/parent/consent`) — learners cannot change own consent | UX-03 §3 |
-| Privacy / DSAR | parent (`/parent/privacy`) — data export, deletion | UX-03 §3.6 |
-| Branding | school admin (`/admin/school/settings/branding`) | District-level branding planned |
+| Concern             | Lives at                                                                    | Notes                                      |
+| ------------------- | --------------------------------------------------------------------------- | ------------------------------------------ |
+| Accessibility modes | per-role settings (text size, dyslexia font, reduced motion, high contrast) | UX-14 §3                                   |
+| Audio prefs         | per-learner under parent (TTS voice / rate / read-aloud default)            | not in learner-self settings — parent owns |
+| Language            | per-role settings                                                           | UX-16 §6                                   |
+| Consent             | parent only (`/parent/consent`) — learners cannot change own consent        | UX-03 §3                                   |
+| Privacy / DSAR      | parent (`/parent/privacy`) — data export, deletion                          | UX-03 §3.6                                 |
+| Branding            | school admin (`/admin/school/settings/branding`)                            | District-level branding planned            |
 
 ### 5.4 Gaps
 

@@ -91,7 +91,8 @@ export async function runDailyExpiryBatch(input: RunBatchInput): Promise<RunBatc
       AND s.current_period_end IS NOT NULL
       AND s.current_period_end >= ${now}
       AND s.current_period_end <= ${windowEnd}
-  `)) as { rows?: Array<{ id: string; user_id: string; current_period_end: Date }> }
+  `)) as
+    | { rows?: Array<{ id: string; user_id: string; current_period_end: Date }> }
     | Array<{ id: string; user_id: string; current_period_end: Date }>;
   const rows = Array.isArray(dueRows) ? dueRows : (dueRows.rows ?? []);
 
@@ -101,9 +102,10 @@ export async function runDailyExpiryBatch(input: RunBatchInput): Promise<RunBatc
   const errors: string[] = [];
 
   for (const row of rows) {
-    const expiresAt = row.current_period_end instanceof Date
-      ? row.current_period_end
-      : new Date(row.current_period_end);
+    const expiresAt =
+      row.current_period_end instanceof Date
+        ? row.current_period_end
+        : new Date(row.current_period_end);
     if (expiresAt.getTime() <= now.getTime()) expired++;
     const r = await send({
       subscriptionId: row.id,
@@ -117,8 +119,7 @@ export async function runDailyExpiryBatch(input: RunBatchInput): Promise<RunBatc
     }
   }
 
-  const status: JobOutcome["status"] =
-    failed === 0 ? "ok" : sent > 0 ? "partial" : "failed";
+  const status: JobOutcome["status"] = failed === 0 ? "ok" : sent > 0 ? "partial" : "failed";
 
   // Write per-job history for the admin Daily Batch card.
   const startedAt = now;

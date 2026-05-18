@@ -21,11 +21,7 @@ import {
 } from "@/lib/db/repos";
 import { audit } from "@/lib/bff/audit";
 import { newRequestId } from "@/lib/observability/logger";
-import {
-  IEP_ALLOWED_MIME_TYPES,
-  IEP_MAX_BYTES,
-  iepUploadMetaSchema,
-} from "@/lib/validators/iep";
+import { IEP_ALLOWED_MIME_TYPES, IEP_MAX_BYTES, iepUploadMetaSchema } from "@/lib/validators/iep";
 import { buildIEPExtraction } from "@/lib/learner/iep";
 
 async function uploadAction(formData: FormData) {
@@ -192,9 +188,9 @@ export default async function IEPUploadPage({
         <div className="text-sm text-aivo-ink-soft">
           <p className="font-medium text-aivo-ink">How we handle this document</p>
           <p className="mt-1">
-            We don't show the raw IEP to your learner. We only keep a structured
-            summary of the supports — and we always make a separate, learner-safe
-            version of the language for any screens your learner sees.
+            We don't show the raw IEP to your learner. We only keep a structured summary of the
+            supports — and we always make a separate, learner-safe version of the language for any
+            screens your learner sees.
           </p>
         </div>
       </Card>
@@ -251,8 +247,7 @@ export default async function IEPUploadPage({
                   className="block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-aivo-primary-soft file:px-3 file:py-2 file:text-aivo-primary"
                 />
                 <span className="text-xs text-aivo-ink-soft">
-                  PDF, Word, or plain text. Up to{" "}
-                  {Math.round(IEP_MAX_BYTES / (1024 * 1024))} MiB.
+                  PDF, Word, or plain text. Up to {Math.round(IEP_MAX_BYTES / (1024 * 1024))} MiB.
                 </span>
               </label>
               <div className="flex flex-wrap gap-2">
@@ -267,8 +262,8 @@ export default async function IEPUploadPage({
             <div className="flex-1">
               <p className="font-display text-base font-semibold">Don't have one?</p>
               <p className="text-sm text-aivo-ink-soft">
-                Skip this step and we'll set supports based on your assessment.
-                You can always come back and upload an IEP later.
+                Skip this step and we'll set supports based on your assessment. You can always come
+                back and upload an IEP later.
               </p>
             </div>
             <form action={skipAction}>

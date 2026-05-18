@@ -104,7 +104,11 @@ function buildBeats(plan: GeneratedLessonPlan, shorter: boolean): Beat[] {
 }
 
 function normalizeAnswer(s: string): string {
-  return s.trim().toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+  return s
+    .trim()
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
 }
 
 function isCorrect(expected: string | undefined, actual: string): boolean {
@@ -143,26 +147,31 @@ export function LessonPlayer({
   const [feedback, setFeedback] = useState<null | "correct" | "incorrect">(null);
   const [showHint, setShowHint] = useState(false);
   const [onBreak, setOnBreak] = useState(false);
-  const [hintsUsed, setHintsUsed] = useState(0);
-  const [scaffoldsUsed, setScaffoldsUsed] = useState(0);
-  const [checksTotal, setChecksTotal] = useState(0);
-  const [checksCorrect, setChecksCorrect] = useState(0);
+  // The four counters and the start timestamp below are kept only for
+  // their re-render side-effect (and to mirror the legacy on-device state
+  // shape). The server now derives checks/hints/scaffolds/seconds from
+  // LessonInteraction rows; see complete() below. Prefixed with `_` to
+  // signal intentional unused-read.
+  const [_hintsUsed, setHintsUsed] = useState(0);
+  const [_scaffoldsUsed, setScaffoldsUsed] = useState(0);
+  const [_checksTotal, setChecksTotal] = useState(0);
+  const [_checksCorrect, setChecksCorrect] = useState(0);
   const [completing, startTransition] = useTransition();
   const [completeError, setCompleteError] = useState<string | null>(null);
-  const startTimeRef = useRef<number>(Date.now());
+  const _startTimeRef = useRef<number>(Date.now());
   const seenBeats = useRef<Set<string>>(new Set());
   const beat = beats[stepIdx];
   const isLastBeat = stepIdx === beats.length - 1;
   const isInteractive = beat.kind === "guided" || beat.kind === "check";
 
   // Mark lesson_started once on mount when status === "ready".
+  // Deps are intentionally empty: this is a mount-only side-effect.
   useEffect(() => {
     if (initialStatus === "ready") {
       fetch(`/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/start`, {
         method: "POST",
       }).catch(() => {});
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Persist current step in URL + emit lesson_step_viewed once per beat.
@@ -199,11 +208,7 @@ export function LessonPlayer({
         body: JSON.stringify({
           stepKind,
           stepRefId:
-            beat.kind === "guided"
-              ? beat.gpId
-              : beat.kind === "check"
-                ? beat.checkId
-                : null,
+            beat.kind === "guided" ? beat.gpId : beat.kind === "check" ? beat.checkId : null,
         }),
       }).catch(() => {});
     }
@@ -220,8 +225,7 @@ export function LessonPlayer({
 
   function submitAnswer() {
     if (!isInteractive || answer.trim().length === 0) return;
-    const expected =
-      beat.kind === "guided" ? beat.expectedAnswer : beat.expectedAnswer;
+    const expected = beat.kind === "guided" ? beat.expectedAnswer : beat.expectedAnswer;
     const correct = isCorrect(expected, answer);
     setFeedback(correct ? "correct" : "incorrect");
     if (beat.kind === "check") {
@@ -233,12 +237,7 @@ export function LessonPlayer({
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         stepKind: "answer_submitted",
-        stepRefId:
-          beat.kind === "guided"
-            ? beat.gpId
-            : beat.kind === "check"
-              ? beat.checkId
-              : null,
+        stepRefId: beat.kind === "guided" ? beat.gpId : beat.kind === "check" ? beat.checkId : null,
         response: answer,
         isCorrect: correct,
       }),
@@ -290,9 +289,7 @@ export function LessonPlayer({
       if (!res.ok) {
         // Surface the failure instead of redirecting blindly — otherwise the
         // run would silently stay in_progress and mastery would never update.
-        setCompleteError(
-          "We couldn't save this lesson. Please try the 'I'm done' button again.",
-        );
+        setCompleteError("We couldn't save this lesson. Please try the 'I'm done' button again.");
         return;
       }
       router.push("/learner/home");
@@ -354,9 +351,12 @@ export function LessonPlayer({
       <Card className={`p-6 ${transitionClass}`}>
         {/* Each beat sets aria-live so read-aloud announces it. */}
         <div aria-live="polite" className="space-y-4">
-          {beat.kind === "welcome" || beat.kind === "goal" ||
-          beat.kind === "story" || beat.kind === "micro" ||
-          beat.kind === "celebrate" || beat.kind === "progress" ||
+          {beat.kind === "welcome" ||
+          beat.kind === "goal" ||
+          beat.kind === "story" ||
+          beat.kind === "micro" ||
+          beat.kind === "celebrate" ||
+          beat.kind === "progress" ||
           beat.kind === "next" ? (
             <p className="font-display text-2xl">{beat.body}</p>
           ) : null}
@@ -401,9 +401,7 @@ export function LessonPlayer({
                 </p>
               )}
               {feedback === "correct" && (
-                <p className="rounded-md bg-emerald-50 p-3 text-sm text-emerald-900">
-                  Nice work!
-                </p>
+                <p className="rounded-md bg-emerald-50 p-3 text-sm text-emerald-900">Nice work!</p>
               )}
               {feedback === "incorrect" && (
                 <p className="rounded-md bg-rose-50 p-3 text-sm text-rose-900">

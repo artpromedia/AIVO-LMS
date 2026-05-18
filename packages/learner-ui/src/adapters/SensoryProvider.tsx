@@ -2,7 +2,11 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { FunctioningLevel } from "../tokens/fl-profiles";
 import type { SensoryProfile, SensoryVars } from "../tokens/sensory-vars";
-import { computeSensoryVars, writeSensoryVarsToRoot, clearSensoryVarsFromRoot } from "../tokens/sensory-vars";
+import {
+  computeSensoryVars,
+  writeSensoryVarsToRoot,
+  clearSensoryVarsFromRoot,
+} from "../tokens/sensory-vars";
 
 interface SensoryContextValue {
   vars: SensoryVars;
@@ -18,10 +22,14 @@ export interface SensoryProviderProps {
   children: React.ReactNode;
 }
 
-export function SensoryProvider({ functioningLevel, sensoryProfile, children }: SensoryProviderProps) {
+export function SensoryProvider({
+  functioningLevel,
+  sensoryProfile,
+  children,
+}: SensoryProviderProps) {
   const vars = useMemo(
     () => computeSensoryVars(functioningLevel, sensoryProfile),
-    [functioningLevel, sensoryProfile]
+    [functioningLevel, sensoryProfile],
   );
 
   useEffect(() => {
@@ -31,14 +39,10 @@ export function SensoryProvider({ functioningLevel, sensoryProfile, children }: 
 
   const value = useMemo(
     () => ({ vars, sensoryProfile: sensoryProfile || null, functioningLevel }),
-    [vars, sensoryProfile, functioningLevel]
+    [vars, sensoryProfile, functioningLevel],
   );
 
-  return (
-    <SensoryContext.Provider value={value}>
-      {children}
-    </SensoryContext.Provider>
-  );
+  return <SensoryContext.Provider value={value}>{children}</SensoryContext.Provider>;
 }
 
 export function useSensoryContext() {

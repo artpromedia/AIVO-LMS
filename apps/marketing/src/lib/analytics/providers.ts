@@ -10,7 +10,9 @@ export interface AnalyticsProvider {
 export const googleAnalyticsProvider: AnalyticsProvider = {
   name: "google-analytics",
   isReady() {
-    return typeof window !== "undefined" && !!GA_MEASUREMENT_ID && typeof window.gtag === "function";
+    return (
+      typeof window !== "undefined" && !!GA_MEASUREMENT_ID && typeof window.gtag === "function"
+    );
   },
   track(event, payload) {
     trackEvent(event, payload as Record<string, string | number | boolean> | undefined);
@@ -32,7 +34,10 @@ export const consoleProvider: AnalyticsProvider = {
 
 const providers: AnalyticsProvider[] = [googleAnalyticsProvider, consoleProvider];
 
-export function trackMarketingEvent(event: MarketingEventName, payload?: MarketingEventPayload): void {
+export function trackMarketingEvent(
+  event: MarketingEventName,
+  payload?: MarketingEventPayload,
+): void {
   for (const p of providers) {
     if (p.isReady()) {
       try {

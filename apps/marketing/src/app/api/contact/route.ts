@@ -38,18 +38,12 @@ export async function POST(req: NextRequest) {
     }
 
     if (!email || !name) {
-      return NextResponse.json(
-        { error: "Name and email are required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Name and email are required" }, { status: 400 });
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: "Invalid email address" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
     }
 
     if (process.env.NODE_ENV !== "production" && !process.env.ADMIN_SVC_URL) {
@@ -91,15 +85,12 @@ export async function POST(req: NextRequest) {
     if (!res.ok) {
       return NextResponse.json(
         { error: data.error || "Failed to process submission" },
-        { status: res.status }
+        { status: res.status },
       );
     }
 
     return NextResponse.json(data);
   } catch {
-    return NextResponse.json(
-      { error: "Failed to process submission" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to process submission" }, { status: 500 });
   }
 }

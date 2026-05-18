@@ -9,31 +9,36 @@ const PRINCIPLES = [
   {
     icon: "🧬",
     title: "Truly Personalized",
-    description: "Every interaction adapts to the individual learner's Brain Clone, a unique AI profile that understands how each student learns best.",
+    description:
+      "Every interaction adapts to the individual learner's Brain Clone, a unique AI profile that understands how each student learns best.",
     color: "#7c3aed",
   },
   {
     icon: "♿",
     title: "Inclusive by Design",
-    description: "Built from the ground up for all functioning levels, with deep IEP integration ensuring every student gets the support they need.",
+    description:
+      "Built from the ground up for all functioning levels, with deep IEP integration ensuring every student gets the support they need.",
     color: "#059669",
   },
   {
     icon: "🤖",
     title: "AI-Native",
-    description: "Not AI-bolted-on. The AI IS the product. Every feature is powered by advanced artificial intelligence, not retrofitted with it.",
+    description:
+      "Not AI-bolted-on. The AI IS the product. Every feature is powered by advanced artificial intelligence, not retrofitted with it.",
     color: "#2563eb",
   },
   {
     icon: "📊",
     title: "Measurably Effective",
-    description: "Data-driven outcomes with transparent progress tracking. Parents and educators always know exactly where students stand.",
+    description:
+      "Data-driven outcomes with transparent progress tracking. Parents and educators always know exactly where students stand.",
     color: "#d97706",
   },
   {
     icon: "🎮",
     title: "Joyful Learning",
-    description: "Gamification, personality-rich tutors, and engaging content make learning something students look forward to every day.",
+    description:
+      "Gamification, personality-rich tutors, and engaging content make learning something students look forward to every day.",
     color: "#ec4899",
   },
 ];
@@ -42,25 +47,29 @@ const VALUES = [
   {
     icon: "💡",
     title: "Innovation",
-    description: "We push the boundaries of what's possible in education technology, using cutting-edge AI to solve real learning challenges.",
+    description:
+      "We push the boundaries of what's possible in education technology, using cutting-edge AI to solve real learning challenges.",
     color: "#7c3aed",
   },
   {
     icon: "🤝",
     title: "Inclusion",
-    description: "Every decision we make is guided by our commitment to serving all learners, regardless of ability, background, or learning style.",
+    description:
+      "Every decision we make is guided by our commitment to serving all learners, regardless of ability, background, or learning style.",
     color: "#059669",
   },
   {
     icon: "🛡️",
     title: "Integrity",
-    description: "We protect student data fiercely, communicate honestly with families and educators, and hold ourselves to the highest ethical standards.",
+    description:
+      "We protect student data fiercely, communicate honestly with families and educators, and hold ourselves to the highest ethical standards.",
     color: "#2563eb",
   },
   {
     icon: "🎯",
     title: "Impact",
-    description: "We measure success by student outcomes. If it doesn't measurably help learners grow, we don't ship it.",
+    description:
+      "We measure success by student outcomes. If it doesn't measurably help learners grow, we don't ship it.",
     color: "#d97706",
   },
 ];
@@ -114,11 +123,23 @@ export default function AboutPage() {
       <header className="bg-white border-b border-slate-100 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 md:px-8 py-3 flex items-center justify-between">
           <Link href="/" className="flex items-center">
-            <Image src="/images/aivo-logo-purple.png" alt="AIVO" width={130} height={40} priority style={{ width: "auto", height: "auto" }} />
+            <Image
+              src="/images/aivo-logo-purple.png"
+              alt="AIVO"
+              width={130}
+              height={40}
+              priority
+              style={{ width: "auto", height: "auto" }}
+            />
           </Link>
           <div className="flex items-center gap-3">
             <LanguageSwitcher compact />
-            <Link href="/" className="px-5 py-2 rounded-lg text-slate-600 font-semibold hover:text-primary transition hidden sm:inline-flex">Home</Link>
+            <Link
+              href="/"
+              className="px-5 py-2 rounded-lg text-slate-600 font-semibold hover:text-primary transition hidden sm:inline-flex"
+            >
+              Home
+            </Link>
             <a
               href={`${WEB_APP_URL}/signup?plan=free`}
               onClick={() => {
@@ -126,12 +147,17 @@ export default function AboutPage() {
                 trackSignupInitiation("about");
               }}
               className="px-5 py-2.5 rounded-full bg-primary text-white font-bold hover:bg-primary-dark transition shadow-lg shadow-purple-200"
-            >Get Started</a>
+            >
+              Get Started
+            </a>
           </div>
         </div>
       </header>
 
-      <section className="relative overflow-hidden py-20 md:py-28" style={{ background: "linear-gradient(135deg, #7c3aed08 0%, #7c3aed04 50%, #ffffff 100%)" }}>
+      <section
+        className="relative overflow-hidden py-20 md:py-28"
+        style={{ background: "linear-gradient(135deg, #7c3aed08 0%, #7c3aed04 50%, #ffffff 100%)" }}
+      >
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full blur-3xl opacity-20 bg-purple-400" />
           <div className="absolute bottom-0 -left-20 w-60 h-60 rounded-full blur-3xl opacity-10 bg-indigo-400" />
@@ -139,13 +165,19 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto px-6 md:px-8 relative z-10 text-center">
           <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-purple-50/80 border border-purple-100 mb-6">
             <span className="text-lg">🎯</span>
-            <span className="text-sm font-bold text-primary uppercase tracking-widest">Our Mission</span>
+            <span className="text-sm font-bold text-primary uppercase tracking-widest">
+              Our Mission
+            </span>
           </div>
           <h1 className="text-4xl md:text-6xl font-heading font-bold text-slate-900 mb-6 leading-tight">
             No Learner Left Behind
           </h1>
           <p className="text-lg md:text-xl text-slate-500 font-body max-w-3xl mx-auto leading-relaxed">
-            AIVO Learning was founded on a simple belief: every student deserves a learning experience that adapts to them, not the other way around. Our AI-powered platform creates a unique learning profile — a Brain Clone — for every student, ensuring that no learner is left behind regardless of their learning differences, disabilities, or functioning level.
+            AIVO Learning was founded on a simple belief: every student deserves a learning
+            experience that adapts to them, not the other way around. Our AI-powered platform
+            creates a unique learning profile — a Brain Clone — for every student, ensuring that no
+            learner is left behind regardless of their learning differences, disabilities, or
+            functioning level.
           </p>
         </div>
       </section>
@@ -153,13 +185,23 @@ export default function AboutPage() {
       <section className="py-16 md:py-24 bg-slate-50/50">
         <div className="max-w-6xl mx-auto px-6 md:px-8">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-slate-900 mb-4">Core Principles</h2>
-            <p className="text-lg text-slate-500 font-body">The foundations that guide everything we build.</p>
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-slate-900 mb-4">
+              Core Principles
+            </h2>
+            <p className="text-lg text-slate-500 font-body">
+              The foundations that guide everything we build.
+            </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {PRINCIPLES.map((p) => (
-              <div key={p.title} className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 text-center">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4" style={{ backgroundColor: `${p.color}10` }}>
+              <div
+                key={p.title}
+                className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 text-center"
+              >
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4"
+                  style={{ backgroundColor: `${p.color}10` }}
+                >
                   {p.icon}
                 </div>
                 <h3 className="text-lg font-heading font-bold text-slate-900 mb-2">{p.title}</h3>
@@ -173,13 +215,23 @@ export default function AboutPage() {
       <section className="py-16 md:py-24">
         <div className="max-w-5xl mx-auto px-6 md:px-8">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-slate-900 mb-4">Our Values</h2>
-            <p className="text-lg text-slate-500 font-body">What we stand for as a company and as educators.</p>
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-slate-900 mb-4">
+              Our Values
+            </h2>
+            <p className="text-lg text-slate-500 font-body">
+              What we stand for as a company and as educators.
+            </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {VALUES.map((v) => (
-              <div key={v.title} className="flex gap-5 p-6 rounded-2xl border border-slate-100 bg-white hover:shadow-lg transition-all">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{ backgroundColor: `${v.color}10` }}>
+              <div
+                key={v.title}
+                className="flex gap-5 p-6 rounded-2xl border border-slate-100 bg-white hover:shadow-lg transition-all"
+              >
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
+                  style={{ backgroundColor: `${v.color}10` }}
+                >
                   {v.icon}
                 </div>
                 <div>
@@ -195,9 +247,13 @@ export default function AboutPage() {
       <section className="py-16 md:py-24 bg-slate-50/50">
         <div className="max-w-6xl mx-auto px-6 md:px-8">
           <div className="text-center mb-14">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-slate-900 mb-4">Meet Our Leadership</h2>
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-slate-900 mb-4">
+              Meet Our Leadership
+            </h2>
             <p className="text-lg text-slate-500 font-body max-w-3xl mx-auto">
-              AIVO is led by a team of seasoned executives who bring decades of cross-sector experience in healthcare, business strategy, education, public service, and technology.
+              AIVO is led by a team of seasoned executives who bring decades of cross-sector
+              experience in healthcare, business strategy, education, public service, and
+              technology.
             </p>
           </div>
           <div className="space-y-8">
@@ -207,7 +263,12 @@ export default function AboutPage() {
                 className={`flex flex-col ${i % 2 === 1 ? "md:flex-row-reverse" : "md:flex-row"} gap-8 bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-xl transition-all`}
               >
                 <div className="relative w-full md:w-80 h-80 md:h-auto flex-shrink-0">
-                  <div className="absolute inset-0 bg-gradient-to-br opacity-10" style={{ background: `linear-gradient(135deg, ${leader.color}30, ${leader.color}05)` }} />
+                  <div
+                    className="absolute inset-0 bg-gradient-to-br opacity-10"
+                    style={{
+                      background: `linear-gradient(135deg, ${leader.color}30, ${leader.color}05)`,
+                    }}
+                  />
                   <Image
                     src={leader.image}
                     alt={leader.name}
@@ -218,10 +279,20 @@ export default function AboutPage() {
                 </div>
                 <div className="flex-1 p-8 md:p-10 flex flex-col justify-center">
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="w-1.5 h-8 rounded-full" style={{ backgroundColor: leader.color }} />
-                    <h3 className="text-2xl font-heading font-bold text-slate-900">{leader.name}</h3>
+                    <div
+                      className="w-1.5 h-8 rounded-full"
+                      style={{ backgroundColor: leader.color }}
+                    />
+                    <h3 className="text-2xl font-heading font-bold text-slate-900">
+                      {leader.name}
+                    </h3>
                   </div>
-                  <p className="text-sm font-bold uppercase tracking-widest mb-4" style={{ color: leader.color }}>{leader.role}</p>
+                  <p
+                    className="text-sm font-bold uppercase tracking-widest mb-4"
+                    style={{ color: leader.color }}
+                  >
+                    {leader.role}
+                  </p>
                   <p className="text-slate-600 font-body leading-relaxed mb-6">{leader.bio}</p>
                   <a
                     href={leader.linkedin}
@@ -247,7 +318,8 @@ export default function AboutPage() {
           <div className="bg-gradient-to-r from-primary to-purple-600 rounded-3xl p-10 md:p-16 text-white">
             <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">Join Our Mission</h2>
             <p className="text-lg text-white/80 font-body mb-8 max-w-2xl mx-auto">
-              Help us build a world where every student gets the personalized education they deserve.
+              Help us build a world where every student gets the personalized education they
+              deserve.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -270,16 +342,49 @@ export default function AboutPage() {
       <footer className="bg-slate-900 py-8">
         <div className="max-w-6xl mx-auto px-6 md:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-6">
-            <Image src="/images/aivo-logo-white.png" alt="AIVO" width={100} height={30} style={{ width: "auto", height: "auto" }} />
+            <Image
+              src="/images/aivo-logo-white.png"
+              alt="AIVO"
+              width={100}
+              height={30}
+              style={{ width: "auto", height: "auto" }}
+            />
             <nav className="hidden md:flex items-center gap-4">
-              <Link href="/privacy-policy" className="text-sm text-slate-400 hover:text-white transition">Privacy</Link>
-              <Link href="/terms-of-service" className="text-sm text-slate-400 hover:text-white transition">Terms</Link>
-              <Link href="/coppa-compliance" className="text-sm text-slate-400 hover:text-white transition">COPPA</Link>
-              <Link href="/ferpa-compliance" className="text-sm text-slate-400 hover:text-white transition">FERPA</Link>
-              <Link href="/accessibility" className="text-sm text-slate-400 hover:text-white transition">Accessibility</Link>
+              <Link
+                href="/privacy-policy"
+                className="text-sm text-slate-400 hover:text-white transition"
+              >
+                Privacy
+              </Link>
+              <Link
+                href="/terms-of-service"
+                className="text-sm text-slate-400 hover:text-white transition"
+              >
+                Terms
+              </Link>
+              <Link
+                href="/coppa-compliance"
+                className="text-sm text-slate-400 hover:text-white transition"
+              >
+                COPPA
+              </Link>
+              <Link
+                href="/ferpa-compliance"
+                className="text-sm text-slate-400 hover:text-white transition"
+              >
+                FERPA
+              </Link>
+              <Link
+                href="/accessibility"
+                className="text-sm text-slate-400 hover:text-white transition"
+              >
+                Accessibility
+              </Link>
             </nav>
           </div>
-          <p className="text-sm text-slate-500 font-body">&copy; {new Date().getFullYear()} AIVO Learning Platform</p>
+          <p className="text-sm text-slate-500 font-body">
+            &copy; {new Date().getFullYear()} AIVO Learning Platform
+          </p>
         </div>
       </footer>
     </div>

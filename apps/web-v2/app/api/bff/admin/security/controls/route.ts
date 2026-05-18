@@ -20,7 +20,10 @@ export async function GET(req: Request): Promise<NextResponse> {
     const roleErr = requireRole(session!, ["platform_admin"], requestId);
     if (roleErr) return roleErr;
     const controls = listSecurityControls();
-    const withEvidence = controls.map((c) => ({ control: c, evidence: listEvidenceForControl(c.id) }));
+    const withEvidence = controls.map((c) => ({
+      control: c,
+      evidence: listEvidenceForControl(c.id),
+    }));
     return ok({ controls: withEvidence }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
@@ -31,7 +34,13 @@ const createSchema = z.object({
   code: z.string().min(1).max(40),
   title: z.string().min(1).max(160),
   description: z.string().min(1).max(2000),
-  criterion: z.enum(["security", "availability", "processing_integrity", "confidentiality", "privacy"]),
+  criterion: z.enum([
+    "security",
+    "availability",
+    "processing_integrity",
+    "confidentiality",
+    "privacy",
+  ]),
   owner: z.string().min(1).max(80),
   status: z.enum(["implemented", "partial", "not_started", "not_applicable"]),
 });
@@ -46,10 +55,18 @@ export async function POST(req: Request): Promise<NextResponse> {
     const body = await req.json().catch(() => null);
     const parsed = createSchema.safeParse(body);
     if (!parsed.success) {
-      return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." }, requestId);
+      return fail(
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
+        requestId,
+      );
     }
     const control = createSecurityControl(parsed.data);
-    audit(session!, "security.control.created", requestId, { metadata: { controlId: control.id, code: control.code } });
+    audit(session!, "security.control.created", requestId, {
+      metadata: { controlId: control.id, code: control.code },
+    });
     return ok({ control }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

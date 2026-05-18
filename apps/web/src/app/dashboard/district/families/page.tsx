@@ -25,7 +25,7 @@ export default function DistrictFamiliesPage() {
     if (!accessToken) return;
     const qs = search ? `?search=${encodeURIComponent(search)}` : "";
     fetch(`/api/district/families${qs}`, { headers: { Authorization: `Bearer ${accessToken}` } })
-      .then((r) => r.ok ? r.json() : { families: [] })
+      .then((r) => (r.ok ? r.json() : { families: [] }))
       .then((data) => setFamilies(data.families || []))
       .catch(() => setFamilies([]))
       .finally(() => setLoading(false));
@@ -39,7 +39,9 @@ export default function DistrictFamiliesPage() {
         </IconWell>
         <div>
           <h1 className="text-2xl font-heading font-bold vi-text">Parents & Families</h1>
-          <p className="text-sm vi-text-muted mt-1">View parent accounts and their linked learners across the district.</p>
+          <p className="text-sm vi-text-muted mt-1">
+            View parent accounts and their linked learners across the district.
+          </p>
         </div>
       </header>
 
@@ -56,7 +58,9 @@ export default function DistrictFamiliesPage() {
 
       {loading ? (
         <div className="animate-pulse space-y-3">
-          {[1, 2, 3].map((i) => <div key={i} className="h-20 bg-slate-200 rounded-2xl" />)}
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-20 bg-slate-200 rounded-2xl" />
+          ))}
         </div>
       ) : families.length === 0 ? (
         <div className="vi-card p-12 text-center">
@@ -64,7 +68,9 @@ export default function DistrictFamiliesPage() {
             <Users size={28} strokeWidth={2.5} aria-hidden="true" />
           </div>
           <p className="vi-text-muted font-medium">No families found</p>
-          <p className="text-sm vi-text-muted mt-1">Parent accounts will appear here once learners are enrolled.</p>
+          <p className="text-sm vi-text-muted mt-1">
+            Parent accounts will appear here once learners are enrolled.
+          </p>
         </div>
       ) : (
         <div className="vi-card overflow-hidden">
@@ -93,7 +99,11 @@ export default function DistrictFamiliesPage() {
                     {f.learners.length > 0 ? (
                       <div className="flex flex-wrap gap-1">
                         {f.learners.map((l) => (
-                          <Link key={l.id} href={`/dashboard/district/learners/${l.id}`} className="px-2 py-0.5 text-xs rounded-full bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))] font-medium hover:bg-violet-200">
+                          <Link
+                            key={l.id}
+                            href={`/dashboard/district/learners/${l.id}`}
+                            className="px-2 py-0.5 text-xs rounded-full bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))] font-medium hover:bg-violet-200"
+                          >
                             {l.name}
                           </Link>
                         ))}

@@ -46,10 +46,7 @@ export function transformActivity(
   return a;
 }
 
-function mergeAdaptations(
-  activity: Activity,
-  defaults: AdaptationProfile | undefined,
-): Activity {
+function mergeAdaptations(activity: Activity, defaults: AdaptationProfile | undefined): Activity {
   if (!defaults) return activity;
   return {
     ...activity,

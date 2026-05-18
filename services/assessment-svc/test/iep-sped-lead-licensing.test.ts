@@ -32,7 +32,11 @@ async function bootstrap() {
 
 async function teardown(app: any, db: any) {
   await app.close();
-  try { await (db as any).$client?.end?.({ timeout: 2 }); } catch { /* ignore */ }
+  try {
+    await (db as any).$client?.end?.({ timeout: 2 });
+  } catch {
+    /* ignore */
+  }
 }
 
 interface Fixture {
@@ -51,17 +55,26 @@ interface Fixture {
 async function seed(db: any): Promise<Fixture> {
   const { tenants, users, learners, learnerTeachers } = await import("@aivo/db");
   const stamp = Date.now() + Math.floor(Math.random() * 1_000_000);
-  const [t] = await db.insert(tenants).values({
-    name: `sped-${stamp}`, type: "B2B_DISTRICT",
-  } as any).returning();
+  const [t] = await db
+    .insert(tenants)
+    .values({
+      name: `sped-${stamp}`,
+      type: "B2B_DISTRICT",
+    } as any)
+    .returning();
   const schoolAId = crypto.randomUUID();
   const schoolBId = crypto.randomUUID();
   const mkUser = async (role: string, name: string, schoolId: string | null = null) => {
-    const [u] = await db.insert(users).values({
-      tenantId: t.id, name, role,
-      schoolId: schoolId || null,
-      email: `${name}-${stamp}@test.local`,
-    } as any).returning();
+    const [u] = await db
+      .insert(users)
+      .values({
+        tenantId: t.id,
+        name,
+        role,
+        schoolId: schoolId || null,
+        email: `${name}-${stamp}@test.local`,
+      } as any)
+      .returning();
     return u.id as string;
   };
   const parentId = await mkUser("PARENT", "sped-parent");
@@ -70,30 +83,56 @@ async function seed(db: any): Promise<Fixture> {
   const spedLeadBId = await mkUser("SPED_LEAD", "sped-lead-b", schoolBId);
   const spedLeadNoSchoolId = await mkUser("SPED_LEAD", "sped-lead-no-school", null);
   const learnerUserId = await mkUser("LEARNER", "sped-luser");
-  const [learner] = await db.insert(learners).values({
-    tenantId: t.id, userId: learnerUserId, parentId,
-    name: "SPED Learner", schoolId: schoolAId,
-  } as any).returning();
-  const [link] = await db.insert(learnerTeachers).values({
-    tenantId: t.id, learnerId: learner.id,
-    teacherEmail: `sped-teacher-${stamp}@test.local`,
-    teacherUserId: teacherId, invitedBy: parentId,
-    status: "ACCEPTED", acceptedAt: new Date(),
-  } as any).returning();
+  const [learner] = await db
+    .insert(learners)
+    .values({
+      tenantId: t.id,
+      userId: learnerUserId,
+      parentId,
+      name: "SPED Learner",
+      schoolId: schoolAId,
+    } as any)
+    .returning();
+  const [link] = await db
+    .insert(learnerTeachers)
+    .values({
+      tenantId: t.id,
+      learnerId: learner.id,
+      teacherEmail: `sped-teacher-${stamp}@test.local`,
+      teacherUserId: teacherId,
+      invitedBy: parentId,
+      status: "ACCEPTED",
+      acceptedAt: new Date(),
+    } as any)
+    .returning();
   return {
-    tenantId: t.id, schoolAId, schoolBId,
-    parentId, teacherId, spedLeadAId, spedLeadBId, spedLeadNoSchoolId,
-    learnerId: learner.id, teacherLinkId: link.id,
+    tenantId: t.id,
+    schoolAId,
+    schoolBId,
+    parentId,
+    teacherId,
+    spedLeadAId,
+    spedLeadBId,
+    spedLeadNoSchoolId,
+    learnerId: learner.id,
+    teacherLinkId: link.id,
   };
 }
 
 async function cleanup(db: any, f: Fixture) {
   const { eq } = await import("drizzle-orm");
   const {
-    tenants, users, learners, learnerTeachers,
-    iepProfiles, iepTeamMembers, iepPresentLevels,
+    tenants,
+    users,
+    learners,
+    learnerTeachers,
+    iepProfiles,
+    iepTeamMembers,
+    iepPresentLevels,
   } = await import("@aivo/db");
-  const profiles = await db.select({ id: iepProfiles.id }).from(iepProfiles)
+  const profiles = await db
+    .select({ id: iepProfiles.id })
+    .from(iepProfiles)
     .where(eq(iepProfiles.learnerId, f.learnerId));
   for (const p of profiles) {
     await db.delete(iepPresentLevels).where(eq(iepPresentLevels.iepProfileId, p.id));
@@ -111,15 +150,18 @@ async function tokenFor(sub: string, role: string, tenantId: string): Promise<st
   return signJWT({ sub, role, tenantId }, "5m");
 }
 
-test("SPED_LEAD with matching school can create drafts; mismatched / unset school cannot",
-  { skip: SKIP }, async () => {
+test(
+  "SPED_LEAD with matching school can create drafts; mismatched / unset school cannot",
+  { skip: SKIP },
+  async () => {
     const { app, db } = await bootstrap();
     const f = await seed(db);
     try {
       // Same-school SPED_LEAD: 201
       const tokA = await tokenFor(f.spedLeadAId, "SPED_LEAD", f.tenantId);
       const okRes = await app.inject({
-        method: "POST", url: "/api/iep/drafts",
+        method: "POST",
+        url: "/api/iep/drafts",
         headers: { Authorization: `Bearer ${tokA}`, "Content-Type": "application/json" },
         payload: { learnerId: f.learnerId },
       });
@@ -128,27 +170,41 @@ test("SPED_LEAD with matching school can create drafts; mismatched / unset schoo
       // Different-school SPED_LEAD: 403
       const tokB = await tokenFor(f.spedLeadBId, "SPED_LEAD", f.tenantId);
       const cross = await app.inject({
-        method: "POST", url: "/api/iep/drafts",
+        method: "POST",
+        url: "/api/iep/drafts",
         headers: { Authorization: `Bearer ${tokB}`, "Content-Type": "application/json" },
         payload: { learnerId: f.learnerId },
       });
-      assert.equal(cross.statusCode, 403,
-        "SPED_LEAD authority is school-scoped — different-school must be denied");
+      assert.equal(
+        cross.statusCode,
+        403,
+        "SPED_LEAD authority is school-scoped — different-school must be denied",
+      );
 
       // SPED_LEAD with no school assignment: 403
       const tokNone = await tokenFor(f.spedLeadNoSchoolId, "SPED_LEAD", f.tenantId);
       const noSchool = await app.inject({
-        method: "POST", url: "/api/iep/drafts",
+        method: "POST",
+        url: "/api/iep/drafts",
         headers: { Authorization: `Bearer ${tokNone}`, "Content-Type": "application/json" },
         payload: { learnerId: f.learnerId },
       });
-      assert.equal(noSchool.statusCode, 403,
-        "SPED_LEAD without users.school_id must be denied (misconfiguration ≠ access)");
-    } finally { await cleanup(db, f); await teardown(app, db); }
-  });
+      assert.equal(
+        noSchool.statusCode,
+        403,
+        "SPED_LEAD without users.school_id must be denied (misconfiguration ≠ access)",
+      );
+    } finally {
+      await cleanup(db, f);
+      await teardown(app, db);
+    }
+  },
+);
 
-test("/api/iep/drafts/learner/:id decorates each draft row with the case manager",
-  { skip: SKIP }, async () => {
+test(
+  "/api/iep/drafts/learner/:id decorates each draft row with the case manager",
+  { skip: SKIP },
+  async () => {
     const { app, db } = await bootstrap();
     const f = await seed(db);
     try {
@@ -156,25 +212,35 @@ test("/api/iep/drafts/learner/:id decorates each draft row with the case manager
       // the author as case_manager via iep_team_members.
       const teacherToken = await tokenFor(f.teacherId, "TEACHER", f.tenantId);
       const created = await app.inject({
-        method: "POST", url: "/api/iep/drafts",
+        method: "POST",
+        url: "/api/iep/drafts",
         headers: { Authorization: `Bearer ${teacherToken}`, "Content-Type": "application/json" },
         payload: { learnerId: f.learnerId },
       });
       assert.equal(created.statusCode, 201, created.body);
 
       const list = await app.inject({
-        method: "GET", url: `/api/iep/drafts/learner/${f.learnerId}`,
+        method: "GET",
+        url: `/api/iep/drafts/learner/${f.learnerId}`,
         headers: { Authorization: `Bearer ${teacherToken}` },
       });
       assert.equal(list.statusCode, 200, list.body);
       const rows = list.json();
-      assert.ok(Array.isArray(rows) && rows.length >= 1,
-        "drafts list must include the draft we just created");
+      assert.ok(
+        Array.isArray(rows) && rows.length >= 1,
+        "drafts list must include the draft we just created",
+      );
       const fresh = rows.find((r: any) => r.id === created.json().id);
       assert.ok(fresh, "created draft is in the list");
-      assert.ok(fresh.caseManager,
-        "drafts list must decorate each row with caseManager metadata");
-      assert.equal(fresh.caseManager.userId, f.teacherId,
-        "the bootstrapped case manager is the original author");
-    } finally { await cleanup(db, f); await teardown(app, db); }
-  });
+      assert.ok(fresh.caseManager, "drafts list must decorate each row with caseManager metadata");
+      assert.equal(
+        fresh.caseManager.userId,
+        f.teacherId,
+        "the bootstrapped case manager is the original author",
+      );
+    } finally {
+      await cleanup(db, f);
+      await teardown(app, db);
+    }
+  },
+);

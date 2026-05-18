@@ -39,36 +39,260 @@ const servicesRoot = join(repoRoot, "services");
 
 const SERVICE_CONTRACTS = {
   // sensitive data planes — must have auth + tenant + audit + tests
-  "identity-svc":        { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: true,  needDb: true,  needTests: true,  domain: "Identity / auth" },
-  "family-svc":          { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: true,  needDb: true,  needTests: true,  domain: "Parent + learner profile" },
-  "tenant-svc":          { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: true,  needDb: false, needTests: true,  domain: "Tenant + org" },
-  "brain-svc":           { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: true,  needDb: true,  needTests: true,  domain: "Brain profile" },
-  "subject-brain-svc":   { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: true,  needDb: true,  needTests: true,  domain: "Subject brain" },
-  "assessment-svc":      { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: true,  needDb: true,  needTests: true,  domain: "Baseline + assessment" },
-  "learning-svc":        { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: true,  needDb: true,  needTests: true,  domain: "LessonRun + Today's Mission" },
-  "tutor-svc":           { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: true,  needDb: true,  needTests: true,  domain: "Tutor runtime" },
-  "homework-svc":        { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: true,  needDb: true,  needTests: true,  domain: "Homework Helper" },
-  "comms-svc":           { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: true,  needDb: true,  needTests: true,  domain: "Notifications" },
-  "billing-svc":         { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: true,  needDb: true,  needTests: true,  domain: "Billing + entitlements" },
-  "audit-svc":           { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: true,  needDb: true,  needTests: true,  domain: "Audit log persistence" },
-  "data-governance-svc": { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: true,  needDb: true,  needTests: true,  domain: "DSAR / export / delete" },
-  "admin-svc":           { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: true,  needDb: true,  needTests: true,  domain: "Admin console BFF" },
-  "curriculum-svc":      { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: false, needDb: false, needTests: true,  domain: "Curriculum + standards" },
-  "recommendation-svc":  { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: false, needDb: false, needTests: true,  domain: "Recommendation" },
-  "engagement-svc":      { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: false, needDb: true,  needTests: true,  domain: "Engagement metrics" },
-  "problem-session-svc": { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: false, needDb: false, needTests: true,  domain: "Problem session ledger" },
-  "responsible-ai-svc":  { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: true,  needDb: false, needTests: true,  domain: "Responsible AI / safety" },
-  "ai-svc":              { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: true,  needDb: false, needTests: true,  domain: "AI provider abstraction" },
+  "identity-svc": {
+    sensitive: true,
+    needAuth: true,
+    needTenant: true,
+    needAudit: true,
+    needDb: true,
+    needTests: true,
+    domain: "Identity / auth",
+  },
+  "family-svc": {
+    sensitive: true,
+    needAuth: true,
+    needTenant: true,
+    needAudit: true,
+    needDb: true,
+    needTests: true,
+    domain: "Parent + learner profile",
+  },
+  "tenant-svc": {
+    sensitive: true,
+    needAuth: true,
+    needTenant: true,
+    needAudit: true,
+    needDb: false,
+    needTests: true,
+    domain: "Tenant + org",
+  },
+  "brain-svc": {
+    sensitive: true,
+    needAuth: true,
+    needTenant: true,
+    needAudit: true,
+    needDb: true,
+    needTests: true,
+    domain: "Brain profile",
+  },
+  "subject-brain-svc": {
+    sensitive: true,
+    needAuth: true,
+    needTenant: true,
+    needAudit: true,
+    needDb: true,
+    needTests: true,
+    domain: "Subject brain",
+  },
+  "assessment-svc": {
+    sensitive: true,
+    needAuth: true,
+    needTenant: true,
+    needAudit: true,
+    needDb: true,
+    needTests: true,
+    domain: "Baseline + assessment",
+  },
+  "learning-svc": {
+    sensitive: true,
+    needAuth: true,
+    needTenant: true,
+    needAudit: true,
+    needDb: true,
+    needTests: true,
+    domain: "LessonRun + Today's Mission",
+  },
+  "tutor-svc": {
+    sensitive: true,
+    needAuth: true,
+    needTenant: true,
+    needAudit: true,
+    needDb: true,
+    needTests: true,
+    domain: "Tutor runtime",
+  },
+  "homework-svc": {
+    sensitive: true,
+    needAuth: true,
+    needTenant: true,
+    needAudit: true,
+    needDb: true,
+    needTests: true,
+    domain: "Homework Helper",
+  },
+  "comms-svc": {
+    sensitive: true,
+    needAuth: true,
+    needTenant: true,
+    needAudit: true,
+    needDb: true,
+    needTests: true,
+    domain: "Notifications",
+  },
+  "billing-svc": {
+    sensitive: true,
+    needAuth: true,
+    needTenant: true,
+    needAudit: true,
+    needDb: true,
+    needTests: true,
+    domain: "Billing + entitlements",
+  },
+  "audit-svc": {
+    sensitive: true,
+    needAuth: true,
+    needTenant: true,
+    needAudit: true,
+    needDb: true,
+    needTests: true,
+    domain: "Audit log persistence",
+  },
+  "data-governance-svc": {
+    sensitive: true,
+    needAuth: true,
+    needTenant: true,
+    needAudit: true,
+    needDb: true,
+    needTests: true,
+    domain: "DSAR / export / delete",
+  },
+  "admin-svc": {
+    sensitive: true,
+    needAuth: true,
+    needTenant: true,
+    needAudit: true,
+    needDb: true,
+    needTests: true,
+    domain: "Admin console BFF",
+  },
+  "curriculum-svc": {
+    sensitive: true,
+    needAuth: true,
+    needTenant: true,
+    needAudit: false,
+    needDb: false,
+    needTests: true,
+    domain: "Curriculum + standards",
+  },
+  "recommendation-svc": {
+    sensitive: true,
+    needAuth: true,
+    needTenant: true,
+    needAudit: false,
+    needDb: false,
+    needTests: true,
+    domain: "Recommendation",
+  },
+  "engagement-svc": {
+    sensitive: true,
+    needAuth: true,
+    needTenant: true,
+    needAudit: false,
+    needDb: true,
+    needTests: true,
+    domain: "Engagement metrics",
+  },
+  "problem-session-svc": {
+    sensitive: true,
+    needAuth: true,
+    needTenant: true,
+    needAudit: false,
+    needDb: false,
+    needTests: true,
+    domain: "Problem session ledger",
+  },
+  "responsible-ai-svc": {
+    sensitive: true,
+    needAuth: true,
+    needTenant: true,
+    needAudit: true,
+    needDb: false,
+    needTests: true,
+    domain: "Responsible AI / safety",
+  },
+  "ai-svc": {
+    sensitive: true,
+    needAuth: true,
+    needTenant: true,
+    needAudit: true,
+    needDb: false,
+    needTests: true,
+    domain: "AI provider abstraction",
+  },
 
   // inference / integration / utility planes
-  "integration-svc":     { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: false, needDb: false, needTests: true,  domain: "External integrations" },
-  "integrations-svc":    { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: false, needDb: true,  needTests: true,  domain: "External integrations (alt)" },
-  "research-svc":        { sensitive: false, needAuth: true,  needTenant: false, needAudit: false, needDb: true,  needTests: true,  domain: "Research / analytics" },
-  "status-page-svc":     { sensitive: false, needAuth: false, needTenant: false, needAudit: false, needDb: false, needTests: false, domain: "Public status page (stateless)" },
-  "alerts-proxy-svc":    { sensitive: false, needAuth: true,  needTenant: false, needAudit: false, needDb: false, needTests: true,  domain: "Ops alerts proxy" },
-  "math-recognizer-svc": { sensitive: false, needAuth: true,  needTenant: false, needAudit: false, needDb: false, needTests: true,  domain: "Math recognizer (inference)" },
-  "science-solver-svc":  { sensitive: false, needAuth: true,  needTenant: false, needAudit: false, needDb: false, needTests: true,  domain: "Science solver (inference)" },
-  "i18n-svc":            { sensitive: false, needAuth: false, needTenant: false, needAudit: false, needDb: true,  needTests: false, domain: "i18n catalog" },
+  "integration-svc": {
+    sensitive: true,
+    needAuth: true,
+    needTenant: true,
+    needAudit: false,
+    needDb: false,
+    needTests: true,
+    domain: "External integrations",
+  },
+  "integrations-svc": {
+    sensitive: true,
+    needAuth: true,
+    needTenant: true,
+    needAudit: false,
+    needDb: true,
+    needTests: true,
+    domain: "External integrations (alt)",
+  },
+  "research-svc": {
+    sensitive: false,
+    needAuth: true,
+    needTenant: false,
+    needAudit: false,
+    needDb: true,
+    needTests: true,
+    domain: "Research / analytics",
+  },
+  "status-page-svc": {
+    sensitive: false,
+    needAuth: false,
+    needTenant: false,
+    needAudit: false,
+    needDb: false,
+    needTests: false,
+    domain: "Public status page (stateless)",
+  },
+  "alerts-proxy-svc": {
+    sensitive: false,
+    needAuth: true,
+    needTenant: false,
+    needAudit: false,
+    needDb: false,
+    needTests: true,
+    domain: "Ops alerts proxy",
+  },
+  "math-recognizer-svc": {
+    sensitive: false,
+    needAuth: true,
+    needTenant: false,
+    needAudit: false,
+    needDb: false,
+    needTests: true,
+    domain: "Math recognizer (inference)",
+  },
+  "science-solver-svc": {
+    sensitive: false,
+    needAuth: true,
+    needTenant: false,
+    needAudit: false,
+    needDb: false,
+    needTests: true,
+    domain: "Science solver (inference)",
+  },
+  "i18n-svc": {
+    sensitive: false,
+    needAuth: false,
+    needTenant: false,
+    needAudit: false,
+    needDb: true,
+    needTests: false,
+    domain: "i18n catalog",
+  },
 };
 
 // --- helpers -----------------------------------------------------------------
@@ -86,33 +310,44 @@ function walk(dir, out = []) {
 }
 
 function readSafe(p) {
-  try { return readFileSync(p, "utf8"); } catch { return ""; }
+  try {
+    return readFileSync(p, "utf8");
+  } catch {
+    return "";
+  }
 }
 
-const AUTH_RE = /\b(authenticate(?:Request)?|requireAuth|verifyToken|verifyJWT|verifyParentOwnership|requireUser|requireRole|jwtVerify|HTTPBearer|require_auth|require_user|require_session|OAuth2PasswordBearer|@aivo\/sso|@aivo\/security|@aivo\/enterprise-core|withAuth|getServerSession|HTTPAuthorizationCredentials|requirePlatformAdmin|requireDistrictAdmin|requireSchoolAdmin|requireParent|requireTeacher|requireLearner|requireStaff|requireSubject|requireScope|requirePermission|requireGuardian|requireSession|fastifyAuth|requiresAuth|registerEnterpriseAuthHook|enterpriseAuthHook|registerAuthHook|requireServiceToken|INTERNAL_SERVICE_TOKEN|EXPECTED_SERVICE_TOKEN|x-service-token)\b/;
-const TENANT_RE = /\b(tenantId|tenant_id|requireTenant|tenantContext|withTenant|tenant_context|getTenant|TenantContext)\b/;
-const AUDIT_RE = /\b(logAuditEvent|emitAudit|audit-svc|audit_svc|writeAuditEvent|auditEvent|auditEvents|recordAudit|aivoAudit|audit\.write|audit\.log|appendAudit|emitBillingAudit|emit[A-Z]\w*Audit|adminAuditLog|admin_audit_log|district_activity_log)\b/;
+const AUTH_RE =
+  /\b(authenticate(?:Request)?|requireAuth|verifyToken|verifyJWT|verifyParentOwnership|requireUser|requireRole|jwtVerify|HTTPBearer|require_auth|require_user|require_session|OAuth2PasswordBearer|@aivo\/sso|@aivo\/security|@aivo\/enterprise-core|withAuth|getServerSession|HTTPAuthorizationCredentials|requirePlatformAdmin|requireDistrictAdmin|requireSchoolAdmin|requireParent|requireTeacher|requireLearner|requireStaff|requireSubject|requireScope|requirePermission|requireGuardian|requireSession|fastifyAuth|requiresAuth|registerEnterpriseAuthHook|enterpriseAuthHook|registerAuthHook|requireServiceToken|INTERNAL_SERVICE_TOKEN|EXPECTED_SERVICE_TOKEN|x-service-token)\b/;
+const TENANT_RE =
+  /\b(tenantId|tenant_id|requireTenant|tenantContext|withTenant|tenant_context|getTenant|TenantContext)\b/;
+const AUDIT_RE =
+  /\b(logAuditEvent|emitAudit|audit-svc|audit_svc|writeAuditEvent|auditEvent|auditEvents|recordAudit|aivoAudit|audit\.write|audit\.log|appendAudit|emitBillingAudit|emit[A-Z]\w*Audit|adminAuditLog|admin_audit_log|district_activity_log)\b/;
 const DB_RE = /(@aivo\/db|drizzle|from\s+["']\.\.\/db|alembic|sqlalchemy|psycopg|postgres)/;
 const ROUTE_TS_RE = /\b(router|app|fastify|server)\.(get|post|put|delete|patch)\(/;
 const ROUTE_PY_RE = /@(router|app)\.(get|post|put|delete|patch)\(|APIRouter\(/;
-const SUSPICIOUS_RE = /(TODO production blocker|throw new Error\(['"]not implemented['"]\)|MOCK_QUESTIONS|coming soon|placeholder for production|STUB_|return\s+\{\s*ok:\s*true\s*\}\s*;\s*\/\/\s*todo)/i;
+const SUSPICIOUS_RE =
+  /(TODO production blocker|throw new Error\(['"]not implemented['"]\)|MOCK_QUESTIONS|coming soon|placeholder for production|STUB_|return\s+\{\s*ok:\s*true\s*\}\s*;\s*\/\/\s*todo)/i;
 
 function inspectService(name, contract) {
   const dir = join(servicesRoot, name);
-  const files = walk(dir).filter((p) =>
-    /\.(ts|tsx|js|mjs|py)$/.test(p) && !p.includes("/dist/") && !p.endsWith(".d.ts"),
+  const files = walk(dir).filter(
+    (p) => /\.(ts|tsx|js|mjs|py)$/.test(p) && !p.includes("/dist/") && !p.endsWith(".d.ts"),
   );
   if (files.length === 0) {
     return { name, contract, missing: true };
   }
   const blob = files.map((p) => `\n// ${p}\n` + readSafe(p)).join("\n");
-  const testFiles = files.filter((p) =>
-    (/(__tests__|\.test\.|_test\.py)/.test(p) ||
-      /\/tests?\/(?!integration\/).*\/?test_[^/]+\.py$/.test(p) ||
-      /\/tests?\/test_[^/]+\.py$/.test(p)) &&
-    !p.includes("/integration/"),
+  const testFiles = files.filter(
+    (p) =>
+      (/(__tests__|\.test\.|_test\.py)/.test(p) ||
+        /\/tests?\/(?!integration\/).*\/?test_[^/]+\.py$/.test(p) ||
+        /\/tests?\/test_[^/]+\.py$/.test(p)) &&
+      !p.includes("/integration/"),
   );
-  const routeFiles = files.filter((p) => ROUTE_TS_RE.test(readSafe(p)) || ROUTE_PY_RE.test(readSafe(p)));
+  const routeFiles = files.filter(
+    (p) => ROUTE_TS_RE.test(readSafe(p)) || ROUTE_PY_RE.test(readSafe(p)),
+  );
   const hasAuth = AUTH_RE.test(blob);
   const hasTenant = TENANT_RE.test(blob);
   const hasAudit = AUDIT_RE.test(blob);
@@ -157,7 +392,12 @@ const rows = [];
 for (const r of reports) {
   if (r.missing) {
     errors.push(`${r.name}: service directory not found or empty`);
-    rows.push({ name: r.name, status: "🔴 missing", domain: r.contract.domain, detail: "no source files" });
+    rows.push({
+      name: r.name,
+      status: "🔴 missing",
+      domain: r.contract.domain,
+      detail: "no source files",
+    });
     continue;
   }
   const c = r.contract;
@@ -168,7 +408,8 @@ for (const r of reports) {
   if (c.needDb && !r.hasDb) failures.push("no-db");
   if (r.routes === 0 && c.sensitive) failures.push("no-routes");
   if (c.needTests && r.tests === 0) failures.push("no-unit-tests");
-  if (c.sensitive && !r.hasIntegration && c.needTests) warnings.push(`${r.name}: no integration test references in tests/integration/**`);
+  if (c.sensitive && !r.hasIntegration && c.needTests)
+    warnings.push(`${r.name}: no integration test references in tests/integration/**`);
   if (r.suspicious.length) failures.push(`suspicious(${r.suspicious.length})`);
 
   let status;

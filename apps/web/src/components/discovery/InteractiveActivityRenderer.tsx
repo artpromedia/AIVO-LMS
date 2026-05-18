@@ -20,11 +20,7 @@ export interface InteractiveActivityRendererProps {
   chapter: AdventureChapter;
   activityNumber: number;
   totalActivities: number;
-  onAnswer: (
-    correct: boolean,
-    latencyMs: number,
-    payload?: Record<string, unknown>,
-  ) => void;
+  onAnswer: (correct: boolean, latencyMs: number, payload?: Record<string, unknown>) => void;
   onSkip: () => void;
   onSurfaceEvent?: (event: SurfaceTelemetryEvent) => void;
 }
@@ -34,17 +30,23 @@ function evaluateExactAnswer(activity: Activity, response: SurfaceResponse): boo
   if (expected === undefined || expected === null) return false;
   const submitted = response.answer ?? response.selectedChoiceId;
   if (typeof expected === "number") {
-    const numeric = typeof submitted === "number" ? submitted : Number(String(submitted ?? "").trim());
+    const numeric =
+      typeof submitted === "number" ? submitted : Number(String(submitted ?? "").trim());
     return Number.isFinite(numeric) && numeric === expected;
   }
   if (typeof expected === "boolean") {
     return Boolean(submitted) === expected;
   }
-  return String(submitted ?? "").trim().toLowerCase() === String(expected).trim().toLowerCase();
+  return (
+    String(submitted ?? "")
+      .trim()
+      .toLowerCase() === String(expected).trim().toLowerCase()
+  );
 }
 
 export default function InteractiveActivityRenderer(props: InteractiveActivityRendererProps) {
-  const { activity, chapter, activityNumber, totalActivities, onAnswer, onSkip, onSurfaceEvent } = props;
+  const { activity, chapter, activityNumber, totalActivities, onAnswer, onSkip, onSurfaceEvent } =
+    props;
   const startRef = useRef<number>(Date.now());
 
   if (!activity.surface) {
@@ -90,7 +92,11 @@ export default function InteractiveActivityRenderer(props: InteractiveActivityRe
       return;
     }
 
-    if (scoringMode === "exact" || (scoringMode === "hybrid" && (activity.scoring?.correctAnswer ?? surface.scoring.correctAnswer) !== undefined)) {
+    if (
+      scoringMode === "exact" ||
+      (scoringMode === "hybrid" &&
+        (activity.scoring?.correctAnswer ?? surface.scoring.correctAnswer) !== undefined)
+    ) {
       const correct = evaluateExactAnswer(activity, response);
       onAnswer(correct, latencyMs, { ...basePayload, correct });
       return;
@@ -103,7 +109,9 @@ export default function InteractiveActivityRenderer(props: InteractiveActivityRe
     <div className="fixed inset-0 vi-bg tier-scene-bg flex flex-col overflow-hidden pt-20">
       <div className="max-w-3xl mx-auto w-full px-4 py-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-lg" aria-hidden>{chapter.landmark.emoji}</span>
+          <span className="text-lg" aria-hidden>
+            {chapter.landmark.emoji}
+          </span>
           <span className="text-slate-600 text-xs font-extrabold">{chapter.title}</span>
         </div>
         <div

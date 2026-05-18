@@ -22,11 +22,7 @@ export const userRoleEnum = pgEnum("user_role", [
   "DEVOPS",
 ]);
 
-export const tenantTypeEnum = pgEnum("tenant_type", [
-  "B2C_FAMILY",
-  "B2B_SCHOOL",
-  "B2B_DISTRICT",
-]);
+export const tenantTypeEnum = pgEnum("tenant_type", ["B2C_FAMILY", "B2B_SCHOOL", "B2B_DISTRICT"]);
 
 export const functioningLevelEnum = pgEnum("functioning_level", [
   "STANDARD",

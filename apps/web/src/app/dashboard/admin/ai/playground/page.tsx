@@ -40,7 +40,9 @@ export default function AIPlaygroundPage() {
   const { accessToken } = useAuth();
   const [selectedTutor, setSelectedTutor] = useState(TUTORS[0].key);
   const [selectedModel, setSelectedModel] = useState(MODELS[0].id);
-  const [systemPrompt, setSystemPrompt] = useState("You are an AI tutor helping a child learn. Be encouraging, patient, and use simple language.");
+  const [systemPrompt, setSystemPrompt] = useState(
+    "You are an AI tutor helping a child learn. Be encouraging, patient, and use simple language.",
+  );
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -76,12 +78,28 @@ export default function AIPlaygroundPage() {
 
       if (res.ok) {
         const data = await res.json();
-        setMessages([...newMessages, { role: "assistant", content: data.response || data.content || "No response received." }]);
+        setMessages([
+          ...newMessages,
+          { role: "assistant", content: data.response || data.content || "No response received." },
+        ]);
       } else {
-        setMessages([...newMessages, { role: "assistant", content: `[Playground endpoint not yet connected. Model: ${selectedModel}, Tutor: ${selectedTutor}]\n\nThis is a simulated response. The AI playground will be functional once the brain-svc playground endpoint is deployed.` }]);
+        setMessages([
+          ...newMessages,
+          {
+            role: "assistant",
+            content: `[Playground endpoint not yet connected. Model: ${selectedModel}, Tutor: ${selectedTutor}]\n\nThis is a simulated response. The AI playground will be functional once the brain-svc playground endpoint is deployed.`,
+          },
+        ]);
       }
     } catch {
-      setMessages([...newMessages, { role: "assistant", content: "[Simulated response] The playground API is not yet available. This page allows testing AI tutor prompts once connected." }]);
+      setMessages([
+        ...newMessages,
+        {
+          role: "assistant",
+          content:
+            "[Simulated response] The playground API is not yet available. This page allows testing AI tutor prompts once connected.",
+        },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -90,14 +108,21 @@ export default function AIPlaygroundPage() {
   return (
     <div className="p-8 space-y-6">
       <div className="flex items-center gap-3 text-sm vi-text-muted">
-        <Link href="/dashboard/admin/ai" className="hover:text-[hsl(var(--visual-primary))] transition">AI & Brain Models</Link>
+        <Link
+          href="/dashboard/admin/ai"
+          className="hover:text-[hsl(var(--visual-primary))] transition"
+        >
+          AI & Brain Models
+        </Link>
         <span>/</span>
         <span className="vi-text font-medium">Prompt Playground</span>
       </div>
 
       <div>
         <h1 className="text-2xl font-heading font-bold vi-text">AI Prompt Playground</h1>
-        <p className="text-sm vi-text-muted mt-1">Test and refine AI tutor prompts with different models and configurations.</p>
+        <p className="text-sm vi-text-muted mt-1">
+          Test and refine AI tutor prompts with different models and configurations.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -106,7 +131,9 @@ export default function AIPlaygroundPage() {
             <h3 className="font-heading font-bold vi-text">Configuration</h3>
 
             <div>
-              <label htmlFor="pg-tutor" className="block text-sm font-medium vi-text mb-1">Tutor</label>
+              <label htmlFor="pg-tutor" className="block text-sm font-medium vi-text mb-1">
+                Tutor
+              </label>
               <select
                 id="pg-tutor"
                 value={selectedTutor}
@@ -114,13 +141,17 @@ export default function AIPlaygroundPage() {
                 className="w-full px-3 py-2 rounded-xl border vi-border text-sm bg-white focus:border-purple-400 outline-none"
               >
                 {TUTORS.map((t) => (
-                  <option key={t.key} value={t.key}>{t.name} — {t.desc}</option>
+                  <option key={t.key} value={t.key}>
+                    {t.name} — {t.desc}
+                  </option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label htmlFor="pg-model" className="block text-sm font-medium vi-text mb-1">Model</label>
+              <label htmlFor="pg-model" className="block text-sm font-medium vi-text mb-1">
+                Model
+              </label>
               <select
                 id="pg-model"
                 value={selectedModel}
@@ -128,13 +159,17 @@ export default function AIPlaygroundPage() {
                 className="w-full px-3 py-2 rounded-xl border vi-border text-sm bg-white focus:border-purple-400 outline-none"
               >
                 {MODELS.map((m) => (
-                  <option key={m.id} value={m.id}>{m.label} ({m.provider})</option>
+                  <option key={m.id} value={m.id}>
+                    {m.label} ({m.provider})
+                  </option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label htmlFor="pg-temp" className="block text-sm font-medium vi-text mb-1">Temperature: {temperature}</label>
+              <label htmlFor="pg-temp" className="block text-sm font-medium vi-text mb-1">
+                Temperature: {temperature}
+              </label>
               <input
                 id="pg-temp"
                 type="range"
@@ -148,7 +183,9 @@ export default function AIPlaygroundPage() {
             </div>
 
             <div>
-              <label htmlFor="pg-tokens" className="block text-sm font-medium vi-text mb-1">Max Tokens: {maxTokens}</label>
+              <label htmlFor="pg-tokens" className="block text-sm font-medium vi-text mb-1">
+                Max Tokens: {maxTokens}
+              </label>
               <input
                 id="pg-tokens"
                 type="range"
@@ -177,9 +214,16 @@ export default function AIPlaygroundPage() {
           <div className="vi-card flex flex-col h-[600px]">
             <div className="p-4 border-b vi-border flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Brain size={18} strokeWidth={2.5} className="text-[hsl(var(--visual-primary))]" aria-hidden="true" />
+                <Brain
+                  size={18}
+                  strokeWidth={2.5}
+                  className="text-[hsl(var(--visual-primary))]"
+                  aria-hidden="true"
+                />
                 <span className="font-semibold vi-text">{tutor?.name}</span>
-                <span className="text-xs vi-surface-soft vi-text-muted px-2 py-0.5 rounded-full">{selectedModel}</span>
+                <span className="text-xs vi-surface-soft vi-text-muted px-2 py-0.5 rounded-full">
+                  {selectedModel}
+                </span>
               </div>
               <button
                 onClick={() => setMessages([])}
@@ -196,12 +240,15 @@ export default function AIPlaygroundPage() {
                 </div>
               )}
               {messages.map((msg, i) => (
-                <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                  <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm ${
-                    msg.role === "user"
-                      ? "bg-purple-600 text-white"
-                      : "vi-surface-soft vi-text"
-                  }`}>
+                <div
+                  key={i}
+                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                >
+                  <div
+                    className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm ${
+                      msg.role === "user" ? "bg-purple-600 text-white" : "vi-surface-soft vi-text"
+                    }`}
+                  >
                     <p className="whitespace-pre-wrap">{msg.content}</p>
                   </div>
                 </div>

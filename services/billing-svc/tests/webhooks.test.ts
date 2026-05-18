@@ -77,18 +77,9 @@ test("readTenantFromMetadata extracts the tenant id", () => {
 });
 
 test("readPlanFromMetadata only accepts known plans", () => {
-  assert.equal(
-    readPlanFromMetadata({ aivo_plan_id: "single" } as Stripe.Metadata),
-    "single",
-  );
-  assert.equal(
-    readPlanFromMetadata({ aivo_plan_id: "family" } as Stripe.Metadata),
-    "family",
-  );
-  assert.equal(
-    readPlanFromMetadata({ aivo_plan_id: "bogus" } as Stripe.Metadata),
-    null,
-  );
+  assert.equal(readPlanFromMetadata({ aivo_plan_id: "single" } as Stripe.Metadata), "single");
+  assert.equal(readPlanFromMetadata({ aivo_plan_id: "family" } as Stripe.Metadata), "family");
+  assert.equal(readPlanFromMetadata({ aivo_plan_id: "bogus" } as Stripe.Metadata), null);
 });
 
 test("readTutorSkuFromMetadata only accepts known SKUs", () => {
@@ -330,7 +321,16 @@ test("customer.subscription.updated skips the write when older than last applied
 test("customer.subscription.updated applies when newer than last applied event", async () => {
   const lastApplied = new Date("2026-05-13T12:00:00Z");
   const { db, calls } = makeRecordingDb([
-    [{ id: "sub-row-1", lastStripeEventAt: lastApplied, stripeStatus: "active", tenantId: "t1", userId: "u1", cancelAtPeriodEnd: false }],
+    [
+      {
+        id: "sub-row-1",
+        lastStripeEventAt: lastApplied,
+        stripeStatus: "active",
+        tenantId: "t1",
+        userId: "u1",
+        cancelAtPeriodEnd: false,
+      },
+    ],
   ]);
   const newer = Math.floor(new Date("2026-05-13T12:10:00Z").getTime() / 1000);
   const sub: Partial<Stripe.Subscription> = {

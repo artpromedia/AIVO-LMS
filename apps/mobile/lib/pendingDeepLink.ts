@@ -14,19 +14,19 @@
  * On web this falls back to localStorage to match the rest of the
  * mobile auth helpers.
  */
-import { Platform } from 'react-native';
+import { Platform } from "react-native";
 
-const PENDING_DEEP_LINK_KEY = 'aivo_pending_deep_link';
+const PENDING_DEEP_LINK_KEY = "aivo_pending_deep_link";
 
-let SecureStore: typeof import('expo-secure-store') | null = null;
-if (Platform.OS !== 'web') {
+let SecureStore: typeof import("expo-secure-store") | null = null;
+if (Platform.OS !== "web") {
   // eslint-disable-next-line @typescript-eslint/no-require-imports -- conditional native module load on non-web platforms
-  SecureStore = require('expo-secure-store');
+  SecureStore = require("expo-secure-store");
 }
 
 export async function setPendingDeepLink(href: string): Promise<void> {
   if (!href) return;
-  if (Platform.OS === 'web') {
+  if (Platform.OS === "web") {
     try {
       localStorage.setItem(PENDING_DEEP_LINK_KEY, href);
     } catch {}
@@ -36,7 +36,7 @@ export async function setPendingDeepLink(href: string): Promise<void> {
 }
 
 export async function getPendingDeepLink(): Promise<string | null> {
-  if (Platform.OS === 'web') {
+  if (Platform.OS === "web") {
     try {
       return localStorage.getItem(PENDING_DEEP_LINK_KEY);
     } catch {
@@ -47,7 +47,7 @@ export async function getPendingDeepLink(): Promise<string | null> {
 }
 
 export async function clearPendingDeepLink(): Promise<void> {
-  if (Platform.OS === 'web') {
+  if (Platform.OS === "web") {
     try {
       localStorage.removeItem(PENDING_DEEP_LINK_KEY);
     } catch {}

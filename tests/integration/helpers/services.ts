@@ -51,15 +51,11 @@ export async function startAllServices(): Promise<void> {
 
     starts.push(
       new Promise((resolve) => {
-        const proc = spawn(
-          "node",
-          ["--loader", "ts-node/esm", "src/index.ts"],
-          {
-            cwd: serviceDir,
-            env: { ...env, [portEnvKey]: String(port) },
-            stdio: ["ignore", "pipe", "pipe"],
-          },
-        );
+        const proc = spawn("node", ["--loader", "ts-node/esm", "src/index.ts"], {
+          cwd: serviceDir,
+          env: { ...env, [portEnvKey]: String(port) },
+          stdio: ["ignore", "pipe", "pipe"],
+        });
         _processes.set(name, proc);
         // Resolve once the service signals it is ready (listens on port).
         const ready = setTimeout(resolve, 8000); // give 8s max per service
@@ -69,7 +65,10 @@ export async function startAllServices(): Promise<void> {
             resolve();
           }
         });
-        proc.on("error", () => { clearTimeout(ready); resolve(); });
+        proc.on("error", () => {
+          clearTimeout(ready);
+          resolve();
+        });
       }),
     );
   }

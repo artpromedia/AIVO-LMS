@@ -4,20 +4,61 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Mail, KeyRound, Lock, Flame, ArrowRight, ShieldCheck, Eye, EyeOff, Calculator, BookOpen, FlaskConical, Heart } from "lucide-react";
+import {
+  Mail,
+  KeyRound,
+  Lock,
+  Flame,
+  ArrowRight,
+  ShieldCheck,
+  Eye,
+  EyeOff,
+  Calculator,
+  BookOpen,
+  FlaskConical,
+  Heart,
+} from "lucide-react";
 
 const SUBJECT_PILLS = [
-  { key: "MATH",    label: "Math",    icon: Calculator,   color: "#E91E63", bg: "bg-pink-100",   text: "text-pink-700" },
-  { key: "READING", label: "Reading", icon: BookOpen,     color: "#0DA2E7", bg: "bg-cyan-100",   text: "text-cyan-700" },
-  { key: "SCIENCE", label: "Science", icon: FlaskConical, color: "#21C45D", bg: "bg-emerald-100",text: "text-emerald-700" },
-  { key: "SEL",     label: "SEL",     icon: Heart,        color: "#FFB700", bg: "bg-amber-100",  text: "text-amber-700" },
+  {
+    key: "MATH",
+    label: "Math",
+    icon: Calculator,
+    color: "#E91E63",
+    bg: "bg-pink-100",
+    text: "text-pink-700",
+  },
+  {
+    key: "READING",
+    label: "Reading",
+    icon: BookOpen,
+    color: "#0DA2E7",
+    bg: "bg-cyan-100",
+    text: "text-cyan-700",
+  },
+  {
+    key: "SCIENCE",
+    label: "Science",
+    icon: FlaskConical,
+    color: "#21C45D",
+    bg: "bg-emerald-100",
+    text: "text-emerald-700",
+  },
+  {
+    key: "SEL",
+    label: "SEL",
+    icon: Heart,
+    color: "#FFB700",
+    bg: "bg-amber-100",
+    text: "text-amber-700",
+  },
 ];
 
 const LEARNERS = [
-  { name: "Leo",   tutor: "nova",    bg: "bg-violet-100",  border: "border-violet-400" },
-  { name: "Maya",  tutor: "sage",    bg: "bg-emerald-100", border: "border-emerald-400" },
-  { name: "Noah",  tutor: "spark",   bg: "bg-amber-100",   border: "border-amber-400" },
-  { name: "Aria",  tutor: "harmony", bg: "bg-pink-100",    border: "border-pink-400" },
+  { name: "Leo", tutor: "nova", bg: "bg-violet-100", border: "border-violet-400" },
+  { name: "Maya", tutor: "sage", bg: "bg-emerald-100", border: "border-emerald-400" },
+  { name: "Noah", tutor: "spark", bg: "bg-amber-100", border: "border-amber-400" },
+  { name: "Aria", tutor: "harmony", bg: "bg-pink-100", border: "border-pink-400" },
 ];
 
 export function Auth() {
@@ -25,34 +66,47 @@ export function Auth() {
   const [showPwd, setShowPwd] = useState(false);
   const [selectedLearner, setSelectedLearner] = useState(0);
   const [activeSubject, setActiveSubject] = useState("MATH");
-  const [pinDigits] = useState(["3","9","•","•","•","•"]);
+  const [pinDigits] = useState(["3", "9", "•", "•", "•", "•"]);
 
   return (
     <div className="aivo-friendly min-h-screen bg-gradient-to-br from-[hsl(var(--primary-light))] via-white to-[hsl(var(--accent)/0.15)] flex items-center justify-center p-6 relative overflow-hidden">
-
       {/* Decorative blobs */}
       <div className="absolute -top-20 -left-20 w-[45vw] h-[45vw] bg-[hsl(var(--primary)/0.18)] rounded-full blur-3xl pointer-events-none aivo-blob" />
-      <div className="absolute -bottom-20 -right-20 w-[40vw] h-[40vw] bg-[hsl(var(--accent)/0.25)] rounded-full blur-3xl pointer-events-none aivo-blob" style={{animationDelay:'5s'}} />
-      <div className="absolute top-1/3 right-10 w-64 h-64 bg-[hsl(var(--secondary)/0.18)] rounded-full blur-3xl pointer-events-none aivo-blob" style={{animationDelay:'2s'}} />
+      <div
+        className="absolute -bottom-20 -right-20 w-[40vw] h-[40vw] bg-[hsl(var(--accent)/0.25)] rounded-full blur-3xl pointer-events-none aivo-blob"
+        style={{ animationDelay: "5s" }}
+      />
+      <div
+        className="absolute top-1/3 right-10 w-64 h-64 bg-[hsl(var(--secondary)/0.18)] rounded-full blur-3xl pointer-events-none aivo-blob"
+        style={{ animationDelay: "2s" }}
+      />
 
       <div className="w-full max-w-[480px] relative z-10">
-
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <a href="#" className="inline-flex">
-            <img src="/mockup-canvas/images/aivo-brand/aivo-logo-purple.png" alt="AIVO" className="h-11 w-auto" />
+            <img
+              src="/mockup-canvas/images/aivo-brand/aivo-logo-purple.png"
+              alt="AIVO"
+              className="h-11 w-auto"
+            />
           </a>
         </div>
 
         <Card className="p-8 rounded-[2rem] border-0 shadow-[0_20px_60px_-15px_rgba(124,58,237,0.25)] bg-white/95 backdrop-blur">
-
           <div className="text-center mb-7">
             <h1 className="text-3xl font-heading font-bold text-slate-900">Welcome back!</h1>
-            <p className="text-slate-500 font-medium mt-1.5">Ready for today's learning adventure?</p>
+            <p className="text-slate-500 font-medium mt-1.5">
+              Ready for today's learning adventure?
+            </p>
           </div>
 
           {/* Tab Switcher */}
-          <div role="tablist" aria-label="Sign in method" className="flex p-1.5 bg-slate-100 rounded-2xl mb-7">
+          <div
+            role="tablist"
+            aria-label="Sign in method"
+            className="flex p-1.5 bg-slate-100 rounded-2xl mb-7"
+          >
             <button
               role="tab"
               id="tab-email"
@@ -88,8 +142,12 @@ export function Auth() {
           </div>
 
           {tab === "email" && (
-            <div role="tabpanel" id="panel-email" aria-labelledby="tab-email" className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
-
+            <div
+              role="tabpanel"
+              id="panel-email"
+              aria-labelledby="tab-email"
+              className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300"
+            >
               {/* Streak preview */}
               <div className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-100 rounded-2xl p-4 flex items-center gap-4">
                 <div className="bg-orange-100 p-2.5 rounded-xl text-orange-500 shrink-0">
@@ -97,13 +155,21 @@ export function Auth() {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-bold text-orange-800">Leo is on a 12-day streak!</p>
-                  <p className="text-xs font-bold text-orange-600">Nova is ready for today's math quest</p>
+                  <p className="text-xs font-bold text-orange-600">
+                    Nova is ready for today's math quest
+                  </p>
                 </div>
-                <img src="/mockup-canvas/images/tutors/nova.png" alt="Nova" className="w-10 h-10 rounded-xl object-contain bg-violet-50" />
+                <img
+                  src="/mockup-canvas/images/tutors/nova.png"
+                  alt="Nova"
+                  className="w-10 h-10 rounded-xl object-contain bg-violet-50"
+                />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="font-bold text-slate-700 ml-1 text-sm">Email</Label>
+                <Label htmlFor="email" className="font-bold text-slate-700 ml-1 text-sm">
+                  Email
+                </Label>
                 <div className="relative">
                   <Mail className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                   <Input
@@ -117,8 +183,15 @@ export function Auth() {
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between items-center ml-1">
-                  <Label htmlFor="password" className="font-bold text-slate-700 text-sm">Password</Label>
-                  <a href="#" className="text-sm font-bold text-[hsl(var(--primary))] hover:underline">Forgot?</a>
+                  <Label htmlFor="password" className="font-bold text-slate-700 text-sm">
+                    Password
+                  </Label>
+                  <a
+                    href="#"
+                    className="text-sm font-bold text-[hsl(var(--primary))] hover:underline"
+                  >
+                    Forgot?
+                  </a>
                 </div>
                 <div className="relative">
                   <Lock className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
@@ -146,8 +219,12 @@ export function Auth() {
           )}
 
           {tab === "pin" && (
-            <div role="tabpanel" id="panel-pin" aria-labelledby="tab-pin" className="space-y-7 animate-in fade-in slide-in-from-bottom-2 duration-300">
-
+            <div
+              role="tabpanel"
+              id="panel-pin"
+              aria-labelledby="tab-pin"
+              className="space-y-7 animate-in fade-in slide-in-from-bottom-2 duration-300"
+            >
               {/* Learner picker */}
               <div className="text-center">
                 <p className="font-bold text-slate-700 mb-4 text-sm">Who's learning today?</p>
@@ -160,12 +237,22 @@ export function Auth() {
                         selectedLearner === idx ? "scale-110" : "opacity-70 hover:opacity-100"
                       }`}
                     >
-                      <div className={`w-16 h-16 rounded-2xl ${l.bg} border-4 ${
-                        selectedLearner === idx ? l.border + " shadow-lg" : "border-transparent"
-                      } flex items-center justify-center overflow-hidden`}>
-                        <img src={`/mockup-canvas/images/tutors/${l.tutor}.png`} alt={l.name} className="w-12 h-12 object-contain" />
+                      <div
+                        className={`w-16 h-16 rounded-2xl ${l.bg} border-4 ${
+                          selectedLearner === idx ? l.border + " shadow-lg" : "border-transparent"
+                        } flex items-center justify-center overflow-hidden`}
+                      >
+                        <img
+                          src={`/mockup-canvas/images/tutors/${l.tutor}.png`}
+                          alt={l.name}
+                          className="w-12 h-12 object-contain"
+                        />
                       </div>
-                      <span className={`text-xs font-bold ${selectedLearner === idx ? "text-slate-900" : "text-slate-500"}`}>{l.name}</span>
+                      <span
+                        className={`text-xs font-bold ${selectedLearner === idx ? "text-slate-900" : "text-slate-500"}`}
+                      >
+                        {l.name}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -173,7 +260,9 @@ export function Auth() {
 
               {/* Subject pills */}
               <div>
-                <p className="font-bold text-slate-700 mb-3 text-sm text-center">What sounds fun?</p>
+                <p className="font-bold text-slate-700 mb-3 text-sm text-center">
+                  What sounds fun?
+                </p>
                 <div className="flex justify-center gap-2 flex-wrap">
                   {SUBJECT_PILLS.map((s) => {
                     const Icon = s.icon;
@@ -198,7 +287,9 @@ export function Auth() {
 
               {/* PIN entry */}
               <div>
-                <p className="font-bold text-slate-700 mb-3 text-sm text-center">Enter your secret PIN</p>
+                <p className="font-bold text-slate-700 mb-3 text-sm text-center">
+                  Enter your secret PIN
+                </p>
                 <div className="flex justify-center gap-2">
                   {pinDigits.map((d, i) => (
                     <div
@@ -221,10 +312,8 @@ export function Auth() {
                 Let's Go!
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
-
             </div>
           )}
-
         </Card>
 
         {/* Trust Signal */}
@@ -234,10 +323,12 @@ export function Auth() {
             COPPA · FERPA · SOC 2 Compliant
           </div>
           <p className="text-sm font-medium text-slate-500 mt-5">
-            New to AIVO? <a href="#" className="text-[hsl(var(--primary))] font-bold hover:underline">Start your free trial</a>
+            New to AIVO?{" "}
+            <a href="#" className="text-[hsl(var(--primary))] font-bold hover:underline">
+              Start your free trial
+            </a>
           </p>
         </div>
-
       </div>
     </div>
   );

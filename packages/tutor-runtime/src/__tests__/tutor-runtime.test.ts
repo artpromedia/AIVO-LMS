@@ -129,12 +129,10 @@ describe("planSession", () => {
   });
 
   it("transforms activities to the learner's functioning level", () => {
-    const plan = planSession(
-      tutor,
-      { ...baseCtx, functioningLevel: "LOW_VERBAL" },
-      pack,
-      { maxActivities: 2, rng: () => 0 },
-    );
+    const plan = planSession(tutor, { ...baseCtx, functioningLevel: "LOW_VERBAL" }, pack, {
+      maxActivities: 2,
+      rng: () => 0,
+    });
     for (const a of plan.activities) {
       expect(a.tags).toContain("level:low_verbal");
       expect(a.adaptations?.maxOnScreenChoices).toBeLessThanOrEqual(2);

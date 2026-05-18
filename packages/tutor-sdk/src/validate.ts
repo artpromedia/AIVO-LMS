@@ -38,7 +38,11 @@ export function validateTutorDefinition(def: TutorDefinition): TutorDefinitionIs
   }
 
   if (!def.subjects || def.subjects.length === 0) {
-    issues.push({ code: "empty_subjects", detail: "At least one subject is required.", path: "subjects" });
+    issues.push({
+      code: "empty_subjects",
+      detail: "At least one subject is required.",
+      path: "subjects",
+    });
   }
   if (!def.gradeBands || def.gradeBands.length === 0) {
     issues.push({
@@ -76,7 +80,8 @@ export function validateTutorDefinition(def: TutorDefinition): TutorDefinitionIs
       seen.add(c);
     }
     // Voice in/out implies consent must be required.
-    const hasVoice = def.capabilities.includes("voice_in") || def.capabilities.includes("voice_out");
+    const hasVoice =
+      def.capabilities.includes("voice_in") || def.capabilities.includes("voice_out");
     if (hasVoice && def.policy && def.policy.requiresConsent === false) {
       issues.push({
         code: "policy_consent_required_for_voice",

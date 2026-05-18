@@ -18,29 +18,29 @@ Authoritative locations:
 
 Driven by `AVAILABLE_TEMPLATES`. The Sprint 13 baseline ships:
 
-| Template id | Channels | Audience |
-|---|---|---|
-| `welcome` | email | parent (account created) |
-| `collaboration_invite` | email | parent / teacher (team invite) |
-| `password_reset` | email | any signed-up user |
-| `progress_report` | email | parent (weekly summary) |
-| `milestone_achieved` | email + push | parent + learner |
-| `session_reminder` | push + email | learner + parent |
-| `iep_update` | email + push | parent |
-| `iep_in_review_parent` | email | parent |
-| `iep_finalised_parent` | email | parent |
-| `iep_comment_mention` | email | mentioned team member |
-| `iep_progress_note` | email | parent |
-| `iep_progress_report_sent` | email | parent |
-| `iep_amendment_proposed` | email | parent |
-| `iep_amendment_acknowledged` | email | team |
-| `iep_review_reminder` | email | parent |
-| `evaluation_submitted` | email | parent |
-| `evaluation_submitted_admin` | email | district admin |
-| `evaluation_decided` | email | parent |
-| `mfa_code` | email | any |
-| `district_admin_invite` | email | district admin |
-| `newsletter_confirmation` | email | marketing opt-in |
+| Template id                  | Channels     | Audience                       |
+| ---------------------------- | ------------ | ------------------------------ |
+| `welcome`                    | email        | parent (account created)       |
+| `collaboration_invite`       | email        | parent / teacher (team invite) |
+| `password_reset`             | email        | any signed-up user             |
+| `progress_report`            | email        | parent (weekly summary)        |
+| `milestone_achieved`         | email + push | parent + learner               |
+| `session_reminder`           | push + email | learner + parent               |
+| `iep_update`                 | email + push | parent                         |
+| `iep_in_review_parent`       | email        | parent                         |
+| `iep_finalised_parent`       | email        | parent                         |
+| `iep_comment_mention`        | email        | mentioned team member          |
+| `iep_progress_note`          | email        | parent                         |
+| `iep_progress_report_sent`   | email        | parent                         |
+| `iep_amendment_proposed`     | email        | parent                         |
+| `iep_amendment_acknowledged` | email        | team                           |
+| `iep_review_reminder`        | email        | parent                         |
+| `evaluation_submitted`       | email        | parent                         |
+| `evaluation_submitted_admin` | email        | district admin                 |
+| `evaluation_decided`         | email        | parent                         |
+| `mfa_code`                   | email        | any                            |
+| `district_admin_invite`      | email        | district admin                 |
+| `newsletter_confirmation`    | email        | marketing opt-in               |
 
 Add a new template by extending `AVAILABLE_TEMPLATES` AND writing a
 `renderTemplate` branch in the same PR. The audit script enforces
@@ -48,12 +48,12 @@ that the catalog and the renderer agree.
 
 ## Channels
 
-| Channel | Provider | Required env |
-|---|---|---|
-| email | Postmark | `POSTMARK_API_KEY` |
-| in-app | comms-svc database | n/a |
-| push | Expo push (mobile) | `EXPO_ACCESS_TOKEN` |
-| SMS | provider-pluggable; OFF by default | `SMS_PROVIDER` flag |
+| Channel | Provider                           | Required env        |
+| ------- | ---------------------------------- | ------------------- |
+| email   | Postmark                           | `POSTMARK_API_KEY`  |
+| in-app  | comms-svc database                 | n/a                 |
+| push    | Expo push (mobile)                 | `EXPO_ACCESS_TOKEN` |
+| SMS     | provider-pluggable; OFF by default | `SMS_PROVIDER` flag |
 
 The web inbox surface lives at `/parent/notifications`,
 `/learner/notifications`, `/teacher/notifications`. The mobile push

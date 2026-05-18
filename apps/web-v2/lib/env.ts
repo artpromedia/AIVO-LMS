@@ -9,7 +9,16 @@ import { z } from "zod";
  * full stack on disk.
  */
 
-const isProd = process.env.NODE_ENV === "production";
+// Strict production validation must NOT fire during `next build` — that
+// phase compiles the code with NODE_ENV=production but doesn't need real
+// DATABASE_URL / SESSION_SECRET / etc. Validation should run at runtime
+// startup ("phase-production-server"), not at compile time
+// ("phase-production-build"). Treat the build phase as non-prod for the
+// purpose of schema strictness; the runtime path still rejects
+// misconfigured deployments at first request.
+const NEXT_PHASE = process.env.NEXT_PHASE ?? "";
+const isBuildPhase = NEXT_PHASE === "phase-production-build";
+const isProd = process.env.NODE_ENV === "production" && !isBuildPhase;
 
 // Sprint 03: AUTH_MODE=mock is a developer affordance only. In production
 // it MUST be set to a real provider, or the app fails to boot. The

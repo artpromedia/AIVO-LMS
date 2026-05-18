@@ -1,6 +1,6 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { theme } from './theme';
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { theme } from "./theme";
 
 interface StatCardProps {
   label: string;
@@ -10,10 +10,18 @@ interface StatCardProps {
   subtitle?: string;
 }
 
-export function StatCard({ label, value, icon, color = theme.colors.primary, subtitle }: StatCardProps) {
+export function StatCard({
+  label,
+  value,
+  icon,
+  color = theme.colors.primary,
+  subtitle,
+}: StatCardProps) {
   return (
     <View style={styles.card}>
-      {icon && <View style={[styles.iconContainer, { backgroundColor: color + '15' }]}>{icon}</View>}
+      {icon && (
+        <View style={[styles.iconContainer, { backgroundColor: color + "15" }]}>{icon}</View>
+      )}
       <Text style={[styles.value, { color }]}>{value}</Text>
       <Text style={styles.label}>{label}</Text>
       {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
@@ -26,7 +34,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.card,
     borderRadius: theme.radius.xl,
     padding: theme.spacing.md,
-    alignItems: 'center',
+    alignItems: "center",
     flex: 1,
     ...theme.shadows.sm,
   },
@@ -34,8 +42,8 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 8,
   },
   value: {
@@ -47,7 +55,7 @@ const styles = StyleSheet.create({
     fontFamily: theme.fonts.body,
     color: theme.colors.textSecondary,
     marginTop: 4,
-    textAlign: 'center',
+    textAlign: "center",
   },
   subtitle: {
     fontSize: 11,

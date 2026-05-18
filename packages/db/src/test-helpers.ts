@@ -12,8 +12,9 @@ import { createDb, type Database } from "./index.js";
 export async function closeDb(db: Database | undefined | null): Promise<void> {
   if (!db) return;
   try {
-    await (db as unknown as { $client?: { end?: (opts?: unknown) => Promise<void> } })
-      .$client?.end?.({ timeout: 2 });
+    await (
+      db as unknown as { $client?: { end?: (opts?: unknown) => Promise<void> } }
+    ).$client?.end?.({ timeout: 2 });
   } catch {
     /* ignore — teardown is best-effort */
   }

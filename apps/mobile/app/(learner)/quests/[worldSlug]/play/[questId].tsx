@@ -1,20 +1,13 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  Pressable,
-  StyleSheet,
-  ActivityIndicator,
-} from 'react-native';
-import { useLocalSearchParams, router } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useAuth } from '@/hooks/useAuth';
-import { apiFetch } from '@/lib/api';
-import { API } from '@/constants/api';
-import { AivoCard } from '@aivo/mobile-ui';
-import { colors, spacing, radius } from '@/constants/colors';
+import React, { useEffect, useMemo, useState } from "react";
+import { View, Text, ScrollView, Pressable, StyleSheet, ActivityIndicator } from "react-native";
+import { useLocalSearchParams, router } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import { useAuth } from "@/hooks/useAuth";
+import { apiFetch } from "@/lib/api";
+import { API } from "@/constants/api";
+import { AivoCard } from "@aivo/mobile-ui";
+import { colors, spacing, radius } from "@/constants/colors";
 
 interface QuestWorld {
   key: string;
@@ -51,7 +44,7 @@ interface QuestChapter {
   bossAssessment: BossAssessment | null;
 }
 
-type Phase = 'intro' | 'play' | 'outro';
+type Phase = "intro" | "play" | "outro";
 
 interface CompletionResult {
   score: number;
@@ -73,8 +66,8 @@ export default function QuestPlayScreen() {
 
   const [world, setWorld] = useState<QuestWorld | null>(null);
   const [quest, setQuest] = useState<QuestChapter | null>(null);
-  const [loadError, setLoadError] = useState<'not_found' | 'mismatch' | 'fetch' | null>(null);
-  const [phase, setPhase] = useState<Phase>('intro');
+  const [loadError, setLoadError] = useState<"not_found" | "mismatch" | "fetch" | null>(null);
+  const [phase, setPhase] = useState<Phase>("intro");
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
   const [completion, setCompletion] = useState<CompletionResult | null>(null);
@@ -91,24 +84,24 @@ export default function QuestPlayScreen() {
         ]);
         if (cancelled) return;
         if (wr.status === 404 || cr.status === 404) {
-          setLoadError('not_found');
+          setLoadError("not_found");
           return;
         }
         if (!wr.ok || !cr.ok) {
-          setLoadError('fetch');
+          setLoadError("fetch");
           return;
         }
         const resolvedWorld: QuestWorld = await wr.json();
         const body = await cr.json();
         const resolvedQuest: QuestChapter = body.quest;
         if (resolvedQuest.worldKey !== resolvedWorld.key) {
-          setLoadError('mismatch');
+          setLoadError("mismatch");
           return;
         }
         setWorld(resolvedWorld);
         setQuest(resolvedQuest);
       } catch {
-        if (!cancelled) setLoadError('fetch');
+        if (!cancelled) setLoadError("fetch");
       }
     })();
     return () => {
@@ -116,10 +109,7 @@ export default function QuestPlayScreen() {
     };
   }, [isAuthenticated, user, slug, id]);
 
-  const questions = useMemo<BossQuestion[]>(
-    () => quest?.bossAssessment?.questions ?? [],
-    [quest],
-  );
+  const questions = useMemo<BossQuestion[]>(() => quest?.bossAssessment?.questions ?? [], [quest]);
 
   const allAnswered = questions.length > 0 && questions.every((q) => answers[q.id] !== undefined);
   const score = useMemo(() => {
@@ -135,8 +125,8 @@ export default function QuestPlayScreen() {
     if (!user || !quest) return;
     setSubmitting(true);
     try {
-      const res = await apiFetch(API.ENGAGEMENT, '/api/engagement/quests/complete', {
-        method: 'POST',
+      const res = await apiFetch(API.ENGAGEMENT, "/api/engagement/quests/complete", {
+        method: "POST",
         body: JSON.stringify({ learnerId: user.id, questId: quest.id, score }),
       });
       if (res.ok) {
@@ -147,12 +137,12 @@ export default function QuestPlayScreen() {
           coinAwarded: body.coinAwarded ?? 0,
           alreadyCompleted: !!body.alreadyCompleted,
         });
-        setPhase('outro');
+        setPhase("outro");
       } else {
-        setLoadError('fetch');
+        setLoadError("fetch");
       }
     } catch {
-      setLoadError('fetch');
+      setLoadError("fetch");
     } finally {
       setSubmitting(false);
     }
@@ -198,18 +188,16 @@ export default function QuestPlayScreen() {
         {world.subject} · Chapter {quest.chapterNumber}
       </Text>
 
-      {phase === 'intro' && (
+      {phase === "intro" && (
         <AivoCard style={styles.introCard}>
-          <Text style={styles.introBody}>
-            {quest.narrativeIntro ?? quest.description ?? ''}
-          </Text>
-          <Pressable onPress={() => setPhase('play')} style={styles.primaryButton}>
+          <Text style={styles.introBody}>{quest.narrativeIntro ?? quest.description ?? ""}</Text>
+          <Pressable onPress={() => setPhase("play")} style={styles.primaryButton}>
             <Text style={styles.primaryButtonText}>Begin →</Text>
           </Pressable>
         </AivoCard>
       )}
 
-      {phase === 'play' &&
+      {phase === "play" &&
         questions.map((q, idx) => {
           const chosen = answers[q.id];
           const isRevealed = revealed[q.id];
@@ -224,16 +212,16 @@ export default function QuestPlayScreen() {
                 const correct = q.answerIndex === choiceIdx;
                 const showState = isRevealed && (selected || correct);
                 let borderColor = colors.border;
-                let bg = '#fff';
+                let bg = "#fff";
                 if (showState && correct) {
-                  borderColor = '#16a34a';
-                  bg = '#dcfce7';
+                  borderColor = "#16a34a";
+                  bg = "#dcfce7";
                 } else if (showState && !correct && selected) {
-                  borderColor = '#dc2626';
-                  bg = '#fee2e2';
+                  borderColor = "#dc2626";
+                  bg = "#fee2e2";
                 } else if (selected) {
                   borderColor = colors.primary;
-                  bg = '#eef2ff';
+                  bg = "#eef2ff";
                 }
                 return (
                   <Pressable
@@ -245,10 +233,7 @@ export default function QuestPlayScreen() {
                     }}
                     accessibilityRole="radio"
                     accessibilityState={{ selected }}
-                    style={[
-                      styles.choice,
-                      { borderColor, backgroundColor: bg },
-                    ]}
+                    style={[styles.choice, { borderColor, backgroundColor: bg }]}
                   >
                     <Text style={styles.choiceText}>{choice}</Text>
                   </Pressable>
@@ -256,8 +241,8 @@ export default function QuestPlayScreen() {
               })}
               {isRevealed && (
                 <Text style={styles.explanation}>
-                  <Text style={{ fontFamily: 'Nunito-Bold' }}>
-                    {answers[q.id] === q.answerIndex ? 'Correct! ' : 'Not quite. '}
+                  <Text style={{ fontFamily: "Nunito-Bold" }}>
+                    {answers[q.id] === q.answerIndex ? "Correct! " : "Not quite. "}
                   </Text>
                   {q.explanation}
                 </Text>
@@ -266,28 +251,23 @@ export default function QuestPlayScreen() {
           );
         })}
 
-      {phase === 'play' && (
+      {phase === "play" && (
         <View style={styles.finishRow}>
           <View>
             <Text style={styles.finishLabel}>Score</Text>
-            <Text style={styles.finishValue}>{allAnswered ? `${score}%` : '—'}</Text>
+            <Text style={styles.finishValue}>{allAnswered ? `${score}%` : "—"}</Text>
           </View>
           <Pressable
             disabled={!allAnswered || submitting}
             onPress={submitCompletion}
-            style={[
-              styles.primaryButton,
-              (!allAnswered || submitting) && { opacity: 0.5 },
-            ]}
+            style={[styles.primaryButton, (!allAnswered || submitting) && { opacity: 0.5 }]}
           >
-            <Text style={styles.primaryButtonText}>
-              {submitting ? 'Saving…' : 'Finish quest'}
-            </Text>
+            <Text style={styles.primaryButtonText}>{submitting ? "Saving…" : "Finish quest"}</Text>
           </Pressable>
         </View>
       )}
 
-      {phase === 'outro' && completion && (
+      {phase === "outro" && completion && (
         <AivoCard style={styles.outroCard}>
           <View style={styles.celebrateRow}>
             <Ionicons name="sparkles" size={18} color="#fff" />
@@ -326,29 +306,29 @@ export default function QuestPlayScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: spacing.md },
-  backRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: spacing.md },
-  backText: { fontSize: 16, fontFamily: 'Nunito-SemiBold', color: colors.primary },
-  title: { fontSize: 22, fontFamily: 'Nunito-ExtraBold', color: colors.text },
+  backRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: spacing.md },
+  backText: { fontSize: 16, fontFamily: "Nunito-SemiBold", color: colors.primary },
+  title: { fontSize: 22, fontFamily: "Nunito-ExtraBold", color: colors.text },
   subtitle: {
     fontSize: 12,
-    fontFamily: 'Nunito-Bold',
-    color: '#6366f1',
-    textTransform: 'uppercase',
+    fontFamily: "Nunito-Bold",
+    color: "#6366f1",
+    textTransform: "uppercase",
     marginTop: 4,
     marginBottom: spacing.lg,
   },
   introCard: { padding: spacing.md, gap: spacing.md },
-  introBody: { fontSize: 15, fontFamily: 'Nunito-Regular', color: colors.text, lineHeight: 22 },
+  introBody: { fontSize: 15, fontFamily: "Nunito-Regular", color: colors.text, lineHeight: 22 },
   questionCard: { padding: spacing.md, marginBottom: spacing.sm, gap: spacing.xs },
   questionMeta: {
     fontSize: 11,
-    fontFamily: 'Nunito-Bold',
+    fontFamily: "Nunito-Bold",
     color: colors.textSecondary,
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
   },
   questionPrompt: {
     fontSize: 15,
-    fontFamily: 'Nunito-Bold',
+    fontFamily: "Nunito-Bold",
     color: colors.text,
     marginBottom: spacing.sm,
   },
@@ -359,21 +339,21 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginBottom: spacing.xs,
     minHeight: 44,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
-  choiceText: { fontSize: 14, fontFamily: 'Nunito-SemiBold', color: colors.text },
+  choiceText: { fontSize: 14, fontFamily: "Nunito-SemiBold", color: colors.text },
   explanation: {
     fontSize: 13,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.textSecondary,
     marginTop: spacing.xs,
   },
   finishRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     padding: spacing.md,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: radius.lg,
     borderWidth: 2,
     borderColor: colors.border,
@@ -381,55 +361,70 @@ const styles = StyleSheet.create({
   },
   finishLabel: {
     fontSize: 11,
-    fontFamily: 'Nunito-Bold',
+    fontFamily: "Nunito-Bold",
     color: colors.textSecondary,
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
   },
-  finishValue: { fontSize: 22, fontFamily: 'Nunito-ExtraBold', color: colors.text },
+  finishValue: { fontSize: 22, fontFamily: "Nunito-ExtraBold", color: colors.text },
   primaryButton: {
     paddingHorizontal: spacing.md,
     paddingVertical: 10,
     borderRadius: radius.lg,
     backgroundColor: colors.primary,
     minHeight: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
-  primaryButtonText: { color: '#fff', fontFamily: 'Nunito-Bold', fontSize: 14 },
-  outroCard: { padding: spacing.lg, backgroundColor: '#4f46e5', gap: spacing.sm },
-  celebrateRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  primaryButtonText: { color: "#fff", fontFamily: "Nunito-Bold", fontSize: 14 },
+  outroCard: { padding: spacing.lg, backgroundColor: "#4f46e5", gap: spacing.sm },
+  celebrateRow: { flexDirection: "row", alignItems: "center", gap: 6 },
   celebrateLabel: {
-    color: '#fff',
-    fontFamily: 'Nunito-Bold',
+    color: "#fff",
+    fontFamily: "Nunito-Bold",
     fontSize: 12,
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
   },
-  outroScore: { color: '#fff', fontSize: 32, fontFamily: 'Nunito-ExtraBold' },
-  outroBody: { color: 'rgba(255,255,255,0.9)', fontSize: 14, fontFamily: 'Nunito-Regular', lineHeight: 20 },
-  rewardRow: { flexDirection: 'row', gap: spacing.lg, marginTop: spacing.sm },
-  rewardValue: { color: '#fff', fontSize: 20, fontFamily: 'Nunito-ExtraBold' },
-  rewardLabel: { color: 'rgba(255,255,255,0.7)', fontSize: 11, fontFamily: 'Nunito-Bold', textTransform: 'uppercase' },
-  alreadyText: { color: 'rgba(255,255,255,0.7)', fontSize: 12, fontFamily: 'Nunito-Regular', marginTop: spacing.xs },
+  outroScore: { color: "#fff", fontSize: 32, fontFamily: "Nunito-ExtraBold" },
+  outroBody: {
+    color: "rgba(255,255,255,0.9)",
+    fontSize: 14,
+    fontFamily: "Nunito-Regular",
+    lineHeight: 20,
+  },
+  rewardRow: { flexDirection: "row", gap: spacing.lg, marginTop: spacing.sm },
+  rewardValue: { color: "#fff", fontSize: 20, fontFamily: "Nunito-ExtraBold" },
+  rewardLabel: {
+    color: "rgba(255,255,255,0.7)",
+    fontSize: 11,
+    fontFamily: "Nunito-Bold",
+    textTransform: "uppercase",
+  },
+  alreadyText: {
+    color: "rgba(255,255,255,0.7)",
+    fontSize: 12,
+    fontFamily: "Nunito-Regular",
+    marginTop: spacing.xs,
+  },
   outroButton: {
     marginTop: spacing.md,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingHorizontal: spacing.md,
     paddingVertical: 10,
     borderRadius: radius.lg,
-    alignItems: 'center',
+    alignItems: "center",
     minHeight: 44,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
-  outroButtonText: { color: '#4f46e5', fontFamily: 'Nunito-Bold', fontSize: 14 },
+  outroButtonText: { color: "#4f46e5", fontFamily: "Nunito-Bold", fontSize: 14 },
   notFoundTitle: {
     fontSize: 20,
-    fontFamily: 'Nunito-ExtraBold',
+    fontFamily: "Nunito-ExtraBold",
     color: colors.text,
     marginTop: spacing.xl,
   },
   notFoundSlug: {
     fontSize: 13,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.textSecondary,
     marginTop: spacing.xs,
   },

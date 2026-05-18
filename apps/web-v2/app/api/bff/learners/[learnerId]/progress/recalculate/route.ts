@@ -28,12 +28,16 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection"],
+      requestId,
+    );
     if (consentErr) return consentErr;
 
     const learner = getLearner(learnerId, session!.tenantId);
-    if (!learner)
-      return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
+    if (!learner) return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
 
     const path = regenerateLearningPath(learnerId, session!.tenantId);
     audit(session!, "progress.recalculate", requestId, { learnerId });

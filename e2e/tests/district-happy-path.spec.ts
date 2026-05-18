@@ -49,11 +49,14 @@ test.describe("district admin happy path", () => {
     const enabled = await isTestModeOn();
     test.skip(
       !enabled,
-      `Requires identity-svc with IDENTITY_TEST_MODE=1 reachable at ${IDENTITY_BASE}.`
+      `Requires identity-svc with IDENTITY_TEST_MODE=1 reachable at ${IDENTITY_BASE}.`,
     );
   });
 
-  test("seeded DISTRICT_ADMIN can sign in and reach /dashboard/district", async ({ page, request }) => {
+  test("seeded DISTRICT_ADMIN can sign in and reach /dashboard/district", async ({
+    page,
+    request,
+  }) => {
     // (1) Seed (idempotent).
     const seedRes = await request.post(`${IDENTITY_BASE}/api/__test__/seed-district-admin`, {
       data: { email: EMAIL, password: PASSWORD, mfaEnabled: MFA_ENABLED },
@@ -66,7 +69,7 @@ test.describe("district admin happy path", () => {
     await page.getByLabel(/^password$/i).fill(PASSWORD);
 
     const districtLoginRespPromise = page.waitForResponse((r) =>
-      r.url().includes("/api/auth/district-login")
+      r.url().includes("/api/auth/district-login"),
     );
     await page.getByRole("button", { name: /sign in to district console/i }).click();
     const districtLoginResp = await districtLoginRespPromise;
@@ -76,7 +79,7 @@ test.describe("district admin happy path", () => {
     // (2a) MFA branch (only when E2E_DISTRICT_MFA_ENABLED=1).
     if (body.mfaPending) {
       const codeRes = await request.get(
-        `${IDENTITY_BASE}/api/__test__/last-mfa-code/${encodeURIComponent(EMAIL)}`
+        `${IDENTITY_BASE}/api/__test__/last-mfa-code/${encodeURIComponent(EMAIL)}`,
       );
       expect(codeRes.ok()).toBeTruthy();
       const { code } = await codeRes.json();

@@ -55,14 +55,28 @@ const SUB_DOMAIN_MAP: Record<string, DapeCategory> = {
 // Bare "motor" / "coordination" are excluded so goals like "visual-motor
 // integration for reading" don't get pulled into DAPE. "motor planning"
 // is included because it is a core DAPE skill area.
-const MOTOR_HINT = /\b(gross\s*motor|fine\s*motor|adapted\s*pe|adapted\s*physical|\bdape\b|locomotor|object\s*control|midline\s*crossing|motor\s*planning|handwriting\s*(?:legib|formation)|pencil\s*grip|bilateral\s*coordination|gait\s*training|balance\s*(?:training|skills)|vestibular\s*regulation|proprioceptive\s*input|heavy\s*work)\b/i;
+const MOTOR_HINT =
+  /\b(gross\s*motor|fine\s*motor|adapted\s*pe|adapted\s*physical|\bdape\b|locomotor|object\s*control|midline\s*crossing|motor\s*planning|handwriting\s*(?:legib|formation)|pencil\s*grip|bilateral\s*coordination|gait\s*training|balance\s*(?:training|skills)|vestibular\s*regulation|proprioceptive\s*input|heavy\s*work)\b/i;
 
-const DAPE_DOMAINS = new Set(["motor", "gross_motor", "fine_motor", "dape", "adapted_pe", "physical"]);
+const DAPE_DOMAINS = new Set([
+  "motor",
+  "gross_motor",
+  "fine_motor",
+  "dape",
+  "adapted_pe",
+  "physical",
+]);
 
 // Roots where we explicitly do NOT want a text match to flip the goal into
 // DAPE — the goal is scoped elsewhere and the language overlaps coincidentally.
 const NON_DAPE_DOMAINS = new Set([
-  "math", "ela", "speech", "behavior", "social", "life_skills", "executive_function",
+  "math",
+  "ela",
+  "speech",
+  "behavior",
+  "social",
+  "life_skills",
+  "executive_function",
 ]);
 
 const DAPE_SERVICE_TYPES = /\b(adapted\s*physical|adapted\s*pe|\bdape\b|adaptive\s*physical)\b/i;
@@ -144,11 +158,8 @@ export function buildDapeProfileSummary(
       sampleGoal: v.sampleGoal,
     }));
 
-  const source: DapeProfileSummary["source"] = hasService && motor.length > 0
-    ? "service+goal"
-    : hasService
-      ? "service"
-      : "goal";
+  const source: DapeProfileSummary["source"] =
+    hasService && motor.length > 0 ? "service+goal" : hasService ? "service" : "goal";
 
   return {
     active: true,

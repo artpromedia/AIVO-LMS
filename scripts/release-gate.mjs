@@ -61,9 +61,7 @@ for (const r of results) {
   const mark = r.ok ? "PASS" : "FAIL";
   process.stdout.write(`${mark}  ${r.name.padEnd(28)} ${r.ms} ms\n`);
 }
-process.stdout.write(
-  `\n${results.length} gate(s) run; ${failures} failure(s).\n`,
-);
+process.stdout.write(`\n${results.length} gate(s) run; ${failures} failure(s).\n`);
 
 if (failures > 0) {
   process.stdout.write(

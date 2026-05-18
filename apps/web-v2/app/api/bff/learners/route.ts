@@ -2,7 +2,12 @@ import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole } from "@/lib/bff/guards";
 import { audit } from "@/lib/bff/audit";
-import { createLearner, listLearnersForParent, refreshLearnerReadiness, recordAgeGate } from "@/lib/db/repos";
+import {
+  createLearner,
+  listLearnersForParent,
+  refreshLearnerReadiness,
+  recordAgeGate,
+} from "@/lib/db/repos";
 import { createLearnerSchema } from "@/lib/validators/learner";
 
 export const dynamic = "force-dynamic";
@@ -36,10 +41,7 @@ export async function POST(req: Request) {
     const json = await req.json().catch(() => ({}));
     const parsed = createLearnerSchema.safeParse(json);
     if (!parsed.success) {
-      return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: parsed.error.message },
-        requestId,
-      );
+      return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.message }, requestId);
     }
     const learner = createLearner({
       tenantId: session!.tenantId,

@@ -45,7 +45,9 @@ export class PostgresOpsAlertOutboxStore implements OpsAlertOutboxStore {
     let drained = 0;
     for (const row of rows) {
       const envelope =
-        typeof row.payload === "string" ? (JSON.parse(row.payload) as OpsAlertEnvelope) : (row.payload as OpsAlertEnvelope);
+        typeof row.payload === "string"
+          ? (JSON.parse(row.payload) as OpsAlertEnvelope)
+          : (row.payload as OpsAlertEnvelope);
       try {
         await handler(envelope);
         await this.client.query(`DELETE FROM ${this.table} WHERE id = $1`, [row.id]);

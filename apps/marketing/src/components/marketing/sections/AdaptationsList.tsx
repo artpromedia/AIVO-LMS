@@ -19,25 +19,18 @@ export function AdaptationsList({
       >
         {heading}
       </h2>
-      {subheading && (
-        <p className="text-slate-600 font-body mb-6 leading-relaxed">{subheading}</p>
-      )}
+      {subheading && <p className="text-slate-600 font-body mb-6 leading-relaxed">{subheading}</p>}
       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {items.map((it) => (
           <li
             key={it.title}
             className="flex gap-3 rounded-2xl border border-slate-100 bg-white p-4"
           >
-            <CheckCircle2
-              className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0"
-              aria-hidden="true"
-            />
+            <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" aria-hidden="true" />
             <div>
               <p className="font-heading font-bold text-slate-900 text-sm">{it.title}</p>
               {it.body && (
-                <p className="mt-1 text-sm text-slate-600 font-body leading-relaxed">
-                  {it.body}
-                </p>
+                <p className="mt-1 text-sm text-slate-600 font-body leading-relaxed">{it.body}</p>
               )}
             </div>
           </li>

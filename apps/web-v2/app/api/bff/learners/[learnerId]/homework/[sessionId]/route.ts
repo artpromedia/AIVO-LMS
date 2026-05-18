@@ -1,11 +1,7 @@
 import { NextResponse } from "next/server";
 import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
-import {
-  requireSession,
-  requireRole,
-  requireLearnerScope,
-} from "@/lib/bff/guards";
+import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
 import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import { getHomeworkSession } from "@/lib/db/repos";
 
@@ -24,15 +20,17 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection", "ai_personalization"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection", "ai_personalization"],
+      requestId,
+    );
     if (consentErr) return consentErr;
 
     const hw = getHomeworkSession(sessionId, session!.tenantId);
     if (!hw || hw.learnerId !== learnerId) {
-      return fail(
-        { ...ERRORS.NOT_FOUND, message: "Homework session not found." },
-        requestId,
-      );
+      return fail({ ...ERRORS.NOT_FOUND, message: "Homework session not found." }, requestId);
     }
     const isLearner = session!.role === "learner";
     return ok(

@@ -35,7 +35,11 @@ function safeEqual(a: string, b: string): boolean {
   return timingSafeEqual(aBuf, bBuf);
 }
 
-export function verifyPostmarkSignature(rawBody: string, headerSignature: string, secret: string): boolean {
+export function verifyPostmarkSignature(
+  rawBody: string,
+  headerSignature: string,
+  secret: string,
+): boolean {
   const expected = createHmac("sha1", secret).update(rawBody).digest("base64");
   return safeEqual(headerSignature, expected);
 }
@@ -50,7 +54,11 @@ export function verifyMailgunSignature(
   return safeEqual(signature.signature, expected);
 }
 
-export function verifyAivoSnsSignature(rawBody: string, headerSignature: string, secret: string): boolean {
+export function verifyAivoSnsSignature(
+  rawBody: string,
+  headerSignature: string,
+  secret: string,
+): boolean {
   const expected = createHmac("sha256", secret).update(rawBody).digest("hex");
   return safeEqual(headerSignature, expected);
 }
@@ -71,7 +79,8 @@ export function normalizePostmark(payload: any): NormalizedEmailEvent | null {
     type: t,
     messageId: payload.MessageID,
     recipient: payload.Email ?? payload.Recipient ?? "",
-    occurredAt: payload.DeliveredAt ?? payload.BouncedAt ?? payload.ReceivedAt ?? new Date().toISOString(),
+    occurredAt:
+      payload.DeliveredAt ?? payload.BouncedAt ?? payload.ReceivedAt ?? new Date().toISOString(),
   };
 }
 
@@ -99,7 +108,10 @@ export function normalizeMailgun(payload: any): NormalizedEmailEvent | null {
 }
 
 export function normalizeSes(payload: any): NormalizedEmailEvent | null {
-  const message = typeof payload?.Message === "string" ? safeParseJson(payload.Message) : payload?.Message ?? payload;
+  const message =
+    typeof payload?.Message === "string"
+      ? safeParseJson(payload.Message)
+      : (payload?.Message ?? payload);
   if (!message) return null;
   const map: Record<string, EmailEventType> = {
     Delivery: "delivered",
@@ -115,9 +127,7 @@ export function normalizeSes(payload: any): NormalizedEmailEvent | null {
     type: t,
     messageId: message.mail?.messageId ?? "",
     recipient:
-      message.mail?.destination?.[0] ??
-      message.bounce?.bouncedRecipients?.[0]?.emailAddress ??
-      "",
+      message.mail?.destination?.[0] ?? message.bounce?.bouncedRecipients?.[0]?.emailAddress ?? "",
     occurredAt: message.mail?.timestamp ?? new Date().toISOString(),
   };
 }
@@ -157,43 +167,47 @@ export function registerEmailEventsRoutes(app: FastifyInstance, deps: EmailEvent
     done(null, payload);
   });
 
-  app.post("/api/comms/webhook/email-events", { schema: emailEventsWebhookSchema }, async (req: FastifyRequest, reply) => {
-    const raw = (req as any).rawBody as string | undefined;
-    const provider = (req.headers["x-email-provider"] as string | undefined) ?? "postmark";
+  app.post(
+    "/api/comms/webhook/email-events",
+    { schema: emailEventsWebhookSchema },
+    async (req: FastifyRequest, reply) => {
+      const raw = (req as any).rawBody as string | undefined;
+      const provider = (req.headers["x-email-provider"] as string | undefined) ?? "postmark";
 
-    let event: NormalizedEmailEvent | null = null;
-    let verified = false;
+      let event: NormalizedEmailEvent | null = null;
+      let verified = false;
 
-    if (provider === "postmark") {
-      const secret = process.env.POSTMARK_WEBHOOK_SECRET ?? "";
-      const sig = (req.headers["x-postmark-signature"] as string) ?? "";
-      verified = !!secret && !!sig && !!raw && verifyPostmarkSignature(raw, sig, secret);
-      if (verified) event = normalizePostmark(req.body);
-    } else if (provider === "mailgun") {
-      const secret = process.env.MAILGUN_WEBHOOK_SIGNING_KEY ?? "";
-      const body = req.body as any;
-      const signature = body?.signature ?? {};
-      verified = !!secret && !!signature?.signature && verifyMailgunSignature(signature, secret);
-      if (verified) event = normalizeMailgun(body);
-    } else if (provider === "ses") {
-      const secret = process.env.AIVO_SNS_WEBHOOK_SECRET ?? "";
-      const sig = (req.headers["x-aivo-webhook-signature"] as string) ?? "";
-      verified = !!secret && !!sig && !!raw && verifyAivoSnsSignature(raw, sig, secret);
-      if (verified) event = normalizeSes(req.body);
-    } else {
-      reply.code(400).send({ error: "unknown_provider" });
-      return;
-    }
+      if (provider === "postmark") {
+        const secret = process.env.POSTMARK_WEBHOOK_SECRET ?? "";
+        const sig = (req.headers["x-postmark-signature"] as string) ?? "";
+        verified = !!secret && !!sig && !!raw && verifyPostmarkSignature(raw, sig, secret);
+        if (verified) event = normalizePostmark(req.body);
+      } else if (provider === "mailgun") {
+        const secret = process.env.MAILGUN_WEBHOOK_SIGNING_KEY ?? "";
+        const body = req.body as any;
+        const signature = body?.signature ?? {};
+        verified = !!secret && !!signature?.signature && verifyMailgunSignature(signature, secret);
+        if (verified) event = normalizeMailgun(body);
+      } else if (provider === "ses") {
+        const secret = process.env.AIVO_SNS_WEBHOOK_SECRET ?? "";
+        const sig = (req.headers["x-aivo-webhook-signature"] as string) ?? "";
+        verified = !!secret && !!sig && !!raw && verifyAivoSnsSignature(raw, sig, secret);
+        if (verified) event = normalizeSes(req.body);
+      } else {
+        reply.code(400).send({ error: "unknown_provider" });
+        return;
+      }
 
-    if (!verified) {
-      reply.code(401).send({ error: "signature_invalid" });
-      return;
-    }
-    if (!event) {
-      reply.code(202).send({ ok: true, ignored: true });
-      return;
-    }
-    await recordEvent(event);
-    return { ok: true, event };
-  });
+      if (!verified) {
+        reply.code(401).send({ error: "signature_invalid" });
+        return;
+      }
+      if (!event) {
+        reply.code(202).send({ ok: true, ignored: true });
+        return;
+      }
+      await recordEvent(event);
+      return { ok: true, event };
+    },
+  );
 }

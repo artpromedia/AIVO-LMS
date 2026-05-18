@@ -11,12 +11,7 @@
  *   - voice activities have an expectedAnswer
  *   - required string fields are non-empty
  */
-import type {
-  Activity,
-  Asset,
-  ContentPack,
-  ContentPackIssue,
-} from "./types.js";
+import type { Activity, Asset, ContentPack, ContentPackIssue } from "./types.js";
 
 const REQUIRED_PACK_STRING_FIELDS: (keyof ContentPack)[] = [
   "id",

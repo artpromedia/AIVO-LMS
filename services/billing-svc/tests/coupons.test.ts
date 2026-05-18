@@ -16,13 +16,16 @@ async function bootstrap() {
   registerCouponRoutes(app, db);
   await app.ready();
 
-  const [admin] = await db.insert(users).values({
-    email: `coupons-admin-${Date.now()}@aivo.dev`,
-    name: "Coupons Admin",
-    role: "PLATFORM_ADMIN",
-    passwordHash:
-      "$argon2id$v=19$m=65536,t=3,p=4$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-  } as any).returning();
+  const [admin] = await db
+    .insert(users)
+    .values({
+      email: `coupons-admin-${Date.now()}@aivo.dev`,
+      name: "Coupons Admin",
+      role: "PLATFORM_ADMIN",
+      passwordHash:
+        "$argon2id$v=19$m=65536,t=3,p=4$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    } as any)
+    .returning();
   const adminToken = await signJWT({
     sub: admin.id,
     role: "PLATFORM_ADMIN",

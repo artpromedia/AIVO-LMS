@@ -23,7 +23,8 @@ export const sparkStarterPack: ContentPack = {
       title: "Push and pull",
       skillId: "ngss.K-PS2-1",
       type: "narration",
-      prompt: "Forces are pushes and pulls. When you push a swing, it moves away. When you pull a wagon, it comes closer. Let's explore!",
+      prompt:
+        "Forces are pushes and pulls. When you push a swing, it moves away. When you pull a wagon, it comes closer. Let's explore!",
       difficulty: "intro",
     },
     {
@@ -31,7 +32,8 @@ export const sparkStarterPack: ContentPack = {
       title: "Push or pull?",
       skillId: "ngss.K-PS2-1",
       type: "tap",
-      prompt: "Look at the picture: a child opening a door by turning a knob. Is that a push or a pull?",
+      prompt:
+        "Look at the picture: a child opening a door by turning a knob. Is that a push or a pull?",
       difficulty: "core",
       choices: [
         { id: "push", label: "Push", correct: false },

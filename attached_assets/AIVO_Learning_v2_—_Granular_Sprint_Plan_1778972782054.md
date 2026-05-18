@@ -48,7 +48,8 @@ Vitest
 React Testing Library  
 Playwright  
 axe accessibility checks  
-API contract tests  
+API contract tests
+
 ---
 
 # **Sprint 0 — Repository, Tooling, and Engineering Foundation**
@@ -109,7 +110,8 @@ CI runs lint, typecheck, unit tests, and Playwright smoke tests.
 Root page loads.  
 Global 404 page exists.  
 Global error page exists.  
-Environment validation fails loudly when required variables are missing.  
+Environment validation fails loudly when required variables are missing.
+
 ---
 
 # **Sprint 1 — Design System and App Shell**
@@ -179,7 +181,8 @@ Every listed route renders a complete screen.
 Each shell has navigation appropriate to the role.  
 All navigation links point to real routes.  
 App supports desktop, tablet, and mobile widths.  
-Base components pass accessibility checks.  
+Base components pass accessibility checks.
+
 ---
 
 # **Sprint 2 — Auth, Roles, Tenant Model, and Route Protection**
@@ -201,9 +204,9 @@ SessionProfile
 parent  
 learner  
 teacher  
-school\_admin  
-district\_admin  
-platform\_admin
+school_admin  
+district_admin  
+platform_admin
 
 ## **BFF Routes**
 
@@ -231,7 +234,8 @@ Role routing works.
 Tenant resolution works.  
 Unauthorized access is blocked.  
 BFF returns userId, tenantId, role, and permissions.  
-No route relies on client-only authorization.  
+No route relies on client-only authorization.
+
 ---
 
 # **Sprint 3 — Core Database Schema and BFF Contract Layer**
@@ -286,10 +290,10 @@ type BffSuccess\<T\> \= {
 type BffFailure \= {  
  ok: false;  
  error: {  
-   code: string;  
-   message: string;  
-   userMessage: string;  
-   retryable: boolean;  
+ code: string;  
+ message: string;  
+ userMessage: string;  
+ retryable: boolean;  
  };  
  requestId: string;  
 };
@@ -312,7 +316,8 @@ All models migrate successfully.
 Seed data loads.  
 BFF helper is used by every existing API route.  
 Errors are normalized.  
-Audit helper can record user action, tenantId, learnerId, and metadata.  
+Audit helper can record user action, tenantId, learnerId, and metadata.
+
 ---
 
 # **Sprint 4 — Parent Home and Learner Management**
@@ -362,12 +367,12 @@ Add learner button
 
 ## **Readiness States**
 
-profile\_created  
-assessment\_needed  
-iep\_optional  
-baseline\_needed  
-ready\_for\_today\_mission  
-active\_learning
+profile_created  
+assessment_needed  
+iep_optional  
+baseline_needed  
+ready_for_today_mission  
+active_learning
 
 ## **Acceptance Criteria**
 
@@ -376,7 +381,8 @@ learnerId is distinct from userId.
 Every learner is attached to tenantId.  
 Parent cannot access another tenant’s learner.  
 Readiness state updates after learner creation.  
-No learner management button is dead.  
+No learner management button is dead.
+
 ---
 
 # **Sprint 5 — Parent Assessment Flow**
@@ -429,7 +435,8 @@ Assessment can be started, saved, resumed, reviewed, and submitted.
 Assessment updates learner context.  
 Parent sees the next step after completion.  
 No clinical diagnosis is required.  
-Answers persist after refresh.  
+Answers persist after refresh.
+
 ---
 
 # **Sprint 6 — IEP Upload and Accommodation Summary**
@@ -482,7 +489,8 @@ Parent can skip IEP.
 Accommodation summary is generated or marked unavailable.  
 Raw IEP text is protected.  
 Learner-safe summary is separate from parent/teacher summaries.  
-Readiness advances after upload or skip.  
+Readiness advances after upload or skip.
+
 ---
 
 # **Sprint 7 — Learner Brain Profile Generation**
@@ -533,7 +541,8 @@ Brain profile is generated after assessment and IEP skip/upload.
 Profile includes learner context, support needs, and accessibility preferences.  
 AI output is schema-validated.  
 Failure state allows retry.  
-Two different learners produce meaningfully different profiles.  
+Two different learners produce meaningfully different profiles.
+
 ---
 
 # **Sprint 8 — Personalized Baseline Generation**
@@ -577,7 +586,7 @@ type BaselineQuestion \= {
  expectedAnswer?: string;  
  hint?: string;  
  readAloudText?: string;  
- difficulty: "foundational" | "approaching" | "grade\_level" | "stretch";  
+ difficulty: "foundational" | "approaching" | "grade_level" | "stretch";  
  accommodationTags: string\[\];  
 };
 
@@ -589,7 +598,8 @@ Baseline is personalized using brain profile.
 Baseline can be started, answered, completed, and scored.  
 Results update mastery map.  
 Results update learner readiness.  
-Parent can see baseline completion summary.  
+Parent can see baseline completion summary.
+
 ---
 
 # **Sprint 9 — Mastery Map and Personalized Learning Path**
@@ -648,7 +658,8 @@ Start lesson button
 Baseline completion creates mastery map.  
 Learning path exists before Today’s Mission.  
 Subject pages show real learner-specific state.  
-No subject Start button creates a lesson without learnerId and tenantId.  
+No subject Start button creates a lesson without learnerId and tenantId.
+
 ---
 
 # **Sprint 10 — LessonRun Core Engine**
@@ -679,20 +690,20 @@ LessonRun:
 
 ## **Sources**
 
-today\_mission  
+today_mission  
 quest  
 homework  
-baseline\_followup  
-parent\_assigned  
-teacher\_assigned  
+baseline_followup  
+parent_assigned  
+teacher_assigned  
 review  
-subject\_path
+subject_path
 
 ## **Statuses**
 
 generating  
 ready  
-in\_progress  
+in_progress  
 completed  
 failed  
 abandoned
@@ -714,7 +725,8 @@ No lesson starts without learnerId.
 No lesson starts without tenantId.  
 LessonRun stores learner, mastery, and accommodation snapshots.  
 LessonRun can be resumed after refresh.  
-Failed LessonRun can retry.  
+Failed LessonRun can retry.
+
 ---
 
 # **Sprint 11 — AI Tutor Lesson Generation**
@@ -734,22 +746,22 @@ type GeneratedLessonPlan \= {
  storyHook: string;  
  microLesson: string;  
  example: {  
-   prompt: string;  
-   explanation: string;  
+ prompt: string;  
+ explanation: string;  
  };  
  guidedPractice: Array\<{  
-   prompt: string;  
-   expectedAnswer?: string;  
-   choices?: string\[\];  
-   hint: string;  
-   scaffold: string;  
-   skillId: string;  
+ prompt: string;  
+ expectedAnswer?: string;  
+ choices?: string\[\];  
+ hint: string;  
+ scaffold: string;  
+ skillId: string;  
  }\>;  
  checksForUnderstanding: Array\<{  
-   prompt: string;  
-   expectedAnswer?: string;  
-   choices?: string\[\];  
-   supportIfWrong: string;  
+ prompt: string;  
+ expectedAnswer?: string;  
+ choices?: string\[\];  
+ supportIfWrong: string;  
  }\>;  
  accessibilitySupports: string\[\];  
  encouragement: string;  
@@ -775,7 +787,8 @@ Lesson generation uses mastery map.
 Lesson generation uses accommodation snapshot.  
 Lesson generation produces valid lesson JSON.  
 Invalid lesson output is rejected and retried.  
-Generated lessons differ for learners with different profiles.  
+Generated lessons differ for learners with different profiles.
+
 ---
 
 # **Sprint 12 — Learner Profile Selection and Learner Home**
@@ -825,7 +838,8 @@ Learner can select profile.
 Active learner persists.  
 Learner home always shows one clear next action.  
 Today’s Mission creates or resumes a LessonRun.  
-Learner cannot access another learner’s data.  
+Learner cannot access another learner’s data.
+
 ---
 
 # **Sprint 13 — Lesson Player**
@@ -870,15 +884,15 @@ Resume after refresh.
 
 ## **Interaction Events**
 
-lesson\_started  
-lesson\_step\_viewed  
-hint\_requested  
-scaffold\_used  
-answer\_submitted  
-answer\_correct  
-answer\_incorrect  
-lesson\_completed  
-lesson\_abandoned
+lesson_started  
+lesson_step_viewed  
+hint_requested  
+scaffold_used  
+answer_submitted  
+answer_correct  
+answer_incorrect  
+lesson_completed  
+lesson_abandoned
 
 ## **Acceptance Criteria**
 
@@ -888,7 +902,8 @@ Progress autosaves.
 Refresh resumes the same step.  
 Completion updates LessonRun status.  
 Completion updates mastery.  
-Completion creates parent summary.  
+Completion creates parent summary.
+
 ---
 
 # **Sprint 14 — Progress, Mastery Updates, and Parent Summary**
@@ -938,7 +953,8 @@ Parent sees plain-language summary.
 Parent does not see raw technical AI data.  
 Parent does not see raw IEP text in progress view.  
 Mastery updates after completed LessonRun.  
-Next recommendation updates after completion.  
+Next recommendation updates after completion.
+
 ---
 
 # **Sprint 15 — Accessibility Preferences and Adaptive Supports**
@@ -978,7 +994,8 @@ Accessibility settings are used in lesson generation.
 Settings persist.  
 Parent can adjust learner settings.  
 Learner can adjust safe display preferences.  
-Lesson player honors reduced motion, large text, and high contrast.  
+Lesson player honors reduced motion, large text, and high contrast.
+
 ---
 
 # **Sprint 16 — Quest Worlds and Gamified Learning**
@@ -1017,7 +1034,8 @@ Quest chapter creates LessonRun.
 Quest progress depends on lesson completion.  
 No fake Complete Activity button exists.  
 Boss challenge unlocks only after required chapters.  
-XP and coins are awarded only after real completion.  
+XP and coins are awarded only after real completion.
+
 ---
 
 # **Sprint 17 — Homework Helper**
@@ -1057,7 +1075,8 @@ Tutor responds using learner profile.
 Tutor guides rather than simply answers.  
 Session can be resumed.  
 Helpful learning insight is saved.  
-Parent can see that homework support occurred.  
+Parent can see that homework support occurred.
+
 ---
 
 # **Sprint 18 — Teacher Dashboard and Assignments**
@@ -1108,7 +1127,8 @@ Teacher can view assigned learners.
 Teacher can view learner progress.  
 Teacher can create an assignment.  
 Learner can receive teacher-assigned lesson as Today’s Mission priority.  
-Teacher cannot access unauthorized learners.  
+Teacher cannot access unauthorized learners.
+
 ---
 
 # **Sprint 19 — School, District, and Platform Admin**
@@ -1168,7 +1188,8 @@ Platform admin can view all tenants.
 School admin cannot view other schools.  
 District admin can view schools in district.  
 AI generation failures are visible.  
-Audit logs capture key events.  
+Audit logs capture key events.
+
 ---
 
 # **Sprint 20 — Observability, Safety, and AI Governance**
@@ -1179,18 +1200,18 @@ Make the system observable, debuggable, and safe enough for child-centered learn
 
 ## **Metrics**
 
-lesson\_generation\_success\_rate  
-lesson\_generation\_latency  
-lesson\_generation\_failure\_count  
-lesson\_generation\_retry\_count  
-baseline\_generation\_latency  
-baseline\_completion\_rate  
-lesson\_completion\_rate  
-hint\_usage\_rate  
-drop\_off\_step  
-quest\_completion\_rate  
-homework\_helper\_usage  
-parent\_onboarding\_completion
+lesson_generation_success_rate  
+lesson_generation_latency  
+lesson_generation_failure_count  
+lesson_generation_retry_count  
+baseline_generation_latency  
+baseline_completion_rate  
+lesson_completion_rate  
+hint_usage_rate  
+drop_off_step  
+quest_completion_rate  
+homework_helper_usage  
+parent_onboarding_completion
 
 ## **Safety Controls**
 
@@ -1218,7 +1239,8 @@ Every AI generation has status, latency, prompt version, and result state.
 Failed generations appear in admin monitoring.  
 Lesson safety validation runs before persistence.  
 Unsafe or malformed lesson output is blocked.  
-Tutor language remains supportive and non-diagnostic.  
+Tutor language remains supportive and non-diagnostic.
+
 ---
 
 # **Sprint 21 — Billing, Subscription Readiness, and Account Settings**
@@ -1250,12 +1272,12 @@ Create upgrade/downgrade-ready service abstraction.
 
 trial  
 active  
-past\_due  
+past_due  
 paused  
 cancelled  
-school\_paid  
-district\_paid  
-platform\_grant
+school_paid  
+district_paid  
+platform_grant
 
 ## **Acceptance Criteria**
 
@@ -1263,7 +1285,8 @@ Parent can view account settings.
 Billing status can be represented.  
 School/district paid status can be represented.  
 Billing does not block core local development.  
-Billing hooks can later connect to Stripe or equivalent provider.  
+Billing hooks can later connect to Stripe or equivalent provider.
+
 ---
 
 # **Sprint 22 — End-to-End QA, Route Audit, and Dead Button Elimination**
@@ -1314,7 +1337,8 @@ All role protections pass.
 All tenant isolation tests pass.  
 Lesson resume works after refresh.  
 Generation failure retry works.  
-Accessibility checks pass for primary learner and parent routes.  
+Accessibility checks pass for primary learner and parent routes.
+
 ---
 
 # **Sprint 23 — Performance, Hardening, and Production Release**
@@ -1352,7 +1376,8 @@ Database indexes exist for learnerId, tenantId, lessonRun status, and generation
 AI generation timeout is handled gracefully.  
 File upload abuse is limited.  
 Protected routes remain protected in production mode.  
-Smoke test passes on deployed environment.  
+Smoke test passes on deployed environment.
+
 ---
 
 # **Final Release Gate**
@@ -1440,16 +1465,16 @@ SessionAudit
 
 ## **Required Consent Types**
 
-parent\_account\_terms  
-parent\_privacy\_policy  
-child\_data\_collection  
-iep\_document\_storage  
-ai\_personalization  
-school\_roster\_import  
-teacher\_access  
-marketing\_opt\_in  
-data\_export\_request  
-data\_deletion\_request
+parent_account_terms  
+parent_privacy_policy  
+child_data_collection  
+iep_document_storage  
+ai_personalization  
+school_roster_import  
+teacher_access  
+marketing_opt_in  
+data_export_request  
+data_deletion_request
 
 ## **Routes**
 
@@ -1487,7 +1512,8 @@ Consent version is stored.
 Consent timestamp, IP hash, user agent, and policy version are recorded.  
 Learner cannot self-create a full under-13 account without parent consent.  
 Parent can revoke optional consents.  
-Revoked consent disables affected features without deleting required audit records.  
+Revoked consent disables affected features without deleting required audit records.
+
 ---
 
 # **Sprint 25 — Privacy, Compliance, Data Governance, and DSAR**
@@ -1519,16 +1545,16 @@ Create admin compliance console.
 ## **Data Classification**
 
 public  
-account\_data  
-parent\_data  
-learner\_profile\_data  
-education\_record  
-iep\_sensitive\_document  
-ai\_generated\_learning\_data  
-usage\_telemetry  
-billing\_data  
-support\_data  
-security\_audit\_data
+account_data  
+parent_data  
+learner_profile_data  
+education_record  
+iep_sensitive_document  
+ai_generated_learning_data  
+usage_telemetry  
+billing_data  
+support_data  
+security_audit_data
 
 ## **Required Data Models**
 
@@ -1578,7 +1604,8 @@ Admin can review DSAR status.
 FERPA-style disclosure log exists.  
 Retention policy can be configured by data type.  
 Raw IEP files can be deleted while preserving lawful audit metadata.  
-Subprocessor list can be maintained.  
+Subprocessor list can be maintained.
+
 ---
 
 # **Sprint 26 — Curriculum Source of Truth, Standards Alignment, and Skill Graph**
@@ -1666,7 +1693,8 @@ Skills can map to standards.
 Baseline generation uses assessment blueprints.  
 Lesson generation uses skill objectives.  
 Admin can view and update curriculum records.  
-AI cannot generate a lesson without a valid skill target.  
+AI cannot generate a lesson without a valid skill target.
+
 ---
 
 # **Sprint 27 — AI Safety, Moderation, Prompt-Injection Defense, and Crisis Handling**
@@ -1705,18 +1733,18 @@ HomeworkInputAudit
 
 ## **Safety Categories**
 
-self\_harm  
+self_harm  
 violence  
-sexual\_content  
-adult\_contact\_risk  
+sexual_content  
+adult_contact_risk  
 bullying  
-hate\_or\_harassment  
-medical\_or\_legal\_advice  
-prompt\_injection  
-privacy\_leakage  
-academic\_cheating  
-unsafe\_external\_link  
-diagnostic\_labeling
+hate_or_harassment  
+medical_or_legal_advice  
+prompt_injection  
+privacy_leakage  
+academic_cheating  
+unsafe_external_link  
+diagnostic_labeling
 
 ## **Routes**
 
@@ -1756,7 +1784,8 @@ Crisis signal creates a review/escalation event.
 Admin can view safety events.  
 Human review queue exists.  
 Safety policy versions are logged.  
-Red-team tests run in CI.  
+Red-team tests run in CI.
+
 ---
 
 # **Sprint 28 — TTS, Read-Aloud, Audio Caching, and Multimodal Accessibility**
@@ -1820,7 +1849,8 @@ Audio is cached.
 Failed TTS does not block lesson completion.  
 Parent can enable or disable read-aloud.  
 Learner can adjust safe playback preferences.  
-TTS usage appears in admin cost dashboard.  
+TTS usage appears in admin cost dashboard.
+
 ---
 
 # **Sprint 29 — Rostering, SIS Integration, Multi-Device Sync, and Notifications**
@@ -1892,17 +1922,17 @@ PATCH /api/bff/notification-preferences
 
 ## **Notification Types**
 
-parent\_progress\_summary  
-baseline\_completed  
-lesson\_completed  
-teacher\_assignment\_created  
-teacher\_assignment\_due  
-streak\_reminder  
-quest\_unlocked  
-iep\_extraction\_ready  
-data\_request\_completed  
-billing\_notice  
-safety\_review\_required
+parent_progress_summary  
+baseline_completed  
+lesson_completed  
+teacher_assignment_created  
+teacher_assignment_due  
+streak_reminder  
+quest_unlocked  
+iep_extraction_ready  
+data_request_completed  
+billing_notice  
+safety_review_required
 
 ## **Acceptance Criteria**
 
@@ -1915,7 +1945,8 @@ Parent can see near-real-time lesson status where permitted.
 Parent can configure notification preferences.  
 Email notifications send through provider abstraction.  
 In-app notifications work.  
-No notification exposes sensitive IEP content.  
+No notification exposes sensitive IEP content.
+
 ---
 
 # **Sprint 30 — Real Billing, AI Cost Controls, Migration, and Commercial Launch Readiness**
@@ -2030,7 +2061,8 @@ Provider failover works.
 Billing is production-ready.  
 Migration framework works.  
 Launch readiness dashboard shows blockers.  
-No commercial tenant can exceed configured AI budget without admin override.  
+No commercial tenant can exceed configured AI budget without admin override.
+
 ---
 
 # **Revised Final Release Order**
@@ -2062,7 +2094,8 @@ Sprint 30:
 Billing, AI cost controls, migration, commercial launch readiness
 
 Final Sprint:  
-Performance, hardening, penetration testing, production release  
+Performance, hardening, penetration testing, production release
+
 ---
 
 # **Updated Non-Negotiable Release Gate**
@@ -2103,16 +2136,16 @@ The original PRD’s core product loop remains the anchor: parent setup, learner
 
 The corrected order should be:
 
-Sprint 0  — Repository, tooling, engineering foundation  
-Sprint 1  — Design system and app shell  
-Sprint 2  — Real auth, identity, role routing, consent foundation  
-Sprint 3  — Core database schema and BFF contract layer  
-Sprint 4  — Compliance data model, privacy ledger, audit foundation  
-Sprint 5  — Curriculum source of truth, standards, and skill graph  
-Sprint 6  — AI safety foundation, moderation, validation, prompt-injection defense  
-Sprint 7  — Parent home and learner management  
-Sprint 8  — Parent assessment flow  
-Sprint 9  — IEP upload and accommodation summary  
+Sprint 0 — Repository, tooling, engineering foundation  
+Sprint 1 — Design system and app shell  
+Sprint 2 — Real auth, identity, role routing, consent foundation  
+Sprint 3 — Core database schema and BFF contract layer  
+Sprint 4 — Compliance data model, privacy ledger, audit foundation  
+Sprint 5 — Curriculum source of truth, standards, and skill graph  
+Sprint 6 — AI safety foundation, moderation, validation, prompt-injection defense  
+Sprint 7 — Parent home and learner management  
+Sprint 8 — Parent assessment flow  
+Sprint 9 — IEP upload and accommodation summary  
 Sprint 10 — Learner brain profile generation  
 Sprint 11 — Personalized baseline generation  
 Sprint 12 — Mastery map and personalized learning path  
@@ -2144,7 +2177,8 @@ Real auth moves before parent/learner workflows.
 Compliance data model moves before IEP and child-data workflows.  
 Curriculum/skill graph moves before baseline, mastery, lessons, and quests.  
 AI safety moves before any AI-generated learner-facing feature.  
-Security and operational readiness are separated from generic launch hardening.  
+Security and operational readiness are separated from generic launch hardening.
+
 ---
 
 # **Why the Reorder Matters**
@@ -2191,7 +2225,8 @@ Create customer-facing status page.
 Create vulnerability disclosure policy.  
 Create DPA packet.  
 Create state student privacy law matrix.  
-Create security questionnaire response library.  
+Create security questionnaire response library.
+
 ---
 
 ## **Compliance and Trust Targets**
@@ -2235,7 +2270,8 @@ KeyRotationRecord
 SecretInventory  
 SBOMRecord  
 DependencyVulnerability  
-SecurityQuestionnaireResponse  
+SecurityQuestionnaireResponse
+
 ---
 
 ## **Required Routes**
@@ -2254,7 +2290,8 @@ SecurityQuestionnaireResponse
 /admin/platform/security/questionnaires  
 /status  
 /security  
-/privacy/subprocessors  
+/privacy/subprocessors
+
 ---
 
 ## **Required BFF Routes**
@@ -2288,7 +2325,8 @@ PATCH /api/bff/admin/security/vulnerabilities/:vulnId
 
 GET /api/bff/admin/security/state-privacy  
 POST /api/bff/admin/security/state-privacy/mappings  
-PATCH /api/bff/admin/security/state-privacy/mappings/:mappingId  
+PATCH /api/bff/admin/security/state-privacy/mappings/:mappingId
+
 ---
 
 ## **Security Controls to Implement**
@@ -2319,7 +2357,8 @@ Data export workflow controls
 Subprocessor approval workflow  
 Vendor risk assessment  
 Incident response runbooks  
-Breach notification workflow  
+Breach notification workflow
+
 ---
 
 ## **Threat Modeling Scope**
@@ -2341,7 +2380,8 @@ Broken object-level authorization
 Insecure direct object reference  
 File upload abuse  
 Secrets exposure  
-Misconfigured storage bucket  
+Misconfigured storage bucket
+
 ---
 
 ## **Incident Response Requirements**
@@ -2359,7 +2399,8 @@ Define post-incident review process.
 Define RPO and RTO targets.  
 Run tabletop exercise.  
 Run backup restore drill.  
-Run production access review.  
+Run production access review.
+
 ---
 
 ## **Vulnerability Disclosure**
@@ -2372,7 +2413,8 @@ Define reporting email.
 Define triage SLA.  
 Define severity scoring.  
 Define researcher communication workflow.  
-Define remediation tracking.  
+Define remediation tracking.
+
 ---
 
 ## **Acceptance Criteria**
@@ -2394,7 +2436,8 @@ Tenant isolation tests pass.
 IEP access logs are immutable.  
 Admin access review completed.  
 Security questionnaire library exists.  
-Responsible disclosure page is published.  
+Responsible disclosure page is published.
+
 ---
 
 # **Sprint 32 — AI Quality, Accessibility Audit, i18n, Operational Readiness, and External Validation**
@@ -2424,7 +2467,8 @@ Create accommodation alignment checker.
 Create hallucination detector.  
 Create inappropriate difficulty detector.  
 Create A/B testing framework.  
-Create outcome tracking model.  
+Create outcome tracking model.
+
 ---
 
 ## **AI Quality Dimensions**
@@ -2443,7 +2487,8 @@ Answer correctness
 Safety compliance  
 Parent summary clarity  
 Next-step quality  
-Differentiation across learner profiles  
+Differentiation across learner profiles
+
 ---
 
 ## **Required Data Models**
@@ -2460,7 +2505,8 @@ BaselineEvalResult
 HumanReviewRating  
 Experiment  
 ExperimentAssignment  
-LearningOutcomeMetric  
+LearningOutcomeMetric
+
 ---
 
 ## **Required Routes**
@@ -2471,7 +2517,8 @@ LearningOutcomeMetric
 /admin/platform/ai-quality/prompt-versions  
 /admin/platform/ai-quality/model-versions  
 /admin/platform/ai-quality/golden-profiles  
-/admin/platform/ai-quality/experiments  
+/admin/platform/ai-quality/experiments
+
 ---
 
 ## **AI Quality Acceptance Criteria**
@@ -2487,7 +2534,8 @@ Accommodation alignment is evaluated.
 Human review queue exists for low-confidence outputs.  
 A/B framework can compare generation strategies.  
 AI quality dashboard shows trend over time.  
-A model swap cannot deploy without passing eval gates.  
+A model swap cannot deploy without passing eval gates.
+
 ---
 
 ## **Part B — Accessibility Audit, Remediation, and VPAT/ACR**
@@ -2531,7 +2579,8 @@ Reduced-motion mode works.
 Read-aloud has transcript fallback.  
 Accessibility statement is published.  
 VPAT/ACR draft exists.  
-Third-party audit findings are tracked to closure.  
+Third-party audit findings are tracked to closure.
+
 ---
 
 ## **Part C — Localization and Internationalization**
@@ -2548,7 +2597,8 @@ Support language-specific TTS voices.
 Support primaryLanguage on learner profile.  
 Support multilingual notification templates.  
 Create translation management workflow.  
-Create fallback-language behavior.  
+Create fallback-language behavior.
+
 ---
 
 ## **Initial Language Strategy**
@@ -2558,7 +2608,8 @@ Spanish as first district-sales language.
 French-ready architecture.  
 Yoruba/Igbo/Hausa-ready architecture if West Africa expansion is planned.  
 Language stored per user and learner.  
-Tutor language can differ from parent dashboard language.  
+Tutor language can differ from parent dashboard language.
+
 ---
 
 ## **i18n Acceptance Criteria**
@@ -2570,7 +2621,8 @@ Tutor can generate in selected language.
 TTS voice matches selected language where supported.  
 Fallback behavior is defined when translation is missing.  
 Email and in-app notifications use language preference.  
-Admin can see untranslated string coverage.  
+Admin can see untranslated string coverage.
+
 ---
 
 ## **Part D — Operational Readiness**
@@ -2590,7 +2642,8 @@ Create disaster recovery plan.
 Create RPO/RTO targets.  
 Create production monitoring dashboards.  
 Create synthetic uptime checks.  
-Create SLO and error-budget policy.  
+Create SLO and error-budget policy.
+
 ---
 
 ## **Operational Targets**
@@ -2602,7 +2655,8 @@ AI generation failure budget defined.
 P1 response process defined.  
 School notification timeline defined.  
 Parent support escalation defined.  
-Data restore procedure tested.  
+Data restore procedure tested.
+
 ---
 
 ## **Ops Acceptance Criteria**
@@ -2617,7 +2671,8 @@ Disaster recovery plan approved.
 Synthetic uptime checks are running.  
 Production dashboards exist.  
 Customer incident templates exist.  
-Launch checklist is complete.  
+Launch checklist is complete.
+
 ---
 
 # **Sprint 33 — External Pen Test, Remediation, Release Candidate, and Production Launch**
@@ -2655,7 +2710,8 @@ AI prompt-injection controls tested.
 Payment webhook security tested.  
 Roster import security tested.  
 Production release candidate approved.  
-Pilot launch approved.  
+Pilot launch approved.
+
 ---
 
 # **Updated Final Release Gate**
@@ -2692,4 +2748,4 @@ Build the identity, consent, compliance, curriculum, and AI safety foundation fi
 Then build the learner product loop.  
 Then build school operations, billing, rostering, TTS, and notifications.  
 Then prove security, accessibility, AI quality, and operational readiness.  
-Then run external pen test and launch a controlled production pilot.  
+Then run external pen test and launch a controlled production pilot.

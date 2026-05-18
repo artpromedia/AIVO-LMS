@@ -29,7 +29,12 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
       >
         <span className="text-base">{localeFlags[locale]}</span>
         {!compact && <span>{localeNames[locale]}</span>}
-        <svg className="w-3 h-3 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg
+          className="w-3 h-3 text-slate-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
@@ -50,8 +55,18 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
               <span className="text-base">{localeFlags[l]}</span>
               <span>{localeNames[l]}</span>
               {l === locale && (
-                <svg className="w-4 h-4 ml-auto text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <svg
+                  className="w-4 h-4 ml-auto text-purple-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
               )}
             </button>

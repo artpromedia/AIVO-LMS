@@ -2,7 +2,6 @@ import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SCHOOL_NAV } from "@/components/layout/role-shells";
@@ -31,7 +30,12 @@ export default async function Page({ searchParams }: Params) {
 
       {schools.length > 1 ? (
         <div className="mb-4 flex flex-wrap gap-2">
-          <Link href="/admin/school/classes" className="rounded-full border border-aivo-border bg-aivo-surface px-3 py-1 text-xs">All</Link>
+          <Link
+            href="/admin/school/classes"
+            className="rounded-full border border-aivo-border bg-aivo-surface px-3 py-1 text-xs"
+          >
+            All
+          </Link>
           {schools.map((s) => (
             <Link
               key={s.id}
@@ -62,7 +66,9 @@ export default async function Page({ searchParams }: Params) {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-display text-base font-semibold">{c.name}</p>
-                    <p className="text-xs text-aivo-muted">School {c.schoolId} · teacher {c.teacherUserId}</p>
+                    <p className="text-xs text-aivo-muted">
+                      School {c.schoolId} · teacher {c.teacherUserId}
+                    </p>
                   </div>
                   <div className="flex flex-col items-end gap-1">
                     <Badge tone="neutral">{c.gradeBand}</Badge>

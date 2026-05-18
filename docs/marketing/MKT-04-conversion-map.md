@@ -4,59 +4,59 @@ Last refreshed: 2026-05-17
 
 ## Audience segments
 
-| # | Segment | Primary need | Buying authority |
-|---|---|---|---|
-| 1 | Parents | Reduce anxiety; understand where their child is and what's next | Direct purchase (family plan) |
-| 2 | Learners | Calm, low-pressure learning experience | None (consumer of product) |
-| 3 | Teachers | Class visibility; assignment + intervention support | Influence; rarely sole decision |
-| 4 | School leaders | Roster-able, privacy-aware, teacher-friendly deployment | Pilot purchase / building budget |
-| 5 | District leaders | Scale, procurement, FERPA/COPPA posture, integrations | Procurement / multi-year contract |
-| 6 | Special ed coordinators | IEP-aware support, accommodations, careful clinical language | Influence on district + school |
-| 7 | Investors / partners | Defensibility, traction, brand maturity | None for product; signal for fundraising |
+| #   | Segment                 | Primary need                                                    | Buying authority                         |
+| --- | ----------------------- | --------------------------------------------------------------- | ---------------------------------------- |
+| 1   | Parents                 | Reduce anxiety; understand where their child is and what's next | Direct purchase (family plan)            |
+| 2   | Learners                | Calm, low-pressure learning experience                          | None (consumer of product)               |
+| 3   | Teachers                | Class visibility; assignment + intervention support             | Influence; rarely sole decision          |
+| 4   | School leaders          | Roster-able, privacy-aware, teacher-friendly deployment         | Pilot purchase / building budget         |
+| 5   | District leaders        | Scale, procurement, FERPA/COPPA posture, integrations           | Procurement / multi-year contract        |
+| 6   | Special ed coordinators | IEP-aware support, accommodations, careful clinical language    | Influence on district + school           |
+| 7   | Investors / partners    | Defensibility, traction, brand maturity                         | None for product; signal for fundraising |
 
 ## Primary conversion actions
 
-| Action | Routes that originate it | Where it lands |
-|---|---|---|
-| Request school demo | `/`, `/for-schools`, `/for-districts`, `/for-special-education`, `/for-teachers`, `/levels`, `/tutors`, `/subjects` | `/contact` (current) → `/demo` (planned, MKT-10) |
-| Start parent setup | `/`, `/for-parents`, `/for-homeschool` | `/signup` (existing) |
-| Join waitlist | `/`, `/for-parents` | `/waitlist` (planned, MKT-10) |
-| Contact sales | `/for-districts`, `/press-kit` | `/contact` |
-| Download school packet | `/for-schools`, `/for-districts`, `/for-special-education` | `/contact?intent=packet` (interim) → packet asset in MKT-11 |
-| Read privacy / security overview | Footer everywhere | `/privacy-policy`, `/coppa-compliance`, `/ferpa-compliance`, future `/security` |
-| View product walkthrough | `/`, `/for-parents`, `/for-schools` | `#mission` + `#lessonrun` anchors on `/` (today) → standalone `/features/*` pages (planned, MKT-09) |
+| Action                           | Routes that originate it                                                                                            | Where it lands                                                                                      |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Request school demo              | `/`, `/for-schools`, `/for-districts`, `/for-special-education`, `/for-teachers`, `/levels`, `/tutors`, `/subjects` | `/contact` (current) → `/demo` (planned, MKT-10)                                                    |
+| Start parent setup               | `/`, `/for-parents`, `/for-homeschool`                                                                              | `/signup` (existing)                                                                                |
+| Join waitlist                    | `/`, `/for-parents`                                                                                                 | `/waitlist` (planned, MKT-10)                                                                       |
+| Contact sales                    | `/for-districts`, `/press-kit`                                                                                      | `/contact`                                                                                          |
+| Download school packet           | `/for-schools`, `/for-districts`, `/for-special-education`                                                          | `/contact?intent=packet` (interim) → packet asset in MKT-11                                         |
+| Read privacy / security overview | Footer everywhere                                                                                                   | `/privacy-policy`, `/coppa-compliance`, `/ferpa-compliance`, future `/security`                     |
+| View product walkthrough         | `/`, `/for-parents`, `/for-schools`                                                                                 | `#mission` + `#lessonrun` anchors on `/` (today) → standalone `/features/*` pages (planned, MKT-09) |
 
 ## Route inventory & sprint mapping
 
 Sprint MKT-04 specifies a target sitemap. We keep the production `/for-*` route names (already indexed, already covered by smoke tests) and treat the prompt's bare names (`/parents`, `/schools`, etc.) as logical names that map to existing physical paths. Routes the prompt requires that **do not yet exist** are flagged for the sprint that will create them.
 
-| Logical name (prompt) | Physical path (this repo) | Status | Owning sprint |
-|---|---|---|---|
-| `/` | `/` | ✅ rebuilt in MKT-05 (this batch) | MKT-05 |
-| `/parents` | `/for-parents` | ✅ exists | MKT-06 (rebuild) |
-| `/schools` | `/for-schools` | ✅ exists | MKT-07 (rebuild) |
-| `/districts` | `/for-districts` | ✅ exists | MKT-07 (rebuild) |
-| `/teachers` | `/for-teachers` | ✅ exists | MKT-07 (rebuild) |
-| `/special-education` | `/for-special-education` | ✅ exists | MKT-08 (rebuild) |
-| `/features/todays-mission` | — | ❌ missing | MKT-09 |
-| `/features/lessonrun` | — | ❌ missing | MKT-09 |
-| `/features/homework-helper` | — | ❌ missing | MKT-09 |
-| `/pricing` | — | ❌ missing (Pricing is a homepage section today) | MKT-10 |
-| `/demo` | — | ❌ missing (CTA points to `/contact`) | MKT-10 |
-| `/waitlist` | — | ❌ missing | MKT-10 |
-| `/thank-you` | — | ❌ missing | MKT-10 |
-| `/contact` | `/contact` | ✅ exists | MKT-10 (form upgrade) |
-| `/security` | — | ❌ missing | MKT-11 |
-| `/privacy` | `/privacy-policy` | ✅ exists | MKT-11 (keep) |
-| `/accessibility` | `/accessibility` | ✅ exists | MKT-11 (keep) |
-| `/terms` | `/terms-of-service` | ✅ exists | MKT-11 (keep) |
-| `/trust` | — | ❌ missing | MKT-11 |
-| `/subprocessors` | — | ❌ missing | MKT-11 |
-| `/about` | `/about` | ✅ exists | — |
-| `/resources` | — | ❌ missing | MKT-12 |
-| `/blog` | `/blog` | ✅ exists | MKT-12 (content) |
-| `/blog/[slug]` | — | ❌ missing | MKT-12 |
-| `/guides/[slug]` | — | ❌ missing | MKT-12 |
+| Logical name (prompt)       | Physical path (this repo) | Status                                           | Owning sprint         |
+| --------------------------- | ------------------------- | ------------------------------------------------ | --------------------- |
+| `/`                         | `/`                       | ✅ rebuilt in MKT-05 (this batch)                | MKT-05                |
+| `/parents`                  | `/for-parents`            | ✅ exists                                        | MKT-06 (rebuild)      |
+| `/schools`                  | `/for-schools`            | ✅ exists                                        | MKT-07 (rebuild)      |
+| `/districts`                | `/for-districts`          | ✅ exists                                        | MKT-07 (rebuild)      |
+| `/teachers`                 | `/for-teachers`           | ✅ exists                                        | MKT-07 (rebuild)      |
+| `/special-education`        | `/for-special-education`  | ✅ exists                                        | MKT-08 (rebuild)      |
+| `/features/todays-mission`  | —                         | ❌ missing                                       | MKT-09                |
+| `/features/lessonrun`       | —                         | ❌ missing                                       | MKT-09                |
+| `/features/homework-helper` | —                         | ❌ missing                                       | MKT-09                |
+| `/pricing`                  | —                         | ❌ missing (Pricing is a homepage section today) | MKT-10                |
+| `/demo`                     | —                         | ❌ missing (CTA points to `/contact`)            | MKT-10                |
+| `/waitlist`                 | —                         | ❌ missing                                       | MKT-10                |
+| `/thank-you`                | —                         | ❌ missing                                       | MKT-10                |
+| `/contact`                  | `/contact`                | ✅ exists                                        | MKT-10 (form upgrade) |
+| `/security`                 | —                         | ❌ missing                                       | MKT-11                |
+| `/privacy`                  | `/privacy-policy`         | ✅ exists                                        | MKT-11 (keep)         |
+| `/accessibility`            | `/accessibility`          | ✅ exists                                        | MKT-11 (keep)         |
+| `/terms`                    | `/terms-of-service`       | ✅ exists                                        | MKT-11 (keep)         |
+| `/trust`                    | —                         | ❌ missing                                       | MKT-11                |
+| `/subprocessors`            | —                         | ❌ missing                                       | MKT-11                |
+| `/about`                    | `/about`                  | ✅ exists                                        | —                     |
+| `/resources`                | —                         | ❌ missing                                       | MKT-12                |
+| `/blog`                     | `/blog`                   | ✅ exists                                        | MKT-12 (content)      |
+| `/blog/[slug]`              | —                         | ❌ missing                                       | MKT-12                |
+| `/guides/[slug]`            | —                         | ❌ missing                                       | MKT-12                |
 
 Bonus routes (already shipped, kept):
 `/about`, `/careers`, `/compare/[slug]`, `/cookie-policy`, `/coppa-compliance`, `/ferpa-compliance`, `/forgot-password`, `/for-homeschool`, `/levels` + `/levels/[level]`, `/login`, `/press-kit`, `/reset-password`, `/signup`, `/subjects` + `/subjects/[slug]`, `/tutors` + `/tutors/[slug]`.
@@ -66,6 +66,7 @@ Bonus routes (already shipped, kept):
 Columns: **Audience** · **Message** · **Goal** · **Primary CTA** · **Secondary CTA** · **Objections** · **Trust proof** · **Product proof** · **SEO theme** · **Internal links** · **Required components**
 
 ### `/`
+
 - **Audience**: All — parent / school / district fork in §2
 - **Message**: AIVO gives every child a personalized next lesson, guided by parent input, learning needs, baseline results, and real progress
 - **Goal**: Segment + capture
@@ -79,6 +80,7 @@ Columns: **Audience** · **Message** · **Goal** · **Primary CTA** · **Seconda
 - **Required components**: `HomePageHeroShell`, `AudienceSelector`, `HowItWorks`, `CoreProductLoop`, `TodaysMissionPreview`, `LessonRunPreview`, `RoleVisibility`, `FunctioningLevels`, `BrainClone`, `TutorCarousel`, `TrustStrip`, `Testimonials`, `Pricing`, `FAQ`, `CTASection`, `Footer`
 
 ### `/for-parents`
+
 - **Audience**: Parents / guardians (esp. of neurodiverse learners)
 - **Message**: Understand where your child is, what they need next, and how we're personalizing support
 - **Goal**: Parent waitlist / setup signup
@@ -92,6 +94,7 @@ Columns: **Audience** · **Message** · **Goal** · **Primary CTA** · **Seconda
 - **Required components**: parent hero, pain-points strip, AIVO loop, parent assessment explainer, IEP support callout, Today's Mission preview, parent summary mockup, accessibility strip, safety section, parent FAQ, parent CTA
 
 ### `/for-schools`
+
 - **Audience**: School leaders, principals, instructional coordinators
 - **Message**: Personalized learning support with teacher visibility and safe deployment
 - **Goal**: Demo request
@@ -105,6 +108,7 @@ Columns: **Audience** · **Message** · **Goal** · **Primary CTA** · **Seconda
 - **Required components**: school hero, workflow strip, teacher dashboard mockup, roster preview, progress visibility, special-ed link card, privacy/security strip, demo CTA
 
 ### `/for-teachers`
+
 - **Audience**: Classroom teachers, intervention specialists
 - **Message**: See what learners are working on, where they need support, and what to assign next
 - **Goal**: Inbound interest / teacher waitlist
@@ -118,6 +122,7 @@ Columns: **Audience** · **Message** · **Goal** · **Primary CTA** · **Seconda
 - **Required components**: teacher hero, class dashboard mockup, skill gap mockup, assignment mockup, LessonRun history list, accommodation summary card, CTA
 
 ### `/for-districts`
+
 - **Audience**: District leaders, tech directors, curriculum leaders, procurement
 - **Message**: Scalable, privacy-aware personalized learning across schools
 - **Goal**: DPA / security packet request + sales meeting
@@ -131,6 +136,7 @@ Columns: **Audience** · **Message** · **Goal** · **Primary CTA** · **Seconda
 - **Required components**: district hero, deployment overview, rostering strip, seat-licensing card, privacy strip, accessibility strip, reporting strip, DPA CTA, demo CTA
 
 ### `/for-special-education`
+
 - **Audience**: Special ed coordinators, parents of neurodiverse learners
 - **Message**: Parent context + optional IEP context personalizes pacing, scaffolds, read-aloud, and lesson structure (no diagnosis claims)
 - **Goal**: Sensitive lead capture; parent or school contact
@@ -144,6 +150,7 @@ Columns: **Audience** · **Message** · **Goal** · **Primary CTA** · **Seconda
 - **Required components**: SE hero, "meet learner where they are" strip, learning-context explainer, optional-IEP card, what-AIVO-adapts list, view-boundary diagram, teacher-safe summary mockup, accessibility section, privacy/consent section, SE FAQ, CTA
 
 ### `/features/todays-mission` (new — MKT-09)
+
 - **Audience**: Parents + schools
 - **Message**: Today's Mission gives each learner one clear next-best learning action
 - **Goal**: Funnel to demo / signup
@@ -157,6 +164,7 @@ Columns: **Audience** · **Message** · **Goal** · **Primary CTA** · **Seconda
 - **Required components**: feature hero, problem strip, AIVO solution strip, mission-priority logic strip, mockup, visibility strip, feature CTA
 
 ### `/features/lessonrun` (new — MKT-09)
+
 - **Audience**: Parents + teachers
 - **Message**: LessonRun is the personalized learning unit behind every AIVO lesson
 - **Goal**: Demo / signup
@@ -170,6 +178,7 @@ Columns: **Audience** · **Message** · **Goal** · **Primary CTA** · **Seconda
 - **Required components**: hero, flow diagram, tutor strip, hints/scaffolds strip, read-aloud strip, break-mode strip, mastery strip, parent-summary strip, feature CTA
 
 ### `/features/homework-helper` (new — MKT-09)
+
 - **Audience**: Parents primarily; teachers secondarily
 - **Message**: Guides learners step by step without simply dumping answers
 - **Goal**: Parent waitlist / signup
@@ -183,6 +192,7 @@ Columns: **Audience** · **Message** · **Goal** · **Primary CTA** · **Seconda
 - **Required components**: hero, problem-input mockup, clarifying-question strip, guided-help strip, scaffolded-explanation strip, follow-up lesson strip, safety strip, feature CTA
 
 ### `/pricing` (new — MKT-10)
+
 - **Audience**: Parents, schools, districts
 - **Message**: Plans for families, schools, and districts — clear, no fake numbers
 - **Goal**: Plan selection → demo / waitlist
@@ -196,14 +206,17 @@ Columns: **Audience** · **Message** · **Goal** · **Primary CTA** · **Seconda
 - **Required components**: pricing hero, 3 plan cards, comparison table, FAQ strip, pricing CTA
 
 ### `/demo`, `/waitlist`, `/thank-you` (new — MKT-10)
+
 - All three are conversion-optimized form pages — short, single-purpose, no nav clutter.
 - See MKT-10 sprint for field specs and form-component contracts.
 
 ### `/security`, `/trust`, `/subprocessors` (new — MKT-11)
+
 - Trust-center surfaces. Procurement-friendly language, no certification overclaims, evidence-ready.
 - See MKT-11 for section specs.
 
 ### `/resources`, `/blog`, `/blog/[slug]`, `/guides/[slug]` (new — MKT-12)
+
 - Top-of-funnel SEO + nurture. Categories: parent guides, personalized learning, special education support, AI in education, teacher workflows, school implementation, accessibility, privacy & safety.
 
 ## Design funnel rules (locked)

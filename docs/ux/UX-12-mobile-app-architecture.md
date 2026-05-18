@@ -1,6 +1,6 @@
 # UX-12 — Unified Mobile App Architecture & Role Switching
 
-> **Last refreshed**: 2026-05-17 — verified current. The five-route-group fragmentation in `apps/mobile/app/{(parent),(learner),(teacher),(caregiver),(therapist)}` is still in place; `apps/mobile/app/index.tsx` still routes on `user.role`; the unified-shell migration is still tracked as DD-04 (P0) in UX-00. UX-13 (this batch) documents the per-mode role experiences that land *into* this shell.
+> **Last refreshed**: 2026-05-17 — verified current. The five-route-group fragmentation in `apps/mobile/app/{(parent),(learner),(teacher),(caregiver),(therapist)}` is still in place; `apps/mobile/app/index.tsx` still routes on `user.role`; the unified-shell migration is still tracked as DD-04 (P0) in UX-00. UX-13 (this batch) documents the per-mode role experiences that land _into_ this shell.
 >
 > **Source of truth.** Grounded in `apps/mobile/app/**`. The mobile app today is **fragmented into five separate role groups** — `(parent)`, `(learner)`, `(teacher)`, `(caregiver)`, `(therapist)` — gated by a switch on `user.role` in `app/index.tsx`. UX‑00 flagged this as a structural problem; this doc proposes the unified-app architecture and identifies the migration path.
 >
@@ -12,12 +12,18 @@
 
 ```ts
 switch (user.role) {
-  case 'PARENT':    router.replace('/(parent)');
-  case 'LEARNER':   router.replace('/(learner)');
-  case 'TEACHER':   router.replace('/(teacher)');
-  case 'CAREGIVER': router.replace('/(caregiver)');
-  case 'THERAPIST': router.replace('/(therapist)');
-  default:          router.replace('/(auth)/login');
+  case "PARENT":
+    router.replace("/(parent)");
+  case "LEARNER":
+    router.replace("/(learner)");
+  case "TEACHER":
+    router.replace("/(teacher)");
+  case "CAREGIVER":
+    router.replace("/(caregiver)");
+  case "THERAPIST":
+    router.replace("/(therapist)");
+  default:
+    router.replace("/(auth)/login");
 }
 ```
 
@@ -25,17 +31,17 @@ Each group has its own tab bar, its own settings screen, its own profile screen,
 
 The cost shows up in three ways:
 
-1. **User confusion** — *"why can't I see my own kid?"* support tickets.
-2. **Code drift** — five copies of *Settings* mean five chances for the FERPA disclosure footer to fall out of sync.
+1. **User confusion** — _"why can't I see my own kid?"_ support tickets.
+2. **Code drift** — five copies of _Settings_ mean five chances for the FERPA disclosure footer to fall out of sync.
 3. **Onboarding friction** — every new role today requires a new top‑level group, which means new auth wiring and new push registration.
 
 ## 2. Principles for the unified app
 
-1. **One app, one identity, many hats.** A signed‑in user has a list of *active roles*; the active role is a per‑session choice, not a sign‑in choice.
-2. **Role context is global, surfaces are shared.** *Subjects*, *Library*, *Rewards*, *Settings* are one screen each, parameterized by active role.
+1. **One app, one identity, many hats.** A signed‑in user has a list of _active roles_; the active role is a per‑session choice, not a sign‑in choice.
+2. **Role context is global, surfaces are shared.** _Subjects_, _Library_, _Rewards_, _Settings_ are one screen each, parameterized by active role.
 3. **Role switching is fast and reversible.** From any screen, two taps to switch role; the previous deep link is remembered.
 4. **Default to the highest‑frequency role.** If the user is a parent + occasional teacher, default to parent. Persist the last‑used role across launches.
-5. **Hard boundaries hold.** Switching to *Teacher* doesn't reveal parent‑only data. Each repo call still re‑authorizes against the active role on the server.
+5. **Hard boundaries hold.** Switching to _Teacher_ doesn't reveal parent‑only data. Each repo call still re‑authorizes against the active role on the server.
 
 ## 3. Target architecture (⬜)
 
@@ -73,9 +79,9 @@ Expo Router supports `(group)` syntax to organize screens without affecting URLs
 type ActiveRole = "PARENT" | "LEARNER" | "TEACHER" | "CAREGIVER" | "THERAPIST";
 
 type RoleContextValue = {
-  available: ActiveRole[];       // every role this user holds
-  active: ActiveRole;            // current selection
-  setActive: (r: ActiveRole) => Promise<void>;  // persists + reroutes if needed
+  available: ActiveRole[]; // every role this user holds
+  active: ActiveRole; // current selection
+  setActive: (r: ActiveRole) => Promise<void>; // persists + reroutes if needed
   /** True when active === "PARENT" and an active-learner cookie is set. */
   hasActiveLearner: boolean;
 };
@@ -85,9 +91,9 @@ type RoleContextValue = {
 
 ### Switching UX
 
-1. **Persistent header pill** — the AppHeader shows a *"You're a {role}"* pill on every screen. Tap → bottom sheet.
+1. **Persistent header pill** — the AppHeader shows a _"You're a {role}"_ pill on every screen. Tap → bottom sheet.
 2. **Bottom sheet** — list of `available` roles with the active one checked. Tap a row → close sheet, update context, re‑render in place.
-3. **Per‑role deep‑link memory** — switching to *Teacher* lands you on the last *Teacher* surface you saw, not the *Teacher* home. Stored as `lastPath[role]` in AsyncStorage.
+3. **Per‑role deep‑link memory** — switching to _Teacher_ lands you on the last _Teacher_ surface you saw, not the _Teacher_ home. Stored as `lastPath[role]` in AsyncStorage.
 
 ### Permission boundary
 
@@ -95,14 +101,14 @@ Client trust is zero. Every BFF call carries the user's session cookie; the serv
 
 ## 5. Screen catalog (proposed, role‑aware)
 
-| Screen | Parent | Learner | Teacher | Caregiver | Therapist |
-|---|---|---|---|---|---|
-| `home` | Today + nudges | Today's Mission | Triage list | Daily routine | Today's caseload |
-| `subjects` | Active learner's map | Own map | Class skill heatmap | Active learner's map | Active learner's map |
-| `library` | All resources | Age‑filtered | Curriculum docs | All resources | Therapy resources |
-| `rewards` | Active learner's badges | Own XP/badges | Class engagement | Active learner's badges | (hidden) |
-| `chat` | Parent ↔ Teacher | (hidden) | Parent ↔ Teacher | Parent ↔ Teacher | Therapy notes |
-| `settings` | Shared shell | Shared shell | Shared shell | Shared shell | Shared shell |
+| Screen     | Parent                  | Learner         | Teacher             | Caregiver               | Therapist            |
+| ---------- | ----------------------- | --------------- | ------------------- | ----------------------- | -------------------- |
+| `home`     | Today + nudges          | Today's Mission | Triage list         | Daily routine           | Today's caseload     |
+| `subjects` | Active learner's map    | Own map         | Class skill heatmap | Active learner's map    | Active learner's map |
+| `library`  | All resources           | Age‑filtered    | Curriculum docs     | All resources           | Therapy resources    |
+| `rewards`  | Active learner's badges | Own XP/badges   | Class engagement    | Active learner's badges | (hidden)             |
+| `chat`     | Parent ↔ Teacher        | (hidden)        | Parent ↔ Teacher    | Parent ↔ Teacher        | Therapy notes        |
+| `settings` | Shared shell            | Shared shell    | Shared shell        | Shared shell            | Shared shell         |
 
 **Rule:** if a screen renders nothing for a role, hide the tab — don't ship an empty tab.
 
@@ -111,8 +117,8 @@ Client trust is zero. Every BFF call carries the user's session cookie; the serv
 These flows already work and are unchanged by the unified app:
 
 - `app/index.tsx` reads `useAuth`, redirects to `/(auth)/login` when not authed.
-- `mustChangePassword` is honored *before* role routing (`app/index.tsx:31-34`). The unified architecture preserves this gate.
-- Pending deep links from `accept-invite.tsx` are consumed *after* the password gate and *before* role routing (`app/index.tsx:42-49`). Retained.
+- `mustChangePassword` is honored _before_ role routing (`app/index.tsx:31-34`). The unified architecture preserves this gate.
+- Pending deep links from `accept-invite.tsx` are consumed _after_ the password gate and _before_ role routing (`app/index.tsx:42-49`). Retained.
 
 The single change: line 50–67's `switch` collapses to `router.replace('/(app)')`.
 
@@ -146,37 +152,37 @@ Each stage ships independently and is rollback‑safe.
 
 ## 8. Microcopy (⬜)
 
-| Surface | String |
-|---|---|
-| Role pill | *"You're a {role}"* |
-| Bottom sheet header | *"Switch role"* |
-| Role with no learner attached (parent) | *"Add a learner to get started"* |
-| Switching mid‑task | *"Save your progress before switching?"* (only when there's unsaved state) |
-| Single‑role user | *(pill renders without tap affordance — visual only)* |
+| Surface                                | String                                                                     |
+| -------------------------------------- | -------------------------------------------------------------------------- |
+| Role pill                              | _"You're a {role}"_                                                        |
+| Bottom sheet header                    | _"Switch role"_                                                            |
+| Role with no learner attached (parent) | _"Add a learner to get started"_                                           |
+| Switching mid‑task                     | _"Save your progress before switching?"_ (only when there's unsaved state) |
+| Single‑role user                       | _(pill renders without tap affordance — visual only)_                      |
 
 ## 9. State matrix
 
-| State | UX |
-|---|---|
-| Single role | Pill is informational only. No bottom sheet. |
-| Two roles | Pill is tappable. Bottom sheet shows both. |
-| Parent role, no active learner | Pill shows *"Parent"*; subjects/rewards tabs route to `/learner/select`. |
-| Role switch while a session is in progress | If unsaved state exists (e.g. mid‑lesson on learner), prompt before switch. Otherwise switch silently. |
-| Role removed mid‑session | (rare — admin revokes teacher access during a session) On next BFF call, server returns 403; client clears active role, re‑evaluates `available`, redirects. |
-| Account suspended | Same as auth failure — redirect to `/(auth)/login`. |
+| State                                      | UX                                                                                                                                                           |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Single role                                | Pill is informational only. No bottom sheet.                                                                                                                 |
+| Two roles                                  | Pill is tappable. Bottom sheet shows both.                                                                                                                   |
+| Parent role, no active learner             | Pill shows _"Parent"_; subjects/rewards tabs route to `/learner/select`.                                                                                     |
+| Role switch while a session is in progress | If unsaved state exists (e.g. mid‑lesson on learner), prompt before switch. Otherwise switch silently.                                                       |
+| Role removed mid‑session                   | (rare — admin revokes teacher access during a session) On next BFF call, server returns 403; client clears active role, re‑evaluates `available`, redirects. |
+| Account suspended                          | Same as auth failure — redirect to `/(auth)/login`.                                                                                                          |
 
 ## 10. Engineering handoff
 
-| Concern | Where |
-|---|---|
-| Legacy role switch | `apps/mobile/app/index.tsx:50-67` — to be simplified |
-| Auth hook | `apps/mobile/hooks/useAuth.ts` — add `availableRoles` to the user shape |
-| Role context | New: `apps/mobile/lib/roleContext.tsx` |
-| Tab bar | New: `apps/mobile/app/(app)/_layout.tsx` |
-| Persistence | `AsyncStorage` key `aivo.activeRole.{userId}` |
-| Active‑role header | Wire `x-aivo-active-role` into the `fetch` wrapper in `apps/mobile/lib/api.ts` |
-| Server‑side check | Web BFFs already enforce role via `requirePageRole`. Mobile BFFs (under `services/identity-svc` etc.) need the same check against the new header. |
-| Feature flag | `MOBILE_UNIFIED_APP` in `apps/mobile/lib/flags.ts` |
+| Concern            | Where                                                                                                                                             |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Legacy role switch | `apps/mobile/app/index.tsx:50-67` — to be simplified                                                                                              |
+| Auth hook          | `apps/mobile/hooks/useAuth.ts` — add `availableRoles` to the user shape                                                                           |
+| Role context       | New: `apps/mobile/lib/roleContext.tsx`                                                                                                            |
+| Tab bar            | New: `apps/mobile/app/(app)/_layout.tsx`                                                                                                          |
+| Persistence        | `AsyncStorage` key `aivo.activeRole.{userId}`                                                                                                     |
+| Active‑role header | Wire `x-aivo-active-role` into the `fetch` wrapper in `apps/mobile/lib/api.ts`                                                                    |
+| Server‑side check  | Web BFFs already enforce role via `requirePageRole`. Mobile BFFs (under `services/identity-svc` etc.) need the same check against the new header. |
+| Feature flag       | `MOBILE_UNIFIED_APP` in `apps/mobile/lib/flags.ts`                                                                                                |
 
 ## 11. Acceptance criteria — honest
 
@@ -189,7 +195,7 @@ Each stage ships independently and is rollback‑safe.
 
 ## 12. Open questions
 
-1. **Is *Therapist* a real role on day one of the unified app, or do we defer?** The legacy `(therapist)` group exists but is the thinnest. Decision affects whether *Chat* needs a *Therapy notes* mode in v1.
-2. **Cross‑role notifications.** If a parent receives a push about their kid's lesson while signed into the *Teacher* role, do we auto‑switch or show a banner *"This is for your Parent view — tap to switch"*? The latter respects the principle in §2.4 but adds friction.
+1. **Is _Therapist_ a real role on day one of the unified app, or do we defer?** The legacy `(therapist)` group exists but is the thinnest. Decision affects whether _Chat_ needs a _Therapy notes_ mode in v1.
+2. **Cross‑role notifications.** If a parent receives a push about their kid's lesson while signed into the _Teacher_ role, do we auto‑switch or show a banner _"This is for your Parent view — tap to switch"_? The latter respects the principle in §2.4 but adds friction.
 3. **Shared device, two parents** — today auth covers this. Confirm the active‑role persistence in §4 is keyed by `userId`, not device, so a logout flushes correctly.
 4. **Tablet layout.** This doc assumes phone tab‑bar. Tablet (the learner's primary device per UX‑05) deserves its own pass — likely a sidebar instead of bottom tabs. Out of scope here.

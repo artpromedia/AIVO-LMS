@@ -14,11 +14,7 @@ import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { PARENT_NAV } from "@/components/layout/role-shells";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  getLearner,
-  getLearnerSensoryProfile,
-  parentCanAccessLearner,
-} from "@/lib/db/repos";
+import { getLearner, getLearnerSensoryProfile, parentCanAccessLearner } from "@/lib/db/repos";
 import type { SensoryModality, SensoryResponse } from "@/lib/db/types";
 
 export const dynamic = "force-dynamic";
@@ -121,8 +117,7 @@ export default async function ParentSensoryPage({
       <div className="grid gap-4 lg:grid-cols-2">
         {MODALITIES.map((m) => {
           const Icon = m.icon;
-          const response: SensoryResponse =
-            profile?.modalities[m.key] ?? "unknown";
+          const response: SensoryResponse = profile?.modalities[m.key] ?? "unknown";
           const tone = RESPONSE_TONE[response];
           return (
             <Card key={m.key} className="p-[var(--aivo-density-card-pad)]">

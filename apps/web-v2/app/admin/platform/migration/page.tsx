@@ -35,7 +35,10 @@ export default async function Page() {
 
       <h2 className="mb-3 font-display text-lg font-semibold">Recent jobs</h2>
       {jobs.length === 0 ? (
-        <EmptyState title="No migration jobs yet" description="Use the form above to start a dry-run." />
+        <EmptyState
+          title="No migration jobs yet"
+          description="Use the form above to start a dry-run."
+        />
       ) : (
         <Card className="overflow-hidden">
           <table className="w-full text-sm">
@@ -57,14 +60,22 @@ export default async function Page() {
                   <td className="p-3 text-aivo-ink-soft">{j.kind}</td>
                   <td className="p-3">
                     <Badge tone={STATUS_TONE[j.status] ?? "neutral"}>{j.status}</Badge>
-                    {j.dryRun ? <span className="ml-2 text-xs text-aivo-ink-soft">dry-run</span> : null}
+                    {j.dryRun ? (
+                      <span className="ml-2 text-xs text-aivo-ink-soft">dry-run</span>
+                    ) : null}
                   </td>
                   <td className="p-3 text-aivo-ink-soft">
                     {j.successRecords}/{j.totalRecords} ok
-                    {j.failedRecords > 0 ? <span className="ml-1 text-aivo-danger">· {j.failedRecords} failed</span> : null}
-                    {j.skippedRecords > 0 ? <span className="ml-1">· {j.skippedRecords} skipped</span> : null}
+                    {j.failedRecords > 0 ? (
+                      <span className="ml-1 text-aivo-danger">· {j.failedRecords} failed</span>
+                    ) : null}
+                    {j.skippedRecords > 0 ? (
+                      <span className="ml-1">· {j.skippedRecords} skipped</span>
+                    ) : null}
                   </td>
-                  <td className="p-3 text-aivo-ink-soft">{new Date(j.createdAt).toLocaleString()}</td>
+                  <td className="p-3 text-aivo-ink-soft">
+                    {new Date(j.createdAt).toLocaleString()}
+                  </td>
                 </tr>
               ))}
             </tbody>

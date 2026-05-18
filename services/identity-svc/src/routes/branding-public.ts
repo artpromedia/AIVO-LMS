@@ -22,27 +22,37 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 export async function registerPublicBrandingRoutes(app: FastifyInstance) {
   const db = (app as any).db;
 
-  app.get("/api/branding/public/:tenantId", { schema: getBrandingPublicByTenantIdSchema }, async (req: any, reply: any) => {
-    const { tenantId } = req.params as { tenantId: string };
-    if (!tenantId || !UUID_RE.test(tenantId)) {
-      return reply.status(404).send({ error: "Not found" });
-    }
-    const [tenant] = await db.select({ id: tenants.id, name: tenants.name })
-      .from(tenants).where(eq(tenants.id, tenantId)).limit(1);
-    if (!tenant) return reply.status(404).send({ error: "Not found" });
-    const [settings] = await db.select({ branding: districtSettings.branding })
-      .from(districtSettings).where(eq(districtSettings.tenantId, tenant.id)).limit(1);
-    const b = ((settings?.branding as any) || {}) as any;
-    // Cache aggressively — this is public and changes infrequently.
-    reply.header("cache-control", "public, max-age=300");
-    return {
-      tenant: { id: tenant.id, name: tenant.name },
-      branding: {
-        displayName: b.displayName || tenant.name,
-        primaryColor: b.primaryColor || null,
-        logoUrl: b.logoUrl || null,
-        supportEmail: b.supportEmail || null,
-      },
-    };
-  });
+  app.get(
+    "/api/branding/public/:tenantId",
+    { schema: getBrandingPublicByTenantIdSchema },
+    async (req: any, reply: any) => {
+      const { tenantId } = req.params as { tenantId: string };
+      if (!tenantId || !UUID_RE.test(tenantId)) {
+        return reply.status(404).send({ error: "Not found" });
+      }
+      const [tenant] = await db
+        .select({ id: tenants.id, name: tenants.name })
+        .from(tenants)
+        .where(eq(tenants.id, tenantId))
+        .limit(1);
+      if (!tenant) return reply.status(404).send({ error: "Not found" });
+      const [settings] = await db
+        .select({ branding: districtSettings.branding })
+        .from(districtSettings)
+        .where(eq(districtSettings.tenantId, tenant.id))
+        .limit(1);
+      const b = ((settings?.branding as any) || {}) as any;
+      // Cache aggressively — this is public and changes infrequently.
+      reply.header("cache-control", "public, max-age=300");
+      return {
+        tenant: { id: tenant.id, name: tenant.name },
+        branding: {
+          displayName: b.displayName || tenant.name,
+          primaryColor: b.primaryColor || null,
+          logoUrl: b.logoUrl || null,
+          supportEmail: b.supportEmail || null,
+        },
+      };
+    },
+  );
 }

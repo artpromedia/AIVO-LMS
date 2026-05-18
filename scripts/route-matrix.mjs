@@ -65,19 +65,27 @@ const CONSENT_BY_PATH = {
 
 const purposeOf = (p, role) => {
   if (p === "/") return "Public landing + role-card switcher for the demo.";
-  if (p === "/login") return "Mock role picker (real auth lands in identity-svc — see UX-00 DD-15).";
-  if (p === "/signup") return "Parent signup — currently disabled UI shell; must be replaced with real auth.";
-  if (p.endsWith("/home")) return `${role[0].toUpperCase() + role.slice(1)} home: surfaces the next action${role === "learner" ? " (Today's Mission)" : ""}.`;
-  if (p.endsWith("/select") && role === "learner") return "Choose which learner a parent is helping (skipped when only one).";
-  if (p.includes("/baseline")) return "Discovery Adventure baseline — adaptive, never displayed as a score.";
+  if (p === "/login")
+    return "Mock role picker (real auth lands in identity-svc — see UX-00 DD-15).";
+  if (p === "/signup")
+    return "Parent signup — currently disabled UI shell; must be replaced with real auth.";
+  if (p.endsWith("/home"))
+    return `${role[0].toUpperCase() + role.slice(1)} home: surfaces the next action${role === "learner" ? " (Today's Mission)" : ""}.`;
+  if (p.endsWith("/select") && role === "learner")
+    return "Choose which learner a parent is helping (skipped when only one).";
+  if (p.includes("/baseline"))
+    return "Discovery Adventure baseline — adaptive, never displayed as a score.";
   if (p.includes("/lesson-runs/")) return "Full-screen lesson player (Stage) — one beat at a time.";
   if (p.includes("/homework/")) return "Homework Helper chat — tutor-mediated, parent-visible.";
-  if (p.includes("/iep")) return "IEP / accommodation document handling — upload + extracted-accommodations review.";
+  if (p.includes("/iep"))
+    return "IEP / accommodation document handling — upload + extracted-accommodations review.";
   if (p.includes("/brain-profile")) return "Plain-language brain profile for parent review.";
-  if (p.includes("/consent")) return "Per-type consent management with version + accept/revoke history.";
+  if (p.includes("/consent"))
+    return "Per-type consent management with version + accept/revoke history.";
   if (p.includes("/privacy")) return "Parent data-rights surfaces (export, delete, DSAR).";
   if (p.includes("/notifications")) return "Per-channel notification preferences + recent items.";
-  if (p.includes("/settings/accessibility")) return "Accessibility preferences (text size, motion, audio).";
+  if (p.includes("/settings/accessibility"))
+    return "Accessibility preferences (text size, motion, audio).";
   if (p.includes("/settings")) return "Account, billing, and per-role settings.";
   if (p.includes("/assignments/new")) return "Teacher creates a new assignment.";
   if (p.includes("/assignments")) return "Teacher assignment tracking.";
@@ -92,8 +100,10 @@ const purposeOf = (p, role) => {
   if (p.includes("/ai-generation")) return "AI generation monitoring.";
   if (p.includes("/ai-costs")) return "Per-tenant LLM cost rollup.";
   if (p.includes("/safety/")) return "Safety review queue / policies / red-team artifacts.";
-  if (p.includes("/security/")) return "Security posture — controls, incidents, risks, vendors, vulns.";
-  if (p.includes("/compliance/")) return "Compliance artifacts — DSAR / retention / disclosures / data inventory.";
+  if (p.includes("/security/"))
+    return "Security posture — controls, incidents, risks, vendors, vulns.";
+  if (p.includes("/compliance/"))
+    return "Compliance artifacts — DSAR / retention / disclosures / data inventory.";
   if (p.includes("/curriculum/")) return "Curriculum management.";
   if (p.includes("/system-health")) return "System health overview.";
   if (p.includes("/tenants")) return "Tenant management.";
@@ -141,28 +151,43 @@ const ctaOf = (p, role) => {
 
 const deviceOf = (_p, role) => (role.endsWith("_admin") ? ["web"] : ["web", "tablet", "mobile"]);
 
-const permissionOf = (_p, role) => ({
-  public: "none",
-  shared: "any signed-in",
-  learner: "learner OR (parent + active learner cookie)",
-  parent: "parent + parentUserId scope on learner reads",
-  teacher: "teacher + class-roster membership for learner reads",
-  school_admin: "school_admin + school tenant scope",
-  district_admin: "district_admin + district tenant scope",
-  platform_admin: "platform_admin",
-}[role] ?? "role-gated");
+const permissionOf = (_p, role) =>
+  ({
+    public: "none",
+    shared: "any signed-in",
+    learner: "learner OR (parent + active learner cookie)",
+    parent: "parent + parentUserId scope on learner reads",
+    teacher: "teacher + class-roster membership for learner reads",
+    school_admin: "school_admin + school tenant scope",
+    district_admin: "district_admin + district tenant scope",
+    platform_admin: "platform_admin",
+  })[role] ?? "role-gated";
 
 const MVP_ANCHORS = new Set([
-  "/", "/login", "/signup",
-  "/parent/home", "/parent/learners", "/parent/learners/new",
-  "/parent/learners/[learnerId]", "/parent/learners/[learnerId]/assessment",
-  "/parent/learners/[learnerId]/iep", "/parent/learners/[learnerId]/baseline",
-  "/parent/learners/[learnerId]/brain-profile", "/parent/learners/[learnerId]/progress",
+  "/",
+  "/login",
+  "/signup",
+  "/parent/home",
+  "/parent/learners",
+  "/parent/learners/new",
+  "/parent/learners/[learnerId]",
+  "/parent/learners/[learnerId]/assessment",
+  "/parent/learners/[learnerId]/iep",
+  "/parent/learners/[learnerId]/baseline",
+  "/parent/learners/[learnerId]/brain-profile",
+  "/parent/learners/[learnerId]/progress",
   "/parent/learners/[learnerId]/lessons",
-  "/learner/select", "/learner/home", "/learner/baseline", "/learner/baseline/[baselineId]",
+  "/learner/select",
+  "/learner/home",
+  "/learner/baseline",
+  "/learner/baseline/[baselineId]",
   "/learner/lesson-runs/[lessonRunId]",
-  "/teacher/home", "/teacher/classes", "/teacher/classes/[classId]", "/teacher/learners/[learnerId]",
-  "/admin/platform", "/settings/accessibility",
+  "/teacher/home",
+  "/teacher/classes",
+  "/teacher/classes/[classId]",
+  "/teacher/learners/[learnerId]",
+  "/admin/platform",
+  "/settings/accessibility",
 ]);
 
 const priorityOf = (p, role) => {
@@ -173,16 +198,21 @@ const priorityOf = (p, role) => {
     p.startsWith("/admin/platform/compliance") ||
     p.startsWith("/admin/platform/tenants") ||
     p.startsWith("/admin/platform/migration")
-  ) return "enterprise";
+  )
+    return "enterprise";
   return "school-ready";
 };
 
 const mobileBehaviorOf = (role) =>
-  role === "learner" ? "Learner Mode tab; full-screen for lesson/baseline/homework"
-  : role === "parent" ? "Parent Mode tab content; stacks vertically"
-  : role === "teacher" ? "Teacher Mode tab content"
-  : role.endsWith("_admin") ? "surfaces a subset under Admin-Lite Mode (alerts / failures / rostering / support only)"
-  : "shared across all modes";
+  role === "learner"
+    ? "Learner Mode tab; full-screen for lesson/baseline/homework"
+    : role === "parent"
+      ? "Parent Mode tab content; stacks vertically"
+      : role === "teacher"
+        ? "Teacher Mode tab content"
+        : role.endsWith("_admin")
+          ? "surfaces a subset under Admin-Lite Mode (alerts / failures / rostering / support only)"
+          : "shared across all modes";
 
 const MOBILE_SCREENS = [
   { key: "/welcome", mode: "pre-auth", name: "Welcome", priority: "MVP" },
@@ -192,13 +222,23 @@ const MOBILE_SCREENS = [
   { key: "/(auth)/verify-mfa", mode: "auth", name: "Verify MFA", priority: "MVP" },
   { key: "/(auth)/forgot-password", mode: "auth", name: "Forgot password", priority: "MVP" },
   { key: "/(auth)/reset-password", mode: "auth", name: "Reset password", priority: "MVP" },
-  { key: "/(auth)/change-password", mode: "auth", name: "Change password", priority: "school-ready" },
+  {
+    key: "/(auth)/change-password",
+    mode: "auth",
+    name: "Change password",
+    priority: "school-ready",
+  },
   { key: "/role-chooser", mode: "auth", name: "Role chooser (first time)", priority: "MVP" },
   { key: "/role-switcher", mode: "shared", name: "Role switcher drawer", priority: "MVP" },
   { key: "parent/home", mode: "parent", name: "Parent home", priority: "MVP" },
   { key: "parent/learners", mode: "parent", name: "Parent learners", priority: "MVP" },
   { key: "parent/progress", mode: "parent", name: "Parent progress", priority: "school-ready" },
-  { key: "parent/notifications", mode: "parent", name: "Parent notifications", priority: "school-ready" },
+  {
+    key: "parent/notifications",
+    mode: "parent",
+    name: "Parent notifications",
+    priority: "school-ready",
+  },
   { key: "parent/settings", mode: "parent", name: "Parent settings", priority: "MVP" },
   { key: "learner/today", mode: "learner", name: "Today (mission)", priority: "MVP" },
   { key: "learner/lesson", mode: "learner", name: "Lesson player", priority: "MVP" },
@@ -210,26 +250,58 @@ const MOBILE_SCREENS = [
   { key: "teacher/classes", mode: "teacher", name: "Classes", priority: "MVP" },
   { key: "teacher/learners", mode: "teacher", name: "Learners", priority: "school-ready" },
   { key: "teacher/assignments", mode: "teacher", name: "Assignments", priority: "school-ready" },
-  { key: "teacher/notifications", mode: "teacher", name: "Notifications", priority: "school-ready" },
+  {
+    key: "teacher/notifications",
+    mode: "teacher",
+    name: "Notifications",
+    priority: "school-ready",
+  },
   { key: "admin-lite/alerts", mode: "admin-lite", name: "Alerts", priority: "enterprise" },
-  { key: "admin-lite/ai-failures", mode: "admin-lite", name: "AI failures", priority: "enterprise" },
-  { key: "admin-lite/rostering-status", mode: "admin-lite", name: "Rostering status", priority: "enterprise" },
+  {
+    key: "admin-lite/ai-failures",
+    mode: "admin-lite",
+    name: "AI failures",
+    priority: "enterprise",
+  },
+  {
+    key: "admin-lite/rostering-status",
+    mode: "admin-lite",
+    name: "Rostering status",
+    priority: "enterprise",
+  },
   { key: "admin-lite/support", mode: "admin-lite", name: "Support", priority: "enterprise" },
   { key: "shared/settings/account", mode: "shared", name: "Account settings", priority: "MVP" },
   { key: "shared/settings/accessibility", mode: "shared", name: "Accessibility", priority: "MVP" },
   { key: "shared/settings/language", mode: "shared", name: "Language", priority: "school-ready" },
-  { key: "shared/settings/notifications", mode: "shared", name: "Notifications prefs", priority: "school-ready" },
-  { key: "shared/notifications", mode: "shared", name: "Notification center", priority: "school-ready" },
+  {
+    key: "shared/settings/notifications",
+    mode: "shared",
+    name: "Notifications prefs",
+    priority: "school-ready",
+  },
+  {
+    key: "shared/notifications",
+    mode: "shared",
+    name: "Notification center",
+    priority: "school-ready",
+  },
 ];
 
 const PLANNED_ROUTES = [
-  "/verify-email", "/forgot-password", "/reset-password", "/account-recovery",
-  "/help", "/help/[topic]",
-  "/parent/inbox", "/parent/learners/[learnerId]/timeline",
+  "/verify-email",
+  "/forgot-password",
+  "/reset-password",
+  "/account-recovery",
+  "/help",
+  "/help/[topic]",
+  "/parent/inbox",
+  "/parent/learners/[learnerId]/timeline",
   "/learner/inbox",
   "/teacher/learners/[learnerId]/iep-summary",
   "/admin/platform/system-health/incidents",
-  "/admin/school/notifications", "/admin/district/notifications", "/admin/platform/notifications",
+  "/admin/school/notifications",
+  "/admin/district/notifications",
+  "/admin/platform/notifications",
 ];
 
 function main() {
@@ -238,7 +310,14 @@ function main() {
     const role = roleOf(p);
     return {
       path: p,
-      name: p === "/" ? "Landing" : p.split("/").filter(Boolean).map((s) => s.replace(/\[|\]/g, "")).join(" / "),
+      name:
+        p === "/"
+          ? "Landing"
+          : p
+              .split("/")
+              .filter(Boolean)
+              .map((s) => s.replace(/\[|\]/g, ""))
+              .join(" / "),
       role,
       device: deviceOf(p, role),
       purpose: purposeOf(p, role),
@@ -251,11 +330,13 @@ function main() {
       retry: "manual",
       permission: permissionOf(p, role),
       consentDependency: CONSENT_BY_PATH[p] ?? [],
-      accessibilityNotes: "inherits SkipLinks + focus-visible from app root; role-specific notes in UX-00 §6",
+      accessibilityNotes:
+        "inherits SkipLinks + focus-visible from app root; role-specific notes in UX-00 §6",
       mobileBehavior: mobileBehaviorOf(role),
       eng: "requirePageRole on page; per-BFF requireSession + ownership/tenant check (see UX-01 §5)",
       priority: priorityOf(p, role),
-      implementationStatus: (p === "/signup" || p === "/login") ? "demo-only — replace per UX-00 DD-15" : "implemented",
+      implementationStatus:
+        p === "/signup" || p === "/login" ? "demo-only — replace per UX-00 DD-15" : "implemented",
     };
   });
 
@@ -287,7 +368,9 @@ function main() {
 
   fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
   fs.writeFileSync(OUT_FILE, JSON.stringify(output, null, 2) + "\n");
-  console.log(`wrote ${OUT_FILE}: ${web.length} web + ${MOBILE_SCREENS.length} mobile + ${planned.length} planned rows`);
+  console.log(
+    `wrote ${OUT_FILE}: ${web.length} web + ${MOBILE_SCREENS.length} mobile + ${planned.length} planned rows`,
+  );
 }
 
 main();

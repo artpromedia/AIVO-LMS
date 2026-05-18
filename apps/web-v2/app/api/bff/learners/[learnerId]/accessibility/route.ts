@@ -11,11 +11,7 @@ import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
 import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import { audit } from "@/lib/bff/audit";
-import {
-  getAccessibilityPrefs,
-  getLearner,
-  updateAccessibilityPrefs,
-} from "@/lib/db/repos";
+import { getAccessibilityPrefs, getLearner, updateAccessibilityPrefs } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
 
@@ -53,7 +49,12 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection"],
+      requestId,
+    );
     if (consentErr) return consentErr;
     if (!getLearner(learnerId, session!.tenantId)) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
@@ -75,7 +76,12 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection"],
+      requestId,
+    );
     if (consentErr) return consentErr;
     if (!getLearner(learnerId, session!.tenantId)) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);

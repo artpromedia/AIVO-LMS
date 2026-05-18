@@ -33,16 +33,13 @@ export const metadata: Metadata = {
 export default function FeaturesPage() {
   return (
     <main id="main" className="mx-auto max-w-4xl px-6 py-16">
-      <p className="text-sm font-medium uppercase tracking-wide text-aivo-purple">
-        Features
-      </p>
+      <p className="text-sm font-medium uppercase tracking-wide text-aivo-purple">Features</p>
       <h1 className="mt-2 font-display text-4xl font-bold">
         Real learning experiences, not feature checklists.
       </h1>
       <p className="mt-3 text-aivo-ink-soft">
-        AIVO is built around three flows learners use every day. Each one is
-        adaptive, accessible, and grounded in the learner's IEP and brain
-        profile.
+        AIVO is built around three flows learners use every day. Each one is adaptive, accessible,
+        and grounded in the learner's IEP and brain profile.
       </p>
 
       <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -55,9 +52,7 @@ export default function FeaturesPage() {
               href={`/features/${f.slug}`}
               className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aivo-purple"
             >
-              <h2 className="font-display text-xl font-semibold text-aivo-ink">
-                {f.title}
-              </h2>
+              <h2 className="font-display text-xl font-semibold text-aivo-ink">{f.title}</h2>
               <p className="mt-2 text-sm text-aivo-ink-soft">{f.description}</p>
               <span className="mt-3 inline-block text-sm font-medium text-aivo-purple">
                 Learn more →

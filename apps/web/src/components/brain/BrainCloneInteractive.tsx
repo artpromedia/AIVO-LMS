@@ -96,68 +96,69 @@ interface Region {
 // Six fixed region slots in a stylised lobe layout. Coordinates are tuned
 // for a 320×240 viewBox and are independent of mastery — only colour and
 // pulse rate change at runtime.
-const REGION_SLOTS: Pick<Region, "id" | "d" | "cx" | "cy" | "labelX" | "labelY" | "labelAnchor">[] = [
-  {
-    // Prefrontal — Executive Function
-    id: "prefrontal",
-    d: "M70,90 Q60,60 95,52 Q130,48 145,72 Q155,95 135,110 Q100,118 80,108 Z",
-    cx: 105,
-    cy: 82,
-    labelX: 8,
-    labelY: 70,
-    labelAnchor: "start",
-  },
-  {
-    // Frontal-occipital — Science
-    id: "frontal-occipital",
-    d: "M150,52 Q185,42 215,55 Q245,68 240,98 Q220,118 185,112 Q155,108 145,82 Z",
-    cx: 195,
-    cy: 80,
-    labelX: 312,
-    labelY: 60,
-    labelAnchor: "end",
-  },
-  {
-    // Parietal — Math
-    id: "parietal",
-    d: "M225,70 Q260,72 268,108 Q260,135 230,138 Q215,128 218,108 Q220,90 225,70 Z",
-    cx: 246,
-    cy: 105,
-    labelX: 312,
-    labelY: 110,
-    labelAnchor: "end",
-  },
-  {
-    // Temporal — Reading / language
-    id: "temporal",
-    d: "M55,118 Q50,150 80,170 Q115,178 135,162 Q140,140 120,128 Q90,122 55,118 Z",
-    cx: 95,
-    cy: 148,
-    labelX: 8,
-    labelY: 160,
-    labelAnchor: "start",
-  },
-  {
-    // Broca / Wernicke — Speech / communication
-    id: "speech",
-    d: "M140,120 Q175,118 200,138 Q205,160 180,170 Q150,172 138,158 Q132,140 140,120 Z",
-    cx: 170,
-    cy: 145,
-    labelX: 312,
-    labelY: 165,
-    labelAnchor: "end",
-  },
-  {
-    // Limbic — SEL
-    id: "limbic",
-    d: "M115,150 Q150,148 175,168 Q170,195 140,200 Q108,198 100,180 Q102,162 115,150 Z",
-    cx: 140,
-    cy: 175,
-    labelX: 8,
-    labelY: 215,
-    labelAnchor: "start",
-  },
-];
+const REGION_SLOTS: Pick<Region, "id" | "d" | "cx" | "cy" | "labelX" | "labelY" | "labelAnchor">[] =
+  [
+    {
+      // Prefrontal — Executive Function
+      id: "prefrontal",
+      d: "M70,90 Q60,60 95,52 Q130,48 145,72 Q155,95 135,110 Q100,118 80,108 Z",
+      cx: 105,
+      cy: 82,
+      labelX: 8,
+      labelY: 70,
+      labelAnchor: "start",
+    },
+    {
+      // Frontal-occipital — Science
+      id: "frontal-occipital",
+      d: "M150,52 Q185,42 215,55 Q245,68 240,98 Q220,118 185,112 Q155,108 145,82 Z",
+      cx: 195,
+      cy: 80,
+      labelX: 312,
+      labelY: 60,
+      labelAnchor: "end",
+    },
+    {
+      // Parietal — Math
+      id: "parietal",
+      d: "M225,70 Q260,72 268,108 Q260,135 230,138 Q215,128 218,108 Q220,90 225,70 Z",
+      cx: 246,
+      cy: 105,
+      labelX: 312,
+      labelY: 110,
+      labelAnchor: "end",
+    },
+    {
+      // Temporal — Reading / language
+      id: "temporal",
+      d: "M55,118 Q50,150 80,170 Q115,178 135,162 Q140,140 120,128 Q90,122 55,118 Z",
+      cx: 95,
+      cy: 148,
+      labelX: 8,
+      labelY: 160,
+      labelAnchor: "start",
+    },
+    {
+      // Broca / Wernicke — Speech / communication
+      id: "speech",
+      d: "M140,120 Q175,118 200,138 Q205,160 180,170 Q150,172 138,158 Q132,140 140,120 Z",
+      cx: 170,
+      cy: 145,
+      labelX: 312,
+      labelY: 165,
+      labelAnchor: "end",
+    },
+    {
+      // Limbic — SEL
+      id: "limbic",
+      d: "M115,150 Q150,148 175,168 Q170,195 140,200 Q108,198 100,180 Q102,162 115,150 Z",
+      cx: 140,
+      cy: 175,
+      labelX: 8,
+      labelY: 215,
+      labelAnchor: "start",
+    },
+  ];
 
 /**
  * Map a learner-domain key to one of the six visual slots. Falls back to
@@ -267,7 +268,7 @@ export default function BrainCloneInteractive({
   const isCard = variant === "card";
   const widthClass = isCard ? "max-w-full" : "max-w-2xl";
 
-  const activeRegion = activeId ? regions.find((r) => r.id === activeId) ?? null : null;
+  const activeRegion = activeId ? (regions.find((r) => r.id === activeId) ?? null) : null;
   const activeStatus = activeRegion ? statusFor(activeRegion, enrolled) : null;
 
   return (
@@ -353,7 +354,9 @@ export default function BrainCloneInteractive({
                   strokeWidth={isHover || isActive ? 2.5 : 1.5}
                   style={{
                     transformOrigin: `${region.cx}px ${region.cy}px`,
-                    animation: animate ? `bciPulse ${pulse.toFixed(2)}s ease-in-out infinite` : undefined,
+                    animation: animate
+                      ? `bciPulse ${pulse.toFixed(2)}s ease-in-out infinite`
+                      : undefined,
                     transition: "stroke-width 200ms ease, filter 200ms ease",
                     filter: isHover || isActive ? "brightness(1.1) saturate(1.1)" : undefined,
                   }}
@@ -451,20 +454,28 @@ export default function BrainCloneInteractive({
           aria-label="Key metrics"
         >
           <MetricCell icon={<Flame className="w-4 h-4" aria-hidden="true" />} label="Streak">
-            {metrics.streakDays != null ? `${metrics.streakDays} day${metrics.streakDays === 1 ? "" : "s"}` : "—"}
+            {metrics.streakDays != null
+              ? `${metrics.streakDays} day${metrics.streakDays === 1 ? "" : "s"}`
+              : "—"}
           </MetricCell>
           <MetricCell icon={<Star className="w-4 h-4" aria-hidden="true" />} label="XP">
             {metrics.totalXp != null ? metrics.totalXp.toLocaleString() : "—"}
           </MetricCell>
           {!isCard && (
-            <MetricCell icon={<TrendingUp className="w-4 h-4" aria-hidden="true" />} label="This week">
+            <MetricCell
+              icon={<TrendingUp className="w-4 h-4" aria-hidden="true" />}
+              label="This week"
+            >
               {metrics.masteryDeltaWeek != null
                 ? `${metrics.masteryDeltaWeek >= 0 ? "+" : ""}${(metrics.masteryDeltaWeek * 100).toFixed(0)} pp`
                 : "—"}
             </MetricCell>
           )}
           {!isCard && (
-            <MetricCell icon={<Sparkles className="w-4 h-4" aria-hidden="true" />} label="Next milestone">
+            <MetricCell
+              icon={<Sparkles className="w-4 h-4" aria-hidden="true" />}
+              label="Next milestone"
+            >
               <span className="truncate inline-block max-w-full align-bottom">
                 {metrics.nextMilestone || "Keep practising"}
               </span>
@@ -501,7 +512,9 @@ export default function BrainCloneInteractive({
           {/* Soft scrim */}
           <div
             className="absolute inset-0 pointer-events-auto"
-            style={{ backgroundColor: "color-mix(in srgb, var(--tier-bg, #FFFAEF) 70%, transparent)" }}
+            style={{
+              backgroundColor: "color-mix(in srgb, var(--tier-bg, #FFFAEF) 70%, transparent)",
+            }}
             onClick={() => setActiveId(null)}
             aria-hidden="true"
           />
@@ -545,7 +558,10 @@ export default function BrainCloneInteractive({
             )}
             {activeRegion.accommodations.length > 0 && (
               <div className="mb-3">
-                <h5 className="text-xs font-bold uppercase tracking-wider mb-1.5" style={{ color: "var(--tier-text-soft, #5C5067)" }}>
+                <h5
+                  className="text-xs font-bold uppercase tracking-wider mb-1.5"
+                  style={{ color: "var(--tier-text-soft, #5C5067)" }}
+                >
                   Accommodations affecting this area
                 </h5>
                 <ul className="flex flex-wrap gap-1.5">
@@ -554,7 +570,8 @@ export default function BrainCloneInteractive({
                       key={a}
                       className="text-xs px-2 py-1 rounded-full"
                       style={{
-                        backgroundColor: "color-mix(in srgb, var(--tier-primary, #7C3AED) 12%, transparent)",
+                        backgroundColor:
+                          "color-mix(in srgb, var(--tier-primary, #7C3AED) 12%, transparent)",
                         color: "var(--tier-primary, #7C3AED)",
                       }}
                     >
@@ -566,7 +583,10 @@ export default function BrainCloneInteractive({
             )}
             {activeRegion.tutors.length > 0 && (
               <div>
-                <h5 className="text-xs font-bold uppercase tracking-wider mb-1.5" style={{ color: "var(--tier-text-soft, #5C5067)" }}>
+                <h5
+                  className="text-xs font-bold uppercase tracking-wider mb-1.5"
+                  style={{ color: "var(--tier-text-soft, #5C5067)" }}
+                >
                   Recommended tutors
                 </h5>
                 <ul className="flex flex-wrap gap-1.5">
@@ -575,7 +595,8 @@ export default function BrainCloneInteractive({
                       key={tName}
                       className="text-xs px-2 py-1 rounded-full"
                       style={{
-                        backgroundColor: "color-mix(in srgb, var(--tier-primary, #7C3AED) 12%, transparent)",
+                        backgroundColor:
+                          "color-mix(in srgb, var(--tier-primary, #7C3AED) 12%, transparent)",
                         color: "var(--tier-primary, #7C3AED)",
                       }}
                     >
@@ -591,7 +612,8 @@ export default function BrainCloneInteractive({
 
       <style jsx>{`
         @keyframes bciPulse {
-          0%, 100% {
+          0%,
+          100% {
             transform: scale(1);
             opacity: 0.85;
           }
@@ -601,7 +623,7 @@ export default function BrainCloneInteractive({
           }
         }
         .bci-region:focus-visible path:first-of-type {
-          outline: 2px solid var(--tier-primary, #7C3AED);
+          outline: 2px solid var(--tier-primary, #7c3aed);
           outline-offset: 2px;
         }
         @media (prefers-reduced-motion: reduce) {
@@ -614,7 +636,15 @@ export default function BrainCloneInteractive({
   );
 }
 
-function MetricCell({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
+function MetricCell({
+  icon,
+  label,
+  children,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div
       className="flex items-center gap-2 rounded-xl px-3 py-2"
@@ -633,7 +663,10 @@ function MetricCell({ icon, label, children }: { icon: React.ReactNode; label: s
         {icon}
       </span>
       <span className="flex flex-col min-w-0">
-        <span className="text-[10px] uppercase tracking-wider font-bold" style={{ color: "var(--tier-text-soft, #5C5067)" }}>
+        <span
+          className="text-[10px] uppercase tracking-wider font-bold"
+          style={{ color: "var(--tier-text-soft, #5C5067)" }}
+        >
           {label}
         </span>
         <span className="text-sm font-bold truncate" style={{ color: "var(--tier-text, #292F3D)" }}>

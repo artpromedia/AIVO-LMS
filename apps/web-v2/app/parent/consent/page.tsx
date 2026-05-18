@@ -4,10 +4,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PARENT_NAV } from "@/components/layout/role-shells";
-import {
-  listConsentVersions,
-  listConsentsForUser,
-} from "@/lib/db/repos";
+import { listConsentVersions, listConsentsForUser } from "@/lib/db/repos";
 import { CONSENT_TYPES } from "@/lib/db/types";
 import { ConsentToggle } from "./consent-toggle";
 
@@ -36,18 +33,13 @@ export default async function Page() {
         {accountTypes.map((type) => {
           const version = versions.find((v) => v.consentType === type);
           const active = records.find(
-            (r) =>
-              r.consentType === type &&
-              r.learnerId === null &&
-              r.revokedAt === null,
+            (r) => r.consentType === type && r.learnerId === null && r.revokedAt === null,
           );
           return (
             <div key={type} className="p-5 flex items-start justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="font-display text-base font-semibold">
-                    {humanize(type)}
-                  </h3>
+                  <h3 className="font-display text-base font-semibold">{humanize(type)}</h3>
                   {active ? (
                     <Badge tone="success">Accepted</Badge>
                   ) : (
@@ -62,11 +54,7 @@ export default async function Page() {
                   {active ? ` · accepted ${formatDate(active.acceptedAt)}` : ""}
                 </p>
               </div>
-              <ConsentToggle
-                consentType={type}
-                accepted={Boolean(active)}
-                learnerId={null}
-              />
+              <ConsentToggle consentType={type} accepted={Boolean(active)} learnerId={null} />
             </div>
           );
         })}

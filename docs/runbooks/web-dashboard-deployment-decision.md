@@ -2,11 +2,11 @@
 
 _Status: **decided** (not yet implemented), 2026-04-28._
 
-| Field | Value |
-| --- | --- |
-| Owner (cutover lead) | _TBD — assign on the platform / devops team_ |
-| Cutover target date | _TBD — fill in once the Hetzner cluster is reachable from the build pipeline_ |
-| Status transitions | `decided` → `in-progress` (when image build CI lands) → `implemented` (after smoke test passes on `app.aivolearning.com`) |
+| Field                | Value                                                                                                                     |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Owner (cutover lead) | _TBD — assign on the platform / devops team_                                                                              |
+| Cutover target date  | _TBD — fill in once the Hetzner cluster is reachable from the build pipeline_                                             |
+| Status transitions   | `decided` → `in-progress` (when image build CI lands) → `implemented` (after smoke test passes on `app.aivolearning.com`) |
 
 > **Maintenance note:** When the rollout below completes, flip the status above to **implemented**, link the PRs that built the image, added the Helm values, and changed Cloudflare DNS, and prune the rollout plan to reflect what actually shipped (image tag, ingress IP, cookie / WebAuthn origin list).
 

@@ -58,7 +58,9 @@ export default function CaregiverObservationsPage() {
   const [obsMood, setObsMood] = useState("good");
   const [obsDate, setObsDate] = useState(new Date().toISOString().slice(0, 10));
   const [submitting, setSubmitting] = useState(false);
-  const [submitMsg, setSubmitMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [submitMsg, setSubmitMsg] = useState<{ type: "success" | "error"; text: string } | null>(
+    null,
+  );
 
   const fetchData = useCallback(async () => {
     if (!accessToken || !user) return;
@@ -67,7 +69,7 @@ export default function CaregiverObservationsPage() {
     try {
       const learnersData = await fetch("/api/family/collaboration/connected-learners", {
         headers: { Authorization: `Bearer ${accessToken}` },
-      }).then(r => r.ok ? r.json() : []);
+      }).then((r) => (r.ok ? r.json() : []));
       const parsed = Array.isArray(learnersData) ? learnersData : [];
       setLearners(parsed);
       if (parsed.length > 0 && !selectedLearner) setSelectedLearner(parsed[0].id);
@@ -78,15 +80,21 @@ export default function CaregiverObservationsPage() {
     }
   }, [accessToken, user]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   useEffect(() => {
     if (!selectedLearner || !accessToken) return;
     fetch(`/api/family/observations?learnerId=${selectedLearner}`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     })
-      .then(r => r.ok ? r.json() : { observations: [] })
-      .then(data => setObservations(Array.isArray(data?.observations) ? data.observations : Array.isArray(data) ? data : []))
+      .then((r) => (r.ok ? r.json() : { observations: [] }))
+      .then((data) =>
+        setObservations(
+          Array.isArray(data?.observations) ? data.observations : Array.isArray(data) ? data : [],
+        ),
+      )
       .catch(() => setObservations([]));
   }, [selectedLearner, accessToken]);
 
@@ -111,7 +119,7 @@ export default function CaregiverObservationsPage() {
       });
       if (!res.ok) throw new Error("Failed");
       const newObs = await res.json();
-      setObservations(prev => [newObs, ...prev]);
+      setObservations((prev) => [newObs, ...prev]);
       setObsNotes("");
       setSubmitMsg({ type: "success", text: "Observation recorded successfully" });
     } catch {
@@ -139,18 +147,25 @@ export default function CaregiverObservationsPage() {
             </span>
           </div>
           <p className="vi-text font-heading font-bold text-xl">No learners connected yet</p>
-          <p className="text-sm vi-text-muted mt-2">Connect with learners to start recording observations.</p>
+          <p className="text-sm vi-text-muted mt-2">
+            Connect with learners to start recording observations.
+          </p>
         </div>
       ) : (
         <>
           <div className="flex items-center gap-4 flex-wrap">
             {learners.length > 1 && (
-              <select value={selectedLearner || ""} onChange={e => setSelectedLearner(e.target.value)}
+              <select
+                value={selectedLearner || ""}
+                onChange={(e) => setSelectedLearner(e.target.value)}
                 aria-label="Select learner"
                 style={{ minHeight: 44 }}
-                className="px-4 py-2 rounded-xl border vi-border text-sm font-semibold bg-[hsl(var(--visual-surface))] vi-text">
-                {learners.map(l => (
-                  <option key={l.id} value={l.id}>{l.name}</option>
+                className="px-4 py-2 rounded-xl border vi-border text-sm font-semibold bg-[hsl(var(--visual-surface))] vi-text"
+              >
+                {learners.map((l) => (
+                  <option key={l.id} value={l.id}>
+                    {l.name}
+                  </option>
                 ))}
               </select>
             )}
@@ -161,25 +176,42 @@ export default function CaregiverObservationsPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label htmlFor="obs-category" className="block text-sm font-semibold vi-text mb-1">Category</label>
-                <select id="obs-category" value={obsCategory} onChange={e => setObsCategory(e.target.value)}
+                <label htmlFor="obs-category" className="block text-sm font-semibold vi-text mb-1">
+                  Category
+                </label>
+                <select
+                  id="obs-category"
+                  value={obsCategory}
+                  onChange={(e) => setObsCategory(e.target.value)}
                   style={{ minHeight: 44 }}
-                  className="w-full px-3 py-2 rounded-lg border vi-border text-sm bg-[hsl(var(--visual-surface))] vi-text">
-                  {CATEGORIES.map(c => (
-                    <option key={c} value={c}>{c}</option>
+                  className="w-full px-3 py-2 rounded-lg border vi-border text-sm bg-[hsl(var(--visual-surface))] vi-text"
+                >
+                  {CATEGORIES.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label htmlFor="obs-date" className="block text-sm font-semibold vi-text mb-1">Date</label>
-                <input id="obs-date" type="date" value={obsDate} onChange={e => setObsDate(e.target.value)}
+                <label htmlFor="obs-date" className="block text-sm font-semibold vi-text mb-1">
+                  Date
+                </label>
+                <input
+                  id="obs-date"
+                  type="date"
+                  value={obsDate}
+                  onChange={(e) => setObsDate(e.target.value)}
                   style={{ minHeight: 44 }}
-                  className="w-full px-3 py-2 rounded-lg border vi-border text-sm bg-[hsl(var(--visual-surface))] vi-text" />
+                  className="w-full px-3 py-2 rounded-lg border vi-border text-sm bg-[hsl(var(--visual-surface))] vi-text"
+                />
               </div>
               <div>
-                <span id="mood-label" className="block text-sm font-semibold vi-text mb-1">Mood</span>
+                <span id="mood-label" className="block text-sm font-semibold vi-text mb-1">
+                  Mood
+                </span>
                 <div className="flex gap-2" role="radiogroup" aria-labelledby="mood-label">
-                  {MOOD_OPTIONS.map(m => (
+                  {MOOD_OPTIONS.map((m) => (
                     <button
                       key={m.value}
                       type="button"
@@ -198,14 +230,24 @@ export default function CaregiverObservationsPage() {
             </div>
 
             <div>
-              <label htmlFor="obs-notes" className="block text-sm font-semibold vi-text mb-1">Notes</label>
-              <textarea id="obs-notes" value={obsNotes} onChange={e => setObsNotes(e.target.value)}
-                rows={4} placeholder="Describe what you observed..."
-                className="w-full px-3 py-2 rounded-lg border vi-border text-sm resize-none bg-[hsl(var(--visual-surface))] vi-text" />
+              <label htmlFor="obs-notes" className="block text-sm font-semibold vi-text mb-1">
+                Notes
+              </label>
+              <textarea
+                id="obs-notes"
+                value={obsNotes}
+                onChange={(e) => setObsNotes(e.target.value)}
+                rows={4}
+                placeholder="Describe what you observed..."
+                className="w-full px-3 py-2 rounded-lg border vi-border text-sm resize-none bg-[hsl(var(--visual-surface))] vi-text"
+              />
             </div>
 
             {submitMsg && (
-              <p className={`text-sm font-medium ${submitMsg.type === "success" ? "text-[hsl(var(--visual-science))]" : "text-[hsl(var(--visual-math))]"}`} role="alert">
+              <p
+                className={`text-sm font-medium ${submitMsg.type === "success" ? "text-[hsl(var(--visual-science))]" : "text-[hsl(var(--visual-math))]"}`}
+                role="alert"
+              >
                 {submitMsg.text}
               </p>
             )}
@@ -224,16 +266,20 @@ export default function CaregiverObservationsPage() {
           {observations.length > 0 && (
             <div className="space-y-3">
               <h2 className="text-lg font-heading font-bold vi-text">Recent Observations</h2>
-              {observations.map(obs => (
+              {observations.map((obs) => (
                 <div key={obs.id} className="vi-card p-4">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-full bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))] font-bold">{obs.category}</span>
-                      <span className="text-xs vi-text-muted">{new Date(obs.date || obs.createdAt).toLocaleDateString()}</span>
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-full bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))] font-bold">
+                        {obs.category}
+                      </span>
+                      <span className="text-xs vi-text-muted">
+                        {new Date(obs.date || obs.createdAt).toLocaleDateString()}
+                      </span>
                     </div>
                     {obs.mood && (
                       <span className="text-lg" aria-label={`Mood: ${obs.mood}`}>
-                        {MOOD_OPTIONS.find(m => m.value === obs.mood)?.emoji || ""}
+                        {MOOD_OPTIONS.find((m) => m.value === obs.mood)?.emoji || ""}
                       </span>
                     )}
                   </div>

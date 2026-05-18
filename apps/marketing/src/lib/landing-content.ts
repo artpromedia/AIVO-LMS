@@ -339,11 +339,7 @@ export const LEVELS: LevelInfo[] = [
       "Enrichment paths for advanced learners",
       "Standardized-assessment-style practice",
     ],
-    accommodations: [
-      "Read-aloud on demand",
-      "Adjustable session length",
-      "Topic interest tagging",
-    ],
+    accommodations: ["Read-aloud on demand", "Adjustable session length", "Topic interest tagging"],
     sample: [
       "Multi-step word problems with hint scaffolds",
       "Close-reading comprehension with author's craft",
@@ -642,16 +638,48 @@ export const COMPARISONS: ComparisonSpec[] = [
         "Families and schools that want a low-cost, breadth-first practice tool for grade-level skills with strong analytics for typically developing learners.",
     },
     rows: [
-      { feature: "Core model", aivo: "AI Brain Clone that adapts in real time", competitor: "Skill tree with diagnostic / SmartScore" },
-      { feature: "AI tutors", aivo: "14 specialized AI tutors", competitor: "No conversational AI tutor" },
-      { feature: "IEP integration", aivo: "Built-in: goal libraries, progress notes", competitor: "None native" },
-      { feature: "AAC / switch / eye-gaze", aivo: "First-class support across all levels", competitor: "Not supported" },
-      { feature: "Functioning levels", aivo: "5 (standard → pre-symbolic)", competitor: "Grade-level only" },
+      {
+        feature: "Core model",
+        aivo: "AI Brain Clone that adapts in real time",
+        competitor: "Skill tree with diagnostic / SmartScore",
+      },
+      {
+        feature: "AI tutors",
+        aivo: "14 specialized AI tutors",
+        competitor: "No conversational AI tutor",
+      },
+      {
+        feature: "IEP integration",
+        aivo: "Built-in: goal libraries, progress notes",
+        competitor: "None native",
+      },
+      {
+        feature: "AAC / switch / eye-gaze",
+        aivo: "First-class support across all levels",
+        competitor: "Not supported",
+      },
+      {
+        feature: "Functioning levels",
+        aivo: "5 (standard → pre-symbolic)",
+        competitor: "Grade-level only",
+      },
       { feature: "Sensory profiles", aivo: "Yes — visuals, audio, pacing", competitor: "Limited" },
-      { feature: "Family pricing", aivo: "$19.99/mo per learner (Family plan, 2+ learners)", competitor: "From $9.95/mo (Family plan)" },
-      { feature: "School / district pricing", aivo: "Volume; from low single-digit $/student/year", competitor: "Volume; widely deployed" },
+      {
+        feature: "Family pricing",
+        aivo: "$19.99/mo per learner (Family plan, 2+ learners)",
+        competitor: "From $9.95/mo (Family plan)",
+      },
+      {
+        feature: "School / district pricing",
+        aivo: "Volume; from low single-digit $/student/year",
+        competitor: "Volume; widely deployed",
+      },
       { feature: "Money-back guarantee", aivo: "30 days", competitor: "30 days" },
-      { feature: "COPPA, FERPA, SOC 2", aivo: "Yes / Yes / Type II", competitor: "Yes / Yes / Yes" },
+      {
+        feature: "COPPA, FERPA, SOC 2",
+        aivo: "Yes / Yes / Type II",
+        competitor: "Yes / Yes / Yes",
+      },
       { feature: "WCAG 2.2 AA VPAT", aivo: "Yes", competitor: "Partial" },
     ],
     honest:
@@ -669,17 +697,46 @@ export const COMPARISONS: ComparisonSpec[] = [
       "Khan Academy is a remarkable, free, mission-driven library of lessons that has educated tens of millions of learners. AIVO is a different product: a paid, personalized AI tutor team that adapts to each learner's profile — especially for learners with IEPs, AAC users, and the full range of functioning levels Khan does not target.",
     bestFor: {
       aivo: "Families and schools that need an AI tutor that personalizes in real time, supports IEPs and AAC, and consolidates multiple specialty apps into one.",
-      competitor: "Anyone who wants free, breadth-first lessons across math, science, humanities and beyond — and who doesn't need IEP or AAC support.",
+      competitor:
+        "Anyone who wants free, breadth-first lessons across math, science, humanities and beyond — and who doesn't need IEP or AAC support.",
     },
     rows: [
-      { feature: "Pricing", aivo: "Free trial, then $19.99–$24.99/mo per learner", competitor: "Free, forever" },
-      { feature: "Personalization", aivo: "AI Brain Clone, real-time adaptation", competitor: "Mastery system, skill maps" },
-      { feature: "AI tutor", aivo: "14 specialized AI tutors", competitor: "Khanmigo (paid add-on)" },
-      { feature: "IEP integration", aivo: "Goal libraries, progress notes built in", competitor: "Not native" },
-      { feature: "AAC / switch / eye-gaze", aivo: "Yes — first-class", competitor: "Not supported" },
-      { feature: "Functioning levels", aivo: "5 (standard → pre-symbolic)", competitor: "Grade-level only" },
+      {
+        feature: "Pricing",
+        aivo: "Free trial, then $19.99–$24.99/mo per learner",
+        competitor: "Free, forever",
+      },
+      {
+        feature: "Personalization",
+        aivo: "AI Brain Clone, real-time adaptation",
+        competitor: "Mastery system, skill maps",
+      },
+      {
+        feature: "AI tutor",
+        aivo: "14 specialized AI tutors",
+        competitor: "Khanmigo (paid add-on)",
+      },
+      {
+        feature: "IEP integration",
+        aivo: "Goal libraries, progress notes built in",
+        competitor: "Not native",
+      },
+      {
+        feature: "AAC / switch / eye-gaze",
+        aivo: "Yes — first-class",
+        competitor: "Not supported",
+      },
+      {
+        feature: "Functioning levels",
+        aivo: "5 (standard → pre-symbolic)",
+        competitor: "Grade-level only",
+      },
       { feature: "Sensory profiles", aivo: "Yes", competitor: "No" },
-      { feature: "Districts", aivo: "Volume pricing, dedicated CSM", competitor: "Khan Academy Districts (limited regions)" },
+      {
+        feature: "Districts",
+        aivo: "Volume pricing, dedicated CSM",
+        competitor: "Khan Academy Districts (limited regions)",
+      },
       { feature: "WCAG 2.2 AA VPAT", aivo: "Yes", competitor: "Partial" },
     ],
     honest:

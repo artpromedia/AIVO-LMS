@@ -8,7 +8,14 @@ import { checkTutorAccess } from "../lib/entitlements.js";
 import { computeTutorXp, computeTutorQuality, type TutorSignals } from "../services/scoring.js";
 import { getActiveCurriculumFocus } from "./curriculum.js";
 import { loadDapeProfile } from "../lib/dape.js";
-import { sessionStartSchema, sessionBySessionIdMessageSchema, sessionBySessionIdCompleteSchema, getSessionsByLearnerIdSchema, getSessionBySessionIdSchema, sessionBySessionIdCoLearnSchema } from "./schemas.js";
+import {
+  sessionStartSchema,
+  sessionBySessionIdMessageSchema,
+  sessionBySessionIdCompleteSchema,
+  getSessionsByLearnerIdSchema,
+  getSessionBySessionIdSchema,
+  sessionBySessionIdCoLearnSchema,
+} from "./schemas.js";
 
 const logger = createLogger("tutor-svc.chat");
 
@@ -40,8 +47,7 @@ const AI_SVC_URL = requireUrl("AI_SVC_URL", "http://localhost:3004");
 const BRAIN_SVC_URL = requireUrl("BRAIN_SVC_URL", "http://localhost:3002");
 
 // ---- Sprint 05 adapter: subject-brain context ---------------------------
-const SUBJECT_BRAIN_SVC_URL =
-  process.env.SUBJECT_BRAIN_SVC_URL ?? "http://localhost:3064";
+const SUBJECT_BRAIN_SVC_URL = process.env.SUBJECT_BRAIN_SVC_URL ?? "http://localhost:3064";
 
 function advancedContentGeneratorsEnabled(): boolean {
   const raw = process.env.AIVO_FEATURE_ADVANCED_CONTENT_GENERATORS;
@@ -72,8 +78,7 @@ async function fetchSubjectBrainContextForChat(input: {
 }
 
 // ---- Sprint 10 adapter: responsible-AI evaluation in tutor chat ---------
-const RESPONSIBLE_AI_SVC_URL =
-  process.env.RESPONSIBLE_AI_SVC_URL ?? "http://localhost:3071";
+const RESPONSIBLE_AI_SVC_URL = process.env.RESPONSIBLE_AI_SVC_URL ?? "http://localhost:3071";
 
 function responsibleAiGuardrailsEnabled(): boolean {
   const raw = process.env.AIVO_FEATURE_RESPONSIBLE_AI_GUARDRAILS;
@@ -238,201 +243,261 @@ export function registerChatRoutes(app: FastifyInstance, db: any) {
       }
     }
 
-    const [session] = await db.insert(tutorSessions).values({
-      tenantId,
-      learnerId,
-      tutorSku,
-      tutorName,
-      sessionType: sessionType || "standard",
-      functioningLevel,
-      brainContext,
-      messages: [],
-    }).returning();
+    const [session] = await db
+      .insert(tutorSessions)
+      .values({
+        tenantId,
+        learnerId,
+        tutorSku,
+        tutorName,
+        sessionType: sessionType || "standard",
+        functioningLevel,
+        brainContext,
+        messages: [],
+      })
+      .returning();
 
     return { sessionId: session.id, tutorName, functioningLevel };
   });
 
-  app.post("/api/tutor/session/:sessionId/message", { schema: sessionBySessionIdMessageSchema }, async (request, reply) => {
-    const { sessionId } = request.params as any;
-    const { message, locale } = request.body as any;
-    if (!message) return reply.code(400).send({ error: "message required" });
+  app.post(
+    "/api/tutor/session/:sessionId/message",
+    { schema: sessionBySessionIdMessageSchema },
+    async (request, reply) => {
+      const { sessionId } = request.params as any;
+      const { message, locale } = request.body as any;
+      if (!message) return reply.code(400).send({ error: "message required" });
 
-    const [session] = await db.select().from(tutorSessions).where(eq(tutorSessions.id, sessionId));
-    if (!session) return reply.code(404).send({ error: "Session not found" });
+      const [session] = await db
+        .select()
+        .from(tutorSessions)
+        .where(eq(tutorSessions.id, sessionId));
+      if (!session) return reply.code(404).send({ error: "Session not found" });
 
-    const existingMessages = (session.messages as any[]) || [];
-    existingMessages.push({ role: "user", content: message, timestamp: new Date().toISOString() });
-
-    const chatMessages = existingMessages.map((m: any) => ({ role: m.role, content: m.content }));
-
-    const liveBrainContext: Record<string, unknown> = { ...((session.brainContext as any) || {}) };
-    const liveSubject = TUTOR_SKU_TO_SUBJECT[session.tutorSku as string];
-    if (liveSubject) {
-      try {
-        const focus = await getActiveCurriculumFocus(db, session.learnerId, liveSubject);
-        if (focus) liveBrainContext.curriculum_focus = focus;
-      } catch (err) {
-        logger.error("Failed to refresh curriculum focus (non-blocking)", { err: String(err) });
-      }
-    }
-
-    // Sprint 05: enrich brain context with subject-brain context when flag is on.
-    if (liveSubject) {
-      const subjectBrain = await fetchSubjectBrainContextForChat({
-        learnerId: session.learnerId,
-        subject: liveSubject,
-        topic:
-          typeof (liveBrainContext as { curriculum_focus?: { topic?: unknown } }).curriculum_focus
-            ?.topic === "string"
-            ? ((liveBrainContext as { curriculum_focus?: { topic?: string } }).curriculum_focus
-                ?.topic as string)
-            : undefined,
-        brainContext: liveBrainContext,
-        functioningLevel: (session.functioningLevel as string | undefined) ?? "STANDARD",
-      });
-      if (subjectBrain) {
-        liveBrainContext.subjectBrain = subjectBrain;
-      }
-    }
-
-    try {
-      const res = await fetch(`${AI_SVC_URL}/api/ai/tutor/chat`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tutor_sku: session.tutorSku,
-          learner_id: session.learnerId,
-          functioning_level: session.functioningLevel || "STANDARD",
-          brain_context: liveBrainContext,
-          messages: chatMessages,
-          locale: typeof locale === "string" && locale ? locale : undefined,
-        }),
+      const existingMessages = (session.messages as any[]) || [];
+      existingMessages.push({
+        role: "user",
+        content: message,
+        timestamp: new Date().toISOString(),
       });
 
-      if (!res.ok) {
-        throw new Error(`ai-svc returned ${res.status}`);
+      const chatMessages = existingMessages.map((m: any) => ({ role: m.role, content: m.content }));
+
+      const liveBrainContext: Record<string, unknown> = {
+        ...((session.brainContext as any) || {}),
+      };
+      const liveSubject = TUTOR_SKU_TO_SUBJECT[session.tutorSku as string];
+      if (liveSubject) {
+        try {
+          const focus = await getActiveCurriculumFocus(db, session.learnerId, liveSubject);
+          if (focus) liveBrainContext.curriculum_focus = focus;
+        } catch (err) {
+          logger.error("Failed to refresh curriculum focus (non-blocking)", { err: String(err) });
+        }
       }
 
-      const data = await res.json();
-
-      // Sprint 10: responsible-AI evaluation in warn mode.
-      const raiResult = await evaluateResponsibleAiChat({
-        learnerId: session.learnerId,
-        inputSummary: message,
-        output: data.response,
-        functioningLevel: (session.functioningLevel as string | undefined) ?? "STANDARD",
-      });
-      if (raiResult && !raiResult.allowed) {
-        logger.warn("responsible-AI flagged tutor chat", {
-          sessionId,
-          severity: raiResult.severity,
+      // Sprint 05: enrich brain context with subject-brain context when flag is on.
+      if (liveSubject) {
+        const subjectBrain = await fetchSubjectBrainContextForChat({
+          learnerId: session.learnerId,
+          subject: liveSubject,
+          topic:
+            typeof (liveBrainContext as { curriculum_focus?: { topic?: unknown } }).curriculum_focus
+              ?.topic === "string"
+              ? ((liveBrainContext as { curriculum_focus?: { topic?: string } }).curriculum_focus
+                  ?.topic as string)
+              : undefined,
+          brainContext: liveBrainContext,
+          functioningLevel: (session.functioningLevel as string | undefined) ?? "STANDARD",
         });
+        if (subjectBrain) {
+          liveBrainContext.subjectBrain = subjectBrain;
+        }
       }
 
-      existingMessages.push({ role: "assistant", content: data.response, timestamp: new Date().toISOString() });
+      try {
+        const res = await fetch(`${AI_SVC_URL}/api/ai/tutor/chat`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tutor_sku: session.tutorSku,
+            learner_id: session.learnerId,
+            functioning_level: session.functioningLevel || "STANDARD",
+            brain_context: liveBrainContext,
+            messages: chatMessages,
+            locale: typeof locale === "string" && locale ? locale : undefined,
+          }),
+        });
 
-      await db.update(tutorSessions).set({
-        messages: existingMessages,
-      }).where(eq(tutorSessions.id, sessionId));
+        if (!res.ok) {
+          throw new Error(`ai-svc returned ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        // Sprint 10: responsible-AI evaluation in warn mode.
+        const raiResult = await evaluateResponsibleAiChat({
+          learnerId: session.learnerId,
+          inputSummary: message,
+          output: data.response,
+          functioningLevel: (session.functioningLevel as string | undefined) ?? "STANDARD",
+        });
+        if (raiResult && !raiResult.allowed) {
+          logger.warn("responsible-AI flagged tutor chat", {
+            sessionId,
+            severity: raiResult.severity,
+          });
+        }
+
+        existingMessages.push({
+          role: "assistant",
+          content: data.response,
+          timestamp: new Date().toISOString(),
+        });
+
+        await db
+          .update(tutorSessions)
+          .set({
+            messages: existingMessages,
+          })
+          .where(eq(tutorSessions.id, sessionId));
+
+        return {
+          response: data.response,
+          model: data.model,
+          messageCount: existingMessages.length,
+        };
+      } catch (err: any) {
+        return reply.code(503).send({ error: "Tutor chat failed", detail: err.message });
+      }
+    },
+  );
+
+  app.post(
+    "/api/tutor/session/:sessionId/complete",
+    { schema: sessionBySessionIdCompleteSchema },
+    async (request, reply) => {
+      const { sessionId } = request.params as any;
+      const body = (request.body as any) || {};
+      const { masteryUpdates, xpEarned } = body;
+
+      const [session] = await db
+        .select()
+        .from(tutorSessions)
+        .where(eq(tutorSessions.id, sessionId));
+      if (!session) return reply.code(404).send({ error: "Session not found" });
+
+      const messages = (session.messages as any[]) || [];
+      const durationSeconds = Math.floor((Date.now() - session.startedAt.getTime()) / 1000);
+
+      const masteryBefore = ((session.brainContext as any)?.mastery_levels || {}) as Record<
+        string,
+        number
+      >;
+      const masteryDelta = computeMasteryDelta(masteryBefore, masteryUpdates || {});
+
+      const signals: TutorSignals = {
+        durationSeconds,
+        functioningLevel: session.functioningLevel || "STANDARD",
+        messageCount: messages.length,
+        beatsCompleted: body.beatsCompleted,
+        beatsTotal: body.beatsTotal,
+        correctAnswers: body.correctAnswers,
+        attemptedAnswers: body.attemptedAnswers,
+        engagementBeats: body.engagementBeats,
+        breaksUsed: body.breaksUsed,
+        masteryDelta,
+      };
+      const computedXp = computeTutorXp(signals);
+      const completionQuality = computeTutorQuality(signals);
+      const finalXp = typeof xpEarned === "number" ? xpEarned : computedXp;
+
+      await db
+        .update(tutorSessions)
+        .set({
+          masteryUpdates: masteryUpdates || {},
+          xpEarned: finalXp,
+          durationSeconds,
+          completedAt: new Date(),
+          completionQuality,
+        })
+        .where(eq(tutorSessions.id, sessionId));
 
       return {
-        response: data.response,
-        model: data.model,
-        messageCount: existingMessages.length,
+        status: "completed",
+        sessionId,
+        durationSeconds,
+        xpEarned: finalXp,
+        completionQuality,
       };
-    } catch (err: any) {
-      return reply.code(503).send({ error: "Tutor chat failed", detail: err.message });
-    }
-  });
+    },
+  );
 
-  app.post("/api/tutor/session/:sessionId/complete", { schema: sessionBySessionIdCompleteSchema }, async (request, reply) => {
-    const { sessionId } = request.params as any;
-    const body = (request.body as any) || {};
-    const { masteryUpdates, xpEarned } = body;
+  app.get(
+    "/api/tutor/sessions/:learnerId",
+    { schema: getSessionsByLearnerIdSchema },
+    async (request) => {
+      const { learnerId } = request.params as any;
+      const sessions = await db
+        .select()
+        .from(tutorSessions)
+        .where(eq(tutorSessions.learnerId, learnerId))
+        .orderBy(desc(tutorSessions.startedAt))
+        .limit(20);
+      return sessions;
+    },
+  );
 
-    const [session] = await db.select().from(tutorSessions).where(eq(tutorSessions.id, sessionId));
-    if (!session) return reply.code(404).send({ error: "Session not found" });
+  app.get(
+    "/api/tutor/session/:sessionId",
+    { schema: getSessionBySessionIdSchema },
+    async (request, reply) => {
+      const { sessionId } = request.params as any;
+      const [session] = await db
+        .select()
+        .from(tutorSessions)
+        .where(eq(tutorSessions.id, sessionId));
+      if (!session) return reply.code(404).send({ error: "Session not found" });
+      return session;
+    },
+  );
 
-    const messages = (session.messages as any[]) || [];
-    const durationSeconds = Math.floor((Date.now() - session.startedAt.getTime()) / 1000);
+  app.post(
+    "/api/tutor/session/:sessionId/co-learn",
+    { schema: sessionBySessionIdCoLearnSchema },
+    async (request, reply) => {
+      const { sessionId } = request.params as any;
+      const { parentId } = request.body as any;
+      if (!parentId) return reply.code(400).send({ error: "parentId required" });
 
-    const masteryBefore = ((session.brainContext as any)?.mastery_levels || {}) as Record<string, number>;
-    const masteryDelta = computeMasteryDelta(masteryBefore, masteryUpdates || {});
+      const [session] = await db
+        .select()
+        .from(tutorSessions)
+        .where(eq(tutorSessions.id, sessionId));
+      if (!session) return reply.code(404).send({ error: "Session not found" });
 
-    const signals: TutorSignals = {
-      durationSeconds,
-      functioningLevel: session.functioningLevel || "STANDARD",
-      messageCount: messages.length,
-      beatsCompleted: body.beatsCompleted,
-      beatsTotal: body.beatsTotal,
-      correctAnswers: body.correctAnswers,
-      attemptedAnswers: body.attemptedAnswers,
-      engagementBeats: body.engagementBeats,
-      breaksUsed: body.breaksUsed,
-      masteryDelta,
-    };
-    const computedXp = computeTutorXp(signals);
-    const completionQuality = computeTutorQuality(signals);
-    const finalXp = typeof xpEarned === "number" ? xpEarned : computedXp;
+      await db
+        .update(tutorSessions)
+        .set({
+          sessionType: "co-learning",
+          brainContext: {
+            ...((session.brainContext as any) || {}),
+            coLearning: {
+              parentId,
+              joinedAt: new Date().toISOString(),
+              active: true,
+            },
+          },
+        })
+        .where(eq(tutorSessions.id, sessionId));
 
-    await db.update(tutorSessions).set({
-      masteryUpdates: masteryUpdates || {},
-      xpEarned: finalXp,
-      durationSeconds,
-      completedAt: new Date(),
-      completionQuality,
-    }).where(eq(tutorSessions.id, sessionId));
-
-    return {
-      status: "completed",
-      sessionId,
-      durationSeconds,
-      xpEarned: finalXp,
-      completionQuality,
-    };
-  });
-
-  app.get("/api/tutor/sessions/:learnerId", { schema: getSessionsByLearnerIdSchema }, async (request) => {
-    const { learnerId } = request.params as any;
-    const sessions = await db.select().from(tutorSessions)
-      .where(eq(tutorSessions.learnerId, learnerId))
-      .orderBy(desc(tutorSessions.startedAt))
-      .limit(20);
-    return sessions;
-  });
-
-  app.get("/api/tutor/session/:sessionId", { schema: getSessionBySessionIdSchema }, async (request, reply) => {
-    const { sessionId } = request.params as any;
-    const [session] = await db.select().from(tutorSessions).where(eq(tutorSessions.id, sessionId));
-    if (!session) return reply.code(404).send({ error: "Session not found" });
-    return session;
-  });
-
-  app.post("/api/tutor/session/:sessionId/co-learn", { schema: sessionBySessionIdCoLearnSchema }, async (request, reply) => {
-    const { sessionId } = request.params as any;
-    const { parentId } = request.body as any;
-    if (!parentId) return reply.code(400).send({ error: "parentId required" });
-
-    const [session] = await db.select().from(tutorSessions).where(eq(tutorSessions.id, sessionId));
-    if (!session) return reply.code(404).send({ error: "Session not found" });
-
-    await db.update(tutorSessions).set({
-      sessionType: "co-learning",
-      brainContext: {
-        ...(session.brainContext as any || {}),
-        coLearning: {
-          parentId,
-          joinedAt: new Date().toISOString(),
-          active: true,
-        },
-      },
-    }).where(eq(tutorSessions.id, sessionId));
-
-    return {
-      status: "co-learning_activated",
-      sessionId,
-      parentId,
-      message: "Parent has joined the session. The tutor will now provide real-time parent coaching alongside learner instruction.",
-    };
-  });
+      return {
+        status: "co-learning_activated",
+        sessionId,
+        parentId,
+        message:
+          "Parent has joined the session. The tutor will now provide real-time parent coaching alongside learner instruction.",
+      };
+    },
+  );
 }

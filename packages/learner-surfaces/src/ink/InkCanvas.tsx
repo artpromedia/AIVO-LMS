@@ -59,7 +59,11 @@ export function InkCanvas({
   return (
     <div>
       {showToolbar ? (
-        <div role="toolbar" aria-label="Scratchpad tools" style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+        <div
+          role="toolbar"
+          aria-label="Scratchpad tools"
+          style={{ display: "flex", gap: 8, marginBottom: 8 }}
+        >
           {TOOLBAR_TOOLS.map((toolbarTool) => (
             <button
               key={toolbarTool}
@@ -72,10 +76,20 @@ export function InkCanvas({
               {toolbarTool}
             </button>
           ))}
-          <button type="button" aria-label="undo" disabled={disabled || readOnly} onClick={ink.undo}>
+          <button
+            type="button"
+            aria-label="undo"
+            disabled={disabled || readOnly}
+            onClick={ink.undo}
+          >
             undo
           </button>
-          <button type="button" aria-label="clear" disabled={disabled || readOnly} onClick={ink.clear}>
+          <button
+            type="button"
+            aria-label="clear"
+            disabled={disabled || readOnly}
+            onClick={ink.clear}
+          >
             clear
           </button>
         </div>

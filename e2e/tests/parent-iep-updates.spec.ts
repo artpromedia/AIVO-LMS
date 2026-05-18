@@ -28,7 +28,8 @@ const IDENTITY_BASE = process.env.IDENTITY_BASE_URL || "http://localhost:3001";
 
 const PARENT_EMAIL = process.env.E2E_IEP_PARENT_EMAIL || "e2e-iep-parent@example.test";
 const PARENT_PASSWORD = process.env.E2E_IEP_PARENT_PASSWORD || "E2eParent!Pass1";
-const TEACHER_EMAIL = process.env.E2E_IEP_TEACHER_EMAIL || "e2e-iep-cross-tenant-teacher@example.test";
+const TEACHER_EMAIL =
+  process.env.E2E_IEP_TEACHER_EMAIL || "e2e-iep-cross-tenant-teacher@example.test";
 const TEACHER_PASSWORD = process.env.E2E_IEP_TEACHER_PASSWORD || "E2eTeacher!Pass1";
 
 const PARENT_NOTE = "PARENT_VISIBLE_NOTE_BODY: timeline e2e parent-visible";
@@ -93,7 +94,11 @@ async function trySeed(opts: { withInApp?: boolean } = {}): Promise<SeedResult |
   }
 }
 
-async function loginViaApi(request: APIRequestContext, email: string, password: string): Promise<string> {
+async function loginViaApi(
+  request: APIRequestContext,
+  email: string,
+  password: string,
+): Promise<string> {
   const res = await request.post(`/api/auth/login`, {
     data: { email, password },
     failOnStatusCode: false,
@@ -129,9 +134,10 @@ test.describe("parent IEP Updates timeline — UI + cross-tenant safety", () => 
     // (UI calling the endpoint with the wrong learner id) we want to
     // catch.
     const timelinePromise = page.waitForResponse(
-      (r) => r.url().includes(`/api/iep/learners/${fixture.learner.id}/timeline`)
-        && r.request().method() === "GET"
-        && r.status() === 200,
+      (r) =>
+        r.url().includes(`/api/iep/learners/${fixture.learner.id}/timeline`) &&
+        r.request().method() === "GET" &&
+        r.status() === 200,
       { timeout: 15_000 },
     );
     await page.goto(`/dashboard/parent/learner/${fixture.learner.id}/iep`);
@@ -146,10 +152,11 @@ test.describe("parent IEP Updates timeline — UI + cross-tenant safety", () => 
     const noteBodies: string[] = items
       .filter((i) => i.type === "note")
       .map((i) => String(i.payload?.body ?? ""));
-    expect(noteBodies, "parent timeline contains the parent-visible note")
-      .toContain(PARENT_NOTE);
-    expect(noteBodies.some((b) => b.includes(INTERNAL_NOTE)), "internal-only note must NOT leak to the parent payload")
-      .toBe(false);
+    expect(noteBodies, "parent timeline contains the parent-visible note").toContain(PARENT_NOTE);
+    expect(
+      noteBodies.some((b) => b.includes(INTERNAL_NOTE)),
+      "internal-only note must NOT leak to the parent payload",
+    ).toBe(false);
 
     // Also assert the rendered DOM shows the parent note and does not
     // include the internal one — guards against a regression where the
@@ -158,7 +165,10 @@ test.describe("parent IEP Updates timeline — UI + cross-tenant safety", () => 
     await expect(page.getByText(INTERNAL_NOTE, { exact: false })).toHaveCount(0);
   });
 
-  test("teacher in a different tenant cannot reach another tenant's parent IEP page or timeline", async ({ page, context }) => {
+  test("teacher in a different tenant cannot reach another tenant's parent IEP page or timeline", async ({
+    page,
+    context,
+  }) => {
     const fixture = seed!;
 
     // Sign the teacher in (drops a refreshToken cookie + returns the
@@ -172,7 +182,11 @@ test.describe("parent IEP Updates timeline — UI + cross-tenant safety", () => 
     page.on("response", async (resp) => {
       if (resp.url().includes(`/api/iep/learners/`) && resp.url().includes("/timeline")) {
         let body = "";
-        try { body = await resp.text(); } catch { /* noop */ }
+        try {
+          body = await resp.text();
+        } catch {
+          /* noop */
+        }
         timelineCalls.push({ url: resp.url(), status: resp.status(), body });
       }
     });
@@ -204,20 +218,22 @@ test.describe("parent IEP Updates timeline — UI + cross-tenant safety", () => 
     // a buggy hook could exploit. Asserts the endpoint itself rejects
     // cross-tenant reads (defense-in-depth alongside the UI assertion
     // above).
-    const denied = await page.request.get(
-      `/api/iep/learners/${fixture.learner.id}/timeline`,
-      { headers: { Authorization: `Bearer ${accessToken}` }, failOnStatusCode: false },
-    );
+    const denied = await page.request.get(`/api/iep/learners/${fixture.learner.id}/timeline`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      failOnStatusCode: false,
+    });
     // Authenticated teacher should hit the tenant-isolation branch
     // specifically (403), not generic auth failure (401). 401 here would
     // indicate the bearer token broke for unrelated reasons and would
     // mask a real cross-tenant regression.
     expect(denied.status(), "cross-tenant teacher must get an authenticated 403").toBe(403);
     const deniedText = await denied.text();
-    expect(deniedText, "denied response must not echo seeded note bodies")
-      .not.toContain(PARENT_NOTE);
-    expect(deniedText, "denied response must not echo internal note bodies")
-      .not.toContain(INTERNAL_NOTE);
+    expect(deniedText, "denied response must not echo seeded note bodies").not.toContain(
+      PARENT_NOTE,
+    );
+    expect(deniedText, "denied response must not echo internal note bodies").not.toContain(
+      INTERNAL_NOTE,
+    );
   });
 });
 
@@ -237,23 +253,30 @@ test.describe("parent dashboard global bell — IEP in-app notifications surface
     );
   });
 
-  test("the bell badge picks up an unread IEP in-app notification on the dashboard home", async ({ page, context }) => {
+  test("the bell badge picks up an unread IEP in-app notification on the dashboard home", async ({
+    page,
+    context,
+  }) => {
     const fixture = bellSeed!;
     await loginViaApi(context.request, PARENT_EMAIL, PARENT_PASSWORD);
 
     // Wait for the layout's merged-inbox unread call so we can inspect
     // the count the bell receives.
     const inboxPromise = page.waitForResponse(
-      (r) => r.url().includes(`/api/family/inbox/${fixture.parent.id}`)
-        && r.url().includes("filter=unread")
-        && r.status() === 200,
+      (r) =>
+        r.url().includes(`/api/family/inbox/${fixture.parent.id}`) &&
+        r.url().includes("filter=unread") &&
+        r.status() === 200,
       { timeout: 15_000 },
     );
     await page.goto(`/dashboard/parent`);
     const inboxResp = await inboxPromise;
     const inboxJson = await inboxResp.json();
     expect(typeof inboxJson.unreadCount).toBe("number");
-    expect(inboxJson.unreadCount, "merged unread count includes the IEP in-app row").toBeGreaterThanOrEqual(1);
+    expect(
+      inboxJson.unreadCount,
+      "merged unread count includes the IEP in-app row",
+    ).toBeGreaterThanOrEqual(1);
 
     // The header bell renders a numeric badge when unreadCount > 0. We
     // can't rely on the icon alone (it's an SVG without text) — instead
@@ -263,27 +286,34 @@ test.describe("parent dashboard global bell — IEP in-app notifications surface
     await expect(bell).toBeVisible({ timeout: 10_000 });
   });
 
-  test("the inbox page shows the IEP in-app notification with a link back to the learner's Updates tab", async ({ page, context }) => {
+  test("the inbox page shows the IEP in-app notification with a link back to the learner's Updates tab", async ({
+    page,
+    context,
+  }) => {
     const fixture = bellSeed!;
     await loginViaApi(context.request, PARENT_EMAIL, PARENT_PASSWORD);
 
     const inboxPromise = page.waitForResponse(
-      (r) => r.url().endsWith(`/api/family/inbox/${fixture.parent.id}`)
-        && r.status() === 200,
+      (r) => r.url().endsWith(`/api/family/inbox/${fixture.parent.id}`) && r.status() === 200,
       { timeout: 15_000 },
     );
     await page.goto(`/dashboard/parent/inbox`);
     const inboxResp = await inboxPromise;
     const json = await inboxResp.json();
     const items = (json.items || []) as Array<{
-      source?: string; learnerId?: string; actionUrl?: string; title?: string;
+      source?: string;
+      learnerId?: string;
+      actionUrl?: string;
+      title?: string;
     }>;
     const iep = items.find((i) => i.source === "iep");
     expect(iep, "merged inbox feed must include an IEP-source row").toBeTruthy();
     expect(iep!.learnerId).toBe(fixture.learner.id);
     expect(iep!.actionUrl).toContain(`/dashboard/parent/learner/${fixture.learner.id}/iep`);
     if (fixture.inAppTitle) {
-      await expect(page.getByText(fixture.inAppTitle, { exact: false })).toBeVisible({ timeout: 10_000 });
+      await expect(page.getByText(fixture.inAppTitle, { exact: false })).toBeVisible({
+        timeout: 10_000,
+      });
     }
   });
 });

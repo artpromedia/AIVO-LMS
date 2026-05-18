@@ -1,9 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import type {
-  SubscriptionRecord,
-  TutorSubscriptionRecord,
-} from "@aivo/billing-entitlements";
+import type { SubscriptionRecord, TutorSubscriptionRecord } from "@aivo/billing-entitlements";
 import { projectLearnerEntitlements } from "../src/lib/learner-entitlements.js";
 
 const LEARNER = "11111111-1111-4111-8111-111111111111";
@@ -43,10 +40,7 @@ describe("projectLearnerEntitlements", () => {
       subscription: withSub({ plan: "single" }),
       tutorSubscriptions: [],
     });
-    assert.deepEqual(
-      payload.effectiveTutors.sort(),
-      ["chrono", "nova", "sage", "spark"],
-    );
+    assert.deepEqual(payload.effectiveTutors.sort(), ["chrono", "nova", "sage", "spark"]);
   });
 
   it("active add-on unlocks the corresponding tutor key (nova → ADDON_TUTOR_MATH bug)", () => {
@@ -54,9 +48,7 @@ describe("projectLearnerEntitlements", () => {
       learnerId: LEARNER,
       tenantId: TENANT,
       subscription: withSub({ plan: "free" }),
-      tutorSubscriptions: [
-        { tutorSku: "ADDON_TUTOR_MATH", status: "active" },
-      ],
+      tutorSubscriptions: [{ tutorSku: "ADDON_TUTOR_MATH", status: "active" }],
     });
     assert.ok(payload.effectiveTutors.includes("nova"), "nova should unlock from ADDON_TUTOR_MATH");
     assert.ok(payload.addonTutors.includes("nova"));
@@ -68,9 +60,7 @@ describe("projectLearnerEntitlements", () => {
       learnerId: LEARNER,
       tenantId: TENANT,
       subscription: withSub({ plan: "free" }),
-      tutorSubscriptions: [
-        { tutorSku: "ADDON_TUTOR_CODING", status: "grace_period" },
-      ],
+      tutorSubscriptions: [{ tutorSku: "ADDON_TUTOR_CODING", status: "grace_period" }],
     });
     assert.ok(payload.effectiveTutors.includes("pixel"));
     assert.ok(payload.graceTutors.includes("pixel"));
@@ -107,9 +97,7 @@ describe("projectLearnerEntitlements", () => {
       learnerId: LEARNER,
       tenantId: TENANT,
       subscription: null,
-      tutorSubscriptions: [
-        { tutorSku: "ADDON_TUTOR_MATH", status: "active" },
-      ],
+      tutorSubscriptions: [{ tutorSku: "ADDON_TUTOR_MATH", status: "active" }],
     });
     assert.equal(payload.subscriptionStatus, "missing");
     assert.equal(payload.plan, "unknown");
@@ -122,9 +110,7 @@ describe("projectLearnerEntitlements", () => {
       learnerId: LEARNER,
       tenantId: TENANT,
       subscription: withSub({ plan: "single", status: "canceled" }),
-      tutorSubscriptions: [
-        { tutorSku: "ADDON_TUTOR_MATH", status: "active" },
-      ],
+      tutorSubscriptions: [{ tutorSku: "ADDON_TUTOR_MATH", status: "active" }],
     });
     assert.equal(payload.effectiveTutors.length, 0);
     assert.equal(payload.lockedTutors.length, 14);

@@ -88,10 +88,34 @@ describe("TimeOfDayMemory", () => {
 
   it("ranks windows by composite what-worked score", () => {
     const m = new TimeOfDayMemory();
-    m.record({ timeOfDay: "morning", dayOfWeek: 1, accuracy: 0.9, frustrationRate: 0.05, attentionMinutes: 25 });
-    m.record({ timeOfDay: "morning", dayOfWeek: 2, accuracy: 0.85, frustrationRate: 0.1, attentionMinutes: 22 });
-    m.record({ timeOfDay: "afternoon", dayOfWeek: 1, accuracy: 0.5, frustrationRate: 0.5, attentionMinutes: 8 });
-    m.record({ timeOfDay: "afternoon", dayOfWeek: 2, accuracy: 0.45, frustrationRate: 0.6, attentionMinutes: 6 });
+    m.record({
+      timeOfDay: "morning",
+      dayOfWeek: 1,
+      accuracy: 0.9,
+      frustrationRate: 0.05,
+      attentionMinutes: 25,
+    });
+    m.record({
+      timeOfDay: "morning",
+      dayOfWeek: 2,
+      accuracy: 0.85,
+      frustrationRate: 0.1,
+      attentionMinutes: 22,
+    });
+    m.record({
+      timeOfDay: "afternoon",
+      dayOfWeek: 1,
+      accuracy: 0.5,
+      frustrationRate: 0.5,
+      attentionMinutes: 8,
+    });
+    m.record({
+      timeOfDay: "afternoon",
+      dayOfWeek: 2,
+      accuracy: 0.45,
+      frustrationRate: 0.6,
+      attentionMinutes: 6,
+    });
     const stats = m.stats();
     expect(stats[0].timeOfDay).toBe("morning");
     expect(stats[stats.length - 1].timeOfDay).toBe("afternoon");
@@ -100,13 +124,25 @@ describe("TimeOfDayMemory", () => {
 
   it("requires ≥2 observations before endorsing a window", () => {
     const m = new TimeOfDayMemory();
-    m.record({ timeOfDay: "morning", dayOfWeek: 1, accuracy: 0.95, frustrationRate: 0.0, attentionMinutes: 30 });
+    m.record({
+      timeOfDay: "morning",
+      dayOfWeek: 1,
+      accuracy: 0.95,
+      frustrationRate: 0.0,
+      attentionMinutes: 30,
+    });
     expect(m.bestWindow()).toBeNull();
   });
 
   it("round-trips via toJSON / fromJSON", () => {
     const m = new TimeOfDayMemory();
-    m.record({ timeOfDay: "morning", dayOfWeek: 1, accuracy: 0.9, frustrationRate: 0.05, attentionMinutes: 25 });
+    m.record({
+      timeOfDay: "morning",
+      dayOfWeek: 1,
+      accuracy: 0.9,
+      frustrationRate: 0.05,
+      attentionMinutes: 25,
+    });
     const m2 = TimeOfDayMemory.fromJSON(m.toJSON());
     expect(m2.toJSON()).toEqual(m.toJSON());
   });

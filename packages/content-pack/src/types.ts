@@ -72,7 +72,9 @@ export interface AdaptationProfile {
   extraThinkingTimeMs?: number;
   /** Functioning levels this activity is *designed* for. If unset, the
    * activity is considered universal. */
-  functioningLevels?: Array<"STANDARD" | "SUPPORTED" | "LOW_VERBAL" | "NON_VERBAL" | "PRE_SYMBOLIC">;
+  functioningLevels?: Array<
+    "STANDARD" | "SUPPORTED" | "LOW_VERBAL" | "NON_VERBAL" | "PRE_SYMBOLIC"
+  >;
 }
 
 /** A single learning activity. */

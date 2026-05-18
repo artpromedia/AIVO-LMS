@@ -10,14 +10,23 @@ interface AdventureMapPreviewProps {
   lightMode?: boolean;
 }
 
-export default function AdventureMapPreview({ totalChapters, learnerName, onClose, lightMode = false }: AdventureMapPreviewProps) {
+export default function AdventureMapPreview({
+  totalChapters,
+  learnerName,
+  onClose,
+  lightMode = false,
+}: AdventureMapPreviewProps) {
   const chapters = ADVENTURE_CHAPTERS.slice(0, totalChapters);
   const textPrimary = lightMode ? "text-slate-900" : "text-white";
   const textSecondary = lightMode ? "text-slate-500" : "text-white/60";
-  const bgClass = lightMode ? "from-amber-50 via-white to-purple-50" : "from-indigo-950 via-purple-950 to-slate-950";
+  const bgClass = lightMode
+    ? "from-amber-50 via-white to-purple-50"
+    : "from-indigo-950 via-purple-950 to-slate-950";
 
   return (
-    <div className={`fixed inset-0 bg-gradient-to-br ${bgClass} flex flex-col items-center justify-center overflow-auto`}>
+    <div
+      className={`fixed inset-0 bg-gradient-to-br ${bgClass} flex flex-col items-center justify-center overflow-auto`}
+    >
       <div className="relative z-10 text-center px-6 py-12 max-w-2xl w-full">
         <h1 className={`text-3xl font-heading font-bold ${textPrimary} mb-2`}>
           Your Adventure Map
@@ -27,7 +36,9 @@ export default function AdventureMapPreview({ totalChapters, learnerName, onClos
         </p>
 
         <div className="relative">
-          <div className={`absolute left-1/2 top-0 bottom-0 w-0.5 ${lightMode ? "bg-purple-200" : "bg-white/10"} -translate-x-1/2`} />
+          <div
+            className={`absolute left-1/2 top-0 bottom-0 w-0.5 ${lightMode ? "bg-purple-200" : "bg-white/10"} -translate-x-1/2`}
+          />
 
           <div className="space-y-6">
             {chapters.map((chapter, idx) => {
@@ -46,9 +57,7 @@ export default function AdventureMapPreview({ totalChapters, learnerName, onClos
                       <p className={`font-heading font-bold ${textPrimary} text-sm`}>
                         {chapter.title}
                       </p>
-                      <p className={`text-xs ${textSecondary} mt-1`}>
-                        with {tutor.name}
-                      </p>
+                      <p className={`text-xs ${textSecondary} mt-1`}>with {tutor.name}</p>
                     </div>
                   </div>
 
@@ -57,7 +66,13 @@ export default function AdventureMapPreview({ totalChapters, learnerName, onClos
                       className="w-14 h-14 rounded-full overflow-hidden border-3 shadow-lg"
                       style={{ borderColor: tutor.color, boxShadow: `0 0 20px ${tutor.color}30` }}
                     >
-                      <Image src={tutor.avatar} alt={tutor.name} width={56} height={56} className="object-cover" />
+                      <Image
+                        src={tutor.avatar}
+                        alt={tutor.name}
+                        width={56}
+                        height={56}
+                        className="object-cover"
+                      />
                     </div>
                     <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-white shadow flex items-center justify-center text-xs font-bold text-slate-700">
                       {idx + 1}

@@ -22,12 +22,7 @@ interface LearnerRecord {
  * Any other role lands on `/` which routes them to their role dashboard
  * (`ROLE_DASHBOARDS` in `apps/web/src/app/page.tsx`).
  */
-const LEARNER_ALLOWED_ROLES = new Set([
-  "LEARNER",
-  "PARENT",
-  "CAREGIVER",
-  "PLATFORM_ADMIN",
-]);
+const LEARNER_ALLOWED_ROLES = new Set(["LEARNER", "PARENT", "CAREGIVER", "PLATFORM_ADMIN"]);
 
 /**
  * Wraps every page under `/dashboard/learner/...` with the active learner's
@@ -76,10 +71,7 @@ function LearnerLayoutInner({ children }: { children: React.ReactNode }) {
       router.replace("/");
       return;
     }
-    if (
-      (user.role === "PARENT" || user.role === "CAREGIVER") &&
-      !queriedLearnerId
-    ) {
+    if ((user.role === "PARENT" || user.role === "CAREGIVER") && !queriedLearnerId) {
       router.replace("/dashboard/parent");
     }
   }, [loading, user, queriedLearnerId, router]);

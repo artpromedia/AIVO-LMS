@@ -11,7 +11,13 @@ const NAV_ITEMS = [
 
 export default function TeacherLayout({ children }: { children: React.ReactNode }) {
   return (
-    <CareTeamLayout accent="blue" roleLabel="Teacher" allowedRoles={["TEACHER", "PLATFORM_ADMIN"]} basePath="/dashboard/teacher" navItems={NAV_ITEMS}>
+    <CareTeamLayout
+      accent="blue"
+      roleLabel="Teacher"
+      allowedRoles={["TEACHER", "PLATFORM_ADMIN"]}
+      basePath="/dashboard/teacher"
+      navItems={NAV_ITEMS}
+    >
       {children}
     </CareTeamLayout>
   );

@@ -61,7 +61,9 @@ describe("CoughDropSync", () => {
 
   it("PATCHes when a board with matching name already exists", async () => {
     sync.mockFetch
-      .mockResolvedValueOnce(makeResponse(200, { boards: [{ id: "existing-board", name: "AIVO - learner-abc" }] }))
+      .mockResolvedValueOnce(
+        makeResponse(200, { boards: [{ id: "existing-board", name: "AIVO - learner-abc" }] }),
+      )
       .mockResolvedValueOnce(makeResponse(200, { board: { id: "existing-board" } }));
 
     await sync.syncLearnerVocabulary("learner-abc", sampleBoard);

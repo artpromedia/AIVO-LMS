@@ -67,9 +67,7 @@ export function assertStarterPacksValid(): void {
       const detail = issues
         .map((i) => `[${i.code}${i.refId ? ` ${i.refId}` : ""}] ${i.detail}`)
         .join("\n  ");
-      throw new Error(
-        `Starter content pack for tutor "${key}" failed validation:\n  ${detail}`,
-      );
+      throw new Error(`Starter content pack for tutor "${key}" failed validation:\n  ${detail}`);
     }
   }
 }

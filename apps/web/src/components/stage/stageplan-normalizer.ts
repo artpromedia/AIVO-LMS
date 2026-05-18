@@ -37,7 +37,12 @@ export interface RawStagePlan {
 }
 
 function looksLikeBeat(value: any): value is Beat {
-  return value && typeof value === "object" && typeof value.id === "string" && typeof value.type === "string";
+  return (
+    value &&
+    typeof value === "object" &&
+    typeof value.id === "string" &&
+    typeof value.type === "string"
+  );
 }
 
 export function normalizeStagePlan(raw: RawStagePlan | null | undefined): NormalizedStagePlan {

@@ -41,11 +41,16 @@ const LEVEL_LABELS: Record<string, string> = {
 };
 
 const LEVEL_STYLES: Record<string, string> = {
-  STANDARD: "bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))] border-[hsl(var(--visual-science)/0.3)]",
-  SUPPORTED: "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))] border-[hsl(var(--visual-reading)/0.3)]",
-  LOW_VERBAL: "bg-[hsl(var(--visual-sel)/0.12)] text-[hsl(var(--visual-sel))] border-[hsl(var(--visual-sel)/0.3)]",
-  NON_VERBAL: "bg-[hsl(var(--visual-sel)/0.12)] text-[hsl(var(--visual-sel))] border-[hsl(var(--visual-sel)/0.3)]",
-  PRE_SYMBOLIC: "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))] border-[hsl(var(--visual-math)/0.3)]",
+  STANDARD:
+    "bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))] border-[hsl(var(--visual-science)/0.3)]",
+  SUPPORTED:
+    "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))] border-[hsl(var(--visual-reading)/0.3)]",
+  LOW_VERBAL:
+    "bg-[hsl(var(--visual-sel)/0.12)] text-[hsl(var(--visual-sel))] border-[hsl(var(--visual-sel)/0.3)]",
+  NON_VERBAL:
+    "bg-[hsl(var(--visual-sel)/0.12)] text-[hsl(var(--visual-sel))] border-[hsl(var(--visual-sel)/0.3)]",
+  PRE_SYMBOLIC:
+    "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))] border-[hsl(var(--visual-math)/0.3)]",
 };
 
 export function LearnerSummaryCard({
@@ -72,7 +77,8 @@ export function LearnerSummaryCard({
     type: "good",
     label: "On track",
     Icon: CheckCircle2,
-    container: "bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))] border-[hsl(var(--visual-science)/0.3)]",
+    container:
+      "bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))] border-[hsl(var(--visual-science)/0.3)]",
     iconWrap: "bg-[hsl(var(--visual-surface))] text-[hsl(var(--visual-science))]",
   };
 
@@ -81,7 +87,8 @@ export function LearnerSummaryCard({
       type: "action",
       label: "Brain review needed",
       Icon: AlertCircle,
-      container: "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))] border-[hsl(var(--visual-math)/0.3)]",
+      container:
+        "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))] border-[hsl(var(--visual-math)/0.3)]",
       iconWrap: "bg-[hsl(var(--visual-surface))] text-[hsl(var(--visual-math))]",
     };
   } else if (pendingRecommendations > 0) {
@@ -89,7 +96,8 @@ export function LearnerSummaryCard({
       type: "attention",
       label: `${pendingRecommendations} recommendation${pendingRecommendations > 1 ? "s" : ""} pending`,
       Icon: AlertCircle,
-      container: "bg-[hsl(var(--visual-sel)/0.12)] text-[hsl(var(--visual-sel))] border-[hsl(var(--visual-sel)/0.3)]",
+      container:
+        "bg-[hsl(var(--visual-sel)/0.12)] text-[hsl(var(--visual-sel))] border-[hsl(var(--visual-sel)/0.3)]",
       iconWrap: "bg-[hsl(var(--visual-surface))] text-[hsl(var(--visual-sel))]",
     };
   } else if (!baselineCompleted && !hasBrain) {
@@ -97,7 +105,8 @@ export function LearnerSummaryCard({
       type: "attention",
       label: "Assessment needed",
       Icon: ClipboardList,
-      container: "bg-[hsl(var(--visual-sel)/0.12)] text-[hsl(var(--visual-sel))] border-[hsl(var(--visual-sel)/0.3)]",
+      container:
+        "bg-[hsl(var(--visual-sel)/0.12)] text-[hsl(var(--visual-sel))] border-[hsl(var(--visual-sel)/0.3)]",
       iconWrap: "bg-[hsl(var(--visual-surface))] text-[hsl(var(--visual-sel))]",
     };
   }

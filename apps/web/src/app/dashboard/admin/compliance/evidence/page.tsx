@@ -42,7 +42,9 @@ export default function EvidencePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
-  const [verifyState, setVerifyState] = useState<Record<string, "ok" | "mismatch" | "downloading">>({});
+  const [verifyState, setVerifyState] = useState<Record<string, "ok" | "mismatch" | "downloading">>(
+    {},
+  );
 
   async function load() {
     if (!accessToken) return;
@@ -64,7 +66,9 @@ export default function EvidencePage() {
 
   // `load` is defined in the same component and only depends on `accessToken`, which is
   // already in the deps array, so omitting it here is safe.
-  useEffect(() => { load(); }, [accessToken]);
+  useEffect(() => {
+    load();
+  }, [accessToken]);
 
   async function downloadAndVerify(b: Bundle) {
     if (!accessToken) return;
@@ -122,9 +126,9 @@ export default function EvidencePage() {
             SOC 2 Evidence Bundles
           </h1>
           <p className="text-sm text-gray-600 mt-1 max-w-2xl">
-            Nightly export of access reviews (CC6.1/CC6.2), audit-log Merkle root (CC7.2),
-            config history (CC8.1), and backup verification (CC7.5). Each bundle is hashed
-            so you can verify integrity end-to-end after download.
+            Nightly export of access reviews (CC6.1/CC6.2), audit-log Merkle root (CC7.2), config
+            history (CC8.1), and backup verification (CC7.5). Each bundle is hashed so you can
+            verify integrity end-to-end after download.
           </p>
         </div>
         <button
@@ -159,12 +163,18 @@ export default function EvidencePage() {
           </thead>
           <tbody>
             {loading && (
-              <tr><td colSpan={8} className="p-6 text-center text-gray-500">Loading…</td></tr>
+              <tr>
+                <td colSpan={8} className="p-6 text-center text-gray-500">
+                  Loading…
+                </td>
+              </tr>
             )}
             {!loading && bundles.length === 0 && (
-              <tr><td colSpan={8} className="p-6 text-center text-gray-500">
-                No bundles yet. Click <em>Generate now</em> to create the first one.
-              </td></tr>
+              <tr>
+                <td colSpan={8} className="p-6 text-center text-gray-500">
+                  No bundles yet. Click <em>Generate now</em> to create the first one.
+                </td>
+              </tr>
             )}
             {bundles.map((b) => {
               const v = verifyState[b.id];
@@ -186,7 +196,13 @@ export default function EvidencePage() {
                       className="inline-flex items-center gap-1 px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-800"
                     >
                       <Download className="w-3 h-3" />
-                      {v === "downloading" ? "…" : v === "ok" ? "Verified" : v === "mismatch" ? "Mismatch!" : "Download"}
+                      {v === "downloading"
+                        ? "…"
+                        : v === "ok"
+                          ? "Verified"
+                          : v === "mismatch"
+                            ? "Mismatch!"
+                            : "Download"}
                     </button>
                   </td>
                 </tr>
@@ -198,8 +214,8 @@ export default function EvidencePage() {
 
       <p className="text-xs text-gray-500">
         Hashes are verified in your browser against <code>X-Evidence-Sha256</code> on download.
-        Bundles are stored on disk under <code>EVIDENCE_DIR</code>; in production the same
-        bytes are mirrored to a WORM-locked S3 bucket once <code>EVIDENCE_S3_BUCKET</code>
+        Bundles are stored on disk under <code>EVIDENCE_DIR</code>; in production the same bytes are
+        mirrored to a WORM-locked S3 bucket once <code>EVIDENCE_S3_BUCKET</code>
         is configured.
       </p>
     </div>

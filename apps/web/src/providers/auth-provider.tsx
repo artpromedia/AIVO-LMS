@@ -75,21 +75,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return null;
   }, []);
 
-  useEffect(() => { refreshToken(); }, [refreshToken]);
+  useEffect(() => {
+    refreshToken();
+  }, [refreshToken]);
 
   // flushSync so the dashboard layout sees `user` on its first render after
   // router.push — without it the !user guard races and bounces back to login.
-  const applySession = useCallback((data: { user: User; accessToken: string; mustChangePassword?: boolean }) => {
-    flushSync(() => {
-      setUser(data.user);
-      setAccessToken(data.accessToken);
-      setMustChangePassword(!!data.mustChangePassword);
-      setIsImpersonating(false);
-      setOriginalAdmin(null);
-      setLoading(false);
-    });
-    sessionStorage.removeItem(IMPERSONATION_FLAG_KEY);
-  }, []);
+  const applySession = useCallback(
+    (data: { user: User; accessToken: string; mustChangePassword?: boolean }) => {
+      flushSync(() => {
+        setUser(data.user);
+        setAccessToken(data.accessToken);
+        setMustChangePassword(!!data.mustChangePassword);
+        setIsImpersonating(false);
+        setOriginalAdmin(null);
+        setLoading(false);
+      });
+      sessionStorage.removeItem(IMPERSONATION_FLAG_KEY);
+    },
+    [],
+  );
 
   // Sprint 7: enforce mustChangePassword by redirecting to the change-
   // password page from anywhere in the dashboard. We allow the user to
@@ -97,7 +102,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // actually complete the change.
   useEffect(() => {
     if (loading || !user || !mustChangePassword) return;
-    const allowed = ["/dashboard/change-password", "/login", "/district/login", "/admin/login", "/logout"];
+    const allowed = [
+      "/dashboard/change-password",
+      "/login",
+      "/district/login",
+      "/admin/login",
+      "/logout",
+    ];
     if (allowed.some((p) => pathname?.startsWith(p))) return;
     router.push("/dashboard/change-password");
   }, [loading, user, mustChangePassword, pathname, router]);
@@ -111,7 +122,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     const data = await res.json();
     if (!res.ok) {
-      const err = new Error(data.error || "Login failed") as Error & { redirectTo?: string; wrongSurface?: string };
+      const err = new Error(data.error || "Login failed") as Error & {
+        redirectTo?: string;
+        wrongSurface?: string;
+      };
       if (data.redirectTo) err.redirectTo = data.redirectTo;
       if (data.wrongSurface) err.wrongSurface = data.wrongSurface;
       throw err;
@@ -213,13 +227,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{
-      user, accessToken, loading,
-      isImpersonating, originalAdmin,
-      login, register, pinLogin, logout, refreshToken,
-      applySession,
-      impersonate, exitImpersonation,
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        accessToken,
+        loading,
+        isImpersonating,
+        originalAdmin,
+        login,
+        register,
+        pinLogin,
+        logout,
+        refreshToken,
+        applySession,
+        impersonate,
+        exitImpersonation,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

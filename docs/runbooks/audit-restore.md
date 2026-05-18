@@ -29,7 +29,7 @@ storage corruption event can still break the hash chain.
     ORDER BY seq;
    ```
 
-   A row whose `prev_hash` doesn't match the prior row's `hash`, *or*
+   A row whose `prev_hash` doesn't match the prior row's `hash`, _or_
    whose `hash` doesn't match `sha256(prev_hash || canonical_json(row))`,
    is the corruption point.
 
@@ -45,7 +45,7 @@ the most recent bundle whose `latestSeq` is **less than**
    the hash recorded in the row.
 
 2. Restore the audit table from the most recent backup that is
-   *older than* `firstBrokenSeq`:
+   _older than_ `firstBrokenSeq`:
 
    ```bash
    pg_restore --table admin_audit_log --data-only \

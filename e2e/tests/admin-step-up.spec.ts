@@ -30,7 +30,10 @@ test.describe("admin step-up auth on destructive ops", () => {
     "Requires E2E_PLATFORM_ADMIN_EMAIL/PASSWORD/TOTP_SECRET and E2E_DELETABLE_TENANT_ID",
   );
 
-  test("tenant suspend prompts step-up; wrong code fails, right code succeeds", async ({ page, request }) => {
+  test("tenant suspend prompts step-up; wrong code fails, right code succeeds", async ({
+    page,
+    request,
+  }) => {
     // Login as PLATFORM_ADMIN
     await page.goto("/login");
     await page.getByLabel(/email/i).fill(ADMIN_EMAIL!);

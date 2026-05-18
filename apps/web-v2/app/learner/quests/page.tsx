@@ -12,11 +12,7 @@ import { LEARNER_NAV } from "@/components/layout/role-shells";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  listQuestChapters,
-  listQuestProgressForLearner,
-  listQuestWorlds,
-} from "@/lib/db/repos";
+import { listQuestChapters, listQuestProgressForLearner, listQuestWorlds } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
 
@@ -71,9 +67,7 @@ export default async function LearnerQuestsPage() {
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <h2 className="text-lg font-semibold">{w.name}</h2>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {w.description}
-                        </p>
+                        <p className="text-sm text-muted-foreground mt-1">{w.description}</p>
                       </div>
                       <Badge tone={bossDone ? "success" : "primary"}>
                         {done}/{normal.length}

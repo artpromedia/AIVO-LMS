@@ -4,11 +4,7 @@ import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { requireSession } from "@/lib/bff/guards";
 import { audit } from "@/lib/bff/audit";
-import {
-  SAFETY_VALIDATE_PLAN,
-  getActiveSafetyPolicy,
-  recordModerationEvent,
-} from "@/lib/db/repos";
+import { SAFETY_VALIDATE_PLAN, getActiveSafetyPolicy, recordModerationEvent } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
 
@@ -17,10 +13,18 @@ const bodySchema = z.object({
   hookText: z.string().max(4000).optional(),
   modelingText: z.string().max(8000).optional(),
   guidedPractice: z
-    .array(z.object({ prompt: z.string().max(2000).optional(), expectedResponse: z.string().max(2000).optional() }))
+    .array(
+      z.object({
+        prompt: z.string().max(2000).optional(),
+        expectedResponse: z.string().max(2000).optional(),
+      }),
+    )
     .max(20)
     .optional(),
-  checksForUnderstanding: z.array(z.object({ prompt: z.string().max(2000).optional() })).max(20).optional(),
+  checksForUnderstanding: z
+    .array(z.object({ prompt: z.string().max(2000).optional() }))
+    .max(20)
+    .optional(),
 });
 
 export async function POST(req: Request): Promise<NextResponse> {
@@ -37,7 +41,10 @@ export async function POST(req: Request): Promise<NextResponse> {
     const parsed = bodySchema.safeParse(body);
     if (!parsed.success) {
       return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." },
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
         requestId,
       );
     }
@@ -48,8 +55,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         learnerId: null,
         subjectKind: "lesson_plan",
         subjectRefId: parsed.data.lessonRunId ?? null,
-        excerpt:
-          (parsed.data.hookText ?? "") + " " + (parsed.data.modelingText ?? ""),
+        excerpt: (parsed.data.hookText ?? "") + " " + (parsed.data.modelingText ?? ""),
         classification: result.classification,
         injectionSignals: [],
         crisisSignals: [],

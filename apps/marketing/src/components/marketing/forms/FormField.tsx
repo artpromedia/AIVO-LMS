@@ -32,7 +32,12 @@ export function FormField({ id, label, required, hint, error, children }: BasePr
     <div className="space-y-1.5">
       <label htmlFor={id} className="block text-sm font-bold text-slate-700">
         {label}
-        {required ? <span aria-hidden="true" className="text-rose-600"> *</span> : null}
+        {required ? (
+          <span aria-hidden="true" className="text-rose-600">
+            {" "}
+            *
+          </span>
+        ) : null}
       </label>
       {decoratedChild}
       {hint ? (

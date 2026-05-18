@@ -4,11 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LearnerAvatar } from "@/components/learner/learner-avatar";
-import {
-  READINESS_LABEL,
-  READINESS_TONE,
-  nextStepFor,
-} from "@/lib/learner/readiness";
+import { READINESS_LABEL, READINESS_TONE, nextStepFor } from "@/lib/learner/readiness";
 import type { LearnerProfile } from "@/lib/db/types";
 
 export function LearnerCard({ learner }: { learner: LearnerProfile }) {
@@ -19,9 +15,7 @@ export function LearnerCard({ learner }: { learner: LearnerProfile }) {
       <div className="flex items-center gap-3">
         <LearnerAvatar name={learner.displayName} size="md" />
         <div className="min-w-0">
-          <p className="truncate font-display text-lg font-semibold">
-            {learner.displayName}
-          </p>
+          <p className="truncate font-display text-lg font-semibold">{learner.displayName}</p>
           <p className="text-xs text-aivo-ink-soft">
             Age {new Date().getFullYear() - learner.birthYear}
             {learner.gradeBand ? ` · Grade ${learner.gradeBand}` : ""}

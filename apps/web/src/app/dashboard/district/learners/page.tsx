@@ -41,15 +41,27 @@ export default function DistrictLearnersPage() {
     if (search) params.set("search", search);
     if (flFilter) params.set("fl", flFilter);
 
-    fetch(`/api/district/learners?${params}`, { headers: { Authorization: `Bearer ${accessToken}` } })
-      .then((r) => r.ok ? r.json() : { learners: [], total: 0 })
-      .then((data) => { setLearners(data.learners || []); setTotal(data.total || 0); })
-      .catch(() => { setLearners([]); setTotal(0); })
+    fetch(`/api/district/learners?${params}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+      .then((r) => (r.ok ? r.json() : { learners: [], total: 0 }))
+      .then((data) => {
+        setLearners(data.learners || []);
+        setTotal(data.total || 0);
+      })
+      .catch(() => {
+        setLearners([]);
+        setTotal(0);
+      })
       .finally(() => setLoading(false));
   }, [accessToken, currentPage, search, flFilter]);
 
-  useEffect(() => { loadLearners(); }, [loadLearners]);
-  useEffect(() => { setCurrentPage(1); }, [search, flFilter]);
+  useEffect(() => {
+    loadLearners();
+  }, [loadLearners]);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, flFilter]);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
@@ -57,7 +69,9 @@ export default function DistrictLearnersPage() {
     <div className="p-8 space-y-6">
       <header>
         <h1 className="text-2xl font-heading font-bold vi-text">Learners</h1>
-        <p className="text-sm vi-text-muted mt-1">Browse enrolled learners, view progress, and manage accommodations.</p>
+        <p className="text-sm vi-text-muted mt-1">
+          Browse enrolled learners, view progress, and manage accommodations.
+        </p>
       </header>
 
       <div className="flex flex-wrap items-center gap-3">
@@ -85,7 +99,9 @@ export default function DistrictLearnersPage() {
 
       {loading ? (
         <div className="animate-pulse space-y-3">
-          {[1, 2, 3, 4, 5].map((i) => <div key={i} className="h-14 bg-slate-200 rounded-xl" />)}
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="h-14 bg-slate-200 rounded-xl" />
+          ))}
         </div>
       ) : (
         <div className="vi-card overflow-hidden">
@@ -102,33 +118,55 @@ export default function DistrictLearnersPage() {
             </thead>
             <tbody>
               {learners.map((l) => (
-                <tr key={l.id} className="border-b vi-border hover:vi-surface-soft transition cursor-pointer">
+                <tr
+                  key={l.id}
+                  className="border-b vi-border hover:vi-surface-soft transition cursor-pointer"
+                >
                   <td className="px-5 py-3">
-                    <Link href={`/dashboard/district/learners/${l.id}`} className="flex items-center gap-3">
+                    <Link
+                      href={`/dashboard/district/learners/${l.id}`}
+                      className="flex items-center gap-3"
+                    >
                       <div className="w-8 h-8 rounded-full bg-[hsl(var(--visual-primary))] flex items-center justify-center text-white text-xs font-bold">
                         {l.name.charAt(0)}
                       </div>
-                      <span className="font-medium vi-text hover:text-[hsl(var(--visual-primary))]">{l.name}</span>
+                      <span className="font-medium vi-text hover:text-[hsl(var(--visual-primary))]">
+                        {l.name}
+                      </span>
                     </Link>
                   </td>
                   <td className="px-5 py-3 vi-text-muted">{l.gradeLevel || "—"}</td>
                   <td className="px-5 py-3">
-                    <span className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${FL_COLORS[l.functioningLevel] || "vi-surface-soft vi-text-muted"}`}>
+                    <span
+                      className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${FL_COLORS[l.functioningLevel] || "vi-surface-soft vi-text-muted"}`}
+                    >
                       {l.functioningLevel?.replace(/_/g, " ") || "—"}
                     </span>
                   </td>
                   <td className="px-5 py-3 vi-text-muted text-xs">{l.school?.name || "—"}</td>
                   <td className="px-5 py-3 vi-text-muted text-xs">{l.parent?.name || "—"}</td>
-                  <td className="px-5 py-3 vi-text-muted">{new Date(l.createdAt).toLocaleDateString()}</td>
+                  <td className="px-5 py-3 vi-text-muted">
+                    {new Date(l.createdAt).toLocaleDateString()}
+                  </td>
                 </tr>
               ))}
               {learners.length === 0 && (
-                <tr><td colSpan={6} className="px-5 py-10 text-center vi-text-muted">No learners found</td></tr>
+                <tr>
+                  <td colSpan={6} className="px-5 py-10 text-center vi-text-muted">
+                    No learners found
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
           {totalPages > 1 && (
-            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} totalItems={total} pageSize={PAGE_SIZE} />
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              totalItems={total}
+              pageSize={PAGE_SIZE}
+            />
           )}
         </div>
       )}

@@ -43,10 +43,20 @@ export async function POST(req: Request): Promise<NextResponse> {
     const roleErr = requireRole(session!, ["parent"], requestId);
     if (roleErr) return roleErr;
     let body: unknown = {};
-    try { body = await req.json(); } catch { body = {}; }
+    try {
+      body = await req.json();
+    } catch {
+      body = {};
+    }
     const parsed = postSchema.safeParse(body);
     if (!parsed.success) {
-      return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." }, requestId);
+      return fail(
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
+        requestId,
+      );
     }
     const result = subscribeTenant({
       tenantId: session!.tenantId,
@@ -71,7 +81,10 @@ export async function POST(req: Request): Promise<NextResponse> {
   }
 }
 
-const deleteSchema = z.object({ subscriptionId: z.string().min(1), atPeriodEnd: z.boolean().default(true) });
+const deleteSchema = z.object({
+  subscriptionId: z.string().min(1),
+  atPeriodEnd: z.boolean().default(true),
+});
 
 export async function DELETE(req: Request): Promise<NextResponse> {
   const requestId = getRequestId(req);
@@ -81,12 +94,26 @@ export async function DELETE(req: Request): Promise<NextResponse> {
     const roleErr = requireRole(session!, ["parent"], requestId);
     if (roleErr) return roleErr;
     let body: unknown = {};
-    try { body = await req.json(); } catch { body = {}; }
+    try {
+      body = await req.json();
+    } catch {
+      body = {};
+    }
     const parsed = deleteSchema.safeParse(body);
     if (!parsed.success) {
-      return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." }, requestId);
+      return fail(
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
+        requestId,
+      );
     }
-    const sub = cancelSubscription(parsed.data.subscriptionId, session!.tenantId, parsed.data.atPeriodEnd);
+    const sub = cancelSubscription(
+      parsed.data.subscriptionId,
+      session!.tenantId,
+      parsed.data.atPeriodEnd,
+    );
     if (!sub) return fail({ ...ERRORS.NOT_FOUND, message: "Subscription not found." }, requestId);
     audit(session!, "billing.subscription.canceled", requestId, {
       metadata: { subscriptionId: sub.id, atPeriodEnd: parsed.data.atPeriodEnd ? "1" : "0" },

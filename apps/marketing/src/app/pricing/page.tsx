@@ -148,7 +148,9 @@ export default function PricingPage() {
             <article
               key={p.key}
               className={`relative flex flex-col rounded-3xl border p-6 shadow-sm ${
-                p.highlight ? "border-purple-300 bg-gradient-to-b from-purple-50 to-white" : "border-slate-200 bg-white"
+                p.highlight
+                  ? "border-purple-300 bg-gradient-to-b from-purple-50 to-white"
+                  : "border-slate-200 bg-white"
               }`}
             >
               {p.badge ? (
@@ -160,13 +162,26 @@ export default function PricingPage() {
               <p className="mt-1 font-body text-sm text-slate-600">{p.description}</p>
               <div className="mt-4">
                 <span className="font-heading text-3xl font-bold text-slate-900">{p.price}</span>
-                {p.cadence ? <span className="ml-1 text-sm text-slate-500">{p.cadence}</span> : null}
+                {p.cadence ? (
+                  <span className="ml-1 text-sm text-slate-500">{p.cadence}</span>
+                ) : null}
               </div>
               <ul className="mt-4 flex-1 space-y-2">
                 {p.features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm font-body text-slate-700">
-                    <svg className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    <svg
+                      className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2.5}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                     <span>{f}</span>
                   </li>
@@ -192,18 +207,33 @@ export default function PricingPage() {
           For schools and districts
         </h2>
         <p className="mt-1 font-body text-slate-600">
-          Annual pricing scales with learner count and program scope. We send a written quote — not a black-box invoice.
+          Annual pricing scales with learner count and program scope. We send a written quote — not
+          a black-box invoice.
         </p>
         <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-2">
           {INSTITUTIONAL.map((p) => (
-            <article key={p.key} className="flex flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <article
+              key={p.key}
+              className="flex flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"
+            >
               <h3 className="font-heading text-xl font-bold text-slate-900">{p.name}</h3>
               <p className="mt-1 font-body text-sm text-slate-600">{p.description}</p>
               <ul className="mt-4 flex-1 space-y-2">
                 {p.features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm font-body text-slate-700">
-                    <svg className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    <svg
+                      className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-600"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2.5}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                     <span>{f}</span>
                   </li>

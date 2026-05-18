@@ -129,9 +129,7 @@ export default async function ParentBaselinePage({
   const subjectsById = new Map(subjects.map((s) => [s.id, s]));
 
   const questions = baseline ? listBaselineQuestions(baseline.id) : [];
-  const attempts = baseline
-    ? listBaselineAttempts(baseline.id, session.tenantId)
-    : [];
+  const attempts = baseline ? listBaselineAttempts(baseline.id, session.tenantId) : [];
 
   return (
     <AppShell
@@ -222,8 +220,7 @@ export default async function ParentBaselinePage({
                     {row.estimate.replaceAll("_", " ")}
                   </Badge>
                   <p className="mt-2 text-xs text-aivo-ink-soft">
-                    {row.correct} of {row.answered} correct (
-                    {Math.round(row.accuracy * 100)}%)
+                    {row.correct} of {row.answered} correct ({Math.round(row.accuracy * 100)}%)
                   </p>
                 </Card>
               );
@@ -248,8 +245,8 @@ export default async function ParentBaselinePage({
 
       <SectionHeader title="The six chapters" className="mt-8" />
       <p className="-mt-2 mb-3 text-sm text-aivo-ink-soft">
-        Each chapter is hosted by a tutor character. They introduce themselves
-        and adapt the difficulty as your learner answers.
+        Each chapter is hosted by a tutor character. They introduce themselves and adapt the
+        difficulty as your learner answers.
       </p>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {BASELINE_TUTORS.map((t) => {
@@ -257,9 +254,7 @@ export default async function ParentBaselinePage({
           const summaryRow = subj
             ? baseline?.summary?.perSubject.find((r) => r.subjectId === subj.id)
             : undefined;
-          const covered = subj
-            ? (baseline?.subjectIds ?? []).includes(subj.id)
-            : false;
+          const covered = subj ? (baseline?.subjectIds ?? []).includes(subj.id) : false;
           return (
             <Card key={t.id} className="p-4">
               <div className="flex items-start gap-3">

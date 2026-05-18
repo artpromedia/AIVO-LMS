@@ -3,11 +3,7 @@ import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole } from "@/lib/bff/guards";
 import { audit } from "@/lib/bff/audit";
 import { hashIpFromRequest } from "@/lib/bff/consent-guard";
-import {
-  listConsentVersions,
-  listConsentsForUser,
-  recordConsent,
-} from "@/lib/db/repos";
+import { listConsentVersions, listConsentsForUser, recordConsent } from "@/lib/db/repos";
 import type { ConsentType } from "@/lib/db/types";
 import { CONSENT_TYPES } from "@/lib/db/types";
 
@@ -41,10 +37,7 @@ export async function POST(req: Request) {
       consentType?: string;
     };
     if (!isConsentType(json.consentType)) {
-      return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: "Unknown consentType" },
-        requestId,
-      );
+      return fail({ ...ERRORS.VALIDATION_FAILED, message: "Unknown consentType" }, requestId);
     }
     const rec = recordConsent({
       tenantId: session!.tenantId,

@@ -4,10 +4,7 @@ import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole } from "@/lib/bff/guards";
 import { audit } from "@/lib/bff/audit";
-import {
-  createPronunciationOverride,
-  listPronunciationOverrides,
-} from "@/lib/db/repos";
+import { createPronunciationOverride, listPronunciationOverrides } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
 
@@ -52,13 +49,19 @@ export async function POST(req: Request): Promise<NextResponse> {
     const parsed = bodySchema.safeParse(body);
     if (!parsed.success) {
       return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." },
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
         requestId,
       );
     }
     if (parsed.data.scope === "platform" && session!.role !== "platform_admin") {
       return fail(
-        { ...ERRORS.FORBIDDEN_ROLE, message: "Only platform admins can publish platform-scope overrides." },
+        {
+          ...ERRORS.FORBIDDEN_ROLE,
+          message: "Only platform admins can publish platform-scope overrides.",
+        },
         requestId,
       );
     }

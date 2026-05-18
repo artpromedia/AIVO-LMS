@@ -10,9 +10,9 @@
 
 A teacher signs into AIVO for three reasons. Every teacher screen must serve one of them; anything else gets cut.
 
-1. **Triage** — *which of my learners need me this morning?* (low mastery, missed sessions, IEP follow‑ups.)
-2. **Assign** — *give this learner / this class targeted practice today.*
-3. **Translate** — *prep something I can hand to a parent or a co‑teacher* (insights, accommodations summaries).
+1. **Triage** — _which of my learners need me this morning?_ (low mastery, missed sessions, IEP follow‑ups.)
+2. **Assign** — _give this learner / this class targeted practice today._
+3. **Translate** — _prep something I can hand to a parent or a co‑teacher_ (insights, accommodations summaries).
 
 Anything that doesn't serve one of those — gradebooks, file managers, third‑party LMS chrome — belongs in a future integration, not the teacher surface.
 
@@ -21,7 +21,7 @@ Anything that doesn't serve one of those — gradebooks, file managers, third‑
 1. **Teachers never see raw IEP text.** Only the `teacherSummary` field and the structured `accommodations[]` are rendered. The safety comment lives in code at `app/teacher/learners/[learnerId]/page.tsx:154-158` — that's the contract.
 2. **Tenant scoped, hard.** A teacher visiting a learner from another tenant gets a 404, not an "access denied" page. The check lives in `getLearner(learnerId, session.tenantId)`.
 3. **Class‑scoped operations only.** Even platform admins cannot grade or assign on behalf of a teacher. The teacher's `session.userId` is the assignment author and is enforced server‑side.
-4. **Real data over filler.** Where data isn't wired, label cards *"Demo data"* explicitly (see `teacher/home/page.tsx:51`). Never imply a feature that isn't shipped.
+4. **Real data over filler.** Where data isn't wired, label cards _"Demo data"_ explicitly (see `teacher/home/page.tsx:51`). Never imply a feature that isn't shipped.
 
 ## 3. Sitemap
 
@@ -42,38 +42,38 @@ There is **no** `/teacher/assignments/[assignmentId]` detail route — the list 
 
 ### Navigation (✅)
 
-`TEACHER_NAV` in `components/layout/role-shells.tsx` (the shared, role-aware array used by every teacher page *except* `/teacher/home`, which redeclares its own local copy without the *Learners* item):
+`TEACHER_NAV` in `components/layout/role-shells.tsx` (the shared, role-aware array used by every teacher page _except_ `/teacher/home`, which redeclares its own local copy without the _Learners_ item):
 
-| Label | Icon | Status |
-|---|---|---|
-| Home | `Home` | 🟡 placeholder content |
-| Classes | `Users` | 🟡 list works; detail has roster cosmetics bug |
-| Learners | `Users` | ✅ |
-| Assignments | `ClipboardList` | ✅ |
-| Insights | `BarChart3` | ✅ |
-| Settings | `Settings` | 🟡 shared shell |
+| Label       | Icon            | Status                                         |
+| ----------- | --------------- | ---------------------------------------------- |
+| Home        | `Home`          | 🟡 placeholder content                         |
+| Classes     | `Users`         | 🟡 list works; detail has roster cosmetics bug |
+| Learners    | `Users`         | ✅                                             |
+| Assignments | `ClipboardList` | ✅                                             |
+| Insights    | `BarChart3`     | ✅                                             |
+| Settings    | `Settings`      | 🟡 shared shell                                |
 
-**Two small nav follow-ups:** (1) replace the local `TEACHER_NAV` in `teacher/home/page.tsx:11-17` with the shared import so *Learners* appears there too; (2) consider a different icon for *Learners* so it doesn't collide visually with *Classes*.
+**Two small nav follow-ups:** (1) replace the local `TEACHER_NAV` in `teacher/home/page.tsx:11-17` with the shared import so _Learners_ appears there too; (2) consider a different icon for _Learners_ so it doesn't collide visually with _Classes_.
 
 ## 4. Screen — `/teacher/home` (🟡)
 
 Source: `teacher/home/page.tsx` (63 lines). **This is the highest‑priority gap in the teacher app.** Today the page renders:
 
-- PageHeader: *"Good to see you, {firstName}"* / *"Review classes, spot learners who need a nudge, and assign next steps."*
-- A disabled *"New assignment (Sprint 16)"* button — the new‑assignment flow is now live; this label is stale and should drop the sprint tag.
-- Section header: *"Your classes — Live class rosters will appear here once Sprint 15 wires them up."*
-- One hardcoded card *"3rd Grade · Room 12 — 22 learners · 3 IEPs · 2 awaiting baseline"* with a *Demo data* badge and a disabled *"Open class (Sprint 15)"* button.
-- One empty state *"Add another class — Roster sync from Google Classroom, Clever, or ClassLink lands in Sprint 19."*
+- PageHeader: _"Good to see you, {firstName}"_ / _"Review classes, spot learners who need a nudge, and assign next steps."_
+- A disabled _"New assignment (Sprint 16)"_ button — the new‑assignment flow is now live; this label is stale and should drop the sprint tag.
+- Section header: _"Your classes — Live class rosters will appear here once Sprint 15 wires them up."_
+- One hardcoded card _"3rd Grade · Room 12 — 22 learners · 3 IEPs · 2 awaiting baseline"_ with a _Demo data_ badge and a disabled _"Open class (Sprint 15)"_ button.
+- One empty state _"Add another class — Roster sync from Google Classroom, Clever, or ClassLink lands in Sprint 19."_
 
 ### What it should be (⬜)
 
 The teacher home is the **triage screen**, not a class directory. Class directory belongs at `/teacher/classes`. Proposed structure:
 
-1. **Today** — *3 learners need attention.* List items, each linking to `/teacher/learners/[id]`:
-   - *Sky* — *No lesson started in 4 days.*
-   - *River* — *Struggling on CVC words (4 sessions, score stuck at 42 %).*
-   - *Theo* — *IEP review due Friday.*
-   The signals come from existing repo data:
+1. **Today** — _3 learners need attention._ List items, each linking to `/teacher/learners/[id]`:
+   - _Sky_ — _No lesson started in 4 days._
+   - _River_ — _Struggling on CVC words (4 sessions, score stuck at 42 %)._
+   - _Theo_ — _IEP review due Friday._
+     The signals come from existing repo data:
    - `listLessonRunsForLearner` with no recent `startedAt`.
    - `SkillMastery` rows with `score ≤ 0.5` and no movement across the last N runs.
    - 🟡 IEP review date is not stored; add `IEPDocument.reviewDueAt` if Triage Card #3 is desired.
@@ -83,9 +83,9 @@ The teacher home is the **triage screen**, not a class directory. Class director
 
 ### Microcopy targets
 
-- *"3 learners need attention this morning."* (header)
-- *"All caught up — no urgent flags today."* (empty)
-- Per‑item secondary action: *Open profile* (not *View*, not *Details*).
+- _"3 learners need attention this morning."_ (header)
+- _"All caught up — no urgent flags today."_ (empty)
+- Per‑item secondary action: _Open profile_ (not _View_, not _Details_).
 
 ## 5. Screen — `/teacher/classes/[classId]` (🟡)
 
@@ -108,7 +108,7 @@ Source: `teacher/learners/[learnerId]/page.tsx` (173 lines). This is the stronge
 
 ### Sections (top to bottom)
 
-1. **Header** — *Learner* eyebrow, name, *"Functioning level {n} · {readinessState}"* meta.
+1. **Header** — _Learner_ eyebrow, name, _"Functioning level {n} · {readinessState}"_ meta.
 2. **Active assignments** — list of `TeacherAssignment` rows with creation date + due date.
 3. **Recent lessons** — last 10 runs with subject · skill, source, started timestamp, status badge.
 4. **Skill gaps** — top 5 `SkillMastery` rows with `score ≤ 0.5`, sorted ascending, shown with a `warning`‑tone percentage badge.
@@ -116,9 +116,9 @@ Source: `teacher/learners/[learnerId]/page.tsx` (173 lines). This is the stronge
 
 ### What it doesn't (yet) have
 
-- 🟡 No quick *"Assign a lesson on this gap"* action on the skill‑gap rows. The repo and BFFs exist (`/teacher/assignments/new`) — the link‑with‑preselected‑skill flow is a 1‑file addition: pass `?subjectId=…&skillId=…&learnerIds=…` to the new‑assignment route.
+- 🟡 No quick _"Assign a lesson on this gap"_ action on the skill‑gap rows. The repo and BFFs exist (`/teacher/assignments/new`) — the link‑with‑preselected‑skill flow is a 1‑file addition: pass `?subjectId=…&skillId=…&learnerIds=…` to the new‑assignment route.
 - ⬜ No timeline / engagement chart. Engagement data is computed; widget not built.
-- 🟡 No homework‑helper visibility from the teacher view. Teachers can legitimately benefit from seeing the parent‑facing insight summaries; consider adding a read‑only *"Recent homework sessions"* section.
+- 🟡 No homework‑helper visibility from the teacher view. Teachers can legitimately benefit from seeing the parent‑facing insight summaries; consider adding a read‑only _"Recent homework sessions"_ section.
 
 ## 7. Screen — `/teacher/assignments` & `/teacher/assignments/new` (✅)
 
@@ -126,23 +126,23 @@ Source: `teacher/assignments/page.tsx` (74 lines) + the `new` route.
 
 ### List
 
-- Header: *Assignments* / *"Set work for individual learners. Assigned work appears on the learner's Today screen."*
+- Header: _Assignments_ / _"Set work for individual learners. Assigned work appears on the learner's Today screen."_
 - Primary action: **New assignment** → `/teacher/assignments/new`.
 - Each row: title, subject name + learner count + created date, instructions excerpt, status badge (`active` / `archived`).
-- Empty: *"No assignments yet. Create one to give a learner targeted practice."*
+- Empty: _"No assignments yet. Create one to give a learner targeted practice."_
 
 ### New assignment form (✅)
 
 Fields:
 
-| Field | Required | Source |
-|---|---|---|
-| Title | ✓ | free text |
-| Instructions | optional | free text, multiline |
-| Subject | ✓ | `listSubjects()` |
-| Skills | ≥ 1 | `listSkills(subjectId)` |
-| Learners | ≥ 1 | `listLearnersForTeacher(teacherUserId, tenantId)` |
-| Due date | optional | date picker |
+| Field        | Required | Source                                            |
+| ------------ | -------- | ------------------------------------------------- |
+| Title        | ✓        | free text                                         |
+| Instructions | optional | free text, multiline                              |
+| Subject      | ✓        | `listSubjects()`                                  |
+| Skills       | ≥ 1      | `listSkills(subjectId)`                           |
+| Learners     | ≥ 1      | `listLearnersForTeacher(teacherUserId, tenantId)` |
+| Due date     | optional | date picker                                       |
 
 Server action:
 
@@ -156,7 +156,7 @@ Server action:
 
 A new active assignment is hoisted to slot 2 of `pickTodaysMission` (`today.ts:131-170`) and the learner sees:
 
-> *Your teacher set this for today: {title}.*
+> _Your teacher set this for today: {title}._
 
 When the learner finishes the run, the completion is matched back to `sourceRefId === assignment.id` and the assignment is considered done for that learner.
 
@@ -164,54 +164,54 @@ When the learner finishes the run, the completion is matched back to `sourceRefI
 
 Source: `teacher/insights/page.tsx`. Real data, no placeholders. Layout:
 
-- PageHeader: *"Teacher" / "Insights" / "Recent mastery and lesson activity across your roster."*
+- PageHeader: _"Teacher" / "Insights" / "Recent mastery and lesson activity across your roster."_
 - For each learner in `listLearnersForTeacher(teacherUserId, tenantId)`, a card showing recent mastery + lesson activity (subject and skill names resolved via the in-page subject/skill maps).
-- Empty state: *"No learners in your tenant — Once learners are rostered, their skill mastery and lesson activity will appear here."*
+- Empty state: _"No learners in your tenant — Once learners are rostered, their skill mastery and lesson activity will appear here."_
 
 ### Gaps worth closing next sprint
 
 - **Skill heatmap (⬜)** — subject × skill, cell colour = average mastery; click-through filters `/teacher/learners` to learners under 50 %.
-- **Class-level rollup (⬜)** — today *Insights* iterates learners individually; a class-by-class summary header would help triage.
+- **Class-level rollup (⬜)** — today _Insights_ iterates learners individually; a class-by-class summary header would help triage.
 - **Assignment completion (⬜)** — % of assignees done per active assignment. All inputs exist (`listTeacherAssignments` + run completion match on `sourceRefId`); the widget doesn't.
 
 ## 9. Microcopy bank
 
-| Surface | String |
-|---|---|
-| Home greeting | *"Good to see you, {firstName}"* |
-| Home triage header | *"Needs attention today"* (⬜ proposed) |
-| Empty triage | *"All caught up — no urgent flags today."* (⬜ proposed) |
-| Assignment empty | *"No assignments yet. Create one to give a learner targeted practice."* |
-| Assignment status `active` | *"active"* (badge primary) |
-| Learner safety footer | (none — silence is intentional) |
-| Learner gap badge | *"{percent}%"* (warning tone) |
-| Roster empty | *"No learners yet. Ask your school admin to assign learners or run a roster import."* |
+| Surface                    | String                                                                                |
+| -------------------------- | ------------------------------------------------------------------------------------- |
+| Home greeting              | _"Good to see you, {firstName}"_                                                      |
+| Home triage header         | _"Needs attention today"_ (⬜ proposed)                                               |
+| Empty triage               | _"All caught up — no urgent flags today."_ (⬜ proposed)                              |
+| Assignment empty           | _"No assignments yet. Create one to give a learner targeted practice."_               |
+| Assignment status `active` | _"active"_ (badge primary)                                                            |
+| Learner safety footer      | (none — silence is intentional)                                                       |
+| Learner gap badge          | _"{percent}%"_ (warning tone)                                                         |
+| Roster empty               | _"No learners yet. Ask your school admin to assign learners or run a roster import."_ |
 
 ## 10. State matrix
 
-| Screen | State | UX |
-|---|---|---|
-| Home | No classes | Empty card *"You're not on a class roster yet."* (⬜) |
-| Classes | 0 classes | Same empty card |
-| Class detail | Roster 0 learners | *"No learners yet. Ask your school admin…"* |
-| Learner detail | Cross‑tenant id in URL | `notFound()` |
-| Learner detail | No mastery | Skill gaps card *"No notable gaps yet — keep going."* |
-| Learner detail | No IEP | Section hidden entirely |
-| Assignment new | Subject changed | Skills list re‑queries |
-| Assignment new | 0 learners in class roster | Roster card renders an inline *"No learners yet…"* empty state; the submit button itself is only disabled while a save is in flight (`disabled={busy}`, label flips to *"Saving…"*). |
-| Assignments list | 0 active + 0 archived | Empty card |
+| Screen           | State                      | UX                                                                                                                                                                                   |
+| ---------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Home             | No classes                 | Empty card _"You're not on a class roster yet."_ (⬜)                                                                                                                                |
+| Classes          | 0 classes                  | Same empty card                                                                                                                                                                      |
+| Class detail     | Roster 0 learners          | _"No learners yet. Ask your school admin…"_                                                                                                                                          |
+| Learner detail   | Cross‑tenant id in URL     | `notFound()`                                                                                                                                                                         |
+| Learner detail   | No mastery                 | Skill gaps card _"No notable gaps yet — keep going."_                                                                                                                                |
+| Learner detail   | No IEP                     | Section hidden entirely                                                                                                                                                              |
+| Assignment new   | Subject changed            | Skills list re‑queries                                                                                                                                                               |
+| Assignment new   | 0 learners in class roster | Roster card renders an inline _"No learners yet…"_ empty state; the submit button itself is only disabled while a save is in flight (`disabled={busy}`, label flips to _"Saving…"_). |
+| Assignments list | 0 active + 0 archived      | Empty card                                                                                                                                                                           |
 
 ## 11. Engineering handoff
 
-| Concern | Where |
-|---|---|
-| Nav | `components/layout/role-shells.tsx` — `TEACHER_NAV` |
-| Roster gap (§5 bug) | `app/teacher/classes/[classId]/page.tsx:38-43` |
-| Triage signals | `listLessonRunsForLearner`, `getMasteryMap`, `IEPDocument` (add `reviewDueAt` if §4 row 3 is in scope) |
-| Assignment server flow | `createTeacherAssignment` in `lib/db/repos.ts`; mission hoist in `lib/learner/today.ts:131-170` |
-| IEP safety contract | `app/teacher/learners/[learnerId]/page.tsx:154-158` — DO NOT widen the rendered fields |
-| Tenant scoping | every page calls `requirePageRole(["teacher"])` and re-checks `tenantId` on every repo call |
-| Audit | actions: `teacher.assignment.create`, `teacher.assignment.archive`, `teacher.learner.view` |
+| Concern                | Where                                                                                                  |
+| ---------------------- | ------------------------------------------------------------------------------------------------------ |
+| Nav                    | `components/layout/role-shells.tsx` — `TEACHER_NAV`                                                    |
+| Roster gap (§5 bug)    | `app/teacher/classes/[classId]/page.tsx:38-43`                                                         |
+| Triage signals         | `listLessonRunsForLearner`, `getMasteryMap`, `IEPDocument` (add `reviewDueAt` if §4 row 3 is in scope) |
+| Assignment server flow | `createTeacherAssignment` in `lib/db/repos.ts`; mission hoist in `lib/learner/today.ts:131-170`        |
+| IEP safety contract    | `app/teacher/learners/[learnerId]/page.tsx:154-158` — DO NOT widen the rendered fields                 |
+| Tenant scoping         | every page calls `requirePageRole(["teacher"])` and re-checks `tenantId` on every repo call            |
+| Audit                  | actions: `teacher.assignment.create`, `teacher.assignment.archive`, `teacher.learner.view`             |
 
 ## 12. Acceptance criteria — honest
 
@@ -219,7 +219,7 @@ Source: `teacher/insights/page.tsx`. Real data, no placeholders. Layout:
 - ✅ Raw IEP text is not rendered on any teacher screen.
 - ✅ New assignment lands on the learner's Today screen at priority slot 2, even if the learner hasn't finished baseline.
 - ✅ A teacher cannot edit another teacher's assignment (server enforces `teacherId === session.userId`).
-- 🟡 `/teacher/home` is still scaffolding — labelled *Demo data*, with stale "Sprint 15/16/19" disabled CTAs. Replace with the triage screen in §4 before the teacher app is shippable.
+- 🟡 `/teacher/home` is still scaffolding — labelled _Demo data_, with stale "Sprint 15/16/19" disabled CTAs. Replace with the triage screen in §4 before the teacher app is shippable.
 - 🟡 `/teacher/classes/[classId]` roster shows the wrong field (subjectId vs learner name). Two‑line fix in §5.
 - ✅ `/teacher/insights` is implemented (per-learner mastery + recent activity); class-level rollup and skill heatmap are still ⬜.
 - ⬜ No `/teacher/assignments/[assignmentId]` detail/edit route — assignment archiving and editing are not yet available in the UI.

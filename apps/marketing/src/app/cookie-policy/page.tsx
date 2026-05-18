@@ -16,7 +16,7 @@ export default function CookiePolicyPage() {
           title: "1. About This Policy",
           content: [
             "This Cookie Policy is a supplement to our Privacy Policy and applies to all visitors and users of the Services. It is intended to be read together with the Privacy Policy and our COPPA Compliance Statement, which describes how we treat children's information differently from adult users.",
-            "Where this policy uses the word \"cookie\", we mean any technology that stores or reads information on your device for the purposes described below — including HTTP cookies, HTML5 local and session storage, IndexedDB, web beacons, tracking pixels, software development kits in our mobile apps, and similar identifiers. We use the single word \"cookie\" throughout for readability.",
+            'Where this policy uses the word "cookie", we mean any technology that stores or reads information on your device for the purposes described below — including HTTP cookies, HTML5 local and session storage, IndexedDB, web beacons, tracking pixels, software development kits in our mobile apps, and similar identifiers. We use the single word "cookie" throughout for readability.',
             "If anything in this Cookie Policy is unclear, or if you would like a copy in an alternative format (large print, plain language, or translated), please email privacy@aivolearning.com and we will help.",
           ],
         },
@@ -25,12 +25,13 @@ export default function CookiePolicyPage() {
           content: [
             "A cookie is a small text file that a website saves on your device. The next time you visit, your browser sends the cookie back to the site, which lets the site remember things between visits — for example, that you are signed in, that you prefer dark mode, or that you already accepted the cookie banner.",
             "Cookies cannot run programs, install software, or read files outside their own scope. They simply hold short pieces of information. Similar technologies — local storage, session storage, IndexedDB, software development kits embedded in our mobile apps, and tracking pixels in transactional emails — work in the same general way and are covered by this policy.",
-            "Cookies set by AIVO directly are called \"first-party\" cookies. Cookies set by another company that helps us run a service (for example, our payment processor) are called \"third-party\" cookies. The categories below explain what each type does on AIVO.",
+            'Cookies set by AIVO directly are called "first-party" cookies. Cookies set by another company that helps us run a service (for example, our payment processor) are called "third-party" cookies. The categories below explain what each type does on AIVO.',
           ],
         },
         {
           title: "3. Categories of Cookies We Use",
-          content: "We group every cookie on AIVO into one of four categories. The first category is required for the Services to work; the others are optional and you can turn them off without losing access to your account.",
+          content:
+            "We group every cookie on AIVO into one of four categories. The first category is required for the Services to work; the others are optional and you can turn them off without losing access to your account.",
           list: [
             "Strictly necessary — required for core functionality such as authentication, session security, fraud prevention, load balancing, accessibility settings, language selection, and saving your cookie-preference choices. These cannot be turned off.",
             "Functional — remember your preferences (theme, language, last-viewed dashboard, learner profile selection) so you don't have to re-enter them every visit. Turning these off will not block features but may make the experience less convenient.",
@@ -40,7 +41,8 @@ export default function CookiePolicyPage() {
         },
         {
           title: "4. Specific Cookies We Set",
-          content: "The following are representative examples of the cookies and similar technologies we currently use. The list is reviewed and updated regularly; you can request the current full list at any time from privacy@aivolearning.com.",
+          content:
+            "The following are representative examples of the cookies and similar technologies we currently use. The list is reviewed and updated regularly; you can request the current full list at any time from privacy@aivolearning.com.",
           list: [
             "aivo_session — Strictly necessary, first-party. Authenticates your session and protects your account from cross-site request forgery. Expires when you sign out or after 24 hours of inactivity.",
             "aivo_csrf — Strictly necessary, first-party. Cross-site request forgery token used on form submissions. Session cookie; deleted when the browser tab closes.",
@@ -57,7 +59,8 @@ export default function CookiePolicyPage() {
         },
         {
           title: "5. Third-Party Services That May Set Cookies",
-          content: "We work with a small number of trusted third parties that may set cookies on the Services to perform a specific job for us. Each is bound by a data-processing agreement that prohibits them from using cookie data for their own marketing or for cross-site behavioral advertising.",
+          content:
+            "We work with a small number of trusted third parties that may set cookies on the Services to perform a specific job for us. Each is bound by a data-processing agreement that prohibits them from using cookie data for their own marketing or for cross-site behavioral advertising.",
           list: [
             "Stripe (payment processing) — sets fraud-prevention cookies on checkout and billing pages only.",
             "Google Analytics 4 (analytics) — runs only on adult marketing pages, with IP-anonymization on, advertising features off, and data-retention shortened to 14 months.",
@@ -78,7 +81,8 @@ export default function CookiePolicyPage() {
         },
         {
           title: "7. Your Choices and How to Manage Cookies",
-          content: "You are in control of optional cookies. You can change your mind at any time without losing access to your account.",
+          content:
+            "You are in control of optional cookies. You can change your mind at any time without losing access to your account.",
           list: [
             "Cookie banner — when you first visit AIVO from a new device, you will see a banner that lets you Accept All, Reject All non-essential, or open Cookie Settings to choose by category.",
             "Cookie settings — at any time you can open Cookie Preferences from the link in the footer of every page and change your category-by-category choices.",
@@ -90,7 +94,8 @@ export default function CookiePolicyPage() {
         },
         {
           title: "8. Browser-Specific Instructions",
-          content: "If you want to manage cookies directly in your browser, the following instructions are a good starting point. Browser publishers update these features regularly; please refer to the help pages of your browser for the latest steps.",
+          content:
+            "If you want to manage cookies directly in your browser, the following instructions are a good starting point. Browser publishers update these features regularly; please refer to the help pages of your browser for the latest steps.",
           list: [
             "Google Chrome — Settings → Privacy and security → Third-party cookies, or Settings → Privacy and security → Site settings → Cookies and site data.",
             "Apple Safari (macOS) — Safari menu → Settings → Privacy → Manage Website Data.",
@@ -110,7 +115,8 @@ export default function CookiePolicyPage() {
           ],
         },
         {
-          title: "10. Region-Specific Information: European Economic Area, United Kingdom, and Switzerland",
+          title:
+            "10. Region-Specific Information: European Economic Area, United Kingdom, and Switzerland",
           content: [
             "If you are visiting AIVO from the European Economic Area, the United Kingdom, or Switzerland, we rely on your consent to set non-essential cookies, in line with the ePrivacy Directive and the General Data Protection Regulation (GDPR). Strictly necessary cookies are set under the legitimate-interest legal basis and do not require consent.",
             "Our cookie banner gives you a granular, opt-in choice and remembers it for 12 months. You can withdraw consent at any time from the Cookie Preferences link in the footer; withdrawal is as easy as giving consent, and does not affect the lawfulness of processing carried out before withdrawal.",
@@ -118,15 +124,17 @@ export default function CookiePolicyPage() {
           ],
         },
         {
-          title: "11. Region-Specific Information: California, Colorado, Connecticut, Virginia, and Other U.S. State Privacy Laws",
+          title:
+            "11. Region-Specific Information: California, Colorado, Connecticut, Virginia, and Other U.S. State Privacy Laws",
           content: [
             "If you are a resident of California, you have specific rights under the California Consumer Privacy Act (CCPA), as amended by the California Privacy Rights Act (CPRA). AIVO does not sell personal information for monetary value. We do not share personal information for cross-context behavioral advertising on learner pages or on pages directed to anyone under 16. On adult marketing pages we honor the Global Privacy Control browser signal as a valid opt-out of sharing.",
-            "California residents can also use the \"Do Not Sell or Share My Personal Information\" link in the footer or email privacy@aivolearning.com to submit a request. We will respond within 45 days.",
+            'California residents can also use the "Do Not Sell or Share My Personal Information" link in the footer or email privacy@aivolearning.com to submit a request. We will respond within 45 days.',
             "Residents of Colorado, Connecticut, Delaware, Indiana, Iowa, Kentucky, Maryland, Minnesota, Montana, Nebraska, New Hampshire, New Jersey, Oregon, Rhode Island, Tennessee, Texas, Utah, and Virginia have similar opt-out rights under their respective state privacy laws. The same Cookie Preferences and email channels can be used to exercise those rights.",
           ],
         },
         {
-          title: "12. Region-Specific Information: Canada, Brazil, Australia, and Other Jurisdictions",
+          title:
+            "12. Region-Specific Information: Canada, Brazil, Australia, and Other Jurisdictions",
           content: [
             "Canada — under the Personal Information Protection and Electronic Documents Act (PIPEDA) and provincial laws such as Quebec's Law 25, AIVO seeks meaningful consent for non-essential cookies and offers a clear, accessible way to withdraw it.",
             "Brazil — under the Lei Geral de Proteção de Dados (LGPD), the legal bases used for cookies are consent (for non-essential cookies) and legitimate interest or legal obligation (for strictly necessary cookies). Brazilian users can contact our Data Protection Officer at dpo@aivolearning.com.",
@@ -137,14 +145,15 @@ export default function CookiePolicyPage() {
         {
           title: "13. How Long Cookies Last",
           content: [
-            "Cookies are either \"session\" cookies, which are deleted when you close your browser tab, or \"persistent\" cookies, which last for a defined period (commonly between 30 days and 13 months) or until you delete them.",
+            'Cookies are either "session" cookies, which are deleted when you close your browser tab, or "persistent" cookies, which last for a defined period (commonly between 30 days and 13 months) or until you delete them.',
             "Strictly-necessary security cookies are short-lived (24 hours or session) to protect your account. Preference cookies are kept for up to 12 months so your settings stay put. Analytics cookies are kept for the minimum period necessary to spot trends and to fix issues — typically no longer than 13 months. Marketing cookies on adult pages are kept for up to 13 months and are reset whenever you change your consent.",
             "When you withdraw consent, the corresponding optional cookies are deleted from your device on the next page load and any associated server-side records are scheduled for deletion within 30 days.",
           ],
         },
         {
           title: "14. Changes to This Cookie Policy",
-          content: "We may update this Cookie Policy from time to time to reflect changes in our use of cookies, in third-party services, or in applicable law. When we make material changes — for example, adding a new category of cookie, adding a new advertising provider, or expanding into a new region — we will update this page, change the \"Last updated\" date at the top, and, where appropriate, ask for your choices again through the cookie banner. Non-material clarifications and editorial fixes will be made without re-prompting.",
+          content:
+            'We may update this Cookie Policy from time to time to reflect changes in our use of cookies, in third-party services, or in applicable law. When we make material changes — for example, adding a new category of cookie, adding a new advertising provider, or expanding into a new region — we will update this page, change the "Last updated" date at the top, and, where appropriate, ask for your choices again through the cookie banner. Non-material clarifications and editorial fixes will be made without re-prompting.',
         },
         {
           title: "15. Contact Us",

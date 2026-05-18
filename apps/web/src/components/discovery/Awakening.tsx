@@ -12,7 +12,14 @@ interface AwakeningProps {
   onComplete: () => void;
 }
 
-type Phase = "gathering" | "convergence" | "formation" | "memories" | "awakening" | "reveal" | "welcome";
+type Phase =
+  | "gathering"
+  | "convergence"
+  | "formation"
+  | "memories"
+  | "awakening"
+  | "reveal"
+  | "welcome";
 
 const DOMAIN_COLORS: Record<string, string> = {
   ela: "#10B981",
@@ -89,10 +96,12 @@ function getMostEngagedTutor(chapterResults: ChapterResult[]): TutorKey {
   return (ch?.tutorKey || "nova") as TutorKey;
 }
 
-function getStrongestMoments(chapterResults: ChapterResult[]): { domain: string; emoji: string; label: string }[] {
+function getStrongestMoments(
+  chapterResults: ChapterResult[],
+): { domain: string; emoji: string; label: string }[] {
   return chapterResults
     .filter((r) => r.total > 0 && r.correct / r.total >= 0.5)
-    .sort((a, b) => (b.correct / b.total) - (a.correct / a.total))
+    .sort((a, b) => b.correct / b.total - a.correct / a.total)
     .slice(0, 3)
     .map((r) => {
       const ch = ADVENTURE_CHAPTERS.find((c) => c.domain === r.domain);
@@ -152,7 +161,13 @@ const PHASE_TIMING: Record<string, Record<Phase, { start: number; duration: numb
   },
 };
 
-export default function Awakening({ learnerName, chapterResults, functioningLevel, brainData, onComplete }: AwakeningProps) {
+export default function Awakening({
+  learnerName,
+  chapterResults,
+  functioningLevel,
+  brainData,
+  onComplete,
+}: AwakeningProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [phase, setPhase] = useState<Phase>("gathering");
   const [narration, setNarration] = useState("");
@@ -201,7 +216,9 @@ export default function Awakening({ learnerName, chapterResults, functioningLeve
       { x: w + 50, y: cy * 1.5 },
     ];
     const chapterEmojis: Record<string, string> = {};
-    ADVENTURE_CHAPTERS.forEach((ch) => { chapterEmojis[ch.domain] = ch.landmark.emoji; });
+    ADVENTURE_CHAPTERS.forEach((ch) => {
+      chapterEmojis[ch.domain] = ch.landmark.emoji;
+    });
 
     orbsRef.current = chapterResults.slice(0, isLowVerbal ? 3 : 6).map((r, i) => ({
       x: startPositions[i % startPositions.length].x,
@@ -250,7 +267,8 @@ export default function Awakening({ learnerName, chapterResults, functioningLeve
       if (t >= timing.welcome.start && timing.welcome.duration > 0) currentPhase = "welcome";
       else if (t >= timing.reveal.start) currentPhase = "reveal";
       else if (t >= timing.awakening.start) currentPhase = "awakening";
-      else if (t >= timing.memories.start && timing.memories.duration > 0) currentPhase = "memories";
+      else if (t >= timing.memories.start && timing.memories.duration > 0)
+        currentPhase = "memories";
       else if (t >= timing.formation.start) currentPhase = "formation";
       else if (t >= timing.convergence.start) currentPhase = "convergence";
 
@@ -277,7 +295,11 @@ export default function Awakening({ learnerName, chapterResults, functioningLeve
             const a = (i / orb.trail.length) * pt.alpha * 0.3;
             ctx.beginPath();
             ctx.arc(pt.x, pt.y, orb.radius * 0.5, 0, Math.PI * 2);
-            ctx.fillStyle = orb.color + Math.floor(a * 255).toString(16).padStart(2, "0");
+            ctx.fillStyle =
+              orb.color +
+              Math.floor(a * 255)
+                .toString(16)
+                .padStart(2, "0");
             ctx.fill();
           });
           ctx.restore();
@@ -312,7 +334,11 @@ export default function Awakening({ learnerName, chapterResults, functioningLeve
             const a = (idx / orb.trail.length) * 0.2;
             ctx.beginPath();
             ctx.arc(pt.x, pt.y, pulseSize * 0.4, 0, Math.PI * 2);
-            ctx.fillStyle = orb.color + Math.floor(a * 255).toString(16).padStart(2, "0");
+            ctx.fillStyle =
+              orb.color +
+              Math.floor(a * 255)
+                .toString(16)
+                .padStart(2, "0");
             ctx.fill();
           });
 
@@ -342,10 +368,17 @@ export default function Awakening({ learnerName, chapterResults, functioningLeve
         }
       }
 
-      if (currentPhase === "formation" || currentPhase === "memories" || currentPhase === "awakening" || currentPhase === "reveal" || currentPhase === "welcome") {
-        const formProgress = currentPhase === "formation"
-          ? Math.min(1, (t - timing.formation.start) / timing.formation.duration)
-          : 1;
+      if (
+        currentPhase === "formation" ||
+        currentPhase === "memories" ||
+        currentPhase === "awakening" ||
+        currentPhase === "reveal" ||
+        currentPhase === "welcome"
+      ) {
+        const formProgress =
+          currentPhase === "formation"
+            ? Math.min(1, (t - timing.formation.start) / timing.formation.duration)
+            : 1;
 
         const breathe = Math.sin(t * 0.002) * 0.05;
         const baseRadius = (w < 500 ? w * 0.2 : 100) * formProgress;
@@ -357,10 +390,14 @@ export default function Awakening({ learnerName, chapterResults, functioningLeve
           glowIntensity = 0.6 + awProgress * 0.4;
 
           if (awProgress > 0.7) {
-            const waveRadius = (awProgress - 0.7) / 0.3 * Math.max(w, h);
+            const waveRadius = ((awProgress - 0.7) / 0.3) * Math.max(w, h);
             ctx.beginPath();
             ctx.arc(cx, cy, waveRadius, 0, Math.PI * 2);
-            ctx.strokeStyle = cs.primary + Math.floor((1 - (awProgress - 0.7) / 0.3) * 80).toString(16).padStart(2, "0");
+            ctx.strokeStyle =
+              cs.primary +
+              Math.floor((1 - (awProgress - 0.7) / 0.3) * 80)
+                .toString(16)
+                .padStart(2, "0");
             ctx.lineWidth = 3;
             ctx.stroke();
           }
@@ -371,10 +408,22 @@ export default function Awakening({ learnerName, chapterResults, functioningLeve
         }
 
         const sphereGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius * 1.5);
-        sphereGrad.addColorStop(0, cs.primary + Math.floor(glowIntensity * 200).toString(16).padStart(2, "0"));
+        sphereGrad.addColorStop(
+          0,
+          cs.primary +
+            Math.floor(glowIntensity * 200)
+              .toString(16)
+              .padStart(2, "0"),
+        );
         cs.secondary.forEach((c, i) => {
           const stop = 0.3 + (i / cs.secondary.length) * 0.4;
-          sphereGrad.addColorStop(stop, c + Math.floor(glowIntensity * 150).toString(16).padStart(2, "0"));
+          sphereGrad.addColorStop(
+            stop,
+            c +
+              Math.floor(glowIntensity * 150)
+                .toString(16)
+                .padStart(2, "0"),
+          );
         });
         sphereGrad.addColorStop(1, cs.primary + "00");
 
@@ -383,10 +432,35 @@ export default function Awakening({ learnerName, chapterResults, functioningLeve
         ctx.fillStyle = sphereGrad;
         ctx.fill();
 
-        const innerGrad = ctx.createRadialGradient(cx - radius * 0.2, cy - radius * 0.2, 0, cx, cy, radius);
-        innerGrad.addColorStop(0, "#FFFFFF" + Math.floor(glowIntensity * 100).toString(16).padStart(2, "0"));
-        innerGrad.addColorStop(0.5, cs.primary + Math.floor(glowIntensity * 200).toString(16).padStart(2, "0"));
-        innerGrad.addColorStop(1, cs.primary + Math.floor(glowIntensity * 120).toString(16).padStart(2, "0"));
+        const innerGrad = ctx.createRadialGradient(
+          cx - radius * 0.2,
+          cy - radius * 0.2,
+          0,
+          cx,
+          cy,
+          radius,
+        );
+        innerGrad.addColorStop(
+          0,
+          "#FFFFFF" +
+            Math.floor(glowIntensity * 100)
+              .toString(16)
+              .padStart(2, "0"),
+        );
+        innerGrad.addColorStop(
+          0.5,
+          cs.primary +
+            Math.floor(glowIntensity * 200)
+              .toString(16)
+              .padStart(2, "0"),
+        );
+        innerGrad.addColorStop(
+          1,
+          cs.primary +
+            Math.floor(glowIntensity * 120)
+              .toString(16)
+              .padStart(2, "0"),
+        );
 
         ctx.beginPath();
         ctx.arc(cx, cy, radius, 0, Math.PI * 2);
@@ -399,7 +473,13 @@ export default function Awakening({ learnerName, chapterResults, functioningLeve
           const ax = cx + Math.cos(a) * radius * 0.6;
           const ay = cy + Math.sin(a) * radius * 0.6;
           const aGrad = ctx.createRadialGradient(ax, ay, 0, ax, ay, radius * 0.5);
-          aGrad.addColorStop(0, cs.hues[i] + Math.floor(glowIntensity * 60).toString(16).padStart(2, "0"));
+          aGrad.addColorStop(
+            0,
+            cs.hues[i] +
+              Math.floor(glowIntensity * 60)
+                .toString(16)
+                .padStart(2, "0"),
+          );
           aGrad.addColorStop(1, cs.hues[i] + "00");
           ctx.beginPath();
           ctx.arc(ax, ay, radius * 0.5, 0, Math.PI * 2);
@@ -424,11 +504,19 @@ export default function Awakening({ learnerName, chapterResults, functioningLeve
         }
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
-        ctx.fillStyle = p.color + Math.floor(p.life * 180).toString(16).padStart(2, "0");
+        ctx.fillStyle =
+          p.color +
+          Math.floor(p.life * 180)
+            .toString(16)
+            .padStart(2, "0");
         ctx.fill();
       }
 
-      if (currentPhase === "formation" || currentPhase === "memories" || currentPhase === "awakening") {
+      if (
+        currentPhase === "formation" ||
+        currentPhase === "memories" ||
+        currentPhase === "awakening"
+      ) {
         for (let i = 0; i < 3; i++) {
           const angle = Math.random() * Math.PI * 2;
           const dist = 60 + Math.random() * 40;
@@ -468,12 +556,30 @@ export default function Awakening({ learnerName, chapterResults, functioningLeve
     } else {
       narrations.push(
         { time: timing.convergence.start + 500, text: "Something amazing is happening..." },
-        { time: timing.formation.start + 2000, text: `This is your Brain, ${learnerName}. It learned so much about you today.` },
-        { time: timing.memories.start + 200, text: memories.length > 0 ? `It remembers every ${memories[0]?.label}...` : "" },
-        { time: timing.memories.start + 1500, text: memories.length > 1 ? `Every ${memories[1]?.label}...` : "" },
-        { time: timing.memories.start + 2500, text: memories.length > 2 ? `And how you feel about learning...` : "" },
-        { time: timing.awakening.start + 1000, text: `Your Brain is awake, ${learnerName}. And it is going to grow with you.` },
-        { time: timing.reveal.start + 1000, text: `Every time we learn together, your Brain gets smarter. It will always be yours.` },
+        {
+          time: timing.formation.start + 2000,
+          text: `This is your Brain, ${learnerName}. It learned so much about you today.`,
+        },
+        {
+          time: timing.memories.start + 200,
+          text: memories.length > 0 ? `It remembers every ${memories[0]?.label}...` : "",
+        },
+        {
+          time: timing.memories.start + 1500,
+          text: memories.length > 1 ? `Every ${memories[1]?.label}...` : "",
+        },
+        {
+          time: timing.memories.start + 2500,
+          text: memories.length > 2 ? `And how you feel about learning...` : "",
+        },
+        {
+          time: timing.awakening.start + 1000,
+          text: `Your Brain is awake, ${learnerName}. And it is going to grow with you.`,
+        },
+        {
+          time: timing.reveal.start + 1000,
+          text: `Every time we learn together, your Brain gets smarter. It will always be yours.`,
+        },
       );
     }
 
@@ -488,7 +594,7 @@ export default function Awakening({ learnerName, chapterResults, functioningLeve
     if (isPreSymbolic) return;
     if (timing.memories.duration > 0) {
       const memTimers = memories.map((_, i) =>
-        setTimeout(() => setShowMemory(i), timing.memories.start + i * 1500)
+        setTimeout(() => setShowMemory(i), timing.memories.start + i * 1500),
       );
       return () => memTimers.forEach(clearTimeout);
     }
@@ -497,10 +603,16 @@ export default function Awakening({ learnerName, chapterResults, functioningLeve
   useEffect(() => {
     if (isPreSymbolic) return;
     const badgeTimer = setTimeout(() => setShowBadge(true), timing.reveal.start + 2000);
-    const btnTimer = setTimeout(() => {
-      setShowButton(true);
-    }, (timing.welcome.start || timing.reveal.start) + (timing.welcome.duration || 2000));
-    return () => { clearTimeout(badgeTimer); clearTimeout(btnTimer); };
+    const btnTimer = setTimeout(
+      () => {
+        setShowButton(true);
+      },
+      (timing.welcome.start || timing.reveal.start) + (timing.welcome.duration || 2000),
+    );
+    return () => {
+      clearTimeout(badgeTimer);
+      clearTimeout(btnTimer);
+    };
   }, [timing, isPreSymbolic]);
 
   if (isPreSymbolic) {
@@ -512,7 +624,9 @@ export default function Awakening({ learnerName, chapterResults, functioningLeve
             {learnerName}&apos;s Brain Profile is Ready
           </h2>
           <p className="text-slate-600 font-body leading-relaxed mb-6">
-            We have built a Brain profile for {learnerName} based on your observations. {learnerName}&apos;s learning will happen through activities you do together. Your dashboard will show daily activity suggestions.
+            We have built a Brain profile for {learnerName} based on your observations.{" "}
+            {learnerName}&apos;s learning will happen through activities you do together. Your
+            dashboard will show daily activity suggestions.
           </p>
           <button
             onClick={onComplete}
@@ -599,13 +713,26 @@ export default function Awakening({ learnerName, chapterResults, functioningLeve
           >
             <div className="bg-black/30 backdrop-blur-xl rounded-2xl px-6 py-4 flex items-start gap-3">
               {leadTutorData && (
-                <div className="w-10 h-10 rounded-full overflow-hidden border-2 flex-shrink-0" style={{ borderColor: leadTutorData.color }}>
-                  <Image src={leadTutorData.avatar} alt={tutorName} width={40} height={40} className="object-cover" />
+                <div
+                  className="w-10 h-10 rounded-full overflow-hidden border-2 flex-shrink-0"
+                  style={{ borderColor: leadTutorData.color }}
+                >
+                  <Image
+                    src={leadTutorData.avatar}
+                    alt={tutorName}
+                    width={40}
+                    height={40}
+                    className="object-cover"
+                  />
                 </div>
               )}
               <div>
-                <p className="text-[10px] font-heading font-bold text-white/40 uppercase mb-1">{tutorName}</p>
-                <p className="text-white/80 text-sm font-body leading-relaxed animate-fadeIn">{narration}</p>
+                <p className="text-[10px] font-heading font-bold text-white/40 uppercase mb-1">
+                  {tutorName}
+                </p>
+                <p className="text-white/80 text-sm font-body leading-relaxed animate-fadeIn">
+                  {narration}
+                </p>
               </div>
             </div>
           </div>
@@ -652,12 +779,23 @@ export default function Awakening({ learnerName, chapterResults, functioningLeve
 
       <style jsx>{`
         @keyframes twinkle {
-          0%, 100% { opacity: 0.2; }
-          50% { opacity: 0.8; }
+          0%,
+          100% {
+            opacity: 0.2;
+          }
+          50% {
+            opacity: 0.8;
+          }
         }
         @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(8px); }
-          to { opacity: 1; transform: translateY(0); }
+          from {
+            opacity: 0;
+            transform: translateY(8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
         .animate-fadeIn {
           animation: fadeIn 0.8s ease-out;

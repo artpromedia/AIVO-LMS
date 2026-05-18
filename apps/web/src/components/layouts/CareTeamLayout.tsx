@@ -17,13 +17,16 @@ const ACCENT_TONE: Record<"blue" | "pink" | "green" | "purple", Tone> = {
   purple: "primary",
 };
 
-const TONE_CLASSES: Record<Tone, {
-  solidBg: string;
-  roleText: string;
-  activeBg: string;
-  activeText: string;
-  focusRing: string;
-}> = {
+const TONE_CLASSES: Record<
+  Tone,
+  {
+    solidBg: string;
+    roleText: string;
+    activeBg: string;
+    activeText: string;
+    focusRing: string;
+  }
+> = {
   reading: {
     solidBg: "bg-[hsl(var(--visual-reading))]",
     roleText: "text-[hsl(var(--visual-reading))]",
@@ -77,7 +80,17 @@ interface CareTeamLayoutProps {
   topNavLabel?: string;
 }
 
-export default function CareTeamLayout({ children, accent, roleLabel, allowedRoles, basePath, navItems, navSections, topNavItems, topNavLabel }: CareTeamLayoutProps) {
+export default function CareTeamLayout({
+  children,
+  accent,
+  roleLabel,
+  allowedRoles,
+  basePath,
+  navItems,
+  navSections,
+  topNavItems,
+  topNavLabel,
+}: CareTeamLayoutProps) {
   const { user, logout, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -107,12 +120,22 @@ export default function CareTeamLayout({ children, accent, roleLabel, allowedRol
       <div className="p-4 border-b vi-border flex items-center justify-between">
         {!collapsed && (
           <Link href={basePath} className="flex items-center gap-3">
-            <div className={`w-9 h-9 ${colors.solidBg} rounded-2xl flex items-center justify-center`}>
-              <Image src="/images/aivo-logo-white.png" alt="AIVO" width={22} height={22} style={{ height: "auto" }} />
+            <div
+              className={`w-9 h-9 ${colors.solidBg} rounded-2xl flex items-center justify-center`}
+            >
+              <Image
+                src="/images/aivo-logo-white.png"
+                alt="AIVO"
+                width={22}
+                height={22}
+                style={{ height: "auto" }}
+              />
             </div>
             <div>
               <p className="font-bold vi-text text-sm">AIVO</p>
-              <p className={`text-xs ${colors.roleText} font-semibold uppercase tracking-wider`}>{roleLabel}</p>
+              <p className={`text-xs ${colors.roleText} font-semibold uppercase tracking-wider`}>
+                {roleLabel}
+              </p>
             </div>
           </Link>
         )}
@@ -121,7 +144,11 @@ export default function CareTeamLayout({ children, accent, roleLabel, allowedRol
           className="vi-text-muted hover:vi-text p-1 transition hidden md:block"
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
-          {collapsed ? <ChevronRight size={16} strokeWidth={2.5} aria-hidden="true" /> : <ChevronLeft size={16} strokeWidth={2.5} aria-hidden="true" />}
+          {collapsed ? (
+            <ChevronRight size={16} strokeWidth={2.5} aria-hidden="true" />
+          ) : (
+            <ChevronLeft size={16} strokeWidth={2.5} aria-hidden="true" />
+          )}
         </button>
         <button
           onClick={() => setMobileOpen(false)}
@@ -136,7 +163,9 @@ export default function CareTeamLayout({ children, accent, roleLabel, allowedRol
         {topNavItems && topNavItems.length > 0 && (
           <div className="mb-3">
             {!collapsed && topNavLabel && (
-              <p className="px-4 text-xs font-bold vi-text-muted uppercase tracking-wider mb-1">{topNavLabel}</p>
+              <p className="px-4 text-xs font-bold vi-text-muted uppercase tracking-wider mb-1">
+                {topNavLabel}
+              </p>
             )}
             {topNavItems.map((item) => {
               const Icon = item.Icon;
@@ -165,7 +194,9 @@ export default function CareTeamLayout({ children, accent, roleLabel, allowedRol
           ? navSections.map((section) => (
               <div key={section.label} className="mb-3">
                 {!collapsed && (
-                  <p className="px-4 text-xs font-bold vi-text-muted uppercase tracking-wider mb-1">{section.label}</p>
+                  <p className="px-4 text-xs font-bold vi-text-muted uppercase tracking-wider mb-1">
+                    {section.label}
+                  </p>
                 )}
                 {section.items.map((item) => {
                   const Icon = item.Icon;
@@ -183,7 +214,12 @@ export default function CareTeamLayout({ children, accent, roleLabel, allowedRol
                       }`}
                       style={{ minHeight: 44 }}
                     >
-                      <Icon size={18} strokeWidth={2.5} className="flex-shrink-0" aria-hidden="true" />
+                      <Icon
+                        size={18}
+                        strokeWidth={2.5}
+                        className="flex-shrink-0"
+                        aria-hidden="true"
+                      />
                       {(!collapsed || mobileOpen) && <span>{item.label}</span>}
                     </Link>
                   );
@@ -237,7 +273,11 @@ export default function CareTeamLayout({ children, accent, roleLabel, allowedRol
       <SkipLink />
 
       {mobileOpen && (
-        <div className="fixed inset-0 bg-slate-900/30 z-40 md:hidden" onClick={() => setMobileOpen(false)} aria-hidden="true" />
+        <div
+          className="fixed inset-0 bg-slate-900/30 z-40 md:hidden"
+          onClick={() => setMobileOpen(false)}
+          aria-hidden="true"
+        />
       )}
 
       <aside
@@ -268,7 +308,13 @@ export default function CareTeamLayout({ children, accent, roleLabel, allowedRol
             <Menu size={22} strokeWidth={2.5} aria-hidden="true" />
           </button>
           <Link href={basePath} className="ml-3">
-            <Image src="/images/aivo-logo-purple.png" alt="AIVO" width={80} height={24} style={{ height: "auto" }} />
+            <Image
+              src="/images/aivo-logo-purple.png"
+              alt="AIVO"
+              width={80}
+              height={24}
+              style={{ height: "auto" }}
+            />
           </Link>
         </div>
         <div className="hidden md:block">
@@ -281,9 +327,7 @@ export default function CareTeamLayout({ children, accent, roleLabel, allowedRol
             baseLabel={roleLabel}
           />
         </div>
-        <div className="flex-1 overflow-auto">
-          {children}
-        </div>
+        <div className="flex-1 overflow-auto">{children}</div>
       </main>
     </div>
   );

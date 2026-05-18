@@ -4,12 +4,7 @@ import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
 import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import { audit } from "@/lib/bff/audit";
-import {
-  deleteLearner,
-  getLearner,
-  refreshLearnerReadiness,
-  updateLearner,
-} from "@/lib/db/repos";
+import { deleteLearner, getLearner, refreshLearnerReadiness, updateLearner } from "@/lib/db/repos";
 import { patchLearnerSchema } from "@/lib/validators/learner";
 
 export const dynamic = "force-dynamic";
@@ -30,7 +25,12 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection"],
+      requestId,
+    );
     if (consentErr) return consentErr;
 
     refreshLearnerReadiness(learnerId, session!.tenantId);
@@ -54,7 +54,12 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection"],
+      requestId,
+    );
     if (consentErr) return consentErr;
 
     const body = await req.json().catch(() => ({}));
@@ -86,7 +91,12 @@ export async function DELETE(req: Request, { params }: Params): Promise<NextResp
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection"],
+      requestId,
+    );
     if (consentErr) return consentErr;
 
     const removed = deleteLearner(learnerId, session!.tenantId);

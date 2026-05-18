@@ -15,11 +15,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     const roleErr = requireRole(session!, [...ADMIN_ROLES], requestId);
     if (roleErr) return roleErr;
     const url = new URL(req.url);
-    const decision = url.searchParams.get("decision") as
-      | "allow"
-      | "review"
-      | "block"
-      | null;
+    const decision = url.searchParams.get("decision") as "allow" | "review" | "block" | null;
     // Platform admins see global events, others scoped to their tenant.
     const tenantId = session!.role === "platform_admin" ? undefined : session!.tenantId;
     const events = listModerationEvents({

@@ -23,10 +23,7 @@ export interface SensoryVars {
   "--learner-volume": string;
 }
 
-export function computeSensoryVars(
-  level: FunctioningLevel,
-  sensory?: SensoryProfile
-): SensoryVars {
+export function computeSensoryVars(level: FunctioningLevel, sensory?: SensoryProfile): SensoryVars {
   const profile = FL_PROFILES[level];
 
   let saturation = 100;

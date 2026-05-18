@@ -19,7 +19,8 @@ Sprint UX-13 — Unified Mobile Role Experiences: Parent, Learner, Teacher, Admi
 Sprint UX-14 — Accessibility, Inclusive Design, and WCAG Audit  
 Sprint UX-15 — AI Generation States, Safety States, and Error Recovery UX  
 Sprint UX-16 — Notifications, Rostering, Billing, Settings, and Language UX  
-Sprint UX-17 — Prototype Testing, Design QA, and Engineering Handoff  
+Sprint UX-17 — Prototype Testing, Design QA, and Engineering Handoff
+
 ---
 
 # **Global UI/UX Rules for Every Sprint**
@@ -92,7 +93,8 @@ Design outputs must include:
 \- Consent dependency  
 \- Accessibility notes  
 \- Mobile behavior  
-\- Engineering handoff notes  
+\- Engineering handoff notes
+
 ---
 
 # **Sprint UX-00 — Product Design Reset and UX Audit**
@@ -178,7 +180,8 @@ Acceptance criteria:
 \- The audit identifies every place where parent trust may break.  
 \- The audit identifies every place where sensitive data could be exposed.  
 \- The audit identifies whether mobile was incorrectly split into separate app concepts.  
-\- The audit produces a prioritized redesign backlog.  
+\- The audit produces a prioritized redesign backlog.
+
 ---
 
 # **Sprint UX-01 — Information Architecture and Route-to-Screen Matrix**
@@ -353,7 +356,8 @@ Acceptance criteria:
 \- Parent navigation centers learner readiness and progress.  
 \- Teacher navigation centers classes, learners, and assignments.  
 \- Admin navigation centers operational controls and auditability.  
-\- Mobile is designed as one unified app with role-based modes.  
+\- Mobile is designed as one unified app with role-based modes.
+
 ---
 
 # **Sprint UX-02 — Visual Design System and Component Library**
@@ -517,7 +521,8 @@ Acceptance criteria:
 \- All interactive components have disabled and loading states.  
 \- Mobile role modes reuse one design system.  
 \- Design tokens are implementation-ready.  
-\- Components are suitable for React, Tailwind, shadcn-style implementation, and native mobile translation.  
+\- Components are suitable for React, Tailwind, shadcn-style implementation, and native mobile translation.
+
 ---
 
 # **Sprint UX-03 — Auth, Consent, Privacy, and Onboarding UX**
@@ -602,7 +607,8 @@ Acceptance criteria:
 \- Feature access reflects consent status.  
 \- Sensitive features have clear privacy explanations.  
 \- No learner data collection flow bypasses consent UX.  
-\- Mobile role switching respects consent, permissions, and learner privacy.  
+\- Mobile role switching respects consent, permissions, and learner privacy.
+
 ---
 
 # **Sprint UX-04 — Parent Web App UX**
@@ -700,7 +706,8 @@ Acceptance criteria:
 \- Parent can understand progress without technical interpretation.  
 \- Parent can manage multiple learners.  
 \- Parent can control accessibility preferences.  
-\- Parent can manage privacy and consent settings.  
+\- Parent can manage privacy and consent settings.
+
 ---
 
 # **Sprint UX-05 — Learner Web and Tablet UX**
@@ -792,7 +799,8 @@ Acceptance criteria:
 \- Learner can start or resume Today’s Mission.  
 \- Learner can access subjects, quests, homework, and progress.  
 \- Learner screens are not dashboard-first.  
-\- Learner UI is accessible, low-clutter, and supportive.  
+\- Learner UI is accessible, low-clutter, and supportive.
+
 ---
 
 # **Sprint UX-06 — Lesson Player UX**
@@ -881,7 +889,8 @@ Acceptance criteria:
 \- Learner can take a break.  
 \- Learner can resume after refresh.  
 \- Learner can complete LessonRun inside unified mobile app Learner Mode.  
-\- Completion leads to progress update and next step.  
+\- Completion leads to progress update and next step.
+
 ---
 
 # **Sprint UX-07 — Baseline Assessment UX**
@@ -953,7 +962,8 @@ Acceptance criteria:
 \- Learner can complete baseline without feeling judged.  
 \- Baseline supports read-aloud and breaks.  
 \- Parent can understand results in plain language.  
-\- Baseline completion leads to mastery map and Today’s Mission.  
+\- Baseline completion leads to mastery map and Today’s Mission.
+
 ---
 
 # **Sprint UX-08 — Subjects, Mastery, and Today’s Mission UX**
@@ -1030,7 +1040,8 @@ Acceptance criteria:
 \- Mastery updates are understandable.  
 \- Parent can understand subject progress.  
 \- Teacher can identify skill gaps.  
-\- Mobile Learner Mode centers Today’s Mission.  
+\- Mobile Learner Mode centers Today’s Mission.
+
 ---
 
 # **Sprint UX-09 — Quest Worlds and Homework Helper UX**
@@ -1103,7 +1114,8 @@ Acceptance criteria:
 \- Homework Helper guides rather than answer-dumps.  
 \- Homework Helper has safe fallback states.  
 \- Parent can see that homework support occurred.  
-\- Mobile Learner Mode supports quests and homework without exposing parent-only areas.  
+\- Mobile Learner Mode supports quests and homework without exposing parent-only areas.
+
 ---
 
 # **Sprint UX-10 — Teacher Web App UX**
@@ -1175,7 +1187,8 @@ Acceptance criteria:
 \- Teacher can create assignments.  
 \- Teacher can track assignment completion.  
 \- Teacher cannot see unauthorized learner data.  
-\- Teacher view is privacy-aware.  
+\- Teacher view is privacy-aware.
+
 ---
 
 # **Sprint UX-11 — School, District, and Platform Admin UX**
@@ -1280,7 +1293,8 @@ Acceptance criteria:
 \- AI failures are visible.  
 \- Safety review queue is usable.  
 \- Audit logs are searchable.  
-\- Admin console supports enterprise review.  
+\- Admin console supports enterprise review.
+
 ---
 
 # **Sprint UX-12 — Unified Mobile App Architecture and Role Switching UX**
@@ -1393,7 +1407,8 @@ Acceptance criteria:
 \- Learner mode is protected from sensitive parent/admin content.  
 \- Parent can manage learners from the same app.  
 \- Teacher can access roster-scoped learners.  
-\- Admin-lite can view critical operational alerts.  
+\- Admin-lite can view critical operational alerts.
+
 ---
 
 # **Sprint UX-13 — Unified Mobile Role Experiences**
@@ -1571,7 +1586,8 @@ Acceptance criteria:
 \- Admin-lite can triage operational alerts on mobile.  
 \- Role boundaries are clear.  
 \- Sensitive data is protected by role.  
-\- The app feels unified, not like four unrelated apps.  
+\- The app feels unified, not like four unrelated apps.
+
 ---
 
 # **Sprint UX-14 — Accessibility, Inclusive Design, and WCAG Audit**
@@ -1649,7 +1665,8 @@ Acceptance criteria:
 \- Focus order is logical.  
 \- Color contrast passes.  
 \- Reduced-motion mode is designed.  
-\- Read-aloud has transcript fallback.  
+\- Read-aloud has transcript fallback.
+
 ---
 
 # **Sprint UX-15 — AI Generation States, Safety States, and Error Recovery UX**
@@ -1730,7 +1747,8 @@ Acceptance criteria:
 \- Parent-facing AI errors are clear.  
 \- Admin-facing AI errors are actionable.  
 \- Safety-blocked content has appropriate UX by role.  
-\- Mobile generation flows handle interruption, offline, retry, and resume.  
+\- Mobile generation flows handle interruption, offline, retry, and resume.
+
 ---
 
 # **Sprint UX-16 — Notifications, Rostering, Billing, Settings, and Language UX**
@@ -1844,7 +1862,8 @@ Acceptance criteria:
 \- Seat management is understandable.  
 \- Settings are organized and searchable.  
 \- Unified mobile app has shared settings and role-specific protected settings.  
-\- Language preferences affect UI, tutor language, TTS, and notifications where supported.  
+\- Language preferences affect UI, tutor language, TTS, and notifications where supported.
+
 ---
 
 # **Sprint UX-17 — Prototype Testing, Design QA, and Engineering Handoff**
@@ -1986,7 +2005,8 @@ Acceptance criteria:
 \- Prototype includes failure and retry states.  
 \- Design QA checklist passes.  
 \- Engineering can implement without guessing.  
-\- Every screen has acceptance criteria.  
+\- Every screen has acceptance criteria.
+
 ---
 
 # **Updated Final Approval Gate for the UI/UX Redesign**
@@ -2077,4 +2097,4 @@ Implementation:
 \- Engineering handoff is complete.  
 \- No primary route is missing.  
 \- No primary button is dead.  
-\- No placeholder UI remains in core journeys.  
+\- No placeholder UI remains in core journeys.

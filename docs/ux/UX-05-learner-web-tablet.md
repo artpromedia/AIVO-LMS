@@ -2,9 +2,10 @@
 
 # Sprint UX-05 — Learner Web and Tablet UX
 
-**Scope**: every learner-facing surface on web + tablet (`apps/web-v2/app/learner/**` — 19 routes today). The Lesson Player itself is the focus of UX-06 (this doc owns the *shell around it*: home, missions, baseline status, subjects, quests, homework, progress, settings, profile select). Mobile Learner Mode is covered by UX-12 + UX-13.
+**Scope**: every learner-facing surface on web + tablet (`apps/web-v2/app/learner/**` — 19 routes today). The Lesson Player itself is the focus of UX-06 (this doc owns the _shell around it_: home, missions, baseline status, subjects, quests, homework, progress, settings, profile select). Mobile Learner Mode is covered by UX-12 + UX-13.
 
 **Source of truth (today)**:
+
 - Routes: `app/learner/**` (19 `page.tsx` files — see §2 sitemap).
 - Today's Mission picker: `lib/learner/today.ts` (`pickTodaysMission` — 4-branch priority today: resume → teacher-assigned → path-driven → cleared-path fallback; quest + parent-assigned stubs reserved for later sprints; see §3 for exact ordering and `learnerSafeReason` non-clinical copy).
 - Home-page action: `startMissionAction` in `app/learner/home/page.tsx` — already wires consent (`child_data_collection` + `ai_personalization`), rate-limit (`RATE_LIMITS.AI_GENERATION`), `createLessonRun`, audit, and redirect to `/learner/lesson-runs/[id]`.
@@ -75,11 +76,13 @@ Already shipped in `lib/learner/today.ts` as `pickTodaysMission(learnerId, tenan
 5. Quest follow-up + parent-assigned are **not wired today** (commented stubs in `today.ts` for Sprints 16 + 14); they're not in `TodayMissionPlan.kind` yet.
 
 **Blockers** (the only three returned today):
+
 - `no_learner` — defensive; never expected at home (`requirePageRole` guards above).
 - `no_baseline` — `MasteryMap` missing. Home shows a "Finish the baseline first" amber card.
 - `no_path` — `MasteryMap` exists but `LearningPath` has zero nodes. Home shows "Your learning path isn't ready yet" amber card.
 
 `startMissionAction` (the server action on `/learner/home`) layers two **additional** redirect-only blockers on top of the picker's output — these are URL query params, not picker outputs:
+
 - `?blocker=consent` — missing `child_data_collection` or `ai_personalization`.
 - `?blocker=rate_limit` — `RATE_LIMITS.AI_GENERATION` bucket exhausted.
 - `?blocker=generation` — `createLessonRun` returned `ok:false`.
@@ -87,6 +90,7 @@ Already shipped in `lib/learner/today.ts` as `pickTodaysMission(learnerId, tenan
 **`TodayMissionPlan` kinds shipped today**: `resume_in_progress · baseline_followup · next_unmastered · review · subject_path`. Note that **teacher-assigned work currently surfaces under `kind: "subject_path"`** with `source: "teacher_assigned"` (not a dedicated `teacher_assigned` kind). Adding distinct `quest_followup` / `parent_assigned` / `teacher_assigned` kinds is ⬜ planned when those upstream features ship.
 
 **Output fields used by the UI** (real fields from `TodayMissionPlan`):
+
 - `kind` — picker tag for analytics + per-kind copy variations.
 - `source` — written through to `LessonRun.source` when the run is created.
 - `subjectName` + `skillName` — what the learner is doing (`Badge` + `<h3>` on the home card).
@@ -115,7 +119,7 @@ Already shipped in `lib/learner/today.ts` as `pickTodaysMission(learnerId, tenan
   3. **Tutor card**: `<LearnerAvatar size="lg">` + `"Your tutor today"` + tutor style sentence + `<TutorBadge name="Nimbus" persona={style}>`.
   4. **Mission card**: section `<SectionHeader title="Today's mission">` then a `<Card>` with two `<Badge>`s (subject + `≈ N min`), `<h3>` skill name, the `learnerReason` paragraph, and a `<form action={startMissionAction}>` with a hidden `learnerId` input + the `<Button size="lg">` whose label is `"Resume lesson"` or `"Start today's lesson"` per `existingRunId`. **This is a hand-composed `<Card>`, not the `<MissionCard>` primitive.**
   5. **Single secondary tile**: section `<SectionHeader title="See your progress">` then a `<Card>` → `View progress` → `/learner/progress`.
-- **Server action**: `startMissionAction` — re-authorizes on the server (parent cookie OR session `learnerId`), checks `child_data_collection + ai_personalization` via `hasLearnerConsent`, enforces `RATE_LIMITS.AI_GENERATION` via `tryConsumeRateLimit`, picks the mission via `pickTodaysMission`, then either redirects to the `existingRunId` *(no `createLessonRun` call, no audit emit on this branch)* or creates a new `LessonRun` via `createLessonRun()`, emits `audit(session, "today.start", "page-action", {…})`, and redirects to `/learner/lesson-runs/[id]`. **Audit is emitted only on the new-run branch** (DD-12 backlog: emit on the resume branch too, with `kind: "resume_in_progress"`).
+- **Server action**: `startMissionAction` — re-authorizes on the server (parent cookie OR session `learnerId`), checks `child_data_collection + ai_personalization` via `hasLearnerConsent`, enforces `RATE_LIMITS.AI_GENERATION` via `tryConsumeRateLimit`, picks the mission via `pickTodaysMission`, then either redirects to the `existingRunId` _(no `createLessonRun` call, no audit emit on this branch)_ or creates a new `LessonRun` via `createLessonRun()`, emits `audit(session, "today.start", "page-action", {…})`, and redirects to `/learner/lesson-runs/[id]`. **Audit is emitted only on the new-run branch** (DD-12 backlog: emit on the resume branch too, with `kind: "resume_in_progress"`).
 - **Blocker UI (when `today.ready === false`)** — amber Card whose copy is computed from `params.blocker ?? today.blocker`:
   - `no_baseline` → "Finish the baseline first."
   - `no_path` → "Your learning path isn't ready yet."
@@ -186,7 +190,7 @@ Saved / reread items the learner can return to. Card grid. Empty: "Anything you 
 
 ### 4.11 `/learner/rewards`
 
-XP / badges / currency. Owned conceptually by the engagement system (UX-09 + UX-08). Critical rules from UX-00 audit: rewards are tied to *real* completed lessons; no fake currency drops; no "you have 14 minutes of XP left before reset" language.
+XP / badges / currency. Owned conceptually by the engagement system (UX-09 + UX-08). Critical rules from UX-00 audit: rewards are tied to _real_ completed lessons; no fake currency drops; no "you have 14 minutes of XP left before reset" language.
 
 ### 4.12 `/learner/notifications`
 
@@ -200,49 +204,49 @@ The full settings surface (the comfort affordance in the AppShell header is the 
 
 ## 5. State matrix (learner app)
 
-| Surface | Loading | Empty | Error | Retry | Notes |
-|---|---|---|---|---|---|
-| `/learner/select` | n/a (server render) | "Ask a grown-up to add a learner" | n/a | n/a | only reachable when parent navigates to `/learner/*` without active cookie |
-| `/learner/home` | ⬜ skeleton (big card + 4 tiles) | per-blocker cards (no_baseline · no_path · consent · rate_limit · generation) | shell error boundary | tap the same CTA | ✅ blockers wired in `startMissionAction` |
-| `/learner/missions` | ⬜ skeleton rows | "Start your baseline" | inline | retry | |
-| `/learner/baseline(+/[id])` | run player handles | "Start" CTA | per-question retry | retry | UX-07 owns in-run |
-| `/learner/lesson-runs/[id]` | ⬜ Stage entry skeleton | n/a (always existing run) | UX-06 | UX-06 | owned by UX-06 |
-| `/learner/subjects` | ⬜ tile skeleton | "Subjects unlock after your baseline" | inline | retry | |
-| `/learner/subjects/[id]` | ⬜ Stepper skeleton | n/a (subject always exists) | inline | retry | |
-| `/learner/quests` | ⬜ world tile skeleton | "Quests unlock after your first lesson" | inline | retry | |
-| `/learner/quests/[w]/chapters/[c]` | ⬜ hero skeleton | n/a | inline | retry | progress is never fake (DD-07) |
-| `/learner/homework` | ⬜ list skeleton | "Start a new homework session" | inline | retry | |
-| `/learner/homework/[id]` | typing indicator | prompt-suggestion list | per-message retry; rate-limit card | retry / wait | `aria-live="polite"` on tutor messages |
-| `/learner/library` | ⬜ skeleton | "Anything you save will live here." | inline | retry | |
-| `/learner/progress` | ⬜ skeleton | "After your first lesson" | inline | retry | no charts |
-| `/learner/rewards` | ⬜ skeleton | "Earn your first reward in a lesson" | inline | retry | tied to real completions |
-| `/learner/notifications` | ⬜ skeleton | "Nothing new." | inline | reload | |
-| `/learner/settings/accessibility(+/audio)` | per-field "Saving…" | n/a | per-field error toast | resave | autosave; no Save button |
+| Surface                                    | Loading                          | Empty                                                                         | Error                              | Retry            | Notes                                                                      |
+| ------------------------------------------ | -------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------- | ---------------- | -------------------------------------------------------------------------- |
+| `/learner/select`                          | n/a (server render)              | "Ask a grown-up to add a learner"                                             | n/a                                | n/a              | only reachable when parent navigates to `/learner/*` without active cookie |
+| `/learner/home`                            | ⬜ skeleton (big card + 4 tiles) | per-blocker cards (no_baseline · no_path · consent · rate_limit · generation) | shell error boundary               | tap the same CTA | ✅ blockers wired in `startMissionAction`                                  |
+| `/learner/missions`                        | ⬜ skeleton rows                 | "Start your baseline"                                                         | inline                             | retry            |                                                                            |
+| `/learner/baseline(+/[id])`                | run player handles               | "Start" CTA                                                                   | per-question retry                 | retry            | UX-07 owns in-run                                                          |
+| `/learner/lesson-runs/[id]`                | ⬜ Stage entry skeleton          | n/a (always existing run)                                                     | UX-06                              | UX-06            | owned by UX-06                                                             |
+| `/learner/subjects`                        | ⬜ tile skeleton                 | "Subjects unlock after your baseline"                                         | inline                             | retry            |                                                                            |
+| `/learner/subjects/[id]`                   | ⬜ Stepper skeleton              | n/a (subject always exists)                                                   | inline                             | retry            |                                                                            |
+| `/learner/quests`                          | ⬜ world tile skeleton           | "Quests unlock after your first lesson"                                       | inline                             | retry            |                                                                            |
+| `/learner/quests/[w]/chapters/[c]`         | ⬜ hero skeleton                 | n/a                                                                           | inline                             | retry            | progress is never fake (DD-07)                                             |
+| `/learner/homework`                        | ⬜ list skeleton                 | "Start a new homework session"                                                | inline                             | retry            |                                                                            |
+| `/learner/homework/[id]`                   | typing indicator                 | prompt-suggestion list                                                        | per-message retry; rate-limit card | retry / wait     | `aria-live="polite"` on tutor messages                                     |
+| `/learner/library`                         | ⬜ skeleton                      | "Anything you save will live here."                                           | inline                             | retry            |                                                                            |
+| `/learner/progress`                        | ⬜ skeleton                      | "After your first lesson"                                                     | inline                             | retry            | no charts                                                                  |
+| `/learner/rewards`                         | ⬜ skeleton                      | "Earn your first reward in a lesson"                                          | inline                             | retry            | tied to real completions                                                   |
+| `/learner/notifications`                   | ⬜ skeleton                      | "Nothing new."                                                                | inline                             | reload           |                                                                            |
+| `/learner/settings/accessibility(+/audio)` | per-field "Saving…"              | n/a                                                                           | per-field error toast              | resave           | autosave; no Save button                                                   |
 
 ---
 
 ## 6. Copy patterns (learner)
 
-| Context | Bad | Good |
-|---|---|---|
-| Daily greeting | "Welcome back, user." | "Hi <FirstName>. Ready for today's step?" |
-| Mission reason | "Skill: addition_within_20, mastery=0.18" | "Today's a Math step. Let's grow this one together." (`learnerSafeReason()` already produces this) |
-| Wrong answer | "Wrong." / "Incorrect." | "Let's look again." / "One more step — you've got this." |
-| Lesson done | "Lesson complete. +12 XP." | "You did it! Take a breath. You'll see what's next on your home screen." |
-| Locked quest world | "World 3 locked. Earn 200 XP to unlock." | "Finish 2 more chapters in <PreviousWorld> to open this one." |
-| Rate-limit hit | "Rate limit exceeded (429)." | "Big breath — let's start in a moment." |
-| Consent missing | "Required consent `child_data_collection` is not on file." | "Ask a grown-up to finish setting up AIVO." |
-| Generation failure | "AI generation failed." | "Hmm — we couldn't get today's lesson ready. Tap to try again." |
+| Context            | Bad                                                        | Good                                                                                               |
+| ------------------ | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Daily greeting     | "Welcome back, user."                                      | "Hi <FirstName>. Ready for today's step?"                                                          |
+| Mission reason     | "Skill: addition_within_20, mastery=0.18"                  | "Today's a Math step. Let's grow this one together." (`learnerSafeReason()` already produces this) |
+| Wrong answer       | "Wrong." / "Incorrect."                                    | "Let's look again." / "One more step — you've got this."                                           |
+| Lesson done        | "Lesson complete. +12 XP."                                 | "You did it! Take a breath. You'll see what's next on your home screen."                           |
+| Locked quest world | "World 3 locked. Earn 200 XP to unlock."                   | "Finish 2 more chapters in <PreviousWorld> to open this one."                                      |
+| Rate-limit hit     | "Rate limit exceeded (429)."                               | "Big breath — let's start in a moment."                                                            |
+| Consent missing    | "Required consent `child_data_collection` is not on file." | "Ask a grown-up to finish setting up AIVO."                                                        |
+| Generation failure | "AI generation failed."                                    | "Hmm — we couldn't get today's lesson ready. Tap to try again."                                    |
 
 ---
 
 ## 7. Tablet vs desktop vs mobile-web
 
-| Breakpoint | Treatment |
-|---|---|
+| Breakpoint                            | Treatment                                                                                                                                                                                                                                        |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Tablet (768–1280, primary target)** | Single column. Mission card spans full content width minus 32px gutter. Secondary tiles wrap 2×2 below. Touch targets ≥ 44×44. AppShell sidebar collapses to a header strip with hamburger; primary nav is bottom-anchored (mirrors mobile-web). |
-| **Desktop (≥ 1280)** | Two-column on home: mission card 2/3 + secondary tiles in a vertical rail 1/3. Subjects + Quests + Progress remain card grids. Sidebar shows full `LEARNER_NAV`. |
-| **Mobile web (≤ 480)** | Single column; mission card stretches; secondary tiles wrap 2×2 below; AppShell is bottom-tab pattern (matches the unified mobile app). For consistency, the same layout is reachable on bigger phones in landscape. |
+| **Desktop (≥ 1280)**                  | Two-column on home: mission card 2/3 + secondary tiles in a vertical rail 1/3. Subjects + Quests + Progress remain card grids. Sidebar shows full `LEARNER_NAV`.                                                                                 |
+| **Mobile web (≤ 480)**                | Single column; mission card stretches; secondary tiles wrap 2×2 below; AppShell is bottom-tab pattern (matches the unified mobile app). For consistency, the same layout is reachable on bigger phones in landscape.                             |
 
 ---
 

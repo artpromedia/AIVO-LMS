@@ -36,7 +36,10 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
     const parsed = patchSchema.safeParse(body);
     if (!parsed.success) {
       return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." },
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
         requestId,
       );
     }
@@ -50,11 +53,18 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
     }
     if (existing.scope === "platform" && session!.role !== "platform_admin") {
       return fail(
-        { ...ERRORS.FORBIDDEN_ROLE, message: "Only platform admins can modify platform-scope overrides." },
+        {
+          ...ERRORS.FORBIDDEN_ROLE,
+          message: "Only platform admins can modify platform-scope overrides.",
+        },
         requestId,
       );
     }
-    if (existing.scope === "tenant" && existing.tenantId !== session!.tenantId && session!.role !== "platform_admin") {
+    if (
+      existing.scope === "tenant" &&
+      existing.tenantId !== session!.tenantId &&
+      session!.role !== "platform_admin"
+    ) {
       return fail(
         { ...ERRORS.FORBIDDEN_TENANT, message: "Override belongs to another tenant." },
         requestId,
@@ -62,7 +72,10 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
     }
     if (parsed.data.scope === "platform" && session!.role !== "platform_admin") {
       return fail(
-        { ...ERRORS.FORBIDDEN_ROLE, message: "Only platform admins can promote to platform scope." },
+        {
+          ...ERRORS.FORBIDDEN_ROLE,
+          message: "Only platform admins can promote to platform scope.",
+        },
         requestId,
       );
     }

@@ -31,7 +31,11 @@ interface BrainState {
   // The XAI explanation (if available) gives us per-domain reasoning.
   xaiExplanation?: {
     mastery_decisions?: Array<{ domain: string; score: number; display_label?: string }>;
-    accommodation_decisions?: Array<{ accommodation: string; display_label?: string; affects_domains?: string[] }>;
+    accommodation_decisions?: Array<{
+      accommodation: string;
+      display_label?: string;
+      affects_domains?: string[];
+    }>;
     tutor_decisions?: Array<{ tutor_key: string; reasoning?: string; affects_domains?: string[] }>;
   };
   updatedAt?: string;
@@ -77,10 +81,7 @@ const DOMAIN_LABELS: Record<string, string> = {
 
 function labelFor(domain: string): string {
   const key = domain.toLowerCase().replace(/[\s-]+/g, "_");
-  return (
-    DOMAIN_LABELS[key] ||
-    domain.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
-  );
+  return DOMAIN_LABELS[key] || domain.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export default function BrainCloneCard({
@@ -227,9 +228,16 @@ export default function BrainCloneCard({
         <div className="flex items-center gap-2">
           <div
             className="w-9 h-9 rounded-full"
-            style={{ background: "color-mix(in srgb, var(--tier-primary, #7C3AED) 18%, transparent)" }}
+            style={{
+              background: "color-mix(in srgb, var(--tier-primary, #7C3AED) 18%, transparent)",
+            }}
           />
-          <div className="flex-1 h-3 rounded" style={{ background: "color-mix(in srgb, var(--tier-primary, #7C3AED) 12%, transparent)" }} />
+          <div
+            className="flex-1 h-3 rounded"
+            style={{
+              background: "color-mix(in srgb, var(--tier-primary, #7C3AED) 12%, transparent)",
+            }}
+          />
         </div>
       </div>
     );
@@ -256,7 +264,8 @@ export default function BrainCloneCard({
         </div>
         <p className="font-heading font-bold mb-1">Brain not built yet</p>
         <p className="text-xs mb-3" style={{ color: "var(--tier-text-soft, #5C5067)" }}>
-          Once {learnerName} finishes the baseline adventure, their personalized Brain Clone will appear here.
+          Once {learnerName} finishes the baseline adventure, their personalized Brain Clone will
+          appear here.
         </p>
         <button
           type="button"

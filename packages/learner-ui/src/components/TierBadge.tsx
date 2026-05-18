@@ -45,7 +45,7 @@ export function TierBadge({
 }: TierBadgeProps) {
   const ctx = useTierThemeOptional();
 
-  const theme = tier ? TIER_THEMES[tier] : ctx?.theme ?? null;
+  const theme = tier ? TIER_THEMES[tier] : (ctx?.theme ?? null);
   if (!theme) return null;
 
   const displayName = name ?? theme.name;

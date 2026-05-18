@@ -183,13 +183,20 @@ export function startSafeCron(opts: SafeCronOptions): SafeCronHandle {
         durationMs: finishedAt.getTime() - start,
         error,
       });
-      log?.info("scheduled job finished", { jobName: opts.jobName, status: outcome.status, replicaId });
+      log?.info("scheduled job finished", {
+        jobName: opts.jobName,
+        status: outcome.status,
+        replicaId,
+      });
       return { ran: true, outcome };
     } finally {
       try {
         await release();
       } catch (e) {
-        log?.error("failed to release advisory lock", { err: e instanceof Error ? e.message : String(e), jobName: opts.jobName });
+        log?.error("failed to release advisory lock", {
+          err: e instanceof Error ? e.message : String(e),
+          jobName: opts.jobName,
+        });
       }
     }
   }
@@ -198,7 +205,10 @@ export function startSafeCron(opts: SafeCronOptions): SafeCronHandle {
     if (stopped) return;
     timer = setTimeout(async () => {
       inFlight = singleTick().catch((e) => {
-        log?.error("scheduled tick crashed", { err: e instanceof Error ? e.message : String(e), jobName: opts.jobName });
+        log?.error("scheduled tick crashed", {
+          err: e instanceof Error ? e.message : String(e),
+          jobName: opts.jobName,
+        });
       });
       await inFlight;
       inFlight = null;
@@ -210,14 +220,20 @@ export function startSafeCron(opts: SafeCronOptions): SafeCronHandle {
   }
 
   // First tick fires shortly after boot so devs see something happen.
-  timer = setTimeout(() => {
-    inFlight = singleTick()
-      .then(() => {})
-      .catch((e) => {
-        log?.error("first tick crashed", { err: e instanceof Error ? e.message : String(e), jobName: opts.jobName });
-      });
-    scheduleNext();
-  }, Math.min(5_000, tickIntervalMs));
+  timer = setTimeout(
+    () => {
+      inFlight = singleTick()
+        .then(() => {})
+        .catch((e) => {
+          log?.error("first tick crashed", {
+            err: e instanceof Error ? e.message : String(e),
+            jobName: opts.jobName,
+          });
+        });
+      scheduleNext();
+    },
+    Math.min(5_000, tickIntervalMs),
+  );
   if (typeof (timer as { unref?: () => void }).unref === "function") {
     (timer as unknown as { unref: () => void }).unref();
   }
@@ -240,11 +256,7 @@ export {
   type DrizzleLikeDb,
 } from "./drizzle-impl.js";
 
-export {
-  computeFreshness,
-  type FreshnessRecord,
-  type FreshnessStatus,
-} from "./freshness.js";
+export { computeFreshness, type FreshnessRecord, type FreshnessStatus } from "./freshness.js";
 
 export type JobRegistryEntry = {
   jobName: string;

@@ -4,7 +4,16 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { ClipboardList, Sparkles, Plus, Trash2, ArrowLeft, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import {
+  ClipboardList,
+  Sparkles,
+  Plus,
+  Trash2,
+  ArrowLeft,
+  CheckCircle2,
+  XCircle,
+  Loader2,
+} from "lucide-react";
 
 const ASSESSMENT_AREAS = [
   "academic",
@@ -113,7 +122,9 @@ export default function TeacherEvaluationPage() {
     }
   }, [accessToken, learnerId, activeId, t]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   const active = evaluations.find((e) => e.id === activeId) || null;
 
@@ -128,7 +139,7 @@ export default function TeacherEvaluationPage() {
       setDecisionCats(active.decisionCategories || active.aiSuggestion?.suggested_categories || []);
       setDecisionRationale(active.decisionRationale || "");
     }
-  }, [activeId, active?.updatedAt]);  
+  }, [activeId, active?.updatedAt]);
 
   if (loading || !user) return null;
 
@@ -161,7 +172,9 @@ export default function TeacherEvaluationPage() {
       });
       if (!r.ok) setError(t("error_save"));
       else await refresh();
-    } finally { setSaving(false); }
+    } finally {
+      setSaving(false);
+    }
   };
 
   const requestSuggestion = async () => {
@@ -181,7 +194,9 @@ export default function TeacherEvaluationPage() {
       });
       if (!r.ok) setError(t("error_suggest"));
       else await refresh();
-    } finally { setSuggesting(false); }
+    } finally {
+      setSuggesting(false);
+    }
   };
 
   const submitForReview = async () => {
@@ -199,11 +214,14 @@ export default function TeacherEvaluationPage() {
         return;
       }
       const r = await fetch(`/api/iep/evaluations/${active.id}/submit`, {
-        method: "POST", headers: { Authorization: `Bearer ${accessToken}` },
+        method: "POST",
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
       if (!r.ok) setError(t("error_save"));
       else await refresh();
-    } finally { setSaving(false); }
+    } finally {
+      setSaving(false);
+    }
   };
 
   const recordDecision = async (decision: "eligible" | "not_eligible" | "needs_more_data") => {
@@ -218,15 +236,19 @@ export default function TeacherEvaluationPage() {
       });
       if (!r.ok) setError(t("error_save"));
       else await refresh();
-    } finally { setBusyDecision(false); }
+    } finally {
+      setBusyDecision(false);
+    }
   };
 
   const editable = active && (active.status === "draft" || active.status === "submitted");
 
   return (
     <div className="p-6 lg:p-8 space-y-6 max-w-6xl mx-auto">
-      <button onClick={() => router.back()}
-        className="inline-flex items-center gap-2 text-sm font-bold vi-text-muted hover:vi-text">
+      <button
+        onClick={() => router.back()}
+        className="inline-flex items-center gap-2 text-sm font-bold vi-text-muted hover:vi-text"
+      >
         <ArrowLeft size={16} strokeWidth={2.5} aria-hidden="true" /> {t("back_to_classes")}
       </button>
 
@@ -240,8 +262,11 @@ export default function TeacherEvaluationPage() {
             <p className="text-sm vi-text-muted font-medium mt-1">{t("subtitle")}</p>
           </div>
         </div>
-        <button onClick={createDraft} style={{ minHeight: 44 }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[hsl(var(--visual-reading))] text-white font-bold text-sm">
+        <button
+          onClick={createDraft}
+          style={{ minHeight: 44 }}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[hsl(var(--visual-reading))] text-white font-bold text-sm"
+        >
           <Plus size={16} strokeWidth={3} aria-hidden="true" /> {t("new_evaluation")}
         </button>
       </header>
@@ -254,7 +279,9 @@ export default function TeacherEvaluationPage() {
 
       <div className="grid lg:grid-cols-[260px_1fr] gap-6">
         <aside className="vi-card p-3 h-fit">
-          <h2 className="text-xs font-black uppercase tracking-wide vi-text-muted px-2 py-2">{t("history")}</h2>
+          <h2 className="text-xs font-black uppercase tracking-wide vi-text-muted px-2 py-2">
+            {t("history")}
+          </h2>
           {loadingList ? (
             <p className="px-2 py-3 text-sm vi-text-muted">{t("loading")}</p>
           ) : evaluations.length === 0 ? (
@@ -263,11 +290,15 @@ export default function TeacherEvaluationPage() {
             <ul className="space-y-1">
               {evaluations.map((e) => (
                 <li key={e.id}>
-                  <button onClick={() => setActiveId(e.id)}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-sm font-bold ${activeId === e.id ? "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]" : "vi-text hover:vi-surface-soft"}`}>
+                  <button
+                    onClick={() => setActiveId(e.id)}
+                    className={`w-full text-left px-3 py-2 rounded-lg text-sm font-bold ${activeId === e.id ? "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]" : "vi-text hover:vi-surface-soft"}`}
+                  >
                     <div className="flex items-center justify-between gap-2">
                       <span>{new Date(e.createdAt).toLocaleDateString()}</span>
-                      <span className={`px-2 py-0.5 text-[10px] rounded-full font-black ${STATUS_STYLE[e.status]}`}>
+                      <span
+                        className={`px-2 py-0.5 text-[10px] rounded-full font-black ${STATUS_STYLE[e.status]}`}
+                      >
                         {t(`status_${e.status}`)}
                       </span>
                     </div>
@@ -287,18 +318,34 @@ export default function TeacherEvaluationPage() {
             <>
               <div className="vi-card p-5 space-y-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-black uppercase tracking-wide vi-text-muted">{t("referral_reason")}</label>
-                  <textarea rows={2} value={draft.referralReason} disabled={!editable}
+                  <label className="text-xs font-black uppercase tracking-wide vi-text-muted">
+                    {t("referral_reason")}
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={draft.referralReason}
+                    disabled={!editable}
                     onChange={(e) => setDraft((d) => ({ ...d, referralReason: e.target.value }))}
-                    className="w-full p-3 rounded-xl border-2 vi-border bg-white text-sm disabled:bg-slate-50" />
+                    className="w-full p-3 rounded-xl border-2 vi-border bg-white text-sm disabled:bg-slate-50"
+                  />
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-black uppercase tracking-wide vi-text-muted">{t("assessment_areas")}</label>
+                    <label className="text-xs font-black uppercase tracking-wide vi-text-muted">
+                      {t("assessment_areas")}
+                    </label>
                     {editable && (
-                      <button type="button" onClick={() => setDraft((d) => ({ ...d, assessmentAreas: [...d.assessmentAreas, { area: ASSESSMENT_AREAS[0] }] }))}
-                        className="text-xs font-bold text-[hsl(var(--visual-reading))] inline-flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setDraft((d) => ({
+                            ...d,
+                            assessmentAreas: [...d.assessmentAreas, { area: ASSESSMENT_AREAS[0] }],
+                          }))
+                        }
+                        className="text-xs font-bold text-[hsl(var(--visual-reading))] inline-flex items-center gap-1"
+                      >
                         <Plus size={12} strokeWidth={3} aria-hidden="true" /> {t("add_area")}
                       </button>
                     )}
@@ -308,33 +355,79 @@ export default function TeacherEvaluationPage() {
                   )}
                   <div className="space-y-2">
                     {draft.assessmentAreas.map((a, i) => (
-                      <div key={i} className="grid grid-cols-1 md:grid-cols-[160px_140px_1fr_120px_auto] gap-2 items-start">
-                        <select value={a.area} disabled={!editable}
-                          onChange={(e) => setDraft((d) => {
-                            const next = [...d.assessmentAreas]; next[i] = { ...a, area: e.target.value }; return { ...d, assessmentAreas: next };
-                          })}
-                          className="p-2 rounded-lg border-2 vi-border text-sm bg-white">
-                          {ASSESSMENT_AREAS.map((opt) => <option key={opt} value={opt}>{t(`area_${opt}`)}</option>)}
+                      <div
+                        key={i}
+                        className="grid grid-cols-1 md:grid-cols-[160px_140px_1fr_120px_auto] gap-2 items-start"
+                      >
+                        <select
+                          value={a.area}
+                          disabled={!editable}
+                          onChange={(e) =>
+                            setDraft((d) => {
+                              const next = [...d.assessmentAreas];
+                              next[i] = { ...a, area: e.target.value };
+                              return { ...d, assessmentAreas: next };
+                            })
+                          }
+                          className="p-2 rounded-lg border-2 vi-border text-sm bg-white"
+                        >
+                          {ASSESSMENT_AREAS.map((opt) => (
+                            <option key={opt} value={opt}>
+                              {t(`area_${opt}`)}
+                            </option>
+                          ))}
                         </select>
-                        <input placeholder={t("method_placeholder")} value={a.method || ""} disabled={!editable}
-                          onChange={(e) => setDraft((d) => {
-                            const next = [...d.assessmentAreas]; next[i] = { ...a, method: e.target.value }; return { ...d, assessmentAreas: next };
-                          })}
-                          className="p-2 rounded-lg border-2 vi-border text-sm" />
-                        <input placeholder={t("findings_placeholder")} value={a.findings || ""} disabled={!editable}
-                          onChange={(e) => setDraft((d) => {
-                            const next = [...d.assessmentAreas]; next[i] = { ...a, findings: e.target.value }; return { ...d, assessmentAreas: next };
-                          })}
-                          className="p-2 rounded-lg border-2 vi-border text-sm" />
-                        <input placeholder={t("score_placeholder")} value={a.score || ""} disabled={!editable}
-                          onChange={(e) => setDraft((d) => {
-                            const next = [...d.assessmentAreas]; next[i] = { ...a, score: e.target.value }; return { ...d, assessmentAreas: next };
-                          })}
-                          className="p-2 rounded-lg border-2 vi-border text-sm" />
+                        <input
+                          placeholder={t("method_placeholder")}
+                          value={a.method || ""}
+                          disabled={!editable}
+                          onChange={(e) =>
+                            setDraft((d) => {
+                              const next = [...d.assessmentAreas];
+                              next[i] = { ...a, method: e.target.value };
+                              return { ...d, assessmentAreas: next };
+                            })
+                          }
+                          className="p-2 rounded-lg border-2 vi-border text-sm"
+                        />
+                        <input
+                          placeholder={t("findings_placeholder")}
+                          value={a.findings || ""}
+                          disabled={!editable}
+                          onChange={(e) =>
+                            setDraft((d) => {
+                              const next = [...d.assessmentAreas];
+                              next[i] = { ...a, findings: e.target.value };
+                              return { ...d, assessmentAreas: next };
+                            })
+                          }
+                          className="p-2 rounded-lg border-2 vi-border text-sm"
+                        />
+                        <input
+                          placeholder={t("score_placeholder")}
+                          value={a.score || ""}
+                          disabled={!editable}
+                          onChange={(e) =>
+                            setDraft((d) => {
+                              const next = [...d.assessmentAreas];
+                              next[i] = { ...a, score: e.target.value };
+                              return { ...d, assessmentAreas: next };
+                            })
+                          }
+                          className="p-2 rounded-lg border-2 vi-border text-sm"
+                        />
                         {editable && (
-                          <button type="button" aria-label={t("remove_area")}
-                            onClick={() => setDraft((d) => ({ ...d, assessmentAreas: d.assessmentAreas.filter((_, j) => j !== i) }))}
-                            className="p-2 text-[hsl(var(--visual-math))] hover:bg-[hsl(var(--visual-math)/0.08)] rounded-lg">
+                          <button
+                            type="button"
+                            aria-label={t("remove_area")}
+                            onClick={() =>
+                              setDraft((d) => ({
+                                ...d,
+                                assessmentAreas: d.assessmentAreas.filter((_, j) => j !== i),
+                              }))
+                            }
+                            className="p-2 text-[hsl(var(--visual-math))] hover:bg-[hsl(var(--visual-math)/0.08)] rounded-lg"
+                          >
                             <Trash2 size={16} strokeWidth={2.5} aria-hidden="true" />
                           </button>
                         )}
@@ -345,33 +438,60 @@ export default function TeacherEvaluationPage() {
 
                 <div className="grid md:grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="text-xs font-black uppercase tracking-wide vi-text-muted">{t("observations")}</label>
-                    <textarea rows={4} value={draft.observations} disabled={!editable}
+                    <label className="text-xs font-black uppercase tracking-wide vi-text-muted">
+                      {t("observations")}
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={draft.observations}
+                      disabled={!editable}
                       onChange={(e) => setDraft((d) => ({ ...d, observations: e.target.value }))}
-                      className="w-full p-3 rounded-xl border-2 vi-border bg-white text-sm disabled:bg-slate-50" />
+                      className="w-full p-3 rounded-xl border-2 vi-border bg-white text-sm disabled:bg-slate-50"
+                    />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-black uppercase tracking-wide vi-text-muted">{t("parent_input")}</label>
-                    <textarea rows={4} value={draft.parentInput} disabled={!editable}
+                    <label className="text-xs font-black uppercase tracking-wide vi-text-muted">
+                      {t("parent_input")}
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={draft.parentInput}
+                      disabled={!editable}
                       onChange={(e) => setDraft((d) => ({ ...d, parentInput: e.target.value }))}
-                      className="w-full p-3 rounded-xl border-2 vi-border bg-white text-sm disabled:bg-slate-50" />
+                      className="w-full p-3 rounded-xl border-2 vi-border bg-white text-sm disabled:bg-slate-50"
+                    />
                   </div>
                 </div>
 
                 {editable && (
                   <div className="flex flex-wrap gap-2 pt-2">
-                    <button onClick={save} disabled={saving} style={{ minHeight: 44 }}
-                      className="px-4 py-2 rounded-full vi-surface-soft vi-text font-bold text-sm border-2 vi-border disabled:opacity-50">
+                    <button
+                      onClick={save}
+                      disabled={saving}
+                      style={{ minHeight: 44 }}
+                      className="px-4 py-2 rounded-full vi-surface-soft vi-text font-bold text-sm border-2 vi-border disabled:opacity-50"
+                    >
                       {saving ? t("saving") : t("save_draft")}
                     </button>
-                    <button onClick={requestSuggestion} disabled={suggesting} style={{ minHeight: 44 }}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[hsl(var(--visual-primary))] text-white font-bold text-sm disabled:opacity-50">
-                      {suggesting ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <Sparkles size={16} strokeWidth={2.5} aria-hidden="true" />}
+                    <button
+                      onClick={requestSuggestion}
+                      disabled={suggesting}
+                      style={{ minHeight: 44 }}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[hsl(var(--visual-primary))] text-white font-bold text-sm disabled:opacity-50"
+                    >
+                      {suggesting ? (
+                        <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+                      ) : (
+                        <Sparkles size={16} strokeWidth={2.5} aria-hidden="true" />
+                      )}
                       {suggesting ? t("getting_suggestion") : t("get_ai_suggestion")}
                     </button>
                     {active.status === "draft" && (
-                      <button onClick={submitForReview} style={{ minHeight: 44 }}
-                        className="px-4 py-2 rounded-full bg-[hsl(var(--visual-reading))] text-white font-bold text-sm">
+                      <button
+                        onClick={submitForReview}
+                        style={{ minHeight: 44 }}
+                        className="px-4 py-2 rounded-full bg-[hsl(var(--visual-reading))] text-white font-bold text-sm"
+                      >
                         {t("submit_for_review")}
                       </button>
                     )}
@@ -382,7 +502,11 @@ export default function TeacherEvaluationPage() {
               {active.aiSuggestion && (
                 <div className="vi-card p-5 border-2 border-[hsl(var(--visual-primary)/0.3)]">
                   <div className="flex items-center gap-2 mb-3">
-                    <Sparkles size={18} className="text-[hsl(var(--visual-primary))]" aria-hidden="true" />
+                    <Sparkles
+                      size={18}
+                      className="text-[hsl(var(--visual-primary))]"
+                      aria-hidden="true"
+                    />
                     <h3 className="font-heading font-bold vi-text">{t("ai_suggestion")}</h3>
                     <span className="ml-auto text-xs vi-text-muted font-bold">
                       {t("confidence")}: {active.aiSuggestion.confidence ?? 0}%
@@ -395,18 +519,25 @@ export default function TeacherEvaluationPage() {
                   {active.aiSuggestion.suggested_categories?.length ? (
                     <div className="flex flex-wrap gap-1.5 mb-3">
                       {active.aiSuggestion.suggested_categories.map((c) => (
-                        <span key={c} className="px-2 py-0.5 rounded-full text-xs font-bold bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]">
+                        <span
+                          key={c}
+                          className="px-2 py-0.5 rounded-full text-xs font-bold bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]"
+                        >
                           {t.has(`category_${c}`) ? t(`category_${c}`) : c}
                         </span>
                       ))}
                     </div>
                   ) : null}
                   {active.aiSuggestion.rationale && (
-                    <p className="text-sm vi-text-muted italic mb-3">{active.aiSuggestion.rationale}</p>
+                    <p className="text-sm vi-text-muted italic mb-3">
+                      {active.aiSuggestion.rationale}
+                    </p>
                   )}
                   {active.aiSuggestion.recommended_next_steps?.length ? (
                     <ul className="text-sm vi-text list-disc pl-5 space-y-1">
-                      {active.aiSuggestion.recommended_next_steps.map((s, i) => <li key={i}>{s}</li>)}
+                      {active.aiSuggestion.recommended_next_steps.map((s, i) => (
+                        <li key={i}>{s}</li>
+                      ))}
                     </ul>
                   ) : null}
                   <p className="text-[11px] vi-text-muted mt-3">{t("ai_disclaimer")}</p>
@@ -421,28 +552,52 @@ export default function TeacherEvaluationPage() {
                     {IDEA_CATEGORIES.map((c) => {
                       const on = decisionCats.includes(c);
                       return (
-                        <button key={c} type="button" onClick={() => setDecisionCats((d) => on ? d.filter((x) => x !== c) : [...d, c])}
-                          className={`px-2.5 py-1 rounded-full text-xs font-bold border-2 ${on ? "bg-[hsl(var(--visual-reading))] text-white border-[hsl(var(--visual-reading))]" : "vi-surface-soft vi-text vi-border"}`}>
+                        <button
+                          key={c}
+                          type="button"
+                          onClick={() =>
+                            setDecisionCats((d) => (on ? d.filter((x) => x !== c) : [...d, c]))
+                          }
+                          className={`px-2.5 py-1 rounded-full text-xs font-bold border-2 ${on ? "bg-[hsl(var(--visual-reading))] text-white border-[hsl(var(--visual-reading))]" : "vi-surface-soft vi-text vi-border"}`}
+                        >
                           {t(`category_${c}`)}
                         </button>
                       );
                     })}
                   </div>
-                  <textarea rows={3} value={decisionRationale} placeholder={t("decision_rationale_placeholder")}
+                  <textarea
+                    rows={3}
+                    value={decisionRationale}
+                    placeholder={t("decision_rationale_placeholder")}
                     onChange={(e) => setDecisionRationale(e.target.value)}
-                    className="w-full p-3 rounded-xl border-2 vi-border bg-white text-sm" />
+                    className="w-full p-3 rounded-xl border-2 vi-border bg-white text-sm"
+                  />
                   <div className="flex gap-2">
-                    <button disabled={busyDecision} onClick={() => recordDecision("eligible")} style={{ minHeight: 44 }}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[hsl(var(--visual-science))] text-white font-bold text-sm disabled:opacity-50">
-                      <CheckCircle2 size={16} strokeWidth={2.5} aria-hidden="true" /> {t("decision_eligible")}
+                    <button
+                      disabled={busyDecision}
+                      onClick={() => recordDecision("eligible")}
+                      style={{ minHeight: 44 }}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[hsl(var(--visual-science))] text-white font-bold text-sm disabled:opacity-50"
+                    >
+                      <CheckCircle2 size={16} strokeWidth={2.5} aria-hidden="true" />{" "}
+                      {t("decision_eligible")}
                     </button>
-                    <button disabled={busyDecision} onClick={() => recordDecision("needs_more_data")} style={{ minHeight: 44 }}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[hsl(var(--visual-sel))] text-white font-bold text-sm disabled:opacity-50">
+                    <button
+                      disabled={busyDecision}
+                      onClick={() => recordDecision("needs_more_data")}
+                      style={{ minHeight: 44 }}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[hsl(var(--visual-sel))] text-white font-bold text-sm disabled:opacity-50"
+                    >
                       {t("decision_needs_more_data")}
                     </button>
-                    <button disabled={busyDecision} onClick={() => recordDecision("not_eligible")} style={{ minHeight: 44 }}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[hsl(var(--visual-math))] text-white font-bold text-sm disabled:opacity-50">
-                      <XCircle size={16} strokeWidth={2.5} aria-hidden="true" /> {t("decision_not_eligible")}
+                    <button
+                      disabled={busyDecision}
+                      onClick={() => recordDecision("not_eligible")}
+                      style={{ minHeight: 44 }}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[hsl(var(--visual-math))] text-white font-bold text-sm disabled:opacity-50"
+                    >
+                      <XCircle size={16} strokeWidth={2.5} aria-hidden="true" />{" "}
+                      {t("decision_not_eligible")}
                     </button>
                   </div>
                 </div>
@@ -451,11 +606,14 @@ export default function TeacherEvaluationPage() {
               {active.status === "eligibility_determined" && (
                 <div className="vi-card p-5 space-y-3">
                   <div className="flex items-center gap-2">
-                    {active.decisionEligible === "eligible"
-                      ? <CheckCircle2 className="text-[hsl(var(--visual-science))]" aria-hidden="true" />
-                      : active.decisionEligible === "not_eligible"
-                        ? <XCircle className="text-[hsl(var(--visual-math))]" aria-hidden="true" />
-                        : null}
+                    {active.decisionEligible === "eligible" ? (
+                      <CheckCircle2
+                        className="text-[hsl(var(--visual-science))]"
+                        aria-hidden="true"
+                      />
+                    ) : active.decisionEligible === "not_eligible" ? (
+                      <XCircle className="text-[hsl(var(--visual-math))]" aria-hidden="true" />
+                    ) : null}
                     <h3 className="font-heading font-bold vi-text">
                       {active.decisionEligible === "eligible"
                         ? t("found_eligible")
@@ -467,22 +625,34 @@ export default function TeacherEvaluationPage() {
                   {active.decisionCategories?.length ? (
                     <div className="flex flex-wrap gap-1.5">
                       {active.decisionCategories.map((c) => (
-                        <span key={c} className="px-2 py-0.5 rounded-full text-xs font-bold bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]">
+                        <span
+                          key={c}
+                          className="px-2 py-0.5 rounded-full text-xs font-bold bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]"
+                        >
                           {t.has(`category_${c}`) ? t(`category_${c}`) : c}
                         </span>
                       ))}
                     </div>
                   ) : null}
-                  {active.decisionRationale && <p className="text-sm vi-text-muted italic">{active.decisionRationale}</p>}
-                  {active.decidedAt && <p className="text-xs vi-text-muted">{t("decided_at", { date: new Date(active.decidedAt).toLocaleString() })}</p>}
+                  {active.decisionRationale && (
+                    <p className="text-sm vi-text-muted italic">{active.decisionRationale}</p>
+                  )}
+                  {active.decidedAt && (
+                    <p className="text-xs vi-text-muted">
+                      {t("decided_at", { date: new Date(active.decidedAt).toLocaleString() })}
+                    </p>
+                  )}
                   {active.decisionEligible === "eligible" && (
                     <button
                       type="button"
-                      onClick={() => router.push(
-                        `/dashboard/teacher/learners/${learnerId}/iep/draft?fromEvaluation=${active.id}`,
-                      )}
+                      onClick={() =>
+                        router.push(
+                          `/dashboard/teacher/learners/${learnerId}/iep/draft?fromEvaluation=${active.id}`,
+                        )
+                      }
                       style={{ minHeight: 44 }}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[hsl(var(--visual-reading))] text-white text-sm font-bold">
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[hsl(var(--visual-reading))] text-white text-sm font-bold"
+                    >
                       {t("start_iep_draft")}
                     </button>
                   )}

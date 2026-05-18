@@ -31,7 +31,10 @@ export default function LearnerTutorsPage() {
 
   // Filter to tutors that fit this learner's age tier (e.g. K-5 hides
   // Chrono / Lingua / Forge / Compass).
-  const tutorEntries = getTutorsForTier(tierCtx?.theme.id ?? null) as [TutorKey, typeof TUTORS[TutorKey]][];
+  const tutorEntries = getTutorsForTier(tierCtx?.theme.id ?? null) as [
+    TutorKey,
+    (typeof TUTORS)[TutorKey],
+  ][];
 
   const filtered = tutorEntries.filter(([key]) => {
     if (filter === "active") return isTutorEntitled(key);
@@ -47,7 +50,12 @@ export default function LearnerTutorsPage() {
       <div className="max-w-5xl mx-auto px-6 py-8">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <Link href="/dashboard/learner" className="text-sm text-primary hover:underline font-semibold mb-2 inline-block">← {tCommon("back")}</Link>
+            <Link
+              href="/dashboard/learner"
+              className="text-sm text-primary hover:underline font-semibold mb-2 inline-block"
+            >
+              ← {tCommon("back")}
+            </Link>
             <h1 className="text-3xl font-heading font-bold text-slate-900">{t("my_tutors")}</h1>
             <p className="text-sm text-slate-500 mt-1">
               {status === "loading"
@@ -56,10 +64,13 @@ export default function LearnerTutorsPage() {
             </p>
           </div>
           <div className="flex gap-1 bg-slate-100 rounded-xl p-1">
-            {(["all", "active", "locked"] as const).map(f => (
-              <button key={f} onClick={() => setFilter(f)}
+            {(["all", "active", "locked"] as const).map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
                 aria-pressed={filter === f}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition capitalize focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${filter === f ? "bg-white text-slate-900 shadow-sm" : "text-slate-500"}`}>
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition capitalize focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${filter === f ? "bg-white text-slate-900 shadow-sm" : "text-slate-500"}`}
+              >
                 {f}
               </button>
             ))}
@@ -81,23 +92,36 @@ export default function LearnerTutorsPage() {
               const sku = TUTOR_KEY_TO_SKU[key];
               const isIncluded = entitlements?.includedTutorSkus.includes(sku);
               return (
-                <Link key={key} href={`/dashboard/learner/tutors/${key}`}
+                <Link
+                  key={key}
+                  href={`/dashboard/learner/tutors/${key}`}
                   aria-label={
                     active
                       ? `${tutor.name}, ${tutor.domain}, unlocked`
                       : t("tutor_locked_label", { name: tutor.name })
                   }
-                  className={`group rounded-2xl border-2 overflow-hidden transition hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${active ? "border-primary/30 bg-white" : "border-slate-200 bg-slate-50/50 opacity-70 hover:opacity-100"}`}>
+                  className={`group rounded-2xl border-2 overflow-hidden transition hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${active ? "border-primary/30 bg-white" : "border-slate-200 bg-slate-50/50 opacity-70 hover:opacity-100"}`}
+                >
                   <div className="p-5">
                     <div className="flex items-center gap-4 mb-3">
-                      <Image src={tutor.avatar} alt={tutor.name} width={56} height={56} className={`rounded-xl shadow-sm ${!active ? "grayscale" : ""}`} />
+                      <Image
+                        src={tutor.avatar}
+                        alt={tutor.name}
+                        width={56}
+                        height={56}
+                        className={`rounded-xl shadow-sm ${!active ? "grayscale" : ""}`}
+                      />
                       <div>
-                        <h3 className="font-heading font-bold text-slate-900 group-hover:text-primary transition">{tutor.name}</h3>
+                        <h3 className="font-heading font-bold text-slate-900 group-hover:text-primary transition">
+                          {tutor.name}
+                        </h3>
                         <p className="text-xs text-slate-500">{tutor.domain}</p>
                       </div>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className={`px-2 py-0.5 text-xs rounded-full font-semibold ${tutor.tier === "core" ? "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]" : "bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]"}`}>
+                      <span
+                        className={`px-2 py-0.5 text-xs rounded-full font-semibold ${tutor.tier === "core" ? "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]" : "bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]"}`}
+                      >
                         {tutor.tier}
                       </span>
                       {active ? (
@@ -105,7 +129,9 @@ export default function LearnerTutorsPage() {
                           {isIncluded ? t("included") : t("purchased")}
                         </span>
                       ) : (
-                        <span className="px-2 py-0.5 text-xs rounded-full bg-slate-200 text-slate-500 font-semibold">{t("locked")}</span>
+                        <span className="px-2 py-0.5 text-xs rounded-full bg-slate-200 text-slate-500 font-semibold">
+                          {t("locked")}
+                        </span>
                       )}
                     </div>
                   </div>

@@ -13,7 +13,10 @@ const validSurface = {
   id: "surf-geo-1",
   type: "geometry_workspace" as const,
   prompt: "Find the area",
-  diagram: { canvasMode: "svg" as const, shapes: [{ id: "rect1", kind: "rectangle" as const, x: 0, y: 0, width: 200, height: 100 }] },
+  diagram: {
+    canvasMode: "svg" as const,
+    shapes: [{ id: "rect1", kind: "rectangle" as const, x: 0, y: 0, width: 200, height: 100 }],
+  },
   capture: { finalAnswer: true, inkStrokes: true },
   scoring: { mode: "exact" as const, correctAnswer: 32 },
   accessibility: { altText: "rect", reduceMotionSafe: true, keyboardAlternative: true },
@@ -25,7 +28,13 @@ test("normalizeStagePlan accepts a generated plan and attaches surfaces", () => 
     objective: "Compute area",
     beats: [
       { id: "b1", type: "narration", tutorState: "speaking", narration: "Hi", visuals: [] },
-      { id: "b2", type: "interaction", tutorState: "encouraging", surfaceId: "surf-geo-1", visuals: [] },
+      {
+        id: "b2",
+        type: "interaction",
+        tutorState: "encouraging",
+        surfaceId: "surf-geo-1",
+        visuals: [],
+      },
     ],
     surfaces: { "surf-geo-1": validSurface },
   });

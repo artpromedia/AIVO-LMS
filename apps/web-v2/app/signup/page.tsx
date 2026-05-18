@@ -6,7 +6,10 @@ import { Label } from "@/components/ui/label";
 
 export default function SignupPage() {
   return (
-    <main id="main" className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12">
+    <main
+      id="main"
+      className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12"
+    >
       <Card>
         <CardHeader>
           <CardTitle>Create your account</CardTitle>

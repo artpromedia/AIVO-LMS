@@ -1,8 +1,8 @@
-import React from 'react';
-import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { colors } from '@/constants/colors';
-import { useTranslation } from '@/hooks/useTranslation';
+import React from "react";
+import { Tabs } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { colors } from "@/constants/colors";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function TherapistLayout() {
   const { t } = useTranslation();
@@ -19,20 +19,20 @@ export default function TherapistLayout() {
           paddingBottom: 20,
           paddingTop: 8,
         },
-        tabBarLabelStyle: { fontFamily: 'Nunito-SemiBold', fontSize: 11 },
+        tabBarLabelStyle: { fontFamily: "Nunito-SemiBold", fontSize: 11 },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: t('tabs.clients'),
+          title: t("tabs.clients"),
           tabBarIcon: ({ color, size }) => <Ionicons name="people" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="sessions"
         options={{
-          title: t('tabs.sessions'),
+          title: t("tabs.sessions"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="calendar-outline" size={size} color={color} />
           ),
@@ -41,8 +41,10 @@ export default function TherapistLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: t('tabs.settings'),
-          tabBarIcon: ({ color, size }) => <Ionicons name="settings-outline" size={size} color={color} />,
+          title: t("tabs.settings"),
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="settings-outline" size={size} color={color} />
+          ),
         }}
       />
       <Tabs.Screen name="client/[id]/index" options={{ href: null }} />

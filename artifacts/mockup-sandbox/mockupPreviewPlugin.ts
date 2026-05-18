@@ -47,15 +47,11 @@ export function mockupPreviewPlugin(): Plugin {
 
   function isMockupFile(absolutePath: string): boolean {
     const rel = path.relative(getMockupsAbsDir(), absolutePath);
-    return (
-      !rel.startsWith("..") && !path.isAbsolute(rel) && rel.endsWith(".tsx")
-    );
+    return !rel.startsWith("..") && !path.isAbsolute(rel) && rel.endsWith(".tsx");
   }
 
   function isPreviewTarget(relativeToMockups: string): boolean {
-    return relativeToMockups
-      .split(path.sep)
-      .every((segment) => !segment.startsWith("_"));
+    return relativeToMockups.split(path.sep).every((segment) => !segment.startsWith("_"));
   }
 
   async function discoverComponents(): Promise<Array<DiscoveredComponent>> {
@@ -72,10 +68,7 @@ export function mockupPreviewPlugin(): Plugin {
 
   function generateSource(components: Array<DiscoveredComponent>): string {
     const entries = components
-      .map(
-        (c) =>
-          `  ${JSON.stringify(c.globKey)}: () => import(${JSON.stringify(c.importPath)})`,
-      )
+      .map((c) => `  ${JSON.stringify(c.globKey)}: () => import(${JSON.stringify(c.importPath)})`)
       .join(",\n");
 
     return [
@@ -160,10 +153,7 @@ export function mockupPreviewPlugin(): Plugin {
       });
 
       watcher.on("add", (file) => {
-        if (
-          isMockupFile(file) &&
-          isPreviewTarget(path.relative(mockupsAbsDir, file))
-        ) {
+        if (isMockupFile(file) && isPreviewTarget(path.relative(mockupsAbsDir, file))) {
           void onFileAddedOrRemoved();
         }
       });

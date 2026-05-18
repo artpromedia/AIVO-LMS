@@ -25,18 +25,24 @@ export default function CaregiverSettingsPage() {
   const fetchPreferences = useCallback(async () => {
     if (!accessToken || !user) return;
     try {
-      const res = await fetch(`/api/comms/preferences/${user.id}`, { headers: { Authorization: `Bearer ${accessToken}` } });
+      const res = await fetch(`/api/comms/preferences/${user.id}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
       if (res.ok) {
         const data = await res.json();
         if (data.email !== undefined) setEmailNotifs(data.email);
         if (data.dailySummary !== undefined) setDailySummary(data.dailySummary);
         if (data.iepAlerts !== undefined) setIepAlerts(data.iepAlerts);
       }
-    } catch { /* use defaults */ }
+    } catch {
+      /* use defaults */
+    }
     setLoadingPrefs(false);
   }, [accessToken, user]);
 
-  useEffect(() => { fetchPreferences(); }, [fetchPreferences]);
+  useEffect(() => {
+    fetchPreferences();
+  }, [fetchPreferences]);
 
   if (loading || !user) return null;
 
@@ -93,38 +99,92 @@ export default function CaregiverSettingsPage() {
         <h2 className="font-heading font-bold text-lg vi-text mb-4">{tc("details")}</h2>
         {loadingPrefs ? (
           <div className="space-y-4">
-            {[1, 2, 3].map(i => <div key={i} className="h-12 vi-surface-soft rounded-xl animate-pulse motion-reduce:animate-none" />)}
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="h-12 vi-surface-soft rounded-xl animate-pulse motion-reduce:animate-none"
+              />
+            ))}
           </div>
         ) : (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold vi-text" id="email-notifs-label">Email Notifications</p>
-                <p className="text-xs vi-text-muted" id="email-notifs-desc">Receive email updates about your learners</p>
+                <p className="text-sm font-semibold vi-text" id="email-notifs-label">
+                  Email Notifications
+                </p>
+                <p className="text-xs vi-text-muted" id="email-notifs-desc">
+                  Receive email updates about your learners
+                </p>
               </div>
-              <AccessibleToggle id="email-notifs" value={emailNotifs} onChange={setEmailNotifs} label="Email Notifications" description="Receive email updates about your learners" color="bg-[hsl(var(--visual-science))]" />
+              <AccessibleToggle
+                id="email-notifs"
+                value={emailNotifs}
+                onChange={setEmailNotifs}
+                label="Email Notifications"
+                description="Receive email updates about your learners"
+                color="bg-[hsl(var(--visual-science))]"
+              />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold vi-text" id="daily-summary-label">Daily Summary</p>
-                <p className="text-xs vi-text-muted" id="daily-summary-desc">Daily overview of learner activities and progress</p>
+                <p className="text-sm font-semibold vi-text" id="daily-summary-label">
+                  Daily Summary
+                </p>
+                <p className="text-xs vi-text-muted" id="daily-summary-desc">
+                  Daily overview of learner activities and progress
+                </p>
               </div>
-              <AccessibleToggle id="daily-summary" value={dailySummary} onChange={setDailySummary} label="Daily Summary" description="Daily overview of learner activities and progress" color="bg-[hsl(var(--visual-science))]" />
+              <AccessibleToggle
+                id="daily-summary"
+                value={dailySummary}
+                onChange={setDailySummary}
+                label="Daily Summary"
+                description="Daily overview of learner activities and progress"
+                color="bg-[hsl(var(--visual-science))]"
+              />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold vi-text" id="iep-alerts-label">IEP Goal Alerts</p>
-                <p className="text-xs vi-text-muted" id="iep-alerts-desc">Notifications when IEP goals are updated or milestones reached</p>
+                <p className="text-sm font-semibold vi-text" id="iep-alerts-label">
+                  IEP Goal Alerts
+                </p>
+                <p className="text-xs vi-text-muted" id="iep-alerts-desc">
+                  Notifications when IEP goals are updated or milestones reached
+                </p>
               </div>
-              <AccessibleToggle id="iep-alerts" value={iepAlerts} onChange={setIepAlerts} label="IEP Goal Alerts" description="Notifications when IEP goals are updated or milestones reached" color="bg-[hsl(var(--visual-science))]" />
+              <AccessibleToggle
+                id="iep-alerts"
+                value={iepAlerts}
+                onChange={setIepAlerts}
+                label="IEP Goal Alerts"
+                description="Notifications when IEP goals are updated or milestones reached"
+                color="bg-[hsl(var(--visual-science))]"
+              />
             </div>
           </div>
         )}
-        {saveStatus === "success" && <p className="text-sm text-[hsl(var(--visual-science))] mt-3 font-medium" role="status" aria-live="polite">Settings saved!</p>}
-        {saveStatus === "error" && <p className="text-sm text-[hsl(var(--visual-math))] mt-3 font-medium" role="alert">Failed to save settings. Please try again.</p>}
-        <button onClick={handleSaveSettings} disabled={saving} aria-busy={saving}
+        {saveStatus === "success" && (
+          <p
+            className="text-sm text-[hsl(var(--visual-science))] mt-3 font-medium"
+            role="status"
+            aria-live="polite"
+          >
+            Settings saved!
+          </p>
+        )}
+        {saveStatus === "error" && (
+          <p className="text-sm text-[hsl(var(--visual-math))] mt-3 font-medium" role="alert">
+            Failed to save settings. Please try again.
+          </p>
+        )}
+        <button
+          onClick={handleSaveSettings}
+          disabled={saving}
+          aria-busy={saving}
           style={{ minHeight: 44 }}
-          className="mt-4 px-6 py-2.5 rounded-xl bg-[hsl(var(--visual-primary))] text-white font-heading font-black uppercase tracking-wider text-sm hover:bg-[hsl(var(--visual-primary)/0.9)] transition disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--visual-primary))] focus-visible:ring-offset-2">
+          className="mt-4 px-6 py-2.5 rounded-xl bg-[hsl(var(--visual-primary))] text-white font-heading font-black uppercase tracking-wider text-sm hover:bg-[hsl(var(--visual-primary)/0.9)] transition disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--visual-primary))] focus-visible:ring-offset-2"
+        >
           {saving ? "Saving..." : "Save Preferences"}
         </button>
       </div>

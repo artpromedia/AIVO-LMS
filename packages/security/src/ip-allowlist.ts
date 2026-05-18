@@ -25,7 +25,7 @@ function parseV4(addr: string): number | null {
   for (const p of parts) {
     const o = Number(p);
     if (!Number.isInteger(o) || o < 0 || o > 255) return null;
-    n = (n * 256) + o;
+    n = n * 256 + o;
   }
   return n >>> 0;
 }
@@ -71,7 +71,7 @@ function parseCidr(raw: string): ParsedCidr | null {
   if (net === null) return null;
   const mask = maskStr === undefined ? 32 : Number(maskStr);
   if (!Number.isInteger(mask) || mask < 0 || mask > 32) return null;
-  const maskBits = mask === 0 ? 0 : (~((1 << (32 - mask)) - 1)) >>> 0;
+  const maskBits = mask === 0 ? 0 : ~((1 << (32 - mask)) - 1) >>> 0;
   return { raw, family: 4, v4Net: (net & maskBits) >>> 0, v4Mask: maskBits };
 }
 
@@ -94,7 +94,7 @@ export function ipMatches(allowlist: ParsedCidr[], ip: string): boolean {
   }
   const n = parseV4(normalized);
   if (n === null) return false;
-  return allowlist.some((c) => c.family === 4 && ((n & c.v4Mask!) >>> 0) === c.v4Net);
+  return allowlist.some((c) => c.family === 4 && (n & c.v4Mask!) >>> 0 === c.v4Net);
 }
 
 function clientIp(req: FastifyRequest): string {
@@ -118,10 +118,7 @@ export function registerAdminIpAllowlist(
   const allowlist = parseAllowlist(process.env[opts.envVar ?? "ADMIN_IP_ALLOWLIST"]);
   if (allowlist.length === 0) return; // off
   const prefixes = opts.prefixes ?? ["/api/admin/", "/api/admin-svc/"];
-  app.log.info(
-    { cidrs: allowlist.map((c) => c.raw), prefixes },
-    "admin ip allowlist enforcing",
-  );
+  app.log.info({ cidrs: allowlist.map((c) => c.raw), prefixes }, "admin ip allowlist enforcing");
   app.addHook("onRequest", async (req: FastifyRequest, reply: FastifyReply) => {
     const url = req.url || "";
     if (!prefixes.some((p) => url.startsWith(p))) return;

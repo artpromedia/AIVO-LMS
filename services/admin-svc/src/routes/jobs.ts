@@ -42,10 +42,21 @@ import type { JobRegistryEntry } from "@aivo/scheduling";
 import { freshnessWatchdogDiscoveries } from "@aivo/db";
 import { requirePlatformAdmin } from "../lib/auth.js";
 import { eq, lt, and, notInArray } from "drizzle-orm";
-import { getAdminSvcJobsSchema, getAdminSvcJobsByJobNameRunsSchema, getAdminSvcJobsByJobNameRunsCsvSchema, getAdminSvcJobsRunsCsvSchema, adminSvcJobsByJobNameRunNowSchema, getAdminSvcJobsFreshnessSchema, deleteAdminSvcJobsDiscoveryByJobNameSchema } from "./schemas.js";
+import {
+  getAdminSvcJobsSchema,
+  getAdminSvcJobsByJobNameRunsSchema,
+  getAdminSvcJobsByJobNameRunsCsvSchema,
+  getAdminSvcJobsRunsCsvSchema,
+  adminSvcJobsByJobNameRunNowSchema,
+  getAdminSvcJobsFreshnessSchema,
+  deleteAdminSvcJobsDiscoveryByJobNameSchema,
+} from "./schemas.js";
 
 interface RunNowRequester {
-  request(jobName: string, owner: JobRegistryEntry): Promise<{ ok: boolean; status?: string; error?: string }>;
+  request(
+    jobName: string,
+    owner: JobRegistryEntry,
+  ): Promise<{ ok: boolean; status?: string; error?: string }>;
 }
 
 const defaultRunNowRequester: RunNowRequester = {
@@ -96,7 +107,10 @@ export function registerJobsRoutes(app: FastifyInstance, db: any, deps: JobsRout
       SELECT job_name, first_seen_at, last_seen_at FROM freshness_watchdog_discoveries
     `)) as { rows?: Array<Record<string, any>> } | Array<Record<string, any>>;
     const discoveryList = Array.isArray(discoveryRows) ? discoveryRows : (discoveryRows.rows ?? []);
-    const discoveryByName = new Map<string, { firstSeenAt: Date | null; lastSeenAt: Date | null }>();
+    const discoveryByName = new Map<
+      string,
+      { firstSeenAt: Date | null; lastSeenAt: Date | null }
+    >();
     for (const r of discoveryList) {
       discoveryByName.set(r.job_name, {
         firstSeenAt: r.first_seen_at ? new Date(r.first_seen_at) : null,
@@ -106,9 +120,7 @@ export function registerJobsRoutes(app: FastifyInstance, db: any, deps: JobsRout
 
     const out = JOB_REGISTRY.map((entry) => {
       const row = byName.get(entry.jobName);
-      const lastFinishedAt = row?.last_finished_at
-        ? new Date(row.last_finished_at)
-        : null;
+      const lastFinishedAt = row?.last_finished_at ? new Date(row.last_finished_at) : null;
       const lastRunAt = row?.last_run_at ? new Date(row.last_run_at) : null;
       const freshness = computeFreshness({
         jobName: entry.jobName,
@@ -167,150 +179,182 @@ export function registerJobsRoutes(app: FastifyInstance, db: any, deps: JobsRout
     return { jobs: out };
   });
 
-  app.get("/api/admin-svc/jobs/:jobName/runs", { schema: getAdminSvcJobsByJobNameRunsSchema }, async (req, reply) => {
-    const me = await requirePlatformAdmin(req, reply);
-    if (!me) return;
+  app.get(
+    "/api/admin-svc/jobs/:jobName/runs",
+    { schema: getAdminSvcJobsByJobNameRunsSchema },
+    async (req, reply) => {
+      const me = await requirePlatformAdmin(req, reply);
+      if (!me) return;
 
-    const params = req.params as { jobName: string };
-    const { rows, limit, since, until } = await selectJobRuns(db, params.jobName, req.query as Record<string, unknown>);
+      const params = req.params as { jobName: string };
+      const { rows, limit, since, until } = await selectJobRuns(
+        db,
+        params.jobName,
+        req.query as Record<string, unknown>,
+      );
 
-    return {
-      jobName: params.jobName,
-      limit,
-      since: since ? since.toISOString() : null,
-      until: until ? until.toISOString() : null,
-      runs: rows.map((r) => ({
-        id: r.id,
-        runAt: r.run_at,
-        finishedAt: r.finished_at,
-        replicaId: r.replica_id,
-        status: r.status,
-        durationMs: r.duration_ms,
-        error: r.error,
-      })),
-    };
-  });
+      return {
+        jobName: params.jobName,
+        limit,
+        since: since ? since.toISOString() : null,
+        until: until ? until.toISOString() : null,
+        runs: rows.map((r) => ({
+          id: r.id,
+          runAt: r.run_at,
+          finishedAt: r.finished_at,
+          replicaId: r.replica_id,
+          status: r.status,
+          durationMs: r.duration_ms,
+          error: r.error,
+        })),
+      };
+    },
+  );
 
   // Per-job CSV export with time-range filtering (#205). Same query shape
   // as /runs but the response is text/csv with a content-disposition so the
   // browser downloads it.
-  app.get("/api/admin-svc/jobs/:jobName/runs.csv", { schema: getAdminSvcJobsByJobNameRunsCsvSchema }, async (req, reply) => {
-    const me = await requirePlatformAdmin(req, reply);
-    if (!me) return;
+  app.get(
+    "/api/admin-svc/jobs/:jobName/runs.csv",
+    { schema: getAdminSvcJobsByJobNameRunsCsvSchema },
+    async (req, reply) => {
+      const me = await requirePlatformAdmin(req, reply);
+      if (!me) return;
 
-    const params = req.params as { jobName: string };
-    const { rows, since, until } = await selectJobRuns(db, params.jobName, req.query as Record<string, unknown>);
-    const filename = csvFilename(`${params.jobName}-runs`, since, until);
-    reply.header("content-type", "text/csv; charset=utf-8");
-    reply.header("content-disposition", `attachment; filename="${filename}"`);
-    return runsToCsv(params.jobName, rows);
-  });
+      const params = req.params as { jobName: string };
+      const { rows, since, until } = await selectJobRuns(
+        db,
+        params.jobName,
+        req.query as Record<string, unknown>,
+      );
+      const filename = csvFilename(`${params.jobName}-runs`, since, until);
+      reply.header("content-type", "text/csv; charset=utf-8");
+      reply.header("content-disposition", `attachment; filename="${filename}"`);
+      return runsToCsv(params.jobName, rows);
+    },
+  );
 
   // Bulk export across every retained run for every job (#206). Quarterly
   // review write-ups need a single sheet covering "all watchdog activity in
   // Q1"; without this, on-call has to click each per-job download in turn.
-  app.get("/api/admin-svc/jobs/runs.csv", { schema: getAdminSvcJobsRunsCsvSchema }, async (req, reply) => {
-    const me = await requirePlatformAdmin(req, reply);
-    if (!me) return;
+  app.get(
+    "/api/admin-svc/jobs/runs.csv",
+    { schema: getAdminSvcJobsRunsCsvSchema },
+    async (req, reply) => {
+      const me = await requirePlatformAdmin(req, reply);
+      if (!me) return;
 
-    const query = req.query as Record<string, unknown>;
-    const since = parseIsoQueryParam(query.since);
-    const until = parseIsoQueryParam(query.until);
-    // Same per-job retention applies (rows are pruned to ~50 by the
-    // janitor, #178), so the worst-case row count is bounded by
-    // JOB_REGISTRY × 50. Streaming a single SELECT across the table is
-    // safe.
-    const conditions: any[] = [];
-    if (since) conditions.push(sql`run_at >= ${since}`);
-    if (until) conditions.push(sql`run_at <= ${until}`);
-    const where =
-      conditions.length === 0
-        ? sql`TRUE`
-        : conditions.reduce((acc, c, i) => (i === 0 ? c : sql`${acc} AND ${c}`));
-    const result = (await db.execute(sql`
+      const query = req.query as Record<string, unknown>;
+      const since = parseIsoQueryParam(query.since);
+      const until = parseIsoQueryParam(query.until);
+      // Same per-job retention applies (rows are pruned to ~50 by the
+      // janitor, #178), so the worst-case row count is bounded by
+      // JOB_REGISTRY × 50. Streaming a single SELECT across the table is
+      // safe.
+      const conditions: any[] = [];
+      if (since) conditions.push(sql`run_at >= ${since}`);
+      if (until) conditions.push(sql`run_at <= ${until}`);
+      const where =
+        conditions.length === 0
+          ? sql`TRUE`
+          : conditions.reduce((acc, c, i) => (i === 0 ? c : sql`${acc} AND ${c}`));
+      const result = (await db.execute(sql`
       SELECT id, job_name, run_at, finished_at, replica_id, status, duration_ms, error
       FROM periodic_job_runs
       WHERE ${where}
       ORDER BY run_at DESC
       LIMIT 5000
     `)) as { rows?: Array<Record<string, any>> } | Array<Record<string, any>>;
-    const rows = Array.isArray(result) ? result : (result.rows ?? []);
+      const rows = Array.isArray(result) ? result : (result.rows ?? []);
 
-    const filename = csvFilename(`all-watchdog-runs`, since, until);
-    reply.header("content-type", "text/csv; charset=utf-8");
-    reply.header("content-disposition", `attachment; filename="${filename}"`);
-    return runsToCsv(null, rows);
-  });
+      const filename = csvFilename(`all-watchdog-runs`, since, until);
+      reply.header("content-type", "text/csv; charset=utf-8");
+      reply.header("content-disposition", `attachment; filename="${filename}"`);
+      return runsToCsv(null, rows);
+    },
+  );
 
-  app.post("/api/admin-svc/jobs/:jobName/run-now", { schema: adminSvcJobsByJobNameRunNowSchema }, async (req, reply) => {
-    const me = await requirePlatformAdmin(req, reply);
-    if (!me) return;
-    const params = req.params as { jobName: string };
-    const owner = JOB_REGISTRY.find((j) => j.jobName === params.jobName);
-    if (!owner) {
-      reply.code(404).send({ error: "job_not_registered", jobName: params.jobName });
-      return;
-    }
-    const result = await runNow.request(params.jobName, owner);
-    if (!result.ok) {
-      reply.code(502).send({ error: "remote_failed", detail: result.error });
-      return;
-    }
-    return { ok: true, status: result.status ?? "queued" };
-  });
+  app.post(
+    "/api/admin-svc/jobs/:jobName/run-now",
+    { schema: adminSvcJobsByJobNameRunNowSchema },
+    async (req, reply) => {
+      const me = await requirePlatformAdmin(req, reply);
+      if (!me) return;
+      const params = req.params as { jobName: string };
+      const owner = JOB_REGISTRY.find((j) => j.jobName === params.jobName);
+      if (!owner) {
+        reply.code(404).send({ error: "job_not_registered", jobName: params.jobName });
+        return;
+      }
+      const result = await runNow.request(params.jobName, owner);
+      if (!result.ok) {
+        reply.code(502).send({ error: "remote_failed", detail: result.error });
+        return;
+      }
+      return { ok: true, status: result.status ?? "queued" };
+    },
+  );
 
-  app.get("/api/admin-svc/jobs/freshness", { schema: getAdminSvcJobsFreshnessSchema }, async (req, reply) => {
-    const me = await requirePlatformAdmin(req, reply);
-    if (!me) return;
+  app.get(
+    "/api/admin-svc/jobs/freshness",
+    { schema: getAdminSvcJobsFreshnessSchema },
+    async (req, reply) => {
+      const me = await requirePlatformAdmin(req, reply);
+      if (!me) return;
 
-    const ledgerResult = (await db.execute(sql`
+      const ledgerResult = (await db.execute(sql`
       SELECT job_name, last_run_at, last_finished_at, last_status FROM daily_job_runs
     `)) as { rows?: Array<Record<string, any>> } | Array<Record<string, any>>;
-    const ledgerRows = Array.isArray(ledgerResult) ? ledgerResult : (ledgerResult.rows ?? []);
-    const byName = new Map<string, Record<string, any>>();
-    for (const r of ledgerRows) byName.set(r.job_name, r);
+      const ledgerRows = Array.isArray(ledgerResult) ? ledgerResult : (ledgerResult.rows ?? []);
+      const byName = new Map<string, Record<string, any>>();
+      for (const r of ledgerRows) byName.set(r.job_name, r);
 
-    const reports = JOB_REGISTRY.map((entry) => {
-      const row = byName.get(entry.jobName);
-      return computeFreshness({
-        jobName: entry.jobName,
-        periodMs: entry.periodMs,
-        lastRunAt: row?.last_run_at ? new Date(row.last_run_at) : null,
-        lastFinishedAt: row?.last_finished_at ? new Date(row.last_finished_at) : null,
-        lastStatus: row?.last_status ?? null,
+      const reports = JOB_REGISTRY.map((entry) => {
+        const row = byName.get(entry.jobName);
+        return computeFreshness({
+          jobName: entry.jobName,
+          periodMs: entry.periodMs,
+          lastRunAt: row?.last_run_at ? new Date(row.last_run_at) : null,
+          lastFinishedAt: row?.last_finished_at ? new Date(row.last_finished_at) : null,
+          lastStatus: row?.last_status ?? null,
+        });
       });
-    });
 
-    const counts = {
-      fresh: reports.filter((r) => r.status === "fresh" && !r.failed).length,
-      warning: reports.filter((r) => r.status === "warning").length,
-      stale: reports.filter((r) => r.status === "stale").length,
-      never_run: reports.filter((r) => r.status === "never_run").length,
-      failed: reports.filter((r) => r.failed).length,
-    };
+      const counts = {
+        fresh: reports.filter((r) => r.status === "fresh" && !r.failed).length,
+        warning: reports.filter((r) => r.status === "warning").length,
+        stale: reports.filter((r) => r.status === "stale").length,
+        never_run: reports.filter((r) => r.status === "never_run").length,
+        failed: reports.filter((r) => r.failed).length,
+      };
 
-    return { generatedAt: new Date().toISOString(), counts, reports };
-  });
+      return { generatedAt: new Date().toISOString(), counts, reports };
+    },
+  );
 
   // Cleanup endpoint for #188. The discovery registry grows by one row per
   // (service, jobName) pair and never shrinks; when a watchdog is removed
   // from a service, its row sticks around forever with a stale lastSeenAt.
   // On-call uses this DELETE to retire those rows manually.
-  app.delete("/api/admin-svc/jobs/discovery/:jobName", { schema: deleteAdminSvcJobsDiscoveryByJobNameSchema }, async (req, reply) => {
-    const me = await requirePlatformAdmin(req, reply);
-    if (!me) return;
-    const params = req.params as { jobName: string };
-    const result = await db
-      .delete(freshnessWatchdogDiscoveries)
-      .where(eq(freshnessWatchdogDiscoveries.jobName, params.jobName))
-      .returning({ jobName: freshnessWatchdogDiscoveries.jobName });
-    const rows = Array.isArray(result) ? result : ((result as { rows?: any[] }).rows ?? []);
-    if (rows.length === 0) {
-      reply.code(404).send({ error: "discovery_not_found", jobName: params.jobName });
-      return;
-    }
-    return { ok: true, jobName: params.jobName };
-  });
+  app.delete(
+    "/api/admin-svc/jobs/discovery/:jobName",
+    { schema: deleteAdminSvcJobsDiscoveryByJobNameSchema },
+    async (req, reply) => {
+      const me = await requirePlatformAdmin(req, reply);
+      if (!me) return;
+      const params = req.params as { jobName: string };
+      const result = await db
+        .delete(freshnessWatchdogDiscoveries)
+        .where(eq(freshnessWatchdogDiscoveries.jobName, params.jobName))
+        .returning({ jobName: freshnessWatchdogDiscoveries.jobName });
+      const rows = Array.isArray(result) ? result : ((result as { rows?: any[] }).rows ?? []);
+      if (rows.length === 0) {
+        reply.code(404).send({ error: "discovery_not_found", jobName: params.jobName });
+        return;
+      }
+      return { ok: true, jobName: params.jobName };
+    },
+  );
 }
 
 interface JobRunsQuery {
@@ -323,7 +367,12 @@ async function selectJobRuns(
   db: any,
   jobName: string,
   query: Record<string, unknown>,
-): Promise<{ rows: Array<Record<string, any>>; limit: number; since: Date | null; until: Date | null }> {
+): Promise<{
+  rows: Array<Record<string, any>>;
+  limit: number;
+  since: Date | null;
+  until: Date | null;
+}> {
   const q = query as JobRunsQuery;
   let limit = 200;
   if (typeof q.limit === "string") {
@@ -389,7 +438,7 @@ function csvCell(v: string | number | Date | null | undefined): string {
   if (v === null || v === undefined) return "";
   const s = v instanceof Date ? v.toISOString() : String(v);
   // RFC 4180 quoting only for cells containing comma, quote, or newline.
-  if (s.includes(",") || s.includes("\"") || s.includes("\n")) {
+  if (s.includes(",") || s.includes('"') || s.includes("\n")) {
     return `"${s.replace(/"/g, '""')}"`;
   }
   return s;

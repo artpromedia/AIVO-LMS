@@ -1,5 +1,15 @@
 "use client";
-import { Map, Calculator, BookOpen, Beaker, Hourglass, Code2, ChevronRight, Swords, Camera } from "lucide-react";
+import {
+  Map,
+  Calculator,
+  BookOpen,
+  Beaker,
+  Hourglass,
+  Code2,
+  ChevronRight,
+  Swords,
+  Camera,
+} from "lucide-react";
 import { TUTORS, getTutorsForTier } from "@aivo/brand";
 import { useFlVariant, LearnerCard, useTierThemeOptional } from "@aivo/learner-ui";
 import { useTranslations } from "next-intl";
@@ -23,9 +33,7 @@ export function AdventuresTab({ onNavigate }: AdventuresTabProps) {
 
   // Hide quest worlds whose tutor isn't curricular for this learner's tier
   // (e.g. Chrono / world_time is removed for K-5 EARLY learners).
-  const allowedTutorKeys = new Set(
-    getTutorsForTier(tierCtx?.theme.id ?? null).map(([k]) => k),
-  );
+  const allowedTutorKeys = new Set(getTutorsForTier(tierCtx?.theme.id ?? null).map(([k]) => k));
   const visibleQuests = QUEST_WORLDS.filter((w) => allowedTutorKeys.has(w.tutor));
 
   return (
@@ -35,7 +43,9 @@ export function AdventuresTab({ onNavigate }: AdventuresTabProps) {
           <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]">
             <Map className="w-5 h-5" strokeWidth={2.5} aria-hidden />
           </div>
-          <h3 className="font-extrabold text-slate-900">{isLow ? t("adventures_title_simple") : t("quest_worlds_title")}</h3>
+          <h3 className="font-extrabold text-slate-900">
+            {isLow ? t("adventures_title_simple") : t("quest_worlds_title")}
+          </h3>
         </div>
         <div className="space-y-2">
           {visibleQuests.slice(0, isLow ? 3 : 5).map((world) => {
@@ -61,7 +71,10 @@ export function AdventuresTab({ onNavigate }: AdventuresTabProps) {
                   <p className="text-sm font-extrabold text-slate-900">{t(world.nameKey)}</p>
                   <p className="text-xs text-slate-500 font-semibold">{t("explore_quests")}</p>
                 </div>
-                <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-[hsl(var(--visual-primary))] transition-colors" aria-hidden />
+                <ChevronRight
+                  className="w-5 h-5 text-slate-300 group-hover:text-[hsl(var(--visual-primary))] transition-colors"
+                  aria-hidden
+                />
               </button>
             );
           })}

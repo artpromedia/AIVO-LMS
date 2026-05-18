@@ -43,13 +43,25 @@ describe("tutor-svc → ai-svc speech buddy client", () => {
       seenUrls.push(url);
       seenHeaders.push(init.headers as Record<string, string>);
       return new Response(
-        JSON.stringify({ sessionId: "sx", ageBand: "6-9", locale: "en", nicknameToken: "Buddy", state: "greet", startedAt: "now", targetedSkills: [] }),
+        JSON.stringify({
+          sessionId: "sx",
+          ageBand: "6-9",
+          locale: "en",
+          nicknameToken: "Buddy",
+          state: "greet",
+          startedAt: "now",
+          targetedSkills: [],
+        }),
         { status: 200, headers: { "content-type": "application/json" } },
       );
     };
     try {
       await aiSvc.startSession({
-        tenantId: "t1", learnerId: "l1", ageBand: "6-9", locale: "en", consentRecordId: "c1",
+        tenantId: "t1",
+        learnerId: "l1",
+        ageBand: "6-9",
+        locale: "en",
+        consentRecordId: "c1",
       });
     } finally {
       (globalThis as any).fetch = realFetch;
@@ -79,10 +91,19 @@ describe("tutor-svc → ai-svc speech buddy client", () => {
     const realFetch = globalThis.fetch;
     (globalThis as any).fetch = async (_url: string, init: any) => {
       seenHeaders.push(init.headers as Record<string, string>);
-      return new Response(JSON.stringify({
-        buddyText: "ok", buddyAudioBase64: "", nextState: "roleplayTurn",
-        ended: false, endedReason: null, trace: {}, safetyFlags: [], skillEvidence: [],
-      }), { status: 200, headers: { "content-type": "application/json" } });
+      return new Response(
+        JSON.stringify({
+          buddyText: "ok",
+          buddyAudioBase64: "",
+          nextState: "roleplayTurn",
+          ended: false,
+          endedReason: null,
+          trace: {},
+          safetyFlags: [],
+          skillEvidence: [],
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      );
     };
     try {
       await aiSvc.runTurn("sess-1", { text: "hi" }, { tenantId: "tenant-A", learnerId: "child-7" });
@@ -114,7 +135,12 @@ describe("tutor-svc → ai-svc speech buddy client", () => {
       });
     };
     const ac = new AbortController();
-    const p = aiSvc.runTurn("s", { text: "hi" }, { tenantId: "t", learnerId: "l" }, { signal: ac.signal });
+    const p = aiSvc.runTurn(
+      "s",
+      { text: "hi" },
+      { tenantId: "t", learnerId: "l" },
+      { signal: ac.signal },
+    );
     setTimeout(() => ac.abort(), 5);
     try {
       await p;
@@ -131,10 +157,20 @@ describe("tutor-svc → ai-svc speech buddy client", () => {
   it("returns base64 buddy audio in TurnResponse so the WS layer can stream it back", async () => {
     const realFetch = globalThis.fetch;
     const audio = Buffer.from([0x49, 0x44, 0x33, 0x04, 0x00]).toString("base64");
-    (globalThis as any).fetch = async () => new Response(JSON.stringify({
-      buddyText: "hi friend", buddyAudioBase64: audio, nextState: "roleplayTurn",
-      ended: false, endedReason: null, trace: {}, safetyFlags: [], skillEvidence: [],
-    }), { status: 200, headers: { "content-type": "application/json" } });
+    (globalThis as any).fetch = async () =>
+      new Response(
+        JSON.stringify({
+          buddyText: "hi friend",
+          buddyAudioBase64: audio,
+          nextState: "roleplayTurn",
+          ended: false,
+          endedReason: null,
+          trace: {},
+          safetyFlags: [],
+          skillEvidence: [],
+        }),
+        { status: 200, headers: { "content-type": "application/json" } },
+      );
     try {
       const r = await aiSvc.runTurn("s", { text: "hi" }, { tenantId: "t", learnerId: "l" });
       assert.equal(r.buddyAudioBase64, audio);

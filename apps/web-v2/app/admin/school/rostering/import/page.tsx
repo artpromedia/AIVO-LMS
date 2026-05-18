@@ -36,9 +36,13 @@ learner,Sky,Doe,sky@family.example,lrn_demo_sky,Room 4A — Ms. Vega,3-5
       />
       <Card className="p-[var(--aivo-density-card-pad)]">
         <p className="mb-3 text-sm text-aivo-ink-soft">
-          Required columns: <code className="font-mono text-xs">role, first_name, last_name, email, external_id, classroom_name, grade_band</code>.
-          Roles must be one of <code className="font-mono text-xs">learner | teacher | co_teacher</code>.
-          Grade bands: <code className="font-mono text-xs">K-2, 3-5, 6-8, 9-12</code>.
+          Required columns:{" "}
+          <code className="font-mono text-xs">
+            role, first_name, last_name, email, external_id, classroom_name, grade_band
+          </code>
+          . Roles must be one of{" "}
+          <code className="font-mono text-xs">learner | teacher | co_teacher</code>. Grade bands:{" "}
+          <code className="font-mono text-xs">K-2, 3-5, 6-8, 9-12</code>.
         </p>
         <RosterImportForm schoolId={selectedSchool.id} sampleCsv={sampleCsv} />
       </Card>

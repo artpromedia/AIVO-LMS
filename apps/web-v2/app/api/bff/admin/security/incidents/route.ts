@@ -15,7 +15,10 @@ export async function GET(req: Request): Promise<NextResponse> {
     if (response) return response;
     const roleErr = requireRole(session!, ["platform_admin"], requestId);
     if (roleErr) return roleErr;
-    const incidents = listIncidents().map((i) => ({ incident: i, timeline: listIncidentTimeline(i.id) }));
+    const incidents = listIncidents().map((i) => ({
+      incident: i,
+      timeline: listIncidentTimeline(i.id),
+    }));
     return ok({ incidents }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
@@ -40,10 +43,18 @@ export async function POST(req: Request): Promise<NextResponse> {
     const body = await req.json().catch(() => null);
     const parsed = schema.safeParse(body);
     if (!parsed.success) {
-      return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." }, requestId);
+      return fail(
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
+        requestId,
+      );
     }
     const inc = createIncident({ ...parsed.data, commanderUserId: session!.userId });
-    audit(session!, "security.incident.opened", requestId, { metadata: { incidentId: inc.id, severity: inc.severity } });
+    audit(session!, "security.incident.opened", requestId, {
+      metadata: { incidentId: inc.id, severity: inc.severity },
+    });
     return ok({ incident: inc }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

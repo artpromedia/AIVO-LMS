@@ -84,7 +84,9 @@ export interface CheckoutForPlanArgs {
   learnerCount?: number;
 }
 
-export async function createPlanCheckoutSession(args: CheckoutForPlanArgs): Promise<Stripe.Checkout.Session> {
+export async function createPlanCheckoutSession(
+  args: CheckoutForPlanArgs,
+): Promise<Stripe.Checkout.Session> {
   const stripe = getStripe();
   return stripe.checkout.sessions.create(
     {
@@ -92,7 +94,7 @@ export async function createPlanCheckoutSession(args: CheckoutForPlanArgs): Prom
       success_url: args.successUrl ?? getReturnUrl("billing_success"),
       cancel_url: args.cancelUrl ?? getReturnUrl("billing_cancel"),
       customer: args.customerId ?? undefined,
-      customer_email: args.customerId ? undefined : args.customerEmail ?? undefined,
+      customer_email: args.customerId ? undefined : (args.customerEmail ?? undefined),
       line_items: [
         {
           price: getPriceIdForPlan(args.plan),
@@ -132,7 +134,9 @@ export interface PortalSessionArgs {
   idempotencyDiscriminator?: string;
 }
 
-export async function createBillingPortalSession(args: PortalSessionArgs): Promise<Stripe.BillingPortal.Session> {
+export async function createBillingPortalSession(
+  args: PortalSessionArgs,
+): Promise<Stripe.BillingPortal.Session> {
   const stripe = getStripe();
   const minuteBucket = args.idempotencyDiscriminator ?? String(Math.floor(Date.now() / 60_000));
   return stripe.billingPortal.sessions.create(

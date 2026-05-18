@@ -102,12 +102,8 @@ export function LegalPageLayout({
           <h1 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 mb-4 leading-tight">
             {title}
           </h1>
-          <p className="text-lg text-slate-500 font-body max-w-2xl">
-            {subtitle}
-          </p>
-          <p className="text-sm text-slate-400 font-body mt-4">
-            Last updated: {lastUpdated}
-          </p>
+          <p className="text-lg text-slate-500 font-body max-w-2xl">{subtitle}</p>
+          <p className="text-sm text-slate-400 font-body mt-4">Last updated: {lastUpdated}</p>
         </div>
       </div>
 
@@ -126,25 +122,17 @@ export function LegalPageLayout({
               </h2>
               {Array.isArray(section.content) ? (
                 section.content.map((paragraph, pi) => (
-                  <p
-                    key={pi}
-                    className="text-slate-600 font-body leading-relaxed mb-4"
-                  >
+                  <p key={pi} className="text-slate-600 font-body leading-relaxed mb-4">
                     {paragraph}
                   </p>
                 ))
               ) : (
-                <p className="text-slate-600 font-body leading-relaxed mb-4">
-                  {section.content}
-                </p>
+                <p className="text-slate-600 font-body leading-relaxed mb-4">{section.content}</p>
               )}
               {section.list && (
                 <ul className="space-y-2 mt-4">
                   {section.list.map((item, li) => (
-                    <li
-                      key={li}
-                      className="flex items-start gap-3 text-slate-600 font-body"
-                    >
+                    <li key={li} className="flex items-start gap-3 text-slate-600 font-body">
                       <svg
                         className="w-5 h-5 mt-0.5 flex-shrink-0"
                         style={{ color: accentColor }}
@@ -175,9 +163,7 @@ export function LegalPageLayout({
             borderColor: `${accentColor}20`,
           }}
         >
-          <h3 className="text-xl font-heading font-bold text-slate-900 mb-2">
-            Questions?
-          </h3>
+          <h3 className="text-xl font-heading font-bold text-slate-900 mb-2">Questions?</h3>
           <p className="text-slate-600 font-body mb-4">
             If you have any questions about this policy, please reach out to our team.
           </p>
@@ -187,7 +173,12 @@ export function LegalPageLayout({
             style={{ backgroundColor: accentColor }}
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              />
             </svg>
             {contactEmail}
           </a>
@@ -205,11 +196,36 @@ export function LegalPageLayout({
               style={{ width: "auto", height: "auto" }}
             />
             <nav className="hidden md:flex items-center gap-4">
-              <Link href="/privacy-policy" className="text-sm text-slate-400 hover:text-white transition">Privacy</Link>
-              <Link href="/terms-of-service" className="text-sm text-slate-400 hover:text-white transition">Terms</Link>
-              <Link href="/coppa-compliance" className="text-sm text-slate-400 hover:text-white transition">COPPA</Link>
-              <Link href="/ferpa-compliance" className="text-sm text-slate-400 hover:text-white transition">FERPA</Link>
-              <Link href="/accessibility" className="text-sm text-slate-400 hover:text-white transition">Accessibility</Link>
+              <Link
+                href="/privacy-policy"
+                className="text-sm text-slate-400 hover:text-white transition"
+              >
+                Privacy
+              </Link>
+              <Link
+                href="/terms-of-service"
+                className="text-sm text-slate-400 hover:text-white transition"
+              >
+                Terms
+              </Link>
+              <Link
+                href="/coppa-compliance"
+                className="text-sm text-slate-400 hover:text-white transition"
+              >
+                COPPA
+              </Link>
+              <Link
+                href="/ferpa-compliance"
+                className="text-sm text-slate-400 hover:text-white transition"
+              >
+                FERPA
+              </Link>
+              <Link
+                href="/accessibility"
+                className="text-sm text-slate-400 hover:text-white transition"
+              >
+                Accessibility
+              </Link>
             </nav>
           </div>
           <p className="text-sm text-slate-500 font-body">

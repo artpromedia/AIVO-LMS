@@ -12,8 +12,7 @@ export function RetentionRow({ policy }: { policy: DataRetentionPolicy }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const dirty =
-    retentionDays !== policy.retentionDays || archiveDays !== policy.archiveDays;
+  const dirty = retentionDays !== policy.retentionDays || archiveDays !== policy.archiveDays;
 
   async function save() {
     setBusy(true);

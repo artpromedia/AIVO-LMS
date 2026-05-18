@@ -26,8 +26,7 @@ export async function PATCH(req: Request): Promise<NextResponse> {
     const { session, response } = await requireSession(req, requestId);
     if (response) return response;
     const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
-    const displayName =
-      typeof body.displayName === "string" ? body.displayName.trim() : null;
+    const displayName = typeof body.displayName === "string" ? body.displayName.trim() : null;
     if (!displayName || displayName.length > 120) {
       return fail(
         { ...ERRORS.VALIDATION_FAILED, message: "displayName is required (1-120)." },

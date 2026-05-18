@@ -41,26 +41,35 @@ export default function DemoPage() {
         aria-labelledby="demo-what-happens-heading"
         className="mt-10 rounded-3xl border border-slate-200 bg-slate-50/60 p-6 md:p-8"
       >
-        <h2 id="demo-what-happens-heading" className="font-heading text-xl font-bold text-slate-900">
+        <h2
+          id="demo-what-happens-heading"
+          className="font-heading text-xl font-bold text-slate-900"
+        >
           What happens next
         </h2>
         <ol className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
           <li className="rounded-2xl border border-slate-200 bg-white p-5">
-            <span className="font-heading text-sm font-bold text-purple-700">Step 1 · Within 1 business day</span>
+            <span className="font-heading text-sm font-bold text-purple-700">
+              Step 1 · Within 1 business day
+            </span>
             <p className="mt-1 font-body text-slate-700">
               A team member emails to confirm your goals and pick a time.
             </p>
           </li>
           <li className="rounded-2xl border border-slate-200 bg-white p-5">
-            <span className="font-heading text-sm font-bold text-purple-700">Step 2 · 30-minute walkthrough</span>
+            <span className="font-heading text-sm font-bold text-purple-700">
+              Step 2 · 30-minute walkthrough
+            </span>
             <p className="mt-1 font-body text-slate-700">
               We show learner, parent, and teacher views — and answer your questions live.
             </p>
           </li>
           <li className="rounded-2xl border border-slate-200 bg-white p-5">
-            <span className="font-heading text-sm font-bold text-purple-700">Step 3 · Pilot or proposal</span>
+            <span className="font-heading text-sm font-bold text-purple-700">
+              Step 3 · Pilot or proposal
+            </span>
             <p className="mt-1 font-body text-slate-700">
-              If it's a fit, we scope a short pilot or send a written proposal — no pressure.
+              If it&apos;s a fit, we scope a short pilot or send a written proposal — no pressure.
             </p>
           </li>
         </ol>

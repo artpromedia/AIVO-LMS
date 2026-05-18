@@ -10,7 +10,10 @@ import { isAudioMuted, speakUtterance, subscribeAudioMuted } from "./audio";
  * Toggling mute mid-utterance cancels the in-flight speech via the
  * shared cancel handler from `audio.ts`.
  */
-export function useTutorVoice(text: string | null | undefined, opts: { rate?: number; pitch?: number; lang?: string; enabled?: boolean } = {}): void {
+export function useTutorVoice(
+  text: string | null | undefined,
+  opts: { rate?: number; pitch?: number; lang?: string; enabled?: boolean } = {},
+): void {
   const { enabled = true, rate, pitch, lang } = opts;
   const cancelRef = useRef<(() => void) | null>(null);
   const lastTextRef = useRef<string | null>(null);

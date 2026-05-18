@@ -48,8 +48,7 @@ export default async function LearnerBaselineIndex() {
 
   const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
   const ready =
-    Boolean(assessment.submittedAt) &&
-    Boolean(getBrainProfile(learnerId, session.tenantId));
+    Boolean(assessment.submittedAt) && Boolean(getBrainProfile(learnerId, session.tenantId));
   const baseline = getActiveBaselineForLearner(learnerId, session.tenantId);
 
   return (
@@ -80,13 +79,9 @@ export default async function LearnerBaselineIndex() {
           <Play className="h-6 w-6 text-aivo-primary" />
           <div className="flex-1">
             <p className="font-display text-lg font-semibold">
-              {baseline?.status === "complete"
-                ? "Want to try again?"
-                : "Ready when you are"}
+              {baseline?.status === "complete" ? "Want to try again?" : "Ready when you are"}
             </p>
-            <p className="text-sm text-aivo-ink-soft">
-              Take your time. You can skip any question.
-            </p>
+            <p className="text-sm text-aivo-ink-soft">Take your time. You can skip any question.</p>
           </div>
           <form action={ensureBaselineAction}>
             <Button type="submit">

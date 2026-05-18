@@ -41,33 +41,23 @@ interface Props {
   lastCorrect: boolean | null;
   /** Beat answer handlers — wired by the screen to the API clients. */
   onChoiceAnswer: (beat: Beat & { kind: "choice" }, answer: string) => Promise<void>;
-  onMathExpression: (
-    beat: Beat & { kind: "math-expression" },
-    expression: string,
-  ) => Promise<void>;
+  onMathExpression: (beat: Beat & { kind: "math-expression" }, expression: string) => Promise<void>;
   onSurfaceSubmit: (beat: Beat & { kind: "surface" }, commands: unknown) => Promise<void>;
   onTutorTurnContinue: (beat: Beat & { kind: "tutor-turn" }) => Promise<void>;
   onAdvance: () => void;
 }
 
 export function MobileStageRuntime(props: Props) {
-  const beat = props.session.stagePlan.beats[props.currentIndex];
+  // `beat` may be undefined at the end of a session; every hook below must
+  // still be called unconditionally to satisfy react-hooks/rules-of-hooks.
+  const beat: Beat | undefined = props.session.stagePlan.beats[props.currentIndex];
   const total = props.session.stagePlan.beats.length;
   const isLast = props.currentIndex >= total - 1;
   const layout = useStageLayout();
   const styles = createStyles(props.theme);
 
-  if (!beat) {
-    return (
-      <View style={styles.empty}>
-        <Text style={styles.emptyText}>
-          This session has no remaining activities.
-        </Text>
-      </View>
-    );
-  }
-
   const tutorMessage = useMemo(() => {
+    if (!beat) return props.labels.intro;
     if (!props.answered) return beat.prompt ?? props.labels.intro;
     if (props.lastCorrect === true) return props.labels.encourage;
     if (props.lastCorrect === false && beat.kind === "choice") {
@@ -78,7 +68,7 @@ export function MobileStageRuntime(props: Props) {
 
   const handleChoice = useCallback(
     (answer: string) => {
-      if (beat.kind !== "choice") return;
+      if (!beat || beat.kind !== "choice") return;
       void props.onChoiceAnswer(beat, answer);
     },
     [beat, props],
@@ -86,7 +76,7 @@ export function MobileStageRuntime(props: Props) {
 
   const handleMath = useCallback(
     (expression: string) => {
-      if (beat.kind !== "math-expression") return;
+      if (!beat || beat.kind !== "math-expression") return;
       void props.onMathExpression(beat, expression);
     },
     [beat, props],
@@ -94,29 +84,33 @@ export function MobileStageRuntime(props: Props) {
 
   const handleSurface = useCallback(
     (commands: unknown) => {
-      if (beat.kind !== "surface") return;
+      if (!beat || beat.kind !== "surface") return;
       void props.onSurfaceSubmit(beat, commands);
     },
     [beat, props],
   );
 
   const handleTutorContinue = useCallback(() => {
-    if (beat.kind !== "tutor-turn") return;
+    if (!beat || beat.kind !== "tutor-turn") return;
     void props.onTutorTurnContinue(beat);
   }, [beat, props]);
+
+  if (!beat) {
+    return (
+      <View style={styles.empty}>
+        <Text style={styles.emptyText}>This session has no remaining activities.</Text>
+      </View>
+    );
+  }
 
   const advanceButton =
     (props.answered || beat.kind === "tutor-turn") && !props.submitting ? (
       <Pressable
         style={styles.advance}
-        onPress={
-          beat.kind === "tutor-turn" ? handleTutorContinue : props.onAdvance
-        }
+        onPress={beat.kind === "tutor-turn" ? handleTutorContinue : props.onAdvance}
         accessibilityRole="button"
       >
-        <Text style={styles.advanceText}>
-          {isLast ? props.labels.finish : props.labels.next}
-        </Text>
+        <Text style={styles.advanceText}>{isLast ? props.labels.finish : props.labels.next}</Text>
       </Pressable>
     ) : null;
 
@@ -145,17 +139,10 @@ export function MobileStageRuntime(props: Props) {
   if (layout.mode === "split") {
     return (
       <View
-        style={[
-          styles.containerSplit,
-          { maxWidth: layout.contentMaxWidth, gap: layout.splitGap },
-        ]}
+        style={[styles.containerSplit, { maxWidth: layout.contentMaxWidth, gap: layout.splitGap }]}
       >
         <View style={{ width: layout.tutorPanelWidth }}>
-          <MobileTutorPanel
-            theme={props.theme}
-            tier={props.tier}
-            message={tutorMessage}
-          />
+          <MobileTutorPanel theme={props.theme} tier={props.tier} message={tutorMessage} />
         </View>
         {beatColumn}
       </View>

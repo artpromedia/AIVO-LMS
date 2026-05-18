@@ -85,8 +85,8 @@ export function DemoRequestForm() {
         title="Demo request received."
         body={
           <>
-            A member of our team will reach out to <strong>{form.email}</strong> within one business day
-            to schedule a walkthrough that matches your role and rollout goals.
+            A member of our team will reach out to <strong>{form.email}</strong> within one business
+            day to schedule a walkthrough that matches your role and rollout goals.
           </>
         }
         primaryHref="/thank-you"
@@ -112,38 +112,110 @@ export function DemoRequestForm() {
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <FormField id={id("name")} label="Your name" required error={errors.name}>
-          <input id={id("name")} type="text" autoComplete="name" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={fieldInputClass} />
+          <input
+            id={id("name")}
+            type="text"
+            autoComplete="name"
+            required
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            className={fieldInputClass}
+          />
         </FormField>
-        <FormField id={id("email")} label="Work email" required error={errors.email} hint="Personal email is OK if you don't have one yet.">
-          <input id={id("email")} type="email" autoComplete="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={fieldInputClass} />
+        <FormField
+          id={id("email")}
+          label="Work email"
+          required
+          error={errors.email}
+          hint="Personal email is OK if you don't have one yet."
+        >
+          <input
+            id={id("email")}
+            type="email"
+            autoComplete="email"
+            required
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            className={fieldInputClass}
+          />
         </FormField>
       </div>
 
-      <FormField id={id("company")} label="School, district, or organization" required error={errors.company}>
-        <input id={id("company")} type="text" autoComplete="organization" required value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} className={fieldInputClass} />
+      <FormField
+        id={id("company")}
+        label="School, district, or organization"
+        required
+        error={errors.company}
+      >
+        <input
+          id={id("company")}
+          type="text"
+          autoComplete="organization"
+          required
+          value={form.company}
+          onChange={(e) => setForm({ ...form, company: e.target.value })}
+          className={fieldInputClass}
+        />
       </FormField>
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <FormField id={id("role")} label="Your role">
-          <select id={id("role")} value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className={fieldInputClass}>
-            {ROLES.map((r) => (<option key={r} value={r}>{r}</option>))}
+          <select
+            id={id("role")}
+            value={form.role}
+            onChange={(e) => setForm({ ...form, role: e.target.value })}
+            className={fieldInputClass}
+          >
+            {ROLES.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
           </select>
         </FormField>
         <FormField id={id("schoolSize")} label="Approximate size">
-          <select id={id("schoolSize")} value={form.schoolSize} onChange={(e) => setForm({ ...form, schoolSize: e.target.value })} className={fieldInputClass}>
-            {SIZES.map((s) => (<option key={s} value={s}>{s}</option>))}
+          <select
+            id={id("schoolSize")}
+            value={form.schoolSize}
+            onChange={(e) => setForm({ ...form, schoolSize: e.target.value })}
+            className={fieldInputClass}
+          >
+            {SIZES.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
           </select>
         </FormField>
       </div>
 
       <FormField id={id("interestArea")} label="What are you most interested in?">
-        <select id={id("interestArea")} value={form.interestArea} onChange={(e) => setForm({ ...form, interestArea: e.target.value })} className={fieldInputClass}>
-          {INTERESTS.map((s) => (<option key={s} value={s}>{s}</option>))}
+        <select
+          id={id("interestArea")}
+          value={form.interestArea}
+          onChange={(e) => setForm({ ...form, interestArea: e.target.value })}
+          className={fieldInputClass}
+        >
+          {INTERESTS.map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
         </select>
       </FormField>
 
-      <FormField id={id("message")} label="Anything else to share?" hint="Optional — timing, learner count, specific goals.">
-        <textarea id={id("message")} rows={4} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className={fieldInputClass} />
+      <FormField
+        id={id("message")}
+        label="Anything else to share?"
+        hint="Optional — timing, learner count, specific goals."
+      >
+        <textarea
+          id={id("message")}
+          rows={4}
+          value={form.message}
+          onChange={(e) => setForm({ ...form, message: e.target.value })}
+          className={fieldInputClass}
+        />
       </FormField>
 
       <div className="space-y-1.5">
@@ -159,7 +231,10 @@ export function DemoRequestForm() {
           />
           <span>
             I agree AIVO can email me about a demo. See our{" "}
-            <a href="/privacy-policy" className="font-semibold text-purple-700 underline">privacy policy</a>.
+            <a href="/privacy-policy" className="font-semibold text-purple-700 underline">
+              privacy policy
+            </a>
+            .
           </span>
         </label>
         {errors.consent ? (
@@ -169,9 +244,15 @@ export function DemoRequestForm() {
         ) : null}
       </div>
 
-      {status === "error" ? <FormErrorPanel message={errorMessage} onRetry={() => reset()} /> : null}
+      {status === "error" ? (
+        <FormErrorPanel message={errorMessage} onRetry={() => reset()} />
+      ) : null}
 
-      <button type="submit" disabled={status === "submitting"} className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-primary to-purple-600 px-7 py-3 font-bold text-white shadow-sm transition hover:from-primary-dark hover:to-purple-700 disabled:opacity-60">
+      <button
+        type="submit"
+        disabled={status === "submitting"}
+        className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-primary to-purple-600 px-7 py-3 font-bold text-white shadow-sm transition hover:from-primary-dark hover:to-purple-700 disabled:opacity-60"
+      >
         {status === "submitting" ? "Sending…" : "Request a demo"}
       </button>
     </form>

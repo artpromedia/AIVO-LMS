@@ -3,11 +3,13 @@
 # Sprint UX-07 — Baseline Assessment UX
 
 **Scope**: the personalized baseline assessment — the moment the learner moves from "set up" to "ready for today's mission". Routes today:
+
 - `/learner/baseline` — entry / readiness gate / generate-if-needed.
 - `/learner/baseline/[baselineId]` — the question runner (one question at a time). Supports a parent-as-learner mode via `?as=parent`.
 - `/parent/learners/[learnerId]/baseline` — parent-side status + plain-language summary post-completion.
 
 **Source of truth (today)**:
+
 - Server pages: `app/learner/baseline/page.tsx` (entry) and `app/learner/baseline/[baselineId]/page.tsx` (runner with `answerAction` + `completeAction` server actions).
 - Types: `lib/db/types.ts` → `Baseline`, `BaselineQuestion`, `BaselineAttempt`, `BaselineDifficulty`, `BaselineSummary`.
 - Repos: `lib/db/repos.ts` → `createBaseline`, `getActiveBaselineForLearner`, `getBaselineById`, `listBaselineQuestions`, `listBaselineAttempts`, `recordBaselineAttempt`, `startBaseline`, `completeBaseline`.
@@ -22,7 +24,7 @@ Status legend: ✅ shipped · 🟡 partial · ⬜ planned.
 ## 1. Principles
 
 1. **Low-pressure framing.** Eyebrow says "Baseline", page title is "A quick check-in" (not "Assessment", not "Diagnostic"). Description is "A few friendly questions so your tutor knows where to start." Already shipped in `app/learner/baseline/page.tsx`.
-2. **One question at a time.** No grid of questions; the runner shows the *next unanswered* question full-width. Already shipped via the `next = questions.find((q) => !answeredQids.has(q.id))` pattern.
+2. **One question at a time.** No grid of questions; the runner shows the _next unanswered_ question full-width. Already shipped via the `next = questions.find((q) => !answeredQids.has(q.id))` pattern.
 3. **Skip is a first-class action.** Every question has a Skip button next to Submit — same visual weight, just a secondary variant. Skipping is captured (`BaselineAttempt.skipped = true`) and never penalized. Learner-safe copy: "We'll come back to that one."
 4. **Hint is inline, optional, opt-in.** When `BaselineQuestion.hint` is present, it shows below the input as a soft Card with `<strong>Hint:</strong> …`. Already shipped.
 5. **Read-aloud is surfaced when available.** When `BaselineQuestion.readAloudText` is set, a small "Read aloud available" chip appears with a `<Volume2>` icon. Already shipped as a chip; full TTS playback is ⬜ planned (parallel with UX-06 §8.3).
@@ -151,22 +153,22 @@ Owned in detail by UX-04 §4.8; in this doc just the contract:
 
 ## 4. State matrix
 
-| State | UI | Recovery |
-|---|---|---|
-| **Baseline readiness gate failed** | EmptyState "A grown-up will set this up" + Back-home | parent finishes assessment/profile |
-| **Baseline generating** | 🟡 today: `createBaseline` is synchronous in the repo, so no generating state surfaces in UI. ⬜ When generation moves to LLM-backed: page should show a "Building your questions…" Card with spinner | back to home if it takes too long |
-| **Baseline ready** | Entry page Start Card | tap Start → enters runner |
-| **Question rendered (pending)** | Runner Card | answer or skip |
-| **Hint opened** | Hint Card already inline (no expand/collapse today) | scroll past — answer when ready |
-| **Read-aloud available** | `<Volume2>` chip visible. 🟡 TTS playback ⬜ | n/a today |
-| **Break** | ⬜ explicit Break button is not yet wired on the runner — refresh is implicit (no progress lost). Adding a "Take a break" link → calm `<EmptyState>` overlay is §6.2 backlog. | refresh / re-open |
-| **Answer submitted** | Server action redirects back; next question renders. No transient celebration per-question (intentional — keeps tone low-stakes). | n/a |
-| **All answered, not committed** | "Ready to finish" Card + Finish button | Finish → complete |
-| **Baseline complete** | "Nice work!" Card + `learnerSafeSummary` | Continue → /learner/home or /parent/.../baseline |
-| **Results processing** | ⬜ today: `completeBaseline` is synchronous; no processing wait. When async: a Card "Putting it all together…" | refresh |
-| **Retry / restart** | ⬜ today there's no learner-facing "start over" — defensive (we don't want re-attempts inflating the answer count). A parent-side "Reset baseline" is the proper escape hatch and is ⬜ planned in `/parent/learners/[id]/baseline`. | parent action |
-| **Mobile Learner Mode baseline** | ⬜ owned by UX-12 + UX-13; same server pages re-rendered inside the native shell. | n/a |
-| **Mobile Parent Mode baseline status** | ⬜ owned by UX-12 + UX-13. | n/a |
+| State                                  | UI                                                                                                                                                                                                                                   | Recovery                                         |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
+| **Baseline readiness gate failed**     | EmptyState "A grown-up will set this up" + Back-home                                                                                                                                                                                 | parent finishes assessment/profile               |
+| **Baseline generating**                | 🟡 today: `createBaseline` is synchronous in the repo, so no generating state surfaces in UI. ⬜ When generation moves to LLM-backed: page should show a "Building your questions…" Card with spinner                                | back to home if it takes too long                |
+| **Baseline ready**                     | Entry page Start Card                                                                                                                                                                                                                | tap Start → enters runner                        |
+| **Question rendered (pending)**        | Runner Card                                                                                                                                                                                                                          | answer or skip                                   |
+| **Hint opened**                        | Hint Card already inline (no expand/collapse today)                                                                                                                                                                                  | scroll past — answer when ready                  |
+| **Read-aloud available**               | `<Volume2>` chip visible. 🟡 TTS playback ⬜                                                                                                                                                                                         | n/a today                                        |
+| **Break**                              | ⬜ explicit Break button is not yet wired on the runner — refresh is implicit (no progress lost). Adding a "Take a break" link → calm `<EmptyState>` overlay is §6.2 backlog.                                                        | refresh / re-open                                |
+| **Answer submitted**                   | Server action redirects back; next question renders. No transient celebration per-question (intentional — keeps tone low-stakes).                                                                                                    | n/a                                              |
+| **All answered, not committed**        | "Ready to finish" Card + Finish button                                                                                                                                                                                               | Finish → complete                                |
+| **Baseline complete**                  | "Nice work!" Card + `learnerSafeSummary`                                                                                                                                                                                             | Continue → /learner/home or /parent/.../baseline |
+| **Results processing**                 | ⬜ today: `completeBaseline` is synchronous; no processing wait. When async: a Card "Putting it all together…"                                                                                                                       | refresh                                          |
+| **Retry / restart**                    | ⬜ today there's no learner-facing "start over" — defensive (we don't want re-attempts inflating the answer count). A parent-side "Reset baseline" is the proper escape hatch and is ⬜ planned in `/parent/learners/[id]/baseline`. | parent action                                    |
+| **Mobile Learner Mode baseline**       | ⬜ owned by UX-12 + UX-13; same server pages re-rendered inside the native shell.                                                                                                                                                    | n/a                                              |
+| **Mobile Parent Mode baseline status** | ⬜ owned by UX-12 + UX-13.                                                                                                                                                                                                           | n/a                                              |
 
 ---
 
@@ -182,6 +184,7 @@ Surfaced from `Baseline.summary: BaselineSummary` (see `lib/db/types.ts`). The s
 - `totalAnswered` / `totalQuestions` / `correctCount` — used **only** in the parent surface (never the learner UI).
 
 Parent baseline summary surfaces (per UX-07 brief sub-bullets):
+
 - **Baseline completed** — ✅ today: green status Card with `<CheckCircle2>` + "Baseline complete" + `baseline.summary.parentSummary` headline. (`app/parent/learners/[learnerId]/baseline/page.tsx`.)
 - **Starting areas** — 🟡 today: the parent page renders a "Per subject" grid using `baseline.summary.perSubject[]` with a difficulty-estimate Badge per subject. A dedicated "Starting areas" callout naming the `recommendedStartSkillId` lesson is ⬜ (§7 polish).
 - **Strengths noticed** — ⬜ today: not surfaced as a separate "what they were confident in" block. The per-subject grid is the closest equivalent.
@@ -193,19 +196,19 @@ Parent baseline summary surfaces (per UX-07 brief sub-bullets):
 
 ## 6. Microcopy (baseline)
 
-| Context | Bad | Good |
-|---|---|---|
-| Entry title | "Baseline Assessment" | "A quick check-in" (already shipped) |
-| Entry description | "Complete the baseline diagnostic to populate your mastery map." | "A few friendly questions so your tutor knows where to start." (already shipped) |
-| Not-ready | "Prerequisites missing." | "A grown-up will set this up." (already shipped) |
-| Question prompt | "Solve: 7 × 3" | "What is 7 × 3?" (the prompt itself comes from the generator; copy rule: question marks + complete sentences) |
-| Skip | "Question skipped." | "We'll come back to that one." (planned toast on skip submit) |
-| Inline hint | "Solution hint: regroup." | "Hint: try counting up by 3s." (the question's `hint` field carries this) |
-| Difficulty badge | "Stretch · diagnostic_tier_3" | "Stretch" (drop the technical tail) |
-| Submit affordance | "Send answer" | "Submit answer" (already shipped) |
-| Complete title | "Baseline complete." | "Nice work!" (already shipped) |
-| Complete body | "Score: 7/10 correct." | "You answered N of M questions." (already shipped — no correctness) |
-| Parent headline | "Mastery delta computed across 5 subjects." | "Sky finished their baseline. We'll start in reading with shorter steps." |
+| Context           | Bad                                                              | Good                                                                                                          |
+| ----------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Entry title       | "Baseline Assessment"                                            | "A quick check-in" (already shipped)                                                                          |
+| Entry description | "Complete the baseline diagnostic to populate your mastery map." | "A few friendly questions so your tutor knows where to start." (already shipped)                              |
+| Not-ready         | "Prerequisites missing."                                         | "A grown-up will set this up." (already shipped)                                                              |
+| Question prompt   | "Solve: 7 × 3"                                                   | "What is 7 × 3?" (the prompt itself comes from the generator; copy rule: question marks + complete sentences) |
+| Skip              | "Question skipped."                                              | "We'll come back to that one." (planned toast on skip submit)                                                 |
+| Inline hint       | "Solution hint: regroup."                                        | "Hint: try counting up by 3s." (the question's `hint` field carries this)                                     |
+| Difficulty badge  | "Stretch · diagnostic_tier_3"                                    | "Stretch" (drop the technical tail)                                                                           |
+| Submit affordance | "Send answer"                                                    | "Submit answer" (already shipped)                                                                             |
+| Complete title    | "Baseline complete."                                             | "Nice work!" (already shipped)                                                                                |
+| Complete body     | "Score: 7/10 correct."                                           | "You answered N of M questions." (already shipped — no correctness)                                           |
+| Parent headline   | "Mastery delta computed across 5 subjects."                      | "Sky finished their baseline. We'll start in reading with shorter steps."                                     |
 
 ---
 

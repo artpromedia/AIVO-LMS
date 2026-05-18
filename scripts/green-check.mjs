@@ -35,9 +35,19 @@ const gates = [
 
   // Production readiness scanners
   { name: "prod:no-demo", script: "prod:no-demo", required: true, category: "prod" },
-  { name: "prod:surface-contract", script: "prod:surface-contract", required: true, category: "prod" },
+  {
+    name: "prod:surface-contract",
+    script: "prod:surface-contract",
+    required: true,
+    category: "prod",
+  },
   { name: "prod:check", script: "prod:check", required: true, category: "prod" },
-  { name: "test:production-readiness", script: "test:production-readiness", required: true, category: "prod" },
+  {
+    name: "test:production-readiness",
+    script: "test:production-readiness",
+    required: true,
+    category: "prod",
+  },
   { name: "test:enterprise", script: "test:enterprise", required: true, category: "prod" },
 
   // i18n
@@ -46,8 +56,18 @@ const gates = [
   // Existing domain audits (GREEN-01 .. GREEN-12 will tighten these)
   { name: "consent:audit", script: "consent:audit", required: true, category: "consent" },
   { name: "auth:audit", script: "auth:audit", required: true, category: "auth" },
-  { name: "curriculum:validate", script: "curriculum:validate", required: true, category: "curriculum" },
-  { name: "onboarding:audit", script: "onboarding:audit", required: true, category: "learner-loop" },
+  {
+    name: "curriculum:validate",
+    script: "curriculum:validate",
+    required: true,
+    category: "curriculum",
+  },
+  {
+    name: "onboarding:audit",
+    script: "onboarding:audit",
+    required: true,
+    category: "learner-loop",
+  },
   { name: "lessonrun:audit", script: "lessonrun:audit", required: true, category: "learner-loop" },
   { name: "route:audit", script: "route:audit", required: true, category: "ux" },
   { name: "mobile:audit", script: "mobile:audit", required: true, category: "mobile" },
@@ -63,7 +83,12 @@ const gates = [
   // Sprint-owned gates implemented in GREEN-01 .. GREEN-03.
   { name: "backend:parity", script: "backend:parity", required: true, category: "backend" },
   { name: "tutor:parity", script: "tutor:parity", required: true, category: "tutor" },
-  { name: "curriculum:coverage", script: "curriculum:coverage", required: true, category: "curriculum" },
+  {
+    name: "curriculum:coverage",
+    script: "curriculum:coverage",
+    required: true,
+    category: "curriculum",
+  },
 
   // Gates owned by later sprints. They are reported here so the gap is
   // visible, but they don't fail the overall run until the sprint that
@@ -71,7 +96,8 @@ const gates = [
   {
     name: "mobile:role-audit",
     status: "not-implemented",
-    reason: "Owned by Sprint GREEN-07. scripts/mobile-role-audit.mjs not yet created. (mobile:audit exists but is a different lens.)",
+    reason:
+      "Owned by Sprint GREEN-07. scripts/mobile-role-audit.mjs not yet created. (mobile:audit exists but is a different lens.)",
     required: false,
     category: "mobile",
   },
@@ -85,7 +111,8 @@ const gates = [
   {
     name: "a11y:audit",
     status: "not-implemented",
-    reason: "Owned by Sprint GREEN-09. accessibility:audit script exists but the GREEN-09 a11y:audit lens (axe + keyboard + reduced-motion snapshots) is not yet implemented.",
+    reason:
+      "Owned by Sprint GREEN-09. accessibility:audit script exists but the GREEN-09 a11y:audit lens (axe + keyboard + reduced-motion snapshots) is not yet implemented.",
     required: false,
     category: "a11y",
   },
@@ -147,7 +174,9 @@ if (hadRequiredFailure) {
   process.exit(1);
 }
 if (notImpl > 0) {
-  console.log("\nResult: YELLOW. Required gates pass but sprint-owned gates are not yet implemented.");
+  console.log(
+    "\nResult: YELLOW. Required gates pass but sprint-owned gates are not yet implemented.",
+  );
   process.exit(0);
 }
 console.log("\nResult: GREEN.");

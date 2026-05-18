@@ -10,7 +10,11 @@ import { Settings } from "lucide-react";
 import { ROLE_LABEL } from "@/lib/auth/types";
 
 const NAV = [
-  { href: "/settings/accessibility", label: "Accessibility", icon: <Settings className="h-4 w-4" /> },
+  {
+    href: "/settings/accessibility",
+    label: "Accessibility",
+    icon: <Settings className="h-4 w-4" />,
+  },
 ];
 
 export default async function AccessibilitySettings() {
@@ -39,7 +43,10 @@ export default async function AccessibilitySettings() {
             <Label className="mb-2 block">Text size</Label>
             <RadioGroup defaultValue="medium" className="grid grid-cols-3 gap-2 sm:max-w-md">
               {(["small", "medium", "large"] as const).map((s) => (
-                <label key={s} className="flex cursor-pointer items-center gap-2 rounded-lg border border-aivo-border p-2 capitalize">
+                <label
+                  key={s}
+                  className="flex cursor-pointer items-center gap-2 rounded-lg border border-aivo-border p-2 capitalize"
+                >
                   <RadioGroupItem value={s} id={`size-${s}`} />
                   <span>{s}</span>
                 </label>
@@ -63,7 +70,11 @@ export default async function AccessibilitySettings() {
         </CardContent>
       </Card>
 
-      <SectionHeader className="mt-10" title="Sensory" description="Coming alongside the learner profile in Sprint 7." />
+      <SectionHeader
+        className="mt-10"
+        title="Sensory"
+        description="Coming alongside the learner profile in Sprint 7."
+      />
       <Card>
         <CardContent className="p-5 text-sm text-aivo-ink-soft">
           Sensory profile controls (sound intensity, animation tempo, color temperature) will land

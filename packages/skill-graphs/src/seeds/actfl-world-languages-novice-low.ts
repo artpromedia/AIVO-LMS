@@ -59,7 +59,8 @@ export const actflWorldLanguagesNoviceLow: SkillGraph = {
     {
       id: "actfl.nl.compare.languages",
       title: "Compare a feature with my home language",
-      description: "I can show one way the new language is the same as or different from my home language.",
+      description:
+        "I can show one way the new language is the same as or different from my home language.",
       subject: "world_languages",
       gradeBand: "6",
       frameworkRefs: [{ framework: "ACTFL", code: "Comparisons" }],

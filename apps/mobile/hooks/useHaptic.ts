@@ -1,5 +1,5 @@
-import { useCallback } from 'react';
-import * as Haptics from 'expo-haptics';
+import { useCallback } from "react";
+import * as Haptics from "expo-haptics";
 
 export function useHaptic() {
   const light = useCallback(() => {

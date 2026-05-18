@@ -43,11 +43,7 @@ export interface EmitArgs {
   details?: Record<string, unknown>;
 }
 
-export async function emitBillingAudit(
-  db: any,
-  log: Logger,
-  args: EmitArgs,
-): Promise<void> {
+export async function emitBillingAudit(db: any, log: Logger, args: EmitArgs): Promise<void> {
   try {
     await appendAudit(db, "audit_events", auditEvents, {
       tenantId: args.tenantId ?? null,

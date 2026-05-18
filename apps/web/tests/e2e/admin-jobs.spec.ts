@@ -10,7 +10,13 @@ import { test, expect } from "@playwright/test";
 
 const ADMIN_AUTH = {
   accessToken: "admin-token",
-  user: { id: "admin-1", role: "PLATFORM_ADMIN", tenantId: null, email: "a@aivo.dev", name: "Admin" },
+  user: {
+    id: "admin-1",
+    role: "PLATFORM_ADMIN",
+    tenantId: null,
+    email: "a@aivo.dev",
+    name: "Admin",
+  },
 };
 
 test.describe("Background Jobs admin page", () => {
@@ -48,7 +54,14 @@ test.describe("Background Jobs admin page", () => {
               lastSent: 7,
               lastFailed: 0,
               lastError: null,
-              freshness: { jobName: "billing.daily-expiry-reminders", status: "fresh", ageMs: 60_000, failed: false, lastFinishedAt: now, lastRunAt: now },
+              freshness: {
+                jobName: "billing.daily-expiry-reminders",
+                status: "fresh",
+                ageMs: 60_000,
+                failed: false,
+                lastFinishedAt: now,
+                lastRunAt: now,
+              },
               unregistered: false,
             },
             {
@@ -63,7 +76,14 @@ test.describe("Background Jobs admin page", () => {
               lastSent: 0,
               lastFailed: 0,
               lastError: null,
-              freshness: { jobName: "research.weekly-aggregation", status: "fresh", ageMs: 3 * 86_400_000, failed: false, lastFinishedAt: stale, lastRunAt: stale },
+              freshness: {
+                jobName: "research.weekly-aggregation",
+                status: "fresh",
+                ageMs: 3 * 86_400_000,
+                failed: false,
+                lastFinishedAt: stale,
+                lastRunAt: stale,
+              },
               unregistered: false,
             },
             {
@@ -78,7 +98,14 @@ test.describe("Background Jobs admin page", () => {
               lastSent: null,
               lastFailed: null,
               lastError: null,
-              freshness: { jobName: "legacy.unknown", status: "warning", ageMs: 60_000, failed: false, lastFinishedAt: null, lastRunAt: now },
+              freshness: {
+                jobName: "legacy.unknown",
+                status: "warning",
+                ageMs: 60_000,
+                failed: false,
+                lastFinishedAt: null,
+                lastRunAt: now,
+              },
               unregistered: true,
             },
           ],
@@ -94,9 +121,33 @@ test.describe("Background Jobs admin page", () => {
           jobName: "billing.daily-expiry-reminders",
           limit: 20,
           runs: [
-            { id: 3, runAt: new Date().toISOString(), finishedAt: null, replicaId: "r1", status: "ok", durationMs: 200, error: null },
-            { id: 2, runAt: new Date(Date.now() - 86_400_000).toISOString(), finishedAt: null, replicaId: "r1", status: "partial", durationMs: 350, error: null },
-            { id: 1, runAt: new Date(Date.now() - 2 * 86_400_000).toISOString(), finishedAt: null, replicaId: "r1", status: "ok", durationMs: 180, error: null },
+            {
+              id: 3,
+              runAt: new Date().toISOString(),
+              finishedAt: null,
+              replicaId: "r1",
+              status: "ok",
+              durationMs: 200,
+              error: null,
+            },
+            {
+              id: 2,
+              runAt: new Date(Date.now() - 86_400_000).toISOString(),
+              finishedAt: null,
+              replicaId: "r1",
+              status: "partial",
+              durationMs: 350,
+              error: null,
+            },
+            {
+              id: 1,
+              runAt: new Date(Date.now() - 2 * 86_400_000).toISOString(),
+              finishedAt: null,
+              replicaId: "r1",
+              status: "ok",
+              durationMs: 180,
+              error: null,
+            },
           ],
         }),
       }),

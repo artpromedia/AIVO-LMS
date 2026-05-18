@@ -2,11 +2,7 @@ import { cookies } from "next/headers";
 import { z } from "zod";
 import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
-import {
-  MOCK_COOKIE_NAME,
-  MOCK_USERS,
-  isMockAuthAllowed,
-} from "@/lib/auth/mock-session";
+import { MOCK_COOKIE_NAME, MOCK_USERS, isMockAuthAllowed } from "@/lib/auth/mock-session";
 import { ROLE_HOME, type Role } from "@/lib/auth/types";
 
 export const dynamic = "force-dynamic";
@@ -43,10 +39,7 @@ export async function POST(req: Request) {
     const json = await req.json().catch(() => ({}));
     const parsed = BodySchema.safeParse(json);
     if (!parsed.success) {
-      return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: parsed.error.message },
-        requestId,
-      );
+      return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.message }, requestId);
     }
     const role = parsed.data.role as Role;
     const jar = await cookies();

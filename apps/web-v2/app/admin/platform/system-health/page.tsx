@@ -4,10 +4,7 @@ import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import {
-  computeSystemHealth,
-  scopeTenantsForSession,
-} from "@/lib/db/repos";
+import { computeSystemHealth, scopeTenantsForSession } from "@/lib/db/repos";
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
@@ -59,9 +56,7 @@ export default async function Page() {
         title="System health"
         description="Live snapshot of the platform's posture."
         actions={
-          <Badge tone={ok ? "success" : "warning"}>
-            {ok ? "All systems green" : "Degraded"}
-          </Badge>
+          <Badge tone={ok ? "success" : "warning"}>{ok ? "All systems green" : "Degraded"}</Badge>
         }
       />
       {groups.map((g) => (

@@ -40,10 +40,7 @@
         "backgroundColor": "#7C3AED",
         "resizeMode": "contain"
       },
-      "permissions": [
-        "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO"
-      ]
+      "permissions": ["android.permission.CAMERA", "android.permission.RECORD_AUDIO"]
     },
     "web": {
       "bundler": "metro",

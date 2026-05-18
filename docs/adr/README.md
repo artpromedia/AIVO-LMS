@@ -8,7 +8,7 @@ that followed.
 
 We use ADRs (rather than tribal knowledge or scattered design docs) so
 that future engineers — and future versions of ourselves — can answer
-"*why is it like this?*" without having to reconstruct the discussion
+"_why is it like this?_" without having to reconstruct the discussion
 from Slack threads.
 
 ## When to write an ADR
@@ -21,7 +21,7 @@ Write a new ADR when a change…
   storage, network exposure);
 - defines a contract that other services or apps will depend on (event
   schema, public API shape, multi-tenant scoping rule);
-- represents a deliberate decision *not* to do something obvious;
+- represents a deliberate decision _not_ to do something obvious;
 - would otherwise leave a reviewer asking "why did we pick X over Y?".
 
 Routine refactors, dependency bumps, and bug fixes do **not** need an
@@ -49,8 +49,8 @@ ADR.
 
 ## Index
 
-| ID                                       | Title                                | Status   |
-| ---------------------------------------- | ------------------------------------ | -------- |
-| [0001](./0001-cors-allowlist-policy.md)  | CORS allow-list & fail-closed policy | Accepted |
+| ID                                      | Title                                | Status   |
+| --------------------------------------- | ------------------------------------ | -------- |
+| [0001](./0001-cors-allowlist-policy.md) | CORS allow-list & fail-closed policy | Accepted |
 
 > Keep this table sorted by ID. Add new rows as ADRs land.

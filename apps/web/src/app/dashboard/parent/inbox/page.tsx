@@ -2,7 +2,18 @@
 import { useAuth } from "@/providers/auth-provider";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Brain, Lightbulb, ClipboardList, Trophy, TrendingUp, Users, Info, Bell, Inbox as InboxIcon, type LucideIcon } from "lucide-react";
+import {
+  Brain,
+  Lightbulb,
+  ClipboardList,
+  Trophy,
+  TrendingUp,
+  Users,
+  Info,
+  Bell,
+  Inbox as InboxIcon,
+  type LucideIcon,
+} from "lucide-react";
 
 interface Notification {
   id: string;
@@ -52,8 +63,8 @@ export default function InboxPage() {
     if (!accessToken || !user) return;
     setLoadingData(true);
     fetch(`/api/family/inbox/${user.id}`, { headers: { Authorization: `Bearer ${accessToken}` } })
-      .then(r => r.ok ? r.json() : { items: [] })
-      .then(data => setNotifications(data.items || []))
+      .then((r) => (r.ok ? r.json() : { items: [] }))
+      .then((data) => setNotifications(data.items || []))
       .catch(() => {})
       .finally(() => setLoadingData(false));
   }, [accessToken, user]);
@@ -65,7 +76,9 @@ export default function InboxPage() {
       method: "PUT",
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, readAt: new Date().toISOString() } : n));
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, readAt: new Date().toISOString() } : n)),
+    );
   };
 
   const dismiss = async (id: string) => {
@@ -73,11 +86,12 @@ export default function InboxPage() {
       method: "PUT",
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-    setNotifications(prev => prev.filter(n => n.id !== id));
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
-  const filtered = notifications.filter(n => {
-    if (activeTab === "action") return ["brain_review", "recommendation", "iep_reminder"].includes(n.type) && !n.readAt;
+  const filtered = notifications.filter((n) => {
+    if (activeTab === "action")
+      return ["brain_review", "recommendation", "iep_reminder"].includes(n.type) && !n.readAt;
     if (activeTab === "celebrations") return ["milestone", "progress"].includes(n.type);
     if (activeTab === "archived") return !!n.readAt;
     return true;
@@ -88,11 +102,17 @@ export default function InboxPage() {
       <h1 className="text-2xl font-heading font-bold vi-text mb-6">Inbox</h1>
 
       <div className="flex gap-1 mb-6 overflow-x-auto">
-        {TABS.map(tab => (
-          <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+        {TABS.map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
             className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition ${
-              activeTab === tab.key ? "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]" : "vi-surface-soft vi-text-muted hover:bg-[hsl(var(--visual-border))]"
-            }`} style={{ minHeight: 44 }}>
+              activeTab === tab.key
+                ? "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]"
+                : "vi-surface-soft vi-text-muted hover:bg-[hsl(var(--visual-border))]"
+            }`}
+            style={{ minHeight: 44 }}
+          >
             {tab.label}
           </button>
         ))}
@@ -106,26 +126,38 @@ export default function InboxPage() {
             <InboxIcon size={24} aria-hidden="true" />
           </div>
           <p className="vi-text-muted font-semibold">
-            {activeTab === "all" ? "Your inbox is empty. We'll let you know when something needs attention." : `No ${activeTab} items.`}
+            {activeTab === "all"
+              ? "Your inbox is empty. We'll let you know when something needs attention."
+              : `No ${activeTab} items.`}
           </p>
         </div>
       ) : (
         <div className="space-y-3">
-          {filtered.map(n => {
+          {filtered.map((n) => {
             const meta = TYPE_META[n.type] || { Icon: Bell, color: "primary" };
             const Icon = meta.Icon;
             return (
-              <div key={n.id}
+              <div
+                key={n.id}
                 className={`vi-card p-4 transition hover:shadow-md ${
-                  !n.readAt ? "border-[hsl(var(--visual-primary)/0.3)] border-l-4 border-l-[hsl(var(--visual-primary))]" : ""
-                }`}>
+                  !n.readAt
+                    ? "border-[hsl(var(--visual-primary)/0.3)] border-l-4 border-l-[hsl(var(--visual-primary))]"
+                    : ""
+                }`}
+              >
                 <div className="flex items-start gap-3">
-                  <span className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 ${WELL_CLASS[meta.color] || WELL_CLASS.primary}`}>
+                  <span
+                    className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 ${WELL_CLASS[meta.color] || WELL_CLASS.primary}`}
+                  >
                     <Icon size={18} aria-hidden="true" />
                   </span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 justify-between">
-                      <p className={`text-sm ${!n.readAt ? "font-bold vi-text" : "font-semibold text-slate-800"}`}>{n.title}</p>
+                      <p
+                        className={`text-sm ${!n.readAt ? "font-bold vi-text" : "font-semibold text-slate-800"}`}
+                      >
+                        {n.title}
+                      </p>
                       <span className="text-xs vi-text-muted flex-shrink-0">
                         {new Date(n.createdAt).toLocaleDateString()}
                       </span>
@@ -133,16 +165,28 @@ export default function InboxPage() {
                     {n.body && <p className="text-sm vi-text-muted mt-1">{n.body}</p>}
                     <div className="flex items-center gap-2 mt-3">
                       {n.actionUrl && (
-                        <a href={n.actionUrl} className="px-3 py-1.5 text-xs rounded-full bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))] font-semibold hover:bg-[hsl(var(--visual-primary)/0.2)] transition" style={{ minHeight: 32 }}>
+                        <a
+                          href={n.actionUrl}
+                          className="px-3 py-1.5 text-xs rounded-full bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))] font-semibold hover:bg-[hsl(var(--visual-primary)/0.2)] transition"
+                          style={{ minHeight: 32 }}
+                        >
                           View →
                         </a>
                       )}
                       {!n.readAt && (
-                        <button onClick={() => markAsRead(n.id)} className="px-3 py-1.5 text-xs rounded-full vi-surface-soft vi-text-muted font-semibold hover:bg-[hsl(var(--visual-border))] transition" style={{ minHeight: 32 }}>
+                        <button
+                          onClick={() => markAsRead(n.id)}
+                          className="px-3 py-1.5 text-xs rounded-full vi-surface-soft vi-text-muted font-semibold hover:bg-[hsl(var(--visual-border))] transition"
+                          style={{ minHeight: 32 }}
+                        >
                           Mark Read
                         </button>
                       )}
-                      <button onClick={() => dismiss(n.id)} className="px-3 py-1.5 text-xs rounded-full vi-text-muted hover:text-[hsl(var(--visual-math))] hover:bg-[hsl(var(--visual-math)/0.06)] transition" style={{ minHeight: 32 }}>
+                      <button
+                        onClick={() => dismiss(n.id)}
+                        className="px-3 py-1.5 text-xs rounded-full vi-text-muted hover:text-[hsl(var(--visual-math))] hover:bg-[hsl(var(--visual-math)/0.06)] transition"
+                        style={{ minHeight: 32 }}
+                      >
                         Dismiss
                       </button>
                     </div>

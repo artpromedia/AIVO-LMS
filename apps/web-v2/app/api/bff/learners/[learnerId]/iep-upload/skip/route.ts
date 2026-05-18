@@ -20,7 +20,12 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["iep_document_storage", "child_data_collection"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["iep_document_storage", "child_data_collection"],
+      requestId,
+    );
     if (consentErr) return consentErr;
 
     const learner = recordIEPSkip(learnerId, session!.tenantId);

@@ -37,9 +37,7 @@ export const ccssMathKindergarten: SkillGraph = {
       description: "I can start counting from any number, not just 1.",
       subject: "math",
       gradeBand: "K",
-      frameworkRefs: [
-        { framework: "CCSS-Math", code: "K.CC.A.2" },
-      ],
+      frameworkRefs: [{ framework: "CCSS-Math", code: "K.CC.A.2" }],
       prerequisites: ["ccss-math.K.CC.A.1"],
     },
     {
@@ -48,9 +46,7 @@ export const ccssMathKindergarten: SkillGraph = {
       description: "I can write numbers from 0 to 20 and show how many a number is.",
       subject: "math",
       gradeBand: "K",
-      frameworkRefs: [
-        { framework: "CCSS-Math", code: "K.CC.A.3" },
-      ],
+      frameworkRefs: [{ framework: "CCSS-Math", code: "K.CC.A.3" }],
       prerequisites: ["ccss-math.K.CC.A.1"],
     },
     {
@@ -59,9 +55,7 @@ export const ccssMathKindergarten: SkillGraph = {
       description: "I can match each object to one number when I count.",
       subject: "math",
       gradeBand: "K",
-      frameworkRefs: [
-        { framework: "CCSS-Math", code: "K.CC.B.4" },
-      ],
+      frameworkRefs: [{ framework: "CCSS-Math", code: "K.CC.B.4" }],
       prerequisites: ["ccss-math.K.CC.A.1"],
     },
     {
@@ -70,9 +64,7 @@ export const ccssMathKindergarten: SkillGraph = {
       description: "I can count how many things are in a group of up to 20.",
       subject: "math",
       gradeBand: "K",
-      frameworkRefs: [
-        { framework: "CCSS-Math", code: "K.CC.B.5" },
-      ],
+      frameworkRefs: [{ framework: "CCSS-Math", code: "K.CC.B.5" }],
       prerequisites: ["ccss-math.K.CC.B.4"],
     },
     {
@@ -81,9 +73,7 @@ export const ccssMathKindergarten: SkillGraph = {
       description: "I can tell which group has more, fewer, or the same number of things.",
       subject: "math",
       gradeBand: "K",
-      frameworkRefs: [
-        { framework: "CCSS-Math", code: "K.CC.C.6" },
-      ],
+      frameworkRefs: [{ framework: "CCSS-Math", code: "K.CC.C.6" }],
       prerequisites: ["ccss-math.K.CC.B.5"],
     },
     {
@@ -92,9 +82,7 @@ export const ccssMathKindergarten: SkillGraph = {
       description: "I can compare two written numbers between 1 and 10.",
       subject: "math",
       gradeBand: "K",
-      frameworkRefs: [
-        { framework: "CCSS-Math", code: "K.CC.C.7" },
-      ],
+      frameworkRefs: [{ framework: "CCSS-Math", code: "K.CC.C.7" }],
       prerequisites: ["ccss-math.K.CC.A.3", "ccss-math.K.CC.C.6"],
     },
 
@@ -105,9 +93,7 @@ export const ccssMathKindergarten: SkillGraph = {
       description: "I can show adding and taking away with things I can move.",
       subject: "math",
       gradeBand: "K",
-      frameworkRefs: [
-        { framework: "CCSS-Math", code: "K.OA.A.1" },
-      ],
+      frameworkRefs: [{ framework: "CCSS-Math", code: "K.OA.A.1" }],
       prerequisites: ["ccss-math.K.CC.B.5"],
     },
     {
@@ -116,9 +102,7 @@ export const ccssMathKindergarten: SkillGraph = {
       description: "I can solve add and subtract story problems with numbers up to 10.",
       subject: "math",
       gradeBand: "K",
-      frameworkRefs: [
-        { framework: "CCSS-Math", code: "K.OA.A.2" },
-      ],
+      frameworkRefs: [{ framework: "CCSS-Math", code: "K.OA.A.2" }],
       prerequisites: ["ccss-math.K.OA.A.1"],
     },
     {
@@ -127,9 +111,7 @@ export const ccssMathKindergarten: SkillGraph = {
       description: "I can quickly add and take away numbers up to 5.",
       subject: "math",
       gradeBand: "K",
-      frameworkRefs: [
-        { framework: "CCSS-Math", code: "K.OA.A.5" },
-      ],
+      frameworkRefs: [{ framework: "CCSS-Math", code: "K.OA.A.5" }],
       prerequisites: ["ccss-math.K.OA.A.2"],
     },
 
@@ -140,9 +122,7 @@ export const ccssMathKindergarten: SkillGraph = {
       description: "I can show that 14 is 1 ten and 4 ones.",
       subject: "math",
       gradeBand: "K",
-      frameworkRefs: [
-        { framework: "CCSS-Math", code: "K.NBT.A.1" },
-      ],
+      frameworkRefs: [{ framework: "CCSS-Math", code: "K.NBT.A.1" }],
       prerequisites: ["ccss-math.K.CC.B.5", "ccss-math.K.OA.A.1"],
     },
 
@@ -153,9 +133,7 @@ export const ccssMathKindergarten: SkillGraph = {
       description: "I can talk about how long, how heavy, or how big things are.",
       subject: "math",
       gradeBand: "K",
-      frameworkRefs: [
-        { framework: "CCSS-Math", code: "K.MD.A.1" },
-      ],
+      frameworkRefs: [{ framework: "CCSS-Math", code: "K.MD.A.1" }],
       prerequisites: [],
     },
     {
@@ -164,9 +142,7 @@ export const ccssMathKindergarten: SkillGraph = {
       description: "I can put things into groups and count each group.",
       subject: "math",
       gradeBand: "K",
-      frameworkRefs: [
-        { framework: "CCSS-Math", code: "K.MD.B.3" },
-      ],
+      frameworkRefs: [{ framework: "CCSS-Math", code: "K.MD.B.3" }],
       prerequisites: ["ccss-math.K.CC.B.5", "ccss-math.K.MD.A.1"],
     },
 
@@ -177,9 +153,7 @@ export const ccssMathKindergarten: SkillGraph = {
       description: "I can name circles, squares, triangles, rectangles, and other shapes.",
       subject: "math",
       gradeBand: "K",
-      frameworkRefs: [
-        { framework: "CCSS-Math", code: "K.G.A.1" },
-      ],
+      frameworkRefs: [{ framework: "CCSS-Math", code: "K.G.A.1" }],
       prerequisites: [],
     },
     {
@@ -188,9 +162,7 @@ export const ccssMathKindergarten: SkillGraph = {
       description: "I can tell how shapes are alike and different (sides, corners, flat or solid).",
       subject: "math",
       gradeBand: "K",
-      frameworkRefs: [
-        { framework: "CCSS-Math", code: "K.G.B.4" },
-      ],
+      frameworkRefs: [{ framework: "CCSS-Math", code: "K.G.B.4" }],
       prerequisites: ["ccss-math.K.G.A.1"],
     },
     {
@@ -199,9 +171,7 @@ export const ccssMathKindergarten: SkillGraph = {
       description: "I can put two triangles together to make a rectangle.",
       subject: "math",
       gradeBand: "K",
-      frameworkRefs: [
-        { framework: "CCSS-Math", code: "K.G.B.6" },
-      ],
+      frameworkRefs: [{ framework: "CCSS-Math", code: "K.G.B.6" }],
       prerequisites: ["ccss-math.K.G.B.4"],
     },
   ],

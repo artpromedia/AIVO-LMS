@@ -6,10 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DISTRICT_NAV } from "@/components/layout/role-shells";
-import {
-  scopeTenantsForSession,
-  listDistrictSchools,
-} from "@/lib/db/repos";
+import { scopeTenantsForSession, listDistrictSchools } from "@/lib/db/repos";
 import { Building2, Users, GraduationCap } from "lucide-react";
 
 export default async function Page() {
@@ -35,18 +32,11 @@ export default async function Page() {
       ) : (
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {schools.map((row) => (
-            <Card
-              key={row.school.id}
-              className="p-[var(--aivo-density-card-pad)]"
-            >
+            <Card key={row.school.id} className="p-[var(--aivo-density-card-pad)]">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="font-display text-lg font-semibold">
-                    {row.school.name}
-                  </p>
-                  <p className="mt-0.5 font-mono text-xs text-aivo-muted">
-                    {row.school.id}
-                  </p>
+                  <p className="font-display text-lg font-semibold">{row.school.name}</p>
+                  <p className="mt-0.5 font-mono text-xs text-aivo-muted">{row.school.id}</p>
                 </div>
                 <Badge tone="primary">School</Badge>
               </div>
@@ -80,10 +70,7 @@ export default async function Page() {
                 </div>
               </dl>
               <div className="mt-4 flex items-center justify-between text-xs text-aivo-ink-soft">
-                <span>
-                  Onboarded{" "}
-                  {new Date(row.school.createdAt).toLocaleDateString()}
-                </span>
+                <span>Onboarded {new Date(row.school.createdAt).toLocaleDateString()}</span>
                 <Link
                   href={`/admin/district/staff`}
                   className="font-medium text-aivo-primary hover:underline"

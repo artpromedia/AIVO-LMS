@@ -31,9 +31,7 @@ function read(rel) {
   return readFileSync(full, "utf8");
 }
 
-const sisInterface = read(
-  "services/integration-svc/src/services/sis-provider-interface.ts",
-);
+const sisInterface = read("services/integration-svc/src/services/sis-provider-interface.ts");
 if (sisInterface) {
   for (const fn of [
     "listSchools",
@@ -48,25 +46,14 @@ if (sisInterface) {
   }
 }
 
-const cleverAdapter = read(
-  "services/integration-svc/src/services/clever-adapter.ts",
-);
+const cleverAdapter = read("services/integration-svc/src/services/clever-adapter.ts");
 if (cleverAdapter && !/createCleverAdapterFromExport/.test(cleverAdapter)) {
-  errors.push(
-    "clever-adapter.ts: must export createCleverAdapterFromExport(payload).",
-  );
+  errors.push("clever-adapter.ts: must export createCleverAdapterFromExport(payload).");
 }
 
-const classlinkAdapter = read(
-  "services/integration-svc/src/services/classlink-adapter.ts",
-);
-if (
-  classlinkAdapter &&
-  !/createClassLinkAdapterFromExport/.test(classlinkAdapter)
-) {
-  errors.push(
-    "classlink-adapter.ts: must export createClassLinkAdapterFromExport(payload).",
-  );
+const classlinkAdapter = read("services/integration-svc/src/services/classlink-adapter.ts");
+if (classlinkAdapter && !/createClassLinkAdapterFromExport/.test(classlinkAdapter)) {
+  errors.push("classlink-adapter.ts: must export createClassLinkAdapterFromExport(payload).");
 }
 
 const integrationIndex = read("services/integration-svc/src/index.ts");

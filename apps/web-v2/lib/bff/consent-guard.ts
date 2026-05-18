@@ -41,18 +41,8 @@ export function requireLearnerConsent(
     );
   }
   for (const type of consentTypes) {
-    const perLearner = getActiveConsentForUser(
-      parentUserId,
-      type,
-      session.tenantId,
-      learnerId,
-    );
-    const account = getActiveConsentForUser(
-      parentUserId,
-      type,
-      session.tenantId,
-      null,
-    );
+    const perLearner = getActiveConsentForUser(parentUserId, type, session.tenantId, learnerId);
+    const account = getActiveConsentForUser(parentUserId, type, session.tenantId, null);
     if (!perLearner && !account) {
       return fail(
         {

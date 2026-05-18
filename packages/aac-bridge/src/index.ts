@@ -22,21 +22,14 @@ export type { AACInputAdapter } from "./adapters/AACInputAdapter.js";
 export { PRCSaltilloAdapter } from "./adapters/PRCSaltilloAdapter.js";
 export { TobiiAdapter } from "./adapters/TobiiAdapter.js";
 export { AssistiveWareAdapter } from "./adapters/AssistiveWareAdapter.js";
-export {
-  detectAndCreateAdapter,
-  listAvailableAdapters,
-} from "./adapters/AdapterFactory.js";
+export { detectAndCreateAdapter, listAvailableAdapters } from "./adapters/AdapterFactory.js";
 
 // CoughDrop sync
 export { CoughDropSync } from "./coughdrop/CoughDropSync.js";
 export type { SyncStatus, SyncState } from "./coughdrop/CoughDropSync.js";
 
 // Eye-gaze pipeline (§9.3)
-export {
-  CalibrationState,
-  GazeTargetMapper,
-  DwellClickController,
-} from "./eye-gaze/pipeline.js";
+export { CalibrationState, GazeTargetMapper, DwellClickController } from "./eye-gaze/pipeline.js";
 export type {
   GazeFrame,
   GazeTarget,
@@ -57,8 +50,4 @@ export type {
   ConformanceCheck,
   ConformanceResult,
 } from "./certification/conformance.js";
-export {
-  CERTIFIED_VENDORS,
-  isCertified,
-  certificationsFor,
-} from "./certification/registry.js";
+export { CERTIFIED_VENDORS, isCertified, certificationsFor } from "./certification/registry.js";

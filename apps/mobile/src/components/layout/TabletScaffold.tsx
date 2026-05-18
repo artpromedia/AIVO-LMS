@@ -1,9 +1,9 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useWindowSizeClass } from '../../design/useWindowSizeClass';
-import { RoleNavigationRail, type RailDestination } from './RoleNavigationRail';
-import { colors } from '@/constants/colors';
+import React from "react";
+import { StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useWindowSizeClass } from "../../design/useWindowSizeClass";
+import { RoleNavigationRail, type RailDestination } from "./RoleNavigationRail";
+import { colors } from "@/constants/colors";
 
 export interface TabletScaffoldProps {
   /**
@@ -67,5 +67,5 @@ export function TabletScaffold({
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  row: { flex: 1, flexDirection: 'row' },
+  row: { flex: 1, flexDirection: "row" },
 });

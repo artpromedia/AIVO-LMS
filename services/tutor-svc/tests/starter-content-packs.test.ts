@@ -47,9 +47,7 @@ describe("starter content packs (Phase 4)", () => {
   it("each pack's skillGraphRefs overlap the tutor's skillGraphRefs", () => {
     for (const [key, pack] of Object.entries(STARTER_CONTENT_PACKS)) {
       const def = TUTOR_REGISTRY[key as keyof typeof TUTOR_REGISTRY];
-      const overlap = pack.skillGraphRefs.some((ref) =>
-        def.skillGraphRefs.includes(ref),
-      );
+      const overlap = pack.skillGraphRefs.some((ref) => def.skillGraphRefs.includes(ref));
       assert.ok(
         overlap,
         `starter pack for "${key}" references no skill graph the tutor declares (pack: ${JSON.stringify(pack.skillGraphRefs)}, tutor: ${JSON.stringify(def.skillGraphRefs)})`,

@@ -50,98 +50,100 @@ async function authenticate(req: any, reply: any) {
 }
 
 export async function registerAvatarRoutes(app: FastifyInstance) {
-  app.post("/api/users/me/avatar", {
-    schema: {
-      tags: ["Users"],
-      security: [{ bearerAuth: [] }],
-      consumes: ["multipart/form-data"],
+  app.post(
+    "/api/users/me/avatar",
+    {
+      schema: {
+        tags: ["Users"],
+        security: [{ bearerAuth: [] }],
+        consumes: ["multipart/form-data"],
+      },
+      preHandler: authenticate,
     },
-    preHandler: authenticate,
-  }, async (req, reply) => {
-    const db = (app as any).db;
-    const user = (req as any).user;
+    async (req, reply) => {
+      const db = (app as any).db;
+      const user = (req as any).user;
 
-    if (!(req as any).isMultipart || !(req as any).isMultipart()) {
-      return reply.status(400).send({ error: "Expected multipart/form-data." });
-    }
-
-    let filePart;
-    try {
-      filePart = await (req as any).file({ limits: { fileSize: AVATAR_MAX_BYTES } });
-    } catch {
-      return reply.status(400).send({ error: "Could not read upload." });
-    }
-    if (!filePart) {
-      return reply.status(400).send({ error: "No file provided." });
-    }
-
-    let buffer: Buffer;
-    try {
-      buffer = await filePart.toBuffer();
-    } catch (err: any) {
-      if (err?.code === "FST_REQ_FILE_TOO_LARGE" || err?.code === "FST_FILES_LIMIT") {
-        return reply.status(413).send({
-          error: `Avatar must be at most ${AVATAR_MAX_BYTES} bytes.`,
-          code: "file_too_large",
-        });
+      if (!(req as any).isMultipart || !(req as any).isMultipart()) {
+        return reply.status(400).send({ error: "Expected multipart/form-data." });
       }
-      return reply.status(400).send({ error: "Upload failed." });
-    }
 
-    const [existing] = await db
-      .select({ avatarUrl: users.avatarUrl })
-      .from(users)
-      .where(eq(users.id, user.sub))
-      .limit(1);
-
-    let processed;
-    try {
-      processed = await processAndStoreAvatar({
-        userId: user.sub,
-        buffer,
-        mimetype: filePart.mimetype,
-      });
-    } catch (err) {
-      if (err instanceof AvatarValidationError) {
-        return reply.status(err.statusCode).send({
-          error: err.message,
-          code: err.code,
-        });
+      let filePart;
+      try {
+        filePart = await (req as any).file({ limits: { fileSize: AVATAR_MAX_BYTES } });
+      } catch {
+        return reply.status(400).send({ error: "Could not read upload." });
       }
-      throw err;
-    }
+      if (!filePart) {
+        return reply.status(400).send({ error: "No file provided." });
+      }
 
-    await db
-      .update(users)
-      .set({ avatarUrl: processed.url })
-      .where(eq(users.id, user.sub));
+      let buffer: Buffer;
+      try {
+        buffer = await filePart.toBuffer();
+      } catch (err: any) {
+        if (err?.code === "FST_REQ_FILE_TOO_LARGE" || err?.code === "FST_FILES_LIMIT") {
+          return reply.status(413).send({
+            error: `Avatar must be at most ${AVATAR_MAX_BYTES} bytes.`,
+            code: "file_too_large",
+          });
+        }
+        return reply.status(400).send({ error: "Upload failed." });
+      }
 
-    // Best-effort: clean up the previously-stored photo so we don't leak
-    // bytes on every replace. Failures are swallowed inside the helper.
-    if (existing?.avatarUrl && existing.avatarUrl !== processed.url) {
-      await deletePreviousAvatarUrl(user.sub, existing.avatarUrl);
-    }
+      const [existing] = await db
+        .select({ avatarUrl: users.avatarUrl })
+        .from(users)
+        .where(eq(users.id, user.sub))
+        .limit(1);
 
-    return {
-      avatarUrl: processed.url,
-      thumbnailUrl: processed.thumbnailUrl,
-    };
-  });
+      let processed;
+      try {
+        processed = await processAndStoreAvatar({
+          userId: user.sub,
+          buffer,
+          mimetype: filePart.mimetype,
+        });
+      } catch (err) {
+        if (err instanceof AvatarValidationError) {
+          return reply.status(err.statusCode).send({
+            error: err.message,
+            code: err.code,
+          });
+        }
+        throw err;
+      }
 
-  app.delete("/api/users/me/avatar", {
-    schema: { tags: ["Users"], security: [{ bearerAuth: [] }] },
-    preHandler: authenticate,
-  }, async (req, reply) => {
-    const db = (app as any).db;
-    const user = (req as any).user;
+      await db.update(users).set({ avatarUrl: processed.url }).where(eq(users.id, user.sub));
 
-    await db
-      .update(users)
-      .set({ avatarUrl: null })
-      .where(eq(users.id, user.sub));
+      // Best-effort: clean up the previously-stored photo so we don't leak
+      // bytes on every replace. Failures are swallowed inside the helper.
+      if (existing?.avatarUrl && existing.avatarUrl !== processed.url) {
+        await deletePreviousAvatarUrl(user.sub, existing.avatarUrl);
+      }
 
-    await deleteAvatarsFor(user.sub);
+      return {
+        avatarUrl: processed.url,
+        thumbnailUrl: processed.thumbnailUrl,
+      };
+    },
+  );
 
-    return reply.status(204).send();
-  });
+  app.delete(
+    "/api/users/me/avatar",
+    {
+      schema: { tags: ["Users"], security: [{ bearerAuth: [] }] },
+      preHandler: authenticate,
+    },
+    async (req, reply) => {
+      const db = (app as any).db;
+      const user = (req as any).user;
+
+      await db.update(users).set({ avatarUrl: null }).where(eq(users.id, user.sub));
+
+      await deleteAvatarsFor(user.sub);
+
+      return reply.status(204).send();
+    },
+  );
 }

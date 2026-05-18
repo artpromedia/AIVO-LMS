@@ -59,8 +59,11 @@ export default async function Page() {
                 {plansById.get(sub.planId)?.name ?? sub.planId}
               </p>
               <p className="text-sm text-aivo-ink-soft">
-                Period {new Date(sub.currentPeriodStartAt).toLocaleDateString()} – {new Date(sub.currentPeriodEndAt).toLocaleDateString()}
-                {sub.trialEndAt ? ` · trial ends ${new Date(sub.trialEndAt).toLocaleDateString()}` : ""}
+                Period {new Date(sub.currentPeriodStartAt).toLocaleDateString()} –{" "}
+                {new Date(sub.currentPeriodEndAt).toLocaleDateString()}
+                {sub.trialEndAt
+                  ? ` · trial ends ${new Date(sub.trialEndAt).toLocaleDateString()}`
+                  : ""}
               </p>
             </div>
             <Badge tone={STATUS_TONE[sub.status] ?? "neutral"} className="ml-auto">
@@ -80,7 +83,10 @@ export default async function Page() {
 
       <h2 className="mb-3 mt-8 font-display text-lg font-semibold">Recent invoices</h2>
       {invoices.length === 0 ? (
-        <EmptyState title="No invoices yet" description="Invoices appear here after each billing period closes." />
+        <EmptyState
+          title="No invoices yet"
+          description="Invoices appear here after each billing period closes."
+        />
       ) : (
         <Card className="overflow-hidden">
           <table className="w-full text-sm">
@@ -97,7 +103,8 @@ export default async function Page() {
                 <tr key={i.id} className="border-t border-aivo-border">
                   <td className="p-3 font-medium">{i.number}</td>
                   <td className="p-3 text-aivo-ink-soft">
-                    {new Date(i.periodStartAt).toLocaleDateString()} – {new Date(i.periodEndAt).toLocaleDateString()}
+                    {new Date(i.periodStartAt).toLocaleDateString()} –{" "}
+                    {new Date(i.periodEndAt).toLocaleDateString()}
                   </td>
                   <td className="p-3">${(i.amountCents / 100).toFixed(2)}</td>
                   <td className="p-3">

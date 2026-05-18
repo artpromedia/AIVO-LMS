@@ -42,7 +42,9 @@ export default function LoginPage() {
     try {
       const result = await login(email, password);
       if (result?.mfaPending) {
-        router.push(`/verify-mfa?token=${encodeURIComponent(result.mfaToken)}&method=${encodeURIComponent(result.mfaMethod || "email")}&returnTo=/`);
+        router.push(
+          `/verify-mfa?token=${encodeURIComponent(result.mfaToken)}&method=${encodeURIComponent(result.mfaMethod || "email")}&returnTo=/`,
+        );
         return;
       }
       const roleDashboards: Record<string, string> = {
@@ -82,8 +84,14 @@ export default function LoginPage() {
 
       <div aria-hidden="true" className="absolute inset-0 pointer-events-none -z-0">
         <div className="absolute -top-20 -left-20 w-[45vw] h-[45vw] bg-violet-300/40 rounded-full blur-3xl animate-blob motion-reduce:animate-none" />
-        <div className="absolute -bottom-20 -right-20 w-[40vw] h-[40vw] bg-amber-200/50 rounded-full blur-3xl animate-blob motion-reduce:animate-none" style={{ animationDelay: "5s" }} />
-        <div className="absolute top-1/3 right-10 w-64 h-64 bg-cyan-200/40 rounded-full blur-3xl animate-blob motion-reduce:animate-none" style={{ animationDelay: "2s" }} />
+        <div
+          className="absolute -bottom-20 -right-20 w-[40vw] h-[40vw] bg-amber-200/50 rounded-full blur-3xl animate-blob motion-reduce:animate-none"
+          style={{ animationDelay: "5s" }}
+        />
+        <div
+          className="absolute top-1/3 right-10 w-64 h-64 bg-cyan-200/40 rounded-full blur-3xl animate-blob motion-reduce:animate-none"
+          style={{ animationDelay: "2s" }}
+        />
       </div>
 
       <header className="relative z-30 flex items-center justify-between p-6">
@@ -111,9 +119,7 @@ export default function LoginPage() {
               <h1 className="text-3xl font-heading font-bold text-slate-900 leading-tight">
                 {t("welcome_back")}!
               </h1>
-              <p className="text-slate-500 font-body mt-1.5">
-                {t("continue_description")}
-              </p>
+              <p className="text-slate-500 font-body mt-1.5">{t("continue_description")}</p>
             </div>
 
             <div
@@ -182,11 +188,17 @@ export default function LoginPage() {
               <div role="tabpanel" id="panel-email" aria-labelledby="tab-email">
                 <form onSubmit={handleEmailLogin} className="space-y-5">
                   <div className="space-y-2">
-                    <label htmlFor="login-email" className="block text-sm font-bold text-slate-700 ml-1">
+                    <label
+                      htmlFor="login-email"
+                      className="block text-sm font-bold text-slate-700 ml-1"
+                    >
                       {t("email")}
                     </label>
                     <div className="relative">
-                      <Mail className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" aria-hidden="true" />
+                      <Mail
+                        className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"
+                        aria-hidden="true"
+                      />
                       <input
                         id="login-email"
                         type="email"
@@ -202,7 +214,10 @@ export default function LoginPage() {
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center ml-1">
-                      <label htmlFor="login-password" className="block text-sm font-bold text-slate-700">
+                      <label
+                        htmlFor="login-password"
+                        className="block text-sm font-bold text-slate-700"
+                      >
                         {t("password")}
                       </label>
                       <Link
@@ -213,7 +228,10 @@ export default function LoginPage() {
                       </Link>
                     </div>
                     <div className="relative">
-                      <Lock className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" aria-hidden="true" />
+                      <Lock
+                        className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"
+                        aria-hidden="true"
+                      />
                       <input
                         id="login-password"
                         type={showPassword ? "text" : "password"}
@@ -231,7 +249,11 @@ export default function LoginPage() {
                         className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                         aria-label={showPassword ? "Hide password" : "Show password"}
                       >
-                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        {showPassword ? (
+                          <EyeOff className="w-5 h-5" />
+                        ) : (
+                          <Eye className="w-5 h-5" />
+                        )}
                       </button>
                     </div>
                   </div>
@@ -244,7 +266,12 @@ export default function LoginPage() {
                   >
                     {loading ? (
                       <>
-                        <Loader2 size={20} strokeWidth={2.5} className="motion-safe:animate-spin" aria-hidden="true" />
+                        <Loader2
+                          size={20}
+                          strokeWidth={2.5}
+                          className="motion-safe:animate-spin"
+                          aria-hidden="true"
+                        />
                         {t("signing_in")}
                       </>
                     ) : (
@@ -260,11 +287,17 @@ export default function LoginPage() {
               <div role="tabpanel" id="panel-pin" aria-labelledby="tab-pin" className="space-y-7">
                 <form onSubmit={handlePinLogin} className="space-y-5">
                   <div>
-                    <label htmlFor="parent-id" className="block text-sm font-bold text-slate-700 mb-2 ml-1">
+                    <label
+                      htmlFor="parent-id"
+                      className="block text-sm font-bold text-slate-700 mb-2 ml-1"
+                    >
                       {t("parent_email_or_id")}
                     </label>
                     <div className="relative">
-                      <User className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" aria-hidden="true" />
+                      <User
+                        className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"
+                        aria-hidden="true"
+                      />
                       <input
                         id="parent-id"
                         type="text"
@@ -279,7 +312,10 @@ export default function LoginPage() {
                     </div>
                   </div>
                   <div>
-                    <label htmlFor="learner-pin" className="block text-sm font-bold text-slate-700 mb-2 ml-1 text-center">
+                    <label
+                      htmlFor="learner-pin"
+                      className="block text-sm font-bold text-slate-700 mb-2 ml-1 text-center"
+                    >
                       {t("enter_secret_pin") ?? "Enter your secret PIN"}
                     </label>
                     <input
@@ -305,7 +341,12 @@ export default function LoginPage() {
                   >
                     {loading ? (
                       <>
-                        <Loader2 size={20} strokeWidth={2.5} className="motion-safe:animate-spin" aria-hidden="true" />
+                        <Loader2
+                          size={20}
+                          strokeWidth={2.5}
+                          className="motion-safe:animate-spin"
+                          aria-hidden="true"
+                        />
                         {t("signing_in")}
                       </>
                     ) : (
@@ -322,12 +363,18 @@ export default function LoginPage() {
 
           <div className="text-center mt-7">
             <div className="inline-flex items-center gap-2 text-sm font-bold text-slate-600 bg-white/70 backdrop-blur px-4 py-2 rounded-full border border-slate-200">
-              <ShieldCheck className="w-4 h-4 text-[hsl(var(--visual-primary))]" aria-hidden="true" />
+              <ShieldCheck
+                className="w-4 h-4 text-[hsl(var(--visual-primary))]"
+                aria-hidden="true"
+              />
               {t("compliance_badge") ?? "COPPA · FERPA · SOC 2 Compliant"}
             </div>
             <p className="text-sm font-medium text-slate-500 mt-5">
               {t("no_account")}{" "}
-              <Link href="/signup" className="text-[hsl(var(--visual-primary))] font-bold hover:underline">
+              <Link
+                href="/signup"
+                className="text-[hsl(var(--visual-primary))] font-bold hover:underline"
+              >
                 {t("start_free_trial") ?? t("sign_up")}
               </Link>
             </p>
@@ -340,11 +387,17 @@ export default function LoginPage() {
           {t("privacy")}
         </Link>
         <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-        <Link href="/terms-of-service" className="hover:text-[hsl(var(--visual-primary))] transition">
+        <Link
+          href="/terms-of-service"
+          className="hover:text-[hsl(var(--visual-primary))] transition"
+        >
           {t("terms")}
         </Link>
         <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-        <Link href="/coppa-compliance" className="hover:text-[hsl(var(--visual-primary))] transition">
+        <Link
+          href="/coppa-compliance"
+          className="hover:text-[hsl(var(--visual-primary))] transition"
+        >
           COPPA
         </Link>
       </footer>

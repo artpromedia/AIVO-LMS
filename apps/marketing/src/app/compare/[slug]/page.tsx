@@ -21,7 +21,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: comp.metaDescription,
     alternates: { canonical: url },
     openGraph: { title: comp.metaTitle, description: comp.metaDescription, url, type: "website" },
-    twitter: { card: "summary_large_image", title: comp.metaTitle, description: comp.metaDescription },
+    twitter: {
+      card: "summary_large_image",
+      title: comp.metaTitle,
+      description: comp.metaDescription,
+    },
   };
 }
 
@@ -51,8 +55,12 @@ export default async function ComparePage({ params }: Props) {
           <p className="text-slate-700 font-body text-sm leading-relaxed">{comp.bestFor.aivo}</p>
         </div>
         <div className="rounded-3xl border border-slate-200 bg-white p-6">
-          <h2 className="font-heading font-bold text-slate-900 mb-2">{comp.competitor} is best for</h2>
-          <p className="text-slate-700 font-body text-sm leading-relaxed">{comp.bestFor.competitor}</p>
+          <h2 className="font-heading font-bold text-slate-900 mb-2">
+            {comp.competitor} is best for
+          </h2>
+          <p className="text-slate-700 font-body text-sm leading-relaxed">
+            {comp.bestFor.competitor}
+          </p>
         </div>
       </section>
 
@@ -65,15 +73,24 @@ export default async function ComparePage({ params }: Props) {
             <caption className="sr-only">AIVO vs {comp.competitor} feature comparison</caption>
             <thead className="bg-slate-50 text-slate-700">
               <tr>
-                <th scope="col" className="text-left font-heading font-bold p-4">Feature</th>
-                <th scope="col" className="text-left font-heading font-bold p-4 text-primary">AIVO</th>
-                <th scope="col" className="text-left font-heading font-bold p-4">{comp.competitor}</th>
+                <th scope="col" className="text-left font-heading font-bold p-4">
+                  Feature
+                </th>
+                <th scope="col" className="text-left font-heading font-bold p-4 text-primary">
+                  AIVO
+                </th>
+                <th scope="col" className="text-left font-heading font-bold p-4">
+                  {comp.competitor}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-700">
               {comp.rows.map((row) => (
                 <tr key={row.feature}>
-                  <th scope="row" className="text-left font-body p-4 font-semibold text-slate-700 align-top">
+                  <th
+                    scope="row"
+                    className="text-left font-body p-4 font-semibold text-slate-700 align-top"
+                  >
                     {row.feature}
                   </th>
                   <td className="p-4 align-top">{row.aivo}</td>

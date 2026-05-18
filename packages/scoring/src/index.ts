@@ -62,9 +62,7 @@ export function computeLessonXp(s: LessonSignals): number {
 
 export function computeCompletionQuality(s: LessonSignals): number {
   const completionRate =
-    s.beatsTotal && s.beatsTotal > 0
-      ? clamp((s.beatsCompleted ?? 0) / s.beatsTotal, 0, 1)
-      : 0.5;
+    s.beatsTotal && s.beatsTotal > 0 ? clamp((s.beatsCompleted ?? 0) / s.beatsTotal, 0, 1) : 0.5;
 
   const correctnessRate =
     s.attemptedAnswers && s.attemptedAnswers > 0
@@ -85,10 +83,7 @@ export function computeCompletionQuality(s: LessonSignals): number {
   else timeOnTaskScore = 0.5;
 
   const score =
-    completionRate * 0.30 +
-    correctnessRate * 0.35 +
-    engagementScore * 0.15 +
-    timeOnTaskScore * 0.20;
+    completionRate * 0.3 + correctnessRate * 0.35 + engagementScore * 0.15 + timeOnTaskScore * 0.2;
 
   return Math.round(clamp(score, 0, 1) * 100) / 100;
 }
@@ -256,11 +251,7 @@ export function scoreSurfaceResponse(
       const exact = scoreExact(spec, response);
       const rubric = scoreRubric(spec, response);
       const process = scoreProcess(response);
-      const score = clamp(
-        exact.score * 0.5 + rubric.score * 0.3 + process.score * 0.2,
-        0,
-        1,
-      );
+      const score = clamp(exact.score * 0.5 + rubric.score * 0.3 + process.score * 0.2, 0, 1);
       base = { correct: exact.correct || rubric.correct, score: Math.round(score * 100) / 100 };
       break;
     }
@@ -455,10 +446,7 @@ export function analyzeRecommendationSignals(
       confidence: 0.6,
       title: "Consider scaffolding for final-answer step",
       rationale: "Process-mode responses correct but exact-mode responses failing.",
-      evidenceIndices: [
-        ...processSamples.map((_, i) => i),
-        ...exactSamples.map((_, i) => i),
-      ],
+      evidenceIndices: [...processSamples.map((_, i) => i), ...exactSamples.map((_, i) => i)],
       payload: {
         processCorrect: processSamples.length,
         exactIncorrect: exactSamples.length,
@@ -468,4 +456,3 @@ export function analyzeRecommendationSignals(
 
   return { sampleCount: window.length, candidates };
 }
-

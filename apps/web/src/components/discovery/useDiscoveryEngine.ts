@@ -27,7 +27,6 @@ export interface ChapterGenerationStatus {
   rejectedCount: number;
 }
 
-
 interface UseDiscoveryEngineProps {
   learnerId: string;
   learnerName: string;
@@ -65,7 +64,13 @@ function clearSavedState(learnerId: string) {
   } catch {}
 }
 
-export function useDiscoveryEngine({ learnerId, learnerName, functioningLevel, accessToken, refreshToken }: UseDiscoveryEngineProps) {
+export function useDiscoveryEngine({
+  learnerId,
+  learnerName,
+  functioningLevel,
+  accessToken,
+  refreshToken,
+}: UseDiscoveryEngineProps) {
   const config = FUNCTIONING_LEVEL_CONFIG[functioningLevel] || FUNCTIONING_LEVEL_CONFIG.STANDARD;
   const chapters = ADVENTURE_CHAPTERS.slice(0, config.chaptersCount);
 
@@ -111,20 +116,31 @@ export function useDiscoveryEngine({ learnerId, learnerName, functioningLevel, a
   // Bumped each time chapter activities are loaded so derived getters
   // (which read from a ref) trigger a re-render in consumers.
   const [, setActivitiesVersion] = useState(0);
-  const [generationStatus, setGenerationStatus] = useState<Record<string, ChapterGenerationStatus>>({});
+  const [generationStatus, setGenerationStatus] = useState<Record<string, ChapterGenerationStatus>>(
+    {},
+  );
 
   const validateAndCoerceActivities = useCallback(
-    (raw: ChapterActivities | undefined, chapterId: string): { activities: ChapterActivities; rejected: number } => {
+    (
+      raw: ChapterActivities | undefined,
+      chapterId: string,
+    ): { activities: ChapterActivities; rejected: number } => {
       if (!raw) return { activities: { easy: [], medium: [], hard: [] }, rejected: 0 };
       const tiers: DifficultyTier[] = ["easy", "medium", "hard"];
       let rejected = 0;
       const out: ChapterActivities = { easy: [], medium: [], hard: [] };
       for (const tier of tiers) {
         const items = raw[tier] || [];
-        const result = validateDiscoveryActivities(items as unknown as Parameters<typeof validateDiscoveryActivities>[0]);
+        const result = validateDiscoveryActivities(
+          items as unknown as Parameters<typeof validateDiscoveryActivities>[0],
+        );
         rejected += result.rejectedActivities.length;
         for (const r of result.rejectedActivities) {
-          emitDiscoveryEvent("baseline_activity_rejected", { chapterId, id: r.id, reason: r.reason });
+          emitDiscoveryEvent("baseline_activity_rejected", {
+            chapterId,
+            id: r.id,
+            reason: r.reason,
+          });
         }
         out[tier] = result.validActivities as unknown as Activity[];
       }
@@ -158,122 +174,135 @@ export function useDiscoveryEngine({ learnerId, learnerName, functioningLevel, a
     [learnerId],
   );
 
-  const loadChapterActivities = useCallback(async (chapter: AdventureChapter): Promise<ChapterActivities> => {
-    if (chapterActivitiesRef.current[chapter.id]) {
-      return chapterActivitiesRef.current[chapter.id];
-    }
+  const loadChapterActivities = useCallback(
+    async (chapter: AdventureChapter): Promise<ChapterActivities> => {
+      if (chapterActivitiesRef.current[chapter.id]) {
+        return chapterActivitiesRef.current[chapter.id];
+      }
 
-    const useFallback = (reason: string, source: GenerationSource = "fallback", level: PersonalizationLevel = "none") => {
-      const fallback = FALLBACK_ACTIVITIES[chapter.id] || FALLBACK_ACTIVITIES.sage_story_garden;
-      chapterActivitiesRef.current[chapter.id] = fallback;
-      setActivitiesVersion(v => v + 1);
-      setGenerationStatus(prev => ({
+      const useFallback = (
+        reason: string,
+        source: GenerationSource = "fallback",
+        level: PersonalizationLevel = "none",
+      ) => {
+        const fallback = FALLBACK_ACTIVITIES[chapter.id] || FALLBACK_ACTIVITIES.sage_story_garden;
+        chapterActivitiesRef.current[chapter.id] = fallback;
+        setActivitiesVersion((v) => v + 1);
+        setGenerationStatus((prev) => ({
+          ...prev,
+          [chapter.id]: {
+            chapterId: chapter.id,
+            source,
+            personalizationLevel: level,
+            retrying: false,
+            reason,
+            rejectedCount: 0,
+          },
+        }));
+        emitDiscoveryEvent("baseline_generation_fallback_used", { chapterId: chapter.id, reason });
+        return fallback;
+      };
+
+      if (!accessToken) {
+        return useFallback("no_access_token");
+      }
+
+      emitDiscoveryEvent("baseline_generation_started", { chapterId: chapter.id });
+      setGenerationStatus((prev) => ({
         ...prev,
         [chapter.id]: {
           chapterId: chapter.id,
-          source,
-          personalizationLevel: level,
+          source: "ai",
+          personalizationLevel: "full",
           retrying: false,
-          reason,
           rejectedCount: 0,
         },
       }));
-      emitDiscoveryEvent("baseline_generation_fallback_used", { chapterId: chapter.id, reason });
-      return fallback;
-    };
 
-    if (!accessToken) {
-      return useFallback("no_access_token");
-    }
-
-    emitDiscoveryEvent("baseline_generation_started", { chapterId: chapter.id });
-    setGenerationStatus(prev => ({
-      ...prev,
-      [chapter.id]: {
-        chapterId: chapter.id,
-        source: "ai",
-        personalizationLevel: "full",
-        retrying: false,
-        rejectedCount: 0,
-      },
-    }));
-
-    let attempt: Awaited<ReturnType<typeof fetchChapterPayload>>;
-    try {
-      attempt = await fetchChapterPayload(chapter, accessToken);
-    } catch (err: any) {
-      attempt = { ok: false, status: 0, reason: `network_error:${err?.message ?? "unknown"}` };
-    }
-
-    if (!attempt.ok) {
-      // Single retry on AI/network failure before falling back.
-      setGenerationStatus(prev => ({
-        ...prev,
-        [chapter.id]: {
-          ...(prev[chapter.id] ?? {
-            chapterId: chapter.id,
-            source: "ai",
-            personalizationLevel: "full",
-            rejectedCount: 0,
-          }),
-          retrying: true,
-          reason: attempt.reason,
-        },
-      }));
+      let attempt: Awaited<ReturnType<typeof fetchChapterPayload>>;
       try {
         attempt = await fetchChapterPayload(chapter, accessToken);
       } catch (err: any) {
         attempt = { ok: false, status: 0, reason: `network_error:${err?.message ?? "unknown"}` };
       }
-    }
 
-    if (!attempt.ok) {
-      emitDiscoveryEvent("baseline_generation_failed", { chapterId: chapter.id, reason: attempt.reason });
-      return useFallback(attempt.reason);
-    }
+      if (!attempt.ok) {
+        // Single retry on AI/network failure before falling back.
+        setGenerationStatus((prev) => ({
+          ...prev,
+          [chapter.id]: {
+            ...(prev[chapter.id] ?? {
+              chapterId: chapter.id,
+              source: "ai",
+              personalizationLevel: "full",
+              rejectedCount: 0,
+            }),
+            retrying: true,
+            reason: attempt.reason,
+          },
+        }));
+        try {
+          attempt = await fetchChapterPayload(chapter, accessToken);
+        } catch (err: any) {
+          attempt = { ok: false, status: 0, reason: `network_error:${err?.message ?? "unknown"}` };
+        }
+      }
 
-    const data = attempt.data as {
-      generated?: boolean;
-      activities?: ChapterActivities;
-      personalizationLevel?: PersonalizationLevel;
-      source?: GenerationSource;
-      rejectedActivities?: unknown[];
-    };
+      if (!attempt.ok) {
+        emitDiscoveryEvent("baseline_generation_failed", {
+          chapterId: chapter.id,
+          reason: attempt.reason,
+        });
+        return useFallback(attempt.reason);
+      }
 
-    if (!data.generated || !data.activities) {
-      return useFallback("ai_no_activities");
-    }
+      const data = attempt.data as {
+        generated?: boolean;
+        activities?: ChapterActivities;
+        personalizationLevel?: PersonalizationLevel;
+        source?: GenerationSource;
+        rejectedActivities?: unknown[];
+      };
 
-    const { activities, rejected } = validateAndCoerceActivities(data.activities, chapter.id);
-    const hasActivities = (["easy", "medium", "hard"] as DifficultyTier[]).some(
-      tier => (activities[tier] || []).length > 0,
-    );
-    if (!hasActivities) {
-      return useFallback("all_activities_invalid");
-    }
+      if (!data.generated || !data.activities) {
+        return useFallback("ai_no_activities");
+      }
 
-    chapterActivitiesRef.current[chapter.id] = activities;
-    setActivitiesVersion(v => v + 1);
-    setGenerationStatus(prev => ({
-      ...prev,
-      [chapter.id]: {
-        chapterId: chapter.id,
-        source: data.source ?? "ai",
-        personalizationLevel: data.personalizationLevel ?? "full",
-        retrying: false,
-        rejectedCount: rejected + (data.rejectedActivities?.length ?? 0),
-      },
-    }));
-    emitDiscoveryEvent("baseline_generation_succeeded", { chapterId: chapter.id, rejected });
-    return activities;
-  }, [accessToken, fetchChapterPayload, validateAndCoerceActivities]);
+      const { activities, rejected } = validateAndCoerceActivities(data.activities, chapter.id);
+      const hasActivities = (["easy", "medium", "hard"] as DifficultyTier[]).some(
+        (tier) => (activities[tier] || []).length > 0,
+      );
+      if (!hasActivities) {
+        return useFallback("all_activities_invalid");
+      }
+
+      chapterActivitiesRef.current[chapter.id] = activities;
+      setActivitiesVersion((v) => v + 1);
+      setGenerationStatus((prev) => ({
+        ...prev,
+        [chapter.id]: {
+          chapterId: chapter.id,
+          source: data.source ?? "ai",
+          personalizationLevel: data.personalizationLevel ?? "full",
+          retrying: false,
+          rejectedCount: rejected + (data.rejectedActivities?.length ?? 0),
+        },
+      }));
+      emitDiscoveryEvent("baseline_generation_succeeded", { chapterId: chapter.id, rejected });
+      return activities;
+    },
+    [accessToken, fetchChapterPayload, validateAndCoerceActivities],
+  );
 
   useEffect(() => {
     if (resumeHandledRef.current) return;
     const saved = loadSavedState(learnerId);
     if (!saved) return;
     resumeHandledRef.current = true;
-    const needsActivities = saved.phase === "activity" || saved.phase === "chapter-intro" || saved.phase === "chapter-complete";
+    const needsActivities =
+      saved.phase === "activity" ||
+      saved.phase === "chapter-intro" ||
+      saved.phase === "chapter-complete";
     if (needsActivities && chapters[saved.currentChapterIdx]) {
       loadChapterActivities(chapters[saved.currentChapterIdx]);
     }
@@ -294,24 +323,30 @@ export function useDiscoveryEngine({ learnerId, learnerName, functioningLevel, a
   }, [getCurrentActivities, state.currentActivityIdx]);
 
   const startAdventure = useCallback(() => {
-    setState(s => ({ ...s, phase: "pre-adventure", startedAt: Date.now() }));
+    setState((s) => ({ ...s, phase: "pre-adventure", startedAt: Date.now() }));
   }, []);
 
   const beginFirstChapter = useCallback(async () => {
     if (chapters.length === 0) {
-      setState(s => ({ ...s, phase: "finale" }));
+      setState((s) => ({ ...s, phase: "finale" }));
       return;
     }
-    setState(s => ({ ...s, phase: "loading" }));
+    setState((s) => ({ ...s, phase: "loading" }));
     await loadChapterActivities(chapters[0]);
     chapterCorrectRef.current = 0;
     chapterTotalRef.current = 0;
     chapterLatenciesRef.current = [];
-    setState(s => ({ ...s, phase: "chapter-intro", currentChapterIdx: 0, currentActivityIdx: 0, currentDifficulty: "easy" }));
+    setState((s) => ({
+      ...s,
+      phase: "chapter-intro",
+      currentChapterIdx: 0,
+      currentActivityIdx: 0,
+      currentDifficulty: "easy",
+    }));
   }, [chapters, loadChapterActivities]);
 
   const startChapterActivities = useCallback(() => {
-    setState(s => ({ ...s, phase: "activity", currentActivityIdx: 0 }));
+    setState((s) => ({ ...s, phase: "activity", currentActivityIdx: 0 }));
   }, []);
 
   const recordSurfaceSignal = useCallback((signal: Record<string, unknown>) => {
@@ -349,112 +384,121 @@ export function useDiscoveryEngine({ learnerId, learnerName, functioningLevel, a
     [ledgerEnabled, learnerId],
   );
 
-  const retryChapterGeneration = useCallback(async (chapter: AdventureChapter) => {
-    delete chapterActivitiesRef.current[chapter.id];
-    setGenerationStatus(prev => {
-      const next = { ...prev };
-      delete next[chapter.id];
-      return next;
-    });
-    return loadChapterActivities(chapter);
-  }, [loadChapterActivities]);
+  const retryChapterGeneration = useCallback(
+    async (chapter: AdventureChapter) => {
+      delete chapterActivitiesRef.current[chapter.id];
+      setGenerationStatus((prev) => {
+        const next = { ...prev };
+        delete next[chapter.id];
+        return next;
+      });
+      return loadChapterActivities(chapter);
+    },
+    [loadChapterActivities],
+  );
 
-  const handleAnswer = useCallback((correct: boolean, latencyMs: number, payload?: Record<string, unknown>) => {
-    if (correct) chapterCorrectRef.current++;
-    chapterTotalRef.current++;
-    chapterLatenciesRef.current.push(latencyMs);
-    if (payload) {
-      recordSurfaceSignal({ ...payload, latencyMs, correct });
-    }
-    emitDiscoveryTelemetry("answer_attempted", {
-      correct,
-      latencyMs,
-      hasInk: Number((payload as { inkStrokeCount?: number } | undefined)?.inkStrokeCount ?? 0) > 0,
-    });
+  const handleAnswer = useCallback(
+    (correct: boolean, latencyMs: number, payload?: Record<string, unknown>) => {
+      if (correct) chapterCorrectRef.current++;
+      chapterTotalRef.current++;
+      chapterLatenciesRef.current.push(latencyMs);
+      if (payload) {
+        recordSurfaceSignal({ ...payload, latencyMs, correct });
+      }
+      emitDiscoveryTelemetry("answer_attempted", {
+        correct,
+        latencyMs,
+        hasInk:
+          Number((payload as { inkStrokeCount?: number } | undefined)?.inkStrokeCount ?? 0) > 0,
+      });
 
-    setState(s => {
-      const newStreakCorrect = correct ? s.streakCorrect + 1 : 0;
-      const newStreakWrong = correct ? 0 : s.streakWrong + 1;
-      const newXp = s.xpEarned + (correct ? 10 : 3);
+      setState((s) => {
+        const newStreakCorrect = correct ? s.streakCorrect + 1 : 0;
+        const newStreakWrong = correct ? 0 : s.streakWrong + 1;
+        const newXp = s.xpEarned + (correct ? 10 : 3);
 
-      const chapter = chapters[s.currentChapterIdx];
-      if (!chapter) return s;
+        const chapter = chapters[s.currentChapterIdx];
+        if (!chapter) return s;
 
-      const chapterActs = chapterActivitiesRef.current[chapter.id];
-      if (!chapterActs) return s;
-      const tierActs = chapterActs[s.currentDifficulty] || chapterActs.easy || [];
-      const activities = tierActs.slice(0, config.activitiesPerChapter);
-      const nextIdx = s.currentActivityIdx + 1;
+        const chapterActs = chapterActivitiesRef.current[chapter.id];
+        if (!chapterActs) return s;
+        const tierActs = chapterActs[s.currentDifficulty] || chapterActs.easy || [];
+        const activities = tierActs.slice(0, config.activitiesPerChapter);
+        const nextIdx = s.currentActivityIdx + 1;
 
-      if (nextIdx >= activities.length) {
-        let nextDifficulty = s.currentDifficulty;
-        const chapterPct = chapterCorrectRef.current / Math.max(1, chapterTotalRef.current);
-        if (chapterPct >= 0.8 && s.currentDifficulty === "easy") nextDifficulty = "medium";
-        else if (chapterPct >= 0.8 && s.currentDifficulty === "medium") nextDifficulty = "hard";
-        else if (chapterPct < 0.4 && s.currentDifficulty === "hard") nextDifficulty = "medium";
-        else if (chapterPct < 0.4 && s.currentDifficulty === "medium") nextDifficulty = "easy";
+        if (nextIdx >= activities.length) {
+          let nextDifficulty = s.currentDifficulty;
+          const chapterPct = chapterCorrectRef.current / Math.max(1, chapterTotalRef.current);
+          if (chapterPct >= 0.8 && s.currentDifficulty === "easy") nextDifficulty = "medium";
+          else if (chapterPct >= 0.8 && s.currentDifficulty === "medium") nextDifficulty = "hard";
+          else if (chapterPct < 0.4 && s.currentDifficulty === "hard") nextDifficulty = "medium";
+          else if (chapterPct < 0.4 && s.currentDifficulty === "medium") nextDifficulty = "easy";
 
-        const result: ChapterResult = {
-          chapterId: chapter.id,
-          domain: chapter.domain,
-          correct: chapterCorrectRef.current,
-          total: chapterTotalRef.current,
-          avgLatencyMs: chapterLatenciesRef.current.length > 0
-            ? chapterLatenciesRef.current.reduce((a, b) => a + b, 0) / chapterLatenciesRef.current.length
-            : 0,
-          difficulty: s.currentDifficulty,
-        };
+          const result: ChapterResult = {
+            chapterId: chapter.id,
+            domain: chapter.domain,
+            correct: chapterCorrectRef.current,
+            total: chapterTotalRef.current,
+            avgLatencyMs:
+              chapterLatenciesRef.current.length > 0
+                ? chapterLatenciesRef.current.reduce((a, b) => a + b, 0) /
+                  chapterLatenciesRef.current.length
+                : 0,
+            difficulty: s.currentDifficulty,
+          };
+
+          return {
+            ...s,
+            phase: "chapter-complete" as AdventurePhase,
+            totalCorrect: s.totalCorrect + (correct ? 1 : 0),
+            totalAttempts: s.totalAttempts + 1,
+            streakCorrect: newStreakCorrect,
+            streakWrong: newStreakWrong,
+            xpEarned: newXp,
+            currentDifficulty: nextDifficulty,
+            chapterResults: [...s.chapterResults, result],
+            responseLatencies: [...s.responseLatencies, latencyMs],
+          };
+        }
 
         return {
           ...s,
-          phase: "chapter-complete" as AdventurePhase,
+          currentActivityIdx: nextIdx,
           totalCorrect: s.totalCorrect + (correct ? 1 : 0),
           totalAttempts: s.totalAttempts + 1,
           streakCorrect: newStreakCorrect,
           streakWrong: newStreakWrong,
           xpEarned: newXp,
-          currentDifficulty: nextDifficulty,
-          chapterResults: [...s.chapterResults, result],
           responseLatencies: [...s.responseLatencies, latencyMs],
         };
-      }
-
-      return {
-        ...s,
-        currentActivityIdx: nextIdx,
-        totalCorrect: s.totalCorrect + (correct ? 1 : 0),
-        totalAttempts: s.totalAttempts + 1,
-        streakCorrect: newStreakCorrect,
-        streakWrong: newStreakWrong,
-        xpEarned: newXp,
-        responseLatencies: [...s.responseLatencies, latencyMs],
-      };
-    });
-  }, [chapters, config.activitiesPerChapter, emitDiscoveryTelemetry, recordSurfaceSignal]);
+      });
+    },
+    [chapters, config.activitiesPerChapter, emitDiscoveryTelemetry, recordSurfaceSignal],
+  );
 
   const advanceToNextChapter = useCallback(async () => {
     const nextIdx = state.currentChapterIdx + 1;
     if (nextIdx >= chapters.length) {
-      setState(s => ({ ...s, phase: "finale" }));
+      setState((s) => ({ ...s, phase: "finale" }));
       return;
     }
 
-    setState(s => ({ ...s, phase: "break" }));
+    setState((s) => ({ ...s, phase: "break" }));
   }, [state.currentChapterIdx, chapters]);
 
   const resumeAfterBreak = useCallback(async () => {
     const nextIdx = state.currentChapterIdx + 1;
     if (nextIdx >= chapters.length) {
-      setState(s => ({ ...s, phase: "finale" }));
+      setState((s) => ({ ...s, phase: "finale" }));
       return;
     }
 
-    setState(s => ({ ...s, phase: "loading" }));
+    setState((s) => ({ ...s, phase: "loading" }));
     await loadChapterActivities(chapters[nextIdx]);
     chapterCorrectRef.current = 0;
     chapterTotalRef.current = 0;
     chapterLatenciesRef.current = [];
-    setState(s => ({
+    setState((s) => ({
       ...s,
       phase: "chapter-intro",
       currentChapterIdx: nextIdx,
@@ -464,7 +508,7 @@ export function useDiscoveryEngine({ learnerId, learnerName, functioningLevel, a
 
   const finishAdventure = useCallback(() => {
     clearSavedState(learnerId);
-    setState(s => ({ ...s, phase: "results" }));
+    setState((s) => ({ ...s, phase: "results" }));
   }, [learnerId]);
 
   const exitToHome = useCallback(() => {
@@ -475,7 +519,12 @@ export function useDiscoveryEngine({ learnerId, learnerName, functioningLevel, a
     return loadSavedState(learnerId) !== null;
   }, [learnerId]);
 
-  const submitResults = useCallback(async (): Promise<{ success: boolean; error?: string; code?: string; status?: number }> => {
+  const submitResults = useCallback(async (): Promise<{
+    success: boolean;
+    error?: string;
+    code?: string;
+    status?: number;
+  }> => {
     const payload = JSON.stringify({
       chapterResults: state.chapterResults,
       totalCorrect: state.totalCorrect,
@@ -535,7 +584,16 @@ export function useDiscoveryEngine({ learnerId, learnerName, functioningLevel, a
     } catch (e: any) {
       return { success: false, error: e?.message || "Network error", code: "network_error" };
     }
-  }, [accessToken, refreshToken, learnerId, state.chapterResults, state.totalCorrect, state.totalAttempts, state.xpEarned, state.responseLatencies]);
+  }, [
+    accessToken,
+    refreshToken,
+    learnerId,
+    state.chapterResults,
+    state.totalCorrect,
+    state.totalAttempts,
+    state.xpEarned,
+    state.responseLatencies,
+  ]);
 
   return {
     state,

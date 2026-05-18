@@ -23,7 +23,7 @@ export default function SchoolDetailPage() {
   useEffect(() => {
     if (!accessToken || !id) return;
     fetch(`/api/district/schools/${id}`, { headers: { Authorization: `Bearer ${accessToken}` } })
-      .then((r) => r.ok ? r.json() : null)
+      .then((r) => (r.ok ? r.json() : null))
       .then(setData)
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -42,7 +42,12 @@ export default function SchoolDetailPage() {
     return (
       <div className="p-8">
         <p className="vi-text-muted">School not found.</p>
-        <Link href="/dashboard/district/schools" className="text-[hsl(var(--visual-primary))] text-sm mt-2 inline-block">Back to Schools</Link>
+        <Link
+          href="/dashboard/district/schools"
+          className="text-[hsl(var(--visual-primary))] text-sm mt-2 inline-block"
+        >
+          Back to Schools
+        </Link>
       </div>
     );
   }
@@ -58,14 +63,25 @@ export default function SchoolDetailPage() {
   return (
     <div className="p-8 space-y-6">
       <header>
-        <Link href="/dashboard/district/schools" className="text-sm text-[hsl(var(--visual-primary))] hover:underline mb-2 inline-block">&larr; Back to Schools</Link>
+        <Link
+          href="/dashboard/district/schools"
+          className="text-sm text-[hsl(var(--visual-primary))] hover:underline mb-2 inline-block"
+        >
+          &larr; Back to Schools
+        </Link>
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))] rounded-2xl flex items-center justify-center"><SchoolIcon size={24} strokeWidth={2.5} aria-hidden="true" /></div>
+          <div className="w-12 h-12 bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))] rounded-2xl flex items-center justify-center">
+            <SchoolIcon size={24} strokeWidth={2.5} aria-hidden="true" />
+          </div>
           <div>
             <h1 className="text-2xl font-heading font-bold vi-text">{s.name}</h1>
-            <p className="text-sm vi-text-muted">{[s.city, s.state].filter(Boolean).join(", ") || "No location set"}</p>
+            <p className="text-sm vi-text-muted">
+              {[s.city, s.state].filter(Boolean).join(", ") || "No location set"}
+            </p>
           </div>
-          <span className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${s.status === "active" ? "bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]" : "vi-surface-soft vi-text-muted"}`}>
+          <span
+            className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${s.status === "active" ? "bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]" : "vi-surface-soft vi-text-muted"}`}
+          >
             {s.status}
           </span>
         </div>
@@ -77,7 +93,9 @@ export default function SchoolDetailPage() {
             key={t.key}
             onClick={() => setTab(t.key)}
             className={`px-4 py-2.5 text-sm font-medium border-b-2 transition ${
-              tab === t.key ? "border-violet-500 text-[hsl(var(--visual-primary))]" : "border-transparent vi-text-muted hover:vi-text"
+              tab === t.key
+                ? "border-violet-500 text-[hsl(var(--visual-primary))]"
+                : "border-transparent vi-text-muted hover:vi-text"
             }`}
           >
             {t.label}
@@ -100,15 +118,21 @@ export default function SchoolDetailPage() {
             <h3 className="text-lg font-semibold vi-text">Summary</h3>
             <div className="grid grid-cols-3 gap-3 text-center">
               <div className="vi-surface-soft rounded-xl p-4">
-                <p className="text-2xl font-bold text-[hsl(var(--visual-primary))]">{data.learnerCount}</p>
+                <p className="text-2xl font-bold text-[hsl(var(--visual-primary))]">
+                  {data.learnerCount}
+                </p>
                 <p className="text-xs vi-text-muted mt-1">Learners</p>
               </div>
               <div className="bg-[hsl(var(--visual-reading)/0.08)] border border-[hsl(var(--visual-reading)/0.25)] rounded-xl p-4">
-                <p className="text-2xl font-bold text-[hsl(var(--visual-reading))]">{data.staff.length}</p>
+                <p className="text-2xl font-bold text-[hsl(var(--visual-reading))]">
+                  {data.staff.length}
+                </p>
                 <p className="text-xs vi-text-muted mt-1">Staff</p>
               </div>
               <div className="bg-[hsl(var(--visual-science)/0.08)] border border-[hsl(var(--visual-science)/0.25)] rounded-xl p-4">
-                <p className="text-2xl font-bold text-[hsl(var(--visual-science))]">{data.classrooms.length}</p>
+                <p className="text-2xl font-bold text-[hsl(var(--visual-science))]">
+                  {data.classrooms.length}
+                </p>
                 <p className="text-xs vi-text-muted mt-1">Classrooms</p>
               </div>
             </div>
@@ -131,7 +155,12 @@ export default function SchoolDetailPage() {
               {data.learners.map((l: any) => (
                 <tr key={l.id} className="border-b vi-border hover:vi-surface-soft transition">
                   <td className="px-5 py-3">
-                    <Link href={`/dashboard/district/learners/${l.id}`} className="font-medium vi-text hover:text-[hsl(var(--visual-primary))]">{l.name}</Link>
+                    <Link
+                      href={`/dashboard/district/learners/${l.id}`}
+                      className="font-medium vi-text hover:text-[hsl(var(--visual-primary))]"
+                    >
+                      {l.name}
+                    </Link>
                   </td>
                   <td className="px-5 py-3 vi-text-muted">{l.gradeLevel || "—"}</td>
                   <td className="px-5 py-3">
@@ -139,11 +168,17 @@ export default function SchoolDetailPage() {
                       {l.functioningLevel?.replace(/_/g, " ")}
                     </span>
                   </td>
-                  <td className="px-5 py-3 vi-text-muted">{new Date(l.createdAt).toLocaleDateString()}</td>
+                  <td className="px-5 py-3 vi-text-muted">
+                    {new Date(l.createdAt).toLocaleDateString()}
+                  </td>
                 </tr>
               ))}
               {data.learners.length === 0 && (
-                <tr><td colSpan={4} className="px-5 py-10 text-center vi-text-muted">No learners enrolled</td></tr>
+                <tr>
+                  <td colSpan={4} className="px-5 py-10 text-center vi-text-muted">
+                    No learners enrolled
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
@@ -165,7 +200,12 @@ export default function SchoolDetailPage() {
               {data.staff.map((u: any) => (
                 <tr key={u.id} className="border-b vi-border hover:vi-surface-soft transition">
                   <td className="px-5 py-3">
-                    <Link href={`/dashboard/district/staff/${u.id}`} className="font-medium vi-text hover:text-[hsl(var(--visual-primary))]">{u.name}</Link>
+                    <Link
+                      href={`/dashboard/district/staff/${u.id}`}
+                      className="font-medium vi-text hover:text-[hsl(var(--visual-primary))]"
+                    >
+                      {u.name}
+                    </Link>
                   </td>
                   <td className="px-5 py-3 vi-text-muted">{u.email || "—"}</td>
                   <td className="px-5 py-3">
@@ -173,11 +213,17 @@ export default function SchoolDetailPage() {
                       {u.role?.replace(/_/g, " ")}
                     </span>
                   </td>
-                  <td className="px-5 py-3 vi-text-muted">{u.assignedAt ? new Date(u.assignedAt).toLocaleDateString() : "—"}</td>
+                  <td className="px-5 py-3 vi-text-muted">
+                    {u.assignedAt ? new Date(u.assignedAt).toLocaleDateString() : "—"}
+                  </td>
                 </tr>
               ))}
               {data.staff.length === 0 && (
-                <tr><td colSpan={4} className="px-5 py-10 text-center vi-text-muted">No staff assigned</td></tr>
+                <tr>
+                  <td colSpan={4} className="px-5 py-10 text-center vi-text-muted">
+                    No staff assigned
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
@@ -205,7 +251,11 @@ export default function SchoolDetailPage() {
                 </tr>
               ))}
               {data.classrooms.length === 0 && (
-                <tr><td colSpan={4} className="px-5 py-10 text-center vi-text-muted">No classrooms created</td></tr>
+                <tr>
+                  <td colSpan={4} className="px-5 py-10 text-center vi-text-muted">
+                    No classrooms created
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>

@@ -1,11 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { eq, and, desc } from "drizzle-orm";
-import {
-  lessonSessions,
-  lessonContent,
-  gradebookEntries,
-  learningPaths,
-} from "@aivo/db";
+import { lessonSessions, lessonContent, gradebookEntries, learningPaths } from "@aivo/db";
 import { emitLessonAudit } from "../lib/audit.js";
 import {
   generateLessonContent,
@@ -577,10 +572,7 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
     { schema: getSessionByIdSchema },
     async (request, reply) => {
       const { sessionId } = request.params as { sessionId: string };
-      const [row] = await db
-        .select()
-        .from(lessonSessions)
-        .where(eq(lessonSessions.id, sessionId));
+      const [row] = await db.select().from(lessonSessions).where(eq(lessonSessions.id, sessionId));
       if (!row) return reply.code(404).send({ error: "Session not found" });
       const access = await requireLearnerAccess(request, reply, db, row.learnerId);
       if (!access) return;

@@ -34,10 +34,7 @@ export function StageContent({ currentBeat, adaptations }: StageContentProps) {
       ) : null}
 
       {currentBeat.interaction?.prompt ? (
-        <Text
-          style={[styles.prompt, { fontSize: fontSize + 2 }]}
-          accessibilityRole="header"
-        >
+        <Text style={[styles.prompt, { fontSize: fontSize + 2 }]} accessibilityRole="header">
           {currentBeat.interaction.prompt}
         </Text>
       ) : null}

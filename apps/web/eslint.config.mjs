@@ -59,11 +59,14 @@ export default tseslint.config(
       "jsx-a11y/anchor-is-valid": "warn",
       "jsx-a11y/click-events-have-key-events": "warn",
       "jsx-a11y/no-static-element-interactions": "warn",
-      "jsx-a11y/label-has-associated-control": ["error", {
-        controlComponents: ["Toggle", "AccessibleToggle"],
-        assert: "either",
-        depth: 3,
-      }],
+      "jsx-a11y/label-has-associated-control": [
+        "error",
+        {
+          controlComponents: ["Toggle", "AccessibleToggle"],
+          assert: "either",
+          depth: 3,
+        },
+      ],
       "no-restricted-syntax": ["warn", interfaceResponseSelector],
     },
   },
@@ -104,11 +107,7 @@ export default tseslint.config(
       // disabled the rule. Re-enable hex guard, drop the interface
       // selector. session-heartbeat is not a dashboard file so the
       // hex selectors are no-ops there but harmless.
-      "no-restricted-syntax": [
-        "warn",
-        dashboardHexLiteralSelector,
-        dashboardHexTemplateSelector,
-      ],
+      "no-restricted-syntax": ["warn", dashboardHexLiteralSelector, dashboardHexTemplateSelector],
     },
   },
 );

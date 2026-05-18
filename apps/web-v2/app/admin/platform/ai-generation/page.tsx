@@ -47,18 +47,12 @@ export default async function Page() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {summary.map((s) => (
           <Card key={s.k} className="p-[var(--aivo-density-card-pad)]">
-            <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-              {s.k}
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{s.k}</p>
             <p className="mt-1 font-display text-3xl font-bold">{s.v}</p>
           </Card>
         ))}
       </div>
-      <SectionHeader
-        className="mt-8"
-        title="Recent jobs"
-        description="Newest first."
-      />
+      <SectionHeader className="mt-8" title="Recent jobs" description="Newest first." />
       {jobs.length === 0 ? (
         <EmptyState title="No AI generation jobs yet" />
       ) : (
@@ -84,9 +78,7 @@ export default async function Page() {
                     {getTenantById(j.tenantId)?.name ?? j.tenantId}
                   </td>
                   <td className="p-3">
-                    <Badge tone={STATUS_TONE[j.status] ?? "neutral"}>
-                      {j.status}
-                    </Badge>
+                    <Badge tone={STATUS_TONE[j.status] ?? "neutral"}>{j.status}</Badge>
                   </td>
                   <td className="p-3 text-aivo-ink-soft">
                     {j.completedAt

@@ -17,10 +17,10 @@ test("returns a zero-θ profile for empty input", () => {
 
 test("rolls up domain accuracy into modality fit, ranked desc", () => {
   const p = deriveLearningProfile([
-    { domain: "math", correct: 9, total: 10, avgLatencyMs: 1200 },          // visual: 0.9
-    { domain: "ela", correct: 3, total: 10, avgLatencyMs: 4000 },           // reading: 0.3
-    { domain: "speech", correct: 7, total: 10, avgLatencyMs: 2000 },        // auditory: 0.7
-    { domain: "science", correct: 5, total: 10, avgLatencyMs: 1800 },       // kinesthetic: 0.5
+    { domain: "math", correct: 9, total: 10, avgLatencyMs: 1200 }, // visual: 0.9
+    { domain: "ela", correct: 3, total: 10, avgLatencyMs: 4000 }, // reading: 0.3
+    { domain: "speech", correct: 7, total: 10, avgLatencyMs: 2000 }, // auditory: 0.7
+    { domain: "science", correct: 5, total: 10, avgLatencyMs: 1800 }, // kinesthetic: 0.5
   ]);
   assert.equal(p.modalityFit[0].modality, "visual");
   assert.equal(p.modalityFit[0].accuracy, 0.9);
@@ -47,11 +47,11 @@ test("falls back to chapter avgLatencyMs when per-item latencies absent", () => 
 
 test("classifies low frustration tolerance when ≥40% chapters bombed", () => {
   const p = deriveLearningProfile([
-    { domain: "math", correct: 1, total: 10 },     // <40% accuracy → frustration
-    { domain: "ela", correct: 1, total: 10 },      // <40% accuracy → frustration
-    { domain: "science", correct: 9, total: 10 },  // ok
-    { domain: "speech", correct: 9, total: 10 },   // ok
-    { domain: "sel", correct: 9, total: 10 },      // ok
+    { domain: "math", correct: 1, total: 10 }, // <40% accuracy → frustration
+    { domain: "ela", correct: 1, total: 10 }, // <40% accuracy → frustration
+    { domain: "science", correct: 9, total: 10 }, // ok
+    { domain: "speech", correct: 9, total: 10 }, // ok
+    { domain: "sel", correct: 9, total: 10 }, // ok
   ]);
   assert.equal(p.frustrationRate, 2 / 5);
   assert.equal(p.frustrationTolerance, "low");
@@ -87,8 +87,8 @@ test("clamps θ to ±2.5", () => {
 
 test("breaks modality-fit ties by n then by canonical order", () => {
   const p = deriveLearningProfile([
-    { domain: "math", correct: 5, total: 10 },     // visual: 0.5, n=10
-    { domain: "speech", correct: 10, total: 20 },  // auditory: 0.5, n=20
+    { domain: "math", correct: 5, total: 10 }, // visual: 0.5, n=10
+    { domain: "speech", correct: 10, total: 20 }, // auditory: 0.5, n=20
   ]);
   // Same accuracy → larger n wins (auditory n=20 vs visual n=10).
   assert.equal(p.modalityFit[0].modality, "auditory");

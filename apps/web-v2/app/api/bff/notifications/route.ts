@@ -17,7 +17,10 @@ export async function GET(req: Request): Promise<NextResponse> {
       userId: session!.userId,
       unreadOnly,
     });
-    return ok({ notifications, unreadCount: notifications.filter((n) => !n.readAt).length }, requestId);
+    return ok(
+      { notifications, unreadCount: notifications.filter((n) => !n.readAt).length },
+      requestId,
+    );
   } catch (e) {
     return failFromUnknown(e, requestId);
   }

@@ -6,14 +6,14 @@ environment variable becomes required, or a new app joins the workspace.
 
 ## Prerequisites
 
-| Tool | Version | Notes |
-|---|---|---|
-| Node.js | `>=22` | enforced by `engines.node` and CI |
-| pnpm | `10.26.1` | enforced by `packageManager` |
-| Python | `>=3.11` | for `services/ai-svc`, `services/brain-svc`, `services/curriculum-svc` |
-| Postgres | `>=15` | `DATABASE_URL` |
-| Redis | `>=7` | `REDIS_URL` |
-| Expo CLI | bundled via `pnpm --filter @aivo/mobile` | for mobile dev |
+| Tool     | Version                                  | Notes                                                                  |
+| -------- | ---------------------------------------- | ---------------------------------------------------------------------- |
+| Node.js  | `>=22`                                   | enforced by `engines.node` and CI                                      |
+| pnpm     | `10.26.1`                                | enforced by `packageManager`                                           |
+| Python   | `>=3.11`                                 | for `services/ai-svc`, `services/brain-svc`, `services/curriculum-svc` |
+| Postgres | `>=15`                                   | `DATABASE_URL`                                                         |
+| Redis    | `>=7`                                    | `REDIS_URL`                                                            |
+| Expo CLI | bundled via `pnpm --filter @aivo/mobile` | for mobile dev                                                         |
 
 ## Bootstrap
 
@@ -63,17 +63,17 @@ Then fill in `JWT_PRIVATE_KEY`, `JWT_PUBLIC_KEY`, `AUTH_SECRET`,
 
 ### Required vars per environment
 
-| Var | Required in dev | Required in prod | Owner |
-|---|---|---|---|
-| `DATABASE_URL` | yes | yes | `@aivo/db` |
-| `REDIS_URL` | yes | yes | scheduling, generation state |
-| `JWT_PRIVATE_KEY` / `JWT_PUBLIC_KEY` | recommended | yes | identity-svc |
-| `AUTH_SECRET` | yes | yes | session cookies |
-| `SESSION_SECRET` | yes | yes | web-v2 sessions |
-| `INTERNAL_SERVICE_TOKEN` | recommended | yes | service-to-service auth |
-| `OPS_ALERT_WEBHOOK_URL` | optional | yes | ops-alerts dispatcher |
-| `STRIPE_SECRET_KEY` | optional | yes (Sprint 11) | billing-svc |
-| AI provider key (`ANTHROPIC_API_KEY` or `OPENAI_API_KEY`) | optional in dev (mock provider) | yes (one of) | ai-svc |
+| Var                                                       | Required in dev                 | Required in prod | Owner                        |
+| --------------------------------------------------------- | ------------------------------- | ---------------- | ---------------------------- |
+| `DATABASE_URL`                                            | yes                             | yes              | `@aivo/db`                   |
+| `REDIS_URL`                                               | yes                             | yes              | scheduling, generation state |
+| `JWT_PRIVATE_KEY` / `JWT_PUBLIC_KEY`                      | recommended                     | yes              | identity-svc                 |
+| `AUTH_SECRET`                                             | yes                             | yes              | session cookies              |
+| `SESSION_SECRET`                                          | yes                             | yes              | web-v2 sessions              |
+| `INTERNAL_SERVICE_TOKEN`                                  | recommended                     | yes              | service-to-service auth      |
+| `OPS_ALERT_WEBHOOK_URL`                                   | optional                        | yes              | ops-alerts dispatcher        |
+| `STRIPE_SECRET_KEY`                                       | optional                        | yes (Sprint 11)  | billing-svc                  |
+| AI provider key (`ANTHROPIC_API_KEY` or `OPENAI_API_KEY`) | optional in dev (mock provider) | yes (one of)     | ai-svc                       |
 
 `apps/web/next.config.ts` will throw at runtime in production if any of
 its required `*_SVC_URL` env vars are missing.
@@ -83,35 +83,35 @@ its required `*_SVC_URL` env vars are missing.
 This is the authoritative dev-mode port map. Every service's `src/index.ts`
 reads `process.env.<NAME>_PORT` first and falls back to these defaults.
 
-| Service | Env var | Dev port | Web rewrite |
-|---|---|---|---|
-| `identity-svc` | `IDENTITY_SVC_URL` | `3001` | `/api/{admin,auth,users,avatars,consent,curriculum}/*` |
-| `brain-svc` | `BRAIN_SVC_URL` | `3002` | `/api/brain/*` |
-| `assessment-svc` | `ASSESSMENT_PORT` | `3003` | `/api/{assessments,iep}/*` |
-| `ai-svc` | (python) | `3004` | `/api/ai/*` |
-| `learning-svc` | `LEARNING_PORT` | `3005` | `/api/learning/*` |
-| `tutor-svc` | `TUTOR_PORT` | `3006` | `/api/{tutors,tutor}/*` |
-| `family-svc` | `FAMILY_PORT` | `3007` | `/api/family/*` |
-| `engagement-svc` | `ENGAGEMENT_PORT` | `3008` | `/api/engagement/*` |
-| `billing-svc` | `BILLING_SVC_PORT` | `3009` | `/api/billing/*` |
-| `comms-svc` | `COMMS_SVC_PORT` | `3010` | `/api/comms/*` |
-| `i18n-svc` | `I18N_SVC_URL` | `3011` | `/api/i18n/*` |
-| `integrations-svc` | `INTEGRATIONS_SVC_PORT` | `3012` | `/api/integrations/*` |
-| `admin-svc` | `ADMIN_SVC_PORT` | `3013` | (no rewrite — server-side only) |
-| `status-page-svc` | `STATUS_PAGE_SVC_PORT` | `3014` | `/api/status/*` |
-| `research-svc` | `RESEARCH_SVC_PORT` | `3015` | `/api/research/*` |
-| `alerts-proxy-svc` | `ALERTS_PROXY_SVC_PORT` | `3016` | server-to-server |
-| `problem-session-svc` | `PROBLEM_SESSION_PORT` | `3061` | server-to-server |
-| `math-recognizer-svc` | `MATH_RECOGNIZER_PORT` | `3062` | invoked by ai-svc |
-| `science-solver-svc` | `SCIENCE_SOLVER_PORT` | `3063` | invoked by ai-svc |
-| `subject-brain-svc` | `SUBJECT_BRAIN_PORT` | `3064` | invoked by ai-svc |
-| `homework-svc` | `HOMEWORK_PORT` | `3065` | (Sprint 06 wires the rewrite) |
-| `recommendation-svc` | `RECOMMENDATION_PORT` | `3066` | server-to-server |
-| `tenant-svc` | `TENANT_PORT` | `3067` | (admin-svc fronts it) |
-| `integration-svc` | `INTEGRATION_PORT` | `3068` | **see drift note below** |
-| `audit-svc` | `AUDIT_PORT` | `3069` | server-to-server |
-| `data-governance-svc` | `DATA_GOVERNANCE_PORT` | `3070` | (Sprint 04 wires the rewrite) |
-| `responsible-ai-svc` | `RESPONSIBLE_AI_PORT` | `3071` | invoked by ai-svc |
+| Service               | Env var                 | Dev port | Web rewrite                                            |
+| --------------------- | ----------------------- | -------- | ------------------------------------------------------ |
+| `identity-svc`        | `IDENTITY_SVC_URL`      | `3001`   | `/api/{admin,auth,users,avatars,consent,curriculum}/*` |
+| `brain-svc`           | `BRAIN_SVC_URL`         | `3002`   | `/api/brain/*`                                         |
+| `assessment-svc`      | `ASSESSMENT_PORT`       | `3003`   | `/api/{assessments,iep}/*`                             |
+| `ai-svc`              | (python)                | `3004`   | `/api/ai/*`                                            |
+| `learning-svc`        | `LEARNING_PORT`         | `3005`   | `/api/learning/*`                                      |
+| `tutor-svc`           | `TUTOR_PORT`            | `3006`   | `/api/{tutors,tutor}/*`                                |
+| `family-svc`          | `FAMILY_PORT`           | `3007`   | `/api/family/*`                                        |
+| `engagement-svc`      | `ENGAGEMENT_PORT`       | `3008`   | `/api/engagement/*`                                    |
+| `billing-svc`         | `BILLING_SVC_PORT`      | `3009`   | `/api/billing/*`                                       |
+| `comms-svc`           | `COMMS_SVC_PORT`        | `3010`   | `/api/comms/*`                                         |
+| `i18n-svc`            | `I18N_SVC_URL`          | `3011`   | `/api/i18n/*`                                          |
+| `integrations-svc`    | `INTEGRATIONS_SVC_PORT` | `3012`   | `/api/integrations/*`                                  |
+| `admin-svc`           | `ADMIN_SVC_PORT`        | `3013`   | (no rewrite — server-side only)                        |
+| `status-page-svc`     | `STATUS_PAGE_SVC_PORT`  | `3014`   | `/api/status/*`                                        |
+| `research-svc`        | `RESEARCH_SVC_PORT`     | `3015`   | `/api/research/*`                                      |
+| `alerts-proxy-svc`    | `ALERTS_PROXY_SVC_PORT` | `3016`   | server-to-server                                       |
+| `problem-session-svc` | `PROBLEM_SESSION_PORT`  | `3061`   | server-to-server                                       |
+| `math-recognizer-svc` | `MATH_RECOGNIZER_PORT`  | `3062`   | invoked by ai-svc                                      |
+| `science-solver-svc`  | `SCIENCE_SOLVER_PORT`   | `3063`   | invoked by ai-svc                                      |
+| `subject-brain-svc`   | `SUBJECT_BRAIN_PORT`    | `3064`   | invoked by ai-svc                                      |
+| `homework-svc`        | `HOMEWORK_PORT`         | `3065`   | (Sprint 06 wires the rewrite)                          |
+| `recommendation-svc`  | `RECOMMENDATION_PORT`   | `3066`   | server-to-server                                       |
+| `tenant-svc`          | `TENANT_PORT`           | `3067`   | (admin-svc fronts it)                                  |
+| `integration-svc`     | `INTEGRATION_PORT`      | `3068`   | **see drift note below**                               |
+| `audit-svc`           | `AUDIT_PORT`            | `3069`   | server-to-server                                       |
+| `data-governance-svc` | `DATA_GOVERNANCE_PORT`  | `3070`   | (Sprint 04 wires the rewrite)                          |
+| `responsible-ai-svc`  | `RESPONSIBLE_AI_PORT`   | `3071`   | invoked by ai-svc                                      |
 
 ### Web app rewrite drift to resolve (Sprint 02)
 
@@ -133,12 +133,12 @@ fetcher. That is intentional during Sprint 08's migration.
 
 ### Duplicate workspace situation
 
-| Workspace | Status | Action |
-|---|---|---|
-| `packages/ops-alert` | **deprecated** — `package.json#deprecated` says "use `@aivo/ops-alerts` (durable outbox + alerts-proxy-svc)" | leave in place until every legacy caller migrates; do not extend |
-| `packages/ops-alerts` | active | new code uses this |
-| `services/integration-svc` (port `3068`) | active — implements SIS providers (Clever, ClassLink), LTI 1.3 launch validation | called by `integrations-svc` and ai-svc |
-| `services/integrations-svc` (port `3012`) | active — implements connector REST routes, connector sync watchdog | this is the BFF surface the web rewrite hits |
+| Workspace                                 | Status                                                                                                       | Action                                                           |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| `packages/ops-alert`                      | **deprecated** — `package.json#deprecated` says "use `@aivo/ops-alerts` (durable outbox + alerts-proxy-svc)" | leave in place until every legacy caller migrates; do not extend |
+| `packages/ops-alerts`                     | active                                                                                                       | new code uses this                                               |
+| `services/integration-svc` (port `3068`)  | active — implements SIS providers (Clever, ClassLink), LTI 1.3 launch validation                             | called by `integrations-svc` and ai-svc                          |
+| `services/integrations-svc` (port `3012`) | active — implements connector REST routes, connector sync watchdog                                           | this is the BFF surface the web rewrite hits                     |
 
 Both services are legitimate. Sprint 12 (Rostering, SIS) is the right
 place to either consolidate them into a single `integrations-svc` with

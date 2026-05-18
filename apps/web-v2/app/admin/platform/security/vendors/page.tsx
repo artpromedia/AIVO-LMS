@@ -26,8 +26,12 @@ export default async function Page() {
         description="Anyone processing learner data appears in the public subprocessor list."
       />
       <Card className="mb-6 p-[var(--aivo-density-card-pad)]">
-        <p className="mb-1 font-display text-base font-semibold">Subprocessors (process learner data)</p>
-        <p className="mb-3 text-xs text-aivo-muted">{subprocessors.length} on file · IL SOPPA + NY 2-d compliant disclosure.</p>
+        <p className="mb-1 font-display text-base font-semibold">
+          Subprocessors (process learner data)
+        </p>
+        <p className="mb-3 text-xs text-aivo-muted">
+          {subprocessors.length} on file · IL SOPPA + NY 2-d compliant disclosure.
+        </p>
         <ul className="space-y-1 text-sm">
           {subprocessors.map((v) => (
             <li key={v.id} className="flex flex-wrap items-center justify-between gap-2">
@@ -51,8 +55,12 @@ export default async function Page() {
               </div>
               <div className="flex items-center gap-2">
                 <Badge tone={TIER_TONE[v.riskTier]}>{v.riskTier}</Badge>
-                <Badge tone={v.dpaSigned ? "success" : "danger"}>{v.dpaSigned ? "DPA signed" : "No DPA"}</Badge>
-                <Badge tone={v.approved ? "success" : "warning"}>{v.approved ? "Approved" : "Pending"}</Badge>
+                <Badge tone={v.dpaSigned ? "success" : "danger"}>
+                  {v.dpaSigned ? "DPA signed" : "No DPA"}
+                </Badge>
+                <Badge tone={v.approved ? "success" : "warning"}>
+                  {v.approved ? "Approved" : "Pending"}
+                </Badge>
                 {v.processesLearnerData && <Badge tone="warning">Learner data</Badge>}
               </div>
             </div>

@@ -5,11 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import {
-  listSupportTickets,
-  scopeTenantsForSession,
-  getTenantById,
-} from "@/lib/db/repos";
+import { listSupportTickets, scopeTenantsForSession, getTenantById } from "@/lib/db/repos";
 import { getStore } from "@/lib/db/store";
 
 const TONE: Record<string, "warning" | "primary" | "success"> = {
@@ -44,9 +40,7 @@ export default async function Page() {
             <Card key={t.id} className="p-[var(--aivo-density-card-pad)]">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="font-display text-lg font-semibold">
-                    {t.subject}
-                  </p>
+                  <p className="font-display text-lg font-semibold">{t.subject}</p>
                   <p className="text-xs text-aivo-muted">
                     From {users.get(t.userId)?.displayName ?? t.userId} ·{" "}
                     {getTenantById(t.tenantId)?.name ?? t.tenantId} ·{" "}

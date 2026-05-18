@@ -67,7 +67,10 @@ export default function ContactPage() {
         </section>
 
         <aside aria-labelledby="contact-inboxes-heading" className="space-y-4">
-          <h2 id="contact-inboxes-heading" className="font-heading text-2xl font-bold text-slate-900">
+          <h2
+            id="contact-inboxes-heading"
+            className="font-heading text-2xl font-bold text-slate-900"
+          >
             Other ways to reach us
           </h2>
           {CONTACTS.map((c) => (

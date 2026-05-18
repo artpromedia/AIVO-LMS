@@ -45,11 +45,7 @@ async function reextractAction(formData: FormData) {
 }
 
 function YesNo({ value }: { value: boolean }) {
-  return value ? (
-    <Badge tone="success">Yes</Badge>
-  ) : (
-    <Badge tone="neutral">No</Badge>
-  );
+  return value ? <Badge tone="success">Yes</Badge> : <Badge tone="neutral">No</Badge>;
 }
 
 export default async function IEPReviewPage({
@@ -119,9 +115,8 @@ export default async function IEPReviewPage({
         <div className="text-sm text-aivo-ink-soft">
           <p className="font-medium text-aivo-ink">Safety note</p>
           <p className="mt-1">
-            Your learner never sees the raw IEP or any clinical / diagnostic
-            language. We keep a separate, supportive learner-safe summary that
-            the lessons can reference.
+            Your learner never sees the raw IEP or any clinical / diagnostic language. We keep a
+            separate, supportive learner-safe summary that the lessons can reference.
           </p>
         </div>
       </Card>
@@ -143,8 +138,8 @@ export default async function IEPReviewPage({
           <Card className="p-[var(--aivo-density-card-pad)]">
             {ex.accommodations.length === 0 ? (
               <p className="text-sm text-aivo-ink-soft">
-                No specific accommodations recorded. AIVO will use sensible
-                defaults based on your assessment.
+                No specific accommodations recorded. AIVO will use sensible defaults based on your
+                assessment.
               </p>
             ) : (
               <ul className="space-y-1.5 text-sm">

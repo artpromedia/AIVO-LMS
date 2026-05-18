@@ -5,17 +5,11 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import {
-  listModerationEvents,
-  scopeTenantsForSession,
-  getTenantById,
-} from "@/lib/db/repos";
+import { listModerationEvents, scopeTenantsForSession, getTenantById } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
 
-function decisionTone(
-  d: "allow" | "review" | "block",
-): "success" | "warning" | "danger" {
+function decisionTone(d: "allow" | "review" | "block"): "success" | "warning" | "danger" {
   return d === "block" ? "danger" : d === "review" ? "warning" : "success";
 }
 
@@ -35,9 +29,7 @@ export default async function Page() {
   const tenantIds = new Set(tenants.map((t) => t.id));
   const tenantById = new Map(tenants.map((t) => [t.id, t]));
 
-  const all = listModerationEvents({ limit: 500 }).filter((e) =>
-    tenantIds.has(e.tenantId),
-  );
+  const all = listModerationEvents({ limit: 500 }).filter((e) => tenantIds.has(e.tenantId));
 
   const reviewed = all.filter((e) => e.classification.decision === "review");
   const blocked = all.filter((e) => e.classification.decision === "block");
@@ -56,9 +48,7 @@ export default async function Page() {
       categoryCount.set(c, (categoryCount.get(c) ?? 0) + 1);
     }
   }
-  const topCategories = [...categoryCount.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5);
+  const topCategories = [...categoryCount.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
 
   const stats = [
     { k: "All events", v: all.length.toLocaleString() },
@@ -91,9 +81,7 @@ export default async function Page() {
       <div className="grid gap-4 md:grid-cols-4 lg:grid-cols-7">
         {stats.map((s) => (
           <Card key={s.k} className="p-[var(--aivo-density-card-pad)]">
-            <p className="text-xs uppercase tracking-wide text-aivo-ink-soft">
-              {s.k}
-            </p>
+            <p className="text-xs uppercase tracking-wide text-aivo-ink-soft">{s.k}</p>
             <p className="mt-2 font-display text-2xl font-semibold">{s.v}</p>
           </Card>
         ))}
@@ -101,24 +89,15 @@ export default async function Page() {
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         <Card className="p-[var(--aivo-density-card-pad)] lg:col-span-1">
-          <p className="font-display text-lg font-semibold">
-            Top categories (block + review)
-          </p>
+          <p className="font-display text-lg font-semibold">Top categories (block + review)</p>
           {topCategories.length === 0 ? (
-            <p className="mt-2 text-sm text-aivo-ink-soft">
-              No categorised events.
-            </p>
+            <p className="mt-2 text-sm text-aivo-ink-soft">No categorised events.</p>
           ) : (
             <ul className="mt-3 space-y-2">
               {topCategories.map(([cat, count]) => (
-                <li
-                  key={cat}
-                  className="flex items-center justify-between text-sm"
-                >
+                <li key={cat} className="flex items-center justify-between text-sm">
                   <span className="capitalize">{cat.replace(/_/g, " ")}</span>
-                  <span className="tabular-nums text-aivo-ink-soft">
-                    {count.toLocaleString()}
-                  </span>
+                  <span className="tabular-nums text-aivo-ink-soft">{count.toLocaleString()}</span>
                 </li>
               ))}
             </ul>
@@ -145,16 +124,13 @@ export default async function Page() {
               </thead>
               <tbody className="divide-y divide-aivo-border">
                 {focus.map((e) => {
-                  const tenant =
-                    tenantById.get(e.tenantId) ?? getTenantById(e.tenantId);
+                  const tenant = tenantById.get(e.tenantId) ?? getTenantById(e.tenantId);
                   return (
                     <tr key={e.id} className="hover:bg-aivo-surface-2/40">
                       <td className="px-4 py-3 text-xs text-aivo-ink-soft">
                         {relativeTime(e.createdAt)}
                       </td>
-                      <td className="px-4 py-3 text-xs">
-                        {tenant?.name ?? e.tenantId}
-                      </td>
+                      <td className="px-4 py-3 text-xs">{tenant?.name ?? e.tenantId}</td>
                       <td className="px-4 py-3">
                         <Badge tone={decisionTone(e.classification.decision)}>
                           {e.classification.decision}
@@ -165,27 +141,17 @@ export default async function Page() {
                       </td>
                       <td className="px-4 py-3 text-xs">
                         {e.injectionSignals.length > 0 ? (
-                          <Badge tone="warning">
-                            injection ×{e.injectionSignals.length}
-                          </Badge>
+                          <Badge tone="warning">injection ×{e.injectionSignals.length}</Badge>
                         ) : null}{" "}
                         {e.crisisSignals.length > 0 ? (
-                          <Badge tone="danger">
-                            crisis ×{e.crisisSignals.length}
-                          </Badge>
+                          <Badge tone="danger">crisis ×{e.crisisSignals.length}</Badge>
                         ) : null}
-                        {e.injectionSignals.length === 0 &&
-                        e.crisisSignals.length === 0
+                        {e.injectionSignals.length === 0 && e.crisisSignals.length === 0
                           ? "—"
                           : null}
                       </td>
-                      <td
-                        className="px-4 py-3 text-xs text-aivo-ink-soft"
-                        title={e.excerpt}
-                      >
-                        {e.excerpt.length > 80
-                          ? `${e.excerpt.slice(0, 80)}…`
-                          : e.excerpt}
+                      <td className="px-4 py-3 text-xs text-aivo-ink-soft" title={e.excerpt}>
+                        {e.excerpt.length > 80 ? `${e.excerpt.slice(0, 80)}…` : e.excerpt}
                       </td>
                     </tr>
                   );

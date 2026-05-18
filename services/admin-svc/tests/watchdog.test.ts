@@ -8,10 +8,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert";
-import {
-  runWatchdogOnce,
-  _setWatchdogAlertsForTest,
-} from "../src/lib/watchdog.js";
+import { runWatchdogOnce, _setWatchdogAlertsForTest } from "../src/lib/watchdog.js";
 
 interface CapturedAlert {
   severity: string;

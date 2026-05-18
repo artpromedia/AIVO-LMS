@@ -1,6 +1,6 @@
 # Scheduled-check Slack alerting
 
-> **TL;DR**  Unattended GitHub Actions checks that nobody is watching in
+> **TL;DR** Unattended GitHub Actions checks that nobody is watching in
 > real time use the `notify-slack-on-failure` composite action to page
 > the on-call human in the shared ops/deploys Slack channel when they go
 > red, and to announce the first recovery after a failure. Steady-state
@@ -48,15 +48,15 @@ action logs and exits 0 instead of failing the build.
 
 ## Workflows that page Slack on failure
 
-| Workflow | Triggers | Pages Slack on |
-| --- | --- | --- |
-| `marketing-smoke-test.yml` | `workflow_run` (post-publish) + 30-min schedule + manual | All non-PR triggers |
-| `db-schema-drift.yml` | PR + push to `main` (paths-filtered to `packages/db/**`) | Push to `main` only — PR failures already block the PR |
-| `paging-url-leaks.yml` | PR + push to `main`/`develop` | Push to `main`/`develop` only — PR failures already block the PR |
-| `secret-scan.yml` | PR + push to `main`/`develop`/`master` + weekly Monday 03:00 UTC schedule + manual | Push, schedule, and manual — PR failures already block the PR |
-| `i18n-file-audit.yml` | PR + push to `main`/`develop` (paths-filtered to locale messages) + manual | Push and manual — PR failures already block the PR |
-| `backup-verify.yml` | Monthly schedule (1st of month, 03:00 UTC) + manual | Every run (no PR/push triggers exist) |
-| `health-check.yml` | Every 5 minutes + manual | Every non-PR run (no PR triggers exist) |
+| Workflow                   | Triggers                                                                           | Pages Slack on                                                   |
+| -------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `marketing-smoke-test.yml` | `workflow_run` (post-publish) + 30-min schedule + manual                           | All non-PR triggers                                              |
+| `db-schema-drift.yml`      | PR + push to `main` (paths-filtered to `packages/db/**`)                           | Push to `main` only — PR failures already block the PR           |
+| `paging-url-leaks.yml`     | PR + push to `main`/`develop`                                                      | Push to `main`/`develop` only — PR failures already block the PR |
+| `secret-scan.yml`          | PR + push to `main`/`develop`/`master` + weekly Monday 03:00 UTC schedule + manual | Push, schedule, and manual — PR failures already block the PR    |
+| `i18n-file-audit.yml`      | PR + push to `main`/`develop` (paths-filtered to locale messages) + manual         | Push and manual — PR failures already block the PR               |
+| `backup-verify.yml`        | Monthly schedule (1st of month, 03:00 UTC) + manual                                | Every run (no PR/push triggers exist)                            |
+| `health-check.yml`         | Every 5 minutes + manual                                                           | Every non-PR run (no PR triggers exist)                          |
 
 The "PR runs are skipped" decision is consistent across the table:
 PR-triggered failures are already visible to the PR author in the merge
@@ -70,10 +70,10 @@ These are the other unattended scheduled / cron-style workflows in
 `.github/workflows/`. They are deliberately **not** wired into the
 notifier; the reasoning is in each row.
 
-| Workflow | Why it doesn't page |
-| --- | --- |
-| `marketing-lighthouse.yml`, `marketing-a11y.yml`, `a11y-tests.yml`, `visual-regression.yml`, `zap-baseline.yml` | Quality / perf / a11y / security baselines that produce **reports**, not pass/fail health signals. Their failures are intentionally reviewed in the Actions UI as part of release prep, not paged in real time. |
-| `ci.yml`, `migrations.yml`, `e2e-module-gate.yml`, `smoke-tests.yml`, `marketing-deploy*.yml`, `deploy-staging.yml`, `deploy-production.yml`, `deploy-hetzner.yml`, `infra-deploy.yml`, `infra-plan.yml`, `rollback.yml`, `mobile-build.yml`, `mobile-release.yml`, `create-release.yml`, `train-brain.yml`, `load-test.yml`, `i18n-coverage.yml`, `alerts-proxy-deploy-gate.yml`, `security-scan.yml` | All driven by an active human action (PR, push, deploy click, release cut) or only run as part of a deploy. A failure has a person already looking at the screen, so a Slack page would be noise. |
+| Workflow                                                                                                                                                                                                                                                                                                                                                                                               | Why it doesn't page                                                                                                                                                                                             |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `marketing-lighthouse.yml`, `marketing-a11y.yml`, `a11y-tests.yml`, `visual-regression.yml`, `zap-baseline.yml`                                                                                                                                                                                                                                                                                        | Quality / perf / a11y / security baselines that produce **reports**, not pass/fail health signals. Their failures are intentionally reviewed in the Actions UI as part of release prep, not paged in real time. |
+| `ci.yml`, `migrations.yml`, `e2e-module-gate.yml`, `smoke-tests.yml`, `marketing-deploy*.yml`, `deploy-staging.yml`, `deploy-production.yml`, `deploy-hetzner.yml`, `infra-deploy.yml`, `infra-plan.yml`, `rollback.yml`, `mobile-build.yml`, `mobile-release.yml`, `create-release.yml`, `train-brain.yml`, `load-test.yml`, `i18n-coverage.yml`, `alerts-proxy-deploy-gate.yml`, `security-scan.yml` | All driven by an active human action (PR, push, deploy click, release cut) or only run as part of a deploy. A failure has a person already looking at the screen, so a Slack page would be noise.               |
 
 If you add a new unattended scheduled check, default to wiring it through
 the composite action and add a row to the first table above. If you have
@@ -100,8 +100,8 @@ the next person knows it was a deliberate choice and not an oversight.
        check-status: ${{ job.status }}
        check-name: "Human-readable check name"
        workflow-filename: my-workflow.yml
-       failure-reason-file: /tmp/myname/output.log   # optional
-       target: "what was being checked"              # optional
+       failure-reason-file: /tmp/myname/output.log # optional
+       target: "what was being checked" # optional
    ```
 
 4. Add a row to the first table in this file.

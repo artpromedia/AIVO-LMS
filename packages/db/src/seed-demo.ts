@@ -14,7 +14,10 @@ import argon2 from "argon2";
  */
 async function seedDemo() {
   const url = process.env.DATABASE_URL;
-  if (!url) { console.error("DATABASE_URL not set"); process.exit(1); }
+  if (!url) {
+    console.error("DATABASE_URL not set");
+    process.exit(1);
+  }
   const db = createDb(url);
 
   const PASSWORD = "Demo123!";
@@ -23,16 +26,26 @@ async function seedDemo() {
   // 1. Fix admin password (base seed used SHA-256, login uses argon2).
   const adminEmail = "admin@aivo.dev";
   const adminAdminPasswordHash = await argon2.hash("admin123");
-  await db.update(users).set({ passwordHash: adminAdminPasswordHash }).where(eq(users.email, adminEmail));
+  await db
+    .update(users)
+    .set({ passwordHash: adminAdminPasswordHash })
+    .where(eq(users.email, adminEmail));
   console.log(`✓ admin@aivo.dev password rehashed with argon2 (login: admin123)`);
 
   // 2. Demo family tenant.
   let demoTenantId: string;
-  const existingTenant = await db.select().from(tenants).where(eq(tenants.name, "Demo Family")).limit(1);
+  const existingTenant = await db
+    .select()
+    .from(tenants)
+    .where(eq(tenants.name, "Demo Family"))
+    .limit(1);
   if (existingTenant.length > 0) {
     demoTenantId = existingTenant[0].id;
   } else {
-    const [t] = await db.insert(tenants).values({ name: "Demo Family", type: "B2C_FAMILY" }).returning();
+    const [t] = await db
+      .insert(tenants)
+      .values({ name: "Demo Family", type: "B2C_FAMILY" })
+      .returning();
     demoTenantId = t.id;
   }
   console.log(`✓ Demo Family tenant: ${demoTenantId}`);
@@ -45,23 +58,26 @@ async function seedDemo() {
     parentId = existingParent[0].id;
     await db.update(users).set({ passwordHash, emailVerified: true }).where(eq(users.id, parentId));
   } else {
-    const [p] = await db.insert(users).values({
-      tenantId: demoTenantId,
-      email: parentEmail,
-      passwordHash,
-      name: "Demo Parent",
-      role: "PARENT",
-      emailVerified: true,
-    }).returning();
+    const [p] = await db
+      .insert(users)
+      .values({
+        tenantId: demoTenantId,
+        email: parentEmail,
+        passwordHash,
+        name: "Demo Parent",
+        role: "PARENT",
+        emailVerified: true,
+      })
+      .returning();
     parentId = p.id;
   }
   console.log(`✓ parent@demo.aivo (Demo Parent) — ${parentId}`);
 
   // 4. Three learners — one per tier. Each learner needs its own LEARNER user record.
   const TIER_LEARNERS = [
-    { gradeLevel: "3",  name: "Mia (K-5)",   email: "mia@demo.aivo",   tier: "Soft Meadow" },
-    { gradeLevel: "7",  name: "Leo (6-8)",   email: "leo@demo.aivo",   tier: "Study Treehouse" },
-    { gradeLevel: "11", name: "Ava (9-12)",  email: "ava@demo.aivo",   tier: "Focus Studio" },
+    { gradeLevel: "3", name: "Mia (K-5)", email: "mia@demo.aivo", tier: "Soft Meadow" },
+    { gradeLevel: "7", name: "Leo (6-8)", email: "leo@demo.aivo", tier: "Study Treehouse" },
+    { gradeLevel: "11", name: "Ava (9-12)", email: "ava@demo.aivo", tier: "Focus Studio" },
   ];
 
   for (const l of TIER_LEARNERS) {
@@ -70,23 +86,36 @@ async function seedDemo() {
     const existingUser = await db.select().from(users).where(eq(users.email, l.email)).limit(1);
     if (existingUser.length > 0) {
       learnerUserId = existingUser[0].id;
-      await db.update(users).set({ passwordHash, emailVerified: true }).where(eq(users.id, learnerUserId));
+      await db
+        .update(users)
+        .set({ passwordHash, emailVerified: true })
+        .where(eq(users.id, learnerUserId));
     } else {
-      const [u] = await db.insert(users).values({
-        tenantId: demoTenantId,
-        email: l.email,
-        passwordHash,
-        name: l.name,
-        role: "LEARNER",
-        emailVerified: true,
-      }).returning();
+      const [u] = await db
+        .insert(users)
+        .values({
+          tenantId: demoTenantId,
+          email: l.email,
+          passwordHash,
+          name: l.name,
+          role: "LEARNER",
+          emailVerified: true,
+        })
+        .returning();
       learnerUserId = u.id;
     }
 
     // (b) Learner record
-    const existingLearner = await db.select().from(learners).where(eq(learners.userId, learnerUserId)).limit(1);
+    const existingLearner = await db
+      .select()
+      .from(learners)
+      .where(eq(learners.userId, learnerUserId))
+      .limit(1);
     if (existingLearner.length > 0) {
-      await db.update(learners).set({ gradeLevel: l.gradeLevel, name: l.name, parentId }).where(eq(learners.id, existingLearner[0].id));
+      await db
+        .update(learners)
+        .set({ gradeLevel: l.gradeLevel, name: l.name, parentId })
+        .where(eq(learners.id, existingLearner[0].id));
     } else {
       await db.insert(learners).values({
         tenantId: demoTenantId,
@@ -105,60 +134,88 @@ async function seedDemo() {
   //    an ACCEPTED learnerTeachers link, so without this fixture the
   //    Playwright authoring spec couldn't run against the dev DB.
   let schoolTenantId: string;
-  const existingSchool = await db.select().from(tenants)
-    .where(eq(tenants.name, "Demo School")).limit(1);
+  const existingSchool = await db
+    .select()
+    .from(tenants)
+    .where(eq(tenants.name, "Demo School"))
+    .limit(1);
   if (existingSchool.length > 0) {
     schoolTenantId = existingSchool[0].id;
   } else {
-    const [t] = await db.insert(tenants).values({
-      name: "Demo School", type: "B2B_DISTRICT" as any,
-    }).returning();
+    const [t] = await db
+      .insert(tenants)
+      .values({
+        name: "Demo School",
+        type: "B2B_DISTRICT" as any,
+      })
+      .returning();
     schoolTenantId = t.id;
   }
   console.log(`✓ Demo School tenant: ${schoolTenantId}`);
 
   const teacherEmail = "teacher@demo.aivo";
   let teacherId: string;
-  const existingTeacher = await db.select().from(users)
-    .where(eq(users.email, teacherEmail)).limit(1);
+  const existingTeacher = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, teacherEmail))
+    .limit(1);
   if (existingTeacher.length > 0) {
     teacherId = existingTeacher[0].id;
-    await db.update(users).set({
-      passwordHash, role: "TEACHER" as any,
-      tenantId: schoolTenantId, emailVerified: true,
-    }).where(eq(users.id, teacherId));
+    await db
+      .update(users)
+      .set({
+        passwordHash,
+        role: "TEACHER" as any,
+        tenantId: schoolTenantId,
+        emailVerified: true,
+      })
+      .where(eq(users.id, teacherId));
   } else {
-    const [u] = await db.insert(users).values({
-      tenantId: schoolTenantId,
-      email: teacherEmail,
-      passwordHash,
-      name: "Demo Teacher",
-      role: "TEACHER" as any,
-      emailVerified: true,
-    }).returning();
+    const [u] = await db
+      .insert(users)
+      .values({
+        tenantId: schoolTenantId,
+        email: teacherEmail,
+        passwordHash,
+        name: "Demo Teacher",
+        role: "TEACHER" as any,
+        emailVerified: true,
+      })
+      .returning();
     teacherId = u.id;
   }
   console.log(`✓ teacher@demo.aivo (Demo Teacher) — ${teacherId}`);
 
   // Pick the K-5 demo learner (Mia) for the assignment so the seeded teacher
   // has an obvious target. Lookup is by email/name pair to stay idempotent.
-  const [miaUser] = await db.select().from(users)
-    .where(eq(users.email, "mia@demo.aivo")).limit(1);
+  const [miaUser] = await db.select().from(users).where(eq(users.email, "mia@demo.aivo")).limit(1);
   if (miaUser) {
-    const [miaLearner] = await db.select().from(learners)
-      .where(eq(learners.userId, miaUser.id)).limit(1);
+    const [miaLearner] = await db
+      .select()
+      .from(learners)
+      .where(eq(learners.userId, miaUser.id))
+      .limit(1);
     if (miaLearner) {
-      const [existingLink] = await db.select().from(learnerTeachers).where(
-        and(
-          eq(learnerTeachers.learnerId, miaLearner.id),
-          eq(learnerTeachers.teacherUserId, teacherId),
-        ),
-      ).limit(1);
+      const [existingLink] = await db
+        .select()
+        .from(learnerTeachers)
+        .where(
+          and(
+            eq(learnerTeachers.learnerId, miaLearner.id),
+            eq(learnerTeachers.teacherUserId, teacherId),
+          ),
+        )
+        .limit(1);
       if (existingLink) {
         if (existingLink.status !== "ACCEPTED") {
-          await db.update(learnerTeachers).set({
-            status: "ACCEPTED", acceptedAt: new Date(),
-          }).where(eq(learnerTeachers.id, existingLink.id));
+          await db
+            .update(learnerTeachers)
+            .set({
+              status: "ACCEPTED",
+              acceptedAt: new Date(),
+            })
+            .where(eq(learnerTeachers.id, existingLink.id));
         }
       } else {
         await db.insert(learnerTeachers).values({
@@ -179,4 +236,7 @@ async function seedDemo() {
   process.exit(0);
 }
 
-seedDemo().catch((e) => { console.error(e); process.exit(1); });
+seedDemo().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

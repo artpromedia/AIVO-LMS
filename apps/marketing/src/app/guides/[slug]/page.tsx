@@ -8,7 +8,11 @@ export function generateStaticParams() {
   return getArticlesByKind("guide").map((a) => ({ slug: a.slug }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
   const { slug } = await params;
   const article = getArticle(slug, "guide");
   if (!article) return { title: "Not found" };

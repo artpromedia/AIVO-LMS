@@ -36,12 +36,8 @@ if (!existsSync(typesPath) || !existsSync(readinessPath)) {
   const typesSrc = readFileSync(typesPath, "utf8");
   const readinessSrc = readFileSync(readinessPath, "utf8");
 
-  const unionMatch = typesSrc.match(
-    /export type ReadinessState\s*=\s*([\s\S]*?);/,
-  );
-  const states = unionMatch
-    ? [...unionMatch[1].matchAll(/"([^"]+)"/g)].map((m) => m[1])
-    : [];
+  const unionMatch = typesSrc.match(/export type ReadinessState\s*=\s*([\s\S]*?);/);
+  const states = unionMatch ? [...unionMatch[1].matchAll(/"([^"]+)"/g)].map((m) => m[1]) : [];
 
   if (states.length === 0) {
     errors.push("Could not parse ReadinessState union.");
@@ -49,7 +45,7 @@ if (!existsSync(typesPath) || !existsSync(readinessPath)) {
 
   function extractTableKeys(label) {
     const m = readinessSrc.match(
-      new RegExp(`export const ${label}[^=]*=\\s*\\{([\\s\\S]*?)\\n\\};`),
+      new RegExp(`export const ${label}[^=]*=\\s*\\{([\\s\\S]*?)\\n\\s*\\};`),
     );
     if (!m) return null;
     // Only top-level keys (those at the start of a line, after the
@@ -57,18 +53,22 @@ if (!existsSync(typesPath) || !existsSync(readinessPath)) {
     // `label:` and `hrefTemplate:` inside Record<,{}> values.
     const body = m[1];
     const keys = new Set();
+    // Indent depth varies with prettier wrapping (2 or 4 spaces depending
+    // on whether the type annotation forced a line break before the
+    // opening brace). Match any indented top-level key, but reject lines
+    // that look like nested object content (those typically have a value
+    // pattern other than a snake_case identifier, e.g. `label:` or
+    // `hrefTemplate:`, which are already covered by the dedicated
+    // hrefTemplate scan below).
+    const nestedValueKeys = new Set(["label", "hrefTemplate"]);
     for (const line of body.split("\n")) {
-      const km = line.match(/^\s{2}(\w+):/);
-      if (km) keys.add(km[1]);
+      const km = line.match(/^\s+(\w+):/);
+      if (km && !nestedValueKeys.has(km[1])) keys.add(km[1]);
     }
     return [...keys];
   }
 
-  for (const tableName of [
-    "READINESS_LABEL",
-    "READINESS_TONE",
-    "READINESS_NEXT_STEP",
-  ]) {
+  for (const tableName of ["READINESS_LABEL", "READINESS_TONE", "READINESS_NEXT_STEP"]) {
     const keys = extractTableKeys(tableName);
     if (!keys) {
       errors.push(`learner/readiness.ts: ${tableName} not found.`);
@@ -81,25 +81,21 @@ if (!existsSync(typesPath) || !existsSync(readinessPath)) {
     }
     for (const key of keys) {
       if (!states.includes(key)) {
-        errors.push(
-          `${tableName} has "${key}" which is not in ReadinessState — drift.`,
-        );
+        errors.push(`${tableName} has "${key}" which is not in ReadinessState — drift.`);
       }
     }
   }
 
   // For NEXT_STEP entries, resolve each hrefTemplate to a page.tsx.
   const nextStepBlock = readinessSrc.match(
-    /export const READINESS_NEXT_STEP[^=]*=\s*\{([\s\S]*?)\n\};/,
+    /export const READINESS_NEXT_STEP[^=]*=\s*\{([\s\S]*?)\n\s*\};/,
   );
   if (nextStepBlock) {
     const hrefRe = /hrefTemplate:\s*"([^"]+)"/g;
     for (const m of nextStepBlock[1].matchAll(hrefRe)) {
       const tpl = m[1];
       // Replace {learnerId} with the [learnerId] folder name.
-      const route = tpl
-        .replace(/\{learnerId\}/g, "[learnerId]")
-        .replace(/\?.*$/, "");
+      const route = tpl.replace(/\{learnerId\}/g, "[learnerId]").replace(/\?.*$/, "");
       const rel = `apps/web-v2/app${route}/page.tsx`;
       if (!existsSync(join(repoRoot, rel))) {
         errors.push(
@@ -156,9 +152,7 @@ for (const rel of REQUIRED_BFF) {
 
 if (errors.length) {
   for (const e of errors) console.error(`error: ${e}`);
-  console.error(
-    `\nonboarding:audit FAILED with ${errors.length} error(s).`,
-  );
+  console.error(`\nonboarding:audit FAILED with ${errors.length} error(s).`);
   process.exit(1);
 }
 

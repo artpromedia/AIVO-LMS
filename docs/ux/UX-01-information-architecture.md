@@ -207,7 +207,7 @@ Legend: ✓ implemented · ★ planned (per UX-00 gap list) · 🔒 consent-gate
 
 ## 2. Unified mobile sitemap
 
-One Expo app. Today's `(parent)/(learner)/(teacher)/(caregiver)/(therapist)` route groups collapse into one `(tabs)` shell whose tab set is driven by the active *role mode*, not by route group. See §7 for the role-switching model.
+One Expo app. Today's `(parent)/(learner)/(teacher)/(caregiver)/(therapist)` route groups collapse into one `(tabs)` shell whose tab set is driven by the active _role mode_, not by route group. See §7 for the role-switching model.
 
 ```
 /                               (auth gate; redirects to /welcome or /role-chooser)
@@ -266,16 +266,17 @@ Today's caregiver and therapist route groups (web has no caregiver/therapist rol
 
 ## 3. Role-based navigation model
 
-| Role | Web shell | Primary nav (left rail) | Secondary | Mobile-mode tabs |
-|---|---|---|---|---|
-| Parent | warm theme, soft sidebar | Home · Learners · Inbox · Schedule · Reports · Consent · Privacy · Settings | account/billing/accessibility under Settings | Home · Learners · Progress · Notifications · Settings |
-| Learner | playful theme, dark sidebar, big tap targets, **one-task** layout | Home (Today) · Subjects · Quests · Library · Progress · Rewards · Notifications | accessibility/audio under Settings (sidebar bottom) | Today · Lesson · Subjects · Quests · Homework · Progress |
-| Teacher | dense theme, light sidebar | Home · Classes · Learners · Assignments · Insights · Settings | — | Home · Classes · Learners · Assignments · Notifications |
-| School admin | businesslike theme | Overview · Classes · Learners · Staff · Rostering · Reports · Billing · Compliance · Settings | — | (uses Admin-Lite Mode) |
-| District admin | businesslike theme | Overview · Schools · Reports · Billing · Compliance · Settings | — | (uses Admin-Lite Mode) |
-| Platform admin | utilitarian theme, dark sidebar | System health · Tenants · Users · Data · Migration · Curriculum · Safety · Security · Compliance · AI gen · AI costs · Audio · Audit · Billing · Support · Settings | grouped into 4 collapsible sections | Alerts · AI failures · Rostering · Support |
+| Role           | Web shell                                                         | Primary nav (left rail)                                                                                                                                             | Secondary                                           | Mobile-mode tabs                                         |
+| -------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | -------------------------------------------------------- |
+| Parent         | warm theme, soft sidebar                                          | Home · Learners · Inbox · Schedule · Reports · Consent · Privacy · Settings                                                                                         | account/billing/accessibility under Settings        | Home · Learners · Progress · Notifications · Settings    |
+| Learner        | playful theme, dark sidebar, big tap targets, **one-task** layout | Home (Today) · Subjects · Quests · Library · Progress · Rewards · Notifications                                                                                     | accessibility/audio under Settings (sidebar bottom) | Today · Lesson · Subjects · Quests · Homework · Progress |
+| Teacher        | dense theme, light sidebar                                        | Home · Classes · Learners · Assignments · Insights · Settings                                                                                                       | —                                                   | Home · Classes · Learners · Assignments · Notifications  |
+| School admin   | businesslike theme                                                | Overview · Classes · Learners · Staff · Rostering · Reports · Billing · Compliance · Settings                                                                       | —                                                   | (uses Admin-Lite Mode)                                   |
+| District admin | businesslike theme                                                | Overview · Schools · Reports · Billing · Compliance · Settings                                                                                                      | —                                                   | (uses Admin-Lite Mode)                                   |
+| Platform admin | utilitarian theme, dark sidebar                                   | System health · Tenants · Users · Data · Migration · Curriculum · Safety · Security · Compliance · AI gen · AI costs · Audio · Audit · Billing · Support · Settings | grouped into 4 collapsible sections                 | Alerts · AI failures · Rostering · Support               |
 
 Active nav state contract:
+
 - Active match uses `pathname === item.href || pathname.startsWith(item.href + "/")`.
 - Light sidebars use `primary-soft` pill on active.
 - Dark sidebars (learner, platform) use sidebar-fg @ 18% mix on active.
@@ -286,32 +287,33 @@ Active nav state contract:
 
 The full matrix lives at **`docs/ux/UX-01-route-matrix.json`** (139 implemented web routes + 35 unified-mobile screens + 14 planned web routes, each with the standard columns below). It is generated by `scripts/route-matrix.mjs` walking `apps/web-v2/app/**/page.tsx`. The columns are:
 
-| Column | Notes |
-|---|---|
-| `path` | route path or mobile screen key |
-| `name` | screen name |
-| `role` | one of the six roles or `public` / `shared` |
-| `device` | `web` · `tablet` · `mobile` |
-| `purpose` | single sentence |
-| `primaryCta` | the one thing this screen exists to do |
-| `secondaryActions` | array |
-| `requiredData` | data shapes |
-| `bff` | BFF route(s) called |
-| `loadingState` | `skeleton` · `spinner` · `inline` · `n/a` |
-| `emptyState` | copy + CTA |
-| `errorState` | copy + retry |
-| `retry` | `automatic` · `manual` · `none` |
-| `permission` | role + permission key |
-| `consentDependency` | one or more of CONSENT_TYPES, or `none` |
-| `accessibilityNotes` | non-default a11y considerations |
-| `mobileBehavior` | how it adapts in the unified app |
-| `eng` | engineering handoff notes |
+| Column               | Notes                                       |
+| -------------------- | ------------------------------------------- |
+| `path`               | route path or mobile screen key             |
+| `name`               | screen name                                 |
+| `role`               | one of the six roles or `public` / `shared` |
+| `device`             | `web` · `tablet` · `mobile`                 |
+| `purpose`            | single sentence                             |
+| `primaryCta`         | the one thing this screen exists to do      |
+| `secondaryActions`   | array                                       |
+| `requiredData`       | data shapes                                 |
+| `bff`                | BFF route(s) called                         |
+| `loadingState`       | `skeleton` · `spinner` · `inline` · `n/a`   |
+| `emptyState`         | copy + CTA                                  |
+| `errorState`         | copy + retry                                |
+| `retry`              | `automatic` · `manual` · `none`             |
+| `permission`         | role + permission key                       |
+| `consentDependency`  | one or more of CONSENT_TYPES, or `none`     |
+| `accessibilityNotes` | non-default a11y considerations             |
+| `mobileBehavior`     | how it adapts in the unified app            |
+| `eng`                | engineering handoff notes                   |
 
 Below are matrix entries for the **eight P0 screens** that anchor the core journey; the rest follow the same template in the JSON file.
 
 ### 4.1 Sample entries (P0 anchors)
 
 **`/signup`**
+
 - Role: public · Device: web/tablet/mobile · Purpose: Parent creates an account and grants the minimum consents required to create a learner.
 - Primary CTA: "Create account". Secondary: "Sign in instead".
 - Required data: email, displayName, password, accepted-terms-version, accepted-COPPA-version.
@@ -321,6 +323,7 @@ Below are matrix entries for the **eight P0 screens** that anchor the core journ
 - A11y: form labels + describedby; password requirements `aria-live="polite"`. Mobile: keyboard-aware scroll. Eng: must inline the Terms + COPPA acceptance (currently separate post-signup — BF-01).
 
 **`/parent/home`**
+
 - Role: parent · Device: all · Purpose: Show learner readiness + the next action AIVO needs.
 - Primary CTA: contextual per learner card ("Complete assessment", "Upload IEP", "Start baseline", "Open today's mission").
 - BFF: `GET /api/bff/parent/learners`, `GET /api/bff/parent/inbox`.
@@ -329,6 +332,7 @@ Below are matrix entries for the **eight P0 screens** that anchor the core journ
 - Mobile: same content, vertical stack of cards.
 
 **`/learner/home`** (Today's Mission)
+
 - Role: learner (+ parent helping) · Device: all · Purpose: Surface the single next learning task.
 - Primary CTA: "Start [Tutor name]'s mission" → `POST /api/bff/learners/[id]/lesson-runs` → redirect to `/learner/lesson-runs/[id]`.
 - Required data: active learner, brain profile, next mission picked by `pickTodaysMission`.
@@ -339,6 +343,7 @@ Below are matrix entries for the **eight P0 screens** that anchor the core journ
 - Mobile: identical layout, swap left rail for bottom tabs.
 
 **`/learner/lesson-runs/[lessonRunId]`** (Stage)
+
 - Role: learner (+ parent helping) · Device: all · Purpose: Deliver one beat of one lesson at a time.
 - Primary CTA: per-beat action ("Tap to choose", "Drag to match", "Speak your answer", "I'm ready").
 - BFF: `GET /api/bff/lesson-runs/[id]`, `POST /api/bff/lesson-runs/[id]/responses`, `POST /api/bff/lesson-runs/[id]/complete`.
@@ -348,6 +353,7 @@ Below are matrix entries for the **eight P0 screens** that anchor the core journ
 - Mobile: full-screen; lock orientation per learner setting.
 
 **`/parent/learners/[id]/iep`**
+
 - Role: parent · Device: all · Purpose: Upload an IEP or accommodation document (or skip).
 - Primary CTA: "Upload IEP" (file picker) · Secondary: "Skip for now".
 - BFF: `POST /api/bff/learners/[id]/iep-upload` (5 MB cap, allow-listed content types).
@@ -357,6 +363,7 @@ Below are matrix entries for the **eight P0 screens** that anchor the core journ
 - Mobile: native document picker.
 
 **`/teacher/classes/[classId]`**
+
 - Role: teacher · Device: web/tablet/mobile · Purpose: Class roster + "which learners need attention".
 - Primary CTA: per-row "Open learner". Secondary: "Create assignment for class", "Export roster".
 - BFF: `GET /api/bff/teacher/classes/[id]`, `GET /api/bff/teacher/classes/[id]/needs-attention`.
@@ -365,6 +372,7 @@ Below are matrix entries for the **eight P0 screens** that anchor the core journ
 - A11y: data table with column headers + sortable.
 
 **`/admin/platform/security/incidents`**
+
 - Role: platform_admin · Device: web · Purpose: Open + recent security incidents.
 - Primary CTA: "Open incident" → detail page. Secondary: "Append timeline event".
 - BFF: `GET /api/bff/admin/security/incidents`, `POST .../timeline`.
@@ -374,6 +382,7 @@ Below are matrix entries for the **eight P0 screens** that anchor the core journ
 - Eng: writes emit `security.incident.timeline.appended` audit (S31).
 
 **`/admin/platform/compliance/dsar`**
+
 - Role: platform_admin · Device: web · Purpose: DSAR request fulfillment.
 - Primary CTA: "Review request" → detail. Secondary: "Export packet", "Mark fulfilled".
 - BFF: `GET /api/bff/admin/compliance/dsar`, `POST /api/bff/admin/compliance/dsar/[id]/fulfill`.
@@ -391,16 +400,16 @@ To regenerate the JSON after adding or moving routes, run `node scripts/route-ma
 
 Source of truth: `lib/auth/server.ts → requirePageRole(roles[])` on every page and `lib/bff/guards.ts → requireRole(req, roles[])` on every BFF.
 
-| Surface tree | Required role | Cross-tenant guard | Notes |
-|---|---|---|---|
-| `/` `/login` `/signup` `/help/*` `/verify-email` `/forgot-password` `/reset-password` | public | n/a | |
-| `/parent/**` | parent | `tenantId === session.tenantId` on every learner read | parent can only see learners with `parentUserId === session.userId` |
-| `/learner/**` | learner OR (parent + active-learner cookie) | learner ownership | parent-helping path re-checks active learner on every server action |
-| `/teacher/**` | teacher | `tenantId === session.tenantId` + class roster membership | teacher can only see learners in their classes |
-| `/admin/school/**` | school_admin | school tenant scope | |
-| `/admin/district/**` | district_admin | district tenant scope | district sees all schools under it |
-| `/admin/platform/**` | platform_admin | n/a | platform sees all tenants |
-| `/settings/accessibility` | any signed-in role | n/a | personal setting |
+| Surface tree                                                                          | Required role                               | Cross-tenant guard                                        | Notes                                                               |
+| ------------------------------------------------------------------------------------- | ------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------- |
+| `/` `/login` `/signup` `/help/*` `/verify-email` `/forgot-password` `/reset-password` | public                                      | n/a                                                       |                                                                     |
+| `/parent/**`                                                                          | parent                                      | `tenantId === session.tenantId` on every learner read     | parent can only see learners with `parentUserId === session.userId` |
+| `/learner/**`                                                                         | learner OR (parent + active-learner cookie) | learner ownership                                         | parent-helping path re-checks active learner on every server action |
+| `/teacher/**`                                                                         | teacher                                     | `tenantId === session.tenantId` + class roster membership | teacher can only see learners in their classes                      |
+| `/admin/school/**`                                                                    | school_admin                                | school tenant scope                                       |                                                                     |
+| `/admin/district/**`                                                                  | district_admin                              | district tenant scope                                     | district sees all schools under it                                  |
+| `/admin/platform/**`                                                                  | platform_admin                              | n/a                                                       | platform sees all tenants                                           |
+| `/settings/accessibility`                                                             | any signed-in role                          | n/a                                                       | personal setting                                                    |
 
 A future `scripts/route-audit.mjs` extension should walk each page+BFF and assert: (a) every page calls `requirePageRole`; (b) every BFF calls `requireSession` + a tenant or ownership check; (c) no learner-facing surface reads brain state without the `child_data_collection` + `ai_personalization` consents.
 
@@ -412,20 +421,21 @@ Consent types (canon — `lib/db/types.ts → CONSENT_TYPES`):
 Per `lib/db/types.ts → CONSENT_TYPES` (10 types):
 `parent_account_terms` · `parent_privacy_policy` · `child_data_collection` · `iep_document_storage` · `ai_personalization` · `school_roster_import` · `teacher_access` · `marketing_opt_in` · `data_export_request` · `data_deletion_request`. COPPA is enforced via the `AgeGateRecord` + `child_data_collection` pairing — see UX-03 §3.1.
 
-| Surface | Required consents | Block behaviour |
-|---|---|---|
-| `/signup` | collect: `parent_account_terms`, `parent_privacy_policy` (+ optional `marketing_opt_in`) | inline checkboxes |
-| `/parent/learners/new` | write `AgeGateRecord`; collect `child_data_collection` for the new learner | inline before submit; AgeGateRecord captures `requiresParentConsent` when learner age < 13 |
-| `/parent/learners/[id]/assessment` | `child_data_collection` | redirect to `/parent/consent/[id]` if missing |
-| `/parent/learners/[id]/iep` | `iep_document_storage` | inline accept-or-skip |
-| `/learner/home`, `/learner/lesson-runs/*`, `/learner/baseline/*`, `/learner/homework/*` | `child_data_collection` + `ai_personalization` | redirect to `/learner/home?blocker=consent` |
-| `/teacher/learners/[id]` | `teacher_access` (per-learner) | hide profile or show "consent required" stub |
-| `/parent/privacy/data-export` | records `data_export_request` per export job | inline; one ConsentRecord row per export request, scoped to account or learner |
-| `/parent/privacy/delete-data` | records `data_deletion_request` per deletion job | inline; starts the 14-day soft-delete window |
-| District rostering ingest | `school_roster_import` (per-learner or account) | parent accepts at school invite; admin cannot bypass |
-| `/parent/notifications` marketing toggles | `marketing_opt_in` | settings-only |
+| Surface                                                                                 | Required consents                                                                        | Block behaviour                                                                            |
+| --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `/signup`                                                                               | collect: `parent_account_terms`, `parent_privacy_policy` (+ optional `marketing_opt_in`) | inline checkboxes                                                                          |
+| `/parent/learners/new`                                                                  | write `AgeGateRecord`; collect `child_data_collection` for the new learner               | inline before submit; AgeGateRecord captures `requiresParentConsent` when learner age < 13 |
+| `/parent/learners/[id]/assessment`                                                      | `child_data_collection`                                                                  | redirect to `/parent/consent/[id]` if missing                                              |
+| `/parent/learners/[id]/iep`                                                             | `iep_document_storage`                                                                   | inline accept-or-skip                                                                      |
+| `/learner/home`, `/learner/lesson-runs/*`, `/learner/baseline/*`, `/learner/homework/*` | `child_data_collection` + `ai_personalization`                                           | redirect to `/learner/home?blocker=consent`                                                |
+| `/teacher/learners/[id]`                                                                | `teacher_access` (per-learner)                                                           | hide profile or show "consent required" stub                                               |
+| `/parent/privacy/data-export`                                                           | records `data_export_request` per export job                                             | inline; one ConsentRecord row per export request, scoped to account or learner             |
+| `/parent/privacy/delete-data`                                                           | records `data_deletion_request` per deletion job                                         | inline; starts the 14-day soft-delete window                                               |
+| District rostering ingest                                                               | `school_roster_import` (per-learner or account)                                          | parent accepts at school invite; admin cannot bypass                                       |
+| `/parent/notifications` marketing toggles                                               | `marketing_opt_in`                                                                       | settings-only                                                                              |
 
 Revocation effect (UX-00 §7 risk): each consent type must declare retroactive policy.
+
 - `ai_personalization` revoked → no new AI-generated content; existing lesson summaries remain visible but flagged.
 - `iep_document_storage` revoked → document is purged within 30 days; brain profile retains derived accommodations unless `child_data_collection` is also revoked.
 - `child_data_collection` revoked → learner data soft-deletes within 30 days; all dashboards show "data removed" tombstone.
@@ -448,6 +458,7 @@ Tab navigator is one component reading `activeRoleMode` to pick its tab list. Ea
 Per-mode deep link contract: `aivo://parent/learners/<id>`, `aivo://learner/lesson/<id>`, `aivo://teacher/classes/<id>`, `aivo://admin-lite/alerts`. The deep-link handler sets the active mode first, then navigates.
 
 Caregiver and therapist (currently separate mobile groups, no web counterpart) — decision required:
+
 - **If kept**: add `caregiver` and `therapist` to the Role canon in `lib/auth/types.ts`, the consent matrix (`teacher_access` likely extends), and the web sitemap.
 - **If folded in**: `(caregiver)` collapses into Parent Mode with a "delegated caregiver" sub-permission; `(therapist)` collapses into Teacher Mode with a clinical sub-permission.
 
@@ -468,16 +479,19 @@ Default recommendation (per UX-00 §11): fold caregiver into parent, keep therap
 ## 9. Screen priority
 
 ### MVP (already shipped or P0 to ship)
+
 Web: `/`, `/login`, `/signup`, `/parent/home`, `/parent/learners`, `/parent/learners/new`, `/parent/learners/[id]/*` (assessment · iep · brain-profile · baseline · progress · lessons), `/learner/select`, `/learner/home`, `/learner/baseline/[id]`, `/learner/lesson-runs/[id]`, `/teacher/home`, `/teacher/classes`, `/teacher/classes/[id]`, `/teacher/learners/[id]`, `/admin/platform`, `/settings/accessibility`, `/verify-email`, `/forgot-password`, `/reset-password`.
 
 Mobile: `/welcome`, `/(auth)/*`, `/role-chooser`, `/role-switcher`, Parent Mode home + learners, Learner Mode today + lesson, Teacher Mode home + classes.
 
 ### School-ready release
+
 Web: `/parent/inbox`, `/parent/consent/*`, `/parent/privacy/*`, `/teacher/assignments/*`, `/teacher/insights`, `/admin/school/*`, `/admin/platform/{ai-generation,ai-costs,audit-logs,safety/*,security/*,compliance/*,curriculum/*}`, `/learner/inbox`, `/learner/subjects/*`, `/learner/quests/*`, `/learner/homework/*`, `/learner/progress`, `/learner/rewards`.
 
 Mobile: All four role modes' tab content, shared settings, notifications center.
 
 ### Enterprise (district) release
+
 Web: `/admin/district/*`, `/admin/platform/{tenants,users,data,migration,billing,support,system-health/incidents}`, `/admin/platform/security/state-privacy`, `/admin/platform/security/vendors`, `/admin/platform/security/risks`.
 
 Mobile: Admin-Lite Mode + push notifications + offline lesson queue.

@@ -72,14 +72,9 @@ if (files.length === 0) {
   process.exit(1);
 }
 
-const guardSrc = readFileSync(
-  join(repoRoot, "apps/web-v2/lib/bff/consent-guard.ts"),
-  "utf8",
-);
+const guardSrc = readFileSync(join(repoRoot, "apps/web-v2/lib/bff/consent-guard.ts"), "utf8");
 if (!/export function requireLearnerConsent/.test(guardSrc)) {
-  console.error(
-    "error: apps/web-v2/lib/bff/consent-guard.ts must export requireLearnerConsent.",
-  );
+  console.error("error: apps/web-v2/lib/bff/consent-guard.ts must export requireLearnerConsent.");
   process.exit(1);
 }
 
@@ -98,19 +93,14 @@ for (const file of files) {
   const rel = file.replace(repoRoot + "/", "");
   const pattern = classify(file);
   if (!pattern) {
-    warnings.push(
-      `${rel}: not classified — add to SENSITIVE_PATTERNS or allow-list.`,
-    );
+    warnings.push(`${rel}: not classified — add to SENSITIVE_PATTERNS or allow-list.`);
     continue;
   }
   if (!pattern.required) continue;
   const src = readFileSync(file, "utf8");
-  const callsGuard =
-    /requireLearnerConsent\(/.test(src) || /hasLearnerConsent\(/.test(src);
+  const callsGuard = /requireLearnerConsent\(/.test(src) || /hasLearnerConsent\(/.test(src);
   if (!callsGuard) {
-    errors.push(
-      `${rel}: must call requireLearnerConsent() before returning a response.`,
-    );
+    errors.push(`${rel}: must call requireLearnerConsent() before returning a response.`);
   }
 }
 

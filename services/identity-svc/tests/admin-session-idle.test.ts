@@ -1,12 +1,24 @@
 import { test } from "node:test";
 import assert from "node:assert";
 import {
-  isInternalRole, refreshTtlMs, deviceFingerprint,
-  INTERNAL_REFRESH_TTL_MS, MFA_FRESHNESS_MS,
+  isInternalRole,
+  refreshTtlMs,
+  deviceFingerprint,
+  INTERNAL_REFRESH_TTL_MS,
+  MFA_FRESHNESS_MS,
 } from "../src/services/admin-session.js";
 
 test("isInternalRole identifies all 8 internal roles", () => {
-  for (const r of ["PLATFORM_ADMIN", "DISTRICT_ADMIN", "SALES", "MARKETING", "CUSTOMER_CARE", "SUPPORT", "FINANCE", "DEVOPS"]) {
+  for (const r of [
+    "PLATFORM_ADMIN",
+    "DISTRICT_ADMIN",
+    "SALES",
+    "MARKETING",
+    "CUSTOMER_CARE",
+    "SUPPORT",
+    "FINANCE",
+    "DEVOPS",
+  ]) {
     assert.equal(isInternalRole(r), true, `${r} should be internal`);
   }
   for (const r of ["PARENT", "GUARDIAN", "TEACHER", "STUDENT", "LEARNER"]) {
@@ -20,9 +32,21 @@ test("refreshTtlMs returns 12h for internal, 30d for consumer", () => {
 });
 
 test("deviceFingerprint is deterministic and changes with UA", () => {
-  const a = deviceFingerprint({ "user-agent": "Mozilla/5.0", "accept-language": "en", "sec-ch-ua": "Chromium" });
-  const b = deviceFingerprint({ "user-agent": "Mozilla/5.0", "accept-language": "en", "sec-ch-ua": "Chromium" });
-  const c = deviceFingerprint({ "user-agent": "curl/8", "accept-language": "en", "sec-ch-ua": "Chromium" });
+  const a = deviceFingerprint({
+    "user-agent": "Mozilla/5.0",
+    "accept-language": "en",
+    "sec-ch-ua": "Chromium",
+  });
+  const b = deviceFingerprint({
+    "user-agent": "Mozilla/5.0",
+    "accept-language": "en",
+    "sec-ch-ua": "Chromium",
+  });
+  const c = deviceFingerprint({
+    "user-agent": "curl/8",
+    "accept-language": "en",
+    "sec-ch-ua": "Chromium",
+  });
   assert.equal(a, b);
   assert.notEqual(a, c);
   assert.equal(a.length, 64);
@@ -44,7 +68,8 @@ test("idle gate rejects after 241 minutes, accepts when fresh", { skip: SKIP }, 
     const fresh = await gateAdminRefresh(db, sessionId, u.id, headers, "127.0.0.1");
     assert.equal(fresh.ok, true, "fresh session must pass");
 
-    await db.update(adminSessions)
+    await db
+      .update(adminSessions)
       .set({ lastActivityAt: new Date(Date.now() - 241 * 60_000) })
       .where(eq(adminSessions.sessionId, sessionId));
     const stale = await gateAdminRefresh(db, sessionId, u.id, headers, "127.0.0.1");
@@ -64,7 +89,13 @@ test("fingerprint mismatch returns mfaPending", { skip: SKIP }, async () => {
     const [u] = await db.select().from(users).limit(1);
     if (!u) return;
     await recordAdminLogin(db, u.id, sessionId, { "user-agent": "browser-A" }, "127.0.0.1");
-    const result = await gateAdminRefresh(db, sessionId, u.id, { "user-agent": "browser-B" }, "127.0.0.1");
+    const result = await gateAdminRefresh(
+      db,
+      sessionId,
+      u.id,
+      { "user-agent": "browser-B" },
+      "127.0.0.1",
+    );
     assert.equal(result.ok, false);
     if (!result.ok) {
       assert.equal(result.body.mfaPending, true);

@@ -11,7 +11,13 @@ const NAV_ITEMS = [
 
 export default function TherapistLayout({ children }: { children: React.ReactNode }) {
   return (
-    <CareTeamLayout accent="pink" roleLabel="Therapist" allowedRoles={["THERAPIST", "PLATFORM_ADMIN"]} basePath="/dashboard/therapist" navItems={NAV_ITEMS}>
+    <CareTeamLayout
+      accent="pink"
+      roleLabel="Therapist"
+      allowedRoles={["THERAPIST", "PLATFORM_ADMIN"]}
+      basePath="/dashboard/therapist"
+      navItems={NAV_ITEMS}
+    >
       {children}
     </CareTeamLayout>
   );

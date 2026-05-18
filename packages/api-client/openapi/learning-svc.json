@@ -575,6 +575,163 @@
         }
       }
     },
+    "/api/learning/sessions/{sessionId}": {
+      "get": {
+        "operationId": "getLearningSessionById",
+        "summary": "Get a single learning session including its stage plan",
+        "tags": [
+          "Learning"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "sessionId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "required": [
+                    "sessionId",
+                    "learnerId",
+                    "tutorSku",
+                    "stagePlan"
+                  ],
+                  "properties": {
+                    "sessionId": {
+                      "type": "string"
+                    },
+                    "learnerId": {
+                      "type": "string"
+                    },
+                    "tutorSku": {
+                      "type": "string"
+                    },
+                    "subject": {
+                      "type": "string"
+                    },
+                    "functioningLevel": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "status": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "startedAt": {
+                      "type": [
+                        "null",
+                        "string"
+                      ],
+                      "format": "date-time"
+                    },
+                    "completedAt": {
+                      "type": [
+                        "null",
+                        "string"
+                      ],
+                      "format": "date-time"
+                    },
+                    "xpEarned": {
+                      "type": [
+                        "null",
+                        "integer"
+                      ]
+                    },
+                    "stagePlan": {
+                      "type": "object",
+                      "additionalProperties": true,
+                      "required": [
+                        "beats"
+                      ],
+                      "properties": {
+                        "beats": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "additionalProperties": true
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/learning/gradebook/{learnerId}": {
       "get": {
         "operationId": "getGradebook",
@@ -1090,6 +1247,15 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/learning/surface-telemetry": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "Default Response"
           }
         }
       }

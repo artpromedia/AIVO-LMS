@@ -38,10 +38,9 @@ describe("entitlement gate end-to-end", () => {
   });
 
   it("returns an empty entitlement set before any subscription exists", async () => {
-    const res = await fetch(
-      serviceUrl("billing-svc", `/api/billing/entitlements/${tenantId}`),
-      { headers: { Authorization: `Bearer ${parentToken}` } },
-    );
+    const res = await fetch(serviceUrl("billing-svc", `/api/billing/entitlements/${tenantId}`), {
+      headers: { Authorization: `Bearer ${parentToken}` },
+    });
     expect(res.status).toBe(200);
     const data = (await res.json()) as { plan: string; effectiveTutorSkus: string[] };
     expect(data.plan).toBe("free");

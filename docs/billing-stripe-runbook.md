@@ -22,21 +22,21 @@ before turning on Stripe webhooks in any environment.
 
 ## Required environment variables
 
-| Variable | Purpose |
-|---|---|
-| `STRIPE_SECRET_KEY` | Server-side Stripe API key. Use a test key in non-prod. |
-| `STRIPE_WEBHOOK_SECRET` | Used by `stripe.webhooks.constructEvent` to verify signatures. |
-| `STRIPE_PRICE_SINGLE` | Price ID for the `single` plan. |
-| `STRIPE_PRICE_FAMILY` | Price ID for the `family` plan. |
-| `STRIPE_PRICE_TUTOR_ADDON` | Single price ID for the $4.99/mo tutor add-on; the line item carries the chosen tutor SKU in metadata. |
-| `APP_BILLING_SUCCESS_URL` | Where Stripe Checkout redirects after a successful checkout. |
-| `APP_BILLING_CANCEL_URL` | Where Stripe Checkout redirects on cancel. |
-| `STRIPE_CUSTOMER_PORTAL_RETURN_URL` | Where the Customer Portal returns after the parent finishes there. |
+| Variable                            | Purpose                                                                                                |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `STRIPE_SECRET_KEY`                 | Server-side Stripe API key. Use a test key in non-prod.                                                |
+| `STRIPE_WEBHOOK_SECRET`             | Used by `stripe.webhooks.constructEvent` to verify signatures.                                         |
+| `STRIPE_PRICE_SINGLE`               | Price ID for the `single` plan.                                                                        |
+| `STRIPE_PRICE_FAMILY`               | Price ID for the `family` plan.                                                                        |
+| `STRIPE_PRICE_TUTOR_ADDON`          | Single price ID for the $4.99/mo tutor add-on; the line item carries the chosen tutor SKU in metadata. |
+| `APP_BILLING_SUCCESS_URL`           | Where Stripe Checkout redirects after a successful checkout.                                           |
+| `APP_BILLING_CANCEL_URL`            | Where Stripe Checkout redirects on cancel.                                                             |
+| `STRIPE_CUSTOMER_PORTAL_RETURN_URL` | Where the Customer Portal returns after the parent finishes there.                                     |
 
 Optional for local development:
 
-| Variable | Purpose |
-|---|---|
+| Variable                         | Purpose                                                                                      |
+| -------------------------------- | -------------------------------------------------------------------------------------------- |
 | `AIVO_ALLOW_UNGATED_TUTORS=true` | Skips the entitlement check in tutor-svc and learning-svc. **Never set this in production.** |
 
 If any required Stripe var is missing, the route fails with `503
@@ -186,10 +186,10 @@ post-deploy regressions or a webhook outage.
 treat Stripe `past_due` (the automatic dunning window after a card
 declines):
 
-| Value | Behavior |
-|---|---|
+| Value             | Behavior                                                                                                                                |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | `allow` (default) | Learner stays unlocked through Stripe's retry attempts. Reflects standard SaaS practice — most transient declines recover within hours. |
-| `deny` | Learner locks out the moment the subscription enters `past_due`. Use only if the contract requires immediate revocation. |
+| `deny`            | Learner locks out the moment the subscription enters `past_due`. Use only if the contract requires immediate revocation.                |
 
 ## What's intentionally out of scope
 

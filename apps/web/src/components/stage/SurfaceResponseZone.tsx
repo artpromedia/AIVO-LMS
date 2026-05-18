@@ -25,10 +25,7 @@ export interface SurfaceResponseZoneProps {
    */
   resolveSurface?: (id: string) => LearnerSurfaceSpec | undefined;
   disabled?: boolean;
-  onCorrectnessEvaluated: (
-    correct: boolean,
-    payload?: Record<string, unknown>,
-  ) => void;
+  onCorrectnessEvaluated: (correct: boolean, payload?: Record<string, unknown>) => void;
   onSurfaceEvent?: (event: SurfaceTelemetryEvent) => void;
 }
 
@@ -43,7 +40,8 @@ function evaluateExact(surface: LearnerSurfaceSpec, response: SurfaceResponse): 
       : undefined);
 
   if (typeof expected === "number") {
-    const numeric = typeof submitted === "number" ? submitted : Number(String(submitted ?? "").trim());
+    const numeric =
+      typeof submitted === "number" ? submitted : Number(String(submitted ?? "").trim());
     return Number.isFinite(numeric) && numeric === expected;
   }
 
@@ -51,7 +49,11 @@ function evaluateExact(surface: LearnerSurfaceSpec, response: SurfaceResponse): 
     return Boolean(submitted) === expected;
   }
 
-  return String(submitted ?? "").trim().toLowerCase() === String(expected).trim().toLowerCase();
+  return (
+    String(submitted ?? "")
+      .trim()
+      .toLowerCase() === String(expected).trim().toLowerCase()
+  );
 }
 
 export function SurfaceResponseZone({

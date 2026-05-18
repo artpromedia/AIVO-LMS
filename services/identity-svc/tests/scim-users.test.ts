@@ -45,18 +45,23 @@ test("SCIM Users: rejects missing bearer token", { skip: SKIP }, async () => {
   try {
     const res = await app.inject({ method: "GET", url: "/scim/v2/Users" });
     assert.equal(res.statusCode, 401);
-  } finally { await teardown(app, db); }
+  } finally {
+    await teardown(app, db);
+  }
 });
 
 test("SCIM Users: rejects bogus bearer token", { skip: SKIP }, async () => {
   const { app, db } = await bootstrap();
   try {
     const res = await app.inject({
-      method: "GET", url: "/scim/v2/Users",
+      method: "GET",
+      url: "/scim/v2/Users",
       headers: { Authorization: "Bearer scim_does-not-exist" },
     });
     assert.equal(res.statusCode, 401);
-  } finally { await teardown(app, db); }
+  } finally {
+    await teardown(app, db);
+  }
 });
 
 test("SCIM Users: list returns SCIM ListResponse with valid token", { skip: SKIP }, async () => {
@@ -64,12 +69,17 @@ test("SCIM Users: list returns SCIM ListResponse with valid token", { skip: SKIP
   try {
     const { tenants } = await import("@aivo/db");
     const { eq } = await import("drizzle-orm");
-    const [tenant] = await db.insert(tenants).values({
-      name: `SCIM Test ${Date.now()}`, type: "B2B_DISTRICT",
-    } as any).returning();
+    const [tenant] = await db
+      .insert(tenants)
+      .values({
+        name: `SCIM Test ${Date.now()}`,
+        type: "B2B_DISTRICT",
+      } as any)
+      .returning();
     const token = await issueToken(db, tenant.id);
     const res = await app.inject({
-      method: "GET", url: "/scim/v2/Users?count=10",
+      method: "GET",
+      url: "/scim/v2/Users?count=10",
       headers: { Authorization: `Bearer ${token}` },
     });
     assert.equal(res.statusCode, 200);
@@ -82,7 +92,9 @@ test("SCIM Users: list returns SCIM ListResponse with valid token", { skip: SKIP
     const { scimTokens } = await import("@aivo/db");
     await db.delete(scimTokens).where(eq(scimTokens.tenantId, tenant.id));
     await db.delete(tenants).where(eq(tenants.id, tenant.id));
-  } finally { await teardown(app, db); }
+  } finally {
+    await teardown(app, db);
+  }
 });
 
 test("SCIM Users: rejects PLATFORM_ADMIN provisioning attempts", { skip: SKIP }, async () => {
@@ -90,12 +102,17 @@ test("SCIM Users: rejects PLATFORM_ADMIN provisioning attempts", { skip: SKIP },
   try {
     const { tenants } = await import("@aivo/db");
     const { eq } = await import("drizzle-orm");
-    const [tenant] = await db.insert(tenants).values({
-      name: `SCIM Reject ${Date.now()}`, type: "B2B_DISTRICT",
-    } as any).returning();
+    const [tenant] = await db
+      .insert(tenants)
+      .values({
+        name: `SCIM Reject ${Date.now()}`,
+        type: "B2B_DISTRICT",
+      } as any)
+      .returning();
     const token = await issueToken(db, tenant.id);
     const res = await app.inject({
-      method: "POST", url: "/scim/v2/Users",
+      method: "POST",
+      url: "/scim/v2/Users",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/scim+json" },
       payload: {
         schemas: ["urn:ietf:params:scim:schemas:core:2.0:User"],
@@ -111,5 +128,7 @@ test("SCIM Users: rejects PLATFORM_ADMIN provisioning attempts", { skip: SKIP },
     const { scimTokens } = await import("@aivo/db");
     await db.delete(scimTokens).where(eq(scimTokens.tenantId, tenant.id));
     await db.delete(tenants).where(eq(tenants.id, tenant.id));
-  } finally { await teardown(app, db); }
+  } finally {
+    await teardown(app, db);
+  }
 });

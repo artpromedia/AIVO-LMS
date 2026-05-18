@@ -3,7 +3,15 @@ import { useAuth } from "@/providers/auth-provider";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { IconWell, StatIconWell } from "@/components/discovery/_vi";
-import { ClipboardList, Clock, AlertTriangle, Search, PenTool, CheckCircle2, Bell } from "lucide-react";
+import {
+  ClipboardList,
+  Clock,
+  AlertTriangle,
+  Search,
+  PenTool,
+  CheckCircle2,
+  Bell,
+} from "lucide-react";
 
 interface IepSummary {
   active: number;
@@ -54,9 +62,13 @@ export default function DistrictIepPage() {
     if (!accessToken) return;
     const headers = { Authorization: `Bearer ${accessToken}` };
     Promise.all([
-      fetch("/api/district/iep/summary", { headers }).then((r) => r.ok ? r.json() : null),
-      fetch("/api/district/iep/learners", { headers }).then((r) => r.ok ? r.json() : { iepLearners: [] }),
-      fetch("/api/district/iep/evaluations-in-progress", { headers }).then((r) => r.ok ? r.json() : { evaluations: [] }),
+      fetch("/api/district/iep/summary", { headers }).then((r) => (r.ok ? r.json() : null)),
+      fetch("/api/district/iep/learners", { headers }).then((r) =>
+        r.ok ? r.json() : { iepLearners: [] },
+      ),
+      fetch("/api/district/iep/evaluations-in-progress", { headers }).then((r) =>
+        r.ok ? r.json() : { evaluations: [] },
+      ),
     ])
       .then(([s, l, e]) => {
         setSummary(s);
@@ -71,10 +83,21 @@ export default function DistrictIepPage() {
 
   const getReviewStatus = (reviewDate: string) => {
     if (!reviewDate) return { label: "No date", cls: "vi-surface-soft vi-text-muted" };
-    if (reviewDate < today) return { label: "Overdue", cls: "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]" };
+    if (reviewDate < today)
+      return {
+        label: "Overdue",
+        cls: "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]",
+      };
     const thirtyDays = new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0];
-    if (reviewDate <= thirtyDays) return { label: "Due soon", cls: "bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]" };
-    return { label: "On track", cls: "bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]" };
+    if (reviewDate <= thirtyDays)
+      return {
+        label: "Due soon",
+        cls: "bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]",
+      };
+    return {
+      label: "On track",
+      cls: "bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]",
+    };
   };
 
   return (
@@ -85,14 +108,18 @@ export default function DistrictIepPage() {
         </IconWell>
         <div>
           <h1 className="text-2xl font-heading font-bold vi-text">IEP Management</h1>
-          <p className="text-sm vi-text-muted mt-1">Track individualized education programs, review dates, and compliance status.</p>
+          <p className="text-sm vi-text-muted mt-1">
+            Track individualized education programs, review dates, and compliance status.
+          </p>
         </div>
       </header>
 
       {loading ? (
         <div className="animate-pulse space-y-4">
           <div className="grid grid-cols-3 gap-4">
-            {[1, 2, 3].map((i) => <div key={i} className="h-24 bg-slate-200 rounded-2xl" />)}
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-24 bg-slate-200 rounded-2xl" />
+            ))}
           </div>
           <div className="h-64 bg-slate-200 rounded-2xl" />
         </div>
@@ -114,16 +141,22 @@ export default function DistrictIepPage() {
                   <StatIconWell color="amber">
                     <Clock size={22} strokeWidth={2.5} aria-hidden="true" />
                   </StatIconWell>
-                  <span className="text-xs text-[hsl(var(--visual-sel))] font-medium uppercase">Reviews Due in 30 Days</span>
+                  <span className="text-xs text-[hsl(var(--visual-sel))] font-medium uppercase">
+                    Reviews Due in 30 Days
+                  </span>
                 </div>
-                <p className="text-3xl font-bold text-[hsl(var(--visual-sel))]">{summary.reviewsDueIn30Days ?? summary.dueForReview}</p>
+                <p className="text-3xl font-bold text-[hsl(var(--visual-sel))]">
+                  {summary.reviewsDueIn30Days ?? summary.dueForReview}
+                </p>
               </div>
               <div className="vi-card p-5">
                 <div className="flex items-center gap-3 mb-2">
                   <StatIconWell color="reading">
                     <Bell size={22} strokeWidth={2.5} aria-hidden="true" />
                   </StatIconWell>
-                  <span className="text-xs vi-text-muted font-medium uppercase">Unread Parent Updates (14d)</span>
+                  <span className="text-xs vi-text-muted font-medium uppercase">
+                    Unread Parent Updates (14d)
+                  </span>
                 </div>
                 <p className="text-3xl font-bold vi-text">{summary.unreadParentUpdates ?? 0}</p>
               </div>
@@ -132,16 +165,22 @@ export default function DistrictIepPage() {
                   <StatIconWell color="red">
                     <AlertTriangle size={22} strokeWidth={2.5} aria-hidden="true" />
                   </StatIconWell>
-                  <span className="text-xs text-[hsl(var(--visual-math))] font-medium uppercase">Overdue</span>
+                  <span className="text-xs text-[hsl(var(--visual-math))] font-medium uppercase">
+                    Overdue
+                  </span>
                 </div>
-                <p className="text-3xl font-bold text-[hsl(var(--visual-math))]">{summary.overdue}</p>
+                <p className="text-3xl font-bold text-[hsl(var(--visual-math))]">
+                  {summary.overdue}
+                </p>
               </div>
               <div className="vi-card p-5">
                 <div className="flex items-center gap-3 mb-2">
                   <StatIconWell color="reading">
                     <Search size={22} strokeWidth={2.5} aria-hidden="true" />
                   </StatIconWell>
-                  <span className="text-xs vi-text-muted font-medium uppercase">Evaluations In Progress</span>
+                  <span className="text-xs vi-text-muted font-medium uppercase">
+                    Evaluations In Progress
+                  </span>
                 </div>
                 <p className="text-3xl font-bold vi-text">{summary.evaluationsInProgress ?? 0}</p>
               </div>
@@ -150,7 +189,9 @@ export default function DistrictIepPage() {
                   <StatIconWell color="primary">
                     <ClipboardList size={22} strokeWidth={2.5} aria-hidden="true" />
                   </StatIconWell>
-                  <span className="text-xs vi-text-muted font-medium uppercase">Drafts in Authoring</span>
+                  <span className="text-xs vi-text-muted font-medium uppercase">
+                    Drafts in Authoring
+                  </span>
                 </div>
                 <p className="text-3xl font-bold vi-text">{summary.drafts ?? 0}</p>
               </div>
@@ -159,7 +200,9 @@ export default function DistrictIepPage() {
                   <StatIconWell color="amber">
                     <PenTool size={22} strokeWidth={2.5} aria-hidden="true" />
                   </StatIconWell>
-                  <span className="text-xs vi-text-muted font-medium uppercase">Awaiting Signatures</span>
+                  <span className="text-xs vi-text-muted font-medium uppercase">
+                    Awaiting Signatures
+                  </span>
                 </div>
                 <p className="text-3xl font-bold vi-text">{summary.awaitingSignatures ?? 0}</p>
               </div>
@@ -168,7 +211,9 @@ export default function DistrictIepPage() {
                   <StatIconWell color="science">
                     <CheckCircle2 size={22} strokeWidth={2.5} aria-hidden="true" />
                   </StatIconWell>
-                  <span className="text-xs vi-text-muted font-medium uppercase">Finalised This Month</span>
+                  <span className="text-xs vi-text-muted font-medium uppercase">
+                    Finalised This Month
+                  </span>
                 </div>
                 <p className="text-3xl font-bold vi-text">{summary.finalisedThisMonth ?? 0}</p>
               </div>
@@ -178,27 +223,46 @@ export default function DistrictIepPage() {
           {evalsInProgress.length > 0 && (
             <div className="vi-card overflow-hidden">
               <div className="p-5 border-b vi-border flex items-center gap-2">
-                <Search size={18} className="text-[hsl(var(--visual-reading))]" aria-hidden="true" />
-                <h2 className="text-lg font-heading font-semibold vi-text">Evaluations in progress</h2>
-                <span className="ml-auto text-xs vi-text-muted">{evalsInProgress.length} most recent</span>
+                <Search
+                  size={18}
+                  className="text-[hsl(var(--visual-reading))]"
+                  aria-hidden="true"
+                />
+                <h2 className="text-lg font-heading font-semibold vi-text">
+                  Evaluations in progress
+                </h2>
+                <span className="ml-auto text-xs vi-text-muted">
+                  {evalsInProgress.length} most recent
+                </span>
               </div>
               <ul className="divide-y vi-border">
                 {evalsInProgress.map((ev) => (
-                  <li key={ev.id} className="p-4 flex items-center justify-between hover:vi-surface-soft">
+                  <li
+                    key={ev.id}
+                    className="p-4 flex items-center justify-between hover:vi-surface-soft"
+                  >
                     <div>
-                      <Link href={`/dashboard/district/learners/${ev.learnerId}`} className="font-bold vi-text hover:text-[hsl(var(--visual-primary))]">
+                      <Link
+                        href={`/dashboard/district/learners/${ev.learnerId}`}
+                        className="font-bold vi-text hover:text-[hsl(var(--visual-primary))]"
+                      >
                         {ev.learnerName}
                       </Link>
                       <div className="text-xs vi-text-muted mt-0.5">
-                        {ev.gradeLevel ? `${ev.gradeLevel} · ` : ""}Started {new Date(ev.createdAt).toLocaleDateString()}
-                        {ev.submittedAt ? ` · Submitted ${new Date(ev.submittedAt).toLocaleDateString()}` : ""}
+                        {ev.gradeLevel ? `${ev.gradeLevel} · ` : ""}Started{" "}
+                        {new Date(ev.createdAt).toLocaleDateString()}
+                        {ev.submittedAt
+                          ? ` · Submitted ${new Date(ev.submittedAt).toLocaleDateString()}`
+                          : ""}
                       </div>
                     </div>
-                    <span className={`px-2.5 py-0.5 text-xs rounded-full font-bold ${
-                      ev.status === "submitted"
-                        ? "bg-[hsl(var(--visual-reading)/0.14)] text-[hsl(var(--visual-reading))]"
-                        : "bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]"
-                    }`}>
+                    <span
+                      className={`px-2.5 py-0.5 text-xs rounded-full font-bold ${
+                        ev.status === "submitted"
+                          ? "bg-[hsl(var(--visual-reading)/0.14)] text-[hsl(var(--visual-reading))]"
+                          : "bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]"
+                      }`}
+                    >
                       {ev.status === "submitted" ? "Awaiting decision" : "Draft"}
                     </span>
                   </li>
@@ -227,18 +291,28 @@ export default function DistrictIepPage() {
                 {iepLearners.map((il) => {
                   const reviewStatus = getReviewStatus(il.reviewDate);
                   return (
-                    <tr key={il.iepId} className="border-b vi-border hover:vi-surface-soft transition">
+                    <tr
+                      key={il.iepId}
+                      className="border-b vi-border hover:vi-surface-soft transition"
+                    >
                       <td className="px-5 py-3">
-                        <Link href={`/dashboard/district/learners/${il.learnerId}`} className="font-medium vi-text hover:text-[hsl(var(--visual-primary))]">
+                        <Link
+                          href={`/dashboard/district/learners/${il.learnerId}`}
+                          className="font-medium vi-text hover:text-[hsl(var(--visual-primary))]"
+                        >
                           {il.learnerName}
                         </Link>
                       </td>
                       <td className="px-5 py-3 vi-text-muted">{il.gradeLevel || "—"}</td>
-                      <td className="px-5 py-3 vi-text-muted text-xs">{il.disabilityCategory || "—"}</td>
+                      <td className="px-5 py-3 vi-text-muted text-xs">
+                        {il.disabilityCategory || "—"}
+                      </td>
                       <td className="px-5 py-3 vi-text-muted text-xs">{il.placement || "—"}</td>
                       <td className="px-5 py-3 vi-text-muted text-xs">{il.reviewDate || "—"}</td>
                       <td className="px-5 py-3">
-                        <span className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${reviewStatus.cls}`}>
+                        <span
+                          className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${reviewStatus.cls}`}
+                        >
                           {reviewStatus.label}
                         </span>
                       </td>
@@ -247,7 +321,11 @@ export default function DistrictIepPage() {
                   );
                 })}
                 {iepLearners.length === 0 && (
-                  <tr><td colSpan={7} className="px-5 py-10 text-center vi-text-muted">No IEP records found</td></tr>
+                  <tr>
+                    <td colSpan={7} className="px-5 py-10 text-center vi-text-muted">
+                      No IEP records found
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>

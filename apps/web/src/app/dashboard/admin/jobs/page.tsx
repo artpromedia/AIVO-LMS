@@ -85,22 +85,11 @@ function DurationSparkline({ runs }: { runs: RunRow[] }) {
         const h = Math.max(2, ((r.durationMs ?? 0) / max) * (height - 4));
         /* eslint-disable no-restricted-syntax -- traffic-light status colors for ops dashboard chart; semantic mapping not subject to age-tier theming */
         const fill =
-          r.status === "failed"
-            ? "#dc2626"
-            : r.status === "partial"
-              ? "#f59e0b"
-              : "#10b981";
+          r.status === "failed" ? "#dc2626" : r.status === "partial" ? "#f59e0b" : "#10b981";
         /* eslint-enable no-restricted-syntax */
         return (
           <g key={r.id ?? i}>
-            <rect
-              x={i * (w + gap)}
-              y={height - h}
-              width={w}
-              height={h}
-              fill={fill}
-              rx={1}
-            >
+            <rect x={i * (w + gap)} y={height - h} width={w} height={h} fill={fill} rx={1}>
               <title>
                 {`${new Date(r.runAt).toLocaleString()} — ${r.status} — ${r.durationMs ?? 0}ms`}
               </title>
@@ -154,7 +143,9 @@ function ExpandedJobRow({ jobName, accessToken }: { jobName: string; accessToken
     <div className="px-4 py-3 bg-gray-50 border-t">
       <div className="mb-3 flex flex-wrap items-end gap-2 text-xs">
         <div>
-          <label htmlFor={`since-${jobName}`} className="block text-gray-500">From</label>
+          <label htmlFor={`since-${jobName}`} className="block text-gray-500">
+            From
+          </label>
           <input
             id={`since-${jobName}`}
             type="datetime-local"
@@ -164,7 +155,9 @@ function ExpandedJobRow({ jobName, accessToken }: { jobName: string; accessToken
           />
         </div>
         <div>
-          <label htmlFor={`until-${jobName}`} className="block text-gray-500">To</label>
+          <label htmlFor={`until-${jobName}`} className="block text-gray-500">
+            To
+          </label>
           <input
             id={`until-${jobName}`}
             type="datetime-local"
@@ -176,7 +169,10 @@ function ExpandedJobRow({ jobName, accessToken }: { jobName: string; accessToken
         {(since || until) && (
           <button
             type="button"
-            onClick={() => { setSince(""); setUntil(""); }}
+            onClick={() => {
+              setSince("");
+              setUntil("");
+            }}
             className="px-2 py-0.5 border rounded bg-white hover:bg-gray-100"
           >
             Clear
@@ -199,10 +195,7 @@ function ExpandedJobRow({ jobName, accessToken }: { jobName: string; accessToken
       <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-600 mb-1">
         Recent runs
       </h4>
-      <table
-        data-testid={`runs-table-${jobName}`}
-        className="w-full text-xs"
-      >
+      <table data-testid={`runs-table-${jobName}`} className="w-full text-xs">
         <thead>
           <tr className="text-left text-gray-500">
             <th className="py-1">Started</th>
@@ -243,17 +236,19 @@ function ExpandedJobRow({ jobName, accessToken }: { jobName: string; accessToken
 export default function BackgroundJobsPage() {
   const { user } = useAuth();
   const accessToken =
-    typeof window !== "undefined" ? window.localStorage.getItem("accessToken") ?? "" : "";
+    typeof window !== "undefined" ? (window.localStorage.getItem("accessToken") ?? "") : "";
   const initialParams = useMemo(() => readWindowSearchParams(), []);
   const [jobs, setJobs] = useState<JobRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<string>(
-    () => readParamString(initialParams, "status", "all"),
+  const [statusFilter, setStatusFilter] = useState<string>(() =>
+    readParamString(initialParams, "status", "all"),
   );
   const [expanded, setExpanded] = useState<string | null>(
     () => readParamString(initialParams, "expanded") || null,
   );
-  const [runNowState, setRunNowState] = useState<Record<string, "idle" | "running" | "ok" | "error">>({});
+  const [runNowState, setRunNowState] = useState<
+    Record<string, "idle" | "running" | "ok" | "error">
+  >({});
 
   useSyncFiltersToUrl({
     status: statusFilter === "all" ? undefined : statusFilter,
@@ -277,7 +272,10 @@ export default function BackgroundJobsPage() {
   const visible = useMemo(() => {
     if (!jobs) return null;
     if (statusFilter === "all") return jobs;
-    return jobs.filter((j) => j.freshness.status === statusFilter || (statusFilter === "failed" && j.freshness.failed));
+    return jobs.filter(
+      (j) =>
+        j.freshness.status === statusFilter || (statusFilter === "failed" && j.freshness.failed),
+    );
   }, [jobs, statusFilter]);
 
   if (!user) return null;
@@ -324,7 +322,9 @@ export default function BackgroundJobsPage() {
       </header>
 
       <div className="mb-4 flex items-center gap-3">
-        <label htmlFor="job-filter" className="text-sm text-gray-600">Filter:</label>
+        <label htmlFor="job-filter" className="text-sm text-gray-600">
+          Filter:
+        </label>
         <select
           id="job-filter"
           aria-label="Filter jobs by status"
@@ -346,10 +346,7 @@ export default function BackgroundJobsPage() {
         >
           Download all watchdog history
         </a>
-        <button
-          className="text-xs px-3 py-1 border rounded hover:bg-gray-100"
-          onClick={load}
-        >
+        <button className="text-xs px-3 py-1 border rounded hover:bg-gray-100" onClick={load}>
           Refresh
         </button>
       </div>
@@ -406,7 +403,9 @@ export default function BackgroundJobsPage() {
                     </td>
                     <td className="px-4 py-2">{j.service}</td>
                     <td className="px-4 py-2">
-                      <span title={j.lastFinishedAt ?? "never"}>{formatAge(j.freshness.ageMs)}</span>
+                      <span title={j.lastFinishedAt ?? "never"}>
+                        {formatAge(j.freshness.ageMs)}
+                      </span>
                     </td>
                     <td className="px-4 py-2">
                       {j.lastSeenAt ? (
@@ -445,10 +444,13 @@ export default function BackgroundJobsPage() {
                         disabled={runState === "running"}
                         className="text-xs px-3 py-1 border rounded hover:bg-gray-100 disabled:opacity-50"
                       >
-                        {runState === "running" ? "Running…"
-                          : runState === "ok" ? "Triggered"
-                          : runState === "error" ? "Error — retry"
-                          : "Run now"}
+                        {runState === "running"
+                          ? "Running…"
+                          : runState === "ok"
+                            ? "Triggered"
+                            : runState === "error"
+                              ? "Error — retry"
+                              : "Run now"}
                       </button>
                       {j.unregistered && j.lastSeenAt && (
                         <button

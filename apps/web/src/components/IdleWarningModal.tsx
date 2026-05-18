@@ -6,11 +6,21 @@
  */
 import { useEffect, useState } from "react";
 import { useAuth } from "@/providers/auth-provider";
-import { attachActivityHeartbeat, sendHeartbeat, type HeartbeatResponse } from "@/lib/session-heartbeat";
+import {
+  attachActivityHeartbeat,
+  sendHeartbeat,
+  type HeartbeatResponse,
+} from "@/lib/session-heartbeat";
 
 const INTERNAL_ROLES = new Set([
-  "PLATFORM_ADMIN", "DISTRICT_ADMIN", "SALES", "MARKETING",
-  "CUSTOMER_CARE", "SUPPORT", "FINANCE", "DEVOPS",
+  "PLATFORM_ADMIN",
+  "DISTRICT_ADMIN",
+  "SALES",
+  "MARKETING",
+  "CUSTOMER_CARE",
+  "SUPPORT",
+  "FINANCE",
+  "DEVOPS",
 ]);
 const WARN_BEFORE_MS = 5 * 60_000;
 
@@ -46,7 +56,11 @@ export function IdleWarningModal() {
 
   const minutes = Math.max(1, Math.ceil(remaining / 60_000));
   return (
-    <div role="dialog" aria-modal="true" className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50">
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50"
+    >
       <div className="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full mx-4 space-y-4">
         <h2 className="text-lg font-semibold text-gray-900">Still there?</h2>
         <p className="text-sm text-gray-600">

@@ -21,10 +21,7 @@ function fnv1a(s: string): number {
  *
  * Returns null if no eligible variant exists.
  */
-export function pickVariant(
-  item: Item,
-  learnerId: string,
-): ItemVariant | null {
+export function pickVariant(item: Item, learnerId: string): ItemVariant | null {
   const eligible = item.variants.filter((v) => v.status !== "retired" && v.cohortWeight > 0);
   if (eligible.length === 0) return null;
   if (eligible.length === 1) return eligible[0];
@@ -48,10 +45,7 @@ export function pickVariant(
  * threshold, marks the variant as retired. Returns the post-mutation
  * variant.
  */
-export function registerDefect(
-  bank: ItemBank,
-  defect: ItemDefect,
-): ItemVariant | null {
+export function registerDefect(bank: ItemBank, defect: ItemDefect): ItemVariant | null {
   for (const item of bank.items) {
     const variant = item.variants.find((v) => v.id === defect.variantId);
     if (!variant) continue;

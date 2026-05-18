@@ -1,13 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import {
-  ArrowRight,
-  Settings,
-  Trophy,
-  Sparkles,
-  Users as UsersIcon,
-  BookOpen,
-} from "lucide-react";
+import { ArrowRight, Settings, Trophy, Sparkles, Users as UsersIcon, BookOpen } from "lucide-react";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
@@ -16,16 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { LearnerAvatar } from "@/components/learner/learner-avatar";
 import { PARENT_NAV } from "@/components/layout/role-shells";
-import {
-  getLearner,
-  parentCanAccessLearner,
-  refreshLearnerReadiness,
-} from "@/lib/db/repos";
-import {
-  READINESS_LABEL,
-  READINESS_TONE,
-  nextStepFor,
-} from "@/lib/learner/readiness";
+import { getLearner, parentCanAccessLearner, refreshLearnerReadiness } from "@/lib/db/repos";
+import { READINESS_LABEL, READINESS_TONE, nextStepFor } from "@/lib/learner/readiness";
 
 export default async function LearnerDetailPage({
   params,
@@ -177,7 +162,9 @@ export default async function LearnerDetailPage({
             <li>High contrast: {learner.accessibilityDefaults.highContrast ? "On" : "Off"}</li>
             <li>Large text: {learner.accessibilityDefaults.largeText ? "On" : "Off"}</li>
             <li>Audio-first: {learner.accessibilityDefaults.audioFirst ? "On" : "Off"}</li>
-            <li>Captions always on: {learner.accessibilityDefaults.captionsAlwaysOn ? "On" : "Off"}</li>
+            <li>
+              Captions always on: {learner.accessibilityDefaults.captionsAlwaysOn ? "On" : "Off"}
+            </li>
           </ul>
         </Card>
       </div>

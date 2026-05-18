@@ -2,10 +2,7 @@ import type { Metadata } from "next";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { audienceMetadata } from "@/components/marketing/AudiencePage";
 import { AUDIENCES } from "@/lib/landing-content";
-import {
-  CalloutCard,
-  MockupShowcase,
-} from "@/components/marketing/sections";
+import { CalloutCard, MockupShowcase } from "@/components/marketing/sections";
 
 const audience = AUDIENCES.find((a) => a.slug === "for-teachers")!;
 
@@ -164,13 +161,13 @@ export default function Page() {
         body={
           <>
             <p>
-              Teachers see what they need to teach — pacing notes, scaffold cues,
-              read-aloud preferences — without raw IEP text, diagnoses, or clinical
-              language exposed in the product.
+              Teachers see what they need to teach — pacing notes, scaffold cues, read-aloud
+              preferences — without raw IEP text, diagnoses, or clinical language exposed in the
+              product.
             </p>
             <p className="mt-3 text-sm text-slate-600">
-              Full IEP documents stay where they belong: in your district's
-              special-services system, with the access controls already in place.
+              Full IEP documents stay where they belong: in your district's special-services system,
+              with the access controls already in place.
             </p>
           </>
         }

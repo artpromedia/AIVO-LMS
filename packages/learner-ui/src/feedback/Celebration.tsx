@@ -77,11 +77,7 @@ export function Celebration({
         >
           {message}
         </p>
-        {tutorName && (
-          <p className="text-sm text-white/80 drop-shadow mt-1">
-            — {tutorName}
-          </p>
-        )}
+        {tutorName && <p className="text-sm text-white/80 drop-shadow mt-1">— {tutorName}</p>}
       </div>
     </div>
   );

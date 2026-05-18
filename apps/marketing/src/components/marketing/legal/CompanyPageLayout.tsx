@@ -125,15 +125,11 @@ export function CompanyPageLayout({
           <h1 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 mb-4 leading-tight">
             {title}
           </h1>
-          <p className="text-lg text-slate-500 font-body max-w-2xl">
-            {subtitle}
-          </p>
+          <p className="text-lg text-slate-500 font-body max-w-2xl">{subtitle}</p>
         </div>
       </div>
 
-      <main className="max-w-4xl mx-auto px-6 md:px-8 py-12 md:py-16">
-        {children}
-      </main>
+      <main className="max-w-4xl mx-auto px-6 md:px-8 py-12 md:py-16">{children}</main>
 
       <footer className="bg-slate-900 py-8">
         <div className="max-w-6xl mx-auto px-6 md:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
@@ -146,12 +142,30 @@ export function CompanyPageLayout({
               style={{ width: "auto", height: "auto" }}
             />
             <nav className="hidden md:flex items-center gap-4">
-              <Link href="/about" className="text-sm text-slate-400 hover:text-white transition">About</Link>
-              <Link href="/blog" className="text-sm text-slate-400 hover:text-white transition">Blog</Link>
-              <Link href="/careers" className="text-sm text-slate-400 hover:text-white transition">Careers</Link>
-              <Link href="/contact" className="text-sm text-slate-400 hover:text-white transition">Contact</Link>
-              <Link href="/privacy-policy" className="text-sm text-slate-400 hover:text-white transition">Privacy</Link>
-              <Link href="/terms-of-service" className="text-sm text-slate-400 hover:text-white transition">Terms</Link>
+              <Link href="/about" className="text-sm text-slate-400 hover:text-white transition">
+                About
+              </Link>
+              <Link href="/blog" className="text-sm text-slate-400 hover:text-white transition">
+                Blog
+              </Link>
+              <Link href="/careers" className="text-sm text-slate-400 hover:text-white transition">
+                Careers
+              </Link>
+              <Link href="/contact" className="text-sm text-slate-400 hover:text-white transition">
+                Contact
+              </Link>
+              <Link
+                href="/privacy-policy"
+                className="text-sm text-slate-400 hover:text-white transition"
+              >
+                Privacy
+              </Link>
+              <Link
+                href="/terms-of-service"
+                className="text-sm text-slate-400 hover:text-white transition"
+              >
+                Terms
+              </Link>
             </nav>
           </div>
           <p className="text-sm text-slate-500 font-body">

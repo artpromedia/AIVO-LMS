@@ -45,11 +45,11 @@ state machine.
 
 ### 1. Account creation (Sprint 03)
 
-| Surface | Path | Consent required |
-|---|---|---|
-| Signup | `/signup` | none — collection happens immediately after via the consent block |
-| Email verification | `/verify-email` (Sprint 03b) | none |
-| Consent block | `/parent/consent` | none — this IS the consent surface |
+| Surface            | Path                         | Consent required                                                  |
+| ------------------ | ---------------------------- | ----------------------------------------------------------------- |
+| Signup             | `/signup`                    | none — collection happens immediately after via the consent block |
+| Email verification | `/verify-email` (Sprint 03b) | none                                                              |
+| Consent block      | `/parent/consent`            | none — this IS the consent surface                                |
 
 The consent block must be completed before any learner can be created.
 The minimum consents to create a learner: `parent_account_terms`,
@@ -58,10 +58,10 @@ The minimum consents to create a learner: `parent_account_terms`,
 
 ### 2. Learner creation
 
-| Surface | Path | Consent required | Audit event |
-|---|---|---|---|
+| Surface       | Path                   | Consent required                                                           | Audit event       |
+| ------------- | ---------------------- | -------------------------------------------------------------------------- | ----------------- |
 | Add a learner | `/parent/learners/new` | `parent_account_terms` + `parent_privacy_policy` + `child_data_collection` | `learner.created` |
-| Learner list | `/parent/learners` | (per-learner consent guards on the per-learner panels) | n/a |
+| Learner list  | `/parent/learners`     | (per-learner consent guards on the per-learner panels)                     | n/a               |
 
 The new-learner form must collect: display name, DOB or age range
 (drives the age gate and `AgeGateRecord.requiresParentConsent`), grade
@@ -71,11 +71,11 @@ under `/parent/learners/[id]/accessibility`).
 
 ### 3. Parent assessment
 
-| Surface | Path | Consent required | Audit |
-|---|---|---|---|
-| Assessment landing | `/parent/learners/[id]/assessment` | `child_data_collection` | `assessment.started` |
-| Submit section | BFF `POST /api/bff/learners/[id]/parent-assessment/submit` | `child_data_collection` | `assessment.section.submitted` |
-| Review submitted | `/parent/learners/[id]/assessment/review` | `child_data_collection` | n/a |
+| Surface            | Path                                                       | Consent required        | Audit                          |
+| ------------------ | ---------------------------------------------------------- | ----------------------- | ------------------------------ |
+| Assessment landing | `/parent/learners/[id]/assessment`                         | `child_data_collection` | `assessment.started`           |
+| Submit section     | BFF `POST /api/bff/learners/[id]/parent-assessment/submit` | `child_data_collection` | `assessment.section.submitted` |
+| Review submitted   | `/parent/learners/[id]/assessment/review`                  | `child_data_collection` | n/a                            |
 
 Section list (drives the parent assessment progress bar):
 
@@ -93,37 +93,37 @@ return without losing work.
 
 ### 4. IEP upload (optional)
 
-| Surface | Path | Consent required | Audit |
-|---|---|---|---|
-| IEP landing | `/parent/learners/[id]/iep` | `iep_document_storage` + `child_data_collection` | `iep.viewed` |
-| Upload | BFF `POST /api/bff/learners/[id]/iep-upload` | same | `iep.upload` |
-| Extract | BFF `POST /api/bff/learners/[id]/iep-upload/extract` | same | `iep.extract` |
-| Review extraction | `/parent/learners/[id]/iep/review` | same | `iep.review.confirmed` / `iep.review.corrected` |
-| Skip | BFF `POST /api/bff/learners/[id]/iep-upload/skip` | same | `iep.skipped` |
-| Delete | BFF `DELETE /api/bff/learners/[id]/iep-upload` | same | `iep.delete` |
+| Surface           | Path                                                 | Consent required                                 | Audit                                           |
+| ----------------- | ---------------------------------------------------- | ------------------------------------------------ | ----------------------------------------------- |
+| IEP landing       | `/parent/learners/[id]/iep`                          | `iep_document_storage` + `child_data_collection` | `iep.viewed`                                    |
+| Upload            | BFF `POST /api/bff/learners/[id]/iep-upload`         | same                                             | `iep.upload`                                    |
+| Extract           | BFF `POST /api/bff/learners/[id]/iep-upload/extract` | same                                             | `iep.extract`                                   |
+| Review extraction | `/parent/learners/[id]/iep/review`                   | same                                             | `iep.review.confirmed` / `iep.review.corrected` |
+| Skip              | BFF `POST /api/bff/learners/[id]/iep-upload/skip`    | same                                             | `iep.skipped`                                   |
+| Delete            | BFF `DELETE /api/bff/learners/[id]/iep-upload`       | same                                             | `iep.delete`                                    |
 
 The upload UI must surface every state — never appear "instantly
 done":
 
-| State | When | UI |
-|---|---|---|
-| `uploading` | bytes in flight | progress bar |
-| `scanning` | virus / malware scan | "Scanning…" |
-| `parsing` | text extraction | "Reading your IEP…" |
-| `extracted` | structured fields produced | "Confirm what we found" → review screen |
-| `confirmed` | parent accepted extraction | green check on landing |
-| `corrected` | parent edited extraction | green check + audit `iep.review.corrected` |
-| `failed` | scan/parse failed | error card + "Try again" + "Skip this step" |
+| State       | When                       | UI                                          |
+| ----------- | -------------------------- | ------------------------------------------- |
+| `uploading` | bytes in flight            | progress bar                                |
+| `scanning`  | virus / malware scan       | "Scanning…"                                 |
+| `parsing`   | text extraction            | "Reading your IEP…"                         |
+| `extracted` | structured fields produced | "Confirm what we found" → review screen     |
+| `confirmed` | parent accepted extraction | green check on landing                      |
+| `corrected` | parent edited extraction   | green check + audit `iep.review.corrected`  |
+| `failed`    | scan/parse failed          | error card + "Try again" + "Skip this step" |
 
 Teachers never see raw IEP text (Sprint 04 contract). The extraction
 review screen is parent-only.
 
 ### 5. Brain profile review
 
-| Surface | Path | Consent required | Audit |
-|---|---|---|---|
-| Brain profile review | `/parent/learners/[id]/brain-profile` | `ai_personalization` + `child_data_collection` | `brain.profile.reviewed` |
-| Regenerate | BFF `POST /api/bff/learners/[id]/brain-profile/regenerate` | same | `brain.profile.regenerated` |
+| Surface              | Path                                                       | Consent required                               | Audit                       |
+| -------------------- | ---------------------------------------------------------- | ---------------------------------------------- | --------------------------- |
+| Brain profile review | `/parent/learners/[id]/brain-profile`                      | `ai_personalization` + `child_data_collection` | `brain.profile.reviewed`    |
+| Regenerate           | BFF `POST /api/bff/learners/[id]/brain-profile/regenerate` | same                                           | `brain.profile.regenerated` |
 
 The brain profile must surface, parent-readable:
 
@@ -143,10 +143,10 @@ version is stale.
 
 ### 6. Baseline launch
 
-| Surface | Path | Consent required | Audit |
-|---|---|---|---|
-| Baseline landing | `/parent/learners/[id]/baseline` (parent can launch on learner's behalf) | `child_data_collection` | `baseline.started` |
-| Learner baseline player | `/learner/baseline` | `child_data_collection` | per-item answer events |
+| Surface                 | Path                                                                     | Consent required        | Audit                  |
+| ----------------------- | ------------------------------------------------------------------------ | ----------------------- | ---------------------- |
+| Baseline landing        | `/parent/learners/[id]/baseline` (parent can launch on learner's behalf) | `child_data_collection` | `baseline.started`     |
+| Learner baseline player | `/learner/baseline`                                                      | `child_data_collection` | per-item answer events |
 
 After baseline completion, the learner moves to
 `ready_for_today_mission` and Sprint 07's LessonRun loop takes over.

@@ -49,7 +49,9 @@ export function getStoredLocale(): Locale | null {
   try {
     const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
     if (stored && isValidLocale(stored)) return stored;
-  } catch {}
+  } catch {
+    // Storage access can throw in SSR / privacy modes — fall through.
+  }
   return null;
 }
 
@@ -57,5 +59,7 @@ export function setStoredLocale(locale: Locale): void {
   if (typeof localStorage === "undefined") return;
   try {
     localStorage.setItem(LOCALE_STORAGE_KEY, locale);
-  } catch {}
+  } catch {
+    // Storage access can throw in SSR / privacy modes — non-fatal.
+  }
 }

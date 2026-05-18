@@ -36,7 +36,9 @@ async function reachable(): Promise<boolean> {
   try {
     const r = await fetch(`${BASE}/health`, { signal: AbortSignal.timeout(2000) });
     return r.ok;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
 test("every /api/district/* route rejects unauthenticated requests via the tenant-scope hook", async (t) => {

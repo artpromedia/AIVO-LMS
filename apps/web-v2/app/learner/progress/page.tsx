@@ -21,9 +21,7 @@ import {
 } from "@/lib/db/repos";
 import { readActiveLearnerFromCookies } from "@/lib/auth/active-learner";
 
-function levelTone(
-  level: string,
-): "primary" | "success" | "neutral" | "warning" {
+function levelTone(level: string): "primary" | "success" | "neutral" | "warning" {
   if (level === "stretching" || level === "on_grade_level") return "success";
   if (level === "approaching") return "primary";
   if (level === "emerging") return "warning";
@@ -32,9 +30,9 @@ function levelTone(
 
 export default async function LearnerProgressPage() {
   const session = await requirePageRole(["learner", "parent"]);
-  let learnerId =
+  const learnerId =
     session.role === "learner"
-      ? session.learnerId ?? null
+      ? (session.learnerId ?? null)
       : await readActiveLearnerFromCookies(session);
   if (!learnerId) redirect(session.role === "parent" ? "/learner/select" : "/login");
   const learner = getLearner(learnerId, session.tenantId);
@@ -104,30 +102,19 @@ export default async function LearnerProgressPage() {
               return (
                 <Card key={subj.id} className="p-[var(--aivo-density-card-pad)]">
                   <div className="flex items-center justify-between">
-                    <p className="font-display text-lg font-semibold">
-                      {subj.name}
-                    </p>
-                    <Badge tone="neutral">
-                      {Math.round(avg * 100)}% avg
-                    </Badge>
+                    <p className="font-display text-lg font-semibold">{subj.name}</p>
+                    <Badge tone="neutral">{Math.round(avg * 100)}% avg</Badge>
                   </div>
                   <ul className="mt-3 space-y-2 text-sm">
                     {masteries.length === 0 && (
-                      <li className="text-aivo-ink-soft">
-                        Not started yet.
-                      </li>
+                      <li className="text-aivo-ink-soft">Not started yet.</li>
                     )}
                     {masteries.slice(0, 5).map((m) => {
                       const skill = subj.skills.find((s) => s.id === m.skillId);
                       return (
-                        <li
-                          key={m.skillId}
-                          className="flex items-center justify-between"
-                        >
+                        <li key={m.skillId} className="flex items-center justify-between">
                           <span>{skill?.name ?? m.skillId}</span>
-                          <Badge tone={levelTone(m.level)}>
-                            {m.level.replace(/_/g, " ")}
-                          </Badge>
+                          <Badge tone={levelTone(m.level)}>{m.level.replace(/_/g, " ")}</Badge>
                         </li>
                       );
                     })}
@@ -152,8 +139,7 @@ export default async function LearnerProgressPage() {
                         {skillNames.get(r.skillId) ?? r.skillId}
                       </p>
                       <p className="text-xs text-aivo-ink-soft">
-                        {r.source.replace(/_/g, " ")} ·{" "}
-                        {new Date(r.createdAt).toLocaleDateString()}
+                        {r.source.replace(/_/g, " ")} · {new Date(r.createdAt).toLocaleDateString()}
                       </p>
                     </div>
                     <Badge

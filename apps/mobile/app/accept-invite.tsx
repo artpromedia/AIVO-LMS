@@ -26,36 +26,41 @@
  * pending for this email (e.g. the link was tapped twice). We surface
  * that as a friendly "no pending invitations" state, matching web.
  */
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
-import { router, useLocalSearchParams, type Href } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useAuth } from '@/hooks/useAuth';
-import { apiFetch } from '@/lib/api';
-import { API } from '@/constants/api';
-import { setPendingDeepLink } from '@/lib/pendingDeepLink';
-import { colors, spacing, radius } from '@/constants/colors';
-import { AivoButton } from '@aivo/mobile-ui';
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView } from "react-native";
+import { router, useLocalSearchParams, type Href } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useAuth } from "@/hooks/useAuth";
+import { apiFetch } from "@/lib/api";
+import { API } from "@/constants/api";
+import { setPendingDeepLink } from "@/lib/pendingDeepLink";
+import { colors, spacing, radius } from "@/constants/colors";
+import { AivoButton } from "@aivo/mobile-ui";
 
 type Status =
-  | 'checking'
-  | 'needs_login'
-  | 'wrong_email'
-  | 'accepting'
-  | 'success'
-  | 'none'
-  | 'error';
+  | "checking"
+  | "needs_login"
+  | "wrong_email"
+  | "accepting"
+  | "success"
+  | "none"
+  | "error";
 
 type Accepted = { role: string; learnerId: string };
 
 function continueHrefForRole(role: string | undefined): Href {
   switch (role) {
-    case 'CAREGIVER': return '/(caregiver)' as Href;
-    case 'TEACHER': return '/(teacher)' as Href;
-    case 'THERAPIST': return '/(therapist)' as Href;
-    case 'PARENT': return '/(parent)' as Href;
-    default: return '/(auth)/login' as Href;
+    case "CAREGIVER":
+      return "/(caregiver)" as Href;
+    case "TEACHER":
+      return "/(teacher)" as Href;
+    case "THERAPIST":
+      return "/(therapist)" as Href;
+    case "PARENT":
+      return "/(parent)" as Href;
+    default:
+      return "/(auth)/login" as Href;
   }
 }
 
@@ -64,11 +69,11 @@ export default function AcceptInviteScreen() {
   const { t } = useTranslation();
   const { isAuthenticated, isLoading, user } = useAuth();
   const params = useLocalSearchParams<{ email?: string }>();
-  const invitedEmail = (typeof params.email === 'string' ? params.email : '').trim();
+  const invitedEmail = (typeof params.email === "string" ? params.email : "").trim();
 
-  const [status, setStatus] = useState<Status>('checking');
+  const [status, setStatus] = useState<Status>("checking");
   const [accepted, setAccepted] = useState<Accepted[]>([]);
-  const [errorMsg, setErrorMsg] = useState<string>('');
+  const [errorMsg, setErrorMsg] = useState<string>("");
 
   useEffect(() => {
     if (isLoading) return;
@@ -80,26 +85,22 @@ export default function AcceptInviteScreen() {
       // sign-in if the user picked a different account.
       const href = invitedEmail
         ? `/accept-invite?email=${encodeURIComponent(invitedEmail)}`
-        : '/accept-invite';
+        : "/accept-invite";
       setPendingDeepLink(href).finally(() => {
-        setStatus('needs_login');
+        setStatus("needs_login");
       });
       return;
     }
 
-    if (
-      invitedEmail &&
-      user.email &&
-      user.email.toLowerCase() !== invitedEmail.toLowerCase()
-    ) {
-      setStatus('wrong_email');
+    if (invitedEmail && user.email && user.email.toLowerCase() !== invitedEmail.toLowerCase()) {
+      setStatus("wrong_email");
       return;
     }
 
     let cancelled = false;
-    setStatus('accepting');
-    apiFetch(API.FAMILY, '/api/family/collaboration/accept-invite', {
-      method: 'POST',
+    setStatus("accepting");
+    apiFetch(API.FAMILY, "/api/family/collaboration/accept-invite", {
+      method: "POST",
     })
       .then(async (r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -109,12 +110,12 @@ export default function AcceptInviteScreen() {
         if (cancelled) return;
         const list: Accepted[] = Array.isArray(data?.accepted) ? data.accepted : [];
         setAccepted(list);
-        setStatus(list.length > 0 ? 'success' : 'none');
+        setStatus(list.length > 0 ? "success" : "none");
       })
       .catch((err: unknown) => {
         if (cancelled) return;
-        setErrorMsg(err instanceof Error ? err.message : t('common.unknownError'));
-        setStatus('error');
+        setErrorMsg(err instanceof Error ? err.message : t("common.unknownError"));
+        setStatus("error");
       });
     return () => {
       cancelled = true;
@@ -135,31 +136,31 @@ export default function AcceptInviteScreen() {
       }}
     >
       <View style={styles.card}>
-        <Text style={styles.title}>{t('auth.acceptInviteTitle')}</Text>
+        <Text style={styles.title}>{t("auth.acceptInviteTitle")}</Text>
 
-        {status === 'checking' && (
+        {status === "checking" && (
           <View style={styles.center}>
             <ActivityIndicator size="large" color={colors.primary} />
-            <Text style={styles.muted}>{t('common.loading')}</Text>
+            <Text style={styles.muted}>{t("common.loading")}</Text>
           </View>
         )}
 
-        {status === 'needs_login' && (
+        {status === "needs_login" && (
           <>
             <Text style={styles.body}>
               {invitedEmail
-                ? t('auth.acceptInviteNeedsLoginWithEmail', { email: invitedEmail })
-                : t('auth.acceptInviteNeedsLogin')}
+                ? t("auth.acceptInviteNeedsLoginWithEmail", { email: invitedEmail })
+                : t("auth.acceptInviteNeedsLogin")}
             </Text>
             <AivoButton
-              title={t('auth.acceptInviteHaveAccount')}
-              onPress={() => router.replace('/(auth)/login')}
+              title={t("auth.acceptInviteHaveAccount")}
+              onPress={() => router.replace("/(auth)/login")}
               size="lg"
               style={{ marginTop: spacing.md }}
             />
             <AivoButton
-              title={t('auth.acceptInviteCreateAccount')}
-              onPress={() => router.replace('/(auth)/signup')}
+              title={t("auth.acceptInviteCreateAccount")}
+              onPress={() => router.replace("/(auth)/signup")}
               size="lg"
               variant="secondary"
               style={{ marginTop: spacing.sm }}
@@ -167,37 +168,37 @@ export default function AcceptInviteScreen() {
           </>
         )}
 
-        {status === 'wrong_email' && (
+        {status === "wrong_email" && (
           <>
             <Text style={styles.warning}>
-              {t('auth.acceptInviteWrongEmail', {
-                current: user?.email ?? '',
+              {t("auth.acceptInviteWrongEmail", {
+                current: user?.email ?? "",
                 invited: invitedEmail,
               })}
             </Text>
             <AivoButton
-              title={t('auth.acceptInviteSwitchAccount')}
-              onPress={() => router.replace('/(auth)/login')}
+              title={t("auth.acceptInviteSwitchAccount")}
+              onPress={() => router.replace("/(auth)/login")}
               size="lg"
               style={{ marginTop: spacing.md }}
             />
           </>
         )}
 
-        {status === 'accepting' && (
+        {status === "accepting" && (
           <View style={styles.center}>
             <ActivityIndicator size="large" color={colors.primary} />
-            <Text style={styles.muted}>{t('auth.acceptInviteAccepting')}</Text>
+            <Text style={styles.muted}>{t("auth.acceptInviteAccepting")}</Text>
           </View>
         )}
 
-        {status === 'success' && (
+        {status === "success" && (
           <>
             <Text style={styles.body}>
-              {t('auth.acceptInviteSuccess', { count: accepted.length })}
+              {t("auth.acceptInviteSuccess", { count: accepted.length })}
             </Text>
             <AivoButton
-              title={t('auth.acceptInviteContinue')}
+              title={t("auth.acceptInviteContinue")}
               onPress={goToDashboard}
               size="lg"
               style={{ marginTop: spacing.md }}
@@ -205,13 +206,13 @@ export default function AcceptInviteScreen() {
           </>
         )}
 
-        {status === 'none' && (
+        {status === "none" && (
           <>
             <Text style={styles.body}>
-              {t('auth.acceptInviteNoneFound', { email: user?.email ?? '' })}
+              {t("auth.acceptInviteNoneFound", { email: user?.email ?? "" })}
             </Text>
             <AivoButton
-              title={t('auth.acceptInviteContinue')}
+              title={t("auth.acceptInviteContinue")}
               onPress={goToDashboard}
               size="lg"
               variant="secondary"
@@ -220,13 +221,11 @@ export default function AcceptInviteScreen() {
           </>
         )}
 
-        {status === 'error' && (
+        {status === "error" && (
           <>
-            <Text style={styles.error}>
-              {t('auth.acceptInviteError', { message: errorMsg })}
-            </Text>
+            <Text style={styles.error}>{t("auth.acceptInviteError", { message: errorMsg })}</Text>
             <AivoButton
-              title={t('auth.acceptInviteContinue')}
+              title={t("auth.acceptInviteContinue")}
               onPress={goToDashboard}
               size="lg"
               variant="secondary"
@@ -245,7 +244,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderRadius: radius.xxl,
     padding: spacing.lg,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
@@ -253,30 +252,30 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
-    fontFamily: 'Nunito-ExtraBold',
+    fontFamily: "Nunito-ExtraBold",
     color: colors.text,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: spacing.md,
   },
   body: {
     fontSize: 14,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.text,
     lineHeight: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   muted: {
     fontSize: 13,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.textSecondary,
     marginTop: spacing.sm,
-    textAlign: 'center',
+    textAlign: "center",
   },
   warning: {
     fontSize: 14,
-    fontFamily: 'Nunito-SemiBold',
+    fontFamily: "Nunito-SemiBold",
     color: colors.text,
-    backgroundColor: colors.warning + '15',
+    backgroundColor: colors.warning + "15",
     padding: spacing.md,
     borderRadius: radius.md,
     lineHeight: 20,
@@ -284,10 +283,10 @@ const styles = StyleSheet.create({
   error: {
     color: colors.error,
     fontSize: 13,
-    fontFamily: 'Nunito-SemiBold',
-    backgroundColor: colors.error + '10',
+    fontFamily: "Nunito-SemiBold",
+    backgroundColor: colors.error + "10",
     padding: spacing.md,
     borderRadius: radius.md,
   },
-  center: { alignItems: 'center', justifyContent: 'center', paddingVertical: spacing.lg },
+  center: { alignItems: "center", justifyContent: "center", paddingVertical: spacing.lg },
 });

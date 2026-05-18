@@ -11,13 +11,7 @@ import {
   getTenantSettings,
   computeSystemHealth,
 } from "@/lib/db/repos";
-import {
-  Building2,
-  Users,
-  GraduationCap,
-  ClipboardList,
-  Activity,
-} from "lucide-react";
+import { Building2, Users, GraduationCap, ClipboardList, Activity } from "lucide-react";
 
 const FL_LABELS: Record<string, string> = {
   standard: "Standard",
@@ -74,10 +68,7 @@ export default async function DistrictAdminHome() {
   ];
 
   const flTotal = stats.flDistribution.reduce((acc, x) => acc + x.count, 0);
-  const flMax = stats.flDistribution.reduce(
-    (acc, x) => (x.count > acc ? x.count : acc),
-    0,
-  );
+  const flMax = stats.flDistribution.reduce((acc, x) => (x.count > acc ? x.count : acc), 0);
 
   return (
     <AppShell
@@ -97,12 +88,8 @@ export default async function DistrictAdminHome() {
           <Card key={k} className="p-[var(--aivo-density-card-pad)]">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-                  {k}
-                </p>
-                <p className="mt-1 font-display text-3xl font-bold">
-                  {v.toLocaleString()}
-                </p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{k}</p>
+                <p className="mt-1 font-display text-3xl font-bold">{v.toLocaleString()}</p>
                 <p className="mt-2 text-xs text-aivo-ink-soft">{helper}</p>
               </div>
               <span
@@ -120,20 +107,16 @@ export default async function DistrictAdminHome() {
         <Card className="p-[var(--aivo-density-card-pad)] lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <p className="font-display text-lg font-semibold">
-                Functioning level distribution
-              </p>
+              <p className="font-display text-lg font-semibold">Functioning level distribution</p>
               <p className="text-xs text-aivo-ink-soft">
-                How the district&rsquo;s {flTotal.toLocaleString()} learners are
-                spread across the five AIVO levels.
+                How the district&rsquo;s {flTotal.toLocaleString()} learners are spread across the
+                five AIVO levels.
               </p>
             </div>
             <Badge tone="neutral">{flTotal.toLocaleString()} learners</Badge>
           </div>
           {flTotal === 0 ? (
-            <p className="text-sm text-aivo-ink-soft">
-              No learners assigned yet.
-            </p>
+            <p className="text-sm text-aivo-ink-soft">No learners assigned yet.</p>
           ) : (
             <ul className="space-y-3">
               {stats.flDistribution.map((row) => {
@@ -142,9 +125,7 @@ export default async function DistrictAdminHome() {
                 return (
                   <li key={row.level}>
                     <div className="mb-1 flex items-center justify-between text-sm">
-                      <span className="font-medium">
-                        {FL_LABELS[row.level] ?? row.level}
-                      </span>
+                      <span className="font-medium">{FL_LABELS[row.level] ?? row.level}</span>
                       <span className="text-aivo-ink-soft">
                         {row.count.toLocaleString()} · {pct.toFixed(0)}%
                       </span>
@@ -168,40 +149,28 @@ export default async function DistrictAdminHome() {
         <Card className="p-[var(--aivo-density-card-pad)]">
           <div className="mb-3 flex items-center gap-2">
             <Activity className="h-4 w-4 text-aivo-primary" />
-            <p className="font-display text-lg font-semibold">
-              Platform health
-            </p>
+            <p className="font-display text-lg font-semibold">Platform health</p>
           </div>
           <dl className="space-y-3 text-sm">
             <div className="flex items-center justify-between">
               <dt className="text-aivo-ink-soft">Lessons completed</dt>
-              <dd className="font-semibold">
-                {health.lessonRunsCompleted.toLocaleString()}
-              </dd>
+              <dd className="font-semibold">{health.lessonRunsCompleted.toLocaleString()}</dd>
             </div>
             <div className="flex items-center justify-between">
               <dt className="text-aivo-ink-soft">Lessons attempted</dt>
-              <dd className="font-semibold">
-                {health.lessonRunsTotal.toLocaleString()}
-              </dd>
+              <dd className="font-semibold">{health.lessonRunsTotal.toLocaleString()}</dd>
             </div>
             <div className="flex items-center justify-between">
               <dt className="text-aivo-ink-soft">AI success rate</dt>
-              <dd className="font-semibold">
-                {(health.generationSuccessRate * 100).toFixed(0)}%
-              </dd>
+              <dd className="font-semibold">{(health.generationSuccessRate * 100).toFixed(0)}%</dd>
             </div>
             <div className="flex items-center justify-between">
               <dt className="text-aivo-ink-soft">AI jobs in queue</dt>
-              <dd className="font-semibold">
-                {health.generationQueuedCount.toLocaleString()}
-              </dd>
+              <dd className="font-semibold">{health.generationQueuedCount.toLocaleString()}</dd>
             </div>
             <div className="flex items-center justify-between">
               <dt className="text-aivo-ink-soft">AI failures</dt>
-              <dd className="font-semibold">
-                {health.generationFailureCount.toLocaleString()}
-              </dd>
+              <dd className="font-semibold">{health.generationFailureCount.toLocaleString()}</dd>
             </div>
           </dl>
         </Card>

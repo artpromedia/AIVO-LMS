@@ -142,9 +142,7 @@ export const productionTTSAdapter: TTSProvider = {
   name: "production-stub",
   available: () => false,
   async generate() {
-    throw new Error(
-      "Production TTS adapter not wired. Set TTS_PROVIDER=mock for dev/test.",
-    );
+    throw new Error("Production TTS adapter not wired. Set TTS_PROVIDER=mock for dev/test.");
   },
 };
 

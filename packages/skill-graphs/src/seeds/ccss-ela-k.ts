@@ -20,7 +20,8 @@ export const ccssElaKindergarten: SkillGraph = {
     {
       id: "ccss-ela.K.RF.1",
       title: "Print concepts",
-      description: "I can show how books and writing work — left to right, top to bottom, page by page.",
+      description:
+        "I can show how books and writing work — left to right, top to bottom, page by page.",
       subject: "ela",
       gradeBand: "K",
       frameworkRefs: [{ framework: "CCSS-ELA", code: "RF.K.1" }],

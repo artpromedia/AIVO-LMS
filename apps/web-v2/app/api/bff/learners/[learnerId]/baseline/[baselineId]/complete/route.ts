@@ -4,11 +4,7 @@ import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
 import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import { audit } from "@/lib/bff/audit";
-import {
-  completeBaseline,
-  getBaselineById,
-  refreshLearnerReadiness,
-} from "@/lib/db/repos";
+import { completeBaseline, getBaselineById, refreshLearnerReadiness } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +20,12 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection"],
+      requestId,
+    );
     if (consentErr) return consentErr;
 
     const existing = getBaselineById(baselineId, session!.tenantId);
@@ -33,10 +34,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     }
     const result = completeBaseline(baselineId, session!.tenantId);
     if (!result) {
-      return fail(
-        { ...ERRORS.INTERNAL_ERROR, message: "Could not complete baseline" },
-        requestId,
-      );
+      return fail({ ...ERRORS.INTERNAL_ERROR, message: "Could not complete baseline" }, requestId);
     }
     refreshLearnerReadiness(learnerId, session!.tenantId);
     audit(session, "baseline.complete", requestId, {

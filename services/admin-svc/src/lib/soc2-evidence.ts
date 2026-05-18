@@ -32,18 +32,21 @@ import path from "path";
 import { gzipSync } from "zlib";
 import { users, adminAuditLog, platformConfig, evidenceBundles, sessions } from "@aivo/db";
 import { desc, sql, eq, gte } from "drizzle-orm";
-import {
-  createDrizzleAdvisoryLock,
-  createDrizzleLedger,
-  startSafeCron,
-} from "@aivo/scheduling";
+import { createDrizzleAdvisoryLock, createDrizzleLedger, startSafeCron } from "@aivo/scheduling";
 
 const INTERNAL_ROLES = [
-  "PLATFORM_ADMIN", "DISTRICT_ADMIN", "SALES", "MARKETING",
-  "CUSTOMER_CARE", "SUPPORT", "FINANCE", "DEVOPS",
+  "PLATFORM_ADMIN",
+  "DISTRICT_ADMIN",
+  "SALES",
+  "MARKETING",
+  "CUSTOMER_CARE",
+  "SUPPORT",
+  "FINANCE",
+  "DEVOPS",
 ];
 
-export const EVIDENCE_DIR = process.env.EVIDENCE_DIR || path.resolve(process.cwd(), "data/evidence");
+export const EVIDENCE_DIR =
+  process.env.EVIDENCE_DIR || path.resolve(process.cwd(), "data/evidence");
 
 interface BundleSummary {
   accessReviewRows: number;
@@ -58,13 +61,20 @@ interface BundleSummary {
 function tarHeader(name: string, size: number): Buffer {
   const buf = Buffer.alloc(512);
   buf.write(name.slice(0, 100), 0, 100, "utf8");
-  buf.write("0000644", 100, 7, "utf8");        // mode
-  buf.write("0000000", 108, 7, "utf8");        // uid
-  buf.write("0000000", 116, 7, "utf8");        // gid
+  buf.write("0000644", 100, 7, "utf8"); // mode
+  buf.write("0000000", 108, 7, "utf8"); // uid
+  buf.write("0000000", 116, 7, "utf8"); // gid
   buf.write(size.toString(8).padStart(11, "0"), 124, 11, "utf8");
-  buf.write(Math.floor(Date.now() / 1000).toString(8).padStart(11, "0"), 136, 11, "utf8");
-  buf.write("        ", 148, 8, "utf8");       // checksum placeholder
-  buf.write("0", 156, 1, "utf8");              // typeflag = regular file
+  buf.write(
+    Math.floor(Date.now() / 1000)
+      .toString(8)
+      .padStart(11, "0"),
+    136,
+    11,
+    "utf8",
+  );
+  buf.write("        ", 148, 8, "utf8"); // checksum placeholder
+  buf.write("0", 156, 1, "utf8"); // typeflag = regular file
   buf.write("ustar  ", 257, 8, "utf8");
   // checksum
   let sum = 0;
@@ -97,9 +107,7 @@ async function buildAccessReview(db: any): Promise<{ csv: string; rows: number }
   // with "op ANY/ALL (array) requires array". We instead build the ARRAY[]
   // literal at template-substitution time. INTERNAL_ROLES is a hard-coded
   // constant, so SQL injection isn't a concern.
-  const rolesArray = sql.raw(
-    `ARRAY[${INTERNAL_ROLES.map((r) => `'${r}'`).join(",")}]::text[]`,
-  );
+  const rolesArray = sql.raw(`ARRAY[${INTERNAL_ROLES.map((r) => `'${r}'`).join(",")}]::text[]`);
   const rows = await db.execute(sql`
     SELECT u.id, u.email, u.name, u.role, u.tenant_id,
            u.mfa_enabled,
@@ -111,18 +119,28 @@ async function buildAccessReview(db: any): Promise<{ csv: string; rows: number }
     ORDER BY u.role, u.email
   `);
   const data: any[] = (rows as any).rows ?? rows;
-  const header = "user_id,email,name,role,tenant_id,mfa_enabled,totp_enrolled,last_login_at,last_session_at";
+  const header =
+    "user_id,email,name,role,tenant_id,mfa_enabled,totp_enrolled,last_login_at,last_session_at";
   const lines = data.map((r: any) =>
-    [r.id, r.email, r.name?.replace(/,/g, " "), r.role, r.tenant_id ?? "",
-     r.mfa_enabled ? "true" : "false", r.totp_enrolled ? "true" : "false",
-     r.last_login_at?.toISOString?.() ?? r.last_login_at ?? "",
-     r.last_session_at?.toISOString?.() ?? r.last_session_at ?? ""].join(","));
+    [
+      r.id,
+      r.email,
+      r.name?.replace(/,/g, " "),
+      r.role,
+      r.tenant_id ?? "",
+      r.mfa_enabled ? "true" : "false",
+      r.totp_enrolled ? "true" : "false",
+      r.last_login_at?.toISOString?.() ?? r.last_login_at ?? "",
+      r.last_session_at?.toISOString?.() ?? r.last_session_at ?? "",
+    ].join(","),
+  );
   return { csv: [header, ...lines].join("\n") + "\n", rows: data.length };
 }
 
 async function buildAuditMerkle(db: any) {
   const [count] = await db.select({ c: sql<number>`COUNT(*)::int` }).from(adminAuditLog);
-  const [latest] = await db.select({ seq: adminAuditLog.seq, hash: adminAuditLog.hash })
+  const [latest] = await db
+    .select({ seq: adminAuditLog.seq, hash: adminAuditLog.hash })
     .from(adminAuditLog)
     .orderBy(desc(adminAuditLog.seq))
     .limit(1);
@@ -152,7 +170,9 @@ async function buildConfigHistory(db: any) {
 }
 
 async function buildBackupVerification(): Promise<{ verified: boolean; details: any }> {
-  const proofPath = process.env.BACKUP_VERIFICATION_PROOF || path.resolve(process.cwd(), "data/backup-verification.json");
+  const proofPath =
+    process.env.BACKUP_VERIFICATION_PROOF ||
+    path.resolve(process.cwd(), "data/backup-verification.json");
   try {
     const txt = await fs.readFile(proofPath, "utf8");
     const parsed = JSON.parse(txt);
@@ -160,12 +180,17 @@ async function buildBackupVerification(): Promise<{ verified: boolean; details: 
   } catch {
     return {
       verified: false,
-      details: { note: "No backup verification artifact present in window. Wire the backup-verify GitHub Action to drop its result at BACKUP_VERIFICATION_PROOF." },
+      details: {
+        note: "No backup verification artifact present in window. Wire the backup-verify GitHub Action to drop its result at BACKUP_VERIFICATION_PROOF.",
+      },
     };
   }
 }
 
-export async function generateEvidenceBundle(db: any, opts: { date?: Date } = {}): Promise<{
+export async function generateEvidenceBundle(
+  db: any,
+  opts: { date?: Date } = {},
+): Promise<{
   bundleDate: string;
   filename: string;
   filepath: string;
@@ -184,15 +209,43 @@ export async function generateEvidenceBundle(db: any, opts: { date?: Date } = {}
   ]);
 
   const entries = [
-    { name: "access-review.csv",       data: Buffer.from(access.csv, "utf8") },
-    { name: "audit-merkle.json",       data: Buffer.from(JSON.stringify(auditMerkle, null, 2), "utf8") },
-    { name: "config-history.json",     data: Buffer.from(JSON.stringify(configHistory, null, 2), "utf8") },
-    { name: "backup-verification.json", data: Buffer.from(JSON.stringify(backup, null, 2), "utf8") },
-    { name: "manifest.json",           data: Buffer.from(JSON.stringify({
-        bundleDate, generatedAt: new Date().toISOString(),
-        artifacts: ["access-review.csv", "audit-merkle.json", "config-history.json", "backup-verification.json"],
-        controls: { "CC6.1": "access-review.csv", "CC6.2": "access-review.csv", "CC7.2": "audit-merkle.json", "CC7.5": "backup-verification.json", "CC8.1": "config-history.json" },
-      }, null, 2), "utf8") },
+    { name: "access-review.csv", data: Buffer.from(access.csv, "utf8") },
+    { name: "audit-merkle.json", data: Buffer.from(JSON.stringify(auditMerkle, null, 2), "utf8") },
+    {
+      name: "config-history.json",
+      data: Buffer.from(JSON.stringify(configHistory, null, 2), "utf8"),
+    },
+    {
+      name: "backup-verification.json",
+      data: Buffer.from(JSON.stringify(backup, null, 2), "utf8"),
+    },
+    {
+      name: "manifest.json",
+      data: Buffer.from(
+        JSON.stringify(
+          {
+            bundleDate,
+            generatedAt: new Date().toISOString(),
+            artifacts: [
+              "access-review.csv",
+              "audit-merkle.json",
+              "config-history.json",
+              "backup-verification.json",
+            ],
+            controls: {
+              "CC6.1": "access-review.csv",
+              "CC6.2": "access-review.csv",
+              "CC7.2": "audit-merkle.json",
+              "CC7.5": "backup-verification.json",
+              "CC8.1": "config-history.json",
+            },
+          },
+          null,
+          2,
+        ),
+        "utf8",
+      ),
+    },
   ];
 
   const tar = buildTar(entries);
@@ -215,12 +268,19 @@ export async function generateEvidenceBundle(db: any, opts: { date?: Date } = {}
 
   // Upsert by bundleDate so a same-day re-run replaces the row instead
   // of failing on the unique constraint.
-  await db.insert(evidenceBundles).values({
-    bundleDate, filename, sizeBytes: gz.length, sha256, summary,
-  }).onConflictDoUpdate({
-    target: evidenceBundles.bundleDate,
-    set: { filename, sizeBytes: gz.length, sha256, summary, generatedAt: new Date() },
-  });
+  await db
+    .insert(evidenceBundles)
+    .values({
+      bundleDate,
+      filename,
+      sizeBytes: gz.length,
+      sha256,
+      summary,
+    })
+    .onConflictDoUpdate({
+      target: evidenceBundles.bundleDate,
+      set: { filename, sizeBytes: gz.length, sha256, summary, generatedAt: new Date() },
+    });
 
   // S3_SWAP_POINT: in production, upload `gz` to a WORM-locked bucket
   // here using @aws-sdk/client-s3 with ObjectLockMode=COMPLIANCE and
@@ -235,10 +295,7 @@ export async function generateEvidenceBundle(db: any, opts: { date?: Date } = {}
  * Background Jobs admin page (Tasks #67, #78). Returns the scheduler handle so
  * the internal "Run now" route can call it.
  */
-export function startEvidenceCron(
-  db: any,
-  log: { info: Function; error: Function },
-) {
+export function startEvidenceCron(db: any, log: { info: Function; error: Function }) {
   const lock = createDrizzleAdvisoryLock(db);
   const ledger = createDrizzleLedger(db);
   return startSafeCron({

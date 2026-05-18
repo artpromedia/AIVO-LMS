@@ -58,7 +58,7 @@ async function hmacSha256(secret: string, message: string): Promise<Uint8Array> 
     enc.encode(secret),
     { name: "HMAC", hash: "SHA-256" },
     false,
-    ["sign"]
+    ["sign"],
   );
   const sig = await crypto.subtle.sign("HMAC", key, enc.encode(message));
   return new Uint8Array(sig);
@@ -67,7 +67,7 @@ async function hmacSha256(secret: string, message: string): Promise<Uint8Array> 
 export async function signSurfaceCookieValue(
   role: string,
   ttlSeconds = 30 * 24 * 60 * 60,
-  secret: string = getSurfaceSecret()
+  secret: string = getSurfaceSecret(),
 ): Promise<string> {
   const exp = Math.floor(Date.now() / 1000) + ttlSeconds;
   const payload = `${role}.${exp}`;
@@ -77,7 +77,7 @@ export async function signSurfaceCookieValue(
 
 export async function verifySurfaceCookieValue(
   value: string | undefined,
-  secret: string = getSurfaceSecret()
+  secret: string = getSurfaceSecret(),
 ): Promise<SurfaceCookieClaims | null> {
   if (!value) return null;
   const parts = value.split(".");

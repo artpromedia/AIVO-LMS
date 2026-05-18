@@ -18,8 +18,8 @@ Free-form HTML/SVG injected by an LLM has three failure modes:
    learners; long typed responses reach LOW_VERBAL learners.
 3. **Security** — raw HTML/SVG can carry injected scripts.
 
-The protocol forces the tutor to declare _intent_ (open_scratchpad,
-show_geometry, ...) and lets the validated client decide _how_ to render it
+The protocol forces the tutor to declare _intent_ (open*scratchpad,
+show_geometry, ...) and lets the validated client decide \_how* to render it
 using `@aivo/learner-surfaces`.
 
 ## Command Types

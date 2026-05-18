@@ -29,7 +29,8 @@ export default function AccessibilityPage() {
         },
         {
           title: "3. Standards and Laws We Align With",
-          content: "AIVO designs and tests its Services against the following laws and standards, which we treat as a single, layered baseline:",
+          content:
+            "AIVO designs and tests its Services against the following laws and standards, which we treat as a single, layered baseline:",
           list: [
             "W3C Web Content Accessibility Guidelines (WCAG) 2.1 Level AA, with progressive adoption of WCAG 2.2 Level AA criteria.",
             "Section 508 of the U.S. Rehabilitation Act of 1973, as amended (29 U.S.C. § 794d) — Revised 508 standards (36 C.F.R. Part 1194).",
@@ -42,7 +43,8 @@ export default function AccessibilityPage() {
         },
         {
           title: "4. Built-in Accessibility Features",
-          content: "Every AIVO surface ships with the following built-in accessibility features. Each can be enabled either by the learner or by an authorized caregiver or teacher in the learner's profile, and the choices persist across devices.",
+          content:
+            "Every AIVO surface ships with the following built-in accessibility features. Each can be enabled either by the learner or by an authorized caregiver or teacher in the learner's profile, and the choices persist across devices.",
           list: [
             "Full keyboard operability — every interactive element is reachable and operable from a keyboard, with a visible focus indicator that meets WCAG 2.4.7 and 2.4.11 contrast requirements.",
             "Screen-reader compatibility — semantic HTML, ARIA landmarks and live regions, descriptive labels for form fields and controls, programmatic associations between visible text and assistive announcements, and tested support for JAWS, NVDA, VoiceOver (macOS and iOS), TalkBack (Android), and Narrator (Windows).",
@@ -57,19 +59,21 @@ export default function AccessibilityPage() {
         },
         {
           title: "5. Sensory Accommodations Specific to AIVO",
-          content: "Because AIVO is designed for neurodivergent learners, we go beyond the WCAG baseline with the following sensory accommodations, configurable per learner profile:",
+          content:
+            "Because AIVO is designed for neurodivergent learners, we go beyond the WCAG baseline with the following sensory accommodations, configurable per learner profile:",
           list: [
-            "Visual — adjustable brightness, contrast, color temperature, visual complexity (a single slider that simplifies layouts and reduces decorative elements), pattern density, and \"calm\" backgrounds.",
-            "Auditory — independent volume controls for narration, sound effects, music, and tutor voice; a master \"sound off\" toggle; and selectable narration voices and speeds.",
-            "Interaction — adjustable timing for taps, holds, and swipes; large-target mode (minimum 48×48 CSS px); switch-input support; and an optional \"single-tap\" mode that converts double-tap and long-press gestures to a single tap.",
-            "Cognitive — \"one-task-at-a-time\" mode that hides non-essential UI; explicit \"next step\" prompts; visual schedules for multi-step activities; and predictable, low-novelty layouts.",
+            'Visual — adjustable brightness, contrast, color temperature, visual complexity (a single slider that simplifies layouts and reduces decorative elements), pattern density, and "calm" backgrounds.',
+            'Auditory — independent volume controls for narration, sound effects, music, and tutor voice; a master "sound off" toggle; and selectable narration voices and speeds.',
+            'Interaction — adjustable timing for taps, holds, and swipes; large-target mode (minimum 48×48 CSS px); switch-input support; and an optional "single-tap" mode that converts double-tap and long-press gestures to a single tap.',
+            'Cognitive — "one-task-at-a-time" mode that hides non-essential UI; explicit "next step" prompts; visual schedules for multi-step activities; and predictable, low-novelty layouts.',
             "Communication — visual symbol overlays compatible with PCS, SymbolStix, and Widgit symbol sets; AAC pass-through for speech-generating devices; and a tutor mode that accepts symbol or picture input.",
-            "Self-regulation — break reminders, configurable session lengths, and a one-touch \"calm corner\" that pauses the session and offers a sensory break.",
+            'Self-regulation — break reminders, configurable session lengths, and a one-touch "calm corner" that pauses the session and offers a sensory break.',
           ],
         },
         {
           title: "6. Functioning-Level Profiles",
-          content: "AIVO supports five functioning-level profiles. Each profile pre-configures the accessibility, sensory, and pedagogical settings most appropriate for the learner. Profiles can be customized further by parents, teachers, and therapists.",
+          content:
+            "AIVO supports five functioning-level profiles. Each profile pre-configures the accessibility, sensory, and pedagogical settings most appropriate for the learner. Profiles can be customized further by parents, teachers, and therapists.",
           list: [
             "Level 1 (Standard) — full curriculum access with the standard accessibility settings turned on by default.",
             "Level 2 (Supported) — simplified navigation, additional scaffolding, visual supports, and on-demand prompts.",
@@ -80,7 +84,8 @@ export default function AccessibilityPage() {
         },
         {
           title: "7. Assistive-Technology Compatibility",
-          content: "AIVO is designed and tested to work with a wide range of assistive technologies. Where a feature has known limitations on a specific assistive-technology configuration, the limitation is documented in the Accessibility Roadmap (Section 13).",
+          content:
+            "AIVO is designed and tested to work with a wide range of assistive technologies. Where a feature has known limitations on a specific assistive-technology configuration, the limitation is documented in the Accessibility Roadmap (Section 13).",
           list: [
             "Screen readers — JAWS 2024 with Chrome and Edge on Windows; NVDA 2024 with Chrome and Firefox on Windows; VoiceOver with Safari on macOS, iOS, and iPadOS; TalkBack with Chrome on Android; Narrator with Edge on Windows.",
             "Screen magnification — ZoomText, MAGic, and the operating-system magnifiers on Windows, macOS, iOS, and Android.",
@@ -93,11 +98,13 @@ export default function AccessibilityPage() {
         },
         {
           title: "8. Mobile Accessibility (iOS and Android)",
-          content: "The AIVO iOS and Android applications are built on each platform's native accessibility APIs. They support Dynamic Type and large-text settings, system-level high-contrast and reduce-motion preferences, VoiceOver and TalkBack with custom rotor / local context menus where appropriate, Switch Control and Switch Access, and the platform's standard pinch-to-zoom and zoom-to-cursor gestures. Custom gestures always have a one-tap alternative reachable from the toolbar.",
+          content:
+            "The AIVO iOS and Android applications are built on each platform's native accessibility APIs. They support Dynamic Type and large-text settings, system-level high-contrast and reduce-motion preferences, VoiceOver and TalkBack with custom rotor / local context menus where appropriate, Switch Control and Switch Access, and the platform's standard pinch-to-zoom and zoom-to-cursor gestures. Custom gestures always have a one-tap alternative reachable from the toolbar.",
         },
         {
           title: "9. Content Authoring Standards",
-          content: "Our content team applies the following standards to every lesson, video, image, and document we author or import.",
+          content:
+            "Our content team applies the following standards to every lesson, video, image, and document we author or import.",
           list: [
             "Plain language — content is written at the lowest reading level appropriate to the learning objective; we publish a plain-language summary at the top of every long-form text.",
             "Captions and audio description — every pre-recorded video has synchronized closed captions in the lesson's language; key videos include a separate audio-described track for learners who are blind or have low vision.",
@@ -110,7 +117,8 @@ export default function AccessibilityPage() {
         },
         {
           title: "10. Continuous Improvement Process",
-          content: "AIVO maintains a continuous accessibility improvement process. Every change goes through these checks before reaching learners:",
+          content:
+            "AIVO maintains a continuous accessibility improvement process. Every change goes through these checks before reaching learners:",
           list: [
             "Design review — new screens are reviewed against an internal accessibility checklist (color, focus order, semantic structure, target size, copy clarity) before engineering begins.",
             "Automated testing — axe-core, Pa11y, and Lighthouse run on every pull request and block merges that introduce regressions.",
@@ -122,11 +130,13 @@ export default function AccessibilityPage() {
         },
         {
           title: "11. Procurement and Third-Party Components",
-          content: "When AIVO selects third-party components, libraries, fonts, or hosted services, accessibility is part of the selection criteria. We require vendors to provide a current VPAT or ACR, we test the component against our internal accessibility baseline before adoption, and we maintain a registry of accepted exceptions with the user impact and the planned remediation. Where a third-party component does not meet our standard, we either fork the component, contribute upstream patches, or replace it.",
+          content:
+            "When AIVO selects third-party components, libraries, fonts, or hosted services, accessibility is part of the selection criteria. We require vendors to provide a current VPAT or ACR, we test the component against our internal accessibility baseline before adoption, and we maintain a registry of accepted exceptions with the user impact and the planned remediation. Where a third-party component does not meet our standard, we either fork the component, contribute upstream patches, or replace it.",
         },
         {
           title: "12. Training and Internal Practices",
-          content: "All AIVO designers, engineers, content authors, and customer-support specialists complete an annual accessibility training, with role-specific deep-dives for those building user interfaces, authoring lessons, and supporting customers. Our hiring rubrics include an accessibility competency for product roles. We maintain an internal Accessibility Guild that meets biweekly to share patterns, review external research, and evaluate emerging assistive technology.",
+          content:
+            "All AIVO designers, engineers, content authors, and customer-support specialists complete an annual accessibility training, with role-specific deep-dives for those building user interfaces, authoring lessons, and supporting customers. Our hiring rubrics include an accessibility competency for product roles. We maintain an internal Accessibility Guild that meets biweekly to share patterns, review external research, and evaluate emerging assistive technology.",
         },
         {
           title: "13. Known Limitations and Roadmap",
@@ -165,7 +175,8 @@ export default function AccessibilityPage() {
         },
         {
           title: "17. Changes to This Statement",
-          content: "We will update this statement to reflect material changes in our products, our standards, or our processes. The \"Last updated\" date at the top of this page indicates when this statement was most recently revised. We keep prior versions on file and will share them on request.",
+          content:
+            'We will update this statement to reflect material changes in our products, our standards, or our processes. The "Last updated" date at the top of this page indicates when this statement was most recently revised. We keep prior versions on file and will share them on request.',
         },
       ]}
     />

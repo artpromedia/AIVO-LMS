@@ -14,11 +14,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
   try {
     const { session, response } = await requireSession(req, requestId);
     if (response) return response;
-    const roleErr = requireRole(
-      session!,
-      ["parent", "platform_admin"],
-      requestId,
-    );
+    const roleErr = requireRole(session!, ["parent", "platform_admin"], requestId);
     if (roleErr) return roleErr;
     const rec =
       session!.role === "platform_admin"

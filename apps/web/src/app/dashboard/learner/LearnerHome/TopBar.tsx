@@ -31,7 +31,15 @@ export function TopBar({ userName, coins, gems, onLogout, onSettings }: TopBarPr
       role="banner"
       aria-label={t("nav_label")}
     >
-      <Image src={brandLogo} alt={brandName} width={140} height={27} unoptimized priority style={{ height: 27, width: "auto", maxWidth: 140 }} />
+      <Image
+        src={brandLogo}
+        alt={brandName}
+        width={140}
+        height={27}
+        unoptimized
+        priority
+        style={{ height: 27, width: "auto", maxWidth: 140 }}
+      />
       <div className="flex items-center gap-3">
         {!isPreSymbolic && (
           <div className="flex items-center gap-2">
@@ -46,12 +54,17 @@ export function TopBar({ userName, coins, gems, onLogout, onSettings }: TopBarPr
           </div>
         )}
         <LocalisedTierBadge size="sm" />
-        <span className="hidden sm:inline text-base font-extrabold text-slate-900">{t("greeting", { userName })}</span>
+        <span className="hidden sm:inline text-base font-extrabold text-slate-900">
+          {t("greeting", { userName })}
+        </span>
         <button
           onClick={onSettings}
           className="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--visual-primary))]"
           aria-label={tc("settings")}
-          style={{ minHeight: "var(--learner-hit-target, 40px)", minWidth: "var(--learner-hit-target, 40px)" }}
+          style={{
+            minHeight: "var(--learner-hit-target, 40px)",
+            minWidth: "var(--learner-hit-target, 40px)",
+          }}
         >
           <Settings className="w-5 h-5" strokeWidth={2.5} />
         </button>
@@ -59,7 +72,10 @@ export function TopBar({ userName, coins, gems, onLogout, onSettings }: TopBarPr
           onClick={onLogout}
           className="w-10 h-10 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-[hsl(var(--visual-math)/0.1)] hover:text-[hsl(var(--visual-math))] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--visual-math))]"
           aria-label={tc("logout")}
-          style={{ minHeight: "var(--learner-hit-target, 40px)", minWidth: "var(--learner-hit-target, 40px)" }}
+          style={{
+            minHeight: "var(--learner-hit-target, 40px)",
+            minWidth: "var(--learner-hit-target, 40px)",
+          }}
         >
           <LogOut className="w-5 h-5" strokeWidth={2.5} />
         </button>

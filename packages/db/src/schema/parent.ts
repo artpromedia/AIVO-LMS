@@ -1,10 +1,23 @@
-import { pgTable, uuid, varchar, timestamp, integer, jsonb, text, date, boolean } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  uuid,
+  varchar,
+  timestamp,
+  integer,
+  jsonb,
+  text,
+  date,
+  boolean,
+} from "drizzle-orm/pg-core";
 import { learners } from "./learners.js";
 import { users } from "./users.js";
 
 export const learnerSettings = pgTable("learner_settings", {
   id: uuid("id").defaultRandom().primaryKey(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull().unique(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull()
+    .unique(),
   accommodations: jsonb("accommodations").default({}),
   learningGoals: jsonb("learning_goals").default({}),
   notifications: jsonb("notifications").default({}),
@@ -15,7 +28,9 @@ export const learnerSettings = pgTable("learner_settings", {
 
 export const parentNotifications = pgTable("parent_notifications", {
   id: uuid("id").defaultRandom().primaryKey(),
-  parentId: uuid("parent_id").references(() => users.id).notNull(),
+  parentId: uuid("parent_id")
+    .references(() => users.id)
+    .notNull(),
   learnerId: uuid("learner_id").references(() => learners.id),
   type: varchar("type", { length: 50 }).notNull(),
   title: varchar("title", { length: 500 }).notNull(),
@@ -29,7 +44,9 @@ export const parentNotifications = pgTable("parent_notifications", {
 
 export const learnerMilestones = pgTable("learner_milestones", {
   id: uuid("id").defaultRandom().primaryKey(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
   type: varchar("type", { length: 50 }).notNull(),
   title: varchar("title", { length: 500 }).notNull(),
   description: text("description"),
@@ -40,7 +57,10 @@ export const learnerMilestones = pgTable("learner_milestones", {
 
 export const learnerStreaks = pgTable("learner_streaks", {
   id: uuid("id").defaultRandom().primaryKey(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull().unique(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull()
+    .unique(),
   currentStreak: integer("current_streak").default(0),
   longestStreak: integer("longest_streak").default(0),
   lastActiveDate: date("last_active_date"),
@@ -49,7 +69,9 @@ export const learnerStreaks = pgTable("learner_streaks", {
 
 export const learnerBadges = pgTable("learner_badges", {
   id: uuid("id").defaultRandom().primaryKey(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
   badgeKey: varchar("badge_key", { length: 50 }).notNull(),
   earnedAt: timestamp("earned_at").defaultNow().notNull(),
 });

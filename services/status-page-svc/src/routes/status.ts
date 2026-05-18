@@ -20,25 +20,107 @@ const IS_PROD = process.env.NODE_ENV === "production";
 // for liveness probes. status-page-svc polls that uniform path because some
 // scoped paths sit behind auth or tenant middleware and 401/404 even when
 // the service is healthy.
-const SERVICE_DEFS: Array<{ name: string; envKey: string; healthPath: string; devDefault: string }> = [
-  { name: "identity-svc",     envKey: "IDENTITY_SVC_URL",     healthPath: "/health", devDefault: "http://localhost:3001" },
-  { name: "brain-svc",        envKey: "BRAIN_SVC_URL",        healthPath: "/health", devDefault: "http://localhost:3002" },
-  { name: "assessment-svc",   envKey: "ASSESSMENT_SVC_URL",   healthPath: "/health", devDefault: "http://localhost:3003" },
-  { name: "ai-svc",           envKey: "AI_SVC_URL",           healthPath: "/health", devDefault: "http://localhost:3004" },
-  { name: "learning-svc",     envKey: "LEARNING_SVC_URL",     healthPath: "/health", devDefault: "http://localhost:3005" },
-  { name: "tutor-svc",        envKey: "TUTOR_SVC_URL",        healthPath: "/health", devDefault: "http://localhost:3006" },
-  { name: "family-svc",       envKey: "FAMILY_SVC_URL",       healthPath: "/health", devDefault: "http://localhost:3007" },
-  { name: "engagement-svc",   envKey: "ENGAGEMENT_SVC_URL",   healthPath: "/health", devDefault: "http://localhost:3008" },
-  { name: "billing-svc",      envKey: "BILLING_SVC_URL",      healthPath: "/health", devDefault: "http://localhost:3009" },
-  { name: "comms-svc",        envKey: "COMMS_SVC_URL",        healthPath: "/health", devDefault: "http://localhost:3010" },
-  { name: "i18n-svc",         envKey: "I18N_SVC_URL",         healthPath: "/health", devDefault: "http://localhost:3011" },
-  { name: "integrations-svc", envKey: "INTEGRATIONS_SVC_URL", healthPath: "/health", devDefault: "http://localhost:3012" },
-  { name: "admin-svc",        envKey: "ADMIN_SVC_URL",        healthPath: "/health", devDefault: "http://localhost:3013" },
-  { name: "status-page-svc",  envKey: "STATUS_PAGE_SVC_URL",  healthPath: "/health", devDefault: "http://localhost:3014" },
-  { name: "research-svc",     envKey: "RESEARCH_SVC_URL",     healthPath: "/health", devDefault: "http://localhost:3015" },
+const SERVICE_DEFS: Array<{
+  name: string;
+  envKey: string;
+  healthPath: string;
+  devDefault: string;
+}> = [
+  {
+    name: "identity-svc",
+    envKey: "IDENTITY_SVC_URL",
+    healthPath: "/health",
+    devDefault: "http://localhost:3001",
+  },
+  {
+    name: "brain-svc",
+    envKey: "BRAIN_SVC_URL",
+    healthPath: "/health",
+    devDefault: "http://localhost:3002",
+  },
+  {
+    name: "assessment-svc",
+    envKey: "ASSESSMENT_SVC_URL",
+    healthPath: "/health",
+    devDefault: "http://localhost:3003",
+  },
+  {
+    name: "ai-svc",
+    envKey: "AI_SVC_URL",
+    healthPath: "/health",
+    devDefault: "http://localhost:3004",
+  },
+  {
+    name: "learning-svc",
+    envKey: "LEARNING_SVC_URL",
+    healthPath: "/health",
+    devDefault: "http://localhost:3005",
+  },
+  {
+    name: "tutor-svc",
+    envKey: "TUTOR_SVC_URL",
+    healthPath: "/health",
+    devDefault: "http://localhost:3006",
+  },
+  {
+    name: "family-svc",
+    envKey: "FAMILY_SVC_URL",
+    healthPath: "/health",
+    devDefault: "http://localhost:3007",
+  },
+  {
+    name: "engagement-svc",
+    envKey: "ENGAGEMENT_SVC_URL",
+    healthPath: "/health",
+    devDefault: "http://localhost:3008",
+  },
+  {
+    name: "billing-svc",
+    envKey: "BILLING_SVC_URL",
+    healthPath: "/health",
+    devDefault: "http://localhost:3009",
+  },
+  {
+    name: "comms-svc",
+    envKey: "COMMS_SVC_URL",
+    healthPath: "/health",
+    devDefault: "http://localhost:3010",
+  },
+  {
+    name: "i18n-svc",
+    envKey: "I18N_SVC_URL",
+    healthPath: "/health",
+    devDefault: "http://localhost:3011",
+  },
+  {
+    name: "integrations-svc",
+    envKey: "INTEGRATIONS_SVC_URL",
+    healthPath: "/health",
+    devDefault: "http://localhost:3012",
+  },
+  {
+    name: "admin-svc",
+    envKey: "ADMIN_SVC_URL",
+    healthPath: "/health",
+    devDefault: "http://localhost:3013",
+  },
+  {
+    name: "status-page-svc",
+    envKey: "STATUS_PAGE_SVC_URL",
+    healthPath: "/health",
+    devDefault: "http://localhost:3014",
+  },
+  {
+    name: "research-svc",
+    envKey: "RESEARCH_SVC_URL",
+    healthPath: "/health",
+    devDefault: "http://localhost:3015",
+  },
 ];
 
-const missingProd = IS_PROD ? SERVICE_DEFS.filter((s) => !process.env[s.envKey]).map((s) => s.envKey) : [];
+const missingProd = IS_PROD
+  ? SERVICE_DEFS.filter((s) => !process.env[s.envKey]).map((s) => s.envKey)
+  : [];
 if (missingProd.length > 0) {
   throw new Error(
     `status-page-svc: required service URL env vars missing in production: ${missingProd.join(", ")}`,
@@ -70,7 +152,10 @@ async function checkService(svc: { name: string; url: string }) {
     const status = res.ok ? "healthy" : "degraded";
 
     if (latencyMs > SLOW_THRESHOLD_MS) {
-      logger.warn({ service: svc.name, latencyMs, threshold: SLOW_THRESHOLD_MS }, "slow_health_check");
+      logger.warn(
+        { service: svc.name, latencyMs, threshold: SLOW_THRESHOLD_MS },
+        "slow_health_check",
+      );
     }
 
     consecutiveDowns[svc.name] = 0;
@@ -153,34 +238,45 @@ export function registerStatusRoutes(app: FastifyInstance) {
     };
   });
 
-  app.get("/api/status/service/:serviceName", { schema: serviceStatusSchema }, async (request, reply) => {
-    const { serviceName } = request.params as any;
-    const svc = SERVICES.find((s) => s.name === serviceName);
-    if (!svc) return reply.code(404).send({ error: "Service not found" });
-    return await checkService(svc);
-  });
+  app.get(
+    "/api/status/service/:serviceName",
+    { schema: serviceStatusSchema },
+    async (request, reply) => {
+      const { serviceName } = request.params as any;
+      const svc = SERVICES.find((s) => s.name === serviceName);
+      if (!svc) return reply.code(404).send({ error: "Service not found" });
+      return await checkService(svc);
+    },
+  );
 
   app.get("/api/status/incidents", { schema: listIncidentsSchema }, async () => {
     return { incidents: [], total: 0 };
   });
 
-  app.post("/api/status/incidents", { schema: createIncidentSchema, preHandler: requireAdmin }, async (request) => {
-    const { title, description, severity, affectedServices } = request.body as any;
-    return {
-      id: crypto.randomUUID(),
-      title,
-      description,
-      severity: severity || "minor",
-      affectedServices: affectedServices || [],
-      status: "investigating",
-      createdAt: new Date().toISOString(),
-    };
-  });
+  app.post(
+    "/api/status/incidents",
+    { schema: createIncidentSchema, preHandler: requireAdmin },
+    async (request) => {
+      const { title, description, severity, affectedServices } = request.body as any;
+      return {
+        id: crypto.randomUUID(),
+        title,
+        description,
+        severity: severity || "minor",
+        affectedServices: affectedServices || [],
+        status: "investigating",
+        createdAt: new Date().toISOString(),
+      };
+    },
+  );
 
   app.get("/api/status/uptime", { schema: uptimeSchema }, async () => {
     return {
       period: "30d",
-      uptime: { overall: 99.95, byService: SERVICES.map((s) => ({ name: s.name, uptime: 99.9 + Math.random() * 0.1 })) },
+      uptime: {
+        overall: 99.95,
+        byService: SERVICES.map((s) => ({ name: s.name, uptime: 99.9 + Math.random() * 0.1 })),
+      },
     };
   });
 }

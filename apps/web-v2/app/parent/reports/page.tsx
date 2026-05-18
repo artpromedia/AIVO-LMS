@@ -37,10 +37,7 @@ export default async function Page() {
         />
       ) : (
         learners.map((l) => {
-          const summaries = listParentLessonSummaries(l.id, session.tenantId).slice(
-            0,
-            8,
-          );
+          const summaries = listParentLessonSummaries(l.id, session.tenantId).slice(0, 8);
           const runs = listLessonRunsForLearner(l.id, session.tenantId);
           const completed = runs.filter((r) => r.status === "completed").length;
           return (

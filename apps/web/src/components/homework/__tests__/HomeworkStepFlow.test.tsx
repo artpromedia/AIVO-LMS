@@ -34,8 +34,5 @@ test("final answer is NOT allowed before SOLVE", () => {
 test("final answer becomes allowed once SOLVE has been entered", () => {
   assert.equal(isFinalAnswerAllowed(["understand", "plan"], "solve"), true);
   assert.equal(isFinalAnswerAllowed(["understand", "plan", "solve"], "check"), true);
-  assert.equal(
-    isFinalAnswerAllowed(["understand", "plan", "solve", "check"], "complete"),
-    true,
-  );
+  assert.equal(isFinalAnswerAllowed(["understand", "plan", "solve", "check"], "complete"), true);
 });

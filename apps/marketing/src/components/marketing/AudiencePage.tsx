@@ -32,7 +32,10 @@ export function AudiencePage({ audience }: { audience: Audience }) {
       />
 
       <section className="mb-14" aria-labelledby="benefits-heading">
-        <h2 id="benefits-heading" className="text-2xl md:text-3xl font-heading font-bold text-slate-900 mb-6">
+        <h2
+          id="benefits-heading"
+          className="text-2xl md:text-3xl font-heading font-bold text-slate-900 mb-6"
+        >
           What you get with AIVO
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -49,13 +52,19 @@ export function AudiencePage({ audience }: { audience: Audience }) {
       </section>
 
       <section className="mb-14" aria-labelledby="outcomes-heading">
-        <h2 id="outcomes-heading" className="text-2xl md:text-3xl font-heading font-bold text-slate-900 mb-6">
+        <h2
+          id="outcomes-heading"
+          className="text-2xl md:text-3xl font-heading font-bold text-slate-900 mb-6"
+        >
           Outcomes you can expect
         </h2>
         <ul className="space-y-3">
           {audience.outcomes.map((o) => (
             <li key={o} className="flex items-start gap-3 text-slate-700 font-body">
-              <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" aria-hidden="true" />
+              <CheckCircle2
+                className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0"
+                aria-hidden="true"
+              />
               <span>{o}</span>
             </li>
           ))}
@@ -63,7 +72,10 @@ export function AudiencePage({ audience }: { audience: Audience }) {
       </section>
 
       <section aria-labelledby="faq-heading" className="mb-4">
-        <h2 id="faq-heading" className="text-2xl md:text-3xl font-heading font-bold text-slate-900 mb-6">
+        <h2
+          id="faq-heading"
+          className="text-2xl md:text-3xl font-heading font-bold text-slate-900 mb-6"
+        >
           Frequently asked questions
         </h2>
         <div className="space-y-3">
@@ -74,7 +86,10 @@ export function AudiencePage({ audience }: { audience: Audience }) {
             >
               <summary className="cursor-pointer font-heading font-bold text-slate-900 flex items-center justify-between gap-4">
                 <span>{f.q}</span>
-                <ArrowRight className="w-4 h-4 text-slate-400 group-open:rotate-90 transition-transform" aria-hidden="true" />
+                <ArrowRight
+                  className="w-4 h-4 text-slate-400 group-open:rotate-90 transition-transform"
+                  aria-hidden="true"
+                />
               </summary>
               <p className="text-slate-600 font-body mt-3 leading-relaxed text-sm">{f.a}</p>
             </details>
@@ -87,16 +102,28 @@ export function AudiencePage({ audience }: { audience: Audience }) {
           Keep exploring
         </h2>
         <div className="flex flex-wrap gap-3">
-          <Link href="/tutors" className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-700 font-bold text-sm hover:bg-slate-200 transition">
+          <Link
+            href="/tutors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-700 font-bold text-sm hover:bg-slate-200 transition"
+          >
             Meet the 14 tutors
           </Link>
-          <Link href="/levels" className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-700 font-bold text-sm hover:bg-slate-200 transition">
+          <Link
+            href="/levels"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-700 font-bold text-sm hover:bg-slate-200 transition"
+          >
             See the 5 functioning levels
           </Link>
-          <Link href="/#pricing" className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-700 font-bold text-sm hover:bg-slate-200 transition">
+          <Link
+            href="/#pricing"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-700 font-bold text-sm hover:bg-slate-200 transition"
+          >
             Pricing
           </Link>
-          <Link href="/compare/aivo-vs-ixl" className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-700 font-bold text-sm hover:bg-slate-200 transition">
+          <Link
+            href="/compare/aivo-vs-ixl"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-700 font-bold text-sm hover:bg-slate-200 transition"
+          >
             AIVO vs IXL
           </Link>
         </div>

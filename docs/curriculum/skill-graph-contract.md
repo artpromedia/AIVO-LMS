@@ -17,35 +17,35 @@ The contract is enforced by:
 A skill graph is a directed acyclic graph (DAG) of curriculum skills.
 Anchored type definitions live in `packages/skill-graphs/src/types.ts`.
 
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| `id` | string | yes | Stable, e.g. `ccss-math.K.CC.A.1` |
-| `title` | string | yes | Short tutor-narration label ("Count to 10") |
-| `description` | string | yes | One-sentence learner-facing ("I can count from 1 to 10") |
-| `subject` | `Subject` enum | yes | math / ela / science / social_studies / geography / coding / speech / sel / life_skills / executive_function / music / pe_health / world_languages / stem_engineering / creative_arts |
-| `gradeBand` | `GradeBand` enum | yes | PRE_K / K / 1–12 / ADULT |
-| `frameworkRefs` | `FrameworkRef[]` | yes\* | At least one CCSS/NGSS/WIDA/etc. code, OR `authoringMeta.scaffolding === "true"` for pedagogical-bridge skills |
-| `prerequisites` | `string[]` | yes (may be empty) | Other skill IDs that must be mastered first |
+| Field           | Type             | Required           | Notes                                                                                                                                                                                 |
+| --------------- | ---------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`            | string           | yes                | Stable, e.g. `ccss-math.K.CC.A.1`                                                                                                                                                     |
+| `title`         | string           | yes                | Short tutor-narration label ("Count to 10")                                                                                                                                           |
+| `description`   | string           | yes                | One-sentence learner-facing ("I can count from 1 to 10")                                                                                                                              |
+| `subject`       | `Subject` enum   | yes                | math / ela / science / social_studies / geography / coding / speech / sel / life_skills / executive_function / music / pe_health / world_languages / stem_engineering / creative_arts |
+| `gradeBand`     | `GradeBand` enum | yes                | PRE_K / K / 1–12 / ADULT                                                                                                                                                              |
+| `frameworkRefs` | `FrameworkRef[]` | yes\*              | At least one CCSS/NGSS/WIDA/etc. code, OR `authoringMeta.scaffolding === "true"` for pedagogical-bridge skills                                                                        |
+| `prerequisites` | `string[]`       | yes (may be empty) | Other skill IDs that must be mastered first                                                                                                                                           |
 
 \* "Scaffolding" skills are the only exception. They bridge between
-   formal standards and exist as authoring aids; mark them explicitly
-   with `authoringMeta: { scaffolding: "true" }` or the validator will
-   warn (and Sprint 14's content-quality eval will flag them as
-   ungrounded for generation).
+formal standards and exist as authoring aids; mark them explicitly
+with `authoringMeta: { scaffolding: "true" }` or the validator will
+warn (and Sprint 14's content-quality eval will flag them as
+ungrounded for generation).
 
 ## Supported frameworks
 
-| Framework | Scope |
-|---|---|
-| `CCSS-Math`, `CCSS-ELA` | U.S. Common Core (national reference) |
-| `NGSS`, `NGSS-Engineering` | Next Generation Science Standards |
-| `WIDA-ELD` | English Language Development |
-| `ISTE`, `CSTA` | Technology / Computer Science |
-| `C3`, `NCSS`, `NCGE` | Social studies / geography |
-| `CASEL` | Social-emotional learning |
-| `ASHA` | Speech-language |
-| `NCAS`, `SHAPE`, `ACTFL` | Creative arts / PE / world languages |
-| `CEC-LS` | Council for Exceptional Children — life skills |
+| Framework                  | Scope                                          |
+| -------------------------- | ---------------------------------------------- |
+| `CCSS-Math`, `CCSS-ELA`    | U.S. Common Core (national reference)          |
+| `NGSS`, `NGSS-Engineering` | Next Generation Science Standards              |
+| `WIDA-ELD`                 | English Language Development                   |
+| `ISTE`, `CSTA`             | Technology / Computer Science                  |
+| `C3`, `NCSS`, `NCGE`       | Social studies / geography                     |
+| `CASEL`                    | Social-emotional learning                      |
+| `ASHA`                     | Speech-language                                |
+| `NCAS`, `SHAPE`, `ACTFL`   | Creative arts / PE / world languages           |
+| `CEC-LS`                   | Council for Exceptional Children — life skills |
 
 State overrides are handled at the item-bank layer (a state may
 override item content while keeping the same skillId).
@@ -54,12 +54,12 @@ override item content while keeping the same skillId).
 
 Skill graphs are content artifacts. Lifecycle states:
 
-| State | Meaning |
-|---|---|
-| `draft` | Authoring; not visible to learners |
-| `active` | Default state for production |
+| State        | Meaning                                                                            |
+| ------------ | ---------------------------------------------------------------------------------- |
+| `draft`      | Authoring; not visible to learners                                                 |
+| `active`     | Default state for production                                                       |
 | `deprecated` | Visible only to existing in-flight mastery records; not selected for new baselines |
-| `archived` | Read-only; preserved for audit + DSAR exports only |
+| `archived`   | Read-only; preserved for audit + DSAR exports only                                 |
 
 Sprint 05 baseline ships all 14 seed graphs as `active` (see
 `packages/skill-graphs/src/index.ts::SEED_GRAPHS`). When a graph moves
@@ -69,16 +69,16 @@ learner who started mastering the graph can finish.
 
 ## Item-bank schema
 
-| Field | Type | Required |
-|---|---|---|
-| `Item.id` | string | yes |
-| `Item.skillId` | string | yes — must resolve to a skill in some live graph |
-| `Item.variants` | `ItemVariant[]` | yes — at least one `active` variant per Item to be routable |
-| `ItemVariant.version` | semver | yes — bump for ANY content change |
-| `ItemVariant.cohortWeight` | `[0,1]` | yes — drives deterministic cohort routing |
-| `ItemVariant.publishedAt` | ISO-8601 | yes |
-| `ItemVariant.body` | object | yes — accommodation hints, surface spec, content |
-| `ItemVariant.status` | `active`/`retired`/`experimental` | yes |
+| Field                      | Type                              | Required                                                    |
+| -------------------------- | --------------------------------- | ----------------------------------------------------------- |
+| `Item.id`                  | string                            | yes                                                         |
+| `Item.skillId`             | string                            | yes — must resolve to a skill in some live graph            |
+| `Item.variants`            | `ItemVariant[]`                   | yes — at least one `active` variant per Item to be routable |
+| `ItemVariant.version`      | semver                            | yes — bump for ANY content change                           |
+| `ItemVariant.cohortWeight` | `[0,1]`                           | yes — drives deterministic cohort routing                   |
+| `ItemVariant.publishedAt`  | ISO-8601                          | yes                                                         |
+| `ItemVariant.body`         | object                            | yes — accommodation hints, surface spec, content            |
+| `ItemVariant.status`       | `active`/`retired`/`experimental` | yes                                                         |
 
 `packages/item-bank/src/routing.ts::pickVariant()` partitions learners
 across variants deterministically via FNV-1a(`learnerId|itemId`), so a
@@ -101,22 +101,22 @@ profile + IEP-derived accommodations + learner gradeBand →
 
 ## Launch coverage (Sprint 05 baseline)
 
-| Subject | Grade bands shipped | Source |
-|---|---|---|
-| math | K (CCSS-Math) | `ccssMathKindergarten` |
-| ela | K (CCSS-ELA) | `ccssElaKindergarten` |
-| science | K–2 (NGSS Physical Science), 3–5 (NGSS Engineering Design) | `ngssK2PhysicalScience`, `ngssEngineeringDesign35` |
-| social_studies | K–2 (C3) | `c3SocialStudiesK2` |
-| geography | K–2 (NCGE) | `ngsGeographyK2` |
-| coding | K–2 (CSTA) | `cstaCodingK2` |
-| speech | early childhood (ASHA) | `ashaSpeechEarly` |
-| sel | K–2 (CASEL) | `caselSelK2` |
-| music | K–2 (NCAS) | `ncasMusicK2` |
-| creative_arts | K–2 (NCAS) | `ncasCreativeArtsK2` |
-| pe_health | K–2 (SHAPE) | `shapePeHealthK2` |
-| world_languages | Novice Low (ACTFL) | `actflWorldLanguagesNoviceLow` |
-| stem_engineering | 3–5 (NGSS-ETS1) | `ngssEngineeringDesign35` |
-| life_skills | 6+ (CEC) | `cecLifeSkills6Plus` |
+| Subject          | Grade bands shipped                                        | Source                                             |
+| ---------------- | ---------------------------------------------------------- | -------------------------------------------------- |
+| math             | K (CCSS-Math)                                              | `ccssMathKindergarten`                             |
+| ela              | K (CCSS-ELA)                                               | `ccssElaKindergarten`                              |
+| science          | K–2 (NGSS Physical Science), 3–5 (NGSS Engineering Design) | `ngssK2PhysicalScience`, `ngssEngineeringDesign35` |
+| social_studies   | K–2 (C3)                                                   | `c3SocialStudiesK2`                                |
+| geography        | K–2 (NCGE)                                                 | `ngsGeographyK2`                                   |
+| coding           | K–2 (CSTA)                                                 | `cstaCodingK2`                                     |
+| speech           | early childhood (ASHA)                                     | `ashaSpeechEarly`                                  |
+| sel              | K–2 (CASEL)                                                | `caselSelK2`                                       |
+| music            | K–2 (NCAS)                                                 | `ncasMusicK2`                                      |
+| creative_arts    | K–2 (NCAS)                                                 | `ncasCreativeArtsK2`                               |
+| pe_health        | K–2 (SHAPE)                                                | `shapePeHealthK2`                                  |
+| world_languages  | Novice Low (ACTFL)                                         | `actflWorldLanguagesNoviceLow`                     |
+| stem_engineering | 3–5 (NGSS-ETS1)                                            | `ngssEngineeringDesign35`                          |
+| life_skills      | 6+ (CEC)                                                   | `cecLifeSkills6Plus`                               |
 
 Sprint 05 launch requirement (validator-enforced): `math`, `ela`,
 `science` must each have at least one seed graph. Other subjects ship

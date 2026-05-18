@@ -151,15 +151,19 @@ The majority of parents will tap "This looks right" within seconds because the p
 ## Functioning-Level Adaptations for The Awakening
 
 ### STANDARD and SUPPORTED
+
 Full Awakening sequence as described. 20-25 seconds. Rich animation, tutor narration, memory flashbacks, full World Map reveal.
 
 ### LOW_VERBAL
+
 Simplified Awakening. 15 seconds total. The orb convergence is simpler (3 orbs instead of 5-6, slower movement). The sphere forms with gentle, sensory-friendly animation (no rapid pulses, no bright flashes). The tutor speaks in shorter phrases: "Look, [Name]! This is yours!" The memory flashbacks are simpler: just 2 moments, with larger, slower visuals. The celebration is warmth-focused: the sphere glows and the tutor hugs it (character animation), rather than particle effects. The World Map transition is direct with fewer animated elements.
 
 ### NON_VERBAL
+
 Minimal Awakening on the child's screen. 10 seconds. A warm, simple animation of colors gathering into a soft glowing circle. No narration (the child may not process spoken language). Gentle music only. The parent sees the full parallel experience on their device. The companion panel for the partner-assisted facilitator shows a note: "[Name]'s Brain is ready. You can show them the glowing light on the screen and say: 'Look! This is for you!'" giving the adult the language to share the moment with the child in whatever communication mode works for them.
 
 ### PRE_SYMBOLIC
+
 No child-facing Awakening. The parent sees the full Brain Profile Reveal on their device, which includes a note: "We have built a Brain profile for [Name] based on your observations. [Name]'s learning will happen through activities you do together, not through screen time. Your dashboard will show you daily activity suggestions, and [Name]'s Brain will grow as you share what you observe." The tone is deeply respectful of the parent's role as the primary mediator of learning for a pre-symbolic child.
 
 ---
@@ -169,15 +173,19 @@ No child-facing Awakening. The parent sees the full Brain Profile Reveal on thei
 The Awakening is not a one-time animation that is never referenced again. The Brain sphere becomes a persistent, living element in the child's daily experience.
 
 ### The Brain Indicator
+
 In the top bar of every Stage session and on the learner dashboard, the child's Brain appears as a small, glowing sphere with their unique color signature. It is always gently pulsing, always alive. When the child earns XP, particles float up into the Brain. When mastery updates happen, the Brain briefly brightens. When the child has not opened AIVO in a few days, the Brain's pulse slows slightly, and when they return, it brightens and pulses faster, like it is happy to see them.
 
 ### Brain Growth Moments
+
 At key milestones (every 5 levels, major mastery breakthroughs, IEP goal achievements), the Brain sphere does a mini-Awakening: it briefly expands, ripples with new colors reflecting the growth area, and then settles back into its updated color signature. The child visually sees their Brain changing over time. A child who starts with a predominantly amber (reading-strong) Brain and improves significantly in math will see cosmic blue threads weaving into their sphere's surface over weeks and months. This is tangible, visible growth.
 
 ### Brain Memories
+
 Periodically (once per week), when the child opens AIVO, the Brain sphere replays a brief memory from a recent session where the child did something notable. "Remember when you solved that fraction puzzle?" with a 2-second impressionistic flash inside the sphere. This reinforces the idea that the Brain remembers, the Brain grows, and the Brain is theirs.
 
 ### Brain Voice
+
 The Brain does not speak. The tutors speak. But the Brain communicates through visual language: glowing brighter when the child is doing well, pulsing in a calming rhythm during difficult moments, and radiating warmth when the child returns after an absence. The Brain is a silent, ever-present companion that the child develops a relationship with over time. It is not anthropomorphized with a face or speech. It is something more intimate: a visual representation of who they are as a learner, always growing, always theirs.
 
 ---
@@ -185,18 +193,23 @@ The Brain does not speak. The tutors speak. But the Brain communicates through v
 ## Technical Implementation
 
 ### Animation Engine
+
 The Awakening uses the same GPU-accelerated rendering engine as The Stage (Pixi.js for web, Flutter CustomPainter/Flame for mobile). The orb convergence and sphere formation are driven by a particle system with spring-based physics. The color signature is computed from the assessment domain scores: dominant domain maps to the primary hue, secondary domains blend in as accent colors. The sphere surface uses a custom shader (WebGL fragment shader for web, Flutter shader for mobile) that creates the aurora-like marbled effect.
 
 ### Personalization Data Flow
+
 When the NATS event assessment.baseline.completed fires, the payload includes domain scores, strongest domains, most-engaged moments (beat IDs from the Discovery Adventure), and the child's implicit behavioral profile. The Awakening animation controller receives this data and parameterizes the animation: which tutor voice narrates, which orb colors are most prominent, which memory flashbacks play, and what the final sphere color signature is. This means the animation cannot be pre-rendered. It is assembled in real-time from the child's actual data, ensuring no two Awakenings are the same.
 
 ### Synchronization
+
 The child's device and the parent's device are synchronized via WebSocket through comms-svc. The parent's Brain Profile Reveal timing is keyed to the child's animation phases. When the child reaches Phase 4 (Memories), the parent transitions from "processing" to the profile reveal. When the child reaches Phase 6 (Reveal), the parent sees the approval buttons. This ensures the parent is not waiting awkwardly or, worse, approving before the child has finished their emotional experience.
 
 ### Brain Sphere Persistence
+
 The Brain's color signature, pulse parameters, and growth state are stored in the brain_states JSONB field as a visual_identity object: { primaryHue, secondaryHues, pulseRate, growthParticles, memoryBank }. The learner client fetches this on app open and renders the Brain indicator accordingly. Updates to the visual_identity happen asynchronously when mastery changes occur, so the Brain's appearance evolves without any loading or transition, it just gradually becomes different over time, like a living thing growing.
 
 ### Performance
+
 The full Awakening sequence must run at 60fps on target devices. The shader-based sphere rendering is the most GPU-intensive element and has a fallback for low-end devices: a pre-rendered Lottie animation with color tinting applied programmatically, achieving the same visual effect without custom shaders. Total asset size for the Awakening: under 3MB (particle textures, audio assets, Lottie fallback). Assets are pre-cached during the Discovery Adventure so there is zero loading delay between the finale and The Awakening.
 
 ---

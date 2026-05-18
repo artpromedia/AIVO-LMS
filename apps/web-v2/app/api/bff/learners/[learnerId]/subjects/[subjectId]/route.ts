@@ -23,7 +23,12 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection"],
+      requestId,
+    );
     if (consentErr) return consentErr;
 
     const detail = getSubjectDetail(learnerId, session!.tenantId, subjectId);

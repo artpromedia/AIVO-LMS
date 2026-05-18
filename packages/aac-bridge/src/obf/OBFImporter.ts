@@ -69,7 +69,8 @@ export function validateOBF(json: unknown): string[] {
   }
   const doc = json as Record<string, unknown>;
   if (!Array.isArray(doc.buttons)) errors.push('Missing required field "buttons" (array)');
-  if (doc.grid !== undefined && typeof doc.grid !== "object") errors.push('"grid" must be an object');
+  if (doc.grid !== undefined && typeof doc.grid !== "object")
+    errors.push('"grid" must be an object');
   return errors;
 }
 
@@ -86,8 +87,8 @@ export async function parseOBZ(zipBuffer: ArrayBuffer): Promise<SymbolBoard[]> {
   const files = unzipSync(bytes);
 
   // Locate manifest.json
-  const manifestEntry = Object.entries(files).find(([name]) =>
-    name === "manifest.json" || name.endsWith("/manifest.json"),
+  const manifestEntry = Object.entries(files).find(
+    ([name]) => name === "manifest.json" || name.endsWith("/manifest.json"),
   );
   if (!manifestEntry) throw new Error("OBZ file missing manifest.json");
 

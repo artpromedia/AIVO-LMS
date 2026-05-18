@@ -48,12 +48,12 @@ The platform serves parents, learners, teachers, caregivers, therapists, and dis
 
 ## What's New in v2.1
 
-The v2.1 release lands a wide sweep of platform fixes — from the four neurodiverse-first corrections that change *how* the agent meets a learner, through new content/curriculum services, observability and budget guardrails, and infrastructure cleanup. Everything below is implemented end-to-end (DB schema → service routes → tests / UI), not scaffolding.
+The v2.1 release lands a wide sweep of platform fixes — from the four neurodiverse-first corrections that change _how_ the agent meets a learner, through new content/curriculum services, observability and budget guardrails, and infrastructure cleanup. Everything below is implemented end-to-end (DB schema → service routes → tests / UI), not scaffolding.
 
 ### Neurodiverse-first corrections (the headline four)
 
 1. **Adaptive multimodal baseline.** The baseline no longer asks "what grade is this kid at?" — it builds a `LearningProfile` (preferred modality, logit θ ability, frustration tolerance, attention-run-length, median latency). The Discovery Adventure derives + persists this profile via `assessment-svc/services/learning-profile.ts`, and a fully adaptive run-loop (`/api/assessments/adaptive-baseline/:learnerId/{start,respond,finalize}`) backed by `@aivo/adaptive-baseline` chooses each next item by SE-stop on a 1-PL model. Tables: `learner_profiles`, `adaptive_baseline_sessions`.
-2. **Special interests as the curriculum engine.** Parents log a learner's deep interests through `family-svc/routes/interests.ts`; signals score directly via `@aivo/special-interest-engine`. The assessment service pipes the top scored theme into both `generate-discovery-chapter` and `generate-baseline` ai-svc calls, and `ai-svc/baseline_generator.py` rewrites the prompt rule when a primary theme is present: *"Build the activity AROUND `<theme>` as the primary theme — the engine, not a sprinkle."* Word problems live in Minecraft, reading passages live in volcanoes. Table: `learner_interest_signals`.
+2. **Special interests as the curriculum engine.** Parents log a learner's deep interests through `family-svc/routes/interests.ts`; signals score directly via `@aivo/special-interest-engine`. The assessment service pipes the top scored theme into both `generate-discovery-chapter` and `generate-baseline` ai-svc calls, and `ai-svc/baseline_generator.py` rewrites the prompt rule when a primary theme is present: _"Build the activity AROUND `<theme>` as the primary theme — the engine, not a sprinkle."_ Word problems live in Minecraft, reading passages live in volcanoes. Table: `learner_interest_signals`.
 3. **Executive-function partner.** ADHD is fundamentally an EF challenge, so the agent quietly carries the planning load. `tutor-svc/routes/ef.ts` exposes `POST /api/ef/breakdown` (a 4-step micro-plan with optional modality narrowing), `GET /api/ef/breakdown/:learnerId/:taskId` (next-step prompt + progress), step-complete endpoints (idempotent via unique index), session-outcome ledger, and `GET /api/ef/best-window/:learnerId` (best learning window endorsed only with ≥2 observations). Tables: `ef_task_breakdowns`, `ef_task_step_progress`, `ef_session_outcomes`.
 4. **"What's working" parent dashboard.** `family-svc/routes/whats-working.ts` (`GET /api/family/whats-working/:learnerId?windowDays=N`) reads the real `ef_session_outcomes` ledger (capped at 5,000 rows / 365 days) through a pure analytics module, and the new `WhatsWorkingPanel` on the parent dashboard surfaces three IEP-meeting-ready signals per learner: best learning window, modality that clicks, where frustration spikes. Per-subject rate limit + payload cap address the CodeQL `js/missing-rate-limiting` finding.
 
@@ -137,19 +137,19 @@ The repository is a Turborepo + pnpm workspace containing three apps, twelve sha
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend (web, marketing) | Next.js 15, React 19, Tailwind CSS v4, TypeScript 5.7 |
-| Mobile | React Native, Expo SDK 54, Expo Router v6, TypeScript |
-| Backend (TypeScript) | Fastify 5, Drizzle ORM 0.45.2, postgres-js 3.4.5 |
-| Backend (Python) | FastAPI, uvicorn, LiteLLM (Claude Sonnet → Gemini Flash → GPT-4o-mini fallback) |
-| Auth | JWT RS256 + refresh tokens, PIN login, Google OAuth, email-based MFA, WebAuthn |
-| Database | PostgreSQL 16 with JSONB brain states |
-| Events | NATS (typed event definitions in `@aivo/events`) |
-| Email | Postmark (via `comms-svc`) |
-| Internationalization | `next-intl`, 10 locales including RTL Arabic |
-| Tooling | Turborepo, pnpm 10.26.1, ESLint, Prettier, cspell |
-| Deployment | Docker, GHCR, Hetzner |
+| Layer                     | Technology                                                                      |
+| ------------------------- | ------------------------------------------------------------------------------- |
+| Frontend (web, marketing) | Next.js 15, React 19, Tailwind CSS v4, TypeScript 5.7                           |
+| Mobile                    | React Native, Expo SDK 54, Expo Router v6, TypeScript                           |
+| Backend (TypeScript)      | Fastify 5, Drizzle ORM 0.45.2, postgres-js 3.4.5                                |
+| Backend (Python)          | FastAPI, uvicorn, LiteLLM (Claude Sonnet → Gemini Flash → GPT-4o-mini fallback) |
+| Auth                      | JWT RS256 + refresh tokens, PIN login, Google OAuth, email-based MFA, WebAuthn  |
+| Database                  | PostgreSQL 16 with JSONB brain states                                           |
+| Events                    | NATS (typed event definitions in `@aivo/events`)                                |
+| Email                     | Postmark (via `comms-svc`)                                                      |
+| Internationalization      | `next-intl`, 10 locales including RTL Arabic                                    |
+| Tooling                   | Turborepo, pnpm 10.26.1, ESLint, Prettier, cspell                               |
+| Deployment                | Docker, GHCR, Hetzner                                                           |
 
 ## Repository Layout
 
@@ -242,25 +242,27 @@ The full list lives in [`.env.example`](.env.example). Production builds validat
 
 Key variables:
 
-| Variable | Required by | Purpose |
-|---|---|---|
-| `DATABASE_URL` | all backend services | Postgres connection string |
-| `JWT_PRIVATE_KEY` / `JWT_PUBLIC_KEY` | identity-svc + verifiers | RS256 signing keys |
-| `INTERNAL_SERVICE_TOKEN` | learning-svc, tutor-svc, status-page-svc | Inter-service shared secret |
-| `INTERNAL_AI_TOKEN` | tutor-svc | Auth for `ai-svc` curriculum calls |
-| `*_SVC_URL` | status-page-svc, tutor-svc | Service discovery (IDENTITY, BRAIN, ASSESSMENT, AI, LEARNING, TUTOR, FAMILY, ENGAGEMENT, BILLING, COMMS, I18N, INTEGRATIONS, ADMIN, STATUS_PAGE, RESEARCH) |
-| `WEBAUTHN_ORIGINS` | identity-svc | Comma-separated WebAuthn origin allow-list |
-| `POSTMARK_SERVER_TOKEN` | comms-svc | Transactional email |
-| `LITELLM_*` | brain-svc, ai-svc | LLM provider keys |
+| Variable                             | Required by                              | Purpose                                                                                                                                                    |
+| ------------------------------------ | ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`                       | all backend services                     | Postgres connection string                                                                                                                                 |
+| `JWT_PRIVATE_KEY` / `JWT_PUBLIC_KEY` | identity-svc + verifiers                 | RS256 signing keys                                                                                                                                         |
+| `INTERNAL_SERVICE_TOKEN`             | learning-svc, tutor-svc, status-page-svc | Inter-service shared secret                                                                                                                                |
+| `INTERNAL_AI_TOKEN`                  | tutor-svc                                | Auth for `ai-svc` curriculum calls                                                                                                                         |
+| `*_SVC_URL`                          | status-page-svc, tutor-svc               | Service discovery (IDENTITY, BRAIN, ASSESSMENT, AI, LEARNING, TUTOR, FAMILY, ENGAGEMENT, BILLING, COMMS, I18N, INTEGRATIONS, ADMIN, STATUS_PAGE, RESEARCH) |
+| `WEBAUTHN_ORIGINS`                   | identity-svc                             | Comma-separated WebAuthn origin allow-list                                                                                                                 |
+| `POSTMARK_SERVER_TOKEN`              | comms-svc                                | Transactional email                                                                                                                                        |
+| `LITELLM_*`                          | brain-svc, ai-svc                        | LLM provider keys                                                                                                                                          |
 
 ## Database Workflow
 
 **Local / dev** — fast schema sync, no migration files:
+
 ```bash
 pnpm --filter @aivo/db db:push
 ```
 
 **Production** — apply numbered SQL files in order:
+
 ```bash
 for f in packages/db/drizzle/*.sql; do
   psql -v ON_ERROR_STOP=1 -f "$f"
@@ -280,6 +282,7 @@ pnpm --filter @aivo/identity-svc test      # one service
 ```
 
 Backend service tests use Node's built-in test runner with auto-migration:
+
 ```bash
 pnpm --filter @aivo/db run build && \
 pnpm --filter @aivo/db run db:migrate && \
@@ -289,6 +292,7 @@ node --test --import tsx tests/*.test.ts
 The shared `@aivo/db` package exports `closeDb(db)` — call it in `finally` blocks so postgres-js releases its pool and the test runner exits cleanly.
 
 End-to-end tests live in `e2e/` and use Playwright:
+
 ```bash
 pnpm --filter e2e test
 ```
@@ -311,6 +315,7 @@ Ten locales are supported via `next-intl`, including RTL Arabic. Translation fil
 `scripts/start-services.sh` launches the ~14 Node and Python backend services in **five small groups with a brief pause between groups**, not in parallel. Fanning out all services at once exhausts the container's process / thread budget on a fresh boot (`EAGAIN` fork errors, `ERR_WORKER_INIT_FAILED` from tsx) and starves the Next.js workflows of CPU long enough to fail port-readiness checks.
 
 Groups:
+
 1. identity / comms / i18n
 2. assessment / learning
 3. tutor / family / engagement

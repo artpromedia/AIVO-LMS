@@ -25,7 +25,14 @@ describe("SwitchScanOverlay logic", () => {
     // Simulate what the overlay does: creates a controller when active.
     const items = makeItems(3);
     const ctrl = new SwitchScanController(
-      { method: "switch_1", scanDelayMs: 1000, dwellTimeMs: 800, auditoryFeedback: false, highlightStyle: "box", autoStart: false },
+      {
+        method: "switch_1",
+        scanDelayMs: 1000,
+        dwellTimeMs: 800,
+        auditoryFeedback: false,
+        highlightStyle: "box",
+        autoStart: false,
+      },
       items,
     );
     expect(ctrl).toBeTruthy();
@@ -36,7 +43,14 @@ describe("SwitchScanOverlay logic", () => {
     // When active=false, the overlay passes items=[] and the controller
     // returns null from getHighlightedItem().
     const ctrl = new SwitchScanController(
-      { method: "switch_1", scanDelayMs: 1000, dwellTimeMs: 800, auditoryFeedback: false, highlightStyle: "box", autoStart: false },
+      {
+        method: "switch_1",
+        scanDelayMs: 1000,
+        dwellTimeMs: 800,
+        auditoryFeedback: false,
+        highlightStyle: "box",
+        autoStart: false,
+      },
       [],
     );
     expect(ctrl.getHighlightedItem()).toBeNull();
@@ -57,7 +71,14 @@ describe("SwitchScanOverlay logic", () => {
 
   it("overlay with empty items list does not activate scanner", () => {
     const ctrl = new SwitchScanController(
-      { method: "switch_1", scanDelayMs: 100, dwellTimeMs: 800, auditoryFeedback: false, highlightStyle: "box", autoStart: true },
+      {
+        method: "switch_1",
+        scanDelayMs: 100,
+        dwellTimeMs: 800,
+        auditoryFeedback: false,
+        highlightStyle: "box",
+        autoStart: true,
+      },
       [],
     );
     ctrl.start();

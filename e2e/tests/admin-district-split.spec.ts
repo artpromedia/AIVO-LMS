@@ -18,7 +18,9 @@ import { test, expect } from "@playwright/test";
  */
 
 test.describe("admin/district auth-surface split", () => {
-  test("district login page is reachable, branded, and posts to /api/auth/district-login", async ({ page }) => {
+  test("district login page is reachable, branded, and posts to /api/auth/district-login", async ({
+    page,
+  }) => {
     const requests: string[] = [];
     page.on("request", (req) => {
       if (req.url().includes("/api/auth/")) requests.push(req.url());
@@ -46,7 +48,10 @@ test.describe("admin/district auth-surface split", () => {
     const districtEmail = process.env.E2E_DISTRICT_ADMIN_EMAIL;
     const districtPassword = process.env.E2E_DISTRICT_ADMIN_PASSWORD;
 
-    test.skip(!districtEmail || !districtPassword, "Requires seeded DISTRICT_ADMIN credentials in E2E_DISTRICT_ADMIN_EMAIL/PASSWORD");
+    test.skip(
+      !districtEmail || !districtPassword,
+      "Requires seeded DISTRICT_ADMIN credentials in E2E_DISTRICT_ADMIN_EMAIL/PASSWORD",
+    );
 
     await page.goto("/login");
 
@@ -59,11 +64,15 @@ test.describe("admin/district auth-surface split", () => {
     const body = await res.json();
     // Dev defaults to relative; production / aivolearning.com hosts default to
     // an absolute cross-host URL on district.aivolearning.com.
-    expect(body.redirectTo).toMatch(/(^\/district\/login$)|(^https:\/\/district\.aivolearning\.com\/district\/login$)/);
+    expect(body.redirectTo).toMatch(
+      /(^\/district\/login$)|(^https:\/\/district\.aivolearning\.com\/district\/login$)/,
+    );
 
     await expect(page.getByRole("alert")).toContainText(/district\.aivolearning\.com/i);
     const staffLink = page.getByRole("link", { name: /staff sign-in/i });
     const href = await staffLink.getAttribute("href");
-    expect(href).toMatch(/(^\/district\/login$)|(^https:\/\/district\.aivolearning\.com\/district\/login$)/);
+    expect(href).toMatch(
+      /(^\/district\/login$)|(^https:\/\/district\.aivolearning\.com\/district\/login$)/,
+    );
   });
 });

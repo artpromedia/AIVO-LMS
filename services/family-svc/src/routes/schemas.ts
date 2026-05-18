@@ -48,7 +48,12 @@ export const getCollaborationByLearnerIdMembersSchema = {
   tags: ["Family"],
   operationId: "getCollaborationByLearnerIdMembers",
   summary: "GET /api/family/collaboration/:learnerId/members",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse },
 } as const;
 
@@ -56,34 +61,75 @@ export const collaborationByLearnerIdInviteTeacherSchema = {
   tags: ["Family"],
   operationId: "collaborationByLearnerIdInviteTeacher",
   summary: "POST /api/family/collaboration/:learnerId/invite/teacher",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   body: passthroughObject,
-  response: { 200: passthroughObject, 201: passthroughObject, 400: errorResponse, 403: errorResponse, 404: errorResponse, 409: errorResponse },
+  response: {
+    200: passthroughObject,
+    201: passthroughObject,
+    400: errorResponse,
+    403: errorResponse,
+    404: errorResponse,
+    409: errorResponse,
+  },
 } as const;
 
 export const collaborationByLearnerIdInviteCaregiverSchema = {
   tags: ["Family"],
   operationId: "collaborationByLearnerIdInviteCaregiver",
   summary: "POST /api/family/collaboration/:learnerId/invite/caregiver",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   body: passthroughObject,
-  response: { 200: passthroughObject, 201: passthroughObject, 400: errorResponse, 403: errorResponse, 404: errorResponse, 409: errorResponse },
+  response: {
+    200: passthroughObject,
+    201: passthroughObject,
+    400: errorResponse,
+    403: errorResponse,
+    404: errorResponse,
+    409: errorResponse,
+  },
 } as const;
 
 export const collaborationByLearnerIdInviteTherapistSchema = {
   tags: ["Family"],
   operationId: "collaborationByLearnerIdInviteTherapist",
   summary: "POST /api/family/collaboration/:learnerId/invite/therapist",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   body: passthroughObject,
-  response: { 200: passthroughObject, 201: passthroughObject, 400: errorResponse, 403: errorResponse, 404: errorResponse, 409: errorResponse },
+  response: {
+    200: passthroughObject,
+    201: passthroughObject,
+    400: errorResponse,
+    403: errorResponse,
+    404: errorResponse,
+    409: errorResponse,
+  },
 } as const;
 
 export const deleteCollaborationByLearnerIdMemberByMemberIdSchema = {
   tags: ["Family"],
   operationId: "deleteCollaborationByLearnerIdMemberByMemberId",
   summary: "DELETE /api/family/collaboration/:learnerId/member/:memberId",
-  params: { type: "object", required: ["learnerId", "memberId"], additionalProperties: true, properties: { learnerId: { type: "string" }, memberId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId", "memberId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" }, memberId: { type: "string" } },
+  },
   querystring: { type: "object", additionalProperties: true, properties: {} },
   response: { 200: passthroughObject, 400: errorResponse, 403: errorResponse },
 } as const;
@@ -92,16 +138,31 @@ export const collaborationByLearnerIdInsightSchema = {
   tags: ["Family"],
   operationId: "collaborationByLearnerIdInsight",
   summary: "POST /api/family/collaboration/:learnerId/insight",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   body: passthroughObject,
-  response: { 200: passthroughObject, 201: passthroughObject, 400: errorResponse, 403: errorResponse },
+  response: {
+    200: passthroughObject,
+    201: passthroughObject,
+    400: errorResponse,
+    403: errorResponse,
+  },
 } as const;
 
 export const getCollaborationByLearnerIdBrainTeacherSchema = {
   tags: ["Family"],
   operationId: "getCollaborationByLearnerIdBrainTeacher",
   summary: "GET /api/family/collaboration/:learnerId/brain/teacher",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse },
 } as const;
 
@@ -109,7 +170,12 @@ export const getCollaborationByLearnerIdBrainCaregiverSchema = {
   tags: ["Family"],
   operationId: "getCollaborationByLearnerIdBrainCaregiver",
   summary: "GET /api/family/collaboration/:learnerId/brain/caregiver",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse },
 } as const;
 
@@ -117,7 +183,12 @@ export const getCollaborationByLearnerIdBrainTherapistSchema = {
   tags: ["Family"],
   operationId: "getCollaborationByLearnerIdBrainTherapist",
   summary: "GET /api/family/collaboration/:learnerId/brain/therapist",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse },
 } as const;
 
@@ -146,7 +217,12 @@ export const getDataExportByLearnerIdSchema = {
   tags: ["Family"],
   operationId: "getDataExportByLearnerId",
   summary: "GET /api/family/data-export/:learnerId",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 401: errorResponse, 403: errorResponse, 404: errorResponse },
 } as const;
 
@@ -182,7 +258,12 @@ export const getIepByLearnerIdGoalsSchema = {
   tags: ["Family"],
   operationId: "getIepByLearnerIdGoals",
   summary: "GET /api/family/iep/:learnerId/goals",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughArray, 403: errorResponse },
 } as const;
 
@@ -190,7 +271,12 @@ export const getIepByLearnerIdGoalsByGoalIdSchema = {
   tags: ["Family"],
   operationId: "getIepByLearnerIdGoalsByGoalId",
   summary: "GET /api/family/iep/:learnerId/goals/:goalId",
-  params: { type: "object", required: ["learnerId", "goalId"], additionalProperties: true, properties: { learnerId: { type: "string" }, goalId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId", "goalId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" }, goalId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse, 404: errorResponse },
 } as const;
 
@@ -198,7 +284,12 @@ export const getIepByLearnerIdProfileSchema = {
   tags: ["Family"],
   operationId: "getIepByLearnerIdProfile",
   summary: "GET /api/family/iep/:learnerId/profile",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse },
 } as const;
 
@@ -206,7 +297,12 @@ export const getIepByLearnerIdDocumentsSchema = {
   tags: ["Family"],
   operationId: "getIepByLearnerIdDocuments",
   summary: "GET /api/family/iep/:learnerId/documents",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughArray, 403: errorResponse },
 } as const;
 
@@ -214,7 +310,12 @@ export const getIepByLearnerIdProgressSchema = {
   tags: ["Family"],
   operationId: "getIepByLearnerIdProgress",
   summary: "GET /api/family/iep/:learnerId/progress",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse },
 } as const;
 
@@ -222,7 +323,12 @@ export const getIepByLearnerIdReportSchema = {
   tags: ["Family"],
   operationId: "getIepByLearnerIdReport",
   summary: "GET /api/family/iep/:learnerId/report",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse, 404: errorResponse },
 } as const;
 
@@ -230,7 +336,12 @@ export const getIepByLearnerIdDapeProfileSchema = {
   tags: ["Family"],
   operationId: "getIepByLearnerIdDapeProfile",
   summary: "GET /api/family/iep/:learnerId/dape/profile",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse },
 } as const;
 
@@ -238,7 +349,12 @@ export const getIepByLearnerIdDapeActivitySchema = {
   tags: ["Family"],
   operationId: "getIepByLearnerIdDapeActivity",
   summary: "GET /api/family/iep/:learnerId/dape/activity",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   querystring: { type: "object", additionalProperties: true, properties: {} },
   response: { 200: passthroughObject, 403: errorResponse, 404: errorResponse },
 } as const;
@@ -247,7 +363,12 @@ export const getIepByLearnerIdDapeProgressSchema = {
   tags: ["Family"],
   operationId: "getIepByLearnerIdDapeProgress",
   summary: "GET /api/family/iep/:learnerId/dape/progress",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse },
 } as const;
 
@@ -255,7 +376,12 @@ export const getInterestsByLearnerIdSchema = {
   tags: ["Family"],
   operationId: "getInterestsByLearnerId",
   summary: "GET /api/family/interests/:learnerId",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse },
 } as const;
 
@@ -263,16 +389,32 @@ export const interestsByLearnerIdSchema = {
   tags: ["Family"],
   operationId: "interestsByLearnerId",
   summary: "POST /api/family/interests/:learnerId",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   body: passthroughObject,
-  response: { 200: passthroughObject, 201: passthroughObject, 400: errorResponse, 403: errorResponse, 429: errorResponse },
+  response: {
+    200: passthroughObject,
+    201: passthroughObject,
+    400: errorResponse,
+    403: errorResponse,
+    429: errorResponse,
+  },
 } as const;
 
 export const deleteInterestsByLearnerIdBySignalIdSchema = {
   tags: ["Family"],
   operationId: "deleteInterestsByLearnerIdBySignalId",
   summary: "DELETE /api/family/interests/:learnerId/:signalId",
-  params: { type: "object", required: ["learnerId", "signalId"], additionalProperties: true, properties: { learnerId: { type: "string" }, signalId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId", "signalId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" }, signalId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 204: errorResponse, 403: errorResponse, 429: errorResponse },
 } as const;
 
@@ -280,7 +422,12 @@ export const languageProfileByLearnerIdSchema = {
   tags: ["Family"],
   operationId: "languageProfileByLearnerId",
   summary: "POST /api/family/language-profile/:learnerId",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   body: passthroughObject,
   response: { 200: passthroughObject, 400: errorResponse, 403: errorResponse },
 } as const;
@@ -289,7 +436,12 @@ export const getLanguageProfileByLearnerIdSchema = {
   tags: ["Family"],
   operationId: "getLanguageProfileByLearnerId",
   summary: "GET /api/family/language-profile/:learnerId",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse, 404: errorResponse },
 } as const;
 
@@ -297,15 +449,31 @@ export const languageProfileByLearnerIdCoughdropSyncSchema = {
   tags: ["Family"],
   operationId: "languageProfileByLearnerIdCoughdropSync",
   summary: "POST /api/family/language-profile/:learnerId/coughdrop-sync",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
-  response: { 200: passthroughObject, 400: errorResponse, 403: errorResponse, 500: errorResponse, 502: errorResponse },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
+  response: {
+    200: passthroughObject,
+    400: errorResponse,
+    403: errorResponse,
+    500: errorResponse,
+    502: errorResponse,
+  },
 } as const;
 
 export const getLanguageProfileByLearnerIdCoughdropSyncStatusSchema = {
   tags: ["Family"],
   operationId: "getLanguageProfileByLearnerIdCoughdropSyncStatus",
   summary: "GET /api/family/language-profile/:learnerId/coughdrop-sync/status",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse },
 } as const;
 
@@ -329,7 +497,12 @@ export const getLearnerSettingsByLearnerIdSchema = {
   tags: ["Family"],
   operationId: "getLearnerSettingsByLearnerId",
   summary: "GET /api/family/learner-settings/:learnerId",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse },
 } as const;
 
@@ -337,7 +510,12 @@ export const updateLearnerSettingsByLearnerIdSchema = {
   tags: ["Family"],
   operationId: "updateLearnerSettingsByLearnerId",
   summary: "PUT /api/family/learner-settings/:learnerId",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   body: passthroughObject,
   response: { 200: passthroughObject, 403: errorResponse },
 } as const;
@@ -346,7 +524,12 @@ export const getInboxByParentIdSchema = {
   tags: ["Family"],
   operationId: "getInboxByParentId",
   summary: "GET /api/family/inbox/:parentId",
-  params: { type: "object", required: ["parentId"], additionalProperties: true, properties: { parentId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["parentId"],
+    additionalProperties: true,
+    properties: { parentId: { type: "string" } },
+  },
   querystring: { type: "object", additionalProperties: true, properties: {} },
   response: { 200: passthroughObject, 403: errorResponse },
 } as const;
@@ -355,7 +538,12 @@ export const updateInboxByNotificationIdReadSchema = {
   tags: ["Family"],
   operationId: "updateInboxByNotificationIdRead",
   summary: "PUT /api/family/inbox/:notificationId/read",
-  params: { type: "object", required: ["notificationId"], additionalProperties: true, properties: { notificationId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["notificationId"],
+    additionalProperties: true,
+    properties: { notificationId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse, 404: errorResponse },
 } as const;
 
@@ -363,7 +551,12 @@ export const updateInboxByNotificationIdDismissSchema = {
   tags: ["Family"],
   operationId: "updateInboxByNotificationIdDismiss",
   summary: "PUT /api/family/inbox/:notificationId/dismiss",
-  params: { type: "object", required: ["notificationId"], additionalProperties: true, properties: { notificationId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["notificationId"],
+    additionalProperties: true,
+    properties: { notificationId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse, 404: errorResponse },
 } as const;
 
@@ -371,7 +564,12 @@ export const getActivityFeedByParentIdSchema = {
   tags: ["Family"],
   operationId: "getActivityFeedByParentId",
   summary: "GET /api/family/activity-feed/:parentId",
-  params: { type: "object", required: ["parentId"], additionalProperties: true, properties: { parentId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["parentId"],
+    additionalProperties: true,
+    properties: { parentId: { type: "string" } },
+  },
   querystring: { type: "object", additionalProperties: true, properties: {} },
   response: { 200: passthroughObject, 403: errorResponse },
 } as const;
@@ -380,7 +578,12 @@ export const getMilestonesByLearnerIdSchema = {
   tags: ["Family"],
   operationId: "getMilestonesByLearnerId",
   summary: "GET /api/family/milestones/:learnerId",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse },
 } as const;
 
@@ -388,7 +591,12 @@ export const getStreaksByLearnerIdSchema = {
   tags: ["Family"],
   operationId: "getStreaksByLearnerId",
   summary: "GET /api/family/streaks/:learnerId",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse },
 } as const;
 
@@ -396,7 +604,12 @@ export const getSummaryByParentIdSchema = {
   tags: ["Family"],
   operationId: "getSummaryByParentId",
   summary: "GET /api/family/summary/:parentId",
-  params: { type: "object", required: ["parentId"], additionalProperties: true, properties: { parentId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["parentId"],
+    additionalProperties: true,
+    properties: { parentId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse },
 } as const;
 
@@ -404,7 +617,12 @@ export const getRecommendationsByLearnerIdSchema = {
   tags: ["Family"],
   operationId: "getRecommendationsByLearnerId",
   summary: "GET /api/family/recommendations/:learnerId",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   querystring: { type: "object", additionalProperties: true, properties: {} },
   response: { 200: passthroughArray, 403: errorResponse },
 } as const;
@@ -413,16 +631,33 @@ export const recommendationsByLearnerIdByRecIdRespondSchema = {
   tags: ["Family"],
   operationId: "recommendationsByLearnerIdByRecIdRespond",
   summary: "POST /api/family/recommendations/:learnerId/:recId/respond",
-  params: { type: "object", required: ["learnerId", "recId"], additionalProperties: true, properties: { learnerId: { type: "string" }, recId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId", "recId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" }, recId: { type: "string" } },
+  },
   body: passthroughObject,
-  response: { 200: passthroughObject, 400: errorResponse, 403: errorResponse, 404: errorResponse, 409: errorResponse, 500: errorResponse },
+  response: {
+    200: passthroughObject,
+    400: errorResponse,
+    403: errorResponse,
+    404: errorResponse,
+    409: errorResponse,
+    500: errorResponse,
+  },
 } as const;
 
 export const getRecommendationsByLearnerIdHistorySchema = {
   tags: ["Family"],
   operationId: "getRecommendationsByLearnerIdHistory",
   summary: "GET /api/family/recommendations/:learnerId/history",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse },
 } as const;
 
@@ -430,7 +665,12 @@ export const getRecommendationsByLearnerIdConflictsSchema = {
   tags: ["Family"],
   operationId: "getRecommendationsByLearnerIdConflicts",
   summary: "GET /api/family/recommendations/:learnerId/conflicts",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse },
 } as const;
 
@@ -446,7 +686,12 @@ export const transitionByLearnerIdSchema = {
   tags: ["Family"],
   operationId: "transitionByLearnerId",
   summary: "POST /api/family/transition/:learnerId",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   body: passthroughObject,
   response: { 200: passthroughObject, 403: errorResponse },
 } as const;
@@ -455,7 +700,12 @@ export const getTransitionByLearnerIdSchema = {
   tags: ["Family"],
   operationId: "getTransitionByLearnerId",
   summary: "GET /api/family/transition/:learnerId",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse, 404: errorResponse },
 } as const;
 
@@ -463,7 +713,12 @@ export const getWhatsWorkingByLearnerIdSchema = {
   tags: ["Family"],
   operationId: "getWhatsWorkingByLearnerId",
   summary: "GET /api/family/whats-working/:learnerId",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   querystring: { type: "object", additionalProperties: true, properties: {} },
   response: { 200: passthroughObject, 403: errorResponse, 429: errorResponse },
 } as const;
@@ -472,7 +727,12 @@ export const whatsWorkingByLearnerIdSchema = {
   tags: ["Family"],
   operationId: "whatsWorkingByLearnerId",
   summary: "POST /api/family/whats-working/:learnerId",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   body: passthroughObject,
   response: { 200: passthroughObject, 403: errorResponse, 413: errorResponse, 429: errorResponse },
 } as const;

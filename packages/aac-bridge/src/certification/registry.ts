@@ -46,7 +46,7 @@ export function isCertified(adapterId: string): boolean {
 
 /** All certifications for a given adapter id, newest-first. */
 export function certificationsFor(adapterId: string): CertifiedVendor[] {
-  return CERTIFIED_VENDORS.filter((v) => v.adapterId === adapterId).slice().sort(
-    (a, b) => (a.certifiedAt < b.certifiedAt ? 1 : -1),
-  );
+  return CERTIFIED_VENDORS.filter((v) => v.adapterId === adapterId)
+    .slice()
+    .sort((a, b) => (a.certifiedAt < b.certifiedAt ? 1 : -1));
 }

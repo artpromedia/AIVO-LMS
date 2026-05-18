@@ -7,7 +7,12 @@ import { PLATFORM_NAV } from "@/components/layout/role-shells";
 import { listVulnerabilities } from "@/lib/db/repos";
 
 const SEV_TONE = { critical: "danger", high: "danger", medium: "warning", low: "neutral" } as const;
-const STATUS_TONE = { open: "danger", triaged: "warning", fixed: "success", wontfix: "neutral" } as const;
+const STATUS_TONE = {
+  open: "danger",
+  triaged: "warning",
+  fixed: "success",
+  wontfix: "neutral",
+} as const;
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
@@ -26,7 +31,9 @@ export default async function Page() {
         description="Dependency, container, IaC, and pen-test findings — triaged centrally."
       />
       {vulns.length === 0 ? (
-        <Card className="p-6 text-sm text-aivo-ink-soft">No vulnerabilities currently tracked.</Card>
+        <Card className="p-6 text-sm text-aivo-ink-soft">
+          No vulnerabilities currently tracked.
+        </Card>
       ) : (
         <div className="space-y-3">
           {vulns.map((v) => (

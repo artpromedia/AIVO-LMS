@@ -141,9 +141,7 @@ export async function requireLearnerAccess(
   const isInternal =
     typeof internalSvc === "string" &&
     internalSvc.length > 0 &&
-    (expectedToken
-      ? typeof serviceToken === "string" && serviceToken === expectedToken
-      : true);
+    (expectedToken ? typeof serviceToken === "string" && serviceToken === expectedToken : true);
 
   if (!auth?.tenantId && !isInternal) {
     reply.code(401).send({ error: "Authentication required" });

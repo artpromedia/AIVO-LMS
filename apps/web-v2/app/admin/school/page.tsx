@@ -36,13 +36,21 @@ export default async function SchoolAdminHome() {
           <Card key={s.k} className="p-[var(--aivo-density-card-pad)]">
             <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{s.k}</p>
             <p className="mt-1 font-display text-3xl font-bold">{s.v}</p>
-            <Badge tone="primary" className="mt-2">Demo data</Badge>
+            <Badge tone="primary" className="mt-2">
+              Demo data
+            </Badge>
           </Card>
         ))}
       </div>
-      <SectionHeader className="mt-10" title="Compliance" description="COPPA, FERPA, and SOC 2 reporting lives here." />
+      <SectionHeader
+        className="mt-10"
+        title="Compliance"
+        description="COPPA, FERPA, and SOC 2 reporting lives here."
+      />
       <Card className="p-[var(--aivo-density-card-pad)]">
-        <p className="text-sm text-aivo-ink-soft">All systems nominal. Detailed reports arrive in Sprint 23.</p>
+        <p className="text-sm text-aivo-ink-soft">
+          All systems nominal. Detailed reports arrive in Sprint 23.
+        </p>
       </Card>
     </AppShell>
   );

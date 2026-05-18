@@ -16,6 +16,9 @@
 # Generated artifacts
 packages/api-client/openapi/**
 packages/api-client/src/_generated/**
+# Per-service typed clients produced by `pnpm api:generate`. Re-format
+# would fight openapi-typescript's deterministic output every run.
+packages/api-client/src/*-svc.ts
 **/*.snap
 **/_generated/**
 

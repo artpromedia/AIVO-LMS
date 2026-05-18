@@ -68,7 +68,12 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
         metadata: { lessonRunId: existing.lessonRun.id },
       });
       return ok(
-        { lessonRun: existing.lessonRun, plan: existing.plan, resumed: true, mission: picked.mission },
+        {
+          lessonRun: existing.lessonRun,
+          plan: existing.plan,
+          resumed: true,
+          mission: picked.mission,
+        },
         requestId,
       );
     }

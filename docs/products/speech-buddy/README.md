@@ -23,11 +23,11 @@ Speech Buddy is shipped as three age-band profiles. Vocabulary, sentence length,
 and persona tone differ per band. The same underlying agent and safety layers
 apply to all bands.
 
-| Band | Ages  | Persona tone                                        | Vocabulary band |
-|------|-------|-----------------------------------------------------|-----------------|
-| K1   | 6–9   | Warm, playful, lots of praise, very short sentences | ~CEFR A1        |
-| K2   | 10–12 | Friendly peer-mentor, light humour, concrete examples | ~CEFR A2–B1   |
-| K3   | 13–15 | Respectful coach, gives reasoning, treats the child as capable | ~CEFR B1–B2 |
+| Band | Ages  | Persona tone                                                   | Vocabulary band |
+| ---- | ----- | -------------------------------------------------------------- | --------------- |
+| K1   | 6–9   | Warm, playful, lots of praise, very short sentences            | ~CEFR A1        |
+| K2   | 10–12 | Friendly peer-mentor, light humour, concrete examples          | ~CEFR A2–B1     |
+| K3   | 13–15 | Respectful coach, gives reasoning, treats the child as capable | ~CEFR B1–B2     |
 
 Every prompt and TTS voice preset is selected per band. The age band is
 captured at consent time (see `safety.md`) and stored with the session, never
@@ -41,19 +41,19 @@ Speech Buddy follows the CASEL five-domain framework. Each domain decomposes
 into a small number of concrete, observable **micro-skills**. A turn or session
 can yield evidence for one or more micro-skills via the `scoreTurn` rubric.
 
-| Domain                       | Micro-skill ID            | What it looks like in a session                                |
-|------------------------------|---------------------------|----------------------------------------------------------------|
-| Self-awareness               | `name_a_feeling`          | Child names an emotion they (or a character) feel              |
-| Self-awareness               | `notice_body_signal`      | Child describes a physical signal of an emotion                |
-| Self-management              | `pause_before_reacting`   | Child takes a beat instead of reacting impulsively             |
-| Self-management              | `use_calm_strategy`       | Child names or uses a calming strategy (breathe, count, etc.)  |
-| Social-awareness             | `read_a_facial_cue`       | Child correctly interprets a described facial expression       |
-| Social-awareness             | `take_others_perspective` | Child voices what another character might be feeling           |
-| Relationship skills          | `ask_open_question`       | Child asks a question that invites more than yes/no            |
-| Relationship skills          | `give_a_compliment`       | Child gives a specific, sincere compliment                     |
-| Relationship skills          | `repair_a_rupture`        | Child apologises or proposes a way to fix a small conflict     |
-| Responsible decision-making  | `weigh_two_options`       | Child names two options and a reason for each                  |
-| Responsible decision-making  | `consider_consequences`   | Child names a likely outcome of an action                      |
+| Domain                      | Micro-skill ID            | What it looks like in a session                               |
+| --------------------------- | ------------------------- | ------------------------------------------------------------- |
+| Self-awareness              | `name_a_feeling`          | Child names an emotion they (or a character) feel             |
+| Self-awareness              | `notice_body_signal`      | Child describes a physical signal of an emotion               |
+| Self-management             | `pause_before_reacting`   | Child takes a beat instead of reacting impulsively            |
+| Self-management             | `use_calm_strategy`       | Child names or uses a calming strategy (breathe, count, etc.) |
+| Social-awareness            | `read_a_facial_cue`       | Child correctly interprets a described facial expression      |
+| Social-awareness            | `take_others_perspective` | Child voices what another character might be feeling          |
+| Relationship skills         | `ask_open_question`       | Child asks a question that invites more than yes/no           |
+| Relationship skills         | `give_a_compliment`       | Child gives a specific, sincere compliment                    |
+| Relationship skills         | `repair_a_rupture`        | Child apologises or proposes a way to fix a small conflict    |
+| Responsible decision-making | `weigh_two_options`       | Child names two options and a reason for each                 |
+| Responsible decision-making | `consider_consequences`   | Child names a likely outcome of an action                     |
 
 Micro-skill IDs are stable identifiers used by `SkillTag` in
 `packages/events/src/index.ts` and by the engagement-svc skill profile.

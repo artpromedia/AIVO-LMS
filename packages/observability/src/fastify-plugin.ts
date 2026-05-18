@@ -5,12 +5,21 @@
  *  - Common http_requests_total counter and http_request_duration_seconds histogram
  */
 import { randomUUID } from "node:crypto";
-import { createLogger, createCounter, createHistogram, exportMetrics, REQUEST_ID_HEADER } from "./index.js";
+import {
+  createLogger,
+  createCounter,
+  createHistogram,
+  exportMetrics,
+  REQUEST_ID_HEADER,
+} from "./index.js";
 
 export function registerObservabilityPlugin(app: any, serviceName: string) {
   const logger = createLogger(serviceName);
   const requestsTotal = createCounter("http_requests_total", ["method", "path", "status"]);
-  const requestDuration = createHistogram("http_request_duration_seconds", undefined, ["method", "path"]);
+  const requestDuration = createHistogram("http_request_duration_seconds", undefined, [
+    "method",
+    "path",
+  ]);
 
   // Request ID hook
   app.addHook("onRequest", async (req: any, reply: any) => {

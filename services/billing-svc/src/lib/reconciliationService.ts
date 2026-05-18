@@ -23,16 +23,9 @@ import type Stripe from "stripe";
 import type { JobOutcome } from "@aivo/scheduling";
 import { subscriptions, tutorSubscriptions } from "@aivo/db";
 import { createLogger } from "@aivo/observability";
-import {
-  getStripe,
-  StripeNotConfiguredError,
-  STRIPE_METADATA_TUTOR_SKU_KEY,
-} from "./stripe.js";
+import { getStripe, StripeNotConfiguredError, STRIPE_METADATA_TUTOR_SKU_KEY } from "./stripe.js";
 import { isTutorSku, type TutorSku } from "@aivo/billing-entitlements";
-import {
-  reconciliationRuns,
-  reconciliationDrift,
-} from "./metrics.js";
+import { reconciliationRuns, reconciliationDrift } from "./metrics.js";
 
 const log = createLogger("billing-svc.reconciliation");
 

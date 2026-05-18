@@ -299,7 +299,7 @@ export const initLearningPathSchema = {
   operationId: "initLearningPath",
   summary: "Initialize a subject learning path",
   description:
-    "Idempotent: returns the existing path with `status: \"already_exists\"` if one is present, otherwise creates one with default topics and best-effort upgrades to LLM-personalized topics.",
+    'Idempotent: returns the existing path with `status: "already_exists"` if one is present, otherwise creates one with default topics and best-effort upgrades to LLM-personalized topics.',
   params: {
     type: "object",
     required: ["learnerId", "subject"],

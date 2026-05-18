@@ -24,7 +24,14 @@ const bodySchema = z.object({
     .min(1)
     .max(20),
   voiceId: z
-    .enum(["warm_female", "warm_male", "calm_neutral", "kid_friendly", "narrator_low", "narrator_high"])
+    .enum([
+      "warm_female",
+      "warm_male",
+      "calm_neutral",
+      "kid_friendly",
+      "narrator_low",
+      "narrator_high",
+    ])
     .optional(),
   languageCode: z.string().min(2).max(16).optional(),
 });
@@ -37,7 +44,12 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (response) return response;
     const scopeErr = requireLearnerScope(session!, learnerId, requestId);
     if (scopeErr) return scopeErr;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection"],
+      requestId,
+    );
     if (consentErr) return consentErr;
     let body: unknown = {};
     try {
@@ -48,7 +60,10 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     const parsed = bodySchema.safeParse(body);
     if (!parsed.success) {
       return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." },
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
         requestId,
       );
     }

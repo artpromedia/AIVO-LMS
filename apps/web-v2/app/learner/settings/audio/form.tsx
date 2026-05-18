@@ -90,11 +90,7 @@ export function AudioPrefForm({
     <div className="space-y-4">
       {canToggleEnabled && (
         <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={enabled}
-            onChange={(e) => setEnabled(e.target.checked)}
-          />
+          <input type="checkbox" checked={enabled} onChange={(e) => setEnabled(e.target.checked)} />
           Enable read-aloud for this learner
         </label>
       )}

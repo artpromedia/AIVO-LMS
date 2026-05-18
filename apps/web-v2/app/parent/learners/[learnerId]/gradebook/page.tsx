@@ -152,7 +152,10 @@ export default async function ParentGradebookPage({
                       const skill = skillsById.get(sm.skillId);
                       const subject = subjectsById.get(sm.subjectId);
                       return (
-                        <tr key={`${sm.learnerId}-${sm.skillId}`} className="border-t border-aivo-border">
+                        <tr
+                          key={`${sm.learnerId}-${sm.skillId}`}
+                          className="border-t border-aivo-border"
+                        >
                           <td className="px-4 py-2 font-medium">{skill?.name ?? sm.skillId}</td>
                           <td className="px-4 py-2 text-aivo-ink-soft">{subject?.name ?? "—"}</td>
                           <td className="px-4 py-2">
@@ -206,8 +209,8 @@ export default async function ParentGradebookPage({
                         run.status === "completed"
                           ? "success"
                           : run.status === "failed"
-                          ? "danger"
-                          : "neutral"
+                            ? "danger"
+                            : "neutral"
                       }
                     >
                       {run.status}

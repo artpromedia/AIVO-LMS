@@ -18,12 +18,7 @@ import { useEffect, useState } from "react";
 import { Sparkles, Clock, AlertTriangle, Eye, TrendingUp } from "lucide-react";
 
 type Modality = "visual" | "auditory" | "kinesthetic" | "reading";
-type TimeOfDay =
-  | "early-morning"
-  | "morning"
-  | "midday"
-  | "afternoon"
-  | "evening";
+type TimeOfDay = "early-morning" | "morning" | "midday" | "afternoon" | "evening";
 
 interface TimeOfDayInsight {
   timeOfDay: TimeOfDay;
@@ -77,12 +72,7 @@ interface Props {
   apiBase?: string;
 }
 
-export function WhatsWorkingPanel({
-  learnerId,
-  learnerName,
-  accessToken,
-  apiBase = "",
-}: Props) {
+export function WhatsWorkingPanel({ learnerId, learnerName, accessToken, apiBase = "" }: Props) {
   const [data, setData] = useState<WhatsWorkingInsights | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -147,10 +137,7 @@ export function WhatsWorkingPanel({
   // The analytics module returns subject × modality cells. For the
   // headline "modality that clicks" tile we collapse cells to a per-
   // modality average accuracy weighted by sessions and pick the best.
-  const modalityAgg = new Map<
-    Modality,
-    { sessions: number; weightedAcc: number }
-  >();
+  const modalityAgg = new Map<Modality, { sessions: number; weightedAcc: number }>();
   for (const c of data.modalityFit) {
     const cur = modalityAgg.get(c.modality) ?? { sessions: 0, weightedAcc: 0 };
     cur.sessions += c.sessions;
@@ -168,15 +155,10 @@ export function WhatsWorkingPanel({
   const topHotspot = data.frustrationHotspots[0];
 
   return (
-    <section
-      className="vi-card p-5 lg:p-6"
-      aria-label={`What's working for ${learnerName}`}
-    >
+    <section className="vi-card p-5 lg:p-6" aria-label={`What's working for ${learnerName}`}>
       <div className="flex items-center gap-2 mb-3">
         <Sparkles size={18} aria-hidden="true" />
-        <h3 className="text-base font-heading font-bold">
-          What's working — {learnerName}
-        </h3>
+        <h3 className="text-base font-heading font-bold">What's working — {learnerName}</h3>
         <span className="ml-auto text-xs vi-text-muted">
           {data.totalSessions} sessions · last {data.windowDays} days
         </span>
@@ -191,9 +173,7 @@ export function WhatsWorkingPanel({
           </div>
           {data.bestWindow ? (
             <div className="mt-1">
-              <div className="text-lg font-bold">
-                {TIME_LABEL[data.bestWindow.timeOfDay]}
-              </div>
+              <div className="text-lg font-bold">{TIME_LABEL[data.bestWindow.timeOfDay]}</div>
               <div className="text-xs vi-text-muted">
                 {Math.round(data.bestWindow.meanAccuracy * 100)}% accuracy ·{" "}
                 {Math.round(data.bestWindow.meanAttentionMinutes)} min attention
@@ -214,18 +194,14 @@ export function WhatsWorkingPanel({
           </div>
           {topModality ? (
             <div className="mt-1">
-              <div className="text-lg font-bold">
-                {MODALITY_LABEL[topModality.modality]}
-              </div>
+              <div className="text-lg font-bold">{MODALITY_LABEL[topModality.modality]}</div>
               <div className="text-xs vi-text-muted">
-                {Math.round(topModality.meanAccuracy * 100)}% accuracy across{" "}
-                {topModality.sessions} session{topModality.sessions === 1 ? "" : "s"}
+                {Math.round(topModality.meanAccuracy * 100)}% accuracy across {topModality.sessions}{" "}
+                session{topModality.sessions === 1 ? "" : "s"}
               </div>
             </div>
           ) : (
-            <div className="mt-1 text-sm vi-text-muted">
-              No modality data yet.
-            </div>
+            <div className="mt-1 text-sm vi-text-muted">No modality data yet.</div>
           )}
         </div>
 
@@ -239,13 +215,11 @@ export function WhatsWorkingPanel({
             <div className="mt-1">
               <div className="text-lg font-bold capitalize">
                 {topHotspot.subject} ·{" "}
-                {topHotspot.modality === "unknown"
-                  ? "mixed"
-                  : MODALITY_LABEL[topHotspot.modality]}
+                {topHotspot.modality === "unknown" ? "mixed" : MODALITY_LABEL[topHotspot.modality]}
               </div>
               <div className="text-xs vi-text-muted">
-                {Math.round(topHotspot.meanFrustration * 100)}% frustration
-                across {topHotspot.sessions} session
+                {Math.round(topHotspot.meanFrustration * 100)}% frustration across{" "}
+                {topHotspot.sessions} session
                 {topHotspot.sessions === 1 ? "" : "s"}
               </div>
             </div>

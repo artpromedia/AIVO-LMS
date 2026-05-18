@@ -4,7 +4,7 @@ This document is the operational contract for school + district
 rostering. It pairs with:
 
 - `docs/sis-sync-contract.md` — the original `SisProvider` interface
-  + adapter contract (Sprint 09 baseline)
+  - adapter contract (Sprint 09 baseline)
 - `services/integration-svc/src/services/{clever,classlink}-adapter.ts`
   — vendor adapters
 - `services/integrations-svc/src/routes/connectors.ts` — connector
@@ -14,21 +14,22 @@ rostering. It pairs with:
 - `scripts/rostering-audit.mjs` (root script `rostering:audit`)
 
 > Sprint 02 documented the `integration-svc` (port 3068, SIS providers
-> + LTI 1.3) vs `integrations-svc` (port 3012, connector REST surface)
-> split. Both are legitimate. This sprint does not consolidate them;
-> see the local-dev guide.
+>
+> - LTI 1.3) vs `integrations-svc` (port 3012, connector REST surface)
+>   split. Both are legitimate. This sprint does not consolidate them;
+>   see the local-dev guide.
 
 ## Import sources
 
-| Source | Path | Status |
-|---|---|---|
-| OneRoster CSV bundle | admin upload | Sprint 12 baseline |
-| OneRoster REST | school SIS pull | Sprint 12 baseline |
-| Clever roster JSON export | `createCleverAdapterFromExport` | shipped (legacy) |
-| ClassLink roster JSON export | `createClassLinkAdapterFromExport` | shipped (legacy) |
-| Manual CSV (schools / classes / teachers / students / guardians / enrollments) | admin upload fallback | Sprint 12 baseline |
-| Clever live OAuth | feature flag `cleverLiveSync` | Sprint 12b |
-| ClassLink live OAuth | feature flag `classlinkLiveSync` | Sprint 12b |
+| Source                                                                         | Path                               | Status             |
+| ------------------------------------------------------------------------------ | ---------------------------------- | ------------------ |
+| OneRoster CSV bundle                                                           | admin upload                       | Sprint 12 baseline |
+| OneRoster REST                                                                 | school SIS pull                    | Sprint 12 baseline |
+| Clever roster JSON export                                                      | `createCleverAdapterFromExport`    | shipped (legacy)   |
+| ClassLink roster JSON export                                                   | `createClassLinkAdapterFromExport` | shipped (legacy)   |
+| Manual CSV (schools / classes / teachers / students / guardians / enrollments) | admin upload fallback              | Sprint 12 baseline |
+| Clever live OAuth                                                              | feature flag `cleverLiveSync`      | Sprint 12b         |
+| ClassLink live OAuth                                                           | feature flag `classlinkLiveSync`   | Sprint 12b         |
 
 ## Import flow
 
@@ -79,12 +80,12 @@ Sprint 12 extends the coverage with the rostering audit.
 A per-row failure does NOT abort the batch. The import receipt always
 shows:
 
-| Field | Meaning |
-|---|---|
-| `succeeded` | rows applied |
-| `pending` | rows held for consent / referential integrity |
-| `failed` | rows that errored, with `rowRef` + `error` |
-| `skipped` | rows that match an existing record byte-for-byte (no-op) |
+| Field       | Meaning                                                  |
+| ----------- | -------------------------------------------------------- |
+| `succeeded` | rows applied                                             |
+| `pending`   | rows held for consent / referential integrity            |
+| `failed`    | rows that errored, with `rowRef` + `error`               |
+| `skipped`   | rows that match an existing record byte-for-byte (no-op) |
 
 The UI surfaces each bucket separately and supports retrying failed
 rows after the underlying cause is fixed.

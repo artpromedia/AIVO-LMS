@@ -9,7 +9,12 @@ export interface MathExpressionSurfaceProps {
   onEvent?: (event: SurfaceTelemetryEvent) => void;
 }
 
-export function MathExpressionSurface({ surface, disabled = false, onSubmit, onEvent }: MathExpressionSurfaceProps) {
+export function MathExpressionSurface({
+  surface,
+  disabled = false,
+  onSubmit,
+  onEvent,
+}: MathExpressionSurfaceProps) {
   const [value, setValue] = useState("");
 
   const isRequired = surface.capture.finalAnswer && surface.answerInput?.type !== "none";

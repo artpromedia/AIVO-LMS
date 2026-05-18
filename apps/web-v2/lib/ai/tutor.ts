@@ -20,10 +20,7 @@ import type {
   SkillVersion,
   Subject,
 } from "@/lib/db/types";
-import {
-  GeneratedLessonPlanSchema,
-  type GeneratedLessonPlanInput,
-} from "@/lib/validators/lesson";
+import { GeneratedLessonPlanSchema, type GeneratedLessonPlanInput } from "@/lib/validators/lesson";
 import { generateDeterministicLessonPlan } from "@/lib/learner/lesson-plan";
 import { logger } from "@/lib/observability/logger";
 

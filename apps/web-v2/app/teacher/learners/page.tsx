@@ -45,8 +45,8 @@ export default async function TeacherLearnersPage() {
                     <div>
                       <p className="font-semibold">{l.displayName}</p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Age {new Date().getFullYear() - l.birthYear} ·{" "}
-                        Functioning level {l.functioningLevel}
+                        Age {new Date().getFullYear() - l.birthYear} · Functioning level{" "}
+                        {l.functioningLevel}
                       </p>
                     </div>
                     <Badge tone="neutral">{l.readinessState}</Badge>

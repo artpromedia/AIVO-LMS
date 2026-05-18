@@ -34,15 +34,15 @@ const repoRoot = resolve(__dirname, "..");
 // Grade bands are matched as substring tokens against seed `gradeBand`
 // declarations so a seed that declares `gradeBand: "K-2"` covers K, 1, 2.
 const REQUIRED_COVERAGE = {
-  math:    ["K", "1", "2", "3", "4", "5", "6", "7", "8"],
-  ela:     ["K", "1", "2", "3", "4", "5", "6", "7", "8"],
+  math: ["K", "1", "2", "3", "4", "5", "6", "7", "8"],
+  ela: ["K", "1", "2", "3", "4", "5", "6", "7", "8"],
   science: ["K", "1", "2", "3", "4", "5", "6", "7", "8"],
   writing: ["K", "1", "2", "3", "4", "5", "6", "7", "8"],
 };
 
 const MIN_ITEMS_PER_SUBJECT = 20; // a smoke threshold — full requirement is
-                                  // much higher but this catches the
-                                  // current empty-item-bank state.
+// much higher but this catches the
+// current empty-item-bank state.
 
 // ---------------------------------------------------------------------------
 // 1. Walk every seed file in packages/skill-graphs/src/seeds/* and collect
@@ -175,7 +175,9 @@ for (const subj of subjects) {
     errors.push(`${subj}: missing grade bands: ${missing.join(", ")}`);
   }
   if (items < MIN_ITEMS_PER_SUBJECT) {
-    errors.push(`${subj}: item bank has ${items} items, minimum production threshold is ${MIN_ITEMS_PER_SUBJECT}`);
+    errors.push(
+      `${subj}: item bank has ${items} items, minimum production threshold is ${MIN_ITEMS_PER_SUBJECT}`,
+    );
   }
 }
 

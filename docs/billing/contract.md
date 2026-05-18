@@ -19,12 +19,12 @@ idempotency. It is paired with:
 
 Defined in `packages/billing-entitlements::PlanId`:
 
-| Plan | Audience | Notes |
-|---|---|---|
-| `free` | new account before checkout | gates everything except marketing-facing learners trial |
-| `single` | one learner family plan | monthly or annual |
-| `family` | multi-learner family plan | up to N learners; check current pricing page |
-| `district` | enterprise PO-billed | seat-based; provisioned by admin-svc |
+| Plan       | Audience                    | Notes                                                   |
+| ---------- | --------------------------- | ------------------------------------------------------- |
+| `free`     | new account before checkout | gates everything except marketing-facing learners trial |
+| `single`   | one learner family plan     | monthly or annual                                       |
+| `family`   | multi-learner family plan   | up to N learners; check current pricing page            |
+| `district` | enterprise PO-billed        | seat-based; provisioned by admin-svc                    |
 
 Plan-to-included-SKUs is in `getIncludedTutorSkusForPlan(plan)`. The
 add-on SKUs (`ADDON_TUTOR_*`) extend a plan with extra tutors. No
@@ -57,13 +57,13 @@ active → grace_period → canceled → inactive
 
 `evaluateTutorEntitlement` returns one of:
 
-| reason | entitled | UI affordance |
-|---|---|---|
-| `included` | true | tutor enabled |
-| `purchased` | true | tutor enabled (add-on) |
-| `grace_period` | true | "your add-on will expire on {date}" banner |
-| `not_entitled` | false | "purchase add-on" CTA |
-| `subscription_inactive` | false | "renew subscription" CTA |
+| reason                  | entitled | UI affordance                              |
+| ----------------------- | -------- | ------------------------------------------ |
+| `included`              | true     | tutor enabled                              |
+| `purchased`             | true     | tutor enabled (add-on)                     |
+| `grace_period`          | true     | "your add-on will expire on {date}" banner |
+| `not_entitled`          | false    | "purchase add-on" CTA                      |
+| `subscription_inactive` | false    | "renew subscription" CTA                   |
 
 Anything that gates a tutor MUST call `evaluateTutorEntitlement` —
 never check `subscription.plan` directly. The audit script
@@ -73,13 +73,13 @@ enforces this on the web-v2 BFF.
 
 `services/billing-svc/src/routes/coupons.ts` exposes:
 
-| Method | Path | Audience |
-|---|---|---|
-| `POST` | `/api/billing/coupons/validate` | parent / staff — quote, no redemption |
-| `POST` | `/api/billing/coupons/redeem` | parent / staff — single-use redemption |
-| `GET` | `/api/billing/admin/coupons` | admin |
-| `POST` | `/api/billing/admin/coupons` | admin |
-| `DELETE` | `/api/billing/admin/coupons/:code` | admin |
+| Method   | Path                               | Audience                               |
+| -------- | ---------------------------------- | -------------------------------------- |
+| `POST`   | `/api/billing/coupons/validate`    | parent / staff — quote, no redemption  |
+| `POST`   | `/api/billing/coupons/redeem`      | parent / staff — single-use redemption |
+| `GET`    | `/api/billing/admin/coupons`       | admin                                  |
+| `POST`   | `/api/billing/admin/coupons`       | admin                                  |
+| `DELETE` | `/api/billing/admin/coupons/:code` | admin                                  |
 
 Coupon kinds:
 
@@ -95,17 +95,17 @@ Every redemption emits `billing.coupon.redeemed`; rejections emit
 
 ## Stripe checkout / portal
 
-| Action | Endpoint |
-|---|---|
-| Start Stripe Checkout | `POST /api/billing/checkout/session` |
-| Open customer portal | `POST /api/billing/portal/session` |
-| Cancel at period end | `POST /api/billing/subscription/:tenantId/cancel` |
-| Resume / undo cancel | `POST /api/billing/subscription/:tenantId/resume` |
-| Add tutor add-on | `POST /api/billing/addons` |
-| Remove tutor add-on | `DELETE /api/billing/addons/:tenantId/:tutorId` |
-| Read entitlements | `GET /api/billing/entitlements/:tenantId` |
-| Read usage | `GET /api/billing/usage/:tenantId` |
-| Read invoices | `GET /api/billing/invoices/:tenantId` |
+| Action                | Endpoint                                          |
+| --------------------- | ------------------------------------------------- |
+| Start Stripe Checkout | `POST /api/billing/checkout/session`              |
+| Open customer portal  | `POST /api/billing/portal/session`                |
+| Cancel at period end  | `POST /api/billing/subscription/:tenantId/cancel` |
+| Resume / undo cancel  | `POST /api/billing/subscription/:tenantId/resume` |
+| Add tutor add-on      | `POST /api/billing/addons`                        |
+| Remove tutor add-on   | `DELETE /api/billing/addons/:tenantId/:tutorId`   |
+| Read entitlements     | `GET /api/billing/entitlements/:tenantId`         |
+| Read usage            | `GET /api/billing/usage/:tenantId`                |
+| Read invoices         | `GET /api/billing/invoices/:tenantId`             |
 
 `lib/stripe.ts` uses Stripe idempotency keys on every mutating call
 (`idempotencyKey: "checkout:plan:<tenant>:<plan>:<user>"`,

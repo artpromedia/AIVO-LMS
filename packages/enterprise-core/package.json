@@ -13,7 +13,11 @@
       "default": "./dist/index.js"
     }
   },
-  "files": ["dist", "src", "package.json"],
+  "files": [
+    "dist",
+    "src",
+    "package.json"
+  ],
   "scripts": {
     "build": "tsc",
     "prepare": "tsc",
@@ -23,7 +27,9 @@
     "fastify": "^5.0.0"
   },
   "peerDependenciesMeta": {
-    "fastify": { "optional": true }
+    "fastify": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

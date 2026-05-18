@@ -28,7 +28,10 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-const NAV_SECTIONS: { label: string; items: { href: string; label: string; Icon: LucideIcon }[] }[] = [
+const NAV_SECTIONS: {
+  label: string;
+  items: { href: string; label: string; Icon: LucideIcon }[];
+}[] = [
   {
     label: "Overview",
     items: [
@@ -61,9 +64,7 @@ const NAV_SECTIONS: { label: string; items: { href: string; label: string; Icon:
   },
   {
     label: "Connect",
-    items: [
-      { href: "/dashboard/district/integrations", label: "Integrations", Icon: Plug },
-    ],
+    items: [{ href: "/dashboard/district/integrations", label: "Integrations", Icon: Plug }],
   },
   {
     label: "Admin",
@@ -84,7 +85,8 @@ export default function DistrictLayout({ children }: { children: React.ReactNode
 
   useEffect(() => {
     if (!loading && !user) router.push("/district/login");
-    if (!loading && user && !["DISTRICT_ADMIN", "PLATFORM_ADMIN"].includes(user.role)) router.push("/");
+    if (!loading && user && !["DISTRICT_ADMIN", "PLATFORM_ADMIN"].includes(user.role))
+      router.push("/");
   }, [user, loading, router]);
 
   if (loading || !user) return null;
@@ -106,11 +108,19 @@ export default function DistrictLayout({ children }: { children: React.ReactNode
           {!collapsed && (
             <Link href="/dashboard/district" className="flex items-center gap-3">
               <div className="w-9 h-9 bg-[hsl(var(--visual-primary))] rounded-2xl flex items-center justify-center">
-                <Image src="/images/aivo-logo-white.png" alt="AIVO" width={22} height={22} style={{ height: "auto" }} />
+                <Image
+                  src="/images/aivo-logo-white.png"
+                  alt="AIVO"
+                  width={22}
+                  height={22}
+                  style={{ height: "auto" }}
+                />
               </div>
               <div>
                 <p className="font-bold vi-text text-sm">AIVO</p>
-                <p className="text-xs text-[hsl(var(--visual-primary))] font-semibold uppercase tracking-wider">District Admin</p>
+                <p className="text-xs text-[hsl(var(--visual-primary))] font-semibold uppercase tracking-wider">
+                  District Admin
+                </p>
               </div>
             </Link>
           )}
@@ -119,7 +129,11 @@ export default function DistrictLayout({ children }: { children: React.ReactNode
             className="vi-text-muted hover:vi-text p-1 transition"
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            {collapsed ? <ChevronRight size={16} strokeWidth={2.5} /> : <ChevronLeft size={16} strokeWidth={2.5} />}
+            {collapsed ? (
+              <ChevronRight size={16} strokeWidth={2.5} />
+            ) : (
+              <ChevronLeft size={16} strokeWidth={2.5} />
+            )}
           </button>
         </div>
 
@@ -127,7 +141,9 @@ export default function DistrictLayout({ children }: { children: React.ReactNode
           {NAV_SECTIONS.map((section) => (
             <div key={section.label} className="mb-3">
               {!collapsed && (
-                <p className="px-4 text-xs font-bold vi-text-muted uppercase tracking-wider mb-1">{section.label}</p>
+                <p className="px-4 text-xs font-bold vi-text-muted uppercase tracking-wider mb-1">
+                  {section.label}
+                </p>
               )}
               {section.items.map((item) => {
                 const Icon = item.Icon;
@@ -145,7 +161,12 @@ export default function DistrictLayout({ children }: { children: React.ReactNode
                     }`}
                     style={{ minHeight: 44 }}
                   >
-                    <Icon size={18} strokeWidth={2.5} className="flex-shrink-0" aria-hidden="true" />
+                    <Icon
+                      size={18}
+                      strokeWidth={2.5}
+                      className="flex-shrink-0"
+                      aria-hidden="true"
+                    />
                     {!collapsed && <span>{item.label}</span>}
                   </Link>
                 );
@@ -163,7 +184,9 @@ export default function DistrictLayout({ children }: { children: React.ReactNode
               </div>
               <div className="vi-surface-soft rounded-2xl p-3 mb-3">
                 <p className="text-xs font-medium text-[hsl(var(--visual-primary))]">Need help?</p>
-                <p className="text-xs vi-text-muted mt-0.5">Contact your platform administrator for support.</p>
+                <p className="text-xs vi-text-muted mt-0.5">
+                  Contact your platform administrator for support.
+                </p>
               </div>
             </>
           )}

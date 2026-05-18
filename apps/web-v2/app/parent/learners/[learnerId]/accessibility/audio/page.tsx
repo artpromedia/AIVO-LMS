@@ -43,11 +43,7 @@ export default async function Page({ params }: PageProps) {
         description="Choose the voice your learner hears and decide whether read-aloud is turned on at all. Captions can be displayed alongside playback."
       />
       <Card className="p-[var(--aivo-density-card-pad)]">
-        <AudioPrefForm
-          learnerId={learnerId}
-          initial={pref}
-          canToggleEnabled={true}
-        />
+        <AudioPrefForm learnerId={learnerId} initial={pref} canToggleEnabled={true} />
       </Card>
     </AppShell>
   );

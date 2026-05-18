@@ -78,9 +78,7 @@ export default function ActivityFeedPage() {
       <h1 className="text-2xl font-heading font-bold vi-text">Activity Feed</h1>
 
       {entries.length === 0 ? (
-        <div className="vi-card p-12 text-center vi-text-muted text-sm">
-          No recent activity.
-        </div>
+        <div className="vi-card p-12 text-center vi-text-muted text-sm">No recent activity.</div>
       ) : (
         <div className="vi-card p-6">
           <div className="relative">
@@ -93,7 +91,9 @@ export default function ActivityFeedPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-sm font-medium vi-text">{entry.actorEmail}</span>
-                        <span className={`px-2 py-0.5 text-[10px] rounded font-semibold ${ACTION_COLORS[entry.action] || "vi-surface-soft vi-text-muted"}`}>
+                        <span
+                          className={`px-2 py-0.5 text-[10px] rounded font-semibold ${ACTION_COLORS[entry.action] || "vi-surface-soft vi-text-muted"}`}
+                        >
                           {entry.action.replace(/_/g, " ")}
                         </span>
                       </div>

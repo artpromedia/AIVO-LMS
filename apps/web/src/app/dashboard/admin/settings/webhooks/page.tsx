@@ -16,11 +16,17 @@ interface Webhook {
 }
 
 const AVAILABLE_EVENTS = [
-  "user.created", "user.updated", "user.deleted",
-  "learner.created", "learner.updated",
-  "session.completed", "assessment.completed",
-  "subscription.created", "subscription.cancelled",
-  "brain.cloned", "brain.updated",
+  "user.created",
+  "user.updated",
+  "user.deleted",
+  "learner.created",
+  "learner.updated",
+  "session.completed",
+  "assessment.completed",
+  "subscription.created",
+  "subscription.cancelled",
+  "brain.cloned",
+  "brain.updated",
 ];
 
 export default function WebhooksPage() {
@@ -31,9 +37,8 @@ export default function WebhooksPage() {
   const [newEvents, setNewEvents] = useState<string[]>([]);
 
   const toggleEvent = (event: string) => {
-    setNewEvents(newEvents.includes(event)
-      ? newEvents.filter((e) => e !== event)
-      : [...newEvents, event]
+    setNewEvents(
+      newEvents.includes(event) ? newEvents.filter((e) => e !== event) : [...newEvents, event],
     );
   };
 
@@ -57,7 +62,12 @@ export default function WebhooksPage() {
   return (
     <div className="p-8 space-y-6">
       <div className="flex items-center gap-3 text-sm vi-text-muted">
-        <Link href="/dashboard/admin/settings" className="hover:text-[hsl(var(--visual-primary))] transition">Settings</Link>
+        <Link
+          href="/dashboard/admin/settings"
+          className="hover:text-[hsl(var(--visual-primary))] transition"
+        >
+          Settings
+        </Link>
         <span>/</span>
         <span className="vi-text font-medium">Webhooks</span>
       </div>
@@ -69,7 +79,9 @@ export default function WebhooksPage() {
           </IconWell>
           <div>
             <h1 className="text-2xl font-heading font-bold vi-text">Webhooks</h1>
-            <p className="text-sm vi-text-muted mt-1">Configure webhook endpoints to receive real-time event notifications.</p>
+            <p className="text-sm vi-text-muted mt-1">
+              Configure webhook endpoints to receive real-time event notifications.
+            </p>
           </div>
         </div>
         <button
@@ -87,7 +99,9 @@ export default function WebhooksPage() {
             <WebhookIcon size={28} strokeWidth={2.5} aria-hidden="true" />
           </div>
           <p className="text-lg font-semibold vi-text">No webhooks configured</p>
-          <p className="text-sm vi-text-muted mt-1">Add a webhook endpoint to start receiving event notifications.</p>
+          <p className="text-sm vi-text-muted mt-1">
+            Add a webhook endpoint to start receiving event notifications.
+          </p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -98,15 +112,24 @@ export default function WebhooksPage() {
                   <p className="font-mono text-sm vi-text font-medium">{wh.url}</p>
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     {wh.events.map((evt) => (
-                      <span key={evt} className="text-xs vi-surface-soft text-[hsl(var(--visual-primary))] px-2 py-0.5 rounded-full">{evt}</span>
+                      <span
+                        key={evt}
+                        className="text-xs vi-surface-soft text-[hsl(var(--visual-primary))] px-2 py-0.5 rounded-full"
+                      >
+                        {evt}
+                      </span>
                     ))}
                   </div>
                   <p className="text-xs vi-text-muted mt-2">
-                    {wh.lastDeliveryAt ? `Last delivery: ${new Date(wh.lastDeliveryAt).toLocaleString()} (${wh.lastDeliveryStatus})` : "No deliveries yet"}
+                    {wh.lastDeliveryAt
+                      ? `Last delivery: ${new Date(wh.lastDeliveryAt).toLocaleString()} (${wh.lastDeliveryStatus})`
+                      : "No deliveries yet"}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${wh.active ? "bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]" : "vi-surface-soft vi-text-muted"}`}>
+                  <span
+                    className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${wh.active ? "bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]" : "vi-surface-soft vi-text-muted"}`}
+                  >
                     {wh.active ? "Active" : "Inactive"}
                   </span>
                   <button
@@ -126,7 +149,9 @@ export default function WebhooksPage() {
         <div className="vi-card p-6 space-y-4">
           <h2 className="text-lg font-heading font-bold vi-text">New Webhook</h2>
           <div>
-            <label htmlFor="webhook-url" className="block text-sm font-medium vi-text mb-1">Endpoint URL</label>
+            <label htmlFor="webhook-url" className="block text-sm font-medium vi-text mb-1">
+              Endpoint URL
+            </label>
             <input
               id="webhook-url"
               type="url"
@@ -140,7 +165,11 @@ export default function WebhooksPage() {
             <p className="text-sm font-medium vi-text mb-2">Events</p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
               {AVAILABLE_EVENTS.map((evt) => (
-                <label key={evt} className="flex items-center gap-2 cursor-pointer" htmlFor={`evt-${evt}`}>
+                <label
+                  key={evt}
+                  className="flex items-center gap-2 cursor-pointer"
+                  htmlFor={`evt-${evt}`}
+                >
                   <input
                     id={`evt-${evt}`}
                     type="checkbox"
@@ -154,7 +183,12 @@ export default function WebhooksPage() {
             </div>
           </div>
           <div className="flex gap-3 pt-2">
-            <button onClick={() => setShowCreate(false)} className="flex-1 py-2.5 rounded-xl border vi-border vi-text-muted font-semibold hover:vi-bg transition">Cancel</button>
+            <button
+              onClick={() => setShowCreate(false)}
+              className="flex-1 py-2.5 rounded-xl border vi-border vi-text-muted font-semibold hover:vi-bg transition"
+            >
+              Cancel
+            </button>
             <button
               onClick={handleCreate}
               disabled={!newUrl || newEvents.length === 0}

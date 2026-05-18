@@ -56,19 +56,14 @@ export function QuickActions({
     if (!l.functioningLevel) {
       actions.push({
         label: `Complete ${l.name}'s Assessment`,
-        description:
-          "Help us understand your child by completing the initial assessment (10 min).",
+        description: "Help us understand your child by completing the initial assessment (10 min).",
         href: `/dashboard/parent/learner/${l.id}/assessment`,
         Icon: ClipboardList,
         priority: 2,
         iconWrap: "bg-[hsl(var(--visual-surface))] text-[hsl(var(--visual-reading))]",
         card: "bg-[hsl(var(--visual-reading)/0.08)] border-[hsl(var(--visual-reading)/0.3)] hover:border-[hsl(var(--visual-reading)/0.5)]",
       });
-    } else if (
-      baselineCompleted[l.id] &&
-      !hasBrain[l.id] &&
-      !pendingReviews[l.id]
-    ) {
+    } else if (baselineCompleted[l.id] && !hasBrain[l.id] && !pendingReviews[l.id]) {
       actions.push({
         label: `${l.name}'s brain is being built!`,
         description: "We'll notify you when it's ready for review.",
@@ -94,9 +89,7 @@ export function QuickActions({
           <p className="text-[hsl(var(--visual-science))] font-heading font-bold text-base">
             All caught up!
           </p>
-          <p className="vi-text-muted text-sm font-medium">
-            Everyone is on track.
-          </p>
+          <p className="vi-text-muted text-sm font-medium">Everyone is on track.</p>
         </div>
       </div>
     );
@@ -127,12 +120,8 @@ export function QuickActions({
               <action.Icon size={22} strokeWidth={2.5} aria-hidden="true" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-heading font-bold vi-text">
-                {action.label}
-              </p>
-              <p className="text-xs vi-text-muted mt-0.5 font-medium">
-                {action.description}
-              </p>
+              <p className="text-sm font-heading font-bold vi-text">{action.label}</p>
+              <p className="text-xs vi-text-muted mt-0.5 font-medium">{action.description}</p>
             </div>
             <ChevronRight
               className="vi-text-muted group-hover:vi-text group-hover:translate-x-1 transition-all shrink-0"

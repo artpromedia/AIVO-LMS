@@ -112,11 +112,7 @@ export interface SkillGraph {
 
 /** Issues surfaced by `validateGraph()`. */
 export interface GraphIssue {
-  code:
-    | "duplicate_skill_id"
-    | "missing_prerequisite"
-    | "self_prerequisite"
-    | "cycle_detected";
+  code: "duplicate_skill_id" | "missing_prerequisite" | "self_prerequisite" | "cycle_detected";
   skillId?: string;
   detail: string;
 }

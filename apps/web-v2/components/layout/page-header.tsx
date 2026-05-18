@@ -15,17 +15,18 @@ export function PageHeader({
   className?: string;
 }) {
   return (
-    <header className={cn("flex flex-col gap-3 pb-6 sm:flex-row sm:items-end sm:justify-between", className)}>
+    <header
+      className={cn(
+        "flex flex-col gap-3 pb-6 sm:flex-row sm:items-end sm:justify-between",
+        className,
+      )}
+    >
       <div>
         {eyebrow ? (
-          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            {eyebrow}
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{eyebrow}</p>
         ) : null}
         <h1 className="mt-1 font-display text-3xl font-bold text-aivo-ink">{title}</h1>
-        {description ? (
-          <p className="mt-1 max-w-2xl text-aivo-ink-soft">{description}</p>
-        ) : null}
+        {description ? <p className="mt-1 max-w-2xl text-aivo-ink-soft">{description}</p> : null}
       </div>
       {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
     </header>

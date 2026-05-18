@@ -15,19 +15,38 @@ import Finale from "@/components/discovery/Finale";
 import { IconWell } from "@/components/discovery/_vi";
 import type { FunctioningLevel } from "@/components/discovery/types";
 
-function ViLoadingScreen({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle?: string }) {
+function ViLoadingScreen({
+  icon,
+  title,
+  subtitle,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  subtitle?: string;
+}) {
   return (
     <div className="fixed inset-0 vi-bg flex items-center justify-center px-6">
       <div className="vi-card p-8 max-w-md w-full text-center bg-gradient-to-br from-white via-[hsl(262_83%_58%/0.04)] to-[hsl(43_100%_50%/0.06)] border-2 border-[hsl(262_83%_58%/0.15)]">
         <div className="mx-auto mb-4 inline-flex">
-          <IconWell color="primary" size="lg">{icon}</IconWell>
+          <IconWell color="primary" size="lg">
+            {icon}
+          </IconWell>
         </div>
         <p className="text-base font-extrabold text-slate-900">{title}</p>
         {subtitle && <p className="text-sm text-slate-500 mt-1 font-semibold">{subtitle}</p>}
         <div className="flex gap-1.5 justify-center mt-5" aria-hidden>
-          <div className="w-2 h-2 rounded-full bg-[hsl(262_83%_58%)] animate-bounce" style={{ animationDelay: "0ms" }} />
-          <div className="w-2 h-2 rounded-full bg-[hsl(262_83%_58%)] animate-bounce" style={{ animationDelay: "150ms" }} />
-          <div className="w-2 h-2 rounded-full bg-[hsl(262_83%_58%)] animate-bounce" style={{ animationDelay: "300ms" }} />
+          <div
+            className="w-2 h-2 rounded-full bg-[hsl(262_83%_58%)] animate-bounce"
+            style={{ animationDelay: "0ms" }}
+          />
+          <div
+            className="w-2 h-2 rounded-full bg-[hsl(262_83%_58%)] animate-bounce"
+            style={{ animationDelay: "150ms" }}
+          />
+          <div
+            className="w-2 h-2 rounded-full bg-[hsl(262_83%_58%)] animate-bounce"
+            style={{ animationDelay: "300ms" }}
+          />
         </div>
       </div>
     </div>
@@ -36,7 +55,12 @@ function ViLoadingScreen({ icon, title, subtitle }: { icon: React.ReactNode; tit
 
 function LoadingFallback() {
   const t = useTranslations("assessment");
-  return <ViLoadingScreen icon={<Compass className="w-10 h-10" strokeWidth={2.5} />} title={t("preparing_baseline")} />;
+  return (
+    <ViLoadingScreen
+      icon={<Compass className="w-10 h-10" strokeWidth={2.5} />}
+      title={t("preparing_baseline")}
+    />
+  );
 }
 
 export default function DiscoveryAdventurePageWrapper() {
@@ -68,7 +92,9 @@ function DiscoveryAdventurePage() {
       const init = async () => {
         try {
           if (isParent && queryLearnerId) {
-            const learnersRes = await fetch("/api/users/learners", { headers: { Authorization: `Bearer ${accessToken}` } });
+            const learnersRes = await fetch("/api/users/learners", {
+              headers: { Authorization: `Bearer ${accessToken}` },
+            });
             if (learnersRes.ok) {
               const learnersList = await learnersRes.json();
               const found = learnersList.find((l: any) => l.id === queryLearnerId);
@@ -81,16 +107,21 @@ function DiscoveryAdventurePage() {
           } else {
             setLearnerName(user.name || "");
             setResolvedLearnerId(user.id);
-            const meRes = await fetch("/api/users/me", { headers: { Authorization: `Bearer ${accessToken}` } });
+            const meRes = await fetch("/api/users/me", {
+              headers: { Authorization: `Bearer ${accessToken}` },
+            });
             if (meRes.ok) {
               const meData = await meRes.json();
               if (meData?.functioningLevel) setLearnerFL(meData.functioningLevel);
             }
           }
 
-          const statusRes = await fetch(`/api/assessments/learner/discovery/${effectiveLearnerId}/status`, {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          });
+          const statusRes = await fetch(
+            `/api/assessments/learner/discovery/${effectiveLearnerId}/status`,
+            {
+              headers: { Authorization: `Bearer ${accessToken}` },
+            },
+          );
           if (statusRes.ok) {
             const statusData = await statusRes.json();
             if (statusData?.baselineCompleted) {
@@ -110,7 +141,12 @@ function DiscoveryAdventurePage() {
   }, [user, loading, router, accessToken, queryLearnerId]);
 
   if (loading || !user || !ready) {
-    return <ViLoadingScreen icon={<Compass className="w-10 h-10" strokeWidth={2.5} />} title={t("preparing_baseline")} />;
+    return (
+      <ViLoadingScreen
+        icon={<Compass className="w-10 h-10" strokeWidth={2.5} />}
+        title={t("preparing_baseline")}
+      />
+    );
   }
 
   if (parentAssessmentRequired) {
@@ -119,15 +155,27 @@ function DiscoveryAdventurePage() {
       <div className="fixed inset-0 vi-bg flex items-center justify-center overflow-y-auto py-8 px-6">
         <div className="max-w-lg w-full">
           <section className="vi-card p-8 md:p-10 bg-gradient-to-br from-white via-[hsl(262_83%_58%/0.04)] to-[hsl(43_100%_50%/0.06)] border-2 border-[hsl(262_83%_58%/0.15)] text-center relative overflow-hidden">
-            <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-[hsl(43_100%_50%/0.18)] blur-2xl" aria-hidden />
-            <div className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-[hsl(262_83%_58%/0.18)] blur-2xl" aria-hidden />
+            <div
+              className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-[hsl(43_100%_50%/0.18)] blur-2xl"
+              aria-hidden
+            />
+            <div
+              className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-[hsl(262_83%_58%/0.18)] blur-2xl"
+              aria-hidden
+            />
 
             <div className="relative">
               <div className="mx-auto mb-5 inline-flex">
-                <IconWell color="primary" size="lg"><Sparkles className="w-10 h-10" strokeWidth={2.5} /></IconWell>
+                <IconWell color="primary" size="lg">
+                  <Sparkles className="w-10 h-10" strokeWidth={2.5} />
+                </IconWell>
               </div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[hsl(262_83%_58%)] mb-3">One More Step</p>
-              <h1 className="text-3xl font-extrabold text-slate-900 mb-3 leading-tight">Almost Ready for Your Adventure!</h1>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[hsl(262_83%_58%)] mb-3">
+                One More Step
+              </p>
+              <h1 className="text-3xl font-extrabold text-slate-900 mb-3 leading-tight">
+                Almost Ready for Your Adventure!
+              </h1>
               <p className="text-base text-slate-600 mb-6 leading-relaxed">
                 {isParent
                   ? "Before your child can start their Discovery Adventure, you need to complete the Parent Assessment first. This helps us personalize the experience just for them!"
@@ -136,7 +184,9 @@ function DiscoveryAdventurePage() {
 
               <div className="vi-card p-4 mb-6 text-left bg-white">
                 <div className="flex items-center gap-3">
-                  <IconWell color="primary" size="sm"><ClipboardList className="w-5 h-5" strokeWidth={2.5} /></IconWell>
+                  <IconWell color="primary" size="sm">
+                    <ClipboardList className="w-5 h-5" strokeWidth={2.5} />
+                  </IconWell>
                   <div className="flex-1 min-w-0">
                     <p className="text-slate-900 font-extrabold text-sm">Parent Assessment</p>
                     <p className="text-slate-500 text-xs">
@@ -145,7 +195,9 @@ function DiscoveryAdventurePage() {
                         : "Your parent will answer questions about how you learn best."}
                     </p>
                   </div>
-                  <span className="px-2.5 py-1 rounded-full bg-[hsl(43_100%_50%/0.16)] text-[hsl(43_100%_50%)] text-[10px] font-extrabold uppercase tracking-wider whitespace-nowrap">Needed</span>
+                  <span className="px-2.5 py-1 rounded-full bg-[hsl(43_100%_50%/0.16)] text-[hsl(43_100%_50%)] text-[10px] font-extrabold uppercase tracking-wider whitespace-nowrap">
+                    Needed
+                  </span>
                 </div>
               </div>
 
@@ -159,7 +211,9 @@ function DiscoveryAdventurePage() {
                 </button>
               ) : (
                 <div className="space-y-3">
-                  <p className="text-slate-500 text-sm">Ask your parent or caregiver to log in and complete the setup.</p>
+                  <p className="text-slate-500 text-sm">
+                    Ask your parent or caregiver to log in and complete the setup.
+                  </p>
                   <button
                     onClick={() => router.push("/dashboard/learner")}
                     className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white border-2 border-slate-200 text-slate-700 font-extrabold hover:border-slate-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(262_83%_58%)]"
@@ -178,9 +232,10 @@ function DiscoveryAdventurePage() {
 
   const effectiveId = resolvedLearnerId || user.id;
   const isParent = user.role === "PARENT";
-  const postBaselineHref = isParent && queryLearnerId
-    ? `/dashboard/parent/learner/${queryLearnerId}/brain-review`
-    : "/dashboard/learner";
+  const postBaselineHref =
+    isParent && queryLearnerId
+      ? `/dashboard/parent/learner/${queryLearnerId}/brain-review`
+      : "/dashboard/learner";
 
   return (
     <DiscoveryAdventureInner
@@ -195,7 +250,12 @@ function DiscoveryAdventurePage() {
 }
 
 function DiscoveryAdventureInner({
-  learnerId, learnerName, functioningLevel, accessToken, refreshToken, postBaselineHref,
+  learnerId,
+  learnerName,
+  functioningLevel,
+  accessToken,
+  refreshToken,
+  postBaselineHref,
 }: {
   learnerId: string;
   learnerName: string;
@@ -207,9 +267,19 @@ function DiscoveryAdventureInner({
   const router = useRouter();
   const t = useTranslations("assessment");
   const {
-    state, chapters, getCurrentActivity, getCurrentActivities,
-    startAdventure, beginFirstChapter, startChapterActivities, handleAnswer,
-    advanceToNextChapter, resumeAfterBreak, exitToHome, hasSavedProgress, submitResults,
+    state,
+    chapters,
+    getCurrentActivity,
+    getCurrentActivities,
+    startAdventure,
+    beginFirstChapter,
+    startChapterActivities,
+    handleAnswer,
+    advanceToNextChapter,
+    resumeAfterBreak,
+    exitToHome,
+    hasSavedProgress,
+    submitResults,
   } = useDiscoveryEngine({ learnerId, learnerName, functioningLevel, accessToken, refreshToken });
 
   useEffect(() => {
@@ -222,7 +292,13 @@ function DiscoveryAdventureInner({
   const lastResult = state.chapterResults[state.chapterResults.length - 1];
 
   if (state.phase === "loading") {
-    return <ViLoadingScreen icon={<Sparkles className="w-10 h-10" strokeWidth={2.5} />} title={t("ai_preparing")} subtitle={t("personalizing")} />;
+    return (
+      <ViLoadingScreen
+        icon={<Sparkles className="w-10 h-10" strokeWidth={2.5} />}
+        title={t("ai_preparing")}
+        subtitle={t("personalizing")}
+      />
+    );
   }
 
   if (state.phase === "pre-adventure") {
@@ -233,7 +309,11 @@ function DiscoveryAdventureInner({
     return (
       <div>
         <div className="fixed top-0 left-0 right-0 z-50">
-          <AdventureMap currentChapterIdx={state.currentChapterIdx} chapterResults={state.chapterResults} totalChapters={chapters.length} />
+          <AdventureMap
+            currentChapterIdx={state.currentChapterIdx}
+            chapterResults={state.chapterResults}
+            totalChapters={chapters.length}
+          />
         </div>
         <ChapterIntro
           chapter={currentChapter}
@@ -249,7 +329,11 @@ function DiscoveryAdventureInner({
     return (
       <div>
         <div className="fixed top-0 left-0 right-0 z-50">
-          <AdventureMap currentChapterIdx={state.currentChapterIdx} chapterResults={state.chapterResults} totalChapters={chapters.length} />
+          <AdventureMap
+            currentChapterIdx={state.currentChapterIdx}
+            chapterResults={state.chapterResults}
+            totalChapters={chapters.length}
+          />
         </div>
         <ActivityRenderer
           activity={currentActivity}
@@ -275,7 +359,13 @@ function DiscoveryAdventureInner({
   }
 
   if (state.phase === "break") {
-    return <BreakActivity chapterNumber={state.currentChapterIdx + 1} onBreakComplete={resumeAfterBreak} functioningLevel={functioningLevel} />;
+    return (
+      <BreakActivity
+        chapterNumber={state.currentChapterIdx + 1}
+        onBreakComplete={resumeAfterBreak}
+        functioningLevel={functioningLevel}
+      />
+    );
   }
 
   if (state.phase === "finale") {
@@ -289,7 +379,10 @@ function DiscoveryAdventureInner({
         xpEarned={state.xpEarned}
         functioningLevel={functioningLevel}
         onFinish={() => router.push(postBaselineHref)}
-        onExitHome={() => { exitToHome(); router.push(postBaselineHref); }}
+        onExitHome={() => {
+          exitToHome();
+          router.push(postBaselineHref);
+        }}
         onSubmitResults={submitResults}
       />
     );

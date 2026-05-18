@@ -38,12 +38,19 @@ function getBreadcrumbs(pathname: string, basePath: string, baseLabel: string) {
 const ACCENT_TOKEN: Record<string, string> = {
   purple: "text-[hsl(var(--visual-primary))]",
   violet: "text-[hsl(var(--visual-primary))]",
-  blue:   "text-[hsl(var(--visual-reading))]",
-  pink:   "text-[hsl(var(--visual-math))]",
-  green:  "text-[hsl(var(--visual-science))]",
+  blue: "text-[hsl(var(--visual-reading))]",
+  pink: "text-[hsl(var(--visual-math))]",
+  green: "text-[hsl(var(--visual-science))]",
 };
 
-export default function DashboardHeader({ userName, userRole, avatarUrl, accent = "purple", basePath, baseLabel }: DashboardHeaderProps) {
+export default function DashboardHeader({
+  userName,
+  userRole,
+  avatarUrl,
+  accent = "purple",
+  basePath,
+  baseLabel,
+}: DashboardHeaderProps) {
   const pathname = usePathname();
   const [showNotifications, setShowNotifications] = useState(false);
   const crumbs = getBreadcrumbs(pathname, basePath, baseLabel);
@@ -56,9 +63,15 @@ export default function DashboardHeader({ userName, userRole, avatarUrl, accent 
         <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-sm">
           {crumbs.map((crumb, i) => (
             <span key={crumb.href} className="flex items-center gap-1.5">
-              {i > 0 && <span className="vi-text-muted opacity-60" aria-hidden="true">/</span>}
+              {i > 0 && (
+                <span className="vi-text-muted opacity-60" aria-hidden="true">
+                  /
+                </span>
+              )}
               {i === crumbs.length - 1 ? (
-                <span className="font-semibold vi-text" aria-current="page">{crumb.label}</span>
+                <span className="font-semibold vi-text" aria-current="page">
+                  {crumb.label}
+                </span>
               ) : (
                 <Link href={crumb.href} className={`${accentColor} hover:underline font-medium`}>
                   {crumb.label}
@@ -88,7 +101,11 @@ export default function DashboardHeader({ userName, userRole, avatarUrl, accent 
 
           {showNotifications && (
             <>
-              <div className="fixed inset-0 z-40" role="presentation" onClick={() => setShowNotifications(false)} />
+              <div
+                className="fixed inset-0 z-40"
+                role="presentation"
+                onClick={() => setShowNotifications(false)}
+              />
               <div className="absolute right-0 top-full mt-2 w-80 vi-card overflow-hidden z-50 p-0">
                 <div className="p-3 border-b vi-border flex items-center justify-between">
                   <span className="text-sm font-semibold vi-text">Notifications</span>
@@ -101,7 +118,9 @@ export default function DashboardHeader({ userName, userRole, avatarUrl, accent 
                       className={`px-3 py-2.5 border-b vi-border hover:vi-surface-soft transition ${!n.read ? "bg-[hsl(var(--visual-reading)/0.06)]" : ""}`}
                     >
                       <div className="flex items-start gap-2">
-                        {!n.read && <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--visual-reading))] mt-1.5 flex-shrink-0" />}
+                        {!n.read && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-[hsl(var(--visual-reading))] mt-1.5 flex-shrink-0" />
+                        )}
                         <div>
                           <p className="text-sm vi-text">{n.message}</p>
                           <p className="text-xs vi-text-muted mt-0.5">{n.time}</p>
@@ -111,7 +130,9 @@ export default function DashboardHeader({ userName, userRole, avatarUrl, accent 
                   ))}
                 </div>
                 <div className="p-2 border-t vi-border">
-                  <button className={`w-full text-center text-xs font-semibold ${accentColor} py-1.5 hover:underline`}>
+                  <button
+                    className={`w-full text-center text-xs font-semibold ${accentColor} py-1.5 hover:underline`}
+                  >
                     View all notifications
                   </button>
                 </div>
@@ -126,7 +147,9 @@ export default function DashboardHeader({ userName, userRole, avatarUrl, accent 
           <UserAvatar avatarUrl={avatarUrl} name={userName} size={32} />
           <div className="hidden md:block">
             <p className="text-sm font-medium vi-text leading-tight">{userName}</p>
-            <p className="text-xs vi-text-muted font-medium uppercase tracking-wide">{userRole.replace(/_/g, " ")}</p>
+            <p className="text-xs vi-text-muted font-medium uppercase tracking-wide">
+              {userRole.replace(/_/g, " ")}
+            </p>
           </div>
         </div>
       </div>

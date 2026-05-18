@@ -49,9 +49,7 @@ if (!existsSync(rolePath)) {
     }
   }
   if (!/"x-aivo-active-role"/.test(src)) {
-    errors.push(
-      'role-context.tsx: ACTIVE_ROLE_HEADER must equal "x-aivo-active-role".',
-    );
+    errors.push('role-context.tsx: ACTIVE_ROLE_HEADER must equal "x-aivo-active-role".');
   }
 }
 

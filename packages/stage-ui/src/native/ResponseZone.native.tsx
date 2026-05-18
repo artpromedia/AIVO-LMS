@@ -4,13 +4,7 @@
  * Announces choices via accessibilityLabel when touch exploration is active.
  */
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  AccessibilityInfo,
-} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, AccessibilityInfo } from "react-native";
 import type { ChoiceOption } from "../types.js";
 
 export interface ResponseZoneProps {
@@ -50,11 +44,7 @@ export function ResponseZone({ choices, onAnswer, disabled = false }: ResponseZo
   };
 
   return (
-    <View
-      style={styles.container}
-      accessible={false}
-      accessibilityRole="none"
-    >
+    <View style={styles.container} accessible={false} accessibilityRole="none">
       {choices.map((choice) => (
         <TouchableOpacity
           key={choice.id}
@@ -72,7 +62,10 @@ export function ResponseZone({ choices, onAnswer, disabled = false }: ResponseZo
               ? `Choice: ${choice.emoji ?? ""} ${choice.label}. Double tap to select.`
               : choice.label
           }
-          accessibilityState={{ selected: selected === choice.id, disabled: disabled || selected !== null }}
+          accessibilityState={{
+            selected: selected === choice.id,
+            disabled: disabled || selected !== null,
+          }}
           hitSlop={{ top: 4, bottom: 4, left: 4, right: 4 }}
         >
           {choice.emoji ? <Text style={styles.emoji}>{choice.emoji}</Text> : null}

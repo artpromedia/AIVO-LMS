@@ -11,7 +11,13 @@ const NAV_ITEMS = [
 
 export default function CaregiverLayout({ children }: { children: React.ReactNode }) {
   return (
-    <CareTeamLayout accent="green" roleLabel="Caregiver" allowedRoles={["CAREGIVER", "PLATFORM_ADMIN"]} basePath="/dashboard/caregiver" navItems={NAV_ITEMS}>
+    <CareTeamLayout
+      accent="green"
+      roleLabel="Caregiver"
+      allowedRoles={["CAREGIVER", "PLATFORM_ADMIN"]}
+      basePath="/dashboard/caregiver"
+      navItems={NAV_ITEMS}
+    >
       {children}
     </CareTeamLayout>
   );

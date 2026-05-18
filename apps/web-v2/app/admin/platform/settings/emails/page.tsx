@@ -52,9 +52,7 @@ export default async function Page() {
       <div className="grid gap-4 md:grid-cols-4">
         {stats.map((s) => (
           <Card key={s.k} className="p-[var(--aivo-density-card-pad)]">
-            <p className="text-xs uppercase tracking-wide text-aivo-ink-soft">
-              {s.k}
-            </p>
+            <p className="text-xs uppercase tracking-wide text-aivo-ink-soft">{s.k}</p>
             <p className="mt-2 font-display text-3xl font-semibold">{s.v}</p>
           </Card>
         ))}
@@ -84,26 +82,16 @@ export default async function Page() {
                 <tr key={t.id} className="hover:bg-aivo-surface-2/40">
                   <td className="px-4 py-3">
                     <div className="font-medium">{t.name}</div>
-                    <div className="font-mono text-xs text-aivo-ink-soft">
-                      {t.key}
-                    </div>
-                    <div className="mt-1 text-xs text-aivo-ink-soft">
-                      {t.description}
-                    </div>
+                    <div className="font-mono text-xs text-aivo-ink-soft">{t.key}</div>
+                    <div className="mt-1 text-xs text-aivo-ink-soft">{t.description}</div>
                   </td>
                   <td className="px-4 py-3 text-xs text-aivo-ink-soft">
                     <div>{t.fromName}</div>
                     <div className="font-mono">{t.fromEmail}</div>
                   </td>
-                  <td className="px-4 py-3 text-xs text-aivo-ink-soft">
-                    {t.subject}
-                  </td>
+                  <td className="px-4 py-3 text-xs text-aivo-ink-soft">{t.subject}</td>
                   <td className="px-4 py-3">
-                    <Badge
-                      tone={t.status === "active" ? "success" : "neutral"}
-                    >
-                      {t.status}
-                    </Badge>
+                    <Badge tone={t.status === "active" ? "success" : "neutral"}>{t.status}</Badge>
                   </td>
                   <td className="px-4 py-3 text-right tabular-nums">
                     {t.sendCount.toLocaleString()}

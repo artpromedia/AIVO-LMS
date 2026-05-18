@@ -6,10 +6,7 @@
  * service can run process-aware analysis without the client having
  * to re-implement the math.
  */
-import type {
-  SurfaceResponse,
-  SurfaceTelemetryEvent,
-} from "@aivo/learner-surfaces";
+import type { SurfaceResponse, SurfaceTelemetryEvent } from "@aivo/learner-surfaces";
 
 export interface LearnerSurfaceSignal {
   activityId: string;
@@ -53,8 +50,10 @@ export function buildSurfaceSignal(input: BuildSignalInput): LearnerSurfaceSigna
   ).length;
 
   const startedAt = input.startedAt ?? (Date.parse(events[0]?.occurredAt ?? "") || undefined);
-  const submittedAt = input.submittedAt ?? (Date.parse(events[events.length - 1]?.occurredAt ?? "") || undefined);
-  const latencyMs = startedAt && submittedAt && submittedAt > startedAt ? submittedAt - startedAt : undefined;
+  const submittedAt =
+    input.submittedAt ?? (Date.parse(events[events.length - 1]?.occurredAt ?? "") || undefined);
+  const latencyMs =
+    startedAt && submittedAt && submittedAt > startedAt ? submittedAt - startedAt : undefined;
 
   return {
     activityId: input.activityId,

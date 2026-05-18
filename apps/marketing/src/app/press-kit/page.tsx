@@ -25,10 +25,16 @@ export default function PressKitPage() {
         <h2 className="text-2xl font-heading font-bold text-slate-900 mb-6">Company Overview</h2>
         <div className="bg-white rounded-2xl border border-slate-100 p-8">
           <p className="text-slate-600 font-body leading-relaxed mb-6">
-            AIVO Learning is an AI-powered adaptive learning platform designed for students of all abilities, including those with autism, developmental differences, and diverse learning needs. Using proprietary Brain Clone technology, AIVO creates a unique learning profile for every student, adapting content, pace, and presentation in real-time across 14 specialized AI tutors and 5 functioning levels.
+            AIVO Learning is an AI-powered adaptive learning platform designed for students of all
+            abilities, including those with autism, developmental differences, and diverse learning
+            needs. Using proprietary Brain Clone technology, AIVO creates a unique learning profile
+            for every student, adapting content, pace, and presentation in real-time across 14
+            specialized AI tutors and 5 functioning levels.
           </p>
           <p className="text-slate-600 font-body leading-relaxed">
-            Founded by a team of healthcare executives, education experts, and technology leaders, AIVO is on a mission to ensure no learner is left behind. The platform serves both families (B2C) and school districts (B2B), with full COPPA, FERPA, and SOC 2 compliance.
+            Founded by a team of healthcare executives, education experts, and technology leaders,
+            AIVO is on a mission to ensure no learner is left behind. The platform serves both
+            families (B2C) and school districts (B2B), with full COPPA, FERPA, and SOC 2 compliance.
           </p>
         </div>
       </section>
@@ -37,7 +43,10 @@ export default function PressKitPage() {
         <h2 className="text-2xl font-heading font-bold text-slate-900 mb-6">Quick Facts</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {FACTS.map((f) => (
-            <div key={f.label} className="bg-amber-50/50 rounded-2xl border border-amber-100 p-5 text-center">
+            <div
+              key={f.label}
+              className="bg-amber-50/50 rounded-2xl border border-amber-100 p-5 text-center"
+            >
               <p className="text-2xl font-heading font-bold text-slate-900">{f.value}</p>
               <p className="text-sm text-slate-500 font-body mt-1">{f.label}</p>
             </div>
@@ -50,13 +59,25 @@ export default function PressKitPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white rounded-2xl border border-slate-100 p-8 flex flex-col items-center">
             <div className="bg-white rounded-xl p-6 mb-4 w-full flex items-center justify-center border border-slate-50">
-              <Image src="/images/aivo-logo-purple.png" alt="AIVO Logo Purple" width={200} height={60} style={{ width: "auto", height: "auto" }} />
+              <Image
+                src="/images/aivo-logo-purple.png"
+                alt="AIVO Logo Purple"
+                width={200}
+                height={60}
+                style={{ width: "auto", height: "auto" }}
+              />
             </div>
             <p className="text-sm text-slate-500 font-body">Primary Logo (Purple)</p>
           </div>
           <div className="bg-slate-900 rounded-2xl border border-slate-700 p-8 flex flex-col items-center">
             <div className="rounded-xl p-6 mb-4 w-full flex items-center justify-center">
-              <Image src="/images/aivo-logo-white.png" alt="AIVO Logo White" width={200} height={60} style={{ width: "auto", height: "auto" }} />
+              <Image
+                src="/images/aivo-logo-white.png"
+                alt="AIVO Logo White"
+                width={200}
+                height={60}
+                style={{ width: "auto", height: "auto" }}
+              />
             </div>
             <p className="text-sm text-slate-400 font-body">Logo on Dark Background</p>
           </div>
@@ -73,7 +94,10 @@ export default function PressKitPage() {
               { name: "Slate 900", hex: "#0F172A", textWhite: true },
             ].map((c) => (
               <div key={c.hex} className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg shadow-sm border border-white/20" style={{ backgroundColor: c.hex }} />
+                <div
+                  className="w-10 h-10 rounded-lg shadow-sm border border-white/20"
+                  style={{ backgroundColor: c.hex }}
+                />
                 <div>
                   <p className="text-sm font-bold text-slate-900">{c.name}</p>
                   <p className="text-xs text-slate-400 font-mono">{c.hex}</p>
@@ -88,14 +112,20 @@ export default function PressKitPage() {
         <div className="bg-amber-50 rounded-3xl border border-amber-100 p-8 md:p-12">
           <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">Media Contact</h2>
           <p className="text-slate-600 font-body mb-6">
-            For press inquiries, interview requests, or media resources, please reach out to our communications team.
+            For press inquiries, interview requests, or media resources, please reach out to our
+            communications team.
           </p>
           <a
             href="mailto:press@aivolearning.com"
             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-amber-600 text-white font-bold hover:bg-amber-700 transition shadow-lg"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              />
             </svg>
             press@aivolearning.com
           </a>

@@ -10,8 +10,18 @@ export const dynamic = "force-dynamic";
 
 const patchSchema = z.object({
   id: z.string().min(1).max(64),
-  retentionDays: z.number().int().min(0).max(365 * 100).optional(),
-  archiveDays: z.number().int().min(0).max(365 * 100).optional(),
+  retentionDays: z
+    .number()
+    .int()
+    .min(0)
+    .max(365 * 100)
+    .optional(),
+  archiveDays: z
+    .number()
+    .int()
+    .min(0)
+    .max(365 * 100)
+    .optional(),
   description: z.string().max(1000).optional(),
 });
 

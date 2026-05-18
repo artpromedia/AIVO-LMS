@@ -1,21 +1,21 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Platform } from 'react-native';
-import { Audio } from 'expo-av';
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Platform } from "react-native";
+import { Audio } from "expo-av";
 // SDK 54 ships expo-file-system v19's "next-gen" File API by default;
 // the back-compat readAsStringAsync used here lives at /legacy until we migrate.
-import * as FileSystem from 'expo-file-system/legacy';
-import { apiFetch } from '@/lib/api';
-import { API } from '@/constants/api';
+import * as FileSystem from "expo-file-system/legacy";
+import { apiFetch } from "@/lib/api";
+import { API } from "@/constants/api";
 
-export type SpeechInputStatus = 'idle' | 'listening' | 'processing' | 'error';
+export type SpeechInputStatus = "idle" | "listening" | "processing" | "error";
 
 export type SpeechInputError =
-  | 'permission_denied'
-  | 'no_speech'
-  | 'unsupported'
-  | 'network'
-  | 'transcription_failed'
-  | 'audio_capture';
+  | "permission_denied"
+  | "no_speech"
+  | "unsupported"
+  | "network"
+  | "transcription_failed"
+  | "audio_capture";
 
 export interface UseSpeechInputOptions {
   /** BCP-47 locale hint forwarded to the transcribe endpoint, e.g. "en-US". */
@@ -57,8 +57,8 @@ export function useSpeechInput({
   onError,
   maxDurationMs = DEFAULT_MAX_DURATION_MS,
 }: UseSpeechInputOptions = {}): SpeechInputApi {
-  const [status, setStatus] = useState<SpeechInputStatus>('idle');
-  const [transcript, setTranscript] = useState('');
+  const [status, setStatus] = useState<SpeechInputStatus>("idle");
+  const [transcript, setTranscript] = useState("");
   const [error, setError] = useState<SpeechInputError | null>(null);
 
   const recordingRef = useRef<Audio.Recording | null>(null);
@@ -68,7 +68,7 @@ export function useSpeechInput({
 
   // expo-av's Recording APIs require a native module. On Expo web we fall back
   // to "unsupported" so the caller can hide the button.
-  const isSupported = Platform.OS !== 'web';
+  const isSupported = Platform.OS !== "web";
 
   const cleanup = useCallback(() => {
     if (stopTimerRef.current) {
@@ -94,7 +94,7 @@ export function useSpeechInput({
   const fail = useCallback(
     (err: SpeechInputError) => {
       cleanup();
-      setStatus('error');
+      setStatus("error");
       setError(err);
       onError?.(err);
     },
@@ -103,9 +103,9 @@ export function useSpeechInput({
 
   const reset = useCallback(() => {
     cleanup();
-    setTranscript('');
+    setTranscript("");
     setError(null);
-    setStatus('idle');
+    setStatus("idle");
   }, [cleanup]);
 
   const stop = useCallback(async () => {
@@ -113,7 +113,7 @@ export function useSpeechInput({
     const rec = recordingRef.current;
     if (!rec) return;
     isStoppingRef.current = true;
-    setStatus('processing');
+    setStatus("processing");
 
     let uri: string | null = null;
     try {
@@ -121,7 +121,7 @@ export function useSpeechInput({
       uri = rec.getURI();
     } catch {
       recordingRef.current = null;
-      fail('audio_capture');
+      fail("audio_capture");
       return;
     }
     recordingRef.current = null;
@@ -133,18 +133,18 @@ export function useSpeechInput({
       return;
     }
     if (!uri) {
-      fail('audio_capture');
+      fail("audio_capture");
       return;
     }
 
     try {
       const info = await FileSystem.getInfoAsync(uri, { size: true });
       if (!info.exists) {
-        fail('audio_capture');
+        fail("audio_capture");
         return;
       }
-      if (typeof info.size === 'number' && info.size > MAX_RECORDED_BYTES) {
-        fail('audio_capture');
+      if (typeof info.size === "number" && info.size > MAX_RECORDED_BYTES) {
+        fail("audio_capture");
         return;
       }
       const audioBase64 = await FileSystem.readAsStringAsync(uri, {
@@ -152,10 +152,10 @@ export function useSpeechInput({
       });
       // expo-av's HIGH_QUALITY preset records to .m4a / AAC on both iOS and
       // Android, so we hard-code the matching mime type for the upload.
-      const mimeType = 'audio/m4a';
+      const mimeType = "audio/m4a";
 
-      const res = await apiFetch(API.AI, '/api/ai/transcribe', {
-        method: 'POST',
+      const res = await apiFetch(API.AI, "/api/ai/transcribe", {
+        method: "POST",
         body: JSON.stringify({
           audio_base64: audioBase64,
           mime_type: mimeType,
@@ -164,24 +164,24 @@ export function useSpeechInput({
       });
       if (!res.ok) {
         if (res.status === 401 || res.status === 403) {
-          fail('permission_denied');
+          fail("permission_denied");
         } else {
-          fail('transcription_failed');
+          fail("transcription_failed");
         }
         return;
       }
       const json = (await res.json()) as { transcript?: string };
-      const text = (json.transcript ?? '').trim();
+      const text = (json.transcript ?? "").trim();
       if (!text) {
-        fail('no_speech');
+        fail("no_speech");
         return;
       }
       setTranscript(text);
-      setStatus('idle');
+      setStatus("idle");
       setError(null);
       onResult?.(text);
     } catch {
-      fail('network');
+      fail("network");
     } finally {
       // Best-effort cleanup of the temp file.
       if (uri) {
@@ -193,21 +193,21 @@ export function useSpeechInput({
 
   const start = useCallback(async () => {
     if (!isSupported) {
-      fail('unsupported');
+      fail("unsupported");
       return;
     }
     if (recordingRef.current) return;
     setError(null);
-    setTranscript('');
+    setTranscript("");
 
     try {
       const perm = await Audio.requestPermissionsAsync();
       if (!perm.granted) {
-        fail('permission_denied');
+        fail("permission_denied");
         return;
       }
     } catch {
-      fail('permission_denied');
+      fail("permission_denied");
       return;
     }
 
@@ -221,14 +221,14 @@ export function useSpeechInput({
       );
       recordingRef.current = recording;
       cancelledRef.current = false;
-      setStatus('listening');
+      setStatus("listening");
       // Auto-stop guard — mirrors the 60 s cap on the web hook.
       stopTimerRef.current = setTimeout(() => {
         stop().catch(() => undefined);
       }, maxDurationMs);
     } catch {
       recordingRef.current = null;
-      fail('audio_capture');
+      fail("audio_capture");
     }
   }, [fail, isSupported, maxDurationMs, stop]);
 

@@ -23,7 +23,10 @@ export function BrainClone() {
     <section className="py-24 bg-gradient-to-br from-primary via-purple-700 to-primary-dark relative overflow-hidden text-white">
       <div className="absolute inset-0 opacity-10 pointer-events-none">
         <div className="absolute top-10 right-20 w-64 h-64 bg-amber-400 rounded-full blur-3xl animate-blob motion-reduce:animate-none" />
-        <div className="absolute bottom-10 left-20 w-72 h-72 bg-cyan-400 rounded-full blur-3xl animate-blob motion-reduce:animate-none" style={{ animationDelay: "6s" }} />
+        <div
+          className="absolute bottom-10 left-20 w-72 h-72 bg-cyan-400 rounded-full blur-3xl animate-blob motion-reduce:animate-none"
+          style={{ animationDelay: "6s" }}
+        />
       </div>
 
       <div className="relative max-w-6xl mx-auto px-6 md:px-8 grid md:grid-cols-2 gap-12 items-center">
@@ -35,9 +38,7 @@ export function BrainClone() {
           <h2 className="text-4xl md:text-5xl font-heading font-bold leading-tight">
             {t("title")}
           </h2>
-          <p className="text-lg text-white/85 font-body leading-relaxed">
-            {t("subtitle")}
-          </p>
+          <p className="text-lg text-white/85 font-body leading-relaxed">{t("subtitle")}</p>
           <div className="grid sm:grid-cols-2 gap-4 pt-2">
             {BRAIN_FEATURES.map((f) => (
               <div key={f.titleKey} className="flex gap-3">
@@ -60,7 +61,9 @@ export function BrainClone() {
                 <Brain className="w-6 h-6" aria-hidden="true" />
               </div>
               <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t("demo_label")}</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  {t("demo_label")}
+                </p>
                 <p className="font-heading font-bold text-lg">{t("demo_name")}</p>
               </div>
               <span className="ml-auto inline-flex items-center px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 font-bold text-xs">
@@ -75,7 +78,10 @@ export function BrainClone() {
                     <span>{m.value}%</span>
                   </div>
                   <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-                    <div className={`h-full ${m.color} rounded-full`} style={{ width: `${m.value}%` }} />
+                    <div
+                      className={`h-full ${m.color} rounded-full`}
+                      style={{ width: `${m.value}%` }}
+                    />
                   </div>
                 </div>
               ))}

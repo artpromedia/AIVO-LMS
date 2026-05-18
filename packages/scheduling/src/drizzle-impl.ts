@@ -64,7 +64,9 @@ export function createDrizzleLedger(
     async getLastRunAt(jobName) {
       const result = (await db.execute(
         sql`SELECT last_run_at FROM daily_job_runs WHERE job_name = ${jobName}`,
-      )) as { rows?: Array<{ last_run_at: string | Date }> } | Array<{ last_run_at: string | Date }>;
+      )) as
+        | { rows?: Array<{ last_run_at: string | Date }> }
+        | Array<{ last_run_at: string | Date }>;
       const rows = Array.isArray(result) ? result : (result.rows ?? []);
       const v = rows[0]?.last_run_at;
       if (!v) return null;

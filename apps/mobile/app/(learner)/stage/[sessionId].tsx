@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -7,29 +7,26 @@ import {
   ActivityIndicator,
   Alert,
   AppState,
-} from 'react-native';
-import { useLocalSearchParams, router } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useAuth } from '@/hooks/useAuth';
-import { useLearners } from '@/hooks/useLearners';
-import { apiFetch } from '@/lib/api';
-import { API } from '@/constants/api';
-import { spacing } from '@/constants/colors';
-import { useTierTheme } from '@aivo/mobile-ui';
-import { useWindowSizeClass } from '@/src/design/useWindowSizeClass';
-import { ScratchPad } from '@/src/components/learning/ScratchPad';
-import { MobileSessionHeader } from '@/src/components/learning/MobileSessionHeader';
-import { MobileStageRuntime } from '@/src/components/learning/MobileStageRuntime';
-import { MobileStageCompletion } from '@/src/components/learning/MobileStageCompletion';
-import {
-  sessionClient,
-  SessionUnavailableError,
-} from '@/src/api/sessionClient';
-import { stageClient } from '@/src/api/stageClient';
-import { problemSessionClient } from '@/src/api/problemSessionClient';
-import type { Beat, Session } from '@/src/types/stage';
+} from "react-native";
+import { useLocalSearchParams, router } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useAuth } from "@/hooks/useAuth";
+import { useLearners } from "@/hooks/useLearners";
+import { apiFetch } from "@/lib/api";
+import { API } from "@/constants/api";
+import { spacing } from "@/constants/colors";
+import { useTierTheme } from "@aivo/mobile-ui";
+import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
+import { ScratchPad } from "@/src/components/learning/ScratchPad";
+import { MobileSessionHeader } from "@/src/components/learning/MobileSessionHeader";
+import { MobileStageRuntime } from "@/src/components/learning/MobileStageRuntime";
+import { MobileStageCompletion } from "@/src/components/learning/MobileStageCompletion";
+import { sessionClient, SessionUnavailableError } from "@/src/api/sessionClient";
+import { stageClient } from "@/src/api/stageClient";
+import { problemSessionClient } from "@/src/api/problemSessionClient";
+import type { Beat, Session } from "@/src/types/stage";
 
 // ── Offline outbox ──────────────────────────────────────────────────────────
 // Session-end payloads are queued in AsyncStorage when offline and flushed
@@ -42,11 +39,11 @@ interface SessionEndPayload {
   queuedAt: number;
 }
 
-const OUTBOX_KEY = '@aivo/session_outbox';
+const OUTBOX_KEY = "@aivo/session_outbox";
 
 async function getAsyncStorage(): Promise<any> {
   try {
-    return (await import('@react-native-async-storage/async-storage')).default;
+    return (await import("@react-native-async-storage/async-storage")).default;
   } catch {
     return null;
   }
@@ -79,8 +76,8 @@ async function flushOutbox(learningApiBase: string, authHeader: string): Promise
         const res = await fetch(
           `${learningApiBase}/api/learning/sessions/${payload.sessionId}/complete`,
           {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', Authorization: authHeader },
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: authHeader },
             body: JSON.stringify({
               masteryUpdates: payload.masteryUpdates,
               xpEarned: payload.xpEarned,
@@ -102,34 +99,34 @@ async function flushOutbox(learningApiBase: string, authHeader: string): Promise
 
 const TIER_VOICE = {
   EARLY: {
-    encourage: '🎉 Yay! You got it!',
+    encourage: "🎉 Yay! You got it!",
     miss: (answer: string) => `Almost! Sora says it's ${answer}!`,
-    completionEmoji: (score: number) => (score >= 80 ? '🎉' : score >= 60 ? '👏' : '💪'),
-    completionTitle: 'Adventure complete!',
-    nextLabel: 'Next →',
-    finishLabel: 'Yay! All done',
-    homeLabel: 'Back to the meadow',
-    intro: 'Let’s solve this together!',
+    completionEmoji: (score: number) => (score >= 80 ? "🎉" : score >= 60 ? "👏" : "💪"),
+    completionTitle: "Adventure complete!",
+    nextLabel: "Next →",
+    finishLabel: "Yay! All done",
+    homeLabel: "Back to the meadow",
+    intro: "Let’s solve this together!",
   },
   MIDDLE: {
-    encourage: 'Solid. Kai nods approvingly.',
+    encourage: "Solid. Kai nods approvingly.",
     miss: (answer: string) => `Close. The answer was ${answer}.`,
-    completionEmoji: (score: number) => (score >= 80 ? '🦊' : score >= 60 ? '🌙' : '🌿'),
-    completionTitle: 'Session wrapped',
-    nextLabel: 'Next question',
-    finishLabel: 'Wrap session',
-    homeLabel: 'Back to the treehouse',
-    intro: 'Take your time.',
+    completionEmoji: (score: number) => (score >= 80 ? "🦊" : score >= 60 ? "🌙" : "🌿"),
+    completionTitle: "Session wrapped",
+    nextLabel: "Next question",
+    finishLabel: "Wrap session",
+    homeLabel: "Back to the treehouse",
+    intro: "Take your time.",
   },
   HIGH: {
-    encourage: 'Correct.',
+    encourage: "Correct.",
     miss: (answer: string) => `Not quite — answer: ${answer}`,
-    completionEmoji: () => '',
-    completionTitle: 'Session complete',
-    nextLabel: 'Next',
-    finishLabel: 'Finish',
-    homeLabel: 'Return to dashboard',
-    intro: 'Begin when ready.',
+    completionEmoji: () => "",
+    completionTitle: "Session complete",
+    nextLabel: "Next",
+    finishLabel: "Finish",
+    homeLabel: "Return to dashboard",
+    intro: "Begin when ready.",
   },
 } as const;
 
@@ -141,8 +138,7 @@ export default function StageScreen() {
   const { t: _t } = useTranslation();
   const { user } = useAuth();
   const { data: learners } = useLearners();
-  const learnerId =
-    user?.role === 'LEARNER' ? user.id : learners?.[0]?.id || '';
+  const learnerId = user?.role === "LEARNER" ? user.id : learners?.[0]?.id || "";
 
   const { tier, theme } = useTierTheme();
   const voice = TIER_VOICE[tier];
@@ -165,7 +161,7 @@ export default function StageScreen() {
   useEffect(() => {
     let cancelled = false;
     if (!sessionId) {
-      setLoadError('Missing session id');
+      setLoadError("Missing session id");
       return;
     }
     setLoadError(null);
@@ -179,9 +175,7 @@ export default function StageScreen() {
       .catch((err: unknown) => {
         if (cancelled) return;
         const msg =
-          err instanceof SessionUnavailableError
-            ? err.message
-            : 'Could not load this session.';
+          err instanceof SessionUnavailableError ? err.message : "Could not load this session.";
         setLoadError(msg);
       });
     return () => {
@@ -191,10 +185,10 @@ export default function StageScreen() {
 
   // Flush the offline outbox whenever the app comes to the foreground.
   useEffect(() => {
-    const authHeader = user ? `Bearer ${(user as any).accessToken ?? ''}` : '';
-    const learningBase = (API as any).LEARNING ?? '';
-    const sub = AppState.addEventListener('change', (next) => {
-      if (next === 'active') flushOutbox(learningBase, authHeader).catch(() => {});
+    const authHeader = user ? `Bearer ${(user as any).accessToken ?? ""}` : "";
+    const learningBase = (API as any).LEARNING ?? "";
+    const sub = AppState.addEventListener("change", (next) => {
+      if (next === "active") flushOutbox(learningBase, authHeader).catch(() => {});
     });
     flushOutbox(learningBase, authHeader).catch(() => {});
     return () => sub.remove();
@@ -205,7 +199,7 @@ export default function StageScreen() {
   // ── Beat handlers ─────────────────────────────────────────────────────────
 
   const recordLedger = useCallback(
-    (beat: Beat, outcome: 'correct' | 'incorrect' | 'partial' | 'skipped', start: number) => {
+    (beat: Beat, outcome: "correct" | "incorrect" | "partial" | "skipped", start: number) => {
       if (!sessionId || !learnerId) return;
       const skill = (beat as { skill?: string }).skill;
       void problemSessionClient
@@ -224,7 +218,7 @@ export default function StageScreen() {
   );
 
   const handleChoiceAnswer = useCallback(
-    async (beat: Extract<Beat, { kind: 'choice' }>, answer: string) => {
+    async (beat: Extract<Beat, { kind: "choice" }>, answer: string) => {
       if (!sessionId || answered || submitting) return;
       const start = Date.now();
       setSelected(answer);
@@ -244,9 +238,9 @@ export default function StageScreen() {
         } else {
           setXpEarned((xp) => xp + 2);
         }
-        recordLedger(beat, result.correct ? 'correct' : 'incorrect', start);
+        recordLedger(beat, result.correct ? "correct" : "incorrect", start);
       } catch {
-        Alert.alert('Warning', 'Could not save your answer. It may not be recorded.');
+        Alert.alert("Warning", "Could not save your answer. It may not be recorded.");
         setLastCorrect(answer === beat.correctAnswer);
       } finally {
         setSubmitting(false);
@@ -256,7 +250,7 @@ export default function StageScreen() {
   );
 
   const handleMathExpression = useCallback(
-    async (beat: Extract<Beat, { kind: 'math-expression' }>, expression: string) => {
+    async (beat: Extract<Beat, { kind: "math-expression" }>, expression: string) => {
       if (!sessionId || answered || submitting) return;
       const start = Date.now();
       setSelected(expression);
@@ -264,7 +258,7 @@ export default function StageScreen() {
       setSubmitting(true);
       try {
         const correct = beat.canonicalAnswer
-          ? expression.replace(/\s+/g, '') === beat.canonicalAnswer.replace(/\s+/g, '')
+          ? expression.replace(/\s+/g, "") === beat.canonicalAnswer.replace(/\s+/g, "")
           : null;
         setLastCorrect(correct);
         if (correct) {
@@ -275,7 +269,7 @@ export default function StageScreen() {
         }
         recordLedger(
           beat,
-          correct === true ? 'correct' : correct === false ? 'incorrect' : 'partial',
+          correct === true ? "correct" : correct === false ? "incorrect" : "partial",
           start,
         );
       } finally {
@@ -286,19 +280,19 @@ export default function StageScreen() {
   );
 
   const handleSurfaceSubmit = useCallback(
-    async (beat: Extract<Beat, { kind: 'surface' }>, _commands: unknown) => {
+    async (beat: Extract<Beat, { kind: "surface" }>, _commands: unknown) => {
       if (answered || submitting) return;
       const start = Date.now();
       setAnswered(true);
       setSubmitting(true);
-      recordLedger(beat, 'partial', start);
+      recordLedger(beat, "partial", start);
       setSubmitting(false);
     },
     [answered, submitting, recordLedger],
   );
 
   const handleTutorTurnContinue = useCallback(
-    async (beat: Extract<Beat, { kind: 'tutor-turn' }>) => {
+    async (beat: Extract<Beat, { kind: "tutor-turn" }>) => {
       await stageClient.ackBeat(beat);
       // tutor-turn auto-advances; we just step the index.
       setSelected(null);
@@ -322,7 +316,7 @@ export default function StageScreen() {
     if (!sessionId) return;
     const score = total > 0 ? Math.round((correctCount / total) * 100) : 0;
     const masteryUpdates: Record<string, number> = {
-      [session.meta.subject || 'lesson']: score,
+      [session.meta.subject || "lesson"]: score,
     };
     try {
       await sessionClient.completeSession({
@@ -338,17 +332,17 @@ export default function StageScreen() {
         xpEarned: xpEarned + 5,
         queuedAt: Date.now(),
       });
-      Alert.alert('Saved offline', 'Your session results will sync when you’re back online.');
+      Alert.alert("Saved offline", "Your session results will sync when you’re back online.");
     }
   }, [session, sessionId, currentIndex, total, correctCount, xpEarned]);
 
   const handlePause = useCallback(() => {
     Alert.alert(
-      tier === 'HIGH' ? 'Pause session' : 'Pause Session',
-      'Your progress will be saved. Continue later?',
+      tier === "HIGH" ? "Pause session" : "Pause Session",
+      "Your progress will be saved. Continue later?",
       [
-        { text: tier === 'EARLY' ? 'Keep going!' : 'Keep going', style: 'cancel' },
-        { text: 'Pause & exit', onPress: () => router.back() },
+        { text: tier === "EARLY" ? "Keep going!" : "Keep going", style: "cancel" },
+        { text: "Pause & exit", onPress: () => router.back() },
       ],
     );
   }, [tier]);
@@ -367,9 +361,7 @@ export default function StageScreen() {
         .then((s) => setSession(s))
         .catch((err: unknown) => {
           const msg =
-            err instanceof SessionUnavailableError
-              ? err.message
-              : 'Could not load this session.';
+            err instanceof SessionUnavailableError ? err.message : "Could not load this session.";
           setLoadError(msg);
         });
     };
@@ -378,22 +370,29 @@ export default function StageScreen() {
         <View style={styles.errorState} accessibilityLiveRegion="polite">
           <Ionicons name="alert-circle" size={48} color={theme.colors.text} />
           <Text style={[styles.errorText, { color: theme.colors.text }]}>{loadError}</Text>
-          <View style={{ flexDirection: 'row', gap: 12 }}>
+          <View style={{ flexDirection: "row", gap: 12 }}>
             <Pressable
               style={[styles.errorBtn, { backgroundColor: theme.colors.primary }]}
               onPress={retry}
               accessibilityRole="button"
               accessibilityLabel="Try again"
             >
-              <Text style={{ color: theme.colors.surface, fontWeight: '700' }}>Try again</Text>
+              <Text style={{ color: theme.colors.surface, fontWeight: "700" }}>Try again</Text>
             </Pressable>
             <Pressable
-              style={[styles.errorBtn, { backgroundColor: 'transparent', borderWidth: 1, borderColor: theme.colors.primary }]}
-              onPress={() => router.replace('/(learner)' as any)}
+              style={[
+                styles.errorBtn,
+                {
+                  backgroundColor: "transparent",
+                  borderWidth: 1,
+                  borderColor: theme.colors.primary,
+                },
+              ]}
+              onPress={() => router.replace("/(learner)" as any)}
               accessibilityRole="button"
               accessibilityLabel="Back to home"
             >
-              <Text style={{ color: theme.colors.primary, fontWeight: '700' }}>Back to home</Text>
+              <Text style={{ color: theme.colors.primary, fontWeight: "700" }}>Back to home</Text>
             </Pressable>
           </View>
         </View>
@@ -437,10 +436,10 @@ export default function StageScreen() {
       onPress={() => setScratchOpen((s) => !s)}
       hitSlop={12}
       accessibilityRole="button"
-      accessibilityLabel={scratchOpen ? 'Close scratchpad' : 'Open scratchpad'}
+      accessibilityLabel={scratchOpen ? "Close scratchpad" : "Open scratchpad"}
     >
       <Ionicons
-        name={scratchOpen ? 'close-circle-outline' : 'pencil'}
+        name={scratchOpen ? "close-circle-outline" : "pencil"}
         size={26}
         color={scratchOpen ? theme.colors.primary : theme.colors.text}
       />
@@ -459,7 +458,7 @@ export default function StageScreen() {
         paddingTop={insets.top}
       />
 
-      <View style={[styles.stageRow, { flexDirection: isTablet ? 'row' : 'column' }]}>
+      <View style={[styles.stageRow, { flexDirection: isTablet ? "row" : "column" }]}>
         <View style={styles.stageColumn}>
           <MobileStageRuntime
             theme={theme}
@@ -505,16 +504,16 @@ function createStyles(bg: string) {
       margin: spacing.md,
       marginLeft: 0,
       borderRadius: 16,
-      overflow: 'hidden',
+      overflow: "hidden",
     },
     errorState: {
       flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
+      alignItems: "center",
+      justifyContent: "center",
       gap: 16,
       padding: 32,
     },
-    errorText: { fontSize: 18, textAlign: 'center' },
+    errorText: { fontSize: 18, textAlign: "center" },
     errorBtn: {
       paddingHorizontal: 20,
       paddingVertical: 12,

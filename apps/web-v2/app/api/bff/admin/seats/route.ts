@@ -38,10 +38,20 @@ export async function POST(req: Request): Promise<NextResponse> {
     const roleErr = requireRole(session!, [...ADMIN_ROLES], requestId);
     if (roleErr) return roleErr;
     let body: unknown = {};
-    try { body = await req.json(); } catch { body = {}; }
+    try {
+      body = await req.json();
+    } catch {
+      body = {};
+    }
     const parsed = assignSchema.safeParse(body);
     if (!parsed.success) {
-      return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." }, requestId);
+      return fail(
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
+        requestId,
+      );
     }
     const result = assignSeat({ ...parsed.data, tenantId: session!.tenantId });
     if (!result.ok) {
@@ -61,7 +71,9 @@ export async function POST(req: Request): Promise<NextResponse> {
             : ERRORS.PRECONDITION_FAILED;
       return fail({ ...err, message: msg }, requestId);
     }
-    audit(session!, "billing.seat.assigned", requestId, { metadata: { assignmentId: result.assignment.id } });
+    audit(session!, "billing.seat.assigned", requestId, {
+      metadata: { assignmentId: result.assignment.id },
+    });
     return ok({ assignment: result.assignment }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
@@ -76,10 +88,20 @@ export async function DELETE(req: Request): Promise<NextResponse> {
     const roleErr = requireRole(session!, [...ADMIN_ROLES], requestId);
     if (roleErr) return roleErr;
     let body: unknown = {};
-    try { body = await req.json(); } catch { body = {}; }
+    try {
+      body = await req.json();
+    } catch {
+      body = {};
+    }
     const parsed = revokeSchema.safeParse(body);
     if (!parsed.success) {
-      return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." }, requestId);
+      return fail(
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
+        requestId,
+      );
     }
     const a = revokeSeat(parsed.data.assignmentId, session!.tenantId);
     if (!a) return fail({ ...ERRORS.NOT_FOUND, message: "Assignment not found." }, requestId);

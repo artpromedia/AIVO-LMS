@@ -52,7 +52,7 @@ export default function AdminSettingsPage() {
       },
     };
     fetch("/api/admin-svc/config", { headers: { Authorization: `Bearer ${accessToken}` } })
-      .then((r) => r.ok ? r.json() : null)
+      .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (data?.features) {
           const merged = { ...defaultConfig };
@@ -114,28 +114,74 @@ export default function AdminSettingsPage() {
   };
 
   const FLAG_DESCRIPTIONS: Record<string, { label: string; desc: string; critical?: boolean }> = {
-    brainCloneEnabled: { label: "Brain Clone Pipeline", desc: "Enable brain state creation from baseline assessments" },
-    baselineAssessmentEnabled: { label: "Baseline Assessments", desc: "Allow new learners to take the Discovery Adventure" },
+    brainCloneEnabled: {
+      label: "Brain Clone Pipeline",
+      desc: "Enable brain state creation from baseline assessments",
+    },
+    baselineAssessmentEnabled: {
+      label: "Baseline Assessments",
+      desc: "Allow new learners to take the Discovery Adventure",
+    },
     aiTutorsEnabled: { label: "AI Tutors", desc: "Enable AI-powered tutoring sessions" },
-    recommendationsEnabled: { label: "Recommendations Engine", desc: "Auto-generate learning recommendations" },
-    homeworkScanEnabled: { label: "Homework Scanner", desc: "Allow parents to scan and upload homework" },
-    billingEnabled: { label: "Billing & Subscriptions", desc: "Enable payment processing and plan management" },
+    recommendationsEnabled: {
+      label: "Recommendations Engine",
+      desc: "Auto-generate learning recommendations",
+    },
+    homeworkScanEnabled: {
+      label: "Homework Scanner",
+      desc: "Allow parents to scan and upload homework",
+    },
+    billingEnabled: {
+      label: "Billing & Subscriptions",
+      desc: "Enable payment processing and plan management",
+    },
     mobileAppEnabled: { label: "Mobile App", desc: "Enable mobile application access" },
     ssoEnabled: { label: "SSO/SAML", desc: "Enterprise single sign-on for districts" },
-    researchExportEnabled: { label: "Research Data Export", desc: "Allow anonymized data export for research" },
-    maintenanceMode: { label: "Maintenance Mode", desc: "Put the platform in maintenance mode", critical: true },
+    researchExportEnabled: {
+      label: "Research Data Export",
+      desc: "Allow anonymized data export for research",
+    },
+    maintenanceMode: {
+      label: "Maintenance Mode",
+      desc: "Put the platform in maintenance mode",
+      critical: true,
+    },
   };
 
   const LIMIT_DESCRIPTIONS: Record<string, { label: string; desc: string; unit: string }> = {
-    maxLearnersPerParent: { label: "Max Learners per Parent", desc: "Maximum number of learner profiles per parent account", unit: "learners" },
-    maxSessionDurationMinutes: { label: "Max Session Duration", desc: "Maximum length of a single tutoring session", unit: "minutes" },
-    maxApiRequestsPerMinute: { label: "API Rate Limit", desc: "Maximum API requests per minute per user", unit: "req/min" },
-    brainSnapshotRetention: { label: "Brain Snapshot Retention", desc: "Number of brain state versions to keep", unit: "versions" },
-    sessionHistoryRetentionDays: { label: "Session History Retention", desc: "How long to keep session history data", unit: "days" },
+    maxLearnersPerParent: {
+      label: "Max Learners per Parent",
+      desc: "Maximum number of learner profiles per parent account",
+      unit: "learners",
+    },
+    maxSessionDurationMinutes: {
+      label: "Max Session Duration",
+      desc: "Maximum length of a single tutoring session",
+      unit: "minutes",
+    },
+    maxApiRequestsPerMinute: {
+      label: "API Rate Limit",
+      desc: "Maximum API requests per minute per user",
+      unit: "req/min",
+    },
+    brainSnapshotRetention: {
+      label: "Brain Snapshot Retention",
+      desc: "Number of brain state versions to keep",
+      unit: "versions",
+    },
+    sessionHistoryRetentionDays: {
+      label: "Session History Retention",
+      desc: "How long to keep session history data",
+      unit: "days",
+    },
   };
 
   if (loading) {
-    return <div className="p-8 text-center vi-text-muted animate-pulse">Loading platform settings...</div>;
+    return (
+      <div className="p-8 text-center vi-text-muted animate-pulse">
+        Loading platform settings...
+      </div>
+    );
   }
 
   return (
@@ -147,15 +193,24 @@ export default function AdminSettingsPage() {
           </IconWell>
           <div>
             <h1 className="text-2xl font-heading font-bold vi-text">{t("general")}</h1>
-            <p className="text-sm vi-text-muted mt-1">Configure feature flags, system limits, and global platform settings.</p>
+            <p className="text-sm vi-text-muted mt-1">
+              Configure feature flags, system limits, and global platform settings.
+            </p>
           </div>
         </div>
         {isPlatformAdmin && (
           <div className="flex items-center gap-3">
-            {saveStatus === "success" && <span className="text-sm text-green-600 font-semibold">Saved!</span>}
-            {saveStatus === "error" && <span className="text-sm text-red-600 font-semibold">Save failed</span>}
-            <button onClick={handleSave} disabled={saving}
-              className="px-5 py-2.5 rounded-xl bg-[hsl(var(--visual-primary))] text-white font-semibold text-sm hover:opacity-90 transition disabled:opacity-50 shadow-sm">
+            {saveStatus === "success" && (
+              <span className="text-sm text-green-600 font-semibold">Saved!</span>
+            )}
+            {saveStatus === "error" && (
+              <span className="text-sm text-red-600 font-semibold">Save failed</span>
+            )}
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="px-5 py-2.5 rounded-xl bg-[hsl(var(--visual-primary))] text-white font-semibold text-sm hover:opacity-90 transition disabled:opacity-50 shadow-sm"
+            >
               {saving ? "Saving..." : "Save Changes"}
             </button>
           </div>
@@ -181,13 +236,20 @@ export default function AdminSettingsPage() {
           {Object.entries(config?.featureFlags || {}).map(([key, enabled]) => {
             const info = FLAG_DESCRIPTIONS[key] || { label: key, desc: "" };
             return (
-              <div key={key} className={`flex items-center justify-between p-4 rounded-xl border ${
-                info.critical ? "border-red-200 bg-red-50/30" : "vi-border"
-              }`}>
+              <div
+                key={key}
+                className={`flex items-center justify-between p-4 rounded-xl border ${
+                  info.critical ? "border-red-200 bg-red-50/30" : "vi-border"
+                }`}
+              >
                 <div>
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-semibold vi-text">{info.label}</p>
-                    {info.critical && <span className="px-1.5 py-0.5 text-[10px] rounded bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))] font-bold">CRITICAL</span>}
+                    {info.critical && (
+                      <span className="px-1.5 py-0.5 text-[10px] rounded bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))] font-bold">
+                        CRITICAL
+                      </span>
+                    )}
                   </div>
                   <p className="text-xs vi-text-muted mt-0.5">{info.desc}</p>
                 </div>
@@ -198,7 +260,9 @@ export default function AdminSettingsPage() {
                     enabled ? (info.critical ? "bg-red-500" : "bg-green-500") : "bg-slate-300"
                   } ${!isPlatformAdmin ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                 >
-                  <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${enabled ? "left-[26px]" : "left-0.5"}`} />
+                  <span
+                    className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${enabled ? "left-[26px]" : "left-0.5"}`}
+                  />
                 </button>
               </div>
             );
@@ -208,7 +272,9 @@ export default function AdminSettingsPage() {
 
       <div className="vi-card p-6">
         <h2 className="font-heading font-bold text-lg vi-text mb-1">System Limits</h2>
-        <p className="text-xs vi-text-muted mb-5">Configure platform-wide resource limits and thresholds.</p>
+        <p className="text-xs vi-text-muted mb-5">
+          Configure platform-wide resource limits and thresholds.
+        </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Object.entries(config?.systemLimits || {}).map(([key, value]) => {
             const info = LIMIT_DESCRIPTIONS[key] || { label: key, desc: "", unit: "" };
@@ -233,18 +299,50 @@ export default function AdminSettingsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {([
-          { href: "/dashboard/admin/settings/emails", label: "Email Templates", desc: "Manage transactional email templates", Icon: Mail, color: "primary" as const },
-          { href: "/dashboard/admin/settings/webhooks", label: "Webhooks", desc: "Configure webhook endpoints for events", Icon: Webhook, color: "math" as const },
-          { href: "/dashboard/admin/settings/api-keys", label: "API Keys", desc: "Manage programmatic API access", Icon: KeyRound, color: "reading" as const },
-        ] as { href: string; label: string; desc: string; Icon: LucideIcon; color: "primary" | "math" | "reading" | "science" | "sel" }[]).map((item) => {
+        {(
+          [
+            {
+              href: "/dashboard/admin/settings/emails",
+              label: "Email Templates",
+              desc: "Manage transactional email templates",
+              Icon: Mail,
+              color: "primary" as const,
+            },
+            {
+              href: "/dashboard/admin/settings/webhooks",
+              label: "Webhooks",
+              desc: "Configure webhook endpoints for events",
+              Icon: Webhook,
+              color: "math" as const,
+            },
+            {
+              href: "/dashboard/admin/settings/api-keys",
+              label: "API Keys",
+              desc: "Manage programmatic API access",
+              Icon: KeyRound,
+              color: "reading" as const,
+            },
+          ] as {
+            href: string;
+            label: string;
+            desc: string;
+            Icon: LucideIcon;
+            color: "primary" | "math" | "reading" | "science" | "sel";
+          }[]
+        ).map((item) => {
           const Icon = item.Icon;
           return (
-            <a key={item.href} href={item.href} className="vi-card p-5 hover:border-purple-300 hover:shadow-md transition group">
+            <a
+              key={item.href}
+              href={item.href}
+              className="vi-card p-5 hover:border-purple-300 hover:shadow-md transition group"
+            >
               <IconWell color={item.color} size="sm">
                 <Icon size={20} strokeWidth={2.5} aria-hidden="true" />
               </IconWell>
-              <h3 className="font-heading font-bold vi-text mt-3 group-hover:text-[hsl(var(--visual-primary))] transition">{item.label}</h3>
+              <h3 className="font-heading font-bold vi-text mt-3 group-hover:text-[hsl(var(--visual-primary))] transition">
+                {item.label}
+              </h3>
               <p className="text-sm vi-text-muted mt-1">{item.desc}</p>
             </a>
           );

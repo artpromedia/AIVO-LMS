@@ -13,8 +13,7 @@ import {
   type TutorSubscriptionStatus,
 } from "@aivo/billing-entitlements";
 
-const ALLOW_UNGATED =
-  String(process.env.AIVO_ALLOW_UNGATED_TUTORS ?? "").toLowerCase() === "true";
+const ALLOW_UNGATED = String(process.env.AIVO_ALLOW_UNGATED_TUTORS ?? "").toLowerCase() === "true";
 
 const PAST_DUE_GRACE_POLICY: PastDueGracePolicy =
   String(process.env.AIVO_PAST_DUE_GRACE_POLICY ?? "").toLowerCase() === "deny" ? "deny" : "allow";

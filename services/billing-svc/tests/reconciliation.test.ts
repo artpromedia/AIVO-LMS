@@ -32,15 +32,28 @@ function makeRecordingDb(seedSelects: unknown[][] = []) {
     } catch {}
     return "unknown";
   };
-  const fluent = <T>(payload: T, captureUpdate?: (set: Record<string, unknown>) => void, captureInsert?: (values: Record<string, unknown>) => void) => {
+  const fluent = <T>(
+    payload: T,
+    captureUpdate?: (set: Record<string, unknown>) => void,
+    captureInsert?: (values: Record<string, unknown>) => void,
+  ) => {
     let currentTable = "unknown";
     const chain: any = {
-      from(t: any) { currentTable = tableName(t); return chain; },
+      from(t: any) {
+        currentTable = tableName(t);
+        return chain;
+      },
       where: () => chain,
       orderBy: () => chain,
       limit: () => chain,
-      values(v: Record<string, unknown>) { captureInsert?.(v); return chain; },
-      set(v: Record<string, unknown>) { captureUpdate?.(v); return chain; },
+      values(v: Record<string, unknown>) {
+        captureInsert?.(v);
+        return chain;
+      },
+      set(v: Record<string, unknown>) {
+        captureUpdate?.(v);
+        return chain;
+      },
       onConflictDoNothing: () => chain,
       returning: () => Promise.resolve(payload),
       then: (resolve: (v: T) => unknown) => Promise.resolve(payload).then(resolve),
@@ -62,9 +75,7 @@ function makeRecordingDb(seedSelects: unknown[][] = []) {
         );
       },
       update(table: any) {
-        return fluent([{ id: "stub-id" }], (set) =>
-          updates.push({ table: tableName(table), set }),
-        );
+        return fluent([{ id: "stub-id" }], (set) => updates.push({ table: tableName(table), set }));
       },
     },
   };

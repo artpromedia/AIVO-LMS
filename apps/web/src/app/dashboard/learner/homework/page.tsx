@@ -19,11 +19,26 @@ interface HomeworkAssignment {
 }
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  PROCESSING: { label: "Processing...", color: "bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]" },
-  READY: { label: "Ready", color: "bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]" },
-  IN_PROGRESS: { label: "In Progress", color: "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]" },
-  COMPLETED: { label: "Done!", color: "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]" },
-  FAILED: { label: "Failed", color: "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]" },
+  PROCESSING: {
+    label: "Processing...",
+    color: "bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]",
+  },
+  READY: {
+    label: "Ready",
+    color: "bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]",
+  },
+  IN_PROGRESS: {
+    label: "In Progress",
+    color: "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]",
+  },
+  COMPLETED: {
+    label: "Done!",
+    color: "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]",
+  },
+  FAILED: {
+    label: "Failed",
+    color: "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]",
+  },
 };
 
 export default function HomeworkPage() {
@@ -40,7 +55,11 @@ export default function HomeworkPage() {
   const [textMode, setTextMode] = useState(false);
   const [pastedText, setPastedText] = useState("");
   const [isDragging, setIsDragging] = useState(false);
-  const [lockedInfo, setLockedInfo] = useState<{ locked: boolean; requiredSku: string; detectedSubject: string } | null>(null);
+  const [lockedInfo, setLockedInfo] = useState<{
+    locked: boolean;
+    requiredSku: string;
+    detectedSubject: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/login");
@@ -107,7 +126,11 @@ export default function HomeworkPage() {
       const data = await res.json();
 
       if (data.locked) {
-        setLockedInfo({ locked: true, requiredSku: data.requiredSku, detectedSubject: data.detectedSubject });
+        setLockedInfo({
+          locked: true,
+          requiredSku: data.requiredSku,
+          detectedSubject: data.detectedSubject,
+        });
         return;
       }
 
@@ -142,9 +165,18 @@ export default function HomeworkPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-cyan-50">
       <header className="bg-white/80 backdrop-blur border-b border-slate-200 px-8 py-4 flex items-center justify-between">
-        <Image src="/images/aivo-logo-purple.png" alt="AIVO" width={100} height={30} style={{ height: "auto" }} />
+        <Image
+          src="/images/aivo-logo-purple.png"
+          alt="AIVO"
+          width={100}
+          height={30}
+          style={{ height: "auto" }}
+        />
         <div className="flex items-center gap-4">
-          <button onClick={() => router.push("/dashboard/learner")} className="text-sm text-slate-500 hover:text-purple-600 font-semibold">
+          <button
+            onClick={() => router.push("/dashboard/learner")}
+            className="text-sm text-slate-500 hover:text-purple-600 font-semibold"
+          >
             {tCommon("back")}
           </button>
         </div>
@@ -166,7 +198,8 @@ export default function HomeworkPage() {
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center space-y-3">
             <p className="text-amber-800 font-bold text-lg">{t("subscription_required")}</p>
             <p className="text-amber-700">
-              This homework is {lockedInfo.detectedSubject.toLowerCase()} — you need a {lockedInfo.detectedSubject.toLowerCase()} tutor subscription to get help.
+              This homework is {lockedInfo.detectedSubject.toLowerCase()} — you need a{" "}
+              {lockedInfo.detectedSubject.toLowerCase()} tutor subscription to get help.
             </p>
             <button
               onClick={() => router.push("/dashboard/parent/store")}
@@ -181,16 +214,29 @@ export default function HomeworkPage() {
           <div
             role="button"
             tabIndex={0}
-            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") fileInputRef.current?.click(); }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") fileInputRef.current?.click();
+            }}
             className={`bg-white rounded-2xl p-8 border-2 border-dashed transition-all cursor-pointer flex flex-col items-center justify-center min-h-[200px] space-y-4 ${
-              isDragging ? "border-purple-500 bg-purple-50" : "border-slate-200 hover:border-purple-300"
+              isDragging
+                ? "border-purple-500 bg-purple-50"
+                : "border-slate-200 hover:border-purple-300"
             }`}
-            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              setIsDragging(true);
+            }}
             onDragLeave={() => setIsDragging(false)}
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
           >
-            <input ref={fileInputRef} type="file" accept="image/*,.pdf,application/pdf" className="hidden" onChange={handleFileChange} />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*,.pdf,application/pdf"
+              className="hidden"
+              onChange={handleFileChange}
+            />
             {uploading ? (
               <>
                 <div className="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin" />
@@ -209,7 +255,10 @@ export default function HomeworkPage() {
           </div>
 
           <div className="bg-white rounded-2xl p-8 border-2 border-slate-200 flex flex-col min-h-[200px] space-y-4">
-            <p className="text-slate-700 font-bold text-lg text-center inline-flex items-center justify-center gap-2"><Pencil className="w-5 h-5 text-purple-600" strokeWidth={2.5} aria-hidden /> {t("paste_text")}</p>
+            <p className="text-slate-700 font-bold text-lg text-center inline-flex items-center justify-center gap-2">
+              <Pencil className="w-5 h-5 text-purple-600" strokeWidth={2.5} aria-hidden />{" "}
+              {t("paste_text")}
+            </p>
             <textarea
               value={pastedText}
               onChange={(e) => setPastedText(e.target.value)}
@@ -251,7 +300,9 @@ export default function HomeworkPage() {
                   onClick={async () => {
                     if (hw.status === "READY" || hw.status === "IN_PROGRESS") {
                       try {
-                        const headers: Record<string, string> = { "Content-Type": "application/json" };
+                        const headers: Record<string, string> = {
+                          "Content-Type": "application/json",
+                        };
                         if (accessToken) headers["Authorization"] = `Bearer ${accessToken}`;
                         const res = await fetch("/api/tutors/homework/session/start", {
                           method: "POST",
@@ -268,7 +319,9 @@ export default function HomeworkPage() {
                   disabled={hw.status === "FAILED"}
                   className="w-full bg-white rounded-xl p-5 shadow-sm border border-slate-100 hover:shadow-md transition flex items-center gap-4 text-left disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${subjectWellClass(subjectLower)}`}>
+                  <div
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center ${subjectWellClass(subjectLower)}`}
+                  >
                     <SubjectIcon className="w-6 h-6" strokeWidth={2} aria-hidden />
                   </div>
                   <div className="flex-1 min-w-0">

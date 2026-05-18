@@ -79,15 +79,19 @@ const KNOWN_FEEDBACK_MODES = new Set<string>([
 
 const KNOWN_SCORING_MODES = new Set<string>(["exact", "rubric", "process", "hybrid"]);
 
-export function validateDiscoveryActivity(activity: any): { ok: true } | { ok: false; reason: string } {
+export function validateDiscoveryActivity(
+  activity: any,
+): { ok: true } | { ok: false; reason: string } {
   if (!activity || typeof activity !== "object") return { ok: false, reason: "not_object" };
   if (!activity.id || typeof activity.id !== "string") return { ok: false, reason: "missing_id" };
-  if (!activity.domain || typeof activity.domain !== "string") return { ok: false, reason: "missing_domain" };
+  if (!activity.domain || typeof activity.domain !== "string")
+    return { ok: false, reason: "missing_domain" };
   if (!activity.difficulty) return { ok: false, reason: "missing_difficulty" };
   if (!activity.interaction || !KNOWN_INTERACTIONS.has(activity.interaction)) {
     return { ok: false, reason: `unsupported_interaction:${activity.interaction}` };
   }
-  if (!activity.prompt || typeof activity.prompt !== "string") return { ok: false, reason: "missing_prompt" };
+  if (!activity.prompt || typeof activity.prompt !== "string")
+    return { ok: false, reason: "missing_prompt" };
   if (activity.feedbackMode && !KNOWN_FEEDBACK_MODES.has(activity.feedbackMode)) {
     return { ok: false, reason: `unsupported_feedback_mode:${activity.feedbackMode}` };
   }
@@ -111,7 +115,11 @@ export function validateDiscoveryActivity(activity: any): { ok: true } | { ok: f
     }
     if (activity.interaction === "geometry_workspace") {
       if (surface.type !== "geometry_workspace") return { ok: false, reason: "wrong_surface_type" };
-      if (!surface.diagram || !Array.isArray(surface.diagram.shapes) || surface.diagram.shapes.length === 0) {
+      if (
+        !surface.diagram ||
+        !Array.isArray(surface.diagram.shapes) ||
+        surface.diagram.shapes.length === 0
+      ) {
         return { ok: false, reason: "geometry_missing_shapes" };
       }
     }
@@ -149,7 +157,11 @@ export function partitionChapterActivitiesPayload(payload: any): {
   totalValid: number;
 } {
   if (!payload || typeof payload !== "object") {
-    return { activities: { easy: [], medium: [], hard: [] }, rejectedActivities: [], totalValid: 0 };
+    return {
+      activities: { easy: [], medium: [], hard: [] },
+      rejectedActivities: [],
+      totalValid: 0,
+    };
   }
   const tiers = ["easy", "medium", "hard"] as const;
   const out: any = { easy: [], medium: [], hard: [] };
@@ -158,7 +170,9 @@ export function partitionChapterActivitiesPayload(payload: any): {
     const items = Array.isArray(payload[tier]) ? payload[tier] : [];
     const result = partitionDiscoveryActivities(items);
     out[tier] = result.validActivities;
-    rejected.push(...result.rejectedActivities.map((r) => ({ ...r, reason: `${tier}:${r.reason}` })));
+    rejected.push(
+      ...result.rejectedActivities.map((r) => ({ ...r, reason: `${tier}:${r.reason}` })),
+    );
   }
   const totalValid = out.easy.length + out.medium.length + out.hard.length;
   return { activities: out, rejectedActivities: rejected, totalValid };

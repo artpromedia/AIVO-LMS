@@ -79,7 +79,6 @@ export default function AdminCouponsPage() {
 
   useEffect(() => {
     loadCoupons();
-     
   }, [accessToken]);
 
   function updateField<K extends keyof CouponForm>(key: K, value: CouponForm[K]) {
@@ -105,7 +104,9 @@ export default function AdminCouponsPage() {
       payload.discountPct = Number(form.discountPct);
     } else if (form.couponType === "SUBSCRIPTION") {
       payload.discountPct = 0;
-      payload.grantsDurationDays = form.subscriptionDurationDays ? Number(form.subscriptionDurationDays) : null;
+      payload.grantsDurationDays = form.subscriptionDurationDays
+        ? Number(form.subscriptionDurationDays)
+        : null;
     } else {
       payload.discountPct = 0;
       payload.grantsTier = form.grantsTier.trim();
@@ -157,7 +158,10 @@ export default function AdminCouponsPage() {
   return (
     <div className="p-8 space-y-6">
       <div className="flex items-center gap-3 text-sm vi-text-muted">
-        <Link href="/dashboard/admin/billing" className="hover:text-[hsl(var(--visual-primary))] transition">
+        <Link
+          href="/dashboard/admin/billing"
+          className="hover:text-[hsl(var(--visual-primary))] transition"
+        >
           Billing
         </Link>
         <span>/</span>
@@ -168,7 +172,8 @@ export default function AdminCouponsPage() {
         <div>
           <h1 className="text-2xl font-heading font-bold vi-text">Coupons & Subscriptions</h1>
           <p className="text-sm vi-text-muted mt-1">
-            Create coupons for subscription access (1-12 months), discounts, or pilot provisioning to districts.
+            Create coupons for subscription access (1-12 months), discounts, or pilot provisioning
+            to districts.
           </p>
         </div>
         <button
@@ -191,19 +196,31 @@ export default function AdminCouponsPage() {
         </div>
         <div className="vi-card p-4">
           <p className="text-xs vi-text-muted uppercase font-bold">Inactive</p>
-          <p className="text-2xl font-bold text-[hsl(var(--visual-math))] mt-2">{Math.max(0, coupons.length - activeCount)}</p>
+          <p className="text-2xl font-bold text-[hsl(var(--visual-math))] mt-2">
+            {Math.max(0, coupons.length - activeCount)}
+          </p>
         </div>
       </div>
 
-      {error && <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
-      {success && <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">{success}</div>}
+      {error && (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+      {success && (
+        <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+          {success}
+        </div>
+      )}
 
       <form onSubmit={onCreateCoupon} className="vi-card p-5 space-y-4">
         <h2 className="font-heading font-bold text-lg vi-text">Create Coupon</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label htmlFor="coupon-code" className="block text-sm font-medium vi-text mb-1">Code</label>
+            <label htmlFor="coupon-code" className="block text-sm font-medium vi-text mb-1">
+              Code
+            </label>
             <input
               id="coupon-code"
               required
@@ -215,11 +232,18 @@ export default function AdminCouponsPage() {
           </div>
 
           <div>
-            <label htmlFor="coupon-type" className="block text-sm font-medium vi-text mb-1">Type</label>
+            <label htmlFor="coupon-type" className="block text-sm font-medium vi-text mb-1">
+              Type
+            </label>
             <select
               id="coupon-type"
               value={form.couponType}
-              onChange={(e) => updateField("couponType", e.target.value as "DISCOUNT" | "SUBSCRIPTION" | "PROVISIONING")}
+              onChange={(e) =>
+                updateField(
+                  "couponType",
+                  e.target.value as "DISCOUNT" | "SUBSCRIPTION" | "PROVISIONING",
+                )
+              }
               className="w-full border vi-border rounded-lg px-3 py-2 text-sm vi-bg"
             >
               <option value="SUBSCRIPTION">Subscription Duration (1mo, 3mo, 6mo, 12mo)</option>
@@ -229,7 +253,9 @@ export default function AdminCouponsPage() {
           </div>
 
           <div>
-            <label htmlFor="coupon-max" className="block text-sm font-medium vi-text mb-1">Max Redemptions</label>
+            <label htmlFor="coupon-max" className="block text-sm font-medium vi-text mb-1">
+              Max Redemptions
+            </label>
             <input
               id="coupon-max"
               type="number"
@@ -244,7 +270,9 @@ export default function AdminCouponsPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="coupon-description" className="block text-sm font-medium vi-text mb-1">Description</label>
+            <label htmlFor="coupon-description" className="block text-sm font-medium vi-text mb-1">
+              Description
+            </label>
             <input
               id="coupon-description"
               value={form.description}
@@ -254,7 +282,9 @@ export default function AdminCouponsPage() {
             />
           </div>
           <div>
-            <label htmlFor="coupon-expiry" className="block text-sm font-medium vi-text mb-1">Expires At</label>
+            <label htmlFor="coupon-expiry" className="block text-sm font-medium vi-text mb-1">
+              Expires At
+            </label>
             <input
               id="coupon-expiry"
               type="datetime-local"
@@ -268,7 +298,9 @@ export default function AdminCouponsPage() {
         {form.couponType === "DISCOUNT" ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label htmlFor="discount-pct" className="block text-sm font-medium vi-text mb-1">Discount %</label>
+              <label htmlFor="discount-pct" className="block text-sm font-medium vi-text mb-1">
+                Discount %
+              </label>
               <input
                 id="discount-pct"
                 type="number"
@@ -284,7 +316,9 @@ export default function AdminCouponsPage() {
           <div className="space-y-4">
             <div>
               {/* eslint-disable-next-line jsx-a11y/label-has-associated-control -- group of toggle buttons, no single control */}
-              <label className="block text-sm font-medium vi-text mb-2">Subscription Duration</label>
+              <label className="block text-sm font-medium vi-text mb-2">
+                Subscription Duration
+              </label>
               <div className="grid grid-cols-4 gap-2">
                 <button
                   type="button"
@@ -333,7 +367,10 @@ export default function AdminCouponsPage() {
               </div>
             </div>
             <div>
-              <label htmlFor="subscription-custom-days" className="block text-sm font-medium vi-text mb-1">
+              <label
+                htmlFor="subscription-custom-days"
+                className="block text-sm font-medium vi-text mb-1"
+              >
                 Or enter custom days
               </label>
               <input
@@ -350,7 +387,9 @@ export default function AdminCouponsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label htmlFor="grants-tier" className="block text-sm font-medium vi-text mb-1">Grants Tier</label>
+              <label htmlFor="grants-tier" className="block text-sm font-medium vi-text mb-1">
+                Grants Tier
+              </label>
               <input
                 id="grants-tier"
                 value={form.grantsTier}
@@ -360,7 +399,9 @@ export default function AdminCouponsPage() {
               />
             </div>
             <div>
-              <label htmlFor="grants-plan" className="block text-sm font-medium vi-text mb-1">Grants Plan</label>
+              <label htmlFor="grants-plan" className="block text-sm font-medium vi-text mb-1">
+                Grants Plan
+              </label>
               <input
                 id="grants-plan"
                 value={form.grantsPlan}
@@ -370,7 +411,9 @@ export default function AdminCouponsPage() {
               />
             </div>
             <div>
-              <label htmlFor="grants-seat-limit" className="block text-sm font-medium vi-text mb-1">Seat Limit</label>
+              <label htmlFor="grants-seat-limit" className="block text-sm font-medium vi-text mb-1">
+                Seat Limit
+              </label>
               <input
                 id="grants-seat-limit"
                 type="number"
@@ -382,7 +425,9 @@ export default function AdminCouponsPage() {
               />
             </div>
             <div>
-              <label htmlFor="grants-duration" className="block text-sm font-medium vi-text mb-1">Duration (days)</label>
+              <label htmlFor="grants-duration" className="block text-sm font-medium vi-text mb-1">
+                Duration (days)
+              </label>
               <input
                 id="grants-duration"
                 type="number"
@@ -439,11 +484,15 @@ export default function AdminCouponsPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center vi-text-muted">Loading coupons...</td>
+                  <td colSpan={6} className="px-4 py-8 text-center vi-text-muted">
+                    Loading coupons...
+                  </td>
                 </tr>
               ) : coupons.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center vi-text-muted">No coupons yet.</td>
+                  <td colSpan={6} className="px-4 py-8 text-center vi-text-muted">
+                    No coupons yet.
+                  </td>
                 </tr>
               ) : (
                 coupons.map((c) => {
@@ -451,13 +500,15 @@ export default function AdminCouponsPage() {
                   const isSubscription = couponType === "SUBSCRIPTION";
                   const isProvision = couponType === "PROVISIONING";
                   const isDiscount = couponType === "DISCOUNT";
-                  
-                  let badgeColor = "bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]";
+
+                  let badgeColor =
+                    "bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]";
                   let typeLabel = "Discount";
                   let details = `${c.discount_pct || 0}% off`;
-                  
+
                   if (isSubscription) {
-                    badgeColor = "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]";
+                    badgeColor =
+                      "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]";
                     typeLabel = "Subscription";
                     const days = c.grants_duration_days || 0;
                     const months = Math.round(days / 30);
@@ -472,7 +523,9 @@ export default function AdminCouponsPage() {
                     <tr key={c.code} className="border-b vi-border hover:vi-bg/50 transition">
                       <td className="px-4 py-3 font-semibold vi-text">{c.code}</td>
                       <td className="px-4 py-3">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${badgeColor}`}>
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-xs font-semibold ${badgeColor}`}
+                        >
                           {typeLabel}
                         </span>
                       </td>
@@ -481,11 +534,13 @@ export default function AdminCouponsPage() {
                         {c.redemptions} / {c.max_redemptions ?? "∞"}
                       </td>
                       <td className="px-4 py-3">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                          c.active
-                            ? "bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]"
-                            : "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]"
-                        }`}>
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                            c.active
+                              ? "bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]"
+                              : "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]"
+                          }`}
+                        >
                           {c.active ? "Active" : "Inactive"}
                         </span>
                       </td>

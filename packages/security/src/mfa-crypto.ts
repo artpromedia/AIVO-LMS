@@ -133,7 +133,9 @@ export function generateRecoveryCodes(count = 10): { plain: string[]; canonical:
 
 /** Normalize user-entered recovery code to canonical (uppercase, alphanumeric only). */
 export function canonicalizeRecoveryCode(input: string): string {
-  return String(input || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  return String(input || "")
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "");
 }
 
 /** Detect if a `code` looks like a recovery code (12 alphanum chars after canonicalization). */

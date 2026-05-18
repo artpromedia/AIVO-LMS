@@ -133,9 +133,7 @@ export function deriveLearningProfile(
     processingSpeedMs =
       sorted.length % 2 === 1
         ? sorted[(sorted.length - 1) / 2]
-        : Math.round(
-            (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2,
-          );
+        : Math.round((sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2);
   } else {
     const avgs = chapters
       .map((c) => c.avgLatencyMs)
@@ -168,14 +166,12 @@ export function deriveLearningProfile(
       if (attentionRunLength === chapters.length) attentionRunLength = i;
     }
   }
-  const frustrationRate =
-    chapters.length === 0 ? 0 : chaptersWithFrustration / chapters.length;
+  const frustrationRate = chapters.length === 0 ? 0 : chaptersWithFrustration / chapters.length;
   const frustrationTolerance: DerivedProfile["frustrationTolerance"] =
     frustrationRate >= 0.4 ? "low" : frustrationRate >= 0.15 ? "moderate" : "high";
 
-  const surfaceSignalSummary = surfaceSignals.length > 0
-    ? summariseSurfaceSignals(surfaceSignals)
-    : undefined;
+  const surfaceSignalSummary =
+    surfaceSignals.length > 0 ? summariseSurfaceSignals(surfaceSignals) : undefined;
 
   return {
     thetaPlacement: Math.round(theta * 10) / 10,

@@ -22,11 +22,7 @@ const PER_LEARNER_TYPES: ConsentType[] = [
   "teacher_access",
 ];
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ learnerId: string }>;
-}) {
+export default async function Page({ params }: { params: Promise<{ learnerId: string }> }) {
   const { learnerId } = await params;
   const session = await requirePageRole(["parent"]);
   if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
@@ -53,24 +49,19 @@ export default async function Page({
       {ageGate?.requiresParentConsent ? (
         <Card className="p-4 mb-4 bg-amber-50 border-amber-200">
           <p className="text-sm text-amber-900">
-            This learner is under 13. Parent consent is required for data
-            collection per COPPA.
+            This learner is under 13. Parent consent is required for data collection per COPPA.
           </p>
         </Card>
       ) : null}
       <Card className="p-0 divide-y">
         {PER_LEARNER_TYPES.map((type) => {
           const version = versions.find((v) => v.consentType === type);
-          const active = records.find(
-            (r) => r.consentType === type && r.revokedAt === null,
-          );
+          const active = records.find((r) => r.consentType === type && r.revokedAt === null);
           return (
             <div key={type} className="p-5 flex items-start justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="font-display text-base font-semibold">
-                    {humanize(type)}
-                  </h3>
+                  <h3 className="font-display text-base font-semibold">{humanize(type)}</h3>
                   {active ? (
                     <Badge tone="success">Accepted</Badge>
                   ) : (
@@ -80,15 +71,9 @@ export default async function Page({
                 <p className="text-sm text-aivo-ink-soft mt-1">
                   {version?.summary ?? "No description available."}
                 </p>
-                <p className="text-xs text-aivo-ink-soft mt-1">
-                  Version {version?.version ?? "—"}
-                </p>
+                <p className="text-xs text-aivo-ink-soft mt-1">Version {version?.version ?? "—"}</p>
               </div>
-              <ConsentToggle
-                consentType={type}
-                accepted={Boolean(active)}
-                learnerId={learnerId}
-              />
+              <ConsentToggle consentType={type} accepted={Boolean(active)} learnerId={learnerId} />
             </div>
           );
         })}

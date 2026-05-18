@@ -39,7 +39,12 @@ const STATE_SCALE: Record<TutorState, number> = {
   pointing: 1.02,
 };
 
-export function TutorCharacter({ tutorKey, tutorState, speechText, reducedMotion = false }: TutorCharacterProps) {
+export function TutorCharacter({
+  tutorKey,
+  tutorState,
+  speechText,
+  reducedMotion = false,
+}: TutorCharacterProps) {
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const targetScale = STATE_SCALE[tutorState] ?? 1;
 
@@ -59,7 +64,12 @@ export function TutorCharacter({ tutorKey, tutorState, speechText, reducedMotion
   const emoji = TUTOR_EMOJIS[tutorKey] ?? "🤖";
 
   return (
-    <View style={styles.container} accessible accessibilityRole="image" accessibilityLabel={`Tutor ${tutorKey} is ${tutorState}`}>
+    <View
+      style={styles.container}
+      accessible
+      accessibilityRole="image"
+      accessibilityLabel={`Tutor ${tutorKey} is ${tutorState}`}
+    >
       <Animated.View style={[styles.avatarWrapper, { transform: [{ scale: scaleAnim }] }]}>
         <View style={styles.avatar}>
           <Text style={styles.emoji}>{emoji}</Text>
@@ -67,7 +77,13 @@ export function TutorCharacter({ tutorKey, tutorState, speechText, reducedMotion
       </Animated.View>
 
       {speechText ? (
-        <View style={styles.speechBubble} accessible accessibilityRole="text" accessibilityLabel={speechText} accessibilityLiveRegion="polite">
+        <View
+          style={styles.speechBubble}
+          accessible
+          accessibilityRole="text"
+          accessibilityLabel={speechText}
+          accessibilityLiveRegion="polite"
+        >
           <Text style={styles.speechText}>{speechText}</Text>
           <View style={styles.bubbleTail} />
         </View>

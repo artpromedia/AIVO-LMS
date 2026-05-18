@@ -49,10 +49,7 @@ describe("quest content seed gate", () => {
   it("every chapter key in QUEST_CHAPTER_CONTENT maps to a real world", () => {
     const validKeys = new Set(QUEST_WORLDS.map((w) => w.key));
     for (const c of QUEST_CHAPTER_CONTENT) {
-      assert.ok(
-        validKeys.has(c.worldKey),
-        `chapter references unknown world key: ${c.worldKey}`,
-      );
+      assert.ok(validKeys.has(c.worldKey), `chapter references unknown world key: ${c.worldKey}`);
     }
   });
 
@@ -76,8 +73,14 @@ describe("quest content seed gate", () => {
   it("XP and coin rewards are positive integers in expected ranges", () => {
     for (const c of QUEST_CHAPTER_CONTENT) {
       const ctx = `${c.worldKey}/${c.chapterNumber}`;
-      assert.ok(Number.isInteger(c.xpReward) && c.xpReward > 0 && c.xpReward <= 1000, `${ctx} xpReward`);
-      assert.ok(Number.isInteger(c.coinReward) && c.coinReward >= 0 && c.coinReward <= 500, `${ctx} coinReward`);
+      assert.ok(
+        Number.isInteger(c.xpReward) && c.xpReward > 0 && c.xpReward <= 1000,
+        `${ctx} xpReward`,
+      );
+      assert.ok(
+        Number.isInteger(c.coinReward) && c.coinReward >= 0 && c.coinReward <= 500,
+        `${ctx} coinReward`,
+      );
     }
   });
 

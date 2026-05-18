@@ -9,7 +9,14 @@ interface AccessibleToggleProps {
   color?: string;
 }
 
-export function AccessibleToggle({ value, onChange, label, description, id, color = "bg-primary" }: AccessibleToggleProps) {
+export function AccessibleToggle({
+  value,
+  onChange,
+  label,
+  description,
+  id,
+  color = "bg-primary",
+}: AccessibleToggleProps) {
   const labelId = `${id}-label`;
   const descId = description ? `${id}-desc` : undefined;
 
@@ -26,8 +33,14 @@ export function AccessibleToggle({ value, onChange, label, description, id, colo
       <span
         className={`absolute w-5 h-5 rounded-full bg-white shadow top-0.5 transition ${value ? "left-[22px]" : "left-0.5"}`}
       />
-      <span id={labelId} className="sr-only">{label}</span>
-      {descId && <span id={descId} className="sr-only">{description}</span>}
+      <span id={labelId} className="sr-only">
+        {label}
+      </span>
+      {descId && (
+        <span id={descId} className="sr-only">
+          {description}
+        </span>
+      )}
     </button>
   );
 }

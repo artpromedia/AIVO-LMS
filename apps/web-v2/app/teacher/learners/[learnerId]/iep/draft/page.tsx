@@ -102,10 +102,19 @@ export default async function TeacherIepDraftPage({
               <div>
                 <p className="font-medium">{iep.fileName}</p>
                 <p className="mt-0.5 text-xs text-aivo-ink-soft">
-                  Uploaded {new Date(iep.uploadedAt).toLocaleDateString()} · {Math.round(iep.bytes / 1024)} KB
+                  Uploaded {new Date(iep.uploadedAt).toLocaleDateString()} ·{" "}
+                  {Math.round(iep.bytes / 1024)} KB
                 </p>
               </div>
-              <Badge tone={iep.status === "parsed" ? "success" : iep.status === "failed" ? "danger" : "neutral"}>
+              <Badge
+                tone={
+                  iep.status === "parsed"
+                    ? "success"
+                    : iep.status === "failed"
+                      ? "danger"
+                      : "neutral"
+                }
+              >
                 {iep.status}
               </Badge>
             </div>
@@ -149,7 +158,8 @@ export default async function TeacherIepDraftPage({
       {drafts.length === 0 ? (
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-sm text-aivo-ink-soft">
-            No skills currently below 60% mastery — this learner is on track. Goal drafts will appear when fresh mastery data indicates a gap.
+            No skills currently below 60% mastery — this learner is on track. Goal drafts will
+            appear when fresh mastery data indicates a gap.
           </p>
         </Card>
       ) : (
@@ -183,10 +193,12 @@ export default async function TeacherIepDraftPage({
           <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-aivo-accent" />
           <div className="space-y-1 text-sm text-aivo-ink-soft">
             <p>
-              Drafts pull from the learner's current MasteryMap snapshot. Skills below 60% mastery are surfaced first, with a target lift of +25 percentage points.
+              Drafts pull from the learner's current MasteryMap snapshot. Skills below 60% mastery
+              are surfaced first, with a target lift of +25 percentage points.
             </p>
             <p>
-              Final SMART goals are reviewed and approved by the parent before being added to the IEP record. Drafts here are not visible to the parent until you submit.
+              Final SMART goals are reviewed and approved by the parent before being added to the
+              IEP record. Drafts here are not visible to the parent until you submit.
             </p>
           </div>
         </div>

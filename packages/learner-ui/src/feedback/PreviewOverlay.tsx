@@ -41,12 +41,13 @@ export function PreviewOverlay({
         className="bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full mx-4 text-center"
         role="alert"
       >
-        {icon && <div className="text-5xl mb-3" aria-hidden="true">{icon}</div>}
+        {icon && (
+          <div className="text-5xl mb-3" aria-hidden="true">
+            {icon}
+          </div>
+        )}
         <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Coming up</p>
-        <h3
-          className="text-xl font-heading font-bold mb-2"
-          style={{ color: accentColor }}
-        >
+        <h3 className="text-xl font-heading font-bold mb-2" style={{ color: accentColor }}>
           {title}
         </h3>
         {description && <p className="text-slate-500 text-sm mb-4">{description}</p>}

@@ -49,7 +49,11 @@ const defaultSubjects: SubjectProfile[] = [
     position: { x: "19%", y: "33%" },
     description:
       "The overall learner profile combines performance across assessments, lessons, practice, and learning behavior.",
-    strengths: ["Consistent engagement", "Strong pattern recognition", "Positive response to visual scaffolds"],
+    strengths: [
+      "Consistent engagement",
+      "Strong pattern recognition",
+      "Positive response to visual scaffolds",
+    ],
     supportNeeds: ["Longer multi-step tasks", "Independent review routines"],
     recommendation: "Continue balanced adaptive practice across reading, math, and science.",
     lastUpdated: "Updated today",
@@ -66,7 +70,8 @@ const defaultSubjects: SubjectProfile[] = [
       "Reading reflects vocabulary, comprehension, fluency, inference, and stamina during literacy activities.",
     strengths: ["Vocabulary recognition", "Story recall", "Literal comprehension"],
     supportNeeds: ["Multi-step inference", "Reading stamina", "Evidence-based responses"],
-    recommendation: "Assign a 15-minute adaptive reading session focused on inference and short evidence prompts.",
+    recommendation:
+      "Assign a 15-minute adaptive reading session focused on inference and short evidence prompts.",
     lastUpdated: "Updated today",
   },
   {
@@ -96,7 +101,8 @@ const defaultSubjects: SubjectProfile[] = [
       "Science reflects concept mastery, observation, cause-and-effect reasoning, and applied scientific vocabulary.",
     strengths: ["Concept recognition", "Visual science activities", "Cause-and-effect reasoning"],
     supportNeeds: ["Scientific explanation writing", "Vocabulary precision"],
-    recommendation: "Continue grade-level science practice with visual simulations and short explanation prompts.",
+    recommendation:
+      "Continue grade-level science practice with visual simulations and short explanation prompts.",
     lastUpdated: "Updated yesterday",
   },
   {
@@ -111,7 +117,8 @@ const defaultSubjects: SubjectProfile[] = [
       "Communication will reflect expressive language, receptive understanding, discussion participation, and clarity of response.",
     strengths: [],
     supportNeeds: [],
-    recommendation: "Collect more communication data through guided discussion, oral response, or short written reflection.",
+    recommendation:
+      "Collect more communication data through guided discussion, oral response, or short written reflection.",
     lastUpdated: "Not enough data yet",
   },
   {
@@ -126,7 +133,8 @@ const defaultSubjects: SubjectProfile[] = [
       "Social-emotional data will reflect focus, confidence, frustration tolerance, task persistence, and learning regulation.",
     strengths: [],
     supportNeeds: [],
-    recommendation: "Collect more data through check-ins, focus activities, and reflection prompts.",
+    recommendation:
+      "Collect more data through check-ins, focus activities, and reflection prompts.",
     lastUpdated: "Not enough data yet",
   },
 ];
@@ -210,7 +218,10 @@ export default function LearnerBrainMap({
   }, [selectedId, subjects]);
 
   const gradePercent = selectedSubject.gradeLevel
-    ? Math.min(100, Math.max(0, (selectedSubject.gradeLevel / Math.max(6, expectedGrade + 1)) * 100))
+    ? Math.min(
+        100,
+        Math.max(0, (selectedSubject.gradeLevel / Math.max(6, expectedGrade + 1)) * 100),
+      )
     : 0;
 
   const availableSubjects = subjects.filter((subject) => subject.gradeLevel !== null);
@@ -253,7 +264,10 @@ export default function LearnerBrainMap({
         </div>
 
         <div className={styles.mapGrid}>
-          <div className={styles.mapCanvas} aria-label={`${learnerName}'s interactive learning map`}>
+          <div
+            className={styles.mapCanvas}
+            aria-label={`${learnerName}'s interactive learning map`}
+          >
             <svg className={styles.brainSvg} viewBox="0 0 720 460" aria-hidden="true">
               <defs>
                 <radialGradient id="brainGlow" cx="50%" cy="45%" r="60%">
@@ -269,7 +283,13 @@ export default function LearnerBrainMap({
                 </linearGradient>
 
                 <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feDropShadow dx="0" dy="22" stdDeviation="28" floodColor="#7C3AED" floodOpacity="0.16" />
+                  <feDropShadow
+                    dx="0"
+                    dy="22"
+                    stdDeviation="28"
+                    floodColor="#7C3AED"
+                    floodOpacity="0.16"
+                  />
                 </filter>
               </defs>
 
@@ -288,8 +308,14 @@ export default function LearnerBrainMap({
               />
 
               <path className={styles.brainDivider} d="M360 98c-9 82-7 171 5 267" />
-              <path className={styles.brainCircuit} d="M205 178c53-36 107-31 154 10 41 36 91 35 145-5" />
-              <path className={styles.brainCircuit} d="M185 282c62-24 119-12 164 33 43 43 101 44 172 4" />
+              <path
+                className={styles.brainCircuit}
+                d="M205 178c53-36 107-31 154 10 41 36 91 35 145-5"
+              />
+              <path
+                className={styles.brainCircuit}
+                d="M185 282c62-24 119-12 164 33 43 43 101 44 172 4"
+              />
               <path className={styles.brainCircuit} d="M250 105c-22 57-17 111 15 161" />
               <path className={styles.brainCircuit} d="M472 111c25 65 14 122-34 171" />
 
@@ -457,7 +483,9 @@ export default function LearnerBrainMap({
             </span>
             <div>
               <p>Next milestone</p>
-              <strong>Reach Gr {expectedGrade.toFixed(0)}+ in {supportSubject?.name ?? "Reading"}</strong>
+              <strong>
+                Reach Gr {expectedGrade.toFixed(0)}+ in {supportSubject?.name ?? "Reading"}
+              </strong>
             </div>
           </div>
         </div>

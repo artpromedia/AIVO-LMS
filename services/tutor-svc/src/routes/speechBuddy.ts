@@ -25,7 +25,12 @@ import {
 } from "@aivo/security";
 import { aiSvc } from "../lib/aiSvc.js";
 import { ConsentError, verifyConsent } from "../lib/familyConsent.js";
-import { speechBuddySessionsSchema, speechBuddySessionsByIdTurnSchema, speechBuddySessionsByIdEndSchema, getSpeechBuddySessionsByIdStreamSchema } from "./schemas.js";
+import {
+  speechBuddySessionsSchema,
+  speechBuddySessionsByIdTurnSchema,
+  speechBuddySessionsByIdEndSchema,
+  getSpeechBuddySessionsByIdStreamSchema,
+} from "./schemas.js";
 
 interface ChildJWT {
   sub: string;
@@ -65,7 +70,11 @@ function parseInbound(raw: unknown): StreamInbound | null {
   switch (r.type) {
     case "audio_frame":
       if (typeof r.audioBase64 !== "string") return null;
-      return { type: "audio_frame", audioBase64: r.audioBase64, mimeType: typeof r.mimeType === "string" ? r.mimeType : undefined };
+      return {
+        type: "audio_frame",
+        audioBase64: r.audioBase64,
+        mimeType: typeof r.mimeType === "string" ? r.mimeType : undefined,
+      };
     case "text_turn":
       if (typeof r.text !== "string") return null;
       return { type: "text_turn", text: r.text };
@@ -86,7 +95,10 @@ declare module "fastify" {
   }
 }
 
-async function requireChildAuth(req: FastifyRequest, reply: FastifyReply): Promise<ChildJWT | undefined> {
+async function requireChildAuth(
+  req: FastifyRequest,
+  reply: FastifyReply,
+): Promise<ChildJWT | undefined> {
   const auth = req.headers.authorization;
   if (!auth?.startsWith("Bearer ")) {
     reply.code(401).send({ error: "Missing authorization header" });
@@ -108,91 +120,107 @@ function isAgeBand(v: unknown): v is SpeechBuddyAgeBand {
 
 export async function registerSpeechBuddyRoutes(app: FastifyInstance) {
   // ── POST /speech-buddy/sessions ─────────────────────────────────────────
-  app.post<{ Body: StartSessionBody }>("/speech-buddy/sessions", { schema: speechBuddySessionsSchema }, async (req, reply) => {
-    const user = await requireChildAuth(req, reply);
-    if (!user) return;
-    const body: StartSessionBody = req.body ?? {};
-    const ageBand = body.ageBand ?? user.ageBand;
-    if (!isAgeBand(ageBand)) {
-      return reply.code(400).send({ error: "ageBand must be 6-9, 10-12 or 13-15" });
-    }
-    if (!isSpeechBuddyEnabled(user.tenantId, ageBand)) {
-      return reply.code(403).send({ error: "Speech Buddy is not enabled for this tenant/age band" });
-    }
-    let consentRecordId: string;
-    try {
-      consentRecordId = await verifyConsent({
-        tenantId: user.tenantId,
-        learnerId: user.sub,
-        ageBand,
-      });
-    } catch (err: any) {
-      const status = err instanceof ConsentError ? err.status : 502;
-      return reply.code(status).send({ error: err.message || "consent verification failed" });
-    }
-    const targetedSkills: string[] = Array.isArray(body.targetedSkills) ? body.targetedSkills : [];
-    const locale: string = typeof body.locale === "string" ? body.locale : "en";
-    try {
-      const session = await aiSvc.startSession({
-        tenantId: user.tenantId,
-        learnerId: user.sub,
-        ageBand,
-        locale,
-        consentRecordId,
-        targetedSkills,
-      });
-      return reply.send(session);
-    } catch (err: any) {
-      req.log?.error?.({ err }, "speech_buddy.start_failed");
-      return reply.code(502).send({ error: "Failed to start Speech Buddy session" });
-    }
-  });
+  app.post<{ Body: StartSessionBody }>(
+    "/speech-buddy/sessions",
+    { schema: speechBuddySessionsSchema },
+    async (req, reply) => {
+      const user = await requireChildAuth(req, reply);
+      if (!user) return;
+      const body: StartSessionBody = req.body ?? {};
+      const ageBand = body.ageBand ?? user.ageBand;
+      if (!isAgeBand(ageBand)) {
+        return reply.code(400).send({ error: "ageBand must be 6-9, 10-12 or 13-15" });
+      }
+      if (!isSpeechBuddyEnabled(user.tenantId, ageBand)) {
+        return reply
+          .code(403)
+          .send({ error: "Speech Buddy is not enabled for this tenant/age band" });
+      }
+      let consentRecordId: string;
+      try {
+        consentRecordId = await verifyConsent({
+          tenantId: user.tenantId,
+          learnerId: user.sub,
+          ageBand,
+        });
+      } catch (err: any) {
+        const status = err instanceof ConsentError ? err.status : 502;
+        return reply.code(status).send({ error: err.message || "consent verification failed" });
+      }
+      const targetedSkills: string[] = Array.isArray(body.targetedSkills)
+        ? body.targetedSkills
+        : [];
+      const locale: string = typeof body.locale === "string" ? body.locale : "en";
+      try {
+        const session = await aiSvc.startSession({
+          tenantId: user.tenantId,
+          learnerId: user.sub,
+          ageBand,
+          locale,
+          consentRecordId,
+          targetedSkills,
+        });
+        return reply.send(session);
+      } catch (err: any) {
+        req.log?.error?.({ err }, "speech_buddy.start_failed");
+        return reply.code(502).send({ error: "Failed to start Speech Buddy session" });
+      }
+    },
+  );
 
   // ── POST /speech-buddy/sessions/:id/turn ────────────────────────────────
-  app.post<{ Params: { id: string }; Body: TurnBody }>("/speech-buddy/sessions/:id/turn", { schema: speechBuddySessionsByIdTurnSchema }, async (req, reply) => {
-    const user = await requireChildAuth(req, reply);
-    if (!user) return;
-    const { id } = req.params;
-    const body: TurnBody = req.body ?? {};
-    if (typeof body.text !== "string" && typeof body.audioBase64 !== "string") {
-      return reply.code(400).send({ error: "text or audioBase64 required" });
-    }
-    try {
-      const out = await aiSvc.runTurn(
-        id,
-        {
-          text: body.text,
-          audioBase64: body.audioBase64,
-          mimeType: typeof body.mimeType === "string" ? body.mimeType : "audio/webm",
-        },
-        { tenantId: user.tenantId, learnerId: user.sub },
-      );
-      return reply.send(out);
-    } catch (err) {
-      const e = err as { status?: number; message?: string };
-      const status = e.status === 404 ? 404 : e.status === 409 ? 409 : 502;
-      return reply.code(status).send({ error: e.message || "turn failed" });
-    }
-  });
+  app.post<{ Params: { id: string }; Body: TurnBody }>(
+    "/speech-buddy/sessions/:id/turn",
+    { schema: speechBuddySessionsByIdTurnSchema },
+    async (req, reply) => {
+      const user = await requireChildAuth(req, reply);
+      if (!user) return;
+      const { id } = req.params;
+      const body: TurnBody = req.body ?? {};
+      if (typeof body.text !== "string" && typeof body.audioBase64 !== "string") {
+        return reply.code(400).send({ error: "text or audioBase64 required" });
+      }
+      try {
+        const out = await aiSvc.runTurn(
+          id,
+          {
+            text: body.text,
+            audioBase64: body.audioBase64,
+            mimeType: typeof body.mimeType === "string" ? body.mimeType : "audio/webm",
+          },
+          { tenantId: user.tenantId, learnerId: user.sub },
+        );
+        return reply.send(out);
+      } catch (err) {
+        const e = err as { status?: number; message?: string };
+        const status = e.status === 404 ? 404 : e.status === 409 ? 409 : 502;
+        return reply.code(status).send({ error: e.message || "turn failed" });
+      }
+    },
+  );
 
   // ── POST /speech-buddy/sessions/:id/end ─────────────────────────────────
-  app.post<{ Params: { id: string }; Body: EndBody }>("/speech-buddy/sessions/:id/end", { schema: speechBuddySessionsByIdEndSchema }, async (req, reply) => {
-    const user = await requireChildAuth(req, reply);
-    if (!user) return;
-    const { id } = req.params;
-    const reason: string = req.body?.reason ?? "completed";
-    try {
-      const out = await aiSvc.endSession(id, reason, {
-        tenantId: user.tenantId,
-        learnerId: user.sub,
-      });
-      return reply.send(out);
-    } catch (err) {
-      const e = err as { status?: number; message?: string };
-      const status = e.status === 404 ? 404 : 502;
-      return reply.code(status).send({ error: e.message || "end failed" });
-    }
-  });
+  app.post<{ Params: { id: string }; Body: EndBody }>(
+    "/speech-buddy/sessions/:id/end",
+    { schema: speechBuddySessionsByIdEndSchema },
+    async (req, reply) => {
+      const user = await requireChildAuth(req, reply);
+      if (!user) return;
+      const { id } = req.params;
+      const reason: string = req.body?.reason ?? "completed";
+      try {
+        const out = await aiSvc.endSession(id, reason, {
+          tenantId: user.tenantId,
+          learnerId: user.sub,
+        });
+        return reply.send(out);
+      } catch (err) {
+        const e = err as { status?: number; message?: string };
+        const status = e.status === 404 ? 404 : 502;
+        return reply.code(status).send({ error: e.message || "end failed" });
+      }
+    },
+  );
 
   // ── WS /speech-buddy/sessions/:id/stream ────────────────────────────────
   // Audio frames travel as JSON `{ type: "audio_frame", audioBase64 }`.
@@ -213,7 +241,11 @@ export async function registerSpeechBuddyRoutes(app: FastifyInstance) {
     async (conn, req) => {
       const { id } = req.params;
       const send = (msg: Record<string, unknown>) => {
-        try { conn.socket.send(JSON.stringify(msg)); } catch { /* socket closed */ }
+        try {
+          conn.socket.send(JSON.stringify(msg));
+        } catch {
+          /* socket closed */
+        }
       };
       // ── Auth & tenant check ──────────────────────────────────────────
       const auth = req.headers.authorization;
@@ -261,26 +293,42 @@ export async function registerSpeechBuddyRoutes(app: FastifyInstance) {
       let inFlight: AbortController | null = null;
       const cancelInFlight = (reason: string) => {
         if (inFlight) {
-          try { inFlight.abort(); } catch { /* noop */ }
+          try {
+            inFlight.abort();
+          } catch {
+            /* noop */
+          }
           inFlight = null;
           send({ type: "tts_cancelled", reason });
         }
       };
       conn.socket.on("message", async (raw: Buffer) => {
         let parsed: unknown;
-        try { parsed = JSON.parse(raw.toString("utf-8")); }
-        catch { return send({ type: "error", error: "invalid json" }); }
+        try {
+          parsed = JSON.parse(raw.toString("utf-8"));
+        } catch {
+          return send({ type: "error", error: "invalid json" });
+        }
         const msg = parseInbound(parsed);
         if (!msg) {
           return send({ type: "error", error: "unknown_frame" });
         }
         const emitTurn = (turn: import("../lib/aiSvc.js").TurnResponse) => {
-          send({ type: "buddy_text", text: turn.buddyText, ended: turn.ended, nextState: turn.nextState });
+          send({
+            type: "buddy_text",
+            text: turn.buddyText,
+            ended: turn.ended,
+            nextState: turn.nextState,
+          });
           if (turn.buddyAudioBase64) {
             // Forward TTS audio back to the child. The bytes are released
             // to the wire — we never hold them on the server beyond this
             // synchronous emit. Client decodes & plays via Web Audio.
-            send({ type: "buddy_audio", audioBase64: turn.buddyAudioBase64, mimeType: "audio/mpeg" });
+            send({
+              type: "buddy_audio",
+              audioBase64: turn.buddyAudioBase64,
+              mimeType: "audio/mpeg",
+            });
           }
           send({ type: "trace", trace: turn.trace, safetyFlags: turn.safetyFlags });
           if (turn.ended) {
@@ -305,10 +353,15 @@ export async function registerSpeechBuddyRoutes(app: FastifyInstance) {
           inFlight = new AbortController();
           const ac = inFlight;
           try {
-            const turn = await aiSvc.runTurn(id, {
-              audioBase64: msg.audioBase64,
-              mimeType: msg.mimeType ?? "audio/webm",
-            }, owner, { signal: ac.signal });
+            const turn = await aiSvc.runTurn(
+              id,
+              {
+                audioBase64: msg.audioBase64,
+                mimeType: msg.mimeType ?? "audio/webm",
+              },
+              owner,
+              { signal: ac.signal },
+            );
             if (ac.signal.aborted) return; // raced with barge_in
             emitTurn(turn);
           } catch (err) {
@@ -337,13 +390,17 @@ export async function registerSpeechBuddyRoutes(app: FastifyInstance) {
           cancelInFlight("session_end");
           try {
             const out = await aiSvc.endSession(id, msg.reason ?? "completed", owner);
-            send({ type: "session_ended", reason: out.endedReason, summary: {
-              durationSeconds: out.durationSeconds,
-              turnCount: out.turnCount,
-              skillEvidenceTotals: out.skillEvidenceTotals,
-              badgesAwarded: out.badgesAwarded,
-              questAssigned: out.questAssigned,
-            }});
+            send({
+              type: "session_ended",
+              reason: out.endedReason,
+              summary: {
+                durationSeconds: out.durationSeconds,
+                turnCount: out.turnCount,
+                skillEvidenceTotals: out.skillEvidenceTotals,
+                badgesAwarded: out.badgesAwarded,
+                questAssigned: out.questAssigned,
+              },
+            });
           } catch (err) {
             const e = err as { message?: string };
             send({ type: "error", error: e.message ?? "end failed" });

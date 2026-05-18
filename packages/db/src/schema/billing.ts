@@ -19,8 +19,12 @@ export const subscriptions = pgTable(
   "subscriptions",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    tenantId: uuid("tenant_id").references(() => tenants.id).notNull(),
-    userId: uuid("user_id").references(() => users.id).notNull(),
+    tenantId: uuid("tenant_id")
+      .references(() => tenants.id)
+      .notNull(),
+    userId: uuid("user_id")
+      .references(() => users.id)
+      .notNull(),
     stripeCustomerId: varchar("stripe_customer_id", { length: 255 }),
     stripeSubscriptionId: varchar("stripe_subscription_id", { length: 255 }),
     stripePriceId: varchar("stripe_price_id", { length: 255 }),
@@ -77,8 +81,12 @@ export const tutorSubscriptions = pgTable(
   "tutor_subscriptions",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    tenantId: uuid("tenant_id").references(() => tenants.id).notNull(),
-    userId: uuid("user_id").references(() => users.id).notNull(),
+    tenantId: uuid("tenant_id")
+      .references(() => tenants.id)
+      .notNull(),
+    userId: uuid("user_id")
+      .references(() => users.id)
+      .notNull(),
     tutorSku: varchar("tutor_sku", { length: 100 }).notNull(),
     status: varchar("status", { length: 20 }).default("active"),
     stripeItemId: varchar("stripe_item_id", { length: 255 }),
@@ -106,7 +114,9 @@ export const invoices = pgTable(
   "invoices",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    tenantId: uuid("tenant_id").references(() => tenants.id).notNull(),
+    tenantId: uuid("tenant_id")
+      .references(() => tenants.id)
+      .notNull(),
     stripeInvoiceId: varchar("stripe_invoice_id", { length: 255 }).notNull(),
     stripeCustomerId: varchar("stripe_customer_id", { length: 255 }),
     stripeSubscriptionId: varchar("stripe_subscription_id", { length: 255 }),

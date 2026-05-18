@@ -10,19 +10,69 @@
  */
 
 const NUMBER_WORDS: Record<string, string> = {
-  zero: "0", one: "1", two: "2", three: "3", four: "4", five: "5",
-  six: "6", seven: "7", eight: "8", nine: "9", ten: "10",
-  eleven: "11", twelve: "12", thirteen: "13", fourteen: "14", fifteen: "15",
-  sixteen: "16", seventeen: "17", eighteen: "18", nineteen: "19", twenty: "20",
-  first: "1", second: "2", third: "3", fourth: "4", fifth: "5",
-  sixth: "6", seventh: "7", eighth: "8", ninth: "9", tenth: "10",
+  zero: "0",
+  one: "1",
+  two: "2",
+  three: "3",
+  four: "4",
+  five: "5",
+  six: "6",
+  seven: "7",
+  eight: "8",
+  nine: "9",
+  ten: "10",
+  eleven: "11",
+  twelve: "12",
+  thirteen: "13",
+  fourteen: "14",
+  fifteen: "15",
+  sixteen: "16",
+  seventeen: "17",
+  eighteen: "18",
+  nineteen: "19",
+  twenty: "20",
+  first: "1",
+  second: "2",
+  third: "3",
+  fourth: "4",
+  fifth: "5",
+  sixth: "6",
+  seventh: "7",
+  eighth: "8",
+  ninth: "9",
+  tenth: "10",
 };
 
 const FILLER_TOKENS = new Set([
-  "a", "an", "the", "is", "it", "it's", "its", "that", "this",
-  "um", "uh", "er", "like", "well", "so", "yeah", "okay", "ok",
-  "i", "i'd", "id", "i'll", "ill", "i'm", "im",
-  "say", "think", "guess", "answer",
+  "a",
+  "an",
+  "the",
+  "is",
+  "it",
+  "it's",
+  "its",
+  "that",
+  "this",
+  "um",
+  "uh",
+  "er",
+  "like",
+  "well",
+  "so",
+  "yeah",
+  "okay",
+  "ok",
+  "i",
+  "i'd",
+  "id",
+  "i'll",
+  "ill",
+  "i'm",
+  "im",
+  "say",
+  "think",
+  "guess",
+  "answer",
 ]);
 
 function stripDiacritics(s: string): string {
@@ -55,10 +105,7 @@ export interface MatchResult {
 // Returns true if any of the "|"-separated expected variants matches the
 // transcript. A match is direct-equal OR every token of the expected variant
 // appears (in any order) in the transcript token list.
-export function matchVoiceAnswer(
-  transcript: string,
-  expected: string | undefined,
-): MatchResult {
+export function matchVoiceAnswer(transcript: string, expected: string | undefined): MatchResult {
   const normTranscript = normalizeAnswer(transcript);
   // No expected answer => "talking practice" beat: any non-empty utterance wins.
   if (!expected || !expected.trim()) {

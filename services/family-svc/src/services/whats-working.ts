@@ -16,12 +16,7 @@
 
 export type Modality = "visual" | "auditory" | "kinesthetic" | "reading";
 
-export type TimeOfDay =
-  | "early-morning"
-  | "morning"
-  | "midday"
-  | "afternoon"
-  | "evening";
+export type TimeOfDay = "early-morning" | "morning" | "midday" | "afternoon" | "evening";
 
 export interface SessionRow {
   /** Local-time ISO-8601 — used to bucket time-of-day. */
@@ -144,9 +139,11 @@ export function computeWhatsWorking(
   const bestWindow = timeOfDay.length > 0 ? timeOfDay[0] : null;
 
   // ---- frustration hotspots --------------------------------------------
-  const hotspotKey = (subject: string, modality: Modality | "unknown") =>
-    `${subject}::${modality}`;
-  const hotspotBuckets = new Map<string, { subject: string; modality: Modality | "unknown"; rows: SessionRow[] }>();
+  const hotspotKey = (subject: string, modality: Modality | "unknown") => `${subject}::${modality}`;
+  const hotspotBuckets = new Map<
+    string,
+    { subject: string; modality: Modality | "unknown"; rows: SessionRow[] }
+  >();
   for (const r of recent) {
     const subject = r.subject ?? "unknown";
     const modality: Modality | "unknown" = r.modality ?? "unknown";

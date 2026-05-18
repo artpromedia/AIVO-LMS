@@ -15,12 +15,7 @@ import { Button } from "@/components/ui/button";
 import { LearnerAvatar } from "@/components/learner/learner-avatar";
 import { TutorBadge } from "@/components/learner/tutor-badge";
 import { LEARNER_NAV } from "@/components/layout/role-shells";
-import {
-  getBrainProfile,
-  getLearner,
-  createLessonRun,
-  getLessonRun,
-} from "@/lib/db/repos";
+import { getBrainProfile, getLearner, createLessonRun } from "@/lib/db/repos";
 import { pickTodaysMission } from "@/lib/learner/today";
 import { readActiveLearnerFromCookies } from "@/lib/auth/active-learner";
 import { audit } from "@/lib/bff/audit";
@@ -40,10 +35,7 @@ async function startMissionAction(formData: FormData) {
     if (active !== learnerId) redirect("/learner/select");
   }
   if (
-    !hasLearnerConsent(session.tenantId, learnerId, [
-      "child_data_collection",
-      "ai_personalization",
-    ])
+    !hasLearnerConsent(session.tenantId, learnerId, ["child_data_collection", "ai_personalization"])
   ) {
     redirect("/learner/home?blocker=consent");
   }
@@ -135,8 +127,7 @@ export default async function LearnerHome({
 
       {session.role === "parent" && (
         <Card className="mb-4 border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-          You're viewing the learner experience for{" "}
-          <strong>{learner.displayName}</strong>.
+          You're viewing the learner experience for <strong>{learner.displayName}</strong>.
         </Card>
       )}
 
@@ -145,9 +136,7 @@ export default async function LearnerHome({
         <div className="flex-1">
           <p className="font-display text-xl font-semibold">Your tutor today</p>
           <p className="text-sm text-aivo-ink-soft">
-            {persona
-              ? `Style: ${persona.style.replace(/_/g, " ")}`
-              : "Friendly and patient."}
+            {persona ? `Style: ${persona.style.replace(/_/g, " ")}` : "Friendly and patient."}
           </p>
           {persona && (
             <div className="mt-2">
@@ -164,16 +153,12 @@ export default async function LearnerHome({
             <Badge tone="primary">{today.mission.subjectName}</Badge>
             <Badge tone="neutral">≈ {today.mission.estimatedMinutes} min</Badge>
           </div>
-          <h3 className="mt-3 font-display text-2xl font-semibold">
-            {today.mission.skillName}
-          </h3>
+          <h3 className="mt-3 font-display text-2xl font-semibold">{today.mission.skillName}</h3>
           <p className="mt-1 text-aivo-ink-soft">{today.mission.learnerReason}</p>
           <form action={startMissionAction} className="mt-4">
             <input type="hidden" name="learnerId" value={learnerId} />
             <Button type="submit" size="lg" data-primary-cta="todays-mission">
-              {today.mission.existingRunId
-                ? "Resume lesson"
-                : "Start today's lesson"}
+              {today.mission.existingRunId ? "Resume lesson" : "Start today's lesson"}
             </Button>
           </form>
         </Card>

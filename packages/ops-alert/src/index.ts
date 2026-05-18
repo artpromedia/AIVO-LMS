@@ -61,19 +61,23 @@ const DEFAULT_DEDUP_MS = 60 * 60 * 1000; // 1h
 function shapePayload(alert: OpsAlert, provider: AlertProvider): unknown {
   switch (provider) {
     case "slack": {
-      const emoji = alert.severity === "critical" ? ":rotating_light:"
-        : alert.severity === "warning" ? ":warning:" : ":information_source:";
+      const emoji =
+        alert.severity === "critical"
+          ? ":rotating_light:"
+          : alert.severity === "warning"
+            ? ":warning:"
+            : ":information_source:";
       const fieldLines = alert.fields
-        ? Object.entries(alert.fields).map(([k, v]) => `*${k}*: ${String(v)}`).join("\n")
+        ? Object.entries(alert.fields)
+            .map(([k, v]) => `*${k}*: ${String(v)}`)
+            .join("\n")
         : "";
       return {
         text: `${emoji} ${alert.title}`,
         blocks: [
           { type: "header", text: { type: "plain_text", text: alert.title } },
           { type: "section", text: { type: "mrkdwn", text: alert.body } },
-          ...(fieldLines
-            ? [{ type: "section", text: { type: "mrkdwn", text: fieldLines } }]
-            : []),
+          ...(fieldLines ? [{ type: "section", text: { type: "mrkdwn", text: fieldLines } }] : []),
         ],
       };
     }
@@ -85,8 +89,11 @@ function shapePayload(alert: OpsAlert, provider: AlertProvider): unknown {
         payload: {
           summary: alert.title,
           severity:
-            alert.severity === "critical" ? "critical"
-            : alert.severity === "warning" ? "warning" : "info",
+            alert.severity === "critical"
+              ? "critical"
+              : alert.severity === "warning"
+                ? "warning"
+                : "info",
           source: "aivo",
           custom_details: { body: alert.body, ...alert.fields },
         },
@@ -96,9 +103,7 @@ function shapePayload(alert: OpsAlert, provider: AlertProvider): unknown {
       return {
         message: alert.title,
         description: alert.body,
-        priority:
-          alert.severity === "critical" ? "P1"
-          : alert.severity === "warning" ? "P3" : "P5",
+        priority: alert.severity === "critical" ? "P1" : alert.severity === "warning" ? "P3" : "P5",
         alias: alert.dedupKey,
         details: alert.fields,
       };
@@ -120,8 +125,7 @@ export function createOpsAlertClient(config: OpsAlertClientConfig = {}): OpsAler
   const url = config.webhookUrl ?? process.env.OPS_ALERT_WEBHOOK_URL;
   const auth = config.authHeader ?? process.env.OPS_ALERT_WEBHOOK_AUTH;
   const provider =
-    (config.provider ?? (process.env.OPS_ALERT_PROVIDER as AlertProvider | undefined)) ??
-    "slack";
+    config.provider ?? (process.env.OPS_ALERT_PROVIDER as AlertProvider | undefined) ?? "slack";
   const dedupWindowMs = config.dedupWindowMs ?? DEFAULT_DEDUP_MS;
   const now = config.now ?? (() => Date.now());
   const fetchImpl: typeof fetch = config.fetchImpl ?? (globalThis.fetch as typeof fetch);

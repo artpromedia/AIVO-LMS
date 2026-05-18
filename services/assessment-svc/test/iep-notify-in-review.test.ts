@@ -42,41 +42,65 @@ interface Fixture {
 }
 
 async function seed(db: any): Promise<Fixture> {
-  const { tenants, users, learners, iepProfiles, iepTeamMembers }
-    = await import("@aivo/db");
+  const { tenants, users, learners, iepProfiles, iepTeamMembers } = await import("@aivo/db");
   const stamp = Date.now() + Math.floor(Math.random() * 1_000_000);
-  const [t] = await db.insert(tenants).values({
-    name: `notify-test-${stamp}`, type: "B2B_DISTRICT",
-  } as any).returning();
+  const [t] = await db
+    .insert(tenants)
+    .values({
+      name: `notify-test-${stamp}`,
+      type: "B2B_DISTRICT",
+    } as any)
+    .returning();
   const mkUser = async (role: string, name: string) => {
-    const [u] = await db.insert(users).values({
-      tenantId: t.id, name, role,
-      email: `${name}-${stamp}@test.local`,
-    } as any).returning();
+    const [u] = await db
+      .insert(users)
+      .values({
+        tenantId: t.id,
+        name,
+        role,
+        email: `${name}-${stamp}@test.local`,
+      } as any)
+      .returning();
     return u.id as string;
   };
   const parentId = await mkUser("PARENT", "notify-parent");
   const caseManagerId = await mkUser("TEACHER", "notify-cm");
   const learnerUser = await mkUser("LEARNER", "notify-learner-user");
-  const [learner] = await db.insert(learners).values({
-    tenantId: t.id, userId: learnerUser, parentId,
-    name: "Notify Test Learner",
-  } as any).returning();
-  const [profile] = await db.insert(iepProfiles).values({
-    learnerId: learner.id,
-    gradeLevel: "5",
-    placement: "general-education",
-    accommodations: [],
-    source: "authored",
-    lifecycleState: "in_review",
-    authoredByUserId: caseManagerId,
-  } as any).returning();
+  const [learner] = await db
+    .insert(learners)
+    .values({
+      tenantId: t.id,
+      userId: learnerUser,
+      parentId,
+      name: "Notify Test Learner",
+    } as any)
+    .returning();
+  const [profile] = await db
+    .insert(iepProfiles)
+    .values({
+      learnerId: learner.id,
+      gradeLevel: "5",
+      placement: "general-education",
+      accommodations: [],
+      source: "authored",
+      lifecycleState: "in_review",
+      authoredByUserId: caseManagerId,
+    } as any)
+    .returning();
   await db.insert(iepTeamMembers).values([
-    { iepProfileId: profile.id, userId: caseManagerId, role: "case_manager", addedBy: caseManagerId },
+    {
+      iepProfileId: profile.id,
+      userId: caseManagerId,
+      role: "case_manager",
+      addedBy: caseManagerId,
+    },
   ] as any);
   return {
-    tenantId: t.id, parentId, caseManagerId,
-    learnerId: learner.id, profileId: profile.id,
+    tenantId: t.id,
+    parentId,
+    caseManagerId,
+    learnerId: learner.id,
+    profileId: profile.id,
   };
 }
 
@@ -96,8 +120,10 @@ async function tokenFor(sub: string, role: string, tenantId: string): Promise<st
   return signJWT({ sub, role, tenantId }, "5m");
 }
 
-test("notify-in-review: concurrent calls dispatch parent notification exactly once",
-  { skip: SKIP }, async () => {
+test(
+  "notify-in-review: concurrent calls dispatch parent notification exactly once",
+  { skip: SKIP },
+  async () => {
     const { app, db, closeDb } = await bootstrap();
     const f = await seed(db);
     // Stub global fetch (used by bestEffortSendEmail) to count outbound calls
@@ -115,25 +141,34 @@ test("notify-in-review: concurrent calls dispatch parent notification exactly on
       const token = await tokenFor(f.caseManagerId, "TEACHER", f.tenantId);
       const N = 8;
       const responses = await Promise.all(
-        Array.from({ length: N }, () => app.inject({
-          method: "POST",
-          url: `/api/iep/drafts/${f.profileId}/notify-in-review`,
-          headers: { Authorization: `Bearer ${token}` },
-        })),
+        Array.from({ length: N }, () =>
+          app.inject({
+            method: "POST",
+            url: `/api/iep/drafts/${f.profileId}/notify-in-review`,
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ),
       );
       const sent = responses.filter((r: any) => {
         assert.equal(r.statusCode, 200, `unexpected status: ${r.statusCode} ${r.body}`);
         return r.json().sent === true;
       });
-      assert.equal(sent.length, 1,
-        `expected exactly one of ${N} concurrent notify-in-review calls to send the parent email, got ${sent.length}`);
+      assert.equal(
+        sent.length,
+        1,
+        `expected exactly one of ${N} concurrent notify-in-review calls to send the parent email, got ${sent.length}`,
+      );
       // Allow the in-flight best-effort fetch microtasks to settle.
       await new Promise((r) => setTimeout(r, 50));
-      assert.equal(commsCalls, 1,
-        `expected exactly one outbound comms-svc dispatch, got ${commsCalls}`);
+      assert.equal(
+        commsCalls,
+        1,
+        `expected exactly one outbound comms-svc dispatch, got ${commsCalls}`,
+      );
     } finally {
       globalThis.fetch = originalFetch;
       await cleanup(db, f);
       await teardown(app, closeDb);
     }
-  });
+  },
+);

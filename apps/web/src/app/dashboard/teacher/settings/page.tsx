@@ -25,18 +25,24 @@ export default function TeacherSettingsPage() {
   const fetchPreferences = useCallback(async () => {
     if (!accessToken || !user) return;
     try {
-      const res = await fetch(`/api/comms/preferences/${user.id}`, { headers: { Authorization: `Bearer ${accessToken}` } });
+      const res = await fetch(`/api/comms/preferences/${user.id}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
       if (res.ok) {
         const data = await res.json();
         if (data.email !== undefined) setEmailNotifs(data.email);
         if (data.weeklyDigest !== undefined) setWeeklyDigest(data.weeklyDigest);
         if (data.atRiskAlerts !== undefined) setAtRiskAlerts(data.atRiskAlerts);
       }
-    } catch { /* use defaults */ }
+    } catch {
+      /* use defaults */
+    }
     setLoadingPrefs(false);
   }, [accessToken, user]);
 
-  useEffect(() => { fetchPreferences(); }, [fetchPreferences]);
+  useEffect(() => {
+    fetchPreferences();
+  }, [fetchPreferences]);
 
   if (loading || !user) return null;
 
@@ -93,38 +99,92 @@ export default function TeacherSettingsPage() {
         <h2 className="font-heading font-bold text-lg vi-text mb-4">{tc("details")}</h2>
         {loadingPrefs ? (
           <div className="space-y-4">
-            {[1, 2, 3].map(i => <div key={i} className="h-12 vi-surface-soft rounded-xl animate-pulse motion-reduce:animate-none" />)}
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="h-12 vi-surface-soft rounded-xl animate-pulse motion-reduce:animate-none"
+              />
+            ))}
           </div>
         ) : (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold vi-text" id="email-notifs-label">Email Notifications</p>
-                <p className="text-xs vi-text-muted" id="email-notifs-desc">Receive email updates about your learners</p>
+                <p className="text-sm font-semibold vi-text" id="email-notifs-label">
+                  Email Notifications
+                </p>
+                <p className="text-xs vi-text-muted" id="email-notifs-desc">
+                  Receive email updates about your learners
+                </p>
               </div>
-              <AccessibleToggle id="email-notifs" value={emailNotifs} onChange={setEmailNotifs} label="Email Notifications" description="Receive email updates about your learners" color="bg-[hsl(var(--visual-reading))]" />
+              <AccessibleToggle
+                id="email-notifs"
+                value={emailNotifs}
+                onChange={setEmailNotifs}
+                label="Email Notifications"
+                description="Receive email updates about your learners"
+                color="bg-[hsl(var(--visual-reading))]"
+              />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold vi-text" id="weekly-digest-label">Weekly Digest</p>
-                <p className="text-xs vi-text-muted" id="weekly-digest-desc">Weekly summary of all learner progress</p>
+                <p className="text-sm font-semibold vi-text" id="weekly-digest-label">
+                  Weekly Digest
+                </p>
+                <p className="text-xs vi-text-muted" id="weekly-digest-desc">
+                  Weekly summary of all learner progress
+                </p>
               </div>
-              <AccessibleToggle id="weekly-digest" value={weeklyDigest} onChange={setWeeklyDigest} label="Weekly Digest" description="Weekly summary of all learner progress" color="bg-[hsl(var(--visual-reading))]" />
+              <AccessibleToggle
+                id="weekly-digest"
+                value={weeklyDigest}
+                onChange={setWeeklyDigest}
+                label="Weekly Digest"
+                description="Weekly summary of all learner progress"
+                color="bg-[hsl(var(--visual-reading))]"
+              />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold vi-text" id="at-risk-label">At-Risk Alerts</p>
-                <p className="text-xs vi-text-muted" id="at-risk-desc">Immediate notification when a learner shows at-risk patterns</p>
+                <p className="text-sm font-semibold vi-text" id="at-risk-label">
+                  At-Risk Alerts
+                </p>
+                <p className="text-xs vi-text-muted" id="at-risk-desc">
+                  Immediate notification when a learner shows at-risk patterns
+                </p>
               </div>
-              <AccessibleToggle id="at-risk-alerts" value={atRiskAlerts} onChange={setAtRiskAlerts} label="At-Risk Alerts" description="Immediate notification when a learner shows at-risk patterns" color="bg-[hsl(var(--visual-reading))]" />
+              <AccessibleToggle
+                id="at-risk-alerts"
+                value={atRiskAlerts}
+                onChange={setAtRiskAlerts}
+                label="At-Risk Alerts"
+                description="Immediate notification when a learner shows at-risk patterns"
+                color="bg-[hsl(var(--visual-reading))]"
+              />
             </div>
           </div>
         )}
-        {saveStatus === "success" && <p className="text-sm text-[hsl(var(--visual-science))] mt-3 font-medium" role="status" aria-live="polite">Settings saved!</p>}
-        {saveStatus === "error" && <p className="text-sm text-[hsl(var(--visual-math))] mt-3 font-medium" role="alert">Failed to save settings. Please try again.</p>}
-        <button onClick={handleSaveSettings} disabled={saving} aria-busy={saving}
+        {saveStatus === "success" && (
+          <p
+            className="text-sm text-[hsl(var(--visual-science))] mt-3 font-medium"
+            role="status"
+            aria-live="polite"
+          >
+            Settings saved!
+          </p>
+        )}
+        {saveStatus === "error" && (
+          <p className="text-sm text-[hsl(var(--visual-math))] mt-3 font-medium" role="alert">
+            Failed to save settings. Please try again.
+          </p>
+        )}
+        <button
+          onClick={handleSaveSettings}
+          disabled={saving}
+          aria-busy={saving}
           style={{ minHeight: "44px" }}
-          className="mt-4 px-6 py-2.5 rounded-xl bg-[hsl(var(--visual-reading))] text-white font-bold text-sm hover:bg-[hsl(var(--visual-reading)/0.9)] transition disabled:opacity-50 disabled:cursor-not-allowed">
+          className="mt-4 px-6 py-2.5 rounded-xl bg-[hsl(var(--visual-reading))] text-white font-bold text-sm hover:bg-[hsl(var(--visual-reading)/0.9)] transition disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           {saving ? "Saving..." : "Save Preferences"}
         </button>
       </div>

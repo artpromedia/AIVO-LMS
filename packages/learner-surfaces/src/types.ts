@@ -137,7 +137,15 @@ export type GeometryShape =
       fill?: string;
       stroke?: string;
     }
-  | { id: string; kind: "circle"; cx: number; cy: number; r: number; fill?: string; stroke?: string }
+  | {
+      id: string;
+      kind: "circle";
+      cx: number;
+      cy: number;
+      r: number;
+      fill?: string;
+      stroke?: string;
+    }
   | { id: string; kind: "polygon"; points: Point[]; fill?: string; stroke?: string }
   | { id: string; kind: "segment"; start: Point; end: Point; stroke?: string }
   | { id: string; kind: "ray"; start: Point; through: Point; stroke?: string }

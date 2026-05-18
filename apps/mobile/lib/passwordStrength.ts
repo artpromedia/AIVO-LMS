@@ -25,9 +25,7 @@ export interface PasswordStrength {
 export function estimatePasswordStrength(password: string): PasswordStrength {
   if (!password) return { score: 0, reasons: [] };
   const len = password.length;
-  const classes = [/[a-z]/, /[A-Z]/, /\d/, /[^a-zA-Z0-9]/].filter((re) =>
-    re.test(password),
-  ).length;
+  const classes = [/[a-z]/, /[A-Z]/, /\d/, /[^a-zA-Z0-9]/].filter((re) => re.test(password)).length;
   // Length-clamped at 32 so absurdly long passwords don't game the meter,
   // class-diversity bonus, repeated-char penalty for things like "aaa".
   let entropy = Math.min(len, 32) * 2 + classes * 6;
@@ -42,7 +40,7 @@ export function estimatePasswordStrength(password: string): PasswordStrength {
   const reasons: string[] = [];
   // 12 char minimum matches the user-facing copy and the most permissive
   // server policy (staff bumps to 14, surfaced via server-side reasons).
-  if (len < 12) reasons.push('too_short');
-  if (score < 3) reasons.push('too_weak');
+  if (len < 12) reasons.push("too_short");
+  if (score < 3) reasons.push("too_weak");
   return { score, reasons };
 }

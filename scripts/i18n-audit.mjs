@@ -9,9 +9,33 @@ const APPS = [
 ];
 
 const BRAND_TOKENS = new Set([
-  "AIVO", "IEP", "PIN", "PDF", "API", "URL", "MFA", "JSON", "XML",
-  "HTML", "CSS", "JS", "TS", "HTTP", "HTTPS", "UUID", "OK", "OAuth",
-  "SAML", "SSO", "FERPA", "COPPA", "GDPR", "AI", "ML", "ID", "URL",
+  "AIVO",
+  "IEP",
+  "PIN",
+  "PDF",
+  "API",
+  "URL",
+  "MFA",
+  "JSON",
+  "XML",
+  "HTML",
+  "CSS",
+  "JS",
+  "TS",
+  "HTTP",
+  "HTTPS",
+  "UUID",
+  "OK",
+  "OAuth",
+  "SAML",
+  "SSO",
+  "FERPA",
+  "COPPA",
+  "GDPR",
+  "AI",
+  "ML",
+  "ID",
+  "URL",
 ]);
 
 // Per-locale allowlist of values that are legitimately identical to English.
@@ -23,29 +47,86 @@ const LOANWORDS_BY_LOCALE = {
   ar: new Set([]),
   hi: new Set([]),
   de: new Set([
-    "Status", "Name", "Details", "Optional", "Standard", "Standards",
-    "Quests", "Avatar", "Avatars", "Power-Ups", "Shop", "Start", "Okay",
-    "Dashboard", "Team", "Trend", "Version", "Deutsch", "Blog",
+    "Status",
+    "Name",
+    "Details",
+    "Optional",
+    "Standard",
+    "Standards",
+    "Quests",
+    "Avatar",
+    "Avatars",
+    "Power-Ups",
+    "Shop",
+    "Start",
+    "Okay",
+    "Dashboard",
+    "Team",
+    "Trend",
+    "Version",
+    "Deutsch",
+    "Blog",
   ]),
   es: new Set([
-    "Error", "Total", "General", "Avatar", "Visual", "Vestibular",
-    "Español", "Legal", "Blog", "Motor",
+    "Error",
+    "Total",
+    "General",
+    "Avatar",
+    "Visual",
+    "Vestibular",
+    "Español",
+    "Legal",
+    "Blog",
+    "Motor",
   ]),
   fr: new Set([
-    "Actions", "Date", "Type", "Description", "Total", "Question",
-    "Co-parent", "Badges", "Notifications", "Standard", "Animations",
-    "Avatars", "Avatar", "Services", "Documents", "Note", "Tactile",
-    "Collaboration", "Messages", "Stable", "stable", "Version",
-    "Français", "Solutions", "Blog", "Contact", "Score", "Vision",
-    "Placement", "Communication", "Signatures",
+    "Actions",
+    "Date",
+    "Type",
+    "Description",
+    "Total",
+    "Question",
+    "Co-parent",
+    "Badges",
+    "Notifications",
+    "Standard",
+    "Animations",
+    "Avatars",
+    "Avatar",
+    "Services",
+    "Documents",
+    "Note",
+    "Tactile",
+    "Collaboration",
+    "Messages",
+    "Stable",
+    "stable",
+    "Version",
+    "Français",
+    "Solutions",
+    "Blog",
+    "Contact",
+    "Score",
+    "Vision",
+    "Placement",
+    "Communication",
+    "Signatures",
     "{count} minutes",
     "Section {number} · ~{minutes} min",
   ]),
   ja: new Set([]),
   ko: new Set([]),
   pt: new Set([
-    "Status", "Total", "Power-ups", "Avatar", "Visual", "Vestibular",
-    "Português", "Legal", "Blog", "Motor",
+    "Status",
+    "Total",
+    "Power-ups",
+    "Avatar",
+    "Visual",
+    "Vestibular",
+    "Português",
+    "Legal",
+    "Blog",
+    "Motor",
   ]),
   zh: new Set([]),
 };
@@ -93,7 +174,7 @@ function looksLikeBrandOrToken(value) {
   if (/^v?\d+(\.\d+)+/.test(trimmed)) return true; // version strings
   // All uppercase tokens / brand acronyms
   const tokens = trimmed.split(/\s+/);
-  if (tokens.every(t => BRAND_TOKENS.has(t.replace(/[.,!?:;]+$/, "")))) return true;
+  if (tokens.every((t) => BRAND_TOKENS.has(t.replace(/[.,!?:;]+$/, "")))) return true;
   return false;
 }
 
@@ -110,7 +191,7 @@ function auditApp(app) {
   const baseKeys = new Set(Object.keys(baseFlat));
 
   const localeFiles = readdirSync(app.dir)
-    .filter(f => f.endsWith(".json") && basename(f, ".json") !== app.base)
+    .filter((f) => f.endsWith(".json") && basename(f, ".json") !== app.base)
     .sort();
 
   const report = { app: app.name, baseKeyCount: baseKeys.size, locales: {} };
@@ -120,8 +201,8 @@ function auditApp(app) {
     const flat = flatten(loadJson(join(app.dir, f)));
     const keys = new Set(Object.keys(flat));
 
-    const missing = [...baseKeys].filter(k => !keys.has(k));
-    const orphans = [...keys].filter(k => !baseKeys.has(k));
+    const missing = [...baseKeys].filter((k) => !keys.has(k));
+    const orphans = [...keys].filter((k) => !baseKeys.has(k));
     const untranslated = [];
     const allowedLoanwords = LOANWORDS_BY_LOCALE[locale] ?? new Set();
     for (const k of baseKeys) {
@@ -161,10 +242,10 @@ function formatReport(reports, { verbose }) {
       const m = info.missing.length;
       const o = info.orphans.length;
       const u = info.untranslated.length;
-      const tag = (m > 0 || o > 0) ? "FAIL" : (u > 0 ? "warn" : "ok  ");
+      const tag = m > 0 || o > 0 ? "FAIL" : u > 0 ? "warn" : "ok  ";
       lines.push(
         `  ${tag}  ${locale.padEnd(3)}  keys=${String(info.keyCount).padStart(4)}  ` +
-        `missing=${String(m).padStart(3)}  orphans=${String(o).padStart(3)}  untranslated=${String(u).padStart(4)}`
+          `missing=${String(m).padStart(3)}  orphans=${String(o).padStart(3)}  untranslated=${String(u).padStart(4)}`,
       );
       if (m > 0) hardFail += m;
       if (o > 0) hardFail += o;
@@ -174,24 +255,29 @@ function formatReport(reports, { verbose }) {
         if (m > 0) {
           lines.push(`        missing keys:`);
           for (const k of info.missing.slice(0, 25)) lines.push(`          - ${k}`);
-          if (info.missing.length > 25) lines.push(`          ... and ${info.missing.length - 25} more`);
+          if (info.missing.length > 25)
+            lines.push(`          ... and ${info.missing.length - 25} more`);
         }
         if (o > 0) {
           lines.push(`        orphan keys (in ${locale} but not in base):`);
           for (const k of info.orphans.slice(0, 25)) lines.push(`          - ${k}`);
-          if (info.orphans.length > 25) lines.push(`          ... and ${info.orphans.length - 25} more`);
+          if (info.orphans.length > 25)
+            lines.push(`          ... and ${info.orphans.length - 25} more`);
         }
         if (u > 0) {
           lines.push(`        untranslated (sample):`);
           for (const k of info.untranslated.slice(0, 10)) lines.push(`          - ${k}`);
-          if (info.untranslated.length > 10) lines.push(`          ... and ${info.untranslated.length - 10} more`);
+          if (info.untranslated.length > 10)
+            lines.push(`          ... and ${info.untranslated.length - 10} more`);
         }
       }
     }
   }
 
   lines.push("");
-  lines.push(`Summary: ${hardFail} hard failures (missing/orphan keys), ${softWarn} untranslated strings (warnings).`);
+  lines.push(
+    `Summary: ${hardFail} hard failures (missing/orphan keys), ${softWarn} untranslated strings (warnings).`,
+  );
   return { text: lines.join("\n"), hardFail, softWarn };
 }
 
@@ -204,7 +290,10 @@ const reports = APPS.map(auditApp);
 
 const totals = reports.reduce(
   (acc, r) => {
-    if (r.error) { acc.hardFail++; return acc; }
+    if (r.error) {
+      acc.hardFail++;
+      return acc;
+    }
     for (const info of Object.values(r.locales)) {
       acc.hardFail += info.missing.length + info.orphans.length;
       acc.softWarn += info.untranslated.length;

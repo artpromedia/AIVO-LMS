@@ -75,11 +75,14 @@ describe("Journey 2: IEP companion", () => {
   });
 
   it("4. Submits IEP profile for review", async () => {
-    const res = await fetch(serviceUrl("assessment-svc", `/api/iep/authoring/${iepProfileId}/submit`), {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${teacherToken}` },
-      body: JSON.stringify({}),
-    });
+    const res = await fetch(
+      serviceUrl("assessment-svc", `/api/iep/authoring/${iepProfileId}/submit`),
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${teacherToken}` },
+        body: JSON.stringify({}),
+      },
+    );
     expect(res.status).toBeLessThan(300);
   });
 
@@ -107,11 +110,14 @@ describe("Journey 2: IEP companion", () => {
   });
 
   it("7. Shares packet with parent and parent can view it", async () => {
-    const shareRes = await fetch(serviceUrl("assessment-svc", `/api/iep/packets/${packetId}/share`), {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${teacherToken}` },
-      body: JSON.stringify({ email: "parent@test.aivo.dev" }),
-    });
+    const shareRes = await fetch(
+      serviceUrl("assessment-svc", `/api/iep/packets/${packetId}/share`),
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${teacherToken}` },
+        body: JSON.stringify({ email: "parent@test.aivo.dev" }),
+      },
+    );
     expect(shareRes.status).toBeLessThan(300);
     const shareData = (await shareRes.json()) as any;
     shareToken = shareData.shareToken;
@@ -119,7 +125,9 @@ describe("Journey 2: IEP companion", () => {
   });
 
   it("8. Parent views packet via share token — parent_viewed_at is set", async () => {
-    const viewRes = await fetch(serviceUrl("assessment-svc", `/api/iep/packets/share/${shareToken}`));
+    const viewRes = await fetch(
+      serviceUrl("assessment-svc", `/api/iep/packets/share/${shareToken}`),
+    );
     expect(viewRes.status).toBe(200);
 
     // Re-fetch packet and confirm parent_viewed_at
@@ -134,11 +142,14 @@ describe("Journey 2: IEP companion", () => {
   });
 
   it("9. Parent signs packet — status becomes 'signed'", async () => {
-    const signRes = await fetch(serviceUrl("assessment-svc", `/api/iep/packets/share/${shareToken}/sign`), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ signature: "Parent Name" }),
-    });
+    const signRes = await fetch(
+      serviceUrl("assessment-svc", `/api/iep/packets/share/${shareToken}/sign`),
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ signature: "Parent Name" }),
+      },
+    );
     expect(signRes.status).toBeLessThan(300);
 
     const data = await pollUntil(

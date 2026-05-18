@@ -68,6 +68,9 @@ export const homeworkAssignmentsRelations = relations(homeworkAssignments, ({ on
 }));
 
 export const homeworkSessionsRelations = relations(homeworkSessions, ({ one }) => ({
-  assignment: one(homeworkAssignments, { fields: [homeworkSessions.homeworkAssignmentId], references: [homeworkAssignments.id] }),
+  assignment: one(homeworkAssignments, {
+    fields: [homeworkSessions.homeworkAssignmentId],
+    references: [homeworkAssignments.id],
+  }),
   learner: one(learners, { fields: [homeworkSessions.learnerId], references: [learners.id] }),
 }));

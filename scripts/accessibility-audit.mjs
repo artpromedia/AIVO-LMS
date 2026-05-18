@@ -41,9 +41,7 @@ if (!existsSync(typesPath)) {
   errors.push("apps/web-v2/lib/db/types.ts missing.");
 } else {
   const src = readFileSync(typesPath, "utf8");
-  const prefsBlock = src.match(
-    /export type AccessibilityPreferences\s*=\s*\{([\s\S]*?)\};/,
-  );
+  const prefsBlock = src.match(/export type AccessibilityPreferences\s*=\s*\{([\s\S]*?)\};/);
   if (!prefsBlock) {
     errors.push("AccessibilityPreferences type not found.");
   } else {
@@ -51,15 +49,11 @@ if (!existsSync(typesPath)) {
     for (const field of REQUIRED_PREFS) {
       const re = new RegExp(`\\b${field}:`);
       if (!re.test(body)) {
-        errors.push(
-          `AccessibilityPreferences missing field "${field}".`,
-        );
+        errors.push(`AccessibilityPreferences missing field "${field}".`);
       }
     }
   }
-  const defaultsBlock = src.match(
-    /export const ACCESSIBILITY_DEFAULTS[^=]*=\s*\{([\s\S]*?)\};/,
-  );
+  const defaultsBlock = src.match(/export const ACCESSIBILITY_DEFAULTS[^=]*=\s*\{([\s\S]*?)\};/);
   if (!defaultsBlock) {
     errors.push("ACCESSIBILITY_DEFAULTS constant not found.");
   } else {
@@ -67,9 +61,7 @@ if (!existsSync(typesPath)) {
     for (const field of REQUIRED_PREFS) {
       const re = new RegExp(`\\b${field}:`);
       if (!re.test(body)) {
-        errors.push(
-          `ACCESSIBILITY_DEFAULTS missing default for "${field}".`,
-        );
+        errors.push(`ACCESSIBILITY_DEFAULTS missing default for "${field}".`);
       }
     }
   }
@@ -139,9 +131,7 @@ for (const rel of REQUIRED_BFF) {
 
 if (errors.length) {
   for (const e of errors) console.error(`error: ${e}`);
-  console.error(
-    `\naccessibility:audit FAILED with ${errors.length} error(s).`,
-  );
+  console.error(`\naccessibility:audit FAILED with ${errors.length} error(s).`);
   process.exit(1);
 }
 

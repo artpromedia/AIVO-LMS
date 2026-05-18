@@ -98,12 +98,14 @@ export const es: Record<string, string> = {
   "parent.level": "Nivel",
   "parent.grade": "Grado",
   "parent.curriculum": "Currículo",
-  "parent.no_learners": "Aún no has agregado estudiantes. ¡Agrega tu primer estudiante para comenzar!",
+  "parent.no_learners":
+    "Aún no has agregado estudiantes. ¡Agrega tu primer estudiante para comenzar!",
   "parent.manage_family": "Administrar Familia",
   "parent.family_settings": "Configuración Familiar",
 
   "enrollment.select_language": "Seleccionar Idioma de Aprendizaje",
-  "enrollment.language_description": "Esto establece el idioma principal para el contenido de aprendizaje de tu hijo y las interacciones con el tutor de IA.",
+  "enrollment.language_description":
+    "Esto establece el idioma principal para el contenido de aprendizaje de tu hijo y las interacciones con el tutor de IA.",
   "enrollment.language_auto_detected": "Detectado automáticamente según tu ubicación",
   "enrollment.you_can_change_later": "Puedes cambiar esto más tarde en la configuración.",
 
@@ -202,7 +204,8 @@ export const es: Record<string, string> = {
   "error.session_expired": "Tu sesión ha expirado. Por favor, inicia sesión de nuevo.",
 
   "landing.hero_title": "Cada Niño Merece una Educación Brillante",
-  "landing.hero_subtitle": "Aprendizaje adaptativo con IA que se adapta exactamente a donde está tu hijo.",
+  "landing.hero_subtitle":
+    "Aprendizaje adaptativo con IA que se adapta exactamente a donde está tu hijo.",
   "landing.get_started": "Comenzar Gratis",
   "landing.learn_more": "Saber Más",
   "landing.for_parents": "Para Padres",

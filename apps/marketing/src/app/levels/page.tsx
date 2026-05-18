@@ -14,7 +14,8 @@ export const metadata: Metadata = {
   alternates: { canonical: URL },
   openGraph: {
     title: "AIVO's 5 Functioning Levels",
-    description: "From grade-level academics to pre-symbolic communication — one platform for every learner.",
+    description:
+      "From grade-level academics to pre-symbolic communication — one platform for every learner.",
     url: URL,
     type: "website",
   },
@@ -47,9 +48,7 @@ export default function LevelsIndex() {
                 <h2 className="font-heading font-bold text-slate-900 text-xl">
                   Level {level.level}: {level.name}
                 </h2>
-                <p className="text-slate-600 font-body mt-2 leading-relaxed">
-                  {level.short}
-                </p>
+                <p className="text-slate-600 font-body mt-2 leading-relaxed">{level.short}</p>
               </div>
               <ArrowRight className="w-5 h-5 text-slate-300 shrink-0 mt-2" aria-hidden="true" />
             </div>

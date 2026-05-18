@@ -16,7 +16,19 @@ import { platformConfig, users } from "@aivo/db";
 import { verifyJWT } from "@aivo/security";
 import { desc, eq } from "drizzle-orm";
 import { logAuditEvent } from "./audit.js";
-import { getAdminSvcStatsSchema, getAdminSvcUsersSchema, getAdminSvcUsersByIdSchema, getAdminSvcLearnersSchema, getAdminSvcLearnersByIdSchema, getAdminSvcTenantsSchema, getAdminSvcTenantsByIdSchema, adminSvcAiPlaygroundSchema, getAdminSvcConfigSchema, updateAdminSvcConfigSchema, getAdminSvcConfigHistorySchema } from "./schemas.js";
+import {
+  getAdminSvcStatsSchema,
+  getAdminSvcUsersSchema,
+  getAdminSvcUsersByIdSchema,
+  getAdminSvcLearnersSchema,
+  getAdminSvcLearnersByIdSchema,
+  getAdminSvcTenantsSchema,
+  getAdminSvcTenantsByIdSchema,
+  adminSvcAiPlaygroundSchema,
+  getAdminSvcConfigSchema,
+  updateAdminSvcConfigSchema,
+  getAdminSvcConfigHistorySchema,
+} from "./schemas.js";
 
 const IS_PROD = process.env.NODE_ENV === "production";
 function requireUrl(name: string, devDefault: string): string {
@@ -80,106 +92,156 @@ async function proxyToIdentity(req: any, reply: FastifyReply, downstreamPath: st
 
 export function registerPlatformRoutes(app: FastifyInstance, db: any) {
   // ── Read proxies ──────────────────────────────────────────────────
-  app.get("/api/admin-svc/stats", { schema: getAdminSvcStatsSchema, preHandler: requireAdmin }, async (req, reply) =>
-    proxyToIdentity(req, reply, "/api/admin/stats"));
+  app.get(
+    "/api/admin-svc/stats",
+    { schema: getAdminSvcStatsSchema, preHandler: requireAdmin },
+    async (req, reply) => proxyToIdentity(req, reply, "/api/admin/stats"),
+  );
 
-  app.get("/api/admin-svc/users", { schema: getAdminSvcUsersSchema, preHandler: requireAdmin }, async (req, reply) =>
-    proxyToIdentity(req, reply, "/api/admin/users"));
-  app.get("/api/admin-svc/users/:id", { schema: getAdminSvcUsersByIdSchema, preHandler: requireAdmin }, async (req: any, reply) =>
-    proxyToIdentity(req, reply, `/api/admin/users/${encodeURIComponent(req.params.id)}`));
+  app.get(
+    "/api/admin-svc/users",
+    { schema: getAdminSvcUsersSchema, preHandler: requireAdmin },
+    async (req, reply) => proxyToIdentity(req, reply, "/api/admin/users"),
+  );
+  app.get(
+    "/api/admin-svc/users/:id",
+    { schema: getAdminSvcUsersByIdSchema, preHandler: requireAdmin },
+    async (req: any, reply) =>
+      proxyToIdentity(req, reply, `/api/admin/users/${encodeURIComponent(req.params.id)}`),
+  );
 
-  app.get("/api/admin-svc/learners", { schema: getAdminSvcLearnersSchema, preHandler: requireAdmin }, async (req, reply) =>
-    proxyToIdentity(req, reply, "/api/admin/learners"));
-  app.get("/api/admin-svc/learners/:id", { schema: getAdminSvcLearnersByIdSchema, preHandler: requireAdmin }, async (req: any, reply) =>
-    proxyToIdentity(req, reply, `/api/admin/learners/${encodeURIComponent(req.params.id)}`));
+  app.get(
+    "/api/admin-svc/learners",
+    { schema: getAdminSvcLearnersSchema, preHandler: requireAdmin },
+    async (req, reply) => proxyToIdentity(req, reply, "/api/admin/learners"),
+  );
+  app.get(
+    "/api/admin-svc/learners/:id",
+    { schema: getAdminSvcLearnersByIdSchema, preHandler: requireAdmin },
+    async (req: any, reply) =>
+      proxyToIdentity(req, reply, `/api/admin/learners/${encodeURIComponent(req.params.id)}`),
+  );
 
-  app.get("/api/admin-svc/tenants", { schema: getAdminSvcTenantsSchema, preHandler: requireAdmin }, async (req, reply) =>
-    proxyToIdentity(req, reply, "/api/admin/tenants"));
-  app.get("/api/admin-svc/tenants/:id", { schema: getAdminSvcTenantsByIdSchema, preHandler: requireAdmin }, async (req: any, reply) =>
-    proxyToIdentity(req, reply, `/api/admin/tenants/${encodeURIComponent(req.params.id)}`));
+  app.get(
+    "/api/admin-svc/tenants",
+    { schema: getAdminSvcTenantsSchema, preHandler: requireAdmin },
+    async (req, reply) => proxyToIdentity(req, reply, "/api/admin/tenants"),
+  );
+  app.get(
+    "/api/admin-svc/tenants/:id",
+    { schema: getAdminSvcTenantsByIdSchema, preHandler: requireAdmin },
+    async (req: any, reply) =>
+      proxyToIdentity(req, reply, `/api/admin/tenants/${encodeURIComponent(req.params.id)}`),
+  );
 
   // ── AI Prompt Playground (proxy to brain-svc) ─────────────────────
   // Admin-only test surface for tutor system prompts. Forwards the
   // full request body + bearer token to brain-svc which calls the
   // selected LLM provider via litellm.
-  app.post("/api/admin-svc/ai/playground", { schema: adminSvcAiPlaygroundSchema, preHandler: requireAdmin }, async (req, reply) => {
-    const url = new URL("/api/brain/playground", BRAIN_URL);
-    let res: Response;
-    try {
-      res = await fetch(url, {
-        method: "POST",
-        headers: {
-          authorization: req.headers.authorization as string,
-          "content-type": "application/json",
-        },
-        body: JSON.stringify(req.body ?? {}),
-        signal: AbortSignal.timeout(60_000),
-      });
-    } catch (e: any) {
-      req.log?.error({ err: e?.message }, "brain-svc playground proxy failed");
-      return reply.status(502).send({ error: "Upstream brain-svc unavailable" });
-    }
-    reply.status(res.status as 200);
-    const ct = res.headers.get("content-type");
-    if (ct) reply.header("content-type", ct);
-    return reply.send(await res.text());
-  });
+  app.post(
+    "/api/admin-svc/ai/playground",
+    { schema: adminSvcAiPlaygroundSchema, preHandler: requireAdmin },
+    async (req, reply) => {
+      const url = new URL("/api/brain/playground", BRAIN_URL);
+      let res: Response;
+      try {
+        res = await fetch(url, {
+          method: "POST",
+          headers: {
+            authorization: req.headers.authorization as string,
+            "content-type": "application/json",
+          },
+          body: JSON.stringify(req.body ?? {}),
+          signal: AbortSignal.timeout(60_000),
+        });
+      } catch (e: any) {
+        req.log?.error({ err: e?.message }, "brain-svc playground proxy failed");
+        return reply.status(502).send({ error: "Upstream brain-svc unavailable" });
+      }
+      reply.status(res.status as 200);
+      const ct = res.headers.get("content-type");
+      if (ct) reply.header("content-type", ct);
+      return reply.send(await res.text());
+    },
+  );
 
   // ── Platform config (owned by admin-svc; append-only history) ──────
-  app.get("/api/admin-svc/config", { schema: getAdminSvcConfigSchema, preHandler: requireAdmin }, async () => {
-    const rows = await db.select().from(platformConfig).orderBy(desc(platformConfig.createdAt)).limit(1);
-    if (rows.length > 0) return rows[0].config;
-    return {
-      features: {
-        coLearning: true, homeworkHelper: true, sensoryProfiles: true,
-        transitionPlanning: true, languageProfiles: true, dataExport: true,
-      },
-      limits: {
-        maxLearnersPerTenant: 50, maxTutorSessionMinutes: 60, maxFileUploadMb: 10,
-      },
-    };
-  });
+  app.get(
+    "/api/admin-svc/config",
+    { schema: getAdminSvcConfigSchema, preHandler: requireAdmin },
+    async () => {
+      const rows = await db
+        .select()
+        .from(platformConfig)
+        .orderBy(desc(platformConfig.createdAt))
+        .limit(1);
+      if (rows.length > 0) return rows[0].config;
+      return {
+        features: {
+          coLearning: true,
+          homeworkHelper: true,
+          sensoryProfiles: true,
+          transitionPlanning: true,
+          languageProfiles: true,
+          dataExport: true,
+        },
+        limits: {
+          maxLearnersPerTenant: 50,
+          maxTutorSessionMinutes: 60,
+          maxFileUploadMb: 10,
+        },
+      };
+    },
+  );
 
-  app.put("/api/admin-svc/config", { schema: updateAdminSvcConfigSchema, preHandler: requireAdmin }, async (request) => {
-    const { config, changeDescription } = request.body as any;
-    const user = (request as any).user;
+  app.put(
+    "/api/admin-svc/config",
+    { schema: updateAdminSvcConfigSchema, preHandler: requireAdmin },
+    async (request) => {
+      const { config, changeDescription } = request.body as any;
+      const user = (request as any).user;
 
-    await db.insert(platformConfig).values({
-      config,
-      changedBy: user.sub,
-      changeDescription: changeDescription || null,
-    });
+      await db.insert(platformConfig).values({
+        config,
+        changedBy: user.sub,
+        changeDescription: changeDescription || null,
+      });
 
-    await logAuditEvent(db, {
-      action: "CONFIG_UPDATED",
-      actorId: user.sub,
-      actorEmail: user.email || "",
-      actorRole: user.role || "",
-      resourceType: "platform_config",
-      details: { config, changeDescription },
-    });
+      await logAuditEvent(db, {
+        action: "CONFIG_UPDATED",
+        actorId: user.sub,
+        actorEmail: user.email || "",
+        actorRole: user.role || "",
+        resourceType: "platform_config",
+        details: { config, changeDescription },
+      });
 
-    return { status: "updated", config };
-  });
+      return { status: "updated", config };
+    },
+  );
 
   // Sprint 10 — append-only config history. Returns the last 200 rows
   // with author + timestamp + description so admins can audit when a
   // setting changed and who flipped it.
-  app.get("/api/admin-svc/config/history", { schema: getAdminSvcConfigHistorySchema, preHandler: requireAdmin }, async () => {
-    const rows = await db
-      .select({
-        id: platformConfig.id,
-        config: platformConfig.config,
-        changedBy: platformConfig.changedBy,
-        changeDescription: platformConfig.changeDescription,
-        createdAt: platformConfig.createdAt,
-        actorEmail: users.email,
-        actorName: users.name,
-      })
-      .from(platformConfig)
-      .leftJoin(users, eq(platformConfig.changedBy, users.id))
-      .orderBy(desc(platformConfig.createdAt))
-      .limit(200);
-    return { history: rows };
-  });
+  app.get(
+    "/api/admin-svc/config/history",
+    { schema: getAdminSvcConfigHistorySchema, preHandler: requireAdmin },
+    async () => {
+      const rows = await db
+        .select({
+          id: platformConfig.id,
+          config: platformConfig.config,
+          changedBy: platformConfig.changedBy,
+          changeDescription: platformConfig.changeDescription,
+          createdAt: platformConfig.createdAt,
+          actorEmail: users.email,
+          actorName: users.name,
+        })
+        .from(platformConfig)
+        .leftJoin(users, eq(platformConfig.changedBy, users.id))
+        .orderBy(desc(platformConfig.createdAt))
+        .limit(200);
+      return { history: rows };
+    },
+  );
 }

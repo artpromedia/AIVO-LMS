@@ -1,9 +1,9 @@
-import React from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTranslation } from '@/hooks/useTranslation';
-import { AccountSettingsCard } from '@/src/components/settings/AccountSettingsCard';
-import { colors, spacing } from '@/constants/colors';
+import React from "react";
+import { ScrollView, StyleSheet, Text } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTranslation } from "@/hooks/useTranslation";
+import { AccountSettingsCard } from "@/src/components/settings/AccountSettingsCard";
+import { colors, spacing } from "@/constants/colors";
 
 export default function TeacherSettings() {
   const insets = useSafeAreaInsets();
@@ -14,9 +14,9 @@ export default function TeacherSettings() {
       style={styles.container}
       contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 32 }}
     >
-      <Text style={styles.title}>{t('teacherSettings.title')}</Text>
+      <Text style={styles.title}>{t("teacherSettings.title")}</Text>
       <AccountSettingsCard />
-      <Text style={styles.version}>{t('common.appVersion')}</Text>
+      <Text style={styles.version}>{t("common.appVersion")}</Text>
     </ScrollView>
   );
 }
@@ -29,15 +29,15 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontFamily: 'Nunito-ExtraBold',
+    fontFamily: "Nunito-ExtraBold",
     color: colors.text,
     marginBottom: spacing.lg,
   },
   version: {
     marginTop: spacing.xl,
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: 12,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.textSecondary,
   },
 });

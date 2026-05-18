@@ -4,11 +4,7 @@
  * reset, end-to-end TobiiAdapter integration via attachEyeGazePipeline().
  */
 import { describe, it, expect, beforeEach } from "vitest";
-import {
-  CalibrationState,
-  GazeTargetMapper,
-  DwellClickController,
-} from "../eye-gaze/pipeline.js";
+import { CalibrationState, GazeTargetMapper, DwellClickController } from "../eye-gaze/pipeline.js";
 import { TobiiAdapter } from "../adapters/TobiiAdapter.js";
 
 describe("CalibrationState", () => {

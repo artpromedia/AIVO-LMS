@@ -9,10 +9,7 @@ import { TEACHER_NAV } from "@/components/layout/role-shells";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  listSubjects,
-  listTeacherAssignments,
-} from "@/lib/db/repos";
+import { listSubjects, listTeacherAssignments } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
 
@@ -51,17 +48,13 @@ export default async function TeacherAssignmentsPage() {
                   <div>
                     <p className="font-semibold">{a.title}</p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {subjectsById.get(a.subjectId)?.name ?? a.subjectId} ·{" "}
-                      {a.learnerIds.length} learner{a.learnerIds.length === 1 ? "" : "s"}{" "}
-                      · created {new Date(a.createdAt).toLocaleDateString()}
+                      {subjectsById.get(a.subjectId)?.name ?? a.subjectId} · {a.learnerIds.length}{" "}
+                      learner{a.learnerIds.length === 1 ? "" : "s"} · created{" "}
+                      {new Date(a.createdAt).toLocaleDateString()}
                     </p>
-                    {a.instructions && (
-                      <p className="text-sm mt-2">{a.instructions}</p>
-                    )}
+                    {a.instructions && <p className="text-sm mt-2">{a.instructions}</p>}
                   </div>
-                  <Badge tone={a.status === "active" ? "primary" : "neutral"}>
-                    {a.status}
-                  </Badge>
+                  <Badge tone={a.status === "active" ? "primary" : "neutral"}>{a.status}</Badge>
                 </div>
               </Card>
             </li>

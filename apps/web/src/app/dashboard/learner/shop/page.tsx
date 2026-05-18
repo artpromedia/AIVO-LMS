@@ -4,7 +4,18 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { ShoppingCart, Store, Scissors, Shirt, Sparkles, Image as ImageIcon, Smile, Palette, Package, type LucideIcon } from "lucide-react";
+import {
+  ShoppingCart,
+  Store,
+  Scissors,
+  Shirt,
+  Sparkles,
+  Image as ImageIcon,
+  Smile,
+  Palette,
+  Package,
+  type LucideIcon,
+} from "lucide-react";
 
 interface AvatarItem {
   id: string;
@@ -80,7 +91,9 @@ export default function ShopPage() {
       .catch(() => {});
   }, [accessToken, user]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const purchase = async (itemId: string, currencyType: "coins" | "gems") => {
     if (!accessToken || !user) return;
@@ -100,13 +113,28 @@ export default function ShopPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-yellow-50">
       <header className="bg-white/80 backdrop-blur border-b border-slate-200 px-8 py-4 flex items-center justify-between">
-        <Image src="/images/aivo-logo-purple.png" alt="AIVO" width={100} height={30} style={{ height: "auto" }} />
+        <Image
+          src="/images/aivo-logo-purple.png"
+          alt="AIVO"
+          width={100}
+          height={30}
+          style={{ height: "auto" }}
+        />
         <div className="flex items-center gap-4">
           <span className="font-bold text-amber-600">{balance.coins} coins</span>
           <span className="font-bold text-purple-600">{balance.gems} gems</span>
-          <button onClick={() => router.push("/dashboard/learner")}
-            className="text-sm text-primary font-semibold hover:underline">{tCommon("back")}</button>
-          <button onClick={logout} className="text-sm text-slate-500 hover:text-red-500 font-semibold">{tLearner("log_out")}</button>
+          <button
+            onClick={() => router.push("/dashboard/learner")}
+            className="text-sm text-primary font-semibold hover:underline"
+          >
+            {tCommon("back")}
+          </button>
+          <button
+            onClick={logout}
+            className="text-sm text-slate-500 hover:text-red-500 font-semibold"
+          >
+            {tLearner("log_out")}
+          </button>
         </div>
       </header>
 
@@ -129,10 +157,18 @@ export default function ShopPage() {
                 key={c}
                 onClick={() => setCategory(c)}
                 className={`px-4 py-2 rounded-full text-sm font-bold transition inline-flex items-center gap-1.5 ${
-                  category === c ? "bg-primary text-white" : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
+                  category === c
+                    ? "bg-primary text-white"
+                    : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
                 }`}
               >
-                {c === "all" ? "All" : (<><Icon className="w-4 h-4" strokeWidth={2} aria-hidden /> {c}</>)}
+                {c === "all" ? (
+                  "All"
+                ) : (
+                  <>
+                    <Icon className="w-4 h-4" strokeWidth={2} aria-hidden /> {c}
+                  </>
+                )}
               </button>
             );
           })}
@@ -151,34 +187,47 @@ export default function ShopPage() {
               const isOwned = owned.includes(item.id);
               const ItemIcon = CATEGORY_ICONS[item.category] || Package;
               return (
-                <div key={item.id} className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm text-center space-y-2">
+                <div
+                  key={item.id}
+                  className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm text-center space-y-2"
+                >
                   <div className="w-12 h-12 mx-auto rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
                     <ItemIcon className="w-6 h-6" strokeWidth={2} aria-hidden />
                   </div>
                   <div className="font-heading font-bold text-sm text-slate-900">{item.name}</div>
-                  <div className="text-xs font-semibold capitalize"
+                  <div
+                    className="text-xs font-semibold capitalize"
                     // eslint-disable-next-line no-restricted-syntax -- gamification rarity palette; neutral fallback for unknown rarity
-                    style={{ color: RARITY_COLORS[item.rarity] || "#94a3b8" }}>
+                    style={{ color: RARITY_COLORS[item.rarity] || "#94a3b8" }}
+                  >
                     {item.rarity}
                   </div>
                   {isOwned ? (
-                    <div className="text-xs font-bold text-green-600 bg-green-50 rounded-full px-3 py-1 inline-block">Owned</div>
+                    <div className="text-xs font-bold text-green-600 bg-green-50 rounded-full px-3 py-1 inline-block">
+                      Owned
+                    </div>
                   ) : item.isFree ? (
-                    <button onClick={() => purchase(item.id, "coins")}
-                      className="px-4 py-1.5 rounded-full bg-green-500 text-white text-xs font-bold hover:bg-green-600 transition">
+                    <button
+                      onClick={() => purchase(item.id, "coins")}
+                      className="px-4 py-1.5 rounded-full bg-green-500 text-white text-xs font-bold hover:bg-green-600 transition"
+                    >
                       Free!
                     </button>
                   ) : (
                     <div className="flex gap-2 justify-center">
                       {item.coinPrice > 0 && (
-                        <button onClick={() => purchase(item.id, "coins")}
-                          className="px-3 py-1.5 rounded-full bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))] text-xs font-bold hover:bg-[hsl(var(--visual-sel)/0.28)] transition">
+                        <button
+                          onClick={() => purchase(item.id, "coins")}
+                          className="px-3 py-1.5 rounded-full bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))] text-xs font-bold hover:bg-[hsl(var(--visual-sel)/0.28)] transition"
+                        >
                           {item.coinPrice} coins
                         </button>
                       )}
                       {item.gemPrice > 0 && (
-                        <button onClick={() => purchase(item.id, "gems")}
-                          className="px-3 py-1.5 rounded-full bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))] text-xs font-bold hover:bg-[hsl(var(--visual-primary)/0.22)] transition">
+                        <button
+                          onClick={() => purchase(item.id, "gems")}
+                          className="px-3 py-1.5 rounded-full bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))] text-xs font-bold hover:bg-[hsl(var(--visual-primary)/0.22)] transition"
+                        >
                           {item.gemPrice} gems
                         </button>
                       )}

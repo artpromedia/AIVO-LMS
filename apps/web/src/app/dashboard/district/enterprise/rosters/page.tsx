@@ -8,8 +8,8 @@ export default function DistrictRostersPage() {
       <header>
         <h1 className="text-2xl font-bold">Roster import</h1>
         <p className="text-sm text-gray-600">
-          Import a normalized Clever or ClassLink JSON export. Existing
-          learners are upserted without overwriting parent-owned profile fields.
+          Import a normalized Clever or ClassLink JSON export. Existing learners are upserted
+          without overwriting parent-owned profile fields.
         </p>
       </header>
       <RosterImportPanel districtId="current" />

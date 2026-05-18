@@ -58,9 +58,7 @@ async function saveStepAction(formData: FormData) {
         break;
       case "grade_subject":
         sectionData.gradeBand = String(formData.get("grade_subject.gradeBand") || "");
-        sectionData.focusSubjects = formData
-          .getAll("grade_subject.focusSubjects")
-          .map(String);
+        sectionData.focusSubjects = formData.getAll("grade_subject.focusSubjects").map(String);
         break;
       case "reading":
         sectionData.comfort = String(formData.get("reading.comfort") || "");
@@ -157,10 +155,7 @@ async function saveStepAction(formData: FormData) {
         if (rm) sectionData.responseMethod = rm;
         const asb = String(formData.get("learning_profile.attentionSpanBucket") || "");
         if (asb) sectionData.attentionSpanBucket = asb;
-        const bestModes = formData
-          .getAll("learning_profile.bestModes")
-          .map(String)
-          .filter(Boolean);
+        const bestModes = formData.getAll("learning_profile.bestModes").map(String).filter(Boolean);
         if (bestModes.length > 0) sectionData.bestModes = bestModes;
         break;
       }
@@ -250,8 +245,7 @@ export default async function AssessmentWizard({
   const step = WIZARD_STEPS.find((s) => s.id === stepNum)!;
   const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
 
-  const selectClass =
-    "h-10 rounded-lg border border-aivo-border bg-aivo-surface px-3 text-sm";
+  const selectClass = "h-10 rounded-lg border border-aivo-border bg-aivo-surface px-3 text-sm";
 
   return (
     <AppShell
@@ -283,9 +277,7 @@ export default async function AssessmentWizard({
 
           {step.sections.map((s) => (
             <fieldset key={s} className="rounded-lg border border-aivo-border p-4">
-              <legend className="px-2 text-sm font-medium">
-                {sectionTitle(s)}
-              </legend>
+              <legend className="px-2 text-sm font-medium">{sectionTitle(s)}</legend>
               <div className="grid gap-4 sm:grid-cols-2">
                 {s === "goals" && (
                   <>
@@ -331,13 +323,11 @@ export default async function AssessmentWizard({
                         defaultValue={fieldString(assessment, "grade_subject", "gradeBand")}
                       >
                         <option value="">Choose…</option>
-                        {["preK", "K", "1-2", "3-5", "6-8", "9-12", "post_secondary"].map(
-                          (v) => (
-                            <option key={v} value={v}>
-                              {v}
-                            </option>
-                          ),
-                        )}
+                        {["preK", "K", "1-2", "3-5", "6-8", "9-12", "post_secondary"].map((v) => (
+                          <option key={v} value={v}>
+                            {v}
+                          </option>
+                        ))}
                       </select>
                     </div>
                     <div className="sm:col-span-2 flex flex-col gap-1.5">
@@ -412,7 +402,9 @@ export default async function AssessmentWizard({
                         min={1}
                         max={120}
                         required
-                        defaultValue={fieldString(assessment, "attention", "focusWindowMinutes") || 10}
+                        defaultValue={
+                          fieldString(assessment, "attention", "focusWindowMinutes") || 10
+                        }
                       />
                     </div>
                     <div className="flex flex-col gap-1.5">
@@ -558,11 +550,7 @@ export default async function AssessmentWizard({
                         type="number"
                         min={0}
                         max={180}
-                        defaultValue={fieldString(
-                          assessment,
-                          "homework",
-                          "typicalSessionMinutes",
-                        )}
+                        defaultValue={fieldString(assessment, "homework", "typicalSessionMinutes")}
                       />
                     </div>
                   </>
@@ -587,11 +575,7 @@ export default async function AssessmentWizard({
                         id="frustration.calmingStrategies"
                         name="frustration.calmingStrategies"
                         rows={3}
-                        defaultValue={fieldString(
-                          assessment,
-                          "frustration",
-                          "calmingStrategies",
-                        )}
+                        defaultValue={fieldString(assessment, "frustration", "calmingStrategies")}
                       />
                     </div>
                   </>
@@ -687,9 +671,7 @@ export default async function AssessmentWizard({
 
                 {s === "concerns" && (
                   <div className="sm:col-span-2 flex flex-col gap-1.5">
-                    <Label htmlFor="concerns.concerns">
-                      Anything else you want AIVO to know
-                    </Label>
+                    <Label htmlFor="concerns.concerns">Anything else you want AIVO to know</Label>
                     <Textarea
                       id="concerns.concerns"
                       name="concerns.concerns"
@@ -851,9 +833,7 @@ export default async function AssessmentWizard({
                 {s === "learning_profile" && (
                   <>
                     <div className="flex flex-col gap-1.5">
-                      <Label htmlFor="learning_profile.communicationMode">
-                        Communication mode
-                      </Label>
+                      <Label htmlFor="learning_profile.communicationMode">Communication mode</Label>
                       <select
                         id="learning_profile.communicationMode"
                         name="learning_profile.communicationMode"
@@ -892,18 +872,12 @@ export default async function AssessmentWizard({
                       </select>
                     </div>
                     <div className="flex flex-col gap-1.5">
-                      <Label htmlFor="learning_profile.responseMethod">
-                        How they respond
-                      </Label>
+                      <Label htmlFor="learning_profile.responseMethod">How they respond</Label>
                       <select
                         id="learning_profile.responseMethod"
                         name="learning_profile.responseMethod"
                         className={selectClass}
-                        defaultValue={fieldString(
-                          assessment,
-                          "learning_profile",
-                          "responseMethod",
-                        )}
+                        defaultValue={fieldString(assessment, "learning_profile", "responseMethod")}
                       >
                         <option value="">Choose…</option>
                         <option value="touch">Touch / tap</option>
@@ -942,11 +916,7 @@ export default async function AssessmentWizard({
                           { v: "kinesthetic", l: "Hands-on" },
                           { v: "reading_writing", l: "Reading / writing" },
                         ].map(({ v, l }) => {
-                          const cur = fieldArray(
-                            assessment,
-                            "learning_profile",
-                            "bestModes",
-                          );
+                          const cur = fieldArray(assessment, "learning_profile", "bestModes");
                           return (
                             <label key={v} className="flex items-center gap-2 text-sm">
                               <input
@@ -972,9 +942,7 @@ export default async function AssessmentWizard({
             <div>
               {stepNum > 1 ? (
                 <Button asChild variant="outline">
-                  <Link
-                    href={`/parent/learners/${learner.id}/assessment?step=${stepNum - 1}`}
-                  >
+                  <Link href={`/parent/learners/${learner.id}/assessment?step=${stepNum - 1}`}>
                     Back
                   </Link>
                 </Button>

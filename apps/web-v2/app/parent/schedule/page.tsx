@@ -55,9 +55,7 @@ export default async function Page() {
                         <p className="font-medium">{a.title}</p>
                         <p className="text-sm text-aivo-ink-soft">
                           {subjectMap.get(a.subjectId)?.name ?? "Subject"}
-                          {a.dueAt
-                            ? ` · due ${new Date(a.dueAt).toLocaleDateString()}`
-                            : ""}
+                          {a.dueAt ? ` · due ${new Date(a.dueAt).toLocaleDateString()}` : ""}
                         </p>
                       </div>
                       <Badge tone="primary">Teacher</Badge>
@@ -69,9 +67,7 @@ export default async function Page() {
                     <div className="flex items-center justify-between gap-3">
                       <div>
                         <p className="font-medium">In-progress lesson</p>
-                        <p className="text-sm text-aivo-ink-soft">
-                          Source: {r.source}
-                        </p>
+                        <p className="text-sm text-aivo-ink-soft">Source: {r.source}</p>
                       </div>
                       <Link
                         href={`/learner/lesson-runs/${r.id}`}
@@ -84,8 +80,8 @@ export default async function Page() {
                 ))}
                 {assignments.length === 0 && activeRuns.length === 0 ? (
                   <Card className="p-4 text-sm text-aivo-ink-soft">
-                    Nothing scheduled — {l.displayName} will pick from Today's
-                    Mission next time they sign in.
+                    Nothing scheduled — {l.displayName} will pick from Today's Mission next time
+                    they sign in.
                   </Card>
                 ) : null}
               </div>

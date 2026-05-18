@@ -20,7 +20,12 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection", "ai_personalization"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection", "ai_personalization"],
+      requestId,
+    );
     if (consentErr) return consentErr;
     const existing = getLessonRun(lessonRunId, session!.tenantId);
     if (!existing || existing.lessonRun.learnerId !== learnerId) {
@@ -36,8 +41,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       );
     }
     const updated = startLessonRun(lessonRunId, session!.tenantId);
-    if (!updated)
-      return fail({ ...ERRORS.NOT_FOUND, message: "Lesson run not found" }, requestId);
+    if (!updated) return fail({ ...ERRORS.NOT_FOUND, message: "Lesson run not found" }, requestId);
     audit(session!, "lesson_run.start", requestId, {
       learnerId,
       metadata: { lessonRunId: updated.id, status: updated.status },

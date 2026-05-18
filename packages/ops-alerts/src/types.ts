@@ -14,7 +14,9 @@ export interface OpsAlertEnvelope {
 export interface OpsAlertOutboxStore {
   readonly kind: "memory" | "file" | "postgres";
   enqueue(envelope: OpsAlertEnvelope): Promise<void>;
-  drain(handler: (envelope: OpsAlertEnvelope) => Promise<void>): Promise<{ drained: number; remaining: number }>;
+  drain(
+    handler: (envelope: OpsAlertEnvelope) => Promise<void>,
+  ): Promise<{ drained: number; remaining: number }>;
   size(): Promise<number>;
 }
 

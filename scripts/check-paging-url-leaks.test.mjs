@@ -35,12 +35,15 @@ function runOnFixture(files) {
   const result = runOnFixture({
     "leaky.ts": [
       "// real-looking slack webhook url",
-      "const SLACK = \"https://hooks.slack.com/services/REDACTED/FOR/TESTING\";",
+      'const SLACK = "https://hooks.slack.com/services/REDACTED/FOR/TESTING";',
       "fetch(SLACK);",
     ].join("\n"),
   });
-  assert.notEqual(result.status, 0,
-    `expected non-zero exit; stdout=${result.stdout} stderr=${result.stderr}`);
+  assert.notEqual(
+    result.status,
+    0,
+    `expected non-zero exit; stdout=${result.stdout} stderr=${result.stderr}`,
+  );
   assert.match(result.stderr, /slack-webhook/);
 }
 
@@ -55,14 +58,17 @@ function runOnFixture(files) {
       "    extra: {",
       "      // note: not named *Webhook* / *Pager* — the key-name guardrail",
       "      // wouldn't see this; the URL-pattern scanner must.",
-      "      notifyUrl: \"https://hooks.slack.com/services/REDACTED/FOR/TESTING\",",
+      '      notifyUrl: "https://hooks.slack.com/services/REDACTED/FOR/TESTING",',
       "    },",
       "  },",
       "};",
     ].join("\n"),
   });
-  assert.notEqual(result.status, 0,
-    `expected non-zero exit for hidden URL; stdout=${result.stdout} stderr=${result.stderr}`);
+  assert.notEqual(
+    result.status,
+    0,
+    `expected non-zero exit for hidden URL; stdout=${result.stdout} stderr=${result.stderr}`,
+  );
   assert.match(result.stderr, /slack-webhook/);
   assert.match(result.stderr, /app\.config\.ts/);
 }
@@ -70,14 +76,21 @@ function runOnFixture(files) {
 // Case 3 (#200): pagerduty events URL embedded in a config blob.
 {
   const result = runOnFixture({
-    "config.json": JSON.stringify({
-      featureFlags: { newRetry: true },
-      // No paging-shaped key, but a real PD events URL.
-      destination: "https://events.pagerduty.com/v2/enqueue",
-    }, null, 2),
+    "config.json": JSON.stringify(
+      {
+        featureFlags: { newRetry: true },
+        // No paging-shaped key, but a real PD events URL.
+        destination: "https://events.pagerduty.com/v2/enqueue",
+      },
+      null,
+      2,
+    ),
   });
-  assert.notEqual(result.status, 0,
-    `expected non-zero exit for PD events URL; stdout=${result.stdout} stderr=${result.stderr}`);
+  assert.notEqual(
+    result.status,
+    0,
+    `expected non-zero exit for PD events URL; stdout=${result.stdout} stderr=${result.stderr}`,
+  );
   assert.match(result.stderr, /pagerduty-events/);
 }
 
@@ -86,13 +99,16 @@ function runOnFixture(files) {
 {
   const result = runOnFixture({
     "ok.ts": [
-      "fetch(\"https://example.com/hooks/services/abc\");",
+      'fetch("https://example.com/hooks/services/abc");',
       "// also a 32-char hex blob that's NOT a routing key (no pagerduty keyword)",
-      "const sha = \"abcdef0123456789abcdef0123456789\";",
+      'const sha = "abcdef0123456789abcdef0123456789";',
     ].join("\n"),
   });
-  assert.equal(result.status, 0,
-    `expected zero exit on clean fixture; stdout=${result.stdout} stderr=${result.stderr}`);
+  assert.equal(
+    result.status,
+    0,
+    `expected zero exit on clean fixture; stdout=${result.stdout} stderr=${result.stderr}`,
+  );
 }
 
 // Case 5 (negative): a `// paging-url-leaks: ignore` comment on the same
@@ -104,8 +120,11 @@ function runOnFixture(files) {
       "https://hooks.slack.com/services/TXX/BYY/zzzzzzzzzzzz // paging-url-leaks: ignore",
     ].join("\n"),
   });
-  assert.equal(result.status, 0,
-    `expected zero exit on ignored line; stdout=${result.stdout} stderr=${result.stderr}`);
+  assert.equal(
+    result.status,
+    0,
+    `expected zero exit on ignored line; stdout=${result.stdout} stderr=${result.stderr}`,
+  );
 }
 
 console.log("guardrail self-test: OK");

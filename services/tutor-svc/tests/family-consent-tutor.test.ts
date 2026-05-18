@@ -4,10 +4,7 @@
  */
 import { describe, it, beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
-import {
-  verifyTutorConsent,
-  ConsentError,
-} from "../src/lib/familyConsent.js";
+import { verifyTutorConsent, ConsentError } from "../src/lib/familyConsent.js";
 
 const ORIGINAL_FETCH = globalThis.fetch;
 
@@ -75,10 +72,10 @@ describe("verifyTutorConsent (Phase 5)", () => {
     let receivedBody: any = null;
     globalThis.fetch = async (_url, init) => {
       receivedBody = JSON.parse((init as any).body as string);
-      return new Response(
-        JSON.stringify({ granted: true, consentRecordId: "rec-7" }),
-        { status: 200, headers: { "content-type": "application/json" } },
-      );
+      return new Response(JSON.stringify({ granted: true, consentRecordId: "rec-7" }), {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
     };
     const id = await verifyTutorConsent({
       tenantId: "t",

@@ -40,10 +40,7 @@ const CANONICAL_TUTORS = [
   "muse",
 ];
 
-const AVATAR_PUBLIC_DIRS = [
-  "apps/web/public/images/tutors",
-  "apps/marketing/public/images/tutors",
-];
+const AVATAR_PUBLIC_DIRS = ["apps/web/public/images/tutors", "apps/marketing/public/images/tutors"];
 
 const errors = [];
 const warnings = [];
@@ -103,7 +100,9 @@ const modeDir = join(repoRoot, "services/tutor-svc/src/modes");
 const modePerTutor = new Map();
 for (const key of CANONICAL_TUTORS) {
   // Find import line in registry to map key → mode file
-  const importMatch = registrySrc.match(new RegExp(`import \\{ (\\w+) \\} from "\\./([\\w-]+)\\.js";[\\s\\S]*?${key}: \\1`));
+  const importMatch = registrySrc.match(
+    new RegExp(`import \\{ (\\w+) \\} from "\\./([\\w-]+)\\.js";[\\s\\S]*?${key}: \\1`),
+  );
   if (!importMatch) {
     modePerTutor.set(key, null);
     continue;
@@ -148,11 +147,12 @@ for (const key of CANONICAL_TUTORS) {
 // animated avatar — a yellow finding for GREEN-02 deep parity / GREEN-09.
 const reducedMotionStatus = new Map();
 for (const tutor of CANONICAL_TUTORS) {
-  const found = AVATAR_PUBLIC_DIRS.map((d) =>
-    existsSync(join(repoRoot, d, `${tutor}-reduced.svg`)) ||
-    existsSync(join(repoRoot, d, `${tutor}-reduced.png`)) ||
-    existsSync(join(repoRoot, d, `${tutor}-static.png`)) ||
-    existsSync(join(repoRoot, d, `${tutor}.svg`)),
+  const found = AVATAR_PUBLIC_DIRS.map(
+    (d) =>
+      existsSync(join(repoRoot, d, `${tutor}-reduced.svg`)) ||
+      existsSync(join(repoRoot, d, `${tutor}-reduced.png`)) ||
+      existsSync(join(repoRoot, d, `${tutor}-static.png`)) ||
+      existsSync(join(repoRoot, d, `${tutor}.svg`)),
   );
   reducedMotionStatus.set(tutor, found);
 }
@@ -241,7 +241,8 @@ if (surplusBrand.length) {
   for (const k of surplusBrand) errors.push(`brand catalog has non-canonical tutor key: ${k}`);
 }
 if (surplusRegistry.length) {
-  for (const k of surplusRegistry) errors.push(`runtime registry has non-canonical tutor key: ${k}`);
+  for (const k of surplusRegistry)
+    errors.push(`runtime registry has non-canonical tutor key: ${k}`);
 }
 
 // ---------------------------------------------------------------------------
@@ -287,7 +288,9 @@ console.log("-".repeat(100));
 const greens = rows.filter((r) => r.status.includes("green")).length;
 const yellows = rows.filter((r) => r.status.includes("yellow")).length;
 const reds = rows.filter((r) => r.status.includes("red")).length;
-console.log(`\nsummary: ${greens}/${CANONICAL_TUTORS.length} green, ${yellows} yellow, ${reds} red`);
+console.log(
+  `\nsummary: ${greens}/${CANONICAL_TUTORS.length} green, ${yellows} yellow, ${reds} red`,
+);
 
 if (warnings.length) {
   console.log("\nwarnings:");

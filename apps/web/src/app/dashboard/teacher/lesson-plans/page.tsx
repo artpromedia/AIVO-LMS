@@ -64,10 +64,10 @@ export default function TeacherLessonPlansPage() {
       const [plansData, learnersData] = await Promise.all([
         fetch("/api/engagement/lesson-plans/teacher", {
           headers: { Authorization: `Bearer ${accessToken}` },
-        }).then(r => r.ok ? r.json() : []),
+        }).then((r) => (r.ok ? r.json() : [])),
         fetch("/api/family/collaboration/connected-learners", {
           headers: { Authorization: `Bearer ${accessToken}` },
-        }).then(r => r.ok ? r.json() : []),
+        }).then((r) => (r.ok ? r.json() : [])),
       ]);
       setPlans(Array.isArray(plansData) ? plansData : []);
       const parsed = Array.isArray(learnersData) ? learnersData : [];
@@ -80,14 +80,16 @@ export default function TeacherLessonPlansPage() {
     }
   }, [accessToken, user]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleGenerate = async () => {
     if (!accessToken || !formLearnerId) return;
     setGenerating(true);
     setGenError(null);
     try {
-      const learner = learners.find(l => l.id === formLearnerId);
+      const learner = learners.find((l) => l.id === formLearnerId);
       const res = await fetch("/api/engagement/lesson-plans/generate", {
         method: "POST",
         headers: {
@@ -118,7 +120,7 @@ export default function TeacherLessonPlansPage() {
 
   if (loading || !user) return null;
 
-  const getLearnerName = (id: string) => learners.find(l => l.id === id)?.name || "Unknown";
+  const getLearnerName = (id: string) => learners.find((l) => l.id === id)?.name || "Unknown";
 
   return (
     <div className="p-8 space-y-6">
@@ -139,40 +141,78 @@ export default function TeacherLessonPlansPage() {
       {showForm && (
         <div className="vi-card p-6 space-y-4">
           <h2 className="text-lg font-heading font-bold vi-text">AI Lesson Plan Generator</h2>
-          <p className="text-sm vi-text-muted">Generate a differentiated lesson plan based on your learner&apos;s Brain Clone profile.</p>
+          <p className="text-sm vi-text-muted">
+            Generate a differentiated lesson plan based on your learner&apos;s Brain Clone profile.
+          </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="lp-learner" className="block text-sm font-semibold vi-text mb-1">Learner</label>
-              <select id="lp-learner" value={formLearnerId} onChange={e => setFormLearnerId(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border vi-border text-sm bg-[hsl(var(--visual-surface))] vi-text">
-                {learners.map(l => (
-                  <option key={l.id} value={l.id}>{l.name} ({l.functioningLevel || "Pending"})</option>
+              <label htmlFor="lp-learner" className="block text-sm font-semibold vi-text mb-1">
+                Learner
+              </label>
+              <select
+                id="lp-learner"
+                value={formLearnerId}
+                onChange={(e) => setFormLearnerId(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg border vi-border text-sm bg-[hsl(var(--visual-surface))] vi-text"
+              >
+                {learners.map((l) => (
+                  <option key={l.id} value={l.id}>
+                    {l.name} ({l.functioningLevel || "Pending"})
+                  </option>
                 ))}
               </select>
             </div>
             <div>
-              <label htmlFor="lp-subject" className="block text-sm font-semibold vi-text mb-1">Subject</label>
-              <select id="lp-subject" value={formSubject} onChange={e => setFormSubject(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border vi-border text-sm bg-[hsl(var(--visual-surface))] vi-text">
-                {SUBJECTS.map(s => (
-                  <option key={s} value={s}>{s}</option>
+              <label htmlFor="lp-subject" className="block text-sm font-semibold vi-text mb-1">
+                Subject
+              </label>
+              <select
+                id="lp-subject"
+                value={formSubject}
+                onChange={(e) => setFormSubject(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg border vi-border text-sm bg-[hsl(var(--visual-surface))] vi-text"
+              >
+                {SUBJECTS.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
                 ))}
               </select>
             </div>
             <div>
-              <label htmlFor="lp-grade" className="block text-sm font-semibold vi-text mb-1">Grade Level</label>
-              <input id="lp-grade" type="text" value={formGrade} onChange={e => setFormGrade(e.target.value)}
-                placeholder="e.g., 3rd" className="w-full px-3 py-2 rounded-lg border vi-border text-sm bg-[hsl(var(--visual-surface))] vi-text" />
+              <label htmlFor="lp-grade" className="block text-sm font-semibold vi-text mb-1">
+                Grade Level
+              </label>
+              <input
+                id="lp-grade"
+                type="text"
+                value={formGrade}
+                onChange={(e) => setFormGrade(e.target.value)}
+                placeholder="e.g., 3rd"
+                className="w-full px-3 py-2 rounded-lg border vi-border text-sm bg-[hsl(var(--visual-surface))] vi-text"
+              />
             </div>
             <div>
-              <label htmlFor="lp-topic" className="block text-sm font-semibold vi-text mb-1">Topic (optional)</label>
-              <input id="lp-topic" type="text" value={formTopic} onChange={e => setFormTopic(e.target.value)}
-                placeholder="e.g., Fractions" className="w-full px-3 py-2 rounded-lg border vi-border text-sm bg-[hsl(var(--visual-surface))] vi-text" />
+              <label htmlFor="lp-topic" className="block text-sm font-semibold vi-text mb-1">
+                Topic (optional)
+              </label>
+              <input
+                id="lp-topic"
+                type="text"
+                value={formTopic}
+                onChange={(e) => setFormTopic(e.target.value)}
+                placeholder="e.g., Fractions"
+                className="w-full px-3 py-2 rounded-lg border vi-border text-sm bg-[hsl(var(--visual-surface))] vi-text"
+              />
             </div>
           </div>
 
-          {genError && <p className="text-sm text-[hsl(var(--visual-math))] font-medium" role="alert">{genError}</p>}
+          {genError && (
+            <p className="text-sm text-[hsl(var(--visual-math))] font-medium" role="alert">
+              {genError}
+            </p>
+          )}
 
           <button
             type="button"
@@ -202,7 +242,7 @@ export default function TeacherLessonPlansPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {plans.map(plan => (
+          {plans.map((plan) => (
             <div key={plan.id} className="vi-card overflow-hidden">
               <button
                 type="button"
@@ -214,40 +254,48 @@ export default function TeacherLessonPlansPage() {
                 <div>
                   <h3 className="font-heading font-bold vi-text">{plan.title}</h3>
                   <p className="text-sm vi-text-muted mt-0.5">
-                    {getLearnerName(plan.learnerId)} &middot; {plan.subject} &middot; {new Date(plan.createdAt).toLocaleDateString()}
+                    {getLearnerName(plan.learnerId)} &middot; {plan.subject} &middot;{" "}
+                    {new Date(plan.createdAt).toLocaleDateString()}
                   </p>
                 </div>
-                <span className={`px-3 py-1 text-xs rounded-full font-bold ${plan.status === "DRAFT" ? "bg-[hsl(var(--visual-sel)/0.16)] text-[hsl(var(--visual-sel))]" : "bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))]"}`}>
+                <span
+                  className={`px-3 py-1 text-xs rounded-full font-bold ${plan.status === "DRAFT" ? "bg-[hsl(var(--visual-sel)/0.16)] text-[hsl(var(--visual-sel))]" : "bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))]"}`}
+                >
                   {plan.status}
                 </span>
               </button>
               {expandedPlan === plan.id && (
-                <div id={`plan-details-${plan.id}`} className="px-6 pb-6 border-t vi-border space-y-4">
-                  {plan.content && typeof plan.content === "object" && (() => {
-                    const c = plan.content as Record<string, string>;
-                    return (
-                      <div className="space-y-3 pt-4">
-                        {c.objective && (
-                          <div>
-                            <h4 className="text-sm font-semibold vi-text">Objective</h4>
-                            <p className="text-sm vi-text-muted">{c.objective}</p>
-                          </div>
-                        )}
-                        {c.overview && (
-                          <div>
-                            <h4 className="text-sm font-semibold vi-text">Overview</h4>
-                            <p className="text-sm vi-text-muted">{c.overview}</p>
-                          </div>
-                        )}
-                        {c.duration && (
-                          <div>
-                            <h4 className="text-sm font-semibold vi-text">Duration</h4>
-                            <p className="text-sm vi-text-muted">{c.duration}</p>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })()}
+                <div
+                  id={`plan-details-${plan.id}`}
+                  className="px-6 pb-6 border-t vi-border space-y-4"
+                >
+                  {plan.content &&
+                    typeof plan.content === "object" &&
+                    (() => {
+                      const c = plan.content as Record<string, string>;
+                      return (
+                        <div className="space-y-3 pt-4">
+                          {c.objective && (
+                            <div>
+                              <h4 className="text-sm font-semibold vi-text">Objective</h4>
+                              <p className="text-sm vi-text-muted">{c.objective}</p>
+                            </div>
+                          )}
+                          {c.overview && (
+                            <div>
+                              <h4 className="text-sm font-semibold vi-text">Overview</h4>
+                              <p className="text-sm vi-text-muted">{c.overview}</p>
+                            </div>
+                          )}
+                          {c.duration && (
+                            <div>
+                              <h4 className="text-sm font-semibold vi-text">Duration</h4>
+                              <p className="text-sm vi-text-muted">{c.duration}</p>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
                   {Array.isArray(plan.activities) && plan.activities.length > 0 && (
                     <div>
                       <h4 className="text-sm font-semibold vi-text mb-2">Activities</h4>
@@ -255,10 +303,21 @@ export default function TeacherLessonPlansPage() {
                         {plan.activities.map((a: unknown, i: number) => {
                           const act = a as Record<string, string>;
                           return (
-                            <div key={i} className="vi-surface-soft rounded-lg p-3 border vi-border">
-                              <p className="font-medium text-sm vi-text">{act.name || `Activity ${i + 1}`}</p>
-                              <p className="text-xs vi-text-muted mt-0.5">{act.description || ""}</p>
-                              {act.duration && <p className="text-xs text-[hsl(var(--visual-reading))] mt-1">{act.duration}</p>}
+                            <div
+                              key={i}
+                              className="vi-surface-soft rounded-lg p-3 border vi-border"
+                            >
+                              <p className="font-medium text-sm vi-text">
+                                {act.name || `Activity ${i + 1}`}
+                              </p>
+                              <p className="text-xs vi-text-muted mt-0.5">
+                                {act.description || ""}
+                              </p>
+                              {act.duration && (
+                                <p className="text-xs text-[hsl(var(--visual-reading))] mt-1">
+                                  {act.duration}
+                                </p>
+                              )}
                             </div>
                           );
                         })}

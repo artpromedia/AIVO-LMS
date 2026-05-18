@@ -6,11 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LEARNER_NAV } from "@/components/layout/role-shells";
-import {
-  listQuestChapters,
-  listQuestProgressForLearner,
-  listQuestWorlds,
-} from "@/lib/db/repos";
+import { listQuestChapters, listQuestProgressForLearner, listQuestWorlds } from "@/lib/db/repos";
 
 export default async function Page() {
   const session = await requirePageRole(["learner"]);
@@ -29,9 +25,7 @@ export default async function Page() {
   }
   const worlds = listQuestWorlds();
   const progress = listQuestProgressForLearner(learnerId, session.tenantId);
-  const completedByChapter = new Map(
-    progress.map((p) => [p.chapterId, p.progress >= 1]),
-  );
+  const completedByChapter = new Map(progress.map((p) => [p.chapterId, p.progress >= 1]));
 
   return (
     <AppShell

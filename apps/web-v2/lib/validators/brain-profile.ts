@@ -35,30 +35,17 @@ export const brainProfileStateSchema = z.object({
   accommodationSummary: z.string().max(2000),
   sensoryProfile: z.object({
     sensitivities: z.array(z.string()),
-    seekingOrAvoiding: z.enum([
-      "seeking",
-      "avoiding",
-      "mixed",
-      "neutral",
-      "unspecified",
-    ]),
+    seekingOrAvoiding: z.enum(["seeking", "avoiding", "mixed", "neutral", "unspecified"]),
     notes: z.string().max(500),
   }),
   attentionProfile: z.object({
     focusWindowMinutes: z.number().int().min(1).max(120),
-    breakStyle: z.enum([
-      "frequent_short",
-      "occasional",
-      "long_uninterrupted",
-      "unspecified",
-    ]),
+    breakStyle: z.enum(["frequent_short", "occasional", "long_uninterrupted", "unspecified"]),
     movementHelps: z.boolean(),
   }),
   readingComfort: z.union([comfortEnum, z.literal("unspecified")]),
   mathComfort: z.union([comfortEnum, z.literal("unspecified")]),
-  preferredModalities: z.array(
-    z.enum(["visual", "auditory", "kinesthetic", "reading_writing"]),
-  ),
+  preferredModalities: z.array(z.enum(["visual", "auditory", "kinesthetic", "reading_writing"])),
   motivationProfile: z.object({
     rewardsThatHelp: z.array(z.string()),
     avoidanceFactors: z.array(z.string()),
@@ -85,12 +72,7 @@ export const brainProfileStateSchema = z.object({
     baselineAttempts: z.number().int().min(0),
   }),
   tutorPersonaRecommendation: z.object({
-    style: z.enum([
-      "warm_coach",
-      "playful_friend",
-      "calm_guide",
-      "structured_mentor",
-    ]),
+    style: z.enum(["warm_coach", "playful_friend", "calm_guide", "structured_mentor"]),
     rationale: z.string().min(1).max(500),
   }),
   // ----- legacy brain_state parity (schema v2) -----
@@ -107,9 +89,7 @@ export const brainProfileStateSchema = z.object({
     .object({
       uploaded: z.boolean(),
       categories: z.array(z.string()),
-      goals: z.array(
-        z.object({ domain: z.string(), text: z.string().max(500) }),
-      ),
+      goals: z.array(z.object({ domain: z.string(), text: z.string().max(500) })),
     })
     .nullable(),
   activeAccommodations: z.array(z.string()),

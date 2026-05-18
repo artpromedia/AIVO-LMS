@@ -30,7 +30,12 @@ const BACKGROUND_STYLE: Record<ScratchpadBackground, CSSProperties> = {
   },
 };
 
-export function ScratchpadSurface({ surface, disabled = false, onSubmit, onEvent }: ScratchpadSurfaceProps) {
+export function ScratchpadSurface({
+  surface,
+  disabled = false,
+  onSubmit,
+  onEvent,
+}: ScratchpadSurfaceProps) {
   const [tool, setTool] = useState<"pencil" | "highlighter" | "eraser">("pencil");
   const [strokes, setStrokes] = useState<InkStroke[]>([]);
   const scratchpad = surface.scratchpad;
@@ -67,7 +72,9 @@ export function ScratchpadSurface({ surface, disabled = false, onSubmit, onEvent
         aria-label="submit scratchpad"
         disabled={submitDisabled}
         onClick={() => {
-          onEvent?.(createSurfaceEvent(surface.id, "surface_submitted", { strokeCount: strokes.length }));
+          onEvent?.(
+            createSurfaceEvent(surface.id, "surface_submitted", { strokeCount: strokes.length }),
+          );
           onSubmit?.({
             surfaceId: surface.id,
             inkStrokes: strokes,

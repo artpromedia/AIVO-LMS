@@ -29,7 +29,11 @@ export function AssignSeatRow({ licenseId, remaining }: { licenseId: string; rem
             const res = await fetch("/api/bff/admin/seats", {
               method: "POST",
               headers: { "content-type": "application/json" },
-              body: JSON.stringify({ licenseId, subjectId: subjectId.trim(), subjectKind: subjectId.startsWith("u_") ? "teacher" : "learner" }),
+              body: JSON.stringify({
+                licenseId,
+                subjectId: subjectId.trim(),
+                subjectKind: subjectId.startsWith("u_") ? "teacher" : "learner",
+              }),
             });
             const json = await res.json();
             if (!res.ok) {

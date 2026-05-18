@@ -2,11 +2,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { TUTORS } from "@aivo/brand";
 import { validateTutorDefinition } from "@aivo/tutor-sdk";
-import {
-  TUTOR_REGISTRY,
-  getTutorDefinition,
-  listTutorDefinitions,
-} from "../src/modes/registry.js";
+import { TUTOR_REGISTRY, getTutorDefinition, listTutorDefinitions } from "../src/modes/registry.js";
 
 describe("tutor-svc tutor registry", () => {
   it("declares one TutorDefinition for every catalog tutor key", () => {
@@ -18,11 +14,7 @@ describe("tutor-svc tutor registry", () => {
   it("each TutorDefinition is well-formed per the SDK validator", () => {
     for (const [key, def] of listTutorDefinitions()) {
       const issues = validateTutorDefinition(def);
-      assert.equal(
-        issues.length,
-        0,
-        `tutor "${key}" has issues: ${JSON.stringify(issues)}`,
-      );
+      assert.equal(issues.length, 0, `tutor "${key}" has issues: ${JSON.stringify(issues)}`);
     }
   });
 
@@ -48,10 +40,7 @@ describe("tutor-svc tutor registry", () => {
 
   it("each TutorDefinition declares at least one skill-graph ref", () => {
     for (const [key, def] of listTutorDefinitions()) {
-      assert.ok(
-        def.skillGraphRefs.length > 0,
-        `tutor "${key}" has no skillGraphRefs`,
-      );
+      assert.ok(def.skillGraphRefs.length > 0, `tutor "${key}" has no skillGraphRefs`);
     }
   });
 

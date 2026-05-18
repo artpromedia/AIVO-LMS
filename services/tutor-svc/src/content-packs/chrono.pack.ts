@@ -23,7 +23,8 @@ export const chronoStarterPack: ContentPack = {
       title: "What is a question?",
       skillId: "c3.k2.D1.Q1",
       type: "narration",
-      prompt: "Historians ask questions about the past — like 'What was school like long ago?' Today we'll be history detectives.",
+      prompt:
+        "Historians ask questions about the past — like 'What was school like long ago?' Today we'll be history detectives.",
       difficulty: "intro",
     },
     {

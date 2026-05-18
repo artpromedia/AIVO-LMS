@@ -169,12 +169,9 @@ export class StuckDetector {
 const MESSAGE_BY_KIND: Record<StuckPromptKind, string> = {
   "try-different-modality":
     "You've been on this for a few minutes — want to try this a different way?",
-  "break-it-smaller":
-    "Let's split this into a smaller piece. We'll just do the first part.",
-  "take-a-breath":
-    "This is a tricky one. Take a slow breath — we'll try again together.",
-  "ask-for-help":
-    "Would you like to ask a grown-up to help with this one?",
+  "break-it-smaller": "Let's split this into a smaller piece. We'll just do the first part.",
+  "take-a-breath": "This is a tricky one. Take a slow breath — we'll try again together.",
+  "ask-for-help": "Would you like to ask a grown-up to help with this one?",
 };
 
 // ===========================================================================
@@ -251,8 +248,7 @@ export class TimeOfDayMemory {
       const n = rows.length;
       const meanAccuracy = rows.reduce((s, r) => s + r.accuracy, 0) / n;
       const meanFrustration = rows.reduce((s, r) => s + r.frustrationRate, 0) / n;
-      const meanAttentionMinutes =
-        rows.reduce((s, r) => s + r.attentionMinutes, 0) / n;
+      const meanAttentionMinutes = rows.reduce((s, r) => s + r.attentionMinutes, 0) / n;
       const score = meanAccuracy + meanAttentionMinutes / 30 - meanFrustration;
       out.push({
         timeOfDay: tod,
@@ -303,11 +299,7 @@ export function nextStepPrompt(input: NextStepPromptInput): NextStepPromptOutput
     .filter((s) => done.has(s.id))
     .reduce((acc, s) => acc + s.weight, 0);
   const progress =
-    input.breakdown.totalWeight === 0
-      ? 1
-      : completedWeight / input.breakdown.totalWeight;
-  const message = next
-    ? `Next: ${next.label}.`
-    : "All done — nice work finishing.";
+    input.breakdown.totalWeight === 0 ? 1 : completedWeight / input.breakdown.totalWeight;
+  const message = next ? `Next: ${next.label}.` : "All done — nice work finishing.";
   return { next, progress, message };
 }

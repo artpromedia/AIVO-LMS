@@ -150,7 +150,7 @@ What the Brain measures: expressive vocabulary, receptive vocabulary, word retri
 The Stage transforms into a colorful puzzle room where logic rules and patterns create the environment.
 
 **Activity 1: The Pattern Path**
-A path of colored tiles leads across The Stage. Some tiles are missing. The child drags the correct colored tile into the gap to continue the pattern. Patterns start simple (red, blue, red, blue, ___) and increase in complexity (red, red, blue, red, red, blue, ___). The path leads to a treasure chest that opens when the pattern is complete.
+A path of colored tiles leads across The Stage. Some tiles are missing. The child drags the correct colored tile into the gap to continue the pattern. Patterns start simple (red, blue, red, blue, **_) and increase in complexity (red, red, blue, red, red, blue, _**). The path leads to a treasure chest that opens when the pattern is complete.
 
 What the Brain measures: pattern recognition, sequential reasoning, working memory.
 
@@ -171,18 +171,23 @@ What the Brain measures: cognitive flexibility, set-shifting, inhibitory control
 The Discovery Adventure adapts its entire presentation based on the functioning level determined by the parent assessment (which happens before the baseline).
 
 ### STANDARD Functioning Level
+
 Full Discovery Adventure as described above. 6 chapters. Approximately 15-20 minutes total. Rich visual scenes with full tutor character interactions. Standard response methods: tap, drag, speak, type.
 
 ### SUPPORTED Functioning Level
+
 Simplified Discovery Adventure. 5 chapters (Executive Function shortened). Approximately 12-15 minutes. Larger interactive targets (48px minimum). 3 answer choices instead of 4. Every prompt has audio narration auto-playing. Tutor character speaks slower. Extended response windows (1.5x). Visual cues on correct answers are more prominent. Gentle transition animations between activities to reduce startle.
 
 ### LOW_VERBAL Functioning Level
+
 Condensed Discovery Adventure. 4 abbreviated chapters (Reading simplified to word-picture matching, Math simplified to counting and 1-to-1 correspondence, Social-Emotional to emotion identification only, Speech if flagged). Approximately 5-8 minutes with a built-in break at the halfway point (a 15-second breathing animation with the tutor). 2 answer choices maximum, presented as large picture cards covering 40% of the screen each. Every element speaks when tapped. Celebration after every interaction (correct or not, because effort is the achievement). Tutor character is large, centered, and moves slowly. No text visible anywhere on screen. Audio is the primary content channel.
 
 ### NON_VERBAL Functioning Level
+
 Partner-Assisted Discovery Adventure. Approximately 3-5 minutes. The adult facilitator sees the full Stage on the child's device plus a companion panel on their own device (or a toggle overlay). The companion panel shows: the current activity, what to present to the child, what to observe, and response recording buttons. The child's screen shows simplified visuals: 2 large, high-contrast images. The adult presents the choices to the child using the child's preferred communication method (pointing, eye gaze, switch). The adult records the child's response. For switch-scanning mode, the 2 options highlight alternately with a 2-second dwell time, and the child activates their switch to select.
 
 ### PRE_SYMBOLIC Functioning Level
+
 Observational Discovery Adventure. There is no child-facing screen. The parent or caregiver completes a structured observational assessment on their own device, presented in a warm, conversational format, not a clinical checklist. Each observation is framed as a gentle question with illustrated examples: "When you show Alex two toys, does Alex reach for one?" with picture cards showing reaching/not reaching. "When you say Alex's name, does Alex look at you?" with picture cards showing looking/not looking. The observations cover: intentional communication, cause-and-effect awareness, object permanence, joint attention, motor responses, sensory preferences. The interface is warm and supportive, acknowledging the parent's role: "You know Alex best. These questions help us understand how Alex explores the world." Approximately 5-7 minutes for the parent to complete. No time pressure.
 
 ---
@@ -190,15 +195,19 @@ Observational Discovery Adventure. There is no child-facing screen. The parent o
 ## Adaptive Engine Behavior During the Discovery Adventure
 
 ### Item Selection
+
 The adaptive engine uses a modified CAT (Computerized Adaptive Testing) algorithm that selects the next activity based on the child's response to the current one. But unlike traditional CAT, the difficulty adjustment is masked by the narrative. Getting an easier item does not feel like "going backward" because the story simply takes a different path: "Let's explore this side of the garden first!" Getting a harder item feels like a natural progression: "You're ready for the deep part of the galaxy!"
 
 ### Implicit Data Collection
+
 Beyond explicit responses (which answer the child tapped), the Brain collects implicit behavioral signals that the child is unaware of. Response latency: how long from prompt to first interaction (processing speed indicator). Tap precision: whether the child taps the center of targets or edges (fine motor indicator). Hesitation patterns: did the child reach toward one answer then switch to another (uncertainty indicator). Attention drift: did the child stop interacting for more than 10 seconds (attention span indicator). Help button usage: how often and at what point in activities (metacognitive awareness). Audio replay requests: did the child tap to hear the narration again (auditory processing speed). These implicit signals feed directly into the Brain's disability signal detection and sensory profile calibration without the child ever being asked "do you have trouble concentrating?" or "do you need more time?"
 
 ### Engagement Monitoring
+
 The adaptive engine monitors engagement in real time and responds before the child disengages. If response latency increases progressively across 3 activities, the engine assumes fatigue and inserts a micro-break: the tutor character stretches and says "Let's take a breather!" and a 15-second animated breathing exercise plays. If the child makes 3 rapid responses (suggesting random guessing), the engine drops difficulty significantly and switches to a different interaction modality (from tapping to dragging, from selecting to speaking) to re-engage. If the child does not interact for 20 seconds, the tutor character makes an attention-getting animation and re-issues the prompt with more visual emphasis.
 
 ### Early Termination
+
 The adaptive engine has a confidence threshold for each domain. Once it has enough data to estimate the child's level with sufficient confidence (typically 4-6 activities per domain), it ends that chapter gracefully: "Amazing! You have explored everything in this world!" The child never feels like they were "cut short" or that they "failed enough questions to stop." Every chapter ends with a discovery and a celebration, regardless of when the adaptive engine decides to terminate.
 
 ---
@@ -238,13 +247,17 @@ It is NOT a question bank with cartoon backgrounds. It is NOT a standardized tes
 ## Technical Implementation
 
 ### Scene Format
+
 Each Discovery Adventure chapter is authored as a sequence of beats in the same JSON scene format as regular Stage lessons. Each beat specifies visual elements, audio narration, interaction type, adaptive branching rules (if correct go to beat X, if incorrect go to beat Y), and implicit data collection targets. The adaptive engine selects which beat to play next based on a real-time ability estimate maintained per domain.
 
 ### Adaptive Algorithm
+
 The adaptive engine uses a modified Bayesian ability estimator (similar to IRT-based CAT) that maintains a posterior distribution over the child's ability level per domain. Each activity has a calibrated difficulty parameter. The engine selects activities that maximize information gain while staying within the child's frustration threshold (never more than 1 standard deviation above estimated ability). The frustration threshold is itself adaptive: if implicit signals suggest frustration (increased latency, decreased precision, help-seeking), the threshold tightens.
 
 ### Pre-Generation
+
 Discovery Adventure content for each grade band and functioning level is pre-generated and cached (unlike regular lessons, which are generated live). This ensures instant loading, consistent quality, and the ability to calibrate difficulty parameters against known populations. The pre-generated content is refreshed quarterly to prevent memorization for returning users. Each grade band has approximately 40-50 activities per domain, of which the adaptive engine selects 4-8 per child.
 
 ### Data Pipeline
+
 All interaction data (explicit responses + implicit behavioral signals) streams in real time to assessment-svc via WebSocket. assessment-svc maintains the running ability estimate and publishes the final domain scores via NATS event assessment.baseline.completed when all chapters are complete or early-terminated. The event payload includes: per-domain ability estimates (0.0-1.0), confidence intervals, disability signal scores, sensory response patterns, attention span estimate, processing speed estimate, and the implicit behavioral profile. This is the richest baseline data any adaptive learning platform has ever collected from a single assessment session, and the child just had fun doing it.

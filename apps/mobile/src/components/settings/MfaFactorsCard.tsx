@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -8,14 +8,14 @@ import {
   Text,
   TextInput,
   View,
-} from 'react-native';
-import * as Clipboard from 'expo-clipboard';
-import { Ionicons } from '@expo/vector-icons';
-import { AivoCard, AivoButton } from '@aivo/mobile-ui';
-import { useTranslation } from '@/hooks/useTranslation';
-import { apiFetch } from '@/lib/api';
-import { API } from '@/constants/api';
-import { colors, spacing, radius } from '@/constants/colors';
+} from "react-native";
+import * as Clipboard from "expo-clipboard";
+import { Ionicons } from "@expo/vector-icons";
+import { AivoCard, AivoButton } from "@aivo/mobile-ui";
+import { useTranslation } from "@/hooks/useTranslation";
+import { apiFetch } from "@/lib/api";
+import { API } from "@/constants/api";
+import { colors, spacing, radius } from "@/constants/colors";
 
 interface TotpEnrollResponse {
   enrollToken: string;
@@ -28,7 +28,7 @@ interface TotpEnrollResponse {
 interface MfaStatus {
   mfaEnabled: boolean;
   mfaForced: boolean;
-  mfaMethod?: 'email' | 'totp' | string;
+  mfaMethod?: "email" | "totp" | string;
 }
 
 interface RecoveryStatus {
@@ -63,18 +63,18 @@ export function MfaFactorsCard() {
   // Enrollment flow
   const [enrolling, setEnrolling] = useState(false);
   const [enrollData, setEnrollData] = useState<TotpEnrollResponse | null>(null);
-  const [confirmCode, setConfirmCode] = useState('');
+  const [confirmCode, setConfirmCode] = useState("");
   const [confirming, setConfirming] = useState(false);
-  const [confirmError, setConfirmError] = useState('');
+  const [confirmError, setConfirmError] = useState("");
 
   // Disable flow
   const [showDisable, setShowDisable] = useState(false);
-  const [disablePassword, setDisablePassword] = useState('');
+  const [disablePassword, setDisablePassword] = useState("");
   const [disabling, setDisabling] = useState(false);
 
   // Recovery code regeneration
   const [showRegenerate, setShowRegenerate] = useState(false);
-  const [regenPassword, setRegenPassword] = useState('');
+  const [regenPassword, setRegenPassword] = useState("");
   const [regenerating, setRegenerating] = useState(false);
 
   // Codes display (shown both right after enroll-confirm and after regenerate).
@@ -84,12 +84,12 @@ export function MfaFactorsCard() {
     setStatusLoading(true);
     try {
       const [mfaRes, recRes] = await Promise.all([
-        apiFetch(API.IDENTITY, '/api/auth/mfa/status'),
-        apiFetch(API.IDENTITY, '/api/auth/mfa/recovery/status'),
+        apiFetch(API.IDENTITY, "/api/auth/mfa/status"),
+        apiFetch(API.IDENTITY, "/api/auth/mfa/recovery/status"),
       ]);
       if (mfaRes.ok) {
         const m = (await mfaRes.json()) as MfaStatus;
-        setTotpEnrolled(m.mfaMethod === 'totp' && !!m.mfaEnabled);
+        setTotpEnrolled(m.mfaMethod === "totp" && !!m.mfaEnabled);
       }
       if (recRes.ok) {
         const r = (await recRes.json()) as RecoveryStatus;
@@ -108,25 +108,23 @@ export function MfaFactorsCard() {
 
   const startEnroll = useCallback(async () => {
     setEnrolling(true);
-    setConfirmError('');
+    setConfirmError("");
     try {
-      const res = await apiFetch(API.IDENTITY, '/api/auth/mfa/totp/enroll', {
-        method: 'POST',
+      const res = await apiFetch(API.IDENTITY, "/api/auth/mfa/totp/enroll", {
+        method: "POST",
       });
-      const data = (await res.json().catch(() => ({}))) as
-        | TotpEnrollResponse
-        | { error?: string };
-      if (!res.ok || !('enrollToken' in data) || !data.enrollToken) {
+      const data = (await res.json().catch(() => ({}))) as TotpEnrollResponse | { error?: string };
+      if (!res.ok || !("enrollToken" in data) || !data.enrollToken) {
         Alert.alert(
-          t('common.error'),
-          (data as { error?: string }).error || t('mfaFactors.enrollFailed'),
+          t("common.error"),
+          (data as { error?: string }).error || t("mfaFactors.enrollFailed"),
         );
         return;
       }
       setEnrollData(data as TotpEnrollResponse);
-      setConfirmCode('');
+      setConfirmCode("");
     } catch {
-      Alert.alert(t('common.error'), t('auth.somethingWentWrong'));
+      Alert.alert(t("common.error"), t("auth.somethingWentWrong"));
     } finally {
       setEnrolling(false);
     }
@@ -135,10 +133,10 @@ export function MfaFactorsCard() {
   const confirmEnroll = useCallback(async () => {
     if (!enrollData || confirmCode.length !== 6) return;
     setConfirming(true);
-    setConfirmError('');
+    setConfirmError("");
     try {
-      const res = await apiFetch(API.IDENTITY, '/api/auth/mfa/totp/confirm', {
-        method: 'POST',
+      const res = await apiFetch(API.IDENTITY, "/api/auth/mfa/totp/confirm", {
+        method: "POST",
         body: JSON.stringify({
           enrollToken: enrollData.enrollToken,
           code: confirmCode,
@@ -150,11 +148,11 @@ export function MfaFactorsCard() {
         error?: string;
       };
       if (!res.ok || !data.success) {
-        setConfirmError(data.error || t('mfaFactors.confirmFailed'));
+        setConfirmError(data.error || t("mfaFactors.confirmFailed"));
         return;
       }
       setEnrollData(null);
-      setConfirmCode('');
+      setConfirmCode("");
       setTotpEnrolled(true);
       // Backend issues a fresh recovery batch on enrollment — show them once.
       if (Array.isArray(data.recoveryCodes) && data.recoveryCodes.length > 0) {
@@ -164,7 +162,7 @@ export function MfaFactorsCard() {
         loadStatus();
       }
     } catch {
-      setConfirmError(t('auth.somethingWentWrong'));
+      setConfirmError(t("auth.somethingWentWrong"));
     } finally {
       setConfirming(false);
     }
@@ -174,25 +172,22 @@ export function MfaFactorsCard() {
     if (!disablePassword) return;
     setDisabling(true);
     try {
-      const res = await apiFetch(API.IDENTITY, '/api/auth/mfa/totp/disable', {
-        method: 'POST',
+      const res = await apiFetch(API.IDENTITY, "/api/auth/mfa/totp/disable", {
+        method: "POST",
         body: JSON.stringify({ password: disablePassword }),
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
-        Alert.alert(
-          t('common.error'),
-          data.error || t('mfaFactors.disableFailed'),
-        );
+        Alert.alert(t("common.error"), data.error || t("mfaFactors.disableFailed"));
         return;
       }
       setShowDisable(false);
-      setDisablePassword('');
+      setDisablePassword("");
       setTotpEnrolled(false);
       setLatestCodes(null);
       loadStatus();
     } catch {
-      Alert.alert(t('common.error'), t('auth.somethingWentWrong'));
+      Alert.alert(t("common.error"), t("auth.somethingWentWrong"));
     } finally {
       setDisabling(false);
     }
@@ -202,33 +197,26 @@ export function MfaFactorsCard() {
     if (!regenPassword) return;
     setRegenerating(true);
     try {
-      const res = await apiFetch(
-        API.IDENTITY,
-        '/api/auth/mfa/recovery/regenerate',
-        {
-          method: 'POST',
-          body: JSON.stringify({ password: regenPassword }),
-        },
-      );
+      const res = await apiFetch(API.IDENTITY, "/api/auth/mfa/recovery/regenerate", {
+        method: "POST",
+        body: JSON.stringify({ password: regenPassword }),
+      });
       const data = (await res.json().catch(() => ({}))) as {
         recoveryCodes?: string[];
         codes?: string[];
         error?: string;
       };
       if (!res.ok) {
-        Alert.alert(
-          t('common.error'),
-          data.error || t('mfaFactors.regenFailed'),
-        );
+        Alert.alert(t("common.error"), data.error || t("mfaFactors.regenFailed"));
         return;
       }
       const codes = data.recoveryCodes ?? data.codes ?? [];
       setLatestCodes(codes);
       setRecovery({ remaining: codes.length, total: 10 });
       setShowRegenerate(false);
-      setRegenPassword('');
+      setRegenPassword("");
     } catch {
-      Alert.alert(t('common.error'), t('auth.somethingWentWrong'));
+      Alert.alert(t("common.error"), t("auth.somethingWentWrong"));
     } finally {
       setRegenerating(false);
     }
@@ -236,14 +224,14 @@ export function MfaFactorsCard() {
 
   const copyCodes = useCallback(async () => {
     if (!latestCodes) return;
-    await Clipboard.setStringAsync(latestCodes.join('\n'));
-    Alert.alert(t('common.success'), t('mfaFactors.codesCopied'));
+    await Clipboard.setStringAsync(latestCodes.join("\n"));
+    Alert.alert(t("common.success"), t("mfaFactors.codesCopied"));
   }, [latestCodes, t]);
 
   const copySecret = useCallback(async () => {
     if (!enrollData) return;
     await Clipboard.setStringAsync(enrollData.base32Secret);
-    Alert.alert(t('common.success'), t('mfaFactors.secretCopied'));
+    Alert.alert(t("common.success"), t("mfaFactors.secretCopied"));
   }, [enrollData, t]);
 
   if (statusLoading) {
@@ -261,27 +249,27 @@ export function MfaFactorsCard() {
       {/* TOTP authenticator app section */}
       <View style={styles.header}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.title}>{t('mfaFactors.totpTitle')}</Text>
-          <Text style={styles.desc}>{t('mfaFactors.totpDesc')}</Text>
+          <Text style={styles.title}>{t("mfaFactors.totpTitle")}</Text>
+          <Text style={styles.desc}>{t("mfaFactors.totpDesc")}</Text>
         </View>
         <View style={[styles.badge, totpEnrolled && styles.badgeOn]}>
           <Text style={[styles.badgeText, totpEnrolled && styles.badgeTextOn]}>
-            {totpEnrolled ? t('common.on') : t('common.off')}
+            {totpEnrolled ? t("common.on") : t("common.off")}
           </Text>
         </View>
       </View>
 
       {enrollData ? (
         <View style={styles.section}>
-          <Text style={styles.desc}>{t('mfaFactors.scanQr')}</Text>
+          <Text style={styles.desc}>{t("mfaFactors.scanQr")}</Text>
           {enrollData.qrDataUrl ? (
             <Image
               source={{ uri: enrollData.qrDataUrl }}
               style={styles.qr}
-              accessibilityLabel={t('mfaFactors.qrAlt')}
+              accessibilityLabel={t("mfaFactors.qrAlt")}
             />
           ) : null}
-          <Text style={styles.helper}>{t('mfaFactors.manualEntry')}</Text>
+          <Text style={styles.helper}>{t("mfaFactors.manualEntry")}</Text>
           <Pressable onPress={copySecret} style={styles.secretRow}>
             <Text style={styles.secretText} selectable>
               {enrollData.base32Secret}
@@ -289,21 +277,21 @@ export function MfaFactorsCard() {
             <Ionicons name="copy-outline" size={18} color={colors.textSecondary} />
           </Pressable>
 
-          <Text style={styles.fieldLabel}>{t('mfaFactors.enterCode')}</Text>
+          <Text style={styles.fieldLabel}>{t("mfaFactors.enterCode")}</Text>
           <TextInput
             style={[styles.codeInput]}
             value={confirmCode}
-            onChangeText={(v) => setConfirmCode(v.replace(/\D/g, '').slice(0, 6))}
+            onChangeText={(v) => setConfirmCode(v.replace(/\D/g, "").slice(0, 6))}
             placeholder="000000"
             placeholderTextColor={colors.textSecondary}
             keyboardType="number-pad"
             maxLength={6}
-            accessibilityLabel={t('mfaFactors.enterCode')}
+            accessibilityLabel={t("mfaFactors.enterCode")}
           />
           {confirmError ? <Text style={styles.error}>{confirmError}</Text> : null}
           <View style={styles.btnRow}>
             <AivoButton
-              title={confirming ? t('common.saving') : t('common.confirm')}
+              title={confirming ? t("common.saving") : t("common.confirm")}
               onPress={confirmEnroll}
               loading={confirming}
               disabled={confirmCode.length !== 6}
@@ -314,22 +302,22 @@ export function MfaFactorsCard() {
               style={styles.cancelBtn}
               onPress={() => {
                 setEnrollData(null);
-                setConfirmCode('');
-                setConfirmError('');
+                setConfirmCode("");
+                setConfirmError("");
               }}
             >
-              <Text style={styles.cancelText}>{t('common.cancel')}</Text>
+              <Text style={styles.cancelText}>{t("common.cancel")}</Text>
             </Pressable>
           </View>
         </View>
       ) : showDisable ? (
         <View style={styles.section}>
-          <Text style={styles.desc}>{t('mfaFactors.disableConfirm')}</Text>
+          <Text style={styles.desc}>{t("mfaFactors.disableConfirm")}</Text>
           <TextInput
             style={styles.input}
             value={disablePassword}
             onChangeText={setDisablePassword}
-            placeholder={t('accountSettings.enterPassword')}
+            placeholder={t("accountSettings.enterPassword")}
             placeholderTextColor={colors.textSecondary}
             secureTextEntry
             autoCapitalize="none"
@@ -338,7 +326,7 @@ export function MfaFactorsCard() {
           />
           <View style={styles.btnRow}>
             <AivoButton
-              title={disabling ? t('common.saving') : t('mfaFactors.disable')}
+              title={disabling ? t("common.saving") : t("mfaFactors.disable")}
               onPress={disableTotp}
               loading={disabling}
               disabled={!disablePassword}
@@ -350,28 +338,24 @@ export function MfaFactorsCard() {
               style={styles.cancelBtn}
               onPress={() => {
                 setShowDisable(false);
-                setDisablePassword('');
+                setDisablePassword("");
               }}
             >
-              <Text style={styles.cancelText}>{t('common.cancel')}</Text>
+              <Text style={styles.cancelText}>{t("common.cancel")}</Text>
             </Pressable>
           </View>
         </View>
       ) : (
         <Pressable
           style={[styles.cta, totpEnrolled && styles.ctaDanger]}
-          onPress={() =>
-            totpEnrolled ? setShowDisable(true) : startEnroll()
-          }
+          onPress={() => (totpEnrolled ? setShowDisable(true) : startEnroll())}
           disabled={enrolling}
         >
           {enrolling ? (
             <ActivityIndicator size="small" color={colors.primary} />
           ) : (
-            <Text
-              style={[styles.ctaText, totpEnrolled && styles.ctaTextDanger]}
-            >
-              {totpEnrolled ? t('mfaFactors.disable') : t('mfaFactors.enroll')}
+            <Text style={[styles.ctaText, totpEnrolled && styles.ctaTextDanger]}>
+              {totpEnrolled ? t("mfaFactors.disable") : t("mfaFactors.enroll")}
             </Text>
           )}
         </Pressable>
@@ -381,21 +365,21 @@ export function MfaFactorsCard() {
       <View style={styles.divider} />
       <View style={styles.header}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.title}>{t('mfaFactors.recoveryTitle')}</Text>
+          <Text style={styles.title}>{t("mfaFactors.recoveryTitle")}</Text>
           <Text style={styles.desc}>
             {recovery
-              ? t('mfaFactors.recoveryRemaining', {
+              ? t("mfaFactors.recoveryRemaining", {
                   remaining: recovery.remaining,
                   total: recovery.total,
                 })
-              : t('mfaFactors.recoveryDesc')}
+              : t("mfaFactors.recoveryDesc")}
           </Text>
         </View>
       </View>
 
       {latestCodes && latestCodes.length > 0 ? (
         <View style={styles.section}>
-          <Text style={styles.warning}>{t('mfaFactors.codesWarning')}</Text>
+          <Text style={styles.warning}>{t("mfaFactors.codesWarning")}</Text>
           <View style={styles.codesGrid}>
             {latestCodes.map((c) => (
               <Text key={c} style={styles.codeChip} selectable>
@@ -405,14 +389,14 @@ export function MfaFactorsCard() {
           </View>
           <View style={styles.btnRow}>
             <AivoButton
-              title={t('mfaFactors.copyCodes')}
+              title={t("mfaFactors.copyCodes")}
               onPress={copyCodes}
               size="sm"
               variant="outline"
               style={{ flex: 1 }}
             />
             <AivoButton
-              title={t('common.done')}
+              title={t("common.done")}
               onPress={() => setLatestCodes(null)}
               size="sm"
               style={{ flex: 1 }}
@@ -421,12 +405,12 @@ export function MfaFactorsCard() {
         </View>
       ) : showRegenerate ? (
         <View style={styles.section}>
-          <Text style={styles.desc}>{t('mfaFactors.regenConfirm')}</Text>
+          <Text style={styles.desc}>{t("mfaFactors.regenConfirm")}</Text>
           <TextInput
             style={styles.input}
             value={regenPassword}
             onChangeText={setRegenPassword}
-            placeholder={t('accountSettings.enterPassword')}
+            placeholder={t("accountSettings.enterPassword")}
             placeholderTextColor={colors.textSecondary}
             secureTextEntry
             autoCapitalize="none"
@@ -435,7 +419,7 @@ export function MfaFactorsCard() {
           />
           <View style={styles.btnRow}>
             <AivoButton
-              title={regenerating ? t('common.saving') : t('mfaFactors.regen')}
+              title={regenerating ? t("common.saving") : t("mfaFactors.regen")}
               onPress={regenerate}
               loading={regenerating}
               disabled={!regenPassword}
@@ -446,19 +430,16 @@ export function MfaFactorsCard() {
               style={styles.cancelBtn}
               onPress={() => {
                 setShowRegenerate(false);
-                setRegenPassword('');
+                setRegenPassword("");
               }}
             >
-              <Text style={styles.cancelText}>{t('common.cancel')}</Text>
+              <Text style={styles.cancelText}>{t("common.cancel")}</Text>
             </Pressable>
           </View>
         </View>
       ) : (
-        <Pressable
-          style={styles.cta}
-          onPress={() => setShowRegenerate(true)}
-        >
-          <Text style={styles.ctaText}>{t('mfaFactors.regen')}</Text>
+        <Pressable style={styles.cta} onPress={() => setShowRegenerate(true)}>
+          <Text style={styles.ctaText}>{t("mfaFactors.regen")}</Text>
         </Pressable>
       )}
     </AivoCard>
@@ -472,22 +453,22 @@ const styles = StyleSheet.create({
   },
   loadingRow: {
     paddingVertical: spacing.md,
-    alignItems: 'center',
+    alignItems: "center",
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     gap: spacing.sm,
   },
   title: {
     fontSize: 16,
-    fontFamily: 'Nunito-Bold',
+    fontFamily: "Nunito-Bold",
     color: colors.text,
     marginBottom: 2,
   },
   desc: {
     fontSize: 13,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.textSecondary,
     lineHeight: 18,
   },
@@ -502,13 +483,13 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     fontSize: 11,
-    fontFamily: 'Nunito-Bold',
+    fontFamily: "Nunito-Bold",
     color: colors.textSecondary,
     letterSpacing: 0.5,
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
   },
   badgeTextOn: {
-    color: '#FFF',
+    color: "#FFF",
   },
   section: {
     marginTop: spacing.sm,
@@ -517,20 +498,20 @@ const styles = StyleSheet.create({
   qr: {
     width: 200,
     height: 200,
-    alignSelf: 'center',
-    backgroundColor: '#FFF',
+    alignSelf: "center",
+    backgroundColor: "#FFF",
     borderRadius: radius.md,
     marginVertical: spacing.sm,
   },
   helper: {
     fontSize: 12,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.textSecondary,
     marginTop: spacing.xs,
   },
   secretRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -541,13 +522,13 @@ const styles = StyleSheet.create({
   secretText: {
     flex: 1,
     fontSize: 13,
-    fontFamily: 'Nunito-Bold',
+    fontFamily: "Nunito-Bold",
     color: colors.text,
     letterSpacing: 1,
   },
   fieldLabel: {
     fontSize: 13,
-    fontFamily: 'Nunito-Bold',
+    fontFamily: "Nunito-Bold",
     color: colors.textSecondary,
     marginTop: spacing.xs,
   },
@@ -558,7 +539,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     paddingHorizontal: spacing.md,
     fontSize: 15,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.text,
     marginTop: 4,
   },
@@ -568,28 +549,28 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: radius.lg,
     paddingHorizontal: spacing.md,
-    textAlign: 'center',
+    textAlign: "center",
     letterSpacing: 8,
     fontSize: 20,
-    fontFamily: 'Nunito-Bold',
+    fontFamily: "Nunito-Bold",
     color: colors.text,
     marginTop: 4,
   },
   error: {
     fontSize: 12,
-    fontFamily: 'Nunito-SemiBold',
+    fontFamily: "Nunito-SemiBold",
     color: colors.error,
     marginTop: 4,
   },
   warning: {
     fontSize: 13,
-    fontFamily: 'Nunito-SemiBold',
+    fontFamily: "Nunito-SemiBold",
     color: colors.error,
     marginBottom: spacing.xs,
   },
   btnRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     marginTop: spacing.xs,
   },
@@ -599,7 +580,7 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     fontSize: 14,
-    fontFamily: 'Nunito-SemiBold',
+    fontFamily: "Nunito-SemiBold",
     color: colors.textSecondary,
   },
   cta: {
@@ -607,17 +588,17 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     paddingVertical: 12,
     borderRadius: radius.full,
-    alignItems: 'center',
+    alignItems: "center",
   },
   ctaDanger: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     borderWidth: 1.5,
     borderColor: colors.error,
   },
   ctaText: {
     fontSize: 14,
-    fontFamily: 'Nunito-Bold',
-    color: '#FFF',
+    fontFamily: "Nunito-Bold",
+    color: "#FFF",
   },
   ctaTextDanger: {
     color: colors.error,
@@ -628,14 +609,14 @@ const styles = StyleSheet.create({
     marginVertical: spacing.md,
   },
   codesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
     marginVertical: spacing.xs,
   },
   codeChip: {
     fontSize: 13,
-    fontFamily: 'Menlo',
+    fontFamily: "Menlo",
     color: colors.text,
     backgroundColor: colors.surface,
     paddingHorizontal: 10,

@@ -4,16 +4,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState, useCallback, type ComponentType } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import {
-  Lock,
-  Check,
-  Sparkles,
-  BookOpen,
-  FlaskConical,
-  Castle,
-  Code2,
-  Globe2,
-} from "lucide-react";
+import { Lock, Check, Sparkles, BookOpen, FlaskConical, Castle, Code2, Globe2 } from "lucide-react";
 
 interface QuestWorld {
   key: string;
@@ -89,7 +80,9 @@ export default function QuestWorldPage() {
   const worldSlug = params.worldSlug as string;
 
   const [world, setWorld] = useState<QuestWorld | null>(null);
-  const [worldStatus, setWorldStatus] = useState<"loading" | "found" | "not_found" | "error">("loading");
+  const [worldStatus, setWorldStatus] = useState<"loading" | "found" | "not_found" | "error">(
+    "loading",
+  );
   const [quests, setQuests] = useState<QuestRow[]>([]);
   const [progress, setProgress] = useState<QuestProgress[]>([]);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -107,7 +100,9 @@ export default function QuestWorldPage() {
     setFetchError(null);
     (async () => {
       try {
-        const wr = await fetch(`/api/engagement/quests/worlds/${encodeURIComponent(worldSlug)}`, { headers: auth });
+        const wr = await fetch(`/api/engagement/quests/worlds/${encodeURIComponent(worldSlug)}`, {
+          headers: auth,
+        });
         if (cancelled) return;
         if (wr.status === 404) {
           setWorld(null);
@@ -176,7 +171,10 @@ export default function QuestWorldPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center max-w-sm px-6">
           <p className="text-slate-700 font-heading font-bold text-lg">{t("quest_not_found")}</p>
-          <p className="text-slate-400 text-xs font-mono mt-2 break-all" data-testid="quest-not-found-slug">
+          <p
+            className="text-slate-400 text-xs font-mono mt-2 break-all"
+            data-testid="quest-not-found-slug"
+          >
             {worldSlug}
           </p>
           <Link
@@ -206,7 +204,7 @@ export default function QuestWorldPage() {
 
   const completedCount = decorated.filter((q) => q.uiStatus === "completed").length;
   const totalXP = decorated.reduce(
-    (sum, q) => sum + (q.uiStatus === "completed" ? q.xpReward ?? 0 : 0),
+    (sum, q) => sum + (q.uiStatus === "completed" ? (q.xpReward ?? 0) : 0),
     0,
   );
 
@@ -227,7 +225,9 @@ export default function QuestWorldPage() {
           ← {tCommon("back")}
         </Link>
 
-        <div className={`bg-linear-to-r ${theme.gradient} rounded-3xl p-8 text-white mb-8 relative overflow-hidden`}>
+        <div
+          className={`bg-linear-to-r ${theme.gradient} rounded-3xl p-8 text-white mb-8 relative overflow-hidden`}
+        >
           <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
           <div className="relative">
             <span className="w-16 h-16 mb-3 rounded-2xl bg-white/20 text-white flex items-center justify-center">
@@ -254,12 +254,17 @@ export default function QuestWorldPage() {
         {decorated.length === 0 ? (
           <div className="rounded-2xl border-2 border-dashed border-slate-200 bg-white p-10 text-center">
             <p className="text-slate-600 font-semibold">{t("quest_not_found")}</p>
-            <p className="text-slate-400 text-sm mt-1">0/{world.chapters} {t("quests_done").toLowerCase()}</p>
+            <p className="text-slate-400 text-sm mt-1">
+              0/{world.chapters} {t("quests_done").toLowerCase()}
+            </p>
           </div>
         ) : (
           <div className="space-y-4">
             {decorated.map((quest, index) => (
-              <div key={quest.id} className={`rounded-2xl border-2 p-6 transition ${STATUS_STYLES[quest.uiStatus]}`}>
+              <div
+                key={quest.id}
+                className={`rounded-2xl border-2 p-6 transition ${STATUS_STYLES[quest.uiStatus]}`}
+              >
                 <div className="flex items-start gap-4">
                   <div
                     className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm ${
@@ -283,7 +288,9 @@ export default function QuestWorldPage() {
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
                       <h3 className="font-heading font-bold text-slate-900">{quest.title}</h3>
-                      <span className="text-sm font-bold text-amber-600">+{quest.xpReward ?? 0} XP</span>
+                      <span className="text-sm font-bold text-amber-600">
+                        +{quest.xpReward ?? 0} XP
+                      </span>
                     </div>
                     {quest.description && (
                       <p className="text-sm text-slate-500 mb-3">{quest.description}</p>
@@ -300,7 +307,9 @@ export default function QuestWorldPage() {
                     )}
                     {quest.uiStatus === "in_progress" && (
                       <button
-                        onClick={() => router.push(`/dashboard/learner/quests/${world.key}/play/${quest.id}`)}
+                        onClick={() =>
+                          router.push(`/dashboard/learner/quests/${world.key}/play/${quest.id}`)
+                        }
                         className="mt-1 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 transition"
                       >
                         {t("continue_quest")}

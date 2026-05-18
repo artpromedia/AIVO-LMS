@@ -85,9 +85,7 @@ export default async function TeacherLearnerDetailPage({
       <section className="grid gap-3 mt-6">
         <SectionHeader title="Recent lessons" />
         {recent.length === 0 ? (
-          <Card className="p-4 text-sm text-muted-foreground">
-            No lessons started yet.
-          </Card>
+          <Card className="p-4 text-sm text-muted-foreground">No lessons started yet.</Card>
         ) : (
           <ul className="grid gap-2">
             {recent.map((r) => {
@@ -103,9 +101,7 @@ export default async function TeacherLearnerDetailPage({
                         </p>
                         <p className="text-xs text-muted-foreground mt-1">
                           {r.source} · started{" "}
-                          {r.startedAt
-                            ? new Date(r.startedAt).toLocaleString()
-                            : "not yet"}
+                          {r.startedAt ? new Date(r.startedAt).toLocaleString() : "not yet"}
                         </p>
                       </div>
                       <Badge tone={r.status === "completed" ? "success" : "neutral"}>
@@ -135,9 +131,7 @@ export default async function TeacherLearnerDetailPage({
                   <Card className="p-3">
                     <div className="flex items-center justify-between">
                       <p className="text-sm">{skill?.name ?? m.skillId}</p>
-                      <Badge tone="warning">
-                        {Math.round(m.score * 100)}%
-                      </Badge>
+                      <Badge tone="warning">{Math.round(m.score * 100)}%</Badge>
                     </div>
                   </Card>
                 </li>

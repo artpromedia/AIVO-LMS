@@ -21,8 +21,8 @@ export default function ParentBrainProfilePage() {
   useEffect(() => {
     if (!accessToken || !learnerId) return;
     fetch("/api/users/learners", { headers: { Authorization: `Bearer ${accessToken}` } })
-      .then(r => r.ok ? r.json() : [])
-      .then(data => {
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => {
         const found = (Array.isArray(data) ? data : []).find((l: any) => l.id === learnerId);
         if (found) {
           setLearnerName(found.name);
@@ -37,7 +37,9 @@ export default function ParentBrainProfilePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-heading font-bold vi-text mb-2">{t("brain_profile_title", { name: learnerName })}</h1>
+        <h1 className="text-2xl font-heading font-bold vi-text mb-2">
+          {t("brain_profile_title", { name: learnerName })}
+        </h1>
         <p className="text-sm vi-text-muted">{t("brain_profile_desc")}</p>
       </div>
 
@@ -45,7 +47,9 @@ export default function ParentBrainProfilePage() {
       {accessToken && (
         <div className="vi-card p-6">
           <div className="flex items-center gap-3 mb-4">
-            <IconWell color="primary" size="sm"><Brain className="w-5 h-5" /></IconWell>
+            <IconWell color="primary" size="sm">
+              <Brain className="w-5 h-5" />
+            </IconWell>
             <h2 className="font-heading font-bold text-lg vi-text">Interactive Brain Map</h2>
           </div>
           <LearnerBrainMapCard
@@ -59,7 +63,9 @@ export default function ParentBrainProfilePage() {
 
       <div className="vi-card p-6">
         <div className="flex items-center gap-3 mb-4">
-          <IconWell color="primary" size="sm"><Brain className="w-5 h-5" /></IconWell>
+          <IconWell color="primary" size="sm">
+            <Brain className="w-5 h-5" />
+          </IconWell>
           <h2 className="font-heading font-bold text-lg vi-text">{t("brain_visualization")}</h2>
         </div>
         {accessToken ? (
@@ -98,25 +104,37 @@ export default function ParentBrainProfilePage() {
         <div className="vi-card p-6">
           <h3 className="font-heading font-bold vi-text mb-3">{t("related_pages")}</h3>
           <div className="space-y-2">
-            <Link href={`/dashboard/parent/learner/${learnerId}/sensory`}
-              className="flex items-center gap-3 p-3 rounded-xl border vi-border hover:bg-[hsl(var(--visual-primary)/0.06)] transition">
-              <IconWell color="reading" size="sm"><Palette className="w-5 h-5" /></IconWell>
+            <Link
+              href={`/dashboard/parent/learner/${learnerId}/sensory`}
+              className="flex items-center gap-3 p-3 rounded-xl border vi-border hover:bg-[hsl(var(--visual-primary)/0.06)] transition"
+            >
+              <IconWell color="reading" size="sm">
+                <Palette className="w-5 h-5" />
+              </IconWell>
               <div>
                 <p className="text-sm font-semibold vi-text">{t("sensory_profile")}</p>
                 <p className="text-xs vi-text-muted">{t("sensory_profile_desc")}</p>
               </div>
             </Link>
-            <Link href={`/dashboard/parent/learner/${learnerId}/recommendations`}
-              className="flex items-center gap-3 p-3 rounded-xl border vi-border hover:bg-[hsl(var(--visual-primary)/0.06)] transition">
-              <IconWell color="sel" size="sm"><Lightbulb className="w-5 h-5" /></IconWell>
+            <Link
+              href={`/dashboard/parent/learner/${learnerId}/recommendations`}
+              className="flex items-center gap-3 p-3 rounded-xl border vi-border hover:bg-[hsl(var(--visual-primary)/0.06)] transition"
+            >
+              <IconWell color="sel" size="sm">
+                <Lightbulb className="w-5 h-5" />
+              </IconWell>
               <div>
                 <p className="text-sm font-semibold vi-text">{t("recommendations")}</p>
                 <p className="text-xs vi-text-muted">{t("recommendations_desc")}</p>
               </div>
             </Link>
-            <Link href={`/dashboard/parent/learner/${learnerId}/iep`}
-              className="flex items-center gap-3 p-3 rounded-xl border vi-border hover:bg-[hsl(var(--visual-primary)/0.06)] transition">
-              <IconWell color="science" size="sm"><Target className="w-5 h-5" /></IconWell>
+            <Link
+              href={`/dashboard/parent/learner/${learnerId}/iep`}
+              className="flex items-center gap-3 p-3 rounded-xl border vi-border hover:bg-[hsl(var(--visual-primary)/0.06)] transition"
+            >
+              <IconWell color="science" size="sm">
+                <Target className="w-5 h-5" />
+              </IconWell>
               <div>
                 <p className="text-sm font-semibold vi-text">{t("iep_goals")}</p>
                 <p className="text-xs vi-text-muted">{t("iep_goals_desc")}</p>

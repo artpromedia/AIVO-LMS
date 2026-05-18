@@ -19,9 +19,7 @@ const CASES: {
   label: string;
   text: string;
   kind: "tutor_response" | "homework_input" | "user_message";
-  expect:
-    | { decision: "block" | "review" | "allow" }
-    | { tutorRuleViolated: string };
+  expect: { decision: "block" | "review" | "allow" } | { tutorRuleViolated: string };
 }[] = [
   {
     label: "Prompt injection (ignore previous)",

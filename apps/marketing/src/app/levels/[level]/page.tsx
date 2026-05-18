@@ -22,7 +22,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: lvl.metaDescription,
     alternates: { canonical: url },
     openGraph: { title: lvl.metaTitle, description: lvl.metaDescription, url, type: "website" },
-    twitter: { card: "summary_large_image", title: lvl.metaTitle, description: lvl.metaDescription },
+    twitter: {
+      card: "summary_large_image",
+      title: lvl.metaTitle,
+      description: lvl.metaDescription,
+    },
   };
 }
 
@@ -53,7 +57,10 @@ export default async function LevelPage({ params }: Props) {
         <ul className="space-y-2">
           {lvl.features.map((f) => (
             <li key={f} className="flex items-start gap-3 text-slate-700 font-body">
-              <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" aria-hidden="true" />
+              <CheckCircle2
+                className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0"
+                aria-hidden="true"
+              />
               <span>{f}</span>
             </li>
           ))}
@@ -61,11 +68,16 @@ export default async function LevelPage({ params }: Props) {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">Built-in accommodations</h2>
+        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">
+          Built-in accommodations
+        </h2>
         <ul className="space-y-2">
           {lvl.accommodations.map((a) => (
             <li key={a} className="flex items-start gap-3 text-slate-700 font-body">
-              <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" aria-hidden="true" />
+              <CheckCircle2
+                className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0"
+                aria-hidden="true"
+              />
               <span>{a}</span>
             </li>
           ))}
@@ -77,7 +89,10 @@ export default async function LevelPage({ params }: Props) {
         <ul className="space-y-2">
           {lvl.sample.map((s) => (
             <li key={s} className="flex items-start gap-3 text-slate-700 font-body">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2.5 shrink-0" aria-hidden="true" />
+              <span
+                className="w-1.5 h-1.5 rounded-full bg-primary mt-2.5 shrink-0"
+                aria-hidden="true"
+              />
               <span>{s}</span>
             </li>
           ))}

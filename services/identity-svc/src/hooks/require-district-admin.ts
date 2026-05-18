@@ -26,9 +26,10 @@ export async function requireDistrictAdmin(req: any, reply: any) {
   if (!["DISTRICT_ADMIN", "PLATFORM_ADMIN"].includes(payload.role as string)) {
     return reply.status(403).send({ error: "District admin access required" });
   }
-  const tid = payload.role === "PLATFORM_ADMIN"
-    ? ((req.query as any)?.tenantId || payload.tenantId)
-    : payload.tenantId;
+  const tid =
+    payload.role === "PLATFORM_ADMIN"
+      ? (req.query as any)?.tenantId || payload.tenantId
+      : payload.tenantId;
   if (!tid) {
     return reply.status(400).send({ error: "No tenant context" });
   }
@@ -73,9 +74,7 @@ export function assertDistrictRouteCoverage(app: FastifyInstance) {
   // The presence of the global hook is what matters; verify it's
   // wired by checking for at least one `onRequest` listener registered
   // on the application.
-  const hooks: any[] = (app as any).hasRequestDecorator
-    ? []
-    : ((app as any).onRequestHooks || []);
+  const hooks: any[] = (app as any).hasRequestDecorator ? [] : (app as any).onRequestHooks || [];
   // Fastify doesn't expose hook listings directly, so the canonical
   // check is: ensure `registerDistrictTenantScope` was called by
   // re-installing it. Idempotent: the hook safely no-ops on

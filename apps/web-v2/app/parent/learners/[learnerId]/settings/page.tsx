@@ -8,12 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PARENT_NAV } from "@/components/layout/role-shells";
-import {
-  deleteLearner,
-  getLearner,
-  parentCanAccessLearner,
-  updateLearner,
-} from "@/lib/db/repos";
+import { deleteLearner, getLearner, parentCanAccessLearner, updateLearner } from "@/lib/db/repos";
 import { audit } from "@/lib/bff/audit";
 import { newRequestId } from "@/lib/observability/logger";
 import { patchLearnerSchema } from "@/lib/validators/learner";
@@ -127,7 +122,13 @@ export default async function LearnerSettingsPage({
           <input type="hidden" name="learnerId" value={learner.id} />
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="firstName">First name</Label>
-            <Input id="firstName" name="firstName" defaultValue={learner.firstName} required maxLength={80} />
+            <Input
+              id="firstName"
+              name="firstName"
+              defaultValue={learner.firstName}
+              required
+              maxLength={80}
+            />
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="preferredName">Preferred name</Label>
@@ -140,7 +141,12 @@ export default async function LearnerSettingsPage({
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="pronouns">Pronouns</Label>
-            <Input id="pronouns" name="pronouns" defaultValue={learner.pronouns ?? ""} maxLength={40} />
+            <Input
+              id="pronouns"
+              name="pronouns"
+              defaultValue={learner.pronouns ?? ""}
+              maxLength={40}
+            />
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="primaryLanguage">Primary language</Label>
@@ -199,7 +205,10 @@ export default async function LearnerSettingsPage({
         </form>
       </Card>
 
-      <SectionHeader title="Danger zone" description="Removing a learner deletes their profile and assessment data." />
+      <SectionHeader
+        title="Danger zone"
+        description="Removing a learner deletes their profile and assessment data."
+      />
       <Card className="max-w-2xl border-aivo-danger/40 p-6">
         <form action={deleteAction} className="flex flex-col gap-3">
           <input type="hidden" name="learnerId" value={learner.id} />

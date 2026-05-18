@@ -4,7 +4,15 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, type ComponentType } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { Sparkles, BookOpen, FlaskConical, Castle, Code2, Globe2, Map as MapIcon } from "lucide-react";
+import {
+  Sparkles,
+  BookOpen,
+  FlaskConical,
+  Castle,
+  Code2,
+  Globe2,
+  Map as MapIcon,
+} from "lucide-react";
 
 interface QuestWorld {
   key: string;
@@ -60,11 +68,26 @@ export default function QuestsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
       <header className="bg-white/80 backdrop-blur border-b border-slate-200 px-8 py-4 flex items-center justify-between">
-        <Image src="/images/aivo-logo-purple.png" alt="AIVO" width={100} height={30} style={{ height: "auto" }} />
+        <Image
+          src="/images/aivo-logo-purple.png"
+          alt="AIVO"
+          width={100}
+          height={30}
+          style={{ height: "auto" }}
+        />
         <div className="flex items-center gap-4">
-          <button onClick={() => router.push("/dashboard/learner")}
-            className="text-sm text-primary font-semibold hover:underline">{tCommon("back")}</button>
-          <button onClick={logout} className="text-sm text-slate-500 hover:text-red-500 font-semibold">{t("log_out")}</button>
+          <button
+            onClick={() => router.push("/dashboard/learner")}
+            className="text-sm text-primary font-semibold hover:underline"
+          >
+            {tCommon("back")}
+          </button>
+          <button
+            onClick={logout}
+            className="text-sm text-slate-500 hover:text-red-500 font-semibold"
+          >
+            {t("log_out")}
+          </button>
         </div>
       </header>
 
@@ -85,7 +108,10 @@ export default function QuestsPage() {
               key={world.key}
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") router.push(`/dashboard/learner/quests/${world.key}`); }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ")
+                  router.push(`/dashboard/learner/quests/${world.key}`);
+              }}
               className="bg-white rounded-2xl p-6 border-2 shadow-sm hover:shadow-xl transition cursor-pointer group"
               // eslint-disable-next-line no-restricted-syntax -- per-world brand color fallback to product brand mark
               style={{ borderColor: WORLD_COLORS[world.key] || "#7c3aed" }}
@@ -95,12 +121,21 @@ export default function QuestsPage() {
                 <div
                   className="w-14 h-14 rounded-2xl flex items-center justify-center"
                   // eslint-disable-next-line no-restricted-syntax -- per-world brand color tints; fallback to product brand mark
-                  style={{ backgroundColor: `${WORLD_COLORS[world.key] || "#7c3aed"}1f`, color: WORLD_COLORS[world.key] || "#7c3aed" }}
+                  style={{
+                    backgroundColor: `${WORLD_COLORS[world.key] || "#7c3aed"}1f`,
+                    color: WORLD_COLORS[world.key] || "#7c3aed",
+                  }}
                 >
-                  {(() => { const Icon = WORLD_ICONS[world.key] || Globe2; return <Icon className="w-7 h-7" strokeWidth={2} aria-hidden />; })()}
+                  {(() => {
+                    const Icon = WORLD_ICONS[world.key] || Globe2;
+                    return <Icon className="w-7 h-7" strokeWidth={2} aria-hidden />;
+                  })()}
                 </div>
                 <div>
-                  <h3 className="text-xl font-heading font-bold" style={{ color: WORLD_COLORS[world.key] }}>
+                  <h3
+                    className="text-xl font-heading font-bold"
+                    style={{ color: WORLD_COLORS[world.key] }}
+                  >
                     {world.name}
                   </h3>
                   <p className="text-sm text-slate-500 font-semibold">{world.subject}</p>
@@ -108,8 +143,13 @@ export default function QuestsPage() {
               </div>
               <p className="text-sm text-slate-600">{world.description}</p>
               <div className="mt-3 flex items-center justify-between">
-                <span className="text-xs text-slate-400 font-semibold">{world.chapters} chapters</span>
-                <span className="text-sm font-bold group-hover:translate-x-1 transition-transform" style={{ color: WORLD_COLORS[world.key] }}>
+                <span className="text-xs text-slate-400 font-semibold">
+                  {world.chapters} chapters
+                </span>
+                <span
+                  className="text-sm font-bold group-hover:translate-x-1 transition-transform"
+                  style={{ color: WORLD_COLORS[world.key] }}
+                >
                   {t("enter")} →
                 </span>
               </div>

@@ -40,9 +40,7 @@ export async function readActiveLearnerFromRequest(
 ): Promise<string | null> {
   if (session.role === "learner") return session.learnerId ?? null;
   const header = req.headers.get("cookie") ?? "";
-  const match = header
-    .split(/;\s*/)
-    .find((c) => c.startsWith(`${ACTIVE_LEARNER_COOKIE}=`));
+  const match = header.split(/;\s*/).find((c) => c.startsWith(`${ACTIVE_LEARNER_COOKIE}=`));
   const candidate = parseId(match?.split("=")[1]);
   if (!candidate) return null;
   return verifyActiveLearner(session, candidate);
@@ -53,10 +51,7 @@ export async function readActiveLearnerFromRequest(
  * session is permitted to view that learner, otherwise null. Parents must
  * have a ParentLearnerRelationship; staff must share tenant.
  */
-export function verifyActiveLearner(
-  session: SessionProfile,
-  candidate: string,
-): string | null {
+export function verifyActiveLearner(session: SessionProfile, candidate: string): string | null {
   if (session.role === "parent") {
     const linked = listLearnersForParent(session.userId, session.tenantId);
     return linked.some((l) => l.id === candidate) ? candidate : null;

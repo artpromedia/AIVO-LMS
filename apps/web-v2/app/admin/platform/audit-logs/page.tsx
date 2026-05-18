@@ -4,16 +4,15 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import {
-  listAuditLogsForTenants,
-  scopeTenantsForSession,
-  getTenantById,
-} from "@/lib/db/repos";
+import { listAuditLogsForTenants, scopeTenantsForSession, getTenantById } from "@/lib/db/repos";
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
-  const logs = listAuditLogsForTenants(tenants.map((t) => t.id), 200);
+  const logs = listAuditLogsForTenants(
+    tenants.map((t) => t.id),
+    200,
+  );
 
   return (
     <AppShell
@@ -48,17 +47,11 @@ export default async function Page() {
                     {new Date(l.occurredAt).toLocaleString()}
                   </td>
                   <td className="p-3 font-medium">{l.action}</td>
-                  <td className="p-3 text-xs text-aivo-muted">
-                    {l.userId ?? "—"}
-                  </td>
+                  <td className="p-3 text-xs text-aivo-muted">{l.userId ?? "—"}</td>
                   <td className="p-3 text-aivo-ink-soft">
-                    {l.tenantId
-                      ? (getTenantById(l.tenantId)?.name ?? l.tenantId)
-                      : "—"}
+                    {l.tenantId ? (getTenantById(l.tenantId)?.name ?? l.tenantId) : "—"}
                   </td>
-                  <td className="p-3 font-mono text-xs text-aivo-muted">
-                    {l.requestId}
-                  </td>
+                  <td className="p-3 font-mono text-xs text-aivo-muted">{l.requestId}</td>
                 </tr>
               ))}
             </tbody>

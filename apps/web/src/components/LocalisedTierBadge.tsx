@@ -1,6 +1,12 @@
 "use client";
 import { useTranslations } from "next-intl";
-import { TierBadge, useTierThemeOptional, TIER_THEMES, type AgeTier, type TierBadgeProps } from "@aivo/learner-ui";
+import {
+  TierBadge,
+  useTierThemeOptional,
+  TIER_THEMES,
+  type AgeTier,
+  type TierBadgeProps,
+} from "@aivo/learner-ui";
 
 type Props = Omit<TierBadgeProps, "label" | "name" | "tagline"> & {
   /** Optional explicit tier; otherwise the active TierThemeProvider tier is used. */
@@ -16,7 +22,7 @@ type Props = Omit<TierBadgeProps, "label" | "name" | "tagline"> & {
 export function LocalisedTierBadge({ tier, ...rest }: Props) {
   const t = useTranslations("tier");
   const ctx = useTierThemeOptional();
-  const theme = tier ? TIER_THEMES[tier] : ctx?.theme ?? null;
+  const theme = tier ? TIER_THEMES[tier] : (ctx?.theme ?? null);
   if (!theme) return null;
 
   // next-intl throws on missing keys; wrap each lookup so a missing

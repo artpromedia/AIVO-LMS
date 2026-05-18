@@ -28,11 +28,36 @@ const THEME_CHROME: Record<
   ReturnType<typeof roleToTheme>,
   { logoGlyph: string; logoBg: string; eyebrow: string; sidebarTone: "light" | "dark" }
 > = {
-  parent: { logoGlyph: "A", logoBg: "bg-aivo-primary text-aivo-primary-fg", eyebrow: "Family workspace", sidebarTone: "light" },
-  learner: { logoGlyph: "★", logoBg: "bg-white text-aivo-primary", eyebrow: "Today's adventure", sidebarTone: "dark" },
-  teacher: { logoGlyph: "A", logoBg: "bg-aivo-primary text-aivo-primary-fg", eyebrow: "Classroom console", sidebarTone: "light" },
-  admin: { logoGlyph: "A", logoBg: "bg-aivo-primary text-aivo-primary-fg", eyebrow: "School operations", sidebarTone: "light" },
-  platform: { logoGlyph: "A", logoBg: "bg-aivo-primary text-aivo-primary-fg", eyebrow: "Platform ops", sidebarTone: "dark" },
+  parent: {
+    logoGlyph: "A",
+    logoBg: "bg-aivo-primary text-aivo-primary-fg",
+    eyebrow: "Family workspace",
+    sidebarTone: "light",
+  },
+  learner: {
+    logoGlyph: "★",
+    logoBg: "bg-white text-aivo-primary",
+    eyebrow: "Today's adventure",
+    sidebarTone: "dark",
+  },
+  teacher: {
+    logoGlyph: "A",
+    logoBg: "bg-aivo-primary text-aivo-primary-fg",
+    eyebrow: "Classroom console",
+    sidebarTone: "light",
+  },
+  admin: {
+    logoGlyph: "A",
+    logoBg: "bg-aivo-primary text-aivo-primary-fg",
+    eyebrow: "School operations",
+    sidebarTone: "light",
+  },
+  platform: {
+    logoGlyph: "A",
+    logoBg: "bg-aivo-primary text-aivo-primary-fg",
+    eyebrow: "Platform ops",
+    sidebarTone: "dark",
+  },
 };
 
 export function AppShell({
@@ -101,9 +126,7 @@ export function AppShell({
           >
             {chrome.eyebrow}
           </p>
-          <p className="px-2 text-xs font-semibold uppercase tracking-wide">
-            {roleLabel}
-          </p>
+          <p className="px-2 text-xs font-semibold uppercase tracking-wide">{roleLabel}</p>
           <div className="mt-2">
             <RoleNav items={navItems} ariaLabel={`${roleLabel} sections`} />
           </div>
@@ -112,10 +135,7 @@ export function AppShell({
             style={{ borderColor: "var(--color-aivo-sidebar-border)" }}
           >
             <p className="px-2 text-sm font-medium">{user.displayName}</p>
-            <p
-              className="px-2 text-xs"
-              style={{ color: "var(--color-aivo-sidebar-muted)" }}
-            >
+            <p className="px-2 text-xs" style={{ color: "var(--color-aivo-sidebar-muted)" }}>
               {user.email}
             </p>
             <Link

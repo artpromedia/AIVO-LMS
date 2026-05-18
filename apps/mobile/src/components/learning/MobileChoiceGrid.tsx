@@ -4,13 +4,7 @@
  */
 
 import React from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  ActivityIndicator,
-  StyleSheet,
-} from "react-native";
+import { View, Text, Pressable, ActivityIndicator, StyleSheet } from "react-native";
 import type { TierThemeMobile } from "@aivo/mobile-ui";
 
 interface Props {
@@ -57,12 +51,7 @@ export function MobileChoiceGrid({
             {submitting && isSelected ? (
               <ActivityIndicator color={theme.colors.surface} />
             ) : (
-              <Text
-                style={[
-                  styles.answerText,
-                  showResult && { color: theme.colors.surface },
-                ]}
-              >
+              <Text style={[styles.answerText, showResult && { color: theme.colors.surface }]}>
                 {answer}
               </Text>
             )}

@@ -5,6 +5,7 @@
 **Scope**: every parent-facing surface on web (`apps/web-v2/app/parent/**` — 28 routes today). Mobile Parent Mode is covered by UX-12 + UX-13; parent auth + consent + onboarding is covered by UX-03; this doc owns the steady-state parent app.
 
 **Source of truth (today)**:
+
 - Routes: `app/parent/**` (28 `page.tsx` files — see §2 sitemap).
 - Readiness model: `lib/learner/readiness.ts` (`ReadinessState`, `READINESS_LABEL`, `READINESS_TONE`, `nextStepFor` — the canonical "what does the parent do next?" function).
 - Components: `components/parent/learner-card.tsx` + the shared `components/ui/*` (19 primitives) + `components/layout/{app-shell,page-header,role-shells}` (AppShell + PageHeader + SectionHeader + PARENT_NAV).
@@ -18,7 +19,7 @@ Status legend: ✅ shipped · 🟡 partial · ⬜ planned.
 
 1. **One next action per learner, always.** `nextStepFor()` is wired from `readinessState`; the card's CTA and the Learner Profile page's hero CTA both render the same href. No dead buttons — every readiness state maps to a real, reachable route. (Already enforced — see `lib/learner/readiness.ts`.)
 2. **Plain language first.** Readiness labels (`"Assessment needed"`, `"Add an IEP (optional)"`, `"Ready for today's mission"`) and progress summary copy use parent-friendly phrasing — never `"functioning_level=PRE_SYMBOLIC"` or `"mastery=0.42"`.
-3. **No diagnostic labels in surface copy.** "ADHD", "dyslexia", "ASD", "MID/severe" never appear in conversational copy. Accommodations are surfaced as *what AIVO did* ("AIVO gave shorter steps today"), not *why* in clinical terms.
+3. **No diagnostic labels in surface copy.** "ADHD", "dyslexia", "ASD", "MID/severe" never appear in conversational copy. Accommodations are surfaced as _what AIVO did_ ("AIVO gave shorter steps today"), not _why_ in clinical terms.
 4. **No raw IEP text.** The IEP review page shows extracted accommodations (read-aloud, extra time, smaller steps), never the source PDF's prose. Source PDF is downloadable from the IEP page only; it never leaks into summary cards.
 5. **Calm density.** Parent home and learner profile are card layouts, not data tables. Dense tables are reserved for `/parent/reports` and `/parent/learners/[id]/lessons` where a power-user parent is expected.
 6. **Multiple learners feel symmetric.** Every learner card is the same shape. The card renders two Badges (readiness state + optional functioning-level chip when present) and one CTA — the only things that vary per card are the readiness Badge tone, the functioning-level chip presence, and the CTA label. Adding a 4th learner doesn't introduce a new pattern.
@@ -60,7 +61,7 @@ Status legend: ✅ shipped · 🟡 partial · ⬜ planned.
     └── /billing                                   ✅ plan, payment method, invoices
 ```
 
-`PARENT_NAV` order (from `components/layout/role-shells.tsx`): **Home · Learners · Schedule · Reports · Privacy · Notifications · Settings**. Privacy *is* in the primary nav (DD-04 reversed — consent rights are surfaced, not buried). Consent management (`/parent/consent`) is reached from `/parent/privacy` and from contextual banners on learner-scoped surfaces, not from the primary nav. Billing lives under `PARENT_SETTINGS_NAV` (Overview · Account · Billing) which appears as a sub-nav when on `/parent/settings/*`.
+`PARENT_NAV` order (from `components/layout/role-shells.tsx`): **Home · Learners · Schedule · Reports · Privacy · Notifications · Settings**. Privacy _is_ in the primary nav (DD-04 reversed — consent rights are surfaced, not buried). Consent management (`/parent/consent`) is reached from `/parent/privacy` and from contextual banners on learner-scoped surfaces, not from the primary nav. Billing lives under `PARENT_SETTINGS_NAV` (Overview · Account · Billing) which appears as a sub-nav when on `/parent/settings/*`.
 
 ---
 
@@ -68,14 +69,14 @@ Status legend: ✅ shipped · 🟡 partial · ⬜ planned.
 
 This is the core mental model. Six states, six labels, six next-step hrefs. **Every parent surface that shows a learner uses this same triplet.**
 
-| `ReadinessState` | Badge label | Badge tone | Next-step label | Next-step href |
-|---|---|---|---|---|
-| `profile_created` | Profile created | neutral | Start parent assessment | `/parent/learners/{id}/assessment` |
-| `assessment_needed` | Assessment needed | warning | Continue parent assessment | `/parent/learners/{id}/assessment` |
-| `iep_optional` | Add an IEP (optional) | primary | Add an IEP or skip | `/parent/learners/{id}/iep` |
-| `baseline_needed` | Baseline assessment ready | primary | Start baseline assessment | `/parent/learners/{id}/baseline` |
-| `ready_for_today_mission` | Ready for today's mission | success | Open today's mission | `/parent/learners/{id}` |
-| `active_learning` | Active learning | success | See growth report | `/parent/learners/{id}` |
+| `ReadinessState`          | Badge label               | Badge tone | Next-step label            | Next-step href                     |
+| ------------------------- | ------------------------- | ---------- | -------------------------- | ---------------------------------- |
+| `profile_created`         | Profile created           | neutral    | Start parent assessment    | `/parent/learners/{id}/assessment` |
+| `assessment_needed`       | Assessment needed         | warning    | Continue parent assessment | `/parent/learners/{id}/assessment` |
+| `iep_optional`            | Add an IEP (optional)     | primary    | Add an IEP or skip         | `/parent/learners/{id}/iep`        |
+| `baseline_needed`         | Baseline assessment ready | primary    | Start baseline assessment  | `/parent/learners/{id}/baseline`   |
+| `ready_for_today_mission` | Ready for today's mission | success    | Open today's mission       | `/parent/learners/{id}`            |
+| `active_learning`         | Active learning           | success    | See growth report          | `/parent/learners/{id}`            |
 
 `refreshLearnerReadiness(learnerId, tenantId)` is called at the top of every parent surface that renders a learner card or hero (e.g. `app/parent/home/page.tsx`, `app/parent/learners/[learnerId]/page.tsx`) so the Badge + CTA are always fresh. Never cache. Already pattern across the app.
 
@@ -125,16 +126,16 @@ Detailed in UX-03 §3.2 step 2 (writes `AgeGateRecord`, collects `child_data_col
 
 Wizard (`<Stepper>`) — **8 steps, 17 sections** — derived from `lib/validators/parent-assessment.ts → WIZARD_STEPS` + `ASSESSMENT_SECTION_ORDER`. Each step shows progress out of total. Submit on the last step → `/review`, which validates every section via `validateSection(sec, current.answers[sec] ?? {})` (the `?? {}` keeps legacy drafts non-blocking — see UX-00 BF-02a).
 
-| Step | Title | Sections collected |
-|---|---|---|
-| 1 | Basics | `basics` (dob, pronouns, languages) |
-| 2 | Goals | `goals` |
-| 3 | Background | `background` (diagnoses + services), `strengths` (loves, goodAt, motivates) |
-| 4 | Confidence | `grade_subject`, `reading`, `math` |
-| 5 | Focus & style | `attention`, `communication`, `learning_profile` (communicationMode, deviceInteraction, responseMethod, attentionSpanBucket, bestModes) |
-| 6 | Sensory & routine | `sensory`, `homework` |
-| 7 | Triggers & motivation | `frustration`, `motivation` |
-| 8 | Supports & pace | `accommodations`, `pace`, `concerns` |
+| Step | Title                 | Sections collected                                                                                                                      |
+| ---- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| 1    | Basics                | `basics` (dob, pronouns, languages)                                                                                                     |
+| 2    | Goals                 | `goals`                                                                                                                                 |
+| 3    | Background            | `background` (diagnoses + services), `strengths` (loves, goodAt, motivates)                                                             |
+| 4    | Confidence            | `grade_subject`, `reading`, `math`                                                                                                      |
+| 5    | Focus & style         | `attention`, `communication`, `learning_profile` (communicationMode, deviceInteraction, responseMethod, attentionSpanBucket, bestModes) |
+| 6    | Sensory & routine     | `sensory`, `homework`                                                                                                                   |
+| 7    | Triggers & motivation | `frustration`, `motivation`                                                                                                             |
+| 8    | Supports & pace       | `accommodations`, `pace`, `concerns`                                                                                                    |
 
 The four sections added in step 1/3/5 are legacy-parity (`basics`, `strengths`, `background`, `learning_profile`) — every field is optional, so any single step can be saved partially without blocking submit. `buildBrainProfile` consumes them to populate `functioningLevel`, `disabilitySignals`, `activeAccommodations`, `activeTutors`, `visualIdentity`, and `xaiExplanation` on the v2 `LearnerBrainProfileState`.
 
@@ -242,47 +243,47 @@ A parent navigating `/learner/*` without an active-learner cookie set is redirec
 
 ## 6. State matrix (parent app)
 
-| Surface | Loading | Empty | Error | Retry | Consent block |
-|---|---|---|---|---|---|
-| `/parent/home` | 🟡 instant render today; ⬜ Suspense skeleton planned | ✅ `<EmptyState>` | 🟡 global err route; ⬜ per-card RetryPanel | manual reload | banner if `parent_account_terms` expired |
-| `/parent/learners/new` | ✅ button busy state | n/a | inline validation + toast | resubmit | n/a (records consent itself) |
-| `/parent/learners/[id]` | 🟡 instant; ⬜ Suspense | n/a | `notFound()` ✅ | manual reload | redirect to `/parent/consent/[id]` if `child_data_collection` missing ⬜ |
-| `/parent/learners/[id]/assessment` | ⬜ skeleton | 🟡 if no questions seeded → ErrorState | inline + toast | resubmit | needs `child_data_collection` |
-| `/parent/learners/[id]/iep` | ✅ upload progress | ✅ "upload or skip" dropzone | ✅ size/type/extract error | re-pick | needs `child_data_collection`; records `iep_document_storage` |
-| `/parent/learners/[id]/brain-profile` | ✅ regenerate spinner | ✅ "after baseline" empty | inline error | manual regenerate | needs `ai_personalization` to regenerate |
-| `/parent/learners/[id]/baseline` | n/a (status card only) | "not started" CTA | error → status `failed`, retry button | retry | needs `child_data_collection` |
-| `/parent/learners/[id]/progress` | ⬜ skeleton rows | ✅ "after first lesson" | row-level error | manual reload | requires `child_data_collection` |
-| `/parent/learners/[id]/lessons` | ⬜ skeleton rows | ✅ "no lessons yet" | row-level | retry | requires `child_data_collection` |
-| `/parent/learners/[id]/homework` | ⬜ skeleton | ✅ "no homework yet" | row-level | retry | requires `child_data_collection` |
-| `/parent/learners/[id]/accessibility(+/audio)` | save spinner | n/a | inline | resubmit | n/a |
-| `/parent/consent(/[id])` | ✅ Toggle spinner | n/a | toast | retry | n/a (this *is* consent) |
-| `/parent/privacy/data-export` | job-status card | "no exports yet" | error + retry | retry | records `data_export_request` |
-| `/parent/privacy/delete-data` | confirm + 14d countdown | n/a | confirm dialog cancel | retry | records `data_deletion_request` |
-| `/parent/notifications` | ⬜ skeleton | ✅ "no new updates" | inline | manual reload | n/a |
-| `/parent/reports` | ⬜ skeleton + table loading row | ✅ "add a learner" | row-level | retry | requires `child_data_collection` per learner |
-| `/parent/schedule` | ⬜ skeleton | ✅ "nothing scheduled" | inline | retry | requires `child_data_collection` |
-| `/parent/settings/account` | save spinner | n/a | inline | resubmit | n/a |
-| `/parent/settings/billing` | ✅ payment provider iframe | ✅ "no card on file" | declined-card banner | retry | n/a |
+| Surface                                        | Loading                                               | Empty                                  | Error                                       | Retry             | Consent block                                                            |
+| ---------------------------------------------- | ----------------------------------------------------- | -------------------------------------- | ------------------------------------------- | ----------------- | ------------------------------------------------------------------------ |
+| `/parent/home`                                 | 🟡 instant render today; ⬜ Suspense skeleton planned | ✅ `<EmptyState>`                      | 🟡 global err route; ⬜ per-card RetryPanel | manual reload     | banner if `parent_account_terms` expired                                 |
+| `/parent/learners/new`                         | ✅ button busy state                                  | n/a                                    | inline validation + toast                   | resubmit          | n/a (records consent itself)                                             |
+| `/parent/learners/[id]`                        | 🟡 instant; ⬜ Suspense                               | n/a                                    | `notFound()` ✅                             | manual reload     | redirect to `/parent/consent/[id]` if `child_data_collection` missing ⬜ |
+| `/parent/learners/[id]/assessment`             | ⬜ skeleton                                           | 🟡 if no questions seeded → ErrorState | inline + toast                              | resubmit          | needs `child_data_collection`                                            |
+| `/parent/learners/[id]/iep`                    | ✅ upload progress                                    | ✅ "upload or skip" dropzone           | ✅ size/type/extract error                  | re-pick           | needs `child_data_collection`; records `iep_document_storage`            |
+| `/parent/learners/[id]/brain-profile`          | ✅ regenerate spinner                                 | ✅ "after baseline" empty              | inline error                                | manual regenerate | needs `ai_personalization` to regenerate                                 |
+| `/parent/learners/[id]/baseline`               | n/a (status card only)                                | "not started" CTA                      | error → status `failed`, retry button       | retry             | needs `child_data_collection`                                            |
+| `/parent/learners/[id]/progress`               | ⬜ skeleton rows                                      | ✅ "after first lesson"                | row-level error                             | manual reload     | requires `child_data_collection`                                         |
+| `/parent/learners/[id]/lessons`                | ⬜ skeleton rows                                      | ✅ "no lessons yet"                    | row-level                                   | retry             | requires `child_data_collection`                                         |
+| `/parent/learners/[id]/homework`               | ⬜ skeleton                                           | ✅ "no homework yet"                   | row-level                                   | retry             | requires `child_data_collection`                                         |
+| `/parent/learners/[id]/accessibility(+/audio)` | save spinner                                          | n/a                                    | inline                                      | resubmit          | n/a                                                                      |
+| `/parent/consent(/[id])`                       | ✅ Toggle spinner                                     | n/a                                    | toast                                       | retry             | n/a (this _is_ consent)                                                  |
+| `/parent/privacy/data-export`                  | job-status card                                       | "no exports yet"                       | error + retry                               | retry             | records `data_export_request`                                            |
+| `/parent/privacy/delete-data`                  | confirm + 14d countdown                               | n/a                                    | confirm dialog cancel                       | retry             | records `data_deletion_request`                                          |
+| `/parent/notifications`                        | ⬜ skeleton                                           | ✅ "no new updates"                    | inline                                      | manual reload     | n/a                                                                      |
+| `/parent/reports`                              | ⬜ skeleton + table loading row                       | ✅ "add a learner"                     | row-level                                   | retry             | requires `child_data_collection` per learner                             |
+| `/parent/schedule`                             | ⬜ skeleton                                           | ✅ "nothing scheduled"                 | inline                                      | retry             | requires `child_data_collection`                                         |
+| `/parent/settings/account`                     | save spinner                                          | n/a                                    | inline                                      | resubmit          | n/a                                                                      |
+| `/parent/settings/billing`                     | ✅ payment provider iframe                            | ✅ "no card on file"                   | declined-card banner                        | retry             | n/a                                                                      |
 
 ---
 
 ## 7. Copy patterns (parent)
 
-| Context | Bad | Good |
-|---|---|---|
-| Readiness label | "Functioning level: PRE_SYMBOLIC" | "Lessons start with one small step at a time." |
-| Lesson summary | "Mastery delta: +0.04 on skill `add_within_20`" | "AIVO gave shorter steps today. Your child made progress on adding small numbers." |
-| Accommodation use | "Accommodation `read_aloud` applied" | "Your child used read-aloud support." |
-| Trend | "Trend = stable (σ=0.12)" | "Steady progress this week." |
-| Error: declined card | "Stripe error: card_declined" | "Your card was declined. Update your payment method to keep AIVO active." |
-| Error: oversize IEP | "413 Payload Too Large" | "That file is over 5 MB. Try a smaller PDF or skip — your child can still start lessons." |
-| Revocation impact | "Revoking AI personalization will degrade lesson quality." | "Your child's next lesson will use generic content. Past summaries stay visible." |
+| Context              | Bad                                                        | Good                                                                                      |
+| -------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Readiness label      | "Functioning level: PRE_SYMBOLIC"                          | "Lessons start with one small step at a time."                                            |
+| Lesson summary       | "Mastery delta: +0.04 on skill `add_within_20`"            | "AIVO gave shorter steps today. Your child made progress on adding small numbers."        |
+| Accommodation use    | "Accommodation `read_aloud` applied"                       | "Your child used read-aloud support."                                                     |
+| Trend                | "Trend = stable (σ=0.12)"                                  | "Steady progress this week."                                                              |
+| Error: declined card | "Stripe error: card_declined"                              | "Your card was declined. Update your payment method to keep AIVO active."                 |
+| Error: oversize IEP  | "413 Payload Too Large"                                    | "That file is over 5 MB. Try a smaller PDF or skip — your child can still start lessons." |
+| Revocation impact    | "Revoking AI personalization will degrade lesson quality." | "Your child's next lesson will use generic content. Past summaries stay visible."         |
 
 ---
 
 ## 8. Engineering handoff
 
-1. ✅ `nextStepFor()` already wired into LearnerCard and learner profile hero — keep it as the *only* CTA source for parent surfaces showing a learner. Adding a new readiness state means updating `READINESS_NEXT_STEP` and the doc table in §3 together.
+1. ✅ `nextStepFor()` already wired into LearnerCard and learner profile hero — keep it as the _only_ CTA source for parent surfaces showing a learner. Adding a new readiness state means updating `READINESS_NEXT_STEP` and the doc table in §3 together.
 2. ⬜ **Section-level Suspense + skeleton boundaries** on every learner-scoped page (DD-09). Today everything is `force-dynamic` server-render — fine for the in-memory store, but a real backing service will need streaming + skeletons. Skeleton primitives already exist (`components/ui/skeleton.tsx`).
 3. ⬜ **Per-card `<RetryPanel>` on `/parent/home`** so one learner's readiness-refresh failure doesn't blank the page.
 4. ⬜ **Dense list variant of `/parent/learners`** (Filter bar + Data table primitives from UX-02 §4.1 backlog).

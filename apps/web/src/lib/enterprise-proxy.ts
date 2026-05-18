@@ -44,14 +44,22 @@ function copyRequestHeaders(req: NextRequest): Record<string, string> {
   return out;
 }
 
-function buildUpstreamUrl(target: ProxyTarget, segments: string[] | undefined, req: NextRequest): URL {
+function buildUpstreamUrl(
+  target: ProxyTarget,
+  segments: string[] | undefined,
+  req: NextRequest,
+): URL {
   const path = segments?.join("/") ?? "";
   const url = new URL(`/api/${target.upstreamPrefix}/${path}`, target.baseUrl());
   url.search = req.nextUrl.search;
   return url;
 }
 
-async function relay(req: NextRequest, target: ProxyTarget, segments?: string[]): Promise<NextResponse> {
+async function relay(
+  req: NextRequest,
+  target: ProxyTarget,
+  segments?: string[],
+): Promise<NextResponse> {
   const url = buildUpstreamUrl(target, segments, req);
   const method = req.method.toUpperCase();
   const init: RequestInit = {
@@ -73,10 +81,7 @@ async function relay(req: NextRequest, target: ProxyTarget, segments?: string[])
     });
     return response;
   } catch {
-    return NextResponse.json(
-      { error: `Failed to reach ${target.publicName}` },
-      { status: 503 },
-    );
+    return NextResponse.json({ error: `Failed to reach ${target.publicName}` }, { status: 503 });
   }
 }
 

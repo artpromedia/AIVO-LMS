@@ -9,8 +9,7 @@ import {
   type MasteryRecord,
 } from "../index.js";
 
-const at = (mins: number) =>
-  new Date(Date.now() - mins * 60_000).toISOString();
+const at = (mins: number) => new Date(Date.now() - mins * 60_000).toISOString();
 
 const wrong = (skillId: string): AnswerOutcome => ({
   skillId,

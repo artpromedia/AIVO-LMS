@@ -29,9 +29,7 @@ export function TrustStripInline({
       >
         {heading}
       </h2>
-      {subheading && (
-        <p className="text-slate-600 font-body mb-6 leading-relaxed">{subheading}</p>
-      )}
+      {subheading && <p className="text-slate-600 font-body mb-6 leading-relaxed">{subheading}</p>}
       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {chips.map((c) => {
           const Icon = c.icon;

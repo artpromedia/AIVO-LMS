@@ -30,25 +30,29 @@ function devLookup(tenantId: string, learnerId: string): string | null {
 }
 
 export async function registerSpeechBuddyConsentRoutes(app: FastifyInstance) {
-  app.post("/api/family/internal/speech-buddy/consent/verify", { schema: internalSpeechBuddyConsentVerifySchema }, async (req, reply) => {
-    const internalKey = req.headers["x-internal-key"];
-    const expectedKey =
-      process.env.INTERNAL_SERVICE_KEY ||
-      (process.env.NODE_ENV === "production" ? "" : "aivo-internal-dev-key");
-    if (!internalKey || !expectedKey || internalKey !== expectedKey) {
-      return reply.code(401).send({ error: "Unauthorized" });
-    }
-    const { tenantId, learnerId, ageBand } = (req.body as any) || {};
-    if (!tenantId || !learnerId || !ageBand) {
-      return reply.code(400).send({ error: "tenantId, learnerId and ageBand required" });
-    }
-    if (!["6-9", "10-12", "13-15"].includes(ageBand)) {
-      return reply.code(400).send({ error: "ageBand must be 6-9 / 10-12 / 13-15" });
-    }
-    const consentRecordId = devLookup(tenantId, learnerId);
-    if (!consentRecordId) {
-      return reply.code(404).send({ granted: false });
-    }
-    return reply.send({ granted: true, consentRecordId, ageBand, scope: "speech_buddy" });
-  });
+  app.post(
+    "/api/family/internal/speech-buddy/consent/verify",
+    { schema: internalSpeechBuddyConsentVerifySchema },
+    async (req, reply) => {
+      const internalKey = req.headers["x-internal-key"];
+      const expectedKey =
+        process.env.INTERNAL_SERVICE_KEY ||
+        (process.env.NODE_ENV === "production" ? "" : "aivo-internal-dev-key");
+      if (!internalKey || !expectedKey || internalKey !== expectedKey) {
+        return reply.code(401).send({ error: "Unauthorized" });
+      }
+      const { tenantId, learnerId, ageBand } = (req.body as any) || {};
+      if (!tenantId || !learnerId || !ageBand) {
+        return reply.code(400).send({ error: "tenantId, learnerId and ageBand required" });
+      }
+      if (!["6-9", "10-12", "13-15"].includes(ageBand)) {
+        return reply.code(400).send({ error: "ageBand must be 6-9 / 10-12 / 13-15" });
+      }
+      const consentRecordId = devLookup(tenantId, learnerId);
+      if (!consentRecordId) {
+        return reply.code(404).send({ granted: false });
+      }
+      return reply.send({ granted: true, consentRecordId, ageBand, scope: "speech_buddy" });
+    },
+  );
 }

@@ -15,12 +15,9 @@ export function CTASection() {
         <div className="relative space-y-6">
           <h2 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 leading-tight">
             {t("title_line1")}
-            <br className="hidden md:block" />
-            {" "}{t("title_line2")}
+            <br className="hidden md:block" /> {t("title_line2")}
           </h2>
-          <p className="text-lg text-slate-600 font-body max-w-xl mx-auto">
-            {t("subtitle")}
-          </p>
+          <p className="text-lg text-slate-600 font-body max-w-xl mx-auto">{t("subtitle")}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
             <a
               href={`${WEB_APP_URL}/signup?plan=free`}
@@ -31,7 +28,10 @@ export function CTASection() {
               className="group inline-flex items-center justify-center gap-2 px-10 py-4 rounded-full bg-gradient-to-r from-primary to-primary-dark text-white font-bold text-lg hover:opacity-95 transition-all shadow-xl shadow-purple-200 hover:-translate-y-0.5 min-h-[44px]"
             >
               {t("cta_trial")}
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+              <ArrowRight
+                className="w-5 h-5 group-hover:translate-x-1 transition-transform"
+                aria-hidden="true"
+              />
             </a>
             <a
               href="#pricing"
@@ -40,9 +40,7 @@ export function CTASection() {
               {t("cta_pricing")}
             </a>
           </div>
-          <p className="text-sm text-slate-500 font-bold pt-2">
-            {t("trust_line")}
-          </p>
+          <p className="text-sm text-slate-500 font-bold pt-2">{t("trust_line")}</p>
         </div>
       </div>
     </section>

@@ -21,7 +21,12 @@ export interface PublicBranding {
   supportEmail: string | null;
 }
 
-const DEFAULT: PublicBranding = { displayName: null, primaryColor: null, logoUrl: null, supportEmail: null };
+const DEFAULT: PublicBranding = {
+  displayName: null,
+  primaryColor: null,
+  logoUrl: null,
+  supportEmail: null,
+};
 const CACHE_KEY = (id: string) => `aivo:branding:${id}`;
 
 /**
@@ -49,18 +54,25 @@ export function useTenantBranding(tenantId: string | null | undefined) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (!tenantId) { setReady(true); return; }
+    if (!tenantId) {
+      setReady(true);
+      return;
+    }
     let alive = true;
     try {
       const cached = sessionStorage.getItem(CACHE_KEY(tenantId));
       if (cached) {
         const parsed = sanitize(JSON.parse(cached) as PublicBranding);
-        setBranding(parsed); applyBrandingCssVars(parsed); setReady(true);
+        setBranding(parsed);
+        applyBrandingCssVars(parsed);
+        setReady(true);
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
 
     fetch(`/api/branding/public/${encodeURIComponent(tenantId)}`)
-      .then((r) => r.ok ? r.json() : null)
+      .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (!alive || !data?.branding) return;
         const b: PublicBranding = sanitize({
@@ -71,12 +83,22 @@ export function useTenantBranding(tenantId: string | null | undefined) {
         });
         setBranding(b);
         applyBrandingCssVars(b);
-        try { sessionStorage.setItem(CACHE_KEY(tenantId), JSON.stringify(b)); } catch { /* quota */ }
+        try {
+          sessionStorage.setItem(CACHE_KEY(tenantId), JSON.stringify(b));
+        } catch {
+          /* quota */
+        }
       })
-      .catch(() => { /* fall back to defaults */ })
-      .finally(() => { if (alive) setReady(true); });
+      .catch(() => {
+        /* fall back to defaults */
+      })
+      .finally(() => {
+        if (alive) setReady(true);
+      });
 
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [tenantId]);
 
   return { branding, ready };

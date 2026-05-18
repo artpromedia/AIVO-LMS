@@ -24,10 +24,7 @@ export default async function Page() {
         description={`How ${tenant?.name ?? "your district"} appears to learners, families, and staff.`}
       />
       <Card className="max-w-2xl p-[var(--aivo-density-card-pad)]">
-        <BrandingForm
-          initial={settings.branding}
-          fallbackName={tenant?.name ?? ""}
-        />
+        <BrandingForm initial={settings.branding} fallbackName={tenant?.name ?? ""} />
       </Card>
     </AppShell>
   );

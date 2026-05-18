@@ -5,23 +5,17 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import {
-  scopeTenantsForSession,
-  listAiGenerationJobs,
-  computeSystemHealth,
-} from "@/lib/db/repos";
+import { scopeTenantsForSession, listAiGenerationJobs, computeSystemHealth } from "@/lib/db/repos";
 import type { AiGenerationJob } from "@/lib/db/types";
 import { Activity, AlertTriangle, CheckCircle2, Clock } from "lucide-react";
 
-const STATUS_TONE: Record<
-  AiGenerationJob["status"],
-  "success" | "danger" | "warning" | "neutral"
-> = {
-  complete: "success",
-  failed: "danger",
-  running: "warning",
-  queued: "neutral",
-};
+const STATUS_TONE: Record<AiGenerationJob["status"], "success" | "danger" | "warning" | "neutral"> =
+  {
+    complete: "success",
+    failed: "danger",
+    running: "warning",
+    queued: "neutral",
+  };
 
 const KIND_LABEL: Record<AiGenerationJob["kind"], string> = {
   brain_profile: "Brain profile",
@@ -50,9 +44,7 @@ export default async function Page() {
   const h = computeSystemHealth(tenantIds);
   const tenantById = new Map(tenants.map((t) => [t.id, t]));
 
-  const byStatus = jobs.reduce<
-    Record<AiGenerationJob["status"], number>
-  >(
+  const byStatus = jobs.reduce<Record<AiGenerationJob["status"], number>>(
     (acc, j) => {
       acc[j.status] = (acc[j.status] ?? 0) + 1;
       return acc;
@@ -131,12 +123,8 @@ export default async function Page() {
           <Card key={k} className="p-[var(--aivo-density-card-pad)]">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-                  {k}
-                </p>
-                <p className="mt-1 font-display text-3xl font-bold">
-                  {v.toLocaleString()}
-                </p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{k}</p>
+                <p className="mt-1 font-display text-3xl font-bold">{v.toLocaleString()}</p>
               </div>
               <span
                 aria-hidden
@@ -171,9 +159,7 @@ export default async function Page() {
           <p className="mt-1 text-xs text-aivo-ink-soft">
             Median completed-job duration across the last {jobs.length} jobs.
           </p>
-          <p className="mt-3 font-display text-3xl font-bold">
-            {formatDuration(median)}
-          </p>
+          <p className="mt-3 font-display text-3xl font-bold">{formatDuration(median)}</p>
           <p className="mt-1 text-xs text-aivo-ink-soft">
             {completedDurations.length.toLocaleString()} completed jobs sampled
           </p>
@@ -216,24 +202,18 @@ export default async function Page() {
                   const tenant = tenantById.get(j.tenantId);
                   return (
                     <tr key={j.id}>
-                      <td className="px-4 py-3 font-medium">
-                        {KIND_LABEL[j.kind]}
-                      </td>
+                      <td className="px-4 py-3 font-medium">{KIND_LABEL[j.kind]}</td>
                       <td className="px-4 py-3">
                         <Badge tone={STATUS_TONE[j.status]}>{j.status}</Badge>
                       </td>
-                      <td className="px-4 py-3 text-aivo-ink-soft">
-                        {tenant?.name ?? j.tenantId}
-                      </td>
+                      <td className="px-4 py-3 text-aivo-ink-soft">{tenant?.name ?? j.tenantId}</td>
                       <td className="px-4 py-3 text-xs text-aivo-ink-soft">
                         {new Date(j.startedAt).toLocaleString()}
                       </td>
                       <td className="px-4 py-3 text-right tabular-nums text-aivo-ink-soft">
                         {formatDuration(durationMs(j))}
                       </td>
-                      <td className="px-4 py-3 font-mono text-xs text-aivo-muted">
-                        {j.inputRef}
-                      </td>
+                      <td className="px-4 py-3 font-mono text-xs text-aivo-muted">{j.inputRef}</td>
                     </tr>
                   );
                 })}

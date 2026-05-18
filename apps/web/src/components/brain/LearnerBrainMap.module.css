@@ -10,8 +10,7 @@
   border-radius: 28px;
   background:
     radial-gradient(circle at 20% 0%, rgba(124, 58, 237, 0.06), transparent 32%),
-    radial-gradient(circle at 90% 12%, rgba(251, 191, 36, 0.08), transparent 28%),
-    #fffdf8;
+    radial-gradient(circle at 90% 12%, rgba(251, 191, 36, 0.08), transparent 28%), #fffdf8;
   box-shadow: 0 18px 50px rgba(96, 62, 26, 0.08);
 }
 
@@ -333,9 +332,7 @@
   gap: 16px;
   border: 1px solid rgba(124, 58, 237, 0.14);
   border-radius: 24px;
-  background:
-    radial-gradient(circle at 80% 0%, rgba(124, 58, 237, 0.08), transparent 34%),
-    #ffffff;
+  background: radial-gradient(circle at 80% 0%, rgba(124, 58, 237, 0.08), transparent 34%), #ffffff;
   box-shadow: 0 14px 40px rgba(66, 39, 12, 0.06);
 }
 
@@ -623,12 +620,30 @@
     width: 210px;
   }
 
-  .subjectNode:nth-of-type(1) { left: 50%; top: 12%; }
-  .subjectNode:nth-of-type(2) { left: 50%; top: 26%; }
-  .subjectNode:nth-of-type(3) { left: 50%; top: 40%; }
-  .subjectNode:nth-of-type(4) { left: 50%; top: 54%; }
-  .subjectNode:nth-of-type(5) { left: 50%; top: 68%; }
-  .subjectNode:nth-of-type(6) { left: 50%; top: 82%; }
+  .subjectNode:nth-of-type(1) {
+    left: 50%;
+    top: 12%;
+  }
+  .subjectNode:nth-of-type(2) {
+    left: 50%;
+    top: 26%;
+  }
+  .subjectNode:nth-of-type(3) {
+    left: 50%;
+    top: 40%;
+  }
+  .subjectNode:nth-of-type(4) {
+    left: 50%;
+    top: 54%;
+  }
+  .subjectNode:nth-of-type(5) {
+    left: 50%;
+    top: 68%;
+  }
+  .subjectNode:nth-of-type(6) {
+    left: 50%;
+    top: 82%;
+  }
 
   .insightGrid,
   .detailMeta,

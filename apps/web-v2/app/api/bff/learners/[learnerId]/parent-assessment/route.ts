@@ -36,7 +36,12 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection"],
+      requestId,
+    );
     if (consentErr) return consentErr;
     const assessment = getOrCreateParentAssessment(learnerId, session!.tenantId);
     return ok({ assessment }, requestId);
@@ -45,15 +50,24 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
   }
 }
 
-async function applyPatch(req: Request, learnerId: string, requestId: string): Promise<NextResponse> {
+async function applyPatch(
+  req: Request,
+  learnerId: string,
+  requestId: string,
+): Promise<NextResponse> {
   const { session, response } = await requireSession(req, requestId);
   if (response) return response;
   const roleErr = requireRole(session!, ["parent"], requestId);
   if (roleErr) return roleErr;
   const scope = requireLearnerScope(session!, learnerId, requestId);
   if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
-    if (consentErr) return consentErr;
+  const consentErr = requireLearnerConsent(
+    session!,
+    learnerId,
+    ["child_data_collection"],
+    requestId,
+  );
+  if (consentErr) return consentErr;
 
   const body = await req.json().catch(() => ({}));
   const parsed = PatchBody.safeParse(body);

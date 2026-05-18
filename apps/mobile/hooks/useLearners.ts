@@ -1,6 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiFetch } from '@/lib/api';
-import { API } from '@/constants/api';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiFetch } from "@/lib/api";
+import { API } from "@/constants/api";
 
 interface Learner {
   id: string;
@@ -15,10 +15,10 @@ interface Learner {
 
 export function useLearners() {
   return useQuery<Learner[]>({
-    queryKey: ['learners'],
+    queryKey: ["learners"],
     queryFn: async () => {
-      const res = await apiFetch(API.IDENTITY, '/api/users/learners');
-      if (!res.ok) throw new Error('Failed to fetch learners');
+      const res = await apiFetch(API.IDENTITY, "/api/users/learners");
+      if (!res.ok) throw new Error("Failed to fetch learners");
       return res.json();
     },
   });
@@ -26,10 +26,10 @@ export function useLearners() {
 
 export function useLearner(learnerId: string) {
   return useQuery<Learner>({
-    queryKey: ['learners', learnerId],
+    queryKey: ["learners", learnerId],
     queryFn: async () => {
       const res = await apiFetch(API.IDENTITY, `/api/users/learners/${learnerId}`);
-      if (!res.ok) throw new Error('Failed to fetch learner');
+      if (!res.ok) throw new Error("Failed to fetch learner");
       return res.json();
     },
     enabled: !!learnerId,
@@ -47,15 +47,15 @@ export function useAddLearner() {
       pin: string;
       dateOfBirth?: string;
     }) => {
-      const res = await apiFetch(API.IDENTITY, '/api/users/learners', {
-        method: 'POST',
+      const res = await apiFetch(API.IDENTITY, "/api/users/learners", {
+        method: "POST",
         body: JSON.stringify(data),
       });
-      if (!res.ok) throw new Error('Failed to add learner');
+      if (!res.ok) throw new Error("Failed to add learner");
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['learners'] });
+      queryClient.invalidateQueries({ queryKey: ["learners"] });
     },
   });
 }

@@ -262,9 +262,7 @@ export default async function BrainProfilePage({
             </div>
             <div className="flex justify-between gap-2">
               <dt className="text-aivo-ink-soft">Breaks</dt>
-              <dd className="capitalize">
-                {s.attentionProfile.breakStyle.replaceAll("_", " ")}
-              </dd>
+              <dd className="capitalize">{s.attentionProfile.breakStyle.replaceAll("_", " ")}</dd>
             </div>
             <div className="flex justify-between gap-2">
               <dt className="text-aivo-ink-soft">Movement helps</dt>
@@ -274,9 +272,7 @@ export default async function BrainProfilePage({
         </Card>
 
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
-            Comfort
-          </p>
+          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">Comfort</p>
           <dl className="mt-2 space-y-1 text-sm">
             <div className="flex justify-between gap-2">
               <dt className="text-aivo-ink-soft">Reading</dt>

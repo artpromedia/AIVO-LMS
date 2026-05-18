@@ -23,27 +23,91 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 const SAMPLE_INVOICES: Invoice[] = [
-  { id: "INV-2026-001", tenantName: "Smith Family", amount: 29, status: "paid", plan: "Family", issuedAt: "2026-04-01", dueAt: "2026-04-15", paidAt: "2026-04-03" },
-  { id: "INV-2026-002", tenantName: "Johnson Academy", amount: 199, status: "paid", plan: "Enterprise", issuedAt: "2026-04-01", dueAt: "2026-04-15", paidAt: "2026-04-02" },
-  { id: "INV-2026-003", tenantName: "Garcia Family", amount: 49, status: "pending", plan: "Family Plus", issuedAt: "2026-04-01", dueAt: "2026-04-15", paidAt: null },
-  { id: "INV-2026-004", tenantName: "Westside District", amount: 499, status: "paid", plan: "Enterprise", issuedAt: "2026-03-01", dueAt: "2026-03-15", paidAt: "2026-03-05" },
-  { id: "INV-2026-005", tenantName: "Lee Family", amount: 29, status: "overdue", plan: "Family", issuedAt: "2026-03-01", dueAt: "2026-03-15", paidAt: null },
-  { id: "INV-2026-006", tenantName: "Maple School", amount: 149, status: "paid", plan: "Enterprise", issuedAt: "2026-03-01", dueAt: "2026-03-15", paidAt: "2026-03-10" },
+  {
+    id: "INV-2026-001",
+    tenantName: "Smith Family",
+    amount: 29,
+    status: "paid",
+    plan: "Family",
+    issuedAt: "2026-04-01",
+    dueAt: "2026-04-15",
+    paidAt: "2026-04-03",
+  },
+  {
+    id: "INV-2026-002",
+    tenantName: "Johnson Academy",
+    amount: 199,
+    status: "paid",
+    plan: "Enterprise",
+    issuedAt: "2026-04-01",
+    dueAt: "2026-04-15",
+    paidAt: "2026-04-02",
+  },
+  {
+    id: "INV-2026-003",
+    tenantName: "Garcia Family",
+    amount: 49,
+    status: "pending",
+    plan: "Family Plus",
+    issuedAt: "2026-04-01",
+    dueAt: "2026-04-15",
+    paidAt: null,
+  },
+  {
+    id: "INV-2026-004",
+    tenantName: "Westside District",
+    amount: 499,
+    status: "paid",
+    plan: "Enterprise",
+    issuedAt: "2026-03-01",
+    dueAt: "2026-03-15",
+    paidAt: "2026-03-05",
+  },
+  {
+    id: "INV-2026-005",
+    tenantName: "Lee Family",
+    amount: 29,
+    status: "overdue",
+    plan: "Family",
+    issuedAt: "2026-03-01",
+    dueAt: "2026-03-15",
+    paidAt: null,
+  },
+  {
+    id: "INV-2026-006",
+    tenantName: "Maple School",
+    amount: 149,
+    status: "paid",
+    plan: "Enterprise",
+    issuedAt: "2026-03-01",
+    dueAt: "2026-03-15",
+    paidAt: "2026-03-10",
+  },
 ];
 
 export default function InvoicesPage() {
   const [invoices] = useState<Invoice[]>(SAMPLE_INVOICES);
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const filtered = statusFilter === "all" ? invoices : invoices.filter((i) => i.status === statusFilter);
+  const filtered =
+    statusFilter === "all" ? invoices : invoices.filter((i) => i.status === statusFilter);
 
-  const totalRevenue = invoices.filter((i) => i.status === "paid").reduce((sum, i) => sum + i.amount, 0);
-  const pendingAmount = invoices.filter((i) => i.status === "pending" || i.status === "overdue").reduce((sum, i) => sum + i.amount, 0);
+  const totalRevenue = invoices
+    .filter((i) => i.status === "paid")
+    .reduce((sum, i) => sum + i.amount, 0);
+  const pendingAmount = invoices
+    .filter((i) => i.status === "pending" || i.status === "overdue")
+    .reduce((sum, i) => sum + i.amount, 0);
 
   return (
     <div className="p-8 space-y-6">
       <div className="flex items-center gap-3 text-sm vi-text-muted">
-        <Link href="/dashboard/admin/billing" className="hover:text-[hsl(var(--visual-primary))] transition">Billing</Link>
+        <Link
+          href="/dashboard/admin/billing"
+          className="hover:text-[hsl(var(--visual-primary))] transition"
+        >
+          Billing
+        </Link>
         <span>/</span>
         <span className="vi-text font-medium">Invoices</span>
       </div>
@@ -81,7 +145,9 @@ export default function InvoicesPage() {
               key={s}
               onClick={() => setStatusFilter(s)}
               className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition ${
-                statusFilter === s ? "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]" : "vi-bg vi-text-muted hover:vi-surface-soft"
+                statusFilter === s
+                  ? "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]"
+                  : "vi-bg vi-text-muted hover:vi-surface-soft"
               }`}
             >
               {s.charAt(0).toUpperCase() + s.slice(1)}
@@ -109,10 +175,18 @@ export default function InvoicesPage() {
                 <td className="px-5 py-3 vi-text-muted">{inv.plan}</td>
                 <td className="px-5 py-3 font-semibold vi-text">${inv.amount}</td>
                 <td className="px-5 py-3">
-                  <span className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${STATUS_COLORS[inv.status]}`}>{inv.status}</span>
+                  <span
+                    className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${STATUS_COLORS[inv.status]}`}
+                  >
+                    {inv.status}
+                  </span>
                 </td>
-                <td className="px-5 py-3 vi-text-muted">{new Date(inv.issuedAt).toLocaleDateString()}</td>
-                <td className="px-5 py-3 vi-text-muted">{inv.paidAt ? new Date(inv.paidAt).toLocaleDateString() : "—"}</td>
+                <td className="px-5 py-3 vi-text-muted">
+                  {new Date(inv.issuedAt).toLocaleDateString()}
+                </td>
+                <td className="px-5 py-3 vi-text-muted">
+                  {inv.paidAt ? new Date(inv.paidAt).toLocaleDateString() : "—"}
+                </td>
               </tr>
             ))}
           </tbody>

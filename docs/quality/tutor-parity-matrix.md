@@ -28,6 +28,7 @@ For each of the 14 canonical tutors:
 ## What this gate does NOT verify yet (P2, sprint-extension)
 
 The sprint prompt also requires every tutor to have:
+
 - Subject / skill mapping verified against the skill graph
 - Supported stage beats (intro, guided explanation, example, practice, hint,
   scaffold, read-aloud, reflection, mastery update)
@@ -84,22 +85,22 @@ gate failure):
 - No code change required to upgrade — only assets.
 
 | Tutor | Voice style | voice_out | Avatars | Reduced-motion | Status |
-|-------|-------------|-----------|---------|----------------|--------|
+| ----- | ----------- | --------- | ------- | -------------- | ------ |
 
-| nova    | playful | yes | ok | ok | 🟢 |
-| sage    | warm    | yes | ok | ok | 🟢 |
-| spark   | playful | yes | ok | ok | 🟢 |
-| chrono  | calm    | yes | ok | ok | 🟢 |
-| pixel   | playful | yes | ok | ok | 🟢 |
-| echo    | warm    | yes | ok | ok | 🟢 |
-| harmony | calm    | yes | ok | ok | 🟢 |
-| atlas   | warm    | yes | ok | ok | 🟢 |
+| nova | playful | yes | ok | ok | 🟢 |
+| sage | warm | yes | ok | ok | 🟢 |
+| spark | playful | yes | ok | ok | 🟢 |
+| chrono | calm | yes | ok | ok | 🟢 |
+| pixel | playful | yes | ok | ok | 🟢 |
+| echo | warm | yes | ok | ok | 🟢 |
+| harmony | calm | yes | ok | ok | 🟢 |
+| atlas | warm | yes | ok | ok | 🟢 |
 | cadence | playful | yes | ok | ok | 🟢 |
-| vigor   | playful | yes | ok | ok | 🟢 |
-| lingua  | warm    | yes | ok | ok | 🟢 |
-| forge   | playful | yes | ok | ok | 🟢 |
-| compass | calm    | yes | ok | ok | 🟢 |
-| muse    | warm    | yes | ok | ok | 🟢 |
+| vigor | playful | yes | ok | ok | 🟢 |
+| lingua | warm | yes | ok | ok | 🟢 |
+| forge | playful | yes | ok | ok | 🟢 |
+| compass | calm | yes | ok | ok | 🟢 |
+| muse | warm | yes | ok | ok | 🟢 |
 
 ## Important caveat
 

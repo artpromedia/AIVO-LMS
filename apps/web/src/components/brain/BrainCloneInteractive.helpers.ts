@@ -48,10 +48,7 @@ export function formatGrade(enrolled: number): string {
  *  - gap          : > 1.5 yrs below — focus area
  *  - unknown      : no mastery data yet
  */
-export function statusFor(
-  mastery: number,
-  enrolled: number,
-): RegionStatus {
+export function statusFor(mastery: number, enrolled: number): RegionStatus {
   if (!Number.isFinite(mastery) || mastery <= 0) {
     return {
       band: "unknown",

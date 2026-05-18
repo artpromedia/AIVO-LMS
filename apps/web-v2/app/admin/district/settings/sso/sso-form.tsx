@@ -52,9 +52,7 @@ export function SSOForm({ initial }: { initial: TenantSSOConfig }) {
         }
         setStatus({
           kind: "ok",
-          msg: rotateScim
-            ? "SCIM token rotated and SSO saved."
-            : "SSO configuration saved.",
+          msg: rotateScim ? "SCIM token rotated and SSO saved." : "SSO configuration saved.",
         });
         router.refresh();
       } catch {
@@ -86,9 +84,7 @@ export function SSOForm({ initial }: { initial: TenantSSOConfig }) {
                 className="sr-only"
               />
               <span className="block font-semibold">{m.label}</span>
-              <span className="mt-1 block text-xs text-aivo-ink-soft">
-                {m.desc}
-              </span>
+              <span className="mt-1 block text-xs text-aivo-ink-soft">{m.desc}</span>
             </label>
           ))}
         </div>
@@ -127,8 +123,8 @@ export function SSOForm({ initial }: { initial: TenantSSOConfig }) {
           <div>
             <p className="text-sm font-semibold">SCIM provisioning</p>
             <p className="text-xs text-aivo-ink-soft">
-              Allow your IdP to create, update, and deactivate users in this
-              district automatically. Requires a SAML or OIDC mode.
+              Allow your IdP to create, update, and deactivate users in this district automatically.
+              Requires a SAML or OIDC mode.
             </p>
           </div>
           <label className="inline-flex cursor-pointer items-center gap-2 text-sm">
@@ -144,8 +140,7 @@ export function SSOForm({ initial }: { initial: TenantSSOConfig }) {
         </div>
         <div className="mt-3 flex items-center justify-between">
           <p className="text-xs text-aivo-ink-soft">
-            Rotating the SCIM token invalidates any IdP integration using the
-            old credential.
+            Rotating the SCIM token invalidates any IdP integration using the old credential.
           </p>
           <Button
             type="button"
@@ -160,12 +155,8 @@ export function SSOForm({ initial }: { initial: TenantSSOConfig }) {
       </div>
 
       <div className="flex items-center justify-end gap-3">
-        {status?.kind === "ok" ? (
-          <p className="text-sm text-aivo-success">{status.msg}</p>
-        ) : null}
-        {status?.kind === "err" ? (
-          <p className="text-sm text-aivo-danger">{status.msg}</p>
-        ) : null}
+        {status?.kind === "ok" ? <p className="text-sm text-aivo-success">{status.msg}</p> : null}
+        {status?.kind === "err" ? <p className="text-sm text-aivo-danger">{status.msg}</p> : null}
         <Button type="submit" disabled={pending}>
           {pending ? "Saving…" : "Save SSO configuration"}
         </Button>

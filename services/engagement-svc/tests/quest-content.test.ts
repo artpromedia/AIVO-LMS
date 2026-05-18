@@ -1,10 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import {
-  QUEST_CHAPTER_CONTENT,
-  getChapter,
-  type BossQuestion,
-} from "../src/quest-content.js";
+import { QUEST_CHAPTER_CONTENT, getChapter, type BossQuestion } from "../src/quest-content.js";
 import { QUEST_WORLDS } from "../src/quest-worlds.js";
 
 describe("quest-content registry", () => {
@@ -19,9 +15,18 @@ describe("quest-content registry", () => {
 
   it("every chapter has a non-empty intro, outro, and 3-question boss", () => {
     for (const chapter of QUEST_CHAPTER_CONTENT) {
-      assert.ok(chapter.narrativeIntro && chapter.narrativeIntro.length > 0, `${chapter.worldKey}/${chapter.chapterNumber} intro`);
-      assert.ok(chapter.narrativeOutro && chapter.narrativeOutro.length > 0, `${chapter.worldKey}/${chapter.chapterNumber} outro`);
-      assert.ok(chapter.bossAssessment, `${chapter.worldKey}/${chapter.chapterNumber} bossAssessment`);
+      assert.ok(
+        chapter.narrativeIntro && chapter.narrativeIntro.length > 0,
+        `${chapter.worldKey}/${chapter.chapterNumber} intro`,
+      );
+      assert.ok(
+        chapter.narrativeOutro && chapter.narrativeOutro.length > 0,
+        `${chapter.worldKey}/${chapter.chapterNumber} outro`,
+      );
+      assert.ok(
+        chapter.bossAssessment,
+        `${chapter.worldKey}/${chapter.chapterNumber} bossAssessment`,
+      );
       const qs = chapter.bossAssessment.questions;
       assert.equal(qs.length, 3, `${chapter.worldKey}/${chapter.chapterNumber} needs 3 questions`);
       for (const q of qs) {
@@ -33,7 +38,11 @@ describe("quest-content registry", () => {
   it("question IDs are unique within a chapter", () => {
     for (const chapter of QUEST_CHAPTER_CONTENT) {
       const ids = chapter.bossAssessment.questions.map((q) => q.id);
-      assert.equal(new Set(ids).size, ids.length, `${chapter.worldKey}/${chapter.chapterNumber} duplicate question id`);
+      assert.equal(
+        new Set(ids).size,
+        ids.length,
+        `${chapter.worldKey}/${chapter.chapterNumber} duplicate question id`,
+      );
     }
   });
 

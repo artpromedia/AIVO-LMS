@@ -19,8 +19,16 @@ interface CelebrationOverlayProps {
 }
 
 export function CelebrationOverlay({
-  xpEarned, coinsEarned, correctCount, totalAttempts, streakCount,
-  newBadges, adaptations, accentColor, tutorName, onComplete,
+  xpEarned,
+  coinsEarned,
+  correctCount,
+  totalAttempts,
+  streakCount,
+  newBadges,
+  adaptations,
+  accentColor,
+  tutorName,
+  onComplete,
 }: CelebrationOverlayProps) {
   const [phase, setPhase] = useState(0);
 
@@ -29,7 +37,11 @@ export function CelebrationOverlay({
     const t1 = setTimeout(() => setPhase(1), speed);
     const t2 = setTimeout(() => setPhase(2), speed * 2);
     const t3 = setTimeout(() => setPhase(3), speed * 3);
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
   }, [adaptations.motionReduced]);
 
   const accuracy = totalAttempts > 0 ? Math.round((correctCount / totalAttempts) * 100) : 100;
@@ -42,17 +54,21 @@ export function CelebrationOverlay({
           {Array.from({ length: 20 }).map((_, i) => {
             const Icon = CONFETTI_ICONS[i % CONFETTI_ICONS.length];
             return (
-            <div
-              key={i}
-              className="absolute animate-confetti"
-              style={{
-                left: `${(i * 5 + 2) % 100}%`,
-                animationDelay: `${(i * 0.1) % 2}s`,
-                animationDuration: `${2 + (i % 4) * 0.5}s`,
-              }}
-            >
-              <Icon className="w-6 h-6 text-amber-400 fill-amber-300" strokeWidth={2} aria-hidden />
-            </div>
+              <div
+                key={i}
+                className="absolute animate-confetti"
+                style={{
+                  left: `${(i * 5 + 2) % 100}%`,
+                  animationDelay: `${(i * 0.1) % 2}s`,
+                  animationDuration: `${2 + (i % 4) * 0.5}s`,
+                }}
+              >
+                <Icon
+                  className="w-6 h-6 text-amber-400 fill-amber-300"
+                  strokeWidth={2}
+                  aria-hidden
+                />
+              </div>
             );
           })}
         </div>
@@ -61,7 +77,13 @@ export function CelebrationOverlay({
       <div className="bg-white/95 backdrop-blur-xl rounded-3xl p-8 max-w-sm w-full mx-4 text-center shadow-2xl space-y-5 animate-scale-in">
         <div className="space-y-2">
           <div className="w-20 h-20 mx-auto rounded-3xl bg-amber-100 text-amber-500 flex items-center justify-center">
-            {stars === 3 ? <Trophy className="w-10 h-10" strokeWidth={2} aria-hidden /> : stars === 2 ? <Sparkles className="w-10 h-10" strokeWidth={2} aria-hidden /> : <Star className="w-10 h-10" strokeWidth={2} aria-hidden />}
+            {stars === 3 ? (
+              <Trophy className="w-10 h-10" strokeWidth={2} aria-hidden />
+            ) : stars === 2 ? (
+              <Sparkles className="w-10 h-10" strokeWidth={2} aria-hidden />
+            ) : (
+              <Star className="w-10 h-10" strokeWidth={2} aria-hidden />
+            )}
           </div>
           <h2 className="text-2xl font-heading font-bold text-slate-900">
             {stars === 3 ? "Amazing!" : stars === 2 ? "Great Job!" : "Good Effort!"}
@@ -71,10 +93,18 @@ export function CelebrationOverlay({
 
         <div className="flex justify-center gap-2">
           {Array.from({ length: 3 }).map((_, i) => (
-            <span key={i} className={`transition-all duration-500 ${
-              i < stars ? "scale-100 opacity-100" : "scale-75 opacity-30"
-            }`} style={{ transitionDelay: `${i * 300}ms` }}>
-              <Star className={`w-8 h-8 ${i < stars ? "text-amber-400 fill-amber-300" : "text-slate-300"}`} strokeWidth={2} aria-hidden />
+            <span
+              key={i}
+              className={`transition-all duration-500 ${
+                i < stars ? "scale-100 opacity-100" : "scale-75 opacity-30"
+              }`}
+              style={{ transitionDelay: `${i * 300}ms` }}
+            >
+              <Star
+                className={`w-8 h-8 ${i < stars ? "text-amber-400 fill-amber-300" : "text-slate-300"}`}
+                strokeWidth={2}
+                aria-hidden
+              />
             </span>
           ))}
         </div>
@@ -82,7 +112,9 @@ export function CelebrationOverlay({
         {phase >= 1 && (
           <div className="flex justify-center gap-6 animate-fade-in">
             <div className="text-center">
-              <div className="text-2xl font-bold font-heading" style={{ color: accentColor }}>+{xpEarned}</div>
+              <div className="text-2xl font-bold font-heading" style={{ color: accentColor }}>
+                +{xpEarned}
+              </div>
               <div className="text-xs text-slate-400 font-body">XP</div>
             </div>
             {coinsEarned > 0 && (
@@ -105,7 +137,10 @@ export function CelebrationOverlay({
             <p className="text-xs text-slate-400 font-body mb-2">New Badge!</p>
             <div className="flex justify-center gap-2">
               {newBadges.map((badge) => (
-                <div key={badge} className="bg-amber-50 border-2 border-amber-200 rounded-xl px-3 py-2 text-sm font-heading font-bold text-amber-700 inline-flex items-center gap-1.5">
+                <div
+                  key={badge}
+                  className="bg-amber-50 border-2 border-amber-200 rounded-xl px-3 py-2 text-sm font-heading font-bold text-amber-700 inline-flex items-center gap-1.5"
+                >
                   <Award className="w-4 h-4" strokeWidth={2.5} aria-hidden /> {badge}
                 </div>
               ))}

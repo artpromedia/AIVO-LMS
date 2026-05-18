@@ -35,7 +35,11 @@ async function bootstrap() {
 
 async function teardown(app: any, db: any) {
   await app.close();
-  try { await (db as any).$client?.end?.({ timeout: 2 }); } catch { /* ignore */ }
+  try {
+    await (db as any).$client?.end?.({ timeout: 2 });
+  } catch {
+    /* ignore */
+  }
 }
 
 interface Fixture {
@@ -50,15 +54,24 @@ async function seed(db: any): Promise<Fixture> {
   const { tenants, users, learners } = await import("@aivo/db");
   const stamp = Date.now();
 
-  const [t] = await db.insert(tenants).values({
-    name: `inapp-test-${stamp}`, type: "B2B_DISTRICT",
-  } as any).returning();
+  const [t] = await db
+    .insert(tenants)
+    .values({
+      name: `inapp-test-${stamp}`,
+      type: "B2B_DISTRICT",
+    } as any)
+    .returning();
 
   const mkUser = async (role: string, name: string) => {
-    const [u] = await db.insert(users).values({
-      tenantId: t.id, name, role,
-      email: `${name}-${stamp}@test.local`,
-    } as any).returning();
+    const [u] = await db
+      .insert(users)
+      .values({
+        tenantId: t.id,
+        name,
+        role,
+        email: `${name}-${stamp}@test.local`,
+      } as any)
+      .returning();
     return u.id as string;
   };
 
@@ -67,27 +80,40 @@ async function seed(db: any): Promise<Fixture> {
   const learnerUserA1 = await mkUser("LEARNER", "inapp-learner-a1");
   const learnerUserA2 = await mkUser("LEARNER", "inapp-learner-a2");
 
-  const [lA1] = await db.insert(learners).values({
-    tenantId: t.id, userId: learnerUserA1, parentId: parentA,
-    name: "InApp Learner A1",
-  } as any).returning();
-  const [lA2] = await db.insert(learners).values({
-    tenantId: t.id, userId: learnerUserA2, parentId: parentA,
-    name: "InApp Learner A2",
-  } as any).returning();
+  const [lA1] = await db
+    .insert(learners)
+    .values({
+      tenantId: t.id,
+      userId: learnerUserA1,
+      parentId: parentA,
+      name: "InApp Learner A1",
+    } as any)
+    .returning();
+  const [lA2] = await db
+    .insert(learners)
+    .values({
+      tenantId: t.id,
+      userId: learnerUserA2,
+      parentId: parentA,
+      name: "InApp Learner A2",
+    } as any)
+    .returning();
 
   return {
-    tenantA: t.id, parentA, parentB,
-    learnerA1: lA1.id, learnerA2: lA2.id,
+    tenantA: t.id,
+    parentA,
+    parentB,
+    learnerA1: lA1.id,
+    learnerA2: lA2.id,
   };
 }
 
 async function cleanup(db: any, f: Fixture) {
   const { eq, inArray } = await import("drizzle-orm");
   const { tenants, users, learners, parentInAppNotifications } = await import("@aivo/db");
-  await db.delete(parentInAppNotifications).where(
-    inArray(parentInAppNotifications.parentId, [f.parentA, f.parentB]),
-  );
+  await db
+    .delete(parentInAppNotifications)
+    .where(inArray(parentInAppNotifications.parentId, [f.parentA, f.parentB]));
   await db.delete(learners).where(inArray(learners.id, [f.learnerA1, f.learnerA2]));
   await db.delete(users).where(eq(users.tenantId, f.tenantA));
   await db.delete(tenants).where(eq(tenants.id, f.tenantA));
@@ -107,38 +133,44 @@ async function postInternal(app: any, body: any, key = INTERNAL_KEY) {
   });
 }
 
-test("in-app-notify: internal endpoint creates a row when key is correct", { skip: SKIP }, async () => {
-  const { app, db } = await bootstrap();
-  const f = await seed(db);
-  try {
-    const res = await postInternal(app, {
-      parentId: f.parentA,
-      learnerId: f.learnerA1,
-      category: "progress_notes",
-      template: "iep_progress_note",
-      title: "New progress note for Test",
-      body: "Body snippet",
-      link: "https://example/dashboard/parent/learner/x/iep",
-    });
-    assert.equal(res.statusCode, 200);
-    const j = res.json();
-    assert.equal(j.status, "created");
-    assert.match(j.id, /[0-9a-f-]{36}/);
+test(
+  "in-app-notify: internal endpoint creates a row when key is correct",
+  { skip: SKIP },
+  async () => {
+    const { app, db } = await bootstrap();
+    const f = await seed(db);
+    try {
+      const res = await postInternal(app, {
+        parentId: f.parentA,
+        learnerId: f.learnerA1,
+        category: "progress_notes",
+        template: "iep_progress_note",
+        title: "New progress note for Test",
+        body: "Body snippet",
+        link: "https://example/dashboard/parent/learner/x/iep",
+      });
+      assert.equal(res.statusCode, 200);
+      const j = res.json();
+      assert.equal(j.status, "created");
+      assert.match(j.id, /[0-9a-f-]{36}/);
 
-    const { parentInAppNotifications } = await import("@aivo/db");
-    const { eq } = await import("drizzle-orm");
-    const rows = await db.select().from(parentInAppNotifications)
-      .where(eq(parentInAppNotifications.parentId, f.parentA));
-    assert.equal(rows.length, 1);
-    assert.equal(rows[0].title, "New progress note for Test");
-    assert.equal(rows[0].category, "progress_notes");
-    assert.equal(rows[0].learnerId, f.learnerA1);
-    assert.equal(rows[0].readAt, null);
-  } finally {
-    await cleanup(db, f);
-    await teardown(app, db);
-  }
-});
+      const { parentInAppNotifications } = await import("@aivo/db");
+      const { eq } = await import("drizzle-orm");
+      const rows = await db
+        .select()
+        .from(parentInAppNotifications)
+        .where(eq(parentInAppNotifications.parentId, f.parentA));
+      assert.equal(rows.length, 1);
+      assert.equal(rows[0].title, "New progress note for Test");
+      assert.equal(rows[0].category, "progress_notes");
+      assert.equal(rows[0].learnerId, f.learnerA1);
+      assert.equal(rows[0].readAt, null);
+    } finally {
+      await cleanup(db, f);
+      await teardown(app, db);
+    }
+  },
+);
 
 test("in-app-notify: internal endpoint rejects missing/invalid key", { skip: SKIP }, async () => {
   const { app, db } = await bootstrap();
@@ -151,9 +183,16 @@ test("in-app-notify: internal endpoint rejects missing/invalid key", { skip: SKI
       payload: { parentId: f.parentA, category: "reports", template: "x", title: "y" },
     });
     assert.equal(noKey.statusCode, 401);
-    const badKey = await postInternal(app, {
-      parentId: f.parentA, category: "reports", template: "x", title: "y",
-    }, "wrong-key");
+    const badKey = await postInternal(
+      app,
+      {
+        parentId: f.parentA,
+        category: "reports",
+        template: "x",
+        title: "y",
+      },
+      "wrong-key",
+    );
     assert.equal(badKey.statusCode, 401);
   } finally {
     await cleanup(db, f);
@@ -176,62 +215,84 @@ test("in-app-notify: internal endpoint validates required fields", { skip: SKIP 
   }
 });
 
-test("list: parent only sees their own notifications, never another parent's", { skip: SKIP }, async () => {
-  const { app, db } = await bootstrap();
-  const f = await seed(db);
-  try {
-    await postInternal(app, {
-      parentId: f.parentA, learnerId: f.learnerA1,
-      category: "progress_notes", template: "iep_progress_note",
-      title: "A's note",
-    });
-    await postInternal(app, {
-      parentId: f.parentB,
-      category: "reports", template: "iep_progress_report_sent",
-      title: "B's report",
-    });
+test(
+  "list: parent only sees their own notifications, never another parent's",
+  { skip: SKIP },
+  async () => {
+    const { app, db } = await bootstrap();
+    const f = await seed(db);
+    try {
+      await postInternal(app, {
+        parentId: f.parentA,
+        learnerId: f.learnerA1,
+        category: "progress_notes",
+        template: "iep_progress_note",
+        title: "A's note",
+      });
+      await postInternal(app, {
+        parentId: f.parentB,
+        category: "reports",
+        template: "iep_progress_report_sent",
+        title: "B's report",
+      });
 
-    const tokenA = await tokenFor(f.parentA, "PARENT", f.tenantA);
-    const resA = await app.inject({
-      method: "GET",
-      url: "/api/comms/in-app-notifications",
-      headers: { Authorization: `Bearer ${tokenA}` },
-    });
-    assert.equal(resA.statusCode, 200);
-    const itemsA = resA.json().items as Array<{ title: string }>;
-    assert.equal(itemsA.length, 1, "parentA must see exactly their one note");
-    assert.equal(itemsA[0].title, "A's note");
-    assert.equal(resA.json().unreadCount, 1);
+      const tokenA = await tokenFor(f.parentA, "PARENT", f.tenantA);
+      const resA = await app.inject({
+        method: "GET",
+        url: "/api/comms/in-app-notifications",
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
+      assert.equal(resA.statusCode, 200);
+      const itemsA = resA.json().items as Array<{ title: string }>;
+      assert.equal(itemsA.length, 1, "parentA must see exactly their one note");
+      assert.equal(itemsA[0].title, "A's note");
+      assert.equal(resA.json().unreadCount, 1);
 
-    const tokenB = await tokenFor(f.parentB, "PARENT", f.tenantA);
-    const resB = await app.inject({
-      method: "GET",
-      url: "/api/comms/in-app-notifications",
-      headers: { Authorization: `Bearer ${tokenB}` },
-    });
-    const itemsB = resB.json().items as Array<{ title: string }>;
-    assert.equal(itemsB.length, 1, "parentB must see exactly their one report");
-    assert.equal(itemsB[0].title, "B's report");
-    // Critical isolation invariant — neither parent should see the other's row.
-    assert.ok(!itemsA.some((i) => i.title === "B's report"));
-    assert.ok(!itemsB.some((i) => i.title === "A's note"));
-  } finally {
-    await cleanup(db, f);
-    await teardown(app, db);
-  }
-});
+      const tokenB = await tokenFor(f.parentB, "PARENT", f.tenantA);
+      const resB = await app.inject({
+        method: "GET",
+        url: "/api/comms/in-app-notifications",
+        headers: { Authorization: `Bearer ${tokenB}` },
+      });
+      const itemsB = resB.json().items as Array<{ title: string }>;
+      assert.equal(itemsB.length, 1, "parentB must see exactly their one report");
+      assert.equal(itemsB[0].title, "B's report");
+      // Critical isolation invariant — neither parent should see the other's row.
+      assert.ok(!itemsA.some((i) => i.title === "B's report"));
+      assert.ok(!itemsB.some((i) => i.title === "A's note"));
+    } finally {
+      await cleanup(db, f);
+      await teardown(app, db);
+    }
+  },
+);
 
 test("list: unread + learnerId filters narrow the feed correctly", { skip: SKIP }, async () => {
   const { app, db } = await bootstrap();
   const f = await seed(db);
   try {
     // 2 unread for A1, 1 unread for A2.
-    await postInternal(app, { parentId: f.parentA, learnerId: f.learnerA1,
-      category: "progress_notes", template: "iep_progress_note", title: "A1-note-1" });
-    await postInternal(app, { parentId: f.parentA, learnerId: f.learnerA1,
-      category: "progress_notes", template: "iep_progress_note", title: "A1-note-2" });
-    await postInternal(app, { parentId: f.parentA, learnerId: f.learnerA2,
-      category: "progress_notes", template: "iep_progress_note", title: "A2-note-1" });
+    await postInternal(app, {
+      parentId: f.parentA,
+      learnerId: f.learnerA1,
+      category: "progress_notes",
+      template: "iep_progress_note",
+      title: "A1-note-1",
+    });
+    await postInternal(app, {
+      parentId: f.parentA,
+      learnerId: f.learnerA1,
+      category: "progress_notes",
+      template: "iep_progress_note",
+      title: "A1-note-2",
+    });
+    await postInternal(app, {
+      parentId: f.parentA,
+      learnerId: f.learnerA2,
+      category: "progress_notes",
+      template: "iep_progress_note",
+      title: "A2-note-1",
+    });
 
     const token = await tokenFor(f.parentA, "PARENT", f.tenantA);
 
@@ -263,40 +324,54 @@ test("list: unread + learnerId filters narrow the feed correctly", { skip: SKIP 
   }
 });
 
-test("mark-read: marks all unread for a parent (optionally scoped to learner)", { skip: SKIP }, async () => {
-  const { app, db } = await bootstrap();
-  const f = await seed(db);
-  try {
-    await postInternal(app, { parentId: f.parentA, learnerId: f.learnerA1,
-      category: "progress_notes", template: "iep_progress_note", title: "A1-1" });
-    await postInternal(app, { parentId: f.parentA, learnerId: f.learnerA2,
-      category: "progress_notes", template: "iep_progress_note", title: "A2-1" });
+test(
+  "mark-read: marks all unread for a parent (optionally scoped to learner)",
+  { skip: SKIP },
+  async () => {
+    const { app, db } = await bootstrap();
+    const f = await seed(db);
+    try {
+      await postInternal(app, {
+        parentId: f.parentA,
+        learnerId: f.learnerA1,
+        category: "progress_notes",
+        template: "iep_progress_note",
+        title: "A1-1",
+      });
+      await postInternal(app, {
+        parentId: f.parentA,
+        learnerId: f.learnerA2,
+        category: "progress_notes",
+        template: "iep_progress_note",
+        title: "A2-1",
+      });
 
-    const token = await tokenFor(f.parentA, "PARENT", f.tenantA);
+      const token = await tokenFor(f.parentA, "PARENT", f.tenantA);
 
-    // Scoped mark-read: only A1's unread should flip.
-    const scoped = await app.inject({
-      method: "POST",
-      url: "/api/comms/in-app-notifications/mark-read",
-      headers: { Authorization: `Bearer ${token}`, "content-type": "application/json" },
-      payload: { all: true, learnerId: f.learnerA1 },
-    });
-    assert.equal(scoped.statusCode, 200);
-    assert.equal(scoped.json().updated, 1);
+      // Scoped mark-read: only A1's unread should flip.
+      const scoped = await app.inject({
+        method: "POST",
+        url: "/api/comms/in-app-notifications/mark-read",
+        headers: { Authorization: `Bearer ${token}`, "content-type": "application/json" },
+        payload: { all: true, learnerId: f.learnerA1 },
+      });
+      assert.equal(scoped.statusCode, 200);
+      assert.equal(scoped.json().updated, 1);
 
-    const unreadAfter = await app.inject({
-      method: "GET",
-      url: "/api/comms/in-app-notifications?unread=true",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const left = (unreadAfter.json().items as Array<{ title: string }>);
-    assert.equal(left.length, 1);
-    assert.equal(left[0].title, "A2-1", "A2's note must remain unread after scoped mark-read");
-  } finally {
-    await cleanup(db, f);
-    await teardown(app, db);
-  }
-});
+      const unreadAfter = await app.inject({
+        method: "GET",
+        url: "/api/comms/in-app-notifications?unread=true",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const left = unreadAfter.json().items as Array<{ title: string }>;
+      assert.equal(left.length, 1);
+      assert.equal(left[0].title, "A2-1", "A2's note must remain unread after scoped mark-read");
+    } finally {
+      await cleanup(db, f);
+      await teardown(app, db);
+    }
+  },
+);
 
 test("mark-read: rejects if neither ids[] nor { all: true } supplied", { skip: SKIP }, async () => {
   const { app, db } = await bootstrap();
@@ -321,8 +396,10 @@ test("mark-read: parentB cannot mark parentA's notifications as read", { skip: S
   const f = await seed(db);
   try {
     const created = await postInternal(app, {
-      parentId: f.parentA, learnerId: f.learnerA1,
-      category: "progress_notes", template: "iep_progress_note",
+      parentId: f.parentA,
+      learnerId: f.learnerA1,
+      category: "progress_notes",
+      template: "iep_progress_note",
       title: "A1 note that B will try to nuke",
     });
     const noteId = created.json().id;

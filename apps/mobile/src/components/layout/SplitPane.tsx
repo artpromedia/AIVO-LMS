@@ -1,7 +1,7 @@
-import React from 'react';
-import { StyleSheet, View, ViewStyle } from 'react-native';
-import { useWindowSizeClass } from '../../design/useWindowSizeClass';
-import { colors, spacing, radius } from '@/constants/colors';
+import React from "react";
+import { StyleSheet, View, ViewStyle } from "react-native";
+import { useWindowSizeClass } from "../../design/useWindowSizeClass";
+import { colors, spacing, radius } from "@/constants/colors";
 
 export interface SplitPaneProps {
   /** Left panel content (or top on phones). */
@@ -18,7 +18,7 @@ export interface SplitPaneProps {
    * Minimum size class required to actually split. Below this, panels are
    * stacked vertically (phone behavior). Default: 'medium'.
    */
-  minSplitClass?: 'medium' | 'expanded';
+  minSplitClass?: "medium" | "expanded";
   gap?: number;
   style?: ViewStyle;
 }
@@ -34,14 +34,14 @@ export function SplitPane({
   center,
   leftWidth = 280,
   rightWidth = 360,
-  minSplitClass = 'medium',
+  minSplitClass = "medium",
   gap = spacing.md,
   style,
 }: SplitPaneProps) {
   const { sizeClass, isLandscape } = useWindowSizeClass();
   const canSplit =
-    sizeClass === 'expanded' ||
-    (sizeClass === 'medium' && minSplitClass === 'medium' && (isLandscape || !!center));
+    sizeClass === "expanded" ||
+    (sizeClass === "medium" && minSplitClass === "medium" && (isLandscape || !!center));
 
   if (!canSplit) {
     return (
@@ -53,38 +53,32 @@ export function SplitPane({
     );
   }
 
-  const showThreePane = !!center && sizeClass === 'expanded';
+  const showThreePane = !!center && sizeClass === "expanded";
 
   return (
     <View style={[styles.row, { gap }, style]}>
       <View style={[styles.panel, { width: leftWidth }]}>{left}</View>
-      {showThreePane ? (
-        <View style={[styles.panel, styles.flexPanel]}>{center}</View>
-      ) : center && !showThreePane ? (
-        // Medium tablet: center merges with right or left
-        null
-      ) : null}
-      <View
-        style={[
-          styles.panel,
-          showThreePane ? { width: rightWidth } : styles.flexPanel,
-        ]}
-      >
-        {showThreePane ? right : center ?? right}
+      {
+        showThreePane ? (
+          <View style={[styles.panel, styles.flexPanel]}>{center}</View>
+        ) : center && !showThreePane ? null : null // Medium tablet: center merges with right or left
+      }
+      <View style={[styles.panel, showThreePane ? { width: rightWidth } : styles.flexPanel]}>
+        {showThreePane ? right : (center ?? right)}
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  row: { flex: 1, flexDirection: 'row' },
-  stack: { flex: 1, flexDirection: 'column' },
+  row: { flex: 1, flexDirection: "row" },
+  stack: { flex: 1, flexDirection: "column" },
   panel: {
     backgroundColor: colors.card,
     borderRadius: radius.xl,
     padding: spacing.md,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   flexPanel: { flex: 1 },
-  stackPanel: { width: '100%' },
+  stackPanel: { width: "100%" },
 });

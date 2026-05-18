@@ -73,7 +73,9 @@ describe("SwitchScanController", () => {
     const items = makeItems(3);
     const ctrl = new SwitchScanController(makeConfig(), items);
     const received: string[] = [];
-    ctrl.subscribe((item) => { if (item) received.push(item.id); });
+    ctrl.subscribe((item) => {
+      if (item) received.push(item.id);
+    });
     ctrl.start();
     vi.advanceTimersByTime(200);
     expect(received).toEqual(["item-1", "item-2"]);

@@ -55,18 +55,19 @@
 
 ### 2.1 Signup screen
 
-| Field | Notes |
-|---|---|
-| Name | required; min 2 chars |
-| Email | required; format check |
-| Password | required; ≥ 10 chars, mix; meter with `aria-live="polite"` |
+| Field                                             | Notes                                                                            |
+| ------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Name                                              | required; min 2 chars                                                            |
+| Email                                             | required; format check                                                           |
+| Password                                          | required; ≥ 10 chars, mix; meter with `aria-live="polite"`                       |
 | ☑ I accept the [Terms of Service](…) (v<version>) | required — recorded as `TermsAcceptance` + `ConsentRecord(parent_account_terms)` |
-| ☑ I accept the [Privacy Policy](…) (v<version>) | required — recorded as `ConsentRecord(parent_privacy_policy)` |
-| ☐ I want to receive AIVO product updates | optional — `ConsentRecord(marketing_opt_in)` |
-| **Create account** (primary) | disabled until required fields valid + boxes ticked |
-| Sign in instead | link |
+| ☑ I accept the [Privacy Policy](…) (v<version>)   | required — recorded as `ConsentRecord(parent_privacy_policy)`                    |
+| ☐ I want to receive AIVO product updates          | optional — `ConsentRecord(marketing_opt_in)`                                     |
+| **Create account** (primary)                      | disabled until required fields valid + boxes ticked                              |
+| Sign in instead                                   | link                                                                             |
 
 States:
+
 - **Loading**: button spinner, fields locked.
 - **Empty (initial)**: only labels + placeholders, no errors shown.
 - **Error**: top-of-form summary + per-field error linked via `aria-describedby`. Server errors map to `BFF.error.userMessage`.
@@ -88,17 +89,18 @@ A11y: status announced via `role="status" aria-live="polite"`.
 
 Replaces today's mock role picker:
 
-| Field | Notes |
-|---|---|
-| Email | required |
-| Password | required |
-| ☐ Remember this device | optional (extends refresh token) |
-| **Sign in** | primary |
-| Forgot password? | link → `/forgot-password` |
-| Create account | link → `/signup` |
+| Field                         | Notes                                    |
+| ----------------------------- | ---------------------------------------- |
+| Email                         | required                                 |
+| Password                      | required                                 |
+| ☐ Remember this device        | optional (extends refresh token)         |
+| **Sign in**                   | primary                                  |
+| Forgot password?              | link → `/forgot-password`                |
+| Create account                | link → `/signup`                         |
 | (later) "Sign in with Google" | secondary; only after Google OAuth ships |
 
 States:
+
 - **Invalid credentials**: inline error "Email or password doesn't match." (Never reveal which.)
 - **Unverified email**: inline warning + "Resend verification email."
 - **MFA required**: redirect to `/login/verify-mfa`.
@@ -119,15 +121,15 @@ Eng: `POST /api/bff/auth/login` returns `{ session, role, mfaRequired? }`. The d
 
 ### 2.6 Mobile auth + role detection
 
-| Step | Screen | Notes |
-|---|---|---|
-| 1 | `/welcome` | brand intro + Get started / Sign in |
-| 2 | `/(auth)/login` | identical fields to web |
-| 3 | `/(auth)/verify-mfa` | if required |
-| 4 | `/(auth)/pin` | learner-mode quick-unlock (set once after login on this device) |
-| 5 | **Role detection** | `availableRoles` from session: 1 → set + skip; 2+ → `/role-chooser` |
-| 6 | `/role-chooser` | one card per available role, last-used pinned to top |
-| 7 | `<Mode>` home | tab navigator renders the active mode's tabs |
+| Step | Screen               | Notes                                                               |
+| ---- | -------------------- | ------------------------------------------------------------------- |
+| 1    | `/welcome`           | brand intro + Get started / Sign in                                 |
+| 2    | `/(auth)/login`      | identical fields to web                                             |
+| 3    | `/(auth)/verify-mfa` | if required                                                         |
+| 4    | `/(auth)/pin`        | learner-mode quick-unlock (set once after login on this device)     |
+| 5    | **Role detection**   | `availableRoles` from session: 1 → set + skip; 2+ → `/role-chooser` |
+| 6    | `/role-chooser`      | one card per available role, last-used pinned to top                |
+| 7    | `<Mode>` home        | tab navigator renders the active mode's tabs                        |
 
 `/role-switcher` (drawer): same list as `/role-chooser` + "Sign out" at bottom. Switching modes **never** re-authenticates.
 
@@ -139,18 +141,18 @@ Eng: `POST /api/bff/auth/login` returns `{ session, role, mfaRequired? }`. The d
 
 These are the **exact** identifiers in the codebase. Don't invent new ones in design; add a new entry to `CONSENT_TYPES` (and a `ConsentVersion` row) first.
 
-| Type | Scope | When collected | Required? | What it gates |
-|---|---|---|---|---|
-| `parent_account_terms` | account | signup | required for any signed-in use | the account itself |
-| `parent_privacy_policy` | account | signup | required | the account itself |
-| `child_data_collection` | per-learner | learner creation | required for the learner | all learner data collection; revoking triggers the 30-day soft-delete (§3.6) |
-| `iep_document_storage` | per-learner | IEP upload step | optional | IEP upload + extracted accommodations |
-| `ai_personalization` | per-learner | learner activation; default off | optional but strongly recommended | tutor personalization + adaptive lessons |
-| `school_roster_import` | account / per-learner | when a school invite is accepted | required to be rostered by a school | district SIS / rostering ingest of this learner |
-| `teacher_access` | per-learner | per-learner, per-teacher (auto-implied when the learner joins the teacher's class via a parent invite) | optional | teacher view of learner profile |
-| `marketing_opt_in` | account | signup or parent settings | optional | product update emails |
-| `data_export_request` | account or per-learner | parent triggers from `/parent/privacy/data-export` | optional (audit-style consent recorded each request) | a DSAR export job is allowed to package the data |
-| `data_deletion_request` | account or per-learner | parent triggers from `/parent/privacy/delete-data` | optional (audit-style consent recorded each request) | the 14-day soft-delete window starts; cascade per §3.6 |
+| Type                    | Scope                  | When collected                                                                                         | Required?                                            | What it gates                                                                |
+| ----------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `parent_account_terms`  | account                | signup                                                                                                 | required for any signed-in use                       | the account itself                                                           |
+| `parent_privacy_policy` | account                | signup                                                                                                 | required                                             | the account itself                                                           |
+| `child_data_collection` | per-learner            | learner creation                                                                                       | required for the learner                             | all learner data collection; revoking triggers the 30-day soft-delete (§3.6) |
+| `iep_document_storage`  | per-learner            | IEP upload step                                                                                        | optional                                             | IEP upload + extracted accommodations                                        |
+| `ai_personalization`    | per-learner            | learner activation; default off                                                                        | optional but strongly recommended                    | tutor personalization + adaptive lessons                                     |
+| `school_roster_import`  | account / per-learner  | when a school invite is accepted                                                                       | required to be rostered by a school                  | district SIS / rostering ingest of this learner                              |
+| `teacher_access`        | per-learner            | per-learner, per-teacher (auto-implied when the learner joins the teacher's class via a parent invite) | optional                                             | teacher view of learner profile                                              |
+| `marketing_opt_in`      | account                | signup or parent settings                                                                              | optional                                             | product update emails                                                        |
+| `data_export_request`   | account or per-learner | parent triggers from `/parent/privacy/data-export`                                                     | optional (audit-style consent recorded each request) | a DSAR export job is allowed to package the data                             |
+| `data_deletion_request` | account or per-learner | parent triggers from `/parent/privacy/delete-data`                                                     | optional (audit-style consent recorded each request) | the 14-day soft-delete window starts; cascade per §3.6                       |
 
 **COPPA**: there is **no** standalone `coppa_parental_consent` type. The COPPA path is the combination of (a) an `AgeGateRecord` (`lib/db/types.ts → AgeGateRecord`) flagging that the learner is under 13 + `requiresParentConsent: true`, and (b) a `child_data_collection` ConsentRecord from the verified parent. Both must exist before the learner can activate.
 
@@ -189,12 +191,12 @@ Each step is a `<Stepper>` panel. "Skip for now" is visible on optional steps. P
 
 A list, not a wizard. One row per consent type with:
 
-| Column | Content |
-|---|---|
-| Label | "AI personalization", "IEP storage", … |
-| Status | `Accepted on Mar 12, 2026` / `Not granted` / `Revoked on Apr 1, 2026` |
-| Version | "v2 — current" (or "v1 — needs re-acceptance") |
-| Action | `<Toggle>` (accept/revoke) or `<Button variant="link">View details</Button>` |
+| Column  | Content                                                                      |
+| ------- | ---------------------------------------------------------------------------- |
+| Label   | "AI personalization", "IEP storage", …                                       |
+| Status  | `Accepted on Mar 12, 2026` / `Not granted` / `Revoked on Apr 1, 2026`        |
+| Version | "v2 — current" (or "v1 — needs re-acceptance")                               |
+| Action  | `<Toggle>` (accept/revoke) or `<Button variant="link">View details</Button>` |
 
 Revocation is one click + confirmation dialog explaining the consequence: "Revoking AI personalization means your child's next lesson will use generic content. Past summaries remain visible."
 
@@ -233,6 +235,7 @@ After revocation, the dependent surfaces show:
 - **Brain profile / lessons history**: existing data remains visible with an "AI personalization was off after `<date>`" timeline marker; never deleted unless `child_data_collection` is also revoked.
 
 Cascade rules (UX-00 §7):
+
 - `ai_personalization` off → no new AI content; past records retained.
 - `iep_document_storage` off → document purged in 30 days; derived accommodations retained until `child_data_collection` revoked.
 - `child_data_collection` off → 30-day soft delete; dashboards show "data removed" tombstone with restore-window note.
@@ -244,6 +247,7 @@ When the parent finishes setup (consent ✓, learner ✓, optionally IEP, baseli
 - `Open learner account` button → `/learner/select` → `/learner/home` (logged in as the parent, with active-learner cookie set).
 
 On a separate device:
+
 - `Send learner sign-in link` → emails a parent-locked link → opens `/(auth)/pin` on mobile or `/learner/select` on web; parent PIN required once per device. After PIN, the learner enters Stage directly on subsequent visits.
 
 ---
@@ -252,19 +256,20 @@ On a separate device:
 
 Plain-language phrasings to use across the consent surfaces. Each line is a card heading + one explainer sentence.
 
-| Consent type | Heading | Sentence |
-|---|---|---|
-| `parent_privacy_policy` | "What we collect" | "Your child's responses, time-on-task, and lesson outcomes — used only to teach them and to show you their progress." |
-| `child_data_collection` | "Why we ask for this" | "AIVO can't teach a child personally if it doesn't keep a memory of what they've learned." |
-| `ai_personalization` | "What turns on with this" | "Lessons adapt to your child's pace, focus, and learning preferences — using their AIVO learning history." |
-| `iep_document_storage` | "What we do with the document" | "We extract accommodations only — read-aloud, extra time, smaller steps. We never quote the document to teachers or learners." |
-| `teacher_access` | "What the teacher sees" | "Mastery on the skills assigned in class, plus AIVO's recommended next step. No diagnostic labels. No raw IEP text." |
-| `school_roster_import` | "What the school sees and sends" | "Your child's name, grade, and class roster — exchanged between AIVO and your school's information system. Lesson responses are not shared back." |
-| `marketing_opt_in` | "What you'll get" | "About one email a month. We never share your address." |
-| `data_export_request` | "What an export contains" | "Everything we have for your account or the learner you pick — in a portable zip. Ready in a few minutes." |
-| `data_deletion_request` | "What deletion does" | "Marks your data for removal. You have 14 days to change your mind before it's gone for good." |
+| Consent type            | Heading                          | Sentence                                                                                                                                          |
+| ----------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `parent_privacy_policy` | "What we collect"                | "Your child's responses, time-on-task, and lesson outcomes — used only to teach them and to show you their progress."                             |
+| `child_data_collection` | "Why we ask for this"            | "AIVO can't teach a child personally if it doesn't keep a memory of what they've learned."                                                        |
+| `ai_personalization`    | "What turns on with this"        | "Lessons adapt to your child's pace, focus, and learning preferences — using their AIVO learning history."                                        |
+| `iep_document_storage`  | "What we do with the document"   | "We extract accommodations only — read-aloud, extra time, smaller steps. We never quote the document to teachers or learners."                    |
+| `teacher_access`        | "What the teacher sees"          | "Mastery on the skills assigned in class, plus AIVO's recommended next step. No diagnostic labels. No raw IEP text."                              |
+| `school_roster_import`  | "What the school sees and sends" | "Your child's name, grade, and class roster — exchanged between AIVO and your school's information system. Lesson responses are not shared back." |
+| `marketing_opt_in`      | "What you'll get"                | "About one email a month. We never share your address."                                                                                           |
+| `data_export_request`   | "What an export contains"        | "Everything we have for your account or the learner you pick — in a portable zip. Ready in a few minutes."                                        |
+| `data_deletion_request` | "What deletion does"             | "Marks your data for removal. You have 14 days to change your mind before it's gone for good."                                                    |
 
 Always avoid:
+
 - Diagnostic labels in conversational copy ("dyslexia", "ADHD", "ASD").
 - Legalese as the lead — link to it second.
 - Implication of consequences that won't actually happen ("Your child will fall behind without this").
@@ -277,47 +282,47 @@ Each screen below must specify all five states + the standard handoff columns. T
 
 ### 5.1 `/signup`
 
-| State | Surface |
-|---|---|
-| Default | Card with form (§2.1) |
-| Loading | Submit button spinner, fields locked |
-| Empty | First load — no errors |
-| Error | Top-of-form summary + per-field `aria-describedby` |
-| Success | Redirect to `/verify-email?email=<masked>` + toast |
-| Permission blocked | n/a (public route) |
-| Consent required | the form *itself* collects the two required consents |
+| State              | Surface                                              |
+| ------------------ | ---------------------------------------------------- |
+| Default            | Card with form (§2.1)                                |
+| Loading            | Submit button spinner, fields locked                 |
+| Empty              | First load — no errors                               |
+| Error              | Top-of-form summary + per-field `aria-describedby`   |
+| Success            | Redirect to `/verify-email?email=<masked>` + toast   |
+| Permission blocked | n/a (public route)                                   |
+| Consent required   | the form _itself_ collects the two required consents |
 
 ### 5.2 `/verify-email`
 
-| State | Surface |
-|---|---|
-| Default | "Check your inbox" panel |
-| Loading | When clicking "Resend email" |
-| Success | "Email verified — continue to setup" |
-| Error | "This link expired" + Send new link |
-| Already verified | Banner + Continue button |
+| State            | Surface                              |
+| ---------------- | ------------------------------------ |
+| Default          | "Check your inbox" panel             |
+| Loading          | When clicking "Resend email"         |
+| Success          | "Email verified — continue to setup" |
+| Error            | "This link expired" + Send new link  |
+| Already verified | Banner + Continue button             |
 
 ### 5.3 `/login`
 
-| State | Surface |
-|---|---|
-| Default | Form (§2.3) |
-| Loading | Submit spinner |
-| Error | Inline "Email or password doesn't match." |
-| Unverified email | Warning panel + Resend |
-| MFA required | Redirect to `/login/verify-mfa` |
-| Locked | "Too many attempts" |
-| Session resume | Redirect to ROLE_HOME |
+| State            | Surface                                   |
+| ---------------- | ----------------------------------------- |
+| Default          | Form (§2.3)                               |
+| Loading          | Submit spinner                            |
+| Error            | Inline "Email or password doesn't match." |
+| Unverified email | Warning panel + Resend                    |
+| MFA required     | Redirect to `/login/verify-mfa`           |
+| Locked           | "Too many attempts"                       |
+| Session resume   | Redirect to ROLE_HOME                     |
 
 ### 5.4 `/parent/consent` (overview + per-type detail dialog)
 
-| State | Surface |
-|---|---|
-| Default | List of consent rows (§3.3) |
-| Loading | Row-level skeleton on each toggle action |
-| Empty | n/a (always at least Terms + Privacy) |
-| Error | Inline error on the row + retry; per `consent-toggle.tsx` today |
-| Success | Toggle position updates + toast "Saved" |
+| State   | Surface                                                                                      |
+| ------- | -------------------------------------------------------------------------------------------- |
+| Default | List of consent rows (§3.3)                                                                  |
+| Loading | Row-level skeleton on each toggle action                                                     |
+| Empty   | n/a (always at least Terms + Privacy)                                                        |
+| Error   | Inline error on the row + retry; per `consent-toggle.tsx` today                              |
+| Success | Toggle position updates + toast "Saved"                                                      |
 | Revoked | Status pill flips + cascade note inline ("Some features will turn off — see your learners.") |
 
 ### 5.5 `/parent/consent/[learnerId]`
@@ -341,28 +346,28 @@ Six-digit code, 30s resend cooldown, `Use backup code` link, `Trust this device`
 
 All under the unified app (UX-01 §7). Required:
 
-| Route | Purpose | States |
-|---|---|---|
-| `/welcome` | Pre-auth intro | default, "already have an account" |
-| `/(auth)/login` | Login | same as web |
-| `/(auth)/signup` | Signup | same as web |
-| `/(auth)/verify-mfa` | MFA | same as web |
-| `/(auth)/pin` | Learner-mode PIN unlock | default, wrong-PIN (locked after 3), "set new PIN" first-time |
-| `/(auth)/forgot-password` | Request reset | same as web |
-| `/(auth)/reset-password` | Token consume | same as web |
-| `/role-chooser` | After login, when >1 role | default, only-one-role (auto-skip), no-roles (lock-out + support) |
-| `/role-switcher` | Drawer | default, role-unavailable warning if a delegated role was removed |
-| `/(parent)/lock` | Parent lock modal | enter PIN to leave Learner Mode |
+| Route                     | Purpose                   | States                                                            |
+| ------------------------- | ------------------------- | ----------------------------------------------------------------- |
+| `/welcome`                | Pre-auth intro            | default, "already have an account"                                |
+| `/(auth)/login`           | Login                     | same as web                                                       |
+| `/(auth)/signup`          | Signup                    | same as web                                                       |
+| `/(auth)/verify-mfa`      | MFA                       | same as web                                                       |
+| `/(auth)/pin`             | Learner-mode PIN unlock   | default, wrong-PIN (locked after 3), "set new PIN" first-time     |
+| `/(auth)/forgot-password` | Request reset             | same as web                                                       |
+| `/(auth)/reset-password`  | Token consume             | same as web                                                       |
+| `/role-chooser`           | After login, when >1 role | default, only-one-role (auto-skip), no-roles (lock-out + support) |
+| `/role-switcher`          | Drawer                    | default, role-unavailable warning if a delegated role was removed |
+| `/(parent)/lock`          | Parent lock modal         | enter PIN to leave Learner Mode                                   |
 
 ### 6.1 Mobile role protection states
 
-| Scenario | UI |
-|---|---|
-| Learner Mode tries to open Settings → Billing | Hidden from nav; deep link → Parent Lock modal |
-| Learner Mode session times out mid-lesson | "Your grown-up's sign-in expired. Tap to ask them to sign in." — preserves lesson state for resume |
-| Parent Mode unlocks Learner Mode | 5-minute trust window (`parent.unlocked` session flag); after that, Parent Lock reappears |
-| Switching to a removed role | `/role-switcher` shows "This role is no longer on your account. Sign out and sign in again." |
-| Deep link `aivo://parent/billing` while in Learner Mode | Parent Lock modal first; on success switch mode + navigate |
+| Scenario                                                | UI                                                                                                 |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Learner Mode tries to open Settings → Billing           | Hidden from nav; deep link → Parent Lock modal                                                     |
+| Learner Mode session times out mid-lesson               | "Your grown-up's sign-in expired. Tap to ask them to sign in." — preserves lesson state for resume |
+| Parent Mode unlocks Learner Mode                        | 5-minute trust window (`parent.unlocked` session flag); after that, Parent Lock reappears          |
+| Switching to a removed role                             | `/role-switcher` shows "This role is no longer on your account. Sign out and sign in again."       |
+| Deep link `aivo://parent/billing` while in Learner Mode | Parent Lock modal first; on success switch mode + navigate                                         |
 
 ### 6.2 Mobile protected learner handoff
 

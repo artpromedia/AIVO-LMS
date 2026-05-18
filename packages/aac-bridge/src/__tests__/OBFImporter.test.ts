@@ -5,9 +5,7 @@ import { dirname, join } from "path";
 import { parseOBF, validateOBF } from "../obf/OBFImporter.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const fixture = JSON.parse(
-  readFileSync(join(__dirname, "fixtures/sample.obf.json"), "utf-8"),
-);
+const fixture = JSON.parse(readFileSync(join(__dirname, "fixtures/sample.obf.json"), "utf-8"));
 
 describe("OBFImporter", () => {
   it("parses fixture OBF and returns a SymbolBoard with correct item count", () => {

@@ -21,7 +21,13 @@ export interface PrimarySlotProps {
   className?: string;
 }
 
-export function PrimarySlot({ action, loading, onStart, onBreak, className = "" }: PrimarySlotProps) {
+export function PrimarySlot({
+  action,
+  loading,
+  onStart,
+  onBreak,
+  className = "",
+}: PrimarySlotProps) {
   if (loading) {
     return (
       <div className={`max-w-2xl mx-auto px-6 py-8 text-center ${className}`}>
@@ -40,7 +46,9 @@ export function PrimarySlot({ action, loading, onStart, onBreak, className = "" 
   if (!action) {
     return (
       <div className={`max-w-2xl mx-auto px-6 py-8 text-center ${className}`}>
-        <div className="text-4xl mb-3" aria-hidden="true">🌟</div>
+        <div className="text-4xl mb-3" aria-hidden="true">
+          🌟
+        </div>
         <h2 className="text-xl font-heading font-bold text-slate-800">All caught up!</h2>
         <p className="text-slate-500 mt-1">Pick a tutor below to keep learning</p>
       </div>
@@ -58,7 +66,11 @@ export function PrimarySlot({ action, loading, onStart, onBreak, className = "" 
       >
         <p className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-1">Next Up</p>
         <div className="flex items-center justify-center gap-2 mb-2">
-          {action.tutorIcon && <span className="text-2xl" aria-hidden="true">{action.tutorIcon}</span>}
+          {action.tutorIcon && (
+            <span className="text-2xl" aria-hidden="true">
+              {action.tutorIcon}
+            </span>
+          )}
           <h2
             className="text-xl md:text-2xl font-heading font-bold"
             style={{ color: action.tutorColor || "#1E293B" }}
@@ -66,9 +78,7 @@ export function PrimarySlot({ action, loading, onStart, onBreak, className = "" 
             {action.title}
           </h2>
         </div>
-        {action.subtitle && (
-          <p className="text-slate-500 mb-4">{action.subtitle}</p>
-        )}
+        {action.subtitle && <p className="text-slate-500 mb-4">{action.subtitle}</p>}
         <div className="flex items-center justify-center gap-3 mt-4">
           <button
             onClick={onStart}

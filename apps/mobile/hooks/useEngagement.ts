@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
-import { apiFetch } from '@/lib/api';
-import { API } from '@/constants/api';
+import { useQuery } from "@tanstack/react-query";
+import { apiFetch } from "@/lib/api";
+import { API } from "@/constants/api";
 
 interface EngagementProfile {
   userId: string;
@@ -19,7 +19,7 @@ interface Badge {
   name: string;
   description: string;
   icon: string;
-  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+  rarity: "common" | "rare" | "epic" | "legendary";
   earnedAt: string;
 }
 
@@ -27,7 +27,7 @@ interface Challenge {
   id: string;
   title: string;
   description: string;
-  type: 'daily' | 'weekly' | 'multiplayer';
+  type: "daily" | "weekly" | "multiplayer";
   progress: number;
   target: number;
   reward: { xp: number; coins: number };
@@ -35,10 +35,10 @@ interface Challenge {
 
 export function useEngagement(userId: string) {
   return useQuery<EngagementProfile>({
-    queryKey: ['engagement', userId],
+    queryKey: ["engagement", userId],
     queryFn: async () => {
       const res = await apiFetch(API.ENGAGEMENT, `/api/engagement/profile/${userId}`);
-      if (!res.ok) throw new Error('Failed to fetch engagement');
+      if (!res.ok) throw new Error("Failed to fetch engagement");
       return res.json();
     },
     enabled: !!userId,
@@ -46,12 +46,12 @@ export function useEngagement(userId: string) {
   });
 }
 
-export function useLeaderboard(scope: 'class' | 'school' | 'global' = 'global') {
+export function useLeaderboard(scope: "class" | "school" | "global" = "global") {
   return useQuery({
-    queryKey: ['leaderboard', scope],
+    queryKey: ["leaderboard", scope],
     queryFn: async () => {
       const res = await apiFetch(API.ENGAGEMENT, `/api/engagement/leaderboard/${scope}`);
-      if (!res.ok) throw new Error('Failed to fetch leaderboard');
+      if (!res.ok) throw new Error("Failed to fetch leaderboard");
       return res.json();
     },
   });

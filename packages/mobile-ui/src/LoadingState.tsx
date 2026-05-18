@@ -1,13 +1,13 @@
-import React from 'react';
-import { View, ActivityIndicator, Text, StyleSheet } from 'react-native';
-import { theme } from './theme';
+import React from "react";
+import { View, ActivityIndicator, Text, StyleSheet } from "react-native";
+import { theme } from "./theme";
 
 interface LoadingStateProps {
   message?: string;
-  size?: 'small' | 'large';
+  size?: "small" | "large";
 }
 
-export function LoadingState({ message = 'Loading...', size = 'large' }: LoadingStateProps) {
+export function LoadingState({ message = "Loading...", size = "large" }: LoadingStateProps) {
   return (
     <View style={styles.container}>
       <ActivityIndicator size={size} color={theme.colors.primary} />
@@ -19,8 +19,8 @@ export function LoadingState({ message = 'Loading...', size = 'large' }: Loading
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     padding: theme.spacing.xl,
   },
   message: {

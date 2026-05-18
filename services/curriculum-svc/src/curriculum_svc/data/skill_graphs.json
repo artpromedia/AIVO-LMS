@@ -93,12 +93,7 @@
       "title": "K ELA Fall 2026",
       "subject": "ela",
       "gradeBand": "K",
-      "skillIds": [
-        "ccss.ela.k.rf.1",
-        "ccss.ela.k.rf.2",
-        "ccss.ela.k.rf.3",
-        "ccss.ela.k.rf.4"
-      ]
+      "skillIds": ["ccss.ela.k.rf.1", "ccss.ela.k.rf.2", "ccss.ela.k.rf.3", "ccss.ela.k.rf.4"]
     }
   ]
 }

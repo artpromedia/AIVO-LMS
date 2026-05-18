@@ -20,9 +20,7 @@ export default function AdminError({
       id="main"
       className="mx-auto flex min-h-[70vh] max-w-xl flex-col items-center justify-center px-6 py-16 text-center"
     >
-      <p className="text-sm font-medium uppercase tracking-wide text-aivo-danger">
-        Admin console
-      </p>
+      <p className="text-sm font-medium uppercase tracking-wide text-aivo-danger">Admin console</p>
       <h1 className="mt-2 font-display text-4xl font-bold">
         Something went wrong loading this page.
       </h1>
@@ -30,9 +28,7 @@ export default function AdminError({
         The error has been logged. Retry now or head back to the admin home.
       </p>
       {error.digest ? (
-        <p className="mt-2 text-xs text-aivo-muted">
-          Reference: {error.digest}
-        </p>
+        <p className="mt-2 text-xs text-aivo-muted">Reference: {error.digest}</p>
       ) : null}
       <div className="mt-6 flex gap-3">
         <Button onClick={() => reset()}>Try again</Button>

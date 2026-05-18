@@ -17,11 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getStore as db } from "@/lib/db/store";
-import {
-  getLearner,
-  getUserById,
-  parentCanAccessLearner,
-} from "@/lib/db/repos";
+import { getLearner, getUserById, parentCanAccessLearner } from "@/lib/db/repos";
 export const dynamic = "force-dynamic";
 
 const ROLE_LABEL: Record<string, string> = {
@@ -68,8 +64,8 @@ export default async function ParentTeamPage({
       rel.relation === "caregiver"
         ? "caregiver"
         : rel.relation === "guardian"
-        ? "guardian"
-        : "parent";
+          ? "guardian"
+          : "parent";
     members.set(u.id, {
       userId: u.id,
       displayName: u.displayName,
@@ -79,8 +75,8 @@ export default async function ParentTeamPage({
         rel.relation === "guardian"
           ? "Legal guardian"
           : rel.relation === "caregiver"
-          ? "Caregiver"
-          : "Parent",
+            ? "Caregiver"
+            : "Parent",
       isPrimary: rel.isPrimary,
     });
   }
@@ -89,10 +85,7 @@ export default async function ParentTeamPage({
   // so a roster row from another tenant cannot leak in if learner ids ever
   // overlap in the in-memory store.
   const learnerEnrollments = Array.from(store.enrollments.values()).filter(
-    (e) =>
-      e.tenantId === learner.tenantId &&
-      e.subjectId === learner.id &&
-      e.role === "learner",
+    (e) => e.tenantId === learner.tenantId && e.subjectId === learner.id && e.role === "learner",
   );
   for (const lEnr of learnerEnrollments) {
     const classroom = store.classrooms.get(lEnr.classroomId);
@@ -180,13 +173,15 @@ export default async function ParentTeamPage({
           <li>Parents and guardians have full access to all learner data.</li>
           <li>Teachers see classroom-scoped progress and may draft IEP goals.</li>
           <li>Therapists and caregivers see read-only summaries unless explicitly elevated.</li>
-          <li>Any member can be removed at any time from{" "}
+          <li>
+            Any member can be removed at any time from{" "}
             <Link
               href={`/parent/learners/${learner.id}/settings`}
               className="text-aivo-accent underline underline-offset-4"
             >
               learner settings
-            </Link>.
+            </Link>
+            .
           </li>
         </ul>
       </Card>

@@ -16,8 +16,7 @@ export default function ParentDataCenterPage() {
       <header>
         <h1 className="text-2xl font-bold">Your data</h1>
         <p className="text-sm text-gray-600">
-          Export or delete your learner's data. Every action is recorded in the
-          audit log.
+          Export or delete your learner's data. Every action is recorded in the audit log.
         </p>
       </header>
       <section className="space-y-2">

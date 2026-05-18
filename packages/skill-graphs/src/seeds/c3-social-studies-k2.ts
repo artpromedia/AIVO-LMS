@@ -21,7 +21,8 @@ export const c3SocialStudiesK2: SkillGraph = {
     {
       id: "c3.k2.D1.Q1",
       title: "Ask a compelling question about people or events",
-      description: "I can ask a big question about people, places, or things that happened long ago.",
+      description:
+        "I can ask a big question about people, places, or things that happened long ago.",
       subject: "social_studies",
       gradeBand: "K",
       frameworkRefs: [{ framework: "C3", code: "D1.1.K-2" }],
@@ -48,7 +49,8 @@ export const c3SocialStudiesK2: SkillGraph = {
     {
       id: "c3.k2.D3.Src.1",
       title: "Use a primary source as evidence",
-      description: "I can look at a photo, object, or short text and tell what it shows about long ago.",
+      description:
+        "I can look at a photo, object, or short text and tell what it shows about long ago.",
       subject: "social_studies",
       gradeBand: "K",
       frameworkRefs: [{ framework: "C3", code: "D3.1.K-2" }],
@@ -57,7 +59,8 @@ export const c3SocialStudiesK2: SkillGraph = {
     {
       id: "c3.k2.D4.Com.1",
       title: "Share what I learned about the past",
-      description: "I can draw, tell, or write what I learned about someone or something from history.",
+      description:
+        "I can draw, tell, or write what I learned about someone or something from history.",
       subject: "social_studies",
       gradeBand: "K",
       frameworkRefs: [{ framework: "C3", code: "D4.1.K-2" }],

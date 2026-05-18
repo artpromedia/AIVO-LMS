@@ -1,12 +1,9 @@
-import { useEffect } from 'react';
-import { router, type Href } from 'expo-router';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { useAuth } from '@/hooks/useAuth';
-import { colors } from '@/constants/colors';
-import {
-  getPendingDeepLink,
-  clearPendingDeepLink,
-} from '@/lib/pendingDeepLink';
+import { useEffect } from "react";
+import { router, type Href } from "expo-router";
+import { View, ActivityIndicator, StyleSheet } from "react-native";
+import { useAuth } from "@/hooks/useAuth";
+import { colors } from "@/constants/colors";
+import { getPendingDeepLink, clearPendingDeepLink } from "@/lib/pendingDeepLink";
 
 export default function Index() {
   const { isAuthenticated, isLoading, user, mustChangePassword } = useAuth();
@@ -15,7 +12,7 @@ export default function Index() {
     if (isLoading) return;
 
     if (!isAuthenticated || !user) {
-      router.replace('/(auth)/login');
+      router.replace("/(auth)/login");
       return;
     }
 
@@ -29,7 +26,7 @@ export default function Index() {
     // `(auth)/change-password.tsx` file exists, but `.expo/types/router.d.ts`
     // is regenerated only on dev/build, not on commit.
     if (mustChangePassword) {
-      router.replace('/(auth)/change-password' as Href);
+      router.replace("/(auth)/change-password" as Href);
       return;
     }
 
@@ -48,23 +45,23 @@ export default function Index() {
         return;
       }
       switch (user.role) {
-        case 'PARENT':
-          router.replace('/(parent)' as Href);
+        case "PARENT":
+          router.replace("/(parent)" as Href);
           break;
-        case 'LEARNER':
-          router.replace('/(learner)' as Href);
+        case "LEARNER":
+          router.replace("/(learner)" as Href);
           break;
-        case 'TEACHER':
-          router.replace('/(teacher)' as Href);
+        case "TEACHER":
+          router.replace("/(teacher)" as Href);
           break;
-        case 'CAREGIVER':
-          router.replace('/(caregiver)' as Href);
+        case "CAREGIVER":
+          router.replace("/(caregiver)" as Href);
           break;
-        case 'THERAPIST':
-          router.replace('/(therapist)' as Href);
+        case "THERAPIST":
+          router.replace("/(therapist)" as Href);
           break;
         default:
-          router.replace('/(auth)/login');
+          router.replace("/(auth)/login");
       }
     })();
     return () => {
@@ -82,8 +79,8 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: colors.background,
   },
 });

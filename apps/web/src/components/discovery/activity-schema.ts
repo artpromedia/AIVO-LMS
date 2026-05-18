@@ -7,10 +7,7 @@
  * this layer is the second line of defense for items that slip
  * through (fixture data, cached payloads, replay).
  */
-import type {
-  LearnerSurfaceSpec,
-  FeedbackMode,
-} from "@aivo/learner-surfaces";
+import type { LearnerSurfaceSpec, FeedbackMode } from "@aivo/learner-surfaces";
 
 export type ActivityInteraction =
   | "choice_grid"
@@ -73,7 +70,13 @@ export interface ValidatedDiscoveryActivity {
   prompt: string;
   tutorLine?: string;
   sceneEmoji?: string;
-  choices?: Array<{ id: string; label: string; emoji?: string; image?: string; isCorrect?: boolean }>;
+  choices?: Array<{
+    id: string;
+    label: string;
+    emoji?: string;
+    image?: string;
+    isCorrect?: boolean;
+  }>;
   surface?: LearnerSurfaceSpec;
   feedbackMode?: FeedbackMode;
   brainMeasures?: string[];
@@ -160,7 +163,10 @@ export function validateDiscoveryActivity(
     }
   }
 
-  if (activity.scoring && !["exact", "rubric", "process", "hybrid"].includes(activity.scoring.mode)) {
+  if (
+    activity.scoring &&
+    !["exact", "rubric", "process", "hybrid"].includes(activity.scoring.mode)
+  ) {
     return { ok: false, reason: `unsupported scoring mode: ${activity.scoring.mode}` };
   }
 

@@ -90,7 +90,9 @@ export default async function Page() {
 
       <Card className="mt-4 p-[var(--aivo-density-card-pad)]">
         <h2 className="font-display text-lg font-semibold">Subprocessors</h2>
-        <p className="text-sm text-aivo-ink-soft">Third parties AIVO uses to deliver the service.</p>
+        <p className="text-sm text-aivo-ink-soft">
+          Third parties AIVO uses to deliver the service.
+        </p>
         <ul className="mt-3 grid gap-2 sm:grid-cols-2">
           {subs.map((s) => (
             <li key={s.id} className="rounded border border-aivo-border p-3 text-sm">

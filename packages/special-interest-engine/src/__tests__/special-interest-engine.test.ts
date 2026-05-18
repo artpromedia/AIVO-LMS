@@ -8,13 +8,18 @@ import {
   type LearnerInterestProfile,
 } from "../index.js";
 
-const ISO = (daysAgo: number) =>
-  new Date(Date.now() - daysAgo * 86_400_000).toISOString();
+const ISO = (daysAgo: number) => new Date(Date.now() - daysAgo * 86_400_000).toISOString();
 
 const profile: LearnerInterestProfile = {
   learnerId: "learner-1",
   signals: [
-    { slug: "dinosaurs", source: "caregiver_intake", polarity: 1, confidence: 1, observedAt: ISO(7) },
+    {
+      slug: "dinosaurs",
+      source: "caregiver_intake",
+      polarity: 1,
+      confidence: 1,
+      observedAt: ISO(7),
+    },
     { slug: "trains", source: "engagement", polarity: 1, confidence: 0.6, observedAt: ISO(2) },
     { slug: "weather", source: "iep_signal", polarity: -1, confidence: 1, observedAt: ISO(30) },
   ],
@@ -39,13 +44,25 @@ describe("scoreInterests", () => {
     const old: LearnerInterestProfile = {
       learnerId: "x",
       signals: [
-        { slug: "dinosaurs", source: "caregiver_intake", polarity: 1, confidence: 1, observedAt: ISO(180) },
+        {
+          slug: "dinosaurs",
+          source: "caregiver_intake",
+          polarity: 1,
+          confidence: 1,
+          observedAt: ISO(180),
+        },
       ],
     };
     const fresh: LearnerInterestProfile = {
       learnerId: "x",
       signals: [
-        { slug: "dinosaurs", source: "caregiver_intake", polarity: 1, confidence: 1, observedAt: ISO(0) },
+        {
+          slug: "dinosaurs",
+          source: "caregiver_intake",
+          polarity: 1,
+          confidence: 1,
+          observedAt: ISO(0),
+        },
       ],
     };
     const oldScore = scoreInterests(old)[0].score;
@@ -64,7 +81,13 @@ describe("pickTheme", () => {
     const adult: LearnerInterestProfile = {
       learnerId: "x",
       signals: [
-        { slug: "trains", source: "caregiver_intake", polarity: 1, confidence: 1, observedAt: ISO(0) },
+        {
+          slug: "trains",
+          source: "caregiver_intake",
+          polarity: 1,
+          confidence: 1,
+          observedAt: ISO(0),
+        },
       ],
     };
     // Trains is age-banded PK / K-2 / 3-5 — 9-12 should miss.
@@ -76,7 +99,13 @@ describe("pickTheme", () => {
     const p: LearnerInterestProfile = {
       learnerId: "x",
       signals: [
-        { slug: "music", source: "caregiver_intake", polarity: 1, confidence: 1, observedAt: ISO(0) },
+        {
+          slug: "music",
+          source: "caregiver_intake",
+          polarity: 1,
+          confidence: 1,
+          observedAt: ISO(0),
+        },
       ],
     };
     const t = pickTheme(p, { excludeCautions: ["loud_audio"] });
@@ -97,7 +126,13 @@ describe("pickTheme", () => {
     const p: LearnerInterestProfile = {
       learnerId: "x",
       signals: [
-        { slug: "weather", source: "caregiver_intake", polarity: 1, confidence: 1, observedAt: ISO(0) },
+        {
+          slug: "weather",
+          source: "caregiver_intake",
+          polarity: 1,
+          confidence: 1,
+          observedAt: ISO(0),
+        },
         { slug: "weather", source: "self_report", polarity: -1, confidence: 1, observedAt: ISO(1) },
       ],
     };
@@ -111,12 +146,17 @@ describe("applyTheme", () => {
     let i = 0;
     const rng = () => [0, 0.3, 0.7][i++ % 3];
     const out = applyTheme("The {{noun}} likes to {{verb}}.", dinos, rng);
-    expect(out).toMatch(/^The (T-Rex|Triceratops|Stegosaurus|Brachiosaurus|Velociraptor|fossil|egg) likes to (stomp|roar|hatch|dig|spot)\.$/);
+    expect(out).toMatch(
+      /^The (T-Rex|Triceratops|Stegosaurus|Brachiosaurus|Velociraptor|fossil|egg) likes to (stomp|roar|hatch|dig|spot)\.$/,
+    );
   });
 
   it("uses a different noun for each {{noun}} placeholder when possible", () => {
     const dinos = SEED_THEMES.find((t) => t.slug === "dinosaurs")!;
-    const rng = (() => { let i = 0; return () => (i++ * 0.137) % 1; })();
+    const rng = (() => {
+      let i = 0;
+      return () => (i++ * 0.137) % 1;
+    })();
     const out = applyTheme("{{noun}} and {{noun}}", dinos, rng);
     const [a, b] = out.split(" and ");
     expect(a).not.toBe(b);
@@ -134,7 +174,9 @@ describe("resolveThemedAssetId", () => {
     expect(resolveThemedAssetId("character-1", dinos)).toBe("dinos/character-1");
   });
   it("returns null when the theme has no asset namespaces", () => {
-    expect(resolveThemedAssetId("character-1", { ...SEED_THEMES[0], assetNamespaces: [] })).toBeNull();
+    expect(
+      resolveThemedAssetId("character-1", { ...SEED_THEMES[0], assetNamespaces: [] }),
+    ).toBeNull();
   });
 });
 

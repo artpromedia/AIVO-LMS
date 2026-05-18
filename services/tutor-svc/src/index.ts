@@ -46,7 +46,9 @@ export async function buildApp() {
       info: { title: "AIVO Tutor Service", version: "1.0.0" },
       servers: process.env.SWAGGER_SERVER_URL
         ? [{ url: process.env.SWAGGER_SERVER_URL }]
-        : (process.env.NODE_ENV === "production" ? [] : [{ url: `http://localhost:${PORT}` }]),
+        : process.env.NODE_ENV === "production"
+          ? []
+          : [{ url: `http://localhost:${PORT}` }],
       components: {
         securitySchemes: { bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" } },
       },
@@ -86,7 +88,9 @@ async function start() {
 const isMain = (() => {
   try {
     return process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 })();
 if (isMain) {
   start().catch((err) => {

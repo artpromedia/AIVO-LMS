@@ -131,7 +131,9 @@ if (blockers.length) {
   console.log(
     `Production readiness check found ${blockers.length} blocker(s) but NODE_ENV is "${process.env.NODE_ENV ?? ""}".`,
   );
-  console.log("These MUST be resolved before a production build. Re-run with NODE_ENV=production or --strict to enforce.");
+  console.log(
+    "These MUST be resolved before a production build. Re-run with NODE_ENV=production or --strict to enforce.",
+  );
   process.exit(0);
 }
 

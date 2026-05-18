@@ -31,17 +31,51 @@ export default async function Page() {
   const vulns = listVulnerabilities();
 
   const implemented = controls.filter((c) => c.status === "implemented").length;
-  const openIncidents = incidents.filter((i) => i.status !== "resolved" && i.status !== "post_mortem").length;
+  const openIncidents = incidents.filter(
+    (i) => i.status !== "resolved" && i.status !== "post_mortem",
+  ).length;
   const openVulns = vulns.filter((v) => v.status === "open" || v.status === "triaged").length;
-  const openHighRisks = risks.filter((r) => r.open && (r.residualSeverity === "high" || r.residualSeverity === "critical")).length;
+  const openHighRisks = risks.filter(
+    (r) => r.open && (r.residualSeverity === "high" || r.residualSeverity === "critical"),
+  ).length;
 
   const tiles = [
-    { label: "Controls implemented", value: `${implemented}/${controls.length}`, href: "/admin/platform/security/controls", tone: implemented === controls.length ? "success" : "warning" },
-    { label: "Open incidents", value: String(openIncidents), href: "/admin/platform/security/incidents", tone: openIncidents === 0 ? "success" : "danger" },
-    { label: "Open vulnerabilities", value: String(openVulns), href: "/admin/platform/security/vulnerabilities", tone: openVulns === 0 ? "success" : "warning" },
-    { label: "High/critical risks", value: String(openHighRisks), href: "/admin/platform/security/risks", tone: openHighRisks === 0 ? "success" : "warning" },
-    { label: "Vendors on file", value: String(vendors.length), href: "/admin/platform/security/vendors", tone: "neutral" },
-    { label: "Privacy laws tracked", value: String(reqs.length), href: "/admin/platform/security/state-privacy", tone: "neutral" },
+    {
+      label: "Controls implemented",
+      value: `${implemented}/${controls.length}`,
+      href: "/admin/platform/security/controls",
+      tone: implemented === controls.length ? "success" : "warning",
+    },
+    {
+      label: "Open incidents",
+      value: String(openIncidents),
+      href: "/admin/platform/security/incidents",
+      tone: openIncidents === 0 ? "success" : "danger",
+    },
+    {
+      label: "Open vulnerabilities",
+      value: String(openVulns),
+      href: "/admin/platform/security/vulnerabilities",
+      tone: openVulns === 0 ? "success" : "warning",
+    },
+    {
+      label: "High/critical risks",
+      value: String(openHighRisks),
+      href: "/admin/platform/security/risks",
+      tone: openHighRisks === 0 ? "success" : "warning",
+    },
+    {
+      label: "Vendors on file",
+      value: String(vendors.length),
+      href: "/admin/platform/security/vendors",
+      tone: "neutral",
+    },
+    {
+      label: "Privacy laws tracked",
+      value: String(reqs.length),
+      href: "/admin/platform/security/state-privacy",
+      tone: "neutral",
+    },
   ] as const;
 
   return (
@@ -62,7 +96,15 @@ export default async function Page() {
             <Card className="flex h-full flex-col justify-between gap-3 p-4 transition group-hover:border-aivo-primary">
               <p className="text-sm font-medium text-aivo-ink-soft">{t.label}</p>
               <p className="font-display text-2xl font-semibold">{t.value}</p>
-              <Badge tone={t.tone}>{t.tone === "success" ? "Healthy" : t.tone === "danger" ? "Needs attention" : t.tone === "warning" ? "Watch" : "Tracked"}</Badge>
+              <Badge tone={t.tone}>
+                {t.tone === "success"
+                  ? "Healthy"
+                  : t.tone === "danger"
+                    ? "Needs attention"
+                    : t.tone === "warning"
+                      ? "Watch"
+                      : "Tracked"}
+              </Badge>
             </Card>
           </Link>
         ))}
@@ -75,7 +117,9 @@ export default async function Page() {
           <ul className="space-y-1 text-sm">
             {recent.map((l) => (
               <li key={l.id} className="flex justify-between gap-3">
-                <span className="font-mono text-xs text-aivo-ink-soft">{new Date(l.occurredAt).toLocaleString()}</span>
+                <span className="font-mono text-xs text-aivo-ink-soft">
+                  {new Date(l.occurredAt).toLocaleString()}
+                </span>
                 <span className="flex-1 truncate">{l.action}</span>
                 <span className="text-xs text-aivo-muted">{l.userId ?? "—"}</span>
               </li>

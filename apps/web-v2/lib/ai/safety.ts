@@ -34,36 +34,133 @@ type Pattern = { category: SafetyCategory; weight: number; regex: RegExp; slug: 
  */
 const RULES: Pattern[] = [
   // self-harm / crisis
-  { category: "self_harm", weight: 0.95, slug: "self_harm_phrase", regex: /\b(kill myself|end my life|want to die|hurt myself|cutting myself|suicid)/i },
-  { category: "self_harm", weight: 0.6, slug: "hopelessness", regex: /\b(nobody (loves|likes) me|no reason to live|i (hate|wish i wasn't) (alive|here))/i },
+  {
+    category: "self_harm",
+    weight: 0.95,
+    slug: "self_harm_phrase",
+    regex: /\b(kill myself|end my life|want to die|hurt myself|cutting myself|suicid)/i,
+  },
+  {
+    category: "self_harm",
+    weight: 0.6,
+    slug: "hopelessness",
+    regex: /\b(nobody (loves|likes) me|no reason to live|i (hate|wish i wasn't) (alive|here))/i,
+  },
   // violence
-  { category: "violence", weight: 0.9, slug: "violence_phrase", regex: /\b(shoot|stab|attack|beat up|bring a (gun|knife))/i },
+  {
+    category: "violence",
+    weight: 0.9,
+    slug: "violence_phrase",
+    regex: /\b(shoot|stab|attack|beat up|bring a (gun|knife))/i,
+  },
   // sexual content
-  { category: "sexual_content", weight: 0.9, slug: "sexual_phrase", regex: /\b(sex|porn|nude|naked photo|sexual)/i },
+  {
+    category: "sexual_content",
+    weight: 0.9,
+    slug: "sexual_phrase",
+    regex: /\b(sex|porn|nude|naked photo|sexual)/i,
+  },
   // adult-contact risk
-  { category: "adult_contact_risk", weight: 0.95, slug: "secret_adult", slugAlt: undefined as never, ...{ regex: /\b(meet me (in person|alone)|don'?t tell (your )?(mom|dad|parents|teacher)|our little secret)\b/i } as any },
+  {
+    category: "adult_contact_risk",
+    weight: 0.95,
+    slug: "secret_adult",
+    slugAlt: undefined as never,
+    ...({
+      regex:
+        /\b(meet me (in person|alone)|don'?t tell (your )?(mom|dad|parents|teacher)|our little secret)\b/i,
+    } as any),
+  },
   // bullying
-  { category: "bullying", weight: 0.7, slug: "bullying_phrase", regex: /\b(everybody hates|you'?re (stupid|dumb|ugly|fat|worthless)|kill yourself)\b/i },
+  {
+    category: "bullying",
+    weight: 0.7,
+    slug: "bullying_phrase",
+    regex: /\b(everybody hates|you'?re (stupid|dumb|ugly|fat|worthless)|kill yourself)\b/i,
+  },
   // hate/harassment (slurs use placeholder)
-  { category: "hate_or_harassment", weight: 0.8, slug: "hate_slur", regex: /\b(\[slur\]|retard(ed)?|n[\W_]*word)\b/i },
+  {
+    category: "hate_or_harassment",
+    weight: 0.8,
+    slug: "hate_slur",
+    regex: /\b(\[slur\]|retard(ed)?|n[\W_]*word)\b/i,
+  },
   // medical/legal advice
-  { category: "medical_or_legal_advice", weight: 0.7, slug: "medical_advice", regex: /\b(diagnose|prescribe|you have (autism|adhd|depression)|stop taking your (meds|medication)|sue them)\b/i },
+  {
+    category: "medical_or_legal_advice",
+    weight: 0.7,
+    slug: "medical_advice",
+    regex:
+      /\b(diagnose|prescribe|you have (autism|adhd|depression)|stop taking your (meds|medication)|sue them)\b/i,
+  },
   // prompt injection
-  { category: "prompt_injection", weight: 0.95, slug: "ignore_previous", regex: /\bignore (all )?(previous|prior|above) (instructions|rules)\b/i },
-  { category: "prompt_injection", weight: 0.9, slug: "system_override", regex: /\b(you are now|act as|pretend to be) (a |an )?(unfiltered|jailbroken|dan|developer mode)/i },
-  { category: "prompt_injection", weight: 0.85, slug: "role_takeover", regex: /\b(new (system|rules)|forget (everything|your role|instructions))\b/i },
-  { category: "prompt_injection", weight: 0.8, slug: "delimiter_injection", regex: /<\|?(system|im_start|im_end)\|?>/i },
+  {
+    category: "prompt_injection",
+    weight: 0.95,
+    slug: "ignore_previous",
+    regex: /\bignore (all )?(previous|prior|above) (instructions|rules)\b/i,
+  },
+  {
+    category: "prompt_injection",
+    weight: 0.9,
+    slug: "system_override",
+    regex:
+      /\b(you are now|act as|pretend to be) (a |an )?(unfiltered|jailbroken|dan|developer mode)/i,
+  },
+  {
+    category: "prompt_injection",
+    weight: 0.85,
+    slug: "role_takeover",
+    regex: /\b(new (system|rules)|forget (everything|your role|instructions))\b/i,
+  },
+  {
+    category: "prompt_injection",
+    weight: 0.8,
+    slug: "delimiter_injection",
+    regex: /<\|?(system|im_start|im_end)\|?>/i,
+  },
   // privacy leakage (best-effort)
-  { category: "privacy_leakage", weight: 0.6, slug: "phone", regex: /\b\d{3}[- .]?\d{3}[- .]?\d{4}\b/ },
-  { category: "privacy_leakage", weight: 0.6, slug: "email", regex: /\b[\w.+-]+@[\w-]+\.[a-z]{2,}\b/i },
+  {
+    category: "privacy_leakage",
+    weight: 0.6,
+    slug: "phone",
+    regex: /\b\d{3}[- .]?\d{3}[- .]?\d{4}\b/,
+  },
+  {
+    category: "privacy_leakage",
+    weight: 0.6,
+    slug: "email",
+    regex: /\b[\w.+-]+@[\w-]+\.[a-z]{2,}\b/i,
+  },
   { category: "privacy_leakage", weight: 0.8, slug: "ssn", regex: /\b\d{3}-\d{2}-\d{4}\b/ },
-  { category: "privacy_leakage", weight: 0.6, slug: "address", regex: /\b\d+\s+[A-Z][a-z]+\s+(St|Ave|Rd|Blvd|Ln|Dr)\b/ },
+  {
+    category: "privacy_leakage",
+    weight: 0.6,
+    slug: "address",
+    regex: /\b\d+\s+[A-Z][a-z]+\s+(St|Ave|Rd|Blvd|Ln|Dr)\b/,
+  },
   // academic cheating — learner asking tutor to just give the answer
-  { category: "academic_cheating", weight: 0.6, slug: "give_me_answer", regex: /\b(just (give|tell) me the answer|do my homework|write (this|my) (essay|paper) for me)\b/i },
+  {
+    category: "academic_cheating",
+    weight: 0.6,
+    slug: "give_me_answer",
+    regex:
+      /\b(just (give|tell) me the answer|do my homework|write (this|my) (essay|paper) for me)\b/i,
+  },
   // unsafe external link
-  { category: "unsafe_external_link", weight: 0.7, slug: "external_link", regex: /\bhttps?:\/\/(?!(aivolearning\.com|localhost|127\.0\.0\.1))[^\s]+/i },
+  {
+    category: "unsafe_external_link",
+    weight: 0.7,
+    slug: "external_link",
+    regex: /\bhttps?:\/\/(?!(aivolearning\.com|localhost|127\.0\.0\.1))[^\s]+/i,
+  },
   // diagnostic labeling (tutor output rule)
-  { category: "diagnostic_labeling", weight: 0.8, slug: "diagnosis", regex: /\b(you (are|have) (autistic|adhd|dyslexic|on the spectrum|bipolar))/i },
+  {
+    category: "diagnostic_labeling",
+    weight: 0.8,
+    slug: "diagnosis",
+    regex: /\b(you (are|have) (autistic|adhd|dyslexic|on the spectrum|bipolar))/i,
+  },
 ];
 
 // Workaround for the spread-construction quirk above:
@@ -78,7 +175,11 @@ RULES[4] = {
 const CRISIS_RULES: { category: CrisisSignal["category"]; regex: RegExp }[] = [
   { category: "self_harm", regex: /\b(kill myself|end my life|want to die|hurt myself|suicid)/i },
   { category: "harm_to_other", regex: /\b(want to (hurt|kill) (him|her|them|someone))/i },
-  { category: "abuse_disclosure", regex: /\b((dad|mom|uncle|aunt|brother|sister|teacher) (hits|hurts|touches) me|i('| a)m being (abused|hurt))/i },
+  {
+    category: "abuse_disclosure",
+    regex:
+      /\b((dad|mom|uncle|aunt|brother|sister|teacher) (hits|hurts|touches) me|i('| a)m being (abused|hurt))/i,
+  },
 ];
 
 // ---------- Default policy ----------
@@ -242,7 +343,8 @@ const TUTOR_RULE_PATTERNS: Record<string, RegExp> = {
   no_iep_leak: /\b(your iep (says|states)|according to your iep)\b/i,
   no_shame: /\b(you'?re (stupid|dumb|lazy|bad)|you should be ashamed)\b/i,
   no_secrecy: /\b(don'?t tell (your )?(mom|dad|parents|teacher)|keep this (between us|secret))\b/i,
-  no_unsafe_instructions: /\b(how to (make|build) (a )?(bomb|weapon|drug)|harm yourself|drink bleach)\b/i,
+  no_unsafe_instructions:
+    /\b(how to (make|build) (a )?(bomb|weapon|drug)|harm yourself|drink bleach)\b/i,
   // guide_not_answer fires when the tutor hands over a finished answer rather
   // than scaffolding. Heuristic: explicit "the answer is X" or "here is the
   // final answer" phrasing in tutor output.
@@ -290,9 +392,7 @@ export function validateLessonPlan(
 
 // ---------- Blocked-response fallback ----------
 
-export function blockedFallbackFor(
-  subjectKind: ClassifyContext["subjectKind"],
-): string {
+export function blockedFallbackFor(subjectKind: ClassifyContext["subjectKind"]): string {
   switch (subjectKind) {
     case "tutor_response":
     case "lesson_plan":

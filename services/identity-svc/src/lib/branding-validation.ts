@@ -37,16 +37,25 @@ export function parseLogoDataUrl(dataUrl: string): LogoCheck {
     return { ok: false, error: "Logo must be PNG or SVG" };
   }
   let buf: Buffer;
-  try { buf = Buffer.from(m[2], "base64"); }
-  catch { return { ok: false, error: "Invalid base64 payload" }; }
+  try {
+    buf = Buffer.from(m[2], "base64");
+  } catch {
+    return { ok: false, error: "Invalid base64 payload" };
+  }
   if (buf.length > MAX_LOGO_BYTES) {
-    return { ok: false, error: `Logo exceeds the 200KB size limit (got ${(buf.length / 1024).toFixed(0)}KB)` };
+    return {
+      ok: false,
+      error: `Logo exceeds the 200KB size limit (got ${(buf.length / 1024).toFixed(0)}KB)`,
+    };
   }
   if (mime === "image/png") {
     const dims = readPngDimensions(buf);
     if (!dims) return { ok: false, error: "Could not read PNG dimensions" };
     if (dims.w < MIN_LOGO_W || dims.h < MIN_LOGO_H) {
-      return { ok: false, error: `Logo must be at least ${MIN_LOGO_W}×${MIN_LOGO_H} pixels (got ${dims.w}×${dims.h})` };
+      return {
+        ok: false,
+        error: `Logo must be at least ${MIN_LOGO_W}×${MIN_LOGO_H} pixels (got ${dims.w}×${dims.h})`,
+      };
     }
     return { ok: true, mime: "image/png", bytes: buf.length, width: dims.w, height: dims.h };
   }
@@ -54,7 +63,10 @@ export function parseLogoDataUrl(dataUrl: string): LogoCheck {
   const dims = readSvgDimensions(buf.toString("utf8"));
   if (!dims) return { ok: false, error: "SVG must declare width/height or viewBox" };
   if (dims.w < MIN_LOGO_W || dims.h < MIN_LOGO_H) {
-    return { ok: false, error: `Logo must be at least ${MIN_LOGO_W}×${MIN_LOGO_H} (got ${dims.w}×${dims.h})` };
+    return {
+      ok: false,
+      error: `Logo must be at least ${MIN_LOGO_W}×${MIN_LOGO_H} (got ${dims.w}×${dims.h})`,
+    };
   }
   return { ok: true, mime: "image/svg+xml", bytes: buf.length, width: dims.w, height: dims.h };
 }
@@ -100,7 +112,11 @@ function hexToRgb(hex: string): [number, number, number] | null {
   const m = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(hex.trim());
   if (!m) return null;
   let h = m[1];
-  if (h.length === 3) h = h.split("").map((c) => c + c).join("");
+  if (h.length === 3)
+    h = h
+      .split("")
+      .map((c) => c + c)
+      .join("");
   return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
 }
 

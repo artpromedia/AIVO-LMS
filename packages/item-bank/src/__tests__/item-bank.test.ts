@@ -9,7 +9,11 @@ import {
   type ItemVariant,
 } from "../index.js";
 
-const variant = (id: string, weight: number, status: ItemVariant["status"] = "active"): ItemVariant => ({
+const variant = (
+  id: string,
+  weight: number,
+  status: ItemVariant["status"] = "active",
+): ItemVariant => ({
   id,
   itemId: "count-3",
   version: "1.0.0",

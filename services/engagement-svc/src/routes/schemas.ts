@@ -43,6 +43,16 @@ export const healthSchema = {
   response: { 200: healthResponseSchema },
 } as const;
 
+// Second route (/health) needs its own operationId so the OpenAPI spec
+// stays valid (operationIds must be unique) and the generated client
+// has distinct accessors for the two probe paths.
+export const probeHealthSchema = {
+  tags: ["Health"],
+  operationId: "engagementHealthProbe",
+  summary: "Service health probe (root liveness/readiness path)",
+  response: { 200: healthResponseSchema },
+} as const;
+
 export const challengesCreateSchema = {
   tags: ["Engagement"],
   operationId: "challengesCreate",
@@ -63,7 +73,12 @@ export const challengesByChallengeIdAnswerSchema = {
   tags: ["Engagement"],
   operationId: "challengesByChallengeIdAnswer",
   summary: "POST /api/engagement/challenges/:challengeId/answer",
-  params: { type: "object", required: ["challengeId"], additionalProperties: true, properties: { challengeId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["challengeId"],
+    additionalProperties: true,
+    properties: { challengeId: { type: "string" } },
+  },
   body: passthroughObject,
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
@@ -72,7 +87,12 @@ export const getChallengesByChallengeIdSchema = {
   tags: ["Engagement"],
   operationId: "getChallengesByChallengeId",
   summary: "GET /api/engagement/challenges/:challengeId",
-  params: { type: "object", required: ["challengeId"], additionalProperties: true, properties: { challengeId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["challengeId"],
+    additionalProperties: true,
+    properties: { challengeId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
 
@@ -80,7 +100,12 @@ export const getChallengesLearnerByLearnerIdSchema = {
   tags: ["Engagement"],
   operationId: "getChallengesLearnerByLearnerId",
   summary: "GET /api/engagement/challenges/learner/:learnerId",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughArray },
 } as const;
 
@@ -111,7 +136,12 @@ export const getLessonPlansLearnerByLearnerIdSchema = {
   tags: ["Engagement"],
   operationId: "getLessonPlansLearnerByLearnerId",
   summary: "GET /api/engagement/lesson-plans/learner/:learnerId",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughArray },
 } as const;
 
@@ -119,7 +149,12 @@ export const getLessonPlansByPlanIdSchema = {
   tags: ["Engagement"],
   operationId: "getLessonPlansByPlanId",
   summary: "GET /api/engagement/lesson-plans/:planId",
-  params: { type: "object", required: ["planId"], additionalProperties: true, properties: { planId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["planId"],
+    additionalProperties: true,
+    properties: { planId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
 
@@ -127,7 +162,12 @@ export const updateLessonPlansByPlanIdSchema = {
   tags: ["Engagement"],
   operationId: "updateLessonPlansByPlanId",
   summary: "PUT /api/engagement/lesson-plans/:planId",
-  params: { type: "object", required: ["planId"], additionalProperties: true, properties: { planId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["planId"],
+    additionalProperties: true,
+    properties: { planId: { type: "string" } },
+  },
   body: passthroughObject,
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
@@ -143,7 +183,12 @@ export const getQuestsWorldBySlugSchema = {
   tags: ["Engagement"],
   operationId: "getQuestsWorldBySlug",
   summary: "GET /api/engagement/quests/worlds/:slug",
-  params: { type: "object", required: ["slug"], additionalProperties: true, properties: { slug: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["slug"],
+    additionalProperties: true,
+    properties: { slug: { type: "string" } },
+  },
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
 
@@ -151,7 +196,12 @@ export const getQuestsByWorldKeySchema = {
   tags: ["Engagement"],
   operationId: "getQuestsByWorldKey",
   summary: "GET /api/engagement/quests/:worldKey",
-  params: { type: "object", required: ["worldKey"], additionalProperties: true, properties: { worldKey: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["worldKey"],
+    additionalProperties: true,
+    properties: { worldKey: { type: "string" } },
+  },
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
 
@@ -159,7 +209,12 @@ export const getQuestsChapterByQuestIdSchema = {
   tags: ["Engagement"],
   operationId: "getQuestsChapterByQuestId",
   summary: "GET /api/engagement/quests/chapter/:questId",
-  params: { type: "object", required: ["questId"], additionalProperties: true, properties: { questId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["questId"],
+    additionalProperties: true,
+    properties: { questId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
 
@@ -167,7 +222,12 @@ export const getQuestsProgressByLearnerIdSchema = {
   tags: ["Engagement"],
   operationId: "getQuestsProgressByLearnerId",
   summary: "GET /api/engagement/quests/progress/:learnerId",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughArray },
 } as const;
 
@@ -199,7 +259,12 @@ export const getSelCheckinsByLearnerIdSchema = {
   tags: ["Engagement"],
   operationId: "getSelCheckinsByLearnerId",
   summary: "GET /api/engagement/sel/checkins/:learnerId",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughArray, 403: errorResponse },
 } as const;
 
@@ -207,7 +272,12 @@ export const getSelExercisesByEmotionSchema = {
   tags: ["Engagement"],
   operationId: "getSelExercisesByEmotion",
   summary: "GET /api/engagement/sel/exercises/:emotion",
-  params: { type: "object", required: ["emotion"], additionalProperties: true, properties: { emotion: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["emotion"],
+    additionalProperties: true,
+    properties: { emotion: { type: "string" } },
+  },
   response: { 200: passthroughArray },
 } as const;
 
@@ -231,7 +301,12 @@ export const getBreaksByLearnerIdSchema = {
   tags: ["Engagement"],
   operationId: "getBreaksByLearnerId",
   summary: "GET /api/engagement/breaks/:learnerId",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughArray, 403: errorResponse },
 } as const;
 
@@ -246,7 +321,12 @@ export const getShopInventoryByLearnerIdSchema = {
   tags: ["Engagement"],
   operationId: "getShopInventoryByLearnerId",
   summary: "GET /api/engagement/shop/inventory/:learnerId",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughArray, 403: errorResponse },
 } as const;
 
@@ -278,7 +358,12 @@ export const getSiblingsByLearnerIdSchema = {
   tags: ["Engagement"],
   operationId: "getSiblingsByLearnerId",
   summary: "GET /api/engagement/siblings/:learnerId",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse },
 } as const;
 
@@ -286,7 +371,12 @@ export const getSiblingsByLearnerIdLeaderboardSchema = {
   tags: ["Engagement"],
   operationId: "getSiblingsByLearnerIdLeaderboard",
   summary: "GET /api/engagement/siblings/:learnerId/leaderboard",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughArray, 403: errorResponse },
 } as const;
 
@@ -310,7 +400,12 @@ export const getProfileByLearnerIdSchema = {
   tags: ["Engagement"],
   operationId: "getProfileByLearnerId",
   summary: "GET /api/engagement/profile/:learnerId",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse },
 } as const;
 
@@ -342,7 +437,12 @@ export const getLeaderboardByScopeSchema = {
   tags: ["Engagement"],
   operationId: "getLeaderboardByScope",
   summary: "GET /api/engagement/leaderboard/:scope",
-  params: { type: "object", required: ["scope"], additionalProperties: true, properties: { scope: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["scope"],
+    additionalProperties: true,
+    properties: { scope: { type: "string" } },
+  },
   querystring: { type: "object", additionalProperties: true, properties: {} },
   response: { 200: passthroughArray, 400: errorResponse, 403: errorResponse },
 } as const;
@@ -351,6 +451,11 @@ export const getCurrencyByLearnerIdSchema = {
   tags: ["Engagement"],
   operationId: "getCurrencyByLearnerId",
   summary: "GET /api/engagement/currency/:learnerId",
-  params: { type: "object", required: ["learnerId"], additionalProperties: true, properties: { learnerId: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["learnerId"],
+    additionalProperties: true,
+    properties: { learnerId: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse },
 } as const;

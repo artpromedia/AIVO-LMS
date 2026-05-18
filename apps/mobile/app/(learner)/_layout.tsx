@@ -1,12 +1,12 @@
-import React from 'react';
-import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useLearners } from '@/hooks/useLearners';
-import { useAuth } from '@/hooks/useAuth';
-import { TierThemeProvider, useTierTheme } from '@aivo/mobile-ui';
-import { SwitchScanOverlay } from '@/src/components/SwitchScanOverlay';
-import { useWindowSizeClass } from '@/src/design/useWindowSizeClass';
+import React from "react";
+import { Tabs } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useLearners } from "@/hooks/useLearners";
+import { useAuth } from "@/hooks/useAuth";
+import { TierThemeProvider, useTierTheme } from "@aivo/mobile-ui";
+import { SwitchScanOverlay } from "@/src/components/SwitchScanOverlay";
+import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 
 /**
  * Resolve the active learner's gradeLevel.
@@ -19,7 +19,7 @@ function useActiveLearnerGrade(): string | null {
   const { user } = useAuth();
   const { data: learners } = useLearners();
   if (!learners || learners.length === 0) return null;
-  if (user?.role === 'LEARNER') {
+  if (user?.role === "LEARNER") {
     const own = learners.find((l) => l.id === user.id);
     return own?.gradeLevel ?? learners[0].gradeLevel ?? null;
   }
@@ -31,12 +31,12 @@ function useSwitchScanningEnabled(): boolean {
   const { user } = useAuth();
   const { data: learners } = useLearners();
   const accommodations: string[] = (() => {
-    if (user?.role === 'LEARNER') {
+    if (user?.role === "LEARNER") {
       return (user as any).activeAccommodations ?? [];
     }
     return (learners?.[0] as any)?.activeAccommodations ?? [];
   })();
-  return accommodations.includes('switch_scanning');
+  return accommodations.includes("switch_scanning");
 }
 
 export default function LearnerLayout() {
@@ -71,7 +71,7 @@ function ThemedLearnerTabs() {
         tabBarActiveTintColor: theme.colors.tabBarActive,
         tabBarInactiveTintColor: theme.colors.tabBarInactive,
         tabBarStyle: isTablet
-          ? { display: 'none' }
+          ? { display: "none" }
           : {
               backgroundColor: theme.colors.tabBar,
               borderTopColor: theme.colors.border,
@@ -80,7 +80,7 @@ function ThemedLearnerTabs() {
               paddingTop: 8,
             },
         tabBarLabelStyle: {
-          fontFamily: 'Nunito-SemiBold',
+          fontFamily: "Nunito-SemiBold",
           fontSize: 11,
         },
         sceneStyle: {
@@ -91,28 +91,28 @@ function ThemedLearnerTabs() {
       <Tabs.Screen
         name="index"
         options={{
-          title: t('tabs.worldMap'),
+          title: t("tabs.worldMap"),
           tabBarIcon: ({ color, size }) => <Ionicons name="map" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="brain"
         options={{
-          title: t('tabs.brain'),
+          title: t("tabs.brain"),
           tabBarIcon: ({ color, size }) => <Ionicons name="bulb" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="shop"
         options={{
-          title: t('tabs.shop'),
+          title: t("tabs.shop"),
           tabBarIcon: ({ color, size }) => <Ionicons name="cart" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="gamification"
         options={{
-          title: t('tabs.profile'),
+          title: t("tabs.profile"),
           tabBarIcon: ({ color, size }) => <Ionicons name="trophy" size={size} color={color} />,
         }}
       />

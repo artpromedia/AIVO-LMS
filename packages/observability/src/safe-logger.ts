@@ -101,7 +101,10 @@ export function redactForLogging(
         if (entry && typeof entry === "object") {
           return redactForLogging(entry as Record<string, unknown>);
         }
-        if (typeof entry === "string" && (valueLooksSensitive(entry) || entry.length > MAX_STRING_LENGTH)) {
+        if (
+          typeof entry === "string" &&
+          (valueLooksSensitive(entry) || entry.length > MAX_STRING_LENGTH)
+        ) {
           return valueLooksSensitive(entry)
             ? "[redacted]"
             : `${entry.slice(0, MAX_STRING_LENGTH)}…`;

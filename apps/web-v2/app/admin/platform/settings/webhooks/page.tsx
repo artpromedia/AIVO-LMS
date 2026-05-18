@@ -6,10 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
 import { listPlatformWebhookEndpoints } from "@/lib/db/repos";
-import type {
-  PlatformWebhookDeliveryStatus,
-  PlatformWebhookStatus,
-} from "@/lib/db/types";
+import type { PlatformWebhookDeliveryStatus, PlatformWebhookStatus } from "@/lib/db/types";
 
 export const dynamic = "force-dynamic";
 
@@ -18,10 +15,7 @@ const STATUS_TONE: Record<PlatformWebhookStatus, "success" | "neutral"> = {
   disabled: "neutral",
 };
 
-const DELIVERY_TONE: Record<
-  PlatformWebhookDeliveryStatus,
-  "success" | "warning" | "danger"
-> = {
+const DELIVERY_TONE: Record<PlatformWebhookDeliveryStatus, "success" | "warning" | "danger"> = {
   success: "success",
   pending: "warning",
   failed: "danger",
@@ -69,9 +63,7 @@ export default async function Page() {
       <div className="grid gap-4 md:grid-cols-4">
         {stats.map((s) => (
           <Card key={s.k} className="p-[var(--aivo-density-card-pad)]">
-            <p className="text-xs uppercase tracking-wide text-aivo-ink-soft">
-              {s.k}
-            </p>
+            <p className="text-xs uppercase tracking-wide text-aivo-ink-soft">{s.k}</p>
             <p className="mt-2 font-display text-3xl font-semibold">{s.v}</p>
           </Card>
         ))}
@@ -100,9 +92,7 @@ export default async function Page() {
                 <tr key={h.id} className="hover:bg-aivo-surface-2/40">
                   <td className="px-4 py-3">
                     <div className="font-mono text-xs">{h.url}</div>
-                    <div className="mt-1 text-xs text-aivo-ink-soft">
-                      {h.description}
-                    </div>
+                    <div className="mt-1 text-xs text-aivo-ink-soft">{h.description}</div>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-wrap gap-1">
@@ -123,22 +113,16 @@ export default async function Page() {
                     <Badge tone={STATUS_TONE[h.status]}>{h.status}</Badge>
                   </td>
                   <td className="px-4 py-3 text-xs">
-                    <div className="text-aivo-ink-soft">
-                      {relativeTime(h.lastDeliveryAt)}
-                    </div>
+                    <div className="text-aivo-ink-soft">{relativeTime(h.lastDeliveryAt)}</div>
                     {h.lastStatus ? (
-                      <Badge tone={DELIVERY_TONE[h.lastStatus]}>
-                        {h.lastStatus}
-                      </Badge>
+                      <Badge tone={DELIVERY_TONE[h.lastStatus]}>{h.lastStatus}</Badge>
                     ) : (
                       <span className="text-aivo-ink-soft">—</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-right tabular-nums">
                     {h.failureCount > 0 ? (
-                      <span className="text-aivo-danger">
-                        {h.failureCount.toLocaleString()}
-                      </span>
+                      <span className="text-aivo-danger">{h.failureCount.toLocaleString()}</span>
                     ) : (
                       <span className="text-aivo-ink-soft">0</span>
                     )}

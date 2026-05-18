@@ -37,28 +37,20 @@ const TUTOR_GREETING_BY_STYLE: Record<
   structured_mentor: (n) => `Hello ${n}. Here's our plan: warm-up, try, check, win.`,
 };
 
-function modalityScaffold(
-  modalities: LearnerBrainProfileState["preferredModalities"],
-): string {
+function modalityScaffold(modalities: LearnerBrainProfileState["preferredModalities"]): string {
   if (modalities.includes("visual")) return "I'll show pictures as we go.";
   if (modalities.includes("auditory")) return "I'll read each step out loud.";
-  if (modalities.includes("kinesthetic"))
-    return "We'll use small actions you can do at your desk.";
+  if (modalities.includes("kinesthetic")) return "We'll use small actions you can do at your desk.";
   return "I'll explain each step clearly before you try.";
 }
 
-function accommodationSupportLines(
-  acc: LessonAccommodationSnapshot,
-): string[] {
+function accommodationSupportLines(acc: LessonAccommodationSnapshot): string[] {
   const out: string[] = [];
   if (acc.supportDefaults.extendedTime) out.push("Take all the time you need.");
   if (acc.supportDefaults.readAloud) out.push("Each question can be read aloud.");
-  if (acc.supportDefaults.speechToText)
-    out.push("You can speak your answer if writing is tricky.");
-  if (acc.supportDefaults.visualSchedules)
-    out.push("A small checklist will show what's next.");
-  if (acc.supportDefaults.sensoryBreaks)
-    out.push("A quiet break is one tap away.");
+  if (acc.supportDefaults.speechToText) out.push("You can speak your answer if writing is tricky.");
+  if (acc.supportDefaults.visualSchedules) out.push("A small checklist will show what's next.");
+  if (acc.supportDefaults.sensoryBreaks) out.push("A quiet break is one tap away.");
   if (acc.accessibility.captionsAlwaysOn) out.push("Captions stay on.");
   if (acc.accessibility.largeText) out.push("Text is shown larger.");
   if (acc.accessibility.reducedMotion) out.push("Movement is kept gentle.");
@@ -222,16 +214,11 @@ export type LessonPlanInputs = {
   source: string;
 };
 
-export function generateDeterministicLessonPlan(
-  input: LessonPlanInputs,
-): GeneratedLessonPlanInput {
-  const { learnerName, brainState, subject, skill, mastery, accommodations } =
-    input;
-  const tutorPersona =
-    TUTOR_PERSONA_BY_SUBJECT[subject.slug] ?? "Nimbus the Calm Explorer";
-  const greeting = TUTOR_GREETING_BY_STYLE[
-    brainState.tutorPersonaRecommendation.style
-  ](learnerName);
+export function generateDeterministicLessonPlan(input: LessonPlanInputs): GeneratedLessonPlanInput {
+  const { learnerName, brainState, subject, skill, mastery, accommodations } = input;
+  const tutorPersona = TUTOR_PERSONA_BY_SUBJECT[subject.slug] ?? "Nimbus the Calm Explorer";
+  const greeting =
+    TUTOR_GREETING_BY_STYLE[brainState.tutorPersonaRecommendation.style](learnerName);
   const tier = difficultyTierForLevel(mastery.level);
 
   const supports = accommodationSupportLines(accommodations);

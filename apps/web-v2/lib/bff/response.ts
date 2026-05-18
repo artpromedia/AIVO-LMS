@@ -25,7 +25,11 @@ export function getRequestId(req: Request): string {
   return req.headers.get("x-request-id") || newRequestId();
 }
 
-export function ok<T>(data: T, requestId: string, init?: ResponseInit): NextResponse<BffSuccess<T>> {
+export function ok<T>(
+  data: T,
+  requestId: string,
+  init?: ResponseInit,
+): NextResponse<BffSuccess<T>> {
   return NextResponse.json<BffSuccess<T>>(
     { ok: true, data, requestId },
     {

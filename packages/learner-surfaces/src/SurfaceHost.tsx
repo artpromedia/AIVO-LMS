@@ -24,16 +24,46 @@ export function SurfaceHost({ surface, disabled = false, onSubmit, onEvent }: Su
 
   switch (surface.type) {
     case "choice_grid":
-      return <ChoiceGridSurface surface={surface} disabled={disabled} onSubmit={onSubmit} onEvent={onEvent} />;
+      return (
+        <ChoiceGridSurface
+          surface={surface}
+          disabled={disabled}
+          onSubmit={onSubmit}
+          onEvent={onEvent}
+        />
+      );
     case "scratchpad":
-      return <ScratchpadSurface surface={surface} disabled={disabled} onSubmit={onSubmit} onEvent={onEvent} />;
+      return (
+        <ScratchpadSurface
+          surface={surface}
+          disabled={disabled}
+          onSubmit={onSubmit}
+          onEvent={onEvent}
+        />
+      );
     case "geometry_workspace":
-      return <GeometrySurface surface={surface} disabled={disabled} onSubmit={onSubmit} onEvent={onEvent} />;
+      return (
+        <GeometrySurface
+          surface={surface}
+          disabled={disabled}
+          onSubmit={onSubmit}
+          onEvent={onEvent}
+        />
+      );
     case "math_expression":
-      return <MathExpressionSurface surface={surface} disabled={disabled} onSubmit={onSubmit} onEvent={onEvent} />;
+      return (
+        <MathExpressionSurface
+          surface={surface}
+          disabled={disabled}
+          onSubmit={onSubmit}
+          onEvent={onEvent}
+        />
+      );
     default: {
       if (!unsupportedRef.current) {
-        onEvent?.(createSurfaceEvent(surface.id, "unsupported_surface", { unsupportedType: surface.type }));
+        onEvent?.(
+          createSurfaceEvent(surface.id, "unsupported_surface", { unsupportedType: surface.type }),
+        );
         unsupportedRef.current = true;
       }
 

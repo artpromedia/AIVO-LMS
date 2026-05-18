@@ -194,6 +194,7 @@ A prominent card on the parent dashboard showing:
 **The Brain visualization** — the same cross-section view from the Building Sequence, with grade ladders per domain, accommodation ring, and goal paths. This is interactive: the parent can tap any compartment to drill into that domain's detail.
 
 **Grade-level summary at a glance:**
+
 - Reading: Grade 3.2 (enrolled 6) with a small progress arrow showing movement since last week
 - Math: Grade 4.5 (enrolled 6) with progress arrow
 - Science: Grade 5.1 (enrolled 6) with progress arrow
@@ -242,24 +243,31 @@ From this point forward, the child can open their Brain at any time to see their
 ## Technical Implementation
 
 ### Rendering
+
 The brain shape is a pre-designed SVG asset with named regions (compartments) that the rendering engine fills programmatically based on domain scores. Grade ladders are rendered as vertical SVG paths with markers positioned by grade-equivalent values. The accommodation ring is a circular layout of card components. Goal stepping stones are animated SVG paths with stroke-dashoffset animation. All rendering uses the same GPU-accelerated engine as The Stage (Pixi.js for web, Flutter CustomPainter for mobile).
 
 ### Data Flow
+
 The animation controller receives the full assessment.baseline.completed payload. It begins the animation immediately while the backend clone pipeline runs. Stage 5 (System Activation) is timed to coincide with the actual brain_states INSERT. If the backend completes faster, the remaining stages are presentational. If slower (rare, target under 10 seconds), Stage 5 extends its pulse animation until the brain.cloned NATS event is received.
 
 ### Rebuild Cycle
+
 When the parent taps "Add Context and Rebuild," the parent's context is submitted to assessment-svc as a parent_context_update event. brain-svc receives the updated context, re-runs the clone pipeline with modified weights and injected insights, and publishes a new brain.cloned event. The Building Sequence replays on the parent's screen with updated data. The diff from the previous build is highlighted: compartments that changed level show a brief animation of the marker moving, new accommodations glow to draw attention, and removed accommodations fade out.
 
 ### Personalization Parameters
+
 The animation is parameterized by: domainScores (determines fill levels and grade-equivalent labels per compartment), strongestDomain (determines tutor connections emphasis), functioningLevel (determines template label and accommodation set), activeAccommodations (determines which cards appear in the ring with evidence text), iepGoals (determines star pins and goal text on ladders), sensoryProfile (determines sensory accommodation cards), childName and gradeLevel (injected into labels and captions), and parentContext (any previous parent-submitted insights, shown as a distinct layer in the Brain).
 
 ### Parent Dashboard Persistence
+
 After approval, the Brain visualization components are embedded in the parent dashboard as a permanent, real-time-updating section. The grade ladders poll brain-svc for mastery updates every time the parent opens the dashboard (or receive push updates via WebSocket for real-time viewing during active sessions). The Brain version history is backed by brain_state_snapshots in PostgreSQL. The recommendation inbox is driven by brain_recommendations with status tracking.
 
 ### Asset Budget
+
 Total assets for the Building Sequence: brain shape SVG (50KB), grade ladder components (100KB), accommodation card templates (80KB), stepping stone icons (120KB), tutor character thumbnails (200KB), ambient sound (150KB). Total: approximately 700KB, loaded during the Discovery Adventure results processing so there is zero delay when the Building Sequence starts.
 
 ### Accessibility
+
 Screen reader users hear each stage announced: "Selecting Brain template for Grade 6. Loading reading level: Grade 3.2. Loading math level: Grade 4.5. Adding accommodations: extended time, audio narration. Mapping goals. Brain activated." The three action buttons (Approve, Add Context, Start Over) are fully accessible with clear ARIA labels and keyboard navigation. The context form supports voice input for parents who prefer speaking over typing.
 
 ---

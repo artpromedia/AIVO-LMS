@@ -10,48 +10,44 @@ export const READINESS_LABEL: Record<ReadinessState, string> = {
   active_learning: "Active learning",
 };
 
-export const READINESS_TONE: Record<
-  ReadinessState,
-  "neutral" | "warning" | "primary" | "success"
-> = {
-  profile_created: "neutral",
-  assessment_needed: "warning",
-  iep_optional: "primary",
-  baseline_needed: "primary",
-  ready_for_today_mission: "success",
-  active_learning: "success",
-};
+export const READINESS_TONE: Record<ReadinessState, "neutral" | "warning" | "primary" | "success"> =
+  {
+    profile_created: "neutral",
+    assessment_needed: "warning",
+    iep_optional: "primary",
+    baseline_needed: "primary",
+    ready_for_today_mission: "success",
+    active_learning: "success",
+  };
 
 /** What the parent should do next for this learner. Always actionable, never dead. */
-export const READINESS_NEXT_STEP: Record<
-  ReadinessState,
-  { label: string; hrefTemplate: string }
-> = {
-  profile_created: {
-    label: "Start parent assessment",
-    hrefTemplate: "/parent/learners/{learnerId}/assessment",
-  },
-  assessment_needed: {
-    label: "Continue parent assessment",
-    hrefTemplate: "/parent/learners/{learnerId}/assessment",
-  },
-  iep_optional: {
-    label: "Add an IEP or skip",
-    hrefTemplate: "/parent/learners/{learnerId}/iep",
-  },
-  baseline_needed: {
-    label: "Start baseline assessment",
-    hrefTemplate: "/parent/learners/{learnerId}/baseline",
-  },
-  ready_for_today_mission: {
-    label: "Open today's mission",
-    hrefTemplate: "/parent/learners/{learnerId}",
-  },
-  active_learning: {
-    label: "See growth report",
-    hrefTemplate: "/parent/learners/{learnerId}",
-  },
-};
+export const READINESS_NEXT_STEP: Record<ReadinessState, { label: string; hrefTemplate: string }> =
+  {
+    profile_created: {
+      label: "Start parent assessment",
+      hrefTemplate: "/parent/learners/{learnerId}/assessment",
+    },
+    assessment_needed: {
+      label: "Continue parent assessment",
+      hrefTemplate: "/parent/learners/{learnerId}/assessment",
+    },
+    iep_optional: {
+      label: "Add an IEP or skip",
+      hrefTemplate: "/parent/learners/{learnerId}/iep",
+    },
+    baseline_needed: {
+      label: "Start baseline assessment",
+      hrefTemplate: "/parent/learners/{learnerId}/baseline",
+    },
+    ready_for_today_mission: {
+      label: "Open today's mission",
+      hrefTemplate: "/parent/learners/{learnerId}",
+    },
+    active_learning: {
+      label: "See growth report",
+      hrefTemplate: "/parent/learners/{learnerId}",
+    },
+  };
 
 export function nextStepFor(learner: Pick<LearnerProfile, "id" | "readinessState">) {
   const tpl = READINESS_NEXT_STEP[learner.readinessState];
@@ -80,8 +76,7 @@ export function computeReadinessFor(learnerId: string, tenantId: string): Readin
   // Sprint 6: parent's explicit decision on the optional IEP step.
   const iepDecided = hasIep || learner.iepDecision === "skipped";
   const baseline = Array.from(store.baselineAssessments.values()).find(
-    (b) =>
-      b.learnerId === learnerId && b.tenantId === tenantId && b.status === "complete",
+    (b) => b.learnerId === learnerId && b.tenantId === tenantId && b.status === "complete",
   );
   const lessonRunCount = Array.from(store.lessonRuns.values()).filter(
     (l) => l.learnerId === learnerId && l.tenantId === tenantId,

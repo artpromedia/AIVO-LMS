@@ -41,7 +41,9 @@ export function WelcomeHero({ userName, unreadCount }: WelcomeHeroProps) {
     <div className="relative overflow-hidden vi-card p-6 lg:p-8">
       <div className="flex items-start justify-between gap-4 relative z-10">
         <div className="flex items-center gap-4">
-          <div className={`w-14 h-14 rounded-2xl vi-surface-soft shadow-sm flex items-center justify-center ${iconColor} shrink-0`}>
+          <div
+            className={`w-14 h-14 rounded-2xl vi-surface-soft shadow-sm flex items-center justify-center ${iconColor} shrink-0`}
+          >
             <Icon size={28} strokeWidth={2.5} aria-hidden="true" />
           </div>
           <div>

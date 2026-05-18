@@ -18,10 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LearnerAvatar } from "@/components/learner/learner-avatar";
 import { listLearnersForParent } from "@/lib/db/repos";
-import {
-  ACTIVE_LEARNER_COOKIE,
-  verifyActiveLearner,
-} from "@/lib/auth/active-learner";
+import { ACTIVE_LEARNER_COOKIE, verifyActiveLearner } from "@/lib/auth/active-learner";
 
 async function chooseLearner(formData: FormData) {
   "use server";
@@ -106,17 +103,13 @@ export default async function LearnerSelectPage({
                 <Card className="flex items-center gap-4 p-[var(--aivo-density-card-pad)] transition hover:border-aivo-primary hover:shadow-md">
                   <LearnerAvatar name={l.displayName} size="lg" />
                   <div className="flex-1">
-                    <p className="font-display text-lg font-semibold">
-                      {l.displayName}
-                    </p>
+                    <p className="font-display text-lg font-semibold">{l.displayName}</p>
                     <p className="text-sm text-aivo-ink-soft">
                       {l.ageRange ?? "Age not set"}
                       {l.gradeBand ? ` · ${l.gradeBand}` : ""}
                     </p>
                     <div className="mt-2">
-                      <Badge tone="neutral">
-                        Readiness: {l.readinessState.replace(/_/g, " ")}
-                      </Badge>
+                      <Badge tone="neutral">Readiness: {l.readinessState.replace(/_/g, " ")}</Badge>
                     </div>
                   </div>
                 </Card>

@@ -82,9 +82,7 @@ async function mockBackend(page: Page) {
     route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify([
-        { id: LEARNER.id, userId: LEARNER.id, gradeLevel: "3" },
-      ]),
+      body: JSON.stringify([{ id: LEARNER.id, userId: LEARNER.id, gradeLevel: "3" }]),
     }),
   );
 
@@ -96,9 +94,7 @@ async function mockBackend(page: Page) {
     }),
   );
   await page.route("**/api/engagement/quests/worlds/*", (route) => {
-    const slug = decodeURIComponent(
-      new URL(route.request().url()).pathname.split("/").pop() ?? "",
-    );
+    const slug = decodeURIComponent(new URL(route.request().url()).pathname.split("/").pop() ?? "");
     const world = WORLDS.find((w) => w.key === slug || w.tutorKey === slug);
     if (!world) {
       return route.fulfill({
@@ -177,16 +173,10 @@ test.describe("learner study routes regression crawler", () => {
       await mockBackend(page);
       const response = await page.goto(route.path, { waitUntil: "networkidle" });
       expect(response, `no response for ${route.path}`).not.toBeNull();
-      expect(
-        response!.status(),
-        `unexpected status for ${route.path}`,
-      ).toBeLessThan(500);
+      expect(response!.status(), `unexpected status for ${route.path}`).toBeLessThan(500);
 
       const banned = await findBannedPhrase(page);
-      expect(
-        banned,
-        `Route ${route.path} rendered a banned phrase: ${banned ?? ""}`,
-      ).toBeNull();
+      expect(banned, `Route ${route.path} rendered a banned phrase: ${banned ?? ""}`).toBeNull();
 
       for (const required of route.mustContain ?? []) {
         await expect(page.getByText(required)).toBeVisible();

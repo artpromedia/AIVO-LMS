@@ -9,27 +9,27 @@
  *
  * The mobile app only needs: @aivo/aac-bridge, @aivo/brand, @aivo/mobile-ui.
  */
-const fs = require('node:fs');
-const path = require('node:path');
+const fs = require("node:fs");
+const path = require("node:path");
 
-const repoRoot = path.resolve(__dirname, '..', '..', '..');
-const packagesDir = path.join(repoRoot, 'packages');
-const keep = new Set(['aac-bridge', 'brand', 'mobile-ui']);
+const repoRoot = path.resolve(__dirname, "..", "..", "..");
+const packagesDir = path.join(repoRoot, "packages");
+const keep = new Set(["aac-bridge", "brand", "mobile-ui"]);
 
 if (!fs.existsSync(packagesDir)) {
-  console.log('[eas-pre-install] no packages directory found, skipping');
+  console.log("[eas-pre-install] no packages directory found, skipping");
   process.exit(0);
 }
 
 for (const name of fs.readdirSync(packagesDir)) {
   if (keep.has(name)) continue;
-  const pkgPath = path.join(packagesDir, name, 'package.json');
+  const pkgPath = path.join(packagesDir, name, "package.json");
   if (!fs.existsSync(pkgPath)) continue;
   try {
-    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
     if (pkg.scripts && pkg.scripts.prepare) {
       delete pkg.scripts.prepare;
-      fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
+      fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
       console.log(`[eas-pre-install] stripped prepare script from packages/${name}`);
     }
   } catch (err) {
@@ -37,4 +37,4 @@ for (const name of fs.readdirSync(packagesDir)) {
   }
 }
 
-console.log('[eas-pre-install] done');
+console.log("[eas-pre-install] done");

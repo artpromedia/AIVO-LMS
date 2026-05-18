@@ -46,11 +46,26 @@ export default function LeaderboardPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-yellow-50">
       <header className="bg-white/80 backdrop-blur border-b border-slate-200 px-8 py-4 flex items-center justify-between">
-        <Image src="/images/aivo-logo-purple.png" alt="AIVO" width={100} height={30} style={{ height: "auto" }} />
+        <Image
+          src="/images/aivo-logo-purple.png"
+          alt="AIVO"
+          width={100}
+          height={30}
+          style={{ height: "auto" }}
+        />
         <div className="flex items-center gap-4">
-          <button onClick={() => router.push("/dashboard/learner")}
-            className="text-sm text-primary font-semibold hover:underline">{tCommon("back")}</button>
-          <button onClick={logout} className="text-sm text-slate-500 hover:text-red-500 font-semibold">{t("log_out")}</button>
+          <button
+            onClick={() => router.push("/dashboard/learner")}
+            className="text-sm text-primary font-semibold hover:underline"
+          >
+            {tCommon("back")}
+          </button>
+          <button
+            onClick={logout}
+            className="text-sm text-slate-500 hover:text-red-500 font-semibold"
+          >
+            {t("log_out")}
+          </button>
         </div>
       </header>
 
@@ -71,7 +86,9 @@ export default function LeaderboardPage() {
               key={s}
               onClick={() => setScope(s)}
               className={`px-5 py-2 rounded-full text-sm font-bold transition capitalize ${
-                scope === s ? "bg-amber-500 text-white" : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
+                scope === s
+                  ? "bg-amber-500 text-white"
+                  : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
               }`}
             >
               {s}
@@ -97,15 +114,28 @@ export default function LeaderboardPage() {
                     className={`flex items-center gap-4 px-6 py-4 ${isMe ? "bg-purple-50" : ""}`}
                   >
                     <div className="w-10 text-center text-xl font-heading font-bold flex items-center justify-center">
-                      {idx < 3
-                        ? (() => { const Icon = MEDAL_ICONS[idx]; return <Icon className={`w-7 h-7 ${MEDAL_TINTS[idx]}`} strokeWidth={2} aria-hidden />; })()
-                        : <span className="text-slate-400">{idx + 1}</span>}
+                      {idx < 3 ? (
+                        (() => {
+                          const Icon = MEDAL_ICONS[idx];
+                          return (
+                            <Icon
+                              className={`w-7 h-7 ${MEDAL_TINTS[idx]}`}
+                              strokeWidth={2}
+                              aria-hidden
+                            />
+                          );
+                        })()
+                      ) : (
+                        <span className="text-slate-400">{idx + 1}</span>
+                      )}
                     </div>
                     <div className="flex-1">
                       <div className="font-heading font-bold text-slate-900">
                         {isMe ? `${user.name} (You)` : `Learner ${entry.learnerId.slice(0, 6)}`}
                       </div>
-                      <div className="text-xs text-slate-400 font-semibold">Level {entry.level}</div>
+                      <div className="text-xs text-slate-400 font-semibold">
+                        Level {entry.level}
+                      </div>
                     </div>
                     <div className="text-right">
                       <div className="font-heading font-bold text-primary">{entry.totalXp} XP</div>

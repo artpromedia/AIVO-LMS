@@ -106,7 +106,7 @@ export function AvatarUploader({
   };
 
   const showingPreview = !!previewUrl;
-  const displayUrl = showingPreview ? previewUrl : currentAvatarUrl ?? null;
+  const displayUrl = showingPreview ? previewUrl : (currentAvatarUrl ?? null);
 
   return (
     <div className="flex items-start gap-5">
@@ -116,7 +116,7 @@ export function AvatarUploader({
             className="relative inline-flex items-center justify-center rounded-full overflow-hidden bg-slate-100"
             style={{ width: size, height: size }}
           >
-            { }
+            {}
             <img
               src={displayUrl as string}
               alt={t("avatar_preview_alt")}

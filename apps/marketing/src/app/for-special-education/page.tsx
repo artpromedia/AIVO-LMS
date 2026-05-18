@@ -16,11 +16,26 @@ const audience = AUDIENCES.find((a) => a.slug === "for-special-education")!;
 export const metadata: Metadata = audienceMetadata(audience);
 
 const CONTEXT_STEPS = [
-  { title: "Parent context first", body: "What's worked, what's hard, what your child loves — in plain language, not clinical jargon." },
-  { title: "Optional accommodation context", body: "If you have an IEP, 504, or informal plan, you can share the relevant context. Skip if you don't." },
-  { title: "Adaptive baseline, calm by design", body: "No timer pressure, no high-stakes scores — a comfortable starting line per subject." },
-  { title: "Personalized supports turn on", body: "Pacing, scaffolds, read-aloud, hint depth, and break cues adjust automatically." },
-  { title: "Parent and teacher safety boundaries", body: "Adults see what they need. Learners never see clinical labels about themselves." },
+  {
+    title: "Parent context first",
+    body: "What's worked, what's hard, what your child loves — in plain language, not clinical jargon.",
+  },
+  {
+    title: "Optional accommodation context",
+    body: "If you have an IEP, 504, or informal plan, you can share the relevant context. Skip if you don't.",
+  },
+  {
+    title: "Adaptive baseline, calm by design",
+    body: "No timer pressure, no high-stakes scores — a comfortable starting line per subject.",
+  },
+  {
+    title: "Personalized supports turn on",
+    body: "Pacing, scaffolds, read-aloud, hint depth, and break cues adjust automatically.",
+  },
+  {
+    title: "Parent and teacher safety boundaries",
+    body: "Adults see what they need. Learners never see clinical labels about themselves.",
+  },
 ];
 
 const ADAPTATIONS = [
@@ -30,12 +45,18 @@ const ADAPTATIONS = [
   { title: "Hints", body: "Tiered hints — never an answer dump." },
   { title: "Scaffolded examples", body: "Worked examples before independent practice." },
   { title: "Break reminders", body: "Gentle, not interruptive — and configurable per learner." },
-  { title: "Reduced cognitive load", body: "Single-task layouts, minimal chrome, no surprise transitions." },
+  {
+    title: "Reduced cognitive load",
+    body: "Single-task layouts, minimal chrome, no surprise transitions.",
+  },
   { title: "Progress summaries", body: "Strengths-first weekly summaries for parents." },
 ];
 
 const ACCESSIBILITY = [
-  { title: "WCAG 2.2 AA design target", body: "Color contrast, focus states, semantic markup — verified in CI." },
+  {
+    title: "WCAG 2.2 AA design target",
+    body: "Color contrast, focus states, semantic markup — verified in CI.",
+  },
   { title: "Keyboard & switch access", body: "Full operability without a mouse or touch screen." },
   { title: "Reduced motion mode", body: "Calmer transitions for sensory-sensitive learners." },
   { title: "High-contrast & large text", body: "Built-in toggles, no extension required." },
@@ -83,14 +104,13 @@ export default function Page() {
         body={
           <>
             <p>
-              Every learner deserves a calm starting line, supports that adjust
-              quietly, and adults who can see what they need to see — without
-              their child being labelled by an app.
+              Every learner deserves a calm starting line, supports that adjust quietly, and adults
+              who can see what they need to see — without their child being labelled by an app.
             </p>
             <p className="mt-3">
-              AIVO is built around that idea. We don't promise outcomes. We
-              don't claim to replace the professionals around your learner. We
-              do build a learning environment that takes context seriously.
+              AIVO is built around that idea. We don't promise outcomes. We don't claim to replace
+              the professionals around your learner. We do build a learning environment that takes
+              context seriously.
             </p>
           </>
         }
@@ -111,15 +131,13 @@ export default function Page() {
         body={
           <>
             <p>
-              You can share the parts of an IEP, 504, or informal accommodation
-              plan that affect day-to-day learning — pacing notes, read-aloud
-              preferences, scaffolding cues. We use that context to personalize
-              supports.
+              You can share the parts of an IEP, 504, or informal accommodation plan that affect
+              day-to-day learning — pacing notes, read-aloud preferences, scaffolding cues. We use
+              that context to personalize supports.
             </p>
             <p className="mt-3 text-sm text-slate-600">
-              We never display raw IEP text inside the learner experience.
-              Clinical sections (eligibility, evaluations, signatures) belong in
-              your district's system, not ours.
+              We never display raw IEP text inside the learner experience. Clinical sections
+              (eligibility, evaluations, signatures) belong in your district's system, not ours.
             </p>
           </>
         }

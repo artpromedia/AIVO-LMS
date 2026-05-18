@@ -60,9 +60,7 @@ if (sessionSrc) {
     );
   }
   for (const fn of ["readMockSessionFromCookies", "getMockSession"]) {
-    const body = sessionSrc.match(
-      new RegExp(`function ${fn}[^{]*\\{([\\s\\S]*?)\\n\\}`),
-    );
+    const body = sessionSrc.match(new RegExp(`function ${fn}[^{]*\\{([\\s\\S]*?)\\n\\}`));
     if (!body || !/mockAuthAllowed\(\)/.test(body[1])) {
       errors.push(
         `apps/web-v2/lib/auth/mock-session.ts: ${fn} must call mockAuthAllowed() before reading cookies.`,
@@ -83,9 +81,7 @@ function walk(dir, out = []) {
 }
 
 const bffAuthRoot = join(repoRoot, "apps/web-v2/app/api/bff/auth");
-const routeFiles = walk(bffAuthRoot).filter((p) =>
-  /mock-[^/\\]+\/route\.ts$/.test(p),
-);
+const routeFiles = walk(bffAuthRoot).filter((p) => /mock-[^/\\]+\/route\.ts$/.test(p));
 if (routeFiles.length === 0) {
   errors.push(
     "apps/web-v2/app/api/bff/auth/mock-*/route.ts: no mock auth routes found (expected at least mock-login).",
@@ -102,9 +98,7 @@ for (const file of routeFiles) {
 
 if (errors.length) {
   for (const e of errors) console.error(`error: ${e}`);
-  console.error(
-    `\nauth:audit FAILED with ${errors.length} guard violation(s).`,
-  );
+  console.error(`\nauth:audit FAILED with ${errors.length} guard violation(s).`);
   process.exit(1);
 }
 

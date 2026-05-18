@@ -107,16 +107,20 @@ export const CONFORMANCE_CHECKS: ConformanceCheck[] = [
       const seen: AACEvent[] = [];
       const off = adapter.onEvent((e) => seen.push(e));
       try {
-        const maybeEmit = (adapter as unknown as {
-          _emitForTest?: (e: AACEvent) => void;
-        })._emitForTest;
+        const maybeEmit = (
+          adapter as unknown as {
+            _emitForTest?: (e: AACEvent) => void;
+          }
+        )._emitForTest;
         if (typeof maybeEmit === "function") {
           // Call with `adapter` as `this` so the method can access its
           // private listeners array.
-          maybeEmit.call(
-            adapter,
-            { method: "switch_1", targetId: "synthetic", timestamp: Date.now(), confidence: 1 },
-          );
+          maybeEmit.call(adapter, {
+            method: "switch_1",
+            targetId: "synthetic",
+            timestamp: Date.now(),
+            confidence: 1,
+          });
           if (seen.length === 0) return "_emitForTest did not deliver event to onEvent listener";
           const e = seen[0];
           for (const k of ["method", "targetId", "timestamp"] as const) {

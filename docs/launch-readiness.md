@@ -1,36 +1,42 @@
 # AIVO v3 Launch Readiness Checklist
 
 ## Sprint 1 — Multi-tenant Foundation
+
 - [x] Multi-tenant data model with `tenantId` on all sensitive tables
 - [x] Safety gate (content moderation hooks before any AI generation reaches a learner)
 - [x] CORS allow-list configured per environment
 - [x] Identity service with role hierarchy (PLATFORM_ADMIN, DISTRICT_ADMIN, TEACHER, THERAPIST, CAREGIVER, PARENT, LEARNER)
 
 ## Sprint 2 — CI & Coverage
+
 - [x] CI lint step is blocking on PRs
 - [x] CI typecheck step is blocking
 - [x] Test coverage thresholds enforced for safety-critical packages
 - [x] Accessibility lint workflow (jsx-a11y) wired into CI
 
 ## Sprint 3 — Content Moderation Pipeline
+
 - [x] Pre-generation prompt scanning
 - [x] Post-generation output moderation
 - [x] Audit log for moderation decisions
 - [x] Manual review queue surfaced in admin dashboard
 
 ## Sprint 4 — Adaptive Learning Paths
+
 - [x] Multi-signal XP (accuracy, persistence, mastery, exploration)
 - [x] Mastery-gated advancement between stages
 - [x] Functioning-level-aware lesson generation (5-tier model)
 - [x] XAI explanation surface for every brain decision
 
 ## Sprint 5 — Parent Dashboard
+
 - [x] Parent dashboard with learners, progress, IEP, sessions, recommendations
 - [x] Brain profile view per child with explanation history
 - [x] Co-learn and team coordination pages
 - [x] Tutor catalog and session scheduling
 
 ## Sprint 6 — Security Hardening
+
 - [x] MFA-forced UI for elevated roles (PLATFORM_ADMIN, DISTRICT_ADMIN, TEACHER, THERAPIST)
 - [x] Global JWT-or-service-token auth hook on learning-svc and tutor-svc
 - [x] `requireLearnerAccess` tenant guard on every learner-scoped route
@@ -40,6 +46,7 @@
 - [x] `docs/security-architecture.md` with sensitive-PII column inventory
 
 ## Sprint 7 — Production Readiness & Polish
+
 - [x] eslint-plugin-jsx-a11y integrated in web app with passing lint
 - [x] Status page tracks per-service response time and warns on slow checks (>2s)
 - [x] Admin alert dispatched after 3 consecutive down-checks (cooldown enforced)
@@ -53,6 +60,7 @@
 - [ ] COPPA Safe Harbor enrollment verification (pre-launch requirement; see Compliance section)
 
 ## Accessibility (WCAG 2.1 AA)
+
 - [x] SkipLink component on all dashboard layouts
 - [x] Sidebar navigation with proper ARIA roles and labels
 - [x] `aria-current="page"` on active nav links
@@ -74,6 +82,7 @@
 - [ ] VoiceOver/NVDA manual testing pass — manual pre-launch task
 
 ## Compliance (pre-launch)
+
 - [ ] **COPPA Safe Harbor**: verify enrollment status with current Safe Harbor program
       (e.g. iKeepSafe, kidSAFE). Marketing site references Safe Harbor — claim must be
       accurate at launch or removed. Owner: Compliance.
@@ -82,6 +91,7 @@
 - [ ] Pen-test or third-party security review scheduled
 
 ## Documentation
+
 - [x] Accessibility guidelines (`docs/accessibility-guidelines.md`)
 - [x] Launch readiness checklist (this file)
 - [x] Security architecture (`docs/security-architecture.md`)

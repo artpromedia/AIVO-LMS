@@ -4,7 +4,16 @@ import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { Calculator, BookOpen, FlaskConical, Landmark, Code2, ClipboardList, BookMarked, type LucideIcon } from "lucide-react";
+import {
+  Calculator,
+  BookOpen,
+  FlaskConical,
+  Landmark,
+  Code2,
+  ClipboardList,
+  BookMarked,
+  type LucideIcon,
+} from "lucide-react";
 
 interface ChildHomework {
   learnerId: string;
@@ -20,10 +29,22 @@ interface ChildHomework {
 }
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  READY: { label: "Ready", color: "bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))]" },
-  IN_PROGRESS: { label: "In Progress", color: "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]" },
-  COMPLETED: { label: "Completed", color: "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]" },
-  FAILED: { label: "Failed", color: "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]" },
+  READY: {
+    label: "Ready",
+    color: "bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))]",
+  },
+  IN_PROGRESS: {
+    label: "In Progress",
+    color: "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]",
+  },
+  COMPLETED: {
+    label: "Completed",
+    color: "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]",
+  },
+  FAILED: {
+    label: "Failed",
+    color: "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]",
+  },
 };
 
 const SUBJECT_META: Record<string, { Icon: LucideIcon; color: string }> = {
@@ -75,7 +96,8 @@ export default function ParentHomeworkPage() {
           assignments: result.assignments || [],
         });
       }
-    } catch {} finally {
+    } catch {
+    } finally {
       setLoading(false);
     }
   }
@@ -85,8 +107,17 @@ export default function ParentHomeworkPage() {
   return (
     <div className="vi-bg">
       <header className="bg-[hsl(var(--visual-surface)/0.95)] backdrop-blur border-b vi-border px-8 py-4 flex items-center justify-between">
-        <Image src="/images/aivo-logo-purple.png" alt="AIVO" width={100} height={30} style={{ height: "auto" }} />
-        <button onClick={() => router.push("/dashboard/parent")} className="text-sm vi-text-muted hover:text-[hsl(var(--visual-primary))] font-semibold">
+        <Image
+          src="/images/aivo-logo-purple.png"
+          alt="AIVO"
+          width={100}
+          height={30}
+          style={{ height: "auto" }}
+        />
+        <button
+          onClick={() => router.push("/dashboard/parent")}
+          className="text-sm vi-text-muted hover:text-[hsl(var(--visual-primary))] font-semibold"
+        >
           {t("back_to_dashboard")}
         </button>
       </header>
@@ -116,15 +147,16 @@ export default function ParentHomeworkPage() {
               const meta = SUBJECT_META[subjectLower] || SUBJECT_META.other;
               const Icon = meta.Icon;
               return (
-                <div
-                  key={hw.id}
-                  className="vi-card p-5 flex items-center gap-4"
-                >
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${SUBJECT_WELL[meta.color] || SUBJECT_WELL.primary}`}>
+                <div key={hw.id} className="vi-card p-5 flex items-center gap-4">
+                  <div
+                    className={`w-10 h-10 rounded-lg flex items-center justify-center ${SUBJECT_WELL[meta.color] || SUBJECT_WELL.primary}`}
+                  >
                     <Icon size={18} aria-hidden="true" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-slate-800 capitalize">{subjectLower} {t("homework_label")}</p>
+                    <p className="font-bold text-slate-800 capitalize">
+                      {subjectLower} {t("homework_label")}
+                    </p>
                     <p className="text-sm vi-text-muted">
                       {t("problems_count", { count: hw.problemCount })} &middot;{" "}
                       {new Date(hw.createdAt).toLocaleDateString()}

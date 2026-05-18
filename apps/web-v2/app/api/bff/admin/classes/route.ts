@@ -50,7 +50,10 @@ export async function POST(req: Request): Promise<NextResponse> {
     const parsed = createSchema.safeParse(body);
     if (!parsed.success) {
       return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." },
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
         requestId,
       );
     }
@@ -59,7 +62,10 @@ export async function POST(req: Request): Promise<NextResponse> {
       return fail({ ...ERRORS.NOT_FOUND, message: "School not found." }, requestId);
     }
     if (school.tenantId !== session!.tenantId && session!.role !== "platform_admin") {
-      return fail({ ...ERRORS.FORBIDDEN_TENANT, message: "School belongs to another tenant." }, requestId);
+      return fail(
+        { ...ERRORS.FORBIDDEN_TENANT, message: "School belongs to another tenant." },
+        requestId,
+      );
     }
     const rec = createClassroom({
       tenantId: school.tenantId,

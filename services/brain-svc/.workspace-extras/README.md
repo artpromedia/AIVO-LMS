@@ -1,6 +1,7 @@
 # Workspace-level Python dependency files (archived)
 
 These files used to live at the repository root:
+
 - `pyproject.toml` — workspace-level Python dependencies
 - `uv.lock` — uv lockfile
 
@@ -10,6 +11,7 @@ fails with `Permission denied` and aborts the build.
 
 The runtime services that actually need these dependencies use their own
 `requirements.txt`:
+
 - `services/brain-svc/requirements.txt`
 - `services/ai-svc/requirements.txt`
 

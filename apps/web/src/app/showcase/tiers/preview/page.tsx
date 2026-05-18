@@ -24,8 +24,14 @@ function AssessmentChrome({ learnerName }: { learnerName: string }) {
   return (
     <div className="vi-bg p-6 rounded-3xl">
       <section className="vi-card p-6 text-center relative overflow-hidden">
-        <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-[hsl(43_100%_50%/0.18)] blur-2xl" aria-hidden />
-        <div className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-[hsl(262_83%_58%/0.18)] blur-2xl" aria-hidden />
+        <div
+          className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-[hsl(43_100%_50%/0.18)] blur-2xl"
+          aria-hidden
+        />
+        <div
+          className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-[hsl(262_83%_58%/0.18)] blur-2xl"
+          aria-hidden
+        />
         <div className="relative">
           <div className="mx-auto mb-4 inline-flex w-14 h-14 rounded-2xl items-center justify-center bg-[hsl(262_83%_58%/0.12)] text-[hsl(262_83%_58%)]">
             <Compass className="w-7 h-7" strokeWidth={2.5} />
@@ -74,8 +80,14 @@ function StageChrome({ tutorName, learnerName }: { tutorName: string; learnerNam
   return (
     <div className="vi-bg p-6 rounded-3xl">
       <section className="vi-card p-6 text-center relative overflow-hidden">
-        <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-[hsl(262_83%_58%/0.20)] blur-2xl" aria-hidden />
-        <div className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-[hsl(43_100%_50%/0.18)] blur-2xl" aria-hidden />
+        <div
+          className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-[hsl(262_83%_58%/0.20)] blur-2xl"
+          aria-hidden
+        />
+        <div
+          className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-[hsl(43_100%_50%/0.18)] blur-2xl"
+          aria-hidden
+        />
         <div className="relative">
           <div className="relative w-24 h-24 rounded-3xl border-4 mx-auto mb-4 flex items-center justify-center text-4xl bg-[hsl(262_83%_58%/0.12)] border-[hsl(262_83%_58%)]">
             ✨
@@ -86,7 +98,9 @@ function StageChrome({ tutorName, learnerName }: { tutorName: string; learnerNam
           <h1 className="text-2xl font-extrabold text-slate-900 mb-2 leading-tight">
             Learn with {tutorName} <Sparkles className="inline w-5 h-5 text-[hsl(43_100%_50%)]" />
           </h1>
-          <p className="text-sm text-slate-500 mb-5">Ready, {learnerName}? Let's pick up where we left off.</p>
+          <p className="text-sm text-slate-500 mb-5">
+            Ready, {learnerName}? Let's pick up where we left off.
+          </p>
 
           <button className="inline-flex items-center gap-2 px-7 py-3 rounded-full text-white font-extrabold text-lg shadow-xl bg-[hsl(262_83%_58%)] shadow-[hsl(262_83%_58%/0.4)]">
             <Play className="w-5 h-5 fill-white" /> Start learning
@@ -102,7 +116,14 @@ export default function TiersPreviewPage() {
     <main style={{ minHeight: "100vh", background: "#1a1320", padding: "32px 24px" }}>
       <div style={{ maxWidth: 1400, margin: "0 auto" }}>
         <header style={{ marginBottom: 32, color: "#F5EBD8" }}>
-          <h1 style={{ fontFamily: "'Fredoka', system-ui", fontSize: 32, fontWeight: 600, marginBottom: 8 }}>
+          <h1
+            style={{
+              fontFamily: "'Fredoka', system-ui",
+              fontSize: 32,
+              fontWeight: 600,
+              marginBottom: 8,
+            }}
+          >
             Baseline Assessment & Stage — three age tiers
           </h1>
           <p style={{ fontFamily: "'Nunito', system-ui", color: "#B89A72", maxWidth: 640 }}>
@@ -117,7 +138,9 @@ export default function TiersPreviewPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
           {TIERS.map((t) => (
             <div key={t.id}>
-              <div style={{ marginBottom: 12, color: "#F5EBD8", fontFamily: "'Fredoka', system-ui" }}>
+              <div
+                style={{ marginBottom: 12, color: "#F5EBD8", fontFamily: "'Fredoka', system-ui" }}
+              >
                 <div style={{ fontSize: 18, fontWeight: 600 }}>{t.label}</div>
                 <div style={{ fontSize: 12, color: "#B89A72", fontFamily: "'Nunito', system-ui" }}>
                   {t.sub} · derived from gradeLevel="{t.sampleGrade}"
@@ -127,7 +150,9 @@ export default function TiersPreviewPage() {
                   panel so we can show all three at once on the same page. */}
               <TierThemeProvider tier={t.id} scopeToRoot={false}>
                 <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                  <AssessmentChrome learnerName={t.id === "HIGH" ? "Atlas" : t.id === "MIDDLE" ? "Kai" : "Sora"} />
+                  <AssessmentChrome
+                    learnerName={t.id === "HIGH" ? "Atlas" : t.id === "MIDDLE" ? "Kai" : "Sora"}
+                  />
                   <StageChrome
                     tutorName="Nova"
                     learnerName={t.id === "HIGH" ? "Atlas" : t.id === "MIDDLE" ? "Kai" : "Sora"}

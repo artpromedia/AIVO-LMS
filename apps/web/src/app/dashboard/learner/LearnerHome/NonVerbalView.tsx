@@ -27,8 +27,17 @@ export function NonVerbalView({ action, onStart, onBreak }: NonVerbalViewProps) 
           minHeight: "var(--learner-hit-target, 88px)",
         }}
       >
-        <div className="relative w-32 h-32 mx-auto rounded-full overflow-hidden shadow-xl mb-4" style={{ borderColor: tutor.color, borderWidth: "5px" }}>
-          <Image src={tutor.avatar} alt={tutor.name} fill className="object-cover object-top" sizes="128px" />
+        <div
+          className="relative w-32 h-32 mx-auto rounded-full overflow-hidden shadow-xl mb-4"
+          style={{ borderColor: tutor.color, borderWidth: "5px" }}
+        >
+          <Image
+            src={tutor.avatar}
+            alt={tutor.name}
+            fill
+            className="object-cover object-top"
+            sizes="128px"
+          />
         </div>
         <div className="text-2xl font-heading font-bold" style={{ color: tutor.color }}>
           {action?.title || t("play_with_tutor", { name: tutor.name })}

@@ -12,9 +12,7 @@ import { z } from "zod";
 
 export const dynamic = "force-dynamic";
 
-const SetActiveBody = z
-  .object({ learnerId: z.string().min(1).max(80) })
-  .strict();
+const SetActiveBody = z.object({ learnerId: z.string().min(1).max(80) }).strict();
 
 /** GET — return current active learner id (or null). */
 export async function GET(req: Request): Promise<NextResponse> {
@@ -44,17 +42,11 @@ export async function POST(req: Request): Promise<NextResponse> {
     const body = await req.json().catch(() => null);
     const parsed = SetActiveBody.safeParse(body);
     if (!parsed.success) {
-      return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: "learnerId required" },
-        requestId,
-      );
+      return fail({ ...ERRORS.VALIDATION_FAILED, message: "learnerId required" }, requestId);
     }
     const authorized = verifyActiveLearner(session!, parsed.data.learnerId);
     if (!authorized) {
-      return fail(
-        { ...ERRORS.FORBIDDEN_LEARNER, message: "Not your learner" },
-        requestId,
-      );
+      return fail({ ...ERRORS.FORBIDDEN_LEARNER, message: "Not your learner" }, requestId);
     }
     audit(session!, "active_learner.set", requestId, {
       learnerId: authorized,
@@ -80,7 +72,7 @@ export async function POST(req: Request): Promise<NextResponse> {
 export async function DELETE(req: Request): Promise<NextResponse> {
   const requestId = getRequestId(req);
   try {
-    const { session, response } = await requireSession(req, requestId);
+    const { session: _session, response } = await requireSession(req, requestId);
     if (response) return response;
     const res = ok({ activeLearnerId: null }, requestId);
     res.cookies.set({

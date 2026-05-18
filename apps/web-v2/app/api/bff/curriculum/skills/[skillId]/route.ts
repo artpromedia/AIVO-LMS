@@ -80,7 +80,10 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
     const parsed = patchSchema.safeParse(body);
     if (!parsed.success) {
       return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." },
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
         requestId,
       );
     }
@@ -105,8 +108,7 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
         return fail(
           {
             ...ERRORS.VALIDATION_FAILED,
-            message:
-              "Prerequisite would create a cycle or references an unknown skill.",
+            message: "Prerequisite would create a cycle or references an unknown skill.",
           },
           requestId,
         );

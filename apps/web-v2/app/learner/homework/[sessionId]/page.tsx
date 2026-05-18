@@ -51,11 +51,7 @@ export default async function HomeworkSessionPage({ params }: Params) {
           </div>
         </Card>
       ) : (
-        <HomeworkChat
-          learnerId={learnerId}
-          sessionId={hw.id}
-          initialMessages={hw.messages}
-        />
+        <HomeworkChat learnerId={learnerId} sessionId={hw.id} initialMessages={hw.messages} />
       )}
     </AppShell>
   );

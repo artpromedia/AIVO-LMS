@@ -7,12 +7,7 @@
  * Requires @aivo/aac-bridge for SwitchScanController.
  */
 import React, { useEffect, useRef, useState } from "react";
-import {
-  Modal,
-  View,
-  StyleSheet,
-  Animated,
-} from "react-native";
+import { Modal, View, StyleSheet, Animated } from "react-native";
 import { SwitchScanController } from "@aivo/aac-bridge";
 import type { AACSessionConfig, SymbolItem } from "@aivo/aac-bridge";
 
@@ -111,10 +106,7 @@ export function SwitchScanOverlay({
     <Modal transparent visible={active} pointerEvents="none" accessible={false}>
       <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
         <Animated.View
-          style={[
-            styles.highlightBox,
-            { transform: [{ scale: pulseAnim }] },
-          ]}
+          style={[styles.highlightBox, { transform: [{ scale: pulseAnim }] }]}
           accessibilityElementsHidden
         />
       </View>

@@ -31,10 +31,7 @@ const repoRoot = resolve(__dirname, "..");
 // stays in lock-step with the package's declared contract. The source uses
 // identifier references like `LEGACY_LOGOS.purple` and spreads like
 // `...Object.values(CANONICAL_LOGOS).filter(...)`. We resolve both.
-const assetsSource = readFileSync(
-  join(repoRoot, "packages/brand/src/assets.ts"),
-  "utf8",
-);
+const assetsSource = readFileSync(join(repoRoot, "packages/brand/src/assets.ts"), "utf8");
 
 function parseExportedObjects(src) {
   const objects = {};
@@ -54,9 +51,7 @@ function parseExportedObjects(src) {
 const exportedObjects = parseExportedObjects(assetsSource);
 
 function extractAssetList(label) {
-  const blockMatch = assetsSource.match(
-    new RegExp(`${label}:\\s*\\[([\\s\\S]*?)\\]`),
-  );
+  const blockMatch = assetsSource.match(new RegExp(`${label}:\\s*\\[([\\s\\S]*?)\\]`));
   if (!blockMatch) return [];
   // Strip filter() expressions so their literal arguments (".png", etc.)
   // are not mistaken for asset paths.
@@ -107,9 +102,7 @@ const warnings = [];
 for (const app of APPS) {
   const publicDir = join(repoRoot, app.publicDir);
   if (!existsSync(publicDir)) {
-    warnings.push(
-      `${app.name}: public dir does not exist (${app.publicDir}); skipping`,
-    );
+    warnings.push(`${app.name}: public dir does not exist (${app.publicDir}); skipping`);
     continue;
   }
   for (const rel of criticalAssets) {
@@ -154,9 +147,7 @@ if (warnings.length) {
 }
 if (errors.length) {
   for (const e of errors) console.error(`error: ${e}`);
-  console.error(
-    `\nbrand:check FAILED with ${errors.length} critical asset error(s).`,
-  );
+  console.error(`\nbrand:check FAILED with ${errors.length} critical asset error(s).`);
   process.exit(1);
 }
 

@@ -49,14 +49,30 @@ export async function PATCH(req: Request): Promise<NextResponse> {
     const roleErr = requireRole(session!, ["platform_admin"], requestId);
     if (roleErr) return roleErr;
     let body: unknown = {};
-    try { body = await req.json(); } catch { body = {}; }
+    try {
+      body = await req.json();
+    } catch {
+      body = {};
+    }
     const parsed = patchSchema.safeParse(body);
     if (!parsed.success) {
-      return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." }, requestId);
+      return fail(
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
+        requestId,
+      );
     }
     const { tenantId, ...patch } = parsed.data;
     const b = updateAIBudget(tenantId, patch);
-    audit(session!, "billing.ai_budget.updated", requestId, { metadata: { tenantId, capCents: String(b.monthlyCapCents ?? "null"), hardStop: String(b.hardStop) } });
+    audit(session!, "billing.ai_budget.updated", requestId, {
+      metadata: {
+        tenantId,
+        capCents: String(b.monthlyCapCents ?? "null"),
+        hardStop: String(b.hardStop),
+      },
+    });
     return ok({ budget: b }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

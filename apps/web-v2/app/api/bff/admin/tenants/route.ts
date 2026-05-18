@@ -3,7 +3,7 @@ import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole } from "@/lib/bff/guards";
 import { audit } from "@/lib/bff/audit";
-import { ADMIN_ROLES, adminScopeForSession } from "@/lib/bff/admin-scope";
+import { ADMIN_ROLES } from "@/lib/bff/admin-scope";
 import { createTenant, scopeTenantsForSession } from "@/lib/db/repos";
 import type { Tenant } from "@/lib/db/types";
 
@@ -33,8 +33,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
     const name = typeof body.name === "string" ? body.name.trim() : "";
     const type = body.type as Tenant["type"] | undefined;
-    const parentTenantId =
-      typeof body.parentTenantId === "string" ? body.parentTenantId : null;
+    const parentTenantId = typeof body.parentTenantId === "string" ? body.parentTenantId : null;
     if (
       !name ||
       name.length > 120 ||

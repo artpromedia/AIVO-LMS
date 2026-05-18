@@ -1,4 +1,4 @@
-import { BRAND } from '@aivo/brand';
+import { BRAND } from "@aivo/brand";
 
 export const theme = {
   colors: {
@@ -11,9 +11,9 @@ export const theme = {
     warning: BRAND.colors.warning,
     error: BRAND.colors.error,
     info: BRAND.colors.info,
-    navy: '#1A1A2E',
+    navy: "#1A1A2E",
     background: BRAND.colors.background,
-    card: '#FFFFFF',
+    card: "#FFFFFF",
     surface: BRAND.colors.surface,
     surfaceSoft: BRAND.colors.visualSurfaceSoft,
     text: BRAND.colors.text,
@@ -42,21 +42,21 @@ export const theme = {
   },
   shadows: {
     sm: {
-      shadowColor: '#000',
+      shadowColor: "#000",
       shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.05,
       shadowRadius: 2,
       elevation: 1,
     },
     md: {
-      shadowColor: '#000',
+      shadowColor: "#000",
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
       elevation: 3,
     },
     lg: {
-      shadowColor: '#000',
+      shadowColor: "#000",
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.15,
       shadowRadius: 8,
@@ -64,11 +64,11 @@ export const theme = {
     },
   },
   fonts: {
-    heading: 'Nunito-ExtraBold',
-    headingSemiBold: 'Nunito-SemiBold',
-    body: 'Nunito-Regular',
-    bodyBold: 'Nunito-Bold',
-    mono: 'JetBrainsMono-Regular',
+    heading: "Nunito-ExtraBold",
+    headingSemiBold: "Nunito-SemiBold",
+    body: "Nunito-Regular",
+    bodyBold: "Nunito-Bold",
+    mono: "JetBrainsMono-Regular",
   },
   /**
    * Tablet-aware breakpoints — kept here so every package and screen
@@ -92,12 +92,12 @@ export const theme = {
   },
 } as const;
 
-export type SizeClass = 'compact' | 'medium' | 'expanded';
+export type SizeClass = "compact" | "medium" | "expanded";
 
 export function classifySizeClass(width: number): SizeClass {
-  if (width >= theme.breakpoints.expanded) return 'expanded';
-  if (width >= theme.breakpoints.medium) return 'medium';
-  return 'compact';
+  if (width >= theme.breakpoints.expanded) return "expanded";
+  if (width >= theme.breakpoints.medium) return "medium";
+  return "compact";
 }
 
 export function isTabletWidth(width: number): boolean {

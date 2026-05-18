@@ -15,10 +15,28 @@ interface Tenant {
   settings?: any;
 }
 
-const TYPE_CONFIG: Record<string, { label: string; Icon: LucideIcon; color: string; well: string }> = {
-  B2C_FAMILY: { label: "Family", Icon: Users, color: "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]", well: "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]" },
-  B2B_SCHOOL: { label: "School", Icon: School, color: "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]", well: "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]" },
-  B2B_DISTRICT: { label: "District", Icon: Building2, color: "bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]", well: "bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]" },
+const TYPE_CONFIG: Record<
+  string,
+  { label: string; Icon: LucideIcon; color: string; well: string }
+> = {
+  B2C_FAMILY: {
+    label: "Family",
+    Icon: Users,
+    color: "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]",
+    well: "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]",
+  },
+  B2B_SCHOOL: {
+    label: "School",
+    Icon: School,
+    color: "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]",
+    well: "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]",
+  },
+  B2B_DISTRICT: {
+    label: "District",
+    Icon: Building2,
+    color: "bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]",
+    well: "bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]",
+  },
 };
 
 export default function AdminTenantsPage() {
@@ -43,7 +61,7 @@ export default function AdminTenantsPage() {
   useEffect(() => {
     if (!accessToken) return;
     fetch("/api/admin-svc/tenants", { headers: { Authorization: `Bearer ${accessToken}` } })
-      .then((r) => r.ok ? r.json() : [])
+      .then((r) => (r.ok ? r.json() : []))
       .then((data) => setTenants(Array.isArray(data) ? data : []))
       .catch(() => setTenants([]))
       .finally(() => setLoading(false));
@@ -69,7 +87,7 @@ export default function AdminTenantsPage() {
         setAdminName("");
         setAdminEmail("");
         fetch("/api/admin-svc/tenants", { headers: { Authorization: `Bearer ${accessToken}` } })
-          .then((r) => r.ok ? r.json() : [])
+          .then((r) => (r.ok ? r.json() : []))
           .then((d) => setTenants(Array.isArray(d) ? d : []))
           .catch(() => {});
       }
@@ -79,16 +97,21 @@ export default function AdminTenantsPage() {
     setCreateLoading(false);
   };
 
-  const typeCounts = Object.keys(TYPE_CONFIG).reduce((acc, type) => {
-    acc[type] = tenants.filter((t) => t.type === type).length;
-    return acc;
-  }, {} as Record<string, number>);
+  const typeCounts = Object.keys(TYPE_CONFIG).reduce(
+    (acc, type) => {
+      acc[type] = tenants.filter((t) => t.type === type).length;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   const filtered = typeFilter === "ALL" ? tenants : tenants.filter((t) => t.type === typeFilter);
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginatedTenants = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
-  useEffect(() => { setCurrentPage(1); }, [typeFilter]);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [typeFilter]);
 
   return (
     <div className="p-8 space-y-6">
@@ -99,7 +122,9 @@ export default function AdminTenantsPage() {
           </IconWell>
           <div>
             <h1 className="text-2xl font-heading font-bold vi-text">{t("tenants")}</h1>
-            <p className="text-sm vi-text-muted mt-1">Manage organizations, schools, and family accounts.</p>
+            <p className="text-sm vi-text-muted mt-1">
+              Manage organizations, schools, and family accounts.
+            </p>
           </div>
         </div>
         {isPlatformAdmin && (
@@ -121,7 +146,9 @@ export default function AdminTenantsPage() {
               key={type}
               onClick={() => setTypeFilter(typeFilter === type ? "ALL" : type)}
               className={`p-5 rounded-2xl border transition text-left ${
-                typeFilter === type ? "border-purple-300 vi-surface-soft shadow-sm" : "vi-border bg-white hover:border-slate-300"
+                typeFilter === type
+                  ? "border-purple-300 vi-surface-soft shadow-sm"
+                  : "vi-border bg-white hover:border-slate-300"
               }`}
             >
               <div className="flex items-center gap-3 mb-2">
@@ -141,47 +168,91 @@ export default function AdminTenantsPage() {
       {showCreate && isPlatformAdmin && (
         <div className="vi-card p-6">
           <h2 className="font-heading font-bold text-lg vi-text mb-1">Create District Account</h2>
-          <p className="text-sm vi-text-muted mb-5">Set up an enterprise district subscription with a district admin account.</p>
+          <p className="text-sm vi-text-muted mb-5">
+            Set up an enterprise district subscription with a district admin account.
+          </p>
 
           {createResult && (
             <div className="mb-5 p-4 rounded-xl bg-green-50 border border-green-200">
-              <h4 className="font-semibold text-[hsl(var(--visual-science))] mb-2">District created successfully</h4>
+              <h4 className="font-semibold text-[hsl(var(--visual-science))] mb-2">
+                District created successfully
+              </h4>
               <div className="text-sm text-[hsl(var(--visual-science))] space-y-1">
-                <p><span className="font-medium">District:</span> {createResult.district?.name}</p>
-                <p><span className="font-medium">Admin:</span> {createResult.admin?.name} ({createResult.admin?.email})</p>
+                <p>
+                  <span className="font-medium">District:</span> {createResult.district?.name}
+                </p>
+                <p>
+                  <span className="font-medium">Admin:</span> {createResult.admin?.name} (
+                  {createResult.admin?.email})
+                </p>
                 <div className="mt-3 p-3 bg-white rounded-lg border border-green-300">
-                  <p className="text-xs vi-text-muted mb-1">Send these credentials to the district administrator:</p>
-                  <p className="font-mono text-sm"><span className="font-medium">Email:</span> {createResult.admin?.email}</p>
-                  <p className="font-mono text-sm"><span className="font-medium">Password:</span> {createResult.temporaryPassword}</p>
+                  <p className="text-xs vi-text-muted mb-1">
+                    Send these credentials to the district administrator:
+                  </p>
+                  <p className="font-mono text-sm">
+                    <span className="font-medium">Email:</span> {createResult.admin?.email}
+                  </p>
+                  <p className="font-mono text-sm">
+                    <span className="font-medium">Password:</span> {createResult.temporaryPassword}
+                  </p>
                 </div>
               </div>
             </div>
           )}
 
-          {createError && <div className="mb-4 p-3 rounded-lg bg-red-50 text-red-600 text-sm">{createError}</div>}
+          {createError && (
+            <div className="mb-4 p-3 rounded-lg bg-red-50 text-red-600 text-sm">{createError}</div>
+          )}
 
           <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label htmlFor="district-name" className="block text-sm font-medium vi-text mb-1">District Name</label>
-              <input id="district-name" type="text" value={districtName} onChange={(e) => setDistrictName(e.target.value)} required
+              <label htmlFor="district-name" className="block text-sm font-medium vi-text mb-1">
+                District Name
+              </label>
+              <input
+                id="district-name"
+                type="text"
+                value={districtName}
+                onChange={(e) => setDistrictName(e.target.value)}
+                required
                 placeholder="e.g. Fairfax County Public Schools"
-                className="w-full px-4 py-2.5 rounded-lg border vi-border focus:border-primary focus:ring-2 focus:ring-purple-100 outline-none text-sm" />
+                className="w-full px-4 py-2.5 rounded-lg border vi-border focus:border-primary focus:ring-2 focus:ring-purple-100 outline-none text-sm"
+              />
             </div>
             <div>
-              <label htmlFor="admin-name" className="block text-sm font-medium vi-text mb-1">Admin Name</label>
-              <input id="admin-name" type="text" value={adminName} onChange={(e) => setAdminName(e.target.value)} required
+              <label htmlFor="admin-name" className="block text-sm font-medium vi-text mb-1">
+                Admin Name
+              </label>
+              <input
+                id="admin-name"
+                type="text"
+                value={adminName}
+                onChange={(e) => setAdminName(e.target.value)}
+                required
                 placeholder="e.g. Dr. Jane Smith"
-                className="w-full px-4 py-2.5 rounded-lg border vi-border focus:border-primary focus:ring-2 focus:ring-purple-100 outline-none text-sm" />
+                className="w-full px-4 py-2.5 rounded-lg border vi-border focus:border-primary focus:ring-2 focus:ring-purple-100 outline-none text-sm"
+              />
             </div>
             <div>
-              <label htmlFor="admin-email" className="block text-sm font-medium vi-text mb-1">Admin Email</label>
-              <input id="admin-email" type="email" value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} required
+              <label htmlFor="admin-email" className="block text-sm font-medium vi-text mb-1">
+                Admin Email
+              </label>
+              <input
+                id="admin-email"
+                type="email"
+                value={adminEmail}
+                onChange={(e) => setAdminEmail(e.target.value)}
+                required
                 placeholder="e.g. admin@district.edu"
-                className="w-full px-4 py-2.5 rounded-lg border vi-border focus:border-primary focus:ring-2 focus:ring-purple-100 outline-none text-sm" />
+                className="w-full px-4 py-2.5 rounded-lg border vi-border focus:border-primary focus:ring-2 focus:ring-purple-100 outline-none text-sm"
+              />
             </div>
             <div className="md:col-span-3">
-              <button type="submit" disabled={createLoading}
-                className="px-6 py-2.5 rounded-lg bg-[hsl(var(--visual-primary))] text-white font-semibold hover:opacity-90 transition disabled:opacity-50 text-sm">
+              <button
+                type="submit"
+                disabled={createLoading}
+                className="px-6 py-2.5 rounded-lg bg-[hsl(var(--visual-primary))] text-white font-semibold hover:opacity-90 transition disabled:opacity-50 text-sm"
+              >
                 {createLoading ? "Creating..." : "Create District Account"}
               </button>
             </div>
@@ -210,27 +281,49 @@ export default function AdminTenantsPage() {
               </thead>
               <tbody>
                 {paginatedTenants.map((t) => {
-                  const tc = TYPE_CONFIG[t.type] || { label: t.type, Icon: ClipboardList, color: "vi-surface-soft vi-text-muted", well: "vi-surface-soft vi-text-muted" };
+                  const tc = TYPE_CONFIG[t.type] || {
+                    label: t.type,
+                    Icon: ClipboardList,
+                    color: "vi-surface-soft vi-text-muted",
+                    well: "vi-surface-soft vi-text-muted",
+                  };
                   const RowIcon = tc.Icon;
                   return (
                     <tr key={t.id} className="border-b vi-border hover:vi-bg/50 transition">
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-3">
-                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${tc.well}`}>
+                          <div
+                            className={`w-8 h-8 rounded-xl flex items-center justify-center ${tc.well}`}
+                          >
                             <RowIcon size={16} strokeWidth={2.5} aria-hidden="true" />
                           </div>
-                          <Link href={`/dashboard/admin/tenants/${t.id}`} className="font-medium text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))]">{t.name}</Link>
+                          <Link
+                            href={`/dashboard/admin/tenants/${t.id}`}
+                            className="font-medium text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))]"
+                          >
+                            {t.name}
+                          </Link>
                         </div>
                       </td>
                       <td className="px-5 py-3">
-                        <span className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${tc.color}`}>{tc.label}</span>
+                        <span
+                          className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${tc.color}`}
+                        >
+                          {tc.label}
+                        </span>
                       </td>
-                      <td className="px-5 py-3 vi-text-muted">{new Date(t.createdAt).toLocaleDateString()}</td>
+                      <td className="px-5 py-3 vi-text-muted">
+                        {new Date(t.createdAt).toLocaleDateString()}
+                      </td>
                     </tr>
                   );
                 })}
                 {paginatedTenants.length === 0 && (
-                  <tr><td colSpan={3} className="px-5 py-10 text-center vi-text-muted">No tenants found</td></tr>
+                  <tr>
+                    <td colSpan={3} className="px-5 py-10 text-center vi-text-muted">
+                      No tenants found
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>

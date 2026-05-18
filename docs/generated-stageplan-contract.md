@@ -66,24 +66,37 @@ lessons must use generated content.
   "topic": "area_rectangle",
   "beats": [
     { "id": "open", "type": "narration", "narration": "Today we explore area." },
-    { "id": "demo", "type": "demonstration", "narration": "Watch how length × width gives the area." },
+    {
+      "id": "demo",
+      "type": "demonstration",
+      "narration": "Watch how length × width gives the area.",
+    },
     { "id": "task", "type": "interaction", "surfaceId": "surf-geo-1" },
-    { "id": "celebrate", "type": "celebration" }
+    { "id": "celebrate", "type": "celebration" },
   ],
   "surfaces": {
     "surf-geo-1": {
       "id": "surf-geo-1",
       "type": "geometry_workspace",
       "prompt": "Find the area of the rectangle.",
-      "diagram": { "canvasMode": "svg", "shapes": [{ "id": "r1", "kind": "rectangle", "x": 100, "y": 80, "width": 320, "height": 180 }] },
+      "diagram": {
+        "canvasMode": "svg",
+        "shapes": [
+          { "id": "r1", "kind": "rectangle", "x": 100, "y": 80, "width": 320, "height": 180 },
+        ],
+      },
       "scratchpad": { "enabled": true },
       "capture": { "finalAnswer": true, "inkStrokes": true },
       "scoring": { "mode": "exact", "correctAnswer": 32 },
-      "accessibility": { "altText": "Rectangle 8×4", "reduceMotionSafe": true, "keyboardAlternative": true }
-    }
+      "accessibility": {
+        "altText": "Rectangle 8×4",
+        "reduceMotionSafe": true,
+        "keyboardAlternative": true,
+      },
+    },
   },
   "masteryTargets": [],
   "accommodationsApplied": [],
-  "safetyChecks": []
+  "safetyChecks": [],
 }
 ```

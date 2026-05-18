@@ -12,13 +12,7 @@
 
 import { apiFetch } from "@/lib/api";
 import { API } from "@/constants/api";
-import type {
-  Beat,
-  ChoiceBeat,
-  Session,
-  StagePlan,
-  SessionMeta,
-} from "@/src/types/stage";
+import type { Beat, ChoiceBeat, Session, StagePlan, SessionMeta } from "@/src/types/stage";
 
 export class SessionUnavailableError extends Error {
   constructor(
@@ -176,9 +170,7 @@ export const sessionClient = {
     const raw = (await res.json()) as RawSessionResponse;
     const stagePlan = extractStagePlan(raw);
     if (!stagePlan) {
-      throw new SessionUnavailableError(
-        "Server did not return a stage plan for this session.",
-      );
+      throw new SessionUnavailableError("Server did not return a stage plan for this session.");
     }
     return { meta: coerceMeta(raw, sessionId), stagePlan };
   },

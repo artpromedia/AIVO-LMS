@@ -1,12 +1,5 @@
 import { spawnSync } from "node:child_process";
-import {
-  mkdtempSync,
-  writeFileSync,
-  mkdirSync,
-  rmSync,
-  existsSync,
-  readFileSync,
-} from "node:fs";
+import { mkdtempSync, writeFileSync, mkdirSync, rmSync, existsSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
@@ -26,10 +19,7 @@ describe("scripts/surface-contract-scan.mjs", () => {
   beforeAll(() => {
     work = mkdtempSync(join(tmpdir(), "aivo-surface-"));
     mkdirSync(join(work, "scripts"), { recursive: true });
-    writeFileSync(
-      join(work, "scripts", "surface-contract-scan.mjs"),
-      readFileSync(SCAN, "utf8"),
-    );
+    writeFileSync(join(work, "scripts", "surface-contract-scan.mjs"), readFileSync(SCAN, "utf8"));
 
     mkdirSync(join(work, "services/ai-svc/src/ai_svc/services"), { recursive: true });
     mkdirSync(join(work, "apps/web/src/components/stage"), { recursive: true });

@@ -84,12 +84,12 @@ pnpm overrides also match.
 
 ### `apps/`
 
-| App | Legacy | AIVO_LMS | Notes |
-|---|---|---|---|
-| `marketing` | present, skeleton only | present, full route tree | richer in AIVO_LMS; preserve |
-| `mobile` | fragmented role groups | fragmented role groups | both need Sprint 09 unification |
-| `web` | present | present | legacy-aligned shell (admin/dashboard/district/MFA) |
-| `web-v2` | — | **new** | role-grouped surfaces for parent/learner/teacher/admin |
+| App         | Legacy                 | AIVO_LMS                 | Notes                                                  |
+| ----------- | ---------------------- | ------------------------ | ------------------------------------------------------ |
+| `marketing` | present, skeleton only | present, full route tree | richer in AIVO_LMS; preserve                           |
+| `mobile`    | fragmented role groups | fragmented role groups   | both need Sprint 09 unification                        |
+| `web`       | present                | present                  | legacy-aligned shell (admin/dashboard/district/MFA)    |
+| `web-v2`    | —                      | **new**                  | role-grouped surfaces for parent/learner/teacher/admin |
 
 ### `packages/`
 
@@ -138,6 +138,7 @@ test entry points already live on both sides.
 ### Mobile routes
 
 Both repos:
+
 ```
 apps/mobile/app/
   (auth)/   (caregiver)/   (learner)/   (parent)/   (teacher)/
@@ -149,6 +150,7 @@ This is the architecture Sprint 09 replaces.
 ### Web routes (AIVO_LMS only)
 
 `apps/web/src/app/`:
+
 ```
 accept-invite, admin, api, canvas-preview, coppa-compliance, dashboard,
 district, forgot-password, login, privacy-policy, reset-password,
@@ -156,6 +158,7 @@ showcase, signup, terms-of-service, verify-mfa
 ```
 
 `apps/web-v2/app/`:
+
 ```
 admin/{district, platform, school}
 learner/{baseline, home, homework, lesson-runs, library, missions,
@@ -174,53 +177,53 @@ This is the role-aware surface that Sprint 08 completes.
 
 ### Keep from AIVO_LMS (do not regress)
 
-| Area | Why |
-|---|---|
-| `apps/marketing` route tree and section sequence (Audience Selector, Core Product Loop, Today's Mission, LessonRun, Role Visibility, FunctioningLevels, BrainClone, Trust, Pricing, FAQ) | Richer than legacy; primary acquisition surface; Sprint 10 finishes it |
-| `apps/web-v2` role groups (`admin`, `learner`, `parent`, `teacher`) | Modern role-aware web shell; Sprint 08 completes it |
-| `packages/brand` as token source-of-truth wiring across apps | Sprint 01 hardens this; do not regress to ad-hoc tokens |
-| `packages/billing-entitlements` | Drives Sprint 11 |
-| `packages/enterprise-core`, `packages/feature-flags`, `packages/security`, `packages/sso` | Enterprise/release-gate foundation |
-| `scripts/no-demo-prod-scan.mjs`, `scripts/surface-contract-scan.mjs`, `scripts/production-readiness-check.mjs` | Production gates; must keep passing through every sprint |
-| `tests/integration/vitest.production-readiness.config.ts`, `vitest.enterprise.config.ts` | Same |
-| `docs/enterprise-release-gates.md`, `docs/production-readiness-gates.md`, `docs/release-blockers.md`, `docs/legacy-feature-porting-map.md` | Existing release-discipline docs |
-| `apps/web` MFA, accept-invite, district shell, dashboard | Pre-existing parent/admin flows still wired to identity-svc routes; do not delete during web-v2 migration |
-| `docs/ux/`, `docs/marketing/` | New doc surfaces |
+| Area                                                                                                                                                                                     | Why                                                                                                       |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `apps/marketing` route tree and section sequence (Audience Selector, Core Product Loop, Today's Mission, LessonRun, Role Visibility, FunctioningLevels, BrainClone, Trust, Pricing, FAQ) | Richer than legacy; primary acquisition surface; Sprint 10 finishes it                                    |
+| `apps/web-v2` role groups (`admin`, `learner`, `parent`, `teacher`)                                                                                                                      | Modern role-aware web shell; Sprint 08 completes it                                                       |
+| `packages/brand` as token source-of-truth wiring across apps                                                                                                                             | Sprint 01 hardens this; do not regress to ad-hoc tokens                                                   |
+| `packages/billing-entitlements`                                                                                                                                                          | Drives Sprint 11                                                                                          |
+| `packages/enterprise-core`, `packages/feature-flags`, `packages/security`, `packages/sso`                                                                                                | Enterprise/release-gate foundation                                                                        |
+| `scripts/no-demo-prod-scan.mjs`, `scripts/surface-contract-scan.mjs`, `scripts/production-readiness-check.mjs`                                                                           | Production gates; must keep passing through every sprint                                                  |
+| `tests/integration/vitest.production-readiness.config.ts`, `vitest.enterprise.config.ts`                                                                                                 | Same                                                                                                      |
+| `docs/enterprise-release-gates.md`, `docs/production-readiness-gates.md`, `docs/release-blockers.md`, `docs/legacy-feature-porting-map.md`                                               | Existing release-discipline docs                                                                          |
+| `apps/web` MFA, accept-invite, district shell, dashboard                                                                                                                                 | Pre-existing parent/admin flows still wired to identity-svc routes; do not delete during web-v2 migration |
+| `docs/ux/`, `docs/marketing/`                                                                                                                                                            | New doc surfaces                                                                                          |
 
 ### Port from legacy (if and only if AIVO_LMS lacks it)
 
 The structural inventory shows that legacy does not have anything
-substantive that AIVO_LMS lacks at the workspace/service/package level.
-Where porting may still apply is at the *implementation* level inside
+substantive that AIVO*LMS lacks at the workspace/service/package level.
+Where porting may still apply is at the \_implementation* level inside
 existing services and packages. Sprint 02 will perform a file-level
 drift sweep and produce a concrete list. Candidate areas to inspect
 during Sprint 02:
 
-| Area | Reason to inspect for porting |
-|---|---|
-| `services/problem-session-svc` | Legacy `problem-session-ledger` was a porting target per `docs/legacy-feature-porting-map.md` |
-| `services/math-recognizer-svc`, `services/science-solver-svc` | Legacy "advanced content generators" porting target |
-| `services/subject-brain-svc` | Legacy "advanced content generators" porting target |
-| `services/responsible-ai-svc` | Legacy "responsible AI guardrails" porting target — Sprint 14 |
-| `services/data-governance-svc` + `audit-svc` | Legacy "data governance center" porting target — Sprint 04 |
-| `services/integration-svc` (SIS, LTI 1.3) | Legacy SIS sync porting target — Sprint 12 |
-| `services/homework-svc` (focus-monitor, self-regulation-recommender, OCR) | Legacy self-regulation hub porting target |
-| `packages/tutor-surface-protocol` validators | Legacy tutor surface protocol porting target |
+| Area                                                                      | Reason to inspect for porting                                                                 |
+| ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `services/problem-session-svc`                                            | Legacy `problem-session-ledger` was a porting target per `docs/legacy-feature-porting-map.md` |
+| `services/math-recognizer-svc`, `services/science-solver-svc`             | Legacy "advanced content generators" porting target                                           |
+| `services/subject-brain-svc`                                              | Legacy "advanced content generators" porting target                                           |
+| `services/responsible-ai-svc`                                             | Legacy "responsible AI guardrails" porting target — Sprint 14                                 |
+| `services/data-governance-svc` + `audit-svc`                              | Legacy "data governance center" porting target — Sprint 04                                    |
+| `services/integration-svc` (SIS, LTI 1.3)                                 | Legacy SIS sync porting target — Sprint 12                                                    |
+| `services/homework-svc` (focus-monitor, self-regulation-recommender, OCR) | Legacy self-regulation hub porting target                                                     |
+| `packages/tutor-surface-protocol` validators                              | Legacy tutor surface protocol porting target                                                  |
 
-These are *behind feature flags* in the porting map and must keep their
+These are _behind feature flags_ in the porting map and must keep their
 existing test gates passing.
 
 ### Rewrite because both are incomplete
 
-| Area | Reason |
-|---|---|
-| `apps/mobile` unified shell | Both repos still route into separate role groups. Sprint 09 replaces with a single shell + role switching + `x-aivo-active-role` server enforcement. |
-| `apps/web-v2` route group surfaces | Skeleton exists; loading/error/empty/permission/consent-blocked states must be completed in Sprint 08. |
-| Consent perimeter (UI + API middleware + audit) | The shared `services/data-governance-svc` and identity-svc consent routes need to be unified behind one `ConsentGate` (web + mobile) and one `requireConsent` middleware. Sprint 04. |
-| AI safety pipeline (input classification → injection detection → output policy validation → fallback/timeout/circuit-breaker → cost controls → eval harness) | Pieces exist (`services/responsible-ai-svc`, ai-svc generators) but the end-to-end pipeline and admin dashboard do not. Sprint 14. |
-| Curriculum + standards + skill-graph + item-bank source-of-truth contract and seeds (CCSS/NGSS, K–8 Math/ELA/Science) | Packages exist but no end-to-end "no baseline without skill alignment" guarantee. Sprint 05. |
-| Brand asset validation script and consolidated `packages/brand` exports for role themes/icons/splash/email/OG | `packages/brand` exists but is not yet enforced. Sprint 01. |
-| Mobile offline queue for learner lesson responses | Sprint 09. |
+| Area                                                                                                                                                         | Reason                                                                                                                                                                               |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `apps/mobile` unified shell                                                                                                                                  | Both repos still route into separate role groups. Sprint 09 replaces with a single shell + role switching + `x-aivo-active-role` server enforcement.                                 |
+| `apps/web-v2` route group surfaces                                                                                                                           | Skeleton exists; loading/error/empty/permission/consent-blocked states must be completed in Sprint 08.                                                                               |
+| Consent perimeter (UI + API middleware + audit)                                                                                                              | The shared `services/data-governance-svc` and identity-svc consent routes need to be unified behind one `ConsentGate` (web + mobile) and one `requireConsent` middleware. Sprint 04. |
+| AI safety pipeline (input classification → injection detection → output policy validation → fallback/timeout/circuit-breaker → cost controls → eval harness) | Pieces exist (`services/responsible-ai-svc`, ai-svc generators) but the end-to-end pipeline and admin dashboard do not. Sprint 14.                                                   |
+| Curriculum + standards + skill-graph + item-bank source-of-truth contract and seeds (CCSS/NGSS, K–8 Math/ELA/Science)                                        | Packages exist but no end-to-end "no baseline without skill alignment" guarantee. Sprint 05.                                                                                         |
+| Brand asset validation script and consolidated `packages/brand` exports for role themes/icons/splash/email/OG                                                | `packages/brand` exists but is not yet enforced. Sprint 01.                                                                                                                          |
+| Mobile offline queue for learner lesson responses                                                                                                            | Sprint 09.                                                                                                                                                                           |
 
 ## Risks to the migration
 

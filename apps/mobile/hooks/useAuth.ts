@@ -1,12 +1,16 @@
-import { useState, useEffect, useCallback, createContext, useContext } from 'react';
-import { AppState, AppStateStatus } from 'react-native';
+import { useState, useEffect, useCallback, createContext, useContext } from "react";
+import { AppState, AppStateStatus } from "react-native";
 import {
-  getToken, setToken, clearTokens, decodeJWT, apiFetch,
+  getToken,
+  setToken,
+  clearTokens,
+  decodeJWT,
+  apiFetch,
   setMustChangePassword as persistMustChangePassword,
   getMustChangePassword,
-} from '@/lib/api';
-import { API } from '@/constants/api';
-import type { UserRole } from '@aivo/brand';
+} from "@/lib/api";
+import { API } from "@/constants/api";
+import type { UserRole } from "@aivo/brand";
 
 interface User {
   id: string;
@@ -30,11 +34,33 @@ interface AuthState {
 }
 
 interface AuthContextValue extends AuthState {
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; mfaPending?: boolean; mfaToken?: string; mustChangePassword?: boolean }>;
+  login: (
+    email: string,
+    password: string,
+  ) => Promise<{
+    success: boolean;
+    error?: string;
+    mfaPending?: boolean;
+    mfaToken?: string;
+    mustChangePassword?: boolean;
+  }>;
   loginWithPin: (pin: string, parentId: string) => Promise<{ success: boolean; error?: string }>;
   signup: (data: SignupData) => Promise<{ success: boolean; error?: string }>;
-  loginWithGoogle: (idToken: string, consent?: { coppaConsent: boolean; termsAccepted: boolean }) => Promise<{ success: boolean; error?: string; requiresConsent?: boolean; mfaPending?: boolean; mfaToken?: string; mustChangePassword?: boolean }>;
-  verifyMfa: (mfaToken: string, code: string) => Promise<{ success: boolean; error?: string; mustChangePassword?: boolean }>;
+  loginWithGoogle: (
+    idToken: string,
+    consent?: { coppaConsent: boolean; termsAccepted: boolean },
+  ) => Promise<{
+    success: boolean;
+    error?: string;
+    requiresConsent?: boolean;
+    mfaPending?: boolean;
+    mfaToken?: string;
+    mustChangePassword?: boolean;
+  }>;
+  verifyMfa: (
+    mfaToken: string,
+    code: string,
+  ) => Promise<{ success: boolean; error?: string; mustChangePassword?: boolean }>;
   resendMfa: (mfaToken: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   clearMustChangePassword: () => Promise<void>;
@@ -51,7 +77,7 @@ export const AuthContext = createContext<AuthContextValue | null>(null);
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }
@@ -70,9 +96,9 @@ export function useAuthState(): AuthContextValue {
     return {
       id: payload.sub as string,
       email: payload.email as string | undefined,
-      name: payload.name as string || '',
+      name: (payload.name as string) || "",
       role: payload.role as UserRole,
-      tenantId: payload.tenantId as string || '',
+      tenantId: (payload.tenantId as string) || "",
     };
   };
 
@@ -86,7 +112,12 @@ export function useAuthState(): AuthContextValue {
           const user = extractUser(token);
           if (user) {
             const mustChange = await getMustChangePassword();
-            setState({ user, isLoading: false, isAuthenticated: true, mustChangePassword: mustChange });
+            setState({
+              user,
+              isLoading: false,
+              isAuthenticated: true,
+              mustChangePassword: mustChange,
+            });
             return;
           }
         }
@@ -100,8 +131,8 @@ export function useAuthState(): AuthContextValue {
   }, [checkAuth]);
 
   useEffect(() => {
-    const sub = AppState.addEventListener('change', (nextState: AppStateStatus) => {
-      if (nextState === 'active') {
+    const sub = AppState.addEventListener("change", (nextState: AppStateStatus) => {
+      if (nextState === "active") {
         checkAuth();
       }
     });
@@ -110,8 +141,8 @@ export function useAuthState(): AuthContextValue {
 
   const login = useCallback(async (email: string, password: string) => {
     try {
-      const response = await apiFetch(API.IDENTITY, '/api/auth/login', {
-        method: 'POST',
+      const response = await apiFetch(API.IDENTITY, "/api/auth/login", {
+        method: "POST",
         body: JSON.stringify({ email, password }),
         skipAuth: true,
       });
@@ -126,20 +157,25 @@ export function useAuthState(): AuthContextValue {
         await persistMustChangePassword(mustChange);
         const user = extractUser(data.accessToken);
         if (user) {
-          setState({ user, isLoading: false, isAuthenticated: true, mustChangePassword: mustChange });
+          setState({
+            user,
+            isLoading: false,
+            isAuthenticated: true,
+            mustChangePassword: mustChange,
+          });
           return { success: true, mustChangePassword: mustChange };
         }
       }
-      return { success: false, error: data.error || data.message || 'Login failed' };
+      return { success: false, error: data.error || data.message || "Login failed" };
     } catch {
-      return { success: false, error: 'Network error. Please try again.' };
+      return { success: false, error: "Network error. Please try again." };
     }
   }, []);
 
   const loginWithPin = useCallback(async (pin: string, parentId: string) => {
     try {
-      const response = await apiFetch(API.IDENTITY, '/api/auth/pin-login', {
-        method: 'POST',
+      const response = await apiFetch(API.IDENTITY, "/api/auth/pin-login", {
+        method: "POST",
         body: JSON.stringify({ parentId, pin }),
         skipAuth: true,
       });
@@ -155,17 +191,22 @@ export function useAuthState(): AuthContextValue {
           return { success: true };
         }
       }
-      return { success: false, error: 'Incorrect PIN' };
+      return { success: false, error: "Incorrect PIN" };
     } catch {
-      return { success: false, error: 'Network error' };
+      return { success: false, error: "Network error" };
     }
   }, []);
 
   const signup = useCallback(async (data: SignupData) => {
     try {
-      const response = await apiFetch(API.IDENTITY, '/api/auth/register', {
-        method: 'POST',
-        body: JSON.stringify({ email: data.email, password: data.password, name: data.name, role: 'PARENT' }),
+      const response = await apiFetch(API.IDENTITY, "/api/auth/register", {
+        method: "POST",
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+          name: data.name,
+          role: "PARENT",
+        }),
         skipAuth: true,
       });
 
@@ -183,53 +224,61 @@ export function useAuthState(): AuthContextValue {
         }
       }
       const error = await response.json().catch(() => ({}));
-      return { success: false, error: error.error || error.message || 'Registration failed' };
+      return { success: false, error: error.error || error.message || "Registration failed" };
     } catch {
-      return { success: false, error: 'Network error' };
+      return { success: false, error: "Network error" };
     }
   }, []);
 
-  const loginWithGoogle = useCallback(async (idToken: string, consent?: { coppaConsent: boolean; termsAccepted: boolean }) => {
-    try {
-      const body: Record<string, unknown> = { idToken };
-      if (consent) {
-        body.coppaConsent = consent.coppaConsent;
-        body.termsAccepted = consent.termsAccepted;
-      }
-
-      const response = await apiFetch(API.IDENTITY, '/api/auth/google', {
-        method: 'POST',
-        body: JSON.stringify(body),
-        skipAuth: true,
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        if (data.mfaPending) {
-          return { success: false, mfaPending: true, mfaToken: data.mfaToken };
+  const loginWithGoogle = useCallback(
+    async (idToken: string, consent?: { coppaConsent: boolean; termsAccepted: boolean }) => {
+      try {
+        const body: Record<string, unknown> = { idToken };
+        if (consent) {
+          body.coppaConsent = consent.coppaConsent;
+          body.termsAccepted = consent.termsAccepted;
         }
-        await setToken(data.accessToken);
-        const mustChange = !!data.mustChangePassword;
-        await persistMustChangePassword(mustChange);
-        const user = extractUser(data.accessToken);
-        if (user) {
-          setState({ user, isLoading: false, isAuthenticated: true, mustChangePassword: mustChange });
-          return { success: true, mustChangePassword: mustChange };
+
+        const response = await apiFetch(API.IDENTITY, "/api/auth/google", {
+          method: "POST",
+          body: JSON.stringify(body),
+          skipAuth: true,
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          if (data.mfaPending) {
+            return { success: false, mfaPending: true, mfaToken: data.mfaToken };
+          }
+          await setToken(data.accessToken);
+          const mustChange = !!data.mustChangePassword;
+          await persistMustChangePassword(mustChange);
+          const user = extractUser(data.accessToken);
+          if (user) {
+            setState({
+              user,
+              isLoading: false,
+              isAuthenticated: true,
+              mustChangePassword: mustChange,
+            });
+            return { success: true, mustChangePassword: mustChange };
+          }
         }
+        if (data.requiresConsent) {
+          return { success: false, error: "requiresConsent", requiresConsent: true };
+        }
+        return { success: false, error: data.error || "Google sign-in failed" };
+      } catch {
+        return { success: false, error: "Network error. Please try again." };
       }
-      if (data.requiresConsent) {
-        return { success: false, error: 'requiresConsent', requiresConsent: true };
-      }
-      return { success: false, error: data.error || 'Google sign-in failed' };
-    } catch {
-      return { success: false, error: 'Network error. Please try again.' };
-    }
-  }, []);
+    },
+    [],
+  );
 
   const verifyMfa = useCallback(async (mfaToken: string, code: string) => {
     try {
-      const response = await apiFetch(API.IDENTITY, '/api/auth/verify-mfa', {
-        method: 'POST',
+      const response = await apiFetch(API.IDENTITY, "/api/auth/verify-mfa", {
+        method: "POST",
         body: JSON.stringify({ mfaToken, code }),
         skipAuth: true,
       });
@@ -240,21 +289,26 @@ export function useAuthState(): AuthContextValue {
         await persistMustChangePassword(mustChange);
         const user = extractUser(data.accessToken);
         if (user) {
-          setState({ user, isLoading: false, isAuthenticated: true, mustChangePassword: mustChange });
+          setState({
+            user,
+            isLoading: false,
+            isAuthenticated: true,
+            mustChangePassword: mustChange,
+          });
           return { success: true, mustChangePassword: mustChange };
         }
       }
       const error = await response.json().catch(() => ({}));
-      return { success: false, error: error.error || 'Verification failed' };
+      return { success: false, error: error.error || "Verification failed" };
     } catch {
-      return { success: false, error: 'Network error' };
+      return { success: false, error: "Network error" };
     }
   }, []);
 
   const resendMfa = useCallback(async (mfaToken: string) => {
     try {
-      const response = await apiFetch(API.IDENTITY, '/api/auth/mfa/resend', {
-        method: 'POST',
+      const response = await apiFetch(API.IDENTITY, "/api/auth/mfa/resend", {
+        method: "POST",
         body: JSON.stringify({ mfaToken }),
         skipAuth: true,
       });
@@ -262,15 +316,15 @@ export function useAuthState(): AuthContextValue {
         return { success: true };
       }
       const error = await response.json().catch(() => ({}));
-      return { success: false, error: error.error || 'Resend failed' };
+      return { success: false, error: error.error || "Resend failed" };
     } catch {
-      return { success: false, error: 'Network error' };
+      return { success: false, error: "Network error" };
     }
   }, []);
 
   const logout = useCallback(async () => {
     try {
-      await apiFetch(API.IDENTITY, '/api/auth/logout', { method: 'POST' });
+      await apiFetch(API.IDENTITY, "/api/auth/logout", { method: "POST" });
     } catch {}
     await clearTokens();
     setState({ user: null, isLoading: false, isAuthenticated: false, mustChangePassword: false });

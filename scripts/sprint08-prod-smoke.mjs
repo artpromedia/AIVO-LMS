@@ -17,9 +17,7 @@
  * failed network call is a failed certification.
  */
 
-const BASE_URL =
-  process.env.SMOKE_BASE_URL ||
-  "http://tutor-svc.aivo.svc.cluster.local:3000";
+const BASE_URL = process.env.SMOKE_BASE_URL || "http://tutor-svc.aivo.svc.cluster.local:3000";
 const TIMEOUT_MS = Number(process.env.SMOKE_TIMEOUT_MS || "5000");
 
 /** Single HTTP check spec. */

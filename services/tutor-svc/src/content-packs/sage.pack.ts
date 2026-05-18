@@ -23,7 +23,8 @@ export const sageStarterPack: ContentPack = {
       title: "How books work",
       skillId: "ccss-ela.K.RF.1",
       type: "narration",
-      prompt: "When we read, we go from the top of the page to the bottom, and from left to right. Let's practice with this story.",
+      prompt:
+        "When we read, we go from the top of the page to the bottom, and from left to right. Let's practice with this story.",
       difficulty: "intro",
     },
     {

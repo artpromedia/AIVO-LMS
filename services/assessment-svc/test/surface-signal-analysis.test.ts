@@ -20,9 +20,27 @@ test("returns a zeroed summary for empty input", () => {
 
 test("computes scratchpad use rate over eligible activities", () => {
   const signals: SurfaceSignal[] = [
-    { activityId: "a1", domain: "math", interaction: "geometry_workspace", scratchpadUsed: true, correct: true },
-    { activityId: "a2", domain: "math", interaction: "geometry_workspace", scratchpadUsed: false, correct: true },
-    { activityId: "a3", domain: "math", interaction: "geometry_workspace", scratchpadUsed: true, correct: false },
+    {
+      activityId: "a1",
+      domain: "math",
+      interaction: "geometry_workspace",
+      scratchpadUsed: true,
+      correct: true,
+    },
+    {
+      activityId: "a2",
+      domain: "math",
+      interaction: "geometry_workspace",
+      scratchpadUsed: false,
+      correct: true,
+    },
+    {
+      activityId: "a3",
+      domain: "math",
+      interaction: "geometry_workspace",
+      scratchpadUsed: true,
+      correct: false,
+    },
     // Not scratchpad-eligible
     { activityId: "a4", domain: "ela", interaction: "choice_grid", correct: true },
   ];
@@ -64,8 +82,20 @@ test("self-correction signal goes high when erasures+correctness co-occur", () =
 
 test("emits supportNeeds for high scratchpad use and short attention", () => {
   const signals: SurfaceSignal[] = [
-    { activityId: "a1", domain: "math", interaction: "geometry_workspace", scratchpadUsed: true, correct: true },
-    { activityId: "a2", domain: "math", interaction: "geometry_workspace", scratchpadUsed: true, correct: true },
+    {
+      activityId: "a1",
+      domain: "math",
+      interaction: "geometry_workspace",
+      scratchpadUsed: true,
+      correct: true,
+    },
+    {
+      activityId: "a2",
+      domain: "math",
+      interaction: "geometry_workspace",
+      scratchpadUsed: true,
+      correct: true,
+    },
     { activityId: "a3", domain: "math", interaction: "geometry_workspace", abandoned: true },
     { activityId: "a4", domain: "math", interaction: "geometry_workspace", abandoned: true },
   ];

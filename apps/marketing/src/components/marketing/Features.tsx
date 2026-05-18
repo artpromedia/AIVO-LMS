@@ -6,12 +6,48 @@ export function Features({ scrollY }: { scrollY: number }) {
   const t = useTranslations("marketing.features");
 
   const FEATURES = [
-    { Icon: Layers, titleKey: "levels_title" as const, descKey: "levels_desc" as const, iconBg: "bg-violet-100", iconColor: "text-violet-600" },
-    { Icon: Users, titleKey: "tutors_title" as const, descKey: "tutors_desc" as const, iconBg: "bg-cyan-100", iconColor: "text-cyan-600" },
-    { Icon: Brain, titleKey: "brain_title" as const, descKey: "brain_desc" as const, iconBg: "bg-amber-100", iconColor: "text-amber-600" },
-    { Icon: MapPin, titleKey: "region_title" as const, descKey: "region_desc" as const, iconBg: "bg-emerald-100", iconColor: "text-emerald-600" },
-    { Icon: Eye, titleKey: "sensory_title" as const, descKey: "sensory_desc" as const, iconBg: "bg-pink-100", iconColor: "text-pink-600" },
-    { Icon: BarChart3, titleKey: "analytics_title" as const, descKey: "analytics_desc" as const, iconBg: "bg-indigo-100", iconColor: "text-indigo-600" },
+    {
+      Icon: Layers,
+      titleKey: "levels_title" as const,
+      descKey: "levels_desc" as const,
+      iconBg: "bg-violet-100",
+      iconColor: "text-violet-600",
+    },
+    {
+      Icon: Users,
+      titleKey: "tutors_title" as const,
+      descKey: "tutors_desc" as const,
+      iconBg: "bg-cyan-100",
+      iconColor: "text-cyan-600",
+    },
+    {
+      Icon: Brain,
+      titleKey: "brain_title" as const,
+      descKey: "brain_desc" as const,
+      iconBg: "bg-amber-100",
+      iconColor: "text-amber-600",
+    },
+    {
+      Icon: MapPin,
+      titleKey: "region_title" as const,
+      descKey: "region_desc" as const,
+      iconBg: "bg-emerald-100",
+      iconColor: "text-emerald-600",
+    },
+    {
+      Icon: Eye,
+      titleKey: "sensory_title" as const,
+      descKey: "sensory_desc" as const,
+      iconBg: "bg-pink-100",
+      iconColor: "text-pink-600",
+    },
+    {
+      Icon: BarChart3,
+      titleKey: "analytics_title" as const,
+      descKey: "analytics_desc" as const,
+      iconBg: "bg-indigo-100",
+      iconColor: "text-indigo-600",
+    },
   ];
 
   return (
@@ -27,9 +63,7 @@ export function Features({ scrollY }: { scrollY: number }) {
           <h2 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 mb-4 leading-tight">
             {t("title")}
           </h2>
-          <p className="text-lg text-slate-600 font-body">
-            {t("subtitle")}
-          </p>
+          <p className="text-lg text-slate-600 font-body">{t("subtitle")}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -38,7 +72,9 @@ export function Features({ scrollY }: { scrollY: number }) {
               key={f.titleKey}
               className="bg-white border-2 border-slate-100 rounded-3xl p-7 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
             >
-              <div className={`w-14 h-14 ${f.iconBg} ${f.iconColor} rounded-2xl flex items-center justify-center mb-5`}>
+              <div
+                className={`w-14 h-14 ${f.iconBg} ${f.iconColor} rounded-2xl flex items-center justify-center mb-5`}
+              >
                 <f.Icon className="w-7 h-7" aria-hidden="true" />
               </div>
               <h3 className="text-xl font-heading font-bold text-slate-900 mb-2">

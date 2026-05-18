@@ -37,32 +37,39 @@ export default function AdminAnalyticsPage() {
     const headers = { Authorization: `Bearer ${accessToken}` };
     Promise.all([
       fetch("/api/research/metrics/engagement", { headers })
-        .then((r) => r.ok ? r.json() : null).catch(() => null),
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null),
       fetch("/api/research/metrics/mastery", { headers })
-        .then((r) => r.ok ? r.json() : null).catch(() => null),
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null),
       fetch("/api/research/cohorts", { headers })
-        .then((r) => r.ok ? r.json() : null).catch(() => null),
-    ]).then(([eng, mast, coh]) => {
-      if (eng) {
-        setEngagement({
-          totalSessions: eng.totalSessions ?? 0,
-          totalDuration: 0,
-          completionRate: eng.completionRate ?? 0,
-          avgSessionLength: eng.avgSessionDurationMin ?? 0,
-        });
-      }
-      if (mast?.subjectBreakdown) {
-        const subjects = Object.entries(mast.subjectBreakdown).map(([subject, data]: [string, any]) => ({
-          subject: subject.charAt(0).toUpperCase() + subject.slice(1),
-          avgMastery: Math.round((data.avgMastery ?? 0) * 100),
-          growth: Math.round((data.growth ?? 0) * 100),
-        }));
-        setMastery({ subjects });
-      }
-      if (coh?.cohorts) {
-        setCohorts(coh.cohorts.map((c: any) => ({ level: c.name || c.id, count: c.count })));
-      }
-    }).finally(() => setLoading(false));
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null),
+    ])
+      .then(([eng, mast, coh]) => {
+        if (eng) {
+          setEngagement({
+            totalSessions: eng.totalSessions ?? 0,
+            totalDuration: 0,
+            completionRate: eng.completionRate ?? 0,
+            avgSessionLength: eng.avgSessionDurationMin ?? 0,
+          });
+        }
+        if (mast?.subjectBreakdown) {
+          const subjects = Object.entries(mast.subjectBreakdown).map(
+            ([subject, data]: [string, any]) => ({
+              subject: subject.charAt(0).toUpperCase() + subject.slice(1),
+              avgMastery: Math.round((data.avgMastery ?? 0) * 100),
+              growth: Math.round((data.growth ?? 0) * 100),
+            }),
+          );
+          setMastery({ subjects });
+        }
+        if (coh?.cohorts) {
+          setCohorts(coh.cohorts.map((c: any) => ({ level: c.name || c.id, count: c.count })));
+        }
+      })
+      .finally(() => setLoading(false));
   }, [accessToken]);
 
   /* eslint-disable no-restricted-syntax -- semantic data-viz palette for cohort levels; values map to fixed analytic categories, not surface tokens */
@@ -86,7 +93,9 @@ export default function AdminAnalyticsPage() {
           </IconWell>
           <div>
             <h1 className="text-2xl font-heading font-bold vi-text">{td("analytics")}</h1>
-            <p className="text-sm vi-text-muted mt-1">Platform-wide engagement metrics, mastery growth, and research data.</p>
+            <p className="text-sm vi-text-muted mt-1">
+              Platform-wide engagement metrics, mastery growth, and research data.
+            </p>
           </div>
         </div>
         <button
@@ -106,12 +115,40 @@ export default function AdminAnalyticsPage() {
       ) : (
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {([
-              { label: "Total Sessions", value: engagement?.totalSessions ?? "—", Icon: BookOpen, color: "primary" },
-              { label: "Avg Session Length", value: engagement?.avgSessionLength ? `${Math.round(engagement.avgSessionLength)}min` : "—", Icon: Clock, color: "reading" },
-              { label: "Completion Rate", value: engagement?.completionRate ? `${Math.round(engagement.completionRate * 100)}%` : "—", Icon: CheckCircle2, color: "science" },
-              { label: "Total Duration", value: engagement?.totalDuration ? `${Math.round(engagement.totalDuration / 60)}h` : "—", Icon: BarChart3, color: "math" },
-            ] as { label: string; value: string | number; Icon: LucideIcon; color: string }[]).map((m) => {
+            {(
+              [
+                {
+                  label: "Total Sessions",
+                  value: engagement?.totalSessions ?? "—",
+                  Icon: BookOpen,
+                  color: "primary",
+                },
+                {
+                  label: "Avg Session Length",
+                  value: engagement?.avgSessionLength
+                    ? `${Math.round(engagement.avgSessionLength)}min`
+                    : "—",
+                  Icon: Clock,
+                  color: "reading",
+                },
+                {
+                  label: "Completion Rate",
+                  value: engagement?.completionRate
+                    ? `${Math.round(engagement.completionRate * 100)}%`
+                    : "—",
+                  Icon: CheckCircle2,
+                  color: "science",
+                },
+                {
+                  label: "Total Duration",
+                  value: engagement?.totalDuration
+                    ? `${Math.round(engagement.totalDuration / 60)}h`
+                    : "—",
+                  Icon: BarChart3,
+                  color: "math",
+                },
+              ] as { label: string; value: string | number; Icon: LucideIcon; color: string }[]
+            ).map((m) => {
               const Icon = m.Icon;
               return (
                 <div key={m.label} className="bg-white rounded-xl p-5 shadow-sm border vi-border">
@@ -139,11 +176,18 @@ export default function AdminAnalyticsPage() {
                     return (
                       <div key={c.level}>
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-semibold vi-text">{c.level.replace(/_/g, " ")}</span>
-                          <span className="text-sm font-bold vi-text">{c.count} ({pct}%)</span>
+                          <span className="text-sm font-semibold vi-text">
+                            {c.level.replace(/_/g, " ")}
+                          </span>
+                          <span className="text-sm font-bold vi-text">
+                            {c.count} ({pct}%)
+                          </span>
                         </div>
                         <div className="vi-surface-soft rounded-full h-3 overflow-hidden">
-                          <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: color }} />
+                          <div
+                            className="h-full rounded-full transition-all"
+                            style={{ width: `${pct}%`, backgroundColor: color }}
+                          />
                         </div>
                       </div>
                     );
@@ -163,37 +207,57 @@ export default function AdminAnalyticsPage() {
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-sm font-semibold vi-text">{s.subject}</span>
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-bold vi-text">{Math.round(s.avgMastery)}%</span>
-                          {s.growth > 0 && <span className="text-xs text-[hsl(var(--visual-science))]">+{s.growth}%</span>}
+                          <span className="text-sm font-bold vi-text">
+                            {Math.round(s.avgMastery)}%
+                          </span>
+                          {s.growth > 0 && (
+                            <span className="text-xs text-[hsl(var(--visual-science))]">
+                              +{s.growth}%
+                            </span>
+                          )}
                         </div>
                       </div>
                       <div className="vi-surface-soft rounded-full h-3 overflow-hidden">
-                        <div className="h-full bg-[hsl(var(--visual-primary))] rounded-full" style={{ width: `${s.avgMastery}%` }} />
+                        <div
+                          className="h-full bg-[hsl(var(--visual-primary))] rounded-full"
+                          style={{ width: `${s.avgMastery}%` }}
+                        />
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm vi-text-muted text-center py-8">No mastery data available yet</p>
+                <p className="text-sm vi-text-muted text-center py-8">
+                  No mastery data available yet
+                </p>
               )}
             </div>
           </div>
 
           <div className="vi-card p-6">
             <h2 className="font-heading font-bold text-lg mb-2">{tc("download")}</h2>
-            <p className="text-sm vi-text-muted mb-4">Export anonymized learner data for research purposes. All data is de-identified per FERPA/COPPA requirements.</p>
+            <p className="text-sm vi-text-muted mb-4">
+              Export anonymized learner data for research purposes. All data is de-identified per
+              FERPA/COPPA requirements.
+            </p>
             <div className="grid grid-cols-3 gap-4">
               <div className="p-4 rounded-xl vi-surface-soft vi-border border">
                 <p className="text-sm font-semibold">Anonymized Profiles</p>
-                <p className="text-xs vi-text-muted mt-1">Functioning levels, mastery scores, engagement patterns</p>
+                <p className="text-xs vi-text-muted mt-1">
+                  Functioning levels, mastery scores, engagement patterns
+                </p>
               </div>
               <div className="p-4 rounded-xl vi-surface-soft vi-border border">
                 <p className="text-sm font-semibold">Session Analytics</p>
-                <p className="text-xs vi-text-muted mt-1">Duration, completion, difficulty progression</p>
+                <p className="text-xs vi-text-muted mt-1">
+                  Duration, completion, difficulty progression
+                </p>
               </div>
               <div className="p-4 rounded-xl vi-surface-soft vi-border border">
                 <p className="text-sm font-semibold">Intervention Outcomes</p>
-                <p className="text-xs vi-text-muted mt-1">Accommodation effectiveness, mastery growth</p>
+                <p className="text-xs vi-text-muted mt-1">
+                  Accommodation effectiveness, mastery growth
+                </p>
               </div>
             </div>
           </div>

@@ -57,7 +57,11 @@ const full: IepPacketInput = {
     { date: "2026-09-05", status: "present" },
     { date: "2026-09-06", status: "absent", notes: "doctor" },
   ],
-  meta: { districtName: "Sunnyvale USD", preparedBy: "AIVO Assessment Service", preparedAt: "2026-09-10T08:00:00Z" },
+  meta: {
+    districtName: "Sunnyvale USD",
+    preparedBy: "AIVO Assessment Service",
+    preparedAt: "2026-09-10T08:00:00Z",
+  },
 };
 
 test("buildIepPacket → minimal input renders all 7 sections", () => {

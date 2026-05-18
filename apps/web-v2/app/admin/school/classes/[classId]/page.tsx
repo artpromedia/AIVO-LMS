@@ -57,9 +57,13 @@ export default async function Page({ params }: Params) {
           ) : (
             <ul className="mt-2 space-y-1 text-sm">
               {learners.slice(0, 50).map((e) => (
-                <li key={e.id} className="font-mono text-xs">{e.subjectId}</li>
+                <li key={e.id} className="font-mono text-xs">
+                  {e.subjectId}
+                </li>
               ))}
-              {learners.length > 50 ? <li className="text-aivo-muted">…and {learners.length - 50} more.</li> : null}
+              {learners.length > 50 ? (
+                <li className="text-aivo-muted">…and {learners.length - 50} more.</li>
+              ) : null}
             </ul>
           )}
         </Card>

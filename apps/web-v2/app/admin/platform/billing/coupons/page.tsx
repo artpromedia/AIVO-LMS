@@ -62,9 +62,7 @@ export default async function Page() {
       <div className="grid gap-4 md:grid-cols-4">
         {stats.map((s) => (
           <Card key={s.k} className="p-[var(--aivo-density-card-pad)]">
-            <p className="text-xs uppercase tracking-wide text-aivo-ink-soft">
-              {s.k}
-            </p>
+            <p className="text-xs uppercase tracking-wide text-aivo-ink-soft">{s.k}</p>
             <p className="mt-2 font-display text-3xl font-semibold">{s.v}</p>
           </Card>
         ))}
@@ -97,27 +95,19 @@ export default async function Page() {
                 return (
                   <tr key={c.id} className="hover:bg-aivo-surface-2/40">
                     <td className="px-4 py-3">
-                      <div className="font-mono text-sm font-semibold">
-                        {c.code}
-                      </div>
+                      <div className="font-mono text-sm font-semibold">{c.code}</div>
                       <div className="text-xs text-aivo-ink-soft">{c.name}</div>
                     </td>
-                    <td className="px-4 py-3 font-medium">
-                      {formatDiscount(c.discount)}
-                    </td>
+                    <td className="px-4 py-3 font-medium">{formatDiscount(c.discount)}</td>
                     <td className="px-4 py-3 text-aivo-ink-soft">
-                      {c.appliesToPlans === null
-                        ? "All plans"
-                        : c.appliesToPlans.join(", ")}
+                      {c.appliesToPlans === null ? "All plans" : c.appliesToPlans.join(", ")}
                     </td>
                     <td className="px-4 py-3">
                       <Badge tone={STATUS_TONE[c.status]}>{c.status}</Badge>
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums">
                       <div>{c.redemptionsCount.toLocaleString()}</div>
-                      <div className="text-xs text-aivo-ink-soft">
-                        {limitLabel}
-                      </div>
+                      <div className="text-xs text-aivo-ink-soft">{limitLabel}</div>
                     </td>
                     <td className="px-4 py-3 text-xs text-aivo-ink-soft">
                       {formatDate(c.validFrom)} → {formatDate(c.validUntil)}

@@ -16,7 +16,10 @@ class SwitchScanAdapter implements AACInputAdapter {
   readonly vendorName = "SwitchScanController";
   private controller: SwitchScanController;
 
-  constructor(private config: AACSessionConfig, private items: SymbolItem[]) {
+  constructor(
+    private config: AACSessionConfig,
+    private items: SymbolItem[],
+  ) {
     this.controller = new SwitchScanController(config, items);
   }
 

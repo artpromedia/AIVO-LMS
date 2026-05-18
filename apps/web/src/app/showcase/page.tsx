@@ -31,13 +31,22 @@ const TIERS = [
 
 export default function ShowcaseIndexPage() {
   return (
-    <main style={{ minHeight: "100vh", padding: 48, background: "#fafafa", fontFamily: "system-ui, sans-serif" }}>
+    <main
+      style={{
+        minHeight: "100vh",
+        padding: 48,
+        background: "#fafafa",
+        fontFamily: "system-ui, sans-serif",
+      }}
+    >
       <h1 style={{ fontSize: 32, marginBottom: 8 }}>AIVO — Tier Theme Showcase</h1>
       <p style={{ color: "#666", marginBottom: 32 }}>
         Internal QA preview of the three production age-tier themes. The active tier is auto-derived
         from a learner&rsquo;s grade level on every page under <code>/dashboard/learner/*</code>.
       </p>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, maxWidth: 1200 }}>
+      <div
+        style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, maxWidth: 1200 }}
+      >
         {TIERS.map((d) => (
           <Link
             key={d.slug}

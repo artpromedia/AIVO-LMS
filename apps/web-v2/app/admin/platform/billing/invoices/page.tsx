@@ -6,10 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import {
-  scopeTenantsForSession,
-  listInvoicesForTenants,
-} from "@/lib/db/repos";
+import { scopeTenantsForSession, listInvoicesForTenants } from "@/lib/db/repos";
 
 const STATUS_TONE: Record<string, "success" | "warning" | "danger" | "neutral"> = {
   paid: "success",
@@ -72,14 +69,10 @@ export default async function Page() {
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
             Total invoices
           </p>
-          <p className="mt-1 font-display text-3xl font-bold">
-            {invoices.length.toLocaleString()}
-          </p>
+          <p className="mt-1 font-display text-3xl font-bold">{invoices.length.toLocaleString()}</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            Paid
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">Paid</p>
           <p className="mt-1 font-display text-3xl font-bold">
             {(byStatus.paid ?? 0).toLocaleString()}
           </p>
@@ -88,9 +81,7 @@ export default async function Page() {
           </p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            Open
-          </p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">Open</p>
           <p className="mt-1 font-display text-3xl font-bold">
             {(byStatus.open ?? 0).toLocaleString()}
           </p>
@@ -103,16 +94,13 @@ export default async function Page() {
           <p className="mt-1 font-display text-3xl font-bold">
             {fmtCurrency(outstandingCents, "USD")}
           </p>
-          <p className="mt-1 text-xs text-aivo-ink-soft">
-            open + uncollectible
-          </p>
+          <p className="mt-1 text-xs text-aivo-ink-soft">open + uncollectible</p>
         </Card>
       </div>
 
       <Card className="mt-6 overflow-hidden">
         <div className="border-b border-aivo-border px-4 py-3 text-sm font-medium">
-          {invoices.length.toLocaleString()}{" "}
-          {invoices.length === 1 ? "invoice" : "invoices"}
+          {invoices.length.toLocaleString()} {invoices.length === 1 ? "invoice" : "invoices"}
         </div>
         {invoices.length === 0 ? (
           <EmptyState title="No invoices yet" />
@@ -134,9 +122,7 @@ export default async function Page() {
                   const t = tenantById.get(inv.tenantId);
                   return (
                     <tr key={inv.id}>
-                      <td className="px-4 py-3 font-mono text-xs">
-                        {inv.number}
-                      </td>
+                      <td className="px-4 py-3 font-mono text-xs">{inv.number}</td>
                       <td className="px-4 py-3">
                         {t ? (
                           <Link
@@ -146,27 +132,21 @@ export default async function Page() {
                             {t.name}
                           </Link>
                         ) : (
-                          <span className="text-aivo-ink-soft">
-                            {inv.tenantId}
-                          </span>
+                          <span className="text-aivo-ink-soft">{inv.tenantId}</span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-right tabular-nums font-medium">
                         {fmtCurrency(inv.amountCents, inv.currency)}
                       </td>
                       <td className="px-4 py-3">
-                        <Badge tone={STATUS_TONE[inv.status] ?? "neutral"}>
-                          {inv.status}
-                        </Badge>
+                        <Badge tone={STATUS_TONE[inv.status] ?? "neutral"}>{inv.status}</Badge>
                       </td>
                       <td className="px-4 py-3 text-xs text-aivo-ink-soft">
                         {new Date(inv.periodStartAt).toLocaleDateString()} →{" "}
                         {new Date(inv.periodEndAt).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3 text-xs text-aivo-ink-soft">
-                        {inv.paidAt
-                          ? new Date(inv.paidAt).toLocaleDateString()
-                          : "—"}
+                        {inv.paidAt ? new Date(inv.paidAt).toLocaleDateString() : "—"}
                       </td>
                     </tr>
                   );

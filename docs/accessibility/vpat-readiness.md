@@ -26,21 +26,21 @@ Authoritative locations:
 Defined in `AccessibilityPreferences`. Every preference is honored by
 the lesson UI + generation layer when set:
 
-| Preference | Effect |
-|---|---|
-| `reducedMotion` | suppress non-essential animation; respect prefers-reduced-motion |
-| `highContrast` | swap to high-contrast color scheme |
-| `largeText` | upscale base font + line height |
-| `audioFirst` | tutor speaks before the printed prompt |
-| `captionsAlwaysOn` | TTS audio always has visible captions |
-| `hapticsEnabled` | mobile haptic feedback on confirm / success |
-| `readAloud` | every text block gets a read-aloud button |
-| `dyslexiaFriendlyFont` | swap to OpenDyslexic / Atkinson Hyperlegible |
-| `shorterSteps` | generator splits long steps into smaller ones |
-| `extraHints` | generator emits scaffold steps before the check |
-| `visualSupports` | add visual aids (number lines, picture cues) |
-| `breakReminders` | session pauses with break prompts every N minutes |
-| `keyboardOptimized` | layout adapts for keyboard-first navigation |
+| Preference             | Effect                                                           |
+| ---------------------- | ---------------------------------------------------------------- |
+| `reducedMotion`        | suppress non-essential animation; respect prefers-reduced-motion |
+| `highContrast`         | swap to high-contrast color scheme                               |
+| `largeText`            | upscale base font + line height                                  |
+| `audioFirst`           | tutor speaks before the printed prompt                           |
+| `captionsAlwaysOn`     | TTS audio always has visible captions                            |
+| `hapticsEnabled`       | mobile haptic feedback on confirm / success                      |
+| `readAloud`            | every text block gets a read-aloud button                        |
+| `dyslexiaFriendlyFont` | swap to OpenDyslexic / Atkinson Hyperlegible                     |
+| `shorterSteps`         | generator splits long steps into smaller ones                    |
+| `extraHints`           | generator emits scaffold steps before the check                  |
+| `visualSupports`       | add visual aids (number lines, picture cues)                     |
+| `breakReminders`       | session pauses with break prompts every N minutes                |
+| `keyboardOptimized`    | layout adapts for keyboard-first navigation                      |
 
 Preferences are loaded per learner; the `learner` role reads its own,
 `parent` reads any of its own learners, `teacher` reads only learners
@@ -63,15 +63,15 @@ covered by `teacher_access` consent.
 
 `packages/aac-bridge` exports:
 
-| API | Purpose |
-|---|---|
-| `useAACInput()` | React hook — wraps SwitchScan / Dwell / Eye-Gaze |
-| `SwitchScanController` | one/two/three-switch scan loops |
-| `parseOBF` / `parseOBZ` / `validateOBF` / `exportToOBF` | open board format |
-| `PRCSaltilloAdapter`, `TobiiAdapter`, `AssistiveWareAdapter` | vendor adapters |
-| `detectAndCreateAdapter`, `listAvailableAdapters` | factory |
-| `CoughDropSync` | symbol-board sync |
-| `CalibrationState`, `GazeTargetMapper`, `DwellClickController` | eye-gaze pipeline |
+| API                                                            | Purpose                                          |
+| -------------------------------------------------------------- | ------------------------------------------------ |
+| `useAACInput()`                                                | React hook — wraps SwitchScan / Dwell / Eye-Gaze |
+| `SwitchScanController`                                         | one/two/three-switch scan loops                  |
+| `parseOBF` / `parseOBZ` / `validateOBF` / `exportToOBF`        | open board format                                |
+| `PRCSaltilloAdapter`, `TobiiAdapter`, `AssistiveWareAdapter`   | vendor adapters                                  |
+| `detectAndCreateAdapter`, `listAvailableAdapters`              | factory                                          |
+| `CoughDropSync`                                                | symbol-board sync                                |
+| `CalibrationState`, `GazeTargetMapper`, `DwellClickController` | eye-gaze pipeline                                |
 
 AAC mode is selected by `FunctioningLevel` (Pre-Symbolic →
 observational; Non-Verbal → switch scan; Low Verbal → picture-based)
@@ -80,12 +80,12 @@ honors this; Sprint 15 ensures the same for LessonRun.
 
 ## WCAG 2.2 AA conformance
 
-| Principle | Coverage |
-|---|---|
-| Perceivable | alt text, decorative `aria-hidden`, contrast ≥ 4.5:1 body / 3:1 large, `role="progressbar"` |
-| Operable | keyboard accessible, logical focus order, `<SkipLink>`, no traps, `prefers-reduced-motion` respected |
-| Understandable | visible labels or `aria-label`, `role="alert"` errors, `role="status"` notices, `autoComplete` |
-| Robust | semantic HTML, ARIA only where native semantics don't suffice |
+| Principle      | Coverage                                                                                             |
+| -------------- | ---------------------------------------------------------------------------------------------------- |
+| Perceivable    | alt text, decorative `aria-hidden`, contrast ≥ 4.5:1 body / 3:1 large, `role="progressbar"`          |
+| Operable       | keyboard accessible, logical focus order, `<SkipLink>`, no traps, `prefers-reduced-motion` respected |
+| Understandable | visible labels or `aria-label`, `role="alert"` errors, `role="status"` notices, `autoComplete`       |
+| Robust         | semantic HTML, ARIA only where native semantics don't suffice                                        |
 
 WCAG 2.2 additions (over 2.1):
 

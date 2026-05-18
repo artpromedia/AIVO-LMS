@@ -46,10 +46,7 @@ export function MobileStageCompletion({
         {correctCount} / {total} correct ({score}%)
       </Text>
       <Text style={styles.line}>+{xpEarned} XP earned</Text>
-      <Pressable
-        style={[styles.btn, tier === "EARLY" && styles.btnEarly]}
-        onPress={onHome}
-      >
+      <Pressable style={[styles.btn, tier === "EARLY" && styles.btnEarly]} onPress={onHome}>
         <Text style={styles.btnText}>{homeLabel}</Text>
       </Pressable>
     </View>
@@ -67,7 +64,13 @@ function createStyles(theme: TierThemeMobile) {
       padding: 24,
     },
     emoji: { fontSize: 64 },
-    title: { color: theme.colors.text, fontSize: 26, fontWeight: "700", marginTop: 16, textAlign: "center" },
+    title: {
+      color: theme.colors.text,
+      fontSize: 26,
+      fontWeight: "700",
+      marginTop: 16,
+      textAlign: "center",
+    },
     line: { color: theme.colors.text, fontSize: 18 },
     btn: {
       marginTop: 32,

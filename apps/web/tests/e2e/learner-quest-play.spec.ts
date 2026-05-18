@@ -84,7 +84,11 @@ test.describe("learner quest play surface", () => {
       }),
     );
     await page.route("**/api/users/me", (route) =>
-      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(LEARNER) }),
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(LEARNER),
+      }),
     );
     await page.route("**/api/users/learners", (route) =>
       route.fulfill({
@@ -95,10 +99,16 @@ test.describe("learner quest play surface", () => {
     );
 
     await page.route("**/api/engagement/quests/worlds", (route) =>
-      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify([WORLD]) }),
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify([WORLD]),
+      }),
     );
     await page.route("**/api/engagement/quests/worlds/*", (route) => {
-      const slug = decodeURIComponent(new URL(route.request().url()).pathname.split("/").pop() ?? "");
+      const slug = decodeURIComponent(
+        new URL(route.request().url()).pathname.split("/").pop() ?? "",
+      );
       if (slug === WORLD.key || slug === WORLD.tutorKey) {
         return route.fulfill({
           status: 200,
@@ -189,7 +199,9 @@ test.describe("learner quest play surface", () => {
     await expect(summary).toContainText(QUEST.narrativeOutro);
   });
 
-  test("answering a question wrong reveals the explanation and lowers the score", async ({ page }) => {
+  test("answering a question wrong reveals the explanation and lowers the score", async ({
+    page,
+  }) => {
     await page.goto(`/dashboard/learner/quests/${WORLD.key}/play/${QUEST.id}`);
     await page.getByTestId("begin-quest").click();
 

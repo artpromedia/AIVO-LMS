@@ -19,7 +19,9 @@ test.describe("verify-mfa method binding via URL", () => {
     await expect(page.getByTestId("resend-email-code")).toHaveCount(0);
   });
 
-  test("renders the WebAuthn / passkey UI when ?method=webauthn and hides email-resend", async ({ page }) => {
+  test("renders the WebAuthn / passkey UI when ?method=webauthn and hides email-resend", async ({
+    page,
+  }) => {
     await page.goto(`/verify-mfa?token=${fakeToken}&method=webauthn`);
     await expect(page.getByText(/passkey|security key|webauthn/i)).toBeVisible({ timeout: 10_000 });
     await expect(page.getByTestId("resend-email-code")).toHaveCount(0);

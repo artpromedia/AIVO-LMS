@@ -22,14 +22,20 @@ import { desc, eq } from "drizzle-orm";
 // `verifyJWT` retained above only for `requirePlatformAdmin`.
 import { EVIDENCE_DIR, generateEvidenceBundle } from "../lib/soc2-evidence.js";
 import { logAuditEvent } from "./audit.js";
-import { getAdminSvcComplianceEvidenceSchema, getAdminSvcComplianceEvidenceByDateSchema, adminSvcComplianceEvidenceRunSchema } from "./schemas.js";
+import {
+  getAdminSvcComplianceEvidenceSchema,
+  getAdminSvcComplianceEvidenceByDateSchema,
+  adminSvcComplianceEvidenceRunSchema,
+} from "./schemas.js";
 
 async function requirePlatformAdmin(req: any, reply: any) {
   const auth = req.headers.authorization;
-  if (!auth?.startsWith("Bearer ")) return reply.status(401).send({ error: "Missing authorization header" });
+  if (!auth?.startsWith("Bearer "))
+    return reply.status(401).send({ error: "Missing authorization header" });
   try {
     const payload = await verifyJWT(auth.slice(7));
-    if (payload.role !== "PLATFORM_ADMIN") return reply.status(403).send({ error: "Platform admin access required" });
+    if (payload.role !== "PLATFORM_ADMIN")
+      return reply.status(403).send({ error: "Platform admin access required" });
     req.user = payload;
   } catch {
     return reply.status(401).send({ error: "Invalid token" });
@@ -50,8 +56,7 @@ function requireUrl(name: string, devDefault: string): string {
   return devDefault;
 }
 const IDENTITY_URL = requireUrl("IDENTITY_SVC_URL", "http://localhost:3001");
-const INTERNAL_KEY = process.env.INTERNAL_SERVICE_KEY
-  || (IS_PROD ? "" : "aivo-internal-dev-key");
+const INTERNAL_KEY = process.env.INTERNAL_SERVICE_KEY || (IS_PROD ? "" : "aivo-internal-dev-key");
 
 async function requireDataExportStepUp(req: any, reply: any) {
   // Always delegate to identity-svc — including the missing-token case —
@@ -71,12 +76,15 @@ async function requireDataExportStepUp(req: any, reply: any) {
     return reply.status(502).send({ error: "Step-up verifier unavailable" });
   }
   let body: any = null;
-  try { body = await res.json(); } catch { /* ignored */ }
+  try {
+    body = await res.json();
+  } catch {
+    /* ignored */
+  }
   if (res.ok && body?.valid) return; // includes flag-off skipped:true
   // Map identity's response back to client-facing status codes.
   const reason = body?.reason || "unknown";
-  const status = res.status === 401 ? 401
-    : (reason === "missing-fields" ? 401 : 403);
+  const status = res.status === 401 ? 401 : reason === "missing-fields" ? 401 : 403;
   return reply.status(status).send({
     error: "Step-up rejected",
     code: "STEP_UP_REQUIRED",
@@ -86,57 +94,82 @@ async function requireDataExportStepUp(req: any, reply: any) {
 }
 
 export function registerEvidenceRoutes(app: FastifyInstance, db: any) {
-  app.get("/api/admin-svc/compliance/evidence", { schema: getAdminSvcComplianceEvidenceSchema, preHandler: requirePlatformAdmin }, async () => {
-    const rows = await db.select().from(evidenceBundles).orderBy(desc(evidenceBundles.bundleDate)).limit(30);
-    return { bundles: rows };
-  });
+  app.get(
+    "/api/admin-svc/compliance/evidence",
+    { schema: getAdminSvcComplianceEvidenceSchema, preHandler: requirePlatformAdmin },
+    async () => {
+      const rows = await db
+        .select()
+        .from(evidenceBundles)
+        .orderBy(desc(evidenceBundles.bundleDate))
+        .limit(30);
+      return { bundles: rows };
+    },
+  );
 
-  app.get("/api/admin-svc/compliance/evidence/:date", { schema: getAdminSvcComplianceEvidenceByDateSchema,
-    preHandler: [requirePlatformAdmin, requireDataExportStepUp],
-  }, async (req: any, reply) => {
-    const { date } = req.params as { date: string };
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return reply.status(400).send({ error: "Invalid date" });
+  app.get(
+    "/api/admin-svc/compliance/evidence/:date",
+    {
+      schema: getAdminSvcComplianceEvidenceByDateSchema,
+      preHandler: [requirePlatformAdmin, requireDataExportStepUp],
+    },
+    async (req: any, reply) => {
+      const { date } = req.params as { date: string };
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date))
+        return reply.status(400).send({ error: "Invalid date" });
 
-    const [row] = await db.select().from(evidenceBundles).where(eq(evidenceBundles.bundleDate, date)).limit(1);
-    if (!row) return reply.status(404).send({ error: "No bundle for that date" });
+      const [row] = await db
+        .select()
+        .from(evidenceBundles)
+        .where(eq(evidenceBundles.bundleDate, date))
+        .limit(1);
+      if (!row) return reply.status(404).send({ error: "No bundle for that date" });
 
-    const filepath = path.join(EVIDENCE_DIR, row.filename);
-    let buf: Buffer;
-    try {
-      buf = await fs.readFile(filepath);
-    } catch {
-      return reply.status(410).send({ error: "Bundle file missing on disk", filename: row.filename });
-    }
+      const filepath = path.join(EVIDENCE_DIR, row.filename);
+      let buf: Buffer;
+      try {
+        buf = await fs.readFile(filepath);
+      } catch {
+        return reply
+          .status(410)
+          .send({ error: "Bundle file missing on disk", filename: row.filename });
+      }
 
-    await logAuditEvent(db, {
-      action: "EVIDENCE_DOWNLOADED",
-      actorId: req.user.sub,
-      actorEmail: req.user.email || "",
-      actorRole: req.user.role || "",
-      resourceType: "evidence_bundle",
-      resourceId: row.id,
-      details: { bundleDate: row.bundleDate, sha256: row.sha256 },
-    });
+      await logAuditEvent(db, {
+        action: "EVIDENCE_DOWNLOADED",
+        actorId: req.user.sub,
+        actorEmail: req.user.email || "",
+        actorRole: req.user.role || "",
+        resourceType: "evidence_bundle",
+        resourceId: row.id,
+        details: { bundleDate: row.bundleDate, sha256: row.sha256 },
+      });
 
-    reply.header("content-type", "application/gzip");
-    reply.header("content-disposition", `attachment; filename="${row.filename}"`);
-    reply.header("x-evidence-sha256", row.sha256);
-    return reply.send(buf);
-  });
+      reply.header("content-type", "application/gzip");
+      reply.header("content-disposition", `attachment; filename="${row.filename}"`);
+      reply.header("x-evidence-sha256", row.sha256);
+      return reply.send(buf);
+    },
+  );
 
-  app.post("/api/admin-svc/compliance/evidence/run", { schema: adminSvcComplianceEvidenceRunSchema,
-    preHandler: [requirePlatformAdmin, requireDataExportStepUp],
-  }, async (req: any) => {
-    const result = await generateEvidenceBundle(db);
-    await logAuditEvent(db, {
-      action: "EVIDENCE_GENERATED",
-      actorId: req.user.sub,
-      actorEmail: req.user.email || "",
-      actorRole: req.user.role || "",
-      resourceType: "evidence_bundle",
-      resourceId: result.bundleDate,
-      details: { triggered: "manual", sha256: result.sha256, sizeBytes: result.sizeBytes },
-    });
-    return { status: "generated", ...result };
-  });
+  app.post(
+    "/api/admin-svc/compliance/evidence/run",
+    {
+      schema: adminSvcComplianceEvidenceRunSchema,
+      preHandler: [requirePlatformAdmin, requireDataExportStepUp],
+    },
+    async (req: any) => {
+      const result = await generateEvidenceBundle(db);
+      await logAuditEvent(db, {
+        action: "EVIDENCE_GENERATED",
+        actorId: req.user.sub,
+        actorEmail: req.user.email || "",
+        actorRole: req.user.role || "",
+        resourceType: "evidence_bundle",
+        resourceId: result.bundleDate,
+        details: { triggered: "manual", sha256: result.sha256, sizeBytes: result.sizeBytes },
+      });
+      return { status: "generated", ...result };
+    },
+  );
 }

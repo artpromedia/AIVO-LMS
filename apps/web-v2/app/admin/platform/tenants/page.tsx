@@ -21,10 +21,7 @@ const TYPE_TONE: Record<string, "primary" | "success" | "neutral" | "warning"> =
   platform: "warning",
 };
 
-const BILLING_TONE: Record<
-  string,
-  "success" | "neutral" | "warning" | "danger"
-> = {
+const BILLING_TONE: Record<string, "success" | "neutral" | "warning" | "danger"> = {
   active: "success",
   trialing: "warning",
   past_due: "danger",
@@ -47,23 +44,14 @@ export default async function Page() {
   const adminCountByTenant = new Map<string, number>();
   const adminRoles: Role[] = ["district_admin", "school_admin", "platform_admin"];
   for (const u of users) {
-    userCountByTenant.set(
-      u.tenantId,
-      (userCountByTenant.get(u.tenantId) ?? 0) + 1,
-    );
+    userCountByTenant.set(u.tenantId, (userCountByTenant.get(u.tenantId) ?? 0) + 1);
     if (adminRoles.includes(u.role)) {
-      adminCountByTenant.set(
-        u.tenantId,
-        (adminCountByTenant.get(u.tenantId) ?? 0) + 1,
-      );
+      adminCountByTenant.set(u.tenantId, (adminCountByTenant.get(u.tenantId) ?? 0) + 1);
     }
   }
   const learnerCountByTenant = new Map<string, number>();
   for (const l of learners) {
-    learnerCountByTenant.set(
-      l.tenantId,
-      (learnerCountByTenant.get(l.tenantId) ?? 0) + 1,
-    );
+    learnerCountByTenant.set(l.tenantId, (learnerCountByTenant.get(l.tenantId) ?? 0) + 1);
   }
 
   const byType = tenants.reduce<Record<string, number>>((acc, t) => {
@@ -104,12 +92,8 @@ export default async function Page() {
           { k: "Platform", v: byType.platform ?? 0 },
         ].map((s) => (
           <Card key={s.k} className="p-[var(--aivo-density-card-pad)]">
-            <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-              {s.k}
-            </p>
-            <p className="mt-1 font-display text-3xl font-bold">
-              {s.v.toLocaleString()}
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{s.k}</p>
+            <p className="mt-1 font-display text-3xl font-bold">{s.v.toLocaleString()}</p>
           </Card>
         ))}
       </div>
@@ -119,8 +103,7 @@ export default async function Page() {
       ) : (
         <Card className="overflow-hidden">
           <div className="border-b border-aivo-border px-4 py-3 text-sm font-medium">
-            {tenants.length.toLocaleString()}{" "}
-            {tenants.length === 1 ? "tenant" : "tenants"}
+            {tenants.length.toLocaleString()} {tenants.length === 1 ? "tenant" : "tenants"}
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -148,19 +131,14 @@ export default async function Page() {
                         >
                           {t.name}
                         </Link>
-                        <p className="font-mono text-xs text-aivo-muted">
-                          {t.id}
-                        </p>
+                        <p className="font-mono text-xs text-aivo-muted">{t.id}</p>
                       </td>
                       <td className="px-4 py-3">
-                        <Badge tone={TYPE_TONE[t.type] ?? "neutral"}>
-                          {t.type}
-                        </Badge>
+                        <Badge tone={TYPE_TONE[t.type] ?? "neutral"}>{t.type}</Badge>
                       </td>
                       <td className="px-4 py-3 text-aivo-ink-soft">
                         {t.parentTenantId
-                          ? (tenantById.get(t.parentTenantId)?.name ??
-                            t.parentTenantId)
+                          ? (tenantById.get(t.parentTenantId)?.name ?? t.parentTenantId)
                           : "—"}
                       </td>
                       <td className="px-4 py-3 text-right tabular-nums">
@@ -178,9 +156,7 @@ export default async function Page() {
                             <Badge tone={BILLING_TONE[billing.status] ?? "neutral"}>
                               {billing.status.replace("_", " ")}
                             </Badge>
-                            <span className="text-xs text-aivo-ink-soft">
-                              {billing.plan}
-                            </span>
+                            <span className="text-xs text-aivo-ink-soft">{billing.plan}</span>
                           </span>
                         ) : (
                           <span className="text-xs text-aivo-ink-soft">—</span>

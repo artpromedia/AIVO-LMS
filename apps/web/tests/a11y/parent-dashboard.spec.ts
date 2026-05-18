@@ -60,9 +60,7 @@ test.describe("Parent dashboard accessibility", () => {
   });
 
   test("color contrast violations are zero", async ({ page }) => {
-    const results = await new AxeBuilder({ page })
-      .withTags(["cat.color"])
-      .analyze();
+    const results = await new AxeBuilder({ page }).withTags(["cat.color"]).analyze();
     expect(results.violations).toEqual([]);
   });
 });

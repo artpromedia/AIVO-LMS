@@ -38,11 +38,31 @@ interface LearnerDetail {
 }
 
 const LEVEL_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  STANDARD: { label: "Standard", color: "text-[hsl(var(--visual-science))]", bg: "bg-[hsl(var(--visual-science)/0.14)]" },
-  SUPPORTED: { label: "Supported", color: "text-[hsl(var(--visual-reading))]", bg: "bg-[hsl(var(--visual-reading)/0.12)]" },
-  LOW_VERBAL: { label: "Low Verbal", color: "text-[hsl(var(--visual-sel))]", bg: "bg-[hsl(var(--visual-sel)/0.18)]" },
-  NON_VERBAL: { label: "Non-Verbal", color: "text-[hsl(var(--visual-sel))]", bg: "bg-[hsl(var(--visual-sel)/0.18)]" },
-  PRE_SYMBOLIC: { label: "Pre-Symbolic", color: "text-[hsl(var(--visual-math))]", bg: "bg-[hsl(var(--visual-math)/0.12)]" },
+  STANDARD: {
+    label: "Standard",
+    color: "text-[hsl(var(--visual-science))]",
+    bg: "bg-[hsl(var(--visual-science)/0.14)]",
+  },
+  SUPPORTED: {
+    label: "Supported",
+    color: "text-[hsl(var(--visual-reading))]",
+    bg: "bg-[hsl(var(--visual-reading)/0.12)]",
+  },
+  LOW_VERBAL: {
+    label: "Low Verbal",
+    color: "text-[hsl(var(--visual-sel))]",
+    bg: "bg-[hsl(var(--visual-sel)/0.18)]",
+  },
+  NON_VERBAL: {
+    label: "Non-Verbal",
+    color: "text-[hsl(var(--visual-sel))]",
+    bg: "bg-[hsl(var(--visual-sel)/0.18)]",
+  },
+  PRE_SYMBOLIC: {
+    label: "Pre-Symbolic",
+    color: "text-[hsl(var(--visual-math))]",
+    bg: "bg-[hsl(var(--visual-math)/0.12)]",
+  },
 };
 
 const SENSORY_LABELS: Record<string, string> = {
@@ -66,7 +86,10 @@ function calcAge(dob: string | null): string {
   const birth = new Date(dob);
   const now = new Date();
   let age = now.getFullYear() - birth.getFullYear();
-  if (now.getMonth() < birth.getMonth() || (now.getMonth() === birth.getMonth() && now.getDate() < birth.getDate())) {
+  if (
+    now.getMonth() < birth.getMonth() ||
+    (now.getMonth() === birth.getMonth() && now.getDate() < birth.getDate())
+  ) {
     age--;
   }
   return `${age} years old`;
@@ -113,7 +136,10 @@ export default function LearnerDetailPage() {
   if (error || !learner) {
     return (
       <div className="p-8 space-y-4">
-        <Link href="/dashboard/admin/learners" className="text-sm text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))] font-medium">
+        <Link
+          href="/dashboard/admin/learners"
+          className="text-sm text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))] font-medium"
+        >
           ← Back to Learners
         </Link>
         <div className="bg-[hsl(var(--visual-math)/0.08)] border border-[hsl(var(--visual-math)/0.25)] rounded-2xl p-6 text-[hsl(var(--visual-math))]">
@@ -123,11 +149,18 @@ export default function LearnerDetailPage() {
     );
   }
 
-  const levelConfig = LEVEL_CONFIG[learner.functioningLevel || ""] || { label: learner.functioningLevel || "Unknown", color: "vi-text-muted", bg: "vi-surface-soft" };
+  const levelConfig = LEVEL_CONFIG[learner.functioningLevel || ""] || {
+    label: learner.functioningLevel || "Unknown",
+    color: "vi-text-muted",
+    bg: "vi-surface-soft",
+  };
 
   return (
     <div className="p-8 space-y-6">
-      <Link href="/dashboard/admin/learners" className="text-sm text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))] font-medium inline-flex items-center gap-1">
+      <Link
+        href="/dashboard/admin/learners"
+        className="text-sm text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))] font-medium inline-flex items-center gap-1"
+      >
         ← Back to Learners
       </Link>
 
@@ -138,12 +171,15 @@ export default function LearnerDetailPage() {
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-heading font-bold vi-text">{learner.name}</h1>
-            <span className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${levelConfig.bg} ${levelConfig.color}`}>
+            <span
+              className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${levelConfig.bg} ${levelConfig.color}`}
+            >
               {levelConfig.label}
             </span>
           </div>
           <p className="text-sm vi-text-muted mt-0.5">
-            {learner.gradeLevel ? `Grade ${learner.gradeLevel}` : "No grade"} · {calcAge(learner.dateOfBirth)}
+            {learner.gradeLevel ? `Grade ${learner.gradeLevel}` : "No grade"} ·{" "}
+            {calcAge(learner.dateOfBirth)}
           </p>
         </div>
       </div>
@@ -184,7 +220,9 @@ export default function LearnerDetailPage() {
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
               <span className="vi-text-muted">Functioning Level</span>
-              <span className={`px-2 py-0.5 text-xs rounded-full font-semibold ${levelConfig.bg} ${levelConfig.color}`}>
+              <span
+                className={`px-2 py-0.5 text-xs rounded-full font-semibold ${levelConfig.bg} ${levelConfig.color}`}
+              >
                 {levelConfig.label}
               </span>
             </div>
@@ -197,7 +235,10 @@ export default function LearnerDetailPage() {
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {learner.diagnoses && learner.diagnoses.length > 0 ? (
                   learner.diagnoses.map((d, i) => (
-                    <span key={i} className="px-2 py-0.5 text-xs rounded-full vi-surface-soft vi-text-muted font-medium">
+                    <span
+                      key={i}
+                      className="px-2 py-0.5 text-xs rounded-full vi-surface-soft vi-text-muted font-medium"
+                    >
                       {d}
                     </span>
                   ))
@@ -222,11 +263,15 @@ export default function LearnerDetailPage() {
             </div>
             <div className="flex justify-between">
               <span className="vi-text-muted">Created</span>
-              <span className="font-medium vi-text">{new Date(learner.createdAt).toLocaleDateString()}</span>
+              <span className="font-medium vi-text">
+                {new Date(learner.createdAt).toLocaleDateString()}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="vi-text-muted">Updated</span>
-              <span className="font-medium vi-text">{new Date(learner.updatedAt).toLocaleDateString()}</span>
+              <span className="font-medium vi-text">
+                {new Date(learner.updatedAt).toLocaleDateString()}
+              </span>
             </div>
           </div>
         </div>
@@ -236,21 +281,28 @@ export default function LearnerDetailPage() {
         <div className="vi-card p-6">
           <h3 className="font-heading font-bold vi-text mb-4">Sensory Profile</h3>
           <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
-            {(["visual", "auditory", "tactile", "vestibular", "proprioceptive"] as const).map((key) => {
-              const val = learner.sensoryProfile?.[key];
-              const pct = val != null ? Math.min(val, 100) : 0;
-              return (
-                <div key={key}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-semibold vi-text-muted">{SENSORY_LABELS[key]}</span>
-                    <span className="text-xs font-bold vi-text">{val != null ? val : "—"}</span>
+            {(["visual", "auditory", "tactile", "vestibular", "proprioceptive"] as const).map(
+              (key) => {
+                const val = learner.sensoryProfile?.[key];
+                const pct = val != null ? Math.min(val, 100) : 0;
+                return (
+                  <div key={key}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-semibold vi-text-muted">
+                        {SENSORY_LABELS[key]}
+                      </span>
+                      <span className="text-xs font-bold vi-text">{val != null ? val : "—"}</span>
+                    </div>
+                    <div className="vi-surface-soft rounded-full h-2 overflow-hidden">
+                      <div
+                        className={`h-full rounded-full ${SENSORY_COLORS[key]}`}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
                   </div>
-                  <div className="vi-surface-soft rounded-full h-2 overflow-hidden">
-                    <div className={`h-full rounded-full ${SENSORY_COLORS[key]}`} style={{ width: `${pct}%` }} />
-                  </div>
-                </div>
-              );
-            })}
+                );
+              },
+            )}
           </div>
           {learner.sensoryProfile.notes && (
             <div className="mt-4 p-3 vi-bg rounded-lg text-sm vi-text-muted">
@@ -268,7 +320,10 @@ export default function LearnerDetailPage() {
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="vi-text-muted">Name</span>
-                <Link href={`/dashboard/admin/users/${learner.parent.id}`} className="font-medium text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))]">
+                <Link
+                  href={`/dashboard/admin/users/${learner.parent.id}`}
+                  className="font-medium text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))]"
+                >
                   {learner.parent.name}
                 </Link>
               </div>
@@ -294,7 +349,10 @@ export default function LearnerDetailPage() {
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="vi-text-muted">Name</span>
-                <Link href={`/dashboard/admin/tenants/${learner.tenant.id}`} className="font-medium text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))]">
+                <Link
+                  href={`/dashboard/admin/tenants/${learner.tenant.id}`}
+                  className="font-medium text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))]"
+                >
                   {learner.tenant.name}
                 </Link>
               </div>

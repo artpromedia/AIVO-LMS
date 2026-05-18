@@ -68,15 +68,15 @@ export async function POST(req: Request): Promise<NextResponse> {
     const parsed = bodySchema.safeParse(body);
     if (!parsed.success) {
       return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." },
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
         requestId,
       );
     }
     if (!listSubjects().some((s) => s.id === parsed.data.subjectId)) {
-      return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: "subjectId not found." },
-        requestId,
-      );
+      return fail({ ...ERRORS.VALIDATION_FAILED, message: "subjectId not found." }, requestId);
     }
     if (listSkills().some((s) => s.slug === parsed.data.slug)) {
       return fail(

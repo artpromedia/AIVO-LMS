@@ -14,11 +14,7 @@ export function registerHealthRoutes(app: FastifyInstance) {
   // Prometheus scrape endpoint. `@aivo/observability` holds counters
   // in-process; multi-replica deployments scrape each replica
   // independently or front them via Prometheus federation.
-  app.get(
-    "/metrics",
-    { schema: { hide: true } },
-    async (_req, reply) => {
-      reply.type("text/plain; version=0.0.4").send(exportMetrics());
-    },
-  );
+  app.get("/metrics", { schema: { hide: true } }, async (_req, reply) => {
+    reply.type("text/plain; version=0.0.4").send(exportMetrics());
+  });
 }

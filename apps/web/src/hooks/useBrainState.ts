@@ -50,16 +50,16 @@ export function useBrainState(learnerId: string, accessToken: string | null) {
       headers: { Authorization: `Bearer ${accessToken}` },
       signal: controller.signal,
     })
-      .then(res => {
+      .then((res) => {
         if (!res.ok) throw new Error("Brain not initialized yet");
         return res.json();
       })
-      .then(data => {
+      .then((data) => {
         const state = data.state || data;
         brainCache.set(learnerId, { state, fetchedAt: Date.now() });
         setBrainState(state);
       })
-      .catch(err => {
+      .catch((err) => {
         if (err.name === "AbortError") return;
         setError(err.message || "Could not load brain data");
       })

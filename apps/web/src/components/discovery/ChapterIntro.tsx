@@ -15,7 +15,13 @@ interface ChapterIntroProps {
   lightMode?: boolean;
 }
 
-export default function ChapterIntro({ chapter, chapterNumber, totalChapters, onReady, onBringGrownUp }: ChapterIntroProps) {
+export default function ChapterIntro({
+  chapter,
+  chapterNumber,
+  totalChapters,
+  onReady,
+  onBringGrownUp,
+}: ChapterIntroProps) {
   const [phase, setPhase] = useState<"intro" | "ready">("intro");
   const tutor = TUTORS[chapter.tutorKey];
   const subjectKey = colorForTutor(tutor?.color);
@@ -28,11 +34,25 @@ export default function ChapterIntro({ chapter, chapterNumber, totalChapters, on
         <div className="relative w-full max-w-md mx-auto px-6">
           <section className="vi-card p-8 text-center" style={{ borderColor: `${subjectColor}26` }}>
             <div className="mx-auto mb-5 inline-flex">
-              <div className="w-20 h-20 rounded-3xl overflow-hidden border-4 shadow-md" style={{ borderColor: subjectColor }}>
-                <Image src={tutor.avatar} alt={tutor.name} width={80} height={80} className="object-cover" />
+              <div
+                className="w-20 h-20 rounded-3xl overflow-hidden border-4 shadow-md"
+                style={{ borderColor: subjectColor }}
+              >
+                <Image
+                  src={tutor.avatar}
+                  alt={tutor.name}
+                  width={80}
+                  height={80}
+                  className="object-cover"
+                />
               </div>
             </div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] mb-2" style={{ color: subjectColor }}>Ready?</p>
+            <p
+              className="text-xs font-bold uppercase tracking-[0.2em] mb-2"
+              style={{ color: subjectColor }}
+            >
+              Ready?
+            </p>
             <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Let&apos;s Begin</h2>
             <p className="text-slate-600 mb-6">{tutor.name} will guide you through this chapter.</p>
 
@@ -40,7 +60,11 @@ export default function ChapterIntro({ chapter, chapterNumber, totalChapters, on
               <button
                 onClick={onReady}
                 className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-full text-white font-extrabold text-lg shadow-xl hover:scale-105 active:scale-95 transition-transform focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-offset-2"
-                style={{ backgroundColor: subjectColor, boxShadow: `0 8px 24px ${subjectColor}40`, minHeight: "var(--learner-hit-target, 56px)" }}
+                style={{
+                  backgroundColor: subjectColor,
+                  boxShadow: `0 8px 24px ${subjectColor}40`,
+                  minHeight: "var(--learner-hit-target, 56px)",
+                }}
               >
                 <Play className="w-5 h-5 fill-white" /> Start
               </button>
@@ -72,32 +96,58 @@ export default function ChapterIntro({ chapter, chapterNumber, totalChapters, on
       <div className="relative w-full max-w-md mx-auto px-6">
         <section
           className="vi-card p-8 text-center relative overflow-hidden"
-          style={{ background: `linear-gradient(135deg, white, ${subjectTint})`, borderColor: `${subjectColor}26` }}
+          style={{
+            background: `linear-gradient(135deg, white, ${subjectTint})`,
+            borderColor: `${subjectColor}26`,
+          }}
         >
-          <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full blur-2xl" style={{ backgroundColor: `${subjectColor}26` }} aria-hidden />
+          <div
+            className="absolute -top-8 -right-8 w-32 h-32 rounded-full blur-2xl"
+            style={{ backgroundColor: `${subjectColor}26` }}
+            aria-hidden
+          />
           <div className="relative">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400 mb-2">
               Chapter {chapterNumber} of {totalChapters}
             </p>
-            <div className="text-6xl mb-3" aria-hidden>{chapter.landmark.emoji}</div>
+            <div className="text-6xl mb-3" aria-hidden>
+              {chapter.landmark.emoji}
+            </div>
             <h1 className="text-3xl font-extrabold text-slate-900 mb-1">{chapter.title}</h1>
             <p className="text-lg text-slate-600 mb-6">{chapter.subtitle}</p>
 
             <div className="flex items-center justify-center gap-3 mb-5">
-              <div className="w-16 h-16 rounded-2xl overflow-hidden border-4 shadow-md" style={{ borderColor: subjectColor }}>
-                <Image src={tutor.avatar} alt={tutor.name} width={64} height={64} className="object-cover" />
+              <div
+                className="w-16 h-16 rounded-2xl overflow-hidden border-4 shadow-md"
+                style={{ borderColor: subjectColor }}
+              >
+                <Image
+                  src={tutor.avatar}
+                  alt={tutor.name}
+                  width={64}
+                  height={64}
+                  className="object-cover"
+                />
               </div>
               <div className="text-left">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Your guide</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Your guide
+                </p>
                 <p className="font-extrabold text-slate-900">{tutor.name}</p>
               </div>
             </div>
-            <p className="text-slate-600 text-sm leading-relaxed max-w-xs mx-auto mb-6">{chapter.sceneDescription}</p>
+            <p className="text-slate-600 text-sm leading-relaxed max-w-xs mx-auto mb-6">
+              {chapter.sceneDescription}
+            </p>
 
             <button
               onClick={() => setPhase("ready")}
               className="inline-flex items-center gap-2 px-7 py-3 rounded-full text-white font-extrabold text-lg shadow-xl hover:scale-105 active:scale-95 transition-transform focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-offset-2"
-              style={{ backgroundColor: subjectColor, boxShadow: `0 8px 24px ${subjectColor}40`, minHeight: "var(--learner-hit-target, 56px)" }}
+              style={{
+                backgroundColor: subjectColor,
+                boxShadow: `0 8px 24px ${subjectColor}40`,
+                minHeight: "var(--learner-hit-target, 56px)",
+              }}
             >
               I&apos;m ready! <ChevronRight className="w-5 h-5" />
             </button>

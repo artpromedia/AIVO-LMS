@@ -1,6 +1,6 @@
-import React from 'react';
-import { View, Text, Pressable, StyleSheet, Image } from 'react-native';
-import { theme } from './theme';
+import React from "react";
+import { View, Text, Pressable, StyleSheet, Image } from "react-native";
+import { theme } from "./theme";
 
 interface TutorCardProps {
   name: string;
@@ -11,7 +11,14 @@ interface TutorCardProps {
   onPress: () => void;
 }
 
-export function TutorCard({ name, domain, icon, color, subscribed = false, onPress }: TutorCardProps) {
+export function TutorCard({
+  name,
+  domain,
+  icon,
+  color,
+  subscribed = false,
+  onPress,
+}: TutorCardProps) {
   return (
     <Pressable
       onPress={onPress}
@@ -20,7 +27,7 @@ export function TutorCard({ name, domain, icon, color, subscribed = false, onPre
         { borderLeftColor: color, borderLeftWidth: 4, opacity: pressed ? 0.9 : 1 },
       ]}
     >
-      <View style={[styles.iconBg, { backgroundColor: color + '20' }]}>
+      <View style={[styles.iconBg, { backgroundColor: color + "20" }]}>
         <Text style={styles.icon}>{icon}</Text>
       </View>
       <View style={styles.info}>
@@ -28,7 +35,7 @@ export function TutorCard({ name, domain, icon, color, subscribed = false, onPre
         <Text style={styles.domain}>{domain}</Text>
       </View>
       {subscribed && (
-        <View style={[styles.badge, { backgroundColor: theme.colors.success + '20' }]}>
+        <View style={[styles.badge, { backgroundColor: theme.colors.success + "20" }]}>
           <Text style={[styles.badgeText, { color: theme.colors.success }]}>Active</Text>
         </View>
       )}
@@ -38,8 +45,8 @@ export function TutorCard({ name, domain, icon, color, subscribed = false, onPre
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: theme.colors.card,
     borderRadius: theme.radius.xl,
     padding: theme.spacing.md,
@@ -50,8 +57,8 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   icon: {
     fontSize: 24,

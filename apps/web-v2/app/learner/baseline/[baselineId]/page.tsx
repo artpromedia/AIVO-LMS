@@ -125,11 +125,7 @@ async function completeAction(formData: FormData) {
       },
     });
   }
-  redirect(
-    asParent
-      ? `/parent/learners/${learnerId}/baseline`
-      : `/learner/baseline/${baselineId}`,
-  );
+  redirect(asParent ? `/parent/learners/${learnerId}/baseline` : `/learner/baseline/${baselineId}`);
 }
 
 export default async function BaselineRunnerPage({
@@ -195,11 +191,7 @@ export default async function BaselineRunnerPage({
         <div className="mt-6">
           <Button asChild>
             <Link
-              href={
-                asParent
-                  ? `/parent/learners/${baseline.learnerId}/baseline`
-                  : `/learner/home`
-              }
+              href={asParent ? `/parent/learners/${baseline.learnerId}/baseline` : `/learner/home`}
             >
               Continue <ArrowRight className="ml-1 h-4 w-4" />
             </Link>
@@ -250,9 +242,7 @@ export default async function BaselineRunnerPage({
       <PageHeader
         eyebrow={tutor ? `${tutor.name}'s ${tutor.landmark}` : `Baseline · ${subjectName}`}
         title={`Question ${progress}`}
-        description={
-          learner ? `For ${learner.displayName}.` : "Take your time. You can skip."
-        }
+        description={learner ? `For ${learner.displayName}.` : "Take your time. You can skip."}
         actions={
           <Badge tone="primary" className="capitalize">
             {next.difficulty.replaceAll("_", " ")}
@@ -336,13 +326,7 @@ export default async function BaselineRunnerPage({
             <Button type="submit">
               Submit answer <ArrowRight className="ml-1 h-4 w-4" />
             </Button>
-            <Button
-              type="submit"
-              variant="outline"
-              name="skipped"
-              value="1"
-              formNoValidate
-            >
+            <Button type="submit" variant="outline" name="skipped" value="1" formNoValidate>
               <SkipForward className="mr-1 h-4 w-4" /> Skip
             </Button>
           </div>
@@ -360,9 +344,7 @@ export default async function BaselineRunnerPage({
                 {String(i + 1).padStart(2, "0")}
               </span>
               <span className="flex-1 truncate text-xs">{q.prompt}</span>
-              <Badge tone={tone}>
-                {a ? (a.skipped ? "skipped" : "answered") : "pending"}
-              </Badge>
+              <Badge tone={tone}>{a ? (a.skipped ? "skipped" : "answered") : "pending"}</Badge>
             </Card>
           );
         })}

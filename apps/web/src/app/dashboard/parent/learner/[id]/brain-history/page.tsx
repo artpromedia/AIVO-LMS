@@ -42,14 +42,19 @@ export default function BrainHistoryPage() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [details, setDetails] = useState<Record<string, any>>({});
 
-  useEffect(() => { if (!authLoading && !user) router.push("/login"); }, [user, authLoading, router]);
+  useEffect(() => {
+    if (!authLoading && !user) router.push("/login");
+  }, [user, authLoading, router]);
 
   useEffect(() => {
     if (!user || !accessToken) return;
     const ctl = new AbortController();
-    fetch(`/api/brain/${learnerId}/history`, { headers: { Authorization: `Bearer ${accessToken}` }, signal: ctl.signal })
-      .then(r => r.ok ? r.json() : [])
-      .then(d => setSnapshots(Array.isArray(d) ? d : []))
+    fetch(`/api/brain/${learnerId}/history`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      signal: ctl.signal,
+    })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((d) => setSnapshots(Array.isArray(d) ? d : []))
       .catch(() => {})
       .finally(() => setLoading(false));
     return () => ctl.abort();
@@ -67,7 +72,7 @@ export default function BrainHistoryPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        setDetails(prev => ({ ...prev, [snap.id]: data }));
+        setDetails((prev) => ({ ...prev, [snap.id]: data }));
       }
     }
   }
@@ -77,8 +82,17 @@ export default function BrainHistoryPage() {
   return (
     <div className="vi-bg min-h-screen">
       <header className="bg-[hsl(var(--visual-surface)/0.95)] backdrop-blur border-b vi-border px-8 py-4 flex items-center justify-between">
-        <Image src="/images/aivo-logo-purple.png" alt="AIVO" width={100} height={30} style={{ height: "auto" }} />
-        <button onClick={() => router.push(`/dashboard/parent/learner/${learnerId}`)} className="text-sm vi-text-muted hover:text-[hsl(var(--visual-primary))] font-semibold">
+        <Image
+          src="/images/aivo-logo-purple.png"
+          alt="AIVO"
+          width={100}
+          height={30}
+          style={{ height: "auto" }}
+        />
+        <button
+          onClick={() => router.push(`/dashboard/parent/learner/${learnerId}`)}
+          className="text-sm vi-text-muted hover:text-[hsl(var(--visual-primary))] font-semibold"
+        >
           {t("brain_history_back")}
         </button>
       </header>
@@ -103,7 +117,7 @@ export default function BrainHistoryPage() {
           </div>
         ) : (
           <ol className="relative border-l-2 vi-border ml-3 space-y-4">
-            {snapshots.map(snap => {
+            {snapshots.map((snap) => {
               const open = expanded === snap.id;
               const detail = details[snap.id];
               const stateData = detail?.snapshot ?? snap.snapshot;
@@ -127,23 +141,38 @@ export default function BrainHistoryPage() {
                           <Clock size={12} /> {new Date(snap.created_at).toLocaleString()}
                         </p>
                       </div>
-                      {open ? <ChevronDown size={18} className="vi-text-muted" /> : <ChevronRight size={18} className="vi-text-muted" />}
+                      {open ? (
+                        <ChevronDown size={18} className="vi-text-muted" />
+                      ) : (
+                        <ChevronRight size={18} className="vi-text-muted" />
+                      )}
                     </div>
                     {open && (
-                      <div id={`snap-detail-${snap.id}`} className="mt-4 pt-4 border-t vi-border space-y-2 text-sm">
+                      <div
+                        id={`snap-detail-${snap.id}`}
+                        className="mt-4 pt-4 border-t vi-border space-y-2 text-sm"
+                      >
                         {!detail && <p className="vi-text-muted text-xs">{tc("loading_detail")}</p>}
                         {stateData && (
                           <>
                             {stateData.functioning_level_profile?.level && (
-                              <Row label={t("brain_history_functioning_level")} value={stateData.functioning_level_profile.level} />
+                              <Row
+                                label={t("brain_history_functioning_level")}
+                                value={stateData.functioning_level_profile.level}
+                              />
                             )}
                             {stateData.curriculum_alignment?.grade_band && (
-                              <Row label={t("brain_history_grade_band")} value={stateData.curriculum_alignment.grade_band} />
+                              <Row
+                                label={t("brain_history_grade_band")}
+                                value={stateData.curriculum_alignment.grade_band}
+                              />
                             )}
                             {stateData.mastery_levels && (
                               <Row
                                 label={t("brain_history_tracked_skills")}
-                                value={t("brain_history_skills_count", { count: Object.keys(stateData.mastery_levels).length })}
+                                value={t("brain_history_skills_count", {
+                                  count: Object.keys(stateData.mastery_levels).length,
+                                })}
                               />
                             )}
                             {stateData.active_accommodations?.length > 0 && (

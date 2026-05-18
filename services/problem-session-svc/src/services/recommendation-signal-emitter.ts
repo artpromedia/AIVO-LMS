@@ -18,8 +18,7 @@ import type {
   ProblemSessionStore,
 } from "./problem-session-store.js";
 
-const RECOMMENDATION_SVC_URL =
-  process.env.RECOMMENDATION_SVC_URL ?? "http://localhost:3066";
+const RECOMMENDATION_SVC_URL = process.env.RECOMMENDATION_SVC_URL ?? "http://localhost:3066";
 
 function profileRecommendationsV2Enabled(): boolean {
   const raw = process.env.AIVO_FEATURE_PROFILE_RECOMMENDATIONS_V2;

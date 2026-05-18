@@ -19,9 +19,7 @@ export function ConsentToggle({
   async function onAccept() {
     setError(null);
     start(async () => {
-      const url = learnerId
-        ? `/api/bff/learners/${learnerId}/consent`
-        : "/api/bff/consent";
+      const url = learnerId ? `/api/bff/learners/${learnerId}/consent` : "/api/bff/consent";
       const res = await fetch(url, {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -55,12 +53,7 @@ export function ConsentToggle({
   return (
     <div className="flex flex-col items-end gap-1 min-w-[8rem]">
       {accepted ? (
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={pending}
-          onClick={onRevoke}
-        >
+        <Button variant="outline" size="sm" disabled={pending} onClick={onRevoke}>
           {pending ? "…" : "Revoke"}
         </Button>
       ) : (

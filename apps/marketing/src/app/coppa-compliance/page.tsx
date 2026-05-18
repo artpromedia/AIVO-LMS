@@ -16,7 +16,7 @@ export default function CoppaCompliancePage() {
           title: "1. Operator Information",
           content: [
             "The operator of the Services for purposes of COPPA is Aivo AI Learning Technologies Inc., a Delaware corporation with its principal place of business at 1400 Van Buren Street S, Suite 200, Minneapolis, MN, United States.",
-            "Our Privacy Office is responsible for compliance with COPPA. You can reach the Privacy Office by email at privacy@aivolearning.com, by phone at +1 (612) 555-0102 between 9:00 a.m. and 6:00 p.m. Eastern Time on business days, or by postal mail at the address above marked \"Attention: Privacy Office\".",
+            'Our Privacy Office is responsible for compliance with COPPA. You can reach the Privacy Office by email at privacy@aivolearning.com, by phone at +1 (612) 555-0102 between 9:00 a.m. and 6:00 p.m. Eastern Time on business days, or by postal mail at the address above marked "Attention: Privacy Office".',
             "Our agent for service of process for privacy matters is the Corporation Service Company, 251 Little Falls Drive, Wilmington, DE 19808, United States.",
           ],
         },
@@ -37,7 +37,8 @@ export default function CoppaCompliancePage() {
         },
         {
           title: "4. Verifiable Parental Consent — How We Obtain It",
-          content: "Before any personal information is collected from a child under 13, AIVO obtains verifiable parental consent (VPC) using one or more of the FTC-approved methods listed in 16 C.F.R. § 312.5(b). We choose the appropriate method based on the type of data being collected and the level of risk.",
+          content:
+            "Before any personal information is collected from a child under 13, AIVO obtains verifiable parental consent (VPC) using one or more of the FTC-approved methods listed in 16 C.F.R. § 312.5(b). We choose the appropriate method based on the type of data being collected and the level of risk.",
           list: [
             "Credit-card or other government-issued payment method — when a parent starts a paid plan, the small authorization charge processed through Stripe verifies the parent's identity.",
             "Email-plus — for free accounts, the parent receives a confirmation email and must respond from the same address; we then send a second confirmation message after a delay so the parent can withdraw consent before any child data is collected.",
@@ -49,7 +50,8 @@ export default function CoppaCompliancePage() {
         },
         {
           title: "5. Information We Collect From Children",
-          content: "We follow a strict data-minimization principle: we collect only what is necessary to provide the educational service that the parent or school has authorized. The following is the complete list of personal information we may collect from a child under 13.",
+          content:
+            "We follow a strict data-minimization principle: we collect only what is necessary to provide the educational service that the parent or school has authorized. The following is the complete list of personal information we may collect from a child under 13.",
           list: [
             "First name or nickname chosen by the parent (no last name unless explicitly entered by a parent).",
             "Age, grade level, and (where the parent provides it) functioning level designation, used to calibrate content difficulty.",
@@ -62,7 +64,8 @@ export default function CoppaCompliancePage() {
         },
         {
           title: "6. Information We Never Collect From Children",
-          content: "AIVO is intentionally designed to avoid collecting categories of personal information that are not needed for the educational service. We do not collect from children under 13:",
+          content:
+            "AIVO is intentionally designed to avoid collecting categories of personal information that are not needed for the educational service. We do not collect from children under 13:",
           list: [
             "Full legal name, postal address, telephone number, or email address (these come from the parent, not from the child).",
             "Social Security numbers, government-issued ID numbers, or financial account numbers.",
@@ -76,19 +79,21 @@ export default function CoppaCompliancePage() {
         },
         {
           title: "7. How We Use Children's Information",
-          content: "Children's personal information is used only for educational purposes that the parent or school has authorized, and only in the following ways:",
+          content:
+            "Children's personal information is used only for educational purposes that the parent or school has authorized, and only in the following ways:",
           list: [
             "To power the Brain-Clone AI that personalizes lesson pacing, difficulty, sensory presentation, and tutor selection.",
             "To generate progress reports for the authorized parent and, where applicable, for school-authorized teachers and therapists.",
             "To provide accessibility accommodations (AAC compatibility, switch access, eye-gaze support, sensory adaptations).",
-            "To ensure the security and integrity of the child's account and to detect and prevent fraud, abuse, or technical errors (the COPPA \"internal operations\" exception).",
+            'To ensure the security and integrity of the child\'s account and to detect and prevent fraud, abuse, or technical errors (the COPPA "internal operations" exception).',
             "To improve AIVO using anonymized, aggregated learning data that cannot be linked back to any individual child.",
             "To respond to a verified parental request to review, modify, or delete the child's information.",
           ],
         },
         {
           title: "8. Disclosure of Children's Information to Third Parties",
-          content: "We do not sell, rent, or trade children's personal information. We share children's information only with the limited recipients below, each of whom is bound by a written agreement that restricts use of the information to the service they perform for AIVO.",
+          content:
+            "We do not sell, rent, or trade children's personal information. We share children's information only with the limited recipients below, each of whom is bound by a written agreement that restricts use of the information to the service they perform for AIVO.",
           list: [
             "The parent or legal guardian of the child, through their secure parent dashboard.",
             "School administrators, teachers, and therapists who have been authorized by the school under a signed Data Privacy Agreement and (where required) by the parent.",
@@ -123,7 +128,8 @@ export default function CoppaCompliancePage() {
         },
         {
           title: "12. Parental Rights — Review, Modify, Delete, Refuse Further Collection",
-          content: "Parents and legal guardians have the following rights regarding the personal information AIVO has collected from their child. We do not require any reason for the request.",
+          content:
+            "Parents and legal guardians have the following rights regarding the personal information AIVO has collected from their child. We do not require any reason for the request.",
           list: [
             "Review — receive a copy of all personal information AIVO has collected from the child, in a portable format.",
             "Modify — correct or update any information about the child.",
@@ -150,16 +156,18 @@ export default function CoppaCompliancePage() {
         },
         {
           title: "15. International Data Transfers",
-          content: "Personal information collected from children under 13 is processed and stored in the United States in single-tenant infrastructure. We do not transfer children's personal information outside the United States for processing. Adult support contacts may be processed by support staff in other countries, but child profiles are restricted to U.S. infrastructure.",
+          content:
+            "Personal information collected from children under 13 is processed and stored in the United States in single-tenant infrastructure. We do not transfer children's personal information outside the United States for processing. Adult support contacts may be processed by support staff in other countries, but child profiles are restricted to U.S. infrastructure.",
         },
         {
           title: "16. Self-Regulatory and Safe-Harbor Programs",
-          content: "AIVO participates in industry self-regulatory programs that strengthen our COPPA compliance, including the iKeepSafe COPPA and FERPA certifications, the Future of Privacy Forum's Student Privacy Pledge 2020, and a planned application for one of the FTC-approved COPPA Safe Harbor programs. Our compliance is independently audited annually, and audit summaries are available on request to schools and districts.",
+          content:
+            "AIVO participates in industry self-regulatory programs that strengthen our COPPA compliance, including the iKeepSafe COPPA and FERPA certifications, the Future of Privacy Forum's Student Privacy Pledge 2020, and a planned application for one of the FTC-approved COPPA Safe Harbor programs. Our compliance is independently audited annually, and audit summaries are available on request to schools and districts.",
         },
         {
           title: "17. State Children's-Privacy Laws",
           content: [
-            "California — under the California Consumer Privacy Act and the California \"Eraser Law\" (Bus. & Prof. Code § 22581), users under 18 may request deletion of content they have posted. AIVO does not allow children to post public content, but a parent may still request deletion of any record under § 22581.",
+            'California — under the California Consumer Privacy Act and the California "Eraser Law" (Bus. & Prof. Code § 22581), users under 18 may request deletion of content they have posted. AIVO does not allow children to post public content, but a parent may still request deletion of any record under § 22581.',
             "New York — for school-authorized accounts, AIVO complies with Education Law § 2-d, including the Parents' Bill of Rights and the prohibition on using student data for marketing.",
             "Connecticut — for school-authorized accounts, AIVO complies with Connecticut General Statutes § 10-234aa et seq.",
             "Other states — AIVO complies with the student-privacy and child-privacy laws of all U.S. states in which our school customers operate, including but not limited to Colorado, Delaware, Florida, Georgia, Illinois, Maine, Maryland, Massachusetts, Tennessee, Texas, Utah, Virginia, and Washington.",
@@ -175,7 +183,8 @@ export default function CoppaCompliancePage() {
         },
         {
           title: "19. Changes to This Statement",
-          content: "We may update this COPPA Compliance Statement from time to time to reflect changes in the law, in our practices, or in the categories of information we collect. When we make material changes — for example, adding a new category of personal information or a new method of obtaining parental consent — we will give parents direct notice (typically by email and through the parent dashboard) and, where required by COPPA, will obtain new verifiable consent before applying the change to existing child profiles. The \"Last updated\" date at the top of this page reflects the most recent material revision.",
+          content:
+            'We may update this COPPA Compliance Statement from time to time to reflect changes in the law, in our practices, or in the categories of information we collect. When we make material changes — for example, adding a new category of personal information or a new method of obtaining parental consent — we will give parents direct notice (typically by email and through the parent dashboard) and, where required by COPPA, will obtain new verifiable consent before applying the change to existing child profiles. The "Last updated" date at the top of this page reflects the most recent material revision.',
         },
         {
           title: "20. Contact the Privacy Office",

@@ -115,9 +115,7 @@ export function useGeometryInteractions({
         const dx = to.x - from.x;
         const dy = to.y - from.y;
         if (dx === 0 && dy === 0) return d;
-        const nextShapes = d.shapes.map((s) =>
-          s.id === shapeId ? translateShape(s, dx, dy) : s,
-        );
+        const nextShapes = d.shapes.map((s) => (s.id === shapeId ? translateShape(s, dx, dy) : s));
         record({ type: "move_shape", shapeId, from, to, at: Date.now() });
         return { ...d, shapes: nextShapes };
       });
@@ -147,12 +145,7 @@ export function useGeometryInteractions({
   );
 
   const measure = useCallback(
-    (
-      tool: "ruler" | "protractor",
-      from: Point,
-      to: Point,
-      label?: string,
-    ): GeometryMeasurement => {
+    (tool: "ruler" | "protractor", from: Point, to: Point, label?: string): GeometryMeasurement => {
       const measurementId = `m-${Date.now().toString(36)}`;
       const value =
         tool === "ruler"

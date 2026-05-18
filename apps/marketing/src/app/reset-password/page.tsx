@@ -2,9 +2,24 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Lock, Eye, EyeOff, CheckCircle2, ArrowLeft, ArrowRight, ShieldCheck, Loader2 } from "lucide-react";
+import {
+  Lock,
+  Eye,
+  EyeOff,
+  CheckCircle2,
+  ArrowLeft,
+  ArrowRight,
+  ShieldCheck,
+  Loader2,
+} from "lucide-react";
 
-const STRENGTH_COLORS = ["bg-rose-500", "bg-orange-500", "bg-amber-500", "bg-lime-500", "bg-emerald-500"];
+const STRENGTH_COLORS = [
+  "bg-rose-500",
+  "bg-orange-500",
+  "bg-amber-500",
+  "bg-lime-500",
+  "bg-emerald-500",
+];
 const STRENGTH_LABELS = ["Very weak", "Weak", "Fair", "Strong", "Very strong"];
 
 interface PolicyCheck {
@@ -31,7 +46,9 @@ function ResetPasswordInner() {
       setChecking(true);
       const len = password.length;
       let score = 0;
-      const classes = [/[a-z]/, /[A-Z]/, /\d/, /[^a-zA-Z0-9]/].filter((re) => re.test(password)).length;
+      const classes = [/[a-z]/, /[A-Z]/, /\d/, /[^a-zA-Z0-9]/].filter((re) =>
+        re.test(password),
+      ).length;
       let entropy = Math.min(len, 32) * 2 + classes * 6;
       if (/(.)\1{2,}/.test(password)) entropy -= 8;
       if (entropy < 18) score = 0;
@@ -64,7 +81,10 @@ function ResetPasswordInner() {
     <div className="min-h-screen bg-gradient-to-br from-violet-100 via-white to-amber-50 flex flex-col relative overflow-hidden">
       <div aria-hidden="true" className="absolute inset-0 pointer-events-none -z-0">
         <div className="absolute -top-20 -left-20 w-[45vw] h-[45vw] bg-violet-300/40 rounded-full blur-3xl animate-blob motion-reduce:animate-none" />
-        <div className="absolute -bottom-20 -right-20 w-[40vw] h-[40vw] bg-amber-200/50 rounded-full blur-3xl animate-blob motion-reduce:animate-none" style={{ animationDelay: "5s" }} />
+        <div
+          className="absolute -bottom-20 -right-20 w-[40vw] h-[40vw] bg-amber-200/50 rounded-full blur-3xl animate-blob motion-reduce:animate-none"
+          style={{ animationDelay: "5s" }}
+        />
       </div>
 
       <header className="relative z-30 flex items-center justify-between p-6">
@@ -101,10 +121,14 @@ function ResetPasswordInner() {
                   </div>
                   <p className="text-emerald-800 font-bold">Password updated</p>
                   <p className="text-sm text-emerald-700 mt-1 font-body">
-                    You&apos;d be redirected to sign in next. (Demo preview — no real reset performed.)
+                    You&apos;d be redirected to sign in next. (Demo preview — no real reset
+                    performed.)
                   </p>
                 </div>
-                <Link href="/login" className="inline-flex items-center gap-2 mt-6 text-sm font-bold text-[hsl(var(--visual-primary))] hover:underline">
+                <Link
+                  href="/login"
+                  className="inline-flex items-center gap-2 mt-6 text-sm font-bold text-[hsl(var(--visual-primary))] hover:underline"
+                >
                   <ArrowLeft className="w-4 h-4" aria-hidden="true" />
                   Back to sign in
                 </Link>
@@ -112,9 +136,17 @@ function ResetPasswordInner() {
             ) : (
               <form onSubmit={handleSubmit} className="mt-7 space-y-5">
                 <div className="space-y-2">
-                  <label htmlFor="reset-password-new" className="block text-sm font-bold text-slate-700 ml-1">New password</label>
+                  <label
+                    htmlFor="reset-password-new"
+                    className="block text-sm font-bold text-slate-700 ml-1"
+                  >
+                    New password
+                  </label>
                   <div className="relative">
-                    <Lock className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" aria-hidden="true" />
+                    <Lock
+                      className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"
+                      aria-hidden="true"
+                    />
                     <input
                       id="reset-password-new"
                       type={showPassword ? "text" : "password"}
@@ -140,15 +172,22 @@ function ResetPasswordInner() {
                     <div className="mt-3 space-y-2">
                       <div className="flex gap-1">
                         {[0, 1, 2, 3, 4].map((i) => (
-                          <div key={i} className={`h-1.5 flex-1 rounded-full ${i <= score ? STRENGTH_COLORS[score] : "bg-slate-200"}`} />
+                          <div
+                            key={i}
+                            className={`h-1.5 flex-1 rounded-full ${i <= score ? STRENGTH_COLORS[score] : "bg-slate-200"}`}
+                          />
                         ))}
                       </div>
-                      <p className={`text-xs font-bold ${score >= 3 ? "text-emerald-600" : "text-slate-500"}`}>
+                      <p
+                        className={`text-xs font-bold ${score >= 3 ? "text-emerald-600" : "text-slate-500"}`}
+                      >
                         {checking ? "Checking..." : STRENGTH_LABELS[score]}
                       </p>
                       {policy && policy.reasons.length > 0 && (
                         <ul className="text-xs text-slate-500 list-disc pl-4 space-y-0.5 font-body">
-                          {policy.reasons.map((r) => <li key={r}>{r}</li>)}
+                          {policy.reasons.map((r) => (
+                            <li key={r}>{r}</li>
+                          ))}
                         </ul>
                       )}
                     </div>
@@ -156,9 +195,17 @@ function ResetPasswordInner() {
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="reset-password-confirm" className="block text-sm font-bold text-slate-700 ml-1">Confirm new password</label>
+                  <label
+                    htmlFor="reset-password-confirm"
+                    className="block text-sm font-bold text-slate-700 ml-1"
+                  >
+                    Confirm new password
+                  </label>
                   <div className="relative">
-                    <Lock className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" aria-hidden="true" />
+                    <Lock
+                      className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"
+                      aria-hidden="true"
+                    />
                     <input
                       id="reset-password-confirm"
                       type={showPassword ? "text" : "password"}
@@ -173,7 +220,9 @@ function ResetPasswordInner() {
                     />
                   </div>
                   {confirm && confirm !== password && (
-                    <p className="text-xs text-rose-600 font-bold ml-1">Passwords don&apos;t match yet</p>
+                    <p className="text-xs text-rose-600 font-bold ml-1">
+                      Passwords don&apos;t match yet
+                    </p>
                   )}
                 </div>
 
@@ -186,7 +235,12 @@ function ResetPasswordInner() {
                 >
                   {loading ? (
                     <>
-                      <Loader2 size={20} strokeWidth={2.5} className="motion-safe:animate-spin" aria-hidden="true" />
+                      <Loader2
+                        size={20}
+                        strokeWidth={2.5}
+                        className="motion-safe:animate-spin"
+                        aria-hidden="true"
+                      />
                       Updating...
                     </>
                   ) : (
@@ -198,7 +252,10 @@ function ResetPasswordInner() {
                 </button>
 
                 <div className="text-center pt-2">
-                  <Link href="/login" className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-[hsl(var(--visual-primary))] transition">
+                  <Link
+                    href="/login"
+                    className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-[hsl(var(--visual-primary))] transition"
+                  >
                     <ArrowLeft className="w-4 h-4" aria-hidden="true" />
                     Back to sign in
                   </Link>
@@ -209,7 +266,10 @@ function ResetPasswordInner() {
 
           <div className="text-center mt-7">
             <div className="inline-flex items-center gap-2 text-sm font-bold text-slate-600 bg-white/70 backdrop-blur px-4 py-2 rounded-full border border-slate-200">
-              <ShieldCheck className="w-4 h-4 text-[hsl(var(--visual-primary))]" aria-hidden="true" />
+              <ShieldCheck
+                className="w-4 h-4 text-[hsl(var(--visual-primary))]"
+                aria-hidden="true"
+              />
               Designed to support COPPA · FERPA · SOC 2
             </div>
           </div>
@@ -221,7 +281,13 @@ function ResetPasswordInner() {
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-slate-400">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center text-slate-400">
+          Loading...
+        </div>
+      }
+    >
       <ResetPasswordInner />
     </Suspense>
   );

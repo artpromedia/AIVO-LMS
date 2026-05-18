@@ -13,10 +13,7 @@
  */
 
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import {
-  analyzeRecommendationSignals,
-  type RecommendationSignalSample,
-} from "@aivo/scoring";
+import { analyzeRecommendationSignals, type RecommendationSignalSample } from "@aivo/scoring";
 
 interface RecommendationCandidatesBody {
   learnerId: string;
@@ -42,15 +39,10 @@ function isValidSample(value: unknown): value is RecommendationSignalSample {
   return true;
 }
 
-export function registerTutorRecommendationCandidatesRoute(
-  app: FastifyInstance,
-): void {
+export function registerTutorRecommendationCandidatesRoute(app: FastifyInstance): void {
   app.post<{ Body: RecommendationCandidatesBody }>(
     "/api/tutor/recommendation-candidates",
-    async (
-      req: FastifyRequest<{ Body: RecommendationCandidatesBody }>,
-      reply: FastifyReply,
-    ) => {
+    async (req: FastifyRequest<{ Body: RecommendationCandidatesBody }>, reply: FastifyReply) => {
       const body = req.body ?? ({} as RecommendationCandidatesBody);
       if (!body.learnerId) {
         return reply.code(400).send({ error: "learnerId is required" });
@@ -63,9 +55,7 @@ export function registerTutorRecommendationCandidatesRoute(
       }
       for (let i = 0; i < body.samples.length; i++) {
         if (!isValidSample(body.samples[i])) {
-          return reply
-            .code(422)
-            .send({ error: `samples[${i}] is invalid` });
+          return reply.code(422).send({ error: `samples[${i}] is invalid` });
         }
       }
 

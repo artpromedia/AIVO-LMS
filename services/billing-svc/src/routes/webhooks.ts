@@ -8,7 +8,14 @@ import {
   stripeWebhookEvents,
 } from "@aivo/db";
 import { isPlanId, isTutorSku, type PlanId, type TutorSku } from "@aivo/billing-entitlements";
-import { getStripe, getWebhookSecret, StripeNotConfiguredError, STRIPE_METADATA_TENANT_KEY, STRIPE_METADATA_PLAN_KEY, STRIPE_METADATA_TUTOR_SKU_KEY } from "../lib/stripe.js";
+import {
+  getStripe,
+  getWebhookSecret,
+  StripeNotConfiguredError,
+  STRIPE_METADATA_TENANT_KEY,
+  STRIPE_METADATA_PLAN_KEY,
+  STRIPE_METADATA_TUTOR_SKU_KEY,
+} from "../lib/stripe.js";
 import {
   webhookEventsReceived,
   webhookEventsDuplicate,
@@ -81,7 +88,10 @@ export function registerWebhookRoutes(app: FastifyInstance, db: any) {
           return { received: true, type: event.type, duplicate: true };
         }
       } catch (err) {
-        app.log.error({ err: String(err), eventId: event.id }, "Failed to record webhook idempotency row");
+        app.log.error(
+          { err: String(err), eventId: event.id },
+          "Failed to record webhook idempotency row",
+        );
         // Fall through and try to process — better to double-process and
         // rely on per-handler idempotency than to drop the event.
       }
@@ -95,11 +105,14 @@ export function registerWebhookRoutes(app: FastifyInstance, db: any) {
           .where(eq(stripeWebhookEvents.id, event.id));
       } catch (err: any) {
         webhookEventsProcessed.increment(1, { type: event.type, outcome: "error" });
-        app.log.error({
-          err: err?.message ?? String(err),
-          eventType: event.type,
-          eventId: event.id,
-        }, "Webhook handler failed");
+        app.log.error(
+          {
+            err: err?.message ?? String(err),
+            eventType: event.type,
+            eventId: event.id,
+          },
+          "Webhook handler failed",
+        );
         await db
           .update(stripeWebhookEvents)
           .set({ error: err?.message ?? String(err) })
@@ -127,14 +140,30 @@ export async function dispatchStripeEvent(db: any, event: Stripe.Event, log: any
   const eventCreated = eventCreatedDate(event);
   switch (event.type) {
     case "checkout.session.completed":
-      await handleCheckoutCompleted(db, event.data.object as Stripe.Checkout.Session, log, eventCreated);
+      await handleCheckoutCompleted(
+        db,
+        event.data.object as Stripe.Checkout.Session,
+        log,
+        eventCreated,
+      );
       return;
     case "customer.subscription.created":
     case "customer.subscription.updated":
-      await handleSubscriptionUpsert(db, event.data.object as Stripe.Subscription, log, eventCreated, event.type);
+      await handleSubscriptionUpsert(
+        db,
+        event.data.object as Stripe.Subscription,
+        log,
+        eventCreated,
+        event.type,
+      );
       return;
     case "customer.subscription.deleted":
-      await handleSubscriptionDeleted(db, event.data.object as Stripe.Subscription, log, eventCreated);
+      await handleSubscriptionDeleted(
+        db,
+        event.data.object as Stripe.Subscription,
+        log,
+        eventCreated,
+      );
       return;
     case "invoice.paid":
     case "invoice.payment_succeeded":
@@ -142,7 +171,13 @@ export async function dispatchStripeEvent(db: any, event: Stripe.Event, log: any
       await handleInvoiceUpsert(db, event.data.object as Stripe.Invoice, "paid", eventCreated, log);
       return;
     case "invoice.payment_failed":
-      await handleInvoiceUpsert(db, event.data.object as Stripe.Invoice, "payment_failed", eventCreated, log);
+      await handleInvoiceUpsert(
+        db,
+        event.data.object as Stripe.Invoice,
+        "payment_failed",
+        eventCreated,
+        log,
+      );
       return;
     case "customer.subscription.trial_will_end":
       await handleTrialWillEnd(db, event.data.object as Stripe.Subscription, log, eventCreated);
@@ -155,7 +190,9 @@ export async function dispatchStripeEvent(db: any, event: Stripe.Event, log: any
   }
 }
 
-export function readTenantFromMetadata(metadata: Stripe.Metadata | null | undefined): string | null {
+export function readTenantFromMetadata(
+  metadata: Stripe.Metadata | null | undefined,
+): string | null {
   return (metadata?.[STRIPE_METADATA_TENANT_KEY] as string | undefined) ?? null;
 }
 
@@ -164,7 +201,9 @@ export function readPlanFromMetadata(metadata: Stripe.Metadata | null | undefine
   return typeof v === "string" && isPlanId(v) ? v : null;
 }
 
-export function readTutorSkuFromMetadata(metadata: Stripe.Metadata | null | undefined): TutorSku | null {
+export function readTutorSkuFromMetadata(
+  metadata: Stripe.Metadata | null | undefined,
+): TutorSku | null {
   const v = metadata?.[STRIPE_METADATA_TUTOR_SKU_KEY];
   return typeof v === "string" && isTutorSku(v) ? v : null;
 }
@@ -189,9 +228,11 @@ async function handleCheckoutCompleted(
   // moments later; we just record the linkage here so the upsert can
   // attach to the right tenant by stripe_subscription_id alone.
   const stripeCustomerId =
-    typeof session.customer === "string" ? session.customer : session.customer?.id ?? null;
+    typeof session.customer === "string" ? session.customer : (session.customer?.id ?? null);
   const stripeSubscriptionId =
-    typeof session.subscription === "string" ? session.subscription : session.subscription?.id ?? null;
+    typeof session.subscription === "string"
+      ? session.subscription
+      : (session.subscription?.id ?? null);
   if (!stripeCustomerId || !stripeSubscriptionId) return;
 
   const existing = await db
@@ -252,8 +293,7 @@ async function handleSubscriptionUpsert(
   const currentPeriodEnd = unixToDate(sub.current_period_end);
   const canceledAt = unixToDate(sub.canceled_at ?? undefined);
   const trialEndsAt = unixToDate(sub.trial_end ?? undefined);
-  const primaryPriceId =
-    sub.items.data[0]?.price?.id ?? null;
+  const primaryPriceId = sub.items.data[0]?.price?.id ?? null;
 
   const existing = await db
     .select()
@@ -263,12 +303,16 @@ async function handleSubscriptionUpsert(
 
   if (existing.length === 0) {
     if (!tenantId) {
-      log.warn("subscription.upsert: missing tenant metadata; cannot create row", { subId: sub.id });
+      log.warn("subscription.upsert: missing tenant metadata; cannot create row", {
+        subId: sub.id,
+      });
       return;
     }
     const userId = (sub.metadata?.userId as string | undefined) ?? null;
     if (!userId) {
-      log.warn("subscription.upsert: missing userId metadata; cannot create row", { subId: sub.id });
+      log.warn("subscription.upsert: missing userId metadata; cannot create row", {
+        subId: sub.id,
+      });
       return;
     }
     await db.insert(subscriptions).values({
@@ -358,7 +402,12 @@ async function handleSubscriptionUpsert(
   // we have but Stripe no longer reports → mark grace_period. Items
   // Stripe reports but we don't have → insert as active.
   if (tenantId) {
-    await reconcileTutorItems(db, sub, tenantId, existing[0]?.userId ?? (sub.metadata?.userId as string | undefined));
+    await reconcileTutorItems(
+      db,
+      sub,
+      tenantId,
+      existing[0]?.userId ?? (sub.metadata?.userId as string | undefined),
+    );
   }
 }
 
@@ -422,7 +471,9 @@ async function reconcileTutorItems(
   }
 }
 
-export function mapStripeStatusToEnum(stripeStatus: string): "ACTIVE" | "PAST_DUE" | "CANCELLED" | "TRIALING" {
+export function mapStripeStatusToEnum(
+  stripeStatus: string,
+): "ACTIVE" | "PAST_DUE" | "CANCELLED" | "TRIALING" {
   switch (stripeStatus) {
     case "trialing":
       return "TRIALING";
@@ -448,7 +499,10 @@ async function handleSubscriptionDeleted(
     .from(subscriptions)
     .where(eq(subscriptions.stripeSubscriptionId, sub.id))
     .limit(1);
-  if (existing[0]?.lastStripeEventAt && eventCreated.getTime() < existing[0].lastStripeEventAt.getTime()) {
+  if (
+    existing[0]?.lastStripeEventAt &&
+    eventCreated.getTime() < existing[0].lastStripeEventAt.getTime()
+  ) {
     webhookEventsStale.increment(1, { type: "customer.subscription.deleted" });
     return;
   }
@@ -477,10 +531,7 @@ async function handleSubscriptionDeleted(
       .update(tutorSubscriptions)
       .set({ status: "grace_period", deactivatedAt: new Date(), graceEndsAt })
       .where(
-        and(
-          eq(tutorSubscriptions.tenantId, tenantId),
-          eq(tutorSubscriptions.status, "active"),
-        ),
+        and(eq(tutorSubscriptions.tenantId, tenantId), eq(tutorSubscriptions.status, "active")),
       )
       .returning({ tutorSku: tutorSubscriptions.tutorSku });
     for (const row of moved ?? []) {
@@ -505,11 +556,11 @@ async function handleInvoiceUpsert(
   log: any,
 ) {
   const stripeCustomerId =
-    typeof invoice.customer === "string" ? invoice.customer : invoice.customer?.id ?? null;
+    typeof invoice.customer === "string" ? invoice.customer : (invoice.customer?.id ?? null);
   const stripeSubscriptionId =
     typeof invoice.subscription === "string"
       ? invoice.subscription
-      : invoice.subscription?.id ?? null;
+      : (invoice.subscription?.id ?? null);
 
   let tenantId = readTenantFromMetadata(invoice.metadata);
   let subscriptionUserId: string | null = null;
@@ -526,7 +577,9 @@ async function handleInvoiceUpsert(
   const periodStart = unixToDate(invoice.period_start);
   const periodEnd = unixToDate(invoice.period_end);
   const paidAt =
-    paymentStatus === "paid" ? unixToDate(invoice.status_transitions?.paid_at ?? undefined) ?? new Date() : null;
+    paymentStatus === "paid"
+      ? (unixToDate(invoice.status_transitions?.paid_at ?? undefined) ?? new Date())
+      : null;
 
   const existing = await db
     .select()
@@ -625,7 +678,11 @@ async function handleTrialWillEnd(
       updatedAt: new Date(),
     })
     .where(eq(subscriptions.stripeSubscriptionId, sub.id))
-    .returning({ id: subscriptions.id, tenantId: subscriptions.tenantId, userId: subscriptions.userId });
+    .returning({
+      id: subscriptions.id,
+      tenantId: subscriptions.tenantId,
+      userId: subscriptions.userId,
+    });
   if (!result || result.length === 0) {
     log.warn("trial_will_end: no local subscription row", { subId: sub.id });
     return;
@@ -654,12 +711,8 @@ async function handleTrialWillEnd(
  * We don't override an existing default with a non-default attach,
  * because parents who add a backup card shouldn't see the UI flip.
  */
-async function handlePaymentMethodAttached(
-  db: any,
-  pm: Stripe.PaymentMethod,
-  log: any,
-) {
-  const customerId = typeof pm.customer === "string" ? pm.customer : pm.customer?.id ?? null;
+async function handlePaymentMethodAttached(db: any, pm: Stripe.PaymentMethod, log: any) {
+  const customerId = typeof pm.customer === "string" ? pm.customer : (pm.customer?.id ?? null);
   if (!customerId) {
     log.warn({ pmId: pm.id }, "payment_method.attached: no customer id");
     return;

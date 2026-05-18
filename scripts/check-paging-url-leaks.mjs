@@ -20,7 +20,11 @@ const PATTERNS = [
   { name: "pagerduty-events-host", re: /https:\/\/events(?:-eu)?\.pagerduty\.com\b/g },
   { name: "opsgenie-api", re: /https:\/\/api(?:\.eu)?\.opsgenie\.com\/v\d+\/alerts\b/g },
   // Routing keys are 32-hex-char tokens. Allow-list common placeholders.
-  { name: "pagerduty-routing-key", re: /\b[a-f0-9]{32}\b/gi, requireKeyword: /pagerduty|routing[_-]?key/i },
+  {
+    name: "pagerduty-routing-key",
+    re: /\b[a-f0-9]{32}\b/gi,
+    requireKeyword: /pagerduty|routing[_-]?key/i,
+  },
 ];
 
 const ALLOWED_FILES = new Set([
@@ -32,7 +36,18 @@ const ALLOWED_FILES = new Set([
   "ops-alerts-external-monitor.yaml",
 ]);
 
-const SKIP_EXT = new Set([".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico", ".pdf", ".lock", ".woff", ".woff2"]);
+const SKIP_EXT = new Set([
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".gif",
+  ".svg",
+  ".ico",
+  ".pdf",
+  ".lock",
+  ".woff",
+  ".woff2",
+]);
 const SKIP_DIRS = ["node_modules", "dist", "build", ".next", ".turbo", ".git"];
 
 function listTrackedFiles() {
@@ -76,7 +91,9 @@ function main() {
   const findings = [];
   for (const f of files) findings.push(...scanFile(f));
   if (findings.length === 0) {
-    console.log(`paging-url-leaks: scanned ${files.length} files, no hard-coded paging URLs found.`);
+    console.log(
+      `paging-url-leaks: scanned ${files.length} files, no hard-coded paging URLs found.`,
+    );
     return;
   }
   console.error(`paging-url-leaks: ${findings.length} hard-coded paging URL(s) found:`);

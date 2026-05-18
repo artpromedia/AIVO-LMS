@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   GestureResponderEvent,
   LayoutChangeEvent,
@@ -7,9 +7,9 @@ import {
   Text,
   View,
   ViewStyle,
-} from 'react-native';
-import Svg, { Path } from 'react-native-svg';
-import { colors, radius, spacing } from '@/constants/colors';
+} from "react-native";
+import Svg, { Path } from "react-native-svg";
+import { colors, radius, spacing } from "@/constants/colors";
 
 export type StrokeColor = string;
 
@@ -36,7 +36,7 @@ export interface ScratchPadProps {
   style?: ViewStyle;
 }
 
-const PALETTE: StrokeColor[] = ['#111827', '#7C3AED', '#2563EB', '#16A34A', '#DC2626', '#F59E0B'];
+const PALETTE: StrokeColor[] = ["#111827", "#7C3AED", "#2563EB", "#16A34A", "#DC2626", "#F59E0B"];
 const THICKNESS = [2, 4, 6, 10];
 
 /**
@@ -53,7 +53,7 @@ export function ScratchPad({
   gridPaper = false,
   initialStrokes = [],
   onChange,
-  background = '#FFFFFF',
+  background = "#FFFFFF",
   toolbar = true,
   compactToolbar = false,
   style,
@@ -140,22 +140,12 @@ export function ScratchPad({
     const lines: React.ReactNode[] = [];
     for (let x = step; x < size.w; x += step) {
       lines.push(
-        <Path
-          key={`vx-${x}`}
-          d={`M ${x} 0 L ${x} ${size.h}`}
-          stroke="#E5E7EB"
-          strokeWidth={1}
-        />,
+        <Path key={`vx-${x}`} d={`M ${x} 0 L ${x} ${size.h}`} stroke="#E5E7EB" strokeWidth={1} />,
       );
     }
     for (let y = step; y < size.h; y += step) {
       lines.push(
-        <Path
-          key={`hy-${y}`}
-          d={`M 0 ${y} L ${size.w} ${y}`}
-          stroke="#E5E7EB"
-          strokeWidth={1}
-        />,
+        <Path key={`hy-${y}`} d={`M 0 ${y} L ${size.w} ${y}`} stroke="#E5E7EB" strokeWidth={1} />,
       );
     }
     return lines;
@@ -168,7 +158,7 @@ export function ScratchPad({
           <ToolButton label="↶" onPress={undo} disabled={strokes.length === 0} />
           <ToolButton label="↷" onPress={redo} disabled={redoStack.length === 0} />
           <ToolButton
-            label={erasing ? 'Erase ✓' : 'Erase'}
+            label={erasing ? "Erase ✓" : "Erase"}
             onPress={() => setErasing((e) => !e)}
             active={erasing}
           />
@@ -200,7 +190,14 @@ export function ScratchPad({
                   style={[styles.thickBtn, width === t && styles.thickBtnActive]}
                   accessibilityLabel={`Thickness ${t}`}
                 >
-                  <View style={{ width: 18, height: t, backgroundColor: colors.text, borderRadius: t / 2 }} />
+                  <View
+                    style={{
+                      width: 18,
+                      height: t,
+                      backgroundColor: colors.text,
+                      borderRadius: t / 2,
+                    }}
+                  />
                 </Pressable>
               ))}
             </View>
@@ -264,7 +261,7 @@ function ToolButton({
       ]}
       accessibilityRole="button"
     >
-      <Text style={[styles.toolBtnText, active && { color: '#FFF' }]}>{label}</Text>
+      <Text style={[styles.toolBtnText, active && { color: "#FFF" }]}>{label}</Text>
     </Pressable>
   );
 }
@@ -274,16 +271,16 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: radius.xl,
     backgroundColor: colors.card,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
     borderColor: colors.border,
   },
   toolbar: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: spacing.xs,
     padding: spacing.sm,
-    flexWrap: 'wrap',
+    flexWrap: "wrap",
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.border,
     backgroundColor: colors.surface,
@@ -297,22 +294,22 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   toolBtnActive: { backgroundColor: colors.primary, borderColor: colors.primary },
   toolBtnDisabled: { opacity: 0.4 },
-  toolBtnText: { fontSize: 13, fontFamily: 'Nunito-Bold', color: colors.text },
-  palette: { flexDirection: 'row', gap: 4 },
+  toolBtnText: { fontSize: 13, fontFamily: "Nunito-Bold", color: colors.text },
+  palette: { flexDirection: "row", gap: 4 },
   swatch: {
     width: 24,
     height: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: 'transparent',
+    borderColor: "transparent",
   },
   swatchActive: { borderColor: colors.text },
-  thicknessRow: { flexDirection: 'row', gap: 4 },
+  thicknessRow: { flexDirection: "row", gap: 4 },
   thickBtn: {
     width: 28,
     height: 28,
@@ -320,8 +317,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   thickBtnActive: { borderColor: colors.primary, borderWidth: 2 },
   canvas: { flex: 1 },

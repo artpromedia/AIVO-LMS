@@ -16,7 +16,12 @@ export interface ProgressPathProps {
   reducedMotion?: boolean;
 }
 
-export function ProgressPath({ current, total, xpEarned, reducedMotion = false }: ProgressPathProps) {
+export function ProgressPath({
+  current,
+  total,
+  xpEarned,
+  reducedMotion = false,
+}: ProgressPathProps) {
   const safeTotal = total > 0 ? total : 1;
   const progress = Math.min(1, current / safeTotal);
   const widthPct = `${(progress * 100).toFixed(2)}%`;

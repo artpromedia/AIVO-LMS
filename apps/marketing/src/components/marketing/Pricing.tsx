@@ -7,13 +7,25 @@ import { trackCTAClick, trackPricingSelection, trackSignupInitiation } from "@/l
 import { WEB_APP_URL, SITE_URL } from "@/lib/constants";
 
 const CHECK_ICON = (
-  <svg className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+  <svg
+    className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    aria-hidden="true"
+  >
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
   </svg>
 );
 
 const CHECK_WHITE = (
-  <svg className="w-4 h-4 text-emerald-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+  <svg
+    className="w-4 h-4 text-emerald-300"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    aria-hidden="true"
+  >
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
   </svg>
 );
@@ -50,7 +62,14 @@ export function Pricing() {
       monthly: 24.99,
       perLearner: true,
       descKey: "single_desc" as const,
-      featureKeys: ["single_f1", "single_f2", "single_f3", "single_f4", "single_f5", "single_f6"] as const,
+      featureKeys: [
+        "single_f1",
+        "single_f2",
+        "single_f3",
+        "single_f4",
+        "single_f5",
+        "single_f6",
+      ] as const,
       ctaKey: "single_cta" as const,
       href: `${WEB_APP_URL}/signup?plan=single`,
       popular: false,
@@ -64,19 +83,34 @@ export function Pricing() {
       monthly: 19.99,
       perLearner: true,
       descKey: "family_desc" as const,
-      featureKeys: ["family_f1", "family_f2", "family_f3", "family_f4", "family_f5", "family_f6", "family_f7"] as const,
+      featureKeys: [
+        "family_f1",
+        "family_f2",
+        "family_f3",
+        "family_f4",
+        "family_f5",
+        "family_f6",
+        "family_f7",
+      ] as const,
       ctaKey: "family_cta" as const,
       href: `${WEB_APP_URL}/signup?plan=family`,
       popular: true,
       bg: "bg-gradient-to-b from-purple-50 to-white",
       border: "border-purple-200",
-      ctaBg: "bg-gradient-to-r from-primary to-purple-600 hover:from-primary-dark hover:to-purple-700",
+      ctaBg:
+        "bg-gradient-to-r from-primary to-purple-600 hover:from-primary-dark hover:to-purple-700",
     },
   ];
 
   const DISTRICT_FEATURES = [
-    "district_f1", "district_f2", "district_f3", "district_f4",
-    "district_f5", "district_f6", "district_f7", "district_f8",
+    "district_f1",
+    "district_f2",
+    "district_f3",
+    "district_f4",
+    "district_f5",
+    "district_f6",
+    "district_f7",
+    "district_f8",
   ] as const;
 
   // Product / Offer JSON-LD for paid plans
@@ -91,14 +125,16 @@ export function Pricing() {
       offers: {
         "@type": "Offer",
         priceCurrency: "USD",
-        price: billing === "annual"
-          ? (Math.round(plan.monthly * ANNUAL_DISCOUNT * 100) / 100).toFixed(2)
-          : plan.monthly.toFixed(2),
-        priceSpecification: {
-          "@type": "UnitPriceSpecification",
-          price: billing === "annual"
+        price:
+          billing === "annual"
             ? (Math.round(plan.monthly * ANNUAL_DISCOUNT * 100) / 100).toFixed(2)
             : plan.monthly.toFixed(2),
+        priceSpecification: {
+          "@type": "UnitPriceSpecification",
+          price:
+            billing === "annual"
+              ? (Math.round(plan.monthly * ANNUAL_DISCOUNT * 100) / 100).toFixed(2)
+              : plan.monthly.toFixed(2),
           priceCurrency: "USD",
           unitText: "MONTH",
           referenceQuantity: { "@type": "QuantitativeValue", value: 1, unitCode: "MON" },
@@ -123,17 +159,11 @@ export function Pricing() {
           <h2 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 mb-4">
             {t("title")}
           </h2>
-          <p className="text-lg text-slate-500 max-w-2xl mx-auto font-body">
-            {t("subtitle")}
-          </p>
+          <p className="text-lg text-slate-500 max-w-2xl mx-auto font-body">{t("subtitle")}</p>
         </div>
 
         {/* Billing toggle */}
-        <div
-          className="flex justify-center mb-12"
-          role="radiogroup"
-          aria-label="Billing frequency"
-        >
+        <div className="flex justify-center mb-12" role="radiogroup" aria-label="Billing frequency">
           <div className="inline-flex items-center bg-white border border-slate-200 rounded-full p-1 shadow-sm">
             <button
               type="button"
@@ -177,9 +207,8 @@ export function Pricing() {
           {PLANS.map((plan) => {
             let monthlyDisplay = t("free_price");
             if (plan.monthly > 0) {
-              monthlyDisplay = billing === "annual"
-                ? formatAnnual(plan.monthly)
-                : `$${plan.monthly.toFixed(2)}`;
+              monthlyDisplay =
+                billing === "annual" ? formatAnnual(plan.monthly) : `$${plan.monthly.toFixed(2)}`;
             }
 
             let periodSuffix = "";
@@ -217,7 +246,10 @@ export function Pricing() {
 
                 <ul className="space-y-3 mb-8">
                   {plan.featureKeys.map((fk) => (
-                    <li key={fk} className="flex items-start gap-2.5 text-sm text-slate-600 font-body">
+                    <li
+                      key={fk}
+                      className="flex items-start gap-2.5 text-sm text-slate-600 font-body"
+                    >
                       {CHECK_ICON}
                       {t(fk)}
                     </li>
@@ -247,9 +279,7 @@ export function Pricing() {
               <ShieldCheck className="w-5 h-5" aria-hidden="true" />
             </span>
             <div>
-              <p className="font-heading font-bold text-emerald-900">
-                {t("guarantee_title")}
-              </p>
+              <p className="font-heading font-bold text-emerald-900">{t("guarantee_title")}</p>
               <p className="text-sm text-emerald-800/90 font-body mt-1 leading-relaxed">
                 {t("guarantee_desc")}
               </p>
@@ -260,8 +290,19 @@ export function Pricing() {
         {/* Add-on note */}
         <div className="max-w-5xl mx-auto mb-16">
           <div className="flex items-center justify-center gap-2 text-sm text-slate-500 font-body text-center">
-            <svg className="w-4 h-4 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
+            <svg
+              className="w-4 h-4 text-amber-500 shrink-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"
+              />
             </svg>
             {t("addon_note")}
           </div>
@@ -329,25 +370,61 @@ export function Pricing() {
                   <th scope="row" className="text-left font-body p-4 font-semibold text-slate-700">
                     {t("compare_parent_dashboard")}
                   </th>
-                  <td className="text-center p-4"><Check className="inline w-4 h-4 text-emerald-500" aria-label={t("compare_yes")} /></td>
-                  <td className="text-center p-4"><Check className="inline w-4 h-4 text-emerald-500" aria-label={t("compare_yes")} /></td>
-                  <td className="text-center p-4"><Check className="inline w-4 h-4 text-emerald-500" aria-label={t("compare_yes")} /></td>
-                  <td className="text-center p-4"><Check className="inline w-4 h-4 text-emerald-500" aria-label={t("compare_yes")} /></td>
+                  <td className="text-center p-4">
+                    <Check
+                      className="inline w-4 h-4 text-emerald-500"
+                      aria-label={t("compare_yes")}
+                    />
+                  </td>
+                  <td className="text-center p-4">
+                    <Check
+                      className="inline w-4 h-4 text-emerald-500"
+                      aria-label={t("compare_yes")}
+                    />
+                  </td>
+                  <td className="text-center p-4">
+                    <Check
+                      className="inline w-4 h-4 text-emerald-500"
+                      aria-label={t("compare_yes")}
+                    />
+                  </td>
+                  <td className="text-center p-4">
+                    <Check
+                      className="inline w-4 h-4 text-emerald-500"
+                      aria-label={t("compare_yes")}
+                    />
+                  </td>
                 </tr>
                 <tr>
                   <th scope="row" className="text-left font-body p-4 font-semibold text-slate-700">
                     {t("compare_multi_learner_discount")}
                   </th>
-                  <td className="text-center p-4 text-slate-300" aria-label={t("compare_no")}>{t("compare_no")}</td>
-                  <td className="text-center p-4 text-slate-300" aria-label={t("compare_no")}>{t("compare_no")}</td>
-                  <td className="text-center p-4"><Check className="inline w-4 h-4 text-emerald-500" aria-label={t("compare_yes")} /></td>
-                  <td className="text-center p-4"><Check className="inline w-4 h-4 text-emerald-500" aria-label={t("compare_yes")} /></td>
+                  <td className="text-center p-4 text-slate-300" aria-label={t("compare_no")}>
+                    {t("compare_no")}
+                  </td>
+                  <td className="text-center p-4 text-slate-300" aria-label={t("compare_no")}>
+                    {t("compare_no")}
+                  </td>
+                  <td className="text-center p-4">
+                    <Check
+                      className="inline w-4 h-4 text-emerald-500"
+                      aria-label={t("compare_yes")}
+                    />
+                  </td>
+                  <td className="text-center p-4">
+                    <Check
+                      className="inline w-4 h-4 text-emerald-500"
+                      aria-label={t("compare_yes")}
+                    />
+                  </td>
                 </tr>
                 <tr>
                   <th scope="row" className="text-left font-body p-4 font-semibold text-slate-700">
                     {t("compare_addon_tutors")}
                   </th>
-                  <td className="text-center p-4 text-slate-300" aria-label={t("compare_no")}>{t("compare_no")}</td>
+                  <td className="text-center p-4 text-slate-300" aria-label={t("compare_no")}>
+                    {t("compare_no")}
+                  </td>
                   <td className="text-center p-4">{t("compare_addon_price")}</td>
                   <td className="text-center p-4">{t("compare_addon_price")}</td>
                   <td className="text-center p-4">{t("compare_addon_included")}</td>
@@ -364,7 +441,9 @@ export function Pricing() {
           </div>
           <div className="relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 mb-6">
-              <span className="text-lg" aria-hidden="true">🏫</span>
+              <span className="text-lg" aria-hidden="true">
+                🏫
+              </span>
               <span className="text-sm font-bold text-white/90">{t("district_badge")}</span>
             </div>
             <h3 className="text-3xl md:text-4xl font-heading font-bold text-white mb-4">

@@ -21,15 +21,12 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
     // Confirm the target user lives inside the admin's tenant scope before
     // touching them — prevents school admins editing district admin records.
     const scope = adminScopeForSession(session!);
-    const inScope = listUsersForTenants(scope.tenantIds).some(
-      (u) => u.user.id === userId,
-    );
+    const inScope = listUsersForTenants(scope.tenantIds).some((u) => u.user.id === userId);
     if (!inScope) {
       return fail({ ...ERRORS.NOT_FOUND, message: "User not found." }, requestId);
     }
     const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
-    const displayName =
-      typeof body.displayName === "string" ? body.displayName.trim() : null;
+    const displayName = typeof body.displayName === "string" ? body.displayName.trim() : null;
     if (!displayName || displayName.length > 120) {
       return fail(
         { ...ERRORS.VALIDATION_FAILED, message: "displayName is required (1-120)." },

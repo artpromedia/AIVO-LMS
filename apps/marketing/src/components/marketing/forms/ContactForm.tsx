@@ -58,7 +58,12 @@ export function ContactForm() {
     return (
       <FormSuccessPanel
         title="Message sent."
-        body={<>We typically reply within one business day. Check your inbox at <strong>{form.email}</strong>.</>}
+        body={
+          <>
+            We typically reply within one business day. Check your inbox at{" "}
+            <strong>{form.email}</strong>.
+          </>
+        }
         primaryHref="/"
         primaryLabel="Back to home"
         onSecondary={() => {
@@ -149,7 +154,10 @@ export function ContactForm() {
           />
           <span>
             I agree AIVO can email me about my question. See our{" "}
-            <a href="/privacy-policy" className="font-semibold text-purple-700 underline">privacy policy</a>.
+            <a href="/privacy-policy" className="font-semibold text-purple-700 underline">
+              privacy policy
+            </a>
+            .
           </span>
         </label>
         {errors.consent ? (

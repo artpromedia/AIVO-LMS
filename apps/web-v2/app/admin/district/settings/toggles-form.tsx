@@ -4,10 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import type {
-  TenantFeatureOverrides,
-  TenantNotificationPrefs,
-} from "@/lib/db/types";
+import type { TenantFeatureOverrides, TenantNotificationPrefs } from "@/lib/db/types";
 
 type Initial = {
   notifications: TenantNotificationPrefs;
@@ -133,18 +130,11 @@ export function SettingsTogglesForm({ initial }: { initial: Initial }) {
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <Card className="p-[var(--aivo-density-card-pad)]">
-        <p className="font-display text-lg font-semibold">
-          Notification preferences
-        </p>
-        <p className="text-sm text-aivo-ink-soft">
-          What district admins are emailed about.
-        </p>
+        <p className="font-display text-lg font-semibold">Notification preferences</p>
+        <p className="text-sm text-aivo-ink-soft">What district admins are emailed about.</p>
         <ul className="mt-4 divide-y divide-aivo-border">
           {NOTIFICATION_ROWS.map((row) => (
-            <li
-              key={row.key}
-              className="flex items-start justify-between gap-4 py-3"
-            >
+            <li key={row.key} className="flex items-start justify-between gap-4 py-3">
               <div>
                 <p className="text-sm font-medium">{row.title}</p>
                 <p className="text-xs text-aivo-ink-soft">{row.desc}</p>
@@ -152,9 +142,7 @@ export function SettingsTogglesForm({ initial }: { initial: Initial }) {
               <Toggle
                 label={row.title}
                 checked={notifications[row.key]}
-                onChange={(v) =>
-                  setNotifications((prev) => ({ ...prev, [row.key]: v }))
-                }
+                onChange={(v) => setNotifications((prev) => ({ ...prev, [row.key]: v }))}
               />
             </li>
           ))}
@@ -168,10 +156,7 @@ export function SettingsTogglesForm({ initial }: { initial: Initial }) {
         </p>
         <ul className="mt-4 divide-y divide-aivo-border">
           {FEATURE_ROWS.map((row) => (
-            <li
-              key={row.key}
-              className="flex items-start justify-between gap-4 py-3"
-            >
+            <li key={row.key} className="flex items-start justify-between gap-4 py-3">
               <div>
                 <p className="text-sm font-medium">{row.title}</p>
                 <p className="text-xs text-aivo-ink-soft">{row.desc}</p>
@@ -179,9 +164,7 @@ export function SettingsTogglesForm({ initial }: { initial: Initial }) {
               <Toggle
                 label={row.title}
                 checked={features[row.key]}
-                onChange={(v) =>
-                  setFeatures((prev) => ({ ...prev, [row.key]: v }))
-                }
+                onChange={(v) => setFeatures((prev) => ({ ...prev, [row.key]: v }))}
               />
             </li>
           ))}
@@ -189,12 +172,8 @@ export function SettingsTogglesForm({ initial }: { initial: Initial }) {
       </Card>
 
       <div className="lg:col-span-2 flex items-center justify-end gap-3">
-        {status?.kind === "ok" ? (
-          <p className="text-sm text-aivo-success">{status.msg}</p>
-        ) : null}
-        {status?.kind === "err" ? (
-          <p className="text-sm text-aivo-danger">{status.msg}</p>
-        ) : null}
+        {status?.kind === "ok" ? <p className="text-sm text-aivo-success">{status.msg}</p> : null}
+        {status?.kind === "err" ? <p className="text-sm text-aivo-danger">{status.msg}</p> : null}
         <Button type="button" onClick={save} disabled={!dirty || pending}>
           {pending ? "Saving…" : "Save changes"}
         </Button>

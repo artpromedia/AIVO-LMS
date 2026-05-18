@@ -25,7 +25,8 @@ export const vigorStarterPack: ContentPack = {
       title: "Move your body",
       skillId: "shape.k2.s1.locomotor",
       type: "narration",
-      prompt: "We can move our bodies in many ways — walk, run, hop, skip, gallop. Today we'll try a few.",
+      prompt:
+        "We can move our bodies in many ways — walk, run, hop, skip, gallop. Today we'll try a few.",
       difficulty: "intro",
     },
     {

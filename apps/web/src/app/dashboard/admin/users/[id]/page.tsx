@@ -37,9 +37,19 @@ const ROLE_DASHBOARDS: Record<string, string> = {
 };
 
 const EDITABLE_ROLES = [
-  "PLATFORM_ADMIN", "DISTRICT_ADMIN",
-  "PARENT", "LEARNER", "TEACHER", "CAREGIVER", "THERAPIST",
-  "SALES", "MARKETING", "CUSTOMER_CARE", "SUPPORT", "FINANCE", "DEVOPS",
+  "PLATFORM_ADMIN",
+  "DISTRICT_ADMIN",
+  "PARENT",
+  "LEARNER",
+  "TEACHER",
+  "CAREGIVER",
+  "THERAPIST",
+  "SALES",
+  "MARKETING",
+  "CUSTOMER_CARE",
+  "SUPPORT",
+  "FINANCE",
+  "DEVOPS",
 ];
 
 interface Learner {
@@ -96,7 +106,10 @@ export default function AdminUserDetailPage() {
   const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false);
   const [deactivating, setDeactivating] = useState(false);
 
-  const [resetResult, setResetResult] = useState<{ temporaryPassword: string; email: string } | null>(null);
+  const [resetResult, setResetResult] = useState<{
+    temporaryPassword: string;
+    email: string;
+  } | null>(null);
   const [resettingPassword, setResettingPassword] = useState(false);
 
   const [impersonating, setImpersonating] = useState(false);
@@ -246,7 +259,10 @@ export default function AdminUserDetailPage() {
   if (error || !userData) {
     return (
       <div className="p-8 space-y-4">
-        <Link href="/dashboard/admin/users" className="text-sm text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))] font-medium">
+        <Link
+          href="/dashboard/admin/users"
+          className="text-sm text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))] font-medium"
+        >
           ← Back to Users
         </Link>
         <div className="bg-[hsl(var(--visual-math)/0.08)] border border-[hsl(var(--visual-math)/0.25)] text-[hsl(var(--visual-math))] px-4 py-3 rounded-xl text-sm">
@@ -266,13 +282,18 @@ export default function AdminUserDetailPage() {
 
       {resetResult && (
         <div className="bg-[hsl(var(--visual-science)/0.08)] border border-[hsl(var(--visual-science)/0.25)] rounded-xl p-4 space-y-2">
-          <p className="text-[hsl(var(--visual-science))] font-semibold">Password reset successfully!</p>
+          <p className="text-[hsl(var(--visual-science))] font-semibold">
+            Password reset successfully!
+          </p>
           <div className="text-sm space-y-1">
             <p className="text-[hsl(var(--visual-science))]">
               Email: <span className="font-mono font-semibold">{resetResult.email}</span>
             </p>
             <p className="text-[hsl(var(--visual-science))]">
-              Temporary Password: <span className="font-mono font-semibold bg-[hsl(var(--visual-science)/0.14)] px-2 py-0.5 rounded select-all">{resetResult.temporaryPassword}</span>
+              Temporary Password:{" "}
+              <span className="font-mono font-semibold bg-[hsl(var(--visual-science)/0.14)] px-2 py-0.5 rounded select-all">
+                {resetResult.temporaryPassword}
+              </span>
             </p>
           </div>
           <p className="text-xs text-[hsl(var(--visual-science))] mt-2">
@@ -287,7 +308,10 @@ export default function AdminUserDetailPage() {
         </div>
       )}
 
-      <Link href="/dashboard/admin/users" className="text-sm text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))] font-medium inline-block">
+      <Link
+        href="/dashboard/admin/users"
+        className="text-sm text-[hsl(var(--visual-primary))] hover:text-[hsl(var(--visual-primary))] font-medium inline-block"
+      >
         ← Back to Users
       </Link>
 
@@ -299,13 +323,19 @@ export default function AdminUserDetailPage() {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 flex-wrap">
               <h1 className="text-2xl font-heading font-bold vi-text">{userData.name}</h1>
-              <span className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${ROLE_COLORS[userData.role] || "vi-surface-soft vi-text-muted"}`}>
+              <span
+                className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${ROLE_COLORS[userData.role] || "vi-surface-soft vi-text-muted"}`}
+              >
                 {userData.role.replace(/_/g, " ")}
               </span>
               {isDeactivated ? (
-                <span className="px-2.5 py-0.5 text-xs rounded-full font-semibold bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]">Deactivated</span>
+                <span className="px-2.5 py-0.5 text-xs rounded-full font-semibold bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]">
+                  Deactivated
+                </span>
               ) : (
-                <span className="px-2.5 py-0.5 text-xs rounded-full font-semibold bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]">Active</span>
+                <span className="px-2.5 py-0.5 text-xs rounded-full font-semibold bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]">
+                  Active
+                </span>
               )}
             </div>
             <p className="text-sm vi-text-muted mt-1">{userData.email || "No email"}</p>
@@ -313,9 +343,7 @@ export default function AdminUserDetailPage() {
               {userData.lastLoginAt && (
                 <span>Last login: {new Date(userData.lastLoginAt).toLocaleString()}</span>
               )}
-              {userData.lastLoginIp && (
-                <span>IP: {userData.lastLoginIp}</span>
-              )}
+              {userData.lastLoginIp && <span>IP: {userData.lastLoginIp}</span>}
             </div>
           </div>
         </div>
@@ -363,7 +391,9 @@ export default function AdminUserDetailPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="vi-card p-6">
-          <h2 className="text-sm font-semibold vi-text-muted uppercase tracking-wider mb-4">Account Info</h2>
+          <h2 className="text-sm font-semibold vi-text-muted uppercase tracking-wider mb-4">
+            Account Info
+          </h2>
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
               <span className="vi-text-muted">Email</span>
@@ -375,31 +405,43 @@ export default function AdminUserDetailPage() {
             </div>
             <div className="flex justify-between">
               <span className="vi-text-muted">Email Verified</span>
-              <span className={`font-medium ${userData.emailVerified ? "text-[hsl(var(--visual-science))]" : "text-[hsl(var(--visual-math))]"}`}>
+              <span
+                className={`font-medium ${userData.emailVerified ? "text-[hsl(var(--visual-science))]" : "text-[hsl(var(--visual-math))]"}`}
+              >
                 {userData.emailVerified ? "Yes" : "No"}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="vi-text-muted">Google ID</span>
-              <span className="vi-text font-medium truncate ml-2 max-w-[160px]">{userData.hasGoogle ? "Connected" : "—"}</span>
+              <span className="vi-text font-medium truncate ml-2 max-w-[160px]">
+                {userData.hasGoogle ? "Connected" : "—"}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="vi-text-muted">Apple ID</span>
-              <span className="vi-text font-medium truncate ml-2 max-w-[160px]">{userData.hasApple ? "Connected" : "—"}</span>
+              <span className="vi-text font-medium truncate ml-2 max-w-[160px]">
+                {userData.hasApple ? "Connected" : "—"}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="vi-text-muted">Created</span>
-              <span className="vi-text font-medium">{new Date(userData.createdAt).toLocaleDateString()}</span>
+              <span className="vi-text font-medium">
+                {new Date(userData.createdAt).toLocaleDateString()}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="vi-text-muted">Updated</span>
-              <span className="vi-text font-medium">{new Date(userData.updatedAt).toLocaleDateString()}</span>
+              <span className="vi-text font-medium">
+                {new Date(userData.updatedAt).toLocaleDateString()}
+              </span>
             </div>
           </div>
         </div>
 
         <div className="vi-card p-6">
-          <h2 className="text-sm font-semibold vi-text-muted uppercase tracking-wider mb-4">Tenant Info</h2>
+          <h2 className="text-sm font-semibold vi-text-muted uppercase tracking-wider mb-4">
+            Tenant Info
+          </h2>
           {userData.tenant ? (
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
@@ -412,7 +454,9 @@ export default function AdminUserDetailPage() {
               </div>
               <div className="flex justify-between">
                 <span className="vi-text-muted">ID</span>
-                <span className="vi-text font-medium font-mono text-xs truncate ml-2 max-w-[160px]">{userData.tenant.id}</span>
+                <span className="vi-text font-medium font-mono text-xs truncate ml-2 max-w-[160px]">
+                  {userData.tenant.id}
+                </span>
               </div>
             </div>
           ) : (
@@ -421,7 +465,9 @@ export default function AdminUserDetailPage() {
         </div>
 
         <div className="vi-card p-6">
-          <h2 className="text-sm font-semibold vi-text-muted uppercase tracking-wider mb-4">Session Info</h2>
+          <h2 className="text-sm font-semibold vi-text-muted uppercase tracking-wider mb-4">
+            Session Info
+          </h2>
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
               <span className="vi-text-muted">Active Sessions</span>
@@ -434,7 +480,9 @@ export default function AdminUserDetailPage() {
       {userData?.learners && userData.learners.length > 0 && (
         <div className="vi-card overflow-hidden">
           <div className="p-5 border-b vi-border">
-            <h2 className="text-sm font-semibold vi-text-muted uppercase tracking-wider">Learners ({userData.learners.length})</h2>
+            <h2 className="text-sm font-semibold vi-text-muted uppercase tracking-wider">
+              Learners ({userData.learners.length})
+            </h2>
           </div>
           <table className="w-full text-sm">
             <thead>
@@ -452,7 +500,9 @@ export default function AdminUserDetailPage() {
                   <td className="px-5 py-3 font-medium vi-text">{learner.name}</td>
                   <td className="px-5 py-3 vi-text-muted">{learner.functioningLevel || "—"}</td>
                   <td className="px-5 py-3 vi-text-muted">{learner.gradeLevel || "—"}</td>
-                  <td className="px-5 py-3 vi-text-muted">{new Date(learner.createdAt).toLocaleDateString()}</td>
+                  <td className="px-5 py-3 vi-text-muted">
+                    {new Date(learner.createdAt).toLocaleDateString()}
+                  </td>
                   <td className="px-5 py-3">
                     <Link
                       href={`/dashboard/admin/learners/${learner.id}`}
@@ -470,7 +520,11 @@ export default function AdminUserDetailPage() {
 
       {showEditModal && (
         <div className="fixed inset-0 z-[9998] flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/40" role="presentation" onClick={() => setShowEditModal(false)} />
+          <div
+            className="absolute inset-0 bg-black/40"
+            role="presentation"
+            onClick={() => setShowEditModal(false)}
+          />
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
             <div className="p-6 border-b vi-border">
               <h2 className="text-lg font-heading font-bold vi-text">Edit User</h2>
@@ -483,7 +537,9 @@ export default function AdminUserDetailPage() {
                 </div>
               )}
               <div>
-                <label htmlFor="edit-name" className="block text-sm font-medium vi-text mb-1">Full Name</label>
+                <label htmlFor="edit-name" className="block text-sm font-medium vi-text mb-1">
+                  Full Name
+                </label>
                 <input
                   id="edit-name"
                   type="text"
@@ -494,7 +550,9 @@ export default function AdminUserDetailPage() {
                 />
               </div>
               <div>
-                <label htmlFor="edit-email" className="block text-sm font-medium vi-text mb-1">Email</label>
+                <label htmlFor="edit-email" className="block text-sm font-medium vi-text mb-1">
+                  Email
+                </label>
                 <input
                   id="edit-email"
                   type="email"
@@ -505,7 +563,9 @@ export default function AdminUserDetailPage() {
                 />
               </div>
               <div>
-                <label htmlFor="edit-role" className="block text-sm font-medium vi-text mb-1">Role</label>
+                <label htmlFor="edit-role" className="block text-sm font-medium vi-text mb-1">
+                  Role
+                </label>
                 <select
                   id="edit-role"
                   value={editRole}
@@ -542,12 +602,18 @@ export default function AdminUserDetailPage() {
 
       {showDeactivateConfirm && (
         <div className="fixed inset-0 z-[9998] flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/40" role="presentation" onClick={() => setShowDeactivateConfirm(false)} />
+          <div
+            className="absolute inset-0 bg-black/40"
+            role="presentation"
+            onClick={() => setShowDeactivateConfirm(false)}
+          />
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
             <div className="p-6">
               <h2 className="text-lg font-heading font-bold vi-text">Deactivate User</h2>
               <p className="text-sm vi-text-muted mt-2">
-                Are you sure you want to deactivate <span className="font-semibold vi-text">{userData.name}</span>? They will no longer be able to log in.
+                Are you sure you want to deactivate{" "}
+                <span className="font-semibold vi-text">{userData.name}</span>? They will no longer
+                be able to log in.
               </p>
               <div className="flex gap-3 mt-6">
                 <button

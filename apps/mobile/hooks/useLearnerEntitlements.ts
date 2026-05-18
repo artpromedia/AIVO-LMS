@@ -1,12 +1,12 @@
-import { useQuery } from '@tanstack/react-query';
-import { apiFetch } from '@/lib/api';
-import { API } from '@/constants/api';
+import { useQuery } from "@tanstack/react-query";
+import { apiFetch } from "@/lib/api";
+import { API } from "@/constants/api";
 import {
   TUTOR_KEY_TO_SKU,
   isTutorKey,
   type TutorKey,
   type TutorSku,
-} from '@aivo/billing-entitlements';
+} from "@aivo/billing-entitlements";
 
 /**
  * Mobile mirror of the web `useLearnerEntitlements` hook. Single
@@ -39,11 +39,11 @@ export interface UseLearnerEntitlementsResult {
 
 export function useLearnerEntitlements(tenantId: string | undefined): UseLearnerEntitlementsResult {
   const query = useQuery<LearnerEntitlements, Error & { status?: number }>({
-    queryKey: ['billing-entitlements', tenantId],
+    queryKey: ["billing-entitlements", tenantId],
     queryFn: async () => {
       const res = await apiFetch(API.BILLING, `/api/billing/entitlements/${tenantId}`);
       if (res.status === 403) {
-        const e: Error & { status?: number } = new Error('forbidden');
+        const e: Error & { status?: number } = new Error("forbidden");
         e.status = 403;
         throw e;
       }

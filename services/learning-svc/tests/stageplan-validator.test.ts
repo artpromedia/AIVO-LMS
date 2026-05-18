@@ -10,7 +10,10 @@ const validGeometrySurface = {
   id: "surf-geo-1",
   type: "geometry_workspace",
   prompt: "Find the area",
-  diagram: { canvasMode: "svg", shapes: [{ id: "rect1", kind: "rectangle", x: 0, y: 0, width: 320, height: 180 }] },
+  diagram: {
+    canvasMode: "svg",
+    shapes: [{ id: "rect1", kind: "rectangle", x: 0, y: 0, width: 320, height: 180 }],
+  },
   capture: { finalAnswer: true, inkStrokes: true },
   scoring: { mode: "exact", correctAnswer: 32 },
   accessibility: {

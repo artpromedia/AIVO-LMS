@@ -35,11 +35,7 @@ export function FlVariantProvider({ level, children }: FlVariantProviderProps) {
     };
   }, [level]);
 
-  return (
-    <FlVariantContext.Provider value={value}>
-      {children}
-    </FlVariantContext.Provider>
-  );
+  return <FlVariantContext.Provider value={value}>{children}</FlVariantContext.Provider>;
 }
 
 export function useFlVariant() {

@@ -22,7 +22,10 @@ export interface ParentDataExportPanelProps {
   fetchImpl?: typeof fetch;
 }
 
-export function ParentDataExportPanel({ learnerId, fetchImpl = fetch }: ParentDataExportPanelProps) {
+export function ParentDataExportPanel({
+  learnerId,
+  fetchImpl = fetch,
+}: ParentDataExportPanelProps) {
   const [busy, setBusy] = useState(false);
   const [job, setJob] = useState<ExportJob | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -71,10 +74,9 @@ export function ParentDataExportPanel({ learnerId, fetchImpl = fetch }: ParentDa
     <section className="parent-data-export-panel rounded border p-4">
       <h3 className="text-lg font-semibold">Export learner data</h3>
       <p className="text-xs text-gray-600">
-        Build a JSON, Markdown, and CSV bundle of profile, recommendations,
-        baseline summaries, lesson progress, homework, problem sessions, parent
-        decisions, teacher observations, and audit counts. Raw IEP / private
-        notes / OCR text are stripped.
+        Build a JSON, Markdown, and CSV bundle of profile, recommendations, baseline summaries,
+        lesson progress, homework, problem sessions, parent decisions, teacher observations, and
+        audit counts. Raw IEP / private notes / OCR text are stripped.
       </p>
       <button
         type="button"

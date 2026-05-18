@@ -33,9 +33,12 @@ describe("Journey 5: SOC2 evidence continuity", () => {
   });
 
   it("2. Audit log contains at least 10 entries", async () => {
-    const res = await fetch(serviceUrl("admin-svc", `/api/admin/audit?tenantId=${tenantId}&limit=20`), {
-      headers: { Authorization: `Bearer ${adminToken}` },
-    });
+    const res = await fetch(
+      serviceUrl("admin-svc", `/api/admin/audit?tenantId=${tenantId}&limit=20`),
+      {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      },
+    );
     expect(res.status).toBe(200);
     const data = (await res.json()) as any[];
     expect(data.length).toBeGreaterThanOrEqual(10);

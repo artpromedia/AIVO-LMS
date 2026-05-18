@@ -12,40 +12,40 @@ Tokens are defined as **OKLCH** in `@theme` and overridden per role via `[data-t
 
 ### 1.1 Base tokens (all themes)
 
-| Token | Role |
-|---|---|
-| `--color-aivo-ink` | primary text |
-| `--color-aivo-ink-soft` | secondary text |
-| `--color-aivo-muted` | tertiary/helper text |
-| `--color-aivo-surface` | card / panel background |
-| `--color-aivo-surface-2` | recessed background |
-| `--color-aivo-border` | hairlines |
-| `--color-aivo-primary` | role-tinted brand action |
-| `--color-aivo-primary-fg` | text on primary |
-| `--color-aivo-primary-soft` | active/selected pill background |
-| `--color-aivo-accent` | secondary accent (badges, charts) |
-| `--color-aivo-success / warning / danger` | state colors |
+| Token                                       | Role                                                   |
+| ------------------------------------------- | ------------------------------------------------------ |
+| `--color-aivo-ink`                          | primary text                                           |
+| `--color-aivo-ink-soft`                     | secondary text                                         |
+| `--color-aivo-muted`                        | tertiary/helper text                                   |
+| `--color-aivo-surface`                      | card / panel background                                |
+| `--color-aivo-surface-2`                    | recessed background                                    |
+| `--color-aivo-border`                       | hairlines                                              |
+| `--color-aivo-primary`                      | role-tinted brand action                               |
+| `--color-aivo-primary-fg`                   | text on primary                                        |
+| `--color-aivo-primary-soft`                 | active/selected pill background                        |
+| `--color-aivo-accent`                       | secondary accent (badges, charts)                      |
+| `--color-aivo-success / warning / danger`   | state colors                                           |
 | `--color-aivo-sidebar-{bg,fg,muted,border}` | sidebar chrome (lets us go dark on learner + platform) |
-| `--color-aivo-page-bg` | the page background behind cards |
+| `--color-aivo-page-bg`                      | the page background behind cards                       |
 
 ### 1.2 Role tints (current values — see globals.css)
 
-| Role | Primary | Sidebar | Card radius | Density |
-|---|---|---|---|---|
-| **parent** | indigo 0.56 0.14 265 | warm cream | 16px | base |
-| **learner** | sunny coral 0.65 0.22 30 | dark coral (FG light) | 28px | larger font + 1.75rem pad |
-| **teacher** | calm teal 0.52 0.10 210 | light teal-gray | 10px | tighter |
-| **admin** (school + district) | slate 0.45 0.08 250 | light slate | 10px | tighter |
-| **platform** | utility blue 0.50 0.15 220 | **dark navy** (FG light) | 8px | tighter |
+| Role                          | Primary                    | Sidebar                  | Card radius | Density                   |
+| ----------------------------- | -------------------------- | ------------------------ | ----------- | ------------------------- |
+| **parent**                    | indigo 0.56 0.14 265       | warm cream               | 16px        | base                      |
+| **learner**                   | sunny coral 0.65 0.22 30   | dark coral (FG light)    | 28px        | larger font + 1.75rem pad |
+| **teacher**                   | calm teal 0.52 0.10 210    | light teal-gray          | 10px        | tighter                   |
+| **admin** (school + district) | slate 0.45 0.08 250        | light slate              | 10px        | tighter                   |
+| **platform**                  | utility blue 0.50 0.15 220 | **dark navy** (FG light) | 8px         | tighter                   |
 
 ### 1.3 State colors (semantic — same across themes)
 
-| Token | Use | Sample copy |
-|---|---|---|
-| `success` | confirmed save, lesson complete | "Saved." · "Lesson complete." |
-| `warning` | review queue, soft block | "Needs review." · "Consent will expire in 14 days." |
-| `danger` | error, hard block | "We couldn't save." · "Consent required to continue." |
-| `info` (= primary-soft + ink-soft) | neutral context | "AI generated this — review before sending." |
+| Token                              | Use                             | Sample copy                                           |
+| ---------------------------------- | ------------------------------- | ----------------------------------------------------- |
+| `success`                          | confirmed save, lesson complete | "Saved." · "Lesson complete."                         |
+| `warning`                          | review queue, soft block        | "Needs review." · "Consent will expire in 14 days."   |
+| `danger`                           | error, hard block               | "We couldn't save." · "Consent required to continue." |
+| `info` (= primary-soft + ink-soft) | neutral context                 | "AI generated this — review before sending."          |
 
 ### 1.4 Focus
 
@@ -54,6 +54,7 @@ Tokens are defined as **OKLCH** in `@theme` and overridden per role via `[data-t
 ### 1.5 High-contrast variants ⬜ planned
 
 Not in `globals.css` today. Spec: per role, define a `[data-theme="…"][data-contrast="high"]` block that:
+
 - Pins `--color-aivo-ink` to `oklch(0.10 …)` and `--color-aivo-ink-soft` to `oklch(0.25 …)`.
 - Pins `--color-aivo-border` to `oklch(0.40 …)` (no hairlines below 4.5:1 against surface).
 - Replaces all `primary-soft` with `primary` directly + white text (no soft pills).
@@ -65,11 +66,11 @@ To be wired from `<html data-contrast={user.contrastMode}>` in `app/layout.tsx`,
 
 Not in `globals.css` today. Spec: define only inside `[data-theme="learner"]` — never inherited by parent/teacher/admin surfaces (avoids "gamified-everywhere" feel).
 
-| Token | Use |
-|---|---|
-| `--color-aivo-reward-coin` `oklch(0.78 0.18 75)` | coins, currency |
-| `--color-aivo-reward-streak` `oklch(0.65 0.20 30)` | streak |
-| `--color-aivo-reward-quest` `oklch(0.62 0.18 150)` | quest progress |
+| Token                                              | Use                 |
+| -------------------------------------------------- | ------------------- |
+| `--color-aivo-reward-coin` `oklch(0.78 0.18 75)`   | coins, currency     |
+| `--color-aivo-reward-streak` `oklch(0.65 0.20 30)` | streak              |
+| `--color-aivo-reward-quest` `oklch(0.62 0.18 150)` | quest progress      |
 | `--color-aivo-reward-badge` `oklch(0.70 0.17 280)` | unlocked badge halo |
 
 ### 1.7 Mobile role-mode accents
@@ -82,12 +83,12 @@ Single design system. The role-mode **switcher** chip and the active-mode tab in
 
 ### 2.1 Type families
 
-| Family | Use | Status |
-|---|---|---|
+| Family                         | Use                                              | Status                 |
+| ------------------------------ | ------------------------------------------------ | ---------------------- |
 | **Fredoka** (`--font-display`) | display headings; primary face for learner theme | ✅ shipped in `@theme` |
-| **Nunito** (`--font-sans`) | body text everywhere except learner shell | ✅ shipped in `@theme` |
-| `ui-monospace` | platform-admin IDs, audit logs | ✅ ambient |
-| **OpenDyslexic** *(DD-13)* | optional dyslexia-friendly text mode | ⬜ planned |
+| **Nunito** (`--font-sans`)     | body text everywhere except learner shell        | ✅ shipped in `@theme` |
+| `ui-monospace`                 | platform-admin IDs, audit logs                   | ✅ ambient             |
+| **OpenDyslexic** _(DD-13)_     | optional dyslexia-friendly text mode             | ⬜ planned             |
 
 Mode wiring (⬜ planned): `<html data-typeface="default|dyslexic">` swaps `--font-sans` and tightens letter-spacing to `0.03em` + line-height to `1.7`. Neither the attribute nor an OpenDyslexic `@font-face` is in the codebase today.
 
@@ -95,13 +96,14 @@ Mode wiring (⬜ planned): `<html data-typeface="default|dyslexic">` swaps `--fo
 
 Density tokens per role (already shipping):
 
-| Token | parent | learner | teacher | admin | platform |
-|---|---|---|---|---|---|
-| `--aivo-density-base-font` | 1rem | 1.0625rem | 0.9375rem | 0.9375rem | 0.9375rem |
-| `--aivo-density-h1-font` | 1.875rem | 2.25rem | 1.625rem | 1.625rem | 1.625rem |
-| `--aivo-density-card-pad` | 1.25rem | 1.75rem | 1rem | 1rem | 1rem |
+| Token                      | parent   | learner   | teacher   | admin     | platform  |
+| -------------------------- | -------- | --------- | --------- | --------- | --------- |
+| `--aivo-density-base-font` | 1rem     | 1.0625rem | 0.9375rem | 0.9375rem | 0.9375rem |
+| `--aivo-density-h1-font`   | 1.875rem | 2.25rem   | 1.625rem  | 1.625rem  | 1.625rem  |
+| `--aivo-density-card-pad`  | 1.25rem  | 1.75rem   | 1rem      | 1rem      | 1rem      |
 
 Heading scale (per-theme `h1` is bound; `h2`–`h4` use Tailwind utilities):
+
 - `h2`: `1.5 * base`, `line-height: 1.25`
 - `h3`: `1.25 * base`, `line-height: 1.3`
 - `h4`: `1.1 * base`, `line-height: 1.4`
@@ -131,15 +133,15 @@ Use Tailwind's `space-*` scale (4px base). The role density tokens already shift
 
 ### 3.2 Grids
 
-| Surface | Columns | Gutter | Max width |
-|---|---|---|---|
-| Parent home (desktop) | 12 | `gap-6` | 1200px |
-| Parent home (tablet) | 8 | `gap-4` | 100% |
-| Learner home (one-task) | 1 (centered) | n/a | 720px |
-| Lesson player (Stage) | full-bleed centered | n/a | 1024px content, full-viewport canvas |
-| Teacher class detail | 12 (8/4 split) | `gap-6` | 1280px |
-| Admin dense data | 12 (with sticky filter rail) | `gap-3` | 1440px |
-| Mobile role shell | 1 | `gap-4` | 100% (max 480px on phablet) |
+| Surface                 | Columns                      | Gutter  | Max width                            |
+| ----------------------- | ---------------------------- | ------- | ------------------------------------ |
+| Parent home (desktop)   | 12                           | `gap-6` | 1200px                               |
+| Parent home (tablet)    | 8                            | `gap-4` | 100%                                 |
+| Learner home (one-task) | 1 (centered)                 | n/a     | 720px                                |
+| Lesson player (Stage)   | full-bleed centered          | n/a     | 1024px content, full-viewport canvas |
+| Teacher class detail    | 12 (8/4 split)               | `gap-6` | 1280px                               |
+| Admin dense data        | 12 (with sticky filter rail) | `gap-3` | 1440px                               |
+| Mobile role shell       | 1                            | `gap-4` | 100% (max 480px on phablet)          |
 
 ### 3.3 Role-specific layouts
 
@@ -159,65 +161,65 @@ Status legend: ✅ shipped · 🟡 partial · ⬜ planned.
 
 Status reflects what's actually in the file as of this sprint. "Variants" lists shipped CVA variants; gaps are explicit so this table can't drift.
 
-| File | Status | Shipped surface |
-|---|---|---|
-| `button.tsx` | ✅ | CVA: variants `default · outline · ghost · soft · danger`; sizes `sm · md · lg · icon`; `asChild` Slot. **No `loading` prop today** (callers spin manually); **no built-in focus ring** — Button sets `focus-visible:outline-none` and relies on the global `*:focus-visible` outline. |
-| `input.tsx` | ✅ | One styled input with `focus-visible:ring-2 ring-aivo-primary` + `disabled` opacity. No CVA invalid variant — invalid state is communicated via Label + helper text. |
-| `textarea.tsx` | ✅ | Mirrors Input. No autosize. |
-| `select.tsx` | ✅ | Native select. No Combobox. |
-| `checkbox.tsx` | ✅ | Radix-backed; default / checked / indeterminate / disabled. |
-| `radio-group.tsx` | ✅ | Radix-backed, `<fieldset>` semantics expected at the call site. |
-| `card.tsx` | ✅ | Reads `--radius-card` + `--aivo-density-card-pad` from theme. |
-| `tabs.tsx` | ✅ | Radix Tabs with one TabsList visual (pill on `surface-2`); explicit `focus-visible:ring-2`. No `underlined` variant. |
-| `stepper.tsx` | ✅ | Used in parent assessment wizard, IEP review. |
-| `dialog.tsx` | ✅ | Radix Dialog; focus trap + restore + ESC. |
-| `drawer.tsx` | ✅ | Bottom-sheet on `< 768px`, side panel on web. |
-| `toast.tsx` | ✅ | Radix Toast Provider/Viewport/Root pass-through with one styled Root. **No tone variants** — caller applies tone via classes. |
-| `badge.tsx` | ✅ | Caller-applied tone (no CVA enum today). |
-| `progress.tsx` | ✅ | Linear progress. |
-| `skeleton.tsx` | ✅ | One block. |
-| `empty-state.tsx` | ✅ | Title + description + CTA slot. |
-| `error-state.tsx` | ✅ | Inline error with retry slot. |
-| `retry-panel.tsx` | ✅ | Larger surface wrapping `<ErrorState>` with retry callback. |
-| `label.tsx` | ✅ | `<label>` with consistent spacing. |
-| Icon button | ⬜ planned | Today every call site uses `<Button size="icon">`; promote to its own export so `aria-label` is enforced. |
-| Toggle (Switch) | ⬜ planned | Needed for accessibility settings + notification prefs (currently `consent-toggle.tsx` uses an Accept/Revoke Button pair). |
-| Slider | ⬜ planned | Learner audio rate + admin retention sliders. |
-| Data table | ⬜ planned | Spec below — single primitive replaces ~30 inlined tables. |
-| Filter bar | ⬜ planned | Sticky, role-themed; pairs with Data table. |
-| Search field | ⬜ planned | Today every call site composes `<Input>`; promote to `<Search>` with debounced onChange + `/` shortcut. |
-| Alert | ⬜ planned | Today inlined as a Card with tone class; promote to a dedicated `<Alert>` with `role="status"` / `role="alert"`. |
-| Toast tone variants | ⬜ planned | Add `tone={success · info · warning · danger}` CVA on the Toast Root. |
-| Tooltip | ⬜ planned | Admin tables + parent help icons; must be keyboard-reachable. |
-| Button `loading` prop | ⬜ planned | Built-in spinner + `aria-busy`; replaces ad-hoc spinning at call sites. |
-| Button focus ring | ⬜ planned | Remove `focus-visible:outline-none` from `button.tsx` or pair it with an explicit `focus-visible:ring-2 ring-aivo-primary` — today only the global `*:focus-visible` outline applies. |
+| File                  | Status     | Shipped surface                                                                                                                                                                                                                                                                        |
+| --------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `button.tsx`          | ✅         | CVA: variants `default · outline · ghost · soft · danger`; sizes `sm · md · lg · icon`; `asChild` Slot. **No `loading` prop today** (callers spin manually); **no built-in focus ring** — Button sets `focus-visible:outline-none` and relies on the global `*:focus-visible` outline. |
+| `input.tsx`           | ✅         | One styled input with `focus-visible:ring-2 ring-aivo-primary` + `disabled` opacity. No CVA invalid variant — invalid state is communicated via Label + helper text.                                                                                                                   |
+| `textarea.tsx`        | ✅         | Mirrors Input. No autosize.                                                                                                                                                                                                                                                            |
+| `select.tsx`          | ✅         | Native select. No Combobox.                                                                                                                                                                                                                                                            |
+| `checkbox.tsx`        | ✅         | Radix-backed; default / checked / indeterminate / disabled.                                                                                                                                                                                                                            |
+| `radio-group.tsx`     | ✅         | Radix-backed, `<fieldset>` semantics expected at the call site.                                                                                                                                                                                                                        |
+| `card.tsx`            | ✅         | Reads `--radius-card` + `--aivo-density-card-pad` from theme.                                                                                                                                                                                                                          |
+| `tabs.tsx`            | ✅         | Radix Tabs with one TabsList visual (pill on `surface-2`); explicit `focus-visible:ring-2`. No `underlined` variant.                                                                                                                                                                   |
+| `stepper.tsx`         | ✅         | Used in parent assessment wizard, IEP review.                                                                                                                                                                                                                                          |
+| `dialog.tsx`          | ✅         | Radix Dialog; focus trap + restore + ESC.                                                                                                                                                                                                                                              |
+| `drawer.tsx`          | ✅         | Bottom-sheet on `< 768px`, side panel on web.                                                                                                                                                                                                                                          |
+| `toast.tsx`           | ✅         | Radix Toast Provider/Viewport/Root pass-through with one styled Root. **No tone variants** — caller applies tone via classes.                                                                                                                                                          |
+| `badge.tsx`           | ✅         | Caller-applied tone (no CVA enum today).                                                                                                                                                                                                                                               |
+| `progress.tsx`        | ✅         | Linear progress.                                                                                                                                                                                                                                                                       |
+| `skeleton.tsx`        | ✅         | One block.                                                                                                                                                                                                                                                                             |
+| `empty-state.tsx`     | ✅         | Title + description + CTA slot.                                                                                                                                                                                                                                                        |
+| `error-state.tsx`     | ✅         | Inline error with retry slot.                                                                                                                                                                                                                                                          |
+| `retry-panel.tsx`     | ✅         | Larger surface wrapping `<ErrorState>` with retry callback.                                                                                                                                                                                                                            |
+| `label.tsx`           | ✅         | `<label>` with consistent spacing.                                                                                                                                                                                                                                                     |
+| Icon button           | ⬜ planned | Today every call site uses `<Button size="icon">`; promote to its own export so `aria-label` is enforced.                                                                                                                                                                              |
+| Toggle (Switch)       | ⬜ planned | Needed for accessibility settings + notification prefs (currently `consent-toggle.tsx` uses an Accept/Revoke Button pair).                                                                                                                                                             |
+| Slider                | ⬜ planned | Learner audio rate + admin retention sliders.                                                                                                                                                                                                                                          |
+| Data table            | ⬜ planned | Spec below — single primitive replaces ~30 inlined tables.                                                                                                                                                                                                                             |
+| Filter bar            | ⬜ planned | Sticky, role-themed; pairs with Data table.                                                                                                                                                                                                                                            |
+| Search field          | ⬜ planned | Today every call site composes `<Input>`; promote to `<Search>` with debounced onChange + `/` shortcut.                                                                                                                                                                                |
+| Alert                 | ⬜ planned | Today inlined as a Card with tone class; promote to a dedicated `<Alert>` with `role="status"` / `role="alert"`.                                                                                                                                                                       |
+| Toast tone variants   | ⬜ planned | Add `tone={success · info · warning · danger}` CVA on the Toast Root.                                                                                                                                                                                                                  |
+| Tooltip               | ⬜ planned | Admin tables + parent help icons; must be keyboard-reachable.                                                                                                                                                                                                                          |
+| Button `loading` prop | ⬜ planned | Built-in spinner + `aria-busy`; replaces ad-hoc spinning at call sites.                                                                                                                                                                                                                |
+| Button focus ring     | ⬜ planned | Remove `focus-visible:outline-none` from `button.tsx` or pair it with an explicit `focus-visible:ring-2 ring-aivo-primary` — today only the global `*:focus-visible` outline applies.                                                                                                  |
 
 ### 4.2 Composites (domain)
 
-| Component | Status | Notes |
-|---|---|---|
-| Mission card | ✅ | `components/learner/mission-card.tsx` |
-| Learner card | ✅ | `components/parent/learner-card.tsx` — readiness state + next-action CTA |
-| Tutor card | 🟡 | `tutor-badge` exists; needs full card with avatar + role + "what they help with" |
-| Subject card | 🟡 | `subject-icon` exists; needs card with mastery bar + last-activity |
-| Lesson step card | ✅ | `components/learner/lesson-step-card.tsx` |
-| Progress card | 🟡 | inlined per dashboard; promote to one composite |
-| Assessment question card | ⬜ | used in baseline + parent assessment; today inlined |
-| IEP upload card | ⬜ | drag-drop area + size/type allow-list + extracted-fields preview |
-| Parent summary card | ⬜ | plain-language "what happened today" — UX-04 |
-| Teacher assignment card | ⬜ | one row per assignment in `/teacher/assignments` |
-| Quest chapter card | ⬜ | locked / unlocked / completed states; learner theme only |
-| Admin stat card | 🟡 | inlined per overview page; one composite with `label · value · delta · sparkline` |
-| Notification item | ⬜ | role-icon + title + meta + action |
-| Audit log row | ⬜ | actor · action · target · diff toggle |
-| Mobile role card | ⬜ | used on `/role-chooser` after login |
-| Mobile role switcher | ⬜ | drawer surface w/ active-mode indicator + last-used mode + sign-out |
-| Parent lock modal | ⬜ | prompts parent PIN to leave Learner Mode |
-| Admin re-auth prompt | ⬜ | forces re-confirmation for destructive admin actions (DSAR fulfill, tenant delete) |
-| Read-aloud control | ⬜ | learner-only; pill button + speaking-state animation respecting reduced-motion |
-| Hint button | ⬜ | learner-only; revealing scaffolds (UX-06) |
-| Scaffold panel | ⬜ | slides in from the right inside Stage; never auto-opens |
-| Accessibility toolbar | ⬜ | persistent in learner shell + reachable in others via `/settings/accessibility` |
+| Component                | Status | Notes                                                                              |
+| ------------------------ | ------ | ---------------------------------------------------------------------------------- |
+| Mission card             | ✅     | `components/learner/mission-card.tsx`                                              |
+| Learner card             | ✅     | `components/parent/learner-card.tsx` — readiness state + next-action CTA           |
+| Tutor card               | 🟡     | `tutor-badge` exists; needs full card with avatar + role + "what they help with"   |
+| Subject card             | 🟡     | `subject-icon` exists; needs card with mastery bar + last-activity                 |
+| Lesson step card         | ✅     | `components/learner/lesson-step-card.tsx`                                          |
+| Progress card            | 🟡     | inlined per dashboard; promote to one composite                                    |
+| Assessment question card | ⬜     | used in baseline + parent assessment; today inlined                                |
+| IEP upload card          | ⬜     | drag-drop area + size/type allow-list + extracted-fields preview                   |
+| Parent summary card      | ⬜     | plain-language "what happened today" — UX-04                                       |
+| Teacher assignment card  | ⬜     | one row per assignment in `/teacher/assignments`                                   |
+| Quest chapter card       | ⬜     | locked / unlocked / completed states; learner theme only                           |
+| Admin stat card          | 🟡     | inlined per overview page; one composite with `label · value · delta · sparkline`  |
+| Notification item        | ⬜     | role-icon + title + meta + action                                                  |
+| Audit log row            | ⬜     | actor · action · target · diff toggle                                              |
+| Mobile role card         | ⬜     | used on `/role-chooser` after login                                                |
+| Mobile role switcher     | ⬜     | drawer surface w/ active-mode indicator + last-used mode + sign-out                |
+| Parent lock modal        | ⬜     | prompts parent PIN to leave Learner Mode                                           |
+| Admin re-auth prompt     | ⬜     | forces re-confirmation for destructive admin actions (DSAR fulfill, tenant delete) |
+| Read-aloud control       | ⬜     | learner-only; pill button + speaking-state animation respecting reduced-motion     |
+| Hint button              | ⬜     | learner-only; revealing scaffolds (UX-06)                                          |
+| Scaffold panel           | ⬜     | slides in from the right inside Stage; never auto-opens                            |
+| Accessibility toolbar    | ⬜     | persistent in learner shell + reachable in others via `/settings/accessibility`    |
 
 ### 4.3 Component spec — `<DataTable>` (the highest-leverage new primitive)
 
@@ -258,23 +260,23 @@ Replaces ~30 inlined `<table>` blocks across admin (S31 + earlier sprints). Must
 
 All interactive primitives must define **all 14** states. Today's coverage by component:
 
-| Component | default | hover | focus | active | pressed | disabled | loading | success | error | retryable | perm-blocked | consent-req | offline | session-expired | role-unavailable |
-|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| Button | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | n/a | ✅ | n/a | ⬜ | ⬜ | n/a | n/a | n/a |
-| Input | ✅ | n/a | ✅ | ✅ | n/a | ✅ | 🟡 | n/a | ✅ | n/a | ⬜ | n/a | n/a | n/a | n/a |
-| Toggle | ⬜ | — | — | — | — | — | — | — | — | — | ⬜ | ⬜ | — | — | — |
-| Mission card | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⬜ | ⬜ | ⬜ |
-| Data table row | ⬜ | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
+| Component      | default | hover | focus | active | pressed | disabled | loading | success | error | retryable | perm-blocked | consent-req | offline | session-expired | role-unavailable |
+| -------------- | :-----: | :---: | :---: | :----: | :-----: | :------: | :-----: | :-----: | :---: | :-------: | :----------: | :---------: | :-----: | :-------------: | :--------------: |
+| Button         |   ✅    |  ✅   |  ✅   |   ✅   |   ✅    |    ✅    |   ✅    |   n/a   |  ✅   |    n/a    |      ⬜      |     ⬜      |   n/a   |       n/a       |       n/a        |
+| Input          |   ✅    |  n/a  |  ✅   |   ✅   |   n/a   |    ✅    |   🟡    |   n/a   |  ✅   |    n/a    |      ⬜      |     n/a     |   n/a   |       n/a       |       n/a        |
+| Toggle         |   ⬜    |   —   |   —   |   —    |    —    |    —     |    —    |    —    |   —   |     —     |      ⬜      |     ⬜      |    —    |        —        |        —         |
+| Mission card   |   ✅    |  ✅   |  ✅   |   ✅   |   ✅    |    ✅    |   ✅    |   ✅    |  ✅   |    ✅     |      ✅      |     ✅      |   ⬜    |       ⬜        |        ⬜        |
+| Data table row |   ⬜    |   —   |   —   |   —    |    —    |    —     |    —    |    —    |   —   |     —     |      —       |      —      |    —    |        —        |        —         |
 
 Page-level states (not per-primitive):
 
-| State | Default surface | Where it fires |
-|---|---|---|
-| **Offline** | banner pinned below header | mobile-only, listens to `NetInfo` |
-| **Session expired** | full-screen overlay with re-auth CTA | both web and mobile; preserves intent URL for return |
-| **Role unavailable** | inline "this role is not part of your account" card | mobile role-switcher when a delegated role is removed |
-| **Permission blocked** | redirect to `/{role-home}?blocker=permission` + toast | any 403 from a BFF |
-| **Consent required** | redirect with `?blocker=consent&type=<consentType>` | any BFF return of `PRECONDITION_FAILED` with consent reason |
+| State                  | Default surface                                       | Where it fires                                              |
+| ---------------------- | ----------------------------------------------------- | ----------------------------------------------------------- |
+| **Offline**            | banner pinned below header                            | mobile-only, listens to `NetInfo`                           |
+| **Session expired**    | full-screen overlay with re-auth CTA                  | both web and mobile; preserves intent URL for return        |
+| **Role unavailable**   | inline "this role is not part of your account" card   | mobile role-switcher when a delegated role is removed       |
+| **Permission blocked** | redirect to `/{role-home}?blocker=permission` + toast | any 403 from a BFF                                          |
+| **Consent required**   | redirect with `?blocker=consent&type=<consentType>`   | any BFF return of `PRECONDITION_FAILED` with consent reason |
 
 ---
 
@@ -282,14 +284,15 @@ Page-level states (not per-primitive):
 
 Tokenized in CSS custom properties:
 
-| Token | Value | Use |
-|---|---|---|
-| `--aivo-motion-quick` | 120ms ease-out | hover/focus rings, toast in |
-| `--aivo-motion-medium` | 220ms ease-out | drawer slide, dialog scale-in |
-| `--aivo-motion-celebration` | 600ms cubic-bezier(.2,.8,.2,1) | learner lesson-complete animation only |
-| `--aivo-motion-role-switch` | 320ms ease-in-out | mobile role-mode transition (palette cross-fade + tab reflow) |
+| Token                       | Value                          | Use                                                           |
+| --------------------------- | ------------------------------ | ------------------------------------------------------------- |
+| `--aivo-motion-quick`       | 120ms ease-out                 | hover/focus rings, toast in                                   |
+| `--aivo-motion-medium`      | 220ms ease-out                 | drawer slide, dialog scale-in                                 |
+| `--aivo-motion-celebration` | 600ms cubic-bezier(.2,.8,.2,1) | learner lesson-complete animation only                        |
+| `--aivo-motion-role-switch` | 320ms ease-in-out              | mobile role-mode transition (palette cross-fade + tab reflow) |
 
 Rules:
+
 - **No animation > 220ms during instruction.** Lesson-player beat transitions ≤ 220ms.
 - **Reduced motion**: when `@media (prefers-reduced-motion: reduce)` is set OR `data-motion="reduced"` is on `<html>`, drop everything to instant or ≤ 100ms cross-fade. Celebrations become a static "Nice work!" panel.
 - **Progress updates**: counter and progress-bar tween 400ms with `ease-out`; suppress when `prefers-reduced-motion`.
@@ -299,17 +302,17 @@ Rules:
 
 ## 7. Do / Don't
 
-| ✅ Do | 🚫 Don't |
-|---|---|
-| Use `bg-aivo-surface` for cards | Hardcode `bg-white` (it survives theme switches — caught residuals in DD-12) |
-| Use `p-[var(--aivo-density-card-pad)]` for card padding | Use `p-5` directly (breaks density tokens — DD-11 lint rule) |
-| Set role on `<html data-theme="…">` via `<AppShell>` | Set role colors inline on a component (defeats theming) |
-| Use Badge for status; always include text | Use color alone (color-only signaling, a11y §6 risk) |
-| Use Toast for transient confirmations | Use Toast for errors the user must act on — use inline Error state |
-| Mission card / Learner card / Subject card as the only "card with action" patterns | Invent a fourth card pattern per page |
-| `aria-live="polite"` for AI-generation status | Spam-update an `aria-live="assertive"` region during streaming |
-| Wrap full-screen learner surfaces in a focus trap with explicit "Exit lesson" | Rely on the global skip link inside Stage (it gets visually suppressed) |
-| Same component system across web + mobile via the token bridge | Build mobile-only or web-only siblings of the same idea |
+| ✅ Do                                                                              | 🚫 Don't                                                                     |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| Use `bg-aivo-surface` for cards                                                    | Hardcode `bg-white` (it survives theme switches — caught residuals in DD-12) |
+| Use `p-[var(--aivo-density-card-pad)]` for card padding                            | Use `p-5` directly (breaks density tokens — DD-11 lint rule)                 |
+| Set role on `<html data-theme="…">` via `<AppShell>`                               | Set role colors inline on a component (defeats theming)                      |
+| Use Badge for status; always include text                                          | Use color alone (color-only signaling, a11y §6 risk)                         |
+| Use Toast for transient confirmations                                              | Use Toast for errors the user must act on — use inline Error state           |
+| Mission card / Learner card / Subject card as the only "card with action" patterns | Invent a fourth card pattern per page                                        |
+| `aria-live="polite"` for AI-generation status                                      | Spam-update an `aria-live="assertive"` region during streaming               |
+| Wrap full-screen learner surfaces in a focus trap with explicit "Exit lesson"      | Rely on the global skip link inside Stage (it gets visually suppressed)      |
+| Same component system across web + mobile via the token bridge                     | Build mobile-only or web-only siblings of the same idea                      |
 
 ---
 

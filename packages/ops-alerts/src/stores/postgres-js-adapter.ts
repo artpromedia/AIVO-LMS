@@ -1,7 +1,10 @@
 import type { PgOutboxClient } from "./postgres.js";
 
 interface PostgresJsSql {
-  unsafe<R = unknown>(sql: string, params?: unknown[]): Promise<R[]> & { execute: () => Promise<R[]> };
+  unsafe<R = unknown>(
+    sql: string,
+    params?: unknown[],
+  ): Promise<R[]> & { execute: () => Promise<R[]> };
 }
 
 /**

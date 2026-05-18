@@ -15,12 +15,12 @@ export const BREAKPOINTS = {
   xlarge: 1200,
 } as const;
 
-export type SizeClass = 'compact' | 'medium' | 'expanded';
+export type SizeClass = "compact" | "medium" | "expanded";
 
 export function classifyWidth(width: number): SizeClass {
-  if (width >= BREAKPOINTS.expanded) return 'expanded';
-  if (width >= BREAKPOINTS.medium) return 'medium';
-  return 'compact';
+  if (width >= BREAKPOINTS.expanded) return "expanded";
+  if (width >= BREAKPOINTS.medium) return "medium";
+  return "compact";
 }
 
 /** True when the device is a tablet-class surface (>=600dp on the short side). */
@@ -33,8 +33,8 @@ export function pickBySizeClass<T>(
   sizeClass: SizeClass,
   values: { compact: T; medium?: T; expanded?: T },
 ): T {
-  if (sizeClass === 'expanded') return values.expanded ?? values.medium ?? values.compact;
-  if (sizeClass === 'medium') return values.medium ?? values.compact;
+  if (sizeClass === "expanded") return values.expanded ?? values.medium ?? values.compact;
+  if (sizeClass === "medium") return values.medium ?? values.compact;
   return values.compact;
 }
 
@@ -43,14 +43,14 @@ export function pickBySizeClass<T>(
  * tablet hardware. Match the values used by the web app's design system.
  */
 export const CONTENT_MAX_WIDTH = {
-  reading: 720,   // long-form text / forms
+  reading: 720, // long-form text / forms
   workspace: 1280, // learning workspace and split-pane shells
   dashboard: 1080, // parent / teacher dashboards
 } as const;
 
 /** Grid column count per size class for card grids. */
 export function gridColumns(sizeClass: SizeClass): number {
-  if (sizeClass === 'expanded') return 4;
-  if (sizeClass === 'medium') return 3;
+  if (sizeClass === "expanded") return 4;
+  if (sizeClass === "medium") return 3;
   return 2;
 }

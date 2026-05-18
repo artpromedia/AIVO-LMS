@@ -72,41 +72,45 @@ export function registerLeadRoutes(app: FastifyInstance, db: any) {
     return { success: true, id: submission.id };
   });
 
-  app.post("/api/admin-svc/newsletter", { schema: adminSvcNewsletterSchema }, async (request, reply) => {
-    const body = request.body as { email?: string };
+  app.post(
+    "/api/admin-svc/newsletter",
+    { schema: adminSvcNewsletterSchema },
+    async (request, reply) => {
+      const body = request.body as { email?: string };
 
-    if (!body.email) {
-      return reply.status(400).send({ error: "Email is required" });
-    }
+      if (!body.email) {
+        return reply.status(400).send({ error: "Email is required" });
+      }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(body.email)) {
-      return reply.status(400).send({ error: "Invalid email address" });
-    }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(body.email)) {
+        return reply.status(400).send({ error: "Invalid email address" });
+      }
 
-    const existing = await db
-      .select({ id: leadSubmissions.id })
-      .from(leadSubmissions)
-      .where(eq(leadSubmissions.email, body.email))
-      .limit(1);
+      const existing = await db
+        .select({ id: leadSubmissions.id })
+        .from(leadSubmissions)
+        .where(eq(leadSubmissions.email, body.email))
+        .limit(1);
 
-    if (existing.length > 0) {
-      return { success: true, message: "Already subscribed" };
-    }
+      if (existing.length > 0) {
+        return { success: true, message: "Already subscribed" };
+      }
 
-    const [submission] = await db
-      .insert(leadSubmissions)
-      .values({
-        type: "newsletter",
-        name: body.email.split("@")[0],
-        email: body.email,
-        source: "website",
-      })
-      .returning({ id: leadSubmissions.id });
+      const [submission] = await db
+        .insert(leadSubmissions)
+        .values({
+          type: "newsletter",
+          name: body.email.split("@")[0],
+          email: body.email,
+          source: "website",
+        })
+        .returning({ id: leadSubmissions.id });
 
-    // Fire confirmation email via comms-svc (fail-soft).
-    await sendNewsletterConfirmation(body.email);
+      // Fire confirmation email via comms-svc (fail-soft).
+      await sendNewsletterConfirmation(body.email);
 
-    return { success: true, id: submission.id };
-  });
+      return { success: true, id: submission.id };
+    },
+  );
 }

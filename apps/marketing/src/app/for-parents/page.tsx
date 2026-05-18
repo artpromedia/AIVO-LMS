@@ -17,17 +17,32 @@ const audience = AUDIENCES.find((a) => a.slug === "for-parents")!;
 export const metadata: Metadata = audienceMetadata(audience);
 
 const LOOP_STEPS = [
-  { title: "Create the learner profile", body: "Add your child in minutes — strengths, interests, and challenges in plain language." },
-  { title: "Complete the parent assessment", body: "Quick context so AIVO knows where to start and what to avoid." },
-  { title: "Add IEP context (optional)", body: "Drop in accommodation context if you have it. Skip if you don't." },
+  {
+    title: "Create the learner profile",
+    body: "Add your child in minutes — strengths, interests, and challenges in plain language.",
+  },
+  {
+    title: "Complete the parent assessment",
+    body: "Quick context so AIVO knows where to start and what to avoid.",
+  },
+  {
+    title: "Add IEP context (optional)",
+    body: "Drop in accommodation context if you have it. Skip if you don't.",
+  },
   { title: "Adaptive baseline", body: "A calm, low-pressure baseline — not a high-stakes test." },
   { title: "Today's Mission", body: "One clear next-best learning action, every day." },
   { title: "LessonRuns", body: "Tutor-guided lessons with hints, scaffolds, and read-aloud." },
-  { title: "Weekly summary", body: "Plain-language progress, designed for parents — not data scientists." },
+  {
+    title: "Weekly summary",
+    body: "Plain-language progress, designed for parents — not data scientists.",
+  },
 ];
 
 const ACCESSIBILITY_ITEMS = [
-  { title: "Read-aloud on every step", body: "Voiceover support across math, reading, and instructions." },
+  {
+    title: "Read-aloud on every step",
+    body: "Voiceover support across math, reading, and instructions.",
+  },
   { title: "Reduced motion mode", body: "Calmer transitions for sensory-sensitive learners." },
   { title: "High-contrast & large text", body: "Built-in toggles, no extension required." },
   { title: "Keyboard & switch access", body: "Full operability without a mouse." },
@@ -74,9 +89,9 @@ export default function Page() {
         heading="Five minutes of context that shapes everything"
         body={
           <>
-            You know your child. The parent assessment is how AIVO learns what
-            matters — interests, sensitivities, what's worked, what hasn't —
-            in plain questions you can answer in a single sitting.
+            You know your child. The parent assessment is how AIVO learns what matters — interests,
+            sensitivities, what's worked, what hasn't — in plain questions you can answer in a
+            single sitting.
           </>
         }
         bullets={[
@@ -114,14 +129,12 @@ export default function Page() {
         body={
           <>
             <p>
-              If your child has an IEP, 504, or informal accommodation plan,
-              you can share the relevant context with AIVO. We use it to adjust
-              pacing, scaffolds, and supports — never to label your child or
-              expose raw plan text inside the product.
+              If your child has an IEP, 504, or informal accommodation plan, you can share the
+              relevant context with AIVO. We use it to adjust pacing, scaffolds, and supports —
+              never to label your child or expose raw plan text inside the product.
             </p>
             <p className="mt-3 text-sm text-slate-600">
-              AIVO does not diagnose. AIVO does not replace therapists, IEP
-              teams, or specialists.
+              AIVO does not diagnose. AIVO does not replace therapists, IEP teams, or specialists.
             </p>
           </>
         }
@@ -180,12 +193,8 @@ export default function Page() {
         mockup={
           <div className="space-y-3">
             <div className="rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 p-4 text-white">
-              <p className="text-xs uppercase tracking-wider text-purple-100">
-                Today's mission
-              </p>
-              <h3 className="mt-1 font-heading text-xl font-bold">
-                Multiplying by 3s
-              </h3>
+              <p className="text-xs uppercase tracking-wider text-purple-100">Today's mission</p>
+              <h3 className="mt-1 font-heading text-xl font-bold">Multiplying by 3s</h3>
               <p className="mt-1 text-xs text-purple-100">With Atlas · ~15 minutes</p>
             </div>
             <div className="rounded-lg bg-slate-900 py-2.5 text-center text-sm font-semibold text-white">

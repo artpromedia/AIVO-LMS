@@ -24,9 +24,7 @@ const specs = readdirSync(OPENAPI_DIR)
 
 if (specs.length === 0) {
   // eslint-disable-next-line no-console
-  console.error(
-    "No specs found in packages/api-client/openapi/. Run `pnpm api:dump` first.",
-  );
+  console.error("No specs found in packages/api-client/openapi/. Run `pnpm api:dump` first.");
   process.exit(1);
 }
 
@@ -37,11 +35,10 @@ for (const file of specs) {
   const inPath = resolve(OPENAPI_DIR, file);
   const outPath = resolve(SRC_DIR, `${stem}.ts`);
 
-  const result = spawnSync(
-    "pnpm",
-    ["exec", "openapi-typescript", inPath, "-o", outPath],
-    { cwd: ROOT, stdio: "inherit" },
-  );
+  const result = spawnSync("pnpm", ["exec", "openapi-typescript", inPath, "-o", outPath], {
+    cwd: ROOT,
+    stdio: "inherit",
+  });
   if (result.status !== 0) {
     // eslint-disable-next-line no-console
     console.error(`openapi-typescript failed for ${file}`);

@@ -39,7 +39,9 @@ export function BreakCloud({ isOpen, onClose, onSelectActivity, className = "" }
         style={{ transitionDuration: "var(--learner-motion-ms, 300ms)" }}
       >
         <div className="text-center mb-6">
-          <div className="text-5xl mb-3" aria-hidden="true">☁️</div>
+          <div className="text-5xl mb-3" aria-hidden="true">
+            ☁️
+          </div>
           <h2 className="text-2xl font-heading font-bold text-slate-800">Take a break</h2>
           <p className="text-slate-500 mt-1">What would you like to do?</p>
         </div>
@@ -53,7 +55,9 @@ export function BreakCloud({ isOpen, onClose, onSelectActivity, className = "" }
                 className="flex flex-col items-center gap-2 p-5 rounded-2xl bg-sky-50 border-2 border-transparent hover:border-sky-300 hover:bg-sky-100 transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-sky-400"
                 style={{ minHeight: "var(--learner-hit-target, 72px)" }}
               >
-                <span className="text-3xl" aria-hidden="true">{option.icon}</span>
+                <span className="text-3xl" aria-hidden="true">
+                  {option.icon}
+                </span>
                 <span className="font-heading font-bold text-sky-800">{option.label}</span>
                 <span className="text-xs text-sky-600">{option.description}</span>
               </button>

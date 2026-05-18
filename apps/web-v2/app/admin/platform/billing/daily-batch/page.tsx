@@ -10,10 +10,7 @@ import type { DailyBillingBatchStatus } from "@/lib/db/types";
 
 export const dynamic = "force-dynamic";
 
-const STATUS_TONE: Record<
-  DailyBillingBatchStatus,
-  "success" | "warning" | "danger" | "neutral"
-> = {
+const STATUS_TONE: Record<DailyBillingBatchStatus, "success" | "warning" | "danger" | "neutral"> = {
   scheduled: "neutral",
   running: "warning",
   success: "success",
@@ -52,13 +49,8 @@ export default async function Page() {
 
   const last30 = batches.slice(0, 30);
   const successCount = last30.filter((b) => b.status === "success").length;
-  const failedCount = last30.filter(
-    (b) => b.status === "failed" || b.status === "partial",
-  ).length;
-  const totalInvoices = last30.reduce(
-    (s, b) => s + b.invoicesGenerated,
-    0,
-  );
+  const failedCount = last30.filter((b) => b.status === "failed" || b.status === "partial").length;
+  const totalInvoices = last30.reduce((s, b) => s + b.invoicesGenerated, 0);
   const totalAmount = last30.reduce((s, b) => s + b.totalAmountCents, 0);
 
   const stats = [
@@ -85,9 +77,7 @@ export default async function Page() {
       <div className="grid gap-4 md:grid-cols-5">
         {stats.map((s) => (
           <Card key={s.k} className="p-[var(--aivo-density-card-pad)]">
-            <p className="text-xs uppercase tracking-wide text-aivo-ink-soft">
-              {s.k}
-            </p>
+            <p className="text-xs uppercase tracking-wide text-aivo-ink-soft">{s.k}</p>
             <p className="mt-2 font-display text-2xl font-semibold">{s.v}</p>
           </Card>
         ))}
@@ -115,9 +105,7 @@ export default async function Page() {
             <tbody className="divide-y divide-aivo-border">
               {batches.map((b) => (
                 <tr key={b.id} className="hover:bg-aivo-surface-2/40">
-                  <td className="px-4 py-3 font-medium">
-                    {formatRunDate(b.runDate)}
-                  </td>
+                  <td className="px-4 py-3 font-medium">{formatRunDate(b.runDate)}</td>
                   <td className="px-4 py-3 text-xs text-aivo-ink-soft">
                     {formatRange(b.startedAt, b.finishedAt)}
                   </td>
@@ -129,9 +117,7 @@ export default async function Page() {
                   </td>
                   <td className="px-4 py-3 text-right tabular-nums">
                     {b.invoicesFailed > 0 ? (
-                      <span className="text-aivo-danger">
-                        {b.invoicesFailed.toLocaleString()}
-                      </span>
+                      <span className="text-aivo-danger">{b.invoicesFailed.toLocaleString()}</span>
                     ) : (
                       <span className="text-aivo-ink-soft">0</span>
                     )}
@@ -139,9 +125,7 @@ export default async function Page() {
                   <td className="px-4 py-3 text-right tabular-nums">
                     {formatCents(b.totalAmountCents)}
                   </td>
-                  <td className="px-4 py-3 text-xs text-aivo-ink-soft">
-                    {b.errorMessage ?? "—"}
-                  </td>
+                  <td className="px-4 py-3 text-xs text-aivo-ink-soft">{b.errorMessage ?? "—"}</td>
                 </tr>
               ))}
             </tbody>

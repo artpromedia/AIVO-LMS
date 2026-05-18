@@ -15,11 +15,20 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
   try {
     const { session, response } = await requireSession(req, requestId);
     if (response) return response;
-    const roleErr = requireRole(session!, ["parent", "learner", "teacher", "school_admin"], requestId);
+    const roleErr = requireRole(
+      session!,
+      ["parent", "learner", "teacher", "school_admin"],
+      requestId,
+    );
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection", "ai_personalization"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection", "ai_personalization"],
+      requestId,
+    );
     if (consentErr) return consentErr;
     const found = getLessonRun(lessonRunId, session!.tenantId);
     if (!found || found.lessonRun.learnerId !== learnerId) {

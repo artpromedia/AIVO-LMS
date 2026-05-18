@@ -6,10 +6,10 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Image tag to deploy (e.g. v1.2.0, latest)'
+        description: "Image tag to deploy (e.g. v1.2.0, latest)"
         required: false
         type: string
-        default: 'latest'
+        default: "latest"
 
 concurrency:
   group: deploy-production

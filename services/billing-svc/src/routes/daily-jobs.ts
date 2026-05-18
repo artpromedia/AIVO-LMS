@@ -83,119 +83,125 @@ export function parseHistoryFilters(query: Record<string, unknown>) {
 }
 
 export function registerDailyJobsRoutes(app: FastifyInstance, db: any) {
-  app.get("/api/billing/admin/daily-jobs/status", { schema: dailyJobsStatusSchema }, async (req, reply) => {
-    const me = await requirePlatformAdmin(req, reply);
-    if (!me) return;
+  app.get(
+    "/api/billing/admin/daily-jobs/status",
+    { schema: dailyJobsStatusSchema },
+    async (req, reply) => {
+      const me = await requirePlatformAdmin(req, reply);
+      if (!me) return;
 
-    const filters = parseHistoryFilters(req.query as Record<string, unknown>);
+      const filters = parseHistoryFilters(req.query as Record<string, unknown>);
 
-    const latestResult = (await db.execute(sql`
+      const latestResult = (await db.execute(sql`
       SELECT job_name, last_run_at, last_finished_at, last_replica_id, last_status,
              last_sent, last_failed, last_error, updated_at
       FROM daily_job_runs
       WHERE job_name = 'billing.daily-expiry-reminders'
     `)) as { rows?: Array<Record<string, any>> } | Array<Record<string, any>>;
-    const latestRows = Array.isArray(latestResult) ? latestResult : (latestResult.rows ?? []);
-    const latest = latestRows[0] ?? null;
+      const latestRows = Array.isArray(latestResult) ? latestResult : (latestResult.rows ?? []);
+      const latest = latestRows[0] ?? null;
 
-    const conds = [sql`job_name = 'billing.daily-expiry-reminders'`];
-    if (filters.statuses) {
-      conds.push(sql`status = ANY(${filters.statuses})`);
-    }
-    if (filters.since) conds.push(sql`run_at >= ${filters.since}`);
-    if (filters.until) conds.push(sql`run_at <= ${filters.until}`);
+      const conds = [sql`job_name = 'billing.daily-expiry-reminders'`];
+      if (filters.statuses) {
+        conds.push(sql`status = ANY(${filters.statuses})`);
+      }
+      if (filters.since) conds.push(sql`run_at >= ${filters.since}`);
+      if (filters.until) conds.push(sql`run_at <= ${filters.until}`);
 
-    let where = conds[0]!;
-    for (let i = 1; i < conds.length; i++) {
-      where = sql`${where} AND ${conds[i]}`;
-    }
+      let where = conds[0]!;
+      for (let i = 1; i < conds.length; i++) {
+        where = sql`${where} AND ${conds[i]}`;
+      }
 
-    const historyResult = (await db.execute(sql`
+      const historyResult = (await db.execute(sql`
       SELECT id, run_at, finished_at, replica_id, status, sent, failed, duration_ms, error
       FROM billing_daily_job_runs
       WHERE ${where}
       ORDER BY run_at DESC
       LIMIT ${filters.limit}
     `)) as { rows?: Array<Record<string, any>> } | Array<Record<string, any>>;
-    const historyRows = Array.isArray(historyResult)
-      ? historyResult
-      : (historyResult.rows ?? []);
+      const historyRows = Array.isArray(historyResult) ? historyResult : (historyResult.rows ?? []);
 
-    return {
-      latest: latest
-        ? {
-            jobName: latest.job_name,
-            lastRunAt: latest.last_run_at,
-            lastFinishedAt: latest.last_finished_at,
-            lastReplicaId: latest.last_replica_id,
-            lastStatus: latest.last_status,
-            lastSent: latest.last_sent,
-            lastFailed: latest.last_failed,
-            lastError: latest.last_error,
-          }
-        : null,
-      filters: {
-        statuses: filters.statuses,
-        since: filters.since?.toISOString() ?? null,
-        until: filters.until?.toISOString() ?? null,
-        limit: filters.limit,
-      },
-      history: historyRows.map((r) => ({
-        id: r.id,
-        runAt: r.run_at,
-        finishedAt: r.finished_at,
-        replicaId: r.replica_id,
-        status: r.status,
-        sent: r.sent,
-        failed: r.failed,
-        durationMs: r.duration_ms,
-        error: r.error,
-      })),
-    };
-  });
+      return {
+        latest: latest
+          ? {
+              jobName: latest.job_name,
+              lastRunAt: latest.last_run_at,
+              lastFinishedAt: latest.last_finished_at,
+              lastReplicaId: latest.last_replica_id,
+              lastStatus: latest.last_status,
+              lastSent: latest.last_sent,
+              lastFailed: latest.last_failed,
+              lastError: latest.last_error,
+            }
+          : null,
+        filters: {
+          statuses: filters.statuses,
+          since: filters.since?.toISOString() ?? null,
+          until: filters.until?.toISOString() ?? null,
+          limit: filters.limit,
+        },
+        history: historyRows.map((r) => ({
+          id: r.id,
+          runAt: r.run_at,
+          finishedAt: r.finished_at,
+          replicaId: r.replica_id,
+          status: r.status,
+          sent: r.sent,
+          failed: r.failed,
+          durationMs: r.duration_ms,
+          error: r.error,
+        })),
+      };
+    },
+  );
 
   // CSV export — same filters, content-type text/csv. (Sprint 7 export ask.)
-  app.get("/api/billing/admin/daily-jobs/history.csv", { schema: dailyJobsHistoryCsvSchema }, async (req, reply) => {
-    const me = await requirePlatformAdmin(req, reply);
-    if (!me) return;
+  app.get(
+    "/api/billing/admin/daily-jobs/history.csv",
+    { schema: dailyJobsHistoryCsvSchema },
+    async (req, reply) => {
+      const me = await requirePlatformAdmin(req, reply);
+      if (!me) return;
 
-    const filters = parseHistoryFilters(req.query as Record<string, unknown>);
-    const conds = [sql`job_name = 'billing.daily-expiry-reminders'`];
-    if (filters.statuses) conds.push(sql`status = ANY(${filters.statuses})`);
-    if (filters.since) conds.push(sql`run_at >= ${filters.since}`);
-    if (filters.until) conds.push(sql`run_at <= ${filters.until}`);
-    let where = conds[0]!;
-    for (let i = 1; i < conds.length; i++) where = sql`${where} AND ${conds[i]}`;
+      const filters = parseHistoryFilters(req.query as Record<string, unknown>);
+      const conds = [sql`job_name = 'billing.daily-expiry-reminders'`];
+      if (filters.statuses) conds.push(sql`status = ANY(${filters.statuses})`);
+      if (filters.since) conds.push(sql`run_at >= ${filters.since}`);
+      if (filters.until) conds.push(sql`run_at <= ${filters.until}`);
+      let where = conds[0]!;
+      for (let i = 1; i < conds.length; i++) where = sql`${where} AND ${conds[i]}`;
 
-    const result = (await db.execute(sql`
+      const result = (await db.execute(sql`
       SELECT run_at, finished_at, replica_id, status, sent, failed, duration_ms, error
       FROM billing_daily_job_runs
       WHERE ${where}
       ORDER BY run_at DESC
       LIMIT ${filters.limit}
     `)) as { rows?: Array<Record<string, any>> } | Array<Record<string, any>>;
-    const rows = Array.isArray(result) ? result : (result.rows ?? []);
+      const rows = Array.isArray(result) ? result : (result.rows ?? []);
 
-    const header = "run_at,finished_at,replica_id,status,sent,failed,duration_ms,error";
-    const lines = [header];
-    for (const r of rows) {
-      const parts = [
-        r.run_at instanceof Date ? r.run_at.toISOString() : r.run_at,
-        r.finished_at instanceof Date ? r.finished_at.toISOString() : (r.finished_at ?? ""),
-        r.replica_id ?? "",
-        r.status,
-        r.sent ?? "",
-        r.failed ?? "",
-        r.duration_ms ?? "",
-        (r.error ?? "").toString().replace(/[\r\n]+/g, " ").replace(/"/g, '""'),
-      ];
-      lines.push(parts.map((p) => `"${String(p)}"`).join(","));
-    }
-    reply.header("content-type", "text/csv; charset=utf-8");
-    reply.header(
-      "content-disposition",
-      'attachment; filename="billing-daily-jobs-history.csv"',
-    );
-    return lines.join("\n");
-  });
+      const header = "run_at,finished_at,replica_id,status,sent,failed,duration_ms,error";
+      const lines = [header];
+      for (const r of rows) {
+        const parts = [
+          r.run_at instanceof Date ? r.run_at.toISOString() : r.run_at,
+          r.finished_at instanceof Date ? r.finished_at.toISOString() : (r.finished_at ?? ""),
+          r.replica_id ?? "",
+          r.status,
+          r.sent ?? "",
+          r.failed ?? "",
+          r.duration_ms ?? "",
+          (r.error ?? "")
+            .toString()
+            .replace(/[\r\n]+/g, " ")
+            .replace(/"/g, '""'),
+        ];
+        lines.push(parts.map((p) => `"${String(p)}"`).join(","));
+      }
+      reply.header("content-type", "text/csv; charset=utf-8");
+      reply.header("content-disposition", 'attachment; filename="billing-daily-jobs-history.csv"');
+      return lines.join("\n");
+    },
+  );
 }

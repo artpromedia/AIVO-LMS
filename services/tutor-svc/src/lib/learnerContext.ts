@@ -24,11 +24,7 @@
  * sensory profile wiring lands when the SensoryProvider exposes a
  * server-side accessor.
  */
-import type {
-  LearnerContext,
-  TutorDefinition,
-  TutorFunctioningLevel,
-} from "@aivo/tutor-runtime";
+import type { LearnerContext, TutorDefinition, TutorFunctioningLevel } from "@aivo/tutor-runtime";
 import type { AnswerOutcome, MasteryRecord } from "@aivo/pedagogy";
 import type { LearnerInterestProfile } from "@aivo/special-interest-engine";
 
@@ -59,9 +55,7 @@ export interface LearnerContextInputs {
 
 /** Coerce any string into a valid `TutorFunctioningLevel`, defaulting
  *  to `STANDARD` when the value is missing or unrecognised. */
-export function normalizeFunctioningLevel(
-  raw: string | null | undefined,
-): TutorFunctioningLevel {
+export function normalizeFunctioningLevel(raw: string | null | undefined): TutorFunctioningLevel {
   if (!raw) return "STANDARD";
   const upper = raw.toUpperCase();
   return (FUNCTIONING_LEVELS as readonly string[]).includes(upper)

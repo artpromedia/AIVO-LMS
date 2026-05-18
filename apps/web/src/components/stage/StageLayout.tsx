@@ -35,9 +35,22 @@ interface StageLayoutProps {
 }
 
 export function StageLayout({
-  tutorKey, phase, tutorState, currentBeat, progress, totalBeats,
-  currentBeatIndex, speechText, functioningLevel, adaptations,
-  isParentWatching, onAnswer, onPause, onHome, onHelp, onBeatPreviewDone,
+  tutorKey,
+  phase,
+  tutorState,
+  currentBeat,
+  progress,
+  totalBeats,
+  currentBeatIndex,
+  speechText,
+  functioningLevel,
+  adaptations,
+  isParentWatching,
+  onAnswer,
+  onPause,
+  onHome,
+  onHelp,
+  onBeatPreviewDone,
 }: StageLayoutProps) {
   const tutor = TUTORS[tutorKey];
   const theme = TUTOR_THEMES[tutorKey];
@@ -48,12 +61,18 @@ export function StageLayout({
   const [beatPreviewAcked, setBeatPreviewAcked] = useState<Record<number, boolean>>({});
 
   const beatsUntilBreak = (() => {
-    const breakInterval = functioningLevel === "STANDARD" ? 5 : functioningLevel === "SUPPORTED" ? 4 : 3;
+    const breakInterval =
+      functioningLevel === "STANDARD" ? 5 : functioningLevel === "SUPPORTED" ? 4 : 3;
     const beatsIntoInterval = currentBeatIndex % breakInterval;
     return breakInterval - beatsIntoInterval;
   })();
 
-  const shouldShowPreview = currentBeat && !beatPreviewAcked[currentBeatIndex] && phase !== "loading" && phase !== "celebration" && motionBudget.previewDurationMs > 0;
+  const shouldShowPreview =
+    currentBeat &&
+    !beatPreviewAcked[currentBeatIndex] &&
+    phase !== "loading" &&
+    phase !== "celebration" &&
+    motionBudget.previewDurationMs > 0;
 
   const accentColor = theme?.accentColor || tutor.color;
 
@@ -67,7 +86,11 @@ export function StageLayout({
       aria-label={`Learning session with ${tutor.name}`}
     >
       <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
-        <StageBackground tutorKey={tutorKey} motionReduced={adaptations.motionReduced} functioningLevel={functioningLevel} />
+        <StageBackground
+          tutorKey={tutorKey}
+          motionReduced={adaptations.motionReduced}
+          functioningLevel={functioningLevel}
+        />
       </div>
 
       <header
@@ -81,16 +104,30 @@ export function StageLayout({
               onClick={onHome}
               className="w-9 h-9 rounded-full vi-surface-soft vi-border border flex items-center justify-center text-sm hover:bg-white transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[hsl(var(--visual-primary))]"
               aria-label="Back home"
-              style={{ minHeight: "var(--learner-hit-target, 36px)", minWidth: "var(--learner-hit-target, 36px)" }}
+              style={{
+                minHeight: "var(--learner-hit-target, 36px)",
+                minWidth: "var(--learner-hit-target, 36px)",
+              }}
             >
               <Home className="w-4 h-4" strokeWidth={2.5} aria-hidden />
             </button>
           )}
-          <div className="w-8 h-8 rounded-full overflow-hidden border-2" style={{ borderColor: accentColor }}>
-            <Image src={tutor.avatar} alt={tutor.name} width={32} height={32} className="object-cover" />
+          <div
+            className="w-8 h-8 rounded-full overflow-hidden border-2"
+            style={{ borderColor: accentColor }}
+          >
+            <Image
+              src={tutor.avatar}
+              alt={tutor.name}
+              width={32}
+              height={32}
+              className="object-cover"
+            />
           </div>
           <div>
-            <p className="text-slate-900 text-sm font-heading font-extrabold leading-none">{tutor.name}</p>
+            <p className="text-slate-900 text-sm font-heading font-extrabold leading-none">
+              {tutor.name}
+            </p>
             <p className="vi-text-muted text-xs">{theme?.envName}</p>
           </div>
         </div>
@@ -107,7 +144,9 @@ export function StageLayout({
           {isParentWatching && (
             <div className="flex items-center gap-1.5 vi-surface-soft rounded-full px-3 py-1">
               <Heart className="w-3.5 h-3.5 fill-rose-500 text-rose-500" aria-hidden />
-              <span className="vi-text-muted text-xs font-bold hidden md:inline">Your grown-up is watching too</span>
+              <span className="vi-text-muted text-xs font-bold hidden md:inline">
+                Your grown-up is watching too
+              </span>
             </div>
           )}
           {onHelp && (
@@ -148,14 +187,14 @@ export function StageLayout({
           />
         </div>
 
-        <StageContent
-          beat={currentBeat}
-          adaptations={adaptations}
-          phase={phase}
-        />
+        <StageContent beat={currentBeat} adaptations={adaptations} phase={phase} />
       </div>
 
-      <div className="relative z-10 flex-shrink-0 pb-4 pt-2 px-4" role="application" aria-label="Answer area">
+      <div
+        className="relative z-10 flex-shrink-0 pb-4 pt-2 px-4"
+        role="application"
+        aria-label="Answer area"
+      >
         <ResponseZone
           beat={currentBeat}
           functioningLevel={functioningLevel}
@@ -170,7 +209,9 @@ export function StageLayout({
           beat={currentBeat!}
           tutorName={tutor.name}
           accentColor={theme?.accentColor || tutor.color}
-          autoAdvanceMs={motionBudget.previewDurationMs > 0 ? motionBudget.previewDurationMs + 1400 : 0}
+          autoAdvanceMs={
+            motionBudget.previewDurationMs > 0 ? motionBudget.previewDurationMs + 1400 : 0
+          }
           onReady={() => {
             setBeatPreviewAcked((prev) => ({ ...prev, [currentBeatIndex]: true }));
             onBeatPreviewDone?.();
@@ -181,14 +222,25 @@ export function StageLayout({
       <StageBreakCloud
         isOpen={showBreak}
         onClose={() => setShowBreak(false)}
-        onPause={() => { setShowBreak(false); onPause(); }}
+        onPause={() => {
+          setShowBreak(false);
+          onPause();
+        }}
         onHome={onHome}
       />
     </div>
   );
 }
 
-function StageBackground({ tutorKey, motionReduced, functioningLevel }: { tutorKey: string; motionReduced: boolean; functioningLevel: FunctioningLevel }) {
+function StageBackground({
+  tutorKey,
+  motionReduced,
+  functioningLevel,
+}: {
+  tutorKey: string;
+  motionReduced: boolean;
+  functioningLevel: FunctioningLevel;
+}) {
   const theme = TUTOR_THEMES[tutorKey];
   if (!theme) return null;
 

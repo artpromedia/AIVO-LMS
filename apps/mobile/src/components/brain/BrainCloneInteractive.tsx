@@ -15,13 +15,7 @@
  *  - Below the SVG sits an optional metrics strip (streak, XP, weekly
  *    delta, next milestone) matching the web variant.
  */
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AccessibilityInfo,
   Animated,
@@ -32,7 +26,7 @@ import {
   Text,
   View,
   type AccessibilityChangeEventName,
-} from 'react-native';
+} from "react-native";
 import Svg, {
   Circle,
   Defs,
@@ -42,9 +36,9 @@ import Svg, {
   RadialGradient,
   Stop,
   Text as SvgText,
-} from 'react-native-svg';
-import { Ionicons } from '@expo/vector-icons';
-import { colors, radius, spacing } from '@/constants/colors';
+} from "react-native-svg";
+import { Ionicons } from "@expo/vector-icons";
+import { colors, radius, spacing } from "@/constants/colors";
 import {
   gradeToNumber,
   pulseSecondsFor,
@@ -52,11 +46,11 @@ import {
   statusFor,
   type BrainRegionDatum,
   type ResolvedRegion,
-} from './BrainCloneInteractive.helpers';
+} from "./BrainCloneInteractive.helpers";
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
-export type { BrainRegionDatum } from './BrainCloneInteractive.helpers';
+export type { BrainRegionDatum } from "./BrainCloneInteractive.helpers";
 
 export interface BrainCloneMetrics {
   streakDays?: number;
@@ -67,7 +61,7 @@ export interface BrainCloneMetrics {
 }
 
 export interface BrainCloneInteractiveProps {
-  variant?: 'card' | 'full';
+  variant?: "card" | "full";
   learnerName: string;
   enrolledGrade?: string | number | null;
   regions: BrainRegionDatum[];
@@ -91,10 +85,8 @@ function useReducedMotion(): boolean {
         if (mounted) setReduced(Boolean(v));
       })
       .catch(() => {});
-    const evt: AccessibilityChangeEventName = 'reduceMotionChanged';
-    const sub = AccessibilityInfo.addEventListener(evt, (v) =>
-      setReduced(Boolean(v)),
-    );
+    const evt: AccessibilityChangeEventName = "reduceMotionChanged";
+    const sub = AccessibilityInfo.addEventListener(evt, (v) => setReduced(Boolean(v)));
     return () => {
       mounted = false;
       sub?.remove?.();
@@ -157,13 +149,13 @@ function RegionPath({ region, enrolled, reduced, onPress }: RegionPathProps) {
         cy={region.cy}
         r={3}
         fill={status.ring}
-        opacity={status.band === 'unknown' ? 0.4 : 0.95}
+        opacity={status.band === "unknown" ? 0.4 : 0.95}
         onPress={() => onPress(region.id)}
       />
       <Line
         x1={region.cx}
         y1={region.cy}
-        x2={region.labelAnchor === 'end' ? region.labelX - 4 : region.labelX + 4}
+        x2={region.labelAnchor === "end" ? region.labelX - 4 : region.labelX + 4}
         y2={region.labelY - 4}
         stroke="rgba(124,58,237,0.35)"
         strokeWidth={0.75}
@@ -186,8 +178,8 @@ function RegionPath({ region, enrolled, reduced, onPress }: RegionPathProps) {
         fontSize="9"
         fill={colors.textSecondary}
       >
-        {status.band === 'unknown'
-          ? 'no data'
+        {status.band === "unknown"
+          ? "no data"
           : `Gr ${(region.mastery * Math.max(enrolled, 1)).toFixed(1)}`}
       </SvgText>
     </>
@@ -216,16 +208,10 @@ function DetailSheet({ region, enrolled, onClose }: DetailSheetProps) {
         <View style={styles.sheet}>
           <View style={styles.sheetHeader}>
             <View style={styles.sheetTitleRow}>
-              <View
-                style={[styles.statusDot, { backgroundColor: status.ring }]}
-              />
+              <View style={[styles.statusDot, { backgroundColor: status.ring }]} />
               <Text style={styles.sheetTitle}>{region.label}</Text>
             </View>
-            <Pressable
-              hitSlop={10}
-              onPress={onClose}
-              accessibilityLabel="Close details"
-            >
+            <Pressable hitSlop={10} onPress={onClose} accessibilityLabel="Close details">
               <Ionicons name="close" size={22} color={colors.textSecondary} />
             </Pressable>
           </View>
@@ -238,13 +224,11 @@ function DetailSheet({ region, enrolled, onClose }: DetailSheetProps) {
           )}
           {region.accommodations.length > 0 && (
             <View style={styles.section}>
-              <Text style={styles.sectionLabel}>
-                Accommodations affecting this area
-              </Text>
+              <Text style={styles.sectionLabel}>Accommodations affecting this area</Text>
               <View style={styles.chipRow}>
                 {region.accommodations.map((a) => (
                   <View key={a} style={styles.chip}>
-                    <Text style={styles.chipText}>{a.replace(/_/g, ' ')}</Text>
+                    <Text style={styles.chipText}>{a.replace(/_/g, " ")}</Text>
                   </View>
                 ))}
               </View>
@@ -289,7 +273,7 @@ function MetricCell({ icon, label, value }: MetricCellProps) {
 }
 
 export default function BrainCloneInteractive({
-  variant = 'card',
+  variant = "card",
   learnerName,
   enrolledGrade,
   regions: regionsInput,
@@ -304,11 +288,9 @@ export default function BrainCloneInteractive({
   const handleRegionPress = useCallback((id: string) => setActiveId(id), []);
   const closeDetail = useCallback(() => setActiveId(null), []);
 
-  const activeRegion = activeId
-    ? regions.find((r) => r.id === activeId) ?? null
-    : null;
+  const activeRegion = activeId ? (regions.find((r) => r.id === activeId) ?? null) : null;
 
-  const isCard = variant === 'card';
+  const isCard = variant === "card";
   const svgHeight = isCard ? 220 : 320;
 
   return (
@@ -317,11 +299,7 @@ export default function BrainCloneInteractive({
       accessibilityLabel={`${learnerName}'s Brain Clone — interactive map of learning domains`}
     >
       <View style={[styles.canvas, isCard && styles.canvasCard]}>
-        <Svg
-          viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
-          width="100%"
-          height={svgHeight}
-        >
+        <Svg viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} width="100%" height={svgHeight}>
           <Defs>
             <RadialGradient id="bci-glow" cx="50%" cy="45%" r="55%">
               <Stop offset="0%" stopColor={colors.primary} stopOpacity={0.18} />
@@ -356,10 +334,7 @@ export default function BrainCloneInteractive({
 
       {metrics && (
         <View
-          style={[
-            styles.metricGrid,
-            !isCard && styles.metricGridFull,
-          ]}
+          style={[styles.metricGrid, !isCard && styles.metricGridFull]}
           accessibilityLabel="Key metrics"
         >
           <MetricCell
@@ -367,16 +342,14 @@ export default function BrainCloneInteractive({
             label="Streak"
             value={
               metrics.streakDays != null
-                ? `${metrics.streakDays} day${metrics.streakDays === 1 ? '' : 's'}`
-                : '—'
+                ? `${metrics.streakDays} day${metrics.streakDays === 1 ? "" : "s"}`
+                : "—"
             }
           />
           <MetricCell
             icon="star-outline"
             label="XP"
-            value={
-              metrics.totalXp != null ? metrics.totalXp.toLocaleString() : '—'
-            }
+            value={metrics.totalXp != null ? metrics.totalXp.toLocaleString() : "—"}
           />
           {!isCard && (
             <MetricCell
@@ -384,10 +357,10 @@ export default function BrainCloneInteractive({
               label="This week"
               value={
                 metrics.masteryDeltaWeek != null
-                  ? `${metrics.masteryDeltaWeek >= 0 ? '+' : ''}${(
+                  ? `${metrics.masteryDeltaWeek >= 0 ? "+" : ""}${(
                       metrics.masteryDeltaWeek * 100
                     ).toFixed(0)} pp`
-                  : '—'
+                  : "—"
               }
             />
           )}
@@ -395,7 +368,7 @@ export default function BrainCloneInteractive({
             <MetricCell
               icon="sparkles-outline"
               label="Next milestone"
-              value={metrics.nextMilestone || 'Keep practising'}
+              value={metrics.nextMilestone || "Keep practising"}
             />
           )}
         </View>
@@ -408,35 +381,31 @@ export default function BrainCloneInteractive({
         </Pressable>
       )}
 
-      <DetailSheet
-        region={activeRegion}
-        enrolled={enrolled}
-        onClose={closeDetail}
-      />
+      <DetailSheet region={activeRegion} enrolled={enrolled} onClose={closeDetail} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { width: '100%' },
+  root: { width: "100%" },
   canvas: {
     borderRadius: radius.xl,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
-    borderColor: 'rgba(124,58,237,0.28)',
+    borderColor: "rgba(124,58,237,0.28)",
     backgroundColor: colors.surface,
     paddingVertical: spacing.sm,
   },
   canvasCard: {},
   metricGrid: {
     marginTop: spacing.sm,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: spacing.sm,
   },
   metricGridFull: {},
   metricCell: {
-    flexBasis: '48%',
+    flexBasis: "48%",
     flexGrow: 1,
     backgroundColor: colors.card,
     borderRadius: radius.lg,
@@ -446,43 +415,43 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   metricIconRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
     marginBottom: 2,
   },
   metricLabel: {
     fontSize: 11,
-    fontFamily: 'Nunito-SemiBold',
+    fontFamily: "Nunito-SemiBold",
     color: colors.textSecondary,
   },
   metricValue: {
     fontSize: 14,
-    fontFamily: 'Nunito-Bold',
+    fontFamily: "Nunito-Bold",
     color: colors.text,
   },
   openFullBtn: {
-    alignSelf: 'flex-start',
-    flexDirection: 'row',
-    alignItems: 'center',
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     marginTop: spacing.sm,
     paddingHorizontal: spacing.md,
     paddingVertical: 6,
     borderRadius: radius.full,
-    backgroundColor: colors.primary + '14',
+    backgroundColor: colors.primary + "14",
     borderWidth: 1,
-    borderColor: colors.primary + '60',
+    borderColor: colors.primary + "60",
   },
   openFullText: {
     fontSize: 12,
-    fontFamily: 'Nunito-Bold',
+    fontFamily: "Nunito-Bold",
     color: colors.primary,
   },
   scrim: {
     flex: 1,
-    backgroundColor: 'rgba(20,20,30,0.45)',
-    justifyContent: 'flex-end',
+    backgroundColor: "rgba(20,20,30,0.45)",
+    justifyContent: "flex-end",
   },
   scrimTap: { flex: 1 },
   sheet: {
@@ -493,56 +462,56 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xl,
   },
   sheetHeader: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
     marginBottom: 4,
   },
-  sheetTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  sheetTitleRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   statusDot: { width: 10, height: 10, borderRadius: 5 },
   sheetTitle: {
     fontSize: 18,
-    fontFamily: 'Nunito-ExtraBold',
+    fontFamily: "Nunito-ExtraBold",
     color: colors.text,
   },
   sheetBand: {
     fontSize: 12,
-    fontFamily: 'Nunito-SemiBold',
+    fontFamily: "Nunito-SemiBold",
     color: colors.textSecondary,
     marginBottom: spacing.sm,
   },
   sheetDescription: {
     fontSize: 14,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.text,
     marginBottom: spacing.sm,
     lineHeight: 20,
   },
   sheetMeta: {
     fontSize: 12,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.textSecondary,
     marginBottom: spacing.md,
   },
   section: { marginTop: spacing.md },
   sectionLabel: {
     fontSize: 11,
-    fontFamily: 'Nunito-Bold',
+    fontFamily: "Nunito-Bold",
     color: colors.textSecondary,
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
     letterSpacing: 0.5,
     marginBottom: 6,
   },
-  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  chipRow: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
   chip: {
-    backgroundColor: colors.primary + '1F',
+    backgroundColor: colors.primary + "1F",
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: radius.full,
   },
   chipText: {
     fontSize: 12,
-    fontFamily: 'Nunito-SemiBold',
+    fontFamily: "Nunito-SemiBold",
     color: colors.primary,
   },
 });

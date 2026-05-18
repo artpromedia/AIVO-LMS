@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { SITE_URL } from "@/lib/constants";
-import {
-  CalloutCard,
-  MockupShowcase,
-} from "@/components/marketing/sections";
+import { CalloutCard, MockupShowcase } from "@/components/marketing/sections";
 
 const TITLE = "Homework Helper · Guided help, never an answer dump";
 const DESCRIPTION =
@@ -83,20 +80,17 @@ export default function Page() {
         mockup={
           <div className="space-y-3">
             <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3 text-sm text-slate-700">
-              Before we solve it — what does “in all” mean to you in
-              this problem?
+              Before we solve it — what does “in all” mean to you in this problem?
             </div>
             <div className="grid grid-cols-2 gap-2">
-              {["Add them up", "Multiply", "Not sure", "Show me an example"].map(
-                (w) => (
-                  <div
-                    key={w}
-                    className="rounded-lg border-2 border-slate-200 bg-white py-2 text-center text-sm font-body text-slate-700"
-                  >
-                    {w}
-                  </div>
-                ),
-              )}
+              {["Add them up", "Multiply", "Not sure", "Show me an example"].map((w) => (
+                <div
+                  key={w}
+                  className="rounded-lg border-2 border-slate-200 bg-white py-2 text-center text-sm font-body text-slate-700"
+                >
+                  {w}
+                </div>
+              ))}
             </div>
           </div>
         }
@@ -116,9 +110,8 @@ export default function Page() {
         mockup={
           <div className="space-y-3">
             <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3 text-sm text-slate-700">
-              Great — “in all” means we're combining. We have 4
-              bags. Each bag has 3 marbles. Let's draw the first bag together.
-              How many marbles go in bag 1?
+              Great — “in all” means we're combining. We have 4 bags. Each bag has 3 marbles. Let's
+              draw the first bag together. How many marbles go in bag 1?
             </div>
             <div className="rounded-lg bg-white border border-slate-200 p-2 text-sm text-slate-700">
               Your answer: <span className="font-mono">3</span>
@@ -166,19 +159,13 @@ export default function Page() {
         mockup={
           <div className="space-y-2">
             <div className="rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 p-3 text-white">
-              <p className="text-xs uppercase tracking-wider text-purple-100">
-                Recommended next
-              </p>
+              <p className="text-xs uppercase tracking-wider text-purple-100">Recommended next</p>
               <h3 className="mt-1 font-heading text-base font-bold">
                 Multiplying by 3s · LessonRun
               </h3>
-              <p className="mt-0.5 text-xs text-purple-100">
-                With Atlas · ~15 minutes
-              </p>
+              <p className="mt-0.5 text-xs text-purple-100">With Atlas · ~15 minutes</p>
             </div>
-            <p className="text-xs text-slate-500">
-              Added to Maya's next session.
-            </p>
+            <p className="text-xs text-slate-500">Added to Maya's next session.</p>
           </div>
         }
       />
@@ -190,20 +177,18 @@ export default function Page() {
         body={
           <>
             <p>
-              Homework Helper is designed to refuse the “just give me the
-              answer” ask. It will read the problem aloud, ask a
-              clarifying question, and offer tiered hints. The learner does the
-              math, every time.
+              Homework Helper is designed to refuse the “just give me the answer” ask. It will read
+              the problem aloud, ask a clarifying question, and offer tiered hints. The learner does
+              the math, every time.
             </p>
             <p className="mt-3">
-              It will also recognize problem types where a learner should be
-              working with a teacher or a specialist — graded test items, IEP
-              assessments, formal evaluation tasks — and decline rather than
-              try.
+              It will also recognize problem types where a learner should be working with a teacher
+              or a specialist — graded test items, IEP assessments, formal evaluation tasks — and
+              decline rather than try.
             </p>
             <p className="mt-3 text-sm text-slate-600">
-              Safety controls are tuned with educators. We log what the helper
-              declined and why, and surface it to parents on request.
+              Safety controls are tuned with educators. We log what the helper declined and why, and
+              surface it to parents on request.
             </p>
           </>
         }

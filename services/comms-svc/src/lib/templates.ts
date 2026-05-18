@@ -42,7 +42,10 @@ export interface TemplateData {
   [key: string]: unknown;
 }
 
-export function renderTemplate(templateId: string, data: TemplateData): { subject: string; html: string; text: string } {
+export function renderTemplate(
+  templateId: string,
+  data: TemplateData,
+): { subject: string; html: string; text: string } {
   switch (templateId) {
     case "welcome":
       return renderWelcome(data);
@@ -104,7 +107,7 @@ function renderWelcome(data: TemplateData) {
       <li>Watch as AIVO builds a personalized Brain Clone</li>
       <li>Start learning with 14 AI tutors</li>
     </ol>
-    <p style="text-align:center"><a href="${data.dashboardUrl || '#'}" class="btn">Go to Dashboard</a></p>
+    <p style="text-align:center"><a href="${data.dashboardUrl || "#"}" class="btn">Go to Dashboard</a></p>
     <p class="body-text">If you have any questions, we're here to help!</p>
   `);
   return {
@@ -122,7 +125,7 @@ function renderCollaborationInvite(data: TemplateData) {
     <h1 class="title">You're Invited to Join a Learning Team</h1>
     <p class="body-text"><span class="highlight">${inviterName}</span> has invited you to join <span class="highlight">${learnerName}</span>'s learning team as a <strong>${role}</strong>.</p>
     <p class="body-text">As part of the team, you'll be able to view progress, contribute observations, and help support ${learnerName}'s learning journey.</p>
-    <p style="text-align:center"><a href="${data.acceptUrl || '#'}" class="btn">Accept Invitation</a></p>
+    <p style="text-align:center"><a href="${data.acceptUrl || "#"}" class="btn">Accept Invitation</a></p>
     <p class="body-text" style="font-size:13px;color:#6b7280">If you weren't expecting this invitation, you can safely ignore this email.</p>
   `);
   return {
@@ -136,13 +139,13 @@ function renderPasswordReset(data: TemplateData) {
   const html = baseLayout(`
     <h1 class="title">Reset Your Password</h1>
     <p class="body-text">We received a request to reset your password. Click the button below to create a new one:</p>
-    <p style="text-align:center"><a href="${data.resetUrl || '#'}" class="btn">Reset Password</a></p>
+    <p style="text-align:center"><a href="${data.resetUrl || "#"}" class="btn">Reset Password</a></p>
     <p class="body-text" style="font-size:13px;color:#6b7280">This link expires in 1 hour. If you didn't request this, you can safely ignore this email.</p>
   `);
   return {
     subject: "Reset your AIVO password",
     html,
-    text: `Reset your password by visiting: ${data.resetUrl || '#'}. This link expires in 1 hour.`,
+    text: `Reset your password by visiting: ${data.resetUrl || "#"}. This link expires in 1 hour.`,
   };
 }
 
@@ -158,7 +161,7 @@ function renderProgressReport(data: TemplateData) {
       <tr><td style="padding:8px;border-bottom:1px solid #e5e7eb">Streak</td><td style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:right;font-weight:700">${data.streak || 0} days</td></tr>
       <tr><td style="padding:8px">Badges earned</td><td style="padding:8px;text-align:right;font-weight:700">${data.badges || 0}</td></tr>
     </table>
-    <p style="text-align:center"><a href="${data.dashboardUrl || '#'}" class="btn">View Full Report</a></p>
+    <p style="text-align:center"><a href="${data.dashboardUrl || "#"}" class="btn">View Full Report</a></p>
   `);
   return {
     subject: `${learnerName}'s weekly progress report`,
@@ -174,7 +177,7 @@ function renderMilestone(data: TemplateData) {
     <h1 class="title">Milestone Achieved!</h1>
     <p class="body-text"><span class="highlight">${learnerName}</span> just reached <strong>${milestone}</strong>!</p>
     <p class="body-text">${(data.description as string) || "Keep up the amazing work!"}</p>
-    <p style="text-align:center"><a href="${data.dashboardUrl || '#'}" class="btn">View Achievement</a></p>
+    <p style="text-align:center"><a href="${data.dashboardUrl || "#"}" class="btn">View Achievement</a></p>
   `);
   return {
     subject: `${learnerName} achieved: ${milestone}`,
@@ -190,7 +193,7 @@ function renderSessionReminder(data: TemplateData) {
     <h1 class="title">Session Reminder</h1>
     <p class="body-text">Just a friendly reminder that <span class="highlight">${learnerName}</span> has a session with <strong>${tutorName}</strong> coming up!</p>
     <p class="body-text">Regular practice helps build strong learning habits.</p>
-    <p style="text-align:center"><a href="${data.sessionUrl || '#'}" class="btn">Start Session</a></p>
+    <p style="text-align:center"><a href="${data.sessionUrl || "#"}" class="btn">Start Session</a></p>
   `);
   return {
     subject: `Reminder: ${learnerName}'s session with ${tutorName}`,
@@ -206,7 +209,7 @@ function renderIEPUpdate(data: TemplateData) {
     <h1 class="title">IEP Goal Update</h1>
     <p class="body-text">There's an update on <span class="highlight">${learnerName}</span>'s IEP goal: <strong>${goalName}</strong></p>
     <p class="body-text">${(data.update as string) || "Progress has been recorded."}</p>
-    <p style="text-align:center"><a href="${data.iepUrl || '#'}" class="btn">View IEP Goals</a></p>
+    <p style="text-align:center"><a href="${data.iepUrl || "#"}" class="btn">View IEP Goals</a></p>
   `);
   return {
     subject: `IEP update for ${learnerName}: ${goalName}`,
@@ -495,12 +498,32 @@ export const AVAILABLE_TEMPLATES = [
   { id: "iep_finalised_parent", name: "IEP — Finalised (Parent)", channels: ["email"] },
   { id: "iep_comment_mention", name: "IEP — Comment Mention", channels: ["email"] },
   { id: "iep_progress_note", name: "IEP — Progress Note (Parent)", channels: ["email"] },
-  { id: "iep_progress_report_sent", name: "IEP — Progress Report Sent (Parent)", channels: ["email"] },
+  {
+    id: "iep_progress_report_sent",
+    name: "IEP — Progress Report Sent (Parent)",
+    channels: ["email"],
+  },
   { id: "iep_amendment_proposed", name: "IEP — Amendment Proposed (Parent)", channels: ["email"] },
-  { id: "iep_amendment_acknowledged", name: "IEP — Amendment Response (Team)", channels: ["email"] },
+  {
+    id: "iep_amendment_acknowledged",
+    name: "IEP — Amendment Response (Team)",
+    channels: ["email"],
+  },
   { id: "iep_review_reminder", name: "IEP — Annual Review Reminder", channels: ["email"] },
   { id: "evaluation_submitted", name: "Evaluation — Submitted (Parent)", channels: ["email"] },
-  { id: "evaluation_submitted_admin", name: "Evaluation — Submitted (District Admin)", channels: ["email"] },
-  { id: "evaluation_decided", name: "Evaluation — Decision Recorded (Parent)", channels: ["email"] },
-  { id: "newsletter_confirmation", name: "Newsletter Subscription Confirmation", channels: ["email"] },
+  {
+    id: "evaluation_submitted_admin",
+    name: "Evaluation — Submitted (District Admin)",
+    channels: ["email"],
+  },
+  {
+    id: "evaluation_decided",
+    name: "Evaluation — Decision Recorded (Parent)",
+    channels: ["email"],
+  },
+  {
+    id: "newsletter_confirmation",
+    name: "Newsletter Subscription Confirmation",
+    channels: ["email"],
+  },
 ];

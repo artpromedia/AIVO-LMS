@@ -14,12 +14,30 @@ const audience = AUDIENCES.find((a) => a.slug === "for-districts")!;
 export const metadata: Metadata = audienceMetadata(audience);
 
 const DEPLOYMENT_STEPS = [
-  { title: "Discovery & DPA", body: "Security and privacy review, DPA exchange, and procurement docs first. No surprises later." },
-  { title: "Pilot scoping", body: "Choose schools, classes, and learner counts. We size the pilot to your evaluation criteria." },
-  { title: "Roster integration", body: "OneRoster-ready architecture, CSV fallback, or manual rostering for short pilots." },
-  { title: "Teacher onboarding", body: "Cohort training, recorded sessions, and an opt-in coach for the first two weeks." },
-  { title: "Mid-pilot review", body: "We bring data, not just sentiment — usage, mastery trends, teacher feedback." },
-  { title: "Expansion planning", body: "Scale to a building or the district with the same architecture you piloted on." },
+  {
+    title: "Discovery & DPA",
+    body: "Security and privacy review, DPA exchange, and procurement docs first. No surprises later.",
+  },
+  {
+    title: "Pilot scoping",
+    body: "Choose schools, classes, and learner counts. We size the pilot to your evaluation criteria.",
+  },
+  {
+    title: "Roster integration",
+    body: "OneRoster-ready architecture, CSV fallback, or manual rostering for short pilots.",
+  },
+  {
+    title: "Teacher onboarding",
+    body: "Cohort training, recorded sessions, and an opt-in coach for the first two weeks.",
+  },
+  {
+    title: "Mid-pilot review",
+    body: "We bring data, not just sentiment — usage, mastery trends, teacher feedback.",
+  },
+  {
+    title: "Expansion planning",
+    body: "Scale to a building or the district with the same architecture you piloted on.",
+  },
 ];
 
 export default function Page() {
@@ -52,15 +70,13 @@ export default function Page() {
         body={
           <>
             <p>
-              AIVO's rostering architecture is designed for OneRoster
-              integration with major SIS providers. For short pilots or single
-              buildings, CSV import and manual rostering are first-class paths
-              — no need to wait on a vendor ticket to start a pilot.
+              AIVO's rostering architecture is designed for OneRoster integration with major SIS
+              providers. For short pilots or single buildings, CSV import and manual rostering are
+              first-class paths — no need to wait on a vendor ticket to start a pilot.
             </p>
             <p className="mt-3 text-sm text-slate-600">
-              We do not overclaim a roster integration we have not built. If
-              your district needs a specific SIS path, we'll tell you where it
-              stands before you sign.
+              We do not overclaim a roster integration we have not built. If your district needs a
+              specific SIS path, we'll tell you where it stands before you sign.
             </p>
           </>
         }
@@ -76,8 +92,8 @@ export default function Page() {
           Seat licensing, district pricing
         </h2>
         <p className="text-slate-600 font-body mb-6 leading-relaxed">
-          Per-learner seats with district volume tiers. Multi-year commitments
-          carry lock-in pricing. We publish a quote — not a fake list price.
+          Per-learner seats with district volume tiers. Multi-year commitments carry lock-in
+          pricing. We publish a quote — not a fake list price.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
@@ -85,10 +101,7 @@ export default function Page() {
             { t: "Volume tiers", b: "Tiered pricing past 500, 2 500, and 10 000 learners." },
             { t: "Multi-year locks", b: "Two- and three-year price locks available on request." },
           ].map((c) => (
-            <div
-              key={c.t}
-              className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm"
-            >
+            <div key={c.t} className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
               <h3 className="font-heading font-bold text-slate-900">{c.t}</h3>
               <p className="mt-1 text-sm text-slate-600 font-body">{c.b}</p>
             </div>
@@ -109,14 +122,12 @@ export default function Page() {
         body={
           <>
             <p>
-              Accessibility is a build-time concern, not an add-on. AIVO targets
-              WCAG 2.2 AA across learner, parent, and teacher surfaces, with
-              built-in read-aloud, reduced-motion, high-contrast, and large-text
-              modes.
+              Accessibility is a build-time concern, not an add-on. AIVO targets WCAG 2.2 AA across
+              learner, parent, and teacher surfaces, with built-in read-aloud, reduced-motion,
+              high-contrast, and large-text modes.
             </p>
             <p className="mt-3 text-sm text-slate-600">
-              We maintain an accessibility statement and publish known gaps —
-              not just claims.
+              We maintain an accessibility statement and publish known gaps — not just claims.
             </p>
           </>
         }

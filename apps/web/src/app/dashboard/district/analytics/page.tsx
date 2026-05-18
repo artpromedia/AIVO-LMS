@@ -2,7 +2,17 @@
 import { useAuth } from "@/providers/auth-provider";
 import { useEffect, useState } from "react";
 import { IconWell, StatIconWell } from "@/components/discovery/_vi";
-import { BarChart3, GraduationCap, UserCog, School, ClipboardList, TrendingUp, Trophy, Bell, type LucideIcon } from "lucide-react";
+import {
+  BarChart3,
+  GraduationCap,
+  UserCog,
+  School,
+  ClipboardList,
+  TrendingUp,
+  Trophy,
+  Bell,
+  type LucideIcon,
+} from "lucide-react";
 
 interface Cohort {
   level: string;
@@ -29,9 +39,13 @@ export default function DistrictAnalyticsPage() {
     if (!accessToken) return;
     const headers = { Authorization: `Bearer ${accessToken}` };
     Promise.all([
-      fetch("/api/district/analytics/cohorts", { headers }).then((r) => r.ok ? r.json() : { cohorts: [], total: 0 }),
-      fetch("/api/district/analytics/engagement", { headers }).then((r) => r.ok ? r.json() : null),
-      fetch("/api/district/stats", { headers }).then((r) => r.ok ? r.json() : null),
+      fetch("/api/district/analytics/cohorts", { headers }).then((r) =>
+        r.ok ? r.json() : { cohorts: [], total: 0 },
+      ),
+      fetch("/api/district/analytics/engagement", { headers }).then((r) =>
+        r.ok ? r.json() : null,
+      ),
+      fetch("/api/district/stats", { headers }).then((r) => (r.ok ? r.json() : null)),
     ])
       .then(([cohortData, engData, statsData]) => {
         setCohorts(cohortData.cohorts || []);
@@ -54,29 +68,55 @@ export default function DistrictAnalyticsPage() {
         </IconWell>
         <div>
           <h1 className="text-2xl font-heading font-bold vi-text">Analytics & Reports</h1>
-          <p className="text-sm vi-text-muted mt-1">District-wide performance metrics, functioning level distribution, and engagement data.</p>
+          <p className="text-sm vi-text-muted mt-1">
+            District-wide performance metrics, functioning level distribution, and engagement data.
+          </p>
         </div>
       </header>
 
       {loading ? (
         <div className="animate-pulse space-y-4">
           <div className="grid grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((i) => <div key={i} className="h-28 bg-slate-200 rounded-2xl" />)}
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-28 bg-slate-200 rounded-2xl" />
+            ))}
           </div>
           <div className="h-64 bg-slate-200 rounded-2xl" />
         </div>
       ) : (
         <>
           <div className="grid gap-4 md:grid-cols-4">
-            <StatCard label="Total Learners" value={stats?.totalLearners ?? 0} Icon={GraduationCap} well="bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]" />
-            <StatCard label="Total Staff" value={stats?.totalStaff ?? 0} Icon={UserCog} well="bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]" />
-            <StatCard label="Schools" value={stats?.totalSchools ?? 0} Icon={School} well="bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]" />
-            <StatCard label="Active IEPs" value={stats?.activeIeps ?? 0} Icon={ClipboardList} well="bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))]" />
+            <StatCard
+              label="Total Learners"
+              value={stats?.totalLearners ?? 0}
+              Icon={GraduationCap}
+              well="bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]"
+            />
+            <StatCard
+              label="Total Staff"
+              value={stats?.totalStaff ?? 0}
+              Icon={UserCog}
+              well="bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]"
+            />
+            <StatCard
+              label="Schools"
+              value={stats?.totalSchools ?? 0}
+              Icon={School}
+              well="bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]"
+            />
+            <StatCard
+              label="Active IEPs"
+              value={stats?.activeIeps ?? 0}
+              Icon={ClipboardList}
+              well="bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))]"
+            />
           </div>
 
           {cohorts.length > 0 && (
             <div className="vi-card p-6">
-              <h2 className="text-lg font-heading font-semibold vi-text mb-1">Functioning Level Distribution</h2>
+              <h2 className="text-lg font-heading font-semibold vi-text mb-1">
+                Functioning Level Distribution
+              </h2>
               <p className="text-xs vi-text-muted mb-4">{cohortsTotal} total learners</p>
               <div className="flex items-end gap-4 h-48">
                 {cohorts.map((d) => (
@@ -86,7 +126,9 @@ export default function DistrictAnalyticsPage() {
                       className="w-full rounded-t-lg bg-[hsl(var(--visual-primary))] transition-all"
                       style={{ height: `${Math.max(8, (d.count / maxCount) * 100)}%` }}
                     />
-                    <span className="text-[10px] vi-text-muted font-medium text-center">{d.level?.replace(/_/g, " ")}</span>
+                    <span className="text-[10px] vi-text-muted font-medium text-center">
+                      {d.level?.replace(/_/g, " ")}
+                    </span>
                     <span className="text-[10px] vi-text-muted">{d.pct}%</span>
                   </div>
                 ))}
@@ -105,10 +147,14 @@ export default function DistrictAnalyticsPage() {
                       <div className="w-24 h-2 rounded-full vi-surface-soft overflow-hidden">
                         <div
                           className="h-full rounded-full bg-[hsl(var(--visual-primary))]"
-                          style={{ width: `${Math.min(100, (Number(r.count) / Math.max(1, stats?.totalUsers ?? 1)) * 100)}%` }}
+                          style={{
+                            width: `${Math.min(100, (Number(r.count) / Math.max(1, stats?.totalUsers ?? 1)) * 100)}%`,
+                          }}
                         />
                       </div>
-                      <span className="text-sm font-semibold vi-text w-8 text-right">{r.count}</span>
+                      <span className="text-sm font-semibold vi-text w-8 text-right">
+                        {r.count}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -125,7 +171,9 @@ export default function DistrictAnalyticsPage() {
                   <EngagementRow label="Completion Rate" value={`${engagement.completionRate}%`} />
                 </div>
               ) : (
-                <p className="text-sm vi-text-muted">Engagement data will populate as learners use the platform.</p>
+                <p className="text-sm vi-text-muted">
+                  Engagement data will populate as learners use the platform.
+                </p>
               )}
             </div>
           </div>
@@ -133,9 +181,24 @@ export default function DistrictAnalyticsPage() {
           <div className="vi-card p-6">
             <h2 className="text-lg font-heading font-semibold vi-text mb-3">Quick Insights</h2>
             <div className="grid gap-3 md:grid-cols-3">
-              <InsightCard Icon={TrendingUp} well="bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]" title="Enrollment Growth" description="Track new student enrollments over time to identify trends." />
-              <InsightCard Icon={Trophy} well="bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]" title="Mastery Tracking" description="Monitor domain mastery across all learners in your district." />
-              <InsightCard Icon={Bell} well="bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]" title="Intervention Alerts" description="Get notified when learners need additional support or accommodations." />
+              <InsightCard
+                Icon={TrendingUp}
+                well="bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]"
+                title="Enrollment Growth"
+                description="Track new student enrollments over time to identify trends."
+              />
+              <InsightCard
+                Icon={Trophy}
+                well="bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]"
+                title="Mastery Tracking"
+                description="Monitor domain mastery across all learners in your district."
+              />
+              <InsightCard
+                Icon={Bell}
+                well="bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]"
+                title="Intervention Alerts"
+                description="Get notified when learners need additional support or accommodations."
+              />
             </div>
           </div>
         </>
@@ -144,7 +207,17 @@ export default function DistrictAnalyticsPage() {
   );
 }
 
-function StatCard({ label, value, Icon, well }: { label: string; value: number; Icon: LucideIcon; well: string }) {
+function StatCard({
+  label,
+  value,
+  Icon,
+  well,
+}: {
+  label: string;
+  value: number;
+  Icon: LucideIcon;
+  well: string;
+}) {
   return (
     <div className="vi-card p-5 hover:shadow-md transition">
       <div className="flex items-center gap-3 mb-2">
@@ -167,7 +240,17 @@ function EngagementRow({ label, value }: { label: string; value: string | number
   );
 }
 
-function InsightCard({ Icon, well, title, description }: { Icon: LucideIcon; well: string; title: string; description: string }) {
+function InsightCard({
+  Icon,
+  well,
+  title,
+  description,
+}: {
+  Icon: LucideIcon;
+  well: string;
+  title: string;
+  description: string;
+}) {
   return (
     <div className="flex items-start gap-3 p-3 rounded-xl vi-bg border vi-border">
       <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${well}`}>

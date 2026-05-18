@@ -40,9 +40,7 @@ const CRISIS_PATTERNS = [/suicid/i, /self[- ]harm/i, /kill (?:my|your)self/i];
  * tutor-style response. The wire-up to the actual LiteLLM-backed ai-svc is a
  * body-only swap.
  */
-export async function runPlaygroundPrompt(
-  input: PlaygroundInput,
-): Promise<PlaygroundResult> {
+export async function runPlaygroundPrompt(input: PlaygroundInput): Promise<PlaygroundResult> {
   await requirePageRole(["platform_admin"]);
 
   const flags: string[] = [];
@@ -71,14 +69,10 @@ export async function runPlaygroundPrompt(
   const latencyMs = 280 + Math.floor(Math.random() * 480);
   await new Promise((r) => setTimeout(r, Math.min(latencyMs, 900)));
 
-  const tokensIn = Math.ceil(
-    (input.systemPrompt.length + input.prompt.length) / 4,
-  );
-  const tokensOut =
-    decision === "block" ? 0 : 80 + Math.floor(Math.random() * 220);
+  const tokensIn = Math.ceil((input.systemPrompt.length + input.prompt.length) / 4);
+  const tokensOut = decision === "block" ? 0 : 80 + Math.floor(Math.random() * 220);
   const rates = COST_PER_1K[input.model];
-  const estimatedCostUsd =
-    (tokensIn / 1000) * rates.in + (tokensOut / 1000) * rates.out;
+  const estimatedCostUsd = (tokensIn / 1000) * rates.in + (tokensOut / 1000) * rates.out;
 
   const output =
     decision === "block"

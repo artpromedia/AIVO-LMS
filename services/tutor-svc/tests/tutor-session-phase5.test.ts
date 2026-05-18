@@ -73,9 +73,7 @@ describe("tutor-svc plan route — Phase 5 specialisations", () => {
       active: true,
       source: "service+goal",
       totalMotorGoals: 3,
-      categories: [
-        { id: "locomotor", label: "Locomotor", goalCount: 2, sampleGoal: "..." },
-      ],
+      categories: [{ id: "locomotor", label: "Locomotor", goalCount: 2, sampleGoal: "..." }],
     };
     const res = await app.inject({
       method: "POST",

@@ -18,10 +18,7 @@ export async function POST(req: Request, { params }: Params) {
     const roleErr = requireRole(session!, ["parent"], requestId);
     if (roleErr) return roleErr;
     if (!(CONSENT_TYPES as readonly string[]).includes(consentType)) {
-      return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: "Unknown consent type" },
-        requestId,
-      );
+      return fail({ ...ERRORS.VALIDATION_FAILED, message: "Unknown consent type" }, requestId);
     }
     const json = (await req.json().catch(() => ({}))) as {
       learnerId?: string | null;
@@ -33,10 +30,7 @@ export async function POST(req: Request, { params }: Params) {
       consentType: consentType as ConsentType,
     });
     if (!rec) {
-      return fail(
-        { ...ERRORS.NOT_FOUND, message: "No active consent to revoke" },
-        requestId,
-      );
+      return fail({ ...ERRORS.NOT_FOUND, message: "No active consent to revoke" }, requestId);
     }
     audit(session, "consent.revoke", requestId, {
       learnerId: rec.learnerId,

@@ -1,11 +1,11 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { apiFetch } from '@/lib/api';
-import { API } from '@/constants/api';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { apiFetch } from "@/lib/api";
+import { API } from "@/constants/api";
 
 export interface HomeworkAssignment {
   id: string;
   subject: string;
-  status: 'PROCESSING' | 'READY' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED' | string;
+  status: "PROCESSING" | "READY" | "IN_PROGRESS" | "COMPLETED" | "FAILED" | string;
   homeworkMode: string;
   detectedSubject: string;
   problemCount: number;
@@ -15,10 +15,10 @@ export interface HomeworkAssignment {
 
 export function useHomeworkAssignments(learnerId: string) {
   return useQuery<HomeworkAssignment[]>({
-    queryKey: ['homework-assignments', learnerId],
+    queryKey: ["homework-assignments", learnerId],
     queryFn: async () => {
       const res = await apiFetch(API.TUTOR, `/api/tutors/homework/learner/${learnerId}`);
-      if (!res.ok) throw new Error('Failed to load homework');
+      if (!res.ok) throw new Error("Failed to load homework");
       const data = await res.json();
       return (data.assignments ?? []) as HomeworkAssignment[];
     },
@@ -39,7 +39,7 @@ export interface AdaptedProblem {
 }
 
 export interface HomeworkChatMessage {
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
   timestamp?: string;
 }
@@ -58,17 +58,13 @@ export interface HomeworkSessionState {
 
 /** Mirrors the web flow: POST /session/start with assignmentId + learnerId returns { sessionId }. */
 export function useStartHomeworkSession() {
-  return useMutation<
-    { sessionId: string },
-    Error,
-    { assignmentId: string; learnerId: string }
-  >({
+  return useMutation<{ sessionId: string }, Error, { assignmentId: string; learnerId: string }>({
     mutationFn: async ({ assignmentId, learnerId }) => {
       const res = await apiFetch(API.TUTOR, `/api/tutors/homework/session/start`, {
-        method: 'POST',
+        method: "POST",
         body: JSON.stringify({ assignmentId, learnerId }),
       });
-      if (!res.ok) throw new Error('Failed to start homework session');
+      if (!res.ok) throw new Error("Failed to start homework session");
       return res.json();
     },
   });
@@ -99,20 +95,20 @@ export function useUploadHomework() {
   >({
     mutationFn: async ({ learnerId, imageBase64, mimeType }) => {
       const res = await apiFetch(API.TUTOR, `/api/tutors/homework/upload`, {
-        method: 'POST',
+        method: "POST",
         body: JSON.stringify({ learnerId, imageBase64, mimeType }),
       });
       const data = (await res.json().catch(() => ({}))) as HomeworkUploadResult & {
         error?: string;
       };
       if (!res.ok && !data.locked) {
-        throw new Error(data.error || 'Upload failed');
+        throw new Error(data.error || "Upload failed");
       }
       return data;
     },
     onSuccess: (data, vars) => {
       if (data.assignment) {
-        qc.invalidateQueries({ queryKey: ['homework-assignments', vars.learnerId] });
+        qc.invalidateQueries({ queryKey: ["homework-assignments", vars.learnerId] });
       }
     },
   });
@@ -120,13 +116,10 @@ export function useUploadHomework() {
 
 export function useHomeworkSessionState(sessionId: string) {
   return useQuery<HomeworkSessionState>({
-    queryKey: ['homework-session', sessionId],
+    queryKey: ["homework-session", sessionId],
     queryFn: async () => {
-      const res = await apiFetch(
-        API.TUTOR,
-        `/api/tutors/homework/session/${sessionId}/state`,
-      );
-      if (!res.ok) throw new Error('Session not found');
+      const res = await apiFetch(API.TUTOR, `/api/tutors/homework/session/${sessionId}/state`);
+      if (!res.ok) throw new Error("Session not found");
       return res.json();
     },
     enabled: !!sessionId,
@@ -136,50 +129,34 @@ export function useHomeworkSessionState(sessionId: string) {
 
 export function useSendHomeworkMessage(sessionId: string) {
   const qc = useQueryClient();
-  return useMutation<
-    { response: string },
-    Error,
-    { message: string; locale?: string }
-  >({
+  return useMutation<{ response: string }, Error, { message: string; locale?: string }>({
     mutationFn: async ({ message, locale }) => {
-      const res = await apiFetch(
-        API.TUTOR,
-        `/api/tutors/homework/session/${sessionId}/message`,
-        {
-          method: 'POST',
-          body: JSON.stringify({ message, locale }),
-        },
-      );
-      if (!res.ok) throw new Error('Message failed');
+      const res = await apiFetch(API.TUTOR, `/api/tutors/homework/session/${sessionId}/message`, {
+        method: "POST",
+        body: JSON.stringify({ message, locale }),
+      });
+      if (!res.ok) throw new Error("Message failed");
       return res.json();
     },
     onSettled: () => {
-      qc.invalidateQueries({ queryKey: ['homework-session', sessionId] });
+      qc.invalidateQueries({ queryKey: ["homework-session", sessionId] });
     },
   });
 }
 
 export function useCompleteHomeworkSession(sessionId: string) {
   const qc = useQueryClient();
-  return useMutation<
-    void,
-    Error,
-    { problemsAttempted: number; problemsCompleted: number }
-  >({
+  return useMutation<void, Error, { problemsAttempted: number; problemsCompleted: number }>({
     mutationFn: async ({ problemsAttempted, problemsCompleted }) => {
-      const res = await apiFetch(
-        API.TUTOR,
-        `/api/tutors/homework/session/${sessionId}/complete`,
-        {
-          method: 'POST',
-          body: JSON.stringify({ problemsAttempted, problemsCompleted }),
-        },
-      );
-      if (!res.ok) throw new Error('Failed to complete session');
+      const res = await apiFetch(API.TUTOR, `/api/tutors/homework/session/${sessionId}/complete`, {
+        method: "POST",
+        body: JSON.stringify({ problemsAttempted, problemsCompleted }),
+      });
+      if (!res.ok) throw new Error("Failed to complete session");
     },
     onSettled: () => {
-      qc.invalidateQueries({ queryKey: ['homework-session', sessionId] });
-      qc.invalidateQueries({ queryKey: ['homework-assignments'] });
+      qc.invalidateQueries({ queryKey: ["homework-session", sessionId] });
+      qc.invalidateQueries({ queryKey: ["homework-assignments"] });
     },
   });
 }

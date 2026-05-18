@@ -14,12 +14,30 @@ const audience = AUDIENCES.find((a) => a.slug === "for-schools")!;
 export const metadata: Metadata = audienceMetadata(audience);
 
 const SCHOOL_WORKFLOW = [
-  { title: "Roster setup", body: "Add classes manually or import via CSV. SIS/OneRoster-ready architecture for districts." },
-  { title: "Teacher onboarding", body: "Teachers see a familiar class dashboard from day one — no 14-tab learning curve." },
-  { title: "Learner baselines", body: "Calm, low-pressure adaptive baselines per learner — not building-wide stress tests." },
-  { title: "Today's Mission distribution", body: "Each learner gets one clear next-best action, surfaced to the teacher." },
-  { title: "Mastery & intervention", body: "The dashboard highlights who needs a check-in, not who's behind." },
-  { title: "Plain-language reports", body: "Progress summaries parents and admins can actually read." },
+  {
+    title: "Roster setup",
+    body: "Add classes manually or import via CSV. SIS/OneRoster-ready architecture for districts.",
+  },
+  {
+    title: "Teacher onboarding",
+    body: "Teachers see a familiar class dashboard from day one — no 14-tab learning curve.",
+  },
+  {
+    title: "Learner baselines",
+    body: "Calm, low-pressure adaptive baselines per learner — not building-wide stress tests.",
+  },
+  {
+    title: "Today's Mission distribution",
+    body: "Each learner gets one clear next-best action, surfaced to the teacher.",
+  },
+  {
+    title: "Mastery & intervention",
+    body: "The dashboard highlights who needs a check-in, not who's behind.",
+  },
+  {
+    title: "Plain-language reports",
+    body: "Progress summaries parents and admins can actually read.",
+  },
 ];
 
 export default function Page() {
@@ -43,11 +61,10 @@ export default function Page() {
         title="Personalized learning fails when it adds teacher workflow"
         body={
           <p>
-            Schools have been promised &ldquo;personalized learning&rdquo; for a decade.
-            Most products deliver another dashboard. AIVO is built around the
-            classroom workflow first — visibility, intervention triggers, and
-            plain-language reports — so the personalization doesn't cost the
-            teacher their planning period.
+            Schools have been promised &ldquo;personalized learning&rdquo; for a decade. Most
+            products deliver another dashboard. AIVO is built around the classroom workflow first —
+            visibility, intervention triggers, and plain-language reports — so the personalization
+            doesn't cost the teacher their planning period.
           </p>
         }
         tone="slate"
@@ -89,9 +106,7 @@ export default function Page() {
                 );
               })}
             </div>
-            <p className="text-xs text-slate-500">
-              3 learners may benefit from a check-in.
-            </p>
+            <p className="text-xs text-slate-500">3 learners may benefit from a check-in.</p>
           </div>
         }
       />
@@ -110,7 +125,11 @@ export default function Page() {
         mockupTitle="Roster · Grade 3"
         mockup={
           <div className="space-y-2">
-            {["Class 3A · Ms. Patel · 24 learners", "Class 3B · Mr. Owens · 22 learners", "Reading group · Ms. Garcia · 6 learners"].map((row) => (
+            {[
+              "Class 3A · Ms. Patel · 24 learners",
+              "Class 3B · Mr. Owens · 22 learners",
+              "Reading group · Ms. Garcia · 6 learners",
+            ].map((row) => (
               <div
                 key={row}
                 className="rounded-lg border border-slate-200 bg-white p-3 text-xs font-body text-slate-700"
@@ -144,10 +163,7 @@ export default function Page() {
                 "Math · working through 3s",
                 "Writing · early draft skills emerging",
               ].map((r) => (
-                <div
-                  key={r}
-                  className="rounded-lg bg-slate-50 p-2 text-xs text-slate-700"
-                >
+                <div key={r} className="rounded-lg bg-slate-50 p-2 text-xs text-slate-700">
                   {r}
                 </div>
               ))}

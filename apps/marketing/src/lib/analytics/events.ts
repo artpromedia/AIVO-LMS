@@ -35,6 +35,12 @@ export type MarketingEventPayload = {
 };
 
 export const TRACKING_RULES = {
-  excludeFields: ["learner_name", "learner_pii", "iep_content", "chat_transcript", "brain_clone_state"] as const,
+  excludeFields: [
+    "learner_name",
+    "learner_pii",
+    "iep_content",
+    "chat_transcript",
+    "brain_clone_state",
+  ] as const,
   respectsCookieConsent: true,
 };

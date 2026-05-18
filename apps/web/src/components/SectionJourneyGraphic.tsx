@@ -117,10 +117,20 @@ export default function SectionJourneyGraphic({
                   stroke="var(--tier-primary, #7C3AED)"
                   strokeWidth="0.6"
                   opacity="0.5"
-                  style={{ animation: "journey-pulse calc(2s * var(--tier-pace, 1)) ease-in-out infinite", transformOrigin: `${p.x}px ${p.y}px` }}
+                  style={{
+                    animation: "journey-pulse calc(2s * var(--tier-pace, 1)) ease-in-out infinite",
+                    transformOrigin: `${p.x}px ${p.y}px`,
+                  }}
                 />
               )}
-              <circle cx={p.x} cy={p.y} r={isCurrent ? 2.2 : 1.8} fill={fill} stroke={stroke} strokeWidth="0.4" />
+              <circle
+                cx={p.x}
+                cy={p.y}
+                r={isCurrent ? 2.2 : 1.8}
+                fill={fill}
+                stroke={stroke}
+                strokeWidth="0.4"
+              />
             </g>
           );
         })}
@@ -164,8 +174,15 @@ export default function SectionJourneyGraphic({
 
       <style jsx>{`
         @keyframes journey-pulse {
-          0%, 100% { transform: scale(1); opacity: 0.5; }
-          50% { transform: scale(1.4); opacity: 0; }
+          0%,
+          100% {
+            transform: scale(1);
+            opacity: 0.5;
+          }
+          50% {
+            transform: scale(1.4);
+            opacity: 0;
+          }
         }
       `}</style>
     </div>

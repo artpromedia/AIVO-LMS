@@ -81,8 +81,24 @@ describe("validateGraph", () => {
   it("flags duplicate ids", () => {
     const issues = validateGraph(
       graphOf([
-        { id: "a", title: "", description: "", subject: "math", gradeBand: "K", frameworkRefs: [], prerequisites: [] },
-        { id: "a", title: "", description: "", subject: "math", gradeBand: "K", frameworkRefs: [], prerequisites: [] },
+        {
+          id: "a",
+          title: "",
+          description: "",
+          subject: "math",
+          gradeBand: "K",
+          frameworkRefs: [],
+          prerequisites: [],
+        },
+        {
+          id: "a",
+          title: "",
+          description: "",
+          subject: "math",
+          gradeBand: "K",
+          frameworkRefs: [],
+          prerequisites: [],
+        },
       ]),
     );
     expect(issues.some((i) => i.code === "duplicate_skill_id")).toBe(true);
@@ -91,7 +107,15 @@ describe("validateGraph", () => {
   it("flags missing prereq", () => {
     const issues = validateGraph(
       graphOf([
-        { id: "a", title: "", description: "", subject: "math", gradeBand: "K", frameworkRefs: [], prerequisites: ["nope"] },
+        {
+          id: "a",
+          title: "",
+          description: "",
+          subject: "math",
+          gradeBand: "K",
+          frameworkRefs: [],
+          prerequisites: ["nope"],
+        },
       ]),
     );
     expect(issues.some((i) => i.code === "missing_prerequisite")).toBe(true);
@@ -100,7 +124,15 @@ describe("validateGraph", () => {
   it("flags self-prereq", () => {
     const issues = validateGraph(
       graphOf([
-        { id: "a", title: "", description: "", subject: "math", gradeBand: "K", frameworkRefs: [], prerequisites: ["a"] },
+        {
+          id: "a",
+          title: "",
+          description: "",
+          subject: "math",
+          gradeBand: "K",
+          frameworkRefs: [],
+          prerequisites: ["a"],
+        },
       ]),
     );
     expect(issues.some((i) => i.code === "self_prerequisite")).toBe(true);
@@ -109,8 +141,24 @@ describe("validateGraph", () => {
   it("detects a 2-cycle", () => {
     const issues = validateGraph(
       graphOf([
-        { id: "a", title: "", description: "", subject: "math", gradeBand: "K", frameworkRefs: [], prerequisites: ["b"] },
-        { id: "b", title: "", description: "", subject: "math", gradeBand: "K", frameworkRefs: [], prerequisites: ["a"] },
+        {
+          id: "a",
+          title: "",
+          description: "",
+          subject: "math",
+          gradeBand: "K",
+          frameworkRefs: [],
+          prerequisites: ["b"],
+        },
+        {
+          id: "b",
+          title: "",
+          description: "",
+          subject: "math",
+          gradeBand: "K",
+          frameworkRefs: [],
+          prerequisites: ["a"],
+        },
       ]),
     );
     expect(issues.some((i) => i.code === "cycle_detected")).toBe(true);

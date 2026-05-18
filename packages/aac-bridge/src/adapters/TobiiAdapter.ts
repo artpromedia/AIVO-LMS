@@ -159,11 +159,13 @@ export class TobiiAdapter implements AACInputAdapter {
    * Call `detachEyeGazePipeline()` to tear it down (e.g. when the
    * learner switches activities and target rects change).
    */
-  attachEyeGazePipeline(opts: {
-    targets?: readonly GazeTarget[];
-    dwellMs?: number;
-    minConfidence?: number;
-  } = {}): {
+  attachEyeGazePipeline(
+    opts: {
+      targets?: readonly GazeTarget[];
+      dwellMs?: number;
+      minConfidence?: number;
+    } = {},
+  ): {
     calibration: CalibrationState;
     mapper: GazeTargetMapper;
     dwell: DwellClickController;

@@ -7,10 +7,17 @@ interface FetchErrorStateProps {
   onRetry?: () => void;
 }
 
-export default function FetchErrorState({ title = "Unable to load data", message = "Something went wrong. Please try again.", onRetry }: FetchErrorStateProps) {
+export default function FetchErrorState({
+  title = "Unable to load data",
+  message = "Something went wrong. Please try again.",
+  onRetry,
+}: FetchErrorStateProps) {
   return (
     <div className="bg-white rounded-2xl p-12 text-center border border-red-100" role="alert">
-      <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-red-50 text-red-500 flex items-center justify-center" aria-hidden="true">
+      <div
+        className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-red-50 text-red-500 flex items-center justify-center"
+        aria-hidden="true"
+      >
         <AlertTriangle className="w-7 h-7" strokeWidth={2} />
       </div>
       <p className="text-red-600 font-semibold text-lg">{title}</p>

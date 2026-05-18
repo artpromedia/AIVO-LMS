@@ -83,7 +83,10 @@
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.66);
   cursor: pointer;
-  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
 }
 
 .soundButton:hover {
@@ -262,8 +265,14 @@
   top: 50%;
   height: 2px;
   transform: translateY(-50%);
-  background:
-    linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.1), rgba(124, 58, 237, 0.55), rgba(251, 191, 36, 0.36), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(34, 211, 238, 0.1),
+    rgba(124, 58, 237, 0.55),
+    rgba(251, 191, 36, 0.36),
+    transparent
+  );
   box-shadow: 0 0 22px rgba(124, 58, 237, 0.35);
 }
 
@@ -271,7 +280,11 @@
   content: "";
   position: absolute;
   inset: -9px 0;
-  background-image: repeating-linear-gradient(90deg, transparent 0 18px, rgba(124, 58, 237, 0.24) 18px 28px);
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0 18px,
+    rgba(124, 58, 237, 0.24) 18px 28px
+  );
   opacity: 0.7;
   animation: streamDash 1.2s linear infinite;
 }
@@ -288,8 +301,7 @@
   border-radius: 999px;
   color: #eef2ff;
   border: 1px solid rgba(191, 219, 254, 0.32);
-  background:
-    linear-gradient(180deg, rgba(30, 41, 59, 0.94), rgba(15, 23, 42, 0.76));
+  background: linear-gradient(180deg, rgba(30, 41, 59, 0.94), rgba(15, 23, 42, 0.76));
   box-shadow: 0 0 24px rgba(34, 211, 238, 0.28);
   font-size: 0.72rem;
   font-weight: 900;
@@ -356,7 +368,9 @@
   font-weight: 800;
   opacity: 0;
   transform: translateY(8px) scale(0.92);
-  transition: opacity 400ms ease, transform 400ms ease;
+  transition:
+    opacity 400ms ease,
+    transform 400ms ease;
 }
 
 .tokenVisible {
@@ -505,7 +519,9 @@
   font-size: 0.92rem;
   font-weight: 800;
   cursor: pointer;
-  transition: color 180ms ease, transform 180ms ease;
+  transition:
+    color 180ms ease,
+    transform 180ms ease;
 }
 
 .skipButton:hover {
@@ -514,7 +530,8 @@
 }
 
 @keyframes sparkle {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1) rotate(0deg);
     opacity: 0.74;
   }
@@ -526,7 +543,8 @@
 }
 
 @keyframes brainPulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(0.98);
     opacity: 0.72;
   }
@@ -538,7 +556,8 @@
 }
 
 @keyframes circuitPulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.44;
   }
 
@@ -548,7 +567,8 @@
 }
 
 @keyframes nodeBlink {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.46;
     transform: scale(0.9);
   }

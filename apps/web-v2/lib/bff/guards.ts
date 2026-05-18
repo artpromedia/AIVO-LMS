@@ -9,10 +9,7 @@ export async function requireSession(req: Request, requestId: string) {
   if (!session) {
     return {
       session: null,
-      response: fail(
-        { ...ERRORS.UNAUTHENTICATED, message: "No session found" },
-        requestId,
-      ),
+      response: fail({ ...ERRORS.UNAUTHENTICATED, message: "No session found" }, requestId),
     };
   }
   return { session, response: null };
@@ -33,10 +30,7 @@ export function requireRole(session: SessionProfile, roles: Role[], requestId: s
 
 export function requireTenant(session: SessionProfile, tenantId: string, requestId: string) {
   if (session.tenantId !== tenantId) {
-    return fail(
-      { ...ERRORS.FORBIDDEN_TENANT, message: "Tenant mismatch" },
-      requestId,
-    );
+    return fail({ ...ERRORS.FORBIDDEN_TENANT, message: "Tenant mismatch" }, requestId);
   }
   return null;
 }
@@ -48,11 +42,7 @@ export function requireTenant(session: SessionProfile, tenantId: string, request
  * - teacher/admins: must share tenantId (cross-tenant blocked here; finer
  *   classroom-level scoping comes in Sprint 18)
  */
-export function requireLearnerScope(
-  session: SessionProfile,
-  learnerId: string,
-  requestId: string,
-) {
+export function requireLearnerScope(session: SessionProfile, learnerId: string, requestId: string) {
   if (session.role === "parent") {
     if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
       return fail(
@@ -73,10 +63,7 @@ export function requireLearnerScope(
   }
   const learner = getLearner(learnerId, session.tenantId);
   if (!learner) {
-    return fail(
-      { ...ERRORS.FORBIDDEN_LEARNER, message: "Learner not found in tenant" },
-      requestId,
-    );
+    return fail({ ...ERRORS.FORBIDDEN_LEARNER, message: "Learner not found in tenant" }, requestId);
   }
   return null;
 }

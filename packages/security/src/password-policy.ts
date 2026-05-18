@@ -16,8 +16,14 @@
 import * as crypto from "node:crypto";
 
 const INTERNAL_ROLES = new Set([
-  "PLATFORM_ADMIN", "DISTRICT_ADMIN", "SALES", "MARKETING",
-  "CUSTOMER_CARE", "SUPPORT", "FINANCE", "DEVOPS",
+  "PLATFORM_ADMIN",
+  "DISTRICT_ADMIN",
+  "SALES",
+  "MARKETING",
+  "CUSTOMER_CARE",
+  "SUPPORT",
+  "FINANCE",
+  "DEVOPS",
 ]);
 
 export interface PasswordPolicyResult {
@@ -94,9 +100,23 @@ function estimateStrength(password: string, opts: PasswordPolicyOptions): 0 | 1 
 }
 
 const COMMON_BLOCKLIST = [
-  "password", "passw0rd", "letmein", "welcome", "qwerty", "111111",
-  "iloveyou", "admin", "monkey", "dragon", "abc123", "trustno1",
-  "sunshine", "princess", "starwars", "football", "baseball",
+  "password",
+  "passw0rd",
+  "letmein",
+  "welcome",
+  "qwerty",
+  "111111",
+  "iloveyou",
+  "admin",
+  "monkey",
+  "dragon",
+  "abc123",
+  "trustno1",
+  "sunshine",
+  "princess",
+  "starwars",
+  "football",
+  "baseball",
 ];
 
 /**
@@ -106,7 +126,10 @@ const COMMON_BLOCKLIST = [
  * valid password change because of an outage), but we log the failure so
  * ops can investigate.
  */
-export async function checkPasswordBreach(password: string, signal?: AbortSignal): Promise<boolean> {
+export async function checkPasswordBreach(
+  password: string,
+  signal?: AbortSignal,
+): Promise<boolean> {
   try {
     const sha1 = crypto.createHash("sha1").update(password, "utf8").digest("hex").toUpperCase();
     const prefix = sha1.slice(0, 5);

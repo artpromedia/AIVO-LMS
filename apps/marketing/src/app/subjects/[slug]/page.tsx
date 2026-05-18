@@ -21,8 +21,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: subject.metaTitle,
     description: subject.metaDescription,
     alternates: { canonical: url },
-    openGraph: { title: subject.metaTitle, description: subject.metaDescription, url, type: "website" },
-    twitter: { card: "summary_large_image", title: subject.metaTitle, description: subject.metaDescription },
+    openGraph: {
+      title: subject.metaTitle,
+      description: subject.metaDescription,
+      url,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: subject.metaTitle,
+      description: subject.metaDescription,
+    },
   };
 }
 
@@ -44,7 +53,9 @@ export default async function SubjectPage({ params }: Props) {
       ]}
     >
       <section className="mb-12">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-3">What {subject.tutorName} does</h2>
+        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-3">
+          What {subject.tutorName} does
+        </h2>
         <p className="text-slate-700 font-body leading-relaxed">{subject.what}</p>
       </section>
 
@@ -53,7 +64,10 @@ export default async function SubjectPage({ params }: Props) {
         <ul className="space-y-2">
           {subject.features.map((f) => (
             <li key={f} className="flex items-start gap-3 text-slate-700 font-body">
-              <CheckCircle2 className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" aria-hidden="true" />
+              <CheckCircle2
+                className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0"
+                aria-hidden="true"
+              />
               <span>{f}</span>
             </li>
           ))}

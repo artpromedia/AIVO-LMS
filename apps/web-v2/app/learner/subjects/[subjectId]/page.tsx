@@ -98,9 +98,7 @@ export default async function LearnerSubjectDetailPage({
           <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
             Your tutor for {detail.subject.name}
           </p>
-          <p className="font-display text-lg font-semibold">
-            {detail.recommendedTutorPersona}
-          </p>
+          <p className="font-display text-lg font-semibold">{detail.recommendedTutorPersona}</p>
         </div>
         {nextSkill ? (
           <Button
@@ -109,9 +107,7 @@ export default async function LearnerSubjectDetailPage({
             // to learner home with the next-skill context so the button is not
             // dead.
           >
-            <Link
-              href={`/learner/home?subjectId=${detail.subject.id}&skillId=${nextSkill.id}`}
-            >
+            <Link href={`/learner/home?subjectId=${detail.subject.id}&skillId=${nextSkill.id}`}>
               <Play className="mr-1 h-4 w-4" /> Start lesson
             </Link>
           </Button>
@@ -122,9 +118,7 @@ export default async function LearnerSubjectDetailPage({
       {nextSkill ? (
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="font-display text-lg font-semibold">{nextSkill.name}</p>
-          <p className="mt-1 text-xs text-aivo-ink-soft">
-            Grade band: {nextSkill.gradeBand}
-          </p>
+          <p className="mt-1 text-xs text-aivo-ink-soft">Grade band: {nextSkill.gradeBand}</p>
           {nextSkill.mastery ? (
             <p className="mt-2 text-sm">
               Current mastery:{" "}

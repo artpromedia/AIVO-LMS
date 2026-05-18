@@ -55,11 +55,7 @@ export type SubscriptionStatus =
   | "inactive";
 
 /** Tutor add-on lifecycle state from `tutor_subscriptions.status`. */
-export type TutorSubscriptionStatus =
-  | "active"
-  | "grace_period"
-  | "canceled"
-  | "inactive";
+export type TutorSubscriptionStatus = "active" | "grace_period" | "canceled" | "inactive";
 
 export const TUTOR_KEY_TO_SKU: Record<TutorKey, TutorSku> = {
   nova: "ADDON_TUTOR_MATH",
@@ -88,18 +84,8 @@ export const TUTOR_SKU_TO_KEY: Record<TutorSku, TutorKey> = Object.fromEntries(
  */
 export const PLAN_INCLUDED_TUTOR_SKUS: Record<PlanId, readonly TutorSku[]> = {
   free: ["ADDON_TUTOR_ELA"],
-  single: [
-    "ADDON_TUTOR_ELA",
-    "ADDON_TUTOR_MATH",
-    "ADDON_TUTOR_SCIENCE",
-    "ADDON_TUTOR_HISTORY",
-  ],
-  family: [
-    "ADDON_TUTOR_ELA",
-    "ADDON_TUTOR_MATH",
-    "ADDON_TUTOR_SCIENCE",
-    "ADDON_TUTOR_HISTORY",
-  ],
+  single: ["ADDON_TUTOR_ELA", "ADDON_TUTOR_MATH", "ADDON_TUTOR_SCIENCE", "ADDON_TUTOR_HISTORY"],
+  family: ["ADDON_TUTOR_ELA", "ADDON_TUTOR_MATH", "ADDON_TUTOR_SCIENCE", "ADDON_TUTOR_HISTORY"],
   district: Object.values(TUTOR_KEY_TO_SKU) as TutorSku[],
 };
 
@@ -118,19 +104,13 @@ export const PLAN_INCLUDED_TUTOR_SKUS: Record<PlanId, readonly TutorSku[]> = {
  * first retry fires is hostile UX. Operators who prefer a stricter
  * policy can pass `pastDueGracePolicy: "deny"`.
  */
-const ALWAYS_ACTIVE_STATUSES: ReadonlySet<SubscriptionStatus> = new Set([
-  "trialing",
-  "active",
-]);
+const ALWAYS_ACTIVE_STATUSES: ReadonlySet<SubscriptionStatus> = new Set(["trialing", "active"]);
 
 export type PastDueGracePolicy = "allow" | "deny";
 
 const DEFAULT_PAST_DUE_GRACE: PastDueGracePolicy = "allow";
 
-function isSubscriptionActive(
-  status: SubscriptionStatus,
-  policy: PastDueGracePolicy,
-): boolean {
+function isSubscriptionActive(status: SubscriptionStatus, policy: PastDueGracePolicy): boolean {
   if (ALWAYS_ACTIVE_STATUSES.has(status)) return true;
   if (status === "past_due" && policy === "allow") return true;
   return false;
@@ -150,12 +130,7 @@ export function isTutorSku(value: string): value is TutorSku {
 }
 
 export function isPlanId(value: string): value is PlanId {
-  return (
-    value === "free" ||
-    value === "single" ||
-    value === "family" ||
-    value === "district"
-  );
+  return value === "free" || value === "single" || value === "family" || value === "district";
 }
 
 export function getTutorSkuForTutorKey(key: TutorKey): TutorSku {

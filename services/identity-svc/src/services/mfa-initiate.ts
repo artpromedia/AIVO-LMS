@@ -30,7 +30,7 @@ async function signMfaToken(userId: string, email: string, method: MfaMethod): P
 
 export async function pickMfaMethod(
   db: any,
-  user: { id: string; mfaMethod: string | null }
+  user: { id: string; mfaMethod: string | null },
 ): Promise<MfaMethod> {
   if (ADMIN_ENTERPRISE.STRONG_MFA) {
     const [cred] = await db
@@ -51,7 +51,7 @@ export async function pickMfaMethod(
  */
 export async function initiateMfa(
   db: any,
-  user: { id: string; email: string; mfaMethod: string | null }
+  user: { id: string; email: string; mfaMethod: string | null },
 ): Promise<MfaChallenge> {
   const method = await pickMfaMethod(db, user);
   const mfaToken = await signMfaToken(user.id, user.email, method);

@@ -24,13 +24,19 @@ interface Branding {
   logoBytes?: number;
 }
 
-const MIN_W = 512, MIN_H = 128, MAX_BYTES = 200 * 1024;
+const MIN_W = 512,
+  MIN_H = 128,
+  MAX_BYTES = 200 * 1024;
 
 function hexToRgb(hex: string): [number, number, number] | null {
   const m = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(hex.trim());
   if (!m) return null;
   let h = m[1];
-  if (h.length === 3) h = h.split("").map((c) => c + c).join("");
+  if (h.length === 3)
+    h = h
+      .split("")
+      .map((c) => c + c)
+      .join("");
   return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
 }
 
@@ -58,42 +64,58 @@ export default function DistrictBrandingPage() {
   useEffect(() => {
     if (!accessToken) return;
     fetch("/api/district/settings", { headers: { Authorization: `Bearer ${accessToken}` } })
-      .then((r) => r.ok ? r.json() : null)
-      .then((s) => { if (s?.branding) setBranding(s.branding); })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((s) => {
+        if (s?.branding) setBranding(s.branding);
+      })
       .finally(() => setLoading(false));
   }, [accessToken]);
 
   const ratio = useMemo(
-    () => branding.primaryColor ? contrastRatio(branding.primaryColor) : null,
+    () => (branding.primaryColor ? contrastRatio(branding.primaryColor) : null),
     [branding.primaryColor],
   );
   const ratioOk = ratio === null ? true : ratio >= 4.5;
 
   async function saveText() {
     if (!accessToken) return;
-    setMsg(null); setSaving(true);
+    setMsg(null);
+    setSaving(true);
     try {
       const res = await fetch("/api/district/settings", {
         method: "PUT",
         headers: { "content-type": "application/json", Authorization: `Bearer ${accessToken}` },
-        body: JSON.stringify({ branding: {
-          displayName: branding.displayName?.trim() || undefined,
-          supportEmail: branding.supportEmail?.trim() || undefined,
-          primaryColor: branding.primaryColor?.trim() || undefined,
-        } }),
+        body: JSON.stringify({
+          branding: {
+            displayName: branding.displayName?.trim() || undefined,
+            supportEmail: branding.supportEmail?.trim() || undefined,
+            primaryColor: branding.primaryColor?.trim() || undefined,
+          },
+        }),
       });
       const body = await res.json().catch(() => ({}));
-      if (!res.ok) { setMsg({ type: "error", text: body.error || "Failed to save" }); return; }
+      if (!res.ok) {
+        setMsg({ type: "error", text: body.error || "Failed to save" });
+        return;
+      }
       setMsg({ type: "ok", text: "Branding saved." });
       if (body.branding) setBranding(body.branding);
-    } finally { setSaving(false); }
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function uploadLogo(file: File) {
     if (!accessToken) return;
     setMsg(null);
-    if (file.size > MAX_BYTES) { setMsg({ type: "error", text: `Logo exceeds 200KB (got ${Math.round(file.size / 1024)}KB)` }); return; }
-    if (!["image/png", "image/svg+xml"].includes(file.type)) { setMsg({ type: "error", text: "Logo must be PNG or SVG" }); return; }
+    if (file.size > MAX_BYTES) {
+      setMsg({ type: "error", text: `Logo exceeds 200KB (got ${Math.round(file.size / 1024)}KB)` });
+      return;
+    }
+    if (!["image/png", "image/svg+xml"].includes(file.type)) {
+      setMsg({ type: "error", text: "Logo must be PNG or SVG" });
+      return;
+    }
     // Client-side dimension check for PNG; skip for SVG (server will check).
     if (file.type === "image/png") {
       const ok = await new Promise<boolean>((resolve) => {
@@ -102,7 +124,10 @@ export default function DistrictBrandingPage() {
         img.onerror = () => resolve(false);
         img.src = URL.createObjectURL(file);
       });
-      if (!ok) { setMsg({ type: "error", text: `PNG must be at least ${MIN_W}×${MIN_H}` }); return; }
+      if (!ok) {
+        setMsg({ type: "error", text: `PNG must be at least ${MIN_W}×${MIN_H}` });
+        return;
+      }
     }
     const dataUrl = await new Promise<string>((resolve, reject) => {
       const fr = new FileReader();
@@ -118,13 +143,23 @@ export default function DistrictBrandingPage() {
         body: JSON.stringify({ dataUrl }),
       });
       const body = await res.json().catch(() => ({}));
-      if (!res.ok) { setMsg({ type: "error", text: body.error || "Upload failed" }); return; }
+      if (!res.ok) {
+        setMsg({ type: "error", text: body.error || "Upload failed" });
+        return;
+      }
       setBranding(body.branding || {});
       setMsg({ type: "ok", text: "Logo updated." });
-    } finally { setLogoBusy(false); }
+    } finally {
+      setLogoBusy(false);
+    }
   }
 
-  if (loading) return <div className="p-8 animate-pulse"><div className="h-8 bg-slate-200 rounded w-48" /></div>;
+  if (loading)
+    return (
+      <div className="p-8 animate-pulse">
+        <div className="h-8 bg-slate-200 rounded w-48" />
+      </div>
+    );
 
   return (
     <div className="p-8 space-y-6 max-w-5xl">
@@ -134,12 +169,16 @@ export default function DistrictBrandingPage() {
         </div>
         <div>
           <h1 className="text-2xl font-heading font-bold vi-text">Branding</h1>
-          <p className="text-sm vi-text-muted mt-1">Customize how your district appears to families and learners.</p>
+          <p className="text-sm vi-text-muted mt-1">
+            Customize how your district appears to families and learners.
+          </p>
         </div>
       </header>
 
       {msg && (
-        <div className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm ${msg.type === "ok" ? "bg-emerald-50 text-emerald-800" : "bg-rose-50 text-rose-800"}`}>
+        <div
+          className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm ${msg.type === "ok" ? "bg-emerald-50 text-emerald-800" : "bg-rose-50 text-rose-800"}`}
+        >
           {msg.type === "ok" ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
           <span>{msg.text}</span>
         </div>
@@ -149,29 +188,48 @@ export default function DistrictBrandingPage() {
         <div className="vi-card p-6 space-y-4">
           <h2 className="text-lg font-heading font-semibold vi-text">Identity</h2>
           <label className="block">
-            <span className="text-xs font-semibold vi-text-muted uppercase tracking-wide">Display Name</span>
-            <input type="text" maxLength={120} value={branding.displayName || ""}
+            <span className="text-xs font-semibold vi-text-muted uppercase tracking-wide">
+              Display Name
+            </span>
+            <input
+              type="text"
+              maxLength={120}
+              value={branding.displayName || ""}
               onChange={(e) => setBranding({ ...branding, displayName: e.target.value })}
-              className="mt-1 w-full rounded-lg border vi-border px-3 py-2 vi-bg vi-text" />
+              className="mt-1 w-full rounded-lg border vi-border px-3 py-2 vi-bg vi-text"
+            />
           </label>
           <label className="block">
-            <span className="text-xs font-semibold vi-text-muted uppercase tracking-wide">Support Email</span>
-            <input type="email" value={branding.supportEmail || ""}
+            <span className="text-xs font-semibold vi-text-muted uppercase tracking-wide">
+              Support Email
+            </span>
+            <input
+              type="email"
+              value={branding.supportEmail || ""}
               onChange={(e) => setBranding({ ...branding, supportEmail: e.target.value })}
-              className="mt-1 w-full rounded-lg border vi-border px-3 py-2 vi-bg vi-text" />
+              className="mt-1 w-full rounded-lg border vi-border px-3 py-2 vi-bg vi-text"
+            />
           </label>
           <label className="block">
-            <span className="text-xs font-semibold vi-text-muted uppercase tracking-wide">Primary Color</span>
+            <span className="text-xs font-semibold vi-text-muted uppercase tracking-wide">
+              Primary Color
+            </span>
             <div className="mt-1 flex items-center gap-3">
               {/* eslint-disable-next-line no-restricted-syntax -- district admin chooses tenant brand color; default is product brand mark, not a tier surface */}
-              <input type="color" value={branding.primaryColor || "#7c3aed"}
+              <input
+                type="color"
+                value={branding.primaryColor || "#7c3aed"}
                 onChange={(e) => setBranding({ ...branding, primaryColor: e.target.value })}
-                className="h-10 w-16 rounded-lg border vi-border" />
-              <input type="text" value={branding.primaryColor || ""}
+                className="h-10 w-16 rounded-lg border vi-border"
+              />
+              <input
+                type="text"
+                value={branding.primaryColor || ""}
                 // eslint-disable-next-line no-restricted-syntax -- placeholder hex example for district brand color input
                 placeholder="#7C3AED"
                 onChange={(e) => setBranding({ ...branding, primaryColor: e.target.value })}
-                className="flex-1 rounded-lg border vi-border px-3 py-2 vi-bg vi-text font-mono text-sm" />
+                className="flex-1 rounded-lg border vi-border px-3 py-2 vi-bg vi-text font-mono text-sm"
+              />
             </div>
             {ratio !== null && (
               <p className={`mt-1 text-xs ${ratioOk ? "text-emerald-700" : "text-rose-700"}`}>
@@ -179,15 +237,21 @@ export default function DistrictBrandingPage() {
               </p>
             )}
           </label>
-          <button onClick={saveText} disabled={saving || !ratioOk}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[hsl(var(--visual-primary))] text-white text-sm font-semibold disabled:opacity-50">
+          <button
+            onClick={saveText}
+            disabled={saving || !ratioOk}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[hsl(var(--visual-primary))] text-white text-sm font-semibold disabled:opacity-50"
+          >
             <Save size={16} /> {saving ? "Saving…" : "Save"}
           </button>
         </div>
 
         <div className="vi-card p-6 space-y-4">
           <h2 className="text-lg font-heading font-semibold vi-text">Logo</h2>
-          <p className="text-xs vi-text-muted">PNG or SVG, ≤ 200KB, at least 512×128. Stored inline as a data URL (no external CDN in this environment).</p>
+          <p className="text-xs vi-text-muted">
+            PNG or SVG, ≤ 200KB, at least 512×128. Stored inline as a data URL (no external CDN in
+            this environment).
+          </p>
           {branding.logoUrl ? (
             <div className="rounded-xl border vi-border bg-slate-50 p-4 flex items-center justify-center min-h-32">
               <img src={branding.logoUrl} alt="District logo" className="max-h-24 max-w-full" />
@@ -197,10 +261,22 @@ export default function DistrictBrandingPage() {
               No logo uploaded yet.
             </div>
           )}
-          <input ref={fileRef} type="file" accept="image/png,image/svg+xml" className="hidden"
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadLogo(f); e.currentTarget.value = ""; }} />
-          <button onClick={() => fileRef.current?.click()} disabled={logoBusy}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border vi-border vi-text text-sm font-semibold disabled:opacity-50">
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/png,image/svg+xml"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) uploadLogo(f);
+              e.currentTarget.value = "";
+            }}
+          />
+          <button
+            onClick={() => fileRef.current?.click()}
+            disabled={logoBusy}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border vi-border vi-text text-sm font-semibold disabled:opacity-50"
+          >
             <Upload size={16} /> {logoBusy ? "Uploading…" : "Upload Logo"}
           </button>
         </div>
@@ -209,20 +285,31 @@ export default function DistrictBrandingPage() {
       <div className="vi-card p-6 space-y-4">
         <h2 className="text-lg font-heading font-semibold vi-text">Live Preview</h2>
         <div className="rounded-2xl border vi-border overflow-hidden">
-          <div className="flex items-center gap-3 px-5 py-3 text-white"
+          <div
+            className="flex items-center gap-3 px-5 py-3 text-white"
             // eslint-disable-next-line no-restricted-syntax -- live preview of tenant brand color (district admin's own choice), defaults to product brand mark
-            style={{ backgroundColor: branding.primaryColor || "#7c3aed" }}>
+            style={{ backgroundColor: branding.primaryColor || "#7c3aed" }}
+          >
             {branding.logoUrl ? (
               <img src={branding.logoUrl} alt="" className="h-8 max-w-32 object-contain" />
             ) : (
               <span className="font-heading font-bold text-base">AIVO</span>
             )}
-            <span className="font-heading font-semibold">{branding.displayName || "Your District"}</span>
+            <span className="font-heading font-semibold">
+              {branding.displayName || "Your District"}
+            </span>
           </div>
           <div className="p-5 vi-bg">
-            <p className="text-sm vi-text">Welcome back! This is what families and learners see at the top of their portal.</p>
+            <p className="text-sm vi-text">
+              Welcome back! This is what families and learners see at the top of their portal.
+            </p>
             {branding.supportEmail && (
-              <p className="text-xs vi-text-muted mt-2">Support: <a className="underline" href={`mailto:${branding.supportEmail}`}>{branding.supportEmail}</a></p>
+              <p className="text-xs vi-text-muted mt-2">
+                Support:{" "}
+                <a className="underline" href={`mailto:${branding.supportEmail}`}>
+                  {branding.supportEmail}
+                </a>
+              </p>
             )}
           </div>
         </div>

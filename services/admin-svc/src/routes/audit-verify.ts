@@ -22,13 +22,45 @@ interface ChainResult {
 }
 
 const PAYLOAD_KEYS: Record<string, readonly string[]> = {
-  audit_events: ["tenantId", "userId", "eventType", "resourceType", "resourceId", "details", "ipAddress", "userAgent"],
-  admin_audit_log: ["action", "actorId", "actorEmail", "actorRole", "onBehalfOfId", "resourceType", "resourceId", "details", "ipAddress", "userAgent", "tenantId"],
-  district_activity_log: ["tenantId", "action", "actorId", "actorName", "onBehalfOfId", "resourceType", "resourceId", "details"],
+  audit_events: [
+    "tenantId",
+    "userId",
+    "eventType",
+    "resourceType",
+    "resourceId",
+    "details",
+    "ipAddress",
+    "userAgent",
+  ],
+  admin_audit_log: [
+    "action",
+    "actorId",
+    "actorEmail",
+    "actorRole",
+    "onBehalfOfId",
+    "resourceType",
+    "resourceId",
+    "details",
+    "ipAddress",
+    "userAgent",
+    "tenantId",
+  ],
+  district_activity_log: [
+    "tenantId",
+    "action",
+    "actorId",
+    "actorName",
+    "onBehalfOfId",
+    "resourceType",
+    "resourceId",
+    "details",
+  ],
 };
 
 async function verifyChain(db: any, tableName: string, drizzleTable: any): Promise<ChainResult> {
-  const totalRes: any = await db.execute(sql`SELECT count(*)::int AS n FROM ${sql.identifier(tableName)}`);
+  const totalRes: any = await db.execute(
+    sql`SELECT count(*)::int AS n FROM ${sql.identifier(tableName)}`,
+  );
   const totalRows = (Array.isArray(totalRes) ? totalRes[0]?.n : totalRes?.rows?.[0]?.n) ?? 0;
 
   const rows = await db.select().from(drizzleTable).orderBy(drizzleTable.seq);
@@ -47,15 +79,31 @@ async function verifyChain(db: any, tableName: string, drizzleTable: any): Promi
     for (const k of keys) payload[k] = row[k];
     const expected = computeAuditHash(prev, payload);
     if (expected !== row.hash || (lastVerifiedSeq !== null && (row.prevHash ?? "") !== prev)) {
-      return { table: tableName, totalRows, chainStartSeq, lastVerifiedSeq, brokenAtSeq: Number(row.seq), ok: false };
+      return {
+        table: tableName,
+        totalRows,
+        chainStartSeq,
+        lastVerifiedSeq,
+        brokenAtSeq: Number(row.seq),
+        ok: false,
+      };
     }
     prev = row.hash;
     lastVerifiedSeq = Number(row.seq);
   }
-  return { table: tableName, totalRows, chainStartSeq, lastVerifiedSeq, brokenAtSeq: null, ok: true };
+  return {
+    table: tableName,
+    totalRows,
+    chainStartSeq,
+    lastVerifiedSeq,
+    brokenAtSeq: null,
+    ok: true,
+  };
 }
 
-export async function runAuditChainVerification(db: any): Promise<{ ok: boolean; chains: ChainResult[] }> {
+export async function runAuditChainVerification(
+  db: any,
+): Promise<{ ok: boolean; chains: ChainResult[] }> {
   const chains = await Promise.all([
     verifyChain(db, "audit_events", auditEvents),
     verifyChain(db, "admin_audit_log", adminAuditLog),
@@ -66,10 +114,12 @@ export async function runAuditChainVerification(db: any): Promise<{ ok: boolean;
 
 async function requirePlatformAdmin(req: any, reply: any) {
   const auth = req.headers.authorization;
-  if (!auth?.startsWith("Bearer ")) return reply.status(401).send({ error: "Missing authorization header" });
+  if (!auth?.startsWith("Bearer "))
+    return reply.status(401).send({ error: "Missing authorization header" });
   try {
     const payload = await verifyJWT(auth.slice(7));
-    if (payload.role !== "PLATFORM_ADMIN") return reply.status(403).send({ error: "Platform admin access required" });
+    if (payload.role !== "PLATFORM_ADMIN")
+      return reply.status(403).send({ error: "Platform admin access required" });
     req.user = payload;
   } catch {
     return reply.status(401).send({ error: "Invalid token" });
@@ -77,7 +127,11 @@ async function requirePlatformAdmin(req: any, reply: any) {
 }
 
 export function registerAuditVerifyRoutes(app: FastifyInstance, db: any) {
-  app.get("/api/admin-svc/audit-log/verify", { schema: getAdminSvcAuditLogVerifySchema, preHandler: requirePlatformAdmin }, async () => {
-    return await runAuditChainVerification(db);
-  });
+  app.get(
+    "/api/admin-svc/audit-log/verify",
+    { schema: getAdminSvcAuditLogVerifySchema, preHandler: requirePlatformAdmin },
+    async () => {
+      return await runAuditChainVerification(db);
+    },
+  );
 }

@@ -10,7 +10,13 @@ import { test, expect } from "@playwright/test";
 
 const ADMIN_AUTH = {
   accessToken: "admin-token",
-  user: { id: "admin-1", role: "PLATFORM_ADMIN", tenantId: null, email: "a@aivo.dev", name: "Admin" },
+  user: {
+    id: "admin-1",
+    role: "PLATFORM_ADMIN",
+    tenantId: null,
+    email: "a@aivo.dev",
+    name: "Admin",
+  },
 };
 
 test.describe("Daily Batch admin page", () => {
@@ -47,7 +53,17 @@ test.describe("Daily Batch admin page", () => {
           },
           filters: { statuses: null, since: null, until: null, limit: 30 },
           history: [
-            { id: 1, runAt: new Date().toISOString(), finishedAt: null, replicaId: "r1", status: "ok", sent: 12, failed: 0, durationMs: 200, error: null },
+            {
+              id: 1,
+              runAt: new Date().toISOString(),
+              finishedAt: null,
+              replicaId: "r1",
+              status: "ok",
+              sent: 12,
+              failed: 0,
+              durationMs: 200,
+              error: null,
+            },
           ],
         }),
       }),
@@ -63,7 +79,11 @@ test.describe("Daily Batch admin page", () => {
       return route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify({ latest: null, filters: { statuses: null, since: null, until: null, limit: 30 }, history: [] }),
+        body: JSON.stringify({
+          latest: null,
+          filters: { statuses: null, since: null, until: null, limit: 30 },
+          history: [],
+        }),
       });
     });
     await page.goto("/dashboard/admin/billing/daily-batch");

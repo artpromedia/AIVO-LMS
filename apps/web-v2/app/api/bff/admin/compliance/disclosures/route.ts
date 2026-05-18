@@ -33,10 +33,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     if (response) return response;
     const roleErr = requireRole(session!, [...ADMIN_ROLES], requestId);
     if (roleErr) return roleErr;
-    return ok(
-      { disclosures: listDisclosures(session!.tenantId) },
-      requestId,
-    );
+    return ok({ disclosures: listDisclosures(session!.tenantId) }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
   }

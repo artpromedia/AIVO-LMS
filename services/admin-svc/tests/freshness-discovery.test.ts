@@ -17,11 +17,14 @@ import assert from "node:assert/strict";
 
 const SKIP = !process.env.DATABASE_URL;
 
-test("discovery store: insert sets both timestamps; conflict preserves firstSeenAt and bumps lastSeenAt",
-  { skip: SKIP }, async () => {
+test(
+  "discovery store: insert sets both timestamps; conflict preserves firstSeenAt and bumps lastSeenAt",
+  { skip: SKIP },
+  async () => {
     const { provisionTestDatabase, freshnessWatchdogDiscoveries } = await import("@aivo/db");
     const { eq } = await import("drizzle-orm");
-    const { makeFreshnessWatchdogDiscoveryStore } = await import("../src/lib/freshness-discovery.js");
+    const { makeFreshnessWatchdogDiscoveryStore } =
+      await import("../src/lib/freshness-discovery.js");
 
     const { db, teardown } = await provisionTestDatabase();
     const store = makeFreshnessWatchdogDiscoveryStore(db);
@@ -33,28 +36,46 @@ test("discovery store: insert sets both timestamps; conflict preserves firstSeen
       const t0 = new Date(Date.now() - 60_000);
       const inserted = await store.recordSeen(jobName, t0);
       assert.equal(inserted.jobName, jobName);
-      assert.equal(inserted.firstSeenAt.getTime(), t0.getTime(),
-        "first observation must set firstSeenAt to the supplied timestamp");
-      assert.equal(inserted.lastSeenAt.getTime(), t0.getTime(),
-        "first observation must set lastSeenAt to the supplied timestamp");
+      assert.equal(
+        inserted.firstSeenAt.getTime(),
+        t0.getTime(),
+        "first observation must set firstSeenAt to the supplied timestamp",
+      );
+      assert.equal(
+        inserted.lastSeenAt.getTime(),
+        t0.getTime(),
+        "first observation must set lastSeenAt to the supplied timestamp",
+      );
 
       const t1 = new Date();
       const updated = await store.recordSeen(jobName, t1);
       assert.equal(updated.jobName, jobName);
-      assert.equal(updated.firstSeenAt.getTime(), t0.getTime(),
-        "re-observing must NOT rewrite firstSeenAt");
-      assert.equal(updated.lastSeenAt.getTime(), t1.getTime(),
-        "re-observing must bump lastSeenAt to the latest timestamp");
+      assert.equal(
+        updated.firstSeenAt.getTime(),
+        t0.getTime(),
+        "re-observing must NOT rewrite firstSeenAt",
+      );
+      assert.equal(
+        updated.lastSeenAt.getTime(),
+        t1.getTime(),
+        "re-observing must bump lastSeenAt to the latest timestamp",
+      );
 
       // A third observation with a timestamp earlier than t1 should still
       // bump lastSeenAt to that earlier value (the contract is "set to
       // supplied", not "max(...)"). Documents the trade-off explicitly.
       const t2 = new Date(t1.getTime() - 10_000);
       const third = await store.recordSeen(jobName, t2);
-      assert.equal(third.firstSeenAt.getTime(), t0.getTime(),
-        "firstSeenAt remains pinned to the very first observation");
-      assert.equal(third.lastSeenAt.getTime(), t2.getTime(),
-        "lastSeenAt mirrors the latest call's timestamp, not the wall-clock max");
+      assert.equal(
+        third.firstSeenAt.getTime(),
+        t0.getTime(),
+        "firstSeenAt remains pinned to the very first observation",
+      );
+      assert.equal(
+        third.lastSeenAt.getTime(),
+        t2.getTime(),
+        "lastSeenAt mirrors the latest call's timestamp, not the wall-clock max",
+      );
 
       // list() should include this row, ordered by firstSeenAt ASC.
       const all = await store.list();
@@ -62,17 +83,22 @@ test("discovery store: insert sets both timestamps; conflict preserves firstSeen
       assert.ok(ours, "list() must include the just-inserted job");
       assert.equal(ours!.firstSeenAt.getTime(), t0.getTime());
     } finally {
-      await db.delete(freshnessWatchdogDiscoveries)
+      await db
+        .delete(freshnessWatchdogDiscoveries)
         .where(eq(freshnessWatchdogDiscoveries.jobName, jobName));
       await teardown();
     }
-  });
+  },
+);
 
-test("discovery store: default `now` is used when no timestamp argument is supplied",
-  { skip: SKIP }, async () => {
+test(
+  "discovery store: default `now` is used when no timestamp argument is supplied",
+  { skip: SKIP },
+  async () => {
     const { provisionTestDatabase, freshnessWatchdogDiscoveries } = await import("@aivo/db");
     const { eq } = await import("drizzle-orm");
-    const { makeFreshnessWatchdogDiscoveryStore } = await import("../src/lib/freshness-discovery.js");
+    const { makeFreshnessWatchdogDiscoveryStore } =
+      await import("../src/lib/freshness-discovery.js");
 
     const { db, teardown } = await provisionTestDatabase();
     const store = makeFreshnessWatchdogDiscoveryStore(db);
@@ -82,15 +108,24 @@ test("discovery store: default `now` is used when no timestamp argument is suppl
       const before = Date.now();
       const inserted = await store.recordSeen(jobName);
       const after = Date.now();
-      assert.ok(inserted.firstSeenAt.getTime() >= before - 1,
-        "default firstSeenAt must be >= call start");
-      assert.ok(inserted.firstSeenAt.getTime() <= after + 1,
-        "default firstSeenAt must be <= call end");
-      assert.equal(inserted.firstSeenAt.getTime(), inserted.lastSeenAt.getTime(),
-        "on first insert, both timestamps share the default `now`");
+      assert.ok(
+        inserted.firstSeenAt.getTime() >= before - 1,
+        "default firstSeenAt must be >= call start",
+      );
+      assert.ok(
+        inserted.firstSeenAt.getTime() <= after + 1,
+        "default firstSeenAt must be <= call end",
+      );
+      assert.equal(
+        inserted.firstSeenAt.getTime(),
+        inserted.lastSeenAt.getTime(),
+        "on first insert, both timestamps share the default `now`",
+      );
     } finally {
-      await db.delete(freshnessWatchdogDiscoveries)
+      await db
+        .delete(freshnessWatchdogDiscoveries)
         .where(eq(freshnessWatchdogDiscoveries.jobName, jobName));
       await teardown();
     }
-  });
+  },
+);

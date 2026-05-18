@@ -21,10 +21,6 @@ export const metadata: Metadata = {
   alternates: { canonical: `${BASE_URL}/cookie-policy` },
 };
 
-export default function CookiePolicyLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function CookiePolicyLayout({ children }: { children: React.ReactNode }) {
   return children;
 }

@@ -63,15 +63,30 @@ export const adminSvcApiKeysByIdRotateSchema = {
   tags: ["Admin"],
   operationId: "adminSvcApiKeysByIdRotate",
   summary: "POST /api/admin-svc/api-keys/:id/rotate",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
-  response: { 200: passthroughObject, 201: passthroughObject, 400: errorResponse, 404: errorResponse },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
+  response: {
+    200: passthroughObject,
+    201: passthroughObject,
+    400: errorResponse,
+    404: errorResponse,
+  },
 } as const;
 
 export const adminSvcApiKeysByIdRevokeSchema = {
   tags: ["Admin"],
   operationId: "adminSvcApiKeysByIdRevoke",
   summary: "POST /api/admin-svc/api-keys/:id/revoke",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
 
@@ -115,7 +130,12 @@ export const getAdminSvcComplianceEvidenceByDateSchema = {
   tags: ["Admin"],
   operationId: "getAdminSvcComplianceEvidenceByDate",
   summary: "GET /api/admin-svc/compliance/evidence/:date",
-  params: { type: "object", required: ["date"], additionalProperties: true, properties: { date: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["date"],
+    additionalProperties: true,
+    properties: { date: { type: "string" } },
+  },
   response: { 200: passthroughObject, 400: errorResponse, 404: errorResponse, 410: errorResponse },
 } as const;
 
@@ -144,7 +164,12 @@ export const internalJobsByJobNameRunNowSchema = {
   tags: ["Admin"],
   operationId: "internalJobsByJobNameRunNow",
   summary: "POST /internal/jobs/:jobName/run-now",
-  params: { type: "object", required: ["jobName"], additionalProperties: true, properties: { jobName: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["jobName"],
+    additionalProperties: true,
+    properties: { jobName: { type: "string" } },
+  },
   response: { 200: passthroughObject, 401: errorResponse, 404: errorResponse },
 } as const;
 
@@ -159,7 +184,12 @@ export const getAdminSvcJobsByJobNameRunsSchema = {
   tags: ["Admin"],
   operationId: "getAdminSvcJobsByJobNameRuns",
   summary: "GET /api/admin-svc/jobs/:jobName/runs",
-  params: { type: "object", required: ["jobName"], additionalProperties: true, properties: { jobName: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["jobName"],
+    additionalProperties: true,
+    properties: { jobName: { type: "string" } },
+  },
   querystring: { type: "object", additionalProperties: true, properties: {} },
   response: { 200: passthroughObject },
 } as const;
@@ -168,7 +198,12 @@ export const getAdminSvcJobsByJobNameRunsCsvSchema = {
   tags: ["Admin"],
   operationId: "getAdminSvcJobsByJobNameRunsCsv",
   summary: "GET /api/admin-svc/jobs/:jobName/runs.csv",
-  params: { type: "object", required: ["jobName"], additionalProperties: true, properties: { jobName: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["jobName"],
+    additionalProperties: true,
+    properties: { jobName: { type: "string" } },
+  },
   querystring: { type: "object", additionalProperties: true, properties: {} },
   response: { 200: passthroughObject },
 } as const;
@@ -185,7 +220,12 @@ export const adminSvcJobsByJobNameRunNowSchema = {
   tags: ["Admin"],
   operationId: "adminSvcJobsByJobNameRunNow",
   summary: "POST /api/admin-svc/jobs/:jobName/run-now",
-  params: { type: "object", required: ["jobName"], additionalProperties: true, properties: { jobName: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["jobName"],
+    additionalProperties: true,
+    properties: { jobName: { type: "string" } },
+  },
   response: { 200: passthroughObject, 404: errorResponse, 502: errorResponse },
 } as const;
 
@@ -200,7 +240,12 @@ export const deleteAdminSvcJobsDiscoveryByJobNameSchema = {
   tags: ["Admin"],
   operationId: "deleteAdminSvcJobsDiscoveryByJobName",
   summary: "DELETE /api/admin-svc/jobs/discovery/:jobName",
-  params: { type: "object", required: ["jobName"], additionalProperties: true, properties: { jobName: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["jobName"],
+    additionalProperties: true,
+    properties: { jobName: { type: "string" } },
+  },
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
 
@@ -240,7 +285,12 @@ export const getAdminSvcModerationByIdSchema = {
   tags: ["Admin"],
   operationId: "getAdminSvcModerationById",
   summary: "GET /api/admin-svc/moderation/:id",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject, 404: errorResponse },
 } as const;
 
@@ -248,7 +298,12 @@ export const patchAdminSvcModerationByIdSchema = {
   tags: ["Admin"],
   operationId: "patchAdminSvcModerationById",
   summary: "PATCH /api/admin-svc/moderation/:id",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   body: passthroughObject,
   response: { 200: passthroughObject, 400: errorResponse, 404: errorResponse },
 } as const;
@@ -278,7 +333,12 @@ export const getAdminSvcUsersByIdSchema = {
   tags: ["Admin"],
   operationId: "getAdminSvcUsersById",
   summary: "GET /api/admin-svc/users/:id",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject },
 } as const;
 
@@ -293,7 +353,12 @@ export const getAdminSvcLearnersByIdSchema = {
   tags: ["Admin"],
   operationId: "getAdminSvcLearnersById",
   summary: "GET /api/admin-svc/learners/:id",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject },
 } as const;
 
@@ -308,7 +373,12 @@ export const getAdminSvcTenantsByIdSchema = {
   tags: ["Admin"],
   operationId: "getAdminSvcTenantsById",
   summary: "GET /api/admin-svc/tenants/:id",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject },
 } as const;
 
@@ -355,14 +425,24 @@ export const adminSvcScimTokensSchema = {
   operationId: "adminSvcScimTokens",
   summary: "POST /api/admin-svc/scim-tokens",
   body: passthroughObject,
-  response: { 200: passthroughObject, 201: passthroughObject, 400: errorResponse, 403: errorResponse },
+  response: {
+    200: passthroughObject,
+    201: passthroughObject,
+    400: errorResponse,
+    403: errorResponse,
+  },
 } as const;
 
 export const adminSvcScimTokensByIdRevokeSchema = {
   tags: ["Admin"],
   operationId: "adminSvcScimTokensByIdRevoke",
   summary: "POST /api/admin-svc/scim-tokens/:id/revoke",
-  params: { type: "object", required: ["id"], additionalProperties: true, properties: { id: { type: "string" } } },
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
   response: { 200: passthroughObject, 403: errorResponse, 404: errorResponse },
 } as const;
 

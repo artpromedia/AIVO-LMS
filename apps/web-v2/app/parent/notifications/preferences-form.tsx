@@ -67,7 +67,9 @@ export function PreferencesForm({ preference }: { preference: NotificationPrefer
             <tr className="border-b border-aivo-border text-left text-xs uppercase tracking-wide text-aivo-muted">
               <th className="py-2 pr-3">Type</th>
               {CHANNELS.map((c) => (
-                <th key={c} className="py-2 pr-3">{c.replace("_", "-")}</th>
+                <th key={c} className="py-2 pr-3">
+                  {c.replace("_", "-")}
+                </th>
               ))}
             </tr>
           </thead>
@@ -96,21 +98,31 @@ export function PreferencesForm({ preference }: { preference: NotificationPrefer
 
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="block text-sm">
-          <span className="block text-xs font-semibold uppercase tracking-wide text-aivo-muted">Quiet hours</span>
+          <span className="block text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+            Quiet hours
+          </span>
           <input
             type="text"
             placeholder="e.g. 22:00-07:00"
             value={quietHours}
-            onChange={(e) => { setQuietHours(e.target.value); setSaved(false); }}
+            onChange={(e) => {
+              setQuietHours(e.target.value);
+              setSaved(false);
+            }}
             className="mt-1 w-full rounded-md border border-aivo-border bg-aivo-surface px-3 py-2 text-sm"
             pattern="\d{2}:\d{2}-\d{2}:\d{2}"
           />
         </label>
         <label className="block text-sm">
-          <span className="block text-xs font-semibold uppercase tracking-wide text-aivo-muted">Digest cadence</span>
+          <span className="block text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+            Digest cadence
+          </span>
           <select
             value={cadence}
-            onChange={(e) => { setCadence(e.target.value as typeof cadence); setSaved(false); }}
+            onChange={(e) => {
+              setCadence(e.target.value as typeof cadence);
+              setSaved(false);
+            }}
             className="mt-1 w-full rounded-md border border-aivo-border bg-aivo-surface px-3 py-2 text-sm"
           >
             <option value="daily">Daily</option>
@@ -121,9 +133,15 @@ export function PreferencesForm({ preference }: { preference: NotificationPrefer
       </div>
 
       <div className="flex items-center gap-3">
-        <Button onClick={save} disabled={saving}>{saving ? "Saving…" : "Save preferences"}</Button>
+        <Button onClick={save} disabled={saving}>
+          {saving ? "Saving…" : "Save preferences"}
+        </Button>
         {saved ? <span className="text-sm text-aivo-success">Saved.</span> : null}
-        {err ? <span role="alert" className="text-sm text-aivo-danger">{err}</span> : null}
+        {err ? (
+          <span role="alert" className="text-sm text-aivo-danger">
+            {err}
+          </span>
+        ) : null}
       </div>
     </div>
   );

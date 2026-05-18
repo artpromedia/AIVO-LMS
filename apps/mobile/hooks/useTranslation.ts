@@ -1,4 +1,4 @@
-import i18n from '@/lib/i18n';
+import i18n from "@/lib/i18n";
 
 export function useTranslation() {
   const t = (key: string, options?: Record<string, any>) => {

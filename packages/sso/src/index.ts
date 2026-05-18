@@ -51,7 +51,10 @@ export interface StoredSsoConfig {
   defaultRole?: string;
 }
 
-export interface DecryptedSsoConfig extends Omit<StoredSsoConfig, "idpCertEnvelope" | "spPrivateKeyEnvelope"> {
+export interface DecryptedSsoConfig extends Omit<
+  StoredSsoConfig,
+  "idpCertEnvelope" | "spPrivateKeyEnvelope"
+> {
   idpCert?: string;
   spPrivateKey?: string;
 }
@@ -93,8 +96,8 @@ export function buildSaml(opts: BuildSamlOptions): SAML {
     logoutCallbackUrl: `${publicBaseUrl}/api/sso/saml/${encodeURIComponent(tenantSlug)}/slo`,
     idpCert: config.idpCert,
     privateKey: config.spPrivateKey,
-    identifierFormat: config.identifierFormat
-      || "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
+    identifierFormat:
+      config.identifierFormat || "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
     wantAssertionsSigned: true,
     wantAuthnResponseSigned: true,
     signatureAlgorithm: "sha256",
@@ -108,7 +111,10 @@ export function buildSaml(opts: BuildSamlOptions): SAML {
  * Pull the SAML attribute that carries the user's email. Tries explicit
  * `emailAttribute` mapping first, then standard SAML email attribute names.
  */
-export function extractEmail(profile: Record<string, any>, config: DecryptedSsoConfig): string | null {
+export function extractEmail(
+  profile: Record<string, any>,
+  config: DecryptedSsoConfig,
+): string | null {
   const candidates = [
     config.emailAttribute,
     "email",

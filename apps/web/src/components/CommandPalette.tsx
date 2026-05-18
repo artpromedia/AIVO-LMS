@@ -61,7 +61,7 @@ export default function CommandPalette() {
         .catch(() => setResults(null))
         .finally(() => setLoading(false));
     },
-    [accessToken]
+    [accessToken],
   );
 
   useEffect(() => {
@@ -90,7 +90,9 @@ export default function CommandPalette() {
       open
       ref={overlayRef}
       onClick={handleOverlayClick}
-      onKeyDown={(e) => { if (e.key === "Escape") setOpen(false); }}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") setOpen(false);
+      }}
       className="fixed inset-0 z-50 bg-black/50 flex items-start justify-center pt-[20vh] w-full h-full max-w-none max-h-none m-0 p-0 border-0"
     >
       <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden">
@@ -110,9 +112,7 @@ export default function CommandPalette() {
         </div>
 
         <div className="max-h-80 overflow-y-auto">
-          {loading && (
-            <div className="p-4 text-center text-sm text-slate-400">Searching...</div>
-          )}
+          {loading && <div className="p-4 text-center text-sm text-slate-400">Searching...</div>}
 
           {!loading && query.trim() && !hasResults && (
             <div className="p-8 text-center text-sm text-slate-400">No results found.</div>

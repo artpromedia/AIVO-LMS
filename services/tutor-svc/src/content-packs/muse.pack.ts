@@ -23,7 +23,8 @@ export const museStarterPack: ContentPack = {
       title: "Imagine a story",
       skillId: "ncas.arts.k2.create.imagine",
       type: "narration",
-      prompt: "Artists imagine first. Picture in your mind: a friendly dragon who collects buttons. What color is the dragon?",
+      prompt:
+        "Artists imagine first. Picture in your mind: a friendly dragon who collects buttons. What color is the dragon?",
       difficulty: "intro",
     },
     {
@@ -48,7 +49,8 @@ export const museStarterPack: ContentPack = {
       title: "Revise your draft",
       skillId: "ncas.arts.k2.create.revise",
       type: "multiple_choice",
-      prompt: "Looking at your dragon drawing, what's ONE thing you could add to make the picture stronger?",
+      prompt:
+        "Looking at your dragon drawing, what's ONE thing you could add to make the picture stronger?",
       difficulty: "stretch",
       choices: [
         { id: "details", label: "Add details like spots or a tail", correct: true },

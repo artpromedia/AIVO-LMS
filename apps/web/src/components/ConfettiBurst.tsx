@@ -102,9 +102,19 @@ export default function ConfettiBurst({
         </div>
         <style jsx>{`
           @keyframes confetti-flash {
-            0% { opacity: 0; transform: translateY(-6px); }
-            20%, 70% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-6px); }
+            0% {
+              opacity: 0;
+              transform: translateY(-6px);
+            }
+            20%,
+            70% {
+              opacity: 1;
+              transform: translateY(0);
+            }
+            100% {
+              opacity: 0;
+              transform: translateY(-6px);
+            }
           }
         `}</style>
       </div>
@@ -136,8 +146,13 @@ export default function ConfettiBurst({
       ))}
       <style jsx>{`
         @keyframes confetti-fall {
-          0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
-          10% { opacity: 1; }
+          0% {
+            transform: translate3d(0, 0, 0) rotate(0deg);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
           100% {
             transform: translate3d(var(--drift, 0px), 110vh, 0) rotate(var(--rot, 360deg));
             opacity: 0.8;

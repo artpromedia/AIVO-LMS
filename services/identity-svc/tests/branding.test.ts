@@ -8,7 +8,11 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseLogoDataUrl, wcagContrastRatio, WCAG_AA_NORMAL } from "../src/lib/branding-validation.js";
+import {
+  parseLogoDataUrl,
+  wcagContrastRatio,
+  WCAG_AA_NORMAL,
+} from "../src/lib/branding-validation.js";
 
 const BASE = process.env.IDENTITY_SVC_URL || "http://localhost:3001";
 
@@ -68,19 +72,31 @@ async function reachable(): Promise<boolean> {
   try {
     const r = await fetch(`${BASE}/health`, { signal: AbortSignal.timeout(2000) });
     return r.ok;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
 
 test("Sprint 9 endpoints are gated", async (t) => {
-  if (!(await reachable())) { t.skip("identity-svc not reachable"); return; }
+  if (!(await reachable())) {
+    t.skip("identity-svc not reachable");
+    return;
+  }
   for (const [m, p, expected] of [
     ["POST", "/api/district/seats/request", [401, 403]],
-    ["GET",  "/api/district/roster.csv", [401, 403]],
-    ["GET",  "/api/district/activity/export", [401, 403]],
+    ["GET", "/api/district/roster.csv", [401, 403]],
+    ["GET", "/api/district/activity/export", [401, 403]],
     ["POST", "/api/district/settings/branding/logo", [401, 403]],
   ] as const) {
-    const res = await fetch(`${BASE}${p}`, { method: m, headers: { "content-type": "application/json" }, body: m === "POST" ? "{}" : undefined });
-    assert.ok(expected.includes(res.status), `${m} ${p} expected ${expected.join("/")}, got ${res.status}`);
+    const res = await fetch(`${BASE}${p}`, {
+      method: m,
+      headers: { "content-type": "application/json" },
+      body: m === "POST" ? "{}" : undefined,
+    });
+    assert.ok(
+      expected.includes(res.status),
+      `${m} ${p} expected ${expected.join("/")}, got ${res.status}`,
+    );
   }
   // Public branding rejects bogus ids and 404s on unknown UUID.
   const bogus = await fetch(`${BASE}/api/branding/public/not-a-uuid`);
@@ -90,7 +106,10 @@ test("Sprint 9 endpoints are gated", async (t) => {
 });
 
 test("PUT /api/district/settings cannot bypass logo upload validation", async (t) => {
-  if (!(await reachable())) { t.skip("identity-svc not reachable"); return; }
+  if (!(await reachable())) {
+    t.skip("identity-svc not reachable");
+    return;
+  }
   // Even unauthenticated, we should be rejected by the tenant-scope hook
   // (401/403) — never 200. This guards the route exists & is gated; the
   // logo-stripping merge logic itself is unit-covered by inspecting that

@@ -58,13 +58,19 @@ async function postJson(urlStr, headers, payload) {
         hostname: url.hostname,
         port: url.port || (url.protocol === "https:" ? 443 : 80),
         path: url.pathname + url.search,
-        headers: { "content-type": "application/json", "content-length": Buffer.byteLength(data), ...headers },
+        headers: {
+          "content-type": "application/json",
+          "content-length": Buffer.byteLength(data),
+          ...headers,
+        },
         timeout: TIMEOUT,
       },
       (res) => {
         const chunks = [];
         res.on("data", (c) => chunks.push(c));
-        res.on("end", () => resolve({ status: res.statusCode, body: Buffer.concat(chunks).toString("utf8") }));
+        res.on("end", () =>
+          resolve({ status: res.statusCode, body: Buffer.concat(chunks).toString("utf8") }),
+        );
       },
     );
     req.on("error", reject);
@@ -76,20 +82,24 @@ async function postJson(urlStr, headers, payload) {
 
 async function pagePagerDuty(reason) {
   if (!PD_KEY) return;
-  const res = await postJson("https://events.pagerduty.com/v2/enqueue", {}, {
-    routing_key: PD_KEY,
-    event_action: "trigger",
-    dedup_key: DEDUP,
-    payload: {
-      summary: `alerts-proxy-svc liveness check failed: ${reason}`,
-      severity: "critical",
-      source: "ops-alerts-external-monitor",
-      component: "alerts-proxy-svc",
-      group: "platform-ops",
-      class: "outage",
-      custom_details: { health_url: HEALTH_URL, reason },
+  const res = await postJson(
+    "https://events.pagerduty.com/v2/enqueue",
+    {},
+    {
+      routing_key: PD_KEY,
+      event_action: "trigger",
+      dedup_key: DEDUP,
+      payload: {
+        summary: `alerts-proxy-svc liveness check failed: ${reason}`,
+        severity: "critical",
+        source: "ops-alerts-external-monitor",
+        component: "alerts-proxy-svc",
+        group: "platform-ops",
+        class: "outage",
+        custom_details: { health_url: HEALTH_URL, reason },
+      },
     },
-  });
+  );
   console.log(`pagerduty: status=${res.status}`);
 }
 
@@ -111,11 +121,15 @@ async function pageOpsgenie(reason) {
 
 async function resolvePagerDuty() {
   if (!PD_KEY) return;
-  await postJson("https://events.pagerduty.com/v2/enqueue", {}, {
-    routing_key: PD_KEY,
-    event_action: "resolve",
-    dedup_key: DEDUP,
-  });
+  await postJson(
+    "https://events.pagerduty.com/v2/enqueue",
+    {},
+    {
+      routing_key: PD_KEY,
+      event_action: "resolve",
+      dedup_key: DEDUP,
+    },
+  );
 }
 
 async function main() {

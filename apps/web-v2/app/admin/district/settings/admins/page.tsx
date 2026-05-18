@@ -5,11 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DISTRICT_NAV } from "@/components/layout/role-shells";
-import {
-  scopeTenantsForSession,
-  listMembersByRole,
-  getTenantById,
-} from "@/lib/db/repos";
+import { scopeTenantsForSession, listMembersByRole, getTenantById } from "@/lib/db/repos";
 
 const ROLE_LABEL: Record<string, string> = {
   district_admin: "District admin",
@@ -20,10 +16,7 @@ export default async function Page() {
   const session = await requirePageRole(["district_admin"]);
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const tenantIds = tenants.map((t) => t.id);
-  const admins = listMembersByRole(tenantIds, [
-    "district_admin",
-    "school_admin",
-  ]);
+  const admins = listMembersByRole(tenantIds, ["district_admin", "school_admin"]);
 
   return (
     <AppShell
@@ -63,27 +56,17 @@ export default async function Page() {
             <tbody className="divide-y divide-aivo-border">
               {admins.map((a) => {
                 const tenant = getTenantById(a.tenantId);
-                const scopeLabel = tenant
-                  ? `${tenant.name} · ${tenant.type}`
-                  : a.tenantId;
+                const scopeLabel = tenant ? `${tenant.name} · ${tenant.type}` : a.tenantId;
                 return (
                   <tr key={`${a.user.id}-${a.tenantId}`}>
-                    <td className="px-4 py-3 font-medium">
-                      {a.user.displayName}
-                    </td>
-                    <td className="px-4 py-3 text-aivo-ink-soft">
-                      {a.user.email}
-                    </td>
+                    <td className="px-4 py-3 font-medium">{a.user.displayName}</td>
+                    <td className="px-4 py-3 text-aivo-ink-soft">{a.user.email}</td>
                     <td className="px-4 py-3">
-                      <Badge
-                        tone={a.role === "district_admin" ? "primary" : "neutral"}
-                      >
+                      <Badge tone={a.role === "district_admin" ? "primary" : "neutral"}>
                         {ROLE_LABEL[a.role] ?? a.role}
                       </Badge>
                     </td>
-                    <td className="px-4 py-3 text-aivo-ink-soft">
-                      {scopeLabel}
-                    </td>
+                    <td className="px-4 py-3 text-aivo-ink-soft">{scopeLabel}</td>
                     <td className="px-4 py-3 text-xs text-aivo-ink-soft">
                       {new Date(a.joinedAt).toLocaleDateString()}
                     </td>

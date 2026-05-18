@@ -16,8 +16,8 @@ const WELL: Record<Tone, string> = {
   primary: "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]",
   reading: "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]",
   science: "bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))]",
-  sel:     "bg-[hsl(var(--visual-sel)/0.16)] text-[hsl(var(--visual-sel))]",
-  math:    "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]",
+  sel: "bg-[hsl(var(--visual-sel)/0.16)] text-[hsl(var(--visual-sel))]",
+  math: "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]",
 };
 
 export default function EmptyLearnerState({

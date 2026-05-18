@@ -1,4 +1,9 @@
-export type FunctioningLevel = "STANDARD" | "SUPPORTED" | "LOW_VERBAL" | "NON_VERBAL" | "PRE_SYMBOLIC";
+export type FunctioningLevel =
+  | "STANDARD"
+  | "SUPPORTED"
+  | "LOW_VERBAL"
+  | "NON_VERBAL"
+  | "PRE_SYMBOLIC";
 
 export interface FlProfile {
   level: FunctioningLevel;

@@ -27,8 +27,8 @@ export interface ScoredResponse {
   itemId: string;
   surface: LearnerSurfaceKind;
   outcome: "correct" | "incorrect" | "partial" | "skipped";
-  score: number;          // 0..1
-  evidence?: string;      // human-readable reason (debug only)
+  score: number; // 0..1
+  evidence?: string; // human-readable reason (debug only)
 }
 
 function normalise(v: unknown): string {

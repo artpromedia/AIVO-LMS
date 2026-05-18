@@ -1,24 +1,33 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import {
-  View, Text, TextInput, Pressable, StyleSheet, KeyboardAvoidingView,
-  Platform, ScrollView, Switch, Image, ActivityIndicator,
-} from 'react-native';
-import { router } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTranslation } from '@/hooks/useTranslation';
-import * as AuthSession from 'expo-auth-session';
-import * as WebBrowser from 'expo-web-browser';
-import { useAuth } from '@/hooks/useAuth';
-import { apiFetch } from '@/lib/api';
-import { API } from '@/constants/api';
-import { colors, spacing, radius } from '@/constants/colors';
-import { AivoButton } from '@aivo/mobile-ui';
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Switch,
+  Image,
+  ActivityIndicator,
+} from "react-native";
+import { router } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTranslation } from "@/hooks/useTranslation";
+import * as AuthSession from "expo-auth-session";
+import * as WebBrowser from "expo-web-browser";
+import { useAuth } from "@/hooks/useAuth";
+import { apiFetch } from "@/lib/api";
+import { API } from "@/constants/api";
+import { colors, spacing, radius } from "@/constants/colors";
+import { AivoButton } from "@aivo/mobile-ui";
 
 async function getAsyncStorage(): Promise<any> {
   try {
     // Optional native dep — gracefully degrades when not installed.
-     
-    return (await import('@react-native-async-storage/async-storage')).default;
+
+    return (await import("@react-native-async-storage/async-storage")).default;
   } catch {
     return null;
   }
@@ -26,25 +35,25 @@ async function getAsyncStorage(): Promise<any> {
 
 WebBrowser.maybeCompleteAuthSession();
 
-const GOOGLE_CLIENT_ID = '373030578076-ftkmofvss349u7qecvsjmiqavq4mt3hs.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = "373030578076-ftkmofvss349u7qecvsjmiqavq4mt3hs.apps.googleusercontent.com";
 
 export default function SignupScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const { signup, loginWithGoogle } = useAuth();
   const [form, setForm] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
   const [coppaConsent, setCoppaConsent] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  const [couponCode, setCouponCode] = useState('');
+  const [couponCode, setCouponCode] = useState("");
   const [couponExpanded, setCouponExpanded] = useState(false);
   const [couponState, setCouponState] = useState<null | {
     valid: boolean;
@@ -56,21 +65,21 @@ export default function SignupScreen() {
   const [couponChecking, setCouponChecking] = useState(false);
   const couponDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const discovery = AuthSession.useAutoDiscovery('https://accounts.google.com');
+  const discovery = AuthSession.useAutoDiscovery("https://accounts.google.com");
 
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
       clientId: GOOGLE_CLIENT_ID,
-      scopes: ['openid', 'profile', 'email'],
+      scopes: ["openid", "profile", "email"],
       responseType: AuthSession.ResponseType.IdToken,
-      redirectUri: AuthSession.makeRedirectUri({ scheme: 'aivo' }),
+      redirectUri: AuthSession.makeRedirectUri({ scheme: "aivo" }),
       usePKCE: false, // implicit flow (IdToken) does not support PKCE
     },
-    discovery
+    discovery,
   );
 
   useEffect(() => {
-    if (response?.type === 'success') {
+    if (response?.type === "success") {
       const idToken = response.params.id_token;
       if (idToken) {
         handleGoogleResponse(idToken);
@@ -88,15 +97,15 @@ export default function SignupScreen() {
     couponDebounceRef.current = setTimeout(async () => {
       setCouponChecking(true);
       try {
-        const res = await apiFetch(API.BILLING, '/api/billing/coupons/validate', {
-          method: 'POST',
+        const res = await apiFetch(API.BILLING, "/api/billing/coupons/validate", {
+          method: "POST",
           body: JSON.stringify({ code: couponCode }),
           skipAuth: true,
         });
         const data = await res.json();
         setCouponState(data);
       } catch {
-        setCouponState({ valid: false, reason: 'network_error' });
+        setCouponState({ valid: false, reason: "network_error" });
       } finally {
         setCouponChecking(false);
       }
@@ -108,46 +117,46 @@ export default function SignupScreen() {
 
   const handleGoogleResponse = async (idToken: string) => {
     if (!coppaConsent || !termsAccepted) {
-      setError(t('auth.acceptCoppaGoogle'));
+      setError(t("auth.acceptCoppaGoogle"));
       return;
     }
     setGoogleLoading(true);
-    setError('');
+    setError("");
     const result = await loginWithGoogle(idToken, { coppaConsent: true, termsAccepted: true });
     if (result.success) {
-      router.replace('/');
-    } else if (result.error === 'requiresConsent') {
-      setError(t('auth.acceptTerms'));
+      router.replace("/");
+    } else if (result.error === "requiresConsent") {
+      setError(t("auth.acceptTerms"));
     } else {
-      setError(result.error || t('auth.googleSignUpFailed'));
+      setError(result.error || t("auth.googleSignUpFailed"));
     }
     setGoogleLoading(false);
   };
 
   const updateField = (field: string, value: string) => {
-    setForm(prev => ({ ...prev, [field]: value }));
+    setForm((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSignup = async () => {
     if (!form.name || !form.email || !form.password) {
-      setError(t('auth.fillAllFields'));
+      setError(t("auth.fillAllFields"));
       return;
     }
     if (form.password !== form.confirmPassword) {
-      setError(t('auth.passwordsMismatch'));
+      setError(t("auth.passwordsMismatch"));
       return;
     }
     if (form.password.length < 8) {
-      setError(t('auth.passwordTooShort'));
+      setError(t("auth.passwordTooShort"));
       return;
     }
     if (!coppaConsent || !termsAccepted) {
-      setError(t('auth.acceptTerms'));
+      setError(t("auth.acceptTerms"));
       return;
     }
 
     setLoading(true);
-    setError('');
+    setError("");
     const result = await signup({
       name: form.name.trim(),
       email: form.email.trim(),
@@ -158,16 +167,16 @@ export default function SignupScreen() {
         try {
           const AsyncStorage = await getAsyncStorage();
           if (AsyncStorage) {
-            await AsyncStorage.setItem('pending_coupon', couponCode);
-            if (couponState.couponType === 'PROVISIONING') {
-              await AsyncStorage.setItem('pending_coupon_type', 'PROVISIONING');
+            await AsyncStorage.setItem("pending_coupon", couponCode);
+            if (couponState.couponType === "PROVISIONING") {
+              await AsyncStorage.setItem("pending_coupon_type", "PROVISIONING");
             }
           }
         } catch {}
       }
-      router.replace('/');
+      router.replace("/");
     } else {
-      setError(result.error || t('auth.registrationFailed'));
+      setError(result.error || t("auth.registrationFailed"));
     }
     setLoading(false);
   };
@@ -175,26 +184,26 @@ export default function SignupScreen() {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
         contentContainerStyle={[styles.container, { paddingTop: insets.top + 20 }]}
         keyboardShouldPersistTaps="handled"
       >
         <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backText}>{t('common.back')}</Text>
+          <Text style={styles.backText}>{t("common.back")}</Text>
         </Pressable>
 
         <View style={styles.logoContainer}>
           <Image
-            source={require('@/assets/images/aivo-logo-purple.png')}
+            source={require("@/assets/images/aivo-logo-purple.png")}
             style={styles.logo}
             resizeMode="contain"
           />
         </View>
 
-        <Text style={styles.title}>{t('auth.createAccount')}</Text>
-        <Text style={styles.subtitle}>{t('auth.createAccountSubtitle')}</Text>
+        <Text style={styles.title}>{t("auth.createAccount")}</Text>
+        <Text style={styles.subtitle}>{t("auth.createAccountSubtitle")}</Text>
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
@@ -205,36 +214,36 @@ export default function SignupScreen() {
         >
           <Text style={styles.googleIcon}>G</Text>
           <Text style={styles.googleButtonText}>
-            {googleLoading ? t('auth.signingUp') : t('auth.signUpWithGoogle')}
+            {googleLoading ? t("auth.signingUp") : t("auth.signUpWithGoogle")}
           </Text>
         </Pressable>
 
         <View style={styles.dividerRow}>
           <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>{t('auth.orSignUpWithEmail')}</Text>
+          <Text style={styles.dividerText}>{t("auth.orSignUpWithEmail")}</Text>
           <View style={styles.dividerLine} />
         </View>
 
         <View style={styles.card}>
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>{t('auth.fullName')}</Text>
+            <Text style={styles.label}>{t("auth.fullName")}</Text>
             <TextInput
               style={styles.input}
               value={form.name}
-              onChangeText={(v) => updateField('name', v)}
-              placeholder={t('auth.fullNamePlaceholder')}
+              onChangeText={(v) => updateField("name", v)}
+              placeholder={t("auth.fullNamePlaceholder")}
               placeholderTextColor={colors.textSecondary}
               autoComplete="name"
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>{t('auth.email')}</Text>
+            <Text style={styles.label}>{t("auth.email")}</Text>
             <TextInput
               style={styles.input}
               value={form.email}
-              onChangeText={(v) => updateField('email', v)}
-              placeholder={t('auth.emailPlaceholder')}
+              onChangeText={(v) => updateField("email", v)}
+              placeholder={t("auth.emailPlaceholder")}
               placeholderTextColor={colors.textSecondary}
               keyboardType="email-address"
               autoCapitalize="none"
@@ -243,24 +252,24 @@ export default function SignupScreen() {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>{t('auth.password')}</Text>
+            <Text style={styles.label}>{t("auth.password")}</Text>
             <TextInput
               style={styles.input}
               value={form.password}
-              onChangeText={(v) => updateField('password', v)}
-              placeholder={t('auth.atLeast8Chars')}
+              onChangeText={(v) => updateField("password", v)}
+              placeholder={t("auth.atLeast8Chars")}
               placeholderTextColor={colors.textSecondary}
               secureTextEntry
             />
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>{t('auth.confirmPassword')}</Text>
+            <Text style={styles.label}>{t("auth.confirmPassword")}</Text>
             <TextInput
               style={styles.input}
               value={form.confirmPassword}
-              onChangeText={(v) => updateField('confirmPassword', v)}
-              placeholder={t('auth.confirmPasswordPlaceholder')}
+              onChangeText={(v) => updateField("confirmPassword", v)}
+              placeholder={t("auth.confirmPasswordPlaceholder")}
               placeholderTextColor={colors.textSecondary}
               secureTextEntry
             />
@@ -271,11 +280,9 @@ export default function SignupScreen() {
               value={coppaConsent}
               onValueChange={setCoppaConsent}
               trackColor={{ false: colors.border, true: colors.primaryLight }}
-              thumbColor={coppaConsent ? colors.primary : '#f4f3f4'}
+              thumbColor={coppaConsent ? colors.primary : "#f4f3f4"}
             />
-            <Text style={styles.switchLabel}>
-              {t('auth.coppaConsent')}
-            </Text>
+            <Text style={styles.switchLabel}>{t("auth.coppaConsent")}</Text>
           </View>
 
           <View style={styles.switchRow}>
@@ -283,20 +290,15 @@ export default function SignupScreen() {
               value={termsAccepted}
               onValueChange={setTermsAccepted}
               trackColor={{ false: colors.border, true: colors.primaryLight }}
-              thumbColor={termsAccepted ? colors.primary : '#f4f3f4'}
+              thumbColor={termsAccepted ? colors.primary : "#f4f3f4"}
             />
-            <Text style={styles.switchLabel}>
-              {t('auth.termsConsent')}
-            </Text>
+            <Text style={styles.switchLabel}>{t("auth.termsConsent")}</Text>
           </View>
 
           {/* Coupon / Access Code */}
-          <Pressable
-            onPress={() => setCouponExpanded((v) => !v)}
-            style={styles.couponToggle}
-          >
+          <Pressable onPress={() => setCouponExpanded((v) => !v)} style={styles.couponToggle}>
             <Text style={styles.couponToggleText}>
-              {couponExpanded ? '▴' : '▾'} Have a coupon or access code?
+              {couponExpanded ? "▴" : "▾"} Have a coupon or access code?
             </Text>
           </Pressable>
 
@@ -314,33 +316,40 @@ export default function SignupScreen() {
               {couponChecking && (
                 <ActivityIndicator size="small" color={colors.primary} style={{ marginTop: 8 }} />
               )}
-              {couponState && !couponChecking && (
-                couponState.valid ? (
+              {couponState &&
+                !couponChecking &&
+                (couponState.valid ? (
                   <Text style={styles.couponValid}>
-                    ✓ {couponCode}{couponState.description ? ` — ${couponState.description}` : ''}
-                    {couponState.couponType === 'DISCOUNT' && couponState.discountPct
+                    ✓ {couponCode}
+                    {couponState.description ? ` — ${couponState.description}` : ""}
+                    {couponState.couponType === "DISCOUNT" && couponState.discountPct
                       ? ` — ${couponState.discountPct}% off`
-                      : ''}
-                    {couponState.couponType === 'PROVISIONING' && !couponState.description
-                      ? ' — Access code applied'
-                      : ''}
+                      : ""}
+                    {couponState.couponType === "PROVISIONING" && !couponState.description
+                      ? " — Access code applied"
+                      : ""}
                   </Text>
                 ) : (
                   <Text style={styles.couponInvalid}>
-                    ✗ {couponState.reason === 'not_found' ? 'Code not found'
-                      : couponState.reason === 'expired' ? 'Code expired'
-                      : couponState.reason === 'exhausted' ? 'Code has reached its usage limit'
-                      : couponState.reason === 'inactive' ? 'Code is no longer active'
-                      : couponState.reason === 'network_error' ? 'Unable to validate — please try again'
-                      : 'Invalid code'}
+                    ✗{" "}
+                    {couponState.reason === "not_found"
+                      ? "Code not found"
+                      : couponState.reason === "expired"
+                        ? "Code expired"
+                        : couponState.reason === "exhausted"
+                          ? "Code has reached its usage limit"
+                          : couponState.reason === "inactive"
+                            ? "Code is no longer active"
+                            : couponState.reason === "network_error"
+                              ? "Unable to validate — please try again"
+                              : "Invalid code"}
                   </Text>
-                )
-              )}
+                ))}
             </View>
           )}
 
           <AivoButton
-            title={t('auth.createAccountBtn')}
+            title={t("auth.createAccountBtn")}
             onPress={handleSignup}
             loading={loading}
             size="lg"
@@ -348,9 +357,9 @@ export default function SignupScreen() {
           />
         </View>
 
-        <Pressable onPress={() => router.push('/(auth)/login')} style={styles.loginLink}>
+        <Pressable onPress={() => router.push("/(auth)/login")} style={styles.loginLink}>
           <Text style={styles.loginText}>
-            {t('auth.haveAccount')} <Text style={styles.loginBold}>{t('auth.signIn')}</Text>
+            {t("auth.haveAccount")} <Text style={styles.loginBold}>{t("auth.signIn")}</Text>
           </Text>
         </Pressable>
       </ScrollView>
@@ -369,11 +378,11 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: 16,
-    fontFamily: 'Nunito-SemiBold',
+    fontFamily: "Nunito-SemiBold",
     color: colors.primary,
   },
   logoContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 16,
   },
   logo: {
@@ -382,32 +391,32 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 26,
-    fontFamily: 'Nunito-ExtraBold',
+    fontFamily: "Nunito-ExtraBold",
     color: colors.text,
-    textAlign: 'center',
+    textAlign: "center",
   },
   subtitle: {
     fontSize: 14,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.textSecondary,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 4,
     marginBottom: 20,
   },
   error: {
     color: colors.error,
     fontSize: 13,
-    fontFamily: 'Nunito-Regular',
-    textAlign: 'center',
+    fontFamily: "Nunito-Regular",
+    textAlign: "center",
     marginBottom: 12,
-    backgroundColor: colors.error + '10',
+    backgroundColor: colors.error + "10",
     padding: 8,
     borderRadius: radius.md,
   },
   googleButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 14,
     borderRadius: radius.xl,
     borderWidth: 1.5,
@@ -415,7 +424,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     gap: 10,
     marginBottom: spacing.sm,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
@@ -423,17 +432,17 @@ const styles = StyleSheet.create({
   },
   googleIcon: {
     fontSize: 20,
-    fontFamily: 'Nunito-ExtraBold',
-    color: '#4285F4',
+    fontFamily: "Nunito-ExtraBold",
+    color: "#4285F4",
   },
   googleButtonText: {
     fontSize: 15,
-    fontFamily: 'Nunito-SemiBold',
+    fontFamily: "Nunito-SemiBold",
     color: colors.text,
   },
   dividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginVertical: spacing.md,
   },
   dividerLine: {
@@ -443,7 +452,7 @@ const styles = StyleSheet.create({
   },
   dividerText: {
     fontSize: 13,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.textSecondary,
     marginHorizontal: 12,
   },
@@ -451,21 +460,21 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderRadius: radius.xxl,
     padding: spacing.lg,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 3,
   },
   row: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   inputGroup: {
     marginBottom: spacing.md,
   },
   label: {
     fontSize: 14,
-    fontFamily: 'Nunito-SemiBold',
+    fontFamily: "Nunito-SemiBold",
     color: colors.text,
     marginBottom: 6,
   },
@@ -476,34 +485,34 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     paddingHorizontal: spacing.md,
     fontSize: 16,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.text,
     backgroundColor: colors.surface,
   },
   switchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 12,
     gap: 10,
   },
   switchLabel: {
     flex: 1,
     fontSize: 13,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.textSecondary,
   },
   loginLink: {
     marginTop: spacing.lg,
-    alignItems: 'center',
+    alignItems: "center",
     paddingBottom: 40,
   },
   loginText: {
     fontSize: 14,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.textSecondary,
   },
   loginBold: {
-    fontFamily: 'Nunito-Bold',
+    fontFamily: "Nunito-Bold",
     color: colors.primary,
   },
   couponToggle: {
@@ -512,7 +521,7 @@ const styles = StyleSheet.create({
   },
   couponToggleText: {
     fontSize: 13,
-    fontFamily: 'Nunito-SemiBold',
+    fontFamily: "Nunito-SemiBold",
     color: colors.primary,
   },
   couponSection: {
@@ -521,18 +530,18 @@ const styles = StyleSheet.create({
   couponValid: {
     marginTop: 6,
     fontSize: 13,
-    fontFamily: 'Nunito-SemiBold',
-    color: '#059669',
-    backgroundColor: '#d1fae5',
+    fontFamily: "Nunito-SemiBold",
+    color: "#059669",
+    backgroundColor: "#d1fae5",
     padding: 8,
     borderRadius: radius.md,
   },
   couponInvalid: {
     marginTop: 6,
     fontSize: 13,
-    fontFamily: 'Nunito-SemiBold',
-    color: '#e11d48',
-    backgroundColor: '#ffe4e6',
+    fontFamily: "Nunito-SemiBold",
+    color: "#e11d48",
+    backgroundColor: "#ffe4e6",
     padding: 8,
     borderRadius: radius.md,
   },

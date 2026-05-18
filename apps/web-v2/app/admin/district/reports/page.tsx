@@ -3,10 +3,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { DISTRICT_NAV } from "@/components/layout/role-shells";
-import {
-  computeSystemHealth,
-  scopeTenantsForSession,
-} from "@/lib/db/repos";
+import { computeSystemHealth, scopeTenantsForSession } from "@/lib/db/repos";
 
 export default async function Page() {
   const session = await requirePageRole(["district_admin"]);
@@ -34,12 +31,8 @@ export default async function Page() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((s) => (
           <Card key={s.k} className="p-[var(--aivo-density-card-pad)]">
-            <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-              {s.k}
-            </p>
-            <p className="mt-1 font-display text-3xl font-bold">
-              {s.v.toLocaleString()}
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{s.k}</p>
+            <p className="mt-1 font-display text-3xl font-bold">{s.v.toLocaleString()}</p>
           </Card>
         ))}
       </div>

@@ -1,11 +1,10 @@
-  
 **AIVO LEARNING PLATFORM**
 
 Phase-by-Phase Build Guide
 
 Granular Engineering Implementation Playbook
 
-*36-Week Delivery · 14 Modules · 11-Point Module Gates*
+_36-Week Delivery · 14 Modules · 11-Point Module Gates_
 
 **CONFIDENTIAL · April 2026**
 
@@ -17,14 +16,14 @@ This document provides granular, sprint-level guidance for building the AIVO Lea
 
 ## **Phase Summary**
 
-| Phase | Duration | Modules | Focus |
-| :---- | :---- | :---- | :---- |
-| **Phase 0** | Weeks 1–4 | 0A, 0B | Foundation \+ Enterprise Critical Blockers |
-| **Phase 1** | Weeks 5–10 | 1A, 1B | The Brain (Assessment, Clone, State, IEP, Functioning Levels) |
-| **Phase 2** | Weeks 11–18 | 2A, 2B | Learning Engine \+ Core 7 AI Tutors |
-| **Phase 3** | Weeks 19–24 | 3A, 3B, 3C | Homework \+ Collaboration \+ Expansion Tutors |
-| **Phase 4** | Weeks 25–30 | 4A–4E | Gamification \+ Category-Leader Features |
-| **Phase 5** | Weeks 31–36 | 5A, 5B | Enterprise Scale \+ Compliance \+ Offline |
+| Phase       | Duration    | Modules    | Focus                                                         |
+| :---------- | :---------- | :--------- | :------------------------------------------------------------ |
+| **Phase 0** | Weeks 1–4   | 0A, 0B     | Foundation \+ Enterprise Critical Blockers                    |
+| **Phase 1** | Weeks 5–10  | 1A, 1B     | The Brain (Assessment, Clone, State, IEP, Functioning Levels) |
+| **Phase 2** | Weeks 11–18 | 2A, 2B     | Learning Engine \+ Core 7 AI Tutors                           |
+| **Phase 3** | Weeks 19–24 | 3A, 3B, 3C | Homework \+ Collaboration \+ Expansion Tutors                 |
+| **Phase 4** | Weeks 25–30 | 4A–4E      | Gamification \+ Category-Leader Features                      |
+| **Phase 5** | Weeks 31–36 | 5A, 5B     | Enterprise Scale \+ Compliance \+ Offline                     |
 
 # **Phase 0 — Foundation \+ Enterprise Critical Blockers (Weeks 1–4)**
 
@@ -92,7 +91,7 @@ This document provides granular, sprint-level guidance for building the AIVO Lea
 
 3. Build COPPA-compliant consent flow: parent account required for all child accounts.
 
-4. Implement role-based access: PARENT, LEARNER, TEACHER, CAREGIVER, THERAPIST (new), PLATFORM\_ADMIN, DISTRICT\_ADMIN.
+4. Implement role-based access: PARENT, LEARNER, TEACHER, CAREGIVER, THERAPIST (new), PLATFORM_ADMIN, DISTRICT_ADMIN.
 
 5. Build learner PIN-based login (e.g., 1234).
 
@@ -102,7 +101,7 @@ This document provides granular, sprint-level guidance for building the AIVO Lea
 
 8. Implement @aivo/security: security headers (HSTS, CSP, X-Frame-Options), CSRF (double-submit cookie), rate limiting (Redis-backed tiered).
 
-9. Build RLS policies: 0001\_rls\_policies.sql with app.current\_tenant\_id on all tables.
+9. Build RLS policies: 0001_rls_policies.sql with app.current_tenant_id on all tables.
 
 10. Write E2E tests: signup flow, login flow, logout, role enforcement, session persistence, OAuth flows, PIN login, CSRF protection, rate limiting.
 
@@ -118,7 +117,7 @@ This document provides granular, sprint-level guidance for building the AIVO Lea
 
 1. Build assessment-svc: Fastify scaffold with Swagger, health checks, Prometheus metrics.
 
-2. Create tables: assessment\_attempts, assessment\_responses, parent\_assessments, iep\_workflow\_documents.
+2. Create tables: assessment_attempts, assessment_responses, parent_assessments, iep_workflow_documents.
 
 3. Build Parent Assessment API: enhanced questionnaire with functioning-level questions (communication mode, device interaction, response method, attention span, diagnoses).
 
@@ -126,17 +125,17 @@ This document provides granular, sprint-level guidance for building the AIVO Lea
 
 5. Build IEP parsing pipeline in ai-svc: LLM extracts disability categories, accommodations, goals, grade level, communication system, assistive technology, recommended functioning level.
 
-6. Create iep\_profiles table with all parsed fields.
+6. Create iep_profiles table with all parsed fields.
 
 7. Build parent confirmation flow: display extracted IEP data, Confirm/Edit/Skip.
 
-8. Build Functioning Level Routing Engine: combine parent signals \+ IEP data → route to STANDARD/SUPPORTED/LOW\_VERBAL/NON\_VERBAL/PRE\_SYMBOLIC. If conflict, use MORE SUPPORTIVE level.
+8. Build Functioning Level Routing Engine: combine parent signals \+ IEP data → route to STANDARD/SUPPORTED/LOW_VERBAL/NON_VERBAL/PRE_SYMBOLIC. If conflict, use MORE SUPPORTIVE level.
 
-9. Create learner\_functioning\_levels table.
+9. Create learner_functioning_levels table.
 
 10. Build sensory profile questionnaire (category-leader feature): capture hyper/hypo/typical for visual, auditory, tactile, vestibular, proprioceptive.
 
-11. Create sensory\_profiles table.
+11. Create sensory_profiles table.
 
 ### **Week 6: Baseline Assessment (All Modes)**
 
@@ -144,23 +143,23 @@ This document provides granular, sprint-level guidance for building the AIVO Lea
 
 2. Build MODIFIED assessment mode: larger touch targets (48px), 3 choices, audio narration, 1.5x extended time, visual cues.
 
-3. Build PICTURE\_BASED assessment mode: questions as pictures with audio, 2 answer choices (large picture cards), touch-to-select, 5-minute cap, celebration animations.
+3. Build PICTURE_BASED assessment mode: questions as pictures with audio, 2 answer choices (large picture cards), touch-to-select, 5-minute cap, celebration animations.
 
-4. Build SWITCH\_SCAN assessment mode: 2 large options highlight sequentially (2s dwell time), switch activation to select.
+4. Build SWITCH_SCAN assessment mode: 2 large options highlight sequentially (2s dwell time), switch activation to select.
 
-5. Build PARTNER\_ASSISTED assessment mode: adult reads choices, observes child’s response (looked at, reached for, vocalized, no clear response), records with confidence level.
+5. Build PARTNER_ASSISTED assessment mode: adult reads choices, observes child’s response (looked at, reached for, vocalized, no clear response), records with confidence level.
 
-6. Build OBSERVATIONAL assessment mode (PRE\_SYMBOLIC): parent completes structured checklist, no child interaction with device. Create observational\_assessments table.
+6. Build OBSERVATIONAL assessment mode (PRE_SYMBOLIC): parent completes structured checklist, no child interaction with device. Create observational_assessments table.
 
-7. Build adaptive item selection engine: domains adapt per functioning level. STANDARD: Reading, Writing, Math, Social-Emotional, Executive Function. LOW\_VERBAL+: Communication, Pre-Academic, Self-Care, Social, Motor/Sensory.
+7. Build adaptive item selection engine: domains adapt per functioning level. STANDARD: Reading, Writing, Math, Social-Emotional, Executive Function. LOW_VERBAL+: Communication, Pre-Academic, Self-Care, Social, Motor/Sensory.
 
 8. Build response time tracking per question (disability signal detection).
 
 ### **Week 7: Synthesis Engine \+ E2E Tests**
 
-1. Build Synthesis Engine with weighted scoring: STANDARD: 70% child \+ 30% parent. LOW\_VERBAL: 50% child \+ 30% parent \+ 20% IEP. NON\_VERBAL/PRE\_SYMBOLIC: 40% parent \+ 60% IEP.
+1. Build Synthesis Engine with weighted scoring: STANDARD: 70% child \+ 30% parent. LOW_VERBAL: 50% child \+ 30% parent \+ 20% IEP. NON_VERBAL/PRE_SYMBOLIC: 40% parent \+ 60% IEP.
 
-2. Calculate per-domain level scores (0.0–1.0). Estimate grade band per domain (PRE\_K through SIXTH\_PLUS).
+2. Calculate per-domain level scores (0.0–1.0). Estimate grade band per domain (PRE_K through SIXTH_PLUS).
 
 3. Map IEP goals to curriculum alignment targets.
 
@@ -180,13 +179,13 @@ This document provides granular, sprint-level guidance for building the AIVO Lea
 
 1. Build brain-svc: Python FastAPI scaffold with /docs, health checks, Prometheus metrics.
 
-2. Create tables: brain\_seed\_templates, brain\_states, brain\_state\_snapshots, brain\_episodes, brain\_insights, brain\_recommendations, functional\_milestones.
+2. Create tables: brain_seed_templates, brain_states, brain_state_snapshots, brain_episodes, brain_insights, brain_recommendations, functional_milestones.
 
 3. Build Brain seed template management: templates per grade band, disability profile, and functioning level.
 
-4. Build Brain clone pipeline (NATS subscriber for assessment.baseline.completed): select seed template → deep copy → inject domain scores → inject disability signals → inject functioning level → inject IEP data → inject sensory profile → resolve accommodations → map IEP goals → initialize functional curriculum tracker → save snapshot → INSERT brain\_states → seed Redis episodic namespace.
+4. Build Brain clone pipeline (NATS subscriber for assessment.baseline.completed): select seed template → deep copy → inject domain scores → inject disability signals → inject functioning level → inject IEP data → inject sensory profile → resolve accommodations → map IEP goals → initialize functional curriculum tracker → save snapshot → INSERT brain_states → seed Redis episodic namespace.
 
-5. Build Brain state JSONB structure: mastery\_levels, disability\_signals, functioning\_level\_profile, iep\_profile, sensory\_profile, active\_accommodations, curriculum\_alignment, active\_tutors, functional\_curriculum.
+5. Build Brain state JSONB structure: mastery_levels, disability_signals, functioning_level_profile, iep_profile, sensory_profile, active_accommodations, curriculum_alignment, active_tutors, functional_curriculum.
 
 6. Build Redis hot cache for Brain context (\< 50ms fetch target).
 
@@ -194,33 +193,33 @@ This document provides granular, sprint-level guidance for building the AIVO Lea
 
 ### **Week 9: Versioning, Rollback & Recommendations**
 
-1. Build Brain versioning: snapshot before every significant mutation. Trigger types: initial\_clone, parent\_approved, mastery\_threshold, rebaseline, main\_brain\_upgrade, tutor\_addon\_activated/deactivated.
+1. Build Brain versioning: snapshot before every significant mutation. Trigger types: initial_clone, parent_approved, mastery_threshold, rebaseline, main_brain_upgrade, tutor_addon_activated/deactivated.
 
 2. Build rollback API: restore Brain state from any snapshot. Parent approval required.
 
 3. Build recommendation engine: generate recommendations based on mastery patterns, session analysis, accommodation effectiveness.
 
-4. Implement all recommendation types: brain\_profile\_review, path\_adjustment, accommodation\_add/remove, goal\_suggestion, curriculum\_shift, rebaseline, brain\_upgrade, regression\_alert, tutor\_suggestion, functioning\_level\_change, iep\_goal\_met, iep\_refresh.
+4. Implement all recommendation types: brain_profile_review, path_adjustment, accommodation_add/remove, goal_suggestion, curriculum_shift, rebaseline, brain_upgrade, regression_alert, tutor_suggestion, functioning_level_change, iep_goal_met, iep_refresh.
 
 5. Build parent approval loop API: APPROVE (apply change), DECLINE (log, re-approach in ≥14 days), ADJUST (accept parent insight as first-class Brain input).
 
 6. Build regression detection: ≥15% mastery drop in any domain within 14 days triggers alert.
 
-7. Build causal analysis engine (category-leader): correlate regression with session frequency, time-of-day, accommodation changes, parent\_reported\_events, school calendar. Present causal hypothesis to parent.
+7. Build causal analysis engine (category-leader): correlate regression with session frequency, time-of-day, accommodation changes, parent_reported_events, school calendar. Present causal hypothesis to parent.
 
-8. Create parent\_reported\_events table for environmental factor tracking.
+8. Create parent_reported_events table for environmental factor tracking.
 
 9. Build Brain context API: GET /brain/{learnerId}/context returns full context for content generation.
 
 ### **Week 10: Functional Curriculum \+ Brain E2E**
 
-1. Build functional curriculum tracker for LOW\_VERBAL/NON\_VERBAL/PRE\_SYMBOLIC learners: milestones across Communication, Self-Care, Social-Emotional, Pre-Academic, Motor/Sensory domains.
+1. Build functional curriculum tracker for LOW_VERBAL/NON_VERBAL/PRE_SYMBOLIC learners: milestones across Communication, Self-Care, Social-Emotional, Pre-Academic, Motor/Sensory domains.
 
-2. Build milestone progression API: not\_started → emerging → developing → achieved. Evidence notes and observation timestamps.
+2. Build milestone progression API: not_started → emerging → developing → achieved. Evidence notes and observation timestamps.
 
 3. Build parent Brain profile reveal page (adapted per functioning level). IEP goals integration display. Accommodation list. APPROVE/ADD INSIGHTS/DECLINE buttons.
 
-4. Build SendGrid email: brain\_profile\_reveal template.
+4. Build SendGrid email: brain_profile_reveal template.
 
 5. Write comprehensive E2E tests: assessment completion → Brain clone → Brain state persisted and retrievable → IEP data in Brain context → sensory profile in Brain context → functioning level correct → snapshot created → rollback works → recommendation created → parent approval flow → Brain context API returns complete data.
 
@@ -228,7 +227,7 @@ This document provides granular, sprint-level guidance for building the AIVO Lea
 
 7. Generate OpenAPI spec for brain-svc.
 
-**Gate: 95% E2E on Brain lifecycle. Clone triggered after assessment. Brain state persisted and retrievable with all fields (including sensory\_profile and IEP data). Version snapshot created. Rollback works. Recommendations generated and resolvable. Brain context API returns complete real data. NATS events published and consumed. OpenAPI spec generated. Circuit breakers active.**
+**Gate: 95% E2E on Brain lifecycle. Clone triggered after assessment. Brain state persisted and retrievable with all fields (including sensory_profile and IEP data). Version snapshot created. Rollback works. Recommendations generated and resolvable. Brain context API returns complete real data. NATS events published and consumed. OpenAPI spec generated. Circuit breakers active.**
 
 # **Phase 2 — Learning Engine \+ Core 7 AI Tutors (Weeks 11–18)**
 
@@ -238,11 +237,11 @@ This document provides granular, sprint-level guidance for building the AIVO Lea
 
 1. Build ai-svc LiteLLM gateway: Anthropic Claude (primary), Google Gemini (secondary), OpenAI GPT (tertiary). Automatic failover.
 
-2. Build 3-layer prompt construction: Layer 1 (Main Brain system prompt from RAG), Layer 2 (Learner Brain context including sensory\_profile), Layer 3 (session request).
+2. Build 3-layer prompt construction: Layer 1 (Main Brain system prompt from RAG), Layer 2 (Learner Brain context including sensory_profile), Layer 3 (session request).
 
 3. Build Content Quality Gate: Gate 1 (Safety screening), Gate 2 (Readability vs delivery level), Gate 3 (Accommodation \+ functioning level compliance \+ sensory profile compliance).
 
-4. Build sensory-aware content generation rules: adjust color intensity, animation speed, visual complexity, text density, sound parameters based on sensory\_profile.
+4. Build sensory-aware content generation rules: adjust color intensity, animation speed, visual complexity, text density, sound parameters based on sensory_profile.
 
 5. Build grade gap scaffolding: generate at enrolled grade OBJECTIVES, deliver at actual delivery level LANGUAGE. Half-grade steps automatic, full grade band \= parent approval.
 
@@ -262,7 +261,7 @@ This document provides granular, sprint-level guidance for building the AIVO Lea
 
 5. Build gradebook with subject mastery bars.
 
-6. Build low-functioning content delivery: LOW\_VERBAL (picture-card mode, 1 sentence/screen, 2 choices, audio-first), NON\_VERBAL (partner-assisted with facilitator guide), PRE\_SYMBOLIC (parent activity guides).
+6. Build low-functioning content delivery: LOW_VERBAL (picture-card mode, 1 sentence/screen, 2 choices, audio-first), NON_VERBAL (partner-assisted with facilitator guide), PRE_SYMBOLIC (parent activity guides).
 
 7. Build parent co-learning mode (category-leader): parent joins session, tutor coaches parent in real-time, post-session parent coaching notes generated.
 
@@ -278,9 +277,9 @@ This document provides granular, sprint-level guidance for building the AIVO Lea
 
 1. Build tutor-svc: Fastify scaffold with Swagger, provisioning pipeline, session management.
 
-2. Build tutor subscription → Brain activation pipeline: billing-svc creates subscription\_item → NATS tutor.addon.activated → brain-svc adds to active\_tutors → learning-svc enables tutor session type \+ homework helper.
+2. Build tutor subscription → Brain activation pipeline: billing-svc creates subscription_item → NATS tutor.addon.activated → brain-svc adds to active_tutors → learning-svc enables tutor session type \+ homework helper.
 
-3. Create tutor\_subscriptions table.
+3. Create tutor_subscriptions table.
 
 4. Build SubjectTutorAgent in ai-svc: loads Brain context at session start, persona identity \+ subject strategy block \+ Brain context \+ IEP accommodations \+ sensory profile \+ spaced repetition due items injected into system prompt.
 
@@ -290,7 +289,7 @@ This document provides granular, sprint-level guidance for building the AIVO Lea
 
 7. Build first 3 tutor personas: Nova (Math — cosmos-themed, visual, step-by-step), Sage (ELA — narrative-driven), Echo (Speech & Language — articulation practice, AAC integration).
 
-8. Build tutor adaptation per functioning level: SUPPORTED (simpler language), LOW\_VERBAL (picture-based, 2-choice, 3–5 min), NON\_VERBAL (partner-assisted), PRE\_SYMBOLIC (parent coaching agent).
+8. Build tutor adaptation per functioning level: SUPPORTED (simpler language), LOW_VERBAL (picture-based, 2-choice, 3–5 min), NON_VERBAL (partner-assisted), PRE_SYMBOLIC (parent coaching agent).
 
 9. Build mastery write-back: NATS tutor.session.completed → brain-svc updates per-skill mastery.
 
@@ -300,9 +299,9 @@ This document provides granular, sprint-level guidance for building the AIVO Lea
 
 2. Build tutor store UI on parent dashboard: browse all tutors, see subject/persona/price, subscribe, manage active tutors.
 
-3. Build tutor deprovisioning: billing-svc cancellation → 7-day grace period → NATS tutor.addon.deactivated → brain-svc removes from active\_tutors \+ disables homework helper. Mastery data preserved permanently.
+3. Build tutor deprovisioning: billing-svc cancellation → 7-day grace period → NATS tutor.addon.deactivated → brain-svc removes from active_tutors \+ disables homework helper. Mastery data preserved permanently.
 
-4. Build SendGrid emails: tutor\_activated, tutor\_deactivated templates.
+4. Build SendGrid emails: tutor_activated, tutor_deactivated templates.
 
 5. Build subscription bundle logic: Core 7 bundle, individual add-on, subject packs.
 
@@ -332,9 +331,9 @@ This document provides granular, sprint-level guidance for building the AIVO Lea
 
 8. Build completion quality calculation (0.0–1.0) and NATS event homework.session.completed → brain-svc mastery update \+ spaced repetition schedule update.
 
-9. Build LOW\_VERBAL homework mode: parent-mediated, picture-supported problems. NON\_VERBAL/PRE\_SYMBOLIC: parent guide mode with functional skill equivalents.
+9. Build LOW_VERBAL homework mode: parent-mediated, picture-supported problems. NON_VERBAL/PRE_SYMBOLIC: parent guide mode with functional skill equivalents.
 
-10. Create homework\_assignments table.
+10. Create homework_assignments table.
 
 11. Write E2E tests: photo upload → OCR extracts real text → subject detected → subscription verified → homework adapted → session with real LLM → mastery updated → locked state for unsubscribed subjects.
 
@@ -342,21 +341,21 @@ This document provides granular, sprint-level guidance for building the AIVO Lea
 
 1. Build parent approval loop UI: recommendation inbox, APPROVE/DECLINE/ADJUST actions, insight text box.
 
-2. Build teacher profile access: invite flow (B2C: parent invites, B2B: teacher invites parent), read-only Brain view, insight submission, teacher\_insight recommendation creation.
+2. Build teacher profile access: invite flow (B2C: parent invites, B2B: teacher invites parent), read-only Brain view, insight submission, teacher_insight recommendation creation.
 
 3. Build caregiver invitation: 2 slots, simplified Brain summary view, observation submission.
 
-4. Build Therapist/BCBA role (category-leader): parent invites therapist, HIPAA-scoped read-only Brain access, therapy goal alignment UI, session notes submission → Brain insight. Create therapy\_sessions and therapy\_goals tables.
+4. Build Therapist/BCBA role (category-leader): parent invites therapist, HIPAA-scoped read-only Brain access, therapy goal alignment UI, session notes submission → Brain insight. Create therapy_sessions and therapy_goals tables.
 
 5. Build IEP goal tracking on parent dashboard: progress toward each IEP goal, baseline vs. current, trend line.
 
-6. Build IEP Meeting Progress Report generator (category-leader): formatted PDF mapping Brain data to IEP goal language, session logs as evidence, accommodation effectiveness. Auto-generate before iep\_profiles.review\_date.
+6. Build IEP Meeting Progress Report generator (category-leader): formatted PDF mapping Brain data to IEP goal language, session logs as evidence, accommodation effectiveness. Auto-generate before iep_profiles.review_date.
 
-7. Build IEP refresh reminders: iep\_refresh recommendation at 10 months post-upload.
+7. Build IEP refresh reminders: iep_refresh recommendation at 10 months post-upload.
 
 8. Build conflict resolution: when parent and teacher insights conflict, Brain surfaces conflict resolution recommendation to parent.
 
-9. Build SendGrid emails: iep\_goal\_met, iep\_refresh\_reminder, functioning\_level\_change, weekly\_progress\_digest.
+9. Build SendGrid emails: iep_goal_met, iep_refresh_reminder, functioning_level_change, weekly_progress_digest.
 
 10. ENTERPRISE: Extend Playwright a11y tests (axe-core) to all apps/web dashboard routes. WCAG 2.1 AA compliance. Add keyboard-only navigation test suite.
 
@@ -368,9 +367,9 @@ This document provides granular, sprint-level guidance for building the AIVO Lea
 
 2. Each tutor: unique system prompt, subject strategy block, functioning-level adaptations, sensory profile integration.
 
-3. Build Compass tutor’s Transition Planning Module (category-leader): vocational interests assessment, independent living skills tracking, community participation, self-advocacy, post-secondary planning. Create transition\_plans table.
+3. Build Compass tutor’s Transition Planning Module (category-leader): vocational interests assessment, independent living skills tracking, community participation, self-advocacy, post-secondary planning. Create transition_plans table.
 
-4. Build Lingua tutor’s Multilingual Brain integration (category-leader): language dominance tracking per domain, code-switching in sessions, bilingual content scaffolding. Create language\_profiles table.
+4. Build Lingua tutor’s Multilingual Brain integration (category-leader): language dominance tracking per domain, code-switching in sessions, bilingual content scaffolding. Create language_profiles table.
 
 5. Update tutor store UI with all 14 tutors, subject packs, Full K–12 bundle.
 
@@ -394,13 +393,13 @@ This document provides granular, sprint-level guidance for building the AIVO Lea
 
 5. Build gamification dashboard: XP card, streak flame, challenges list, leaderboard preview, badge cabinet.
 
-6. Build low-functioning gamification: LOW\_VERBAL (celebration-first, star rewards, no leaderboard, sensory-friendly animations), NON\_VERBAL (cause-and-effect rewards), PRE\_SYMBOLIC (parent-facing gamification only).
+6. Build low-functioning gamification: LOW_VERBAL (celebration-first, star rewards, no leaderboard, sensory-friendly animations), NON_VERBAL (cause-and-effect rewards), PRE_SYMBOLIC (parent-facing gamification only).
 
-7. Wire Brain integration: XP awards update engagement\_profile, badges recorded in episodic memory.
+7. Wire Brain integration: XP awards update engagement_profile, badges recorded in episodic memory.
 
-8. Build SendGrid emails: streak\_broken, badge\_earned.
+8. Build SendGrid emails: streak_broken, badge_earned.
 
-9. Build sibling profile awareness (category-leader): sibling\_links table, family XP leaderboard (opt-in), collaborative activities between siblings.
+9. Build sibling profile awareness (category-leader): sibling_links table, family XP leaderboard (opt-in), collaborative activities between siblings.
 
 ## **Module 4B: Avatar & Rewards Shop (Week 27\)**
 
@@ -422,7 +421,7 @@ Quiz battles (1v1), team challenges, weekly tournaments. Invite code system (8-c
 
 3. Build break activities: guided breaks triggered by attention signals, 5 XP per break.
 
-4. Build teacher lesson plan generator (category-leader): teacher clicks “Generate Lesson Plan” → Brain-informed, accommodation-compliant lesson plan for classroom, differentiated instruction groups, suggested activities aligned to district curriculum, formative assessment suggestions. Create lesson\_plans table. PDF/docx export.
+4. Build teacher lesson plan generator (category-leader): teacher clicks “Generate Lesson Plan” → Brain-informed, accommodation-compliant lesson plan for classroom, differentiated instruction groups, suggested activities aligned to district curriculum, formative assessment suggestions. Create lesson_plans table. PDF/docx export.
 
 5. ENTERPRISE: Implement HashiCorp Vault for secrets management. 90-day API key rotation, 30-day DB credentials.
 
@@ -466,9 +465,9 @@ Quiz battles (1v1), team challenges, weekly tournaments. Invite code system (8-c
 
 3. Build mobile gamification: streak card, badge cabinet, shop, quest map.
 
-4. Build AAC device bi-directional integration (category-leader): vocabulary sync protocol with Proloquo2Go, TouchChat, LAMP Words for Life. Create aac\_vocabulary\_sync table.
+4. Build AAC device bi-directional integration (category-leader): vocabulary sync protocol with Proloquo2Go, TouchChat, LAMP Words for Life. Create aac_vocabulary_sync table.
 
-5. Build all remaining SendGrid templates: status\_incident (wire existing stub in status-page-svc).
+5. Build all remaining SendGrid templates: status_incident (wire existing stub in status-page-svc).
 
 6. Build Brain data export: GDPR-compliant ZIP with human-readable summary \+ raw JSON \+ all session history \+ IEP data \+ functional milestones \+ tutor/homework history.
 
@@ -488,45 +487,45 @@ Quiz battles (1v1), team challenges, weekly tournaments. Invite code system (8-c
 
 # **Appendix A — Module Gate Checklist (Copy for Each Module)**
 
-* 1\. 95% E2E Test Coverage — Playwright, real services, real DB, real NATS, real Redis, real LLM (low-cost model).
+- 1\. 95% E2E Test Coverage — Playwright, real services, real DB, real NATS, real Redis, real LLM (low-cost model).
 
-* 2\. 80% Unit Test Coverage — c8/Vitest (TS), pytest-cov (Python). CI gates enforced.
+- 2\. 80% Unit Test Coverage — c8/Vitest (TS), pytest-cov (Python). CI gates enforced.
 
-* 3\. Zero Stubs in Production — No TODO/FIXME, no placeholder responses, no console.log handlers. Grep audit clean.
+- 3\. Zero Stubs in Production — No TODO/FIXME, no placeholder responses, no console.log handlers. Grep audit clean.
 
-* 4\. All Routes Wired — Every API route → real service function → real DB query. Every NATS event has a subscriber.
+- 4\. All Routes Wired — Every API route → real service function → real DB query. Every NATS event has a subscriber.
 
-* 5\. All Buttons Click-Through — Every button navigates to real page or triggers real API call with real feedback.
+- 5\. All Buttons Click-Through — Every button navigates to real page or triggers real API call with real feedback.
 
-* 6\. Cross-Module Integration — E2E tests for this module call dependent module’s real API. Full event chains verified.
+- 6\. Cross-Module Integration — E2E tests for this module call dependent module’s real API. Full event chains verified.
 
-* 7\. Error Handling Complete — Proper HTTP status codes. User-friendly error messages. Network failure handling.
+- 7\. Error Handling Complete — Proper HTTP status codes. User-friendly error messages. Network failure handling.
 
-* 8\. Performance Baseline Met — All targets from NFRs verified. No endpoint exceeds 2x target.
+- 8\. Performance Baseline Met — All targets from NFRs verified. No endpoint exceeds 2x target.
 
-* 9\. Email Templates Brand-Compliant — SendGrid. Brand audit passes. CTA links resolve. UTM parameters. Dev fallback works.
+- 9\. Email Templates Brand-Compliant — SendGrid. Brand audit passes. CTA links resolve. UTM parameters. Dev fallback works.
 
-* 10\. UI/UX Brand-Compliant — @aivo/brand tokens. axe-core: zero critical/serious. Responsive 375px/768px/1280px. Dark mode.
+- 10\. UI/UX Brand-Compliant — @aivo/brand tokens. axe-core: zero critical/serious. Responsive 375px/768px/1280px. Dark mode.
 
-* 11\. OpenAPI Spec Generated — Swagger UI accessible for all new/modified endpoints. Contract tests passing.
+- 11\. OpenAPI Spec Generated — Swagger UI accessible for all new/modified endpoints. Contract tests passing.
 
 # **Appendix B — Complete Tutor Catalog (14 Tutors)**
 
-| \# | Tutor | Subject | Phase | SKU |
-| :---- | :---- | :---- | :---- | :---- |
-| 1 | **Nova** | Mathematics | Phase 2 (Core) | ADDON\_TUTOR\_MATH |
-| 2 | **Sage** | English Language Arts | Phase 2 (Core) | ADDON\_TUTOR\_ELA |
-| 3 | **Spark** | Science | Phase 2 (Core) | ADDON\_TUTOR\_SCIENCE |
-| 4 | **Chrono** | History | Phase 2 (Core) | ADDON\_TUTOR\_HISTORY |
-| 5 | **Pixel** | Coding & CS | Phase 2 (Core) | ADDON\_TUTOR\_CODING |
-| 6 | **Echo** | Speech & Language | Phase 2 (Core) | ADDON\_TUTOR\_SPEECH |
-| 7 | **Harmony** | Social-Emotional Learning | Phase 2 (Core) | ADDON\_TUTOR\_SEL |
-| 8 | **Atlas** | Social Studies / Civics | Phase 3 (Expansion) | ADDON\_TUTOR\_SOCIAL\_STUDIES |
-| 9 | **Cadence** | Music & Arts | Phase 3 (Expansion) | ADDON\_TUTOR\_ARTS |
-| 10 | **Vigor** | PE / Health & Wellness | Phase 3 (Expansion) | ADDON\_TUTOR\_PE\_HEALTH |
-| 11 | **Lingua** | World Languages | Phase 3 (Expansion) | ADDON\_TUTOR\_LANGUAGES |
-| 12 | **Forge** | Engineering / STEM Design | Phase 3 (Expansion) | ADDON\_TUTOR\_STEM\_DESIGN |
-| 13 | **Compass** | Life Skills / Transition | Phase 3 (Expansion) | ADDON\_TUTOR\_LIFE\_SKILLS |
-| 14 | **Muse** | Creative Writing / Media | Phase 3 (Expansion) | ADDON\_TUTOR\_CREATIVE\_WRITING |
+| \#  | Tutor       | Subject                   | Phase               | SKU                          |
+| :-- | :---------- | :------------------------ | :------------------ | :--------------------------- |
+| 1   | **Nova**    | Mathematics               | Phase 2 (Core)      | ADDON_TUTOR_MATH             |
+| 2   | **Sage**    | English Language Arts     | Phase 2 (Core)      | ADDON_TUTOR_ELA              |
+| 3   | **Spark**   | Science                   | Phase 2 (Core)      | ADDON_TUTOR_SCIENCE          |
+| 4   | **Chrono**  | History                   | Phase 2 (Core)      | ADDON_TUTOR_HISTORY          |
+| 5   | **Pixel**   | Coding & CS               | Phase 2 (Core)      | ADDON_TUTOR_CODING           |
+| 6   | **Echo**    | Speech & Language         | Phase 2 (Core)      | ADDON_TUTOR_SPEECH           |
+| 7   | **Harmony** | Social-Emotional Learning | Phase 2 (Core)      | ADDON_TUTOR_SEL              |
+| 8   | **Atlas**   | Social Studies / Civics   | Phase 3 (Expansion) | ADDON_TUTOR_SOCIAL_STUDIES   |
+| 9   | **Cadence** | Music & Arts              | Phase 3 (Expansion) | ADDON_TUTOR_ARTS             |
+| 10  | **Vigor**   | PE / Health & Wellness    | Phase 3 (Expansion) | ADDON_TUTOR_PE_HEALTH        |
+| 11  | **Lingua**  | World Languages           | Phase 3 (Expansion) | ADDON_TUTOR_LANGUAGES        |
+| 12  | **Forge**   | Engineering / STEM Design | Phase 3 (Expansion) | ADDON_TUTOR_STEM_DESIGN      |
+| 13  | **Compass** | Life Skills / Transition  | Phase 3 (Expansion) | ADDON_TUTOR_LIFE_SKILLS      |
+| 14  | **Muse**    | Creative Writing / Media  | Phase 3 (Expansion) | ADDON_TUTOR_CREATIVE_WRITING |
 
-*End of Build Guide*
+_End of Build Guide_

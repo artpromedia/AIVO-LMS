@@ -31,7 +31,13 @@ interface EngagementProfile {
   level: number;
   xpForNextLevel: number;
   xpProgress: number;
-  streak: { current: number; longest: number; tier: string; lastActivity: string | null; freezesUsed: number };
+  streak: {
+    current: number;
+    longest: number;
+    tier: string;
+    lastActivity: string | null;
+    freezesUsed: number;
+  };
   badges: { id: string; badgeType: string; name: string; rarity: string; earnedAt: string }[];
   currency: { coins: number; gems: number };
 }
@@ -43,7 +49,11 @@ export function LearnerHome() {
   const tc = useTranslations("common");
   const TABS = [
     { id: "today", label: t("tab_today"), icon: <Backpack className="w-5 h-5" aria-hidden /> },
-    { id: "adventures", label: t("tab_adventures"), icon: <MapIcon className="w-5 h-5" aria-hidden /> },
+    {
+      id: "adventures",
+      label: t("tab_adventures"),
+      icon: <MapIcon className="w-5 h-5" aria-hidden />,
+    },
     { id: "rewards", label: t("tab_rewards"), icon: <Gift className="w-5 h-5" aria-hidden /> },
   ];
   const TABS_LOW = [
@@ -116,7 +126,9 @@ export function LearnerHome() {
       .catch(() => {});
   }, [accessToken, user]);
 
-  useEffect(() => { fetchProfile(); }, [fetchProfile]);
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
   useEffect(() => {
     if (!accessToken || !user) return;
@@ -189,7 +201,10 @@ export function LearnerHome() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-950 via-indigo-950 to-slate-950 flex flex-col items-center justify-center px-6">
         <main id="main-content" tabIndex={-1} className="max-w-md text-center">
-          <div className="w-24 h-24 rounded-3xl bg-purple-500/20 text-purple-200 flex items-center justify-center mx-auto mb-6 animate-pulse" aria-hidden="true">
+          <div
+            className="w-24 h-24 rounded-3xl bg-purple-500/20 text-purple-200 flex items-center justify-center mx-auto mb-6 animate-pulse"
+            aria-hidden="true"
+          >
             <BrainIcon className="w-12 h-12" strokeWidth={2} />
           </div>
           <h1 className="text-3xl font-heading font-bold text-white mb-3">{t("approval_title")}</h1>
@@ -199,7 +214,9 @@ export function LearnerHome() {
           <div className="bg-white/10 backdrop-blur rounded-2xl p-6 mb-6">
             <div className="flex items-center justify-center gap-3 mb-3">
               <div className="w-3 h-3 rounded-full bg-amber-400 animate-pulse" />
-              <p className="text-amber-300 font-heading font-bold text-sm">{t("approval_waiting")}</p>
+              <p className="text-amber-300 font-heading font-bold text-sm">
+                {t("approval_waiting")}
+              </p>
             </div>
             <p className="text-white/40 text-xs">{t("approval_instruction")}</p>
           </div>
@@ -214,8 +231,13 @@ export function LearnerHome() {
     );
   }
 
-  const xpPercent = profile ? Math.min(100, (profile.xpProgress / profile.xpForNextLevel) * 100) : 0;
-  const isLow = functioningLevel === "LOW_VERBAL" || functioningLevel === "NON_VERBAL" || functioningLevel === "PRE_SYMBOLIC";
+  const xpPercent = profile
+    ? Math.min(100, (profile.xpProgress / profile.xpForNextLevel) * 100)
+    : 0;
+  const isLow =
+    functioningLevel === "LOW_VERBAL" ||
+    functioningLevel === "NON_VERBAL" ||
+    functioningLevel === "PRE_SYMBOLIC";
 
   return (
     <FlVariantProvider level={functioningLevel}>
@@ -302,8 +324,22 @@ export function LearnerHome() {
                 {activeTab === "today" && (
                   <TodayTab
                     missions={[
-                      { id: "m1", title: t("mission_nova_session"), tutorKey: "nova", progress: 0, target: 1, xpReward: 25 },
-                      { id: "m2", title: t("mission_sage_reading"), tutorKey: "sage", progress: 0, target: 1, xpReward: 25 },
+                      {
+                        id: "m1",
+                        title: t("mission_nova_session"),
+                        tutorKey: "nova",
+                        progress: 0,
+                        target: 1,
+                        xpReward: 25,
+                      },
+                      {
+                        id: "m2",
+                        title: t("mission_sage_reading"),
+                        tutorKey: "sage",
+                        progress: 0,
+                        target: 1,
+                        xpReward: 25,
+                      },
                     ]}
                     onSelCheckin={handleSelCheckin}
                   />

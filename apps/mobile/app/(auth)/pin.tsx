@@ -1,84 +1,95 @@
-import React, { useState, useCallback } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
-import { useTranslation } from '@/hooks/useTranslation';
-import * as Haptics from 'expo-haptics';
-import { useAuth } from '@/hooks/useAuth';
-import { colors, spacing } from '@/constants/colors';
+import React, { useState, useCallback } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { router } from "expo-router";
+import { useTranslation } from "@/hooks/useTranslation";
+import * as Haptics from "expo-haptics";
+import { useAuth } from "@/hooks/useAuth";
+import { colors, spacing } from "@/constants/colors";
 
 export default function PinScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const { loginWithPin } = useAuth();
-  const [parentId, setParentId] = useState('');
-  const [pin, setPin] = useState('');
-  const [error, setError] = useState('');
+  const [parentId, setParentId] = useState("");
+  const [pin, setPin] = useState("");
+  const [error, setError] = useState("");
   const [attempts, setAttempts] = useState(0);
-  const [step, setStep] = useState<'parent' | 'pin'>('parent');
+  const [step, setStep] = useState<"parent" | "pin">("parent");
 
   const handleParentSubmit = useCallback(() => {
     if (!parentId.trim()) {
-      setError(t('auth.pleaseEnterParentEmail'));
+      setError(t("auth.pleaseEnterParentEmail"));
       return;
     }
-    setError('');
-    setStep('pin');
+    setError("");
+    setStep("pin");
   }, [parentId, t]);
 
-  const handlePress = useCallback(async (digit: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    const newPin = pin + digit;
-    setPin(newPin);
-    setError('');
+  const handlePress = useCallback(
+    async (digit: string) => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      const newPin = pin + digit;
+      setPin(newPin);
+      setError("");
 
-    if (newPin.length === 4) {
-      const result = await loginWithPin(newPin, parentId.trim());
-      if (result.success) {
-        router.replace('/');
-      } else {
-        setAttempts(prev => prev + 1);
-        setPin('');
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-        if (attempts >= 4) {
-          setError(t('auth.tooManyAttempts'));
+      if (newPin.length === 4) {
+        const result = await loginWithPin(newPin, parentId.trim());
+        if (result.success) {
+          router.replace("/");
         } else {
-          setError(t('auth.incorrectPin'));
+          setAttempts((prev) => prev + 1);
+          setPin("");
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          if (attempts >= 4) {
+            setError(t("auth.tooManyAttempts"));
+          } else {
+            setError(t("auth.incorrectPin"));
+          }
         }
       }
-    }
-  }, [pin, attempts, loginWithPin, parentId, t]);
+    },
+    [pin, attempts, loginWithPin, parentId, t],
+  );
 
   const handleDelete = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setPin(prev => prev.slice(0, -1));
+    setPin((prev) => prev.slice(0, -1));
   }, []);
 
-  const digits = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'del'];
+  const digits = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "del"];
 
-  if (step === 'parent') {
+  if (step === "parent") {
     return (
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <View style={[styles.container, { paddingTop: insets.top + 40 }]}>
           <Pressable onPress={() => router.back()} style={styles.back}>
-            <Text style={styles.backText}>{t('common.back')}</Text>
+            <Text style={styles.backText}>{t("common.back")}</Text>
           </Pressable>
 
           <View style={styles.header}>
             <View style={styles.avatarCircle}>
               <Text style={styles.avatarEmoji}>🎓</Text>
             </View>
-            <Text style={styles.title}>{t('auth.learnerLogin')}</Text>
-            <Text style={styles.subtitle}>{t('auth.enterParentEmail')}</Text>
+            <Text style={styles.title}>{t("auth.learnerLogin")}</Text>
+            <Text style={styles.subtitle}>{t("auth.enterParentEmail")}</Text>
           </View>
 
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
-              placeholder={t('auth.parentEmailPlaceholder')}
+              placeholder={t("auth.parentEmailPlaceholder")}
               placeholderTextColor="rgba(255,255,255,0.4)"
               value={parentId}
               onChangeText={setParentId}
@@ -92,7 +103,7 @@ export default function PinScreen() {
               onPress={handleParentSubmit}
               disabled={!parentId.trim()}
             >
-              <Text style={styles.continueBtnText}>{t('auth.continueToPin')}</Text>
+              <Text style={styles.continueBtnText}>{t("auth.continueToPin")}</Text>
             </Pressable>
           </View>
         </View>
@@ -102,20 +113,27 @@ export default function PinScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + 40 }]}>
-      <Pressable onPress={() => { setStep('parent'); setPin(''); setError(''); }} style={styles.back}>
-        <Text style={styles.backText}>{t('common.back')}</Text>
+      <Pressable
+        onPress={() => {
+          setStep("parent");
+          setPin("");
+          setError("");
+        }}
+        style={styles.back}
+      >
+        <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
 
       <View style={styles.header}>
         <View style={styles.avatarCircle}>
           <Text style={styles.avatarEmoji}>🎓</Text>
         </View>
-        <Text style={styles.title}>{t('auth.enterYourPin')}</Text>
+        <Text style={styles.title}>{t("auth.enterYourPin")}</Text>
         {error ? <Text style={styles.error}>{error}</Text> : null}
       </View>
 
       <View style={styles.dotsRow}>
-        {[0, 1, 2, 3].map(i => (
+        {[0, 1, 2, 3].map((i) => (
           <View
             key={i}
             style={[
@@ -129,8 +147,8 @@ export default function PinScreen() {
 
       <View style={styles.pad}>
         {digits.map((d, i) => {
-          if (d === '') return <View key={i} style={styles.padKey} />;
-          if (d === 'del') {
+          if (d === "") return <View key={i} style={styles.padKey} />;
+          if (d === "del") {
             return (
               <Pressable
                 key={i}
@@ -161,21 +179,21 @@ export default function PinScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1A1A2E',
-    alignItems: 'center',
+    backgroundColor: "#1A1A2E",
+    alignItems: "center",
     paddingHorizontal: spacing.lg,
   },
   back: {
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
     marginBottom: 20,
   },
   backText: {
-    color: 'rgba(255,255,255,0.7)',
+    color: "rgba(255,255,255,0.7)",
     fontSize: 16,
-    fontFamily: 'Nunito-SemiBold',
+    fontFamily: "Nunito-SemiBold",
   },
   header: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 32,
   },
   avatarCircle: {
@@ -183,8 +201,8 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
     backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 16,
   },
   avatarEmoji: {
@@ -192,41 +210,41 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontFamily: 'Nunito-ExtraBold',
-    color: '#FFFFFF',
+    fontFamily: "Nunito-ExtraBold",
+    color: "#FFFFFF",
   },
   subtitle: {
     fontSize: 14,
-    fontFamily: 'Nunito-Regular',
-    color: 'rgba(255,255,255,0.6)',
+    fontFamily: "Nunito-Regular",
+    color: "rgba(255,255,255,0.6)",
     marginTop: 4,
   },
   error: {
     color: colors.error,
     fontSize: 14,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     marginTop: 8,
   },
   inputContainer: {
-    width: '100%',
+    width: "100%",
     maxWidth: 320,
     marginTop: 16,
   },
   input: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: "rgba(255,255,255,0.1)",
     borderRadius: 16,
     padding: 16,
     fontSize: 16,
-    fontFamily: 'Nunito-Regular',
-    color: '#FFFFFF',
+    fontFamily: "Nunito-Regular",
+    color: "#FFFFFF",
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderColor: "rgba(255,255,255,0.2)",
   },
   continueBtn: {
     backgroundColor: colors.primary,
     borderRadius: 16,
     padding: 16,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 16,
   },
   continueBtnDisabled: {
@@ -234,11 +252,11 @@ const styles = StyleSheet.create({
   },
   continueBtnText: {
     fontSize: 16,
-    fontFamily: 'Nunito-Bold',
-    color: '#FFFFFF',
+    fontFamily: "Nunito-Bold",
+    color: "#FFFFFF",
   },
   dotsRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 16,
     marginBottom: 40,
   },
@@ -247,7 +265,7 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.4)',
+    borderColor: "rgba(255,255,255,0.4)",
   },
   dotFilled: {
     backgroundColor: colors.primary,
@@ -257,9 +275,9 @@ const styles = StyleSheet.create({
     borderColor: colors.error,
   },
   pad: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
     width: 280,
     gap: 12,
   },
@@ -267,9 +285,9 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "rgba(255,255,255,0.1)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   padKeyPressed: {
     backgroundColor: colors.primary,
@@ -277,7 +295,7 @@ const styles = StyleSheet.create({
   },
   padKeyText: {
     fontSize: 28,
-    fontFamily: 'Nunito-ExtraBold',
-    color: '#FFFFFF',
+    fontFamily: "Nunito-ExtraBold",
+    color: "#FFFFFF",
   },
 });

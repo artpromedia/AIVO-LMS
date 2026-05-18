@@ -14,12 +14,12 @@ green, and the exit criteria the sprint cannot ship without.
 The critical dependency chain:
 
 > Auth + Consent + Curriculum
->  → Assessment / Brain / Baseline
->   → LessonRun
->    → Role Surfaces
->     → Mobile Unification
->      → Billing / Rostering / Comms
->       → AI Safety / Accessibility / Security Release
+> → Assessment / Brain / Baseline
+> → LessonRun
+> → Role Surfaces
+> → Mobile Unification
+> → Billing / Rostering / Comms
+> → AI Safety / Accessibility / Security Release
 
 Sprints inside the same band can overlap if and only if they touch
 disjoint workspaces. The default mode is strict-serial because most
@@ -101,7 +101,7 @@ audits, not by good intentions:
 - Refreshes `packages/api-client` (`api:dump`, `api:generate`,
   `api:check` all clean).
 - Adds/updates CI workflow to run install + lint + test + build + api:check
-  + prod:check + test:production-readiness.
+  - prod:check + test:production-readiness.
 - Exit: a fresh `pnpm install && pnpm build` succeeds from
   `docs/dev/local-dev.md` instructions.
 
@@ -162,7 +162,7 @@ audits, not by good intentions:
   `services/assessment-svc`, `services/learning-svc`, `services/tutor-svc`.
 - Removes any static `MOCK_QUESTIONS`. Wires baseline to parent
   assessment + brain profile + IEP-derived accommodations + skill graph
-  + item bank.
+  - item bank.
 - Implements LessonRun: intro → guided → practice → feedback →
   reflection → mastery event → resumable state.
 - Exit: lessons are real, stateful, resumable, auditable; parent

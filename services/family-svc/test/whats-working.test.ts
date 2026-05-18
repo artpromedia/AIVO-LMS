@@ -56,11 +56,31 @@ test("excludes sessions outside the trailing window", () => {
 test("ranks time-of-day windows by composite score", () => {
   const rows: SessionRow[] = [
     // Strong morning sessions.
-    row({ startedAt: "2026-04-28T09:00:00Z", accuracy: 0.9, frustrationRate: 0.05, attentionMinutes: 25 }),
-    row({ startedAt: "2026-04-27T09:30:00Z", accuracy: 0.85, frustrationRate: 0.1, attentionMinutes: 22 }),
+    row({
+      startedAt: "2026-04-28T09:00:00Z",
+      accuracy: 0.9,
+      frustrationRate: 0.05,
+      attentionMinutes: 25,
+    }),
+    row({
+      startedAt: "2026-04-27T09:30:00Z",
+      accuracy: 0.85,
+      frustrationRate: 0.1,
+      attentionMinutes: 22,
+    }),
     // Weak afternoon sessions.
-    row({ startedAt: "2026-04-28T15:00:00Z", accuracy: 0.5, frustrationRate: 0.5, attentionMinutes: 8 }),
-    row({ startedAt: "2026-04-27T16:00:00Z", accuracy: 0.45, frustrationRate: 0.55, attentionMinutes: 6 }),
+    row({
+      startedAt: "2026-04-28T15:00:00Z",
+      accuracy: 0.5,
+      frustrationRate: 0.5,
+      attentionMinutes: 8,
+    }),
+    row({
+      startedAt: "2026-04-27T16:00:00Z",
+      accuracy: 0.45,
+      frustrationRate: 0.55,
+      attentionMinutes: 6,
+    }),
   ];
   const r = computeWhatsWorking(rows, { now: NOW });
   // Server interprets startedAt in *local* time. The assertion is loose
@@ -74,9 +94,7 @@ test("ranks time-of-day windows by composite score", () => {
 });
 
 test("does not endorse a single-session window as best", () => {
-  const rows: SessionRow[] = [
-    row({ startedAt: "2026-04-28T09:00:00Z", accuracy: 0.95 }),
-  ];
+  const rows: SessionRow[] = [row({ startedAt: "2026-04-28T09:00:00Z", accuracy: 0.95 })];
   const r = computeWhatsWorking(rows, { now: NOW });
   assert.equal(r.bestWindow, null);
 });

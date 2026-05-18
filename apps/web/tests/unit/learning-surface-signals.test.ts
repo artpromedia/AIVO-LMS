@@ -21,10 +21,26 @@ test("counts ink strokes, erasures, tool changes, and latency", () => {
       ],
     },
     events: [
-      { id: "e1", surfaceId: "s1", type: "surface_started", occurredAt: "2024-01-01T00:00:00.000Z" },
-      { id: "e2", surfaceId: "s1", type: "tool_changed", occurredAt: "2024-01-01T00:00:01.000Z", payload: { tool: "eraser" } },
+      {
+        id: "e1",
+        surfaceId: "s1",
+        type: "surface_started",
+        occurredAt: "2024-01-01T00:00:00.000Z",
+      },
+      {
+        id: "e2",
+        surfaceId: "s1",
+        type: "tool_changed",
+        occurredAt: "2024-01-01T00:00:01.000Z",
+        payload: { tool: "eraser" },
+      },
       { id: "e3", surfaceId: "s1", type: "ink_undo", occurredAt: "2024-01-01T00:00:02.000Z" },
-      { id: "e4", surfaceId: "s1", type: "surface_submitted", occurredAt: "2024-01-01T00:00:05.000Z" },
+      {
+        id: "e4",
+        surfaceId: "s1",
+        type: "surface_submitted",
+        occurredAt: "2024-01-01T00:00:05.000Z",
+      },
     ],
     correct: true,
   });

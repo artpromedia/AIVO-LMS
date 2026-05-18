@@ -24,7 +24,10 @@ const validGeometry = {
     id: "surf-geo-1",
     type: "geometry_workspace",
     prompt: "Find the area of the rectangle.",
-    diagram: { canvasMode: "svg", shapes: [{ id: "rect1", kind: "rectangle", x: 0, y: 0, width: 320, height: 180 }] },
+    diagram: {
+      canvasMode: "svg",
+      shapes: [{ id: "rect1", kind: "rectangle", x: 0, y: 0, width: 320, height: 180 }],
+    },
     capture: { finalAnswer: true, inkStrokes: true },
     scoring: { mode: "exact", correctAnswer: 32 },
     accessibility: {
@@ -70,7 +73,11 @@ test("rejects draw activity without ink capture", () => {
       prompt: "Draw a line",
       capture: { finalAnswer: true, inkStrokes: false },
       scoring: { mode: "process" },
-      accessibility: { altText: "blank surface", reduceMotionSafe: true, keyboardAlternative: true },
+      accessibility: {
+        altText: "blank surface",
+        reduceMotionSafe: true,
+        keyboardAlternative: true,
+      },
     },
   };
   const result = validateDiscoveryActivity(draw);

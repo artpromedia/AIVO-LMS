@@ -92,9 +92,9 @@ describe("assertValidTutorDefinition", () => {
     expect(() => assertValidTutorDefinition(valid)).not.toThrow();
   });
   it("throws with a multi-issue summary on invalid def", () => {
-    expect(() =>
-      assertValidTutorDefinition({ ...valid, id: "x", subjects: [] }),
-    ).toThrow(/invalid_id|empty_subjects/);
+    expect(() => assertValidTutorDefinition({ ...valid, id: "x", subjects: [] })).toThrow(
+      /invalid_id|empty_subjects/,
+    );
   });
 });
 

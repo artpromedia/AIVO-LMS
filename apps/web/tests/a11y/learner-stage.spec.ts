@@ -31,7 +31,9 @@ test.describe("Learner stage accessibility", () => {
   });
 
   test("choice buttons have accessible names", async ({ page }) => {
-    const choices = page.locator('[role="button"], button').filter({ hasNot: page.locator(":empty") });
+    const choices = page
+      .locator('[role="button"], button')
+      .filter({ hasNot: page.locator(":empty") });
     const count = await choices.count();
     if (count === 0) {
       test.skip(true, "No choice buttons rendered");

@@ -43,7 +43,8 @@ test("audit_events trigger blocks UPDATE", { skip: SKIP }, async () => {
       userAgent: null,
     });
     await assert.rejects(
-      () => db.execute(sql`UPDATE audit_events SET event_type = 'HACKED' WHERE id = ${inserted.id}`),
+      () =>
+        db.execute(sql`UPDATE audit_events SET event_type = 'HACKED' WHERE id = ${inserted.id}`),
       /append-only/i,
       "trigger must reject UPDATE",
     );
@@ -62,14 +63,24 @@ test("appendAudit links rows: row N+1 prevHash equals row N hash", { skip: SKIP 
   const db = createDb(process.env.DATABASE_URL!);
   try {
     const r1 = await appendAudit(db, "audit_events", auditEvents, {
-      tenantId: null, userId: null,
-      eventType: "CHAIN_TEST_1", resourceType: "test", resourceId: String(Date.now()),
-      details: null, ipAddress: null, userAgent: null,
+      tenantId: null,
+      userId: null,
+      eventType: "CHAIN_TEST_1",
+      resourceType: "test",
+      resourceId: String(Date.now()),
+      details: null,
+      ipAddress: null,
+      userAgent: null,
     });
     const r2 = await appendAudit(db, "audit_events", auditEvents, {
-      tenantId: null, userId: null,
-      eventType: "CHAIN_TEST_2", resourceType: "test", resourceId: String(Date.now() + 1),
-      details: null, ipAddress: null, userAgent: null,
+      tenantId: null,
+      userId: null,
+      eventType: "CHAIN_TEST_2",
+      resourceType: "test",
+      resourceId: String(Date.now() + 1),
+      details: null,
+      ipAddress: null,
+      userAgent: null,
     });
     assert.equal(r2.prevHash, r1.hash, "row 2 must link to row 1");
   } finally {

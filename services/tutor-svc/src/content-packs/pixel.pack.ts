@@ -23,7 +23,8 @@ export const pixelStarterPack: ContentPack = {
       title: "Computers follow steps",
       skillId: "csta.1A.CS.1",
       type: "narration",
-      prompt: "Computers do exactly what we tell them — step by step. Today we'll write our first set of steps.",
+      prompt:
+        "Computers do exactly what we tell them — step by step. Today we'll write our first set of steps.",
       difficulty: "intro",
     },
     {
@@ -44,7 +45,8 @@ export const pixelStarterPack: ContentPack = {
       title: "Find the bug",
       skillId: "csta.1A.AP.10",
       type: "multiple_choice",
-      prompt: "Steps to brush teeth: (1) put toothpaste on the brush, (2) eat breakfast, (3) brush teeth. Which step doesn't belong?",
+      prompt:
+        "Steps to brush teeth: (1) put toothpaste on the brush, (2) eat breakfast, (3) brush teeth. Which step doesn't belong?",
       difficulty: "core",
       choices: [
         { id: "step1", label: "Step 1: put toothpaste on the brush", correct: false },
@@ -57,7 +59,8 @@ export const pixelStarterPack: ContentPack = {
       title: "Write a tiny program",
       skillId: "csta.1A.AP.8",
       type: "draw",
-      prompt: "Draw arrows to show how to move from start ★ to the goal ⛳. You can go up, down, left, or right.",
+      prompt:
+        "Draw arrows to show how to move from start ★ to the goal ⛳. You can go up, down, left, or right.",
       difficulty: "stretch",
     },
   ],

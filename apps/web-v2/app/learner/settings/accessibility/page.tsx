@@ -8,11 +8,7 @@ import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { LEARNER_NAV } from "@/components/layout/role-shells";
 import { PageHeader } from "@/components/layout/page-header";
-import {
-  getAccessibilityPrefs,
-  getLearner,
-  parentCanAccessLearner,
-} from "@/lib/db/repos";
+import { getAccessibilityPrefs, getLearner, parentCanAccessLearner } from "@/lib/db/repos";
 import { readActiveLearnerFromCookies } from "@/lib/auth/active-learner";
 import { AccessibilityForm } from "@/components/learner/accessibility-form";
 

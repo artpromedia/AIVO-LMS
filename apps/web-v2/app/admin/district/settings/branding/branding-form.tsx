@@ -32,13 +32,9 @@ export function BrandingForm({
   fallbackName: string;
 }) {
   const router = useRouter();
-  const [displayName, setDisplayName] = useState(
-    initial.displayName ?? fallbackName,
-  );
+  const [displayName, setDisplayName] = useState(initial.displayName ?? fallbackName);
   const [supportEmail, setSupportEmail] = useState(initial.supportEmail ?? "");
-  const [primaryColor, setPrimaryColor] = useState(
-    initial.primaryColor ?? "#2D5BFF",
-  );
+  const [primaryColor, setPrimaryColor] = useState(initial.primaryColor ?? "#2D5BFF");
   const [pending, startTransition] = useTransition();
   const [status, setStatus] = useState<
     { kind: "ok"; msg: string } | { kind: "err"; msg: string } | null
@@ -159,12 +155,8 @@ export function BrandingForm({
       </div>
 
       <div className="flex items-center justify-end gap-3">
-        {status?.kind === "ok" ? (
-          <p className="text-sm text-aivo-success">{status.msg}</p>
-        ) : null}
-        {status?.kind === "err" ? (
-          <p className="text-sm text-aivo-danger">{status.msg}</p>
-        ) : null}
+        {status?.kind === "ok" ? <p className="text-sm text-aivo-success">{status.msg}</p> : null}
+        {status?.kind === "err" ? <p className="text-sm text-aivo-danger">{status.msg}</p> : null}
         <Button type="submit" disabled={pending}>
           {pending ? "Saving…" : "Save branding"}
         </Button>

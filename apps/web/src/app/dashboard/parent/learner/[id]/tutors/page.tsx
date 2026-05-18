@@ -40,8 +40,9 @@ export default function ParentLearnerTutorsPage() {
       fetch(`/api/tutors/entitlements/${learnerId}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       }).then((r) => (r.ok ? r.json() : null)),
-      fetch(`/api/users/learners`, { headers: { Authorization: `Bearer ${accessToken}` } })
-        .then((r) => (r.ok ? r.json() : [])),
+      fetch(`/api/users/learners`, { headers: { Authorization: `Bearer ${accessToken}` } }).then(
+        (r) => (r.ok ? r.json() : []),
+      ),
     ])
       .then(([entResp, learnersData]) => {
         setEntitlements(entResp as LearnerEntitlementResponse | null);
@@ -62,7 +63,7 @@ export default function ParentLearnerTutorsPage() {
   // Filter to tutors that fit this learner's age tier (e.g. K-5 hides
   // Chrono / Lingua / Forge / Compass).
   const tier = learnerGrade != null ? gradeToTier(learnerGrade) : null;
-  const tutorEntries = getTutorsForTier(tier) as [TutorKey, typeof TUTORS[TutorKey]][];
+  const tutorEntries = getTutorsForTier(tier) as [TutorKey, (typeof TUTORS)[TutorKey]][];
   const effective = new Set(entitlements?.effectiveTutors ?? []);
   const grace = new Set(entitlements?.graceTutors ?? []);
   const isActive = (key: string) => effective.has(key);
@@ -71,12 +72,25 @@ export default function ParentLearnerTutorsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-heading font-bold vi-text mb-2">{t("tutors_title", { name: "" }).trim()}</h1>
-        <p className="text-sm vi-text-muted">{t("tutors_manage_desc")} {t("visit_store")} <Link href="/dashboard/parent/store" className="text-[hsl(var(--visual-primary))] hover:underline font-semibold">{t("tutor_store_link")}</Link> {t("to_add_more")}</p>
+        <h1 className="text-2xl font-heading font-bold vi-text mb-2">
+          {t("tutors_title", { name: "" }).trim()}
+        </h1>
+        <p className="text-sm vi-text-muted">
+          {t("tutors_manage_desc")} {t("visit_store")}{" "}
+          <Link
+            href="/dashboard/parent/store"
+            className="text-[hsl(var(--visual-primary))] hover:underline font-semibold"
+          >
+            {t("tutor_store_link")}
+          </Link>{" "}
+          {t("to_add_more")}
+        </p>
       </div>
 
       {loadingData ? (
-        <div className="vi-card p-12 text-center animate-pulse vi-text-muted">{t("loading_tutors")}</div>
+        <div className="vi-card p-12 text-center animate-pulse vi-text-muted">
+          {t("loading_tutors")}
+        </div>
       ) : learnerLookupFailed ? (
         // Fail closed: if we can't determine this learner's grade, do NOT
         // show the catalogue (it would expose tier-restricted tutors).
@@ -86,27 +100,44 @@ export default function ParentLearnerTutorsPage() {
           {tutorEntries.map(([key, tutor]) => {
             const active = isActive(key);
             return (
-              <div key={key} className={`rounded-2xl border-2 overflow-hidden transition ${active ? "border-[hsl(var(--visual-primary)/0.3)] bg-[hsl(var(--visual-surface))] shadow-sm" : "vi-border vi-surface-soft opacity-60"}`}>
+              <div
+                key={key}
+                className={`rounded-2xl border-2 overflow-hidden transition ${active ? "border-[hsl(var(--visual-primary)/0.3)] bg-[hsl(var(--visual-surface))] shadow-sm" : "vi-border vi-surface-soft opacity-60"}`}
+              >
                 <div className="p-5">
                   <div className="flex items-center gap-3 mb-3">
-                    <Image src={tutor.avatar} alt={tutor.name} width={48} height={48} className="rounded-xl" />
+                    <Image
+                      src={tutor.avatar}
+                      alt={tutor.name}
+                      width={48}
+                      height={48}
+                      className="rounded-xl"
+                    />
                     <div>
                       <h3 className="font-heading font-bold vi-text">{tutor.name}</h3>
                       <p className="text-xs vi-text-muted">{tutor.domain}</p>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className={`px-2 py-0.5 text-xs rounded-full font-semibold ${tutor.tier === "core" ? "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]" : "bg-[hsl(var(--visual-sel)/0.16)] text-[hsl(var(--visual-sel))]"}`}>
+                    <span
+                      className={`px-2 py-0.5 text-xs rounded-full font-semibold ${tutor.tier === "core" ? "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]" : "bg-[hsl(var(--visual-sel)/0.16)] text-[hsl(var(--visual-sel))]"}`}
+                    >
                       {tutor.tier}
                     </span>
                     {active ? (
                       isGrace(key) ? (
-                        <span className="px-3 py-1 text-xs rounded-full bg-amber-100 text-amber-700 font-semibold">Grace period</span>
+                        <span className="px-3 py-1 text-xs rounded-full bg-amber-100 text-amber-700 font-semibold">
+                          Grace period
+                        </span>
                       ) : (
-                        <span className="px-3 py-1 text-xs rounded-full bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))] font-semibold">{tc("active")}</span>
+                        <span className="px-3 py-1 text-xs rounded-full bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))] font-semibold">
+                          {tc("active")}
+                        </span>
                       )
                     ) : (
-                      <span className="px-3 py-1 text-xs rounded-full vi-surface-soft vi-text-muted font-semibold">{t("not_subscribed")}</span>
+                      <span className="px-3 py-1 text-xs rounded-full vi-surface-soft vi-text-muted font-semibold">
+                        {t("not_subscribed")}
+                      </span>
                     )}
                   </div>
                 </div>
@@ -120,9 +151,19 @@ export default function ParentLearnerTutorsPage() {
       <div className="p-5 rounded-2xl vi-surface-soft border vi-border">
         <p className="text-sm vi-text">
           <span className="font-semibold">{t("want_more_tutors")}</span> {t("visit_store")}{" "}
-          <Link href="/dashboard/parent/store" className="text-[hsl(var(--visual-primary))] font-bold hover:underline">{t("tutor_store_link")}</Link>{" "}
+          <Link
+            href="/dashboard/parent/store"
+            className="text-[hsl(var(--visual-primary))] font-bold hover:underline"
+          >
+            {t("tutor_store_link")}
+          </Link>{" "}
           {tc("or")}{" "}
-          <Link href="/dashboard/parent/billing" className="text-[hsl(var(--visual-primary))] font-bold hover:underline">{t("billing_link")}</Link>{" "}
+          <Link
+            href="/dashboard/parent/billing"
+            className="text-[hsl(var(--visual-primary))] font-bold hover:underline"
+          >
+            {t("billing_link")}
+          </Link>{" "}
           {t("manage_addons_desc")}
         </p>
       </div>

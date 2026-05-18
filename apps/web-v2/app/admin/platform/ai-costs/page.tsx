@@ -31,7 +31,9 @@ export default async function Page() {
   const tenantsById = new Map(tenants.map((t) => [t.id, t]));
 
   const totalSpent = rows.reduce((s, r) => s + r.spent, 0);
-  const overBudget = rows.filter((r) => r.budget.monthlyCapCents !== null && r.spent >= r.budget.monthlyCapCents).length;
+  const overBudget = rows.filter(
+    (r) => r.budget.monthlyCapCents !== null && r.spent >= r.budget.monthlyCapCents,
+  ).length;
   const warning = rows.filter((r) => r.check.warning && r.check.allow).length;
 
   return (
@@ -49,11 +51,15 @@ export default async function Page() {
 
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">Spend (MTD)</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+            Spend (MTD)
+          </p>
           <p className="mt-1 font-display text-3xl font-bold">{fmtCents(totalSpent)}</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">Approaching cap</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+            Approaching cap
+          </p>
           <p className="mt-1 font-display text-3xl font-bold">{warning}</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
@@ -75,14 +81,19 @@ export default async function Page() {
           </thead>
           <tbody>
             {rows.map((r) => {
-              const ratio = r.budget.monthlyCapCents === null ? 0 : r.budget.monthlyCapCents === 0 ? 1 : r.spent / r.budget.monthlyCapCents;
+              const ratio =
+                r.budget.monthlyCapCents === null
+                  ? 0
+                  : r.budget.monthlyCapCents === 0
+                    ? 1
+                    : r.spent / r.budget.monthlyCapCents;
               const tone: "neutral" | "warning" | "danger" | "success" = !r.check.allow
                 ? "danger"
                 : r.check.warning
-                ? "warning"
-                : r.budget.monthlyCapCents === null
-                ? "neutral"
-                : "success";
+                  ? "warning"
+                  : r.budget.monthlyCapCents === null
+                    ? "neutral"
+                    : "success";
               return (
                 <tr key={r.tenant.id} className="border-t border-aivo-border">
                   <td className="p-3 font-medium">
@@ -92,13 +103,23 @@ export default async function Page() {
                   <td className="p-3">
                     {fmtCents(r.spent)}
                     {r.budget.monthlyCapCents !== null ? (
-                      <span className="ml-1 text-xs text-aivo-ink-soft">/ {fmtCents(r.budget.monthlyCapCents)} ({Math.round(ratio * 100)}%)</span>
+                      <span className="ml-1 text-xs text-aivo-ink-soft">
+                        / {fmtCents(r.budget.monthlyCapCents)} ({Math.round(ratio * 100)}%)
+                      </span>
                     ) : (
                       <span className="ml-1 text-xs text-aivo-ink-soft">/ unlimited</span>
                     )}
                   </td>
                   <td className="p-3">
-                    <Badge tone={tone}>{!r.check.allow ? "blocked" : r.check.warning ? "approaching" : r.budget.monthlyCapCents === null ? "unlimited" : "ok"}</Badge>
+                    <Badge tone={tone}>
+                      {!r.check.allow
+                        ? "blocked"
+                        : r.check.warning
+                          ? "approaching"
+                          : r.budget.monthlyCapCents === null
+                            ? "unlimited"
+                            : "ok"}
+                    </Badge>
                   </td>
                   <td className="p-3">
                     <BudgetEditor
@@ -117,7 +138,10 @@ export default async function Page() {
 
       <h2 className="mb-3 font-display text-lg font-semibold">Recent cost events</h2>
       {events.length === 0 ? (
-        <EmptyState title="No cost events yet" description="AI generations will appear here as they run." />
+        <EmptyState
+          title="No cost events yet"
+          description="AI generations will appear here as they run."
+        />
       ) : (
         <Card className="overflow-hidden">
           <table className="w-full text-sm">
@@ -134,11 +158,19 @@ export default async function Page() {
             <tbody>
               {events.map((e) => (
                 <tr key={e.id} className="border-t border-aivo-border">
-                  <td className="p-3 text-aivo-ink-soft">{new Date(e.occurredAt).toLocaleString()}</td>
-                  <td className="p-3 font-medium">{tenantsById.get(e.tenantId)?.name ?? e.tenantId}</td>
+                  <td className="p-3 text-aivo-ink-soft">
+                    {new Date(e.occurredAt).toLocaleString()}
+                  </td>
+                  <td className="p-3 font-medium">
+                    {tenantsById.get(e.tenantId)?.name ?? e.tenantId}
+                  </td>
                   <td className="p-3 text-aivo-ink-soft">{e.feature}</td>
-                  <td className="p-3 text-aivo-ink-soft">{e.provider} · {e.model}</td>
-                  <td className="p-3 text-aivo-ink-soft">{e.promptTokens.toLocaleString()} → {e.completionTokens.toLocaleString()}</td>
+                  <td className="p-3 text-aivo-ink-soft">
+                    {e.provider} · {e.model}
+                  </td>
+                  <td className="p-3 text-aivo-ink-soft">
+                    {e.promptTokens.toLocaleString()} → {e.completionTokens.toLocaleString()}
+                  </td>
                   <td className="p-3">{fmtCents(e.amountCents)}</td>
                 </tr>
               ))}

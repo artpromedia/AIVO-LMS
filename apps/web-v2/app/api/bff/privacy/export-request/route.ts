@@ -3,10 +3,7 @@ import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
 import { audit } from "@/lib/bff/audit";
-import {
-  createDataExportRequest,
-  listDataExportRequestsForUser,
-} from "@/lib/db/repos";
+import { createDataExportRequest, listDataExportRequestsForUser } from "@/lib/db/repos";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -23,10 +20,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     if (response) return response;
     const roleErr = requireRole(session!, ["parent"], requestId);
     if (roleErr) return roleErr;
-    const items = listDataExportRequestsForUser(
-      session!.userId,
-      session!.tenantId,
-    );
+    const items = listDataExportRequestsForUser(session!.userId, session!.tenantId);
     return ok({ requests: items }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

@@ -66,14 +66,10 @@ export default async function Page() {
                           <span>
                             {skill?.name ?? m.skillId}
                             {subject ? (
-                              <span className="ml-2 text-xs text-aivo-muted">
-                                {subject.name}
-                              </span>
+                              <span className="ml-2 text-xs text-aivo-muted">{subject.name}</span>
                             ) : null}
                           </span>
-                          <span className="font-medium">
-                            {Math.round(m.score * 100)}%
-                          </span>
+                          <span className="font-medium">{Math.round(m.score * 100)}%</span>
                         </li>
                       );
                     })}

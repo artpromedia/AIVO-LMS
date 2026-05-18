@@ -71,7 +71,9 @@ function NewsletterSignup() {
         </button>
       </div>
       {status === "error" && (
-        <p className="text-xs text-red-400 font-body mt-2">Something went wrong. Please try again.</p>
+        <p className="text-xs text-red-400 font-body mt-2">
+          Something went wrong. Please try again.
+        </p>
       )}
       {status === "success" && (
         <p className="text-xs text-emerald-400 font-body mt-2">You&apos;re subscribed — thanks!</p>
@@ -144,21 +146,34 @@ export function Footer() {
               className="mb-4"
               style={{ width: "auto", height: "auto" }}
             />
-            <p className="text-sm text-slate-400 font-body leading-relaxed mb-4">
-              {t("tagline")}
-            </p>
+            <p className="text-sm text-slate-400 font-body leading-relaxed mb-4">{t("tagline")}</p>
             <div className="inline-flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-xl">
-              <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              <svg
+                className="w-4 h-4 text-emerald-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
               </svg>
-              <span className="text-sm font-bold text-slate-200 whitespace-nowrap">Designed to support COPPA &amp; FERPA</span>
+              <span className="text-sm font-bold text-slate-200 whitespace-nowrap">
+                Designed to support COPPA &amp; FERPA
+              </span>
             </div>
             <NewsletterSignup />
           </div>
 
           {FOOTER_SECTIONS.map((section) => (
             <div key={section.titleKey}>
-              <h4 className="text-sm font-heading font-bold text-white mb-4">{t(section.titleKey)}</h4>
+              <h4 className="text-sm font-heading font-bold text-white mb-4">
+                {t(section.titleKey)}
+              </h4>
               <ul className="space-y-2.5">
                 {section.links.map((link) => (
                   <li key={link.labelKey}>
@@ -179,9 +194,7 @@ export function Footer() {
           <p className="text-sm text-slate-500 font-body">
             {t("copyright", { year: new Date().getFullYear() })}
           </p>
-          <p className="text-xs text-slate-600 font-body">
-            {t("built_with_care")}
-          </p>
+          <p className="text-xs text-slate-600 font-body">{t("built_with_care")}</p>
         </div>
       </div>
     </footer>

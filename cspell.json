@@ -1,10 +1,4 @@
 {
   "version": "0.2",
-  "words": [
-    "aivo",
-    "appuser",
-    "addgroup",
-    "adduser",
-    "oonrumail"
-  ]
+  "words": ["aivo", "appuser", "addgroup", "adduser", "oonrumail"]
 }

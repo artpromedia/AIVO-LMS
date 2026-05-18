@@ -13,11 +13,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getStore as db } from "@/lib/db/store";
-import {
-  getIEPForLearner,
-  getMasteryMap,
-  listLearnersForTeacher,
-} from "@/lib/db/repos";
+import { getIEPForLearner, getMasteryMap, listLearnersForTeacher } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
 
@@ -41,14 +37,9 @@ export default async function TeacherReportsPage() {
     return { learner, avg, skillsCount, onGrade, emerging, iep };
   });
 
-  const classroomAvg =
-    rows.length > 0
-      ? rows.reduce((acc, r) => acc + r.avg, 0) / rows.length
-      : 0;
+  const classroomAvg = rows.length > 0 ? rows.reduce((acc, r) => acc + r.avg, 0) / rows.length : 0;
   const learnersWithIep = rows.filter((r) => r.iep).length;
-  const learnersOnTrack = rows.filter(
-    (r) => r.avg >= 0.7 && r.skillsCount > 0,
-  ).length;
+  const learnersOnTrack = rows.filter((r) => r.avg >= 0.7 && r.skillsCount > 0).length;
 
   // Distribution across mastery buckets.
   const distribution: Array<{ label: string; count: number }> = [
@@ -65,12 +56,12 @@ export default async function TeacherReportsPage() {
         sm.level === "stretching"
           ? 0
           : sm.level === "on_grade_level"
-          ? 1
-          : sm.level === "approaching"
-          ? 2
-          : sm.level === "emerging"
-          ? 3
-          : 4;
+            ? 1
+            : sm.level === "approaching"
+              ? 2
+              : sm.level === "emerging"
+                ? 3
+                : 4;
       distribution[idx]!.count += 1;
     }
   }
@@ -100,8 +91,12 @@ export default async function TeacherReportsPage() {
           <p className="mt-1 font-display text-3xl font-semibold">{learners.length}</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">Class mastery</p>
-          <p className="mt-1 font-display text-3xl font-semibold">{Math.round(classroomAvg * 100)}%</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+            Class mastery
+          </p>
+          <p className="mt-1 font-display text-3xl font-semibold">
+            {Math.round(classroomAvg * 100)}%
+          </p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">On track</p>
@@ -109,7 +104,9 @@ export default async function TeacherReportsPage() {
           <p className="mt-1 text-xs text-aivo-ink-soft">Avg ≥ 70% mastery</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">IEPs on file</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+            IEPs on file
+          </p>
           <p className="mt-1 font-display text-3xl font-semibold">{learnersWithIep}</p>
         </Card>
       </div>
@@ -135,10 +132,7 @@ export default async function TeacherReportsPage() {
                     </span>
                   </div>
                   <div className="mt-1 h-2 w-full rounded-full bg-aivo-border">
-                    <div
-                      className="h-2 rounded-full bg-aivo-accent"
-                      style={{ width: `${pct}%` }}
-                    />
+                    <div className="h-2 rounded-full bg-aivo-accent" style={{ width: `${pct}%` }} />
                   </div>
                 </div>
               );
@@ -178,9 +172,7 @@ export default async function TeacherReportsPage() {
                   <tr key={r.learner.id} className="border-t border-aivo-border">
                     <td className="px-4 py-2 font-medium">{r.learner.displayName}</td>
                     <td className="px-4 py-2 text-right font-mono">{r.skillsCount}</td>
-                    <td className="px-4 py-2 text-right font-mono">
-                      {Math.round(r.avg * 100)}%
-                    </td>
+                    <td className="px-4 py-2 text-right font-mono">{Math.round(r.avg * 100)}%</td>
                     <td className="px-4 py-2 text-right font-mono">{r.onGrade}</td>
                     <td className="px-4 py-2 text-right font-mono">{r.emerging}</td>
                     <td className="px-4 py-2">

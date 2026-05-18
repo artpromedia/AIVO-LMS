@@ -13,12 +13,7 @@ type BrainPersonalizationAnimationProps = {
   onSkip?: () => void;
 };
 
-const progressSteps = [
-  "Analyzing profile",
-  "Preparing model",
-  "Personalizing subjects",
-  "Ready",
-];
+const progressSteps = ["Analyzing profile", "Preparing model", "Personalizing subjects", "Ready"];
 
 const trustItems = [
   { icon: "lock", label: "Encrypted setup" },
@@ -77,13 +72,7 @@ function Icon({ name }: { name: string }) {
   );
 }
 
-function BrainSvg({
-  variant,
-  progress,
-}: {
-  variant: "master" | "learner";
-  progress: number;
-}) {
+function BrainSvg({ variant, progress }: { variant: "master" | "learner"; progress: number }) {
   const isMaster = variant === "master";
   const fillWidth = isMaster ? 100 : Math.min(100, Math.max(0, progress));
 
@@ -293,7 +282,9 @@ export default function BrainPersonalizationAnimation({
 
         <div className={styles.header}>
           <div className={styles.badge}>
-            <span className={styles.badgeSpark} aria-hidden="true">✦</span>
+            <span className={styles.badgeSpark} aria-hidden="true">
+              ✦
+            </span>
             {ready ? "MODEL READY" : "PERSONALIZING MODEL"}
           </div>
 
@@ -304,8 +295,8 @@ export default function BrainPersonalizationAnimation({
           </h1>
 
           <p>
-            AIVO is personalizing lessons, pacing, and support using grade, profile,
-            learning goals, and approved family inputs.
+            AIVO is personalizing lessons, pacing, and support using grade, profile, learning goals,
+            and approved family inputs.
           </p>
         </div>
 
@@ -348,10 +339,7 @@ export default function BrainPersonalizationAnimation({
             aria-valuemax={100}
             aria-label="Model personalization progress"
           >
-            <span
-              className={styles.progressFill}
-              style={{ width: `${progress}%` }}
-            />
+            <span className={styles.progressFill} style={{ width: `${progress}%` }} />
           </div>
 
           <ol className={styles.steps}>

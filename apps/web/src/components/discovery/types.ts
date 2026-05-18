@@ -1,7 +1,16 @@
 import type { TutorKey } from "@aivo/brand";
 import type { LearnerSurfaceSpec, FeedbackMode } from "@aivo/learner-surfaces";
 
-export type AdventurePhase = "loading" | "pre-adventure" | "map" | "chapter-intro" | "activity" | "chapter-complete" | "break" | "finale" | "results";
+export type AdventurePhase =
+  | "loading"
+  | "pre-adventure"
+  | "map"
+  | "chapter-intro"
+  | "activity"
+  | "chapter-complete"
+  | "break"
+  | "finale"
+  | "results";
 
 export type ActivityInteraction =
   | "tap_image"
@@ -113,7 +122,8 @@ export const ADVENTURE_CHAPTERS: AdventureChapter[] = [
     domain: "ela",
     tutorKey: "sage" as TutorKey,
     bgGradient: "from-emerald-900 via-teal-800 to-slate-900",
-    sceneDescription: "An illustrated garden where words grow on trees, sentences bloom as flowers, and stories hide in magical books.",
+    sceneDescription:
+      "An illustrated garden where words grow on trees, sentences bloom as flowers, and stories hide in magical books.",
     landmark: { emoji: "🌳", label: "Story Garden" },
     transitionLine: "Your story garden is growing beautifully! Let me introduce you to my friend.",
   },
@@ -135,7 +145,8 @@ export const ADVENTURE_CHAPTERS: AdventureChapter[] = [
     domain: "science",
     tutorKey: "spark" as TutorKey,
     bgGradient: "from-amber-900 via-orange-800 to-slate-900",
-    sceneDescription: "A colorful laboratory with bubbling beakers, a terrarium with plants, and a microscope.",
+    sceneDescription:
+      "A colorful laboratory with bubbling beakers, a terrarium with plants, and a microscope.",
     landmark: { emoji: "🧪", label: "Discovery Lab" },
     transitionLine: "Science is all around us! Let's visit someone very special next.",
   },
@@ -146,7 +157,8 @@ export const ADVENTURE_CHAPTERS: AdventureChapter[] = [
     domain: "sel",
     tutorKey: "harmony" as TutorKey,
     bgGradient: "from-violet-900 via-purple-800 to-slate-900",
-    sceneDescription: "A warm, cozy treehouse with soft lighting, cushions, and a window showing the outside world.",
+    sceneDescription:
+      "A warm, cozy treehouse with soft lighting, cushions, and a window showing the outside world.",
     landmark: { emoji: "🏡", label: "Feelings Treehouse" },
     transitionLine: "You are so kind and thoughtful! One more friend wants to meet you.",
   },
@@ -157,7 +169,8 @@ export const ADVENTURE_CHAPTERS: AdventureChapter[] = [
     domain: "speech",
     tutorKey: "echo" as TutorKey,
     bgGradient: "from-pink-900 via-rose-800 to-slate-900",
-    sceneDescription: "A friendly recording studio with microphones, sound waves, and musical notes.",
+    sceneDescription:
+      "A friendly recording studio with microphones, sound waves, and musical notes.",
     landmark: { emoji: "🎵", label: "Sound Studio" },
     transitionLine: "Your voice is music to my ears! Time for one last adventure.",
   },
@@ -168,7 +181,8 @@ export const ADVENTURE_CHAPTERS: AdventureChapter[] = [
     domain: "executive_function",
     tutorKey: "pixel" as TutorKey,
     bgGradient: "from-cyan-900 via-sky-800 to-slate-900",
-    sceneDescription: "A colorful puzzle room where logic rules and patterns create the environment.",
+    sceneDescription:
+      "A colorful puzzle room where logic rules and patterns create the environment.",
     landmark: { emoji: "🔮", label: "Puzzle Palace" },
     transitionLine: "You solved every puzzle! What an amazing adventure.",
   },
@@ -183,12 +197,48 @@ export interface TutorIntro {
 }
 
 export const TUTOR_INTROS: TutorIntro[] = [
-  { tutorKey: "sage" as TutorKey, name: "Sage", line: "I know the best stories!", emoji: "📖", color: "#10B981" },
-  { tutorKey: "nova" as TutorKey, name: "Nova", line: "I love stars and numbers!", emoji: "✨", color: "#7C3AED" },
-  { tutorKey: "spark" as TutorKey, name: "Spark", line: "Want to see something cool?", emoji: "⚡", color: "#F59E0B" },
-  { tutorKey: "harmony" as TutorKey, name: "Harmony", line: "I care about how you feel!", emoji: "💜", color: "#8B5CF6" },
-  { tutorKey: "echo" as TutorKey, name: "Echo", line: "Let's make some sounds together!", emoji: "🎵", color: "#EC4899" },
-  { tutorKey: "pixel" as TutorKey, name: "Pixel", line: "I have the best puzzles!", emoji: "🧩", color: "#06B6D4" },
+  {
+    tutorKey: "sage" as TutorKey,
+    name: "Sage",
+    line: "I know the best stories!",
+    emoji: "📖",
+    color: "#10B981",
+  },
+  {
+    tutorKey: "nova" as TutorKey,
+    name: "Nova",
+    line: "I love stars and numbers!",
+    emoji: "✨",
+    color: "#7C3AED",
+  },
+  {
+    tutorKey: "spark" as TutorKey,
+    name: "Spark",
+    line: "Want to see something cool?",
+    emoji: "⚡",
+    color: "#F59E0B",
+  },
+  {
+    tutorKey: "harmony" as TutorKey,
+    name: "Harmony",
+    line: "I care about how you feel!",
+    emoji: "💜",
+    color: "#8B5CF6",
+  },
+  {
+    tutorKey: "echo" as TutorKey,
+    name: "Echo",
+    line: "Let's make some sounds together!",
+    emoji: "🎵",
+    color: "#EC4899",
+  },
+  {
+    tutorKey: "pixel" as TutorKey,
+    name: "Pixel",
+    line: "I have the best puzzles!",
+    emoji: "🧩",
+    color: "#06B6D4",
+  },
 ];
 
 export const FUNCTIONING_LEVEL_CONFIG = {
@@ -210,9 +260,27 @@ export interface BreakOption {
 }
 
 export const BREAK_OPTIONS: BreakOption[] = [
-  { type: "music", label: "Listen to Music", emoji: "🎵", description: "Relax with some calming tunes", durationSec: 35 },
-  { type: "word_game", label: "Word Game", emoji: "🔤", description: "Play a quick word scramble", durationSec: 40 },
-  { type: "exercise", label: "Move & Stretch", emoji: "🤸", description: "Do some fun stretches", durationSec: 30 },
+  {
+    type: "music",
+    label: "Listen to Music",
+    emoji: "🎵",
+    description: "Relax with some calming tunes",
+    durationSec: 35,
+  },
+  {
+    type: "word_game",
+    label: "Word Game",
+    emoji: "🔤",
+    description: "Play a quick word scramble",
+    durationSec: 40,
+  },
+  {
+    type: "exercise",
+    label: "Move & Stretch",
+    emoji: "🤸",
+    description: "Do some fun stretches",
+    durationSec: 30,
+  },
 ];
 
 export type FunctioningLevel = keyof typeof FUNCTIONING_LEVEL_CONFIG;

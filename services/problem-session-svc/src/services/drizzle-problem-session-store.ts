@@ -73,7 +73,9 @@ function toEventRecord(row: typeof problemSessionEvents.$inferSelect): ProblemSe
   };
 }
 
-function toAttemptRecord(row: typeof problemSessionAttempts.$inferSelect): ProblemSessionAttemptRecord {
+function toAttemptRecord(
+  row: typeof problemSessionAttempts.$inferSelect,
+): ProblemSessionAttemptRecord {
   return {
     id: row.id,
     problemSessionId: row.problemSessionId,
@@ -227,10 +229,7 @@ export class DrizzleProblemSessionStore implements ProblemSessionStore {
     return rows.map(toSnapshotRecord);
   }
 
-  async listRecentForLearner(
-    learnerId: string,
-    limit = 20,
-  ): Promise<ProblemSessionRecord[]> {
+  async listRecentForLearner(learnerId: string, limit = 20): Promise<ProblemSessionRecord[]> {
     const rows = await this.db
       .select()
       .from(problemSessions)

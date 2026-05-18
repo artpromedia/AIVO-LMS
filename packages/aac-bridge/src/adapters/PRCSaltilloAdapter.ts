@@ -8,9 +8,8 @@
 import type { AACEvent, AACSessionConfig } from "../types.js";
 import type { AACInputAdapter } from "./AACInputAdapter.js";
 
-const PRC_APP_ID = typeof process !== "undefined"
-  ? (process.env.PRC_APP_ID ?? "aivo-dev")
-  : "aivo-dev";
+const PRC_APP_ID =
+  typeof process !== "undefined" ? (process.env.PRC_APP_ID ?? "aivo-dev") : "aivo-dev";
 
 export class PRCSaltilloAdapter implements AACInputAdapter {
   readonly vendorName = "PRC-Saltillo";
@@ -21,10 +20,7 @@ export class PRCSaltilloAdapter implements AACInputAdapter {
 
   isAvailable(): boolean {
     if (typeof window === "undefined") return false;
-    return !!(
-      (window as any).__LAMP_SDK ||
-      (window as any).__SnapCore
-    );
+    return !!((window as any).__LAMP_SDK || (window as any).__SnapCore);
   }
 
   async initialize(config: AACSessionConfig): Promise<void> {

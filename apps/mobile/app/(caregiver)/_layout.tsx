@@ -1,8 +1,8 @@
-import React from 'react';
-import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { colors } from '@/constants/colors';
-import { useTranslation } from '@/hooks/useTranslation';
+import React from "react";
+import { Tabs } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { colors } from "@/constants/colors";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function CaregiverLayout() {
   const { t } = useTranslation();
@@ -19,27 +19,29 @@ export default function CaregiverLayout() {
           paddingBottom: 20,
           paddingTop: 8,
         },
-        tabBarLabelStyle: { fontFamily: 'Nunito-SemiBold', fontSize: 11 },
+        tabBarLabelStyle: { fontFamily: "Nunito-SemiBold", fontSize: 11 },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          title: t('tabs.home'),
+          title: t("tabs.home"),
           tabBarIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="notifications"
         options={{
-          title: t('tabs.alerts'),
-          tabBarIcon: ({ color, size }) => <Ionicons name="notifications" size={size} color={color} />,
+          title: t("tabs.alerts"),
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="notifications" size={size} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: t('tabs.settings'),
+          title: t("tabs.settings"),
           tabBarIcon: ({ color, size }) => <Ionicons name="settings" size={size} color={color} />,
         }}
       />

@@ -3,11 +3,7 @@ import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole } from "@/lib/bff/guards";
 import { audit } from "@/lib/bff/audit";
-import {
-  createTeacherAssignment,
-  getLearner,
-  listTeacherAssignments,
-} from "@/lib/db/repos";
+import { createTeacherAssignment, getLearner, listTeacherAssignments } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
 
@@ -44,20 +40,17 @@ export async function POST(req: Request): Promise<NextResponse> {
       dueAt?: unknown;
     };
     const title = typeof body.title === "string" ? body.title.trim() : "";
-    const instructions =
-      typeof body.instructions === "string" ? body.instructions.trim() : "";
+    const instructions = typeof body.instructions === "string" ? body.instructions.trim() : "";
     const subjectId = typeof body.subjectId === "string" ? body.subjectId : "";
     const skillIds =
       Array.isArray(body.skillIds) && body.skillIds.every((s) => typeof s === "string")
         ? (body.skillIds as string[])
         : null;
     const learnerIds =
-      Array.isArray(body.learnerIds) &&
-      body.learnerIds.every((s) => typeof s === "string")
+      Array.isArray(body.learnerIds) && body.learnerIds.every((s) => typeof s === "string")
         ? (body.learnerIds as string[])
         : null;
-    const dueAt =
-      typeof body.dueAt === "string" && body.dueAt.length > 0 ? body.dueAt : null;
+    const dueAt = typeof body.dueAt === "string" && body.dueAt.length > 0 ? body.dueAt : null;
     if (
       !title ||
       title.length > 200 ||
@@ -81,9 +74,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     // dropped. This prevents a teacher from partially-leaking which learner
     // IDs do/don't exist in their tenant and ensures the assignment they
     // think they created actually includes the learners they specified.
-    const foreignIds = learnerIds.filter(
-      (id) => !getLearner(id, session!.tenantId),
-    );
+    const foreignIds = learnerIds.filter((id) => !getLearner(id, session!.tenantId));
     if (foreignIds.length > 0) {
       return fail(
         {

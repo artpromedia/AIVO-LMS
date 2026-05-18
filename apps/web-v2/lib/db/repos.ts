@@ -45,13 +45,9 @@ import type {
   CurriculumMap,
   LessonObjectiveTemplate,
   AssessmentBlueprint,
-  AssessmentBlueprintItemKind,
   CurriculumImportJob,
 } from "@/lib/db/types";
-import {
-  defaultBaselineSubjectSlugs,
-  generateBaselineQuestions,
-} from "@/lib/learner/baseline";
+import { defaultBaselineSubjectSlugs, generateBaselineQuestions } from "@/lib/learner/baseline";
 import {
   buildBaselineSummary,
   computeSkillMasteryFromBaseline,
@@ -103,8 +99,7 @@ export function parentCanAccessLearner(
   tenantId: string,
 ): boolean {
   return db().parentLearnerRelationships.some(
-    (r) =>
-      r.parentUserId === parentUserId && r.learnerId === learnerId && r.tenantId === tenantId,
+    (r) => r.parentUserId === parentUserId && r.learnerId === learnerId && r.tenantId === tenantId,
   );
 }
 
@@ -113,10 +108,7 @@ export function parentCanAccessLearner(
  * Used by consent enforcement so learner/teacher requests are still blocked
  * when the parent has revoked consent.
  */
-export function findPrimaryParentForLearner(
-  learnerId: string,
-  tenantId: string,
-): string | null {
+export function findPrimaryParentForLearner(learnerId: string, tenantId: string): string | null {
   const rels = db().parentLearnerRelationships.filter(
     (r) => r.learnerId === learnerId && r.tenantId === tenantId,
   );
@@ -170,9 +162,7 @@ export function createLearner(input: {
     learnerId: id,
     tenantId: input.tenantId,
     relation: "parent",
-    isPrimary: store.parentLearnerRelationships.every(
-      (r) => r.parentUserId !== input.parentUserId,
-    ),
+    isPrimary: store.parentLearnerRelationships.every((r) => r.parentUserId !== input.parentUserId),
   };
   store.parentLearnerRelationships.push(rel);
   return learner;
@@ -194,19 +184,19 @@ export function updateLearner(
         ? existing.preferredName
         : patch.preferredName?.trim() || null,
     birthYear: patch.birthYear ?? existing.birthYear,
-    pronouns: patch.pronouns === undefined ? existing.pronouns : patch.pronouns ?? undefined,
-    ageRange: patch.ageRange === undefined ? existing.ageRange : patch.ageRange ?? null,
-    gradeBand: patch.gradeBand === undefined ? existing.gradeBand : patch.gradeBand ?? null,
+    pronouns: patch.pronouns === undefined ? existing.pronouns : (patch.pronouns ?? undefined),
+    ageRange: patch.ageRange === undefined ? existing.ageRange : (patch.ageRange ?? null),
+    gradeBand: patch.gradeBand === undefined ? existing.gradeBand : (patch.gradeBand ?? null),
     schoolContext:
-      patch.schoolContext === undefined ? existing.schoolContext : patch.schoolContext ?? null,
+      patch.schoolContext === undefined ? existing.schoolContext : (patch.schoolContext ?? null),
     primaryLanguage:
       patch.primaryLanguage === undefined
         ? existing.primaryLanguage
-        : patch.primaryLanguage ?? null,
+        : (patch.primaryLanguage ?? null),
     readingComfort:
-      patch.readingComfort === undefined ? existing.readingComfort : patch.readingComfort ?? null,
+      patch.readingComfort === undefined ? existing.readingComfort : (patch.readingComfort ?? null),
     mathComfort:
-      patch.mathComfort === undefined ? existing.mathComfort : patch.mathComfort ?? null,
+      patch.mathComfort === undefined ? existing.mathComfort : (patch.mathComfort ?? null),
     knownStrengths: patch.knownStrengths ?? existing.knownStrengths,
     knownChallenges: patch.knownChallenges ?? existing.knownChallenges,
     accessibilityDefaults: patch.accessibilityDefaults
@@ -234,10 +224,7 @@ export function deleteLearner(id: string, tenantId: string): boolean {
   return true;
 }
 
-export function refreshLearnerReadiness(
-  id: string,
-  tenantId: string,
-): ReadinessState | null {
+export function refreshLearnerReadiness(id: string, tenantId: string): ReadinessState | null {
   const store = db();
   const existing = store.learnerProfiles.get(id);
   if (!existing || existing.tenantId !== tenantId) return null;
@@ -276,10 +263,7 @@ function emptyAnswers(): ParentAssessment["answers"] {
  * null if none has been started yet — does NOT create a draft. Use this in
  * read paths and preflight validators that must remain mutation-free.
  */
-export function findParentAssessment(
-  learnerId: string,
-  tenantId: string,
-): ParentAssessment | null {
+export function findParentAssessment(learnerId: string, tenantId: string): ParentAssessment | null {
   const store = db();
   for (const a of store.parentAssessments.values()) {
     if (a.learnerId === learnerId && a.tenantId === tenantId) return a;
@@ -287,10 +271,7 @@ export function findParentAssessment(
   return null;
 }
 
-export function getOrCreateParentAssessment(
-  learnerId: string,
-  tenantId: string,
-): ParentAssessment {
+export function getOrCreateParentAssessment(learnerId: string, tenantId: string): ParentAssessment {
   const store = db();
   const existing = findParentAssessment(learnerId, tenantId);
   if (existing) return existing;
@@ -347,10 +328,7 @@ export function submitParentAssessment(
 }
 
 // ===== IEP (Sprint 6) =====
-export function getIEPForLearner(
-  learnerId: string,
-  tenantId: string,
-): IEPDocument | null {
+export function getIEPForLearner(learnerId: string, tenantId: string): IEPDocument | null {
   const store = db();
   for (const doc of store.iepDocuments.values()) {
     if (doc.learnerId === learnerId && doc.tenantId === tenantId) return doc;
@@ -389,10 +367,7 @@ export function uploadIEPDocument(input: {
   return doc;
 }
 
-export function deleteIEPForLearner(
-  learnerId: string,
-  tenantId: string,
-): boolean {
+export function deleteIEPForLearner(learnerId: string, tenantId: string): boolean {
   const store = db();
   const existing = getIEPForLearner(learnerId, tenantId);
   if (!existing) return false;
@@ -430,10 +405,7 @@ export function recordIEPSkip(learnerId: string, tenantId: string): LearnerProfi
 }
 
 // ===== Brain profile (Sprint 7) =====
-export function getBrainProfile(
-  learnerId: string,
-  tenantId: string,
-): LearnerBrainProfile | null {
+export function getBrainProfile(learnerId: string, tenantId: string): LearnerBrainProfile | null {
   const store = db();
   for (const p of store.brainProfiles.values()) {
     if (p.learnerId === learnerId && p.tenantId === tenantId) return p;
@@ -453,9 +425,7 @@ export function upsertBrainProfile(
   // here before mutating.
   const learner = store.learnerProfiles.get(learnerId);
   if (!learner || learner.tenantId !== tenantId) {
-    throw new Error(
-      `upsertBrainProfile: learner ${learnerId} not found in tenant ${tenantId}`,
-    );
+    throw new Error(`upsertBrainProfile: learner ${learnerId} not found in tenant ${tenantId}`);
   }
   const existing = getBrainProfile(learnerId, tenantId);
   const now = nowIso();
@@ -572,7 +542,6 @@ export function cloneBrainFromBaseline(
   return commitBrainClone(prepared);
 }
 
-
 // ===== Baseline (Sprint 8) =====
 
 export function getActiveBaselineForLearner(
@@ -588,10 +557,7 @@ export function getActiveBaselineForLearner(
   return latest;
 }
 
-export function getBaselineById(
-  baselineId: string,
-  tenantId: string,
-): BaselineAssessment | null {
+export function getBaselineById(baselineId: string, tenantId: string): BaselineAssessment | null {
   const b = db().baselineAssessments.get(baselineId);
   if (!b || b.tenantId !== tenantId) return null;
   return b;
@@ -603,10 +569,7 @@ export function listBaselineQuestions(baselineId: string): BaselineQuestion[] {
     .sort((a, b) => a.order - b.order);
 }
 
-export function listBaselineAttempts(
-  baselineId: string,
-  tenantId: string,
-): BaselineAttempt[] {
+export function listBaselineAttempts(baselineId: string, tenantId: string): BaselineAttempt[] {
   return db().baselineAttempts.filter(
     (a) => a.baselineId === baselineId && a.tenantId === tenantId,
   );
@@ -627,9 +590,7 @@ export function createBaseline(input: {
   if (!learner || learner.tenantId !== input.tenantId) return null;
 
   const allSubjects = Array.from(store.subjects.values());
-  const wantedSlugs = input.subjectIds?.length
-    ? null
-    : new Set(defaultBaselineSubjectSlugs());
+  const wantedSlugs = input.subjectIds?.length ? null : new Set(defaultBaselineSubjectSlugs());
   const subjects =
     input.subjectIds && input.subjectIds.length > 0
       ? allSubjects.filter((s) => input.subjectIds!.includes(s.id))
@@ -692,10 +653,7 @@ export function createBaseline(input: {
   return { baseline, questions };
 }
 
-export function startBaseline(
-  baselineId: string,
-  tenantId: string,
-): BaselineAssessment | null {
+export function startBaseline(baselineId: string, tenantId: string): BaselineAssessment | null {
   const store = db();
   const b = store.baselineAssessments.get(baselineId);
   if (!b || b.tenantId !== tenantId) return null;
@@ -887,11 +845,7 @@ export function completeBaseline(
   // missing pre-clone profile) we bail out atomically — no skill-mastery,
   // mastery-map, learning-path, review-schedule, or status mutations land in
   // the store, so the parent can simply retry without observable partial state.
-  const preparedClone = prepareBrainCloneFromSummary(
-    baseline.learnerId,
-    tenantId,
-    summary,
-  );
+  const preparedClone = prepareBrainCloneFromSummary(baseline.learnerId, tenantId, summary);
   if (!preparedClone) return null;
 
   // --- Commit (atomic from this point: validation has already passed) ---
@@ -967,10 +921,7 @@ export function getMasteryMap(
   return { map, skillMasteries };
 }
 
-export function getLearningPath(
-  learnerId: string,
-  tenantId: string,
-): LearningPath | null {
+export function getLearningPath(learnerId: string, tenantId: string): LearningPath | null {
   for (const p of db().learningPaths.values()) {
     if (p.learnerId === learnerId && p.tenantId === tenantId) return p;
   }
@@ -981,10 +932,7 @@ export function getLearningPath(
  * Re-generate the learning path from the current MasteryMap. Used when the
  * parent or a tutor wants a fresh path after lesson activity.
  */
-export function regenerateLearningPath(
-  learnerId: string,
-  tenantId: string,
-): LearningPath | null {
+export function regenerateLearningPath(learnerId: string, tenantId: string): LearningPath | null {
   const store = db();
   const { map, skillMasteries } = getMasteryMap(learnerId, tenantId);
   if (!map || skillMasteries.length === 0) return null;
@@ -1029,9 +977,7 @@ export function getSubjectDetail(
   const subject = store.subjects.get(subjectId);
   if (!subject) return null;
 
-  const skills = Array.from(store.skills.values()).filter(
-    (s) => s.subjectId === subjectId,
-  );
+  const skills = Array.from(store.skills.values()).filter((s) => s.subjectId === subjectId);
   const { skillMasteries } = getMasteryMap(learnerId, tenantId);
   const masteryBySkillId = new Map(skillMasteries.map((m) => [m.skillId, m]));
   const annotated = skills.map((s) => ({
@@ -1060,13 +1006,10 @@ export function getSubjectDetail(
     .slice()
     .sort((a, b) => (a.mastery?.score ?? 0) - (b.mastery?.score ?? 0));
   const nextSkill =
-    sortedForNext.find(
-      (s) => !s.mastery || s.mastery.score < 0.65,
-    ) ?? annotated[0] ?? null;
+    sortedForNext.find((s) => !s.mastery || s.mastery.score < 0.65) ?? annotated[0] ?? null;
 
   const path = getLearningPath(learnerId, tenantId);
-  const pathNodesForSubject =
-    path?.nodes.filter((n) => n.subjectId === subjectId) ?? [];
+  const pathNodesForSubject = path?.nodes.filter((n) => n.subjectId === subjectId) ?? [];
 
   const tutorByYubject: Record<string, string> = {
     reading: "Nimbus the Calm Explorer",
@@ -1083,8 +1026,7 @@ export function getSubjectDetail(
     skills: annotated,
     currentLevel,
     nextSkillId: nextSkill?.id ?? null,
-    recommendedTutorPersona:
-      tutorByYubject[subject.slug] ?? "Nimbus the Calm Explorer",
+    recommendedTutorPersona: tutorByYubject[subject.slug] ?? "Nimbus the Calm Explorer",
     pathNodesForSubject,
   };
 }
@@ -1269,15 +1211,17 @@ export async function createLessonRun(
   const accommodationSnapshot = buildAccommodationSnapshotFrom(brain.state);
   const contextSnapshot = buildContextSnapshot(learner, brain.state);
   const tutorPersona =
-    ({
-      reading: "Nimbus the Calm Explorer",
-      math: "Zara the Number Friend",
-      writing: "Penn the Story Builder",
-      science: "Dr. Sprout the Curious",
-      social: "Lumi the Kindness Coach",
-      life: "Sage the Routine Guide",
-      art: "Hue the Color Pal",
-    } as Record<string, string>)[subject.slug] ?? "Nimbus the Calm Explorer";
+    (
+      {
+        reading: "Nimbus the Calm Explorer",
+        math: "Zara the Number Friend",
+        writing: "Penn the Story Builder",
+        science: "Dr. Sprout the Curious",
+        social: "Lumi the Kindness Coach",
+        life: "Sage the Routine Guide",
+        art: "Hue the Color Pal",
+      } as Record<string, string>
+    )[subject.slug] ?? "Nimbus the Calm Explorer";
 
   const now = nowIso();
   const run: LessonRun = {
@@ -1366,9 +1310,7 @@ export function getLessonRun(
   const store = db();
   const run = store.lessonRuns.get(lessonRunId);
   if (!run || run.tenantId !== tenantId) return null;
-  const plan = run.lessonPlanId
-    ? store.generatedLessonPlans.get(run.lessonPlanId) ?? null
-    : null;
+  const plan = run.lessonPlanId ? (store.generatedLessonPlans.get(run.lessonPlanId) ?? null) : null;
   return { lessonRun: run, plan: plan && plan.tenantId === tenantId ? plan : null };
 }
 
@@ -1384,15 +1326,10 @@ export function listLessonRunsForLearner(
       r.tenantId === tenantId &&
       (!opts?.status || r.status === opts.status),
   );
-  return all
-    .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
-    .slice(0, limit);
+  return all.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1)).slice(0, limit);
 }
 
-export function startLessonRun(
-  lessonRunId: string,
-  tenantId: string,
-): LessonRun | null {
+export function startLessonRun(lessonRunId: string, tenantId: string): LessonRun | null {
   const store = db();
   const run = store.lessonRuns.get(lessonRunId);
   if (!run || run.tenantId !== tenantId) return null;
@@ -1451,10 +1388,7 @@ export function recordLessonStep(input: {
   return interaction;
 }
 
-export function listLessonInteractions(
-  lessonRunId: string,
-  tenantId: string,
-): LessonInteraction[] {
+export function listLessonInteractions(lessonRunId: string, tenantId: string): LessonInteraction[] {
   return db().lessonInteractions.filter(
     (i) => i.lessonRunId === lessonRunId && i.tenantId === tenantId,
   );
@@ -1477,10 +1411,7 @@ export function listLessonInteractions(
  *   (clamped to >= 0), falling back to (completedAt - startedAt) when no
  *   interactions exist.
  */
-export function deriveOutcomeFromInteractions(
-  run: LessonRun,
-  abandoned: boolean,
-): LessonOutcome {
+export function deriveOutcomeFromInteractions(run: LessonRun, abandoned: boolean): LessonOutcome {
   const store = db();
   const interactions = store.lessonInteractions
     .filter((i) => i.lessonRunId === run.id && i.tenantId === run.tenantId)
@@ -1513,16 +1444,12 @@ export function deriveOutcomeFromInteractions(
   }
 
   const hintsUsed = interactions.filter((i) => i.stepKind === "hint_used").length;
-  const scaffoldsUsed = interactions.filter(
-    (i) => i.stepKind === "scaffold_used",
-  ).length;
+  const scaffoldsUsed = interactions.filter((i) => i.stepKind === "scaffold_used").length;
 
   let secondsActive = 0;
   if (interactions.length >= 2) {
     const first = new Date(interactions[0].occurredAt).getTime();
-    const last = new Date(
-      interactions[interactions.length - 1].occurredAt,
-    ).getTime();
+    const last = new Date(interactions[interactions.length - 1].occurredAt).getTime();
     secondsActive = Math.max(0, Math.round((last - first) / 1000));
   } else if (run.startedAt) {
     const start = new Date(run.startedAt).getTime();
@@ -1560,30 +1487,19 @@ function applyOutcomeToMastery(
   const store = db();
   const existing = store.skillMasteries.find(
     (m) =>
-      m.learnerId === run.learnerId &&
-      m.tenantId === run.tenantId &&
-      m.skillId === run.skillId,
+      m.learnerId === run.learnerId && m.tenantId === run.tenantId && m.skillId === run.skillId,
   );
   const beforeScore = existing?.score ?? run.masterySnapshot.score;
   const beforeLevel: SkillMasteryLevel = existing?.level ?? run.masterySnapshot.level;
 
   // accuracy in [0..1]; default to 0.5 when there were no checks (intro-only run)
-  const accuracy =
-    outcome.checksTotal > 0
-      ? outcome.checksCorrect / outcome.checksTotal
-      : 0.5;
+  const accuracy = outcome.checksTotal > 0 ? outcome.checksCorrect / outcome.checksTotal : 0.5;
   // Hints and scaffolds discount the apparent accuracy.
-  const supportPenalty = Math.min(
-    0.15,
-    0.04 * outcome.hintsUsed + 0.05 * outcome.scaffoldsUsed,
-  );
+  const supportPenalty = Math.min(0.15, 0.04 * outcome.hintsUsed + 0.05 * outcome.scaffoldsUsed);
   const adjusted = Math.max(0, accuracy - supportPenalty);
   // Move 25% of the way toward the adjusted target; abandoned runs decay slightly.
   const target = outcome.abandoned ? Math.min(beforeScore, 0.5) : adjusted;
-  const afterScore = Math.max(
-    0,
-    Math.min(1, beforeScore + (target - beforeScore) * 0.25),
-  );
+  const afterScore = Math.max(0, Math.min(1, beforeScore + (target - beforeScore) * 0.25));
   const afterLevel = levelFromScore(afterScore);
   const now = nowIso();
 
@@ -1633,10 +1549,7 @@ function buildParentLessonSummary(
   const subjectName = subject?.name ?? "this subject";
   const skillName = skill?.name ?? "this skill";
   const name = learner?.preferredName || learner?.firstName || "Your child";
-  const accuracy =
-    outcome.checksTotal > 0
-      ? outcome.checksCorrect / outcome.checksTotal
-      : null;
+  const accuracy = outcome.checksTotal > 0 ? outcome.checksCorrect / outcome.checksTotal : null;
 
   const headline = outcome.abandoned
     ? `${name} stepped away from ${skillName} in ${subjectName} — we'll bring it back soon.`
@@ -1667,10 +1580,8 @@ function buildParentLessonSummary(
         : null;
 
   const supportsUsed: string[] = [];
-  if (run.accommodationSnapshot.supportDefaults.extendedTime)
-    supportsUsed.push("extended time");
-  if (run.accommodationSnapshot.supportDefaults.readAloud)
-    supportsUsed.push("read-aloud");
+  if (run.accommodationSnapshot.supportDefaults.extendedTime) supportsUsed.push("extended time");
+  if (run.accommodationSnapshot.supportDefaults.readAloud) supportsUsed.push("read-aloud");
   if (run.accommodationSnapshot.supportDefaults.visualSchedules)
     supportsUsed.push("visual schedule");
   if (run.accommodationSnapshot.supportDefaults.sensoryBreaks)
@@ -1746,9 +1657,7 @@ export function completeLessonRun(
 // ===== Sprint 16: Quest worlds + progress =====
 
 export function listQuestWorlds(): QuestWorld[] {
-  return Array.from(db().questWorlds.values()).sort((a, b) =>
-    a.name.localeCompare(b.name),
-  );
+  return Array.from(db().questWorlds.values()).sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export function getQuestWorld(worldId: string): QuestWorld | null {
@@ -1780,11 +1689,7 @@ export function getQuestProgress(
   chapterId: string,
 ): QuestProgress | null {
   for (const p of db().questProgress.values()) {
-    if (
-      p.learnerId === learnerId &&
-      p.tenantId === tenantId &&
-      p.chapterId === chapterId
-    ) {
+    if (p.learnerId === learnerId && p.tenantId === tenantId && p.chapterId === chapterId) {
       return p;
     }
   }
@@ -1806,9 +1711,7 @@ export function isQuestChapterUnlocked(
       .filter((p) => p.progress >= 1)
       .map((p) => p.chapterId),
   );
-  return chapter.prerequisiteChapterIds.every((id) =>
-    completedChapterIds.has(id),
-  );
+  return chapter.prerequisiteChapterIds.every((id) => completedChapterIds.has(id));
 }
 
 /**
@@ -1954,7 +1857,7 @@ export async function retryLessonRun(
   if (run.status !== "failed" && run.status !== "generating") {
     // Not retryable from this state — surface a precondition error to caller.
     const plan = run.lessonPlanId
-      ? store.generatedLessonPlans.get(run.lessonPlanId) ?? null
+      ? (store.generatedLessonPlans.get(run.lessonPlanId) ?? null)
       : null;
     return { ok: false, code: "not_retryable", lessonRun: run, plan };
   }
@@ -2024,10 +1927,7 @@ function accessibilityKey(learnerId: ID, tenantId: ID) {
 }
 
 /** Returns the stored preferences or a defaults object when none persisted. */
-export function getAccessibilityPrefs(
-  learnerId: ID,
-  tenantId: ID,
-): AccessibilityPreferences {
+export function getAccessibilityPrefs(learnerId: ID, tenantId: ID): AccessibilityPreferences {
   const stored = db().accessibilityPrefs.get(accessibilityKey(learnerId, tenantId));
   if (stored) return stored;
   return {
@@ -2060,10 +1960,7 @@ export function updateAccessibilityPrefs(
 }
 
 /** Restore defaults, deleting any stored row. Returns the defaults record. */
-export function resetAccessibilityPrefs(
-  learnerId: ID,
-  tenantId: ID,
-): AccessibilityPreferences {
+export function resetAccessibilityPrefs(learnerId: ID, tenantId: ID): AccessibilityPreferences {
   db().accessibilityPrefs.delete(accessibilityKey(learnerId, tenantId));
   return getAccessibilityPrefs(learnerId, tenantId);
 }
@@ -2273,10 +2170,7 @@ export function listActiveAssignmentsForLearner(
 ): TeacherAssignment[] {
   const all = Array.from(db().teacherAssignments.values())
     .filter(
-      (a) =>
-        a.tenantId === tenantId &&
-        a.status === "active" &&
-        a.learnerIds.includes(learnerId),
+      (a) => a.tenantId === tenantId && a.status === "active" && a.learnerIds.includes(learnerId),
     )
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
   return all;
@@ -2289,10 +2183,7 @@ export function listActiveAssignmentsForLearner(
  * but excludes any private fields a teacher shouldn't see (raw IEP text is
  * never on the LearnerProfile anyway — it lives behind AccommodationSummary).
  */
-export function listLearnersForTeacher(
-  teacherId: string,
-  tenantId: string,
-): LearnerProfile[] {
+export function listLearnersForTeacher(teacherId: string, tenantId: string): LearnerProfile[] {
   const store = db();
   // Classrooms this teacher leads in this tenant.
   const classroomIds = new Set(
@@ -2303,11 +2194,7 @@ export function listLearnersForTeacher(
   // Also include classrooms where the teacher is enrolled with role=teacher
   // (co-teaching support).
   for (const e of store.enrollments.values()) {
-    if (
-      e.tenantId === tenantId &&
-      e.role === "teacher" &&
-      e.subjectId === teacherId
-    ) {
+    if (e.tenantId === tenantId && e.role === "teacher" && e.subjectId === teacherId) {
       classroomIds.add(e.classroomId);
     }
   }
@@ -2315,11 +2202,7 @@ export function listLearnersForTeacher(
   // Learner enrollments scoped to those classrooms.
   const learnerIds = new Set<string>();
   for (const e of store.enrollments.values()) {
-    if (
-      e.tenantId === tenantId &&
-      e.role === "learner" &&
-      classroomIds.has(e.classroomId)
-    ) {
+    if (e.tenantId === tenantId && e.role === "learner" && classroomIds.has(e.classroomId)) {
       learnerIds.add(e.subjectId);
     }
   }
@@ -2361,10 +2244,7 @@ import type { Role } from "@/lib/auth/types";
  *  - learner        → own tenant only
  * Returns a deterministic, name-sorted list.
  */
-export function scopeTenantsForSession(
-  role: Role,
-  tenantId: string,
-): Tenant[] {
+export function scopeTenantsForSession(role: Role, tenantId: string): Tenant[] {
   const all = Array.from(db().tenants.values());
   let visible: Tenant[];
   if (role === "platform_admin") {
@@ -2392,10 +2272,7 @@ export function getTenantById(id: string): Tenant | null {
   return db().tenants.get(id) ?? null;
 }
 
-export function updateTenant(
-  id: string,
-  patch: Partial<Pick<Tenant, "name">>,
-): Tenant | null {
+export function updateTenant(id: string, patch: Partial<Pick<Tenant, "name">>): Tenant | null {
   const t = db().tenants.get(id);
   if (!t) return null;
   const next: Tenant = { ...t, ...patch };
@@ -2444,10 +2321,7 @@ export function listUsersForTenants(tenantIds: string[]): UserSummary[] {
   return rows.sort((a, b) => a.user.displayName.localeCompare(b.user.displayName));
 }
 
-export function updateUserDisplayName(
-  userId: string,
-  displayName: string,
-): User | null {
+export function updateUserDisplayName(userId: string, displayName: string): User | null {
   const u = db().users.get(userId);
   if (!u) return null;
   const next: User = { ...u, displayName };
@@ -2456,10 +2330,7 @@ export function updateUserDisplayName(
 }
 
 /** Audit logs scoped to a tenant set. */
-export function listAuditLogsForTenants(
-  tenantIds: string[],
-  limit = 100,
-): AuditLog[] {
+export function listAuditLogsForTenants(tenantIds: string[], limit = 100): AuditLog[] {
   const ids = new Set(tenantIds);
   return db()
     .auditLogs.filter((l) => (l.tenantId ? ids.has(l.tenantId) : false))
@@ -2468,10 +2339,7 @@ export function listAuditLogsForTenants(
 }
 
 /** AI generation jobs scoped to a tenant set, newest first. */
-export function listAiGenerationJobs(
-  tenantIds: string[],
-  limit = 100,
-): AiGenerationJob[] {
+export function listAiGenerationJobs(tenantIds: string[], limit = 100): AiGenerationJob[] {
   const ids = new Set(tenantIds);
   return Array.from(db().aiGenerationJobs.values())
     .filter((j) => ids.has(j.tenantId))
@@ -2515,18 +2383,12 @@ export type SystemHealth = {
 };
 export function computeSystemHealth(tenantIds: string[]): SystemHealth {
   const ids = new Set(tenantIds);
-  const jobs = Array.from(db().aiGenerationJobs.values()).filter((j) =>
-    ids.has(j.tenantId),
-  );
+  const jobs = Array.from(db().aiGenerationJobs.values()).filter((j) => ids.has(j.tenantId));
   const complete = jobs.filter((j) => j.status === "complete").length;
   const failed = jobs.filter((j) => j.status === "failed").length;
-  const queued = jobs.filter(
-    (j) => j.status === "queued" || j.status === "running",
-  ).length;
+  const queued = jobs.filter((j) => j.status === "queued" || j.status === "running").length;
   const denom = complete + failed;
-  const runs = Array.from(db().lessonRuns.values()).filter((r) =>
-    ids.has(r.tenantId),
-  );
+  const runs = Array.from(db().lessonRuns.values()).filter((r) => ids.has(r.tenantId));
   const runsCompleted = runs.filter((r) => r.status === "completed").length;
   const memberTenants = new Set<string>();
   for (const m of db().memberships) {
@@ -2617,17 +2479,12 @@ export function listConsentVersions(): ConsentVersion[] {
 }
 
 export function getActiveConsentVersion(type: ConsentType): ConsentVersion | null {
-  const all = Array.from(db().consentVersions.values()).filter(
-    (v) => v.consentType === type,
-  );
+  const all = Array.from(db().consentVersions.values()).filter((v) => v.consentType === type);
   if (!all.length) return null;
   return all.sort((a, b) => b.effectiveAt.localeCompare(a.effectiveAt))[0];
 }
 
-export function listConsentsForUser(
-  parentUserId: string,
-  tenantId: string,
-): ConsentRecord[] {
+export function listConsentsForUser(parentUserId: string, tenantId: string): ConsentRecord[] {
   return db().consentRecords.filter(
     (r) => r.parentUserId === parentUserId && r.tenantId === tenantId,
   );
@@ -2639,10 +2496,7 @@ export function listConsentsForLearner(
   tenantId: string,
 ): ConsentRecord[] {
   return db().consentRecords.filter(
-    (r) =>
-      r.parentUserId === parentUserId &&
-      r.learnerId === learnerId &&
-      r.tenantId === tenantId,
+    (r) => r.parentUserId === parentUserId && r.learnerId === learnerId && r.tenantId === tenantId,
   );
 }
 
@@ -2750,10 +2604,7 @@ export function recordTermsAcceptance(input: {
   return t;
 }
 
-export function getAgeGateForLearner(
-  learnerId: string,
-  tenantId: string,
-): AgeGateRecord | null {
+export function getAgeGateForLearner(learnerId: string, tenantId: string): AgeGateRecord | null {
   const rec = db().ageGateRecords.get(learnerId);
   if (!rec || rec.tenantId !== tenantId) return null;
   return rec;
@@ -2773,9 +2624,7 @@ export function recordAgeGate(input: {
     learnerId: input.learnerId,
     recordedByUserId: input.recordedByUserId,
     ageRange: input.ageRange,
-    requiresParentConsent: input.ageRange
-      ? UNDER_13_AGE_RANGES.has(input.ageRange)
-      : true,
+    requiresParentConsent: input.ageRange ? UNDER_13_AGE_RANGES.has(input.ageRange) : true,
     recordedAt: nowIso(),
   };
   db().ageGateRecords.set(input.learnerId, rec);
@@ -2799,9 +2648,7 @@ import type {
 } from "@/lib/db/types";
 
 export function listDataInventory(): DataInventoryItem[] {
-  return Array.from(db().dataInventory.values()).sort((a, b) =>
-    a.key.localeCompare(b.key),
-  );
+  return Array.from(db().dataInventory.values()).sort((a, b) => a.key.localeCompare(b.key));
 }
 
 export function listRetentionPolicies(): DataRetentionPolicy[] {
@@ -2890,10 +2737,7 @@ export function createDataExportRequest(input: {
   return rec;
 }
 
-export function getDataExportRequest(
-  id: string,
-  tenantId: string,
-): DataExportRequest | null {
+export function getDataExportRequest(id: string, tenantId: string): DataExportRequest | null {
   const r = db().dataExportRequests.get(id);
   if (!r || r.tenantId !== tenantId) return null;
   return r;
@@ -2959,10 +2803,7 @@ export function createDataDeletionRequest(input: {
   return rec;
 }
 
-export function getDataDeletionRequest(
-  id: string,
-  tenantId: string,
-): DataDeletionRequest | null {
+export function getDataDeletionRequest(id: string, tenantId: string): DataDeletionRequest | null {
   const r = db().dataDeletionRequests.get(id);
   if (!r || r.tenantId !== tenantId) return null;
   return r;
@@ -3013,22 +2854,16 @@ export function listIepAccessForLearner(
   tenantId: string,
 ): IEPDocumentAccessLog[] {
   return db()
-    .iepDocumentAccessLogs.filter(
-      (r) => r.learnerId === learnerId && r.tenantId === tenantId,
-    )
+    .iepDocumentAccessLogs.filter((r) => r.learnerId === learnerId && r.tenantId === tenantId)
     .sort((a, b) => b.accessedAt.localeCompare(a.accessedAt));
 }
 
 export function listPolicyVersions(): PolicyVersion[] {
-  return Array.from(db().policyVersions.values()).sort((a, b) =>
-    a.kind.localeCompare(b.kind),
-  );
+  return Array.from(db().policyVersions.values()).sort((a, b) => a.kind.localeCompare(b.kind));
 }
 
 export function listSubprocessors(): SubprocessorRecord[] {
-  return Array.from(db().subprocessors.values()).sort((a, b) =>
-    a.name.localeCompare(b.name),
-  );
+  return Array.from(db().subprocessors.values()).sort((a, b) => a.name.localeCompare(b.name));
 }
 
 // ===== Sprint 26: Curriculum / Standards / Skill Graph =====
@@ -3039,9 +2874,7 @@ export function listSubprocessors(): SubprocessorRecord[] {
 // update functions that mint ids via newId() so BFFs stay thin.
 
 export function listStandardsFrameworks(): StandardsFramework[] {
-  return Array.from(db().standardsFrameworks.values()).sort((a, b) =>
-    a.name.localeCompare(b.name),
-  );
+  return Array.from(db().standardsFrameworks.values()).sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export function getStandardsFramework(id: string): StandardsFramework | null {
@@ -3075,15 +2908,12 @@ export function createStandardsFramework(input: {
 
 export function listStandardDocuments(frameworkId?: string): StandardDocument[] {
   const all = Array.from(db().standardDocuments.values());
-  return (frameworkId ? all.filter((d) => d.frameworkId === frameworkId) : all).sort(
-    (a, b) => a.title.localeCompare(b.title),
+  return (frameworkId ? all.filter((d) => d.frameworkId === frameworkId) : all).sort((a, b) =>
+    a.title.localeCompare(b.title),
   );
 }
 
-export function listStandards(filter?: {
-  frameworkId?: string;
-  documentId?: string;
-}): Standard[] {
+export function listStandards(filter?: { frameworkId?: string; documentId?: string }): Standard[] {
   let all = Array.from(db().standards.values());
   if (filter?.frameworkId) all = all.filter((s) => s.frameworkId === filter.frameworkId);
   if (filter?.documentId) all = all.filter((s) => s.documentId === filter.documentId);
@@ -3187,10 +3017,7 @@ export function addSkillPrerequisite(input: {
   // Also refuse duplicate edges so the graph stays a clean DAG.
   const prereqsBySkill = new Map<string, string[]>();
   for (const edge of store.skillPrerequisites.values()) {
-    if (
-      edge.skillId === input.skillId &&
-      edge.prerequisiteSkillId === input.prerequisiteSkillId
-    ) {
+    if (edge.skillId === input.skillId && edge.prerequisiteSkillId === input.prerequisiteSkillId) {
       return null; // duplicate edge
     }
     const list = prereqsBySkill.get(edge.skillId) ?? [];
@@ -3292,9 +3119,7 @@ export function listLessonObjectiveTemplates(skillId?: string): LessonObjectiveT
   return skillId ? all.filter((t) => t.skillId === skillId) : all;
 }
 
-export function getActiveLessonObjectiveTemplate(
-  skillId: string,
-): LessonObjectiveTemplate | null {
+export function getActiveLessonObjectiveTemplate(skillId: string): LessonObjectiveTemplate | null {
   for (const t of db().lessonObjectiveTemplates.values()) {
     if (t.skillId === skillId && t.status === "active") return t;
   }
@@ -3429,9 +3254,7 @@ export function recordModerationEvent(input: {
     ["self_harm", "adult_contact_risk", "violence"].includes(c),
   );
   const needsCase =
-    decision === "review" ||
-    input.crisisSignals.length > 0 ||
-    (decision === "block" && sensitive);
+    decision === "review" || input.crisisSignals.length > 0 || (decision === "block" && sensitive);
 
   let reviewCase: HumanReviewCase | null = null;
   let reviewCaseId: string | null = null;
@@ -3517,10 +3340,7 @@ export function updateHumanReviewCase(
   if (!c) return null;
   if (patch.status !== undefined) {
     c.status = patch.status;
-    if (
-      (patch.status === "resolved_allow" || patch.status === "resolved_block") &&
-      !c.resolvedAt
-    ) {
+    if ((patch.status === "resolved_allow" || patch.status === "resolved_block") && !c.resolvedAt) {
       c.resolvedAt = nowIso();
     }
     if (patch.status === "escalated" && !c.escalatedAt) c.escalatedAt = nowIso();
@@ -3602,11 +3422,7 @@ export function listHomeworkInputAudits(tenantId?: string): HomeworkInputAudit[]
 
 // ===== Sprint 28: TTS / Read-Aloud =====
 
-import {
-  getTTSProvider,
-  ttsContentHash,
-  type TTSRequest,
-} from "@/lib/tts/provider";
+import { getTTSProvider, ttsContentHash, type TTSRequest } from "@/lib/tts/provider";
 import type {
   AudioAsset,
   AudioCacheEntry,
@@ -3618,7 +3434,10 @@ import type {
   TTSVoiceId,
 } from "@/lib/db/types";
 
-const DEFAULT_VOICE_PREFERENCE: Omit<LearnerVoicePreference, "learnerId" | "tenantId" | "updatedAt"> = {
+const DEFAULT_VOICE_PREFERENCE: Omit<
+  LearnerVoicePreference,
+  "learnerId" | "tenantId" | "updatedAt"
+> = {
   voiceId: "kid_friendly",
   speed: 1.0,
   enabled: true,
@@ -3692,7 +3511,10 @@ export function upsertLearnerVoicePreference(input: {
     tenantId: input.tenantId,
     voiceId: input.voiceId ?? existing?.voiceId ?? DEFAULT_VOICE_PREFERENCE.voiceId,
     // Clamp speed to keep audio intelligible.
-    speed: Math.min(2, Math.max(0.5, input.speed ?? existing?.speed ?? DEFAULT_VOICE_PREFERENCE.speed)),
+    speed: Math.min(
+      2,
+      Math.max(0.5, input.speed ?? existing?.speed ?? DEFAULT_VOICE_PREFERENCE.speed),
+    ),
     enabled: input.enabled ?? existing?.enabled ?? DEFAULT_VOICE_PREFERENCE.enabled,
     captionsAlways:
       input.captionsAlways ?? existing?.captionsAlways ?? DEFAULT_VOICE_PREFERENCE.captionsAlways,
@@ -3733,7 +3555,13 @@ export async function generateTTS(input: {
     replacement: o.replacement,
     encoding: o.encoding,
   }));
-  const hash = ttsContentHash({ text: input.text, voiceId, languageCode, speed, pronunciationOverrides: overrides });
+  const hash = ttsContentHash({
+    text: input.text,
+    voiceId,
+    languageCode,
+    speed,
+    pronunciationOverrides: overrides,
+  });
 
   const key = cacheKey(input.tenantId, languageCode, hash);
   const cached = store.audioCacheEntries.get(key);
@@ -4000,16 +3828,31 @@ type CsvRow = {
   gradeBand: Classroom["gradeBand"];
 };
 
-function parseRosterCsv(text: string): { rows: CsvRow[]; errors: { rowNumber: number; row: Record<string, string>; message: string }[] } {
+function parseRosterCsv(text: string): {
+  rows: CsvRow[];
+  errors: { rowNumber: number; row: Record<string, string>; message: string }[];
+} {
   const lines = text.split(/\r?\n/);
   const rows: CsvRow[] = [];
   const errors: { rowNumber: number; row: Record<string, string>; message: string }[] = [];
   if (lines.length === 0) return { rows, errors };
   const header = lines[0]!.split(",").map((h) => h.trim().toLowerCase());
-  const required = ["role", "first_name", "last_name", "email", "external_id", "classroom_name", "grade_band"];
+  const required = [
+    "role",
+    "first_name",
+    "last_name",
+    "email",
+    "external_id",
+    "classroom_name",
+    "grade_band",
+  ];
   const missingCols = required.filter((c) => !header.includes(c));
   if (missingCols.length > 0) {
-    errors.push({ rowNumber: 1, row: { header: header.join(",") }, message: `Missing columns: ${missingCols.join(", ")}` });
+    errors.push({
+      rowNumber: 1,
+      row: { header: header.join(",") },
+      message: `Missing columns: ${missingCols.join(", ")}`,
+    });
     return { rows, errors };
   }
   for (let i = 1; i < lines.length; i++) {
@@ -4021,7 +3864,11 @@ function parseRosterCsv(text: string): { rows: CsvRow[]; errors: { rowNumber: nu
     const rowNumber = i + 1;
     const role = row.role?.toLowerCase();
     if (role !== "learner" && role !== "teacher" && role !== "co_teacher") {
-      errors.push({ rowNumber, row, message: `Invalid role "${row.role}". Expected learner | teacher | co_teacher.` });
+      errors.push({
+        rowNumber,
+        row,
+        message: `Invalid role "${row.role}". Expected learner | teacher | co_teacher.`,
+      });
       continue;
     }
     const gradeBand = row.grade_band as Classroom["gradeBand"];
@@ -4117,7 +3964,9 @@ export function runRosterImport(input: {
   // Track classrooms we've materialized this run so multiple roster rows
   // pointing at the same "Mrs. Smith 4A" share one classroom record.
   const classroomByName = new Map<string, Classroom>();
-  for (const c of Array.from(store.classrooms.values()).filter((c) => c.schoolId === input.schoolId)) {
+  for (const c of Array.from(store.classrooms.values()).filter(
+    (c) => c.schoolId === input.schoolId,
+  )) {
     classroomByName.set(c.name, c);
   }
 
@@ -4173,7 +4022,11 @@ export function runRosterImport(input: {
       store.rosterImportErrors.set(errRec.id, errRec);
     }
   }
-  job.status = input.dryRun ? "dry_run" : job.errorRows > 0 && job.createdRows === 0 ? "failed" : "completed";
+  job.status = input.dryRun
+    ? "dry_run"
+    : job.errorRows > 0 && job.createdRows === 0
+      ? "failed"
+      : "completed";
   job.completedAt = nowIso();
   return job;
 }
@@ -4213,7 +4066,9 @@ export function listSISConnections(tenantId: string): SISConnection[] {
 }
 
 export function listExternalRosterMappings(connectionId: string): ExternalRosterMapping[] {
-  return Array.from(db().externalRosterMappings.values()).filter((m) => m.connectionId === connectionId);
+  return Array.from(db().externalRosterMappings.values()).filter(
+    (m) => m.connectionId === connectionId,
+  );
 }
 
 /** Multi-device lesson sync — optimistic concurrency on `version`. */
@@ -4289,7 +4144,10 @@ function defaultPreferenceMap(): Record<string, boolean> {
   return m;
 }
 
-export function getNotificationPreference(userId: string, tenantId: string): NotificationPreference {
+export function getNotificationPreference(
+  userId: string,
+  tenantId: string,
+): NotificationPreference {
   const existing = db().notificationPreferences.get(userId);
   if (existing) return existing;
   // Create on read so the UI always has a row to render. Saves an explicit
@@ -4367,7 +4225,11 @@ export function createNotification(input: {
   return { notification: rec, deliveries };
 }
 
-export function listNotifications(opts: { tenantId: string; userId: string; unreadOnly?: boolean }): Notification[] {
+export function listNotifications(opts: {
+  tenantId: string;
+  userId: string;
+  unreadOnly?: boolean;
+}): Notification[] {
   let arr = Array.from(db().notifications.values()).filter(
     (n) => n.tenantId === opts.tenantId && n.userId === opts.userId,
   );
@@ -4388,7 +4250,9 @@ export function markNotificationsRead(userId: string, tenantId: string, ids: str
 }
 
 export function listDeliveriesFor(notificationId: string): NotificationDelivery[] {
-  return Array.from(db().notificationDeliveries.values()).filter((d) => d.notificationId === notificationId);
+  return Array.from(db().notificationDeliveries.values()).filter(
+    (d) => d.notificationId === notificationId,
+  );
 }
 
 export function listDigestSchedules(tenantId: string, userId?: string): DigestSchedule[] {
@@ -4413,7 +4277,9 @@ import type {
 } from "@/lib/db/types";
 
 export function listPlans(audience?: Plan["audience"]): Array<{ plan: Plan; prices: Price[] }> {
-  const plans = Array.from(db().plans.values()).filter((p) => p.active && (!audience || p.audience === audience));
+  const plans = Array.from(db().plans.values()).filter(
+    (p) => p.active && (!audience || p.audience === audience),
+  );
   return plans.map((plan) => ({
     plan,
     prices: Array.from(db().prices.values()).filter((p) => p.planId === plan.id && p.active),
@@ -4469,7 +4335,8 @@ export function subscribeTenant(input: {
     existing.canceledAt = nowIso();
   }
   const now = new Date();
-  const trialEnd = price.trialDays > 0 ? new Date(now.getTime() + price.trialDays * 86400_000) : null;
+  const trialEnd =
+    price.trialDays > 0 ? new Date(now.getTime() + price.trialDays * 86400_000) : null;
   const periodEnd = new Date(now);
   if (price.interval === "monthly") periodEnd.setMonth(periodEnd.getMonth() + 1);
   else periodEnd.setFullYear(periodEnd.getFullYear() + 1);
@@ -4520,7 +4387,11 @@ export function subscribeTenant(input: {
   return { subscription: sub, invoice };
 }
 
-export function cancelSubscription(subscriptionId: string, tenantId: string, atPeriodEnd = true): Subscription | null {
+export function cancelSubscription(
+  subscriptionId: string,
+  tenantId: string,
+  atPeriodEnd = true,
+): Subscription | null {
   const sub = db().subscriptions.get(subscriptionId);
   if (!sub || sub.tenantId !== tenantId) return null;
   if (atPeriodEnd) {
@@ -4538,7 +4409,9 @@ export function listInvoicesForTenant(tenantId: string): Invoice[] {
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export function listSeatLicensesForTenant(tenantId: string): Array<{ license: SeatLicense; assigned: number; remaining: number }> {
+export function listSeatLicensesForTenant(
+  tenantId: string,
+): Array<{ license: SeatLicense; assigned: number; remaining: number }> {
   const licenses = Array.from(db().seatLicenses.values()).filter((l) => l.tenantId === tenantId);
   return licenses.map((license) => {
     const assigned = Array.from(db().seatAssignments.values()).filter(
@@ -4557,7 +4430,12 @@ export function assignSeat(input: {
   tenantId: string;
   subjectId: string;
   subjectKind: SeatAssignment["subjectKind"];
-}): { ok: true; assignment: SeatAssignment } | { ok: false; reason: "license_not_found" | "subject_not_in_tenant" | "full" | "already_assigned" } {
+}):
+  | { ok: true; assignment: SeatAssignment }
+  | {
+      ok: false;
+      reason: "license_not_found" | "subject_not_in_tenant" | "full" | "already_assigned";
+    } {
   const lic = db().seatLicenses.get(input.licenseId);
   if (!lic || lic.tenantId !== input.tenantId) return { ok: false, reason: "license_not_found" };
   // The subject must belong to the same tenant as the license. Otherwise a
@@ -4685,8 +4563,14 @@ export function checkAIBudget(tenantId: string): {
   };
 }
 
-export function recordAICostEvent(input: Omit<AICostEvent, "id" | "occurredAt"> & { occurredAt?: string }): AICostEvent {
-  const rec: AICostEvent = { id: newId("acos"), occurredAt: input.occurredAt ?? nowIso(), ...input };
+export function recordAICostEvent(
+  input: Omit<AICostEvent, "id" | "occurredAt"> & { occurredAt?: string },
+): AICostEvent {
+  const rec: AICostEvent = {
+    id: newId("acos"),
+    occurredAt: input.occurredAt ?? nowIso(),
+    ...input,
+  };
   db().aiCostEvents.set(rec.id, rec);
   return rec;
 }
@@ -4823,7 +4707,9 @@ export function runMigrationJob(input: {
 }
 
 export function listMigrationJobs(): MigrationJob[] {
-  return Array.from(db().migrationJobs.values()).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  return Array.from(db().migrationJobs.values()).sort((a, b) =>
+    b.createdAt.localeCompare(a.createdAt),
+  );
 }
 
 export function getMigrationJob(jobId: string): MigrationJob | null {
@@ -4861,7 +4747,9 @@ export function listSecurityControls(): SecurityControl[] {
 export function getSecurityControl(id: string): SecurityControl | null {
   return db().securityControls.get(id) ?? null;
 }
-export function createSecurityControl(input: Omit<SecurityControl, "id" | "createdAt" | "lastReviewedAt"> & { lastReviewedAt?: string }): SecurityControl {
+export function createSecurityControl(
+  input: Omit<SecurityControl, "id" | "createdAt" | "lastReviewedAt"> & { lastReviewedAt?: string },
+): SecurityControl {
   const rec: SecurityControl = {
     id: newId("ctl"),
     createdAt: nowIso(),
@@ -4876,7 +4764,10 @@ export function createSecurityControl(input: Omit<SecurityControl, "id" | "creat
   db().securityControls.set(rec.id, rec);
   return rec;
 }
-export function updateSecurityControl(id: string, patch: Partial<Omit<SecurityControl, "id" | "code" | "createdAt">>): SecurityControl | null {
+export function updateSecurityControl(
+  id: string,
+  patch: Partial<Omit<SecurityControl, "id" | "code" | "createdAt">>,
+): SecurityControl | null {
   const c = db().securityControls.get(id);
   if (!c) return null;
   Object.assign(c, patch);
@@ -4889,7 +4780,9 @@ export function listEvidenceForControl(controlId: string): SecurityControlEviden
     .filter((e) => e.controlId === controlId)
     .sort((a, b) => b.collectedAt.localeCompare(a.collectedAt));
 }
-export function createControlEvidence(input: Omit<SecurityControlEvidence, "id" | "collectedAt">): SecurityControlEvidence | null {
+export function createControlEvidence(
+  input: Omit<SecurityControlEvidence, "id" | "collectedAt">,
+): SecurityControlEvidence | null {
   if (!db().securityControls.has(input.controlId)) return null;
   const rec: SecurityControlEvidence = { id: newId("evd"), collectedAt: nowIso(), ...input };
   db().securityControlEvidence.set(rec.id, rec);
@@ -4899,14 +4792,26 @@ export function createControlEvidence(input: Omit<SecurityControlEvidence, "id" 
 // ---- Risk register ----
 
 export function listRisks(): RiskRegisterEntry[] {
-  return Array.from(db().riskRegister.values()).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  return Array.from(db().riskRegister.values()).sort((a, b) =>
+    b.updatedAt.localeCompare(a.updatedAt),
+  );
 }
-export function createRisk(input: Omit<RiskRegisterEntry, "id" | "createdAt" | "updatedAt">): RiskRegisterEntry {
-  const rec: RiskRegisterEntry = { id: newId("risk"), createdAt: nowIso(), updatedAt: nowIso(), ...input };
+export function createRisk(
+  input: Omit<RiskRegisterEntry, "id" | "createdAt" | "updatedAt">,
+): RiskRegisterEntry {
+  const rec: RiskRegisterEntry = {
+    id: newId("risk"),
+    createdAt: nowIso(),
+    updatedAt: nowIso(),
+    ...input,
+  };
   db().riskRegister.set(rec.id, rec);
   return rec;
 }
-export function updateRisk(id: string, patch: Partial<Omit<RiskRegisterEntry, "id" | "createdAt">>): RiskRegisterEntry | null {
+export function updateRisk(
+  id: string,
+  patch: Partial<Omit<RiskRegisterEntry, "id" | "createdAt">>,
+): RiskRegisterEntry | null {
   const r = db().riskRegister.get(id);
   if (!r) return null;
   Object.assign(r, patch);
@@ -4952,7 +4857,20 @@ export function createIncident(input: {
   db().incidentTimelineEvents.set(tev.id, tev);
   return rec;
 }
-export function updateIncident(id: string, patch: Partial<Pick<Incident, "status" | "severity" | "summary" | "customerImpact" | "regulatorNotificationRequired" | "resolvedAt">>): Incident | null {
+export function updateIncident(
+  id: string,
+  patch: Partial<
+    Pick<
+      Incident,
+      | "status"
+      | "severity"
+      | "summary"
+      | "customerImpact"
+      | "regulatorNotificationRequired"
+      | "resolvedAt"
+    >
+  >,
+): Incident | null {
   const i = db().incidents.get(id);
   if (!i) return null;
   Object.assign(i, patch);
@@ -4981,7 +4899,9 @@ export function listIncidentTimeline(incidentId: string): IncidentTimelineEvent[
 export function listVendors(): Vendor[] {
   return Array.from(db().vendors.values()).sort((a, b) => a.name.localeCompare(b.name));
 }
-export function createVendor(input: Omit<Vendor, "id" | "createdAt" | "lastReviewedAt"> & { lastReviewedAt?: string }): Vendor {
+export function createVendor(
+  input: Omit<Vendor, "id" | "createdAt" | "lastReviewedAt"> & { lastReviewedAt?: string },
+): Vendor {
   const rec: Vendor = {
     id: newId("vnd"),
     createdAt: nowIso(),
@@ -4998,7 +4918,10 @@ export function createVendor(input: Omit<Vendor, "id" | "createdAt" | "lastRevie
   db().vendors.set(rec.id, rec);
   return rec;
 }
-export function updateVendor(id: string, patch: Partial<Omit<Vendor, "id" | "createdAt">>): Vendor | null {
+export function updateVendor(
+  id: string,
+  patch: Partial<Omit<Vendor, "id" | "createdAt">>,
+): Vendor | null {
   const v = db().vendors.get(id);
   if (!v) return null;
   Object.assign(v, patch);
@@ -5009,19 +4932,28 @@ export function updateVendor(id: string, patch: Partial<Omit<Vendor, "id" | "cre
 // ---- State privacy law matrix ----
 
 export function listStatePrivacyRequirements(): StatePrivacyRequirement[] {
-  return Array.from(db().statePrivacyRequirements.values()).sort((a, b) => a.label.localeCompare(b.label));
+  return Array.from(db().statePrivacyRequirements.values()).sort((a, b) =>
+    a.label.localeCompare(b.label),
+  );
 }
 export function listStatePrivacyMappingsFor(requirementId: string): StatePrivacyControlMapping[] {
-  return Array.from(db().statePrivacyMappings.values()).filter((m) => m.requirementId === requirementId);
+  return Array.from(db().statePrivacyMappings.values()).filter(
+    (m) => m.requirementId === requirementId,
+  );
 }
-export function createStatePrivacyMapping(input: Omit<StatePrivacyControlMapping, "id" | "reviewedAt">): StatePrivacyControlMapping | null {
+export function createStatePrivacyMapping(
+  input: Omit<StatePrivacyControlMapping, "id" | "reviewedAt">,
+): StatePrivacyControlMapping | null {
   if (!db().statePrivacyRequirements.has(input.requirementId)) return null;
   if (!db().securityControls.has(input.controlId)) return null;
   const rec: StatePrivacyControlMapping = { id: newId("spm"), reviewedAt: nowIso(), ...input };
   db().statePrivacyMappings.set(rec.id, rec);
   return rec;
 }
-export function updateStatePrivacyMapping(id: string, patch: Partial<Pick<StatePrivacyControlMapping, "status" | "evidence">>): StatePrivacyControlMapping | null {
+export function updateStatePrivacyMapping(
+  id: string,
+  patch: Partial<Pick<StatePrivacyControlMapping, "status" | "evidence">>,
+): StatePrivacyControlMapping | null {
   const m = db().statePrivacyMappings.get(id);
   if (!m) return null;
   Object.assign(m, patch);
@@ -5032,9 +4964,15 @@ export function updateStatePrivacyMapping(id: string, patch: Partial<Pick<StateP
 // ---- Vulnerabilities ----
 
 export function listVulnerabilities(): VulnerabilityReport[] {
-  return Array.from(db().vulnerabilityReports.values()).sort((a, b) => b.discoveredAt.localeCompare(a.discoveredAt));
+  return Array.from(db().vulnerabilityReports.values()).sort((a, b) =>
+    b.discoveredAt.localeCompare(a.discoveredAt),
+  );
 }
-export function createVulnerability(input: Omit<VulnerabilityReport, "id" | "discoveredAt" | "resolvedAt"> & { discoveredAt?: string }): VulnerabilityReport {
+export function createVulnerability(
+  input: Omit<VulnerabilityReport, "id" | "discoveredAt" | "resolvedAt"> & {
+    discoveredAt?: string;
+  },
+): VulnerabilityReport {
   const rec: VulnerabilityReport = {
     id: newId("vuln"),
     discoveredAt: input.discoveredAt ?? nowIso(),
@@ -5050,7 +4988,10 @@ export function createVulnerability(input: Omit<VulnerabilityReport, "id" | "dis
   db().vulnerabilityReports.set(rec.id, rec);
   return rec;
 }
-export function updateVulnerability(id: string, patch: Partial<Pick<VulnerabilityReport, "status" | "fixedIn" | "severity">>): VulnerabilityReport | null {
+export function updateVulnerability(
+  id: string,
+  patch: Partial<Pick<VulnerabilityReport, "status" | "fixedIn" | "severity">>,
+): VulnerabilityReport | null {
   const v = db().vulnerabilityReports.get(id);
   if (!v) return null;
   Object.assign(v, patch);
@@ -5171,12 +5112,9 @@ export function getDistrictStats(tenantIds: string[]): DistrictStats {
   const tenants = Array.from(db().tenants.values()).filter((t) => ids.has(t.id));
   const memberships = db().memberships.filter((m) => ids.has(m.tenantId));
 
-  const roleCount = (role: Role) =>
-    memberships.filter((m) => m.role === role).length;
+  const roleCount = (role: Role) => memberships.filter((m) => m.role === role).length;
 
-  const learners = Array.from(db().learnerProfiles.values()).filter((l) =>
-    ids.has(l.tenantId),
-  );
+  const learners = Array.from(db().learnerProfiles.values()).filter((l) => ids.has(l.tenantId));
 
   const levels: Array<FunctioningLevel | "unset"> = [
     "standard",
@@ -5196,10 +5134,7 @@ export function getDistrictStats(tenantIds: string[]): DistrictStats {
   return {
     schools: tenants.filter((t) => t.type === "school").length,
     families: tenants.filter((t) => t.type === "family").length,
-    staff:
-      roleCount("teacher") +
-      roleCount("school_admin") +
-      roleCount("district_admin"),
+    staff: roleCount("teacher") + roleCount("school_admin") + roleCount("district_admin"),
     districtAdmins: roleCount("district_admin"),
     schoolAdmins: roleCount("school_admin"),
     teachers: roleCount("teacher"),
@@ -5214,10 +5149,7 @@ export function getDistrictStats(tenantIds: string[]): DistrictStats {
  * Users in this tenant set holding an admin/teacher/etc. role. Used by the
  * district admins + staff pages. `roles` filters the result.
  */
-export function listMembersByRole(
-  tenantIds: string[],
-  roles: Role[],
-): UserSummary[] {
+export function listMembersByRole(tenantIds: string[], roles: Role[]): UserSummary[] {
   const wanted = new Set(roles);
   return listUsersForTenants(tenantIds).filter((u) => wanted.has(u.role));
 }
@@ -5235,14 +5167,10 @@ export type DistrictLearnerRow = {
 
 export function listDistrictLearners(tenantIds: string[]): DistrictLearnerRow[] {
   const learners = listLearnersForTenants(tenantIds);
-  const iepLearnerIds = new Set(
-    Array.from(db().iepDocuments.values()).map((d) => d.learnerId),
-  );
+  const iepLearnerIds = new Set(Array.from(db().iepDocuments.values()).map((d) => d.learnerId));
   return learners.map((l) => {
     const family = db().tenants.get(l.tenantId);
-    const school = family?.parentTenantId
-      ? db().tenants.get(family.parentTenantId)
-      : null;
+    const school = family?.parentTenantId ? db().tenants.get(family.parentTenantId) : null;
     return {
       learner: l,
       familyName: family?.name ?? l.tenantId,
@@ -5266,17 +5194,13 @@ export function listDistrictSchools(tenantIds: string[]): DistrictSchoolRow[] {
   const schools = tenants.filter((t) => t.type === "school");
   return schools
     .map((school) => {
-      const families = tenants.filter(
-        (t) => t.type === "family" && t.parentTenantId === school.id,
-      );
+      const families = tenants.filter((t) => t.type === "family" && t.parentTenantId === school.id);
       const familyIds = new Set(families.map((f) => f.id));
-      const learnerCount = Array.from(db().learnerProfiles.values()).filter(
-        (l) => familyIds.has(l.tenantId),
+      const learnerCount = Array.from(db().learnerProfiles.values()).filter((l) =>
+        familyIds.has(l.tenantId),
       ).length;
       const staffCount = db().memberships.filter(
-        (m) =>
-          m.tenantId === school.id &&
-          (m.role === "teacher" || m.role === "school_admin"),
+        (m) => m.tenantId === school.id && (m.role === "teacher" || m.role === "school_admin"),
       ).length;
       return {
         school,
@@ -5287,7 +5211,6 @@ export function listDistrictSchools(tenantIds: string[]): DistrictSchoolRow[] {
     })
     .sort((a, b) => a.school.name.localeCompare(b.school.name));
 }
-
 
 /** Look up a single user by id. Returns null when not found. */
 export function getUserById(id: string): User | null {
@@ -5324,9 +5247,7 @@ import type {
 
 /** Every coupon, newest first. */
 export function listCoupons(): Coupon[] {
-  return Array.from(db().coupons.values()).sort((a, b) =>
-    b.createdAt.localeCompare(a.createdAt),
-  );
+  return Array.from(db().coupons.values()).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
 /** Every daily billing batch, newest run-date first. */
@@ -5384,10 +5305,7 @@ export function getLearnerEngagement(
 }
 
 /** All badges earned by a learner, newest first. */
-export function listLearnerBadges(
-  learnerId: string,
-  tenantId: string,
-): LearnerBadge[] {
+export function listLearnerBadges(learnerId: string, tenantId: string): LearnerBadge[] {
   return Array.from(db().learnerBadges.values())
     .filter((b) => b.learnerId === learnerId && b.tenantId === tenantId)
     .sort((a, b) => b.earnedAt.localeCompare(a.earnedAt));
@@ -5420,9 +5338,7 @@ export function upsertLearnerSensoryModality(
   // a shared learnerId key.
   const learner = store.learnerProfiles.get(learnerId);
   if (!learner || learner.tenantId !== tenantId) {
-    throw new Error(
-      `upsertLearnerSensoryModality: learner ${learnerId} not in tenant ${tenantId}`,
-    );
+    throw new Error(`upsertLearnerSensoryModality: learner ${learnerId} not in tenant ${tenantId}`);
   }
   let prof = store.learnerSensoryProfiles.get(learnerId);
   if (!prof || prof.tenantId !== tenantId) {

@@ -1,7 +1,7 @@
-import React from 'react';
-import { ScrollView, StyleSheet, View, ViewStyle } from 'react-native';
-import { useWindowSizeClass } from '../../design/useWindowSizeClass';
-import { colors, radius, spacing } from '@/constants/colors';
+import React from "react";
+import { ScrollView, StyleSheet, View, ViewStyle } from "react-native";
+import { useWindowSizeClass } from "../../design/useWindowSizeClass";
+import { colors, radius, spacing } from "@/constants/colors";
 
 export interface HomeworkWorkspaceProps {
   /** Problem list / adapted-problem queue. */
@@ -37,7 +37,7 @@ export function HomeworkWorkspace({
 }: HomeworkWorkspaceProps) {
   const { sizeClass } = useWindowSizeClass();
 
-  if (sizeClass === 'expanded') {
+  if (sizeClass === "expanded") {
     return (
       <View style={[styles.flex, style]}>
         {header}
@@ -51,7 +51,7 @@ export function HomeworkWorkspace({
     );
   }
 
-  if (sizeClass === 'medium') {
+  if (sizeClass === "medium") {
     return (
       <View style={[styles.flex, style]}>
         {header}
@@ -82,15 +82,15 @@ export function HomeworkWorkspace({
 
 const styles = StyleSheet.create({
   flex: { flex: 1, backgroundColor: colors.background },
-  threeCol: { flex: 1, flexDirection: 'row', padding: spacing.md, gap: spacing.md },
-  twoCol: { flex: 1, flexDirection: 'row', padding: spacing.md, gap: spacing.md },
+  threeCol: { flex: 1, flexDirection: "row", padding: spacing.md, gap: spacing.md },
+  twoCol: { flex: 1, flexDirection: "row", padding: spacing.md, gap: spacing.md },
   rightStack: { flex: 1, gap: spacing.md },
   stack: { gap: spacing.md, padding: spacing.md },
   panel: {
     backgroundColor: colors.card,
     borderRadius: radius.xl,
     padding: spacing.md,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   problemsCol: { width: 300 },
   workCol: { flex: 1 },
@@ -98,5 +98,5 @@ const styles = StyleSheet.create({
   problemsColMedium: { width: 240 },
   workColMedium: { flex: 1.2 },
   tutorColMedium: { flex: 1 },
-  stackPanel: { width: '100%' },
+  stackPanel: { width: "100%" },
 });

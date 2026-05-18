@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Target environment'
+        description: "Target environment"
         required: true
         type: choice
         options:
@@ -12,7 +12,7 @@ on:
           - staging
           - production
       action:
-        description: 'Migration action'
+        description: "Migration action"
         required: true
         type: choice
         options:

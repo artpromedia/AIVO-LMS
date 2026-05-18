@@ -9,14 +9,8 @@
  */
 "use client";
 import { useCallback, useEffect, useState } from "react";
-import type {
-  CSSProperties,
-} from "react";
-import type {
-  SensoryProfile,
-  SensoryAdaptations,
-  FunctioningLevel,
-} from "@aivo/stage-ui";
+import type { CSSProperties } from "react";
+import type { SensoryProfile, SensoryAdaptations, FunctioningLevel } from "@aivo/stage-ui";
 
 const DEFAULT_PROFILE: SensoryProfile = {
   visual: "typical",
@@ -130,11 +124,15 @@ export function useSensoryAdapter(
     setAdaptations(computeAdaptations(profile, functioningLevel));
   }, [profile, functioningLevel]);
 
-  const getCSSVars = useCallback((): CSSProperties => ({
-    "--stage-saturation": `${adaptations.colorSaturation}%`,
-    "--stage-animation-speed": `${adaptations.animationSpeed}`,
-    "--stage-transition-duration": `${300 / adaptations.animationSpeed}ms`,
-  } as CSSProperties), [adaptations]);
+  const getCSSVars = useCallback(
+    (): CSSProperties =>
+      ({
+        "--stage-saturation": `${adaptations.colorSaturation}%`,
+        "--stage-animation-speed": `${adaptations.animationSpeed}`,
+        "--stage-transition-duration": `${300 / adaptations.animationSpeed}ms`,
+      }) as CSSProperties,
+    [adaptations],
+  );
 
   // DAPE regulation-break suggester. Maps the dominant sensory pattern to
   // the type of movement break most likely to bring the learner back into

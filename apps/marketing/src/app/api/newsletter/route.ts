@@ -18,18 +18,12 @@ export async function POST(req: NextRequest) {
     const { email } = body;
 
     if (!email) {
-      return NextResponse.json(
-        { error: "Email is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: "Invalid email address" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
     }
 
     const res = await fetch(`${ADMIN_SVC_URL}/api/admin-svc/newsletter`, {
@@ -43,15 +37,12 @@ export async function POST(req: NextRequest) {
     if (!res.ok) {
       return NextResponse.json(
         { error: data.error || "Failed to process subscription" },
-        { status: res.status }
+        { status: res.status },
       );
     }
 
     return NextResponse.json(data);
   } catch {
-    return NextResponse.json(
-      { error: "Failed to process subscription" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to process subscription" }, { status: 500 });
   }
 }

@@ -22,12 +22,7 @@
  */
 import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { eq, and, desc } from "drizzle-orm";
-import {
-  efTaskBreakdowns,
-  efTaskStepProgress,
-  efSessionOutcomes,
-  learners,
-} from "@aivo/db";
+import { efTaskBreakdowns, efTaskStepProgress, efSessionOutcomes, learners } from "@aivo/db";
 import {
   breakDownTask,
   bucketLocalHour,
@@ -76,11 +71,7 @@ async function loadAuthorizedLearner(
     reply.code(401).send({ error: "Unauthorized" });
     return null;
   }
-  const [learner] = await db
-    .select()
-    .from(learners)
-    .where(eq(learners.id, learnerId))
-    .limit(1);
+  const [learner] = await db.select().from(learners).where(eq(learners.id, learnerId)).limit(1);
   if (!learner) {
     reply.code(404).send({ error: "Learner not found" });
     return null;
@@ -149,9 +140,7 @@ export function registerEfRoutes(app: FastifyInstance, db: any): void {
         const base = breakDownTask({ taskId: body.taskId, title: body.title });
         if (!body.modalities || body.modalities.length === 0) return base;
         const allow = new Set(body.modalities);
-        const narrowed = base.steps.filter(
-          (s) => !s.modality || allow.has(s.modality),
-        );
+        const narrowed = base.steps.filter((s) => !s.modality || allow.has(s.modality));
         if (narrowed.length === 0) return base;
         return {
           taskId: base.taskId,
@@ -165,10 +154,7 @@ export function registerEfRoutes(app: FastifyInstance, db: any): void {
       await db
         .delete(efTaskBreakdowns)
         .where(
-          and(
-            eq(efTaskBreakdowns.learnerId, learner.id),
-            eq(efTaskBreakdowns.taskId, body.taskId),
-          ),
+          and(eq(efTaskBreakdowns.learnerId, learner.id), eq(efTaskBreakdowns.taskId, body.taskId)),
         );
       const [row] = await db
         .insert(efTaskBreakdowns)
@@ -222,12 +208,7 @@ export function registerEfRoutes(app: FastifyInstance, db: any): void {
       const [row] = await db
         .select()
         .from(efTaskBreakdowns)
-        .where(
-          and(
-            eq(efTaskBreakdowns.learnerId, learner.id),
-            eq(efTaskBreakdowns.taskId, taskId),
-          ),
-        )
+        .where(and(eq(efTaskBreakdowns.learnerId, learner.id), eq(efTaskBreakdowns.taskId, taskId)))
         .limit(1);
       if (!row) return reply.code(404).send({ error: "No breakdown" });
 
@@ -297,12 +278,7 @@ export function registerEfRoutes(app: FastifyInstance, db: any): void {
         .where(eq(efTaskBreakdowns.id, id))
         .limit(1);
       if (!breakdown) return reply.code(404).send({ error: "No breakdown" });
-      const learner = await loadAuthorizedLearner(
-        db,
-        req,
-        reply,
-        breakdown.learnerId,
-      );
+      const learner = await loadAuthorizedLearner(db, req, reply, breakdown.learnerId);
       if (!learner) return;
 
       // Reject step IDs that aren't in the persisted plan — defends
@@ -386,16 +362,12 @@ export function registerEfRoutes(app: FastifyInstance, db: any): void {
       const learner = await loadAuthorizedLearner(db, req, reply, body.learnerId);
       if (!learner) return;
 
-      const startedAt = body.outcome.startedAt
-        ? new Date(body.outcome.startedAt)
-        : new Date();
+      const startedAt = body.outcome.startedAt ? new Date(body.outcome.startedAt) : new Date();
       if (Number.isNaN(startedAt.getTime())) {
         return reply.code(400).send({ error: "Invalid startedAt" });
       }
       const hour =
-        typeof body.outcome.localHour === "number"
-          ? body.outcome.localHour
-          : startedAt.getHours();
+        typeof body.outcome.localHour === "number" ? body.outcome.localHour : startedAt.getHours();
       const tod = bucketLocalHour(hour);
 
       const [row] = await db
@@ -447,16 +419,16 @@ export function registerEfRoutes(app: FastifyInstance, db: any): void {
       const memory = TimeOfDayMemory.fromJSON(
         rows
           .filter((r: any) => VALID_TOD.has(r.timeOfDay))
-          .map((r: any): SessionOutcome => ({
-            timeOfDay: r.timeOfDay,
-            dayOfWeek:
-              r.startedAt instanceof Date
-                ? r.startedAt.getDay()
-                : new Date(r.startedAt).getDay(),
-            accuracy: r.accuracy,
-            frustrationRate: r.frustrationRate,
-            attentionMinutes: r.attentionMinutes,
-          })),
+          .map(
+            (r: any): SessionOutcome => ({
+              timeOfDay: r.timeOfDay,
+              dayOfWeek:
+                r.startedAt instanceof Date ? r.startedAt.getDay() : new Date(r.startedAt).getDay(),
+              accuracy: r.accuracy,
+              frustrationRate: r.frustrationRate,
+              attentionMinutes: r.attentionMinutes,
+            }),
+          ),
       );
 
       return reply.send({

@@ -4,11 +4,7 @@ import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireLearnerScope } from "@/lib/bff/guards";
 import { audit } from "@/lib/bff/audit";
-import {
-  SAFETY_CLASSIFY,
-  getActiveSafetyPolicy,
-  recordModerationEvent,
-} from "@/lib/db/repos";
+import { SAFETY_CLASSIFY, getActiveSafetyPolicy, recordModerationEvent } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
 
@@ -40,7 +36,10 @@ export async function POST(req: Request): Promise<NextResponse> {
     const parsed = bodySchema.safeParse(body);
     if (!parsed.success) {
       return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." },
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
         requestId,
       );
     }

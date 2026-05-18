@@ -15,7 +15,9 @@ function makeStubDb(rows: any[]) {
   return {
     queries,
     execute(q: any) {
-      queries.push(q?.queryChunks?.map((c: any) => (typeof c === "string" ? c : "?")).join("") ?? "");
+      queries.push(
+        q?.queryChunks?.map((c: any) => (typeof c === "string" ? c : "?")).join("") ?? "",
+      );
       // The first query is the SELECT, subsequent queries are the INSERT and DELETE.
       // Return rows for the SELECT, empty for everything else.
       if (queries.length === 1) return Promise.resolve({ rows });

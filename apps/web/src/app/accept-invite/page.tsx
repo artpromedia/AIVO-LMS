@@ -13,7 +13,14 @@ function AcceptInviteInner() {
   const { user, accessToken, loading } = useAuth();
 
   const [status, setStatus] = useState<
-    "checking" | "needs_login" | "needs_signup" | "wrong_email" | "accepting" | "success" | "none" | "error"
+    | "checking"
+    | "needs_login"
+    | "needs_signup"
+    | "wrong_email"
+    | "accepting"
+    | "success"
+    | "none"
+    | "error"
   >("checking");
   const [accepted, setAccepted] = useState<{ role: string; learnerId: string }[]>([]);
   const [errorMsg, setErrorMsg] = useState<string>("");
@@ -60,10 +67,10 @@ function AcceptInviteInner() {
     user?.role === "CAREGIVER"
       ? "/dashboard/caregiver"
       : user?.role === "TEACHER"
-      ? "/dashboard/teacher"
-      : user?.role === "THERAPIST"
-      ? "/dashboard/therapist"
-      : "/dashboard/parent";
+        ? "/dashboard/teacher"
+        : user?.role === "THERAPIST"
+          ? "/dashboard/therapist"
+          : "/dashboard/parent";
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-[hsl(var(--visual-surface-soft))]">
@@ -85,9 +92,15 @@ function AcceptInviteInner() {
           <>
             <p className="text-sm vi-text-muted text-center">
               {invitedEmail ? (
-                <>You've been invited to join a learning team for <strong className="vi-text">{invitedEmail}</strong>.</>
+                <>
+                  You've been invited to join a learning team for{" "}
+                  <strong className="vi-text">{invitedEmail}</strong>.
+                </>
               ) : (
-                <>You've been invited to join a learning team. Sign in or create your account to continue.</>
+                <>
+                  You've been invited to join a learning team. Sign in or create your account to
+                  continue.
+                </>
               )}
             </p>
             <div className="flex flex-col gap-3">
@@ -115,7 +128,8 @@ function AcceptInviteInner() {
               <AlertCircle className="w-5 h-5 text-[hsl(var(--visual-sel))] shrink-0 mt-0.5" />
               <p className="text-sm vi-text">
                 You're signed in as <strong>{user?.email}</strong>, but this invitation is for{" "}
-                <strong>{invitedEmail}</strong>. Please sign out and sign in with the invited address.
+                <strong>{invitedEmail}</strong>. Please sign out and sign in with the invited
+                address.
               </p>
             </div>
             <Link
@@ -140,8 +154,7 @@ function AcceptInviteInner() {
             <div className="flex items-start gap-2 p-3 rounded-lg bg-[hsl(var(--visual-science)/0.12)]">
               <CheckCircle2 className="w-5 h-5 text-[hsl(var(--visual-science))] shrink-0 mt-0.5" />
               <p className="text-sm vi-text">
-                You've been added to{" "}
-                <strong>{accepted.length}</strong>{" "}
+                You've been added to <strong>{accepted.length}</strong>{" "}
                 {accepted.length === 1 ? "learner's team" : "learners' teams"}. Welcome!
               </p>
             </div>
@@ -158,8 +171,8 @@ function AcceptInviteInner() {
         {status === "none" && (
           <div className="space-y-3">
             <p className="text-sm vi-text-muted text-center">
-              No pending invitations were found for your account. If you were expecting one, ask the parent to
-              re-send the invite to <strong>{user?.email}</strong>.
+              No pending invitations were found for your account. If you were expecting one, ask the
+              parent to re-send the invite to <strong>{user?.email}</strong>.
             </p>
             <button
               onClick={() => router.push(continueHref)}

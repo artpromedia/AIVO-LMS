@@ -101,9 +101,7 @@ export function registerEnterpriseAuthHook(
   options: EnterpriseAuthOptions,
 ): void {
   const skip = new Set(options.skipPaths ?? ["/healthz", "/metrics"]);
-  let cachedVerifier:
-    | ((token: string) => Promise<Record<string, unknown> | null>)
-    | null = null;
+  let cachedVerifier: ((token: string) => Promise<Record<string, unknown> | null>) | null = null;
 
   app.addHook("onRequest", async (request: FastifyRequest, reply: FastifyReply) => {
     if (skip.has(request.url.split("?")[0])) {
@@ -155,8 +153,7 @@ export function registerEnterpriseAuthHook(
     const role = coerceRole(claims?.role);
     const tenantId = typeof claims?.tenantId === "string" ? claims.tenantId : undefined;
     const actorId = typeof claims?.sub === "string" ? claims.sub : undefined;
-    const tenant: TenantContext | undefined =
-      tenantId && role ? { tenantId, role } : undefined;
+    const tenant: TenantContext | undefined = tenantId && role ? { tenantId, role } : undefined;
     request.enterpriseContext = createRequestContext({
       actorId,
       actorRole: role,

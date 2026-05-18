@@ -35,7 +35,10 @@ const PORT = parseInt(process.env.BILLING_SVC_PORT || "3009", 10);
  */
 type CronHandles = Record<string, SafeCronHandle>;
 
-export async function buildApp(handles: CronHandles = {}, db = createDb(process.env.DATABASE_URL ?? "")) {
+export async function buildApp(
+  handles: CronHandles = {},
+  db = createDb(process.env.DATABASE_URL ?? ""),
+) {
   const app = Fastify({ logger: false });
 
   await app.register(cors, { origin: true, credentials: true });
@@ -53,7 +56,9 @@ export async function buildApp(handles: CronHandles = {}, db = createDb(process.
       info: { title: "AIVO Billing Service", version: "1.0.0" },
       servers: process.env.SWAGGER_SERVER_URL
         ? [{ url: process.env.SWAGGER_SERVER_URL }]
-        : (process.env.NODE_ENV === "production" ? [] : [{ url: `http://localhost:${PORT}` }]),
+        : process.env.NODE_ENV === "production"
+          ? []
+          : [{ url: `http://localhost:${PORT}` }],
       components: {
         securitySchemes: { bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" } },
       },
@@ -133,7 +138,9 @@ async function start() {
 const isMain = (() => {
   try {
     return process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 })();
 if (isMain) {
   start().catch((err) => {

@@ -26,14 +26,11 @@ export interface StageLayout {
 export function resolveStageLayout(width: number, height: number): StageLayout {
   const sizeClass = classifyWidth(width);
   const isLandscape = width > height;
-  const split =
-    sizeClass === "expanded" || (sizeClass === "medium" && isLandscape);
+  const split = sizeClass === "expanded" || (sizeClass === "medium" && isLandscape);
 
   return {
     mode: split ? "split" : "stacked",
-    contentMaxWidth: split
-      ? CONTENT_MAX_WIDTH.workspace
-      : CONTENT_MAX_WIDTH.dashboard,
+    contentMaxWidth: split ? CONTENT_MAX_WIDTH.workspace : CONTENT_MAX_WIDTH.dashboard,
     tutorPanelWidth: sizeClass === "expanded" ? 360 : 320,
     splitGap: 16,
   };

@@ -43,7 +43,7 @@ if (!existsSync(learnerHome)) {
   const matches = [...src.matchAll(/data-primary-cta(?:=["{][^"}]*["}])?/g)];
   if (matches.length === 0) {
     errors.push(
-      'learner/home/page.tsx: must declare exactly one element with `data-primary-cta` (Today\'s Mission); none found.',
+      "learner/home/page.tsx: must declare exactly one element with `data-primary-cta` (Today's Mission); none found.",
     );
   } else if (matches.length > 1) {
     errors.push(
@@ -100,8 +100,7 @@ for (const role of ROLE_GROUPS) {
   const pages = walk(roleDir).filter((p) => p.endsWith("/page.tsx"));
   for (const p of pages) {
     const src = readFileSync(p, "utf8");
-    const callsGuard =
-      /requirePageRole|requireSession\b/.test(src) || layoutCoversRole;
+    const callsGuard = /requirePageRole|requireSession\b/.test(src) || layoutCoversRole;
     if (!callsGuard) {
       errors.push(
         `${p.replace(repoRoot + "/", "")}: must call requirePageRole or be covered by a role-group layout that does.`,

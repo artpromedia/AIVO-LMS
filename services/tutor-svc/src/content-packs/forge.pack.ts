@@ -23,7 +23,8 @@ export const forgeStarterPack: ContentPack = {
       title: "Define the problem",
       skillId: "ngss.eng.3-5.ETS1-1",
       type: "narration",
-      prompt: "Engineers start by defining the problem: what needs to be solved, who it's for, and what counts as success. Today we'll design a paper-tower challenge.",
+      prompt:
+        "Engineers start by defining the problem: what needs to be solved, who it's for, and what counts as success. Today we'll design a paper-tower challenge.",
       difficulty: "intro",
     },
     {
@@ -31,7 +32,8 @@ export const forgeStarterPack: ContentPack = {
       title: "Pick the criteria",
       skillId: "ngss.eng.3-5.ETS1-1",
       type: "multiple_choice",
-      prompt: "Our paper tower must hold up a tennis ball for 10 seconds. Which is the SUCCESS CRITERION?",
+      prompt:
+        "Our paper tower must hold up a tennis ball for 10 seconds. Which is the SUCCESS CRITERION?",
       difficulty: "core",
       choices: [
         { id: "criterion", label: "Holds the ball for 10 seconds", correct: true },
@@ -44,7 +46,8 @@ export const forgeStarterPack: ContentPack = {
       title: "Compare two designs",
       skillId: "ngss.eng.3-5.ETS1-2",
       type: "tap",
-      prompt: "Two towers were tested. Tower A held the ball 12 seconds; Tower B held it 4 seconds. Which design met the criterion?",
+      prompt:
+        "Two towers were tested. Tower A held the ball 12 seconds; Tower B held it 4 seconds. Which design met the criterion?",
       difficulty: "core",
       choices: [
         { id: "a", label: "Tower A", correct: true },
@@ -56,7 +59,8 @@ export const forgeStarterPack: ContentPack = {
       title: "Plan a fair test",
       skillId: "ngss.eng.3-5.ETS1-3.test",
       type: "draw",
-      prompt: "Sketch a simple test setup with one variable changed (e.g., paper thickness) and everything else the same.",
+      prompt:
+        "Sketch a simple test setup with one variable changed (e.g., paper thickness) and everything else the same.",
       difficulty: "stretch",
     },
   ],

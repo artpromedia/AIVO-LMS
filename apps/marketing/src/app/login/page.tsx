@@ -22,17 +22,81 @@ import {
 } from "lucide-react";
 
 const SUBJECT_PILLS = [
-  { key: "MATH", label: "Math", Icon: Calculator, bg: "bg-pink-100", text: "text-pink-700", border: "border-pink-300" },
-  { key: "READING", label: "Reading", Icon: BookOpen, bg: "bg-cyan-100", text: "text-cyan-700", border: "border-cyan-300" },
-  { key: "SCIENCE", label: "Science", Icon: FlaskConical, bg: "bg-emerald-100", text: "text-emerald-700", border: "border-emerald-300" },
-  { key: "SEL", label: "Feelings", Icon: Heart, bg: "bg-amber-100", text: "text-amber-700", border: "border-amber-300" },
+  {
+    key: "MATH",
+    label: "Math",
+    Icon: Calculator,
+    bg: "bg-pink-100",
+    text: "text-pink-700",
+    border: "border-pink-300",
+  },
+  {
+    key: "READING",
+    label: "Reading",
+    Icon: BookOpen,
+    bg: "bg-cyan-100",
+    text: "text-cyan-700",
+    border: "border-cyan-300",
+  },
+  {
+    key: "SCIENCE",
+    label: "Science",
+    Icon: FlaskConical,
+    bg: "bg-emerald-100",
+    text: "text-emerald-700",
+    border: "border-emerald-300",
+  },
+  {
+    key: "SEL",
+    label: "Feelings",
+    Icon: Heart,
+    bg: "bg-amber-100",
+    text: "text-amber-700",
+    border: "border-amber-300",
+  },
 ] as const;
 
 const LEARNERS = [
-  { name: "Leo", tutor: "nova", subject: "math", days: 12, subtitle: "Algebra adventure ready when you are.", bg: "bg-violet-100", border: "border-violet-400", avatarBg: "bg-violet-50" },
-  { name: "Maya", tutor: "sage", subject: "reading", days: 8, subtitle: "Three new stories unlocked this week.", bg: "bg-emerald-100", border: "border-emerald-400", avatarBg: "bg-emerald-50" },
-  { name: "Noah", tutor: "spark", subject: "science", days: 21, subtitle: "Lab experiment waiting to begin.", bg: "bg-amber-100", border: "border-amber-400", avatarBg: "bg-amber-50" },
-  { name: "Aria", tutor: "harmony", subject: "sel", days: 5, subtitle: "Mood check-in and a calm-down game.", bg: "bg-pink-100", border: "border-pink-400", avatarBg: "bg-pink-50" },
+  {
+    name: "Leo",
+    tutor: "nova",
+    subject: "math",
+    days: 12,
+    subtitle: "Algebra adventure ready when you are.",
+    bg: "bg-violet-100",
+    border: "border-violet-400",
+    avatarBg: "bg-violet-50",
+  },
+  {
+    name: "Maya",
+    tutor: "sage",
+    subject: "reading",
+    days: 8,
+    subtitle: "Three new stories unlocked this week.",
+    bg: "bg-emerald-100",
+    border: "border-emerald-400",
+    avatarBg: "bg-emerald-50",
+  },
+  {
+    name: "Noah",
+    tutor: "spark",
+    subject: "science",
+    days: 21,
+    subtitle: "Lab experiment waiting to begin.",
+    bg: "bg-amber-100",
+    border: "border-amber-400",
+    avatarBg: "bg-amber-50",
+  },
+  {
+    name: "Aria",
+    tutor: "harmony",
+    subject: "sel",
+    days: 5,
+    subtitle: "Mood check-in and a calm-down game.",
+    bg: "bg-pink-100",
+    border: "border-pink-400",
+    avatarBg: "bg-pink-50",
+  },
 ] as const;
 
 function getDailyLearnerIndex(): number {
@@ -74,8 +138,14 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-violet-100 via-white to-amber-50 flex flex-col relative overflow-hidden">
       <div aria-hidden="true" className="absolute inset-0 pointer-events-none -z-0">
         <div className="absolute -top-20 -left-20 w-[45vw] h-[45vw] bg-violet-300/40 rounded-full blur-3xl animate-blob motion-reduce:animate-none" />
-        <div className="absolute -bottom-20 -right-20 w-[40vw] h-[40vw] bg-amber-200/50 rounded-full blur-3xl animate-blob motion-reduce:animate-none" style={{ animationDelay: "5s" }} />
-        <div className="absolute top-1/3 right-10 w-64 h-64 bg-cyan-200/40 rounded-full blur-3xl animate-blob motion-reduce:animate-none" style={{ animationDelay: "2s" }} />
+        <div
+          className="absolute -bottom-20 -right-20 w-[40vw] h-[40vw] bg-amber-200/50 rounded-full blur-3xl animate-blob motion-reduce:animate-none"
+          style={{ animationDelay: "5s" }}
+        />
+        <div
+          className="absolute top-1/3 right-10 w-64 h-64 bg-cyan-200/40 rounded-full blur-3xl animate-blob motion-reduce:animate-none"
+          style={{ animationDelay: "2s" }}
+        />
       </div>
 
       <header className="relative z-30 flex items-center justify-between p-6">
@@ -191,11 +261,17 @@ export default function LoginPage() {
 
                 <form onSubmit={simulateSubmit} className="space-y-5">
                   <div className="space-y-2">
-                    <label htmlFor="login-email" className="block text-sm font-bold text-slate-700 ml-1">
+                    <label
+                      htmlFor="login-email"
+                      className="block text-sm font-bold text-slate-700 ml-1"
+                    >
                       Email
                     </label>
                     <div className="relative">
-                      <Mail className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" aria-hidden="true" />
+                      <Mail
+                        className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"
+                        aria-hidden="true"
+                      />
                       <input
                         id="login-email"
                         type="email"
@@ -211,7 +287,10 @@ export default function LoginPage() {
                   </div>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center ml-1">
-                      <label htmlFor="login-password" className="block text-sm font-bold text-slate-700">
+                      <label
+                        htmlFor="login-password"
+                        className="block text-sm font-bold text-slate-700"
+                      >
                         Password
                       </label>
                       <Link
@@ -222,7 +301,10 @@ export default function LoginPage() {
                       </Link>
                     </div>
                     <div className="relative">
-                      <Lock className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" aria-hidden="true" />
+                      <Lock
+                        className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"
+                        aria-hidden="true"
+                      />
                       <input
                         id="login-password"
                         type={showPassword ? "text" : "password"}
@@ -240,7 +322,11 @@ export default function LoginPage() {
                         className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                         aria-label={showPassword ? "Hide password" : "Show password"}
                       >
-                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        {showPassword ? (
+                          <EyeOff className="w-5 h-5" />
+                        ) : (
+                          <Eye className="w-5 h-5" />
+                        )}
                       </button>
                     </div>
                   </div>
@@ -253,7 +339,12 @@ export default function LoginPage() {
                   >
                     {loading ? (
                       <>
-                        <Loader2 size={20} strokeWidth={2.5} className="motion-safe:animate-spin" aria-hidden="true" />
+                        <Loader2
+                          size={20}
+                          strokeWidth={2.5}
+                          className="motion-safe:animate-spin"
+                          aria-hidden="true"
+                        />
                         Signing in...
                       </>
                     ) : (
@@ -268,7 +359,9 @@ export default function LoginPage() {
             ) : (
               <div role="tabpanel" id="panel-pin" aria-labelledby="tab-pin" className="space-y-7">
                 <div className="text-center">
-                  <p className="font-bold text-slate-700 mb-4 text-sm">Who&apos;s learning today?</p>
+                  <p className="font-bold text-slate-700 mb-4 text-sm">
+                    Who&apos;s learning today?
+                  </p>
                   <div className="flex justify-center gap-3">
                     {LEARNERS.map((l, idx) => (
                       <button
@@ -285,16 +378,28 @@ export default function LoginPage() {
                             selectedLearner === idx ? l.border + " shadow-lg" : "border-transparent"
                           } flex items-center justify-center overflow-hidden`}
                         >
-                          <Image src={`/images/tutors/${l.tutor}.png`} alt="" width={48} height={48} className="object-contain" />
+                          <Image
+                            src={`/images/tutors/${l.tutor}.png`}
+                            alt=""
+                            width={48}
+                            height={48}
+                            className="object-contain"
+                          />
                         </div>
-                        <span className={`text-xs font-bold ${selectedLearner === idx ? "text-slate-900" : "text-slate-500"}`}>{l.name}</span>
+                        <span
+                          className={`text-xs font-bold ${selectedLearner === idx ? "text-slate-900" : "text-slate-500"}`}
+                        >
+                          {l.name}
+                        </span>
                       </button>
                     ))}
                   </div>
                 </div>
 
                 <div>
-                  <p className="font-bold text-slate-700 mb-3 text-sm text-center">What sounds fun?</p>
+                  <p className="font-bold text-slate-700 mb-3 text-sm text-center">
+                    What sounds fun?
+                  </p>
                   <div className="flex justify-center gap-2 flex-wrap">
                     {SUBJECT_PILLS.map((s) => {
                       const active = activeSubject === s.key;
@@ -320,11 +425,17 @@ export default function LoginPage() {
 
                 <form onSubmit={simulateSubmit} className="space-y-5">
                   <div>
-                    <label htmlFor="parent-id" className="block text-sm font-bold text-slate-700 mb-2 ml-1">
+                    <label
+                      htmlFor="parent-id"
+                      className="block text-sm font-bold text-slate-700 mb-2 ml-1"
+                    >
                       Parent email or ID
                     </label>
                     <div className="relative">
-                      <User className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" aria-hidden="true" />
+                      <User
+                        className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"
+                        aria-hidden="true"
+                      />
                       <input
                         id="parent-id"
                         type="text"
@@ -339,7 +450,10 @@ export default function LoginPage() {
                     </div>
                   </div>
                   <div>
-                    <label htmlFor="learner-pin" className="block text-sm font-bold text-slate-700 mb-2 ml-1 text-center">
+                    <label
+                      htmlFor="learner-pin"
+                      className="block text-sm font-bold text-slate-700 mb-2 ml-1 text-center"
+                    >
                       Enter your secret PIN
                     </label>
                     <input
@@ -365,7 +479,12 @@ export default function LoginPage() {
                   >
                     {loading ? (
                       <>
-                        <Loader2 size={20} strokeWidth={2.5} className="motion-safe:animate-spin" aria-hidden="true" />
+                        <Loader2
+                          size={20}
+                          strokeWidth={2.5}
+                          className="motion-safe:animate-spin"
+                          aria-hidden="true"
+                        />
                         Signing in...
                       </>
                     ) : (
@@ -382,12 +501,18 @@ export default function LoginPage() {
 
           <div className="text-center mt-7">
             <div className="inline-flex items-center gap-2 text-sm font-bold text-slate-600 bg-white/70 backdrop-blur px-4 py-2 rounded-full border border-slate-200">
-              <ShieldCheck className="w-4 h-4 text-[hsl(var(--visual-primary))]" aria-hidden="true" />
+              <ShieldCheck
+                className="w-4 h-4 text-[hsl(var(--visual-primary))]"
+                aria-hidden="true"
+              />
               Designed to support COPPA · FERPA · SOC 2
             </div>
             <p className="text-sm font-medium text-slate-500 mt-5">
               Don&apos;t have an account?{" "}
-              <Link href="/signup" className="text-[hsl(var(--visual-primary))] font-bold hover:underline">
+              <Link
+                href="/signup"
+                className="text-[hsl(var(--visual-primary))] font-bold hover:underline"
+              >
                 Start free trial
               </Link>
             </p>
@@ -400,11 +525,17 @@ export default function LoginPage() {
           Privacy
         </Link>
         <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-        <Link href="/terms-of-service" className="hover:text-[hsl(var(--visual-primary))] transition">
+        <Link
+          href="/terms-of-service"
+          className="hover:text-[hsl(var(--visual-primary))] transition"
+        >
           Terms
         </Link>
         <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-        <Link href="/coppa-compliance" className="hover:text-[hsl(var(--visual-primary))] transition">
+        <Link
+          href="/coppa-compliance"
+          className="hover:text-[hsl(var(--visual-primary))] transition"
+        >
           COPPA
         </Link>
       </footer>

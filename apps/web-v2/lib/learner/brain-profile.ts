@@ -105,7 +105,7 @@ const CORE_TUTORS = [
  *  legacy clone keeps the core 7 unless mastery in a domain is high enough
  *  that the tutor becomes redundant (>= 0.85), with a hard floor of 4 so the
  *  learner is never left with too few coaches. */
-function pickActiveTutors(masteryLevels: Record<string, number>): string[] {
+function pickActiveTutors(_masteryLevels: Record<string, number>): string[] {
   // For now we don't have a subjectId→tutor map; keep the full core 7 and let
   // future enrichment narrow it. Recording the decision in xai_explanation.
   return [...CORE_TUTORS];
@@ -138,12 +138,7 @@ function inferFunctioningLevel(
  *  visual_identity defaults so the learner's "brain" UI feels consistent
  *  across the v1/v2 transition. */
 function buildVisualIdentity(
-  functioningLevel:
-    | "STANDARD"
-    | "SUPPORTED"
-    | "LOW_VERBAL"
-    | "NON_VERBAL"
-    | "PRE_SYMBOLIC",
+  functioningLevel: "STANDARD" | "SUPPORTED" | "LOW_VERBAL" | "NON_VERBAL" | "PRE_SYMBOLIC",
   sensorySeekingOrAvoiding: string,
 ): LearnerBrainProfileState["visualIdentity"] {
   const calmMode =
@@ -258,10 +253,8 @@ export function buildBrainProfile(input: GenInput): LearnerBrainProfileState {
     baselineBySubject.set(row.subjectId, row);
   }
 
-  const focusWindow =
-    pick<number>(assessment, "attention", "focusWindowMinutes") ?? 10;
-  const breakStyleRaw =
-    pick<string>(assessment, "attention", "breakStyle") ?? "occasional";
+  const focusWindow = pick<number>(assessment, "attention", "focusWindowMinutes") ?? 10;
+  const breakStyleRaw = pick<string>(assessment, "attention", "breakStyle") ?? "occasional";
   const breakStyle = (
     ["frequent_short", "occasional", "long_uninterrupted"].includes(breakStyleRaw)
       ? breakStyleRaw
@@ -288,8 +281,7 @@ export function buildBrainProfile(input: GenInput): LearnerBrainProfileState {
   const needsCoaching = Boolean(pick<boolean>(assessment, "homework", "needsCoaching"));
 
   const name = learner.preferredName?.trim() || learner.firstName.trim() || "Your learner";
-  const goalsLine =
-    goals.length === 0 ? "no goals recorded yet" : goals.slice(0, 3).join("; ");
+  const goalsLine = goals.length === 0 ? "no goals recorded yet" : goals.slice(0, 3).join("; ");
   const parentAssessmentSummary = `${name} is in the ${
     learner.gradeBand ?? "n/a"
   } grade band. Reading comfort: ${
@@ -315,8 +307,7 @@ export function buildBrainProfile(input: GenInput): LearnerBrainProfileState {
     speechToText:
       Boolean(iepExtraction?.writingSupport) ||
       Boolean(pick<boolean>(assessment, "accommodations", "speechToText")),
-    visualSchedules:
-      breakStyle === "frequent_short" || communicationStyle === "visual",
+    visualSchedules: breakStyle === "frequent_short" || communicationStyle === "visual",
     sensoryBreaks: sensitivities.length > 0 || movementHelps,
   };
 
@@ -342,11 +333,7 @@ export function buildBrainProfile(input: GenInput): LearnerBrainProfileState {
       return { subjectId: s.id, subjectName: s.name, estimate };
     });
 
-  const tutorPersonaRecommendation = inferTutorPersona(
-    triggers,
-    preferredPace,
-    needsCoaching,
-  );
+  const tutorPersonaRecommendation = inferTutorPersona(triggers, preferredPace, needsCoaching);
 
   // ===== Sprint 14: legacy brain_state parity =====
   // Pull the new learning-profile + background fields. They're optional —
@@ -355,11 +342,7 @@ export function buildBrainProfile(input: GenInput): LearnerBrainProfileState {
   const communicationMode = pick<string>(assessment, "learning_profile", "communicationMode");
   const deviceInteraction = pick<string>(assessment, "learning_profile", "deviceInteraction");
   const responseMethod = pick<string>(assessment, "learning_profile", "responseMethod");
-  const attentionSpanBucket = pick<string>(
-    assessment,
-    "learning_profile",
-    "attentionSpanBucket",
-  );
+  const attentionSpanBucket = pick<string>(assessment, "learning_profile", "attentionSpanBucket");
   const diagnoses = pick<string[]>(assessment, "background", "diagnoses") ?? [];
   const services = pick<string[]>(assessment, "background", "services") ?? [];
 
@@ -395,9 +378,7 @@ export function buildBrainProfile(input: GenInput): LearnerBrainProfileState {
     communicationNeeds: communicationMode ?? null,
     attention: attentionSpanBucket ?? (focusWindow < 10 ? "short" : null),
     sensory:
-      sensitivities.length > 0
-        ? `sensitive_to:${sensitivities.slice(0, 3).join(",")}`
-        : null,
+      sensitivities.length > 0 ? `sensitive_to:${sensitivities.slice(0, 3).join(",")}` : null,
     motor: responseMethod && responseMethod !== "touch" ? responseMethod : null,
     diagnoses,
   };
@@ -499,8 +480,7 @@ export function buildBrainProfile(input: GenInput): LearnerBrainProfileState {
       gradeBand: learner.gradeBand,
       primaryLanguage: learner.primaryLanguage,
     },
-    parentAssessmentSummary:
-      parentAssessmentSummary || "Parent assessment not yet completed.",
+    parentAssessmentSummary: parentAssessmentSummary || "Parent assessment not yet completed.",
     accommodationSummary,
     sensoryProfile: {
       sensitivities,

@@ -75,5 +75,7 @@ export function resolveQuestWorld(slugOrKey: string | undefined | null): QuestWo
 }
 
 export function isQuestWorldKey(value: unknown): value is string {
-  return typeof value === "string" && Object.prototype.hasOwnProperty.call(QUEST_WORLD_ALIASES, value);
+  return (
+    typeof value === "string" && Object.prototype.hasOwnProperty.call(QUEST_WORLD_ALIASES, value)
+  );
 }

@@ -29,9 +29,11 @@ import { getIepGoalsSchema, getTherapyGoalsSchema } from "./schemas.js";
  *   }
  */
 export async function registerFamilyGoalsRoutes(app: FastifyInstance) {
-  const db = (app as unknown as {
-    db: ReturnType<typeof import("@aivo/db").createDb>;
-  }).db;
+  const db = (
+    app as unknown as {
+      db: ReturnType<typeof import("@aivo/db").createDb>;
+    }
+  ).db;
 
   /**
    * Resolve every learnerId visible to the caller via:
@@ -45,39 +47,47 @@ export async function registerFamilyGoalsRoutes(app: FastifyInstance) {
     tenantId: string,
   ): Promise<string[]> {
     if (role === "PLATFORM_ADMIN") {
-      const rows = await db.select({ id: learners.id }).from(learners).where(
-        eq(learners.tenantId, tenantId),
-      );
+      const rows = await db
+        .select({ id: learners.id })
+        .from(learners)
+        .where(eq(learners.tenantId, tenantId));
       return rows.map((r) => r.id);
     }
     const ids = new Set<string>();
-    const ownedRows = await db.select({ id: learners.id }).from(learners).where(
-      eq(learners.parentId, userSub),
-    );
+    const ownedRows = await db
+      .select({ id: learners.id })
+      .from(learners)
+      .where(eq(learners.parentId, userSub));
     for (const r of ownedRows) ids.add(r.id);
 
-    const teacherRows = await db.select({ learnerId: learnerTeachers.learnerId })
+    const teacherRows = await db
+      .select({ learnerId: learnerTeachers.learnerId })
       .from(learnerTeachers)
-      .where(and(
-        eq(learnerTeachers.teacherUserId, userSub),
-        eq(learnerTeachers.status, "ACCEPTED"),
-      ));
+      .where(
+        and(eq(learnerTeachers.teacherUserId, userSub), eq(learnerTeachers.status, "ACCEPTED")),
+      );
     for (const r of teacherRows) ids.add(r.learnerId);
 
-    const caregiverRows = await db.select({ learnerId: learnerCaregivers.learnerId })
+    const caregiverRows = await db
+      .select({ learnerId: learnerCaregivers.learnerId })
       .from(learnerCaregivers)
-      .where(and(
-        eq(learnerCaregivers.caregiverUserId, userSub),
-        eq(learnerCaregivers.status, "ACCEPTED"),
-      ));
+      .where(
+        and(
+          eq(learnerCaregivers.caregiverUserId, userSub),
+          eq(learnerCaregivers.status, "ACCEPTED"),
+        ),
+      );
     for (const r of caregiverRows) ids.add(r.learnerId);
 
-    const therapistRows = await db.select({ learnerId: learnerTherapists.learnerId })
+    const therapistRows = await db
+      .select({ learnerId: learnerTherapists.learnerId })
       .from(learnerTherapists)
-      .where(and(
-        eq(learnerTherapists.therapistUserId, userSub),
-        eq(learnerTherapists.status, "ACCEPTED"),
-      ));
+      .where(
+        and(
+          eq(learnerTherapists.therapistUserId, userSub),
+          eq(learnerTherapists.status, "ACCEPTED"),
+        ),
+      );
     for (const r of therapistRows) ids.add(r.learnerId);
 
     return Array.from(ids);
@@ -87,14 +97,12 @@ export async function registerFamilyGoalsRoutes(app: FastifyInstance) {
     const claims = await authenticateRequest(request, reply);
     if (!claims) return;
 
-    const learnerIds = await getAccessibleLearnerIds(
-      claims.sub,
-      claims.role,
-      claims.tenantId,
-    );
+    const learnerIds = await getAccessibleLearnerIds(claims.sub, claims.role, claims.tenantId);
     if (learnerIds.length === 0) return { goals: [] };
 
-    const rows = await db.select().from(iepGoals)
+    const rows = await db
+      .select()
+      .from(iepGoals)
       .where(inArray(iepGoals.learnerId, learnerIds))
       .orderBy(desc(iepGoals.createdAt));
 
@@ -114,45 +122,47 @@ export async function registerFamilyGoalsRoutes(app: FastifyInstance) {
     return { goals };
   });
 
-  app.get("/api/family/therapy-goals", { schema: getTherapyGoalsSchema }, async (request, reply) => {
-    const claims = await authenticateRequest(request, reply);
-    if (!claims) return;
+  app.get(
+    "/api/family/therapy-goals",
+    { schema: getTherapyGoalsSchema },
+    async (request, reply) => {
+      const claims = await authenticateRequest(request, reply);
+      if (!claims) return;
 
-    const learnerIds = await getAccessibleLearnerIds(
-      claims.sub,
-      claims.role,
-      claims.tenantId,
-    );
-    if (learnerIds.length === 0) return { goals: [] };
+      const learnerIds = await getAccessibleLearnerIds(claims.sub, claims.role, claims.tenantId);
+      if (learnerIds.length === 0) return { goals: [] };
 
-    const rows = await db.select().from(therapyGoals)
-      .where(inArray(therapyGoals.learnerId, learnerIds))
-      .orderBy(desc(therapyGoals.createdAt));
+      const rows = await db
+        .select()
+        .from(therapyGoals)
+        .where(inArray(therapyGoals.learnerId, learnerIds))
+        .orderBy(desc(therapyGoals.createdAt));
 
-    const goals = rows.map((g) => {
-      // therapy_goals.current_progress is varchar — accept "75%", "75",
-      // "in progress", etc. and project to a 0–100 integer.
-      let progressPct = 0;
-      if (typeof g.currentProgress === "string") {
-        const match = g.currentProgress.match(/(\d+(?:\.\d+)?)/);
-        if (match) {
-          const parsed = Math.round(parseFloat(match[1]));
-          progressPct = Math.max(0, Math.min(100, parsed));
+      const goals = rows.map((g) => {
+        // therapy_goals.current_progress is varchar — accept "75%", "75",
+        // "in progress", etc. and project to a 0–100 integer.
+        let progressPct = 0;
+        if (typeof g.currentProgress === "string") {
+          const match = g.currentProgress.match(/(\d+(?:\.\d+)?)/);
+          if (match) {
+            const parsed = Math.round(parseFloat(match[1]));
+            progressPct = Math.max(0, Math.min(100, parsed));
+          }
         }
-      }
-      return {
-        id: g.id,
-        learnerId: g.learnerId,
-        title: g.goalText,
-        // Therapy domain (e.g. "speech", "occupational") maps to the
-        // `category` field the dashboards render as a pill.
-        category: g.domain ?? "general",
-        progressPct,
-        targetDate: undefined,
-        status: g.status ?? "active",
-      };
-    });
+        return {
+          id: g.id,
+          learnerId: g.learnerId,
+          title: g.goalText,
+          // Therapy domain (e.g. "speech", "occupational") maps to the
+          // `category` field the dashboards render as a pill.
+          category: g.domain ?? "general",
+          progressPct,
+          targetDate: undefined,
+          status: g.status ?? "active",
+        };
+      });
 
-    return { goals };
-  });
+      return { goals };
+    },
+  );
 }

@@ -64,8 +64,8 @@ export function RosterImportPanel({ districtId, fetchImpl = fetch }: RosterImpor
     <section className="roster-import-panel rounded border p-4">
       <h3 className="text-lg font-semibold">Import roster</h3>
       <p className="text-xs text-gray-600">
-        Paste a normalized Clever or ClassLink JSON export. Parent-owned profile
-        fields on existing learners are preserved.
+        Paste a normalized Clever or ClassLink JSON export. Parent-owned profile fields on existing
+        learners are preserved.
       </p>
       <form onSubmit={handleImport} className="mt-2 space-y-2">
         <label className="block text-sm">

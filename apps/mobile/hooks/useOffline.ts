@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import NetInfo from '@react-native-community/netinfo';
+import { useState, useEffect, useCallback } from "react";
+import NetInfo from "@react-native-community/netinfo";
 
 interface SyncItem {
   id: string;
@@ -28,18 +28,21 @@ export function useOffline() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- processSyncQueue is module-scoped and stable
   }, []);
 
-  const addToSyncQueue = useCallback((action: string, endpoint: string, method: string, body: unknown) => {
-    const item: SyncItem = {
-      id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-      action,
-      endpoint,
-      method,
-      body: JSON.stringify(body),
-      createdAt: Date.now(),
-    };
-    syncQueue.push(item);
-    setPendingActions(syncQueue.length);
-  }, []);
+  const addToSyncQueue = useCallback(
+    (action: string, endpoint: string, method: string, body: unknown) => {
+      const item: SyncItem = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        action,
+        endpoint,
+        method,
+        body: JSON.stringify(body),
+        createdAt: Date.now(),
+      };
+      syncQueue.push(item);
+      setPendingActions(syncQueue.length);
+    },
+    [],
+  );
 
   const processSyncQueue = useCallback(async () => {
     while (syncQueue.length > 0) {
@@ -47,7 +50,7 @@ export function useOffline() {
       try {
         await fetch(item.endpoint, {
           method: item.method,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
           body: item.body,
         });
         syncQueue.shift();

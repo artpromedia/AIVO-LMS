@@ -88,11 +88,7 @@ export const REQUIRED_BRAND_ASSETS = {
   // Files that MUST exist in every public-facing app or `brand:check`
   // fails. These are the minimum needed for a usable production
   // experience.
-  critical: [
-    LEGACY_LOGOS.purple,
-    LEGACY_LOGOS.white,
-    LEGACY_LOGOS.favicon,
-  ],
+  critical: [LEGACY_LOGOS.purple, LEGACY_LOGOS.white, LEGACY_LOGOS.favicon],
   // Canonical targets. Missing canonical assets surface as warnings.
   canonical: [
     ...Object.values(CANONICAL_LOGOS).filter((p) => p.endsWith(".png")),

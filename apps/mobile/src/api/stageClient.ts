@@ -8,12 +8,7 @@ import { sessionClient } from "./sessionClient";
 import type { Beat, ChoiceBeat } from "@/src/types/stage";
 
 export const stageClient = {
-  submitChoice(params: {
-    sessionId: string;
-    learnerId: string;
-    beat: ChoiceBeat;
-    answer: string;
-  }) {
+  submitChoice(params: { sessionId: string; learnerId: string; beat: ChoiceBeat; answer: string }) {
     const correct = params.answer === params.beat.correctAnswer;
     return sessionClient
       .submitBeatResponse({

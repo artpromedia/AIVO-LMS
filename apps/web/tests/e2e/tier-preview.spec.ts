@@ -18,11 +18,7 @@ import AxeBuilder from "@axe-core/playwright";
  * follow-up in the PR description.
  */
 
-const TIER_LABELS = [
-  "K–5 · Soft Meadow",
-  "6–8 · Study Treehouse",
-  "9–12 · Focus Studio",
-];
+const TIER_LABELS = ["K–5 · Soft Meadow", "6–8 · Study Treehouse", "9–12 · Focus Studio"];
 
 test.describe("tier preview showcase", () => {
   test("all three tiers render unauthenticated", async ({ page }) => {
@@ -33,9 +29,9 @@ test.describe("tier preview showcase", () => {
     // 15s timeout is intentional: this spec runs against the dev server
     // (Turbopack first-load can take ~5–10s in CI runners), so a shorter
     // bound would flake before the page is genuinely broken.
-    await expect(
-      page.getByRole("heading", { name: /three age tiers/i }).first(),
-    ).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole("heading", { name: /three age tiers/i }).first()).toBeVisible({
+      timeout: 15_000,
+    });
 
     for (const label of TIER_LABELS) {
       await expect(page.getByText(label, { exact: false }).first()).toBeVisible();

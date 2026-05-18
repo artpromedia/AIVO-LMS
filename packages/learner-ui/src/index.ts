@@ -4,7 +4,12 @@ export type { FunctioningLevel, FlProfile } from "./tokens/fl-profiles";
 export { MOTION_BUDGETS } from "./tokens/motion";
 export type { MotionBudget } from "./tokens/motion";
 
-export { computeSensoryVars, writeSensoryVarsToRoot, clearSensoryVarsFromRoot, sensoryVarsToCSS } from "./tokens/sensory-vars";
+export {
+  computeSensoryVars,
+  writeSensoryVarsToRoot,
+  clearSensoryVarsFromRoot,
+  sensoryVarsToCSS,
+} from "./tokens/sensory-vars";
 export type { SensoryProfile, SensoryVars } from "./tokens/sensory-vars";
 
 export { LearnerButton } from "./primitives/Button";
@@ -40,12 +45,7 @@ export type { SensoryProviderProps } from "./adapters/SensoryProvider";
 export { FlVariantProvider, useFlVariant } from "./adapters/FlVariantProvider";
 export type { FlVariantProviderProps } from "./adapters/FlVariantProvider";
 
-export {
-  TIER_THEMES,
-  gradeToTier,
-  gradeToTheme,
-  tierThemeToCssVars,
-} from "./tokens/age-tiers";
+export { TIER_THEMES, gradeToTier, gradeToTheme, tierThemeToCssVars } from "./tokens/age-tiers";
 export type { AgeTier, TierTheme } from "./tokens/age-tiers";
 
 export {

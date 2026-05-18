@@ -1,4 +1,14 @@
-import { pgTable, uuid, varchar, timestamp, integer, jsonb, text, real, pgEnum } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  uuid,
+  varchar,
+  timestamp,
+  integer,
+  jsonb,
+  text,
+  real,
+  pgEnum,
+} from "drizzle-orm/pg-core";
 import { learners } from "./learners.js";
 import { tenants } from "./tenants.js";
 import { users } from "./users.js";
@@ -22,8 +32,12 @@ export const contentTypeEnum = pgEnum("content_type", [
 
 export const lessonSessions = pgTable("lesson_sessions", {
   id: uuid("id").defaultRandom().primaryKey(),
-  tenantId: uuid("tenant_id").references(() => tenants.id).notNull(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
   tutorSku: varchar("tutor_sku", { length: 100 }).notNull(),
   subject: varchar("subject", { length: 100 }).notNull(),
   status: sessionStatusEnum("status").default("STARTED"),
@@ -42,7 +56,9 @@ export const lessonSessions = pgTable("lesson_sessions", {
 
 export const lessonContent = pgTable("lesson_content", {
   id: uuid("id").defaultRandom().primaryKey(),
-  sessionId: uuid("session_id").references(() => lessonSessions.id).notNull(),
+  sessionId: uuid("session_id")
+    .references(() => lessonSessions.id)
+    .notNull(),
   contentType: contentTypeEnum("content_type").default("LESSON"),
   subject: varchar("subject", { length: 100 }).notNull(),
   topic: varchar("topic", { length: 255 }),
@@ -61,8 +77,12 @@ export const lessonContent = pgTable("lesson_content", {
 
 export const learningPaths = pgTable("learning_paths", {
   id: uuid("id").defaultRandom().primaryKey(),
-  tenantId: uuid("tenant_id").references(() => tenants.id).notNull(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
   subject: varchar("subject", { length: 100 }).notNull(),
   currentTopic: varchar("current_topic", { length: 255 }),
   topicSequence: jsonb("topic_sequence").default([]),
@@ -75,8 +95,12 @@ export const learningPaths = pgTable("learning_paths", {
 
 export const gradebookEntries = pgTable("gradebook_entries", {
   id: uuid("id").defaultRandom().primaryKey(),
-  tenantId: uuid("tenant_id").references(() => tenants.id).notNull(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
   subject: varchar("subject", { length: 100 }).notNull(),
   skill: varchar("skill", { length: 255 }).notNull(),
   masteryScore: real("mastery_score").default(0),
@@ -89,8 +113,12 @@ export const gradebookEntries = pgTable("gradebook_entries", {
 
 export const tutorSessions = pgTable("tutor_sessions", {
   id: uuid("id").defaultRandom().primaryKey(),
-  tenantId: uuid("tenant_id").references(() => tenants.id).notNull(),
-  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
+  learnerId: uuid("learner_id")
+    .references(() => learners.id)
+    .notNull(),
   tutorSku: varchar("tutor_sku", { length: 100 }).notNull(),
   tutorName: varchar("tutor_name", { length: 50 }).notNull(),
   sessionType: varchar("session_type", { length: 30 }).default("standard"),
@@ -108,7 +136,9 @@ export const tutorSessions = pgTable("tutor_sessions", {
 
 export const tokenUsage = pgTable("token_usage", {
   id: uuid("id").defaultRandom().primaryKey(),
-  tenantId: uuid("tenant_id").references(() => tenants.id).notNull(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
   service: varchar("service", { length: 50 }).notNull(),
   model: varchar("model", { length: 100 }).notNull(),
   promptTokens: integer("prompt_tokens").default(0),

@@ -57,7 +57,8 @@ export default async function ParentLessonsPage({
       />
       {summaries.length === 0 ? (
         <Card className="p-6 text-aivo-ink-soft">
-          No completed lessons yet. Recaps will appear here as {learner.displayName} finishes lessons.
+          No completed lessons yet. Recaps will appear here as {learner.displayName} finishes
+          lessons.
         </Card>
       ) : (
         <div className="grid gap-3">
@@ -74,9 +75,7 @@ export default async function ParentLessonsPage({
                     </p>
                     <p className="font-semibold">{s.headline}</p>
                   </div>
-                  <Badge
-                    tone={delta > 0 ? "success" : delta < 0 ? "warning" : "neutral"}
-                  >
+                  <Badge tone={delta > 0 ? "success" : delta < 0 ? "warning" : "neutral"}>
                     {delta > 0 ? "+" : ""}
                     {Math.round(delta * 100)}%
                   </Badge>

@@ -33,10 +33,14 @@ const WELL: Record<string, string> = {
 export function colorForTutor(tutorColor?: string): string {
   if (!tutorColor) return "primary";
   const c = tutorColor.toLowerCase();
-  if (c.includes("ec4899") || c.includes("be185d") || c.includes("pink") || c.includes("rose")) return "math";
-  if (c.includes("0369a1") || c.includes("0ea5e9") || c.includes("blue") || c.includes("cyan")) return "reading";
-  if (c.includes("15803d") || c.includes("10b981") || c.includes("green") || c.includes("emerald")) return "science";
-  if (c.includes("b45309") || c.includes("f59e0b") || c.includes("amber") || c.includes("yellow")) return "sel";
+  if (c.includes("ec4899") || c.includes("be185d") || c.includes("pink") || c.includes("rose"))
+    return "math";
+  if (c.includes("0369a1") || c.includes("0ea5e9") || c.includes("blue") || c.includes("cyan"))
+    return "reading";
+  if (c.includes("15803d") || c.includes("10b981") || c.includes("green") || c.includes("emerald"))
+    return "science";
+  if (c.includes("b45309") || c.includes("f59e0b") || c.includes("amber") || c.includes("yellow"))
+    return "sel";
   return "primary";
 }
 
@@ -50,10 +54,16 @@ export function IconWell({
   size?: "sm" | "md" | "lg";
 }) {
   const sz =
-    size === "lg" ? "w-20 h-20 rounded-3xl" :
-    size === "sm" ? "w-10 h-10 rounded-xl" :
-    "w-14 h-14 rounded-2xl";
-  return <div className={`${sz} flex items-center justify-center ${WELL[color] || WELL.primary}`}>{children}</div>;
+    size === "lg"
+      ? "w-20 h-20 rounded-3xl"
+      : size === "sm"
+        ? "w-10 h-10 rounded-xl"
+        : "w-14 h-14 rounded-2xl";
+  return (
+    <div className={`${sz} flex items-center justify-center ${WELL[color] || WELL.primary}`}>
+      {children}
+    </div>
+  );
 }
 
 const STAT_WELL: Record<string, string> = {
@@ -85,7 +95,9 @@ export function StatIconWell({
   const sz = size === "sm" ? "w-10 h-10 rounded-xl" : "w-11 h-11 rounded-2xl";
   const palette = wellClass ?? STAT_WELL[color] ?? STAT_WELL.primary;
   return (
-    <div className={`${sz} flex items-center justify-center ${palette}${className ? ` ${className}` : ""}`}>
+    <div
+      className={`${sz} flex items-center justify-center ${palette}${className ? ` ${className}` : ""}`}
+    >
       {children}
     </div>
   );

@@ -58,10 +58,7 @@ export default async function Page() {
   // Top revenue tenants.
   const byTenant = new Map<string, number>();
   for (const inv of paid) {
-    byTenant.set(
-      inv.tenantId,
-      (byTenant.get(inv.tenantId) ?? 0) + inv.amountCents,
-    );
+    byTenant.set(inv.tenantId, (byTenant.get(inv.tenantId) ?? 0) + inv.amountCents);
   }
   const topTenants = Array.from(byTenant.entries())
     .sort((a, b) => b[1] - a[1])
@@ -99,9 +96,7 @@ export default async function Page() {
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
             Lifetime collected
           </p>
-          <p className="mt-1 font-display text-3xl font-bold">
-            {fmtUsd(lifetimeCents)}
-          </p>
+          <p className="mt-1 font-display text-3xl font-bold">{fmtUsd(lifetimeCents)}</p>
           <p className="mt-1 text-xs text-aivo-ink-soft">
             {paid.length.toLocaleString()} paid invoices
           </p>
@@ -110,12 +105,8 @@ export default async function Page() {
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
             Last 30 days
           </p>
-          <p className="mt-1 font-display text-3xl font-bold">
-            {fmtUsd(last30Cents)}
-          </p>
-          <p className="mt-1 text-xs text-aivo-ink-soft">
-            rolling window of paid invoices
-          </p>
+          <p className="mt-1 font-display text-3xl font-bold">{fmtUsd(last30Cents)}</p>
+          <p className="mt-1 text-xs text-aivo-ink-soft">rolling window of paid invoices</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
@@ -131,13 +122,9 @@ export default async function Page() {
       </div>
 
       <Card className="mt-6 p-[var(--aivo-density-card-pad)]">
-        <p className="font-display text-lg font-semibold">
-          Monthly collected · last 12 months
-        </p>
+        <p className="font-display text-lg font-semibold">Monthly collected · last 12 months</p>
         {months.length === 0 ? (
-          <p className="mt-3 text-sm text-aivo-ink-soft">
-            No paid invoices yet.
-          </p>
+          <p className="mt-3 text-sm text-aivo-ink-soft">No paid invoices yet.</p>
         ) : (
           <ul className="mt-4 space-y-2 text-sm">
             {months.map(([month, cents]) => {
@@ -145,12 +132,8 @@ export default async function Page() {
               return (
                 <li key={month}>
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs text-aivo-ink-soft">
-                      {month}
-                    </span>
-                    <span className="font-semibold tabular-nums">
-                      {fmtUsd(cents)}
-                    </span>
+                    <span className="font-mono text-xs text-aivo-ink-soft">{month}</span>
+                    <span className="font-semibold tabular-nums">{fmtUsd(cents)}</span>
                   </div>
                   <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-aivo-border/60">
                     <div
@@ -167,9 +150,7 @@ export default async function Page() {
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="font-display text-lg font-semibold">
-            Top revenue tenants
-          </p>
+          <p className="font-display text-lg font-semibold">Top revenue tenants</p>
           {topTenants.length === 0 ? (
             <EmptyState title="No collections yet" />
           ) : (
@@ -177,10 +158,7 @@ export default async function Page() {
               {topTenants.map(([tenantId, cents]) => {
                 const t = tenantById.get(tenantId);
                 return (
-                  <li
-                    key={tenantId}
-                    className="flex items-center justify-between py-2"
-                  >
+                  <li key={tenantId} className="flex items-center justify-between py-2">
                     {t ? (
                       <Link
                         href={`/admin/platform/tenants/${tenantId}`}
@@ -191,9 +169,7 @@ export default async function Page() {
                     ) : (
                       <span className="font-mono text-xs">{tenantId}</span>
                     )}
-                    <span className="font-semibold tabular-nums">
-                      {fmtUsd(cents)}
-                    </span>
+                    <span className="font-semibold tabular-nums">{fmtUsd(cents)}</span>
                   </li>
                 );
               })}
@@ -212,9 +188,7 @@ export default async function Page() {
                   className="flex items-center justify-between rounded-md border border-aivo-border px-3 py-2"
                 >
                   <Badge tone="primary">{plan}</Badge>
-                  <span className="font-semibold tabular-nums">
-                    {n.toLocaleString()}
-                  </span>
+                  <span className="font-semibold tabular-nums">{n.toLocaleString()}</span>
                 </li>
               );
             })}

@@ -1,4 +1,4 @@
-import { BRAND } from '@aivo/brand';
+import { BRAND } from "@aivo/brand";
 
 export const colors = {
   primary: BRAND.colors.primary,
@@ -10,9 +10,9 @@ export const colors = {
   warning: BRAND.colors.warning,
   error: BRAND.colors.error,
   info: BRAND.colors.info,
-  navy: '#1A1A2E',
+  navy: "#1A1A2E",
   background: BRAND.colors.background,
-  card: '#FFFFFF',
+  card: "#FFFFFF",
   surface: BRAND.colors.surface,
   surfaceSoft: BRAND.colors.visualSurfaceSoft,
   text: BRAND.colors.text,
@@ -22,8 +22,8 @@ export const colors = {
   visualReading: BRAND.colors.visualReading,
   visualScience: BRAND.colors.visualScience,
   visualSel: BRAND.colors.visualSel,
-  white: '#FFFFFF',
-  black: '#000000',
+  white: "#FFFFFF",
+  black: "#000000",
 };
 
 export const spacing = {

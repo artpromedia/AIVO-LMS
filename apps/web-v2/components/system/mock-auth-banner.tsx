@@ -11,8 +11,8 @@ export function MockAuthBanner() {
       aria-live="polite"
       className="w-full bg-amber-50 text-amber-900 border-b border-amber-200 text-xs px-4 py-1.5 text-center"
     >
-      Demo mode — mock authentication is active. Switch the role from the
-      session menu. Production identity provider is not yet enabled.
+      Demo mode — mock authentication is active. Switch the role from the session menu. Production
+      identity provider is not yet enabled.
     </div>
   );
 }

@@ -89,12 +89,7 @@ const integritySrc = read(
   "services/responsible-ai-svc/src/services/homework-integrity-evaluator.ts",
 );
 if (integritySrc) {
-  const REQUIRED_PATTERNS = [
-    /the answer is/i,
-    /answer:/i,
-    /\\s\*=/,
-    /x\\s\*=/,
-  ];
+  const REQUIRED_PATTERNS = [/the answer is/i, /answer:/i, /\\s\*=/, /x\\s\*=/];
   for (const re of REQUIRED_PATTERNS) {
     if (!re.test(integritySrc)) {
       errors.push(

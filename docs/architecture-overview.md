@@ -96,34 +96,40 @@ sequenceDiagram
 ## Key Design Decisions
 
 ### Brain Clone (per learner, per tenant)
+
 The Brain Clone is the single source of truth for a learner's accommodations,
 functioning level, sensory profile, mastery vector, and behavioral signals. Every
 AI generation pulls the current clone state. Parents must explicitly **approve** the
 initial clone and any structural changes (XAI surface shows what changed and why).
 
 ### Five-tier Functioning Level Model
+
 Learners are placed on a 1–5 scale spanning emerging-foundational through
 advanced-independent. The model drives lesson modality (visual/audio/text mix),
 prompt complexity, scaffolding density, and the threshold for mastery-gated
 advancement. The level is not a label shown to learners; it conditions content.
 
 ### Explainable AI (XAI) Everywhere
+
 No AI decision goes opaque. Every brain update, accommodation suggestion, and
 mastery judgment carries a structured explanation: signals, weights, prior beliefs,
 counterfactuals. Parents and reviewers see this on the brain-review surface.
 
 ### Multi-tenant Isolation
+
 Tenants are organizations (districts, schools, family pods). Every learner-scoped
 route enforces `requireLearnerAccess(req, learnerId)` which validates that the
 caller's tenant matches the learner's tenant (or the caller is an internal service
 with a valid token). See `docs/security-architecture.md`.
 
 ### Safety-first Pipeline
+
 Content moderation runs **before** prompt submission and **after** generation.
 Failures fall back to a safe template, never to the raw model output. The safety
 gate is non-bypassable from any client-facing path.
 
 ## API Reference
+
 Every Fastify service mounts Swagger UI at `/docs` (e.g. `http://localhost:3005/docs`
 for learning-svc). The Python brain-svc mounts FastAPI's interactive docs at
 `/docs` on port 3002. There is no consolidated cross-service OpenAPI bundle; the

@@ -133,12 +133,8 @@
           "name": "consent_records_parent_id_users_id_fk",
           "tableFrom": "consent_records",
           "tableTo": "users",
-          "columnsFrom": [
-            "parent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["parent_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -146,12 +142,8 @@
           "name": "consent_records_child_id_users_id_fk",
           "tableFrom": "consent_records",
           "tableTo": "users",
-          "columnsFrom": [
-            "child_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["child_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -270,12 +262,8 @@
           "name": "mfa_codes_user_id_users_id_fk",
           "tableFrom": "mfa_codes",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -329,12 +317,8 @@
           "name": "sessions_user_id_users_id_fk",
           "tableFrom": "sessions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -483,12 +467,8 @@
           "name": "users_tenant_id_tenants_id_fk",
           "tableFrom": "users",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -555,12 +535,8 @@
           "name": "iep_documents_learner_id_learners_id_fk",
           "tableFrom": "iep_documents",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -653,12 +629,8 @@
           "name": "iep_goals_learner_id_learners_id_fk",
           "tableFrom": "iep_goals",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -666,12 +638,8 @@
           "name": "iep_goals_iep_profile_id_iep_profiles_id_fk",
           "tableFrom": "iep_goals",
           "tableTo": "iep_profiles",
-          "columnsFrom": [
-            "iep_profile_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["iep_profile_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -773,12 +741,8 @@
           "name": "iep_profiles_learner_id_learners_id_fk",
           "tableFrom": "iep_profiles",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -866,12 +830,8 @@
           "name": "language_profiles_learner_id_learners_id_fk",
           "tableFrom": "language_profiles",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -947,12 +907,8 @@
           "name": "learner_functioning_levels_learner_id_learners_id_fk",
           "tableFrom": "learner_functioning_levels",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1102,12 +1058,8 @@
           "name": "learners_tenant_id_tenants_id_fk",
           "tableFrom": "learners",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1115,12 +1067,8 @@
           "name": "learners_user_id_users_id_fk",
           "tableFrom": "learners",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1128,12 +1076,8 @@
           "name": "learners_parent_id_users_id_fk",
           "tableFrom": "learners",
           "tableTo": "users",
-          "columnsFrom": [
-            "parent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["parent_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1223,12 +1167,8 @@
           "name": "sensory_profiles_learner_id_learners_id_fk",
           "tableFrom": "sensory_profiles",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1357,12 +1297,8 @@
           "name": "transition_plans_learner_id_learners_id_fk",
           "tableFrom": "transition_plans",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1370,12 +1306,8 @@
           "name": "transition_plans_tenant_id_tenants_id_fk",
           "tableFrom": "transition_plans",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1471,12 +1403,8 @@
           "name": "assessment_attempts_tenant_id_tenants_id_fk",
           "tableFrom": "assessment_attempts",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1484,12 +1412,8 @@
           "name": "assessment_attempts_learner_id_learners_id_fk",
           "tableFrom": "assessment_attempts",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1567,12 +1491,8 @@
           "name": "assessment_responses_attempt_id_assessment_attempts_id_fk",
           "tableFrom": "assessment_responses",
           "tableTo": "assessment_attempts",
-          "columnsFrom": [
-            "attempt_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["attempt_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1633,12 +1553,8 @@
           "name": "observational_assessments_attempt_id_assessment_attempts_id_fk",
           "tableFrom": "observational_assessments",
           "tableTo": "assessment_attempts",
-          "columnsFrom": [
-            "attempt_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["attempt_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1730,12 +1646,8 @@
           "name": "parent_assessments_tenant_id_tenants_id_fk",
           "tableFrom": "parent_assessments",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1743,12 +1655,8 @@
           "name": "parent_assessments_learner_id_learners_id_fk",
           "tableFrom": "parent_assessments",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1814,12 +1722,8 @@
           "name": "brain_insights_learner_id_learners_id_fk",
           "tableFrom": "brain_insights",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1913,12 +1817,8 @@
           "name": "brain_recommendations_tenant_id_tenants_id_fk",
           "tableFrom": "brain_recommendations",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1926,12 +1826,8 @@
           "name": "brain_recommendations_learner_id_learners_id_fk",
           "tableFrom": "brain_recommendations",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2049,12 +1945,8 @@
           "name": "brain_state_snapshots_brain_state_id_brain_states_id_fk",
           "tableFrom": "brain_state_snapshots",
           "tableTo": "brain_states",
-          "columnsFrom": [
-            "brain_state_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["brain_state_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -2062,12 +1954,8 @@
           "name": "brain_state_snapshots_learner_id_learners_id_fk",
           "tableFrom": "brain_state_snapshots",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2227,12 +2115,8 @@
           "name": "brain_states_tenant_id_tenants_id_fk",
           "tableFrom": "brain_states",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -2240,12 +2124,8 @@
           "name": "brain_states_learner_id_learners_id_fk",
           "tableFrom": "brain_states",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2350,12 +2230,8 @@
           "name": "causal_analyses_learner_id_learners_id_fk",
           "tableFrom": "causal_analyses",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2436,12 +2312,8 @@
           "name": "functional_milestones_learner_id_learners_id_fk",
           "tableFrom": "functional_milestones",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2501,12 +2373,8 @@
           "name": "parent_reported_events_learner_id_learners_id_fk",
           "tableFrom": "parent_reported_events",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2561,12 +2429,8 @@
           "name": "avatar_inventory_learner_id_learners_id_fk",
           "tableFrom": "avatar_inventory",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -2574,12 +2438,8 @@
           "name": "avatar_inventory_item_id_avatar_items_id_fk",
           "tableFrom": "avatar_inventory",
           "tableTo": "avatar_items",
-          "columnsFrom": [
-            "item_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["item_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2589,10 +2449,7 @@
         "uq_avatar_inventory_learner_item": {
           "name": "uq_avatar_inventory_learner_item",
           "nullsNotDistinct": false,
-          "columns": [
-            "learner_id",
-            "item_id"
-          ]
+          "columns": ["learner_id", "item_id"]
         }
       },
       "policies": {},
@@ -2773,12 +2630,8 @@
           "name": "badges_tenant_id_tenants_id_fk",
           "tableFrom": "badges",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -2786,12 +2639,8 @@
           "name": "badges_learner_id_learners_id_fk",
           "tableFrom": "badges",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2859,12 +2708,8 @@
           "name": "break_activities_learner_id_learners_id_fk",
           "tableFrom": "break_activities",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2939,12 +2784,8 @@
           "name": "challenge_participants_challenge_id_challenges_id_fk",
           "tableFrom": "challenge_participants",
           "tableTo": "challenges",
-          "columnsFrom": [
-            "challenge_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["challenge_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -2952,12 +2793,8 @@
           "name": "challenge_participants_learner_id_learners_id_fk",
           "tableFrom": "challenge_participants",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -3069,12 +2906,8 @@
           "name": "challenges_tenant_id_tenants_id_fk",
           "tableFrom": "challenges",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -3082,12 +2915,8 @@
           "name": "challenges_created_by_learners_id_fk",
           "tableFrom": "challenges",
           "tableTo": "learners",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -3153,12 +2982,8 @@
           "name": "currency_transactions_learner_id_learners_id_fk",
           "tableFrom": "currency_transactions",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -3246,12 +3071,8 @@
           "name": "leaderboard_entries_learner_id_learners_id_fk",
           "tableFrom": "leaderboard_entries",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -3261,11 +3082,7 @@
         "uq_leaderboard_learner_scope": {
           "name": "uq_leaderboard_learner_scope",
           "nullsNotDistinct": false,
-          "columns": [
-            "learner_id",
-            "scope",
-            "scope_id"
-          ]
+          "columns": ["learner_id", "scope", "scope_id"]
         }
       },
       "policies": {},
@@ -3375,12 +3192,8 @@
           "name": "lesson_plans_tenant_id_tenants_id_fk",
           "tableFrom": "lesson_plans",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -3388,12 +3201,8 @@
           "name": "lesson_plans_teacher_user_id_users_id_fk",
           "tableFrom": "lesson_plans",
           "tableTo": "users",
-          "columnsFrom": [
-            "teacher_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["teacher_user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -3401,12 +3210,8 @@
           "name": "lesson_plans_learner_id_learners_id_fk",
           "tableFrom": "lesson_plans",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -3474,12 +3279,8 @@
           "name": "quest_progress_learner_id_learners_id_fk",
           "tableFrom": "quest_progress",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -3487,12 +3288,8 @@
           "name": "quest_progress_quest_id_quests_id_fk",
           "tableFrom": "quest_progress",
           "tableTo": "quests",
-          "columnsFrom": [
-            "quest_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["quest_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -3599,10 +3396,7 @@
         "uq_quests_world_chapter": {
           "name": "uq_quests_world_chapter",
           "nullsNotDistinct": false,
-          "columns": [
-            "world_key",
-            "chapter_number"
-          ]
+          "columns": ["world_key", "chapter_number"]
         }
       },
       "policies": {},
@@ -3666,12 +3460,8 @@
           "name": "sel_checkins_learner_id_learners_id_fk",
           "tableFrom": "sel_checkins",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -3726,12 +3516,8 @@
           "name": "sibling_links_learner_a_id_learners_id_fk",
           "tableFrom": "sibling_links",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_a_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_a_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -3739,12 +3525,8 @@
           "name": "sibling_links_learner_b_id_learners_id_fk",
           "tableFrom": "sibling_links",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_b_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_b_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -3820,12 +3602,8 @@
           "name": "streaks_learner_id_learners_id_fk",
           "tableFrom": "streaks",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -3835,9 +3613,7 @@
         "uq_streaks_learner": {
           "name": "uq_streaks_learner",
           "nullsNotDistinct": false,
-          "columns": [
-            "learner_id"
-          ]
+          "columns": ["learner_id"]
         }
       },
       "policies": {},
@@ -3903,12 +3679,8 @@
           "name": "virtual_currency_learner_id_learners_id_fk",
           "tableFrom": "virtual_currency",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -3918,9 +3690,7 @@
         "uq_virtual_currency_learner": {
           "name": "uq_virtual_currency_learner",
           "nullsNotDistinct": false,
-          "columns": [
-            "learner_id"
-          ]
+          "columns": ["learner_id"]
         }
       },
       "policies": {},
@@ -3983,12 +3753,8 @@
           "name": "xp_events_tenant_id_tenants_id_fk",
           "tableFrom": "xp_events",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -3996,12 +3762,8 @@
           "name": "xp_events_learner_id_learners_id_fk",
           "tableFrom": "xp_events",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -4089,12 +3851,8 @@
           "name": "subscriptions_tenant_id_tenants_id_fk",
           "tableFrom": "subscriptions",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -4102,12 +3860,8 @@
           "name": "subscriptions_user_id_users_id_fk",
           "tableFrom": "subscriptions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -4186,12 +3940,8 @@
           "name": "tutor_subscriptions_tenant_id_tenants_id_fk",
           "tableFrom": "tutor_subscriptions",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -4199,12 +3949,8 @@
           "name": "tutor_subscriptions_user_id_users_id_fk",
           "tableFrom": "tutor_subscriptions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -4374,12 +4120,8 @@
           "name": "gradebook_entries_tenant_id_tenants_id_fk",
           "tableFrom": "gradebook_entries",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -4387,12 +4129,8 @@
           "name": "gradebook_entries_learner_id_learners_id_fk",
           "tableFrom": "gradebook_entries",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -4487,12 +4225,8 @@
           "name": "learning_paths_tenant_id_tenants_id_fk",
           "tableFrom": "learning_paths",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -4500,12 +4234,8 @@
           "name": "learning_paths_learner_id_learners_id_fk",
           "tableFrom": "learning_paths",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -4633,12 +4363,8 @@
           "name": "lesson_content_session_id_lesson_sessions_id_fk",
           "tableFrom": "lesson_content",
           "tableTo": "lesson_sessions",
-          "columnsFrom": [
-            "session_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["session_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -4774,12 +4500,8 @@
           "name": "lesson_sessions_tenant_id_tenants_id_fk",
           "tableFrom": "lesson_sessions",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -4787,12 +4509,8 @@
           "name": "lesson_sessions_learner_id_learners_id_fk",
           "tableFrom": "lesson_sessions",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -4880,12 +4598,8 @@
           "name": "token_usage_tenant_id_tenants_id_fk",
           "tableFrom": "token_usage",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -5012,12 +4726,8 @@
           "name": "tutor_sessions_tenant_id_tenants_id_fk",
           "tableFrom": "tutor_sessions",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -5025,12 +4735,8 @@
           "name": "tutor_sessions_learner_id_learners_id_fk",
           "tableFrom": "tutor_sessions",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -5162,12 +4868,8 @@
           "name": "homework_assignments_learner_id_learners_id_fk",
           "tableFrom": "homework_assignments",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -5299,12 +5001,8 @@
           "name": "homework_sessions_homework_assignment_id_homework_assignments_id_fk",
           "tableFrom": "homework_sessions",
           "tableTo": "homework_assignments",
-          "columnsFrom": [
-            "homework_assignment_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["homework_assignment_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -5312,12 +5010,8 @@
           "name": "homework_sessions_learner_id_learners_id_fk",
           "tableFrom": "homework_sessions",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -5397,12 +5091,8 @@
           "name": "caregiver_observations_tenant_id_tenants_id_fk",
           "tableFrom": "caregiver_observations",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -5410,12 +5100,8 @@
           "name": "caregiver_observations_learner_id_learners_id_fk",
           "tableFrom": "caregiver_observations",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -5423,12 +5109,8 @@
           "name": "caregiver_observations_submitted_by_users_id_fk",
           "tableFrom": "caregiver_observations",
           "tableTo": "users",
-          "columnsFrom": [
-            "submitted_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["submitted_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -5513,12 +5195,8 @@
           "name": "collaboration_invites_tenant_id_tenants_id_fk",
           "tableFrom": "collaboration_invites",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -5526,12 +5204,8 @@
           "name": "collaboration_invites_learner_id_learners_id_fk",
           "tableFrom": "collaboration_invites",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -5539,12 +5213,8 @@
           "name": "collaboration_invites_invited_by_users_id_fk",
           "tableFrom": "collaboration_invites",
           "tableTo": "users",
-          "columnsFrom": [
-            "invited_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["invited_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -5650,12 +5320,8 @@
           "name": "learner_caregivers_tenant_id_tenants_id_fk",
           "tableFrom": "learner_caregivers",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -5663,12 +5329,8 @@
           "name": "learner_caregivers_learner_id_learners_id_fk",
           "tableFrom": "learner_caregivers",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -5676,12 +5338,8 @@
           "name": "learner_caregivers_caregiver_user_id_users_id_fk",
           "tableFrom": "learner_caregivers",
           "tableTo": "users",
-          "columnsFrom": [
-            "caregiver_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["caregiver_user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -5689,12 +5347,8 @@
           "name": "learner_caregivers_invited_by_users_id_fk",
           "tableFrom": "learner_caregivers",
           "tableTo": "users",
-          "columnsFrom": [
-            "invited_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["invited_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -5801,12 +5455,8 @@
           "name": "learner_teachers_tenant_id_tenants_id_fk",
           "tableFrom": "learner_teachers",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -5814,12 +5464,8 @@
           "name": "learner_teachers_learner_id_learners_id_fk",
           "tableFrom": "learner_teachers",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -5827,12 +5473,8 @@
           "name": "learner_teachers_teacher_user_id_users_id_fk",
           "tableFrom": "learner_teachers",
           "tableTo": "users",
-          "columnsFrom": [
-            "teacher_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["teacher_user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -5840,12 +5482,8 @@
           "name": "learner_teachers_invited_by_users_id_fk",
           "tableFrom": "learner_teachers",
           "tableTo": "users",
-          "columnsFrom": [
-            "invited_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["invited_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -5957,12 +5595,8 @@
           "name": "learner_therapists_tenant_id_tenants_id_fk",
           "tableFrom": "learner_therapists",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -5970,12 +5604,8 @@
           "name": "learner_therapists_learner_id_learners_id_fk",
           "tableFrom": "learner_therapists",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -5983,12 +5613,8 @@
           "name": "learner_therapists_therapist_user_id_users_id_fk",
           "tableFrom": "learner_therapists",
           "tableTo": "users",
-          "columnsFrom": [
-            "therapist_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["therapist_user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -5996,12 +5622,8 @@
           "name": "learner_therapists_invited_by_users_id_fk",
           "tableFrom": "learner_therapists",
           "tableTo": "users",
-          "columnsFrom": [
-            "invited_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["invited_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -6111,12 +5733,8 @@
           "name": "therapy_goals_tenant_id_tenants_id_fk",
           "tableFrom": "therapy_goals",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -6124,12 +5742,8 @@
           "name": "therapy_goals_learner_id_learners_id_fk",
           "tableFrom": "therapy_goals",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -6137,12 +5751,8 @@
           "name": "therapy_goals_therapist_id_learner_therapists_id_fk",
           "tableFrom": "therapy_goals",
           "tableTo": "learner_therapists",
-          "columnsFrom": [
-            "therapist_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["therapist_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -6228,12 +5838,8 @@
           "name": "therapy_sessions_tenant_id_tenants_id_fk",
           "tableFrom": "therapy_sessions",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -6241,12 +5847,8 @@
           "name": "therapy_sessions_learner_id_learners_id_fk",
           "tableFrom": "therapy_sessions",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -6254,12 +5856,8 @@
           "name": "therapy_sessions_therapist_id_learner_therapists_id_fk",
           "tableFrom": "therapy_sessions",
           "tableTo": "learner_therapists",
-          "columnsFrom": [
-            "therapist_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["therapist_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -6432,12 +6030,8 @@
           "name": "integration_connections_tenant_id_tenants_id_fk",
           "tableFrom": "integration_connections",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -6566,12 +6160,8 @@
           "name": "integration_roster_mappings_connection_id_integration_connections_id_fk",
           "tableFrom": "integration_roster_mappings",
           "tableTo": "integration_connections",
-          "columnsFrom": [
-            "connection_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["connection_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -6711,12 +6301,8 @@
           "name": "integration_sync_logs_connection_id_integration_connections_id_fk",
           "tableFrom": "integration_sync_logs",
           "tableTo": "integration_connections",
-          "columnsFrom": [
-            "connection_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["connection_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -6879,12 +6465,8 @@
           "name": "admin_audit_log_actor_id_users_id_fk",
           "tableFrom": "admin_audit_log",
           "tableTo": "users",
-          "columnsFrom": [
-            "actor_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["actor_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -6892,12 +6474,8 @@
           "name": "admin_audit_log_tenant_id_tenants_id_fk",
           "tableFrom": "admin_audit_log",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -7105,12 +6683,8 @@
           "name": "api_keys_tenant_id_tenants_id_fk",
           "tableFrom": "api_keys",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -7118,12 +6692,8 @@
           "name": "api_keys_created_by_users_id_fk",
           "tableFrom": "api_keys",
           "tableTo": "users",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -7226,12 +6796,8 @@
           "name": "content_moderation_queue_reviewer_id_users_id_fk",
           "tableFrom": "content_moderation_queue",
           "tableTo": "users",
-          "columnsFrom": [
-            "reviewer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["reviewer_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -7329,12 +6895,8 @@
           "name": "data_requests_subject_id_users_id_fk",
           "tableFrom": "data_requests",
           "tableTo": "users",
-          "columnsFrom": [
-            "subject_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["subject_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -7342,12 +6904,8 @@
           "name": "data_requests_requester_id_users_id_fk",
           "tableFrom": "data_requests",
           "tableTo": "users",
-          "columnsFrom": [
-            "requester_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["requester_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -7434,12 +6992,8 @@
           "name": "email_templates_updated_by_users_id_fk",
           "tableFrom": "email_templates",
           "tableTo": "users",
-          "columnsFrom": [
-            "updated_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["updated_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -7449,9 +7003,7 @@
         "email_templates_key_unique": {
           "name": "email_templates_key_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "key"
-          ]
+          "columns": ["key"]
         }
       },
       "policies": {},
@@ -7630,12 +7182,8 @@
           "name": "platform_config_changed_by_users_id_fk",
           "tableFrom": "platform_config",
           "tableTo": "users",
-          "columnsFrom": [
-            "changed_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["changed_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -7701,12 +7249,8 @@
           "name": "webhook_deliveries_webhook_id_webhooks_id_fk",
           "tableFrom": "webhook_deliveries",
           "tableTo": "webhooks",
-          "columnsFrom": [
-            "webhook_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["webhook_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -7791,12 +7335,8 @@
           "name": "webhooks_tenant_id_tenants_id_fk",
           "tableFrom": "webhooks",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -7804,12 +7344,8 @@
           "name": "webhooks_created_by_users_id_fk",
           "tableFrom": "webhooks",
           "tableTo": "users",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -7885,12 +7421,8 @@
           "name": "classroom_enrollments_classroom_id_classrooms_id_fk",
           "tableFrom": "classroom_enrollments",
           "tableTo": "classrooms",
-          "columnsFrom": [
-            "classroom_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["classroom_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -7898,12 +7430,8 @@
           "name": "classroom_enrollments_learner_id_learners_id_fk",
           "tableFrom": "classroom_enrollments",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -7991,12 +7519,8 @@
           "name": "classrooms_school_id_schools_id_fk",
           "tableFrom": "classrooms",
           "tableTo": "schools",
-          "columnsFrom": [
-            "school_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["school_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -8004,12 +7528,8 @@
           "name": "classrooms_teacher_id_users_id_fk",
           "tableFrom": "classrooms",
           "tableTo": "users",
-          "columnsFrom": [
-            "teacher_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["teacher_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -8109,12 +7629,8 @@
           "name": "district_activity_log_tenant_id_tenants_id_fk",
           "tableFrom": "district_activity_log",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -8122,12 +7638,8 @@
           "name": "district_activity_log_actor_id_users_id_fk",
           "tableFrom": "district_activity_log",
           "tableTo": "users",
-          "columnsFrom": [
-            "actor_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["actor_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -8204,12 +7716,8 @@
           "name": "district_settings_tenant_id_tenants_id_fk",
           "tableFrom": "district_settings",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -8219,9 +7727,7 @@
         "district_settings_tenant_id_unique": {
           "name": "district_settings_tenant_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "tenant_id"
-          ]
+          "columns": ["tenant_id"]
         }
       },
       "policies": {},
@@ -8368,12 +7874,8 @@
           "name": "iep_records_learner_id_learners_id_fk",
           "tableFrom": "iep_records",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -8381,12 +7883,8 @@
           "name": "iep_records_case_manager_id_users_id_fk",
           "tableFrom": "iep_records",
           "tableTo": "users",
-          "columnsFrom": [
-            "case_manager_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["case_manager_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -8495,12 +7993,8 @@
           "name": "interventions_learner_id_learners_id_fk",
           "tableFrom": "interventions",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -8508,12 +8002,8 @@
           "name": "interventions_assigned_by_users_id_fk",
           "tableFrom": "interventions",
           "tableTo": "users",
-          "columnsFrom": [
-            "assigned_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["assigned_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -8646,12 +8136,8 @@
           "name": "schools_tenant_id_tenants_id_fk",
           "tableFrom": "schools",
           "tableTo": "tenants",
-          "columnsFrom": [
-            "tenant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -8733,12 +8219,8 @@
           "name": "staff_assignments_user_id_users_id_fk",
           "tableFrom": "staff_assignments",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -8746,12 +8228,8 @@
           "name": "staff_assignments_school_id_schools_id_fk",
           "tableFrom": "staff_assignments",
           "tableTo": "schools",
-          "columnsFrom": [
-            "school_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["school_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -8799,12 +8277,8 @@
           "name": "learner_badges_learner_id_learners_id_fk",
           "tableFrom": "learner_badges",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -8878,12 +8352,8 @@
           "name": "learner_milestones_learner_id_learners_id_fk",
           "tableFrom": "learner_milestones",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -8959,12 +8429,8 @@
           "name": "learner_settings_learner_id_learners_id_fk",
           "tableFrom": "learner_settings",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -8972,12 +8438,8 @@
           "name": "learner_settings_updated_by_users_id_fk",
           "tableFrom": "learner_settings",
           "tableTo": "users",
-          "columnsFrom": [
-            "updated_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["updated_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -8987,9 +8449,7 @@
         "learner_settings_learner_id_unique": {
           "name": "learner_settings_learner_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "learner_id"
-          ]
+          "columns": ["learner_id"]
         }
       },
       "policies": {},
@@ -9047,12 +8507,8 @@
           "name": "learner_streaks_learner_id_learners_id_fk",
           "tableFrom": "learner_streaks",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -9062,9 +8518,7 @@
         "learner_streaks_learner_id_unique": {
           "name": "learner_streaks_learner_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "learner_id"
-          ]
+          "columns": ["learner_id"]
         }
       },
       "policies": {},
@@ -9151,12 +8605,8 @@
           "name": "parent_notifications_parent_id_users_id_fk",
           "tableFrom": "parent_notifications",
           "tableTo": "users",
-          "columnsFrom": [
-            "parent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["parent_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -9164,12 +8614,8 @@
           "name": "parent_notifications_learner_id_learners_id_fk",
           "tableFrom": "parent_notifications",
           "tableTo": "learners",
-          "columnsFrom": [
-            "learner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["learner_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -9197,75 +8643,37 @@
     "public.assessment_status": {
       "name": "assessment_status",
       "schema": "public",
-      "values": [
-        "NOT_STARTED",
-        "IN_PROGRESS",
-        "COMPLETED",
-        "EXPIRED"
-      ]
+      "values": ["NOT_STARTED", "IN_PROGRESS", "COMPLETED", "EXPIRED"]
     },
     "public.brain_approval_status": {
       "name": "brain_approval_status",
       "schema": "public",
-      "values": [
-        "pending_parent_review",
-        "approved",
-        "amended",
-        "declined"
-      ]
+      "values": ["pending_parent_review", "approved", "amended", "declined"]
     },
     "public.functioning_level": {
       "name": "functioning_level",
       "schema": "public",
-      "values": [
-        "STANDARD",
-        "SUPPORTED",
-        "LOW_VERBAL",
-        "NON_VERBAL",
-        "PRE_SYMBOLIC"
-      ]
+      "values": ["STANDARD", "SUPPORTED", "LOW_VERBAL", "NON_VERBAL", "PRE_SYMBOLIC"]
     },
     "public.homework_mode": {
       "name": "homework_mode",
       "schema": "public",
-      "values": [
-        "STANDARD",
-        "SUPPORTED",
-        "LOW_VERBAL",
-        "NON_VERBAL",
-        "PRE_SYMBOLIC"
-      ]
+      "values": ["STANDARD", "SUPPORTED", "LOW_VERBAL", "NON_VERBAL", "PRE_SYMBOLIC"]
     },
     "public.homework_status": {
       "name": "homework_status",
       "schema": "public",
-      "values": [
-        "PROCESSING",
-        "READY",
-        "IN_PROGRESS",
-        "COMPLETED",
-        "FAILED"
-      ]
+      "values": ["PROCESSING", "READY", "IN_PROGRESS", "COMPLETED", "FAILED"]
     },
     "public.milestone_status": {
       "name": "milestone_status",
       "schema": "public",
-      "values": [
-        "not_started",
-        "emerging",
-        "developing",
-        "achieved"
-      ]
+      "values": ["not_started", "emerging", "developing", "achieved"]
     },
     "public.recommendation_status": {
       "name": "recommendation_status",
       "schema": "public",
-      "values": [
-        "PENDING",
-        "APPROVED",
-        "DECLINED",
-        "ADJUSTED"
-      ]
+      "values": ["PENDING", "APPROVED", "DECLINED", "ADJUSTED"]
     },
     "public.recommendation_type": {
       "name": "recommendation_type",
@@ -9303,21 +8711,12 @@
     "public.subscription_status": {
       "name": "subscription_status",
       "schema": "public",
-      "values": [
-        "ACTIVE",
-        "PAST_DUE",
-        "CANCELLED",
-        "TRIALING"
-      ]
+      "values": ["ACTIVE", "PAST_DUE", "CANCELLED", "TRIALING"]
     },
     "public.tenant_type": {
       "name": "tenant_type",
       "schema": "public",
-      "values": [
-        "B2C_FAMILY",
-        "B2B_SCHOOL",
-        "B2B_DISTRICT"
-      ]
+      "values": ["B2C_FAMILY", "B2B_SCHOOL", "B2B_DISTRICT"]
     },
     "public.user_role": {
       "name": "user_role",
@@ -9341,13 +8740,7 @@
     "public.content_type": {
       "name": "content_type",
       "schema": "public",
-      "values": [
-        "LESSON",
-        "PRACTICE",
-        "REVIEW",
-        "ASSESSMENT",
-        "HOMEWORK"
-      ]
+      "values": ["LESSON", "PRACTICE", "REVIEW", "ASSESSMENT", "HOMEWORK"]
     },
     "public.session_status": {
       "name": "session_status",
@@ -9364,35 +8757,17 @@
     "public.connection_status": {
       "name": "connection_status",
       "schema": "public",
-      "values": [
-        "pending",
-        "authorized",
-        "active",
-        "syncing",
-        "error",
-        "disconnected"
-      ]
+      "values": ["pending", "authorized", "active", "syncing", "error", "disconnected"]
     },
     "public.connector_type": {
       "name": "connector_type",
       "schema": "public",
-      "values": [
-        "lms",
-        "sis",
-        "sso",
-        "assessment"
-      ]
+      "values": ["lms", "sis", "sso", "assessment"]
     },
     "public.sync_status": {
       "name": "sync_status",
       "schema": "public",
-      "values": [
-        "pending",
-        "running",
-        "completed",
-        "partial",
-        "failed"
-      ]
+      "values": ["pending", "running", "completed", "partial", "failed"]
     }
   },
   "schemas": {},

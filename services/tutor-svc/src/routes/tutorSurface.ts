@@ -13,10 +13,7 @@
  */
 
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import {
-  buildLearnerContext,
-  negotiateFunctioningLevel,
-} from "../lib/learnerContext.js";
+import { buildLearnerContext, negotiateFunctioningLevel } from "../lib/learnerContext.js";
 import { planSession, TutorPolicyError, type LearnerContext } from "@aivo/tutor-runtime";
 import { getTutorDefinition } from "../modes/registry.js";
 import { getStarterContentPack } from "../content-packs/index.js";
@@ -51,10 +48,12 @@ export function registerTutorSurfaceRoutes(app: FastifyInstance): void {
       }
 
       const contentPack = body.contentPack ?? getStarterContentPack(tutorKey);
-      if (!contentPack || !Array.isArray(contentPack.activities) || contentPack.activities.length === 0) {
-        return reply
-          .code(400)
-          .send({ error: `no content pack available for tutor "${tutorKey}"` });
+      if (
+        !contentPack ||
+        !Array.isArray(contentPack.activities) ||
+        contentPack.activities.length === 0
+      ) {
+        return reply.code(400).send({ error: `no content pack available for tutor "${tutorKey}"` });
       }
 
       const baseCtx = buildLearnerContext({

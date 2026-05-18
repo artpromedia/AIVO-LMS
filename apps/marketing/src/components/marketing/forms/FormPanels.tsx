@@ -24,7 +24,13 @@ export function FormSuccessPanel({
       className="rounded-2xl border border-emerald-200 bg-emerald-50 p-8 text-center"
     >
       <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
-        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+        <svg
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          aria-hidden="true"
+        >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
         </svg>
       </div>
@@ -53,13 +59,7 @@ export function FormSuccessPanel({
   );
 }
 
-export function FormErrorPanel({
-  message,
-  onRetry,
-}: {
-  message: string;
-  onRetry?: () => void;
-}) {
+export function FormErrorPanel({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
     <div
       role="alert"

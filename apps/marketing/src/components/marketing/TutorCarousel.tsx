@@ -35,15 +35,12 @@ export function TutorCarousel({ tutors }: { tutors: Tutor[] }) {
     };
   }, []);
 
-  const goTo = useCallback(
-    (index: number) => {
-      setActiveTutor(index);
-      setIsAutoPlaying(false);
-      if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
-      resumeTimerRef.current = setTimeout(() => setIsAutoPlaying(true), 15000);
-    },
-    []
-  );
+  const goTo = useCallback((index: number) => {
+    setActiveTutor(index);
+    setIsAutoPlaying(false);
+    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+    resumeTimerRef.current = setTimeout(() => setIsAutoPlaying(true), 15000);
+  }, []);
 
   const toggleAutoPlay = useCallback(() => {
     if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
@@ -86,9 +83,7 @@ export function TutorCarousel({ tutors }: { tutors: Tutor[] }) {
           <h2 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 mb-4">
             {t("title")}
           </h2>
-          <p className="text-lg text-slate-500 max-w-2xl mx-auto font-body">
-            {t("subtitle")}
-          </p>
+          <p className="text-lg text-slate-500 max-w-2xl mx-auto font-body">{t("subtitle")}</p>
         </div>
 
         <div className="relative h-[520px] md:h-[560px]">
@@ -97,8 +92,18 @@ export function TutorCarousel({ tutors }: { tutors: Tutor[] }) {
             className="absolute left-0 md:left-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white/90 shadow-lg flex items-center justify-center hover:bg-white hover:scale-110 transition-all"
             aria-label={t("prev_tutor")}
           >
-            <svg className="w-6 h-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <svg
+              className="w-6 h-6 text-slate-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </button>
           <button
@@ -106,7 +111,12 @@ export function TutorCarousel({ tutors }: { tutors: Tutor[] }) {
             className="absolute right-0 md:right-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-full bg-white/90 shadow-lg flex items-center justify-center hover:bg-white hover:scale-110 transition-all"
             aria-label={t("next_tutor")}
           >
-            <svg className="w-6 h-6 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg
+              className="w-6 h-6 text-slate-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
@@ -169,18 +179,34 @@ export function TutorCarousel({ tutors }: { tutors: Tutor[] }) {
 
           <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 w-[340px] z-[25] pointer-events-none">
             <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-slate-100 pointer-events-auto">
-              <p className="text-sm font-semibold uppercase tracking-wider mb-1" style={{ color: current.color }}>
+              <p
+                className="text-sm font-semibold uppercase tracking-wider mb-1"
+                style={{ color: current.color }}
+              >
                 {current.domain}
               </p>
-              <h3 className="text-3xl font-heading font-bold text-slate-900 mb-2">{current.name}</h3>
+              <h3 className="text-3xl font-heading font-bold text-slate-900 mb-2">
+                {current.name}
+              </h3>
               <p className="text-base italic mb-4" style={{ color: current.color }}>
                 {current.tagline}
               </p>
               <ul className="space-y-3 mb-6">
                 {current.bullets.map((b) => (
                   <li key={b} className="flex items-start gap-2 text-sm text-slate-600">
-                    <svg className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: current.color }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-4 h-4 mt-0.5 flex-shrink-0"
+                      style={{ color: current.color }}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                     {b}
                   </li>
@@ -204,7 +230,10 @@ export function TutorCarousel({ tutors }: { tutors: Tutor[] }) {
             <div className="bg-white/95 backdrop-blur-sm rounded-t-2xl p-6 shadow-xl border-t border-slate-100">
               <div className="flex items-center justify-between mb-2">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: current.color }}>
+                  <p
+                    className="text-xs font-semibold uppercase tracking-wider"
+                    style={{ color: current.color }}
+                  >
                     {current.domain}
                   </p>
                   <h3 className="text-xl font-heading font-bold text-slate-900">{current.name}</h3>

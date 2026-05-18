@@ -20,20 +20,10 @@ import {
   getMasteryMap,
   listActiveAssignmentsForLearner,
 } from "@/lib/db/repos";
-import type {
-  LearningPathNode,
-  LessonRun,
-  LessonRunSource,
-  Subject,
-} from "@/lib/db/types";
+import type { LearningPathNode, LessonRun, LessonRunSource, Subject } from "@/lib/db/types";
 
 export type TodayMissionPlan = {
-  kind:
-    | "resume_in_progress"
-    | "baseline_followup"
-    | "next_unmastered"
-    | "review"
-    | "subject_path";
+  kind: "resume_in_progress" | "baseline_followup" | "next_unmastered" | "review" | "subject_path";
   source: LessonRunSource;
   /** Existing in-progress LessonRun to resume (null when we'd create a new one). */
   existingRunId: string | null;
@@ -79,10 +69,7 @@ function learnerSafeReason(node: LearningPathNode, subj: Subject): string {
   }
 }
 
-export function pickTodaysMission(
-  learnerId: string,
-  tenantId: string,
-): TodayMissionResult {
+export function pickTodaysMission(learnerId: string, tenantId: string): TodayMissionResult {
   const store = getStore();
   const learner = getLearner(learnerId, tenantId);
   if (!learner) return { ready: false, blocker: "no_learner" };
@@ -196,10 +183,7 @@ export function pickTodaysMission(
   const completedSkillIds = new Set(
     Array.from(store.lessonRuns.values())
       .filter(
-        (r) =>
-          r.learnerId === learnerId &&
-          r.tenantId === tenantId &&
-          r.status === "completed",
+        (r) => r.learnerId === learnerId && r.tenantId === tenantId && r.status === "completed",
       )
       .map((r) => r.skillId),
   );
@@ -214,10 +198,7 @@ export function pickTodaysMission(
   };
   const candidate = path.nodes
     .slice()
-    .sort(
-      (a, b) =>
-        KIND_PRIORITY[a.kind] - KIND_PRIORITY[b.kind] || a.order - b.order,
-    )
+    .sort((a, b) => KIND_PRIORITY[a.kind] - KIND_PRIORITY[b.kind] || a.order - b.order)
     .find((n) => {
       if (completedNodeIds.has(n.id)) return false;
       // Review nodes are exempt from the skill-level completion filter —

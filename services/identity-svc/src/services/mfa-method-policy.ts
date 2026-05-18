@@ -38,6 +38,9 @@ export function challengeAllowsEmailResend(payload: MfaChallengePayload): boolea
  * TOTP code. Requires both: user has TOTP enrolled AND their active mfaMethod
  * is "totp" (so an old, disabled secret cannot be used to bypass a downgrade).
  */
-export function userMayUseTotp(user: { mfaMethod?: string | null; totpSecretEncrypted?: string | null }): boolean {
+export function userMayUseTotp(user: {
+  mfaMethod?: string | null;
+  totpSecretEncrypted?: string | null;
+}): boolean {
   return user?.mfaMethod === "totp" && !!user?.totpSecretEncrypted;
 }

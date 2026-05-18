@@ -43,16 +43,16 @@ function signEvent(payload: object): { rawBody: string; signature: string } {
   const rawBody = JSON.stringify(payload);
   const timestamp = Math.floor(Date.now() / 1000);
   const signedPayload = `${timestamp}.${rawBody}`;
-  const v1 = crypto
-    .createHmac("sha256", WEBHOOK_SECRET)
-    .update(signedPayload)
-    .digest("hex");
+  const v1 = crypto.createHmac("sha256", WEBHOOK_SECRET).update(signedPayload).digest("hex");
   return { rawBody, signature: `t=${timestamp},v1=${v1}` };
 }
 
 function buildSubscriptionEvent(args: {
   eventId: string;
-  type: "customer.subscription.created" | "customer.subscription.updated" | "customer.subscription.deleted";
+  type:
+    | "customer.subscription.created"
+    | "customer.subscription.updated"
+    | "customer.subscription.deleted";
   createdSecs: number;
   subscription: StripeSubscriptionEvent;
 }) {

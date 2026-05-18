@@ -1,12 +1,12 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiFetch } from '@/lib/api';
-import { API } from '@/constants/api';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiFetch } from "@/lib/api";
+import { API } from "@/constants/api";
 
 export interface TeamMemberRow {
   id: string;
   email: string;
-  status: 'PENDING' | 'ACCEPTED' | string;
-  memberType: 'teacher' | 'caregiver' | 'therapist';
+  status: "PENDING" | "ACCEPTED" | string;
+  memberType: "teacher" | "caregiver" | "therapist";
   specialty?: string | null;
   credentials?: string | null;
   relationship?: string | null;
@@ -30,17 +30,17 @@ export interface CollaborationResponse {
 
 export function useCollaboration(learnerId: string) {
   return useQuery<CollaborationResponse>({
-    queryKey: ['collaboration', learnerId],
+    queryKey: ["collaboration", learnerId],
     queryFn: async () => {
       const res = await apiFetch(API.FAMILY, `/api/family/collaboration/${learnerId}/members`);
-      if (!res.ok) throw new Error('Failed to fetch team');
+      if (!res.ok) throw new Error("Failed to fetch team");
       return res.json();
     },
     enabled: !!learnerId,
   });
 }
 
-export type InviteRole = 'TEACHER' | 'CAREGIVER' | 'THERAPIST';
+export type InviteRole = "TEACHER" | "CAREGIVER" | "THERAPIST";
 
 export function useInviteMember() {
   const queryClient = useQueryClient();
@@ -54,39 +54,39 @@ export function useInviteMember() {
       relationship?: string;
     }) => {
       const path =
-        vars.role === 'TEACHER'
+        vars.role === "TEACHER"
           ? `/api/family/collaboration/${vars.learnerId}/invite/teacher`
-          : vars.role === 'CAREGIVER'
-          ? `/api/family/collaboration/${vars.learnerId}/invite/caregiver`
-          : `/api/family/collaboration/${vars.learnerId}/invite/therapist`;
+          : vars.role === "CAREGIVER"
+            ? `/api/family/collaboration/${vars.learnerId}/invite/caregiver`
+            : `/api/family/collaboration/${vars.learnerId}/invite/therapist`;
       const body: Record<string, string> = { email: vars.email };
-      if (vars.role === 'THERAPIST') {
+      if (vars.role === "THERAPIST") {
         if (vars.specialty) body.specialty = vars.specialty;
         if (vars.credentials) body.credentials = vars.credentials;
       }
-      if (vars.role === 'CAREGIVER' && vars.relationship) body.relationship = vars.relationship;
+      if (vars.role === "CAREGIVER" && vars.relationship) body.relationship = vars.relationship;
       const res = await apiFetch(API.FAMILY, path, {
-        method: 'POST',
+        method: "POST",
         body: JSON.stringify(body),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || 'Failed to invite');
+        throw new Error(data.error || "Failed to invite");
       }
       return res.json();
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['collaboration', variables.learnerId] });
+      queryClient.invalidateQueries({ queryKey: ["collaboration", variables.learnerId] });
     },
   });
 }
 
 export function useConnectedLearners() {
   return useQuery({
-    queryKey: ['connected-learners'],
+    queryKey: ["connected-learners"],
     queryFn: async () => {
-      const res = await apiFetch(API.FAMILY, '/api/family/collaboration/connected-learners');
-      if (!res.ok) throw new Error('Failed to fetch connected learners');
+      const res = await apiFetch(API.FAMILY, "/api/family/collaboration/connected-learners");
+      if (!res.ok) throw new Error("Failed to fetch connected learners");
       return res.json();
     },
   });
@@ -94,10 +94,10 @@ export function useConnectedLearners() {
 
 export function useIEPGoals(learnerId: string) {
   return useQuery({
-    queryKey: ['iep-goals', learnerId],
+    queryKey: ["iep-goals", learnerId],
     queryFn: async () => {
       const res = await apiFetch(API.FAMILY, `/api/family/iep/${learnerId}/goals`);
-      if (!res.ok) throw new Error('Failed to fetch IEP goals');
+      if (!res.ok) throw new Error("Failed to fetch IEP goals");
       return res.json();
     },
     enabled: !!learnerId,
@@ -111,10 +111,10 @@ export function useIEPGoals(learnerId: string) {
 // each consumer only sees the slice it cares about.
 export function useTherapyGoals(learnerId: string) {
   return useQuery({
-    queryKey: ['therapy-goals', learnerId],
+    queryKey: ["therapy-goals", learnerId],
     queryFn: async () => {
-      const res = await apiFetch(API.FAMILY, '/api/family/therapy-goals');
-      if (!res.ok) throw new Error('Failed to fetch therapy goals');
+      const res = await apiFetch(API.FAMILY, "/api/family/therapy-goals");
+      if (!res.ok) throw new Error("Failed to fetch therapy goals");
       const data = (await res.json()) as { goals?: { learnerId: string }[] };
       const goals = Array.isArray(data?.goals) ? data.goals : [];
       return { goals: goals.filter((g) => g.learnerId === learnerId) };
@@ -126,7 +126,7 @@ export function useTherapyGoals(learnerId: string) {
 // ─────────────── IEP Updates: Timeline / Amendments / Preferences ───────────────
 
 export interface IEPTimelineItem {
-  type: 'note' | 'report' | 'amendment' | 'reminder';
+  type: "note" | "report" | "amendment" | "reminder";
   id: string;
   at: string;
   payload: any;
@@ -141,25 +141,25 @@ export interface IEPTimelineResponse {
 
 export function useIEPTimeline(learnerId: string) {
   return useQuery<IEPTimelineResponse>({
-    queryKey: ['iep-timeline', learnerId],
+    queryKey: ["iep-timeline", learnerId],
     queryFn: async () => {
       const res = await apiFetch(API.ASSESSMENT, `/api/iep/learners/${learnerId}/timeline`);
-      if (!res.ok) throw new Error('Failed to fetch timeline');
+      if (!res.ok) throw new Error("Failed to fetch timeline");
       return res.json();
     },
     enabled: !!learnerId,
   });
 }
 
-export type IEPPrefCategory = 'progress_notes' | 'reports' | 'amendments' | 'reminders';
+export type IEPPrefCategory = "progress_notes" | "reports" | "amendments" | "reminders";
 export type IEPPrefs = Record<IEPPrefCategory, { email: boolean; inApp: boolean }>;
 
 export function useIEPPreferences() {
   return useQuery<IEPPrefs>({
-    queryKey: ['iep-preferences'],
+    queryKey: ["iep-preferences"],
     queryFn: async () => {
-      const res = await apiFetch(API.ASSESSMENT, '/api/iep/preferences');
-      if (!res.ok) throw new Error('Failed to fetch preferences');
+      const res = await apiFetch(API.ASSESSMENT, "/api/iep/preferences");
+      if (!res.ok) throw new Error("Failed to fetch preferences");
       return res.json();
     },
   });
@@ -169,14 +169,14 @@ export function useSaveIEPPreferences() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (prefs: IEPPrefs) => {
-      const res = await apiFetch(API.ASSESSMENT, '/api/iep/preferences', {
-        method: 'PUT',
+      const res = await apiFetch(API.ASSESSMENT, "/api/iep/preferences", {
+        method: "PUT",
         body: JSON.stringify(prefs),
       });
-      if (!res.ok) throw new Error('Failed to save preferences');
+      if (!res.ok) throw new Error("Failed to save preferences");
       return res.json();
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['iep-preferences'] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["iep-preferences"] }),
   });
 }
 
@@ -185,22 +185,26 @@ export function useRespondToAmendment() {
   return useMutation({
     mutationFn: async (vars: {
       amendmentId: string;
-      response: 'acknowledged' | 'objected';
+      response: "acknowledged" | "objected";
       note?: string;
       learnerId: string;
     }) => {
-      const res = await apiFetch(API.ASSESSMENT, `/api/iep/amendments/${vars.amendmentId}/respond`, {
-        method: 'POST',
-        body: JSON.stringify({ response: vars.response, note: vars.note }),
-      });
+      const res = await apiFetch(
+        API.ASSESSMENT,
+        `/api/iep/amendments/${vars.amendmentId}/respond`,
+        {
+          method: "POST",
+          body: JSON.stringify({ response: vars.response, note: vars.note }),
+        },
+      );
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || 'Failed to submit response');
+        throw new Error(data.error || "Failed to submit response");
       }
       return res.json();
     },
     onSuccess: (_, variables) => {
-      qc.invalidateQueries({ queryKey: ['iep-timeline', variables.learnerId] });
+      qc.invalidateQueries({ queryKey: ["iep-timeline", variables.learnerId] });
     },
   });
 }

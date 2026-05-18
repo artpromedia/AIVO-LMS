@@ -24,9 +24,7 @@ export function MockupShowcase({
       <div className="grid gap-8 lg:grid-cols-2 items-center">
         <div className={reverse ? "lg:order-2" : ""}>
           {eyebrow && (
-            <p className="text-xs font-bold uppercase tracking-wider text-purple-700">
-              {eyebrow}
-            </p>
+            <p className="text-xs font-bold uppercase tracking-wider text-purple-700">{eyebrow}</p>
           )}
           <h2
             id={headingId}

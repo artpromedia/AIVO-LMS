@@ -30,7 +30,12 @@ export type { DapeCategory };
 
 export type SensoryProfileType = "seeker" | "avoider" | "any";
 
-export type DapeFunctioningTier = "STANDARD" | "SUPPORTED" | "LOW_VERBAL" | "NON_VERBAL" | "PRE_SYMBOLIC";
+export type DapeFunctioningTier =
+  | "STANDARD"
+  | "SUPPORTED"
+  | "LOW_VERBAL"
+  | "NON_VERBAL"
+  | "PRE_SYMBOLIC";
 
 export interface DapeActivity {
   id: string;
@@ -125,7 +130,8 @@ export const DAPE_LIBRARY: DapeActivity[] = [
       NON_VERBAL: "Partner places hand under learner's, releases together.",
       PRE_SYMBOLIC: "Drop bean bag into a bucket together — listen to the thud.",
     },
-    partnerCue: "Notice their grip. A two-handed grip is fine — release timing matters more than form.",
+    partnerCue:
+      "Notice their grip. A two-handed grip is fine — release timing matters more than form.",
   },
   {
     id: "obj-rolling-catch",
@@ -219,7 +225,8 @@ export const DAPE_LIBRARY: DapeActivity[] = [
       NON_VERBAL: "Partner-assisted: gently guide hand to opposite knee.",
       PRE_SYMBOLIC: "Crossed-leg gentle rocking together.",
     },
-    partnerCue: "Crossing the midline activates both brain hemispheres — pause if it feels effortful.",
+    partnerCue:
+      "Crossing the midline activates both brain hemispheres — pause if it feels effortful.",
   },
   {
     id: "mid-figure-8",
@@ -453,6 +460,8 @@ export function pickActivity(
 
 /** Suggest a regulation break activity based on dysregulation profile. */
 export function suggestRegulationBreak(profile: SensoryProfileType): DapeActivity {
-  const candidates = DAPE_LIBRARY.filter((a) => a.regulationFor === profile || a.regulationFor === "any");
+  const candidates = DAPE_LIBRARY.filter(
+    (a) => a.regulationFor === profile || a.regulationFor === "any",
+  );
   return candidates[Math.floor(Math.random() * candidates.length)];
 }

@@ -5,11 +5,7 @@ import swaggerUI from "@fastify/swagger-ui";
 import { createLogger } from "@aivo/observability";
 import { createDb } from "@aivo/db";
 import { bootstrapOpsAlerts } from "@aivo/ops-alerts";
-import {
-  startSafeCron,
-  createDrizzleAdvisoryLock,
-  createDrizzleLedger,
-} from "@aivo/scheduling";
+import { startSafeCron, createDrizzleAdvisoryLock, createDrizzleLedger } from "@aivo/scheduling";
 import { runWeeklyRollupOnce } from "./lib/weekly-rollup.js";
 import { registerHealthRoutes } from "./routes/health.js";
 import { registerXpRoutes } from "./routes/xp.js";
@@ -32,7 +28,9 @@ export async function buildApp(db = createDb(process.env.DATABASE_URL ?? "")) {
       info: { title: "AIVO Engagement Service", version: "1.0.0" },
       servers: process.env.SWAGGER_SERVER_URL
         ? [{ url: process.env.SWAGGER_SERVER_URL }]
-        : (process.env.NODE_ENV === "production" ? [] : [{ url: `http://localhost:${PORT}` }]),
+        : process.env.NODE_ENV === "production"
+          ? []
+          : [{ url: `http://localhost:${PORT}` }],
       components: {
         securitySchemes: { bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" } },
       },
@@ -74,7 +72,9 @@ async function start() {
 const isMain = (() => {
   try {
     return process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 })();
 if (isMain) {
   start().catch((err) => {

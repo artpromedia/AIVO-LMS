@@ -7,7 +7,12 @@ import { PLATFORM_NAV } from "@/components/layout/role-shells";
 import { listIncidents, listIncidentTimeline } from "@/lib/db/repos";
 import { OpenIncidentForm } from "@/components/admin/security/open-incident-form";
 
-const SEVERITY_TONE = { sev1: "danger", sev2: "warning", sev3: "warning", sev4: "neutral" } as const;
+const SEVERITY_TONE = {
+  sev1: "danger",
+  sev2: "warning",
+  sev3: "warning",
+  sev4: "neutral",
+} as const;
 const STATUS_TONE = {
   open: "danger",
   investigating: "warning",
@@ -50,7 +55,9 @@ export default async function Page() {
                     <Badge tone={SEVERITY_TONE[i.severity]}>{i.severity.toUpperCase()}</Badge>
                     <Badge tone={STATUS_TONE[i.status]}>{i.status.replace("_", " ")}</Badge>
                     {i.customerImpact && <Badge tone="warning">Customer impact</Badge>}
-                    {i.regulatorNotificationRequired && <Badge tone="danger">Regulator notify</Badge>}
+                    {i.regulatorNotificationRequired && (
+                      <Badge tone="danger">Regulator notify</Badge>
+                    )}
                   </div>
                 </div>
                 <p className="mb-3 text-sm text-aivo-ink-soft">{i.summary}</p>

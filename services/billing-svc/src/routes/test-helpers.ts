@@ -17,11 +17,7 @@
  */
 import type { FastifyInstance } from "fastify";
 import { and, eq } from "drizzle-orm";
-import {
-  subscriptions,
-  tutorSubscriptions,
-  invoices as invoicesTable,
-} from "@aivo/db";
+import { subscriptions, tutorSubscriptions, invoices as invoicesTable } from "@aivo/db";
 
 function testModeEnabled(): boolean {
   return process.env.BILLING_TEST_MODE === "1" && process.env.NODE_ENV !== "production";
@@ -52,10 +48,13 @@ export function registerBillingTestHelperRoutes(app: FastifyInstance, db: any): 
     }
     const stripeStatus = body.stripeStatus ?? "active";
     const enumStatus =
-      stripeStatus === "trialing" ? "TRIALING"
-      : stripeStatus === "past_due" || stripeStatus === "unpaid" ? "PAST_DUE"
-      : stripeStatus === "canceled" ? "CANCELLED"
-      : "ACTIVE";
+      stripeStatus === "trialing"
+        ? "TRIALING"
+        : stripeStatus === "past_due" || stripeStatus === "unpaid"
+          ? "PAST_DUE"
+          : stripeStatus === "canceled"
+            ? "CANCELLED"
+            : "ACTIVE";
     const stripeCustomerId = body.stripeCustomerId ?? `cus_test_${Date.now()}`;
     const stripeSubscriptionId = body.stripeSubscriptionId ?? `sub_test_${Date.now()}`;
     const [row] = await db

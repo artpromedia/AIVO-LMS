@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { healthSchema } from "./schemas.js";
+import { healthSchema, probeHealthSchema } from "./schemas.js";
 
 export function registerHealthRoutes(app: FastifyInstance) {
   const handler = async () => ({
@@ -9,6 +9,7 @@ export function registerHealthRoutes(app: FastifyInstance) {
   });
 
   app.get("/api/engagement/health", { schema: healthSchema }, handler);
-  // Liveness/Readiness/Startup probes hit /health
-  app.get("/health", { schema: healthSchema }, handler);
+  // Liveness/Readiness/Startup probes hit /health. Distinct schema so the
+  // generated OpenAPI document has unique operationIds.
+  app.get("/health", { schema: probeHealthSchema }, handler);
 }

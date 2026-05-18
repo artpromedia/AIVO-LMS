@@ -88,9 +88,7 @@ async function main() {
     if (result.ok) {
       console.log(`  ok   ${result.status ?? "-"}  ${result.path}`);
     } else {
-      console.error(
-        `  FAIL ${result.status ?? "-"}  ${result.path}  ${result.reason}`,
-      );
+      console.error(`  FAIL ${result.status ?? "-"}  ${result.path}  ${result.reason}`);
     }
   }
   const failures = results.filter((r) => !r.ok);

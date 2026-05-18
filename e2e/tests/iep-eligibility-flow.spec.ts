@@ -62,7 +62,11 @@ async function trySeed(): Promise<SeedResult | null> {
   }
 }
 
-async function loginViaApi(request: APIRequestContext, email: string, password: string): Promise<string> {
+async function loginViaApi(
+  request: APIRequestContext,
+  email: string,
+  password: string,
+): Promise<string> {
   const res = await request.post("/api/auth/login", {
     data: { email, password },
     failOnStatusCode: false,
@@ -83,7 +87,10 @@ test.describe("IEP eligibility evaluation — teacher lifecycle + parent read-on
     );
   });
 
-  test("teacher walks an evaluation from draft → submitted → eligible decision", async ({ page, context }) => {
+  test("teacher walks an evaluation from draft → submitted → eligible decision", async ({
+    page,
+    context,
+  }) => {
     const fixture = seed!;
 
     await loginViaApi(context.request, TEACHER_EMAIL, TEACHER_PASSWORD);
@@ -96,13 +103,18 @@ test.describe("IEP eligibility evaluation — teacher lifecycle + parent read-on
     // Capture the create-draft network call so we can assert the right
     // learner id is being sent (the most likely regression vector).
     const createPromise = page.waitForResponse(
-      (r) => r.url().endsWith("/api/iep/evaluations") && r.request().method() === "POST" && r.status() === 200,
+      (r) =>
+        r.url().endsWith("/api/iep/evaluations") &&
+        r.request().method() === "POST" &&
+        r.status() === 200,
       { timeout: 15_000 },
     );
     await page.getByRole("button", { name: /new evaluation/i }).click();
     const createResp = await createPromise;
     const created = await createResp.json();
-    expect(created.learnerId, "draft is created against the right learner").toBe(fixture.learner.id);
+    expect(created.learnerId, "draft is created against the right learner").toBe(
+      fixture.learner.id,
+    );
     expect(created.status, "starts in draft").toBe("draft");
 
     // Fill in the referral concern + observations.
@@ -116,7 +128,10 @@ test.describe("IEP eligibility evaluation — teacher lifecycle + parent read-on
 
     // Save draft and wait for the PATCH to land.
     const patchPromise = page.waitForResponse(
-      (r) => r.url().includes(`/api/iep/evaluations/${created.id}`) && r.request().method() === "PATCH" && r.status() === 200,
+      (r) =>
+        r.url().includes(`/api/iep/evaluations/${created.id}`) &&
+        r.request().method() === "PATCH" &&
+        r.status() === 200,
       { timeout: 15_000 },
     );
     await page.getByRole("button", { name: /save draft/i }).click();
@@ -125,9 +140,10 @@ test.describe("IEP eligibility evaluation — teacher lifecycle + parent read-on
     // Submit for team review (draft → submitted) and confirm the decision
     // controls render.
     const submitPromise = page.waitForResponse(
-      (r) => r.url().includes(`/api/iep/evaluations/${created.id}/submit`)
-        && r.request().method() === "POST"
-        && r.status() === 200,
+      (r) =>
+        r.url().includes(`/api/iep/evaluations/${created.id}/submit`) &&
+        r.request().method() === "POST" &&
+        r.status() === 200,
       { timeout: 15_000 },
     );
     await page.getByRole("button", { name: /submit for team review/i }).click();
@@ -140,9 +156,10 @@ test.describe("IEP eligibility evaluation — teacher lifecycle + parent read-on
     await page.getByRole("button", { name: /specific learning disability/i }).click();
     await page.locator("textarea").last().fill(RATIONALE);
     const decisionPromise = page.waitForResponse(
-      (r) => r.url().includes(`/api/iep/evaluations/${created.id}/decision`)
-        && r.request().method() === "POST"
-        && r.status() === 200,
+      (r) =>
+        r.url().includes(`/api/iep/evaluations/${created.id}/decision`) &&
+        r.request().method() === "POST" &&
+        r.status() === 200,
       { timeout: 15_000 },
     );
     await page.getByRole("button", { name: /^found eligible$/i }).click();
@@ -158,7 +175,10 @@ test.describe("IEP eligibility evaluation — teacher lifecycle + parent read-on
     await expect(handoff).toBeVisible({ timeout: 10_000 });
   });
 
-  test("parent sees only the parent-summary shape on the same evaluation", async ({ context, page }) => {
+  test("parent sees only the parent-summary shape on the same evaluation", async ({
+    context,
+    page,
+  }) => {
     const fixture = seed!;
 
     // Drive the eligibility flow from the API directly (the previous test
@@ -180,7 +200,8 @@ test.describe("IEP eligibility evaluation — teacher lifecycle + parent read-on
     const evalRow = await created.json();
 
     const submitted = await context.request.post(`/api/iep/evaluations/${evalRow.id}/submit`, {
-      headers: teacherHeaders, failOnStatusCode: false,
+      headers: teacherHeaders,
+      failOnStatusCode: false,
     });
     expect(submitted.status()).toBe(200);
 
@@ -205,26 +226,26 @@ test.describe("IEP eligibility evaluation — teacher lifecycle + parent read-on
     );
     expect(parentList.status()).toBe(200);
     const list = await parentList.json();
-    const parentRow = Array.isArray(list)
-      ? list.find((r: any) => r.id === evalRow.id)
-      : null;
+    const parentRow = Array.isArray(list) ? list.find((r: any) => r.id === evalRow.id) : null;
     expect(parentRow, "parent must see the decided evaluation in their list").toBeTruthy();
     expect(parentRow.referralReason, "referralReason must NOT leak to parents").toBeUndefined();
     expect(parentRow.observations, "observations must NOT leak to parents").toBeUndefined();
     expect(parentRow.aiSuggestion, "aiSuggestion must NOT leak to parents").toBeUndefined();
-    expect(parentRow.eligibilityDecision || parentRow.decisionEligible, "decision visible").toBe("eligible");
-
-    const parentSingle = await context.request.get(
-      `/api/iep/evaluations/${evalRow.id}`,
-      { failOnStatusCode: false },
+    expect(parentRow.eligibilityDecision || parentRow.decisionEligible, "decision visible").toBe(
+      "eligible",
     );
+
+    const parentSingle = await context.request.get(`/api/iep/evaluations/${evalRow.id}`, {
+      failOnStatusCode: false,
+    });
     expect(parentSingle.status()).toBe(200);
     const single = await parentSingle.json();
     expect(single.referralReason).toBeUndefined();
     expect(single.observations).toBeUndefined();
     expect(single.aiSuggestion).toBeUndefined();
-    expect(single.decisionRationale, "decision rationale is part of the parent summary")
-      .toBe(RATIONALE);
+    expect(single.decisionRationale, "decision rationale is part of the parent summary").toBe(
+      RATIONALE,
+    );
 
     // Sanity: parent cannot create or mutate evaluations.
     const parentCreate = await context.request.post("/api/iep/evaluations", {

@@ -58,10 +58,14 @@ async function lookupCoupon(db: any, code: string): Promise<Record<string, any> 
   return rows[0] ?? null;
 }
 
-function validateCouponRow(row: Record<string, any>): { valid: false; reason: string } | { valid: true } {
+function validateCouponRow(
+  row: Record<string, any>,
+): { valid: false; reason: string } | { valid: true } {
   if (!row.active) return { valid: false, reason: "inactive" };
-  if (row.expires_at && new Date(row.expires_at) < new Date()) return { valid: false, reason: "expired" };
-  if (row.max_redemptions != null && row.redemptions >= row.max_redemptions) return { valid: false, reason: "exhausted" };
+  if (row.expires_at && new Date(row.expires_at) < new Date())
+    return { valid: false, reason: "expired" };
+  if (row.max_redemptions != null && row.redemptions >= row.max_redemptions)
+    return { valid: false, reason: "exhausted" };
   return { valid: true };
 }
 
@@ -70,7 +74,8 @@ export function registerCouponRoutes(app: FastifyInstance, db: any) {
   // in a real deploy, but coupons is admin-only and the dev env may not have run
   // migrations recently.
   void db
-    .execute(sql`
+    .execute(
+      sql`
       CREATE TABLE IF NOT EXISTS billing_coupons (
         code            varchar(64) PRIMARY KEY,
         description     text,
@@ -81,16 +86,37 @@ export function registerCouponRoutes(app: FastifyInstance, db: any) {
         created_at      timestamptz NOT NULL DEFAULT NOW(),
         expires_at      timestamptz
       )
-    `)
+    `,
+    )
     .catch(() => {})
     .then(() =>
       Promise.all([
-        db.execute(sql`ALTER TABLE billing_coupons ADD COLUMN IF NOT EXISTS coupon_type varchar(20) NOT NULL DEFAULT 'DISCOUNT'`).catch(() => {}),
-        db.execute(sql`ALTER TABLE billing_coupons ADD COLUMN IF NOT EXISTS grants_tier varchar(30)`).catch(() => {}),
-        db.execute(sql`ALTER TABLE billing_coupons ADD COLUMN IF NOT EXISTS grants_plan varchar(50)`).catch(() => {}),
-        db.execute(sql`ALTER TABLE billing_coupons ADD COLUMN IF NOT EXISTS grants_seat_limit integer`).catch(() => {}),
-        db.execute(sql`ALTER TABLE billing_coupons ADD COLUMN IF NOT EXISTS grants_duration_days integer`).catch(() => {}),
-      ])
+        db
+          .execute(
+            sql`ALTER TABLE billing_coupons ADD COLUMN IF NOT EXISTS coupon_type varchar(20) NOT NULL DEFAULT 'DISCOUNT'`,
+          )
+          .catch(() => {}),
+        db
+          .execute(
+            sql`ALTER TABLE billing_coupons ADD COLUMN IF NOT EXISTS grants_tier varchar(30)`,
+          )
+          .catch(() => {}),
+        db
+          .execute(
+            sql`ALTER TABLE billing_coupons ADD COLUMN IF NOT EXISTS grants_plan varchar(50)`,
+          )
+          .catch(() => {}),
+        db
+          .execute(
+            sql`ALTER TABLE billing_coupons ADD COLUMN IF NOT EXISTS grants_seat_limit integer`,
+          )
+          .catch(() => {}),
+        db
+          .execute(
+            sql`ALTER TABLE billing_coupons ADD COLUMN IF NOT EXISTS grants_duration_days integer`,
+          )
+          .catch(() => {}),
+      ]),
     )
     .catch(() => {});
 
@@ -116,14 +142,19 @@ export function registerCouponRoutes(app: FastifyInstance, db: any) {
     const code = typeof body.code === "string" ? body.code.trim() : "";
     const description = typeof body.description === "string" ? body.description : null;
     const couponType: "DISCOUNT" | "SUBSCRIPTION" | "PROVISIONING" =
-      body.couponType === "SUBSCRIPTION" ? "SUBSCRIPTION" : body.couponType === "PROVISIONING" ? "PROVISIONING" : "DISCOUNT";
+      body.couponType === "SUBSCRIPTION"
+        ? "SUBSCRIPTION"
+        : body.couponType === "PROVISIONING"
+          ? "PROVISIONING"
+          : "DISCOUNT";
     const discountPct = Number(body.discountPct ?? 0);
     const maxRedemptions = body.maxRedemptions != null ? Number(body.maxRedemptions) : null;
     const expiresAt = typeof body.expiresAt === "string" ? new Date(body.expiresAt) : null;
     const grantsTier = typeof body.grantsTier === "string" ? body.grantsTier : null;
     const grantsPlan = typeof body.grantsPlan === "string" ? body.grantsPlan : null;
     const grantsSeatLimit = body.grantsSeatLimit != null ? Number(body.grantsSeatLimit) : null;
-    const grantsDurationDays = body.grantsDurationDays != null ? Number(body.grantsDurationDays) : null;
+    const grantsDurationDays =
+      body.grantsDurationDays != null ? Number(body.grantsDurationDays) : null;
 
     if (!code || !/^[A-Z0-9_-]{2,64}$/.test(code)) {
       reply.code(400).send({ error: "invalid_code" });
@@ -165,41 +196,49 @@ export function registerCouponRoutes(app: FastifyInstance, db: any) {
     reply.code(201).send({ ok: true, code });
   });
 
-  app.delete("/api/billing/admin/coupons/:code", { schema: deactivateCouponSchema }, async (req, reply) => {
-    const me = await requirePlatformAdmin(req, reply);
-    if (!me) return;
-    const params = req.params as { code: string };
-    await db.execute(sql`
+  app.delete(
+    "/api/billing/admin/coupons/:code",
+    { schema: deactivateCouponSchema },
+    async (req, reply) => {
+      const me = await requirePlatformAdmin(req, reply);
+      if (!me) return;
+      const params = req.params as { code: string };
+      await db.execute(sql`
       UPDATE billing_coupons SET active = false WHERE code = ${params.code}
     `);
-    return { ok: true, code: params.code };
-  });
+      return { ok: true, code: params.code };
+    },
+  );
 
   // ── Public: validate a coupon code (no auth required) ──────────────────────
-  app.post("/api/billing/coupons/validate", { schema: validateCouponSchema }, async (req, reply) => {
-    const body = (req.body ?? {}) as Record<string, unknown>;
-    const code = typeof body.code === "string" ? body.code.trim() : "";
-    if (!code) {
-      return reply.code(400).send({ valid: false, reason: "missing_code" });
-    }
+  app.post(
+    "/api/billing/coupons/validate",
+    { schema: validateCouponSchema },
+    async (req, reply) => {
+      const body = (req.body ?? {}) as Record<string, unknown>;
+      const code = typeof body.code === "string" ? body.code.trim() : "";
+      if (!code) {
+        return reply.code(400).send({ valid: false, reason: "missing_code" });
+      }
 
-    const row = await lookupCoupon(db, code);
-    if (!row) return { valid: false, reason: "not_found" };
+      const row = await lookupCoupon(db, code);
+      if (!row) return { valid: false, reason: "not_found" };
 
-    const check = validateCouponRow(row);
-    if (!check.valid) return check;
+      const check = validateCouponRow(row);
+      if (!check.valid) return check;
 
-    return {
-      valid: true,
-      couponType: row.coupon_type ?? "DISCOUNT",
-      discountPct: row.discount_pct ?? 0,
-      grantsTier: row.grants_tier ?? null,
-      grantsPlan: row.grants_plan ?? null,
-      grantsSeatLimit: row.grants_seat_limit ?? null,
-      grantsDurationDays: row.grants_duration_days ?? null,
-      description: row.description ?? null,
-    };
-  });
+      return {
+        valid: true,
+        couponType: row.coupon_type ?? "DISCOUNT",
+        discountPct: row.discount_pct ?? 0,
+        grantsTier: row.grants_tier ?? null,
+        grantsPlan: row.grants_plan ?? null,
+        grantsSeatLimit: row.grants_seat_limit ?? null,
+        grantsDurationDays: row.grants_duration_days ?? null,
+        description: row.description ?? null,
+      };
+    },
+  );
 
   // ── Authenticated: redeem a coupon (PARENT minimum) ────────────────────────
   app.post("/api/billing/coupons/redeem", { schema: redeemCouponSchema }, async (req, reply) => {
@@ -254,7 +293,7 @@ export function registerCouponRoutes(app: FastifyInstance, db: any) {
 
     // SUBSCRIPTION or PROVISIONING coupon
     const userId: string = jwtPayload.sub;
-    
+
     if (couponType === "SUBSCRIPTION") {
       // Subscription duration coupon: grants direct subscription time
       const rawDuration = Number(row.grants_duration_days);
@@ -273,7 +312,7 @@ export function registerCouponRoutes(app: FastifyInstance, db: any) {
             'subscription_duration',
             'ACTIVE',
             NOW() + make_interval(days => ${grantsDurationDays}),
-            ${JSON.stringify({ couponCode: row.code, type: 'subscription_duration', grantedDays: grantsDurationDays })}
+            ${JSON.stringify({ couponCode: row.code, type: "subscription_duration", grantedDays: grantsDurationDays })}
           )
         `);
         await tx.execute(sql`

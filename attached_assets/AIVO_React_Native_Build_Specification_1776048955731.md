@@ -22,29 +22,29 @@ The mobile app plugs into this monorepo as another `apps/` entry. It does not du
 
 ## Technical Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Expo SDK 52+ (managed workflow) |
-| Navigation | Expo Router (file-based, mirrors Next.js routing) |
-| Server State | TanStack Query v5 (caching, background refetch, offline) |
-| Local State | Zustand (UI state, auth state, sensory profile context) |
-| HTTP Clients | `@aivo/brain-client`, `@aivo/ai-client`, `@aivo/tutor-client` (direct monorepo import) |
-| Streaming | `react-native-sse` polyfill (SSE for tutor sessions) |
-| GPU Rendering | `@shopify/react-native-skia` (Stage canvas, Brain visualization) |
-| Animations | `react-native-reanimated` v3 (UI thread worklets) + `lottie-react-native` (tutor characters) |
-| Gestures | `react-native-gesture-handler` (drag-and-drop, swipe, pan) |
-| Haptics | `expo-haptics` (correct/incorrect feedback, drag snap, celebrations) |
-| Audio | `expo-av` (TTS playback, sound effects, ambient) + `expo-speech` (fallback TTS) |
-| Camera | `expo-camera` + `expo-image-picker` (homework capture, IEP photo) |
-| Files | `expo-file-system` + `expo-document-picker` (PDF upload) |
-| Offline DB | `expo-sqlite` (Brain cache, lesson cache, sync queue) |
-| Secure Storage | `expo-secure-store` (JWT, refresh tokens, learner PIN) |
-| Push | `expo-notifications` + FCM (Android) + APNs (iOS) |
-| Biometrics | `expo-local-authentication` (Face ID / Touch ID for parent) |
-| i18n | `i18next` + `react-i18next` (19 namespaces, ~2050 keys, matches web) |
-| Design Tokens | `@aivo/brand` (direct import, same tokens as web) |
-| Testing | Jest + React Native Testing Library (unit/component) + Detox (E2E) |
-| OTA Updates | EAS Update (channels: production, staging, preview) |
+| Layer          | Technology                                                                                   |
+| -------------- | -------------------------------------------------------------------------------------------- |
+| Framework      | Expo SDK 52+ (managed workflow)                                                              |
+| Navigation     | Expo Router (file-based, mirrors Next.js routing)                                            |
+| Server State   | TanStack Query v5 (caching, background refetch, offline)                                     |
+| Local State    | Zustand (UI state, auth state, sensory profile context)                                      |
+| HTTP Clients   | `@aivo/brain-client`, `@aivo/ai-client`, `@aivo/tutor-client` (direct monorepo import)       |
+| Streaming      | `react-native-sse` polyfill (SSE for tutor sessions)                                         |
+| GPU Rendering  | `@shopify/react-native-skia` (Stage canvas, Brain visualization)                             |
+| Animations     | `react-native-reanimated` v3 (UI thread worklets) + `lottie-react-native` (tutor characters) |
+| Gestures       | `react-native-gesture-handler` (drag-and-drop, swipe, pan)                                   |
+| Haptics        | `expo-haptics` (correct/incorrect feedback, drag snap, celebrations)                         |
+| Audio          | `expo-av` (TTS playback, sound effects, ambient) + `expo-speech` (fallback TTS)              |
+| Camera         | `expo-camera` + `expo-image-picker` (homework capture, IEP photo)                            |
+| Files          | `expo-file-system` + `expo-document-picker` (PDF upload)                                     |
+| Offline DB     | `expo-sqlite` (Brain cache, lesson cache, sync queue)                                        |
+| Secure Storage | `expo-secure-store` (JWT, refresh tokens, learner PIN)                                       |
+| Push           | `expo-notifications` + FCM (Android) + APNs (iOS)                                            |
+| Biometrics     | `expo-local-authentication` (Face ID / Touch ID for parent)                                  |
+| i18n           | `i18next` + `react-i18next` (19 namespaces, ~2050 keys, matches web)                         |
+| Design Tokens  | `@aivo/brand` (direct import, same tokens as web)                                            |
+| Testing        | Jest + React Native Testing Library (unit/component) + Detox (E2E)                           |
+| OTA Updates    | EAS Update (channels: production, staging, preview)                                          |
 
 ---
 
@@ -54,17 +54,17 @@ The mobile app plugs into this monorepo as another `apps/` entry. It does not du
 
 These packages are pure TypeScript with no DOM or Node dependencies. Import them in the mobile app exactly as the web app does via `workspace:*` in `package.json`:
 
-| Package | What It Provides |
-|---------|-----------------|
-| `@aivo/brand` | Color tokens (purple, teal, navy), gradients, fonts, radius, shadows |
-| `@aivo/events` | Zod-typed NATS event definitions (all event payloads as TS types) |
-| `@aivo/brain-client` | Type-safe HTTP client for brain-svc (uses fetch, works in RN) |
-| `@aivo/ai-client` | Type-safe HTTP client for ai-svc (uses fetch) |
-| `@aivo/tutor-client` | Type-safe HTTP client for tutor-svc (uses fetch) |
-| `@aivo/auth` | JWT decode, role enums, guard logic, session types |
-| `@aivo/feature-flags` | Feature flag client (uses fetch) |
-| `@aivo/iep-parser` | IEP document parsing type definitions |
-| `@aivo/functioning-levels` | Functioning level enum, routing logic, content generation rules |
+| Package                    | What It Provides                                                     |
+| -------------------------- | -------------------------------------------------------------------- |
+| `@aivo/brand`              | Color tokens (purple, teal, navy), gradients, fonts, radius, shadows |
+| `@aivo/events`             | Zod-typed NATS event definitions (all event payloads as TS types)    |
+| `@aivo/brain-client`       | Type-safe HTTP client for brain-svc (uses fetch, works in RN)        |
+| `@aivo/ai-client`          | Type-safe HTTP client for ai-svc (uses fetch)                        |
+| `@aivo/tutor-client`       | Type-safe HTTP client for tutor-svc (uses fetch)                     |
+| `@aivo/auth`               | JWT decode, role enums, guard logic, session types                   |
+| `@aivo/feature-flags`      | Feature flag client (uses fetch)                                     |
+| `@aivo/iep-parser`         | IEP document parsing type definitions                                |
+| `@aivo/functioning-levels` | Functioning level enum, routing logic, content generation rules      |
 
 ### New Package: @aivo/mobile-ui
 
@@ -72,13 +72,13 @@ Create `packages/mobile-ui`. This package provides React Native components that 
 
 ### Not Used on Mobile
 
-| Package | Why |
-|---------|-----|
-| `@aivo/ui` | React DOM components, cannot render in RN |
-| `@aivo/security` | CSRF not applicable (token auth only), rate limiting is server-side |
-| `@aivo/db` | Type exports importable, but no Drizzle DB connection on mobile |
-| `@aivo/nats` | No direct NATS connection from mobile, events consumed via API |
-| `@enterprise-email/aivolearning-email` | Email sent server-side only |
+| Package                                | Why                                                                 |
+| -------------------------------------- | ------------------------------------------------------------------- |
+| `@aivo/ui`                             | React DOM components, cannot render in RN                           |
+| `@aivo/security`                       | CSRF not applicable (token auth only), rate limiting is server-side |
+| `@aivo/db`                             | Type exports importable, but no Drizzle DB connection on mobile     |
+| `@aivo/nats`                           | No direct NATS connection from mobile, events consumed via API      |
+| `@enterprise-email/aivolearning-email` | Email sent server-side only                                         |
 
 ---
 
@@ -225,75 +225,75 @@ apps/mobile/
 
 ### Parent Screens (14 screens)
 
-| Screen | Route | Key Features |
-|--------|-------|-------------|
-| Dashboard Home | `/(parent)/` | Child cards with Brain summary, quick stats per child, recommendation count badges, streak indicators |
-| Brain Profile | `/(parent)/brain/[childId]` | Interactive Skia Brain cross-section with grade ladders per domain, accommodation ring, goal paths |
-| Brain Domain Drill-Down | `/(parent)/brain/[childId]/[domain]` | Full-size grade ladder, stepping stones with skill labels, session history, tutor performance, trend chart |
-| Brain Version History | `/(parent)/brain/[childId]/history` | Version timeline, snapshot comparison, rollback to any previous state |
-| Recommendation Inbox | `/(parent)/recommendations` | APPROVE / DECLINE / ADD CONTEXT per recommendation, filterable by child and type |
-| IEP Management | `/(parent)/iep/[childId]` | Upload (camera + PDF), parsed goals display, per-goal progress bars, "Generate IEP Report" PDF |
-| Progress Dashboard | `/(parent)/progress/[childId]` | Domain mastery trend charts, session frequency, tutor usage stats, engagement metrics |
-| Tutor Store | `/(parent)/tutors` | Browse all 14 tutors, persona previews, subscribe individually or by bundle (Core 7, Subject Packs, Full 14), manage active tutors |
-| Co-View Session | `/(parent)/session/[childId]` | Real-time view of child's active Stage session |
-| Parent Co-Learning | `/(parent)/colearn/[childId]` | Join tutor session alongside child, receive real-time coaching notes |
-| Add Child (Onboarding) | `/(parent)/onboard` | Parent assessment, IEP upload, functioning level routing, Building Sequence (6 stages), approve/context/deny |
-| Care Team | `/(parent)/team/[childId]` | Invite/manage teacher (1 slot), caregivers (2 slots), therapist. View pending invites. |
-| Billing | `/(parent)/billing` | Stripe subscription management, plan tier, tutor add-ons, invoices, payment method |
-| Settings | `/(parent)/settings` | Account, notifications, data export (GDPR ZIP), data deletion, child PIN management |
+| Screen                  | Route                                | Key Features                                                                                                                       |
+| ----------------------- | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Dashboard Home          | `/(parent)/`                         | Child cards with Brain summary, quick stats per child, recommendation count badges, streak indicators                              |
+| Brain Profile           | `/(parent)/brain/[childId]`          | Interactive Skia Brain cross-section with grade ladders per domain, accommodation ring, goal paths                                 |
+| Brain Domain Drill-Down | `/(parent)/brain/[childId]/[domain]` | Full-size grade ladder, stepping stones with skill labels, session history, tutor performance, trend chart                         |
+| Brain Version History   | `/(parent)/brain/[childId]/history`  | Version timeline, snapshot comparison, rollback to any previous state                                                              |
+| Recommendation Inbox    | `/(parent)/recommendations`          | APPROVE / DECLINE / ADD CONTEXT per recommendation, filterable by child and type                                                   |
+| IEP Management          | `/(parent)/iep/[childId]`            | Upload (camera + PDF), parsed goals display, per-goal progress bars, "Generate IEP Report" PDF                                     |
+| Progress Dashboard      | `/(parent)/progress/[childId]`       | Domain mastery trend charts, session frequency, tutor usage stats, engagement metrics                                              |
+| Tutor Store             | `/(parent)/tutors`                   | Browse all 14 tutors, persona previews, subscribe individually or by bundle (Core 7, Subject Packs, Full 14), manage active tutors |
+| Co-View Session         | `/(parent)/session/[childId]`        | Real-time view of child's active Stage session                                                                                     |
+| Parent Co-Learning      | `/(parent)/colearn/[childId]`        | Join tutor session alongside child, receive real-time coaching notes                                                               |
+| Add Child (Onboarding)  | `/(parent)/onboard`                  | Parent assessment, IEP upload, functioning level routing, Building Sequence (6 stages), approve/context/deny                       |
+| Care Team               | `/(parent)/team/[childId]`           | Invite/manage teacher (1 slot), caregivers (2 slots), therapist. View pending invites.                                             |
+| Billing                 | `/(parent)/billing`                  | Stripe subscription management, plan tier, tutor add-ons, invoices, payment method                                                 |
+| Settings                | `/(parent)/settings`                 | Account, notifications, data export (GDPR ZIP), data deletion, child PIN management                                                |
 
 ### Learner Screens (12 screens)
 
-| Screen | Route | Key Features |
-|--------|-------|-------------|
-| World Map Home | `/(learner)/` | Quest worlds (up to 14, one per subscribed tutor), avatar display, streak flame, XP bar, daily challenge card, quick-start tutor buttons |
-| The Stage | `/(learner)/stage/[sessionId]` | Full-screen Skia canvas. Tutor character, visual content, Response Zone. All functioning-level adaptations. SensoryAdapter active. Haptics. |
-| Discovery Adventure | `/(learner)/adventure` | Baseline assessment as 6-chapter adventure. Skia Stage with adaptive engine. |
-| Tutor Session | `/(learner)/tutor/[tutorSlug]` | Any of 14 tutors. SSE streaming rendered on Stage. Tutor character animations, visual content, Socratic interaction. |
-| Homework Helper | `/(learner)/homework` | Camera capture, gallery, PDF. OCR processing animation. Adapted homework view. Interactive session with subscribed tutor. |
-| Brain Explorer | `/(learner)/brain` | Child-friendly Brain cross-section with grade ladders. Tutor narrates on first view. Progress markers climb after sessions. |
-| Gamification Dashboard | `/(learner)/gamification` | XP card, streak flame, active challenges, leaderboard preview, badge count |
-| Avatar & Shop | `/(learner)/shop` | Avatar customization, 50+ items across 6 categories, rarity tiers, coin/gem purchase, grade-band filtering |
-| Quest Map | `/(learner)/quests` | Up to 14 quest worlds (one per tutor), chapter progression, boss battles, XP/coin rewards |
-| Multiplayer | `/(learner)/challenges` | Quiz battles (1v1), team challenges, weekly tournaments, invite codes, real-time scoring |
-| Badge Cabinet | `/(learner)/badges` | Visual badge display by rarity tier, celebration replay on tap, total count |
-| Gradebook | `/(learner)/gradebook` | Subject mastery bars per domain, session history with dates and skills practiced |
+| Screen                 | Route                          | Key Features                                                                                                                                |
+| ---------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| World Map Home         | `/(learner)/`                  | Quest worlds (up to 14, one per subscribed tutor), avatar display, streak flame, XP bar, daily challenge card, quick-start tutor buttons    |
+| The Stage              | `/(learner)/stage/[sessionId]` | Full-screen Skia canvas. Tutor character, visual content, Response Zone. All functioning-level adaptations. SensoryAdapter active. Haptics. |
+| Discovery Adventure    | `/(learner)/adventure`         | Baseline assessment as 6-chapter adventure. Skia Stage with adaptive engine.                                                                |
+| Tutor Session          | `/(learner)/tutor/[tutorSlug]` | Any of 14 tutors. SSE streaming rendered on Stage. Tutor character animations, visual content, Socratic interaction.                        |
+| Homework Helper        | `/(learner)/homework`          | Camera capture, gallery, PDF. OCR processing animation. Adapted homework view. Interactive session with subscribed tutor.                   |
+| Brain Explorer         | `/(learner)/brain`             | Child-friendly Brain cross-section with grade ladders. Tutor narrates on first view. Progress markers climb after sessions.                 |
+| Gamification Dashboard | `/(learner)/gamification`      | XP card, streak flame, active challenges, leaderboard preview, badge count                                                                  |
+| Avatar & Shop          | `/(learner)/shop`              | Avatar customization, 50+ items across 6 categories, rarity tiers, coin/gem purchase, grade-band filtering                                  |
+| Quest Map              | `/(learner)/quests`            | Up to 14 quest worlds (one per tutor), chapter progression, boss battles, XP/coin rewards                                                   |
+| Multiplayer            | `/(learner)/challenges`        | Quiz battles (1v1), team challenges, weekly tournaments, invite codes, real-time scoring                                                    |
+| Badge Cabinet          | `/(learner)/badges`            | Visual badge display by rarity tier, celebration replay on tap, total count                                                                 |
+| Gradebook              | `/(learner)/gradebook`         | Subject mastery bars per domain, session history with dates and skills practiced                                                            |
 
 ### Teacher Screens (6 screens)
 
-| Screen | Route | Key Features |
-|--------|-------|-------------|
-| Classroom Dashboard | `/(teacher)/` | Class list, at-risk student indicators (regression, low engagement), overall domain progress |
-| Student Brain Profile | `/(teacher)/student/[id]` | Read-only Brain with grade ladders, accommodations, IEP goals, functioning level |
-| Submit Insight | `/(teacher)/student/[id]/insight` | Text + voice input for Brain insights. Creates teacher_insight recommendation in parent inbox. |
-| Lesson Plan Generator | `/(teacher)/lesson-plan` | Select students, auto-generate Brain-informed lesson plan with differentiated groups, PDF export |
-| IEP Upload | `/(teacher)/student/[id]/iep` | Upload IEP on behalf of parent (stored as pending until parent confirms) |
-| Class Analytics | `/(teacher)/analytics` | Functioning level distribution, domain progress heatmap, tutor usage, engagement trends |
+| Screen                | Route                             | Key Features                                                                                     |
+| --------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Classroom Dashboard   | `/(teacher)/`                     | Class list, at-risk student indicators (regression, low engagement), overall domain progress     |
+| Student Brain Profile | `/(teacher)/student/[id]`         | Read-only Brain with grade ladders, accommodations, IEP goals, functioning level                 |
+| Submit Insight        | `/(teacher)/student/[id]/insight` | Text + voice input for Brain insights. Creates teacher_insight recommendation in parent inbox.   |
+| Lesson Plan Generator | `/(teacher)/lesson-plan`          | Select students, auto-generate Brain-informed lesson plan with differentiated groups, PDF export |
+| IEP Upload            | `/(teacher)/student/[id]/iep`     | Upload IEP on behalf of parent (stored as pending until parent confirms)                         |
+| Class Analytics       | `/(teacher)/analytics`            | Functioning level distribution, domain progress heatmap, tutor usage, engagement trends          |
 
 ### Caregiver Screens (10 screens)
 
-| Screen | Route | Key Features |
-|--------|-------|-------------|
-| Dashboard | `/(caregiver)/` | Assigned children list, recent activity per child, upcoming session indicators, quick observation button |
-| Child Overview | `/(caregiver)/child/[childId]` | Brain summary card, today's completed/upcoming sessions, current streak, active tutors |
-| Brain Summary | `/(caregiver)/child/[childId]/brain` | Read-only summary-level Brain view with grade ladders showing enrolled grade vs. functioning grade per domain |
-| Accommodations | `/(caregiver)/child/[childId]/accommodations` | Full list of active accommodations with plain-language explanations of what each one means and why it is active |
-| IEP Goals | `/(caregiver)/child/[childId]/iep-goals` | Visual progress bars per IEP goal showing baseline, current, and target. Read-only. |
-| Gradebook | `/(caregiver)/child/[childId]/gradebook` | Subject mastery bars, session history with dates, skills practiced, and mastery changes |
-| Session Log | `/(caregiver)/child/[childId]/sessions` | Chronological session log: date, subject, tutor used, duration, skill focus, completion quality |
-| Submit Observation | `/(caregiver)/child/[childId]/observation` | Text input + voice recording for observational notes. Stored as caregiver insight in Brain. Prompts: "How did [name] do today?" "Anything we should know?" |
-| Progress Trends | `/(caregiver)/child/[childId]/progress` | Trend charts showing delivery level movement per domain over time. Enrolled grade as target line. |
-| Notifications | `/(caregiver)/notifications` | Alerts for IEP goal milestones, functioning level changes, streak achievements, Brain updates |
+| Screen             | Route                                         | Key Features                                                                                                                                               |
+| ------------------ | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dashboard          | `/(caregiver)/`                               | Assigned children list, recent activity per child, upcoming session indicators, quick observation button                                                   |
+| Child Overview     | `/(caregiver)/child/[childId]`                | Brain summary card, today's completed/upcoming sessions, current streak, active tutors                                                                     |
+| Brain Summary      | `/(caregiver)/child/[childId]/brain`          | Read-only summary-level Brain view with grade ladders showing enrolled grade vs. functioning grade per domain                                              |
+| Accommodations     | `/(caregiver)/child/[childId]/accommodations` | Full list of active accommodations with plain-language explanations of what each one means and why it is active                                            |
+| IEP Goals          | `/(caregiver)/child/[childId]/iep-goals`      | Visual progress bars per IEP goal showing baseline, current, and target. Read-only.                                                                        |
+| Gradebook          | `/(caregiver)/child/[childId]/gradebook`      | Subject mastery bars, session history with dates, skills practiced, and mastery changes                                                                    |
+| Session Log        | `/(caregiver)/child/[childId]/sessions`       | Chronological session log: date, subject, tutor used, duration, skill focus, completion quality                                                            |
+| Submit Observation | `/(caregiver)/child/[childId]/observation`    | Text input + voice recording for observational notes. Stored as caregiver insight in Brain. Prompts: "How did [name] do today?" "Anything we should know?" |
+| Progress Trends    | `/(caregiver)/child/[childId]/progress`       | Trend charts showing delivery level movement per domain over time. Enrolled grade as target line.                                                          |
+| Notifications      | `/(caregiver)/notifications`                  | Alerts for IEP goal milestones, functioning level changes, streak achievements, Brain updates                                                              |
 
 ### Therapist Screens (5 screens)
 
-| Screen | Route | Key Features |
-|--------|-------|-------------|
-| Client Dashboard | `/(therapist)/` | Client list (learners the therapist has been invited to), Brain summary per client, recent session activity |
-| Brain Profile (HIPAA-Scoped) | `/(therapist)/client/[id]` | Read-only Brain scoped to therapy-relevant domains. Grade ladders, accommodations, functioning level, sensory profile. |
-| Therapy Goal Alignment | `/(therapist)/client/[id]/goals` | Align therapy goals with Brain/IEP goals. Create linked therapy goals. Track progress across both systems. |
-| Session Notes | `/(therapist)/client/[id]/notes` | Submit therapy session notes that feed the Brain's insight layer. Structured fields: skill targeted, method, outcome, recommendations. |
-| Progress Reports | `/(therapist)/client/[id]/reports` | Generate insurance-documentation-formatted progress reports. CPT code aligned. PDF export. |
+| Screen                       | Route                              | Key Features                                                                                                                           |
+| ---------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Client Dashboard             | `/(therapist)/`                    | Client list (learners the therapist has been invited to), Brain summary per client, recent session activity                            |
+| Brain Profile (HIPAA-Scoped) | `/(therapist)/client/[id]`         | Read-only Brain scoped to therapy-relevant domains. Grade ladders, accommodations, functioning level, sensory profile.                 |
+| Therapy Goal Alignment       | `/(therapist)/client/[id]/goals`   | Align therapy goals with Brain/IEP goals. Create linked therapy goals. Track progress across both systems.                             |
+| Session Notes                | `/(therapist)/client/[id]/notes`   | Submit therapy session notes that feed the Brain's insight layer. Structured fields: skill targeted, method, outcome, recommendations. |
+| Progress Reports             | `/(therapist)/client/[id]/reports` | Generate insurance-documentation-formatted progress reports. CPT code aligned. PDF export.                                             |
 
 ---
 
@@ -365,7 +365,7 @@ interface StageBeat {
   visual: {
     background: string;
     elements: StageElement[];
-    tutorState: 'idle' | 'speaking' | 'pointing' | 'celebrating' | 'thinking' | 'encouraging';
+    tutorState: "idle" | "speaking" | "pointing" | "celebrating" | "thinking" | "encouraging";
     tutorTarget?: string;
   };
   audio: {
@@ -374,7 +374,7 @@ interface StageBeat {
     ambient?: string;
   };
   interaction: {
-    type: 'tap' | 'drag' | 'speak' | 'match' | 'draw' | 'yesno';
+    type: "tap" | "drag" | "speak" | "match" | "draw" | "yesno";
     options: InteractionOption[];
     correctIds: string[];
     hintAfter?: number;
@@ -425,15 +425,15 @@ Tutor assets are loaded lazily. Only the active session's tutor is loaded (~300K
 
 ```typescript
 // lib/haptics.ts
-import * as Haptics from 'expo-haptics';
+import * as Haptics from "expo-haptics";
 
 export const haptic = {
-  tap:       () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
-  dragSnap:  () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium),
-  correct:   () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success),
+  tap: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
+  dragSnap: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium),
+  correct: () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success),
   incorrect: () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning),
   celebrate: () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success),
-  pinTap:    () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
+  pinTap: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
 };
 // All calls filtered through useSensory() — if tactile === 'off', these become no-ops
 ```
@@ -442,14 +442,14 @@ export const haptic = {
 
 Import `@aivo/functioning-levels` for all rules:
 
-| Level | Response Zone Behavior |
-|-------|----------------------|
-| STANDARD | 4 answer cards (48px touch targets), drag-and-drop, voice, text input, drawing |
-| SUPPORTED | 3 answer cards (56px), auto-play audio labels, 1.5x response timeout, larger drag targets |
-| LOW_VERBAL | 2 answer cards covering 40% of screen each, no text anywhere, audio-primary, touch-anywhere-to-select, celebration on every interaction |
-| NON_VERBAL (switch) | 2 options highlight alternately via Reanimated withRepeat (configurable dwell 1.5-3s), iOS Switch Control / Android Switch Access triggers selection |
-| NON_VERBAL (partner) | Facilitator overlay shows instructions, child screen shows 2 simplified visuals, facilitator taps response recording buttons |
-| PRE_SYMBOLIC | No Stage. Parent sees activity guides and observational checklists in their dashboard. |
+| Level                | Response Zone Behavior                                                                                                                               |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| STANDARD             | 4 answer cards (48px touch targets), drag-and-drop, voice, text input, drawing                                                                       |
+| SUPPORTED            | 3 answer cards (56px), auto-play audio labels, 1.5x response timeout, larger drag targets                                                            |
+| LOW_VERBAL           | 2 answer cards covering 40% of screen each, no text anywhere, audio-primary, touch-anywhere-to-select, celebration on every interaction              |
+| NON_VERBAL (switch)  | 2 options highlight alternately via Reanimated withRepeat (configurable dwell 1.5-3s), iOS Switch Control / Android Switch Access triggers selection |
+| NON_VERBAL (partner) | Facilitator overlay shows instructions, child screen shows 2 simplified visuals, facilitator taps response recording buttons                         |
+| PRE_SYMBOLIC         | No Stage. Parent sees activity guides and observational checklists in their dashboard.                                                               |
 
 ---
 
@@ -522,16 +522,16 @@ gamification_cache (
 
 Register device token with comms-svc on login via `expo-notifications`.
 
-| Notification | NATS Trigger | Deep Link |
-|-------------|-------------|-----------|
-| Brain recommendation | `brain.recommendation.created` | `/(parent)/recommendations` |
-| Tutor activated | `tutor.addon.activated` | `/(parent)/tutors` |
-| IEP goal met | `brain.iep_goal.met` | `/(parent)/brain/[childId]` |
-| Streak broken | `engagement.streak.broken` | `/(learner)/gamification` |
-| Badge earned | `engagement.badge.awarded` | `/(learner)/badges` |
-| Homework ready | `homework.processed` | `/(learner)/homework` |
-| Weekly digest | Weekly cron | `/(parent)/progress/[childId]` |
-| Level change | `brain.functioning_level.changed` | `/(parent)/brain/[childId]` |
+| Notification         | NATS Trigger                      | Deep Link                      |
+| -------------------- | --------------------------------- | ------------------------------ |
+| Brain recommendation | `brain.recommendation.created`    | `/(parent)/recommendations`    |
+| Tutor activated      | `tutor.addon.activated`           | `/(parent)/tutors`             |
+| IEP goal met         | `brain.iep_goal.met`              | `/(parent)/brain/[childId]`    |
+| Streak broken        | `engagement.streak.broken`        | `/(learner)/gamification`      |
+| Badge earned         | `engagement.badge.awarded`        | `/(learner)/badges`            |
+| Homework ready       | `homework.processed`              | `/(learner)/homework`          |
+| Weekly digest        | Weekly cron                       | `/(parent)/progress/[childId]` |
+| Level change         | `brain.functioning_level.changed` | `/(parent)/brain/[childId]`    |
 
 Deep links handled in root `_layout.tsx` via Expo Router's `useURL()` hook.
 
@@ -554,16 +554,16 @@ Deep links handled in root `_layout.tsx` via Expo Router's `useURL()` hook.
 ### Token Consumption
 
 ```typescript
-import { tokens } from '@aivo/brand';
+import { tokens } from "@aivo/brand";
 
 export const theme = {
   colors: {
-    primary: tokens.colors.purple[500],     // #915EE3
-    primaryDark: tokens.colors.purple[600],  // #7C3AED
-    secondary: tokens.colors.teal[400],      // #35CBDA
-    navy: tokens.colors.navy,                // #1A1A2E
-    background: '#FFFBF7',
-    card: '#FFFFFF',
+    primary: tokens.colors.purple[500], // #915EE3
+    primaryDark: tokens.colors.purple[600], // #7C3AED
+    secondary: tokens.colors.teal[400], // #35CBDA
+    navy: tokens.colors.navy, // #1A1A2E
+    background: "#FFFBF7",
+    card: "#FFFFFF",
     success: tokens.colors.success,
     warning: tokens.colors.warning,
     error: tokens.colors.error,
@@ -571,29 +571,29 @@ export const theme = {
   spacing: { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 },
   radius: tokens.radius,
   shadows: tokens.shadows,
-  fonts: { heading: 'Nunito-ExtraBold', body: 'Nunito-Regular', mono: 'JetBrainsMono-Regular' },
+  fonts: { heading: "Nunito-ExtraBold", body: "Nunito-Regular", mono: "JetBrainsMono-Regular" },
 };
 ```
 
 ### Core Components
 
-| Component | Purpose |
-|-----------|---------|
-| `AivoButton` | Pressable with Reanimated scale, haptic on press, rounded-2xl, purple gradient or outline variants |
-| `AivoCard` | View with card shadow, rounded-3xl, warm white background |
-| `AivoHeader` | `expo-linear-gradient` purple gradient with logo |
-| `StatCard` | Animated stat number (Reanimated `withTiming` on value change) |
-| `BrainVisualization` | Skia canvas rendering cross-section, grade ladders, accommodation ring |
-| `GradeLadder` | Skia vertical path with Reanimated-driven marker position |
-| `TutorCard` | Tutor avatar image, persona name, subject, subscribe/launch button |
-| `XPBar` | Reanimated width animation with purple gradient fill |
-| `StreakFlame` | Lottie flame, day count overlay |
-| `BadgeIcon` | Image with rarity-colored border, sparkle Lottie on first reveal |
-| `AnswerCard` | Large touchable, illustration, haptic feedback, correct/incorrect Reanimated animation |
-| `DragTarget` | Gesture handler drop zone, snap Reanimated spring, haptic on drop |
-| `MicButton` | Pulsing Reanimated ring, expo-av recording, Whisper STT via API |
-| `DrawCanvas` | Skia touch drawing surface, thick forgiving lines |
-| `EmptyState` | Illustration + message + CTA button |
+| Component            | Purpose                                                                                            |
+| -------------------- | -------------------------------------------------------------------------------------------------- |
+| `AivoButton`         | Pressable with Reanimated scale, haptic on press, rounded-2xl, purple gradient or outline variants |
+| `AivoCard`           | View with card shadow, rounded-3xl, warm white background                                          |
+| `AivoHeader`         | `expo-linear-gradient` purple gradient with logo                                                   |
+| `StatCard`           | Animated stat number (Reanimated `withTiming` on value change)                                     |
+| `BrainVisualization` | Skia canvas rendering cross-section, grade ladders, accommodation ring                             |
+| `GradeLadder`        | Skia vertical path with Reanimated-driven marker position                                          |
+| `TutorCard`          | Tutor avatar image, persona name, subject, subscribe/launch button                                 |
+| `XPBar`              | Reanimated width animation with purple gradient fill                                               |
+| `StreakFlame`        | Lottie flame, day count overlay                                                                    |
+| `BadgeIcon`          | Image with rarity-colored border, sparkle Lottie on first reveal                                   |
+| `AnswerCard`         | Large touchable, illustration, haptic feedback, correct/incorrect Reanimated animation             |
+| `DragTarget`         | Gesture handler drop zone, snap Reanimated spring, haptic on drop                                  |
+| `MicButton`          | Pulsing Reanimated ring, expo-av recording, Whisper STT via API                                    |
+| `DrawCanvas`         | Skia touch drawing surface, thick forgiving lines                                                  |
+| `EmptyState`         | Illustration + message + CTA button                                                                |
 
 Every interactive component accepts sensory context and adapts (touch target size, animation intensity, haptic on/off).
 
@@ -672,46 +672,46 @@ Every component, hook, and utility function has unit tests. Import `@aivo/events
 
 ### E2E Tests (Detox)
 
-| Flow | Steps |
-|------|-------|
-| Parent onboarding | Signup, COPPA consent, add child, parent assessment, IEP upload, Building Sequence, approve Brain, view dashboard |
-| Learner session | PIN login, world map, tap quest, Stage loads, complete activity, XP awarded, streak updated, view Brain |
-| Tutor session | Parent subscribes to tutor (any of 14), learner opens tutor, SSE streams, complete session, mastery updated |
-| Homework | Learner opens homework, simulated camera capture, OCR processes, adapted view, complete session |
-| Gamification | Complete activity, verify XP, verify streak, open shop, purchase item, verify avatar update |
-| Teacher flow | Login, view classroom, tap student, view Brain, submit insight, generate lesson plan |
-| Caregiver flow | Login, view assigned children, tap child, view Brain summary, view accommodations, view IEP goals, view session log, submit observation, check notifications |
-| Therapist flow | Login, view client list, tap client, view HIPAA-scoped Brain, align therapy goal with IEP goal, submit session notes, generate progress report |
-| Offline | Disable network, complete cached lesson, re-enable network, verify sync queue drains |
-| All 14 tutors | Verify each tutor loads persona, streams SSE, renders on Stage, writes mastery back to Brain |
+| Flow              | Steps                                                                                                                                                        |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Parent onboarding | Signup, COPPA consent, add child, parent assessment, IEP upload, Building Sequence, approve Brain, view dashboard                                            |
+| Learner session   | PIN login, world map, tap quest, Stage loads, complete activity, XP awarded, streak updated, view Brain                                                      |
+| Tutor session     | Parent subscribes to tutor (any of 14), learner opens tutor, SSE streams, complete session, mastery updated                                                  |
+| Homework          | Learner opens homework, simulated camera capture, OCR processes, adapted view, complete session                                                              |
+| Gamification      | Complete activity, verify XP, verify streak, open shop, purchase item, verify avatar update                                                                  |
+| Teacher flow      | Login, view classroom, tap student, view Brain, submit insight, generate lesson plan                                                                         |
+| Caregiver flow    | Login, view assigned children, tap child, view Brain summary, view accommodations, view IEP goals, view session log, submit observation, check notifications |
+| Therapist flow    | Login, view client list, tap client, view HIPAA-scoped Brain, align therapy goal with IEP goal, submit session notes, generate progress report               |
+| Offline           | Disable network, complete cached lesson, re-enable network, verify sync queue drains                                                                         |
+| All 14 tutors     | Verify each tutor loads persona, streams SSE, renders on Stage, writes mastery back to Brain                                                                 |
 
 ### Performance Targets
 
-| Metric | Target |
-|--------|--------|
-| Cold start to dashboard | < 2 seconds |
-| Stage first render (60fps) | Verified on iPhone 12 / Pixel 6 |
-| Cached lesson load | < 500ms |
-| Tutor SSE first token | < 2 seconds |
-| Offline mode activation | < 1 second |
-| Sync queue drain (50 events) | < 30 seconds |
-| Lottie tutor load | < 500ms |
-| Brain visualization render | < 300ms |
+| Metric                       | Target                          |
+| ---------------------------- | ------------------------------- |
+| Cold start to dashboard      | < 2 seconds                     |
+| Stage first render (60fps)   | Verified on iPhone 12 / Pixel 6 |
+| Cached lesson load           | < 500ms                         |
+| Tutor SSE first token        | < 2 seconds                     |
+| Offline mode activation      | < 1 second                      |
+| Sync queue drain (50 events) | < 30 seconds                    |
+| Lottie tutor load            | < 500ms                         |
+| Brain visualization render   | < 300ms                         |
 
 ---
 
 ## Build Timeline
 
-| Week | Deliverables |
-|------|-------------|
-| 1-2 | Expo scaffold, Expo Router routes for all 5 roles (parent, learner, teacher, caregiver, therapist), `@aivo/mobile-ui` core components (AivoButton, AivoCard, AivoHeader, StatCard, EmptyState), auth flows (parent login + OAuth, learner PIN pad, teacher/caregiver/therapist login), secure token storage, role-based shell routing with bottom tab navigators per role |
-| 3-4 | Parent dashboard (child cards, recommendation badges), Brain Skia visualization (cross-section, grade ladders, accommodation ring, goal paths), recommendation inbox (APPROVE/DECLINE/ADD CONTEXT), IEP upload flow (camera + document picker + parsed confirmation), care team management (invite teacher/caregiver/therapist) |
-| 5-7 | Stage Skia renderer + SensoryAdapter + BeatRunner, Lottie tutor character system (all 14 tutor personas with state machines), Response Zone (AnswerCard, DragTarget, MicButton, DrawCanvas, YesNo), haptic patterns, audio engine (TTS + sound effects + ambient), Discovery Adventure (6 chapters, adaptive engine, all functioning levels), Building Sequence (6-stage parent onboarding clone visualization with approve/context/deny) |
-| 8-9 | Tutor sessions (SSE streaming on Stage for all 14 tutors), tutor store (browse 14 tutors, individual + bundle subscription, Subject Packs), subscription management, homework upload (camera capture + gallery + PDF, OCR processing, adapted homework session with tutor persona) |
-| 10-11 | Gamification dashboard (XP, streaks, badges, daily challenges), avatar shop (50+ items, 6 categories, purchase flow), quest world map (up to 14 worlds, one per tutor, chapter progression, boss battles), multiplayer challenges (1v1, team, tournament, invite codes), leaderboard, badge cabinet, streak/XP Reanimated animations |
-| 12-13 | Caregiver screens (dashboard, child overview, Brain summary, accommodations, IEP goals, session log, observation submission, progress trends, notifications). Teacher screens (classroom, student Brain, insight submission, lesson plan generator, IEP upload, analytics). Therapist screens (client list, HIPAA-scoped Brain, goal alignment, session notes, insurance reports). |
-| 14 | Offline SQLite implementation (Brain cache, lesson cache, sync queue, gamification cache), sync drain logic, TanStack Query offline mode, push notification registration + deep link handling |
-| 15-16 | Performance optimization (Hermes engine, Skia render profiling, asset lazy loading), accessibility audit (VoiceOver, TalkBack, Switch Access, Dynamic Type, Reduced Motion), Detox E2E suite for all flows including caregiver and therapist, app store assets (screenshots for all 5 roles, preview videos, descriptions, privacy labels), TestFlight + Google Play internal testing, store submission |
+| Week  | Deliverables                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1-2   | Expo scaffold, Expo Router routes for all 5 roles (parent, learner, teacher, caregiver, therapist), `@aivo/mobile-ui` core components (AivoButton, AivoCard, AivoHeader, StatCard, EmptyState), auth flows (parent login + OAuth, learner PIN pad, teacher/caregiver/therapist login), secure token storage, role-based shell routing with bottom tab navigators per role                                                                 |
+| 3-4   | Parent dashboard (child cards, recommendation badges), Brain Skia visualization (cross-section, grade ladders, accommodation ring, goal paths), recommendation inbox (APPROVE/DECLINE/ADD CONTEXT), IEP upload flow (camera + document picker + parsed confirmation), care team management (invite teacher/caregiver/therapist)                                                                                                           |
+| 5-7   | Stage Skia renderer + SensoryAdapter + BeatRunner, Lottie tutor character system (all 14 tutor personas with state machines), Response Zone (AnswerCard, DragTarget, MicButton, DrawCanvas, YesNo), haptic patterns, audio engine (TTS + sound effects + ambient), Discovery Adventure (6 chapters, adaptive engine, all functioning levels), Building Sequence (6-stage parent onboarding clone visualization with approve/context/deny) |
+| 8-9   | Tutor sessions (SSE streaming on Stage for all 14 tutors), tutor store (browse 14 tutors, individual + bundle subscription, Subject Packs), subscription management, homework upload (camera capture + gallery + PDF, OCR processing, adapted homework session with tutor persona)                                                                                                                                                        |
+| 10-11 | Gamification dashboard (XP, streaks, badges, daily challenges), avatar shop (50+ items, 6 categories, purchase flow), quest world map (up to 14 worlds, one per tutor, chapter progression, boss battles), multiplayer challenges (1v1, team, tournament, invite codes), leaderboard, badge cabinet, streak/XP Reanimated animations                                                                                                      |
+| 12-13 | Caregiver screens (dashboard, child overview, Brain summary, accommodations, IEP goals, session log, observation submission, progress trends, notifications). Teacher screens (classroom, student Brain, insight submission, lesson plan generator, IEP upload, analytics). Therapist screens (client list, HIPAA-scoped Brain, goal alignment, session notes, insurance reports).                                                        |
+| 14    | Offline SQLite implementation (Brain cache, lesson cache, sync queue, gamification cache), sync drain logic, TanStack Query offline mode, push notification registration + deep link handling                                                                                                                                                                                                                                             |
+| 15-16 | Performance optimization (Hermes engine, Skia render profiling, asset lazy loading), accessibility audit (VoiceOver, TalkBack, Switch Access, Dynamic Type, Reduced Motion), Detox E2E suite for all flows including caregiver and therapist, app store assets (screenshots for all 5 roles, preview videos, descriptions, privacy labels), TestFlight + Google Play internal testing, store submission                                   |
 
 ---
 

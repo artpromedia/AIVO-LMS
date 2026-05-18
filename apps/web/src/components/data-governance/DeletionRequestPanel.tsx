@@ -70,8 +70,8 @@ export function DeletionRequestPanel({
     <section className="deletion-request-panel rounded border p-4">
       <h3 className="text-lg font-semibold">Delete learner data</h3>
       <p className="text-xs text-gray-600">
-        Submit a deletion request. If the district has an active retention
-        hold, the request is recorded but blocked until the hold expires.
+        Submit a deletion request. If the district has an active retention hold, the request is
+        recorded but blocked until the hold expires.
       </p>
       <label className="mt-2 block text-sm">
         <input

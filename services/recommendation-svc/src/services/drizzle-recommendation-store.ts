@@ -8,15 +8,8 @@
 
 import { desc, eq } from "drizzle-orm";
 import type { Database } from "@aivo/db";
-import {
-  profileRecommendationSnapshots,
-  profileRecommendationsV2,
-} from "@aivo/db";
-import type {
-  BrainSnapshot,
-  ProfileRecommendation,
-  RecommendationEvidence,
-} from "./types.js";
+import { profileRecommendationSnapshots, profileRecommendationsV2 } from "@aivo/db";
+import type { BrainSnapshot, ProfileRecommendation, RecommendationEvidence } from "./types.js";
 
 function rowToRecommendation(
   row: typeof profileRecommendationsV2.$inferSelect,

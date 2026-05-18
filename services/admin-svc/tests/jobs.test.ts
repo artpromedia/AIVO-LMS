@@ -51,13 +51,16 @@ async function bootstrap() {
   });
   await app.ready();
 
-  const [admin] = await db.insert(users).values({
-    email: `jobs-admin-${Date.now()}@aivo.dev`,
-    name: "Jobs Admin",
-    role: "PLATFORM_ADMIN",
-    passwordHash:
-      "$argon2id$v=19$m=65536,t=3,p=4$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-  } as any).returning();
+  const [admin] = await db
+    .insert(users)
+    .values({
+      email: `jobs-admin-${Date.now()}@aivo.dev`,
+      name: "Jobs Admin",
+      role: "PLATFORM_ADMIN",
+      passwordHash:
+        "$argon2id$v=19$m=65536,t=3,p=4$AAAAAAAAAAAAAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    } as any)
+    .returning();
   const token = await signJWT({
     sub: admin.id,
     role: "PLATFORM_ADMIN",
@@ -86,34 +89,38 @@ test("GET /api/admin-svc/jobs requires PLATFORM_ADMIN", { skip: SKIP }, async ()
   await closeDb(db);
 });
 
-test("GET /api/admin-svc/jobs returns the registry merged with the ledger", { skip: SKIP }, async () => {
-  const { app, db, sql, auth, closeDb } = await bootstrap();
-  await db.execute(sql`DELETE FROM daily_job_runs`);
-  await db.execute(sql`
+test(
+  "GET /api/admin-svc/jobs returns the registry merged with the ledger",
+  { skip: SKIP },
+  async () => {
+    const { app, db, sql, auth, closeDb } = await bootstrap();
+    await db.execute(sql`DELETE FROM daily_job_runs`);
+    await db.execute(sql`
     INSERT INTO daily_job_runs (job_name, last_run_at, last_finished_at, last_status)
     VALUES ('billing.daily-expiry-reminders', NOW(), NOW(), 'ok')
   `);
-  // An entry in the ledger that's not in the registry — should appear with unregistered:true.
-  await db.execute(sql`
+    // An entry in the ledger that's not in the registry — should appear with unregistered:true.
+    await db.execute(sql`
     INSERT INTO daily_job_runs (job_name, last_run_at, last_finished_at, last_status)
     VALUES ('legacy.unknown-job', NOW(), NOW(), 'ok')
   `);
-  const res = await app.inject({
-    method: "GET",
-    url: "/api/admin-svc/jobs",
-    headers: { authorization: auth },
-  });
-  assert.equal(res.statusCode, 200);
-  const body = res.json();
-  const billing = body.jobs.find((j: any) => j.jobName === "billing.daily-expiry-reminders");
-  assert.ok(billing);
-  assert.equal(billing.unregistered, false);
-  const legacy = body.jobs.find((j: any) => j.jobName === "legacy.unknown-job");
-  assert.ok(legacy);
-  assert.equal(legacy.unregistered, true);
-  await app.close();
-  await closeDb(db);
-});
+    const res = await app.inject({
+      method: "GET",
+      url: "/api/admin-svc/jobs",
+      headers: { authorization: auth },
+    });
+    assert.equal(res.statusCode, 200);
+    const body = res.json();
+    const billing = body.jobs.find((j: any) => j.jobName === "billing.daily-expiry-reminders");
+    assert.ok(billing);
+    assert.equal(billing.unregistered, false);
+    const legacy = body.jobs.find((j: any) => j.jobName === "legacy.unknown-job");
+    assert.ok(legacy);
+    assert.equal(legacy.unregistered, true);
+    await app.close();
+    await closeDb(db);
+  },
+);
 
 test("GET /api/admin-svc/jobs/:name/runs limits to 200", { skip: SKIP }, async () => {
   const { app, db, sql, auth, closeDb } = await bootstrap();
@@ -135,30 +142,38 @@ test("GET /api/admin-svc/jobs/:name/runs limits to 200", { skip: SKIP }, async (
   await closeDb(db);
 });
 
-test("POST /api/admin-svc/jobs/:name/run-now 404s for an unregistered job", { skip: SKIP }, async () => {
-  const { app, db, auth, closeDb } = await bootstrap();
-  const res = await app.inject({
-    method: "POST",
-    url: "/api/admin-svc/jobs/totally.fake/run-now",
-    headers: { authorization: auth },
-  });
-  assert.equal(res.statusCode, 404);
-  await app.close();
-  await closeDb(db);
-});
+test(
+  "POST /api/admin-svc/jobs/:name/run-now 404s for an unregistered job",
+  { skip: SKIP },
+  async () => {
+    const { app, db, auth, closeDb } = await bootstrap();
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/admin-svc/jobs/totally.fake/run-now",
+      headers: { authorization: auth },
+    });
+    assert.equal(res.statusCode, 404);
+    await app.close();
+    await closeDb(db);
+  },
+);
 
-test("POST /api/admin-svc/jobs/:name/run-now forwards to the owning service", { skip: SKIP }, async () => {
-  const { app, db, auth, runNowCalls, closeDb } = await bootstrap();
-  const res = await app.inject({
-    method: "POST",
-    url: "/api/admin-svc/jobs/billing.daily-expiry-reminders/run-now",
-    headers: { authorization: auth },
-  });
-  assert.equal(res.statusCode, 200);
-  assert.deepEqual(runNowCalls(), ["billing.daily-expiry-reminders"]);
-  await app.close();
-  await closeDb(db);
-});
+test(
+  "POST /api/admin-svc/jobs/:name/run-now forwards to the owning service",
+  { skip: SKIP },
+  async () => {
+    const { app, db, auth, runNowCalls, closeDb } = await bootstrap();
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/admin-svc/jobs/billing.daily-expiry-reminders/run-now",
+      headers: { authorization: auth },
+    });
+    assert.equal(res.statusCode, 200);
+    assert.deepEqual(runNowCalls(), ["billing.daily-expiry-reminders"]);
+    await app.close();
+    await closeDb(db);
+  },
+);
 
 test("GET /api/admin-svc/jobs/freshness aggregates counts", { skip: SKIP }, async () => {
   const { app, db, auth, closeDb } = await bootstrap();

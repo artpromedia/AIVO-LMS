@@ -23,7 +23,15 @@ export async function GET(req: Request): Promise<NextResponse> {
 
 const schema = z.object({
   name: z.string().min(1).max(80),
-  category: z.enum(["llm_provider", "tts_provider", "infra", "analytics", "support", "billing", "other"]),
+  category: z.enum([
+    "llm_provider",
+    "tts_provider",
+    "infra",
+    "analytics",
+    "support",
+    "billing",
+    "other",
+  ]),
   dataResidency: z.string().min(1).max(40),
   processesLearnerData: z.boolean(),
   dpaSigned: z.boolean(),
@@ -42,10 +50,18 @@ export async function POST(req: Request): Promise<NextResponse> {
     const body = await req.json().catch(() => null);
     const parsed = schema.safeParse(body);
     if (!parsed.success) {
-      return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." }, requestId);
+      return fail(
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
+        requestId,
+      );
     }
     const vendor = createVendor({ ...parsed.data, notes: parsed.data.notes ?? null });
-    audit(session!, "security.vendor.created", requestId, { metadata: { vendorId: vendor.id, name: vendor.name } });
+    audit(session!, "security.vendor.created", requestId, {
+      metadata: { vendorId: vendor.id, name: vendor.name },
+    });
     return ok({ vendor }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

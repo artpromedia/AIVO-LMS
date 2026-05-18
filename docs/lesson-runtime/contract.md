@@ -17,25 +17,25 @@ Mission, and the tutor runtime. It is enforced by:
 
 ## Baseline
 
-| Property | Contract |
-|---|---|
-| Item construction | `BaselineItem` MUST carry `skillId` (curriculum-validate enforces no Item has empty `skillId`). |
-| Generation | Items come from `packages/item-bank` via `pickVariant(learnerId, itemId)` — deterministic per learner so retries are stable. |
-| Selection | Driven by learner θ + modality preferences + IEP-derived accommodations + reading-load flag. No hard-coded item lists. |
-| Stopping rule | Adaptive; stops when SE(θ) falls below threshold. A learner never sits through items they cannot answer. |
-| Output | `LearningProfile` + grade-level placement. Grade level is a derived signal; the profile is the primary output. |
-| Score display | Learners NEVER see a baseline score. |
-| Resumability | If the player closes mid-baseline, `BaselineSession.status="in_progress"` is persisted and the next session resumes from the last answered item. |
-| Consent gate | Every `bff/learners/[learnerId]/baseline/*` route calls `requireLearnerConsent(["child_data_collection"])` (Sprint 04). |
+| Property          | Contract                                                                                                                                         |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Item construction | `BaselineItem` MUST carry `skillId` (curriculum-validate enforces no Item has empty `skillId`).                                                  |
+| Generation        | Items come from `packages/item-bank` via `pickVariant(learnerId, itemId)` — deterministic per learner so retries are stable.                     |
+| Selection         | Driven by learner θ + modality preferences + IEP-derived accommodations + reading-load flag. No hard-coded item lists.                           |
+| Stopping rule     | Adaptive; stops when SE(θ) falls below threshold. A learner never sits through items they cannot answer.                                         |
+| Output            | `LearningProfile` + grade-level placement. Grade level is a derived signal; the profile is the primary output.                                   |
+| Score display     | Learners NEVER see a baseline score.                                                                                                             |
+| Resumability      | If the player closes mid-baseline, `BaselineSession.status="in_progress"` is persisted and the next session resumes from the last answered item. |
+| Consent gate      | Every `bff/learners/[learnerId]/baseline/*` route calls `requireLearnerConsent(["child_data_collection"])` (Sprint 04).                          |
 
 ## Mastery
 
-| Property | Contract |
-|---|---|
-| Update | After every lesson run + every baseline, mastery is recomputed per skill. The update is pure / synchronous / deterministic. |
-| Snapshot | `LessonMasterySnapshot` captures `score`, `level`, `confidence`, and `subjectContext` (siblings ordered by score asc). |
-| Surface | Parent sees a plain-language summary, never the raw score. Teacher dashboards see the heatmap. |
-| Consent gate | Every `bff/learners/[learnerId]/mastery/*` route calls `requireLearnerConsent(["child_data_collection"])` (Sprint 04). |
+| Property     | Contract                                                                                                                    |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| Update       | After every lesson run + every baseline, mastery is recomputed per skill. The update is pure / synchronous / deterministic. |
+| Snapshot     | `LessonMasterySnapshot` captures `score`, `level`, `confidence`, and `subjectContext` (siblings ordered by score asc).      |
+| Surface      | Parent sees a plain-language summary, never the raw score. Teacher dashboards see the heatmap.                              |
+| Consent gate | Every `bff/learners/[learnerId]/mastery/*` route calls `requireLearnerConsent(["child_data_collection"])` (Sprint 04).      |
 
 ## LessonRun
 
@@ -60,16 +60,16 @@ that for every source listed below, at least one BFF or
 service-internal call site exists that emits a `LessonRun` with that
 source.
 
-| Source | Creator |
-|---|---|
-| `today_mission` | `/api/bff/learners/[learnerId]/today/start` |
-| `quest` | `/api/bff/learners/[learnerId]/quests/[worldId]/chapters/[chapterId]/start` |
-| `homework` | `/api/bff/learners/[learnerId]/homework/[sessionId]/...` |
-| `baseline_followup` | created internally by baseline completion |
-| `parent_assigned` | `/api/bff/parent/.../assign` (Sprint 08) |
-| `teacher_assigned` | `/api/bff/teacher/assignments/...` |
-| `review` | scheduling-svc spaced-review job |
-| `subject_path` | `/api/bff/learners/[learnerId]/subjects/[subjectId]` |
+| Source              | Creator                                                                     |
+| ------------------- | --------------------------------------------------------------------------- |
+| `today_mission`     | `/api/bff/learners/[learnerId]/today/start`                                 |
+| `quest`             | `/api/bff/learners/[learnerId]/quests/[worldId]/chapters/[chapterId]/start` |
+| `homework`          | `/api/bff/learners/[learnerId]/homework/[sessionId]/...`                    |
+| `baseline_followup` | created internally by baseline completion                                   |
+| `parent_assigned`   | `/api/bff/parent/.../assign` (Sprint 08)                                    |
+| `teacher_assigned`  | `/api/bff/teacher/assignments/...`                                          |
+| `review`            | scheduling-svc spaced-review job                                            |
+| `subject_path`      | `/api/bff/learners/[learnerId]/subjects/[subjectId]`                        |
 
 ### Snapshots are frozen
 
@@ -131,20 +131,20 @@ mastery updates, and Sprint 14 AI safety review.
 
 ## Today's Mission
 
-| Property | Contract |
-|---|---|
-| Source-of-truth | Computed live from current mastery + prerequisites + teacher assignments + parent goals + learner fatigue/sensory signals. |
-| No fabrication | Today's Mission MUST NOT show fake progress. If no mission can be selected (e.g. learner just finished a chapter), surface an explicit empty state with a celebrate-and-rest CTA. |
-| Cache | Cached for 10 minutes per learner; invalidated by mastery update, new assignment, or parent goal change. |
-| Consent gate | Every `bff/learners/[learnerId]/today/*` route calls `requireLearnerConsent(["child_data_collection","ai_personalization"])` (Sprint 04). |
+| Property        | Contract                                                                                                                                                                          |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Source-of-truth | Computed live from current mastery + prerequisites + teacher assignments + parent goals + learner fatigue/sensory signals.                                                        |
+| No fabrication  | Today's Mission MUST NOT show fake progress. If no mission can be selected (e.g. learner just finished a chapter), surface an explicit empty state with a celebrate-and-rest CTA. |
+| Cache           | Cached for 10 minutes per learner; invalidated by mastery update, new assignment, or parent goal change.                                                                          |
+| Consent gate    | Every `bff/learners/[learnerId]/today/*` route calls `requireLearnerConsent(["child_data_collection","ai_personalization"])` (Sprint 04).                                         |
 
 ## Tutor runtime
 
-| Property | Contract |
-|---|---|
-| Persona | Driven by `LessonRun.tutorPersona`, frozen at run creation. |
-| Surface protocol | Validated by `packages/tutor-surface-protocol::validators` — raw HTML/SVG are rejected; speech-required commands are gated by learner profile. |
-| Cost / safety | Sprint 14 wraps every generation in classification, prompt-injection detection, output policy validation, and per-tenant/per-learner/per-feature budget enforcement. |
+| Property         | Contract                                                                                                                                                             |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Persona          | Driven by `LessonRun.tutorPersona`, frozen at run creation.                                                                                                          |
+| Surface protocol | Validated by `packages/tutor-surface-protocol::validators` — raw HTML/SVG are rejected; speech-required commands are gated by learner profile.                       |
+| Cost / safety    | Sprint 14 wraps every generation in classification, prompt-injection detection, output policy validation, and per-tenant/per-learner/per-feature budget enforcement. |
 
 ## Parent summary
 

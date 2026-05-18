@@ -10,11 +10,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PARENT_NAV } from "@/components/layout/role-shells";
-import {
-  getLearner,
-  listHomeworkSessionsForLearner,
-  parentCanAccessLearner,
-} from "@/lib/db/repos";
+import { getLearner, listHomeworkSessionsForLearner, parentCanAccessLearner } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
 
@@ -45,9 +41,7 @@ export default async function ParentHomeworkHistoryPage({
         description="What your child has been working on with the Homework Helper. Message contents stay between your child and the tutor."
       />
       {sessions.length === 0 ? (
-        <Card className="p-6 text-sm text-muted-foreground">
-          No homework sessions yet.
-        </Card>
+        <Card className="p-6 text-sm text-muted-foreground">No homework sessions yet.</Card>
       ) : (
         <ul className="grid gap-3">
           {sessions.map((s) => (
@@ -57,12 +51,9 @@ export default async function ParentHomeworkHistoryPage({
                   <div>
                     <p className="font-medium">{s.topic}</p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {new Date(s.startedAt).toLocaleString()} ·{" "}
-                      {s.messages.length} messages
+                      {new Date(s.startedAt).toLocaleString()} · {s.messages.length} messages
                     </p>
-                    {s.insight && (
-                      <p className="text-sm mt-2">{s.insight}</p>
-                    )}
+                    {s.insight && <p className="text-sm mt-2">{s.insight}</p>}
                   </div>
                   <Badge tone={s.endedAt ? "neutral" : "primary"}>
                     {s.endedAt ? "Done" : "Open"}

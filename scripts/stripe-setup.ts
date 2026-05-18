@@ -45,7 +45,8 @@ const SPECS: Spec[] = [
     productName: "AIVO Tutor Add-on",
     productKind: "addon:tutor",
     unitAmountCents: 499,
-    description: "$4.99/mo per additional AI tutor. The chosen tutor SKU is carried in subscription-item metadata.",
+    description:
+      "$4.99/mo per additional AI tutor. The chosen tutor SKU is carried in subscription-item metadata.",
   },
 ];
 
@@ -79,7 +80,10 @@ async function findRecurringPrice(
   return null;
 }
 
-async function provision(stripe: Stripe, spec: Spec): Promise<{ envVar: string; priceId: string; reused: boolean }> {
+async function provision(
+  stripe: Stripe,
+  spec: Spec,
+): Promise<{ envVar: string; priceId: string; reused: boolean }> {
   let product = await findProduct(stripe, spec.productKind);
   let productReused = !!product;
   if (!product) {
@@ -109,7 +113,9 @@ async function provision(stripe: Stripe, spec: Spec): Promise<{ envVar: string; 
 async function main(): Promise<void> {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) {
-    console.error("STRIPE_SECRET_KEY is required. Run with: STRIPE_SECRET_KEY=sk_test_... npx tsx scripts/stripe-setup.ts");
+    console.error(
+      "STRIPE_SECRET_KEY is required. Run with: STRIPE_SECRET_KEY=sk_test_... npx tsx scripts/stripe-setup.ts",
+    );
     process.exit(2);
   }
   const stripe = new Stripe(key, {

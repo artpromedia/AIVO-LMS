@@ -70,7 +70,7 @@ export const LLM_COST_WARNING_USD = 40;
 /** LLM cost (USD) per tenant per day that triggers a CRITICAL page + auto-cap. */
 export const LLM_COST_CRITICAL_USD = 80;
 /** IEP parse failure rate (0–1) over a 5-minute window that triggers a WARNING. */
-export const IEP_PARSE_FAILURE_RATE_WARNING = 0.10;
+export const IEP_PARSE_FAILURE_RATE_WARNING = 0.1;
 /** 5xx error rate (0–1) over a 2-minute window that triggers a WARNING. */
 export const HTTP_5XX_RATE_WARNING = 0.02;
 
@@ -139,10 +139,7 @@ export async function runWatchdogOnce(
     if (report.status === "stale" || report.status === "never_run" || report.failed) {
       alerted.push(entry.jobName);
       const ageHours = report.ageMs ? Math.round(report.ageMs / (60 * 60 * 1000)) : null;
-      const sev =
-        report.status === "stale" ? "critical"
-        : report.failed ? "critical"
-        : "warning";
+      const sev = report.status === "stale" ? "critical" : report.failed ? "critical" : "warning";
       try {
         await alerts.send({
           severity: sev,
@@ -186,13 +183,11 @@ async function triggerBrainSvcLlmPause(
 ): Promise<void> {
   const brainSvcUrl = process.env.BRAIN_SVC_URL;
   if (!brainSvcUrl) {
-    log?.warn(
-      { tenantId },
-      "LLM auto-cap skipped: BRAIN_SVC_URL not configured",
-    );
+    log?.warn({ tenantId }, "LLM auto-cap skipped: BRAIN_SVC_URL not configured");
     return;
   }
-  const internalToken = process.env.INTERNAL_SERVICE_TOKEN || process.env.INTERNAL_SERVICE_KEY || "";
+  const internalToken =
+    process.env.INTERNAL_SERVICE_TOKEN || process.env.INTERNAL_SERVICE_KEY || "";
   try {
     const res = await fetch(`${brainSvcUrl}/api/brain/admin/pause-llm`, {
       method: "POST",
@@ -209,10 +204,7 @@ async function triggerBrainSvcLlmPause(
       }),
     });
     if (!res.ok) {
-      log?.error(
-        { tenantId, status: res.status },
-        "LLM auto-cap brain-svc returned non-2xx",
-      );
+      log?.error({ tenantId, status: res.status }, "LLM auto-cap brain-svc returned non-2xx");
     } else {
       log?.warn({ tenantId, costUsd }, "LLM auto-cap engaged via brain-svc");
     }
@@ -233,26 +225,38 @@ export async function checkLlmCostAlerts(
   for (const [tenantId, costUsd] of tenantSpend) {
     if (costUsd >= LLM_COST_CRITICAL_USD) {
       log?.warn({ tenantId, costUsd }, "LLM cost CRITICAL threshold reached");
-      await alerts.send({
-        severity: "critical",
-        title: `LLM budget critical: tenant ${tenantId}`,
-        body: `Tenant ${tenantId} has spent $${costUsd.toFixed(2)} on LLM calls today (threshold: $${LLM_COST_CRITICAL_USD}).`,
-        dedupKey: `llm-cost-critical:${tenantId}:${new Date().toISOString().slice(0, 10)}`,
-        fields: { tenantId, costUsd: costUsd.toFixed(2), threshold: String(LLM_COST_CRITICAL_USD) },
-      }).catch((e: unknown) => log?.error({ err: e }, "llm cost alert send failed"));
+      await alerts
+        .send({
+          severity: "critical",
+          title: `LLM budget critical: tenant ${tenantId}`,
+          body: `Tenant ${tenantId} has spent $${costUsd.toFixed(2)} on LLM calls today (threshold: $${LLM_COST_CRITICAL_USD}).`,
+          dedupKey: `llm-cost-critical:${tenantId}:${new Date().toISOString().slice(0, 10)}`,
+          fields: {
+            tenantId,
+            costUsd: costUsd.toFixed(2),
+            threshold: String(LLM_COST_CRITICAL_USD),
+          },
+        })
+        .catch((e: unknown) => log?.error({ err: e }, "llm cost alert send failed"));
       // Auto-cap: pause LLM for the offending tenant via brain-svc so
       // costs stop accruing while ops investigates. This MUST run after
       // the alert send so an on-call human is aware of the pause.
       await triggerBrainSvcLlmPause(tenantId, costUsd, log);
     } else if (costUsd >= LLM_COST_WARNING_USD) {
       log?.warn({ tenantId, costUsd }, "LLM cost WARNING threshold reached");
-      await alerts.send({
-        severity: "warning",
-        title: `LLM budget warning: tenant ${tenantId}`,
-        body: `Tenant ${tenantId} has spent $${costUsd.toFixed(2)} on LLM calls today (threshold: $${LLM_COST_WARNING_USD}).`,
-        dedupKey: `llm-cost-warning:${tenantId}:${new Date().toISOString().slice(0, 10)}`,
-        fields: { tenantId, costUsd: costUsd.toFixed(2), threshold: String(LLM_COST_WARNING_USD) },
-      }).catch((e: unknown) => log?.error({ err: e }, "llm cost alert send failed"));
+      await alerts
+        .send({
+          severity: "warning",
+          title: `LLM budget warning: tenant ${tenantId}`,
+          body: `Tenant ${tenantId} has spent $${costUsd.toFixed(2)} on LLM calls today (threshold: $${LLM_COST_WARNING_USD}).`,
+          dedupKey: `llm-cost-warning:${tenantId}:${new Date().toISOString().slice(0, 10)}`,
+          fields: {
+            tenantId,
+            costUsd: costUsd.toFixed(2),
+            threshold: String(LLM_COST_WARNING_USD),
+          },
+        })
+        .catch((e: unknown) => log?.error({ err: e }, "llm cost alert send failed"));
     }
   }
 }
@@ -272,13 +276,15 @@ export async function checkIepParseFailureRate(
   if (rate > IEP_PARSE_FAILURE_RATE_WARNING) {
     const alerts = getAlerts();
     log?.warn({ rate, failed, total }, "IEP parse failure rate WARNING");
-    await alerts.send({
-      severity: "warning",
-      title: "IEP parse failure rate elevated",
-      body: `IEP parse failure rate is ${(rate * 100).toFixed(1)}% (${failed}/${total}) in the last 5 minutes.`,
-      dedupKey: `iep-parse-failure:${new Date().toISOString().slice(0, 16)}`,
-      fields: { rate: rate.toFixed(3), failed: String(failed), total: String(total) },
-    }).catch((e: unknown) => log?.error({ err: e }, "iep parse alert send failed"));
+    await alerts
+      .send({
+        severity: "warning",
+        title: "IEP parse failure rate elevated",
+        body: `IEP parse failure rate is ${(rate * 100).toFixed(1)}% (${failed}/${total}) in the last 5 minutes.`,
+        dedupKey: `iep-parse-failure:${new Date().toISOString().slice(0, 16)}`,
+        fields: { rate: rate.toFixed(3), failed: String(failed), total: String(total) },
+      })
+      .catch((e: unknown) => log?.error({ err: e }, "iep parse alert send failed"));
   }
 }
 
@@ -293,13 +299,15 @@ export async function alertBrainCloneFailure(
 ): Promise<void> {
   const alerts = getAlerts();
   log?.error({ learnerId, reason }, "Brain clone CRITICAL failure");
-  await alerts.send({
-    severity: "critical",
-    title: `Brain clone failed: learner ${learnerId}`,
-    body: `Brain clone pipeline failed for learner ${learnerId}. Reason: ${reason}`,
-    dedupKey: `brain-clone-failure:${learnerId}`,
-    fields: { learnerId, reason },
-  }).catch((e: unknown) => log?.error({ err: e }, "brain clone alert send failed"));
+  await alerts
+    .send({
+      severity: "critical",
+      title: `Brain clone failed: learner ${learnerId}`,
+      body: `Brain clone pipeline failed for learner ${learnerId}. Reason: ${reason}`,
+      dedupKey: `brain-clone-failure:${learnerId}`,
+      fields: { learnerId, reason },
+    })
+    .catch((e: unknown) => log?.error({ err: e }, "brain clone alert send failed"));
 }
 
 /**
@@ -317,13 +325,20 @@ export async function checkHttp5xxRate(
   if (rate > HTTP_5XX_RATE_WARNING) {
     const alerts = getAlerts();
     log?.warn({ service, rate, errorCount, totalRequests }, "HTTP 5xx rate WARNING");
-    await alerts.send({
-      severity: "warning",
-      title: `High 5xx rate: ${service}`,
-      body: `Service ${service} has a 5xx error rate of ${(rate * 100).toFixed(1)}% (${errorCount}/${totalRequests}) in the last ${windowLabel}.`,
-      dedupKey: `5xx-rate:${service}:${new Date().toISOString().slice(0, 16)}`,
-      fields: { service, rate: rate.toFixed(3), errorCount: String(errorCount), totalRequests: String(totalRequests) },
-    }).catch((e: unknown) => log?.error({ err: e }, "5xx rate alert send failed"));
+    await alerts
+      .send({
+        severity: "warning",
+        title: `High 5xx rate: ${service}`,
+        body: `Service ${service} has a 5xx error rate of ${(rate * 100).toFixed(1)}% (${errorCount}/${totalRequests}) in the last ${windowLabel}.`,
+        dedupKey: `5xx-rate:${service}:${new Date().toISOString().slice(0, 16)}`,
+        fields: {
+          service,
+          rate: rate.toFixed(3),
+          errorCount: String(errorCount),
+          totalRequests: String(totalRequests),
+        },
+      })
+      .catch((e: unknown) => log?.error({ err: e }, "5xx rate alert send failed"));
   }
 }
 

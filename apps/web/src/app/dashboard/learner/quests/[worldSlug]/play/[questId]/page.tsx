@@ -84,7 +84,9 @@ export default function QuestPlayPage() {
     (async () => {
       try {
         const [wr, cr] = await Promise.all([
-          fetch(`/api/engagement/quests/worlds/${encodeURIComponent(worldSlug)}`, { headers: auth }),
+          fetch(`/api/engagement/quests/worlds/${encodeURIComponent(worldSlug)}`, {
+            headers: auth,
+          }),
           fetch(`/api/engagement/quests/chapter/${encodeURIComponent(questId)}`, { headers: auth }),
         ]);
         if (cancelled) return;
@@ -115,10 +117,7 @@ export default function QuestPlayPage() {
     };
   }, [accessToken, user, worldSlug, questId]);
 
-  const questions = useMemo<BossQuestion[]>(
-    () => quest?.bossAssessment?.questions ?? [],
-    [quest],
-  );
+  const questions = useMemo<BossQuestion[]>(() => quest?.bossAssessment?.questions ?? [], [quest]);
   const allAnswered = questions.length > 0 && questions.every((q) => answers[q.id] !== undefined);
 
   const score = useMemo(() => {
@@ -214,9 +213,7 @@ export default function QuestPlayPage() {
             {world.subject} · Chapter {quest.chapterNumber}
           </p>
           <h1 className="text-3xl font-heading font-bold text-slate-900">{quest.title}</h1>
-          {quest.description && (
-            <p className="text-slate-500 mt-1">{quest.description}</p>
-          )}
+          {quest.description && <p className="text-slate-500 mt-1">{quest.description}</p>}
         </header>
 
         {phase === "intro" && (
@@ -313,7 +310,10 @@ export default function QuestPlayPage() {
             <div className="flex items-center justify-between rounded-2xl bg-white border-2 border-slate-200 p-4">
               <div>
                 <p className="text-xs uppercase font-bold text-slate-400">Score</p>
-                <p className="text-2xl font-heading font-bold text-slate-900" data-testid="running-score">
+                <p
+                  className="text-2xl font-heading font-bold text-slate-900"
+                  data-testid="running-score"
+                >
                   {allAnswered ? `${score}%` : "—"}
                 </p>
               </div>

@@ -39,7 +39,10 @@ export default function CollaborationPage() {
   const t = useTranslations("parent");
   const tCommon = useTranslations("common");
 
-  interface SeatInfo { used: number; max: number }
+  interface SeatInfo {
+    used: number;
+    max: number;
+  }
   interface MembersState {
     teachers: TeamMember[];
     caregivers: TeamMember[];
@@ -47,7 +50,9 @@ export default function CollaborationPage() {
     seats?: { teacher: SeatInfo; caregiver: SeatInfo; therapist: SeatInfo };
   }
   const [members, setMembers] = useState<MembersState>({
-    teachers: [], caregivers: [], therapists: [],
+    teachers: [],
+    caregivers: [],
+    therapists: [],
   });
   const [showInvite, setShowInvite] = useState<"teacher" | "caregiver" | "therapist" | null>(null);
   const [inviteEmail, setInviteEmail] = useState("");
@@ -69,7 +74,9 @@ export default function CollaborationPage() {
     }
   };
 
-  useEffect(() => { fetchMembers(); }, [accessToken, learnerId]);
+  useEffect(() => {
+    fetchMembers();
+  }, [accessToken, learnerId]);
 
   const inviteMember = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,10 +117,13 @@ export default function CollaborationPage() {
   const removeMember = async (memberId: string, memberType: string) => {
     if (!confirm(t("remove_team_member"))) return;
     try {
-      await fetch(`/api/family/collaboration/${learnerId}/member/${memberId}?memberType=${memberType}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
+      await fetch(
+        `/api/family/collaboration/${learnerId}/member/${memberId}?memberType=${memberType}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${accessToken}` },
+        },
+      );
       fetchMembers();
     } catch (err) {
       console.error("Failed to remove member:", err);
@@ -132,12 +142,15 @@ export default function CollaborationPage() {
   };
 
   const allMembers = [
-    ...members.teachers.map(m => ({ ...m, memberType: "teacher" as const })),
-    ...members.caregivers.map(m => ({ ...m, memberType: "caregiver" as const })),
-    ...members.therapists.map(m => ({ ...m, memberType: "therapist" as const })),
+    ...members.teachers.map((m) => ({ ...m, memberType: "teacher" as const })),
+    ...members.caregivers.map((m) => ({ ...m, memberType: "caregiver" as const })),
+    ...members.therapists.map((m) => ({ ...m, memberType: "therapist" as const })),
   ];
 
-  const ROLE_ICON: Record<"teacher" | "caregiver" | "therapist", React.ComponentType<{ className?: string; strokeWidth?: number }>> = {
+  const ROLE_ICON: Record<
+    "teacher" | "caregiver" | "therapist",
+    React.ComponentType<{ className?: string; strokeWidth?: number }>
+  > = {
     teacher: GraduationCap,
     caregiver: HeartHandshake,
     therapist: Brain,
@@ -152,11 +165,13 @@ export default function CollaborationPage() {
 
       {members.seats && (
         <div className="grid grid-cols-3 gap-4">
-          {([
-            { key: "teacher" as const, label: t("invite_teacher") },
-            { key: "caregiver" as const, label: t("invite_caregiver") },
-            { key: "therapist" as const, label: t("invite_therapist") },
-          ] as const).map(({ key, label }) => {
+          {(
+            [
+              { key: "teacher" as const, label: t("invite_teacher") },
+              { key: "caregiver" as const, label: t("invite_caregiver") },
+              { key: "therapist" as const, label: t("invite_therapist") },
+            ] as const
+          ).map(({ key, label }) => {
             const seat = members.seats![key];
             const isFull = seat.used >= seat.max;
             const color = ROLE_COLOR[key];
@@ -166,15 +181,23 @@ export default function CollaborationPage() {
               <div
                 key={key}
                 className="vi-card p-4"
-                style={isFull ? undefined : { background: `hsl(${hsl} / 0.06)`, borderColor: `hsl(${hsl} / 0.3)` }}
+                style={
+                  isFull
+                    ? undefined
+                    : { background: `hsl(${hsl} / 0.06)`, borderColor: `hsl(${hsl} / 0.3)` }
+                }
               >
                 <div className="flex items-center justify-between mb-2">
-                  <IconWell color={color} size="sm"><Icon className="w-5 h-5" strokeWidth={2.5} /></IconWell>
+                  <IconWell color={color} size="sm">
+                    <Icon className="w-5 h-5" strokeWidth={2.5} />
+                  </IconWell>
                   <span
                     className="text-xs font-bold px-2 py-0.5 rounded-full"
-                    style={isFull
-                      ? { background: "rgb(226 232 240)", color: "rgb(100 116 139)" }
-                      : { background: `hsl(${hsl} / 0.12)`, color: `hsl(${hsl})` }}
+                    style={
+                      isFull
+                        ? { background: "rgb(226 232 240)", color: "rgb(100 116 139)" }
+                        : { background: `hsl(${hsl} / 0.12)`, color: `hsl(${hsl})` }
+                    }
                   >
                     {seat.used}/{seat.max}
                   </span>
@@ -184,9 +207,15 @@ export default function CollaborationPage() {
                   onClick={() => !isFull && setShowInvite(key)}
                   disabled={isFull}
                   className={`w-full px-4 py-2 rounded-full text-sm font-bold transition ${
-                    isFull ? "vi-surface-soft vi-text-muted cursor-not-allowed" : "text-white hover:opacity-90"
+                    isFull
+                      ? "vi-surface-soft vi-text-muted cursor-not-allowed"
+                      : "text-white hover:opacity-90"
                   }`}
-                  style={isFull ? { minHeight: "44px" } : { background: `hsl(${hsl})`, minHeight: "44px" }}
+                  style={
+                    isFull
+                      ? { minHeight: "44px" }
+                      : { background: `hsl(${hsl})`, minHeight: "44px" }
+                  }
                 >
                   {isFull ? t("seats_full") : label}
                 </button>
@@ -200,13 +229,22 @@ export default function CollaborationPage() {
         <div className="flex gap-3">
           {(["teacher", "caregiver", "therapist"] as const).map((key) => {
             const hsl = ROLE_HSL[key];
-            const labelKey = key === "teacher" ? "invite_teacher" : key === "caregiver" ? "invite_caregiver" : "invite_therapist";
+            const labelKey =
+              key === "teacher"
+                ? "invite_teacher"
+                : key === "caregiver"
+                  ? "invite_caregiver"
+                  : "invite_therapist";
             return (
               <button
                 key={key}
                 onClick={() => setShowInvite(key)}
                 className="px-5 py-2.5 rounded-full font-bold transition text-sm hover:opacity-90"
-                style={{ background: `hsl(${hsl} / 0.12)`, color: `hsl(${hsl})`, minHeight: "44px" }}
+                style={{
+                  background: `hsl(${hsl} / 0.12)`,
+                  color: `hsl(${hsl})`,
+                  minHeight: "44px",
+                }}
               >
                 {t(labelKey)}
               </button>
@@ -228,50 +266,84 @@ export default function CollaborationPage() {
           )}
 
           <div>
-            <label className="block text-sm font-bold text-slate-800 mb-1">{t("email_address")}</label>
-            <input type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} required
+            <label className="block text-sm font-bold text-slate-800 mb-1">
+              {t("email_address")}
+            </label>
+            <input
+              type="email"
+              value={inviteEmail}
+              onChange={(e) => setInviteEmail(e.target.value)}
+              required
               className="w-full px-4 py-2.5 rounded-xl border vi-border focus:border-[hsl(var(--visual-primary))] focus:ring-2 focus:ring-[hsl(var(--visual-primary)/0.2)] outline-none font-body"
-              style={{ minHeight: "44px" }} />
+              style={{ minHeight: "44px" }}
+            />
           </div>
 
           {showInvite === "caregiver" && (
             <div>
-              <label className="block text-sm font-bold text-slate-800 mb-1">{t("relationship")}</label>
-              <input type="text" value={inviteRelationship} onChange={(e) => setInviteRelationship(e.target.value)}
+              <label className="block text-sm font-bold text-slate-800 mb-1">
+                {t("relationship")}
+              </label>
+              <input
+                type="text"
+                value={inviteRelationship}
+                onChange={(e) => setInviteRelationship(e.target.value)}
                 placeholder={t("relationship_placeholder")}
                 className="w-full px-4 py-2.5 rounded-xl border vi-border focus:border-[hsl(var(--visual-primary))] focus:ring-2 focus:ring-[hsl(var(--visual-primary)/0.2)] outline-none font-body"
-                style={{ minHeight: "44px" }} />
+                style={{ minHeight: "44px" }}
+              />
             </div>
           )}
 
           {showInvite === "therapist" && (
             <>
               <div>
-                <label className="block text-sm font-bold text-slate-800 mb-1">{t("specialty")}</label>
-                <input type="text" value={inviteSpecialty} onChange={(e) => setInviteSpecialty(e.target.value)}
+                <label className="block text-sm font-bold text-slate-800 mb-1">
+                  {t("specialty")}
+                </label>
+                <input
+                  type="text"
+                  value={inviteSpecialty}
+                  onChange={(e) => setInviteSpecialty(e.target.value)}
                   placeholder={t("specialty_placeholder")}
                   className="w-full px-4 py-2.5 rounded-xl border vi-border focus:border-[hsl(var(--visual-primary))] focus:ring-2 focus:ring-[hsl(var(--visual-primary)/0.2)] outline-none font-body"
-                  style={{ minHeight: "44px" }} />
+                  style={{ minHeight: "44px" }}
+                />
               </div>
               <div>
-                <label className="block text-sm font-bold text-slate-800 mb-1">{t("credentials")}</label>
-                <input type="text" value={inviteCredentials} onChange={(e) => setInviteCredentials(e.target.value)}
+                <label className="block text-sm font-bold text-slate-800 mb-1">
+                  {t("credentials")}
+                </label>
+                <input
+                  type="text"
+                  value={inviteCredentials}
+                  onChange={(e) => setInviteCredentials(e.target.value)}
                   placeholder={t("credentials_placeholder")}
                   className="w-full px-4 py-2.5 rounded-xl border vi-border focus:border-[hsl(var(--visual-primary))] focus:ring-2 focus:ring-[hsl(var(--visual-primary)/0.2)] outline-none font-body"
-                  style={{ minHeight: "44px" }} />
+                  style={{ minHeight: "44px" }}
+                />
               </div>
             </>
           )}
 
           <div className="flex gap-3">
-            <button type="submit" disabled={submitting}
+            <button
+              type="submit"
+              disabled={submitting}
               className="px-6 py-2.5 rounded-full bg-[hsl(var(--visual-primary))] text-white font-bold hover:bg-[hsl(var(--visual-primary)/0.9)] transition disabled:opacity-50"
-              style={{ minHeight: "44px" }}>
+              style={{ minHeight: "44px" }}
+            >
               {submitting ? t("sending") : t("send_invite")}
             </button>
-            <button type="button" onClick={() => { setShowInvite(null); setError(""); }}
+            <button
+              type="button"
+              onClick={() => {
+                setShowInvite(null);
+                setError("");
+              }}
               className="px-6 py-2.5 rounded-full vi-surface-soft vi-text-muted font-bold hover:bg-[hsl(var(--visual-border))] transition"
-              style={{ minHeight: "44px" }}>
+              style={{ minHeight: "44px" }}
+            >
               {tCommon("cancel")}
             </button>
           </div>
@@ -294,7 +366,9 @@ export default function CollaborationPage() {
         {allMembers.length === 0 ? (
           <div className="text-center py-12">
             <div className="mx-auto inline-flex mb-3">
-              <IconWell color="primary" size="md"><Users className="w-7 h-7" strokeWidth={2.5} /></IconWell>
+              <IconWell color="primary" size="md">
+                <Users className="w-7 h-7" strokeWidth={2.5} />
+              </IconWell>
             </div>
             <p className="vi-text-muted font-semibold">{t("no_team_members")}</p>
           </div>
@@ -303,7 +377,10 @@ export default function CollaborationPage() {
             {allMembers.map((m) => {
               const hsl = ROLE_HSL[m.memberType];
               return (
-                <div key={m.id} className="flex items-center justify-between p-4 rounded-xl vi-surface-soft border vi-border">
+                <div
+                  key={m.id}
+                  className="flex items-center justify-between p-4 rounded-xl vi-surface-soft border vi-border"
+                >
                   <div className="flex items-center gap-4">
                     <div
                       className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
@@ -322,11 +399,15 @@ export default function CollaborationPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`px-3 py-1 text-xs rounded-full font-bold ${STATUS_COLORS[m.status] || "vi-surface-soft vi-text-muted"}`}>
+                    <span
+                      className={`px-3 py-1 text-xs rounded-full font-bold ${STATUS_COLORS[m.status] || "vi-surface-soft vi-text-muted"}`}
+                    >
                       {m.status}
                     </span>
-                    <button onClick={() => removeMember(m.id, m.memberType)}
-                      className="text-xs text-[hsl(var(--visual-math))] hover:opacity-80 font-bold transition">
+                    <button
+                      onClick={() => removeMember(m.id, m.memberType)}
+                      className="text-xs text-[hsl(var(--visual-math))] hover:opacity-80 font-bold transition"
+                    >
                       {tCommon("remove")}
                     </button>
                   </div>

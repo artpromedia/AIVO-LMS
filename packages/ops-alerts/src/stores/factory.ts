@@ -19,14 +19,19 @@ export interface OutboxFromEnvResult {
   pgRequestedButUnwired: boolean;
 }
 
-export async function opsAlertOutboxStoreFromEnv(opts: OutboxFromEnvOptions): Promise<OutboxFromEnvResult> {
+export async function opsAlertOutboxStoreFromEnv(
+  opts: OutboxFromEnvOptions,
+): Promise<OutboxFromEnvResult> {
   const env = opts.env ?? process.env;
   const pgTable = env.OPS_ALERTS_OUTBOX_PG_TABLE;
   const filePath = env.OPS_ALERTS_OUTBOX_FILE_PATH;
 
   if (pgTable && opts.pgOutboxClient) {
     const client = await opts.pgOutboxClient();
-    return { store: new PostgresOpsAlertOutboxStore({ table: pgTable, client }), pgRequestedButUnwired: false };
+    return {
+      store: new PostgresOpsAlertOutboxStore({ table: pgTable, client }),
+      pgRequestedButUnwired: false,
+    };
   }
 
   if (pgTable && !opts.pgOutboxClient) {
@@ -48,8 +53,14 @@ export async function opsAlertOutboxStoreFromEnv(opts: OutboxFromEnvOptions): Pr
   }
 
   if (filePath) {
-    return { store: new FileOpsAlertOutboxStore(filePath), pgRequestedButUnwired: Boolean(pgTable && !opts.pgOutboxClient) };
+    return {
+      store: new FileOpsAlertOutboxStore(filePath),
+      pgRequestedButUnwired: Boolean(pgTable && !opts.pgOutboxClient),
+    };
   }
 
-  return { store: new MemoryOpsAlertOutboxStore(), pgRequestedButUnwired: Boolean(pgTable && !opts.pgOutboxClient) };
+  return {
+    store: new MemoryOpsAlertOutboxStore(),
+    pgRequestedButUnwired: Boolean(pgTable && !opts.pgOutboxClient),
+  };
 }

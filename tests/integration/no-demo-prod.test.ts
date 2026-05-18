@@ -77,10 +77,7 @@ export default function Stage() { useSession("x"); return null; }
 `,
     );
     // Test file with the forbidden pattern must NOT trigger a failure.
-    writeFileSync(
-      testFixture,
-      `const QUESTIONS = [{ id: "1", prompt: "demo" }];\nexport {};\n`,
-    );
+    writeFileSync(testFixture, `const QUESTIONS = [{ id: "1", prompt: "demo" }];\nexport {};\n`);
     const res = runScanIn(work);
     expect(res.status).toBe(0);
   });

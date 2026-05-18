@@ -21,7 +21,12 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection"],
+      requestId,
+    );
     if (consentErr) return consentErr;
 
     const baseline = getBaselineById(baselineId, session!.tenantId);
@@ -43,17 +48,11 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     try {
       body = await req.json();
     } catch {
-      return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: "Invalid JSON body" },
-        requestId,
-      );
+      return fail({ ...ERRORS.VALIDATION_FAILED, message: "Invalid JSON body" }, requestId);
     }
     const parsed = BaselineAnswerInput.safeParse(body);
     if (!parsed.success) {
-      return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: parsed.error.message },
-        requestId,
-      );
+      return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.message }, requestId);
     }
     const attempt = recordBaselineAttempt({
       baselineId,
@@ -64,10 +63,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       skipped: parsed.data.skipped,
     });
     if (!attempt) {
-      return fail(
-        { ...ERRORS.NOT_FOUND, message: "Question not found for baseline" },
-        requestId,
-      );
+      return fail({ ...ERRORS.NOT_FOUND, message: "Question not found for baseline" }, requestId);
     }
     audit(session, "baseline.answer", requestId, {
       learnerId,

@@ -7,11 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SCHOOL_NAV } from "@/components/layout/role-shells";
-import {
-  listRosterImportJobs,
-  listSISConnections,
-  listSchools,
-} from "@/lib/db/repos";
+import { listRosterImportJobs, listSISConnections, listSchools } from "@/lib/db/repos";
 
 export default async function Page() {
   const session = await requirePageRole(["school_admin", "district_admin", "platform_admin"]);
@@ -58,7 +54,9 @@ export default async function Page() {
               </div>
               <div className="mt-3 flex gap-2">
                 <Link href={`/admin/school/classes?schoolId=${s.id}`}>
-                  <Button variant="outline" size="sm">Classes</Button>
+                  <Button variant="outline" size="sm">
+                    Classes
+                  </Button>
                 </Link>
                 <Link href={`/admin/school/rostering/import?schoolId=${s.id}`}>
                   <Button size="sm">Import CSV</Button>
@@ -69,7 +67,11 @@ export default async function Page() {
         </div>
       )}
 
-      <SectionHeader className="mt-10" title="SIS connections" description="Clever, ClassLink, OneRoster, or Google Classroom." />
+      <SectionHeader
+        className="mt-10"
+        title="SIS connections"
+        description="Clever, ClassLink, OneRoster, or Google Classroom."
+      />
       {connections.length === 0 ? (
         <EmptyState
           title="No SIS connection yet"
@@ -85,7 +87,11 @@ export default async function Page() {
                   Provider: {c.provider} · last sync: {c.lastSyncedAt ?? "never"}
                 </p>
               </div>
-              <Badge tone={c.status === "active" ? "success" : c.status === "paused" ? "warning" : "neutral"}>
+              <Badge
+                tone={
+                  c.status === "active" ? "success" : c.status === "paused" ? "warning" : "neutral"
+                }
+              >
                 {c.status}
               </Badge>
             </Card>
@@ -93,7 +99,11 @@ export default async function Page() {
         </div>
       )}
 
-      <SectionHeader className="mt-10" title="Recent import jobs" description="Audit trail of every roster sync." />
+      <SectionHeader
+        className="mt-10"
+        title="Recent import jobs"
+        description="Audit trail of every roster sync."
+      />
       {jobs.length === 0 ? (
         <EmptyState title="No imports yet" description="Run your first CSV import above." />
       ) : (
@@ -107,10 +117,21 @@ export default async function Page() {
                   {j.dryRun ? " · dry run" : ""}
                 </p>
                 <p className="text-xs text-aivo-muted">
-                  {new Date(j.createdAt).toLocaleString()} · {j.createdRows} created · {j.skippedRows} skipped · {j.errorRows} errors
+                  {new Date(j.createdAt).toLocaleString()} · {j.createdRows} created ·{" "}
+                  {j.skippedRows} skipped · {j.errorRows} errors
                 </p>
               </div>
-              <Badge tone={j.status === "completed" ? "success" : j.status === "failed" ? "danger" : j.status === "dry_run" ? "primary" : "warning"}>
+              <Badge
+                tone={
+                  j.status === "completed"
+                    ? "success"
+                    : j.status === "failed"
+                      ? "danger"
+                      : j.status === "dry_run"
+                        ? "primary"
+                        : "warning"
+                }
+              >
                 {j.status}
               </Badge>
             </div>

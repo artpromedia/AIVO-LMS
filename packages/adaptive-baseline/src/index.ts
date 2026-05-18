@@ -25,11 +25,7 @@
 
 export type Modality = "visual" | "auditory" | "kinesthetic" | "reading";
 
-export type AffectSignal =
-  | "frustration"
-  | "disengagement"
-  | "delight"
-  | "calm";
+export type AffectSignal = "frustration" | "disengagement" | "delight" | "calm";
 
 export interface BaselineItem {
   id: string;
@@ -264,9 +260,7 @@ export function buildLearningProfile(
     // Default to all delivered modalities if the client did not supply
     // `consumedModality`; this still credits the learner against each
     // available modality, which is the conservative read.
-    const mods: readonly Modality[] = r.consumedModality
-      ? [r.consumedModality]
-      : it.modalities;
+    const mods: readonly Modality[] = r.consumedModality ? [r.consumedModality] : it.modalities;
     for (const m of mods) {
       const cur = buckets.get(m) ?? { correct: 0, n: 0 };
       cur.n += 1;
@@ -274,13 +268,11 @@ export function buildLearningProfile(
       buckets.set(m, cur);
     }
   }
-  const modalityFit: ModalityFit[] = [...buckets.entries()].map(
-    ([modality, b]) => ({
-      modality,
-      accuracy: b.n === 0 ? 0 : b.correct / b.n,
-      n: b.n,
-    }),
-  );
+  const modalityFit: ModalityFit[] = [...buckets.entries()].map(([modality, b]) => ({
+    modality,
+    accuracy: b.n === 0 ? 0 : b.correct / b.n,
+    n: b.n,
+  }));
   modalityFit.sort((a, b) => {
     if (b.accuracy !== a.accuracy) return b.accuracy - a.accuracy;
     if (b.n !== a.n) return b.n - a.n;
@@ -298,9 +290,7 @@ export function buildLearningProfile(
       : correctTimes.length % 2 === 1
         ? correctTimes[(correctTimes.length - 1) / 2]
         : Math.round(
-            (correctTimes[correctTimes.length / 2 - 1] +
-              correctTimes[correctTimes.length / 2]) /
-              2,
+            (correctTimes[correctTimes.length / 2 - 1] + correctTimes[correctTimes.length / 2]) / 2,
           );
 
   // ---- frustration rate + run-length ------------------------------------
@@ -308,9 +298,7 @@ export function buildLearningProfile(
   let attentionRunLength = state.administered.length;
   for (let i = 0; i < state.administered.length; i++) {
     const r = state.administered[i];
-    const fired = r.affect?.some(
-      (a) => a === "frustration" || a === "disengagement",
-    );
+    const fired = r.affect?.some((a) => a === "frustration" || a === "disengagement");
     if (fired) {
       frustrationCount += 1;
       if (attentionRunLength === state.administered.length) {
@@ -319,9 +307,7 @@ export function buildLearningProfile(
     }
   }
   const frustrationRate =
-    state.administered.length === 0
-      ? 0
-      : frustrationCount / state.administered.length;
+    state.administered.length === 0 ? 0 : frustrationCount / state.administered.length;
 
   const frustrationTolerance: LearningProfile["frustrationTolerance"] =
     frustrationRate >= 0.4 ? "low" : frustrationRate >= 0.15 ? "moderate" : "high";
@@ -344,10 +330,7 @@ export interface BaselineResult {
 }
 
 /** Convenience: end the assessment and produce the final result. */
-export function finalize(
-  state: BaselineState,
-  bank: readonly BaselineItem[],
-): BaselineResult {
+export function finalize(state: BaselineState, bank: readonly BaselineItem[]): BaselineResult {
   return {
     finalTheta: state.theta,
     itemsAdministered: state.administered.length,

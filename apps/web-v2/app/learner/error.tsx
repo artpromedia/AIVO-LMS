@@ -27,13 +27,11 @@ export default function LearnerError({
         Let's take a quick breath and try again.
       </h1>
       <p className="mt-3 text-aivo-ink-soft">
-        Your progress is saved. Tap "Try again" to come right back, or visit
-        home for your next mission.
+        Your progress is saved. Tap "Try again" to come right back, or visit home for your next
+        mission.
       </p>
       {error.digest ? (
-        <p className="mt-2 text-xs text-aivo-muted">
-          Reference: {error.digest}
-        </p>
+        <p className="mt-2 text-xs text-aivo-muted">Reference: {error.digest}</p>
       ) : null}
       <div className="mt-6 flex gap-3">
         <Button onClick={() => reset()}>Try again</Button>

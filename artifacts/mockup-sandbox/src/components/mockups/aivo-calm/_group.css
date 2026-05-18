@@ -1,19 +1,19 @@
 /* artifacts/mockup-sandbox/src/components/mockups/aivo-calm/_group.css */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
 
 :root {
   --background: 40 33% 93%; /* #f5f0e6 warm cream */
   --foreground: 215 25% 27%; /* deep slate */
-  
+
   --primary: 120 16% 66%; /* #9bb59b soft sage green */
   --primary-foreground: 215 25% 27%;
-  
+
   --secondary: 40 25% 85%; /* slightly darker cream */
   --secondary-foreground: 215 25% 27%;
-  
+
   --accent: 15 45% 65%; /* muted terracotta */
   --accent-foreground: 40 33% 93%;
-  
+
   --destructive: 0 45% 65%;
   --destructive-foreground: 40 33% 93%;
 
@@ -34,7 +34,7 @@
 }
 
 body {
-  font-family: 'DM Sans', sans-serif;
+  font-family: "DM Sans", sans-serif;
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
   line-height: 1.6;

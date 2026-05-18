@@ -26,7 +26,9 @@ export interface OpsAlertClientOptions {
 }
 
 export class OpsAlertClient {
-  private readonly opts: Required<Omit<OpsAlertClientOptions, "onAutoFlush" | "logger" | "fetchImpl">> & {
+  private readonly opts: Required<
+    Omit<OpsAlertClientOptions, "onAutoFlush" | "logger" | "fetchImpl">
+  > & {
     onAutoFlush?: OpsAlertClientOptions["onAutoFlush"];
     fetchImpl: typeof fetch;
     logger: ReturnType<typeof createLogger>;
@@ -91,7 +93,10 @@ export class OpsAlertClient {
     } catch (err: any) {
       this.stats.autoFlushErrorsTotal++;
       error = err instanceof Error ? err : new Error(String(err));
-      this.opts.logger.warn("ops_alert.auto_flush_error", { err: error.message, service: this.opts.service });
+      this.opts.logger.warn("ops_alert.auto_flush_error", {
+        err: error.message,
+        service: this.opts.service,
+      });
     }
     this.opts.onAutoFlush?.({ drained, error });
   }
@@ -120,10 +125,11 @@ export class OpsAlertClient {
     this.stats.enqueuedTotal++;
     this.stats.lastEnqueuedAt = envelope.occurredAt;
     if (!this.stats.firstNonZeroAt) this.stats.firstNonZeroAt = envelope.occurredAt;
-    this.opts.logger.warn(
-      "ops_alert.queued",
-      { service: this.opts.service, alertId: envelope.id, severity: envelope.severity },
-    );
+    this.opts.logger.warn("ops_alert.queued", {
+      service: this.opts.service,
+      alertId: envelope.id,
+      severity: envelope.severity,
+    });
     return { delivered: false, queued: true };
   }
 
@@ -206,10 +212,11 @@ export class OpsAlertClient {
       lost = leftover;
       this.stats.droppedTotal += lost;
       this.stats.lastDropReason = "shutdown_timeout";
-      this.opts.logger.error(
-        "ops_alert.dropped",
-        { service: this.opts.service, count: lost, reason: "shutdown_timeout" },
-      );
+      this.opts.logger.error("ops_alert.dropped", {
+        service: this.opts.service,
+        count: lost,
+        reason: "shutdown_timeout",
+      });
     }
 
     const outcome: ShutdownDrainOutcome = {
@@ -222,7 +229,10 @@ export class OpsAlertClient {
       finishedAt: new Date().toISOString(),
     };
     this.stats.lastShutdown = outcome;
-    this.opts.logger.info("ops_alert.shutdown_drain", outcome as unknown as Record<string, unknown>);
+    this.opts.logger.info(
+      "ops_alert.shutdown_drain",
+      outcome as unknown as Record<string, unknown>,
+    );
     return outcome;
   }
 

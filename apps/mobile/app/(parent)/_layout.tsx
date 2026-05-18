@@ -1,9 +1,9 @@
-import React from 'react';
-import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { colors } from '@/constants/colors';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useWindowSizeClass } from '@/src/design/useWindowSizeClass';
+import React from "react";
+import { Tabs } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { colors } from "@/constants/colors";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 
 export default function ParentLayout() {
   const { t } = useTranslation();
@@ -15,7 +15,7 @@ export default function ParentLayout() {
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textSecondary,
         tabBarStyle: isTablet
-          ? { display: 'none' }
+          ? { display: "none" }
           : {
               backgroundColor: colors.card,
               borderTopColor: colors.border,
@@ -24,7 +24,7 @@ export default function ParentLayout() {
               paddingTop: 8,
             },
         tabBarLabelStyle: {
-          fontFamily: 'Nunito-SemiBold',
+          fontFamily: "Nunito-SemiBold",
           fontSize: 11,
         },
       }}
@@ -32,44 +32,38 @@ export default function ParentLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: t('tabs.home'),
+          title: t("tabs.home"),
           tabBarIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="brain/[childId]/index"
         options={{
-          title: t('tabs.brain'),
+          title: t("tabs.brain"),
           tabBarIcon: ({ color, size }) => <Ionicons name="bulb" size={size} color={color} />,
           href: null,
         }}
       />
-      <Tabs.Screen
-        name="brain/[childId]/[domain]"
-        options={{ href: null }}
-      />
-      <Tabs.Screen
-        name="brain/[childId]/history"
-        options={{ href: null }}
-      />
+      <Tabs.Screen name="brain/[childId]/[domain]" options={{ href: null }} />
+      <Tabs.Screen name="brain/[childId]/history" options={{ href: null }} />
       <Tabs.Screen
         name="recommendations"
         options={{
-          title: t('tabs.inbox'),
+          title: t("tabs.inbox"),
           tabBarIcon: ({ color, size }) => <Ionicons name="mail" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="tutors"
         options={{
-          title: t('tabs.tutors'),
+          title: t("tabs.tutors"),
           tabBarIcon: ({ color, size }) => <Ionicons name="school" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: t('tabs.settings'),
+          title: t("tabs.settings"),
           tabBarIcon: ({ color, size }) => <Ionicons name="settings" size={size} color={color} />,
         }}
       />

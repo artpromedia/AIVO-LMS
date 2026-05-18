@@ -13,7 +13,11 @@ export interface HomeworkSurfacePanelProps {
  * When no surface is active the panel shows a calm placeholder so the
  * layout stays stable across steps.
  */
-export function HomeworkSurfacePanel({ surface, disabled = false, onSubmit }: HomeworkSurfacePanelProps) {
+export function HomeworkSurfacePanel({
+  surface,
+  disabled = false,
+  onSubmit,
+}: HomeworkSurfacePanelProps) {
   if (!surface) {
     return (
       <div className="homework-surface-panel-empty rounded border border-dashed p-4 text-sm text-gray-600">

@@ -35,12 +35,8 @@ export default async function Page() {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {rows.map((r) => (
           <Card key={r.k} className="p-[var(--aivo-density-card-pad)]">
-            <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-              {r.k}
-            </p>
-            <p className="mt-1 font-display text-3xl font-bold">
-              {r.v.toLocaleString()}
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{r.k}</p>
+            <p className="mt-1 font-display text-3xl font-bold">{r.v.toLocaleString()}</p>
           </Card>
         ))}
       </div>

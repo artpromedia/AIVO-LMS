@@ -16,7 +16,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ path
   const pathStr = path?.join("/") || "";
   const fullPath = `/api/admin-svc/${pathStr}`;
   const url = new URL(fullPath, getAdminSvcUrl());
-  
+
   // Preserve query string
   url.search = req.nextUrl.search;
 
@@ -38,10 +38,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ path
     });
     return response;
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to reach admin service" },
-      { status: 503 }
-    );
+    return NextResponse.json({ error: "Failed to reach admin service" }, { status: 503 });
   }
 }
 
@@ -50,7 +47,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pat
   const pathStr = path?.join("/") || "";
   const fullPath = `/api/admin-svc/${pathStr}`;
   const url = new URL(fullPath, getAdminSvcUrl());
-  
+
   try {
     const body = await req.text();
     const res = await fetch(url.toString(), {
@@ -71,19 +68,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pat
     });
     return response;
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to reach admin service" },
-      { status: 503 }
-    );
+    return NextResponse.json({ error: "Failed to reach admin service" }, { status: 503 });
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: Promise<{ path?: string[] }> }) {
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ path?: string[] }> },
+) {
   const { path } = await params;
   const pathStr = path?.join("/") || "";
   const fullPath = `/api/admin-svc/${pathStr}`;
   const url = new URL(fullPath, getAdminSvcUrl());
-  
+
   try {
     const res = await fetch(url.toString(), {
       method: "DELETE",
@@ -102,9 +99,6 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ p
     });
     return response;
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to reach admin service" },
-      { status: 503 }
-    );
+    return NextResponse.json({ error: "Failed to reach admin service" }, { status: 503 });
   }
 }

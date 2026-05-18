@@ -57,8 +57,7 @@ export default function RecommendationsV2Page() {
       {
         id: item.id,
         type: item.type,
-        status:
-          action === "accept" ? "APPLIED" : action === "amend" ? "APPLIED" : "DECLINED",
+        status: action === "accept" ? "APPLIED" : action === "amend" ? "APPLIED" : "DECLINED",
         decidedAt: new Date().toISOString(),
         title: item.title,
       },
@@ -78,10 +77,7 @@ export default function RecommendationsV2Page() {
 
       <section>
         <h2 className="mb-2 text-lg font-semibold">Pending</h2>
-        <RecommendationInbox
-          recommendations={pending}
-          onDecisionMade={handleDecisionMade}
-        />
+        <RecommendationInbox recommendations={pending} onDecisionMade={handleDecisionMade} />
       </section>
 
       <section>

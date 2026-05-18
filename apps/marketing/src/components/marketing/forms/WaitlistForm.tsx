@@ -70,8 +70,8 @@ export function WaitlistForm() {
         title="You're on the list."
         body={
           <>
-            We'll email <strong>{form.email}</strong> as new spots open. No spam, no sharing — just a
-            heads-up when it's your turn.
+            We'll email <strong>{form.email}</strong> as new spots open. No spam, no sharing — just
+            a heads-up when it's your turn.
           </>
         }
         primaryHref="/thank-you"
@@ -97,28 +97,72 @@ export function WaitlistForm() {
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <FormField id={id("name")} label="Your name" required error={errors.name}>
-          <input id={id("name")} type="text" autoComplete="name" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className={fieldInputClass} />
+          <input
+            id={id("name")}
+            type="text"
+            autoComplete="name"
+            required
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            className={fieldInputClass}
+          />
         </FormField>
         <FormField id={id("email")} label="Email" required error={errors.email}>
-          <input id={id("email")} type="email" autoComplete="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={fieldInputClass} />
+          <input
+            id={id("email")}
+            type="email"
+            autoComplete="email"
+            required
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            className={fieldInputClass}
+          />
         </FormField>
       </div>
 
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <FormField id={id("gradeBand")} label="Learner age / grade band">
-          <select id={id("gradeBand")} value={form.gradeBand} onChange={(e) => setForm({ ...form, gradeBand: e.target.value })} className={fieldInputClass}>
-            {GRADE_BANDS.map((g) => (<option key={g} value={g}>{g}</option>))}
+          <select
+            id={id("gradeBand")}
+            value={form.gradeBand}
+            onChange={(e) => setForm({ ...form, gradeBand: e.target.value })}
+            className={fieldInputClass}
+          >
+            {GRADE_BANDS.map((g) => (
+              <option key={g} value={g}>
+                {g}
+              </option>
+            ))}
           </select>
         </FormField>
         <FormField id={id("interestArea")} label="Most interested in">
-          <select id={id("interestArea")} value={form.interestArea} onChange={(e) => setForm({ ...form, interestArea: e.target.value })} className={fieldInputClass}>
-            {INTERESTS.map((i) => (<option key={i} value={i}>{i}</option>))}
+          <select
+            id={id("interestArea")}
+            value={form.interestArea}
+            onChange={(e) => setForm({ ...form, interestArea: e.target.value })}
+            className={fieldInputClass}
+          >
+            {INTERESTS.map((i) => (
+              <option key={i} value={i}>
+                {i}
+              </option>
+            ))}
           </select>
         </FormField>
       </div>
 
-      <FormField id={id("message")} label="Anything you'd like us to know?" hint="Optional — about your learner, your goals, what they love or struggle with.">
-        <textarea id={id("message")} rows={4} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className={fieldInputClass} />
+      <FormField
+        id={id("message")}
+        label="Anything you'd like us to know?"
+        hint="Optional — about your learner, your goals, what they love or struggle with."
+      >
+        <textarea
+          id={id("message")}
+          rows={4}
+          value={form.message}
+          onChange={(e) => setForm({ ...form, message: e.target.value })}
+          className={fieldInputClass}
+        />
       </FormField>
 
       <div className="space-y-1.5">
@@ -134,7 +178,10 @@ export function WaitlistForm() {
           />
           <span>
             I agree AIVO can email me about my waitlist spot. See our{" "}
-            <a href="/privacy-policy" className="font-semibold text-purple-700 underline">privacy policy</a>.
+            <a href="/privacy-policy" className="font-semibold text-purple-700 underline">
+              privacy policy
+            </a>
+            .
           </span>
         </label>
         {errors.consent ? (
@@ -144,9 +191,15 @@ export function WaitlistForm() {
         ) : null}
       </div>
 
-      {status === "error" ? <FormErrorPanel message={errorMessage} onRetry={() => reset()} /> : null}
+      {status === "error" ? (
+        <FormErrorPanel message={errorMessage} onRetry={() => reset()} />
+      ) : null}
 
-      <button type="submit" disabled={status === "submitting"} className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-primary to-purple-600 px-7 py-3 font-bold text-white shadow-sm transition hover:from-primary-dark hover:to-purple-700 disabled:opacity-60">
+      <button
+        type="submit"
+        disabled={status === "submitting"}
+        className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-primary to-purple-600 px-7 py-3 font-bold text-white shadow-sm transition hover:from-primary-dark hover:to-purple-700 disabled:opacity-60"
+      >
         {status === "submitting" ? "Saving your spot…" : "Join the waitlist"}
       </button>
     </form>

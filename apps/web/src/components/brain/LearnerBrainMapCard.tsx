@@ -134,7 +134,10 @@ function buildInsights(label: string, status: SubjectStatus, xai: any) {
   const strengths: string[] = [];
   if (status === "ahead") strengths.push("Performing above expected grade level");
   if (status === "onTrack") strengths.push("Aligned with expected grade level");
-  if (tutorMatches.length > 0) strengths.push(`${tutorMatches.length} adaptive tutor${tutorMatches.length > 1 ? "s" : ""} active`);
+  if (tutorMatches.length > 0)
+    strengths.push(
+      `${tutorMatches.length} adaptive tutor${tutorMatches.length > 1 ? "s" : ""} active`,
+    );
 
   let recommendation = `Continue grade-level practice in ${label.toLowerCase()}.`;
   if (status === "ahead") {
@@ -295,9 +298,16 @@ export default function LearnerBrainMapCard({
         <div className="flex items-center gap-2">
           <div
             className="w-9 h-9 rounded-full"
-            style={{ background: "color-mix(in srgb, var(--tier-primary, #7C3AED) 18%, transparent)" }}
+            style={{
+              background: "color-mix(in srgb, var(--tier-primary, #7C3AED) 18%, transparent)",
+            }}
           />
-          <div className="flex-1 h-3 rounded" style={{ background: "color-mix(in srgb, var(--tier-primary, #7C3AED) 12%, transparent)" }} />
+          <div
+            className="flex-1 h-3 rounded"
+            style={{
+              background: "color-mix(in srgb, var(--tier-primary, #7C3AED) 12%, transparent)",
+            }}
+          />
         </div>
       </div>
     );
@@ -324,7 +334,8 @@ export default function LearnerBrainMapCard({
         </div>
         <p className="font-heading font-bold mb-1">Brain not built yet</p>
         <p className="text-xs mb-3" style={{ color: "var(--tier-text-soft, #5C5067)" }}>
-          Once {learnerName} finishes the baseline adventure, their personalized Brain Clone will appear here.
+          Once {learnerName} finishes the baseline adventure, their personalized Brain Clone will
+          appear here.
         </p>
         <button
           type="button"
@@ -344,10 +355,6 @@ export default function LearnerBrainMapCard({
   }
 
   return (
-    <LearnerBrainMap
-      learnerName={learnerName}
-      expectedGrade={expectedGrade}
-      subjects={subjects}
-    />
+    <LearnerBrainMap learnerName={learnerName} expectedGrade={expectedGrade} subjects={subjects} />
   );
 }

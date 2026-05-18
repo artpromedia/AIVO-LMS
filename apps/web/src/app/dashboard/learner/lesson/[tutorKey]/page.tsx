@@ -17,7 +17,6 @@ import type { Beat, TutorState, FunctioningLevel } from "@/components/stage/type
 import { fetchTutorSurfaceBeats } from "@/components/stage/TutorSurfaceRuntime";
 import { TUTOR_KEY_TO_SKU, isTutorKey } from "@aivo/billing-entitlements";
 
-
 export default function LessonPage() {
   const { user, accessToken, loading } = useAuth();
   const router = useRouter();
@@ -46,20 +45,31 @@ export default function LessonPage() {
   } | null>(null);
   const tCurriculum = useTranslations("curriculum");
   const tDape = useTranslations("dape");
-  const [dapeProfile, setDapeProfile] = useState<{ hasActiveTrack: boolean; categories: { id: string; label: string; goalCount: number }[] } | null>(null);
+  const [dapeProfile, setDapeProfile] = useState<{
+    hasActiveTrack: boolean;
+    categories: { id: string; label: string; goalCount: number }[];
+  } | null>(null);
   const [dapeActivity, setDapeActivity] = useState<null | {
     category: string;
-    activity: { name: string; pictureSequence: string[]; steps: string[]; equipment: string[]; partnerCue: string; durationMin: number };
+    activity: {
+      name: string;
+      pictureSequence: string[];
+      steps: string[];
+      equipment: string[];
+      partnerCue: string;
+      durationMin: number;
+    };
   }>(null);
   const [dapeLoading, setDapeLoading] = useState(false);
 
   const { adaptations, getRegulationBreak } = useSensoryAdapter(
     user?.id || null,
     accessToken,
-    functioningLevel
+    functioningLevel,
   );
 
-  const { state, currentBeat, progress, setPhase, loadBeats, nextBeat, recordAnswer, cleanup } = useSessionFlow(tutorKey, user?.id || "", functioningLevel);
+  const { state, currentBeat, progress, setPhase, loadBeats, nextBeat, recordAnswer, cleanup } =
+    useSessionFlow(tutorKey, user?.id || "", functioningLevel);
 
   const { locale } = useLocale();
   const { speak, stop: stopTTS, isSpeaking } = useTTS(tutorKey, adaptations, locale);
@@ -124,38 +134,48 @@ export default function LessonPage() {
         headers: { Authorization: `Bearer ${accessToken}` },
       })
         .then((r) => (r.ok ? r.json() : null))
-        .then((data) => { if (data) setDapeProfile(data); })
+        .then((data) => {
+          if (data) setDapeProfile(data);
+        })
         .catch(() => {});
     }
   }, [accessToken, user, tutorKey]);
 
-  const loadDapeActivity = useCallback(async (category?: string) => {
-    if (!user || !accessToken) return;
-    setDapeLoading(true);
-    try {
-      const url = `/api/family/iep/${user.id}/dape/activity${category ? `?category=${encodeURIComponent(category)}` : ""}`;
-      const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
-      if (res.ok) setDapeActivity(await res.json());
-    } catch { /* ignore */ }
-    setDapeLoading(false);
-  }, [user, accessToken]);
-
-  const handleNarration = useCallback(async (beat: Beat | null) => {
-    if (!beat?.narration) {
-      if (beat && !beat.interaction) {
-        setTimeout(() => nextBeat(), 1500);
+  const loadDapeActivity = useCallback(
+    async (category?: string) => {
+      if (!user || !accessToken) return;
+      setDapeLoading(true);
+      try {
+        const url = `/api/family/iep/${user.id}/dape/activity${category ? `?category=${encodeURIComponent(category)}` : ""}`;
+        const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+        if (res.ok) setDapeActivity(await res.json());
+      } catch {
+        /* ignore */
       }
-      return;
-    }
-    setSpeechText(beat.narration);
-    setTutorState(beat.tutorState || "speaking");
-    await speak(beat.narration);
-    setTutorState("idle");
-    if (!beat.interaction) {
-      const delay = beat.type === "celebration" ? 2000 : 1500;
-      setTimeout(() => nextBeat(), delay);
-    }
-  }, [speak, nextBeat]);
+      setDapeLoading(false);
+    },
+    [user, accessToken],
+  );
+
+  const handleNarration = useCallback(
+    async (beat: Beat | null) => {
+      if (!beat?.narration) {
+        if (beat && !beat.interaction) {
+          setTimeout(() => nextBeat(), 1500);
+        }
+        return;
+      }
+      setSpeechText(beat.narration);
+      setTutorState(beat.tutorState || "speaking");
+      await speak(beat.narration);
+      setTutorState("idle");
+      if (!beat.interaction) {
+        const delay = beat.type === "celebration" ? 2000 : 1500;
+        setTimeout(() => nextBeat(), delay);
+      }
+    },
+    [speak, nextBeat],
+  );
 
   useEffect(() => {
     if (started && currentBeat) {
@@ -246,7 +266,11 @@ export default function LessonPage() {
             eventType: "lesson_completed",
             xpAmount: state.xpEarned || 50,
             coinReward: state.coinsEarned || 10,
-            metadata: { tutorKey, correctCount: state.correctCount, totalAttempts: state.totalAttempts },
+            metadata: {
+              tutorKey,
+              correctCount: state.correctCount,
+              totalAttempts: state.totalAttempts,
+            },
           }),
         });
       } catch {}
@@ -261,24 +285,31 @@ export default function LessonPage() {
     }
   };
 
-  const handleAnswer = useCallback((correct: boolean) => {
-    if (correct) {
-      setTutorState("celebrating");
-      setSpeechText(["Great job!", "Amazing!", "You got it!", "Wonderful!"][Math.floor(Math.random() * 4)]);
-      recordAnswer(true, 15, 3);
-      speak(["Great job!", "Amazing!", "You got it!", "Wonderful!"][Math.floor(Math.random() * 4)]).then(() => {
-        setTutorState("idle");
-        setTimeout(() => nextBeat(), 800);
-      });
-    } else {
-      setTutorState("encouraging");
-      setSpeechText("That's okay! Let's try again!");
-      recordAnswer(false, 5, 1);
-      speak("That's okay! Let's try again!").then(() => {
-        setTutorState("idle");
-      });
-    }
-  }, [recordAnswer, nextBeat, speak]);
+  const handleAnswer = useCallback(
+    (correct: boolean) => {
+      if (correct) {
+        setTutorState("celebrating");
+        setSpeechText(
+          ["Great job!", "Amazing!", "You got it!", "Wonderful!"][Math.floor(Math.random() * 4)],
+        );
+        recordAnswer(true, 15, 3);
+        speak(
+          ["Great job!", "Amazing!", "You got it!", "Wonderful!"][Math.floor(Math.random() * 4)],
+        ).then(() => {
+          setTutorState("idle");
+          setTimeout(() => nextBeat(), 800);
+        });
+      } else {
+        setTutorState("encouraging");
+        setSpeechText("That's okay! Let's try again!");
+        recordAnswer(false, 5, 1);
+        speak("That's okay! Let's try again!").then(() => {
+          setTutorState("idle");
+        });
+      }
+    },
+    [recordAnswer, nextBeat, speak],
+  );
 
   const handlePause = useCallback(() => {
     stopTTS();
@@ -299,7 +330,12 @@ export default function LessonPage() {
   }, [cleanup, router]);
 
   if (loading || !user) return null;
-  if (!tutor) return <div className="min-h-screen flex items-center justify-center text-slate-500 font-heading">{tTutor("not_found")}</div>;
+  if (!tutor)
+    return (
+      <div className="min-h-screen flex items-center justify-center text-slate-500 font-heading">
+        {tTutor("not_found")}
+      </div>
+    );
 
   const theme = TUTOR_THEMES[tutorKey];
 
@@ -314,15 +350,31 @@ export default function LessonPage() {
               borderColor: `${tutor.color}26`,
             }}
           >
-            <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full blur-2xl" style={{ backgroundColor: `${tutor.color}30` }} aria-hidden />
-            <div className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-[hsl(43_100%_50%/0.18)] blur-2xl" aria-hidden />
+            <div
+              className="absolute -top-8 -right-8 w-32 h-32 rounded-full blur-2xl"
+              style={{ backgroundColor: `${tutor.color}30` }}
+              aria-hidden
+            />
+            <div
+              className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-[hsl(43_100%_50%/0.18)] blur-2xl"
+              aria-hidden
+            />
             <div className="relative">
-              <div className="relative w-32 h-32 md:w-36 md:h-36 rounded-3xl overflow-hidden border-4 shadow-xl mx-auto mb-6 animate-breathe" style={{ borderColor: tutor.color }}>
+              <div
+                className="relative w-32 h-32 md:w-36 md:h-36 rounded-3xl overflow-hidden border-4 shadow-xl mx-auto mb-6 animate-breathe"
+                style={{ borderColor: tutor.color }}
+              >
                 <Image src={tutor.avatar} alt={tutor.name} fill className="object-cover" priority />
               </div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] mb-2" style={{ color: tutor.color }}>{tutor.domain}</p>
+              <p
+                className="text-xs font-bold uppercase tracking-[0.2em] mb-2"
+                style={{ color: tutor.color }}
+              >
+                {tutor.domain}
+              </p>
               <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 leading-tight">
-                Learn with {tutor.name} <Sparkles className="inline w-7 h-7 text-[hsl(43_100%_50%)]" aria-hidden />
+                Learn with {tutor.name}{" "}
+                <Sparkles className="inline w-7 h-7 text-[hsl(43_100%_50%)]" aria-hidden />
               </h1>
               <p className="text-base text-slate-600 mb-1">{theme?.envName || tutor.domain}</p>
               {learnerName && (
@@ -348,10 +400,18 @@ export default function LessonPage() {
               )}
 
               {tutorKey === "vigor" && dapeProfile?.hasActiveTrack && (
-                <div className="mt-6 text-left rounded-2xl border-2 p-4 bg-white" style={{ borderColor: `${tutor.color}40` }}>
+                <div
+                  className="mt-6 text-left rounded-2xl border-2 p-4 bg-white"
+                  style={{ borderColor: `${tutor.color}40` }}
+                >
                   <div className="flex items-center justify-between mb-2 gap-3">
                     <div>
-                      <p className="text-xs font-bold uppercase tracking-wide" style={{ color: tutor.color }}>{tDape("track_label")}</p>
+                      <p
+                        className="text-xs font-bold uppercase tracking-wide"
+                        style={{ color: tutor.color }}
+                      >
+                        {tDape("track_label")}
+                      </p>
                       <p className="font-extrabold text-slate-900">{tDape("track_heading")}</p>
                     </div>
                     <button
@@ -361,7 +421,11 @@ export default function LessonPage() {
                       className="text-xs font-bold rounded-full px-3 py-1.5 disabled:opacity-50"
                       style={{ backgroundColor: `${tutor.color}18`, color: tutor.color }}
                     >
-                      {dapeActivity ? tDape("new_activity") : (dapeLoading ? tDape("loading") : tDape("suggest_activity"))}
+                      {dapeActivity
+                        ? tDape("new_activity")
+                        : dapeLoading
+                          ? tDape("loading")
+                          : tDape("suggest_activity")}
                     </button>
                   </div>
                   {dapeProfile.categories.length > 0 && (
@@ -380,15 +444,21 @@ export default function LessonPage() {
                   )}
                   {dapeActivity && (
                     <div className="rounded-xl bg-slate-50 p-3 space-y-2">
-                      <p className="font-extrabold text-slate-900 text-sm">{dapeActivity.activity.name}</p>
+                      <p className="font-extrabold text-slate-900 text-sm">
+                        {dapeActivity.activity.name}
+                      </p>
                       <p className="text-2xl tracking-widest" aria-hidden>
                         {dapeActivity.activity.pictureSequence.join(" ")}
                       </p>
                       <ol className="list-decimal list-inside text-xs text-slate-700 space-y-0.5">
-                        {dapeActivity.activity.steps.map((s, i) => <li key={i}>{s}</li>)}
+                        {dapeActivity.activity.steps.map((s, i) => (
+                          <li key={i}>{s}</li>
+                        ))}
                       </ol>
                       {dapeActivity.activity.partnerCue && (
-                        <p className="text-xs italic text-slate-500">{tDape("partner_cue")}: {dapeActivity.activity.partnerCue}</p>
+                        <p className="text-xs italic text-slate-500">
+                          {tDape("partner_cue")}: {dapeActivity.activity.partnerCue}
+                        </p>
                       )}
                     </div>
                   )}
@@ -426,7 +496,9 @@ export default function LessonPage() {
               {tCurriculum("stage_banner_label")}
             </span>
             <span className="font-semibold truncate max-w-[18rem]">
-              {curriculumFocus.title || (curriculumFocus.topics || [])[0] || curriculumFocus.summary?.slice(0, 60)}
+              {curriculumFocus.title ||
+                (curriculumFocus.topics || [])[0] ||
+                curriculumFocus.summary?.slice(0, 60)}
             </span>
           </div>
         </div>
@@ -448,24 +520,37 @@ export default function LessonPage() {
 
       {showPause && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm animate-fade-in px-4">
-          <div className="vi-card p-8 max-w-sm w-full text-center space-y-5 animate-scale-in border-2" style={{ borderColor: `${tutor.color}26` }}>
+          <div
+            className="vi-card p-8 max-w-sm w-full text-center space-y-5 animate-scale-in border-2"
+            style={{ borderColor: `${tutor.color}26` }}
+          >
             <div className="mx-auto inline-flex">
               <div className="w-16 h-16 rounded-3xl flex items-center justify-center bg-[hsl(199_89%_48%/0.12)] text-[hsl(199_89%_48%)] animate-breathe">
                 <Wind className="w-8 h-8" strokeWidth={2.5} aria-hidden />
               </div>
             </div>
             <div>
-              <h2 className="text-2xl font-extrabold text-slate-900 mb-1">{tLearner("taking_break")}</h2>
+              <h2 className="text-2xl font-extrabold text-slate-900 mb-1">
+                {tLearner("taking_break")}
+              </h2>
               <p className="text-slate-600">{tLearner("take_breath")}</p>
             </div>
 
             {dapeProfile?.hasActiveTrack && dapeActivity && (
               <div className="rounded-xl bg-slate-50 p-3 text-left space-y-1.5">
-                <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">{tDape("regulation_break")}</p>
-                <p className="font-extrabold text-slate-900 text-sm">{dapeActivity.activity.name}</p>
-                <p className="text-xl tracking-widest" aria-hidden>{dapeActivity.activity.pictureSequence.join(" ")}</p>
+                <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">
+                  {tDape("regulation_break")}
+                </p>
+                <p className="font-extrabold text-slate-900 text-sm">
+                  {dapeActivity.activity.name}
+                </p>
+                <p className="text-xl tracking-widest" aria-hidden>
+                  {dapeActivity.activity.pictureSequence.join(" ")}
+                </p>
                 <ol className="list-decimal list-inside text-xs text-slate-700 space-y-0.5">
-                  {dapeActivity.activity.steps.slice(0, 3).map((s, i) => <li key={i}>{s}</li>)}
+                  {dapeActivity.activity.steps.slice(0, 3).map((s, i) => (
+                    <li key={i}>{s}</li>
+                  ))}
                 </ol>
               </div>
             )}
@@ -479,7 +564,10 @@ export default function LessonPage() {
                 <Play className="w-4 h-4 fill-white" /> {tLearner("resume")}
               </button>
               <button
-                onClick={() => { cleanup(); router.push("/dashboard/learner"); }}
+                onClick={() => {
+                  cleanup();
+                  router.push("/dashboard/learner");
+                }}
                 className="flex-1 inline-flex items-center justify-center gap-2 py-3 rounded-full font-extrabold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
               >
                 <LogOut className="w-4 h-4" /> {tLearner("log_out")}

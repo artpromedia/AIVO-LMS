@@ -54,6 +54,15 @@
         }
       }
     },
+    "/health": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Default Response"
+          }
+        }
+      }
+    },
     "/api/integrations/connectors": {
       "get": {
         "operationId": "listConnectors",

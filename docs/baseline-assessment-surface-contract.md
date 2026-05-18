@@ -9,12 +9,24 @@ client.
 
 ```ts
 type ActivityInteraction =
-  | "choice_grid" | "tap_image" | "tap_word"
-  | "drag_sort" | "drag_place" | "sequence"
-  | "pattern_fill" | "memory" | "memory_sequence"
-  | "observation" | "emotion_pick"
-  | "draw" | "scratchpad" | "geometry_workspace" | "math_expression"
-  | "voice_response" | "reading_annotation" | "science_diagram";
+  | "choice_grid"
+  | "tap_image"
+  | "tap_word"
+  | "drag_sort"
+  | "drag_place"
+  | "sequence"
+  | "pattern_fill"
+  | "memory"
+  | "memory_sequence"
+  | "observation"
+  | "emotion_pick"
+  | "draw"
+  | "scratchpad"
+  | "geometry_workspace"
+  | "math_expression"
+  | "voice_response"
+  | "reading_annotation"
+  | "science_diagram";
 
 interface DiscoveryActivity {
   id: string;
@@ -28,7 +40,10 @@ interface DiscoveryActivity {
   tutorLine?: string;
   feedbackMode?: FeedbackMode;
   brainMeasures?: string[];
-  scoring?: { mode: "exact" | "rubric" | "process" | "hybrid"; correctAnswer?: string | number | boolean };
+  scoring?: {
+    mode: "exact" | "rubric" | "process" | "hybrid";
+    correctAnswer?: string | number | boolean;
+  };
   surface?: LearnerSurfaceSpec;
   choices?: ChoiceOption[];
 }
@@ -41,7 +56,7 @@ interface DiscoveryActivity {
 - `delayed_after_block` — defer until block end.
 - `no_correctness_feedback_diagnostic` — never reveal correctness;
   client returns the neutral acknowledgement
-  *"Thanks, I learned how you solve that."*
+  _"Thanks, I learned how you solve that."_
 
 ## Scoring modes
 
@@ -70,7 +85,7 @@ Rejected items appear in the response under `rejectedActivities`.
 ## Fallback behavior
 
 When AI generation fails the assessment service returns a 502 if
-*every* item is invalid. Otherwise it returns the partial set of
+_every_ item is invalid. Otherwise it returns the partial set of
 valid items with `personalizationLevel: "partial"`. The client
 attempts a single retry before falling back to the bundled warm-up
 activities. Fallback is always labeled as such in the

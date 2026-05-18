@@ -10,7 +10,12 @@ import { promises as fsp } from "node:fs";
 import { createLogger, registerObservabilityPlugin } from "@aivo/observability";
 import { createDb } from "@aivo/db";
 import { bootstrapOpsAlerts } from "@aivo/ops-alerts";
-import { initKeys, logAdminEnterpriseFlags, assertMfaKeyConfigured, registerAdminIpAllowlist } from "@aivo/security";
+import {
+  initKeys,
+  logAdminEnterpriseFlags,
+  assertMfaKeyConfigured,
+  registerAdminIpAllowlist,
+} from "@aivo/security";
 import { registerAuthRoutes } from "./routes/auth.js";
 import { registerTestHelperRoutes } from "./routes/test-helpers.js";
 import { registerUserRoutes } from "./routes/users.js";
@@ -25,8 +30,16 @@ import { registerDistrictAdminRoutes } from "./routes/district-admins.js";
 import { registerSsoRoutes } from "./routes/sso.js";
 import { registerScimRoutes } from "./routes/scim.js";
 import { registerAvatarRoutes } from "./routes/avatars.js";
-import { AVATAR_MAX_BYTES, AVATAR_STORAGE_ROOT, AVATAR_S3_ENABLED, getAvatarObjectFromS3 } from "./lib/avatar-storage.js";
-import { registerDistrictTenantScope, REQUIRE_DISTRICT_ADMIN_FLAG } from "./hooks/require-district-admin.js";
+import {
+  AVATAR_MAX_BYTES,
+  AVATAR_STORAGE_ROOT,
+  AVATAR_S3_ENABLED,
+  getAvatarObjectFromS3,
+} from "./lib/avatar-storage.js";
+import {
+  registerDistrictTenantScope,
+  REQUIRE_DISTRICT_ADMIN_FLAG,
+} from "./hooks/require-district-admin.js";
 
 const logger = createLogger("identity-svc");
 const PORT = parseInt(process.env.PORT || "3001", 10);
@@ -58,9 +71,9 @@ export async function buildApp() {
   ) {
     logger.warn(
       "DATABASE_URL is missing sslmode=require in production. PII " +
-      "(emails, password hashes, MFA codes) is being transmitted over " +
-      "an unencrypted database connection. Append `?sslmode=require` " +
-      "(or stronger) to your connection string immediately.",
+        "(emails, password hashes, MFA codes) is being transmitted over " +
+        "an unencrypted database connection. Append `?sslmode=require` " +
+        "(or stronger) to your connection string immediately.",
     );
   }
 
@@ -81,7 +94,9 @@ export async function buildApp() {
   const isDev = process.env.NODE_ENV === "development" || !process.env.NODE_ENV;
   let corsOrigin: boolean | string[];
   if (process.env.CORS_ORIGINS) {
-    corsOrigin = process.env.CORS_ORIGINS.split(",").map((s) => s.trim()).filter(Boolean);
+    corsOrigin = process.env.CORS_ORIGINS.split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
   } else if (!isDev) {
     corsOrigin = process.env.APP_URL ? [process.env.APP_URL] : [];
   } else {
@@ -166,11 +181,14 @@ export async function buildApp() {
       info: {
         title: "AIVO Identity Service",
         version: "1.0.0",
-        description: "Authentication, authorization, and user management for AIVO Learning Platform",
+        description:
+          "Authentication, authorization, and user management for AIVO Learning Platform",
       },
       servers: process.env.SWAGGER_SERVER_URL
         ? [{ url: process.env.SWAGGER_SERVER_URL }]
-        : (process.env.NODE_ENV === "production" ? [] : [{ url: `http://localhost:${PORT}` }]),
+        : process.env.NODE_ENV === "production"
+          ? []
+          : [{ url: `http://localhost:${PORT}` }],
       components: {
         securitySchemes: {
           bearerAuth: {
@@ -226,17 +244,21 @@ async function start() {
   // tenant-scope hook. We can't introspect Fastify hooks directly, so
   // the assertion here is "the prefix has at least one registered
   // route AND the global hook was installed".
-  const districtRoutes = app.printRoutes({ commonPrefix: false })
+  const districtRoutes = app
+    .printRoutes({ commonPrefix: false })
     .split("\n")
     .filter((l) => l.includes("/api/district/"));
   if (districtRoutes.length === 0) {
-    throw new Error("[boot-check] No /api/district/* routes registered — tenant-scope hook would silently no-op.");
+    throw new Error(
+      "[boot-check] No /api/district/* routes registered — tenant-scope hook would silently no-op.",
+    );
   }
   await app.listen({ port: PORT, host: "0.0.0.0" });
   logger.info(`Identity service listening on port ${PORT}`);
   // Sprint 7: fleet-wide daily housekeeping via the shared scheduler.
   try {
-    const { startSafeCron, createDrizzleAdvisoryLock, createDrizzleLedger } = await import("@aivo/scheduling");
+    const { startSafeCron, createDrizzleAdvisoryLock, createDrizzleLedger } =
+      await import("@aivo/scheduling");
     const { runSessionHousekeepingOnce } = await import("./lib/session-housekeeping.js");
     const db = createDb(process.env.DATABASE_URL ?? "");
     startSafeCron({
@@ -256,7 +278,9 @@ async function start() {
 const isMain = (() => {
   try {
     return process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 })();
 if (isMain) {
   start().catch((err) => {

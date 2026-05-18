@@ -18,13 +18,17 @@ export function RecoveryCodesTab({ injectedCodes, onCodesShown }: Props) {
 
   const loadStatus = async () => {
     try {
-      const r = await fetch("/api/auth/mfa/recovery/status", { headers: { Authorization: `Bearer ${accessToken}` } });
+      const r = await fetch("/api/auth/mfa/recovery/status", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
       const d = await r.json();
       if (r.ok) setRemaining(d.remaining ?? 0);
     } catch {}
   };
 
-  useEffect(() => { if (accessToken) loadStatus(); }, [accessToken]);
+  useEffect(() => {
+    if (accessToken) loadStatus();
+  }, [accessToken]);
 
   useEffect(() => {
     if (injectedCodes && injectedCodes.length) {
@@ -36,7 +40,8 @@ export function RecoveryCodesTab({ injectedCodes, onCodesShown }: Props) {
 
   const regenerate = async () => {
     if (!password) return;
-    setErr(""); setBusy(true);
+    setErr("");
+    setBusy(true);
     try {
       const r = await fetch("/api/auth/mfa/recovery/regenerate", {
         method: "POST",
@@ -48,9 +53,12 @@ export function RecoveryCodesTab({ injectedCodes, onCodesShown }: Props) {
       else {
         setCodes(d.recoveryCodes || []);
         setRemaining((d.recoveryCodes || []).length);
-        setPassword(""); setShowPwForm(false);
+        setPassword("");
+        setShowPwForm(false);
       }
-    } catch { setErr("Network error"); }
+    } catch {
+      setErr("Network error");
+    }
     setBusy(false);
   };
 
@@ -64,8 +72,11 @@ export function RecoveryCodesTab({ injectedCodes, onCodesShown }: Props) {
     const blob = new Blob([codes.join("\n") + "\n"], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = "aivo-recovery-codes.txt";
-    document.body.appendChild(a); a.click(); a.remove();
+    a.href = url;
+    a.download = "aivo-recovery-codes.txt";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
     URL.revokeObjectURL(url);
   };
 
@@ -86,36 +97,67 @@ export function RecoveryCodesTab({ injectedCodes, onCodesShown }: Props) {
             Save these now — they will not be shown again.
           </div>
           <div className="grid grid-cols-2 gap-2 p-4 rounded-xl bg-slate-50 border border-slate-200 font-mono text-sm">
-            {codes.map((c, i) => <div key={i} className="tracking-widest">{c}</div>)}
+            {codes.map((c, i) => (
+              <div key={i} className="tracking-widest">
+                {c}
+              </div>
+            ))}
           </div>
           <div className="flex gap-2">
-            <button onClick={copyAll} className="px-4 py-2 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">Copy all</button>
-            <button onClick={downloadTxt} className="px-4 py-2 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">Download .txt</button>
-            <button onClick={() => setCodes(null)} className="px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-bold hover:bg-violet-700">I've saved them</button>
+            <button
+              onClick={copyAll}
+              className="px-4 py-2 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              Copy all
+            </button>
+            <button
+              onClick={downloadTxt}
+              className="px-4 py-2 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              Download .txt
+            </button>
+            <button
+              onClick={() => setCodes(null)}
+              className="px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-bold hover:bg-violet-700"
+            >
+              I've saved them
+            </button>
           </div>
         </div>
       ) : showPwForm ? (
         <div className="space-y-3">
           <input
-            type="password" value={password} onChange={e => setPassword(e.target.value)}
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             placeholder="Confirm your password"
             className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:border-violet-400 focus:ring-2 focus:ring-violet-100 outline-none"
           />
           <div className="flex gap-3">
-            <button onClick={regenerate} disabled={busy || !password}
-              className="flex-1 py-2.5 rounded-xl bg-violet-600 text-white font-bold text-sm hover:bg-violet-700 disabled:opacity-50">
+            <button
+              onClick={regenerate}
+              disabled={busy || !password}
+              className="flex-1 py-2.5 rounded-xl bg-violet-600 text-white font-bold text-sm hover:bg-violet-700 disabled:opacity-50"
+            >
               {busy ? "Generating…" : "Generate new codes"}
             </button>
-            <button onClick={() => { setShowPwForm(false); setPassword(""); }}
-              className="px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-600 hover:bg-slate-50">
+            <button
+              onClick={() => {
+                setShowPwForm(false);
+                setPassword("");
+              }}
+              className="px-4 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-600 hover:bg-slate-50"
+            >
               Cancel
             </button>
           </div>
           {err && <p className="text-sm text-red-600">{err}</p>}
         </div>
       ) : (
-        <button onClick={() => setShowPwForm(true)}
-          className="px-5 py-2.5 rounded-xl border border-violet-200 text-violet-700 text-sm font-bold hover:bg-violet-50">
+        <button
+          onClick={() => setShowPwForm(true)}
+          className="px-5 py-2.5 rounded-xl border border-violet-200 text-violet-700 text-sm font-bold hover:bg-violet-50"
+        >
           Generate new recovery codes
         </button>
       )}

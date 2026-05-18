@@ -3,7 +3,13 @@
  */
 import { describe, it, expect, beforeAll } from "vitest";
 import { serviceUrl } from "./helpers/services.js";
-import { createTenant, createUser, createLearner, createBrainState, pollUntil } from "./helpers/fixtures.js";
+import {
+  createTenant,
+  createUser,
+  createLearner,
+  createBrainState,
+  pollUntil,
+} from "./helpers/fixtures.js";
 
 describe("Journey 3: Weekly progress report", () => {
   let adminToken: string;
@@ -70,9 +76,12 @@ describe("Journey 3: Weekly progress report", () => {
   });
 
   it("5. Comms-svc notification created for parent", async () => {
-    const res = await fetch(serviceUrl("comms-svc", `/api/comms/notifications?learnerId=${learnerId}&type=weekly_report`), {
-      headers: { Authorization: `Bearer ${adminToken}` },
-    });
+    const res = await fetch(
+      serviceUrl("comms-svc", `/api/comms/notifications?learnerId=${learnerId}&type=weekly_report`),
+      {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      },
+    );
     expect(res.status).toBe(200);
     const data = (await res.json()) as any[];
     expect(data.length).toBeGreaterThan(0);

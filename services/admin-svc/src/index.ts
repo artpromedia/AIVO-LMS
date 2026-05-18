@@ -36,7 +36,10 @@ const PORT = parseInt(process.env.ADMIN_SVC_PORT || "3013", 10);
 
 type CronHandles = Record<string, SafeCronHandle>;
 
-export async function buildApp(handles: CronHandles = {}, db = createDb(process.env.DATABASE_URL ?? "")) {
+export async function buildApp(
+  handles: CronHandles = {},
+  db = createDb(process.env.DATABASE_URL ?? ""),
+) {
   logAdminEnterpriseFlags(logger);
   const app = Fastify({ logger: false });
 
@@ -49,7 +52,9 @@ export async function buildApp(handles: CronHandles = {}, db = createDb(process.
       info: { title: "AIVO Admin Service", version: "1.0.0" },
       servers: process.env.SWAGGER_SERVER_URL
         ? [{ url: process.env.SWAGGER_SERVER_URL }]
-        : (process.env.NODE_ENV === "production" ? [] : [{ url: `http://localhost:${PORT}` }]),
+        : process.env.NODE_ENV === "production"
+          ? []
+          : [{ url: `http://localhost:${PORT}` }],
       components: {
         securitySchemes: { bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" } },
       },
@@ -125,7 +130,9 @@ async function start() {
 const isMain = (() => {
   try {
     return process.argv[1] && import.meta.url === new URL(`file://${process.argv[1]}`).href;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 })();
 if (isMain) {
   start().catch((err) => {

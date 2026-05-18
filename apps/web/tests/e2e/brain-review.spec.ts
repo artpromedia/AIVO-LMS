@@ -37,7 +37,12 @@ test.describe("brain review", () => {
           functioningLevel: 3,
           accommodations: [
             { id: "acc-1", name: "Extra time", enabled: true, reason: "Processing speed signal" },
-            { id: "acc-2", name: "Visual prompts", enabled: false, reason: "Visual-spatial preference" },
+            {
+              id: "acc-2",
+              name: "Visual prompts",
+              enabled: false,
+              reason: "Visual-spatial preference",
+            },
           ],
           explanation: { signals: ["assessment-1"], confidence: 0.82 },
         }),
@@ -55,21 +60,30 @@ test.describe("brain review", () => {
   test("brain profile page resolves", async ({ page }) => {
     const response = await page.goto("/dashboard/parent/learner/learner-1/brain");
     expect(response?.status()).toBeLessThan(500);
-    const body = await page.locator("body").innerText().catch(() => "");
+    const body = await page
+      .locator("body")
+      .innerText()
+      .catch(() => "");
     expect(body).not.toMatch(/Application error|Internal Server Error/i);
   });
 
   test("brain history page resolves", async ({ page }) => {
     const response = await page.goto("/dashboard/parent/learner/learner-1/brain-history");
     expect(response?.status()).toBeLessThan(500);
-    const body = await page.locator("body").innerText().catch(() => "");
+    const body = await page
+      .locator("body")
+      .innerText()
+      .catch(() => "");
     expect(body).not.toMatch(/Application error|Internal Server Error/i);
   });
 
   test("brain review page resolves", async ({ page }) => {
     const response = await page.goto("/dashboard/parent/learner/learner-1/brain-review");
     expect(response?.status()).toBeLessThan(500);
-    const body = await page.locator("body").innerText().catch(() => "");
+    const body = await page
+      .locator("body")
+      .innerText()
+      .catch(() => "");
     expect(body).not.toMatch(/Application error|Internal Server Error/i);
   });
 });

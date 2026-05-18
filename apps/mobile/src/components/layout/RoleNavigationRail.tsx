@@ -1,9 +1,9 @@
-import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useWindowSizeClass } from '../../design/useWindowSizeClass';
-import { colors, spacing, radius } from '@/constants/colors';
+import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useWindowSizeClass } from "../../design/useWindowSizeClass";
+import { colors, spacing, radius } from "@/constants/colors";
 
 export interface RailDestination {
   key: string;
@@ -25,7 +25,7 @@ export interface RoleNavigationRailProps {
    * 'rail' = compact 80dp rail with icon + label (medium tablets).
    * 'drawer' = 240dp persistent sidebar (expanded tablets).
    */
-  variant?: 'auto' | 'rail' | 'drawer';
+  variant?: "auto" | "rail" | "drawer";
 }
 
 /**
@@ -39,18 +39,13 @@ export function RoleNavigationRail({
   activeTintColor = colors.primary,
   inactiveTintColor = colors.textSecondary,
   background = colors.card,
-  variant = 'auto',
+  variant = "auto",
 }: RoleNavigationRailProps) {
   const insets = useSafeAreaInsets();
   const { sizeClass } = useWindowSizeClass();
 
-  const resolved =
-    variant === 'auto'
-      ? sizeClass === 'expanded'
-        ? 'drawer'
-        : 'rail'
-      : variant;
-  const isDrawer = resolved === 'drawer';
+  const resolved = variant === "auto" ? (sizeClass === "expanded" ? "drawer" : "rail") : variant;
+  const isDrawer = resolved === "drawer";
   const width = isDrawer ? 240 : 84;
 
   return (
@@ -80,7 +75,7 @@ export function RoleNavigationRail({
               style={({ pressed }) => [
                 styles.item,
                 isDrawer ? styles.itemDrawer : styles.itemRail,
-                dest.active && { backgroundColor: activeTintColor + '14' },
+                dest.active && { backgroundColor: activeTintColor + "14" },
                 pressed && { opacity: 0.7 },
               ]}
             >
@@ -89,7 +84,7 @@ export function RoleNavigationRail({
                 {dest.badge && dest.badge > 0 ? (
                   <View style={styles.badge}>
                     <Text style={styles.badgeText}>
-                      {dest.badge > 9 ? '9+' : String(dest.badge)}
+                      {dest.badge > 9 ? "9+" : String(dest.badge)}
                     </Text>
                   </View>
                 ) : null}
@@ -99,7 +94,7 @@ export function RoleNavigationRail({
                 style={[
                   isDrawer ? styles.labelDrawer : styles.labelRail,
                   { color: tint },
-                  dest.active && { fontFamily: 'Nunito-ExtraBold' },
+                  dest.active && { fontFamily: "Nunito-ExtraBold" },
                 ]}
               >
                 {dest.label}
@@ -120,37 +115,37 @@ const styles = StyleSheet.create({
     borderRightColor: colors.border,
     paddingHorizontal: spacing.sm,
   },
-  header: { alignItems: 'center', marginBottom: spacing.md },
+  header: { alignItems: "center", marginBottom: spacing.md },
   items: { flex: 1, gap: spacing.xs },
   footer: { marginTop: spacing.sm },
   item: {
     borderRadius: radius.lg,
   },
   itemRail: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.xs,
     gap: 4,
   },
   itemDrawer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 10,
     paddingHorizontal: 12,
     gap: 12,
   },
   labelRail: {
     fontSize: 11,
-    fontFamily: 'Nunito-SemiBold',
-    textAlign: 'center',
+    fontFamily: "Nunito-SemiBold",
+    textAlign: "center",
   },
   labelDrawer: {
     fontSize: 14,
-    fontFamily: 'Nunito-SemiBold',
+    fontFamily: "Nunito-SemiBold",
     flex: 1,
   },
   badge: {
-    position: 'absolute',
+    position: "absolute",
     top: -4,
     right: -8,
     minWidth: 16,
@@ -158,13 +153,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     borderRadius: 8,
     backgroundColor: colors.error,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   badgeText: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 10,
-    fontFamily: 'Nunito-Bold',
+    fontFamily: "Nunito-Bold",
     lineHeight: 12,
   },
 });

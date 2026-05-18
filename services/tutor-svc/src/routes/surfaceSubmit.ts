@@ -43,10 +43,7 @@ function isValidScoringSpec(spec: unknown): spec is SurfaceScoringSpec {
 export function registerTutorSurfaceSubmitRoute(app: FastifyInstance): void {
   app.post<{ Body: SurfaceSubmitBody }>(
     "/api/tutor/surface-submit",
-    async (
-      req: FastifyRequest<{ Body: SurfaceSubmitBody }>,
-      reply: FastifyReply,
-    ) => {
+    async (req: FastifyRequest<{ Body: SurfaceSubmitBody }>, reply: FastifyReply) => {
       const body = req.body ?? ({} as SurfaceSubmitBody);
       if (!body.learnerId) {
         return reply.code(400).send({ error: "learnerId is required" });
@@ -61,9 +58,7 @@ export function registerTutorSurfaceSubmitRoute(app: FastifyInstance): void {
         return reply.code(400).send({ error: "response is required" });
       }
       if (body.response.surfaceId !== body.surface.id) {
-        return reply
-          .code(422)
-          .send({ error: "response.surfaceId does not match surface.id" });
+        return reply.code(422).send({ error: "response.surfaceId does not match surface.id" });
       }
 
       const result = scoreSurfaceResponse(body.surface.scoring, {

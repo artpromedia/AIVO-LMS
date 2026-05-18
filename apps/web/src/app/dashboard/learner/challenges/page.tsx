@@ -79,11 +79,26 @@ export default function ChallengesPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50">
       <header className="bg-white/80 backdrop-blur border-b border-slate-200 px-8 py-4 flex items-center justify-between">
-        <Image src="/images/aivo-logo-purple.png" alt="AIVO" width={100} height={30} style={{ height: "auto" }} />
+        <Image
+          src="/images/aivo-logo-purple.png"
+          alt="AIVO"
+          width={100}
+          height={30}
+          style={{ height: "auto" }}
+        />
         <div className="flex items-center gap-4">
-          <button onClick={() => router.push("/dashboard/learner")}
-            className="text-sm text-primary font-semibold hover:underline">{tCommon("back")}</button>
-          <button onClick={logout} className="text-sm text-slate-500 hover:text-red-500 font-semibold">{t("log_out")}</button>
+          <button
+            onClick={() => router.push("/dashboard/learner")}
+            className="text-sm text-primary font-semibold hover:underline"
+          >
+            {tCommon("back")}
+          </button>
+          <button
+            onClick={logout}
+            className="text-sm text-slate-500 hover:text-red-500 font-semibold"
+          >
+            {t("log_out")}
+          </button>
         </div>
       </header>
 
@@ -99,8 +114,10 @@ export default function ChallengesPage() {
         </div>
 
         <div className="flex gap-4 justify-center flex-wrap">
-          <button onClick={() => setShowCreate(!showCreate)}
-            className="px-6 py-3 rounded-full bg-red-600 text-white font-bold hover:bg-red-700 transition">
+          <button
+            onClick={() => setShowCreate(!showCreate)}
+            className="px-6 py-3 rounded-full bg-red-600 text-white font-bold hover:bg-red-700 transition"
+          >
             {t("create_challenge")}
           </button>
           <div className="flex items-center gap-2">
@@ -111,8 +128,10 @@ export default function ChallengesPage() {
               className="px-4 py-3 rounded-full border border-slate-200 text-sm font-semibold w-44"
               maxLength={8}
             />
-            <button onClick={joinChallenge}
-              className="px-6 py-3 rounded-full bg-orange-500 text-white font-bold hover:bg-orange-600 transition">
+            <button
+              onClick={joinChallenge}
+              className="px-6 py-3 rounded-full bg-orange-500 text-white font-bold hover:bg-orange-600 transition"
+            >
               {t("join")}
             </button>
           </div>
@@ -137,8 +156,10 @@ export default function ChallengesPage() {
               <option>History</option>
               <option>Coding</option>
             </select>
-            <button onClick={createChallenge}
-              className="w-full px-6 py-3 rounded-full bg-red-600 text-white font-bold hover:bg-red-700 transition">
+            <button
+              onClick={createChallenge}
+              className="w-full px-6 py-3 rounded-full bg-red-600 text-white font-bold hover:bg-red-700 transition"
+            >
               {tCommon("add")}
             </button>
           </div>
@@ -154,19 +175,30 @@ export default function ChallengesPage() {
             </div>
           ) : (
             challenges.map((c) => (
-              <div key={c.id} className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center justify-between">
+              <div
+                key={c.id}
+                className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex items-center justify-between"
+              >
                 <div>
                   <h3 className="font-heading font-bold text-lg text-slate-900">{c.title}</h3>
                   <p className="text-sm text-slate-500">{c.subject}</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                    c.status === "ACTIVE" ? "bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]" :
-                    c.status === "COMPLETED" ? "bg-slate-100 text-slate-500" :
-                    "bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]"
-                  }`}>{c.status}</span>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-bold ${
+                      c.status === "ACTIVE"
+                        ? "bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]"
+                        : c.status === "COMPLETED"
+                          ? "bg-slate-100 text-slate-500"
+                          : "bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]"
+                    }`}
+                  >
+                    {c.status}
+                  </span>
                   {c.inviteCode && (
-                    <span className="text-xs font-mono bg-slate-100 px-3 py-1 rounded-full">{c.inviteCode}</span>
+                    <span className="text-xs font-mono bg-slate-100 px-3 py-1 rounded-full">
+                      {c.inviteCode}
+                    </span>
                   )}
                 </div>
               </div>

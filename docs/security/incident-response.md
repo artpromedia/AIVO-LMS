@@ -2,12 +2,12 @@
 
 ## Severity levels
 
-| Sev | Definition | Page on-call | First response |
-|---|---|---|---|
-| SEV-1 | active data exposure / auth compromise / total outage | yes, immediately | < 15 min |
-| SEV-2 | partial outage / suspected exposure / AI safety flood | yes | < 30 min |
-| SEV-3 | degraded UX / single-customer issue | next business day | < 4 h |
-| SEV-4 | cosmetic / planned-fix | no | next sprint |
+| Sev   | Definition                                            | Page on-call      | First response |
+| ----- | ----------------------------------------------------- | ----------------- | -------------- |
+| SEV-1 | active data exposure / auth compromise / total outage | yes, immediately  | < 15 min       |
+| SEV-2 | partial outage / suspected exposure / AI safety flood | yes               | < 30 min       |
+| SEV-3 | degraded UX / single-customer issue                   | next business day | < 4 h          |
+| SEV-4 | cosmetic / planned-fix                                | no                | next sprint    |
 
 ## Detection sources
 
@@ -96,9 +96,9 @@ Postmortems land at `docs/postmortems/<date>-<slug>.md`.
 
 ## RPO + RTO targets
 
-| Tier | RPO | RTO |
-|---|---|---|
-| Auth / billing | ≤ 1 h | ≤ 1 h |
-| Learner data / IEP | ≤ 4 h | ≤ 4 h |
-| Marketing / blog | ≤ 24 h | ≤ 4 h |
-| Audit chain | 0 (synchronous append) | ≤ 1 h |
+| Tier               | RPO                    | RTO   |
+| ------------------ | ---------------------- | ----- |
+| Auth / billing     | ≤ 1 h                  | ≤ 1 h |
+| Learner data / IEP | ≤ 4 h                  | ≤ 4 h |
+| Marketing / blog   | ≤ 24 h                 | ≤ 4 h |
+| Audit chain        | 0 (synchronous append) | ≤ 1 h |

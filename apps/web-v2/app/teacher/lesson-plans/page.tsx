@@ -27,14 +27,10 @@ export default async function TeacherLessonPlansPage() {
 
   // Scope to classroom learners only — a teacher should not see lesson plans
   // for learners in other classrooms within the same school tenant.
-  const learnerIds = new Set(
-    listLearnersForTeacher(session.userId, tenantId).map((l) => l.id),
-  );
+  const learnerIds = new Set(listLearnersForTeacher(session.userId, tenantId).map((l) => l.id));
   const allowedRunIds = new Set(
     Array.from(store.lessonRuns.values())
-      .filter(
-        (r) => r.tenantId === tenantId && learnerIds.has(r.learnerId),
-      )
+      .filter((r) => r.tenantId === tenantId && learnerIds.has(r.learnerId))
       .map((r) => r.id),
   );
 
@@ -43,15 +39,11 @@ export default async function TeacherLessonPlansPage() {
     .sort((a, b) => b.generatedAt.localeCompare(a.generatedAt))
     .slice(0, 30);
 
-  const jobs = listAiGenerationJobs([tenantId], 20).filter(
-    (j) => j.kind === "lesson_plan",
-  );
+  const jobs = listAiGenerationJobs([tenantId], 20).filter((j) => j.kind === "lesson_plan");
 
   const completeCount = jobs.filter((j) => j.status === "complete").length;
   const failedCount = jobs.filter((j) => j.status === "failed").length;
-  const runningCount = jobs.filter(
-    (j) => j.status === "running" || j.status === "queued",
-  ).length;
+  const runningCount = jobs.filter((j) => j.status === "running" || j.status === "queued").length;
 
   return (
     <AppShell
@@ -75,7 +67,9 @@ export default async function TeacherLessonPlansPage() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">Generated (recent)</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+            Generated (recent)
+          </p>
           <p className="mt-1 font-display text-3xl font-semibold">{plans.length}</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
@@ -86,7 +80,9 @@ export default async function TeacherLessonPlansPage() {
           </p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">Fallback chain</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+            Fallback chain
+          </p>
           <p className="mt-1 text-sm font-medium">Claude Opus 4.7</p>
           <p className="text-xs text-aivo-ink-soft">→ Gemini 3.0 Pro → GPT-5.5</p>
         </Card>
@@ -161,8 +157,8 @@ export default async function TeacherLessonPlansPage() {
                         job.status === "complete"
                           ? "success"
                           : job.status === "failed"
-                          ? "danger"
-                          : "neutral"
+                            ? "danger"
+                            : "neutral"
                       }
                     >
                       {job.status}

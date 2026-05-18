@@ -14,23 +14,65 @@ export default function FinanceDashboard() {
   useEffect(() => {
     if (!accessToken) return;
     fetch("/api/admin-svc/stats", { headers: { Authorization: `Bearer ${accessToken}` } })
-      .then((r) => r.ok ? r.json() : null)
+      .then((r) => (r.ok ? r.json() : null))
       .then(setStats)
       .catch(() => {});
   }, [accessToken]);
 
-  const revenueMetrics: Array<{label: string; value: string; trend: string; Icon: LucideIcon; well: string}> = [
-    { label: "Monthly Recurring Revenue", value: "$48,200", trend: "+18%", Icon: DollarSign, well: "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]" },
-    { label: "Annual Run Rate", value: "$578,400", trend: "+22%", Icon: TrendingUp, well: "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]" },
-    { label: "Avg Revenue per User", value: "$24.50", trend: "+$2.30", Icon: User, well: "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]" },
-    { label: "Churn Rate", value: "3.2%", trend: "-0.8pp", Icon: TrendingDown, well: "bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))]" },
+  const revenueMetrics: Array<{
+    label: string;
+    value: string;
+    trend: string;
+    Icon: LucideIcon;
+    well: string;
+  }> = [
+    {
+      label: "Monthly Recurring Revenue",
+      value: "$48,200",
+      trend: "+18%",
+      Icon: DollarSign,
+      well: "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]",
+    },
+    {
+      label: "Annual Run Rate",
+      value: "$578,400",
+      trend: "+22%",
+      Icon: TrendingUp,
+      well: "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]",
+    },
+    {
+      label: "Avg Revenue per User",
+      value: "$24.50",
+      trend: "+$2.30",
+      Icon: User,
+      well: "bg-[hsl(var(--visual-reading)/0.12)] text-[hsl(var(--visual-reading))]",
+    },
+    {
+      label: "Churn Rate",
+      value: "3.2%",
+      trend: "-0.8pp",
+      Icon: TrendingDown,
+      well: "bg-[hsl(var(--visual-science)/0.12)] text-[hsl(var(--visual-science))]",
+    },
   ];
 
   const subscriptionBreakdown = [
     { plan: "Free Trial", count: 245, revenue: "$0", pct: 0, color: "bg-slate-300" },
     { plan: "Family ($29/mo)", count: 680, revenue: "$19,720", pct: 41, color: "bg-purple-400" },
-    { plan: "Family Plus ($49/mo)", count: 420, revenue: "$20,580", pct: 43, color: "bg-[hsl(var(--visual-reading))]" },
-    { plan: "Enterprise", count: 12, revenue: "$7,900", pct: 16, color: "bg-[hsl(var(--visual-sel))]" },
+    {
+      plan: "Family Plus ($49/mo)",
+      count: 420,
+      revenue: "$20,580",
+      pct: 43,
+      color: "bg-[hsl(var(--visual-reading))]",
+    },
+    {
+      plan: "Enterprise",
+      count: 12,
+      revenue: "$7,900",
+      pct: 16,
+      color: "bg-[hsl(var(--visual-sel))]",
+    },
   ];
 
   const paymentHealth = [
@@ -43,12 +85,48 @@ export default function FinanceDashboard() {
   ];
 
   const recentTransactions = [
-    { date: "Today", description: "Family Plus — Annual Renewal", amount: "$588.00", status: "completed", method: "Stripe" },
-    { date: "Today", description: "Enterprise — Metro ISD Q2", amount: "$18,750.00", status: "completed", method: "Invoice" },
-    { date: "Yesterday", description: "Family — Monthly Subscription", amount: "$29.00", status: "completed", method: "Stripe" },
-    { date: "Yesterday", description: "Family Plus — Monthly", amount: "$49.00", status: "failed", method: "Stripe" },
-    { date: "2d ago", description: "Family — Monthly Subscription", amount: "$29.00", status: "refunded", method: "Stripe" },
-    { date: "3d ago", description: "Enterprise — Fairfax Schools", amount: "$25,000.00", status: "pending", method: "Invoice" },
+    {
+      date: "Today",
+      description: "Family Plus — Annual Renewal",
+      amount: "$588.00",
+      status: "completed",
+      method: "Stripe",
+    },
+    {
+      date: "Today",
+      description: "Enterprise — Metro ISD Q2",
+      amount: "$18,750.00",
+      status: "completed",
+      method: "Invoice",
+    },
+    {
+      date: "Yesterday",
+      description: "Family — Monthly Subscription",
+      amount: "$29.00",
+      status: "completed",
+      method: "Stripe",
+    },
+    {
+      date: "Yesterday",
+      description: "Family Plus — Monthly",
+      amount: "$49.00",
+      status: "failed",
+      method: "Stripe",
+    },
+    {
+      date: "2d ago",
+      description: "Family — Monthly Subscription",
+      amount: "$29.00",
+      status: "refunded",
+      method: "Stripe",
+    },
+    {
+      date: "3d ago",
+      description: "Enterprise — Fairfax Schools",
+      amount: "$25,000.00",
+      status: "pending",
+      method: "Invoice",
+    },
   ];
 
   const costBreakdown = [
@@ -68,7 +146,9 @@ export default function FinanceDashboard() {
         </IconWell>
         <div>
           <h1 className="text-2xl font-heading font-bold vi-text">{t("overview")}</h1>
-          <p className="text-sm vi-text-muted mt-1">Revenue tracking, subscription analytics, and financial health.</p>
+          <p className="text-sm vi-text-muted mt-1">
+            Revenue tracking, subscription analytics, and financial health.
+          </p>
         </div>
       </div>
 
@@ -79,7 +159,9 @@ export default function FinanceDashboard() {
               <StatIconWell wellClass={m.well}>
                 <m.Icon size={22} strokeWidth={2.5} aria-hidden="true" />
               </StatIconWell>
-              <span className="text-xs text-[hsl(var(--visual-science))] font-semibold">{m.trend}</span>
+              <span className="text-xs text-[hsl(var(--visual-science))] font-semibold">
+                {m.trend}
+              </span>
             </div>
             <p className="text-2xl font-bold vi-text">{m.value}</p>
             <p className="text-xs vi-text-muted font-semibold mt-1">{m.label}</p>
@@ -101,7 +183,10 @@ export default function FinanceDashboard() {
                   <span className="text-sm font-bold vi-text">{plan.revenue}/mo</span>
                 </div>
                 <div className="vi-surface-soft rounded-full h-3 overflow-hidden">
-                  <div className={`h-full rounded-full ${plan.color} transition-all`} style={{ width: `${plan.pct}%` }} />
+                  <div
+                    className={`h-full rounded-full ${plan.color} transition-all`}
+                    style={{ width: `${plan.pct}%` }}
+                  />
                 </div>
               </div>
             ))}
@@ -115,7 +200,10 @@ export default function FinanceDashboard() {
               <div key={cost.category} className="flex items-center gap-4">
                 <span className="text-sm font-medium vi-text w-48">{cost.category}</span>
                 <div className="flex-1 vi-surface-soft rounded-full h-2.5 overflow-hidden">
-                  <div className="h-full rounded-full bg-[hsl(var(--visual-math))] transition-all" style={{ width: `${cost.pct}%` }} />
+                  <div
+                    className="h-full rounded-full bg-[hsl(var(--visual-math))] transition-all"
+                    style={{ width: `${cost.pct}%` }}
+                  />
                 </div>
                 <span className="text-sm font-bold vi-text w-20 text-right">{cost.amount}</span>
               </div>
@@ -135,7 +223,9 @@ export default function FinanceDashboard() {
       <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
         {paymentHealth.map((ph) => (
           <div key={ph.metric} className="bg-white rounded-xl p-4 border vi-border text-center">
-            <p className={`text-xl font-bold ${ph.status === "good" ? "text-[hsl(var(--visual-science))]" : ph.status === "warning" ? "text-[hsl(var(--visual-sel))]" : "vi-text"}`}>
+            <p
+              className={`text-xl font-bold ${ph.status === "good" ? "text-[hsl(var(--visual-science))]" : ph.status === "warning" ? "text-[hsl(var(--visual-sel))]" : "vi-text"}`}
+            >
               {ph.value}
             </p>
             <p className="text-[10px] vi-text-muted font-semibold mt-1">{ph.metric}</p>
@@ -165,12 +255,19 @@ export default function FinanceDashboard() {
                 <td className="px-5 py-3 font-semibold vi-text">{tx.amount}</td>
                 <td className="px-5 py-3 vi-text-muted">{tx.method}</td>
                 <td className="px-5 py-3">
-                  <span className={`px-2 py-0.5 text-xs rounded-full font-semibold ${
-                    tx.status === "completed" ? "bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]" :
-                    tx.status === "pending" ? "bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]" :
-                    tx.status === "failed" ? "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]" :
-                    "vi-surface-soft vi-text-muted"
-                  }`}>{tx.status}</span>
+                  <span
+                    className={`px-2 py-0.5 text-xs rounded-full font-semibold ${
+                      tx.status === "completed"
+                        ? "bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]"
+                        : tx.status === "pending"
+                          ? "bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]"
+                          : tx.status === "failed"
+                            ? "bg-[hsl(var(--visual-math)/0.12)] text-[hsl(var(--visual-math))]"
+                            : "vi-surface-soft vi-text-muted"
+                    }`}
+                  >
+                    {tx.status}
+                  </span>
                 </td>
               </tr>
             ))}

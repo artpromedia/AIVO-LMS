@@ -99,7 +99,7 @@ export function summariseSurfaceSignals(signals: readonly SurfaceSignal[]): Surf
   const inputModeFit: InputModeFitEntry[] = [...byInteraction.entries()]
     .filter(([, b]) => b.n > 0)
     .map(([mode, b]) => ({ mode, accuracy: b.correct / b.n, n: b.n }))
-    .sort((a, b) => (b.accuracy - a.accuracy) || (b.n - a.n));
+    .sort((a, b) => b.accuracy - a.accuracy || b.n - a.n);
 
   const averageLatencyByInteraction: Record<string, number> = {};
   for (const [mode, b] of byInteraction.entries()) {
@@ -112,9 +112,10 @@ export function summariseSurfaceSignals(signals: readonly SurfaceSignal[]): Surf
   const hintDependenceRate = hintTouched / total;
   const erasureRate = inkEligible > 0 ? erasureCountSum / inkEligible : 0;
   const abandonmentRate = abandonedCount / total;
-  const dragAvg = dragPrecisionSamples.length > 0
-    ? dragPrecisionSamples.reduce((a, b) => a + b, 0) / dragPrecisionSamples.length
-    : 1;
+  const dragAvg =
+    dragPrecisionSamples.length > 0
+      ? dragPrecisionSamples.reduce((a, b) => a + b, 0) / dragPrecisionSamples.length
+      : 1;
   const fineMotorDragConcern = dragPrecisionSamples.length > 0 && dragAvg < 0.65;
 
   const selfCorrectionRate = selfCorrectionHits / total;

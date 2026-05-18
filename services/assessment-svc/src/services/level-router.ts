@@ -20,7 +20,8 @@ export function determineFunctioningLevel(signals: ParentSignals): LevelResult {
       level: "PRE_SYMBOLIC",
       confidence: 85,
       assessmentMode: "OBSERVATIONAL",
-      reasoning: "Pre-symbolic communication or partner-assisted interaction indicates pre-symbolic functioning level",
+      reasoning:
+        "Pre-symbolic communication or partner-assisted interaction indicates pre-symbolic functioning level",
     };
   }
 
@@ -29,11 +30,16 @@ export function determineFunctioningLevel(signals: ParentSignals): LevelResult {
       level: "NON_VERBAL",
       confidence: 80,
       assessmentMode: "SWITCH_SCAN",
-      reasoning: "Non-verbal communication or eye-gaze interaction indicates non-verbal functioning level",
+      reasoning:
+        "Non-verbal communication or eye-gaze interaction indicates non-verbal functioning level",
     };
   }
 
-  if (communicationMode === "limited_verbal" || deviceInteraction === "switch_access" || responseMethod === "switch_scan") {
+  if (
+    communicationMode === "limited_verbal" ||
+    deviceInteraction === "switch_access" ||
+    responseMethod === "switch_scan"
+  ) {
     return {
       level: "LOW_VERBAL",
       confidence: 75,
@@ -42,12 +48,17 @@ export function determineFunctioningLevel(signals: ParentSignals): LevelResult {
     };
   }
 
-  if (communicationMode === "aac_device" || communicationMode === "sign_language" || deviceInteraction === "guided") {
+  if (
+    communicationMode === "aac_device" ||
+    communicationMode === "sign_language" ||
+    deviceInteraction === "guided"
+  ) {
     return {
       level: "SUPPORTED",
       confidence: 70,
       assessmentMode: "MODIFIED",
-      reasoning: "AAC device, sign language, or guided interaction indicates supported functioning level",
+      reasoning:
+        "AAC device, sign language, or guided interaction indicates supported functioning level",
     };
   }
 
@@ -55,6 +66,7 @@ export function determineFunctioningLevel(signals: ParentSignals): LevelResult {
     level: "STANDARD",
     confidence: 90,
     assessmentMode: "STANDARD",
-    reasoning: "Verbal communication with independent device interaction indicates standard functioning level",
+    reasoning:
+      "Verbal communication with independent device interaction indicates standard functioning level",
   };
 }

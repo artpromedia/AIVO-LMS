@@ -19,7 +19,10 @@ export interface HeartbeatResponse {
   mfaDeadline: number;
 }
 
-export async function sendHeartbeat(accessToken: string, force = false): Promise<HeartbeatResponse | null> {
+export async function sendHeartbeat(
+  accessToken: string,
+  force = false,
+): Promise<HeartbeatResponse | null> {
   const now = Date.now();
   if (!force && now - lastSentAt < MIN_INTERVAL_MS) return null;
   if (inflight) return inflight;

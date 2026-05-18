@@ -45,15 +45,39 @@ type BadgeDef = {
 };
 
 const BADGES: Record<BadgeKey, BadgeDef> = {
-  first_session: { name: "First Session", description: "Complete the first tutoring session.", icon: Star },
+  first_session: {
+    name: "First Session",
+    description: "Complete the first tutoring session.",
+    icon: Star,
+  },
   on_fire: { name: "On Fire", description: "Maintain a 7-day learning streak.", icon: Flame },
-  brain_activated: { name: "Brain Activated", description: "Brain profile reviewed and approved.", icon: Brain },
+  brain_activated: {
+    name: "Brain Activated",
+    description: "Brain profile reviewed and approved.",
+    icon: Brain,
+  },
   bookworm: { name: "Bookworm", description: "Ten sessions completed.", icon: BookOpen },
-  mastery_champion: { name: "Mastery Champion", description: "Any subject above 75% mastery.", icon: Trophy },
+  mastery_champion: {
+    name: "Mastery Champion",
+    description: "Any subject above 75% mastery.",
+    icon: Trophy,
+  },
   goal_getter: { name: "Goal Getter", description: "IEP goal met for the period.", icon: Target },
-  team_player: { name: "Team Player", description: "Full care team active and collaborating.", icon: Users },
-  multi_subject: { name: "Multi-Subject", description: "Active in three or more subjects.", icon: Rainbow },
-  speed_learner: { name: "Speed Learner", description: "Session time in top 25% of cohort.", icon: Zap },
+  team_player: {
+    name: "Team Player",
+    description: "Full care team active and collaborating.",
+    icon: Users,
+  },
+  multi_subject: {
+    name: "Multi-Subject",
+    description: "Active in three or more subjects.",
+    icon: Rainbow,
+  },
+  speed_learner: {
+    name: "Speed Learner",
+    description: "Session time in top 25% of cohort.",
+    icon: Zap,
+  },
   explorer: { name: "Explorer", description: "Every subject area explored.", icon: Globe2 },
 };
 
@@ -111,27 +135,32 @@ export default async function ParentMilestonesPage({
         <>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Card className="p-[var(--aivo-density-card-pad)]">
-              <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">Total XP</p>
-              <p className="mt-1 font-display text-3xl font-semibold">{eng.totalXp.toLocaleString()}</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+                Total XP
+              </p>
+              <p className="mt-1 font-display text-3xl font-semibold">
+                {eng.totalXp.toLocaleString()}
+              </p>
               <div className="mt-3 h-2 w-full rounded-full bg-aivo-border">
-                <div
-                  className="h-2 rounded-full bg-aivo-accent"
-                  style={{ width: `${xpPct}%` }}
-                />
+                <div className="h-2 rounded-full bg-aivo-accent" style={{ width: `${xpPct}%` }} />
               </div>
               <p className="mt-1 text-xs text-aivo-ink-soft">
                 {xpToNext} XP to level {eng.level + 1}
               </p>
             </Card>
             <Card className="p-[var(--aivo-density-card-pad)]">
-              <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">Level</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+                Level
+              </p>
               <p className="mt-1 font-display text-3xl font-semibold">{eng.level}</p>
               <p className="mt-3 text-xs text-aivo-ink-soft">
                 Levels unlock new avatars, customizations, and quest worlds.
               </p>
             </Card>
             <Card className="p-[var(--aivo-density-card-pad)]">
-              <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">Current Streak</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+                Current Streak
+              </p>
               <p className="mt-1 flex items-center gap-2 font-display text-3xl font-semibold">
                 <Flame className="h-7 w-7 text-orange-500" />
                 {eng.currentStreakDays}d
@@ -141,10 +170,14 @@ export default async function ParentMilestonesPage({
               </p>
             </Card>
             <Card className="p-[var(--aivo-density-card-pad)]">
-              <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">Wallet</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
+                Wallet
+              </p>
               <div className="mt-1 flex items-baseline gap-4">
                 <span className="font-display text-2xl font-semibold">{eng.coins} ¢</span>
-                <span className="font-display text-2xl font-semibold text-aivo-accent">{eng.gems} ◆</span>
+                <span className="font-display text-2xl font-semibold text-aivo-accent">
+                  {eng.gems} ◆
+                </span>
               </div>
               <p className="mt-3 text-xs text-aivo-ink-soft">
                 Coins earned per session. Gems unlocked for big wins.
@@ -162,14 +195,13 @@ export default async function ParentMilestonesPage({
               const isEarned = earnedKeys.has(key);
               const Icon = def.icon;
               return (
-                <Card
-                  key={key}
-                  className={`p-4 ${isEarned ? "" : "opacity-50"}`}
-                >
+                <Card key={key} className={`p-4 ${isEarned ? "" : "opacity-50"}`}>
                   <div className="flex items-start gap-3">
                     <div
                       className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
-                        isEarned ? "bg-aivo-accent/20 text-aivo-accent" : "bg-aivo-border/40 text-aivo-ink-soft"
+                        isEarned
+                          ? "bg-aivo-accent/20 text-aivo-accent"
+                          : "bg-aivo-border/40 text-aivo-ink-soft"
                       }`}
                     >
                       <Icon className="h-5 w-5" />
@@ -197,16 +229,16 @@ export default async function ParentMilestonesPage({
               <HelpCircle className="mt-0.5 h-5 w-5 shrink-0 text-aivo-ink-soft" />
               <div className="space-y-1 text-sm text-aivo-ink-soft">
                 <p>
-                  Learners earn 10–40 XP per completed session, plus bonus XP for
-                  hitting their daily quest goal and maintaining a streak.
+                  Learners earn 10–40 XP per completed session, plus bonus XP for hitting their
+                  daily quest goal and maintaining a streak.
                 </p>
                 <p>
-                  Coins are converted from XP and can be spent in the Rewards Shop;
-                  Gems are reserved for cosmetic upgrades and special items.
+                  Coins are converted from XP and can be spent in the Rewards Shop; Gems are
+                  reserved for cosmetic upgrades and special items.
                 </p>
                 <p>
-                  XP, levels, and badges have no effect on academic grades or IEP
-                  goal tracking — they exist purely to keep learners engaged.
+                  XP, levels, and badges have no effect on academic grades or IEP goal tracking —
+                  they exist purely to keep learners engaged.
                 </p>
               </div>
             </div>

@@ -26,12 +26,12 @@ and never throws.
 
 ## Surface types
 
-| `LearnerSurfaceType`   | Component               |
-| ---------------------- | ----------------------- |
-| `choice_grid`          | `ChoiceGridSurface`     |
-| `scratchpad`           | `ScratchpadSurface`     |
-| `geometry_workspace`   | `GeometrySurface`       |
-| `math_expression`      | `MathExpressionSurface` |
+| `LearnerSurfaceType` | Component               |
+| -------------------- | ----------------------- |
+| `choice_grid`        | `ChoiceGridSurface`     |
+| `scratchpad`         | `ScratchpadSurface`     |
+| `geometry_workspace` | `GeometrySurface`       |
+| `math_expression`    | `MathExpressionSurface` |
 
 Other types (`number_line`, `graph`, `drag_manipulative`,
 `reading_annotation`, `science_diagram`, `voice_response`,

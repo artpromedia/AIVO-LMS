@@ -8,7 +8,10 @@ import { users } from "@aivo/db";
 
 export const MFA_LOCKOUT_THRESHOLD = parseInt(process.env.MFA_LOCKOUT_THRESHOLD || "5", 10);
 export const MFA_LOCKOUT_WINDOW_MS = parseInt(process.env.MFA_LOCKOUT_WINDOW_MS || "600000", 10); // 10 min
-export const MFA_LOCKOUT_DURATION_MS = parseInt(process.env.MFA_LOCKOUT_DURATION_MS || "900000", 10); // 15 min
+export const MFA_LOCKOUT_DURATION_MS = parseInt(
+  process.env.MFA_LOCKOUT_DURATION_MS || "900000",
+  10,
+); // 15 min
 
 export async function isMfaLocked(db: any, userId: string): Promise<boolean> {
   const [u] = await db
@@ -20,7 +23,10 @@ export async function isMfaLocked(db: any, userId: string): Promise<boolean> {
   return new Date(u.lockedUntil).getTime() > Date.now();
 }
 
-export async function recordMfaFailure(db: any, userId: string): Promise<{ locked: boolean; attempts: number }> {
+export async function recordMfaFailure(
+  db: any,
+  userId: string,
+): Promise<{ locked: boolean; attempts: number }> {
   const [u] = await db
     .select({
       attempts: users.mfaFailedAttempts,

@@ -6,10 +6,7 @@
 import { eq, and, isNull } from "drizzle-orm";
 import argon2 from "argon2";
 import { mfaRecoveryCodes } from "@aivo/db";
-import {
-  generateRecoveryCodes,
-  canonicalizeRecoveryCode,
-} from "@aivo/security";
+import { generateRecoveryCodes, canonicalizeRecoveryCode } from "@aivo/security";
 
 export const RECOVERY_CODE_COUNT = 10;
 
@@ -21,7 +18,7 @@ export async function regenerateRecoveryCodes(db: any, userId: string): Promise<
     canonical.map(async (c) => ({
       userId,
       codeHash: await argon2.hash(c),
-    }))
+    })),
   );
   await db.insert(mfaRecoveryCodes).values(rows);
   return plain;
@@ -43,7 +40,7 @@ export async function countActiveRecoveryCodes(db: any, userId: string): Promise
 export async function redeemRecoveryCode(
   db: any,
   userId: string,
-  rawInput: string
+  rawInput: string,
 ): Promise<boolean> {
   const canonical = canonicalizeRecoveryCode(rawInput);
   if (canonical.length !== 12) return false;

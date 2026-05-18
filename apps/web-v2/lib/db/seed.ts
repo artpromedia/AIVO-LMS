@@ -29,21 +29,71 @@ import type { Role } from "@/lib/auth/types";
 const SUBJECTS: Omit<Subject, "id">[] = [
   // Six "Discovery Adventure" domains aligned with the legacy baseline:
   // ELA/Sage, Math/Nova, Science/Spark, SEL/Harmony, Speech/Echo, ExecFn/Pixel.
-  { slug: "reading", name: "Reading & Language", description: "Decoding, comprehension, vocabulary.", iconKey: "book" },
-  { slug: "math", name: "Math", description: "Number sense, operations, problem solving.", iconKey: "calculator" },
-  { slug: "science", name: "Science", description: "Observation, experimentation, nature.", iconKey: "flask" },
-  { slug: "social", name: "Social-Emotional", description: "Feelings, friendships, self-regulation.", iconKey: "people" },
-  { slug: "speech", name: "Speech & Language", description: "Sounds, rhyming, syllables, articulation.", iconKey: "music" },
-  { slug: "executive-function", name: "Executive Function", description: "Patterns, memory, logic, multi-step thinking.", iconKey: "puzzle" },
+  {
+    slug: "reading",
+    name: "Reading & Language",
+    description: "Decoding, comprehension, vocabulary.",
+    iconKey: "book",
+  },
+  {
+    slug: "math",
+    name: "Math",
+    description: "Number sense, operations, problem solving.",
+    iconKey: "calculator",
+  },
+  {
+    slug: "science",
+    name: "Science",
+    description: "Observation, experimentation, nature.",
+    iconKey: "flask",
+  },
+  {
+    slug: "social",
+    name: "Social-Emotional",
+    description: "Feelings, friendships, self-regulation.",
+    iconKey: "people",
+  },
+  {
+    slug: "speech",
+    name: "Speech & Language",
+    description: "Sounds, rhyming, syllables, articulation.",
+    iconKey: "music",
+  },
+  {
+    slug: "executive-function",
+    name: "Executive Function",
+    description: "Patterns, memory, logic, multi-step thinking.",
+    iconKey: "puzzle",
+  },
   // Non-baseline subjects kept for tutor / lesson coverage:
-  { slug: "writing", name: "Writing", description: "Sentence building, narrative, expression.", iconKey: "pencil" },
-  { slug: "life", name: "Life skills", description: "Daily routines, self-care, organization.", iconKey: "home" },
-  { slug: "art", name: "Art", description: "Drawing, color, creative expression.", iconKey: "palette" },
+  {
+    slug: "writing",
+    name: "Writing",
+    description: "Sentence building, narrative, expression.",
+    iconKey: "pencil",
+  },
+  {
+    slug: "life",
+    name: "Life skills",
+    description: "Daily routines, self-care, organization.",
+    iconKey: "home",
+  },
+  {
+    slug: "art",
+    name: "Art",
+    description: "Drawing, color, creative expression.",
+    iconKey: "palette",
+  },
 ];
 
 const SKILL_SEED: { subjectSlug: string; slug: string; name: string; gradeBand: string }[] = [
   { subjectSlug: "reading", slug: "phonics-cvc", name: "CVC words", gradeBand: "K-1" },
-  { subjectSlug: "reading", slug: "sight-words-50", name: "First 50 sight words", gradeBand: "K-1" },
+  {
+    subjectSlug: "reading",
+    slug: "sight-words-50",
+    name: "First 50 sight words",
+    gradeBand: "K-1",
+  },
   { subjectSlug: "reading", slug: "story-sequence", name: "Story sequencing", gradeBand: "1-2" },
   { subjectSlug: "reading", slug: "main-idea", name: "Main idea", gradeBand: "2-3" },
   { subjectSlug: "math", slug: "count-to-20", name: "Count to 20", gradeBand: "K" },
@@ -51,7 +101,12 @@ const SKILL_SEED: { subjectSlug: string; slug: string; name: string; gradeBand: 
   { subjectSlug: "math", slug: "place-value-10s", name: "Place value (tens)", gradeBand: "1-2" },
   { subjectSlug: "math", slug: "subtract-within-20", name: "Subtract within 20", gradeBand: "1-2" },
   { subjectSlug: "writing", slug: "trace-letters", name: "Trace letters", gradeBand: "PreK-K" },
-  { subjectSlug: "writing", slug: "simple-sentence", name: "Write a simple sentence", gradeBand: "1-2" },
+  {
+    subjectSlug: "writing",
+    slug: "simple-sentence",
+    name: "Write a simple sentence",
+    gradeBand: "1-2",
+  },
   { subjectSlug: "science", slug: "five-senses", name: "Five senses", gradeBand: "K-1" },
   { subjectSlug: "science", slug: "weather", name: "Weather and seasons", gradeBand: "K-2" },
   { subjectSlug: "social", slug: "name-feelings", name: "Naming feelings", gradeBand: "K-2" },
@@ -60,9 +115,24 @@ const SKILL_SEED: { subjectSlug: string; slug: string; name: string; gradeBand: 
   { subjectSlug: "speech", slug: "rhyming-words", name: "Rhyming words", gradeBand: "PreK-K" },
   { subjectSlug: "speech", slug: "syllable-count", name: "Syllable counting", gradeBand: "K-1" },
   { subjectSlug: "speech", slug: "synonyms-basics", name: "Synonyms", gradeBand: "1-3" },
-  { subjectSlug: "executive-function", slug: "pattern-complete", name: "Pattern completion", gradeBand: "K-1" },
-  { subjectSlug: "executive-function", slug: "memory-sequence", name: "Memory sequence", gradeBand: "K-2" },
-  { subjectSlug: "executive-function", slug: "multi-step-plan", name: "Multi-step planning", gradeBand: "1-3" },
+  {
+    subjectSlug: "executive-function",
+    slug: "pattern-complete",
+    name: "Pattern completion",
+    gradeBand: "K-1",
+  },
+  {
+    subjectSlug: "executive-function",
+    slug: "memory-sequence",
+    name: "Memory sequence",
+    gradeBand: "K-2",
+  },
+  {
+    subjectSlug: "executive-function",
+    slug: "multi-step-plan",
+    name: "Multi-step planning",
+    gradeBand: "1-3",
+  },
   { subjectSlug: "life", slug: "morning-routine", name: "Morning routine", gradeBand: "K-2" },
   { subjectSlug: "art", slug: "primary-colors", name: "Primary colors", gradeBand: "PreK-K" },
 ];
@@ -474,7 +544,11 @@ export function ensureSeeded(): void {
 
   // Demo parent has already accepted account terms + privacy + AI personalization,
   // plus per-learner child_data_collection so AI generation routes work in demo.
-  for (const ct of ["parent_account_terms", "parent_privacy_policy", "ai_personalization"] as const) {
+  for (const ct of [
+    "parent_account_terms",
+    "parent_privacy_policy",
+    "ai_personalization",
+  ] as const) {
     const rec: ConsentRecord = {
       id: newId("crec"),
       tenantId: parent.tenantId,
@@ -639,17 +713,61 @@ export function ensureSeeded(): void {
     (typeof DATA_CLASSIFICATIONS)[number],
     { retentionDays: number; archiveDays: number; description: string }
   > = {
-    public: { retentionDays: 365 * 10, archiveDays: 0, description: "Public content; no retention limit." },
-    account_data: { retentionDays: 365 * 7, archiveDays: 90, description: "Kept while account is active plus 7 years post-closure." },
-    parent_data: { retentionDays: 365 * 7, archiveDays: 90, description: "Parent records kept with account." },
-    learner_profile_data: { retentionDays: 365 * 7, archiveDays: 90, description: "Retained while learner is enrolled; deletable on parent request." },
-    education_record: { retentionDays: 365 * 5, archiveDays: 365, description: "Education record retention — FERPA aligned." },
-    iep_sensitive_document: { retentionDays: 365 * 3, archiveDays: 90, description: "Sensitive IEP documents — short retention, deletable on parent request." },
-    ai_generated_learning_data: { retentionDays: 365 * 3, archiveDays: 90, description: "AI-generated learning artifacts." },
-    usage_telemetry: { retentionDays: 365, archiveDays: 30, description: "Operational telemetry, no PII." },
-    billing_data: { retentionDays: 365 * 7, archiveDays: 365, description: "Tax/financial records — legal obligation." },
-    support_data: { retentionDays: 365 * 3, archiveDays: 90, description: "Support tickets and conversations." },
-    security_audit_data: { retentionDays: 365 * 7, archiveDays: 365, description: "Security and consent audit log — legal obligation." },
+    public: {
+      retentionDays: 365 * 10,
+      archiveDays: 0,
+      description: "Public content; no retention limit.",
+    },
+    account_data: {
+      retentionDays: 365 * 7,
+      archiveDays: 90,
+      description: "Kept while account is active plus 7 years post-closure.",
+    },
+    parent_data: {
+      retentionDays: 365 * 7,
+      archiveDays: 90,
+      description: "Parent records kept with account.",
+    },
+    learner_profile_data: {
+      retentionDays: 365 * 7,
+      archiveDays: 90,
+      description: "Retained while learner is enrolled; deletable on parent request.",
+    },
+    education_record: {
+      retentionDays: 365 * 5,
+      archiveDays: 365,
+      description: "Education record retention — FERPA aligned.",
+    },
+    iep_sensitive_document: {
+      retentionDays: 365 * 3,
+      archiveDays: 90,
+      description: "Sensitive IEP documents — short retention, deletable on parent request.",
+    },
+    ai_generated_learning_data: {
+      retentionDays: 365 * 3,
+      archiveDays: 90,
+      description: "AI-generated learning artifacts.",
+    },
+    usage_telemetry: {
+      retentionDays: 365,
+      archiveDays: 30,
+      description: "Operational telemetry, no PII.",
+    },
+    billing_data: {
+      retentionDays: 365 * 7,
+      archiveDays: 365,
+      description: "Tax/financial records — legal obligation.",
+    },
+    support_data: {
+      retentionDays: 365 * 3,
+      archiveDays: 90,
+      description: "Support tickets and conversations.",
+    },
+    security_audit_data: {
+      retentionDays: 365 * 7,
+      archiveDays: 365,
+      description: "Security and consent audit log — legal obligation.",
+    },
   };
   for (const cls of DATA_CLASSIFICATIONS) {
     const id = newId("dret");
@@ -666,11 +784,41 @@ export function ensureSeeded(): void {
   }
 
   const policies: Omit<PolicyVersion, "id">[] = [
-    { kind: "privacy_policy", version: "2025-01-01", effectiveAt: "2025-01-01T00:00:00.000Z", summary: "AIVO collects only the data needed to personalize learning.", url: null },
-    { kind: "terms_of_service", version: "2025-01-01", effectiveAt: "2025-01-01T00:00:00.000Z", summary: "Terms governing parent and school use of AIVO Learning.", url: null },
-    { kind: "coppa_notice", version: "2025-01-01", effectiveAt: "2025-01-01T00:00:00.000Z", summary: "Parent consent is required before collecting data from learners under 13.", url: null },
-    { kind: "ferpa_notice", version: "2025-01-01", effectiveAt: "2025-01-01T00:00:00.000Z", summary: "Education records are processed under FERPA when AIVO is engaged by a school.", url: null },
-    { kind: "dpa_template", version: "2025-01-01", effectiveAt: "2025-01-01T00:00:00.000Z", summary: "Standard data-processing agreement template for schools.", url: null },
+    {
+      kind: "privacy_policy",
+      version: "2025-01-01",
+      effectiveAt: "2025-01-01T00:00:00.000Z",
+      summary: "AIVO collects only the data needed to personalize learning.",
+      url: null,
+    },
+    {
+      kind: "terms_of_service",
+      version: "2025-01-01",
+      effectiveAt: "2025-01-01T00:00:00.000Z",
+      summary: "Terms governing parent and school use of AIVO Learning.",
+      url: null,
+    },
+    {
+      kind: "coppa_notice",
+      version: "2025-01-01",
+      effectiveAt: "2025-01-01T00:00:00.000Z",
+      summary: "Parent consent is required before collecting data from learners under 13.",
+      url: null,
+    },
+    {
+      kind: "ferpa_notice",
+      version: "2025-01-01",
+      effectiveAt: "2025-01-01T00:00:00.000Z",
+      summary: "Education records are processed under FERPA when AIVO is engaged by a school.",
+      url: null,
+    },
+    {
+      kind: "dpa_template",
+      version: "2025-01-01",
+      effectiveAt: "2025-01-01T00:00:00.000Z",
+      summary: "Standard data-processing agreement template for schools.",
+      url: null,
+    },
   ];
   for (const p of policies) {
     const id = newId("pol");
@@ -678,10 +826,34 @@ export function ensureSeeded(): void {
   }
 
   const subs: Omit<SubprocessorRecord, "id">[] = [
-    { name: "PostgreSQL (managed)", purpose: "Primary application database.", region: "us-east", status: "active", dpaUrl: null },
-    { name: "Object storage", purpose: "IEP document storage.", region: "us-east", status: "active", dpaUrl: null },
-    { name: "AI model provider", purpose: "Lesson, tutor, and homework generation.", region: "us", status: "active", dpaUrl: null },
-    { name: "Transactional email", purpose: "Parent notifications and password reset.", region: "us", status: "active", dpaUrl: null },
+    {
+      name: "PostgreSQL (managed)",
+      purpose: "Primary application database.",
+      region: "us-east",
+      status: "active",
+      dpaUrl: null,
+    },
+    {
+      name: "Object storage",
+      purpose: "IEP document storage.",
+      region: "us-east",
+      status: "active",
+      dpaUrl: null,
+    },
+    {
+      name: "AI model provider",
+      purpose: "Lesson, tutor, and homework generation.",
+      region: "us",
+      status: "active",
+      dpaUrl: null,
+    },
+    {
+      name: "Transactional email",
+      purpose: "Parent notifications and password reset.",
+      region: "us",
+      status: "active",
+      dpaUrl: null,
+    },
   ];
   for (const s of subs) {
     const id = newId("sub");
@@ -1116,11 +1288,12 @@ export function ensureSeeded(): void {
   // preference per learner so the audio settings pages aren't empty.
   const platformAdmin = Array.from(store.users.values()).find((u) => u.email?.includes("platform"));
   const platformUserId = platformAdmin?.id ?? "u_platform_1";
-  const PRON_SEED: { token: string; replacement: string; encoding: "ipa" | "x-sampa" | "plain" }[] = [
-    { token: "AIVO", replacement: "ay-voh", encoding: "plain" },
-    { token: "IEP", replacement: "I E P", encoding: "plain" },
-    { token: "COPPA", replacement: "kah-pah", encoding: "plain" },
-  ];
+  const PRON_SEED: { token: string; replacement: string; encoding: "ipa" | "x-sampa" | "plain" }[] =
+    [
+      { token: "AIVO", replacement: "ay-voh", encoding: "plain" },
+      { token: "IEP", replacement: "I E P", encoding: "plain" },
+      { token: "COPPA", replacement: "kah-pah", encoding: "plain" },
+    ];
   for (const p of PRON_SEED) {
     const id = newId("pron");
     store.pronunciationOverrides.set(id, {
@@ -1214,8 +1387,7 @@ export function ensureSeeded(): void {
       learnerId: learner.id,
       tenantId: learner.tenantId,
       modalities,
-      notes:
-        "Initial profile based on parent intake. Refine after the first weeks of sessions.",
+      notes: "Initial profile based on parent intake. Refine after the first weeks of sessions.",
       updatedAt: nowIso(),
     });
     learnerIdx += 1;
@@ -1227,7 +1399,6 @@ export function ensureSeeded(): void {
   // be seeded above; we look them up rather than assuming ids.
   const subjects = Array.from(store.subjects.values());
   const mathSubject = subjects.find((s) => s.name.toLowerCase().includes("math")) ?? subjects[0];
-  const elaSubject = subjects.find((s) => s.name.toLowerCase().includes("english") || s.name.toLowerCase().includes("ela") || s.name.toLowerCase().includes("read")) ?? subjects[0];
 
   type SeedSchoolSpec = {
     tenantId: string;
@@ -1236,8 +1407,18 @@ export function ensureSeeded(): void {
     teacherUserId: string;
   };
   const SCHOOLS: SeedSchoolSpec[] = [
-    { tenantId: "t_demo", schoolId: "sch_demo_main", schoolName: "AIVO Demo Elementary", teacherUserId: "u_teacher_1" },
-    { tenantId: "t_school_demo", schoolId: "sch_school_demo", schoolName: "Maple Hill Elementary", teacherUserId: "u_teacher_1" },
+    {
+      tenantId: "t_demo",
+      schoolId: "sch_demo_main",
+      schoolName: "AIVO Demo Elementary",
+      teacherUserId: "u_teacher_1",
+    },
+    {
+      tenantId: "t_school_demo",
+      schoolId: "sch_school_demo",
+      schoolName: "Maple Hill Elementary",
+      teacherUserId: "u_teacher_1",
+    },
   ];
   for (const spec of SCHOOLS) {
     store.schools.set(spec.schoolId, {
@@ -1345,7 +1526,13 @@ export function ensureSeeded(): void {
   };
   store.notificationPreferences.set("u_parent_1", parentPrefs);
 
-  const SAMPLE_NOTIFICATIONS: { type: NotificationType; title: string; body: string; href: string | null; learnerId: string | null }[] = [
+  const SAMPLE_NOTIFICATIONS: {
+    type: NotificationType;
+    title: string;
+    body: string;
+    href: string | null;
+    learnerId: string | null;
+  }[] = [
     {
       type: "baseline_completed",
       title: "Sky finished the baseline adventure",
@@ -1397,7 +1584,12 @@ export function ensureSeeded(): void {
       name: "Family · Plus",
       audience: "family" as const,
       description: "Up to 4 learners with full Brain-Clone personalization.",
-      features: ["Up to 4 learners", "Brain-Clone personalization", "IEP upload", "Read-aloud included"],
+      features: [
+        "Up to 4 learners",
+        "Brain-Clone personalization",
+        "IEP upload",
+        "Read-aloud included",
+      ],
       maxLearners: 4,
       maxSeats: null,
       priceCents: 1499,
@@ -1528,16 +1720,88 @@ export function ensureSeeded(): void {
   });
 
   // AI budgets — platform tenant unbounded; demo tenant gets $50/mo cap.
-  store.aiBudgets.set("t_platform", { tenantId: "t_platform", monthlyCapCents: null, warnAt: 0.8, hardStop: false, updatedAt: nowIso() });
-  store.aiBudgets.set("t_demo", { tenantId: "t_demo", monthlyCapCents: 5000, warnAt: 0.8, hardStop: false, updatedAt: nowIso() });
-  store.aiBudgets.set("t_school_demo", { tenantId: "t_school_demo", monthlyCapCents: 20000, warnAt: 0.75, hardStop: true, updatedAt: nowIso() });
+  store.aiBudgets.set("t_platform", {
+    tenantId: "t_platform",
+    monthlyCapCents: null,
+    warnAt: 0.8,
+    hardStop: false,
+    updatedAt: nowIso(),
+  });
+  store.aiBudgets.set("t_demo", {
+    tenantId: "t_demo",
+    monthlyCapCents: 5000,
+    warnAt: 0.8,
+    hardStop: false,
+    updatedAt: nowIso(),
+  });
+  store.aiBudgets.set("t_school_demo", {
+    tenantId: "t_school_demo",
+    monthlyCapCents: 20000,
+    warnAt: 0.75,
+    hardStop: true,
+    updatedAt: nowIso(),
+  });
   // Sample cost events so the AI cost dashboard shows real numbers.
-  const SAMPLE_COSTS: Array<{ tenantId: string; feature: AICostEvent["feature"]; provider: AICostEvent["provider"]; model: string; amountCents: number; pt: number; ct: number; learnerId: string | null }> = [
-    { tenantId: "t_demo", feature: "baseline", provider: "anthropic", model: "claude-sonnet", amountCents: 18, pt: 2400, ct: 1100, learnerId: "lrn_demo_sky" },
-    { tenantId: "t_demo", feature: "lesson_plan", provider: "anthropic", model: "claude-sonnet", amountCents: 32, pt: 3800, ct: 2200, learnerId: "lrn_demo_sky" },
-    { tenantId: "t_demo", feature: "homework_help", provider: "openai", model: "gpt-4o-mini", amountCents: 7, pt: 900, ct: 400, learnerId: "lrn_demo_sky" },
-    { tenantId: "t_demo", feature: "tts", provider: "elevenlabs", model: "tts-eng-en", amountCents: 5, pt: 0, ct: 0, learnerId: "lrn_demo_sky" },
-    { tenantId: "t_school_demo", feature: "lesson_plan", provider: "anthropic", model: "claude-sonnet", amountCents: 410, pt: 38000, ct: 22000, learnerId: null },
+  const SAMPLE_COSTS: Array<{
+    tenantId: string;
+    feature: AICostEvent["feature"];
+    provider: AICostEvent["provider"];
+    model: string;
+    amountCents: number;
+    pt: number;
+    ct: number;
+    learnerId: string | null;
+  }> = [
+    {
+      tenantId: "t_demo",
+      feature: "baseline",
+      provider: "anthropic",
+      model: "claude-sonnet",
+      amountCents: 18,
+      pt: 2400,
+      ct: 1100,
+      learnerId: "lrn_demo_sky",
+    },
+    {
+      tenantId: "t_demo",
+      feature: "lesson_plan",
+      provider: "anthropic",
+      model: "claude-sonnet",
+      amountCents: 32,
+      pt: 3800,
+      ct: 2200,
+      learnerId: "lrn_demo_sky",
+    },
+    {
+      tenantId: "t_demo",
+      feature: "homework_help",
+      provider: "openai",
+      model: "gpt-4o-mini",
+      amountCents: 7,
+      pt: 900,
+      ct: 400,
+      learnerId: "lrn_demo_sky",
+    },
+    {
+      tenantId: "t_demo",
+      feature: "tts",
+      provider: "elevenlabs",
+      model: "tts-eng-en",
+      amountCents: 5,
+      pt: 0,
+      ct: 0,
+      learnerId: "lrn_demo_sky",
+    },
+    {
+      tenantId: "t_school_demo",
+      feature: "lesson_plan",
+      provider: "anthropic",
+      model: "claude-sonnet",
+      amountCents: 410,
+      pt: 38000,
+      ct: 22000,
+      learnerId: null,
+    },
   ];
   for (const c of SAMPLE_COSTS) {
     const id = newId("acos");
@@ -1560,14 +1824,71 @@ export function ensureSeeded(): void {
   // Common Criteria where it maps cleanly, with internal "AIVO-*" codes for
   // domain-specific obligations (IEP, AI safety).
   const CONTROLS = [
-    { code: "CC6.1", title: "Logical access controls", criterion: "security" as const, owner: "Platform Security", status: "implemented" as const, description: "Role-based access enforced per BFF route with audit log." },
-    { code: "CC6.6", title: "Encryption in transit", criterion: "security" as const, owner: "Platform Infra", status: "implemented" as const, description: "TLS 1.2+ enforced at the edge for every customer-facing endpoint." },
-    { code: "CC6.7", title: "Encryption at rest", criterion: "confidentiality" as const, owner: "Platform Infra", status: "partial" as const, description: "Application data encrypted at rest in Postgres; IEP blob encryption pending KMS rotation." },
-    { code: "CC7.2", title: "Security monitoring and detection", criterion: "security" as const, owner: "Platform Security", status: "partial" as const, description: "Audit log streams to SIEM; alert rules under tuning." },
-    { code: "CC7.3", title: "Incident response", criterion: "availability" as const, owner: "Platform Security", status: "implemented" as const, description: "Runbooks + on-call rotation + post-mortem workflow." },
-    { code: "AIVO-IEP-01", title: "IEP document access logging", criterion: "privacy" as const, owner: "Privacy", status: "implemented" as const, description: "Every read/export of an IEP document writes an IEPDocumentAccessLog row." },
-    { code: "AIVO-AI-01", title: "AI prompt + response moderation", criterion: "processing_integrity" as const, owner: "Trust & Safety", status: "implemented" as const, description: "Pre/post moderation pipeline on every tutor + homework generation." },
-    { code: "AIVO-CHILD-01", title: "COPPA verifiable parental consent", criterion: "privacy" as const, owner: "Privacy", status: "implemented" as const, description: "Per-learner consent capture before AI features unlock for under-13 learners." },
+    {
+      code: "CC6.1",
+      title: "Logical access controls",
+      criterion: "security" as const,
+      owner: "Platform Security",
+      status: "implemented" as const,
+      description: "Role-based access enforced per BFF route with audit log.",
+    },
+    {
+      code: "CC6.6",
+      title: "Encryption in transit",
+      criterion: "security" as const,
+      owner: "Platform Infra",
+      status: "implemented" as const,
+      description: "TLS 1.2+ enforced at the edge for every customer-facing endpoint.",
+    },
+    {
+      code: "CC6.7",
+      title: "Encryption at rest",
+      criterion: "confidentiality" as const,
+      owner: "Platform Infra",
+      status: "partial" as const,
+      description:
+        "Application data encrypted at rest in Postgres; IEP blob encryption pending KMS rotation.",
+    },
+    {
+      code: "CC7.2",
+      title: "Security monitoring and detection",
+      criterion: "security" as const,
+      owner: "Platform Security",
+      status: "partial" as const,
+      description: "Audit log streams to SIEM; alert rules under tuning.",
+    },
+    {
+      code: "CC7.3",
+      title: "Incident response",
+      criterion: "availability" as const,
+      owner: "Platform Security",
+      status: "implemented" as const,
+      description: "Runbooks + on-call rotation + post-mortem workflow.",
+    },
+    {
+      code: "AIVO-IEP-01",
+      title: "IEP document access logging",
+      criterion: "privacy" as const,
+      owner: "Privacy",
+      status: "implemented" as const,
+      description: "Every read/export of an IEP document writes an IEPDocumentAccessLog row.",
+    },
+    {
+      code: "AIVO-AI-01",
+      title: "AI prompt + response moderation",
+      criterion: "processing_integrity" as const,
+      owner: "Trust & Safety",
+      status: "implemented" as const,
+      description: "Pre/post moderation pipeline on every tutor + homework generation.",
+    },
+    {
+      code: "AIVO-CHILD-01",
+      title: "COPPA verifiable parental consent",
+      criterion: "privacy" as const,
+      owner: "Privacy",
+      status: "implemented" as const,
+      description: "Per-learner consent capture before AI features unlock for under-13 learners.",
+    },
   ];
   const controlIdByCode = new Map<string, string>();
   for (const c of CONTROLS) {
@@ -1588,9 +1909,24 @@ export function ensureSeeded(): void {
   // A few evidence rows so the controls list isn't empty when a school
   // procurement reviewer drills in.
   const evidenceSeeds = [
-    { code: "CC6.1", kind: "policy" as const, summary: "Access-control policy v3.1", uri: "docs/security/access-control.md" },
-    { code: "CC7.3", kind: "runbook" as const, summary: "Sev-1 incident runbook", uri: "docs/runbooks/sev1.md" },
-    { code: "AIVO-IEP-01", kind: "log" as const, summary: "IEP access log sample export (Q1 2026)", uri: null },
+    {
+      code: "CC6.1",
+      kind: "policy" as const,
+      summary: "Access-control policy v3.1",
+      uri: "docs/security/access-control.md",
+    },
+    {
+      code: "CC7.3",
+      kind: "runbook" as const,
+      summary: "Sev-1 incident runbook",
+      uri: "docs/runbooks/sev1.md",
+    },
+    {
+      code: "AIVO-IEP-01",
+      kind: "log" as const,
+      summary: "IEP access log sample export (Q1 2026)",
+      uri: null,
+    },
   ];
   for (const e of evidenceSeeds) {
     const id = newId("evd");
@@ -1606,10 +1942,46 @@ export function ensureSeeded(): void {
   }
 
   const RISKS = [
-    { title: "Prompt injection via homework input", category: "security" as const, inherent: "high" as const, residual: "medium" as const, treatment: "mitigate" as const, owner: "Trust & Safety", desc: "Hostile homework input could try to override system prompts.", open: true },
-    { title: "Cross-tenant IEP leakage", category: "privacy" as const, inherent: "critical" as const, residual: "low" as const, treatment: "mitigate" as const, owner: "Privacy", desc: "Every BFF enforces tenantId scoping; covered by route audit.", open: true },
-    { title: "AI provider data retention", category: "third_party" as const, inherent: "high" as const, residual: "medium" as const, treatment: "transfer" as const, owner: "Privacy", desc: "Provider DPAs disable training-on-customer-data and limit retention to zero/30 days.", open: true },
-    { title: "Payment webhook spoofing", category: "security" as const, inherent: "high" as const, residual: "low" as const, treatment: "mitigate" as const, owner: "Platform Security", desc: "Stripe webhook signature verified before any account state change.", open: true },
+    {
+      title: "Prompt injection via homework input",
+      category: "security" as const,
+      inherent: "high" as const,
+      residual: "medium" as const,
+      treatment: "mitigate" as const,
+      owner: "Trust & Safety",
+      desc: "Hostile homework input could try to override system prompts.",
+      open: true,
+    },
+    {
+      title: "Cross-tenant IEP leakage",
+      category: "privacy" as const,
+      inherent: "critical" as const,
+      residual: "low" as const,
+      treatment: "mitigate" as const,
+      owner: "Privacy",
+      desc: "Every BFF enforces tenantId scoping; covered by route audit.",
+      open: true,
+    },
+    {
+      title: "AI provider data retention",
+      category: "third_party" as const,
+      inherent: "high" as const,
+      residual: "medium" as const,
+      treatment: "transfer" as const,
+      owner: "Privacy",
+      desc: "Provider DPAs disable training-on-customer-data and limit retention to zero/30 days.",
+      open: true,
+    },
+    {
+      title: "Payment webhook spoofing",
+      category: "security" as const,
+      inherent: "high" as const,
+      residual: "low" as const,
+      treatment: "mitigate" as const,
+      owner: "Platform Security",
+      desc: "Stripe webhook signature verified before any account state change.",
+      open: true,
+    },
   ];
   for (const r of RISKS) {
     const id = newId("risk");
@@ -1629,13 +2001,76 @@ export function ensureSeeded(): void {
   }
 
   const VENDORS = [
-    { name: "Anthropic", category: "llm_provider" as const, residency: "US", learner: true, dpa: true, tier: "tier1" as const, approved: true, notes: "Claude Sonnet. Zero data retention rider in DPA." },
-    { name: "OpenAI", category: "llm_provider" as const, residency: "US", learner: true, dpa: true, tier: "tier1" as const, approved: true, notes: "GPT-4o-mini fallback. Training opt-out enabled." },
-    { name: "Google Gemini", category: "llm_provider" as const, residency: "Global", learner: true, dpa: true, tier: "tier1" as const, approved: true, notes: "Fallback only. Vertex AI tenancy." },
-    { name: "ElevenLabs", category: "tts_provider" as const, residency: "US", learner: false, dpa: true, tier: "tier2" as const, approved: true, notes: "Text-only TTS. No learner voice persisted." },
-    { name: "Postmark", category: "support" as const, residency: "US", learner: false, dpa: true, tier: "tier3" as const, approved: true, notes: "Transactional email." },
-    { name: "Hetzner", category: "infra" as const, residency: "EU", learner: true, dpa: true, tier: "tier1" as const, approved: true, notes: "Production K3s cluster. Backups encrypted." },
-    { name: "GitHub", category: "infra" as const, residency: "US", learner: false, dpa: true, tier: "tier2" as const, approved: true, notes: "Source + container registry." },
+    {
+      name: "Anthropic",
+      category: "llm_provider" as const,
+      residency: "US",
+      learner: true,
+      dpa: true,
+      tier: "tier1" as const,
+      approved: true,
+      notes: "Claude Sonnet. Zero data retention rider in DPA.",
+    },
+    {
+      name: "OpenAI",
+      category: "llm_provider" as const,
+      residency: "US",
+      learner: true,
+      dpa: true,
+      tier: "tier1" as const,
+      approved: true,
+      notes: "GPT-4o-mini fallback. Training opt-out enabled.",
+    },
+    {
+      name: "Google Gemini",
+      category: "llm_provider" as const,
+      residency: "Global",
+      learner: true,
+      dpa: true,
+      tier: "tier1" as const,
+      approved: true,
+      notes: "Fallback only. Vertex AI tenancy.",
+    },
+    {
+      name: "ElevenLabs",
+      category: "tts_provider" as const,
+      residency: "US",
+      learner: false,
+      dpa: true,
+      tier: "tier2" as const,
+      approved: true,
+      notes: "Text-only TTS. No learner voice persisted.",
+    },
+    {
+      name: "Postmark",
+      category: "support" as const,
+      residency: "US",
+      learner: false,
+      dpa: true,
+      tier: "tier3" as const,
+      approved: true,
+      notes: "Transactional email.",
+    },
+    {
+      name: "Hetzner",
+      category: "infra" as const,
+      residency: "EU",
+      learner: true,
+      dpa: true,
+      tier: "tier1" as const,
+      approved: true,
+      notes: "Production K3s cluster. Backups encrypted.",
+    },
+    {
+      name: "GitHub",
+      category: "infra" as const,
+      residency: "US",
+      learner: false,
+      dpa: true,
+      tier: "tier2" as const,
+      approved: true,
+      notes: "Source + container registry.",
+    },
   ];
   for (const v of VENDORS) {
     const id = newId("vnd");
@@ -1654,15 +2089,75 @@ export function ensureSeeded(): void {
     });
   }
 
-  const REQS: Array<{ code: import("@/lib/db/types").StatePrivacyLawCode; label: string; jurisdiction: string; summary: string; obligation: string }> = [
-    { code: "FERPA", label: "FERPA", jurisdiction: "US Federal", summary: "Family Educational Rights and Privacy Act.", obligation: "Schools control education records; operator acts under school direction only." },
-    { code: "COPPA", label: "COPPA", jurisdiction: "US Federal", summary: "Children's Online Privacy Protection Act.", obligation: "Verifiable parental consent required before collecting data from under-13 users outside school context." },
-    { code: "SOPIPA_CA", label: "California SOPIPA", jurisdiction: "California", summary: "Student Online Personal Information Protection Act.", obligation: "No targeted advertising, no profile-building outside school purpose, no sale of student data." },
-    { code: "NY_2D", label: "New York Ed Law 2-d", jurisdiction: "New York", summary: "Personally identifiable information protections.", obligation: "Encryption at rest + in transit, breach notification within 7 days, DPA appendix required." },
-    { code: "IL_SOPPA", label: "Illinois SOPPA", jurisdiction: "Illinois", summary: "Student Online Personal Protection Act.", obligation: "Public posting of subprocessors; breach notification within 30 days; parental right to inspect." },
-    { code: "CO_SDP", label: "Colorado Student Data Privacy Act", jurisdiction: "Colorado", summary: "Student data privacy obligations.", obligation: "Use limitation to school-authorized purposes; data return/destruction on contract end." },
-    { code: "CT_PA1814", label: "Connecticut PA 16-189", jurisdiction: "Connecticut", summary: "Student data privacy.", obligation: "Data destruction within 60 days of contract termination; written security policy." },
-    { code: "STUDENT_PRIVACY_PLEDGE", label: "Student Privacy Pledge", jurisdiction: "Industry", summary: "Voluntary K-12 service provider pledge.", obligation: "Twelve commitments around transparency and student-data limitations." },
+  const REQS: Array<{
+    code: import("@/lib/db/types").StatePrivacyLawCode;
+    label: string;
+    jurisdiction: string;
+    summary: string;
+    obligation: string;
+  }> = [
+    {
+      code: "FERPA",
+      label: "FERPA",
+      jurisdiction: "US Federal",
+      summary: "Family Educational Rights and Privacy Act.",
+      obligation: "Schools control education records; operator acts under school direction only.",
+    },
+    {
+      code: "COPPA",
+      label: "COPPA",
+      jurisdiction: "US Federal",
+      summary: "Children's Online Privacy Protection Act.",
+      obligation:
+        "Verifiable parental consent required before collecting data from under-13 users outside school context.",
+    },
+    {
+      code: "SOPIPA_CA",
+      label: "California SOPIPA",
+      jurisdiction: "California",
+      summary: "Student Online Personal Information Protection Act.",
+      obligation:
+        "No targeted advertising, no profile-building outside school purpose, no sale of student data.",
+    },
+    {
+      code: "NY_2D",
+      label: "New York Ed Law 2-d",
+      jurisdiction: "New York",
+      summary: "Personally identifiable information protections.",
+      obligation:
+        "Encryption at rest + in transit, breach notification within 7 days, DPA appendix required.",
+    },
+    {
+      code: "IL_SOPPA",
+      label: "Illinois SOPPA",
+      jurisdiction: "Illinois",
+      summary: "Student Online Personal Protection Act.",
+      obligation:
+        "Public posting of subprocessors; breach notification within 30 days; parental right to inspect.",
+    },
+    {
+      code: "CO_SDP",
+      label: "Colorado Student Data Privacy Act",
+      jurisdiction: "Colorado",
+      summary: "Student data privacy obligations.",
+      obligation:
+        "Use limitation to school-authorized purposes; data return/destruction on contract end.",
+    },
+    {
+      code: "CT_PA1814",
+      label: "Connecticut PA 16-189",
+      jurisdiction: "Connecticut",
+      summary: "Student data privacy.",
+      obligation:
+        "Data destruction within 60 days of contract termination; written security policy.",
+    },
+    {
+      code: "STUDENT_PRIVACY_PLEDGE",
+      label: "Student Privacy Pledge",
+      jurisdiction: "Industry",
+      summary: "Voluntary K-12 service provider pledge.",
+      obligation: "Twelve commitments around transparency and student-data limitations.",
+    },
   ];
   const reqIdByCode = new Map<string, string>();
   for (const r of REQS) {
@@ -1679,15 +2174,61 @@ export function ensureSeeded(): void {
     });
   }
   // Seed mappings: each law mapped to the most relevant control.
-  const MAPPINGS: Array<{ req: string; ctl: string; status: "covered" | "partial" | "gap"; evidence: string }> = [
-    { req: "FERPA", ctl: "AIVO-IEP-01", status: "covered", evidence: "School-controlled access; full audit log on every IEP read." },
-    { req: "COPPA", ctl: "AIVO-CHILD-01", status: "covered", evidence: "Per-learner verifiable parental consent; under-13 age gate at creation." },
-    { req: "SOPIPA_CA", ctl: "CC6.1", status: "covered", evidence: "No advertising surfaces; data used only for school purpose; covered by access policy." },
-    { req: "NY_2D", ctl: "CC6.7", status: "partial", evidence: "TLS in transit covered; KMS-rotated at-rest encryption rollout in progress." },
-    { req: "IL_SOPPA", ctl: "AIVO-IEP-01", status: "covered", evidence: "Subprocessor list public at /privacy/subprocessors; 30-day breach SLO documented." },
-    { req: "CO_SDP", ctl: "CC6.1", status: "covered", evidence: "Use-limitation enforced in DPA + product surfaces." },
-    { req: "CT_PA1814", ctl: "CC7.3", status: "partial", evidence: "Destruction workflow exists; 60-day SLA codified in DPA — automated cron pending." },
-    { req: "STUDENT_PRIVACY_PLEDGE", ctl: "AIVO-CHILD-01", status: "covered", evidence: "Pledge commitments mapped 1:1 in privacy policy section 6." },
+  const MAPPINGS: Array<{
+    req: string;
+    ctl: string;
+    status: "covered" | "partial" | "gap";
+    evidence: string;
+  }> = [
+    {
+      req: "FERPA",
+      ctl: "AIVO-IEP-01",
+      status: "covered",
+      evidence: "School-controlled access; full audit log on every IEP read.",
+    },
+    {
+      req: "COPPA",
+      ctl: "AIVO-CHILD-01",
+      status: "covered",
+      evidence: "Per-learner verifiable parental consent; under-13 age gate at creation.",
+    },
+    {
+      req: "SOPIPA_CA",
+      ctl: "CC6.1",
+      status: "covered",
+      evidence:
+        "No advertising surfaces; data used only for school purpose; covered by access policy.",
+    },
+    {
+      req: "NY_2D",
+      ctl: "CC6.7",
+      status: "partial",
+      evidence: "TLS in transit covered; KMS-rotated at-rest encryption rollout in progress.",
+    },
+    {
+      req: "IL_SOPPA",
+      ctl: "AIVO-IEP-01",
+      status: "covered",
+      evidence: "Subprocessor list public at /privacy/subprocessors; 30-day breach SLO documented.",
+    },
+    {
+      req: "CO_SDP",
+      ctl: "CC6.1",
+      status: "covered",
+      evidence: "Use-limitation enforced in DPA + product surfaces.",
+    },
+    {
+      req: "CT_PA1814",
+      ctl: "CC7.3",
+      status: "partial",
+      evidence: "Destruction workflow exists; 60-day SLA codified in DPA — automated cron pending.",
+    },
+    {
+      req: "STUDENT_PRIVACY_PLEDGE",
+      ctl: "AIVO-CHILD-01",
+      status: "covered",
+      evidence: "Pledge commitments mapped 1:1 in privacy policy section 6.",
+    },
   ];
   for (const m of MAPPINGS) {
     const id = newId("spm");
@@ -1707,7 +2248,8 @@ export function ensureSeeded(): void {
   store.incidents.set(inc1Id, {
     id: inc1Id,
     title: "Status page degraded — 3 minute partial outage",
-    summary: "Health probe latency on identity-svc crossed alert threshold; auto-resolved after rolling pod restart.",
+    summary:
+      "Health probe latency on identity-svc crossed alert threshold; auto-resolved after rolling pod restart.",
     severity: "sev3",
     status: "resolved",
     commanderUserId: "u_platform_1",
@@ -1729,9 +2271,33 @@ export function ensureSeeded(): void {
 
   // Vulnerabilities — a typical mix from scans + a pen-test finding.
   const VULNS = [
-    { title: "lodash <4.17.21 prototype pollution (CVE-2021-23337)", cve: "CVE-2021-23337", severity: "high" as const, status: "fixed" as const, source: "dependency_scan" as const, comp: "@aivo/web-v2", fixed: ">=4.17.21" },
-    { title: "Next.js 15.0.0 SSRF in image optimizer", cve: "CVE-2025-12345", severity: "medium" as const, status: "triaged" as const, source: "dependency_scan" as const, comp: "apps/marketing", fixed: "15.1.4" },
-    { title: "Missing Subresource Integrity on third-party CDN", cve: null, severity: "low" as const, status: "open" as const, source: "pen_test" as const, comp: "apps/marketing", fixed: null },
+    {
+      title: "lodash <4.17.21 prototype pollution (CVE-2021-23337)",
+      cve: "CVE-2021-23337",
+      severity: "high" as const,
+      status: "fixed" as const,
+      source: "dependency_scan" as const,
+      comp: "@aivo/web-v2",
+      fixed: ">=4.17.21",
+    },
+    {
+      title: "Next.js 15.0.0 SSRF in image optimizer",
+      cve: "CVE-2025-12345",
+      severity: "medium" as const,
+      status: "triaged" as const,
+      source: "dependency_scan" as const,
+      comp: "apps/marketing",
+      fixed: "15.1.4",
+    },
+    {
+      title: "Missing Subresource Integrity on third-party CDN",
+      cve: null,
+      severity: "low" as const,
+      status: "open" as const,
+      source: "pen_test" as const,
+      comp: "apps/marketing",
+      fixed: null,
+    },
   ];
   for (const v of VULNS) {
     const id = newId("vuln");
@@ -1914,13 +2480,7 @@ export function ensureSeeded(): void {
     const generated = 380 + Math.floor(Math.sin(d) * 40) + d * 3;
     const failed = d === 4 ? 11 : d === 9 ? 3 : 0;
     const status: import("@/lib/db/types").DailyBillingBatchStatus =
-      d === 0
-        ? "running"
-        : failed > 5
-          ? "failed"
-          : failed > 0
-            ? "partial"
-            : "success";
+      d === 0 ? "running" : failed > 5 ? "failed" : failed > 0 ? "partial" : "success";
     const id = newId("bbatch");
     store.dailyBillingBatches.set(id, {
       id,

@@ -35,17 +35,18 @@ export function NotificationList({ notifications: initial }: { notifications: No
             size="sm"
             variant="outline"
             disabled={pending}
-            onClick={() => startTransition(() => { void markRead(unread.map((n) => n.id)); })}
+            onClick={() =>
+              startTransition(() => {
+                void markRead(unread.map((n) => n.id));
+              })
+            }
           >
             Mark all read
           </Button>
         </div>
       ) : null}
       {items.map((n) => (
-        <Card
-          key={n.id}
-          className={`p-4 ${n.readAt ? "opacity-70" : "border-aivo-primary/40"}`}
-        >
+        <Card key={n.id} className={`p-4 ${n.readAt ? "opacity-70" : "border-aivo-primary/40"}`}>
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <div className="flex items-center gap-2">
@@ -62,7 +63,11 @@ export function NotificationList({ notifications: initial }: { notifications: No
                 size="sm"
                 variant="ghost"
                 disabled={pending}
-                onClick={() => startTransition(() => { void markRead([n.id]); })}
+                onClick={() =>
+                  startTransition(() => {
+                    void markRead([n.id]);
+                  })
+                }
               >
                 Mark read
               </Button>

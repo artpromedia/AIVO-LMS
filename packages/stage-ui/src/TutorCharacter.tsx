@@ -40,7 +40,12 @@ const STATE_SCALE: Record<TutorState, number> = {
   pointing: 1.02,
 };
 
-export function TutorCharacter({ tutorKey, tutorState, speechText, reducedMotion = false }: TutorCharacterProps) {
+export function TutorCharacter({
+  tutorKey,
+  tutorState,
+  speechText,
+  reducedMotion = false,
+}: TutorCharacterProps) {
   const scale = STATE_SCALE[tutorState] ?? 1;
   const emoji = TUTOR_EMOJIS[tutorKey] ?? "🤖";
   const transition = reducedMotion ? "none" : "transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)";

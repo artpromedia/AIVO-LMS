@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -9,15 +9,15 @@ import {
   Text,
   TextInput,
   View,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { AivoCard, AivoButton } from '@aivo/mobile-ui';
-import { useTranslation } from '@/hooks/useTranslation';
-import { AccountSettingsCard } from '@/src/components/settings/AccountSettingsCard';
-import { colors, spacing, radius } from '@/constants/colors';
-import { API } from '@/constants/api';
-import { apiFetch } from '@/lib/api';
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import { AivoCard, AivoButton } from "@aivo/mobile-ui";
+import { useTranslation } from "@/hooks/useTranslation";
+import { AccountSettingsCard } from "@/src/components/settings/AccountSettingsCard";
+import { colors, spacing, radius } from "@/constants/colors";
+import { API } from "@/constants/api";
+import { apiFetch } from "@/lib/api";
 
 interface ParentLearner {
   id: string;
@@ -39,7 +39,7 @@ export default function ParentSettings() {
   const { t } = useTranslation();
 
   const [pinModalVisible, setPinModalVisible] = useState(false);
-  const [newPin, setNewPin] = useState('');
+  const [newPin, setNewPin] = useState("");
   const [savingPin, setSavingPin] = useState(false);
   const [learners, setLearners] = useState<ParentLearner[] | null>(null);
   const [learnersLoading, setLearnersLoading] = useState(false);
@@ -54,30 +54,27 @@ export default function ParentSettings() {
   const loadLearners = useCallback(async () => {
     setLearnersLoading(true);
     try {
-      const res = await apiFetch(API.IDENTITY, '/api/users/learners');
+      const res = await apiFetch(API.IDENTITY, "/api/users/learners");
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        Alert.alert(
-          t('common.error'),
-          data?.error || t('parentSettings.pinLoadFailed'),
-        );
+        Alert.alert(t("common.error"), data?.error || t("parentSettings.pinLoadFailed"));
         setLearners([]);
         return;
       }
       const list = await res.json();
       const normalized: ParentLearner[] = Array.isArray(list)
         ? list
-            .filter((l: any) => l && typeof l.id === 'string')
-            .map((l: any) => ({ id: l.id as string, name: (l.name as string) || '' }))
+            .filter((l: any) => l && typeof l.id === "string")
+            .map((l: any) => ({ id: l.id as string, name: (l.name as string) || "" }))
         : [];
       setLearners(normalized);
       // Default selection — first learner — but only if the parent hasn't
       // already chosen one in a previous open.
       setSelectedLearnerId((prev) =>
-        prev && normalized.some((l) => l.id === prev) ? prev : normalized[0]?.id ?? null,
+        prev && normalized.some((l) => l.id === prev) ? prev : (normalized[0]?.id ?? null),
       );
     } catch {
-      Alert.alert(t('common.error'), t('auth.somethingWentWrong'));
+      Alert.alert(t("common.error"), t("auth.somethingWentWrong"));
       setLearners([]);
     } finally {
       setLearnersLoading(false);
@@ -92,44 +89,34 @@ export default function ParentSettings() {
 
   const handleSavePin = useCallback(async () => {
     if (newPin.length !== 4) {
-      Alert.alert(t('common.error'), t('parentSettings.pinLengthError'));
+      Alert.alert(t("common.error"), t("parentSettings.pinLengthError"));
       return;
     }
     if (!selectedLearnerId || !learners || learners.length === 0) {
-      Alert.alert(t('common.error'), t('parentSettings.pinNoLearners'));
+      Alert.alert(t("common.error"), t("parentSettings.pinNoLearners"));
       return;
     }
     const target = learners.find((l) => l.id === selectedLearnerId);
     if (!target) {
-      Alert.alert(t('common.error'), t('parentSettings.pinNoLearners'));
+      Alert.alert(t("common.error"), t("parentSettings.pinNoLearners"));
       return;
     }
     setSavingPin(true);
     try {
-      const updateRes = await apiFetch(
-        API.IDENTITY,
-        `/api/users/learners/${target.id}`,
-        {
-          method: 'PUT',
-          body: JSON.stringify({ pin: newPin }),
-        },
-      );
+      const updateRes = await apiFetch(API.IDENTITY, `/api/users/learners/${target.id}`, {
+        method: "PUT",
+        body: JSON.stringify({ pin: newPin }),
+      });
       if (updateRes.ok) {
-        Alert.alert(
-          t('common.success'),
-          t('parentSettings.pinUpdated', { name: target.name }),
-        );
+        Alert.alert(t("common.success"), t("parentSettings.pinUpdated", { name: target.name }));
         setPinModalVisible(false);
-        setNewPin('');
+        setNewPin("");
       } else {
         const data = await updateRes.json().catch(() => ({}));
-        Alert.alert(
-          t('common.error'),
-          data?.error || t('parentSettings.pinUpdateFailed'),
-        );
+        Alert.alert(t("common.error"), data?.error || t("parentSettings.pinUpdateFailed"));
       }
     } catch {
-      Alert.alert(t('common.error'), t('auth.somethingWentWrong'));
+      Alert.alert(t("common.error"), t("auth.somethingWentWrong"));
     } finally {
       setSavingPin(false);
     }
@@ -138,12 +125,12 @@ export default function ParentSettings() {
   const handleExportData = useCallback(async () => {
     setExportingData(true);
     try {
-      const res = await apiFetch(API.IDENTITY, '/api/users/me');
+      const res = await apiFetch(API.IDENTITY, "/api/users/me");
       if (res.ok) {
         const data = await res.json();
         Alert.alert(
-          t('parentSettings.exportData'),
-          t('parentSettings.exportSummary', {
+          t("parentSettings.exportData"),
+          t("parentSettings.exportSummary", {
             name: data.name,
             email: data.email,
             role: data.role,
@@ -151,32 +138,29 @@ export default function ParentSettings() {
         );
       } else {
         const data = await res.json().catch(() => ({}));
-        Alert.alert(
-          t('common.error'),
-          data?.error || t('parentSettings.exportFailed'),
-        );
+        Alert.alert(t("common.error"), data?.error || t("parentSettings.exportFailed"));
       }
     } catch {
-      Alert.alert(t('common.error'), t('auth.somethingWentWrong'));
+      Alert.alert(t("common.error"), t("auth.somethingWentWrong"));
     } finally {
       setExportingData(false);
     }
   }, [t]);
 
   const parentRows: {
-    icon: React.ComponentProps<typeof Ionicons>['name'];
+    icon: React.ComponentProps<typeof Ionicons>["name"];
     label: string;
     onPress: () => void;
     loading?: boolean;
   }[] = [
     {
-      icon: 'key-outline',
-      label: t('parentSettings.managePins'),
+      icon: "key-outline",
+      label: t("parentSettings.managePins"),
       onPress: () => setPinModalVisible(true),
     },
     {
-      icon: 'download-outline',
-      label: t('parentSettings.exportData'),
+      icon: "download-outline",
+      label: t("parentSettings.exportData"),
       onPress: handleExportData,
       loading: exportingData,
     },
@@ -190,7 +174,7 @@ export default function ParentSettings() {
         paddingBottom: 32,
       }}
     >
-      <Text style={styles.title}>{t('parentSettings.title')}</Text>
+      <Text style={styles.title}>{t("parentSettings.title")}</Text>
 
       <AccountSettingsCard enableAvatarUpload />
 
@@ -198,43 +182,27 @@ export default function ParentSettings() {
         {parentRows.map((row, i) => (
           <Pressable
             key={row.label}
-            style={[
-              styles.row,
-              i < parentRows.length - 1 && styles.rowBorder,
-            ]}
+            style={[styles.row, i < parentRows.length - 1 && styles.rowBorder]}
             onPress={row.onPress}
             disabled={row.loading}
           >
-            <Ionicons
-              name={row.icon}
-              size={22}
-              color={colors.textSecondary}
-            />
+            <Ionicons name={row.icon} size={22} color={colors.textSecondary} />
             <Text style={styles.rowLabel}>{row.label}</Text>
             {row.loading ? (
               <ActivityIndicator size="small" color={colors.primary} />
             ) : (
-              <Ionicons
-                name="chevron-forward"
-                size={18}
-                color={colors.textSecondary}
-              />
+              <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
             )}
           </Pressable>
         ))}
       </AivoCard>
 
-      <Text style={styles.version}>{t('common.appVersion')}</Text>
+      <Text style={styles.version}>{t("common.appVersion")}</Text>
 
       <Modal visible={pinModalVisible} transparent animationType="slide">
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={() => setPinModalVisible(false)}
-        >
+        <Pressable style={styles.modalOverlay} onPress={() => setPinModalVisible(false)}>
           <Pressable style={styles.modalContent} onPress={() => {}}>
-            <Text style={styles.modalTitle}>
-              {t('parentSettings.managePins')}
-            </Text>
+            <Text style={styles.modalTitle}>{t("parentSettings.managePins")}</Text>
 
             {learnersLoading ? (
               <View style={styles.modalLoading}>
@@ -242,9 +210,7 @@ export default function ParentSettings() {
               </View>
             ) : learners && learners.length > 0 ? (
               <>
-                <Text style={styles.fieldLabel}>
-                  {t('parentSettings.pinSelectLearner')}
-                </Text>
+                <Text style={styles.fieldLabel}>{t("parentSettings.pinSelectLearner")}</Text>
                 <View style={styles.learnerChips}>
                   {learners.map((l) => {
                     const selected = l.id === selectedLearnerId;
@@ -252,10 +218,7 @@ export default function ParentSettings() {
                       <Pressable
                         key={l.id}
                         onPress={() => setSelectedLearnerId(l.id)}
-                        style={[
-                          styles.learnerChip,
-                          selected && styles.learnerChipSelected,
-                        ]}
+                        style={[styles.learnerChip, selected && styles.learnerChipSelected]}
                         accessibilityRole="button"
                         accessibilityState={{ selected }}
                       >
@@ -266,7 +229,7 @@ export default function ParentSettings() {
                           ]}
                           numberOfLines={1}
                         >
-                          {l.name || t('parentSettings.unnamedLearner')}
+                          {l.name || t("parentSettings.unnamedLearner")}
                         </Text>
                       </Pressable>
                     );
@@ -274,26 +237,22 @@ export default function ParentSettings() {
                 </View>
               </>
             ) : learners && learners.length === 0 ? (
-              <Text style={styles.modalEmpty}>
-                {t('parentSettings.pinNoLearners')}
-              </Text>
+              <Text style={styles.modalEmpty}>{t("parentSettings.pinNoLearners")}</Text>
             ) : null}
 
-            <Text style={styles.fieldLabel}>
-              {t('parentSettings.newPinLabel')}
-            </Text>
+            <Text style={styles.fieldLabel}>{t("parentSettings.newPinLabel")}</Text>
             <TextInput
               style={[
                 styles.modalInput,
                 {
-                  textAlign: 'center',
+                  textAlign: "center",
                   letterSpacing: 12,
                   fontSize: 24,
-                  fontFamily: 'Nunito-ExtraBold',
+                  fontFamily: "Nunito-ExtraBold",
                 },
               ]}
               value={newPin}
-              onChangeText={(v) => setNewPin(v.replace(/\D/g, '').slice(0, 4))}
+              onChangeText={(v) => setNewPin(v.replace(/\D/g, "").slice(0, 4))}
               placeholder="• • • •"
               placeholderTextColor={colors.textSecondary}
               keyboardType="number-pad"
@@ -303,17 +262,17 @@ export default function ParentSettings() {
             />
             <View style={styles.modalActions}>
               <AivoButton
-                title={t('common.cancel')}
+                title={t("common.cancel")}
                 onPress={() => {
                   setPinModalVisible(false);
-                  setNewPin('');
+                  setNewPin("");
                 }}
                 variant="outline"
                 size="sm"
                 style={styles.modalButton}
               />
               <AivoButton
-                title={savingPin ? t('common.saving') : t('common.save')}
+                title={savingPin ? t("common.saving") : t("common.save")}
                 onPress={handleSavePin}
                 loading={savingPin}
                 size="sm"
@@ -336,14 +295,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontFamily: 'Nunito-ExtraBold',
+    fontFamily: "Nunito-ExtraBold",
     color: colors.text,
     marginBottom: spacing.lg,
   },
   parentCard: { marginTop: spacing.sm, padding: 0 },
   row: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: spacing.md,
     gap: 12,
   },
@@ -351,38 +310,38 @@ const styles = StyleSheet.create({
   rowLabel: {
     flex: 1,
     fontSize: 15,
-    fontFamily: 'Nunito-SemiBold',
+    fontFamily: "Nunito-SemiBold",
     color: colors.text,
   },
   version: {
     marginTop: spacing.xl,
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: 12,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.textSecondary,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalContent: {
     backgroundColor: colors.card,
     borderRadius: radius.xl,
     padding: spacing.lg,
-    width: '85%',
+    width: "85%",
   },
   modalTitle: {
     fontSize: 20,
-    fontFamily: 'Nunito-ExtraBold',
+    fontFamily: "Nunito-ExtraBold",
     color: colors.text,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: spacing.md,
   },
   fieldLabel: {
     fontSize: 13,
-    fontFamily: 'Nunito-Bold',
+    fontFamily: "Nunito-Bold",
     color: colors.textSecondary,
     marginBottom: 4,
     marginTop: 8,
@@ -394,29 +353,29 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     paddingHorizontal: spacing.md,
     fontSize: 16,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.text,
   },
   modalActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 8,
     marginTop: spacing.md,
   },
   modalButton: { flex: 1 },
   modalLoading: {
     paddingVertical: spacing.md,
-    alignItems: 'center',
+    alignItems: "center",
   },
   modalEmpty: {
     fontSize: 13,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.textSecondary,
-    textAlign: 'center',
+    textAlign: "center",
     paddingVertical: spacing.sm,
   },
   learnerChips: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
     marginBottom: spacing.sm,
   },
@@ -427,7 +386,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: colors.border,
     backgroundColor: colors.surface,
-    maxWidth: '100%',
+    maxWidth: "100%",
   },
   learnerChipSelected: {
     backgroundColor: colors.primary,
@@ -435,10 +394,10 @@ const styles = StyleSheet.create({
   },
   learnerChipText: {
     fontSize: 13,
-    fontFamily: 'Nunito-SemiBold',
+    fontFamily: "Nunito-SemiBold",
     color: colors.text,
   },
   learnerChipTextSelected: {
-    color: '#FFF',
+    color: "#FFF",
   },
 });

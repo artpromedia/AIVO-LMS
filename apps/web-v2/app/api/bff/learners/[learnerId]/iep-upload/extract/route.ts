@@ -29,7 +29,12 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["iep_document_storage", "child_data_collection"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["iep_document_storage", "child_data_collection"],
+      requestId,
+    );
     if (consentErr) return consentErr;
 
     const learner = getLearner(learnerId, session!.tenantId);
@@ -38,10 +43,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     }
     const doc = getIEPForLearner(learnerId, session!.tenantId);
     if (!doc) {
-      return fail(
-        { ...ERRORS.PRECONDITION_FAILED, message: "No IEP uploaded yet" },
-        requestId,
-      );
+      return fail({ ...ERRORS.PRECONDITION_FAILED, message: "No IEP uploaded yet" }, requestId);
     }
     const assessment = getOrCreateParentAssessment(learnerId, session!.tenantId);
     // Gate on a submitted assessment: extraction reads from assessment fields,
@@ -52,8 +54,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       return fail(
         {
           ...ERRORS.PRECONDITION_FAILED,
-          message:
-            "Submit the parent assessment before extracting accommodations from the IEP.",
+          message: "Submit the parent assessment before extracting accommodations from the IEP.",
         },
         requestId,
       );

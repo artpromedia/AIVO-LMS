@@ -15,7 +15,12 @@ interface BrainSphereProps {
   className?: string;
 }
 
-export default function BrainSphere({ visualIdentity, size = 40, animate = true, className = "" }: BrainSphereProps) {
+export default function BrainSphere({
+  visualIdentity,
+  size = 40,
+  animate = true,
+  className = "",
+}: BrainSphereProps) {
   const primary = visualIdentity?.primaryHue || "#7C3AED";
   const secondaries = visualIdentity?.secondaryHues || ["#6366F1"];
   const allColors = [primary, ...secondaries];
@@ -48,12 +53,21 @@ export default function BrainSphere({ visualIdentity, size = 40, animate = true,
       />
       <style jsx>{`
         @keyframes brainSphPulse {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.05); }
+          0%,
+          100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.05);
+          }
         }
         @keyframes brainSphRotate {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
         }
       `}</style>
     </div>

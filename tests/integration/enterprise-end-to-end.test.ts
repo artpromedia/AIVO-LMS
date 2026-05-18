@@ -152,14 +152,11 @@ describe("enterprise end-to-end", () => {
       updatedAt: new Date().toISOString(),
     });
 
-    const acceptRes = await fetch(
-      `${recommendation.url}/api/recommendations/rec-e2e-1/accept`,
-      {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ actorRole: "parent" }),
-      },
-    );
+    const acceptRes = await fetch(`${recommendation.url}/api/recommendations/rec-e2e-1/accept`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ actorRole: "parent" }),
+    });
     expect(acceptRes.status).toBe(200);
 
     let counts: Record<string, number> = {};

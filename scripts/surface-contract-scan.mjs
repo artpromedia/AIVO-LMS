@@ -71,14 +71,12 @@ function readAnyMatching(rel, predicate) {
 // ---------------------------------------------------------------------------
 const baselineGen =
   readIfExists("services/ai-svc/src/ai_svc/services/baseline_generator.py") ??
-  readAnyMatching("services/ai-svc/src/ai_svc/services", (n) =>
-    n.startsWith("baseline_") && n.endsWith(".py"),
+  readAnyMatching(
+    "services/ai-svc/src/ai_svc/services",
+    (n) => n.startsWith("baseline_") && n.endsWith(".py"),
   );
 if (!baselineGen) {
-  fail(
-    "baseline-generator",
-    "Could not locate services/ai-svc baseline generator module",
-  );
+  fail("baseline-generator", "Could not locate services/ai-svc baseline generator module");
 } else {
   const hasSurfaceContract =
     /LearnerSurfaceSpec\b/.test(baselineGen) ||
@@ -111,8 +109,7 @@ if (!baselineGen) {
 // ---------------------------------------------------------------------------
 // 2. tutor prompt builder mentions Surface Tool Protocol
 // ---------------------------------------------------------------------------
-const promptBuilder =
-  readIfExists("services/ai-svc/src/ai_svc/services/prompt_builder.py") ?? "";
+const promptBuilder = readIfExists("services/ai-svc/src/ai_svc/services/prompt_builder.py") ?? "";
 if (!promptBuilder) {
   fail("tutor-prompt-builder", "services/ai-svc prompt_builder.py is missing");
 } else if (!/Surface Tool Protocol|surfaceCommands/.test(promptBuilder)) {
@@ -131,10 +128,7 @@ const surfaceZone =
   readIfExists("apps/web/src/components/stage/SurfaceResponseZone.ts") ??
   "";
 if (!surfaceZone) {
-  fail(
-    "surface-response-zone-missing",
-    "apps/web SurfaceResponseZone component is missing",
-  );
+  fail("surface-response-zone-missing", "apps/web SurfaceResponseZone component is missing");
 } else if (!/SurfaceHost\b/.test(surfaceZone)) {
   fail(
     "surface-response-zone-host",
@@ -146,19 +140,14 @@ if (!surfaceZone) {
 // ---------------------------------------------------------------------------
 // 4. mobile learner stage uses a real session loader (no hardcoded QUESTIONS)
 // ---------------------------------------------------------------------------
-const mobileStage =
-  readIfExists("apps/mobile/app/(learner)/stage/[sessionId].tsx") ?? "";
+const mobileStage = readIfExists("apps/mobile/app/(learner)/stage/[sessionId].tsx") ?? "";
 if (!mobileStage) {
-  fail(
-    "mobile-stage-missing",
-    "apps/mobile/app/(learner)/stage/[sessionId].tsx is missing",
-  );
+  fail("mobile-stage-missing", "apps/mobile/app/(learner)/stage/[sessionId].tsx is missing");
 } else {
-  const hasHardcodedQuestions = /\b(?:const|let|var)\s+QUESTIONS\s*[:=]\s*\[/.test(
+  const hasHardcodedQuestions = /\b(?:const|let|var)\s+QUESTIONS\s*[:=]\s*\[/.test(mobileStage);
+  const hasSessionLoader = /useSession\(|getSession\(|sessionClient\.|fetchStageSession\(/.test(
     mobileStage,
   );
-  const hasSessionLoader =
-    /useSession\(|getSession\(|sessionClient\.|fetchStageSession\(/.test(mobileStage);
   if (hasHardcodedQuestions) {
     fail(
       "mobile-stage-hardcoded-questions",

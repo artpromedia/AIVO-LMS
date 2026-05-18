@@ -1,17 +1,19 @@
 import { FastifyInstance } from "fastify";
 import { eq, and, or, desc, isNull } from "drizzle-orm";
-import {
-  iepEvaluations,
-  learners,
-  learnerTeachers,
-  users,
-} from "@aivo/db";
+import { iepEvaluations, learners, learnerTeachers, users } from "@aivo/db";
 import { verifyJWT } from "@aivo/security";
-import { getIepEvaluationsLearnerByLearnerIdSchema, getIepEvaluationsByIdSchema, patchIepEvaluationsByIdSchema, iepEvaluationsByIdSuggestSchema, iepEvaluationsByIdSubmitSchema } from "./schemas.js";
+import {
+  getIepEvaluationsLearnerByLearnerIdSchema,
+  getIepEvaluationsByIdSchema,
+  patchIepEvaluationsByIdSchema,
+  iepEvaluationsByIdSuggestSchema,
+  iepEvaluationsByIdSubmitSchema,
+} from "./schemas.js";
 
 const COMMS_URL = process.env.COMMS_SVC_URL || "http://localhost:3010";
-const INTERNAL_KEY = process.env.INTERNAL_SERVICE_KEY
-  || (process.env.NODE_ENV === "production" ? "" : "aivo-internal-dev-key");
+const INTERNAL_KEY =
+  process.env.INTERNAL_SERVICE_KEY ||
+  (process.env.NODE_ENV === "production" ? "" : "aivo-internal-dev-key");
 const APP_URL = process.env.APP_URL || "http://localhost:5000";
 
 // Best-effort email dispatch — comms-svc failures must never block the
@@ -23,7 +25,9 @@ async function bestEffortSendEmail(template: string, to: string, data: Record<st
       headers: { "Content-Type": "application/json", "x-internal-key": INTERNAL_KEY },
       body: JSON.stringify({ template, to, data }),
     });
-  } catch { /* swallow */ }
+  } catch {
+    /* swallow */
+  }
 }
 
 // Best-effort in-app notification (parent-only inbox). Mirrors the email
@@ -43,7 +47,9 @@ async function bestEffortInAppNotify(payload: {
       headers: { "Content-Type": "application/json", "x-internal-key": INTERNAL_KEY },
       body: JSON.stringify(payload),
     });
-  } catch { /* swallow */ }
+  } catch {
+    /* swallow */
+  }
 }
 
 const IS_PROD = process.env.NODE_ENV === "production";
@@ -80,21 +86,25 @@ async function authenticate(req: any, reply: any): Promise<AuthClaims | null> {
 
 async function isTeacherOf(db: any, userSub: string, learnerId: string): Promise<boolean> {
   if (!isUuid(userSub) || !isUuid(learnerId)) return false;
-  const rows = await db.select().from(learnerTeachers).where(
-    and(
-      eq(learnerTeachers.learnerId, learnerId),
-      eq(learnerTeachers.teacherUserId, userSub),
-      eq(learnerTeachers.status, "ACCEPTED"),
-    ),
-  );
+  const rows = await db
+    .select()
+    .from(learnerTeachers)
+    .where(
+      and(
+        eq(learnerTeachers.learnerId, learnerId),
+        eq(learnerTeachers.teacherUserId, userSub),
+        eq(learnerTeachers.status, "ACCEPTED"),
+      ),
+    );
   return rows.length > 0;
 }
 
 async function isParentOf(db: any, userSub: string, learnerId: string): Promise<boolean> {
   if (!isUuid(userSub) || !isUuid(learnerId)) return false;
-  const rows = await db.select().from(learners).where(
-    and(eq(learners.id, learnerId), eq(learners.parentId, userSub)),
-  );
+  const rows = await db
+    .select()
+    .from(learners)
+    .where(and(eq(learners.id, learnerId), eq(learners.parentId, userSub)));
   return rows.length > 0;
 }
 
@@ -115,8 +125,10 @@ async function isSpedLeadForLearner(db: any, claims: AuthClaims, learner: any): 
   // we deny — SPED_LEAD without a school assignment is a misconfiguration
   // we won't paper over.
   if (!learner.schoolId) return false;
-  const [u] = await db.select({ schoolId: users.schoolId })
-    .from(users).where(eq(users.id, claims.sub));
+  const [u] = await db
+    .select({ schoolId: users.schoolId })
+    .from(users)
+    .where(eq(users.id, claims.sub));
   if (!u?.schoolId) return false;
   return u.schoolId === learner.schoolId;
 }
@@ -142,7 +154,7 @@ async function canWrite(db: any, claims: AuthClaims, learnerId: string): Promise
     return claims.tenantId === learner.tenantId;
   }
   if (await isSpedLeadForLearner(db, claims, learner)) return true;
-  if (claims.role === "TEACHER" && await isTeacherOf(db, claims.sub, learnerId)) return true;
+  if (claims.role === "TEACHER" && (await isTeacherOf(db, claims.sub, learnerId))) return true;
   return false;
 }
 
@@ -168,291 +180,348 @@ export async function registerIepEvaluationRoutes(app: FastifyInstance) {
   const db = (app as any).db;
 
   // Create a draft evaluation
-  app.post("/api/iep/evaluations", {
-    schema: {
-      tags: ["IEP-Evaluations"],
-      security: [{ bearerAuth: [] }],
-      body: {
-        type: "object",
-        required: ["learnerId"],
-        properties: {
-          learnerId: { type: "string" },
-          referralReason: { type: "string" },
-          assessmentAreas: { type: "array" },
-          observations: { type: "string" },
-          parentInput: { type: "string" },
+  app.post(
+    "/api/iep/evaluations",
+    {
+      schema: {
+        tags: ["IEP-Evaluations"],
+        security: [{ bearerAuth: [] }],
+        body: {
+          type: "object",
+          required: ["learnerId"],
+          properties: {
+            learnerId: { type: "string" },
+            referralReason: { type: "string" },
+            assessmentAreas: { type: "array" },
+            observations: { type: "string" },
+            parentInput: { type: "string" },
+          },
         },
       },
     },
-  }, async (req, reply) => {
-    const claims = await authenticate(req, reply);
-    if (!claims) return;
-    const body = req.body as any;
-    const learner = await getLearner(db, body.learnerId);
-    if (!learner) return reply.code(404).send({ error: "Learner not found" });
-    if (!await canWrite(db, claims, body.learnerId)) {
-      return reply.code(403).send({ error: "Access denied" });
-    }
+    async (req, reply) => {
+      const claims = await authenticate(req, reply);
+      if (!claims) return;
+      const body = req.body as any;
+      const learner = await getLearner(db, body.learnerId);
+      if (!learner) return reply.code(404).send({ error: "Learner not found" });
+      if (!(await canWrite(db, claims, body.learnerId))) {
+        return reply.code(403).send({ error: "Access denied" });
+      }
 
-    const [row] = await db.insert(iepEvaluations).values({
-      learnerId: body.learnerId,
-      tenantId: learner.tenantId,
-      initiatedByUserId: claims.sub,
-      status: "draft",
-      referralReason: body.referralReason || null,
-      assessmentAreas: body.assessmentAreas || [],
-      observations: body.observations || null,
-      parentInput: body.parentInput || null,
-    }).returning();
-    return row;
-  });
+      const [row] = await db
+        .insert(iepEvaluations)
+        .values({
+          learnerId: body.learnerId,
+          tenantId: learner.tenantId,
+          initiatedByUserId: claims.sub,
+          status: "draft",
+          referralReason: body.referralReason || null,
+          assessmentAreas: body.assessmentAreas || [],
+          observations: body.observations || null,
+          parentInput: body.parentInput || null,
+        })
+        .returning();
+      return row;
+    },
+  );
 
   // List evaluations for a learner
-  app.get("/api/iep/evaluations/learner/:learnerId", { schema: getIepEvaluationsLearnerByLearnerIdSchema }, async (req, reply) => {
-    const claims = await authenticate(req, reply);
-    if (!claims) return;
-    const { learnerId } = req.params as { learnerId: string };
-    if (!await canRead(db, claims, learnerId)) {
-      return reply.code(403).send({ error: "Access denied" });
-    }
-    const rows = await db.select().from(iepEvaluations)
-      .where(eq(iepEvaluations.learnerId, learnerId))
-      .orderBy(desc(iepEvaluations.createdAt));
-    // Parents only see submitted/decided records, and only summary fields.
-    if (claims.role === "PARENT") {
-      return rows
-        .filter((r: any) => (PARENT_VISIBLE_STATUSES as readonly string[]).includes(r.status))
-        .map(parentSummary);
-    }
-    return rows;
-  });
+  app.get(
+    "/api/iep/evaluations/learner/:learnerId",
+    { schema: getIepEvaluationsLearnerByLearnerIdSchema },
+    async (req, reply) => {
+      const claims = await authenticate(req, reply);
+      if (!claims) return;
+      const { learnerId } = req.params as { learnerId: string };
+      if (!(await canRead(db, claims, learnerId))) {
+        return reply.code(403).send({ error: "Access denied" });
+      }
+      const rows = await db
+        .select()
+        .from(iepEvaluations)
+        .where(eq(iepEvaluations.learnerId, learnerId))
+        .orderBy(desc(iepEvaluations.createdAt));
+      // Parents only see submitted/decided records, and only summary fields.
+      if (claims.role === "PARENT") {
+        return rows
+          .filter((r: any) => (PARENT_VISIBLE_STATUSES as readonly string[]).includes(r.status))
+          .map(parentSummary);
+      }
+      return rows;
+    },
+  );
 
   // Get single evaluation
-  app.get("/api/iep/evaluations/:id", { schema: getIepEvaluationsByIdSchema }, async (req, reply) => {
-    const claims = await authenticate(req, reply);
-    if (!claims) return;
-    const { id } = req.params as { id: string };
-    if (!isUuid(id)) return reply.code(400).send({ error: "Invalid id" });
-    const [row] = await db.select().from(iepEvaluations).where(eq(iepEvaluations.id, id));
-    if (!row) return reply.code(404).send({ error: "Evaluation not found" });
-    if (!await canRead(db, claims, row.learnerId)) {
-      return reply.code(403).send({ error: "Access denied" });
-    }
-    if (claims.role === "PARENT") {
-      if (!(PARENT_VISIBLE_STATUSES as readonly string[]).includes(row.status)) {
-        return reply.code(404).send({ error: "Evaluation not found" });
+  app.get(
+    "/api/iep/evaluations/:id",
+    { schema: getIepEvaluationsByIdSchema },
+    async (req, reply) => {
+      const claims = await authenticate(req, reply);
+      if (!claims) return;
+      const { id } = req.params as { id: string };
+      if (!isUuid(id)) return reply.code(400).send({ error: "Invalid id" });
+      const [row] = await db.select().from(iepEvaluations).where(eq(iepEvaluations.id, id));
+      if (!row) return reply.code(404).send({ error: "Evaluation not found" });
+      if (!(await canRead(db, claims, row.learnerId))) {
+        return reply.code(403).send({ error: "Access denied" });
       }
-      return parentSummary(row);
-    }
-    return row;
-  });
+      if (claims.role === "PARENT") {
+        if (!(PARENT_VISIBLE_STATUSES as readonly string[]).includes(row.status)) {
+          return reply.code(404).send({ error: "Evaluation not found" });
+        }
+        return parentSummary(row);
+      }
+      return row;
+    },
+  );
 
   // Update a draft/submitted evaluation
-  app.patch("/api/iep/evaluations/:id", { schema: patchIepEvaluationsByIdSchema }, async (req, reply) => {
-    const claims = await authenticate(req, reply);
-    if (!claims) return;
-    const { id } = req.params as { id: string };
-    if (!isUuid(id)) return reply.code(400).send({ error: "Invalid id" });
-    const [existing] = await db.select().from(iepEvaluations).where(eq(iepEvaluations.id, id));
-    if (!existing) return reply.code(404).send({ error: "Evaluation not found" });
-    if (!await canWrite(db, claims, existing.learnerId)) {
-      return reply.code(403).send({ error: "Access denied" });
-    }
-    if (existing.status === "eligibility_determined") {
-      return reply.code(409).send({ error: "Decision already recorded; cannot edit" });
-    }
-    const body = req.body as any;
-    const update: any = { updatedAt: new Date() };
-    if (body.referralReason !== undefined) update.referralReason = body.referralReason;
-    if (body.assessmentAreas !== undefined) update.assessmentAreas = body.assessmentAreas;
-    if (body.observations !== undefined) update.observations = body.observations;
-    if (body.parentInput !== undefined) update.parentInput = body.parentInput;
-    // Status-guarded write so a concurrent decision call cannot be overwritten.
-    const updated = await db.update(iepEvaluations).set(update).where(and(
-      eq(iepEvaluations.id, id),
-      or(eq(iepEvaluations.status, "draft"), eq(iepEvaluations.status, "submitted")),
-    )).returning();
-    if (updated.length === 0) {
-      return reply.code(409).send({ error: "Evaluation status changed; please reload" });
-    }
-    return updated[0];
-  });
+  app.patch(
+    "/api/iep/evaluations/:id",
+    { schema: patchIepEvaluationsByIdSchema },
+    async (req, reply) => {
+      const claims = await authenticate(req, reply);
+      if (!claims) return;
+      const { id } = req.params as { id: string };
+      if (!isUuid(id)) return reply.code(400).send({ error: "Invalid id" });
+      const [existing] = await db.select().from(iepEvaluations).where(eq(iepEvaluations.id, id));
+      if (!existing) return reply.code(404).send({ error: "Evaluation not found" });
+      if (!(await canWrite(db, claims, existing.learnerId))) {
+        return reply.code(403).send({ error: "Access denied" });
+      }
+      if (existing.status === "eligibility_determined") {
+        return reply.code(409).send({ error: "Decision already recorded; cannot edit" });
+      }
+      const body = req.body as any;
+      const update: any = { updatedAt: new Date() };
+      if (body.referralReason !== undefined) update.referralReason = body.referralReason;
+      if (body.assessmentAreas !== undefined) update.assessmentAreas = body.assessmentAreas;
+      if (body.observations !== undefined) update.observations = body.observations;
+      if (body.parentInput !== undefined) update.parentInput = body.parentInput;
+      // Status-guarded write so a concurrent decision call cannot be overwritten.
+      const updated = await db
+        .update(iepEvaluations)
+        .set(update)
+        .where(
+          and(
+            eq(iepEvaluations.id, id),
+            or(eq(iepEvaluations.status, "draft"), eq(iepEvaluations.status, "submitted")),
+          ),
+        )
+        .returning();
+      if (updated.length === 0) {
+        return reply.code(409).send({ error: "Evaluation status changed; please reload" });
+      }
+      return updated[0];
+    },
+  );
 
   // Request AI eligibility suggestion
-  app.post("/api/iep/evaluations/:id/suggest", { schema: iepEvaluationsByIdSuggestSchema }, async (req, reply) => {
-    const claims = await authenticate(req, reply);
-    if (!claims) return;
-    const { id } = req.params as { id: string };
-    if (!isUuid(id)) return reply.code(400).send({ error: "Invalid id" });
-    const [evalRow] = await db.select().from(iepEvaluations).where(eq(iepEvaluations.id, id));
-    if (!evalRow) return reply.code(404).send({ error: "Evaluation not found" });
-    if (!await canWrite(db, claims, evalRow.learnerId)) {
-      return reply.code(403).send({ error: "Access denied" });
-    }
+  app.post(
+    "/api/iep/evaluations/:id/suggest",
+    { schema: iepEvaluationsByIdSuggestSchema },
+    async (req, reply) => {
+      const claims = await authenticate(req, reply);
+      if (!claims) return;
+      const { id } = req.params as { id: string };
+      if (!isUuid(id)) return reply.code(400).send({ error: "Invalid id" });
+      const [evalRow] = await db.select().from(iepEvaluations).where(eq(iepEvaluations.id, id));
+      if (!evalRow) return reply.code(404).send({ error: "Evaluation not found" });
+      if (!(await canWrite(db, claims, evalRow.learnerId))) {
+        return reply.code(403).send({ error: "Access denied" });
+      }
 
-    let suggestion: any = null;
-    try {
-      const aiRes = await fetch(`${AI_SVC_URL}/api/ai/eligibility-suggest`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          referral_reason: evalRow.referralReason || "",
-          assessment_areas: evalRow.assessmentAreas || [],
-          observations: evalRow.observations || "",
-          parent_input: evalRow.parentInput || "",
-        }),
-      });
-      if (aiRes.ok) suggestion = await aiRes.json();
-    } catch (err) {
-      req.log.error({ err }, "AI eligibility-suggest call failed");
-    }
-    if (!suggestion) {
-      return reply.code(502).send({ error: "AI eligibility suggestion unavailable" });
-    }
-    const [row] = await db.update(iepEvaluations)
-      .set({ aiSuggestion: suggestion, updatedAt: new Date() })
-      .where(eq(iepEvaluations.id, id)).returning();
-    return row;
-  });
+      let suggestion: any = null;
+      try {
+        const aiRes = await fetch(`${AI_SVC_URL}/api/ai/eligibility-suggest`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            referral_reason: evalRow.referralReason || "",
+            assessment_areas: evalRow.assessmentAreas || [],
+            observations: evalRow.observations || "",
+            parent_input: evalRow.parentInput || "",
+          }),
+        });
+        if (aiRes.ok) suggestion = await aiRes.json();
+      } catch (err) {
+        req.log.error({ err }, "AI eligibility-suggest call failed");
+      }
+      if (!suggestion) {
+        return reply.code(502).send({ error: "AI eligibility suggestion unavailable" });
+      }
+      const [row] = await db
+        .update(iepEvaluations)
+        .set({ aiSuggestion: suggestion, updatedAt: new Date() })
+        .where(eq(iepEvaluations.id, id))
+        .returning();
+      return row;
+    },
+  );
 
   // Submit (move from draft → submitted). Fires parent + district-admin
   // notifications exactly once per evaluation via the submit_notified_at
   // latch — a retried submit cannot duplicate the alert.
-  app.post("/api/iep/evaluations/:id/submit", { schema: iepEvaluationsByIdSubmitSchema }, async (req, reply) => {
-    const claims = await authenticate(req, reply);
-    if (!claims) return;
-    const { id } = req.params as { id: string };
-    if (!isUuid(id)) return reply.code(400).send({ error: "Invalid id" });
-    const [existing] = await db.select().from(iepEvaluations).where(eq(iepEvaluations.id, id));
-    if (!existing) return reply.code(404).send({ error: "Evaluation not found" });
-    if (!await canWrite(db, claims, existing.learnerId)) {
-      return reply.code(403).send({ error: "Access denied" });
-    }
-    if (existing.status !== "draft") {
-      return reply.code(409).send({ error: `Cannot submit from status '${existing.status}'` });
-    }
-    // Status-guarded UPDATE so concurrent submit retries elect a single
-    // winner at the database — the read-then-write check above is a
-    // TOCTOU and cannot be relied on alone.
-    const [row] = await db.update(iepEvaluations)
-      .set({ status: "submitted", submittedAt: new Date(), updatedAt: new Date() })
-      .where(and(eq(iepEvaluations.id, id), eq(iepEvaluations.status, "draft")))
-      .returning();
-    if (!row) {
-      return reply.code(409).send({ error: "Evaluation status changed; please reload" });
-    }
-    // Idempotent notification dispatch: claim the latch atomically and
-    // only fan out if the UPDATE wins. Concurrent submit retries see
-    // `notified.length === 0` and skip dispatch entirely.
-    void (async () => {
-      try {
-        const notified = await db.update(iepEvaluations)
-          .set({ submitNotifiedAt: new Date() })
-          .where(and(
-            eq(iepEvaluations.id, id),
-            isNull(iepEvaluations.submitNotifiedAt),
-          ))
-          .returning({ id: iepEvaluations.id });
-        if (notified.length === 0) return;
-        await dispatchSubmittedNotifications(db, row);
-      } catch (err) {
-        req.log.error({ err, evaluationId: id }, "evaluation-submit notify dispatch failed");
+  app.post(
+    "/api/iep/evaluations/:id/submit",
+    { schema: iepEvaluationsByIdSubmitSchema },
+    async (req, reply) => {
+      const claims = await authenticate(req, reply);
+      if (!claims) return;
+      const { id } = req.params as { id: string };
+      if (!isUuid(id)) return reply.code(400).send({ error: "Invalid id" });
+      const [existing] = await db.select().from(iepEvaluations).where(eq(iepEvaluations.id, id));
+      if (!existing) return reply.code(404).send({ error: "Evaluation not found" });
+      if (!(await canWrite(db, claims, existing.learnerId))) {
+        return reply.code(403).send({ error: "Access denied" });
       }
-    })();
-    return row;
-  });
+      if (existing.status !== "draft") {
+        return reply.code(409).send({ error: `Cannot submit from status '${existing.status}'` });
+      }
+      // Status-guarded UPDATE so concurrent submit retries elect a single
+      // winner at the database — the read-then-write check above is a
+      // TOCTOU and cannot be relied on alone.
+      const [row] = await db
+        .update(iepEvaluations)
+        .set({ status: "submitted", submittedAt: new Date(), updatedAt: new Date() })
+        .where(and(eq(iepEvaluations.id, id), eq(iepEvaluations.status, "draft")))
+        .returning();
+      if (!row) {
+        return reply.code(409).send({ error: "Evaluation status changed; please reload" });
+      }
+      // Idempotent notification dispatch: claim the latch atomically and
+      // only fan out if the UPDATE wins. Concurrent submit retries see
+      // `notified.length === 0` and skip dispatch entirely.
+      void (async () => {
+        try {
+          const notified = await db
+            .update(iepEvaluations)
+            .set({ submitNotifiedAt: new Date() })
+            .where(and(eq(iepEvaluations.id, id), isNull(iepEvaluations.submitNotifiedAt)))
+            .returning({ id: iepEvaluations.id });
+          if (notified.length === 0) return;
+          await dispatchSubmittedNotifications(db, row);
+        } catch (err) {
+          req.log.error({ err, evaluationId: id }, "evaluation-submit notify dispatch failed");
+        }
+      })();
+      return row;
+    },
+  );
 
   // Record team eligibility decision (eligible | not_eligible | needs_more_data).
   // The status moves to "eligibility_determined" regardless of which value the
   // team chose; the specific outcome lives in `decisionEligible`.
-  app.post("/api/iep/evaluations/:id/decision", {
-    schema: {
-      tags: ["IEP-Evaluations"],
-      security: [{ bearerAuth: [] }],
-      body: {
-        type: "object",
-        properties: {
-          decision: { type: "string", enum: ["eligible", "not_eligible", "needs_more_data"] },
-          eligible: { type: "boolean" },
-          categories: { type: "array", items: { type: "string" } },
-          rationale: { type: "string" },
+  app.post(
+    "/api/iep/evaluations/:id/decision",
+    {
+      schema: {
+        tags: ["IEP-Evaluations"],
+        security: [{ bearerAuth: [] }],
+        body: {
+          type: "object",
+          properties: {
+            decision: { type: "string", enum: ["eligible", "not_eligible", "needs_more_data"] },
+            eligible: { type: "boolean" },
+            categories: { type: "array", items: { type: "string" } },
+            rationale: { type: "string" },
+          },
         },
       },
     },
-  }, async (req, reply) => {
-    const claims = await authenticate(req, reply);
-    if (!claims) return;
-    const { id } = req.params as { id: string };
-    if (!isUuid(id)) return reply.code(400).send({ error: "Invalid id" });
-    const [existing] = await db.select().from(iepEvaluations).where(eq(iepEvaluations.id, id));
-    if (!existing) return reply.code(404).send({ error: "Evaluation not found" });
-    if (!await canWrite(db, claims, existing.learnerId)) {
-      return reply.code(403).send({ error: "Access denied" });
-    }
-    if (existing.status !== "submitted") {
-      return reply.code(409).send({ error: "Evaluation must be submitted before recording a decision" });
-    }
-    type Decision = "eligible" | "not_eligible" | "needs_more_data";
-    const body = req.body as {
-      decision?: Decision;
-      eligible?: boolean;
-      categories?: string[];
-      rationale?: string;
-    };
-    let decision: Decision | null = null;
-    if (body.decision === "eligible" || body.decision === "not_eligible" || body.decision === "needs_more_data") {
-      decision = body.decision;
-    } else if (body.eligible === true) {
-      decision = "eligible";
-    } else if (body.eligible === false) {
-      decision = "not_eligible";
-    }
-    if (!decision) {
-      return reply.code(400).send({ error: "decision is required" });
-    }
-    // Validate categories against the IDEA-13 enum so we don't persist arbitrary strings.
-    const ALLOWED_CATEGORIES = new Set([
-      "autism", "specific_learning_disability", "speech_language_impairment",
-      "other_health_impairment", "emotional_disturbance", "intellectual_disability",
-      "developmental_delay", "hearing_impairment", "visual_impairment",
-      "orthopedic_impairment", "traumatic_brain_injury", "multiple_disabilities",
-      "deaf_blindness", "deafness",
-    ]);
-    const cleanCategories = Array.isArray(body.categories)
-      ? body.categories.filter((c) => typeof c === "string" && ALLOWED_CATEGORIES.has(c))
-      : [];
-    // Status-guarded update prevents races with concurrent PATCH/decision requests.
-    const updated = await db.update(iepEvaluations).set({
-      status: "eligibility_determined",
-      decisionEligible: decision,
-      decisionCategories: cleanCategories,
-      decisionRationale: body.rationale || null,
-      decidedAt: new Date(),
-      decidedByUserId: claims.sub,
-      updatedAt: new Date(),
-    }).where(and(eq(iepEvaluations.id, id), eq(iepEvaluations.status, "submitted"))).returning();
-    if (updated.length === 0) {
-      return reply.code(409).send({ error: "Evaluation status changed; please reload" });
-    }
-    // Notify the parent that the eligibility decision has been recorded —
-    // exactly once per evaluation via the decision_notified_at latch.
-    void (async () => {
-      try {
-        const notified = await db.update(iepEvaluations)
-          .set({ decisionNotifiedAt: new Date() })
-          .where(and(
-            eq(iepEvaluations.id, id),
-            isNull(iepEvaluations.decisionNotifiedAt),
-          ))
-          .returning({ id: iepEvaluations.id });
-        if (notified.length === 0) return;
-        await dispatchDecidedNotifications(db, updated[0]);
-      } catch (err) {
-        req.log.error({ err, evaluationId: id }, "evaluation-decision notify dispatch failed");
+    async (req, reply) => {
+      const claims = await authenticate(req, reply);
+      if (!claims) return;
+      const { id } = req.params as { id: string };
+      if (!isUuid(id)) return reply.code(400).send({ error: "Invalid id" });
+      const [existing] = await db.select().from(iepEvaluations).where(eq(iepEvaluations.id, id));
+      if (!existing) return reply.code(404).send({ error: "Evaluation not found" });
+      if (!(await canWrite(db, claims, existing.learnerId))) {
+        return reply.code(403).send({ error: "Access denied" });
       }
-    })();
-    return updated[0];
-  });
+      if (existing.status !== "submitted") {
+        return reply
+          .code(409)
+          .send({ error: "Evaluation must be submitted before recording a decision" });
+      }
+      type Decision = "eligible" | "not_eligible" | "needs_more_data";
+      const body = req.body as {
+        decision?: Decision;
+        eligible?: boolean;
+        categories?: string[];
+        rationale?: string;
+      };
+      let decision: Decision | null = null;
+      if (
+        body.decision === "eligible" ||
+        body.decision === "not_eligible" ||
+        body.decision === "needs_more_data"
+      ) {
+        decision = body.decision;
+      } else if (body.eligible === true) {
+        decision = "eligible";
+      } else if (body.eligible === false) {
+        decision = "not_eligible";
+      }
+      if (!decision) {
+        return reply.code(400).send({ error: "decision is required" });
+      }
+      // Validate categories against the IDEA-13 enum so we don't persist arbitrary strings.
+      const ALLOWED_CATEGORIES = new Set([
+        "autism",
+        "specific_learning_disability",
+        "speech_language_impairment",
+        "other_health_impairment",
+        "emotional_disturbance",
+        "intellectual_disability",
+        "developmental_delay",
+        "hearing_impairment",
+        "visual_impairment",
+        "orthopedic_impairment",
+        "traumatic_brain_injury",
+        "multiple_disabilities",
+        "deaf_blindness",
+        "deafness",
+      ]);
+      const cleanCategories = Array.isArray(body.categories)
+        ? body.categories.filter((c) => typeof c === "string" && ALLOWED_CATEGORIES.has(c))
+        : [];
+      // Status-guarded update prevents races with concurrent PATCH/decision requests.
+      const updated = await db
+        .update(iepEvaluations)
+        .set({
+          status: "eligibility_determined",
+          decisionEligible: decision,
+          decisionCategories: cleanCategories,
+          decisionRationale: body.rationale || null,
+          decidedAt: new Date(),
+          decidedByUserId: claims.sub,
+          updatedAt: new Date(),
+        })
+        .where(and(eq(iepEvaluations.id, id), eq(iepEvaluations.status, "submitted")))
+        .returning();
+      if (updated.length === 0) {
+        return reply.code(409).send({ error: "Evaluation status changed; please reload" });
+      }
+      // Notify the parent that the eligibility decision has been recorded —
+      // exactly once per evaluation via the decision_notified_at latch.
+      void (async () => {
+        try {
+          const notified = await db
+            .update(iepEvaluations)
+            .set({ decisionNotifiedAt: new Date() })
+            .where(and(eq(iepEvaluations.id, id), isNull(iepEvaluations.decisionNotifiedAt)))
+            .returning({ id: iepEvaluations.id });
+          if (notified.length === 0) return;
+          await dispatchDecidedNotifications(db, updated[0]);
+        } catch (err) {
+          req.log.error({ err, evaluationId: id }, "evaluation-decision notify dispatch failed");
+        }
+      })();
+      return updated[0];
+    },
+  );
 }
 
 // Fan out parent + district-admin notifications when an evaluation is
@@ -462,9 +531,14 @@ export async function registerIepEvaluationRoutes(app: FastifyInstance) {
 async function dispatchSubmittedNotifications(db: any, evalRow: any) {
   const [learner] = await db.select().from(learners).where(eq(learners.id, evalRow.learnerId));
   if (!learner) return;
-  const [parent] = await db.select({
-    id: users.id, email: users.email, name: users.name,
-  }).from(users).where(eq(users.id, learner.parentId));
+  const [parent] = await db
+    .select({
+      id: users.id,
+      email: users.email,
+      name: users.name,
+    })
+    .from(users)
+    .where(eq(users.id, learner.parentId));
   const learnerLink = `${APP_URL}/dashboard/parent/learner/${learner.id}`;
   if (parent?.email) {
     await bestEffortSendEmail("evaluation_submitted", parent.email, {
@@ -487,7 +561,8 @@ async function dispatchSubmittedNotifications(db: any, evalRow: any) {
   // District admin email digest. The dashboard tile aggregates submitted
   // evaluations from /api/iep/evaluations/learner/:id; the email here is
   // a courtesy ping so admins don't have to refresh the tile to notice.
-  const districtAdmins = await db.select({ email: users.email })
+  const districtAdmins = await db
+    .select({ email: users.email })
     .from(users)
     .where(and(eq(users.role, "DISTRICT_ADMIN"), eq(users.tenantId, evalRow.tenantId)));
   for (const admin of districtAdmins) {
@@ -506,9 +581,14 @@ async function dispatchSubmittedNotifications(db: any, evalRow: any) {
 async function dispatchDecidedNotifications(db: any, evalRow: any) {
   const [learner] = await db.select().from(learners).where(eq(learners.id, evalRow.learnerId));
   if (!learner) return;
-  const [parent] = await db.select({
-    id: users.id, email: users.email, name: users.name,
-  }).from(users).where(eq(users.id, learner.parentId));
+  const [parent] = await db
+    .select({
+      id: users.id,
+      email: users.email,
+      name: users.name,
+    })
+    .from(users)
+    .where(eq(users.id, learner.parentId));
   const learnerLink = `${APP_URL}/dashboard/parent/learner/${learner.id}`;
   const decision = evalRow.decisionEligible || "needs_more_data";
   if (parent?.email) {

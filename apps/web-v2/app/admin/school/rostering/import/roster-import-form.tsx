@@ -79,22 +79,47 @@ export function RosterImportForm({ schoolId, sampleCsv }: { schoolId: string; sa
         <div className="rounded-lg border border-aivo-border bg-aivo-surface p-4">
           <div className="flex items-center justify-between">
             <p className="font-medium">
-              Job {job.id} <Badge tone={job.status === "completed" ? "success" : job.status === "dry_run" ? "primary" : "warning"}>{job.status}</Badge>
+              Job {job.id}{" "}
+              <Badge
+                tone={
+                  job.status === "completed"
+                    ? "success"
+                    : job.status === "dry_run"
+                      ? "primary"
+                      : "warning"
+                }
+              >
+                {job.status}
+              </Badge>
             </p>
-            <p className="text-xs text-aivo-muted">{job.dryRun ? "Dry run — no rows persisted." : "Committed."}</p>
+            <p className="text-xs text-aivo-muted">
+              {job.dryRun ? "Dry run — no rows persisted." : "Committed."}
+            </p>
           </div>
           <div className="mt-2 grid grid-cols-4 gap-2 text-sm">
-            <div><span className="text-aivo-muted">Total:</span> {job.totalRows}</div>
-            <div><span className="text-aivo-muted">Created:</span> {job.createdRows}</div>
-            <div><span className="text-aivo-muted">Skipped:</span> {job.skippedRows}</div>
-            <div><span className="text-aivo-muted">Errors:</span> {job.errorRows}</div>
+            <div>
+              <span className="text-aivo-muted">Total:</span> {job.totalRows}
+            </div>
+            <div>
+              <span className="text-aivo-muted">Created:</span> {job.createdRows}
+            </div>
+            <div>
+              <span className="text-aivo-muted">Skipped:</span> {job.skippedRows}
+            </div>
+            <div>
+              <span className="text-aivo-muted">Errors:</span> {job.errorRows}
+            </div>
           </div>
           {errors.length > 0 ? (
             <ul className="mt-3 space-y-1 text-xs">
               {errors.slice(0, 25).map((e) => (
-                <li key={e.rowNumber} className="text-aivo-danger">Row {e.rowNumber}: {e.message}</li>
+                <li key={e.rowNumber} className="text-aivo-danger">
+                  Row {e.rowNumber}: {e.message}
+                </li>
               ))}
-              {errors.length > 25 ? <li className="text-aivo-muted">…and {errors.length - 25} more.</li> : null}
+              {errors.length > 25 ? (
+                <li className="text-aivo-muted">…and {errors.length - 25} more.</li>
+              ) : null}
             </ul>
           ) : null}
         </div>

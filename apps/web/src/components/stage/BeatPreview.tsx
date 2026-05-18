@@ -11,7 +11,13 @@ interface BeatPreviewProps {
   onReady: () => void;
 }
 
-export function BeatPreview({ beat, tutorName, accentColor, autoAdvanceMs = 2000, onReady }: BeatPreviewProps) {
+export function BeatPreview({
+  beat,
+  tutorName,
+  accentColor,
+  autoAdvanceMs = 2000,
+  onReady,
+}: BeatPreviewProps) {
   const [interacted, setInteracted] = useState(false);
 
   useEffect(() => {
@@ -51,7 +57,11 @@ export function BeatPreview({ beat, tutorName, accentColor, autoAdvanceMs = 2000
         role="alert"
         aria-label={`Coming up: ${beatTitle}`}
       >
-        <div className="w-16 h-16 mx-auto mb-3 rounded-2xl flex items-center justify-center" style={{ backgroundColor: `${accentColor}1f`, color: accentColor }} aria-hidden="true">
+        <div
+          className="w-16 h-16 mx-auto mb-3 rounded-2xl flex items-center justify-center"
+          style={{ backgroundColor: `${accentColor}1f`, color: accentColor }}
+          aria-hidden="true"
+        >
           <BeatIcon className="w-8 h-8" strokeWidth={2} />
         </div>
         <p className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-1">Coming up</p>

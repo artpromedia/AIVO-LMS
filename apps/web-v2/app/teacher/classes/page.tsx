@@ -2,7 +2,6 @@ import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { TEACHER_NAV } from "@/components/layout/role-shells";
@@ -43,7 +42,9 @@ export default async function Page() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="font-display text-base font-semibold">{c.name}</p>
-                    <p className="text-xs text-aivo-muted">{c.gradeBand} · {learners} learners</p>
+                    <p className="text-xs text-aivo-muted">
+                      {c.gradeBand} · {learners} learners
+                    </p>
                   </div>
                   <Badge tone="primary">{c.gradeBand}</Badge>
                 </div>

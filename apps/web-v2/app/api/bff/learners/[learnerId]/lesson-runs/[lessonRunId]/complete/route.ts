@@ -5,11 +5,7 @@ import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guar
 import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import { audit } from "@/lib/bff/audit";
 import { z } from "zod";
-import {
-  completeLessonRun,
-  deriveOutcomeFromInteractions,
-  getLessonRun,
-} from "@/lib/db/repos";
+import { completeLessonRun, deriveOutcomeFromInteractions, getLessonRun } from "@/lib/db/repos";
 
 /**
  * Post-architect-review: the client is no longer trusted to report check
@@ -42,7 +38,12 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection", "ai_personalization"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection", "ai_personalization"],
+      requestId,
+    );
     if (consentErr) return consentErr;
     const found = getLessonRun(lessonRunId, session!.tenantId);
     if (!found || found.lessonRun.learnerId !== learnerId) {
@@ -64,7 +65,10 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
         const parsed = BodySchema.safeParse(raw);
         if (!parsed.success) {
           return fail(
-            { ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid outcome" },
+            {
+              ...ERRORS.VALIDATION_FAILED,
+              message: parsed.error.issues[0]?.message ?? "Invalid outcome",
+            },
             requestId,
           );
         }
@@ -79,8 +83,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       ? undefined
       : deriveOutcomeFromInteractions(found.lessonRun, abandoned);
     const updated = completeLessonRun(lessonRunId, session!.tenantId, derivedOutcome);
-    if (!updated)
-      return fail({ ...ERRORS.NOT_FOUND, message: "Lesson run not found" }, requestId);
+    if (!updated) return fail({ ...ERRORS.NOT_FOUND, message: "Lesson run not found" }, requestId);
     if (!wasAlreadyComplete) {
       audit(session!, "lesson_run.complete", requestId, {
         learnerId,

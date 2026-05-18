@@ -27,7 +27,10 @@ test.describe("learner session", () => {
       route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify({ sessionId: "sess-1", tutor: { slug: "math-buddy", name: "Math Buddy" } }),
+        body: JSON.stringify({
+          sessionId: "sess-1",
+          tutor: { slug: "math-buddy", name: "Math Buddy" },
+        }),
       }),
     );
     await page.route("**/api/tutors/**/message", (route) =>
@@ -59,21 +62,30 @@ test.describe("learner session", () => {
   test("learner home renders without server error", async ({ page }) => {
     const response = await page.goto("/dashboard/learner");
     expect(response?.status()).toBeLessThan(500);
-    const body = await page.locator("body").innerText().catch(() => "");
+    const body = await page
+      .locator("body")
+      .innerText()
+      .catch(() => "");
     expect(body).not.toMatch(/Application error|Internal Server Error/i);
   });
 
   test("learner tutors catalog resolves", async ({ page }) => {
     const response = await page.goto("/dashboard/learner/tutors");
     expect(response?.status()).toBeLessThan(500);
-    const body = await page.locator("body").innerText().catch(() => "");
+    const body = await page
+      .locator("body")
+      .innerText()
+      .catch(() => "");
     expect(body).not.toMatch(/Application error|Internal Server Error/i);
   });
 
   test("learner homework page resolves", async ({ page }) => {
     const response = await page.goto("/dashboard/learner/homework");
     expect(response?.status()).toBeLessThan(500);
-    const body = await page.locator("body").innerText().catch(() => "");
+    const body = await page
+      .locator("body")
+      .innerText()
+      .catch(() => "");
     expect(body).not.toMatch(/Application error|Internal Server Error/i);
   });
 });

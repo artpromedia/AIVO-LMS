@@ -19,12 +19,18 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
   try {
     const { session, response } = await requireSession(req, requestId);
     if (response) return response;
-    const roleErr = requireRole(session!, ["parent", "learner", "teacher", "school_admin"], requestId);
+    const roleErr = requireRole(
+      session!,
+      ["parent", "learner", "teacher", "school_admin"],
+      requestId,
+    );
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
     const limitParam = new URL(req.url).searchParams.get("limit");
-    const limit = limitParam ? Math.min(100, Math.max(1, Number.parseInt(limitParam, 10) || 25)) : 25;
+    const limit = limitParam
+      ? Math.min(100, Math.max(1, Number.parseInt(limitParam, 10) || 25))
+      : 25;
     const runs = listLessonRunsForLearner(learnerId, session!.tenantId, { limit });
     return ok({ lessonRuns: runs }, requestId);
   } catch (e) {
@@ -60,7 +66,10 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     const parsed = LessonRunCreateInput.safeParse(body);
     if (!parsed.success) {
       return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid input" },
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid input",
+        },
         requestId,
       );
     }

@@ -16,11 +16,11 @@ Dev mode uses Turbopack and `next dev`. Production binds to `0.0.0.0:$PORT`.
 
 ## Required environment
 
-| Variable                  | Required in prod | Notes                                            |
-|---------------------------|------------------|--------------------------------------------------|
-| `NODE_ENV`                | yes              | `production` enables HSTS + strict envs.         |
-| `NEXT_PUBLIC_AUTH_MODE`   | yes              | Must be `production` once a real IdP is wired.   |
-| `PORT`                    | yes              | Bind port for `next start`.                      |
+| Variable                | Required in prod | Notes                                          |
+| ----------------------- | ---------------- | ---------------------------------------------- |
+| `NODE_ENV`              | yes              | `production` enables HSTS + strict envs.       |
+| `NEXT_PUBLIC_AUTH_MODE` | yes              | Must be `production` once a real IdP is wired. |
+| `PORT`                  | yes              | Bind port for `next start`.                    |
 
 Mock auth is intentionally still active (Sprint 24 ships the data layer;
 provider swap is its own deliverable). The root layout renders a yellow

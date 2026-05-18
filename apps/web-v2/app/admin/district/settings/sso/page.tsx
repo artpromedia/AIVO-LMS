@@ -35,9 +35,7 @@ export default async function Page() {
             <div className="flex items-center justify-between">
               <dt className="text-aivo-ink-soft">Mode</dt>
               <dd>
-                <Badge
-                  tone={settings.sso.mode === "off" ? "neutral" : "success"}
-                >
+                <Badge tone={settings.sso.mode === "off" ? "neutral" : "success"}>
                   {settings.sso.mode.toUpperCase()}
                 </Badge>
               </dd>
@@ -60,9 +58,8 @@ export default async function Page() {
             </div>
           </dl>
           <p className="mt-4 text-xs text-aivo-ink-soft">
-            ACS URL and entity ID for your IdP setup are in the configuration
-            guide. After saving below, send the new metadata URL to your
-            identity team.
+            ACS URL and entity ID for your IdP setup are in the configuration guide. After saving
+            below, send the new metadata URL to your identity team.
           </p>
         </Card>
       </div>

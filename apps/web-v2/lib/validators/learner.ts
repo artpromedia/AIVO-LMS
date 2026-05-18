@@ -1,30 +1,9 @@
 import { z } from "zod";
 
-export const ageRangeEnum = z.enum([
-  "3-5",
-  "5-7",
-  "7-9",
-  "9-11",
-  "11-13",
-  "13-15",
-  "15-18",
-]);
-export const gradeBandEnum = z.enum([
-  "preK",
-  "K",
-  "1-2",
-  "3-5",
-  "6-8",
-  "9-12",
-  "post_secondary",
-]);
+export const ageRangeEnum = z.enum(["3-5", "5-7", "7-9", "9-11", "11-13", "13-15", "15-18"]);
+export const gradeBandEnum = z.enum(["preK", "K", "1-2", "3-5", "6-8", "9-12", "post_secondary"]);
 export const comfortEnum = z.enum(["new", "growing", "confident", "advanced"]);
-export const schoolContextEnum = z.enum([
-  "in_school",
-  "homeschool",
-  "hybrid",
-  "not_in_school",
-]);
+export const schoolContextEnum = z.enum(["in_school", "homeschool", "hybrid", "not_in_school"]);
 
 export const accessibilityDefaultsSchema = z.object({
   reducedMotion: z.boolean().default(false),
@@ -37,11 +16,7 @@ export const accessibilityDefaultsSchema = z.object({
 export const createLearnerSchema = z.object({
   firstName: z.string().min(1).max(80),
   preferredName: z.string().max(80).optional().nullable(),
-  birthYear: z
-    .number()
-    .int()
-    .min(1990)
-    .max(new Date().getFullYear()),
+  birthYear: z.number().int().min(1990).max(new Date().getFullYear()),
   pronouns: z.string().max(40).optional().nullable(),
   ageRange: ageRangeEnum.optional().nullable(),
   gradeBand: gradeBandEnum.optional().nullable(),

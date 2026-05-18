@@ -25,7 +25,11 @@ export function transformToNonVerbal(a: Activity): Activity {
       ],
       expectedAnswer: undefined,
     };
-  } else if ((a.type === "tap" || a.type === "multiple_choice") && a.choices && a.choices.length > 2) {
+  } else if (
+    (a.type === "tap" || a.type === "multiple_choice") &&
+    a.choices &&
+    a.choices.length > 2
+  ) {
     const correct = a.choices.find((c) => c.correct);
     const distractor = a.choices.find((c) => !c.correct);
     if (correct && distractor) {
@@ -42,7 +46,10 @@ export function transformToNonVerbal(a: Activity): Activity {
       reducedMotion: true,
       extraThinkingTimeMs: Math.max(next.adaptations?.extraThinkingTimeMs ?? 0, 8_000),
     },
-    tags: dedupe([...(next.tags ?? []).filter((t) => t !== "level:low_verbal"), "level:non_verbal"]),
+    tags: dedupe([
+      ...(next.tags ?? []).filter((t) => t !== "level:low_verbal"),
+      "level:non_verbal",
+    ]),
   };
   return next;
 }

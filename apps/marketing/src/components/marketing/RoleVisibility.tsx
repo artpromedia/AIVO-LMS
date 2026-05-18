@@ -22,7 +22,11 @@ export function RoleVisibility() {
             <div className="mt-4 space-y-3">
               {[
                 { l: "Reading", s: "Steady progress", c: "from-blue-500 to-cyan-500" },
-                { l: "Math · Multiplication", s: "Working through 3s", c: "from-purple-500 to-pink-500" },
+                {
+                  l: "Math · Multiplication",
+                  s: "Working through 3s",
+                  c: "from-purple-500 to-pink-500",
+                },
                 { l: "Read-aloud used", s: "12 minutes", c: "from-emerald-500 to-teal-500" },
               ].map((r) => (
                 <div
@@ -43,9 +47,7 @@ export function RoleVisibility() {
             <h3 className="font-heading text-lg font-bold text-slate-900">
               22 learners · 18 active today
             </h3>
-            <p className="mt-1 text-sm text-slate-600">
-              3 learners may benefit from a check-in.
-            </p>
+            <p className="mt-1 text-sm text-slate-600">3 learners may benefit from a check-in.</p>
             <div className="mt-4 grid grid-cols-3 gap-2">
               {Array.from({ length: 9 }).map((_, i) => {
                 const flagged = i === 2 || i === 5 || i === 7;
@@ -55,9 +57,7 @@ export function RoleVisibility() {
                 return (
                   <div key={i} className={`rounded-lg ${tone} p-3 text-center`}>
                     <p className="font-heading text-xs font-bold">L{i + 1}</p>
-                    <p className="mt-0.5 text-[10px]">
-                      {flagged ? "Check in" : "On track"}
-                    </p>
+                    <p className="mt-0.5 text-[10px]">{flagged ? "Check in" : "On track"}</p>
                   </div>
                 );
               })}

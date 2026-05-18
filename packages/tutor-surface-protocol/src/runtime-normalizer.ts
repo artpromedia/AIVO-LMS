@@ -17,11 +17,7 @@
  *   • Reports per-command issues and totals so the caller can log
  *     model-quality regressions.
  */
-import type {
-  SurfaceProtocolProfile,
-  TutorSurfaceCommand,
-  ValidationIssue,
-} from "./types.js";
+import type { SurfaceProtocolProfile, TutorSurfaceCommand, ValidationIssue } from "./types.js";
 import { validateTutorSurfaceCommand } from "./validators.js";
 
 export interface NormalizationOutcome {
@@ -76,10 +72,8 @@ function repairCommand(raw: unknown): TutorSurfaceCommand | undefined {
       typeof accessibilityRaw.altText === "string" && accessibilityRaw.altText.trim() !== ""
         ? accessibilityRaw.altText
         : reason;
-    const keyboardAlternative =
-      accessibilityRaw.keyboardAlternative === false ? false : true;
-    const reduceMotionSafe =
-      accessibilityRaw.reduceMotionSafe === false ? false : true;
+    const keyboardAlternative = accessibilityRaw.keyboardAlternative === false ? false : true;
+    const reduceMotionSafe = accessibilityRaw.reduceMotionSafe === false ? false : true;
     surface = {
       ...(surfaceRaw as Record<string, unknown>),
       id: typeof surfaceRaw.id === "string" ? surfaceRaw.id : surfaceId,

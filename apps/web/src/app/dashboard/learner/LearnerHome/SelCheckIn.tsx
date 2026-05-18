@@ -42,10 +42,17 @@ export function SelCheckIn({ onCheckin }: SelCheckInProps) {
 
   if (exercise) {
     return (
-      <LearnerCard className="max-w-lg mx-auto" variant="bordered" accentColor="hsl(var(--visual-sel))">
+      <LearnerCard
+        className="max-w-lg mx-auto"
+        variant="bordered"
+        accentColor="hsl(var(--visual-sel))"
+      >
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Heart className="w-5 h-5 text-[hsl(var(--visual-sel))] fill-[hsl(var(--visual-sel))]" aria-hidden />
+            <Heart
+              className="w-5 h-5 text-[hsl(var(--visual-sel))] fill-[hsl(var(--visual-sel))]"
+              aria-hidden
+            />
             <h3 className="font-extrabold text-lg text-slate-900">{exercise.title}</h3>
           </div>
           <button
@@ -59,12 +66,16 @@ export function SelCheckIn({ onCheckin }: SelCheckInProps) {
         <ol className="space-y-2">
           {exercise.steps.map((step, i) => (
             <li key={i} className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-[hsl(var(--visual-sel)/0.16)] text-[hsl(var(--visual-sel))] text-xs font-extrabold flex items-center justify-center shrink-0">{i + 1}</span>
+              <span className="w-6 h-6 rounded-full bg-[hsl(var(--visual-sel)/0.16)] text-[hsl(var(--visual-sel))] text-xs font-extrabold flex items-center justify-center shrink-0">
+                {i + 1}
+              </span>
               <span className="text-sm text-slate-700">{step}</span>
             </li>
           ))}
         </ol>
-        <div className="text-xs text-slate-500 mt-3 font-semibold">{t("minutes_count", { count: exercise.durationMinutes })}</div>
+        <div className="text-xs text-slate-500 mt-3 font-semibold">
+          {t("minutes_count", { count: exercise.durationMinutes })}
+        </div>
       </LearnerCard>
     );
   }
@@ -79,10 +90,15 @@ export function SelCheckIn({ onCheckin }: SelCheckInProps) {
         style={{ minHeight: "var(--learner-hit-target, 44px)" }}
         aria-expanded={isOpen}
       >
-        <Heart className="w-4 h-4 fill-[hsl(var(--visual-sel))]" aria-hidden /> {t("feeling_prompt")}
+        <Heart className="w-4 h-4 fill-[hsl(var(--visual-sel))]" aria-hidden />{" "}
+        {t("feeling_prompt")}
       </button>
       {isOpen && (
-        <div className="flex gap-2 flex-wrap justify-center vi-card p-3" role="radiogroup" aria-label={t("feeling_prompt")}>
+        <div
+          className="flex gap-2 flex-wrap justify-center vi-card p-3"
+          role="radiogroup"
+          aria-label={t("feeling_prompt")}
+        >
           {visibleEmotions.map((e) => {
             const Icon = e.Icon;
             const label = t(`emotion_${e.labelKey}` as const);
@@ -97,7 +113,10 @@ export function SelCheckIn({ onCheckin }: SelCheckInProps) {
                 }`}
                 title={label}
                 aria-label={label}
-                style={{ minHeight: "var(--learner-hit-target, 48px)", minWidth: "var(--learner-hit-target, 48px)" }}
+                style={{
+                  minHeight: "var(--learner-hit-target, 48px)",
+                  minWidth: "var(--learner-hit-target, 48px)",
+                }}
               >
                 <Icon className={isLow ? "w-9 h-9" : "w-6 h-6"} strokeWidth={2.25} aria-hidden />
               </button>

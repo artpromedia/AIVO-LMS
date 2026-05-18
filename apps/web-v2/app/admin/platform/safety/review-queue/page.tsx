@@ -33,7 +33,9 @@ export default async function Page() {
       />
       <div className="space-y-3">
         {cases.length === 0 ? (
-          <Card className="p-[var(--aivo-density-card-pad)] text-aivo-muted text-sm">No review cases yet.</Card>
+          <Card className="p-[var(--aivo-density-card-pad)] text-aivo-muted text-sm">
+            No review cases yet.
+          </Card>
         ) : (
           cases.map((c) => {
             const event = getModerationEvent(c.eventId);
@@ -45,14 +47,11 @@ export default async function Page() {
                       <Badge tone={statusTone(c.status)}>{c.status.replace(/_/g, " ")}</Badge>
                       {event && (
                         <span className="text-xs text-aivo-muted">
-                          {event.subjectKind.replace(/_/g, " ")} ·{" "}
-                          {event.classification.severity}
+                          {event.subjectKind.replace(/_/g, " ")} · {event.classification.severity}
                         </span>
                       )}
                     </div>
-                    {event && (
-                      <p className="mt-2 text-sm">{event.excerpt}</p>
-                    )}
+                    {event && <p className="mt-2 text-sm">{event.excerpt}</p>}
                     {event && event.classification.categories.length > 0 && (
                       <div className="mt-2 flex flex-wrap gap-1">
                         {event.classification.categories.map((cat) => (
@@ -63,9 +62,7 @@ export default async function Page() {
                       </div>
                     )}
                     {c.resolution && (
-                      <p className="mt-2 text-xs text-aivo-muted">
-                        Resolution: {c.resolution}
-                      </p>
+                      <p className="mt-2 text-xs text-aivo-muted">Resolution: {c.resolution}</p>
                     )}
                   </div>
                   <div className="text-[11px] text-aivo-muted whitespace-nowrap">

@@ -74,14 +74,7 @@ export interface TutorBeat {
     position: { x: number; y: number };
   }>;
   interaction?: {
-    type:
-      | "multiple_choice"
-      | "drag_drop"
-      | "voice"
-      | "draw"
-      | "tap"
-      | "match"
-      | "scratchpad";
+    type: "multiple_choice" | "drag_drop" | "voice" | "draw" | "tap" | "match" | "scratchpad";
     prompt?: string;
     choices?: TutorBeatChoice[];
     dragItems?: TutorBeatDragItem[];
@@ -164,7 +157,11 @@ function buildInteractionBeat(activity: Activity): TutorBeat {
   const interactionType: TutorBeat["interaction"] = (() => {
     switch (activity.type) {
       case "multiple_choice":
-        return { type: "multiple_choice", prompt: activity.prompt, choices: buildChoices(activity) };
+        return {
+          type: "multiple_choice",
+          prompt: activity.prompt,
+          choices: buildChoices(activity),
+        };
       case "drag_drop":
         return {
           type: "drag_drop",
@@ -253,9 +250,7 @@ function buildClosingBeat(plan: SessionPlan): TutorBeat {
  */
 export function buildTutorSurfaceBeats(plan: SessionPlan): TutorSurfaceBeatsResponse {
   if (!plan || !Array.isArray(plan.activities) || plan.activities.length === 0) {
-    throw new Error(
-      "buildTutorSurfaceBeats: session plan must include at least one activity",
-    );
+    throw new Error("buildTutorSurfaceBeats: session plan must include at least one activity");
   }
   const beats: TutorBeat[] = [];
   plan.activities.forEach((activity, index) => {

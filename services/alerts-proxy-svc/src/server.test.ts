@@ -136,7 +136,9 @@ describe("alerts-proxy-svc /api/alerts/page", () => {
   });
 
   it("rejects malformed envelopes", async () => {
-    const channels = loadChannels({ OPS_ALERTS_SLACK_WEBHOOK_URL: "https://hooks.slack.example/x" });
+    const channels = loadChannels({
+      OPS_ALERTS_SLACK_WEBHOOK_URL: "https://hooks.slack.example/x",
+    });
     const app = await buildServer({ channels });
     const res = await app.inject({
       method: "POST",
@@ -149,7 +151,9 @@ describe("alerts-proxy-svc /api/alerts/page", () => {
   });
 
   it("rejects POST without service token", async () => {
-    const channels = loadChannels({ OPS_ALERTS_SLACK_WEBHOOK_URL: "https://hooks.slack.example/x" });
+    const channels = loadChannels({
+      OPS_ALERTS_SLACK_WEBHOOK_URL: "https://hooks.slack.example/x",
+    });
     const app = await buildServer({ channels });
     const res = await app.inject({
       method: "POST",
@@ -162,7 +166,9 @@ describe("alerts-proxy-svc /api/alerts/page", () => {
   });
 
   it("rejects POST with wrong service token", async () => {
-    const channels = loadChannels({ OPS_ALERTS_SLACK_WEBHOOK_URL: "https://hooks.slack.example/x" });
+    const channels = loadChannels({
+      OPS_ALERTS_SLACK_WEBHOOK_URL: "https://hooks.slack.example/x",
+    });
     const app = await buildServer({ channels });
     const res = await app.inject({
       method: "POST",

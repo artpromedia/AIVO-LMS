@@ -133,18 +133,16 @@ export default function SensoryProfilePage() {
   return (
     <div className="space-y-6">
       <div className="vi-surface-soft rounded-2xl p-6 border vi-border">
-        <h2 className="text-lg font-heading font-bold vi-text mb-2">
-          {t("sensory_needs_title")}
-        </h2>
-        <p className="text-sm vi-text-muted">
-          {t("sensory_needs_desc")}
-        </p>
+        <h2 className="text-lg font-heading font-bold vi-text mb-2">{t("sensory_needs_title")}</h2>
+        <p className="text-sm vi-text-muted">{t("sensory_needs_desc")}</p>
       </div>
 
       {MODALITIES.map((mod) => (
         <div key={mod.key} className="vi-card p-6">
           <div className="flex items-center gap-3 mb-3">
-            <IconWell color={mod.color} size="sm">{mod.icon}</IconWell>
+            <IconWell color={mod.color} size="sm">
+              {mod.icon}
+            </IconWell>
             <div>
               <h3 className="font-heading font-bold vi-text">{mod.label}</h3>
               <p className="text-sm vi-text-muted">{mod.description}</p>
@@ -153,9 +151,26 @@ export default function SensoryProfilePage() {
 
           <div className="grid grid-cols-3 gap-3 mt-4">
             {[
-              { value: "hyper", label: t("hyper_sensitive"), desc: mod.hyperDesc, activeCls: "bg-[hsl(var(--visual-math)/0.08)] border-[hsl(var(--visual-math)/0.4)]" },
-              { value: "typical", label: t("typical"), desc: t("typical_desc"), activeCls: "bg-[hsl(var(--visual-science)/0.08)] border-[hsl(var(--visual-science)/0.4)]" },
-              { value: "hypo", label: t("hypo_sensitive"), desc: mod.hypoDesc, activeCls: "bg-[hsl(var(--visual-reading)/0.08)] border-[hsl(var(--visual-reading)/0.4)]" },
+              {
+                value: "hyper",
+                label: t("hyper_sensitive"),
+                desc: mod.hyperDesc,
+                activeCls: "bg-[hsl(var(--visual-math)/0.08)] border-[hsl(var(--visual-math)/0.4)]",
+              },
+              {
+                value: "typical",
+                label: t("typical"),
+                desc: t("typical_desc"),
+                activeCls:
+                  "bg-[hsl(var(--visual-science)/0.08)] border-[hsl(var(--visual-science)/0.4)]",
+              },
+              {
+                value: "hypo",
+                label: t("hypo_sensitive"),
+                desc: mod.hypoDesc,
+                activeCls:
+                  "bg-[hsl(var(--visual-reading)/0.08)] border-[hsl(var(--visual-reading)/0.4)]",
+              },
             ].map((opt) => (
               <button
                 key={opt.value}
@@ -198,7 +213,13 @@ export default function SensoryProfilePage() {
           className="px-8 py-3 rounded-full bg-[hsl(var(--visual-primary))] text-white font-heading font-black uppercase tracking-wider hover:bg-[hsl(var(--visual-primary)/0.9)] transition disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[hsl(var(--visual-primary)/0.4)]"
           style={{ minHeight: 44 }}
         >
-          {saving ? tc("saving") : saved ? t("saved") : existingProfile ? t("update_profile") : t("save_profile")}
+          {saving
+            ? tc("saving")
+            : saved
+              ? t("saved")
+              : existingProfile
+                ? t("update_profile")
+                : t("save_profile")}
         </button>
       </div>
     </div>

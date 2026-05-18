@@ -10,7 +10,7 @@
 
 ## 1. Why this is the closing sprint
 
-The previous sixteen sprints describe what AIVO should *be*. This one describes how we know it actually *is*. It is the design-to-shipped pipeline: how we validate with users before code, how we keep design intent intact through engineering, and how we hand a sprint over without context loss.
+The previous sixteen sprints describe what AIVO should _be_. This one describes how we know it actually _is_. It is the design-to-shipped pipeline: how we validate with users before code, how we keep design intent intact through engineering, and how we hand a sprint over without context loss.
 
 The deliverable from this sprint is a repeatable process, not a single artifact. The acceptance test is whether the next person onboarding can pick up any UX-0x doc and ship from it.
 
@@ -20,13 +20,13 @@ The deliverable from this sprint is a repeatable process, not a single artifact.
 
 Each sprint advances along five rungs. A sprint that hasn't cleared the rung below it doesn't ship.
 
-| Rung | Question | Method | Owner | Today |
-|---|---|---|---|---|
-| 1 | Is this the right thing to build? | Discovery interviews + UX-00 audit linkage | Product | ✅ UX-00 maintained |
-| 2 | Does the contract make sense? | This `docs/ux/` doc set + architect / code-review pass | Design + Eng lead | ✅ 17 docs current |
-| 3 | Does the prototype work for our users? | Moderated usability sessions on canvas mockups (3 representative learners + 3 parents + 2 teachers per surface) | UX research | 🟡 ad-hoc today |
-| 4 | Did engineering preserve the contract? | Design QA pass against UX-0x acceptance criteria | Design | 🟡 ad-hoc today |
-| 5 | Does it keep working in prod? | Smoke tests + scheduled checks + observability | Eng + DevOps | ✅ marketing; 🟡 dashboard |
+| Rung | Question                               | Method                                                                                                          | Owner             | Today                      |
+| ---- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ----------------- | -------------------------- |
+| 1    | Is this the right thing to build?      | Discovery interviews + UX-00 audit linkage                                                                      | Product           | ✅ UX-00 maintained        |
+| 2    | Does the contract make sense?          | This `docs/ux/` doc set + architect / code-review pass                                                          | Design + Eng lead | ✅ 17 docs current         |
+| 3    | Does the prototype work for our users? | Moderated usability sessions on canvas mockups (3 representative learners + 3 parents + 2 teachers per surface) | UX research       | 🟡 ad-hoc today            |
+| 4    | Did engineering preserve the contract? | Design QA pass against UX-0x acceptance criteria                                                                | Design            | 🟡 ad-hoc today            |
+| 5    | Does it keep working in prod?          | Smoke tests + scheduled checks + observability                                                                  | Eng + DevOps      | ✅ marketing; 🟡 dashboard |
 
 Rung 3 and Rung 4 are the gaps this doc is mostly here to close.
 
@@ -52,12 +52,12 @@ Don't prototype when:
 
 Three buckets — each surface validates with a representative slice:
 
-| Surface | Primary | Secondary |
-|---|---|---|
-| Parent (UX-04) | 3 parents of neurodiverse children (mixed age, mixed diagnoses) | 1 caregiver |
-| Learner (UX-05/06/08/09) | 3 learners across 3 functioning levels (STANDARD, EMERGING_AAC, PRE_SYMBOLIC) | 1 AAC user |
-| Teacher (UX-10) | 2 SPED teachers + 1 general-ed teacher | 1 paraprofessional |
-| Admin (UX-11) | 1 district admin + 1 school admin | 1 IT contact |
+| Surface                  | Primary                                                                       | Secondary          |
+| ------------------------ | ----------------------------------------------------------------------------- | ------------------ |
+| Parent (UX-04)           | 3 parents of neurodiverse children (mixed age, mixed diagnoses)               | 1 caregiver        |
+| Learner (UX-05/06/08/09) | 3 learners across 3 functioning levels (STANDARD, EMERGING_AAC, PRE_SYMBOLIC) | 1 AAC user         |
+| Teacher (UX-10)          | 2 SPED teachers + 1 general-ed teacher                                        | 1 paraprofessional |
+| Admin (UX-11)            | 1 district admin + 1 school admin                                             | 1 IT contact       |
 
 Compensate every participant; use neurodiversity-affirming recruiting language ("learners who use AT", not "with deficits").
 
@@ -74,13 +74,13 @@ Tasks are written from the acceptance criteria of the relevant UX-0x doc. Never 
 
 ### 3.4 What we score
 
-| Signal | Captured how |
-|---|---|
-| Task completion | Pass / partial / fail per task |
-| Time-on-task | Stopwatch in the recording timeline |
-| Confusion moments | Timestamped notes — single-word tag: copy, layout, terminology, flow |
+| Signal             | Captured how                                                           |
+| ------------------ | ---------------------------------------------------------------------- |
+| Task completion    | Pass / partial / fail per task                                         |
+| Time-on-task       | Stopwatch in the recording timeline                                    |
+| Confusion moments  | Timestamped notes — single-word tag: copy, layout, terminology, flow   |
 | Emotional friction | Timestamped notes — soft signals (sigh, "wait, what?", "I don't know") |
-| Direct verbatims | 1–3 per task |
+| Direct verbatims   | 1–3 per task                                                           |
 
 Scores live in `docs/ux/usability-tests/<date>-<surface>.md` — one row per task per participant.
 
@@ -121,13 +121,13 @@ Every design QA pass uses these four lenses, in this order:
 
 ### 4.4 Tooling
 
-| Tool | Purpose | Status |
-|---|---|---|
-| Storybook / mockup sandbox preview | State-by-state screenshots | ✅ via `artifacts/mockup-sandbox` |
-| Playwright visual snapshots | Regression detection on top routes | ⬜ planned |
-| Axe DevTools | Per-surface a11y violation scan | 🟡 manual today; CI planned in UX-14 §7 |
-| `pnpm i18n:audit` | Locale-file parity | ✅ in CI |
-| `scripts/verify-marketing-deploy.sh` + `scripts/verify-marketing-build.sh` | Marketing route markers | ✅ in CI |
+| Tool                                                                       | Purpose                            | Status                                  |
+| -------------------------------------------------------------------------- | ---------------------------------- | --------------------------------------- |
+| Storybook / mockup sandbox preview                                         | State-by-state screenshots         | ✅ via `artifacts/mockup-sandbox`       |
+| Playwright visual snapshots                                                | Regression detection on top routes | ⬜ planned                              |
+| Axe DevTools                                                               | Per-surface a11y violation scan    | 🟡 manual today; CI planned in UX-14 §7 |
+| `pnpm i18n:audit`                                                          | Locale-file parity                 | ✅ in CI                                |
+| `scripts/verify-marketing-deploy.sh` + `scripts/verify-marketing-build.sh` | Marketing route markers            | ✅ in CI                                |
 
 ---
 
@@ -166,7 +166,7 @@ Engineering returns the surface to design only when:
 
 - Every acceptance criterion in the UX-0x doc is checked off in the PR description.
 - All four design QA lenses (§4.3) have a planned slot on the staging build.
-- A new state ("admin in a not-yet-rostered school") that the doc didn't anticipate is documented as an *open question* in a new draft against the same UX-0x doc — not silently invented in code.
+- A new state ("admin in a not-yet-rostered school") that the doc didn't anticipate is documented as an _open question_ in a new draft against the same UX-0x doc — not silently invented in code.
 
 ### 5.4 Avoiding scope drift
 
@@ -180,18 +180,18 @@ Mitigation: any code path that doesn't trace to a UX-0x state ID gets a `// TODO
 
 A "release" = one UX-0x sprint shipping to production. The full pipeline:
 
-| Stage | Gate | Artifact |
-|---|---|---|
-| 1. Discovery | UX-00 ticket exists with a problem statement | `docs/ux/UX-00-audit.md` row |
-| 2. Design | UX-0x doc drafted, architect-reviewed | `docs/ux/UX-NN-*.md` |
-| 3. Prototype | Canvas mockup + Rung-3 thresholds met (§3.5) | `docs/ux/usability-tests/<date>-<surface>.md` |
-| 4. Implementation | PRs link the UX-0x doc + tick acceptance criteria | PR description |
-| 5. Design QA | Four-lens pass (§4.3), all ✅ or 🟡 | `docs/ux/design-qa/<date>-UX-NN.md` |
-| 6. CI | i18n audit, marketing markers, a11y CI, type-check | GitHub Actions green |
-| 7. Staging | Vercel preview verified | `marketing-deploy-staging.yml` log |
-| 8. Production | Replit autoscale (marketing) or Hetzner K3s (dashboard) | `marketing-smoke-test.yml` first-run-green |
-| 9. Observability | First 24h dashboards reviewed | `/admin/platform/{ai-generation,alerts}` |
-| 10. Retrospective | Findings folded into UX-00 | next UX-00 entry |
+| Stage             | Gate                                                    | Artifact                                      |
+| ----------------- | ------------------------------------------------------- | --------------------------------------------- |
+| 1. Discovery      | UX-00 ticket exists with a problem statement            | `docs/ux/UX-00-audit.md` row                  |
+| 2. Design         | UX-0x doc drafted, architect-reviewed                   | `docs/ux/UX-NN-*.md`                          |
+| 3. Prototype      | Canvas mockup + Rung-3 thresholds met (§3.5)            | `docs/ux/usability-tests/<date>-<surface>.md` |
+| 4. Implementation | PRs link the UX-0x doc + tick acceptance criteria       | PR description                                |
+| 5. Design QA      | Four-lens pass (§4.3), all ✅ or 🟡                     | `docs/ux/design-qa/<date>-UX-NN.md`           |
+| 6. CI             | i18n audit, marketing markers, a11y CI, type-check      | GitHub Actions green                          |
+| 7. Staging        | Vercel preview verified                                 | `marketing-deploy-staging.yml` log            |
+| 8. Production     | Replit autoscale (marketing) or Hetzner K3s (dashboard) | `marketing-smoke-test.yml` first-run-green    |
+| 9. Observability  | First 24h dashboards reviewed                           | `/admin/platform/{ai-generation,alerts}`      |
+| 10. Retrospective | Findings folded into UX-00                              | next UX-00 entry                              |
 
 A sprint is "done" when stage 9 reports clean. A sprint is "in service" when stage 10 has updated UX-00.
 
@@ -213,7 +213,7 @@ Every UX-0x doc carries a "Last refreshed" header. The cadence:
 
 - **Sprint refresh.** When the doc is the source of truth for an active sprint, refresh at sprint start.
 - **Code-drift refresh.** When code changes a citation the doc relies on, the same PR that changes the code refreshes the doc.
-- **Quarterly audit.** Once a quarter, walk the doc set top-to-bottom, refresh "Last refreshed" headers, mark anything still current as *verified current*.
+- **Quarterly audit.** Once a quarter, walk the doc set top-to-bottom, refresh "Last refreshed" headers, mark anything still current as _verified current_.
 
 The next quarterly audit is **2026-08-17**. Reminder lives in the `docs/ux/UX-00-audit.md` backlog (⬜ planned row to add).
 

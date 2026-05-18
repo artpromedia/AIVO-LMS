@@ -36,8 +36,7 @@ export const BASELINE_TUTORS: BaselineTutor[] = [
     landmark: "Story Garden",
     emoji: "📖",
     color: "#10B981",
-    scene:
-      "An illustrated garden where words grow on trees and stories hide in magical books.",
+    scene: "An illustrated garden where words grow on trees and stories hide in magical books.",
     greeting: "I know the best stories — want to read one with me?",
   },
   {
@@ -72,8 +71,7 @@ export const BASELINE_TUTORS: BaselineTutor[] = [
     landmark: "Feelings Treehouse",
     emoji: "💜",
     color: "#8B5CF6",
-    scene:
-      "A warm, cozy treehouse with soft lighting, cushions, and a window to the world.",
+    scene: "A warm, cozy treehouse with soft lighting, cushions, and a window to the world.",
     greeting: "I care about how you feel — there are no wrong answers here.",
   },
   {
@@ -84,8 +82,7 @@ export const BASELINE_TUTORS: BaselineTutor[] = [
     landmark: "Sound Studio",
     emoji: "🎵",
     color: "#EC4899",
-    scene:
-      "A friendly recording studio with microphones, sound waves, and musical notes.",
+    scene: "A friendly recording studio with microphones, sound waves, and musical notes.",
     greeting: "Let's make some sounds and play with words together.",
   },
   {
@@ -96,8 +93,7 @@ export const BASELINE_TUTORS: BaselineTutor[] = [
     landmark: "Puzzle Palace",
     emoji: "🧩",
     color: "#06B6D4",
-    scene:
-      "A colorful puzzle room where logic rules and patterns create the environment.",
+    scene: "A colorful puzzle room where logic rules and patterns create the environment.",
     greeting: "I have the best puzzles. Ready to try one?",
   },
 ];

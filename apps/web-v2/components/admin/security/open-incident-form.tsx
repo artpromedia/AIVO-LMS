@@ -81,16 +81,26 @@ export function OpenIncidentForm() {
       </label>
       <div className="flex flex-wrap gap-4 text-sm">
         <label className="flex items-center gap-2">
-          <input type="checkbox" checked={customerImpact} onChange={(e) => setCustomerImpact(e.target.checked)} />
+          <input
+            type="checkbox"
+            checked={customerImpact}
+            onChange={(e) => setCustomerImpact(e.target.checked)}
+          />
           Customer impact
         </label>
         <label className="flex items-center gap-2">
-          <input type="checkbox" checked={regulator} onChange={(e) => setRegulator(e.target.checked)} />
+          <input
+            type="checkbox"
+            checked={regulator}
+            onChange={(e) => setRegulator(e.target.checked)}
+          />
           Regulator notification required
         </label>
       </div>
       {msg && <p className="text-sm text-aivo-danger">{msg}</p>}
-      <Button type="submit" disabled={busy}>{busy ? "Opening…" : "Open incident"}</Button>
+      <Button type="submit" disabled={busy}>
+        {busy ? "Opening…" : "Open incident"}
+      </Button>
     </form>
   );
 }

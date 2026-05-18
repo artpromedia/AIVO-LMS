@@ -20,11 +20,7 @@
  *          `LearningProfile` on finalize.
  */
 import { FastifyInstance } from "fastify";
-import {
-  learners,
-  learnerProfiles,
-  adaptiveBaselineSessions,
-} from "@aivo/db";
+import { learners, learnerProfiles, adaptiveBaselineSessions } from "@aivo/db";
 import { verifyJWT } from "@aivo/security";
 import { eq, desc } from "drizzle-orm";
 import {
@@ -79,17 +75,9 @@ async function authenticate(req: any, reply: any) {
 }
 
 async function loadLearner(db: any, learnerId: string) {
-  let [learner] = await db
-    .select()
-    .from(learners)
-    .where(eq(learners.id, learnerId))
-    .limit(1);
+  let [learner] = await db.select().from(learners).where(eq(learners.id, learnerId)).limit(1);
   if (!learner) {
-    [learner] = await db
-      .select()
-      .from(learners)
-      .where(eq(learners.userId, learnerId))
-      .limit(1);
+    [learner] = await db.select().from(learners).where(eq(learners.userId, learnerId)).limit(1);
   }
   return learner ?? null;
 }

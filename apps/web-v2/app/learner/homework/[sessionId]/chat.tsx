@@ -32,14 +32,11 @@ export function HomeworkChat({
     if (!trimmed) return;
     setBusy(true);
     try {
-      const res = await fetch(
-        `/api/bff/learners/${learnerId}/homework/${sessionId}/message`,
-        {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ text: trimmed }),
-        },
-      );
+      const res = await fetch(`/api/bff/learners/${learnerId}/homework/${sessionId}/message`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ text: trimmed }),
+      });
       const body = (await res.json()) as {
         ok: boolean;
         data?: { session: { messages: HomeworkHelpMessage[] } };
@@ -62,10 +59,9 @@ export function HomeworkChat({
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch(
-        `/api/bff/learners/${learnerId}/homework/${sessionId}/complete`,
-        { method: "POST" },
-      );
+      const res = await fetch(`/api/bff/learners/${learnerId}/homework/${sessionId}/complete`, {
+        method: "POST",
+      });
       if (!res.ok) {
         const body = (await res.json().catch(() => null)) as {
           error?: { message: string };

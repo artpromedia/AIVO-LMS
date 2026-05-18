@@ -807,7 +807,7 @@ EOF
 mkdir -p infra/k8s/overlays/hetzner
 ```
 
-```yaml
+````yaml
 # infra/k8s/overlays/hetzner/kustomization.yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -985,7 +985,7 @@ spec:
                 name: identity-svc
                 port:
                   number: 3000
-```
+````
 
 ### 5.4 Run Database Migrations
 
@@ -1007,7 +1007,7 @@ cd ../billing-svc
 DATABASE_URL="postgresql://aivo_app:PASSWORD@localhost:5432/aivo_billing?schema=public" npx prisma migrate deploy
 
 # Repeat for all 9 v2 services with prisma/schema.prisma
-````
+```
 
 ### 5.5 Deploy Services
 
@@ -1125,7 +1125,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to deploy'
+        description: "Version to deploy"
         required: true
 
 env:
@@ -1453,7 +1453,7 @@ export default {
     const url = new URL(request.url);
 
     // 1. Static content APIs — edge cache with stale-while-revalidate
-    if (url.pathname.startsWith('/api/v1/content/') && request.method === 'GET') {
+    if (url.pathname.startsWith("/api/v1/content/") && request.method === "GET") {
       const cache = caches.default;
       const cacheKey = new Request(url.toString(), request);
       let response = await cache.match(cacheKey);
@@ -1461,7 +1461,7 @@ export default {
       if (response) {
         // Cache HIT — served from nearest US edge node (~10ms)
         response = new Response(response.body, response);
-        response.headers.set('X-Cache', 'HIT');
+        response.headers.set("X-Cache", "HIT");
         return response;
       }
 
@@ -1469,30 +1469,30 @@ export default {
       response = await fetch(request);
       if (response.ok) {
         response = new Response(response.body, response);
-        response.headers.set('Cache-Control', 'public, s-maxage=3600');
-        response.headers.set('X-Cache', 'MISS');
+        response.headers.set("Cache-Control", "public, s-maxage=3600");
+        response.headers.set("X-Cache", "MISS");
         await cache.put(cacheKey, response.clone());
       }
       return response;
     }
 
     // 2. JWT pre-validation at edge (reject bad tokens instantly)
-    if (url.pathname.startsWith('/api/v1/') && request.method !== 'GET') {
-      const authHeader = request.headers.get('Authorization');
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return new Response(JSON.stringify({ error: 'Missing authorization' }), {
+    if (url.pathname.startsWith("/api/v1/") && request.method !== "GET") {
+      const authHeader = request.headers.get("Authorization");
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return new Response(JSON.stringify({ error: "Missing authorization" }), {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         });
       }
 
       // Basic JWT structure validation (reject malformed tokens at edge)
       const token = authHeader.substring(7);
-      const parts = token.split('.');
+      const parts = token.split(".");
       if (parts.length !== 3) {
-        return new Response(JSON.stringify({ error: 'Invalid token format' }), {
+        return new Response(JSON.stringify({ error: "Invalid token format" }), {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         });
       }
 
@@ -1500,9 +1500,9 @@ export default {
       try {
         const payload = JSON.parse(atob(parts[1]));
         if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
-          return new Response(JSON.stringify({ error: 'Token expired' }), {
+          return new Response(JSON.stringify({ error: "Token expired" }), {
             status: 401,
-            headers: { 'Content-Type': 'application/json' },
+            headers: { "Content-Type": "application/json" },
           });
         }
       } catch (e) {
@@ -1512,9 +1512,9 @@ export default {
 
     // 3. Add geo headers for origin
     const newRequest = new Request(request);
-    newRequest.headers.set('X-Client-Country', request.cf?.country || 'unknown');
-    newRequest.headers.set('X-Client-Region', request.cf?.region || 'unknown');
-    newRequest.headers.set('X-Client-City', request.cf?.city || 'unknown');
+    newRequest.headers.set("X-Client-Country", request.cf?.country || "unknown");
+    newRequest.headers.set("X-Client-Region", request.cf?.region || "unknown");
+    newRequest.headers.set("X-Client-City", request.cf?.city || "unknown");
 
     return fetch(newRequest);
   },
@@ -1565,8 +1565,8 @@ export default {
 
     // After successful login, cache the session token in KV
     if (
-      request.method === 'POST' &&
-      new URL(request.url).pathname === '/api/v1/auth/login' &&
+      request.method === "POST" &&
+      new URL(request.url).pathname === "/api/v1/auth/login" &&
       response.ok
     ) {
       const body = await response.clone().json();
@@ -1575,7 +1575,7 @@ export default {
         await env.SESSIONS.put(
           `session:${body.accessToken.substring(0, 32)}`,
           JSON.stringify({ userId: body.userId, role: body.role }),
-          { expirationTtl: 3600 } // 1 hour
+          { expirationTtl: 3600 }, // 1 hour
         );
       }
     }
@@ -1697,28 +1697,28 @@ nginx -t && systemctl restart nginx
 
 ### Private Network (vSwitch 10.0.0.0/24 — all HEL1)
 
-| Server          | IP       | Location | CPU / RAM / Storage                                 | Cost         | Services                                                                      |
-| --------------- | -------- | -------- | --------------------------------------------------- | ------------ | ----------------------------------------------------------------------------- |
-| DB (Server 1)   | 10.0.0.1 | HEL1     | Xeon W-2145 8C/16T / 128GB ECC / 2×1.92TB DC SSD    | $81.90/mo    | PostgreSQL :5432, PgBouncer :6432, Redis :6379                                |
+| Server          | IP       | Location | CPU / RAM / Storage                                 | Cost         | Services                                                                     |
+| --------------- | -------- | -------- | --------------------------------------------------- | ------------ | ---------------------------------------------------------------------------- |
+| DB (Server 1)   | 10.0.0.1 | HEL1     | Xeon W-2145 8C/16T / 128GB ECC / 2×1.92TB DC SSD    | $81.90/mo    | PostgreSQL :5432, PgBouncer :6432, Redis :6379                               |
 | App1 (Server 2) | 10.0.0.2 | HEL1     | i9-9900K 8C/16T / 128GB / 2×1TB NVMe                | $53.90/mo    | K3s control plane :6443, Ingress :80/:443, 9 TypeScript services, Monitoring |
-| App2 (Server 3) | 10.0.0.3 | HEL1     | i7-8700 6C/12T / 128GB / 3×1TB NVMe                 | $51.90/mo    | K3s Agent, MinIO :9000, backup mirror, staging                                |
-| ML (Server 4)   | 10.0.0.4 | HEL1     | Ryzen 9 5950X 16C/32T / 128GB ECC / 2×3.84TB DC SSD | ~$105/mo     | K3s Agent, 1 Python AI service (ai-svc), model cache                              |
-|                 |          |          |                                                     | **~$293/mo** |                                                                               |
+| App2 (Server 3) | 10.0.0.3 | HEL1     | i7-8700 6C/12T / 128GB / 3×1TB NVMe                 | $51.90/mo    | K3s Agent, MinIO :9000, backup mirror, staging                               |
+| ML (Server 4)   | 10.0.0.4 | HEL1     | Ryzen 9 5950X 16C/32T / 128GB ECC / 2×3.84TB DC SSD | ~$105/mo     | K3s Agent, 1 Python AI service (ai-svc), model cache                         |
+|                 |          |          |                                                     | **~$293/mo** |                                                                              |
 
 ### Application Service Ports (inside K3s)
 
-| Service             | Port | Health Check |
-| ------------------- | ---- | ------------ |
-| identity-svc        | 3000 | /health      |
-| billing-svc         | 3000 | /health      |
-| family-svc          | 3000 | /health      |
-| integrations-svc    | 3000 | /health      |
-| admin-svc           | 3000 | /health      |
-| ai-svc              | 8000 | /health      |
-| learning-svc        | 3000 | /health      |
-| engagement-svc      | 3000 | /health      |
-| comms-svc           | 3000 | /health      |
-| web                 | 3000 | /            |
+| Service          | Port | Health Check |
+| ---------------- | ---- | ------------ |
+| identity-svc     | 3000 | /health      |
+| billing-svc      | 3000 | /health      |
+| family-svc       | 3000 | /health      |
+| integrations-svc | 3000 | /health      |
+| admin-svc        | 3000 | /health      |
+| ai-svc           | 8000 | /health      |
+| learning-svc     | 3000 | /health      |
+| engagement-svc   | 3000 | /health      |
+| comms-svc        | 3000 | /health      |
+| web              | 3000 | /            |
 
 ---
 

@@ -22,7 +22,14 @@ export function RunForm() {
   const [dryRun, setDryRun] = useState(true);
   const [records, setRecords] = useState(KIND_HINT.users);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<{ jobId: string; total: number; success: number; failed: number; skipped: number; dryRun: boolean } | null>(null);
+  const [result, setResult] = useState<{
+    jobId: string;
+    total: number;
+    success: number;
+    failed: number;
+    skipped: number;
+    dryRun: boolean;
+  } | null>(null);
 
   function submit() {
     setError(null);
@@ -66,11 +73,15 @@ export function RunForm() {
     <Card className="mb-6 p-[var(--aivo-density-card-pad)]">
       <div className="grid gap-3 sm:grid-cols-3">
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">Source</label>
+          <label className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+            Source
+          </label>
           <Input value={source} onChange={(e) => setSource(e.target.value)} />
         </div>
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">Kind</label>
+          <label className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+            Kind
+          </label>
           <select
             value={kind}
             onChange={(e) => {
@@ -94,8 +105,15 @@ export function RunForm() {
         </div>
       </div>
       <div className="mt-3">
-        <label className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">Source records (JSON)</label>
-        <Textarea rows={6} value={records} onChange={(e) => setRecords(e.target.value)} className="font-mono text-xs" />
+        <label className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
+          Source records (JSON)
+        </label>
+        <Textarea
+          rows={6}
+          value={records}
+          onChange={(e) => setRecords(e.target.value)}
+          className="font-mono text-xs"
+        />
       </div>
       <div className="mt-3 flex items-center gap-3">
         <Button disabled={pending} onClick={submit}>
@@ -105,7 +123,8 @@ export function RunForm() {
         {result ? (
           <span className="text-sm text-aivo-ink-soft">
             {result.dryRun ? "Dry run · " : "Done · "}
-            {result.success}/{result.total} migrated, {result.failed} failed, {result.skipped} skipped
+            {result.success}/{result.total} migrated, {result.failed} failed, {result.skipped}{" "}
+            skipped
           </span>
         ) : null}
       </div>

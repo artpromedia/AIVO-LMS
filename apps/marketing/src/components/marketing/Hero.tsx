@@ -63,7 +63,9 @@ export function Hero({ scrollY }: Readonly<{ scrollY: number }>) {
   const [parallaxEnabled, setParallaxEnabled] = useState(false);
   useEffect(() => {
     if (typeof globalThis === "undefined" || !("matchMedia" in globalThis)) return;
-    const mq = globalThis.matchMedia("(min-width: 768px) and (prefers-reduced-motion: no-preference)");
+    const mq = globalThis.matchMedia(
+      "(min-width: 768px) and (prefers-reduced-motion: no-preference)",
+    );
     const update = () => setParallaxEnabled(mq.matches);
     update();
     mq.addEventListener("change", update);
@@ -125,7 +127,10 @@ export function Hero({ scrollY }: Readonly<{ scrollY: number }>) {
                 className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-primary to-primary-dark text-white font-bold text-lg hover:opacity-95 transition-all shadow-xl shadow-purple-200 hover:-translate-y-0.5 min-h-[44px]"
               >
                 {t("cta_trial")}
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+                <ArrowRight
+                  className="w-5 h-5 group-hover:translate-x-1 transition-transform"
+                  aria-hidden="true"
+                />
               </a>
               <a
                 href="#brain"
@@ -168,8 +173,12 @@ export function Hero({ scrollY }: Readonly<{ scrollY: number }>) {
                   <Flame className="w-6 h-6 fill-current" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("badge_streak")}</p>
-                  <p className="text-xl font-heading font-bold text-slate-800">{t("badge_streak_value")}</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">
+                    {t("badge_streak")}
+                  </p>
+                  <p className="text-xl font-heading font-bold text-slate-800">
+                    {t("badge_streak_value")}
+                  </p>
                 </div>
               </div>
             </div>
@@ -186,7 +195,9 @@ export function Hero({ scrollY }: Readonly<{ scrollY: number }>) {
                 className="w-10 h-10 rounded-full object-cover bg-violet-100"
               />
               <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("badge_now_learning")}</p>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">
+                  {t("badge_now_learning")}
+                </p>
                 <p className="text-sm font-heading font-bold text-slate-800">
                   {current.tutor.name} · {current.tutor.subject}
                 </p>
@@ -228,7 +239,9 @@ export function Hero({ scrollY }: Readonly<{ scrollY: number }>) {
                 <button
                   type="button"
                   onClick={() => setAutoPlay((value) => !value)}
-                  aria-label={autoPlay ? "Pause automatic slide rotation" : "Play automatic slide rotation"}
+                  aria-label={
+                    autoPlay ? "Pause automatic slide rotation" : "Play automatic slide rotation"
+                  }
                   aria-pressed={autoPlay}
                   className="ml-1 inline-flex items-center justify-center text-white/90 hover:text-white transition"
                 >
@@ -258,12 +271,13 @@ export function Hero({ scrollY }: Readonly<{ scrollY: number }>) {
 
       <div className="relative bg-slate-50 border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-6 md:px-8 py-5 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-slate-500 font-body">
-            {t("trust_line")}
-          </p>
+          <p className="text-sm text-slate-500 font-body">{t("trust_line")}</p>
           <div className="flex items-center gap-4 flex-wrap justify-center">
             {TRUST_CITIES.map((city) => (
-              <span key={city} className="flex items-center gap-1.5 text-sm text-slate-400 font-body">
+              <span
+                key={city}
+                className="flex items-center gap-1.5 text-sm text-slate-400 font-body"
+              >
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                 {city}
               </span>

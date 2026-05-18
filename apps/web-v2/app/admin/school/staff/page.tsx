@@ -5,10 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SCHOOL_NAV } from "@/components/layout/role-shells";
-import {
-  listUsersForTenants,
-  scopeTenantsForSession,
-} from "@/lib/db/repos";
+import { listUsersForTenants, scopeTenantsForSession } from "@/lib/db/repos";
 
 export default async function Page() {
   const session = await requirePageRole(["school_admin"]);

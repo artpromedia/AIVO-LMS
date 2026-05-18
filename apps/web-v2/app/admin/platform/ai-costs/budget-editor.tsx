@@ -40,7 +40,12 @@ export function BudgetEditor({
       const res = await fetch("/api/bff/admin/ai-budgets", {
         method: "PATCH",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ tenantId, monthlyCapCents: capCents, warnAt: warnNum, hardStop: stop }),
+        body: JSON.stringify({
+          tenantId,
+          monthlyCapCents: capCents,
+          warnAt: warnNum,
+          hardStop: stop,
+        }),
       });
       const json = await res.json();
       if (!res.ok) {

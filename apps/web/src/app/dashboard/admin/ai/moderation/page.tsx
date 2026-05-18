@@ -59,8 +59,12 @@ export default function ContentModerationPage() {
     try {
       const qs = filter === "ALL" ? "" : `?status=${filter}`;
       const [listRes, statsRes] = await Promise.all([
-        fetch(`/api/admin-svc/moderation${qs}`, { headers: { Authorization: `Bearer ${accessToken}` } }),
-        fetch(`/api/admin-svc/moderation/stats`, { headers: { Authorization: `Bearer ${accessToken}` } }),
+        fetch(`/api/admin-svc/moderation${qs}`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }),
+        fetch(`/api/admin-svc/moderation/stats`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }),
       ]);
       if (!listRes.ok) throw new Error(`List failed: ${listRes.status}`);
       const listJson = await listRes.json();
@@ -73,7 +77,9 @@ export default function ContentModerationPage() {
     }
   }, [accessToken, filter]);
 
-  useEffect(() => { fetchItems(); }, [fetchItems]);
+  useEffect(() => {
+    fetchItems();
+  }, [fetchItems]);
 
   useEffect(() => {
     const i = setInterval(fetchItems, 30000);
@@ -90,8 +96,12 @@ export default function ContentModerationPage() {
     });
     if (res.ok) {
       const updated = await res.json();
-      setItems((prev) => prev.map((it) => it.id === id ? updated : it));
-      setNotesDraft((d) => { const next = { ...d }; delete next[id]; return next; });
+      setItems((prev) => prev.map((it) => (it.id === id ? updated : it)));
+      setNotesDraft((d) => {
+        const next = { ...d };
+        delete next[id];
+        return next;
+      });
       fetchItems();
     } else {
       setError(`Action failed: ${res.status}`);
@@ -104,7 +114,12 @@ export default function ContentModerationPage() {
   return (
     <div className="p-8 space-y-6">
       <div className="flex items-center gap-3 text-sm vi-text-muted">
-        <Link href="/dashboard/admin/ai" className="hover:text-[hsl(var(--visual-primary))] transition">AI &amp; Brain Models</Link>
+        <Link
+          href="/dashboard/admin/ai"
+          className="hover:text-[hsl(var(--visual-primary))] transition"
+        >
+          AI &amp; Brain Models
+        </Link>
         <span>/</span>
         <span className="vi-text font-medium">Content Moderation</span>
       </div>
@@ -112,7 +127,9 @@ export default function ContentModerationPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-heading font-bold vi-text">Content Moderation</h1>
-          <p className="text-sm vi-text-muted mt-1">Review AI-generated content flagged by automated safety filters.</p>
+          <p className="text-sm vi-text-muted mt-1">
+            Review AI-generated content flagged by automated safety filters.
+          </p>
         </div>
         <button
           onClick={fetchItems}
@@ -124,18 +141,35 @@ export default function ContentModerationPage() {
       </div>
 
       {error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
       )}
 
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
         {[
           { label: "Pending", value: statCount("PENDING"), color: "text-[hsl(var(--visual-sel))]" },
-          { label: "Approved", value: statCount("APPROVED"), color: "text-[hsl(var(--visual-science))]" },
-          { label: "Rejected", value: statCount("REJECTED"), color: "text-[hsl(var(--visual-math))]" },
-          { label: "Escalated", value: statCount("ESCALATED"), color: "text-[hsl(var(--visual-primary))]" },
+          {
+            label: "Approved",
+            value: statCount("APPROVED"),
+            color: "text-[hsl(var(--visual-science))]",
+          },
+          {
+            label: "Rejected",
+            value: statCount("REJECTED"),
+            color: "text-[hsl(var(--visual-math))]",
+          },
+          {
+            label: "Escalated",
+            value: statCount("ESCALATED"),
+            color: "text-[hsl(var(--visual-primary))]",
+          },
           { label: "Total Flagged", value: totalCount, color: "vi-text" },
         ].map((m) => (
-          <div key={m.label} className="bg-white rounded-xl p-4 shadow-sm border vi-border text-center">
+          <div
+            key={m.label}
+            className="bg-white rounded-xl p-4 shadow-sm border vi-border text-center"
+          >
             <p className={`text-2xl font-bold ${m.color}`}>{m.value}</p>
             <p className="text-xs vi-text-muted font-semibold mt-1">{m.label}</p>
           </div>
@@ -150,7 +184,9 @@ export default function ContentModerationPage() {
               key={f}
               onClick={() => setFilter(f)}
               className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition ${
-                filter === f ? "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]" : "vi-bg vi-text-muted hover:vi-surface-soft"
+                filter === f
+                  ? "bg-[hsl(var(--visual-primary)/0.12)] text-[hsl(var(--visual-primary))]"
+                  : "vi-bg vi-text-muted hover:vi-surface-soft"
               }`}
             >
               {f.charAt(0) + f.slice(1).toLowerCase().replace("_", " ")}
@@ -160,22 +196,35 @@ export default function ContentModerationPage() {
 
         <div className="divide-y divide-slate-50">
           {items.map((item) => {
-            const conf = typeof item.flagConfidence === "string" ? parseFloat(item.flagConfidence) : (item.flagConfidence || 0);
+            const conf =
+              typeof item.flagConfidence === "string"
+                ? parseFloat(item.flagConfidence)
+                : item.flagConfidence || 0;
             return (
               <div key={item.id} className="p-5 hover:vi-bg/50 transition">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
-                      <span className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${STATUS_COLORS[item.status] || "bg-slate-100 text-slate-700"}`}>{item.status}</span>
-                      <span className="text-xs vi-surface-soft vi-text-muted px-2 py-0.5 rounded-full">{item.flagReason.replace(/_/g, " ")}</span>
-                      <span className="text-xs vi-text-muted">Confidence: {(conf * 100).toFixed(0)}%</span>
+                      <span
+                        className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${STATUS_COLORS[item.status] || "bg-slate-100 text-slate-700"}`}
+                      >
+                        {item.status}
+                      </span>
+                      <span className="text-xs vi-surface-soft vi-text-muted px-2 py-0.5 rounded-full">
+                        {item.flagReason.replace(/_/g, " ")}
+                      </span>
+                      <span className="text-xs vi-text-muted">
+                        Confidence: {(conf * 100).toFixed(0)}%
+                      </span>
                     </div>
                     <p className="text-sm vi-text line-clamp-2">{item.content}</p>
                     <div className="flex items-center gap-4 mt-2 text-xs vi-text-muted flex-wrap">
                       <span>Tutor: {item.tutorSku || "—"}</span>
                       <span>Model: {item.modelUsed || "—"}</span>
                       <span>{new Date(item.createdAt).toLocaleString()}</span>
-                      {item.reviewedAt && <span>Reviewed {new Date(item.reviewedAt).toLocaleString()}</span>}
+                      {item.reviewedAt && (
+                        <span>Reviewed {new Date(item.reviewedAt).toLocaleString()}</span>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2 ml-4">
@@ -196,17 +245,26 @@ export default function ContentModerationPage() {
                     </div>
                     {item.reviewNotes && (
                       <div>
-                        <p className="text-xs font-semibold vi-text-muted mb-1">Existing review notes</p>
+                        <p className="text-xs font-semibold vi-text-muted mb-1">
+                          Existing review notes
+                        </p>
                         <p className="text-sm vi-text whitespace-pre-wrap">{item.reviewNotes}</p>
                       </div>
                     )}
                     <div>
-                      <label className="text-xs font-semibold vi-text-muted block mb-1" htmlFor={`notes-${item.id}`}>Add review notes</label>
+                      <label
+                        className="text-xs font-semibold vi-text-muted block mb-1"
+                        htmlFor={`notes-${item.id}`}
+                      >
+                        Add review notes
+                      </label>
                       <textarea
                         id={`notes-${item.id}`}
                         rows={3}
                         value={notesDraft[item.id] ?? ""}
-                        onChange={(e) => setNotesDraft((d) => ({ ...d, [item.id]: e.target.value }))}
+                        onChange={(e) =>
+                          setNotesDraft((d) => ({ ...d, [item.id]: e.target.value }))
+                        }
                         className="w-full text-sm rounded-lg border vi-border p-2 bg-white"
                         placeholder="Why are you approving / rejecting / escalating this item?"
                       />
@@ -215,15 +273,21 @@ export default function ContentModerationPage() {
                       <button
                         onClick={() => handleAction(item.id, "APPROVED")}
                         className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[hsl(var(--visual-science)/0.08)] text-[hsl(var(--visual-science))] hover:bg-[hsl(var(--visual-science)/0.14)] border border-[hsl(var(--visual-science)/0.25)] transition"
-                      >Approve</button>
+                      >
+                        Approve
+                      </button>
                       <button
                         onClick={() => handleAction(item.id, "REJECTED")}
                         className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[hsl(var(--visual-math)/0.08)] text-[hsl(var(--visual-math))] hover:bg-[hsl(var(--visual-math)/0.12)] border border-[hsl(var(--visual-math)/0.25)] transition"
-                      >Reject</button>
+                      >
+                        Reject
+                      </button>
                       <button
                         onClick={() => handleAction(item.id, "ESCALATED")}
                         className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-[hsl(var(--visual-primary)/0.08)] text-[hsl(var(--visual-primary))] hover:bg-[hsl(var(--visual-primary)/0.14)] border border-[hsl(var(--visual-primary)/0.25)] transition"
-                      >Escalate</button>
+                      >
+                        Escalate
+                      </button>
                     </div>
                   </div>
                 )}
@@ -231,7 +295,9 @@ export default function ContentModerationPage() {
             );
           })}
           {items.length === 0 && !loading && (
-            <div className="p-10 text-center vi-text-muted">No moderation items match the current filter.</div>
+            <div className="p-10 text-center vi-text-muted">
+              No moderation items match the current filter.
+            </div>
           )}
           {loading && items.length === 0 && (
             <div className="p-10 text-center vi-text-muted">Loading…</div>

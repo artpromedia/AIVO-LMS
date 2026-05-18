@@ -117,10 +117,7 @@ async function loadSubscriptionRow(db: any, tenantId: string) {
 }
 
 async function loadTutorSubsForTenant(db: any, tenantId: string) {
-  return db
-    .select()
-    .from(tutorSubscriptions)
-    .where(eq(tutorSubscriptions.tenantId, tenantId));
+  return db.select().from(tutorSubscriptions).where(eq(tutorSubscriptions.tenantId, tenantId));
 }
 
 function toSubscriptionRecord(row: any): SubscriptionRecord | null {
@@ -303,12 +300,14 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
       const body = (request.body ?? {}) as any;
       if (body.paymentMethodId) {
         return reply.code(400).send({
-          error: "Direct payment-method submission is no longer supported. Use POST /api/billing/checkout/session.",
+          error:
+            "Direct payment-method submission is no longer supported. Use POST /api/billing/checkout/session.",
         });
       }
       const { tenantId, planId } = body;
       const user = (request as any).user as JWTPayload;
-      if (!tenantId || !planId) return reply.code(400).send({ error: "tenantId and planId required" });
+      if (!tenantId || !planId)
+        return reply.code(400).send({ error: "tenantId and planId required" });
       if (!ensureTenantAccess(user, tenantId, reply)) return;
 
       // The free plan is the implicit default. We model it as "no row";
@@ -323,7 +322,8 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
         } catch (err) {
           return handleStripeError(err, reply);
         }
-        await db.update(subscriptions)
+        await db
+          .update(subscriptions)
           .set({ cancelAtPeriodEnd: true, canceledAt: new Date(), updatedAt: new Date() })
           .where(eq(subscriptions.id, row.id));
         return { status: "cancel_scheduled", subscription: { tenantId, planId: "free" } };
@@ -341,7 +341,8 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
       return (reply as any).code(303).header("Location", "/api/billing/checkout/session").send({
         status: "redirect",
         next: "/api/billing/checkout/session",
-        message: "Use POST /api/billing/checkout/session with { tenantId, planId } to start a Stripe Checkout.",
+        message:
+          "Use POST /api/billing/checkout/session with { tenantId, planId } to start a Stripe Checkout.",
       });
     },
   );
@@ -401,7 +402,9 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
       if (!ensureTenantAccess(user, body.tenantId, reply)) return;
       const row = await loadSubscriptionRow(db, body.tenantId);
       if (!row?.stripeCustomerId) {
-        return reply.code(404).send({ error: "No Stripe customer for this tenant. Subscribe to a paid plan first." });
+        return reply
+          .code(404)
+          .send({ error: "No Stripe customer for this tenant. Subscribe to a paid plan first." });
       }
       try {
         const portal = await createBillingPortalSession({
@@ -438,7 +441,8 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
           return handleStripeError(err, reply);
         }
       }
-      await db.update(subscriptions)
+      await db
+        .update(subscriptions)
         .set({ cancelAtPeriodEnd: true, canceledAt: new Date(), updatedAt: new Date() })
         .where(eq(subscriptions.id, row.id));
       await emitBillingAudit(db, auditLog, {
@@ -460,14 +464,16 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
       const user = (request as any).user as JWTPayload;
       if (!ensureTenantAccess(user, tenantId, reply)) return;
       const row = await loadSubscriptionRow(db, tenantId);
-      if (!row?.stripeSubscriptionId) return reply.code(404).send({ error: "No active subscription" });
+      if (!row?.stripeSubscriptionId)
+        return reply.code(404).send({ error: "No active subscription" });
       if (!row.cancelAtPeriodEnd) return { status: "active", tenantId, cancelAtPeriodEnd: false };
       try {
         await cancelStripeSubscriptionAtPeriodEnd(row.stripeSubscriptionId, false);
       } catch (err) {
         return handleStripeError(err, reply);
       }
-      await db.update(subscriptions)
+      await db
+        .update(subscriptions)
         .set({ cancelAtPeriodEnd: false, canceledAt: null, updatedAt: new Date() })
         .where(eq(subscriptions.id, row.id));
       await emitBillingAudit(db, auditLog, {
@@ -488,7 +494,8 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
       const user = (request as any).user as JWTPayload;
       if (!ensureTenantAccess(user, tenantId, reply)) return;
       const subRow = await loadSubscriptionRow(db, tenantId);
-      const periodStart = subRow?.currentPeriodStart ?? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+      const periodStart =
+        subRow?.currentPeriodStart ?? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
       const periodEnd = subRow?.currentPeriodEnd ?? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
       const [learnerRows, tutorRows] = await Promise.all([
         db.select({ id: learners.id }).from(learners).where(eq(learners.tenantId, tenantId)),
@@ -545,7 +552,10 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
       if (!ensureTenantAccess(user, body.tenantId, reply)) return;
 
       const sku = coerceTutorSku(body.tutorSku ?? body.tutorId);
-      if (!sku) return reply.code(400).send({ error: "tutorSku or tutorId required (must be a known tutor SKU or key)" });
+      if (!sku)
+        return reply
+          .code(400)
+          .send({ error: "tutorSku or tutorId required (must be a known tutor SKU or key)" });
 
       const subRow = await loadSubscriptionRow(db, body.tenantId);
       if (!subRow?.stripeSubscriptionId) {
@@ -565,7 +575,9 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
           ),
         );
       if (existing.length > 0) {
-        return (reply as any).code(409).send({ error: "Add-on already active", addon: existing[0] });
+        return (reply as any)
+          .code(409)
+          .send({ error: "Add-on already active", addon: existing[0] });
       }
 
       try {
@@ -619,10 +631,7 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
         .select()
         .from(tutorSubscriptions)
         .where(
-          and(
-            eq(tutorSubscriptions.tenantId, tenantId),
-            eq(tutorSubscriptions.tutorSku, sku),
-          ),
+          and(eq(tutorSubscriptions.tenantId, tenantId), eq(tutorSubscriptions.tutorSku, sku)),
         );
       if (!row) return reply.code(404).send({ error: "Add-on not found" });
 
@@ -709,8 +718,7 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
         plan,
         status,
         cancelAtPeriodEnd: subscription?.cancelAtPeriodEnd ?? false,
-        currentPeriodEnd:
-          (subRow?.currentPeriodEnd?.toISOString?.() ?? null) as string | null,
+        currentPeriodEnd: (subRow?.currentPeriodEnd?.toISOString?.() ?? null) as string | null,
         paymentStatus: subRow?.paymentStatus ?? null,
         includedTutorSkus: included,
         purchasedTutorSkus: purchased,
@@ -729,4 +737,3 @@ export function registerPlanRoutes(app: FastifyInstance, db: any) {
     if (!isPlanId(plan)) throw new Error(`bad PLAN_ID in entitlements: ${plan}`);
   }
 }
-

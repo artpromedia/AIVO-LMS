@@ -31,7 +31,12 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection"],
+      requestId,
+    );
     if (consentErr) return consentErr;
 
     const baseline = getActiveBaselineForLearner(learnerId, session!.tenantId);
@@ -55,7 +60,12 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection"],
+      requestId,
+    );
     if (consentErr) return consentErr;
 
     // Preconditions: parent assessment submitted + brain profile exists.
@@ -65,8 +75,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
         {
           ...ERRORS.PRECONDITION_FAILED,
           message: "Parent assessment not submitted",
-          userMessage:
-            "Finish the parent assessment before starting the baseline.",
+          userMessage: "Finish the parent assessment before starting the baseline.",
         },
         requestId,
       );
@@ -92,10 +101,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     }
     const parsed = BaselineCreateInput.safeParse(body);
     if (!parsed.success) {
-      return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: parsed.error.message },
-        requestId,
-      );
+      return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.message }, requestId);
     }
     const result = createBaseline({
       learnerId,

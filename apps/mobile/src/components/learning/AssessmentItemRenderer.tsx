@@ -1,15 +1,8 @@
-import React, { useState } from 'react';
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-  ViewStyle,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { GeometryCanvas, type GeometryShape } from './GeometryCanvas';
-import { colors, radius, spacing } from '@/constants/colors';
+import React, { useState } from "react";
+import { Pressable, StyleSheet, Text, TextInput, View, ViewStyle } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { GeometryCanvas, type GeometryShape } from "./GeometryCanvas";
+import { colors, radius, spacing } from "@/constants/colors";
 
 /**
  * Normalized assessment-item schema. Mirrors the shape returned by
@@ -30,48 +23,54 @@ interface BaseItem {
   prompt: string;
   hint?: string;
   /** Optional visual asset rendered above the prompt. */
-  figure?: { width: number; height: number; shapes: GeometryShape[]; grid?: boolean; axes?: boolean };
+  figure?: {
+    width: number;
+    height: number;
+    shapes: GeometryShape[];
+    grid?: boolean;
+    axes?: boolean;
+  };
 }
 
 export interface MultipleChoiceItem extends BaseItem {
-  kind: 'multiple_choice';
+  kind: "multiple_choice";
   options: { id: string; label: string }[];
   correctOptionId: string;
 }
 
 export interface ShortAnswerItem extends BaseItem {
-  kind: 'short_answer';
+  kind: "short_answer";
   acceptedAnswers: string[];
   caseSensitive?: boolean;
 }
 
 export interface NumericItem extends BaseItem {
-  kind: 'numeric';
+  kind: "numeric";
   answer: number;
   tolerance?: number;
   unit?: string;
 }
 
 export interface GeometryItem extends BaseItem {
-  kind: 'geometry';
+  kind: "geometry";
   /** A free-response geometry prompt — graded server-side. */
   rubric?: string;
 }
 
 export interface OrderingItem extends BaseItem {
-  kind: 'ordering';
+  kind: "ordering";
   options: { id: string; label: string }[];
   correctOrder: string[];
 }
 
 export interface MultiSelectItem extends BaseItem {
-  kind: 'multi_select';
+  kind: "multi_select";
   options: { id: string; label: string }[];
   correctOptionIds: string[];
 }
 
 export interface FreeResponseItem extends BaseItem {
-  kind: 'free_response';
+  kind: "free_response";
   minWords?: number;
 }
 
@@ -80,13 +79,13 @@ export interface AssessmentItemRendererProps {
   /** Fires when the learner submits an answer. */
   onSubmit: (
     submission:
-      | { kind: 'multiple_choice'; optionId: string }
-      | { kind: 'short_answer'; text: string }
-      | { kind: 'numeric'; value: number }
-      | { kind: 'geometry'; note: string }
-      | { kind: 'ordering'; order: string[] }
-      | { kind: 'multi_select'; optionIds: string[] }
-      | { kind: 'free_response'; text: string },
+      | { kind: "multiple_choice"; optionId: string }
+      | { kind: "short_answer"; text: string }
+      | { kind: "numeric"; value: number }
+      | { kind: "geometry"; note: string }
+      | { kind: "ordering"; order: string[] }
+      | { kind: "multi_select"; optionIds: string[] }
+      | { kind: "free_response"; text: string },
     isCorrect: boolean | null,
   ) => void;
   /** Disable input (e.g. after submission). */
@@ -131,31 +130,21 @@ export function AssessmentItemRenderer({
         </View>
       ) : null}
 
-      <ItemBody
-        item={item}
-        onSubmit={onSubmit}
-        disabled={disabled}
-        revealCorrect={revealCorrect}
-      />
+      <ItemBody item={item} onSubmit={onSubmit} disabled={disabled} revealCorrect={revealCorrect} />
     </View>
   );
 }
 
-function ItemBody({
-  item,
-  onSubmit,
-  disabled,
-  revealCorrect,
-}: AssessmentItemRendererProps) {
+function ItemBody({ item, onSubmit, disabled, revealCorrect }: AssessmentItemRendererProps) {
   const [selected, setSelected] = useState<string | null>(null);
   const [multiSelected, setMultiSelected] = useState<Set<string>>(new Set());
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
   const [order, setOrder] = useState<string[]>(() =>
-    item.kind === 'ordering' ? item.options.map((o) => o.id) : [],
+    item.kind === "ordering" ? item.options.map((o) => o.id) : [],
   );
 
   switch (item.kind) {
-    case 'multiple_choice': {
+    case "multiple_choice": {
       return (
         <View style={styles.optionsGrid}>
           {item.options.map((opt) => {
@@ -169,7 +158,7 @@ function ItemBody({
                 onPress={() => {
                   setSelected(opt.id);
                   onSubmit(
-                    { kind: 'multiple_choice', optionId: opt.id },
+                    { kind: "multiple_choice", optionId: opt.id },
                     opt.id === item.correctOptionId,
                   );
                 }}
@@ -189,7 +178,7 @@ function ItemBody({
         </View>
       );
     }
-    case 'multi_select': {
+    case "multi_select": {
       const toggle = (id: string) => {
         setMultiSelected((prev) => {
           const next = new Set(prev);
@@ -203,7 +192,7 @@ function ItemBody({
         const correct =
           ids.length === item.correctOptionIds.length &&
           item.correctOptionIds.every((id) => multiSelected.has(id));
-        onSubmit({ kind: 'multi_select', optionIds: ids }, correct);
+        onSubmit({ kind: "multi_select", optionIds: ids }, correct);
       };
       return (
         <View>
@@ -218,7 +207,7 @@ function ItemBody({
                   style={[styles.optionCard, isSelected && styles.optionSelected]}
                 >
                   <Ionicons
-                    name={isSelected ? 'checkbox' : 'square-outline'}
+                    name={isSelected ? "checkbox" : "square-outline"}
                     size={18}
                     color={isSelected ? colors.primary : colors.textSecondary}
                   />
@@ -231,13 +220,13 @@ function ItemBody({
         </View>
       );
     }
-    case 'short_answer': {
+    case "short_answer": {
       const submit = () => {
         const trimmed = text.trim();
         const correct = item.acceptedAnswers.some((a) =>
           item.caseSensitive ? a === trimmed : a.toLowerCase() === trimmed.toLowerCase(),
         );
-        onSubmit({ kind: 'short_answer', text: trimmed }, correct);
+        onSubmit({ kind: "short_answer", text: trimmed }, correct);
       };
       return (
         <View>
@@ -255,16 +244,16 @@ function ItemBody({
         </View>
       );
     }
-    case 'numeric': {
+    case "numeric": {
       const submit = () => {
         const value = Number(text);
         if (Number.isNaN(value)) {
-          onSubmit({ kind: 'numeric', value: NaN }, false);
+          onSubmit({ kind: "numeric", value: NaN }, false);
           return;
         }
         const tolerance = item.tolerance ?? 0;
         const correct = Math.abs(value - item.answer) <= tolerance;
-        onSubmit({ kind: 'numeric', value }, correct);
+        onSubmit({ kind: "numeric", value }, correct);
       };
       return (
         <View>
@@ -284,7 +273,7 @@ function ItemBody({
         </View>
       );
     }
-    case 'ordering': {
+    case "ordering": {
       const moveUp = (idx: number) => {
         if (idx === 0) return;
         setOrder((prev) => {
@@ -303,7 +292,7 @@ function ItemBody({
       };
       const submit = () => {
         const correct = order.every((id, i) => id === item.correctOrder[i]);
-        onSubmit({ kind: 'ordering', order }, correct);
+        onSubmit({ kind: "ordering", order }, correct);
       };
       return (
         <View>
@@ -314,7 +303,11 @@ function ItemBody({
               <View key={id} style={styles.orderRow}>
                 <Text style={styles.orderIndex}>{i + 1}.</Text>
                 <Text style={styles.orderLabel}>{opt.label}</Text>
-                <Pressable onPress={() => moveUp(i)} disabled={disabled || i === 0} style={styles.orderBtn}>
+                <Pressable
+                  onPress={() => moveUp(i)}
+                  disabled={disabled || i === 0}
+                  style={styles.orderBtn}
+                >
                   <Ionicons name="chevron-up" size={20} color={colors.text} />
                 </Pressable>
                 <Pressable
@@ -331,7 +324,7 @@ function ItemBody({
         </View>
       );
     }
-    case 'geometry': {
+    case "geometry": {
       return (
         <View>
           <TextInput
@@ -344,14 +337,14 @@ function ItemBody({
             style={[styles.textInput, styles.textArea]}
           />
           <SubmitBar
-            onSubmit={() => onSubmit({ kind: 'geometry', note: text }, null)}
+            onSubmit={() => onSubmit({ kind: "geometry", note: text }, null)}
             disabled={disabled}
             label="Submit work"
           />
         </View>
       );
     }
-    case 'free_response': {
+    case "free_response": {
       const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
       const meetsMin = !item.minWords || wordCount >= item.minWords;
       return (
@@ -371,7 +364,7 @@ function ItemBody({
             </Text>
           ) : null}
           <SubmitBar
-            onSubmit={() => onSubmit({ kind: 'free_response', text }, null)}
+            onSubmit={() => onSubmit({ kind: "free_response", text }, null)}
             disabled={disabled || !meetsMin}
             label="Submit"
           />
@@ -386,7 +379,7 @@ function ItemBody({
 function SubmitBar({
   onSubmit,
   disabled,
-  label = 'Check',
+  label = "Check",
 }: {
   onSubmit: () => void;
   disabled?: boolean;
@@ -406,24 +399,24 @@ function SubmitBar({
 
 const styles = StyleSheet.create({
   container: { gap: spacing.md },
-  figureWrap: { alignSelf: 'center' },
-  prompt: { fontSize: 18, fontFamily: 'Nunito-ExtraBold', color: colors.text },
-  hintRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  hintText: { fontSize: 13, fontFamily: 'Nunito-SemiBold', color: colors.warning, flex: 1 },
+  figureWrap: { alignSelf: "center" },
+  prompt: { fontSize: 18, fontFamily: "Nunito-ExtraBold", color: colors.text },
+  hintRow: { flexDirection: "row", alignItems: "center", gap: 6 },
+  hintText: { fontSize: 13, fontFamily: "Nunito-SemiBold", color: colors.warning, flex: 1 },
   optionsGrid: { gap: spacing.sm },
   optionCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: spacing.md,
     borderRadius: radius.lg,
     borderWidth: 1.5,
     borderColor: colors.border,
     backgroundColor: colors.card,
   },
-  optionSelected: { borderColor: colors.primary, backgroundColor: colors.primary + '10' },
-  optionCorrect: { borderColor: colors.success, backgroundColor: colors.success + '14' },
-  optionWrong: { borderColor: colors.error, backgroundColor: colors.error + '14' },
-  optionText: { fontSize: 15, fontFamily: 'Nunito-Bold', color: colors.text, flex: 1 },
+  optionSelected: { borderColor: colors.primary, backgroundColor: colors.primary + "10" },
+  optionCorrect: { borderColor: colors.success, backgroundColor: colors.success + "14" },
+  optionWrong: { borderColor: colors.error, backgroundColor: colors.error + "14" },
+  optionText: { fontSize: 15, fontFamily: "Nunito-Bold", color: colors.text, flex: 1 },
   textInput: {
     borderWidth: 1.5,
     borderColor: colors.border,
@@ -431,17 +424,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: 10,
     fontSize: 16,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.text,
     backgroundColor: colors.card,
   },
-  textArea: { minHeight: 96, textAlignVertical: 'top' },
-  numericRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  textArea: { minHeight: 96, textAlignVertical: "top" },
+  numericRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   numericInput: { flex: 1 },
-  unitText: { fontSize: 16, fontFamily: 'Nunito-Bold', color: colors.text },
+  unitText: { fontSize: 16, fontFamily: "Nunito-Bold", color: colors.text },
   orderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: spacing.sm,
     borderRadius: radius.md,
     borderWidth: 1,
@@ -449,16 +442,21 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     gap: 8,
   },
-  orderIndex: { fontSize: 14, fontFamily: 'Nunito-Bold', color: colors.primary, width: 22 },
-  orderLabel: { fontSize: 14, fontFamily: 'Nunito-SemiBold', color: colors.text, flex: 1 },
+  orderIndex: { fontSize: 14, fontFamily: "Nunito-Bold", color: colors.primary, width: 22 },
+  orderLabel: { fontSize: 14, fontFamily: "Nunito-SemiBold", color: colors.text, flex: 1 },
   orderBtn: { padding: 6 },
-  helperText: { fontSize: 12, fontFamily: 'Nunito-Regular', color: colors.textSecondary, marginTop: 4 },
+  helperText: {
+    fontSize: 12,
+    fontFamily: "Nunito-Regular",
+    color: colors.textSecondary,
+    marginTop: 4,
+  },
   submit: {
     marginTop: spacing.sm,
     paddingVertical: 14,
     borderRadius: radius.full,
     backgroundColor: colors.primary,
-    alignItems: 'center',
+    alignItems: "center",
   },
-  submitText: { fontSize: 15, fontFamily: 'Nunito-Bold', color: '#FFF' },
+  submitText: { fontSize: 15, fontFamily: "Nunito-Bold", color: "#FFF" },
 });

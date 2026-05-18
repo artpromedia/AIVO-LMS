@@ -129,7 +129,7 @@ export default function MasterToChildClone({
   // How many particles have "arrived" — drives the child-brain region lighting.
   const arrivedCount = useMemo(
     () => Math.floor(progress * (DOMAIN_PARTICLES.length + 1)),
-    [progress]
+    [progress],
   );
 
   // Fire a per-region chime exactly once when each particle first arrives.
@@ -289,10 +289,7 @@ export default function MasterToChildClone({
             DOMAIN_PARTICLES.map((p, i) => {
               // Stagger each particle's start so the stream feels continuous.
               const startFrac = i / DOMAIN_PARTICLES.length;
-              const localProgress = Math.max(
-                0,
-                Math.min(1, (progress - startFrac * 0.6) / 0.45)
-              );
+              const localProgress = Math.max(0, Math.min(1, (progress - startFrac * 0.6) / 0.45));
               if (localProgress <= 0) return null;
               const x1 = 230;
               const x2 = 370;
@@ -315,8 +312,7 @@ export default function MasterToChildClone({
         </svg>
 
         <p className="mt-4 text-base md:text-lg font-heading font-bold">
-          {caption ||
-            `Cloning AIVO's learning model into ${learnerName}'s personal brain…`}
+          {caption || `Cloning AIVO's learning model into ${learnerName}'s personal brain…`}
         </p>
         <p className="mt-1 text-xs md:text-sm text-white/60 max-w-md mx-auto">
           {progress < 0.95
@@ -330,8 +326,7 @@ export default function MasterToChildClone({
             className="h-full rounded-full"
             style={{
               width: `${Math.round(progress * 100)}%`,
-              background:
-                "linear-gradient(90deg, #A78BFA, #7C3AED, #06B6D4, #10B981)",
+              background: "linear-gradient(90deg, #A78BFA, #7C3AED, #06B6D4, #10B981)",
               transition: "width 200ms linear",
             }}
           />

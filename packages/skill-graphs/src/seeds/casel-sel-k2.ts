@@ -30,7 +30,8 @@ export const caselSelK2: SkillGraph = {
     {
       id: "casel.k2.self_management.calm",
       title: "Use a calm-down strategy",
-      description: "I can pick a strategy (deep breath, count, take a break) when I feel big feelings.",
+      description:
+        "I can pick a strategy (deep breath, count, take a break) when I feel big feelings.",
       subject: "sel",
       gradeBand: "K",
       frameworkRefs: [{ framework: "CASEL", code: "Self-Management" }],

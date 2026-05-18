@@ -142,4 +142,6 @@ if (failed) {
   console.error("\nAudit failed.");
   process.exit(1);
 }
-console.log(`\nOK — ${staticRoutes.length} static routes, ${routes.length - staticRoutes.length} dynamic, ${allHrefs.size} href literals, 0 dead, 0 ComingSoon.`);
+console.log(
+  `\nOK — ${staticRoutes.length} static routes, ${routes.length - staticRoutes.length} dynamic, ${allHrefs.size} href literals, 0 dead, 0 ComingSoon.`,
+);

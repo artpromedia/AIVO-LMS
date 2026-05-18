@@ -26,7 +26,10 @@ export interface LearningEvent {
   payload: Record<string, unknown>;
 }
 
-export function emitLearningEvent(name: LearningEventName, payload: Record<string, unknown> = {}): LearningEvent {
+export function emitLearningEvent(
+  name: LearningEventName,
+  payload: Record<string, unknown> = {},
+): LearningEvent {
   const event: LearningEvent = { name, occurredAt: new Date().toISOString(), payload };
   if (typeof window !== "undefined") {
     console.info(`[learning] ${name}`, payload);

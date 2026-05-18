@@ -4,10 +4,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
-import {
-  listAllDataExportRequests,
-  listAllDataDeletionRequests,
-} from "@/lib/db/repos";
+import { listAllDataExportRequests, listAllDataDeletionRequests } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
 

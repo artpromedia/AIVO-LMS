@@ -24,7 +24,8 @@ export const compassStarterPack: ContentPack = {
       title: "Plan a small goal",
       skillId: "cec.ls.6.ef.plan",
       type: "narration",
-      prompt: "Executive function is the brain's manager — it helps us plan, start, and finish tasks. Today we'll set one small goal for the week.",
+      prompt:
+        "Executive function is the brain's manager — it helps us plan, start, and finish tasks. Today we'll set one small goal for the week.",
       difficulty: "intro",
     },
     {

@@ -17,11 +17,7 @@
       "path": "/",
       "name": "Landing",
       "role": "public",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Public landing + role-card switcher for the demo.",
       "primaryCta": "Continue as <role> / Sign in",
       "requiredData": "see BFF dependency",
@@ -42,9 +38,7 @@
       "path": "/admin/district",
       "name": "admin / district",
       "role": "district_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Role-scoped surface.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -65,9 +59,7 @@
       "path": "/admin/district/billing",
       "name": "admin / district / billing",
       "role": "district_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Billing for this role / tenant scope.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -88,9 +80,7 @@
       "path": "/admin/district/compliance",
       "name": "admin / district / compliance",
       "role": "district_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Role-scoped surface.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -111,9 +101,7 @@
       "path": "/admin/district/iep",
       "name": "admin / district / iep",
       "role": "district_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "IEP / accommodation document handling — upload + extracted-accommodations review.",
       "primaryCta": "Upload IEP",
       "requiredData": "see BFF dependency",
@@ -134,9 +122,7 @@
       "path": "/admin/district/reports",
       "name": "admin / district / reports",
       "role": "district_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Reporting scoped to this role.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -157,9 +143,7 @@
       "path": "/admin/district/schools",
       "name": "admin / district / schools",
       "role": "district_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Role-scoped surface.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -180,9 +164,7 @@
       "path": "/admin/district/settings",
       "name": "admin / district / settings",
       "role": "district_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Account, billing, and per-role settings.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -203,9 +185,7 @@
       "path": "/admin/district/settings/admins",
       "name": "admin / district / settings / admins",
       "role": "district_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Account, billing, and per-role settings.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -226,9 +206,7 @@
       "path": "/admin/district/settings/branding",
       "name": "admin / district / settings / branding",
       "role": "district_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Account, billing, and per-role settings.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -249,9 +227,7 @@
       "path": "/admin/district/settings/sso",
       "name": "admin / district / settings / sso",
       "role": "district_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Account, billing, and per-role settings.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -272,9 +248,7 @@
       "path": "/admin/district/staff",
       "name": "admin / district / staff",
       "role": "district_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "School staff roster + roles.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -295,9 +269,7 @@
       "path": "/admin/platform",
       "name": "admin / platform",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Role-scoped surface.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -318,9 +290,7 @@
       "path": "/admin/platform/ai-costs",
       "name": "admin / platform / ai-costs",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Per-tenant LLM cost rollup.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -341,9 +311,7 @@
       "path": "/admin/platform/ai-generation",
       "name": "admin / platform / ai-generation",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "AI generation monitoring.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -364,9 +332,7 @@
       "path": "/admin/platform/ai/moderation",
       "name": "admin / platform / ai / moderation",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Role-scoped surface.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -387,9 +353,7 @@
       "path": "/admin/platform/ai/playground",
       "name": "admin / platform / ai / playground",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Role-scoped surface.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -410,9 +374,7 @@
       "path": "/admin/platform/audio",
       "name": "admin / platform / audio",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Audio settings / pronunciation library.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -433,9 +395,7 @@
       "path": "/admin/platform/audio/pronunciation",
       "name": "admin / platform / audio / pronunciation",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Audio settings / pronunciation library.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -456,9 +416,7 @@
       "path": "/admin/platform/audit-logs",
       "name": "admin / platform / audit-logs",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Tenant-scoped audit log explorer.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -479,9 +437,7 @@
       "path": "/admin/platform/billing",
       "name": "admin / platform / billing",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Billing for this role / tenant scope.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -502,9 +458,7 @@
       "path": "/admin/platform/billing/coupons",
       "name": "admin / platform / billing / coupons",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Billing for this role / tenant scope.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -525,9 +479,7 @@
       "path": "/admin/platform/billing/daily-batch",
       "name": "admin / platform / billing / daily-batch",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Billing for this role / tenant scope.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -548,9 +500,7 @@
       "path": "/admin/platform/billing/invoices",
       "name": "admin / platform / billing / invoices",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Billing for this role / tenant scope.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -571,9 +521,7 @@
       "path": "/admin/platform/billing/revenue",
       "name": "admin / platform / billing / revenue",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Billing for this role / tenant scope.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -594,9 +542,7 @@
       "path": "/admin/platform/compliance",
       "name": "admin / platform / compliance",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Role-scoped surface.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -617,9 +563,7 @@
       "path": "/admin/platform/compliance/data-inventory",
       "name": "admin / platform / compliance / data-inventory",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Compliance artifacts — DSAR / retention / disclosures / data inventory.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -640,9 +584,7 @@
       "path": "/admin/platform/compliance/disclosures",
       "name": "admin / platform / compliance / disclosures",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Compliance artifacts — DSAR / retention / disclosures / data inventory.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -663,9 +605,7 @@
       "path": "/admin/platform/compliance/dsar",
       "name": "admin / platform / compliance / dsar",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Compliance artifacts — DSAR / retention / disclosures / data inventory.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -686,9 +626,7 @@
       "path": "/admin/platform/compliance/retention",
       "name": "admin / platform / compliance / retention",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Compliance artifacts — DSAR / retention / disclosures / data inventory.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -709,9 +647,7 @@
       "path": "/admin/platform/curriculum",
       "name": "admin / platform / curriculum",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Role-scoped surface.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -732,9 +668,7 @@
       "path": "/admin/platform/curriculum/frameworks",
       "name": "admin / platform / curriculum / frameworks",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Curriculum management.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -755,9 +689,7 @@
       "path": "/admin/platform/curriculum/import",
       "name": "admin / platform / curriculum / import",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Curriculum management.",
       "primaryCta": "Import",
       "requiredData": "see BFF dependency",
@@ -778,9 +710,7 @@
       "path": "/admin/platform/curriculum/skills",
       "name": "admin / platform / curriculum / skills",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Curriculum management.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -801,9 +731,7 @@
       "path": "/admin/platform/curriculum/subjects",
       "name": "admin / platform / curriculum / subjects",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Curriculum management.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -824,9 +752,7 @@
       "path": "/admin/platform/curriculum/versioning",
       "name": "admin / platform / curriculum / versioning",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Curriculum management.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -847,9 +773,7 @@
       "path": "/admin/platform/data",
       "name": "admin / platform / data",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Tenant data inspector.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -870,9 +794,7 @@
       "path": "/admin/platform/jobs",
       "name": "admin / platform / jobs",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Role-scoped surface.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -893,9 +815,7 @@
       "path": "/admin/platform/learners",
       "name": "admin / platform / learners",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Learner list scoped to this role.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -916,9 +836,7 @@
       "path": "/admin/platform/migration",
       "name": "admin / platform / migration",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Data migration ops.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -939,9 +857,7 @@
       "path": "/admin/platform/safety",
       "name": "admin / platform / safety",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Role-scoped surface.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -962,9 +878,7 @@
       "path": "/admin/platform/safety/moderation",
       "name": "admin / platform / safety / moderation",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Safety review queue / policies / red-team artifacts.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -985,9 +899,7 @@
       "path": "/admin/platform/safety/policies",
       "name": "admin / platform / safety / policies",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Safety review queue / policies / red-team artifacts.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1008,9 +920,7 @@
       "path": "/admin/platform/safety/red-team",
       "name": "admin / platform / safety / red-team",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Safety review queue / policies / red-team artifacts.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1031,9 +941,7 @@
       "path": "/admin/platform/safety/review-queue",
       "name": "admin / platform / safety / review-queue",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Safety review queue / policies / red-team artifacts.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1054,9 +962,7 @@
       "path": "/admin/platform/security",
       "name": "admin / platform / security",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Role-scoped surface.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1077,9 +983,7 @@
       "path": "/admin/platform/security/controls",
       "name": "admin / platform / security / controls",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Security posture — controls, incidents, risks, vendors, vulns.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1100,9 +1004,7 @@
       "path": "/admin/platform/security/incidents",
       "name": "admin / platform / security / incidents",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Security posture — controls, incidents, risks, vendors, vulns.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1123,9 +1025,7 @@
       "path": "/admin/platform/security/risks",
       "name": "admin / platform / security / risks",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Security posture — controls, incidents, risks, vendors, vulns.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1146,9 +1046,7 @@
       "path": "/admin/platform/security/state-privacy",
       "name": "admin / platform / security / state-privacy",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Security posture — controls, incidents, risks, vendors, vulns.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1169,9 +1067,7 @@
       "path": "/admin/platform/security/vendors",
       "name": "admin / platform / security / vendors",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Security posture — controls, incidents, risks, vendors, vulns.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1192,9 +1088,7 @@
       "path": "/admin/platform/security/vulnerabilities",
       "name": "admin / platform / security / vulnerabilities",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Security posture — controls, incidents, risks, vendors, vulns.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1215,9 +1109,7 @@
       "path": "/admin/platform/settings",
       "name": "admin / platform / settings",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Account, billing, and per-role settings.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1238,9 +1130,7 @@
       "path": "/admin/platform/settings/api-keys",
       "name": "admin / platform / settings / api-keys",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Account, billing, and per-role settings.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1261,9 +1151,7 @@
       "path": "/admin/platform/settings/emails",
       "name": "admin / platform / settings / emails",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Account, billing, and per-role settings.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1284,9 +1172,7 @@
       "path": "/admin/platform/settings/webhooks",
       "name": "admin / platform / settings / webhooks",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Account, billing, and per-role settings.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1307,9 +1193,7 @@
       "path": "/admin/platform/support",
       "name": "admin / platform / support",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Support ticket queue.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1330,9 +1214,7 @@
       "path": "/admin/platform/system-health",
       "name": "admin / platform / system-health",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "System health overview.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1353,9 +1235,7 @@
       "path": "/admin/platform/tenants",
       "name": "admin / platform / tenants",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Tenant management.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1376,9 +1256,7 @@
       "path": "/admin/platform/tenants/[id]",
       "name": "admin / platform / tenants / id",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Tenant management.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1399,9 +1277,7 @@
       "path": "/admin/platform/users",
       "name": "admin / platform / users",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Cross-tenant user search + actions.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1422,9 +1298,7 @@
       "path": "/admin/platform/users/[id]",
       "name": "admin / platform / users / id",
       "role": "platform_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Cross-tenant user search + actions.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1445,9 +1319,7 @@
       "path": "/admin/school",
       "name": "admin / school",
       "role": "school_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Role-scoped surface.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1468,9 +1340,7 @@
       "path": "/admin/school/billing",
       "name": "admin / school / billing",
       "role": "school_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Billing for this role / tenant scope.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1491,9 +1361,7 @@
       "path": "/admin/school/classes",
       "name": "admin / school / classes",
       "role": "school_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Class list with size + last-active.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1514,9 +1382,7 @@
       "path": "/admin/school/classes/[classId]",
       "name": "admin / school / classes / classId",
       "role": "school_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Class detail — roster + needs-attention rail.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1537,9 +1403,7 @@
       "path": "/admin/school/compliance",
       "name": "admin / school / compliance",
       "role": "school_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Role-scoped surface.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1560,9 +1424,7 @@
       "path": "/admin/school/learners",
       "name": "admin / school / learners",
       "role": "school_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Learner list scoped to this role.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1583,9 +1445,7 @@
       "path": "/admin/school/reports",
       "name": "admin / school / reports",
       "role": "school_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Reporting scoped to this role.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1606,9 +1466,7 @@
       "path": "/admin/school/rostering",
       "name": "admin / school / rostering",
       "role": "school_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "SIS rostering status + import.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1629,9 +1487,7 @@
       "path": "/admin/school/rostering/import",
       "name": "admin / school / rostering / import",
       "role": "school_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "SIS rostering status + import.",
       "primaryCta": "Import roster",
       "requiredData": "see BFF dependency",
@@ -1652,9 +1508,7 @@
       "path": "/admin/school/settings",
       "name": "admin / school / settings",
       "role": "school_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "Account, billing, and per-role settings.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1675,9 +1529,7 @@
       "path": "/admin/school/staff",
       "name": "admin / school / staff",
       "role": "school_admin",
-      "device": [
-        "web"
-      ],
+      "device": ["web"],
       "purpose": "School staff roster + roles.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1698,11 +1550,7 @@
       "path": "/learner/baseline",
       "name": "learner / baseline",
       "role": "learner",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Discovery Adventure baseline — adaptive, never displayed as a score.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1723,11 +1571,7 @@
       "path": "/learner/baseline/[baselineId]",
       "name": "learner / baseline / baselineId",
       "role": "learner",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Discovery Adventure baseline — adaptive, never displayed as a score.",
       "primaryCta": "Continue",
       "requiredData": "see BFF dependency",
@@ -1737,10 +1581,7 @@
       "error": "inline banner + retry-panel",
       "retry": "manual",
       "permission": "learner OR (parent + active learner cookie)",
-      "consentDependency": [
-        "child_data_collection",
-        "ai_personalization"
-      ],
+      "consentDependency": ["child_data_collection", "ai_personalization"],
       "accessibilityNotes": "inherits SkipLinks + focus-visible from app root; role-specific notes in UX-00 §6",
       "mobileBehavior": "Learner Mode tab; full-screen for lesson/baseline/homework",
       "eng": "requirePageRole on page; per-BFF requireSession + ownership/tenant check (see UX-01 §5)",
@@ -1751,11 +1592,7 @@
       "path": "/learner/home",
       "name": "learner / home",
       "role": "learner",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Learner home: surfaces the next action (Today's Mission).",
       "primaryCta": "Start today's mission",
       "requiredData": "see BFF dependency",
@@ -1765,10 +1602,7 @@
       "error": "inline banner + retry-panel",
       "retry": "manual",
       "permission": "learner OR (parent + active learner cookie)",
-      "consentDependency": [
-        "child_data_collection",
-        "ai_personalization"
-      ],
+      "consentDependency": ["child_data_collection", "ai_personalization"],
       "accessibilityNotes": "inherits SkipLinks + focus-visible from app root; role-specific notes in UX-00 §6",
       "mobileBehavior": "Learner Mode tab; full-screen for lesson/baseline/homework",
       "eng": "requirePageRole on page; per-BFF requireSession + ownership/tenant check (see UX-01 §5)",
@@ -1779,11 +1613,7 @@
       "path": "/learner/homework",
       "name": "learner / homework",
       "role": "learner",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Role-scoped surface.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1804,11 +1634,7 @@
       "path": "/learner/homework/[sessionId]",
       "name": "learner / homework / sessionId",
       "role": "learner",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Homework Helper chat — tutor-mediated, parent-visible.",
       "primaryCta": "Send message",
       "requiredData": "see BFF dependency",
@@ -1818,10 +1644,7 @@
       "error": "inline banner + retry-panel",
       "retry": "manual",
       "permission": "learner OR (parent + active learner cookie)",
-      "consentDependency": [
-        "child_data_collection",
-        "ai_personalization"
-      ],
+      "consentDependency": ["child_data_collection", "ai_personalization"],
       "accessibilityNotes": "inherits SkipLinks + focus-visible from app root; role-specific notes in UX-00 §6",
       "mobileBehavior": "Learner Mode tab; full-screen for lesson/baseline/homework",
       "eng": "requirePageRole on page; per-BFF requireSession + ownership/tenant check (see UX-01 §5)",
@@ -1832,11 +1655,7 @@
       "path": "/learner/lesson-runs/[lessonRunId]",
       "name": "learner / lesson-runs / lessonRunId",
       "role": "learner",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Full-screen lesson player (Stage) — one beat at a time.",
       "primaryCta": "Submit beat response",
       "requiredData": "see BFF dependency",
@@ -1846,10 +1665,7 @@
       "error": "inline banner + retry-panel",
       "retry": "manual",
       "permission": "learner OR (parent + active learner cookie)",
-      "consentDependency": [
-        "child_data_collection",
-        "ai_personalization"
-      ],
+      "consentDependency": ["child_data_collection", "ai_personalization"],
       "accessibilityNotes": "inherits SkipLinks + focus-visible from app root; role-specific notes in UX-00 §6",
       "mobileBehavior": "Learner Mode tab; full-screen for lesson/baseline/homework",
       "eng": "requirePageRole on page; per-BFF requireSession + ownership/tenant check (see UX-01 §5)",
@@ -1860,11 +1676,7 @@
       "path": "/learner/library",
       "name": "learner / library",
       "role": "learner",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Browsable learning library.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1885,11 +1697,7 @@
       "path": "/learner/missions",
       "name": "learner / missions",
       "role": "learner",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Today's Mission + upcoming.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1899,10 +1707,7 @@
       "error": "inline banner + retry-panel",
       "retry": "manual",
       "permission": "learner OR (parent + active learner cookie)",
-      "consentDependency": [
-        "child_data_collection",
-        "ai_personalization"
-      ],
+      "consentDependency": ["child_data_collection", "ai_personalization"],
       "accessibilityNotes": "inherits SkipLinks + focus-visible from app root; role-specific notes in UX-00 §6",
       "mobileBehavior": "Learner Mode tab; full-screen for lesson/baseline/homework",
       "eng": "requirePageRole on page; per-BFF requireSession + ownership/tenant check (see UX-01 §5)",
@@ -1913,11 +1718,7 @@
       "path": "/learner/notifications",
       "name": "learner / notifications",
       "role": "learner",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Per-channel notification preferences + recent items.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1938,11 +1739,7 @@
       "path": "/learner/progress",
       "name": "learner / progress",
       "role": "learner",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Progress rollup (mastery, time, streak).",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1963,11 +1760,7 @@
       "path": "/learner/quests",
       "name": "learner / quests",
       "role": "learner",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Quest worlds and chapters — gated on real learning.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -1988,11 +1781,7 @@
       "path": "/learner/quests/[worldId]",
       "name": "learner / quests / worldId",
       "role": "learner",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Quest worlds and chapters — gated on real learning.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2013,11 +1802,7 @@
       "path": "/learner/quests/[worldId]/chapters/[chapterId]",
       "name": "learner / quests / worldId / chapters / chapterId",
       "role": "learner",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Quest worlds and chapters — gated on real learning.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2027,10 +1812,7 @@
       "error": "inline banner + retry-panel",
       "retry": "manual",
       "permission": "learner OR (parent + active learner cookie)",
-      "consentDependency": [
-        "child_data_collection",
-        "ai_personalization"
-      ],
+      "consentDependency": ["child_data_collection", "ai_personalization"],
       "accessibilityNotes": "inherits SkipLinks + focus-visible from app root; role-specific notes in UX-00 §6",
       "mobileBehavior": "Learner Mode tab; full-screen for lesson/baseline/homework",
       "eng": "requirePageRole on page; per-BFF requireSession + ownership/tenant check (see UX-01 §5)",
@@ -2041,11 +1823,7 @@
       "path": "/learner/rewards",
       "name": "learner / rewards",
       "role": "learner",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Avatar shop, coins, badges — never used to shame.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2066,11 +1844,7 @@
       "path": "/learner/select",
       "name": "learner / select",
       "role": "learner",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Choose which learner a parent is helping (skipped when only one).",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2091,11 +1865,7 @@
       "path": "/learner/settings/accessibility",
       "name": "learner / settings / accessibility",
       "role": "learner",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Accessibility preferences (text size, motion, audio).",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2116,11 +1886,7 @@
       "path": "/learner/settings/audio",
       "name": "learner / settings / audio",
       "role": "learner",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Account, billing, and per-role settings.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2141,11 +1907,7 @@
       "path": "/learner/subjects",
       "name": "learner / subjects",
       "role": "learner",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Subject browsing / detail.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2166,11 +1928,7 @@
       "path": "/learner/subjects/[subjectId]",
       "name": "learner / subjects / subjectId",
       "role": "learner",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Subject browsing / detail.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2180,9 +1938,7 @@
       "error": "inline banner + retry-panel",
       "retry": "manual",
       "permission": "learner OR (parent + active learner cookie)",
-      "consentDependency": [
-        "child_data_collection"
-      ],
+      "consentDependency": ["child_data_collection"],
       "accessibilityNotes": "inherits SkipLinks + focus-visible from app root; role-specific notes in UX-00 §6",
       "mobileBehavior": "Learner Mode tab; full-screen for lesson/baseline/homework",
       "eng": "requirePageRole on page; per-BFF requireSession + ownership/tenant check (see UX-01 §5)",
@@ -2193,11 +1949,7 @@
       "path": "/login",
       "name": "login",
       "role": "public",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Mock role picker (real auth lands in identity-svc — see UX-00 DD-15).",
       "primaryCta": "Sign in",
       "requiredData": "see BFF dependency",
@@ -2218,11 +1970,7 @@
       "path": "/parent/consent",
       "name": "parent / consent",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Per-type consent management with version + accept/revoke history.",
       "primaryCta": "Accept / Revoke",
       "requiredData": "see BFF dependency",
@@ -2243,11 +1991,7 @@
       "path": "/parent/consent/[learnerId]",
       "name": "parent / consent / learnerId",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Per-type consent management with version + accept/revoke history.",
       "primaryCta": "Accept / Revoke",
       "requiredData": "see BFF dependency",
@@ -2268,11 +2012,7 @@
       "path": "/parent/home",
       "name": "parent / home",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Parent home: surfaces the next action.",
       "primaryCta": "Open next action",
       "requiredData": "see BFF dependency",
@@ -2293,11 +2033,7 @@
       "path": "/parent/learners",
       "name": "parent / learners",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Learner list scoped to this role.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2318,11 +2054,7 @@
       "path": "/parent/learners/[learnerId]",
       "name": "parent / learners / learnerId",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Learner detail view — role-scoped subset of the profile.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2343,11 +2075,7 @@
       "path": "/parent/learners/[learnerId]/accessibility",
       "name": "parent / learners / learnerId / accessibility",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Learner detail view — role-scoped subset of the profile.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2368,11 +2096,7 @@
       "path": "/parent/learners/[learnerId]/accessibility/audio",
       "name": "parent / learners / learnerId / accessibility / audio",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Learner detail view — role-scoped subset of the profile.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2393,11 +2117,7 @@
       "path": "/parent/learners/[learnerId]/assessment",
       "name": "parent / learners / learnerId / assessment",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Learner detail view — role-scoped subset of the profile.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2407,9 +2127,7 @@
       "error": "inline banner + retry-panel",
       "retry": "manual",
       "permission": "parent + parentUserId scope on learner reads",
-      "consentDependency": [
-        "child_data_collection"
-      ],
+      "consentDependency": ["child_data_collection"],
       "accessibilityNotes": "inherits SkipLinks + focus-visible from app root; role-specific notes in UX-00 §6",
       "mobileBehavior": "Parent Mode tab content; stacks vertically",
       "eng": "requirePageRole on page; per-BFF requireSession + ownership/tenant check (see UX-01 §5)",
@@ -2420,11 +2138,7 @@
       "path": "/parent/learners/[learnerId]/assessment/review",
       "name": "parent / learners / learnerId / assessment / review",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Learner detail view — role-scoped subset of the profile.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2434,9 +2148,7 @@
       "error": "inline banner + retry-panel",
       "retry": "manual",
       "permission": "parent + parentUserId scope on learner reads",
-      "consentDependency": [
-        "child_data_collection"
-      ],
+      "consentDependency": ["child_data_collection"],
       "accessibilityNotes": "inherits SkipLinks + focus-visible from app root; role-specific notes in UX-00 §6",
       "mobileBehavior": "Parent Mode tab content; stacks vertically",
       "eng": "requirePageRole on page; per-BFF requireSession + ownership/tenant check (see UX-01 §5)",
@@ -2447,11 +2159,7 @@
       "path": "/parent/learners/[learnerId]/baseline",
       "name": "parent / learners / learnerId / baseline",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Discovery Adventure baseline — adaptive, never displayed as a score.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2461,10 +2169,7 @@
       "error": "inline banner + retry-panel",
       "retry": "manual",
       "permission": "parent + parentUserId scope on learner reads",
-      "consentDependency": [
-        "child_data_collection",
-        "ai_personalization"
-      ],
+      "consentDependency": ["child_data_collection", "ai_personalization"],
       "accessibilityNotes": "inherits SkipLinks + focus-visible from app root; role-specific notes in UX-00 §6",
       "mobileBehavior": "Parent Mode tab content; stacks vertically",
       "eng": "requirePageRole on page; per-BFF requireSession + ownership/tenant check (see UX-01 §5)",
@@ -2475,11 +2180,7 @@
       "path": "/parent/learners/[learnerId]/brain-profile",
       "name": "parent / learners / learnerId / brain-profile",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Plain-language brain profile for parent review.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2489,10 +2190,7 @@
       "error": "inline banner + retry-panel",
       "retry": "manual",
       "permission": "parent + parentUserId scope on learner reads",
-      "consentDependency": [
-        "child_data_collection",
-        "ai_personalization"
-      ],
+      "consentDependency": ["child_data_collection", "ai_personalization"],
       "accessibilityNotes": "inherits SkipLinks + focus-visible from app root; role-specific notes in UX-00 §6",
       "mobileBehavior": "Parent Mode tab content; stacks vertically",
       "eng": "requirePageRole on page; per-BFF requireSession + ownership/tenant check (see UX-01 §5)",
@@ -2503,11 +2201,7 @@
       "path": "/parent/learners/[learnerId]/gradebook",
       "name": "parent / learners / learnerId / gradebook",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Learner detail view — role-scoped subset of the profile.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2528,11 +2222,7 @@
       "path": "/parent/learners/[learnerId]/homework",
       "name": "parent / learners / learnerId / homework",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Learner detail view — role-scoped subset of the profile.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2542,9 +2232,7 @@
       "error": "inline banner + retry-panel",
       "retry": "manual",
       "permission": "parent + parentUserId scope on learner reads",
-      "consentDependency": [
-        "child_data_collection"
-      ],
+      "consentDependency": ["child_data_collection"],
       "accessibilityNotes": "inherits SkipLinks + focus-visible from app root; role-specific notes in UX-00 §6",
       "mobileBehavior": "Parent Mode tab content; stacks vertically",
       "eng": "requirePageRole on page; per-BFF requireSession + ownership/tenant check (see UX-01 §5)",
@@ -2555,11 +2243,7 @@
       "path": "/parent/learners/[learnerId]/iep",
       "name": "parent / learners / learnerId / iep",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "IEP / accommodation document handling — upload + extracted-accommodations review.",
       "primaryCta": "Upload IEP",
       "requiredData": "see BFF dependency",
@@ -2569,9 +2253,7 @@
       "error": "inline banner + retry-panel",
       "retry": "manual",
       "permission": "parent + parentUserId scope on learner reads",
-      "consentDependency": [
-        "iep_document_storage"
-      ],
+      "consentDependency": ["iep_document_storage"],
       "accessibilityNotes": "inherits SkipLinks + focus-visible from app root; role-specific notes in UX-00 §6",
       "mobileBehavior": "Parent Mode tab content; stacks vertically",
       "eng": "requirePageRole on page; per-BFF requireSession + ownership/tenant check (see UX-01 §5)",
@@ -2582,11 +2264,7 @@
       "path": "/parent/learners/[learnerId]/iep/review",
       "name": "parent / learners / learnerId / iep / review",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "IEP / accommodation document handling — upload + extracted-accommodations review.",
       "primaryCta": "Confirm extracted accommodations",
       "requiredData": "see BFF dependency",
@@ -2596,9 +2274,7 @@
       "error": "inline banner + retry-panel",
       "retry": "manual",
       "permission": "parent + parentUserId scope on learner reads",
-      "consentDependency": [
-        "iep_document_storage"
-      ],
+      "consentDependency": ["iep_document_storage"],
       "accessibilityNotes": "inherits SkipLinks + focus-visible from app root; role-specific notes in UX-00 §6",
       "mobileBehavior": "Parent Mode tab content; stacks vertically",
       "eng": "requirePageRole on page; per-BFF requireSession + ownership/tenant check (see UX-01 §5)",
@@ -2609,11 +2285,7 @@
       "path": "/parent/learners/[learnerId]/lessons",
       "name": "parent / learners / learnerId / lessons",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Learner detail view — role-scoped subset of the profile.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2623,9 +2295,7 @@
       "error": "inline banner + retry-panel",
       "retry": "manual",
       "permission": "parent + parentUserId scope on learner reads",
-      "consentDependency": [
-        "child_data_collection"
-      ],
+      "consentDependency": ["child_data_collection"],
       "accessibilityNotes": "inherits SkipLinks + focus-visible from app root; role-specific notes in UX-00 §6",
       "mobileBehavior": "Parent Mode tab content; stacks vertically",
       "eng": "requirePageRole on page; per-BFF requireSession + ownership/tenant check (see UX-01 §5)",
@@ -2636,11 +2306,7 @@
       "path": "/parent/learners/[learnerId]/milestones",
       "name": "parent / learners / learnerId / milestones",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Learner detail view — role-scoped subset of the profile.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2661,11 +2327,7 @@
       "path": "/parent/learners/[learnerId]/progress",
       "name": "parent / learners / learnerId / progress",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Learner detail view — role-scoped subset of the profile.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2686,11 +2348,7 @@
       "path": "/parent/learners/[learnerId]/sensory",
       "name": "parent / learners / learnerId / sensory",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Learner detail view — role-scoped subset of the profile.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2711,11 +2369,7 @@
       "path": "/parent/learners/[learnerId]/settings",
       "name": "parent / learners / learnerId / settings",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Account, billing, and per-role settings.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2736,11 +2390,7 @@
       "path": "/parent/learners/[learnerId]/summary",
       "name": "parent / learners / learnerId / summary",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Learner detail view — role-scoped subset of the profile.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2761,11 +2411,7 @@
       "path": "/parent/learners/[learnerId]/team",
       "name": "parent / learners / learnerId / team",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Learner detail view — role-scoped subset of the profile.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2786,11 +2432,7 @@
       "path": "/parent/learners/new",
       "name": "parent / learners / new",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Add a learner (collects age-gate + initial consents).",
       "primaryCta": "Add learner",
       "requiredData": "see BFF dependency",
@@ -2811,11 +2453,7 @@
       "path": "/parent/notifications",
       "name": "parent / notifications",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Per-channel notification preferences + recent items.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2836,11 +2474,7 @@
       "path": "/parent/privacy",
       "name": "parent / privacy",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Parent data-rights surfaces (export, delete, DSAR).",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2861,11 +2495,7 @@
       "path": "/parent/privacy/data-export",
       "name": "parent / privacy / data-export",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Parent data-rights surfaces (export, delete, DSAR).",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2886,11 +2516,7 @@
       "path": "/parent/privacy/delete-data",
       "name": "parent / privacy / delete-data",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Parent data-rights surfaces (export, delete, DSAR).",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2911,11 +2537,7 @@
       "path": "/parent/reports",
       "name": "parent / reports",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Reporting scoped to this role.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2936,11 +2558,7 @@
       "path": "/parent/schedule",
       "name": "parent / schedule",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Family / class schedule view.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2961,11 +2579,7 @@
       "path": "/parent/settings",
       "name": "parent / settings",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Account, billing, and per-role settings.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -2986,11 +2600,7 @@
       "path": "/parent/settings/account",
       "name": "parent / settings / account",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Account, billing, and per-role settings.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -3011,11 +2621,7 @@
       "path": "/parent/settings/billing",
       "name": "parent / settings / billing",
       "role": "parent",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Account, billing, and per-role settings.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -3036,11 +2642,7 @@
       "path": "/settings/accessibility",
       "name": "settings / accessibility",
       "role": "shared",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Accessibility preferences (text size, motion, audio).",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -3061,11 +2663,7 @@
       "path": "/signup",
       "name": "signup",
       "role": "public",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Parent signup — currently disabled UI shell; must be replaced with real auth.",
       "primaryCta": "Create account (currently disabled)",
       "requiredData": "see BFF dependency",
@@ -3086,11 +2684,7 @@
       "path": "/teacher/assignments",
       "name": "teacher / assignments",
       "role": "teacher",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Teacher assignment tracking.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -3111,11 +2705,7 @@
       "path": "/teacher/assignments/new",
       "name": "teacher / assignments / new",
       "role": "teacher",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Teacher creates a new assignment.",
       "primaryCta": "Create assignment",
       "requiredData": "see BFF dependency",
@@ -3136,11 +2726,7 @@
       "path": "/teacher/classes",
       "name": "teacher / classes",
       "role": "teacher",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Class list with size + last-active.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -3161,11 +2747,7 @@
       "path": "/teacher/classes/[classId]",
       "name": "teacher / classes / classId",
       "role": "teacher",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Class detail — roster + needs-attention rail.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -3186,11 +2768,7 @@
       "path": "/teacher/home",
       "name": "teacher / home",
       "role": "teacher",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Teacher home: surfaces the next action.",
       "primaryCta": "Open class needing attention",
       "requiredData": "see BFF dependency",
@@ -3211,11 +2789,7 @@
       "path": "/teacher/insights",
       "name": "teacher / insights",
       "role": "teacher",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Cohort-level mastery + intervention insights.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -3236,11 +2810,7 @@
       "path": "/teacher/learners",
       "name": "teacher / learners",
       "role": "teacher",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Learner list scoped to this role.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -3261,11 +2831,7 @@
       "path": "/teacher/learners/[learnerId]",
       "name": "teacher / learners / learnerId",
       "role": "teacher",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Learner detail view — role-scoped subset of the profile.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -3275,9 +2841,7 @@
       "error": "inline banner + retry-panel",
       "retry": "manual",
       "permission": "teacher + class-roster membership for learner reads",
-      "consentDependency": [
-        "teacher_access"
-      ],
+      "consentDependency": ["teacher_access"],
       "accessibilityNotes": "inherits SkipLinks + focus-visible from app root; role-specific notes in UX-00 §6",
       "mobileBehavior": "Teacher Mode tab content",
       "eng": "requirePageRole on page; per-BFF requireSession + ownership/tenant check (see UX-01 §5)",
@@ -3288,11 +2852,7 @@
       "path": "/teacher/learners/[learnerId]/iep/draft",
       "name": "teacher / learners / learnerId / iep / draft",
       "role": "teacher",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "IEP / accommodation document handling — upload + extracted-accommodations review.",
       "primaryCta": "Upload IEP",
       "requiredData": "see BFF dependency",
@@ -3313,11 +2873,7 @@
       "path": "/teacher/lesson-plans",
       "name": "teacher / lesson-plans",
       "role": "teacher",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Role-scoped surface.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -3338,11 +2894,7 @@
       "path": "/teacher/reports",
       "name": "teacher / reports",
       "role": "teacher",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Reporting scoped to this role.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",
@@ -3363,11 +2915,7 @@
       "path": "/teacher/settings",
       "name": "teacher / settings",
       "role": "teacher",
-      "device": [
-        "web",
-        "tablet",
-        "mobile"
-      ],
+      "device": ["web", "tablet", "mobile"],
       "purpose": "Account, billing, and per-role settings.",
       "primaryCta": "Open detail",
       "requiredData": "see BFF dependency",

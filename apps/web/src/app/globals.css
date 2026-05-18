@@ -18,7 +18,7 @@
 .vi-card {
   background-color: hsl(var(--visual-surface));
   border-radius: 24px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
   border: 2px solid hsl(var(--visual-border));
 }
 .vi-bg {
@@ -86,17 +86,26 @@
  * sub-cards whose dark slate text must stay dark. The `:not(.bg-white *)`
  * fragment excludes any descendant of a `.bg-white` element, and the
  * `:not(.bg-white)` excludes the element itself. */
-[data-tier="MIDDLE"] .vi-card
-  :is(.text-slate-900, .text-slate-800, .text-slate-700, .text-slate-600, .text-slate-500, .text-slate-400, .text-slate-300):not(.bg-white):not(.bg-white *) {
+[data-tier="MIDDLE"]
+  .vi-card
+  :is(
+    .text-slate-900,
+    .text-slate-800,
+    .text-slate-700,
+    .text-slate-600,
+    .text-slate-500,
+    .text-slate-400,
+    .text-slate-300
+  ):not(.bg-white):not(.bg-white *) {
   color: hsl(38 60% 90%);
 }
 /* Faded variants get a softer parchment so hierarchy is preserved. */
-[data-tier="MIDDLE"] .vi-card
+[data-tier="MIDDLE"]
+  .vi-card
   :is(.text-slate-500, .text-slate-400):not(.bg-white):not(.bg-white *) {
   color: hsl(33 35% 65%);
 }
-[data-tier="MIDDLE"] .vi-card
-  :is(.text-slate-600):not(.bg-white):not(.bg-white *) {
+[data-tier="MIDDLE"] .vi-card :is(.text-slate-600):not(.bg-white):not(.bg-white *) {
   color: hsl(33 40% 72%);
 }
 
@@ -129,15 +138,31 @@
 .tier-scene-bg {
   background-color: hsl(var(--visual-bg));
   background-image:
-    radial-gradient(ellipse 80% 60% at 50% 0%, color-mix(in srgb, var(--tier-sky, #EDE3FE) 65%, transparent) 0%, transparent 65%),
-    radial-gradient(ellipse 60% 40% at 50% 100%, color-mix(in srgb, var(--tier-warm, #F8C4A0) 30%, transparent) 0%, transparent 70%);
+    radial-gradient(
+      ellipse 80% 60% at 50% 0%,
+      color-mix(in srgb, var(--tier-sky, #ede3fe) 65%, transparent) 0%,
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 60% 40% at 50% 100%,
+      color-mix(in srgb, var(--tier-warm, #f8c4a0) 30%, transparent) 0%,
+      transparent 70%
+    );
 }
 [data-tier="MIDDLE"] .tier-scene-bg {
   /* Twilight tier needs a stronger top-down gradient because the
      base surface is already dark. */
   background-image:
-    radial-gradient(ellipse 80% 70% at 50% 0%, color-mix(in srgb, var(--tier-sky, #3F2D6E) 80%, transparent) 0%, transparent 75%),
-    linear-gradient(to bottom, transparent 60%, color-mix(in srgb, var(--tier-warm, #5D7A5C) 18%, transparent) 100%);
+    radial-gradient(
+      ellipse 80% 70% at 50% 0%,
+      color-mix(in srgb, var(--tier-sky, #3f2d6e) 80%, transparent) 0%,
+      transparent 75%
+    ),
+    linear-gradient(
+      to bottom,
+      transparent 60%,
+      color-mix(in srgb, var(--tier-warm, #5d7a5c) 18%, transparent) 100%
+    );
 }
 
 /* Pace-aware variant for animated decoration inside scenes — lets us write
@@ -150,23 +175,23 @@
 }
 
 @theme {
-  --color-primary: #7C3AED;
-  --color-primary-light: #A78BFA;
-  --color-primary-dark: #5B21B6;
-  --color-secondary: #06B6D4;
-  --color-accent: #F59E0B;
-  --color-surface: #F8FAFC;
-  --color-surface-hover: #F1F5F9;
-  --color-subject-math: #BE185D;
-  --color-subject-math-soft: #FCE7F3;
-  --color-subject-reading: #0369A1;
-  --color-subject-reading-soft: #E0F2FE;
-  --color-subject-science: #15803D;
-  --color-subject-science-soft: #DCFCE7;
-  --color-subject-sel: #B45309;
-  --color-subject-sel-soft: #FEF3C7;
-  --font-heading: var(--font-fredoka), 'Fredoka', sans-serif;
-  --font-body: var(--font-nunito), 'Nunito', sans-serif;
+  --color-primary: #7c3aed;
+  --color-primary-light: #a78bfa;
+  --color-primary-dark: #5b21b6;
+  --color-secondary: #06b6d4;
+  --color-accent: #f59e0b;
+  --color-surface: #f8fafc;
+  --color-surface-hover: #f1f5f9;
+  --color-subject-math: #be185d;
+  --color-subject-math-soft: #fce7f3;
+  --color-subject-reading: #0369a1;
+  --color-subject-reading-soft: #e0f2fe;
+  --color-subject-science: #15803d;
+  --color-subject-science-soft: #dcfce7;
+  --color-subject-sel: #b45309;
+  --color-subject-sel-soft: #fef3c7;
+  --font-heading: var(--font-fredoka), "Fredoka", sans-serif;
+  --font-body: var(--font-nunito), "Nunito", sans-serif;
 
   --animate-breathe: breathe 3s ease-in-out infinite;
   --animate-speak: speak 0.6s ease-in-out infinite;
@@ -188,86 +213,201 @@
 }
 
 @keyframes breathe {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.03); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
 }
 @keyframes speak {
-  0%, 100% { transform: scale(1) translateY(0); }
-  25% { transform: scale(1.02) translateY(-2px); }
-  75% { transform: scale(0.98) translateY(1px); }
+  0%,
+  100% {
+    transform: scale(1) translateY(0);
+  }
+  25% {
+    transform: scale(1.02) translateY(-2px);
+  }
+  75% {
+    transform: scale(0.98) translateY(1px);
+  }
 }
 @keyframes celebrate {
-  0% { transform: scale(1) rotate(0); }
-  25% { transform: scale(1.15) rotate(-5deg); }
-  50% { transform: scale(1.2) rotate(5deg); }
-  75% { transform: scale(1.1) rotate(-3deg); }
-  100% { transform: scale(1) rotate(0); }
+  0% {
+    transform: scale(1) rotate(0);
+  }
+  25% {
+    transform: scale(1.15) rotate(-5deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(5deg);
+  }
+  75% {
+    transform: scale(1.1) rotate(-3deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
 }
 @keyframes think {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
 }
 @keyframes encourage {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 @keyframes point {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(8px); }
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(8px);
+  }
 }
 @keyframes bounce-gentle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
 }
 @keyframes ping-slow {
-  0% { transform: scale(1); opacity: 0.4; }
-  100% { transform: scale(1.4); opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
 }
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes scale-in {
-  from { opacity: 0; transform: scale(0.8); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 @keyframes slide-up {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes bounce-in {
-  0% { opacity: 0; transform: scale(0.3); }
-  50% { transform: scale(1.05); }
-  70% { transform: scale(0.95); }
-  100% { opacity: 1; transform: scale(1); }
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 @keyframes pulse-gentle {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 @keyframes glow {
-  0%, 100% { box-shadow: 0 0 5px rgba(255,255,255,0.2); }
-  50% { box-shadow: 0 0 20px rgba(255,255,255,0.4); }
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+  }
 }
 @keyframes confetti {
-  0% { transform: translateY(-20vh) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  0% {
+    transform: translateY(-20vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
 }
 @keyframes stage-particle {
-  0% { transform: translate(0, 0) rotate(0deg); opacity: 0.3; }
-  25% { opacity: 0.5; }
-  50% { transform: translate(30px, -40px) rotate(180deg); opacity: 0.3; }
-  75% { opacity: 0.5; }
-  100% { transform: translate(0, 0) rotate(360deg); opacity: 0.3; }
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 0.3;
+  }
+  25% {
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate(30px, -40px) rotate(180deg);
+    opacity: 0.3;
+  }
+  75% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(0, 0) rotate(360deg);
+    opacity: 0.3;
+  }
 }
 @keyframes twinkle {
-  0%, 100% { opacity: 0.2; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1.2); }
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
 }
 
 @layer base {
@@ -277,7 +417,9 @@
     border-radius: 4px;
   }
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+    *,
+    *::before,
+    *::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
@@ -328,33 +470,91 @@
 }
 
 @supports not (background: color-mix(in oklab, red, blue)) {
-  .bg-white\/80 { background-color: rgba(255,255,255,0.8); }
-  .bg-white\/70 { background-color: rgba(255,255,255,0.7); }
-  .bg-white\/60 { background-color: rgba(255,255,255,0.6); }
-  .bg-white\/50 { background-color: rgba(255,255,255,0.5); }
-  .bg-white\/30 { background-color: rgba(255,255,255,0.3); }
-  .bg-white\/20 { background-color: rgba(255,255,255,0.2); }
-  .bg-white\/10 { background-color: rgba(255,255,255,0.1); }
-  .text-white\/90 { color: rgba(255,255,255,0.9); }
-  .text-white\/80 { color: rgba(255,255,255,0.8); }
-  .text-white\/70 { color: rgba(255,255,255,0.7); }
-  .text-white\/60 { color: rgba(255,255,255,0.6); }
-  .border-white\/40 { border-color: rgba(255,255,255,0.4); }
-  .border-white\/30 { border-color: rgba(255,255,255,0.3); }
-  .border-white\/20 { border-color: rgba(255,255,255,0.2); }
-  .border-white\/10 { border-color: rgba(255,255,255,0.1); }
-  .bg-black\/50 { background-color: rgba(0,0,0,0.5); }
-  .bg-black\/40 { background-color: rgba(0,0,0,0.4); }
-  .bg-black\/30 { background-color: rgba(0,0,0,0.3); }
-  .bg-black\/20 { background-color: rgba(0,0,0,0.2); }
-  .bg-violet-500\/20 { background-color: rgba(139,92,246,0.2); }
-  .bg-violet-500\/10 { background-color: rgba(139,92,246,0.1); }
-  .border-violet-500\/20 { border-color: rgba(139,92,246,0.2); }
-  .ring-violet-500\/20 { --tw-ring-color: rgba(139,92,246,0.2); }
-  .bg-emerald-500\/20 { background-color: rgba(16,185,129,0.2); }
-  .bg-emerald-500\/10 { background-color: rgba(16,185,129,0.1); }
-  .bg-rose-500\/10 { background-color: rgba(244,63,94,0.1); }
-  .bg-rose-500\/20 { background-color: rgba(244,63,94,0.2); }
-  .bg-amber-500\/10 { background-color: rgba(245,158,11,0.1); }
-  .bg-amber-500\/20 { background-color: rgba(245,158,11,0.2); }
+  .bg-white\/80 {
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+  .bg-white\/70 {
+    background-color: rgba(255, 255, 255, 0.7);
+  }
+  .bg-white\/60 {
+    background-color: rgba(255, 255, 255, 0.6);
+  }
+  .bg-white\/50 {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
+  .bg-white\/30 {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+  .bg-white\/20 {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  .bg-white\/10 {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  .text-white\/90 {
+    color: rgba(255, 255, 255, 0.9);
+  }
+  .text-white\/80 {
+    color: rgba(255, 255, 255, 0.8);
+  }
+  .text-white\/70 {
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .text-white\/60 {
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .border-white\/40 {
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+  .border-white\/30 {
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  .border-white\/20 {
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  .border-white\/10 {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  .bg-black\/50 {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  .bg-black\/40 {
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+  .bg-black\/30 {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+  .bg-black\/20 {
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+  .bg-violet-500\/20 {
+    background-color: rgba(139, 92, 246, 0.2);
+  }
+  .bg-violet-500\/10 {
+    background-color: rgba(139, 92, 246, 0.1);
+  }
+  .border-violet-500\/20 {
+    border-color: rgba(139, 92, 246, 0.2);
+  }
+  .ring-violet-500\/20 {
+    --tw-ring-color: rgba(139, 92, 246, 0.2);
+  }
+  .bg-emerald-500\/20 {
+    background-color: rgba(16, 185, 129, 0.2);
+  }
+  .bg-emerald-500\/10 {
+    background-color: rgba(16, 185, 129, 0.1);
+  }
+  .bg-rose-500\/10 {
+    background-color: rgba(244, 63, 94, 0.1);
+  }
+  .bg-rose-500\/20 {
+    background-color: rgba(244, 63, 94, 0.2);
+  }
+  .bg-amber-500\/10 {
+    background-color: rgba(245, 158, 11, 0.1);
+  }
+  .bg-amber-500\/20 {
+    background-color: rgba(245, 158, 11, 0.2);
+  }
 }

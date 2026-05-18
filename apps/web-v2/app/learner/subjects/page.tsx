@@ -9,11 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LEARNER_NAV } from "@/components/layout/role-shells";
-import {
-  getMasteryMap,
-  getSubjectDetail,
-  listSubjects,
-} from "@/lib/db/repos";
+import { getMasteryMap, getSubjectDetail, listSubjects } from "@/lib/db/repos";
 
 const LEVEL_LABEL: Record<string, string> = {
   not_started: "Not started yet",

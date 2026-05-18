@@ -44,7 +44,10 @@ interface Args {
   accessToken: string | undefined | null;
 }
 
-export function useLearnerEntitlements({ tenantId, accessToken }: Args): UseLearnerEntitlementsResult {
+export function useLearnerEntitlements({
+  tenantId,
+  accessToken,
+}: Args): UseLearnerEntitlementsResult {
   const [status, setStatus] = useState<EntitlementsLoadStatus>("loading");
   const [entitlements, setEntitlements] = useState<LearnerEntitlements | null>(null);
 

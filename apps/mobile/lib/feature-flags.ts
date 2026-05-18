@@ -14,8 +14,7 @@
  * (parent)/(learner)/(teacher)/(caregiver)/(therapist) directories.
  */
 
-function envFlag(name: string, defaultValue: boolean): boolean {
-  const raw = process.env[name];
+function parseBoolEnv(raw: string | undefined, defaultValue: boolean): boolean {
   if (raw === undefined || raw === "") return defaultValue;
   const lowered = raw.toLowerCase();
   if (["1", "true", "on", "yes"].includes(lowered)) return true;
@@ -23,6 +22,9 @@ function envFlag(name: string, defaultValue: boolean): boolean {
   return defaultValue;
 }
 
+// Each flag must read its env var by literal name so Expo can statically
+// inline EXPO_PUBLIC_* values at build time. Don't introduce a generic
+// dynamic getter — it breaks Expo's static analysis.
 export const MOBILE_FLAGS = {
   /**
    * When true, the app boots into the unified (app) shell at
@@ -31,7 +33,7 @@ export const MOBILE_FLAGS = {
    * legacy (parent) / (learner) / (teacher) / (caregiver) /
    * (therapist) role groups still ship.
    */
-  MOBILE_UNIFIED_APP: envFlag("EXPO_PUBLIC_MOBILE_UNIFIED_APP", false),
+  MOBILE_UNIFIED_APP: parseBoolEnv(process.env.EXPO_PUBLIC_MOBILE_UNIFIED_APP, false),
 } as const;
 
 export type MobileFlag = keyof typeof MOBILE_FLAGS;

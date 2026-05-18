@@ -36,7 +36,9 @@ export interface TemplateEmailOptions {
   tag?: string;
 }
 
-export async function sendEmail(options: EmailOptions): Promise<{ messageId: string; status: string }> {
+export async function sendEmail(
+  options: EmailOptions,
+): Promise<{ messageId: string; status: string }> {
   const pm = getClient();
 
   const result = await pm.sendEmail({
@@ -61,7 +63,9 @@ export async function sendEmail(options: EmailOptions): Promise<{ messageId: str
   };
 }
 
-export async function sendTemplateEmail(options: TemplateEmailOptions): Promise<{ messageId: string; status: string }> {
+export async function sendTemplateEmail(
+  options: TemplateEmailOptions,
+): Promise<{ messageId: string; status: string }> {
   const pm = getClient();
 
   const result = await pm.sendEmailWithTemplate({
@@ -75,7 +79,10 @@ export async function sendTemplateEmail(options: TemplateEmailOptions): Promise<
     MessageStream: "outbound",
   });
 
-  logger.info({ to: options.to, template: options.templateAlias, messageId: result.MessageID }, "Template email sent");
+  logger.info(
+    { to: options.to, template: options.templateAlias, messageId: result.MessageID },
+    "Template email sent",
+  );
 
   return {
     messageId: result.MessageID,
@@ -83,7 +90,9 @@ export async function sendTemplateEmail(options: TemplateEmailOptions): Promise<
   };
 }
 
-export async function sendBatchEmails(emails: EmailOptions[]): Promise<{ sent: number; failed: number }> {
+export async function sendBatchEmails(
+  emails: EmailOptions[],
+): Promise<{ sent: number; failed: number }> {
   const pm = getClient();
 
   const messages = emails.map((e) => ({

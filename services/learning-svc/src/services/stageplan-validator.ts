@@ -121,8 +121,10 @@ export function validateStagePlan(
     return { valid: false, issues: [{ code: "not_object", detail: "stageplan" }] };
   }
 
-  if (!plan.title || typeof plan.title !== "string") issues.push({ code: "missing_title", detail: "title" });
-  if (!plan.objective || typeof plan.objective !== "string") issues.push({ code: "missing_objective", detail: "objective" });
+  if (!plan.title || typeof plan.title !== "string")
+    issues.push({ code: "missing_title", detail: "title" });
+  if (!plan.objective || typeof plan.objective !== "string")
+    issues.push({ code: "missing_objective", detail: "objective" });
   if (!Array.isArray(plan.beats) || plan.beats.length === 0) {
     issues.push({ code: "missing_beats", detail: "beats" });
   }
@@ -133,7 +135,8 @@ export function validateStagePlan(
   const seenBeatIds = new Set<string>();
   const seenSurfaceIds = new Set<string>();
 
-  const surfaces: Record<string, any> = (plan.surfaces && typeof plan.surfaces === "object") ? plan.surfaces : {};
+  const surfaces: Record<string, any> =
+    plan.surfaces && typeof plan.surfaces === "object" ? plan.surfaces : {};
   for (const [id, surface] of Object.entries(surfaces)) {
     if (seenSurfaceIds.has(id)) issues.push({ code: "duplicate_surface_id", detail: id });
     seenSurfaceIds.add(id);
@@ -225,12 +228,7 @@ export function validateStagePlan(
   // functioning level that requires adaptation, the plan must record at
   // least one applied accommodation in `accommodationsApplied` OR a
   // profile note inside `subjectBrainEvidenceUsed.profileAdaptations`.
-  if (
-    fl === "LOW_VERBAL" ||
-    fl === "NON_VERBAL" ||
-    fl === "PRE_SYMBOLIC" ||
-    fl === "DEVELOPING"
-  ) {
+  if (fl === "LOW_VERBAL" || fl === "NON_VERBAL" || fl === "PRE_SYMBOLIC" || fl === "DEVELOPING") {
     const applied = Array.isArray(plan.accommodationsApplied) ? plan.accommodationsApplied : [];
     const evidence = (plan as { subjectBrainEvidenceUsed?: { profileAdaptations?: unknown } })
       .subjectBrainEvidenceUsed;

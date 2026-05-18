@@ -77,10 +77,8 @@ async function recordHomeworkProblemSession(input: {
 }
 
 // ---- Sprint 04 adapter: math + science recognizers ---------------------
-const MATH_RECOGNIZER_SVC_URL =
-  process.env.MATH_RECOGNIZER_SVC_URL ?? "http://localhost:3062";
-const SCIENCE_SOLVER_SVC_URL =
-  process.env.SCIENCE_SOLVER_SVC_URL ?? "http://localhost:3063";
+const MATH_RECOGNIZER_SVC_URL = process.env.MATH_RECOGNIZER_SVC_URL ?? "http://localhost:3062";
+const SCIENCE_SOLVER_SVC_URL = process.env.SCIENCE_SOLVER_SVC_URL ?? "http://localhost:3063";
 
 function advancedContentGeneratorsEnabled(): boolean {
   const raw = process.env.AIVO_FEATURE_ADVANCED_CONTENT_GENERATORS;
@@ -133,7 +131,12 @@ async function callScienceSolver(input: {
   topic?: string;
   prompt: string;
   response: string | Record<string, unknown>;
-  expectedReasoningType?: "classification" | "sequence" | "hypothesis" | "observation" | "cause_effect";
+  expectedReasoningType?:
+    | "classification"
+    | "sequence"
+    | "hypothesis"
+    | "observation"
+    | "cause_effect";
 }): Promise<ScienceSolverSummary | undefined> {
   if (!advancedContentGeneratorsEnabled()) return undefined;
   try {

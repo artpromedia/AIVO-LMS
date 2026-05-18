@@ -103,7 +103,8 @@ export const en: Record<string, string> = {
   "parent.family_settings": "Family Settings",
 
   "enrollment.select_language": "Select Learning Language",
-  "enrollment.language_description": "This sets the primary language for your child's learning content and AI tutor interactions.",
+  "enrollment.language_description":
+    "This sets the primary language for your child's learning content and AI tutor interactions.",
   "enrollment.language_auto_detected": "Auto-detected based on your location",
   "enrollment.you_can_change_later": "You can change this later in settings.",
 
@@ -202,7 +203,8 @@ export const en: Record<string, string> = {
   "error.session_expired": "Your session has expired. Please sign in again.",
 
   "landing.hero_title": "Every Child Deserves a Brilliant Education",
-  "landing.hero_subtitle": "AI-powered adaptive learning that meets your child exactly where they are.",
+  "landing.hero_subtitle":
+    "AI-powered adaptive learning that meets your child exactly where they are.",
   "landing.get_started": "Get Started Free",
   "landing.learn_more": "Learn More",
   "landing.for_parents": "For Parents",

@@ -240,27 +240,54 @@ function buildHtml(md: string): string {
   for (const raw of lines) {
     const line = raw;
     if (/^# /.test(line)) {
-      if (inList) { out.push("</ul>"); inList = false; }
+      if (inList) {
+        out.push("</ul>");
+        inList = false;
+      }
       out.push(`<h1>${escapeHtml(line.slice(2))}</h1>`);
     } else if (/^## /.test(line)) {
-      if (inList) { out.push("</ul>"); inList = false; }
+      if (inList) {
+        out.push("</ul>");
+        inList = false;
+      }
       out.push(`<h2>${escapeHtml(line.slice(3))}</h2>`);
     } else if (/^### /.test(line)) {
-      if (inList) { out.push("</ul>"); inList = false; }
+      if (inList) {
+        out.push("</ul>");
+        inList = false;
+      }
       out.push(`<h3>${escapeHtml(line.slice(4))}</h3>`);
     } else if (/^- /.test(line)) {
-      if (!inList) { out.push("<ul>"); inList = true; }
+      if (!inList) {
+        out.push("<ul>");
+        inList = true;
+      }
       out.push(`<li>${escapeHtml(line.slice(2))}</li>`);
     } else if (/^\|/.test(line)) {
-      if (inList) { out.push("</ul>"); inList = false; }
-      if (!inTable) { out.push("<table>"); inTable = true; }
+      if (inList) {
+        out.push("</ul>");
+        inList = false;
+      }
+      if (!inTable) {
+        out.push("<table>");
+        inTable = true;
+      }
       // Skip the markdown separator row.
       if (/^\|\s*-/.test(line)) continue;
-      const cells = line.split("|").slice(1, -1).map((c) => c.trim());
+      const cells = line
+        .split("|")
+        .slice(1, -1)
+        .map((c) => c.trim());
       out.push("<tr>" + cells.map((c) => `<td>${escapeHtml(c)}</td>`).join("") + "</tr>");
     } else {
-      if (inList) { out.push("</ul>"); inList = false; }
-      if (inTable) { out.push("</table>"); inTable = false; }
+      if (inList) {
+        out.push("</ul>");
+        inList = false;
+      }
+      if (inTable) {
+        out.push("</table>");
+        inTable = false;
+      }
       if (line.trim().length === 0) continue;
       out.push(`<p>${escapeHtml(line)}</p>`);
     }

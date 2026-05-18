@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       model:
-        description: 'Base model to use'
+        description: "Base model to use"
         required: true
         type: choice
         options:
@@ -14,11 +14,11 @@ on:
           - claude-haiku-4-5
           - gemini-3.0-pro
       version:
-        description: 'Model version tag'
+        description: "Model version tag"
         required: true
-        default: 'v1.0.0'
+        default: "v1.0.0"
       tutor:
-        description: 'Specific tutor ID (optional, blank for all 14 tutors)'
+        description: "Specific tutor ID (optional, blank for all 14 tutors)"
         required: false
 
 jobs:

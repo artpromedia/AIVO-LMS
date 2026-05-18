@@ -7,10 +7,7 @@ export function LessonRunPreview() {
     <section className="py-20 sm:py-24" aria-labelledby="lessonrun-heading">
       <Container>
         <div className="grid items-center gap-10 lg:grid-cols-2">
-          <ProductMockupFrame
-            title="LessonRun · Step 3 of 7"
-            className="order-2 lg:order-1"
-          >
+          <ProductMockupFrame title="LessonRun · Step 3 of 7" className="order-2 lg:order-1">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <div
@@ -19,15 +16,12 @@ export function LessonRunPreview() {
                 />
                 <div>
                   <p className="text-xs font-semibold text-slate-500">Tutor</p>
-                  <p className="font-heading text-sm font-bold text-slate-900">
-                    Atlas
-                  </p>
+                  <p className="font-heading text-sm font-bold text-slate-900">Atlas</p>
                 </div>
               </div>
               <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
                 <p className="text-sm text-slate-700">
-                  Great work! Let's try one more. What is{" "}
-                  <span className="font-bold">3 × 4</span>?
+                  Great work! Let's try one more. What is <span className="font-bold">3 × 4</span>?
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-2">
@@ -66,7 +60,8 @@ export function LessonRunPreview() {
               The personalized learning unit behind every AIVO lesson
             </h2>
             <p className="mt-4 text-lg text-slate-600">
-              Tutor-guided. Step by step. With hints, scaffolds, read-aloud, and a built-in break mode — so learners stay in the zone, not in frustration.
+              Tutor-guided. Step by step. With hints, scaffolds, read-aloud, and a built-in break
+              mode — so learners stay in the zone, not in frustration.
             </p>
             <ul className="mt-6 grid gap-3 sm:grid-cols-2">
               {[

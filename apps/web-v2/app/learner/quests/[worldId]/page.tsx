@@ -39,9 +39,7 @@ export default async function QuestWorldPage({ params }: Params) {
   if (!world) notFound();
   const chapters = listQuestChapters(worldId);
   const progress = listQuestProgressForLearner(learnerId, session.tenantId, worldId);
-  const completed = new Set(
-    progress.filter((p) => p.progress >= 1).map((p) => p.chapterId),
-  );
+  const completed = new Set(progress.filter((p) => p.progress >= 1).map((p) => p.chapterId));
 
   return (
     <AppShell
@@ -50,20 +48,14 @@ export default async function QuestWorldPage({ params }: Params) {
       navItems={LEARNER_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <PageHeader
-        eyebrow="Quest"
-        title={world.name}
-        description={world.description}
-      />
+      <PageHeader eyebrow="Quest" title={world.name} description={world.description} />
       <ul className="grid gap-3" aria-label="Quest chapters">
         {chapters.map((c) => {
           const unlocked = isQuestChapterUnlocked(learnerId!, session.tenantId, c);
           const isDone = completed.has(c.id);
           const inner = (
             <Card
-              className={`p-5 ${
-                unlocked ? "hover:shadow-lg transition-shadow" : "opacity-60"
-              }`}
+              className={`p-5 ${unlocked ? "hover:shadow-lg transition-shadow" : "opacity-60"}`}
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
@@ -79,9 +71,7 @@ export default async function QuestWorldPage({ params }: Params) {
                     ) : null}
                   </div>
                   <h2 className="text-lg font-semibold mt-1">{c.title}</h2>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {c.description}
-                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">{c.description}</p>
                 </div>
               </div>
             </Card>

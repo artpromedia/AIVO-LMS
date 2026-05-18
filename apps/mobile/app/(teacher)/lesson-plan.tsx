@@ -1,18 +1,46 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { View, Text, ScrollView, StyleSheet, TextInput, Alert, ActivityIndicator, Pressable } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { useQuery } from '@tanstack/react-query';
-import { useTranslation } from '@/hooks/useTranslation';
-import { useAuth } from '@/hooks/useAuth';
-import { useConnectedLearners } from '@/hooks/useFamily';
-import { apiFetch } from '@/lib/api';
-import { API } from '@/constants/api';
-import { AivoCard, AivoButton, EmptyState } from '@aivo/mobile-ui';
-import { colors, spacing, radius } from '@/constants/colors';
+import React, { useState, useCallback, useEffect, useMemo } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  Alert,
+  ActivityIndicator,
+  Pressable,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useAuth } from "@/hooks/useAuth";
+import { useConnectedLearners } from "@/hooks/useFamily";
+import { apiFetch } from "@/lib/api";
+import { API } from "@/constants/api";
+import { AivoCard, AivoButton, EmptyState } from "@aivo/mobile-ui";
+import { colors, spacing, radius } from "@/constants/colors";
 
-const SUBJECTS = ['Mathematics', 'English Language Arts', 'Science', 'History & Social Studies', 'Coding & Computer Science', 'Speech & Language', 'Social-Emotional Learning'];
-const GRADE_LEVELS = ['Pre-K', 'Kindergarten', '1st Grade', '2nd Grade', '3rd Grade', '4th Grade', '5th Grade', '6th Grade', '7th Grade', '8th Grade'];
+const SUBJECTS = [
+  "Mathematics",
+  "English Language Arts",
+  "Science",
+  "History & Social Studies",
+  "Coding & Computer Science",
+  "Speech & Language",
+  "Social-Emotional Learning",
+];
+const GRADE_LEVELS = [
+  "Pre-K",
+  "Kindergarten",
+  "1st Grade",
+  "2nd Grade",
+  "3rd Grade",
+  "4th Grade",
+  "5th Grade",
+  "6th Grade",
+  "7th Grade",
+  "8th Grade",
+];
 
 interface LessonPlanContent {
   objective?: string;
@@ -61,11 +89,11 @@ export default function LessonPlanScreen() {
     [learnersRaw],
   );
 
-  const [selectedLearnerId, setSelectedLearnerId] = useState<string>('');
-  const [subject, setSubject] = useState('Mathematics');
-  const [gradeLevel, setGradeLevel] = useState('3rd Grade');
-  const [topic, setTopic] = useState('');
-  const [accommodationNotes, setAccommodationNotes] = useState('');
+  const [selectedLearnerId, setSelectedLearnerId] = useState<string>("");
+  const [subject, setSubject] = useState("Mathematics");
+  const [gradeLevel, setGradeLevel] = useState("3rd Grade");
+  const [topic, setTopic] = useState("");
+  const [accommodationNotes, setAccommodationNotes] = useState("");
   const [generating, setGenerating] = useState(false);
   const [generatedPlan, setGeneratedPlan] = useState<LessonPlan | null>(null);
   const [expandedPlanId, setExpandedPlanId] = useState<string | null>(null);
@@ -81,14 +109,13 @@ export default function LessonPlanScreen() {
     () => learners.find((l) => l.id === selectedLearnerId) || null,
     [learners, selectedLearnerId],
   );
-  const getLearnerName = (id: string) =>
-    learners.find((l) => l.id === id)?.name || 'Unknown';
+  const getLearnerName = (id: string) => learners.find((l) => l.id === id)?.name || "Unknown";
 
   const { data: recentPlans, refetch: refetchPlans } = useQuery<LessonPlan[]>({
-    queryKey: ['lesson-plans', user?.id],
+    queryKey: ["lesson-plans", user?.id],
     queryFn: async () => {
-      const res = await apiFetch(API.ENGAGEMENT, '/api/engagement/lesson-plans/teacher');
-      if (!res.ok) throw new Error('Failed to fetch plans');
+      const res = await apiFetch(API.ENGAGEMENT, "/api/engagement/lesson-plans/teacher");
+      if (!res.ok) throw new Error("Failed to fetch plans");
       return res.json();
     },
     enabled: !!user?.id,
@@ -96,18 +123,18 @@ export default function LessonPlanScreen() {
 
   const handleGenerate = useCallback(async () => {
     if (!selectedLearnerId) {
-      Alert.alert(t('common.error'), t('teacherLessonPlan.noLearnerError'));
+      Alert.alert(t("common.error"), t("teacherLessonPlan.noLearnerError"));
       return;
     }
     setGenerating(true);
     setGeneratedPlan(null);
     try {
-      const res = await apiFetch(API.ENGAGEMENT, '/api/engagement/lesson-plans/generate', {
-        method: 'POST',
+      const res = await apiFetch(API.ENGAGEMENT, "/api/engagement/lesson-plans/generate", {
+        method: "POST",
         body: JSON.stringify({
           learnerId: selectedLearnerId,
           subject,
-          gradeLevel: gradeLevel || selectedLearner?.gradeLevel || '3rd',
+          gradeLevel: gradeLevel || selectedLearner?.gradeLevel || "3rd",
           topic: topic.trim() || undefined,
           functioningLevel: selectedLearner?.functioningLevel || undefined,
           accommodationNotes: accommodationNotes.trim() || undefined,
@@ -118,36 +145,49 @@ export default function LessonPlanScreen() {
         setGeneratedPlan(data);
         refetchPlans();
       } else {
-        Alert.alert(t('common.error'), data.error || t('teacherLessonPlan.generateError'));
+        Alert.alert(t("common.error"), data.error || t("teacherLessonPlan.generateError"));
       }
     } catch {
-      Alert.alert(t('common.error'), t('teacherLessonPlan.networkError'));
+      Alert.alert(t("common.error"), t("teacherLessonPlan.networkError"));
     } finally {
       setGenerating(false);
     }
-  }, [selectedLearnerId, selectedLearner, subject, gradeLevel, topic, accommodationNotes, t, refetchPlans]);
+  }, [
+    selectedLearnerId,
+    selectedLearner,
+    subject,
+    gradeLevel,
+    topic,
+    accommodationNotes,
+    t,
+    refetchPlans,
+  ]);
 
   return (
     <ScrollView
       style={styles.container}
       contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 32 }}
     >
-      <Text style={styles.title}>{t('teacherLessonPlan.title')}</Text>
-      <Text style={styles.subtitle}>{t('teacherLessonPlan.subtitle')}</Text>
+      <Text style={styles.title}>{t("teacherLessonPlan.title")}</Text>
+      <Text style={styles.subtitle}>{t("teacherLessonPlan.subtitle")}</Text>
 
       <AivoCard style={styles.genCard}>
         <Ionicons name="sparkles" size={32} color={colors.primary} />
-        <Text style={styles.genTitle}>{t('teacherLessonPlan.generateNew')}</Text>
-        <Text style={styles.genDesc}>{t('teacherLessonPlan.generateDesc')}</Text>
+        <Text style={styles.genTitle}>{t("teacherLessonPlan.generateNew")}</Text>
+        <Text style={styles.genDesc}>{t("teacherLessonPlan.generateDesc")}</Text>
 
         <View style={styles.formSection}>
-          <Text style={styles.fieldLabel}>{t('teacherLessonPlan.learner')}</Text>
+          <Text style={styles.fieldLabel}>{t("teacherLessonPlan.learner")}</Text>
           {learners.length === 0 ? (
-            <Text style={[styles.genDesc, { textAlign: 'left', marginBottom: 12 }]}>
-              {t('teacherLessonPlan.noLearnersHint')}
+            <Text style={[styles.genDesc, { textAlign: "left", marginBottom: 12 }]}>
+              {t("teacherLessonPlan.noLearnersHint")}
             </Text>
           ) : (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={{ marginBottom: 12 }}
+            >
               {learners.map((l) => {
                 const active = l.id === selectedLearnerId;
                 return (
@@ -160,7 +200,7 @@ export default function LessonPlanScreen() {
                   >
                     <Text style={[styles.chipText, active && styles.chipTextActive]}>
                       {l.name}
-                      {l.functioningLevel ? ` (${l.functioningLevel})` : ''}
+                      {l.functioningLevel ? ` (${l.functioningLevel})` : ""}
                     </Text>
                   </Pressable>
                 );
@@ -169,8 +209,12 @@ export default function LessonPlanScreen() {
           )}
 
           <Text style={styles.fieldLabel}>Subject</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
-            {SUBJECTS.map(s => (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={{ marginBottom: 12 }}
+          >
+            {SUBJECTS.map((s) => (
               <Pressable
                 key={s}
                 style={[styles.chip, subject === s && styles.chipActive]}
@@ -182,14 +226,20 @@ export default function LessonPlanScreen() {
           </ScrollView>
 
           <Text style={styles.fieldLabel}>Grade Level</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
-            {GRADE_LEVELS.map(g => (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={{ marginBottom: 12 }}
+          >
+            {GRADE_LEVELS.map((g) => (
               <Pressable
                 key={g}
                 style={[styles.chip, gradeLevel === g && styles.chipActive]}
                 onPress={() => setGradeLevel(g)}
               >
-                <Text style={[styles.chipText, gradeLevel === g && styles.chipTextActive]}>{g}</Text>
+                <Text style={[styles.chipText, gradeLevel === g && styles.chipTextActive]}>
+                  {g}
+                </Text>
               </Pressable>
             ))}
           </ScrollView>
@@ -215,22 +265,30 @@ export default function LessonPlanScreen() {
         </View>
 
         {generating ? (
-          <View style={{ alignItems: 'center', marginTop: spacing.md }}>
+          <View style={{ alignItems: "center", marginTop: spacing.md }}>
             <ActivityIndicator size="large" color={colors.primary} />
-            <Text style={[styles.genDesc, { marginTop: 8 }]}>Generating lesson plan with AI...</Text>
+            <Text style={[styles.genDesc, { marginTop: 8 }]}>
+              Generating lesson plan with AI...
+            </Text>
           </View>
         ) : (
-          <AivoButton title={t('teacherLessonPlan.createPlan')} onPress={handleGenerate} style={{ marginTop: spacing.md }} />
+          <AivoButton
+            title={t("teacherLessonPlan.createPlan")}
+            onPress={handleGenerate}
+            style={{ marginTop: spacing.md }}
+          />
         )}
       </AivoCard>
 
       {generatedPlan && (
         <AivoCard style={{ marginBottom: spacing.lg, borderWidth: 2, borderColor: colors.success }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 8 }}>
             <Ionicons name="checkmark-circle" size={20} color={colors.success} />
             <Text style={styles.genTitle}>Plan Generated!</Text>
           </View>
-          <Text style={{ fontSize: 16, fontFamily: 'Nunito-Bold', color: colors.text, marginBottom: 4 }}>
+          <Text
+            style={{ fontSize: 16, fontFamily: "Nunito-Bold", color: colors.text, marginBottom: 4 }}
+          >
             {generatedPlan.title}
           </Text>
           {generatedPlan.content && (
@@ -238,13 +296,19 @@ export default function LessonPlanScreen() {
               {generatedPlan.content.objective && (
                 <View style={{ marginBottom: 8 }}>
                   <Text style={styles.fieldLabel}>Objective</Text>
-                  <Text style={{ fontSize: 13, fontFamily: 'Nunito-Regular', color: colors.text }}>
+                  <Text style={{ fontSize: 13, fontFamily: "Nunito-Regular", color: colors.text }}>
                     {generatedPlan.content.objective}
                   </Text>
                 </View>
               )}
               {generatedPlan.content.duration && (
-                <Text style={{ fontSize: 12, fontFamily: 'Nunito-SemiBold', color: colors.textSecondary }}>
+                <Text
+                  style={{
+                    fontSize: 12,
+                    fontFamily: "Nunito-SemiBold",
+                    color: colors.textSecondary,
+                  }}
+                >
                   Duration: {generatedPlan.content.duration}
                 </Text>
               )}
@@ -254,7 +318,15 @@ export default function LessonPlanScreen() {
             <View style={{ marginTop: 8 }}>
               <Text style={styles.fieldLabel}>Activities ({generatedPlan.activities.length})</Text>
               {generatedPlan.activities.map((a, i) => (
-                <Text key={i} style={{ fontSize: 12, fontFamily: 'Nunito-Regular', color: colors.text, marginLeft: 8 }}>
+                <Text
+                  key={i}
+                  style={{
+                    fontSize: 12,
+                    fontFamily: "Nunito-Regular",
+                    color: colors.text,
+                    marginLeft: 8,
+                  }}
+                >
                   • {a.name}: {a.duration}
                 </Text>
               ))}
@@ -263,7 +335,9 @@ export default function LessonPlanScreen() {
         </AivoCard>
       )}
 
-      <Text style={[styles.sectionTitle, { marginBottom: spacing.md }]}>{t('teacherLessonPlan.recentPlans')}</Text>
+      <Text style={[styles.sectionTitle, { marginBottom: spacing.md }]}>
+        {t("teacherLessonPlan.recentPlans")}
+      </Text>
       {recentPlans && recentPlans.length > 0 ? (
         recentPlans.map((plan) => {
           const expanded = expandedPlanId === plan.id;
@@ -278,7 +352,7 @@ export default function LessonPlanScreen() {
                 <View style={{ flex: 1 }}>
                   <Text style={styles.planTitle}>{plan.title}</Text>
                   <Text style={styles.planMeta}>
-                    {getLearnerName(plan.learnerId)} • {plan.subject} •{' '}
+                    {getLearnerName(plan.learnerId)} • {plan.subject} •{" "}
                     {new Date(plan.createdAt).toLocaleDateString()}
                   </Text>
                 </View>
@@ -287,21 +361,21 @@ export default function LessonPlanScreen() {
                     styles.statusBadge,
                     {
                       backgroundColor:
-                        (plan.status === 'DRAFT' ? colors.accent : colors.success) + '22',
+                        (plan.status === "DRAFT" ? colors.accent : colors.success) + "22",
                     },
                   ]}
                 >
                   <Text
                     style={[
                       styles.statusBadgeText,
-                      { color: plan.status === 'DRAFT' ? colors.accent : colors.success },
+                      { color: plan.status === "DRAFT" ? colors.accent : colors.success },
                     ]}
                   >
                     {plan.status}
                   </Text>
                 </View>
                 <Ionicons
-                  name={expanded ? 'chevron-up' : 'chevron-down'}
+                  name={expanded ? "chevron-up" : "chevron-down"}
                   size={18}
                   color={colors.textSecondary}
                   style={{ marginLeft: 6 }}
@@ -312,19 +386,19 @@ export default function LessonPlanScreen() {
                 <View style={styles.planDetails}>
                   {plan.content?.objective && (
                     <View style={styles.detailBlock}>
-                      <Text style={styles.detailLabel}>{t('teacherLessonPlan.objective')}</Text>
+                      <Text style={styles.detailLabel}>{t("teacherLessonPlan.objective")}</Text>
                       <Text style={styles.detailText}>{plan.content.objective}</Text>
                     </View>
                   )}
                   {plan.content?.overview && (
                     <View style={styles.detailBlock}>
-                      <Text style={styles.detailLabel}>{t('teacherLessonPlan.overview')}</Text>
+                      <Text style={styles.detailLabel}>{t("teacherLessonPlan.overview")}</Text>
                       <Text style={styles.detailText}>{plan.content.overview}</Text>
                     </View>
                   )}
                   {plan.content?.duration && (
                     <View style={styles.detailBlock}>
-                      <Text style={styles.detailLabel}>{t('teacherLessonPlan.duration')}</Text>
+                      <Text style={styles.detailLabel}>{t("teacherLessonPlan.duration")}</Text>
                       <Text style={styles.detailText}>{plan.content.duration}</Text>
                     </View>
                   )}
@@ -332,12 +406,12 @@ export default function LessonPlanScreen() {
                   {Array.isArray(plan.activities) && plan.activities.length > 0 && (
                     <View style={styles.detailBlock}>
                       <Text style={styles.detailLabel}>
-                        {t('teacherLessonPlan.activities')} ({plan.activities.length})
+                        {t("teacherLessonPlan.activities")} ({plan.activities.length})
                       </Text>
                       {plan.activities.map((a, i) => (
                         <View key={i} style={styles.activityItem}>
                           <Text style={styles.activityName}>
-                            {a.name || `${t('teacherLessonPlan.activities')} ${i + 1}`}
+                            {a.name || `${t("teacherLessonPlan.activities")} ${i + 1}`}
                           </Text>
                           {a.description ? (
                             <Text style={styles.activityDesc}>{a.description}</Text>
@@ -352,11 +426,15 @@ export default function LessonPlanScreen() {
 
                   {Array.isArray(plan.accommodations) && plan.accommodations.length > 0 && (
                     <View style={styles.detailBlock}>
-                      <Text style={styles.detailLabel}>{t('teacherLessonPlan.accommodations')}</Text>
+                      <Text style={styles.detailLabel}>
+                        {t("teacherLessonPlan.accommodations")}
+                      </Text>
                       {plan.accommodations.map((a, i) => (
                         <Text key={i} style={styles.accommodationLine}>
-                          <Text style={styles.accommodationType}>{a.type ? `${a.type}: ` : ''}</Text>
-                          {a.description || ''}
+                          <Text style={styles.accommodationType}>
+                            {a.type ? `${a.type}: ` : ""}
+                          </Text>
+                          {a.description || ""}
                         </Text>
                       ))}
                     </View>
@@ -369,8 +447,8 @@ export default function LessonPlanScreen() {
       ) : (
         <EmptyState
           icon={<Ionicons name="document-text-outline" size={48} color={colors.textSecondary} />}
-          title={t('teacherLessonPlan.noPlansTitle')}
-          message={t('teacherLessonPlan.noPlansMessage')}
+          title={t("teacherLessonPlan.noPlansTitle")}
+          message={t("teacherLessonPlan.noPlansMessage")}
         />
       )}
     </ScrollView>
@@ -379,18 +457,40 @@ export default function LessonPlanScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: spacing.md },
-  title: { fontSize: 24, fontFamily: 'Nunito-ExtraBold', color: colors.text },
-  subtitle: { fontSize: 14, fontFamily: 'Nunito-Regular', color: colors.textSecondary, marginBottom: spacing.lg },
-  genCard: { alignItems: 'center' as const, paddingVertical: spacing.lg, marginBottom: spacing.lg },
-  genTitle: { fontSize: 18, fontFamily: 'Nunito-Bold', color: colors.text, marginTop: 8 },
-  genDesc: { fontSize: 13, fontFamily: 'Nunito-Regular', color: colors.textSecondary, textAlign: 'center', marginTop: 4 },
-  sectionTitle: { fontSize: 18, fontFamily: 'Nunito-Bold', color: colors.text },
-  formSection: { width: '100%', marginTop: spacing.md },
-  fieldLabel: { fontSize: 13, fontFamily: 'Nunito-Bold', color: colors.textSecondary, marginBottom: 4 },
-  chip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: radius.full, backgroundColor: colors.surface, marginRight: 6 },
+  title: { fontSize: 24, fontFamily: "Nunito-ExtraBold", color: colors.text },
+  subtitle: {
+    fontSize: 14,
+    fontFamily: "Nunito-Regular",
+    color: colors.textSecondary,
+    marginBottom: spacing.lg,
+  },
+  genCard: { alignItems: "center" as const, paddingVertical: spacing.lg, marginBottom: spacing.lg },
+  genTitle: { fontSize: 18, fontFamily: "Nunito-Bold", color: colors.text, marginTop: 8 },
+  genDesc: {
+    fontSize: 13,
+    fontFamily: "Nunito-Regular",
+    color: colors.textSecondary,
+    textAlign: "center",
+    marginTop: 4,
+  },
+  sectionTitle: { fontSize: 18, fontFamily: "Nunito-Bold", color: colors.text },
+  formSection: { width: "100%", marginTop: spacing.md },
+  fieldLabel: {
+    fontSize: 13,
+    fontFamily: "Nunito-Bold",
+    color: colors.textSecondary,
+    marginBottom: 4,
+  },
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: radius.full,
+    backgroundColor: colors.surface,
+    marginRight: 6,
+  },
   chipActive: { backgroundColor: colors.primary },
-  chipText: { fontSize: 12, fontFamily: 'Nunito-SemiBold', color: colors.textSecondary },
-  chipTextActive: { color: '#FFF' },
+  chipText: { fontSize: 12, fontFamily: "Nunito-SemiBold", color: colors.textSecondary },
+  chipTextActive: { color: "#FFF" },
   input: {
     height: 40,
     borderWidth: 1.5,
@@ -398,15 +498,25 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     paddingHorizontal: spacing.md,
     fontSize: 14,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.text,
     marginBottom: 12,
   },
-  planHeader: { flexDirection: 'row', alignItems: 'center' },
-  planTitle: { fontSize: 15, fontFamily: 'Nunito-Bold', color: colors.text },
-  planMeta: { fontSize: 12, fontFamily: 'Nunito-Regular', color: colors.textSecondary, marginTop: 2 },
-  statusBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: radius.full, marginLeft: 8 },
-  statusBadgeText: { fontSize: 11, fontFamily: 'Nunito-Bold', textTransform: 'uppercase' },
+  planHeader: { flexDirection: "row", alignItems: "center" },
+  planTitle: { fontSize: 15, fontFamily: "Nunito-Bold", color: colors.text },
+  planMeta: {
+    fontSize: 12,
+    fontFamily: "Nunito-Regular",
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: radius.full,
+    marginLeft: 8,
+  },
+  statusBadgeText: { fontSize: 11, fontFamily: "Nunito-Bold", textTransform: "uppercase" },
   planDetails: {
     marginTop: spacing.sm,
     paddingTop: spacing.sm,
@@ -416,26 +526,36 @@ const styles = StyleSheet.create({
   detailBlock: { marginBottom: spacing.sm },
   detailLabel: {
     fontSize: 12,
-    fontFamily: 'Nunito-Bold',
+    fontFamily: "Nunito-Bold",
     color: colors.textSecondary,
-    textTransform: 'uppercase',
+    textTransform: "uppercase",
     marginBottom: 2,
   },
-  detailText: { fontSize: 13, fontFamily: 'Nunito-Regular', color: colors.text },
+  detailText: { fontSize: 13, fontFamily: "Nunito-Regular", color: colors.text },
   activityItem: {
     backgroundColor: colors.surface,
     borderRadius: radius.md,
     padding: spacing.sm,
     marginTop: 6,
   },
-  activityName: { fontSize: 13, fontFamily: 'Nunito-SemiBold', color: colors.text },
+  activityName: { fontSize: 13, fontFamily: "Nunito-SemiBold", color: colors.text },
   activityDesc: {
     fontSize: 12,
-    fontFamily: 'Nunito-Regular',
+    fontFamily: "Nunito-Regular",
     color: colors.textSecondary,
     marginTop: 2,
   },
-  activityDuration: { fontSize: 11, fontFamily: 'Nunito-SemiBold', color: colors.primary, marginTop: 4 },
-  accommodationLine: { fontSize: 13, fontFamily: 'Nunito-Regular', color: colors.text, marginTop: 4 },
-  accommodationType: { fontFamily: 'Nunito-Bold' },
+  activityDuration: {
+    fontSize: 11,
+    fontFamily: "Nunito-SemiBold",
+    color: colors.primary,
+    marginTop: 4,
+  },
+  accommodationLine: {
+    fontSize: 13,
+    fontFamily: "Nunito-Regular",
+    color: colors.text,
+    marginTop: 4,
+  },
+  accommodationType: { fontFamily: "Nunito-Bold" },
 });

@@ -4,7 +4,15 @@ export const SEED_THEMES: readonly InterestTheme[] = [
   {
     slug: "dinosaurs",
     label: "Dinosaurs",
-    nouns: ["T-Rex", "Triceratops", "Stegosaurus", "Brachiosaurus", "Velociraptor", "fossil", "egg"],
+    nouns: [
+      "T-Rex",
+      "Triceratops",
+      "Stegosaurus",
+      "Brachiosaurus",
+      "Velociraptor",
+      "fossil",
+      "egg",
+    ],
     verbs: ["stomp", "roar", "hatch", "dig", "spot"],
     assetNamespaces: ["dinos"],
     ageBands: ["PK", "K-2", "3-5", "6-8"],

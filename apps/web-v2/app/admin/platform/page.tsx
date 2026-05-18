@@ -163,9 +163,7 @@ export default async function PlatformAdminHome() {
                     {k}
                   </p>
                   <p className="mt-1 font-display text-3xl font-bold">
-                    {k === "AI success"
-                      ? `${v}%`
-                      : v.toLocaleString()}
+                    {k === "AI success" ? `${v}%` : v.toLocaleString()}
                   </p>
                   <p className="mt-2 text-xs text-aivo-ink-soft">{helper}</p>
                 </div>
@@ -185,9 +183,7 @@ export default async function PlatformAdminHome() {
         <Card className="p-[var(--aivo-density-card-pad)] lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <p className="font-display text-lg font-semibold">
-                Tenant footprint
-              </p>
+              <p className="font-display text-lg font-semibold">Tenant footprint</p>
               <p className="text-xs text-aivo-ink-soft">
                 Distribution of tenants currently provisioned in this environment.
               </p>
@@ -205,9 +201,7 @@ export default async function PlatformAdminHome() {
                 <dt className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
                   {row.k}
                 </dt>
-                <dd className="mt-1 font-display text-2xl font-bold">
-                  {row.v.toLocaleString()}
-                </dd>
+                <dd className="mt-1 font-display text-2xl font-bold">{row.v.toLocaleString()}</dd>
               </div>
             ))}
           </dl>
@@ -242,14 +236,10 @@ export default async function PlatformAdminHome() {
         <Card className="p-[var(--aivo-density-card-pad)]">
           <div className="mb-3 flex items-center gap-2">
             <Activity className="h-4 w-4 text-aivo-primary" />
-            <p className="font-display text-lg font-semibold">
-              Recent AI jobs
-            </p>
+            <p className="font-display text-lg font-semibold">Recent AI jobs</p>
           </div>
           {recentJobs.length === 0 ? (
-            <p className="text-sm text-aivo-ink-soft">
-              No AI generation activity yet.
-            </p>
+            <p className="text-sm text-aivo-ink-soft">No AI generation activity yet.</p>
           ) : (
             <ul className="space-y-2">
               {recentJobs.map((j) => {
@@ -262,14 +252,9 @@ export default async function PlatformAdminHome() {
                         ? "warning"
                         : "neutral";
                 return (
-                  <li
-                    key={j.id}
-                    className="flex items-center justify-between gap-2 text-sm"
-                  >
+                  <li key={j.id} className="flex items-center justify-between gap-2 text-sm">
                     <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium">
-                        {j.kind.replace("_", " ")}
-                      </p>
+                      <p className="truncate font-medium">{j.kind.replace("_", " ")}</p>
                       <p className="text-xs text-aivo-ink-soft">
                         {new Date(j.startedAt).toLocaleString()}
                       </p>
@@ -290,9 +275,7 @@ export default async function PlatformAdminHome() {
       </div>
 
       <section className="mt-6">
-        <p className="mb-3 font-display text-lg font-semibold">
-          Operations centres
-        </p>
+        <p className="mb-3 font-display text-lg font-semibold">Operations centres</p>
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {operationsCards.map((c) => (
             <Link
@@ -302,14 +285,10 @@ export default async function PlatformAdminHome() {
             >
               <Card className="h-full p-[var(--aivo-density-card-pad)] transition-shadow group-hover:shadow-md">
                 <div className="flex items-center justify-between">
-                  <p className="font-display text-base font-semibold">
-                    {c.title}
-                  </p>
+                  <p className="font-display text-base font-semibold">{c.title}</p>
                   <Badge tone="neutral">{c.badge}</Badge>
                 </div>
-                <p className="mt-1 text-sm text-aivo-ink-soft">
-                  {c.description}
-                </p>
+                <p className="mt-1 text-sm text-aivo-ink-soft">{c.description}</p>
                 <p className="mt-3 inline-flex items-center text-sm font-medium text-aivo-primary">
                   Open <ArrowRight className="ml-1 h-3.5 w-3.5" />
                 </p>

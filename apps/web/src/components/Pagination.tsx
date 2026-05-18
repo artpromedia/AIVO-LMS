@@ -8,7 +8,13 @@ interface PaginationProps {
   pageSize?: number;
 }
 
-export default function Pagination({ currentPage, totalPages, onPageChange, totalItems, pageSize }: PaginationProps) {
+export default function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+  totalItems,
+  pageSize,
+}: PaginationProps) {
   if (totalPages <= 1) return null;
 
   const pages: (number | "...")[] = [];
@@ -17,7 +23,11 @@ export default function Pagination({ currentPage, totalPages, onPageChange, tota
   } else {
     pages.push(1);
     if (currentPage > 3) pages.push("...");
-    for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+    for (
+      let i = Math.max(2, currentPage - 1);
+      i <= Math.min(totalPages - 1, currentPage + 1);
+      i++
+    ) {
       pages.push(i);
     }
     if (currentPage < totalPages - 2) pages.push("...");
@@ -46,7 +56,9 @@ export default function Pagination({ currentPage, totalPages, onPageChange, tota
         </button>
         {pages.map((p, i) =>
           p === "..." ? (
-            <span key={`dots-${i}`} className="px-1.5 text-xs text-slate-400">...</span>
+            <span key={`dots-${i}`} className="px-1.5 text-xs text-slate-400">
+              ...
+            </span>
           ) : (
             <button
               key={p}
@@ -59,7 +71,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange, tota
             >
               {p}
             </button>
-          )
+          ),
         )}
         <button
           onClick={() => onPageChange(currentPage + 1)}

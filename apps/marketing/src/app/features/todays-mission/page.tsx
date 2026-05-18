@@ -1,11 +1,7 @@
 import type { Metadata } from "next";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { SITE_URL } from "@/lib/constants";
-import {
-  NumberedSteps,
-  CalloutCard,
-  MockupShowcase,
-} from "@/components/marketing/sections";
+import { NumberedSteps, CalloutCard, MockupShowcase } from "@/components/marketing/sections";
 
 const TITLE = "Today's Mission · One next-best learning action, every day";
 const DESCRIPTION =
@@ -25,12 +21,30 @@ export const metadata: Metadata = {
 };
 
 const PRIORITY_LOGIC = [
-  { title: "Mastery state", body: "What the learner is currently working on, and where the next click of progress lives." },
-  { title: "Recent LessonRuns", body: "What was finished, skipped, or paused — and what should follow." },
-  { title: "Accommodation context", body: "Pacing, scaffold depth, and supports the learner needs today." },
-  { title: "Energy & session signals", body: "Time of day, recent break usage, and length of the last successful run." },
-  { title: "Teacher overrides", body: "Assignments and intervention queues take priority over algorithmic suggestions." },
-  { title: "Parent moments", body: "If a parent flags a focus area in the dashboard, AIVO surfaces it next." },
+  {
+    title: "Mastery state",
+    body: "What the learner is currently working on, and where the next click of progress lives.",
+  },
+  {
+    title: "Recent LessonRuns",
+    body: "What was finished, skipped, or paused — and what should follow.",
+  },
+  {
+    title: "Accommodation context",
+    body: "Pacing, scaffold depth, and supports the learner needs today.",
+  },
+  {
+    title: "Energy & session signals",
+    body: "Time of day, recent break usage, and length of the last successful run.",
+  },
+  {
+    title: "Teacher overrides",
+    body: "Assignments and intervention queues take priority over algorithmic suggestions.",
+  },
+  {
+    title: "Parent moments",
+    body: "If a parent flags a focus area in the dashboard, AIVO surfaces it next.",
+  },
 ];
 
 export default function Page() {
@@ -55,10 +69,9 @@ export default function Page() {
         title="Learners get lost in dashboards"
         body={
           <p>
-            Most learning products give kids a menu — units, lessons, badges,
-            streaks — and ask a child to choose. For neurodiverse learners,
-            executive-function-tired learners, or any learner at the end of a
-            long school day, that menu is the moment they bounce.
+            Most learning products give kids a menu — units, lessons, badges, streaks — and ask a
+            child to choose. For neurodiverse learners, executive-function-tired learners, or any
+            learner at the end of a long school day, that menu is the moment they bounce.
           </p>
         }
         tone="slate"
@@ -78,22 +91,14 @@ export default function Page() {
         mockup={
           <div className="space-y-3">
             <div className="rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 p-4 text-white">
-              <p className="text-xs uppercase tracking-wider text-purple-100">
-                Today's mission
-              </p>
-              <h3 className="mt-1 font-heading text-xl font-bold">
-                Multiplying by 3s
-              </h3>
-              <p className="mt-1 text-xs text-purple-100">
-                With Atlas · ~15 minutes · Math
-              </p>
+              <p className="text-xs uppercase tracking-wider text-purple-100">Today's mission</p>
+              <h3 className="mt-1 font-heading text-xl font-bold">Multiplying by 3s</h3>
+              <p className="mt-1 text-xs text-purple-100">With Atlas · ~15 minutes · Math</p>
             </div>
             <div className="rounded-lg bg-slate-900 py-2.5 text-center text-sm font-semibold text-white">
               Start mission →
             </div>
-            <p className="text-xs text-slate-500">
-              Read-aloud and break mode are on for Maya.
-            </p>
+            <p className="text-xs text-slate-500">Read-aloud and break mode are on for Maya.</p>
           </div>
         }
       />
@@ -129,9 +134,7 @@ export default function Page() {
               <div
                 key={r.l}
                 className={`flex items-center justify-between rounded-lg border p-2.5 text-xs ${
-                  r.flag
-                    ? "border-amber-200 bg-amber-50"
-                    : "border-slate-200 bg-white"
+                  r.flag ? "border-amber-200 bg-amber-50" : "border-slate-200 bg-white"
                 }`}
               >
                 <span className="font-semibold text-slate-900">{r.l}</span>
@@ -149,14 +152,13 @@ export default function Page() {
         body={
           <>
             <p>
-              Parents see the same mission their child saw — in calm, plain
-              language — alongside whether it was completed, paused, or skipped.
-              Teachers see the roster view above. No raw scores, no rankings,
-              no decoder ring required.
+              Parents see the same mission their child saw — in calm, plain language — alongside
+              whether it was completed, paused, or skipped. Teachers see the roster view above. No
+              raw scores, no rankings, no decoder ring required.
             </p>
             <p className="mt-3 text-sm text-slate-600">
-              Today's Mission is visible across the parent dashboard, the
-              teacher class view, and the weekly parent summary email.
+              Today's Mission is visible across the parent dashboard, the teacher class view, and
+              the weekly parent summary email.
             </p>
           </>
         }

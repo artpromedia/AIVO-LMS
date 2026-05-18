@@ -20,7 +20,7 @@ rewrite — including any S3/MinIO key referenced in those commits.
 
 ## When to run this
 
-- A `gitleaks` / `trufflehog` finding on `main` confirms a *real* secret
+- A `gitleaks` / `trufflehog` finding on `main` confirms a _real_ secret
   (not a placeholder, not a fixture value, not an `EXAMPLE_KEY=` line).
 - Code review caught a credential that was force-pushed earlier and is
   no longer on the tip of the branch but still reachable via tags or
@@ -28,7 +28,7 @@ rewrite — including any S3/MinIO key referenced in those commits.
 - A retired environment's MinIO root credentials were once committed,
   even if they have since been changed in deployed config.
 
-If the only thing in history is an *example* value, prefer adding it to
+If the only thing in history is an _example_ value, prefer adding it to
 `.gitleaks.toml` allowlist instead — see "Decision tree" below.
 
 ## Pre-flight (do not skip)
@@ -51,7 +51,7 @@ If the only thing in history is an *example* value, prefer adding it to
    deployments, secret managers, runbooks, and Terraform state. You
    will need the list for Phase B.
 
-## Phase A — Rotate MinIO credentials *first*
+## Phase A — Rotate MinIO credentials _first_
 
 > Rotate **before** rewriting history. The rewrite is loud; the moment
 > the force-push lands, every fork operator and historical clone holder
@@ -92,7 +92,7 @@ dedicated 1 TB NVMe (`/data/extra/minio` → `/data/minio`); see
    read & write to MinIO with the new credentials. Tail logs for
    `SignatureDoesNotMatch` or `InvalidAccessKeyId` for at least 30
    minutes.
-6. **Revoke the old credentials** *only after* all consumers are happy:
+6. **Revoke the old credentials** _only after_ all consumers are happy:
    ```bash
    mc admin user remove aivo-prod <OLD_ACCESS_KEY>
    ```
@@ -218,7 +218,7 @@ Announce both options in `#eng-announce` along with the new SHA of
 ## Phase D — Post-incident
 
 1. **Update `.gitleaks.toml`** with the redacted secret pattern in the
-   `[allowlist]` block, *not* the value, so the scanner knows to ignore
+   `[allowlist]` block, _not_ the value, so the scanner knows to ignore
    `***REMOVED***` and any test fixtures that resemble the format.
 2. **File a SIRT post-mortem**: how did the secret land in a commit,
    why did pre-commit/CI not catch it, what guardrail are we adding?

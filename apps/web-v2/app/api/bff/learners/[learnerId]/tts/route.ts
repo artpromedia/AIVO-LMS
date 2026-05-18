@@ -5,11 +5,7 @@ import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireLearnerScope } from "@/lib/bff/guards";
 import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import { audit } from "@/lib/bff/audit";
-import {
-  generateTTS,
-  getLearnerVoicePreference,
-  recordReadAloudUsage,
-} from "@/lib/db/repos";
+import { generateTTS, getLearnerVoicePreference, recordReadAloudUsage } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +16,14 @@ const bodySchema = z.object({
   contextKind: z.enum(["baseline_question", "lesson_step", "homework_message", "ui_label"]),
   contextRefId: z.string().min(1).max(128).nullable().optional(),
   voiceId: z
-    .enum(["warm_female", "warm_male", "calm_neutral", "kid_friendly", "narrator_low", "narrator_high"])
+    .enum([
+      "warm_female",
+      "warm_male",
+      "calm_neutral",
+      "kid_friendly",
+      "narrator_low",
+      "narrator_high",
+    ])
     .optional(),
   speed: z.number().min(0.5).max(2).optional(),
   languageCode: z.string().min(2).max(16).optional(),
@@ -34,7 +37,12 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (response) return response;
     const scopeErr = requireLearnerScope(session!, learnerId, requestId);
     if (scopeErr) return scopeErr;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection"],
+      requestId,
+    );
     if (consentErr) return consentErr;
     const pref = getLearnerVoicePreference(learnerId);
     if (pref && !pref.enabled) {
@@ -52,7 +60,10 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     const parsed = bodySchema.safeParse(body);
     if (!parsed.success) {
       return fail(
-        { ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." },
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
         requestId,
       );
     }
@@ -78,7 +89,11 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       });
       audit(session!, "tts.generate", requestId, {
         learnerId,
-        metadata: { assetId: asset.id, cacheHit: cacheHit ? "1" : "0", chars: String(parsed.data.text.length) },
+        metadata: {
+          assetId: asset.id,
+          cacheHit: cacheHit ? "1" : "0",
+          chars: String(parsed.data.text.length),
+        },
       });
       return ok({ job, asset }, requestId);
     } catch (e) {

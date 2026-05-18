@@ -8,7 +8,7 @@ async function verifyLearnerAccess(
   db: ReturnType<typeof import("@aivo/db").createDb>,
   userId: string,
   learnerId: string,
-  role?: string
+  role?: string,
 ): Promise<boolean> {
   if (role === "PLATFORM_ADMIN") return true;
 
@@ -22,8 +22,8 @@ async function verifyLearnerAccess(
       and(
         eq(learnerCaregivers.learnerId, learnerId),
         eq(learnerCaregivers.caregiverUserId, userId),
-        eq(learnerCaregivers.status, "ACCEPTED")
-      )
+        eq(learnerCaregivers.status, "ACCEPTED"),
+      ),
     );
   return caregiver.length > 0;
 }

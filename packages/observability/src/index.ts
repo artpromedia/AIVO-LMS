@@ -51,7 +51,9 @@ export function createLogger(serviceName: string, context?: Record<string, unkno
     level: process.env.LOG_LEVEL || "info",
     timestamp: pino.stdTimeFunctions.isoTime,
     formatters: {
-      level(label) { return { level: label }; },
+      level(label) {
+        return { level: label };
+      },
     },
     base: context ? sanitize({ service: serviceName, ...context }) : { service: serviceName },
   });
@@ -93,7 +95,9 @@ export type { Logger as PinoLogger };
 
 // ── Metrics registry ───────────────────────────────────────────────────────
 
-interface LabelSet { [label: string]: string }
+interface LabelSet {
+  [label: string]: string;
+}
 
 export interface Counter {
   increment(value?: number, labelValues?: LabelSet): void;
@@ -143,7 +147,14 @@ export function createHistogram(
   buckets: number[] = DEFAULT_BUCKETS,
   labels: string[] = [],
 ): Histogram {
-  const state: HistogramState = { name, labels, buckets, bucketCounts: new Map(), sums: new Map(), counts: new Map() };
+  const state: HistogramState = {
+    name,
+    labels,
+    buckets,
+    bucketCounts: new Map(),
+    sums: new Map(),
+    counts: new Map(),
+  };
   _histograms.push(state);
   return {
     record(value: number, labelValues: LabelSet = {}) {
@@ -253,7 +264,10 @@ export function registerRequestIdHook(app: any) {
   });
 }
 
-export function propagateHeaders(req: any, extra: Record<string, string> = {}): Record<string, string> {
+export function propagateHeaders(
+  req: any,
+  extra: Record<string, string> = {},
+): Record<string, string> {
   const out: Record<string, string> = { ...extra };
   if (req?.requestId) out[REQUEST_ID_HEADER] = req.requestId;
   return out;

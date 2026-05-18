@@ -70,7 +70,13 @@ export interface CalibrationPoint {
 
 export class CalibrationState {
   private points: CalibrationPoint[] = [];
-  private current: { i: number; targetX: number; targetY: number; xs: number[]; ys: number[] } | null = null;
+  private current: {
+    i: number;
+    targetX: number;
+    targetY: number;
+    xs: number[];
+    ys: number[];
+  } | null = null;
 
   /** Start collecting samples for the next calibration point. */
   beginPoint(i: number, targetX: number, targetY: number): void {
@@ -133,7 +139,8 @@ export class CalibrationState {
   /** Compute a global linear correction (additive offset) from all points. */
   globalOffset(): { dx: number; dy: number } {
     if (this.points.length === 0) return { dx: 0, dy: 0 };
-    let sx = 0, sy = 0;
+    let sx = 0,
+      sy = 0;
     for (const p of this.points) {
       sx += p.measuredX - p.targetX;
       sy += p.measuredY - p.targetY;
@@ -205,7 +212,13 @@ export interface DwellClickConfig {
 }
 
 export class DwellClickController {
-  private current: { targetId: string; startedAt: number; lastSeenAt: number; confSum: number; samples: number } | null = null;
+  private current: {
+    targetId: string;
+    startedAt: number;
+    lastSeenAt: number;
+    confSum: number;
+    samples: number;
+  } | null = null;
   private listeners: Array<(ev: GazeClickEvent) => void> = [];
 
   constructor(private cfg: DwellClickConfig) {}
@@ -221,7 +234,11 @@ export class DwellClickController {
       this.current = null;
       return;
     }
-    if (!this.current || this.current.targetId !== targetId || now - this.current.lastSeenAt > gap) {
+    if (
+      !this.current ||
+      this.current.targetId !== targetId ||
+      now - this.current.lastSeenAt > gap
+    ) {
       this.current = { targetId, startedAt: now, lastSeenAt: now, confSum: conf, samples: 1 };
       return;
     }

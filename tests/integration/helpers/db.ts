@@ -40,7 +40,9 @@ export async function setup(): Promise<void> {
       _container = container;
       console.log("[integration/db] Container started:", _dbUrl);
     } catch (err) {
-      console.warn("[integration/db] @testcontainers/postgresql not available; falling back to localhost postgres");
+      console.warn(
+        "[integration/db] @testcontainers/postgresql not available; falling back to localhost postgres",
+      );
       _dbUrl = "postgresql://aivo:aivo_test_pw@localhost:5432/aivo_test";
     }
   }

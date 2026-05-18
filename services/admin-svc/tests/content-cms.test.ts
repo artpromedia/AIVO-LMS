@@ -6,10 +6,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import Fastify from "fastify";
-import {
-  registerContentCmsRoutes,
-  _resetPackStoreForTest,
-} from "../src/routes/content-cms.js";
+import { registerContentCmsRoutes, _resetPackStoreForTest } from "../src/routes/content-cms.js";
 
 async function bootstrap() {
   _resetPackStoreForTest();

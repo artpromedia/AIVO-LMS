@@ -6,11 +6,7 @@
 // not exposed as a regular root script — it is a migration tool, not
 // an ongoing gate. After running it once, the gate is consent:audit.
 
-import {
-  existsSync,
-  readFileSync,
-  writeFileSync,
-} from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -146,9 +142,7 @@ for (const rel of TARGETS) {
   patched++;
 }
 
-console.log(
-  `apply-consent-guards: patched=${patched} skipped=${skipped} errors=${errors.length}`,
-);
+console.log(`apply-consent-guards: patched=${patched} skipped=${skipped} errors=${errors.length}`);
 if (errors.length) {
   for (const e of errors) console.error(`  - ${e}`);
   process.exit(1);

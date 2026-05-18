@@ -2,11 +2,7 @@
  * Pure helpers over `SkillGraph`. No I/O, no React — these are the lookup
  * primitives that brain-svc / tutor-svc / curriculum builders use.
  */
-import type {
-  GraphIssue,
-  Skill,
-  SkillGraph,
-} from "./types.js";
+import type { GraphIssue, Skill, SkillGraph } from "./types.js";
 
 /**
  * Validate a skill graph: id uniqueness, prerequisite existence, no
@@ -49,7 +45,9 @@ export function validateGraph(graph: SkillGraph): GraphIssue[] {
   }
 
   // Cycle detection (white/grey/black DFS).
-  const WHITE = 0, GREY = 1, BLACK = 2;
+  const WHITE = 0,
+    GREY = 1,
+    BLACK = 2;
   const color = new Map<string, number>();
   for (const id of skillsById.keys()) color.set(id, WHITE);
   const stack: { id: string; iter: Iterator<string> }[] = [];
@@ -146,21 +144,14 @@ export function topologicalSort(graph: SkillGraph): Skill[] {
 }
 
 /** Find every skill whose `frameworkRefs` includes the given framework code. */
-export function findByFrameworkCode(
-  graph: SkillGraph,
-  framework: string,
-  code: string,
-): Skill[] {
+export function findByFrameworkCode(graph: SkillGraph, framework: string, code: string): Skill[] {
   return graph.skills.filter((s) =>
     s.frameworkRefs.some((r) => r.framework === framework && r.code === code),
   );
 }
 
 /** Compute the transitive prerequisite closure of a skill (excluding itself). */
-export function prerequisiteClosure(
-  graph: SkillGraph,
-  skillId: string,
-): string[] {
+export function prerequisiteClosure(graph: SkillGraph, skillId: string): string[] {
   const idx = indexGraph(graph);
   const out = new Set<string>();
   const stack: string[] = [...(idx.get(skillId)?.prerequisites ?? [])];

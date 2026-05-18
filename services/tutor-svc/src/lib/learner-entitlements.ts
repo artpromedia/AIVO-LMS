@@ -103,8 +103,7 @@ export function projectLearnerEntitlements(args: {
 }): LearnerEntitlementPayload {
   const { subscription, tutorSubscriptions } = args;
   const plan: PlanId | "unknown" = subscription?.plan ?? "unknown";
-  const subscriptionStatus: SubscriptionStatus | "missing" =
-    subscription?.status ?? "missing";
+  const subscriptionStatus: SubscriptionStatus | "missing" = subscription?.status ?? "missing";
 
   const includedSkus = subscription
     ? new Set<TutorSku>(getIncludedTutorSkusForPlan(subscription.plan))
@@ -130,11 +129,7 @@ export function projectLearnerEntitlements(args: {
   const addonTutors = subActive ? skusToKeys([...addonSkus]) : [];
   const graceTutors = subActive ? skusToKeys([...graceSkus]) : [];
 
-  const effectiveSet = new Set<TutorKey>([
-    ...includedTutors,
-    ...addonTutors,
-    ...graceTutors,
-  ]);
+  const effectiveSet = new Set<TutorKey>([...includedTutors, ...addonTutors, ...graceTutors]);
   const effectiveTutors = [...effectiveSet];
   const lockedTutors = ALL_TUTOR_KEYS.filter((k) => !effectiveSet.has(k));
 
@@ -147,7 +142,7 @@ export function projectLearnerEntitlements(args: {
     currentPeriodEnd:
       subscription?.currentPeriodEnd instanceof Date
         ? subscription.currentPeriodEnd.toISOString()
-        : (subscription?.currentPeriodEnd as string | null) ?? null,
+        : ((subscription?.currentPeriodEnd as string | null) ?? null),
     includedTutors,
     addonTutors,
     graceTutors,
@@ -176,9 +171,7 @@ export async function buildLearnerEntitlementPayload(
 }
 
 function skusToKeys(skus: TutorSku[]): TutorKey[] {
-  return skus
-    .map((s) => TUTOR_SKU_TO_KEY[s])
-    .filter((k): k is TutorKey => Boolean(k));
+  return skus.map((s) => TUTOR_SKU_TO_KEY[s]).filter((k): k is TutorKey => Boolean(k));
 }
 
 export const __INTERNAL_FOR_TESTS__ = { TUTOR_KEY_TO_SKU };

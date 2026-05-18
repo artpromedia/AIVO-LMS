@@ -62,8 +62,8 @@ export default async function Page() {
                   <Badge tone={o.status === "active" ? "success" : "neutral"}>{o.status}</Badge>
                 </div>
                 <div className="text-[11px] text-aivo-muted">
-                  {skillById.get(o.skillId)?.name ?? o.skillId} ·{" "}
-                  {o.objectives.length} objective{o.objectives.length === 1 ? "" : "s"}
+                  {skillById.get(o.skillId)?.name ?? o.skillId} · {o.objectives.length} objective
+                  {o.objectives.length === 1 ? "" : "s"}
                 </div>
               </li>
             ))}
@@ -86,9 +86,7 @@ export default async function Page() {
                   <td className="py-2">{skillById.get(b.skillId)?.name ?? b.skillId}</td>
                   <td className="py-2">{b.name}</td>
                   <td className="py-2 text-[11px]">
-                    {b.items
-                      .map((i) => `${i.count}× ${i.kind.replace(/_/g, " ")}`)
-                      .join(", ")}
+                    {b.items.map((i) => `${i.count}× ${i.kind.replace(/_/g, " ")}`).join(", ")}
                   </td>
                   <td className="py-2">
                     <Badge tone={b.status === "active" ? "success" : "neutral"}>{b.status}</Badge>

@@ -64,9 +64,7 @@ export function DisclosureForm() {
           id="rtype"
           className="mt-1 w-full rounded border border-aivo-border bg-aivo-surface-1 p-2"
           value={recipientType}
-          onChange={(e) =>
-            setRecipientType(e.target.value as (typeof RECIPIENT_TYPES)[number])
-          }
+          onChange={(e) => setRecipientType(e.target.value as (typeof RECIPIENT_TYPES)[number])}
         >
           {RECIPIENT_TYPES.map((t) => (
             <option key={t} value={t}>

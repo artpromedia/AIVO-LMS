@@ -9,7 +9,12 @@ export interface ChoiceGridSurfaceProps {
   onEvent?: (event: SurfaceTelemetryEvent) => void;
 }
 
-export function ChoiceGridSurface({ surface, disabled = false, onSubmit, onEvent }: ChoiceGridSurfaceProps) {
+export function ChoiceGridSurface({
+  surface,
+  disabled = false,
+  onSubmit,
+  onEvent,
+}: ChoiceGridSurfaceProps) {
   const [selectedChoiceId, setSelectedChoiceId] = useState<string | undefined>();
 
   const submitDisabled = disabled || (surface.capture.finalAnswer && !selectedChoiceId);
@@ -28,7 +33,9 @@ export function ChoiceGridSurface({ surface, disabled = false, onSubmit, onEvent
             disabled={disabled}
             onClick={() => {
               setSelectedChoiceId(choice.id);
-              onEvent?.(createSurfaceEvent(surface.id, "answer_changed", { selectedChoiceId: choice.id }));
+              onEvent?.(
+                createSurfaceEvent(surface.id, "answer_changed", { selectedChoiceId: choice.id }),
+              );
             }}
           >
             {choice.emoji ? `${choice.emoji} ` : ""}

@@ -9,7 +9,13 @@
  * indigo background in favour of a calmer slate palette.
  */
 import React from "react";
-import type { Beat, FunctioningLevel, SensoryAdaptations, SessionPhase, TutorState } from "./types.js";
+import type {
+  Beat,
+  FunctioningLevel,
+  SensoryAdaptations,
+  SessionPhase,
+  TutorState,
+} from "./types.js";
 
 export interface StageLayoutProps {
   phase: SessionPhase;

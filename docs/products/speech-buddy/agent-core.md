@@ -23,25 +23,25 @@ HKDF-SHA256-derived AES-256-GCM keys. See `encryption.py`.
 
 Concrete entry points:
 
-| Surface | File |
-|---|---|
-| FastAPI internal API | `services/ai-svc/src/ai_svc/routes/speech_buddy.py` |
-| Python orchestrator | `services/ai-svc/src/ai_svc/speech_buddy/orchestrator_impl.py` |
-| 3-layer safety | `services/ai-svc/src/ai_svc/speech_buddy/safety.py` |
-| Toolset (scenarios/scaffolds/rubric) | `services/ai-svc/src/ai_svc/speech_buddy/tools_impl.py` |
-| Event emitter | `services/ai-svc/src/ai_svc/speech_buddy/events.py` |
-| Transcript encryption | `services/ai-svc/src/ai_svc/speech_buddy/encryption.py` |
-| STT adapters (mock + Whisper) | `services/ai-svc/src/ai_svc/speech_buddy/stt.py` |
-| TTS adapters (mock + OpenAI/litellm) | `services/ai-svc/src/ai_svc/speech_buddy/tts.py` |
-| VAD + barge-in | `services/ai-svc/src/ai_svc/speech_buddy/vad.py` |
-| Tutor-svc HTTP/WS routes | `services/tutor-svc/src/routes/speechBuddy.ts` |
-| Family-svc consent verify | `services/family-svc/src/routes/speech-buddy-consent.ts` |
-| Comms-svc safety dispatch | `services/comms-svc/src/routes/notifications.ts` (`/api/comms/internal/speech-buddy-safety`) |
+| Surface                              | File                                                                                         |
+| ------------------------------------ | -------------------------------------------------------------------------------------------- |
+| FastAPI internal API                 | `services/ai-svc/src/ai_svc/routes/speech_buddy.py`                                          |
+| Python orchestrator                  | `services/ai-svc/src/ai_svc/speech_buddy/orchestrator_impl.py`                               |
+| 3-layer safety                       | `services/ai-svc/src/ai_svc/speech_buddy/safety.py`                                          |
+| Toolset (scenarios/scaffolds/rubric) | `services/ai-svc/src/ai_svc/speech_buddy/tools_impl.py`                                      |
+| Event emitter                        | `services/ai-svc/src/ai_svc/speech_buddy/events.py`                                          |
+| Transcript encryption                | `services/ai-svc/src/ai_svc/speech_buddy/encryption.py`                                      |
+| STT adapters (mock + Whisper)        | `services/ai-svc/src/ai_svc/speech_buddy/stt.py`                                             |
+| TTS adapters (mock + OpenAI/litellm) | `services/ai-svc/src/ai_svc/speech_buddy/tts.py`                                             |
+| VAD + barge-in                       | `services/ai-svc/src/ai_svc/speech_buddy/vad.py`                                             |
+| Tutor-svc HTTP/WS routes             | `services/tutor-svc/src/routes/speechBuddy.ts`                                               |
+| Family-svc consent verify            | `services/family-svc/src/routes/speech-buddy-consent.ts`                                     |
+| Comms-svc safety dispatch            | `services/comms-svc/src/routes/notifications.ts` (`/api/comms/internal/speech-buddy-safety`) |
 
 State machine: `greet → pickScenario → roleplayTurn* → reflect → assignQuest → farewell`.
 
 > Implementation note: `pickScenario` is **internal** — it runs once
-> inside `start_session()` (see `orchestrator_impl.py`) and is *not*
+> inside `start_session()` (see `orchestrator_impl.py`) and is _not_
 > a runtime turn-boundary state externally observable on the WS
 > stream. The runtime transitions reachable from `run_turn` are
 > `greet → roleplayTurn × N → reflect → assignQuest → farewell`,
@@ -64,15 +64,15 @@ output, and is invoked twice per turn:
 
 Categories:
 
-| Category | Severity | Buddy response |
-|---|---|---|
-| `self_harm` | hard | crisis script (en/es), session ends, guardian + moderator paged |
-| `abuse_disclosure` | hard | crisis script (en/es), session ends, guardian + moderator paged |
-| `romantic_sexual` | soft → hard on 2nd hit | redirect line |
-| `violence` | soft → hard on 2nd hit | redirect line |
-| `medical_advice` | soft | redirect line |
-| `pii` | soft | redirect line |
-| `jailbreak` | soft → hard on 2nd hit | redirect line |
+| Category           | Severity               | Buddy response                                                  |
+| ------------------ | ---------------------- | --------------------------------------------------------------- |
+| `self_harm`        | hard                   | crisis script (en/es), session ends, guardian + moderator paged |
+| `abuse_disclosure` | hard                   | crisis script (en/es), session ends, guardian + moderator paged |
+| `romantic_sexual`  | soft → hard on 2nd hit | redirect line                                                   |
+| `violence`         | soft → hard on 2nd hit | redirect line                                                   |
+| `medical_advice`   | soft                   | redirect line                                                   |
+| `pii`              | soft                   | redirect line                                                   |
+| `jailbreak`        | soft → hard on 2nd hit | redirect line                                                   |
 
 Hard flags emit `speech_buddy.safety.flag.raised` and (only for
 `self_harm` / `abuse_disclosure`) page comms-svc with
@@ -129,16 +129,16 @@ of the layers introduces a sleep/blocking call.
 Run with `SPEECH_BUDDY_STT_PROVIDER=whisper SPEECH_BUDDY_TTS_PROVIDER=openai`
 and a real moderation judge wired in. The expected breakdown per turn:
 
-| Stage | p50 budget | Notes |
-|---|---|---|
-| Browser → server (audio frames) | 30 ms | over WS, `~16 KB` per frame |
-| STT (Whisper) | 350 ms | shared with the existing `transcribe.py` route |
-| Safety (child_input) | 5 ms | regex+classifier dominates; judge async-batched |
-| Planner | 350 ms | LLM call, streamed first-token |
-| Safety (buddy_output) | 10 ms | output is short |
-| TTS (OpenAI tts-1) | 250 ms | first audio byte (streamed) |
-| Server → browser | 30 ms | back over the same WS |
-| **Total** | **~1.05 s** | within the 1.2s budget |
+| Stage                           | p50 budget  | Notes                                           |
+| ------------------------------- | ----------- | ----------------------------------------------- |
+| Browser → server (audio frames) | 30 ms       | over WS, `~16 KB` per frame                     |
+| STT (Whisper)                   | 350 ms      | shared with the existing `transcribe.py` route  |
+| Safety (child_input)            | 5 ms        | regex+classifier dominates; judge async-batched |
+| Planner                         | 350 ms      | LLM call, streamed first-token                  |
+| Safety (buddy_output)           | 10 ms       | output is short                                 |
+| TTS (OpenAI tts-1)              | 250 ms      | first audio byte (streamed)                     |
+| Server → browser                | 30 ms       | back over the same WS                           |
+| **Total**                       | **~1.05 s** | within the 1.2s budget                          |
 
 p95 budget: **2.0s**. Exceeding p95 for 5 consecutive minutes triggers
 an on-call page (alerting wiring lands in task #42 dashboards).
@@ -154,13 +154,13 @@ on-device build itself ships in task #41 alongside the child UI.
 
 ### Components
 
-| Layer | Cloud | On-device fallback |
-|---|---|---|
-| VAD | server energy heuristic | **WebRTC VAD** in the browser (`@webrtc-vad/wasm`) |
-| STT | Whisper | **whisper.cpp WASM (tiny.en, 39 MB)** running in a Web Worker |
-| Safety | 3-layer (regex+classifier+LLM) | **regex + classifier only** (judge unavailable) |
-| Planner | server LLM | **deterministic templated planner** (same scaffolds, no novel content) |
-| TTS | OpenAI | **Web Speech API `SpeechSynthesisUtterance`** with the closest matching voice |
+| Layer   | Cloud                          | On-device fallback                                                            |
+| ------- | ------------------------------ | ----------------------------------------------------------------------------- |
+| VAD     | server energy heuristic        | **WebRTC VAD** in the browser (`@webrtc-vad/wasm`)                            |
+| STT     | Whisper                        | **whisper.cpp WASM (tiny.en, 39 MB)** running in a Web Worker                 |
+| Safety  | 3-layer (regex+classifier+LLM) | **regex + classifier only** (judge unavailable)                               |
+| Planner | server LLM                     | **deterministic templated planner** (same scaffolds, no novel content)        |
+| TTS     | OpenAI                         | **Web Speech API `SpeechSynthesisUtterance`** with the closest matching voice |
 
 Trigger conditions for failover (any one):
 

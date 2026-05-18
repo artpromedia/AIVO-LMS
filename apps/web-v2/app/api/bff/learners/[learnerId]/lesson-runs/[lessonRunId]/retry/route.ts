@@ -39,31 +39,24 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       return fail({ ...ERRORS.NOT_FOUND, message: "Lesson run not found" }, requestId);
     }
     const result = await retryLessonRun(lessonRunId, session!.tenantId);
-    audit(
-      session!,
-      result.ok ? "lesson_run.retry" : "lesson_run.retry.failed",
-      requestId,
-      {
-        learnerId,
-        metadata: {
-          lessonRunId,
-          retryCount: result.lessonRun.retryCount,
-          status: result.lessonRun.status,
-        },
+    audit(session!, result.ok ? "lesson_run.retry" : "lesson_run.retry.failed", requestId, {
+      learnerId,
+      metadata: {
+        lessonRunId,
+        retryCount: result.lessonRun.retryCount,
+        status: result.lessonRun.status,
       },
-    );
+    });
     if (!result.ok) {
       const errKey =
-        result.code === "not_retryable"
-          ? ERRORS.PRECONDITION_FAILED
-          : ERRORS.UPSTREAM_UNAVAILABLE;
+        result.code === "not_retryable" ? ERRORS.PRECONDITION_FAILED : ERRORS.UPSTREAM_UNAVAILABLE;
       return fail(
         {
           ...errKey,
           message:
             result.code === "not_retryable"
               ? `Cannot retry a ${result.lessonRun.status} run`
-              : result.lessonRun.failureReason ?? "Retry failed",
+              : (result.lessonRun.failureReason ?? "Retry failed"),
         },
         requestId,
       );

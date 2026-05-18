@@ -23,7 +23,8 @@ export const cadenceStarterPack: ContentPack = {
       title: "Make a rhythm idea",
       skillId: "ncas.music.k2.create.idea",
       type: "narration",
-      prompt: "Music starts with an idea — a clap, a stomp, or a hum. Today we'll invent a rhythm together.",
+      prompt:
+        "Music starts with an idea — a clap, a stomp, or a hum. Today we'll invent a rhythm together.",
       difficulty: "intro",
     },
     {
@@ -33,9 +34,7 @@ export const cadenceStarterPack: ContentPack = {
       type: "tap",
       prompt: "Tap along with the steady beat — once for every drum sound you hear.",
       difficulty: "core",
-      choices: [
-        { id: "tap", label: "Tap to the beat", correct: true },
-      ],
+      choices: [{ id: "tap", label: "Tap to the beat", correct: true }],
     },
     {
       id: "cadence.k2.echo.voice",
@@ -51,7 +50,8 @@ export const cadenceStarterPack: ContentPack = {
       title: "Compose 4 beats",
       skillId: "ncas.music.k2.create.idea",
       type: "draw",
-      prompt: "Draw 4 boxes. Mark each box with a clap (👏) or a rest (—) to make your own 4-beat pattern.",
+      prompt:
+        "Draw 4 boxes. Mark each box with a clap (👏) or a rest (—) to make your own 4-beat pattern.",
       difficulty: "stretch",
     },
   ],

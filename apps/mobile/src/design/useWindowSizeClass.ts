@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
-import { useWindowDimensions } from 'react-native';
-import { classifyWidth, isTabletWidth, type SizeClass } from './responsive';
+import { useMemo } from "react";
+import { useWindowDimensions } from "react-native";
+import { classifyWidth, isTabletWidth, type SizeClass } from "./responsive";
 
 export interface WindowSizeClass {
   width: number;
@@ -28,9 +28,9 @@ export function useWindowSizeClass(): WindowSizeClass {
       height,
       sizeClass,
       isTablet: isTabletWidth(width),
-      isCompact: sizeClass === 'compact',
-      isMedium: sizeClass === 'medium',
-      isExpanded: sizeClass === 'expanded',
+      isCompact: sizeClass === "compact",
+      isMedium: sizeClass === "medium",
+      isExpanded: sizeClass === "expanded",
       isLandscape: width > height,
     };
   }, [width, height]);

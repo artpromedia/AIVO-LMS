@@ -45,7 +45,11 @@ async function queueSessionEnd(payload: SessionEndPayload): Promise<void> {
   await mockAsyncStorage.setItem(OUTBOX_KEY, JSON.stringify(outbox));
 }
 
-async function flushOutbox(learningApiBase: string, authHeader: string, fetchFn: typeof fetch): Promise<void> {
+async function flushOutbox(
+  learningApiBase: string,
+  authHeader: string,
+  fetchFn: typeof fetch,
+): Promise<void> {
   const raw = await mockAsyncStorage.getItem(OUTBOX_KEY);
   if (!raw) return;
   const outbox: SessionEndPayload[] = JSON.parse(raw);
@@ -59,7 +63,10 @@ async function flushOutbox(learningApiBase: string, authHeader: string, fetchFn:
         {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: authHeader },
-          body: JSON.stringify({ masteryUpdates: payload.masteryUpdates, xpEarned: payload.xpEarned }),
+          body: JSON.stringify({
+            masteryUpdates: payload.masteryUpdates,
+            xpEarned: payload.xpEarned,
+          }),
         },
       );
       if (!res.ok) remaining.push(payload);

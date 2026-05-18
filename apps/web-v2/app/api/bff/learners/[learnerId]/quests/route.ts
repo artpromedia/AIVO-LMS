@@ -1,16 +1,8 @@
 import { NextResponse } from "next/server";
-import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
-import {
-  requireSession,
-  requireRole,
-  requireLearnerScope,
-} from "@/lib/bff/guards";
+import { failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
+import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
 import { requireLearnerConsent } from "@/lib/bff/consent-guard";
-import {
-  listQuestChapters,
-  listQuestProgressForLearner,
-  listQuestWorlds,
-} from "@/lib/db/repos";
+import { listQuestChapters, listQuestProgressForLearner, listQuestWorlds } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
 
@@ -32,7 +24,12 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection", "ai_personalization"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection", "ai_personalization"],
+      requestId,
+    );
     if (consentErr) return consentErr;
 
     const worlds = listQuestWorlds();
@@ -44,9 +41,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
       const chapters = listQuestChapters(w.id);
       const normal = chapters.filter((c) => !c.isBoss);
       const boss = chapters.find((c) => c.isBoss);
-      const chaptersCompleted = normal.filter((c) =>
-        completedChapterIds.has(c.id),
-      ).length;
+      const chaptersCompleted = normal.filter((c) => completedChapterIds.has(c.id)).length;
       const bossDone = boss ? completedChapterIds.has(boss.id) : false;
       const bossUnlocked = boss
         ? boss.prerequisiteChapterIds.every((id) => completedChapterIds.has(id))

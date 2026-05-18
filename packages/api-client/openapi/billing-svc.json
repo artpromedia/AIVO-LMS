@@ -233,16 +233,59 @@
                     "status": {
                       "type": "string"
                     },
+                    "paymentStatus": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
                     "currentPeriodStart": {
-                      "type": "string",
+                      "type": [
+                        "null",
+                        "string"
+                      ],
                       "format": "date-time"
                     },
                     "currentPeriodEnd": {
-                      "type": "string",
+                      "type": [
+                        "null",
+                        "string"
+                      ],
                       "format": "date-time"
                     },
                     "cancelAtPeriodEnd": {
                       "type": "boolean"
+                    },
+                    "hasStripeCustomer": {
+                      "type": "boolean"
+                    },
+                    "trialEndsAt": {
+                      "type": [
+                        "null",
+                        "string"
+                      ],
+                      "format": "date-time"
+                    },
+                    "paymentMethod": {
+                      "type": [
+                        "null",
+                        "object"
+                      ],
+                      "additionalProperties": true,
+                      "properties": {
+                        "brand": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        },
+                        "last4": {
+                          "type": [
+                            "null",
+                            "string"
+                          ]
+                        }
+                      }
                     }
                   }
                 }
@@ -408,6 +451,299 @@
         }
       }
     },
+    "/api/billing/checkout/session": {
+      "post": {
+        "operationId": "createCheckoutSession",
+        "summary": "Create a Stripe Checkout Session for a plan subscription",
+        "tags": [
+          "Billing"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "tenantId",
+                  "planId"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                  "tenantId": {
+                    "type": "string"
+                  },
+                  "planId": {
+                    "type": "string",
+                    "enum": [
+                      "single",
+                      "family"
+                    ]
+                  },
+                  "successUrl": {
+                    "type": "string"
+                  },
+                  "cancelUrl": {
+                    "type": "string"
+                  },
+                  "learnerCount": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "checkoutUrl"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "checkoutUrl": {
+                      "type": "string"
+                    },
+                    "sessionId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/billing/portal/session": {
+      "post": {
+        "operationId": "createPortalSession",
+        "summary": "Create a Stripe Customer Portal Session",
+        "tags": [
+          "Billing"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "tenantId"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                  "tenantId": {
+                    "type": "string"
+                  },
+                  "returnUrl": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "portalUrl"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "portalUrl": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/billing/subscription/{tenantId}/cancel": {
       "post": {
         "operationId": "cancelSubscription",
@@ -472,6 +808,129 @@
             }
           },
           "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/billing/subscription/{tenantId}/resume": {
+      "post": {
+        "operationId": "resumeSubscription",
+        "summary": "Undo cancel-at-period-end on the current subscription",
+        "tags": [
+          "Billing"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "tenantId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "tenantId"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "tenantId": {
+                      "type": "string"
+                    },
+                    "cancelAtPeriodEnd": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
             "description": "Default Response",
             "content": {
               "application/json": {
@@ -680,7 +1139,7 @@
     "/api/billing/addons": {
       "post": {
         "operationId": "addAddon",
-        "summary": "Attach an add-on (extra tutor) to a tenant",
+        "summary": "Attach a tutor add-on to the tenant subscription via Stripe",
         "tags": [
           "Billing"
         ],
@@ -691,12 +1150,14 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "tenantId",
-                  "tutorId"
+                  "tenantId"
                 ],
                 "additionalProperties": true,
                 "properties": {
                   "tenantId": {
+                    "type": "string"
+                  },
+                  "tutorSku": {
                     "type": "string"
                   },
                   "tutorId": {
@@ -715,8 +1176,7 @@
                 "schema": {
                   "type": "object",
                   "required": [
-                    "status",
-                    "addon"
+                    "status"
                   ],
                   "additionalProperties": true,
                   "properties": {
@@ -788,6 +1248,44 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -795,7 +1293,7 @@
     "/api/billing/addons/{tenantId}/{tutorId}": {
       "delete": {
         "operationId": "removeAddon",
-        "summary": "Detach an add-on from a tenant",
+        "summary": "Detach a tutor add-on from the tenant subscription via Stripe",
         "tags": [
           "Billing"
         ],
@@ -882,6 +1380,44 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -924,6 +1460,127 @@
                       "items": {
                         "type": "object",
                         "additionalProperties": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "error"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/billing/entitlements/{tenantId}": {
+      "get": {
+        "operationId": "getEntitlements",
+        "summary": "Effective tutor entitlements for a tenant",
+        "tags": [
+          "Billing"
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "name": "tenantId",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "tenantId",
+                    "plan",
+                    "status",
+                    "effectiveTutorSkus"
+                  ],
+                  "additionalProperties": true,
+                  "properties": {
+                    "tenantId": {
+                      "type": "string"
+                    },
+                    "plan": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "cancelAtPeriodEnd": {
+                      "type": "boolean"
+                    },
+                    "currentPeriodEnd": {
+                      "type": [
+                        "null",
+                        "string"
+                      ],
+                      "format": "date-time"
+                    },
+                    "paymentStatus": {
+                      "type": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "includedTutorSkus": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "purchasedTutorSkus": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "effectiveTutorSkus": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
                       }
                     }
                   }

@@ -42,10 +42,7 @@ export interface StepUpUserCtx {
  * email OTP. Returns `null` only if the user has no email on file (which
  * would indicate a misconfigured account).
  */
-export async function selectFactor(
-  db: any,
-  userId: string,
-): Promise<StepUpFactor | null> {
+export async function selectFactor(db: any, userId: string): Promise<StepUpFactor | null> {
   const [u] = await db
     .select({
       mfaMethod: users.mfaMethod,
@@ -185,7 +182,12 @@ export async function verifyEmailOtpForUser(
   if (!/^\d{6}$/.test(trimmed)) return false;
   const inputHash = hashOtpCode(trimmed);
   const rows = await db
-    .select({ id: mfaCodes.id, codeHash: mfaCodes.codeHash, expiresAt: mfaCodes.expiresAt, purpose: mfaCodes.purpose })
+    .select({
+      id: mfaCodes.id,
+      codeHash: mfaCodes.codeHash,
+      expiresAt: mfaCodes.expiresAt,
+      purpose: mfaCodes.purpose,
+    })
     .from(mfaCodes)
     .where(eq(mfaCodes.userId, userId));
   const now = Date.now();
@@ -216,7 +218,11 @@ export async function verifyRecoveryCodeForUser(
   if (!looksLikeRecoveryCode(canonical)) return false;
   const argon2 = await import("argon2");
   const rows = await db
-    .select({ id: mfaRecoveryCodes.id, codeHash: mfaRecoveryCodes.codeHash, usedAt: mfaRecoveryCodes.usedAt })
+    .select({
+      id: mfaRecoveryCodes.id,
+      codeHash: mfaRecoveryCodes.codeHash,
+      usedAt: mfaRecoveryCodes.usedAt,
+    })
     .from(mfaRecoveryCodes)
     .where(eq(mfaRecoveryCodes.userId, userId));
   for (const row of rows) {

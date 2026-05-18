@@ -58,7 +58,9 @@ export function CelebrationOverlay({
         <Animated.View style={[styles.card, { transform: [{ scale: scaleAnim }] }]}>
           <Text style={styles.emoji}>🎉</Text>
           <Text style={styles.title}>Amazing!</Text>
-          <Text style={styles.sub}>+{xpEarned} XP · +{coinsEarned} coins</Text>
+          <Text style={styles.sub}>
+            +{xpEarned} XP · +{coinsEarned} coins
+          </Text>
         </Animated.View>
       </Animated.View>
     </Modal>

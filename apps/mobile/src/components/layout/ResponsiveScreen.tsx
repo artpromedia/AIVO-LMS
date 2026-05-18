@@ -1,17 +1,11 @@
-import React from 'react';
-import {
-  ScrollView,
-  ScrollViewProps,
-  StyleSheet,
-  View,
-  ViewStyle,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useWindowSizeClass } from '../../design/useWindowSizeClass';
-import { CONTENT_MAX_WIDTH, pickBySizeClass } from '../../design/responsive';
-import { colors, spacing } from '@/constants/colors';
+import React from "react";
+import { ScrollView, ScrollViewProps, StyleSheet, View, ViewStyle } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useWindowSizeClass } from "../../design/useWindowSizeClass";
+import { CONTENT_MAX_WIDTH, pickBySizeClass } from "../../design/responsive";
+import { colors, spacing } from "@/constants/colors";
 
-export type ContentWidth = keyof typeof CONTENT_MAX_WIDTH | 'full';
+export type ContentWidth = keyof typeof CONTENT_MAX_WIDTH | "full";
 
 export interface ResponsiveScreenProps extends ScrollViewProps {
   /** Centered max content width. 'full' = stretch to screen edges. */
@@ -37,7 +31,7 @@ export interface ResponsiveScreenProps extends ScrollViewProps {
  * Use this in place of bare ScrollView/View at the top of every screen.
  */
 export function ResponsiveScreen({
-  maxWidth = 'full',
+  maxWidth = "full",
   applyTopInset = true,
   horizontalPadding,
   scroll = true,
@@ -57,17 +51,11 @@ export function ResponsiveScreen({
       medium: spacing.lg,
       expanded: spacing.xl,
     });
-  const cap = maxWidth === 'full' ? width : CONTENT_MAX_WIDTH[maxWidth];
+  const cap = maxWidth === "full" ? width : CONTENT_MAX_WIDTH[maxWidth];
   const contentWidth = Math.min(width - hPad * 2, cap);
 
   const inner = (
-    <View
-      style={[
-        styles.inner,
-        { width: contentWidth, alignSelf: 'center' },
-        innerStyle,
-      ]}
-    >
+    <View style={[styles.inner, { width: contentWidth, alignSelf: "center" }, innerStyle]}>
       {children}
     </View>
   );
@@ -76,9 +64,7 @@ export function ResponsiveScreen({
 
   if (!scroll) {
     return (
-      <View
-        style={[styles.container, bgStyle, { paddingHorizontal: hPad }, style as ViewStyle]}
-      >
+      <View style={[styles.container, bgStyle, { paddingHorizontal: hPad }, style as ViewStyle]}>
         {applyTopInset ? <View style={{ height: insets.top }} /> : null}
         {inner}
       </View>
@@ -89,7 +75,11 @@ export function ResponsiveScreen({
     <ScrollView
       style={[styles.container, bgStyle, style]}
       contentContainerStyle={[
-        { paddingTop: applyTopInset ? insets.top + 16 : 16, paddingHorizontal: hPad, paddingBottom: 32 },
+        {
+          paddingTop: applyTopInset ? insets.top + 16 : 16,
+          paddingHorizontal: hPad,
+          paddingBottom: 32,
+        },
         contentContainerStyle,
       ]}
       keyboardShouldPersistTaps="handled"
@@ -102,5 +92,5 @@ export function ResponsiveScreen({
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  inner: { width: '100%' },
+  inner: { width: "100%" },
 });

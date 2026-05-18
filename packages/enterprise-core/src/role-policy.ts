@@ -69,10 +69,7 @@ export function canMutateBrainGovernanceFields(role: TenantRole | undefined): bo
 
 // ---- Sprint 08 district-mode helpers ----------------------------------
 
-const MANAGE_DISTRICT_HIERARCHY_ROLES = new Set<TenantRole>([
-  "district_admin",
-  "platform_admin",
-]);
+const MANAGE_DISTRICT_HIERARCHY_ROLES = new Set<TenantRole>(["district_admin", "platform_admin"]);
 
 const MANAGE_SCHOOL_ROSTER_ROLES = new Set<TenantRole>([
   "school_admin",
@@ -87,18 +84,11 @@ const VIEW_CLASS_LEARNERS_ROLES = new Set<TenantRole>([
   "platform_admin",
 ]);
 
-const RUN_SIS_IMPORT_ROLES = new Set<TenantRole>([
-  "district_admin",
-  "platform_admin",
-  "service",
-]);
+const RUN_SIS_IMPORT_ROLES = new Set<TenantRole>(["district_admin", "platform_admin", "service"]);
 
 const ACCEPT_DPA_ROLES = new Set<TenantRole>(["district_admin"]);
 
-const EXPORT_DISTRICT_COMPLIANCE_ROLES = new Set<TenantRole>([
-  "district_admin",
-  "platform_admin",
-]);
+const EXPORT_DISTRICT_COMPLIANCE_ROLES = new Set<TenantRole>(["district_admin", "platform_admin"]);
 
 export function canManageDistrictHierarchy(role: TenantRole | undefined): boolean {
   if (!role) return false;

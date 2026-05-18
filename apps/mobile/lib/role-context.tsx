@@ -21,14 +21,7 @@
  * grant.
  */
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import type { UserRole } from "@aivo/brand";
 
 export type ActiveLearnerContext = {
@@ -76,9 +69,7 @@ export function RoleProvider({
   const [activeRole, setActiveRoleState] = useState<UserRole | null>(
     initialActiveRole ?? availableRoles[0] ?? null,
   );
-  const [lastPathByRole, setLastPathByRole] = useState<
-    Partial<Record<UserRole, string>>
-  >({});
+  const [lastPathByRole, setLastPathByRole] = useState<Partial<Record<UserRole, string>>>({});
   const [activeLearner, setActiveLearner] = useState<ActiveLearnerContext | null>(
     initialActiveLearner ?? null,
   );
@@ -86,9 +77,7 @@ export function RoleProvider({
   const setActiveRole = useCallback(
     (role: UserRole) => {
       if (!availableRoles.includes(role)) {
-        throw new Error(
-          `[role-context] cannot activate role "${role}" — not in availableRoles.`,
-        );
+        throw new Error(`[role-context] cannot activate role "${role}" — not in availableRoles.`);
       }
       setActiveRoleState(role);
     },
@@ -109,14 +98,7 @@ export function RoleProvider({
       activeLearner,
       setActiveLearner,
     }),
-    [
-      availableRoles,
-      activeRole,
-      setActiveRole,
-      lastPathByRole,
-      rememberPath,
-      activeLearner,
-    ],
+    [availableRoles, activeRole, setActiveRole, lastPathByRole, rememberPath, activeLearner],
   );
 
   return <RoleContext.Provider value={value}>{children}</RoleContext.Provider>;

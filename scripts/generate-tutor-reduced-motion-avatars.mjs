@@ -24,26 +24,23 @@ const repoRoot = resolve(__dirname, "..");
 // packages/brand/src/index.ts TUTORS. Kept inline to keep this script
 // dependency-free.
 const TUTORS = [
-  { key: "nova",    name: "Nova",    color: "#7C3AED" },
-  { key: "sage",    name: "Sage",    color: "#10B981" },
-  { key: "spark",   name: "Spark",   color: "#F59E0B" },
-  { key: "chrono",  name: "Chrono",  color: "#6366F1" },
-  { key: "pixel",   name: "Pixel",   color: "#06B6D4" },
-  { key: "echo",    name: "Echo",    color: "#EC4899" },
+  { key: "nova", name: "Nova", color: "#7C3AED" },
+  { key: "sage", name: "Sage", color: "#10B981" },
+  { key: "spark", name: "Spark", color: "#F59E0B" },
+  { key: "chrono", name: "Chrono", color: "#6366F1" },
+  { key: "pixel", name: "Pixel", color: "#06B6D4" },
+  { key: "echo", name: "Echo", color: "#EC4899" },
   { key: "harmony", name: "Harmony", color: "#8B5CF6" },
-  { key: "atlas",   name: "Atlas",   color: "#14B8A6" },
+  { key: "atlas", name: "Atlas", color: "#14B8A6" },
   { key: "cadence", name: "Cadence", color: "#D946EF" },
-  { key: "vigor",   name: "Vigor",   color: "#22C55E" },
-  { key: "lingua",  name: "Lingua",  color: "#0EA5E9" },
-  { key: "forge",   name: "Forge",   color: "#EF4444" },
+  { key: "vigor", name: "Vigor", color: "#22C55E" },
+  { key: "lingua", name: "Lingua", color: "#0EA5E9" },
+  { key: "forge", name: "Forge", color: "#EF4444" },
   { key: "compass", name: "Compass", color: "#F97316" },
-  { key: "muse",    name: "Muse",    color: "#A855F7" },
+  { key: "muse", name: "Muse", color: "#A855F7" },
 ];
 
-const PUBLIC_DIRS = [
-  "apps/web/public/images/tutors",
-  "apps/marketing/public/images/tutors",
-];
+const PUBLIC_DIRS = ["apps/web/public/images/tutors", "apps/marketing/public/images/tutors"];
 
 function renderSvg({ key, name, color }) {
   const initial = name.charAt(0).toUpperCase();

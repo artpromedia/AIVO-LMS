@@ -123,7 +123,10 @@
   font: inherit;
   font-weight: 900;
   cursor: pointer;
-  transition: color 180ms ease, background 180ms ease, transform 180ms ease;
+  transition:
+    color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
 }
 
 .tabs button:hover {
@@ -272,7 +275,10 @@
   background: #ffffff;
   box-shadow: 0 16px 34px rgba(20, 28, 48, 0.08);
   cursor: pointer;
-  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
 }
 
 .subjectCallout:hover {

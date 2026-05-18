@@ -7,16 +7,8 @@
  * deterministically replayed for QA / regression tests.
  */
 export type { MasteryRecord, AnswerOutcome } from "./types.js";
-export {
-  scaffold,
-  type ScaffoldDecision,
-  type ScaffoldInput,
-} from "./strategies/scaffolding.js";
-export {
-  retrieve,
-  type RetrievalDecision,
-  type RetrievalInput,
-} from "./strategies/retrieval.js";
+export { scaffold, type ScaffoldDecision, type ScaffoldInput } from "./strategies/scaffolding.js";
+export { retrieve, type RetrievalDecision, type RetrievalInput } from "./strategies/retrieval.js";
 export {
   schedule,
   initialMasteryRecord,

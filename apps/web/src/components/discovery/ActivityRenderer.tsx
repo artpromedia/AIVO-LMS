@@ -19,7 +19,11 @@ interface ActivityRendererProps {
 }
 
 export default function ActivityRenderer({
-  activity, chapter, activityNumber, totalActivities, onAnswer,
+  activity,
+  chapter,
+  activityNumber,
+  totalActivities,
+  onAnswer,
 }: ActivityRendererProps) {
   const [phase, setPhase] = useState<"narrating" | "interacting" | "feedback">("narrating");
   const [selected, setSelected] = useState<string | null>(null);
@@ -42,9 +46,15 @@ export default function ActivityRenderer({
     setSelected(null);
     setIsCorrect(null);
     setShowChoices(false);
-    const t1 = setTimeout(() => { setPhase("interacting"); promptStartRef.current = Date.now(); }, 2500);
+    const t1 = setTimeout(() => {
+      setPhase("interacting");
+      promptStartRef.current = Date.now();
+    }, 2500);
     const t2 = setTimeout(() => setShowChoices(true), 3000);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
   }, [activity.id]);
 
   const handleSelect = (choice: ActivityChoice) => {
@@ -62,17 +72,26 @@ export default function ActivityRenderer({
     <div className="fixed inset-0 vi-bg tier-scene-bg flex flex-col overflow-hidden pt-20">
       <div className="max-w-3xl mx-auto w-full px-4 py-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-lg" aria-hidden>{chapter.landmark.emoji}</span>
+          <span className="text-lg" aria-hidden>
+            {chapter.landmark.emoji}
+          </span>
           <span className="text-slate-600 text-xs font-extrabold">{chapter.title}</span>
         </div>
-        <div className="flex items-center gap-1.5" role="progressbar" aria-valuenow={activityNumber} aria-valuemax={totalActivities}>
+        <div
+          className="flex items-center gap-1.5"
+          role="progressbar"
+          aria-valuenow={activityNumber}
+          aria-valuemax={totalActivities}
+        >
           {Array.from({ length: totalActivities }).map((_, i) => (
             <div
               key={i}
               className={`h-2 rounded-full transition-all ${
-                i < activityNumber - 1 ? "w-6 bg-[hsl(262_83%_58%)]"
-                  : i === activityNumber - 1 ? "w-8 bg-[hsl(262_83%_58%)]"
-                  : "w-2 bg-slate-200"
+                i < activityNumber - 1
+                  ? "w-6 bg-[hsl(262_83%_58%)]"
+                  : i === activityNumber - 1
+                    ? "w-8 bg-[hsl(262_83%_58%)]"
+                    : "w-2 bg-slate-200"
               }`}
             />
           ))}
@@ -98,18 +117,36 @@ export default function ActivityRenderer({
                   </IconWell>
                 )}
               </div>
-              <p className="text-xl font-extrabold text-slate-900">{isCorrect ? "Amazing!" : "Good try!"}</p>
-              <p className="text-sm text-slate-600 mt-1">{isCorrect ? "You got it right!" : "The adventure continues!"}</p>
+              <p className="text-xl font-extrabold text-slate-900">
+                {isCorrect ? "Amazing!" : "Good try!"}
+              </p>
+              <p className="text-sm text-slate-600 mt-1">
+                {isCorrect ? "You got it right!" : "The adventure continues!"}
+              </p>
             </div>
           </div>
         )}
 
-        <div className={`transition-all duration-700 ${phase === "narrating" ? "opacity-100 scale-100" : "opacity-0 scale-95 absolute"}`}>
+        <div
+          className={`transition-all duration-700 ${phase === "narrating" ? "opacity-100 scale-100" : "opacity-0 scale-95 absolute"}`}
+        >
           <div className="flex flex-col items-center gap-4 max-w-sm mx-auto text-center">
-            <div className="w-24 h-24 rounded-3xl overflow-hidden border-4 shadow-lg animate-bounce-gentle" style={{ borderColor: subjectColor }}>
-              <Image src={tutor.avatar} alt={tutor.name} width={96} height={96} className="object-cover" />
+            <div
+              className="w-24 h-24 rounded-3xl overflow-hidden border-4 shadow-lg animate-bounce-gentle"
+              style={{ borderColor: subjectColor }}
+            >
+              <Image
+                src={tutor.avatar}
+                alt={tutor.name}
+                width={96}
+                height={96}
+                className="object-cover"
+              />
             </div>
-            <div className="vi-card px-6 py-4" style={{ background: subjectTint, borderColor: `${subjectColor}26` }}>
+            <div
+              className="vi-card px-6 py-4"
+              style={{ background: subjectTint, borderColor: `${subjectColor}26` }}
+            >
               <p className="text-slate-800 text-base leading-relaxed">{activity.narration}</p>
             </div>
           </div>
@@ -118,15 +155,29 @@ export default function ActivityRenderer({
         {phase !== "narrating" && (
           <div className="w-full max-w-lg space-y-5">
             <div className="flex items-start gap-3">
-              <div className="w-12 h-12 rounded-2xl overflow-hidden border-2 shrink-0" style={{ borderColor: subjectColor }}>
-                <Image src={tutor.avatar} alt={tutor.name} width={48} height={48} className="object-cover" />
+              <div
+                className="w-12 h-12 rounded-2xl overflow-hidden border-2 shrink-0"
+                style={{ borderColor: subjectColor }}
+              >
+                <Image
+                  src={tutor.avatar}
+                  alt={tutor.name}
+                  width={48}
+                  height={48}
+                  className="object-cover"
+                />
               </div>
-              <div className="vi-card px-5 py-3 flex-1" style={{ background: subjectTint, borderColor: `${subjectColor}26` }}>
+              <div
+                className="vi-card px-5 py-3 flex-1"
+                style={{ background: subjectTint, borderColor: `${subjectColor}26` }}
+              >
                 <p className="text-slate-800 text-sm">{activity.tutorLine}</p>
               </div>
             </div>
 
-            <div className="text-center text-5xl mb-2" aria-hidden>{activity.sceneEmoji}</div>
+            <div className="text-center text-5xl mb-2" aria-hidden>
+              {activity.sceneEmoji}
+            </div>
 
             <div
               className={`grid grid-cols-2 gap-3 transition-all duration-500 ${showChoices ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}
@@ -141,15 +192,35 @@ export default function ActivityRenderer({
                     onClick={() => handleSelect(choice)}
                     disabled={selected !== null}
                     className={`relative vi-card p-4 text-center transition-all duration-300 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[hsl(262_83%_58%)] focus-visible:ring-offset-2 ${
-                      isRight ? "scale-105" : isWrong ? "scale-95 opacity-50" : isSelected ? "" : "hover:scale-105 active:scale-95"
+                      isRight
+                        ? "scale-105"
+                        : isWrong
+                          ? "scale-95 opacity-50"
+                          : isSelected
+                            ? ""
+                            : "hover:scale-105 active:scale-95"
                     }`}
                     style={{
-                      borderColor: isRight ? "hsl(142 71% 45%)" : isWrong ? "hsl(0 72% 51%)" : isSelected ? subjectColor : undefined,
-                      background: isRight ? "hsl(142 71% 45% / 0.08)" : isWrong ? "hsl(0 72% 51% / 0.08)" : undefined,
+                      borderColor: isRight
+                        ? "hsl(142 71% 45%)"
+                        : isWrong
+                          ? "hsl(0 72% 51%)"
+                          : isSelected
+                            ? subjectColor
+                            : undefined,
+                      background: isRight
+                        ? "hsl(142 71% 45% / 0.08)"
+                        : isWrong
+                          ? "hsl(0 72% 51% / 0.08)"
+                          : undefined,
                       animationDelay: `${idx * 100}ms`,
                     }}
                   >
-                    {choice.emoji && <div className="text-3xl mb-2" aria-hidden>{choice.emoji}</div>}
+                    {choice.emoji && (
+                      <div className="text-3xl mb-2" aria-hidden>
+                        {choice.emoji}
+                      </div>
+                    )}
                     <p className="text-slate-900 font-extrabold text-sm">{choice.label}</p>
                     {isRight && (
                       <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-[hsl(142_71%_45%)] flex items-center justify-center text-white shadow-md">

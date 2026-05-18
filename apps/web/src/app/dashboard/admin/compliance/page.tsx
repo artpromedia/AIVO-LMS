@@ -3,7 +3,17 @@ import { useAuth } from "@/providers/auth-provider";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { IconWell } from "@/components/discovery/_vi";
-import { ShieldCheck, Check, X, Circle, ClipboardList, Trash2, Upload, AlertTriangle, type LucideIcon } from "lucide-react";
+import {
+  ShieldCheck,
+  Check,
+  X,
+  Circle,
+  ClipboardList,
+  Trash2,
+  Upload,
+  AlertTriangle,
+  type LucideIcon,
+} from "lucide-react";
 
 interface AuditEntry {
   action: string;
@@ -39,7 +49,9 @@ export default function AdminCompliancePage() {
       fetch("/api/admin-svc/stats", { headers: { Authorization: `Bearer ${accessToken}` } })
         .then((r) => (r.ok ? r.json() : null))
         .catch(() => null),
-      fetch("/api/admin-svc/compliance/controls", { headers: { Authorization: `Bearer ${accessToken}` } })
+      fetch("/api/admin-svc/compliance/controls", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
         .then(async (r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
         .catch((e) => ({ __err: String(e?.message ?? e) })),
     ]).then(([s, c]: any) => {
@@ -56,48 +68,128 @@ export default function AdminCompliancePage() {
   }, [accessToken]);
 
   const complianceChecks = [
-    { framework: "COPPA", status: "compliant", score: 100, items: [
-      { label: "Parental consent required before data collection", status: true },
-      { label: "No direct marketing to children under 13", status: true },
-      { label: "Parent can review/delete child data at any time", status: true },
-      { label: "Minimal data collection principle enforced", status: true },
-    ]},
-    { framework: "FERPA", status: "compliant", score: 100, items: [
-      { label: "Student education records access controls", status: true },
-      { label: "Parent access to student data guaranteed", status: true },
-      { label: "Data sharing limited to educational purpose", status: true },
-      { label: "Annual notification procedures in place", status: true },
-    ]},
-    { framework: "GDPR/CCPA", status: "compliant", score: 100, items: [
-      { label: "Right to access personal data", status: true },
-      { label: "Right to deletion (data erasure)", status: true },
-      { label: "Data portability support", status: true },
-      { label: "Consent management & withdrawal", status: true },
-    ]},
-    { framework: "SOC2 Type II", status: "in_progress", score: 80, items: [
-      { label: "Access control procedures", status: true },
-      { label: "System change management", status: true },
-      { label: "Risk assessment documentation", status: true },
-      { label: "Incident response procedures", status: true },
-      { label: "Audit evidence automation", status: false },
-    ]},
+    {
+      framework: "COPPA",
+      status: "compliant",
+      score: 100,
+      items: [
+        { label: "Parental consent required before data collection", status: true },
+        { label: "No direct marketing to children under 13", status: true },
+        { label: "Parent can review/delete child data at any time", status: true },
+        { label: "Minimal data collection principle enforced", status: true },
+      ],
+    },
+    {
+      framework: "FERPA",
+      status: "compliant",
+      score: 100,
+      items: [
+        { label: "Student education records access controls", status: true },
+        { label: "Parent access to student data guaranteed", status: true },
+        { label: "Data sharing limited to educational purpose", status: true },
+        { label: "Annual notification procedures in place", status: true },
+      ],
+    },
+    {
+      framework: "GDPR/CCPA",
+      status: "compliant",
+      score: 100,
+      items: [
+        { label: "Right to access personal data", status: true },
+        { label: "Right to deletion (data erasure)", status: true },
+        { label: "Data portability support", status: true },
+        { label: "Consent management & withdrawal", status: true },
+      ],
+    },
+    {
+      framework: "SOC2 Type II",
+      status: "in_progress",
+      score: 80,
+      items: [
+        { label: "Access control procedures", status: true },
+        { label: "System change management", status: true },
+        { label: "Risk assessment documentation", status: true },
+        { label: "Incident response procedures", status: true },
+        { label: "Audit evidence automation", status: false },
+      ],
+    },
   ];
 
   // Security controls now come from the runtime probes endpoint; no hardcoded array.
 
   const recentAudit: AuditEntry[] = [
-    { action: "USER_CREATED", actor: "admin@aivo.test", resource: "User", timestamp: new Date(Date.now() - 3600000).toISOString(), details: "Created new team member" },
-    { action: "ROLE_ASSIGNED", actor: "admin@aivo.test", resource: "User", timestamp: new Date(Date.now() - 7200000).toISOString(), details: "Assigned DISTRICT_ADMIN role" },
-    { action: "TENANT_CREATED", actor: "admin@aivo.test", resource: "Tenant", timestamp: new Date(Date.now() - 14400000).toISOString(), details: "Created district account" },
-    { action: "LOGIN", actor: "admin@aivo.test", resource: "Session", timestamp: new Date(Date.now() - 18000000).toISOString(), details: "Admin login from dashboard" },
-    { action: "IMPERSONATION", actor: "admin@aivo.test", resource: "Session", timestamp: new Date(Date.now() - 86400000).toISOString(), details: "Impersonated parent user for support" },
-    { action: "CONFIG_UPDATED", actor: "admin@aivo.test", resource: "Settings", timestamp: new Date(Date.now() - 172800000).toISOString(), details: "Updated feature flags" },
+    {
+      action: "USER_CREATED",
+      actor: "admin@aivo.test",
+      resource: "User",
+      timestamp: new Date(Date.now() - 3600000).toISOString(),
+      details: "Created new team member",
+    },
+    {
+      action: "ROLE_ASSIGNED",
+      actor: "admin@aivo.test",
+      resource: "User",
+      timestamp: new Date(Date.now() - 7200000).toISOString(),
+      details: "Assigned DISTRICT_ADMIN role",
+    },
+    {
+      action: "TENANT_CREATED",
+      actor: "admin@aivo.test",
+      resource: "Tenant",
+      timestamp: new Date(Date.now() - 14400000).toISOString(),
+      details: "Created district account",
+    },
+    {
+      action: "LOGIN",
+      actor: "admin@aivo.test",
+      resource: "Session",
+      timestamp: new Date(Date.now() - 18000000).toISOString(),
+      details: "Admin login from dashboard",
+    },
+    {
+      action: "IMPERSONATION",
+      actor: "admin@aivo.test",
+      resource: "Session",
+      timestamp: new Date(Date.now() - 86400000).toISOString(),
+      details: "Impersonated parent user for support",
+    },
+    {
+      action: "CONFIG_UPDATED",
+      actor: "admin@aivo.test",
+      resource: "Settings",
+      timestamp: new Date(Date.now() - 172800000).toISOString(),
+      details: "Updated feature flags",
+    },
   ];
 
-  const dataRequests: { type: string; count: number; desc: string; Icon: LucideIcon; color: string }[] = [
-    { type: "Access Request", count: 0, desc: "Pending data access requests", Icon: ClipboardList, color: "primary" },
-    { type: "Deletion Request", count: 0, desc: "Pending data deletion requests", Icon: Trash2, color: "math" },
-    { type: "Export Request", count: 0, desc: "Pending data export requests", Icon: Upload, color: "reading" },
+  const dataRequests: {
+    type: string;
+    count: number;
+    desc: string;
+    Icon: LucideIcon;
+    color: string;
+  }[] = [
+    {
+      type: "Access Request",
+      count: 0,
+      desc: "Pending data access requests",
+      Icon: ClipboardList,
+      color: "primary",
+    },
+    {
+      type: "Deletion Request",
+      count: 0,
+      desc: "Pending data deletion requests",
+      Icon: Trash2,
+      color: "math",
+    },
+    {
+      type: "Export Request",
+      count: 0,
+      desc: "Pending data export requests",
+      Icon: Upload,
+      color: "reading",
+    },
   ];
 
   const ACTION_COLORS: Record<string, string> = {
@@ -114,7 +206,9 @@ export default function AdminCompliancePage() {
       <div className="p-8 space-y-6">
         <div className="h-8 bg-slate-200 rounded-lg w-64 animate-pulse" />
         <div className="grid grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => <div key={i} className="h-48 bg-slate-200 rounded-2xl animate-pulse" />)}
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-48 bg-slate-200 rounded-2xl animate-pulse" />
+          ))}
         </div>
         <div className="h-64 bg-slate-200 rounded-2xl animate-pulse" />
       </div>
@@ -130,7 +224,9 @@ export default function AdminCompliancePage() {
           </IconWell>
           <div>
             <h1 className="text-2xl font-heading font-bold vi-text">{t("audit_logs")}</h1>
-            <p className="text-sm vi-text-muted mt-1">COPPA, FERPA, GDPR compliance status, security controls, and audit trail.</p>
+            <p className="text-sm vi-text-muted mt-1">
+              COPPA, FERPA, GDPR compliance status, security controls, and audit trail.
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))] text-sm font-semibold">
@@ -147,9 +243,13 @@ export default function AdminCompliancePage() {
             <div key={fw.framework} className="vi-card p-5">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-heading font-bold vi-text">{fw.framework}</h3>
-                <span className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${
-                  fw.status === "compliant" ? "bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]" : "bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]"
-                }`}>
+                <span
+                  className={`px-2.5 py-0.5 text-xs rounded-full font-semibold ${
+                    fw.status === "compliant"
+                      ? "bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))]"
+                      : "bg-[hsl(var(--visual-sel)/0.18)] text-[hsl(var(--visual-sel))]"
+                  }`}
+                >
                   {fw.status === "compliant" ? "Compliant" : "In Progress"}
                 </span>
               </div>
@@ -157,18 +257,33 @@ export default function AdminCompliancePage() {
                 {fw.items.map((item, i) => (
                   <div key={i} className="flex items-start gap-2">
                     {item.status ? (
-                      <Check size={12} strokeWidth={3} className="mt-0.5 text-[hsl(var(--visual-science))] flex-shrink-0" aria-hidden="true" />
+                      <Check
+                        size={12}
+                        strokeWidth={3}
+                        className="mt-0.5 text-[hsl(var(--visual-science))] flex-shrink-0"
+                        aria-hidden="true"
+                      />
                     ) : (
-                      <Circle size={12} strokeWidth={2.5} className="mt-0.5 vi-text-muted opacity-70 flex-shrink-0" aria-hidden="true" />
+                      <Circle
+                        size={12}
+                        strokeWidth={2.5}
+                        className="mt-0.5 vi-text-muted opacity-70 flex-shrink-0"
+                        aria-hidden="true"
+                      />
                     )}
                     <span className="text-xs vi-text-muted">{item.label}</span>
                   </div>
                 ))}
               </div>
               <div className="mt-3 vi-surface-soft rounded-full h-1.5 overflow-hidden">
-                <div className={`h-full rounded-full ${fw.status === "compliant" ? "bg-[hsl(var(--visual-science))]" : "bg-[hsl(var(--visual-sel))]"}`} style={{ width: `${(passed / total) * 100}%` }} />
+                <div
+                  className={`h-full rounded-full ${fw.status === "compliant" ? "bg-[hsl(var(--visual-science))]" : "bg-[hsl(var(--visual-sel))]"}`}
+                  style={{ width: `${(passed / total) * 100}%` }}
+                />
               </div>
-              <p className="text-[10px] vi-text-muted mt-1">{passed}/{total} checks passed</p>
+              <p className="text-[10px] vi-text-muted mt-1">
+                {passed}/{total} checks passed
+              </p>
             </div>
           );
         })}
@@ -185,7 +300,10 @@ export default function AdminCompliancePage() {
             )}
           </div>
           {controlsErr && (
-            <div className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700 mb-3" data-testid="runtime-controls-error">
+            <div
+              className="rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-700 mb-3"
+              data-testid="runtime-controls-error"
+            >
               Compliance probes unavailable: {controlsErr}
             </div>
           )}
@@ -199,7 +317,8 @@ export default function AdminCompliancePage() {
                     : ctrl.status === "fail"
                       ? "text-[hsl(var(--visual-math))]"
                       : "vi-text-muted";
-              const Icon = ctrl.status === "pass" ? Check : ctrl.status === "fail" ? X : AlertTriangle;
+              const Icon =
+                ctrl.status === "pass" ? Check : ctrl.status === "fail" ? X : AlertTriangle;
               return (
                 <div
                   key={ctrl.id}
@@ -207,7 +326,12 @@ export default function AdminCompliancePage() {
                   data-testid={`runtime-control-${ctrl.id}`}
                   data-status={ctrl.status}
                 >
-                  <Icon size={16} strokeWidth={3} className={`mt-0.5 flex-shrink-0 ${tone}`} aria-hidden="true" />
+                  <Icon
+                    size={16}
+                    strokeWidth={3}
+                    className={`mt-0.5 flex-shrink-0 ${tone}`}
+                    aria-hidden="true"
+                  />
                   <div className="flex-1">
                     <p className="text-sm font-medium vi-text">{ctrl.label}</p>
                     <p className="text-[11px] vi-text-muted mt-0.5">{ctrl.evidence}</p>
@@ -222,7 +346,9 @@ export default function AdminCompliancePage() {
                       </a>
                     )}
                   </div>
-                  <span className="px-2 py-0.5 text-[10px] rounded vi-surface-soft vi-text-muted font-medium">{ctrl.category}</span>
+                  <span className="px-2 py-0.5 text-[10px] rounded vi-surface-soft vi-text-muted font-medium">
+                    {ctrl.category}
+                  </span>
                 </div>
               );
             })}
@@ -239,8 +365,13 @@ export default function AdminCompliancePage() {
           </div>
           <div className="space-y-2">
             {recentAudit.map((entry, i) => (
-              <div key={i} className="flex items-center gap-3 py-2.5 px-3 rounded-lg border vi-border hover:vi-bg transition">
-                <span className={`px-2 py-0.5 text-[10px] rounded font-semibold flex-shrink-0 ${ACTION_COLORS[entry.action] || "vi-surface-soft vi-text-muted"}`}>
+              <div
+                key={i}
+                className="flex items-center gap-3 py-2.5 px-3 rounded-lg border vi-border hover:vi-bg transition"
+              >
+                <span
+                  className={`px-2 py-0.5 text-[10px] rounded font-semibold flex-shrink-0 ${ACTION_COLORS[entry.action] || "vi-surface-soft vi-text-muted"}`}
+                >
                   {entry.action.replace(/_/g, " ")}
                 </span>
                 <div className="flex-1 min-w-0">
@@ -260,40 +391,55 @@ export default function AdminCompliancePage() {
         {dataRequests.map((dr) => {
           const Icon = dr.Icon;
           return (
-          <div key={dr.type} className="vi-card p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <IconWell color={dr.color} size="sm">
-                <Icon size={18} strokeWidth={2.5} aria-hidden="true" />
-              </IconWell>
-              <div>
-                <p className="text-sm font-semibold vi-text">{dr.type}</p>
-                <p className="text-xs vi-text-muted">{dr.desc}</p>
+            <div key={dr.type} className="vi-card p-5">
+              <div className="flex items-center gap-3 mb-3">
+                <IconWell color={dr.color} size="sm">
+                  <Icon size={18} strokeWidth={2.5} aria-hidden="true" />
+                </IconWell>
+                <div>
+                  <p className="text-sm font-semibold vi-text">{dr.type}</p>
+                  <p className="text-xs vi-text-muted">{dr.desc}</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <p className="text-3xl font-bold vi-text">{dr.count}</p>
+                <span className="px-2.5 py-0.5 text-xs rounded-full bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))] font-semibold">
+                  Clear
+                </span>
               </div>
             </div>
-            <div className="flex items-center justify-between">
-              <p className="text-3xl font-bold vi-text">{dr.count}</p>
-              <span className="px-2.5 py-0.5 text-xs rounded-full bg-[hsl(var(--visual-science)/0.14)] text-[hsl(var(--visual-science))] font-semibold">Clear</span>
-            </div>
-          </div>
           );
         })}
       </div>
 
       <div className="vi-card p-6">
         <h2 className="font-heading font-bold text-lg vi-text mb-4">Consent Management</h2>
-        <p className="text-sm vi-text-muted mb-4">COPPA parental consent is required before any child data is collected. All consent records are tracked with timestamps and can be revoked.</p>
+        <p className="text-sm vi-text-muted mb-4">
+          COPPA parental consent is required before any child data is collected. All consent records
+          are tracked with timestamps and can be revoked.
+        </p>
         <div className="grid grid-cols-3 gap-4">
           <div className="p-4 rounded-xl bg-[hsl(var(--visual-science)/0.08)] border border-[hsl(var(--visual-science)/0.25)] text-center">
-            <p className="text-2xl font-bold text-[hsl(var(--visual-science))]">{stats?.totalLearners ?? 0}</p>
-            <p className="text-xs text-[hsl(var(--visual-science))] font-medium mt-1">Active Consents</p>
+            <p className="text-2xl font-bold text-[hsl(var(--visual-science))]">
+              {stats?.totalLearners ?? 0}
+            </p>
+            <p className="text-xs text-[hsl(var(--visual-science))] font-medium mt-1">
+              Active Consents
+            </p>
           </div>
           <div className="p-4 rounded-xl bg-[hsl(var(--visual-reading)/0.08)] border border-[hsl(var(--visual-reading)/0.25)] text-center">
             <p className="text-2xl font-bold text-[hsl(var(--visual-reading))]">Enforced</p>
-            <p className="text-xs text-[hsl(var(--visual-reading))] font-medium mt-1">Data Minimization</p>
+            <p className="text-xs text-[hsl(var(--visual-reading))] font-medium mt-1">
+              Data Minimization
+            </p>
           </div>
           <div className="p-4 rounded-xl vi-surface-soft border border-[hsl(var(--visual-primary)/0.3)] text-center">
-            <p className="text-2xl font-bold text-[hsl(var(--visual-primary))]">{recentAudit.length}</p>
-            <p className="text-xs text-[hsl(var(--visual-primary))] font-medium mt-1">Recent Admin Actions</p>
+            <p className="text-2xl font-bold text-[hsl(var(--visual-primary))]">
+              {recentAudit.length}
+            </p>
+            <p className="text-xs text-[hsl(var(--visual-primary))] font-medium mt-1">
+              Recent Admin Actions
+            </p>
           </div>
         </div>
       </div>

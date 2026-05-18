@@ -2,7 +2,7 @@
 
 **Audience:** Platform on-call · **Severity:** P1 · **Last reviewed:** Sprint 11
 
-Use this runbook when *every* PLATFORM_ADMIN account is locked out
+Use this runbook when _every_ PLATFORM_ADMIN account is locked out
 (MFA hardware lost, SSO IdP outage, mass credential reset) and an
 incident requires immediate platform-admin action.
 
@@ -46,7 +46,6 @@ incident requires immediate platform-admin action.
    a SOC 2 finding if not justified.
 
 6. **Re-seal.** Once the incident is resolved:
-
    - Rotate the break-glass password (1Password generates + reseals).
    - Re-enable MFA on the break-glass account:
 

@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
-import { apiFetch } from '@/lib/api';
-import { API } from '@/constants/api';
+import { useQuery } from "@tanstack/react-query";
+import { apiFetch } from "@/lib/api";
+import { API } from "@/constants/api";
 
 export interface Milestone {
   id: string;
@@ -30,10 +30,10 @@ export interface MilestonesResponse {
 
 export function useLearnerMilestones(learnerId: string) {
   return useQuery<MilestonesResponse>({
-    queryKey: ['learner-milestones', learnerId],
+    queryKey: ["learner-milestones", learnerId],
     queryFn: async () => {
       const res = await apiFetch(API.FAMILY, `/api/family/milestones/${learnerId}`);
-      if (!res.ok) throw new Error('Failed to load milestones');
+      if (!res.ok) throw new Error("Failed to load milestones");
       return res.json();
     },
     enabled: !!learnerId,

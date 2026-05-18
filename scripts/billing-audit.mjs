@@ -60,18 +60,13 @@ if (!existsSync(pkgPath)) {
 
 // --- 2. Webhook idempotency -----------------------------------------
 
-const webhookPath = join(
-  repoRoot,
-  "services/billing-svc/src/routes/webhooks.ts",
-);
+const webhookPath = join(repoRoot, "services/billing-svc/src/routes/webhooks.ts");
 if (!existsSync(webhookPath)) {
   errors.push("services/billing-svc/src/routes/webhooks.ts missing.");
 } else {
   const src = readFileSync(webhookPath, "utf8");
   if (!/stripe_webhook_events/.test(src) && !/stripeWebhookEvents/.test(src)) {
-    errors.push(
-      "webhooks.ts: must dedupe via stripe_webhook_events insert (no in-memory dedup).",
-    );
+    errors.push("webhooks.ts: must dedupe via stripe_webhook_events insert (no in-memory dedup).");
   }
 }
 
@@ -138,8 +133,7 @@ for (const root of ROOTS) {
       // The route may delegate via lib/billing/* helpers. Accept that.
       // We only flag routes that gate something paid without any
       // entitlement check at all.
-      const looksGating =
-        /tutorSku|tutorKey|tutor_id|tutorId|isEntitled|entitlement/i.test(src);
+      const looksGating = /tutorSku|tutorKey|tutor_id|tutorId|isEntitled|entitlement/i.test(src);
       if (looksGating) {
         errors.push(
           `${rel}: handles a tutor / entitlement value but does not call the billing-entitlements evaluator. Reach evaluateTutorEntitlement().`,

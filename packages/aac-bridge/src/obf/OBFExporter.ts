@@ -7,9 +7,7 @@ import { validateOBF } from "./OBFImporter.js";
 
 function buildGrid(items: SymbolItem[], rows: number, cols: number): object {
   // Initialise order matrix with nulls.
-  const order: (string | null)[][] = Array.from({ length: rows }, () =>
-    Array(cols).fill(null),
-  );
+  const order: (string | null)[][] = Array.from({ length: rows }, () => Array(cols).fill(null));
 
   for (const item of items) {
     const r = item.position.row;

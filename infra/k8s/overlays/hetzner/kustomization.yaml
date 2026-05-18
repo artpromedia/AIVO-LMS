@@ -32,7 +32,7 @@ commonAnnotations:
   deployment.kubernetes.io/platform: hetzner
   prometheus.io/scrape: "true"
 
-#  Images: GHCR instead of GCR 
+#  Images: GHCR instead of GCR
 # Tags are set dynamically by CI/CD:
 #   kustomize edit set image aivo/<svc>=ghcr.io/artpromedia/aivo-<svc>:<tag>
 images:
@@ -126,7 +126,7 @@ images:
     newName: ghcr.io/artpromedia/aivo-gamification-svc
     newTag: latest
 
-  #  Python AI/ML Services 
+  #  Python AI/ML Services
   #  Heavy (large model loading)
   - name: aivo/training-svc
     newName: ghcr.io/artpromedia/aivo-training-svc
@@ -191,7 +191,7 @@ images:
     newName: ghcr.io/artpromedia/aivo-curriculum-py-svc
     newTag: latest
 
-  #  Web Frontend Applications 
+  #  Web Frontend Applications
   - name: aivo/web-learner
     newName: ghcr.io/artpromedia/aivo-web-learner
     newTag: latest
@@ -221,7 +221,7 @@ images:
     newTag: latest
 
 patches:
-  #  ConfigMap: NODE_ENV=production 
+  #  ConfigMap: NODE_ENV=production
   - target:
       kind: ConfigMap
     patch: |-
@@ -229,7 +229,7 @@ patches:
         path: /data/NODE_ENV
         value: "production"
 
-  #  All services: imagePullSecrets for GHCR 
+  #  All services: imagePullSecrets for GHCR
   - target:
       kind: Deployment
     patch: |-
@@ -238,7 +238,7 @@ patches:
         value:
           - name: ghcr-pull-secret
 
-  #  Resource limits (right-sized for i7-8700 servers) 
+  #  Resource limits (right-sized for i7-8700 servers)
   # Default: conservative for most services
   - target:
       kind: Deployment
@@ -256,7 +256,7 @@ patches:
         path: /spec/template/spec/containers/0/resources/limits/memory
         value: "512Mi"
 
-  #  AI Orchestrator: more resources (handles LLM response streaming) 
+  #  AI Orchestrator: more resources (handles LLM response streaming)
   - target:
       kind: Deployment
       name: ai-orchestrator
@@ -274,7 +274,7 @@ patches:
         path: /spec/template/spec/containers/0/resources/limits/memory
         value: "2Gi"
 
-  #  Replica counts 
+  #  Replica counts
   - target:
       kind: Deployment
       name: auth-svc
@@ -304,7 +304,7 @@ patches:
         path: /spec/replicas
         value: 2
 
-  #  Web Frontend Replicas (high-traffic apps get 2 replicas) 
+  #  Web Frontend Replicas (high-traffic apps get 2 replicas)
   - target:
       kind: Deployment
       name: web-learner
@@ -327,9 +327,9 @@ patches:
         path: /spec/replicas
         value: 2
 
-  # 
+  #
   # Python AI/ML Services  Tiered Resource Allocation
-  # 
+  #
   #
   #  HEAVY: Load large models (PyTorch, transformers)  pin to i9-9900K
   #  MEDIUM: Smaller models (scikit-learn, sentence-transformers)
@@ -338,7 +338,7 @@ patches:
   # Total Python budget: ~5.5 CPU cores, ~23.5 Gi RAM (requests)
   # Both app servers have 8+ cores and 128GB RAM  plenty of headroom.
 
-  #   HEAVY: training-svc (DKT LSTM + phi-2 LoRA fine-tuning ~5GB) 
+  #   HEAVY: training-svc (DKT LSTM + phi-2 LoRA fine-tuning ~5GB)
   - target:
       kind: Deployment
       name: training-svc
@@ -361,7 +361,7 @@ patches:
         value:
           aivo.ai/workload: ml-heavy
 
-  #   HEAVY: vision-analysis-svc (TrOCR + EasyOCR + MediaPipe) 
+  #   HEAVY: vision-analysis-svc (TrOCR + EasyOCR + MediaPipe)
   - target:
       kind: Deployment
       name: vision-analysis-svc
@@ -384,7 +384,7 @@ patches:
         value:
           aivo.ai/workload: ml-heavy
 
-  #   HEAVY: accessibility-ai-svc (local Whisper + Coqui TTS) 
+  #   HEAVY: accessibility-ai-svc (local Whisper + Coqui TTS)
   - target:
       kind: Deployment
       name: accessibility-ai-svc
@@ -407,7 +407,7 @@ patches:
         value:
           aivo.ai/workload: ml-heavy
 
-  #   HEAVY: question-generation-svc (T5 + Bloom classifier) 
+  #   HEAVY: question-generation-svc (T5 + Bloom classifier)
   - target:
       kind: Deployment
       name: question-generation-svc
@@ -430,7 +430,7 @@ patches:
         value:
           aivo.ai/workload: ml-heavy
 
-  #   MEDIUM: speech-analysis-svc (CNN+BiLSTM PyTorch) 
+  #   MEDIUM: speech-analysis-svc (CNN+BiLSTM PyTorch)
   - target:
       kind: Deployment
       name: speech-analysis-svc
@@ -445,7 +445,7 @@ patches:
             cpu: "1000m"
             memory: "2Gi"
 
-  #   MEDIUM: writing-assessment-svc 
+  #   MEDIUM: writing-assessment-svc
   - target:
       kind: Deployment
       name: writing-assessment-svc
@@ -460,7 +460,7 @@ patches:
             cpu: "1000m"
             memory: "2Gi"
 
-  #   MEDIUM: content-intelligence-svc 
+  #   MEDIUM: content-intelligence-svc
   - target:
       kind: Deployment
       name: content-intelligence-svc
@@ -475,7 +475,7 @@ patches:
             cpu: "1000m"
             memory: "2Gi"
 
-  #   MEDIUM: knowledge-graph-svc 
+  #   MEDIUM: knowledge-graph-svc
   - target:
       kind: Deployment
       name: knowledge-graph-svc
@@ -490,7 +490,7 @@ patches:
             cpu: "1000m"
             memory: "2Gi"
 
-  #   MEDIUM: multimodal-analytics-svc 
+  #   MEDIUM: multimodal-analytics-svc
   - target:
       kind: Deployment
       name: multimodal-analytics-svc
@@ -505,7 +505,7 @@ patches:
             cpu: "1500m"
             memory: "3Gi"
 
-  #   MEDIUM: ml-recommendation-svc 
+  #   MEDIUM: ml-recommendation-svc
   - target:
       kind: Deployment
       name: ml-recommendation-svc
@@ -520,7 +520,7 @@ patches:
             cpu: "1000m"
             memory: "1Gi"
 
-  #   MEDIUM: document-intelligence-svc 
+  #   MEDIUM: document-intelligence-svc
   - target:
       kind: Deployment
       name: document-intelligence-svc
@@ -535,7 +535,7 @@ patches:
             cpu: "1000m"
             memory: "1Gi"
 
-  #   MEDIUM: peer-learning-svc 
+  #   MEDIUM: peer-learning-svc
   - target:
       kind: Deployment
       name: peer-learning-svc
@@ -550,7 +550,7 @@ patches:
             cpu: "1000m"
             memory: "1Gi"
 
-  #   MEDIUM: grading-engine 
+  #   MEDIUM: grading-engine
   - target:
       kind: Deployment
       name: grading-engine
@@ -565,7 +565,7 @@ patches:
             cpu: "1000m"
             memory: "1Gi"
 
-  #   LIGHT: ai-inference-svc (external API proxy only) 
+  #   LIGHT: ai-inference-svc (external API proxy only)
   - target:
       kind: Deployment
       name: ai-inference-svc
@@ -580,7 +580,7 @@ patches:
             cpu: "500m"
             memory: "512Mi"
 
-  #   LIGHT: brain-engine (numpy/scipy math) 
+  #   LIGHT: brain-engine (numpy/scipy math)
   - target:
       kind: Deployment
       name: brain-engine
@@ -595,7 +595,7 @@ patches:
             cpu: "500m"
             memory: "512Mi"
 
-  #   LIGHT: python-api-gateway 
+  #   LIGHT: python-api-gateway
   - target:
       kind: Deployment
       name: python-api-gateway
@@ -610,7 +610,7 @@ patches:
             cpu: "500m"
             memory: "512Mi"
 
-  #   LIGHT: specialized-support-svc 
+  #   LIGHT: specialized-support-svc
   - target:
       kind: Deployment
       name: specialized-support-svc
@@ -625,7 +625,7 @@ patches:
             cpu: "500m"
             memory: "512Mi"
 
-  #   LIGHT: rl-tutoring-svc 
+  #   LIGHT: rl-tutoring-svc
   - target:
       kind: Deployment
       name: rl-tutoring-svc
@@ -640,7 +640,7 @@ patches:
             cpu: "500m"
             memory: "512Mi"
 
-  #   LIGHT: cognitive-load-svc 
+  #   LIGHT: cognitive-load-svc
   - target:
       kind: Deployment
       name: cognitive-load-svc
@@ -655,7 +655,7 @@ patches:
             cpu: "500m"
             memory: "1Gi"
 
-  #   LIGHT: curriculum-py-svc 
+  #   LIGHT: curriculum-py-svc
   - target:
       kind: Deployment
       name: curriculum-py-svc
@@ -670,7 +670,7 @@ patches:
             cpu: "500m"
             memory: "512Mi"
 
-  #  Schedule TypeScript app pods on app/ml nodes (not database node) 
+  #  Schedule TypeScript app pods on app/ml nodes (not database node)
   # Python ML services already have nodeSelector targeting aivo-ml1
   - target:
       kind: Deployment

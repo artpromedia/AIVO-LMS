@@ -25,7 +25,13 @@ export async function POST(req: Request): Promise<NextResponse> {
     const body = await req.json().catch(() => null);
     const parsed = schema.safeParse(body);
     if (!parsed.success) {
-      return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." }, requestId);
+      return fail(
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
+        requestId,
+      );
     }
     const rec = createControlEvidence({
       controlId: parsed.data.controlId,
@@ -35,7 +41,9 @@ export async function POST(req: Request): Promise<NextResponse> {
       collectedByUserId: session!.userId,
     });
     if (!rec) return fail({ ...ERRORS.NOT_FOUND, message: "Control not found." }, requestId);
-    audit(session!, "security.evidence.collected", requestId, { metadata: { evidenceId: rec.id, controlId: rec.controlId } });
+    audit(session!, "security.evidence.collected", requestId, {
+      metadata: { evidenceId: rec.id, controlId: rec.controlId },
+    });
     return ok({ evidence: rec }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

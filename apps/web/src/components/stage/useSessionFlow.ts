@@ -1,6 +1,10 @@
 "use client";
 import { useCallback, useRef, useState } from "react";
-import type { LearnerSurfaceSpec, SurfaceResponse, SurfaceTelemetryEvent } from "@aivo/learner-surfaces";
+import type {
+  LearnerSurfaceSpec,
+  SurfaceResponse,
+  SurfaceTelemetryEvent,
+} from "@aivo/learner-surfaces";
 import type { Beat, SessionPhase, SessionState, FunctioningLevel } from "./types";
 import type { TutorKey } from "@aivo/brand";
 import { SESSION_DURATIONS } from "./types";
@@ -287,9 +291,10 @@ export function useSessionFlow(
           // tutor-svc for recommendation candidates derived from the
           // rolling window. No demo fallback — silent on network
           // failure so the stage UI keeps running.
-          const mode = typeof (d as { mode?: unknown }).mode === "string"
-            ? ((d as { mode: string }).mode)
-            : "exact";
+          const mode =
+            typeof (d as { mode?: unknown }).mode === "string"
+              ? (d as { mode: string }).mode
+              : "exact";
           const sample: RecommendationSampleInternal = {
             surfaceId: entry.surfaceId,
             occurredAt: new Date().toISOString(),
@@ -300,11 +305,8 @@ export function useSessionFlow(
               misconceptions: entry.misconceptions,
               mode,
             },
-            durationMs:
-              typeof response.durationMs === "number" ? response.durationMs : undefined,
-            inkStrokeCount: Array.isArray(response.inkStrokes)
-              ? response.inkStrokes.length
-              : 0,
+            durationMs: typeof response.durationMs === "number" ? response.durationMs : undefined,
+            inkStrokeCount: Array.isArray(response.inkStrokes) ? response.inkStrokes.length : 0,
             geometryActionCount: Array.isArray(response.geometryActions)
               ? response.geometryActions.length
               : 0,

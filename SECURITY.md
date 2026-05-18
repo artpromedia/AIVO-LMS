@@ -67,11 +67,11 @@ necessary, and audit access logs for misuse.
 
 ## Supported Versions
 
-| Version              | Supported          |
-| -------------------- | ------------------ |
-| `main` (latest)      | :white_check_mark: |
-| Most recent release  | :white_check_mark: |
-| Older releases       | :x:                |
+| Version             | Supported          |
+| ------------------- | ------------------ |
+| `main` (latest)     | :white_check_mark: |
+| Most recent release | :white_check_mark: |
+| Older releases      | :x:                |
 
 ## Coordinated Disclosure
 

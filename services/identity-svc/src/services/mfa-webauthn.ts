@@ -35,9 +35,15 @@ const DEFAULT_PROD_ORIGINS = [
   "https://district.aivolearning.com",
 ];
 
-export function getExpectedOrigin(req: { headers: Record<string, string | string[] | undefined> }): string[] {
+export function getExpectedOrigin(req: {
+  headers: Record<string, string | string[] | undefined>;
+}): string[] {
   const fromEnv = process.env.WEBAUTHN_ORIGINS;
-  if (fromEnv) return fromEnv.split(",").map((s) => s.trim()).filter(Boolean);
+  if (fromEnv)
+    return fromEnv
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
 
   // Production: strict static allow-list only. We deliberately do NOT
   // derive an origin from request headers — that would let a bad
@@ -74,7 +80,7 @@ export async function signWebauthnChallenge(opts: {
 
 export async function verifyWebauthnChallengeToken(
   token: string,
-  expectedPurpose: "register" | "login"
+  expectedPurpose: "register" | "login",
 ): Promise<{ userId: string; challenge: string }> {
   const payload = await verifyJWT<WebauthnChallengeJWT>(token);
   if (payload.purpose !== `webauthn-${expectedPurpose}`) {

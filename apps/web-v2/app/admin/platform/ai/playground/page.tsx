@@ -32,25 +32,22 @@ export default async function Page() {
           <p className="font-display text-lg font-semibold">How it works</p>
           <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm text-aivo-ink-soft">
             <li>
-              Your prompt is screened by the safety pipeline (prompt-injection,
-              crisis, age-appropriateness) before any LLM is called.
+              Your prompt is screened by the safety pipeline (prompt-injection, crisis,
+              age-appropriateness) before any LLM is called.
             </li>
             <li>
-              If allowed, the request is sent through the standard fallback
-              chain (Claude Opus 4.7 → Gemini 3.0 Pro → GPT-5.5).
+              If allowed, the request is sent through the standard fallback chain (Claude Opus 4.7 →
+              Gemini 3.0 Pro → GPT-5.5).
             </li>
+            <li>Responses are passed back through output moderation before being returned here.</li>
             <li>
-              Responses are passed back through output moderation before being
-              returned here.
-            </li>
-            <li>
-              Every playground call is attributed to your platform-admin
-              session in the AI cost ledger.
+              Every playground call is attributed to your platform-admin session in the AI cost
+              ledger.
             </li>
           </ol>
           <p className="mt-4 text-xs text-aivo-ink-soft">
-            Playground responses are <span className="font-medium">not</span>{" "}
-            persisted to learner-facing surfaces.
+            Playground responses are <span className="font-medium">not</span> persisted to
+            learner-facing surfaces.
           </p>
         </Card>
       </div>

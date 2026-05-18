@@ -2,12 +2,13 @@
 
 This document captures the cross-cutting security posture of the AIVO
 Learning Platform. It is intentionally short and operational — it tells
-operators *what is true today* and *what they must do* to keep PII safe
+operators _what is true today_ and _what they must do_ to keep PII safe
 in production.
 
 ## 1. Authentication & Authorization
 
 ### 1.1 End-user authentication
+
 - All user sessions begin at `identity-svc` via password login or OAuth
   (Google, Apple, Clever, ClassLink).
 - JWTs are signed RS256 with keys loaded from `JWT_PRIVATE_KEY` /
@@ -18,6 +19,7 @@ in production.
   production; `sameSite=lax`.
 
 ### 1.2 Multi-Factor Authentication (MFA)
+
 - **TOTP** (RFC 6238) is the primary second factor. Secrets are stored
   AES-GCM-encrypted in `users.totp_secret_encrypted`; the key comes
   from `MFA_ENCRYPTION_KEY` (KMS-wrapped in production).
@@ -31,19 +33,20 @@ in production.
   rate-limited to 3 resends per code with a 10-minute TTL.
 - Roles in `MFA_FORCED_ROLES` (platform admins, district admins, etc.)
   cannot disable MFA; tenants can additionally flip
-  `featureOverrides.forceMfa` to require MFA for *all* tenant staff.
+  `featureOverrides.forceMfa` to require MFA for _all_ tenant staff.
 - Login emits an `mfaPending` token if MFA is required, and the
   frontend exchanges it on `/verify-mfa` for a real access token +
   refresh cookie.
 
 ### 1.3 Service-to-service authentication
+
 - Internal microservice calls (brain-svc → learning-svc, tutor-svc →
   learning-svc, etc.) authenticate with a shared secret:
   - Header: `x-service-token: ${INTERNAL_SERVICE_TOKEN}`
   - Optional: `x-internal-service: <caller name>` for log tracing.
 - `learning-svc` and `tutor-svc` enforce this via a global `onRequest`
-  hook (`registerAuthHook` in `lib/tenant.ts`) that requires *either* a
-  valid JWT *or* a matching service token. Health and Swagger paths are
+  hook (`registerAuthHook` in `lib/tenant.ts`) that requires _either_ a
+  valid JWT _or_ a matching service token. Health and Swagger paths are
   the only exclusions.
 - **Production requirement:** `INTERNAL_SERVICE_TOKEN` MUST be set to a
   long random string (>= 32 bytes). In dev, services fall back to a
@@ -51,6 +54,7 @@ in production.
   unblocked; the fallback is disabled when `NODE_ENV=production`.
 
 ### 1.4 Tenant isolation
+
 - `requireLearnerAccess()` in `services/*/lib/tenant.ts` is the strict
   guard for any learner-scoped read or mutation. It looks up the
   learner's `tenantId` and rejects callers whose JWT `tenantId` does not
@@ -60,6 +64,7 @@ in production.
   `/api/learning/gradebook/update` has been removed.
 
 ### 1.5 Step-Up Authentication
+
 - Sensitive operations (user delete, password reset, data export, evidence
   bundle download, district-admin management) require a fresh proof of
   presence even when the session is already authenticated.
@@ -75,6 +80,7 @@ in production.
   control reference — do not reuse one scope for an unrelated action.
 
 ### 1.6 SAML SSO + SCIM provisioning
+
 - Per-tenant SAML 2.0 federation backed by `samlsso` table; signed
   responses required, NameID = email.
 - SCIM 2.0 endpoints under `/scim/v2/*` accept per-tenant bearer tokens
@@ -84,11 +90,12 @@ in production.
 - All SCIM mutations (Users + Groups create/update/deprovision) write
   to `admin_audit_log` with `actor_role = "SCIM"` and the originating
   tenant's id, so deprovisioning shows up in evidence bundles
-  (CC6.3 — *least privilege & timely deprovisioning*).
+  (CC6.3 — _least privilege & timely deprovisioning_).
 
 ## 2. Encryption
 
 ### 2.1 In transit
+
 - Public traffic terminates TLS at the deployment edge (Replit Deployments
   proxy / Cloudflare).
 - All cross-service HTTP calls are made over the platform's mTLS-protected
@@ -100,20 +107,21 @@ The following columns hold sensitive personally identifiable information
 or authentication material and rely on database-level encryption at rest.
 Operators MUST ensure the underlying storage is encrypted (see 2.3).
 
-| Table              | Column(s)                              | Sensitivity        |
-|--------------------|----------------------------------------|--------------------|
-| `users`            | `email`, `name`, `passwordHash`, `lastLoginIp` | PII + secret |
-| `users`            | `mfaEnabled`, `mfaMethod`              | Authentication metadata |
-| `learners`         | `name`, `dateOfBirth`, `iepData`, `accommodations` | Child PII (FERPA / COPPA) |
-| `mfaCodes`         | `code`                                 | Short-lived auth secret |
-| `sessions`         | `refreshToken`                         | Stored hashed (`hashRefreshToken`) |
-| `consentRecords`   | `parentName`, `parentEmail`, `signature` | PII |
-| `gradebookEntries` | `learnerId`, `masteryScore`            | FERPA-protected academic record |
-| `lessonSessions`   | `learnerId`, `brainContextSnapshot`, `sessionData` | FERPA-protected |
-| `brainStates`      | `functioning_level_profile`, `mastery_levels` | Child PII (FERPA) |
-| `parentMessages`   | `body`, `attachments`                  | Family PII |
+| Table              | Column(s)                                          | Sensitivity                        |
+| ------------------ | -------------------------------------------------- | ---------------------------------- |
+| `users`            | `email`, `name`, `passwordHash`, `lastLoginIp`     | PII + secret                       |
+| `users`            | `mfaEnabled`, `mfaMethod`                          | Authentication metadata            |
+| `learners`         | `name`, `dateOfBirth`, `iepData`, `accommodations` | Child PII (FERPA / COPPA)          |
+| `mfaCodes`         | `code`                                             | Short-lived auth secret            |
+| `sessions`         | `refreshToken`                                     | Stored hashed (`hashRefreshToken`) |
+| `consentRecords`   | `parentName`, `parentEmail`, `signature`           | PII                                |
+| `gradebookEntries` | `learnerId`, `masteryScore`                        | FERPA-protected academic record    |
+| `lessonSessions`   | `learnerId`, `brainContextSnapshot`, `sessionData` | FERPA-protected                    |
+| `brainStates`      | `functioning_level_profile`, `mastery_levels`      | Child PII (FERPA)                  |
+| `parentMessages`   | `body`, `attachments`                              | Family PII                         |
 
 ### 2.3 At rest — database
+
 - Application code does **not** add column-level encryption. Sensitive
   PII (emails, learner names, MFA codes, password hashes) lives in
   Postgres and depends on the storage layer for encryption at rest.
@@ -132,6 +140,7 @@ Operators MUST ensure the underlying storage is encrypted (see 2.3).
   `hashPassword` in `@aivo/security`.
 
 ### 2.3 At rest — object storage
+
 - Family / integrations exports go to S3. Buckets MUST be configured
   with default SSE-S3 (or SSE-KMS for stricter tenants).
 - Bucket policies must deny public read; access is via short-lived
@@ -154,13 +163,13 @@ Operators MUST ensure the underlying storage is encrypted (see 2.3).
 
 `.github/workflows/security-scan.yml` runs on every PR and on `main`:
 
-| Gate              | Tool             | Failing severity              |
-|-------------------|------------------|-------------------------------|
-| JS dep audit      | `pnpm audit`     | HIGH or CRITICAL              |
-| Python dep audit  | `pip-audit`      | Any (strict mode)             |
-| Filesystem CVE    | Trivy            | CRITICAL (SARIF for HIGH)     |
-| Secrets in git    | TruffleHog       | Any verified finding          |
-| Python SAST       | Bandit           | HIGH severity + HIGH confidence |
+| Gate             | Tool         | Failing severity                |
+| ---------------- | ------------ | ------------------------------- |
+| JS dep audit     | `pnpm audit` | HIGH or CRITICAL                |
+| Python dep audit | `pip-audit`  | Any (strict mode)               |
+| Filesystem CVE   | Trivy        | CRITICAL (SARIF for HIGH)       |
+| Secrets in git   | TruffleHog   | Any verified finding            |
+| Python SAST      | Bandit       | HIGH severity + HIGH confidence |
 
 A `security-summary` aggregator job re-runs at the end and fails the
 workflow if any individual gate failed, producing a markdown summary in

@@ -8,15 +8,15 @@
 }
 
 @theme {
-  --color-primary: #7C3AED;
-  --color-primary-light: #A78BFA;
-  --color-primary-dark: #5B21B6;
-  --color-secondary: #06B6D4;
-  --color-accent: #F59E0B;
-  --color-surface: #F8FAFC;
-  --color-surface-hover: #F1F5F9;
-  --font-heading: var(--font-fredoka), 'Fredoka', sans-serif;
-  --font-body: var(--font-nunito), 'Nunito', sans-serif;
+  --color-primary: #7c3aed;
+  --color-primary-light: #a78bfa;
+  --color-primary-dark: #5b21b6;
+  --color-secondary: #06b6d4;
+  --color-accent: #f59e0b;
+  --color-surface: #f8fafc;
+  --color-surface-hover: #f1f5f9;
+  --font-heading: var(--font-fredoka), "Fredoka", sans-serif;
+  --font-body: var(--font-nunito), "Nunito", sans-serif;
 
   --animate-fade-in: fade-in 0.5s ease-out forwards;
   --animate-scale-in: scale-in 0.4s ease-out forwards;
@@ -32,51 +32,115 @@
 }
 
 @keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes scale-in {
-  from { opacity: 0; transform: scale(0.8); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 @keyframes slide-up {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes bounce-in {
-  0% { opacity: 0; transform: scale(0.3); }
-  50% { transform: scale(1.05); }
-  70% { transform: scale(0.95); }
-  100% { opacity: 1; transform: scale(1); }
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 @keyframes pulse-gentle {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 @keyframes glow {
-  0%, 100% { box-shadow: 0 0 5px rgba(255,255,255,0.2); }
-  50% { box-shadow: 0 0 20px rgba(255,255,255,0.4); }
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+  }
 }
 @keyframes bounce-gentle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
 }
 @keyframes ping-slow {
-  0% { transform: scale(1); opacity: 0.4; }
-  100% { transform: scale(1.4); opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
 }
 @keyframes blob {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -40px) scale(1.05); }
-  66% { transform: translate(-20px, 20px) scale(0.95); }
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -40px) scale(1.05);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.95);
+  }
 }
 @keyframes float-slow {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 /* ============================================================
@@ -131,36 +195,100 @@
    and other prominent surfaces. Older browsers see rgba(), newer
    browsers continue to use Tailwind's color-mix() output. */
 @supports not (background: color-mix(in oklab, red, blue)) {
-  .bg-white\/80 { background-color: rgba(255,255,255,0.8); }
-  .bg-white\/70 { background-color: rgba(255,255,255,0.7); }
-  .bg-white\/60 { background-color: rgba(255,255,255,0.6); }
-  .bg-white\/50 { background-color: rgba(255,255,255,0.5); }
-  .bg-white\/30 { background-color: rgba(255,255,255,0.3); }
-  .bg-white\/20 { background-color: rgba(255,255,255,0.2); }
-  .bg-white\/10 { background-color: rgba(255,255,255,0.1); }
-  .bg-white\/85 { background-color: rgba(255,255,255,0.85); }
-  .text-white\/90 { color: rgba(255,255,255,0.9); }
-  .text-white\/80 { color: rgba(255,255,255,0.8); }
-  .text-white\/70 { color: rgba(255,255,255,0.7); }
-  .text-white\/60 { color: rgba(255,255,255,0.6); }
-  .text-white\/50 { color: rgba(255,255,255,0.5); }
-  .border-white\/40 { border-color: rgba(255,255,255,0.4); }
-  .border-white\/30 { border-color: rgba(255,255,255,0.3); }
-  .border-white\/25 { border-color: rgba(255,255,255,0.25); }
-  .border-white\/20 { border-color: rgba(255,255,255,0.2); }
-  .border-white\/10 { border-color: rgba(255,255,255,0.1); }
-  .bg-black\/50 { background-color: rgba(0,0,0,0.5); }
-  .bg-black\/40 { background-color: rgba(0,0,0,0.4); }
-  .bg-black\/30 { background-color: rgba(0,0,0,0.3); }
-  .bg-black\/20 { background-color: rgba(0,0,0,0.2); }
-  .bg-emerald-500\/30 { background-color: rgba(16,185,129,0.3); }
-  .bg-emerald-500\/20 { background-color: rgba(16,185,129,0.2); }
-  .bg-emerald-400\/30 { background-color: rgba(52,211,153,0.3); }
-  .border-emerald-400\/40 { border-color: rgba(52,211,153,0.4); }
-  .border-emerald-400\/30 { border-color: rgba(52,211,153,0.3); }
-  .bg-purple-600\/30 { background-color: rgba(147,51,234,0.3); }
-  .bg-purple-900\/40 { background-color: rgba(88,28,135,0.4); }
-  .bg-purple-900\/50 { background-color: rgba(88,28,135,0.5); }
-  .shadow-purple-900\/40 { box-shadow: 0 25px 50px -12px rgba(88,28,135,0.4); }
-  .shadow-purple-800\/50 { box-shadow: 0 25px 50px -12px rgba(107,33,168,0.5); }
+  .bg-white\/80 {
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+  .bg-white\/70 {
+    background-color: rgba(255, 255, 255, 0.7);
+  }
+  .bg-white\/60 {
+    background-color: rgba(255, 255, 255, 0.6);
+  }
+  .bg-white\/50 {
+    background-color: rgba(255, 255, 255, 0.5);
+  }
+  .bg-white\/30 {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+  .bg-white\/20 {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  .bg-white\/10 {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  .bg-white\/85 {
+    background-color: rgba(255, 255, 255, 0.85);
+  }
+  .text-white\/90 {
+    color: rgba(255, 255, 255, 0.9);
+  }
+  .text-white\/80 {
+    color: rgba(255, 255, 255, 0.8);
+  }
+  .text-white\/70 {
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .text-white\/60 {
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .text-white\/50 {
+    color: rgba(255, 255, 255, 0.5);
+  }
+  .border-white\/40 {
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+  .border-white\/30 {
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  .border-white\/25 {
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+  .border-white\/20 {
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+  .border-white\/10 {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  .bg-black\/50 {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  .bg-black\/40 {
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+  .bg-black\/30 {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+  .bg-black\/20 {
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+  .bg-emerald-500\/30 {
+    background-color: rgba(16, 185, 129, 0.3);
+  }
+  .bg-emerald-500\/20 {
+    background-color: rgba(16, 185, 129, 0.2);
+  }
+  .bg-emerald-400\/30 {
+    background-color: rgba(52, 211, 153, 0.3);
+  }
+  .border-emerald-400\/40 {
+    border-color: rgba(52, 211, 153, 0.4);
+  }
+  .border-emerald-400\/30 {
+    border-color: rgba(52, 211, 153, 0.3);
+  }
+  .bg-purple-600\/30 {
+    background-color: rgba(147, 51, 234, 0.3);
+  }
+  .bg-purple-900\/40 {
+    background-color: rgba(88, 28, 135, 0.4);
+  }
+  .bg-purple-900\/50 {
+    background-color: rgba(88, 28, 135, 0.5);
+  }
+  .shadow-purple-900\/40 {
+    box-shadow: 0 25px 50px -12px rgba(88, 28, 135, 0.4);
+  }
+  .shadow-purple-800\/50 {
+    box-shadow: 0 25px 50px -12px rgba(107, 33, 168, 0.5);
+  }
 }

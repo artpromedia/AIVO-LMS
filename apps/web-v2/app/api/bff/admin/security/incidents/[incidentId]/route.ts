@@ -20,13 +20,25 @@ const patchSchema = z.object({
   customerImpact: z.boolean().optional(),
   regulatorNotificationRequired: z.boolean().optional(),
   // Optional appended timeline note in the same request.
-  note: z.object({
-    kind: z.enum(["detection", "investigation", "mitigation", "communication", "resolution", "note"]),
-    message: z.string().min(1).max(1000),
-  }).optional(),
+  note: z
+    .object({
+      kind: z.enum([
+        "detection",
+        "investigation",
+        "mitigation",
+        "communication",
+        "resolution",
+        "note",
+      ]),
+      message: z.string().min(1).max(1000),
+    })
+    .optional(),
 });
 
-export async function PATCH(req: Request, ctx: { params: Promise<{ incidentId: string }> }): Promise<NextResponse> {
+export async function PATCH(
+  req: Request,
+  ctx: { params: Promise<{ incidentId: string }> },
+): Promise<NextResponse> {
   const requestId = getRequestId(req);
   try {
     const { session, response } = await requireSession(req, requestId);
@@ -40,7 +52,13 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ incidentId: s
     const body = await req.json().catch(() => null);
     const parsed = patchSchema.safeParse(body);
     if (!parsed.success) {
-      return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.issues[0]?.message ?? "Invalid body." }, requestId);
+      return fail(
+        {
+          ...ERRORS.VALIDATION_FAILED,
+          message: parsed.error.issues[0]?.message ?? "Invalid body.",
+        },
+        requestId,
+      );
     }
     const { note, ...patch } = parsed.data;
     const updated = updateIncident(incidentId, patch);

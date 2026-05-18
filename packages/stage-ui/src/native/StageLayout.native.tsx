@@ -5,7 +5,13 @@
  */
 import React from "react";
 import { View, StyleSheet, SafeAreaView, StatusBar, AccessibilityInfo } from "react-native";
-import type { SessionPhase, TutorState, Beat, SensoryAdaptations, FunctioningLevel } from "../types.js";
+import type {
+  SessionPhase,
+  TutorState,
+  Beat,
+  SensoryAdaptations,
+  FunctioningLevel,
+} from "../types.js";
 
 export interface StageLayoutProps {
   phase: SessionPhase;

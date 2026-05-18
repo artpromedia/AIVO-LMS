@@ -38,7 +38,12 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(session!, learnerId, ["child_data_collection"], requestId);
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection"],
+      requestId,
+    );
     if (consentErr) return consentErr;
 
     const learner = getLearner(learnerId, session!.tenantId);
@@ -66,9 +71,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
           subjectSkills.some((s) => s.id === m.skillId),
         );
         if (subjectMasteries.length === 0) return null;
-        const avg =
-          subjectMasteries.reduce((acc, m) => acc + m.score, 0) /
-          subjectMasteries.length;
+        const avg = subjectMasteries.reduce((acc, m) => acc + m.score, 0) / subjectMasteries.length;
         return {
           subjectId: subject.id,
           subjectName: subject.name,
@@ -92,13 +95,13 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     const stats = {
       lessonsCompleted: completedRuns.length,
       totalMinutes: completedRuns.reduce(
-        (acc, r) => acc + (r.completedAt && r.startedAt
-          ? Math.round(
-              (new Date(r.completedAt).getTime() -
-                new Date(r.startedAt).getTime()) /
-                60000,
-            )
-          : 0),
+        (acc, r) =>
+          acc +
+          (r.completedAt && r.startedAt
+            ? Math.round(
+                (new Date(r.completedAt).getTime() - new Date(r.startedAt).getTime()) / 60000,
+              )
+            : 0),
         0,
       ),
       skillsTracked: skillMasteries.length,

@@ -16,7 +16,13 @@ export interface TabsRailProps {
   className?: string;
 }
 
-export function TabsRail({ tabs, activeTab, onTabChange, iconsOnly = false, className = "" }: TabsRailProps) {
+export function TabsRail({
+  tabs,
+  activeTab,
+  onTabChange,
+  iconsOnly = false,
+  className = "",
+}: TabsRailProps) {
   return (
     <div
       className={`flex items-center justify-center gap-1 bg-white/80 backdrop-blur rounded-2xl p-1.5 border border-slate-100 shadow-sm ${className}`}
@@ -33,9 +39,10 @@ export function TabsRail({ tabs, activeTab, onTabChange, iconsOnly = false, clas
             className={`
               inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-heading font-bold text-sm
               transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-purple-400 focus-visible:ring-offset-1
-              ${isActive
-                ? "bg-purple-100 text-purple-700 shadow-sm"
-                : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
+              ${
+                isActive
+                  ? "bg-purple-100 text-purple-700 shadow-sm"
+                  : "text-slate-500 hover:text-slate-700 hover:bg-slate-50"
               }
             `}
             style={{
@@ -44,7 +51,7 @@ export function TabsRail({ tabs, activeTab, onTabChange, iconsOnly = false, clas
             }}
           >
             <span aria-hidden={!iconsOnly && !tab.hideLabel ? "true" : undefined}>{tab.icon}</span>
-            {(iconsOnly || tab.hideLabel) ? (
+            {iconsOnly || tab.hideLabel ? (
               <span className="sr-only">{tab.label}</span>
             ) : (
               <span>{tab.label}</span>

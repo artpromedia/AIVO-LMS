@@ -13,10 +13,7 @@ export { installFatalErrorPager } from "./fatal.js";
 export type { InstallFatalPagerOptions } from "./fatal.js";
 export { bootstrapOpsAlerts } from "./bootstrap.js";
 export type { OpsAlertBootstrap, OpsAlertBootstrapOptions } from "./bootstrap.js";
-export {
-  LegacyOpsAlertClient,
-  createLegacyOpsAlertClient,
-} from "./legacy.js";
+export { LegacyOpsAlertClient, createLegacyOpsAlertClient } from "./legacy.js";
 export type {
   LegacyAlertSeverity,
   LegacyOpsAlert,
