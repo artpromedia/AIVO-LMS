@@ -27,6 +27,7 @@
     "consent:audit": "node scripts/consent-gate-audit.mjs",
     "auth:audit": "node scripts/auth-mode-audit.mjs",
     "curriculum:validate": "node scripts/curriculum-validate.mjs",
+    "curriculum:validate-pack": "tsx scripts/validate-k8-curriculum-pack.ts",
     "onboarding:audit": "node scripts/onboarding-audit.mjs",
     "lessonrun:audit": "node scripts/lessonrun-audit.mjs",
     "route:audit": "node scripts/route-audit.mjs",
