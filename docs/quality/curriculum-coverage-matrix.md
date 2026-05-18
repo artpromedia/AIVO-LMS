@@ -53,6 +53,7 @@ material — far worse than the current honest red.
 ## Recommendation
 
 Open a dedicated content sprint with:
+
 - 1 curriculum designer per subject (Math / ELA / Science / Writing)
 - 1 special-education specialist for accessibility review
 - 1 engineer to wire the authored data into the existing seeds + item

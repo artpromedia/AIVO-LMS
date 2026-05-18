@@ -12,6 +12,7 @@ import {
 import { observeFocus, type FocusSignals } from "../services/focus-monitor.js";
 import { recommendSelfRegulationPrompt } from "../services/self-regulation-recommender.js";
 import { emitHomeworkAudit } from "../lib/audit.js";
+import { persistHomeworkSessionStart } from "../lib/session-store.js";
 
 interface HomeworkSessionRecord {
   id: string;
@@ -38,7 +39,10 @@ function requireSession(id: string): HomeworkSessionRecord {
   return session;
 }
 
-export function registerHomeworkSessionRoutes(app: FastifyInstance): void {
+export function registerHomeworkSessionRoutes(
+  app: FastifyInstance,
+  db: any | null | undefined = null,
+): void {
   app.post<{
     Body: {
       learnerId: string;
@@ -55,8 +59,22 @@ export function registerHomeworkSessionRoutes(app: FastifyInstance): void {
     const adaptation = body.profile
       ? adaptHomeworkForProfile(body.subject, body.topic, body.profile)
       : undefined;
+
+    // Persist to homework_assignments + homework_sessions when a DB
+    // client is available so the practice session survives restart
+    // and is queryable by sibling services. When no DB is wired (tests
+    // / local dev), we use a fresh UUID and accept the in-memory-only
+    // limitation. The server boot refuses production startup without
+    // a database, so this path is only ever reached in test/dev.
+    const persisted = await persistHomeworkSessionStart(db, request, {
+      learnerId: body.learnerId,
+      subject: body.subject,
+      topic: body.topic,
+    });
+    const sessionId = persisted?.sessionId ?? randomUUID();
+
     const session: HomeworkSessionRecord = {
-      id: randomUUID(),
+      id: sessionId,
       learnerId: body.learnerId,
       tenantId: body.tenantId,
       subject: body.subject,
@@ -74,7 +92,11 @@ export function registerHomeworkSessionRoutes(app: FastifyInstance): void {
       tenantId: body.tenantId,
       learnerId: body.learnerId,
       resourceId: session.id,
-      details: { subject: body.subject, topic: body.topic },
+      details: {
+        subject: body.subject,
+        topic: body.topic,
+        persisted: persisted !== undefined,
+      },
     });
     return reply.code(201).send(session);
   });

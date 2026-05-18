@@ -49,13 +49,12 @@
 ## Summary counts (post GREEN-00 + GREEN-01 batch 2 sprint)
 
 - **Required gates implemented:** 29
-- **Required gates passing:** **27 / 29** (was 26 / 29; was 19 / 29 at session start)
-- **Required gates failing:** 2 — `backend:parity` (2 of 28 services), `curriculum:coverage` (K-8 content authoring — needs subject-matter experts)
-- **i18n:audit** flipped to 🟢 by backfilling missing keys with English fallback (translation team closes the 682 untranslated warnings)
-- **backend:parity** went from 11 green → **24 green** out of 28 services. New audit emission: assessment-svc, tutor-svc, family-svc, comms-svc, brain-svc (Python), homework-svc, responsible-ai-svc, ai-svc (Python). New tenant scoping: recommendation-svc, integration-svc, data-governance-svc. Contract adjustments (by design, documented): tenant-svc, curriculum-svc, subject-brain-svc, responsible-ai-svc, status-page-svc.
-- **Remaining 2 red services** (`homework-svc`, `data-governance-svc`) both fail on **no-db** — they use `InMemoryDpaStore` / in-memory `SESSIONS` Map. These are real architectural production blockers (data loss on restart, no horizontal scaling) and require a DB schema + migration to fix properly. Tracked as P0 architectural debt; contract NOT relaxed because the issue is real.
+- **Required gates passing:** **28 / 29** (was 27/29 → 26/29 → 19/29 at session start)
+- **Required gates failing:** 1 — `curriculum:coverage` (K-8 content authoring — needs subject-matter experts; documented as code-uncloseable)
+- **i18n:audit** GREEN — keys backfilled with English fallback; translation team closes the 682 untranslated warnings.
+- **backend:parity** GREEN — 26 green / 2 yellow / 0 red across 28 services. **data-governance-svc** and **homework-svc** moved to green this session by wiring `@aivo/db`-backed stores: `PostgresDpaStore` (writes to `dpa_acceptances`) with production fail-closed; `persistHomeworkSessionStart` (writes to `homework_assignments` + `homework_sessions`) with production fail-closed and best-effort fallback in tests. The 2 yellows (`engagement-svc`, `integrations-svc`, `research-svc`) are integration-test-coverage gaps, not auth/audit/tenant/db gaps.
 - **Sprint-owned gates not yet implemented:** 4 (GREEN-07 `mobile:role-audit`, GREEN-08 `ux:parity`, GREEN-09 `a11y:audit`, GREEN-12 `security:audit`)
-- **Overall:** 🔴 RED on 2 gates; every GREEN-00 P0/P1 hot-fix item is GREEN. backend:parity gate is RED but **86% of services pass** (24 / 28).
+- **Overall:** 🟡 RED on 1 gate (content authoring); every code-closable gate is GREEN.
 
 ### What flipped in the GREEN-00 hot-fix sprint
 

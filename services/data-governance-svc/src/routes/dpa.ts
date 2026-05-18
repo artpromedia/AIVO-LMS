@@ -1,10 +1,30 @@
 import type { FastifyInstance } from "fastify";
 import { emitAuditEvent } from "@aivo/audit-svc";
-import { InMemoryDpaStore, type DpaAcceptanceInput } from "../services/dpa-store.js";
+import {
+  InMemoryDpaStore,
+  selectDpaStore,
+  type DpaAcceptanceInput,
+  type DpaStore,
+} from "../services/dpa-store.js";
 
-const STORE = new InMemoryDpaStore();
+// Default store: in-memory for tests / local dev. Production replaces
+// this via `setDpaStore(...)` at boot with a PostgresDpaStore wrapping
+// the drizzle client constructed from DATABASE_URL.
+let STORE: DpaStore = new InMemoryDpaStore();
 
-export function getDpaStoreForTest(): InMemoryDpaStore {
+/** Override the module-level store. Called from server boot with a
+ *  Postgres-backed implementation when DATABASE_URL is configured. */
+export function setDpaStore(store: DpaStore): void {
+  STORE = store;
+}
+
+/** Initialize the store from a (possibly absent) drizzle client.
+ *  In production with no client, throws — DPA records must persist. */
+export function initDpaStoreFromDb(db: any | null | undefined): void {
+  STORE = selectDpaStore(db);
+}
+
+export function getDpaStoreForTest(): DpaStore {
   return STORE;
 }
 
@@ -22,7 +42,7 @@ export function registerDpaRoutes(app: FastifyInstance): void {
     if (!tenantId) {
       return reply.code(400).send({ error: "tenantId is required (auth context)" });
     }
-    const record = STORE.acceptDpa(body);
+    const record = await Promise.resolve(STORE.acceptDpa(body));
     void emitAuditEvent({
       actorId: body.acceptedById,
       actorRole: body.acceptedByRole,
@@ -40,7 +60,7 @@ export function registerDpaRoutes(app: FastifyInstance): void {
   app.get<{ Params: { districtId: string } }>(
     "/api/dpa/:districtId/latest",
     async (request, reply) => {
-      const record = STORE.latestForDistrict(request.params.districtId);
+      const record = await Promise.resolve(STORE.latestForDistrict(request.params.districtId));
       if (!record) return reply.code(404).send({ error: "No DPA acceptance found" });
       return record;
     },
