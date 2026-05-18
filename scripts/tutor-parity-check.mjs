@@ -138,13 +138,18 @@ for (const key of CANONICAL_TUTORS) {
   }
 }
 
-// Reduced-motion avatar variants. Convention: <key>-reduced.png alongside
-// <key>.png in the same public dir. If the variant is missing, learners
-// who turn on reduced-motion will see the animated avatar — a yellow
-// finding for GREEN-02 deep parity / GREEN-09 a11y.
+// Reduced-motion avatar variants. Accepted conventions, in priority order:
+//   - <key>-reduced.svg   (preferred — static-by-construction, accessible)
+//   - <key>-reduced.png   (designer-authored static variant)
+//   - <key>-static.png    (alternate name some teams use)
+//   - <key>.svg           (only if the SVG is known to be static)
+// Files live alongside <key>.png in the same public dir. If none of the
+// variants exist, learners who turn on reduced-motion will see the
+// animated avatar — a yellow finding for GREEN-02 deep parity / GREEN-09.
 const reducedMotionStatus = new Map();
 for (const tutor of CANONICAL_TUTORS) {
   const found = AVATAR_PUBLIC_DIRS.map((d) =>
+    existsSync(join(repoRoot, d, `${tutor}-reduced.svg`)) ||
     existsSync(join(repoRoot, d, `${tutor}-reduced.png`)) ||
     existsSync(join(repoRoot, d, `${tutor}-static.png`)) ||
     existsSync(join(repoRoot, d, `${tutor}.svg`)),
