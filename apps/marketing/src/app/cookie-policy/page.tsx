@@ -1,4 +1,3 @@
-"use client";
 import { LegalPageLayout } from "@/components/marketing/legal/LegalPageLayout";
 
 export default function CookiePolicyPage() {

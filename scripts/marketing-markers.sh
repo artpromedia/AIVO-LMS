@@ -8,10 +8,16 @@
 # marker, update it here and both checks stay in sync.
 #
 # Coverage (path -> required substrings, asserted case-insensitively):
-#   /                    Hero headline + Footer trust lock badge
-#                        - apps/marketing/src/components/marketing/Hero.tsx
-#                          (i18n marketing.hero.title_line1 -> "Learning
-#                          adventures")
+#   /                    Hero headline + philosophy section + Footer trust lock
+#                        - apps/marketing/src/app/page.tsx
+#                          (Inclusive Lab — Warm hero: "Learning that" and
+#                          "to your child." — the word "adapts" between them
+#                          is wrapped in a gradient/underline span pair for
+#                          the design, so the literal substring
+#                          "Learning that adapts" does not survive in the
+#                          rendered HTML; the two halves on either side of
+#                          the span are stable and equivalent in coverage)
+#                          (philosophy section: "Engineered for the margins")
 #                        - apps/marketing/src/components/marketing/Footer.tsx
 #                          ("COPPA · FERPA · SOC 2")
 #   /privacy-policy      apps/marketing/src/app/privacy-policy/page.tsx
@@ -29,8 +35,8 @@
 #                        FTC's COPPA Rule.
 #   /ferpa-compliance    apps/marketing/src/app/ferpa-compliance/page.tsx
 #                        Must keep the page title ("FERPA Compliance
-#                        Statement") and the SOC 2 Type II audit claim that
-#                        district buyers look for.
+#                        Statement") and the "SOC 2 Trust Services Criteria"
+#                        safeguards language that district buyers look for.
 #
 # Usage (bash):
 #   source "$(dirname "$0")/marketing-markers.sh"
@@ -58,7 +64,9 @@ marketing_markers_for() {
   case "${1:-}" in
     "/")
       printf '%s\n' \
-        "Learning adventures" \
+        "Learning that" \
+        "to your child." \
+        "Engineered for the margins" \
         "COPPA" \
         "FERPA" \
         "SOC 2"
@@ -77,7 +85,7 @@ marketing_markers_for() {
     "/ferpa-compliance")
       printf '%s\n' \
         "FERPA Compliance Statement" \
-        "SOC 2 Type II"
+        "SOC 2 Trust Services Criteria"
       ;;
     *)
       printf 'marketing_markers_for: unknown path %q\n' "${1:-}" >&2

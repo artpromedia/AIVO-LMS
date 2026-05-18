@@ -1,8 +1,10 @@
-import Image from "next/image";
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { WEB_APP_URL } from "@/lib/constants";
 import { Breadcrumbs, breadcrumbJsonLd, type Crumb } from "./Breadcrumbs";
+import { StickyHeader } from "./StickyHeader";
+import { Footer } from "./Footer";
+import { getSensoryModeFromCookies } from "@/lib/sensory-mode.server";
 
 interface LandingFinalCta {
   title: string;
@@ -31,7 +33,17 @@ interface LandingPageLayoutProps {
   finalCta?: LandingFinalCta;
 }
 
-export function LandingPageLayout({
+/**
+ * Shared chrome for ~25 secondary marketing pages (audiences, features,
+ * tutors, levels, subjects, compare, pricing, waitlist, thank-you, …).
+ *
+ * Wraps the page body in the Inclusive Lab — Warm StickyHeader + Footer
+ * so the entire marketing surface inherits the same nav (with the
+ * sensory-mode pill) and footer (with the COPPA · FERPA · SOC 2 lock
+ * badge) as the home page. Server component so it can read the
+ * sensory-mode cookie and forward the initial value to the header.
+ */
+export async function LandingPageLayout({
   badge,
   badgeColor = "#7c3aed",
   title,
@@ -44,8 +56,10 @@ export function LandingPageLayout({
   children,
   finalCta,
 }: LandingPageLayoutProps) {
+  const sensoryMode = await getSensoryModeFromCookies();
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[var(--aivo-color-background,#fdf6ec)]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -53,48 +67,12 @@ export function LandingPageLayout({
         }}
       />
 
-      <header className="bg-white border-b border-slate-100 sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 md:px-8 py-3 flex items-center justify-between">
-          <Link href="/" className="flex items-center" aria-label="AIVO Learning home">
-            <Image
-              src="/images/aivo-logo-purple.png"
-              alt=""
-              width={130}
-              height={40}
-              priority
-              style={{ width: "auto", height: "auto" }}
-            />
-          </Link>
-          <nav className="hidden md:flex items-center gap-6 text-sm font-bold text-slate-600">
-            <Link href="/#features" className="hover:text-primary transition">
-              Features
-            </Link>
-            <Link href="/tutors" className="hover:text-primary transition">
-              Tutors
-            </Link>
-            <Link href="/levels" className="hover:text-primary transition">
-              Levels
-            </Link>
-            <Link href="/#pricing" className="hover:text-primary transition">
-              Pricing
-            </Link>
-            <Link href="/contact" className="hover:text-primary transition">
-              Contact
-            </Link>
-          </nav>
-          <a
-            href={primaryCtaHref}
-            className="px-5 py-2.5 rounded-full bg-primary text-white font-bold hover:bg-primary-dark transition shadow-lg shadow-purple-200 min-h-[44px] inline-flex items-center"
-          >
-            Get Started
-          </a>
-        </div>
-      </header>
+      <StickyHeader initialSensoryMode={sensoryMode} />
 
       <div
         className="relative overflow-hidden py-12 md:py-16"
         style={{
-          background: `linear-gradient(135deg, ${badgeColor}10 0%, ${badgeColor}05 50%, #ffffff 100%)`,
+          background: `linear-gradient(135deg, ${badgeColor}14 0%, ${badgeColor}06 50%, transparent 100%)`,
         }}
       >
         <div className="absolute inset-0 pointer-events-none">
@@ -111,7 +89,7 @@ export function LandingPageLayout({
           >
             {badge}
           </span>
-          <h1 className="text-4xl md:text-5xl font-heading font-bold text-slate-900 mb-4 leading-tight">
+          <h1 className="font-heading text-4xl md:text-5xl font-bold text-slate-900 mb-4 leading-tight">
             {title}
           </h1>
           <p className="text-lg text-slate-600 font-body max-w-2xl mb-6 leading-relaxed">
@@ -120,7 +98,7 @@ export function LandingPageLayout({
           <div className="flex flex-col sm:flex-row gap-3">
             <a
               href={primaryCtaHref}
-              className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-primary to-primary-dark text-white font-bold hover:opacity-95 transition shadow-lg shadow-purple-200 min-h-[44px]"
+              className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[var(--aivo-color-primary,#7c3aed)] text-white font-bold hover:opacity-90 transition shadow-lg shadow-purple-200 min-h-[44px]"
             >
               {primaryCtaLabel}
               <ArrowRight
@@ -130,7 +108,7 @@ export function LandingPageLayout({
             </a>
             <Link
               href={secondaryCtaHref}
-              className="inline-flex items-center justify-center px-7 py-3.5 rounded-full border-2 border-slate-200 bg-white text-slate-700 font-bold hover:bg-slate-50 transition min-h-[44px]"
+              className="inline-flex items-center justify-center px-7 py-3.5 rounded-full border border-slate-200 bg-white text-slate-700 font-bold hover:bg-slate-50 transition min-h-[44px]"
             >
               {secondaryCtaLabel}
             </Link>
@@ -140,9 +118,9 @@ export function LandingPageLayout({
 
       <main className="max-w-4xl mx-auto px-6 md:px-8 py-12 md:py-16 prose-aivo">{children}</main>
 
-      <section className="bg-gradient-to-br from-purple-50 to-white border-t border-slate-100">
+      <section className="bg-white/50 border-t border-slate-200/70">
         <div className="max-w-4xl mx-auto px-6 md:px-8 py-14 text-center">
-          <h2 className="text-2xl md:text-3xl font-heading font-bold text-slate-900 mb-3">
+          <h2 className="font-heading text-2xl md:text-3xl font-bold text-slate-900 mb-3">
             {finalCta?.title ?? "Ready to give every learner a tutor that actually adapts?"}
           </h2>
           <p className="text-slate-600 font-body mb-6 max-w-2xl mx-auto">
@@ -152,14 +130,14 @@ export function LandingPageLayout({
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a
               href={finalCta?.primary.href ?? primaryCtaHref}
-              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-primary to-primary-dark text-white font-bold hover:opacity-95 transition shadow-lg shadow-purple-200 min-h-[44px]"
+              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[var(--aivo-color-primary,#7c3aed)] text-white font-bold hover:opacity-90 transition shadow-lg shadow-purple-200 min-h-[44px]"
             >
               {finalCta?.primary.label ?? primaryCtaLabel}
               <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </a>
             <Link
-              href={finalCta?.secondary.href ?? "/#pricing"}
-              className="inline-flex items-center justify-center px-7 py-3.5 rounded-full border-2 border-slate-200 bg-white text-slate-700 font-bold hover:bg-slate-50 transition min-h-[44px]"
+              href={finalCta?.secondary.href ?? "/pricing"}
+              className="inline-flex items-center justify-center px-7 py-3.5 rounded-full border border-slate-200 bg-white text-slate-700 font-bold hover:bg-slate-50 transition min-h-[44px]"
             >
               {finalCta?.secondary.label ?? "See pricing"}
             </Link>
@@ -167,45 +145,7 @@ export function LandingPageLayout({
         </div>
       </section>
 
-      <footer className="bg-slate-900 py-8">
-        <div className="max-w-6xl mx-auto px-6 md:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-6">
-            <Image
-              src="/images/aivo-logo-white.png"
-              alt="AIVO"
-              width={100}
-              height={30}
-              style={{ width: "auto", height: "auto" }}
-            />
-            <nav className="hidden md:flex items-center gap-4">
-              <Link href="/about" className="text-sm text-slate-400 hover:text-white transition">
-                About
-              </Link>
-              <Link href="/blog" className="text-sm text-slate-400 hover:text-white transition">
-                Blog
-              </Link>
-              <Link href="/contact" className="text-sm text-slate-400 hover:text-white transition">
-                Contact
-              </Link>
-              <Link
-                href="/privacy-policy"
-                className="text-sm text-slate-400 hover:text-white transition"
-              >
-                Privacy
-              </Link>
-              <Link
-                href="/terms-of-service"
-                className="text-sm text-slate-400 hover:text-white transition"
-              >
-                Terms
-              </Link>
-            </nav>
-          </div>
-          <p className="text-sm text-slate-500 font-body">
-            &copy; {new Date().getFullYear()} AIVO Learning Platform
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

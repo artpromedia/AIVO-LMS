@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Fredoka, Nunito } from "next/font/google";
+import "@aivo/brand/tokens.css";
 import "./globals.css";
 import { I18nProvider } from "@/providers/i18n-provider";
 import enMessages from "@/i18n/messages/en.json";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { getSensoryModeFromCookies } from "@/lib/sensory-mode.server";
 
 const fredoka = Fredoka({
   subsets: ["latin"],
@@ -81,9 +83,6 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: BASE_URL,
-    // Note: locales are runtime-switched (no per-locale URLs), so we only
-    // declare x-default + en. When per-locale paths ship (e.g. /es, /fr),
-    // expand this map to include the rest of `locales`.
     languages: {
       "x-default": BASE_URL,
       en: BASE_URL,
@@ -91,9 +90,21 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Server-read the visitor's persisted sensory-mode choice so the very
+  // first paint applies the right CSS variables (no flash of unstyled
+  // content on hard navigation). The cookie is written by the
+  // SensoryModeToggle client component via /api/sensory-mode.
+  const sensoryMode = await getSensoryModeFromCookies();
+
   return (
-    <html lang="en" className={`${fredoka.variable} ${nunito.variable}`} suppressHydrationWarning>
+    <html
+      lang="en"
+      data-brand="inclusive-warm"
+      data-sensory-mode={sensoryMode}
+      className={`${fredoka.variable} ${nunito.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <script
           type="application/ld+json"
@@ -161,7 +172,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className="font-body antialiased bg-white text-slate-800">
+      <body className="font-body antialiased bg-[var(--aivo-color-background,#fdf6ec)] text-slate-800">
         <GoogleAnalytics />
         <I18nProvider initialMessages={enMessages}>{children}</I18nProvider>
       </body>
