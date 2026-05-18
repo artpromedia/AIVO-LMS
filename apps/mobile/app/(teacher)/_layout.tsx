@@ -1,5 +1,5 @@
 import React from "react";
-import { Tabs, router, type Href } from "expo-router";
+import { Tabs, router, usePathname, type Href } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/constants/colors";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -9,11 +9,12 @@ import { RoleTabletShell } from "@/src/components/layout/RoleTabletShell";
 export default function TeacherLayout() {
   const { t } = useTranslation();
   const { isTablet } = useWindowSizeClass();
+  const pathname = usePathname();
   const railDestinations = [
-    { key: "index", label: t("tabs.classroom"), icon: "school" as const, onPress: () => router.push("/(teacher)" as Href) },
-    { key: "lessonPlan", label: t("tabs.lessonPlans"), icon: "document-text" as const, onPress: () => router.push("/(teacher)/lesson-plan" as Href) },
-    { key: "analytics", label: t("tabs.analytics"), icon: "bar-chart" as const, onPress: () => router.push("/(teacher)/analytics" as Href) },
-    { key: "settings", label: t("tabs.settings"), icon: "settings-outline" as const, onPress: () => router.push("/(teacher)/settings" as Href) },
+    { key: "index", label: t("tabs.classroom"), icon: "school" as const, active: pathname === "/(teacher)" || pathname === "/" || pathname === "/(teacher)/index", onPress: () => router.push("/(teacher)" as Href) },
+    { key: "lessonPlan", label: t("tabs.lessonPlans"), icon: "document-text" as const, active: pathname?.includes("/lesson-plan"), onPress: () => router.push("/(teacher)/lesson-plan" as Href) },
+    { key: "analytics", label: t("tabs.analytics"), icon: "bar-chart" as const, active: pathname?.includes("/analytics"), onPress: () => router.push("/(teacher)/analytics" as Href) },
+    { key: "settings", label: t("tabs.settings"), icon: "settings-outline" as const, active: pathname?.includes("/settings"), onPress: () => router.push("/(teacher)/settings" as Href) },
   ];
   return (
     <RoleTabletShell destinations={railDestinations}>

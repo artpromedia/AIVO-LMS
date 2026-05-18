@@ -1,5 +1,5 @@
 import React from "react";
-import { Tabs, router, type Href } from "expo-router";
+import { Tabs, router, usePathname, type Href } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/constants/colors";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -9,10 +9,11 @@ import { RoleTabletShell } from "@/src/components/layout/RoleTabletShell";
 export default function CaregiverLayout() {
   const { t } = useTranslation();
   const { isTablet } = useWindowSizeClass();
+  const pathname = usePathname();
   const railDestinations = [
-    { key: "index", label: t("tabs.home"), icon: "home" as const, onPress: () => router.push("/(caregiver)" as Href) },
-    { key: "notifications", label: t("tabs.alerts"), icon: "notifications" as const, onPress: () => router.push("/(caregiver)/notifications" as Href) },
-    { key: "settings", label: t("tabs.settings"), icon: "settings" as const, onPress: () => router.push("/(caregiver)/settings" as Href) },
+    { key: "index", label: t("tabs.home"), icon: "home" as const, active: pathname === "/(caregiver)" || pathname === "/" || pathname === "/(caregiver)/index", onPress: () => router.push("/(caregiver)" as Href) },
+    { key: "notifications", label: t("tabs.alerts"), icon: "notifications" as const, active: pathname?.includes("/notifications"), onPress: () => router.push("/(caregiver)/notifications" as Href) },
+    { key: "settings", label: t("tabs.settings"), icon: "settings" as const, active: pathname?.includes("/settings"), onPress: () => router.push("/(caregiver)/settings" as Href) },
   ];
   return (
     <RoleTabletShell destinations={railDestinations}>
