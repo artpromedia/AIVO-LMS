@@ -1,0 +1,27 @@
+{
+  "modes": {
+    "theme": {
+      "light": {
+        "surfaceCanvas": "#f9fafb",
+        "surfaceBase": "#ffffff",
+        "textPrimary": "#111827",
+        "textSecondary": "#374151",
+        "border": "#d1d5db"
+      },
+      "dark": {
+        "surfaceCanvas": "#030712",
+        "surfaceBase": "#111827",
+        "textPrimary": "#f9fafb",
+        "textSecondary": "#d1d5db",
+        "border": "#374151"
+      },
+      "high-contrast": {
+        "surfaceCanvas": "#000000",
+        "surfaceBase": "#000000",
+        "textPrimary": "#ffffff",
+        "textSecondary": "#ffffff",
+        "border": "#ffffff"
+      }
+    }
+  }
+}

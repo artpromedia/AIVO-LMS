@@ -7,6 +7,7 @@ export { StatCard } from './StatCard';
 export { EmptyState } from './EmptyState';
 export { LoadingState } from './LoadingState';
 export { TutorCard } from './TutorCard';
+export { MobilePlayfulButton, MobilePlayfulCard } from './PlayfulPrimitives';
 
 export {
   TIER_THEMES_MOBILE,

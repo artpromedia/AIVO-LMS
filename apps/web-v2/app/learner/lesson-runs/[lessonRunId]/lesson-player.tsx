@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { PageHeader } from "@/components/layout/page-header";
+import { AudioControlBar, FocusMode } from "@/components/playful-calm";
 import type {
   AccessibilityPreferences,
   GeneratedLessonPlan,
@@ -345,12 +346,16 @@ export function LessonPlayer({
       />
 
       <div className="mb-4">
+        <AudioControlBar />
+      </div>
+      <div className="mb-4">
         <Progress value={((stepIdx + 1) / beats.length) * 100} />
         <p className="mt-1 text-xs text-aivo-ink-soft" aria-live="polite">
           Step {stepIdx + 1} of {beats.length}
         </p>
       </div>
 
+      <FocusMode title={beat.kind === "check" ? "Knowledge check" : "Lesson focus"}>
       <Card className={`p-6 ${transitionClass}`}>
         {/* Each beat sets aria-live so read-aloud announces it. */}
         <div aria-live="polite" className="space-y-4">
@@ -385,7 +390,7 @@ export function LessonPlayer({
                 </div>
               ) : (
                 <input
-                  className="w-full rounded-md border border-aivo-line p-3"
+                  className="w-full rounded-md border border-aivo-border p-3"
                   placeholder="Type your answer…"
                   value={answer}
                   onChange={(e) => setAnswer(e.target.value)}
@@ -441,7 +446,7 @@ export function LessonPlayer({
                 </div>
               ) : (
                 <input
-                  className="w-full rounded-md border border-aivo-line p-3"
+                  className="w-full rounded-md border border-aivo-border p-3"
                   placeholder="Type your answer…"
                   value={answer}
                   onChange={(e) => setAnswer(e.target.value)}
@@ -494,6 +499,7 @@ export function LessonPlayer({
           </p>
         ) : null}
       </Card>
+      </FocusMode>
     </div>
   );
 }

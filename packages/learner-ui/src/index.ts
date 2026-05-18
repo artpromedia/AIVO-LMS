@@ -63,3 +63,46 @@ export type { SkipLinkProps } from "./a11y/SkipLink";
 
 export { LiveRegion } from "./a11y/LiveRegion";
 export type { LiveRegionProps } from "./a11y/LiveRegion";
+
+export {
+  Button as PlayfulButton,
+  Card as PlayfulCard,
+  Input as PlayfulInput,
+  Select as PlayfulSelect,
+  Checkbox as PlayfulCheckbox,
+  Radio as PlayfulRadio,
+  Switch as PlayfulSwitch,
+  Badge as PlayfulBadge,
+  Chip as PlayfulChip,
+  Tag as PlayfulTag,
+  Avatar as PlayfulAvatar,
+  Modal as PlayfulModal,
+  Sheet as PlayfulSheet,
+  Toast as PlayfulToast,
+  Tooltip as PlayfulTooltip,
+  ProgressBar as PlayfulProgressBar,
+  ProgressRing as PlayfulProgressRing,
+  XPMeter,
+  StreakFlame,
+  Tabs as PlayfulTabs,
+  Accordion as PlayfulAccordion,
+  Stepper as PlayfulStepper,
+} from "./playful-calm/primitives";
+export {
+  LessonCard,
+  TopicGrid,
+  LearningPath,
+  MascotCoach,
+  RewardCelebration,
+  StickerBook,
+  AudioControlBar,
+  AgeModeSwitcher,
+  FocusMode,
+} from "./playful-calm/patterns";
+export { MOTION_VARIANTS } from "./motion/variants";
+export { useSfx } from "./sound/useSfx";
+export {
+  PLAYFUL_CALM_AGE_MODES,
+  resolvePlayfulCalmAgeMode,
+} from "./tokens/playful-calm-modes";
+export type { PlayfulCalmAgeMode } from "./tokens/playful-calm-modes";

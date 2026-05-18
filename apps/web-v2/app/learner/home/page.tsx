@@ -26,6 +26,7 @@ import { readActiveLearnerFromCookies } from "@/lib/auth/active-learner";
 import { audit } from "@/lib/bff/audit";
 import { hasLearnerConsent } from "@/lib/bff/consent-guard";
 import { tryConsumeRateLimit, RATE_LIMITS } from "@/lib/bff/rate-limit";
+import { LearningPath, MascotCoach } from "@/components/playful-calm";
 
 async function startMissionAction(formData: FormData) {
   "use server";
@@ -195,6 +196,22 @@ export default async function LearnerHome({
           )}
         </Card>
       )}
+
+      <SectionHeader title="Learning path" />
+      <LearningPath
+        nodes={[
+          { id: "warmup", label: "Warm up", state: "complete" },
+          { id: "today", label: "Today", state: "current" },
+          { id: "next", label: "Next challenge", state: "locked" },
+        ]}
+      />
+
+      <div className="mt-6">
+        <MascotCoach
+          name="Pip the Fox"
+          tip="Need help? Tap Read aloud and I can guide this step."
+        />
+      </div>
 
       <SectionHeader title="See your progress" />
       <Card className="p-[var(--aivo-density-card-pad)]">

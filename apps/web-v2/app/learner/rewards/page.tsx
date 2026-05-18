@@ -11,6 +11,7 @@ import {
   listQuestProgressForLearner,
   listQuestWorlds,
 } from "@/lib/db/repos";
+import { StickerBook } from "@/components/playful-calm";
 
 export default async function Page() {
   const session = await requirePageRole(["learner"]);
@@ -45,6 +46,9 @@ export default async function Page() {
         title="Rewards"
         description="Track every chapter you've completed across the quest worlds."
       />
+      <div className="mb-4">
+        <StickerBook earned={progress.filter((p) => p.progress >= 1).length} total={Math.max(progress.length, 1)} />
+      </div>
       <div className="grid gap-4 sm:grid-cols-2">
         {worlds.map((w) => {
           const chapters = listQuestChapters(w.id);

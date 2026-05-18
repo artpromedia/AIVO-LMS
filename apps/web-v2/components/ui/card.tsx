@@ -1,12 +1,25 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-export const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
+export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: "flat" | "elevated" | "lesson" | "achievement" | "topic";
+}
+
+const variantClasses: Record<NonNullable<CardProps["variant"]>, string> = {
+  flat: "shadow-none",
+  elevated: "shadow-soft-3",
+  lesson: "shadow-soft-3 bg-[var(--aivo-color-calmSky-50)]",
+  achievement: "shadow-soft-3 bg-[var(--aivo-color-sunshine-50)]",
+  topic: "shadow-soft-3 bg-[var(--aivo-color-lavender-50)]",
+};
+
+export const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, variant = "flat", ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
-        "rounded-[var(--radius-card)] border border-aivo-border bg-aivo-surface shadow-sm",
+        "rounded-[var(--radius-card)] border border-aivo-border bg-aivo-surface",
+        variantClasses[variant],
         className,
       )}
       {...props}

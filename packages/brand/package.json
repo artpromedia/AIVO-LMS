@@ -4,8 +4,19 @@
   "private": true,
   "type": "module",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist", "src", "tokens", "assets", "package.json"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./tokens.css": "./dist/css/tokens.css",
+    "./tokens.json": "./dist/json/tokens.json",
+    "./tailwind-preset": "./dist/tailwind/preset.cjs"
+  },
   "scripts": {
-    "build": "tsc"
+    "build": "node ./scripts/build-tokens.mjs && tsc"
   },
   "devDependencies": {
     "typescript": "^5.7.3"

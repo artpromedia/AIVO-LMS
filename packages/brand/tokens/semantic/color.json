@@ -1,0 +1,15 @@
+{
+  "semantic": {
+    "color": {
+      "surface": {"canvas":"#f9fafb","base":"#ffffff","raised":"#ffffff","sunken":"#f3f4f6"},
+      "text": {"primary":"#111827","secondary":"#374151","muted":"#6b7280","onPrimary":"#ffffff"},
+      "interactive": {
+        "primary": {"default":"#3b82f6","hover":"#2563eb","active":"#1d4ed8","disabled":"#93c5fd"},
+        "secondary": {"default":"#f43f5e","hover":"#e11d48","active":"#be123c","disabled":"#fda4af"},
+        "audio": {"default":"#34d399","hover":"#10b981","active":"#059669","disabled":"#a7f3d0"}
+      },
+      "border": {"subtle":"#e5e7eb","default":"#d1d5db","strong":"#9ca3af","focus":"#3b82f6"},
+      "feedback": {"success":"#10b981","warning":"#f59e0b","error":"#ef4444","info":"#3b82f6"}
+    }
+  }
+}

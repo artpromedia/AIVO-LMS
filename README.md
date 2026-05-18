@@ -25,6 +25,7 @@
 - [Running Tests](#running-tests)
 - [Linting and Formatting](#linting-and-formatting)
 - [Internationalization](#internationalization)
+- [Design Language](#design-language)
 - [Backend Boot Ordering](#backend-boot-ordering)
 - [Deployment](#deployment)
 - [Continuous Integration](#continuous-integration)
@@ -102,6 +103,14 @@ The v2.1 release lands a wide sweep of platform fixes — from the four neurodiv
 - **Code-review feedback** addressed: spelling fixes and env-var naming consistency across services.
 
 All new HTTP routes inherit the platform auth contract (parent-on-own-kid / learner-on-self / TEACHER / ADMIN / service-token), are covered by a 120-rpm `@fastify/rate-limit` global cap on top of per-route token buckets, and ship with unit tests for the pure helpers.
+
+## Design Language
+
+The new **Aivo Playful Calm** design language lives in [`docs/design-language/`](./docs/design-language/README.md), with implementation in:
+
+- `packages/brand` (layered tokens + brand assets)
+- `packages/learner-ui` (playful calm primitives + patterns + motion/sound)
+- `apps/web-v2` (theme/age-mode aware integration)
 
 ## Architecture
 

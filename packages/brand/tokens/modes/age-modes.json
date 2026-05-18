@@ -1,0 +1,30 @@
+{
+  "modes": {
+    "age": {
+      "sprout": {
+        "touchTarget": "56px",
+        "density": "roomy",
+        "radiusScale": 1.2,
+        "fontScale": 1.08,
+        "motionIntensity": 1.1,
+        "contrastTarget": "AAA"
+      },
+      "spark": {
+        "touchTarget": "56px",
+        "density": "comfortable",
+        "radiusScale": 1.0,
+        "fontScale": 1.0,
+        "motionIntensity": 1.0,
+        "contrastTarget": "AA"
+      },
+      "scholar": {
+        "touchTarget": "48px",
+        "density": "compact",
+        "radiusScale": 0.85,
+        "fontScale": 0.95,
+        "motionIntensity": 0.85,
+        "contrastTarget": "AA"
+      }
+    }
+  }
+}
