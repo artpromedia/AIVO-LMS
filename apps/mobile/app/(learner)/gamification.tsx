@@ -1,25 +1,21 @@
 import React from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { router } from "expo-router";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
 import { useEngagement } from "@/hooks/useEngagement";
 import { AivoCard, StatCard, AivoButton } from "@aivo/mobile-ui";
 import { colors, spacing, radius } from "@/constants/colors";
+import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 
 export default function GamificationScreen() {
-  const insets = useSafeAreaInsets();
   const { user, logout } = useAuth();
   const { data: engagement } = useEngagement(user?.id || "");
   const { t } = useTranslation();
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 32 }}
-    >
+    <ResponsiveScreen maxWidth="reading" background={colors.background}>
       <View style={styles.header}>
         <Text style={styles.title}>{t("learnerGamification.title")}</Text>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
@@ -129,12 +125,11 @@ export default function GamificationScreen() {
           style={{ flex: 1 }}
         />
       </View>
-    </ScrollView>
+    </ResponsiveScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: spacing.md },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",

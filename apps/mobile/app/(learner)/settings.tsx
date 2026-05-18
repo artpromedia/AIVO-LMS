@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet, Switch } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { View, Text, Pressable, StyleSheet, Switch } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -10,6 +9,7 @@ import { spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { Card, Button, SensoryToggle } from "@/components/ui";
+import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 
 const STORAGE_KEY = "aivo_learner_prefs_v1";
 
@@ -28,7 +28,6 @@ const DEFAULT_PREFS: LearnerPrefs = {
 };
 
 export default function LearnerSettingsScreen() {
-  const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const { user } = useAuth();
   const palette = useSensoryPalette();
@@ -83,14 +82,7 @@ export default function LearnerSettingsScreen() {
   );
 
   return (
-    <ScrollView
-      style={[styles.container, { backgroundColor: palette.bgPage }]}
-      contentContainerStyle={{
-        paddingTop: insets.top + 16,
-        paddingBottom: 32,
-        paddingHorizontal: spacing.md,
-      }}
-    >
+    <ResponsiveScreen maxWidth="reading" background={palette.bgPage}>
       <View style={styles.header}>
         <Pressable
           onPress={() => router.back()}
@@ -186,12 +178,11 @@ export default function LearnerSettingsScreen() {
         size="lg"
         style={{ marginTop: spacing.md }}
       />
-    </ScrollView>
+    </ResponsiveScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
   header: {
     flexDirection: "row",
     alignItems: "center",

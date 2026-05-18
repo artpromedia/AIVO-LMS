@@ -39,8 +39,23 @@ import "./_group.css";
  *  - Amplified display headline matching `useResponsiveType` on the
  *    `expanded` size class (≈+50%).
  */
+type SensoryMode = "standard" | "calm" | "highContrast";
+type Orientation = "landscape" | "portrait";
+
+const SENSORY_MODES: { id: SensoryMode; label: string }[] = [
+  { id: "standard", label: "Standard" },
+  { id: "calm", label: "Calm" },
+  { id: "highContrast", label: "High contrast" },
+];
+
+const ORIENTATIONS: { id: Orientation; label: string; width: number; height: number }[] = [
+  { id: "landscape", label: "Landscape", width: 1180, height: 820 },
+  { id: "portrait", label: "Portrait", width: 820, height: 1180 },
+];
+
 export function Tablet() {
-  const [mode, setMode] = useState<"standard" | "calm">("standard");
+  const [mode, setMode] = useState<SensoryMode>("standard");
+  const [orientation, setOrientation] = useState<Orientation>("landscape");
 
   const railItems = [
     { icon: Map, label: "World Map", active: true },
@@ -61,12 +76,57 @@ export function Tablet() {
     { icon: "🎵", name: "Lyric", domain: "Music" },
   ];
 
+  const orient = ORIENTATIONS.find((o) => o.id === orientation)!;
+  const modeClass =
+    mode === "calm" ? "sensory-calm" : mode === "highContrast" ? "high-contrast" : "";
+  const isPortrait = orientation === "portrait";
+
   return (
-    <div
-      className={`aivo-inclusive-warm relative w-full h-full bg-background text-foreground overflow-hidden flex font-sans transition-colors duration-500 border shadow-2xl ${
-        mode === "calm" ? "sensory-calm" : ""
-      }`}
-    >
+    <div className="flex flex-col gap-4 items-center w-full">
+      {/* QA control strip — lets reviewers enumerate every form-factor x
+          sensory-mode combination from a single mockup canvas tile. */}
+      <div className="flex flex-wrap items-center gap-3 px-4 py-3 rounded-2xl border bg-card text-foreground shadow-sm">
+        <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          Sensory
+        </span>
+        {SENSORY_MODES.map((m) => (
+          <button
+            key={m.id}
+            onClick={() => setMode(m.id)}
+            className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
+              mode === m.id
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-muted/70"
+            }`}
+          >
+            {m.label}
+          </button>
+        ))}
+        <span className="w-px h-5 bg-border mx-1" />
+        <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          Orientation
+        </span>
+        {ORIENTATIONS.map((o) => (
+          <button
+            key={o.id}
+            onClick={() => setOrientation(o.id)}
+            className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
+              orientation === o.id
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-muted/70"
+            }`}
+          >
+            {o.label}
+          </button>
+        ))}
+      </div>
+
+      <div
+        style={{ width: orient.width, height: orient.height }}
+        className={`aivo-inclusive-warm relative bg-background text-foreground overflow-hidden flex font-sans transition-colors duration-500 border shadow-2xl rounded-2xl ${modeClass} ${
+          isPortrait ? "flex-col" : "flex-row"
+        }`}
+      >
       {/* Fake iPad status bar — fixed top, full width */}
       <div className="absolute top-0 left-0 right-0 h-8 px-6 flex items-center justify-between text-foreground text-[13px] font-semibold z-50 bg-transparent">
         <span>9:41</span>
@@ -77,47 +137,59 @@ export function Tablet() {
         </div>
       </div>
 
-      {/* Persistent left navigation rail (drawer variant — 240dp) */}
-      <aside className="w-60 shrink-0 bg-card border-r flex flex-col pt-12 pb-4 px-3 gap-1">
-        <div className="px-3 mb-4 flex items-center gap-3">
+      {/* Persistent navigation — drawer (240dp) in landscape, compact
+          rail (84dp) in portrait so the content column keeps a
+          generous reading width. */}
+      <aside
+        className={`shrink-0 bg-card border-r flex flex-col pt-12 pb-4 px-3 gap-1 ${
+          isPortrait ? "w-20 items-center" : "w-60"
+        }`}
+      >
+        <div className={`mb-4 flex items-center gap-3 ${isPortrait ? "px-0 flex-col" : "px-3"}`}>
           <div className="w-10 h-10 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center font-bold text-lg shadow-inner">
             A
           </div>
-          <div>
-            <p className="font-bold text-sm leading-tight">Alex</p>
-            <p className="text-[11px] font-semibold text-muted-foreground">Level 3 Explorer</p>
-          </div>
+          {!isPortrait && (
+            <div>
+              <p className="font-bold text-sm leading-tight">Alex</p>
+              <p className="text-[11px] font-semibold text-muted-foreground">Level 3 Explorer</p>
+            </div>
+          )}
         </div>
         {railItems.map((item) => {
           const Icon = item.icon;
           return (
             <button
               key={item.label}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+              className={`flex items-center rounded-xl text-sm font-semibold transition-colors ${
+                isPortrait ? "flex-col gap-1 py-2 w-14" : "gap-3 px-3 py-2.5"
+              } ${
                 item.active
                   ? "bg-primary/10 text-primary"
                   : "text-muted-foreground hover:bg-muted"
               }`}
             >
               <Icon className="w-5 h-5" />
-              <span>{item.label}</span>
+              <span className={isPortrait ? "text-[10px]" : ""}>{item.label}</span>
             </button>
           );
         })}
-        <div className="mt-auto pt-4 border-t">
-          <button
-            onClick={() => setMode((m) => (m === "standard" ? "calm" : "standard"))}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-muted-foreground hover:bg-muted"
-          >
-            <Eye className={`w-5 h-5 ${mode === "calm" ? "text-primary" : ""}`} />
-            <span>{mode === "calm" ? "Calm mode" : "Standard mode"}</span>
-          </button>
+        <div className="mt-auto pt-4 border-t w-full">
+          <div className={`flex items-center gap-2 px-3 py-2 ${isPortrait ? "justify-center" : ""}`}>
+            <Eye className={`w-5 h-5 ${mode !== "standard" ? "text-primary" : "text-muted-foreground"}`} />
+            {!isPortrait && (
+              <span className="text-xs font-semibold text-muted-foreground capitalize">
+                {mode === "highContrast" ? "High contrast" : mode}
+              </span>
+            )}
+          </div>
         </div>
       </aside>
 
-      {/* Main scrollable area — centered 1080dp content column */}
+      {/* Main scrollable area — centered 1080dp content column.
+          Portrait drops to 720dp reading cap. */}
       <main className="flex-1 overflow-y-auto pt-12">
-        <div className="max-w-[1080px] mx-auto px-8 pb-12">
+        <div className={`mx-auto px-8 pb-12 ${isPortrait ? "max-w-[720px]" : "max-w-[1080px]"}`}>
           {/* Hero — amplified display ramp */}
           <section className="mb-8">
             <div
@@ -278,6 +350,7 @@ export function Tablet() {
           </div>
         </div>
       </main>
+      </div>
     </div>
   );
 }

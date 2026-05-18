@@ -169,10 +169,6 @@ exposeLocalhost = true
 localPort = 8222
 externalPort = 3002
 
-[[ports]]
-localPort = 5173
-externalPort = 5173
-
 [userenv]
 
 [userenv.development]

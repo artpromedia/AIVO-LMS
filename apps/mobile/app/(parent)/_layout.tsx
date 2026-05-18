@@ -1,19 +1,57 @@
 import React from "react";
-import { Tabs, router, type Href } from "expo-router";
+import { Tabs, router, usePathname, type Href } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/constants/colors";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useAuth } from "@/hooks/useAuth";
+import { useParentInbox } from "@/hooks/useParentInbox";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { RoleTabletShell } from "@/src/components/layout/RoleTabletShell";
 
 export default function ParentLayout() {
   const { t } = useTranslation();
   const { isTablet } = useWindowSizeClass();
+  const { user } = useAuth();
+  const { data: inbox } = useParentInbox(user?.id ?? "");
+  const unreadCount = inbox?.unreadCount ?? 0;
+  const pathname = usePathname();
   const railDestinations = [
-    { key: "home", label: t("tabs.home"), icon: "home" as const, onPress: () => router.push("/(parent)" as Href) },
-    { key: "inbox", label: t("tabs.inbox"), icon: "mail" as const, onPress: () => router.push("/(parent)/recommendations" as Href) },
-    { key: "tutors", label: t("tabs.tutors"), icon: "school" as const, onPress: () => router.push("/(parent)/tutors" as Href) },
-    { key: "settings", label: t("tabs.settings"), icon: "settings" as const, onPress: () => router.push("/(parent)/settings" as Href) },
+    {
+      key: "home",
+      label: t("tabs.home"),
+      icon: "home" as const,
+      active: pathname === "/(parent)" || pathname === "/" || pathname === "/(parent)/index",
+      onPress: () => router.push("/(parent)" as Href),
+    },
+    {
+      key: "inbox",
+      label: t("tabs.inbox"),
+      icon: "mail" as const,
+      badge: unreadCount,
+      active: pathname?.includes("/recommendations") || pathname?.includes("/inbox"),
+      onPress: () => router.push("/(parent)/recommendations" as Href),
+    },
+    {
+      key: "tutors",
+      label: t("tabs.tutors"),
+      icon: "school" as const,
+      active: pathname?.includes("/tutors"),
+      onPress: () => router.push("/(parent)/tutors" as Href),
+    },
+    {
+      key: "billing",
+      label: t("parent.billing"),
+      icon: "card-outline" as const,
+      active: pathname?.includes("/billing"),
+      onPress: () => router.push("/(parent)/billing" as Href),
+    },
+    {
+      key: "settings",
+      label: t("tabs.settings"),
+      icon: "settings" as const,
+      active: pathname?.includes("/settings"),
+      onPress: () => router.push("/(parent)/settings" as Href),
+    },
   ];
   return (
     <RoleTabletShell destinations={railDestinations}>
