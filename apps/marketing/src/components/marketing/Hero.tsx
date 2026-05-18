@@ -173,7 +173,7 @@ export function Hero({ scrollY }: Readonly<{ scrollY: number }>) {
                   <Flame className="w-6 h-6 fill-current" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">
                     {t("badge_streak")}
                   </p>
                   <p className="text-xl font-heading font-bold text-slate-800">
@@ -195,7 +195,7 @@ export function Hero({ scrollY }: Readonly<{ scrollY: number }>) {
                 className="w-10 h-10 rounded-full object-cover bg-violet-100"
               />
               <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">
                   {t("badge_now_learning")}
                 </p>
                 <p className="text-sm font-heading font-bold text-slate-800">
@@ -222,7 +222,7 @@ export function Hero({ scrollY }: Readonly<{ scrollY: number }>) {
                 />
               </div>
 
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 bg-black/30 backdrop-blur-sm rounded-full px-3 py-2">
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 bg-black/30 backdrop-blur-sm rounded-full px-2 py-1">
                 {SLIDES.map((slide, i) => (
                   <button
                     key={slide.src}
@@ -233,8 +233,13 @@ export function Hero({ scrollY }: Readonly<{ scrollY: number }>) {
                     }}
                     aria-label={`Show slide ${i + 1} of ${SLIDES.length}`}
                     aria-current={i === activeSlide}
-                    className={`h-2 rounded-full transition-all ${i === activeSlide ? "w-6 bg-white" : "w-2 bg-white/60 hover:bg-white/80"}`}
-                  />
+                    className="inline-flex h-6 w-6 items-center justify-center"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={`block h-2 rounded-full transition-all ${i === activeSlide ? "w-6 bg-white" : "w-2 bg-white/60"}`}
+                    />
+                  </button>
                 ))}
                 <button
                   type="button"
@@ -276,7 +281,7 @@ export function Hero({ scrollY }: Readonly<{ scrollY: number }>) {
             {TRUST_CITIES.map((city) => (
               <span
                 key={city}
-                className="flex items-center gap-1.5 text-sm text-slate-400 font-body"
+                className="flex items-center gap-1.5 text-sm text-slate-500 font-body"
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                 {city}

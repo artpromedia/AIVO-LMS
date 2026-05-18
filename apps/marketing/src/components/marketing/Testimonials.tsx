@@ -62,7 +62,7 @@ export function Testimonials() {
               className={`border ${item.color} rounded-3xl p-8 hover:shadow-lg transition-all duration-300`}
             >
               <div className="flex items-center justify-between mb-4">
-                <div className="flex gap-1" aria-label="5 out of 5 stars">
+                <div className="flex gap-1" role="img" aria-label="5 out of 5 stars">
                   {new Array(5).fill(null).map((_, i) => (
                     <svg
                       key={`star-${item.nameKey}-${i}`}
@@ -98,7 +98,7 @@ export function Testimonials() {
             </figure>
           ))}
         </div>
-        <p className="mt-10 text-center text-xs text-slate-400 font-body max-w-2xl mx-auto">
+        <p className="mt-10 text-center text-xs text-slate-500 font-body max-w-2xl mx-auto">
           Quotes shown are from pilot-program educators and families. Names withheld to protect
           learner privacy under FERPA.
         </p>

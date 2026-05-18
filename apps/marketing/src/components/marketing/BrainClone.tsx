@@ -61,7 +61,7 @@ export function BrainClone() {
                 <Brain className="w-6 h-6" aria-hidden="true" />
               </div>
               <div>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                   {t("demo_label")}
                 </p>
                 <p className="font-heading font-bold text-lg">{t("demo_name")}</p>

@@ -273,7 +273,7 @@ export default async function Home() {
 
             <div className="grid md:grid-cols-2 gap-8 md:gap-10 max-w-6xl mx-auto">
               <article className="bg-white border border-slate-200/60 shadow-lg rounded-[2.5rem] p-8 md:p-10">
-                <div className="flex gap-1.5 mb-6" aria-label="5 star rating">
+                <div className="flex gap-1.5 mb-6" role="img" aria-label="5 star rating">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
@@ -300,7 +300,7 @@ export default async function Home() {
               </article>
 
               <article className="bg-white border border-slate-200/60 shadow-lg rounded-[2.5rem] p-8 md:p-10">
-                <div className="flex gap-1.5 mb-6" aria-label="5 star rating">
+                <div className="flex gap-1.5 mb-6" role="img" aria-label="5 star rating">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
@@ -351,7 +351,7 @@ export default async function Home() {
                   >
                     Ready to clone their brilliance?
                   </h2>
-                  <p className="text-white/80 mb-9 text-lg md:text-xl font-medium leading-relaxed">
+                  <p className="text-white mb-9 text-lg md:text-xl font-medium leading-relaxed">
                     Start with a comprehensive baseline assessment. No credit card required for
                     the first 14 days.
                   </p>

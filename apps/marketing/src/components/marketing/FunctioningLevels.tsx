@@ -110,7 +110,7 @@ export function FunctioningLevels() {
                   {[lvl.f1, lvl.f2, lvl.f3].map((fKey) => (
                     <li
                       key={fKey}
-                      className="text-xs text-slate-400 font-body flex items-center gap-1.5 justify-center"
+                      className="text-xs text-slate-500 font-body flex items-center gap-1.5 justify-center"
                     >
                       <span
                         className="w-1 h-1 rounded-full flex-shrink-0"

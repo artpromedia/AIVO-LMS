@@ -16,7 +16,7 @@ export function TrustStrip() {
       className="bg-white border-b border-slate-100 py-8"
     >
       <div className="max-w-6xl mx-auto px-6 md:px-8">
-        <p className="text-center text-xs font-bold uppercase tracking-widest text-slate-400 mb-6">
+        <p className="text-center text-xs font-bold uppercase tracking-widest text-slate-500 mb-6">
           Privacy, security, and accessibility — taken seriously
         </p>
         <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">

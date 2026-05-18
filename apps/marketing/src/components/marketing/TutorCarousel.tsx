@@ -278,13 +278,19 @@ export function TutorCarousel({ tutors }: { tutors: Tutor[] }) {
             <button
               key={tutor.name}
               onClick={() => goTo(i)}
-              className="w-3 h-3 rounded-full transition-all duration-300"
-              style={{
-                backgroundColor: i === activeTutor ? tutor.color : "#CBD5E1",
-                transform: i === activeTutor ? "scale(1.3)" : "scale(1)",
-              }}
+              className="inline-flex w-6 h-6 items-center justify-center rounded-full"
               aria-label={t("go_to", { name: tutor.name })}
-            />
+              aria-current={i === activeTutor}
+            >
+              <span
+                aria-hidden="true"
+                className="block w-3 h-3 rounded-full transition-all duration-300"
+                style={{
+                  backgroundColor: i === activeTutor ? tutor.color : "#CBD5E1",
+                  transform: i === activeTutor ? "scale(1.3)" : "scale(1)",
+                }}
+              />
+            </button>
           ))}
         </div>
       </div>

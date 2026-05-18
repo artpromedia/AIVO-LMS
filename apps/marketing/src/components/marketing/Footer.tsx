@@ -162,9 +162,9 @@ export function Footer() {
 
           {FOOTER_SECTIONS.map((section) => (
             <div key={section.titleKey}>
-              <h4 className="text-sm font-heading font-bold text-slate-900 mb-4">
+              <h3 className="text-sm font-heading font-bold text-slate-900 mb-4">
                 {t(section.titleKey)}
-              </h4>
+              </h3>
               <ul className="space-y-2.5">
                 {section.links.map((link) => (
                   <li key={link.labelKey}>
