@@ -25,8 +25,7 @@ import { fontFamilies } from "@/constants/typography";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { Button as InclusiveButton, SensoryToggle } from "@/components/ui";
 import { AivoLogo } from "@/components/AivoLogo";
-import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
-import { CONTENT_MAX_WIDTH } from "@/src/design/responsive";
+import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 
 async function getAsyncStorage(): Promise<any> {
   try {
@@ -46,8 +45,6 @@ export default function SignupScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const palette = useSensoryPalette();
-  const { width: winWidth } = useWindowSizeClass();
-  const authWidth = Math.min(winWidth - 32, CONTENT_MAX_WIDTH.auth);
   const { signup, loginWithGoogle } = useAuth();
   const [form, setForm] = useState({
     name: "",
@@ -194,14 +191,11 @@ export default function SignupScreen() {
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <ScrollView
-        contentContainerStyle={[
-          styles.container,
-          { paddingTop: insets.top + 20, backgroundColor: palette.bgPage },
-        ]}
-        keyboardShouldPersistTaps="handled"
+      <ResponsiveScreen
+        maxWidth="auth"
+        background={palette.bgPage}
+        contentContainerStyle={{ paddingTop: insets.top + 20, paddingBottom: 32 }}
       >
-        <View style={{ width: authWidth, alignSelf: "center" }}>
         <View style={styles.topRow}>
           <Pressable onPress={() => router.back()} style={styles.backButton} hitSlop={12}>
             <Text style={[styles.backText, { color: palette.primary }]}>{t("common.back")}</Text>
@@ -387,8 +381,7 @@ export default function SignupScreen() {
             {t("auth.haveAccount")} <Text style={styles.loginBold}>{t("auth.signIn")}</Text>
           </Text>
         </Pressable>
-        </View>
-      </ScrollView>
+      </ResponsiveScreen>
     </KeyboardAvoidingView>
   );
 }

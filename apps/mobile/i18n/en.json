@@ -575,6 +575,8 @@
     "letsSolve": "Let's solve this together!",
     "learner": "Learner",
     "loading": "Preparing your session…",
+    "sessionMap": "Session map",
+    "beatLabel": "Beat {{index}}",
     "nav": {
       "map": "Map",
       "brain": "Brain",

@@ -18,8 +18,7 @@ import { INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
 import { fontFamilies } from "@/constants/typography";
 import { useSensoryPalette, useSensoryMode } from "@/context/SensoryModeProvider";
 import { Button, SensoryToggle } from "@/components/ui";
-import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
-import { CONTENT_MAX_WIDTH } from "@/src/design/responsive";
+import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 
 // The learner PIN screen keeps the dark capsule chrome by design
 // (it's a kid-friendly lock screen), but the *accent* color, dot
@@ -30,8 +29,6 @@ export default function PinScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const palette = useSensoryPalette();
-  const { width: winWidth } = useWindowSizeClass();
-  const authWidth = Math.min(winWidth - 32, CONTENT_MAX_WIDTH.auth);
   const { mode } = useSensoryMode();
   const { loginWithPin } = useAuth();
   const [parentId, setParentId] = useState("");
@@ -101,8 +98,14 @@ export default function PinScreen() {
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <View style={[styles.container, { paddingTop: insets.top + 40 }]}>
-          <View style={{ width: authWidth, alignSelf: "center", flex: 1 }}>
+        <ResponsiveScreen
+          maxWidth="auth"
+          scroll={false}
+          applyTopInset={false}
+          background={INCLUSIVE_WARM_PALETTE.darkSurface}
+          style={{ paddingTop: insets.top + 40 }}
+          innerStyle={{ flex: 1 }}
+        >
           <View style={styles.topRow}>
             <Pressable onPress={() => router.back()} style={styles.back} hitSlop={12}>
               <Text style={styles.backText}>{t("common.back")}</Text>
@@ -141,15 +144,20 @@ export default function PinScreen() {
               style={{ marginTop: 16 }}
             />
           </View>
-          </View>
-        </View>
+        </ResponsiveScreen>
       </KeyboardAvoidingView>
     );
   }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + 40 }]}>
-      <View style={{ width: authWidth, alignSelf: "center", flex: 1, alignItems: "center" }}>
+    <ResponsiveScreen
+      maxWidth="auth"
+      scroll={false}
+      applyTopInset={false}
+      background={INCLUSIVE_WARM_PALETTE.darkSurface}
+      style={{ paddingTop: insets.top + 40 }}
+      innerStyle={{ flex: 1, alignItems: "center" }}
+    >
       <View style={styles.topRow}>
         <Pressable
           onPress={() => {
@@ -223,8 +231,7 @@ export default function PinScreen() {
           );
         })}
       </View>
-      </View>
-    </View>
+    </ResponsiveScreen>
   );
 }
 

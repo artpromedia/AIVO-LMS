@@ -15,7 +15,6 @@ import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { Card, HeaderUserChip, SensoryToggle, DarkCapsuleNav } from "@/components/ui";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { CONTENT_MAX_WIDTH, gridColumns, pickBySizeClass } from "@/src/design/responsive";
-import { TabletScaffold } from "@/src/components/layout/TabletScaffold";
 
 export default function LearnerWorldMap() {
   const insets = useSafeAreaInsets();
@@ -27,58 +26,6 @@ export default function LearnerWorldMap() {
   const palette = useSensoryPalette();
 
   const coreTutors = Object.entries(TUTORS).filter(([, t]) => t.tier === "core");
-
-  const railDestinations = [
-    {
-      key: "worldMap",
-      label: t("tabs.worldMap"),
-      icon: "map" as const,
-      active: true,
-      onPress: () => router.push("/(learner)" as Href),
-    },
-    {
-      key: "brain",
-      label: t("tabs.brain"),
-      icon: "bulb" as const,
-      onPress: () => router.push("/(learner)/brain" as Href),
-    },
-    {
-      key: "homework",
-      label: t("learner.homework"),
-      icon: "camera" as const,
-      onPress: () => router.push("/(learner)/homework" as Href),
-    },
-    {
-      key: "quests",
-      label: t("learner.quests"),
-      icon: "compass" as const,
-      onPress: () => router.push("/(learner)/quests" as Href),
-    },
-    {
-      key: "gradebook",
-      label: t("learner.grades"),
-      icon: "bar-chart" as const,
-      onPress: () => router.push("/(learner)/gradebook" as Href),
-    },
-    {
-      key: "shop",
-      label: t("tabs.shop"),
-      icon: "cart" as const,
-      onPress: () => router.push("/(learner)/shop" as Href),
-    },
-    {
-      key: "gamification",
-      label: t("tabs.profile"),
-      icon: "trophy" as const,
-      onPress: () => router.push("/(learner)/gamification" as Href),
-    },
-    {
-      key: "settings",
-      label: t("tabs.settings"),
-      icon: "settings-outline" as const,
-      onPress: () => router.push("/(learner)/settings" as Href),
-    },
-  ];
 
   const cols = gridColumns(sizeClass);
   const cardWidthPct = `${Math.floor(100 / cols) - 2}%` as const;
@@ -126,7 +73,7 @@ export default function LearnerWorldMap() {
       ]
     : [];
 
-  const body = (
+  return (
     <View style={[styles.container, { backgroundColor: palette.bgPage }]}>
       <ScrollView
         contentContainerStyle={{
@@ -351,8 +298,6 @@ export default function LearnerWorldMap() {
       {!isTablet ? <DarkCapsuleNav items={capsuleNavItems} /> : null}
     </View>
   );
-
-  return <TabletScaffold destinations={railDestinations}>{body}</TabletScaffold>;
 }
 
 // ── Small composite primitives used only on this screen ───────────────────

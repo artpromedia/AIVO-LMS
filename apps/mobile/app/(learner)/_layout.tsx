@@ -1,5 +1,5 @@
 import React from "react";
-import { Tabs } from "expo-router";
+import { Tabs, router, usePathname, type Href } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useLearners } from "@/hooks/useLearners";
@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { TierThemeProvider, useTierTheme } from "@aivo/mobile-ui";
 import { SwitchScanOverlay } from "@/src/components/SwitchScanOverlay";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
+import { RoleTabletShell } from "@/src/components/layout/RoleTabletShell";
 
 /**
  * Resolve the active learner's gradeLevel.
@@ -59,12 +60,72 @@ export default function LearnerLayout() {
 function ThemedLearnerTabs() {
   const { t } = useTranslation();
   const { theme } = useTierTheme();
-  // On tablets we hide the bottom tab bar and rely on the per-screen
-  // tablet scaffold to render a navigation rail/sidebar instead. The
-  // <Tabs> navigator stays mounted so deep links keep working — only the
-  // bottom bar UI is suppressed.
+  // On tablets we hide the bottom tab bar and render a persistent
+  // navigation rail at the layout level via RoleTabletShell. The
+  // <Tabs> navigator stays mounted so deep links keep working — only
+  // the bottom bar UI is suppressed.
   const { isTablet } = useWindowSizeClass();
+  const pathname = usePathname();
+  const railDestinations = [
+    {
+      key: "worldMap",
+      label: t("tabs.worldMap"),
+      icon: "map" as const,
+      active: pathname === "/(learner)" || pathname === "/" || pathname === "/(learner)/index",
+      onPress: () => router.push("/(learner)" as Href),
+    },
+    {
+      key: "brain",
+      label: t("tabs.brain"),
+      icon: "bulb" as const,
+      active: pathname?.includes("/brain"),
+      onPress: () => router.push("/(learner)/brain" as Href),
+    },
+    {
+      key: "homework",
+      label: t("learner.homework"),
+      icon: "camera" as const,
+      active: pathname?.includes("/homework"),
+      onPress: () => router.push("/(learner)/homework" as Href),
+    },
+    {
+      key: "quests",
+      label: t("learner.quests"),
+      icon: "compass" as const,
+      active: pathname?.includes("/quests"),
+      onPress: () => router.push("/(learner)/quests" as Href),
+    },
+    {
+      key: "gradebook",
+      label: t("learner.grades"),
+      icon: "bar-chart" as const,
+      active: pathname?.includes("/gradebook"),
+      onPress: () => router.push("/(learner)/gradebook" as Href),
+    },
+    {
+      key: "shop",
+      label: t("tabs.shop"),
+      icon: "cart" as const,
+      active: pathname?.includes("/shop"),
+      onPress: () => router.push("/(learner)/shop" as Href),
+    },
+    {
+      key: "gamification",
+      label: t("tabs.profile"),
+      icon: "trophy" as const,
+      active: pathname?.includes("/gamification"),
+      onPress: () => router.push("/(learner)/gamification" as Href),
+    },
+    {
+      key: "settings",
+      label: t("tabs.settings"),
+      icon: "settings-outline" as const,
+      active: pathname?.includes("/settings"),
+      onPress: () => router.push("/(learner)/settings" as Href),
+    },
+  ];
   return (
+    <RoleTabletShell destinations={railDestinations}>
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -130,5 +191,6 @@ function ThemedLearnerTabs() {
       <Tabs.Screen name="settings" options={{ href: null }} />
       <Tabs.Screen name="leaderboard" options={{ href: null }} />
     </Tabs>
+    </RoleTabletShell>
   );
 }

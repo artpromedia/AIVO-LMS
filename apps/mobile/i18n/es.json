@@ -575,6 +575,8 @@
     "letsSolve": "¡Resolvamos esto juntos!",
     "learner": "Estudiante",
     "loading": "Preparando tu sesión…",
+    "sessionMap": "Mapa de la sesión",
+    "beatLabel": "Ritmo {{index}}",
     "nav": {
       "map": "Mapa",
       "brain": "Cerebro",

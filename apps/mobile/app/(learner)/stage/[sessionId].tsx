@@ -18,6 +18,7 @@ import { useEngagement } from "@/hooks/useEngagement";
 import { apiFetch } from "@/lib/api";
 import { API } from "@/constants/api";
 import { spacing } from "@/constants/colors";
+import { fontFamilies } from "@/constants/typography";
 import { useTierTheme } from "@aivo/mobile-ui";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
@@ -162,7 +163,11 @@ export default function StageScreen() {
     [tierTheme, palette],
   );
   const voice = useMemo(() => buildVoice(tier, t), [tier, t]);
-  const { isTablet } = useWindowSizeClass();
+  const { isTablet, isLandscape, sizeClass } = useWindowSizeClass();
+  const isExpanded = sizeClass === "expanded";
+  // Landscape tablet session-map rail is only shown when there are
+  // enough beats to be worth orienting around.
+  const showSessionMap = isTablet && isLandscape;
 
   const [session, setSession] = useState<Session | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -525,7 +530,16 @@ export default function StageScreen() {
       />
 
       <View style={[styles.stageRow, { flexDirection: isTablet ? "row" : "column" }]}>
-        <View style={styles.stageColumn}>
+        <View
+          style={[
+            styles.stageColumn,
+            // On expanded (≥840dp) tablets, cap the runtime column so
+            // answer-target cards stretch to a comfortable column width
+            // (not the full screen width) — paired with the scratchpad
+            // and session-map rails when those are open.
+            isExpanded && { maxWidth: 720, alignSelf: "center", width: "100%" },
+          ]}
+        >
           <MobileStageRuntime
             theme={theme}
             tier={tier}
@@ -553,6 +567,67 @@ export default function StageScreen() {
         {isTablet && scratchOpen ? (
           <View style={styles.scratchSide}>
             <ScratchPad gridPaper compactToolbar />
+          </View>
+        ) : null}
+
+        {showSessionMap && session ? (
+          <View
+            style={[
+              styles.sessionMapRail,
+              { backgroundColor: palette.bgRaised, borderColor: palette.border },
+            ]}
+            accessibilityLabel={t("learnerStage.sessionMap")}
+          >
+            <Text
+              style={[
+                styles.sessionMapTitle,
+                { color: palette.inkMuted },
+              ]}
+            >
+              {t("learnerStage.sessionMap")}
+            </Text>
+            {session.stagePlan.beats.map((beat, i) => {
+              const isCurrent = i === currentIndex;
+              const isDone = i < currentIndex;
+              return (
+                <View
+                  key={beat.id ?? `beat-${i}`}
+                  style={[
+                    styles.sessionMapItem,
+                    {
+                      backgroundColor: isCurrent ? palette.primary : "transparent",
+                      borderColor: isCurrent ? palette.primary : palette.border,
+                    },
+                  ]}
+                  accessibilityState={{ selected: isCurrent }}
+                >
+                  <View
+                    style={[
+                      styles.sessionMapDot,
+                      {
+                        backgroundColor: isDone
+                          ? palette.primary
+                          : isCurrent
+                            ? palette.primaryFg
+                            : palette.border,
+                      },
+                    ]}
+                  />
+                  <Text
+                    style={[
+                      styles.sessionMapLabel,
+                      {
+                        color: isCurrent ? palette.primaryFg : palette.ink,
+                        fontFamily: isCurrent ? fontFamilies.bodyBold : fontFamilies.bodyRegular,
+                      },
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {t("learnerStage.beatLabel", { index: i + 1 })}
+                  </Text>
+                </View>
+              );
+            })}
           </View>
         ) : null}
       </View>
@@ -587,6 +662,40 @@ function createStyles(bg: string) {
       borderWidth: 1,
       alignItems: "center",
       justifyContent: "center",
+    },
+    sessionMapRail: {
+      width: 200,
+      margin: spacing.md,
+      marginLeft: 0,
+      padding: spacing.md,
+      borderRadius: 16,
+      borderWidth: 1,
+      gap: 6,
+    },
+    sessionMapTitle: {
+      fontSize: 11,
+      fontFamily: "Nunito-Bold",
+      textTransform: "uppercase",
+      letterSpacing: 0.5,
+      marginBottom: 4,
+    },
+    sessionMapItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      paddingVertical: 8,
+      paddingHorizontal: 10,
+      borderRadius: 10,
+      borderWidth: 1,
+    },
+    sessionMapDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+    },
+    sessionMapLabel: {
+      fontSize: 13,
+      flex: 1,
     },
   });
 }
