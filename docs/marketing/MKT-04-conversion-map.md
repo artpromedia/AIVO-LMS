@@ -77,7 +77,7 @@ Columns: **Audience** · **Message** · **Goal** · **Primary CTA** · **Seconda
 - **Product proof**: Today's Mission mockup, LessonRun mockup, Parent + Teacher dashboards
 - **SEO theme**: personalized learning platform; adaptive learning K-12
 - **Internal links**: `/for-parents`, `/for-schools`, `/for-districts`, `/tutors`, `/levels`, `/contact`
-- **Required components**: `HomePageHeroShell`, `AudienceSelector`, `HowItWorks`, `CoreProductLoop`, `TodaysMissionPreview`, `LessonRunPreview`, `RoleVisibility`, `FunctioningLevels`, `BrainClone`, `TutorCarousel`, `TrustStrip`, `Testimonials`, `Pricing`, `FAQ`, `CTASection`, `Footer`
+- **Required components**: `StickyHeader`, `Hero`, `Features`, `AudienceSelector`, `HowItWorks`, `CoreProductLoop`, `TodaysMissionPreview`, `LessonRunPreview`, `RoleVisibility`, `FunctioningLevels`, `BrainClone`, `TutorCarousel`, `TrustStrip`, `Testimonials`, `Pricing`, `FAQ`, `CTASection`, `Footer`
 
 ### `/for-parents`
 

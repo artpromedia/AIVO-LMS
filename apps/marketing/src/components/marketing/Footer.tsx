@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { ArrowRight, CheckCircle2, Loader2, ShieldCheck } from "lucide-react";
-import { WEB_APP_URL } from "@/lib/constants";
 import { trackFormSubmission } from "@/lib/analytics";
 
 function NewsletterSignup() {

@@ -22,9 +22,8 @@ import type { SensoryMode } from "@/lib/sensory-mode";
  * Hosts the sensory-mode pill (standard → calm → high-contrast) so the
  * choice is reachable from every marketing surface.
  *
- * `scrollY` is optional — the old hero shell drove a shadow transition
- * with it; new chrome no longer depends on it but the prop is kept for
- * backwards compatibility with HomePageHeroShell consumers.
+ * `scrollY` is optional and currently unused by the chrome; it is kept
+ * for backwards compatibility with older callers that still pass it.
  */
 export function StickyHeader({
   scrollY = 0,
