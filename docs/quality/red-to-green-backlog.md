@@ -5,6 +5,29 @@
 > P0 (production blocker), P1 (release blocker), P2 (parity gap),
 > P3 (polish). Each item lists the owning sprint.
 
+## ✅ GREEN-00 hot-fix sprint — ALL P0/P1 items closed
+
+These items shipped in the GREEN-00 hot-fix sprint and the corresponding
+gates are now passing:
+
+| ID | Fix | Verification |
+|----|-----|--------------|
+| P0-001 | Added `@eslint/js`, `eslint`, `typescript-eslint`, `vitest` to root `devDependencies`. Cleaned 12 real lint errors uncovered (unused imports, prefer-const, hooks-in-conditional bug in `MobileStageRuntime.tsx`). | `pnpm lint` 37/37 |
+| P0-002 | Fixed `apps/marketing/src/app/compare/page.tsx` to derive card title from `competitor` + `intro` first sentence (no schema change needed). | `pnpm build` 58/58 |
+| P0-003 | `@aivo/sso/dist/index.js` resolves correctly after `pnpm build` populates the workspace artifacts. | `pnpm api:check` passes |
+| P0-004 | Added `apps/web-v2/lib/env.test.ts` with real coverage of the build-phase env relaxation (2 tests). | `pnpm test` 80/80 |
+| P0-005 | Cascade kills disappeared once P0-004 stopped failing. | `pnpm test` 80/80 |
+| P0-006 | `vitest` added to root `devDependencies`. | `pnpm test:production-readiness` 8/8, `pnpm test:enterprise` 14/14 |
+| P1-101 | Ran `pnpm format` repo-wide; added `packages/api-client/src/*-svc.ts` to `.prettierignore` to break a regen ↔ format loop. | `pnpm format:check` passes |
+| P1-105 | Regenerated and committed 9 drifted OpenAPI/client pairs. Fixed engagement-svc duplicate `operationId` collision (added `probeHealthSchema`). | `pnpm api:check` passes |
+
+Additional unscoped fixes shipped in the same sprint:
+- **`apps/web-v2/lib/env.ts`**: NEXT_PHASE-aware strictness so prod schema doesn't fire during `next build`. Runtime validation still rejects misconfigured deployments at first request.
+- **`apps/marketing/src/components/marketing/LandingPageLayout.tsx`**: added optional `finalCta` prop instead of hardcoded closing CTA — supports the pricing / waitlist / thank-you / demo override pattern without parallel layouts.
+- **`scripts/onboarding-audit.mjs`**: relaxed regex to survive prettier line-wrap on long type annotations.
+- **`services/engagement-svc/src/routes/{schemas,health}.ts`**: split health-probe operationIds so OpenAPI spec is valid.
+- **Real bug fix**: `apps/mobile/src/components/learning/MobileStageRuntime.tsx` had 5 hooks called *after* a conditional `return` — violating Rules of Hooks. Restructured to call all hooks unconditionally with internal guards.
+
 ## P0 — Production blockers (block merge / release / pilot)
 
 | ID     | Item                                                                                                                                                                                                                                                                                                        | Owner sprint                | Evidence                                                            |
