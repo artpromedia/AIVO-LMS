@@ -1,0 +1,163 @@
+#!/usr/bin/env node
+// green-check: orchestrates the AIVO_LMS production-readiness gate sequence.
+//
+// Sprint GREEN-00 deliverable. Runs every existing audit/quality gate and
+// reports a single red/yellow/green status. Gates that don't yet have a
+// dedicated script are listed as "not-implemented" so the dashboard reflects
+// reality instead of silently passing.
+
+import { spawnSync } from "node:child_process";
+import { existsSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const repoRoot = resolve(__dirname, "..");
+
+const args = new Set(process.argv.slice(2));
+const fastFail = args.has("--fail-fast");
+const onlyImplemented = args.has("--only-implemented");
+
+// A gate is either:
+//   { name, script: "<pnpm script name>", required: boolean, category }
+//   { name, status: "not-implemented", reason, required, category }
+//
+// `required: true` gates fail the overall run when red.
+// `required: false` gates are reported but don't fail the run yet (used for
+// gates whose script exists but covers a sprint not finished).
+const gates = [
+  // Core gates
+  { name: "format:check", script: "format:check", required: true, category: "core" },
+  { name: "lint", script: "lint", required: true, category: "core" },
+  { name: "test", script: "test", required: true, category: "core" },
+  { name: "build", script: "build", required: true, category: "core" },
+  { name: "api:check", script: "api:check", required: true, category: "core" },
+
+  // Production readiness scanners
+  { name: "prod:no-demo", script: "prod:no-demo", required: true, category: "prod" },
+  { name: "prod:surface-contract", script: "prod:surface-contract", required: true, category: "prod" },
+  { name: "prod:check", script: "prod:check", required: true, category: "prod" },
+  { name: "test:production-readiness", script: "test:production-readiness", required: true, category: "prod" },
+  { name: "test:enterprise", script: "test:enterprise", required: true, category: "prod" },
+
+  // i18n
+  { name: "i18n:audit", script: "i18n:audit", required: true, category: "i18n" },
+
+  // Existing domain audits (GREEN-01 .. GREEN-12 will tighten these)
+  { name: "consent:audit", script: "consent:audit", required: true, category: "consent" },
+  { name: "auth:audit", script: "auth:audit", required: true, category: "auth" },
+  { name: "curriculum:validate", script: "curriculum:validate", required: true, category: "curriculum" },
+  { name: "onboarding:audit", script: "onboarding:audit", required: true, category: "learner-loop" },
+  { name: "lessonrun:audit", script: "lessonrun:audit", required: true, category: "learner-loop" },
+  { name: "route:audit", script: "route:audit", required: true, category: "ux" },
+  { name: "mobile:audit", script: "mobile:audit", required: true, category: "mobile" },
+  { name: "marketing:audit", script: "marketing:audit", required: true, category: "marketing" },
+  { name: "billing:audit", script: "billing:audit", required: true, category: "ops" },
+  { name: "rostering:audit", script: "rostering:audit", required: true, category: "ops" },
+  { name: "comms:audit", script: "comms:audit", required: true, category: "ops" },
+  { name: "ai-safety:audit", script: "ai-safety:audit", required: true, category: "ai" },
+  { name: "accessibility:audit", script: "accessibility:audit", required: true, category: "a11y" },
+  { name: "brand:check", script: "brand:check", required: true, category: "brand" },
+  { name: "repo:health", script: "repo:health", required: true, category: "core" },
+
+  // Gates owned by later sprints. They are reported here so the gap is
+  // visible, but they don't fail the overall run until the sprint that
+  // creates the underlying script lands.
+  {
+    name: "backend:parity",
+    status: "not-implemented",
+    reason: "Owned by Sprint GREEN-01. scripts/backend-parity-check.mjs not yet created.",
+    required: false,
+    category: "backend",
+  },
+  {
+    name: "tutor:parity",
+    status: "not-implemented",
+    reason: "Owned by Sprint GREEN-02. scripts/tutor-parity-check.mjs not yet created.",
+    required: false,
+    category: "tutor",
+  },
+  {
+    name: "mobile:role-audit",
+    status: "not-implemented",
+    reason: "Owned by Sprint GREEN-07. scripts/mobile-role-audit.mjs not yet created. (mobile:audit exists but is a different lens.)",
+    required: false,
+    category: "mobile",
+  },
+  {
+    name: "ux:parity",
+    status: "not-implemented",
+    reason: "Owned by Sprint GREEN-08. scripts/ux-parity-check.mjs not yet created.",
+    required: false,
+    category: "ux",
+  },
+  {
+    name: "a11y:audit",
+    status: "not-implemented",
+    reason: "Owned by Sprint GREEN-09. accessibility:audit script exists but the GREEN-09 a11y:audit lens (axe + keyboard + reduced-motion snapshots) is not yet implemented.",
+    required: false,
+    category: "a11y",
+  },
+  {
+    name: "security:audit",
+    status: "not-implemented",
+    reason: "Owned by Sprint GREEN-12. scripts/security-audit.mjs not yet created.",
+    required: false,
+    category: "security",
+  },
+];
+
+const results = [];
+let hadRequiredFailure = false;
+
+for (const gate of gates) {
+  if (gate.status === "not-implemented") {
+    if (onlyImplemented) continue;
+    results.push({ ...gate, ok: false, skipped: true });
+    continue;
+  }
+
+  process.stdout.write(`\n=== gate: ${gate.name} ===\n`);
+  const child = spawnSync("pnpm", ["run", "-s", gate.script], {
+    cwd: repoRoot,
+    stdio: "inherit",
+    shell: false,
+  });
+  const ok = child.status === 0;
+  results.push({ ...gate, ok, exitCode: child.status });
+  if (!ok && gate.required) {
+    hadRequiredFailure = true;
+    if (fastFail) break;
+  }
+}
+
+// Summary
+const pad = (s, n) => String(s).padEnd(n);
+console.log("\n\n=================== GREEN CHECK SUMMARY ===================");
+console.log(pad("gate", 30), pad("status", 18), pad("required", 10), "category");
+console.log("-".repeat(90));
+for (const r of results) {
+  let status;
+  if (r.skipped) status = "NOT-IMPLEMENTED";
+  else if (r.ok) status = "PASS";
+  else status = "FAIL";
+  console.log(pad(r.name, 30), pad(status, 18), pad(r.required ? "yes" : "no", 10), r.category);
+}
+console.log("-".repeat(90));
+
+const requiredImpl = results.filter((r) => r.required && !r.skipped);
+const requiredPass = requiredImpl.filter((r) => r.ok).length;
+const notImpl = results.filter((r) => r.skipped).length;
+console.log(`required gates: ${requiredPass}/${requiredImpl.length} passing`);
+console.log(`not-implemented gates: ${notImpl} (tracked in docs/quality/red-to-green-backlog.md)`);
+
+if (hadRequiredFailure) {
+  console.log("\nResult: RED. See logs above and docs/quality/green-dashboard.md.");
+  process.exit(1);
+}
+if (notImpl > 0) {
+  console.log("\nResult: YELLOW. Required gates pass but sprint-owned gates are not yet implemented.");
+  process.exit(0);
+}
+console.log("\nResult: GREEN.");
+process.exit(0);

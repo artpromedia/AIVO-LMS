@@ -37,7 +37,8 @@
     "comms:audit": "node scripts/comms-audit.mjs",
     "ai-safety:audit": "node scripts/ai-safety-audit.mjs",
     "accessibility:audit": "node scripts/accessibility-audit.mjs",
-    "release:gate": "node scripts/release-gate.mjs"
+    "release:gate": "node scripts/release-gate.mjs",
+    "green:check": "node scripts/green-check.mjs"
   },
   "devDependencies": {
     "eas-cli": "^18.6.0",
