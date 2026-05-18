@@ -6,6 +6,7 @@ from typing import Optional
 from ..services.llm_gateway import generate_completion
 from ..services.budget_caps import BudgetExceeded
 from ..services.prompt_builder import build_content_generation_prompt, build_tutor_system_prompt
+from ..audit import emit_ai_audit
 from ..services.quality_gate import run_quality_gate
 from ..services.baseline_generator import build_baseline_generation_prompt
 from ..services.responsible_ai_client import evaluate as evaluate_responsible_ai
@@ -108,6 +109,22 @@ async def generate_content(req: ContentRequest):
             "responsible-AI flagged generated content: %s",
             {"severity": rai_result.get("severity"), "subject": req.subject},
         )
+
+    await emit_ai_audit(
+        event_type="AI_CONTENT_GENERATED",
+        tenant_id=req.brain_context.get("tenant_id"),
+        learner_id=req.brain_context.get("learner_id"),
+        details={
+            "model": result.get("model"),
+            "subject": req.subject,
+            "topic": req.topic,
+            "promptTokens": result.get("prompt_tokens"),
+            "completionTokens": result.get("completion_tokens"),
+            "qualityScore": quality.get("score"),
+            "qualityGatePassed": quality.get("passed"),
+            "responsibleAiAllowed": (rai_result or {}).get("allowed", True),
+        },
+    )
 
     return ContentResponse(
         content=result["content"],

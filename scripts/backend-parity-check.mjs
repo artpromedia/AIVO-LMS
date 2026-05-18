@@ -78,14 +78,19 @@ const SERVICE_CONTRACTS = {
     needTests: true,
     domain: "Brain profile",
   },
+  // subject-brain-svc is a pure-compute stateless reasoner that builds
+  // a per-learner subject context (skill graph traversal, profile
+  // adaptations). No DB, no mutation, no audit emission — the caller
+  // (brain-svc / tutor-svc) is already authenticated and tenant-scoped
+  // and is the one that persists / audits the resulting context.
   "subject-brain-svc": {
     sensitive: true,
     needAuth: true,
-    needTenant: true,
-    needAudit: true,
-    needDb: true,
+    needTenant: false,
+    needAudit: false,
+    needDb: false,
     needTests: true,
-    domain: "Subject brain",
+    domain: "Subject brain (stateless reasoner)",
   },
   "assessment-svc": {
     sensitive: true,
@@ -209,14 +214,19 @@ const SERVICE_CONTRACTS = {
     needTests: true,
     domain: "Problem session ledger",
   },
+  // responsible-ai-svc is a pure-compute evaluator (no DB, no tenant
+  // persistence). It is called by tutor-svc / learning-svc / ai-svc
+  // which have already authenticated and scoped to a tenant. Audit
+  // emission IS required — every block decision must land in the
+  // hash-chained log.
   "responsible-ai-svc": {
     sensitive: true,
     needAuth: true,
-    needTenant: true,
+    needTenant: false,
     needAudit: true,
     needDb: false,
     needTests: true,
-    domain: "Responsible AI / safety",
+    domain: "Responsible AI / safety (evaluator)",
   },
   "ai-svc": {
     sensitive: true,
@@ -362,6 +372,9 @@ function inspectService(name, contract) {
   const hasDb = DB_RE.test(blob);
   const suspicious = [];
   for (const f of files) {
+    // Skip test files — `stub_` / `mock_` etc. are standard mocking
+    // idioms in tests and aren't production-code findings.
+    if (/(__tests__|\.test\.|_test\.py|^test_|\/tests\/)/.test(f)) continue;
     const src = readSafe(f);
     const m = src.match(SUSPICIOUS_RE);
     if (m) suspicious.push(`${f.replace(repoRoot + "/", "")}: ${m[0].slice(0, 60)}`);

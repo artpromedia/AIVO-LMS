@@ -9,6 +9,7 @@ import {
   evaluateSurfaceRequirements,
 } from "../services/surface-requirement-evaluator.js";
 import { decideEvaluateOutput } from "../services/escalation-policy.js";
+import { emitResponsibleAiAudit } from "../lib/audit.js";
 
 export function evaluateAll(input: EvaluateInput): EvaluateOutput {
   const text = typeof input.output === "string" ? input.output : JSON.stringify(input.output);
@@ -38,6 +39,37 @@ export function registerEvaluateRoutes(app: FastifyInstance): void {
         .code(400)
         .send({ error: "learnerId, contextType, policyMode, and output are required" });
     }
-    return evaluateAll(body);
+    const result = evaluateAll(body);
+    if (result.recommendedAction !== "allow") {
+      // Every non-allow decision is a safety event worth tracing.
+      // Map RecommendedAction → audit event type; "block" is the only
+      // hard-stop, the others document why the output was rewritten or
+      // escalated for human review.
+      const eventTypeMap: Record<
+        string,
+        "RESPONSIBLE_AI_BLOCKED" | "RESPONSIBLE_AI_REVISED" | "RESPONSIBLE_AI_ESCALATED"
+      > = {
+        block: "RESPONSIBLE_AI_BLOCKED",
+        revise: "RESPONSIBLE_AI_REVISED",
+        escalate: "RESPONSIBLE_AI_ESCALATED",
+      };
+      const eventType = eventTypeMap[result.recommendedAction];
+      if (eventType) {
+        await emitResponsibleAiAudit({
+          request,
+          eventType,
+          learnerId: body.learnerId,
+          contextType: body.contextType,
+          severity: result.severity,
+          violationCodes: result.violations.map((v) => v.code),
+          details: {
+            tutorSku: body.tutorSku,
+            policyMode: body.policyMode,
+            violationCount: result.violations.length,
+          },
+        });
+      }
+    }
+    return result;
   });
 }

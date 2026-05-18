@@ -15,6 +15,52 @@
 Plus: every item declares `skillId`, `standardId`, `gradeBand`, `difficulty`,
 `response type`, `surface spec`, `accessibility affordances`.
 
+## Why this gate is intentionally RED and CANNOT be fixed in code
+
+The curriculum:coverage gate is the one place in the entire green:check
+suite that **cannot be closed by code changes alone**. Each subject /
+grade band needs:
+
+1. **Real standards-aligned skill records** — CCSS-Math for grades 1–8
+   has ~30 skills per grade with prerequisite chains; CCSS-ELA ~25;
+   NGSS Science varies by grade band; CCSS Writing has its own scope
+   and sequence.
+2. **Real item bank** — every skill needs ≥3 items per difficulty band
+   (intro / core / stretch), each with a surface contract, response
+   type, and accessibility affordances per learner profile.
+3. **Subject-matter review** — curriculum designers and special-
+   education specialists need to audit that the items are accurate,
+   age-appropriate, and aligned with the standards they claim.
+
+This is straight content authoring by qualified educators. Generating
+stubs that look like K-8 coverage would directly violate the project's
+"no fake progress" rule and downstream pipelines (baseline generation,
+LessonRun routing, mastery map) would route learners through fabricated
+material — far worse than the current honest red.
+
+## What CAN be done in code (and is tracked separately)
+
+- ✅ Gate exists and correctly fails (this file's parent script:
+  `scripts/curriculum-coverage-check.mjs`).
+- ✅ Item bank infrastructure (`packages/item-bank`) is ready to
+  accept authored items.
+- ✅ Skill-graph infrastructure (`packages/skill-graphs`) accepts new
+  seeds with the same shape as the existing K starters.
+- ✅ `pnpm curriculum:validate` (structural) is green: any new content
+  authored against the existing types will pass the structural check
+  before the coverage check runs.
+
+## Recommendation
+
+Open a dedicated content sprint with:
+- 1 curriculum designer per subject (Math / ELA / Science / Writing)
+- 1 special-education specialist for accessibility review
+- 1 engineer to wire the authored data into the existing seeds + item
+  bank packages
+
+This is the only honest path. Until that sprint lands, this gate
+should remain RED — and that is the right behavior.
+
 ## Actual seeded coverage at snapshot
 
 | Subject | K   | 1   | 2   | 3   | 4   | 5   | 6   | 7   | 8   | Item-bank entries |

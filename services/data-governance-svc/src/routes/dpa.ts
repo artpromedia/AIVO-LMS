@@ -14,6 +14,14 @@ export function registerDpaRoutes(app: FastifyInstance): void {
     if (!body?.districtId || !body?.version || !body?.acceptedById || !body?.acceptedByRole) {
       return reply.code(400).send({ error: "Missing required DPA fields" });
     }
+    // Tenant scope: a DPA acceptance always belongs to a tenant (the
+    // district's account). The enterprise auth hook puts tenantId on
+    // request.auth; refuse the call if it's missing so a record cannot
+    // be filed against the wrong tenant boundary.
+    const tenantId = (request as any).auth?.tenantId ?? null;
+    if (!tenantId) {
+      return reply.code(400).send({ error: "tenantId is required (auth context)" });
+    }
     const record = STORE.acceptDpa(body);
     void emitAuditEvent({
       actorId: body.acceptedById,
