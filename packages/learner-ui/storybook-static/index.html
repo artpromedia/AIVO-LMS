@@ -1,11 +1,1189 @@
 <!doctype html>
-<html><head><meta charset="utf-8"/><title>Aivo Playful Calm Storybook</title>
-<style>body{font-family:Nunito,sans-serif;padding:24px;background:#f9fafb;color:#111827}section{margin-bottom:24px;background:white;border:1px solid #e5e7eb;border-radius:16px;padding:16px} .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px} .chip{padding:8px 12px;border-radius:999px;background:#dbeafe;display:inline-block;margin:4px}</style>
-</head><body>
-<h1>Aivo Playful Calm — Component & Token Gallery</h1>
-<section><h2>Theme switch matrix</h2><p>Light / Dark / High-contrast × Sprout / Spark / Scholar are supported via <code>data-theme</code> and <code>data-age-mode</code>.</p></section>
-<section><h2>Primitives</h2><div class="grid"><div>Button</div><div>Card</div><div>Input</div><div>Select</div><div>Badge</div><div>Tooltip</div><div>ProgressRing</div></div></section>
-<section><h2>Patterns</h2><div class="grid"><div>LessonCard</div><div>TopicGrid</div><div>LearningPath</div><div>MascotCoach</div><div>StickerBook</div><div>FocusMode</div></div></section>
-<section><h2>Mascots</h2><div class="chip">Aivo the Owl</div><div class="chip">Pip the Fox</div><div class="chip">Echo the Whale</div></section>
-<section><h2>Design Tokens</h2><p>Generated tokens are available in <code>@aivo/brand/dist</code>.</p></section>
-</body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Aivo Playful Calm — Storybook</title>
+  <style>
+:root { color-scheme: light; }
+
+:root {
+  --aivo-0: 0px;
+  --aivo-1: 4px;
+  --aivo-2: 8px;
+  --aivo-3: 12px;
+  --aivo-4: 16px;
+  --aivo-5: 20px;
+  --aivo-6: 24px;
+  --aivo-8: 32px;
+  --aivo-10: 40px;
+  --aivo-12: 48px;
+  --aivo-14: 56px;
+  --aivo-16: 64px;
+  --aivo-20: 80px;
+  --aivo-24: 96px;
+  --aivo-calmSky-50: #eff6ff;
+  --aivo-calmSky-100: #dbeafe;
+  --aivo-calmSky-200: #bfdbfe;
+  --aivo-calmSky-300: #93c5fd;
+  --aivo-calmSky-400: #60a5fa;
+  --aivo-calmSky-500: #3b82f6;
+  --aivo-calmSky-600: #2563eb;
+  --aivo-calmSky-700: #1d4ed8;
+  --aivo-calmSky-800: #1e40af;
+  --aivo-calmSky-900: #1e3a8a;
+  --aivo-calmSky-950: #172554;
+  --aivo-sunriseCoral-50: #fff1f2;
+  --aivo-sunriseCoral-100: #ffe4e6;
+  --aivo-sunriseCoral-200: #fecdd3;
+  --aivo-sunriseCoral-300: #fda4af;
+  --aivo-sunriseCoral-400: #fb7185;
+  --aivo-sunriseCoral-500: #f43f5e;
+  --aivo-sunriseCoral-600: #e11d48;
+  --aivo-sunriseCoral-700: #be123c;
+  --aivo-sunriseCoral-800: #9f1239;
+  --aivo-sunriseCoral-900: #881337;
+  --aivo-sunriseCoral-950: #4c0519;
+  --aivo-meadow-50: #ecfdf5;
+  --aivo-meadow-100: #d1fae5;
+  --aivo-meadow-200: #a7f3d0;
+  --aivo-meadow-300: #6ee7b7;
+  --aivo-meadow-400: #34d399;
+  --aivo-meadow-500: #10b981;
+  --aivo-meadow-600: #059669;
+  --aivo-meadow-700: #047857;
+  --aivo-meadow-800: #065f46;
+  --aivo-meadow-900: #064e3b;
+  --aivo-meadow-950: #022c22;
+  --aivo-sunshine-50: #fffbeb;
+  --aivo-sunshine-100: #fef3c7;
+  --aivo-sunshine-200: #fde68a;
+  --aivo-sunshine-300: #fcd34d;
+  --aivo-sunshine-400: #fbbf24;
+  --aivo-sunshine-500: #f59e0b;
+  --aivo-sunshine-600: #d97706;
+  --aivo-sunshine-700: #b45309;
+  --aivo-sunshine-800: #92400e;
+  --aivo-sunshine-900: #78350f;
+  --aivo-sunshine-950: #451a03;
+  --aivo-lavender-50: #f5f3ff;
+  --aivo-lavender-100: #ede9fe;
+  --aivo-lavender-200: #ddd6fe;
+  --aivo-lavender-300: #c4b5fd;
+  --aivo-lavender-400: #a78bfa;
+  --aivo-lavender-500: #8b5cf6;
+  --aivo-lavender-600: #7c3aed;
+  --aivo-lavender-700: #6d28d9;
+  --aivo-lavender-800: #5b21b6;
+  --aivo-lavender-900: #4c1d95;
+  --aivo-lavender-950: #2e1065;
+  --aivo-cloud-0: #ffffff;
+  --aivo-cloud-50: #f9fafb;
+  --aivo-cloud-100: #f3f4f6;
+  --aivo-cloud-200: #e5e7eb;
+  --aivo-cloud-300: #d1d5db;
+  --aivo-cloud-400: #9ca3af;
+  --aivo-cloud-500: #6b7280;
+  --aivo-cloud-600: #4b5563;
+  --aivo-cloud-700: #374151;
+  --aivo-cloud-800: #1f2937;
+  --aivo-cloud-900: #111827;
+  --aivo-cloud-950: #030712;
+  --aivo-status-success: #10b981;
+  --aivo-status-warning: #f59e0b;
+  --aivo-status-error: #ef4444;
+  --aivo-status-info: #3b82f6;
+  --aivo-fontFamily-display: 'Fredoka', 'Nunito', ui-sans-serif, system-ui, sans-serif;
+  --aivo-fontFamily-body: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+  --aivo-fontFamily-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  --aivo-fontFamily-dyslexia: 'OpenDyslexic', 'Comic Sans MS', 'Arial', sans-serif;
+  --aivo-size-xs-fontSize: 0.75rem;
+  --aivo-size-xs-lineHeight: 1.25rem;
+  --aivo-size-xs-letterSpacing: 0.01em;
+  --aivo-size-sm-fontSize: 0.875rem;
+  --aivo-size-sm-lineHeight: 1.375rem;
+  --aivo-size-sm-letterSpacing: 0.005em;
+  --aivo-size-base-fontSize: 1rem;
+  --aivo-size-base-lineHeight: 1.5rem;
+  --aivo-size-base-letterSpacing: 0;
+  --aivo-size-lg-fontSize: 1.125rem;
+  --aivo-size-lg-lineHeight: 1.75rem;
+  --aivo-size-lg-letterSpacing: 0;
+  --aivo-size-xl-fontSize: 1.25rem;
+  --aivo-size-xl-lineHeight: 1.875rem;
+  --aivo-size-xl-letterSpacing: -0.005em;
+  --aivo-size-2xl-fontSize: 1.5rem;
+  --aivo-size-2xl-lineHeight: 2rem;
+  --aivo-size-2xl-letterSpacing: -0.01em;
+  --aivo-size-3xl-fontSize: 1.875rem;
+  --aivo-size-3xl-lineHeight: 2.375rem;
+  --aivo-size-3xl-letterSpacing: -0.015em;
+  --aivo-size-4xl-fontSize: 2.25rem;
+  --aivo-size-4xl-lineHeight: 2.75rem;
+  --aivo-size-4xl-letterSpacing: -0.02em;
+  --aivo-size-5xl-fontSize: 3rem;
+  --aivo-size-5xl-lineHeight: 3.25rem;
+  --aivo-size-5xl-letterSpacing: -0.025em;
+  --aivo-size-6xl-fontSize: 3.75rem;
+  --aivo-size-6xl-lineHeight: 4rem;
+  --aivo-size-6xl-letterSpacing: -0.03em;
+  --aivo-none: 0px;
+  --aivo-sm: 640px;
+  --aivo-md: 768px;
+  --aivo-lg: 1024px;
+  --aivo-xl: 1280px;
+  --aivo-2xl: 1536px;
+  --aivo-pill: 9999px;
+  --aivo-soft-1: 0 2px 6px rgba(59, 130, 246, 0.08);
+  --aivo-soft-2: 0 6px 12px rgba(59, 130, 246, 0.1);
+  --aivo-soft-3: 0 10px 22px rgba(59, 130, 246, 0.12);
+  --aivo-soft-4: 0 16px 30px rgba(59, 130, 246, 0.14);
+  --aivo-soft-5: 0 24px 44px rgba(59, 130, 246, 0.16);
+  --aivo-duration-instant: 0ms;
+  --aivo-duration-fast: 150ms;
+  --aivo-duration-base: 250ms;
+  --aivo-duration-slow: 400ms;
+  --aivo-duration-playful: 600ms;
+  --aivo-easing-ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --aivo-easing-spring-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --aivo-easing-spring-gentle: cubic-bezier(0.22, 1, 0.36, 1);
+  --aivo-base: 0;
+  --aivo-dropdown: 1000;
+  --aivo-sticky: 1100;
+  --aivo-overlay: 1200;
+  --aivo-modal: 1300;
+  --aivo-toast: 1400;
+  --aivo-tooltip: 1500;
+  --aivo-xs: 360px;
+  --aivo-color-surface-canvas: #f9fafb;
+  --aivo-color-surface-base: #ffffff;
+  --aivo-color-surface-raised: #ffffff;
+  --aivo-color-surface-sunken: #f3f4f6;
+  --aivo-color-text-primary: #111827;
+  --aivo-color-text-secondary: #374151;
+  --aivo-color-text-muted: #6b7280;
+  --aivo-color-text-onPrimary: #ffffff;
+  --aivo-color-interactive-primary-default: #3b82f6;
+  --aivo-color-interactive-primary-hover: #2563eb;
+  --aivo-color-interactive-primary-active: #1d4ed8;
+  --aivo-color-interactive-primary-disabled: #93c5fd;
+  --aivo-color-interactive-secondary-default: #f43f5e;
+  --aivo-color-interactive-secondary-hover: #e11d48;
+  --aivo-color-interactive-secondary-active: #be123c;
+  --aivo-color-interactive-secondary-disabled: #fda4af;
+  --aivo-color-interactive-audio-default: #34d399;
+  --aivo-color-interactive-audio-hover: #10b981;
+  --aivo-color-interactive-audio-active: #059669;
+  --aivo-color-interactive-audio-disabled: #a7f3d0;
+  --aivo-color-border-subtle: #e5e7eb;
+  --aivo-color-border-default: #d1d5db;
+  --aivo-color-border-strong: #9ca3af;
+  --aivo-color-border-focus: #3b82f6;
+  --aivo-color-feedback-success: #10b981;
+  --aivo-color-feedback-warning: #f59e0b;
+  --aivo-color-feedback-error: #ef4444;
+  --aivo-color-feedback-info: #3b82f6;
+}
+
+[data-theme="light"] {
+  --aivo-theme-surfaceCanvas: #f9fafb;
+  --aivo-theme-surfaceBase: #ffffff;
+  --aivo-theme-textPrimary: #111827;
+  --aivo-theme-textSecondary: #374151;
+  --aivo-theme-border: #d1d5db;
+}
+
+[data-theme="dark"] {
+  --aivo-theme-surfaceCanvas: #030712;
+  --aivo-theme-surfaceBase: #111827;
+  --aivo-theme-textPrimary: #f9fafb;
+  --aivo-theme-textSecondary: #d1d5db;
+  --aivo-theme-border: #374151;
+}
+
+[data-theme="high-contrast"] {
+  --aivo-theme-surfaceCanvas: #000000;
+  --aivo-theme-surfaceBase: #000000;
+  --aivo-theme-textPrimary: #ffffff;
+  --aivo-theme-textSecondary: #ffffff;
+  --aivo-theme-border: #ffffff;
+}
+
+[data-age-mode="sprout"] {
+  --aivo-age-touchTarget: 56px;
+  --aivo-age-density: roomy;
+  --aivo-age-radiusScale: 1.2;
+  --aivo-age-fontScale: 1.08;
+  --aivo-age-motionIntensity: 1.1;
+  --aivo-age-contrastTarget: AAA;
+}
+
+[data-age-mode="spark"] {
+  --aivo-age-touchTarget: 56px;
+  --aivo-age-density: comfortable;
+  --aivo-age-radiusScale: 1;
+  --aivo-age-fontScale: 1;
+  --aivo-age-motionIntensity: 1;
+  --aivo-age-contrastTarget: AA;
+}
+
+[data-age-mode="scholar"] {
+  --aivo-age-touchTarget: 48px;
+  --aivo-age-density: compact;
+  --aivo-age-radiusScale: 0.85;
+  --aivo-age-fontScale: 0.95;
+  --aivo-age-motionIntensity: 0.85;
+  --aivo-age-contrastTarget: AA;
+}
+
+@media (prefers-reduced-motion: reduce) { :root { --aivo-motion-duration-fast: 0ms; --aivo-motion-duration-base: 0ms; --aivo-motion-duration-slow: 0ms; --aivo-motion-duration-playful: 0ms; } }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--aivo-fontFamily-body, 'Nunito', system-ui, sans-serif);
+  background: var(--aivo-semantic-color-surface-base, #f9fafb);
+  color: var(--aivo-semantic-color-text-primary, #111827);
+  padding: 24px;
+}
+h1, h2, h3 { font-family: var(--aivo-fontFamily-display, 'Fredoka', system-ui, sans-serif); }
+h1 { font-size: 2rem; margin: 0 0 8px; }
+h2 { margin-top: 32px; }
+code { background: rgba(0,0,0,.05); padding: 2px 6px; border-radius: 6px; font-size: 12px; }
+
+.sb-toolbar {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+  background: var(--aivo-semantic-color-surface-raised, #fff);
+  border: 1px solid var(--aivo-semantic-color-border-subtle, #e5e7eb);
+  border-radius: 16px;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  box-shadow: var(--aivo-shadow-soft-1, 0 2px 6px rgba(0,0,0,.06));
+}
+.sb-toolbar fieldset { border: 0; padding: 0; margin: 0; display: flex; gap: 6px; align-items: center; }
+.sb-toolbar legend { font-weight: 700; margin-right: 4px; }
+.sb-toolbar button[aria-pressed="true"] { background: var(--aivo-color-calmSky-500,#3b82f6); color: #fff; border-color: transparent; }
+
+.sb-section {
+  background: var(--aivo-semantic-color-surface-raised, #fff);
+  border: 1px solid var(--aivo-semantic-color-border-subtle, #e5e7eb);
+  border-radius: 24px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+
+.sb-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.sb-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 12px; }
+.sb-card {
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--aivo-semantic-color-surface-base, #f9fafb);
+  border: 1px solid var(--aivo-semantic-color-border-subtle, #e5e7eb);
+}
+
+.sb-palette { margin-bottom: 16px; }
+.sb-palette__grid { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+.sb-swatch { display: flex; gap: 8px; align-items: center; padding: 6px; border-radius: 12px; background: var(--aivo-semantic-color-surface-base,#f9fafb); border: 1px solid var(--aivo-semantic-color-border-subtle,#e5e7eb); }
+.sb-swatch__chip { width: 40px; height: 40px; border-radius: 12px; border: 1px solid rgba(0,0,0,.08); flex: 0 0 40px; }
+.sb-swatch__meta { font-size: 12px; line-height: 1.3; }
+
+.sb-token { display: flex; gap: 12px; align-items: center; padding: 8px; border-radius: 12px; background: var(--aivo-semantic-color-surface-base,#f9fafb); }
+.sb-token__demo { flex: 0 0 auto; }
+
+.sb-mascots { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+.sb-mascot { margin: 0; text-align: center; padding: 8px; border-radius: 16px; background: var(--aivo-semantic-color-surface-base,#f9fafb); border: 1px solid var(--aivo-semantic-color-border-subtle,#e5e7eb); }
+.sb-mascot__art svg { width: 100%; height: auto; max-height: 120px; }
+.sb-mascot figcaption { font-size: 12px; margin-top: 4px; }
+
+/* Playful Calm primitive styles — token-driven */
+.pc-btn {
+  font: inherit; font-weight: 700;
+  min-height: 56px;
+  padding: 0 20px;
+  border-radius: var(--aivo-radius-xl, 24px);
+  background: var(--aivo-semantic-color-interactive-primary-default, #3b82f6);
+  color: var(--aivo-semantic-color-text-onPrimary, #fff);
+  border: 0;
+  cursor: pointer;
+  transition: transform var(--aivo-motion-duration-fast, 150ms) var(--aivo-motion-easing-spring-bounce, cubic-bezier(.34,1.56,.64,1));
+}
+.pc-btn:hover { transform: translateY(-1px); }
+.pc-btn:focus-visible { outline: 3px solid var(--aivo-color-sunshine-400, #fbbf24); outline-offset: 2px; }
+.pc-btn--secondary { background: var(--aivo-semantic-color-interactive-secondary-default, #f43f5e); }
+.pc-btn--ghost     { background: transparent; color: var(--aivo-semantic-color-text-primary,#111827); border: 2px solid var(--aivo-semantic-color-border-default,#d1d5db); }
+.pc-btn--playful   { background: var(--aivo-color-lavender-500, #8b5cf6); }
+.pc-btn--audio     { background: var(--aivo-semantic-color-interactive-audio-default, #34d399); }
+.pc-btn--sm   { min-height: 48px; padding: 0 14px; }
+.pc-btn--lg   { min-height: 60px; padding: 0 22px; font-size: 1.1rem; }
+.pc-btn--xl   { min-height: 64px; padding: 0 26px; font-size: 1.15rem; }
+.pc-btn--hero { min-height: 72px; padding: 0 32px; font-size: 1.25rem; }
+
+.pc-card {
+  border-radius: var(--aivo-radius-xl, 24px);
+  background: var(--aivo-semantic-color-surface-raised, #fff);
+  box-shadow: var(--aivo-shadow-soft-2, 0 6px 12px rgba(59,130,246,.1));
+  border: 1px solid var(--aivo-semantic-color-border-subtle, #e5e7eb);
+}
+
+.pc-field { display: flex; flex-direction: column; gap: 4px; min-width: 180px; }
+.pc-field span { font-weight: 600; font-size: 14px; }
+.pc-input {
+  min-height: 56px;
+  border-radius: var(--aivo-radius-lg, 16px);
+  border: 2px solid var(--aivo-semantic-color-border-default, #d1d5db);
+  padding: 0 16px;
+  background: var(--aivo-semantic-color-surface-raised, #fff);
+  color: var(--aivo-semantic-color-text-primary, #111827);
+  font: inherit;
+}
+.pc-input:focus-visible { outline: 3px solid var(--aivo-color-sunshine-400,#fbbf24); outline-offset: 2px; border-color: var(--aivo-color-calmSky-500,#3b82f6); }
+.pc-checkbox { display: inline-flex; gap: 8px; align-items: center; padding: 8px 12px; border-radius: 12px; background: var(--aivo-semantic-color-surface-base,#f9fafb); }
+.pc-checkbox input { width: 20px; height: 20px; accent-color: var(--aivo-color-calmSky-500,#3b82f6); }
+
+.pc-switch { width: 64px; height: 36px; border-radius: 999px; border: 0; padding: 4px; background: var(--aivo-color-calmSky-500,#3b82f6); cursor: pointer; }
+.pc-switch span { display: block; width: 28px; height: 28px; border-radius: 999px; background: #fff; transform: translateX(28px); transition: transform .2s ease; }
+.pc-switch[aria-checked="false"] { background: var(--aivo-semantic-color-border-default,#d1d5db); }
+.pc-switch[aria-checked="false"] span { transform: translateX(0); }
+
+.pc-badge {
+  display: inline-flex; align-items: center;
+  border-radius: var(--aivo-radius-pill, 9999px);
+  padding: 6px 12px;
+  background: var(--aivo-semantic-color-interactive-primary-default, #3b82f6);
+  color: var(--aivo-semantic-color-text-onPrimary, #fff);
+  font-size: 12px; font-weight: 700;
+}
+.pc-badge--coral    { background: var(--aivo-color-sunriseCoral-500, #f43f5e); }
+.pc-badge--meadow   { background: var(--aivo-color-meadow-500, #10b981); }
+.pc-badge--sunshine { background: var(--aivo-color-sunshine-500, #f59e0b); color:#1f2937; }
+.pc-badge--cloud    { background: var(--aivo-color-cloud-300, #d1d5db); color: var(--aivo-color-cloud-800,#1f2937); }
+
+.pc-progress {
+  width: 100%; height: 12px; border-radius: 9999px;
+  background: var(--aivo-semantic-color-border-subtle, #e5e7eb);
+  overflow: hidden;
+}
+.pc-progress__bar {
+  height: 100%; border-radius: 9999px;
+  background: linear-gradient(90deg, var(--aivo-color-calmSky-500,#3b82f6), var(--aivo-color-lavender-500,#8b5cf6));
+}
+
+.pc-sticker { display: grid; place-items: center; aspect-ratio: 1; border-radius: 16px; background: var(--aivo-color-sunshine-100,#fef3c7); font-size: 28px; }
+.pc-sticker--locked { background: var(--aivo-color-cloud-200,#e5e7eb); color: var(--aivo-color-cloud-500,#6b7280); }
+
+/* Dark mode polish — handled by tokens.css [data-theme="dark"], with a couple of UI tweaks */
+[data-theme="dark"] body { background: var(--aivo-semantic-color-surface-base, #0f172a); color: var(--aivo-semantic-color-text-primary, #f8fafc); }
+[data-theme="high-contrast"] body { background: #000; color: #fff; }
+[data-theme="high-contrast"] .pc-btn { outline: 2px solid #fff; }
+
+/* Age-mode rounding adjustments (visual nod — full token tuning lives in @aivo/brand) */
+[data-age-mode="sprout"]  .pc-btn, [data-age-mode="sprout"]  .pc-card { border-radius: 28px; }
+[data-age-mode="spark"]   .pc-btn, [data-age-mode="spark"]   .pc-card { border-radius: 20px; }
+[data-age-mode="scholar"] .pc-btn, [data-age-mode="scholar"] .pc-card { border-radius: 12px; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Aivo Playful Calm — Storybook</h1>
+    <p>Live, token-driven gallery of the Playful Calm design system. Use the controls to switch theme, age mode, and dyslexia font.</p>
+  </header>
+  
+  <div class="sb-toolbar" role="toolbar" aria-label="Storybook controls">
+    <fieldset>
+      <legend>Theme</legend>
+      <button class="pc-btn pc-btn--ghost pc-btn--sm" aria-pressed="true" data-action="theme" data-value="light">light</button><button class="pc-btn pc-btn--ghost pc-btn--sm" aria-pressed="false" data-action="theme" data-value="dark">dark</button><button class="pc-btn pc-btn--ghost pc-btn--sm" aria-pressed="false" data-action="theme" data-value="high-contrast">high-contrast</button>
+    </fieldset>
+    <fieldset>
+      <legend>Age mode</legend>
+      <button class="pc-btn pc-btn--ghost pc-btn--sm" aria-pressed="false" data-action="ageMode" data-value="sprout">sprout</button><button class="pc-btn pc-btn--ghost pc-btn--sm" aria-pressed="true" data-action="ageMode" data-value="spark">spark</button><button class="pc-btn pc-btn--ghost pc-btn--sm" aria-pressed="false" data-action="ageMode" data-value="scholar">scholar</button>
+    </fieldset>
+    <fieldset>
+      <legend>Dyslexia font</legend>
+      <button class="pc-btn pc-btn--ghost pc-btn--sm" aria-pressed="false" data-action="dyslexia">Toggle</button>
+    </fieldset>
+  </div>
+
+
+  <section class="sb-section" id="primitives">
+    <h2>Primitives</h2>
+    <h3>Button</h3>
+    
+  <div class="sb-row">
+    <button class="pc-btn pc-btn--primary">Primary</button>
+    <button class="pc-btn pc-btn--secondary">Secondary</button>
+    <button class="pc-btn pc-btn--ghost">Ghost</button>
+    <button class="pc-btn pc-btn--playful">Playful</button>
+    <button class="pc-btn pc-btn--audio" aria-label="Read aloud">🔊 Read aloud</button>
+  </div>
+  <div class="sb-row">
+    <button class="pc-btn pc-btn--primary pc-btn--sm">Small</button>
+    <button class="pc-btn pc-btn--primary">Medium</button>
+    <button class="pc-btn pc-btn--primary pc-btn--lg">Large</button>
+    <button class="pc-btn pc-btn--primary pc-btn--xl">Extra large</button>
+    <button class="pc-btn pc-btn--primary pc-btn--hero">Hero</button>
+  </div>
+
+    <h3>Form controls</h3>
+    <div class="sb-row">
+  <label class="pc-field"><span>Email</span><input class="pc-input" type="email" placeholder="learner@aivo.app" /></label>
+  <label class="pc-field"><span>Grade</span>
+    <select class="pc-input"><option>K</option><option>1</option><option>2</option><option>3</option></select>
+  </label>
+  <label class="pc-checkbox"><input type="checkbox" checked /> Read aloud by default</label>
+  <label class="pc-checkbox"><input type="radio" name="theme" checked /> Calm Sky</label>
+  <label class="pc-checkbox"><input type="radio" name="theme" /> Meadow</label>
+  <button class="pc-switch" role="switch" aria-checked="true" aria-label="Sound on"><span></span></button>
+</div>
+    <h3>Badge</h3>
+    <div class="sb-row">
+  <span class="pc-badge">+25 XP</span>
+  <span class="pc-badge pc-badge--coral">🔥 5 day streak</span>
+  <span class="pc-badge pc-badge--meadow">Completed</span>
+  <span class="pc-badge pc-badge--sunshine">New</span>
+</div>
+    <h3>Progress</h3>
+    <div class="sb-row">
+  <div style="width:280px"><div class="pc-progress"><div class="pc-progress__bar" style="width:64%"></div></div></div>
+  <svg width="88" height="88" viewBox="0 0 88 88" aria-label="Progress ring 70%">
+    <circle cx="44" cy="44" r="36" stroke="var(--aivo-semantic-color-border-subtle,#e5e7eb)" stroke-width="8" fill="none" />
+    <circle cx="44" cy="44" r="36" stroke="var(--aivo-semantic-color-interactive-primary-default,#3b82f6)" stroke-width="8" fill="none" stroke-dasharray="226" stroke-dashoffset="68" transform="rotate(-90 44 44)" />
+  </svg>
+</div>
+  </section>
+
+  <section class="sb-section" id="patterns">
+    <h2>Patterns</h2>
+    
+  <div class="sb-grid">
+    <div class="pc-card" style="padding:20px">
+      <p style="margin:0;font-weight:700">Lesson 3 — Counting clouds</p>
+      <p style="margin:4px 0">8 min</p>
+      <span class="pc-badge">+25 XP</span>
+      <div style="margin-top:12px"><button class="pc-btn pc-btn--primary">Start</button></div>
+    </div>
+    <div class="pc-card" style="padding:16px">
+      <strong>Mascot Coach</strong>
+      <p>You're doing great — ready for the next one?</p>
+      <button class="pc-btn pc-btn--audio">🔊 Read aloud</button>
+    </div>
+    <div class="pc-card" style="padding:16px">
+      <strong>Sticker Book</strong>
+      <div style="display:grid;gap:8px;grid-template-columns:repeat(3,1fr);margin-top:8px">
+        <div class="pc-sticker">⭐</div>
+        <div class="pc-sticker">🦊</div>
+        <div class="pc-sticker pc-sticker--locked">🔒</div>
+        <div class="pc-sticker">🌟</div>
+        <div class="pc-sticker pc-sticker--locked">🔒</div>
+        <div class="pc-sticker">🎉</div>
+      </div>
+    </div>
+    <div class="pc-card" style="padding:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 style="margin:0">Focus Mode</h3>
+        <svg width="56" height="56" viewBox="0 0 88 88"><circle cx="44" cy="44" r="36" stroke="#e5e7eb" stroke-width="8" fill="none"/><circle cx="44" cy="44" r="36" stroke="var(--aivo-color-meadow-500,#10b981)" stroke-width="8" fill="none" stroke-dasharray="226" stroke-dashoffset="113" transform="rotate(-90 44 44)"/></svg>
+      </div>
+      <p>Distraction-free reading on.</p>
+    </div>
+    <div class="pc-card" style="padding:16px;display:flex;gap:12px;align-items:center">
+      <span>🔊 60%</span><span>⏱ 1×</span>
+      <button class="pc-btn pc-btn--audio">Voice</button>
+    </div>
+    <div class="pc-card" style="padding:16px">
+      <strong>Learning Path</strong>
+      <ol style="margin:8px 0;padding-left:20px">
+        <li><span class="pc-badge pc-badge--meadow">complete</span> Letters</li>
+        <li><span class="pc-badge">current</span> Numbers</li>
+        <li><span class="pc-badge pc-badge--cloud">locked</span> Shapes</li>
+      </ol>
+    </div>
+  </div>
+
+  </section>
+
+  <section class="sb-section" id="mascots">
+    <h2>Mascots — Aivo Owl · Pip Fox · Echo Whale</h2>
+    <div class="sb-mascots"><figure class="sb-mascot"><div class="sb-mascot__art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="aivo owl celebrating"><rect width="128" height="128" rx="32" fill="#F8FAFC"/><ellipse cx="64" cy="72" rx="42" ry="34" fill="#3B82F6"/><circle cx="64" cy="50" r="26" fill="#3B82F6"/><text x="48" y="56" font-size="10" fill="#fff">• •</text><text x="59" y="76" font-size="16" fill="#fff">◠</text><circle cx="96" cy="26" r="8" fill="#FBBF24"/><text x="88" y="28" font-family="Nunito, sans-serif" font-size="12" fill="#1F2937"></text></svg></div><figcaption>aivo-owl-celebrating</figcaption></figure><figure class="sb-mascot"><div class="sb-mascot__art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="aivo owl encouraging"><rect width="128" height="128" rx="32" fill="#F8FAFC"/><ellipse cx="64" cy="72" rx="42" ry="34" fill="#3B82F6"/><circle cx="64" cy="50" r="26" fill="#3B82F6"/><text x="48" y="56" font-size="10" fill="#fff">• •</text><text x="59" y="76" font-size="16" fill="#fff">◡</text><text x="88" y="28" font-family="Nunito, sans-serif" font-size="12" fill="#1F2937"></text></svg></div><figcaption>aivo-owl-encouraging</figcaption></figure><figure class="sb-mascot"><div class="sb-mascot__art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="aivo owl happy"><rect width="128" height="128" rx="32" fill="#F8FAFC"/><ellipse cx="64" cy="72" rx="42" ry="34" fill="#3B82F6"/><circle cx="64" cy="50" r="26" fill="#3B82F6"/><text x="48" y="56" font-size="10" fill="#fff">• •</text><text x="59" y="76" font-size="16" fill="#fff">⌣</text><text x="88" y="28" font-family="Nunito, sans-serif" font-size="12" fill="#1F2937"></text></svg></div><figcaption>aivo-owl-happy</figcaption></figure><figure class="sb-mascot"><div class="sb-mascot__art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="aivo owl idle"><rect width="128" height="128" rx="32" fill="#F8FAFC"/><ellipse cx="64" cy="72" rx="42" ry="34" fill="#3B82F6"/><circle cx="64" cy="50" r="26" fill="#3B82F6"/><text x="48" y="56" font-size="10" fill="#fff">• •</text><text x="59" y="76" font-size="16" fill="#fff">◡</text><text x="88" y="28" font-family="Nunito, sans-serif" font-size="12" fill="#1F2937"></text></svg></div><figcaption>aivo-owl-idle</figcaption></figure><figure class="sb-mascot"><div class="sb-mascot__art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="aivo owl sleeping"><rect width="128" height="128" rx="32" fill="#F8FAFC"/><ellipse cx="64" cy="72" rx="42" ry="34" fill="#3B82F6"/><circle cx="64" cy="50" r="26" fill="#3B82F6"/><text x="48" y="56" font-size="10" fill="#fff">— —</text><text x="59" y="76" font-size="16" fill="#fff">﹏</text><text x="88" y="28" font-family="Nunito, sans-serif" font-size="12" fill="#1F2937">Zz</text></svg></div><figcaption>aivo-owl-sleeping</figcaption></figure><figure class="sb-mascot"><div class="sb-mascot__art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="aivo owl thinking"><rect width="128" height="128" rx="32" fill="#F8FAFC"/><ellipse cx="64" cy="72" rx="42" ry="34" fill="#3B82F6"/><circle cx="64" cy="50" r="26" fill="#3B82F6"/><text x="48" y="56" font-size="10" fill="#fff">• •</text><text x="59" y="76" font-size="16" fill="#fff">◔</text><text x="88" y="28" font-family="Nunito, sans-serif" font-size="12" fill="#1F2937">? </text></svg></div><figcaption>aivo-owl-thinking</figcaption></figure><figure class="sb-mascot"><div class="sb-mascot__art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="echo whale celebrating"><rect width="128" height="128" rx="32" fill="#F8FAFC"/><ellipse cx="64" cy="72" rx="42" ry="34" fill="#34D399"/><circle cx="64" cy="50" r="26" fill="#34D399"/><text x="48" y="56" font-size="10" fill="#fff">• •</text><text x="59" y="76" font-size="16" fill="#fff">◠</text><circle cx="96" cy="26" r="8" fill="#FBBF24"/><text x="88" y="28" font-family="Nunito, sans-serif" font-size="12" fill="#1F2937"></text></svg></div><figcaption>echo-whale-celebrating</figcaption></figure><figure class="sb-mascot"><div class="sb-mascot__art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="echo whale encouraging"><rect width="128" height="128" rx="32" fill="#F8FAFC"/><ellipse cx="64" cy="72" rx="42" ry="34" fill="#34D399"/><circle cx="64" cy="50" r="26" fill="#34D399"/><text x="48" y="56" font-size="10" fill="#fff">• •</text><text x="59" y="76" font-size="16" fill="#fff">◡</text><text x="88" y="28" font-family="Nunito, sans-serif" font-size="12" fill="#1F2937"></text></svg></div><figcaption>echo-whale-encouraging</figcaption></figure><figure class="sb-mascot"><div class="sb-mascot__art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="echo whale happy"><rect width="128" height="128" rx="32" fill="#F8FAFC"/><ellipse cx="64" cy="72" rx="42" ry="34" fill="#34D399"/><circle cx="64" cy="50" r="26" fill="#34D399"/><text x="48" y="56" font-size="10" fill="#fff">• •</text><text x="59" y="76" font-size="16" fill="#fff">⌣</text><text x="88" y="28" font-family="Nunito, sans-serif" font-size="12" fill="#1F2937"></text></svg></div><figcaption>echo-whale-happy</figcaption></figure><figure class="sb-mascot"><div class="sb-mascot__art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="echo whale idle"><rect width="128" height="128" rx="32" fill="#F8FAFC"/><ellipse cx="64" cy="72" rx="42" ry="34" fill="#34D399"/><circle cx="64" cy="50" r="26" fill="#34D399"/><text x="48" y="56" font-size="10" fill="#fff">• •</text><text x="59" y="76" font-size="16" fill="#fff">◡</text><text x="88" y="28" font-family="Nunito, sans-serif" font-size="12" fill="#1F2937"></text></svg></div><figcaption>echo-whale-idle</figcaption></figure><figure class="sb-mascot"><div class="sb-mascot__art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="echo whale sleeping"><rect width="128" height="128" rx="32" fill="#F8FAFC"/><ellipse cx="64" cy="72" rx="42" ry="34" fill="#34D399"/><circle cx="64" cy="50" r="26" fill="#34D399"/><text x="48" y="56" font-size="10" fill="#fff">— —</text><text x="59" y="76" font-size="16" fill="#fff">﹏</text><text x="88" y="28" font-family="Nunito, sans-serif" font-size="12" fill="#1F2937">Zz</text></svg></div><figcaption>echo-whale-sleeping</figcaption></figure><figure class="sb-mascot"><div class="sb-mascot__art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="echo whale thinking"><rect width="128" height="128" rx="32" fill="#F8FAFC"/><ellipse cx="64" cy="72" rx="42" ry="34" fill="#34D399"/><circle cx="64" cy="50" r="26" fill="#34D399"/><text x="48" y="56" font-size="10" fill="#fff">• •</text><text x="59" y="76" font-size="16" fill="#fff">◔</text><text x="88" y="28" font-family="Nunito, sans-serif" font-size="12" fill="#1F2937">? </text></svg></div><figcaption>echo-whale-thinking</figcaption></figure><figure class="sb-mascot"><div class="sb-mascot__art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="pip fox celebrating"><rect width="128" height="128" rx="32" fill="#F8FAFC"/><ellipse cx="64" cy="72" rx="42" ry="34" fill="#FB7185"/><circle cx="64" cy="50" r="26" fill="#FB7185"/><text x="48" y="56" font-size="10" fill="#fff">• •</text><text x="59" y="76" font-size="16" fill="#fff">◠</text><circle cx="96" cy="26" r="8" fill="#FBBF24"/><text x="88" y="28" font-family="Nunito, sans-serif" font-size="12" fill="#1F2937"></text></svg></div><figcaption>pip-fox-celebrating</figcaption></figure><figure class="sb-mascot"><div class="sb-mascot__art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="pip fox encouraging"><rect width="128" height="128" rx="32" fill="#F8FAFC"/><ellipse cx="64" cy="72" rx="42" ry="34" fill="#FB7185"/><circle cx="64" cy="50" r="26" fill="#FB7185"/><text x="48" y="56" font-size="10" fill="#fff">• •</text><text x="59" y="76" font-size="16" fill="#fff">◡</text><text x="88" y="28" font-family="Nunito, sans-serif" font-size="12" fill="#1F2937"></text></svg></div><figcaption>pip-fox-encouraging</figcaption></figure><figure class="sb-mascot"><div class="sb-mascot__art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="pip fox happy"><rect width="128" height="128" rx="32" fill="#F8FAFC"/><ellipse cx="64" cy="72" rx="42" ry="34" fill="#FB7185"/><circle cx="64" cy="50" r="26" fill="#FB7185"/><text x="48" y="56" font-size="10" fill="#fff">• •</text><text x="59" y="76" font-size="16" fill="#fff">⌣</text><text x="88" y="28" font-family="Nunito, sans-serif" font-size="12" fill="#1F2937"></text></svg></div><figcaption>pip-fox-happy</figcaption></figure><figure class="sb-mascot"><div class="sb-mascot__art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="pip fox idle"><rect width="128" height="128" rx="32" fill="#F8FAFC"/><ellipse cx="64" cy="72" rx="42" ry="34" fill="#FB7185"/><circle cx="64" cy="50" r="26" fill="#FB7185"/><text x="48" y="56" font-size="10" fill="#fff">• •</text><text x="59" y="76" font-size="16" fill="#fff">◡</text><text x="88" y="28" font-family="Nunito, sans-serif" font-size="12" fill="#1F2937"></text></svg></div><figcaption>pip-fox-idle</figcaption></figure><figure class="sb-mascot"><div class="sb-mascot__art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="pip fox sleeping"><rect width="128" height="128" rx="32" fill="#F8FAFC"/><ellipse cx="64" cy="72" rx="42" ry="34" fill="#FB7185"/><circle cx="64" cy="50" r="26" fill="#FB7185"/><text x="48" y="56" font-size="10" fill="#fff">— —</text><text x="59" y="76" font-size="16" fill="#fff">﹏</text><text x="88" y="28" font-family="Nunito, sans-serif" font-size="12" fill="#1F2937">Zz</text></svg></div><figcaption>pip-fox-sleeping</figcaption></figure><figure class="sb-mascot"><div class="sb-mascot__art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="pip fox thinking"><rect width="128" height="128" rx="32" fill="#F8FAFC"/><ellipse cx="64" cy="72" rx="42" ry="34" fill="#FB7185"/><circle cx="64" cy="50" r="26" fill="#FB7185"/><text x="48" y="56" font-size="10" fill="#fff">• •</text><text x="59" y="76" font-size="16" fill="#fff">◔</text><text x="88" y="28" font-family="Nunito, sans-serif" font-size="12" fill="#1F2937">? </text></svg></div><figcaption>pip-fox-thinking</figcaption></figure></div>
+  </section>
+
+  <section class="sb-section" id="color">
+    <h2>Color palettes</h2>
+    <div class="sb-palette"><h3>calmSky</h3><div class="sb-palette__grid">
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#eff6ff"></div>
+          <div class="sb-swatch__meta">
+            <strong>calmSky-50</strong>
+            <code>#eff6ff</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#dbeafe"></div>
+          <div class="sb-swatch__meta">
+            <strong>calmSky-100</strong>
+            <code>#dbeafe</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#bfdbfe"></div>
+          <div class="sb-swatch__meta">
+            <strong>calmSky-200</strong>
+            <code>#bfdbfe</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#93c5fd"></div>
+          <div class="sb-swatch__meta">
+            <strong>calmSky-300</strong>
+            <code>#93c5fd</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#60a5fa"></div>
+          <div class="sb-swatch__meta">
+            <strong>calmSky-400</strong>
+            <code>#60a5fa</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#3b82f6"></div>
+          <div class="sb-swatch__meta">
+            <strong>calmSky-500</strong>
+            <code>#3b82f6</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#2563eb"></div>
+          <div class="sb-swatch__meta">
+            <strong>calmSky-600</strong>
+            <code>#2563eb</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#1d4ed8"></div>
+          <div class="sb-swatch__meta">
+            <strong>calmSky-700</strong>
+            <code>#1d4ed8</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#1e40af"></div>
+          <div class="sb-swatch__meta">
+            <strong>calmSky-800</strong>
+            <code>#1e40af</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#1e3a8a"></div>
+          <div class="sb-swatch__meta">
+            <strong>calmSky-900</strong>
+            <code>#1e3a8a</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#172554"></div>
+          <div class="sb-swatch__meta">
+            <strong>calmSky-950</strong>
+            <code>#172554</code>
+          </div>
+        </div></div></div><div class="sb-palette"><h3>sunriseCoral</h3><div class="sb-palette__grid">
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#fff1f2"></div>
+          <div class="sb-swatch__meta">
+            <strong>sunriseCoral-50</strong>
+            <code>#fff1f2</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#ffe4e6"></div>
+          <div class="sb-swatch__meta">
+            <strong>sunriseCoral-100</strong>
+            <code>#ffe4e6</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#fecdd3"></div>
+          <div class="sb-swatch__meta">
+            <strong>sunriseCoral-200</strong>
+            <code>#fecdd3</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#fda4af"></div>
+          <div class="sb-swatch__meta">
+            <strong>sunriseCoral-300</strong>
+            <code>#fda4af</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#fb7185"></div>
+          <div class="sb-swatch__meta">
+            <strong>sunriseCoral-400</strong>
+            <code>#fb7185</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#f43f5e"></div>
+          <div class="sb-swatch__meta">
+            <strong>sunriseCoral-500</strong>
+            <code>#f43f5e</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#e11d48"></div>
+          <div class="sb-swatch__meta">
+            <strong>sunriseCoral-600</strong>
+            <code>#e11d48</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#be123c"></div>
+          <div class="sb-swatch__meta">
+            <strong>sunriseCoral-700</strong>
+            <code>#be123c</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#9f1239"></div>
+          <div class="sb-swatch__meta">
+            <strong>sunriseCoral-800</strong>
+            <code>#9f1239</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#881337"></div>
+          <div class="sb-swatch__meta">
+            <strong>sunriseCoral-900</strong>
+            <code>#881337</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#4c0519"></div>
+          <div class="sb-swatch__meta">
+            <strong>sunriseCoral-950</strong>
+            <code>#4c0519</code>
+          </div>
+        </div></div></div><div class="sb-palette"><h3>meadow</h3><div class="sb-palette__grid">
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#ecfdf5"></div>
+          <div class="sb-swatch__meta">
+            <strong>meadow-50</strong>
+            <code>#ecfdf5</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#d1fae5"></div>
+          <div class="sb-swatch__meta">
+            <strong>meadow-100</strong>
+            <code>#d1fae5</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#a7f3d0"></div>
+          <div class="sb-swatch__meta">
+            <strong>meadow-200</strong>
+            <code>#a7f3d0</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#6ee7b7"></div>
+          <div class="sb-swatch__meta">
+            <strong>meadow-300</strong>
+            <code>#6ee7b7</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#34d399"></div>
+          <div class="sb-swatch__meta">
+            <strong>meadow-400</strong>
+            <code>#34d399</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#10b981"></div>
+          <div class="sb-swatch__meta">
+            <strong>meadow-500</strong>
+            <code>#10b981</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#059669"></div>
+          <div class="sb-swatch__meta">
+            <strong>meadow-600</strong>
+            <code>#059669</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#047857"></div>
+          <div class="sb-swatch__meta">
+            <strong>meadow-700</strong>
+            <code>#047857</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#065f46"></div>
+          <div class="sb-swatch__meta">
+            <strong>meadow-800</strong>
+            <code>#065f46</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#064e3b"></div>
+          <div class="sb-swatch__meta">
+            <strong>meadow-900</strong>
+            <code>#064e3b</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#022c22"></div>
+          <div class="sb-swatch__meta">
+            <strong>meadow-950</strong>
+            <code>#022c22</code>
+          </div>
+        </div></div></div><div class="sb-palette"><h3>sunshine</h3><div class="sb-palette__grid">
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#fffbeb"></div>
+          <div class="sb-swatch__meta">
+            <strong>sunshine-50</strong>
+            <code>#fffbeb</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#fef3c7"></div>
+          <div class="sb-swatch__meta">
+            <strong>sunshine-100</strong>
+            <code>#fef3c7</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#fde68a"></div>
+          <div class="sb-swatch__meta">
+            <strong>sunshine-200</strong>
+            <code>#fde68a</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#fcd34d"></div>
+          <div class="sb-swatch__meta">
+            <strong>sunshine-300</strong>
+            <code>#fcd34d</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#fbbf24"></div>
+          <div class="sb-swatch__meta">
+            <strong>sunshine-400</strong>
+            <code>#fbbf24</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#f59e0b"></div>
+          <div class="sb-swatch__meta">
+            <strong>sunshine-500</strong>
+            <code>#f59e0b</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#d97706"></div>
+          <div class="sb-swatch__meta">
+            <strong>sunshine-600</strong>
+            <code>#d97706</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#b45309"></div>
+          <div class="sb-swatch__meta">
+            <strong>sunshine-700</strong>
+            <code>#b45309</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#92400e"></div>
+          <div class="sb-swatch__meta">
+            <strong>sunshine-800</strong>
+            <code>#92400e</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#78350f"></div>
+          <div class="sb-swatch__meta">
+            <strong>sunshine-900</strong>
+            <code>#78350f</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#451a03"></div>
+          <div class="sb-swatch__meta">
+            <strong>sunshine-950</strong>
+            <code>#451a03</code>
+          </div>
+        </div></div></div><div class="sb-palette"><h3>lavender</h3><div class="sb-palette__grid">
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#f5f3ff"></div>
+          <div class="sb-swatch__meta">
+            <strong>lavender-50</strong>
+            <code>#f5f3ff</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#ede9fe"></div>
+          <div class="sb-swatch__meta">
+            <strong>lavender-100</strong>
+            <code>#ede9fe</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#ddd6fe"></div>
+          <div class="sb-swatch__meta">
+            <strong>lavender-200</strong>
+            <code>#ddd6fe</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#c4b5fd"></div>
+          <div class="sb-swatch__meta">
+            <strong>lavender-300</strong>
+            <code>#c4b5fd</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#a78bfa"></div>
+          <div class="sb-swatch__meta">
+            <strong>lavender-400</strong>
+            <code>#a78bfa</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#8b5cf6"></div>
+          <div class="sb-swatch__meta">
+            <strong>lavender-500</strong>
+            <code>#8b5cf6</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#7c3aed"></div>
+          <div class="sb-swatch__meta">
+            <strong>lavender-600</strong>
+            <code>#7c3aed</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#6d28d9"></div>
+          <div class="sb-swatch__meta">
+            <strong>lavender-700</strong>
+            <code>#6d28d9</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#5b21b6"></div>
+          <div class="sb-swatch__meta">
+            <strong>lavender-800</strong>
+            <code>#5b21b6</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#4c1d95"></div>
+          <div class="sb-swatch__meta">
+            <strong>lavender-900</strong>
+            <code>#4c1d95</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#2e1065"></div>
+          <div class="sb-swatch__meta">
+            <strong>lavender-950</strong>
+            <code>#2e1065</code>
+          </div>
+        </div></div></div><div class="sb-palette"><h3>cloud</h3><div class="sb-palette__grid">
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#ffffff"></div>
+          <div class="sb-swatch__meta">
+            <strong>cloud-0</strong>
+            <code>#ffffff</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#f9fafb"></div>
+          <div class="sb-swatch__meta">
+            <strong>cloud-50</strong>
+            <code>#f9fafb</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#f3f4f6"></div>
+          <div class="sb-swatch__meta">
+            <strong>cloud-100</strong>
+            <code>#f3f4f6</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#e5e7eb"></div>
+          <div class="sb-swatch__meta">
+            <strong>cloud-200</strong>
+            <code>#e5e7eb</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#d1d5db"></div>
+          <div class="sb-swatch__meta">
+            <strong>cloud-300</strong>
+            <code>#d1d5db</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#9ca3af"></div>
+          <div class="sb-swatch__meta">
+            <strong>cloud-400</strong>
+            <code>#9ca3af</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#6b7280"></div>
+          <div class="sb-swatch__meta">
+            <strong>cloud-500</strong>
+            <code>#6b7280</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#4b5563"></div>
+          <div class="sb-swatch__meta">
+            <strong>cloud-600</strong>
+            <code>#4b5563</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#374151"></div>
+          <div class="sb-swatch__meta">
+            <strong>cloud-700</strong>
+            <code>#374151</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#1f2937"></div>
+          <div class="sb-swatch__meta">
+            <strong>cloud-800</strong>
+            <code>#1f2937</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#111827"></div>
+          <div class="sb-swatch__meta">
+            <strong>cloud-900</strong>
+            <code>#111827</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#030712"></div>
+          <div class="sb-swatch__meta">
+            <strong>cloud-950</strong>
+            <code>#030712</code>
+          </div>
+        </div></div></div><div class="sb-palette"><h3>status</h3><div class="sb-palette__grid">
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#10b981"></div>
+          <div class="sb-swatch__meta">
+            <strong>status-success</strong>
+            <code>#10b981</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#f59e0b"></div>
+          <div class="sb-swatch__meta">
+            <strong>status-warning</strong>
+            <code>#f59e0b</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#ef4444"></div>
+          <div class="sb-swatch__meta">
+            <strong>status-error</strong>
+            <code>#ef4444</code>
+          </div>
+        </div>
+        <div class="sb-swatch">
+          <div class="sb-swatch__chip" style="background:#3b82f6"></div>
+          <div class="sb-swatch__meta">
+            <strong>status-info</strong>
+            <code>#3b82f6</code>
+          </div>
+        </div></div></div>
+  </section>
+
+  <section class="sb-section" id="typography">
+    <h2>Typography</h2>
+    
+  <div class="sb-type">
+    <p style="font-family:'Fredoka', 'Nunito', ui-sans-serif, system-ui, sans-serif;font-size:1.25rem">
+          <strong>display</strong>: The quick brown fox jumps over the lazy dog 1234567890
+        </p><p style="font-family:'Nunito', ui-sans-serif, system-ui, sans-serif;font-size:1.25rem">
+          <strong>body</strong>: The quick brown fox jumps over the lazy dog 1234567890
+        </p><p style="font-family:'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;font-size:1.25rem">
+          <strong>mono</strong>: The quick brown fox jumps over the lazy dog 1234567890
+        </p><p style="font-family:'OpenDyslexic', 'Comic Sans MS', 'Arial', sans-serif;font-size:1.25rem">
+          <strong>dyslexia</strong>: The quick brown fox jumps over the lazy dog 1234567890
+        </p>
+    <p style="font-size:0.75rem;line-height:1.25rem;margin:4px 0"><code>xs</code> — Learning is the seed of curiosity.</p><p style="font-size:0.875rem;line-height:1.375rem;margin:4px 0"><code>sm</code> — Learning is the seed of curiosity.</p><p style="font-size:1rem;line-height:1.5rem;margin:4px 0"><code>base</code> — Learning is the seed of curiosity.</p><p style="font-size:1.125rem;line-height:1.75rem;margin:4px 0"><code>lg</code> — Learning is the seed of curiosity.</p><p style="font-size:1.25rem;line-height:1.875rem;margin:4px 0"><code>xl</code> — Learning is the seed of curiosity.</p><p style="font-size:1.5rem;line-height:2rem;margin:4px 0"><code>2xl</code> — Learning is the seed of curiosity.</p><p style="font-size:1.875rem;line-height:2.375rem;margin:4px 0"><code>3xl</code> — Learning is the seed of curiosity.</p><p style="font-size:2.25rem;line-height:2.75rem;margin:4px 0"><code>4xl</code> — Learning is the seed of curiosity.</p><p style="font-size:3rem;line-height:3.25rem;margin:4px 0"><code>5xl</code> — Learning is the seed of curiosity.</p><p style="font-size:3.75rem;line-height:4rem;margin:4px 0"><code>6xl</code> — Learning is the seed of curiosity.</p>
+  </div>
+
+  </section>
+
+  <section class="sb-section" id="radius">
+    <h2>Radius</h2>
+    <div class="sb-grid">
+    <div class="sb-token">
+      <div class="sb-token__demo" style="border-radius:0px;width:80px;height:80px;background:var(--aivo-semantic-color-interactive-primary-default,#3b82f6)"></div>
+      <div><strong>radius.none</strong><br/><code>0px</code></div>
+    </div>
+    <div class="sb-token">
+      <div class="sb-token__demo" style="border-radius:8px;width:80px;height:80px;background:var(--aivo-semantic-color-interactive-primary-default,#3b82f6)"></div>
+      <div><strong>radius.sm</strong><br/><code>8px</code></div>
+    </div>
+    <div class="sb-token">
+      <div class="sb-token__demo" style="border-radius:12px;width:80px;height:80px;background:var(--aivo-semantic-color-interactive-primary-default,#3b82f6)"></div>
+      <div><strong>radius.md</strong><br/><code>12px</code></div>
+    </div>
+    <div class="sb-token">
+      <div class="sb-token__demo" style="border-radius:16px;width:80px;height:80px;background:var(--aivo-semantic-color-interactive-primary-default,#3b82f6)"></div>
+      <div><strong>radius.lg</strong><br/><code>16px</code></div>
+    </div>
+    <div class="sb-token">
+      <div class="sb-token__demo" style="border-radius:24px;width:80px;height:80px;background:var(--aivo-semantic-color-interactive-primary-default,#3b82f6)"></div>
+      <div><strong>radius.xl</strong><br/><code>24px</code></div>
+    </div>
+    <div class="sb-token">
+      <div class="sb-token__demo" style="border-radius:32px;width:80px;height:80px;background:var(--aivo-semantic-color-interactive-primary-default,#3b82f6)"></div>
+      <div><strong>radius.2xl</strong><br/><code>32px</code></div>
+    </div>
+    <div class="sb-token">
+      <div class="sb-token__demo" style="border-radius:9999px;width:80px;height:80px;background:var(--aivo-semantic-color-interactive-primary-default,#3b82f6)"></div>
+      <div><strong>radius.pill</strong><br/><code>9999px</code></div>
+    </div></div>
+  </section>
+
+  <section class="sb-section" id="spacing">
+    <h2>Spacing</h2>
+    <div class="sb-grid">
+    <div class="sb-token">
+      <div class="sb-token__demo" style="width:0px;height:16px;background:var(--aivo-color-lavender-400,#a78bfa);border-radius:4px"></div>
+      <div><strong>spacing.0</strong><br/><code>0px</code></div>
+    </div>
+    <div class="sb-token">
+      <div class="sb-token__demo" style="width:4px;height:16px;background:var(--aivo-color-lavender-400,#a78bfa);border-radius:4px"></div>
+      <div><strong>spacing.1</strong><br/><code>4px</code></div>
+    </div>
+    <div class="sb-token">
+      <div class="sb-token__demo" style="width:8px;height:16px;background:var(--aivo-color-lavender-400,#a78bfa);border-radius:4px"></div>
+      <div><strong>spacing.2</strong><br/><code>8px</code></div>
+    </div>
+    <div class="sb-token">
+      <div class="sb-token__demo" style="width:12px;height:16px;background:var(--aivo-color-lavender-400,#a78bfa);border-radius:4px"></div>
+      <div><strong>spacing.3</strong><br/><code>12px</code></div>
+    </div>
+    <div class="sb-token">
+      <div class="sb-token__demo" style="width:16px;height:16px;background:var(--aivo-color-lavender-400,#a78bfa);border-radius:4px"></div>
+      <div><strong>spacing.4</strong><br/><code>16px</code></div>
+    </div>
+    <div class="sb-token">
+      <div class="sb-token__demo" style="width:20px;height:16px;background:var(--aivo-color-lavender-400,#a78bfa);border-radius:4px"></div>
+      <div><strong>spacing.5</strong><br/><code>20px</code></div>
+    </div>
+    <div class="sb-token">
+      <div class="sb-token__demo" style="width:24px;height:16px;background:var(--aivo-color-lavender-400,#a78bfa);border-radius:4px"></div>
+      <div><strong>spacing.6</strong><br/><code>24px</code></div>
+    </div>
+    <div class="sb-token">
+      <div class="sb-token__demo" style="width:32px;height:16px;background:var(--aivo-color-lavender-400,#a78bfa);border-radius:4px"></div>
+      <div><strong>spacing.8</strong><br/><code>32px</code></div>
+    </div>
+    <div class="sb-token">
+      <div class="sb-token__demo" style="width:40px;height:16px;background:var(--aivo-color-lavender-400,#a78bfa);border-radius:4px"></div>
+      <div><strong>spacing.10</strong><br/><code>40px</code></div>
+    </div>
+    <div class="sb-token">
+      <div class="sb-token__demo" style="width:48px;height:16px;background:var(--aivo-color-lavender-400,#a78bfa);border-radius:4px"></div>
+      <div><strong>spacing.12</strong><br/><code>48px</code></div>
+    </div>
+    <div class="sb-token">
+      <div class="sb-token__demo" style="width:56px;height:16px;background:var(--aivo-color-lavender-400,#a78bfa);border-radius:4px"></div>
+      <div><strong>spacing.14</strong><br/><code>56px</code></div>
+    </div>
+    <div class="sb-token">
+      <div class="sb-token__demo" style="width:64px;height:16px;background:var(--aivo-color-lavender-400,#a78bfa);border-radius:4px"></div>
+      <div><strong>spacing.16</strong><br/><code>64px</code></div>
+    </div>
+    <div class="sb-token">
+      <div class="sb-token__demo" style="width:80px;height:16px;background:var(--aivo-color-lavender-400,#a78bfa);border-radius:4px"></div>
+      <div><strong>spacing.20</strong><br/><code>80px</code></div>
+    </div>
+    <div class="sb-token">
+      <div class="sb-token__demo" style="width:96px;height:16px;background:var(--aivo-color-lavender-400,#a78bfa);border-radius:4px"></div>
+      <div><strong>spacing.24</strong><br/><code>96px</code></div>
+    </div></div>
+  </section>
+
+  <section class="sb-section" id="shadow">
+    <h2>Shadow</h2>
+    <div class="sb-grid">
+    <div class="sb-token sb-token--shadow">
+      <div class="sb-token__demo" style="box-shadow:0 2px 6px rgba(59, 130, 246, 0.08);width:120px;height:64px;background:#fff;border-radius:12px"></div>
+      <div><strong>shadow.soft-1</strong></div>
+    </div>
+    <div class="sb-token sb-token--shadow">
+      <div class="sb-token__demo" style="box-shadow:0 6px 12px rgba(59, 130, 246, 0.1);width:120px;height:64px;background:#fff;border-radius:12px"></div>
+      <div><strong>shadow.soft-2</strong></div>
+    </div>
+    <div class="sb-token sb-token--shadow">
+      <div class="sb-token__demo" style="box-shadow:0 10px 22px rgba(59, 130, 246, 0.12);width:120px;height:64px;background:#fff;border-radius:12px"></div>
+      <div><strong>shadow.soft-3</strong></div>
+    </div>
+    <div class="sb-token sb-token--shadow">
+      <div class="sb-token__demo" style="box-shadow:0 16px 30px rgba(59, 130, 246, 0.14);width:120px;height:64px;background:#fff;border-radius:12px"></div>
+      <div><strong>shadow.soft-4</strong></div>
+    </div>
+    <div class="sb-token sb-token--shadow">
+      <div class="sb-token__demo" style="box-shadow:0 24px 44px rgba(59, 130, 246, 0.16);width:120px;height:64px;background:#fff;border-radius:12px"></div>
+      <div><strong>shadow.soft-5</strong></div>
+    </div></div>
+  </section>
+
+  <section class="sb-section" id="motion">
+    <h2>Motion</h2>
+    
+  <div class="sb-grid">
+    <div class="sb-card"><strong>duration.instant</strong><br/><code>0ms</code></div><div class="sb-card"><strong>duration.fast</strong><br/><code>150ms</code></div><div class="sb-card"><strong>duration.base</strong><br/><code>250ms</code></div><div class="sb-card"><strong>duration.slow</strong><br/><code>400ms</code></div><div class="sb-card"><strong>duration.playful</strong><br/><code>600ms</code></div>
+    <div class="sb-card"><strong>easing.ease-out-soft</strong><br/><code>cubic-bezier(0.16, 1, 0.3, 1)</code></div><div class="sb-card"><strong>easing.spring-bounce</strong><br/><code>cubic-bezier(0.34, 1.56, 0.64, 1)</code></div><div class="sb-card"><strong>easing.spring-gentle</strong><br/><code>cubic-bezier(0.22, 1, 0.36, 1)</code></div>
+  </div>
+
+  </section>
+
+  
+<script>
+(function () {
+  function setAttr(name, value, btn) {
+    document.documentElement.setAttribute(name, value);
+    var group = btn.closest('fieldset');
+    if (!group) return;
+    group.querySelectorAll('[aria-pressed]').forEach(function (b) {
+      b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+    });
+  }
+  document.documentElement.setAttribute('data-theme', 'light');
+  document.documentElement.setAttribute('data-age-mode', 'spark');
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-action]');
+    if (!btn) return;
+    var action = btn.getAttribute('data-action');
+    if (action === 'theme')   setAttr('data-theme',    btn.getAttribute('data-value'), btn);
+    if (action === 'ageMode') setAttr('data-age-mode', btn.getAttribute('data-value'), btn);
+    if (action === 'dyslexia') {
+      var on = btn.getAttribute('aria-pressed') !== 'true';
+      btn.setAttribute('aria-pressed', String(on));
+      document.body.style.fontFamily = on
+        ? "var(--aivo-fontFamily-dyslexia, 'OpenDyslexic', 'Comic Sans MS', sans-serif)"
+        : '';
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
