@@ -3,6 +3,7 @@ import { eq, and, desc } from "drizzle-orm";
 import { caregiverObservations, learnerCaregivers } from "@aivo/db";
 import { authenticateRequest, verifyParentOwnership } from "../auth.js";
 import { getObservationsSchema, observationsSchema } from "./schemas.js";
+import { emitFamilyAudit } from "../lib/audit.js";
 
 async function verifyLearnerAccess(
   db: ReturnType<typeof import("@aivo/db").createDb>,
@@ -90,6 +91,20 @@ export async function registerObservationRoutes(app: FastifyInstance) {
         date: body.date ? new Date(body.date) : new Date(),
       })
       .returning();
+
+    await emitFamilyAudit({
+      db,
+      request,
+      eventType: "PARENT_OBSERVATION_SUBMITTED",
+      tenantId,
+      learnerId: body.learnerId,
+      resourceId: obs.id,
+      details: {
+        category: obs.category,
+        submittedBy: claims.sub,
+        mood: body.mood ?? null,
+      },
+    });
 
     return obs;
   });

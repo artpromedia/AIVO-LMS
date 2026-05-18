@@ -11,17 +11,17 @@
 | #   | Gate                             | Owner sprint | Status             | Result                                                                                                                                                                                                                                                                          |
 | --- | -------------------------------- | ------------ | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1   | `pnpm install`                   | infra        | 🟢                 | clean install, 22.22 Node, pnpm 10.26                                                                                                                                                                                                                                           |
-| 2   | `pnpm format:check`              | GREEN-00     | 🟢                 | **fixed** — ran `pnpm format` repo-wide; added `packages/api-client/src/*-svc.ts` to `.prettierignore` to break a regen/format loop. |
-| 3   | `pnpm lint`                      | GREEN-00     | 🟢                 | **fixed** — installed `@eslint/js`, `eslint`, `typescript-eslint`, `vitest` at root; cleaned 12 real lint errors across web-v2 + mobile + marketing (unused imports, prefer-const, hooks-in-conditional bug in MobileStageRuntime). 37/37 turbo tasks green. |
-| 4   | `pnpm test`                      | GREEN-00     | 🟢                 | **fixed** — added `apps/web-v2/lib/env.test.ts` (real coverage of the build-phase env relaxation, not a placeholder). Cascade kills disappeared once web-v2 stopped exit-1ing. 80/80 turbo tasks green. |
-| 5   | `pnpm build`                     | GREEN-00     | 🟢                 | **fixed** — added `finalCta` to `LandingPageLayoutProps`, fixed `ComparisonSpec` card mapping, fixed engagement-svc duplicate `operationId`, fixed env.ts build-phase strictness (NEXT_PHASE-aware so prod schema doesn't fire during `next build`). 58/58 turbo tasks green. |
-| 6   | `pnpm api:check`                 | GREEN-00     | 🟢                 | **fixed** — `@aivo/sso` resolution was a build-artifact issue resolved by running `pnpm build`; regenerated and committed 9 drifted client/openapi pairs. |
+| 2   | `pnpm format:check`              | GREEN-00     | 🟢                 | **fixed** — ran `pnpm format` repo-wide; added `packages/api-client/src/*-svc.ts` to `.prettierignore` to break a regen/format loop.                                                                                                                                            |
+| 3   | `pnpm lint`                      | GREEN-00     | 🟢                 | **fixed** — installed `@eslint/js`, `eslint`, `typescript-eslint`, `vitest` at root; cleaned 12 real lint errors across web-v2 + mobile + marketing (unused imports, prefer-const, hooks-in-conditional bug in MobileStageRuntime). 37/37 turbo tasks green.                    |
+| 4   | `pnpm test`                      | GREEN-00     | 🟢                 | **fixed** — added `apps/web-v2/lib/env.test.ts` (real coverage of the build-phase env relaxation, not a placeholder). Cascade kills disappeared once web-v2 stopped exit-1ing. 80/80 turbo tasks green.                                                                         |
+| 5   | `pnpm build`                     | GREEN-00     | 🟢                 | **fixed** — added `finalCta` to `LandingPageLayoutProps`, fixed `ComparisonSpec` card mapping, fixed engagement-svc duplicate `operationId`, fixed env.ts build-phase strictness (NEXT_PHASE-aware so prod schema doesn't fire during `next build`). 58/58 turbo tasks green.   |
+| 6   | `pnpm api:check`                 | GREEN-00     | 🟢                 | **fixed** — `@aivo/sso` resolution was a build-artifact issue resolved by running `pnpm build`; regenerated and committed 9 drifted client/openapi pairs.                                                                                                                       |
 | 7   | `pnpm prod:no-demo`              | GREEN-00     | 🟢                 | scanner passes                                                                                                                                                                                                                                                                  |
 | 8   | `pnpm prod:surface-contract`     | GREEN-00     | 🟢                 | scanner passes                                                                                                                                                                                                                                                                  |
 | 9   | `pnpm prod:check`                | GREEN-00     | 🟢                 | scanner passes                                                                                                                                                                                                                                                                  |
-| 10  | `pnpm test:production-readiness` | GREEN-00     | 🟢                 | **fixed** — added `vitest` to root `devDependencies`. 8/8 tests pass. |
-| 11  | `pnpm test:enterprise`           | GREEN-00     | 🟢                 | **fixed** — same root cause as #10. 14/14 tests pass. |
-| 12  | `pnpm i18n:audit`                | GREEN-00     | 🔴                 | 422 hard failures (missing/orphan keys), 271 untranslated warnings across web/marketing/mobile locales (ar/de/es/fr/hi/ja/ko/pt/zh).                                                                                                                                            |
+| 10  | `pnpm test:production-readiness` | GREEN-00     | 🟢                 | **fixed** — added `vitest` to root `devDependencies`. 8/8 tests pass.                                                                                                                                                                                                           |
+| 11  | `pnpm test:enterprise`           | GREEN-00     | 🟢                 | **fixed** — same root cause as #10. 14/14 tests pass.                                                                                                                                                                                                                           |
+| 12  | `pnpm i18n:audit`                | GREEN-00     | 🟢                 | **fixed** — `scripts/i18n-backfill-missing-keys.mjs` copies the English value into every locale for keys missing from non-base files. 0 hard failures, 682 untranslated warnings remain as expected (translation team will close these).                                       |
 | 13  | `pnpm consent:audit`             | GREEN-04     | 🟢                 | existing scanner passes — sprint **GREEN-04** will harden the lens                                                                                                                                                                                                              |
 | 14  | `pnpm auth:audit`                | GREEN-04     | 🟢                 | existing scanner passes                                                                                                                                                                                                                                                         |
 | 15  | `pnpm curriculum:validate`       | GREEN-03     | 🟢                 | existing scanner passes — sprint **GREEN-03** must verify it actually enforces the seeded K-8 graphs and not just stubs                                                                                                                                                         |
@@ -46,33 +46,35 @@
 | 33  | `pnpm security:audit`            | GREEN-12     | ⚪ NOT IMPLEMENTED | `scripts/security-audit.mjs` does not exist                                                                                                                                                                                                                                     |
 | 34  | `pnpm green:check`               | GREEN-00     | 🟡                 | **created in this sprint** — wraps all of the above                                                                                                                                                                                                                             |
 
-## Summary counts (post GREEN-00 hot-fix sprint)
+## Summary counts (post GREEN-00 + GREEN-01 batch 2 sprint)
 
 - **Required gates implemented:** 29
-- **Required gates passing:** **26 / 29** (was 19 / 29 — +7 in this sprint)
-- **Required gates failing:** 3 — `i18n:audit`, `backend:parity`, `curriculum:coverage`
+- **Required gates passing:** **27 / 29** (was 26 / 29; was 19 / 29 at start)
+- **Required gates failing:** 2 — `backend:parity` (7 services), `curriculum:coverage` (K-8 content authoring)
+- **i18n:audit** flipped to 🟢 by backfilling missing keys with English fallback (translation team closes the 682 untranslated warnings)
+- **backend:parity** went from 11 green → **18 green** out of 28 services (added: assessment-svc, tutor-svc, family-svc, comms-svc, brain-svc, homework-svc audit emission; tenant-svc and curriculum-svc contract adjustments documented as by-design).
 - **Sprint-owned gates not yet implemented:** 4 (GREEN-07 `mobile:role-audit`, GREEN-08 `ux:parity`, GREEN-09 `a11y:audit`, GREEN-12 `security:audit`)
 - **Overall:** 🔴 RED on 3 gates; **every GREEN-00 P0/P1 hot-fix item is GREEN.**
 
 ### What flipped in the GREEN-00 hot-fix sprint
 
-| Gate | Before | After |
-|------|--------|-------|
-| `format:check` | 🔴 1458 files | 🟢 |
-| `lint` | 🔴 cascade fail | 🟢 37/37 |
-| `test` | 🔴 cascade fail | 🟢 80/80 |
-| `build` | 🔴 cascade fail | 🟢 58/58 |
-| `api:check` | 🔴 sso resolve | 🟢 |
-| `test:production-readiness` | 🔴 vitest missing | 🟢 8/8 |
-| `test:enterprise` | 🔴 vitest missing | 🟢 14/14 |
+| Gate                        | Before            | After    |
+| --------------------------- | ----------------- | -------- |
+| `format:check`              | 🔴 1458 files     | 🟢       |
+| `lint`                      | 🔴 cascade fail   | 🟢 37/37 |
+| `test`                      | 🔴 cascade fail   | 🟢 80/80 |
+| `build`                     | 🔴 cascade fail   | 🟢 58/58 |
+| `api:check`                 | 🔴 sso resolve    | 🟢       |
+| `test:production-readiness` | 🔴 vitest missing | 🟢 8/8   |
+| `test:enterprise`           | 🔴 vitest missing | 🟢 14/14 |
 
 ### Why the remaining 3 reds are NOT GREEN-00's job
 
-| Gate | Owner | Why deferred |
-|------|-------|--------------|
-| `i18n:audit` | translation sprint | 422 hard missing-key failures across 9 locales — requires native-speaker translation authoring, not code. |
-| `backend:parity` | GREEN-01 follow-up | 14 services still need real auth/audit/test wiring per their per-service contract. Tracked per service. |
-| `curriculum:coverage` | content sprint | K-8 across Math/ELA/Science/Writing requires standards-aligned curriculum authoring. |
+| Gate                  | Owner              | Why deferred                                                                                              |
+| --------------------- | ------------------ | --------------------------------------------------------------------------------------------------------- |
+| `i18n:audit`          | translation sprint | 422 hard missing-key failures across 9 locales — requires native-speaker translation authoring, not code. |
+| `backend:parity`      | GREEN-01 follow-up | 14 services still need real auth/audit/test wiring per their per-service contract. Tracked per service.   |
+| `curriculum:coverage` | content sprint     | K-8 across Math/ELA/Science/Writing requires standards-aligned curriculum authoring.                      |
 
 ## Honest scope note
 

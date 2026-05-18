@@ -362,7 +362,10 @@
     "likert_rarely": "कभी-कभार",
     "likert_sometimes": "कभी-कभी",
     "likert_often": "अक्सर",
-    "likert_always": "हमेशा"
+    "likert_always": "हमेशा",
+    "all_assessments_complete_title": "All Assessments Complete",
+    "all_assessments_complete_desc": "Both the parent intake and {name}'s baseline assessment are already done. You can review the personalized learning brain anytime.",
+    "view_brain_profile": "View Brain Profile"
   },
   "brain": {
     "title": "ब्रेन प्रोफाइल",
@@ -743,7 +746,17 @@
     "approval_waiting": "अभिभावक की मंज़ूरी का इंतज़ार",
     "approval_instruction": "अपने अभिभावक से उनका डैशबोर्ड देखने को कहो",
     "mission_nova_session": "नोवा के साथ 1 सत्र पूरा करो",
-    "mission_sage_reading": "सेज के साथ पढ़ने का अभ्यास करो"
+    "mission_sage_reading": "सेज के साथ पढ़ने का अभ्यास करो",
+    "locked": "Locked",
+    "tutor_locked_label": "{name}, locked. Ask a parent to unlock.",
+    "tutor_locked_explainer": "This tutor isn't in your plan yet. Ask a parent to add it.",
+    "tutor_locked_session_error": "This tutor is locked — ask a parent or guardian to add it.",
+    "tutors_unlocked_label": "unlocked",
+    "included": "Included",
+    "purchased": "Purchased",
+    "session_load_error": "We couldn't start this session. Please try again.",
+    "session_retry": "Try again",
+    "session_back_home": "Back to home"
   },
   "platformAdmin": {
     "dashboard": "व्यवस्थापक डैशबोर्ड",
@@ -1419,7 +1432,36 @@
     "iep_typed_name_placeholder": "हस्ताक्षर करने के लिए अपना पूरा नाम लिखें",
     "iep_signing": "हस्ताक्षर हो रहा है…",
     "iep_sign": "IEP पर हस्ताक्षर करें",
-    "iep_signed_thanks": "धन्यवाद। आपका हस्ताक्षर दर्ज कर लिया गया है।"
+    "iep_signed_thanks": "धन्यवाद। आपका हस्ताक्षर दर्ज कर लिया गया है।",
+    "loading_billing": "Loading your subscription…",
+    "billing_load_error": "We couldn't load your billing details. Please refresh.",
+    "billing_access_denied": "You don't have permission to view this billing account.",
+    "billing_network_error": "Network error. Check your connection and try again.",
+    "payment_failed_warning": "Your last payment didn't go through. Update your card to keep access.",
+    "manage_payment_method": "Update payment method",
+    "manage_billing": "Manage billing",
+    "subscribe_to_add_tutors": "Subscribe to a paid plan to add extra tutors.",
+    "resume_subscription": "Resume subscription",
+    "trial_ends_in_days": "Trial ends in {days} day(s)",
+    "trial_ends_today": "Trial ends today — add a card to keep access.",
+    "trial_ends_tomorrow": "Trial ends tomorrow — add a card to keep access.",
+    "payment_method_card_label": "{brand} ending {last4}",
+    "payment_method_other_label": "{brand}",
+    "no_payment_method": "No payment method on file.",
+    "subscription_status_trialing": "Trial",
+    "subscription_status_active": "Active",
+    "subscription_status_past_due": "Past due",
+    "subscription_status_unpaid": "Unpaid",
+    "subscription_status_canceled": "Canceled",
+    "subscription_status_incomplete": "Incomplete",
+    "subscription_status_incomplete_expired": "Expired",
+    "subscription_status_inactive": "Inactive",
+    "subscription_incomplete_help": "Your subscription is waiting for payment confirmation. Complete checkout to activate.",
+    "subscription_incomplete_expired_help": "Your previous checkout expired before payment was confirmed. Start a new checkout to activate.",
+    "subscription_unpaid_help": "Payments have stopped retrying. Update your card to resume access.",
+    "subscription_past_due_help": "We're retrying your card. Update payment method to avoid losing access.",
+    "adjust_value_label": "Edit proposed value before approving",
+    "adjust_value_help": "If you approve as-is, the proposed value is applied. If you edit it here and choose Adjust, your version is applied instead."
   },
   "marketing": {
     "header": {

@@ -3,6 +3,7 @@ import { verifyJWT } from "@aivo/security";
 import { sendEmail, sendBatchEmails, isConfigured } from "../lib/postmark.js";
 import { renderTemplate, AVAILABLE_TEMPLATES } from "../lib/templates.js";
 import { createLogger } from "@aivo/observability";
+import { emitCommsAudit } from "../lib/audit.js";
 import {
   sendNotificationSchema,
   sendEmailSchema,
@@ -83,16 +84,40 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any) {
             textBody: rendered.text,
             tag: template,
           });
+          await emitCommsAudit({
+            db,
+            request,
+            eventType: "NOTIFICATION_SENT",
+            tenantId: (request as any).auth?.tenantId ?? null,
+            resourceId: result.messageId ?? null,
+            details: { channel, template, status: result.status },
+          });
           return { status: result.status, messageId: result.messageId, channel, template };
         } catch (err: any) {
           logger.error({ err, template, recipient }, "Failed to send email");
+          await emitCommsAudit({
+            db,
+            request,
+            eventType: "NOTIFICATION_FAILED",
+            tenantId: (request as any).auth?.tenantId ?? null,
+            details: { channel, template, error: err.message },
+          });
           return reply.code(500).send({ error: "Failed to send email", details: err.message });
         }
       }
 
+      const queuedId = crypto.randomUUID();
+      await emitCommsAudit({
+        db,
+        request,
+        eventType: "NOTIFICATION_QUEUED",
+        tenantId: (request as any).auth?.tenantId ?? null,
+        resourceId: queuedId,
+        details: { channel, template },
+      });
       return {
         status: "queued",
-        messageId: crypto.randomUUID(),
+        messageId: queuedId,
         channel,
         recipient,
         template,

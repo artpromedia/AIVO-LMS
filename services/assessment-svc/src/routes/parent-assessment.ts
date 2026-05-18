@@ -3,6 +3,7 @@ import { parentAssessments, learners, learnerFunctioningLevels, learnerCaregiver
 import { verifyJWT } from "@aivo/security";
 import { and, desc, eq, isNotNull } from "drizzle-orm";
 import { determineFunctioningLevel } from "../services/level-router.js";
+import { emitAssessmentAudit } from "../lib/audit.js";
 
 // True when `userId` is either the learner's primary parent or an
 // ACCEPTED caregiver/co-parent on that learner. Co-parents need to take
@@ -208,6 +209,21 @@ export async function registerParentAssessmentRoutes(app: FastifyInstance) {
           responseMethod: body.responseMethod,
         },
         confidence: level.confidence,
+      });
+
+      await emitAssessmentAudit({
+        db,
+        request: req,
+        eventType: "PARENT_ASSESSMENT_SUBMITTED",
+        tenantId: learnerTenantId,
+        learnerId: body.learnerId,
+        resourceId: assessment.id,
+        details: {
+          submittedBy: submitterId,
+          functioningLevel: level.level,
+          confidence: level.confidence,
+          diagnosisCount: (body.diagnoses ?? []).length,
+        },
       });
 
       return {

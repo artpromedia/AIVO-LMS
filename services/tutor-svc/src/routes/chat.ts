@@ -6,6 +6,7 @@ import { createLogger } from "@aivo/observability";
 import { resolveTenantIdForLearner } from "../lib/tenant.js";
 import { checkTutorAccess } from "../lib/entitlements.js";
 import { computeTutorXp, computeTutorQuality, type TutorSignals } from "../services/scoring.js";
+import { emitTutorAudit } from "../lib/audit.js";
 import { getActiveCurriculumFocus } from "./curriculum.js";
 import { loadDapeProfile } from "../lib/dape.js";
 import {
@@ -256,6 +257,16 @@ export function registerChatRoutes(app: FastifyInstance, db: any) {
         messages: [],
       })
       .returning();
+
+    await emitTutorAudit({
+      db,
+      request,
+      eventType: "TUTOR_SESSION_STARTED",
+      tenantId,
+      learnerId,
+      sessionId: session.id,
+      details: { tutorSku, tutorName, sessionType: sessionType || "standard", functioningLevel },
+    });
 
     return { sessionId: session.id, tutorName, functioningLevel };
   });

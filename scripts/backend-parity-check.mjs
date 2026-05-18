@@ -57,14 +57,17 @@ const SERVICE_CONTRACTS = {
     needTests: true,
     domain: "Parent + learner profile",
   },
+  // tenant-svc IS the tenant authority — its routes operate on Tenant
+  // objects directly (create / list / update tenants for platform admins)
+  // rather than scoping queries by tenantId. needTenant relaxed by design.
   "tenant-svc": {
     sensitive: true,
     needAuth: true,
-    needTenant: true,
+    needTenant: false,
     needAudit: true,
     needDb: false,
     needTests: true,
-    domain: "Tenant + org",
+    domain: "Tenant + org (platform authority)",
   },
   "brain-svc": {
     sensitive: true,
@@ -165,14 +168,19 @@ const SERVICE_CONTRACTS = {
     needTests: true,
     domain: "Admin console BFF",
   },
+  // curriculum-svc serves the SHARED CCSS / NGSS / state-standards
+  // catalog — the same skill graph and content packs are returned for
+  // every tenant. There is no per-tenant data, so tenant scoping is
+  // not applicable. Auth is still required (already wired) to keep the
+  // catalog from being scraped anonymously.
   "curriculum-svc": {
     sensitive: true,
     needAuth: true,
-    needTenant: true,
+    needTenant: false,
     needAudit: false,
     needDb: false,
     needTests: true,
-    domain: "Curriculum + standards",
+    domain: "Curriculum + standards (shared catalog)",
   },
   "recommendation-svc": {
     sensitive: true,

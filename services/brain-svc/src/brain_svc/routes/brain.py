@@ -8,6 +8,7 @@ from sqlalchemy import text
 from brain_svc.models.database import get_db
 from brain_svc.models.schemas import BrainCloneRequest, BrainRollbackRequest, BrainApproveRequest, BrainAmendRequest, BrainDeclineRequest
 from brain_svc.services.clone_pipeline import clone_brain
+from brain_svc.audit import emit_brain_audit
 from brain_svc.auth import AuthClaims, require_auth
 
 LEARNING_SVC_URL = os.environ.get("LEARNING_SVC_URL", "http://localhost:3005")
@@ -168,6 +169,19 @@ async def clone_brain_endpoint(request: BrainCloneRequest, db: Session = Depends
             )
 
     result = clone_brain(db, request)
+
+    await emit_brain_audit(
+        event_type="BRAIN_CLONED",
+        tenant_id=getattr(auth, "tenant_id", None),
+        learner_id=request.learner_id,
+        resource_id=str(result.get("id")) if isinstance(result, dict) else None,
+        actor_user_id=getattr(auth, "user_id", None) or getattr(auth, "sub", None),
+        actor_role=getattr(auth, "role", None),
+        details={
+            "version": (result.get("version") if isinstance(result, dict) else None),
+        },
+    )
+
     return result
 
 @router.get("/{learner_id}")

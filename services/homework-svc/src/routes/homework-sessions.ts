@@ -11,6 +11,7 @@ import {
 } from "../services/homework-profile-adapter.js";
 import { observeFocus, type FocusSignals } from "../services/focus-monitor.js";
 import { recommendSelfRegulationPrompt } from "../services/self-regulation-recommender.js";
+import { emitHomeworkAudit } from "../lib/audit.js";
 
 interface HomeworkSessionRecord {
   id: string;
@@ -67,6 +68,14 @@ export function registerHomeworkSessionRoutes(app: FastifyInstance): void {
       problems: [],
     };
     SESSIONS.set(session.id, session);
+    await emitHomeworkAudit({
+      request,
+      eventType: "HOMEWORK_SESSION_STARTED",
+      tenantId: body.tenantId,
+      learnerId: body.learnerId,
+      resourceId: session.id,
+      details: { subject: body.subject, topic: body.topic },
+    });
     return reply.code(201).send(session);
   });
 
