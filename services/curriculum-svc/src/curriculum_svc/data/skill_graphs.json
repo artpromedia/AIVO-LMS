@@ -1,6 +1,20 @@
 {
   "schemaVersion": 1,
   "generatedAt": "2026-04-29T00:00:00Z",
+  "districts": [
+    {
+      "id": "mn-stpaul-public-schools",
+      "name": "Saint Paul Public Schools",
+      "state": "MN",
+      "zipCodes": ["55101", "55102", "55103", "55104", "55105", "55106", "55107", "55108", "55114", "55116", "55117", "55119", "55130"]
+    },
+    {
+      "id": "wa-tacoma-public-schools",
+      "name": "Tacoma Public Schools",
+      "state": "WA",
+      "zipCodes": ["98402", "98403", "98404", "98405", "98406", "98407", "98408", "98409", "98418", "98421", "98422", "98444", "98445"]
+    }
+  ],
   "skills": [
     {
       "id": "ccss.math.k.cc.a.1",
@@ -77,10 +91,11 @@
   ],
   "contentPacks": [
     {
-      "id": "k-math-fall-2026",
-      "title": "K Math Fall 2026",
+      "id": "mn-stpaul-k-math-fall-2026",
+      "title": "Saint Paul K Math Fall 2026",
       "subject": "math",
       "gradeBand": "K",
+      "districtIds": ["mn-stpaul-public-schools"],
       "skillIds": [
         "ccss.math.k.cc.a.1",
         "ccss.math.k.cc.a.2",
@@ -89,11 +104,32 @@
       ]
     },
     {
-      "id": "k-ela-fall-2026",
-      "title": "K ELA Fall 2026",
+      "id": "mn-stpaul-k-ela-fall-2026",
+      "title": "Saint Paul K ELA Fall 2026",
       "subject": "ela",
       "gradeBand": "K",
+      "districtIds": ["mn-stpaul-public-schools"],
       "skillIds": ["ccss.ela.k.rf.1", "ccss.ela.k.rf.2", "ccss.ela.k.rf.3", "ccss.ela.k.rf.4"]
+    },
+    {
+      "id": "wa-tacoma-k-math-fall-2026",
+      "title": "Tacoma K Math Fall 2026",
+      "subject": "math",
+      "gradeBand": "K",
+      "districtIds": ["wa-tacoma-public-schools"],
+      "skillIds": [
+        "ccss.math.k.cc.a.1",
+        "ccss.math.k.cc.a.2",
+        "ccss.math.k.cc.b.4"
+      ]
+    },
+    {
+      "id": "wa-tacoma-k-ela-fall-2026",
+      "title": "Tacoma K ELA Fall 2026",
+      "subject": "ela",
+      "gradeBand": "K",
+      "districtIds": ["wa-tacoma-public-schools"],
+      "skillIds": ["ccss.ela.k.rf.1", "ccss.ela.k.rf.2", "ccss.ela.k.rf.3"]
     }
   ]
 }

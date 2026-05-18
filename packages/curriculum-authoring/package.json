@@ -1,0 +1,27 @@
+{
+  "name": "@aivo/curriculum-authoring",
+  "version": "0.1.0",
+  "private": true,
+  "description": "K-8 curriculum authoring contracts, validators, and SME review gates for AIVO LMS.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "package.json"],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "tsc",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.3",
+    "vitest": "^2.0.0"
+  }
+}
