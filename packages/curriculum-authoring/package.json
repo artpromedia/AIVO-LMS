@@ -19,6 +19,10 @@
     "prepare": "tsc",
     "test": "vitest run"
   },
+  "dependencies": {
+    "@aivo/item-bank": "workspace:*",
+    "@aivo/skill-graphs": "workspace:*"
+  },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "typescript": "^5.7.3",

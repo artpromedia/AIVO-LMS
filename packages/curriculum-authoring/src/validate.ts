@@ -1,4 +1,4 @@
-import { K8_CURRICULUM_SCHEMA_VERSION, type CurriculumSubject, type K8CurriculumPack } from "./types.js";
+import { K8_CURRICULUM_SCHEMA_VERSION, type CurriculumSubject, type K8CurriculumPack, type ReviewerRole } from "./types.js";
 
 export interface CurriculumPackIssue {
   code:
@@ -25,7 +25,7 @@ export interface CurriculumPackValidationResult {
   issues: CurriculumPackIssue[];
 }
 
-const SUBJECT_REVIEW_ROLE: Record<CurriculumSubject, string> = {
+const SUBJECT_REVIEW_ROLE: Record<CurriculumSubject, ReviewerRole> = {
   math: "math_curriculum_designer",
   ela: "ela_curriculum_designer",
   science: "science_curriculum_designer",

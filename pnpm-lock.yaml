@@ -543,6 +543,13 @@ importers:
         version: 2.1.9(@types/node@22.19.17)(jsdom@25.0.1)(lightningcss@1.32.0)(terser@5.46.1)
 
   packages/curriculum-authoring:
+    dependencies:
+      '@aivo/item-bank':
+        specifier: workspace:*
+        version: link:../item-bank
+      '@aivo/skill-graphs':
+        specifier: workspace:*
+        version: link:../skill-graphs
     devDependencies:
       '@types/node':
         specifier: ^22.0.0

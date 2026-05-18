@@ -18,6 +18,12 @@ export function toSkillGraphs(pack: K8CurriculumPack): SkillGraph[] {
     groups.set(key, list);
   }
 
+  // `CurriculumSubject` includes "writing" because authors organize content
+  // that way, but the skill-graph layer treats writing as part of ELA
+  // (matches `FRAMEWORK_BY_SUBJECT` above — both map to CCSS-ELA).
+  const toSkillGraphSubject = (s: CurriculumSubject): SkillGraph["subject"] =>
+    s === "writing" ? "ela" : s;
+
   return [...groups.entries()].map(([key, skills]) => {
     const [subject, gradeBand] = key.split(":") as [CurriculumSubject, SkillGraph["gradeBand"]];
     return {
@@ -26,13 +32,13 @@ export function toSkillGraphs(pack: K8CurriculumPack): SkillGraph[] {
       version: pack.metadata.version,
       source: `${pack.metadata.publisher}; ${pack.metadata.academicYear}; ${pack.metadata.sourceNotes ?? "SME-authored K-8 curriculum pack"}`,
       framework: FRAMEWORK_BY_SUBJECT[subject],
-      subject,
+      subject: toSkillGraphSubject(subject),
       gradeBand,
       skills: skills.map((skill) => ({
         id: skill.id,
         title: skill.title,
         description: skill.description,
-        subject: skill.subject,
+        subject: toSkillGraphSubject(skill.subject),
         gradeBand: skill.gradeBand,
         frameworkRefs: skill.standardCodes.map((code) => {
           const standard = pack.standards.find((s) => s.code === code);
