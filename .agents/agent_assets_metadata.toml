@@ -312,6 +312,108 @@ uri = "file://apps/marketing/public/images/hero/girl-reading.png"
 type = "image"
 title = "girl_reading_hero"
 
+[[generated]]
+id = "X4eYLa8TVL-qsiuc4YDHI"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-cosmic-lab/hero.png"
+type = "image"
+title = "Glowing constellation brain-clone"
+
+[[generated]]
+id = "GkkBVHiMgsZacBgbtUQgi"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-cosmic-lab/tutor-hub.png"
+type = "image"
+title = "Cosmic specialized AI tutors"
+
+[[generated]]
+id = "OMLGBVsHe8P7vhYohemHm"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-cosmic-lab/mobile-avatar.png"
+type = "image"
+title = "Cosmic learner app avatar"
+
+[[generated]]
+id = "MOxeGSVrAxHMxiifgC18e"
+uri = "file://artifacts/mockup-sandbox/public/images/storybook-hero.png"
+type = "image"
+title = "Child reading with animal companion"
+
+[[generated]]
+id = "c3af40dHqNlU_T9S5tXpr"
+uri = "file://artifacts/mockup-sandbox/public/images/storybook-tutors.png"
+type = "image"
+title = "Cast of AIVO storybook characters"
+
+[[generated]]
+id = "ukY2VGOXVTWlzQzwz9Qtg"
+uri = "file://artifacts/mockup-sandbox/public/images/storybook-map.png"
+type = "image"
+title = "Storybook world map for kids"
+
+[[generated]]
+id = "yY4eyX-EKZrtIbtgc6mLl"
+uri = "file://artifacts/mockup-sandbox/public/images/brave-hero.png"
+type = "image"
+title = "Brave gamified hero illustration"
+
+[[generated]]
+id = "cnJc7h2loTxHSPs58S98S"
+uri = "file://artifacts/mockup-sandbox/public/images/brave-tutor-1.png"
+type = "image"
+title = "Gamified avatar tutor robot"
+
+[[generated]]
+id = "xYs94evsp25k-z4O2kRAC"
+uri = "file://artifacts/mockup-sandbox/public/images/brave-tutor-2.png"
+type = "image"
+title = "Gamified avatar tutor owl"
+
+[[generated]]
+id = "UGYRDErf401gsqi_nnuTJ"
+uri = "file://artifacts/mockup-sandbox/public/images/brave-world.png"
+type = "image"
+title = "Gamified map level"
+
+[[generated]]
+id = "jwv0ZSMbAdmhOFBUp9Cjn"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-friendly/mascot.png"
+type = "image"
+title = "AIVO soft mascot companion"
+
+[[generated]]
+id = "CjFTMXtqPatmRp31krqG-"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-friendly/hero-bg.png"
+type = "image"
+title = "Soft pastel abstract background"
+
+[[generated]]
+id = "yNoRuek_yf9ZkBCukasPg"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-friendly/feature-1.png"
+type = "image"
+title = "AIVO calm learning illustration"
+
+[[generated]]
+id = "MyHSKo5Mm6Sqci5SwlTZk"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-friendly/feature-2.png"
+type = "image"
+title = "AIVO calm progress illustration"
+
+[[generated]]
+id = "OIZmmEOWjE0uu8gFOl_PA"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-cosmic-friendly/hero-brain.png"
+type = "image"
+title = "Constellation shaped like a brain"
+
+[[generated]]
+id = "6yOJ2v4tXZSNMMOZiFiS_"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-cosmic-friendly/mascot.png"
+type = "image"
+title = "Cute star creature mascot"
+
+[[generated]]
+id = "iGvNpPnAr3zkxpozTbXAV"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-cosmic-friendly/mobile-avatar.png"
+type = "image"
+title = "Mobile avatar child explorer"
+
 [[outputs]]
 id = "0e7lRmti5tdoSwrX0-ySG"
 uri = "file://.local/preview/marketing-hero.jpg"

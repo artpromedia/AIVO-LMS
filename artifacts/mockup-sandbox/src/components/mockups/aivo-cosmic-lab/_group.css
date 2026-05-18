@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Inter:wght@400;500;600&display=swap');
+
+.cosmic-theme {
+  --background: 230 50% 8%; /* Very deep indigo */
+  --foreground: 210 40% 98%;
+  
+  --card: 230 40% 12%;
+  --card-foreground: 210 40% 98%;
+  
+  --popover: 230 40% 12%;
+  --popover-foreground: 210 40% 98%;
+  
+  --primary: 180 70% 50%; /* Soft teal */
+  --primary-foreground: 230 50% 8%;
+  --primary-border: 180 70% 40%;
+  
+  --secondary: 320 50% 50%; /* Soft magenta */
+  --secondary-foreground: 210 40% 98%;
+  --secondary-border: 320 50% 40%;
+  
+  --muted: 230 30% 20%;
+  --muted-foreground: 215 20% 70%;
+  
+  --accent: 180 50% 20%;
+  --accent-foreground: 210 40% 98%;
+  
+  --destructive: 0 60% 40%;
+  --destructive-foreground: 210 40% 98%;
+  --destructive-border: 0 60% 50%;
+  
+  --border: 230 30% 20%;
+  --input: 230 30% 20%;
+  --ring: 180 70% 50%;
+  --radius: 1rem;
+}
+
+.cosmic-theme {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: 'Inter', sans-serif;
+}
+
+.font-display {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes float-delayed {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 15px 0 rgba(45, 212, 191, 0.1); }
+  50% { box-shadow: 0 0 30px 5px rgba(45, 212, 191, 0.3); }
+  100% { box-shadow: 0 0 15px 0 rgba(45, 212, 191, 0.1); }
+}
+
+@keyframes pulse-glow-magenta {
+  0% { box-shadow: 0 0 15px 0 rgba(192, 38, 211, 0.1); }
+  50% { box-shadow: 0 0 30px 5px rgba(192, 38, 211, 0.3); }
+  100% { box-shadow: 0 0 15px 0 rgba(192, 38, 211, 0.1); }
+}
+
+@keyframes slow-pan {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float-delayed 8s ease-in-out infinite 2s;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 4s ease-in-out infinite;
+}
+
+.animate-pulse-glow-magenta {
+  animation: pulse-glow-magenta 5s ease-in-out infinite 1s;
+}
+
+.bg-aurora {
+  background: linear-gradient(-45deg, #0b0f19, #131b2f, #1e152a, #0b2226);
+  background-size: 300% 300%;
+  animation: slow-pan 20s ease infinite;
+}
+
+.glass-panel {
+  background: rgba(30, 35, 55, 0.4);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.constellation-dot {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background-color: rgba(45, 212, 191, 0.6);
+  border-radius: 50%;
+  box-shadow: 0 0 8px 2px rgba(45, 212, 191, 0.4);
+}
+
+.constellation-line {
+  position: absolute;
+  background-color: rgba(45, 212, 191, 0.15);
+  transform-origin: 0 50%;
+}
