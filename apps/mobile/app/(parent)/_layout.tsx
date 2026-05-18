@@ -1,14 +1,22 @@
 import React from "react";
-import { Tabs } from "expo-router";
+import { Tabs, router, type Href } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/constants/colors";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
+import { RoleTabletShell } from "@/src/components/layout/RoleTabletShell";
 
 export default function ParentLayout() {
   const { t } = useTranslation();
   const { isTablet } = useWindowSizeClass();
+  const railDestinations = [
+    { key: "home", label: t("tabs.home"), icon: "home" as const, onPress: () => router.push("/(parent)" as Href) },
+    { key: "inbox", label: t("tabs.inbox"), icon: "mail" as const, onPress: () => router.push("/(parent)/recommendations" as Href) },
+    { key: "tutors", label: t("tabs.tutors"), icon: "school" as const, onPress: () => router.push("/(parent)/tutors" as Href) },
+    { key: "settings", label: t("tabs.settings"), icon: "settings" as const, onPress: () => router.push("/(parent)/settings" as Href) },
+  ];
   return (
+    <RoleTabletShell destinations={railDestinations}>
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -77,5 +85,6 @@ export default function ParentLayout() {
       <Tabs.Screen name="inbox" options={{ href: null }} />
       <Tabs.Screen name="milestones/[childId]" options={{ href: null }} />
     </Tabs>
+    </RoleTabletShell>
   );
 }

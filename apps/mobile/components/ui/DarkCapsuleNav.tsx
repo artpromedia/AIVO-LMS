@@ -20,6 +20,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { fontFamilies } from "@/constants/typography";
 import { colors } from "@/constants/colors";
+import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 
 export interface DarkCapsuleNavItem {
   key: string;
@@ -32,10 +33,20 @@ export interface DarkCapsuleNavItem {
 interface DarkCapsuleNavProps {
   items: DarkCapsuleNavItem[];
   style?: StyleProp<ViewStyle>;
+  /**
+   * Hide the capsule on tablet form factors (medium + expanded size
+   * classes). Defaults to true — tablets use `RoleNavigationRail` /
+   * `TabletScaffold` instead of the floating bottom capsule, so call
+   * sites no longer need to manually gate with `!isTablet`.
+   */
+  hideOnTablet?: boolean;
 }
 
-export function DarkCapsuleNav({ items, style }: DarkCapsuleNavProps) {
+export function DarkCapsuleNav({ items, style, hideOnTablet = true }: DarkCapsuleNavProps) {
   const palette = useSensoryPalette();
+  const { isTablet } = useWindowSizeClass();
+  if (hideOnTablet && isTablet) return null;
+  if (!items.length) return null;
   return (
     <View style={[styles.wrap, style]}>
       <View style={styles.capsule}>

@@ -1,14 +1,22 @@
 import React from "react";
-import { Tabs } from "expo-router";
+import { Tabs, router, type Href } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/constants/colors";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
+import { RoleTabletShell } from "@/src/components/layout/RoleTabletShell";
 
 export default function TeacherLayout() {
   const { t } = useTranslation();
   const { isTablet } = useWindowSizeClass();
+  const railDestinations = [
+    { key: "index", label: t("tabs.classroom"), icon: "school" as const, onPress: () => router.push("/(teacher)" as Href) },
+    { key: "lessonPlan", label: t("tabs.lessonPlans"), icon: "document-text" as const, onPress: () => router.push("/(teacher)/lesson-plan" as Href) },
+    { key: "analytics", label: t("tabs.analytics"), icon: "bar-chart" as const, onPress: () => router.push("/(teacher)/analytics" as Href) },
+    { key: "settings", label: t("tabs.settings"), icon: "settings-outline" as const, onPress: () => router.push("/(teacher)/settings" as Href) },
+  ];
   return (
+    <RoleTabletShell destinations={railDestinations}>
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -62,5 +70,6 @@ export default function TeacherLayout() {
       <Tabs.Screen name="student/[id]/insight" options={{ href: null }} />
       <Tabs.Screen name="student/[id]/iep" options={{ href: null }} />
     </Tabs>
+    </RoleTabletShell>
   );
 }

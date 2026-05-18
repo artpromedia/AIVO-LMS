@@ -18,11 +18,15 @@ import { fontFamilies } from "@/constants/typography";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { Button, Card, SensoryToggle } from "@/components/ui";
 import { AivoLogo } from "@/components/AivoLogo";
+import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
+import { CONTENT_MAX_WIDTH } from "@/src/design/responsive";
 
 export default function VerifyMfaScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const palette = useSensoryPalette();
+  const { width: winWidth } = useWindowSizeClass();
+  const authWidth = Math.min(winWidth - 32, CONTENT_MAX_WIDTH.auth);
   const { verifyMfa, resendMfa } = useAuth();
   const { mfaToken } = useLocalSearchParams<{ mfaToken: string }>();
 
@@ -140,6 +144,7 @@ export default function VerifyMfaScreen() {
           { paddingTop: insets.top + 40, backgroundColor: palette.bgPage },
         ]}
       >
+        <View style={{ width: authWidth, alignSelf: "center", flex: 1, justifyContent: "center" }}>
         <View style={styles.topRow}>
           <View style={{ flex: 1 }} />
           <SensoryToggle variant="icon" />
@@ -245,6 +250,7 @@ export default function VerifyMfaScreen() {
         <Text style={[styles.expireNote, { color: palette.inkMuted }]}>
           {t("auth.codeExpires")}
         </Text>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );

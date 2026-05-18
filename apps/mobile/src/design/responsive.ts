@@ -43,6 +43,7 @@ export function pickBySizeClass<T>(
  * tablet hardware. Match the values used by the web app's design system.
  */
 export const CONTENT_MAX_WIDTH = {
+  auth: 520, // login / signup / pin — single-column form, never stretches
   reading: 720, // long-form text / forms
   workspace: 1280, // learning workspace and split-pane shells
   dashboard: 1080, // parent / teacher dashboards

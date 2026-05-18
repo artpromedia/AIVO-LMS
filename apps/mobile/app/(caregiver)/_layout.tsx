@@ -1,24 +1,35 @@
 import React from "react";
-import { Tabs } from "expo-router";
+import { Tabs, router, type Href } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/constants/colors";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
+import { RoleTabletShell } from "@/src/components/layout/RoleTabletShell";
 
 export default function CaregiverLayout() {
   const { t } = useTranslation();
+  const { isTablet } = useWindowSizeClass();
+  const railDestinations = [
+    { key: "index", label: t("tabs.home"), icon: "home" as const, onPress: () => router.push("/(caregiver)" as Href) },
+    { key: "notifications", label: t("tabs.alerts"), icon: "notifications" as const, onPress: () => router.push("/(caregiver)/notifications" as Href) },
+    { key: "settings", label: t("tabs.settings"), icon: "settings" as const, onPress: () => router.push("/(caregiver)/settings" as Href) },
+  ];
   return (
+    <RoleTabletShell destinations={railDestinations}>
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textSecondary,
-        tabBarStyle: {
-          backgroundColor: colors.card,
-          borderTopColor: colors.border,
-          height: 84,
-          paddingBottom: 20,
-          paddingTop: 8,
-        },
+        tabBarStyle: isTablet
+          ? { display: "none" }
+          : {
+              backgroundColor: colors.card,
+              borderTopColor: colors.border,
+              height: 84,
+              paddingBottom: 20,
+              paddingTop: 8,
+            },
         tabBarLabelStyle: { fontFamily: "Nunito-SemiBold", fontSize: 11 },
       }}
     >
@@ -54,5 +65,6 @@ export default function CaregiverLayout() {
       <Tabs.Screen name="child/[childId]/observation" options={{ href: null }} />
       <Tabs.Screen name="child/[childId]/progress" options={{ href: null }} />
     </Tabs>
+    </RoleTabletShell>
   );
 }

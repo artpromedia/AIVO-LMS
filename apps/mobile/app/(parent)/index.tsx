@@ -15,7 +15,7 @@ import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { Card, Button, SensoryToggle } from "@/components/ui";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { CONTENT_MAX_WIDTH, pickBySizeClass } from "@/src/design/responsive";
-import { TabletScaffold } from "@/src/components/layout/TabletScaffold";
+import { useResponsiveType } from "@/src/design/useResponsiveType";
 
 export default function ParentDashboard() {
   const insets = useSafeAreaInsets();
@@ -27,6 +27,7 @@ export default function ParentDashboard() {
   const { t } = useTranslation();
   const palette = useSensoryPalette();
   const { sizeClass, isTablet, width: winWidth } = useWindowSizeClass();
+  const type = useResponsiveType();
   const hPad = pickBySizeClass(sizeClass, {
     compact: spacing.md,
     medium: spacing.lg,
@@ -37,48 +38,13 @@ export default function ParentDashboard() {
     isTablet ? CONTENT_MAX_WIDTH.dashboard : winWidth,
   );
 
-  const railDestinations = [
-    {
-      key: "home",
-      label: t("tabs.home"),
-      icon: "home" as const,
-      active: true,
-      onPress: () => router.push("/(parent)" as Href),
-    },
-    {
-      key: "inbox",
-      label: t("tabs.inbox"),
-      icon: "mail" as const,
-      badge: unreadCount,
-      onPress: () => router.push("/(parent)/recommendations" as Href),
-    },
-    {
-      key: "tutors",
-      label: t("tabs.tutors"),
-      icon: "school" as const,
-      onPress: () => router.push("/(parent)/tutors" as Href),
-    },
-    {
-      key: "billing",
-      label: t("parent.billing"),
-      icon: "card-outline" as const,
-      onPress: () => router.push("/(parent)/billing" as Href),
-    },
-    {
-      key: "settings",
-      label: t("tabs.settings"),
-      icon: "settings" as const,
-      onPress: () => router.push("/(parent)/settings" as Href),
-    },
-  ];
-
   const onRefresh = async () => {
     setRefreshing(true);
     await refetch();
     setRefreshing(false);
   };
 
-  const body = (
+  return (
     <ScrollView
       style={[styles.container, { backgroundColor: palette.bgPage }]}
       contentContainerStyle={{
@@ -99,7 +65,7 @@ export default function ParentDashboard() {
       <View style={{ width: contentWidth }}>
         <View style={styles.header}>
           <View style={{ flex: 1 }}>
-            <Text style={[styles.greeting, { color: palette.ink }]}>
+            <Text style={[styles.greeting, { color: palette.ink, fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>
               {t("parent.greeting", { name: user?.name || "Parent" })}
             </Text>
             <Text style={[styles.subGreeting, { color: palette.inkMuted }]}>
@@ -304,8 +270,6 @@ export default function ParentDashboard() {
       </View>
     </ScrollView>
   );
-
-  return <TabletScaffold destinations={railDestinations}>{body}</TabletScaffold>;
 }
 
 function StatTile({

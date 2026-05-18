@@ -12,6 +12,9 @@ import { spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { Card, SensoryToggle, HeaderUserChip } from "@/components/ui";
+import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
+import { CONTENT_MAX_WIDTH, pickBySizeClass } from "@/src/design/responsive";
+import { useResponsiveType } from "@/src/design/useResponsiveType";
 
 export default function TeacherDashboard() {
   const { t } = useTranslation();
@@ -19,21 +22,33 @@ export default function TeacherDashboard() {
   const { user, logout } = useAuth();
   const { data: students, isLoading, refetch } = useConnectedLearners();
   const palette = useSensoryPalette();
+  const { sizeClass, width: winWidth, isTablet } = useWindowSizeClass();
+  const type = useResponsiveType();
 
   if (isLoading) return <LoadingState />;
+
+  const hPad = pickBySizeClass(sizeClass, {
+    compact: spacing.md,
+    medium: spacing.lg,
+    expanded: spacing.xl,
+  });
+  const maxContentWidth = isTablet ? CONTENT_MAX_WIDTH.dashboard : winWidth;
+  const contentWidth = Math.min(winWidth - hPad * 2, maxContentWidth);
 
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: palette.bgPage }}
       contentContainerStyle={{
-        paddingTop: insets.top + 16,
+        paddingTop: isTablet ? spacing.lg : insets.top + 16,
         paddingBottom: 32,
-        paddingHorizontal: spacing.md,
+        paddingHorizontal: hPad,
+        alignItems: "center",
       }}
       refreshControl={
         <RefreshControl refreshing={false} onRefresh={refetch} colors={[palette.primary]} />
       }
     >
+      <View style={{ width: contentWidth }}>
       <View style={styles.header}>
         <HeaderUserChip
           name={user?.name || t("teacher.title")}
@@ -49,7 +64,10 @@ export default function TeacherDashboard() {
       </View>
 
       <Text
-        style={[styles.greeting, { color: palette.ink, fontFamily: fontFamilies.displayBold }]}
+        style={[
+          styles.greeting,
+          { color: palette.ink, fontFamily: fontFamilies.displayBold, fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight },
+        ]}
       >
         {t("teacher.greeting", { name: user?.name })}
       </Text>
@@ -144,6 +162,7 @@ export default function TeacherDashboard() {
           </Pressable>
         ))
       )}
+      </View>
     </ScrollView>
   );
 }

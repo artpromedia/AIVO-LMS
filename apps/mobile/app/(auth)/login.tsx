@@ -22,6 +22,8 @@ import { fontFamilies } from "@/constants/typography";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { Button } from "@/components/ui";
 import { AivoLogo } from "@/components/AivoLogo";
+import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
+import { CONTENT_MAX_WIDTH } from "@/src/design/responsive";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -32,6 +34,8 @@ export default function LoginScreen() {
   const { t } = useTranslation();
   const { login, loginWithGoogle } = useAuth();
   const palette = useSensoryPalette();
+  const { width: winWidth } = useWindowSizeClass();
+  const authWidth = Math.min(winWidth - 32, CONTENT_MAX_WIDTH.auth);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -133,6 +137,7 @@ export default function LoginScreen() {
         contentContainerStyle={[styles.container, { paddingTop: insets.top + 32 }]}
         keyboardShouldPersistTaps="handled"
       >
+        <View style={{ width: authWidth, alignSelf: "center" }}>
         <View style={styles.logoContainer}>
           <AivoLogo variant="dark" width={160} />
           <Text style={[styles.tagline, { color: palette.inkMuted }]}>
@@ -254,6 +259,7 @@ export default function LoginScreen() {
             </Text>
           </Text>
         </Pressable>
+        </View>
       </ScrollView>
 
       <Modal visible={consentModal} transparent animationType="slide">
