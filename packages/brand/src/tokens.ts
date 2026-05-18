@@ -6,45 +6,45 @@
 // app-local copies of these values — they will drift.
 
 export const COLORS = {
-  primary: "#7C3AED",
-  primaryLight: "#EDE3FE",
-  primaryDark: "#5B21B6",
-  secondary: "#0DA2E7",
-  accent: "#FFB700",
+  primary: "#3B82F6",
+  primaryLight: "#DBEAFE",
+  primaryDark: "#1D4ED8",
+  secondary: "#FB7185",
+  accent: "#FBBF24",
 
-  success: "#21C45D",
-  warning: "#FFB700",
-  error: "#E91E63",
-  info: "#0DA2E7",
+  success: "#10B981",
+  warning: "#F59E0B",
+  error: "#EF4444",
+  info: "#3B82F6",
 
-  background: "#FAFAFA",
+  background: "#F9FAFB",
   surface: "#FFFFFF",
-  surfaceHover: "#F6F7F9",
-  surfaceMuted: "#F0F2F5",
+  surfaceHover: "#F3F4F6",
+  surfaceMuted: "#E5E7EB",
 
-  text: "#292F3D",
-  textSecondary: "#6B7280",
-  textMuted: "#9CA3AF",
+  text: "#111827",
+  textSecondary: "#374151",
+  textMuted: "#6B7280",
   textOnPrimary: "#FFFFFF",
 
-  border: "#E2E4E9",
-  borderStrong: "#CBD5E1",
-  borderSubtle: "#F1F3F6",
+  border: "#D1D5DB",
+  borderStrong: "#9CA3AF",
+  borderSubtle: "#E5E7EB",
 
-  visualMath: "#E91E63",
-  visualReading: "#0DA2E7",
-  visualScience: "#21C45D",
-  visualSel: "#FFB700",
-  visualSurfaceSoft: "#F6F7F9",
+  visualMath: "#FB7185",
+  visualReading: "#3B82F6",
+  visualScience: "#34D399",
+  visualSel: "#FBBF24",
+  visualSurfaceSoft: "#F3F4F6",
 
-  focusRing: "#7C3AED",
+  focusRing: "#3B82F6",
   overlay: "rgba(15, 23, 42, 0.45)",
 } as const;
 
 export type ColorToken = keyof typeof COLORS;
 
 export const GRADIENTS = {
-  brand: `linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.primaryDark} 100%)`,
+  brand: `linear-gradient(135deg, ${COLORS.primary} 0%, #A78BFA 100%)`,
   brandSoft: `linear-gradient(135deg, ${COLORS.primaryLight} 0%, #FFFFFF 100%)`,
   hero: `linear-gradient(180deg, #FAF5FF 0%, #FFFFFF 60%)`,
   celebrate: `linear-gradient(135deg, ${COLORS.primary} 0%, ${COLORS.accent} 100%)`,
@@ -99,20 +99,20 @@ export const SPACING = {
 
 export const RADII = {
   none: "0",
-  sm: "0.375rem",
-  md: "0.5rem",
-  lg: "0.75rem",
-  xl: "1rem",
-  xxl: "1.5rem",
+  sm: "8px",
+  md: "12px",
+  lg: "16px",
+  xl: "24px",
+  xxl: "32px",
   full: "9999px",
 } as const;
 
 export const SHADOWS = {
   none: "none",
-  sm: "0 1px 2px 0 rgba(15, 23, 42, 0.06)",
-  md: "0 2px 8px 0 rgba(15, 23, 42, 0.08)",
-  lg: "0 8px 24px 0 rgba(15, 23, 42, 0.12)",
-  xl: "0 20px 48px 0 rgba(15, 23, 42, 0.18)",
+  sm: "0 2px 6px rgba(59, 130, 246, 0.08)",
+  md: "0 6px 12px rgba(59, 130, 246, 0.10)",
+  lg: "0 10px 22px rgba(59, 130, 246, 0.12)",
+  xl: "0 16px 30px rgba(59, 130, 246, 0.14)",
   focus: `0 0 0 3px ${COLORS.primaryLight}`,
 } as const;
 

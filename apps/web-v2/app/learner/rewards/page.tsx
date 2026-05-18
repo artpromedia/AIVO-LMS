@@ -6,7 +6,12 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LEARNER_NAV } from "@/components/layout/role-shells";
-import { listQuestChapters, listQuestProgressForLearner, listQuestWorlds } from "@/lib/db/repos";
+import {
+  listQuestChapters,
+  listQuestProgressForLearner,
+  listQuestWorlds,
+} from "@/lib/db/repos";
+import { StickerBook } from "@/components/playful-calm";
 
 export default async function Page() {
   const session = await requirePageRole(["learner"]);
@@ -25,7 +30,9 @@ export default async function Page() {
   }
   const worlds = listQuestWorlds();
   const progress = listQuestProgressForLearner(learnerId, session.tenantId);
-  const completedByChapter = new Map(progress.map((p) => [p.chapterId, p.progress >= 1]));
+  const completedByChapter = new Map(
+    progress.map((p) => [p.chapterId, p.progress >= 1]),
+  );
 
   return (
     <AppShell
@@ -39,6 +46,9 @@ export default async function Page() {
         title="Rewards"
         description="Track every chapter you've completed across the quest worlds."
       />
+      <div className="mb-4">
+        <StickerBook earned={progress.filter((p) => p.progress >= 1).length} total={Math.max(progress.length, 1)} />
+      </div>
       <div className="grid gap-4 sm:grid-cols-2">
         {worlds.map((w) => {
           const chapters = listQuestChapters(w.id);

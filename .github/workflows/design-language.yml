@@ -1,0 +1,109 @@
+name: Design Language
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "packages/brand/**"
+      - "packages/learner-ui/**"
+      - "packages/stage-ui/**"
+      - "packages/mobile-ui/**"
+      - "docs/design-language/**"
+      - ".github/workflows/design-language.yml"
+  push:
+    branches: [main]
+    paths:
+      - "packages/brand/**"
+      - "packages/learner-ui/**"
+      - "packages/stage-ui/**"
+      - "packages/mobile-ui/**"
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  build:
+    name: Build tokens, typecheck, Storybook
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build @aivo/brand (tokens + types)
+        run: pnpm --filter @aivo/brand build
+
+      - name: Verify token outputs
+        run: |
+          set -e
+          for f in \
+            packages/brand/dist/css/tokens.css \
+            packages/brand/dist/json/tokens.json \
+            packages/brand/dist/ts/tokens.ts \
+            packages/brand/dist/tailwind/preset.cjs \
+            packages/brand/dist/index.js \
+            packages/brand/dist/index.d.ts; do
+            if [ ! -s "$f" ]; then
+              echo "::error::Missing or empty token output: $f"
+              exit 1
+            fi
+          done
+          echo "All token outputs present."
+
+      - name: Build @aivo/learner-ui (typecheck)
+        run: pnpm --filter @aivo/learner-ui build
+
+      - name: Build Storybook (static)
+        run: pnpm --filter @aivo/learner-ui storybook:build
+
+      - name: Verify Storybook output
+        run: |
+          if [ ! -s packages/learner-ui/storybook-static/index.html ]; then
+            echo "::error::Storybook output missing"
+            exit 1
+          fi
+          # Sanity check: real storybook should be at least 10KB and reference brand tokens.
+          size=$(wc -c < packages/learner-ui/storybook-static/index.html)
+          if [ "$size" -lt 10000 ]; then
+            echo "::error::Storybook output suspiciously small ($size bytes)"
+            exit 1
+          fi
+          if ! grep -q "aivo-color-calmSky" packages/learner-ui/storybook-static/index.html; then
+            echo "::error::Storybook output does not include @aivo/brand tokens"
+            exit 1
+          fi
+          echo "Storybook output OK ($size bytes)."
+
+      - name: Upload Storybook artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: storybook-static
+          path: packages/learner-ui/storybook-static
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Upload brand token artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: brand-tokens
+          path: |
+            packages/brand/dist/css/tokens.css
+            packages/brand/dist/json/tokens.json
+            packages/brand/dist/ts/tokens.ts
+            packages/brand/dist/tailwind/preset.cjs
+          retention-days: 14
+          if-no-files-found: error

@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { readMockSessionFromCookies } from "@/lib/auth/mock-session";
 import { MOCK_COOKIE_NAME, MOCK_USERS } from "@/lib/auth/mock-session";
 import { ROLE_HOME, ROLE_LABEL, type Role } from "@/lib/auth/types";
+import { MascotCoach } from "@/components/playful-calm";
 
 /**
  * Demo-mode role switch invoked by the role cards below. Replaces the cookie
@@ -53,10 +54,10 @@ export default async function Home() {
     <main id="main" className="mx-auto max-w-5xl px-6 py-16">
       <header className="mb-12">
         <p className="text-sm font-medium uppercase tracking-wide text-aivo-muted">
-          AIVO Learning v2
+          Aivo Playful Calm
         </p>
         <h1 className="mt-2 font-display text-5xl font-bold text-aivo-ink">
-          Learning adventures, built around your child.
+          A calmer, more personal way to learn.
         </h1>
         <p className="mt-4 max-w-2xl text-lg text-aivo-ink-soft">
           A calmer, more personal way to learn — with AI tutors that adapt to how each learner
@@ -84,6 +85,10 @@ export default async function Home() {
           )}
         </div>
       </header>
+      <MascotCoach
+        name="Echo the Whale"
+        tip="One primary action per screen helps young learners stay focused."
+      />
 
       <section aria-labelledby="roles-heading" className="mt-12">
         <h2 id="roles-heading" className="font-display text-2xl font-semibold">

@@ -9,6 +9,10 @@
       "cache": false,
       "persistent": true
     },
+    "storybook:build": {
+      "dependsOn": ["^build"],
+      "outputs": ["storybook-static/**"]
+    },
     "lint": {
       "dependsOn": ["^build"]
     },

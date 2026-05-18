@@ -6,6 +6,7 @@
     "build": "turbo build",
     "lint": "turbo lint",
     "test": "turbo test",
+    "storybook:build": "corepack pnpm --filter @aivo/learner-ui storybook:build",
     "db:push": "pnpm --filter @aivo/db db:push",
     "db:seed": "pnpm --filter @aivo/db db:seed",
     "i18n:audit": "node scripts/i18n-audit.mjs",

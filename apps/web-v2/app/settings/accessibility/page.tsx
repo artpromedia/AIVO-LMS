@@ -8,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Settings } from "lucide-react";
 import { ROLE_LABEL } from "@/lib/auth/types";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const NAV = [
   {
@@ -39,6 +40,28 @@ export default async function AccessibilitySettings() {
           <CardTitle>Text and reading</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-5">
+          <fieldset className="grid gap-2 sm:max-w-md">
+            <Label>Age mode</Label>
+            <Select defaultValue="spark">
+              <SelectTrigger><SelectValue placeholder="Choose age mode" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="sprout">Sprout (4–7)</SelectItem>
+                <SelectItem value="spark">Spark (8–12)</SelectItem>
+                <SelectItem value="scholar">Scholar (13+)</SelectItem>
+              </SelectContent>
+            </Select>
+          </fieldset>
+          <fieldset className="grid gap-2 sm:max-w-md">
+            <Label>Theme</Label>
+            <Select defaultValue="light">
+              <SelectTrigger><SelectValue placeholder="Choose theme" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="light">Light</SelectItem>
+                <SelectItem value="dark">Dark</SelectItem>
+                <SelectItem value="high-contrast">High contrast</SelectItem>
+              </SelectContent>
+            </Select>
+          </fieldset>
           <fieldset>
             <Label className="mb-2 block">Text size</Label>
             <RadioGroup defaultValue="medium" className="grid grid-cols-3 gap-2 sm:max-w-md">
@@ -55,17 +78,29 @@ export default async function AccessibilitySettings() {
           </fieldset>
           <fieldset className="flex flex-col gap-2">
             <Label>Other</Label>
-            {[
-              { id: "high-contrast", label: "High contrast" },
-              { id: "reduce-motion", label: "Reduce motion" },
-              { id: "read-aloud", label: "Read aloud by default" },
-              { id: "captions", label: "Always show captions" },
-            ].map((opt) => (
-              <label key={opt.id} className="flex items-center gap-3 text-sm">
-                <Checkbox id={opt.id} />
-                {opt.label}
-              </label>
-            ))}
+              {[
+                { id: "high-contrast", label: "High contrast" },
+                { id: "reduce-motion", label: "Reduce motion" },
+                { id: "read-aloud", label: "Read aloud by default" },
+                { id: "dyslexia-font", label: "Dyslexia-friendly font (OpenDyslexic)" },
+                { id: "captions", label: "Always show captions" },
+              ].map((opt) => (
+                <label key={opt.id} className="flex items-center gap-3 text-sm">
+                  <Checkbox id={opt.id} />
+                  {opt.label}
+                </label>
+              ))}
+            </fieldset>
+          <fieldset className="grid gap-2 sm:max-w-md">
+            <Label>Language</Label>
+            <Select defaultValue="en-US">
+              <SelectTrigger><SelectValue placeholder="Choose language" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="en-US">English (US)</SelectItem>
+                <SelectItem value="es-ES">Español</SelectItem>
+                <SelectItem value="fr-FR">Français</SelectItem>
+              </SelectContent>
+            </Select>
           </fieldset>
         </CardContent>
       </Card>

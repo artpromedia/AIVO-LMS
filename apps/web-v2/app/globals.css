@@ -1,22 +1,23 @@
 @import "tailwindcss";
+@import "@aivo/brand/tokens.css";
 
 @theme {
-  --color-aivo-ink: oklch(0.22 0.04 270);
-  --color-aivo-ink-soft: oklch(0.42 0.03 270);
-  --color-aivo-muted: oklch(0.62 0.02 270);
-  --color-aivo-surface: oklch(0.99 0.005 270);
-  --color-aivo-surface-2: oklch(0.97 0.01 270);
-  --color-aivo-border: oklch(0.92 0.01 270);
-  --color-aivo-primary: oklch(0.58 0.18 265);
-  --color-aivo-primary-fg: oklch(0.99 0.005 270);
-  --color-aivo-primary-soft: oklch(0.94 0.04 265);
-  --color-aivo-accent: oklch(0.72 0.18 60);
-  --color-aivo-success: oklch(0.65 0.14 155);
-  --color-aivo-warning: oklch(0.78 0.15 75);
-  --color-aivo-danger: oklch(0.62 0.2 25);
-  --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Fredoka", ui-sans-serif, system-ui, sans-serif;
-  --radius-card: 14px;
+  --color-aivo-ink: var(--aivo-semantic-color-text-primary);
+  --color-aivo-ink-soft: var(--aivo-semantic-color-text-secondary);
+  --color-aivo-muted: var(--aivo-semantic-color-text-muted);
+  --color-aivo-surface: var(--aivo-semantic-color-surface-base);
+  --color-aivo-surface-2: var(--aivo-semantic-color-surface-sunken);
+  --color-aivo-border: var(--aivo-semantic-color-border-default);
+  --color-aivo-primary: var(--aivo-semantic-color-interactive-primary-default);
+  --color-aivo-primary-fg: var(--aivo-semantic-color-text-onPrimary);
+  --color-aivo-primary-soft: var(--aivo-color-calmSky-100);
+  --color-aivo-accent: var(--aivo-color-sunshine-400);
+  --color-aivo-success: var(--aivo-semantic-color-feedback-success);
+  --color-aivo-warning: var(--aivo-semantic-color-feedback-warning);
+  --color-aivo-danger: var(--aivo-semantic-color-feedback-error);
+  --font-sans: var(--aivo-typography-fontFamily-body);
+  --font-display: var(--aivo-typography-fontFamily-display);
+  --radius-card: var(--aivo-radius-xl);
   /* Sidebar/page chrome — overridden per role theme. */
   --color-aivo-sidebar-bg: var(--color-aivo-surface);
   --color-aivo-sidebar-fg: var(--color-aivo-ink);
@@ -36,9 +37,9 @@ body {
 }
 
 *:focus-visible {
-  outline: 3px solid var(--color-aivo-primary);
+  outline: 2px solid var(--color-aivo-primary);
   outline-offset: 2px;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
 .skip-link {
@@ -98,15 +99,37 @@ body {
   --aivo-density-h1-font: 2.25rem;
 }
 
+[data-age-mode="sprout"] {
+  --radius-card: var(--aivo-radius-2xl);
+  --aivo-density-card-pad: 1.5rem;
+  --aivo-density-base-font: 1.0625rem;
+  --aivo-density-h1-font: 2.25rem;
+}
+
+[data-age-mode="spark"] {
+  --radius-card: var(--aivo-radius-xl);
+}
+
+[data-age-mode="scholar"] {
+  --radius-card: var(--aivo-radius-lg);
+  --aivo-density-card-pad: 1rem;
+  --aivo-density-base-font: 0.95rem;
+  --aivo-density-h1-font: 1.75rem;
+}
+
+[data-dyslexia-font="on"] {
+  --font-sans: var(--aivo-typography-fontFamily-dyslexia);
+}
+
 /* TEACHER — instructional, denser, more grayscale. Smaller radius, more
    data-tabular feel, calmer cool-teal primary. */
 [data-theme="teacher"] {
-  --color-aivo-ink: oklch(0.2 0.02 220);
-  --color-aivo-ink-soft: oklch(0.4 0.02 220);
+  --color-aivo-ink: oklch(0.20 0.02 220);
+  --color-aivo-ink-soft: oklch(0.40 0.02 220);
   --color-aivo-surface: oklch(0.99 0.003 220);
   --color-aivo-surface-2: oklch(0.96 0.006 220);
-  --color-aivo-border: oklch(0.9 0.006 220);
-  --color-aivo-primary: oklch(0.52 0.1 210);
+  --color-aivo-border: oklch(0.90 0.006 220);
+  --color-aivo-primary: oklch(0.52 0.10 210);
   --color-aivo-primary-soft: oklch(0.94 0.025 210);
   --color-aivo-page-bg: oklch(0.965 0.005 220);
   --color-aivo-sidebar-bg: oklch(0.99 0.003 220);
@@ -136,18 +159,18 @@ body {
 /* PLATFORM ADMIN — utilitarian, dashboardy, dark sidebar, monospace IDs.
    Internal-facing; density over warmth. */
 [data-theme="platform"] {
-  --color-aivo-ink: oklch(0.2 0.02 240);
-  --color-aivo-ink-soft: oklch(0.4 0.02 240);
+  --color-aivo-ink: oklch(0.20 0.02 240);
+  --color-aivo-ink-soft: oklch(0.40 0.02 240);
   --color-aivo-surface: oklch(0.99 0.004 240);
   --color-aivo-surface-2: oklch(0.95 0.008 240);
   --color-aivo-border: oklch(0.88 0.01 240);
-  --color-aivo-primary: oklch(0.5 0.15 220);
+  --color-aivo-primary: oklch(0.50 0.15 220);
   --color-aivo-primary-soft: oklch(0.94 0.03 220);
   --color-aivo-accent: oklch(0.72 0.18 195);
   --color-aivo-page-bg: oklch(0.95 0.008 240);
   --color-aivo-sidebar-bg: oklch(0.22 0.04 250);
   --color-aivo-sidebar-fg: oklch(0.96 0.01 240);
-  --color-aivo-sidebar-muted: oklch(0.7 0.03 240);
+  --color-aivo-sidebar-muted: oklch(0.70 0.03 240);
   --color-aivo-sidebar-border: oklch(0.32 0.04 250);
   --radius-card: 8px;
   --aivo-density-card-pad: 1rem;

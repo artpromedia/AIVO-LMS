@@ -103,3 +103,38 @@ export const REQUIRED_BRAND_ASSETS = {
     CANONICAL_SOCIAL.ogBanner,
   ],
 } as const;
+
+export const PLAYFUL_CALM_LOGOS = {
+  gradientWordmark: "/packages/brand/assets/logo/aivo-wordmark-gradient.svg",
+  darkWordmark: "/packages/brand/assets/logo/aivo-wordmark-dark.svg",
+  lightWordmark: "/packages/brand/assets/logo/aivo-wordmark-light.svg",
+  favicon: "/packages/brand/assets/logo/favicon.svg",
+  faviconMaskable: "/packages/brand/assets/logo/favicon-maskable.svg",
+} as const;
+
+export const PLAYFUL_CALM_MASCOTS = {
+  owl: {
+    idle: "/packages/brand/assets/mascots/aivo-owl-idle.svg",
+    happy: "/packages/brand/assets/mascots/aivo-owl-happy.svg",
+    thinking: "/packages/brand/assets/mascots/aivo-owl-thinking.svg",
+    celebrating: "/packages/brand/assets/mascots/aivo-owl-celebrating.svg",
+    encouraging: "/packages/brand/assets/mascots/aivo-owl-encouraging.svg",
+    sleeping: "/packages/brand/assets/mascots/aivo-owl-sleeping.svg",
+  },
+  fox: {
+    idle: "/packages/brand/assets/mascots/pip-fox-idle.svg",
+    happy: "/packages/brand/assets/mascots/pip-fox-happy.svg",
+    thinking: "/packages/brand/assets/mascots/pip-fox-thinking.svg",
+    celebrating: "/packages/brand/assets/mascots/pip-fox-celebrating.svg",
+    encouraging: "/packages/brand/assets/mascots/pip-fox-encouraging.svg",
+    sleeping: "/packages/brand/assets/mascots/pip-fox-sleeping.svg",
+  },
+  whale: {
+    idle: "/packages/brand/assets/mascots/echo-whale-idle.svg",
+    happy: "/packages/brand/assets/mascots/echo-whale-happy.svg",
+    thinking: "/packages/brand/assets/mascots/echo-whale-thinking.svg",
+    celebrating: "/packages/brand/assets/mascots/echo-whale-celebrating.svg",
+    encouraging: "/packages/brand/assets/mascots/echo-whale-encouraging.svg",
+    sleeping: "/packages/brand/assets/mascots/echo-whale-sleeping.svg",
+  },
+} as const;

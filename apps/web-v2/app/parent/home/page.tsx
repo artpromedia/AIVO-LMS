@@ -5,6 +5,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Badge } from "@/components/ui/badge";
 import { PARENT_NAV } from "@/components/layout/role-shells";
 import { listLearnersForParent, refreshLearnerReadiness } from "@/lib/db/repos";
 import { LearnerCard } from "@/components/parent/learner-card";
@@ -27,11 +28,14 @@ export default async function ParentHome() {
         title={`Welcome, ${session.displayName.split(" ")[0]}`}
         description="Set up each learner, follow their growth, and adjust supports any time."
         actions={
-          <Button asChild>
-            <Link href="/parent/learners/new">
-              <Plus className="mr-1 h-4 w-4" /> Add learner
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Badge tone="neutral">Scholar mode</Badge>
+            <Button asChild>
+              <Link href="/parent/learners/new">
+                <Plus className="mr-1 h-4 w-4" /> Add learner
+              </Link>
+            </Button>
+          </div>
         }
       />
 

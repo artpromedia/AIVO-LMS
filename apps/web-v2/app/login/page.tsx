@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MOCK_USERS } from "@/lib/auth/mock-session";
 import { ROLE_LABEL, type Role } from "@/lib/auth/types";
+import { Badge } from "@/components/ui/badge";
 
 async function mockSignIn(formData: FormData) {
   "use server";
@@ -34,23 +35,20 @@ const ROLES: Role[] = [
   "platform_admin",
 ];
 
-export default function LoginPage({
-  searchParams: _searchParams,
-}: {
-  searchParams: Promise<{ error?: string }>;
-}) {
+export default function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   return (
-    <main
-      id="main"
-      className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12"
-    >
-      <Card>
-        <CardHeader>
-          <CardTitle>Sign in</CardTitle>
-          <CardDescription>
-            Choose a role to enter the demo. Real authentication arrives in Sprint 2.
-          </CardDescription>
-        </CardHeader>
+    <main id="main" className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12">
+        <Card>
+          <CardHeader>
+            <CardTitle>Sign in</CardTitle>
+            <CardDescription>
+              Choose a role to enter the demo. Real authentication arrives in Sprint 2.
+            </CardDescription>
+            <div className="mt-2 flex gap-2">
+              <Badge tone="primary">Playful Calm</Badge>
+              <Badge tone="neutral">Audio-first ready</Badge>
+            </div>
+          </CardHeader>
         <CardContent>
           <form action={mockSignIn} className="flex flex-col gap-3">
             <fieldset className="flex flex-col gap-2">

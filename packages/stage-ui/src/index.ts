@@ -24,6 +24,7 @@ export { ProgressPath } from "./ProgressPath.js";
 export { CelebrationOverlay } from "./CelebrationOverlay.js";
 export { TutorCharacter } from "./TutorCharacter.js";
 export { StageBreakCloud } from "./StageBreakCloud.js";
+export { StagePlayfulButton, StagePlayfulCard } from "./PlayfulPrimitives.js";
 
 export type { StageLayoutProps } from "./StageLayout.js";
 export type { StageBreakCloudProps } from "./StageBreakCloud.js";

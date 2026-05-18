@@ -5,7 +5,9 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "storybook": "node ./scripts/build-storybook.mjs",
+    "storybook:build": "node ./scripts/build-storybook.mjs"
   },
   "peerDependencies": {
     "react": ">=18",
