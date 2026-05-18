@@ -26,13 +26,36 @@
 | P1-104 | `pnpm test:production-readiness` and `pnpm test:enterprise` not yet exercised by `green:check`; need to be wired in once P0-001..P0-004 unblock the core gates. | GREEN-00 follow-up | dashboard gates #10–#11 |
 | P1-105 | Running `pnpm api:generate` regenerates **9 openapi snapshots and 9 generated TS clients** with diffs vs. committed state (admin-svc, assessment-svc, billing-svc, engagement-svc, family-svc, integrations-svc, learning-svc, research-svc, tutor-svc) — indicates committed clients are stale. Independent of P0-003, fixing identity-svc will expose this drift directly. Reproduce: `pnpm api:generate && git status -- packages/api-client`. Snapshots intentionally **not** committed in this GREEN-00 commit so the drift remains visible. | GREEN-01 | observed during GREEN-00 baseline run |
 
+## P0 — New production blockers surfaced by GREEN-01
+
+| ID | Item | Owner sprint | Evidence |
+|----|------|--------------|----------|
+| P0-007 | `audit-svc` itself has no auth middleware detected — the audit log writer accepts unauthenticated writes (if confirmed by human review). | GREEN-04 / security | `pnpm backend:parity` |
+| P0-008 | `data-governance-svc` (DSAR / export / delete) is a Python service with no `Depends(...)` auth on routes. | GREEN-04 / security | same |
+| P0-009 | `responsible-ai-svc` (Python) has no auth, no tenant, no audit — the safety service itself is unauthenticated. | GREEN-04 / GREEN-06 | same |
+| P0-010 | `curriculum-svc` (Python) has no auth and no tenant — curriculum lookup is open. | GREEN-04 | same |
+| P0-011 | `tutor-svc`, `learning-svc`, `assessment-svc`, `family-svc`, `comms-svc`, `homework-svc`, `brain-svc` emit **zero audit events** despite being on consent-sensitive data planes. | GREEN-04 / GREEN-06 | same |
+| P0-012 | `homework-svc` has no `@aivo/db` persistence detected — Homework Helper data plane appears in-memory. | GREEN-05 | `pnpm backend:parity` |
+| P0-013 | `subject-brain-svc` has no auth, tenant, audit, or db — looks like an unimplemented stub. | GREEN-01 follow-up | same |
+
+## P1 — New release blockers surfaced by GREEN-03
+
+| ID | Item | Owner sprint | Evidence |
+|----|------|--------------|----------|
+| P1-106 | Math coverage: only grade K seeded. Need 1–8. | GREEN-03 | `pnpm curriculum:coverage` |
+| P1-107 | ELA coverage: only grade K seeded. Need 1–8. | GREEN-03 | same |
+| P1-108 | Science coverage: only K-2 (Physical Science) + 3-5 (Engineering Design) seeded. Need 6-8. | GREEN-03 | same |
+| P1-109 | Writing: no separate Writing seed graph exists; folded into ELA pack. Need standalone K-8 seed. | GREEN-03 | same |
+| P1-110 | Item bank: **zero items** across all subjects. `packages/item-bank/src/` is library code only. | GREEN-03 | same |
+| P1-111 | `packages/curriculum/` package does not exist. Sprint prompt lists it as a required deliverable. | GREEN-03 | repo inspection |
+
 ## P2 — Parity / missing-gate gaps (own each in its sprint)
 
 | ID | Item | Owner sprint |
 |----|------|--------------|
-| P2-201 | `pnpm backend:parity` script + matrix-driven enforcement does not exist. Requires real persistence/route/test verification, not type-only. | GREEN-01 |
-| P2-202 | `pnpm tutor:parity` script + per-tutor matrix does not exist. Must verify runtime, persona, surface, avatar, voice, safety, analytics, and tests for all 14 tutors. | GREEN-02 |
-| P2-203 | Curriculum is currently passing `curriculum:validate`; GREEN-03 must verify the scanner actually exercises real seeded K-8 graphs in Math / Reading / Science / Writing, not stubs. | GREEN-03 |
+| P2-201 | ~~`pnpm backend:parity` script + matrix-driven enforcement does not exist.~~ **GREEN-01 done** — script `scripts/backend-parity-check.mjs` is now live; surfacing 20 service findings. Remediating those findings is downstream sprint work. | GREEN-01 ✅ (gate) / downstream (fixes) |
+| P2-202 | ~~`pnpm tutor:parity` script + per-tutor matrix does not exist.~~ **GREEN-02 structural done.** 14/14 tutors pass catalog+registry+persona+avatar. **P2 extensions still open:** voice profiles, reduced-motion avatars, pronunciation overrides, per-tutor analytics events, per-tutor safety eval rubrics, accessibility affordances. | GREEN-02 ✅ (structural) / GREEN-02 extension (deep) |
+| P2-203 | ~~Curriculum is currently passing `curriculum:validate`; GREEN-03 must verify…~~ **GREEN-03 gate done** — new `scripts/curriculum-coverage-check.mjs` correctly fails RED on K-only coverage. Remediation (actually seeding K-8 across 4 subjects + item bank) belongs to a content sprint. | GREEN-03 ✅ (gate) / content sprint (fixes) |
 | P2-204 | Server-side consent middleware coverage, IEP guard, raw-IEP leak prevention to learner UI need positive integration tests beyond the current scanner. | GREEN-04 |
 | P2-205 | Core learner loop (parent assessment → brain profile → baseline → mastery → Today's Mission → LessonRun → parent summary) must be verified end-to-end with no static mock baseline reachable in prod. | GREEN-05 |
 | P2-206 | AI safety / quality / cost gate harness, eval rubrics, fallback metrics, admin cost dashboard. | GREEN-06 |

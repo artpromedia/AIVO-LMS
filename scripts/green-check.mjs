@@ -60,23 +60,14 @@ const gates = [
   { name: "brand:check", script: "brand:check", required: true, category: "brand" },
   { name: "repo:health", script: "repo:health", required: true, category: "core" },
 
+  // Sprint-owned gates implemented in GREEN-01 .. GREEN-03.
+  { name: "backend:parity", script: "backend:parity", required: true, category: "backend" },
+  { name: "tutor:parity", script: "tutor:parity", required: true, category: "tutor" },
+  { name: "curriculum:coverage", script: "curriculum:coverage", required: true, category: "curriculum" },
+
   // Gates owned by later sprints. They are reported here so the gap is
   // visible, but they don't fail the overall run until the sprint that
   // creates the underlying script lands.
-  {
-    name: "backend:parity",
-    status: "not-implemented",
-    reason: "Owned by Sprint GREEN-01. scripts/backend-parity-check.mjs not yet created.",
-    required: false,
-    category: "backend",
-  },
-  {
-    name: "tutor:parity",
-    status: "not-implemented",
-    reason: "Owned by Sprint GREEN-02. scripts/tutor-parity-check.mjs not yet created.",
-    required: false,
-    category: "tutor",
-  },
   {
     name: "mobile:role-audit",
     status: "not-implemented",

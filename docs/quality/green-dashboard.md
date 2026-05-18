@@ -36,21 +36,26 @@
 | 25 | `pnpm accessibility:audit` | GREEN-09 | 🟢 | scanner passes (legacy lens; the GREEN-09 `a11y:audit` adds axe + keyboard + reduced-motion snapshots) |
 | 26 | `pnpm brand:check` | GREEN-10 | 🟢 | scanner passes |
 | 27 | `pnpm repo:health` | infra | ⚪ | not yet wired into green:check default run; verify in next iteration |
-| 28 | `pnpm backend:parity` | GREEN-01 | ⚪ NOT IMPLEMENTED | `scripts/backend-parity-check.mjs` does not exist |
-| 29 | `pnpm tutor:parity` | GREEN-02 | ⚪ NOT IMPLEMENTED | `scripts/tutor-parity-check.mjs` does not exist |
+| 28 | `pnpm backend:parity` | GREEN-01 | 🔴 | **gate built** — 5 green / 3 yellow / 20 red across 28 services. See `backend-parity-matrix.md`. |
+| 29 | `pnpm tutor:parity` | GREEN-02 | 🟢 | **gate built** — 14 / 14 canonical tutors pass structural parity (catalog + registry + persona + avatars). P2 items (voice, reduced-motion, safety eval, analytics) remain. See `tutor-parity-matrix.md`. |
+| 29b| `pnpm curriculum:coverage` | GREEN-03 | 🔴 | **gate built** — K-8 coverage of Math/ELA/Science/Writing is stubbed; 8 errors across grade bands and item bank. See `curriculum-coverage-matrix.md`. |
 | 30 | `pnpm mobile:role-audit` | GREEN-07 | ⚪ NOT IMPLEMENTED | `scripts/mobile-role-audit.mjs` does not exist (separate lens from `mobile:audit`) |
 | 31 | `pnpm ux:parity` | GREEN-08 | ⚪ NOT IMPLEMENTED | `scripts/ux-parity-check.mjs` does not exist |
 | 32 | `pnpm a11y:audit` | GREEN-09 | ⚪ NOT IMPLEMENTED | distinct from existing `accessibility:audit`; new lens defined in GREEN-09 |
 | 33 | `pnpm security:audit` | GREEN-12 | ⚪ NOT IMPLEMENTED | `scripts/security-audit.mjs` does not exist |
 | 34 | `pnpm green:check` | GREEN-00 | 🟡 | **created in this sprint** — wraps all of the above |
 
-## Summary counts (verified by `pnpm -w green:check --only-implemented`)
+## Summary counts (post GREEN-01..03)
 
-- **Required gates implemented:** 26
-- **Required gates passing:** 18 / 26
-- **Required gates failing:** 8 — `format:check`, `lint`, `test`, `build`, `api:check`, `test:production-readiness`, `test:enterprise`, `i18n:audit`
-- **Sprint-owned gates not yet implemented:** 6 (GREEN-01..09 + GREEN-12)
-- **Overall:** 🔴 RED — production blockers in core build/test/lint/api/i18n surface
+- **Required gates implemented:** 29 (was 26; added backend:parity, tutor:parity, curriculum:coverage)
+- **Required gates passing:** 19 / 29
+- **Required gates failing:** 10 — `format:check`, `lint`, `test`, `build`, `api:check`, `test:production-readiness`, `test:enterprise`, `i18n:audit`, **`backend:parity`** (new red — 20 service findings), **`curriculum:coverage`** (new red — K-only stubs)
+- **Sprint-owned gates not yet implemented:** 4 (GREEN-07 `mobile:role-audit`, GREEN-08 `ux:parity`, GREEN-09 `a11y:audit`, GREEN-12 `security:audit`)
+- **Overall:** 🔴 RED — production blockers across core build, backend parity, and curriculum coverage
+
+The new reds are not a regression — they were always there; `green:check`
+just couldn't see them before. Making them visible IS the GREEN-01..03
+deliverable.
 
 ## Honest scope note
 
