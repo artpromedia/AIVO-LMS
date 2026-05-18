@@ -98,7 +98,7 @@ const personaKeys = new Set(
   [...personaSrc.matchAll(/^\s*"(ADDON_TUTOR_[A-Z_]+)":\s*\{/gm)].map((m) => m[1]),
 );
 
-// Per-tutor mode file aiSvcPersonaKey
+// Per-tutor mode file aiSvcPersonaKey + deep-parity fields
 const modeDir = join(repoRoot, "services/tutor-svc/src/modes");
 const modePerTutor = new Map();
 for (const key of CANONICAL_TUTORS) {
@@ -112,10 +112,44 @@ for (const key of CANONICAL_TUTORS) {
   if (existsSync(modeFile)) {
     const src = readFileSync(modeFile, "utf8");
     const k = src.match(/aiSvcPersonaKey:\s*"([^"]+)"/);
-    modePerTutor.set(key, { file: modeFile, personaKey: k?.[1] ?? null });
+    // Deep-parity surface inspection: these correspond to fields that
+    // already exist in TutorDefinition (packages/tutor-sdk/src/types.ts).
+    // Missing or empty values become yellow findings.
+    const voiceStyle = src.match(/voiceStyle:\s*"([^"]+)"/)?.[1] ?? null;
+    const hasVoiceOut = /capabilities:\s*\[[\s\S]*?"voice_out"/.test(src);
+    const hasSubjects = /subjects:\s*\[[\s\S]*?"[\w-]+"/.test(src);
+    const hasGradeBands = /gradeBands:\s*\[[\s\S]*?"[\w+-]+"/.test(src);
+    const hasFunctioningLevels = /functioningLevels:\s*\[[\s\S]*?"[A-Z_]+"/.test(src);
+    const hasSkillGraphRefs = /skillGraphRefs:\s*\[[\s\S]*?"[^"]+"/.test(src);
+    const hasPolicy = /policy:\s*\{/.test(src);
+    modePerTutor.set(key, {
+      file: modeFile,
+      personaKey: k?.[1] ?? null,
+      voiceStyle,
+      hasVoiceOut,
+      hasSubjects,
+      hasGradeBands,
+      hasFunctioningLevels,
+      hasSkillGraphRefs,
+      hasPolicy,
+    });
   } else {
     modePerTutor.set(key, { file: modeFile, personaKey: null });
   }
+}
+
+// Reduced-motion avatar variants. Convention: <key>-reduced.png alongside
+// <key>.png in the same public dir. If the variant is missing, learners
+// who turn on reduced-motion will see the animated avatar — a yellow
+// finding for GREEN-02 deep parity / GREEN-09 a11y.
+const reducedMotionStatus = new Map();
+for (const tutor of CANONICAL_TUTORS) {
+  const found = AVATAR_PUBLIC_DIRS.map((d) =>
+    existsSync(join(repoRoot, d, `${tutor}-reduced.png`)) ||
+    existsSync(join(repoRoot, d, `${tutor}-static.png`)) ||
+    existsSync(join(repoRoot, d, `${tutor}.svg`)),
+  );
+  reducedMotionStatus.set(tutor, found);
 }
 
 // ---------------------------------------------------------------------------
@@ -141,7 +175,10 @@ for (const tutor of CANONICAL_TUTORS) {
   const personaExists = personaKey ? personaKeys.has(personaKey) : false;
   const avatars = avatarStatus.get(tutor);
   const avatarOK = avatars && avatars.every(Boolean);
+  const reducedMotion = reducedMotionStatus.get(tutor);
+  const reducedMotionOK = reducedMotion && reducedMotion.every(Boolean);
 
+  // Hard requirements (red)
   const missing = [];
   if (!inBrand) missing.push("brand-catalog");
   if (!inRegistry) missing.push("runtime-registry");
@@ -150,18 +187,43 @@ for (const tutor of CANONICAL_TUTORS) {
   for (let i = 0; i < AVATAR_PUBLIC_DIRS.length; i++) {
     if (!avatars[i]) missing.push(`no-avatar(${AVATAR_PUBLIC_DIRS[i]})`);
   }
+  if (mode) {
+    if (!mode.voiceStyle) missing.push("no-voice-style");
+    if (!mode.hasSubjects) missing.push("no-subjects");
+    if (!mode.hasGradeBands) missing.push("no-gradeBands");
+    if (!mode.hasFunctioningLevels) missing.push("no-functioningLevels");
+    if (!mode.hasSkillGraphRefs) missing.push("no-skillGraphRefs");
+    if (!mode.hasPolicy) missing.push("no-policy");
+  }
+
+  // Soft requirements (yellow) — GREEN-02 deep parity / GREEN-09 a11y
+  const soft = [];
+  if (mode && !mode.hasVoiceOut) soft.push("no-voice_out-capability");
+  if (!reducedMotionOK) soft.push("no-reduced-motion-avatar");
 
   let status;
-  if (missing.length === 0) status = "🟢 green";
-  else if (missing.length <= 1 && missing.every((m) => m.startsWith("no-avatar"))) {
+  if (missing.length === 0 && soft.length === 0) status = "🟢 green";
+  else if (missing.length === 0) {
     status = "🟡 yellow";
-    for (const m of missing) warnings.push(`${tutor}: ${m}`);
+    for (const s of soft) warnings.push(`${tutor}: ${s}`);
   } else {
     status = "🔴 red";
     for (const m of missing) errors.push(`${tutor}: ${m}`);
+    for (const s of soft) warnings.push(`${tutor}: ${s}`);
   }
 
-  rows.push({ tutor, status, brand: inBrand, registry: inRegistry, persona: personaKey ?? "—", personaOK: personaExists, avatarOK });
+  rows.push({
+    tutor,
+    status,
+    brand: inBrand,
+    registry: inRegistry,
+    persona: personaKey ?? "—",
+    personaOK: personaExists,
+    avatarOK,
+    voiceStyle: mode?.voiceStyle ?? "—",
+    voiceOut: mode?.hasVoiceOut ?? false,
+    reducedMotionOK,
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -190,19 +252,32 @@ function emitAndExit() {
 
 const pad = (s, n) => String(s).padEnd(n);
 console.log("\nTUTOR PARITY MATRIX\n");
-console.log(pad("tutor", 10), pad("status", 12), pad("brand", 8), pad("registry", 10), pad("persona", 24), "avatar");
-console.log("-".repeat(90));
+console.log(
+  pad("tutor", 10),
+  pad("status", 12),
+  pad("brand", 7),
+  pad("reg", 5),
+  pad("persona", 16),
+  pad("voice", 10),
+  pad("v_out", 6),
+  pad("avatar", 8),
+  "reduced-motion",
+);
+console.log("-".repeat(100));
 for (const r of rows) {
   console.log(
     pad(r.tutor, 10),
     pad(r.status, 12),
-    pad(r.brand ? "yes" : "NO", 8),
-    pad(r.registry ? "yes" : "NO", 10),
-    pad(`${r.persona}${r.personaOK ? "" : " (MISSING)"}`, 24),
-    r.avatarOK ? "ok" : "MISSING",
+    pad(r.brand ? "yes" : "NO", 7),
+    pad(r.registry ? "yes" : "NO", 5),
+    pad(`${r.personaOK ? "ok" : "MISSING"}`, 16),
+    pad(r.voiceStyle, 10),
+    pad(r.voiceOut ? "yes" : "NO", 6),
+    pad(r.avatarOK ? "ok" : "MISSING", 8),
+    r.reducedMotionOK ? "ok" : "MISSING",
   );
 }
-console.log("-".repeat(90));
+console.log("-".repeat(100));
 
 const greens = rows.filter((r) => r.status.includes("green")).length;
 const yellows = rows.filter((r) => r.status.includes("yellow")).length;

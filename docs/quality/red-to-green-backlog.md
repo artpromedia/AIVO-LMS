@@ -38,6 +38,23 @@
 | P0-012 | `homework-svc` has no `@aivo/db` persistence detected — Homework Helper data plane appears in-memory. | GREEN-05 | `pnpm backend:parity` |
 | P0-013 | `subject-brain-svc` has no auth, tenant, audit, or db — looks like an unimplemented stub. | GREEN-01 follow-up | same |
 
+### GREEN-01 follow-up — fixes that LANDED
+
+| ID | Fix shipped | Evidence |
+|----|-------------|----------|
+| P0-fix-001 | `alerts-proxy-svc`: added `X-Service-Token` auth on `POST /api/alerts/page` with production-fail-closed env check. Tests added: rejects-no-token, rejects-wrong-token, plus updated all existing POST tests. 8/8 tests pass. | `services/alerts-proxy-svc/src/{index.ts,server.test.ts}` |
+| P0-fix-002 | `curriculum-svc`: added FastAPI `Depends(require_service_or_user)` on `/lookup` and `/skills/{id}/path`. Accepts X-Service-Token OR Authorization Bearer. New module `auth.py` with prod-fail-closed. Tests added: rejects-no-creds, rejects-wrong-token, accepts-bearer, prereq-rejects, health-remains-public. 15/15 tests pass. | `services/curriculum-svc/src/curriculum_svc/auth.py`, `routes/lookup.py`, `tests/test_lookup.py` |
+| P0-fix-003 | `learning-svc`: wired `appendAudit` into LessonRun completion with new helper `lib/audit.ts`. Emits `LESSON_RUN_COMPLETED` event with hash-chain into `audit_events` table. Logs warn-level breadcrumb on audit-write failure so lesson flow is not blocked. Build green, 10/10 existing tests pass. | `services/learning-svc/src/lib/audit.ts`, `routes/sessions.ts` |
+
+### GREEN-01 follow-up — gate accuracy improvements
+
+| ID | Improvement | Impact |
+|----|-------------|--------|
+| G-001 | AUTH_RE extended to detect `registerEnterpriseAuthHook`, `verifyJWT`, `verifyParentOwnership`, `@aivo/security`, `@aivo/enterprise-core`, `INTERNAL_SERVICE_TOKEN`, `x-service-token`, `requireServiceToken`. | Eliminated false negatives on 7 services that already had auth. |
+| G-002 | AUDIT_RE extended to detect `appendAudit`, `emitBillingAudit`, `emit*Audit`, `auditEvents`, `adminAuditLog`. | identity-svc + billing-svc + data-governance-svc + audit-svc no longer falsely flagged. |
+| G-003 | Test-file detection now matches pytest-style `tests/test_*.py` files. | curriculum-svc, ai-svc, brain-svc test counts now accurate. |
+| G-004 | `status-page-svc` contract: `needDb: false` (intentionally stateless public status page). | Removed bogus no-db error. |
+
 ## P1 — New release blockers surfaced by GREEN-03
 
 | ID | Item | Owner sprint | Evidence |

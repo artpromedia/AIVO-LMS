@@ -64,7 +64,7 @@ const SERVICE_CONTRACTS = {
   "integration-svc":     { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: false, needDb: false, needTests: true,  domain: "External integrations" },
   "integrations-svc":    { sensitive: true,  needAuth: true,  needTenant: true,  needAudit: false, needDb: true,  needTests: true,  domain: "External integrations (alt)" },
   "research-svc":        { sensitive: false, needAuth: true,  needTenant: false, needAudit: false, needDb: true,  needTests: true,  domain: "Research / analytics" },
-  "status-page-svc":     { sensitive: false, needAuth: false, needTenant: false, needAudit: false, needDb: true,  needTests: false, domain: "Public status page" },
+  "status-page-svc":     { sensitive: false, needAuth: false, needTenant: false, needAudit: false, needDb: false, needTests: false, domain: "Public status page (stateless)" },
   "alerts-proxy-svc":    { sensitive: false, needAuth: true,  needTenant: false, needAudit: false, needDb: false, needTests: true,  domain: "Ops alerts proxy" },
   "math-recognizer-svc": { sensitive: false, needAuth: true,  needTenant: false, needAudit: false, needDb: false, needTests: true,  domain: "Math recognizer (inference)" },
   "science-solver-svc":  { sensitive: false, needAuth: true,  needTenant: false, needAudit: false, needDb: false, needTests: true,  domain: "Science solver (inference)" },
@@ -89,7 +89,7 @@ function readSafe(p) {
   try { return readFileSync(p, "utf8"); } catch { return ""; }
 }
 
-const AUTH_RE = /\b(authenticate(?:Request)?|requireAuth|verifyToken|verifyJWT|verifyParentOwnership|requireUser|requireRole|jwtVerify|HTTPBearer|require_auth|require_user|require_session|OAuth2PasswordBearer|@aivo\/sso|@aivo\/security|withAuth|getServerSession|HTTPAuthorizationCredentials|requirePlatformAdmin|requireDistrictAdmin|requireSchoolAdmin|requireParent|requireTeacher|requireLearner|requireStaff|requireSubject|requireScope|requirePermission|requireGuardian|requireSession|fastifyAuth|requiresAuth)\b/;
+const AUTH_RE = /\b(authenticate(?:Request)?|requireAuth|verifyToken|verifyJWT|verifyParentOwnership|requireUser|requireRole|jwtVerify|HTTPBearer|require_auth|require_user|require_session|OAuth2PasswordBearer|@aivo\/sso|@aivo\/security|@aivo\/enterprise-core|withAuth|getServerSession|HTTPAuthorizationCredentials|requirePlatformAdmin|requireDistrictAdmin|requireSchoolAdmin|requireParent|requireTeacher|requireLearner|requireStaff|requireSubject|requireScope|requirePermission|requireGuardian|requireSession|fastifyAuth|requiresAuth|registerEnterpriseAuthHook|enterpriseAuthHook|registerAuthHook|requireServiceToken|INTERNAL_SERVICE_TOKEN|EXPECTED_SERVICE_TOKEN|x-service-token)\b/;
 const TENANT_RE = /\b(tenantId|tenant_id|requireTenant|tenantContext|withTenant|tenant_context|getTenant|TenantContext)\b/;
 const AUDIT_RE = /\b(logAuditEvent|emitAudit|audit-svc|audit_svc|writeAuditEvent|auditEvent|auditEvents|recordAudit|aivoAudit|audit\.write|audit\.log|appendAudit|emitBillingAudit|emit[A-Z]\w*Audit|adminAuditLog|admin_audit_log|district_activity_log)\b/;
 const DB_RE = /(@aivo\/db|drizzle|from\s+["']\.\.\/db|alembic|sqlalchemy|psycopg|postgres)/;
@@ -107,7 +107,10 @@ function inspectService(name, contract) {
   }
   const blob = files.map((p) => `\n// ${p}\n` + readSafe(p)).join("\n");
   const testFiles = files.filter((p) =>
-    /(__tests__|\.test\.|_test\.py)/.test(p) && !p.includes("/integration/"),
+    (/(__tests__|\.test\.|_test\.py)/.test(p) ||
+      /\/tests?\/(?!integration\/).*\/?test_[^/]+\.py$/.test(p) ||
+      /\/tests?\/test_[^/]+\.py$/.test(p)) &&
+    !p.includes("/integration/"),
   );
   const routeFiles = files.filter((p) => ROUTE_TS_RE.test(readSafe(p)) || ROUTE_PY_RE.test(readSafe(p)));
   const hasAuth = AUTH_RE.test(blob);

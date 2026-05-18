@@ -8,9 +8,10 @@ responses indefinitely.
 """
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
+from curriculum_svc.auth import require_service_or_user
 from curriculum_svc.catalogue import Skill, get_catalogue
 
 
@@ -55,6 +56,7 @@ def lookup(
     subject: str | None = Query(default=None, max_length=64),
     gradeBand: str | None = Query(default=None, max_length=8),
     skillId: str | None = Query(default=None, max_length=128),
+    _auth: str = Depends(require_service_or_user),
 ) -> LookupResponse:
     """Lookup over the catalogue.
 
@@ -103,7 +105,10 @@ class PrereqPathResponse(BaseModel):
 
 
 @router.get("/skills/{skill_id}/path", response_model=PrereqPathResponse)
-def prereq_path(skill_id: str) -> PrereqPathResponse:
+def prereq_path(
+    skill_id: str,
+    _auth: str = Depends(require_service_or_user),
+) -> PrereqPathResponse:
     """Return the prerequisite chain leading up to a skill, prerequisites
     first. Returns an empty list when the skill has no prerequisites."""
     cat = get_catalogue()

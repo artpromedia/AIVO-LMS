@@ -1,6 +1,12 @@
 import { FastifyInstance } from "fastify";
 import { eq, and, desc } from "drizzle-orm";
-import { lessonSessions, lessonContent, gradebookEntries, learningPaths } from "@aivo/db";
+import {
+  lessonSessions,
+  lessonContent,
+  gradebookEntries,
+  learningPaths,
+} from "@aivo/db";
+import { emitLessonAudit } from "../lib/audit.js";
 import {
   generateLessonContent,
   getSubjectForTutor,
@@ -467,6 +473,24 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
           }
         }
       }
+
+      await emitLessonAudit({
+        db,
+        request,
+        eventType: "LESSON_RUN_COMPLETED",
+        tenantId: session.tenantId,
+        learnerId: session.learnerId,
+        sessionId: session.id,
+        details: {
+          subject: session.subject,
+          tutorSku: session.tutorSku,
+          durationSeconds,
+          xpEarned: finalXp,
+          completionQuality,
+          masteryDelta,
+          masterySkillCount: masteryUpdates ? Object.keys(masteryUpdates).length : 0,
+        },
+      });
 
       return { status: "COMPLETED", sessionId, xpEarned: finalXp, completionQuality };
     },

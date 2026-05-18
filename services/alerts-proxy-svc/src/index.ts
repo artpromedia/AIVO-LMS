@@ -1,4 +1,4 @@
-import Fastify from "fastify";
+import Fastify, { type FastifyReply, type FastifyRequest } from "fastify";
 import cors from "@fastify/cors";
 import { createLogger } from "@aivo/observability";
 import { loadChannels, publicView, REQUIRED_CHANNELS_IN_PROD, type ChannelConfig } from "./channels.js";
@@ -7,6 +7,32 @@ import { fanOut, type ForwarderDeps, type OpsAlertEnvelope } from "./forwarders.
 const logger = createLogger("alerts-proxy-svc");
 const PORT = parseInt(process.env.ALERTS_PROXY_SVC_PORT || "3016", 10);
 const IS_PROD = process.env.NODE_ENV === "production";
+
+const INTERNAL_SERVICE_TOKEN = process.env.INTERNAL_SERVICE_TOKEN || "";
+if (IS_PROD && !INTERNAL_SERVICE_TOKEN) {
+  throw new Error(
+    "alerts-proxy-svc: INTERNAL_SERVICE_TOKEN must be set in production " +
+      "(shared secret for inter-service calls to POST /api/alerts/page).",
+  );
+}
+const EXPECTED_SERVICE_TOKEN =
+  INTERNAL_SERVICE_TOKEN || (IS_PROD ? "" : "aivo-internal-dev-token");
+
+function requireServiceToken(req: FastifyRequest, reply: FastifyReply): boolean {
+  const presented = req.headers["x-service-token"];
+  if (
+    EXPECTED_SERVICE_TOKEN &&
+    typeof presented === "string" &&
+    presented === EXPECTED_SERVICE_TOKEN
+  ) {
+    return true;
+  }
+  logger.warn("ops_alert.proxy.auth_rejected", {
+    hasToken: typeof presented === "string" && presented.length > 0,
+  });
+  reply.code(401).send({ error: "service token required" });
+  return false;
+}
 
 export interface BuildServerOptions {
   channels?: ChannelConfig[];
@@ -36,6 +62,7 @@ export async function buildServer(opts: BuildServerOptions | ChannelConfig[] = {
   });
 
   app.post("/api/alerts/page", async (req, reply) => {
+    if (!requireServiceToken(req, reply)) return;
     const body = req.body as Record<string, unknown> | undefined;
     if (!body || typeof body !== "object") {
       return reply.code(400).send({ error: "missing body" });

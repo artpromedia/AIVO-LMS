@@ -56,6 +56,7 @@ describe("alerts-proxy-svc /api/alerts/page", () => {
     const res = await app.inject({
       method: "POST",
       url: "/api/alerts/page",
+      headers: { "x-service-token": "aivo-internal-dev-token" },
       payload: {
         id: "envelope-1",
         service: "billing-svc",
@@ -104,6 +105,7 @@ describe("alerts-proxy-svc /api/alerts/page", () => {
     const res = await app.inject({
       method: "POST",
       url: "/api/alerts/page",
+      headers: { "x-service-token": "aivo-internal-dev-token" },
       payload: { service: "comms-svc", severity: "info", title: "hello", message: "world" },
     });
     const body = res.json() as any;
@@ -126,6 +128,7 @@ describe("alerts-proxy-svc /api/alerts/page", () => {
     const res = await app.inject({
       method: "POST",
       url: "/api/alerts/page",
+      headers: { "x-service-token": "aivo-internal-dev-token" },
       payload: { service: "x", severity: "critical", title: "t", message: "m" },
     });
     assert.equal(res.statusCode, 502);
@@ -135,8 +138,39 @@ describe("alerts-proxy-svc /api/alerts/page", () => {
   it("rejects malformed envelopes", async () => {
     const channels = loadChannels({ OPS_ALERTS_SLACK_WEBHOOK_URL: "https://hooks.slack.example/x" });
     const app = await buildServer({ channels });
-    const res = await app.inject({ method: "POST", url: "/api/alerts/page", payload: { service: 1 } });
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/alerts/page",
+      headers: { "x-service-token": "aivo-internal-dev-token" },
+      payload: { service: 1 },
+    });
     assert.equal(res.statusCode, 400);
+    await app.close();
+  });
+
+  it("rejects POST without service token", async () => {
+    const channels = loadChannels({ OPS_ALERTS_SLACK_WEBHOOK_URL: "https://hooks.slack.example/x" });
+    const app = await buildServer({ channels });
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/alerts/page",
+      payload: { service: "x", severity: "info", title: "t", message: "m" },
+    });
+    assert.equal(res.statusCode, 401);
+    assert.match(res.body, /service token required/);
+    await app.close();
+  });
+
+  it("rejects POST with wrong service token", async () => {
+    const channels = loadChannels({ OPS_ALERTS_SLACK_WEBHOOK_URL: "https://hooks.slack.example/x" });
+    const app = await buildServer({ channels });
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/alerts/page",
+      headers: { "x-service-token": "wrong" },
+      payload: { service: "x", severity: "info", title: "t", message: "m" },
+    });
+    assert.equal(res.statusCode, 401);
     await app.close();
   });
 });

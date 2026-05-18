@@ -14,6 +14,11 @@ from curriculum_svc.catalogue import (
 )
 from curriculum_svc.main import app
 
+# Default headers carry the dev service token so authenticated routes
+# accept the request in unit tests. Add ``DEV_TOKEN_HEADERS`` to every
+# call to a protected route; ``/api/curriculum/health`` remains public.
+DEV_TOKEN_HEADERS = {"X-Service-Token": "aivo-internal-dev-token"}
+
 client = TestClient(app)
 
 
@@ -64,12 +69,16 @@ def test_health_endpoint():
 
 
 def test_lookup_requires_at_least_one_filter():
-    r = client.get("/api/curriculum/lookup")
+    r = client.get("/api/curriculum/lookup", headers=DEV_TOKEN_HEADERS)
     assert r.status_code == 400
 
 
 def test_lookup_by_subject_and_grade_band():
-    r = client.get("/api/curriculum/lookup", params={"subject": "math", "gradeBand": "K"})
+    r = client.get(
+        "/api/curriculum/lookup",
+        params={"subject": "math", "gradeBand": "K"},
+        headers=DEV_TOKEN_HEADERS,
+    )
     assert r.status_code == 200
     body = r.json()
     skill_ids = [s["id"] for s in body["skills"]]
@@ -83,7 +92,11 @@ def test_lookup_by_subject_and_grade_band():
 
 
 def test_lookup_by_skill_id_returns_skill_and_immediate_prereqs():
-    r = client.get("/api/curriculum/lookup", params={"skillId": "ccss.math.k.cc.b.4"})
+    r = client.get(
+        "/api/curriculum/lookup",
+        params={"skillId": "ccss.math.k.cc.b.4"},
+        headers=DEV_TOKEN_HEADERS,
+    )
     assert r.status_code == 200
     body = r.json()
     ids = [s["id"] for s in body["skills"]]
@@ -93,12 +106,19 @@ def test_lookup_by_skill_id_returns_skill_and_immediate_prereqs():
 
 
 def test_lookup_by_unknown_skill_id_404s():
-    r = client.get("/api/curriculum/lookup", params={"skillId": "no-such-skill"})
+    r = client.get(
+        "/api/curriculum/lookup",
+        params={"skillId": "no-such-skill"},
+        headers=DEV_TOKEN_HEADERS,
+    )
     assert r.status_code == 404
 
 
 def test_prereq_path_endpoint():
-    r = client.get("/api/curriculum/skills/ccss.math.1.oa.a.1/path")
+    r = client.get(
+        "/api/curriculum/skills/ccss.math.1.oa.a.1/path",
+        headers=DEV_TOKEN_HEADERS,
+    )
     assert r.status_code == 200
     body = r.json()
     assert body["skillId"] == "ccss.math.1.oa.a.1"
@@ -107,5 +127,47 @@ def test_prereq_path_endpoint():
 
 
 def test_prereq_path_endpoint_404s_for_unknown_skill():
-    r = client.get("/api/curriculum/skills/no-such/path")
+    r = client.get(
+        "/api/curriculum/skills/no-such/path",
+        headers=DEV_TOKEN_HEADERS,
+    )
     assert r.status_code == 404
+
+
+# ── Auth ──────────────────────────────────────────────────────────────
+
+
+def test_lookup_rejects_request_without_credentials():
+    r = client.get(
+        "/api/curriculum/lookup",
+        params={"subject": "math", "gradeBand": "K"},
+    )
+    assert r.status_code == 401
+
+
+def test_lookup_rejects_wrong_service_token():
+    r = client.get(
+        "/api/curriculum/lookup",
+        params={"subject": "math", "gradeBand": "K"},
+        headers={"X-Service-Token": "wrong"},
+    )
+    assert r.status_code == 401
+
+
+def test_lookup_accepts_bearer_token():
+    r = client.get(
+        "/api/curriculum/lookup",
+        params={"subject": "math", "gradeBand": "K"},
+        headers={"Authorization": "Bearer a-bearer-longer-than-16-chars"},
+    )
+    assert r.status_code == 200
+
+
+def test_prereq_path_rejects_request_without_credentials():
+    r = client.get("/api/curriculum/skills/ccss.math.1.oa.a.1/path")
+    assert r.status_code == 401
+
+
+def test_health_endpoint_remains_public():
+    r = client.get("/api/curriculum/health")
+    assert r.status_code == 200

@@ -43,24 +43,39 @@ The sprint prompt also requires every tutor to have:
 These are P2 items and remain open until GREEN-02's extension lands. The gate
 will be tightened iteratively.
 
-## Snapshot — all 14 tutors green on structural check
+## Snapshot — 14 tutors yellow on deep parity (was "green" on structural)
 
-| Tutor | Display name | Domain | Persona key | Status |
-|-------|--------------|--------|-------------|--------|
-| nova    | Nova    | Mathematics                      | ADDON_TUTOR_MATH             | 🟢 |
-| sage    | Sage    | English Language Arts            | ADDON_TUTOR_ELA              | 🟢 |
-| spark   | Spark   | Science                          | ADDON_TUTOR_SCIENCE          | 🟢 |
-| chrono  | Chrono  | History & Social Studies         | ADDON_TUTOR_HISTORY          | 🟢 |
-| pixel   | Pixel   | Coding & Computational Thinking  | ADDON_TUTOR_CODING           | 🟢 |
-| echo    | Echo    | Speech & Language Therapy        | ADDON_TUTOR_SPEECH           | 🟢 |
-| harmony | Harmony | Social-Emotional Learning        | ADDON_TUTOR_SEL              | 🟢 |
-| atlas   | Atlas   | Geography & World Cultures       | ADDON_TUTOR_SOCIAL_STUDIES   | 🟢 |
-| cadence | Cadence | Music & Rhythm                   | ADDON_TUTOR_ARTS             | 🟢 |
-| vigor   | Vigor   | Physical Education & Health      | ADDON_TUTOR_PE_HEALTH        | 🟢 |
-| lingua  | Lingua  | World Languages                  | ADDON_TUTOR_LANGUAGES        | 🟢 |
-| forge   | Forge   | STEM & Engineering               | ADDON_TUTOR_STEM_DESIGN      | 🟢 |
-| compass | Compass | Life Skills & Executive Function | ADDON_TUTOR_LIFE_SKILLS      | 🟢 |
-| muse    | Muse    | Creative Arts & Expression       | ADDON_TUTOR_CREATIVE_WRITING | 🟢 |
+**The gate has been tightened.** It now also verifies for each tutor:
+
+- `voiceStyle` declared in `TutorDefinition.persona`
+- `subjects`, `gradeBands`, `functioningLevels`, `skillGraphRefs`, `policy`
+  populated (hard requirement, would turn red if absent)
+- `voice_out` capability present (soft yellow)
+- Reduced-motion avatar variant (`<key>-reduced.png` / `<key>-static.png` /
+  `<key>.svg`) in both apps' public dirs (soft yellow)
+
+**Result:** all 14 tutors satisfy the hard requirements but **none** of them
+have a reduced-motion avatar variant — every learner who enables
+reduced-motion currently sees the animated avatar. This is the correct
+honest signal: structurally complete, deep-parity gap on accessibility.
+
+| Tutor | Voice style | voice_out | Avatars | Reduced-motion | Status |
+|-------|-------------|-----------|---------|----------------|--------|
+
+| nova    | playful | yes | ok | MISSING | 🟡 |
+| sage    | warm    | yes | ok | MISSING | 🟡 |
+| spark   | playful | yes | ok | MISSING | 🟡 |
+| chrono  | calm    | yes | ok | MISSING | 🟡 |
+| pixel   | playful | yes | ok | MISSING | 🟡 |
+| echo    | warm    | yes | ok | MISSING | 🟡 |
+| harmony | calm    | yes | ok | MISSING | 🟡 |
+| atlas   | warm    | yes | ok | MISSING | 🟡 |
+| cadence | playful | yes | ok | MISSING | 🟡 |
+| vigor   | playful | yes | ok | MISSING | 🟡 |
+| lingua  | warm    | yes | ok | MISSING | 🟡 |
+| forge   | playful | yes | ok | MISSING | 🟡 |
+| compass | calm    | yes | ok | MISSING | 🟡 |
+| muse    | warm    | yes | ok | MISSING | 🟡 |
 
 ## Important caveat
 

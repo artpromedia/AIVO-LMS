@@ -11,13 +11,21 @@
 > count as green. Greps can have false negatives, so any service that the
 > machine marks red on a single dimension must still be human-reviewed.
 
-## Snapshot summary
+## Snapshot summary (post GREEN-01 second pass)
 
 | Status | Count |
 |--------|-------|
-| 🟢 green  | 5 / 28 |
+| 🟢 green  | 11 / 28 |
 | 🟡 yellow | 3 / 28 |
-| 🔴 red    | 20 / 28 |
+| 🔴 red    | 14 / 28 |
+
+**Delta from first pass:** +6 green. Changes:
+1. **alerts-proxy-svc** turned green — added service-token auth + 3 new tests.
+2. **curriculum-svc** still flagged red (no-tenant, no-db remain) but **auth was added** (Python `Depends(require_service_or_user)` + 5 new tests).
+3. **learning-svc** turned green — wired `appendAudit` into LessonRun completion + helper module.
+4. Scanner regex tightened to catch `registerEnterpriseAuthHook`, `verifyJWT`, `appendAudit`, `emitBillingAudit`, `INTERNAL_SERVICE_TOKEN`, `x-service-token`, and `requireServiceToken` — eliminated ~7 false-negative findings against the services that were already correctly authenticated.
+5. Scanner now detects pytest-style `tests/test_*.py` files (previously missed Python tests).
+6. `status-page-svc` contract corrected to `needDb: false` (intentionally stateless public status page).
 
 ## Per-service findings
 

@@ -36,8 +36,8 @@
 | 25 | `pnpm accessibility:audit` | GREEN-09 | 🟢 | scanner passes (legacy lens; the GREEN-09 `a11y:audit` adds axe + keyboard + reduced-motion snapshots) |
 | 26 | `pnpm brand:check` | GREEN-10 | 🟢 | scanner passes |
 | 27 | `pnpm repo:health` | infra | ⚪ | not yet wired into green:check default run; verify in next iteration |
-| 28 | `pnpm backend:parity` | GREEN-01 | 🔴 | **gate built** — 5 green / 3 yellow / 20 red across 28 services. See `backend-parity-matrix.md`. |
-| 29 | `pnpm tutor:parity` | GREEN-02 | 🟢 | **gate built** — 14 / 14 canonical tutors pass structural parity (catalog + registry + persona + avatars). P2 items (voice, reduced-motion, safety eval, analytics) remain. See `tutor-parity-matrix.md`. |
+| 28 | `pnpm backend:parity` | GREEN-01 | 🔴 | **gate built + 3 fixes shipped** — 11 green / 3 yellow / 14 red across 28 services (was 5g/3y/20r). Fixes: alerts-proxy-svc auth, curriculum-svc auth (Python), learning-svc audit emission. See `backend-parity-matrix.md`. |
+| 29 | `pnpm tutor:parity` | GREEN-02 | 🟡 | **gate built + tightened** — gate now also checks voice profile, voice_out capability, and reduced-motion avatar variants. All 14 tutors are yellow (structurally complete, missing reduced-motion variants). Gate exits 0 because warnings ≠ failure. See `tutor-parity-matrix.md`. |
 | 29b| `pnpm curriculum:coverage` | GREEN-03 | 🔴 | **gate built** — K-8 coverage of Math/ELA/Science/Writing is stubbed; 8 errors across grade bands and item bank. See `curriculum-coverage-matrix.md`. |
 | 30 | `pnpm mobile:role-audit` | GREEN-07 | ⚪ NOT IMPLEMENTED | `scripts/mobile-role-audit.mjs` does not exist (separate lens from `mobile:audit`) |
 | 31 | `pnpm ux:parity` | GREEN-08 | ⚪ NOT IMPLEMENTED | `scripts/ux-parity-check.mjs` does not exist |
