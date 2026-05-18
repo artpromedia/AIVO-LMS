@@ -18,16 +18,16 @@
     "@aivo/security": "workspace:*",
     "@fastify/cors": "^11.0.0",
     "@fastify/swagger": "^9.6.0",
-    "@fastify/swagger-ui": "^5.2.2",
+    "@fastify/swagger-ui": "^5.2.6",
     "drizzle-orm": "^0.44.2",
     "fastify": "^5.3.3",
     "fastify-raw-body": "^5.0.0",
-    "jose": "^6.0.11",
-    "postgres": "^3.4.5",
+    "jose": "^6.2.3",
+    "postgres": "^3.4.9",
     "stripe": "^17.5.0"
   },
   "devDependencies": {
-    "tsx": "^4.19.4",
+    "tsx": "^4.22.2",
     "typescript": "^5.7.3"
   }
 }
