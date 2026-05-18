@@ -4,17 +4,22 @@ snapshot. The catalogue is the read-only source of truth for the
 service: callers ask "what skills exist?" and "what's the prerequisite
 chain to skill X?" and get back deterministic results.
 
-The snapshot ships in the wheel (or in the source tree during dev). A
-future PR can extend `Catalogue` to lazy-reload from S3, but for now the
-service is purely in-memory.
+District scoping is enforced here, not in callers. Enrollment can pass a
+learner ZIP code to the curriculum API, the catalogue resolves it to a
+home district, and only content packs assigned to that district are
+eligible to be served.
 """
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from functools import lru_cache
 from importlib import resources
 from typing import Iterable
+
+
+_ZIP5_RE = re.compile(r"^\d{5}$")
 
 
 @dataclass(frozen=True)
@@ -28,20 +33,59 @@ class Skill:
 
 
 @dataclass(frozen=True)
+class District:
+    id: str
+    name: str
+    state: str
+    zip_codes: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class ContentPack:
     id: str
     title: str
     subject: str
     grade_band: str
     skill_ids: tuple[str, ...]
+    district_ids: tuple[str, ...]
 
 
 class Catalogue:
     """Read-only curriculum catalogue."""
 
-    def __init__(self, skills: Iterable[Skill], content_packs: Iterable[ContentPack]):
+    def __init__(
+        self,
+        skills: Iterable[Skill],
+        content_packs: Iterable[ContentPack],
+        districts: Iterable[District] = (),
+    ):
         self._by_id: dict[str, Skill] = {s.id: s for s in skills}
         self._packs: dict[str, ContentPack] = {p.id: p for p in content_packs}
+        self._districts: dict[str, District] = {d.id: d for d in districts}
+        self._district_by_zip: dict[str, District] = {}
+        for district in districts:
+            for zip_code in district.zip_codes:
+                self._district_by_zip[zip_code] = district
+
+    # ── District resolution ──────────────────────────────────────────
+
+    @staticmethod
+    def normalize_zip_code(zip_code: str) -> str:
+        """Return a normalized US ZIP5 value. Accepts ZIP+4 by truncating
+        to the first five digits. Raises ValueError for malformed input.
+        """
+        candidate = zip_code.strip()
+        if len(candidate) >= 5:
+            candidate = candidate[:5]
+        if not _ZIP5_RE.match(candidate):
+            raise ValueError("zipCode must contain a valid 5-digit ZIP code.")
+        return candidate
+
+    def resolve_district_by_zip(self, zip_code: str) -> District | None:
+        return self._district_by_zip.get(self.normalize_zip_code(zip_code))
+
+    def get_district(self, district_id: str) -> District | None:
+        return self._districts.get(district_id)
 
     # ── Lookups ──────────────────────────────────────────────────────
 
@@ -52,9 +96,19 @@ class Catalogue:
         self,
         subject: str | None = None,
         grade_band: str | None = None,
+        district_id: str | None = None,
     ) -> list[Skill]:
+        allowed_skill_ids: set[str] | None = None
+        if district_id is not None:
+            allowed_skill_ids = {
+                skill_id
+                for pack in self.list_packs(subject=subject, grade_band=grade_band, district_id=district_id)
+                for skill_id in pack.skill_ids
+            }
         out: list[Skill] = []
         for s in self._by_id.values():
+            if allowed_skill_ids is not None and s.id not in allowed_skill_ids:
+                continue
             if subject is not None and s.subject != subject:
                 continue
             if grade_band is not None and s.grade_band != grade_band:
@@ -67,9 +121,12 @@ class Catalogue:
         self,
         subject: str | None = None,
         grade_band: str | None = None,
+        district_id: str | None = None,
     ) -> list[ContentPack]:
         out: list[ContentPack] = []
         for p in self._packs.values():
+            if district_id is not None and district_id not in p.district_ids:
+                continue
             if subject is not None and p.subject != subject:
                 continue
             if grade_band is not None and p.grade_band != grade_band:
@@ -77,10 +134,17 @@ class Catalogue:
             out.append(p)
         return sorted(out, key=lambda p: p.id)
 
-    def prerequisite_path(self, skill_id: str) -> list[Skill]:
+    def skill_is_available_to_district(self, skill_id: str, district_id: str) -> bool:
+        return any(skill_id in pack.skill_ids for pack in self.list_packs(district_id=district_id))
+
+    def prerequisite_path(self, skill_id: str, district_id: str | None = None) -> list[Skill]:
         """Topologically-sorted prerequisite chain leading up to `skill_id`,
         prerequisites first. Returns `[]` if the skill is unknown.
         Cycles are tolerated by skipping already-visited nodes.
+
+        When `district_id` is supplied, the path is filtered so callers
+        only receive prerequisite skills available through that district's
+        approved content packs.
         """
         target = self._by_id.get(skill_id)
         if target is None:
@@ -101,7 +165,10 @@ class Catalogue:
         visit(target)
         # Drop the target itself from the path — callers asked for the
         # *prerequisites*. The target is appended last by `visit`.
-        return order[:-1]
+        path = order[:-1]
+        if district_id is not None:
+            path = [s for s in path if self.skill_is_available_to_district(s.id, district_id)]
+        return path
 
 
 # ── Loader ────────────────────────────────────────────────────────────
@@ -118,6 +185,15 @@ def _parse_snapshot(raw: dict) -> Catalogue:
         )
         for s in raw.get("skills", [])
     ]
+    districts = [
+        District(
+            id=d["id"],
+            name=d.get("name", d["id"]),
+            state=d.get("state", ""),
+            zip_codes=tuple(str(z) for z in d.get("zipCodes", [])),
+        )
+        for d in raw.get("districts", [])
+    ]
     packs = [
         ContentPack(
             id=p["id"],
@@ -125,10 +201,11 @@ def _parse_snapshot(raw: dict) -> Catalogue:
             subject=p["subject"],
             grade_band=p["gradeBand"],
             skill_ids=tuple(p.get("skillIds", [])),
+            district_ids=tuple(p.get("districtIds", [])),
         )
         for p in raw.get("contentPacks", [])
     ]
-    return Catalogue(skills, packs)
+    return Catalogue(skills, packs, districts)
 
 
 @lru_cache(maxsize=1)
