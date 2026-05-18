@@ -572,7 +572,77 @@
     "functioningAt": "Functioning at Grade {{functioning}} (Enrolled: {{enrolled}})"
   },
   "learnerStage": {
-    "letsSolve": "Let's solve this together!"
+    "letsSolve": "Let's solve this together!",
+    "learner": "Learner",
+    "loading": "Preparing your session…",
+    "nav": {
+      "map": "Map",
+      "brain": "Brain",
+      "stats": "Stats",
+      "settings": "Settings"
+    },
+    "header": {
+      "closeSession": "Close session",
+      "pauseSession": "Pause session",
+      "openScratchpad": "Open scratchpad",
+      "closeScratchpad": "Close scratchpad"
+    },
+    "error": {
+      "missingId": "Missing session id",
+      "couldNotLoad": "Could not load this session.",
+      "tryAgain": "Try again",
+      "backToHome": "Back to home"
+    },
+    "pause": {
+      "titleSoft": "Pause Session",
+      "titleStandard": "Pause session",
+      "message": "Your progress will be saved. Continue later?",
+      "keepGoingSoft": "Keep going!",
+      "keepGoing": "Keep going",
+      "exit": "Pause & exit"
+    },
+    "saveError": {
+      "title": "Warning",
+      "message": "Could not save your answer. It may not be recorded."
+    },
+    "offline": {
+      "title": "Saved offline",
+      "message": "Your session results will sync when you're back online."
+    },
+    "level": "Level {{level}}",
+    "completion": {
+      "score": "{{correct}} / {{total}} correct ({{score}}%)",
+      "xpEarned": "+{{xp}} XP earned"
+    },
+    "voice": {
+      "early": {
+        "encourage": "🎉 Yay! You got it!",
+        "miss": "Almost! Sora says it's {{answer}}!",
+        "completionTitle": "Adventure complete!",
+        "nextLabel": "Next →",
+        "finishLabel": "Yay! All done",
+        "homeLabel": "Back to the meadow",
+        "intro": "Let's solve this together!"
+      },
+      "middle": {
+        "encourage": "Solid. Kai nods approvingly.",
+        "miss": "Close. The answer was {{answer}}.",
+        "completionTitle": "Session wrapped",
+        "nextLabel": "Next question",
+        "finishLabel": "Wrap session",
+        "homeLabel": "Back to the treehouse",
+        "intro": "Take your time."
+      },
+      "high": {
+        "encourage": "Correct.",
+        "miss": "Not quite — answer: {{answer}}",
+        "completionTitle": "Session complete",
+        "nextLabel": "Next",
+        "finishLabel": "Finish",
+        "homeLabel": "Return to dashboard",
+        "intro": "Begin when ready."
+      }
+    }
   },
   "learnerTutor": {
     "tutorNotFound": "Tutor not found",

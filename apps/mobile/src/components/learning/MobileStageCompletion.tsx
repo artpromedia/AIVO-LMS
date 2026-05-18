@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Card, Button, DarkCapsuleNav, type DarkCapsuleNavItem } from "@/components/ui";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { fontFamilies } from "@/constants/typography";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface Props {
   tier: "EARLY" | "MIDDLE" | "HIGH";
@@ -41,6 +42,7 @@ export function MobileStageCompletion({
 }: Props) {
   const score = total > 0 ? Math.round((correctCount / total) * 100) : 0;
   const palette = useSensoryPalette();
+  const { t } = useTranslation();
   return (
     <View style={[styles.container, { backgroundColor: palette.bgPage, paddingTop }]}>
       <Card tone="hero" style={styles.card}>
@@ -52,9 +54,11 @@ export function MobileStageCompletion({
           )}
           <Text style={[styles.title, { color: palette.ink }]}>{title}</Text>
           <Text style={[styles.line, { color: palette.ink }]}>
-            {correctCount} / {total} correct ({score}%)
+            {t("learnerStage.completion.score", { correct: correctCount, total, score })}
           </Text>
-          <Text style={[styles.line, { color: palette.inkMuted }]}>+{xpEarned} XP earned</Text>
+          <Text style={[styles.line, { color: palette.inkMuted }]}>
+            {t("learnerStage.completion.xpEarned", { xp: xpEarned })}
+          </Text>
           <Button
             title={homeLabel}
             onPress={onHome}

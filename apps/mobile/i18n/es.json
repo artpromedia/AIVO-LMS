@@ -572,7 +572,77 @@
     "functioningAt": "Funcionando en Grado {{functioning}} (Inscrito: {{enrolled}})"
   },
   "learnerStage": {
-    "letsSolve": "¡Resolvamos esto juntos!"
+    "letsSolve": "¡Resolvamos esto juntos!",
+    "learner": "Estudiante",
+    "loading": "Preparando tu sesión…",
+    "nav": {
+      "map": "Mapa",
+      "brain": "Cerebro",
+      "stats": "Estadísticas",
+      "settings": "Ajustes"
+    },
+    "header": {
+      "closeSession": "Cerrar sesión",
+      "pauseSession": "Pausar sesión",
+      "openScratchpad": "Abrir bloc de notas",
+      "closeScratchpad": "Cerrar bloc de notas"
+    },
+    "error": {
+      "missingId": "Falta el identificador de sesión",
+      "couldNotLoad": "No se pudo cargar esta sesión.",
+      "tryAgain": "Intentar de nuevo",
+      "backToHome": "Volver al inicio"
+    },
+    "pause": {
+      "titleSoft": "Pausar sesión",
+      "titleStandard": "Pausar sesión",
+      "message": "Tu progreso se guardará. ¿Continuar más tarde?",
+      "keepGoingSoft": "¡Seguir jugando!",
+      "keepGoing": "Continuar",
+      "exit": "Pausar y salir"
+    },
+    "saveError": {
+      "title": "Aviso",
+      "message": "No se pudo guardar tu respuesta. Puede que no quede registrada."
+    },
+    "offline": {
+      "title": "Guardado sin conexión",
+      "message": "Los resultados de tu sesión se sincronizarán cuando vuelvas a estar en línea."
+    },
+    "level": "Nivel {{level}}",
+    "completion": {
+      "score": "{{correct}} / {{total}} correctas ({{score}}%)",
+      "xpEarned": "+{{xp}} XP ganados"
+    },
+    "voice": {
+      "early": {
+        "encourage": "🎉 ¡Sí! ¡Lo lograste!",
+        "miss": "¡Casi! Sora dice que es {{answer}}.",
+        "completionTitle": "¡Aventura completada!",
+        "nextLabel": "Siguiente →",
+        "finishLabel": "¡Sí! Todo listo",
+        "homeLabel": "Volver al prado",
+        "intro": "¡Resolvamos esto juntos!"
+      },
+      "middle": {
+        "encourage": "Bien hecho. Kai asiente con aprobación.",
+        "miss": "Cerca. La respuesta era {{answer}}.",
+        "completionTitle": "Sesión terminada",
+        "nextLabel": "Siguiente pregunta",
+        "finishLabel": "Cerrar sesión",
+        "homeLabel": "Volver a la casa del árbol",
+        "intro": "Tómate tu tiempo."
+      },
+      "high": {
+        "encourage": "Correcto.",
+        "miss": "No del todo — respuesta: {{answer}}",
+        "completionTitle": "Sesión completada",
+        "nextLabel": "Siguiente",
+        "finishLabel": "Finalizar",
+        "homeLabel": "Volver al panel",
+        "intro": "Empieza cuando estés listo."
+      }
+    }
   },
   "learnerTutor": {
     "tutorNotFound": "Tutor no encontrado",

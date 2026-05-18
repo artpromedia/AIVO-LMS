@@ -100,45 +100,41 @@ async function flushOutbox(learningApiBase: string, authHeader: string): Promise
 
 // ── Tier voice ──────────────────────────────────────────────────────────────
 
-const TIER_VOICE = {
-  EARLY: {
-    encourage: "🎉 Yay! You got it!",
-    miss: (answer: string) => `Almost! Sora says it's ${answer}!`,
-    completionEmoji: (score: number) => (score >= 80 ? "🎉" : score >= 60 ? "👏" : "💪"),
-    completionTitle: "Adventure complete!",
-    nextLabel: "Next →",
-    finishLabel: "Yay! All done",
-    homeLabel: "Back to the meadow",
-    intro: "Let’s solve this together!",
-  },
-  MIDDLE: {
-    encourage: "Solid. Kai nods approvingly.",
-    miss: (answer: string) => `Close. The answer was ${answer}.`,
-    completionEmoji: (score: number) => (score >= 80 ? "🦊" : score >= 60 ? "🌙" : "🌿"),
-    completionTitle: "Session wrapped",
-    nextLabel: "Next question",
-    finishLabel: "Wrap session",
-    homeLabel: "Back to the treehouse",
-    intro: "Take your time.",
-  },
-  HIGH: {
-    encourage: "Correct.",
-    miss: (answer: string) => `Not quite — answer: ${answer}`,
-    completionEmoji: () => "",
-    completionTitle: "Session complete",
-    nextLabel: "Next",
-    finishLabel: "Finish",
-    homeLabel: "Return to dashboard",
-    intro: "Begin when ready.",
-  },
-} as const;
+type TFn = (key: string, options?: Record<string, any>) => string;
+
+const TIER_EMOJI: Record<"EARLY" | "MIDDLE" | "HIGH", (score: number) => string> = {
+  EARLY: (score) => (score >= 80 ? "🎉" : score >= 60 ? "👏" : "💪"),
+  MIDDLE: (score) => (score >= 80 ? "🦊" : score >= 60 ? "🌙" : "🌿"),
+  HIGH: () => "",
+};
+
+const TIER_VOICE_KEY: Record<"EARLY" | "MIDDLE" | "HIGH", "early" | "middle" | "high"> = {
+  EARLY: "early",
+  MIDDLE: "middle",
+  HIGH: "high",
+};
+
+function buildVoice(tier: "EARLY" | "MIDDLE" | "HIGH", t: TFn) {
+  const k = TIER_VOICE_KEY[tier];
+  const base = `learnerStage.voice.${k}`;
+  return {
+    encourage: t(`${base}.encourage`),
+    miss: (answer: string) => t(`${base}.miss`, { answer }),
+    completionEmoji: TIER_EMOJI[tier],
+    completionTitle: t(`${base}.completionTitle`),
+    nextLabel: t(`${base}.nextLabel`),
+    finishLabel: t(`${base}.finishLabel`),
+    homeLabel: t(`${base}.homeLabel`),
+    intro: t(`${base}.intro`),
+  };
+}
 
 // ── Screen ──────────────────────────────────────────────────────────────────
 
 export default function StageScreen() {
   const { sessionId } = useLocalSearchParams<{ sessionId: string }>();
   const insets = useSafeAreaInsets();
-  const { t: _t } = useTranslation();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { data: learners } = useLearners();
   const learnerId = user?.role === "LEARNER" ? user.id : learners?.[0]?.id || "";
@@ -165,7 +161,7 @@ export default function StageScreen() {
     }),
     [tierTheme, palette],
   );
-  const voice = TIER_VOICE[tier];
+  const voice = useMemo(() => buildVoice(tier, t), [tier, t]);
   const { isTablet } = useWindowSizeClass();
 
   const [session, setSession] = useState<Session | null>(null);
@@ -185,7 +181,7 @@ export default function StageScreen() {
   useEffect(() => {
     let cancelled = false;
     if (!sessionId) {
-      setLoadError("Missing session id");
+      setLoadError(t("learnerStage.error.missingId"));
       return;
     }
     setLoadError(null);
@@ -199,13 +195,15 @@ export default function StageScreen() {
       .catch((err: unknown) => {
         if (cancelled) return;
         const msg =
-          err instanceof SessionUnavailableError ? err.message : "Could not load this session.";
+          err instanceof SessionUnavailableError
+            ? err.message
+            : t("learnerStage.error.couldNotLoad");
         setLoadError(msg);
       });
     return () => {
       cancelled = true;
     };
-  }, [sessionId]);
+  }, [sessionId, t]);
 
   // Flush the offline outbox whenever the app comes to the foreground.
   useEffect(() => {
@@ -264,7 +262,10 @@ export default function StageScreen() {
         }
         recordLedger(beat, result.correct ? "correct" : "incorrect", start);
       } catch {
-        Alert.alert("Warning", "Could not save your answer. It may not be recorded.");
+        Alert.alert(
+          t("learnerStage.saveError.title"),
+          t("learnerStage.saveError.message"),
+        );
         setLastCorrect(answer === beat.correctAnswer);
       } finally {
         setSubmitting(false);
@@ -356,20 +357,28 @@ export default function StageScreen() {
         xpEarned: xpEarned + 5,
         queuedAt: Date.now(),
       });
-      Alert.alert("Saved offline", "Your session results will sync when you’re back online.");
+      Alert.alert(t("learnerStage.offline.title"), t("learnerStage.offline.message"));
     }
-  }, [session, sessionId, currentIndex, total, correctCount, xpEarned]);
+  }, [session, sessionId, currentIndex, total, correctCount, xpEarned, t]);
 
   const handlePause = useCallback(() => {
     Alert.alert(
-      tier === "HIGH" ? "Pause session" : "Pause Session",
-      "Your progress will be saved. Continue later?",
+      tier === "HIGH"
+        ? t("learnerStage.pause.titleStandard")
+        : t("learnerStage.pause.titleSoft"),
+      t("learnerStage.pause.message"),
       [
-        { text: tier === "EARLY" ? "Keep going!" : "Keep going", style: "cancel" },
-        { text: "Pause & exit", onPress: () => router.back() },
+        {
+          text:
+            tier === "EARLY"
+              ? t("learnerStage.pause.keepGoingSoft")
+              : t("learnerStage.pause.keepGoing"),
+          style: "cancel",
+        },
+        { text: t("learnerStage.pause.exit"), onPress: () => router.back() },
       ],
     );
-  }, [tier]);
+  }, [tier, t]);
 
   // ── Render ────────────────────────────────────────────────────────────────
 
@@ -385,7 +394,9 @@ export default function StageScreen() {
         .then((s) => setSession(s))
         .catch((err: unknown) => {
           const msg =
-            err instanceof SessionUnavailableError ? err.message : "Could not load this session.";
+            err instanceof SessionUnavailableError
+              ? err.message
+              : t("learnerStage.error.couldNotLoad");
           setLoadError(msg);
         });
     };
@@ -395,9 +406,9 @@ export default function StageScreen() {
           <Ionicons name="alert-circle" size={48} color={theme.colors.text} />
           <Text style={[styles.errorText, { color: theme.colors.text }]}>{loadError}</Text>
           <View style={{ flexDirection: "row", gap: 12 }}>
-            <Button title="Try again" onPress={retry} variant="primary" />
+            <Button title={t("learnerStage.error.tryAgain")} onPress={retry} variant="primary" />
             <Button
-              title="Back to home"
+              title={t("learnerStage.error.backToHome")}
               onPress={() => router.replace("/(learner)" as Href)}
               variant="outline"
             />
@@ -413,41 +424,41 @@ export default function StageScreen() {
         <View style={styles.errorState}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
           <Text style={[styles.errorText, { color: theme.colors.text }]}>
-            Preparing your session…
+            {t("learnerStage.loading")}
           </Text>
         </View>
       </View>
     );
   }
 
-  const learnerName = user?.name || "Learner";
+  const learnerName = user?.name || t("learnerStage.learner");
   const learnerSubtitle =
-    engagement?.level != null ? `Level ${engagement.level}` : undefined;
+    engagement?.level != null ? t("learnerStage.level", { level: engagement.level }) : undefined;
 
   const completionNavItems: DarkCapsuleNavItem[] = !isTablet
     ? [
         {
           key: "map",
-          label: "Map",
+          label: t("learnerStage.nav.map"),
           icon: "map",
           active: true,
           onPress: () => router.replace("/(learner)" as Href),
         },
         {
           key: "brain",
-          label: "Brain",
+          label: t("learnerStage.nav.brain"),
           icon: "bulb",
           onPress: () => router.replace("/(learner)/brain" as Href),
         },
         {
           key: "stats",
-          label: "Stats",
+          label: t("learnerStage.nav.stats"),
           icon: "trophy",
           onPress: () => router.replace("/(learner)/gamification" as Href),
         },
         {
           key: "settings",
-          label: "Settings",
+          label: t("learnerStage.nav.settings"),
           icon: "settings",
           onPress: () => router.replace("/(learner)/settings" as Href),
         },
@@ -478,7 +489,11 @@ export default function StageScreen() {
       hitSlop={12}
       accessibilityRole="button"
       accessibilityState={{ selected: scratchOpen }}
-      accessibilityLabel={scratchOpen ? "Close scratchpad" : "Open scratchpad"}
+      accessibilityLabel={
+        scratchOpen
+          ? t("learnerStage.header.closeScratchpad")
+          : t("learnerStage.header.openScratchpad")
+      }
       style={({ pressed }) => [
         styles.scratchToggle,
         {

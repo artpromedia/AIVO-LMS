@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { spacing } from "@/constants/colors";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { HeaderUserChip, SensoryToggle } from "@/components/ui";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface Props {
   beatCount: number;
@@ -38,6 +39,7 @@ export function MobileSessionHeader({
   paddingTop,
 }: Props) {
   const palette = useSensoryPalette();
+  const { t } = useTranslation();
   const styles = createStyles(paddingTop);
   return (
     <View style={styles.topBar}>
@@ -46,7 +48,7 @@ export function MobileSessionHeader({
           onPress={onClose}
           hitSlop={12}
           accessibilityRole="button"
-          accessibilityLabel="Close session"
+          accessibilityLabel={t("learnerStage.header.closeSession")}
           style={({ pressed }) => [
             styles.iconBtn,
             {
@@ -82,7 +84,7 @@ export function MobileSessionHeader({
           onPress={onPause}
           hitSlop={12}
           accessibilityRole="button"
-          accessibilityLabel="Pause session"
+          accessibilityLabel={t("learnerStage.header.pauseSession")}
           style={({ pressed }) => [
             styles.iconBtn,
             {
