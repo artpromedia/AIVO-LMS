@@ -1,45 +1,72 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;500;600;700;800;900&display=swap');
 
 .aivo-inclusive-warm {
-  --background: 250 40% 96%; /* soft lavender wash */
-  --foreground: 230 40% 15%; /* ink */
-  
-  --card: 40 40% 98%; /* warm cream cards */
-  --card-foreground: 230 40% 15%;
-  
-  --popover: 40 40% 98%;
-  --popover-foreground: 230 40% 15%;
-  
-  --primary: 153 70% 25%; /* emerald for trust */
+  --background: 250 60% 97%;
+  --foreground: 222 47% 11%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+
+  --primary: 217 91% 60%;
   --primary-foreground: 0 0% 100%;
-  
-  --secondary: 40 90% 50%; /* amber for warm action */
-  --secondary-foreground: 230 40% 15%;
-  
-  --muted: 250 30% 90%;
-  --muted-foreground: 230 20% 45%;
-  
-  --accent: 40 90% 50%;
-  --accent-foreground: 230 40% 15%;
-  
+
+  --secondary: 38 92% 50%;
+  --secondary-foreground: 26 70% 18%;
+
+  --muted: 250 30% 92%;
+  --muted-foreground: 220 15% 42%;
+
+  --accent: 258 90% 66%;
+  --accent-foreground: 0 0% 100%;
+
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-  
-  --border: 250 20% 85%;
-  --input: 250 20% 85%;
-  --ring: 153 70% 25%;
-  
-  --radius: 1.5rem; /* Generous rounded corners */
-  
-  font-family: 'Inter', sans-serif;
+
+  --border: 250 25% 88%;
+  --input: 250 25% 88%;
+  --ring: 217 91% 60%;
+
+  --radius: 1.5rem;
+
+  --aivo-blue-50: #eff6ff;
+  --aivo-blue-100: #dbeafe;
+  --aivo-blue-500: #3b82f6;
+  --aivo-blue-600: #2563eb;
+  --aivo-blue-700: #1d4ed8;
+  --aivo-blue-800: #1e40af;
+  --aivo-lavender-50: #f5f3ff;
+  --aivo-lavender-100: #ede9fe;
+  --aivo-lavender-300: #c4b5fd;
+  --aivo-lavender-400: #a78bfa;
+  --aivo-lavender-500: #8b5cf6;
+  --aivo-lavender-600: #7c3aed;
+  --aivo-lavender-800: #5b21b6;
+  --aivo-sunshine-100: #fef3c7;
+  --aivo-sunshine-400: #fbbf24;
+  --aivo-sunshine-500: #f59e0b;
+  --aivo-sunshine-600: #d97706;
+  --aivo-sunshine-700: #b45309;
+  --aivo-cream: #fdfaf3;
+
+  --aivo-gradient: linear-gradient(135deg, #3b82f6 0%, #a78bfa 100%);
+
+  font-family: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+}
+
+.aivo-inclusive-warm .aivo-display {
+  font-family: 'Fredoka', 'Nunito', sans-serif;
 }
 
 .aivo-inclusive-warm.sensory-calm {
-  --background: 40 20% 94%;
-  --foreground: 220 20% 25%;
-  --primary: 153 40% 30%;
-  --secondary: 40 40% 60%;
-  --card: 40 20% 92%;
+  --background: 250 40% 95%;
+  --foreground: 220 25% 22%;
+  --primary: 217 60% 48%;
+  --secondary: 38 50% 60%;
+  --card: 250 30% 97%;
+  --muted: 250 20% 88%;
 }
 
 .aivo-inclusive-warm.high-contrast {
@@ -48,9 +75,9 @@
   --muted: 0 0% 90%;
   --muted-foreground: 0 0% 20%;
   --border: 0 0% 0%;
-  --primary: 0 0% 0%;
+  --primary: 217 100% 30%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 0 0% 10%;
+  --secondary: 38 100% 35%;
   --secondary-foreground: 0 0% 100%;
   --card: 0 0% 100%;
 }

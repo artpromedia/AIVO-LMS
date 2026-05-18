@@ -29,12 +29,14 @@ export function Web() {
       <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-xl border-b border-border/50">
         <div className="container mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-10">
-            <div className="flex items-center gap-2">
-              <div className="bg-primary text-white p-2 rounded-2xl">
-                <Brain className="w-6 h-6" />
-              </div>
-              <span className="text-2xl font-bold tracking-tight text-primary">AIVO</span>
-            </div>
+            <a href="#" className="flex items-center" aria-label="AIVO home">
+              <span
+                className="aivo-display text-3xl font-bold tracking-tight bg-clip-text text-transparent"
+                style={{ backgroundImage: "linear-gradient(135deg, #3b82f6 0%, #a78bfa 100%)" }}
+              >
+                AIVO
+              </span>
+            </a>
             <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
               <a href="#" className="hover:text-foreground transition-colors">Platform</a>
               <a href="#" className="hover:text-foreground transition-colors">Research</a>
@@ -88,10 +90,10 @@ export function Web() {
                 <ShieldCheck className="w-4 h-4 mr-2" />
                 FERPA & COPPA Compliant
               </Badge>
-              <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.1] mb-8 text-foreground">
+              <h1 className="aivo-display text-5xl md:text-7xl font-bold tracking-tight leading-[1.05] mb-8 text-foreground">
                 Learning that <span className="relative inline-block px-2">
-                  <span className="relative z-10">adapts</span>
-                  <span className="absolute bottom-1 left-0 w-full h-4 bg-secondary/40 -rotate-2 rounded-lg -z-0"></span>
+                  <span className="relative z-10 bg-clip-text text-transparent" style={{ backgroundImage: "linear-gradient(135deg, #3b82f6 0%, #a78bfa 100%)" }}>adapts</span>
+                  <span className="absolute bottom-2 left-0 w-full h-4 bg-[#c4b5fd]/50 -rotate-2 rounded-lg -z-0"></span>
                 </span> to your child.
               </h1>
               <p className="text-xl text-muted-foreground mb-10 leading-relaxed font-medium">
@@ -108,9 +110,9 @@ export function Web() {
               </div>
               <div className="mt-10 flex items-center gap-4 text-sm font-medium text-muted-foreground">
                 <div className="flex -space-x-3">
-                  <div className="w-10 h-10 rounded-full border-2 border-background bg-emerald-100 flex items-center justify-center text-emerald-800 font-bold text-xs">S</div>
-                  <div className="w-10 h-10 rounded-full border-2 border-background bg-amber-100 flex items-center justify-center text-amber-800 font-bold text-xs">M</div>
-                  <div className="w-10 h-10 rounded-full border-2 border-background bg-indigo-100 flex items-center justify-center text-indigo-800 font-bold text-xs">J</div>
+                  <div className="w-10 h-10 rounded-full border-2 border-background bg-[#dbeafe] flex items-center justify-center text-[#1e40af] font-bold text-xs">S</div>
+                  <div className="w-10 h-10 rounded-full border-2 border-background bg-[#fef3c7] flex items-center justify-center text-[#92400e] font-bold text-xs">M</div>
+                  <div className="w-10 h-10 rounded-full border-2 border-background bg-[#ede9fe] flex items-center justify-center text-[#5b21b6] font-bold text-xs">J</div>
                 </div>
                 <p>Trusted by 1,200+ specialists and parents.</p>
               </div>
@@ -126,12 +128,12 @@ export function Web() {
               {/* Floating Stat Card */}
               <Card className="absolute -bottom-8 -left-8 w-72 shadow-xl border-white/50 bg-white/90 backdrop-blur-md rounded-3xl p-1">
                 <CardContent className="p-5 flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center shrink-0">
-                    <LineChart className="w-6 h-6 text-emerald-700" />
+                  <div className="w-12 h-12 rounded-2xl bg-[#dbeafe] flex items-center justify-center shrink-0">
+                    <LineChart className="w-6 h-6 text-[#1d4ed8]" />
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-muted-foreground mb-1">Focus Duration</p>
-                    <p className="text-3xl font-extrabold tracking-tight text-emerald-700">+47.2%</p>
+                    <p className="text-3xl font-extrabold tracking-tight text-[#1d4ed8]">+47.2%</p>
                     <p className="text-xs font-medium text-muted-foreground mt-1">Average increase week 1</p>
                   </div>
                 </CardContent>
@@ -294,11 +296,13 @@ export function Web() {
       <footer className="border-t border-border/50 bg-white/50 pt-20 pb-12">
         <div className="container mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-12 mb-16">
           <div>
-            <div className="flex items-center gap-2 mb-6">
-              <div className="bg-primary text-white p-1.5 rounded-xl">
-                <Brain className="w-5 h-5" />
-              </div>
-              <span className="text-xl font-bold text-primary">AIVO</span>
+            <div className="flex items-center mb-6">
+              <span
+                className="aivo-display text-2xl font-bold tracking-tight bg-clip-text text-transparent"
+                style={{ backgroundImage: "linear-gradient(135deg, #3b82f6 0%, #a78bfa 100%)" }}
+              >
+                AIVO
+              </span>
             </div>
             <p className="text-sm text-muted-foreground font-medium leading-relaxed">
               Engineered for the margins.<br/>

@@ -134,8 +134,8 @@ export function Mobile() {
             <Card className="border border-border/50 bg-card rounded-[2rem] shadow-sm opacity-90">
               <CardContent className="p-5 flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-[1.5rem] bg-indigo-100 flex items-center justify-center shrink-0">
-                    <BookOpen className="w-7 h-7 text-indigo-600" />
+                  <div className="w-14 h-14 rounded-[1.5rem] bg-[#ede9fe] flex items-center justify-center shrink-0">
+                    <BookOpen className="w-7 h-7 text-[#7c3aed]" />
                   </div>
                   <div>
                     <h4 className="font-bold text-[15px] mb-0.5">Reading Logic</h4>
