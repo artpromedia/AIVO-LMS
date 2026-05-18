@@ -52,15 +52,17 @@ export default async function Home() {
 
   return (
     <main id="main" className="mx-auto max-w-5xl px-6 py-16">
-      <header className="mb-12">
-        <p className="text-sm font-medium uppercase tracking-wide text-aivo-muted">
-          Aivo Playful Calm
+      <header className="mb-12 rounded-iw-hero border border-iw-border bg-iw-hero p-8 shadow-soft-3 sm:p-12">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-iw-ink-muted">
+          Aivo Inclusive Lab · Warm
         </p>
-        <h1 className="mt-2 font-display text-5xl font-bold text-aivo-ink">
-          A calmer, more personal way to learn.
+        <h1 className="mt-3 font-iw-display text-5xl font-bold tracking-tight leading-[1.05] text-iw-ink sm:text-6xl">
+          Learning that{" "}
+          <span className="bg-clip-text text-transparent bg-iw-sensory-brand">adapts</span> to
+          every child.
         </h1>
-        <p className="mt-4 max-w-2xl text-lg text-aivo-ink-soft">
-          A calmer, more personal way to learn — with AI tutors that adapt to how each learner
+        <p className="mt-4 max-w-2xl text-lg text-iw-ink-muted">
+          A warmer, more personal way to learn — with AI tutors that adapt to how each learner
           thinks, focuses, and grows.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
@@ -86,15 +88,18 @@ export default async function Home() {
         </div>
       </header>
       <MascotCoach
-        name="Echo the Whale"
+        name="Your tutor companion"
         tip="One primary action per screen helps young learners stay focused."
       />
 
       <section aria-labelledby="roles-heading" className="mt-12">
-        <h2 id="roles-heading" className="font-display text-2xl font-semibold">
+        <h2
+          id="roles-heading"
+          className="font-iw-display text-2xl font-semibold tracking-tight text-iw-ink"
+        >
           Choose your space
         </h2>
-        <p className="mt-1 text-aivo-ink-soft">
+        <p className="mt-1 text-iw-ink-muted">
           {session
             ? `Signed in as ${session.displayName} (${ROLE_LABEL[session.role]}). Pick a role to switch — demo mode only.`
             : "Every role has a dedicated home. Pick one to enter the demo."}
@@ -105,23 +110,24 @@ export default async function Home() {
             return (
               <Card
                 key={card.role}
-                className="p-5 flex flex-col gap-2"
+                variant={isActive ? "elevated" : "flat"}
+                className="flex flex-col gap-2 p-5"
                 aria-current={isActive ? "true" : undefined}
               >
-                <h3 className="font-display text-lg font-semibold">
+                <h3 className="font-iw-display text-lg font-semibold text-iw-ink">
                   {card.title}
                   {isActive ? (
-                    <span className="ml-2 rounded-full bg-aivo-primary-soft px-2 py-0.5 text-xs font-medium text-aivo-primary align-middle">
+                    <span className="ml-2 rounded-full bg-iw-accent-soft px-2 py-0.5 align-middle text-xs font-semibold text-iw-primary">
                       You
                     </span>
                   ) : null}
                 </h3>
-                <p className="text-sm text-aivo-ink-soft">{card.body}</p>
+                <p className="text-sm text-iw-ink-muted">{card.body}</p>
                 <form action={switchRoleAction} className="mt-2">
                   <input type="hidden" name="role" value={card.role} />
                   <button
                     type="submit"
-                    className="text-sm font-medium text-aivo-primary hover:underline focus-visible:underline"
+                    className="text-sm font-semibold text-iw-primary hover:underline focus-visible:underline"
                   >
                     {isActive
                       ? `Open ${card.title.toLowerCase()} →`

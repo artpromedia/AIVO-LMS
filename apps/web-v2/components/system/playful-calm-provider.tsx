@@ -45,17 +45,19 @@ export function PlayfulCalmProvider({ children }: { children: React.ReactNode })
   return (
     <>
       {children}
-      <div className="fixed bottom-3 right-3 z-[var(--aivo-zIndex-toast,1400)] rounded-2xl border border-aivo-border bg-aivo-surface p-3 shadow-soft-3">
-        <p className="mb-2 text-xs font-semibold text-aivo-ink-soft">Playful Calm</p>
-        <label className="mb-1 block text-xs">Theme</label>
-        <select className="mb-2 w-full rounded-md border border-aivo-border bg-aivo-surface px-2 py-1 text-xs" value={theme} onChange={(e) => setTheme(e.target.value as PlayfulTheme)}>
+      <div className="fixed bottom-3 right-3 z-[var(--aivo-zIndex-toast,1400)] rounded-iw-card border border-iw-border bg-iw-card p-3 shadow-soft-3">
+        <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-iw-ink-muted">
+          Display preferences
+        </p>
+        <label className="mb-1 block text-xs text-iw-ink">Theme</label>
+        <select className="mb-2 w-full rounded-md border border-iw-border bg-iw-raised px-2 py-1 text-xs text-iw-ink" value={theme} onChange={(e) => setTheme(e.target.value as PlayfulTheme)}>
           {THEMES.map((t) => <option key={t} value={t}>{t}</option>)}
         </select>
-        <label className="mb-1 block text-xs">Age mode</label>
-        <select className="mb-2 w-full rounded-md border border-aivo-border bg-aivo-surface px-2 py-1 text-xs" value={ageMode} onChange={(e) => setAgeMode(e.target.value as PlayfulAgeMode)}>
+        <label className="mb-1 block text-xs text-iw-ink">Age mode</label>
+        <select className="mb-2 w-full rounded-md border border-iw-border bg-iw-raised px-2 py-1 text-xs text-iw-ink" value={ageMode} onChange={(e) => setAgeMode(e.target.value as PlayfulAgeMode)}>
           {AGES.map((a) => <option key={a} value={a}>{a}</option>)}
         </select>
-        <label className="flex items-center gap-2 text-xs">
+        <label className="flex items-center gap-2 text-xs text-iw-ink">
           <input type="checkbox" checked={dyslexia} onChange={(e) => setDyslexia(e.target.checked)} />
           Dyslexia font
         </label>

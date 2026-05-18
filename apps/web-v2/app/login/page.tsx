@@ -38,17 +38,17 @@ const ROLES: Role[] = [
 export default function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   return (
     <main id="main" className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12">
-        <Card>
-          <CardHeader>
-            <CardTitle>Sign in</CardTitle>
-            <CardDescription>
-              Choose a role to enter the demo. Real authentication arrives in Sprint 2.
-            </CardDescription>
-            <div className="mt-2 flex gap-2">
-              <Badge tone="primary">Playful Calm</Badge>
-              <Badge tone="neutral">Audio-first ready</Badge>
-            </div>
-          </CardHeader>
+      <Card variant="hero">
+        <CardHeader>
+          <CardTitle>Sign in</CardTitle>
+          <CardDescription>
+            Choose a role to enter the demo. Real authentication arrives in Sprint 2.
+          </CardDescription>
+          <div className="mt-2 flex gap-2">
+            <Badge tone="primary">Inclusive Lab · Warm</Badge>
+            <Badge tone="neutral">Audio-first ready</Badge>
+          </div>
+        </CardHeader>
         <CardContent>
           <form action={mockSignIn} className="flex flex-col gap-3">
             <fieldset className="flex flex-col gap-2">
@@ -56,17 +56,17 @@ export default function LoginPage({ searchParams }: { searchParams: Promise<{ er
               {ROLES.map((r) => (
                 <label
                   key={r}
-                  className="flex cursor-pointer items-center gap-3 rounded-lg border border-aivo-border bg-aivo-surface p-3 text-sm hover:bg-aivo-surface-2"
+                  className="flex cursor-pointer items-center gap-3 rounded-iw-card border border-iw-border bg-iw-card p-3 text-sm hover:bg-iw-raised"
                 >
                   <input
                     type="radio"
                     name="role"
                     value={r}
                     defaultChecked={r === "parent"}
-                    className="h-4 w-4 accent-aivo-primary"
+                    className="h-4 w-4 accent-iw-primary"
                   />
-                  <span className="font-medium">{ROLE_LABEL[r]}</span>
-                  <span className="ml-auto text-xs text-aivo-muted">{MOCK_USERS[r].email}</span>
+                  <span className="font-semibold text-iw-ink">{ROLE_LABEL[r]}</span>
+                  <span className="ml-auto text-xs text-iw-ink-muted">{MOCK_USERS[r].email}</span>
                 </label>
               ))}
             </fieldset>
@@ -74,9 +74,9 @@ export default function LoginPage({ searchParams }: { searchParams: Promise<{ er
               Continue
             </Button>
           </form>
-          <p className="mt-4 text-sm text-aivo-ink-soft">
+          <p className="mt-4 text-sm text-iw-ink-muted">
             New here?{" "}
-            <Link href="/signup" className="font-medium text-aivo-primary hover:underline">
+            <Link href="/signup" className="font-semibold text-iw-primary hover:underline">
               Create an account
             </Link>
             .
