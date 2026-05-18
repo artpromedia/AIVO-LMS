@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
 import { useLearners } from "@/hooks/useLearners";
+import { useEngagement } from "@/hooks/useEngagement";
 import { apiFetch } from "@/lib/api";
 import { API } from "@/constants/api";
 import { spacing } from "@/constants/colors";
@@ -24,6 +25,7 @@ import { ScratchPad } from "@/src/components/learning/ScratchPad";
 import { MobileSessionHeader } from "@/src/components/learning/MobileSessionHeader";
 import { MobileStageRuntime } from "@/src/components/learning/MobileStageRuntime";
 import { MobileStageCompletion } from "@/src/components/learning/MobileStageCompletion";
+import { Button, type DarkCapsuleNavItem } from "@/components/ui";
 import { sessionClient, SessionUnavailableError } from "@/src/api/sessionClient";
 import { stageClient } from "@/src/api/stageClient";
 import { problemSessionClient } from "@/src/api/problemSessionClient";
@@ -140,6 +142,7 @@ export default function StageScreen() {
   const { user } = useAuth();
   const { data: learners } = useLearners();
   const learnerId = user?.role === "LEARNER" ? user.id : learners?.[0]?.id || "";
+  const { data: engagement } = useEngagement(learnerId);
 
   const { tier, theme: tierTheme } = useTierTheme();
   const palette = useSensoryPalette();
@@ -392,29 +395,12 @@ export default function StageScreen() {
           <Ionicons name="alert-circle" size={48} color={theme.colors.text} />
           <Text style={[styles.errorText, { color: theme.colors.text }]}>{loadError}</Text>
           <View style={{ flexDirection: "row", gap: 12 }}>
-            <Pressable
-              style={[styles.errorBtn, { backgroundColor: theme.colors.primary }]}
-              onPress={retry}
-              accessibilityRole="button"
-              accessibilityLabel="Try again"
-            >
-              <Text style={{ color: theme.colors.surface, fontWeight: "700" }}>Try again</Text>
-            </Pressable>
-            <Pressable
-              style={[
-                styles.errorBtn,
-                {
-                  backgroundColor: "transparent",
-                  borderWidth: 1,
-                  borderColor: theme.colors.primary,
-                },
-              ]}
+            <Button title="Try again" onPress={retry} variant="primary" />
+            <Button
+              title="Back to home"
               onPress={() => router.replace("/(learner)" as Href)}
-              accessibilityRole="button"
-              accessibilityLabel="Back to home"
-            >
-              <Text style={{ color: theme.colors.primary, fontWeight: "700" }}>Back to home</Text>
-            </Pressable>
+              variant="outline"
+            />
           </View>
         </View>
       </View>
@@ -434,11 +420,44 @@ export default function StageScreen() {
     );
   }
 
+  const learnerName = user?.name || "Learner";
+  const learnerSubtitle =
+    engagement?.level != null ? `Level ${engagement.level}` : undefined;
+
+  const completionNavItems: DarkCapsuleNavItem[] = !isTablet
+    ? [
+        {
+          key: "map",
+          label: "Map",
+          icon: "map",
+          active: true,
+          onPress: () => router.replace("/(learner)" as Href),
+        },
+        {
+          key: "brain",
+          label: "Brain",
+          icon: "bulb",
+          onPress: () => router.replace("/(learner)/brain" as Href),
+        },
+        {
+          key: "stats",
+          label: "Stats",
+          icon: "trophy",
+          onPress: () => router.replace("/(learner)/gamification" as Href),
+        },
+        {
+          key: "settings",
+          label: "Settings",
+          icon: "settings",
+          onPress: () => router.replace("/(learner)/settings" as Href),
+        },
+      ]
+    : [];
+
   if (sessionComplete) {
     const score = total > 0 ? Math.round((correctCount / total) * 100) : 0;
     return (
       <MobileStageCompletion
-        theme={theme}
         tier={tier}
         correctCount={correctCount}
         total={total}
@@ -448,6 +467,7 @@ export default function StageScreen() {
         homeLabel={voice.homeLabel}
         onHome={() => router.back()}
         paddingTop={insets.top}
+        navItems={completionNavItems}
       />
     );
   }
@@ -457,12 +477,21 @@ export default function StageScreen() {
       onPress={() => setScratchOpen((s) => !s)}
       hitSlop={12}
       accessibilityRole="button"
+      accessibilityState={{ selected: scratchOpen }}
       accessibilityLabel={scratchOpen ? "Close scratchpad" : "Open scratchpad"}
+      style={({ pressed }) => [
+        styles.scratchToggle,
+        {
+          backgroundColor: scratchOpen ? palette.primary : palette.bgRaised,
+          borderColor: scratchOpen ? palette.primary : palette.border,
+          opacity: pressed ? 0.85 : 1,
+        },
+      ]}
     >
       <Ionicons
-        name={scratchOpen ? "close-circle-outline" : "pencil"}
-        size={26}
-        color={scratchOpen ? theme.colors.primary : theme.colors.text}
+        name={scratchOpen ? "close" : "pencil"}
+        size={20}
+        color={scratchOpen ? palette.primaryFg : palette.ink}
       />
     </Pressable>
   ) : null;
@@ -470,9 +499,10 @@ export default function StageScreen() {
   return (
     <View style={styles.container}>
       <MobileSessionHeader
-        theme={theme}
         beatCount={total}
         currentIndex={currentIndex}
+        userName={learnerName}
+        userSubtitle={learnerSubtitle}
         onClose={() => router.back()}
         onPause={handlePause}
         scratchpadButton={scratchToggle}
@@ -535,10 +565,13 @@ function createStyles(bg: string) {
       padding: 32,
     },
     errorText: { fontSize: 18, textAlign: "center" },
-    errorBtn: {
-      paddingHorizontal: 20,
-      paddingVertical: 12,
-      borderRadius: 24,
+    scratchToggle: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
+      borderWidth: 1,
+      alignItems: "center",
+      justifyContent: "center",
     },
   });
 }
