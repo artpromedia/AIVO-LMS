@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.aivo-inclusive-lab {
+  --background: 40 20% 98%;
+  --foreground: 220 30% 15%;
+  
+  --card: 0 0% 100%;
+  --card-foreground: 220 30% 15%;
+  
+  --popover: 0 0% 100%;
+  --popover-foreground: 220 30% 15%;
+  
+  --primary: 153 90% 15%; /* Deep emerald */
+  --primary-foreground: 0 0% 100%;
+  
+  --secondary: 40 90% 50%; /* Soft amber */
+  --secondary-foreground: 220 30% 15%;
+  
+  --muted: 40 20% 90%;
+  --muted-foreground: 220 15% 40%;
+  
+  --accent: 40 20% 90%;
+  --accent-foreground: 220 30% 15%;
+  
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  
+  --border: 40 15% 85%;
+  --input: 40 15% 85%;
+  --ring: 153 90% 15%;
+  
+  --radius: 0.5rem;
+  
+  font-family: 'Inter', sans-serif;
+}
+
+.aivo-inclusive-lab.sensory-calm {
+  --background: 40 20% 94%;
+  --foreground: 220 20% 25%;
+  --primary: 153 40% 30%;
+  --secondary: 40 40% 60%;
+}
+
+.aivo-inclusive-lab.high-contrast {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 0%;
+  --muted: 0 0% 90%;
+  --muted-foreground: 0 0% 20%;
+  --border: 0 0% 0%;
+  --primary: 0 0% 0%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 10%;
+  --secondary-foreground: 0 0% 100%;
+}

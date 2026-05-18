@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter:wght@300;400;500;600&display=swap');
+
+.aivo-editorial-calm {
+  --background: 40 20% 97%; /* #F9F8F6 Cream */
+  --foreground: 0 0% 10%; /* #1A1A1A Deep ink */
+  
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 10%;
+  
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 10%;
+  
+  --primary: 150 10% 45%; /* Sage green #6B7D72 */
+  --primary-foreground: 0 0% 100%;
+  
+  --secondary: 40 20% 92%; /* Light beige */
+  --secondary-foreground: 0 0% 10%;
+  
+  --muted: 40 20% 92%;
+  --muted-foreground: 0 0% 40%;
+  
+  --accent: 12 55% 55%; /* Terracotta #C86A51 */
+  --accent-foreground: 0 0% 100%;
+  
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+
+  --border: 40 15% 85%;
+  --input: 40 15% 85%;
+  --ring: 150 10% 45%;
+
+  --radius: 0.5rem;
+}
+
+.aivo-editorial-calm {
+  font-family: 'Inter', sans-serif;
+  color: hsl(var(--foreground));
+  background-color: hsl(var(--background));
+}
+
+.aivo-editorial-calm h1, 
+.aivo-editorial-calm h2, 
+.aivo-editorial-calm h3, 
+.aivo-editorial-calm h4, 
+.aivo-editorial-calm h5, 
+.aivo-editorial-calm h6,
+.aivo-editorial-calm .font-serif {
+  font-family: 'Fraunces', serif;
+}

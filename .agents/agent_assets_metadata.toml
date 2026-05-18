@@ -414,6 +414,42 @@ uri = "file://artifacts/mockup-sandbox/public/images/aivo-cosmic-friendly/mobile
 type = "image"
 title = "Mobile avatar child explorer"
 
+[[generated]]
+id = "Z47XLJ5NhOvhfwWkZD0Uk"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-editorial-calm/hero.png"
+type = "image"
+title = "Candid editorial photo of family"
+
+[[generated]]
+id = "_k1WSM3uKYv_eVSff2SY7"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-editorial-calm/feature-play.png"
+type = "image"
+title = "Child playing naturally"
+
+[[generated]]
+id = "WMk06pVbpygoK82Hl2sEK"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-editorial-calm/feature-quiet.png"
+type = "image"
+title = "Quiet learning environment"
+
+[[generated]]
+id = "wdZ_aBs-IvED9aeHbpwJT"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-inclusive-lab/hero-device.png"
+type = "image"
+title = "iPad with clean educational interface"
+
+[[generated]]
+id = "mHSU05Ut4ULY81BQAEeP7"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-inclusive-lab/parent-child.png"
+type = "image"
+title = "Parent and child at tablet"
+
+[[generated]]
+id = "Aqkvw5cmWUwpa7CJL0BKV"
+uri = "file://artifacts/mockup-sandbox/public/images/aivo-inclusive-lab/companion.png"
+type = "image"
+title = "Abstract geometric companion"
+
 [[outputs]]
 id = "0e7lRmti5tdoSwrX0-ySG"
 uri = "file://.local/preview/marketing-hero.jpg"

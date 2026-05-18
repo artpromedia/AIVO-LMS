@@ -1,0 +1,58 @@
+.aivo-qa-theme {
+  --background: 0 0% 99%;
+  --foreground: 0 0% 4%;
+  --primary: 164 36% 26%; /* Forest Green */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 94%;
+  --secondary-foreground: 0 0% 9%;
+  --muted: 0 0% 94%;
+  --muted-foreground: 0 0% 45%;
+  --accent: 164 36% 26%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 88%;
+  --input: 0 0% 88%;
+  --ring: 164 36% 26%;
+  --radius: 0.5rem;
+  
+  font-family: 'Space Grotesk', sans-serif;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+.aivo-qa-theme.dark {
+  --background: 0 0% 6%;
+  --foreground: 0 0% 98%;
+  --primary: 164 36% 46%;
+  --primary-foreground: 0 0% 9%;
+  --secondary: 0 0% 12%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 0 0% 12%;
+  --muted-foreground: 0 0% 64%;
+  --accent: 164 36% 46%;
+  --accent-foreground: 0 0% 9%;
+  --border: 0 0% 18%;
+  --input: 0 0% 18%;
+}
+
+.aivo-qa-theme .font-inter {
+  font-family: 'Inter', sans-serif;
+}
+
+.aivo-qa-theme .font-sans {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* Subtle grain overlay */
+.aivo-qa-theme .bg-noise {
+  position: relative;
+}
+.aivo-qa-theme .bg-noise::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+  z-index: 10;
+}
