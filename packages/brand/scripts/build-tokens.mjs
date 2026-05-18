@@ -16,6 +16,7 @@ const sourceFiles = [
   "tokens/semantic/color.json",
   "tokens/modes/age-modes.json",
   "tokens/modes/themes.json",
+  "tokens/modes/sensory.json",
 ];
 
 const mergeDeep = (target, source) => {
@@ -73,6 +74,20 @@ const ageVars = Object.entries(tokens.modes.age).map(([name, values]) =>
     flatten({ age: values }),
   ));
 
+const sensoryVars = tokens.modes.sensory
+  ? Object.entries(tokens.modes.sensory).map(([name, values]) =>
+      cssBlock(`[data-sensory-mode=\"${name}\"]`,
+        flatten({ sensory: values }),
+      ))
+  : [];
+
+// Emit the "standard" sensory mode defaults under :root so apps that
+// don't yet set `<html data-sensory-mode="…">` still get a usable
+// palette out of the box.
+const sensoryRootDefaults = tokens.modes.sensory?.standard
+  ? cssBlock(":root", flatten({ sensory: tokens.modes.sensory.standard }))
+  : "";
+
 fs.mkdirSync(path.join(distDir, "css"), { recursive: true });
 fs.mkdirSync(path.join(distDir, "ts"), { recursive: true });
 fs.mkdirSync(path.join(distDir, "json"), { recursive: true });
@@ -81,14 +96,80 @@ fs.mkdirSync(path.join(distDir, "tailwind"), { recursive: true });
 const css = [
   ":root { color-scheme: light; }",
   cssBlock(":root", baseVars),
+  sensoryRootDefaults,
   ...themeVars,
   ...ageVars,
-  "@media (prefers-reduced-motion: reduce) { :root { --aivo-motion-duration-fast: 0ms; --aivo-motion-duration-base: 0ms; --aivo-motion-duration-slow: 0ms; --aivo-motion-duration-playful: 0ms; } }",
-].join("\n\n");
+  ...sensoryVars,
+  "@media (prefers-reduced-motion: reduce) { :root { --aivo-motion-duration-fast: 0ms; --aivo-motion-duration-base: 0ms; --aivo-motion-duration-slow: 0ms; --aivo-motion-duration-playful: 0ms; --aivo-sensory-motionScale: 0; } }",
+].filter(Boolean).join("\n\n");
 
 const ts = `export const playfulCalmTokens = ${JSON.stringify(tokens, null, 2)} as const;\nexport type PlayfulCalmTokens = typeof playfulCalmTokens;\n`;
 
-const preset = `module.exports = {\n  theme: {\n    extend: {\n      colors: {\n        brand: {\n          primary: \"var(--aivo-semantic-color-interactive-primary-default)\",\n          secondary: \"var(--aivo-semantic-color-interactive-secondary-default)\",\n          meadow: \"var(--aivo-color-meadow-400)\",\n          sunshine: \"var(--aivo-color-sunshine-400)\",\n          lavender: \"var(--aivo-color-lavender-400)\",\n          canvas: \"var(--aivo-semantic-color-surface-canvas)\",\n          surface: \"var(--aivo-semantic-color-surface-base)\",\n          ink: \"var(--aivo-semantic-color-text-primary)\"\n        }\n      },\n      borderRadius: {\n        md: \"var(--aivo-radius-md)\",\n        lg: \"var(--aivo-radius-lg)\",\n        xl: \"var(--aivo-radius-xl)\",\n        \"2xl\": \"var(--aivo-radius-2xl)\",\n        pill: \"var(--aivo-radius-pill)\"\n      },\n      boxShadow: {\n        \"soft-1\": \"var(--aivo-shadow-soft-1)\",\n        \"soft-3\": \"var(--aivo-shadow-soft-3)\",\n        \"soft-5\": \"var(--aivo-shadow-soft-5)\"\n      }\n    }\n  }\n};\n`;
+const preset = `module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        brand: {
+          primary: "var(--aivo-semantic-color-interactive-primary-default)",
+          secondary: "var(--aivo-semantic-color-interactive-secondary-default)",
+          meadow: "var(--aivo-color-meadow-400)",
+          sunshine: "var(--aivo-color-sunshine-400)",
+          lavender: "var(--aivo-color-lavender-400)",
+          canvas: "var(--aivo-semantic-color-surface-canvas)",
+          surface: "var(--aivo-semantic-color-surface-base)",
+          ink: "var(--aivo-semantic-color-text-primary)"
+        },
+        // Inclusive-Warm sensory-mode-aware semantic tokens. These resolve
+        // through CSS variables, so the same Tailwind class repaints itself
+        // when [data-sensory-mode] flips on <html>.
+        iw: {
+          bg: "var(--aivo-sensory-bgPage)",
+          card: "var(--aivo-sensory-bgCard)",
+          raised: "var(--aivo-sensory-bgRaised)",
+          primary: "var(--aivo-sensory-primary)",
+          "primary-hover": "var(--aivo-sensory-primaryHover)",
+          "primary-fg": "var(--aivo-sensory-primaryFg)",
+          accent: "var(--aivo-sensory-accent)",
+          "accent-soft": "var(--aivo-sensory-accentSoft)",
+          warm: "var(--aivo-sensory-warm)",
+          "warm-soft": "var(--aivo-sensory-warmSoft)",
+          ink: "var(--aivo-sensory-ink)",
+          "ink-muted": "var(--aivo-sensory-inkMuted)",
+          border: "var(--aivo-sensory-border)",
+          ring: "var(--aivo-sensory-ringFocus)"
+        }
+      },
+      borderRadius: {
+        md: "var(--aivo-radius-md)",
+        lg: "var(--aivo-radius-lg)",
+        xl: "var(--aivo-radius-xl)",
+        "2xl": "var(--aivo-radius-2xl)",
+        pill: "var(--aivo-radius-pill)",
+        "iw-card": "1.5rem",
+        "iw-card-lg": "2rem",
+        "iw-hero": "2.5rem"
+      },
+      boxShadow: {
+        "soft-1": "var(--aivo-shadow-soft-1)",
+        "soft-3": "var(--aivo-shadow-soft-3)",
+        "soft-5": "var(--aivo-shadow-soft-5)"
+      },
+      backgroundImage: {
+        // Identity gradient (logo, email). Does NOT respond to sensory mode.
+        "iw-brand": "linear-gradient(135deg, #3b82f6 0%, #a78bfa 100%)",
+        // In-product gradient (headline word, hero accents). Responds to sensory mode.
+        "iw-sensory-brand": "linear-gradient(135deg, var(--aivo-sensory-primary) 0%, var(--aivo-sensory-accent) 100%)",
+        "iw-hero": "linear-gradient(180deg, var(--aivo-sensory-bgPage) 0%, var(--aivo-sensory-bgRaised) 70%)"
+      },
+      fontFamily: {
+        "iw-display": ["Fredoka", "Nunito", "ui-sans-serif", "system-ui", "sans-serif"],
+        "iw-body": ["Nunito", "ui-sans-serif", "system-ui", "sans-serif"],
+        "iw-dyslexia": ["OpenDyslexic", "Comic Sans MS", "Arial", "sans-serif"]
+      }
+    }
+  }
+};
+`;
 
 fs.writeFileSync(path.join(distDir, "css", "tokens.css"), css);
 fs.writeFileSync(path.join(distDir, "ts", "tokens.ts"), ts);

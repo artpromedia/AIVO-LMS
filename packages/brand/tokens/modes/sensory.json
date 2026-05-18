@@ -1,0 +1,60 @@
+{
+  "modes": {
+    "sensory": {
+      "standard": {
+        "bgPage": "#f5f3ff",
+        "bgCard": "#fdfaf3",
+        "bgRaised": "#ffffff",
+        "primary": "#3b82f6",
+        "primaryHover": "#2563eb",
+        "primaryFg": "#ffffff",
+        "accent": "#a78bfa",
+        "accentSoft": "#ede9fe",
+        "warm": "#f59e0b",
+        "warmSoft": "#fef3c7",
+        "ink": "#111827",
+        "inkMuted": "#4b5563",
+        "border": "#e5e7eb",
+        "ringFocus": "#3b82f6",
+        "motionScale": 1,
+        "shadowStrength": 0.14
+      },
+      "calm": {
+        "bgPage": "#f3f1ec",
+        "bgCard": "#fefdf9",
+        "bgRaised": "#ffffff",
+        "primary": "#2563eb",
+        "primaryHover": "#1d4ed8",
+        "primaryFg": "#ffffff",
+        "accent": "#8b5cf6",
+        "accentSoft": "#ede9fe",
+        "warm": "#b45309",
+        "warmSoft": "#fef3c7",
+        "ink": "#1f2937",
+        "inkMuted": "#52525b",
+        "border": "#d6d3d1",
+        "ringFocus": "#2563eb",
+        "motionScale": 0.5,
+        "shadowStrength": 0.08
+      },
+      "high-contrast": {
+        "bgPage": "#ffffff",
+        "bgCard": "#ffffff",
+        "bgRaised": "#ffffff",
+        "primary": "#1d4ed8",
+        "primaryHover": "#1e3a8a",
+        "primaryFg": "#ffffff",
+        "accent": "#5b21b6",
+        "accentSoft": "#e5e7eb",
+        "warm": "#92400e",
+        "warmSoft": "#f3f4f6",
+        "ink": "#000000",
+        "inkMuted": "#1f2937",
+        "border": "#000000",
+        "ringFocus": "#000000",
+        "motionScale": 0,
+        "shadowStrength": 0
+      }
+    }
+  }
+}

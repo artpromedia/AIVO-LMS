@@ -2,6 +2,7 @@ export * from "./tokens.js";
 export * from "./assets.js";
 export * from "./role-themes.js";
 export * from "./playful-calm.js";
+export * from "./inclusive-warm.js";
 
 export const BRAND = {
   name: "AIVO",
