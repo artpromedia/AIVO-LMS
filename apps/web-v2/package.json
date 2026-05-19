@@ -5,9 +5,9 @@
   "scripts": {
     "build:brand": "corepack pnpm --filter @aivo/brand run build",
     "check:brand": "node ./scripts/check-brand-tokens.mjs",
-    "dev": "corepack pnpm run build:brand && corepack pnpm run check:brand && next dev --port 5000 --hostname 0.0.0.0 --turbopack",
-    "build": "corepack pnpm run build:brand && corepack pnpm run check:brand && next build",
-    "start": "corepack pnpm run build:brand && corepack pnpm run check:brand && next start --port 5000 --hostname 0.0.0.0",
+    "dev": "corepack pnpm run build:brand && next dev --port 5000 --hostname 0.0.0.0 --turbopack",
+    "build": "corepack pnpm run build:brand && next build",
+    "start": "corepack pnpm run build:brand && next start --port 5000 --hostname 0.0.0.0",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

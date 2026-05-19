@@ -14,6 +14,6 @@ if (missing.length > 0) {
   for (const path of missing) {
     console.error(`  - ${path}`);
   }
-  console.error("\nRun `pnpm --filter @aivo/brand run build` and try again.\n");
+  console.error("\nRun `corepack pnpm run build:brand` in apps/web-v2 and try again.\n");
   process.exit(1);
 }
