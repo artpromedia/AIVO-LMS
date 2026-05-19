@@ -172,7 +172,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           }}
         />
       </head>
-      <body className="font-body antialiased bg-[var(--aivo-color-background,#fdf6ec)] text-slate-800">
+      <body className="font-body antialiased bg-[var(--aivo-color-surface-canvas,#fdf6ec)] text-slate-800">
         <GoogleAnalytics />
         <I18nProvider initialMessages={enMessages}>{children}</I18nProvider>
       </body>

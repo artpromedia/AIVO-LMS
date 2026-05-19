@@ -53,7 +53,7 @@ export default async function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-[var(--aivo-color-background,#fdf6ec)] text-slate-900">
+    <div className="min-h-screen bg-[var(--aivo-color-surface-canvas,#fdf6ec)] text-slate-900">
       <StickyHeader initialSensoryMode={sensoryMode} />
 
       <main>
@@ -72,7 +72,7 @@ export default async function Home() {
 
           <div className="max-w-6xl mx-auto px-6 md:px-8 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div className="max-w-2xl relative z-10">
-              <span className="inline-flex items-center gap-2 mb-7 py-2 px-4 rounded-full border border-purple-200 bg-white/70 text-[var(--aivo-color-primary,#7c3aed)] font-semibold text-sm shadow-sm backdrop-blur">
+              <span className="inline-flex items-center gap-2 mb-7 py-2 px-4 rounded-full border border-purple-200 bg-white/70 text-[var(--aivo-sensory-primary,#7c3aed)] font-semibold text-sm shadow-sm backdrop-blur">
                 <ShieldCheck className="w-4 h-4" aria-hidden="true" />
                 FERPA &amp; COPPA Compliant
               </span>
@@ -103,14 +103,14 @@ export default async function Home() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <a
                   href={`${WEB_APP_URL}/signup?plan=family`}
-                  className="inline-flex items-center justify-center h-14 px-7 text-base rounded-full bg-[var(--aivo-color-primary,#7c3aed)] hover:opacity-90 text-white font-semibold shadow-lg shadow-purple-200 transition min-h-[44px]"
+                  className="inline-flex items-center justify-center h-14 px-7 text-base rounded-full bg-[var(--aivo-sensory-primary,#7c3aed)] hover:opacity-90 text-white font-semibold shadow-lg shadow-purple-200 transition min-h-[44px]"
                 >
                   Start Family Trial
                   <ArrowRight className="ml-2 w-5 h-5" aria-hidden="true" />
                 </a>
                 <Link
                   href="/for-districts"
-                  className="inline-flex items-center justify-center h-14 px-7 text-base rounded-full bg-white/60 border border-purple-200 hover:bg-white text-[var(--aivo-color-primary,#7c3aed)] font-semibold transition min-h-[44px]"
+                  className="inline-flex items-center justify-center h-14 px-7 text-base rounded-full bg-white/60 border border-purple-200 hover:bg-white text-[var(--aivo-sensory-primary,#7c3aed)] font-semibold transition min-h-[44px]"
                 >
                   <Building2 className="w-5 h-5 mr-2" aria-hidden="true" />
                   For School Districts
@@ -316,7 +316,7 @@ export default async function Home() {
                   phenomenal.&rdquo;
                 </p>
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-purple-100 flex items-center justify-center font-bold text-lg text-[var(--aivo-color-primary,#7c3aed)]">
+                  <div className="w-14 h-14 rounded-full bg-purple-100 flex items-center justify-center font-bold text-lg text-[var(--aivo-sensory-primary,#7c3aed)]">
                     M.R.
                   </div>
                   <div>
@@ -336,7 +336,7 @@ export default async function Home() {
           <div className="max-w-6xl mx-auto px-6 md:px-8">
             <div
               className="text-white shadow-2xl rounded-[2.5rem] md:rounded-[3rem] overflow-hidden border-0 relative"
-              style={{ backgroundColor: "var(--aivo-color-primary, #7c3aed)" }}
+              style={{ backgroundColor: "var(--aivo-sensory-primary, #7c3aed)" }}
             >
               <div
                 className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"

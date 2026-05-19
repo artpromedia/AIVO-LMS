@@ -256,3 +256,33 @@ export function computeEffectiveTutorSkus(args: {
 export const ALL_TUTOR_SKUS: readonly TutorSku[] = Object.values(TUTOR_KEY_TO_SKU);
 export const ALL_TUTOR_KEYS: readonly TutorKey[] = Object.keys(TUTOR_KEY_TO_SKU) as TutorKey[];
 export const ALL_PLAN_IDS: readonly PlanId[] = ["free", "single", "family", "district"];
+
+/**
+ * Learner-scoped entitlement snapshot returned by
+ * `GET /api/tutors/entitlements/:learnerId` (tutor-svc).
+ *
+ * Keyed by tutor *key* (not SKU) so consumers — web tutor cards, mobile
+ * tutor cards, lesson start guards — don't need to repeat the SKU↔key
+ * lookup. `effectiveTutors` is the only set learner surfaces ever need
+ * to check for "Active vs Locked".
+ *
+ * Lives in this package (rather than tutor-svc) because it's consumed by
+ * web, mobile, billing-svc, and tutor-svc. Per the file preamble: "one
+ * source of truth shared by billing-svc, tutor-svc, learning-svc, the
+ * web app, and the mobile app". The matching service implementation in
+ * `services/tutor-svc/src/lib/learner-entitlements.ts` imports this type
+ * and is structurally compatible.
+ */
+export interface LearnerEntitlementPayload {
+  learnerId: string;
+  tenantId: string;
+  plan: PlanId | "unknown";
+  subscriptionStatus: SubscriptionStatus | "missing";
+  cancelAtPeriodEnd: boolean;
+  currentPeriodEnd: string | null;
+  includedTutors: TutorKey[];
+  addonTutors: TutorKey[];
+  graceTutors: TutorKey[];
+  effectiveTutors: TutorKey[];
+  lockedTutors: TutorKey[];
+}

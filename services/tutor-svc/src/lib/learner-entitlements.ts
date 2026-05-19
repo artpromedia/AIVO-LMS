@@ -6,6 +6,7 @@ import {
   TUTOR_SKU_TO_KEY,
   getIncludedTutorSkusForPlan,
   isTutorSku,
+  type LearnerEntitlementPayload,
   type PlanId,
   type SubscriptionRecord,
   type SubscriptionStatus,
@@ -18,24 +19,12 @@ import { loadEntitlementContextForTenant } from "./entitlements.js";
 /**
  * Learner-scoped entitlement snapshot.
  *
- * Keyed by tutor *key* (not SKU) so consumers — web tutor cards, mobile
- * tutor cards, lesson start guards — don't need to repeat the SKU↔key
- * lookup. `effectiveTutors` is the only set learner surfaces ever need
- * to check for "Active vs Locked".
+ * The canonical shape lives in `@aivo/billing-entitlements` so web,
+ * mobile, billing-svc, and tutor-svc all reference one source of truth.
+ * Re-exported here so existing callers in tutor-svc keep their import
+ * paths.
  */
-export interface LearnerEntitlementPayload {
-  learnerId: string;
-  tenantId: string;
-  plan: PlanId | "unknown";
-  subscriptionStatus: SubscriptionStatus | "missing";
-  cancelAtPeriodEnd: boolean;
-  currentPeriodEnd: string | null;
-  includedTutors: TutorKey[];
-  addonTutors: TutorKey[];
-  graceTutors: TutorKey[];
-  effectiveTutors: TutorKey[];
-  lockedTutors: TutorKey[];
-}
+export type { LearnerEntitlementPayload };
 
 export type LearnerLookupError = "not_found" | "tenant_mismatch";
 

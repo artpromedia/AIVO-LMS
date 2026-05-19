@@ -59,7 +59,7 @@ export async function LandingPageLayout({
   const sensoryMode = await getSensoryModeFromCookies();
 
   return (
-    <div className="min-h-screen bg-[var(--aivo-color-background,#fdf6ec)]">
+    <div className="min-h-screen bg-[var(--aivo-color-surface-canvas,#fdf6ec)]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -98,7 +98,7 @@ export async function LandingPageLayout({
           <div className="flex flex-col sm:flex-row gap-3">
             <a
               href={primaryCtaHref}
-              className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[var(--aivo-color-primary,#7c3aed)] text-white font-bold hover:opacity-90 transition shadow-lg shadow-purple-200 min-h-[44px]"
+              className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[var(--aivo-sensory-primary,#7c3aed)] text-white font-bold hover:opacity-90 transition shadow-lg shadow-purple-200 min-h-[44px]"
             >
               {primaryCtaLabel}
               <ArrowRight
@@ -130,7 +130,7 @@ export async function LandingPageLayout({
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a
               href={finalCta?.primary.href ?? primaryCtaHref}
-              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[var(--aivo-color-primary,#7c3aed)] text-white font-bold hover:opacity-90 transition shadow-lg shadow-purple-200 min-h-[44px]"
+              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[var(--aivo-sensory-primary,#7c3aed)] text-white font-bold hover:opacity-90 transition shadow-lg shadow-purple-200 min-h-[44px]"
             >
               {finalCta?.primary.label ?? primaryCtaLabel}
               <ArrowRight className="w-4 h-4" aria-hidden="true" />

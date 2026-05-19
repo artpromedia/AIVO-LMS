@@ -6,19 +6,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { TUTORS, type TutorKey, getTutorsForTier } from "@aivo/brand";
 import { gradeToTier } from "@aivo/learner-ui";
+import type { LearnerEntitlementPayload } from "@aivo/billing-entitlements";
 import { useTranslations } from "next-intl";
-
-// eslint-disable-next-line no-restricted-syntax -- TODO(billing): replace hand-rolled shape with the typed response from @aivo/api-client/billing once the billing-svc /learner-entitlements endpoint is migrated to per-route schemas
-interface LearnerEntitlementResponse {
-  learnerId: string;
-  plan: string;
-  subscriptionStatus: string;
-  effectiveTutors: string[];
-  graceTutors: string[];
-  includedTutors: string[];
-  addonTutors: string[];
-  lockedTutors: string[];
-}
 
 export default function ParentLearnerTutorsPage() {
   const { user, accessToken, loading } = useAuth();
@@ -27,7 +16,7 @@ export default function ParentLearnerTutorsPage() {
   const t = useTranslations("parent");
   const tc = useTranslations("common");
 
-  const [entitlements, setEntitlements] = useState<LearnerEntitlementResponse | null>(null);
+  const [entitlements, setEntitlements] = useState<LearnerEntitlementPayload | null>(null);
   const [loadingData, setLoadingData] = useState(true);
   const [learnerGrade, setLearnerGrade] = useState<string | null>(null);
   const [learnerLookupFailed, setLearnerLookupFailed] = useState(false);
@@ -46,7 +35,7 @@ export default function ParentLearnerTutorsPage() {
       ),
     ])
       .then(([entResp, learnersData]) => {
-        setEntitlements(entResp as LearnerEntitlementResponse | null);
+        setEntitlements(entResp as LearnerEntitlementPayload | null);
         const learners = Array.isArray(learnersData) ? learnersData : [];
         const me = learners.find((l: any) => l.id === learnerId);
         if (me?.gradeLevel) {
@@ -67,8 +56,8 @@ export default function ParentLearnerTutorsPage() {
   const tutorEntries = getTutorsForTier(tier) as [TutorKey, (typeof TUTORS)[TutorKey]][];
   const effective = new Set(entitlements?.effectiveTutors ?? []);
   const grace = new Set(entitlements?.graceTutors ?? []);
-  const isActive = (key: string) => effective.has(key);
-  const isGrace = (key: string) => grace.has(key);
+  const isActive = (key: TutorKey) => effective.has(key);
+  const isGrace = (key: TutorKey) => grace.has(key);
 
   return (
     <div className="space-y-6">

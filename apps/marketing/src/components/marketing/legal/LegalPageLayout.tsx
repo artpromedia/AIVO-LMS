@@ -50,7 +50,7 @@ export async function LegalPageLayout({
   const sensoryMode = await getSensoryModeFromCookies();
 
   return (
-    <div className="min-h-screen bg-[var(--aivo-color-background,#fdf6ec)]">
+    <div className="min-h-screen bg-[var(--aivo-color-surface-canvas,#fdf6ec)]">
       <StickyHeader initialSensoryMode={sensoryMode} />
 
       <div

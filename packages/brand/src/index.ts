@@ -281,3 +281,43 @@ export const ROLES = {
 export type TutorKey = keyof typeof TUTORS;
 export type FunctioningLevel = keyof typeof FUNCTIONING_LEVELS;
 export type UserRole = keyof typeof ROLES;
+
+/**
+ * Brain-clone visualization palette, keyed by functioning level.
+ *
+ * The brain-clone canvas (Sprint 7+ `LearnerBrainProfileState.visualIdentity`)
+ * paints these hex values directly — they are deliberately concrete data
+ * shipped to the client renderer, not Tailwind classes. Centralizing them here
+ * keeps `apps/web-v2` from re-declaring the literal palette and gives future
+ * sensory-mode reskins (calm / focus / sensory-friendly) a single source of
+ * truth to swap.
+ *
+ * Each entry provides:
+ *   • `primary`     — dominant hue painted on the brain silhouette
+ *   • `secondaries` — two complementary hues for accents / particles
+ */
+export const BRAIN_VISUAL_IDENTITY_PALETTE = {
+  STANDARD: {
+    primary: "#E63946",
+    secondaries: ["#F1FAEE", "#A8DADC"] as const,
+  },
+  SUPPORTED: {
+    primary: "#6A4C93",
+    secondaries: ["#B392D8", "#F1FAEE"] as const,
+  },
+  LOW_VERBAL: {
+    primary: "#1D3557",
+    secondaries: ["#457B9D", "#A8DADC"] as const,
+  },
+  NON_VERBAL: {
+    primary: "#457B9D",
+    secondaries: ["#A8DADC", "#F1FAEE"] as const,
+  },
+  PRE_SYMBOLIC: {
+    primary: "#A8DADC",
+    secondaries: ["#E6F0F2", "#F1FAEE"] as const,
+  },
+} as const satisfies Record<
+  FunctioningLevel,
+  { primary: string; secondaries: readonly [string, string] }
+>;

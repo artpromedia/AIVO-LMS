@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-syntax -- BASELINE_TUTORS.color values are the tutor brand-mark palette; they're documented as kept-in-sync with @aivo/brand TutorKey on line 22. Sprint 2 will replace these literals with imports from @aivo/brand once the TutorKey palette export ships. */
 /**
  * Discovery Adventure tutor metadata for the baseline assessment.
  *
@@ -6,7 +5,13 @@
  * `apps/web/src/components/discovery/types.ts` — six named tutors, one per
  * baseline domain. Subject slug is the join key with `Subject.slug` so the
  * baseline pages can render a per-chapter card without hardcoding subject ids.
+ *
+ * Brand colors are imported from the canonical `TUTORS` catalogue in
+ * `@aivo/brand` rather than re-declared, so the baseline UI stays in lockstep
+ * with the rest of the platform (tutor avatars, tier copy, marketing).
  */
+import { TUTORS } from "@aivo/brand";
+
 export type BaselineTutor = {
   /** Stable id (also the legacy chapter id). */
   id: string;
@@ -20,7 +25,7 @@ export type BaselineTutor = {
   landmark: string;
   /** Emoji used as a lightweight tutor avatar. */
   emoji: string;
-  /** Brand color (kept in sync with @aivo/brand TutorKey palette). */
+  /** Brand color sourced from `@aivo/brand` TUTORS catalogue. */
   color: string;
   /** Single-sentence scene description for the chapter intro. */
   scene: string;
@@ -36,7 +41,7 @@ export const BASELINE_TUTORS: BaselineTutor[] = [
     subtitle: "Reading & Language",
     landmark: "Story Garden",
     emoji: "📖",
-    color: "#10B981",
+    color: TUTORS.sage.color,
     scene: "An illustrated garden where words grow on trees and stories hide in magical books.",
     greeting: "I know the best stories — want to read one with me?",
   },
@@ -47,7 +52,7 @@ export const BASELINE_TUTORS: BaselineTutor[] = [
     subtitle: "Math",
     landmark: "Number Galaxy",
     emoji: "✨",
-    color: "#7C3AED",
+    color: TUTORS.nova.color,
     scene:
       "A cosmic scene with planets, stars, and gently floating asteroids waiting to be counted.",
     greeting: "I love stars and numbers. Let's explore them together.",
@@ -59,7 +64,7 @@ export const BASELINE_TUTORS: BaselineTutor[] = [
     subtitle: "Science",
     landmark: "Discovery Lab",
     emoji: "⚡",
-    color: "#F59E0B",
+    color: TUTORS.spark.color,
     scene:
       "A colorful laboratory with bubbling beakers, a terrarium with plants, and a microscope.",
     greeting: "Want to see something cool? Science is everywhere.",
@@ -71,7 +76,7 @@ export const BASELINE_TUTORS: BaselineTutor[] = [
     subtitle: "Social-Emotional",
     landmark: "Feelings Treehouse",
     emoji: "💜",
-    color: "#8B5CF6",
+    color: TUTORS.harmony.color,
     scene: "A warm, cozy treehouse with soft lighting, cushions, and a window to the world.",
     greeting: "I care about how you feel — there are no wrong answers here.",
   },
@@ -82,7 +87,7 @@ export const BASELINE_TUTORS: BaselineTutor[] = [
     subtitle: "Speech & Language",
     landmark: "Sound Studio",
     emoji: "🎵",
-    color: "#EC4899",
+    color: TUTORS.echo.color,
     scene: "A friendly recording studio with microphones, sound waves, and musical notes.",
     greeting: "Let's make some sounds and play with words together.",
   },
@@ -93,7 +98,7 @@ export const BASELINE_TUTORS: BaselineTutor[] = [
     subtitle: "Executive Function",
     landmark: "Puzzle Palace",
     emoji: "🧩",
-    color: "#06B6D4",
+    color: TUTORS.pixel.color,
     scene: "A colorful puzzle room where logic rules and patterns create the environment.",
     greeting: "I have the best puzzles. Ready to try one?",
   },

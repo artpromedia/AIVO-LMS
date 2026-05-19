@@ -11,6 +11,7 @@
  * different profiles." This is satisfied because every field above the
  * accessibility defaults is derived from learner-specific inputs.
  */
+import { BRAIN_VISUAL_IDENTITY_PALETTE } from "@aivo/brand";
 import type {
   BaselineSummary,
   IEPExtraction,
@@ -145,41 +146,23 @@ function buildVisualIdentity(
     sensorySeekingOrAvoiding === "avoiding" ||
     functioningLevel === "PRE_SYMBOLIC" ||
     functioningLevel === "NON_VERBAL";
-  /* eslint-disable no-restricted-syntax -- brain-clone visualization data sent to the client renderer; these are functioning-level-coded palette identifiers (not surface tokens) that the brain-clone canvas paints directly. Sprint 2 will move these into @aivo/brand under a `brain.functioningLevel.*` palette so they reskin with sensory mode. */
-  switch (functioningLevel) {
-    case "PRE_SYMBOLIC":
-      return {
-        primaryHue: "#A8DADC",
-        secondaryHues: ["#E6F0F2", "#F1FAEE"],
-        pulseRate: "calm",
-      };
-    case "NON_VERBAL":
-      return {
-        primaryHue: "#457B9D",
-        secondaryHues: ["#A8DADC", "#F1FAEE"],
-        pulseRate: "calm",
-      };
-    case "LOW_VERBAL":
-      return {
-        primaryHue: "#1D3557",
-        secondaryHues: ["#457B9D", "#A8DADC"],
-        pulseRate: "steady",
-      };
-    case "SUPPORTED":
-      return {
-        primaryHue: "#6A4C93",
-        secondaryHues: ["#B392D8", "#F1FAEE"],
-        pulseRate: calmMode ? "steady" : "energetic",
-      };
-    case "STANDARD":
-    default:
-      return {
-        primaryHue: "#E63946",
-        secondaryHues: ["#F1FAEE", "#A8DADC"],
-        pulseRate: calmMode ? "steady" : "energetic",
-      };
-  }
-  /* eslint-enable no-restricted-syntax */
+  const palette = BRAIN_VISUAL_IDENTITY_PALETTE[functioningLevel];
+  // "calm" is locked in for PRE_SYMBOLIC and NON_VERBAL regardless of sensory
+  // input; other levels follow the sensory profile (steady when avoiding,
+  // energetic when seeking).
+  const lockedCalm = functioningLevel === "PRE_SYMBOLIC" || functioningLevel === "NON_VERBAL";
+  const pulseRate: LearnerBrainProfileState["visualIdentity"]["pulseRate"] = lockedCalm
+    ? "calm"
+    : functioningLevel === "LOW_VERBAL"
+      ? "steady"
+      : calmMode
+        ? "steady"
+        : "energetic";
+  return {
+    primaryHue: palette.primary,
+    secondaryHues: [...palette.secondaries],
+    pulseRate,
+  };
 }
 
 function pick<T = unknown>(
