@@ -28,8 +28,8 @@ export default function VerifyMfaPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-50 via-white to-purple-50">
-          <div className="animate-spin w-8 h-8 border-4 border-violet-200 border-t-violet-600 rounded-full" />
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-iw-bg via-iw-raised to-iw-warm-soft">
+          <div className="animate-spin w-8 h-8 border-4 border-iw-primary/30 border-t-iw-primary rounded-full" />
         </div>
       }
     >
@@ -232,7 +232,7 @@ function VerifyMfaContent() {
           : t("code_sent_desc");
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-50 via-white to-purple-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-iw-bg via-iw-raised to-iw-warm-soft px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/">
@@ -247,12 +247,12 @@ function VerifyMfaContent() {
           </Link>
         </div>
 
-        <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+        <div className="bg-iw-card rounded-2xl p-8 shadow-soft-5 border border-iw-border">
           <div className="text-center mb-6">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-violet-100 flex items-center justify-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-iw-primary/10 flex items-center justify-center">
               {mode === "webauthn" ? (
                 <svg
-                  className="w-8 h-8 text-violet-600"
+                  className="w-8 h-8 text-iw-primary"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -266,7 +266,7 @@ function VerifyMfaContent() {
                 </svg>
               ) : mode === "totp" ? (
                 <svg
-                  className="w-8 h-8 text-violet-600"
+                  className="w-8 h-8 text-iw-primary"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -280,7 +280,7 @@ function VerifyMfaContent() {
                 </svg>
               ) : mode === "recovery" ? (
                 <svg
-                  className="w-8 h-8 text-violet-600"
+                  className="w-8 h-8 text-iw-primary"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -294,7 +294,7 @@ function VerifyMfaContent() {
                 </svg>
               ) : (
                 <svg
-                  className="w-8 h-8 text-violet-600"
+                  className="w-8 h-8 text-iw-primary"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -308,12 +308,12 @@ function VerifyMfaContent() {
                 </svg>
               )}
             </div>
-            <h1 className="text-2xl font-heading font-bold text-gray-900">{heading}</h1>
-            <p className="text-gray-500 text-sm mt-2 font-body">{subtitle}</p>
+            <h1 className="text-2xl font-heading font-bold text-iw-ink">{heading}</h1>
+            <p className="text-iw-ink-muted text-sm mt-2 font-body">{subtitle}</p>
           </div>
 
           {error && (
-            <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-100 text-red-700 text-sm font-medium mb-4">
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-medium mb-4">
               <svg
                 className="w-4 h-4 flex-shrink-0"
                 fill="none"
@@ -331,7 +331,7 @@ function VerifyMfaContent() {
             </div>
           )}
           {info && (
-            <div className="p-3 rounded-xl bg-green-50 border border-green-100 text-green-700 text-sm font-medium mb-4">
+            <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 text-sm font-medium mb-4">
               {info}
             </div>
           )}
@@ -341,7 +341,7 @@ function VerifyMfaContent() {
               type="button"
               onClick={runWebAuthn}
               disabled={loading}
-              className="w-full py-3.5 rounded-xl bg-violet-600 text-white font-bold hover:bg-violet-700 transition disabled:opacity-50"
+              className="w-full py-3.5 rounded-xl bg-iw-primary text-iw-primary-fg font-bold hover:bg-iw-primary-hover transition disabled:opacity-50"
             >
               {loading ? "Waiting for device…" : "Use passkey"}
             </button>
@@ -362,13 +362,13 @@ function VerifyMfaContent() {
                 value={code}
                 onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
                 placeholder="000000"
-                className="w-full text-center text-3xl tracking-[0.5em] font-bold px-4 py-4 rounded-xl border-2 border-gray-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none mb-4"
+                className="w-full text-center text-3xl tracking-[0.5em] font-bold px-4 py-4 rounded-xl border-2 border-iw-border bg-iw-bg text-iw-ink focus:border-iw-primary focus:ring-2 focus:ring-iw-ring/30 outline-none mb-4"
                 aria-label="6-digit code"
               />
               <button
                 type="submit"
                 disabled={loading || code.length !== 6}
-                className="w-full py-3.5 rounded-xl bg-violet-600 text-white font-bold hover:bg-violet-700 transition disabled:opacity-50"
+                className="w-full py-3.5 rounded-xl bg-iw-primary text-iw-primary-fg font-bold hover:bg-iw-primary-hover transition disabled:opacity-50"
               >
                 {loading ? t("verifying") : t("verify_code")}
               </button>
@@ -388,13 +388,13 @@ function VerifyMfaContent() {
                 value={recovery}
                 onChange={(e) => setRecovery(e.target.value)}
                 placeholder="xxxx-xxxx-xxxx"
-                className="w-full text-center text-lg tracking-widest font-mono font-semibold px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 outline-none mb-4"
+                className="w-full text-center text-lg tracking-widest font-mono font-semibold px-4 py-3 rounded-xl border-2 border-iw-border bg-iw-bg text-iw-ink focus:border-iw-primary focus:ring-2 focus:ring-iw-ring/30 outline-none mb-4"
                 aria-label="Recovery code"
               />
               <button
                 type="submit"
                 disabled={loading || recovery.trim().length < 8}
-                className="w-full py-3.5 rounded-xl bg-violet-600 text-white font-bold hover:bg-violet-700 transition disabled:opacity-50"
+                className="w-full py-3.5 rounded-xl bg-iw-primary text-iw-primary-fg font-bold hover:bg-iw-primary-hover transition disabled:opacity-50"
               >
                 {loading ? t("verifying") : "Use recovery code"}
               </button>
@@ -407,7 +407,7 @@ function VerifyMfaContent() {
                 data-testid="resend-email-code"
                 onClick={handleResend}
                 disabled={resending || resendCooldown > 0}
-                className="text-violet-600 font-semibold hover:text-violet-800 disabled:opacity-50"
+                className="text-iw-primary font-semibold hover:text-iw-primary-hover disabled:opacity-50"
               >
                 {resending
                   ? t("resending")
@@ -423,7 +423,7 @@ function VerifyMfaContent() {
                   setError("");
                   setInfo("");
                 }}
-                className="text-slate-600 hover:text-violet-700 font-semibold"
+                className="text-iw-ink-muted hover:text-iw-primary font-semibold"
               >
                 Use a recovery code instead
               </button>
@@ -436,7 +436,7 @@ function VerifyMfaContent() {
                   setError("");
                   setInfo("");
                 }}
-                className="text-slate-600 hover:text-violet-700 font-semibold"
+                className="text-iw-ink-muted hover:text-iw-primary font-semibold"
               >
                 Back to{" "}
                 {initialMethod === "webauthn"
@@ -446,14 +446,14 @@ function VerifyMfaContent() {
                     : "email code"}
               </button>
             )}
-            <Link href="/login" className="text-gray-500 hover:text-gray-700">
+            <Link href="/login" className="text-iw-ink-muted hover:text-iw-ink">
               {t("back_to_login")}
             </Link>
           </div>
         </div>
 
         {mode === "email" && (
-          <p className="text-center text-xs text-gray-400 mt-6 font-body">{t("code_expires")}</p>
+          <p className="text-center text-xs text-iw-ink-muted mt-6 font-body">{t("code_expires")}</p>
         )}
       </div>
     </div>

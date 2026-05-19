@@ -79,17 +79,17 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-100 via-white to-amber-50 flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-iw-bg via-iw-raised to-iw-warm-soft flex flex-col relative overflow-hidden">
       <SkipLink />
 
       <div aria-hidden="true" className="absolute inset-0 pointer-events-none -z-0">
-        <div className="absolute -top-20 -left-20 w-[45vw] h-[45vw] bg-violet-300/40 rounded-full blur-3xl animate-blob motion-reduce:animate-none" />
+        <div className="absolute -top-20 -left-20 w-[45vw] h-[45vw] bg-iw-primary/20 rounded-full blur-3xl animate-blob motion-reduce:animate-none" />
         <div
-          className="absolute -bottom-20 -right-20 w-[40vw] h-[40vw] bg-amber-200/50 rounded-full blur-3xl animate-blob motion-reduce:animate-none"
+          className="absolute -bottom-20 -right-20 w-[40vw] h-[40vw] bg-iw-warm/40 rounded-full blur-3xl animate-blob motion-reduce:animate-none"
           style={{ animationDelay: "5s" }}
         />
         <div
-          className="absolute top-1/3 right-10 w-64 h-64 bg-cyan-200/40 rounded-full blur-3xl animate-blob motion-reduce:animate-none"
+          className="absolute top-1/3 right-10 w-64 h-64 bg-iw-accent-soft/60 rounded-full blur-3xl animate-blob motion-reduce:animate-none"
           style={{ animationDelay: "2s" }}
         />
       </div>
@@ -114,18 +114,18 @@ export default function LoginPage() {
         className="relative z-10 flex-1 flex items-center justify-center px-6 pb-10"
       >
         <div className="w-full max-w-[480px]">
-          <div className="bg-white/95 backdrop-blur p-8 rounded-[2rem] border border-white shadow-[0_24px_60px_-15px_rgba(124,58,237,0.25)]">
+          <div className="bg-iw-card/95 backdrop-blur p-8 rounded-[2rem] border border-iw-raised shadow-soft-5">
             <div className="text-center mb-7">
-              <h1 className="text-3xl font-heading font-bold text-slate-900 leading-tight">
+              <h1 className="text-3xl font-heading font-bold text-iw-ink leading-tight">
                 {t("welcome_back")}!
               </h1>
-              <p className="text-slate-500 font-body mt-1.5">{t("continue_description")}</p>
+              <p className="text-iw-ink-muted font-body mt-1.5">{t("continue_description")}</p>
             </div>
 
             <div
               role="tablist"
               aria-label={t("login_method_label") ?? "Sign in method"}
-              className="flex p-1.5 bg-slate-100 rounded-2xl mb-7"
+              className="flex p-1.5 bg-iw-bg rounded-2xl mb-7"
             >
               <button
                 role="tab"
@@ -136,8 +136,8 @@ export default function LoginPage() {
                 style={{ minHeight: 44 }}
                 className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${
                   mode === "email"
-                    ? "bg-white text-[hsl(var(--visual-primary))] shadow-sm"
-                    : "text-slate-500 hover:text-slate-700"
+                    ? "bg-iw-raised text-iw-primary shadow-sm"
+                    : "text-iw-ink-muted hover:text-iw-ink"
                 }`}
               >
                 <Mail className="w-4 h-4" aria-hidden="true" />
@@ -152,8 +152,8 @@ export default function LoginPage() {
                 style={{ minHeight: 44 }}
                 className={`flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${
                   mode === "pin"
-                    ? "bg-gradient-to-r from-amber-300 to-amber-400 text-slate-900 shadow-sm"
-                    : "text-slate-500 hover:text-slate-700"
+                    ? "bg-iw-warm text-iw-ink shadow-sm"
+                    : "text-iw-ink-muted hover:text-iw-ink"
                 }`}
               >
                 <KeyRound className="w-4 h-4" aria-hidden="true" />
@@ -190,13 +190,13 @@ export default function LoginPage() {
                   <div className="space-y-2">
                     <label
                       htmlFor="login-email"
-                      className="block text-sm font-bold text-slate-700 ml-1"
+                      className="block text-sm font-bold text-iw-ink ml-1"
                     >
                       {t("email")}
                     </label>
                     <div className="relative">
                       <Mail
-                        className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"
+                        className="w-5 h-5 text-iw-ink-muted absolute left-4 top-1/2 -translate-y-1/2"
                         aria-hidden="true"
                       />
                       <input
@@ -207,7 +207,7 @@ export default function LoginPage() {
                         required
                         autoComplete="email"
                         style={{ minHeight: 44 }}
-                        className="w-full h-14 pl-12 pr-4 rounded-2xl bg-slate-50 border-2 border-slate-100 text-slate-900 font-body focus:bg-white focus:border-[hsl(var(--visual-primary))] focus:ring-4 focus:ring-[hsl(var(--visual-primary)/0.15)] outline-none transition"
+                        className="w-full h-14 pl-12 pr-4 rounded-2xl bg-iw-bg border-2 border-iw-border text-iw-ink font-body focus:bg-iw-raised focus:border-iw-primary focus:ring-4 focus:ring-iw-ring/30 outline-none transition"
                         placeholder="parent@example.com"
                       />
                     </div>
@@ -216,20 +216,20 @@ export default function LoginPage() {
                     <div className="flex justify-between items-center ml-1">
                       <label
                         htmlFor="login-password"
-                        className="block text-sm font-bold text-slate-700"
+                        className="block text-sm font-bold text-iw-ink"
                       >
                         {t("password")}
                       </label>
                       <Link
                         href="/forgot-password"
-                        className="text-sm font-bold text-[hsl(var(--visual-primary))] hover:underline"
+                        className="text-sm font-bold text-iw-primary hover:underline"
                       >
                         {t("forgot_password") ?? "Forgot?"}
                       </Link>
                     </div>
                     <div className="relative">
                       <Lock
-                        className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"
+                        className="w-5 h-5 text-iw-ink-muted absolute left-4 top-1/2 -translate-y-1/2"
                         aria-hidden="true"
                       />
                       <input
@@ -240,13 +240,13 @@ export default function LoginPage() {
                         required
                         autoComplete="current-password"
                         style={{ minHeight: 44 }}
-                        className="w-full h-14 pl-12 pr-12 rounded-2xl bg-slate-50 border-2 border-slate-100 text-slate-900 font-body focus:bg-white focus:border-[hsl(var(--visual-primary))] focus:ring-4 focus:ring-[hsl(var(--visual-primary)/0.15)] outline-none transition"
+                        className="w-full h-14 pl-12 pr-12 rounded-2xl bg-iw-bg border-2 border-iw-border text-iw-ink font-body focus:bg-iw-raised focus:border-iw-primary focus:ring-4 focus:ring-iw-ring/30 outline-none transition"
                         placeholder={t("enter_password") ?? "Enter your password"}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-iw-ink-muted hover:text-iw-ink"
                         aria-label={showPassword ? "Hide password" : "Show password"}
                       >
                         {showPassword ? (
@@ -262,7 +262,7 @@ export default function LoginPage() {
                     disabled={loading}
                     aria-busy={loading}
                     style={{ minHeight: 44 }}
-                    className="w-full h-14 mt-2 rounded-2xl bg-gradient-to-r from-[hsl(var(--visual-primary))] to-[hsl(var(--visual-primary-dark,262_83%_46%))] hover:opacity-95 text-white font-bold text-lg shadow-xl shadow-purple-200 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+                    className="w-full h-14 mt-2 rounded-2xl bg-iw-primary hover:bg-iw-primary-hover text-iw-primary-fg font-bold text-lg shadow-soft-5 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
                   >
                     {loading ? (
                       <>
@@ -289,13 +289,13 @@ export default function LoginPage() {
                   <div>
                     <label
                       htmlFor="parent-id"
-                      className="block text-sm font-bold text-slate-700 mb-2 ml-1"
+                      className="block text-sm font-bold text-iw-ink mb-2 ml-1"
                     >
                       {t("parent_email_or_id")}
                     </label>
                     <div className="relative">
                       <User
-                        className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"
+                        className="w-5 h-5 text-iw-ink-muted absolute left-4 top-1/2 -translate-y-1/2"
                         aria-hidden="true"
                       />
                       <input
@@ -306,7 +306,7 @@ export default function LoginPage() {
                         required
                         autoComplete="username"
                         style={{ minHeight: 44 }}
-                        className="w-full h-14 pl-12 pr-4 rounded-2xl bg-slate-50 border-2 border-slate-100 text-slate-900 font-body focus:bg-white focus:border-amber-400 focus:ring-4 focus:ring-amber-200/40 outline-none transition"
+                        className="w-full h-14 pl-12 pr-4 rounded-2xl bg-iw-bg border-2 border-iw-border text-iw-ink font-body focus:bg-iw-raised focus:border-iw-warm focus:ring-4 focus:ring-iw-warm-soft/60 outline-none transition"
                         placeholder="parent@example.com"
                       />
                     </div>
@@ -314,7 +314,7 @@ export default function LoginPage() {
                   <div>
                     <label
                       htmlFor="learner-pin"
-                      className="block text-sm font-bold text-slate-700 mb-2 ml-1 text-center"
+                      className="block text-sm font-bold text-iw-ink mb-2 ml-1 text-center"
                     >
                       {t("enter_secret_pin") ?? "Enter your secret PIN"}
                     </label>
@@ -328,7 +328,7 @@ export default function LoginPage() {
                       inputMode="numeric"
                       autoComplete="one-time-code"
                       style={{ minHeight: 44 }}
-                      className="w-full h-14 px-4 rounded-2xl bg-slate-50 border-2 border-slate-100 text-slate-900 font-heading font-bold text-3xl text-center tracking-[0.6em] focus:bg-white focus:border-amber-400 focus:ring-4 focus:ring-amber-200/40 outline-none transition"
+                      className="w-full h-14 px-4 rounded-2xl bg-iw-bg border-2 border-iw-border text-iw-ink font-heading font-bold text-3xl text-center tracking-[0.6em] focus:bg-iw-raised focus:border-iw-warm focus:ring-4 focus:ring-iw-warm-soft/60 outline-none transition"
                       placeholder="••••••"
                     />
                   </div>
@@ -337,7 +337,7 @@ export default function LoginPage() {
                     disabled={loading}
                     aria-busy={loading}
                     style={{ minHeight: 44 }}
-                    className="w-full h-14 rounded-2xl bg-gradient-to-r from-amber-300 to-amber-400 hover:opacity-95 text-slate-900 font-bold text-lg shadow-xl shadow-amber-100 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+                    className="w-full h-14 rounded-2xl bg-iw-warm hover:opacity-95 text-iw-ink font-bold text-lg shadow-soft-3 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
                   >
                     {loading ? (
                       <>
@@ -362,19 +362,13 @@ export default function LoginPage() {
           </div>
 
           <div className="text-center mt-7">
-            <div className="inline-flex items-center gap-2 text-sm font-bold text-slate-600 bg-white/70 backdrop-blur px-4 py-2 rounded-full border border-slate-200">
-              <ShieldCheck
-                className="w-4 h-4 text-[hsl(var(--visual-primary))]"
-                aria-hidden="true"
-              />
+            <div className="inline-flex items-center gap-2 text-sm font-bold text-iw-ink-muted bg-iw-raised/70 backdrop-blur px-4 py-2 rounded-full border border-iw-border">
+              <ShieldCheck className="w-4 h-4 text-iw-primary" aria-hidden="true" />
               {t("compliance_badge") ?? "COPPA · FERPA · SOC 2 Compliant"}
             </div>
-            <p className="text-sm font-medium text-slate-500 mt-5">
+            <p className="text-sm font-medium text-iw-ink-muted mt-5">
               {t("no_account")}{" "}
-              <Link
-                href="/signup"
-                className="text-[hsl(var(--visual-primary))] font-bold hover:underline"
-              >
+              <Link href="/signup" className="text-iw-primary font-bold hover:underline">
                 {t("start_free_trial") ?? t("sign_up")}
               </Link>
             </p>
@@ -382,22 +376,16 @@ export default function LoginPage() {
         </div>
       </main>
 
-      <footer className="relative z-10 flex items-center justify-center gap-6 pb-6 text-xs text-slate-500 font-body font-semibold">
-        <Link href="/privacy-policy" className="hover:text-[hsl(var(--visual-primary))] transition">
+      <footer className="relative z-10 flex items-center justify-center gap-6 pb-6 text-xs text-iw-ink-muted font-body font-semibold">
+        <Link href="/privacy-policy" className="hover:text-iw-primary transition">
           {t("privacy")}
         </Link>
-        <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-        <Link
-          href="/terms-of-service"
-          className="hover:text-[hsl(var(--visual-primary))] transition"
-        >
+        <span className="w-1.5 h-1.5 rounded-full bg-iw-border" />
+        <Link href="/terms-of-service" className="hover:text-iw-primary transition">
           {t("terms")}
         </Link>
-        <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-        <Link
-          href="/coppa-compliance"
-          className="hover:text-[hsl(var(--visual-primary))] transition"
-        >
+        <span className="w-1.5 h-1.5 rounded-full bg-iw-border" />
+        <Link href="/coppa-compliance" className="hover:text-iw-primary transition">
           COPPA
         </Link>
       </footer>
