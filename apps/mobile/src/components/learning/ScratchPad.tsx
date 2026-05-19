@@ -9,7 +9,7 @@ import {
   ViewStyle,
 } from "react-native";
 import Svg, { Path } from "react-native-svg";
-import { colors, radius, spacing } from "@/constants/colors";
+import { colors, radius, spacing, INCLUSIVE_WARM_PALETTE } from "@/constants/colors";
 
 export type StrokeColor = string;
 
@@ -36,7 +36,16 @@ export interface ScratchPadProps {
   style?: ViewStyle;
 }
 
-const PALETTE: StrokeColor[] = ["#111827", "#7C3AED", "#2563EB", "#16A34A", "#DC2626", "#F59E0B"];
+// Stroke colour swatches — data, not chrome. Sourced from the brand palette
+// so learner pen colours stay coherent with the Inclusive-Warm look.
+const PALETTE: StrokeColor[] = [
+  INCLUSIVE_WARM_PALETTE.ink,
+  INCLUSIVE_WARM_PALETTE.accentDeep,
+  INCLUSIVE_WARM_PALETTE.primaryHover,
+  INCLUSIVE_WARM_PALETTE.success,
+  INCLUSIVE_WARM_PALETTE.danger,
+  INCLUSIVE_WARM_PALETTE.warm,
+];
 const THICKNESS = [2, 4, 6, 10];
 
 /**
@@ -53,7 +62,7 @@ export function ScratchPad({
   gridPaper = false,
   initialStrokes = [],
   onChange,
-  background = "#FFFFFF",
+  background = colors.white,
   toolbar = true,
   compactToolbar = false,
   style,
@@ -140,12 +149,12 @@ export function ScratchPad({
     const lines: React.ReactNode[] = [];
     for (let x = step; x < size.w; x += step) {
       lines.push(
-        <Path key={`vx-${x}`} d={`M ${x} 0 L ${x} ${size.h}`} stroke="#E5E7EB" strokeWidth={1} />,
+        <Path key={`vx-${x}`} d={`M ${x} 0 L ${x} ${size.h}`} stroke={colors.border} strokeWidth={1} />,
       );
     }
     for (let y = step; y < size.h; y += step) {
       lines.push(
-        <Path key={`hy-${y}`} d={`M 0 ${y} L ${size.w} ${y}`} stroke="#E5E7EB" strokeWidth={1} />,
+        <Path key={`hy-${y}`} d={`M 0 ${y} L ${size.w} ${y}`} stroke={colors.border} strokeWidth={1} />,
       );
     }
     return lines;
@@ -261,7 +270,7 @@ function ToolButton({
       ]}
       accessibilityRole="button"
     >
-      <Text style={[styles.toolBtnText, active && { color: "#FFF" }]}>{label}</Text>
+      <Text style={[styles.toolBtnText, active && { color: colors.white }]}>{label}</Text>
     </Pressable>
   );
 }

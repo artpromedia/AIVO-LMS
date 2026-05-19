@@ -6,6 +6,7 @@
 import React from "react";
 import { View, Text, Pressable, ActivityIndicator, StyleSheet } from "react-native";
 import type { TierThemeMobile } from "@aivo/mobile-ui";
+import { colors } from "@/constants/colors";
 
 interface Props {
   theme: TierThemeMobile;
@@ -83,9 +84,9 @@ function createStyles(theme: TierThemeMobile) {
       padding: 12,
     },
     answerPressed: { opacity: 0.8 },
-    answerCorrect: { backgroundColor: "#2e7d32", borderColor: "#2e7d32" },
-    answerWrong: { backgroundColor: "#c62828", borderColor: "#c62828" },
-    answerRevealCorrect: { borderColor: "#2e7d32" },
+    answerCorrect: { backgroundColor: colors.success, borderColor: colors.success },
+    answerWrong: { backgroundColor: colors.error, borderColor: colors.error },
+    answerRevealCorrect: { borderColor: colors.success },
     answerText: { color: theme.colors.text, fontSize: 22, fontWeight: "600" },
   });
 }

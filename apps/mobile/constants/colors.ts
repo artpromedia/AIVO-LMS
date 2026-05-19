@@ -34,6 +34,7 @@ export const colors = {
   // meaning shouldn't shift with mode), sourced from the brand
   // package's named palette.
   success: P.success,
+  successSoft: P.successSoft,
   warning: P.warning,
   error: P.danger,
   info: P.info,
@@ -64,6 +65,12 @@ export const colors = {
 
   white: P.primaryFg,
   black: STANDARD.ink,
+
+  // Switch-scan / focus-trap highlight ring. Intentionally a fixed
+  // high-visibility yellow (Tailwind yellow-400 / WCAG-friendly luminance)
+  // that does NOT reskin with sensory mode — AAC switch scanning needs
+  // maximum luminance contrast against any background regardless of mode.
+  a11yFocusHighlight: "#facc15",
 };
 
 export const spacing = {

@@ -10,6 +10,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Modal, View, StyleSheet, Animated } from "react-native";
 import { SwitchScanController } from "@aivo/aac-bridge";
 import type { AACSessionConfig, SymbolItem } from "@aivo/aac-bridge";
+import { colors } from "@/constants/colors";
 
 const DEFAULT_CONFIG: AACSessionConfig = {
   method: "switch_1",
@@ -122,7 +123,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     borderWidth: 4,
-    borderColor: "#facc15", // high-visibility yellow
+    borderColor: colors.a11yFocusHighlight,
     borderRadius: 12,
     backgroundColor: "transparent",
     margin: 8,

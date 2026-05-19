@@ -365,7 +365,7 @@ export function AccountSettingsCard({
               accessibilityLabel={t("accountSettings.avatarChange")}
             >
               {avatarBusy ? (
-                <ActivityIndicator color="#FFF" />
+                <ActivityIndicator color={colors.white} />
               ) : avatarUrl ? (
                 <Image source={{ uri: avatarUrl }} style={styles.avatarImage} />
               ) : (
@@ -651,7 +651,7 @@ const styles = StyleSheet.create({
     fontFamily: "Nunito-SemiBold",
     marginTop: 6,
   },
-  avatarText: { fontSize: 20, fontFamily: "Nunito-ExtraBold", color: "#FFF" },
+  avatarText: { fontSize: 20, fontFamily: "Nunito-ExtraBold", color: colors.white },
   name: { fontSize: 16, fontFamily: "Nunito-Bold", color: colors.text },
   email: { fontSize: 13, fontFamily: "Nunito-Regular", color: colors.textSecondary },
 
@@ -700,13 +700,13 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
     backgroundColor: colors.border,
   },
-  mfaBadgeOn: { backgroundColor: "#dcfce7" },
+  mfaBadgeOn: { backgroundColor: colors.successSoft },
   mfaBadgeText: {
     fontSize: 11,
     fontFamily: "Nunito-Bold",
     color: colors.textSecondary,
   },
-  mfaBadgeTextOn: { color: "#16a34a" },
+  mfaBadgeTextOn: { color: colors.success },
   mfaMsg: {
     fontSize: 12,
     fontFamily: "Nunito-Regular",
@@ -728,7 +728,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: colors.error,
   },
-  mfaToggleText: { fontSize: 14, fontFamily: "Nunito-Bold", color: "#fff" },
+  mfaToggleText: { fontSize: 14, fontFamily: "Nunito-Bold", color: colors.white },
   mfaToggleTextDanger: { color: colors.error },
   mfaInputSection: {
     paddingHorizontal: spacing.md,
@@ -825,6 +825,6 @@ const styles = StyleSheet.create({
   dangerBtnText: {
     fontSize: 15,
     fontFamily: "Nunito-Bold",
-    color: "#FFF",
+    color: colors.white,
   },
 });

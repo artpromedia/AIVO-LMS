@@ -1,28 +1,41 @@
-import { BRAND } from "@aivo/brand";
+import { INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
+
+/**
+ * Mobile theme rebased on `INCLUSIVE_WARM_PALETTE` (Sprint 3).
+ *
+ * Every color flows through the brand package so React Native screens stay
+ * in lockstep with web (`apps/web*` `--aivo-sensory-*` CSS vars). The legacy
+ * `BRAND.colors.*` palette has been superseded; do not reintroduce it.
+ *
+ * `navy` / `shadowColor` are React-Native-specific chrome (status-bar dark
+ * surface, drop-shadow source) sourced from the palette's `darkSurface`
+ * (intentionally stable across sensory modes).
+ */
+const P = INCLUSIVE_WARM_PALETTE;
 
 export const theme = {
   colors: {
-    primary: BRAND.colors.primary,
-    primaryLight: BRAND.colors.primaryLight,
-    primaryDark: BRAND.colors.primaryDark,
-    secondary: BRAND.colors.secondary,
-    accent: BRAND.colors.accent,
-    success: BRAND.colors.success,
-    warning: BRAND.colors.warning,
-    error: BRAND.colors.error,
-    info: BRAND.colors.info,
-    navy: "#1A1A2E",
-    background: BRAND.colors.background,
-    card: "#FFFFFF",
-    surface: BRAND.colors.surface,
-    surfaceSoft: BRAND.colors.visualSurfaceSoft,
-    text: BRAND.colors.text,
-    textSecondary: BRAND.colors.textSecondary,
-    border: BRAND.colors.border,
-    visualMath: BRAND.colors.visualMath,
-    visualReading: BRAND.colors.visualReading,
-    visualScience: BRAND.colors.visualScience,
-    visualSel: BRAND.colors.visualSel,
+    primary: P.primary,
+    primaryLight: P.primarySoft,
+    primaryDark: P.primaryDeep,
+    secondary: P.accent,
+    accent: P.accentDeep,
+    success: P.success,
+    warning: P.warning,
+    error: P.danger,
+    info: P.info,
+    navy: P.darkSurface,
+    background: P.bgPage,
+    card: P.bgRaised,
+    surface: P.bgRaised,
+    surfaceSoft: P.bgCard,
+    text: P.ink,
+    textSecondary: P.inkMuted,
+    border: P.border,
+    visualMath: P.visualMath,
+    visualReading: P.visualReading,
+    visualScience: P.visualScience,
+    visualSel: P.visualSel,
   },
   spacing: {
     xs: 4,
@@ -42,21 +55,21 @@ export const theme = {
   },
   shadows: {
     sm: {
-      shadowColor: "#000",
+      shadowColor: P.darkSurface,
       shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.05,
       shadowRadius: 2,
       elevation: 1,
     },
     md: {
-      shadowColor: "#000",
+      shadowColor: P.darkSurface,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
       elevation: 3,
     },
     lg: {
-      shadowColor: "#000",
+      shadowColor: P.darkSurface,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.15,
       shadowRadius: 8,
