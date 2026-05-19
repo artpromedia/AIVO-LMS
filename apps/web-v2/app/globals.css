@@ -181,13 +181,13 @@ body {
 /* Apply density tokens to the themed subtree so we don't have to edit every
    PageHeader / Card. The h1 selector targets the PageHeader title; the body
    font-size targets readable copy across the shell. */
-[data-theme] {
+[data-role-theme] {
   font-size: var(--aivo-density-base-font);
 }
-[data-theme] h1 {
+[data-role-theme] h1 {
   font-size: var(--aivo-density-h1-font);
 }
-[data-theme] main {
+[data-role-theme] main {
   background: transparent;
 }
 
@@ -205,8 +205,8 @@ body {
   background: var(--color-aivo-primary-soft);
   color: var(--color-aivo-primary);
 }
-[data-theme="learner"] .aivo-nav-link--active,
-[data-theme="platform"] .aivo-nav-link--active {
+[data-role-theme="learner"] .aivo-nav-link--active,
+[data-role-theme="platform"] .aivo-nav-link--active {
   background: color-mix(in oklch, var(--color-aivo-sidebar-fg) 18%, transparent);
   color: var(--color-aivo-sidebar-fg);
 }

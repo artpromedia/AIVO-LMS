@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Map a session role to the visual theme it should render under.
- * Theme tokens live in app/globals.css under `[data-theme="…"]` rules; this
+ * Theme tokens live in app/globals.css under `[data-role-theme="…"]` rules; this
  * lets us differentiate parent / learner / teacher / admin / platform without
  * editing every page that calls AppShell.
  */
@@ -72,7 +72,7 @@ export function AppShell({
   const isDarkSidebar = chrome.sidebarTone === "dark";
 
   return (
-    <div data-theme={theme} data-role={role} className="min-h-screen bg-iw-bg text-iw-ink">
+    <div data-role-theme={theme} data-role={role} className="min-h-screen bg-iw-bg text-iw-ink">
       <a href="#main" className="skip-link">
         Skip to main content
       </a>
