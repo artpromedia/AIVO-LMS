@@ -1,19 +1,43 @@
 @import "tailwindcss";
 @import "@aivo/brand/tokens.css";
 
+/*
+ * Default `--visual-*` palette = Inclusive-Warm anchor colors expressed
+ * as space-separated HSL components so they can be composed with
+ * `hsl(var(--visual-*))` in Tailwind utility classes.
+ *
+ * Hex anchors (`INCLUSIVE_WARM_PALETTE` in `@aivo/brand`):
+ *   primary       #3b82f6   → 217 91% 60%   (blue-500)
+ *   primarySoft   #dbeafe   → 214 95% 93%   (blue-100)
+ *   visualMath    #3b82f6   → 217 91% 60%
+ *   visualReading #7c3aed   → 263 84% 58%   (accentDeep / violet-600)
+ *   visualScience #10b981   → 160 84% 39%   (emerald-500)
+ *   visualSel     #f59e0b   →  38 92% 50%   (amber-500 / warm)
+ *   bgPage        #f5f3ff   → 250 100% 98%
+ *   bgRaised      #ffffff   →   0 0%  100%
+ *   bgCard        #fdfaf3   →  42 71%  97%   (warm cream surface-soft)
+ *   border        #e5e7eb   → 220 13%  91%
+ *   ink           #111827   → 221 39%  11%
+ *   inkMuted      #4b5563   → 215 14%  34%
+ *
+ * Per-tier `[data-tier="EARLY|MIDDLE|HIGH"]` blocks below override these
+ * once <TierThemeProvider> sets the attribute. The defaults here apply to
+ * unauthenticated chrome (login / signup / forgot-password / accept-invite)
+ * and to any surface rendered before a learner is selected.
+ */
 :root {
-  --visual-primary: 262 83% 58%;
-  --visual-primary-light: 262 83% 92%;
-  --visual-math: 340 82% 52%;
-  --visual-reading: 199 89% 48%;
-  --visual-science: 142 71% 45%;
-  --visual-sel: 43 100% 50%;
-  --visual-bg: 0 0% 98%;
+  --visual-primary: 217 91% 60%;
+  --visual-primary-light: 214 95% 93%;
+  --visual-math: 217 91% 60%;
+  --visual-reading: 263 84% 58%;
+  --visual-science: 160 84% 39%;
+  --visual-sel: 38 92% 50%;
+  --visual-bg: 250 100% 98%;
   --visual-surface: 0 0% 100%;
-  --visual-surface-soft: 220 20% 97%;
-  --visual-border: 220 14% 90%;
-  --visual-text: 220 20% 20%;
-  --visual-text-muted: 220 9% 46%;
+  --visual-surface-soft: 42 71% 97%;
+  --visual-border: 220 13% 91%;
+  --visual-text: 221 39% 11%;
+  --visual-text-muted: 215 14% 34%;
 }
 
 .vi-card {
@@ -47,8 +71,9 @@
  * variables here, every existing `.vi-bg`, `.vi-card`, `.vi-text`,
  * etc. across the assessment and stage flows re-skins automatically.
  *
- * Brand identity is constant (violet --visual-primary stays the same);
- * only the surrounding canvas / surface / text mood shifts per age band.
+ * Brand identity is constant (Inclusive-Warm `--visual-primary` blue
+ * stays the same); only the surrounding canvas / surface / text mood
+ * shifts per age band.
  * ───────────────────────────────────────────────────────────────────── */
 
 /* K–5 · Soft Meadow — cream daylight, chunky friendly radii */
