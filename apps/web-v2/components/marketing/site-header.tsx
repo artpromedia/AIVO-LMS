@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { SensoryModeToggle } from "@/components/system/sensory-mode-provider";
 
@@ -13,9 +14,9 @@ import { SensoryModeToggle } from "@/components/system/sensory-mode-provider";
 export function SiteHeader() {
   const NAV_LINKS = [
     { label: "Platform", href: "/#roles" },
+    { label: "Research", href: "/#roles" },
+    { label: "For Districts", href: "/admin/district" },
     { label: "Families", href: "/parent/home" },
-    { label: "Teachers", href: "/teacher/home" },
-    { label: "Schools", href: "/admin/school" },
   ];
 
   return (
@@ -25,17 +26,16 @@ export function SiteHeader() {
           <Link
             href="/"
             aria-label="AIVO Learning home"
-            className="inline-flex items-center gap-2 rounded-full px-1 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring"
+            className="inline-flex items-center rounded-full px-1 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring"
           >
-            <span
-              aria-hidden="true"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-iw-brand text-base font-bold text-white shadow-soft-1"
-            >
-              A
-            </span>
-            <span className="font-iw-display text-xl font-bold tracking-tight text-iw-ink">
-              AIVO
-            </span>
+            <Image
+              src="/images/aivo-logo-purple.png"
+              alt="AIVO Learning"
+              width={160}
+              height={48}
+              priority
+              className="h-10 w-auto md:h-12"
+            />
           </Link>
           <nav
             aria-label="Primary"
@@ -43,7 +43,7 @@ export function SiteHeader() {
           >
             {NAV_LINKS.map((link) => (
               <Link
-                key={link.href}
+                key={link.label}
                 href={link.href}
                 className="transition-colors hover:text-iw-ink"
               >

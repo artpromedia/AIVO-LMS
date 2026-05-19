@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
 
@@ -52,16 +53,14 @@ export function SiteFooter() {
       <div className="mx-auto max-w-6xl px-6 md:px-8">
         <div className="mb-12 grid grid-cols-2 gap-10 md:grid-cols-6">
           <div className="col-span-2">
-            <Link href="/" aria-label="AIVO Learning home" className="inline-flex items-center gap-2">
-              <span
-                aria-hidden="true"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-iw-brand text-base font-bold text-white shadow-soft-1"
-              >
-                A
-              </span>
-              <span className="font-iw-display text-xl font-bold tracking-tight text-iw-ink">
-                AIVO
-              </span>
+            <Link href="/" aria-label="AIVO Learning home" className="inline-flex items-center">
+              <Image
+                src="/images/aivo-logo-purple.png"
+                alt="AIVO Learning"
+                width={160}
+                height={48}
+                className="h-10 w-auto"
+              />
             </Link>
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-iw-ink-muted">
               Engineered for the margins. Transformative for everyone.

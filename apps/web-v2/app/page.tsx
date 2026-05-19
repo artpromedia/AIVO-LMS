@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import { ShieldCheck } from "lucide-react";
+import { ArrowRight, Building2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { readMockSessionFromCookies, MOCK_COOKIE_NAME, MOCK_USERS } from "@/lib/auth/mock-session";
@@ -56,55 +56,87 @@ export default async function Home() {
   return (
     <>
       <SiteHeader />
-      <main id="main" className="mx-auto max-w-6xl px-6 py-16">
-        <header className="mb-12 rounded-iw-hero border border-iw-border bg-iw-hero p-8 shadow-soft-3 sm:p-14">
-          <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr]">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-iw-border bg-iw-accent-soft px-3.5 py-1.5 text-iw-primary">
-                <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-                <span className="text-xs font-semibold tracking-wide">
-                  COPPA · FERPA · SOC 2 Compliant
+      <main id="main" className="mx-auto max-w-6xl px-6 pb-16 pt-10 sm:pt-14 lg:pt-16">
+        <section className="grid items-center gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-iw-border bg-white px-4 py-1.5 text-iw-primary shadow-soft-1">
+              <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+              <span className="text-sm font-bold tracking-wide">FERPA &amp; COPPA Compliant</span>
+            </div>
+            <h1 className="mt-6 font-iw-display text-5xl font-bold leading-[1.05] tracking-tight text-iw-ink sm:text-6xl lg:text-7xl">
+              Learning that
+              <br />
+              <span className="inline-block bg-iw-accent-soft px-2 text-iw-primary">adapts</span>{" "}
+              to your
+              <br />
+              child.
+            </h1>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-iw-ink-muted sm:text-xl">
+              AIVO is the first AI learning platform engineered explicitly for neurodiverse
+              cognitive profiles. We build a personalised &ldquo;brain-clone&rdquo; that models
+              how your K&ndash;8 child learns best.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              {session ? (
+                <>
+                  <Button asChild size="lg">
+                    <Link href={ROLE_HOME[session.role]} className="group">
+                      Continue as {ROLE_LABEL[session.role]}
+                      <ArrowRight
+                        className="h-5 w-5 transition-transform group-hover:translate-x-1"
+                        aria-hidden="true"
+                      />
+                    </Link>
+                  </Button>
+                  <Button asChild size="lg" variant="outline">
+                    <Link href="/login">Switch role</Link>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button asChild size="lg">
+                    <Link href="/signup" className="group">
+                      Start Family Trial
+                      <ArrowRight
+                        className="h-5 w-5 transition-transform group-hover:translate-x-1"
+                        aria-hidden="true"
+                      />
+                    </Link>
+                  </Button>
+                  <Button asChild size="lg" variant="outline">
+                    <Link href="/admin/district">
+                      <Building2 className="h-5 w-5" aria-hidden="true" />
+                      For School Districts
+                    </Link>
+                  </Button>
+                </>
+              )}
+            </div>
+            <div className="mt-8 flex items-center gap-3">
+              <div
+                aria-hidden="true"
+                className="flex -space-x-2"
+              >
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border-2 border-iw-bg bg-iw-accent-soft text-xs font-bold text-iw-primary">
+                  S
+                </span>
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border-2 border-iw-bg bg-iw-warm-soft text-xs font-bold text-iw-warm">
+                  M
+                </span>
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border-2 border-iw-bg bg-iw-accent text-xs font-bold text-iw-primary-fg">
+                  J
                 </span>
               </div>
-              <h1 className="mt-5 font-iw-display text-5xl font-bold leading-[1.05] tracking-tight text-iw-ink sm:text-6xl lg:text-7xl">
-                Learning that{" "}
-                <span className="bg-iw-sensory-brand bg-clip-text text-transparent">adapts</span>{" "}
-                to every child.
-              </h1>
-              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-iw-ink-muted sm:text-xl">
-                A warmer, more personal way to learn — with AI tutors that adapt to how each
-                learner thinks, focuses, and grows.
+              <p className="text-sm font-semibold text-iw-ink-muted">
+                Trusted by 1,200+ specialists and parents.
               </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                {session ? (
-                  <>
-                    <Button asChild size="lg">
-                      <Link href={ROLE_HOME[session.role]}>
-                        Continue as {ROLE_LABEL[session.role]}
-                      </Link>
-                    </Button>
-                    <Button asChild size="lg" variant="outline">
-                      <Link href="/login">Switch role</Link>
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button asChild size="lg">
-                      <Link href="/signup">Start Family Trial</Link>
-                    </Button>
-                    <Button asChild size="lg" variant="outline">
-                      <Link href="/admin/district">For School Districts</Link>
-                    </Button>
-                  </>
-                )}
-              </div>
-            </div>
-
-            <div className="hidden lg:block">
-              <HeroVisual />
             </div>
           </div>
-        </header>
+
+          <div className="hidden lg:block">
+            <HeroVisual />
+          </div>
+        </section>
         <MascotCoach
           name="Your tutor companion"
           tip="One primary action per screen helps young learners stay focused."
