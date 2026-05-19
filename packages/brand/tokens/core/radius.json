@@ -6,6 +6,12 @@
     "lg": "16px",
     "xl": "24px",
     "2xl": "32px",
-    "pill": "9999px"
+    "pill": "9999px",
+    "card": "28px",
+    "cardLg": "36px",
+    "hero": "44px",
+    "control": "14px",
+    "chip": "9999px",
+    "sheetTop": "24px"
   }
 }

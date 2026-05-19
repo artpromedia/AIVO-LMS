@@ -101,7 +101,19 @@ const css = [
   ...themeVars,
   ...ageVars,
   ...sensoryVars,
-  "@media (prefers-reduced-motion: reduce) { :root { --aivo-motion-duration-fast: 0ms; --aivo-motion-duration-base: 0ms; --aivo-motion-duration-slow: 0ms; --aivo-motion-duration-playful: 0ms; --aivo-sensory-motionScale: 0; } }",
+  // Named motion keyframes. Each named animation is duration- and easing-token-driven.
+  `@keyframes aivo-ai-thinking { 0% { opacity: 0.45; transform: scale(1); } 50% { opacity: 1; transform: scale(1.06); } 100% { opacity: 0.45; transform: scale(1); } }`,
+  `@keyframes aivo-lesson-reveal { 0% { opacity: 0; transform: translateY(8px); } 100% { opacity: 1; transform: translateY(0); } }`,
+  `@keyframes aivo-mastery-up { 0% { transform: scale(1); } 35% { transform: scale(1.08); } 100% { transform: scale(1); } }`,
+  `@keyframes aivo-approve { 0% { opacity: 0; transform: scale(0.92); } 60% { opacity: 1; transform: scale(1.04); } 100% { opacity: 1; transform: scale(1); } }`,
+  `@keyframes aivo-baseline-gen { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }`,
+  `.aivo-motion-ai-thinking { animation: aivo-ai-thinking 1400ms linear infinite; }`,
+  `.aivo-motion-lesson-reveal { animation: aivo-lesson-reveal 520ms cubic-bezier(0.16, 1, 0.3, 1) both; }`,
+  `.aivo-motion-mastery-up { animation: aivo-mastery-up 720ms cubic-bezier(0.34, 1.56, 0.64, 1); }`,
+  `.aivo-motion-approve { animation: aivo-approve 320ms cubic-bezier(0.22, 1, 0.36, 1) both; }`,
+  `.aivo-motion-baseline-gen { animation: aivo-baseline-gen 1800ms linear infinite; background-size: 200% 100%; }`,
+  // Reduced-motion: collapse durations + skip transforms, keep opacity finals.
+  "@media (prefers-reduced-motion: reduce) { :root { --aivo-motion-duration-fast: 0ms; --aivo-motion-duration-base: 0ms; --aivo-motion-duration-slow: 0ms; --aivo-motion-duration-playful: 0ms; --aivo-motion-duration-aiThinking: 0ms; --aivo-motion-duration-lessonReveal: 0ms; --aivo-motion-duration-masteryUp: 0ms; --aivo-motion-duration-approve: 0ms; --aivo-motion-duration-baselineGen: 0ms; --aivo-sensory-motionScale: 0; } .aivo-motion-ai-thinking, .aivo-motion-lesson-reveal, .aivo-motion-mastery-up, .aivo-motion-approve, .aivo-motion-baseline-gen { animation: none !important; transform: none !important; } }",
 ].filter(Boolean).join("\n\n");
 
 const ts = `export const playfulCalmTokens = ${JSON.stringify(tokens, null, 2)} as const;\nexport type PlayfulCalmTokens = typeof playfulCalmTokens;\n`;
@@ -260,9 +272,12 @@ const preset = `module.exports = {
         xl: "var(--aivo-radius-xl)",
         "2xl": "var(--aivo-radius-2xl)",
         pill: "var(--aivo-radius-pill)",
-        "iw-card": "1.75rem",
-        "iw-card-lg": "2.25rem",
-        "iw-hero": "2.75rem"
+        "iw-card": "var(--aivo-radius-card)",
+        "iw-card-lg": "var(--aivo-radius-cardLg)",
+        "iw-hero": "var(--aivo-radius-hero)",
+        "iw-control": "var(--aivo-radius-control)",
+        "iw-chip": "var(--aivo-radius-chip)",
+        "iw-sheet-top": "var(--aivo-radius-sheetTop)"
       },
       boxShadow: {
         "soft-1": "var(--aivo-shadow-soft-1)",
@@ -296,7 +311,11 @@ const preset = `module.exports = {
         ".iw-metric-sm": { "font-size": "1.125rem", "line-height": "1.5rem", "letter-spacing": "-0.01em", "font-weight": "600", "font-variant-numeric": "tabular-nums" },
         ".iw-label":    { "font-size": "0.875rem", "line-height": "1.25rem", "font-weight": "500", "letter-spacing": "0.005em" },
         ".iw-label-sm": { "font-size": "0.75rem", "line-height": "1rem", "font-weight": "600", "letter-spacing": "0.04em", "text-transform": "uppercase" },
-        ".iw-caption":  { "font-size": "0.75rem", "line-height": "1.125rem", "font-weight": "400", "letter-spacing": "0.01em" }
+        ".iw-caption":  { "font-size": "0.75rem", "line-height": "1.125rem", "font-weight": "400", "letter-spacing": "0.01em" },
+        ".iw-safe-top":    { "padding-top": "env(safe-area-inset-top)" },
+        ".iw-safe-bottom": { "padding-bottom": "env(safe-area-inset-bottom)" },
+        ".iw-safe-x":      { "padding-left": "env(safe-area-inset-left)", "padding-right": "env(safe-area-inset-right)" },
+        ".iw-touch":       { "min-height": "44px", "min-width": "44px" }
       });
     }
   ]

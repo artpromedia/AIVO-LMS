@@ -5,12 +5,31 @@
       "fast": "150ms",
       "base": "250ms",
       "slow": "400ms",
-      "playful": "600ms"
+      "playful": "600ms",
+      "aiThinking": "1400ms",
+      "lessonReveal": "520ms",
+      "masteryUp": "720ms",
+      "approve": "320ms",
+      "baselineGen": "1800ms"
     },
     "easing": {
       "ease-out-soft": "cubic-bezier(0.16, 1, 0.3, 1)",
       "spring-bounce": "cubic-bezier(0.34, 1.56, 0.64, 1)",
-      "spring-gentle": "cubic-bezier(0.22, 1, 0.36, 1)"
+      "spring-gentle": "cubic-bezier(0.22, 1, 0.36, 1)",
+      "ease-in-out":   "cubic-bezier(0.4, 0, 0.2, 1)",
+      "linear":        "linear"
+    },
+    "named": {
+      "aiThinking":   {"duration": "1400ms", "easing": "linear",        "description": "Pulsing dot/aura while AI computes a baseline or response."},
+      "lessonReveal": {"duration": "520ms",  "easing": "cubic-bezier(0.16, 1, 0.3, 1)", "description": "Card mounts with subtle Y translate + opacity."},
+      "masteryUp":    {"duration": "720ms",  "easing": "cubic-bezier(0.34, 1.56, 0.64, 1)", "description": "Metric tick + soft bounce when mastery increases."},
+      "approve":      {"duration": "320ms",  "easing": "cubic-bezier(0.22, 1, 0.36, 1)", "description": "Confirmation pulse + check icon on parent approval."},
+      "baselineGen":  {"duration": "1800ms", "easing": "linear",        "description": "Long-running brain-clone baseline build progress."}
+    },
+    "reducedMotion": {
+      "duration": "0ms",
+      "easing": "linear",
+      "note": "All durations collapse to 0 when prefers-reduced-motion: reduce; opacity-only transitions remain."
     }
   }
 }
