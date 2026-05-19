@@ -52,7 +52,7 @@ export function StickyHeader({
       }`}
     >
       <div className="max-w-6xl mx-auto px-6 md:px-8 h-20 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-6 lg:gap-8 min-w-0">
           <Link href="/" className="flex items-center relative w-[140px] h-[40px]" aria-label="AIVO Learning home">
             <Image
               src="/images/aivo-logo-purple.png"
@@ -63,12 +63,12 @@ export function StickyHeader({
               className="object-contain object-left"
             />
           </Link>
-          <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-500">
+          <nav className="hidden md:flex items-center gap-5 lg:gap-8 text-sm font-semibold text-slate-500">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="hover:text-slate-900 transition-colors"
+                className="whitespace-nowrap hover:text-slate-900 transition-colors"
               >
                 {link.label}
               </Link>
@@ -76,14 +76,14 @@ export function StickyHeader({
           </nav>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:block">
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="hidden lg:block">
             <SensoryModeToggle initialMode={initialSensoryMode ?? "standard"} />
           </div>
           <LanguageSwitcher compact />
           <a
             href={`${WEB_APP_URL}/login`}
-            className="hidden md:inline-flex items-center px-4 py-2 rounded-full text-slate-700 font-semibold text-sm hover:bg-slate-100 transition min-h-[44px]"
+            className="hidden md:inline-flex items-center px-4 py-2 rounded-full text-slate-700 font-semibold text-sm hover:bg-slate-100 transition min-h-[44px] whitespace-nowrap"
           >
             {t("sign_in")}
           </a>
@@ -93,7 +93,7 @@ export function StickyHeader({
               trackCTAClick("header_get_started", `${WEB_APP_URL}/signup?plan=free`);
               trackSignupInitiation("header");
             }}
-            className="hidden sm:inline-flex items-center px-5 py-2.5 rounded-full bg-[var(--aivo-sensory-primary,#7c3aed)] text-white font-semibold text-sm hover:opacity-90 transition shadow-md shadow-purple-200 min-h-[44px]"
+            className="hidden sm:inline-flex items-center px-5 py-2.5 rounded-full bg-[var(--aivo-sensory-primary,#7c3aed)] text-white font-semibold text-sm hover:opacity-90 transition shadow-md shadow-purple-200 min-h-[44px] whitespace-nowrap"
           >
             {t("get_started")}
           </a>
@@ -125,7 +125,7 @@ export function StickyHeader({
                 {link.label}
               </Link>
             ))}
-            <div className="px-4 py-3 sm:hidden">
+            <div className="px-4 py-3 lg:hidden">
               <SensoryModeToggle initialMode={initialSensoryMode ?? "standard"} compact />
             </div>
             <hr className="my-2 border-slate-100" />
