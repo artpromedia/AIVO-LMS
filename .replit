@@ -68,7 +68,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "(cd packages/brand && node ./scripts/build-tokens.mjs) && cd apps/web-v2 && exec ./node_modules/.bin/next dev --port 5000 --hostname 0.0.0.0 --turbopack"
+args = "bash scripts/start-web-v2.sh"
 waitForPort = 5000
 
 [[workflows.workflow]]
