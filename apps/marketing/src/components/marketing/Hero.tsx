@@ -94,7 +94,7 @@ export function Hero({ scrollY }: Readonly<{ scrollY: number }>) {
       <div className="absolute inset-0 pointer-events-none -z-0">
         <div className="absolute top-10 -left-10 w-[40vw] h-[40vw] bg-purple-200 rounded-full blur-3xl opacity-60 animate-blob motion-reduce:animate-none" />
         <div
-          className="absolute -bottom-10 -right-10 w-[35vw] h-[35vw] bg-amber-200/50 rounded-full blur-3xl animate-blob motion-reduce:animate-none"
+          className="absolute -bottom-10 -right-10 w-[35vw] h-[35vw] bg-[#ffe4dc] rounded-full blur-3xl animate-blob motion-reduce:animate-none"
           style={{ animationDelay: "4s" }}
         />
       </div>
@@ -112,7 +112,13 @@ export function Hero({ scrollY }: Readonly<{ scrollY: number }>) {
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-slate-900 leading-[1.05] tracking-tight">
               {t("headline_line1")}
               <br />
-              <span className="text-primary">{t("headline_line2")}</span>
+              <span className="relative inline-block">
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-x-0 bottom-1 -z-10 h-[0.55em] rounded-sm bg-[#ffe4dc]"
+                />
+                <span className="relative text-slate-900">{t("headline_line2")}</span>
+              </span>
             </h1>
             <p className="text-lg md:text-xl text-slate-600 font-body leading-relaxed max-w-xl mx-auto md:mx-0">
               {t("subheadline")}

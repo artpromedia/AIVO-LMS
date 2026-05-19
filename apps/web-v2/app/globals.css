@@ -99,7 +99,7 @@ body {
   --color-aivo-sidebar-fg: oklch(0.99 0.01 30);
   --color-aivo-sidebar-muted: oklch(0.95 0.05 30 / 0.85);
   --color-aivo-sidebar-border: oklch(0.55 0.22 30);
-  --font-sans: "Fredoka", "Nunito", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", "Nunito", ui-sans-serif, system-ui, sans-serif;
   --radius-card: 28px;
   --aivo-density-card-pad: 1.75rem;
   --aivo-density-base-font: 1.0625rem;

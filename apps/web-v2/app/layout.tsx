@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fredoka, Nunito } from "next/font/google";
+import { Inter, Nunito } from "next/font/google";
 import "./globals.css";
 import { MockAuthBanner } from "@/components/system/mock-auth-banner";
 import { PlayfulCalmProvider } from "@/components/system/playful-calm-provider";
@@ -7,12 +7,13 @@ import { SensoryModeProvider } from "@/components/system/sensory-mode-provider";
 import { readSensoryModeFromCookies } from "@/lib/sensory-mode/server";
 
 // Inclusive-Warm display + body faces. Loaded at the root so every dashboard
-// inherits Fredoka (display) and Nunito (body) on first paint — these are
-// what the new brand calls for and are the only fonts the `--font-display`
-// / `--font-sans` CSS vars resolve to in the new preset.
-const fredoka = Fredoka({
+// inherits Inter (display) and Nunito (body) on first paint. Inter gives the
+// platform a clean, data-friendly grotesk for hero copy and dashboard
+// numerals (matches the platform-wide design language reference); Nunito
+// keeps reading body copy warm and approachable.
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
   variable: "--font-aivo-display",
   display: "swap",
 });
@@ -40,7 +41,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" data-sensory-mode={sensoryMode} data-brand="inclusive-warm">
       <body
         data-age-mode="spark"
-        className={`${fredoka.variable} ${nunito.variable} font-iw-body bg-iw-bg text-iw-ink antialiased`}
+        className={`${inter.variable} ${nunito.variable} font-iw-body bg-iw-bg text-iw-ink antialiased`}
       >
         <a href="#main" className="skip-link">
           Skip to main content

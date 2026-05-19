@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fredoka, Nunito } from "next/font/google";
+import { Inter, Nunito } from "next/font/google";
 import "@aivo/brand/tokens.css";
 import "./globals.css";
 import { I18nProvider } from "@/providers/i18n-provider";
@@ -7,11 +7,11 @@ import enMessages from "@/i18n/messages/en.json";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { getSensoryModeFromCookies } from "@/lib/sensory-mode.server";
 
-const fredoka = Fredoka({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-fredoka",
+  variable: "--font-inter",
   display: "swap",
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 const nunito = Nunito({
@@ -102,7 +102,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       lang="en"
       data-brand="inclusive-warm"
       data-sensory-mode={sensoryMode}
-      className={`${fredoka.variable} ${nunito.variable}`}
+      className={`${inter.variable} ${nunito.variable}`}
       suppressHydrationWarning
     >
       <head>

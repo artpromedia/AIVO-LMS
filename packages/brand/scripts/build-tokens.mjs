@@ -162,7 +162,7 @@ const preset = `module.exports = {
         "iw-hero": "linear-gradient(180deg, var(--aivo-sensory-bgPage) 0%, var(--aivo-sensory-bgRaised) 70%)"
       },
       fontFamily: {
-        "iw-display": ["Fredoka", "Nunito", "ui-sans-serif", "system-ui", "sans-serif"],
+        "iw-display": ["Inter", "Nunito", "ui-sans-serif", "system-ui", "sans-serif"],
         "iw-body": ["Nunito", "ui-sans-serif", "system-ui", "sans-serif"],
         "iw-dyslexia": ["OpenDyslexic", "Comic Sans MS", "Arial", "sans-serif"]
       }

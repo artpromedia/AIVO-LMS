@@ -12,10 +12,11 @@
   --color-primary-light: #a78bfa;
   --color-primary-dark: #5b21b6;
   --color-secondary: #06b6d4;
-  --color-accent: #f59e0b;
+  --color-accent: #ff6a4d;
+  --color-accent-soft: #ffe4dc;
   --color-surface: #f8fafc;
   --color-surface-hover: #f1f5f9;
-  --font-heading: var(--font-fredoka), "Fredoka", sans-serif;
+  --font-heading: var(--font-inter), "Inter", sans-serif;
   --font-body: var(--font-nunito), "Nunito", sans-serif;
 
   --animate-fade-in: fade-in 0.5s ease-out forwards;
