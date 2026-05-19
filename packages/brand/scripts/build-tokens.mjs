@@ -36,9 +36,11 @@ const tokens = sourceFiles.reduce((acc, file) => {
   return mergeDeep(acc, json);
 }, {});
 
+const META_KEYS = new Set(["description", "note", "notes", "doc", "$description"]);
 const flatten = (obj, prefix = []) => {
   const out = [];
   for (const [k, v] of Object.entries(obj)) {
+    if (META_KEYS.has(k)) continue;
     if (v && typeof v === "object" && !Array.isArray(v)) {
       out.push(...flatten(v, [...prefix, k]));
     } else {
