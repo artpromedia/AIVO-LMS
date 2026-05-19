@@ -61,7 +61,12 @@ export default function LoginPage({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form className="flex flex-col gap-4">
+              <form
+                action={IS_DEMO ? mockSignIn : undefined}
+                className="flex flex-col gap-4"
+              >
+                {/* Demo: any submission signs in as parent; DemoRolePicker below switches role. */}
+                <input type="hidden" name="role" value="parent" />
                 <div>
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -71,7 +76,6 @@ export default function LoginPage({
                     autoComplete="email"
                     placeholder="you@example.com"
                     required
-                    disabled={IS_DEMO}
                   />
                 </div>
                 <div>
@@ -90,11 +94,10 @@ export default function LoginPage({
                     type="password"
                     autoComplete="current-password"
                     required
-                    disabled={IS_DEMO}
                   />
                 </div>
-                <Button type="submit" size="lg" disabled={IS_DEMO}>
-                  {IS_DEMO ? "Sign in (coming soon)" : "Sign in"}
+                <Button type="submit" size="lg">
+                  Sign in
                 </Button>
               </form>
 

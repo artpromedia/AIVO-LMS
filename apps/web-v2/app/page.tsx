@@ -64,12 +64,15 @@ export default async function Home() {
               <span className="text-sm font-bold tracking-wide">FERPA &amp; COPPA Compliant</span>
             </div>
             <h1 className="mt-6 font-iw-display text-5xl font-bold leading-[1.05] tracking-tight text-iw-ink sm:text-6xl lg:text-7xl">
-              Learning that
-              <br />
-              <span className="inline-block bg-iw-accent-soft px-2 text-iw-primary">adapts</span>{" "}
-              to your
-              <br />
-              child.
+              Learning that{" "}
+              <span className="relative inline-block">
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-x-0 bottom-1 -z-10 h-[0.55em] rounded-sm bg-iw-warm-soft"
+                />
+                <span className="relative text-iw-ink">adapts</span>
+              </span>{" "}
+              to your child.
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-iw-ink-muted sm:text-xl">
               AIVO is the first AI learning platform engineered explicitly for neurodiverse
