@@ -29,27 +29,27 @@ export default async function Page() {
         title="Consent center"
         description="Each consent is versioned. Revoking disables the related feature without deleting required audit history."
       />
-      <Card className="p-0 divide-y">
+      <Card className="divide-y divide-iw-border p-0">
         {accountTypes.map((type) => {
           const version = versions.find((v) => v.consentType === type);
           const active = records.find(
             (r) => r.consentType === type && r.learnerId === null && r.revokedAt === null,
           );
           return (
-            <div key={type} className="p-5 flex items-start justify-between gap-4">
+            <div key={type} className="flex items-start justify-between gap-4 bg-iw-card p-5">
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="font-display text-base font-semibold">{humanize(type)}</h3>
+                  <h3 className="font-iw-display text-base font-semibold text-iw-ink">{humanize(type)}</h3>
                   {active ? (
                     <Badge tone="success">Accepted</Badge>
                   ) : (
-                    <Badge tone="neutral">Not accepted</Badge>
+                    <Badge tone="warning">Not accepted</Badge>
                   )}
                 </div>
-                <p className="text-sm text-aivo-ink-soft mt-1">
+                <p className="mt-1 text-sm text-iw-ink-muted">
                   {version?.summary ?? "No description available."}
                 </p>
-                <p className="text-xs text-aivo-ink-soft mt-1">
+                <p className="mt-1 text-xs text-iw-ink-muted">
                   Version {version?.version ?? "—"}
                   {active ? ` · accepted ${formatDate(active.acceptedAt)}` : ""}
                 </p>

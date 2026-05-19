@@ -6,13 +6,15 @@
 export function MockAuthBanner() {
   if (process.env.NEXT_PUBLIC_AUTH_MODE === "production") return null;
   return (
-    <div
-      role="status"
-      aria-live="polite"
-      className="w-full bg-amber-50 text-amber-900 border-b border-amber-200 text-xs px-4 py-1.5 text-center"
-    >
-      Demo mode — mock authentication is active. Switch the role from the session menu. Production
-      identity provider is not yet enabled.
+    <div className="mx-auto w-full max-w-[1400px] px-4 pt-2 sm:px-6">
+      <div
+        role="status"
+        aria-live="polite"
+        className="rounded-iw-pill border border-iw-warm bg-iw-warm-soft px-4 py-2 text-center text-xs font-medium text-iw-ink shadow-soft-1"
+      >
+        Demo mode — mock authentication is active. Switch the role from the session menu.
+        Production identity provider is not yet enabled.
+      </div>
     </div>
   );
 }

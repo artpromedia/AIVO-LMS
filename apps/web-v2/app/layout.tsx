@@ -39,7 +39,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en" data-sensory-mode={sensoryMode} data-brand="inclusive-warm">
       <body
-        data-theme="light"
         data-age-mode="spark"
         className={`${fredoka.variable} ${nunito.variable} font-iw-body bg-iw-bg text-iw-ink antialiased`}
       >
