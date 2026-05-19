@@ -1,6 +1,13 @@
 @import "tailwindcss";
 @import "@aivo/brand/tokens.css";
 
+/* Pull in the v3-style @aivo/brand Tailwind preset (iw-*, brand-*, sensory-mode
+ * aware utility colors). Tailwind v4 ignores `tailwind.config.cjs` unless it is
+ * explicitly loaded via this directive, so without it every `bg-iw-bg`,
+ * `text-iw-ink`, `bg-brand-meadow`, etc. silently resolves to nothing and the
+ * Inclusive Lab — Warm chrome renders unstyled. */
+@config "../tailwind.config.cjs";
+
 @theme {
   --color-aivo-ink: var(--aivo-semantic-color-text-primary);
   --color-aivo-ink-soft: var(--aivo-semantic-color-text-secondary);
