@@ -96,7 +96,7 @@ export function AppShell({
               A
             </span>
             <span className="font-iw-display text-lg font-bold tracking-tight text-iw-ink">
-              Aivo Learning
+              AIVO
             </span>
           </Link>
 

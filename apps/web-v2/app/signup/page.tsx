@@ -3,14 +3,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SiteHeader } from "@/components/marketing/site-header";
+import { SiteFooter } from "@/components/marketing/site-footer";
 
 export default function SignupPage() {
   return (
-    <main
-      id="main"
-      className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12"
-    >
-      <Card>
+    <>
+      <SiteHeader />
+      <main
+        id="main"
+        className="mx-auto flex w-full max-w-md flex-col px-6 py-16 sm:py-24"
+      >
+        <Card>
         <CardHeader>
           <CardTitle>Create your account</CardTitle>
           <CardDescription>
@@ -41,6 +45,8 @@ export default function SignupPage() {
           </form>
         </CardContent>
       </Card>
-    </main>
+      </main>
+      <SiteFooter />
+    </>
   );
 }

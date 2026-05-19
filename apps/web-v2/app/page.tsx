@@ -9,6 +9,7 @@ import { ROLE_HOME, ROLE_LABEL, type Role } from "@/lib/auth/types";
 import { MascotCoach } from "@/components/playful-calm";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
+import { HeroVisual } from "@/components/marketing/hero-visual";
 
 /**
  * Demo-mode role switch invoked by the role cards below. Replaces the cookie
@@ -57,43 +58,51 @@ export default async function Home() {
       <SiteHeader />
       <main id="main" className="mx-auto max-w-6xl px-6 py-16">
         <header className="mb-12 rounded-iw-hero border border-iw-border bg-iw-hero p-8 shadow-soft-3 sm:p-14">
-          <div className="inline-flex items-center gap-2 rounded-full border border-iw-border bg-iw-accent-soft px-3.5 py-1.5 text-iw-primary">
-            <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-            <span className="text-xs font-semibold tracking-wide">
-              COPPA · FERPA · SOC 2 Compliant
-            </span>
-          </div>
-          <h1 className="mt-5 font-iw-display text-5xl font-bold leading-[1.05] tracking-tight text-iw-ink sm:text-6xl lg:text-7xl">
-            Learning that{" "}
-            <span className="bg-iw-sensory-brand bg-clip-text text-transparent">adapts</span> to
-            every child.
-          </h1>
-          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-iw-ink-muted sm:text-xl">
-            A warmer, more personal way to learn — with AI tutors that adapt to how each learner
-            thinks, focuses, and grows.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            {session ? (
-              <>
-                <Button asChild size="lg">
-                  <Link href={ROLE_HOME[session.role]}>
-                    Continue as {ROLE_LABEL[session.role]}
-                  </Link>
-                </Button>
-                <Button asChild size="lg" variant="outline">
-                  <Link href="/login">Switch role</Link>
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button asChild size="lg">
-                  <Link href="/signup">Start Family Trial</Link>
-                </Button>
-                <Button asChild size="lg" variant="outline">
-                  <Link href="/admin/district">For School Districts</Link>
-                </Button>
-              </>
-            )}
+          <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr]">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-iw-border bg-iw-accent-soft px-3.5 py-1.5 text-iw-primary">
+                <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+                <span className="text-xs font-semibold tracking-wide">
+                  COPPA · FERPA · SOC 2 Compliant
+                </span>
+              </div>
+              <h1 className="mt-5 font-iw-display text-5xl font-bold leading-[1.05] tracking-tight text-iw-ink sm:text-6xl lg:text-7xl">
+                Learning that{" "}
+                <span className="bg-iw-sensory-brand bg-clip-text text-transparent">adapts</span>{" "}
+                to every child.
+              </h1>
+              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-iw-ink-muted sm:text-xl">
+                A warmer, more personal way to learn — with AI tutors that adapt to how each
+                learner thinks, focuses, and grows.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                {session ? (
+                  <>
+                    <Button asChild size="lg">
+                      <Link href={ROLE_HOME[session.role]}>
+                        Continue as {ROLE_LABEL[session.role]}
+                      </Link>
+                    </Button>
+                    <Button asChild size="lg" variant="outline">
+                      <Link href="/login">Switch role</Link>
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button asChild size="lg">
+                      <Link href="/signup">Start Family Trial</Link>
+                    </Button>
+                    <Button asChild size="lg" variant="outline">
+                      <Link href="/admin/district">For School Districts</Link>
+                    </Button>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="hidden lg:block">
+              <HeroVisual />
+            </div>
           </div>
         </header>
         <MascotCoach

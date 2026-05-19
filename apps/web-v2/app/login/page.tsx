@@ -4,6 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { MOCK_USERS } from "@/lib/auth/mock-session";
 import { ROLE_LABEL, type Role } from "@/lib/auth/types";
 import { Badge } from "@/components/ui/badge";
+import { SiteHeader } from "@/components/marketing/site-header";
+import { SiteFooter } from "@/components/marketing/site-footer";
 
 async function mockSignIn(formData: FormData) {
   "use server";
@@ -41,8 +43,13 @@ export default function LoginPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   return (
-    <main id="main" className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12">
-      <Card variant="hero">
+    <>
+      <SiteHeader />
+      <main
+        id="main"
+        className="mx-auto flex w-full max-w-md flex-col px-6 py-16 sm:py-24"
+      >
+        <Card variant="hero">
         <CardHeader>
           <CardTitle>Sign in</CardTitle>
           <CardDescription>
@@ -87,6 +94,8 @@ export default function LoginPage({
           </p>
         </CardContent>
       </Card>
-    </main>
+      </main>
+      <SiteFooter />
+    </>
   );
 }
