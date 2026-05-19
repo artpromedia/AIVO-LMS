@@ -11,7 +11,8 @@ import type { BffFailure } from "@/lib/bff/response";
 type Bucket = { tokens: number; updatedAt: number };
 
 declare global {
-  // eslint-disable-next-line no-var
+  // `declare var` is required for global augmentation in TS; this is
+  // expected pattern for module-scoped singletons.
   var __aivoRateBuckets: Map<string, Bucket> | undefined;
 }
 

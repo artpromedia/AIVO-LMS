@@ -215,9 +215,9 @@ export default function DistrictBrandingPage() {
               Primary Color
             </span>
             <div className="mt-1 flex items-center gap-3">
-              {/* eslint-disable-next-line no-restricted-syntax -- district admin chooses tenant brand color; default is product brand mark, not a tier surface */}
               <input
                 type="color"
+                // eslint-disable-next-line no-restricted-syntax -- district admin chooses tenant brand color; default is product brand mark, not a tier surface
                 value={branding.primaryColor || "#7c3aed"}
                 onChange={(e) => setBranding({ ...branding, primaryColor: e.target.value })}
                 className="h-10 w-16 rounded-lg border vi-border"

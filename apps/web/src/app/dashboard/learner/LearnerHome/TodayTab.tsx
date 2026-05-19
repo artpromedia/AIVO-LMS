@@ -50,8 +50,8 @@ export function TodayTab({ missions, onSelCheckin }: TodayTabProps) {
                 >
                   <div
                     className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
-                    // eslint-disable-next-line no-restricted-syntax -- tutor brand-mark tint; neutral slate fallback when no tutor assigned
                     style={{
+                      // eslint-disable-next-line no-restricted-syntax -- tutor brand-mark tint; neutral slate fallback when no tutor assigned
                       backgroundColor: tutor ? `${tutor.color}1f` : "#f1f5f9",
                       color: tutor?.color,
                     }}

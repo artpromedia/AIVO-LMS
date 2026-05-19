@@ -69,6 +69,7 @@ const RULES: Pattern[] = [
     ...({
       regex:
         /\b(meet me (in person|alone)|don'?t tell (your )?(mom|dad|parents|teacher)|our little secret)\b/i,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- regex variant carries shape that doesn't fit the discriminated union; safe cast at definition time
     } as any),
   },
   // bullying

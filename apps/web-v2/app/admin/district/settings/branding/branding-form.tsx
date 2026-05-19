@@ -34,6 +34,7 @@ export function BrandingForm({
   const router = useRouter();
   const [displayName, setDisplayName] = useState(initial.displayName ?? fallbackName);
   const [supportEmail, setSupportEmail] = useState(initial.supportEmail ?? "");
+  // eslint-disable-next-line no-restricted-syntax -- district admin chooses tenant brand color; default is product brand mark, not a tier surface
   const [primaryColor, setPrimaryColor] = useState(initial.primaryColor ?? "#2D5BFF");
   const [pending, startTransition] = useTransition();
   const [status, setStatus] = useState<

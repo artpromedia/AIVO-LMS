@@ -270,7 +270,8 @@ export type Store = {
 };
 
 declare global {
-  // eslint-disable-next-line no-var
+  // `declare var` is required for global augmentation in TS; this is
+  // expected pattern for module-scoped singletons.
   var __aivoStore: Store | undefined;
 }
 

@@ -145,6 +145,7 @@ function buildVisualIdentity(
     sensorySeekingOrAvoiding === "avoiding" ||
     functioningLevel === "PRE_SYMBOLIC" ||
     functioningLevel === "NON_VERBAL";
+  /* eslint-disable no-restricted-syntax -- brain-clone visualization data sent to the client renderer; these are functioning-level-coded palette identifiers (not surface tokens) that the brain-clone canvas paints directly. Sprint 2 will move these into @aivo/brand under a `brain.functioningLevel.*` palette so they reskin with sensory mode. */
   switch (functioningLevel) {
     case "PRE_SYMBOLIC":
       return {
@@ -178,6 +179,7 @@ function buildVisualIdentity(
         pulseRate: calmMode ? "steady" : "energetic",
       };
   }
+  /* eslint-enable no-restricted-syntax */
 }
 
 function pick<T = unknown>(

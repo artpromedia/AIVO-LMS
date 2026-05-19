@@ -120,9 +120,10 @@ export default function QuestsPage() {
               <div className="flex items-center gap-4 mb-3">
                 <div
                   className="w-14 h-14 rounded-2xl flex items-center justify-center"
-                  // eslint-disable-next-line no-restricted-syntax -- per-world brand color tints; fallback to product brand mark
                   style={{
+                    // eslint-disable-next-line no-restricted-syntax -- per-world brand color tints; fallback to product brand mark
                     backgroundColor: `${WORLD_COLORS[world.key] || "#7c3aed"}1f`,
+                    // eslint-disable-next-line no-restricted-syntax -- per-world brand color tints; fallback to product brand mark
                     color: WORLD_COLORS[world.key] || "#7c3aed",
                   }}
                 >

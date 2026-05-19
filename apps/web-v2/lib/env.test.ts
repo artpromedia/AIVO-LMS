@@ -13,17 +13,20 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest";
 
 describe("lib/env build-phase relaxation", () => {
   const originalEnv = { ...process.env };
+  // `process.env`'s NODE_ENV is typed as readonly under @types/node 22+; tests
+  // need a writable view to exercise the schema's runtime branches.
+  const env = process.env as unknown as Record<string, string | undefined>;
 
   beforeEach(() => {
     // Each test wipes the relevant env so module-level constants in
     // lib/env.ts are re-evaluated from a known baseline.
-    delete process.env.NODE_ENV;
-    delete process.env.NEXT_PHASE;
-    delete process.env.AUTH_MODE;
-    delete process.env.AI_PROVIDER;
-    delete process.env.DATABASE_URL;
-    delete process.env.REDIS_URL;
-    delete process.env.SESSION_SECRET;
+    delete env.NODE_ENV;
+    delete env.NEXT_PHASE;
+    delete env.AUTH_MODE;
+    delete env.AI_PROVIDER;
+    delete env.DATABASE_URL;
+    delete env.REDIS_URL;
+    delete env.SESSION_SECRET;
   });
 
   afterEach(() => {
@@ -31,20 +34,25 @@ describe("lib/env build-phase relaxation", () => {
   });
 
   it("allows AUTH_MODE=mock when NODE_ENV=production but NEXT_PHASE indicates build", async () => {
-    process.env.NODE_ENV = "production";
-    process.env.NEXT_PHASE = "phase-production-build";
-    process.env.AUTH_MODE = "mock";
-    process.env.AI_PROVIDER = "mock";
-    // Re-import to pick up the freshly mutated env.
-    const env = await import("./env?build-phase-mock");
-    expect(env.serverEnv.AUTH_MODE).toBe("mock");
-    expect(env.serverEnv.AI_PROVIDER).toBe("mock");
+    env.NODE_ENV = "production";
+    env.NEXT_PHASE = "phase-production-build";
+    env.AUTH_MODE = "mock";
+    env.AI_PROVIDER = "mock";
+    // Re-import to pick up the freshly mutated env. The `?query` suffix is a
+    // Vitest cache-buster — the test runner ignores it but it forces a fresh
+    // module evaluation. TS doesn't model `?query` import specifiers, hence
+    // the suppression.
+    // @ts-expect-error -- vitest query-string cache-buster
+    const mod = await import("./env?build-phase-mock");
+    expect(mod.serverEnv.AUTH_MODE).toBe("mock");
+    expect(mod.serverEnv.AI_PROVIDER).toBe("mock");
   });
 
   it("loads with defaults when NODE_ENV is unset (dev path)", async () => {
-    const env = await import("./env?dev-defaults");
-    expect(env.serverEnv.AUTH_MODE).toBe("mock");
-    expect(env.serverEnv.AI_PROVIDER).toBe("mock");
-    expect(env.serverEnv.NODE_ENV).toBe("development");
+    // @ts-expect-error -- vitest query-string cache-buster
+    const mod = await import("./env?dev-defaults");
+    expect(mod.serverEnv.AUTH_MODE).toBe("mock");
+    expect(mod.serverEnv.AI_PROVIDER).toBe("mock");
+    expect(mod.serverEnv.NODE_ENV).toBe("development");
   });
 });

@@ -35,7 +35,11 @@ const ROLES: Role[] = [
   "platform_admin",
 ];
 
-export default function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+export default function LoginPage({
+  searchParams: _searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
   return (
     <main id="main" className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12">
       <Card variant="hero">

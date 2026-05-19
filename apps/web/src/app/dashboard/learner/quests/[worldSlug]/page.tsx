@@ -40,7 +40,7 @@ interface QuestProgress {
 type IconCmp = ComponentType<{ className?: string; strokeWidth?: number; "aria-hidden"?: boolean }>;
 
 // Per-world theme keyed by worldKey. Falls back to a neutral gradient.
-/* eslint-disable no-restricted-syntax -- per-world brand identity, not surface tokens */
+// (Gradients are Tailwind class names — no raw hex — so no lint disable needed.)
 const WORLD_THEMES: Record<string, { icon: IconCmp; gradient: string }> = {
   nova_number_galaxy: { icon: Sparkles, gradient: "from-indigo-500 to-purple-600" },
   sage_story_kingdom: { icon: BookOpen, gradient: "from-emerald-500 to-teal-600" },
@@ -49,7 +49,6 @@ const WORLD_THEMES: Record<string, { icon: IconCmp; gradient: string }> = {
   pixel_code_forge: { icon: Code2, gradient: "from-blue-500 to-cyan-600" },
 };
 const DEFAULT_THEME = { icon: Globe2 as IconCmp, gradient: "from-slate-500 to-slate-700" };
-/* eslint-enable no-restricted-syntax */
 
 type UiStatus = "completed" | "in_progress" | "available" | "locked";
 

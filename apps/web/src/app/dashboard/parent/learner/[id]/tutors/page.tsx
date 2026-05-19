@@ -8,6 +8,7 @@ import { TUTORS, type TutorKey, getTutorsForTier } from "@aivo/brand";
 import { gradeToTier } from "@aivo/learner-ui";
 import { useTranslations } from "next-intl";
 
+// eslint-disable-next-line no-restricted-syntax -- TODO(billing): replace hand-rolled shape with the typed response from @aivo/api-client/billing once the billing-svc /learner-entitlements endpoint is migrated to per-route schemas
 interface LearnerEntitlementResponse {
   learnerId: string;
   plan: string;

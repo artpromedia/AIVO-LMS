@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable no-restricted-syntax -- global error boundary renders BEFORE the app's CSS/tokens are loaded (Next.js spec: global-error replaces the root layout when the layout itself crashes). Inline hex styles are intentional so the fallback works even when @aivo/brand/tokens.css fails to load. */
+
 export default function GlobalError({
   error,
   reset,

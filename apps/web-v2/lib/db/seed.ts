@@ -2377,6 +2377,7 @@ export function ensureSeeded(): void {
     branding: {
       displayName: "Maple Hill USD",
       supportEmail: "support@maplehillusd.org",
+      // eslint-disable-next-line no-restricted-syntax -- seeded tenant brand color (per-tenant identity); not a surface token
       primaryColor: "#2D5BFF",
     },
     notifications: {

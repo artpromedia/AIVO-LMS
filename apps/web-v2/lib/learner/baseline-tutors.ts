@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax -- BASELINE_TUTORS.color values are the tutor brand-mark palette; they're documented as kept-in-sync with @aivo/brand TutorKey on line 22. Sprint 2 will replace these literals with imports from @aivo/brand once the TutorKey palette export ships. */
 /**
  * Discovery Adventure tutor metadata for the baseline assessment.
  *

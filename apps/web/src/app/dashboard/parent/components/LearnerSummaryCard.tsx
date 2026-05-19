@@ -114,7 +114,6 @@ export function LearnerSummaryCard({
   const goToLearner = () => router.push(`/dashboard/parent/learner/${learner.id}`);
 
   return (
-    // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus, jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/prefer-tag-over-role
     <div
       role="button"
       tabIndex={0}
@@ -184,7 +183,7 @@ export function LearnerSummaryCard({
             Stops click-bubbling so interacting with the brain (hover/click
             a region) does not also navigate to the learner detail page. */}
         {hasBrain && accessToken && (
-          // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
+          // eslint-disable-next-line jsx-a11y/no-static-element-interactions -- stopPropagation handlers attached to a presentational wrapper so brain-region interactions don't bubble to the parent card's click navigation
           <div
             className="mb-4"
             onClick={(e) => e.stopPropagation()}

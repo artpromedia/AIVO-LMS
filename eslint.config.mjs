@@ -13,6 +13,8 @@ export default tseslint.config(
       "**/coverage/**",
       "**/.venv/**",
       "**/*.config.{js,mjs,ts}",
+      "**/*.config.cjs",
+      "**/next-env.d.ts",
       "**/vitest.setup.ts",
       "**/lighthouserc.js",
       "**/scripts/**",
@@ -71,6 +73,43 @@ export default tseslint.config(
       "no-case-declarations": "warn",
       "no-undef": "off",
       // Drizzle/Fastify generics often legitimately use `any` at boundaries.
+    },
+  },
+  {
+    // Inclusive-Lab Warm: forbid hardcoded hex colors in `apps/web-v2` and
+    // `apps/marketing` so all surface colors flow through the brand tokens
+    // (`@aivo/brand/tokens.css` CSS variables and `iw-*` Tailwind utilities).
+    // Replaces the legacy `apps/web-v2/.eslintrc.json` which was tied to the
+    // deprecated `next lint` wrapper and incompatible with ESLint 10.
+    files: ["apps/web-v2/**/*.{ts,tsx}", "apps/marketing/**/*.{ts,tsx}"],
+    ignores: [
+      "**/*.test.{ts,tsx}",
+      "**/*.spec.{ts,tsx}",
+      "apps/web-v2/e2e/**",
+      "apps/web-v2/lib/env.ts",
+    ],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "Literal[value=/#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\\b/]",
+          message:
+            "Do not hardcode hex colors. Use Inclusive-Warm Tailwind utilities (bg-iw-*, text-iw-*, border-iw-*) or the @aivo/brand CSS variables instead.",
+        },
+        {
+          selector:
+            "TemplateElement[value.raw=/#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\\b/]",
+          message:
+            "Do not hardcode hex colors. Use Inclusive-Warm Tailwind utilities (bg-iw-*, text-iw-*, border-iw-*) or the @aivo/brand CSS variables instead.",
+        },
+        {
+          selector:
+            "JSXAttribute[name.name=/^(className|style|class)$/] Literal[value=/#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\\b/]",
+          message:
+            "Do not hardcode hex colors in JSX className/style attributes. Use Inclusive-Warm Tailwind utilities (bg-iw-*, text-iw-*, border-iw-*) or the @aivo/brand CSS variables instead.",
+        },
+      ],
     },
   },
 );
