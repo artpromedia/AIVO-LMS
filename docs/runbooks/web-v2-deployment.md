@@ -12,6 +12,16 @@ pnpm --filter @aivo/web-v2 build
 PORT=5000 pnpm --filter @aivo/web-v2 start
 ```
 
+`@aivo/web-v2` now runs `pnpm --filter @aivo/brand build` before `dev`, `build`,
+and `start`, so brand token CSS + Tailwind preset artifacts are generated
+automatically even when `packages/brand/dist/` is empty.
+
+For Replit/local supervisor workflows, use:
+
+```
+bash scripts/start-web-v2.sh
+```
+
 Dev mode uses Turbopack and `next dev`. Production binds to `0.0.0.0:$PORT`.
 
 ## Required environment
