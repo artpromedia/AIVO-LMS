@@ -89,11 +89,11 @@ export default function DistrictLoginPage() {
 
   return (
     <div className="min-h-screen flex">
-      <div className="hidden lg:flex lg:w-[45%] relative overflow-hidden bg-gradient-to-br from-indigo-950 via-violet-900 to-indigo-950">
+      <div className="hidden lg:flex lg:w-[45%] relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
         <div className="absolute inset-0 opacity-25">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-violet-500 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-sky-500 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 left-1/3 w-48 h-48 bg-fuchsia-500 rounded-full blur-3xl" />
+          <div className="absolute top-20 left-10 w-72 h-72 bg-iw-primary rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-iw-accent rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/3 w-48 h-48 bg-iw-warm rounded-full blur-3xl" />
         </div>
 
         <div className="absolute inset-0 flex flex-col justify-between p-12 z-10">
@@ -106,7 +106,7 @@ export default function DistrictLoginPage() {
               style={{ width: "auto", height: "auto" }}
             />
             <div className="h-6 w-px bg-white/30" />
-            <span className="text-sm font-bold text-violet-300 uppercase tracking-widest">
+            <span className="text-sm font-bold text-iw-accent uppercase tracking-widest">
               District
             </span>
           </div>
@@ -159,7 +159,7 @@ export default function DistrictLoginPage() {
         </div>
       </div>
 
-      <main className="flex-1 flex flex-col bg-violet-50/40 min-h-screen">
+      <main className="flex-1 flex flex-col bg-iw-bg min-h-screen">
         <div className="flex items-center justify-between p-6 lg:p-8">
           <div className="lg:hidden flex items-center gap-2">
             <Image
@@ -169,7 +169,7 @@ export default function DistrictLoginPage() {
               height={28}
               style={{ width: "auto", height: "auto" }}
             />
-            <span className="text-xs font-bold text-violet-700 uppercase tracking-wider">
+            <span className="text-xs font-bold text-iw-primary uppercase tracking-wider">
               District
             </span>
           </div>
@@ -180,9 +180,9 @@ export default function DistrictLoginPage() {
           <div className="w-full max-w-[400px]">
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-violet-700 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-iw-primary flex items-center justify-center">
                   <svg
-                    className="w-5 h-5 text-violet-100"
+                    className="w-5 h-5 text-iw-primary-fg"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -196,21 +196,21 @@ export default function DistrictLoginPage() {
                   </svg>
                 </div>
                 <div>
-                  <h1 className="text-2xl font-heading font-bold text-slate-900">
+                  <h1 className="text-2xl font-heading font-bold text-iw-ink">
                     District Sign In
                   </h1>
-                  <p className="text-sm text-slate-500 font-body">District administrators only</p>
+                  <p className="text-sm text-iw-ink-muted font-body">District administrators only</p>
                 </div>
               </div>
             </div>
 
             {error && (
               <div
-                className="flex items-center gap-3 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium mb-6"
+                className="flex items-center gap-3 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-medium mb-6"
                 role="alert"
               >
                 <svg
-                  className="w-5 h-5 text-red-400 flex-shrink-0"
+                  className="w-5 h-5 text-rose-500 flex-shrink-0"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -230,14 +230,14 @@ export default function DistrictLoginPage() {
               <div>
                 <label
                   htmlFor="district-email"
-                  className="block text-sm font-semibold text-slate-700 mb-2"
+                  className="block text-sm font-semibold text-iw-ink mb-2"
                 >
                   Work Email
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <svg
-                      className="w-5 h-5 text-violet-400"
+                      className="w-5 h-5 text-iw-primary"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -257,7 +257,7 @@ export default function DistrictLoginPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     autoComplete="email"
-                    className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white border border-violet-200 text-slate-900 placeholder-slate-400 focus:border-violet-700 focus:ring-2 focus:ring-violet-700/15 outline-none transition font-body"
+                    className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-iw-raised border border-iw-border text-iw-ink placeholder-iw-ink-muted focus:border-iw-primary focus:ring-2 focus:ring-iw-ring/30 outline-none transition font-body"
                     placeholder="admin@yourdistrict.org"
                   />
                 </div>
@@ -266,13 +266,13 @@ export default function DistrictLoginPage() {
               {discover?.mode === "sso" && discover.ssoLoginUrl && (
                 <a
                   href={discover.ssoLoginUrl}
-                  className="block w-full py-3.5 rounded-xl bg-slate-900 text-white font-bold text-base text-center hover:bg-slate-800 active:bg-slate-700 transition-all shadow-lg"
+                  className="block w-full py-3.5 rounded-xl bg-slate-900 text-white font-bold text-base text-center hover:bg-slate-800 active:bg-slate-700 transition-all shadow-soft-3"
                 >
                   Continue with {discover.idpLabel || "your identity provider"}
                 </a>
               )}
               {discover?.mode === "sso" && discover.requireSso && (
-                <p className="text-xs text-slate-500 text-center">
+                <p className="text-xs text-iw-ink-muted text-center">
                   Your district requires SSO — password sign-in is disabled for this email domain.
                 </p>
               )}
@@ -281,14 +281,14 @@ export default function DistrictLoginPage() {
                 <div>
                   <label
                     htmlFor="district-password"
-                    className="block text-sm font-semibold text-slate-700 mb-2"
+                    className="block text-sm font-semibold text-iw-ink mb-2"
                   >
                     Password
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                       <svg
-                        className="w-5 h-5 text-violet-400"
+                        className="w-5 h-5 text-iw-primary"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -308,13 +308,13 @@ export default function DistrictLoginPage() {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       autoComplete="current-password"
-                      className="w-full pl-12 pr-12 py-3.5 rounded-xl bg-white border border-violet-200 text-slate-900 placeholder-slate-400 focus:border-violet-700 focus:ring-2 focus:ring-violet-700/15 outline-none transition font-body"
+                      className="w-full pl-12 pr-12 py-3.5 rounded-xl bg-iw-raised border border-iw-border text-iw-ink placeholder-iw-ink-muted focus:border-iw-primary focus:ring-2 focus:ring-iw-ring/30 outline-none transition font-body"
                       placeholder="Enter your password"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition"
+                      className="absolute inset-y-0 right-0 pr-4 flex items-center text-iw-ink-muted hover:text-iw-ink transition"
                       aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? (
@@ -362,7 +362,7 @@ export default function DistrictLoginPage() {
                 disabled={
                   loading || discovering || (discover?.mode === "sso" && !!discover.requireSso)
                 }
-                className="w-full py-3.5 rounded-xl bg-violet-700 text-white font-bold text-base hover:bg-violet-800 active:bg-violet-900 transition-all shadow-lg shadow-violet-900/25 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3.5 rounded-xl bg-iw-primary text-iw-primary-fg font-bold text-base hover:bg-iw-primary-hover transition-all shadow-soft-5 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
@@ -389,8 +389,8 @@ export default function DistrictLoginPage() {
               </button>
             </form>
 
-            <div className="mt-8 pt-6 border-t border-violet-200">
-              <div className="flex items-center justify-center gap-2 text-xs text-slate-400">
+            <div className="mt-8 pt-6 border-t border-iw-border">
+              <div className="flex items-center justify-center gap-2 text-xs text-iw-ink-muted">
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
                     strokeLinecap="round"
@@ -405,9 +405,9 @@ export default function DistrictLoginPage() {
           </div>
         </div>
 
-        <div className="flex items-center justify-center gap-4 pb-6 text-xs text-slate-400 font-body">
+        <div className="flex items-center justify-center gap-4 pb-6 text-xs text-iw-ink-muted font-body">
           <span>&copy; {new Date().getFullYear()} AIVO Learning Platform</span>
-          <span className="w-1 h-1 rounded-full bg-slate-300" />
+          <span className="w-1 h-1 rounded-full bg-iw-border" />
           <span>District v1.0</span>
         </div>
       </main>

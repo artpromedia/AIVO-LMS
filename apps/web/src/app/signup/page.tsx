@@ -144,17 +144,17 @@ function SignupInner() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-100 via-white to-amber-50 flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-iw-bg via-iw-raised to-iw-warm-soft flex flex-col relative overflow-hidden">
       <SkipLink />
 
       <div aria-hidden="true" className="absolute inset-0 pointer-events-none -z-0">
-        <div className="absolute -top-20 -left-20 w-[45vw] h-[45vw] bg-violet-300/40 rounded-full blur-3xl animate-blob motion-reduce:animate-none" />
+        <div className="absolute -top-20 -left-20 w-[45vw] h-[45vw] bg-iw-primary/20 rounded-full blur-3xl animate-blob motion-reduce:animate-none" />
         <div
-          className="absolute -bottom-20 -right-20 w-[40vw] h-[40vw] bg-amber-200/50 rounded-full blur-3xl animate-blob motion-reduce:animate-none"
+          className="absolute -bottom-20 -right-20 w-[40vw] h-[40vw] bg-iw-warm/40 rounded-full blur-3xl animate-blob motion-reduce:animate-none"
           style={{ animationDelay: "5s" }}
         />
         <div
-          className="absolute top-1/3 right-10 w-64 h-64 bg-cyan-200/40 rounded-full blur-3xl animate-blob motion-reduce:animate-none"
+          className="absolute top-1/3 right-10 w-64 h-64 bg-iw-accent-soft/60 rounded-full blur-3xl animate-blob motion-reduce:animate-none"
           style={{ animationDelay: "2s" }}
         />
       </div>
@@ -179,30 +179,30 @@ function SignupInner() {
         className="relative z-10 flex-1 flex items-center justify-center px-6 pb-10"
       >
         <div className="w-full max-w-[480px]">
-          <div className="bg-white/95 backdrop-blur p-8 rounded-[2rem] border border-white shadow-[0_24px_60px_-15px_rgba(124,58,237,0.25)]">
+          <div className="bg-iw-card/95 backdrop-blur p-8 rounded-[2rem] border border-iw-raised shadow-soft-5">
             <div className="text-center mb-7">
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-100 text-violet-700 font-bold text-xs uppercase tracking-wider mb-3">
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-iw-primary/10 text-iw-primary font-bold text-xs uppercase tracking-wider mb-3">
                 <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
                 {t("start_free_today") ?? "Start free today"}
               </span>
-              <h1 className="text-3xl font-heading font-bold text-slate-900 leading-tight">
+              <h1 className="text-3xl font-heading font-bold text-iw-ink leading-tight">
                 {t("create_account")}
               </h1>
-              <p className="text-slate-500 font-body mt-1.5">{t("signup_subtitle")}</p>
+              <p className="text-iw-ink-muted font-body mt-1.5">{t("signup_subtitle")}</p>
             </div>
 
             <div className="grid grid-cols-2 gap-3 mb-7">
               {VALUE_PROPS.map(({ Icon, key, color, bg }) => (
                 <div
                   key={key}
-                  className="flex items-center gap-2.5 p-2.5 rounded-2xl bg-slate-50 border border-slate-100"
+                  className="flex items-center gap-2.5 p-2.5 rounded-2xl bg-iw-bg border border-iw-border"
                 >
                   <div
                     className={`w-9 h-9 rounded-xl ${bg} ${color} flex items-center justify-center shrink-0`}
                   >
                     <Icon className="w-4.5 h-4.5" size={18} strokeWidth={2.5} aria-hidden="true" />
                   </div>
-                  <p className="text-xs font-bold text-slate-700 leading-snug">{t(key)}</p>
+                  <p className="text-xs font-bold text-iw-ink leading-snug">{t(key)}</p>
                 </div>
               ))}
             </div>
@@ -213,7 +213,7 @@ function SignupInner() {
                 aria-live="assertive"
                 className="flex items-start gap-3 p-4 rounded-2xl bg-rose-50 border-2 border-rose-200 text-rose-700 text-sm font-bold mb-6"
               >
-                <span className="w-8 h-8 rounded-xl bg-white text-rose-600 flex items-center justify-center shrink-0 shadow-sm">
+                <span className="w-8 h-8 rounded-xl bg-iw-raised text-rose-600 flex items-center justify-center shrink-0 shadow-sm">
                   <AlertCircle size={18} strokeWidth={2.5} aria-hidden="true" />
                 </span>
                 <span className="pt-1">{error}</span>
@@ -224,13 +224,13 @@ function SignupInner() {
               <div className="space-y-2">
                 <label
                   htmlFor="signup-name"
-                  className="block text-sm font-bold text-slate-700 ml-1"
+                  className="block text-sm font-bold text-iw-ink ml-1"
                 >
                   {t("full_name")}
                 </label>
                 <div className="relative">
                   <User
-                    className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"
+                    className="w-5 h-5 text-iw-ink-muted absolute left-4 top-1/2 -translate-y-1/2"
                     aria-hidden="true"
                   />
                   <input
@@ -241,7 +241,7 @@ function SignupInner() {
                     required
                     autoComplete="name"
                     style={{ minHeight: 44 }}
-                    className="w-full h-14 pl-12 pr-4 rounded-2xl bg-slate-50 border-2 border-slate-100 text-slate-900 font-body focus:bg-white focus:border-[hsl(var(--visual-primary))] focus:ring-4 focus:ring-[hsl(var(--visual-primary)/0.15)] outline-none transition"
+                    className="w-full h-14 pl-12 pr-4 rounded-2xl bg-iw-bg border-2 border-iw-border text-iw-ink font-body focus:bg-iw-raised focus:border-iw-primary focus:ring-4 focus:ring-iw-ring/30 outline-none transition"
                     placeholder={t("name_placeholder")}
                   />
                 </div>
@@ -250,13 +250,13 @@ function SignupInner() {
               <div className="space-y-2">
                 <label
                   htmlFor="signup-email"
-                  className="block text-sm font-bold text-slate-700 ml-1"
+                  className="block text-sm font-bold text-iw-ink ml-1"
                 >
                   {t("email")}
                 </label>
                 <div className="relative">
                   <Mail
-                    className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"
+                    className="w-5 h-5 text-iw-ink-muted absolute left-4 top-1/2 -translate-y-1/2"
                     aria-hidden="true"
                   />
                   <input
@@ -267,7 +267,7 @@ function SignupInner() {
                     required
                     autoComplete="email"
                     style={{ minHeight: 44 }}
-                    className="w-full h-14 pl-12 pr-4 rounded-2xl bg-slate-50 border-2 border-slate-100 text-slate-900 font-body focus:bg-white focus:border-[hsl(var(--visual-primary))] focus:ring-4 focus:ring-[hsl(var(--visual-primary)/0.15)] outline-none transition"
+                    className="w-full h-14 pl-12 pr-4 rounded-2xl bg-iw-bg border-2 border-iw-border text-iw-ink font-body focus:bg-iw-raised focus:border-iw-primary focus:ring-4 focus:ring-iw-ring/30 outline-none transition"
                     placeholder="parent@example.com"
                   />
                 </div>
@@ -276,13 +276,13 @@ function SignupInner() {
               <div className="space-y-2">
                 <label
                   htmlFor="signup-password"
-                  className="block text-sm font-bold text-slate-700 ml-1"
+                  className="block text-sm font-bold text-iw-ink ml-1"
                 >
                   {t("password")}
                 </label>
                 <div className="relative">
                   <Lock
-                    className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"
+                    className="w-5 h-5 text-iw-ink-muted absolute left-4 top-1/2 -translate-y-1/2"
                     aria-hidden="true"
                   />
                   <input
@@ -294,19 +294,19 @@ function SignupInner() {
                     minLength={8}
                     autoComplete="new-password"
                     style={{ minHeight: 44 }}
-                    className="w-full h-14 pl-12 pr-12 rounded-2xl bg-slate-50 border-2 border-slate-100 text-slate-900 font-body focus:bg-white focus:border-[hsl(var(--visual-primary))] focus:ring-4 focus:ring-[hsl(var(--visual-primary)/0.15)] outline-none transition"
+                    className="w-full h-14 pl-12 pr-12 rounded-2xl bg-iw-bg border-2 border-iw-border text-iw-ink font-body focus:bg-iw-raised focus:border-iw-primary focus:ring-4 focus:ring-iw-ring/30 outline-none transition"
                     placeholder={t("password_min_placeholder")}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-iw-ink-muted hover:text-iw-ink"
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
-                <p className="text-xs text-slate-500 font-body mt-1.5 ml-1">{t("password_hint")}</p>
+                <p className="text-xs text-iw-ink-muted font-body mt-1.5 ml-1">{t("password_hint")}</p>
               </div>
 
               {/* Coupon / Access Code */}
@@ -314,7 +314,7 @@ function SignupInner() {
                 <button
                   type="button"
                   onClick={() => setCouponExpanded((v) => !v)}
-                  className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-[hsl(var(--visual-primary))] transition"
+                  className="flex items-center gap-2 text-sm font-bold text-iw-ink-muted hover:text-iw-primary transition"
                 >
                   <Tag className="w-4 h-4" aria-hidden="true" />
                   {t("coupon_toggle")}
@@ -329,7 +329,7 @@ function SignupInner() {
                   <div className="mt-3 space-y-2">
                     <div className="relative">
                       <Tag
-                        className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"
+                        className="w-5 h-5 text-iw-ink-muted absolute left-4 top-1/2 -translate-y-1/2"
                         aria-hidden="true"
                       />
                       <input
@@ -340,12 +340,12 @@ function SignupInner() {
                         autoCapitalize="characters"
                         autoComplete="off"
                         style={{ minHeight: 44 }}
-                        className="w-full h-14 pl-12 pr-12 rounded-2xl bg-slate-50 border-2 border-slate-100 text-slate-900 font-body focus:bg-white focus:border-[hsl(var(--visual-primary))] focus:ring-4 focus:ring-[hsl(var(--visual-primary)/0.15)] outline-none transition uppercase tracking-widest"
+                        className="w-full h-14 pl-12 pr-12 rounded-2xl bg-iw-bg border-2 border-iw-border text-iw-ink font-body focus:bg-iw-raised focus:border-iw-primary focus:ring-4 focus:ring-iw-ring/30 outline-none transition uppercase tracking-widest"
                         placeholder={t("coupon_placeholder")}
                       />
                       {couponChecking && (
                         <Loader2
-                          className="w-5 h-5 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 motion-safe:animate-spin"
+                          className="w-5 h-5 text-iw-ink-muted absolute right-4 top-1/2 -translate-y-1/2 motion-safe:animate-spin"
                           aria-hidden="true"
                         />
                       )}
@@ -396,7 +396,7 @@ function SignupInner() {
                 disabled={loading}
                 aria-busy={loading}
                 style={{ minHeight: 44 }}
-                className="w-full h-14 mt-2 rounded-2xl bg-gradient-to-r from-[hsl(var(--visual-primary))] to-[hsl(var(--visual-primary-dark,262_83%_46%))] hover:opacity-95 text-white font-bold text-lg shadow-xl shadow-purple-200 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+                className="w-full h-14 mt-2 rounded-2xl bg-iw-primary hover:bg-iw-primary-hover text-iw-primary-fg font-bold text-lg shadow-soft-5 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
@@ -422,24 +422,24 @@ function SignupInner() {
                 <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
                 {t("signup_free_trial")}
               </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-iw-bg text-iw-ink-muted text-xs font-bold">
                 <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
                 {t("signup_no_credit_card")}
               </span>
             </div>
 
-            <p className="text-xs text-slate-500 text-center mt-4 font-body leading-relaxed">
+            <p className="text-xs text-iw-ink-muted text-center mt-4 font-body leading-relaxed">
               {t("agree_terms_prefix")}{" "}
               <Link
                 href="/terms-of-service"
-                className="text-[hsl(var(--visual-primary))] hover:underline font-bold"
+                className="text-iw-primary hover:underline font-bold"
               >
                 {t("terms")}
               </Link>{" "}
               {t("and")}{" "}
               <Link
                 href="/privacy-policy"
-                className="text-[hsl(var(--visual-primary))] hover:underline font-bold"
+                className="text-iw-primary hover:underline font-bold"
               >
                 {t("privacy")}
               </Link>
@@ -447,19 +447,13 @@ function SignupInner() {
           </div>
 
           <div className="text-center mt-7">
-            <div className="inline-flex items-center gap-2 text-sm font-bold text-slate-600 bg-white/70 backdrop-blur px-4 py-2 rounded-full border border-slate-200">
-              <ShieldCheck
-                className="w-4 h-4 text-[hsl(var(--visual-primary))]"
-                aria-hidden="true"
-              />
+            <div className="inline-flex items-center gap-2 text-sm font-bold text-iw-ink-muted bg-iw-raised/70 backdrop-blur px-4 py-2 rounded-full border border-iw-border">
+              <ShieldCheck className="w-4 h-4 text-iw-primary" aria-hidden="true" />
               {t("compliance_badge") ?? "COPPA · FERPA · SOC 2 Compliant"}
             </div>
-            <p className="text-sm font-medium text-slate-500 mt-5">
+            <p className="text-sm font-medium text-iw-ink-muted mt-5">
               {t("have_account")}{" "}
-              <Link
-                href="/login"
-                className="text-[hsl(var(--visual-primary))] font-bold hover:underline"
-              >
+              <Link href="/login" className="text-iw-primary font-bold hover:underline">
                 {t("sign_in")}
               </Link>
             </p>
@@ -467,22 +461,16 @@ function SignupInner() {
         </div>
       </main>
 
-      <footer className="relative z-10 flex items-center justify-center gap-6 pb-6 text-xs text-slate-500 font-body font-semibold">
-        <Link href="/privacy-policy" className="hover:text-[hsl(var(--visual-primary))] transition">
+      <footer className="relative z-10 flex items-center justify-center gap-6 pb-6 text-xs text-iw-ink-muted font-body font-semibold">
+        <Link href="/privacy-policy" className="hover:text-iw-primary transition">
           {t("privacy")}
         </Link>
-        <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-        <Link
-          href="/terms-of-service"
-          className="hover:text-[hsl(var(--visual-primary))] transition"
-        >
+        <span className="w-1.5 h-1.5 rounded-full bg-iw-border" />
+        <Link href="/terms-of-service" className="hover:text-iw-primary transition">
           {t("terms")}
         </Link>
-        <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-        <Link
-          href="/coppa-compliance"
-          className="hover:text-[hsl(var(--visual-primary))] transition"
-        >
+        <span className="w-1.5 h-1.5 rounded-full bg-iw-border" />
+        <Link href="/coppa-compliance" className="hover:text-iw-primary transition">
           COPPA
         </Link>
       </footer>

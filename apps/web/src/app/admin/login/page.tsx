@@ -65,8 +65,8 @@ export default function AdminLoginPage() {
     <div className="min-h-screen flex">
       <div className="hidden lg:flex lg:w-[45%] relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
         <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-indigo-500 rounded-full blur-3xl" />
+          <div className="absolute top-20 left-10 w-72 h-72 bg-iw-primary rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-iw-accent rounded-full blur-3xl" />
         </div>
 
         <div className="absolute inset-0 flex flex-col justify-between p-12 z-10">
@@ -79,7 +79,7 @@ export default function AdminLoginPage() {
               style={{ width: "auto", height: "auto" }}
             />
             <div className="h-6 w-px bg-white/30" />
-            <span className="text-sm font-bold text-purple-400 uppercase tracking-widest">
+            <span className="text-sm font-bold text-iw-accent uppercase tracking-widest">
               Admin
             </span>
           </div>
@@ -132,7 +132,7 @@ export default function AdminLoginPage() {
         </div>
       </div>
 
-      <main className="flex-1 flex flex-col bg-slate-50 min-h-screen">
+      <main className="flex-1 flex flex-col bg-iw-bg min-h-screen">
         <div className="flex items-center justify-between p-6 lg:p-8">
           <div className="lg:hidden flex items-center gap-2">
             <Image
@@ -142,7 +142,7 @@ export default function AdminLoginPage() {
               height={28}
               style={{ width: "auto", height: "auto" }}
             />
-            <span className="text-xs font-bold text-purple-600 uppercase tracking-wider">
+            <span className="text-xs font-bold text-iw-primary uppercase tracking-wider">
               Admin
             </span>
           </div>
@@ -155,7 +155,7 @@ export default function AdminLoginPage() {
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center">
                   <svg
-                    className="w-5 h-5 text-purple-400"
+                    className="w-5 h-5 text-iw-accent"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -169,16 +169,16 @@ export default function AdminLoginPage() {
                   </svg>
                 </div>
                 <div>
-                  <h1 className="text-2xl font-heading font-bold text-slate-900">Admin Sign In</h1>
-                  <p className="text-sm text-slate-500 font-body">Platform staff access only</p>
+                  <h1 className="text-2xl font-heading font-bold text-iw-ink">Admin Sign In</h1>
+                  <p className="text-sm text-iw-ink-muted font-body">Platform staff access only</p>
                 </div>
               </div>
             </div>
 
             {error && (
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium mb-6">
+              <div className="flex items-center gap-3 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-medium mb-6">
                 <svg
-                  className="w-5 h-5 text-red-400 flex-shrink-0"
+                  className="w-5 h-5 text-rose-500 flex-shrink-0"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -198,14 +198,14 @@ export default function AdminLoginPage() {
               <div>
                 <label
                   htmlFor="admin-email"
-                  className="block text-sm font-semibold text-slate-700 mb-2"
+                  className="block text-sm font-semibold text-iw-ink mb-2"
                 >
                   Email Address
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <svg
-                      className="w-5 h-5 text-slate-400"
+                      className="w-5 h-5 text-iw-ink-muted"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -225,7 +225,7 @@ export default function AdminLoginPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     autoComplete="email"
-                    className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-white border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 outline-none transition font-body"
+                    className="w-full pl-12 pr-4 py-3.5 rounded-xl bg-iw-raised border border-iw-border text-iw-ink placeholder-iw-ink-muted focus:border-iw-primary focus:ring-2 focus:ring-iw-ring/30 outline-none transition font-body"
                     placeholder="admin@aivolearning.com"
                   />
                 </div>
@@ -234,14 +234,14 @@ export default function AdminLoginPage() {
               <div>
                 <label
                   htmlFor="admin-password"
-                  className="block text-sm font-semibold text-slate-700 mb-2"
+                  className="block text-sm font-semibold text-iw-ink mb-2"
                 >
                   Password
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <svg
-                      className="w-5 h-5 text-slate-400"
+                      className="w-5 h-5 text-iw-ink-muted"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -261,13 +261,13 @@ export default function AdminLoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     autoComplete="current-password"
-                    className="w-full pl-12 pr-12 py-3.5 rounded-xl bg-white border border-slate-200 text-slate-900 placeholder-slate-400 focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 outline-none transition font-body"
+                    className="w-full pl-12 pr-12 py-3.5 rounded-xl bg-iw-raised border border-iw-border text-iw-ink placeholder-iw-ink-muted focus:border-iw-primary focus:ring-2 focus:ring-iw-ring/30 outline-none transition font-body"
                     placeholder="Enter your password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition"
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-iw-ink-muted hover:text-iw-ink transition"
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? (
@@ -339,8 +339,8 @@ export default function AdminLoginPage() {
               </button>
             </form>
 
-            <div className="mt-8 pt-6 border-t border-slate-200">
-              <div className="flex items-center justify-center gap-2 text-xs text-slate-400">
+            <div className="mt-8 pt-6 border-t border-iw-border">
+              <div className="flex items-center justify-center gap-2 text-xs text-iw-ink-muted">
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path
                     strokeLinecap="round"
@@ -355,9 +355,9 @@ export default function AdminLoginPage() {
           </div>
         </div>
 
-        <div className="flex items-center justify-center gap-4 pb-6 text-xs text-slate-400 font-body">
+        <div className="flex items-center justify-center gap-4 pb-6 text-xs text-iw-ink-muted font-body">
           <span>&copy; {new Date().getFullYear()} AIVO Learning Platform</span>
-          <span className="w-1 h-1 rounded-full bg-slate-300" />
+          <span className="w-1 h-1 rounded-full bg-iw-border" />
           <span>v3.0</span>
         </div>
       </main>
