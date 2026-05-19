@@ -8,7 +8,20 @@
     "dev": {
       "dependsOn": ["^build"],
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "env": [
+        "DATABASE_URL",
+        "NODE_ENV",
+        "PORT",
+        "JWT_SECRET",
+        "SURFACE_COOKIE_SECRET",
+        "COOKIE_SECRET",
+        "IDENTITY_SVC_URL",
+        "APP_URL",
+        "CORS_ORIGINS",
+        "NEXT_PUBLIC_WEB_APP_URL",
+        "NEXT_PUBLIC_SITE_URL"
+      ]
     },
     "storybook:build": {
       "dependsOn": ["^build"],
