@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Nunito } from "next/font/google";
+import { Inter, Atkinson_Hyperlegible } from "next/font/google";
 import "@aivo/brand/tokens.css";
 import "./globals.css";
 import { I18nProvider } from "@/providers/i18n-provider";
@@ -14,11 +14,11 @@ const inter = Inter({
   weight: ["400", "500", "600", "700", "800"],
 });
 
-const nunito = Nunito({
+const atkinson = Atkinson_Hyperlegible({
   subsets: ["latin"],
-  variable: "--font-nunito",
+  variable: "--font-atkinson",
   display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "700"],
 });
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://aivolearning.com";
@@ -102,10 +102,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       lang="en"
       data-brand="inclusive-warm"
       data-sensory-mode={sensoryMode}
-      className={`${inter.variable} ${nunito.variable}`}
+      className={`${inter.variable} ${atkinson.variable}`}
       suppressHydrationWarning
     >
       <head>
+        {/* Satoshi Variable from Fontshare — used as the display face
+            across the marketing site. Falls through to Inter while loading. */}
+        <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="" />
+        <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="" />
+        <link
+          rel="stylesheet"
+          href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,600,700,800,900&display=swap"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -172,7 +180,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           }}
         />
       </head>
-      <body className="font-body antialiased bg-[var(--aivo-color-surface-canvas,#fdf6ec)] text-slate-800">
+      <body className="font-body antialiased bg-[var(--aivo-sensory-bgPage,#f4f6f5)] text-[var(--aivo-sensory-ink,#090909)]">
         <GoogleAnalytics />
         <I18nProvider initialMessages={enMessages}>{children}</I18nProvider>
       </body>

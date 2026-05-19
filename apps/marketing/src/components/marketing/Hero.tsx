@@ -90,11 +90,11 @@ export function Hero({ scrollY }: Readonly<{ scrollY: number }>) {
   const current = SLIDES[activeSlide];
 
   return (
-    <section className="relative bg-white overflow-hidden">
+    <section className="relative bg-[#f4f6f5] overflow-hidden">
       <div className="absolute inset-0 pointer-events-none -z-0">
-        <div className="absolute top-10 -left-10 w-[40vw] h-[40vw] bg-purple-200 rounded-full blur-3xl opacity-60 animate-blob motion-reduce:animate-none" />
+        <div className="absolute top-10 -left-10 w-[40vw] h-[40vw] bg-[#ede9fe] rounded-full blur-3xl opacity-70 animate-blob motion-reduce:animate-none" />
         <div
-          className="absolute -bottom-10 -right-10 w-[35vw] h-[35vw] bg-[#ffe4dc] rounded-full blur-3xl animate-blob motion-reduce:animate-none"
+          className="absolute -bottom-10 -right-10 w-[35vw] h-[35vw] bg-[#ccfbf1] rounded-full blur-3xl opacity-70 animate-blob motion-reduce:animate-none"
           style={{ animationDelay: "4s" }}
         />
       </div>
@@ -115,7 +115,7 @@ export function Hero({ scrollY }: Readonly<{ scrollY: number }>) {
               <span className="relative inline-block">
                 <span
                   aria-hidden="true"
-                  className="absolute inset-x-0 bottom-1 -z-10 h-[0.55em] rounded-sm bg-[#ffe4dc]"
+                  className="absolute inset-x-0 bottom-1 -z-10 h-[0.55em] rounded-sm bg-[#ffedd5]"
                 />
                 <span className="relative text-slate-900">{t("headline_line2")}</span>
               </span>

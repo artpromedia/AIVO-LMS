@@ -145,9 +145,9 @@ const preset = `module.exports = {
         xl: "var(--aivo-radius-xl)",
         "2xl": "var(--aivo-radius-2xl)",
         pill: "var(--aivo-radius-pill)",
-        "iw-card": "1.5rem",
-        "iw-card-lg": "2rem",
-        "iw-hero": "2.5rem"
+        "iw-card": "1.75rem",
+        "iw-card-lg": "2.25rem",
+        "iw-hero": "2.75rem"
       },
       boxShadow: {
         "soft-1": "var(--aivo-shadow-soft-1)",
@@ -156,15 +156,15 @@ const preset = `module.exports = {
       },
       backgroundImage: {
         // Identity gradient (logo, email). Does NOT respond to sensory mode.
-        "iw-brand": "linear-gradient(135deg, #3b82f6 0%, #a78bfa 100%)",
+        "iw-brand": "linear-gradient(135deg, #7c3aed 0%, #14b8a6 100%)",
         // In-product gradient (headline word, hero accents). Responds to sensory mode.
         "iw-sensory-brand": "linear-gradient(135deg, var(--aivo-sensory-primary) 0%, var(--aivo-sensory-accent) 100%)",
         "iw-hero": "linear-gradient(180deg, var(--aivo-sensory-bgPage) 0%, var(--aivo-sensory-bgRaised) 70%)"
       },
       fontFamily: {
-        "iw-display": ["Inter", "Nunito", "ui-sans-serif", "system-ui", "sans-serif"],
-        "iw-body": ["Nunito", "ui-sans-serif", "system-ui", "sans-serif"],
-        "iw-dyslexia": ["OpenDyslexic", "Comic Sans MS", "Arial", "sans-serif"]
+        "iw-display": ["Satoshi Variable", "Satoshi", "Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        "iw-body": ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        "iw-dyslexia": ["Atkinson Hyperlegible", "OpenDyslexic", "Inter", "ui-sans-serif", "system-ui", "sans-serif"]
       }
     }
   }

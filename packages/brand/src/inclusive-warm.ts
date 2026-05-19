@@ -129,60 +129,60 @@ export const SUNSHINE = {
  * email templates).
  */
 export const INCLUSIVE_WARM_PALETTE = {
-  primary: "#3b82f6",
-  primaryHover: "#2563eb",
-  primaryDeep: "#1d4ed8",
-  primarySoft: "#dbeafe",
+  primary: "#7c3aed",
+  primaryHover: "#6d28d9",
+  primaryDeep: "#5b21b6",
+  primarySoft: "#ede9fe",
   primaryFg: "#ffffff",
 
-  accent: "#a78bfa",
-  accentDeep: "#7c3aed",
-  accentSoft: "#ede9fe",
+  accent: "#14b8a6",
+  accentDeep: "#0f766e",
+  accentSoft: "#ccfbf1",
 
-  warm: "#ff6a4d",
-  warmDeep: "#c2462a",
-  warmSoft: "#ffe4dc",
+  warm: "#f97316",
+  warmDeep: "#c2410c",
+  warmSoft: "#ffedd5",
 
-  bgPage: "#f5f3ff",
-  bgCard: "#fdfaf3",
-  bgRaised: "#ffffff",
+  bgPage: "#f4f6f5",
+  bgCard: "#ffffff",
+  bgRaised: "#f8f9f8",
 
-  ink: "#111827",
-  inkMuted: "#4b5563",
-  inkSubtle: "#6b7280",
+  ink: "#090909",
+  inkMuted: "#6f7275",
+  inkSubtle: "#9ca0a3",
 
-  border: "#e5e7eb",
-  borderStrong: "#d1d5db",
+  border: "rgba(0,0,0,0.05)",
+  borderStrong: "rgba(0,0,0,0.08)",
 
   // Wordmark gradient ends. Used for hero word-highlight, brand chip,
   // any inline SVG that needs to match the logo.
-  gradientStart: "#3b82f6",
-  gradientEnd: "#a78bfa",
+  gradientStart: "#7c3aed",
+  gradientEnd: "#14b8a6",
 
   // Semantic status colors. Same hex across all three sensory modes —
   // status meaning shouldn't shift with mode. Sourced from the
   // tokens/semantic JSON so web + RN share a single source of truth.
-  success: "#16a34a",
-  successSoft: "#d1fae5",
+  success: "#22c55e",
+  successSoft: "#dcfce7",
   warning: "#f59e0b",
   warningSoft: "#fef3c7",
-  danger: "#dc2626",
+  danger: "#ef4444",
   dangerSoft: "#fee2e2",
-  info: "#3b82f6",
-  infoSoft: "#dbeafe",
+  info: "#7c3aed",
+  infoSoft: "#ede9fe",
 
   // Visual-domain accents — used by the tutor world map and the
   // 4-quadrant subject icons. Kept stable across sensory modes.
-  visualMath: "#3b82f6",
-  visualReading: "#7c3aed",
-  visualScience: "#10b981",
-  visualSel: "#f59e0b",
+  visualMath: "#7c3aed",
+  visualReading: "#14b8a6",
+  visualScience: "#22c55e",
+  visualSel: "#f97316",
 
   // Dark capsule chrome (bottom nav, modal overlays, brand wordmark
-  // dark variant). The `#1a1c23` ink-near-black is intentionally
+  // dark variant). The `#0e1014` ink-near-black is intentionally
   // unaffected by sensory mode — it's a brand surface, not a content
   // surface.
-  darkSurface: "#1a1c23",
+  darkSurface: "#0e1014",
 } as const;
 
 export type InclusiveWarmColor = keyof typeof INCLUSIVE_WARM_PALETTE;
@@ -203,16 +203,18 @@ export const INCLUSIVE_WARM_GRADIENTS = {
 export const INCLUSIVE_WARM_RADII = {
   pill: "9999px",
   control: "9999px",
-  card: "1.5rem",
-  cardLarge: "2rem",
-  hero: "2.5rem",
+  card: "1.75rem",
+  cardLarge: "2.25rem",
+  hero: "2.75rem",
 } as const;
 
 export const INCLUSIVE_WARM_FONTS = {
-  display: "'Fredoka', 'Nunito', ui-sans-serif, system-ui, sans-serif",
-  body: "'Nunito', ui-sans-serif, system-ui, sans-serif",
+  display:
+    "'Satoshi Variable', 'Satoshi', 'Inter', ui-sans-serif, system-ui, sans-serif",
+  body: "'Inter', ui-sans-serif, system-ui, sans-serif",
   mono: "'JetBrains Mono', ui-monospace, SFMono-Regular, monospace",
-  dyslexia: "'OpenDyslexic', 'Comic Sans MS', 'Arial', sans-serif",
+  dyslexia:
+    "'Atkinson Hyperlegible', 'OpenDyslexic', 'Inter', ui-sans-serif, system-ui, sans-serif",
 } as const;
 
 /**
@@ -313,51 +315,51 @@ export const INCLUSIVE_WARM_BY_MODE: Record<
   }
 > = {
   standard: {
-    bgPage: "#f5f3ff",
-    bgCard: "#fdfaf3",
-    bgRaised: "#ffffff",
-    primary: "#3b82f6",
-    primaryHover: "#2563eb",
+    bgPage: "#f4f6f5",
+    bgCard: "#ffffff",
+    bgRaised: "#f8f9f8",
+    primary: "#7c3aed",
+    primaryHover: "#6d28d9",
     primaryFg: "#ffffff",
-    accent: "#a78bfa",
-    accentSoft: "#ede9fe",
-    warm: "#ff6a4d",
-    warmSoft: "#ffe4dc",
-    ink: "#111827",
-    inkMuted: "#4b5563",
-    border: "#e5e7eb",
-    ringFocus: "#3b82f6",
+    accent: "#14b8a6",
+    accentSoft: "#ccfbf1",
+    warm: "#f97316",
+    warmSoft: "#ffedd5",
+    ink: "#090909",
+    inkMuted: "#6f7275",
+    border: "rgba(0,0,0,0.05)",
+    ringFocus: "#7c3aed",
     motionScale: 1,
-    shadowStrength: 0.14,
+    shadowStrength: 0.06,
   },
   calm: {
-    bgPage: "#f3f1ec",
-    bgCard: "#fefdf9",
-    bgRaised: "#ffffff",
-    primary: "#2563eb",
-    primaryHover: "#1d4ed8",
+    bgPage: "#f1f2f1",
+    bgCard: "#ffffff",
+    bgRaised: "#f7f8f7",
+    primary: "#6d28d9",
+    primaryHover: "#5b21b6",
     primaryFg: "#ffffff",
-    accent: "#8b5cf6",
-    accentSoft: "#ede9fe",
-    warm: "#c2462a",
-    warmSoft: "#fbe1d7",
-    ink: "#1f2937",
-    inkMuted: "#52525b",
-    border: "#d6d3d1",
-    ringFocus: "#2563eb",
+    accent: "#0d9488",
+    accentSoft: "#ccfbf1",
+    warm: "#ea580c",
+    warmSoft: "#ffedd5",
+    ink: "#0f0f10",
+    inkMuted: "#52555a",
+    border: "rgba(0,0,0,0.06)",
+    ringFocus: "#6d28d9",
     motionScale: 0.5,
-    shadowStrength: 0.08,
+    shadowStrength: 0.04,
   },
   "high-contrast": {
     bgPage: "#ffffff",
     bgCard: "#ffffff",
     bgRaised: "#ffffff",
-    primary: "#1d4ed8",
-    primaryHover: "#1e3a8a",
+    primary: "#4c1d95",
+    primaryHover: "#3b1373",
     primaryFg: "#ffffff",
-    accent: "#5b21b6",
+    accent: "#0f766e",
     accentSoft: "#e5e7eb",
-    warm: "#7a2814",
+    warm: "#9a3412",
     warmSoft: "#f3f4f6",
     ink: "#000000",
     inkMuted: "#1f2937",

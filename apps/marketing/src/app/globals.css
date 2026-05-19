@@ -11,13 +11,21 @@
   --color-primary: #7c3aed;
   --color-primary-light: #a78bfa;
   --color-primary-dark: #5b21b6;
-  --color-secondary: #06b6d4;
-  --color-accent: #ff6a4d;
-  --color-accent-soft: #ffe4dc;
-  --color-surface: #f8fafc;
-  --color-surface-hover: #f1f5f9;
-  --font-heading: var(--font-inter), "Inter", sans-serif;
-  --font-body: var(--font-nunito), "Nunito", sans-serif;
+  --color-secondary: #14b8a6;
+  --color-accent: #f97316;
+  --color-accent-soft: #ffedd5;
+  --color-canvas: #f4f6f5;
+  --color-card: #ffffff;
+  --color-soft-card: #f8f9f8;
+  --color-ink: #090909;
+  --color-ink-muted: #6f7275;
+  --color-ink-subtle: #9ca0a3;
+  --color-border: rgba(0, 0, 0, 0.05);
+  --color-surface: #f4f6f5;
+  --color-surface-hover: #f8f9f8;
+  --font-heading: "Satoshi Variable", "Satoshi", var(--font-inter), "Inter", sans-serif;
+  --font-body: var(--font-inter), "Inter", sans-serif;
+  --font-reading: var(--font-atkinson), "Atkinson Hyperlegible", sans-serif;
 
   --animate-fade-in: fade-in 0.5s ease-out forwards;
   --animate-scale-in: scale-in 0.4s ease-out forwards;
