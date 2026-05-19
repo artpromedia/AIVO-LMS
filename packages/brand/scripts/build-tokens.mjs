@@ -14,6 +14,7 @@ const sourceFiles = [
   "tokens/core/z-index.json",
   "tokens/core/breakpoint.json",
   "tokens/semantic/color.json",
+  "tokens/semantic/domain.json",
   "tokens/modes/age-modes.json",
   "tokens/modes/themes.json",
   "tokens/modes/sensory.json",
@@ -136,7 +137,121 @@ const preset = `module.exports = {
           ink: "var(--aivo-sensory-ink)",
           "ink-muted": "var(--aivo-sensory-inkMuted)",
           border: "var(--aivo-sensory-border)",
-          ring: "var(--aivo-sensory-ringFocus)"
+          ring: "var(--aivo-sensory-ringFocus)",
+          // Brand scales (flat, sensory-independent)
+          purple: {
+            50:  "var(--aivo-color-aivoPurple-50)",
+            100: "var(--aivo-color-aivoPurple-100)",
+            200: "var(--aivo-color-aivoPurple-200)",
+            300: "var(--aivo-color-aivoPurple-300)",
+            400: "var(--aivo-color-aivoPurple-400)",
+            500: "var(--aivo-color-aivoPurple-500)",
+            600: "var(--aivo-color-aivoPurple-600)",
+            700: "var(--aivo-color-aivoPurple-700)",
+            800: "var(--aivo-color-aivoPurple-800)",
+            900: "var(--aivo-color-aivoPurple-900)",
+            950: "var(--aivo-color-aivoPurple-950)"
+          },
+          teal: {
+            50:  "var(--aivo-color-aivoTeal-50)",
+            100: "var(--aivo-color-aivoTeal-100)",
+            200: "var(--aivo-color-aivoTeal-200)",
+            300: "var(--aivo-color-aivoTeal-300)",
+            400: "var(--aivo-color-aivoTeal-400)",
+            500: "var(--aivo-color-aivoTeal-500)",
+            600: "var(--aivo-color-aivoTeal-600)",
+            700: "var(--aivo-color-aivoTeal-700)",
+            800: "var(--aivo-color-aivoTeal-800)",
+            900: "var(--aivo-color-aivoTeal-900)",
+            950: "var(--aivo-color-aivoTeal-950)"
+          },
+          orange: {
+            50:  "var(--aivo-color-aivoOrange-50)",
+            100: "var(--aivo-color-aivoOrange-100)",
+            200: "var(--aivo-color-aivoOrange-200)",
+            300: "var(--aivo-color-aivoOrange-300)",
+            400: "var(--aivo-color-aivoOrange-400)",
+            500: "var(--aivo-color-aivoOrange-500)",
+            600: "var(--aivo-color-aivoOrange-600)",
+            700: "var(--aivo-color-aivoOrange-700)",
+            800: "var(--aivo-color-aivoOrange-800)",
+            900: "var(--aivo-color-aivoOrange-900)",
+            950: "var(--aivo-color-aivoOrange-950)"
+          },
+          // Universal status
+          success: "var(--aivo-color-status-success)",
+          warning: "var(--aivo-color-status-warning)",
+          error:   "var(--aivo-color-status-error)",
+          info:    "var(--aivo-color-status-info)",
+          // Domain status (each has subtle / default / strong / on)
+          mastery: {
+            "emerging-subtle":   "var(--aivo-domain-mastery-emerging-subtle)",
+            "emerging":          "var(--aivo-domain-mastery-emerging-default)",
+            "emerging-strong":   "var(--aivo-domain-mastery-emerging-strong)",
+            "developing-subtle": "var(--aivo-domain-mastery-developing-subtle)",
+            "developing":        "var(--aivo-domain-mastery-developing-default)",
+            "developing-strong": "var(--aivo-domain-mastery-developing-strong)",
+            "proficient-subtle": "var(--aivo-domain-mastery-proficient-subtle)",
+            "proficient":        "var(--aivo-domain-mastery-proficient-default)",
+            "proficient-strong": "var(--aivo-domain-mastery-proficient-strong)",
+            "mastered-subtle":   "var(--aivo-domain-mastery-mastered-subtle)",
+            "mastered":          "var(--aivo-domain-mastery-mastered-default)",
+            "mastered-strong":   "var(--aivo-domain-mastery-mastered-strong)"
+          },
+          risk: {
+            "low-subtle":      "var(--aivo-domain-risk-low-subtle)",
+            "low":             "var(--aivo-domain-risk-low-default)",
+            "watch-subtle":    "var(--aivo-domain-risk-watch-subtle)",
+            "watch":           "var(--aivo-domain-risk-watch-default)",
+            "elevated-subtle": "var(--aivo-domain-risk-elevated-subtle)",
+            "elevated":        "var(--aivo-domain-risk-elevated-default)",
+            "high-subtle":     "var(--aivo-domain-risk-high-subtle)",
+            "high":            "var(--aivo-domain-risk-high-default)"
+          },
+          consent: {
+            "pending-subtle": "var(--aivo-domain-consent-pending-subtle)",
+            "pending":        "var(--aivo-domain-consent-pending-default)",
+            "granted-subtle": "var(--aivo-domain-consent-granted-subtle)",
+            "granted":        "var(--aivo-domain-consent-granted-default)",
+            "revoked-subtle": "var(--aivo-domain-consent-revoked-subtle)",
+            "revoked":        "var(--aivo-domain-consent-revoked-default)",
+            "expired-subtle": "var(--aivo-domain-consent-expired-subtle)",
+            "expired":        "var(--aivo-domain-consent-expired-default)"
+          },
+          billing: {
+            "paid-subtle":     "var(--aivo-domain-billing-paid-subtle)",
+            "paid":            "var(--aivo-domain-billing-paid-default)",
+            "due-subtle":      "var(--aivo-domain-billing-due-subtle)",
+            "due":             "var(--aivo-domain-billing-due-default)",
+            "overdue-subtle":  "var(--aivo-domain-billing-overdue-subtle)",
+            "overdue":         "var(--aivo-domain-billing-overdue-default)",
+            "trial-subtle":    "var(--aivo-domain-billing-trial-subtle)",
+            "trial":           "var(--aivo-domain-billing-trial-default)",
+            "refunded-subtle": "var(--aivo-domain-billing-refunded-subtle)",
+            "refunded":        "var(--aivo-domain-billing-refunded-default)"
+          },
+          safety: {
+            "safe-subtle":   "var(--aivo-domain-safety-safe-subtle)",
+            "safe":          "var(--aivo-domain-safety-safe-default)",
+            "review-subtle": "var(--aivo-domain-safety-review-subtle)",
+            "review":        "var(--aivo-domain-safety-review-default)",
+            "flag-subtle":   "var(--aivo-domain-safety-flag-subtle)",
+            "flag":          "var(--aivo-domain-safety-flag-default)",
+            "block-subtle":  "var(--aivo-domain-safety-block-subtle)",
+            "block":         "var(--aivo-domain-safety-block-default)"
+          },
+          completion: {
+            "notStarted-subtle": "var(--aivo-domain-completion-notStarted-subtle)",
+            "notStarted":        "var(--aivo-domain-completion-notStarted-default)",
+            "inProgress-subtle": "var(--aivo-domain-completion-inProgress-subtle)",
+            "inProgress":        "var(--aivo-domain-completion-inProgress-default)",
+            "submitted-subtle":  "var(--aivo-domain-completion-submitted-subtle)",
+            "submitted":         "var(--aivo-domain-completion-submitted-default)",
+            "complete-subtle":   "var(--aivo-domain-completion-complete-subtle)",
+            "complete":          "var(--aivo-domain-completion-complete-default)",
+            "overdue-subtle":    "var(--aivo-domain-completion-overdue-subtle)",
+            "overdue":           "var(--aivo-domain-completion-overdue-default)"
+          }
         }
       },
       borderRadius: {
@@ -165,9 +280,26 @@ const preset = `module.exports = {
         "iw-display": ["Satoshi Variable", "Satoshi", "Inter", "ui-sans-serif", "system-ui", "sans-serif"],
         "iw-body": ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
         "iw-dyslexia": ["Atkinson Hyperlegible", "OpenDyslexic", "Inter", "ui-sans-serif", "system-ui", "sans-serif"]
+      },
+      fontVariantNumeric: {
+        "iw-tabular": "tabular-nums"
       }
     }
-  }
+  },
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities({
+        ".iw-tabular": { "font-variant-numeric": "tabular-nums" },
+        ".iw-metric-xl": { "font-size": "3rem", "line-height": "3.25rem", "letter-spacing": "-0.03em", "font-weight": "700", "font-variant-numeric": "tabular-nums" },
+        ".iw-metric-lg": { "font-size": "2.25rem", "line-height": "2.5rem", "letter-spacing": "-0.025em", "font-weight": "700", "font-variant-numeric": "tabular-nums" },
+        ".iw-metric-md": { "font-size": "1.5rem", "line-height": "1.875rem", "letter-spacing": "-0.015em", "font-weight": "600", "font-variant-numeric": "tabular-nums" },
+        ".iw-metric-sm": { "font-size": "1.125rem", "line-height": "1.5rem", "letter-spacing": "-0.01em", "font-weight": "600", "font-variant-numeric": "tabular-nums" },
+        ".iw-label":    { "font-size": "0.875rem", "line-height": "1.25rem", "font-weight": "500", "letter-spacing": "0.005em" },
+        ".iw-label-sm": { "font-size": "0.75rem", "line-height": "1rem", "font-weight": "600", "letter-spacing": "0.04em", "text-transform": "uppercase" },
+        ".iw-caption":  { "font-size": "0.75rem", "line-height": "1.125rem", "font-weight": "400", "letter-spacing": "0.01em" }
+      });
+    }
+  ]
 };
 `;
 
