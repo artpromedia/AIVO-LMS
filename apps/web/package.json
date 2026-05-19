@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 5000 --turbopack",
+    "dev": "node -e \"console.log('[@aivo/web] dev disabled — superseded by @aivo/web-v2 on port 5000. Run dev:legacy to start the old app on 5100.')\"",
+    "dev:legacy": "next dev --port 5100 --turbopack",
     "build": "node ../../scripts/next-build-with-ca.mjs",
     "start": "next start",
     "lint": "eslint src/ --ext .ts,.tsx",
