@@ -8,6 +8,8 @@ on:
       - "packages/learner-ui/**"
       - "packages/stage-ui/**"
       - "packages/mobile-ui/**"
+      - "apps/web-v2/**"
+      - "apps/marketing/**"
       - "docs/design-language/**"
       - ".github/workflows/design-language.yml"
   push:
@@ -17,6 +19,8 @@ on:
       - "packages/learner-ui/**"
       - "packages/stage-ui/**"
       - "packages/mobile-ui/**"
+      - "apps/web-v2/**"
+      - "apps/marketing/**"
   workflow_dispatch:
 
 env:
@@ -63,6 +67,9 @@ jobs:
             fi
           done
           echo "All token outputs present."
+
+      - name: Verify web-v2 brand contract
+        run: pnpm --filter @aivo/web-v2 run check:brand
 
       - name: Build @aivo/learner-ui (typecheck)
         run: pnpm --filter @aivo/learner-ui build
