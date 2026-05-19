@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@aivo/brand/tokens.css";
 
 :root {
   --visual-primary: 262 83% 58%;

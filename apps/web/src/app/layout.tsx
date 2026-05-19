@@ -30,8 +30,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${fredoka.variable} ${nunito.variable}`} suppressHydrationWarning>
-      <body className="font-body antialiased bg-white text-slate-800">
+    <html
+      lang="en"
+      data-brand="inclusive-warm"
+      data-sensory-mode="standard"
+      className={`${fredoka.variable} ${nunito.variable}`}
+      suppressHydrationWarning
+    >
+      <body className="font-iw-body antialiased bg-iw-bg text-iw-ink">
         <I18nProvider initialMessages={enMessages}>
           <AuthProvider>
             <ImpersonationBanner />
