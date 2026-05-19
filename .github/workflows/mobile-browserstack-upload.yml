@@ -1,0 +1,142 @@
+name: Mobile · Upload to BrowserStack App Live
+
+# Uploads an EAS-built `.ipa` and/or `.apk` to BrowserStack App Live so
+# remote tablet QA can install the build on a real device without anyone
+# owning the hardware. See docs/runbooks/tablet-remote-qa-setup.md.
+
+on:
+  workflow_dispatch:
+    inputs:
+      ios_build_url:
+        description: "Public download URL for an EAS-built .ipa (leave blank to skip iOS)"
+        required: false
+        default: ""
+      android_build_url:
+        description: "Public download URL for an EAS-built .apk (leave blank to skip Android)"
+        required: false
+        default: ""
+      custom_id:
+        description: "Optional custom_id so the build replaces the previous upload in the App Live picker (e.g. 'aivo-mobile-preview')"
+        required: false
+        default: "aivo-mobile-preview"
+
+concurrency:
+  group: mobile-browserstack-upload-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  preflight:
+    name: Preflight (secrets + inputs)
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Verify BrowserStack credentials are configured
+        env:
+          BROWSERSTACK_USERNAME: ${{ secrets.BROWSERSTACK_USERNAME }}
+          BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+        run: |
+          missing=()
+          [ -z "${BROWSERSTACK_USERNAME}" ] && missing+=("BROWSERSTACK_USERNAME")
+          [ -z "${BROWSERSTACK_ACCESS_KEY}" ] && missing+=("BROWSERSTACK_ACCESS_KEY")
+          if [ ${#missing[@]} -ne 0 ]; then
+            echo "::error::Missing required repo secret(s): ${missing[*]}"
+            echo ""
+            echo "Setup checklist:"
+            echo "  1. Log in to BrowserStack with the AIVO workspace account."
+            echo "  2. Account → Settings → copy Username + Access Key."
+            echo "  3. GitHub → Settings → Secrets and variables → Actions:"
+            echo "       - BROWSERSTACK_USERNAME"
+            echo "       - BROWSERSTACK_ACCESS_KEY"
+            echo "  4. Re-run this workflow."
+            echo ""
+            echo "Full runbook: docs/runbooks/tablet-remote-qa-setup.md"
+            exit 1
+          fi
+          echo "BrowserStack credentials present."
+
+      - name: Verify at least one build URL was provided
+        env:
+          IOS_URL: ${{ inputs.ios_build_url }}
+          ANDROID_URL: ${{ inputs.android_build_url }}
+        run: |
+          if [ -z "${IOS_URL}" ] && [ -z "${ANDROID_URL}" ]; then
+            echo "::error::Provide ios_build_url, android_build_url, or both."
+            exit 1
+          fi
+          echo "Inputs OK."
+
+  upload:
+    name: Upload to App Live
+    needs: preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Upload iOS build
+        if: ${{ inputs.ios_build_url != '' }}
+        env:
+          BS_USER: ${{ secrets.BROWSERSTACK_USERNAME }}
+          BS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+          IOS_URL: ${{ inputs.ios_build_url }}
+          CUSTOM_ID: ${{ inputs.custom_id }}
+        run: |
+          set -euo pipefail
+          echo "Uploading iOS build from: ${IOS_URL}"
+          response=$(curl --silent --show-error --fail-with-body \
+            -u "${BS_USER}:${BS_KEY}" \
+            -X POST "https://api-cloud.browserstack.com/app-live/upload" \
+            -F "url=${IOS_URL}" \
+            -F "custom_id=${CUSTOM_ID}-ios")
+          echo "Response: ${response}"
+          app_url=$(echo "${response}" | python3 -c "import json,sys; print(json.load(sys.stdin).get('app_url',''))")
+          if [ -z "${app_url}" ]; then
+            echo "::error::No app_url in BrowserStack response."
+            exit 1
+          fi
+          {
+            echo "### iOS upload"
+            echo ""
+            echo "- App URL: \`${app_url}\`"
+            echo "- Custom ID: \`${CUSTOM_ID}-ios\`"
+            echo "- Launch: https://app-live.browserstack.com/dashboard"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Android build
+        if: ${{ inputs.android_build_url != '' }}
+        env:
+          BS_USER: ${{ secrets.BROWSERSTACK_USERNAME }}
+          BS_KEY: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+          ANDROID_URL: ${{ inputs.android_build_url }}
+          CUSTOM_ID: ${{ inputs.custom_id }}
+        run: |
+          set -euo pipefail
+          echo "Uploading Android build from: ${ANDROID_URL}"
+          response=$(curl --silent --show-error --fail-with-body \
+            -u "${BS_USER}:${BS_KEY}" \
+            -X POST "https://api-cloud.browserstack.com/app-live/upload" \
+            -F "url=${ANDROID_URL}" \
+            -F "custom_id=${CUSTOM_ID}-android")
+          echo "Response: ${response}"
+          app_url=$(echo "${response}" | python3 -c "import json,sys; print(json.load(sys.stdin).get('app_url',''))")
+          if [ -z "${app_url}" ]; then
+            echo "::error::No app_url in BrowserStack response."
+            exit 1
+          fi
+          {
+            echo "### Android upload"
+            echo ""
+            echo "- App URL: \`${app_url}\`"
+            echo "- Custom ID: \`${CUSTOM_ID}-android\`"
+            echo "- Launch: https://app-live.browserstack.com/dashboard"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Next steps
+        run: |
+          {
+            echo ""
+            echo "### Next steps"
+            echo ""
+            echo "1. Open https://app-live.browserstack.com"
+            echo "2. Pick a device from the matrix in \`docs/runbooks/tablet-hardware-qa.md\`"
+            echo "3. Select the uploaded build from *Uploaded apps*"
+            echo "4. Walk the per-role checklist and fill in the Drift log"
+          } >> "$GITHUB_STEP_SUMMARY"

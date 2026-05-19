@@ -23,6 +23,16 @@ factor."
 Each device should be tested in **both** portrait and landscape, with
 the device's system text size at the default setting.
 
+> **Don't own all three devices?** See
+> [`tablet-remote-qa-setup.md`](./tablet-remote-qa-setup.md) for how to
+> run this whole checklist against real hardware in BrowserStack App
+> Live (the GitHub workflow `Mobile · Upload to BrowserStack App Live`
+> pushes an EAS `preview-device` build straight to the App Live device
+> picker). Everything below works the same way through a remote
+> session — except push notifications, biometric auth, and camera
+> capture, which still require owned hardware (see the
+> *What this does not cover* section in the remote setup doc).
+
 ## Per-role walk-through
 
 For each role below, sign in fresh and walk:
@@ -114,7 +124,7 @@ only for what's actually broken** — don't preemptively redesign.
 
 | Device | Orientation | Role | Screen | Drift observed | Severity |
 |---|---|---|---|---|---|
-|   |   |   |   |   |   |
+| _all_ | _all_ | _all_ | _all_ | First real pass pending: BrowserStack App Live wiring landed (`docs/runbooks/tablet-remote-qa-setup.md` + `mobile-browserstack-upload.yml`), but `BROWSERSTACK_USERNAME` / `BROWSERSTACK_ACCESS_KEY` repo secrets and the EAS `preview-device` build artifacts still need to be added before the first session can be opened. Remove this row and replace with per-cell findings once that's done. | — |
 
 Severity guide: **P0** blocks the "tablet is primary" message
 (double-nav, dead-end, blank screen). **P1** visible polish issue
