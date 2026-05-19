@@ -15,6 +15,12 @@
 #   * We still background a curl warmup loop so Turbopack compiles the
 #     root page quickly and the supervisor's HTTP probe gets a 200.
 set -e
+# Ensure @aivo/brand token CSS + tailwind preset are built before
+# marketing starts compiling — without this, the `@import "@aivo/brand/tokens.css"`
+# in app/layout.tsx resolves to a non-existent dist file and the
+# Inclusive-Lab Warm tokens never load.
+(cd "$(dirname "$0")/../packages/brand" && node ./scripts/build-tokens.mjs)
+
 cd "$(dirname "$0")/../apps/marketing"
 
 (
