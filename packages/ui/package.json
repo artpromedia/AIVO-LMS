@@ -43,6 +43,10 @@
       "types": "./dist/hero/index.d.ts",
       "import": "./dist/hero/index.js"
     },
+    "./assessment": {
+      "types": "./dist/assessment/index.d.ts",
+      "import": "./dist/assessment/index.js"
+    },
     "./utils": {
       "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils/index.js"

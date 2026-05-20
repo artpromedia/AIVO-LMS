@@ -109,13 +109,15 @@ const css = [
   `@keyframes aivo-mastery-up { 0% { transform: scale(1); } 35% { transform: scale(1.08); } 100% { transform: scale(1); } }`,
   `@keyframes aivo-approve { 0% { opacity: 0; transform: scale(0.92); } 60% { opacity: 1; transform: scale(1.04); } 100% { opacity: 1; transform: scale(1); } }`,
   `@keyframes aivo-baseline-gen { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }`,
+  `@keyframes aivo-indeterminate { 0% { transform: translateX(-100%); } 100% { transform: translateX(300%); } }`,
   `.aivo-motion-ai-thinking { animation: aivo-ai-thinking 1400ms linear infinite; }`,
   `.aivo-motion-lesson-reveal { animation: aivo-lesson-reveal 520ms cubic-bezier(0.16, 1, 0.3, 1) both; }`,
   `.aivo-motion-mastery-up { animation: aivo-mastery-up 720ms cubic-bezier(0.34, 1.56, 0.64, 1); }`,
   `.aivo-motion-approve { animation: aivo-approve 320ms cubic-bezier(0.22, 1, 0.36, 1) both; }`,
   `.aivo-motion-baseline-gen { animation: aivo-baseline-gen 1800ms linear infinite; background-size: 200% 100%; }`,
+  `.aivo-motion-indeterminate { animation: aivo-indeterminate 1600ms cubic-bezier(0.65, 0, 0.35, 1) infinite; }`,
   // Reduced-motion: collapse durations + skip transforms, keep opacity finals.
-  "@media (prefers-reduced-motion: reduce) { :root { --aivo-motion-duration-fast: 0ms; --aivo-motion-duration-base: 0ms; --aivo-motion-duration-slow: 0ms; --aivo-motion-duration-playful: 0ms; --aivo-motion-duration-aiThinking: 0ms; --aivo-motion-duration-lessonReveal: 0ms; --aivo-motion-duration-masteryUp: 0ms; --aivo-motion-duration-approve: 0ms; --aivo-motion-duration-baselineGen: 0ms; --aivo-sensory-motionScale: 0; } .aivo-motion-ai-thinking, .aivo-motion-lesson-reveal, .aivo-motion-mastery-up, .aivo-motion-approve, .aivo-motion-baseline-gen { animation: none !important; transform: none !important; } }",
+  "@media (prefers-reduced-motion: reduce) { :root { --aivo-motion-duration-fast: 0ms; --aivo-motion-duration-base: 0ms; --aivo-motion-duration-slow: 0ms; --aivo-motion-duration-playful: 0ms; --aivo-motion-duration-aiThinking: 0ms; --aivo-motion-duration-lessonReveal: 0ms; --aivo-motion-duration-masteryUp: 0ms; --aivo-motion-duration-approve: 0ms; --aivo-motion-duration-baselineGen: 0ms; --aivo-sensory-motionScale: 0; } .aivo-motion-ai-thinking, .aivo-motion-lesson-reveal, .aivo-motion-mastery-up, .aivo-motion-approve, .aivo-motion-baseline-gen, .aivo-motion-indeterminate { animation: none !important; transform: none !important; } }",
 ].filter(Boolean).join("\n\n");
 
 const ts = `export const playfulCalmTokens = ${JSON.stringify(tokens, null, 2)} as const;\nexport type PlayfulCalmTokens = typeof playfulCalmTokens;\n`;
