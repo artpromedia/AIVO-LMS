@@ -34,9 +34,9 @@
   --color-aivo-danger: var(--aivo-color-feedback-error);
   --font-sans: var(--aivo-fontFamily-body);
   --font-display: var(--aivo-fontFamily-display);
-  /* Base card radius. See the per-age-mode overrides below for why we
-     hard-code rather than reach for var(--aivo-radius-xl). */
-  --radius-card: 24px;
+  /* Base card radius. The namespaced --aivo-radius-* form resolves
+     correctly post brand dual-emit (no breakpoint collision). */
+  --radius-card: var(--aivo-radius-xl);
   /* Sidebar/page chrome — overridden per role theme. */
   --color-aivo-sidebar-bg: var(--color-aivo-surface);
   --color-aivo-sidebar-fg: var(--color-aivo-ink);
@@ -136,22 +136,21 @@ body {
   --aivo-sensory-ringFocus: oklch(0.54 0.25 278);
 }
 
-/* Per-age-mode card radius. Literal values match tokens/core/radius.json
-   (2xl=32, xl=24, lg=16) — see the note above the base @theme block
-   for why we can't reach these via var(--aivo-radius-X). */
+/* Per-age-mode card radius. Pulls from the namespaced
+   --aivo-radius-{2xl,xl,lg} forms (now safe post brand dual-emit). */
 [data-age-mode="sprout"] {
-  --radius-card: 32px;
+  --radius-card: var(--aivo-radius-2xl);
   --aivo-density-card-pad: 1.5rem;
   --aivo-density-base-font: 1.0625rem;
   --aivo-density-h1-font: 2.25rem;
 }
 
 [data-age-mode="spark"] {
-  --radius-card: 24px;
+  --radius-card: var(--aivo-radius-xl);
 }
 
 [data-age-mode="scholar"] {
-  --radius-card: 16px;
+  --radius-card: var(--aivo-radius-lg);
   --aivo-density-card-pad: 1rem;
   --aivo-density-base-font: 0.95rem;
   --aivo-density-h1-font: 1.75rem;

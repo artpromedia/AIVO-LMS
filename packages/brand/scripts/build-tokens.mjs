@@ -55,7 +55,43 @@ const cssBlock = (selector, vars) => {
   return `${selector} {\n${lines.join("\n")}\n}`;
 };
 
-const baseVars = flatten({
+// Base CSS variables. Emitted in TWO shapes for every value:
+//
+//   1. NAMESPACED (preferred for new code) — each token block keeps its
+//      source-name as the leading segment of the var name:
+//          tokens.radius.sm        → --aivo-radius-sm
+//          tokens.breakpoint.sm    → --aivo-breakpoint-sm
+//          tokens.shadow.soft-1    → --aivo-shadow-soft-1
+//          tokens.color.status.X   → --aivo-color-status-X
+//          tokens.color.aivoPurple → --aivo-color-aivoPurple-100
+//          tokens.semantic.color.surface.base
+//                                  → --aivo-semantic-color-surface-base
+//      This shape eliminates the collisions the legacy emission had —
+//      most notably tokens.radius.{sm,md,lg,xl,2xl} colliding with
+//      tokens.breakpoint.{sm,md,lg,xl,2xl} on flat `--aivo-{key}` slots.
+//
+//   2. LEGACY FLAT (kept for backwards compat with existing app code
+//      and the in-tree preset.cjs). Same value, just no namespace
+//      segment. This mirrors what the build emitted before — including
+//      the breakpoint↔radius collision (breakpoint wins, last-spread).
+//      New code SHOULD prefer the namespaced shape above; do not add
+//      new references to flat names in app code.
+//
+// Apps that don't yet migrate continue to work because both shapes
+// resolve to identical values.
+const baseVarsNamespaced = flatten({
+  color: tokens.color,
+  typography: tokens.typography,
+  radius: tokens.radius,
+  spacing: tokens.spacing,
+  shadow: tokens.shadow,
+  motion: tokens.motion,
+  zIndex: tokens.zIndex,
+  breakpoint: tokens.breakpoint,
+  semantic: tokens.semantic,
+});
+
+const baseVarsLegacy = flatten({
   ...tokens.color,
   ...tokens.typography,
   ...tokens.radius,
@@ -66,6 +102,8 @@ const baseVars = flatten({
   ...tokens.breakpoint,
   ...tokens.semantic,
 });
+
+const baseVars = [...baseVarsNamespaced, ...baseVarsLegacy];
 
 const themeVars = Object.entries(tokens.modes.theme).map(([name, values]) =>
   cssBlock(`[data-theme=\"${name}\"]`,
@@ -169,62 +207,59 @@ const preset = `module.exports = {
           "ink-muted": "var(--aivo-sensory-inkMuted)",
           border: "var(--aivo-sensory-border)",
           ring: "var(--aivo-sensory-ringFocus)",
-          // Brand scales (flat, sensory-independent). The flat
-          // aivoPurple / aivoTeal / aivoOrange palettes live under
-          // tokens.color.aivoPurple etc. The build spreads tokens.color
-          // into baseVars so they emit as --aivo-aivoPurple-N (no
-          // color- infix).
+          // Brand scales (flat, sensory-independent). Uses the
+          // namespaced emission (--aivo-color-aivoPurple-N) added by
+          // the dual-emit build. The legacy flat --aivo-aivoPurple-N
+          // form continues to resolve identically for any consumer that
+          // still references it directly.
           purple: {
-            50:  "var(--aivo-aivoPurple-50)",
-            100: "var(--aivo-aivoPurple-100)",
-            200: "var(--aivo-aivoPurple-200)",
-            300: "var(--aivo-aivoPurple-300)",
-            400: "var(--aivo-aivoPurple-400)",
-            500: "var(--aivo-aivoPurple-500)",
-            600: "var(--aivo-aivoPurple-600)",
-            700: "var(--aivo-aivoPurple-700)",
-            800: "var(--aivo-aivoPurple-800)",
-            900: "var(--aivo-aivoPurple-900)",
-            950: "var(--aivo-aivoPurple-950)"
+            50:  "var(--aivo-color-aivoPurple-50)",
+            100: "var(--aivo-color-aivoPurple-100)",
+            200: "var(--aivo-color-aivoPurple-200)",
+            300: "var(--aivo-color-aivoPurple-300)",
+            400: "var(--aivo-color-aivoPurple-400)",
+            500: "var(--aivo-color-aivoPurple-500)",
+            600: "var(--aivo-color-aivoPurple-600)",
+            700: "var(--aivo-color-aivoPurple-700)",
+            800: "var(--aivo-color-aivoPurple-800)",
+            900: "var(--aivo-color-aivoPurple-900)",
+            950: "var(--aivo-color-aivoPurple-950)"
           },
           teal: {
-            50:  "var(--aivo-aivoTeal-50)",
-            100: "var(--aivo-aivoTeal-100)",
-            200: "var(--aivo-aivoTeal-200)",
-            300: "var(--aivo-aivoTeal-300)",
-            400: "var(--aivo-aivoTeal-400)",
-            500: "var(--aivo-aivoTeal-500)",
-            600: "var(--aivo-aivoTeal-600)",
-            700: "var(--aivo-aivoTeal-700)",
-            800: "var(--aivo-aivoTeal-800)",
-            900: "var(--aivo-aivoTeal-900)",
-            950: "var(--aivo-aivoTeal-950)"
+            50:  "var(--aivo-color-aivoTeal-50)",
+            100: "var(--aivo-color-aivoTeal-100)",
+            200: "var(--aivo-color-aivoTeal-200)",
+            300: "var(--aivo-color-aivoTeal-300)",
+            400: "var(--aivo-color-aivoTeal-400)",
+            500: "var(--aivo-color-aivoTeal-500)",
+            600: "var(--aivo-color-aivoTeal-600)",
+            700: "var(--aivo-color-aivoTeal-700)",
+            800: "var(--aivo-color-aivoTeal-800)",
+            900: "var(--aivo-color-aivoTeal-900)",
+            950: "var(--aivo-color-aivoTeal-950)"
           },
           orange: {
-            50:  "var(--aivo-aivoOrange-50)",
-            100: "var(--aivo-aivoOrange-100)",
-            200: "var(--aivo-aivoOrange-200)",
-            300: "var(--aivo-aivoOrange-300)",
-            400: "var(--aivo-aivoOrange-400)",
-            500: "var(--aivo-aivoOrange-500)",
-            600: "var(--aivo-aivoOrange-600)",
-            700: "var(--aivo-aivoOrange-700)",
-            800: "var(--aivo-aivoOrange-800)",
-            900: "var(--aivo-aivoOrange-900)",
-            950: "var(--aivo-aivoOrange-950)"
+            50:  "var(--aivo-color-aivoOrange-50)",
+            100: "var(--aivo-color-aivoOrange-100)",
+            200: "var(--aivo-color-aivoOrange-200)",
+            300: "var(--aivo-color-aivoOrange-300)",
+            400: "var(--aivo-color-aivoOrange-400)",
+            500: "var(--aivo-color-aivoOrange-500)",
+            600: "var(--aivo-color-aivoOrange-600)",
+            700: "var(--aivo-color-aivoOrange-700)",
+            800: "var(--aivo-color-aivoOrange-800)",
+            900: "var(--aivo-color-aivoOrange-900)",
+            950: "var(--aivo-color-aivoOrange-950)"
           },
-          // Universal status. The flat --aivo-status-{kind} form is
-          // what the build emits from tokens.color.status. The
-          // --aivo-color-feedback-{kind} semantic form exists too (from
-          // tokens.semantic.color.feedback) but resolves to a different
-          // palette tuned for the legacy semantic layer; we intentionally
-          // reach for the brand-scale status form here so bg-iw-success
-          // et al. read as the brand palette, not the semantic-layer
-          // palette.
-          success: "var(--aivo-status-success)",
-          warning: "var(--aivo-status-warning)",
-          error:   "var(--aivo-status-error)",
-          info:    "var(--aivo-status-info)",
+          // Universal status — now namespaced via --aivo-color-status-X
+          // (no more collision with --aivo-status-X if/when we add
+          // mode-scoped status overrides). The brand-scale status
+          // palette is intentional here; the semantic feedback palette
+          // (--aivo-semantic-color-feedback-X) reads differently.
+          success: "var(--aivo-color-status-success)",
+          warning: "var(--aivo-color-status-warning)",
+          error:   "var(--aivo-color-status-error)",
+          info:    "var(--aivo-color-status-info)",
           // Domain status (each has subtle / default / strong / on)
           mastery: {
             "emerging-subtle":   "var(--aivo-domain-mastery-emerging-subtle)",
@@ -296,29 +331,30 @@ const preset = `module.exports = {
           }
         }
       },
-      // Radius. The build flattens tokens.radius without a wrapping
-      // namespace, so values land as flat --aivo-{key} (--aivo-card,
-      // --aivo-control, --aivo-chip, etc.), NOT --aivo-radius-{key}.
-      // md/lg/xl/2xl are intentionally NOT remapped here because their
-      // var names collide with the breakpoint scale (--aivo-md = 768px,
-      // not 12px). Tailwind's built-in rounded-md / lg / xl / 2xl
-      // defaults cover those cases adequately; the iw-* entries below
-      // are the design-system additions.
+      // Radius. The dual-emit build now exposes properly namespaced
+      // --aivo-radius-{key} forms which can't collide with
+      // --aivo-breakpoint-{key}, so we use the long form here and add
+      // back md/lg/xl/2xl entries that the previous emit couldn't
+      // safely reach.
       borderRadius: {
-        pill: "var(--aivo-pill)",
-        "iw-card": "var(--aivo-card)",
-        "iw-card-lg": "var(--aivo-cardLg)",
-        "iw-hero": "var(--aivo-hero)",
-        "iw-control": "var(--aivo-control)",
-        "iw-chip": "var(--aivo-chip)",
-        "iw-sheet-top": "var(--aivo-sheetTop)"
+        sm:        "var(--aivo-radius-sm)",
+        md:        "var(--aivo-radius-md)",
+        lg:        "var(--aivo-radius-lg)",
+        xl:        "var(--aivo-radius-xl)",
+        "2xl":     "var(--aivo-radius-2xl)",
+        pill:      "var(--aivo-radius-pill)",
+        "iw-card": "var(--aivo-radius-card)",
+        "iw-card-lg": "var(--aivo-radius-cardLg)",
+        "iw-hero": "var(--aivo-radius-hero)",
+        "iw-control": "var(--aivo-radius-control)",
+        "iw-chip": "var(--aivo-radius-chip)",
+        "iw-sheet-top": "var(--aivo-radius-sheetTop)"
       },
-      // Shadow. Same flattening rule: emitted as --aivo-{key}, not
-      // --aivo-shadow-{key}.
+      // Shadow — namespaced.
       boxShadow: {
-        "soft-1": "var(--aivo-soft-1)",
-        "soft-3": "var(--aivo-soft-3)",
-        "soft-5": "var(--aivo-soft-5)"
+        "soft-1": "var(--aivo-shadow-soft-1)",
+        "soft-3": "var(--aivo-shadow-soft-3)",
+        "soft-5": "var(--aivo-shadow-soft-5)"
       },
       backgroundImage: {
         // Identity gradient (logo, email). Does NOT respond to sensory mode.
