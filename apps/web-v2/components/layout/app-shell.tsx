@@ -3,7 +3,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { RoleNav, type RoleNavItem } from "@/components/layout/role-nav";
 import { logoutAction } from "@/lib/auth/actions";
-import { SensoryModeToggle } from "@/components/system/sensory-mode-provider";
+import { SensoryModePopover } from "@/components/system/sensory-mode-provider";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 /**
@@ -119,7 +120,7 @@ export function AppShell({
               chrome — visually loud, informationally empty. */}
 
           <div className="ml-auto flex items-center gap-2 sm:gap-3">
-            {immersive ? null : <SensoryModeToggle size="sm" />}
+            {immersive ? null : <SensoryModePopover />}
             <span className="hidden text-right sm:block">
               <span className="block text-sm font-semibold leading-tight text-iw-ink">
                 {user.displayName}
@@ -169,40 +170,41 @@ export function AppShell({
               uppercase tag. */}
           <RoleNav items={navItems} ariaLabel={`${roleLabel} sections`} />
           <div
-            className="mt-6 border-t pt-4"
+            className="mt-6 flex flex-col gap-1 border-t pt-4"
             style={{
               borderColor: isDarkSidebar ? "var(--color-aivo-sidebar-border)" : undefined,
             }}
           >
-            <p className="px-2 text-sm font-medium">{user.displayName}</p>
+            <p className="truncate px-2 text-sm font-semibold leading-tight">
+              {user.displayName}
+            </p>
             <p
-              className="px-2 text-xs"
+              className="truncate px-2 text-xs leading-tight"
               style={isDarkSidebar ? { color: "var(--color-aivo-sidebar-muted)" } : undefined}
+              title={user.email}
             >
               {user.email}
             </p>
-            <Link
-              href="/settings/accessibility"
-              className={cn(
-                "mt-2 block rounded-lg px-2 py-1 text-xs",
-                isDarkSidebar ? "hover:bg-white/10" : "text-iw-ink-muted hover:bg-iw-raised",
-              )}
-              style={isDarkSidebar ? { color: "var(--color-aivo-sidebar-muted)" } : undefined}
-            >
-              Accessibility settings
-            </Link>
-            <form action={logoutAction}>
-              <button
-                type="submit"
-                className={cn(
-                  "mt-1 block w-full rounded-lg px-2 py-1 text-left text-xs",
-                  isDarkSidebar ? "hover:bg-white/10" : "text-iw-ink-muted hover:bg-iw-raised",
-                )}
-                style={isDarkSidebar ? { color: "var(--color-aivo-sidebar-muted)" } : undefined}
+            <div className="mt-2 flex flex-col gap-1">
+              <Button
+                asChild
+                variant="ghost"
+                size="sm"
+                className="h-8 justify-start px-2 text-xs font-medium"
               >
-                Sign out
-              </button>
-            </form>
+                <Link href="/settings/accessibility">Accessibility settings</Link>
+              </Button>
+              <form action={logoutAction}>
+                <Button
+                  type="submit"
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-full justify-start px-2 text-xs font-medium"
+                >
+                  Sign out
+                </Button>
+              </form>
+            </div>
           </div>
         </aside>
         )}

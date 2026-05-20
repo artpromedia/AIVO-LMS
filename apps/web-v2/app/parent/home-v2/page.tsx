@@ -64,7 +64,7 @@ export default function ParentHomeV2() {
                 Start with {learnerFirstName}
               </Link>
               <Link
-                href="/parent/learners/new-v2"
+                href="/parent/learners/new"
                 className="inline-flex items-center gap-2 h-11 px-5 rounded-iw-control bg-white text-iw-text-strong font-semibold border border-iw-border hover:border-iw-text-muted"
               >
                 <AivoIcon name="rosterStudents" size={18} />
