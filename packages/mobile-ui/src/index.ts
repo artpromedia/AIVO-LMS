@@ -9,6 +9,8 @@ export { LoadingState } from './LoadingState';
 export { TutorCard } from './TutorCard';
 export { MobilePlayfulButton, MobilePlayfulCard } from './PlayfulPrimitives';
 
+export * from './shell';
+
 export {
   TIER_THEMES_MOBILE,
   TierThemeProvider,

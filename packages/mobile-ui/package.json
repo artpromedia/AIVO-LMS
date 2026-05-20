@@ -5,7 +5,8 @@
   "main": "src/index.ts",
   "types": "src/index.ts",
   "dependencies": {
-    "@aivo/brand": "workspace:*"
+    "@aivo/brand": "workspace:*",
+    "@aivo/nav": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "~19.0.0",
