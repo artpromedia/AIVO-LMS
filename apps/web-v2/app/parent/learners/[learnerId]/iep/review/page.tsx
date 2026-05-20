@@ -12,6 +12,7 @@ import {
   ReassuranceCard,
   InsightChip,
 } from "@aivo/ui";
+import { Button } from "@/components/ui/button";
 import {
   confirmIEPExtraction,
   getIEPForLearner,
@@ -211,21 +212,15 @@ export default async function IEPReviewPage({
             <div className="flex items-center gap-2">
               <form action={reextractAction}>
                 <input type="hidden" name="learnerId" value={learner.id} />
-                <button
-                  type="submit"
-                  className="inline-flex items-center gap-1 rounded-iw-control px-3 py-1.5 text-xs font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-muted)]"
-                >
+                <Button type="submit" variant="outline" size="sm">
                   Re-run extraction
-                </button>
+                </Button>
               </form>
               <form action={deleteAction}>
                 <input type="hidden" name="learnerId" value={learner.id} />
-                <button
-                  type="submit"
-                  className="inline-flex items-center gap-1 rounded-iw-control px-3 py-1.5 text-xs font-semibold text-[var(--aivo-color-status-error-strong)] bg-white border border-[var(--aivo-color-status-error-default)] hover:bg-[var(--aivo-color-status-error-subtle)]"
-                >
+                <Button type="submit" variant="danger" size="sm">
                   Remove
-                </button>
+                </Button>
               </form>
             </div>
           }

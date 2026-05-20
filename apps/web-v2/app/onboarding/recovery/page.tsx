@@ -3,6 +3,7 @@ import * as React from "react";
 import Link from "next/link";
 import { AuthShell, AuthCard, AuthInput, ReassuranceCard } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
+import { Button } from "@/components/ui/button";
 
 export default function RecoveryPage() {
   const [email, setEmail] = React.useState("");
@@ -23,12 +24,9 @@ export default function RecoveryPage() {
         }
         actions={
           <>
-            <button
-              type="button"
-              className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold hover:opacity-95"
-            >
+            <Button type="button" size="lg" className="w-full">
               Send recovery link
-            </button>
+            </Button>
             <p className="text-xs text-iw-text-muted text-center">
               <Link href="/onboarding/signin" className="hover:underline">
                 Back to sign in

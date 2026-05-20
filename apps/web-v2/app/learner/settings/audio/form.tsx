@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { LearnerVoicePreference, TTSVoiceId } from "@/lib/db/types";
+import { Button } from "@/components/ui/button";
 
 const VOICES: { id: TTSVoiceId; label: string }[] = [
   { id: "kid_friendly", label: "Kid-friendly" },
@@ -129,20 +130,12 @@ export function AudioPrefForm({
         Always show captions
       </label>
       <div className="flex flex-wrap items-center gap-2">
-        <button
-          onClick={preview}
-          disabled={previewBusy}
-          className="rounded border px-3 py-1.5 text-sm font-medium disabled:opacity-50"
-        >
+        <Button type="button" variant="outline" size="sm" onClick={preview} disabled={previewBusy}>
           {previewBusy ? "Generating…" : "Preview voice"}
-        </button>
-        <button
-          onClick={save}
-          disabled={busy}
-          className="rounded bg-aivo-primary px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
-        >
+        </Button>
+        <Button type="button" size="sm" onClick={save} disabled={busy}>
           Save
-        </button>
+        </Button>
         {err && <span className="text-xs text-red-600">{err}</span>}
       </div>
       {previewSrc && (

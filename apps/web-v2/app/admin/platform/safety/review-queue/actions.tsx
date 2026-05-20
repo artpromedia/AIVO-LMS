@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export function ReviewActions({ caseId }: { caseId: string }) {
   const router = useRouter();
@@ -38,27 +39,32 @@ export function ReviewActions({ caseId }: { caseId: string }) {
         className="w-full rounded border px-2 py-1 text-sm"
       />
       <div className="flex gap-2">
-        <button
+        <Button
+          type="button"
+          size="sm"
           onClick={() => resolve("resolved_allow")}
           disabled={busy}
-          className="rounded bg-aivo-success/20 px-3 py-1 text-xs font-medium text-aivo-success disabled:opacity-50"
         >
           Allow
-        </button>
-        <button
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant="danger"
           onClick={() => resolve("resolved_block")}
           disabled={busy}
-          className="rounded bg-aivo-danger/20 px-3 py-1 text-xs font-medium text-aivo-danger disabled:opacity-50"
         >
           Block
-        </button>
-        <button
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
           onClick={() => resolve("escalated")}
           disabled={busy}
-          className="rounded border px-3 py-1 text-xs font-medium disabled:opacity-50"
         >
           Escalate
-        </button>
+        </Button>
       </div>
       {err && <p className="text-xs text-red-600">{err}</p>}
     </div>

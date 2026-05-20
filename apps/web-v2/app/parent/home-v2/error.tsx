@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { AivoIcon } from "@aivo/ui/icon";
+import { Button } from "@/components/ui/button";
 
 /**
  * /parent/home-v2 — error boundary.
@@ -41,19 +42,12 @@ export default function ParentHomeV2Error({
           </p>
         ) : null}
         <div className="flex flex-col sm:flex-row gap-2 justify-center pt-2">
-          <button
-            type="button"
-            onClick={reset}
-            className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-iw-control bg-[var(--aivo-sensory-primary,#7c3aed)] text-white font-semibold hover:opacity-95"
-          >
+          <Button type="button" onClick={reset}>
             Try again
-          </button>
-          <Link
-            href="/parent/home"
-            className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-iw-control bg-white text-iw-text-strong font-semibold border border-iw-border hover:border-iw-text-muted"
-          >
-            Open legacy home
-          </Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/parent/home">Open legacy home</Link>
+          </Button>
         </div>
       </div>
     </main>

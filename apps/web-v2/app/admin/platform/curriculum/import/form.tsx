@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 const FRAMEWORK_OPTIONS = [
   { value: "common-core-math", label: "Common Core Math" },
@@ -66,13 +67,9 @@ export function ImportForm() {
         />
       </label>
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <button
-        type="submit"
-        disabled={busy}
-        className="rounded bg-aivo-primary px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
-      >
+      <Button type="submit" size="sm" disabled={busy}>
         {busy ? "Starting…" : "Start import"}
-      </button>
+      </Button>
     </form>
   );
 }

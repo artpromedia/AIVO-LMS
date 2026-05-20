@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePageRole } from "@/lib/auth/server";
+import { Button } from "@/components/ui/button";
 import {
   LearnerBaselineShell,
   PersonalizationChip,
@@ -174,16 +175,13 @@ export default async function BaselineSubjectsPage({
           <p className="text-xs text-iw-text-muted">
             Subjects with a "Picked by grown-up" tag come from your parent's setup.
           </p>
-          <button
-            type="submit"
-            className="inline-flex items-center gap-2 rounded-iw-control px-5 py-3 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 shadow-[0_4px_12px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.3)] focus:outline-none focus:ring-2 focus:ring-[var(--aivo-sensory-ringFocus)] focus:ring-offset-2 focus:ring-offset-[var(--aivo-color-surface-canvas)]"
-          >
+          <Button type="submit" size="lg">
             Get ready
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M5 12h14" />
               <path d="m13 5 7 7-7 7" />
             </svg>
-          </button>
+          </Button>
         </div>
       </form>
     </LearnerBaselineShell>

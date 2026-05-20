@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { runPlaygroundPrompt, type PlaygroundResult } from "./actions";
+import { Button } from "@/components/ui/button";
 
 const PRESETS: Array<{ label: string; system: string; prompt: string }> = [
   {
@@ -53,14 +54,15 @@ export function PlaygroundForm() {
         </label>
         <div className="flex flex-wrap gap-2">
           {PRESETS.map((p, i) => (
-            <button
+            <Button
               key={p.label}
               type="button"
+              variant="outline"
+              size="sm"
               onClick={() => applyPreset(i)}
-              className="rounded-full border border-aivo-border bg-aivo-surface-2 px-3 py-1 text-xs hover:bg-aivo-surface"
             >
               {p.label}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -118,13 +120,9 @@ export function PlaygroundForm() {
         />
       </div>
 
-      <button
-        type="submit"
-        disabled={isPending || prompt.trim().length === 0}
-        className="rounded-full bg-aivo-primary px-5 py-2 text-sm font-semibold text-white hover:bg-aivo-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
-      >
+      <Button type="submit" disabled={isPending || prompt.trim().length === 0}>
         {isPending ? "Running…" : "Run prompt"}
-      </button>
+      </Button>
 
       {result ? (
         <div className="mt-4 space-y-3 rounded-lg border border-aivo-border bg-aivo-surface-2 p-4">

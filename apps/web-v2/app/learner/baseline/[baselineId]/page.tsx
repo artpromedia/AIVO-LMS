@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requirePageRole } from "@/lib/auth/server";
+import { Button } from "@/components/ui/button";
 import {
   LearnerBaselineShell,
   LearnerQuestionCard,
@@ -265,16 +266,13 @@ export default async function BaselineRunnerPage({
               <input type="hidden" name="baselineId" value={baseline.id} />
               <input type="hidden" name="learnerId" value={baseline.learnerId} />
               {asParent ? <input type="hidden" name="asParent" value="1" /> : null}
-              <button
-                type="submit"
-                className="inline-flex items-center gap-2 rounded-iw-control px-5 py-3 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 shadow-[0_4px_12px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.3)]"
-              >
+              <Button type="submit" size="lg">
                 Finish baseline
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M5 12h14" />
                   <path d="m13 5 7 7-7 7" />
                 </svg>
-              </button>
+              </Button>
             </form>
           }
         />
@@ -389,30 +387,22 @@ export default async function BaselineRunnerPage({
                 <input type="hidden" name="questionId" value={next.id} />
                 <input type="hidden" name="skipped" value="1" />
                 {asParent ? <input type="hidden" name="asParent" value="1" /> : null}
-                <button
-                  type="submit"
-                  formNoValidate
-                  className="inline-flex items-center gap-1.5 rounded-iw-control px-4 py-2.5 text-sm font-semibold text-iw-text-muted bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-muted)] hover:text-iw-text-strong"
-                >
+                <Button type="submit" variant="outline" size="sm" formNoValidate>
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <polygon points="5 4 15 12 5 20 5 4" />
                     <line x1="19" y1="5" x2="19" y2="19" />
                   </svg>
                   Skip
-                </button>
+                </Button>
               </form>
             </div>
-            <button
-              type="submit"
-              form={`answer-form-${next.id}`}
-              className="inline-flex items-center gap-2 rounded-iw-control px-5 py-2.5 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 shadow-[0_4px_12px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.3)]"
-            >
+            <Button type="submit" form={`answer-form-${next.id}`}>
               Next
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M5 12h14" />
                 <path d="m13 5 7 7-7 7" />
               </svg>
-            </button>
+            </Button>
           </>
         }
       >
