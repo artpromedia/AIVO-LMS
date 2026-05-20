@@ -41,7 +41,7 @@ export default function ParentHomeV2() {
   ];
 
   return (
-    <main className="min-h-screen bg-[var(--aivo-color-surface-canvas,#f4f6f5)]">
+    <main className="min-h-screen bg-[var(--aivo-color-surface-canvas)]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 lg:py-10 flex flex-col gap-6">
         <LearningHero
           greeting={
@@ -58,7 +58,7 @@ export default function ParentHomeV2() {
             <>
               <Link
                 href={`${learnerHref}/lessons`}
-                className="inline-flex items-center gap-2 h-11 px-5 rounded-iw-control bg-[var(--aivo-sensory-primary,#7c3aed)] text-white font-semibold shadow-sm hover:opacity-95"
+                className="inline-flex items-center gap-2 h-11 px-5 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold shadow-sm hover:opacity-95"
               >
                 <AivoIcon name="care" size={18} />
                 Start with {learnerFirstName}
@@ -198,11 +198,11 @@ export default function ParentHomeV2() {
             <ul className="space-y-2">
               <li className="flex justify-between gap-3">
                 <span>Parent / guardian consent</span>
-                <span className="text-[var(--aivo-domain-completion-completed-strong,#16a34a)] font-semibold">Approved</span>
+                <span className="text-[var(--aivo-domain-completion-complete-strong)] font-semibold">Approved</span>
               </li>
               <li className="flex justify-between gap-3">
                 <span>AI personalization</span>
-                <span className="text-[var(--aivo-domain-completion-completed-strong,#16a34a)] font-semibold">Approved</span>
+                <span className="text-[var(--aivo-domain-completion-complete-strong)] font-semibold">Approved</span>
               </li>
               <li className="flex justify-between gap-3">
                 <span>School data sharing</span>

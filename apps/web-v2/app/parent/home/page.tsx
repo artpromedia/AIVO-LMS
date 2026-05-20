@@ -40,15 +40,15 @@ export default async function ParentHome() {
     >
       <section
         aria-label="Greeting"
-        className="relative overflow-hidden rounded-iw-hero bg-gradient-to-br from-[var(--aivo-color-aivoPurple-100,#ede9fe)] via-white to-[var(--aivo-color-aivoTeal-100,#ccfbf1)] px-6 py-8 sm:px-10 sm:py-10 lg:px-12 lg:py-12 shadow-[0_40px_100px_-50px_rgba(124,58,237,0.25)]"
+        className="relative overflow-hidden rounded-iw-hero bg-gradient-to-br from-[var(--aivo-aivoPurple-100)] via-white to-[var(--aivo-aivoTeal-100)] px-6 py-8 sm:px-10 sm:py-10 lg:px-12 lg:py-12 shadow-[0_40px_100px_-50px_rgba(124,58,237,0.25)]"
       >
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-gradient-to-br from-[var(--aivo-sensory-primary,#7c3aed)]/20 to-[var(--aivo-color-aivoTeal-700,#0f766e)]/10 blur-3xl"
+          className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-gradient-to-br from-[var(--aivo-sensory-primary)]/20 to-[var(--aivo-aivoTeal-700)]/10 blur-3xl"
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-16 -left-10 h-56 w-56 rounded-full bg-gradient-to-tr from-[var(--aivo-color-aivoTeal-100,#ccfbf1)] to-transparent blur-3xl"
+          className="pointer-events-none absolute -bottom-16 -left-10 h-56 w-56 rounded-full bg-gradient-to-tr from-[var(--aivo-aivoTeal-100)] to-transparent blur-3xl"
         />
         <div className="relative flex max-w-2xl flex-col gap-4">
           <p className="text-sm font-medium text-iw-text-muted">Family workspace</p>

@@ -14,10 +14,10 @@ export function LearnerCard({ learner }: { learner: LearnerProfile }) {
     <Card className="group relative flex flex-col gap-5 overflow-hidden rounded-iw-hero border-0 bg-white p-7 shadow-[0_30px_80px_-40px_rgba(15,23,42,0.22)] transition-shadow hover:shadow-[0_40px_100px_-40px_rgba(124,58,237,0.28)]">
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-gradient-to-br from-[var(--aivo-color-aivoPurple-100,#ede9fe)] to-[var(--aivo-color-aivoTeal-100,#ccfbf1)] opacity-80 blur-2xl"
+        className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-gradient-to-br from-[var(--aivo-aivoPurple-100)] to-[var(--aivo-aivoTeal-100)] opacity-80 blur-2xl"
       />
       <div className="relative flex items-center gap-4">
-        <div className="rounded-full bg-gradient-to-br from-[var(--aivo-color-aivoPurple-100,#ede9fe)] to-[var(--aivo-color-aivoTeal-100,#ccfbf1)] p-[3px]">
+        <div className="rounded-full bg-gradient-to-br from-[var(--aivo-aivoPurple-100)] to-[var(--aivo-aivoTeal-100)] p-[3px]">
           <LearnerAvatar name={learner.displayName} size="md" />
         </div>
         <div className="min-w-0">

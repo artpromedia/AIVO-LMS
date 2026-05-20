@@ -20,7 +20,7 @@ export default function LearnerSnapshot({ params }: SnapshotProps) {
   const base = `/parent/learners/${learnerId}`;
 
   return (
-    <main className="min-h-screen bg-[var(--aivo-color-surface-canvas,#f4f6f5)]">
+    <main className="min-h-screen bg-[var(--aivo-color-surface-canvas)]">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-6 lg:py-10 flex flex-col gap-6">
         <LearningHero
           greeting={<>This week with {learnerName}</>}
@@ -28,7 +28,7 @@ export default function LearnerSnapshot({ params }: SnapshotProps) {
           actions={
             <Link
               href={`${base}/profile-v2`}
-              className="inline-flex items-center gap-2 h-11 px-5 rounded-iw-control bg-[var(--aivo-sensory-primary,#7c3aed)] text-white font-semibold shadow-sm hover:opacity-95"
+              className="inline-flex items-center gap-2 h-11 px-5 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold shadow-sm hover:opacity-95"
             >
               <AivoIcon name="aiBrain" size={18} />
               Open full profile
