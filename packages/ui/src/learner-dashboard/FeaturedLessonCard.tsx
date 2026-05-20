@@ -35,11 +35,11 @@ export interface FeaturedLessonCardProps {
 }
 
 const SUBJECT_TONE: Record<NonNullable<FeaturedLessonCardProps["subjectTone"]>, string> = {
-  math: "bg-[var(--aivo-color-sunriseCoral-100)] text-[var(--aivo-color-sunriseCoral-700)]",
-  reading: "bg-[var(--aivo-color-calmSky-100)] text-[var(--aivo-color-calmSky-700)]",
-  science: "bg-[var(--aivo-color-meadow-100)] text-[var(--aivo-color-meadow-700)]",
-  social: "bg-[var(--aivo-color-sunshine-100)] text-[var(--aivo-color-sunshine-800)]",
-  art: "bg-[var(--aivo-color-lavender-100)] text-[var(--aivo-color-lavender-700)]",
+  math: "bg-[var(--aivo-sunriseCoral-100)] text-[var(--aivo-sunriseCoral-700)]",
+  reading: "bg-[var(--aivo-calmSky-100)] text-[var(--aivo-calmSky-700)]",
+  science: "bg-[var(--aivo-meadow-100)] text-[var(--aivo-meadow-700)]",
+  social: "bg-[var(--aivo-sunshine-100)] text-[var(--aivo-sunshine-800)]",
+  art: "bg-[var(--aivo-lavender-100)] text-[var(--aivo-lavender-700)]",
   neutral: "bg-iw-bg text-iw-text-strong",
 };
 

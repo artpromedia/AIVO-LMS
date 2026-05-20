@@ -26,11 +26,11 @@ const STATUS_COPY: Record<NonNullable<LearnerProfileCardProps["approvalStatus"]>
 
 const STATUS_CLS: Record<NonNullable<LearnerProfileCardProps["approvalStatus"]>, string> = {
   approved:
-    "bg-[var(--aivo-color-meadow-50)] text-[var(--aivo-color-meadow-700)] border-[var(--aivo-color-meadow-200)]",
+    "bg-[var(--aivo-meadow-50)] text-[var(--aivo-meadow-700)] border-[var(--aivo-meadow-200)]",
   pending:
-    "bg-[var(--aivo-color-sunshine-50)] text-[var(--aivo-color-sunshine-700)] border-[var(--aivo-color-sunshine-200)]",
+    "bg-[var(--aivo-sunshine-50)] text-[var(--aivo-sunshine-700)] border-[var(--aivo-sunshine-200)]",
   review:
-    "bg-[var(--aivo-color-calmSky-50)] text-[var(--aivo-color-calmSky-700)] border-[var(--aivo-color-calmSky-200)]",
+    "bg-[var(--aivo-calmSky-50)] text-[var(--aivo-calmSky-700)] border-[var(--aivo-calmSky-200)]",
 };
 
 export function LearnerProfileCard({

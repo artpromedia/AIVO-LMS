@@ -24,15 +24,15 @@ export interface StatChipProps {
 
 const TONE_BG: Record<NonNullable<StatChipProps["tone"]>, string> = {
   primary: "bg-[color-mix(in_oklab,var(--color-aivo-primary)_14%,white)]",
-  warm: "bg-[color-mix(in_oklab,var(--aivo-color-sunshine-400)_22%,white)]",
-  success: "bg-[color-mix(in_oklab,var(--aivo-color-meadow-400)_18%,white)]",
-  info: "bg-[color-mix(in_oklab,var(--aivo-color-calmSky-400)_18%,white)]",
+  warm: "bg-[color-mix(in_oklab,var(--aivo-sunshine-400)_22%,white)]",
+  success: "bg-[color-mix(in_oklab,var(--aivo-meadow-400)_18%,white)]",
+  info: "bg-[color-mix(in_oklab,var(--aivo-calmSky-400)_18%,white)]",
 };
 const TONE_FG: Record<NonNullable<StatChipProps["tone"]>, string> = {
   primary: "text-[var(--color-aivo-primary)]",
-  warm: "text-[var(--aivo-color-sunshine-700)]",
-  success: "text-[var(--aivo-color-meadow-700)]",
-  info: "text-[var(--aivo-color-calmSky-700)]",
+  warm: "text-[var(--aivo-sunshine-700)]",
+  success: "text-[var(--aivo-meadow-700)]",
+  info: "text-[var(--aivo-calmSky-700)]",
 };
 
 export function StatChip({ icon, label, value, tone = "primary", className }: StatChipProps) {
