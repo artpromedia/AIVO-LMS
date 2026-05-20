@@ -98,9 +98,20 @@ const TONE_TINT: Record<(typeof INSIGHTS)[number]["tone"], string> = {
     "bg-[var(--aivo-color-aivoTeal-50)] text-[var(--aivo-color-aivoTeal-700)] border-[var(--aivo-color-aivoTeal-100)]",
 };
 
+// Greeting first-name: skips honorifics (Ms./Mr./Mrs./Mx./Dr./Prof.)
+// so "Ms. Vega" becomes "Vega" instead of "Ms.".
+function greetingName(displayName: string): string {
+  const parts = displayName.trim().split(/\s+/);
+  const HONORIFICS = new Set(["Ms.", "Ms", "Mr.", "Mr", "Mrs.", "Mrs", "Mx.", "Mx", "Dr.", "Dr", "Prof.", "Prof"]);
+  for (const p of parts) {
+    if (!HONORIFICS.has(p)) return p;
+  }
+  return parts[0] ?? displayName;
+}
+
 export default async function TeacherHome() {
   const session = await requirePageRole(["teacher"]);
-  const first = session.displayName.split(" ")[0];
+  const first = greetingName(session.displayName);
   return (
     <AppShell
       role="teacher"
