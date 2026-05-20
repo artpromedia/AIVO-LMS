@@ -20,4 +20,5 @@ export * from "./hero";
 export * from "./assessment";
 export * from "./baseline";
 export * from "./learner-home";
+export * from "./tutor";
 export * from "./utils";
