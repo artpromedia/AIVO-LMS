@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react";
 import { AuthInput } from "@aivo/ui/auth";
 
 /**
@@ -9,6 +10,9 @@ import { AuthInput } from "@aivo/ui/auth";
  * (server) page so it can drive the `mockSignIn` server action via the
  * `form="login-form"` attribute. The hidden `role` defaults to "parent"
  * — the DemoRolePicker sets a different value when used.
+ *
+ * All interactive colors flow through `iw-*` Tailwind utilities so the
+ * sensory-mode toggle repaints the form without re-wiring.
  */
 export function LoginForm({
   id,
@@ -49,17 +53,22 @@ export function LoginForm({
           <button
             type="button"
             onClick={() => setShowPw((value) => !value)}
-            className="text-xs font-semibold text-[var(--aivo-sensory-primary,#7c3aed)] hover:underline"
             aria-label={showPw ? "Hide password" : "Show password"}
+            aria-pressed={showPw}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-full text-iw-ink-muted hover:bg-iw-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring focus-visible:ring-offset-2 focus-visible:ring-offset-iw-bg"
           >
-            {showPw ? "Hide" : "Show"}
+            {showPw ? (
+              <EyeOff className="h-4 w-4" aria-hidden="true" />
+            ) : (
+              <Eye className="h-4 w-4" aria-hidden="true" />
+            )}
           </button>
         }
       />
       <div className="flex justify-end">
         <Link
           href="/forgot-password"
-          className="text-xs font-semibold text-[var(--aivo-sensory-primary,#7c3aed)] hover:underline"
+          className="text-sm font-semibold text-iw-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring focus-visible:ring-offset-2 focus-visible:ring-offset-iw-bg rounded"
         >
           Forgot password?
         </Link>
