@@ -1,23 +1,42 @@
 /**
- * Sprint 7: Learner home redesign on @aivo/ui/learner-home primitives.
+ * Learner home — SensoryAdaptive redesign.
  *
- * Keeps the existing today-mission server action + readActiveLearner
- * resolution intact — only the UI changes. Adds a hero greeting, a
- * single TodayFocusCard with one CTA, a soft subject grid, and a
- * message-card stack for parent/teacher/tutor nudges.
+ * Preserves the existing today-mission server action, consent guard,
+ * rate limit, and audit hooks intact. Rebuilds the UI on top of the
+ * new `@aivo/ui/learner-dashboard` primitives:
+ *
+ *   ┌──────────────────────────────────────────────────────────────┐
+ *   │ AppShell top bar (logo · sensory toggle · profile)           │
+ *   ├──────────────┬───────────────────────────────────────────────┤
+ *   │ Workspace    │ Top stat strip · greeting                     │
+ *   │ rail         │ FeaturedLessonCard (Today's mission)          │
+ *   │  · profile   │ "Your AI Tutors" grid                         │
+ *   │  · mood      │ "Your subjects" grid                          │
+ *   │  · spacing   │ "For you today" messages                      │
+ *   │  · font      │                                               │
+ *   │  · sound     │                                               │
+ *   └──────────────┴───────────────────────────────────────────────┘
+ *
+ * The AppShell is rendered in `immersive` mode so its nav rail is
+ * hidden — the workspace rail on the left takes its place. Primary
+ * navigation is reachable via the role nav on every other learner
+ * subpage (subjects, missions, library, etc.) and via deep links
+ * from the dashboard surfaces below.
  */
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import {
-  LearningHero,
-  FloatingMetricCard,
-  SubjectCard,
-  TodayFocusCard,
-  MessageCard,
-  InsightChip,
-} from "@aivo/ui";
+  StatChip,
+  LearnerLevelBadge,
+  FeaturedLessonCard,
+  LessonSecondaryAction,
+  TutorAvatarCard,
+  type TutorAvatarTone,
+} from "@aivo/ui/learner-dashboard";
+import { SubjectCard, MessageCard } from "@aivo/ui";
+import { LearnerWorkspaceRail } from "@/components/learner/learner-workspace-rail";
 import { LEARNER_NAV } from "@/components/layout/role-shells";
 import {
   createLessonRun,
@@ -45,7 +64,10 @@ async function startMissionAction(formData: FormData) {
     if (active !== learnerId) redirect("/learner/select");
   }
   if (
-    !hasLearnerConsent(session.tenantId, learnerId, ["child_data_collection", "ai_personalization"])
+    !hasLearnerConsent(session.tenantId, learnerId, [
+      "child_data_collection",
+      "ai_personalization",
+    ])
   ) {
     redirect("/learner/home?blocker=consent");
   }
@@ -90,6 +112,33 @@ function masteryLabel(score: number): string {
   return "Not started";
 }
 
+function adaptiveLevel(score: number): string {
+  if (score >= 0.85) return "Soaring";
+  if (score >= 0.65) return "Confident";
+  if (score >= 0.4) return "Growing";
+  return "Emerging";
+}
+
+function timeOfDayGreeting(name: string): string {
+  const hour = new Date().getHours();
+  const slot = hour < 12 ? "morning" : hour < 18 ? "afternoon" : "evening";
+  return `Good ${slot}, ${name}!`;
+}
+
+// Subject-slug → category tile color tone for the featured lesson chip
+// and the tutor grid. Keeps the mapping in one place so we don't sprinkle
+// pastel hex around the page.
+const SUBJECT_LESSON_TONE: Record<
+  string,
+  { lessonTone: "math" | "reading" | "science" | "social" | "art" | "neutral"; tutorTone: TutorAvatarTone }
+> = {
+  math: { lessonTone: "math", tutorTone: "lavender" },
+  reading: { lessonTone: "reading", tutorTone: "sky" },
+  science: { lessonTone: "science", tutorTone: "mint" },
+  social: { lessonTone: "social", tutorTone: "sunshine" },
+  art: { lessonTone: "art", tutorTone: "lavender" },
+};
+
 export default async function LearnerHome({
   searchParams,
 }: {
@@ -114,7 +163,6 @@ export default async function LearnerHome({
   const { skillMasteries } = getMasteryMap(learnerId, session.tenantId);
   const iep = getIEPForLearner(learnerId, session.tenantId);
 
-  // Aggregate per-subject mastery for the subject cards.
   const subjectScore = new Map<string, { score: number; count: number }>();
   for (const sm of skillMasteries) {
     const entry = subjectScore.get(sm.subjectId) ?? { score: 0, count: 0 };
@@ -127,13 +175,55 @@ export default async function LearnerHome({
     if (!e || e.count === 0) return 0;
     return e.score / e.count;
   };
+  const overallAvg =
+    skillMasteries.length === 0
+      ? 0
+      : skillMasteries.reduce((acc, sm) => acc + sm.score, 0) / skillMasteries.length;
 
   const blocker = params.blocker ?? (today.ready ? null : today.blocker);
   const supportsCount = iep?.acceptedAccommodations?.length ?? 0;
-  // streakDays is computed by the engagement service; until it lands we
-  // surface the calm "Start today / Day 1 awaits" fallback so the chip
-  // never reads as a placeholder zero.
   const streakDays = 0;
+  const levelNumber = Math.max(1, Math.round(overallAvg * 20) + 1);
+  const xp = Math.round(overallAvg * 5000) + 250;
+  const displayName = learner.preferredName || learner.firstName;
+  const initialSource = learner.displayName || learner.firstName || displayName;
+  const initials = initialSource
+    .split(/\s+/)
+    .map((part: string) => part[0] ?? "")
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
+  const featuredSubjectSlug = today.ready
+    ? allSubjects.find((s) => s.id === today.mission.subjectId)?.slug ?? ""
+    : "";
+  const featuredTutor = today.ready ? tutorForSubjectSlug(featuredSubjectSlug) : null;
+  const featuredTones = today.ready
+    ? SUBJECT_LESSON_TONE[featuredSubjectSlug] ?? {
+        lessonTone: "neutral" as const,
+        tutorTone: "lavender" as const,
+      }
+    : { lessonTone: "neutral" as const, tutorTone: "lavender" as const };
+
+  // Up to 4 AI tutors shown beneath the featured lesson — drawn from the
+  // subjects the learner is enrolled in so the cards never advertise a
+  // tutor for a subject they can't open.
+  const tutorTiles = allSubjects
+    .slice(0, 4)
+    .map((s) => {
+      const t = tutorForSubjectSlug(s.slug);
+      if (!t) return null;
+      const tones = SUBJECT_LESSON_TONE[s.slug] ?? { tutorTone: "lavender" as const };
+      return {
+        id: s.id,
+        href: `/learner/subjects/${s.id}`,
+        name: t.name,
+        subject: s.name,
+        glyph: t.emoji,
+        tone: tones.tutorTone,
+      };
+    })
+    .filter((t): t is NonNullable<typeof t> => t !== null);
 
   return (
     <AppShell
@@ -141,175 +231,246 @@ export default async function LearnerHome({
       roleLabel={session.role === "learner" ? "Learner" : "Parent · Learner view"}
       navItems={LEARNER_NAV}
       user={{ displayName: session.displayName, email: session.email }}
+      variant="immersive"
     >
-      <LearningHero
-        greeting={`Hi, ${learner.preferredName || learner.firstName}.`}
-        subhead={
-          today.ready
-            ? "Ready for a calm learning session?"
-            : "Let's get set up so we can start something just for you."
-        }
-        actions={
-          today.ready ? (
-            <form action={startMissionAction}>
-              <input type="hidden" name="learnerId" value={learnerId} />
-              <button
-                type="submit"
-                data-primary-cta="todays-mission"
-                className="inline-flex items-center gap-2 rounded-iw-control px-5 py-3 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 shadow-[0_4px_12px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.3)]"
-              >
-                {today.mission.existingRunId ? "Resume today's lesson" : "Start today's lesson"}
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M5 12h14" />
-                  <path d="m13 5 7 7-7 7" />
+      <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
+        <LearnerWorkspaceRail
+          learnerName={displayName}
+          initials={initials}
+          approvalStatus="approved"
+        />
+
+        <div className="flex flex-col gap-6 min-w-0">
+          {/* Top stat strip */}
+          <div className="flex items-center gap-3 p-4 rounded-3xl bg-white border border-iw-border/60 flex-wrap">
+            <StatChip
+              tone="warm"
+              label={`Level ${levelNumber}`}
+              value={`${xp.toLocaleString()} XP`}
+              icon={
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  <path d="m12 2 2.6 6.4 6.9.5-5.3 4.4 1.7 6.7L12 16.8 6.1 20l1.7-6.7L2.5 8.9l6.9-.5L12 2Z" />
                 </svg>
-              </button>
-            </form>
-          ) : (
-            <Link
-              href={blocker === "no_baseline" ? "/learner/baseline" : "/learner/home"}
-              className="inline-flex items-center gap-2 rounded-iw-control px-5 py-3 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
-            >
-              {blocker === "no_baseline" ? "Finish the baseline" : "Open setup"}
-            </Link>
-          )
-        }
-      />
+              }
+            />
+            <StatChip
+              tone="primary"
+              label="Streak"
+              value={streakDays > 0 ? `${streakDays} Days` : "Day 1"}
+              icon={
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" />
+                </svg>
+              }
+            />
+            <span className="ml-auto">
+              <LearnerLevelBadge level={adaptiveLevel(overallAvg)} />
+            </span>
+          </div>
 
-      <section
-        aria-label="Today at a glance"
-        className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3"
-      >
-        <FloatingMetricCard
-          label="Today's focus"
-          value={today.ready ? today.mission.subjectName : "Setting up"}
-          description={today.ready ? `${today.mission.estimatedMinutes} min` : "Almost there"}
-          tone="info"
-        />
-        <FloatingMetricCard
-          label="Streak"
-          value={streakDays > 0 ? `${streakDays} days` : "Day 1"}
-          description={streakDays > 0 ? "Keep going!" : "A fresh start"}
-          tone="success"
-        />
-        <FloatingMetricCard
-          label="Support mode"
-          value={supportsCount > 0 ? `${supportsCount} on` : "Calm"}
-          description={iep?.confirmedAt ? "IEP supports" : "Default calm mode"}
-          tone="info"
-        />
-        <FloatingMetricCard
-          label="Tutor"
-          value="Ready"
-          description="Ask for a hint anytime"
-          tone="neutral"
-        />
-      </section>
+          {/* Greeting */}
+          <h1 className="text-3xl md:text-4xl font-bold text-iw-text-strong leading-tight">
+            {timeOfDayGreeting(displayName)}
+          </h1>
 
-      {today.ready ? (
-        <section className="mt-6">
-          <TodayFocusCard
-            eyebrow={`Continue · ${today.mission.subjectName}`}
-            title={today.mission.skillName}
-            body={today.mission.learnerReason}
-            meta={
-              <>
-                <InsightChip tone="primary" size="md">
-                  {today.mission.estimatedMinutes} min
-                </InsightChip>
-                {iep?.confirmedAt ? (
-                  <InsightChip tone="accent" size="md">
-                    IEP supports on
-                  </InsightChip>
-                ) : null}
-                <InsightChip tone="info" size="md">
-                  Read-aloud available
-                </InsightChip>
-              </>
-            }
-            action={
-              <form action={startMissionAction}>
-                <input type="hidden" name="learnerId" value={learnerId} />
-                <button
-                  type="submit"
-                  className="inline-flex items-center gap-2 rounded-iw-control px-5 py-2.5 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
-                >
-                  {today.mission.existingRunId ? "Resume" : "Let's go"}
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M5 12h14" />
-                    <path d="m13 5 7 7-7 7" />
-                  </svg>
-                </button>
-              </form>
-            }
-          />
-        </section>
-      ) : null}
-
-      <section className="mt-8 flex flex-col gap-3">
-        <header className="flex items-center justify-between gap-2">
-          <h2 className="text-xl font-semibold text-iw-text-strong">Your subjects</h2>
-          <Link
-            href="/learner/subjects"
-            className="text-sm font-semibold text-[var(--aivo-sensory-primary)] hover:underline"
-          >
-            See all →
-          </Link>
-        </header>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {allSubjects.slice(0, 6).map((s) => {
-            const tutor = tutorForSubjectSlug(s.slug);
-            const avg = subjectAvg(s.id);
-            return (
-              <SubjectCard
-                key={s.id}
-                href={`/learner/subjects/${s.id}`}
-                name={s.name}
-                eyebrow={tutor ? `${tutor.name} · ${tutor.landmark}` : undefined}
-                masteryLabel={masteryLabel(avg)}
-                masteryPct={Math.round(avg * 100)}
-                accent={tutor?.color}
-                icon={tutor?.emoji ?? "📘"}
-                nextAction={
-                  today.ready && today.mission.subjectId === s.id
-                    ? today.mission.skillName
-                    : "Pick where to start"
-                }
-                support={iep?.confirmedAt ? "Supports on" : undefined}
-                locked={avg === 0 && !today.ready}
-              />
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="mt-8 flex flex-col gap-3">
-        <h2 className="text-xl font-semibold text-iw-text-strong">For you today</h2>
-        <div className="grid gap-3 md:grid-cols-2">
-          <MessageCard
-            from="tutor"
-            sender="AIVO"
-            title="Need a hint? I'm here."
-            body="Tap the read-aloud speaker on any question to hear it. No grades — just exploring together."
-            avatar="✨"
-          />
-          {iep?.confirmedAt ? (
-            <MessageCard
-              from="system"
-              title="Your supports are on"
-              body={`Read-aloud, calm pacing, and ${supportsCount} other support${supportsCount === 1 ? "" : "s"} from your IEP are active.`}
-              avatar="🛡"
+          {/* Featured lesson */}
+          {today.ready ? (
+            <FeaturedLessonCard
+              subject={today.mission.subjectName}
+              subjectTone={featuredTones.lessonTone}
+              durationLabel={`${today.mission.estimatedMinutes} mins`}
+              difficultyLabel={overallAvg >= 0.65 ? "Steady" : "Easy"}
+              title={today.mission.skillName}
+              description={today.mission.learnerReason}
+              tutorName={featuredTutor?.name ?? "Your tutor"}
+              tutorPersonality={
+                featuredTutor ? `${featuredTutor.subtitle} guide` : "Patient & Encouraging"
+              }
+              tutorGlyph={featuredTutor?.emoji ?? "🤖"}
+              tutorTone={featuredTones.tutorTone}
+              secondaryActions={
+                <>
+                  <LessonSecondaryAction
+                    icon={
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden
+                      >
+                        <path d="M3 10v4a1 1 0 0 0 1 1h3l4 4V5l-4 4H4a1 1 0 0 0-1 1Z" />
+                        <path d="M15 9a4 4 0 0 1 0 6" />
+                        <path d="M18 6a8 8 0 0 1 0 12" />
+                      </svg>
+                    }
+                  >
+                    Read Aloud
+                  </LessonSecondaryAction>
+                  <LessonSecondaryAction
+                    icon={
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden
+                      >
+                        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                      </svg>
+                    }
+                  >
+                    Overview
+                  </LessonSecondaryAction>
+                </>
+              }
+              primaryAction={
+                <form action={startMissionAction}>
+                  <input type="hidden" name="learnerId" value={learnerId} />
+                  <button
+                    type="submit"
+                    data-primary-cta="todays-mission"
+                    className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl text-base font-bold text-white bg-[var(--color-aivo-primary)] hover:brightness-110 shadow-[0_8px_24px_-6px_color-mix(in_oklab,var(--color-aivo-primary)_55%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-aivo-primary)] focus-visible:ring-offset-2 transition"
+                  >
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      aria-hidden
+                    >
+                      <path d="M8 5v14l11-7L8 5Z" />
+                    </svg>
+                    {today.mission.existingRunId ? "Resume Lesson" : "Start Lesson"}
+                  </button>
+                </form>
+              }
             />
           ) : (
-            <MessageCard
-              from="break"
-              title="Breaks are good"
-              body="Stretch, sip water, look out the window. AIVO will save your place."
-              avatar="🌿"
-            />
+            <div className="rounded-[28px] bg-white border border-iw-border/60 p-8 flex flex-col gap-4">
+              <h2 className="text-2xl font-bold text-iw-text-strong">Let's get you set up</h2>
+              <p className="text-base text-iw-text-muted">
+                {blocker === "no_baseline"
+                  ? "We need a quick baseline check so we can build a lesson plan just for you."
+                  : "Just a moment — we're picking something special."}
+              </p>
+              <Link
+                href={blocker === "no_baseline" ? "/learner/baseline" : "/learner/home"}
+                className="self-start inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl text-base font-bold text-white bg-[var(--color-aivo-primary)] hover:brightness-110 transition"
+              >
+                {blocker === "no_baseline" ? "Finish the baseline" : "Refresh"}
+              </Link>
+            </div>
           )}
+
+          {/* AI tutors grid */}
+          {tutorTiles.length > 0 ? (
+            <section className="flex flex-col gap-4">
+              <header className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-iw-text-strong">Your AI Tutors</h2>
+                <Link
+                  href="/learner/subjects"
+                  className="text-sm font-bold text-[var(--color-aivo-primary)] hover:underline"
+                >
+                  See All
+                </Link>
+              </header>
+              <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
+                {tutorTiles.map((t) => (
+                  <TutorAvatarCard
+                    key={t.id}
+                    href={t.href}
+                    name={t.name}
+                    subject={t.subject}
+                    glyph={t.glyph}
+                    tone={t.tone}
+                  />
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {/* Subjects */}
+          <section className="flex flex-col gap-4">
+            <header className="flex items-center justify-between">
+              <h2 className="text-xl font-bold text-iw-text-strong">Your Subjects</h2>
+              <Link
+                href="/learner/subjects"
+                className="text-sm font-bold text-[var(--color-aivo-primary)] hover:underline"
+              >
+                See All
+              </Link>
+            </header>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {allSubjects.slice(0, 6).map((s) => {
+                const tutor = tutorForSubjectSlug(s.slug);
+                const avg = subjectAvg(s.id);
+                return (
+                  <SubjectCard
+                    key={s.id}
+                    href={`/learner/subjects/${s.id}`}
+                    name={s.name}
+                    eyebrow={tutor ? `${tutor.name} · ${tutor.landmark}` : undefined}
+                    masteryLabel={masteryLabel(avg)}
+                    masteryPct={Math.round(avg * 100)}
+                    accent={tutor?.color}
+                    icon={tutor?.emoji ?? "📘"}
+                    nextAction={
+                      today.ready && today.mission.subjectId === s.id
+                        ? today.mission.skillName
+                        : "Pick where to start"
+                    }
+                    support={iep?.confirmedAt ? "Supports on" : undefined}
+                    locked={avg === 0 && !today.ready}
+                  />
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Messages */}
+          <section className="flex flex-col gap-4">
+            <h2 className="text-xl font-bold text-iw-text-strong">For You Today</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              <MessageCard
+                from="tutor"
+                sender="AIVO"
+                title="Need a hint? I'm here."
+                body="Tap the read-aloud speaker on any question to hear it. No grades — just exploring together."
+                avatar="✨"
+              />
+              {iep?.confirmedAt ? (
+                <MessageCard
+                  from="system"
+                  title="Your supports are on"
+                  body={`Read-aloud, calm pacing, and ${supportsCount} other support${
+                    supportsCount === 1 ? "" : "s"
+                  } from your IEP are active.`}
+                  avatar="🛡"
+                />
+              ) : (
+                <MessageCard
+                  from="break"
+                  title="Breaks are good"
+                  body="Stretch, sip water, look out the window. AIVO will save your place."
+                  avatar="🌿"
+                />
+              )}
+            </div>
+          </section>
         </div>
-      </section>
+      </div>
     </AppShell>
   );
 }

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@aivo/brand/tokens.css";
 
 :root {
   /* Mirrors apps/web --visual-primary so the auth pages here render
@@ -7,22 +8,31 @@
   --visual-primary-dark: 262 83% 46%;
 }
 
+/* ------------------------------------------------------------------
+   Marketing surface palette is now bound to the @aivo/brand token
+   system (see @aivo/brand/tokens.css). Tailwind v4 generates utilities
+   like `bg-primary` from these @theme entries; the values themselves
+   resolve to brand vars so a token bump in /packages/brand instantly
+   reflows the marketing chrome. No hardcoded hex literals belong in
+   this file — add new shades to /packages/brand/tokens/core/color.json
+   and reference them here.
+   ------------------------------------------------------------------ */
 @theme {
-  --color-primary: #7c3aed;
-  --color-primary-light: #a78bfa;
-  --color-primary-dark: #5b21b6;
-  --color-secondary: #14b8a6;
-  --color-accent: #f97316;
-  --color-accent-soft: #ffedd5;
-  --color-canvas: #f4f6f5;
-  --color-card: #ffffff;
-  --color-soft-card: #f8f9f8;
-  --color-ink: #090909;
-  --color-ink-muted: #6f7275;
-  --color-ink-subtle: #9ca0a3;
+  --color-primary: var(--aivo-aivoPurple-600);
+  --color-primary-light: var(--aivo-aivoPurple-400);
+  --color-primary-dark: var(--aivo-aivoPurple-800);
+  --color-secondary: var(--aivo-aivoTeal-500);
+  --color-accent: var(--aivo-aivoOrange-500);
+  --color-accent-soft: var(--aivo-aivoOrange-100);
+  --color-canvas: var(--aivo-cloud-50);
+  --color-card: var(--aivo-cloud-0);
+  --color-soft-card: var(--aivo-cloud-50);
+  --color-ink: var(--aivo-cloud-950);
+  --color-ink-muted: var(--aivo-cloud-500);
+  --color-ink-subtle: var(--aivo-cloud-400);
   --color-border: rgba(0, 0, 0, 0.05);
-  --color-surface: #f4f6f5;
-  --color-surface-hover: #f8f9f8;
+  --color-surface: var(--aivo-cloud-50);
+  --color-surface-hover: var(--aivo-cloud-100);
   --font-heading: "Satoshi Variable", "Satoshi", var(--font-inter), "Inter", sans-serif;
   --font-body: var(--font-inter), "Inter", sans-serif;
   --font-reading: var(--font-atkinson), "Atkinson Hyperlegible", sans-serif;

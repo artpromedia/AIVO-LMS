@@ -20,6 +20,7 @@ export * from "./hero";
 export * from "./assessment";
 export * from "./baseline";
 export * from "./learner-home";
+export * from "./learner-dashboard";
 export * from "./tutor";
 export * from "./homework";
 export * from "./curriculum";

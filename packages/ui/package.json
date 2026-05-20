@@ -55,6 +55,10 @@
       "types": "./dist/learner-home/index.d.ts",
       "import": "./dist/learner-home/index.js"
     },
+    "./learner-dashboard": {
+      "types": "./dist/learner-dashboard/index.d.ts",
+      "import": "./dist/learner-dashboard/index.js"
+    },
     "./tutor": {
       "types": "./dist/tutor/index.d.ts",
       "import": "./dist/tutor/index.js"
