@@ -122,19 +122,34 @@ const css = [
 
 const ts = `export const playfulCalmTokens = ${JSON.stringify(tokens, null, 2)} as const;\nexport type PlayfulCalmTokens = typeof playfulCalmTokens;\n`;
 
+// IMPORTANT — keep var names in sync with what the CSS layer actually
+// emits.
+//
+// build-tokens spreads `tokens.color`, `tokens.semantic`, etc. directly
+// into baseVars. That means brand-scale palettes (aivoPurple, aivoTeal,
+// aivoOrange, meadow, sunshine, lavender, status) end up as flat
+// `--aivo-{name}-{step}` vars with NO `color-` infix, and semantic
+// blocks end up as `--aivo-color-{group}-{key}` (the leading `color`
+// comes from the semantic.color subtree, not the top-level `color`
+// namespace).
+//
+// Earlier versions of this preset assumed a `--aivo-color-aivoPurple-N`
+// / `--aivo-semantic-color-...` shape that was never emitted. Every
+// utility built on those refs silently fell back to nothing. The refs
+// below are the ones that actually resolve in `dist/css/tokens.css`.
 const preset = `module.exports = {
   theme: {
     extend: {
       colors: {
         brand: {
-          primary: "var(--aivo-semantic-color-interactive-primary-default)",
-          secondary: "var(--aivo-semantic-color-interactive-secondary-default)",
-          meadow: "var(--aivo-color-meadow-400)",
-          sunshine: "var(--aivo-color-sunshine-400)",
-          lavender: "var(--aivo-color-lavender-400)",
-          canvas: "var(--aivo-semantic-color-surface-canvas)",
-          surface: "var(--aivo-semantic-color-surface-base)",
-          ink: "var(--aivo-semantic-color-text-primary)"
+          primary: "var(--aivo-color-interactive-primary-default)",
+          secondary: "var(--aivo-color-interactive-secondary-default)",
+          meadow: "var(--aivo-meadow-400)",
+          sunshine: "var(--aivo-sunshine-400)",
+          lavender: "var(--aivo-lavender-400)",
+          canvas: "var(--aivo-color-surface-canvas)",
+          surface: "var(--aivo-color-surface-base)",
+          ink: "var(--aivo-color-text-primary)"
         },
         // Inclusive-Warm sensory-mode-aware semantic tokens. These resolve
         // through CSS variables, so the same Tailwind class repaints itself
@@ -154,51 +169,62 @@ const preset = `module.exports = {
           "ink-muted": "var(--aivo-sensory-inkMuted)",
           border: "var(--aivo-sensory-border)",
           ring: "var(--aivo-sensory-ringFocus)",
-          // Brand scales (flat, sensory-independent)
+          // Brand scales (flat, sensory-independent). The flat
+          // aivoPurple / aivoTeal / aivoOrange palettes live under
+          // tokens.color.aivoPurple etc. The build spreads tokens.color
+          // into baseVars so they emit as --aivo-aivoPurple-N (no
+          // color- infix).
           purple: {
-            50:  "var(--aivo-color-aivoPurple-50)",
-            100: "var(--aivo-color-aivoPurple-100)",
-            200: "var(--aivo-color-aivoPurple-200)",
-            300: "var(--aivo-color-aivoPurple-300)",
-            400: "var(--aivo-color-aivoPurple-400)",
-            500: "var(--aivo-color-aivoPurple-500)",
-            600: "var(--aivo-color-aivoPurple-600)",
-            700: "var(--aivo-color-aivoPurple-700)",
-            800: "var(--aivo-color-aivoPurple-800)",
-            900: "var(--aivo-color-aivoPurple-900)",
-            950: "var(--aivo-color-aivoPurple-950)"
+            50:  "var(--aivo-aivoPurple-50)",
+            100: "var(--aivo-aivoPurple-100)",
+            200: "var(--aivo-aivoPurple-200)",
+            300: "var(--aivo-aivoPurple-300)",
+            400: "var(--aivo-aivoPurple-400)",
+            500: "var(--aivo-aivoPurple-500)",
+            600: "var(--aivo-aivoPurple-600)",
+            700: "var(--aivo-aivoPurple-700)",
+            800: "var(--aivo-aivoPurple-800)",
+            900: "var(--aivo-aivoPurple-900)",
+            950: "var(--aivo-aivoPurple-950)"
           },
           teal: {
-            50:  "var(--aivo-color-aivoTeal-50)",
-            100: "var(--aivo-color-aivoTeal-100)",
-            200: "var(--aivo-color-aivoTeal-200)",
-            300: "var(--aivo-color-aivoTeal-300)",
-            400: "var(--aivo-color-aivoTeal-400)",
-            500: "var(--aivo-color-aivoTeal-500)",
-            600: "var(--aivo-color-aivoTeal-600)",
-            700: "var(--aivo-color-aivoTeal-700)",
-            800: "var(--aivo-color-aivoTeal-800)",
-            900: "var(--aivo-color-aivoTeal-900)",
-            950: "var(--aivo-color-aivoTeal-950)"
+            50:  "var(--aivo-aivoTeal-50)",
+            100: "var(--aivo-aivoTeal-100)",
+            200: "var(--aivo-aivoTeal-200)",
+            300: "var(--aivo-aivoTeal-300)",
+            400: "var(--aivo-aivoTeal-400)",
+            500: "var(--aivo-aivoTeal-500)",
+            600: "var(--aivo-aivoTeal-600)",
+            700: "var(--aivo-aivoTeal-700)",
+            800: "var(--aivo-aivoTeal-800)",
+            900: "var(--aivo-aivoTeal-900)",
+            950: "var(--aivo-aivoTeal-950)"
           },
           orange: {
-            50:  "var(--aivo-color-aivoOrange-50)",
-            100: "var(--aivo-color-aivoOrange-100)",
-            200: "var(--aivo-color-aivoOrange-200)",
-            300: "var(--aivo-color-aivoOrange-300)",
-            400: "var(--aivo-color-aivoOrange-400)",
-            500: "var(--aivo-color-aivoOrange-500)",
-            600: "var(--aivo-color-aivoOrange-600)",
-            700: "var(--aivo-color-aivoOrange-700)",
-            800: "var(--aivo-color-aivoOrange-800)",
-            900: "var(--aivo-color-aivoOrange-900)",
-            950: "var(--aivo-color-aivoOrange-950)"
+            50:  "var(--aivo-aivoOrange-50)",
+            100: "var(--aivo-aivoOrange-100)",
+            200: "var(--aivo-aivoOrange-200)",
+            300: "var(--aivo-aivoOrange-300)",
+            400: "var(--aivo-aivoOrange-400)",
+            500: "var(--aivo-aivoOrange-500)",
+            600: "var(--aivo-aivoOrange-600)",
+            700: "var(--aivo-aivoOrange-700)",
+            800: "var(--aivo-aivoOrange-800)",
+            900: "var(--aivo-aivoOrange-900)",
+            950: "var(--aivo-aivoOrange-950)"
           },
-          // Universal status
-          success: "var(--aivo-color-status-success)",
-          warning: "var(--aivo-color-status-warning)",
-          error:   "var(--aivo-color-status-error)",
-          info:    "var(--aivo-color-status-info)",
+          // Universal status. The flat --aivo-status-{kind} form is
+          // what the build emits from tokens.color.status. The
+          // --aivo-color-feedback-{kind} semantic form exists too (from
+          // tokens.semantic.color.feedback) but resolves to a different
+          // palette tuned for the legacy semantic layer; we intentionally
+          // reach for the brand-scale status form here so bg-iw-success
+          // et al. read as the brand palette, not the semantic-layer
+          // palette.
+          success: "var(--aivo-status-success)",
+          warning: "var(--aivo-status-warning)",
+          error:   "var(--aivo-status-error)",
+          info:    "var(--aivo-status-info)",
           // Domain status (each has subtle / default / strong / on)
           mastery: {
             "emerging-subtle":   "var(--aivo-domain-mastery-emerging-subtle)",

@@ -9,21 +9,31 @@
 @config "../tailwind.config.cjs";
 
 @theme {
-  --color-aivo-ink: var(--aivo-semantic-color-text-primary);
-  --color-aivo-ink-soft: var(--aivo-semantic-color-text-secondary);
-  --color-aivo-muted: var(--aivo-semantic-color-text-muted);
-  --color-aivo-surface: var(--aivo-semantic-color-surface-base);
-  --color-aivo-surface-2: var(--aivo-semantic-color-surface-sunken);
-  --color-aivo-border: var(--aivo-semantic-color-border-default);
-  --color-aivo-primary: var(--aivo-semantic-color-interactive-primary-default);
-  --color-aivo-primary-fg: var(--aivo-semantic-color-text-onPrimary);
-  --color-aivo-primary-soft: var(--aivo-color-calmSky-100);
-  --color-aivo-accent: var(--aivo-color-sunshine-400);
-  --color-aivo-success: var(--aivo-semantic-color-feedback-success);
-  --color-aivo-warning: var(--aivo-semantic-color-feedback-warning);
-  --color-aivo-danger: var(--aivo-semantic-color-feedback-error);
-  --font-sans: var(--aivo-typography-fontFamily-body);
-  --font-display: var(--aivo-typography-fontFamily-display);
+  /* Base @aivo/brand var refs. The build emits semantic blocks (text,
+     surface, border, interactive, feedback) as `--aivo-color-{group}-...`
+     and brand-scale palettes as flat `--aivo-{name}-{step}` — no
+     `--aivo-semantic-*` and no `--aivo-color-{palette}-` infix exists.
+     Earlier versions of this file referenced `--aivo-semantic-*` /
+     `--aivo-typography-fontFamily-*` / `--aivo-color-calmSky-*` —
+     none of those vars are ever defined, so the values below were
+     silently unset until each per-role-theme block (further down)
+     overrode them with literal OKLCH values. The refs below are the
+     real names that resolve in dist/css/tokens.css. */
+  --color-aivo-ink: var(--aivo-color-text-primary);
+  --color-aivo-ink-soft: var(--aivo-color-text-secondary);
+  --color-aivo-muted: var(--aivo-color-text-muted);
+  --color-aivo-surface: var(--aivo-color-surface-base);
+  --color-aivo-surface-2: var(--aivo-color-surface-sunken);
+  --color-aivo-border: var(--aivo-color-border-default);
+  --color-aivo-primary: var(--aivo-color-interactive-primary-default);
+  --color-aivo-primary-fg: var(--aivo-color-text-onPrimary);
+  --color-aivo-primary-soft: var(--aivo-calmSky-100);
+  --color-aivo-accent: var(--aivo-sunshine-400);
+  --color-aivo-success: var(--aivo-color-feedback-success);
+  --color-aivo-warning: var(--aivo-color-feedback-warning);
+  --color-aivo-danger: var(--aivo-color-feedback-error);
+  --font-sans: var(--aivo-fontFamily-body);
+  --font-display: var(--aivo-fontFamily-display);
   --radius-card: var(--aivo-radius-xl);
   /* Sidebar/page chrome — overridden per role theme. */
   --color-aivo-sidebar-bg: var(--color-aivo-surface);
