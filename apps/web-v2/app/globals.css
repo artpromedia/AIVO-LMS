@@ -83,27 +83,31 @@ body {
   --radius-card: 16px;
 }
 
-/* LEARNER — playful, kid-safe, neurodiversity-aware. Bigger radius, brighter
-   sunny primary, larger base font, Fredoka used everywhere for friendliness,
-   higher-contrast surface. One-task density. */
+/* LEARNER — Aivo Learning EdTech-friendly. Indigo primary, white chrome,
+   pastel category accents, large card radius (28px), 1.75rem card padding.
+   Matches the SensoryAdaptive reference: warm whitespace, soft borders,
+   indigo primary on a near-white canvas with a white sidebar (not a
+   color-flooded one). One-task density. */
 [data-theme="learner"] {
-  --color-aivo-ink: oklch(0.18 0.05 280);
-  --color-aivo-surface: oklch(0.995 0.01 240);
-  --color-aivo-surface-2: oklch(0.96 0.04 230);
-  --color-aivo-border: oklch(0.88 0.04 240);
-  --color-aivo-primary: oklch(0.65 0.22 30);
-  --color-aivo-primary-soft: oklch(0.93 0.08 30);
-  --color-aivo-accent: oklch(0.78 0.18 145);
-  --color-aivo-page-bg: oklch(0.96 0.04 230);
-  --color-aivo-sidebar-bg: oklch(0.65 0.22 30);
-  --color-aivo-sidebar-fg: oklch(0.99 0.01 30);
-  --color-aivo-sidebar-muted: oklch(0.95 0.05 30 / 0.85);
-  --color-aivo-sidebar-border: oklch(0.55 0.22 30);
+  --color-aivo-ink: oklch(0.22 0.07 280);
+  --color-aivo-ink-soft: oklch(0.42 0.05 280);
+  --color-aivo-muted: oklch(0.56 0.03 280);
+  --color-aivo-surface: oklch(1 0 0);
+  --color-aivo-surface-2: oklch(0.985 0.005 280);
+  --color-aivo-border: oklch(0.92 0.01 280);
+  --color-aivo-primary: oklch(0.54 0.25 278);
+  --color-aivo-primary-soft: oklch(0.96 0.04 278);
+  --color-aivo-accent: oklch(0.78 0.16 348);
+  --color-aivo-page-bg: oklch(0.985 0.005 280);
+  --color-aivo-sidebar-bg: oklch(1 0 0);
+  --color-aivo-sidebar-fg: oklch(0.22 0.07 280);
+  --color-aivo-sidebar-muted: oklch(0.56 0.03 280);
+  --color-aivo-sidebar-border: oklch(0.92 0.01 280);
   --font-sans: "Satoshi Variable", "Satoshi", "Inter", ui-sans-serif, system-ui, sans-serif;
   --radius-card: 28px;
   --aivo-density-card-pad: 1.75rem;
   --aivo-density-base-font: 1.0625rem;
-  --aivo-density-h1-font: 2.25rem;
+  --aivo-density-h1-font: 2.5rem;
 }
 
 [data-age-mode="sprout"] {

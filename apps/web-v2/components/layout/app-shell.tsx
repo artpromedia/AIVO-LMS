@@ -61,16 +61,24 @@ export function AppShell({
   navItems,
   user,
   children,
+  variant = "standard",
 }: {
   role: string;
   roleLabel: string;
   navItems: RoleNavItem[];
   user: { displayName: string; email: string };
   children: React.ReactNode;
+  /**
+   * `immersive` hides the nav rail so the page can render its own
+   * workspace rail (used by the SensoryAdaptive learner home, where
+   * the rail is a sensory-preferences panel rather than nav).
+   */
+  variant?: "standard" | "immersive";
 }) {
   const theme = roleToTheme(role);
   const chrome = THEME_CHROME[theme];
   const isDarkSidebar = chrome.sidebarTone === "dark";
+  const immersive = variant === "immersive";
 
   return (
     <div data-role-theme={theme} data-role={role} className="min-h-screen bg-iw-bg text-iw-ink">
@@ -132,10 +140,12 @@ export function AppShell({
 
       <div
         className={cn(
-          "mx-auto grid grid-cols-1 gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[260px_1fr]",
-          theme === "learner" ? "max-w-[1200px]" : "max-w-[1400px]",
+          "mx-auto grid grid-cols-1 gap-6 px-4 py-6 sm:px-6",
+          !immersive && "lg:grid-cols-[260px_1fr]",
+          theme === "learner" ? "max-w-[1280px]" : "max-w-[1400px]",
         )}
       >
+        {immersive ? null : (
         <aside
           aria-label={`${roleLabel} navigation`}
           className={cn(
@@ -197,6 +207,7 @@ export function AppShell({
             </form>
           </div>
         </aside>
+        )}
 
         <main id="main" data-role={role} className="min-w-0">
           {children}
