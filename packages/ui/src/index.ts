@@ -21,4 +21,5 @@ export * from "./assessment";
 export * from "./baseline";
 export * from "./learner-home";
 export * from "./tutor";
+export * from "./homework";
 export * from "./utils";

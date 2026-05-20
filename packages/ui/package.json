@@ -59,6 +59,10 @@
       "types": "./dist/tutor/index.d.ts",
       "import": "./dist/tutor/index.js"
     },
+    "./homework": {
+      "types": "./dist/homework/index.d.ts",
+      "import": "./dist/homework/index.js"
+    },
     "./utils": {
       "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils/index.js"
