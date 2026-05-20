@@ -73,13 +73,16 @@ body {
    other will silently stop applying.
    ===================================================================== */
 
-/* PARENT — warm, calm, trustworthy. Slight cream tint, current primary,
-   gentler page background. Closest to the original AIVO look. */
+/* PARENT — warm, calm, trustworthy. Slight cream tint for the page
+   chrome, violet primary, soft violet (NOT peach) for active states so
+   the active nav pill harmonizes with the primary CTA color instead of
+   clashing with it. Peach is preserved as the accent for warm moments
+   (rewards, milestones), not as the active-state surface. */
 [data-role-theme="parent"] {
   --color-aivo-surface: oklch(0.995 0.008 80);
   --color-aivo-surface-2: oklch(0.965 0.018 75);
   --color-aivo-primary: oklch(0.56 0.14 265);
-  --color-aivo-primary-soft: oklch(0.94 0.04 75);
+  --color-aivo-primary-soft: oklch(0.95 0.035 280);
   --color-aivo-accent: oklch(0.74 0.16 55);
   --color-aivo-page-bg: oklch(0.965 0.018 75);
   --color-aivo-sidebar-bg: oklch(0.99 0.012 75);

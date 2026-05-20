@@ -112,14 +112,13 @@ export function AppShell({
             />
           </Link>
 
-          <span
-            className="hidden text-[10px] font-semibold uppercase tracking-[0.16em] text-iw-ink-muted sm:inline"
-            aria-hidden
-          >
-            · {chrome.eyebrow}
-          </span>
+          {/* The `· Family workspace` eyebrow was previously rendered here.
+              Removed in the design pass: the sidebar already labels the
+              role and the user chip already shows the role label. Three
+              role badges on one bar was the worst kind of redundant
+              chrome — visually loud, informationally empty. */}
 
-          <div className="ml-auto flex items-center gap-3">
+          <div className="ml-auto flex items-center gap-2 sm:gap-3">
             {immersive ? null : <SensoryModeToggle size="sm" />}
             <span className="hidden text-right sm:block">
               <span className="block text-sm font-semibold leading-tight text-iw-ink">
@@ -129,7 +128,7 @@ export function AppShell({
             </span>
             <span
               aria-hidden
-              className="grid h-9 w-9 place-items-center rounded-full bg-iw-accent-soft text-sm font-bold text-iw-accent"
+              className="grid h-9 w-9 place-items-center rounded-full bg-iw-accent-soft text-sm font-bold text-iw-primary"
               title={user.displayName}
             >
               {user.displayName.charAt(0).toUpperCase()}
@@ -163,12 +162,11 @@ export function AppShell({
               : undefined
           }
         >
-          <p
-            className="px-2 pb-3 text-[10px] font-semibold uppercase tracking-[0.16em]"
-            style={isDarkSidebar ? { color: "var(--color-aivo-sidebar-muted)" } : undefined}
-          >
-            {roleLabel}
-          </p>
+          {/* The {roleLabel} eyebrow was previously rendered here.
+              Removed — the user chip in the top bar already shows the
+              role label, and the nav items themselves communicate
+              context. Saved ~28px of vertical chrome and one redundant
+              uppercase tag. */}
           <RoleNav items={navItems} ariaLabel={`${roleLabel} sections`} />
           <div
             className="mt-6 border-t pt-4"
