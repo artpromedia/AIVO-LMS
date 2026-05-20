@@ -139,8 +139,16 @@ body {
   --aivo-density-h1-font: 1.75rem;
 }
 
-[data-dyslexia-font="on"] {
+/* Dyslexia-friendly typeface mode. The learner workspace rail mirrors
+   the user's choice onto `<html data-typeface="standard|dyslexia">`.
+   Override every body-font variable (Tailwind `font-sans`, the
+   `font-iw-body` family, and the brand `--aivo-typography-fontFamily-body`
+   ramp) so any text reading from any of them lands on Atkinson
+   Hyperlegible / OpenDyslexic. */
+[data-typeface="dyslexia"] {
   --font-sans: var(--aivo-typography-fontFamily-dyslexia);
+  --font-aivo-body: var(--font-aivo-dyslexia);
+  --aivo-typography-fontFamily-body: var(--aivo-typography-fontFamily-dyslexia);
 }
 
 /* TEACHER — instructional, denser, more grayscale. Smaller radius, more
