@@ -120,7 +120,7 @@ export function AppShell({
           </span>
 
           <div className="ml-auto flex items-center gap-3">
-            <SensoryModeToggle size="sm" />
+            {immersive ? null : <SensoryModeToggle size="sm" />}
             <span className="hidden text-right sm:block">
               <span className="block text-sm font-semibold leading-tight text-iw-ink">
                 {user.displayName}
@@ -141,7 +141,7 @@ export function AppShell({
       <div
         className={cn(
           "mx-auto grid grid-cols-1 gap-6 px-4 py-6 sm:px-6",
-          !immersive && "lg:grid-cols-[260px_1fr]",
+          !immersive && "md:grid-cols-[240px_1fr] lg:grid-cols-[260px_1fr]",
           theme === "learner" ? "max-w-[1280px]" : "max-w-[1400px]",
         )}
       >
@@ -149,7 +149,7 @@ export function AppShell({
         <aside
           aria-label={`${roleLabel} navigation`}
           className={cn(
-            "h-fit rounded-iw-card p-4 shadow-sm lg:sticky lg:top-[88px]",
+            "h-fit rounded-iw-card p-4 shadow-sm md:sticky md:top-[88px]",
             isDarkSidebar
               ? "border border-[color:var(--color-aivo-sidebar-border)]"
               : "border border-iw-border bg-iw-card",

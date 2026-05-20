@@ -5,7 +5,6 @@ import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Settings } from "lucide-react";
 import { ROLE_LABEL } from "@/lib/auth/types";
 import {
@@ -17,6 +16,8 @@ import {
 } from "@/components/ui/select";
 import { SensoryModeToggle } from "@/components/system/sensory-mode-provider";
 import { SENSORY_MODE_LABELS, SENSORY_MODES } from "@/lib/sensory-mode/constants";
+import { A11yPreferencesToggles } from "@/components/system/a11y-preferences-toggles";
+import { readTypefaceFromCookies, readReducedMotionFromCookies } from "@/lib/a11y/server";
 
 const NAV = [
   {
@@ -29,6 +30,9 @@ const NAV = [
 export default async function AccessibilitySettings() {
   const session = await readMockSessionFromCookies();
   if (!session) redirect("/login");
+
+  const typeface = await readTypefaceFromCookies();
+  const reducedMotion = await readReducedMotionFromCookies();
 
   return (
     <AppShell
@@ -113,21 +117,10 @@ export default async function AccessibilitySettings() {
               ))}
             </RadioGroup>
           </fieldset>
-          <fieldset className="flex flex-col gap-2">
-            <Label>Other</Label>
-            {[
-              { id: "high-contrast", label: "High contrast" },
-              { id: "reduce-motion", label: "Reduce motion" },
-              { id: "read-aloud", label: "Read aloud by default" },
-              { id: "dyslexia-font", label: "Dyslexia-friendly font (OpenDyslexic)" },
-              { id: "captions", label: "Always show captions" },
-            ].map((opt) => (
-              <label key={opt.id} className="flex items-center gap-3 text-sm">
-                <Checkbox id={opt.id} />
-                {opt.label}
-              </label>
-            ))}
-          </fieldset>
+          <A11yPreferencesToggles
+            initialTypeface={typeface}
+            initialReducedMotion={reducedMotion}
+          />
           <fieldset className="grid gap-2 sm:max-w-md">
             <Label>Language</Label>
             <Select defaultValue="en-US">

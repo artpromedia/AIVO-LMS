@@ -34,7 +34,17 @@ export function AuthShell({ brand, footer, children, className }: AuthShellProps
         className,
       )}
     >
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[minmax(0,520px)_minmax(0,1fr)]">
+      <div
+        className={cn(
+          "flex-1 grid grid-cols-1",
+          // Only allocate a 520px brand-rail column when a brand panel
+          // is actually provided. Without this guard the grid still
+          // reserved 520px on the left even when the aside was null,
+          // pinning every brand-less step to a narrow left column on
+          // desktop instead of centering it in the viewport.
+          brand ? "lg:grid-cols-[minmax(0,520px)_minmax(0,1fr)]" : "",
+        )}
+      >
         {brand ? (
           <aside
             className={cn(

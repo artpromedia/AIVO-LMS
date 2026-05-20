@@ -40,12 +40,12 @@ const SIZE_MAP: Record<TutorAvatarSize, string> = {
 };
 
 const TONE_MAP: Record<TutorAvatarTone, string> = {
-  lavender: "bg-[var(--aivo-color-lavender-100)]",
-  mint: "bg-[var(--aivo-color-meadow-100)]",
-  peach: "bg-[var(--aivo-color-aivoOrange-100)]",
-  coral: "bg-[var(--aivo-color-sunriseCoral-100)]",
-  sunshine: "bg-[var(--aivo-color-sunshine-100)]",
-  sky: "bg-[var(--aivo-color-calmSky-100)]",
+  lavender: "bg-[var(--aivo-lavender-100)]",
+  mint: "bg-[var(--aivo-meadow-100)]",
+  peach: "bg-[var(--aivo-aivoOrange-100)]",
+  coral: "bg-[var(--aivo-sunriseCoral-100)]",
+  sunshine: "bg-[var(--aivo-sunshine-100)]",
+  sky: "bg-[var(--aivo-calmSky-100)]",
 };
 
 export function TutorAvatar({

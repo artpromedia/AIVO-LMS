@@ -53,32 +53,34 @@ export default async function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-[var(--aivo-color-surface-canvas,#fdf6ec)] text-slate-900">
+    <div className="min-h-screen bg-white text-slate-900">
       <StickyHeader initialSensoryMode={sensoryMode} />
 
       <main>
-        {/* Hero */}
+        {/* Hero — Modern SaaS: cool gradient field, no rotations, tighter
+            type, restrained shadow. Replaces the warm peach blob backdrop
+            with a soft indigo→sky gradient lit from the top-right. */}
         <section className="pt-20 pb-24 md:pt-24 md:pb-32 overflow-hidden relative">
           <div
-            className="absolute top-0 right-0 -translate-y-12 translate-x-1/3 w-[600px] h-[600px] rounded-full blur-3xl -z-10"
-            style={{ backgroundColor: "rgba(255, 207, 159, 0.35)" }}
+            className="absolute top-0 right-0 -translate-y-16 translate-x-1/4 w-[640px] h-[640px] rounded-full blur-3xl -z-10"
+            style={{ backgroundColor: "rgba(124, 58, 237, 0.10)" }}
             aria-hidden="true"
           />
           <div
-            className="absolute bottom-0 left-0 translate-y-1/3 -translate-x-1/4 w-[500px] h-[500px] rounded-full blur-3xl -z-10"
-            style={{ backgroundColor: "rgba(124, 58, 237, 0.08)" }}
+            className="absolute bottom-0 left-0 translate-y-1/3 -translate-x-1/3 w-[520px] h-[520px] rounded-full blur-3xl -z-10"
+            style={{ backgroundColor: "rgba(59, 130, 246, 0.06)" }}
             aria-hidden="true"
           />
 
           <div className="max-w-6xl mx-auto px-6 md:px-8 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div className="max-w-2xl relative z-10">
-              <span className="inline-flex items-center gap-2 mb-7 py-2 px-4 rounded-full border border-purple-200 bg-white/70 text-[var(--aivo-sensory-primary,#7c3aed)] font-semibold text-sm shadow-sm backdrop-blur">
-                <ShieldCheck className="w-4 h-4" aria-hidden="true" />
+              <span className="inline-flex items-center gap-2 mb-7 py-1.5 px-3.5 rounded-full border border-slate-200 bg-white text-slate-700 font-semibold text-xs tracking-wide uppercase">
+                <ShieldCheck className="w-3.5 h-3.5 text-[var(--aivo-sensory-primary,#7c3aed)]" aria-hidden="true" />
                 FERPA &amp; COPPA Compliant
               </span>
               <h1 className="font-heading text-4xl md:text-6xl font-bold tracking-tight leading-[1.05] mb-7 text-slate-900">
                 Learning that{" "}
-                <span className="relative inline-block px-2">
+                <span className="relative inline-block">
                   <span
                     className="relative z-10 bg-clip-text text-transparent"
                     style={{
@@ -87,11 +89,6 @@ export default async function Home() {
                   >
                     adapts
                   </span>
-                  <span
-                    className="absolute bottom-1.5 left-0 w-full h-3 md:h-4 -rotate-2 rounded-lg -z-0"
-                    style={{ backgroundColor: "rgba(196, 181, 253, 0.55)" }}
-                    aria-hidden="true"
-                  />
                 </span>{" "}
                 to your child.
               </h1>
@@ -100,19 +97,19 @@ export default async function Home() {
                 cognitive profiles. We build a personalized &ldquo;brain-clone&rdquo; that models
                 how your K-8 child learns best.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <a
                   href={`${WEB_APP_URL}/signup?plan=family`}
-                  className="inline-flex items-center justify-center h-14 px-7 text-base rounded-full bg-[var(--aivo-sensory-primary,#7c3aed)] hover:opacity-90 text-white font-semibold shadow-lg shadow-purple-200 transition min-h-[44px]"
+                  className="inline-flex items-center justify-center h-12 px-6 text-[15px] rounded-xl bg-[var(--aivo-sensory-primary,#7c3aed)] hover:brightness-110 text-white font-semibold shadow-[0_6px_20px_-6px_rgba(124,58,237,0.45)] transition min-h-[44px]"
                 >
                   Start Family Trial
-                  <ArrowRight className="ml-2 w-5 h-5" aria-hidden="true" />
+                  <ArrowRight className="ml-2 w-4 h-4" aria-hidden="true" />
                 </a>
                 <Link
                   href="/for-districts"
-                  className="inline-flex items-center justify-center h-14 px-7 text-base rounded-full bg-white/60 border border-purple-200 hover:bg-white text-[var(--aivo-sensory-primary,#7c3aed)] font-semibold transition min-h-[44px]"
+                  className="inline-flex items-center justify-center h-12 px-6 text-[15px] rounded-xl bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-900 font-semibold transition min-h-[44px]"
                 >
-                  <Building2 className="w-5 h-5 mr-2" aria-hidden="true" />
+                  <Building2 className="w-4 h-4 mr-2" aria-hidden="true" />
                   For School Districts
                 </Link>
               </div>
@@ -134,8 +131,7 @@ export default async function Home() {
 
             <div className="relative">
               <div
-                className="absolute inset-0 rounded-[2.5rem] -rotate-2 scale-105 -z-10"
-                style={{ backgroundColor: "rgba(255, 207, 159, 0.4)" }}
+                className="absolute inset-0 rounded-[2rem] scale-[1.02] -z-10 bg-gradient-to-br from-indigo-100/50 via-white to-sky-100/40"
                 aria-hidden="true"
               />
               <Image
@@ -144,17 +140,19 @@ export default async function Home() {
                 width={720}
                 height={720}
                 priority
-                className="rounded-[2.5rem] shadow-2xl w-full object-cover border-4 border-white/60 rotate-1 transition-transform hover:rotate-0 duration-500 aspect-square"
+                className="rounded-[2rem] shadow-[0_30px_60px_-30px_rgba(15,23,42,0.30)] w-full object-cover border border-slate-200/60 aspect-square"
               />
 
               {/* Floating stat card */}
-              <div className="absolute -bottom-6 -left-4 md:-bottom-8 md:-left-8 w-64 md:w-72 rounded-3xl bg-white/95 backdrop-blur-md shadow-xl border border-white/60 p-5 flex items-start gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-[#dbeafe] flex items-center justify-center shrink-0">
-                  <LineChart className="w-6 h-6 text-[#1d4ed8]" aria-hidden="true" />
+              <div className="absolute -bottom-5 -left-4 md:-bottom-7 md:-left-7 w-64 md:w-72 rounded-2xl bg-white shadow-[0_20px_45px_-20px_rgba(15,23,42,0.25)] border border-slate-200/80 p-5 flex items-start gap-4">
+                <div className="w-11 h-11 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
+                  <LineChart className="w-5 h-5 text-indigo-600" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-slate-500 mb-1">Focus Duration</p>
-                  <p className="text-2xl md:text-3xl font-bold tracking-tight text-[#1d4ed8]">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">
+                    Focus Duration
+                  </p>
+                  <p className="text-2xl md:text-3xl font-bold tracking-tight text-indigo-600 tabular-nums">
                     +47.2%
                   </p>
                   <p className="text-xs font-medium text-slate-500 mt-1">
@@ -166,29 +164,30 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Research banner */}
+        {/* Research banner — uniform type, lower opacity, tighter spacing
+            for the Modern-SaaS logo-wall pattern. */}
         <section
-          className="py-12 border-y border-slate-200/70 bg-white/40"
+          className="py-14 border-y border-slate-200/70"
           aria-labelledby="research-heading"
         >
           <div className="max-w-6xl mx-auto px-6 md:px-8">
             <h2
               id="research-heading"
-              className="text-center text-sm font-bold tracking-widest text-slate-500 uppercase mb-8"
+              className="text-center text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase mb-8"
             >
               Methodology Built on Research From
             </h2>
-            <div className="flex flex-wrap justify-center gap-10 md:gap-20 opacity-60">
-              <span className="font-serif text-xl md:text-2xl font-bold text-slate-700">
+            <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-4 md:gap-x-20 text-slate-700/70">
+              <span className="font-heading text-base md:text-lg font-semibold tracking-tight">
                 Stanford University
               </span>
-              <span className="font-serif text-xl md:text-2xl font-bold text-slate-700">
+              <span className="font-heading text-base md:text-lg font-semibold tracking-tight">
                 MIT Media Lab
               </span>
-              <span className="font-sans text-xl md:text-2xl font-black uppercase tracking-tighter text-slate-700">
+              <span className="font-heading text-base md:text-lg font-semibold tracking-tight">
                 CAST
               </span>
-              <span className="font-serif text-xl md:text-2xl font-bold italic text-slate-700">
+              <span className="font-heading text-base md:text-lg font-semibold tracking-tight">
                 Johns Hopkins
               </span>
             </div>
@@ -200,8 +199,7 @@ export default async function Home() {
           <div className="max-w-6xl mx-auto px-6 md:px-8 grid md:grid-cols-2 gap-16 md:gap-20 items-center">
             <div className="relative order-2 md:order-1">
               <div
-                className="absolute inset-0 rounded-[3rem] transform -rotate-3 scale-105 -z-10"
-                style={{ backgroundColor: "rgba(255, 207, 159, 0.35)" }}
+                className="absolute inset-0 rounded-[2rem] scale-[1.02] -z-10 bg-gradient-to-br from-sky-100/40 via-white to-indigo-100/40"
                 aria-hidden="true"
               />
               <Image
@@ -209,7 +207,7 @@ export default async function Home() {
                 alt="A child learning on a tablet with the AIVO interface"
                 width={640}
                 height={640}
-                className="rounded-[2.5rem] shadow-xl w-full object-cover border-4 border-white aspect-square"
+                className="rounded-[2rem] shadow-[0_30px_60px_-30px_rgba(15,23,42,0.25)] w-full object-cover border border-slate-200/60 aspect-square"
               />
             </div>
             <div className="order-1 md:order-2">
@@ -228,14 +226,14 @@ export default async function Home() {
                 to any mind.
               </p>
 
-              <ul className="space-y-7">
+              <ul className="space-y-6">
                 {heroFeatures.map((feature) => (
-                  <li key={feature.title} className="flex gap-5">
-                    <div className="mt-1 bg-amber-100/70 p-3 rounded-2xl h-fit">
-                      <CheckCircle2 className="w-6 h-6 text-amber-700" aria-hidden="true" />
+                  <li key={feature.title} className="flex gap-4">
+                    <div className="mt-0.5 bg-indigo-50 p-2.5 rounded-xl h-fit shrink-0">
+                      <CheckCircle2 className="w-5 h-5 text-indigo-600" aria-hidden="true" />
                     </div>
                     <div>
-                      <h3 className="font-heading font-bold text-xl mb-1 text-slate-900">
+                      <h3 className="font-heading font-bold text-lg mb-1 text-slate-900">
                         {feature.title}
                       </h3>
                       <p className="text-slate-600 font-medium">{feature.desc}</p>
@@ -247,81 +245,74 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Testimonials */}
-        <section className="py-24 md:py-32 bg-white/50" aria-labelledby="testimonials-heading">
+        {/* Testimonials — Modern SaaS quote layout: tight cards, drop the
+            sticky-note underline, slate-only chrome with one accent color
+            for the stars. */}
+        <section className="py-24 md:py-32 bg-slate-50/60 border-y border-slate-200/70" aria-labelledby="testimonials-heading">
           <div className="max-w-6xl mx-auto px-6 md:px-8">
-            <div className="flex flex-col items-center text-center mb-16 md:mb-20">
-              <span className="mb-5 py-1.5 px-4 rounded-full bg-amber-100/70 text-amber-900 text-sm font-semibold">
+            <div className="flex flex-col items-center text-center mb-14 md:mb-16">
+              <span className="mb-5 py-1 px-3 rounded-full bg-white border border-slate-200 text-slate-700 text-[11px] font-semibold tracking-wide uppercase">
                 Family Evidence
               </span>
               <h2
                 id="testimonials-heading"
-                className="font-heading text-3xl md:text-5xl font-bold text-slate-900"
+                className="font-heading text-3xl md:text-5xl font-bold text-slate-900 tracking-tight"
               >
-                The relief of feeling{" "}
-                <span className="relative inline-block px-1">
-                  <span className="relative z-10">understood</span>
-                  <span
-                    className="absolute bottom-1 left-0 w-full h-3 rounded-lg -z-0"
-                    style={{ backgroundColor: "rgba(255, 207, 159, 0.6)" }}
-                    aria-hidden="true"
-                  />
-                </span>
-                .
+                The relief of feeling understood.
               </h2>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8 md:gap-10 max-w-6xl mx-auto">
-              <article className="bg-white border border-slate-200/60 shadow-lg rounded-[2.5rem] p-8 md:p-10">
-                <div className="flex gap-1.5 mb-6" role="img" aria-label="5 star rating">
+            <div className="grid md:grid-cols-2 gap-6 md:gap-8 max-w-6xl mx-auto">
+              <article className="bg-white border border-slate-200 shadow-[0_2px_8px_-2px_rgba(15,23,42,0.06)] rounded-2xl p-8 md:p-10">
+                <div className="flex gap-1 mb-6" role="img" aria-label="5 star rating">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className="w-5 h-5 fill-amber-400 text-amber-400"
+                      className="w-4 h-4 fill-amber-400 text-amber-400"
                       aria-hidden="true"
                     />
                   ))}
                 </div>
-                <p className="text-lg md:text-xl mb-8 leading-relaxed font-medium text-slate-700">
+                <p className="text-base md:text-lg mb-8 leading-relaxed font-medium text-slate-700">
                   &ldquo;My 8-year-old has profound ADHD and dyslexia. Every other app felt like
                   a slot machine — too loud, too fast. AIVO is the first platform that slows down
                   when he gets overwhelmed. It&apos;s not just a learning app, it&apos;s a
                   regulated environment.&rdquo;
                 </p>
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-amber-100 flex items-center justify-center font-bold text-lg text-amber-800">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center font-bold text-sm text-slate-700">
                     S.T.
                   </div>
                   <div>
-                    <p className="font-bold text-lg text-slate-900">Sarah T.</p>
-                    <p className="font-medium text-slate-500">Parent of 2</p>
+                    <p className="font-bold text-slate-900">Sarah T.</p>
+                    <p className="text-sm font-medium text-slate-500">Parent of 2</p>
                   </div>
                 </div>
               </article>
 
-              <article className="bg-white border border-slate-200/60 shadow-lg rounded-[2.5rem] p-8 md:p-10">
-                <div className="flex gap-1.5 mb-6" role="img" aria-label="5 star rating">
+              <article className="bg-white border border-slate-200 shadow-[0_2px_8px_-2px_rgba(15,23,42,0.06)] rounded-2xl p-8 md:p-10">
+                <div className="flex gap-1 mb-6" role="img" aria-label="5 star rating">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className="w-5 h-5 fill-amber-400 text-amber-400"
+                      className="w-4 h-4 fill-amber-400 text-amber-400"
                       aria-hidden="true"
                     />
                   ))}
                 </div>
-                <p className="text-lg md:text-xl mb-8 leading-relaxed font-medium text-slate-700">
+                <p className="text-base md:text-lg mb-8 leading-relaxed font-medium text-slate-700">
                   &ldquo;We use the &lsquo;Calm&rsquo; sensory mode exclusively. For an autistic
                   learner, removing the visual clutter isn&apos;t a nice-to-have, it&apos;s the
                   difference between learning and melting down. The data tracking for his IEP is
                   phenomenal.&rdquo;
                 </p>
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-purple-100 flex items-center justify-center font-bold text-lg text-[var(--aivo-sensory-primary,#7c3aed)]">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-full bg-indigo-50 flex items-center justify-center font-bold text-sm text-indigo-700">
                     M.R.
                   </div>
                   <div>
-                    <p className="font-bold text-lg text-slate-900">Dr. Marcus R.</p>
-                    <p className="font-medium text-slate-500">
+                    <p className="font-bold text-slate-900">Dr. Marcus R.</p>
+                    <p className="text-sm font-medium text-slate-500">
                       Special Education Director &amp; Parent
                     </p>
                   </div>
@@ -331,40 +322,41 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* CTA card */}
+        {/* CTA card — refined: tighter radius, gradient overlay, the
+            secondary action is a clean inverted button (white-on-indigo)
+            and the photo isn't rotated. */}
         <section className="py-24 md:py-32" aria-labelledby="cta-heading">
           <div className="max-w-6xl mx-auto px-6 md:px-8">
             <div
-              className="text-white shadow-2xl rounded-[2.5rem] md:rounded-[3rem] overflow-hidden border-0 relative"
-              style={{ backgroundColor: "var(--aivo-sensory-primary, #7c3aed)" }}
+              className="text-white shadow-[0_30px_80px_-30px_rgba(76,29,149,0.45)] rounded-3xl md:rounded-[2rem] overflow-hidden border-0 relative bg-gradient-to-br from-[var(--aivo-sensory-primary,#7c3aed)] to-indigo-800"
             >
               <div
                 className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"
-                style={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+                style={{ backgroundColor: "rgba(255, 255, 255, 0.10)" }}
                 aria-hidden="true"
               />
               <div className="relative z-10 grid md:grid-cols-2">
                 <div className="p-10 md:p-16 lg:p-20 flex flex-col justify-center">
                   <h2
                     id="cta-heading"
-                    className="font-heading text-3xl md:text-5xl font-bold mb-6 leading-tight"
+                    className="font-heading text-3xl md:text-5xl font-bold mb-6 leading-tight tracking-tight"
                   >
                     Ready to clone their brilliance?
                   </h2>
-                  <p className="text-white mb-9 text-lg md:text-xl font-medium leading-relaxed">
+                  <p className="text-white/85 mb-9 text-base md:text-lg font-medium leading-relaxed">
                     Start with a comprehensive baseline assessment. No credit card required for
                     the first 14 days.
                   </p>
-                  <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex flex-col sm:flex-row gap-3">
                     <a
                       href={`${WEB_APP_URL}/signup?plan=family`}
-                      className="inline-flex items-center justify-center h-14 bg-amber-300 text-amber-900 hover:bg-amber-200 rounded-full text-base font-bold shadow-lg px-7 min-h-[44px] transition"
+                      className="inline-flex items-center justify-center h-12 bg-white text-[var(--aivo-sensory-primary,#7c3aed)] hover:bg-slate-50 rounded-xl text-[15px] font-bold px-6 min-h-[44px] transition"
                     >
                       Start Family Trial
                     </a>
                     <Link
                       href="/for-districts"
-                      className="inline-flex items-center justify-center h-14 text-white border border-white/40 hover:bg-white/10 rounded-full text-base font-semibold px-7 min-h-[44px] transition"
+                      className="inline-flex items-center justify-center h-12 text-white border border-white/30 hover:bg-white/10 rounded-xl text-[15px] font-semibold px-6 min-h-[44px] transition"
                     >
                       Talk to District Sales
                     </Link>
@@ -376,7 +368,7 @@ export default async function Home() {
                     alt="A parent and child learning together on a sofa"
                     width={560}
                     height={560}
-                    className="w-full max-w-md object-cover drop-shadow-2xl rounded-[2rem] -rotate-3 aspect-square"
+                    className="w-full max-w-md object-cover rounded-2xl shadow-[0_30px_60px_-20px_rgba(0,0,0,0.4)] aspect-square"
                   />
                 </div>
               </div>
