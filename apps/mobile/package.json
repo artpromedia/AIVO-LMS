@@ -19,6 +19,7 @@
     "@aivo/billing-entitlements": "workspace:*",
     "@aivo/brand": "workspace:*",
     "@aivo/mobile-ui": "workspace:*",
+    "@aivo/nav": "workspace:*",
     "@expo/metro-runtime": "~6.1.0",
     "@expo/vector-icons": "^15.0.3",
     "@react-native-async-storage/async-storage": "^3.0.2",
