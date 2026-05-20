@@ -4,6 +4,7 @@ import "./globals.css";
 import { PlayfulCalmProvider } from "@/components/system/playful-calm-provider";
 import { SensoryModeProvider } from "@/components/system/sensory-mode-provider";
 import { readSensoryModeFromCookies } from "@/lib/sensory-mode/server";
+import { readTypefaceFromCookies, readReducedMotionFromCookies } from "@/lib/a11y/server";
 
 // AIVO design language typography.
 //   - Body: Inter (via next/font/google, self-hosted).
@@ -50,9 +51,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // any signed-in page). The client provider keeps this in sync going
   // forward and mirrors changes back to the cookie.
   const sensoryMode = await readSensoryModeFromCookies();
+  const typeface = await readTypefaceFromCookies();
+  const reducedMotion = await readReducedMotionFromCookies();
 
   return (
-    <html lang="en" data-sensory-mode={sensoryMode} data-brand="inclusive-warm">
+    <html
+      lang="en"
+      data-sensory-mode={sensoryMode}
+      data-typeface={typeface}
+      data-reduced-motion={reducedMotion}
+      data-brand="inclusive-warm"
+    >
       <head>
         {/* Satoshi Variable from Fontshare — the AIVO display face.
             Defined as the first family in `--aivo-typography-fontFamily-display`

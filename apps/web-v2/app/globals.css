@@ -139,16 +139,32 @@ body {
   --aivo-density-h1-font: 1.75rem;
 }
 
-/* Dyslexia-friendly typeface mode. The learner workspace rail mirrors
-   the user's choice onto `<html data-typeface="standard|dyslexia">`.
-   Override every body-font variable (Tailwind `font-sans`, the
-   `font-iw-body` family, and the brand `--aivo-typography-fontFamily-body`
-   ramp) so any text reading from any of them lands on Atkinson
-   Hyperlegible / OpenDyslexic. */
+/* Dyslexia-friendly typeface mode. The learner workspace rail and the
+   accessibility-settings page mirror the user's choice onto
+   `<html data-typeface="standard|dyslexia">` (also persisted to the
+   `aivo.typeface` cookie so the root layout can SSR the attribute and
+   avoid font-swap flash on first paint). Override every body-font
+   variable (Tailwind `font-sans`, the `font-iw-body` family, and the
+   brand `--aivo-typography-fontFamily-body` ramp) so any text reading
+   from any of them lands on Atkinson Hyperlegible / OpenDyslexic. */
 [data-typeface="dyslexia"] {
   --font-sans: var(--aivo-typography-fontFamily-dyslexia);
   --font-aivo-body: var(--font-aivo-dyslexia);
   --aivo-typography-fontFamily-body: var(--aivo-typography-fontFamily-dyslexia);
+}
+
+/* User-requested reduced motion. The OS-level `prefers-reduced-motion`
+   media query is already honored by @aivo/brand's motion tokens; this
+   rule adds a manual override (Accessibility settings page → "Reduce
+   motion" checkbox) for users whose OS preference is not set but who
+   still want a calmer experience. Mirrors the same effect on the page
+   root via `[data-reduced-motion="reduce"]`. */
+[data-reduced-motion="reduce"],
+[data-reduced-motion="reduce"] * {
+  animation-duration: 0ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0ms !important;
+  scroll-behavior: auto !important;
 }
 
 /* TEACHER — instructional, denser, more grayscale. Smaller radius, more

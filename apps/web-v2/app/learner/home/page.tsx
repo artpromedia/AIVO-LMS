@@ -37,6 +37,7 @@ import {
 } from "@aivo/ui/learner-dashboard";
 import { SubjectCard, MessageCard } from "@aivo/ui";
 import { LearnerWorkspaceRail } from "@/components/learner/learner-workspace-rail";
+import { readTypefaceFromCookies } from "@/lib/a11y/server";
 import { LEARNER_NAV } from "@/components/layout/role-shells";
 import {
   createLessonRun,
@@ -162,6 +163,7 @@ export default async function LearnerHome({
   const allSubjects = listSubjects();
   const { skillMasteries } = getMasteryMap(learnerId, session.tenantId);
   const iep = getIEPForLearner(learnerId, session.tenantId);
+  const typeface = await readTypefaceFromCookies();
 
   const subjectScore = new Map<string, { score: number; count: number }>();
   for (const sm of skillMasteries) {
@@ -238,6 +240,7 @@ export default async function LearnerHome({
           learnerName={displayName}
           initials={initials}
           approvalStatus="approved"
+          initialTypeface={typeface}
         />
 
         <div className="flex flex-col gap-6 min-w-0">

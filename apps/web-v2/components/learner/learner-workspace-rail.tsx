@@ -7,6 +7,7 @@ import {
   SensoryControlGroup,
 } from "@aivo/ui/learner-dashboard";
 import { useSensoryMode } from "@/components/system/sensory-mode-provider";
+import { setTypefaceCookie } from "@/lib/a11y/actions";
 import { Moon, Sun, Zap, VolumeX, Volume1, Volume2 } from "lucide-react";
 
 /**
@@ -24,6 +25,10 @@ export interface LearnerWorkspaceRailProps {
   learnerName: string;
   initials?: string;
   approvalStatus?: "approved" | "pending" | "review";
+  /** Hydrate the Font Style segmented control from the typeface cookie
+   *  so the rail and the /settings/accessibility page stay in lockstep
+   *  on first paint. Falls back to "standard" when not provided. */
+  initialTypeface?: "standard" | "dyslexia";
 }
 
 const moodOptions = [
@@ -53,19 +58,17 @@ export function LearnerWorkspaceRail({
   learnerName,
   initials,
   approvalStatus = "approved",
+  initialTypeface = "standard",
 }: LearnerWorkspaceRailProps) {
   const { mode, setMode } = useSensoryMode();
   const [spacing, setSpacing] = React.useState<(typeof spacingOptions)[number]["value"]>(
     "comfortable",
   );
   const [fontStyle, setFontStyle] = React.useState<(typeof fontStyleOptions)[number]["value"]>(
-    "standard",
+    initialTypeface,
   );
   const [sound, setSound] = React.useState<(typeof soundOptions)[number]["value"]>("soft");
 
-  // Reflect spacing on the root via data attribute so other components
-  // can respond. The CSS contract is opt-in (no required selector ships
-  // yet); this primes the experience for follow-up token wiring.
   React.useEffect(() => {
     if (typeof document !== "undefined") {
       document.documentElement.setAttribute("data-spacing", spacing);
@@ -75,6 +78,7 @@ export function LearnerWorkspaceRail({
     if (typeof document !== "undefined") {
       document.documentElement.setAttribute("data-typeface", fontStyle);
     }
+    void setTypefaceCookie(fontStyle);
   }, [fontStyle]);
 
   return (
