@@ -9,6 +9,15 @@ export default function AuthLayout() {
       <Stack.Screen name="forgot-password" />
       <Stack.Screen name="reset-password" />
       <Stack.Screen name="change-password" options={{ gestureEnabled: false }} />
+      <Stack.Screen
+        name="consent-sheet"
+        options={{ presentation: "modal", animation: "slide_from_bottom" }}
+      />
+      <Stack.Screen name="biometric-setup" />
+      <Stack.Screen
+        name="session-switch"
+        options={{ presentation: "modal", animation: "slide_from_bottom" }}
+      />
     </Stack>
   );
 }
