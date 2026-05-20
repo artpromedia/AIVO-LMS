@@ -296,23 +296,29 @@ const preset = `module.exports = {
           }
         }
       },
+      // Radius. The build flattens tokens.radius without a wrapping
+      // namespace, so values land as flat --aivo-{key} (--aivo-card,
+      // --aivo-control, --aivo-chip, etc.), NOT --aivo-radius-{key}.
+      // md/lg/xl/2xl are intentionally NOT remapped here because their
+      // var names collide with the breakpoint scale (--aivo-md = 768px,
+      // not 12px). Tailwind's built-in rounded-md / lg / xl / 2xl
+      // defaults cover those cases adequately; the iw-* entries below
+      // are the design-system additions.
       borderRadius: {
-        md: "var(--aivo-radius-md)",
-        lg: "var(--aivo-radius-lg)",
-        xl: "var(--aivo-radius-xl)",
-        "2xl": "var(--aivo-radius-2xl)",
-        pill: "var(--aivo-radius-pill)",
-        "iw-card": "var(--aivo-radius-card)",
-        "iw-card-lg": "var(--aivo-radius-cardLg)",
-        "iw-hero": "var(--aivo-radius-hero)",
-        "iw-control": "var(--aivo-radius-control)",
-        "iw-chip": "var(--aivo-radius-chip)",
-        "iw-sheet-top": "var(--aivo-radius-sheetTop)"
+        pill: "var(--aivo-pill)",
+        "iw-card": "var(--aivo-card)",
+        "iw-card-lg": "var(--aivo-cardLg)",
+        "iw-hero": "var(--aivo-hero)",
+        "iw-control": "var(--aivo-control)",
+        "iw-chip": "var(--aivo-chip)",
+        "iw-sheet-top": "var(--aivo-sheetTop)"
       },
+      // Shadow. Same flattening rule: emitted as --aivo-{key}, not
+      // --aivo-shadow-{key}.
       boxShadow: {
-        "soft-1": "var(--aivo-shadow-soft-1)",
-        "soft-3": "var(--aivo-shadow-soft-3)",
-        "soft-5": "var(--aivo-shadow-soft-5)"
+        "soft-1": "var(--aivo-soft-1)",
+        "soft-3": "var(--aivo-soft-3)",
+        "soft-5": "var(--aivo-soft-5)"
       },
       backgroundImage: {
         // Identity gradient (logo, email). Does NOT respond to sensory mode.
