@@ -8,6 +8,7 @@ import { TierThemeProvider, useTierTheme } from "@aivo/mobile-ui";
 import { SwitchScanOverlay } from "@/src/components/SwitchScanOverlay";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { RoleTabletShell } from "@/src/components/layout/RoleTabletShell";
+import { useTabBarStyle, TAB_BAR_LABEL_STYLE } from "@/hooks/useTabBarStyle";
 
 /**
  * Resolve the active learner's gradeLevel.
@@ -66,6 +67,11 @@ function ThemedLearnerTabs() {
   // the bottom bar UI is suppressed.
   const { isTablet } = useWindowSizeClass();
   const pathname = usePathname();
+  const tabBarStyle = useTabBarStyle({
+    hidden: isTablet,
+    backgroundColor: theme.colors.tabBar,
+    borderTopColor: theme.colors.border,
+  });
   const railDestinations = [
     {
       key: "worldMap",
@@ -119,7 +125,7 @@ function ThemedLearnerTabs() {
     {
       key: "settings",
       label: t("tabs.settings"),
-      icon: "settings-outline" as const,
+      icon: "settings" as const,
       active: pathname?.includes("/settings"),
       onPress: () => router.push("/(learner)/settings" as Href),
     },
@@ -131,19 +137,8 @@ function ThemedLearnerTabs() {
         headerShown: false,
         tabBarActiveTintColor: theme.colors.tabBarActive,
         tabBarInactiveTintColor: theme.colors.tabBarInactive,
-        tabBarStyle: isTablet
-          ? { display: "none" }
-          : {
-              backgroundColor: theme.colors.tabBar,
-              borderTopColor: theme.colors.border,
-              height: 84,
-              paddingBottom: 20,
-              paddingTop: 8,
-            },
-        tabBarLabelStyle: {
-          fontFamily: "Nunito-SemiBold",
-          fontSize: 11,
-        },
+        tabBarStyle,
+        tabBarLabelStyle: TAB_BAR_LABEL_STYLE,
         sceneStyle: {
           backgroundColor: theme.colors.bg,
         },

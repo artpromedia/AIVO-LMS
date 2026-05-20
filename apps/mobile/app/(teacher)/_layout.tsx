@@ -5,16 +5,18 @@ import { colors } from "@/constants/colors";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { RoleTabletShell } from "@/src/components/layout/RoleTabletShell";
+import { useTabBarStyle, TAB_BAR_LABEL_STYLE } from "@/hooks/useTabBarStyle";
 
 export default function TeacherLayout() {
   const { t } = useTranslation();
   const { isTablet } = useWindowSizeClass();
   const pathname = usePathname();
+  const tabBarStyle = useTabBarStyle({ hidden: isTablet });
   const railDestinations = [
     { key: "index", label: t("tabs.classroom"), icon: "school" as const, active: pathname === "/(teacher)" || pathname === "/" || pathname === "/(teacher)/index", onPress: () => router.push("/(teacher)" as Href) },
     { key: "lessonPlan", label: t("tabs.lessonPlans"), icon: "document-text" as const, active: pathname?.includes("/lesson-plan"), onPress: () => router.push("/(teacher)/lesson-plan" as Href) },
     { key: "analytics", label: t("tabs.analytics"), icon: "bar-chart" as const, active: pathname?.includes("/analytics"), onPress: () => router.push("/(teacher)/analytics" as Href) },
-    { key: "settings", label: t("tabs.settings"), icon: "settings-outline" as const, active: pathname?.includes("/settings"), onPress: () => router.push("/(teacher)/settings" as Href) },
+    { key: "settings", label: t("tabs.settings"), icon: "settings" as const, active: pathname?.includes("/settings"), onPress: () => router.push("/(teacher)/settings" as Href) },
   ];
   return (
     <RoleTabletShell destinations={railDestinations}>
@@ -23,16 +25,8 @@ export default function TeacherLayout() {
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textSecondary,
-        tabBarStyle: isTablet
-          ? { display: "none" }
-          : {
-              backgroundColor: colors.card,
-              borderTopColor: colors.border,
-              height: 84,
-              paddingBottom: 20,
-              paddingTop: 8,
-            },
-        tabBarLabelStyle: { fontFamily: "Nunito-SemiBold", fontSize: 11 },
+        tabBarStyle,
+        tabBarLabelStyle: TAB_BAR_LABEL_STYLE,
       }}
     >
       <Tabs.Screen
@@ -63,7 +57,7 @@ export default function TeacherLayout() {
         options={{
           title: t("tabs.settings"),
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="settings-outline" size={size} color={color} />
+            <Ionicons name="settings" size={size} color={color} />
           ),
         }}
       />

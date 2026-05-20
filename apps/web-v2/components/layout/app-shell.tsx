@@ -1,10 +1,17 @@
 import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { Menu } from "lucide-react";
 import { RoleNav, type RoleNavItem } from "@/components/layout/role-nav";
 import { logoutAction } from "@/lib/auth/actions";
 import { SensoryModePopover } from "@/components/system/sensory-mode-provider";
+import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import {
+  Drawer,
+  DrawerTrigger,
+  DrawerContent,
+} from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
 
 /**
@@ -41,14 +48,84 @@ const THEME_CHROME: Record<
 };
 
 /**
+ * Shared sidebar body. Rendered in two places:
+ *   - inline as a sticky `<aside>` on md+
+ *   - inside the mobile `<Drawer>` on small viewports.
+ * Keeps a single source of truth for navigation + user block.
+ */
+function SidebarBody({
+  navItems,
+  ariaLabel,
+  user,
+  isDarkSidebar,
+}: {
+  readonly navItems: RoleNavItem[];
+  readonly ariaLabel: string;
+  readonly user: { displayName: string; email: string };
+  readonly isDarkSidebar: boolean;
+}) {
+  return (
+    <>
+      <RoleNav items={navItems} ariaLabel={ariaLabel} />
+      <div
+        className="mt-6 flex flex-col gap-2 border-t pt-4"
+        style={{
+          borderColor: isDarkSidebar ? "var(--color-aivo-sidebar-border)" : undefined,
+        }}
+      >
+        <div className="flex items-center gap-3 px-2">
+          <Avatar name={user.displayName} size="md" />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold leading-tight">
+              {user.displayName}
+            </p>
+            <p
+              className="truncate text-xs leading-tight"
+              style={
+                isDarkSidebar ? { color: "var(--color-aivo-sidebar-muted)" } : undefined
+              }
+              title={user.email}
+            >
+              {user.email}
+            </p>
+          </div>
+        </div>
+        <div className="mt-1 flex flex-col gap-1">
+          <Button
+            asChild
+            variant="ghost"
+            size="sm"
+            className="h-8 justify-start px-2 text-xs font-medium"
+          >
+            <Link href="/settings/accessibility">Accessibility settings</Link>
+          </Button>
+          <form action={logoutAction}>
+            <Button
+              type="submit"
+              variant="ghost"
+              size="sm"
+              className="h-8 w-full justify-start px-2 text-xs font-medium"
+            >
+              Sign out
+            </Button>
+          </form>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/**
  * App shell for every signed-in dashboard.
  *
  * Layout:
  *   ┌──────────────────────────────────────────────────────────────┐
- *   │  Top bar: AIVO wordmark · eyebrow · sensory toggle · user    │
+ *   │  Top bar: ☰ · AIVO wordmark · sensory popover · user chip    │
+ *   │           (☰ visible only below md; opens the sidebar in a   │
+ *   │           drawer for one-handed phone / narrow-tablet use.)  │
  *   ├────────────┬─────────────────────────────────────────────────┤
  *   │  Sidebar   │  <main id="main">  …page content…  </main>      │
- *   │  RoleNav   │                                                 │
+ *   │  (md+)     │                                                 │
  *   └────────────┴─────────────────────────────────────────────────┘
  *
  * The Inclusive-Warm chrome is intentionally driven by `iw-*` Tailwind
@@ -80,6 +157,15 @@ export function AppShell({
   const chrome = THEME_CHROME[theme];
   const isDarkSidebar = chrome.sidebarTone === "dark";
   const immersive = variant === "immersive";
+  const navAriaLabel = `${roleLabel} sections`;
+  const _eyebrow = chrome.eyebrow; // retained for future header pass
+
+  const sidebarStyle = isDarkSidebar
+    ? {
+        background: "var(--color-aivo-sidebar-bg)",
+        color: "var(--color-aivo-sidebar-fg)",
+      }
+    : undefined;
 
   return (
     <div data-role-theme={theme} data-role={role} className="min-h-screen bg-iw-bg text-iw-ink">
@@ -94,10 +180,43 @@ export function AppShell({
       >
         <div
           className={cn(
-            "mx-auto flex h-16 items-center gap-4 px-4 sm:px-6",
+            "mx-auto flex h-16 items-center gap-2 px-4 sm:gap-4 sm:px-6",
             theme === "learner" ? "max-w-[1200px]" : "max-w-[1400px]",
           )}
         >
+          {/* Mobile-only nav trigger — opens the sidebar in a drawer.
+              Hidden on md+ where the sidebar is always visible. */}
+          {!immersive && (
+            <Drawer>
+              <DrawerTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="md:hidden -ml-2"
+                  aria-label={`Open ${roleLabel} navigation`}
+                >
+                  <Menu className="h-5 w-5" aria-hidden="true" />
+                </Button>
+              </DrawerTrigger>
+              <DrawerContent
+                side="left"
+                className={cn(
+                  "p-5",
+                  isDarkSidebar ? "" : "bg-iw-card",
+                )}
+                style={sidebarStyle}
+              >
+                <SidebarBody
+                  navItems={navItems}
+                  ariaLabel={navAriaLabel}
+                  user={user}
+                  isDarkSidebar={isDarkSidebar}
+                />
+              </DrawerContent>
+            </Drawer>
+          )}
+
           <Link
             href="/"
             aria-label="AIVO Learning home"
@@ -113,12 +232,6 @@ export function AppShell({
             />
           </Link>
 
-          {/* The `· Family workspace` eyebrow was previously rendered here.
-              Removed in the design pass: the sidebar already labels the
-              role and the user chip already shows the role label. Three
-              role badges on one bar was the worst kind of redundant
-              chrome — visually loud, informationally empty. */}
-
           <div className="ml-auto flex items-center gap-2 sm:gap-3">
             {immersive ? null : <SensoryModePopover />}
             <span className="hidden text-right sm:block">
@@ -127,13 +240,7 @@ export function AppShell({
               </span>
               <span className="block text-[11px] leading-tight text-iw-ink-muted">{roleLabel}</span>
             </span>
-            <span
-              aria-hidden
-              className="grid h-9 w-9 place-items-center rounded-full bg-iw-accent-soft text-sm font-bold text-iw-primary"
-              title={user.displayName}
-            >
-              {user.displayName.charAt(0).toUpperCase()}
-            </span>
+            <Avatar name={user.displayName} size="md" />
           </div>
         </div>
       </header>
@@ -146,67 +253,25 @@ export function AppShell({
         )}
       >
         {immersive ? null : (
-        <aside
-          aria-label={`${roleLabel} navigation`}
-          className={cn(
-            "h-fit rounded-iw-card p-4 shadow-sm md:sticky md:top-[88px]",
-            isDarkSidebar
-              ? "border border-[color:var(--color-aivo-sidebar-border)]"
-              : "border border-iw-border bg-iw-card",
-          )}
-          style={
-            isDarkSidebar
-              ? {
-                  background: "var(--color-aivo-sidebar-bg)",
-                  color: "var(--color-aivo-sidebar-fg)",
-                }
-              : undefined
-          }
-        >
-          {/* The {roleLabel} eyebrow was previously rendered here.
-              Removed — the user chip in the top bar already shows the
-              role label, and the nav items themselves communicate
-              context. Saved ~28px of vertical chrome and one redundant
-              uppercase tag. */}
-          <RoleNav items={navItems} ariaLabel={`${roleLabel} sections`} />
-          <div
-            className="mt-6 flex flex-col gap-1 border-t pt-4"
-            style={{
-              borderColor: isDarkSidebar ? "var(--color-aivo-sidebar-border)" : undefined,
-            }}
+          /* Sticky sidebar on md+ only. On smaller viewports the same
+             content lives behind the top-bar drawer above. */
+          <aside
+            aria-label={`${roleLabel} navigation`}
+            className={cn(
+              "hidden md:block h-fit rounded-iw-card p-4 shadow-sm md:sticky md:top-[88px]",
+              isDarkSidebar
+                ? "border border-[color:var(--color-aivo-sidebar-border)]"
+                : "border border-iw-border bg-iw-card",
+            )}
+            style={sidebarStyle}
           >
-            <p className="truncate px-2 text-sm font-semibold leading-tight">
-              {user.displayName}
-            </p>
-            <p
-              className="truncate px-2 text-xs leading-tight"
-              style={isDarkSidebar ? { color: "var(--color-aivo-sidebar-muted)" } : undefined}
-              title={user.email}
-            >
-              {user.email}
-            </p>
-            <div className="mt-2 flex flex-col gap-1">
-              <Button
-                asChild
-                variant="ghost"
-                size="sm"
-                className="h-8 justify-start px-2 text-xs font-medium"
-              >
-                <Link href="/settings/accessibility">Accessibility settings</Link>
-              </Button>
-              <form action={logoutAction}>
-                <Button
-                  type="submit"
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 w-full justify-start px-2 text-xs font-medium"
-                >
-                  Sign out
-                </Button>
-              </form>
-            </div>
-          </div>
-        </aside>
+            <SidebarBody
+              navItems={navItems}
+              ariaLabel={navAriaLabel}
+              user={user}
+              isDarkSidebar={isDarkSidebar}
+            />
+          </aside>
         )}
 
         <main id="main" data-role={role} className="min-w-0">
