@@ -141,7 +141,7 @@ export default function BaselineDesignSystemPage() {
             eyebrow="With Maya · Story Garden"
             companion={
               <span
-                className="w-12 h-12 rounded-full inline-flex items-center justify-center text-2xl bg-[var(--aivo-color-aivoOrange-50)] text-[var(--aivo-color-aivoOrange-700)]"
+                className="w-12 h-12 rounded-full inline-flex items-center justify-center text-2xl bg-[var(--aivo-aivoOrange-50)] text-[var(--aivo-aivoOrange-700)]"
                 aria-hidden="true"
               >
                 📚
@@ -263,7 +263,7 @@ export default function BaselineDesignSystemPage() {
                 eyebrow="With Maya · Story Garden"
                 companion={
                   <span
-                    className="w-12 h-12 rounded-full inline-flex items-center justify-center text-2xl bg-[var(--aivo-color-aivoOrange-50)] text-[var(--aivo-color-aivoOrange-700)]"
+                    className="w-12 h-12 rounded-full inline-flex items-center justify-center text-2xl bg-[var(--aivo-aivoOrange-50)] text-[var(--aivo-aivoOrange-700)]"
                     aria-hidden="true"
                   >
                     📚

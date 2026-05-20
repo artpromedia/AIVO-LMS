@@ -80,7 +80,7 @@ export default async function Page() {
                   </div>
                   <Link
                     href={`/parent/learners/${l.id}`}
-                    className="inline-flex items-center gap-1.5 rounded-iw-control px-3 py-1.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-muted)]"
+                    className="inline-flex items-center gap-1.5 rounded-iw-control px-3 py-1.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
                   >
                     Open learner →
                   </Link>

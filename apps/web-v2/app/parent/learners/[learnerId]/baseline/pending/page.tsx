@@ -78,7 +78,7 @@ export default async function BaselinePendingPage({
           secondary={
             <Link
               href={`/parent/learners/${learner.id}`}
-              className="inline-flex items-center gap-1.5 rounded-iw-control px-4 py-2 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-muted)]"
+              className="inline-flex items-center gap-1.5 rounded-iw-control px-4 py-2 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
             >
               Check back later
             </Link>

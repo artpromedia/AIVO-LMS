@@ -147,7 +147,7 @@ export default async function LearnerTutorHome() {
                   <Link
                     key={s.id}
                     href={`/learner/subjects/${s.id}`}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-iw-chip text-xs font-semibold border border-iw-border bg-white text-iw-text-strong hover:bg-[var(--aivo-color-aivoPurple-50)]/40"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-iw-chip text-xs font-semibold border border-iw-border bg-white text-iw-text-strong hover:bg-[var(--aivo-aivoPurple-50)]/40"
                   >
                     <span aria-hidden="true">{tutor?.emoji ?? "📘"}</span>
                     Help with {s.name}

@@ -14,11 +14,11 @@ const bannerVariants = cva(
         info: "border-iw-border bg-iw-card text-iw-ink",
         demo: "border-iw-accent/40 bg-iw-accent-soft text-iw-ink",
         warning:
-          "border-aivo-warning/40 bg-[color-mix(in_oklab,var(--aivo-warning)_12%,transparent)] text-iw-ink",
+          "border-aivo-warning/40 bg-[color-mix(in_oklab,var(--aivo-status-warning)_12%,transparent)] text-iw-ink",
         danger:
-          "border-aivo-danger/40 bg-[color-mix(in_oklab,var(--aivo-danger)_10%,transparent)] text-iw-ink",
+          "border-aivo-danger/40 bg-[color-mix(in_oklab,var(--aivo-status-error)_10%,transparent)] text-iw-ink",
         success:
-          "border-aivo-success/40 bg-[color-mix(in_oklab,var(--aivo-success)_10%,transparent)] text-iw-ink",
+          "border-aivo-success/40 bg-[color-mix(in_oklab,var(--aivo-status-success)_10%,transparent)] text-iw-ink",
       },
     },
     defaultVariants: { tone: "info" },

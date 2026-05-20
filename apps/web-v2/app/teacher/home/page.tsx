@@ -91,12 +91,12 @@ const INSIGHTS = [
 
 const TONE_TINT: Record<(typeof INSIGHTS)[number]["tone"], string> = {
   warning:
-    "bg-[var(--aivo-color-status-warning-subtle)] text-[var(--aivo-color-status-warning-strong)] border-[var(--aivo-color-status-warning-default)]",
+    "bg-iw-warm-soft text-[var(--aivo-status-warning)] border-[var(--aivo-status-warning)]",
   primary:
-    "bg-[var(--aivo-color-aivoPurple-50)] text-[var(--aivo-color-aivoPurple-700)] border-[var(--aivo-color-aivoPurple-100)]",
-  info: "bg-[var(--aivo-color-status-info-subtle)] text-[var(--aivo-color-status-info-strong)] border-[var(--aivo-color-status-info-default)]",
+    "bg-[var(--aivo-aivoPurple-50)] text-[var(--aivo-aivoPurple-700)] border-[var(--aivo-aivoPurple-100)]",
+  info: "bg-iw-accent-soft text-[var(--aivo-status-info)] border-[var(--aivo-status-info)]",
   accent:
-    "bg-[var(--aivo-color-aivoTeal-50)] text-[var(--aivo-color-aivoTeal-700)] border-[var(--aivo-color-aivoTeal-100)]",
+    "bg-[var(--aivo-aivoTeal-50)] text-[var(--aivo-aivoTeal-700)] border-[var(--aivo-aivoTeal-100)]",
 };
 
 // Greeting first-name: skips honorifics (Ms./Mr./Mrs./Mx./Dr./Prof.)
@@ -203,13 +203,13 @@ export default async function TeacherHome() {
                     className="ring-2 ring-white"
                   />
                 ))}
-                <span className="ml-3 inline-flex items-center px-2 py-0.5 rounded-iw-chip text-[10px] font-semibold bg-[var(--aivo-color-surface-muted)] text-iw-text-strong">
+                <span className="ml-3 inline-flex items-center px-2 py-0.5 rounded-iw-chip text-[10px] font-semibold bg-[var(--aivo-color-surface-sunken)] text-iw-text-strong">
                   +17
                 </span>
               </div>
               <Link
                 href="/teacher/classes"
-                className="inline-flex items-center gap-1 rounded-iw-control px-3 py-1.5 text-xs font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-muted)]"
+                className="inline-flex items-center gap-1 rounded-iw-control px-3 py-1.5 text-xs font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
               >
                 Open
                 <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

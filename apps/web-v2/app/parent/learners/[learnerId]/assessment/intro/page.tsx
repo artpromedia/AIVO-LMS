@@ -165,7 +165,7 @@ export default async function AssessmentIntro({
               className="flex items-start gap-3 rounded-iw-card border border-iw-border bg-[var(--aivo-color-surface-canvas)]/40 p-4"
             >
               <span
-                className="shrink-0 w-9 h-9 rounded-iw-control flex items-center justify-center bg-[var(--aivo-color-aivoPurple-50)] text-[var(--aivo-sensory-primary)]"
+                className="shrink-0 w-9 h-9 rounded-iw-control flex items-center justify-center bg-[var(--aivo-aivoPurple-50)] text-[var(--aivo-sensory-primary)]"
                 aria-hidden="true"
               >
                 {step.icon}

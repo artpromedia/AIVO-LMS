@@ -34,7 +34,9 @@
   --color-aivo-danger: var(--aivo-color-feedback-error);
   --font-sans: var(--aivo-fontFamily-body);
   --font-display: var(--aivo-fontFamily-display);
-  --radius-card: var(--aivo-radius-xl);
+  /* Base card radius. See the per-age-mode overrides below for why we
+     hard-code rather than reach for var(--aivo-radius-xl). */
+  --radius-card: 24px;
   /* Sidebar/page chrome — overridden per role theme. */
   --color-aivo-sidebar-bg: var(--color-aivo-surface);
   --color-aivo-sidebar-fg: var(--color-aivo-ink);
@@ -134,19 +136,22 @@ body {
   --aivo-sensory-ringFocus: oklch(0.54 0.25 278);
 }
 
+/* Per-age-mode card radius. Literal values match tokens/core/radius.json
+   (2xl=32, xl=24, lg=16) — see the note above the base @theme block
+   for why we can't reach these via var(--aivo-radius-X). */
 [data-age-mode="sprout"] {
-  --radius-card: var(--aivo-radius-2xl);
+  --radius-card: 32px;
   --aivo-density-card-pad: 1.5rem;
   --aivo-density-base-font: 1.0625rem;
   --aivo-density-h1-font: 2.25rem;
 }
 
 [data-age-mode="spark"] {
-  --radius-card: var(--aivo-radius-xl);
+  --radius-card: 24px;
 }
 
 [data-age-mode="scholar"] {
-  --radius-card: var(--aivo-radius-lg);
+  --radius-card: 16px;
   --aivo-density-card-pad: 1rem;
   --aivo-density-base-font: 0.95rem;
   --aivo-density-h1-font: 1.75rem;
@@ -158,12 +163,12 @@ body {
    `aivo.typeface` cookie so the root layout can SSR the attribute and
    avoid font-swap flash on first paint). Override every body-font
    variable (Tailwind `font-sans`, the `font-iw-body` family, and the
-   brand `--aivo-typography-fontFamily-body` ramp) so any text reading
-   from any of them lands on Atkinson Hyperlegible / OpenDyslexic. */
+   brand `--aivo-fontFamily-body` ramp) so any text reading from any of
+   them lands on Atkinson Hyperlegible / OpenDyslexic. */
 [data-typeface="dyslexia"] {
-  --font-sans: var(--aivo-typography-fontFamily-dyslexia);
+  --font-sans: var(--aivo-fontFamily-dyslexia);
   --font-aivo-body: var(--font-aivo-dyslexia);
-  --aivo-typography-fontFamily-body: var(--aivo-typography-fontFamily-dyslexia);
+  --aivo-fontFamily-body: var(--aivo-fontFamily-dyslexia);
 }
 
 /* User-requested reduced motion. The OS-level `prefers-reduced-motion`

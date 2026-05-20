@@ -70,7 +70,7 @@ export default async function BaselineSubjectsPage({
       headerLeft={
         <Link
           href="/learner/baseline/why"
-          className="inline-flex items-center gap-1.5 rounded-iw-control px-3 py-1.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-muted)]"
+          className="inline-flex items-center gap-1.5 rounded-iw-control px-3 py-1.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M19 12H5" />
@@ -95,7 +95,7 @@ export default async function BaselineSubjectsPage({
       {sp.error === "pick_one" ? (
         <p
           role="alert"
-          className="rounded-iw-card border border-[var(--aivo-color-status-warning-default)] bg-[var(--aivo-color-status-warning-subtle)] text-[var(--aivo-color-status-warning-strong)] px-4 py-2.5 text-sm"
+          className="rounded-iw-card border border-[var(--aivo-status-warning)] bg-iw-warm-soft text-[var(--aivo-status-warning)] px-4 py-2.5 text-sm"
         >
           Pick at least one subject to start.
         </p>
@@ -111,7 +111,7 @@ export default async function BaselineSubjectsPage({
               return (
                 <label
                   key={s.id}
-                  className="group relative flex flex-col gap-3 cursor-pointer select-none rounded-iw-card-lg border-2 bg-white p-5 transition-all duration-150 hover:border-[var(--aivo-color-aivoPurple-200)] focus-within:outline-none focus-within:ring-2 focus-within:ring-[var(--aivo-sensory-ringFocus)] focus-within:ring-offset-2 border-iw-border has-[:checked]:border-[var(--aivo-sensory-primary)] has-[:checked]:bg-[var(--aivo-color-aivoPurple-50)]/40 has-[:checked]:shadow-[0_4px_12px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.15)]"
+                  className="group relative flex flex-col gap-3 cursor-pointer select-none rounded-iw-card-lg border-2 bg-white p-5 transition-all duration-150 hover:border-[var(--aivo-aivoPurple-200)] focus-within:outline-none focus-within:ring-2 focus-within:ring-[var(--aivo-sensory-ringFocus)] focus-within:ring-offset-2 border-iw-border has-[:checked]:border-[var(--aivo-sensory-primary)] has-[:checked]:bg-[var(--aivo-aivoPurple-50)]/40 has-[:checked]:shadow-[0_4px_12px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.15)]"
                 >
                   <input
                     type="checkbox"
@@ -161,7 +161,7 @@ export default async function BaselineSubjectsPage({
                     </p>
                   ) : null}
                   {isFocus ? (
-                    <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-iw-chip text-[10px] font-semibold uppercase tracking-wide bg-[var(--aivo-color-aivoOrange-50)] text-[var(--aivo-color-aivoOrange-700)]">
+                    <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-iw-chip text-[10px] font-semibold uppercase tracking-wide bg-[var(--aivo-aivoOrange-50)] text-[var(--aivo-aivoOrange-700)]">
                       Picked by grown-up
                     </span>
                   ) : null}

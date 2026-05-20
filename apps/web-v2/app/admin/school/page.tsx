@@ -145,7 +145,7 @@ export default async function SchoolAdminHome() {
           description="Family + school plans"
           actions={<InsightChip tone="info" size="md">82% used</InsightChip>}
         >
-          <div className="relative h-2 rounded-full bg-[var(--aivo-color-surface-muted)] overflow-hidden" role="img" aria-label="License utilization 82 percent">
+          <div className="relative h-2 rounded-full bg-[var(--aivo-color-surface-sunken)] overflow-hidden" role="img" aria-label="License utilization 82 percent">
             <span className="absolute inset-y-0 left-0 rounded-full bg-[var(--aivo-sensory-primary)]" style={{ width: "82%" }} />
           </div>
           <p className="text-xs text-iw-text-muted">411 / 500 seats used</p>

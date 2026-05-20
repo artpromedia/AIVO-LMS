@@ -156,7 +156,7 @@ export default async function BaselineSummaryPage({
                 Answered {s.answered}{s.correct > 0 ? <> · {s.correct} on the first try</> : null}
               </p>
               <div
-                className="relative h-1.5 rounded-full bg-[var(--aivo-color-surface-muted)] overflow-hidden"
+                className="relative h-1.5 rounded-full bg-[var(--aivo-color-surface-sunken)] overflow-hidden"
                 role="img"
                 aria-label={`${s.subjectName} accuracy ${Math.round(s.accuracy * 100)} percent`}
               >
@@ -208,7 +208,7 @@ export default async function BaselineSummaryPage({
         </Link>
         <Link
           href={`/parent/learners/${learner.id}/baseline`}
-          className="inline-flex items-center gap-1.5 rounded-iw-control px-4 py-2.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-muted)]"
+          className="inline-flex items-center gap-1.5 rounded-iw-control px-4 py-2.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
         >
           Run another baseline
         </Link>

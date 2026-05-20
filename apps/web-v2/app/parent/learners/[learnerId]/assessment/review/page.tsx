@@ -174,7 +174,7 @@ export default async function AssessmentReviewPage({
                   className={`flex flex-col gap-2 rounded-iw-card border bg-white p-4 ${
                     step.ok
                       ? "border-iw-border"
-                      : "border-[var(--aivo-color-status-warning-default)]"
+                      : "border-[var(--aivo-status-warning)]"
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
