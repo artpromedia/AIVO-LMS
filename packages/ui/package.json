@@ -35,6 +35,10 @@
       "types": "./dist/shell/index.d.ts",
       "import": "./dist/shell/index.js"
     },
+    "./auth": {
+      "types": "./dist/auth/index.d.ts",
+      "import": "./dist/auth/index.js"
+    },
     "./utils": {
       "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils/index.js"
