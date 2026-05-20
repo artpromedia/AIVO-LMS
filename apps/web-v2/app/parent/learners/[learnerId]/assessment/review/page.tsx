@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requirePageRole } from "@/lib/auth/server";
-import { AppShell } from "@/components/layout/app-shell";
-import { PageHeader, SectionHeader } from "@/components/layout/page-header";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { PARENT_NAV } from "@/components/layout/role-shells";
+import {
+  AssessmentShell,
+  QuestionCard,
+  AssessmentFooter,
+  ASSESSMENT_BACK_CLASS,
+  ASSESSMENT_GHOST_CLASS,
+  InsightChip,
+  ReassuranceCard,
+} from "@aivo/ui";
 import {
   getLearner,
   getOrCreateParentAssessment,
@@ -19,6 +22,7 @@ import { newRequestId } from "@/lib/observability/logger";
 import {
   ASSESSMENT_SECTION_LABEL,
   ASSESSMENT_SECTION_ORDER,
+  WIZARD_STEPS,
   validateSection,
   type AssessmentSectionId,
 } from "@/lib/validators/parent-assessment";
@@ -34,14 +38,11 @@ async function submitAction(formData: FormData) {
   }
   const current = getOrCreateParentAssessment(learnerId, session.tenantId);
   for (const sec of ASSESSMENT_SECTION_ORDER) {
-    // `?? {}` keeps optional sections (basics, strengths, background,
-    // learning_profile) non-blocking for legacy assessments whose stored
-    // answers map predates these keys.
     const v = validateSection(sec, current.answers[sec] ?? {});
     if (!v.ok) {
       redirect(
-        `/parent/learners/${learnerId}/assessment?step=1&error=${encodeURIComponent(
-          `incomplete:${sec}`,
+        `/parent/learners/${learnerId}/assessment?step=${stepForSection(sec)}&error=${encodeURIComponent(
+          sec,
         )}`,
       );
     }
@@ -52,7 +53,28 @@ async function submitAction(formData: FormData) {
     learnerId,
     metadata: { source: "ui" },
   });
-  redirect(`/parent/learners/${learnerId}`);
+  redirect(`/parent/learners/${learnerId}/iep`);
+}
+
+function stepForSection(sec: AssessmentSectionId): number {
+  const step = WIZARD_STEPS.find((s) => s.sections.includes(sec));
+  return step?.id ?? 1;
+}
+
+function summarizeAnswers(answers: Record<string, unknown>): string {
+  const parts: string[] = [];
+  for (const [, v] of Object.entries(answers)) {
+    if (v === null || v === undefined || v === "") continue;
+    if (Array.isArray(v)) {
+      if (v.length === 0) continue;
+      parts.push(v.join(", "));
+    } else if (typeof v === "boolean") {
+      if (v) parts.push("yes");
+    } else {
+      parts.push(String(v));
+    }
+  }
+  return parts.join(" · ").slice(0, 160);
 }
 
 export default async function AssessmentReviewPage({
@@ -69,123 +91,130 @@ export default async function AssessmentReviewPage({
   if (!learner) notFound();
   const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
 
-  const sectionStatus = ASSESSMENT_SECTION_ORDER.map((s) => {
-    const v = validateSection(s, assessment.answers[s] ?? {});
-    return { id: s, ok: v.ok };
+  const stepStatus = WIZARD_STEPS.map((step) => {
+    const sectionStatus = step.sections.map((sec) => {
+      const v = validateSection(sec, assessment.answers[sec] ?? {});
+      return { id: sec, ok: v.ok };
+    });
+    return {
+      id: step.id,
+      label: step.label,
+      longLabel: step.longLabel,
+      sections: sectionStatus,
+      ok: sectionStatus.every((s) => s.ok),
+    };
   });
-  const allValid = sectionStatus.every((s) => s.ok);
-
-  function renderValue(v: unknown): string {
-    if (v === null || v === undefined || v === "") return "—";
-    if (Array.isArray(v)) return v.length ? v.join(", ") : "—";
-    if (typeof v === "boolean") return v ? "Yes" : "No";
-    return String(v);
-  }
+  const allValid = stepStatus.every((s) => s.ok);
+  const incompleteCount = stepStatus.filter((s) => !s.ok).length;
 
   return (
-    <AppShell
-      role="parent"
-      roleLabel="Parent"
-      navItems={PARENT_NAV}
-      user={{ displayName: session.displayName, email: session.email }}
+    <AssessmentShell
+      eyebrow={`Review for ${learner.displayName}`}
+      reassurance={
+        <>
+          <ReassuranceCard
+            tone="info"
+            title="One more pass before we apply this"
+            body="After submit, AIVO uses these answers to generate a personalized baseline. You'll still be able to edit everything later."
+          />
+          <ReassuranceCard
+            tone="privacy"
+            title="What happens next"
+            body="We'll route you to the optional IEP step. If you'd rather skip, your assessment alone is plenty for AIVO to start."
+          />
+        </>
+      }
     >
-      <PageHeader
-        eyebrow={`Review for ${learner.displayName}`}
-        title="Review and submit"
-        description="Check the highlights below before we generate the brain profile."
-      />
-
-      {!allValid ? (
-        <div className="mb-4 rounded-md border border-aivo-warning bg-aivo-warning/10 px-3 py-2 text-sm">
-          Some sections still need attention before submit.{" "}
-          <Link
-            className="font-semibold underline"
-            href={`/parent/learners/${learner.id}/assessment?step=1`}
-          >
-            Go back to the wizard
-          </Link>
-          .
-        </div>
-      ) : null}
-
-      <SectionHeader title="Your answers" />
-      <div className="grid gap-4 sm:grid-cols-2">
-        {ASSESSMENT_SECTION_ORDER.map((sec) => {
-          const answers = (assessment.answers[sec] ?? {}) as Record<string, unknown>;
-          const ok = sectionStatus.find((s) => s.id === sec)!.ok;
-          return (
-            <Card key={sec} className="p-[var(--aivo-density-card-pad)]">
-              <div className="flex items-center justify-between gap-2">
-                <p className="font-display text-base font-semibold">
-                  {ASSESSMENT_SECTION_LABEL[sec]}
-                </p>
-                <Badge tone={ok ? "success" : "warning"}>{ok ? "Complete" : "Needs info"}</Badge>
-              </div>
-              <dl className="mt-3 space-y-1.5 text-sm">
-                {Object.keys(answers).length === 0 ? (
-                  <p className="text-aivo-ink-soft">Not yet answered.</p>
-                ) : (
-                  Object.entries(answers).map(([k, v]) => (
-                    <div key={k} className="grid grid-cols-3 gap-2">
-                      <dt className="col-span-1 text-aivo-ink-soft capitalize">{k}</dt>
-                      <dd className="col-span-2">{renderValue(v)}</dd>
-                    </div>
-                  ))
-                )}
-              </dl>
-              <div className="mt-3">
-                <Button asChild variant="outline" size="sm">
+      <form action={submitAction}>
+        <input type="hidden" name="learnerId" value={learner.id} />
+        <QuestionCard
+          eyebrow="Review & submit"
+          title={`A quick look back before AIVO starts personalising for ${learner.preferredName || learner.firstName}`}
+          helper={
+            allValid
+              ? "Everything looks complete. Submit when you're ready — you can come back and edit later."
+              : `${incompleteCount} step${incompleteCount === 1 ? "" : "s"} still need a touch-up before we can submit.`
+          }
+          tag={allValid ? "Ready to submit" : "Almost ready"}
+          actions={
+            <AssessmentFooter
+              back={
+                <Link
+                  href={`/parent/learners/${learner.id}/assessment?step=${WIZARD_STEPS.length}`}
+                  className={ASSESSMENT_BACK_CLASS}
+                >
+                  Back to last step
+                </Link>
+              }
+              saveExit={
+                <Link
+                  href={`/parent/learners/${learner.id}`}
+                  className={ASSESSMENT_GHOST_CLASS}
+                >
+                  Save & exit
+                </Link>
+              }
+              primaryLabel="Submit assessment"
+              primaryDisabled={!allValid}
+            />
+          }
+        >
+          <ol className="grid gap-3 sm:grid-cols-2">
+            {stepStatus.map((step) => {
+              const answers = step.sections
+                .map((s) => {
+                  const obj = (assessment.answers[s.id] ?? {}) as Record<string, unknown>;
+                  return summarizeAnswers(obj);
+                })
+                .filter(Boolean)
+                .join(" · ");
+              return (
+                <li
+                  key={step.id}
+                  className={`flex flex-col gap-2 rounded-iw-card border bg-white p-4 ${
+                    step.ok
+                      ? "border-iw-border"
+                      : "border-[var(--aivo-color-status-warning-default)]"
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-sm font-semibold text-iw-text-strong">
+                      {step.longLabel}
+                    </p>
+                    <InsightChip tone={step.ok ? "success" : "warning"} size="sm">
+                      {step.ok ? "Complete" : "Needs info"}
+                    </InsightChip>
+                  </div>
+                  {answers ? (
+                    <p className="text-xs text-iw-text-muted leading-relaxed line-clamp-2">
+                      {answers}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-iw-text-muted italic">Not yet answered.</p>
+                  )}
+                  <div className="flex flex-wrap gap-1.5 mt-1">
+                    {step.sections.map((sec) => (
+                      <InsightChip
+                        key={sec.id}
+                        tone={sec.ok ? "neutral" : "warning"}
+                        size="sm"
+                      >
+                        {ASSESSMENT_SECTION_LABEL[sec.id]}
+                      </InsightChip>
+                    ))}
+                  </div>
                   <Link
-                    href={`/parent/learners/${learner.id}/assessment?step=${stepForSection(sec)}`}
+                    href={`/parent/learners/${learner.id}/assessment?step=${step.id}`}
+                    className="self-start text-xs font-semibold text-[var(--aivo-sensory-primary)] hover:underline mt-1"
                   >
-                    Edit
+                    Edit answers →
                   </Link>
-                </Button>
-              </div>
-            </Card>
-          );
-        })}
-      </div>
-
-      <Card className="mt-6 max-w-3xl p-6">
-        <form action={submitAction} className="flex flex-col gap-3">
-          <input type="hidden" name="learnerId" value={learner.id} />
-          <p className="text-sm text-aivo-ink-soft">
-            You can still update everything from learner settings after submitting.
-          </p>
-          <div className="flex justify-end gap-2">
-            <Button asChild variant="outline">
-              <Link href={`/parent/learners/${learner.id}/assessment?step=8`}>Back</Link>
-            </Button>
-            <Button type="submit" disabled={!allValid}>
-              Submit assessment
-            </Button>
-          </div>
-        </form>
-      </Card>
-    </AppShell>
+                </li>
+              );
+            })}
+          </ol>
+        </QuestionCard>
+      </form>
+    </AssessmentShell>
   );
-}
-
-function stepForSection(sec: AssessmentSectionId): number {
-  const map: Record<AssessmentSectionId, number> = {
-    basics: 1,
-    goals: 2,
-    background: 3,
-    strengths: 3,
-    grade_subject: 4,
-    reading: 4,
-    math: 4,
-    attention: 5,
-    communication: 5,
-    learning_profile: 5,
-    sensory: 6,
-    homework: 6,
-    frustration: 7,
-    motivation: 7,
-    accommodations: 8,
-    pace: 8,
-    concerns: 8,
-  };
-  return map[sec];
 }
