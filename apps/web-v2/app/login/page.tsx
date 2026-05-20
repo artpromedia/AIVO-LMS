@@ -58,11 +58,14 @@ export default function LoginPage({
       <SiteHeader />
       <main
         id="main"
-        className="mx-auto w-full max-w-5xl px-6 py-10 sm:py-14 lg:py-20"
+        className="mx-auto w-full max-w-5xl px-6 py-10 sm:py-12 lg:py-14"
       >
-        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-16">
-          {/* Brand-presence strip — desktop only. Intentionally quiet. */}
-          <aside className="hidden lg:flex flex-col gap-6 max-w-md">
+        <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-16">
+          {/* Brand-presence strip — desktop only. Intentionally quiet
+              but with enough body to balance the form card's height
+              instead of leaving a gulf of empty space at the top of the
+              page. */}
+          <aside className="hidden lg:flex flex-col gap-6 max-w-md pt-2">
             <span
               aria-hidden="true"
               className="inline-flex h-12 w-12 items-center justify-center rounded-iw-card bg-iw-accent-soft text-iw-primary"
@@ -76,6 +79,26 @@ export default function LoginPage({
               Your tutors, missions, and family insights — all in one place,
               tuned for how your learner thinks.
             </p>
+            {/* Quiet trust block. Mirrors the chrome strip in the marketing
+                footer (COPPA · FERPA · SOC 2) so the brand side has the same
+                weight as the form card without re-selling the product to a
+                returning user. */}
+            <div className="mt-2 flex flex-col gap-3">
+              <div className="inline-flex items-center gap-2 self-start rounded-full bg-iw-accent-soft px-3 py-1.5 text-xs font-semibold text-iw-primary">
+                <AivoIcon name="safetyOk" size={14} />
+                <span>COPPA · FERPA · SOC 2</span>
+              </div>
+              <blockquote className="border-l-2 border-iw-border pl-4 text-sm leading-relaxed text-iw-ink-muted">
+                <p>
+                  &ldquo;AIVO adapts to how my daughter actually learns. The
+                  first platform that didn&rsquo;t make us feel like we were
+                  fighting it.&rdquo;
+                </p>
+                <footer className="mt-2 text-xs font-semibold not-italic text-iw-ink-muted">
+                  — Parent of a Grade 3 learner
+                </footer>
+              </blockquote>
+            </div>
           </aside>
 
           {/* Form card — dominant on every breakpoint. */}

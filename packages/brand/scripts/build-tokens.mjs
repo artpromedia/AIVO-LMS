@@ -364,7 +364,13 @@ const preset = `module.exports = {
         "iw-hero": "linear-gradient(180deg, var(--aivo-sensory-bgPage) 0%, var(--aivo-sensory-bgRaised) 70%)"
       },
       fontFamily: {
-        "iw-display": ["var(--font-aivo-display)", "Inter Display", "Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        // Display stack. Satoshi Variable is the AIVO display face
+        // (loaded via the Fontshare <link> in apps/web-v2/app/layout.tsx
+        // and apps/marketing's equivalent). It MUST sit before the
+        // next/font Inter variable — otherwise the variable resolves
+        // first and headlines silently fall back to Inter even though
+        // the Satoshi stylesheet is downloaded.
+        "iw-display": ["Satoshi Variable", "var(--font-aivo-display)", "Inter Display", "Inter", "ui-sans-serif", "system-ui", "sans-serif"],
         "iw-body": ["var(--font-aivo-body)", "Inter", "ui-sans-serif", "system-ui", "sans-serif"],
         "iw-dyslexia": ["var(--font-aivo-dyslexia)", "Atkinson Hyperlegible", "OpenDyslexic", "Inter", "ui-sans-serif", "system-ui", "sans-serif"]
       },

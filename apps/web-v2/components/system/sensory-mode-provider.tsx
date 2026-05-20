@@ -94,7 +94,14 @@ export function SensoryModeToggle({
   size = "md",
 }: {
   className?: string;
-  size?: "sm" | "md";
+  /**
+   * - `xs` — compact pills for marketing chrome where the toggle has
+   *   to share a busy top-bar with nav links + sign-in + CTA.
+   * - `sm` — used on tight dashboard slots.
+   * - `md` — used on the dedicated accessibility settings page where
+   *   the toggle is the primary visible control.
+   */
+  size?: "xs" | "sm" | "md";
 }) {
   const { mode, setMode } = useSensoryMode();
   return (
@@ -102,7 +109,8 @@ export function SensoryModeToggle({
       role="radiogroup"
       aria-label="Sensory mode"
       className={cn(
-        "inline-flex items-center gap-1 rounded-full border p-1 shadow-sm",
+        "inline-flex items-center rounded-full border shadow-sm",
+        size === "xs" ? "gap-0.5 p-0.5" : "gap-1 p-1",
         "border-iw-border bg-iw-raised",
         className,
       )}
@@ -119,7 +127,11 @@ export function SensoryModeToggle({
             title={SENSORY_MODE_LABELS[m].description}
             className={cn(
               "inline-flex items-center rounded-full font-semibold transition-colors",
-              size === "sm" ? "h-7 px-3 text-[11px]" : "h-8 px-3 text-xs",
+              size === "xs"
+                ? "h-6 px-2.5 text-[10px]"
+                : size === "sm"
+                  ? "h-7 px-3 text-[11px]"
+                  : "h-8 px-3 text-xs",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring focus-visible:ring-offset-1",
               active
                 ? "bg-iw-primary text-iw-primary-fg shadow"

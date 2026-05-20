@@ -32,6 +32,11 @@ const nextConfig: NextConfig = {
     "*.picard.replit.dev",
   ],
   typedRoutes: false,
+  // Hide the floating "N" dev-mode badge that sits in the bottom-left
+  // corner during `next dev`. It overlapped real UI affordances on the
+  // mobile screenshots and isn't useful day-to-day. Production builds
+  // never render it; this flag silences it in dev too.
+  devIndicators: false,
   async headers() {
     return [{ source: "/:path*", headers: SECURITY_HEADERS }];
   },

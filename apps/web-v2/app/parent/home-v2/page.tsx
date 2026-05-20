@@ -6,6 +6,9 @@ import {
   type SetupStep,
 } from "@aivo/ui/hero";
 import { AivoIcon } from "@aivo/ui/icon";
+import { requirePageRole } from "@/lib/auth/server";
+import { AppShell } from "@/components/layout/app-shell";
+import { PARENT_NAV } from "@/components/layout/role-shells";
 import { SectionCard } from "./_components/SectionCard";
 
 /**
@@ -23,15 +26,19 @@ import { SectionCard } from "./_components/SectionCard";
  *
  *   Greeting: "Hi, [name]. [Child] is ready for today's learning."
  *
- * This page is server-rendered with placeholder data; a later
- * Sprint 4 commit wires it to the real `listLearnersForParent`
- * repo.
+ * Now rendered inside the shared AppShell so this surface gets the
+ * same top-bar + sidebar chrome (hamburger drawer on mobile, sensory
+ * popover, Avatar) as every other parent screen. Previously the page
+ * shipped its own bare `<main>` and bypassed AppShell entirely.
  */
-export default function ParentHomeV2() {
-  // Placeholder data — Sprint 4 commit 5 wires to real session.
-  const parentFirstName = "Ofem";
+export default async function ParentHomeV2() {
+  const session = await requirePageRole(["parent"]);
+
+  // Placeholder content data — wiring to listLearnersForParent is a
+  // separate task and is intentionally out of scope here.
   const learnerFirstName = "Emma";
   const learnerHref = "/parent/learners/emma";
+  const parentFirstName = session.displayName.split(" ")[0] ?? "there";
 
   const setupSteps: SetupStep[] = [
     { id: "verify", label: "Verify parent", status: "done", href: "/onboarding/parent-verify" },
@@ -41,8 +48,13 @@ export default function ParentHomeV2() {
   ];
 
   return (
-    <main className="min-h-screen bg-[var(--aivo-color-surface-canvas)]">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 lg:py-10 flex flex-col gap-6">
+    <AppShell
+      role="parent"
+      roleLabel="Parent"
+      navItems={PARENT_NAV}
+      user={{ displayName: session.displayName, email: session.email }}
+    >
+      <div className="flex flex-col gap-6">
         <LearningHero
           greeting={
             <>
@@ -311,6 +323,6 @@ export default function ParentHomeV2() {
           .
         </p>
       </div>
-    </main>
+    </AppShell>
   );
 }
