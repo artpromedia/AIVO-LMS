@@ -23,6 +23,10 @@
       "types": "./dist/states/index.d.ts",
       "import": "./dist/states/index.js"
     },
+    "./chart": {
+      "types": "./dist/chart/index.d.ts",
+      "import": "./dist/chart/index.js"
+    },
     "./utils": {
       "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils/index.js"
