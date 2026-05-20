@@ -22,11 +22,11 @@ export type FloatingMetricCardProps = {
   className?: string;
 };
 
-const TONE_RING: Record<NonNullable<FloatingMetricCardProps["tone"]>, string> = {
-  neutral: "ring-iw-border",
-  success: "ring-[var(--aivo-domain-completion-completed-strong,#16a34a)]/30",
-  warning: "ring-amber-300/60",
-  info: "ring-[var(--aivo-status-info-strong,#0284c7)]/30",
+const TONE_ACCENT: Record<NonNullable<FloatingMetricCardProps["tone"]>, string> = {
+  neutral: "from-slate-100 to-white",
+  success: "from-[var(--aivo-domain-completion-completed-strong,#16a34a)]/15 to-white",
+  warning: "from-amber-200/40 to-white",
+  info: "from-[var(--aivo-color-aivoTeal-100,#ccfbf1)]/70 to-white",
 };
 
 const DELTA_CLASS = {
@@ -50,20 +50,25 @@ export function FloatingMetricCard({
     <Wrapper
       {...(href ? { href } : {})}
       className={clsx(
-        "block rounded-iw-card-lg bg-white p-5 sm:p-6",
-        "ring-1",
-        TONE_RING[tone],
-        "shadow-[0_24px_60px_-30px_rgba(15,23,42,0.18)]",
-        href ? "transition-transform hover:-translate-y-0.5 hover:shadow-[0_30px_70px_-30px_rgba(15,23,42,0.24)]" : "",
+        "relative block overflow-hidden rounded-iw-hero bg-white p-6 sm:p-7",
+        "shadow-[0_30px_80px_-40px_rgba(15,23,42,0.22)]",
+        href ? "transition-transform hover:-translate-y-0.5 hover:shadow-[0_36px_90px_-40px_rgba(15,23,42,0.28)]" : "",
         className,
       )}
     >
-      <div className="flex items-center justify-between gap-3">
-        <p className="iw-label uppercase tracking-wider text-iw-text-muted">{label}</p>
+      <div
+        aria-hidden
+        className={clsx(
+          "pointer-events-none absolute -right-10 -top-12 h-32 w-32 rounded-full bg-gradient-to-br opacity-80 blur-2xl",
+          TONE_ACCENT[tone],
+        )}
+      />
+      <div className="relative flex items-center justify-between gap-3">
+        <p className="text-sm font-medium text-iw-text-muted">{label}</p>
         {icon ? <div className="text-iw-text-muted">{icon}</div> : null}
       </div>
-      <div className="mt-2 flex items-baseline gap-2">
-        <p className="text-3xl sm:text-4xl font-extrabold text-iw-text-strong tabular-nums">
+      <div className="relative mt-3 flex items-baseline gap-2">
+        <p className="font-iw-display text-4xl sm:text-5xl font-bold tracking-tight text-iw-text-strong tabular-nums">
           {value}
         </p>
         {delta ? (
@@ -73,7 +78,7 @@ export function FloatingMetricCard({
         ) : null}
       </div>
       {description ? (
-        <p className="mt-2 text-sm text-iw-text-muted leading-snug">{description}</p>
+        <p className="relative mt-3 text-sm text-iw-text-muted leading-snug">{description}</p>
       ) : null}
     </Wrapper>
   );

@@ -1,5 +1,6 @@
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { RoleNav, type RoleNavItem } from "@/components/layout/role-nav";
 import { logoutAction } from "@/lib/auth/actions";
 import { SensoryModeToggle } from "@/components/system/sensory-mode-provider";
@@ -88,16 +89,19 @@ export function AppShell({
             theme === "learner" ? "max-w-[1200px]" : "max-w-[1400px]",
           )}
         >
-          <Link href="/" className="flex items-center gap-2.5">
-            <span
-              aria-hidden
-              className="grid h-9 w-9 place-items-center rounded-full bg-iw-brand text-base font-bold text-iw-primary-fg shadow"
-            >
-              A
-            </span>
-            <span className="font-iw-display text-lg font-bold tracking-tight text-iw-ink">
-              AIVO
-            </span>
+          <Link
+            href="/"
+            aria-label="AIVO Learning home"
+            className="inline-flex items-center rounded-full px-1 py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring"
+          >
+            <Image
+              src="/images/aivo-logo-purple.png"
+              alt="AIVO Learning"
+              width={160}
+              height={48}
+              priority
+              className="h-9 w-auto"
+            />
           </Link>
 
           <span
