@@ -15,6 +15,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
+import { LessonPreviewCard } from "@aivo/ui";
 import { getStore as db } from "@/lib/db/store";
 import { listAiGenerationJobs } from "@/lib/db/repos";
 
@@ -99,30 +100,26 @@ export default async function TeacherLessonPlansPage() {
         <ul className="grid gap-3">
           {plans.map((plan) => (
             <li key={plan.id}>
-              <Card className="p-[var(--aivo-density-card-pad)]">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium">{plan.title}</p>
-                    <p className="mt-0.5 text-sm text-aivo-ink-soft">{plan.objective}</p>
-                    <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                      <Badge tone="neutral">{plan.estimatedMinutes} min</Badge>
-                      <Badge tone="neutral">{plan.tutorPersona}</Badge>
-                      <Badge tone="primary">
-                        {plan.generation.provider} · {plan.generation.model}
-                      </Badge>
-                      {plan.accessibilitySupports.length > 0 ? (
-                        <Badge tone="success">
-                          {plan.accessibilitySupports.length} access supports
-                        </Badge>
-                      ) : null}
-                    </div>
-                  </div>
-                  <div className="text-right text-xs text-aivo-ink-soft">
-                    {new Date(plan.generatedAt).toLocaleString()}
-                  </div>
-                </div>
-                <p className="mt-3 text-sm text-aivo-ink-soft line-clamp-2">{plan.storyHook}</p>
-              </Card>
+              <LessonPreviewCard
+                skillName={plan.title}
+                summary={plan.storyHook ?? plan.objective}
+                state="pending"
+                estimateMinutes={plan.estimatedMinutes}
+                sources={[
+                  `${plan.generation.provider} · ${plan.generation.model}`,
+                  plan.tutorPersona,
+                ]}
+                accommodations={
+                  plan.accessibilitySupports.length > 0
+                    ? plan.accessibilitySupports.slice(0, 4).map((a) => String(a))
+                    : undefined
+                }
+                actions={
+                  <span className="text-xs text-iw-text-muted">
+                    Generated {new Date(plan.generatedAt).toLocaleString()}
+                  </span>
+                }
+              />
             </li>
           ))}
         </ul>

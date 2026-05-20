@@ -182,6 +182,15 @@ export type IEPDocument = {
   uploadedAt: ISODate;
   status: "pending" | "parsed" | "failed";
   extraction: IEPExtraction | null;
+  /**
+   * Sprint 5: subset of `extraction.accommodations` that the parent has
+   * explicitly consented to. When `null` we treat the full extraction
+   * list as implicit consent (legacy behavior). When an array, AIVO
+   * only applies the listed supports to lessons / homework / tutor.
+   */
+  acceptedAccommodations: string[] | null;
+  /** Sprint 5: ISO timestamp of when the parent confirmed supports. */
+  confirmedAt: ISODate | null;
 };
 
 export type AccommodationSummary = {

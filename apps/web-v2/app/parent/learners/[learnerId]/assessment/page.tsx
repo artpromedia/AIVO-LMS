@@ -1,15 +1,18 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requirePageRole } from "@/lib/auth/server";
-import { AppShell } from "@/components/layout/app-shell";
-import { PageHeader } from "@/components/layout/page-header";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Stepper } from "@/components/ui/stepper";
-import { PARENT_NAV } from "@/components/layout/role-shells";
+import {
+  AssessmentShell,
+  AssessmentProgress,
+  QuestionCard,
+  PillCardGroup,
+  ScaleField,
+  SoftTextField,
+  AssessmentFooter,
+  ASSESSMENT_BACK_CLASS,
+  ASSESSMENT_GHOST_CLASS,
+  ReassuranceCard,
+} from "@aivo/ui";
 import {
   getLearner,
   getOrCreateParentAssessment,
@@ -26,6 +29,8 @@ import {
 } from "@/lib/validators/parent-assessment";
 import type { ParentAssessment } from "@/lib/db/types";
 
+/* ----- helpers -------------------------------------------------------------- */
+
 function parseList(raw: string, max = 10): string[] {
   return raw
     .split(/[\n,]/)
@@ -33,6 +38,54 @@ function parseList(raw: string, max = 10): string[] {
     .filter(Boolean)
     .slice(0, max);
 }
+
+function sectionAnswers(
+  assessment: ParentAssessment,
+  section: AssessmentSectionId,
+): Record<string, unknown> {
+  return (assessment.answers[section] ?? {}) as Record<string, unknown>;
+}
+
+function fieldString(
+  assessment: ParentAssessment,
+  section: AssessmentSectionId,
+  field: string,
+): string {
+  const v = sectionAnswers(assessment, section)[field];
+  if (Array.isArray(v)) return v.join(", ");
+  if (v === undefined || v === null) return "";
+  return String(v);
+}
+
+function fieldArray(
+  assessment: ParentAssessment,
+  section: AssessmentSectionId,
+  field: string,
+): string[] {
+  const v = sectionAnswers(assessment, section)[field];
+  return Array.isArray(v) ? (v as string[]) : [];
+}
+
+function fieldBool(
+  assessment: ParentAssessment,
+  section: AssessmentSectionId,
+  field: string,
+): boolean {
+  return Boolean(sectionAnswers(assessment, section)[field]);
+}
+
+function fieldNumber(
+  assessment: ParentAssessment,
+  section: AssessmentSectionId,
+  field: string,
+): number | undefined {
+  const v = sectionAnswers(assessment, section)[field];
+  if (typeof v === "number") return v;
+  if (typeof v === "string" && v) return Number(v) || undefined;
+  return undefined;
+}
+
+/* ----- server action -------------------------------------------------------- */
 
 async function saveStepAction(formData: FormData) {
   "use server";
@@ -47,7 +100,6 @@ async function saveStepAction(formData: FormData) {
   const step = WIZARD_STEPS.find((s) => s.id === stepNum);
   if (!step) redirect(`/parent/learners/${learnerId}/assessment?step=1`);
 
-  // Build a per-section answer object from form fields prefixed `<section>.<field>`.
   const failures: string[] = [];
   for (const sectionId of step!.sections) {
     const sectionData: Record<string, unknown> = {};
@@ -107,12 +159,14 @@ async function saveStepAction(formData: FormData) {
           String(formData.get("motivation.avoidanceFactors") || ""),
         );
         break;
-      case "accommodations":
-        sectionData.known = parseList(String(formData.get("accommodations.known") || ""), 20);
+      case "accommodations": {
+        const known = parseList(String(formData.get("accommodations.known") || ""), 20);
+        sectionData.known = known;
         sectionData.extendedTime = formData.get("accommodations.extendedTime") === "on";
         sectionData.readAloud = formData.get("accommodations.readAloud") === "on";
         sectionData.speechToText = formData.get("accommodations.speechToText") === "on";
         break;
+      }
       case "pace":
         sectionData.preferred = String(formData.get("pace.preferred") || "");
         break;
@@ -155,7 +209,10 @@ async function saveStepAction(formData: FormData) {
         if (rm) sectionData.responseMethod = rm;
         const asb = String(formData.get("learning_profile.attentionSpanBucket") || "");
         if (asb) sectionData.attentionSpanBucket = asb;
-        const bestModes = formData.getAll("learning_profile.bestModes").map(String).filter(Boolean);
+        const bestModes = formData
+          .getAll("learning_profile.bestModes")
+          .map(String)
+          .filter(Boolean);
         if (bestModes.length > 0) sectionData.bestModes = bestModes;
         break;
       }
@@ -187,40 +244,697 @@ async function saveStepAction(formData: FormData) {
   redirect(`/parent/learners/${learnerId}/assessment/review`);
 }
 
-function sectionAnswers(
-  assessment: ParentAssessment,
-  section: AssessmentSectionId,
-): Record<string, unknown> {
-  return (assessment.answers[section] ?? {}) as Record<string, unknown>;
+/* ----- option lists --------------------------------------------------------- */
+
+const GRADE_OPTIONS = [
+  { value: "preK", label: "Pre-K", description: "Before kindergarten" },
+  { value: "K", label: "Kindergarten" },
+  { value: "1-2", label: "Grades 1–2", description: "Early elementary" },
+  { value: "3-5", label: "Grades 3–5", description: "Upper elementary" },
+  { value: "6-8", label: "Grades 6–8", description: "Middle school" },
+  { value: "9-12", label: "Grades 9–12", description: "High school" },
+  { value: "post_secondary", label: "Post-secondary", description: "After high school" },
+];
+
+const SUBJECT_OPTIONS = [
+  { value: "math", label: "Math" },
+  { value: "reading", label: "Reading" },
+  { value: "writing", label: "Writing" },
+  { value: "science", label: "Science" },
+  { value: "social_studies", label: "Social studies" },
+  { value: "coding", label: "Coding / AI literacy" },
+  { value: "social_skills", label: "Social skills" },
+];
+
+const COMFORT_SCALE = [
+  {
+    value: "early",
+    label: "Just starting",
+    description: "Brand new to the topic. We'll start gently.",
+  },
+  {
+    value: "building",
+    label: "Building",
+    description: "Recognises basics, still practising consistency.",
+  },
+  {
+    value: "on_grade",
+    label: "On grade",
+    description: "Comfortable at age-typical work most days.",
+  },
+  {
+    value: "advanced",
+    label: "Advanced",
+    description: "Wants more challenge than the typical grade gives.",
+  },
+];
+
+const BREAK_STYLE = [
+  { value: "frequent_short", label: "Frequent short breaks", description: "Every 5–10 minutes works best." },
+  { value: "occasional", label: "Occasional breaks", description: "Every 15–25 minutes." },
+  { value: "long_uninterrupted", label: "Long stretches", description: "Can focus 30+ minutes once warmed up." },
+];
+
+const COMMUNICATION_STYLE = [
+  { value: "spoken", label: "Spoken", description: "Talks through ideas out loud." },
+  { value: "written", label: "Written", description: "Prefers writing or typing." },
+  { value: "visual", label: "Visual", description: "Pictures, drawings, gestures." },
+  { value: "mixed", label: "Mixed", description: "Switches depending on the moment." },
+];
+
+const PACE_OPTIONS = [
+  { value: "slow", label: "Slower", description: "Lots of time to think, repeat as needed." },
+  { value: "steady", label: "Steady", description: "A predictable, even rhythm." },
+  { value: "fast", label: "Faster", description: "Likes momentum, more in one sitting." },
+];
+
+const SENSORY_OPTIONS = [
+  { value: "sound", label: "Sound" },
+  { value: "light", label: "Light" },
+  { value: "touch", label: "Touch" },
+  { value: "movement", label: "Movement" },
+  { value: "smell", label: "Smell" },
+  { value: "taste", label: "Taste" },
+];
+
+const SENSORY_PROFILE = [
+  { value: "seeking", label: "Seeking", description: "Wants more sensory input." },
+  { value: "avoiding", label: "Avoiding", description: "Prefers less input." },
+  { value: "mixed", label: "A mix", description: "Depends on the day." },
+  { value: "neutral", label: "Not noticeable", description: "Sensory hasn't been a factor." },
+];
+
+const TIME_OF_DAY = [
+  { value: "morning", label: "Morning" },
+  { value: "afternoon", label: "Afternoon" },
+  { value: "evening", label: "Evening" },
+  { value: "varies", label: "Varies", description: "We adjust day to day." },
+];
+
+const GOAL_TIMELINE = [
+  { value: "weeks", label: "Next few weeks" },
+  { value: "this_term", label: "This term" },
+  { value: "this_year", label: "This year" },
+  { value: "long_term", label: "Long term" },
+];
+
+const DIAGNOSES_OPTIONS = [
+  { value: "adhd", label: "ADHD" },
+  { value: "autism", label: "Autism spectrum" },
+  { value: "dyslexia", label: "Dyslexia" },
+  { value: "dyscalculia", label: "Dyscalculia" },
+  { value: "dysgraphia", label: "Dysgraphia" },
+  { value: "anxiety", label: "Anxiety" },
+  { value: "speech_language", label: "Speech / language" },
+  { value: "sensory", label: "Sensory processing" },
+  { value: "twice_exceptional", label: "Twice-exceptional" },
+];
+
+const SERVICES_OPTIONS = [
+  { value: "speech", label: "Speech therapy" },
+  { value: "occupational", label: "Occupational therapy" },
+  { value: "physical", label: "Physical therapy" },
+  { value: "counseling", label: "Counseling" },
+  { value: "aba", label: "ABA" },
+  { value: "tutor", label: "Tutoring" },
+  { value: "rti", label: "RTI / MTSS" },
+];
+
+const COMM_MODE = [
+  { value: "verbal", label: "Verbal" },
+  { value: "sign", label: "Sign" },
+  { value: "aac", label: "AAC" },
+  { value: "non_verbal", label: "Non-verbal" },
+];
+
+const DEVICE_INTERACTION = [
+  { value: "independent", label: "Independent" },
+  { value: "with_prompts", label: "With prompts" },
+  { value: "hand_over_hand", label: "Hand over hand" },
+];
+
+const RESPONSE_METHOD = [
+  { value: "touch", label: "Touch" },
+  { value: "voice", label: "Voice" },
+  { value: "switch", label: "Switch" },
+  { value: "eye_gaze", label: "Eye gaze" },
+];
+
+const BEST_MODES = [
+  { value: "visual", label: "Visual" },
+  { value: "auditory", label: "Auditory" },
+  { value: "kinesthetic", label: "Hands-on" },
+  { value: "reading_writing", label: "Reading / writing" },
+];
+
+const ATTENTION_BUCKET = [
+  { value: "under_5", label: "Under 5 min" },
+  { value: "5_10", label: "5–10 min" },
+  { value: "10_20", label: "10–20 min" },
+  { value: "20_plus", label: "20+ min" },
+];
+
+const ERROR_MESSAGES: Record<string, string> = {
+  basics: "Please double-check the dates and pronouns.",
+  background: "Please review the background fields.",
+  strengths: "Please review the strengths fields.",
+  frustration: "Please review the challenges fields.",
+  grade_subject: "Pick a grade band and at least one subject to continue.",
+  attention: "Please choose how breaks work best.",
+  pace: "Please choose a pace.",
+  communication: "Please choose a communication style.",
+  learning_profile: "Please review the learning profile fields.",
+  reading: "Please pick a reading comfort level.",
+  math: "Please pick a math comfort level.",
+  sensory: "Please review the sensory fields.",
+  accommodations: "Please review the supports fields.",
+  homework: "Please choose a best time of day.",
+  goals: "Please share at least one learning goal.",
+  motivation: "Please review the motivation fields.",
+  concerns: "Please review the concerns field.",
+};
+
+/* ----- screen renderer ------------------------------------------------------ */
+
+function ReassuranceColumn({ stepNum }: { stepNum: number }) {
+  const cards: Array<React.ReactElement> = [
+    <ReassuranceCard
+      key="privacy"
+      tone="privacy"
+      title="Private by default"
+      body="Your answers are kept on your account. We never show your raw assessment to your learner."
+      icon={
+        <svg
+          className="w-4 h-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <rect x="3" y="11" width="18" height="11" rx="2" />
+          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        </svg>
+      }
+    />,
+    <ReassuranceCard
+      key="purpose"
+      tone="info"
+      title={stepNum === 1 ? "Why we ask this" : "What this changes"}
+      body={
+        stepNum <= 3
+          ? "These answers shape how AIVO greets and paces your learner — never how it judges them."
+          : stepNum <= 7
+            ? "Your picks feed the baseline check directly, so lessons land at the right level from day one."
+            : "Together with the optional IEP, these supports stay applied across lessons, homework, and the tutor."
+      }
+    />,
+  ];
+  if (stepNum >= 9) {
+    cards.push(
+      <ReassuranceCard
+        key="safety"
+        tone="safety"
+        title="No diagnosis required"
+        body="Pick what feels right. AIVO doesn't need a formal label — only what helps day to day."
+      />,
+    );
+  }
+  return <>{cards}</>;
 }
 
-function fieldString(
+function renderSection(
+  sectionId: AssessmentSectionId,
   assessment: ParentAssessment,
-  section: AssessmentSectionId,
-  field: string,
-): string {
-  const v = sectionAnswers(assessment, section)[field];
-  if (Array.isArray(v)) return v.join("\n");
-  if (v === undefined || v === null) return "";
-  return String(v);
+): React.ReactElement {
+  switch (sectionId) {
+    case "basics":
+      return (
+        <div className="grid gap-4 sm:grid-cols-2" key={sectionId}>
+          <SoftTextField
+            name="basics.dob"
+            type="date"
+            label="Date of birth"
+            helper="Optional. Helps AIVO align early lessons with grade and age."
+            defaultValue={fieldString(assessment, "basics", "dob")}
+          />
+          <SoftTextField
+            name="basics.pronouns"
+            label="Pronouns"
+            helper="Optional. We'll honour these everywhere."
+            placeholder="she / her, he / him, they / them…"
+            defaultValue={fieldString(assessment, "basics", "pronouns")}
+            maxLength={40}
+          />
+          <SoftTextField
+            className="sm:col-span-2"
+            name="basics.languages"
+            label="Languages at home"
+            helper="Optional. Separate with commas. Up to 5."
+            placeholder="English, Spanish"
+            defaultValue={fieldString(assessment, "basics", "languages")}
+          />
+        </div>
+      );
+    case "background":
+      return (
+        <div className="flex flex-col gap-5" key={sectionId}>
+          <PillCardGroup
+            mode="multi"
+            name="background.diagnoses"
+            legend="Any diagnoses we should know about?"
+            helper="Optional. Pick all that apply — leave blank if you'd rather not say."
+            columns={3}
+            options={DIAGNOSES_OPTIONS}
+            defaultValues={fieldArray(assessment, "background", "diagnoses")}
+          />
+          <SoftTextField
+            name="background.diagnosesOther"
+            label="Anything else to add"
+            helper="Optional. Separate with commas."
+            placeholder="e.g. APD, mild hearing loss"
+          />
+          <PillCardGroup
+            mode="multi"
+            name="background.services"
+            legend="Support services your child receives"
+            helper="Optional. AIVO won't replace these — it works alongside them."
+            columns={3}
+            options={SERVICES_OPTIONS}
+            defaultValues={fieldArray(assessment, "background", "services")}
+          />
+        </div>
+      );
+    case "strengths":
+      return (
+        <div className="flex flex-col gap-5" key={sectionId}>
+          <SoftTextField
+            name="strengths.loves"
+            multiline
+            label="What does your child love to talk about or do?"
+            helper="A passion, a hobby, a favourite show. AIVO weaves these into examples."
+            placeholder="Dinosaurs. Building with LEGO. Cooking with grandma."
+            defaultValue={fieldString(assessment, "strengths", "loves")}
+            maxLength={500}
+          />
+          <SoftTextField
+            name="strengths.goodAt"
+            label="Things your child is good at"
+            helper="Comma-separated. Up to 10."
+            placeholder="Memorising lyrics, building, drawing, kindness"
+            defaultValue={fieldString(assessment, "strengths", "goodAt")}
+          />
+          <SoftTextField
+            name="strengths.motivates"
+            multiline
+            label="What lights them up when learning?"
+            helper="A goal, a topic, a reward, a person they want to impress."
+            placeholder="Beating their own time. Showing dad. Cool space facts."
+            defaultValue={fieldString(assessment, "strengths", "motivates")}
+            maxLength={500}
+          />
+        </div>
+      );
+    case "frustration":
+      return (
+        <div className="flex flex-col gap-5" key={sectionId}>
+          <SoftTextField
+            name="frustration.triggers"
+            multiline
+            label="What tends to make learning hard or frustrating?"
+            helper="One per line. AIVO will gently route around these in early sessions."
+            placeholder="Long reading passages.\nTimers.\nLoud rooms."
+            defaultValue={fieldString(assessment, "frustration", "triggers")}
+          />
+          <SoftTextField
+            name="frustration.calmingStrategies"
+            multiline
+            label="What helps your child reset?"
+            helper="One per line. AIVO can suggest these inside a session."
+            placeholder="A short walk.\nWater + 2 minutes off screen.\nNoise-cancelling headphones."
+            defaultValue={fieldString(assessment, "frustration", "calmingStrategies")}
+          />
+        </div>
+      );
+    case "grade_subject":
+      return (
+        <div className="flex flex-col gap-5" key={sectionId}>
+          <PillCardGroup
+            mode="single"
+            required
+            name="grade_subject.gradeBand"
+            legend="Grade band"
+            columns={3}
+            options={GRADE_OPTIONS}
+            defaultValue={fieldString(assessment, "grade_subject", "gradeBand")}
+          />
+          <PillCardGroup
+            mode="multi"
+            required
+            name="grade_subject.focusSubjects"
+            legend="Subjects to focus on first"
+            helper="Pick one or more. You can change this later."
+            columns={3}
+            options={SUBJECT_OPTIONS}
+            defaultValues={fieldArray(assessment, "grade_subject", "focusSubjects")}
+          />
+        </div>
+      );
+    case "attention":
+      return (
+        <div className="flex flex-col gap-5" key={sectionId}>
+          <PillCardGroup
+            mode="single"
+            required
+            name="attention.breakStyle"
+            legend="Break style that works best"
+            options={BREAK_STYLE}
+            defaultValue={fieldString(assessment, "attention", "breakStyle")}
+          />
+          <SoftTextField
+            name="attention.focusWindowMinutes"
+            type="number"
+            label="Typical focus window (minutes)"
+            helper="A rough guess is fine. AIVO will fine-tune by watching how sessions go."
+            placeholder="10"
+            defaultValue={
+              fieldNumber(assessment, "attention", "focusWindowMinutes")?.toString() ?? ""
+            }
+            min={1}
+            max={120}
+          />
+          <label className="flex items-start gap-3 rounded-iw-card border border-iw-border bg-white p-3 cursor-pointer">
+            <input
+              type="checkbox"
+              name="attention.movementHelps"
+              defaultChecked={fieldBool(assessment, "attention", "movementHelps")}
+              className="mt-0.5 h-5 w-5 rounded-[6px] accent-[var(--aivo-sensory-primary)]"
+            />
+            <span className="flex-1">
+              <span className="block text-sm font-semibold text-iw-text-strong">
+                Movement helps my child focus
+              </span>
+              <span className="block text-xs text-iw-text-muted mt-0.5">
+                AIVO can suggest stretch / walk breaks between question blocks.
+              </span>
+            </span>
+          </label>
+        </div>
+      );
+    case "pace":
+      return (
+        <PillCardGroup
+          key={sectionId}
+          mode="single"
+          required
+          name="pace.preferred"
+          legend="Preferred pace"
+          options={PACE_OPTIONS}
+          defaultValue={fieldString(assessment, "pace", "preferred")}
+        />
+      );
+    case "communication":
+      return (
+        <div className="flex flex-col gap-5" key={sectionId}>
+          <PillCardGroup
+            mode="single"
+            required
+            name="communication.style"
+            legend="How does your child usually share thinking?"
+            options={COMMUNICATION_STYLE}
+            defaultValue={fieldString(assessment, "communication", "style")}
+          />
+          <label className="flex items-start gap-3 rounded-iw-card border border-iw-border bg-white p-3 cursor-pointer">
+            <input
+              type="checkbox"
+              name="communication.aacUsed"
+              defaultChecked={fieldBool(assessment, "communication", "aacUsed")}
+              className="mt-0.5 h-5 w-5 rounded-[6px] accent-[var(--aivo-sensory-primary)]"
+            />
+            <span className="flex-1">
+              <span className="block text-sm font-semibold text-iw-text-strong">
+                My child uses an AAC device or app
+              </span>
+              <span className="block text-xs text-iw-text-muted mt-0.5">
+                AIVO will switch to AAC-friendly response patterns.
+              </span>
+            </span>
+          </label>
+          <SoftTextField
+            name="communication.notes"
+            multiline
+            label="Anything else about communication?"
+            helper="Optional. e.g. echolalia patterns, processing time, picture supports."
+            defaultValue={fieldString(assessment, "communication", "notes")}
+            maxLength={500}
+          />
+        </div>
+      );
+    case "learning_profile":
+      return (
+        <div className="flex flex-col gap-5" key={sectionId}>
+          <PillCardGroup
+            mode="single"
+            name="learning_profile.communicationMode"
+            legend="Primary communication mode"
+            columns={2}
+            options={COMM_MODE}
+            defaultValue={fieldString(assessment, "learning_profile", "communicationMode")}
+          />
+          <PillCardGroup
+            mode="single"
+            name="learning_profile.deviceInteraction"
+            legend="How does your child use the device?"
+            columns={3}
+            options={DEVICE_INTERACTION}
+            defaultValue={fieldString(assessment, "learning_profile", "deviceInteraction")}
+          />
+          <PillCardGroup
+            mode="single"
+            name="learning_profile.responseMethod"
+            legend="Preferred response method"
+            columns={2}
+            options={RESPONSE_METHOD}
+            defaultValue={fieldString(assessment, "learning_profile", "responseMethod")}
+          />
+          <PillCardGroup
+            mode="single"
+            name="learning_profile.attentionSpanBucket"
+            legend="Typical attention span"
+            columns={2}
+            options={ATTENTION_BUCKET}
+            defaultValue={fieldString(assessment, "learning_profile", "attentionSpanBucket")}
+          />
+          <PillCardGroup
+            mode="multi"
+            name="learning_profile.bestModes"
+            legend="Modes that land best"
+            columns={2}
+            options={BEST_MODES}
+            defaultValues={fieldArray(assessment, "learning_profile", "bestModes")}
+          />
+        </div>
+      );
+    case "reading":
+      return (
+        <div className="flex flex-col gap-5" key={sectionId}>
+          <ScaleField
+            required
+            name="reading.comfort"
+            legend="How does reading feel right now?"
+            options={COMFORT_SCALE}
+            defaultValue={fieldString(assessment, "reading", "comfort")}
+          />
+          <SoftTextField
+            name="reading.notes"
+            multiline
+            label="Anything else AIVO should know about reading?"
+            helper="Optional. Decoding, sight words, comprehension, fluency, audio supports."
+            defaultValue={fieldString(assessment, "reading", "notes")}
+            maxLength={500}
+          />
+        </div>
+      );
+    case "math":
+      return (
+        <div className="flex flex-col gap-5" key={sectionId}>
+          <ScaleField
+            required
+            name="math.comfort"
+            legend="How does math feel right now?"
+            options={COMFORT_SCALE}
+            defaultValue={fieldString(assessment, "math", "comfort")}
+          />
+          <SoftTextField
+            name="math.notes"
+            multiline
+            label="Anything else AIVO should know about math?"
+            helper="Optional. Facts fluency, word problems, anxiety, visual supports."
+            defaultValue={fieldString(assessment, "math", "notes")}
+            maxLength={500}
+          />
+        </div>
+      );
+    case "sensory":
+      return (
+        <div className="flex flex-col gap-5" key={sectionId}>
+          <PillCardGroup
+            mode="multi"
+            name="sensory.sensitivities"
+            legend="Sensory sensitivities"
+            helper="Pick all that apply. AIVO uses these to set calm-mode defaults."
+            columns={3}
+            options={SENSORY_OPTIONS}
+            defaultValues={fieldArray(assessment, "sensory", "sensitivities")}
+          />
+          <PillCardGroup
+            mode="single"
+            name="sensory.seekingOrAvoiding"
+            legend="Overall sensory profile"
+            columns={2}
+            options={SENSORY_PROFILE}
+            defaultValue={fieldString(assessment, "sensory", "seekingOrAvoiding")}
+          />
+        </div>
+      );
+    case "accommodations":
+      return (
+        <div className="flex flex-col gap-5" key={sectionId}>
+          <SoftTextField
+            name="accommodations.known"
+            multiline
+            label="Known accommodations (one per line)"
+            helper="If you have an IEP, you can upload it next — but a quick list here helps too."
+            placeholder="Extended time on tests.\nFrequent movement breaks.\nQuiet testing environment."
+            defaultValue={fieldString(assessment, "accommodations", "known")}
+            maxLength={2000}
+          />
+          <div className="grid gap-3 sm:grid-cols-3">
+            {(
+              [
+                ["extendedTime", "Extended time"],
+                ["readAloud", "Read-aloud"],
+                ["speechToText", "Speech to text"],
+              ] as const
+            ).map(([key, label]) => (
+              <label
+                key={key}
+                className="flex items-start gap-2 rounded-iw-card border border-iw-border bg-white p-3 cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  name={`accommodations.${key}`}
+                  defaultChecked={fieldBool(assessment, "accommodations", key)}
+                  className="mt-0.5 h-5 w-5 rounded-[6px] accent-[var(--aivo-sensory-primary)]"
+                />
+                <span className="text-sm font-semibold text-iw-text-strong">{label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      );
+    case "homework":
+      return (
+        <div className="flex flex-col gap-5" key={sectionId}>
+          <PillCardGroup
+            mode="single"
+            required
+            name="homework.bestTimeOfDay"
+            legend="Best time of day for learning"
+            columns={2}
+            options={TIME_OF_DAY}
+            defaultValue={fieldString(assessment, "homework", "bestTimeOfDay")}
+          />
+          <SoftTextField
+            name="homework.typicalSessionMinutes"
+            type="number"
+            label="Typical session length (minutes)"
+            helper="Optional. We'll respect this when shaping sessions."
+            placeholder="20"
+            defaultValue={
+              fieldNumber(assessment, "homework", "typicalSessionMinutes")?.toString() ?? ""
+            }
+            min={1}
+            max={180}
+          />
+          <label className="flex items-start gap-3 rounded-iw-card border border-iw-border bg-white p-3 cursor-pointer">
+            <input
+              type="checkbox"
+              name="homework.needsCoaching"
+              defaultChecked={fieldBool(assessment, "homework", "needsCoaching")}
+              className="mt-0.5 h-5 w-5 rounded-[6px] accent-[var(--aivo-sensory-primary)]"
+            />
+            <span className="flex-1">
+              <span className="block text-sm font-semibold text-iw-text-strong">
+                My child needs help getting started with homework
+              </span>
+              <span className="block text-xs text-iw-text-muted mt-0.5">
+                AIVO will offer scaffolded start-up nudges.
+              </span>
+            </span>
+          </label>
+        </div>
+      );
+    case "goals":
+      return (
+        <div className="flex flex-col gap-5" key={sectionId}>
+          <SoftTextField
+            name="goals.goals"
+            multiline
+            required
+            label="What would you like AIVO to help with?"
+            helper="One per line. Up to 8."
+            placeholder="Read for 15 minutes without quitting.\nFeel confident with multiplication.\nWrite a short story."
+            defaultValue={fieldString(assessment, "goals", "goals")}
+          />
+          <PillCardGroup
+            mode="single"
+            name="goals.timeline"
+            legend="When are you hoping to see progress?"
+            columns={2}
+            options={GOAL_TIMELINE}
+            defaultValue={fieldString(assessment, "goals", "timeline")}
+          />
+        </div>
+      );
+    case "motivation":
+      return (
+        <div className="flex flex-col gap-5" key={sectionId}>
+          <SoftTextField
+            name="motivation.rewardsThatHelp"
+            multiline
+            label="Rewards or motivators that help"
+            helper="One per line. AIVO can lean on these — sparingly."
+            defaultValue={fieldString(assessment, "motivation", "rewardsThatHelp")}
+          />
+          <SoftTextField
+            name="motivation.avoidanceFactors"
+            multiline
+            label="Things that make your child shut down"
+            helper="Optional. One per line."
+            defaultValue={fieldString(assessment, "motivation", "avoidanceFactors")}
+          />
+        </div>
+      );
+    case "concerns":
+      return (
+        <SoftTextField
+          key={sectionId}
+          name="concerns.concerns"
+          multiline
+          label="Tell us anything else AIVO should know"
+          helper="Optional. Up to 2000 characters."
+          placeholder="Worried about confidence with reading. Recently moved schools. Big test in spring."
+          defaultValue={fieldString(assessment, "concerns", "concerns")}
+          maxLength={2000}
+        />
+      );
+  }
 }
 
-function fieldArray(
-  assessment: ParentAssessment,
-  section: AssessmentSectionId,
-  field: string,
-): string[] {
-  const v = sectionAnswers(assessment, section)[field];
-  return Array.isArray(v) ? (v as string[]) : [];
-}
-
-function fieldBool(
-  assessment: ParentAssessment,
-  section: AssessmentSectionId,
-  field: string,
-): boolean {
-  return Boolean(sectionAnswers(assessment, section)[field]);
-}
+/* ----- page ---------------------------------------------------------------- */
 
 export default async function AssessmentWizard({
   params,
@@ -238,749 +952,123 @@ export default async function AssessmentWizard({
   const learner = getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
+  const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
+
+  // Brand-new assessment: send the parent to the calm intro screen first.
+  const hasAnyAnswers = Object.values(assessment.answers ?? {}).some(
+    (v) => v && Object.keys(v).length > 0,
+  );
+  if (!hasAnyAnswers && !sp.step) {
+    redirect(`/parent/learners/${learnerId}/assessment/intro`);
+  }
+
   const stepNum = Math.max(
     1,
     Math.min(WIZARD_STEPS.length, Number.parseInt(sp.step || "1", 10) || 1),
   );
   const step = WIZARD_STEPS.find((s) => s.id === stepNum)!;
-  const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
+  const isLast = stepNum === WIZARD_STEPS.length;
 
-  const selectClass = "h-10 rounded-lg border border-aivo-border bg-aivo-surface px-3 text-sm";
+  const errorSections = sp.error ? sp.error.split(",") : [];
+  const errorMessage = errorSections
+    .map((s) => ERROR_MESSAGES[s])
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <AppShell
-      role="parent"
-      roleLabel="Parent"
-      navItems={PARENT_NAV}
-      user={{ displayName: session.displayName, email: session.email }}
+    <AssessmentShell
+      eyebrow={`Parent assessment for ${learner.displayName}`}
+      progress={
+        <AssessmentProgress
+          total={WIZARD_STEPS.length}
+          current={stepNum - 1}
+          label={step.label}
+          hint={
+            isLast
+              ? "Almost done — one more screen to go."
+              : `About ${Math.max(1, WIZARD_STEPS.length - stepNum)} minute${
+                  WIZARD_STEPS.length - stepNum === 1 ? "" : "s"
+                } left.`
+          }
+        />
+      }
+      saveIndicator={
+        <span className="inline-flex items-center gap-1.5">
+          <svg
+            className="w-3.5 h-3.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          Answers autosave as you move forward
+        </span>
+      }
+      reassurance={<ReassuranceColumn stepNum={stepNum} />}
     >
-      <PageHeader
-        eyebrow={`Parent assessment for ${learner.displayName}`}
-        title={step.label}
-        description="Plain-language questions only. No diagnosis required. Your answers autosave as you move forward."
-      />
-      <Stepper
-        steps={WIZARD_STEPS.map((s) => ({ label: s.label }))}
-        current={stepNum - 1}
-        className="mb-6"
-      />
-      {sp.error ? (
-        <div className="mb-4 rounded-md border border-aivo-danger bg-aivo-danger/5 px-3 py-2 text-sm text-aivo-danger">
-          We couldn't save: {sp.error}. Please review the highlighted fields and try again.
-        </div>
-      ) : null}
-
-      <Card className="max-w-3xl p-6">
-        <form action={saveStepAction} className="flex flex-col gap-6">
-          <input type="hidden" name="learnerId" value={learner.id} />
-          <input type="hidden" name="step" value={stepNum} />
-
-          {step.sections.map((s) => (
-            <fieldset key={s} className="rounded-lg border border-aivo-border p-4">
-              <legend className="px-2 text-sm font-medium">{sectionTitle(s)}</legend>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {s === "goals" && (
-                  <>
-                    <div className="sm:col-span-2 flex flex-col gap-1.5">
-                      <Label htmlFor="goals.goals">
-                        What do you want AIVO to help with? (one per line)
-                      </Label>
-                      <Textarea
-                        id="goals.goals"
-                        name="goals.goals"
-                        rows={3}
-                        defaultValue={fieldString(assessment, "goals", "goals")}
-                        required
-                      />
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <Label htmlFor="goals.timeline">Timeline</Label>
-                      <select
-                        id="goals.timeline"
-                        name="goals.timeline"
-                        className={selectClass}
-                        defaultValue={fieldString(assessment, "goals", "timeline")}
-                      >
-                        <option value="">Choose…</option>
-                        <option value="weeks">In a few weeks</option>
-                        <option value="this_term">This term</option>
-                        <option value="this_year">This year</option>
-                        <option value="long_term">Long term</option>
-                      </select>
-                    </div>
-                  </>
-                )}
-
-                {s === "grade_subject" && (
-                  <>
-                    <div className="flex flex-col gap-1.5">
-                      <Label htmlFor="grade_subject.gradeBand">Grade band</Label>
-                      <select
-                        id="grade_subject.gradeBand"
-                        name="grade_subject.gradeBand"
-                        className={selectClass}
-                        required
-                        defaultValue={fieldString(assessment, "grade_subject", "gradeBand")}
-                      >
-                        <option value="">Choose…</option>
-                        {["preK", "K", "1-2", "3-5", "6-8", "9-12", "post_secondary"].map((v) => (
-                          <option key={v} value={v}>
-                            {v}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="sm:col-span-2 flex flex-col gap-1.5">
-                      <Label>Focus subjects</Label>
-                      <div className="grid grid-cols-2 gap-1 sm:grid-cols-3">
-                        {["Reading", "Math", "Writing", "Science", "Social", "Life", "Art"].map(
-                          (subj) => {
-                            const current = fieldArray(
-                              assessment,
-                              "grade_subject",
-                              "focusSubjects",
-                            );
-                            return (
-                              <label key={subj} className="flex items-center gap-2 text-sm">
-                                <input
-                                  type="checkbox"
-                                  name="grade_subject.focusSubjects"
-                                  value={subj}
-                                  defaultChecked={current.includes(subj)}
-                                  className="h-4 w-4 rounded border-aivo-border"
-                                />
-                                {subj}
-                              </label>
-                            );
-                          },
-                        )}
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {(s === "reading" || s === "math") && (
-                  <>
-                    <div className="flex flex-col gap-1.5">
-                      <Label htmlFor={`${s}.comfort`}>Comfort</Label>
-                      <select
-                        id={`${s}.comfort`}
-                        name={`${s}.comfort`}
-                        className={selectClass}
-                        required
-                        defaultValue={fieldString(assessment, s, "comfort")}
-                      >
-                        <option value="">Choose…</option>
-                        <option value="new">Just starting</option>
-                        <option value="growing">Growing</option>
-                        <option value="confident">Confident</option>
-                        <option value="advanced">Advanced</option>
-                      </select>
-                    </div>
-                    <div className="sm:col-span-2 flex flex-col gap-1.5">
-                      <Label htmlFor={`${s}.notes`}>Notes (optional)</Label>
-                      <Textarea
-                        id={`${s}.notes`}
-                        name={`${s}.notes`}
-                        rows={2}
-                        defaultValue={fieldString(assessment, s, "notes")}
-                      />
-                    </div>
-                  </>
-                )}
-
-                {s === "attention" && (
-                  <>
-                    <div className="flex flex-col gap-1.5">
-                      <Label htmlFor="attention.focusWindowMinutes">
-                        Typical focus window (minutes)
-                      </Label>
-                      <Input
-                        id="attention.focusWindowMinutes"
-                        name="attention.focusWindowMinutes"
-                        type="number"
-                        min={1}
-                        max={120}
-                        required
-                        defaultValue={
-                          fieldString(assessment, "attention", "focusWindowMinutes") || 10
-                        }
-                      />
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <Label htmlFor="attention.breakStyle">Break style</Label>
-                      <select
-                        id="attention.breakStyle"
-                        name="attention.breakStyle"
-                        className={selectClass}
-                        required
-                        defaultValue={fieldString(assessment, "attention", "breakStyle")}
-                      >
-                        <option value="">Choose…</option>
-                        <option value="frequent_short">Frequent short breaks</option>
-                        <option value="occasional">Occasional breaks</option>
-                        <option value="long_uninterrupted">Long uninterrupted blocks</option>
-                      </select>
-                    </div>
-                    <label className="flex items-center gap-2 text-sm">
-                      <input
-                        type="checkbox"
-                        name="attention.movementHelps"
-                        defaultChecked={fieldBool(assessment, "attention", "movementHelps")}
-                        className="h-4 w-4 rounded border-aivo-border"
-                      />
-                      Movement helps with focus
-                    </label>
-                  </>
-                )}
-
-                {s === "communication" && (
-                  <>
-                    <div className="flex flex-col gap-1.5">
-                      <Label htmlFor="communication.style">Style</Label>
-                      <select
-                        id="communication.style"
-                        name="communication.style"
-                        className={selectClass}
-                        required
-                        defaultValue={fieldString(assessment, "communication", "style")}
-                      >
-                        <option value="">Choose…</option>
-                        <option value="spoken">Spoken</option>
-                        <option value="written">Written</option>
-                        <option value="visual">Visual</option>
-                        <option value="mixed">Mixed</option>
-                      </select>
-                    </div>
-                    <label className="flex items-center gap-2 text-sm">
-                      <input
-                        type="checkbox"
-                        name="communication.aacUsed"
-                        defaultChecked={fieldBool(assessment, "communication", "aacUsed")}
-                        className="h-4 w-4 rounded border-aivo-border"
-                      />
-                      Uses AAC tools
-                    </label>
-                    <div className="sm:col-span-2 flex flex-col gap-1.5">
-                      <Label htmlFor="communication.notes">Notes (optional)</Label>
-                      <Textarea
-                        id="communication.notes"
-                        name="communication.notes"
-                        rows={2}
-                        defaultValue={fieldString(assessment, "communication", "notes")}
-                      />
-                    </div>
-                  </>
-                )}
-
-                {s === "sensory" && (
-                  <>
-                    <div className="sm:col-span-2 flex flex-col gap-1.5">
-                      <Label>Sensitivities</Label>
-                      <div className="grid grid-cols-2 gap-1 sm:grid-cols-3">
-                        {["sound", "light", "touch", "movement", "smell", "taste"].map((v) => {
-                          const cur = fieldArray(assessment, "sensory", "sensitivities");
-                          return (
-                            <label key={v} className="flex items-center gap-2 text-sm capitalize">
-                              <input
-                                type="checkbox"
-                                name="sensory.sensitivities"
-                                value={v}
-                                defaultChecked={cur.includes(v)}
-                                className="h-4 w-4 rounded border-aivo-border"
-                              />
-                              {v}
-                            </label>
-                          );
-                        })}
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <Label htmlFor="sensory.seekingOrAvoiding">Pattern</Label>
-                      <select
-                        id="sensory.seekingOrAvoiding"
-                        name="sensory.seekingOrAvoiding"
-                        className={selectClass}
-                        defaultValue={fieldString(assessment, "sensory", "seekingOrAvoiding")}
-                      >
-                        <option value="">Choose…</option>
-                        <option value="seeking">Seeking</option>
-                        <option value="avoiding">Avoiding</option>
-                        <option value="mixed">Mixed</option>
-                        <option value="neutral">Neutral</option>
-                      </select>
-                    </div>
-                  </>
-                )}
-
-                {s === "homework" && (
-                  <>
-                    <label className="flex items-center gap-2 text-sm">
-                      <input
-                        type="checkbox"
-                        name="homework.needsCoaching"
-                        defaultChecked={fieldBool(assessment, "homework", "needsCoaching")}
-                        className="h-4 w-4 rounded border-aivo-border"
-                      />
-                      Needs coaching to start homework
-                    </label>
-                    <div className="flex flex-col gap-1.5">
-                      <Label htmlFor="homework.bestTimeOfDay">Best time of day</Label>
-                      <select
-                        id="homework.bestTimeOfDay"
-                        name="homework.bestTimeOfDay"
-                        className={selectClass}
-                        required
-                        defaultValue={fieldString(assessment, "homework", "bestTimeOfDay")}
-                      >
-                        <option value="">Choose…</option>
-                        <option value="morning">Morning</option>
-                        <option value="afternoon">Afternoon</option>
-                        <option value="evening">Evening</option>
-                        <option value="varies">It varies</option>
-                      </select>
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <Label htmlFor="homework.typicalSessionMinutes">
-                        Typical session (minutes, optional)
-                      </Label>
-                      <Input
-                        id="homework.typicalSessionMinutes"
-                        name="homework.typicalSessionMinutes"
-                        type="number"
-                        min={0}
-                        max={180}
-                        defaultValue={fieldString(assessment, "homework", "typicalSessionMinutes")}
-                      />
-                    </div>
-                  </>
-                )}
-
-                {s === "frustration" && (
-                  <>
-                    <div className="sm:col-span-2 flex flex-col gap-1.5">
-                      <Label htmlFor="frustration.triggers">Triggers (one per line)</Label>
-                      <Textarea
-                        id="frustration.triggers"
-                        name="frustration.triggers"
-                        rows={3}
-                        defaultValue={fieldString(assessment, "frustration", "triggers")}
-                      />
-                    </div>
-                    <div className="sm:col-span-2 flex flex-col gap-1.5">
-                      <Label htmlFor="frustration.calmingStrategies">
-                        Calming strategies (one per line)
-                      </Label>
-                      <Textarea
-                        id="frustration.calmingStrategies"
-                        name="frustration.calmingStrategies"
-                        rows={3}
-                        defaultValue={fieldString(assessment, "frustration", "calmingStrategies")}
-                      />
-                    </div>
-                  </>
-                )}
-
-                {s === "motivation" && (
-                  <>
-                    <div className="sm:col-span-2 flex flex-col gap-1.5">
-                      <Label htmlFor="motivation.rewardsThatHelp">
-                        Rewards that help (one per line)
-                      </Label>
-                      <Textarea
-                        id="motivation.rewardsThatHelp"
-                        name="motivation.rewardsThatHelp"
-                        rows={3}
-                        defaultValue={fieldString(assessment, "motivation", "rewardsThatHelp")}
-                      />
-                    </div>
-                    <div className="sm:col-span-2 flex flex-col gap-1.5">
-                      <Label htmlFor="motivation.avoidanceFactors">
-                        Things to avoid (optional, one per line)
-                      </Label>
-                      <Textarea
-                        id="motivation.avoidanceFactors"
-                        name="motivation.avoidanceFactors"
-                        rows={3}
-                        defaultValue={fieldString(assessment, "motivation", "avoidanceFactors")}
-                      />
-                    </div>
-                  </>
-                )}
-
-                {s === "accommodations" && (
-                  <>
-                    <div className="sm:col-span-2 flex flex-col gap-1.5">
-                      <Label htmlFor="accommodations.known">
-                        Known accommodations (one per line)
-                      </Label>
-                      <Textarea
-                        id="accommodations.known"
-                        name="accommodations.known"
-                        rows={3}
-                        defaultValue={fieldString(assessment, "accommodations", "known")}
-                      />
-                    </div>
-                    <label className="flex items-center gap-2 text-sm">
-                      <input
-                        type="checkbox"
-                        name="accommodations.extendedTime"
-                        defaultChecked={fieldBool(assessment, "accommodations", "extendedTime")}
-                        className="h-4 w-4 rounded border-aivo-border"
-                      />
-                      Extended time
-                    </label>
-                    <label className="flex items-center gap-2 text-sm">
-                      <input
-                        type="checkbox"
-                        name="accommodations.readAloud"
-                        defaultChecked={fieldBool(assessment, "accommodations", "readAloud")}
-                        className="h-4 w-4 rounded border-aivo-border"
-                      />
-                      Read-aloud
-                    </label>
-                    <label className="flex items-center gap-2 text-sm">
-                      <input
-                        type="checkbox"
-                        name="accommodations.speechToText"
-                        defaultChecked={fieldBool(assessment, "accommodations", "speechToText")}
-                        className="h-4 w-4 rounded border-aivo-border"
-                      />
-                      Speech-to-text
-                    </label>
-                  </>
-                )}
-
-                {s === "pace" && (
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="pace.preferred">Preferred pace</Label>
-                    <select
-                      id="pace.preferred"
-                      name="pace.preferred"
-                      className={selectClass}
-                      required
-                      defaultValue={fieldString(assessment, "pace", "preferred")}
+      <form action={saveStepAction}>
+        <input type="hidden" name="learnerId" value={learner.id} />
+        <input type="hidden" name="step" value={stepNum} />
+        <QuestionCard
+          eyebrow={step.label}
+          title={step.longLabel}
+          helper={step.helper}
+          tag={isLast ? "Final step" : undefined}
+          error={errorMessage || undefined}
+          actions={
+            <AssessmentFooter
+              back={
+                stepNum > 1 ? (
+                  <Link
+                    href={`/parent/learners/${learner.id}/assessment?step=${stepNum - 1}`}
+                    className={ASSESSMENT_BACK_CLASS}
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.25"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
                     >
-                      <option value="">Choose…</option>
-                      <option value="slow">Slow and steady</option>
-                      <option value="steady">Steady</option>
-                      <option value="fast">Fast</option>
-                    </select>
-                  </div>
-                )}
-
-                {s === "concerns" && (
-                  <div className="sm:col-span-2 flex flex-col gap-1.5">
-                    <Label htmlFor="concerns.concerns">Anything else you want AIVO to know</Label>
-                    <Textarea
-                      id="concerns.concerns"
-                      name="concerns.concerns"
-                      rows={4}
-                      required
-                      defaultValue={fieldString(assessment, "concerns", "concerns")}
-                    />
-                  </div>
-                )}
-
-                {s === "basics" && (
-                  <>
-                    <div className="flex flex-col gap-1.5">
-                      <Label htmlFor="basics.dob">Date of birth (optional)</Label>
-                      <Input
-                        id="basics.dob"
-                        name="basics.dob"
-                        type="date"
-                        defaultValue={fieldString(assessment, "basics", "dob")}
-                      />
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <Label htmlFor="basics.pronouns">Pronouns (optional)</Label>
-                      <Input
-                        id="basics.pronouns"
-                        name="basics.pronouns"
-                        placeholder="she/her, he/him, they/them"
-                        defaultValue={fieldString(assessment, "basics", "pronouns")}
-                      />
-                    </div>
-                    <div className="sm:col-span-2 flex flex-col gap-1.5">
-                      <Label htmlFor="basics.languages">
-                        Languages spoken at home (comma or new-line separated)
-                      </Label>
-                      <Input
-                        id="basics.languages"
-                        name="basics.languages"
-                        placeholder="English, Spanish"
-                        defaultValue={fieldString(assessment, "basics", "languages")}
-                      />
-                    </div>
-                  </>
-                )}
-
-                {s === "strengths" && (
-                  <>
-                    <div className="sm:col-span-2 flex flex-col gap-1.5">
-                      <Label htmlFor="strengths.loves">What does your child love?</Label>
-                      <Textarea
-                        id="strengths.loves"
-                        name="strengths.loves"
-                        rows={2}
-                        placeholder="Dinosaurs, drawing, building with blocks…"
-                        defaultValue={fieldString(assessment, "strengths", "loves")}
-                      />
-                    </div>
-                    <div className="sm:col-span-2 flex flex-col gap-1.5">
-                      <Label htmlFor="strengths.goodAt">
-                        What are they good at? (comma or new-line separated)
-                      </Label>
-                      <Textarea
-                        id="strengths.goodAt"
-                        name="strengths.goodAt"
-                        rows={2}
-                        placeholder="Memorising songs, puzzles, kindness…"
-                        defaultValue={fieldString(assessment, "strengths", "goodAt")}
-                      />
-                    </div>
-                    <div className="sm:col-span-2 flex flex-col gap-1.5">
-                      <Label htmlFor="strengths.motivates">What motivates them?</Label>
-                      <Textarea
-                        id="strengths.motivates"
-                        name="strengths.motivates"
-                        rows={2}
-                        placeholder="Earning stickers, praise, choosing the next activity…"
-                        defaultValue={fieldString(assessment, "strengths", "motivates")}
-                      />
-                    </div>
-                  </>
-                )}
-
-                {s === "background" && (
-                  <>
-                    <div className="sm:col-span-2 flex flex-col gap-1.5">
-                      <Label>Diagnoses (check all that apply — optional)</Label>
-                      <div className="grid grid-cols-2 gap-1 sm:grid-cols-3">
-                        {[
-                          "ADHD",
-                          "Autism",
-                          "Dyslexia",
-                          "Dyscalculia",
-                          "Dysgraphia",
-                          "Anxiety",
-                          "Speech delay",
-                          "Sensory processing",
-                          "Down syndrome",
-                          "Hearing loss",
-                          "Vision impairment",
-                          "Other",
-                        ].map((v) => {
-                          const cur = fieldArray(assessment, "background", "diagnoses");
-                          return (
-                            <label key={v} className="flex items-center gap-2 text-sm">
-                              <input
-                                type="checkbox"
-                                name="background.diagnoses"
-                                value={v}
-                                defaultChecked={cur.includes(v)}
-                                className="h-4 w-4 rounded border-aivo-border"
-                              />
-                              {v}
-                            </label>
-                          );
-                        })}
-                      </div>
-                    </div>
-                    <div className="sm:col-span-2 flex flex-col gap-1.5">
-                      <Label htmlFor="background.diagnosesOther">
-                        Add another (optional, comma or new-line separated)
-                      </Label>
-                      <Input
-                        id="background.diagnosesOther"
-                        name="background.diagnosesOther"
-                        placeholder="e.g. Tourette syndrome"
-                      />
-                    </div>
-                    <div className="sm:col-span-2 flex flex-col gap-1.5">
-                      <Label>Support services they currently receive</Label>
-                      <div className="grid grid-cols-2 gap-1 sm:grid-cols-3">
-                        {[
-                          "Speech therapy",
-                          "Occupational therapy",
-                          "Physical therapy",
-                          "ABA",
-                          "Counseling",
-                          "Resource room",
-                          "Tutoring",
-                          "None",
-                        ].map((v) => {
-                          const cur = fieldArray(assessment, "background", "services");
-                          return (
-                            <label key={v} className="flex items-center gap-2 text-sm">
-                              <input
-                                type="checkbox"
-                                name="background.services"
-                                value={v}
-                                defaultChecked={cur.includes(v)}
-                                className="h-4 w-4 rounded border-aivo-border"
-                              />
-                              {v}
-                            </label>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {s === "learning_profile" && (
-                  <>
-                    <div className="flex flex-col gap-1.5">
-                      <Label htmlFor="learning_profile.communicationMode">Communication mode</Label>
-                      <select
-                        id="learning_profile.communicationMode"
-                        name="learning_profile.communicationMode"
-                        className={selectClass}
-                        defaultValue={fieldString(
-                          assessment,
-                          "learning_profile",
-                          "communicationMode",
-                        )}
-                      >
-                        <option value="">Choose…</option>
-                        <option value="verbal">Verbal</option>
-                        <option value="sign">Sign language</option>
-                        <option value="aac">AAC device</option>
-                        <option value="non_verbal">Non-verbal</option>
-                      </select>
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <Label htmlFor="learning_profile.deviceInteraction">
-                        Uses tablet/computer
-                      </Label>
-                      <select
-                        id="learning_profile.deviceInteraction"
-                        name="learning_profile.deviceInteraction"
-                        className={selectClass}
-                        defaultValue={fieldString(
-                          assessment,
-                          "learning_profile",
-                          "deviceInteraction",
-                        )}
-                      >
-                        <option value="">Choose…</option>
-                        <option value="independent">Independently</option>
-                        <option value="with_prompts">With prompts</option>
-                        <option value="hand_over_hand">With hand-over-hand support</option>
-                      </select>
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <Label htmlFor="learning_profile.responseMethod">How they respond</Label>
-                      <select
-                        id="learning_profile.responseMethod"
-                        name="learning_profile.responseMethod"
-                        className={selectClass}
-                        defaultValue={fieldString(assessment, "learning_profile", "responseMethod")}
-                      >
-                        <option value="">Choose…</option>
-                        <option value="touch">Touch / tap</option>
-                        <option value="voice">Voice</option>
-                        <option value="switch">Switch / button</option>
-                        <option value="eye_gaze">Eye gaze</option>
-                      </select>
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <Label htmlFor="learning_profile.attentionSpanBucket">
-                        Typical attention span
-                      </Label>
-                      <select
-                        id="learning_profile.attentionSpanBucket"
-                        name="learning_profile.attentionSpanBucket"
-                        className={selectClass}
-                        defaultValue={fieldString(
-                          assessment,
-                          "learning_profile",
-                          "attentionSpanBucket",
-                        )}
-                      >
-                        <option value="">Choose…</option>
-                        <option value="under_5">Under 5 minutes</option>
-                        <option value="5_10">5–10 minutes</option>
-                        <option value="10_20">10–20 minutes</option>
-                        <option value="20_plus">20+ minutes</option>
-                      </select>
-                    </div>
-                    <div className="sm:col-span-2 flex flex-col gap-1.5">
-                      <Label>Best learning modes (check all that apply)</Label>
-                      <div className="grid grid-cols-2 gap-1 sm:grid-cols-4">
-                        {[
-                          { v: "visual", l: "Visual" },
-                          { v: "auditory", l: "Auditory" },
-                          { v: "kinesthetic", l: "Hands-on" },
-                          { v: "reading_writing", l: "Reading / writing" },
-                        ].map(({ v, l }) => {
-                          const cur = fieldArray(assessment, "learning_profile", "bestModes");
-                          return (
-                            <label key={v} className="flex items-center gap-2 text-sm">
-                              <input
-                                type="checkbox"
-                                name="learning_profile.bestModes"
-                                value={v}
-                                defaultChecked={cur.includes(v)}
-                                className="h-4 w-4 rounded border-aivo-border"
-                              />
-                              {l}
-                            </label>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            </fieldset>
-          ))}
-
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              {stepNum > 1 ? (
-                <Button asChild variant="outline">
-                  <Link href={`/parent/learners/${learner.id}/assessment?step=${stepNum - 1}`}>
+                      <path d="M19 12H5" />
+                      <path d="m12 19-7-7 7-7" />
+                    </svg>
                     Back
                   </Link>
-                </Button>
-              ) : (
-                <Button asChild variant="outline">
-                  <Link href={`/parent/learners/${learner.id}`}>Exit without saving</Link>
-                </Button>
-              )}
-            </div>
-            <Button type="submit">
-              {stepNum < WIZARD_STEPS.length ? "Save and continue" : "Save and review"}
-            </Button>
+                ) : (
+                  <Link
+                    href={`/parent/learners/${learner.id}/assessment/intro`}
+                    className={ASSESSMENT_BACK_CLASS}
+                  >
+                    Back to intro
+                  </Link>
+                )
+              }
+              saveExit={
+                <Link
+                  href={`/parent/learners/${learner.id}`}
+                  className={ASSESSMENT_GHOST_CLASS}
+                >
+                  Save & exit
+                </Link>
+              }
+              primaryLabel={isLast ? "Review answers" : "Save & continue"}
+            />
+          }
+        >
+          <div className="flex flex-col gap-6">
+            {step.sections.map((s) => renderSection(s, assessment))}
           </div>
-        </form>
-      </Card>
-    </AppShell>
+        </QuestionCard>
+      </form>
+    </AssessmentShell>
   );
-}
-
-function sectionTitle(s: AssessmentSectionId): string {
-  const titles: Record<AssessmentSectionId, string> = {
-    basics: "About your child",
-    goals: "Learning goals",
-    background: "Background & support services",
-    strengths: "Strengths & what motivates them",
-    grade_subject: "Grade and focus subjects",
-    reading: "Reading confidence",
-    math: "Math confidence",
-    attention: "Attention and focus",
-    communication: "Communication style",
-    learning_profile: "Learning profile",
-    sensory: "Sensory preferences",
-    homework: "Homework habits",
-    frustration: "Frustration triggers and calming",
-    motivation: "Motivation",
-    accommodations: "Known accommodations",
-    pace: "Preferred pace",
-    concerns: "Your concerns",
-  };
-  return titles[s];
 }

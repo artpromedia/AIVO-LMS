@@ -43,7 +43,7 @@ export default function IepUploadPage() {
           <>
             <Link
               href="/onboarding/parent-verify"
-              className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary,#7c3aed)] text-white font-semibold flex items-center justify-center hover:opacity-95"
+              className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold flex items-center justify-center hover:opacity-95"
             >
               {file ? "Upload and continue" : "Skip for now"}
             </Link>
@@ -80,7 +80,7 @@ export default function IepUploadPage() {
             className={`inline-flex items-center gap-2 px-4 h-10 rounded-iw-control font-semibold text-sm ${
               explicitConsent
                 ? "bg-white border border-iw-border text-iw-text-strong cursor-pointer hover:border-iw-text-muted"
-                : "bg-[var(--aivo-color-surface-canvas,#f4f6f5)] text-iw-text-muted cursor-not-allowed"
+                : "bg-[var(--aivo-color-surface-canvas)] text-iw-text-muted cursor-not-allowed"
             }`}
           >
             <AivoIcon name="curriculum" size={18} />

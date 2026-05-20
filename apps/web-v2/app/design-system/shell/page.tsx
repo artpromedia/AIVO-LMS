@@ -58,7 +58,7 @@ export default function ShellShowcase() {
         linkAs: Link,
         brand: (
           <span className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-iw-control bg-[var(--aivo-color-aivoPurple-100,#ede9fe)]">
+            <span className="flex h-8 w-8 items-center justify-center rounded-iw-control bg-[var(--aivo-color-aivoPurple-100)]">
               <AivoIcon name="aiSparkle" tone="brand" className="h-4 w-4" />
             </span>
             <span className="font-semibold text-iw-text-strong">AIVO</span>
@@ -109,7 +109,7 @@ export default function ShellShowcase() {
               title="Today's next step"
               subtitle="Emma's reading baseline finishes in 12 minutes. We'll show her starting point as soon as it lands."
               primaryAction={
-                <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-iw-chip bg-[var(--aivo-sensory-primary,#7c3aed)] text-white text-sm font-semibold shadow-md">
+                <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-iw-chip bg-[var(--aivo-sensory-primary)] text-white text-sm font-semibold shadow-md">
                   See Emma's profile
                 </span>
               }

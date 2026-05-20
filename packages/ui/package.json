@@ -43,6 +43,30 @@
       "types": "./dist/hero/index.d.ts",
       "import": "./dist/hero/index.js"
     },
+    "./assessment": {
+      "types": "./dist/assessment/index.d.ts",
+      "import": "./dist/assessment/index.js"
+    },
+    "./baseline": {
+      "types": "./dist/baseline/index.d.ts",
+      "import": "./dist/baseline/index.js"
+    },
+    "./learner-home": {
+      "types": "./dist/learner-home/index.d.ts",
+      "import": "./dist/learner-home/index.js"
+    },
+    "./tutor": {
+      "types": "./dist/tutor/index.d.ts",
+      "import": "./dist/tutor/index.js"
+    },
+    "./homework": {
+      "types": "./dist/homework/index.d.ts",
+      "import": "./dist/homework/index.js"
+    },
+    "./curriculum": {
+      "types": "./dist/curriculum/index.d.ts",
+      "import": "./dist/curriculum/index.js"
+    },
     "./utils": {
       "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils/index.js"

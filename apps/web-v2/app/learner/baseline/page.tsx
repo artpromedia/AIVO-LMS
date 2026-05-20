@@ -1,46 +1,28 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowRight, Play } from "lucide-react";
 import { requirePageRole } from "@/lib/auth/server";
-import { AppShell } from "@/components/layout/app-shell";
-import { PageHeader } from "@/components/layout/page-header";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
-import { LEARNER_NAV } from "@/components/layout/role-shells";
 import {
-  createBaseline,
+  LearnerBaselineShell,
+  AICompanionHero,
+  PersonalizationChip,
+  type PersonalizationVariant,
+} from "@aivo/ui";
+import {
   getActiveBaselineForLearner,
   getBrainProfile,
+  getIEPForLearner,
+  getLearner,
   getOrCreateParentAssessment,
-  listBaselineAttempts,
-  listBaselineQuestions,
 } from "@/lib/db/repos";
-import { audit } from "@/lib/bff/audit";
-import { newRequestId } from "@/lib/observability/logger";
 
-async function ensureBaselineAction() {
-  "use server";
-  const { readMockSessionFromCookies } = await import("@/lib/auth/mock-session");
-  const session = await readMockSessionFromCookies();
-  if (!session || session.role !== "learner" || !session.learnerId) redirect("/login");
-  const learnerId = session.learnerId;
-  const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
-  if (!assessment.submittedAt) redirect("/learner/home");
-  if (!getBrainProfile(learnerId, session.tenantId)) redirect("/learner/home");
-  let baseline = getActiveBaselineForLearner(learnerId, session.tenantId);
-  if (!baseline || baseline.status === "complete") {
-    const created = createBaseline({ learnerId, tenantId: session.tenantId });
-    if (!created) redirect("/learner/home");
-    baseline = created!.baseline;
-    audit(session, "baseline.create", newRequestId(), {
-      learnerId,
-      metadata: { baselineId: baseline.id, questionCount: created!.questions.length },
-    });
-  }
-  redirect(`/learner/baseline/${baseline.id}`);
-}
-
+/**
+ * /learner/baseline
+ *
+ * Soft entry point. Routes the learner to the calm intro flow
+ * (why → subjects → readiness → intro → first question) on first
+ * visit. Returning learners with an in-progress baseline jump back
+ * into the runner.
+ */
 export default async function LearnerBaselineIndex() {
   const session = await requirePageRole(["learner"]);
   const learnerId = session.learnerId;
@@ -51,67 +33,87 @@ export default async function LearnerBaselineIndex() {
     Boolean(assessment.submittedAt) && Boolean(getBrainProfile(learnerId, session.tenantId));
   const baseline = getActiveBaselineForLearner(learnerId, session.tenantId);
 
-  return (
-    <AppShell
-      role="learner"
-      roleLabel="Learner"
-      navItems={LEARNER_NAV}
-      user={{ displayName: session.displayName, email: session.email }}
-    >
-      <PageHeader
-        eyebrow="Baseline"
-        title="A quick check-in"
-        description="A few friendly questions so your tutor knows where to start."
-      />
+  // Already mid-way? Drop the learner straight into the runner.
+  if (baseline && baseline.status === "in_progress") {
+    redirect(`/learner/baseline/${baseline.id}`);
+  }
 
-      {!ready ? (
-        <EmptyState
-          title="A grown-up will set this up"
-          description="Ask the grown-up who signed you up to finish the setup."
-          action={
-            <Button asChild variant="outline">
-              <Link href="/learner/home">Back home</Link>
-            </Button>
+  const learner = getLearner(learnerId, session.tenantId);
+  if (!learner) redirect("/learner/home");
+
+  if (!ready) {
+    return (
+      <LearnerBaselineShell
+        headerLeft={
+          <Link
+            href="/learner/home"
+            className="inline-flex items-center gap-1.5 rounded-iw-control px-3 py-1.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-muted)]"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M19 12H5" />
+              <path d="m12 19-7-7 7-7" />
+            </svg>
+            Back home
+          </Link>
+        }
+      >
+        <AICompanionHero
+          eyebrow="Almost ready"
+          title="A grown-up is still setting this up"
+          body="Ask the grown-up who signed you up — they have a couple of questions to finish before AIVO can plan your check-in."
+          actions={
+            <Link
+              href="/learner/home"
+              className="inline-flex items-center gap-2 rounded-iw-control px-5 py-3 text-base font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-muted)]"
+            >
+              Back home
+            </Link>
           }
         />
-      ) : !baseline || baseline.status === "complete" ? (
-        <Card className="flex flex-col gap-3 p-[var(--aivo-density-card-pad)] sm:flex-row sm:items-center">
-          <Play className="h-6 w-6 text-aivo-primary" />
-          <div className="flex-1">
-            <p className="font-display text-lg font-semibold">
-              {baseline?.status === "complete" ? "Want to try again?" : "Ready when you are"}
-            </p>
-            <p className="text-sm text-aivo-ink-soft">Take your time. You can skip any question.</p>
-          </div>
-          <form action={ensureBaselineAction}>
-            <Button type="submit">
-              {baseline?.status === "complete" ? "Start again" : "Start"}{" "}
-              <ArrowRight className="ml-1 h-4 w-4" />
-            </Button>
-          </form>
-        </Card>
-      ) : (
-        (() => {
-          const qs = listBaselineQuestions(baseline.id);
-          const ats = listBaselineAttempts(baseline.id, session.tenantId);
-          return (
-            <Card className="flex flex-col gap-3 p-[var(--aivo-density-card-pad)] sm:flex-row sm:items-center">
-              <Play className="h-6 w-6 text-aivo-primary" />
-              <div className="flex-1">
-                <p className="font-display text-lg font-semibold">Pick up where you left off</p>
-                <p className="text-sm text-aivo-ink-soft">
-                  {ats.length} of {qs.length} answered.
-                </p>
-              </div>
-              <Button asChild>
-                <Link href={`/learner/baseline/${baseline.id}`}>
-                  Continue <ArrowRight className="ml-1 h-4 w-4" />
-                </Link>
-              </Button>
-            </Card>
-          );
-        })()
-      )}
-    </AppShell>
+      </LearnerBaselineShell>
+    );
+  }
+
+  const iep = getIEPForLearner(learnerId, session.tenantId);
+  const chips: PersonalizationVariant[] = ["parent_assessment", "no_grades"];
+  if (iep?.confirmedAt) chips.unshift("iep");
+  chips.push("pacing", "ai_companion");
+
+  return (
+    <LearnerBaselineShell
+      headerLeft={
+        <Link
+          href="/learner/home"
+          className="inline-flex items-center gap-1.5 rounded-iw-control px-3 py-1.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-muted)]"
+        >
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M19 12H5" />
+            <path d="m12 19-7-7 7-7" />
+          </svg>
+          Back home
+        </Link>
+      }
+    >
+      <AICompanionHero
+        eyebrow="A friendly check-in"
+        title={`Hi ${learner.preferredName || learner.firstName} — ready to show me how you think?`}
+        body="Three calm steps before the first question. Pick what you want to start with, AIVO does the rest."
+        chips={chips.slice(0, 4).map((v) => (
+          <PersonalizationChip key={v} variant={v} />
+        ))}
+        actions={
+          <Link
+            href="/learner/baseline/why"
+            className="inline-flex items-center gap-2 rounded-iw-control px-6 py-3 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 shadow-[0_4px_12px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.3)]"
+          >
+            Let's go
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M5 12h14" />
+              <path d="m13 5 7 7-7 7" />
+            </svg>
+          </Link>
+        }
+      />
+    </LearnerBaselineShell>
   );
 }

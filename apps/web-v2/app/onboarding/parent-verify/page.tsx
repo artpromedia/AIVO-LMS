@@ -40,7 +40,7 @@ export default function ParentVerifyPage() {
             <button
               type="button"
               onClick={() => setStage(stage === "phone" ? "code" : "phone")}
-              className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary,#7c3aed)] text-white font-semibold hover:opacity-95"
+              className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold hover:opacity-95"
             >
               {stage === "phone" ? "Send code" : "Verify and continue"}
             </button>

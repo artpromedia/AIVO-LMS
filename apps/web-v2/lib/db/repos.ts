@@ -357,6 +357,8 @@ export function uploadIEPDocument(input: {
     uploadedAt: nowIso(),
     status: "pending",
     extraction: null,
+    acceptedAccommodations: null,
+    confirmedAt: null,
   };
   store.iepDocuments.set(doc.id, doc);
   // Mark learner as having decided "uploaded"
@@ -388,6 +390,32 @@ export function setIEPExtraction(
   const existing = getIEPForLearner(learnerId, tenantId);
   if (!existing) return null;
   const next: IEPDocument = { ...existing, extraction, status: "parsed" };
+  store.iepDocuments.set(existing.id, next);
+  return next;
+}
+
+/**
+ * Sprint 5: record the parent's explicit consent over the extracted
+ * accommodations. Only the listed supports are applied downstream. We
+ * also stamp `confirmedAt` so readiness / brain-profile generation can
+ * trust the document was actively reviewed.
+ */
+export function confirmIEPExtraction(
+  learnerId: string,
+  tenantId: string,
+  acceptedAccommodations: string[],
+): IEPDocument | null {
+  const store = db();
+  const existing = getIEPForLearner(learnerId, tenantId);
+  if (!existing) return null;
+  // Defensive: only allow consent on labels that exist in the extraction.
+  const allowed = new Set(existing.extraction?.accommodations ?? []);
+  const accepted = acceptedAccommodations.filter((a) => allowed.has(a));
+  const next: IEPDocument = {
+    ...existing,
+    acceptedAccommodations: accepted,
+    confirmedAt: nowIso(),
+  };
   store.iepDocuments.set(existing.id, next);
   return next;
 }

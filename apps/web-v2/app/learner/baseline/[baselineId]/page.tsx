@@ -1,17 +1,26 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowRight, CheckCircle2, SkipForward, Volume2 } from "lucide-react";
 import { requirePageRole } from "@/lib/auth/server";
-import { AppShell } from "@/components/layout/app-shell";
-import { PageHeader, SectionHeader } from "@/components/layout/page-header";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { LEARNER_NAV, PARENT_NAV } from "@/components/layout/role-shells";
+import {
+  LearnerBaselineShell,
+  LearnerQuestionCard,
+  LearnerChoiceCard,
+  BaselineProgressDots,
+  PersonalizationChip,
+  HintCard,
+  ReadAloudButton,
+  BreakCard,
+  CompletionHero,
+  ProctorBanner,
+  type DotState,
+  type PersonalizationVariant,
+} from "@aivo/ui";
 import {
   completeBaseline,
   getBaselineById,
+  getIEPForLearner,
   getLearner,
+  getOrCreateParentAssessment,
   listBaselineAttempts,
   listBaselineQuestions,
   listSubjects,
@@ -25,11 +34,20 @@ import { newRequestId } from "@/lib/observability/logger";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
 
 /**
- * Defense-in-depth: server actions are mutating endpoints reachable from any
- * authenticated session. The BFF guards already check learner scope, but the
- * server-action path bypasses BFF — so we also confirm the baseline actually
- * belongs to the form-supplied learnerId before mutating anything.
+ * Sprint 6: calm baseline runner.
+ *
+ * Defense-in-depth: server actions are mutating endpoints reachable
+ * from any authenticated session. The BFF guards already check
+ * learner scope, but the server-action path bypasses BFF — we also
+ * confirm the baseline actually belongs to the form-supplied
+ * learnerId before mutating anything.
+ *
+ * Break cadence: after every BREAK_EVERY answered questions we show
+ * a BreakCard before the next question. The learner taps "Resume" to
+ * continue — break is just a soft pause, no state is mutated.
  */
+const BREAK_EVERY = 5;
+
 function assertBaselineMatchesLearner(
   baselineId: string,
   learnerId: string,
@@ -51,7 +69,6 @@ async function answerAction(formData: FormData) {
   const skipped = String(formData.get("skipped") || "") === "1";
   const asParent = String(formData.get("asParent") || "") === "1";
 
-  // Scope check based on role.
   if (session.role === "parent") {
     if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
       redirect("/parent/learners");
@@ -62,7 +79,6 @@ async function answerAction(formData: FormData) {
     redirect("/login");
   }
 
-  // Reject mismatched baseline/learner combos before any mutation.
   if (!assertBaselineMatchesLearner(baselineId, learnerId, session.tenantId)) {
     redirect(session.role === "parent" ? "/parent/learners" : "/learner/home");
   }
@@ -121,7 +137,6 @@ async function completeAction(formData: FormData) {
         correct: result.summary.correctCount,
         answered: result.summary.totalAnswered,
         brainCloned: Boolean(result.clonedBrainProfile),
-        brainCloneStage: result.clonedBrainProfile?.cloneStage ?? null,
       },
     });
   }
@@ -133,7 +148,7 @@ export default async function BaselineRunnerPage({
   searchParams,
 }: {
   params: Promise<{ baselineId: string }>;
-  searchParams: Promise<{ as?: string }>;
+  searchParams: Promise<{ as?: string; resume?: string; paused?: string }>;
 }) {
   const sp = await searchParams;
   const asParent = sp.as === "parent";
@@ -143,7 +158,6 @@ export default async function BaselineRunnerPage({
   const baseline = getBaselineById(baselineId, session.tenantId);
   if (!baseline) notFound();
 
-  // Scope check.
   if (session.role === "parent") {
     if (!parentCanAccessLearner(session.userId, baseline.learnerId, session.tenantId)) {
       notFound();
@@ -158,197 +172,286 @@ export default async function BaselineRunnerPage({
   const questions = listBaselineQuestions(baseline.id);
   const attempts = listBaselineAttempts(baseline.id, session.tenantId);
   const answeredQids = new Set(attempts.map((a) => a.questionId));
-  const next = questions.find((q) => !answeredQids.has(q.id));
   const totalAnswered = attempts.length;
+  const next = questions.find((q) => !answeredQids.has(q.id));
 
-  const nav = asParent ? PARENT_NAV : LEARNER_NAV;
-  const role: "parent" | "learner" = asParent ? "parent" : "learner";
-  const roleLabel = asParent ? "Parent" : "Learner";
+  const iep = getIEPForLearner(baseline.learnerId, session.tenantId);
+  const assessment = getOrCreateParentAssessment(baseline.learnerId, session.tenantId);
+  const sensorySensitivities =
+    (assessment.answers.sensory as { sensitivities?: string[] })?.sensitivities ?? [];
+  const calmMode = sensorySensitivities.length > 0;
 
+  const chips: PersonalizationVariant[] = ["parent_assessment", "no_grades"];
+  if (iep?.confirmedAt) chips.unshift("iep");
+  if (learner?.accessibilityDefaults.audioFirst || iep?.extraction?.readingSupport) {
+    chips.push("read_aloud");
+  }
+  if (calmMode) chips.push("calm_mode");
+  if (iep?.extraction?.extendedTime) chips.push("extended_time");
+
+  const topBanner = asParent ? (
+    <ProctorBanner
+      role="parent"
+      proctorName={session.displayName}
+      learnerName={learner?.displayName ?? "your learner"}
+      exit={
+        <Link
+          href={`/parent/learners/${baseline.learnerId}/baseline`}
+          className="inline-flex items-center gap-1 text-xs font-semibold underline-offset-2 hover:underline"
+        >
+          Exit proctor view
+        </Link>
+      }
+    />
+  ) : undefined;
+
+  /* --------- Completion screen --------- */
   if (baseline.status === "complete") {
+    const subjectMastery = baseline.summary?.perSubject ?? [];
     return (
-      <AppShell
-        role={role}
-        roleLabel={roleLabel}
-        navItems={nav}
-        user={{ displayName: session.displayName, email: session.email }}
+      <LearnerBaselineShell
+        topBanner={topBanner}
+        headerLeft={
+          <Link
+            href={asParent ? `/parent/learners/${baseline.learnerId}/baseline` : "/learner/home"}
+            className="inline-flex items-center gap-1.5 rounded-iw-control px-3 py-1.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-muted)]"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M19 12H5" />
+              <path d="m12 19-7-7 7-7" />
+            </svg>
+            {asParent ? "Back to baseline" : "Back home"}
+          </Link>
+        }
       >
-        <PageHeader
-          eyebrow="Baseline"
-          title="Nice work!"
-          description={baseline.summary?.learnerSafeSummary ?? "You did it."}
-        />
-        <Card className="flex items-start gap-3 p-[var(--aivo-density-card-pad)]">
-          <CheckCircle2 className="mt-0.5 h-6 w-6 text-aivo-success" />
-          <div className="text-sm">
-            <p className="font-display text-lg font-semibold">All done</p>
-            <p className="mt-1">
-              You answered {baseline.summary?.totalAnswered ?? 0} of{" "}
-              {baseline.summary?.totalQuestions ?? 0} questions.
-            </p>
-          </div>
-        </Card>
-        <div className="mt-6">
-          <Button asChild>
+        <CompletionHero
+          learnerName={learner?.preferredName || learner?.firstName}
+          answered={baseline.summary?.totalAnswered ?? 0}
+          total={baseline.summary?.totalQuestions ?? 0}
+          showAnswered={asParent}
+          body={baseline.summary?.learnerSafeSummary ?? undefined}
+          learned={[
+            ...subjectMastery.map((s) => `${s.subjectName}: starting at ${s.estimate.replaceAll("_", " ")}`),
+            ...(chips.includes("iep") ? ["IEP supports stay on"] : []),
+            ...(chips.includes("calm_mode") ? ["Calm pacing locked in"] : []),
+          ]}
+          primary={
             <Link
-              href={asParent ? `/parent/learners/${baseline.learnerId}/baseline` : `/learner/home`}
+              href={asParent ? `/parent/learners/${baseline.learnerId}/baseline/summary` : "/learner/home"}
+              className="inline-flex items-center gap-2 rounded-iw-control px-5 py-3 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 shadow-[0_4px_12px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.3)]"
             >
-              Continue <ArrowRight className="ml-1 h-4 w-4" />
+              {asParent ? "See the parent summary" : "Take me home"}
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M5 12h14" />
+                <path d="m13 5 7 7-7 7" />
+              </svg>
             </Link>
-          </Button>
-        </div>
-      </AppShell>
-    );
-  }
-
-  if (!next) {
-    // All questions answered but not yet completed.
-    return (
-      <AppShell
-        role={role}
-        roleLabel={roleLabel}
-        navItems={nav}
-        user={{ displayName: session.displayName, email: session.email }}
-      >
-        <PageHeader
-          eyebrow="Baseline"
-          title="Ready to finish"
-          description="Tap the button to send your answers."
+          }
         />
-        <form action={completeAction}>
-          <input type="hidden" name="baselineId" value={baseline.id} />
-          <input type="hidden" name="learnerId" value={baseline.learnerId} />
-          {asParent ? <input type="hidden" name="asParent" value="1" /> : null}
-          <Button type="submit">
-            Finish baseline <ArrowRight className="ml-1 h-4 w-4" />
-          </Button>
-        </form>
-      </AppShell>
+      </LearnerBaselineShell>
     );
   }
 
+  /* --------- Ready-to-submit screen (every question answered) --------- */
+  if (!next) {
+    return (
+      <LearnerBaselineShell topBanner={topBanner}>
+        <CompletionHero
+          learnerName={learner?.preferredName || learner?.firstName}
+          title="One last tap"
+          body="You answered every question. Send your answers when you're ready."
+          primary={
+            <form action={completeAction}>
+              <input type="hidden" name="baselineId" value={baseline.id} />
+              <input type="hidden" name="learnerId" value={baseline.learnerId} />
+              {asParent ? <input type="hidden" name="asParent" value="1" /> : null}
+              <button
+                type="submit"
+                className="inline-flex items-center gap-2 rounded-iw-control px-5 py-3 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 shadow-[0_4px_12px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.3)]"
+              >
+                Finish baseline
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M5 12h14" />
+                  <path d="m13 5 7 7-7 7" />
+                </svg>
+              </button>
+            </form>
+          }
+        />
+      </LearnerBaselineShell>
+    );
+  }
+
+  /* --------- Break screen (between question blocks) --------- */
+  // Show a break every BREAK_EVERY answered questions, but only if the
+  // learner hasn't already passed it (sp.resume=1 skips the break).
+  const dueForBreak =
+    totalAnswered > 0 && totalAnswered % BREAK_EVERY === 0 && sp.resume !== "1";
+  if (dueForBreak) {
+    return (
+      <LearnerBaselineShell
+        topBanner={topBanner}
+        status={[
+          <PersonalizationChip key="paused" variant="paused" />,
+          ...chips.slice(0, 3).map((v) => <PersonalizationChip key={v} variant={v} />),
+        ]}
+      >
+        <BreakCard
+          learnerName={learner?.preferredName || learner?.firstName}
+          answered={totalAnswered}
+          total={questions.length}
+          resume={
+            <Link
+              href={`/learner/baseline/${baseline.id}?resume=1${asParent ? "&as=parent" : ""}`}
+              className="inline-flex items-center gap-2 rounded-iw-control px-5 py-3 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
+            >
+              Resume
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <polygon points="5 3 19 12 5 21 5 3" />
+              </svg>
+            </Link>
+          }
+          secondary={
+            <Link
+              href={asParent ? `/parent/learners/${baseline.learnerId}/baseline` : "/learner/home"}
+              className="inline-flex items-center gap-1.5 rounded-iw-control px-4 py-2.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-muted)]"
+            >
+              Stop for today
+            </Link>
+          }
+        />
+      </LearnerBaselineShell>
+    );
+  }
+
+  /* --------- Question screen --------- */
   const subject = subjectsById.get(next.subjectId);
-  const subjectName = subject?.name ?? "";
   const tutor = subject ? tutorForSubjectSlug(subject.slug) : null;
-  const progress = `${Math.min(totalAnswered + 1, questions.length)} of ${questions.length}`;
+
+  // Per-question dot states for the progress strip.
+  const dots: DotState[] = questions.map((q, i) => {
+    const a = attempts.find((x) => x.questionId === q.id);
+    if (a) return a.skipped ? "skipped" : "answered";
+    if (q.id === next.id) return "current";
+    return i < totalAnswered ? "pending" : "pending";
+  });
 
   return (
-    <AppShell
-      role={role}
-      roleLabel={roleLabel}
-      navItems={nav}
-      user={{ displayName: session.displayName, email: session.email }}
-    >
-      <PageHeader
-        eyebrow={tutor ? `${tutor.name}'s ${tutor.landmark}` : `Baseline · ${subjectName}`}
-        title={`Question ${progress}`}
-        description={learner ? `For ${learner.displayName}.` : "Take your time. You can skip."}
-        actions={
-          <Badge tone="primary" className="capitalize">
-            {next.difficulty.replaceAll("_", " ")}
-          </Badge>
-        }
-      />
-
-      {tutor ? (
-        <Card
-          className="flex items-start gap-3 p-4"
-          style={{
-            backgroundColor: `${tutor.color}0F`,
-            borderColor: `${tutor.color}55`,
-          }}
+    <LearnerBaselineShell
+      topBanner={topBanner}
+      headerLeft={
+        <p className="text-xs text-iw-text-muted">
+          {subject?.name ?? "Question"} · {Math.min(totalAnswered + 1, questions.length)} of{" "}
+          {questions.length}
+        </p>
+      }
+      headerRight={
+        <Link
+          href={asParent ? `/parent/learners/${baseline.learnerId}/baseline` : "/learner/home"}
+          className="inline-flex items-center gap-1.5 rounded-iw-control px-3 py-1.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-muted)]"
         >
-          <span
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg"
-            style={{ backgroundColor: `${tutor.color}1A`, color: tutor.color }}
-            aria-hidden
-          >
-            {tutor.emoji}
-          </span>
-          <div className="min-w-0 flex-1 text-sm">
-            <p className="font-semibold">{tutor.name} says:</p>
-            <p className="text-aivo-ink-soft">{tutor.greeting}</p>
-          </div>
-        </Card>
-      ) : null}
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <rect x="6" y="4" width="4" height="16" />
+            <rect x="14" y="4" width="4" height="16" />
+          </svg>
+          Pause
+        </Link>
+      }
+      status={chips.slice(0, 4).map((v) => (
+        <PersonalizationChip key={v} variant={v} />
+      ))}
+    >
+      <BaselineProgressDots states={dots} ariaLabel="Baseline progress" />
 
-      <Card className="p-6">
-        <p className="font-display text-xl font-semibold">{next.prompt}</p>
-        {next.readAloudText ? (
-          <p className="mt-1 flex items-center gap-1 text-xs text-aivo-ink-soft">
-            <Volume2 className="h-3.5 w-3.5" /> Read aloud available
-          </p>
-        ) : null}
-
-        <form action={answerAction} className="mt-5 space-y-3">
+      <LearnerQuestionCard
+        eyebrow={tutor ? `With ${tutor.name} · ${tutor.landmark}` : subject?.name}
+        companion={
+          tutor ? (
+            <span
+              className="w-12 h-12 rounded-full inline-flex items-center justify-center text-2xl"
+              style={{ backgroundColor: `${tutor.color}1A`, color: tutor.color }}
+              aria-hidden="true"
+            >
+              {tutor.emoji}
+            </span>
+          ) : null
+        }
+        prompt={next.prompt}
+        readAloud={
+          next.readAloudText ? <ReadAloudButton href={`?read=${next.id}`} /> : null
+        }
+        footer={
+          <>
+            <div className="flex items-center gap-2">
+              <form action={answerAction}>
+                <input type="hidden" name="baselineId" value={baseline.id} />
+                <input type="hidden" name="learnerId" value={baseline.learnerId} />
+                <input type="hidden" name="questionId" value={next.id} />
+                <input type="hidden" name="skipped" value="1" />
+                {asParent ? <input type="hidden" name="asParent" value="1" /> : null}
+                <button
+                  type="submit"
+                  formNoValidate
+                  className="inline-flex items-center gap-1.5 rounded-iw-control px-4 py-2.5 text-sm font-semibold text-iw-text-muted bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-muted)] hover:text-iw-text-strong"
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <polygon points="5 4 15 12 5 20 5 4" />
+                    <line x1="19" y1="5" x2="19" y2="19" />
+                  </svg>
+                  Skip
+                </button>
+              </form>
+            </div>
+            <button
+              type="submit"
+              form={`answer-form-${next.id}`}
+              className="inline-flex items-center gap-2 rounded-iw-control px-5 py-2.5 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 shadow-[0_4px_12px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.3)]"
+            >
+              Next
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M5 12h14" />
+                <path d="m13 5 7 7-7 7" />
+              </svg>
+            </button>
+          </>
+        }
+      >
+        <form id={`answer-form-${next.id}`} action={answerAction} className="flex flex-col gap-3">
           <input type="hidden" name="baselineId" value={baseline.id} />
           <input type="hidden" name="learnerId" value={baseline.learnerId} />
           <input type="hidden" name="questionId" value={next.id} />
           {asParent ? <input type="hidden" name="asParent" value="1" /> : null}
 
           {next.choices && next.choices.length > 0 ? (
-            <fieldset className="space-y-2">
+            <fieldset className="flex flex-col gap-3">
               <legend className="sr-only">Choose one</legend>
               {next.choices.map((choice, i) => (
-                <label
+                <LearnerChoiceCard
                   key={choice}
-                  className="flex cursor-pointer items-center gap-3 rounded-lg border border-aivo-ink-soft/20 bg-aivo-surface p-3 text-sm hover:border-aivo-primary/50 focus-within:border-aivo-primary"
-                >
-                  <input
-                    type="radio"
-                    name="response"
-                    value={choice}
-                    required
-                    defaultChecked={i === 0 ? false : false}
-                    className="h-4 w-4"
-                  />
-                  <span>{choice}</span>
-                </label>
+                  name="response"
+                  value={choice}
+                  label={choice}
+                  index={i}
+                  required
+                />
               ))}
             </fieldset>
           ) : (
-            <input
-              type="text"
-              name="response"
-              required
-              placeholder="Type your answer"
-              className="w-full rounded-lg border border-aivo-ink-soft/20 bg-aivo-surface p-3 text-sm focus:border-aivo-primary focus:outline-none"
-            />
+            <label className="flex flex-col gap-1.5">
+              <span className="sr-only">Type your answer</span>
+              <input
+                type="text"
+                name="response"
+                required
+                placeholder="Type your answer"
+                className="w-full rounded-iw-control border border-iw-border bg-white px-4 py-3 text-base text-iw-text-strong placeholder:text-iw-text-muted/70 focus:outline-none focus:border-[var(--aivo-sensory-primary)] focus:ring-2 focus:ring-[var(--aivo-sensory-ringFocus)]/40"
+              />
+            </label>
           )}
 
-          {next.hint ? (
-            <p className="rounded-md bg-aivo-canvas/60 p-3 text-xs text-aivo-ink-soft">
-              <strong>Hint:</strong> {next.hint}
-            </p>
-          ) : null}
-
-          <div className="flex flex-wrap gap-2">
-            <Button type="submit">
-              Submit answer <ArrowRight className="ml-1 h-4 w-4" />
-            </Button>
-            <Button type="submit" variant="outline" name="skipped" value="1" formNoValidate>
-              <SkipForward className="mr-1 h-4 w-4" /> Skip
-            </Button>
-          </div>
+          {next.hint ? <HintCard hint={next.hint} policy="available" /> : null}
         </form>
-      </Card>
-
-      <SectionHeader title="Progress" className="mt-8" />
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-        {questions.map((q, i) => {
-          const a = attempts.find((x) => x.questionId === q.id);
-          const tone = a ? (a.skipped ? "neutral" : "success") : "neutral";
-          return (
-            <Card key={q.id} className="flex items-center gap-3 p-3">
-              <span className="font-mono text-xs text-aivo-ink-soft">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <span className="flex-1 truncate text-xs">{q.prompt}</span>
-              <Badge tone={tone}>{a ? (a.skipped ? "skipped" : "answered") : "pending"}</Badge>
-            </Card>
-          );
-        })}
-      </div>
-    </AppShell>
+      </LearnerQuestionCard>
+    </LearnerBaselineShell>
   );
 }

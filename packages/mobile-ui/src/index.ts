@@ -8,6 +8,10 @@ export { EmptyState } from './EmptyState';
 export { LoadingState } from './LoadingState';
 export { TutorCard } from './TutorCard';
 export { MobilePlayfulButton, MobilePlayfulCard } from './PlayfulPrimitives';
+export { MobileSubjectCard } from './MobileSubjectCard';
+export type { MobileSubjectCardProps } from './MobileSubjectCard';
+export { MobileLearningHero } from './MobileLearningHero';
+export type { MobileLearningHeroProps } from './MobileLearningHero';
 
 export * from './shell';
 

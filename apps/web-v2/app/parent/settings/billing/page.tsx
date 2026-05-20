@@ -1,9 +1,20 @@
+/**
+ * Sprint 16: Family billing redesign — clear, trustworthy, dignified.
+ *
+ * Three calm sections: current plan + status, plan picker, and
+ * recent invoices. Past-due / payment-failed states use warning
+ * tone but never red-scare; cancellation is offered without
+ * friction so trust is preserved.
+ */
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
-import { PageHeader } from "@/components/layout/page-header";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { EmptyState } from "@/components/ui/empty-state";
+import {
+  FloatingMetricCard,
+  GlassCard,
+  InsightChip,
+  EmptyState,
+  ReassuranceCard,
+} from "@aivo/ui";
 import { PARENT_NAV } from "@/components/layout/role-shells";
 import {
   getActiveSubscriptionForTenant,
@@ -11,22 +22,21 @@ import {
   listInvoicesForTenant,
   listPlans,
 } from "@/lib/db/repos";
-import { CreditCard } from "lucide-react";
 import { SubscribeForm, CancelButton } from "./subscribe-form";
 
-const STATUS_TONE: Record<string, "success" | "warning" | "danger" | "neutral"> = {
+const STATUS_TONE: Record<string, "success" | "warning" | "error" | "neutral"> = {
   trialing: "warning",
   active: "success",
-  past_due: "danger",
+  past_due: "error",
   canceled: "neutral",
   paused: "warning",
 };
 
-const INV_TONE: Record<string, "success" | "warning" | "danger" | "neutral"> = {
+const INV_TONE: Record<string, "success" | "warning" | "error" | "neutral"> = {
   paid: "success",
   open: "warning",
   void: "neutral",
-  uncollectible: "danger",
+  uncollectible: "error",
 };
 
 export default async function Page() {
@@ -36,6 +46,10 @@ export default async function Page() {
   const plans = listPlans("family");
   const invoices = listInvoicesForTenant(session.tenantId);
   const plansById = new Map(plans.map((p) => [p.plan.id, p.plan]));
+  const activePlan = sub ? plansById.get(sub.planId) : null;
+  const totalPaidCents = invoices
+    .filter((i) => i.status === "paid")
+    .reduce((acc, i) => acc + i.amountCents, 0);
 
   return (
     <AppShell
@@ -44,78 +58,128 @@ export default async function Page() {
       navItems={PARENT_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <PageHeader
-        eyebrow="Settings"
-        title="Billing"
-        description={`Plan and payment status for ${tenant?.name ?? "your family"}.`}
-      />
+      <header className="flex flex-col gap-2 mb-6">
+        <p className="iw-label text-iw-text-muted">Settings · Billing</p>
+        <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong">
+          Family plan & billing
+        </h1>
+        <p className="text-sm md:text-base text-iw-text-muted max-w-2xl">
+          Plan, payment, and invoice history for {tenant?.name ?? "your family"}.
+        </p>
+      </header>
 
-      {sub ? (
-        <Card className="mb-6 max-w-3xl p-6">
-          <div className="flex flex-wrap items-center gap-3">
-            <CreditCard className="h-5 w-5 text-aivo-primary" />
-            <div>
-              <p className="font-display text-lg font-semibold">
-                {plansById.get(sub.planId)?.name ?? sub.planId}
-              </p>
-              <p className="text-sm text-aivo-ink-soft">
-                Period {new Date(sub.currentPeriodStartAt).toLocaleDateString()} –{" "}
-                {new Date(sub.currentPeriodEndAt).toLocaleDateString()}
-                {sub.trialEndAt
-                  ? ` · trial ends ${new Date(sub.trialEndAt).toLocaleDateString()}`
-                  : ""}
-              </p>
-            </div>
-            <Badge tone={STATUS_TONE[sub.status] ?? "neutral"} className="ml-auto">
-              {sub.status}
-            </Badge>
-          </div>
-          <div className="mt-4 border-t border-aivo-border pt-4">
-            <CancelButton subscriptionId={sub.id} cancelAtPeriodEnd={sub.cancelAtPeriodEnd} />
-          </div>
-        </Card>
-      ) : (
-        <EmptyState title="No active plan" description="Pick a plan below to get started." />
-      )}
-
-      <h2 className="mb-3 font-display text-lg font-semibold">Choose a plan</h2>
-      <SubscribeForm plans={plans} activePlanId={sub?.planId ?? null} />
-
-      <h2 className="mb-3 mt-8 font-display text-lg font-semibold">Recent invoices</h2>
-      {invoices.length === 0 ? (
-        <EmptyState
-          title="No invoices yet"
-          description="Invoices appear here after each billing period closes."
+      <section className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <FloatingMetricCard
+          label="Current plan"
+          value={activePlan?.name ?? "No plan"}
+          description={sub?.status ?? "Pick one to start"}
+          tone={sub?.status === "active" ? "success" : "info"}
         />
-      ) : (
-        <Card className="overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-aivo-surface-2 text-left">
-              <tr>
-                <th className="p-3">Number</th>
-                <th className="p-3">Period</th>
-                <th className="p-3">Amount</th>
-                <th className="p-3">Status</th>
-              </tr>
-            </thead>
-            <tbody>
+        <FloatingMetricCard
+          label="Next renewal"
+          value={
+            sub?.currentPeriodEndAt
+              ? new Date(sub.currentPeriodEndAt).toLocaleDateString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                })
+              : "—"
+          }
+          description={sub?.cancelAtPeriodEnd ? "Will not renew" : "Auto-renews"}
+          tone={sub?.cancelAtPeriodEnd ? "warning" : "neutral"}
+        />
+        <FloatingMetricCard
+          label="Total paid"
+          value={`$${(totalPaidCents / 100).toFixed(2)}`}
+          description={`${invoices.length} invoice${invoices.length === 1 ? "" : "s"}`}
+          tone="neutral"
+        />
+      </section>
+
+      <section className="mt-6 grid gap-4 lg:grid-cols-[1fr,320px]">
+        {sub ? (
+          <GlassCard
+            elevation="raised"
+            density="comfortable"
+            title={activePlan?.name ?? sub.planId}
+            description={`Billing period ${new Date(sub.currentPeriodStartAt).toLocaleDateString()} – ${new Date(sub.currentPeriodEndAt).toLocaleDateString()}${
+              sub.trialEndAt
+                ? ` · trial ends ${new Date(sub.trialEndAt).toLocaleDateString()}`
+                : ""
+            }`}
+            actions={
+              <InsightChip tone={STATUS_TONE[sub.status] ?? "neutral"} size="md">
+                {sub.status.replaceAll("_", " ")}
+              </InsightChip>
+            }
+          >
+            <div className="mt-2 border-t border-iw-border pt-4">
+              <CancelButton subscriptionId={sub.id} cancelAtPeriodEnd={sub.cancelAtPeriodEnd} />
+            </div>
+          </GlassCard>
+        ) : (
+          <GlassCard elevation="raised" density="comfortable">
+            <EmptyState title="No active plan" body="Pick a plan below to get started." />
+          </GlassCard>
+        )}
+
+        <aside className="flex flex-col gap-3">
+          <ReassuranceCard
+            tone="privacy"
+            title="Billing stays out of learner view"
+            body="Your learner never sees plan, payment, or invoice surfaces. Even when they switch into your account, billing is hidden."
+          />
+          <ReassuranceCard
+            tone="info"
+            title="Cancel any time, no friction"
+            body="Cancellation keeps your learning history intact and you'll keep access until the period ends."
+          />
+        </aside>
+      </section>
+
+      <section className="mt-8 flex flex-col gap-3">
+        <h2 className="text-xl font-semibold text-iw-text-strong">Choose a plan</h2>
+        <SubscribeForm plans={plans} activePlanId={sub?.planId ?? null} />
+      </section>
+
+      <section className="mt-8 flex flex-col gap-3">
+        <h2 className="text-xl font-semibold text-iw-text-strong">Recent invoices</h2>
+        {invoices.length === 0 ? (
+          <GlassCard elevation="raised" density="comfortable">
+            <EmptyState
+              title="No invoices yet"
+              body="Invoices appear here after each billing period closes."
+            />
+          </GlassCard>
+        ) : (
+          <GlassCard elevation="raised" density="comfortable" className="overflow-hidden">
+            <ul className="divide-y divide-iw-border -mx-1">
               {invoices.map((i) => (
-                <tr key={i.id} className="border-t border-aivo-border">
-                  <td className="p-3 font-medium">{i.number}</td>
-                  <td className="p-3 text-aivo-ink-soft">
-                    {new Date(i.periodStartAt).toLocaleDateString()} –{" "}
-                    {new Date(i.periodEndAt).toLocaleDateString()}
-                  </td>
-                  <td className="p-3">${(i.amountCents / 100).toFixed(2)}</td>
-                  <td className="p-3">
-                    <Badge tone={INV_TONE[i.status] ?? "neutral"}>{i.status}</Badge>
-                  </td>
-                </tr>
+                <li
+                  key={i.id}
+                  className="px-1 py-3 grid grid-cols-[1fr,auto] gap-2 items-center"
+                >
+                  <div className="min-w-0">
+                    <p className="font-semibold text-iw-text-strong tabular-nums">{i.number}</p>
+                    <p className="text-xs text-iw-text-muted">
+                      {new Date(i.periodStartAt).toLocaleDateString()} –{" "}
+                      {new Date(i.periodEndAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="text-right flex flex-col gap-1 items-end">
+                    <p className="font-semibold text-iw-text-strong tabular-nums">
+                      ${(i.amountCents / 100).toFixed(2)}
+                    </p>
+                    <InsightChip tone={INV_TONE[i.status] ?? "neutral"} size="sm">
+                      {i.status}
+                    </InsightChip>
+                  </div>
+                </li>
               ))}
-            </tbody>
-          </table>
-        </Card>
-      )}
+            </ul>
+          </GlassCard>
+        )}
+      </section>
     </AppShell>
   );
 }

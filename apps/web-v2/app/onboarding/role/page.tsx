@@ -77,8 +77,8 @@ export default function RoleSelectionPage() {
                 aria-disabled={!selectedRole}
                 className={`w-full h-12 rounded-iw-control text-white font-semibold flex items-center justify-center transition-opacity ${
                   selectedRole
-                    ? "bg-[var(--aivo-sensory-primary,#7c3aed)] hover:opacity-95"
-                    : "bg-[var(--aivo-sensory-primary,#7c3aed)]/50 pointer-events-none"
+                    ? "bg-[var(--aivo-sensory-primary)] hover:opacity-95"
+                    : "bg-[var(--aivo-sensory-primary)]/50 pointer-events-none"
                 }`}
               >
                 Continue
@@ -102,12 +102,12 @@ export default function RoleSelectionPage() {
                   aria-pressed={active}
                   className={`flex items-start gap-3 text-left rounded-iw-card border bg-white p-4 transition-all ${
                     active
-                      ? "border-[var(--aivo-sensory-primary,#7c3aed)] ring-2 ring-[var(--aivo-sensory-primary,#7c3aed)]/30"
+                      ? "border-[var(--aivo-sensory-primary)] ring-2 ring-[var(--aivo-sensory-primary)]/30"
                       : "border-iw-border hover:border-iw-text-muted"
                   }`}
                 >
                   <span
-                    className="shrink-0 w-10 h-10 rounded-iw-control bg-[var(--aivo-color-surface-canvas,#f4f6f5)] flex items-center justify-center text-iw-text-muted"
+                    className="shrink-0 w-10 h-10 rounded-iw-control bg-[var(--aivo-color-surface-canvas)] flex items-center justify-center text-iw-text-muted"
                     aria-hidden="true"
                   >
                     <AivoIcon name={r.icon} size={20} />

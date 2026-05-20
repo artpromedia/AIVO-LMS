@@ -1,14 +1,16 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowRight, FileText, ShieldCheck, Upload } from "lucide-react";
 import { requirePageRole } from "@/lib/auth/server";
-import { AppShell } from "@/components/layout/app-shell";
-import { PageHeader, SectionHeader } from "@/components/layout/page-header";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
-import { PARENT_NAV } from "@/components/layout/role-shells";
+import {
+  AssessmentShell,
+  QuestionCard,
+  AssessmentFooter,
+  ASSESSMENT_BACK_CLASS,
+  ASSESSMENT_GHOST_CLASS,
+  UploadDropZone,
+  UploadFileCard,
+  ReassuranceCard,
+} from "@aivo/ui";
 import {
   getIEPForLearner,
   getLearner,
@@ -23,6 +25,8 @@ import { audit } from "@/lib/bff/audit";
 import { newRequestId } from "@/lib/observability/logger";
 import { IEP_ALLOWED_MIME_TYPES, IEP_MAX_BYTES, iepUploadMetaSchema } from "@/lib/validators/iep";
 import { buildIEPExtraction } from "@/lib/learner/iep";
+
+/* ----- server actions ------------------------------------------------------ */
 
 async function uploadAction(formData: FormData) {
   "use server";
@@ -55,8 +59,7 @@ async function uploadAction(formData: FormData) {
     learnerId,
     metadata: { fileName: meta.data.fileName, bytes: meta.data.bytes, source: "ui" },
   });
-  // Auto-extract on upload so the parent sees a populated review screen on
-  // the next click — keeps the flow to a single confirmation.
+  // Kick off the synthesized extraction so the review step always has a populated card.
   const learner = getLearner(learnerId, session.tenantId);
   const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
   if (learner) {
@@ -83,7 +86,7 @@ async function skipAction(formData: FormData) {
   recordIEPSkip(learnerId, session.tenantId);
   refreshLearnerReadiness(learnerId, session.tenantId);
   audit(session, "iep.skip", newRequestId(), { learnerId });
-  redirect(`/parent/learners/${learnerId}/brain-profile`);
+  redirect(`/parent/learners/${learnerId}/assessment/submitted?skipped=iep`);
 }
 
 async function deleteAction(formData: FormData) {
@@ -103,16 +106,32 @@ async function deleteAction(formData: FormData) {
 }
 
 const ERROR_MESSAGES: Record<string, string> = {
-  missing_file: "Please choose a file to upload.",
-  invalid_file:
-    "We can accept PDF, Word, or plain text files up to 10 MiB. Please try a different file.",
+  missing_file:
+    "Choose a file before uploading. You can drag it onto the card, pick from your device, or take a photo on mobile.",
+  invalid_file: `We can accept PDF, Word, or image files up to ${Math.round(IEP_MAX_BYTES / (1024 * 1024))} MB. Please try a different file.`,
 };
 
-function formatBytes(n: number): string {
-  if (n < 1024) return `${n} B`;
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KiB`;
-  return `${(n / (1024 * 1024)).toFixed(1)} MiB`;
+function formatDate(iso: string): string {
+  try {
+    return new Date(iso).toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  } catch {
+    return iso;
+  }
 }
+
+function kindFromMime(mime: string): string {
+  if (mime === "application/pdf") return "PDF";
+  if (mime.includes("word")) return "Word";
+  if (mime.startsWith("image/")) return "Photo";
+  if (mime === "text/plain") return "Text";
+  return "Document";
+}
+
+/* ----- page ---------------------------------------------------------------- */
 
 export default async function IEPUploadPage({
   params,
@@ -132,149 +151,215 @@ export default async function IEPUploadPage({
 
   const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
   if (!assessment.submittedAt) {
-    // PRECONDITION: assessment must be submitted first. We don't show a dead
-    // upload form — we route the parent to the assessment with a notice.
     return (
-      <AppShell
-        role="parent"
-        roleLabel="Parent"
-        navItems={PARENT_NAV}
-        user={{ displayName: session.displayName, email: session.email }}
+      <AssessmentShell
+        eyebrow={`IEP & accommodations for ${learner.displayName}`}
+        reassurance={
+          <ReassuranceCard
+            tone="info"
+            title="Why we ask for assessment first"
+            body="Your answers and the IEP work together. We use both to apply the right supports — never one without the other."
+          />
+        }
       >
-        <PageHeader
-          eyebrow="IEP & accommodations"
+        <QuestionCard
+          eyebrow="One step back"
           title="Finish the parent assessment first"
-          description="We use your assessment answers alongside the IEP so the supports line up. Once you submit the assessment, you'll come back here."
-        />
-        <EmptyState
-          icon={<FileText className="h-8 w-8" />}
-          title="Parent assessment is in progress"
-          description="Complete and submit the parent assessment, then upload an IEP or skip this step."
-          action={
-            <Button asChild>
-              <Link href={`/parent/learners/${learner.id}/assessment`}>
-                Continue assessment <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
-            </Button>
+          helper="When that's submitted, you'll come right back here to upload an IEP — or skip and use your assessment alone."
+          actions={
+            <AssessmentFooter
+              back={
+                <Link
+                  href={`/parent/learners/${learner.id}`}
+                  className={ASSESSMENT_BACK_CLASS}
+                >
+                  Back to learner
+                </Link>
+              }
+              primary={
+                <Link
+                  href={`/parent/learners/${learner.id}/assessment`}
+                  className="inline-flex items-center gap-2 rounded-iw-control px-5 py-2.5 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
+                >
+                  Continue assessment
+                </Link>
+              }
+            />
           }
-        />
-      </AppShell>
+        >
+          <p className="text-sm text-iw-text-muted">
+            Submit your assessment and we'll route you straight here to optionally share an IEP, 504,
+            or accommodations letter.
+          </p>
+        </QuestionCard>
+      </AssessmentShell>
     );
   }
 
   const existing = getIEPForLearner(learnerId, session.tenantId);
+  const errorMessage = sp.error ? ERROR_MESSAGES[sp.error] : undefined;
 
   return (
-    <AppShell
-      role="parent"
-      roleLabel="Parent"
-      navItems={PARENT_NAV}
-      user={{ displayName: session.displayName, email: session.email }}
+    <AssessmentShell
+      eyebrow={`IEP & accommodations for ${learner.displayName}`}
+      reassurance={
+        <>
+          <ReassuranceCard
+            tone="safety"
+            title="The IEP stays private"
+            body="Your learner never sees the raw document. We only keep a structured list of supports, plus a learner-safe summary."
+            icon={
+              <svg
+                className="w-4 h-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+            }
+          />
+          <ReassuranceCard
+            tone="privacy"
+            title="You stay in control"
+            body="You can review every extracted support, deselect any you'd rather skip, and remove the document at any time."
+          />
+        </>
+      }
     >
-      <PageHeader
-        eyebrow={`IEP & accommodations for ${learner.displayName}`}
-        title="Optional: share an IEP"
-        description="You can upload an IEP, 504 plan, or accommodations summary. We'll pull supports out for AIVO to follow. This step is optional — skip and we'll use your assessment instead."
-      />
-
-      {sp.error ? (
-        <div className="mb-4 rounded-md border border-aivo-danger bg-aivo-danger/5 px-3 py-2 text-sm text-aivo-danger">
-          {ERROR_MESSAGES[sp.error] ?? "Something didn't work. Please try again."}
-        </div>
-      ) : null}
-
-      <Card className="mb-4 flex items-start gap-3 p-4">
-        <ShieldCheck className="h-5 w-5 shrink-0 text-aivo-primary" />
-        <div className="text-sm text-aivo-ink-soft">
-          <p className="font-medium text-aivo-ink">How we handle this document</p>
-          <p className="mt-1">
-            We don't show the raw IEP to your learner. We only keep a structured summary of the
-            supports — and we always make a separate, learner-safe version of the language for any
-            screens your learner sees.
-          </p>
-        </div>
-      </Card>
-
-      {existing ? (
-        <>
-          <SectionHeader title="On file" />
-          <Card className="flex flex-col gap-4 p-[var(--aivo-density-card-pad)] sm:flex-row sm:items-center">
-            <FileText className="h-8 w-8 shrink-0 text-aivo-primary" />
-            <div className="flex-1">
-              <p className="font-display text-base font-semibold">{existing.fileName}</p>
-              <p className="text-sm text-aivo-ink-soft">
-                {existing.mimeType} · {formatBytes(existing.bytes)} · uploaded{" "}
-                {new Date(existing.uploadedAt).toLocaleDateString()}
-              </p>
-              <div className="mt-2 flex flex-wrap gap-2">
-                <Badge tone={existing.status === "parsed" ? "success" : "neutral"}>
-                  {existing.status === "parsed" ? "Supports extracted" : "Awaiting extraction"}
-                </Badge>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <Button asChild>
-                <Link href={`/parent/learners/${learner.id}/iep/review`}>
-                  Review extracted supports <ArrowRight className="ml-1 h-4 w-4" />
-                </Link>
-              </Button>
-              <form action={deleteAction}>
+      <QuestionCard
+        eyebrow="Optional · IEP, 504, or accommodation letter"
+        title="Share a document so we apply the right supports"
+        helper="Drop the file here, pick from your device, or take a photo on mobile. We'll extract the supports — never the diagnosis language — and let you review before anything turns on."
+        tag="Optional"
+        error={errorMessage}
+        actions={
+          <AssessmentFooter
+            back={
+              <Link
+                href={`/parent/learners/${learner.id}/assessment/review`}
+                className={ASSESSMENT_BACK_CLASS}
+              >
+                Back
+              </Link>
+            }
+            saveExit={
+              <form action={skipAction}>
                 <input type="hidden" name="learnerId" value={learner.id} />
-                <Button type="submit" variant="outline">
-                  Remove
-                </Button>
+                <button type="submit" className={ASSESSMENT_GHOST_CLASS}>
+                  Skip for now
+                </button>
               </form>
-            </div>
-          </Card>
-        </>
-      ) : (
-        <>
-          <SectionHeader title="Upload an IEP, 504 plan, or accommodations letter" />
-          <Card className="p-6">
-            <form
-              action={uploadAction}
-              encType="multipart/form-data"
-              className="flex flex-col gap-4"
+            }
+            primary={
+              existing ? (
+                <Link
+                  href={`/parent/learners/${learner.id}/iep/review`}
+                  className="inline-flex items-center gap-2 rounded-iw-control px-5 py-2.5 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
+                >
+                  Review extracted supports
+                  <svg
+                    className="w-4 h-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.25"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M5 12h14" />
+                    <path d="m13 5 7 7-7 7" />
+                  </svg>
+                </Link>
+              ) : null
+            }
+          />
+        }
+      >
+        {existing ? (
+          <div className="flex flex-col gap-4">
+            <UploadFileCard
+              fileName={existing.fileName}
+              bytes={existing.bytes}
+              kind={kindFromMime(existing.mimeType)}
+              uploadedAt={formatDate(existing.uploadedAt)}
+              status={existing.status === "parsed" ? "parsed" : "extracting"}
+              actions={
+                <form action={deleteAction}>
+                  <input type="hidden" name="learnerId" value={learner.id} />
+                  <button
+                    type="submit"
+                    className="inline-flex items-center gap-1 rounded-iw-control px-3 py-1.5 text-xs font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-muted)]"
+                  >
+                    <svg
+                      className="w-3.5 h-3.5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <polyline points="3 6 5 6 21 6" />
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                      <path d="M10 11v6" />
+                      <path d="M14 11v6" />
+                    </svg>
+                    Remove
+                  </button>
+                </form>
+              }
+            />
+            <p className="text-xs text-iw-text-muted">
+              You can replace this document any time. Removing it clears any extracted supports —
+              we'll fall back to your assessment for personalization.
+            </p>
+          </div>
+        ) : (
+          <form
+            action={uploadAction}
+            encType="multipart/form-data"
+            className="flex flex-col gap-3"
+          >
+            <input type="hidden" name="learnerId" value={learner.id} />
+            <UploadDropZone
+              name="file"
+              label="Upload IEP, 504 plan, or accommodation letter"
+              helper={`PDF, Word, image, or text. We'll only extract structured supports — never diagnosis language.`}
+              accept={[...IEP_ALLOWED_MIME_TYPES, "image/jpeg", "image/png", "image/heic"].join(
+                ",",
+              )}
+              maxBytes={IEP_MAX_BYTES}
+              enableCameraCapture
+            />
+            <button
+              type="submit"
+              className="inline-flex self-end items-center gap-2 rounded-iw-control px-5 py-2.5 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 shadow-[0_2px_6px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.18)] focus:outline-none focus:ring-2 focus:ring-[var(--aivo-sensory-ringFocus)] focus:ring-offset-2 focus:ring-offset-white"
             >
-              <input type="hidden" name="learnerId" value={learner.id} />
-              <label className="flex flex-col gap-2 text-sm">
-                <span className="font-medium">Document</span>
-                <input
-                  type="file"
-                  name="file"
-                  required
-                  accept={IEP_ALLOWED_MIME_TYPES.join(",")}
-                  className="block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-aivo-primary-soft file:px-3 file:py-2 file:text-aivo-primary"
-                />
-                <span className="text-xs text-aivo-ink-soft">
-                  PDF, Word, or plain text. Up to {Math.round(IEP_MAX_BYTES / (1024 * 1024))} MiB.
-                </span>
-              </label>
-              <div className="flex flex-wrap gap-2">
-                <Button type="submit">
-                  <Upload className="mr-1 h-4 w-4" /> Upload & review
-                </Button>
-              </div>
-            </form>
-          </Card>
-
-          <Card className="mt-4 flex flex-col gap-3 p-[var(--aivo-density-card-pad)] sm:flex-row sm:items-center">
-            <div className="flex-1">
-              <p className="font-display text-base font-semibold">Don't have one?</p>
-              <p className="text-sm text-aivo-ink-soft">
-                Skip this step and we'll set supports based on your assessment. You can always come
-                back and upload an IEP later.
-              </p>
-            </div>
-            <form action={skipAction}>
-              <input type="hidden" name="learnerId" value={learner.id} />
-              <Button type="submit" variant="outline">
-                Skip for now
-              </Button>
-            </form>
-          </Card>
-        </>
-      )}
-    </AppShell>
+              Upload & extract supports
+              <svg
+                className="w-4 h-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M5 12h14" />
+                <path d="m13 5 7 7-7 7" />
+              </svg>
+            </button>
+          </form>
+        )}
+      </QuestionCard>
+    </AssessmentShell>
   );
 }

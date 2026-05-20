@@ -51,7 +51,7 @@ export default function NewLearnerPage() {
             <>
               <Link
                 href="/onboarding/consent"
-                className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary,#7c3aed)] text-white font-semibold flex items-center justify-center hover:opacity-95"
+                className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold flex items-center justify-center hover:opacity-95"
               >
                 Continue to consent
               </Link>
@@ -82,7 +82,7 @@ export default function NewLearnerPage() {
               id="grade"
               value={grade}
               onChange={(e) => setGrade(e.target.value)}
-              className="h-12 px-3 rounded-iw-control bg-white border border-iw-border text-base text-iw-text-strong focus:border-[var(--aivo-sensory-primary,#7c3aed)] focus:ring-2 focus:ring-[var(--aivo-sensory-primary,#7c3aed)]/20 outline-none"
+              className="h-12 px-3 rounded-iw-control bg-white border border-iw-border text-base text-iw-text-strong focus:border-[var(--aivo-sensory-primary)] focus:ring-2 focus:ring-[var(--aivo-sensory-primary)]/20 outline-none"
             >
               <option value="" disabled>
                 Pick a band
@@ -115,7 +115,7 @@ export default function NewLearnerPage() {
                   onClick={() => setHasIep(v)}
                   className={`px-4 h-10 rounded-iw-chip border text-sm font-medium capitalize transition-colors ${
                     hasIep === v
-                      ? "bg-[var(--aivo-sensory-primary,#7c3aed)] text-white border-transparent"
+                      ? "bg-[var(--aivo-sensory-primary)] text-white border-transparent"
                       : "bg-white text-iw-text-strong border-iw-border hover:border-iw-text-muted"
                   }`}
                 >

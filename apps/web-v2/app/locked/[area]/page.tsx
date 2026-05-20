@@ -50,7 +50,7 @@ export default async function LockedRoute({ params, searchParams }: Params) {
   return (
     <main
       id="main"
-      className="min-h-screen bg-[var(--aivo-color-surface-canvas,#f4f6f5)]"
+      className="min-h-screen bg-[var(--aivo-color-surface-canvas)]"
     >
       <LockedScreen role={role} area={area} linkAs={Link} />
     </main>
