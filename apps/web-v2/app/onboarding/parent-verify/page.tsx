@@ -3,6 +3,7 @@ import * as React from "react";
 import Link from "next/link";
 import { AuthShell, AuthCard, AuthInput, ReassuranceCard } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
+import { Button } from "@/components/ui/button";
 
 /**
  * /onboarding/parent-verify
@@ -37,21 +38,24 @@ export default function ParentVerifyPage() {
         }
         actions={
           <>
-            <button
+            <Button
               type="button"
+              size="lg"
+              className="w-full"
               onClick={() => setStage(stage === "phone" ? "code" : "phone")}
-              className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold hover:opacity-95"
             >
               {stage === "phone" ? "Send code" : "Verify and continue"}
-            </button>
+            </Button>
             {stage === "code" ? (
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="sm"
                 onClick={() => setStage("phone")}
-                className="text-xs text-iw-text-muted text-center hover:underline"
+                className="text-xs text-iw-text-muted hover:underline"
               >
                 Use a different phone number
-              </button>
+              </Button>
             ) : (
               <Link
                 href="/onboarding/consent"

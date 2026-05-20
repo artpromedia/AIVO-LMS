@@ -27,6 +27,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
+import { Button } from "@/components/ui/button";
 import {
   StatChip,
   LearnerLevelBadge,
@@ -341,11 +342,7 @@ export default async function LearnerHome({
               primaryAction={
                 <form action={startMissionAction}>
                   <input type="hidden" name="learnerId" value={learnerId} />
-                  <button
-                    type="submit"
-                    data-primary-cta="todays-mission"
-                    className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl text-base font-bold text-white bg-[var(--color-aivo-primary)] hover:brightness-110 shadow-[0_8px_24px_-6px_color-mix(in_oklab,var(--color-aivo-primary)_55%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-aivo-primary)] focus-visible:ring-offset-2 transition"
-                  >
+                  <Button type="submit" size="lg" data-primary-cta="todays-mission">
                     <svg
                       width="18"
                       height="18"
@@ -356,7 +353,7 @@ export default async function LearnerHome({
                       <path d="M8 5v14l11-7L8 5Z" />
                     </svg>
                     {today.mission.existingRunId ? "Resume Lesson" : "Start Lesson"}
-                  </button>
+                  </Button>
                 </form>
               }
             />

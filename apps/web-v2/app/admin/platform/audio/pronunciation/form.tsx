@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export function CreateOverrideForm({ canPublishPlatform }: { canPublishPlatform: boolean }) {
   const router = useRouter();
@@ -87,13 +88,14 @@ export function CreateOverrideForm({ canPublishPlatform }: { canPublishPlatform:
         />
       </label>
       <div className="sm:col-span-2 flex items-center gap-2">
-        <button
+        <Button
+          type="button"
+          size="sm"
           onClick={submit}
           disabled={busy || !token.trim() || !replacement.trim()}
-          className="rounded bg-aivo-primary px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
         >
           Add override
-        </button>
+        </Button>
         {err && <span className="text-xs text-red-600">{err}</span>}
       </div>
     </div>

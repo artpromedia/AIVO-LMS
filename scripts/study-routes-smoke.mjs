@@ -12,7 +12,7 @@
  *   node scripts/study-routes-smoke.mjs
  *
  * Pairs with the Playwright crawler at
- *   apps/web/tests/e2e/learner-study-routes.spec.ts
+ *   apps/web-v2/e2e/learner-study-routes.spec.ts
  * which mocks the backend; this one talks to the real backend.
  */
 

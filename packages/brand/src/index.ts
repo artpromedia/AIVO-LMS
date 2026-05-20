@@ -4,50 +4,58 @@ export * from "./role-themes.js";
 export * from "./playful-calm.js";
 export * from "./inclusive-warm.js";
 
+// Re-imports for the `BRAND` summary object below. The `export *` lines
+// above expose the same symbols to consumers; these locals only exist so
+// `BRAND` can stay in lock-step with `tokens.ts` without duplicating
+// values.
+import { COLORS, TYPOGRAPHY, RADII, SPACING } from "./tokens.js";
+
+/**
+ * Marketing-facing brand summary. Mirrors `SEMANTIC` / `COLORS` in
+ * `./tokens.ts` (the canonical source of truth) so consumers like
+ * marketing meta tags and press materials don't drift. App UI code
+ * should consume `SEMANTIC` from `./tokens.ts`, not this object.
+ */
 export const BRAND = {
   name: "AIVO",
   tagline: "A calmer, more personal way to learn",
   colors: {
-    primary: "#3B82F6",
-    primaryLight: "#DBEAFE",
-    primaryDark: "#1D4ED8",
-    secondary: "#FB7185",
-    accent: "#FBBF24",
-    success: "#10B981",
-    warning: "#F59E0B",
-    error: "#EF4444",
-    info: "#3B82F6",
-    background: "#F9FAFB",
-    surface: "#FFFFFF",
-    surfaceHover: "#F3F4F6",
-    text: "#111827",
-    textSecondary: "#374151",
-    border: "#D1D5DB",
-    visualMath: "#FB7185",
-    visualReading: "#3B82F6",
-    visualScience: "#34D399",
-    visualSel: "#FBBF24",
-    visualSurfaceSoft: "#F3F4F6",
+    primary: COLORS.primary,
+    primaryLight: COLORS.primaryLight,
+    primaryDark: COLORS.primaryDark,
+    secondary: COLORS.secondary,
+    accent: COLORS.accent,
+    success: COLORS.success,
+    warning: COLORS.warning,
+    error: COLORS.error,
+    info: COLORS.info,
+    background: COLORS.background,
+    surface: COLORS.surface,
+    surfaceHover: COLORS.surfaceHover,
+    text: COLORS.text,
+    textSecondary: COLORS.textSecondary,
+    border: COLORS.border,
+    visualMath: COLORS.visualMath,
+    visualReading: COLORS.visualReading,
+    visualScience: COLORS.visualScience,
+    visualSel: COLORS.visualSel,
+    visualSurfaceSoft: COLORS.visualSurfaceSoft,
   },
-  fonts: {
-    heading: "'Fredoka', sans-serif",
-    body: "'Nunito', sans-serif",
-    mono: "'JetBrains Mono', monospace",
-  },
+  fonts: TYPOGRAPHY.fontFamilies,
   radii: {
-    sm: "8px",
-    md: "12px",
-    lg: "16px",
-    xl: "24px",
-    full: "9999px",
+    sm: RADII.sm,
+    md: RADII.md,
+    lg: RADII.lg,
+    xl: RADII.xl,
+    full: RADII.full,
   },
   spacing: {
-    xs: "0.25rem",
-    sm: "0.5rem",
-    md: "1rem",
-    lg: "1.5rem",
-    xl: "2rem",
-    xxl: "3rem",
+    xs: SPACING.xs,
+    sm: SPACING.sm,
+    md: SPACING.md,
+    lg: SPACING.lg,
+    xl: SPACING.xl,
+    xxl: SPACING.xxl,
   },
   logos: {
     dark: "/images/aivo-logo-dark.png",

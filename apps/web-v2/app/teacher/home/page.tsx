@@ -10,6 +10,7 @@
 import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
+import { Button } from "@/components/ui/button";
 import {
   LearningHero,
   FloatingMetricCard,
@@ -229,13 +230,9 @@ export default async function TeacherHome() {
               title="Add another class"
               body="Roster sync from Google Classroom, Clever, or ClassLink lands here."
               action={
-                <button
-                  type="button"
-                  disabled
-                  className="inline-flex items-center gap-1.5 rounded-iw-control px-4 py-2 text-sm font-semibold text-iw-text-muted bg-white border border-iw-border cursor-not-allowed"
-                >
+                <Button type="button" variant="outline" size="sm" disabled>
                   Connect roster
-                </button>
+                </Button>
               }
             />
           </div>

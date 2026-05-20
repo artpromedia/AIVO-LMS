@@ -10,6 +10,7 @@ import {
 import { AivoIcon } from "@aivo/ui/icon";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
+import { Button } from "@/components/ui/button";
 
 /**
  * Inclusive-Warm / Playful Calm signup surface. Rebuilt on the
@@ -111,14 +112,15 @@ export default function SignupPage() {
             }
             actions={
               <>
-                <button
+                <Button
                   type="submit"
                   form="signup-form"
+                  size="lg"
                   disabled={!canSubmit}
-                  className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary,#7c3aed)] text-white font-semibold flex items-center justify-center transition hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--aivo-sensory-primary,#7c3aed)]"
+                  className="w-full"
                 >
                   {submitting ? "Creating your account…" : "Create account"}
-                </button>
+                </Button>
               </>
             }
           >

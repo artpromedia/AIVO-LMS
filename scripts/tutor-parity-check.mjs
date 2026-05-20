@@ -40,7 +40,7 @@ const CANONICAL_TUTORS = [
   "muse",
 ];
 
-const AVATAR_PUBLIC_DIRS = ["apps/web/public/images/tutors", "apps/marketing/public/images/tutors"];
+const AVATAR_PUBLIC_DIRS = ["apps/marketing/public/images/tutors"];
 
 const errors = [];
 const warnings = [];

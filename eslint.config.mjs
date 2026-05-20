@@ -18,8 +18,7 @@ export default tseslint.config(
       "**/vitest.setup.ts",
       "**/lighthouserc.js",
       "**/scripts/**",
-      // apps/web and apps/mobile own their own ESLint configs.
-      "apps/web/**",
+      // apps/mobile owns its own ESLint config.
       "apps/mobile/**",
       // Generated OpenAPI typed client.
       "packages/api-client/src/_generated/**",

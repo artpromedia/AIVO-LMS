@@ -9,6 +9,7 @@ import {
   StepperHeader,
 } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
+import { Button } from "@/components/ui/button";
 
 const STEPS = [
   { label: "About you" },
@@ -108,19 +109,17 @@ export default function NewLearnerPage() {
             </p>
             <div className="flex flex-wrap gap-2 mt-1">
               {(["yes", "no", "unsure"] as const).map((v) => (
-                <button
+                <Button
                   key={v}
                   type="button"
+                  size="sm"
+                  variant={hasIep === v ? "default" : "outline"}
                   aria-pressed={hasIep === v}
                   onClick={() => setHasIep(v)}
-                  className={`px-4 h-10 rounded-iw-chip border text-sm font-medium capitalize transition-colors ${
-                    hasIep === v
-                      ? "bg-[var(--aivo-sensory-primary)] text-white border-transparent"
-                      : "bg-white text-iw-text-strong border-iw-border hover:border-iw-text-muted"
-                  }`}
+                  className="capitalize"
                 >
                   {v === "unsure" ? "Not sure yet" : v}
-                </button>
+                </Button>
               ))}
             </div>
           </fieldset>

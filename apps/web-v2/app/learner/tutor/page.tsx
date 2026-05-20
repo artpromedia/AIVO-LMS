@@ -11,6 +11,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
+import { Button } from "@/components/ui/button";
 import {
   AICompanionHero,
   PersonalizationChip,
@@ -121,18 +122,12 @@ export default async function LearnerTutorHome() {
             prompt="Simplify 4/10."
             actions={
               <>
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-1.5 rounded-iw-control px-3 py-2 text-xs font-semibold text-iw-text-muted bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-muted)] hover:text-iw-text-strong"
-                >
+                <Button type="button" variant="outline" size="sm">
                   Need a hint?
-                </button>
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-2 rounded-iw-control px-4 py-2 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
-                >
+                </Button>
+                <Button type="button" size="sm">
                   Submit
-                </button>
+                </Button>
               </>
             }
           >

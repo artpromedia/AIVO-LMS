@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { AuthCard, ReassuranceCard } from "@aivo/ui/auth";
+import { AuthCard } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
+import { Button } from "@/components/ui/button";
 import { MOCK_USERS } from "@/lib/auth/mock-session";
 import type { Role } from "@/lib/auth/types";
 import { SiteHeader } from "@/components/marketing/site-header";
@@ -30,10 +31,22 @@ async function mockSignIn(formData: FormData) {
 }
 
 /**
- * Inclusive-Warm / Playful Calm login surface. Rebuilt on the
- * @aivo/ui/auth primitives so the inputs, CTA, and reassurance tone
- * match the rest of onboarding. The actual server action stays in this
- * server file; only the form fields run on the client via LoginForm.
+ * Login surface — parent / educator entry into AIVO.
+ *
+ * Layout intent (post-Day-6 redesign):
+ *
+ *   < lg : single-column. Wordmark header above one form card. No bullet
+ *          list, no reassurance card, no secondary chrome — the user is
+ *          here to sign in, not be re-sold the product.
+ *
+ *   ≥ lg : two columns weighted toward the form. The left column is a
+ *          quiet brand-presence strip (mark + a single line of context +
+ *          a single decorative dot). It establishes "you're on AIVO"
+ *          without competing with the form.
+ *
+ * No inline hex. No raw `<button>`. All interactive colors flow through
+ * `iw-*` Tailwind utilities so the sensory-mode toggle repaints the
+ * surface without re-wiring.
  */
 export default function LoginPage({
   searchParams: _searchParams,
@@ -45,86 +58,85 @@ export default function LoginPage({
       <SiteHeader />
       <main
         id="main"
-        className="mx-auto w-full max-w-6xl px-6 py-12 sm:py-16 lg:py-20"
+        className="mx-auto w-full max-w-5xl px-6 py-10 sm:py-14 lg:py-20"
       >
-        <div className="grid gap-10 lg:grid-cols-[1.05fr_1fr] lg:items-start">
-          <aside className="flex flex-col gap-5">
-            <AuthCard
-              icon={<AivoIcon name="aiSparkle" size={32} />}
-              eyebrow="Welcome back"
-              title="Pick up where every learner left off."
-              subtitle="Sign in to continue your personalised AIVO journey — tutors, missions, and progress all in one place."
+        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-16">
+          {/* Brand-presence strip — desktop only. Intentionally quiet. */}
+          <aside className="hidden lg:flex flex-col gap-6 max-w-md">
+            <span
+              aria-hidden="true"
+              className="inline-flex h-12 w-12 items-center justify-center rounded-iw-card bg-iw-accent-soft text-iw-primary"
             >
-              <ul className="flex flex-col gap-3 text-sm text-iw-ink">
-                <li className="flex items-start gap-3">
-                  <span
-                    aria-hidden="true"
-                    className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--aivo-color-aivoPurple-100,#ede9fe)] text-[var(--aivo-sensory-primary,#7c3aed)]"
-                  >
-                    <AivoIcon name="aiSparkle" size={16} />
-                  </span>
-                  <span>Personalised tutors that remember where each learner left off.</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span
-                    aria-hidden="true"
-                    className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--aivo-color-aivoTeal-100,#ccfbf1)] text-[var(--aivo-color-aivoTeal-700,#0f766e)]"
-                  >
-                    <AivoIcon name="safetyOk" size={16} />
-                  </span>
-                  <span>Sensory-friendly modes follow you across devices.</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span
-                    aria-hidden="true"
-                    className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--aivo-color-aivoPurple-100,#ede9fe)] text-[var(--aivo-sensory-primary,#7c3aed)]"
-                  >
-                    <AivoIcon name="curriculum" size={16} />
-                  </span>
-                  <span>Family insights and IEP-aware progress, always in one place.</span>
-                </li>
-              </ul>
-            </AuthCard>
-            <ReassuranceCard
-              tone="privacy"
-              title="We never sell your data."
-              body="Your email is used only to identify your account. Read the privacy notice for more."
-              link={{ href: "/onboarding/privacy", label: "Read the privacy notice" }}
-            />
+              <AivoIcon name="aiSparkle" size={28} />
+            </span>
+            <h2 className="font-iw-display text-3xl font-bold leading-[1.1] text-iw-ink">
+              Sign in to continue your AIVO journey.
+            </h2>
+            <p className="text-base leading-relaxed text-iw-ink-muted">
+              Your tutors, missions, and family insights — all in one place,
+              tuned for how your learner thinks.
+            </p>
           </aside>
 
-          <AuthCard
-            icon={<AivoIcon name="aiSparkle" size={32} />}
-            eyebrow="Sign in"
-            title="Welcome back"
-            subtitle="Use your AIVO account to access tutors, missions, and family insights."
-            actions={
-              <>
-                <button
-                  type="submit"
-                  form="login-form"
-                  className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary,#7c3aed)] text-white font-semibold flex items-center justify-center transition hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--aivo-sensory-primary,#7c3aed)]"
-                >
-                  Sign in
-                </button>
-                <p className="text-sm text-iw-ink-muted text-center">
-                  New here?{" "}
-                  <Link
-                    href="/signup"
-                    className="font-semibold text-[var(--aivo-sensory-primary,#7c3aed)] hover:underline"
+          {/* Form card — dominant on every breakpoint. */}
+          <div className="flex flex-col gap-4">
+            {/* Mobile-only header — replaces the desktop brand-presence strip. */}
+            <div className="lg:hidden flex items-center gap-3">
+              <span
+                aria-hidden="true"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-iw-card bg-iw-accent-soft text-iw-primary"
+              >
+                <AivoIcon name="aiSparkle" size={22} />
+              </span>
+              <h2 className="font-iw-display text-2xl font-bold leading-tight text-iw-ink">
+                Welcome back.
+              </h2>
+            </div>
+
+            <AuthCard
+              eyebrow="Sign in"
+              title="Continue with your AIVO account"
+              subtitle="Email and password. Single sign-on coming soon."
+              actions={
+                <>
+                  <Button
+                    type="submit"
+                    form="login-form"
+                    variant="default"
+                    size="lg"
+                    className="w-full"
                   >
-                    Create an account
-                  </Link>
-                  .
-                </p>
-              </>
-            }
-          >
-            <LoginForm
-              id="login-form"
-              action={mockSignIn}
-            />
-          </AuthCard>
+                    Sign in
+                  </Button>
+                  <p className="text-sm text-iw-ink-muted text-center">
+                    New here?{" "}
+                    <Link
+                      href="/signup"
+                      className="font-semibold text-iw-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring focus-visible:ring-offset-2 focus-visible:ring-offset-iw-bg rounded"
+                    >
+                      Create an account
+                    </Link>
+                    .
+                  </p>
+                </>
+              }
+            >
+              <LoginForm id="login-form" action={mockSignIn} />
+            </AuthCard>
+
+            {/* Single-line privacy reassurance. Replaces the previous
+                ReassuranceCard so the screen has one visual focus, not two. */}
+            <p className="text-xs text-iw-ink-muted text-center">
+              We never sell your data.{" "}
+              <Link
+                href="/onboarding/privacy"
+                className="font-semibold text-iw-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring focus-visible:ring-offset-2 focus-visible:ring-offset-iw-bg rounded"
+              >
+                Read the privacy notice
+              </Link>
+              .
+            </p>
+          </div>
         </div>
       </main>
       <SiteFooter />

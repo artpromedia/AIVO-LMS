@@ -121,19 +121,21 @@ if (!promptBuilder) {
 }
 
 // ---------------------------------------------------------------------------
-// 3. web SurfaceResponseZone uses SurfaceHost
+// 3. web-v2 SurfaceResponseZone uses SurfaceHost
+//
+// The legacy apps/web path was retired with the v1 web shell. The check is
+// kept here so that whenever a SurfaceResponseZone reappears under
+// apps/web-v2 it still has to render via SurfaceHost; until then this
+// silently passes.
 // ---------------------------------------------------------------------------
 const surfaceZone =
-  readIfExists("apps/web/src/components/stage/SurfaceResponseZone.tsx") ??
-  readIfExists("apps/web/src/components/stage/SurfaceResponseZone.ts") ??
+  readIfExists("apps/web-v2/components/stage/SurfaceResponseZone.tsx") ??
+  readIfExists("apps/web-v2/components/stage/SurfaceResponseZone.ts") ??
   "";
-if (!surfaceZone) {
-  fail("surface-response-zone-missing", "apps/web SurfaceResponseZone component is missing");
-} else if (!/SurfaceHost\b/.test(surfaceZone)) {
+if (surfaceZone && !/SurfaceHost\b/.test(surfaceZone)) {
   fail(
     "surface-response-zone-host",
     "SurfaceResponseZone does not render via SurfaceHost",
-    "Sprint 04 fixes this",
   );
 }
 

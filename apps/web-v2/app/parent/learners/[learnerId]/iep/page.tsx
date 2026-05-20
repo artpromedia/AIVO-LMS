@@ -6,11 +6,11 @@ import {
   QuestionCard,
   AssessmentFooter,
   ASSESSMENT_BACK_CLASS,
-  ASSESSMENT_GHOST_CLASS,
   UploadDropZone,
   UploadFileCard,
   ReassuranceCard,
 } from "@aivo/ui";
+import { Button } from "@/components/ui/button";
 import {
   getIEPForLearner,
   getLearner,
@@ -250,9 +250,9 @@ export default async function IEPUploadPage({
             saveExit={
               <form action={skipAction}>
                 <input type="hidden" name="learnerId" value={learner.id} />
-                <button type="submit" className={ASSESSMENT_GHOST_CLASS}>
+                <Button type="submit" variant="ghost" size="sm">
                   Skip for now
-                </button>
+                </Button>
               </form>
             }
             primary={
@@ -292,10 +292,7 @@ export default async function IEPUploadPage({
               actions={
                 <form action={deleteAction}>
                   <input type="hidden" name="learnerId" value={learner.id} />
-                  <button
-                    type="submit"
-                    className="inline-flex items-center gap-1 rounded-iw-control px-3 py-1.5 text-xs font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-muted)]"
-                  >
+                  <Button type="submit" variant="outline" size="sm">
                     <svg
                       className="w-3.5 h-3.5"
                       viewBox="0 0 24 24"
@@ -312,7 +309,7 @@ export default async function IEPUploadPage({
                       <path d="M14 11v6" />
                     </svg>
                     Remove
-                  </button>
+                  </Button>
                 </form>
               }
             />
@@ -338,10 +335,7 @@ export default async function IEPUploadPage({
               maxBytes={IEP_MAX_BYTES}
               enableCameraCapture
             />
-            <button
-              type="submit"
-              className="inline-flex self-end items-center gap-2 rounded-iw-control px-5 py-2.5 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 shadow-[0_2px_6px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.18)] focus:outline-none focus:ring-2 focus:ring-[var(--aivo-sensory-ringFocus)] focus:ring-offset-2 focus:ring-offset-white"
-            >
+            <Button type="submit" className="self-end">
               Upload & extract supports
               <svg
                 className="w-4 h-4"
@@ -356,7 +350,7 @@ export default async function IEPUploadPage({
                 <path d="M5 12h14" />
                 <path d="m13 5 7 7-7 7" />
               </svg>
-            </button>
+            </Button>
           </form>
         )}
       </QuestionCard>
