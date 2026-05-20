@@ -12,8 +12,7 @@
 //   - All present                         → exit 0
 //
 // Apps audited:
-//   - apps/web/public
-//   - apps/web-v2/public        (created if not present is acceptable)
+//   - apps/web-v2/public
 //   - apps/marketing/public
 //   - apps/mobile/assets
 //
@@ -91,7 +90,6 @@ if (criticalAssets.length === 0) {
 }
 
 const APPS = [
-  { name: "web", publicDir: "apps/web/public" },
   { name: "web-v2", publicDir: "apps/web-v2/public" },
   { name: "marketing", publicDir: "apps/marketing/public" },
 ];

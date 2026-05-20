@@ -40,7 +40,7 @@ const TUTORS = [
   { key: "muse", name: "Muse", color: "#A855F7" },
 ];
 
-const PUBLIC_DIRS = ["apps/web/public/images/tutors", "apps/marketing/public/images/tutors"];
+const PUBLIC_DIRS = ["apps/marketing/public/images/tutors"];
 
 function renderSvg({ key, name, color }) {
   const initial = name.charAt(0).toUpperCase();

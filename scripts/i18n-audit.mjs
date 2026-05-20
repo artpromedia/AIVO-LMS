@@ -3,7 +3,6 @@ import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { join, basename } from "node:path";
 
 const APPS = [
-  { name: "web", dir: "apps/web/src/i18n/messages", base: "en" },
   { name: "marketing", dir: "apps/marketing/src/i18n/messages", base: "en" },
   { name: "mobile", dir: "apps/mobile/i18n", base: "en" },
 ];

@@ -22,7 +22,7 @@ const REPO_ROOT = resolve(__dirname, "..");
 
 const ROOTS = [
   "apps/mobile",
-  "apps/web",
+  "apps/web-v2",
   "services/ai-svc",
   "services/learning-svc",
   "services/tutor-svc",
