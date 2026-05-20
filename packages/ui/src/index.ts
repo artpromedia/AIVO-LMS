@@ -18,4 +18,5 @@ export * from "./shell";
 export * from "./auth";
 export * from "./hero";
 export * from "./assessment";
+export * from "./baseline";
 export * from "./utils";

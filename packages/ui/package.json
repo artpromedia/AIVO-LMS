@@ -47,6 +47,10 @@
       "types": "./dist/assessment/index.d.ts",
       "import": "./dist/assessment/index.js"
     },
+    "./baseline": {
+      "types": "./dist/baseline/index.d.ts",
+      "import": "./dist/baseline/index.js"
+    },
     "./utils": {
       "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils/index.js"
