@@ -140,19 +140,104 @@ export const ASSESSMENT_SECTION_LABEL: Record<AssessmentSectionId, string> = {
  *  step (Basics) and the new Background/Strengths/Learning-profile sections
  *  feed the legacy brain-clone signals (functioning level, diagnoses,
  *  communication mode) — see `lib/learner/brain-profile.ts`. */
-export const WIZARD_STEPS: { id: number; label: string; sections: AssessmentSectionId[] }[] = [
-  { id: 1, label: "Basics", sections: ["basics"] },
-  { id: 2, label: "Goals", sections: ["goals"] },
-  { id: 3, label: "Background", sections: ["background", "strengths"] },
-  { id: 4, label: "Confidence", sections: ["grade_subject", "reading", "math"] },
+export const WIZARD_STEPS: {
+  id: number;
+  /** Short label for the step (used in legacy stepper). */
+  label: string;
+  /** Long, friendly label used in the calm soft-glass screen header. */
+  longLabel: string;
+  /** Sentence shown under the title to frame the question. */
+  helper?: string;
+  sections: AssessmentSectionId[];
+}[] = [
+  {
+    id: 1,
+    label: "Background",
+    longLabel: "Tell us about your child",
+    helper:
+      "A few quick details so AIVO can speak about your learner the way you do. None of this is shown to your child.",
+    sections: ["basics", "background"],
+  },
+  {
+    id: 2,
+    label: "Strengths",
+    longLabel: "What does your child love and do well?",
+    helper:
+      "Strengths help AIVO weave familiar topics into early lessons. There's no wrong answer here.",
+    sections: ["strengths"],
+  },
+  {
+    id: 3,
+    label: "Challenges",
+    longLabel: "What gets in the way of learning?",
+    helper:
+      "Tell us about frustration triggers and what helps your child reset. AIVO uses this to avoid stuck-points.",
+    sections: ["frustration"],
+  },
+  {
+    id: 4,
+    label: "Subjects",
+    longLabel: "Grade level and subject focus",
+    helper:
+      "Pick the grade band your child is working in, plus the subjects you'd like AIVO to focus on first.",
+    sections: ["grade_subject"],
+  },
   {
     id: 5,
-    label: "Focus & style",
-    sections: ["attention", "communication", "learning_profile"],
+    label: "Attention & pacing",
+    longLabel: "How does your child focus and pace?",
+    helper:
+      "Short focus windows and frequent breaks are common and fine. AIVO will plan sessions around what works.",
+    sections: ["attention", "pace"],
   },
-  { id: 6, label: "Sensory & routine", sections: ["sensory", "homework"] },
-  { id: 7, label: "Triggers & motivation", sections: ["frustration", "motivation"] },
-  { id: 8, label: "Supports & pace", sections: ["accommodations", "pace", "concerns"] },
+  {
+    id: 6,
+    label: "Communication",
+    longLabel: "How does your child communicate?",
+    helper:
+      "Spoken, written, visual, mixed, AAC — every learner is different. AIVO honours whatever you select.",
+    sections: ["communication", "learning_profile"],
+  },
+  {
+    id: 7,
+    label: "Reading",
+    longLabel: "Reading comfort",
+    helper:
+      "Pick the level that matches today, not the long-term goal. AIVO will adjust automatically as your child grows.",
+    sections: ["reading"],
+  },
+  {
+    id: 8,
+    label: "Math",
+    longLabel: "Math confidence",
+    helper:
+      "How does math feel for your child right now? AIVO will start at a comfortable place and build from there.",
+    sections: ["math"],
+  },
+  {
+    id: 9,
+    label: "Sensory & support",
+    longLabel: "Sensory needs and known supports",
+    helper:
+      "Tell AIVO about sensitivities and any accommodations that already help. These shape the calm-mode defaults.",
+    sections: ["sensory", "accommodations"],
+  },
+  {
+    id: 10,
+    label: "Routine & goals",
+    longLabel: "When does learning fit best, and what's the goal?",
+    helper:
+      "Best time of day, typical session length, what you'd like AIVO to help with, and what motivates your learner.",
+    sections: ["homework", "goals", "motivation"],
+  },
+  {
+    id: 11,
+    label: "Concerns",
+    longLabel: "Anything else AIVO should know?",
+    helper:
+      "Tell us what's on your mind. There's no right or wrong here — this goes straight to the personalization layer.",
+    sections: ["concerns"],
+  },
 ];
 
 export function validateSection(
