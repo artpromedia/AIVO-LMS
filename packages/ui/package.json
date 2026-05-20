@@ -51,6 +51,10 @@
       "types": "./dist/baseline/index.d.ts",
       "import": "./dist/baseline/index.js"
     },
+    "./learner-home": {
+      "types": "./dist/learner-home/index.d.ts",
+      "import": "./dist/learner-home/index.js"
+    },
     "./utils": {
       "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils/index.js"
