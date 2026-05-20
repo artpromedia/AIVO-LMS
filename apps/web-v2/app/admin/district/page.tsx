@@ -1,8 +1,10 @@
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
-import { PageHeader } from "@/components/layout/page-header";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import {
+  FloatingMetricCard,
+  GlassCard,
+  InsightChip,
+} from "@aivo/ui";
 import { DISTRICT_NAV } from "@/components/layout/role-shells";
 import {
   scopeTenantsForSession,
@@ -11,7 +13,7 @@ import {
   getTenantSettings,
   computeSystemHealth,
 } from "@/lib/db/repos";
-import { Building2, Users, GraduationCap, ClipboardList, Activity } from "lucide-react";
+import { Building2, Users, GraduationCap, ClipboardList } from "lucide-react";
 
 const FL_LABELS: Record<string, string> = {
   standard: "Standard",
@@ -77,65 +79,56 @@ export default async function DistrictAdminHome() {
       navItems={DISTRICT_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <PageHeader
-        eyebrow="District admin"
-        title={districtName}
-        description="Cross-school oversight, rostering, and reporting."
-      />
+      <header className="flex flex-col gap-2 mb-6">
+        <p className="iw-label text-iw-text-muted">District admin</p>
+        <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong">{districtName}</h1>
+        <p className="text-sm md:text-base text-iw-text-muted max-w-2xl">
+          Cross-school oversight, rostering, and reporting. Drill into a card to manage a school.
+        </p>
+      </header>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {kpis.map(({ k, v, helper, Icon }) => (
-          <Card key={k} className="p-[var(--aivo-density-card-pad)]">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{k}</p>
-                <p className="mt-1 font-display text-3xl font-bold">{v.toLocaleString()}</p>
-                <p className="mt-2 text-xs text-aivo-ink-soft">{helper}</p>
-              </div>
-              <span
-                aria-hidden
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-aivo-primary-soft text-aivo-primary"
-              >
-                <Icon className="h-4 w-4" />
-              </span>
-            </div>
-          </Card>
+      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {kpis.map(({ k, v, helper }) => (
+          <FloatingMetricCard
+            key={k}
+            label={k}
+            value={v.toLocaleString()}
+            description={helper}
+            tone={k === "IEPs on file" ? "info" : k === "Learners" ? "success" : "neutral"}
+          />
         ))}
-      </div>
+      </section>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-3">
-        <Card className="p-[var(--aivo-density-card-pad)] lg:col-span-2">
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <p className="font-display text-lg font-semibold">Functioning level distribution</p>
-              <p className="text-xs text-aivo-ink-soft">
-                How the district&rsquo;s {flTotal.toLocaleString()} learners are spread across the
-                five AIVO levels.
-              </p>
-            </div>
-            <Badge tone="neutral">{flTotal.toLocaleString()} learners</Badge>
-          </div>
+      <section className="mt-6 grid gap-4 lg:grid-cols-3">
+        <GlassCard
+          elevation="raised"
+          density="comfortable"
+          title="Functioning level distribution"
+          description={`${flTotal.toLocaleString()} learners across five AIVO levels`}
+          actions={<InsightChip tone="neutral" size="md">{flTotal.toLocaleString()}</InsightChip>}
+          className="lg:col-span-2"
+        >
           {flTotal === 0 ? (
-            <p className="text-sm text-aivo-ink-soft">No learners assigned yet.</p>
+            <p className="text-sm text-iw-text-muted">No learners assigned yet.</p>
           ) : (
-            <ul className="space-y-3">
+            <ul className="space-y-3 mt-2">
               {stats.flDistribution.map((row) => {
                 const pct = flTotal === 0 ? 0 : (row.count / flTotal) * 100;
                 const barPct = flMax === 0 ? 0 : (row.count / flMax) * 100;
                 return (
                   <li key={row.level}>
                     <div className="mb-1 flex items-center justify-between text-sm">
-                      <span className="font-medium">{FL_LABELS[row.level] ?? row.level}</span>
-                      <span className="text-aivo-ink-soft">
+                      <span className="font-medium text-iw-text-strong">{FL_LABELS[row.level] ?? row.level}</span>
+                      <span className="text-iw-text-muted tabular-nums">
                         {row.count.toLocaleString()} · {pct.toFixed(0)}%
                       </span>
                     </div>
                     <div
-                      className="h-2 w-full overflow-hidden rounded-full bg-aivo-border/60"
+                      className="h-2 w-full overflow-hidden rounded-full bg-[var(--aivo-color-surface-muted)]"
                       role="presentation"
                     >
                       <div
-                        className="h-full rounded-full bg-aivo-primary"
+                        className="h-full rounded-full bg-[var(--aivo-sensory-primary)] transition-[width] duration-300"
                         style={{ width: `${barPct}%` }}
                       />
                     </div>
@@ -144,37 +137,42 @@ export default async function DistrictAdminHome() {
               })}
             </ul>
           )}
-        </Card>
+        </GlassCard>
 
-        <Card className="p-[var(--aivo-density-card-pad)]">
-          <div className="mb-3 flex items-center gap-2">
-            <Activity className="h-4 w-4 text-aivo-primary" />
-            <p className="font-display text-lg font-semibold">Platform health</p>
-          </div>
-          <dl className="space-y-3 text-sm">
+        <GlassCard
+          elevation="raised"
+          density="comfortable"
+          title="Platform health"
+          description="Last 30 days"
+          actions={
+            <InsightChip
+              tone={health.generationSuccessRate > 0.95 ? "success" : "warning"}
+              size="md"
+            >
+              {(health.generationSuccessRate * 100).toFixed(0)}% OK
+            </InsightChip>
+          }
+        >
+          <dl className="space-y-2.5 text-sm mt-2">
             <div className="flex items-center justify-between">
-              <dt className="text-aivo-ink-soft">Lessons completed</dt>
-              <dd className="font-semibold">{health.lessonRunsCompleted.toLocaleString()}</dd>
+              <dt className="text-iw-text-muted">Lessons completed</dt>
+              <dd className="font-semibold text-iw-text-strong tabular-nums">{health.lessonRunsCompleted.toLocaleString()}</dd>
             </div>
             <div className="flex items-center justify-between">
-              <dt className="text-aivo-ink-soft">Lessons attempted</dt>
-              <dd className="font-semibold">{health.lessonRunsTotal.toLocaleString()}</dd>
+              <dt className="text-iw-text-muted">Lessons attempted</dt>
+              <dd className="font-semibold text-iw-text-strong tabular-nums">{health.lessonRunsTotal.toLocaleString()}</dd>
             </div>
             <div className="flex items-center justify-between">
-              <dt className="text-aivo-ink-soft">AI success rate</dt>
-              <dd className="font-semibold">{(health.generationSuccessRate * 100).toFixed(0)}%</dd>
+              <dt className="text-iw-text-muted">AI jobs in queue</dt>
+              <dd className="font-semibold text-iw-text-strong tabular-nums">{health.generationQueuedCount.toLocaleString()}</dd>
             </div>
             <div className="flex items-center justify-between">
-              <dt className="text-aivo-ink-soft">AI jobs in queue</dt>
-              <dd className="font-semibold">{health.generationQueuedCount.toLocaleString()}</dd>
-            </div>
-            <div className="flex items-center justify-between">
-              <dt className="text-aivo-ink-soft">AI failures</dt>
-              <dd className="font-semibold">{health.generationFailureCount.toLocaleString()}</dd>
+              <dt className="text-iw-text-muted">AI failures</dt>
+              <dd className="font-semibold text-iw-text-strong tabular-nums">{health.generationFailureCount.toLocaleString()}</dd>
             </div>
           </dl>
-        </Card>
-      </div>
+        </GlassCard>
+      </section>
     </AppShell>
   );
 }
