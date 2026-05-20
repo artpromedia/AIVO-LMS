@@ -1,15 +1,19 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowRight, CheckCircle2, ShieldCheck } from "lucide-react";
 import { requirePageRole } from "@/lib/auth/server";
-import { AppShell } from "@/components/layout/app-shell";
-import { PageHeader, SectionHeader } from "@/components/layout/page-header";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
-import { PARENT_NAV } from "@/components/layout/role-shells";
 import {
+  AssessmentShell,
+  QuestionCard,
+  AssessmentFooter,
+  ASSESSMENT_BACK_CLASS,
+  ASSESSMENT_GHOST_CLASS,
+  ExtractedSupportRow,
+  UploadFileCard,
+  ReassuranceCard,
+  InsightChip,
+} from "@aivo/ui";
+import {
+  confirmIEPExtraction,
   getIEPForLearner,
   getLearner,
   getOrCreateParentAssessment,
@@ -44,17 +48,80 @@ async function reextractAction(formData: FormData) {
   redirect(`/parent/learners/${learnerId}/iep/review`);
 }
 
-function YesNo({ value }: { value: boolean }) {
-  return value ? <Badge tone="success">Yes</Badge> : <Badge tone="neutral">No</Badge>;
+async function confirmAction(formData: FormData) {
+  "use server";
+  const { readMockSessionFromCookies } = await import("@/lib/auth/mock-session");
+  const session = await readMockSessionFromCookies();
+  if (!session || session.role !== "parent") redirect("/login");
+  const learnerId = String(formData.get("learnerId") || "");
+  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+    redirect("/parent/learners");
+  }
+  const accepted = formData.getAll("accepted").map(String);
+  const usageConsent = formData.get("usageConsent") === "on";
+  if (!usageConsent) {
+    redirect(`/parent/learners/${learnerId}/iep/review?error=consent_required`);
+  }
+  confirmIEPExtraction(learnerId, session.tenantId, accepted);
+  refreshLearnerReadiness(learnerId, session.tenantId);
+  audit(session, "iep.confirm", newRequestId(), {
+    learnerId,
+    metadata: { acceptedCount: accepted.length },
+  });
+  redirect(`/parent/learners/${learnerId}/assessment/submitted`);
+}
+
+async function deleteAction(formData: FormData) {
+  "use server";
+  const { readMockSessionFromCookies } = await import("@/lib/auth/mock-session");
+  const session = await readMockSessionFromCookies();
+  if (!session || session.role !== "parent") redirect("/login");
+  const learnerId = String(formData.get("learnerId") || "");
+  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+    redirect("/parent/learners");
+  }
+  const { deleteIEPForLearner } = await import("@/lib/db/repos");
+  deleteIEPForLearner(learnerId, session.tenantId);
+  refreshLearnerReadiness(learnerId, session.tenantId);
+  audit(session, "iep.delete", newRequestId(), { learnerId });
+  redirect(`/parent/learners/${learnerId}/iep`);
+}
+
+const ERROR_MESSAGES: Record<string, string> = {
+  consent_required:
+    "Please tick the consent box to confirm AIVO can use these supports for your learner's personalization.",
+};
+
+function formatDate(iso: string): string {
+  try {
+    return new Date(iso).toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  } catch {
+    return iso;
+  }
+}
+
+function kindFromMime(mime: string): string {
+  if (mime === "application/pdf") return "PDF";
+  if (mime.includes("word")) return "Word";
+  if (mime.startsWith("image/")) return "Photo";
+  if (mime === "text/plain") return "Text";
+  return "Document";
 }
 
 export default async function IEPReviewPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ learnerId: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
+  const sp = await searchParams;
   if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
@@ -64,192 +131,237 @@ export default async function IEPReviewPage({
   const doc = getIEPForLearner(learnerId, session.tenantId);
   if (!doc) {
     return (
-      <AppShell
-        role="parent"
-        roleLabel="Parent"
-        navItems={PARENT_NAV}
-        user={{ displayName: session.displayName, email: session.email }}
-      >
-        <PageHeader
-          eyebrow={`IEP review for ${learner.displayName}`}
+      <AssessmentShell eyebrow={`IEP review for ${learner.displayName}`}>
+        <QuestionCard
+          eyebrow="Nothing to review yet"
           title="No IEP on file"
-          description="Upload an IEP first to see the extracted supports here."
-        />
-        <EmptyState
-          title="Nothing to review yet"
-          description="Once you upload a document we'll pull the supports out and show them here."
-          action={
-            <Button asChild>
-              <Link href={`/parent/learners/${learner.id}/iep`}>
-                Go to IEP upload <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
-            </Button>
+          helper="Upload an IEP, 504 plan, or accommodation letter to see the extracted supports here."
+          actions={
+            <AssessmentFooter
+              primary={
+                <Link
+                  href={`/parent/learners/${learner.id}/iep`}
+                  className="inline-flex items-center gap-2 rounded-iw-control px-5 py-2.5 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
+                >
+                  Go to IEP upload
+                </Link>
+              }
+            />
           }
-        />
-      </AppShell>
+        >
+          <p className="text-sm text-iw-text-muted">
+            Or skip and we'll use your assessment alone for personalization. You can always come
+            back to upload later.
+          </p>
+        </QuestionCard>
+      </AssessmentShell>
     );
   }
 
   const ex = doc.extraction;
+  const previouslyAccepted = new Set(doc.acceptedAccommodations ?? ex?.accommodations ?? []);
+  const errorMessage = sp.error ? ERROR_MESSAGES[sp.error] : undefined;
+
+  // Confidence is synthetic until the LLM adapter writes per-accommodation
+  // confidence — we treat learner-affecting supports (read aloud, extended
+  // time, speech-to-text) as high, the rest as medium, and any free-text
+  // entries from the parent's known list as worth-a-glance.
+  function confidenceFor(label: string): "high" | "medium" | "low" {
+    const lower = label.toLowerCase();
+    if (
+      lower.includes("extended time") ||
+      lower.includes("read-aloud") ||
+      lower.includes("speech-to-text") ||
+      lower.includes("aac")
+    ) {
+      return "high";
+    }
+    if (lower.includes("sensory") || lower.includes("movement") || lower.includes("break")) {
+      return "medium";
+    }
+    return "low";
+  }
 
   return (
-    <AppShell
-      role="parent"
-      roleLabel="Parent"
-      navItems={PARENT_NAV}
-      user={{ displayName: session.displayName, email: session.email }}
+    <AssessmentShell
+      eyebrow={`IEP review for ${learner.displayName}`}
+      reassurance={
+        <>
+          <ReassuranceCard
+            tone="safety"
+            title="Learner never sees this"
+            body="Your child only sees a calm, supportive summary — never clinical or diagnostic language."
+          />
+          <ReassuranceCard
+            tone="privacy"
+            title="You can deselect anything"
+            body="Toggle off any support you'd rather not have AIVO apply. You can also remove the whole document."
+          />
+        </>
+      }
     >
-      <PageHeader
-        eyebrow={`IEP review for ${learner.displayName}`}
-        title="Extracted supports"
-        description="This is what AIVO will use during lessons. You can re-run the extraction or replace the document at any time."
-        actions={
-          <Button asChild variant="outline">
-            <Link href={`/parent/learners/${learner.id}/iep`}>Manage document</Link>
-          </Button>
-        }
-      />
-
-      <Card className="mb-4 flex items-start gap-3 p-4">
-        <ShieldCheck className="h-5 w-5 shrink-0 text-aivo-primary" />
-        <div className="text-sm text-aivo-ink-soft">
-          <p className="font-medium text-aivo-ink">Safety note</p>
-          <p className="mt-1">
-            Your learner never sees the raw IEP or any clinical / diagnostic language. We keep a
-            separate, supportive learner-safe summary that the lessons can reference.
-          </p>
-        </div>
-      </Card>
-
-      {!ex ? (
-        <EmptyState
-          title="No supports extracted yet"
-          description="We couldn't extract supports from this document automatically."
-          action={
-            <form action={reextractAction}>
-              <input type="hidden" name="learnerId" value={learner.id} />
-              <Button type="submit">Try extraction again</Button>
-            </form>
+      <div className="flex flex-col gap-4">
+        <UploadFileCard
+          fileName={doc.fileName}
+          bytes={doc.bytes}
+          kind={kindFromMime(doc.mimeType)}
+          uploadedAt={formatDate(doc.uploadedAt)}
+          status={ex ? "parsed" : "extracting"}
+          actions={
+            <div className="flex items-center gap-2">
+              <form action={reextractAction}>
+                <input type="hidden" name="learnerId" value={learner.id} />
+                <button
+                  type="submit"
+                  className="inline-flex items-center gap-1 rounded-iw-control px-3 py-1.5 text-xs font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-muted)]"
+                >
+                  Re-run extraction
+                </button>
+              </form>
+              <form action={deleteAction}>
+                <input type="hidden" name="learnerId" value={learner.id} />
+                <button
+                  type="submit"
+                  className="inline-flex items-center gap-1 rounded-iw-control px-3 py-1.5 text-xs font-semibold text-[var(--aivo-color-status-error-strong)] bg-white border border-[var(--aivo-color-status-error-default)] hover:bg-[var(--aivo-color-status-error-subtle)]"
+                >
+                  Remove
+                </button>
+              </form>
+            </div>
           }
         />
-      ) : (
-        <>
-          <SectionHeader title="Accommodations" />
-          <Card className="p-[var(--aivo-density-card-pad)]">
-            {ex.accommodations.length === 0 ? (
-              <p className="text-sm text-aivo-ink-soft">
-                No specific accommodations recorded. AIVO will use sensible defaults based on your
-                assessment.
-              </p>
-            ) : (
-              <ul className="space-y-1.5 text-sm">
-                {ex.accommodations.map((a) => (
-                  <li key={a} className="flex items-start gap-2">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-aivo-success" />
-                    {a}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Card>
 
-          <SectionHeader title="Support areas" className="mt-6" />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <Card className="flex items-center justify-between p-[var(--aivo-density-card-pad)]">
-              <span className="text-sm font-medium">Extended time</span>
-              <YesNo value={ex.extendedTime} />
-            </Card>
-            <Card className="flex items-center justify-between p-[var(--aivo-density-card-pad)]">
-              <span className="text-sm font-medium">Reading support</span>
-              <YesNo value={ex.readingSupport} />
-            </Card>
-            <Card className="flex items-center justify-between p-[var(--aivo-density-card-pad)]">
-              <span className="text-sm font-medium">Writing support</span>
-              <YesNo value={ex.writingSupport} />
-            </Card>
-            <Card className="flex items-center justify-between p-[var(--aivo-density-card-pad)]">
-              <span className="text-sm font-medium">Behavioral support</span>
-              <YesNo value={ex.behavioralSupport} />
-            </Card>
-            <Card className="flex items-center justify-between p-[var(--aivo-density-card-pad)]">
-              <span className="text-sm font-medium">Sensory support</span>
-              <YesNo value={ex.sensorySupport} />
-            </Card>
-            <Card className="flex items-center justify-between p-[var(--aivo-density-card-pad)]">
-              <span className="text-sm font-medium">Communication support</span>
-              <YesNo value={ex.communicationSupport} />
-            </Card>
-          </div>
-
-          <SectionHeader title="Service areas & assistive tech" className="mt-6" />
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Card className="p-[var(--aivo-density-card-pad)]">
-              <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
-                Service areas
-              </p>
-              {ex.serviceAreas.length === 0 ? (
-                <p className="mt-2 text-sm text-aivo-ink-soft">None flagged.</p>
+        {!ex ? (
+          <QuestionCard
+            eyebrow="Extraction in progress"
+            title="Reading the document"
+            helper="This usually takes about a minute. We'll let you know when the supports are ready."
+          >
+            <p className="text-sm text-iw-text-muted">
+              If this is taking longer than expected, try re-running the extraction from the file
+              card above.
+            </p>
+          </QuestionCard>
+        ) : (
+          <form action={confirmAction}>
+            <input type="hidden" name="learnerId" value={learner.id} />
+            <QuestionCard
+              eyebrow="Extracted supports"
+              title="Confirm what AIVO can apply"
+              helper="Each support below comes from your IEP. Untick any you'd rather skip. You can change this later from the learner's settings."
+              tag={`${ex.accommodations.length} found`}
+              error={errorMessage}
+              actions={
+                <AssessmentFooter
+                  back={
+                    <Link
+                      href={`/parent/learners/${learner.id}/iep`}
+                      className={ASSESSMENT_BACK_CLASS}
+                    >
+                      Back to upload
+                    </Link>
+                  }
+                  saveExit={
+                    <Link
+                      href={`/parent/learners/${learner.id}`}
+                      className={ASSESSMENT_GHOST_CLASS}
+                    >
+                      Save & exit
+                    </Link>
+                  }
+                  primaryLabel="Confirm & continue"
+                />
+              }
+            >
+              {ex.accommodations.length === 0 ? (
+                <p className="text-sm text-iw-text-muted rounded-iw-card border border-iw-border bg-white p-4">
+                  We couldn't pull any specific accommodations from this document. AIVO will use
+                  sensible defaults based on your assessment instead.
+                </p>
               ) : (
-                <ul className="mt-2 list-disc pl-5 text-sm">
-                  {ex.serviceAreas.map((s) => (
-                    <li key={s}>{s}</li>
+                <div className="flex flex-col gap-2.5">
+                  {ex.accommodations.map((acc) => (
+                    <ExtractedSupportRow
+                      key={acc}
+                      name="accepted"
+                      value={acc}
+                      label={acc}
+                      provenance={
+                        ex.source === "ai_extraction"
+                          ? "Extracted from your IEP document"
+                          : "Inferred from IEP + your parent assessment"
+                      }
+                      confidence={confidenceFor(acc)}
+                      defaultChecked={previouslyAccepted.has(acc)}
+                    />
                   ))}
-                </ul>
+                </div>
               )}
-            </Card>
-            <Card className="p-[var(--aivo-density-card-pad)]">
-              <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
-                Assistive technology
-              </p>
-              {ex.assistiveTechnologyNeeds.length === 0 ? (
-                <p className="mt-2 text-sm text-aivo-ink-soft">None recorded.</p>
-              ) : (
-                <ul className="mt-2 list-disc pl-5 text-sm">
-                  {ex.assistiveTechnologyNeeds.map((s) => (
-                    <li key={s}>{s}</li>
-                  ))}
-                </ul>
-              )}
-            </Card>
-          </div>
 
-          <SectionHeader title="Plain-language summaries" className="mt-6" />
-          <div className="grid gap-4 lg:grid-cols-3">
-            <Card className="p-[var(--aivo-density-card-pad)]">
-              <p className="text-xs font-medium uppercase tracking-wide text-aivo-primary">
-                Learner-safe
-              </p>
-              <p className="mt-2 text-sm">{ex.learnerSafeSummary}</p>
-            </Card>
-            <Card className="p-[var(--aivo-density-card-pad)]">
-              <p className="text-xs font-medium uppercase tracking-wide text-aivo-primary">
-                For parents
-              </p>
-              <p className="mt-2 text-sm">{ex.parentSummary}</p>
-            </Card>
-            <Card className="p-[var(--aivo-density-card-pad)]">
-              <p className="text-xs font-medium uppercase tracking-wide text-aivo-primary">
-                For teachers
-              </p>
-              <p className="mt-2 text-sm">{ex.teacherSummary}</p>
-            </Card>
-          </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-iw-card border border-iw-border bg-white p-4">
+                  <p className="iw-label text-iw-text-muted mb-2">Service areas</p>
+                  {ex.serviceAreas.length === 0 ? (
+                    <p className="text-sm text-iw-text-muted">None flagged.</p>
+                  ) : (
+                    <ul className="flex flex-wrap gap-2">
+                      {ex.serviceAreas.map((s) => (
+                        <InsightChip key={s} tone="info" size="md">
+                          {s}
+                        </InsightChip>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <div className="rounded-iw-card border border-iw-border bg-white p-4">
+                  <p className="iw-label text-iw-text-muted mb-2">Assistive technology</p>
+                  {ex.assistiveTechnologyNeeds.length === 0 ? (
+                    <p className="text-sm text-iw-text-muted">None recorded.</p>
+                  ) : (
+                    <ul className="flex flex-wrap gap-2">
+                      {ex.assistiveTechnologyNeeds.map((s) => (
+                        <InsightChip key={s} tone="accent" size="md">
+                          {s}
+                        </InsightChip>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
 
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-            <form action={reextractAction}>
-              <input type="hidden" name="learnerId" value={learner.id} />
-              <Button type="submit" variant="outline">
-                Re-run extraction
-              </Button>
-            </form>
-            <Button asChild>
-              <Link href={`/parent/learners/${learner.id}/brain-profile`}>
-                Continue to brain profile <ArrowRight className="ml-1 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-        </>
-      )}
-    </AppShell>
+              <div className="rounded-iw-card border border-iw-border bg-[var(--aivo-color-aivoPurple-50)]/40 p-4">
+                <p className="iw-label text-iw-text-muted mb-2">Learner-safe summary</p>
+                <p className="text-sm text-iw-text-strong leading-relaxed">
+                  {ex.learnerSafeSummary}
+                </p>
+                <p className="text-[11px] text-iw-text-muted mt-2">
+                  This is the only version your learner ever sees. They never see the raw IEP or
+                  any clinical language.
+                </p>
+              </div>
+
+              <label className="flex items-start gap-3 rounded-iw-card border border-iw-border bg-white p-4 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="usageConsent"
+                  required
+                  className="mt-0.5 h-5 w-5 rounded-[6px] accent-[var(--aivo-sensory-primary)]"
+                />
+                <span className="flex flex-col gap-0.5">
+                  <span className="text-sm font-semibold text-iw-text-strong">
+                    I consent to AIVO using these supports to personalize learning
+                  </span>
+                  <span className="text-xs text-iw-text-muted leading-relaxed">
+                    AIVO will apply the supports you've ticked above across lessons, homework, and
+                    the AI tutor. You can change or revoke this any time from the learner's
+                    settings.
+                  </span>
+                </span>
+              </label>
+            </QuestionCard>
+          </form>
+        )}
+      </div>
+    </AssessmentShell>
   );
 }
