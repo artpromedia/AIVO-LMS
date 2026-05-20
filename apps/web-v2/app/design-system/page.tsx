@@ -1,11 +1,18 @@
+"use client";
 /**
  * /design-system — non-destructive showcase of every AIVO primitive.
  *
  * Lives outside the parent/learner/teacher/admin route trees so we can
  * iterate on the visual system without breaking dashboards. Once we are
  * happy with this page we migrate each role's home in a follow-up.
+ *
+ * Client component because several primitives (InsightChip, MetricCard,
+ * EmptyState) accept an `icon` render-function prop, and Next 15 RSC
+ * strict serialization rejects passing functions across the server/
+ * client boundary. The showcase has no server data needs, so going
+ * client-side is harmless.
  */
-import type { Metadata } from "next";
+import Link from "next/link";
 import {
   GlassCard,
   MetricCard,
@@ -23,10 +30,9 @@ import {
   type MasteryCell,
 } from "@aivo/ui";
 
-export const metadata: Metadata = {
-  title: "AIVO Design System",
-  description: "Showcase of the AIVO calm design language primitives.",
-};
+// Note: `export const metadata` is only valid on server components.
+// Title for this showcase is set in the parent route's layout (if any)
+// or falls through to the app-wide default. Keep this client-only.
 
 const trend = [
   { label: "W1", value: 42 },
@@ -63,19 +69,45 @@ export default function DesignSystemPage() {
   return (
     <main className="min-h-screen bg-[var(--aivo-color-surface-canvas)] iw-safe-top">
       <div className="max-w-iw-container-desktop mx-auto px-6 lg:px-8 py-12 flex flex-col gap-12">
-        <header className="flex flex-col gap-2">
-          <p className="iw-label text-iw-text-muted">Design system showcase</p>
-          <h1 className="text-3xl md:text-4xl font-semibold text-iw-text-strong">
-            AIVO calm — primitives
-          </h1>
-          <p className="text-iw-text-muted max-w-2xl">
-            Every panel, chart, and chip below resolves through{" "}
-            <code className="px-1.5 py-0.5 rounded-iw-control bg-iw-card border border-iw-border text-xs">
-              @aivo/brand
-            </code>{" "}
-            tokens. Use this page as a quick visual diff while iterating on the
-            shared system.
-          </p>
+        <header className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <p className="iw-label text-iw-text-muted">Design system showcase</p>
+            <h1 className="text-3xl md:text-4xl font-semibold text-iw-text-strong">
+              AIVO calm — primitives
+            </h1>
+            <p className="text-iw-text-muted max-w-2xl">
+              Every panel, chart, and chip below resolves through{" "}
+              <code className="px-1.5 py-0.5 rounded-iw-control bg-iw-card border border-iw-border text-xs">
+                @aivo/brand
+              </code>{" "}
+              tokens. Use this page as a quick visual diff while iterating on the
+              shared system.
+            </p>
+          </div>
+
+          {/* Showcase index — one tile per @aivo/ui module. Each route renders
+              the primitives in that module with synthetic props so we can
+              eyeball changes without seeding production data. */}
+          <nav aria-label="Design system sections" className="flex flex-wrap gap-2 pt-2">
+            {[
+              { href: "/design-system", label: "Overview" },
+              { href: "/design-system/learner-dashboard", label: "Learner dashboard" },
+              { href: "/design-system/learner-home", label: "Learner home (legacy)" },
+              { href: "/design-system/tutor", label: "Tutor" },
+              { href: "/design-system/assessment", label: "Assessment" },
+              { href: "/design-system/baseline", label: "Baseline" },
+              { href: "/design-system/states", label: "States" },
+              { href: "/design-system/shell", label: "Shell" },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold bg-white border border-iw-border text-iw-text-strong hover:border-[var(--color-aivo-primary)]/40 hover:bg-iw-bg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-aivo-primary)] focus-visible:ring-offset-2"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
         </header>
 
         {/* Hero */}

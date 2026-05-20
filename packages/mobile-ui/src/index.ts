@@ -1,5 +1,14 @@
 export { theme, classifySizeClass, isTabletWidth } from './theme';
 export type { SizeClass } from './theme';
+export {
+  useResponsiveLayout,
+  useResponsiveValue,
+  useColumns,
+  useContentMaxWidth,
+  getResponsiveLayoutSnapshot,
+  subscribeResponsiveLayout,
+} from './responsive';
+export type { ResponsiveLayout } from './responsive';
 export { AivoButton } from './AivoButton';
 export { AivoCard } from './AivoCard';
 export { AivoHeader } from './AivoHeader';
