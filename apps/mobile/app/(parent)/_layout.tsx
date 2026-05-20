@@ -122,6 +122,7 @@ export default function ParentLayout() {
       <Tabs.Screen name="billing" options={{ href: null }} />
       <Tabs.Screen name="inbox" options={{ href: null }} />
       <Tabs.Screen name="milestones/[childId]" options={{ href: null }} />
+      <Tabs.Screen name="home-v2" options={{ href: null }} />
     </Tabs>
     </RoleTabletShell>
   );
