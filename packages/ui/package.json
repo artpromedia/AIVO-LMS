@@ -31,6 +31,10 @@
       "types": "./dist/icon/index.d.ts",
       "import": "./dist/icon/index.js"
     },
+    "./shell": {
+      "types": "./dist/shell/index.d.ts",
+      "import": "./dist/shell/index.js"
+    },
     "./utils": {
       "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils/index.js"
@@ -42,6 +46,7 @@
   },
   "dependencies": {
     "@aivo/brand": "workspace:*",
+    "@aivo/nav": "workspace:*",
     "clsx": "^2.1.1",
     "lucide-react": "^0.460.0"
   },
