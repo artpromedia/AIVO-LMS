@@ -61,7 +61,7 @@ const mastery: MasteryCell[] = [
 
 export default function DesignSystemPage() {
   return (
-    <main className="min-h-screen bg-[var(--aivo-color-surface-canvas,#f4f6f5)] iw-safe-top">
+    <main className="min-h-screen bg-[var(--aivo-color-surface-canvas)] iw-safe-top">
       <div className="max-w-iw-container-desktop mx-auto px-6 lg:px-8 py-12 flex flex-col gap-12">
         <header className="flex flex-col gap-2">
           <p className="iw-label text-iw-text-muted">Design system showcase</p>
@@ -92,7 +92,7 @@ export default function DesignSystemPage() {
             title="Welcome back, Sky"
             subtitle="Your reading mastery jumped from 53% to 67% this week. Two lessons left to hit your weekly goal."
             primaryAction={
-              <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-iw-chip bg-[var(--aivo-sensory-primary,#7c3aed)] text-white text-sm font-semibold shadow-md">
+              <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-iw-chip bg-[var(--aivo-sensory-primary)] text-white text-sm font-semibold shadow-md">
                 <AivoIcon name="curriculum" className="w-4 h-4 text-white" />
                 Continue lesson
               </button>
@@ -211,7 +211,7 @@ export default function DesignSystemPage() {
                 title="No IEP documents yet"
                 body="Upload an IEP to unlock accommodations for this learner."
                 action={
-                  <button className="inline-flex items-center gap-2 px-4 py-2 rounded-iw-chip bg-[var(--aivo-sensory-primary,#7c3aed)] text-white text-sm font-semibold">
+                  <button className="inline-flex items-center gap-2 px-4 py-2 rounded-iw-chip bg-[var(--aivo-sensory-primary)] text-white text-sm font-semibold">
                     Upload IEP
                   </button>
                 }

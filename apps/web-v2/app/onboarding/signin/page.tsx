@@ -42,7 +42,7 @@ export default function SignInPage() {
           <>
             <button
               type="submit"
-              className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary,#7c3aed)] text-white font-semibold hover:opacity-95"
+              className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold hover:opacity-95"
             >
               Sign in
             </button>
@@ -55,7 +55,7 @@ export default function SignInPage() {
               </Link>
               <Link
                 href="/onboarding/signup"
-                className="font-semibold text-[var(--aivo-sensory-primary,#7c3aed)] hover:underline"
+                className="font-semibold text-[var(--aivo-sensory-primary)] hover:underline"
               >
                 Create an account
               </Link>
@@ -84,7 +84,7 @@ export default function SignInPage() {
             <button
               type="button"
               onClick={() => setShowPw((v) => !v)}
-              className="text-xs font-semibold text-[var(--aivo-sensory-primary,#7c3aed)] hover:underline"
+              className="text-xs font-semibold text-[var(--aivo-sensory-primary)] hover:underline"
               aria-label={showPw ? "Hide password" : "Show password"}
             >
               {showPw ? "Hide" : "Show"}

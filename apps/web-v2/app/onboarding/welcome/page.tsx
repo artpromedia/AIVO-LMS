@@ -40,13 +40,13 @@ export default function WelcomePage() {
           <>
             <Link
               href="/onboarding/signin"
-              className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary,#7c3aed)] text-white font-semibold flex items-center justify-center hover:opacity-95 transition-opacity"
+              className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold flex items-center justify-center hover:opacity-95 transition-opacity"
             >
               Sign in
             </Link>
             <Link
               href="/onboarding/signup"
-              className="w-full h-12 rounded-iw-control bg-white border border-iw-border text-iw-text-strong font-semibold flex items-center justify-center hover:bg-[var(--aivo-color-surface-canvas,#f4f6f5)] transition-colors"
+              className="w-full h-12 rounded-iw-control bg-white border border-iw-border text-iw-text-strong font-semibold flex items-center justify-center hover:bg-[var(--aivo-color-surface-canvas)] transition-colors"
             >
               Create an account
             </Link>
@@ -54,7 +54,7 @@ export default function WelcomePage() {
               Have an invite code from a school or district?{" "}
               <Link
                 href="/onboarding/signup?via=invite"
-                className="font-semibold text-[var(--aivo-sensory-primary,#7c3aed)] hover:underline"
+                className="font-semibold text-[var(--aivo-sensory-primary)] hover:underline"
               >
                 Use an invite link
               </Link>

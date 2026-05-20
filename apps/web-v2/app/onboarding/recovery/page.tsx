@@ -25,7 +25,7 @@ export default function RecoveryPage() {
           <>
             <button
               type="button"
-              className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary,#7c3aed)] text-white font-semibold hover:opacity-95"
+              className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold hover:opacity-95"
             >
               Send recovery link
             </button>

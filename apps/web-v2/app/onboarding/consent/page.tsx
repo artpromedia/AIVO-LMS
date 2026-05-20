@@ -60,8 +60,8 @@ export default function ConsentReviewPage() {
                 aria-disabled={!parentConsent}
                 className={`w-full h-12 rounded-iw-control text-white font-semibold flex items-center justify-center ${
                   parentConsent
-                    ? "bg-[var(--aivo-sensory-primary,#7c3aed)] hover:opacity-95"
-                    : "bg-[var(--aivo-sensory-primary,#7c3aed)]/50 pointer-events-none"
+                    ? "bg-[var(--aivo-sensory-primary)] hover:opacity-95"
+                    : "bg-[var(--aivo-sensory-primary)]/50 pointer-events-none"
                 }`}
               >
                 Continue

@@ -40,8 +40,8 @@ export default function PinSetupPage() {
               aria-disabled={!ready}
               className={`w-full h-12 rounded-iw-control text-white font-semibold flex items-center justify-center ${
                 ready
-                  ? "bg-[var(--aivo-sensory-primary,#7c3aed)] hover:opacity-95"
-                  : "bg-[var(--aivo-sensory-primary,#7c3aed)]/50 pointer-events-none"
+                  ? "bg-[var(--aivo-sensory-primary)] hover:opacity-95"
+                  : "bg-[var(--aivo-sensory-primary)]/50 pointer-events-none"
               }`}
             >
               Save PIN
@@ -95,14 +95,14 @@ function PinRing({
         aria-invalid={error ? true : undefined}
         className={`h-14 px-3 rounded-iw-control bg-white border text-center text-2xl font-bold tracking-[0.6em] tabular-nums outline-none transition-colors ${
           error
-            ? "border-[var(--aivo-status-error-strong,#dc2626)] focus:ring-2 focus:ring-[var(--aivo-status-error-strong,#dc2626)]/30"
-            : "border-iw-border focus:border-[var(--aivo-sensory-primary,#7c3aed)] focus:ring-2 focus:ring-[var(--aivo-sensory-primary,#7c3aed)]/20"
+            ? "border-[var(--aivo-status-error-strong)] focus:ring-2 focus:ring-[var(--aivo-status-error-strong)]/30"
+            : "border-iw-border focus:border-[var(--aivo-sensory-primary)] focus:ring-2 focus:ring-[var(--aivo-sensory-primary)]/20"
         }`}
       />
       {error ? (
         <p
           role="alert"
-          className="text-xs text-[var(--aivo-status-error-strong,#dc2626)]"
+          className="text-xs text-[var(--aivo-status-error-strong)]"
         >
           {error}
         </p>

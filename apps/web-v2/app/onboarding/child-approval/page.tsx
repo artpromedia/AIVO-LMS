@@ -43,7 +43,7 @@ export default function ChildApprovalPage() {
           <>
             <Link
               href="/parent/home"
-              className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary,#7c3aed)] text-white font-semibold flex items-center justify-center hover:opacity-95"
+              className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold flex items-center justify-center hover:opacity-95"
             >
               Approve and finish
             </Link>
