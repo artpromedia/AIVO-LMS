@@ -358,6 +358,9 @@ importers:
       '@aivo/brand':
         specifier: workspace:*
         version: link:../../packages/brand
+      '@aivo/nav':
+        specifier: workspace:*
+        version: link:../../packages/nav
       '@aivo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
