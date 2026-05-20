@@ -1,15 +1,46 @@
+"use client";
+
+import * as React from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  AuthCard,
+  AuthInput,
+  ReassuranceCard,
+} from "@aivo/ui/auth";
+import { AivoIcon } from "@aivo/ui/icon";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
-import { WelcomePanel } from "@/components/auth/welcome-panel";
 
-const IS_DEMO = process.env.NEXT_PUBLIC_AUTH_MODE !== "production";
-
+/**
+ * Inclusive-Warm / Playful Calm signup surface. Rebuilt on the
+ * @aivo/ui/auth primitives (AuthCard + AuthInput + ReassuranceCard) so
+ * the field treatment, CTA, and reassurance copy match the other
+ * onboarding screens. The submit is mocked locally — backend auth is
+ * intentionally deferred until a real identity provider is wired.
+ */
 export default function SignupPage() {
+  const [name, setName] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [submitting, setSubmitting] = React.useState(false);
+
+  const canSubmit =
+    name.trim().length > 1 &&
+    /.+@.+\..+/.test(email) &&
+    password.length >= 8 &&
+    !submitting;
+
+  function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!canSubmit) return;
+    setSubmitting(true);
+    // Mock signup — backend wiring deferred. Send the operator to /login
+    // so they can drop into any demo role.
+    globalThis.setTimeout(() => {
+      globalThis.location.assign("/login?signup=mock");
+    }, 600);
+  }
+
   return (
     <>
       <SiteHeader />
@@ -17,79 +48,118 @@ export default function SignupPage() {
         id="main"
         className="mx-auto w-full max-w-6xl px-6 py-12 sm:py-16 lg:py-20"
       >
-        <div className="grid gap-10 lg:grid-cols-[1.05fr_1fr] lg:items-stretch">
-          <WelcomePanel
-            eyebrow="Start your family trial"
-            title="A warmer way to learn — for every child in the family."
-            body="Set up learners in minutes. Adaptive AI tutors, sensory-friendly modes, and progress every parent can see."
-          />
+        <div className="grid gap-10 lg:grid-cols-[1.05fr_1fr] lg:items-start">
+          <aside className="flex flex-col gap-5">
+            <AuthCard
+              icon={<AivoIcon name="aiSparkle" size={32} />}
+              eyebrow="Start your family trial"
+              title="A warmer way to learn — for every child in the family."
+              subtitle="Set up learners in minutes. Adaptive AI tutors, sensory-friendly modes, and progress every parent can see."
+            >
+              <ul className="flex flex-col gap-3 text-sm text-iw-ink">
+                <li className="flex items-start gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--aivo-color-aivoPurple-100,#ede9fe)] text-[var(--aivo-sensory-primary,#7c3aed)]"
+                  >
+                    <AivoIcon name="aiSparkle" size={16} />
+                  </span>
+                  <span>Adaptive AI tutors that meet every learner where they are.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--aivo-color-aivoTeal-100,#ccfbf1)] text-[var(--aivo-color-aivoTeal-700,#0f766e)]"
+                  >
+                    <AivoIcon name="safetyOk" size={16} />
+                  </span>
+                  <span>Sensory-friendly modes: Standard, Calm, High Contrast.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--aivo-color-aivoPurple-100,#ede9fe)] text-[var(--aivo-sensory-primary,#7c3aed)]"
+                  >
+                    <AivoIcon name="curriculum" size={16} />
+                  </span>
+                  <span>Progress every parent can see — IEP-aware and quietly honest.</span>
+                </li>
+              </ul>
+            </AuthCard>
+            <ReassuranceCard
+              tone="safety"
+              title="Adults set up accounts, not children."
+              body="You'll add learners on the next step. AIVO never asks a child to create their own account, and COPPA / FERPA / SOC 2 protections apply to everything from day one."
+            />
+          </aside>
 
-          <Card variant="hero" className="self-center">
-            <CardHeader>
-              <CardTitle>Create your account</CardTitle>
-              <CardDescription>
+          <AuthCard
+            icon={<AivoIcon name="aiSparkle" size={32} />}
+            eyebrow="Create your account"
+            title="Tell us a little about you"
+            subtitle={
+              <>
                 Already have one?{" "}
-                <Link href="/login" className="font-semibold text-iw-primary hover:underline">
+                <Link
+                  href="/login"
+                  className="font-semibold text-[var(--aivo-sensory-primary,#7c3aed)] hover:underline"
+                >
                   Sign in
                 </Link>
                 .
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form className="flex flex-col gap-4">
-                <div>
-                  <Label htmlFor="name">Your name</Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    autoComplete="name"
-                    placeholder="Riley Parent"
-                    required
-                    disabled
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    placeholder="you@example.com"
-                    required
-                    disabled
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="new-password"
-                    required
-                    disabled
-                  />
-                  <p className="mt-1.5 text-xs text-iw-ink-muted">
-                    At least 8 characters with a number and a symbol.
-                  </p>
-                </div>
-                <Button type="submit" size="lg" disabled>
-                  Create account (coming soon)
-                </Button>
-              </form>
-
-              {IS_DEMO ? (
-                <p className="mt-4 text-xs text-iw-ink-muted">
-                  Want to explore first? Use{" "}
-                  <Link href="/login" className="font-semibold text-iw-primary hover:underline">
-                    sign in
-                  </Link>{" "}
-                  to enter any demo role.
-                </p>
-              ) : null}
-            </CardContent>
-          </Card>
+              </>
+            }
+            actions={
+              <>
+                <button
+                  type="submit"
+                  form="signup-form"
+                  disabled={!canSubmit}
+                  className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary,#7c3aed)] text-white font-semibold flex items-center justify-center transition hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--aivo-sensory-primary,#7c3aed)]"
+                >
+                  {submitting ? "Creating your account…" : "Create account"}
+                </button>
+              </>
+            }
+          >
+            <form
+              id="signup-form"
+              onSubmit={onSubmit}
+              className="flex flex-col gap-4"
+              noValidate
+            >
+              <AuthInput
+                id="name"
+                label="Your name"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                placeholder="Riley Parent"
+                autoComplete="name"
+                required
+              />
+              <AuthInput
+                id="email"
+                label="Email"
+                type="email"
+                inputMode="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="you@example.com"
+                autoComplete="email"
+                required
+              />
+              <AuthInput
+                id="password"
+                label="Password"
+                type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                helper="At least 8 characters with a number and a symbol."
+                autoComplete="new-password"
+                required
+              />
+            </form>
+          </AuthCard>
         </div>
       </main>
       <SiteFooter />

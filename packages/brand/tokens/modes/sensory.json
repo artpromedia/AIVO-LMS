@@ -2,9 +2,9 @@
   "modes": {
     "sensory": {
       "standard": {
-        "bgPage": "#f4f6f5",
-        "bgCard": "#ffffff",
-        "bgRaised": "#f8f9f8",
+        "bgPage": "#e9ebed",
+        "bgCard": "#f3f4f5",
+        "bgRaised": "#ffffff",
         "primary": "#7c3aed",
         "primaryHover": "#6d28d9",
         "primaryFg": "#ffffff",
@@ -12,17 +12,17 @@
         "accentSoft": "#ccfbf1",
         "warm": "#f97316",
         "warmSoft": "#ffedd5",
-        "ink": "#090909",
-        "inkMuted": "#6f7275",
-        "border": "rgba(0,0,0,0.05)",
+        "ink": "#0b0c0e",
+        "inkMuted": "#5b6168",
+        "border": "rgba(15,23,42,0.06)",
         "ringFocus": "#7c3aed",
         "motionScale": 1,
-        "shadowStrength": 0.06
+        "shadowStrength": 0.04
       },
       "calm": {
-        "bgPage": "#f1f2f1",
-        "bgCard": "#ffffff",
-        "bgRaised": "#f7f8f7",
+        "bgPage": "#e6e8e9",
+        "bgCard": "#f1f2f3",
+        "bgRaised": "#fafafb",
         "primary": "#6d28d9",
         "primaryHover": "#5b21b6",
         "primaryFg": "#ffffff",
@@ -32,10 +32,10 @@
         "warmSoft": "#ffedd5",
         "ink": "#0f0f10",
         "inkMuted": "#52555a",
-        "border": "rgba(0,0,0,0.06)",
+        "border": "rgba(15,23,42,0.06)",
         "ringFocus": "#6d28d9",
         "motionScale": 0.5,
-        "shadowStrength": 0.04
+        "shadowStrength": 0.03
       },
       "high-contrast": {
         "bgPage": "#ffffff",

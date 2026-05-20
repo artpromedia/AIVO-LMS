@@ -1,16 +1,11 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { AuthCard, ReassuranceCard } from "@aivo/ui/auth";
+import { AivoIcon } from "@aivo/ui/icon";
 import { MOCK_USERS } from "@/lib/auth/mock-session";
 import type { Role } from "@/lib/auth/types";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
-import { WelcomePanel } from "@/components/auth/welcome-panel";
-import { DemoRolePicker } from "@/components/auth/demo-role-picker";
-
-const IS_DEMO = process.env.NEXT_PUBLIC_AUTH_MODE !== "production";
+import { LoginForm } from "./_components/login-form";
 
 async function mockSignIn(formData: FormData) {
   "use server";
@@ -34,6 +29,12 @@ async function mockSignIn(formData: FormData) {
   redirect(ROLE_HOME[role]);
 }
 
+/**
+ * Inclusive-Warm / Playful Calm login surface. Rebuilt on the
+ * @aivo/ui/auth primitives so the inputs, CTA, and reassurance tone
+ * match the rest of onboarding. The actual server action stays in this
+ * server file; only the form fields run on the client via LoginForm.
+ */
 export default function LoginPage({
   searchParams: _searchParams,
 }: {
@@ -46,72 +47,84 @@ export default function LoginPage({
         id="main"
         className="mx-auto w-full max-w-6xl px-6 py-12 sm:py-16 lg:py-20"
       >
-        <div className="grid gap-10 lg:grid-cols-[1.05fr_1fr] lg:items-stretch">
-          <WelcomePanel
-            eyebrow="Welcome back"
-            title="Pick up where every learner left off."
-            body="Sign in to continue your personalised AIVO journey — tutors, missions, and progress all in one place."
-          />
+        <div className="grid gap-10 lg:grid-cols-[1.05fr_1fr] lg:items-start">
+          <aside className="flex flex-col gap-5">
+            <AuthCard
+              icon={<AivoIcon name="aiSparkle" size={32} />}
+              eyebrow="Welcome back"
+              title="Pick up where every learner left off."
+              subtitle="Sign in to continue your personalised AIVO journey — tutors, missions, and progress all in one place."
+            >
+              <ul className="flex flex-col gap-3 text-sm text-iw-ink">
+                <li className="flex items-start gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--aivo-color-aivoPurple-100,#ede9fe)] text-[var(--aivo-sensory-primary,#7c3aed)]"
+                  >
+                    <AivoIcon name="aiSparkle" size={16} />
+                  </span>
+                  <span>Personalised tutors that remember where each learner left off.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--aivo-color-aivoTeal-100,#ccfbf1)] text-[var(--aivo-color-aivoTeal-700,#0f766e)]"
+                  >
+                    <AivoIcon name="safetyOk" size={16} />
+                  </span>
+                  <span>Sensory-friendly modes follow you across devices.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--aivo-color-aivoPurple-100,#ede9fe)] text-[var(--aivo-sensory-primary,#7c3aed)]"
+                  >
+                    <AivoIcon name="curriculum" size={16} />
+                  </span>
+                  <span>Family insights and IEP-aware progress, always in one place.</span>
+                </li>
+              </ul>
+            </AuthCard>
+            <ReassuranceCard
+              tone="privacy"
+              title="We never sell your data."
+              body="Your email is used only to identify your account. Read the privacy notice for more."
+              link={{ href: "/onboarding/privacy", label: "Read the privacy notice" }}
+            />
+          </aside>
 
-          <Card variant="hero" className="self-center">
-            <CardHeader>
-              <CardTitle>Sign in</CardTitle>
-              <CardDescription>
-                Use your AIVO account to access tutors, missions, and family insights.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form
-                action={IS_DEMO ? mockSignIn : undefined}
-                className="flex flex-col gap-4"
-              >
-                {/* Demo: any submission signs in as parent; DemoRolePicker below switches role. */}
-                <input type="hidden" name="role" value="parent" />
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    placeholder="you@example.com"
-                    required
-                  />
-                </div>
-                <div>
-                  <div className="flex items-baseline justify-between">
-                    <Label htmlFor="password">Password</Label>
-                    <Link
-                      href="/forgot-password"
-                      className="text-xs font-semibold text-iw-primary hover:underline"
-                    >
-                      Forgot password?
-                    </Link>
-                  </div>
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                  />
-                </div>
-                <Button type="submit" size="lg">
+          <AuthCard
+            icon={<AivoIcon name="aiSparkle" size={32} />}
+            eyebrow="Sign in"
+            title="Welcome back"
+            subtitle="Use your AIVO account to access tutors, missions, and family insights."
+            actions={
+              <>
+                <button
+                  type="submit"
+                  form="login-form"
+                  className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary,#7c3aed)] text-white font-semibold flex items-center justify-center transition hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--aivo-sensory-primary,#7c3aed)]"
+                >
                   Sign in
-                </Button>
-              </form>
-
-              <p className="mt-4 text-sm text-iw-ink-muted">
-                New here?{" "}
-                <Link href="/signup" className="font-semibold text-iw-primary hover:underline">
-                  Create an account
-                </Link>
-                .
-              </p>
-
-              {IS_DEMO ? <DemoRolePicker action={mockSignIn} /> : null}
-            </CardContent>
-          </Card>
+                </button>
+                <p className="text-sm text-iw-ink-muted text-center">
+                  New here?{" "}
+                  <Link
+                    href="/signup"
+                    className="font-semibold text-[var(--aivo-sensory-primary,#7c3aed)] hover:underline"
+                  >
+                    Create an account
+                  </Link>
+                  .
+                </p>
+              </>
+            }
+          >
+            <LoginForm
+              id="login-form"
+              action={mockSignIn}
+            />
+          </AuthCard>
         </div>
       </main>
       <SiteFooter />

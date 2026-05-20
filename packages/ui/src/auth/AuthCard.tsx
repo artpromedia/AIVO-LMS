@@ -41,8 +41,8 @@ export function AuthCard({
   return (
     <section
       className={cn(
-        "rounded-iw-card-lg bg-white border border-iw-border",
-        "shadow-[0_4px_12px_rgba(15,23,42,0.04),0_24px_48px_-20px_rgba(15,23,42,0.08)]",
+        "rounded-iw-card-lg bg-iw-card border border-iw-border",
+        "shadow-[0_1px_2px_rgba(15,23,42,0.04),0_18px_48px_-28px_rgba(15,23,42,0.18)]",
         "p-6 md:p-8 flex flex-col gap-6",
         className,
       )}
@@ -52,7 +52,7 @@ export function AuthCard({
         {eyebrow ? (
           <p className="iw-label text-iw-text-muted">{eyebrow}</p>
         ) : null}
-        <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong">
+        <h1 className="font-iw-display text-3xl md:text-4xl font-semibold tracking-tight text-iw-text-strong">
           {title}
         </h1>
         {subtitle ? (

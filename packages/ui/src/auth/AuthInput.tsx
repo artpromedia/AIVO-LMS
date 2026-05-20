@@ -48,8 +48,8 @@ export const AuthInput = React.forwardRef<HTMLInputElement, AuthInputProps>(
         </label>
         <div
           className={cn(
-            "relative flex items-center rounded-iw-control bg-white border transition-colors",
-            "h-12 px-3",
+            "relative flex items-center rounded-iw-control bg-iw-raised border transition-colors",
+            "h-12 px-3.5",
             error
               ? "border-[var(--aivo-status-error-strong,#dc2626)] focus-within:ring-2 focus-within:ring-[var(--aivo-status-error-strong,#dc2626)]/30"
               : "border-iw-border focus-within:border-[var(--aivo-sensory-primary,#7c3aed)] focus-within:ring-2 focus-within:ring-[var(--aivo-sensory-primary,#7c3aed)]/20",
