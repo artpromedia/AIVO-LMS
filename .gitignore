@@ -10,6 +10,12 @@ coverage/
 .next/
 out/
 
+# Generated screenshot baselines (regenerable via
+# `scripts/screenshot-redesign.mjs`). The other screenshots in this dir
+# (e.g. `web-app-home.jpg`, `design-language/`, `web-v2-consent-*.png`)
+# are committed reference artifacts and stay tracked.
+screenshots/redesign/
+
 # Python
 __pycache__/
 *.py[cod]
