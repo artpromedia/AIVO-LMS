@@ -120,7 +120,7 @@ export function AppShell({
           </span>
 
           <div className="ml-auto flex items-center gap-3">
-            <SensoryModeToggle size="sm" />
+            {immersive ? null : <SensoryModeToggle size="sm" />}
             <span className="hidden text-right sm:block">
               <span className="block text-sm font-semibold leading-tight text-iw-ink">
                 {user.displayName}

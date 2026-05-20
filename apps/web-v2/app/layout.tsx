@@ -56,7 +56,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         {/* Satoshi Variable from Fontshare — the AIVO display face.
             Defined as the first family in `--aivo-typography-fontFamily-display`
-            and in the `[data-theme="learner"]` font stack. Falls through to
+            and in the `[data-role-theme="learner"]` font stack. Falls through to
             Inter (loaded above via next/font) while Satoshi streams. Mirrors
             the marketing app's setup so both surfaces render the same
             headline aesthetic. */}
