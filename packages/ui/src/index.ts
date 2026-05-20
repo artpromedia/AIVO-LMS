@@ -13,4 +13,5 @@ export * from "./surface";
 export * from "./overlay";
 export * from "./states";
 export * from "./chart";
+export * from "./icon";
 export * from "./utils";

@@ -27,6 +27,10 @@
       "types": "./dist/chart/index.d.ts",
       "import": "./dist/chart/index.js"
     },
+    "./icon": {
+      "types": "./dist/icon/index.d.ts",
+      "import": "./dist/icon/index.js"
+    },
     "./utils": {
       "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils/index.js"
