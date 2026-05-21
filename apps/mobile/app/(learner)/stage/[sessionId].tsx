@@ -15,7 +15,6 @@ import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
 import { useLearners } from "@/hooks/useLearners";
 import { useEngagement } from "@/hooks/useEngagement";
-import { apiFetch } from "@/lib/api";
 import { API } from "@/constants/api";
 import { spacing } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
@@ -276,7 +275,7 @@ export default function StageScreen() {
         setSubmitting(false);
       }
     },
-    [sessionId, learnerId, answered, submitting, recordLedger],
+    [sessionId, learnerId, answered, submitting, recordLedger, t],
   );
 
   const handleMathExpression = useCallback(

@@ -4,7 +4,6 @@ import Svg, {
   Circle,
   G,
   Line,
-  Path,
   Polygon,
   Polyline,
   Rect,

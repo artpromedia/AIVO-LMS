@@ -6,7 +6,8 @@
       "@/*": ["./*"],
       "@aivo/brand": ["../../packages/brand/src"],
       "@aivo/events": ["../../packages/events/src"],
-      "@aivo/mobile-ui": ["../../packages/mobile-ui/src"]
+      "@aivo/mobile-ui": ["../../packages/mobile-ui/src"],
+      "@aivo/nav": ["../../packages/nav/src"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]

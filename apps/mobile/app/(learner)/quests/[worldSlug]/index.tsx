@@ -149,7 +149,7 @@ export default function QuestWorldScreen() {
 
   const progressMap = new Map<string, QuestProgress>(progress.map((p) => [p.questId, p]));
   const sortedChapters = [...chapters].sort((a, b) => a.chapterNumber - b.chapterNumber);
-  const decorated = sortedChapters.reduce<Array<QuestRow & { uiStatus: UiStatus }>>((acc, q) => {
+  const decorated = sortedChapters.reduce<(QuestRow & { uiStatus: UiStatus })[]>((acc, q) => {
     const prev = acc[acc.length - 1];
     const prevCompleted = prev ? prev.uiStatus === "completed" : true;
     acc.push({ ...q, uiStatus: deriveStatus(q, progressMap, prevCompleted) });

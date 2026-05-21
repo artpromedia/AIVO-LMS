@@ -24,7 +24,7 @@ export class SessionUnavailableError extends Error {
   }
 }
 
-interface RawSessionResponse {
+interface RawSessionData {
   id?: string;
   sessionId?: string;
   learnerId?: string;
@@ -41,7 +41,7 @@ interface RawSessionResponse {
   };
 }
 
-function coerceMeta(raw: RawSessionResponse, sessionId: string): SessionMeta {
+function coerceMeta(raw: RawSessionData, sessionId: string): SessionMeta {
   return {
     id: raw.id ?? raw.sessionId ?? sessionId,
     learnerId: raw.learnerId ?? "",
@@ -65,8 +65,8 @@ function isBeat(value: unknown): value is Beat {
   );
 }
 
-function extractStagePlan(raw: RawSessionResponse): StagePlan | null {
-  const candidates: Array<Beat[] | undefined> = [
+function extractStagePlan(raw: RawSessionData): StagePlan | null {
+  const candidates: (Beat[] | undefined)[] = [
     raw.stagePlan?.beats,
     raw.lessonContent?.generatedContent?.stagePlan?.beats,
   ];
@@ -154,10 +154,9 @@ export const sessionClient = {
     let res: Response;
     try {
       res = await apiFetch(API.LEARNING, `/api/learning/sessions/${sessionId}`);
-    } catch (err: any) {
-      throw new SessionUnavailableError(
-        `Network error loading session: ${err?.message ?? "unknown"}`,
-      );
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "unknown";
+      throw new SessionUnavailableError(`Network error loading session: ${message}`);
     }
 
     if (!res.ok) {
@@ -167,7 +166,7 @@ export const sessionClient = {
       );
     }
 
-    const raw = (await res.json()) as RawSessionResponse;
+    const raw = (await res.json()) as RawSessionData;
     const stagePlan = extractStagePlan(raw);
     if (!stagePlan) {
       throw new SessionUnavailableError("Server did not return a stage plan for this session.");

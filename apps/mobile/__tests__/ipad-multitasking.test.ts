@@ -61,7 +61,7 @@ const FULL_SCREEN: Case[] = [
 ];
 
 describe("iPadOS multitasking → size class", () => {
-  const groups: Array<[string, Case[]]> = [
+  const groups: [string, Case[]][] = [
     ["Slide Over", SLIDE_OVER],
     ["1/3 Split View", ONE_THIRD],
     ["1/2 Split View", ONE_HALF],
