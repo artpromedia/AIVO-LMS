@@ -13,7 +13,9 @@ import { fileURLToPath } from "node:url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, "..");
 
-const REQUIRED_APPS = ["marketing", "mobile", "web", "web-v2"];
+// `apps/web` was retired in commit 6f30f5d — `apps/web-v2` is the
+// canonical learner/parent surface going forward.
+const REQUIRED_APPS = ["marketing", "mobile", "web-v2"];
 
 const REQUIRED_PACKAGES = [
   "aac-bridge",

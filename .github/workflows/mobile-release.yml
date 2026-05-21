@@ -80,13 +80,13 @@ jobs:
       (github.event_name == 'workflow_dispatch' && (inputs.platform == 'ios' || inputs.platform == 'both'))
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -127,13 +127,13 @@ jobs:
       (github.event_name == 'workflow_dispatch' && (inputs.platform == 'android' || inputs.platform == 'both'))
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -173,7 +173,7 @@ jobs:
     if: always() && needs.validate.result == 'success' && (needs.ios-build.result == 'success' || needs.android-build.result == 'success')
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Create Release
         env:

@@ -68,15 +68,15 @@ jobs:
           - ai-svc # 12 (python)
           - curriculum-svc # 13 (python)
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Setup pnpm
         if: matrix.target != 'brain-svc' && matrix.target != 'ai-svc' && matrix.target != 'curriculum-svc'
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
 
       - name: Setup Node
         if: matrix.target != 'brain-svc' && matrix.target != 'ai-svc' && matrix.target != 'curriculum-svc'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -151,7 +151,7 @@ jobs:
           docker run --rm -v "$GITHUB_WORKSPACE":/work alpine \
             sh -c "chown -R $(id -u):$(id -g) /work"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Build and push Python service images
         run: |
@@ -189,7 +189,7 @@ jobs:
           docker run --rm -v "$GITHUB_WORKSPACE":/work alpine \
             sh -c "chown -R $(id -u):$(id -g) /work"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Build and push Node service images
         run: |
@@ -231,7 +231,7 @@ jobs:
           docker run --rm -v "$GITHUB_WORKSPACE":/work alpine \
             sh -c "chown -R $(id -u):$(id -g) /work"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - id: tag
         name: Resolve image tag
@@ -480,11 +480,11 @@ jobs:
           docker run --rm -v "$GITHUB_WORKSPACE":/work alpine \
             sh -c "chown -R $(id -u):$(id -g) /work"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -630,7 +630,7 @@ jobs:
           docker run --rm -v "$GITHUB_WORKSPACE":/work alpine \
             sh -c "chown -R $(id -u):$(id -g) /work"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Verify cluster reachable
         run: |
