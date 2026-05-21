@@ -93,7 +93,7 @@ export default function ParentHomeV2() {
     >
       <View style={[s.hero, { backgroundColor: palette.primary + "12", borderColor: palette.primary + "33" }]}>
         <Text style={s.heroGreeting}>Hi, {parentFirstName}.</Text>
-        <Text style={s.heroSubhead}>{learnerFirstName} is ready for today's learning.</Text>
+        <Text style={s.heroSubhead}>{learnerFirstName} is ready for today&apos;s learning.</Text>
         <Text style={s.heroBody}>Calm, personalized, and waiting for one quick check-in from you.</Text>
         <View style={s.heroActions}>
           <Pressable

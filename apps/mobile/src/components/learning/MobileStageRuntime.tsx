@@ -7,7 +7,7 @@
  * Pure UI orchestrator: it never fabricates content. Sprint 02 gate.
  */
 
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import { View, Text, Pressable, StyleSheet, Alert } from "react-native";
 import type { TierThemeMobile } from "@aivo/mobile-ui";
 import type { Beat, Session } from "@/src/types/stage";
