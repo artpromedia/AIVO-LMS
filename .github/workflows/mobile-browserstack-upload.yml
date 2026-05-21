@@ -20,6 +20,9 @@ on:
         required: false
         default: "aivo-mobile-preview"
 
+permissions:
+  contents: read
+
 concurrency:
   group: mobile-browserstack-upload-${{ github.ref }}
   cancel-in-progress: false

@@ -19,6 +19,13 @@ on:
           - push
           - status
 
+permissions:
+  contents: read
+
+concurrency:
+  group: db-migrate-${{ inputs.environment }}
+  cancel-in-progress: false
+
 env:
   NODE_VERSION: "22"
 

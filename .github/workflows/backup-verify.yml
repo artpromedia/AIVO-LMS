@@ -11,6 +11,10 @@ permissions:
   # lookup.
   actions: read
 
+concurrency:
+  group: backup-verify
+  cancel-in-progress: false
+
 jobs:
   verify-restore:
     name: Verify Backup Restore

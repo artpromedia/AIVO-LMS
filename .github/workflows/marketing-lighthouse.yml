@@ -7,6 +7,13 @@ on:
       - "packages/brand/**"
       - "packages/ui/**"
 
+permissions:
+  contents: read
+
+concurrency:
+  group: marketing-lighthouse-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lighthouse:
     runs-on: ubuntu-latest

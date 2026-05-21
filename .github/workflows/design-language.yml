@@ -23,6 +23,13 @@ on:
       - "apps/marketing/**"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: design-language-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   NODE_VERSION: "22"
 

@@ -15,10 +15,15 @@ permissions:
   # actions: read is kept for any future previous-run lookup tooling we add.
   actions: read
 
+concurrency:
+  group: db-schema-drift-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check-schema-drift:
     name: assert every pgTable has a CREATE TABLE migration
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

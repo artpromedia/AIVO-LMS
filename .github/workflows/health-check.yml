@@ -17,6 +17,10 @@ permissions:
   # continue-on-error).
   issues: write
 
+concurrency:
+  group: health-check
+  cancel-in-progress: false
+
 jobs:
   health-check:
     name: Check Production Health

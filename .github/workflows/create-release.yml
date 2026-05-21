@@ -21,6 +21,10 @@ permissions:
   contents: write
   packages: write
 
+concurrency:
+  group: create-release-${{ inputs.version }}
+  cancel-in-progress: false
+
 env:
   IMAGE_PREFIX: ghcr.io/artpromedia
   ALL_SERVICES: >-

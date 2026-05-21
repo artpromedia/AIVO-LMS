@@ -12,6 +12,10 @@ permissions:
   # lookup.
   actions: read
 
+concurrency:
+  group: paging-url-leaks-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   scan:
     name: scan source for hard-coded paging URLs

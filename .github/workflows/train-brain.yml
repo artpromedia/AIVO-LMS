@@ -21,6 +21,13 @@ on:
         description: "Specific tutor ID (optional, blank for all 14 tutors)"
         required: false
 
+permissions:
+  contents: read
+
+concurrency:
+  group: train-brain-${{ inputs.version }}
+  cancel-in-progress: false
+
 jobs:
   train-model:
     name: Train AIVO Brain

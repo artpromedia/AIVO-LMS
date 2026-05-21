@@ -11,10 +11,15 @@ permissions:
   security-events: write
   actions: read
 
+concurrency:
+  group: security-scan-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   pnpm-audit:
     name: pnpm audit (high+)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -29,6 +34,7 @@ jobs:
   pip-audit:
     name: pip audit (Python services)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -54,6 +60,7 @@ jobs:
   trivy-scan:
     name: Trivy vulnerability scan
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - name: Run Trivy (table, fail on CRITICAL)
@@ -84,6 +91,7 @@ jobs:
   secret-detection:
     name: Secret detection (TruffleHog, verified)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
@@ -96,6 +104,7 @@ jobs:
   python-sast:
     name: Python SAST (Bandit, fail on HIGH severity+confidence)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -114,6 +123,7 @@ jobs:
   python-lint:
     name: Python lint (Ruff F,E9 — blocking)
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -135,6 +145,7 @@ jobs:
   security-summary:
     name: Security summary
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     needs: [pnpm-audit, pip-audit, trivy-scan, secret-detection, python-sast, python-lint]
     if: always()
     steps:
