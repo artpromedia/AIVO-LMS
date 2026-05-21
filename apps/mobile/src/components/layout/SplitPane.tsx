@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, View, ViewStyle } from "react-native";
 import { useWindowSizeClass } from "../../design/useWindowSizeClass";
+import { resolveSplitPaneLayout } from "../../design/splitPaneLayout";
 import { colors, spacing, radius } from "@/constants/colors";
 
 export interface SplitPaneProps {
@@ -39,9 +40,12 @@ export function SplitPane({
   style,
 }: SplitPaneProps) {
   const { sizeClass, isLandscape } = useWindowSizeClass();
-  const canSplit =
-    sizeClass === "expanded" ||
-    (sizeClass === "medium" && minSplitClass === "medium" && (isLandscape || !!center));
+  const { canSplit, showThreePane } = resolveSplitPaneLayout({
+    sizeClass,
+    isLandscape,
+    hasCenter: !!center,
+    minSplitClass,
+  });
 
   if (!canSplit) {
     return (
@@ -53,16 +57,10 @@ export function SplitPane({
     );
   }
 
-  const showThreePane = !!center && sizeClass === "expanded";
-
   return (
     <View style={[styles.row, { gap }, style]}>
       <View style={[styles.panel, { width: leftWidth }]}>{left}</View>
-      {
-        showThreePane ? (
-          <View style={[styles.panel, styles.flexPanel]}>{center}</View>
-        ) : center && !showThreePane ? null : null // Medium tablet: center merges with right or left
-      }
+      {showThreePane ? <View style={[styles.panel, styles.flexPanel]}>{center}</View> : null}
       <View style={[styles.panel, showThreePane ? { width: rightWidth } : styles.flexPanel]}>
         {showThreePane ? right : (center ?? right)}
       </View>

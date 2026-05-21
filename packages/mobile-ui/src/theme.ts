@@ -99,6 +99,7 @@ export const theme = {
    * edge-to-edge on tablet hardware.
    */
   contentMaxWidth: {
+    auth: 520,
     reading: 720,
     dashboard: 1080,
     workspace: 1280,

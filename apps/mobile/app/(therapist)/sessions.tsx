@@ -37,6 +37,8 @@ import { apiFetch } from "@/lib/api";
 import { API } from "@/constants/api";
 import { AivoButton, AivoCard, EmptyState, LoadingState } from "@aivo/mobile-ui";
 import { colors, spacing, radius } from "@/constants/colors";
+import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
+import { CONTENT_MAX_WIDTH, pickBySizeClass } from "@/src/design/responsive";
 
 interface ConnectedLearner {
   id: string;
@@ -78,6 +80,7 @@ function statusTone(status: string): { bg: string; fg: string } {
 export default function TherapistSessionsScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const { sizeClass, width: winWidth, isTablet } = useWindowSizeClass();
   const {
     data: clientsRaw,
     isLoading: clientsLoading,
@@ -177,15 +180,27 @@ export default function TherapistSessionsScreen() {
 
   if (clientsLoading) return <LoadingState />;
 
+  const hPad = pickBySizeClass(sizeClass, {
+    compact: spacing.md,
+    medium: spacing.lg,
+    expanded: spacing.xl,
+  });
+  const contentWidth = Math.min(
+    winWidth - hPad * 2,
+    isTablet ? CONTENT_MAX_WIDTH.dashboard : winWidth,
+  );
+
   return (
     <ScrollView
       style={styles.container}
       contentContainerStyle={{
         paddingTop: insets.top + 16,
         paddingBottom: 32,
-        paddingHorizontal: spacing.md,
+        paddingHorizontal: hPad,
+        alignItems: "center",
       }}
     >
+      <View style={{ width: contentWidth }}>
       <Text style={styles.title}>{t("therapistSessions.title")}</Text>
 
       {clientsError ? (
@@ -375,6 +390,7 @@ export default function TherapistSessionsScreen() {
           )}
         </>
       )}
+      </View>
     </ScrollView>
   );
 }

@@ -5,6 +5,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useResponsiveType } from "@/src/design/useResponsiveType";
+import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
+import { CONTENT_MAX_WIDTH, pickBySizeClass } from "@/src/design/responsive";
 import { useTherapyGoals } from "@/hooks/useFamily";
 import { AivoCard, LoadingState, EmptyState } from "@aivo/mobile-ui";
 import { colors, spacing } from "@/constants/colors";
@@ -15,45 +17,62 @@ export default function TherapyGoals() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const { data: goals, isLoading } = useTherapyGoals(id);
+  const { sizeClass, width: winWidth, isTablet } = useWindowSizeClass();
+  const hPad = pickBySizeClass(sizeClass, {
+    compact: spacing.md,
+    medium: spacing.lg,
+    expanded: spacing.xl,
+  });
+  const contentWidth = Math.min(
+    winWidth - hPad * 2,
+    isTablet ? CONTENT_MAX_WIDTH.reading : winWidth,
+  );
   if (isLoading) return <LoadingState />;
 
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 32 }}
+      contentContainerStyle={{
+        paddingTop: insets.top + 16,
+        paddingBottom: 32,
+        paddingHorizontal: hPad,
+        alignItems: "center",
+      }}
     >
-      <Pressable onPress={() => router.back()} style={styles.backRow}>
-        <Ionicons name="arrow-back" size={20} color={colors.primary} />
-        <Text style={styles.backText}>{t("common.back")}</Text>
-      </Pressable>
-      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>{t("therapistClient.goalsTitle")}</Text>
-      <Text style={styles.subtitle}>{t("therapistClient.goalsSubtitle")}</Text>
+      <View style={{ width: contentWidth }}>
+        <Pressable onPress={() => router.back()} style={styles.backRow}>
+          <Ionicons name="arrow-back" size={20} color={colors.primary} />
+          <Text style={styles.backText}>{t("common.back")}</Text>
+        </Pressable>
+        <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>{t("therapistClient.goalsTitle")}</Text>
+        <Text style={styles.subtitle}>{t("therapistClient.goalsSubtitle")}</Text>
 
-      {!goals?.length ? (
-        <EmptyState
-          icon={<Ionicons name="flag-outline" size={48} color={colors.textSecondary} />}
-          title={t("therapistClient.noGoalsTitle")}
-          message={t("therapistClient.noGoalsMessage")}
-          actionLabel={t("therapistClient.addGoal")}
-          onAction={() => {}}
-        />
-      ) : (
-        goals.map((g: any) => (
-          <AivoCard key={g.id} style={styles.goalCard}>
-            <Text style={styles.goalTitle}>{g.title}</Text>
-            <View style={styles.bar}>
-              <View style={[styles.fill, { width: `${g.progress}%` }]} />
-            </View>
-            <Text style={styles.pct}>{g.progress}%</Text>
-          </AivoCard>
-        ))
-      )}
+        {!goals?.length ? (
+          <EmptyState
+            icon={<Ionicons name="flag-outline" size={48} color={colors.textSecondary} />}
+            title={t("therapistClient.noGoalsTitle")}
+            message={t("therapistClient.noGoalsMessage")}
+            actionLabel={t("therapistClient.addGoal")}
+            onAction={() => {}}
+          />
+        ) : (
+          goals.map((g: any) => (
+            <AivoCard key={g.id} style={styles.goalCard}>
+              <Text style={styles.goalTitle}>{g.title}</Text>
+              <View style={styles.bar}>
+                <View style={[styles.fill, { width: `${g.progress}%` }]} />
+              </View>
+              <Text style={styles.pct}>{g.progress}%</Text>
+            </AivoCard>
+          ))
+        )}
+      </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: spacing.md },
+  container: { flex: 1, backgroundColor: colors.background },
   backRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: spacing.md },
   backText: { fontSize: 16, fontFamily: "Nunito-SemiBold", color: colors.primary },
   title: { fontSize: 24, fontFamily: "Nunito-ExtraBold", color: colors.text },

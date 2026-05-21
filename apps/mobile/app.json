@@ -35,6 +35,7 @@
         "backgroundColor": "#7C3AED"
       },
       "package": "com.artpromedia.aivo",
+      "resizeableActivity": true,
       "splash": {
         "image": "./assets/images/splash-icon.png",
         "backgroundColor": "#7C3AED",

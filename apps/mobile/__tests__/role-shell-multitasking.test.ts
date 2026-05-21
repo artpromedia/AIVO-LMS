@@ -49,7 +49,14 @@ describe("role layouts route through RoleTabletShell", () => {
         // Compact widths (Slide Over, 1/3 / narrow 1/2 splits) leave
         // `isTablet` false and keep the tab bar visible; medium+ widths
         // hide it and the rail in RoleTabletShell takes over.
-        expect(src).toMatch(/isTablet\s*\?\s*\{\s*display:\s*["']none["']/);
+        //
+        // Two patterns are accepted:
+        //   1. Inline ternary:  `isTablet ? { display: "none" }`
+        //   2. Hook abstraction: `useTabBarStyle({ hidden: isTablet })`
+        // Both flow `isTablet` into the bottom tab visibility decision.
+        const inlineTernary = /isTablet\s*\?\s*\{\s*display:\s*["']none["']/;
+        const hookForm = /useTabBarStyle\s*\(\s*\{[\s\S]*?hidden:\s*isTablet/;
+        expect(inlineTernary.test(src) || hookForm.test(src)).toBe(true);
       });
     });
   }

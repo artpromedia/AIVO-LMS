@@ -5,6 +5,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useResponsiveType } from "@/src/design/useResponsiveType";
+import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
+import { CONTENT_MAX_WIDTH, pickBySizeClass } from "@/src/design/responsive";
 import { useLearner } from "@/hooks/useLearners";
 import { AivoCard, AivoButton } from "@aivo/mobile-ui";
 import BrainCloneCard from "@/src/components/brain/BrainCloneCard";
@@ -17,12 +19,28 @@ export default function TherapistClientProfile() {
   const insets = useSafeAreaInsets();
   const { data: learner } = useLearner(id);
   const learnerName = learner ? `${learner.firstName} ${learner.lastName}`.trim() : "Client";
+  const { sizeClass, width: winWidth, isTablet } = useWindowSizeClass();
+  const hPad = pickBySizeClass(sizeClass, {
+    compact: spacing.md,
+    medium: spacing.lg,
+    expanded: spacing.xl,
+  });
+  const contentWidth = Math.min(
+    winWidth - hPad * 2,
+    isTablet ? CONTENT_MAX_WIDTH.dashboard : winWidth,
+  );
 
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 32 }}
+      contentContainerStyle={{
+        paddingTop: insets.top + 16,
+        paddingBottom: 32,
+        paddingHorizontal: hPad,
+        alignItems: "center",
+      }}
     >
+      <View style={{ width: contentWidth }}>
       <Pressable onPress={() => router.back()} style={styles.backRow}>
         <Ionicons name="arrow-back" size={20} color={colors.primary} />
         <Text style={styles.backText}>{t("common.back")}</Text>
@@ -66,12 +84,13 @@ export default function TherapistClientProfile() {
         variant="secondary"
         style={{ marginTop: spacing.sm }}
       />
+      </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: spacing.md },
+  container: { flex: 1, backgroundColor: colors.background },
   backRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: spacing.md },
   backText: { fontSize: 16, fontFamily: "Nunito-SemiBold", color: colors.primary },
   title: { fontSize: 22, fontFamily: "Nunito-ExtraBold", color: colors.text },

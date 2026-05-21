@@ -19,10 +19,17 @@ import { theme, classifySizeClass, isTabletWidth, type SizeClass } from "./theme
  *     `theme.contentMaxWidth` so reading flows don't stretch
  *     edge-to-edge on a 12.9" iPad.
  *
- * The audit flagged that the mobile app currently renders as a
- * magnified phone on iPad. Wiring these hooks into the learner home,
- * subject hub, and tutor screens fixes that without rebuilding the
- * underlying components.
+ * **Mirrored module:** `apps/mobile/src/design/responsive.ts` exposes
+ * a parallel API (`pickBySizeClass`, `gridColumns`, `CONTENT_MAX_WIDTH`)
+ * with the same breakpoints. Keep both files in lockstep — runtime
+ * cross-import is intentionally avoided because `@aivo/brand`
+ * (transitively pulled in by `theme.ts`) is not resolvable from
+ * vitest's node environment, and the breakpoint regression tests live
+ * on the app side.
+ *
+ * Wiring these hooks into the learner home, subject hub, and tutor
+ * screens fixes the "magnified phone" rendering on iPad without
+ * rebuilding the underlying components.
  */
 
 export interface ResponsiveLayout {

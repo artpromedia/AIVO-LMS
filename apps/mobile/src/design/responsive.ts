@@ -7,6 +7,21 @@
  *
  * These breakpoints match Material 3 / Apple's iPadOS size classes so a
  * single layout decision can drive both platforms.
+ *
+ * **Single source of truth, by convention:**
+ * The same constants are mirrored in `@aivo/mobile-ui/theme.ts` (which
+ * other packages consume) and `@aivo/mobile-ui/responsive.ts` (which
+ * exposes a parallel `useResponsiveLayout`/`useColumns` API). Keep the
+ * three in lockstep — `__tests__/ipad-multitasking.test.ts` enforces
+ * that the breakpoint values here match the iPad multitasking matrix
+ * documented in `useWindowSizeClass.ts`.
+ *
+ * App code should import from this module; shared `mobile-ui`
+ * components import from `@aivo/mobile-ui`. Do **not** add a runtime
+ * cross-package import — `@aivo/brand` (transitively pulled in by
+ * mobile-ui's theme) is a TS-source workspace package and is not
+ * resolvable from the vitest node env that drives our breakpoint
+ * regression tests.
  */
 export const BREAKPOINTS = {
   compact: 0,
@@ -40,7 +55,8 @@ export function pickBySizeClass<T>(
 
 /**
  * Content width caps so cards and forms don't stretch edge-to-edge on
- * tablet hardware. Match the values used by the web app's design system.
+ * tablet hardware. Match the values used by the web app's design system
+ * and the mirror in `@aivo/mobile-ui/theme.ts`.
  */
 export const CONTENT_MAX_WIDTH = {
   auth: 520, // login / signup / pin — single-column form, never stretches
