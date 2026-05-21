@@ -1,0 +1,413 @@
+/**
+ * Thin server-side HTTP client for services/identity-svc.
+ *
+ * Web-v2 talks to identity-svc as a BFF: the Next server makes the call
+ * inside a server action / route handler, then sets its OWN httpOnly
+ * cookies on the web-v2 domain. We do NOT forward identity-svc cookies
+ * verbatim because they are scoped to the identity-svc origin in
+ * production. Only the access token + a session-profile snapshot are
+ * persisted on the web-v2 side; the refresh token is kept server-side
+ * (re-fetched from identity-svc via the bearer token when needed).
+ *
+ * This module is server-only. It's only imported from server actions
+ * and route handlers; do not import it from client components.
+ */
+import { serverEnv } from "@/lib/env";
+import type { Role, SessionProfile } from "./types";
+
+export const IDENTITY_ACCESS_TOKEN_COOKIE = "aivo_access_token";
+export const IDENTITY_REFRESH_TOKEN_COOKIE = "aivo_refresh_token";
+export const IDENTITY_SESSION_COOKIE = "aivo_session";
+
+/**
+ * identity-svc emits uppercase enum-like role names; web-v2 uses
+ * lowercase. Map both directions so we never leak the wire format into
+ * the UI layer.
+ */
+const WIRE_TO_ROLE: Record<string, Role> = {
+  PARENT: "parent",
+  LEARNER: "learner",
+  TEACHER: "teacher",
+  SCHOOL_ADMIN: "school_admin",
+  DISTRICT_ADMIN: "district_admin",
+  PLATFORM_ADMIN: "platform_admin",
+};
+
+export function mapWireRoleToRole(wire: string | undefined | null): Role | null {
+  if (!wire) return null;
+  return WIRE_TO_ROLE[wire.toUpperCase()] ?? null;
+}
+
+export type IdentityUser = {
+  id: string;
+  email: string;
+  name: string | null;
+  role: string; // wire format (uppercase)
+  tenantId: string;
+};
+
+export type IdentityLoginSuccess = {
+  kind: "ok";
+  user: IdentityUser;
+  accessToken: string;
+  mustChangePassword?: boolean;
+  /** Raw Set-Cookie strings from identity-svc (e.g. refreshToken). */
+  setCookies: string[];
+};
+
+export type IdentityLoginMfa = {
+  kind: "mfa";
+  mfaToken: string;
+  mfaMethod: string;
+};
+
+export type IdentityLoginError = {
+  kind: "error";
+  status: number;
+  error: string;
+  redirectTo?: string;
+  wrongSurface?: string;
+};
+
+export type IdentityLoginResult =
+  | IdentityLoginSuccess
+  | IdentityLoginMfa
+  | IdentityLoginError;
+
+/**
+ * Extract Set-Cookie headers across runtimes. Node 18+ exposes
+ * `getSetCookie()`; older fetch implementations fall back to raw
+ * iteration.
+ */
+function readSetCookies(headers: Headers): string[] {
+  const anyHeaders = headers as Headers & { getSetCookie?: () => string[] };
+  if (typeof anyHeaders.getSetCookie === "function") {
+    return anyHeaders.getSetCookie();
+  }
+  const value = headers.get("set-cookie");
+  return value ? [value] : [];
+}
+
+function parseRefreshToken(setCookies: string[]): string | null {
+  for (const raw of setCookies) {
+    const first = raw.split(";", 1)[0]?.trim();
+    if (!first) continue;
+    const eq = first.indexOf("=");
+    if (eq <= 0) continue;
+    const name = first.slice(0, eq).trim();
+    if (name === "refreshToken") {
+      return decodeURIComponent(first.slice(eq + 1));
+    }
+  }
+  return null;
+}
+
+/**
+ * POST /api/auth/login on identity-svc with the user's credentials.
+ * Returns a discriminated union for the three legitimate outcomes.
+ */
+export async function identityLogin(
+  email: string,
+  password: string,
+): Promise<IdentityLoginResult> {
+  let res: Response;
+  try {
+    res = await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/auth/login`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ email, password }),
+      // Server-to-server; never cache.
+      cache: "no-store",
+    });
+  } catch (err) {
+    return {
+      kind: "error",
+      status: 502,
+      error: `identity-svc unreachable: ${(err as Error).message}`,
+    };
+  }
+
+  const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+
+  if (!res.ok) {
+    return {
+      kind: "error",
+      status: res.status,
+      error: typeof json.error === "string" ? json.error : "Login failed",
+      redirectTo: typeof json.redirectTo === "string" ? json.redirectTo : undefined,
+      wrongSurface: typeof json.wrongSurface === "string" ? json.wrongSurface : undefined,
+    };
+  }
+
+  if (json.mfaPending) {
+    return {
+      kind: "mfa",
+      mfaToken: typeof json.mfaToken === "string" ? json.mfaToken : "",
+      mfaMethod: typeof json.mfaMethod === "string" ? json.mfaMethod : "",
+    };
+  }
+
+  return {
+    kind: "ok",
+    user: json.user as IdentityUser,
+    accessToken: typeof json.accessToken === "string" ? json.accessToken : "",
+    mustChangePassword: Boolean(json.mustChangePassword),
+    setCookies: readSetCookies(res.headers),
+  };
+}
+
+export function extractRefreshToken(setCookies: string[]): string | null {
+  return parseRefreshToken(setCookies);
+}
+
+/**
+ * Complete an MFA challenge for one of the supported factors:
+ *   - email OTP (6-digit)
+ *   - TOTP authenticator code (6-digit)
+ *   - recovery code (12-char, optionally dash-separated)
+ *
+ * Server response shape mirrors /api/auth/login on success, so the
+ * caller can re-use the same cookie-setting logic. Returns the same
+ * discriminated union, minus the `mfa` arm (a second MFA round is not
+ * supported).
+ */
+export async function identityVerifyMfa(
+  mfaToken: string,
+  code: string,
+): Promise<IdentityLoginSuccess | IdentityLoginError> {
+  let res: Response;
+  try {
+    res = await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/auth/verify-mfa`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ mfaToken, code }),
+      cache: "no-store",
+    });
+  } catch (err) {
+    return {
+      kind: "error",
+      status: 502,
+      error: `identity-svc unreachable: ${(err as Error).message}`,
+    };
+  }
+
+  const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+
+  if (!res.ok) {
+    return {
+      kind: "error",
+      status: res.status,
+      error: typeof json.error === "string" ? json.error : "MFA verification failed",
+    };
+  }
+
+  return {
+    kind: "ok",
+    user: json.user as IdentityUser,
+    accessToken: typeof json.accessToken === "string" ? json.accessToken : "",
+    mustChangePassword: Boolean(json.mustChangePassword),
+    setCookies: readSetCookies(res.headers),
+  };
+}
+
+/**
+ * Resend the email OTP for an in-flight MFA challenge. Only valid when
+ * the original challenge method was "email" — identity-svc rejects
+ * resend for TOTP/WebAuthn challenges.
+ */
+export async function identityResendMfa(
+  mfaToken: string,
+): Promise<{ ok: true; resendsRemaining: number } | { ok: false; status: number; error: string }> {
+  let res: Response;
+  try {
+    res = await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/auth/mfa/resend`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ mfaToken }),
+      cache: "no-store",
+    });
+  } catch (err) {
+    return { ok: false, status: 502, error: `identity-svc unreachable: ${(err as Error).message}` };
+  }
+
+  const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  if (!res.ok) {
+    return {
+      ok: false,
+      status: res.status,
+      error: typeof json.error === "string" ? json.error : "Failed to resend code",
+    };
+  }
+  return {
+    ok: true,
+    resendsRemaining: typeof json.resendsRemaining === "number" ? json.resendsRemaining : 0,
+  };
+}
+
+export type IdentityRefreshResult =
+  | {
+      ok: true;
+      accessToken: string;
+      mustChangePassword: boolean;
+      passwordRotationDue: boolean;
+      setCookies: string[];
+    }
+  | { ok: false; status: number; error: string };
+
+/**
+ * Exchange a refresh token for a fresh access token. The caller passes
+ * the raw refresh-token string captured from the original login (kept
+ * on the web-v2 domain in `aivo_refresh_token`). identity-svc reads it
+ * from the `refreshToken` cookie header.
+ */
+export async function identityRefresh(refreshToken: string): Promise<IdentityRefreshResult> {
+  let res: Response;
+  try {
+    res = await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/auth/refresh`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        cookie: `refreshToken=${encodeURIComponent(refreshToken)}`,
+      },
+      cache: "no-store",
+    });
+  } catch (err) {
+    return { ok: false, status: 502, error: `identity-svc unreachable: ${(err as Error).message}` };
+  }
+
+  const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  if (!res.ok) {
+    return {
+      ok: false,
+      status: res.status,
+      error: typeof json.error === "string" ? json.error : "Refresh failed",
+    };
+  }
+  return {
+    ok: true,
+    accessToken: typeof json.accessToken === "string" ? json.accessToken : "",
+    mustChangePassword: Boolean(json.mustChangePassword),
+    passwordRotationDue: Boolean(json.passwordRotationDue),
+    setCookies: readSetCookies(res.headers),
+  };
+}
+
+/**
+ * Trigger a password-reset email. identity-svc always returns 200 with
+ * a generic message regardless of whether the email exists, to prevent
+ * account enumeration. We mirror that behavior here.
+ */
+export async function identityForgotPassword(
+  email: string,
+): Promise<{ ok: true } | { ok: false; status: number; error: string }> {
+  let res: Response;
+  try {
+    res = await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/auth/forgot-password`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ email }),
+      cache: "no-store",
+    });
+  } catch (err) {
+    return { ok: false, status: 502, error: `identity-svc unreachable: ${(err as Error).message}` };
+  }
+  if (!res.ok) {
+    const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+    return {
+      ok: false,
+      status: res.status,
+      error: typeof json.error === "string" ? json.error : "Request failed",
+    };
+  }
+  return { ok: true };
+}
+
+export type IdentityResetPasswordResult =
+  | { ok: true }
+  | {
+      ok: false;
+      status: number;
+      error: string;
+      /** Policy-violation reasons returned by /api/auth/reset-password. */
+      reasons?: string[];
+      strengthScore?: number;
+    };
+
+/**
+ * Complete a password reset. Identity-svc validates the token, runs the
+ * new password through the policy engine (history, blacklist, strength),
+ * and invalidates every active session on success.
+ */
+export async function identityResetPassword(
+  token: string,
+  newPassword: string,
+): Promise<IdentityResetPasswordResult> {
+  let res: Response;
+  try {
+    res = await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/auth/reset-password`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ token, newPassword }),
+      cache: "no-store",
+    });
+  } catch (err) {
+    return { ok: false, status: 502, error: `identity-svc unreachable: ${(err as Error).message}` };
+  }
+
+  const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  if (!res.ok) {
+    const reasons = Array.isArray(json.reasons)
+      ? (json.reasons.filter((r) => typeof r === "string") as string[])
+      : undefined;
+    return {
+      ok: false,
+      status: res.status,
+      error: typeof json.error === "string" ? json.error : "Reset failed",
+      reasons,
+      strengthScore: typeof json.strengthScore === "number" ? json.strengthScore : undefined,
+    };
+  }
+  return { ok: true };
+}
+
+/**
+ * POST /api/auth/logout. Best-effort — failures are swallowed because
+ * the client-side cookies are cleared regardless.
+ */
+export async function identityLogout(refreshToken: string | null): Promise<void> {
+  if (!refreshToken) return;
+  try {
+    await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/auth/logout`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        // identity-svc reads the refresh token from the `refreshToken`
+        // cookie. Send it on the server-to-server call so the row is
+        // invalidated in the sessions table.
+        cookie: `refreshToken=${encodeURIComponent(refreshToken)}`,
+      },
+      cache: "no-store",
+    });
+  } catch {
+    // Network failure — fall through. Cookies still cleared client-side.
+  }
+}
+
+/**
+ * Build a SessionProfile from an identity-svc user payload. Permissions
+ * are intentionally empty here — identity-svc doesn't currently emit a
+ * permission list, so callers that need fine-grained checks should
+ * derive them from `role` until permission claims land in the JWT.
+ */
+export function toSessionProfile(user: IdentityUser): SessionProfile | null {
+  const role = mapWireRoleToRole(user.role);
+  if (!role) return null;
+  return {
+    userId: user.id,
+    tenantId: user.tenantId,
+    role,
+    email: user.email,
+    displayName: user.name ?? user.email,
+    permissions: [],
+  };
+}

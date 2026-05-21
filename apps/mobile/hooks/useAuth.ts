@@ -9,6 +9,15 @@ import {
   setMustChangePassword as persistMustChangePassword,
   getMustChangePassword,
 } from "@/lib/api";
+import {
+  tryBiometricUnlock,
+  disableBiometricUnlock,
+} from "@/lib/biometric";
+import {
+  mapIdentityErrorResponse,
+  mapIdentityErrorBody,
+  mapIdentityNetworkError,
+} from "@/lib/auth/error-mapping";
 import { API } from "@/constants/api";
 import type { UserRole } from "@aivo/brand";
 
@@ -62,6 +71,12 @@ interface AuthContextValue extends AuthState {
     code: string,
   ) => Promise<{ success: boolean; error?: string; mustChangePassword?: boolean }>;
   resendMfa: (mfaToken: string) => Promise<{ success: boolean; error?: string }>;
+  /**
+   * Hand a SecureStore-gated access token back to the auth context
+   * after the user satisfies a biometric prompt. The token may already
+   * be near-expiry; `apiFetch` will refresh-and-retry on the next 401.
+   */
+  unlockWithBiometric: () => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   clearMustChangePassword: () => Promise<void>;
 }
@@ -106,7 +121,7 @@ export function useAuthState(): AuthContextValue {
     const token = await getToken();
     if (token) {
       const payload = decodeJWT(token);
-      if (payload && payload.exp) {
+      if (payload?.exp) {
         const expiresAt = (payload.exp as number) * 1000;
         if (Date.now() < expiresAt) {
           const user = extractUser(token);
@@ -147,7 +162,7 @@ export function useAuthState(): AuthContextValue {
         skipAuth: true,
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
       if (response.ok) {
         if (data.mfaPending) {
           return { success: false, mfaPending: true, mfaToken: data.mfaToken };
@@ -166,9 +181,10 @@ export function useAuthState(): AuthContextValue {
           return { success: true, mustChangePassword: mustChange };
         }
       }
-      return { success: false, error: data.error || data.message || "Login failed" };
-    } catch {
-      return { success: false, error: "Network error. Please try again." };
+      const mapped = mapIdentityErrorBody(response.status, data);
+      return { success: false, error: mapped.message };
+    } catch (err) {
+      return { success: false, error: mapIdentityNetworkError(err).message };
     }
   }, []);
 
@@ -191,9 +207,10 @@ export function useAuthState(): AuthContextValue {
           return { success: true };
         }
       }
-      return { success: false, error: "Incorrect PIN" };
-    } catch {
-      return { success: false, error: "Network error" };
+      const mapped = await mapIdentityErrorResponse(response, "Incorrect PIN");
+      return { success: false, error: mapped.message };
+    } catch (err) {
+      return { success: false, error: mapIdentityNetworkError(err).message };
     }
   }, []);
 
@@ -224,9 +241,10 @@ export function useAuthState(): AuthContextValue {
         }
       }
       const error = await response.json().catch(() => ({}));
-      return { success: false, error: error.error || error.message || "Registration failed" };
-    } catch {
-      return { success: false, error: "Network error" };
+      const mapped = mapIdentityErrorBody(response.status, error);
+      return { success: false, error: mapped.message };
+    } catch (err) {
+      return { success: false, error: mapIdentityNetworkError(err).message };
     }
   }, []);
 
@@ -267,9 +285,10 @@ export function useAuthState(): AuthContextValue {
         if (data.requiresConsent) {
           return { success: false, error: "requiresConsent", requiresConsent: true };
         }
-        return { success: false, error: data.error || "Google sign-in failed" };
-      } catch {
-        return { success: false, error: "Network error. Please try again." };
+        const mapped = mapIdentityErrorBody(response.status, data);
+        return { success: false, error: mapped.message };
+      } catch (err) {
+        return { success: false, error: mapIdentityNetworkError(err).message };
       }
     },
     [],
@@ -299,9 +318,10 @@ export function useAuthState(): AuthContextValue {
         }
       }
       const error = await response.json().catch(() => ({}));
-      return { success: false, error: error.error || "Verification failed" };
-    } catch {
-      return { success: false, error: "Network error" };
+      const mapped = mapIdentityErrorBody(response.status, error, "Verification failed");
+      return { success: false, error: mapped.message };
+    } catch (err) {
+      return { success: false, error: mapIdentityNetworkError(err).message };
     }
   }, []);
 
@@ -316,16 +336,51 @@ export function useAuthState(): AuthContextValue {
         return { success: true };
       }
       const error = await response.json().catch(() => ({}));
-      return { success: false, error: error.error || "Resend failed" };
-    } catch {
-      return { success: false, error: "Network error" };
+      const mapped = mapIdentityErrorBody(response.status, error, "Resend failed");
+      return { success: false, error: mapped.message };
+    } catch (err) {
+      return { success: false, error: mapIdentityNetworkError(err).message };
     }
+  }, []);
+
+  const unlockWithBiometric = useCallback(async () => {
+    const token = await tryBiometricUnlock();
+    if (!token) {
+      return { success: false, error: "biometric_failed" };
+    }
+    const payload = decodeJWT(token);
+    if (!payload) {
+      // Token is unreadable: scrap the biometric copy so the user falls
+      // back to password next time instead of looping on a bad unlock.
+      await disableBiometricUnlock();
+      return { success: false, error: "biometric_token_invalid" };
+    }
+    await setToken(token);
+    const user = extractUser(token);
+    const mustChange = await getMustChangePassword();
+    if (!user) {
+      await disableBiometricUnlock();
+      return { success: false, error: "biometric_token_invalid" };
+    }
+    setState({
+      user,
+      isLoading: false,
+      isAuthenticated: true,
+      mustChangePassword: mustChange,
+    });
+    return { success: true };
   }, []);
 
   const logout = useCallback(async () => {
     try {
       await apiFetch(API.IDENTITY, "/api/auth/logout", { method: "POST" });
-    } catch {}
+    } catch {
+      /* network failures shouldn't block local sign-out */
+    }
+    // Wipe biometric opt-in too: a logged-out user must not be able to
+    // unlock back into the previous session via Face ID. Settings can
+    // re-enable after the next successful login.
+    await disableBiometricUnlock();
     await clearTokens();
     setState({ user: null, isLoading: false, isAuthenticated: false, mustChangePassword: false });
   }, []);
@@ -343,6 +398,7 @@ export function useAuthState(): AuthContextValue {
     loginWithGoogle,
     verifyMfa,
     resendMfa,
+    unlockWithBiometric,
     logout,
     clearMustChangePassword,
   };

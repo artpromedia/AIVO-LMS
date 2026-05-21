@@ -56,6 +56,9 @@ const serverSchema = z.object({
   SESSION_SECRET: isProd
     ? z.string().min(32, "SESSION_SECRET must be at least 32 chars in production")
     : z.string().min(8).default("dev-session-secret-please-change-me"),
+  // Base URL of the real identity-svc (Fastify) used when
+  // AUTH_MODE !== "mock". Default to localhost for the dev workflow.
+  IDENTITY_SVC_URL: z.string().url().default("http://localhost:3001"),
   AI_PROVIDER: aiProviderSchema,
   ANTHROPIC_API_KEY: z.string().optional(),
   OPENAI_API_KEY: z.string().optional(),

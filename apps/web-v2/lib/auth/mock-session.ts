@@ -73,26 +73,64 @@ function parseRole(value: string | undefined): Role | null {
   return null;
 }
 
-/** Server-component / route-handler session reader. */
+// Real-mode session cookie set by the identity-svc-backed login server
+// action. Stores a JSON snapshot of the user profile so server components
+// can read the session without round-tripping to identity-svc on every
+// render. Kept here (not in identity-client.ts) so the constant is safe
+// to import from edge contexts that cannot reach the network client.
+const REAL_SESSION_COOKIE = "aivo_session";
+
+function parseRealSession(value: string | undefined): SessionProfile | null {
+  if (!value) return null;
+  try {
+    const decoded = JSON.parse(decodeURIComponent(value)) as SessionProfile;
+    if (!decoded || typeof decoded.role !== "string") return null;
+    return decoded;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Server-component / route-handler session reader.
+ *
+ * Mode-aware: in AUTH_MODE=mock it returns the canned MOCK_USERS profile
+ * keyed by the mock cookie's role. In any other mode it parses the
+ * real-auth session cookie set by the identity-svc-backed login action.
+ *
+ * Kept under the historic `readMockSessionFromCookies` name so the
+ * dozens of existing call sites continue to work without churn.
+ */
 export async function readMockSessionFromCookies(): Promise<SessionProfile | null> {
-  if (!mockAuthAllowed()) return null;
   const jar = await cookies();
-  const role = parseRole(jar.get(COOKIE_NAME)?.value);
-  return role ? MOCK_USERS[role] : null;
+  if (mockAuthAllowed()) {
+    const role = parseRole(jar.get(COOKIE_NAME)?.value);
+    return role ? MOCK_USERS[role] : null;
+  }
+  return parseRealSession(jar.get(REAL_SESSION_COOKIE)?.value);
 }
 
 /** Edge-friendly variant for middleware / Request-based callers. */
 export async function getMockSession(req: Request): Promise<SessionProfile | null> {
-  if (!mockAuthAllowed()) return null;
   const header = req.headers.get("cookie") ?? "";
-  const match = header.split(/;\s*/).find((c) => c.startsWith(`${COOKIE_NAME}=`));
-  const role = parseRole(match?.split("=")[1]);
-  return role ? MOCK_USERS[role] : null;
+  const cookieMap = new Map<string, string>();
+  for (const part of header.split(/;\s*/)) {
+    const eq = part.indexOf("=");
+    if (eq <= 0) continue;
+    cookieMap.set(part.slice(0, eq), part.slice(eq + 1));
+  }
+  if (mockAuthAllowed()) {
+    const role = parseRole(cookieMap.get(COOKIE_NAME));
+    return role ? MOCK_USERS[role] : null;
+  }
+  return parseRealSession(cookieMap.get(REAL_SESSION_COOKIE));
 }
 
 export const MOCK_COOKIE_NAME = COOKIE_NAME;
+export const SESSION_COOKIE_NAME = REAL_SESSION_COOKIE;
 
 /** Exposed for the mock-login route handler to refuse cleanly. */
 export function isMockAuthAllowed(): boolean {
   return mockAuthAllowed();
 }
+

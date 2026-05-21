@@ -9,7 +9,7 @@ import {
   Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "@/hooks/useTranslation";
 import * as Haptics from "expo-haptics";
 import { useAuth } from "@/hooks/useAuth";
@@ -31,11 +31,17 @@ export default function PinScreen() {
   const palette = useSensoryPalette();
   const { mode } = useSensoryMode();
   const { loginWithPin } = useAuth();
-  const [parentId, setParentId] = useState("");
+  // session-switch deep-links here with `?parentId=<sub>&learnerId=…`
+  // so a parent who's already signed in can hand the device to their
+  // learner without retyping their email. The parentId here is the
+  // identity-svc subject id of the parent account.
+  const params = useLocalSearchParams<{ parentId?: string; learnerId?: string }>();
+  const presetParentId = typeof params.parentId === "string" ? params.parentId.trim() : "";
+  const [parentId, setParentId] = useState(presetParentId);
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
   const [attempts, setAttempts] = useState(0);
-  const [step, setStep] = useState<"parent" | "pin">("parent");
+  const [step, setStep] = useState<"parent" | "pin">(presetParentId ? "pin" : "parent");
 
   // In calm mode the haptics are noisier than the user wants; suppress
   // to "light" only. High-contrast keeps the medium feedback.
@@ -186,7 +192,7 @@ export default function PinScreen() {
       <View style={styles.dotsRow}>
         {[0, 1, 2, 3].map((i) => (
           <View
-            key={i}
+            key={`dot-${i}`}
             style={[
               styles.dot,
               pin.length > i && { backgroundColor: accent, borderColor: accent },
@@ -198,11 +204,16 @@ export default function PinScreen() {
 
       <View style={styles.pad}>
         {digits.map((d, i) => {
-          if (d === "") return <View key={i} style={styles.padKey} />;
+          // `digits` is a fixed 12-slot grid (1-9, blank, 0, del); the
+          // position itself is the stable identity, but the linter
+          // wants a non-numeric key. Compose with the cell value so two
+          // blanks (if ever added) still keep distinct keys.
+          const cellKey = `pad-${i}-${d || "blank"}`;
+          if (d === "") return <View key={cellKey} style={styles.padKey} />;
           if (d === "del") {
             return (
               <Pressable
-                key={i}
+                key={cellKey}
                 style={({ pressed }) => [
                   styles.padKey,
                   pressed && { backgroundColor: accent, transform: [{ scale: 0.95 }] },
@@ -217,7 +228,7 @@ export default function PinScreen() {
           }
           return (
             <Pressable
-              key={i}
+              key={cellKey}
               style={({ pressed }) => [
                 styles.padKey,
                 pressed && { backgroundColor: accent, transform: [{ scale: 0.95 }] },

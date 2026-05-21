@@ -1,38 +1,122 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   Pressable,
   StyleSheet,
   Switch,
-  Platform,
+  ActivityIndicator,
 } from "react-native";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
+import {
+  getBiometricSupport,
+  isBiometricUnlockArmed,
+  enableBiometricUnlock,
+  disableBiometricUnlock,
+  type BiometricSupport,
+} from "@/lib/biometric";
+import { getToken } from "@/lib/api";
+import { useAuth } from "@/hooks/useAuth";
 
 /**
  * /(auth)/biometric-setup
  *
- * Offers Face ID / Touch ID (iOS) or fingerprint (Android) as an
- * accelerator on top of the PIN. The PIN remains the source of
- * truth; biometrics are an unlock convenience only.
+ * Lets the signed-in user opt in or out of Face ID / Touch ID /
+ * Fingerprint as a re-entry accelerator. The actual server session
+ * still depends on the identity-svc JWT in SecureStore — biometrics
+ * only gates the *read* of a copy of that token, so opting out simply
+ * deletes the gated copy and leaves the rest of the auth state alone.
  *
- * `expo-local-authentication` is not currently a dependency of this
- * app, so this screen captures intent only and stores a preference.
- * The actual biometric prompt will be wired up when the dep is
- * added — at which point only the `useBiometric` handler below
- * needs to change.
+ * Reachable from settings and from the post-signup onboarding flow.
  */
 export default function BiometricSetupScreen() {
   const insets = useSafeAreaInsets();
   const palette = useSensoryPalette();
-  const [enabled, setEnabled] = useState(false);
+  const { user } = useAuth();
 
-  const biometryLabel =
-    Platform.OS === "ios" ? "Face ID / Touch ID" : "Fingerprint";
+  const [support, setSupport] = useState<BiometricSupport | null>(null);
+  const [enabled, setEnabled] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const [s, armed] = await Promise.all([
+        getBiometricSupport(),
+        isBiometricUnlockArmed(),
+      ]);
+      if (cancelled) return;
+      setSupport(s);
+      setEnabled(armed.armed);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const biometryLabel = support?.label || "Biometric unlock";
+  const unavailableReason =
+    support && !support.available
+      ? "This device doesn't support biometrics."
+      : support && !support.enrolled
+        ? `No ${biometryLabel.toLowerCase()} is set up in system settings.`
+        : null;
+
+  const handleToggle = async (next: boolean) => {
+    setError(null);
+    if (busy) return;
+    setBusy(true);
+    try {
+      if (next) {
+        const token = await getToken();
+        if (!token) {
+          setError("Sign in again to enable biometric unlock.");
+          setBusy(false);
+          return;
+        }
+        const result = await enableBiometricUnlock({
+          accessToken: token,
+          email: user?.email ?? "",
+        });
+        if (!result.enabled) {
+          setError(
+            result.reason === "cancelled"
+              ? "Biometric prompt was cancelled."
+              : result.reason === "not_enrolled"
+                ? `Set up ${biometryLabel} in system settings first.`
+                : result.reason === "no_hardware"
+                  ? "This device doesn't support biometrics."
+                  : "Could not enable biometric unlock.",
+          );
+          setEnabled(false);
+        } else {
+          setEnabled(true);
+        }
+      } else {
+        await disableBiometricUnlock();
+        setEnabled(false);
+      }
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleContinue = () => {
+    router.replace("/(auth)/session-switch");
+  };
+
+  if (!support) {
+    return (
+      <View style={[styles.root, styles.center]}>
+        <ActivityIndicator color={palette.primary} />
+      </View>
+    );
+  }
 
   return (
     <View
@@ -45,9 +129,21 @@ export default function BiometricSetupScreen() {
         <Text style={styles.eyebrow}>One-tap unlock</Text>
         <Text style={styles.title}>Use {biometryLabel} to unlock?</Text>
         <Text style={styles.subtitle}>
-          Adds a faster way to switch into your parent session. Your PIN
-          still works, and any sensitive action still re-prompts.
+          Adds a faster way back into your account. Your password still
+          works, and any sensitive action still re-prompts.
         </Text>
+
+        {unavailableReason ? (
+          <View style={styles.warn}>
+            <Text style={styles.warnText}>{unavailableReason}</Text>
+          </View>
+        ) : null}
+
+        {error ? (
+          <View style={styles.warn}>
+            <Text style={styles.warnText}>{error}</Text>
+          </View>
+        ) : null}
 
         <View style={styles.row}>
           <View style={{ flex: 1, paddingRight: spacing.md }}>
@@ -58,29 +154,30 @@ export default function BiometricSetupScreen() {
           </View>
           <Switch
             value={enabled}
-            onValueChange={setEnabled}
+            onValueChange={handleToggle}
+            disabled={busy || !support.available || !support.enrolled}
             trackColor={{ true: palette.primary, false: colors.border }}
           />
         </View>
 
         <View style={styles.reassure}>
-          <Text style={styles.reassureTitle}>It's a shortcut, not a vault.</Text>
+          <Text style={styles.reassureTitle}>It&apos;s a shortcut, not a vault.</Text>
           <Text style={styles.reassureBody}>
             Approving a child profile, changing consent, or accessing billing
-            still requires your PIN or password.
+            still requires your password.
           </Text>
         </View>
       </View>
 
       <View style={styles.footer}>
         <Pressable
-          onPress={() => router.replace("/(auth)/session-switch")}
+          onPress={handleContinue}
           style={[styles.cta, { backgroundColor: palette.primary }]}
           accessibilityRole="button"
-          accessibilityLabel={enabled ? `Enable ${biometryLabel} and continue` : "Skip and continue"}
+          accessibilityLabel={enabled ? `Continue with ${biometryLabel} enabled` : "Skip and continue"}
         >
           <Text style={styles.ctaLabel}>
-            {enabled ? `Enable ${biometryLabel}` : "Skip for now"}
+            {enabled ? "Continue" : "Skip for now"}
           </Text>
         </Pressable>
       </View>
@@ -94,6 +191,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     paddingHorizontal: spacing.lg,
   },
+  center: { alignItems: "center", justifyContent: "center" },
   body: { flex: 1 },
   eyebrow: {
     fontFamily: fontFamilies.bodySemiBold,
@@ -115,6 +213,18 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     color: colors.textSecondary,
     marginBottom: spacing.lg,
+  },
+  warn: {
+    backgroundColor: "rgba(220, 38, 38, 0.08)",
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+  },
+  warnText: {
+    fontFamily: fontFamilies.bodyRegular,
+    fontSize: 13,
+    lineHeight: 19,
+    color: "#b91c1c",
   },
   row: {
     flexDirection: "row",

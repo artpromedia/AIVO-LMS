@@ -8,26 +8,98 @@ import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
 import { LoginForm } from "./_components/login-form";
 
-async function mockSignIn(formData: FormData) {
+async function signInAction(formData: FormData) {
   "use server";
   const { cookies } = await import("next/headers");
   const { redirect } = await import("next/navigation");
   const { ROLE_HOME } = await import("@/lib/auth/types");
-  const { MOCK_COOKIE_NAME } = await import("@/lib/auth/mock-session");
+  const { serverEnv } = await import("@/lib/env");
 
-  const raw = formData.get("role");
-  const role = (typeof raw === "string" ? raw : "parent") as Role;
-  if (!(role in MOCK_USERS)) {
-    redirect("/login?error=invalid_role");
+  const emailRaw = formData.get("email");
+  const passwordRaw = formData.get("password");
+  const email = typeof emailRaw === "string" ? emailRaw.trim() : "";
+  const password = typeof passwordRaw === "string" ? passwordRaw : "";
+
+  // --- Mock path: developer affordance, identical to the previous
+  // behavior so AUTH_MODE=mock dev workflows keep working. -----------
+  if (serverEnv.AUTH_MODE === "mock") {
+    const { MOCK_COOKIE_NAME } = await import("@/lib/auth/mock-session");
+    const raw = formData.get("role");
+    const role = (typeof raw === "string" ? raw : "parent") as Role;
+    if (!(role in MOCK_USERS)) {
+      redirect("/login?error=invalid_role");
+    }
+    const jar = await cookies();
+    jar.set(MOCK_COOKIE_NAME, role, {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+    redirect(ROLE_HOME[role]);
   }
+
+  // --- Real path: services/identity-svc -----------------------------
+  if (!email || !password) {
+    redirect("/login?error=missing_credentials");
+  }
+
+  const {
+    identityLogin,
+    extractRefreshToken,
+    toSessionProfile,
+  } = await import("@/lib/auth/identity-client");
+  const { setAuthSessionCookies } = await import("@/lib/auth/session-cookies");
+  const { MFA_CHALLENGE_COOKIE, MFA_CHALLENGE_MAX_AGE_SECONDS } = await import(
+    "@/lib/auth/mfa-cookies"
+  );
+
+  const result = await identityLogin(email, password);
+
+  if (result.kind === "mfa") {
+    // Stash the mfaToken in a short-lived httpOnly cookie instead of the
+    // URL so the bearer credential never appears in browser history,
+    // server logs, or the Referer header. /login/mfa reads it back.
+    const jar = await cookies();
+    jar.set(
+      MFA_CHALLENGE_COOKIE,
+      encodeURIComponent(JSON.stringify({ token: result.mfaToken, method: result.mfaMethod })),
+      {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: MFA_CHALLENGE_MAX_AGE_SECONDS,
+      },
+    );
+    redirect("/login/mfa");
+  }
+
+  if (result.kind === "error") {
+    let code: string;
+    if (result.status === 401) {
+      code = "invalid_credentials";
+    } else if (result.status === 403) {
+      code = "wrong_surface";
+    } else {
+      code = "login_failed";
+    }
+    redirect(`/login?error=${code}`);
+  }
+
+  const profile = toSessionProfile(result.user);
+  if (!profile) {
+    redirect("/login?error=unsupported_role");
+  }
+
   const jar = await cookies();
-  jar.set(MOCK_COOKIE_NAME, role, {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7,
+  setAuthSessionCookies(jar, {
+    accessToken: result.accessToken,
+    refreshToken: extractRefreshToken(result.setCookies),
+    profile,
   });
-  redirect(ROLE_HOME[role]);
+
+  redirect(ROLE_HOME[profile.role]);
 }
 
 /**
@@ -48,11 +120,32 @@ async function mockSignIn(formData: FormData) {
  * `iw-*` Tailwind utilities so the sensory-mode toggle repaints the
  * surface without re-wiring.
  */
-export default function LoginPage({
-  searchParams: _searchParams,
+const ERROR_COPY: Record<string, string> = {
+  invalid_credentials: "Email or password is incorrect.",
+  invalid_role: "That role isn't available for this account.",
+  missing_credentials: "Enter your email and password to sign in.",
+  mfa_required:
+    "We need a verification code to finish signing you in. Please enter it on the next screen.",
+  mfa_session_expired: "Your verification session expired. Please sign in again.",
+  wrong_surface:
+    "This account signs in on a different surface (district or admin). Use the correct portal.",
+  unsupported_role: "Your account role isn't supported on this surface yet.",
+  login_failed: "We couldn't sign you in. Please try again.",
+};
+
+const NOTICE_COPY: Record<string, string> = {
+  password_reset: "Your password has been reset. Please sign in with your new password.",
+  logged_out: "You've been signed out.",
+};
+
+export default async function LoginPage({
+  searchParams,
 }: {
-  readonly searchParams: Promise<{ error?: string }>;
+  readonly searchParams: Promise<{ error?: string; notice?: string }>;
 }) {
+  const { error, notice } = await searchParams;
+  const errorMessage = error ? (ERROR_COPY[error] ?? ERROR_COPY.login_failed) : null;
+  const noticeMessage = notice ? (NOTICE_COPY[notice] ?? null) : null;
   return (
     <>
       <SiteHeader />
@@ -144,8 +237,28 @@ export default function LoginPage({
                 </>
               }
             >
-              <LoginForm id="login-form" action={mockSignIn} />
+              <LoginForm id="login-form" action={signInAction} />
             </AuthCard>
+
+            {noticeMessage ? (
+              <div
+                role="status"
+                aria-live="polite"
+                className="rounded-iw-card border border-iw-success/40 bg-iw-success/10 px-4 py-3 text-sm text-iw-success"
+              >
+                {noticeMessage}
+              </div>
+            ) : null}
+
+            {errorMessage ? (
+              <div
+                role="alert"
+                aria-live="polite"
+                className="rounded-iw-card border border-iw-danger/40 bg-iw-danger/10 px-4 py-3 text-sm text-iw-danger"
+              >
+                {errorMessage}
+              </div>
+            ) : null}
 
             {/* Single-line privacy reassurance. Replaces the previous
                 ReassuranceCard so the screen has one visual focus, not two. */}

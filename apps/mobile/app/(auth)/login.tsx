@@ -7,7 +7,6 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
   Modal,
   Switch,
 } from "react-native";
@@ -17,6 +16,10 @@ import { useTranslation } from "@/hooks/useTranslation";
 import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import { useAuth } from "@/hooks/useAuth";
+import {
+  isBiometricUnlockArmed,
+  getBiometricSupport,
+} from "@/lib/biometric";
 import { spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
@@ -31,7 +34,7 @@ const GOOGLE_CLIENT_ID = "373030578076-ftkmofvss349u7qecvsjmiqavq4mt3hs.apps.goo
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
-  const { login, loginWithGoogle } = useAuth();
+  const { login, loginWithGoogle, unlockWithBiometric } = useAuth();
   const palette = useSensoryPalette();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -42,6 +45,57 @@ export default function LoginScreen() {
   const [pendingIdToken, setPendingIdToken] = useState<string | null>(null);
   const [coppaConsent, setCoppaConsent] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [biometric, setBiometric] = useState<{
+    armed: boolean;
+    email: string | null;
+    label: string;
+  }>({ armed: false, email: null, label: "" });
+  const [biometricLoading, setBiometricLoading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const [armed, support] = await Promise.all([
+        isBiometricUnlockArmed(),
+        getBiometricSupport(),
+      ]);
+      if (cancelled) return;
+      setBiometric({
+        armed: armed.armed && support.available && support.enrolled,
+        email: armed.email,
+        label: support.label,
+      });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleBiometricUnlock = async () => {
+    setError("");
+    setBiometricLoading(true);
+    try {
+      const result = await unlockWithBiometric();
+      if (!result.success) {
+        if (result.error === "biometric_token_invalid") {
+          // Helper wiped the gated copy; hide the button until next opt-in.
+          setBiometric({ armed: false, email: null, label: biometric.label });
+          setError(
+            t(
+              "auth.biometricSessionExpired",
+              "Your saved session has expired. Sign in again to re-enable biometric unlock.",
+            ),
+          );
+        } else {
+          setError(t("auth.biometricUnlockFailed", "Biometric unlock failed."));
+        }
+        return;
+      }
+      router.replace("/");
+    } finally {
+      setBiometricLoading(false);
+    }
+  };
 
   const discovery = AuthSession.useAutoDiscovery("https://accounts.google.com");
 
@@ -124,6 +178,23 @@ export default function LoginScreen() {
     color: palette.ink,
     backgroundColor: palette.bgRaised,
   } as const;
+
+  const biometricLabelText = biometric.label || "biometrics";
+  let biometricButtonLabel: string;
+  if (biometricLoading) {
+    biometricButtonLabel = t("auth.unlocking", "Unlocking…");
+  } else if (biometric.email) {
+    biometricButtonLabel = t("auth.unlockAs", {
+      label: biometricLabelText,
+      email: biometric.email,
+      defaultValue: `Unlock with ${biometricLabelText} as ${biometric.email}`,
+    });
+  } else {
+    biometricButtonLabel = t("auth.unlockWithBiometric", {
+      label: biometricLabelText,
+      defaultValue: `Unlock with ${biometricLabelText}`,
+    });
+  }
 
   return (
     <KeyboardAvoidingView
@@ -210,6 +281,26 @@ export default function LoginScreen() {
             fullWidth
             style={{ marginTop: spacing.sm }}
           />
+
+          {biometric.armed ? (
+            <Pressable
+              style={[
+                styles.biometricButton,
+                { borderColor: palette.primary, backgroundColor: palette.bgRaised },
+              ]}
+              onPress={handleBiometricUnlock}
+              disabled={biometricLoading}
+              accessibilityRole="button"
+              accessibilityLabel={t("auth.unlockWithBiometric", {
+                label: biometric.label || "biometrics",
+                defaultValue: `Unlock with ${biometric.label || "biometrics"}`,
+              })}
+            >
+              <Text style={[styles.biometricButtonText, { color: palette.primary }]}>
+                {biometricButtonLabel}
+              </Text>
+            </Pressable>
+          ) : null}
 
           <View style={styles.dividerRow}>
             <View style={[styles.dividerLine, { backgroundColor: palette.border }]} />
@@ -413,6 +504,18 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
   },
   pinButtonText: {
+    fontSize: 15,
+    fontFamily: fontFamilies.bodyBold,
+  },
+  biometricButton: {
+    marginTop: spacing.md,
+    alignItems: "center",
+    justifyContent: "center",
+    height: 52,
+    borderRadius: 9999,
+    borderWidth: 1.5,
+  },
+  biometricButtonText: {
     fontSize: 15,
     fontFamily: fontFamilies.bodyBold,
   },
