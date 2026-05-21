@@ -7,10 +7,12 @@ import { useAuth } from "@/hooks/useAuth";
 import { useParentInbox } from "@/hooks/useParentInbox";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { RoleTabletShell } from "@/src/components/layout/RoleTabletShell";
+import { useTabBarStyle, TAB_BAR_LABEL_STYLE } from "@/hooks/useTabBarStyle";
 
 export default function ParentLayout() {
   const { t } = useTranslation();
   const { isTablet } = useWindowSizeClass();
+  const tabBarStyle = useTabBarStyle({ hidden: isTablet });
   const { user } = useAuth();
   const { data: inbox } = useParentInbox(user?.id ?? "");
   const unreadCount = inbox?.unreadCount ?? 0;
@@ -41,7 +43,7 @@ export default function ParentLayout() {
     {
       key: "billing",
       label: t("parent.billing"),
-      icon: "card-outline" as const,
+      icon: "card" as const,
       active: pathname?.includes("/billing"),
       onPress: () => router.push("/(parent)/billing" as Href),
     },
@@ -60,19 +62,8 @@ export default function ParentLayout() {
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textSecondary,
-        tabBarStyle: isTablet
-          ? { display: "none" }
-          : {
-              backgroundColor: colors.card,
-              borderTopColor: colors.border,
-              height: 84,
-              paddingBottom: 20,
-              paddingTop: 8,
-            },
-        tabBarLabelStyle: {
-          fontFamily: "Nunito-SemiBold",
-          fontSize: 11,
-        },
+        tabBarStyle,
+        tabBarLabelStyle: TAB_BAR_LABEL_STYLE,
       }}
     >
       <Tabs.Screen

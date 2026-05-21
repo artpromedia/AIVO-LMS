@@ -58,7 +58,7 @@ export default function ShellShowcase() {
         linkAs: Link,
         brand: (
           <span className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-iw-control bg-[var(--aivo-color-aivoPurple-100)]">
+            <span className="flex h-8 w-8 items-center justify-center rounded-iw-control bg-[var(--aivo-aivoPurple-100)]">
               <AivoIcon name="aiSparkle" tone="brand" className="h-4 w-4" />
             </span>
             <span className="font-semibold text-iw-text-strong">AIVO</span>

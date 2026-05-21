@@ -28,11 +28,11 @@ export interface SectionCardProps {
 const BADGE_TONE: Record<NonNullable<SectionCardProps["badgeTone"]>, string> = {
   neutral: "bg-iw-card text-iw-text-muted border border-iw-border",
   info:
-    "bg-[var(--aivo-color-aivoTeal-100,#ccfbf1)] text-[var(--aivo-color-aivoTeal-700,#0f766e)]",
+    "bg-[var(--aivo-aivoTeal-100)] text-[var(--aivo-aivoTeal-700)]",
   success:
-    "bg-[var(--aivo-domain-completion-completed-subtle,#dcfce7)] text-[var(--aivo-domain-completion-completed-strong,#16a34a)]",
+    "bg-[var(--aivo-domain-completion-complete-subtle)] text-[var(--aivo-domain-completion-complete-strong)]",
   warning:
-    "bg-[var(--aivo-status-warning-subtle,#fef3c7)] text-[var(--aivo-status-warning-strong,#b45309)]",
+    "bg-iw-warm-soft text-[var(--aivo-status-warning)]",
 };
 
 export function SectionCard({
@@ -56,7 +56,7 @@ export function SectionCard({
     >
       <header className="flex items-start gap-3">
         {iconName ? (
-          <span className="inline-flex items-center justify-center h-9 w-9 rounded-iw-control bg-[var(--aivo-color-aivoPurple-100,#ede9fe)] text-[var(--aivo-sensory-primary,#7c3aed)] shrink-0">
+          <span className="inline-flex items-center justify-center h-9 w-9 rounded-iw-control bg-[var(--aivo-aivoPurple-100)] text-[var(--aivo-sensory-primary)] shrink-0">
             <AivoIcon name={iconName} size={20} />
           </span>
         ) : null}
@@ -88,7 +88,7 @@ export function SectionCard({
         <footer className="pt-1">
           <Link
             href={cta.href}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--aivo-sensory-primary,#7c3aed)] hover:underline"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--aivo-sensory-primary)] hover:underline"
           >
             {cta.label}
             <AivoIcon name="goal" size={14} />

@@ -19,14 +19,13 @@ export default function ParentHomeV2Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // eslint-disable-next-line no-console
     console.error("[parent/home-v2]", error);
   }, [error]);
 
   return (
-    <main className="min-h-screen bg-[var(--aivo-color-surface-canvas,#f4f6f5)] flex items-center justify-center p-6">
+    <main className="min-h-screen bg-[var(--aivo-color-surface-canvas)] flex items-center justify-center p-6">
       <div className="max-w-lg w-full rounded-iw-card-lg bg-white border border-iw-border shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)] p-8 flex flex-col gap-4 text-center">
-        <div className="self-center inline-flex items-center justify-center h-14 w-14 rounded-full bg-[var(--aivo-status-warning-subtle,#fef3c7)] text-[var(--aivo-status-warning-strong,#b45309)]">
+        <div className="self-center inline-flex items-center justify-center h-14 w-14 rounded-full bg-iw-warm-soft text-[var(--aivo-status-warning)]">
           <AivoIcon name="safetyFlag" size={28} />
         </div>
         <h1 className="text-xl font-semibold text-iw-text-strong">

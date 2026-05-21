@@ -124,7 +124,7 @@ export default async function DistrictAdminHome() {
                       </span>
                     </div>
                     <div
-                      className="h-2 w-full overflow-hidden rounded-full bg-[var(--aivo-color-surface-muted)]"
+                      className="h-2 w-full overflow-hidden rounded-full bg-[var(--aivo-color-surface-sunken)]"
                       role="presentation"
                     >
                       <div

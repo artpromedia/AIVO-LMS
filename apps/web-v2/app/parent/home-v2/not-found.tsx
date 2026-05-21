@@ -9,9 +9,9 @@ import { AivoIcon } from "@aivo/ui/icon";
  */
 export default function ParentHomeV2NotFound() {
   return (
-    <main className="min-h-screen bg-[var(--aivo-color-surface-canvas,#f4f6f5)] flex items-center justify-center p-6">
+    <main className="min-h-screen bg-[var(--aivo-color-surface-canvas)] flex items-center justify-center p-6">
       <div className="max-w-lg w-full rounded-iw-card-lg bg-white border border-iw-border shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)] p-8 flex flex-col gap-4 text-center">
-        <div className="self-center inline-flex items-center justify-center h-14 w-14 rounded-full bg-[var(--aivo-color-aivoTeal-100,#ccfbf1)] text-[var(--aivo-color-aivoTeal-700,#0f766e)]">
+        <div className="self-center inline-flex items-center justify-center h-14 w-14 rounded-full bg-[var(--aivo-aivoTeal-100)] text-[var(--aivo-aivoTeal-700)]">
           <AivoIcon name="aiBrain" size={28} />
         </div>
         <h1 className="text-xl font-semibold text-iw-text-strong">
@@ -25,7 +25,7 @@ export default function ParentHomeV2NotFound() {
         <div className="flex flex-col sm:flex-row gap-2 justify-center pt-2">
           <Link
             href="/parent/home-v2"
-            className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-iw-control bg-[var(--aivo-sensory-primary,#7c3aed)] text-white font-semibold hover:opacity-95"
+            className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold hover:opacity-95"
           >
             Back to parent home
           </Link>

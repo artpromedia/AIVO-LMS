@@ -84,7 +84,7 @@ export default function LearnerHomeDesignSystemPage() {
             title="Identifying main idea"
             body="A short story and a couple of friendly questions. About 12 minutes."
             companion={
-              <span className="w-12 h-12 rounded-full inline-flex items-center justify-center text-2xl bg-[var(--aivo-color-aivoOrange-50)] text-[var(--aivo-color-aivoOrange-700)]" aria-hidden="true">
+              <span className="w-12 h-12 rounded-full inline-flex items-center justify-center text-2xl bg-[var(--aivo-aivoOrange-50)] text-[var(--aivo-aivoOrange-700)]" aria-hidden="true">
                 📚
               </span>
             }
@@ -118,7 +118,7 @@ export default function LearnerHomeDesignSystemPage() {
               masteryLabel="On grade"
               masteryPct={72}
               icon="📚"
-              accent="var(--aivo-color-aivoOrange-600)"
+              accent="var(--aivo-aivoOrange-600)"
               nextAction="Identifying main idea"
               support="Read-aloud on"
               teacherAssigned={2}
@@ -140,7 +140,7 @@ export default function LearnerHomeDesignSystemPage() {
               masteryLabel="Strong"
               masteryPct={88}
               icon="🔬"
-              accent="var(--aivo-color-aivoTeal-600)"
+              accent="var(--aivo-aivoTeal-600)"
               nextAction="Plant life cycles"
               support="Supports on"
             />

@@ -324,7 +324,7 @@ export default async function IEPReviewPage({
                 </div>
               </div>
 
-              <div className="rounded-iw-card border border-iw-border bg-[var(--aivo-color-aivoPurple-50)]/40 p-4">
+              <div className="rounded-iw-card border border-iw-border bg-[var(--aivo-aivoPurple-50)]/40 p-4">
                 <p className="iw-label text-iw-text-muted mb-2">Learner-safe summary</p>
                 <p className="text-sm text-iw-text-strong leading-relaxed">
                   {ex.learnerSafeSummary}

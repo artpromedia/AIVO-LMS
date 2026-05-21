@@ -55,7 +55,43 @@ const cssBlock = (selector, vars) => {
   return `${selector} {\n${lines.join("\n")}\n}`;
 };
 
-const baseVars = flatten({
+// Base CSS variables. Emitted in TWO shapes for every value:
+//
+//   1. NAMESPACED (preferred for new code) — each token block keeps its
+//      source-name as the leading segment of the var name:
+//          tokens.radius.sm        → --aivo-radius-sm
+//          tokens.breakpoint.sm    → --aivo-breakpoint-sm
+//          tokens.shadow.soft-1    → --aivo-shadow-soft-1
+//          tokens.color.status.X   → --aivo-color-status-X
+//          tokens.color.aivoPurple → --aivo-color-aivoPurple-100
+//          tokens.semantic.color.surface.base
+//                                  → --aivo-semantic-color-surface-base
+//      This shape eliminates the collisions the legacy emission had —
+//      most notably tokens.radius.{sm,md,lg,xl,2xl} colliding with
+//      tokens.breakpoint.{sm,md,lg,xl,2xl} on flat `--aivo-{key}` slots.
+//
+//   2. LEGACY FLAT (kept for backwards compat with existing app code
+//      and the in-tree preset.cjs). Same value, just no namespace
+//      segment. This mirrors what the build emitted before — including
+//      the breakpoint↔radius collision (breakpoint wins, last-spread).
+//      New code SHOULD prefer the namespaced shape above; do not add
+//      new references to flat names in app code.
+//
+// Apps that don't yet migrate continue to work because both shapes
+// resolve to identical values.
+const baseVarsNamespaced = flatten({
+  color: tokens.color,
+  typography: tokens.typography,
+  radius: tokens.radius,
+  spacing: tokens.spacing,
+  shadow: tokens.shadow,
+  motion: tokens.motion,
+  zIndex: tokens.zIndex,
+  breakpoint: tokens.breakpoint,
+  semantic: tokens.semantic,
+});
+
+const baseVarsLegacy = flatten({
   ...tokens.color,
   ...tokens.typography,
   ...tokens.radius,
@@ -66,6 +102,8 @@ const baseVars = flatten({
   ...tokens.breakpoint,
   ...tokens.semantic,
 });
+
+const baseVars = [...baseVarsNamespaced, ...baseVarsLegacy];
 
 const themeVars = Object.entries(tokens.modes.theme).map(([name, values]) =>
   cssBlock(`[data-theme=\"${name}\"]`,
@@ -122,19 +160,34 @@ const css = [
 
 const ts = `export const playfulCalmTokens = ${JSON.stringify(tokens, null, 2)} as const;\nexport type PlayfulCalmTokens = typeof playfulCalmTokens;\n`;
 
+// IMPORTANT — keep var names in sync with what the CSS layer actually
+// emits.
+//
+// build-tokens spreads `tokens.color`, `tokens.semantic`, etc. directly
+// into baseVars. That means brand-scale palettes (aivoPurple, aivoTeal,
+// aivoOrange, meadow, sunshine, lavender, status) end up as flat
+// `--aivo-{name}-{step}` vars with NO `color-` infix, and semantic
+// blocks end up as `--aivo-color-{group}-{key}` (the leading `color`
+// comes from the semantic.color subtree, not the top-level `color`
+// namespace).
+//
+// Earlier versions of this preset assumed a `--aivo-color-aivoPurple-N`
+// / `--aivo-semantic-color-...` shape that was never emitted. Every
+// utility built on those refs silently fell back to nothing. The refs
+// below are the ones that actually resolve in `dist/css/tokens.css`.
 const preset = `module.exports = {
   theme: {
     extend: {
       colors: {
         brand: {
-          primary: "var(--aivo-semantic-color-interactive-primary-default)",
-          secondary: "var(--aivo-semantic-color-interactive-secondary-default)",
-          meadow: "var(--aivo-color-meadow-400)",
-          sunshine: "var(--aivo-color-sunshine-400)",
-          lavender: "var(--aivo-color-lavender-400)",
-          canvas: "var(--aivo-semantic-color-surface-canvas)",
-          surface: "var(--aivo-semantic-color-surface-base)",
-          ink: "var(--aivo-semantic-color-text-primary)"
+          primary: "var(--aivo-color-interactive-primary-default)",
+          secondary: "var(--aivo-color-interactive-secondary-default)",
+          meadow: "var(--aivo-meadow-400)",
+          sunshine: "var(--aivo-sunshine-400)",
+          lavender: "var(--aivo-lavender-400)",
+          canvas: "var(--aivo-color-surface-canvas)",
+          surface: "var(--aivo-color-surface-base)",
+          ink: "var(--aivo-color-text-primary)"
         },
         // Inclusive-Warm sensory-mode-aware semantic tokens. These resolve
         // through CSS variables, so the same Tailwind class repaints itself
@@ -154,7 +207,11 @@ const preset = `module.exports = {
           "ink-muted": "var(--aivo-sensory-inkMuted)",
           border: "var(--aivo-sensory-border)",
           ring: "var(--aivo-sensory-ringFocus)",
-          // Brand scales (flat, sensory-independent)
+          // Brand scales (flat, sensory-independent). Uses the
+          // namespaced emission (--aivo-color-aivoPurple-N) added by
+          // the dual-emit build. The legacy flat --aivo-aivoPurple-N
+          // form continues to resolve identically for any consumer that
+          // still references it directly.
           purple: {
             50:  "var(--aivo-color-aivoPurple-50)",
             100: "var(--aivo-color-aivoPurple-100)",
@@ -194,7 +251,11 @@ const preset = `module.exports = {
             900: "var(--aivo-color-aivoOrange-900)",
             950: "var(--aivo-color-aivoOrange-950)"
           },
-          // Universal status
+          // Universal status — now namespaced via --aivo-color-status-X
+          // (no more collision with --aivo-status-X if/when we add
+          // mode-scoped status overrides). The brand-scale status
+          // palette is intentional here; the semantic feedback palette
+          // (--aivo-semantic-color-feedback-X) reads differently.
           success: "var(--aivo-color-status-success)",
           warning: "var(--aivo-color-status-warning)",
           error:   "var(--aivo-color-status-error)",
@@ -270,12 +331,18 @@ const preset = `module.exports = {
           }
         }
       },
+      // Radius. The dual-emit build now exposes properly namespaced
+      // --aivo-radius-{key} forms which can't collide with
+      // --aivo-breakpoint-{key}, so we use the long form here and add
+      // back md/lg/xl/2xl entries that the previous emit couldn't
+      // safely reach.
       borderRadius: {
-        md: "var(--aivo-radius-md)",
-        lg: "var(--aivo-radius-lg)",
-        xl: "var(--aivo-radius-xl)",
-        "2xl": "var(--aivo-radius-2xl)",
-        pill: "var(--aivo-radius-pill)",
+        sm:        "var(--aivo-radius-sm)",
+        md:        "var(--aivo-radius-md)",
+        lg:        "var(--aivo-radius-lg)",
+        xl:        "var(--aivo-radius-xl)",
+        "2xl":     "var(--aivo-radius-2xl)",
+        pill:      "var(--aivo-radius-pill)",
         "iw-card": "var(--aivo-radius-card)",
         "iw-card-lg": "var(--aivo-radius-cardLg)",
         "iw-hero": "var(--aivo-radius-hero)",
@@ -283,6 +350,7 @@ const preset = `module.exports = {
         "iw-chip": "var(--aivo-radius-chip)",
         "iw-sheet-top": "var(--aivo-radius-sheetTop)"
       },
+      // Shadow — namespaced.
       boxShadow: {
         "soft-1": "var(--aivo-shadow-soft-1)",
         "soft-3": "var(--aivo-shadow-soft-3)",
@@ -296,7 +364,13 @@ const preset = `module.exports = {
         "iw-hero": "linear-gradient(180deg, var(--aivo-sensory-bgPage) 0%, var(--aivo-sensory-bgRaised) 70%)"
       },
       fontFamily: {
-        "iw-display": ["var(--font-aivo-display)", "Inter Display", "Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        // Display stack. Satoshi Variable is the AIVO display face
+        // (loaded via the Fontshare <link> in apps/web-v2/app/layout.tsx
+        // and apps/marketing's equivalent). It MUST sit before the
+        // next/font Inter variable — otherwise the variable resolves
+        // first and headlines silently fall back to Inter even though
+        // the Satoshi stylesheet is downloaded.
+        "iw-display": ["Satoshi Variable", "var(--font-aivo-display)", "Inter Display", "Inter", "ui-sans-serif", "system-ui", "sans-serif"],
         "iw-body": ["var(--font-aivo-body)", "Inter", "ui-sans-serif", "system-ui", "sans-serif"],
         "iw-dyslexia": ["var(--font-aivo-dyslexia)", "Atkinson Hyperlegible", "OpenDyslexic", "Inter", "ui-sans-serif", "system-ui", "sans-serif"]
       },

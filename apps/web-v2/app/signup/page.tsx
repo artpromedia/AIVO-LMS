@@ -61,7 +61,7 @@ export default function SignupPage() {
                 <li className="flex items-start gap-3">
                   <span
                     aria-hidden="true"
-                    className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--aivo-color-aivoPurple-100,#ede9fe)] text-[var(--aivo-sensory-primary,#7c3aed)]"
+                    className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--aivo-aivoPurple-100)] text-[var(--aivo-sensory-primary)]"
                   >
                     <AivoIcon name="aiSparkle" size={16} />
                   </span>
@@ -70,7 +70,7 @@ export default function SignupPage() {
                 <li className="flex items-start gap-3">
                   <span
                     aria-hidden="true"
-                    className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--aivo-color-aivoTeal-100,#ccfbf1)] text-[var(--aivo-color-aivoTeal-700,#0f766e)]"
+                    className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--aivo-aivoTeal-100)] text-[var(--aivo-aivoTeal-700)]"
                   >
                     <AivoIcon name="safetyOk" size={16} />
                   </span>
@@ -79,7 +79,7 @@ export default function SignupPage() {
                 <li className="flex items-start gap-3">
                   <span
                     aria-hidden="true"
-                    className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--aivo-color-aivoPurple-100,#ede9fe)] text-[var(--aivo-sensory-primary,#7c3aed)]"
+                    className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--aivo-aivoPurple-100)] text-[var(--aivo-sensory-primary)]"
                   >
                     <AivoIcon name="curriculum" size={16} />
                   </span>
@@ -103,7 +103,7 @@ export default function SignupPage() {
                 Already have one?{" "}
                 <Link
                   href="/login"
-                  className="font-semibold text-[var(--aivo-sensory-primary,#7c3aed)] hover:underline"
+                  className="font-semibold text-[var(--aivo-sensory-primary)] hover:underline"
                 >
                   Sign in
                 </Link>

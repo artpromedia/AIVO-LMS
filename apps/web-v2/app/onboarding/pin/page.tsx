@@ -95,14 +95,14 @@ function PinRing({
         aria-invalid={error ? true : undefined}
         className={`h-14 px-3 rounded-iw-control bg-white border text-center text-2xl font-bold tracking-[0.6em] tabular-nums outline-none transition-colors ${
           error
-            ? "border-[var(--aivo-status-error-strong)] focus:ring-2 focus:ring-[var(--aivo-status-error-strong)]/30"
+            ? "border-[var(--aivo-status-error)] focus:ring-2 focus:ring-[var(--aivo-status-error)]/30"
             : "border-iw-border focus:border-[var(--aivo-sensory-primary)] focus:ring-2 focus:ring-[var(--aivo-sensory-primary)]/20"
         }`}
       />
       {error ? (
         <p
           role="alert"
-          className="text-xs text-[var(--aivo-status-error-strong)]"
+          className="text-xs text-[var(--aivo-status-error)]"
         >
           {error}
         </p>

@@ -5,15 +5,17 @@ import { colors } from "@/constants/colors";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { RoleTabletShell } from "@/src/components/layout/RoleTabletShell";
+import { useTabBarStyle, TAB_BAR_LABEL_STYLE } from "@/hooks/useTabBarStyle";
 
 export default function TherapistLayout() {
   const { t } = useTranslation();
   const { isTablet } = useWindowSizeClass();
   const pathname = usePathname();
+  const tabBarStyle = useTabBarStyle({ hidden: isTablet });
   const railDestinations = [
     { key: "index", label: t("tabs.clients"), icon: "people" as const, active: pathname === "/(therapist)" || pathname === "/" || pathname === "/(therapist)/index", onPress: () => router.push("/(therapist)" as Href) },
-    { key: "sessions", label: t("tabs.sessions"), icon: "calendar-outline" as const, active: pathname?.includes("/sessions"), onPress: () => router.push("/(therapist)/sessions" as Href) },
-    { key: "settings", label: t("tabs.settings"), icon: "settings-outline" as const, active: pathname?.includes("/settings"), onPress: () => router.push("/(therapist)/settings" as Href) },
+    { key: "sessions", label: t("tabs.sessions"), icon: "calendar" as const, active: pathname?.includes("/sessions"), onPress: () => router.push("/(therapist)/sessions" as Href) },
+    { key: "settings", label: t("tabs.settings"), icon: "settings" as const, active: pathname?.includes("/settings"), onPress: () => router.push("/(therapist)/settings" as Href) },
   ];
   return (
     <RoleTabletShell destinations={railDestinations}>
@@ -22,16 +24,8 @@ export default function TherapistLayout() {
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textSecondary,
-        tabBarStyle: isTablet
-          ? { display: "none" }
-          : {
-              backgroundColor: colors.card,
-              borderTopColor: colors.border,
-              height: 84,
-              paddingBottom: 20,
-              paddingTop: 8,
-            },
-        tabBarLabelStyle: { fontFamily: "Nunito-SemiBold", fontSize: 11 },
+        tabBarStyle,
+        tabBarLabelStyle: TAB_BAR_LABEL_STYLE,
       }}
     >
       <Tabs.Screen
@@ -46,7 +40,7 @@ export default function TherapistLayout() {
         options={{
           title: t("tabs.sessions"),
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="calendar-outline" size={size} color={color} />
+            <Ionicons name="calendar" size={size} color={color} />
           ),
         }}
       />
@@ -55,7 +49,7 @@ export default function TherapistLayout() {
         options={{
           title: t("tabs.settings"),
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="settings-outline" size={size} color={color} />
+            <Ionicons name="settings" size={size} color={color} />
           ),
         }}
       />

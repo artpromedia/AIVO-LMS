@@ -154,7 +154,7 @@ export default async function PlatformAdminHome() {
           <Link
             key={k}
             href={href}
-            className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aivo-primary rounded-[var(--aivo-radius-card)]"
+            className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aivo-primary rounded-iw-card"
           >
             <Card className="h-full p-[var(--aivo-density-card-pad)] transition-shadow group-hover:shadow-md">
               <div className="flex items-start justify-between gap-3">
@@ -281,7 +281,7 @@ export default async function PlatformAdminHome() {
             <Link
               key={c.href}
               href={c.href}
-              className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aivo-primary rounded-[var(--aivo-radius-card)]"
+              className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aivo-primary rounded-iw-card"
             >
               <Card className="h-full p-[var(--aivo-density-card-pad)] transition-shadow group-hover:shadow-md">
                 <div className="flex items-center justify-between">
@@ -298,7 +298,7 @@ export default async function PlatformAdminHome() {
         </div>
       </section>
 
-      <div className="mt-6 flex items-center justify-between rounded-[var(--aivo-radius-card)] border border-aivo-border bg-aivo-surface-2 p-4 text-sm">
+      <div className="mt-6 flex items-center justify-between rounded-iw-card border border-aivo-border bg-aivo-surface-2 p-4 text-sm">
         <div className="flex items-center gap-2 text-aivo-ink-soft">
           <DollarSign className="h-4 w-4" />
           <span>

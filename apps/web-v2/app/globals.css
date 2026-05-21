@@ -9,21 +9,33 @@
 @config "../tailwind.config.cjs";
 
 @theme {
-  --color-aivo-ink: var(--aivo-semantic-color-text-primary);
-  --color-aivo-ink-soft: var(--aivo-semantic-color-text-secondary);
-  --color-aivo-muted: var(--aivo-semantic-color-text-muted);
-  --color-aivo-surface: var(--aivo-semantic-color-surface-base);
-  --color-aivo-surface-2: var(--aivo-semantic-color-surface-sunken);
-  --color-aivo-border: var(--aivo-semantic-color-border-default);
-  --color-aivo-primary: var(--aivo-semantic-color-interactive-primary-default);
-  --color-aivo-primary-fg: var(--aivo-semantic-color-text-onPrimary);
-  --color-aivo-primary-soft: var(--aivo-color-calmSky-100);
-  --color-aivo-accent: var(--aivo-color-sunshine-400);
-  --color-aivo-success: var(--aivo-semantic-color-feedback-success);
-  --color-aivo-warning: var(--aivo-semantic-color-feedback-warning);
-  --color-aivo-danger: var(--aivo-semantic-color-feedback-error);
-  --font-sans: var(--aivo-typography-fontFamily-body);
-  --font-display: var(--aivo-typography-fontFamily-display);
+  /* Base @aivo/brand var refs. The build emits semantic blocks (text,
+     surface, border, interactive, feedback) as `--aivo-color-{group}-...`
+     and brand-scale palettes as flat `--aivo-{name}-{step}` — no
+     `--aivo-semantic-*` and no `--aivo-color-{palette}-` infix exists.
+     Earlier versions of this file referenced `--aivo-semantic-*` /
+     `--aivo-typography-fontFamily-*` / `--aivo-color-calmSky-*` —
+     none of those vars are ever defined, so the values below were
+     silently unset until each per-role-theme block (further down)
+     overrode them with literal OKLCH values. The refs below are the
+     real names that resolve in dist/css/tokens.css. */
+  --color-aivo-ink: var(--aivo-color-text-primary);
+  --color-aivo-ink-soft: var(--aivo-color-text-secondary);
+  --color-aivo-muted: var(--aivo-color-text-muted);
+  --color-aivo-surface: var(--aivo-color-surface-base);
+  --color-aivo-surface-2: var(--aivo-color-surface-sunken);
+  --color-aivo-border: var(--aivo-color-border-default);
+  --color-aivo-primary: var(--aivo-color-interactive-primary-default);
+  --color-aivo-primary-fg: var(--aivo-color-text-onPrimary);
+  --color-aivo-primary-soft: var(--aivo-calmSky-100);
+  --color-aivo-accent: var(--aivo-sunshine-400);
+  --color-aivo-success: var(--aivo-color-feedback-success);
+  --color-aivo-warning: var(--aivo-color-feedback-warning);
+  --color-aivo-danger: var(--aivo-color-feedback-error);
+  --font-sans: var(--aivo-fontFamily-body);
+  --font-display: var(--aivo-fontFamily-display);
+  /* Base card radius. The namespaced --aivo-radius-* form resolves
+     correctly post brand dual-emit (no breakpoint collision). */
   --radius-card: var(--aivo-radius-xl);
   /* Sidebar/page chrome — overridden per role theme. */
   --color-aivo-sidebar-bg: var(--color-aivo-surface);
@@ -73,13 +85,16 @@ body {
    other will silently stop applying.
    ===================================================================== */
 
-/* PARENT — warm, calm, trustworthy. Slight cream tint, current primary,
-   gentler page background. Closest to the original AIVO look. */
+/* PARENT — warm, calm, trustworthy. Slight cream tint for the page
+   chrome, violet primary, soft violet (NOT peach) for active states so
+   the active nav pill harmonizes with the primary CTA color instead of
+   clashing with it. Peach is preserved as the accent for warm moments
+   (rewards, milestones), not as the active-state surface. */
 [data-role-theme="parent"] {
   --color-aivo-surface: oklch(0.995 0.008 80);
   --color-aivo-surface-2: oklch(0.965 0.018 75);
   --color-aivo-primary: oklch(0.56 0.14 265);
-  --color-aivo-primary-soft: oklch(0.94 0.04 75);
+  --color-aivo-primary-soft: oklch(0.95 0.035 280);
   --color-aivo-accent: oklch(0.74 0.16 55);
   --color-aivo-page-bg: oklch(0.965 0.018 75);
   --color-aivo-sidebar-bg: oklch(0.99 0.012 75);
@@ -121,6 +136,8 @@ body {
   --aivo-sensory-ringFocus: oklch(0.54 0.25 278);
 }
 
+/* Per-age-mode card radius. Pulls from the namespaced
+   --aivo-radius-{2xl,xl,lg} forms (now safe post brand dual-emit). */
 [data-age-mode="sprout"] {
   --radius-card: var(--aivo-radius-2xl);
   --aivo-density-card-pad: 1.5rem;
@@ -145,12 +162,12 @@ body {
    `aivo.typeface` cookie so the root layout can SSR the attribute and
    avoid font-swap flash on first paint). Override every body-font
    variable (Tailwind `font-sans`, the `font-iw-body` family, and the
-   brand `--aivo-typography-fontFamily-body` ramp) so any text reading
-   from any of them lands on Atkinson Hyperlegible / OpenDyslexic. */
+   brand `--aivo-fontFamily-body` ramp) so any text reading from any of
+   them lands on Atkinson Hyperlegible / OpenDyslexic. */
 [data-typeface="dyslexia"] {
-  --font-sans: var(--aivo-typography-fontFamily-dyslexia);
+  --font-sans: var(--aivo-fontFamily-dyslexia);
   --font-aivo-body: var(--font-aivo-dyslexia);
-  --aivo-typography-fontFamily-body: var(--aivo-typography-fontFamily-dyslexia);
+  --aivo-fontFamily-body: var(--aivo-fontFamily-dyslexia);
 }
 
 /* User-requested reduced motion. The OS-level `prefers-reduced-motion`

@@ -105,7 +105,7 @@ export default async function Page() {
             <Link
               key={href}
               href={href}
-              className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aivo-primary rounded-[var(--aivo-radius-card)]"
+              className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-aivo-primary rounded-iw-card"
             >
               <Card className="h-full p-[var(--aivo-density-card-pad)] transition-shadow group-hover:shadow-md">
                 <div className="flex items-start justify-between">

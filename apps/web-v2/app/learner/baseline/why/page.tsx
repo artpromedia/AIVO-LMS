@@ -50,7 +50,7 @@ export default async function BaselineWhyPage() {
       headerLeft={
         <Link
           href="/learner/home"
-          className="inline-flex items-center gap-1.5 rounded-iw-control px-3 py-1.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-muted)]"
+          className="inline-flex items-center gap-1.5 rounded-iw-control px-3 py-1.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
         >
           <svg
             className="w-4 h-4"
@@ -101,7 +101,7 @@ export default async function BaselineWhyPage() {
 
       <section className="grid gap-3 md:grid-cols-3">
         <article className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-2">
-          <span className="w-9 h-9 rounded-iw-control bg-[var(--aivo-color-aivoPurple-50)] text-[var(--aivo-color-aivoPurple-700)] flex items-center justify-center" aria-hidden="true">
+          <span className="w-9 h-9 rounded-iw-control bg-[var(--aivo-aivoPurple-50)] text-[var(--aivo-aivoPurple-700)] flex items-center justify-center" aria-hidden="true">
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
               <polyline points="14 2 14 8 20 8" />
@@ -114,7 +114,7 @@ export default async function BaselineWhyPage() {
           </p>
         </article>
         <article className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-2">
-          <span className="w-9 h-9 rounded-iw-control bg-[var(--aivo-color-aivoTeal-50)] text-[var(--aivo-color-aivoTeal-700)] flex items-center justify-center" aria-hidden="true">
+          <span className="w-9 h-9 rounded-iw-control bg-[var(--aivo-aivoTeal-50)] text-[var(--aivo-aivoTeal-700)] flex items-center justify-center" aria-hidden="true">
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
               <polyline points="22 4 12 14.01 9 11.01" />
@@ -126,7 +126,7 @@ export default async function BaselineWhyPage() {
           </p>
         </article>
         <article className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-2">
-          <span className="w-9 h-9 rounded-iw-control bg-[var(--aivo-color-aivoOrange-50)] text-[var(--aivo-color-aivoOrange-700)] flex items-center justify-center" aria-hidden="true">
+          <span className="w-9 h-9 rounded-iw-control bg-[var(--aivo-aivoOrange-50)] text-[var(--aivo-aivoOrange-700)] flex items-center justify-center" aria-hidden="true">
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
             </svg>
