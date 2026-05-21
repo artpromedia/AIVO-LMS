@@ -10,7 +10,7 @@
   "dependencies": {
     "@aivo/brand": "workspace:*",
     "lucide-react": "^0.513.0",
-    "next": "^15.3.3",
+    "next": "^15.5.18",
     "next-intl": "^4.9.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
