@@ -1,11 +1,12 @@
 "use client";
+import { MARKETING_ACCENTS } from "@aivo/brand";
 import { useTranslations } from "next-intl";
 
 const LEVELS = [
   {
     level: 1,
     icon: "📖",
-    color: "#7C3AED",
+    color: MARKETING_ACCENTS.purple,
     bg: "from-violet-500 to-purple-600",
     nameKey: "l1_name",
     descKey: "l1_desc",
@@ -16,7 +17,7 @@ const LEVELS = [
   {
     level: 2,
     icon: "🤝",
-    color: "#06B6D4",
+    color: MARKETING_ACCENTS.cyan,
     bg: "from-cyan-500 to-teal-600",
     nameKey: "l2_name",
     descKey: "l2_desc",
@@ -27,7 +28,7 @@ const LEVELS = [
   {
     level: 3,
     icon: "🧩",
-    color: "#F59E0B",
+    color: MARKETING_ACCENTS.amber,
     bg: "from-amber-400 to-orange-500",
     nameKey: "l3_name",
     descKey: "l3_desc",
@@ -38,7 +39,7 @@ const LEVELS = [
   {
     level: 4,
     icon: "🎨",
-    color: "#10B981",
+    color: MARKETING_ACCENTS.emerald,
     bg: "from-emerald-500 to-green-600",
     nameKey: "l4_name",
     descKey: "l4_desc",
@@ -49,7 +50,7 @@ const LEVELS = [
   {
     level: 5,
     icon: "✨",
-    color: "#EC4899",
+    color: MARKETING_ACCENTS.pink,
     bg: "from-pink-500 to-rose-600",
     nameKey: "l5_name",
     descKey: "l5_desc",

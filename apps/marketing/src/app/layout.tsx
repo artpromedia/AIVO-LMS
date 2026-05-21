@@ -180,7 +180,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           }}
         />
       </head>
-      <body className="font-body antialiased bg-[var(--aivo-sensory-bgPage,#f4f6f5)] text-[var(--aivo-sensory-ink,#090909)]">
+      <body className="font-body antialiased bg-[var(--aivo-sensory-bgPage)] text-[var(--aivo-sensory-ink)]">
         <GoogleAnalytics />
         <I18nProvider initialMessages={enMessages}>{children}</I18nProvider>
       </body>

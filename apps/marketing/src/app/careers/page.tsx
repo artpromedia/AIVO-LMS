@@ -1,4 +1,5 @@
 "use client";
+import { MARKETING_ACCENTS } from "@aivo/brand";
 import { CompanyPageLayout } from "@/components/marketing/legal/CompanyPageLayout";
 
 const PERKS = [
@@ -39,7 +40,7 @@ const PERKS = [
 const DEPARTMENTS = [
   {
     name: "Engineering",
-    color: "#7c3aed",
+    color: MARKETING_ACCENTS.purple,
     roles: [
       { title: "Senior Full-Stack Engineer", type: "Full-time", location: "Remote" },
       { title: "AI/ML Engineer — Brain Clone", type: "Full-time", location: "Remote" },
@@ -48,7 +49,7 @@ const DEPARTMENTS = [
   },
   {
     name: "Education & Content",
-    color: "#059669",
+    color: MARKETING_ACCENTS.emeraldDeep,
     roles: [
       { title: "Curriculum Designer — Special Education", type: "Full-time", location: "Remote" },
       { title: "Content Writer — K-12 Learning", type: "Contract", location: "Remote" },
@@ -56,7 +57,7 @@ const DEPARTMENTS = [
   },
   {
     name: "Sales & Growth",
-    color: "#2563eb",
+    color: MARKETING_ACCENTS.blue,
     roles: [
       {
         title: "Enterprise Sales — School Districts",
@@ -76,7 +77,7 @@ export default function CareersPage() {
       title="Join the AIVO Team"
       subtitle="Help us build a world where every student gets the personalized education they deserve. We're always looking for passionate people."
       icon="🚀"
-      accentColor="#059669"
+      accentColor={MARKETING_ACCENTS.emeraldDeep}
     >
       <section className="mb-16">
         <h2 className="text-2xl font-heading font-bold text-slate-900 mb-8">Why Work at AIVO?</h2>

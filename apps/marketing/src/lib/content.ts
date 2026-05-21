@@ -1,3 +1,5 @@
+import { MARKETING_ACCENTS } from "@aivo/brand";
+
 export type ContentKind = "blog" | "guide";
 
 export type ContentArticle = {
@@ -20,7 +22,7 @@ export const CONTENT: ContentArticle[] = [
     slug: "what-is-personalized-learning",
     kind: "blog",
     category: "Personalized Learning",
-    categoryColor: "#7c3aed",
+    categoryColor: MARKETING_ACCENTS.purple,
     title: "What Is Personalized Learning?",
     excerpt:
       "Personalized learning means the path adapts to the learner — pacing, support, examples, and next steps. Here is what that means in practice, in plain language.",
@@ -58,7 +60,7 @@ export const CONTENT: ContentArticle[] = [
     slug: "parent-progress-without-jargon",
     kind: "blog",
     category: "Parent Guides",
-    categoryColor: "#059669",
+    categoryColor: MARKETING_ACCENTS.emeraldDeep,
     title: "How Parents Can Understand Learning Progress Without Jargon",
     excerpt:
       "Progress should be readable. A short guide to what AIVO's parent summaries actually mean — and which terms you can safely ignore.",
@@ -96,7 +98,7 @@ export const CONTENT: ContentArticle[] = [
     slug: "what-is-a-baseline-assessment",
     kind: "blog",
     category: "Assessments",
-    categoryColor: "#2563eb",
+    categoryColor: MARKETING_ACCENTS.blue,
     title: "What Is a Baseline Assessment?",
     excerpt:
       "Not a test. Not a grade. A short, adaptive starting point so the lesson plan begins at the right place, not too easy and not too hard.",
@@ -134,7 +136,7 @@ export const CONTENT: ContentArticle[] = [
     slug: "read-aloud-and-scaffolds",
     kind: "blog",
     category: "Accessibility",
-    categoryColor: "#d97706",
+    categoryColor: MARKETING_ACCENTS.amberDeep,
     title: "How Read-Aloud and Scaffolds Support Learners",
     excerpt:
       "Support is not a shortcut. A short look at when AIVO offers read-aloud, hints, examples, and reduced cognitive load — and when it pulls back.",
@@ -172,7 +174,7 @@ export const CONTENT: ContentArticle[] = [
     slug: "school-buying-checklist-ai-learning",
     kind: "guide",
     category: "School Implementation",
-    categoryColor: "#0891b2",
+    categoryColor: MARKETING_ACCENTS.cyanDeep,
     title: "What Schools Should Ask Before Buying AI Learning Tools",
     excerpt:
       'A procurement-friendly checklist: data boundaries, learner privacy, teacher workflow fit, accessibility, and what "AI-powered" actually has to mean.',
@@ -224,7 +226,7 @@ export const CONTENT: ContentArticle[] = [
     slug: "how-aivo-thinks-about-privacy",
     kind: "guide",
     category: "Privacy & Safety",
-    categoryColor: "#7c3aed",
+    categoryColor: MARKETING_ACCENTS.purple,
     title: "How AIVO Thinks About Privacy and Learner Data",
     excerpt:
       "A short, plain version of the privacy posture: no learner data to foundation-model training, parent-default authority under 13, deletion within 30 days.",

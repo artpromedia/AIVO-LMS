@@ -75,7 +75,7 @@ export default async function Home() {
           <div className="max-w-6xl mx-auto px-6 md:px-8 grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div className="max-w-2xl relative z-10">
               <span className="inline-flex items-center gap-2 mb-7 py-1.5 px-3.5 rounded-full border border-slate-200 bg-white text-slate-700 font-semibold text-xs tracking-wide uppercase">
-                <ShieldCheck className="w-3.5 h-3.5 text-[var(--aivo-sensory-primary,#7c3aed)]" aria-hidden="true" />
+                <ShieldCheck className="w-3.5 h-3.5 text-[var(--aivo-sensory-primary)]" aria-hidden="true" />
                 FERPA &amp; COPPA Compliant
               </span>
               <h1 className="font-heading text-4xl md:text-6xl font-bold tracking-tight leading-[1.05] mb-7 text-slate-900">
@@ -84,7 +84,7 @@ export default async function Home() {
                   <span
                     className="relative z-10 bg-clip-text text-transparent"
                     style={{
-                      backgroundImage: "linear-gradient(135deg, #3b82f6 0%, #a78bfa 100%)",
+                      backgroundImage: "linear-gradient(135deg, var(--aivo-calmSky-500) 0%, var(--aivo-aivoPurple-400) 100%)",
                     }}
                   >
                     adapts
@@ -100,7 +100,7 @@ export default async function Home() {
               <div className="flex flex-col sm:flex-row gap-3">
                 <a
                   href={`${WEB_APP_URL}/signup?plan=family`}
-                  className="inline-flex items-center justify-center h-12 px-6 text-[15px] rounded-xl bg-[var(--aivo-sensory-primary,#7c3aed)] hover:brightness-110 text-white font-semibold shadow-[0_6px_20px_-6px_rgba(124,58,237,0.45)] transition min-h-[44px]"
+                  className="inline-flex items-center justify-center h-12 px-6 text-[15px] rounded-xl bg-[var(--aivo-sensory-primary)] hover:brightness-110 text-white font-semibold shadow-[0_6px_20px_-6px_rgba(124,58,237,0.45)] transition min-h-[44px]"
                 >
                   Start Family Trial
                   <ArrowRight className="ml-2 w-4 h-4" aria-hidden="true" />
@@ -115,13 +115,13 @@ export default async function Home() {
               </div>
               <div className="mt-9 flex items-center gap-4 text-sm font-medium text-slate-600">
                 <div className="flex -space-x-3" aria-hidden="true">
-                  <div className="w-10 h-10 rounded-full border-2 border-white bg-[#dbeafe] flex items-center justify-center text-[#1e40af] font-bold text-xs">
+                  <div className="w-10 h-10 rounded-full border-2 border-white bg-[var(--aivo-calmSky-100)] flex items-center justify-center text-[var(--aivo-calmSky-800)] font-bold text-xs">
                     S
                   </div>
-                  <div className="w-10 h-10 rounded-full border-2 border-white bg-[#fef3c7] flex items-center justify-center text-[#92400e] font-bold text-xs">
+                  <div className="w-10 h-10 rounded-full border-2 border-white bg-[var(--aivo-sunshine-100)] flex items-center justify-center text-[var(--aivo-sunshine-800)] font-bold text-xs">
                     M
                   </div>
-                  <div className="w-10 h-10 rounded-full border-2 border-white bg-[#ede9fe] flex items-center justify-center text-[#5b21b6] font-bold text-xs">
+                  <div className="w-10 h-10 rounded-full border-2 border-white bg-[var(--aivo-aivoPurple-100)] flex items-center justify-center text-[var(--aivo-aivoPurple-800)] font-bold text-xs">
                     J
                   </div>
                 </div>
@@ -328,7 +328,7 @@ export default async function Home() {
         <section className="py-24 md:py-32" aria-labelledby="cta-heading">
           <div className="max-w-6xl mx-auto px-6 md:px-8">
             <div
-              className="text-white shadow-[0_30px_80px_-30px_rgba(76,29,149,0.45)] rounded-3xl md:rounded-[2rem] overflow-hidden border-0 relative bg-gradient-to-br from-[var(--aivo-sensory-primary,#7c3aed)] to-indigo-800"
+              className="text-white shadow-[0_30px_80px_-30px_rgba(76,29,149,0.45)] rounded-3xl md:rounded-[2rem] overflow-hidden border-0 relative bg-gradient-to-br from-[var(--aivo-sensory-primary)] to-indigo-800"
             >
               <div
                 className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"
@@ -350,7 +350,7 @@ export default async function Home() {
                   <div className="flex flex-col sm:flex-row gap-3">
                     <a
                       href={`${WEB_APP_URL}/signup?plan=family`}
-                      className="inline-flex items-center justify-center h-12 bg-white text-[var(--aivo-sensory-primary,#7c3aed)] hover:bg-slate-50 rounded-xl text-[15px] font-bold px-6 min-h-[44px] transition"
+                      className="inline-flex items-center justify-center h-12 bg-white text-[var(--aivo-sensory-primary)] hover:bg-slate-50 rounded-xl text-[15px] font-bold px-6 min-h-[44px] transition"
                     >
                       Start Family Trial
                     </a>

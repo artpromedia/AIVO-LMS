@@ -1,3 +1,4 @@
+import { MARKETING_ACCENTS } from "@aivo/brand";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -25,7 +26,7 @@ export default function LevelsIndex() {
   return (
     <LandingPageLayout
       badge="Functioning Levels"
-      badgeColor="#7c3aed"
+      badgeColor={MARKETING_ACCENTS.purple}
       title="Five levels. One platform. Every learner."
       subtitle="AIVO is the only AI learning platform built to serve learners across the full spectrum — from grade-level academics down to pre-symbolic, partner-assisted communication."
       breadcrumbs={[

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { MARKETING_ACCENTS } from "@aivo/brand";
 import { CompanyPageLayout } from "@/components/marketing/legal/CompanyPageLayout";
 import { ContactForm } from "@/components/marketing/forms";
 import { SITE_URL } from "@/lib/constants";
@@ -16,28 +17,28 @@ const CONTACTS = [
     title: "General Inquiries",
     description: "Questions about AIVO Learning? We'd love to hear from you.",
     email: "hello@aivolearning.com",
-    color: "#7c3aed",
+    color: MARKETING_ACCENTS.purple,
   },
   {
     icon: "🛡️",
     title: "Privacy & Data",
     description: "Questions about data privacy, COPPA, FERPA, or student records.",
     email: "privacy@aivolearning.com",
-    color: "#059669",
+    color: MARKETING_ACCENTS.emeraldDeep,
   },
   {
     icon: "🎯",
     title: "Customer Support",
     description: "Need help with your AIVO account or a technical issue?",
     email: "support@aivolearning.com",
-    color: "#d97706",
+    color: MARKETING_ACCENTS.amberDeep,
   },
   {
     icon: "📰",
     title: "Press & Media",
     description: "Media inquiries, press releases, and partnership opportunities.",
     email: "press@aivolearning.com",
-    color: "#ec4899",
+    color: MARKETING_ACCENTS.pink,
   },
 ];
 
@@ -48,7 +49,7 @@ export default function ContactPage() {
       title="Talk to a real person."
       subtitle="Pick the right inbox or send us a message — we typically reply within one business day."
       icon="💬"
-      accentColor="#7c3aed"
+      accentColor={MARKETING_ACCENTS.purple}
       breadcrumbSlug="contact"
       breadcrumbLabel="Contact"
     >

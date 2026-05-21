@@ -1,4 +1,5 @@
 "use client";
+import { MARKETING_ACCENTS } from "@aivo/brand";
 import Image from "next/image";
 import Link from "next/link";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -11,35 +12,35 @@ const PRINCIPLES = [
     title: "Truly Personalized",
     description:
       "Every interaction adapts to the individual learner's Brain Clone, a unique AI profile that understands how each student learns best.",
-    color: "#7c3aed",
+    color: MARKETING_ACCENTS.purple,
   },
   {
     icon: "♿",
     title: "Inclusive by Design",
     description:
       "Built from the ground up for all functioning levels, with deep IEP integration ensuring every student gets the support they need.",
-    color: "#059669",
+    color: MARKETING_ACCENTS.emeraldDeep,
   },
   {
     icon: "🤖",
     title: "AI-Native",
     description:
       "Not AI-bolted-on. The AI IS the product. Every feature is powered by advanced artificial intelligence, not retrofitted with it.",
-    color: "#2563eb",
+    color: MARKETING_ACCENTS.blue,
   },
   {
     icon: "📊",
     title: "Measurably Effective",
     description:
       "Data-driven outcomes with transparent progress tracking. Parents and educators always know exactly where students stand.",
-    color: "#d97706",
+    color: MARKETING_ACCENTS.amberDeep,
   },
   {
     icon: "🎮",
     title: "Joyful Learning",
     description:
       "Gamification, personality-rich tutors, and engaging content make learning something students look forward to every day.",
-    color: "#ec4899",
+    color: MARKETING_ACCENTS.pink,
   },
 ];
 
@@ -49,28 +50,28 @@ const VALUES = [
     title: "Innovation",
     description:
       "We push the boundaries of what's possible in education technology, using cutting-edge AI to solve real learning challenges.",
-    color: "#7c3aed",
+    color: MARKETING_ACCENTS.purple,
   },
   {
     icon: "🤝",
     title: "Inclusion",
     description:
       "Every decision we make is guided by our commitment to serving all learners, regardless of ability, background, or learning style.",
-    color: "#059669",
+    color: MARKETING_ACCENTS.emeraldDeep,
   },
   {
     icon: "🛡️",
     title: "Integrity",
     description:
       "We protect student data fiercely, communicate honestly with families and educators, and hold ourselves to the highest ethical standards.",
-    color: "#2563eb",
+    color: MARKETING_ACCENTS.blue,
   },
   {
     icon: "🎯",
     title: "Impact",
     description:
       "We measure success by student outcomes. If it doesn't measurably help learners grow, we don't ship it.",
-    color: "#d97706",
+    color: MARKETING_ACCENTS.amberDeep,
   },
 ];
 
@@ -81,7 +82,7 @@ const LEADERS = [
     image: "/images/team/osuji.png",
     bio: "Ikechukwu Osuji, MD, MPH, is a distinguished Internal Medicine physician and healthcare executive with over 35 years of global experience. He completed his Internal Medicine residency at Howard University — graduating top of his class — and earned a Master of Public Health from George Washington University specializing in International Health. Ike's career spans both clinical and executive leadership, serving as Chief of Staff at two U.S. hospitals and Medical Director of Ernest Health International, overseeing 26 hospitals nationwide.",
     linkedin: "https://www.linkedin.com/",
-    color: "#7c3aed",
+    color: MARKETING_ACCENTS.purple,
   },
   {
     name: "Ofem Ekapong Ofem",
@@ -89,7 +90,7 @@ const LEADERS = [
     image: "/images/team/ofem.png",
     bio: "Ofem Ofem is a business executive with nearly two decades of experience in workforce development, human capital strategy, and organizational leadership. He served as Managing Director of SmartCity Lagos, a $10 billion smart-city initiative assessed by PwC as one of the largest single foreign direct investments in Nigerian history. A published scholar completing his Doctor of Business Administration at Saint Mary's University of Minnesota with a focus on AI governance.",
     linkedin: "https://www.linkedin.com/in/ofem-ofem",
-    color: "#2563eb",
+    color: MARKETING_ACCENTS.blue,
   },
   {
     name: "Nnamdi Uzokwe",
@@ -97,7 +98,7 @@ const LEADERS = [
     image: "/images/team/nnamdi.jpg",
     bio: "Nnamdi Uzokwe is a retired U.S. Navy Reserves officer with over three decades of experience in medical device sales and entrepreneurship. His disciplined military leadership background and deep healthcare-industry relationships give AIVO a powerful commercial engine — from go-to-market strategy and channel partnerships to enterprise sales execution across school districts, therapy practices, and healthcare organizations.",
     linkedin: "https://www.linkedin.com/",
-    color: "#059669",
+    color: MARKETING_ACCENTS.emeraldDeep,
   },
   {
     name: "Edward Hamilton",
@@ -105,7 +106,7 @@ const LEADERS = [
     image: "/images/team/edward.png",
     bio: "Edward Hamilton is a veteran of the NYPD 911 system and a dedicated special education advocate. His years of frontline public service instilled a profound commitment to protecting and uplifting vulnerable communities. Edward bridges the gap between families navigating the complex special education system and the technology that can transform their children's outcomes.",
     linkedin: "https://www.linkedin.com/",
-    color: "#d97706",
+    color: MARKETING_ACCENTS.amberDeep,
   },
   {
     name: "Dr. Patrick Ukata",
@@ -113,7 +114,7 @@ const LEADERS = [
     image: "/images/team/patrick.png",
     bio: "Patrick Ukata, PhD, brings over three decades of experience in the education sector, with roles at American University (Washington, D.C.), George Washington University, and Johns Hopkins University. His deep expertise in curriculum development, instructional design, and regulatory compliance ensures AIVO's learning content meets the highest academic standards and accessibility requirements.",
     linkedin: "https://www.linkedin.com/",
-    color: "#ec4899",
+    color: MARKETING_ACCENTS.pink,
   },
 ];
 
@@ -156,7 +157,10 @@ export default function AboutPage() {
 
       <section
         className="relative overflow-hidden py-20 md:py-28"
-        style={{ background: "linear-gradient(135deg, #7c3aed08 0%, #7c3aed04 50%, #ffffff 100%)" }}
+        style={{
+          background:
+            "linear-gradient(135deg, color-mix(in srgb, var(--aivo-aivoPurple-600) 3%, transparent) 0%, color-mix(in srgb, var(--aivo-aivoPurple-600) 2%, transparent) 50%, var(--aivo-cloud-0) 100%)",
+        }}
       >
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full blur-3xl opacity-20 bg-purple-400" />

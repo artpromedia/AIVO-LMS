@@ -45,7 +45,7 @@ export function StickyHeader({
 
   return (
     <header
-      className={`sticky top-0 z-50 w-full bg-[var(--aivo-color-surface-canvas,#fdf6ec)]/85 backdrop-blur-xl border-b transition-shadow duration-300 ${
+      className={`sticky top-0 z-50 w-full bg-[var(--aivo-color-surface-canvas)]/85 backdrop-blur-xl border-b transition-shadow duration-300 ${
         isScrolled
           ? "shadow-sm border-slate-200/70"
           : "border-slate-200/40"
@@ -93,7 +93,7 @@ export function StickyHeader({
               trackCTAClick("header_get_started", `${WEB_APP_URL}/signup?plan=free`);
               trackSignupInitiation("header");
             }}
-            className="hidden sm:inline-flex items-center px-5 py-2.5 rounded-full bg-[var(--aivo-sensory-primary,#7c3aed)] text-white font-semibold text-sm hover:opacity-90 transition shadow-md shadow-purple-200 min-h-[44px] whitespace-nowrap"
+            className="hidden sm:inline-flex items-center px-5 py-2.5 rounded-full bg-[var(--aivo-sensory-primary)] text-white font-semibold text-sm hover:opacity-90 transition shadow-md shadow-purple-200 min-h-[44px] whitespace-nowrap"
           >
             {t("get_started")}
           </a>
@@ -143,7 +143,7 @@ export function StickyHeader({
                 trackCTAClick("mobile_menu_get_started", `${WEB_APP_URL}/signup?plan=free`);
                 trackSignupInitiation("mobile_menu");
               }}
-              className="px-4 py-3 bg-[var(--aivo-sensory-primary,#7c3aed)] text-white font-semibold rounded-full text-center hover:opacity-90 transition min-h-[44px] flex items-center justify-center mt-2"
+              className="px-4 py-3 bg-[var(--aivo-sensory-primary)] text-white font-semibold rounded-full text-center hover:opacity-90 transition min-h-[44px] flex items-center justify-center mt-2"
             >
               {t("get_started")}
             </a>

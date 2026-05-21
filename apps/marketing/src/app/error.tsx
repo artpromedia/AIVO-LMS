@@ -12,7 +12,6 @@ export default function ErrorPage({
 }) {
   useEffect(() => {
     if (typeof window !== "undefined") {
-      // eslint-disable-next-line no-console
       console.error("[marketing-error]", error.message, error.digest);
     }
   }, [error]);

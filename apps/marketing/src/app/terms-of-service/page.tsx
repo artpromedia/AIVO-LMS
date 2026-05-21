@@ -1,3 +1,4 @@
+import { MARKETING_ACCENTS } from "@aivo/brand";
 import { LegalPageLayout } from "@/components/marketing/legal/LegalPageLayout";
 
 export default function TermsOfServicePage() {
@@ -9,7 +10,7 @@ export default function TermsOfServicePage() {
         'Welcome! We\'re glad you\'re interested in Aivo AI Learning Technologies Inc., a U.S. company that builds adaptive learning for neurodivergent learners. We own and operate the website at aivolearning.com, our mobile apps, our APIs, and any other products or services we may offer now or in the future. Together, we call all these our "Services." You\'re entering into a legal agreement with us, AIVO, when you use our Services. Whether you\'re just visiting our sites or actively using our Services, we\'ll refer to you as a "User" or collectively as "Users." These Terms of Service, together with our Privacy Policy, Cookie Policy, COPPA Compliance Notice, FERPA Compliance Notice, and any additional Guidelines (collectively, the "Terms"), set the rules for your use of our Services. PLEASE READ THESE TERMS CAREFULLY. BY REGISTERING FOR, ACCESSING, BROWSING, OR USING THE SERVICES, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE TO BE BOUND BY THESE TERMS. THESE TERMS INCLUDE A BINDING ARBITRATION PROVISION AND A CLASS ACTION WAIVER.'
       }
       icon="📜"
-      accentColor="#2563eb"
+      accentColor={MARKETING_ACCENTS.blue}
       lastUpdated="December 15, 2026"
       contactEmail="legal@aivolearning.com"
       sections={[

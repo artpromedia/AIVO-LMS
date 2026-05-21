@@ -1,3 +1,4 @@
+import { MARKETING_ACCENTS } from "@aivo/brand";
 import type { Metadata } from "next";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { SITE_URL } from "@/lib/constants";
@@ -51,7 +52,7 @@ export default function Page() {
   return (
     <LandingPageLayout
       badge="Feature · Today's Mission"
-      badgeColor="#7c3aed"
+      badgeColor={MARKETING_ACCENTS.purple}
       title="One next-best learning action, every day"
       subtitle="Today's Mission is the calm answer to “what should my child work on right now?” — one clear lesson, picked for this learner, today."
       primaryCtaLabel="Start parent setup"

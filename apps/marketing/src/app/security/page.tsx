@@ -1,3 +1,4 @@
+import { MARKETING_ACCENTS } from "@aivo/brand";
 import type { Metadata } from "next";
 import { LegalPageLayout } from "@/components/marketing/legal/LegalPageLayout";
 import { SITE_URL } from "@/lib/constants";
@@ -16,7 +17,7 @@ export default function SecurityPage() {
       title="How we protect your data."
       subtitle="AIVO is designed to support the security expectations of families and schools. This page is procurement-friendly: it describes what we actually do today, what we're building toward, and how to reach our security team."
       icon="🛡️"
-      accentColor="#0d9488"
+      accentColor={MARKETING_ACCENTS.tealDeep}
       lastUpdated="May 17, 2026"
       contactEmail="security@aivolearning.com"
       sections={[

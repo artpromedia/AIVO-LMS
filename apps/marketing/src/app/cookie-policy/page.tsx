@@ -1,3 +1,4 @@
+import { MARKETING_ACCENTS } from "@aivo/brand";
 import { LegalPageLayout } from "@/components/marketing/legal/LegalPageLayout";
 
 export default function CookiePolicyPage() {
@@ -7,7 +8,7 @@ export default function CookiePolicyPage() {
       title="Cookie Policy"
       subtitle={`This Cookie Policy explains how Aivo AI Learning Technologies Inc. ("AIVO", "we", "us") uses cookies and similar technologies on aivolearning.com, app.aivolearning.com, and our mobile and tablet applications (together, the "Services"). It tells you what cookies we use, why we use them, how long they last, and the choices you have.`}
       icon="🍪"
-      accentColor="#ea580c"
+      accentColor={MARKETING_ACCENTS.orange}
       lastUpdated="April 1, 2026"
       contactEmail="privacy@aivolearning.com"
       sections={[

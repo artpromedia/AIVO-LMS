@@ -1,3 +1,4 @@
+import { MARKETING_ACCENTS } from "@aivo/brand";
 import type { Metadata } from "next";
 import { LegalPageLayout } from "@/components/marketing/legal/LegalPageLayout";
 import { SITE_URL } from "@/lib/constants";
@@ -16,7 +17,7 @@ export default function TrustPage() {
       title="What we promise — and how to check."
       subtitle="A short, honest summary of how AIVO behaves around learners, families, and teachers. Every claim here is something we can show evidence for if you ask."
       icon="🤝"
-      accentColor="#7c3aed"
+      accentColor={MARKETING_ACCENTS.purple}
       lastUpdated="May 17, 2026"
       contactEmail="trust@aivolearning.com"
       sections={[
