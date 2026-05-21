@@ -1,3 +1,4 @@
+import { MARKETING_ACCENTS } from "@aivo/brand";
 import type { Metadata } from "next";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { SITE_URL } from "@/lib/constants";
@@ -24,7 +25,7 @@ export default function Page() {
   return (
     <LandingPageLayout
       badge="Feature · Homework Helper"
-      badgeColor="#059669"
+      badgeColor={MARKETING_ACCENTS.emeraldDeep}
       title="Guided help, never an answer dump"
       subtitle="Homework Helper walks learners through the problem step by step — clarifying, scaffolding, and recommending what to learn next. It is designed to teach, not to cheat."
       primaryCtaLabel="Start parent setup"

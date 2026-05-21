@@ -1,4 +1,5 @@
 "use client";
+import { MARKETING_ACCENTS } from "@aivo/brand";
 import Image from "next/image";
 import { CompanyPageLayout } from "@/components/marketing/legal/CompanyPageLayout";
 
@@ -19,7 +20,7 @@ export default function PressKitPage() {
       title="Media Resources"
       subtitle="Everything you need to tell the AIVO story. Download logos, read our fact sheet, and get in touch with our press team."
       icon="📰"
-      accentColor="#d97706"
+      accentColor={MARKETING_ACCENTS.amberDeep}
     >
       <section className="mb-16">
         <h2 className="text-2xl font-heading font-bold text-slate-900 mb-6">Company Overview</h2>
@@ -86,12 +87,12 @@ export default function PressKitPage() {
           <h3 className="font-heading font-bold text-slate-900 mb-3">Brand Colors</h3>
           <div className="flex flex-wrap gap-4">
             {[
-              { name: "AIVO Purple", hex: "#7C3AED", textWhite: true },
-              { name: "Deep Purple", hex: "#6D28D9", textWhite: true },
-              { name: "Teal", hex: "#06B6D4", textWhite: true },
-              { name: "Emerald", hex: "#10B981", textWhite: true },
-              { name: "Amber", hex: "#F59E0B", textWhite: false },
-              { name: "Slate 900", hex: "#0F172A", textWhite: true },
+              { name: "AIVO Purple", hex: MARKETING_ACCENTS.purple, textWhite: true },
+              { name: "Deep Purple", hex: MARKETING_ACCENTS.purpleDeep, textWhite: true },
+              { name: "Teal", hex: MARKETING_ACCENTS.cyan, textWhite: true },
+              { name: "Emerald", hex: MARKETING_ACCENTS.emerald, textWhite: true },
+              { name: "Amber", hex: MARKETING_ACCENTS.amber, textWhite: false },
+              { name: "Slate 900", hex: MARKETING_ACCENTS.slate, textWhite: true },
             ].map((c) => (
               <div key={c.hex} className="flex items-center gap-3">
                 <div

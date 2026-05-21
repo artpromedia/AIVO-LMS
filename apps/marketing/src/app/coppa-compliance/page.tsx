@@ -1,3 +1,4 @@
+import { MARKETING_ACCENTS } from "@aivo/brand";
 import { LegalPageLayout } from "@/components/marketing/legal/LegalPageLayout";
 
 export default function CoppaCompliancePage() {
@@ -7,7 +8,7 @@ export default function CoppaCompliancePage() {
       title="COPPA Compliance Statement"
       subtitle={`This statement describes how Aivo AI Learning Technologies Inc. complies with the Children's Online Privacy Protection Act of 1998 ("COPPA") and the Federal Trade Commission's COPPA Rule (16 C.F.R. Part 312). It is the official Direct Notice to Parents required by the Rule and is intended to be read together with our Privacy Policy and Cookie Policy.`}
       icon="🛡️"
-      accentColor="#059669"
+      accentColor={MARKETING_ACCENTS.emeraldDeep}
       lastUpdated="April 1, 2026"
       contactEmail="privacy@aivolearning.com"
       sections={[

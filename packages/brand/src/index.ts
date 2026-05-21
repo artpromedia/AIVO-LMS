@@ -329,3 +329,46 @@ export const BRAIN_VISUAL_IDENTITY_PALETTE = {
   FunctioningLevel,
   { primary: string; secondaries: readonly [string, string] }
 >;
+
+/**
+ * Marketing-site accent palette.
+ *
+ * `apps/marketing` decorates principle cards, tutor avatars, blog
+ * categories, audience badges and legal-page headers with concrete
+ * accent hex values. Several of those are composed at runtime with an
+ * 8-bit alpha suffix (`` `${color}15` ``) for tinted backgrounds, so they
+ * must remain plain hex strings rather than CSS variables.
+ *
+ * The `no-restricted-syntax` lint rule in `eslint.config.mjs` forbids
+ * hex literals inside `apps/marketing`, so the literal values live here
+ * in `@aivo/brand` (the documented source of truth) — mirroring how
+ * `BRAIN_VISUAL_IDENTITY_PALETTE` centralizes the brain-clone palette
+ * for `apps/web-v2`.
+ */
+export const MARKETING_ACCENTS = {
+  purple: "#7C3AED",
+  purpleDeep: "#6D28D9",
+  violet: "#8B5CF6",
+  orchid: "#A855F7",
+  indigo: "#6366F1",
+  blue: "#2563EB",
+  blueDeep: "#1E40AF",
+  cyan: "#06B6D4",
+  cyanDeep: "#0891B2",
+  teal: "#14B8A6",
+  tealDeep: "#0D9488",
+  emerald: "#10B981",
+  emeraldDeep: "#059669",
+  green: "#22C55E",
+  amber: "#F59E0B",
+  amberDeep: "#D97706",
+  amberDark: "#92400E",
+  orange: "#EA580C",
+  pink: "#EC4899",
+  pinkDeep: "#DB2777",
+  fuchsia: "#D946EF",
+  red: "#EF4444",
+  slate: "#0F172A",
+} as const;
+
+export type MarketingAccent = keyof typeof MARKETING_ACCENTS;

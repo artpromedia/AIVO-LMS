@@ -94,7 +94,7 @@ export function CompanyPageLayout({
       <div
         className="relative overflow-hidden py-16 md:py-24"
         style={{
-          background: `linear-gradient(135deg, ${accentColor}08 0%, ${accentColor}04 50%, #ffffff 100%)`,
+          background: `linear-gradient(135deg, ${accentColor}08 0%, ${accentColor}04 50%, var(--aivo-cloud-0) 100%)`,
         }}
       >
         <div className="absolute inset-0 pointer-events-none">

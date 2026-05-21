@@ -4,6 +4,8 @@
  * page can be a pure RSC and ship as static HTML for SEO.
  */
 
+import { MARKETING_ACCENTS } from "@aivo/brand";
+
 export type Audience = {
   slug: string;
   badge: string;
@@ -21,7 +23,7 @@ export const AUDIENCES: Audience[] = [
   {
     slug: "for-parents",
     badge: "For Parents",
-    badgeColor: "#7c3aed",
+    badgeColor: MARKETING_ACCENTS.purple,
     title: "An AI tutor that finally meets your child where they are",
     metaTitle: "AIVO for Parents – Personalized AI Tutoring for Every Child",
     metaDescription:
@@ -74,7 +76,7 @@ export const AUDIENCES: Audience[] = [
   {
     slug: "for-teachers",
     badge: "For Teachers",
-    badgeColor: "#0891b2",
+    badgeColor: MARKETING_ACCENTS.cyanDeep,
     title: "Differentiated instruction, finally automated",
     metaTitle: "AIVO for Teachers – AI-Powered Differentiation for Every Classroom",
     metaDescription:
@@ -123,7 +125,7 @@ export const AUDIENCES: Audience[] = [
   {
     slug: "for-schools",
     badge: "For Schools",
-    badgeColor: "#0891b2",
+    badgeColor: MARKETING_ACCENTS.cyanDeep,
     title: "Personalized learning across your whole building",
     metaTitle: "AIVO for Schools – AI Adaptive Learning for K-12 Buildings",
     metaDescription:
@@ -168,7 +170,7 @@ export const AUDIENCES: Audience[] = [
   {
     slug: "for-districts",
     badge: "For Districts",
-    badgeColor: "#1e40af",
+    badgeColor: MARKETING_ACCENTS.blueDeep,
     title: "Scalable, IEP-aware AI for every learner in your district",
     metaTitle: "AIVO for Districts – District-Wide AI Adaptive Learning Platform",
     metaDescription:
@@ -217,7 +219,7 @@ export const AUDIENCES: Audience[] = [
   {
     slug: "for-special-education",
     badge: "Special Education",
-    badgeColor: "#db2777",
+    badgeColor: MARKETING_ACCENTS.pinkDeep,
     title: "AI built from the ground up for IEP and 504 learners",
     metaTitle: "AIVO for Special Education – IEP-Aware AI Tutoring & Progress Monitoring",
     metaDescription:
@@ -266,7 +268,7 @@ export const AUDIENCES: Audience[] = [
   {
     slug: "for-homeschool",
     badge: "For Homeschool",
-    badgeColor: "#d97706",
+    badgeColor: MARKETING_ACCENTS.amberDeep,
     title: "Your AI co-teacher for every subject, every learner",
     metaTitle: "AIVO for Homeschool – AI Tutors That Adapt to Every Child",
     metaDescription:

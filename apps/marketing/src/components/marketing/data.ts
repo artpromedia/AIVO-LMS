@@ -1,10 +1,11 @@
+import { MARKETING_ACCENTS } from "@aivo/brand";
 import type { Tutor } from "./TutorCarousel";
 
 export const TUTORS: Tutor[] = [
   {
     name: "Nova",
     domain: "Mathematics",
-    color: "#7C3AED",
+    color: MARKETING_ACCENTS.purple,
     bg: "from-violet-500 to-purple-600",
     tagline: "Numbers come alive with Nova.",
     bullets: [
@@ -17,7 +18,7 @@ export const TUTORS: Tutor[] = [
   {
     name: "Sage",
     domain: "English Language Arts",
-    color: "#10B981",
+    color: MARKETING_ACCENTS.emerald,
     bg: "from-emerald-500 to-green-600",
     tagline: "Every child has a story worth telling.",
     bullets: [
@@ -30,7 +31,7 @@ export const TUTORS: Tutor[] = [
   {
     name: "Spark",
     domain: "Science",
-    color: "#F59E0B",
+    color: MARKETING_ACCENTS.amber,
     bg: "from-amber-400 to-orange-500",
     tagline: "Curiosity is the best experiment.",
     bullets: [
@@ -43,7 +44,7 @@ export const TUTORS: Tutor[] = [
   {
     name: "Chrono",
     domain: "History & Social Studies",
-    color: "#6366F1",
+    color: MARKETING_ACCENTS.indigo,
     bg: "from-indigo-500 to-blue-600",
     tagline: "Travel through time, one lesson at a time.",
     bullets: [
@@ -56,7 +57,7 @@ export const TUTORS: Tutor[] = [
   {
     name: "Pixel",
     domain: "Coding & Technology",
-    color: "#06B6D4",
+    color: MARKETING_ACCENTS.cyan,
     bg: "from-cyan-500 to-teal-600",
     tagline: "Build the future, one block at a time.",
     bullets: [
@@ -69,7 +70,7 @@ export const TUTORS: Tutor[] = [
   {
     name: "Echo",
     domain: "Speech & Communication",
-    color: "#EC4899",
+    color: MARKETING_ACCENTS.pink,
     bg: "from-pink-500 to-rose-600",
     tagline: "Find your voice, at your own pace.",
     bullets: [
@@ -82,7 +83,7 @@ export const TUTORS: Tutor[] = [
   {
     name: "Harmony",
     domain: "Social-Emotional Learning",
-    color: "#8B5CF6",
+    color: MARKETING_ACCENTS.violet,
     bg: "from-violet-400 to-purple-500",
     tagline: "Feelings are superpowers when you understand them.",
     bullets: [
@@ -95,7 +96,7 @@ export const TUTORS: Tutor[] = [
   {
     name: "Atlas",
     domain: "Geography & World Studies",
-    color: "#14B8A6",
+    color: MARKETING_ACCENTS.teal,
     bg: "from-teal-500 to-emerald-600",
     tagline: "Explore every corner of the world.",
     bullets: [
@@ -108,7 +109,7 @@ export const TUTORS: Tutor[] = [
   {
     name: "Cadence",
     domain: "Music & Rhythm",
-    color: "#D946EF",
+    color: MARKETING_ACCENTS.fuchsia,
     bg: "from-fuchsia-500 to-pink-600",
     tagline: "Every learner has a rhythm inside.",
     bullets: [
@@ -121,7 +122,7 @@ export const TUTORS: Tutor[] = [
   {
     name: "Vigor",
     domain: "Physical Education & Wellness",
-    color: "#22C55E",
+    color: MARKETING_ACCENTS.green,
     bg: "from-green-500 to-lime-600",
     tagline: "Move, play, and grow stronger.",
     bullets: [
@@ -134,7 +135,7 @@ export const TUTORS: Tutor[] = [
   {
     name: "Lingua",
     domain: "World Languages",
-    color: "#EF4444",
+    color: MARKETING_ACCENTS.red,
     bg: "from-red-500 to-rose-600",
     tagline: "Open doors with every new word.",
     bullets: [
@@ -147,7 +148,7 @@ export const TUTORS: Tutor[] = [
   {
     name: "Forge",
     domain: "STEM & Engineering",
-    color: "#92400E",
+    color: MARKETING_ACCENTS.amberDark,
     bg: "from-amber-700 to-yellow-800",
     tagline: "Design, build, and engineer the future.",
     bullets: [
@@ -160,7 +161,7 @@ export const TUTORS: Tutor[] = [
   {
     name: "Compass",
     domain: "Executive Function & Life Skills",
-    color: "#1E40AF",
+    color: MARKETING_ACCENTS.blueDeep,
     bg: "from-blue-700 to-indigo-800",
     tagline: "Navigate life with confidence.",
     bullets: [
@@ -173,7 +174,7 @@ export const TUTORS: Tutor[] = [
   {
     name: "Muse",
     domain: "Creative Arts & Expression",
-    color: "#A855F7",
+    color: MARKETING_ACCENTS.orchid,
     bg: "from-purple-500 to-fuchsia-600",
     tagline: "Create without limits.",
     bullets: [

@@ -26,7 +26,6 @@ export const consoleProvider: AnalyticsProvider = {
   },
   track(event, payload) {
     if (typeof window !== "undefined") {
-      // eslint-disable-next-line no-console
       console.debug("[analytics]", event, payload ?? {});
     }
   },

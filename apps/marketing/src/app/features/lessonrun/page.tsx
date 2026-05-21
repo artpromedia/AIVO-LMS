@@ -1,3 +1,4 @@
+import { MARKETING_ACCENTS } from "@aivo/brand";
 import type { Metadata } from "next";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { SITE_URL } from "@/lib/constants";
@@ -38,7 +39,7 @@ export default function Page() {
   return (
     <LandingPageLayout
       badge="Feature · LessonRun"
-      badgeColor="#2563eb"
+      badgeColor={MARKETING_ACCENTS.blue}
       title="The personalized learning unit behind every AIVO lesson"
       subtitle="LessonRun is what happens after the learner taps Start. Tutor-guided, scaffolded, sensory-aware — and quietly building a real picture of mastery."
       primaryCtaLabel="Start parent setup"

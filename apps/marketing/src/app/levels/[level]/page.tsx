@@ -1,3 +1,4 @@
+import { MARKETING_ACCENTS } from "@aivo/brand";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -38,7 +39,7 @@ export default async function LevelPage({ params }: Props) {
   return (
     <LandingPageLayout
       badge={`Level ${lvl.level}`}
-      badgeColor="#7c3aed"
+      badgeColor={MARKETING_ACCENTS.purple}
       title={`Level ${lvl.level}: ${lvl.name}`}
       subtitle={lvl.short}
       breadcrumbs={[

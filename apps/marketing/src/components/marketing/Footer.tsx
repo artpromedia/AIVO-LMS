@@ -32,7 +32,7 @@ function NewsletterSignup() {
   return (
     <form onSubmit={handleSubmit} className="mt-6" aria-label="Subscribe to AIVO newsletter">
       <p className="text-sm text-slate-600 font-medium mb-2.5">Stay updated with AIVO news</p>
-      <div className="flex items-center w-full max-w-sm rounded-full bg-white border border-slate-200 focus-within:border-[var(--aivo-sensory-primary,#7c3aed)] focus-within:ring-2 focus-within:ring-purple-300/30 transition overflow-hidden">
+      <div className="flex items-center w-full max-w-sm rounded-full bg-white border border-slate-200 focus-within:border-[var(--aivo-sensory-primary)] focus-within:ring-2 focus-within:ring-purple-300/30 transition overflow-hidden">
         <input
           type="email"
           required
@@ -47,7 +47,7 @@ function NewsletterSignup() {
         <button
           type="submit"
           disabled={status === "submitting" || status === "success"}
-          className="m-1 inline-flex items-center justify-center gap-1.5 rounded-full bg-[var(--aivo-sensory-primary,#7c3aed)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition disabled:opacity-70 shrink-0 min-h-10"
+          className="m-1 inline-flex items-center justify-center gap-1.5 rounded-full bg-[var(--aivo-sensory-primary)] px-5 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition disabled:opacity-70 shrink-0 min-h-10"
         >
           {status === "submitting" && (
             <>
@@ -151,7 +151,7 @@ export function Footer() {
             <p className="text-sm text-slate-600 leading-relaxed mb-5 max-w-xs">
               Engineered for the margins. Transformative for everyone.
             </p>
-            <div className="inline-flex items-center gap-2 bg-purple-50 border border-purple-100 px-4 py-2 rounded-full text-[var(--aivo-sensory-primary,#7c3aed)]">
+            <div className="inline-flex items-center gap-2 bg-purple-50 border border-purple-100 px-4 py-2 rounded-full text-[var(--aivo-sensory-primary)]">
               <ShieldCheck className="w-4 h-4" aria-hidden="true" />
               <span className="text-sm font-semibold whitespace-nowrap">
                 COPPA · FERPA · SOC 2
@@ -170,7 +170,7 @@ export function Footer() {
                   <li key={link.labelKey}>
                     <Link
                       href={link.href}
-                      className="text-sm text-slate-600 hover:text-[var(--aivo-sensory-primary,#7c3aed)] transition"
+                      className="text-sm text-slate-600 hover:text-[var(--aivo-sensory-primary)] transition"
                     >
                       {t(link.labelKey)}
                     </Link>
@@ -185,7 +185,7 @@ export function Footer() {
           <p className="text-sm text-slate-500">
             {t("copyright", { year: new Date().getFullYear() })}
           </p>
-          <div className="inline-flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-full text-[var(--aivo-sensory-primary,#7c3aed)]">
+          <div className="inline-flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-full text-[var(--aivo-sensory-primary)]">
             <ShieldCheck className="w-4 h-4" aria-hidden="true" />
             <span className="text-sm font-semibold">Secure &amp; Compliant</span>
           </div>

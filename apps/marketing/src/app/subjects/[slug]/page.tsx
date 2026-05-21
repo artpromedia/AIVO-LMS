@@ -1,3 +1,4 @@
+import { MARKETING_ACCENTS } from "@aivo/brand";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -43,7 +44,7 @@ export default async function SubjectPage({ params }: Props) {
   return (
     <LandingPageLayout
       badge={subject.name}
-      badgeColor="#0891b2"
+      badgeColor={MARKETING_ACCENTS.cyanDeep}
       title={`AI ${subject.name} tutoring with ${subject.tutorName}`}
       subtitle={subject.short}
       breadcrumbs={[

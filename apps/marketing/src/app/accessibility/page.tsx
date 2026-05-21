@@ -1,3 +1,4 @@
+import { MARKETING_ACCENTS } from "@aivo/brand";
 import { LegalPageLayout } from "@/components/marketing/legal/LegalPageLayout";
 
 export default function AccessibilityPage() {
@@ -7,7 +8,7 @@ export default function AccessibilityPage() {
       title="AIVO Accessibility Statement"
       subtitle={`At AIVO, accessibility is a direct extension of our mission to deliver a free, world-class adaptive education to every neurodivergent learner. We design our products to be usable by the widest possible range of people, including learners and adults with cognitive, sensory, motor, or speech disabilities, and we measure our work against established standards for digital accessibility.`}
       icon="♿"
-      accentColor="#8b5cf6"
+      accentColor={MARKETING_ACCENTS.violet}
       lastUpdated="April 1, 2026"
       contactEmail="accessibility@aivolearning.com"
       sections={[

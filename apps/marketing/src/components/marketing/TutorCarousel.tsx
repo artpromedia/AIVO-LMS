@@ -72,7 +72,7 @@ export function TutorCarousel({ tutors }: { tutors: Tutor[] }) {
     <section
       className="relative py-24 overflow-hidden"
       style={{
-        background: "linear-gradient(180deg, #f0fdf4 0%, #ecfdf5 30%, #f0f9ff 70%, #f8fafc 100%)",
+        background: "linear-gradient(180deg, var(--aivo-meadow-50) 0%, var(--aivo-meadow-50) 30%, var(--aivo-calmSky-50) 70%, var(--aivo-cloud-50) 100%)",
       }}
     >
       <div className="max-w-6xl mx-auto px-6 md:px-8">
@@ -286,7 +286,7 @@ export function TutorCarousel({ tutors }: { tutors: Tutor[] }) {
                 aria-hidden="true"
                 className="block w-3 h-3 rounded-full transition-all duration-300"
                 style={{
-                  backgroundColor: i === activeTutor ? tutor.color : "#CBD5E1",
+                  backgroundColor: i === activeTutor ? tutor.color : "var(--aivo-cloud-300)",
                   transform: i === activeTutor ? "scale(1.3)" : "scale(1)",
                 }}
               />

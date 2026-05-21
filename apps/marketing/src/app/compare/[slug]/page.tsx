@@ -1,3 +1,4 @@
+import { MARKETING_ACCENTS } from "@aivo/brand";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -37,7 +38,7 @@ export default async function ComparePage({ params }: Props) {
   return (
     <LandingPageLayout
       badge="Comparison"
-      badgeColor="#7c3aed"
+      badgeColor={MARKETING_ACCENTS.purple}
       title={`AIVO vs ${comp.competitor}`}
       subtitle="An honest, side-by-side look at how the two platforms differ — written by us, fact-checked against public information from both vendors."
       breadcrumbs={[

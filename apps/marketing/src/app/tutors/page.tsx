@@ -1,3 +1,4 @@
+import { MARKETING_ACCENTS } from "@aivo/brand";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -25,7 +26,7 @@ export default function TutorsIndex() {
   return (
     <LandingPageLayout
       badge="AI Tutors"
-      badgeColor="#7c3aed"
+      badgeColor={MARKETING_ACCENTS.purple}
       title="Fourteen AI tutors. One Brain Clone for your child."
       subtitle="Each AIVO tutor is a specialist with a personality. They share what they learn about your child so every session picks up exactly where the last one left off."
       breadcrumbs={[

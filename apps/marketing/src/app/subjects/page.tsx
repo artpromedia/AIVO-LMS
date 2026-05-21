@@ -1,3 +1,4 @@
+import { MARKETING_ACCENTS } from "@aivo/brand";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -25,7 +26,7 @@ export default function SubjectsIndex() {
   return (
     <LandingPageLayout
       badge="Subjects"
-      badgeColor="#0891b2"
+      badgeColor={MARKETING_ACCENTS.cyanDeep}
       title="One tutor per subject. One Brain Clone for your child."
       subtitle="AIVO covers every core academic subject — and the often-neglected ones like speech, social-emotional learning, and life skills — with specialist AI tutors that share what they learn."
       breadcrumbs={[
