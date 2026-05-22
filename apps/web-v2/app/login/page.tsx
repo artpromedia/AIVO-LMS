@@ -73,6 +73,7 @@ async function signInAction(formData: FormData) {
       },
     );
     redirect("/login/mfa");
+    return;
   }
 
   if (result.kind === "error") {
@@ -85,6 +86,7 @@ async function signInAction(formData: FormData) {
       code = "login_failed";
     }
     redirect(`/login?error=${code}`);
+    return;
   }
 
   const profile = toSessionProfile(result.user);
