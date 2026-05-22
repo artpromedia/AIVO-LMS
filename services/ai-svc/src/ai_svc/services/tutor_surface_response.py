@@ -22,8 +22,8 @@ gate it must pass through.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Any, Iterable, Mapping, Optional, Sequence
+from dataclasses import dataclass
+from typing import Any, Iterable, Mapping, Optional
 
 from .surface_directives import (
     SURFACE_REQUIRING_COMMAND_TYPES,

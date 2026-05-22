@@ -7,7 +7,6 @@ from typing import Optional
 # baseline_item_templates; both are validated by
 # baseline_surface_validator before items reach the runtime.
 from .baseline_surface_contract import (
-    LearnerSurfaceSpec,  # re-exported for type annotations downstream
     render_prompt_section as render_surface_prompt_section,
 )
 from .baseline_item_templates import render_template_examples

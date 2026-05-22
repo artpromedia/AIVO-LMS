@@ -208,7 +208,7 @@ def _accommodation_gap_recommendations(
             tenant_id=tenant_id,
             rec_type="accommodation_add",
             title=f"Add accommodation: {name}",
-            description=f"This accommodation is on your child's IEP but not yet active.",
+            description="This accommodation is on your child's IEP but not yet active.",
             payload=payload,
             evidence={"source": "iep_profile"},
             source_signals=["iep_profiles.accommodations"],
