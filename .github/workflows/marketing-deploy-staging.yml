@@ -84,7 +84,7 @@ jobs:
       # does. Catches `next build` regressions (typescript errors, missing
       # env vars referenced at build time, etc.) before talking to Vercel.
       - name: Build marketing site (sanity check)
-        run: pnpm --filter @aivo/marketing build
+        run: pnpm exec turbo run build --filter=@aivo/marketing
 
       # Preflight: surface a clear actionable error if the `staging`
       # environment hasn't been wired up yet, instead of a cryptic

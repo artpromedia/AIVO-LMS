@@ -38,7 +38,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build marketing site
-        run: pnpm --filter @aivo/marketing build
+        run: pnpm exec turbo run build --filter=@aivo/marketing
 
       - name: Deploy to staging
         run: echo "Add staging deployment steps for your hosting provider (Vercel, Netlify, etc.)"
