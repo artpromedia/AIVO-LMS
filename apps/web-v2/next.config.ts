@@ -22,6 +22,7 @@ const SECURITY_HEADERS = [
 ];
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   reactStrictMode: true,
   allowedDevOrigins: [
     "*.replit.dev",
