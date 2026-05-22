@@ -1,7 +1,7 @@
 "use client";
 import { forwardRef } from "react";
 import { cn } from "../utils/cn";
-import { MASTERY_TONE_CLASS, type MasteryLevel } from "./helpers";
+import { type MasteryLevel } from "./helpers";
 
 export type MasteryCell = {
   /** Standard / skill code, e.g. "RL.3.1". */
@@ -129,5 +129,3 @@ export const MasteryHeatStrip = forwardRef<HTMLDivElement, MasteryHeatStripProps
 );
 
 MasteryHeatStrip.displayName = "Chart/MasteryHeatStrip";
-
-export { MASTERY_TONE_CLASS };
