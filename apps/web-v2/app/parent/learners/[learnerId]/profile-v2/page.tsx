@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { FloatingMetricCard, LearningHero } from "@aivo/ui/hero";
 import { AivoIcon } from "@aivo/ui/icon";
+import { requirePageRole } from "@/lib/auth/server";
 
 interface ProfileV2Props {
   params: { learnerId: string };
@@ -17,7 +18,8 @@ interface ProfileV2Props {
  *
  * Verbatim acceptance: "All cards have real destinations."
  */
-export default function LearnerProfileV2({ params }: ProfileV2Props) {
+export default async function LearnerProfileV2({ params }: ProfileV2Props) {
+  await requirePageRole(["parent"]);
   const { learnerId } = params;
   // Placeholder display data; sprint 4 commit 4 wires to repo.
   const learnerName = "Emma";

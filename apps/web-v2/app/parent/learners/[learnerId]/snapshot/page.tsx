@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { FloatingMetricCard, LearningHero } from "@aivo/ui/hero";
 import { AivoIcon } from "@aivo/ui/icon";
+import { requirePageRole } from "@/lib/auth/server";
 
 interface SnapshotProps {
   params: { learnerId: string };
@@ -14,7 +15,8 @@ interface SnapshotProps {
  * Verbatim acceptance: "Parent home feels premium and calm.
  * All cards have real destinations."
  */
-export default function LearnerSnapshot({ params }: SnapshotProps) {
+export default async function LearnerSnapshot({ params }: SnapshotProps) {
+  await requirePageRole(["parent"]);
   const { learnerId } = params;
   const learnerName = "Emma";
   const base = `/parent/learners/${learnerId}`;
