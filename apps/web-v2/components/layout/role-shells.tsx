@@ -179,3 +179,21 @@ export const PARENT_SETTINGS_NAV: RoleNavItem[] = [
   { href: "/parent/settings/account", label: "Account", icon: <Users className="h-4 w-4" /> },
   { href: "/parent/settings/billing", label: "Billing", icon: <CreditCard className="h-4 w-4" /> },
 ];
+
+export const CAREGIVER_NAV: RoleNavItem[] = [
+  { href: "/caregiver/home", label: "Home", icon: <Home className="h-4 w-4" /> },
+  { href: "/caregiver/learners", label: "Learners", icon: <Users className="h-4 w-4" /> },
+  {
+    href: "/caregiver/observations",
+    label: "Observations",
+    icon: <ClipboardList className="h-4 w-4" />,
+  },
+  { href: "/caregiver/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
+];
+
+export const THERAPIST_NAV: RoleNavItem[] = [
+  { href: "/therapist/home", label: "Caseload", icon: <Users className="h-4 w-4" /> },
+  { href: "/therapist/reports", label: "Reports", icon: <FileText className="h-4 w-4" /> },
+  { href: "/therapist/sessions", label: "Sessions", icon: <Calendar className="h-4 w-4" /> },
+  { href: "/therapist/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
+];

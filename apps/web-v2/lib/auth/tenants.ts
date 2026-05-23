@@ -50,6 +50,8 @@ export const ROLE_PERMISSIONS: Record<Role, readonly string[]> = {
   parent: ["learners:read", "learners:write", "reports:read", "billing:read"],
   learner: ["self:read", "self:write"],
   teacher: ["class:read", "class:write", "assignments:read", "assignments:write"],
+  caregiver: ["learner:read"],
+  therapist: ["learner:read", "reports:read"],
   school_admin: ["school:read", "school:write", "staff:read", "staff:write", "reports:read"],
   district_admin: ["district:read", "district:write", "schools:read", "reports:read"],
   platform_admin: ["*"],

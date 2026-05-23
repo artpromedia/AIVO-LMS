@@ -65,6 +65,22 @@ export const MOCK_USERS: Record<Role, SessionProfile> = {
     displayName: "AIVO Admin",
     permissions: ["*"],
   },
+  caregiver: {
+    userId: "u_caregiver_1",
+    tenantId: "t_family_1",
+    role: "caregiver",
+    email: "caregiver@demo.aivo",
+    displayName: "Sam Caregiver",
+    permissions: ["learner:read"],
+  },
+  therapist: {
+    userId: "u_therapist_1",
+    tenantId: "t_family_1",
+    role: "therapist",
+    email: "therapist@demo.aivo",
+    displayName: "Dr. Park",
+    permissions: ["learner:read"],
+  },
 };
 
 function parseRole(value: string | undefined): Role | null {

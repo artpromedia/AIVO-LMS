@@ -7,17 +7,18 @@
  */
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { UserPlus, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { PARENT_NAV } from "@/components/layout/role-shells";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { getStore as db } from "@/lib/db/store";
 import { getLearner, getUserById, parentCanAccessLearner } from "@/lib/db/repos";
+import { getCareTeam } from "@/lib/db/team-invites";
+import { TeamInviteSection } from "./team-invite-section";
 export const dynamic = "force-dynamic";
 
 const ROLE_LABEL: Record<string, string> = {
@@ -129,12 +130,10 @@ export default async function ParentTeamPage({
         eyebrow={learner.displayName}
         title="Care team"
         description="Everyone supporting this learner. Parents, teachers, therapists, and caregivers can all see progress."
-        actions={
-          <Button variant="outline" disabled title="Invites available in a later release">
-            <UserPlus className="mr-1 h-4 w-4" /> Invite member
-          </Button>
-        }
       />
+
+      <SectionHeader title="Invite a team member" />
+      <TeamInviteSection learnerId={learner.id} careTeam={getCareTeam(learner.id)} />
 
       <SectionHeader title={`${list.length} member${list.length === 1 ? "" : "s"}`} />
       {list.length === 0 ? (

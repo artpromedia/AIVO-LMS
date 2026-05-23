@@ -1,6 +1,6 @@
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
-import { PageHeader } from "@/components/layout/page-header";
+import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -11,6 +11,8 @@ import {
   getTenantById,
   getDistrictStats,
 } from "@/lib/db/repos";
+import { listStaffInvitesForTenants } from "@/lib/db/staff-invites";
+import { StaffInviteSection } from "./staff-invite-section";
 
 const ROLE_LABEL: Record<string, string> = {
   district_admin: "District admin",
@@ -30,6 +32,17 @@ export default async function Page() {
   const tenantIds = tenants.map((t) => t.id);
   const stats = getDistrictStats(tenantIds);
   const staff = listMembersByRole(tenantIds, ["district_admin", "school_admin", "teacher"]);
+  const pendingInvites = listStaffInvitesForTenants(tenantIds).map((i) => ({
+    id: i.id,
+    email: i.email,
+    role: i.role,
+    displayName: i.displayName,
+    invitedAt: i.invitedAt,
+    schoolId: i.schoolId,
+  }));
+  const schools = tenants
+    .filter((t) => t.type === "school")
+    .map((t) => ({ id: t.id, name: t.name }));
 
   return (
     <AppShell
@@ -57,7 +70,11 @@ export default async function Page() {
         ))}
       </div>
 
-      <Card className="mt-6 overflow-hidden">
+      <SectionHeader title="Invitations" />
+      <StaffInviteSection schools={schools} pendingInvites={pendingInvites} />
+
+      <SectionHeader title="Active staff" />
+      <Card className="overflow-hidden">
         <div className="border-b border-aivo-border px-4 py-3">
           <p className="text-sm font-medium">
             {staff.length} {staff.length === 1 ? "person" : "people"}
