@@ -1,5 +1,6 @@
 "use client";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import {
   type Locale,
@@ -64,6 +65,7 @@ export function I18nProvider({
   });
   const [messages, setMessages] = useState<Messages>(initialMessages);
   const [initialized, setInitialized] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (initialized) return;
@@ -82,25 +84,32 @@ export function I18nProvider({
           setMessages(msgs);
           setLocaleState(detected);
           setStoredLocale(detected);
+          // Re-render Server Components with newly detected locale cookie.
+          router.refresh();
         });
       }
     }
     setInitialized(true);
-  }, [initialized]);
+  }, [initialized, router]);
 
-  const setLocale = useCallback((newLocale: Locale) => {
-    setStoredLocale(newLocale);
-    loadMessages(newLocale).then((msgs) => {
-      setMessages(msgs);
-      setLocaleState(newLocale);
-      document.documentElement.lang = newLocale;
-      if (newLocale === "ar") {
-        document.documentElement.dir = "rtl";
-      } else {
-        document.documentElement.dir = "ltr";
-      }
-    });
-  }, []);
+  const setLocale = useCallback(
+    (newLocale: Locale) => {
+      setStoredLocale(newLocale);
+      loadMessages(newLocale).then((msgs) => {
+        setMessages(msgs);
+        setLocaleState(newLocale);
+        document.documentElement.lang = newLocale;
+        if (newLocale === "ar") {
+          document.documentElement.dir = "rtl";
+        } else {
+          document.documentElement.dir = "ltr";
+        }
+        // Re-render Server Components so server-rendered chunks pick up the cookie.
+        router.refresh();
+      });
+    },
+    [router],
+  );
 
   useEffect(() => {
     document.documentElement.lang = locale;

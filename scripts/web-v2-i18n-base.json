@@ -1,0 +1,40 @@
+{
+  "en": {
+    "common": {
+      "sign_in": "Sign in",
+      "sign_out": "Sign out",
+      "get_started": "Get started",
+      "loading": "Loading...",
+      "language": "Language"
+    },
+    "nav": {
+      "platform": "Platform",
+      "research": "Research",
+      "for_districts": "For Districts",
+      "families": "Families",
+      "open": "Open navigation"
+    },
+    "app": {
+      "tagline": "Personalized learning adventures for every child."
+    }
+  },
+  "de": {
+    "common": {
+      "sign_in": "Anmelden",
+      "sign_out": "Abmelden",
+      "get_started": "Loslegen",
+      "loading": "Laden...",
+      "language": "Sprache"
+    },
+    "nav": {
+      "platform": "Plattform",
+      "research": "Forschung",
+      "for_districts": "Für Schulbezirke",
+      "families": "Familien",
+      "open": "Navigation öffnen"
+    },
+    "app": {
+      "tagline": "Personalisierte Lernabenteuer für jedes Kind."
+    }
+  }
+}

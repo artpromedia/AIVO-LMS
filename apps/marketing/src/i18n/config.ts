@@ -43,8 +43,37 @@ export function detectBrowserLocale(): Locale {
 }
 
 const LOCALE_STORAGE_KEY = "aivo_locale";
+export const LOCALE_COOKIE_NAME = "aivo_locale";
+const LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
+
+function readLocaleCookie(): Locale | null {
+  if (typeof document === "undefined") return null;
+  try {
+    const match = document.cookie
+      .split("; ")
+      .find((c) => c.startsWith(`${LOCALE_COOKIE_NAME}=`));
+    if (!match) return null;
+    const value = decodeURIComponent(match.split("=")[1] ?? "");
+    if (value && isValidLocale(value)) return value;
+  } catch {
+    // ignore
+  }
+  return null;
+}
+
+function writeLocaleCookie(locale: Locale): void {
+  if (typeof document === "undefined") return;
+  try {
+    document.cookie = `${LOCALE_COOKIE_NAME}=${encodeURIComponent(locale)}; path=/; max-age=${LOCALE_COOKIE_MAX_AGE}; samesite=lax`;
+  } catch {
+    // ignore
+  }
+}
 
 export function getStoredLocale(): Locale | null {
+  // Cookie wins so server + client agree on first render after navigation.
+  const fromCookie = readLocaleCookie();
+  if (fromCookie) return fromCookie;
   if (typeof localStorage === "undefined") return null;
   try {
     const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
@@ -56,6 +85,7 @@ export function getStoredLocale(): Locale | null {
 }
 
 export function setStoredLocale(locale: Locale): void {
+  writeLocaleCookie(locale);
   if (typeof localStorage === "undefined") return;
   try {
     localStorage.setItem(LOCALE_STORAGE_KEY, locale);

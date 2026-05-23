@@ -1,0 +1,19 @@
+{
+  "common": {
+    "sign_in": "Sign in",
+    "sign_out": "Sign out",
+    "get_started": "Get started",
+    "loading": "Loading...",
+    "language": "Language"
+  },
+  "nav": {
+    "platform": "Platform",
+    "research": "Research",
+    "for_districts": "For Districts",
+    "families": "Families",
+    "open": "Open navigation"
+  },
+  "app": {
+    "tagline": "Personalized learning adventures for every child."
+  }
+}

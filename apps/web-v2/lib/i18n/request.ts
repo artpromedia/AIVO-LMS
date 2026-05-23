@@ -11,7 +11,7 @@ export default getRequestConfig(async () => {
       locale = raw;
     }
   } catch {
-    // cookies() is only available within a request scope — fall back to default.
+    // cookies() only resolves within a request scope — fall back to default.
   }
   const messages = (await import(`./messages/${locale}.json`)).default;
   return { locale, messages, timeZone: "America/New_York" };

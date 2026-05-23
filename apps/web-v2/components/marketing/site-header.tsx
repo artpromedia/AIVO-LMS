@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Menu } from "lucide-react";
 import { SensoryModeToggle } from "@/components/system/sensory-mode-provider";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -74,6 +75,7 @@ export function SiteHeader() {
               </nav>
               <div className="mt-6 flex items-center gap-3">
                 <SensoryModeToggle size="sm" />
+                <LanguageSwitcher />
               </div>
               <Button asChild variant="default" size="lg" className="mt-6 w-full">
                 <Link href="/signup">Get started</Link>
@@ -112,6 +114,7 @@ export function SiteHeader() {
         </div>
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <LanguageSwitcher />
           <div className="hidden sm:block">
             <SensoryModeToggle size="xs" />
           </div>

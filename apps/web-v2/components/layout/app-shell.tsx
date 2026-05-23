@@ -5,6 +5,7 @@ import { Menu } from "lucide-react";
 import { RoleNav, type RoleNavItem } from "@/components/layout/role-nav";
 import { logoutAction } from "@/lib/auth/actions";
 import { SensoryModePopover } from "@/components/system/sensory-mode-provider";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -234,6 +235,7 @@ export function AppShell({
 
           <div className="ml-auto flex items-center gap-2 sm:gap-3">
             {immersive ? null : <SensoryModePopover />}
+            {immersive ? null : <LanguageSwitcher />}
             <span className="hidden text-right sm:block">
               <span className="block text-sm font-semibold leading-tight text-iw-ink">
                 {user.displayName}

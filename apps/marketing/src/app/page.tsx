@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import {
   ArrowRight,
   Building2,
@@ -16,39 +17,33 @@ import { getSensoryModeFromCookies } from "@/lib/sensory-mode.server";
 /**
  * Home page — Inclusive Lab — Warm rollout.
  *
- * Ported 1:1 from the approved Web mockup at
- *   artifacts/mockup-sandbox/src/components/mockups/aivo-inclusive-warm/Web.tsx
- * with real production wiring:
- *   - Real photography for the hero (existing /images/hero/* slides).
- *   - Generated 3D companion (apps/marketing/public/images/companion/*).
- *     Falls back to the parent-child photo if a 3D asset isn't yet present.
- *   - Next.js Link + Image instead of <a>/<img>.
- *   - Header + Footer come from the shared StickyHeader/Footer so the rest
- *     of the marketing site inherits the same chrome.
+ * All copy is sourced from `marketing.home.*` translations and is
+ * locale-aware via the aivo_locale cookie (see apps/marketing/src/i18n).
  *
- * The hero copy is "Learning that adapts to your child." — the word
- * "adapts" sits inside nested spans for the gradient + underline effect,
- * so the literal substring "Learning that adapts" is not contiguous in
- * the SSR output. The production smoke check in
- * scripts/marketing-markers.sh therefore asserts the two halves on
- * either side of that span: "Learning that" and "to your child." If you
- * rename the headline, update both markers there.
+ * The hero headline "Learning that adapts to your child." is split into
+ * three keys (hero_headline_pre / hero_headline_emph / hero_headline_post)
+ * so the gradient/underline can sit around the emphasized word. The
+ * production smoke check in scripts/marketing-markers.sh asserts the
+ * two halves on either side of the emphasized word; keep the English
+ * values of hero_headline_pre ("Learning that") and hero_headline_post
+ * ("to your child.") in sync with that script.
  */
 export default async function Home() {
   const sensoryMode = await getSensoryModeFromCookies();
+  const t = await getTranslations("marketing.home");
 
   const heroFeatures = [
     {
-      title: "14 Specialized AI Tutors",
-      desc: "From highly-structured explicit instruction to open-ended exploratory dialog.",
+      title: t("philosophy_feature_tutors_title"),
+      desc: t("philosophy_feature_tutors_desc"),
     },
     {
-      title: "5 Functioning Levels",
-      desc: "Content complexity decoupled from interface complexity.",
+      title: t("philosophy_feature_levels_title"),
+      desc: t("philosophy_feature_levels_desc"),
     },
     {
-      title: "Sensory-First Design",
-      desc: "First-class controls for visual noise, contrast, and cognitive load.",
+      title: t("philosophy_feature_sensory_title"),
+      desc: t("philosophy_feature_sensory_desc"),
     },
   ];
 
@@ -57,9 +52,7 @@ export default async function Home() {
       <StickyHeader initialSensoryMode={sensoryMode} />
 
       <main>
-        {/* Hero — Modern SaaS: cool gradient field, no rotations, tighter
-            type, restrained shadow. Replaces the warm peach blob backdrop
-            with a soft indigo→sky gradient lit from the top-right. */}
+        {/* Hero */}
         <section className="pt-20 pb-24 md:pt-24 md:pb-32 overflow-hidden relative">
           <div
             className="absolute top-0 right-0 -translate-y-16 translate-x-1/4 w-[640px] h-[640px] rounded-full blur-3xl -z-10"
@@ -76,10 +69,10 @@ export default async function Home() {
             <div className="max-w-2xl relative z-10">
               <span className="inline-flex items-center gap-2 mb-7 py-1.5 px-3.5 rounded-full border border-slate-200 bg-white text-slate-700 font-semibold text-xs tracking-wide uppercase">
                 <ShieldCheck className="w-3.5 h-3.5 text-[var(--aivo-sensory-primary)]" aria-hidden="true" />
-                FERPA &amp; COPPA Compliant
+                {t("hero_badge")}
               </span>
               <h1 className="font-heading text-4xl md:text-6xl font-bold tracking-tight leading-[1.05] mb-7 text-slate-900">
-                Learning that{" "}
+                {t("hero_headline_pre")}{" "}
                 <span className="relative inline-block">
                   <span
                     className="relative z-10 bg-clip-text text-transparent"
@@ -87,22 +80,20 @@ export default async function Home() {
                       backgroundImage: "linear-gradient(135deg, var(--aivo-calmSky-500) 0%, var(--aivo-aivoPurple-400) 100%)",
                     }}
                   >
-                    adapts
+                    {t("hero_headline_emph")}
                   </span>
                 </span>{" "}
-                to your child.
+                {t("hero_headline_post")}
               </h1>
               <p className="text-lg md:text-xl text-slate-600 mb-9 leading-relaxed font-medium">
-                AIVO is the first AI learning platform engineered explicitly for neurodiverse
-                cognitive profiles. We build a personalized &ldquo;brain-clone&rdquo; that models
-                how your K-8 child learns best.
+                {t("hero_body")}
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <a
                   href={`${WEB_APP_URL}/signup?plan=family`}
                   className="inline-flex items-center justify-center h-12 px-6 text-[15px] rounded-xl bg-[var(--aivo-sensory-primary)] hover:brightness-110 text-white font-semibold shadow-[0_6px_20px_-6px_rgba(124,58,237,0.45)] transition min-h-[44px]"
                 >
-                  Start Family Trial
+                  {t("hero_cta_primary")}
                   <ArrowRight className="ml-2 w-4 h-4" aria-hidden="true" />
                 </a>
                 <Link
@@ -110,7 +101,7 @@ export default async function Home() {
                   className="inline-flex items-center justify-center h-12 px-6 text-[15px] rounded-xl bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-900 font-semibold transition min-h-[44px]"
                 >
                   <Building2 className="w-4 h-4 mr-2" aria-hidden="true" />
-                  For School Districts
+                  {t("hero_cta_secondary")}
                 </Link>
               </div>
               <div className="mt-9 flex items-center gap-4 text-sm font-medium text-slate-600">
@@ -125,7 +116,7 @@ export default async function Home() {
                     J
                   </div>
                 </div>
-                <p>Trusted by 1,200+ specialists and parents.</p>
+                <p>{t("hero_trusted")}</p>
               </div>
             </div>
 
@@ -136,7 +127,7 @@ export default async function Home() {
               />
               <Image
                 src="/images/hero/girl-laptop.png"
-                alt="A child smiling while learning on a laptop with AIVO"
+                alt={t("hero_image_alt")}
                 width={720}
                 height={720}
                 priority
@@ -150,13 +141,13 @@ export default async function Home() {
                 </div>
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">
-                    Focus Duration
+                    {t("stat_focus_label")}
                   </p>
                   <p className="text-2xl md:text-3xl font-bold tracking-tight text-indigo-600 tabular-nums">
                     +47.2%
                   </p>
                   <p className="text-xs font-medium text-slate-500 mt-1">
-                    Average increase week 1
+                    {t("stat_focus_caption")}
                   </p>
                 </div>
               </div>
@@ -164,8 +155,7 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Research banner — uniform type, lower opacity, tighter spacing
-            for the Modern-SaaS logo-wall pattern. */}
+        {/* Research banner */}
         <section
           className="py-14 border-y border-slate-200/70"
           aria-labelledby="research-heading"
@@ -175,7 +165,7 @@ export default async function Home() {
               id="research-heading"
               className="text-center text-[11px] font-semibold tracking-[0.18em] text-slate-500 uppercase mb-8"
             >
-              Methodology Built on Research From
+              {t("research_heading")}
             </h2>
             <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-4 md:gap-x-20 text-slate-700/70">
               <span className="font-heading text-base md:text-lg font-semibold tracking-tight">
@@ -194,7 +184,7 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Philosophy — Engineered for the margins */}
+        {/* Philosophy */}
         <section className="py-24 md:py-32" id="features" aria-labelledby="philosophy-heading">
           <div className="max-w-6xl mx-auto px-6 md:px-8 grid md:grid-cols-2 gap-16 md:gap-20 items-center">
             <div className="relative order-2 md:order-1">
@@ -204,7 +194,7 @@ export default async function Home() {
               />
               <Image
                 src="/images/hero/boy-tablet.png"
-                alt="A child learning on a tablet with the AIVO interface"
+                alt={t("philosophy_image_alt")}
                 width={640}
                 height={640}
                 className="rounded-[2rem] shadow-[0_30px_60px_-30px_rgba(15,23,42,0.25)] w-full object-cover border border-slate-200/60 aspect-square"
@@ -215,15 +205,12 @@ export default async function Home() {
                 id="philosophy-heading"
                 className="font-heading text-3xl md:text-5xl font-bold mb-8 leading-tight text-slate-900"
               >
-                Engineered for the margins.
+                {t("philosophy_heading_line1")}
                 <br />
-                <span className="text-slate-500">Transformative for everyone.</span>
+                <span className="text-slate-500">{t("philosophy_heading_line2")}</span>
               </h2>
               <p className="text-lg md:text-xl text-slate-600 mb-10 leading-relaxed font-medium">
-                Most EdTech builds for the &ldquo;average&rdquo; student and patches on
-                accessibility later. We started with the most complex cognitive profiles — autism,
-                ADHD, sensory processing differences — and built an engine that dynamically scales
-                to any mind.
+                {t("philosophy_body")}
               </p>
 
               <ul className="space-y-6">
@@ -245,26 +232,24 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Testimonials — Modern SaaS quote layout: tight cards, drop the
-            sticky-note underline, slate-only chrome with one accent color
-            for the stars. */}
+        {/* Testimonials */}
         <section className="py-24 md:py-32 bg-slate-50/60 border-y border-slate-200/70" aria-labelledby="testimonials-heading">
           <div className="max-w-6xl mx-auto px-6 md:px-8">
             <div className="flex flex-col items-center text-center mb-14 md:mb-16">
               <span className="mb-5 py-1 px-3 rounded-full bg-white border border-slate-200 text-slate-700 text-[11px] font-semibold tracking-wide uppercase">
-                Family Evidence
+                {t("testimonials_badge")}
               </span>
               <h2
                 id="testimonials-heading"
                 className="font-heading text-3xl md:text-5xl font-bold text-slate-900 tracking-tight"
               >
-                The relief of feeling understood.
+                {t("testimonials_heading")}
               </h2>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6 md:gap-8 max-w-6xl mx-auto">
               <article className="bg-white border border-slate-200 shadow-[0_2px_8px_-2px_rgba(15,23,42,0.06)] rounded-2xl p-8 md:p-10">
-                <div className="flex gap-1 mb-6" role="img" aria-label="5 star rating">
+                <div className="flex gap-1 mb-6" role="img" aria-label={t("testimonials_star_alt")}>
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
@@ -274,24 +259,21 @@ export default async function Home() {
                   ))}
                 </div>
                 <p className="text-base md:text-lg mb-8 leading-relaxed font-medium text-slate-700">
-                  &ldquo;My 8-year-old has profound ADHD and dyslexia. Every other app felt like
-                  a slot machine — too loud, too fast. AIVO is the first platform that slows down
-                  when he gets overwhelmed. It&apos;s not just a learning app, it&apos;s a
-                  regulated environment.&rdquo;
+                  {t("testimonial_1_quote")}
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center font-bold text-sm text-slate-700">
                     S.T.
                   </div>
                   <div>
-                    <p className="font-bold text-slate-900">Sarah T.</p>
-                    <p className="text-sm font-medium text-slate-500">Parent of 2</p>
+                    <p className="font-bold text-slate-900">{t("testimonial_1_name")}</p>
+                    <p className="text-sm font-medium text-slate-500">{t("testimonial_1_role")}</p>
                   </div>
                 </div>
               </article>
 
               <article className="bg-white border border-slate-200 shadow-[0_2px_8px_-2px_rgba(15,23,42,0.06)] rounded-2xl p-8 md:p-10">
-                <div className="flex gap-1 mb-6" role="img" aria-label="5 star rating">
+                <div className="flex gap-1 mb-6" role="img" aria-label={t("testimonials_star_alt")}>
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
@@ -301,19 +283,16 @@ export default async function Home() {
                   ))}
                 </div>
                 <p className="text-base md:text-lg mb-8 leading-relaxed font-medium text-slate-700">
-                  &ldquo;We use the &lsquo;Calm&rsquo; sensory mode exclusively. For an autistic
-                  learner, removing the visual clutter isn&apos;t a nice-to-have, it&apos;s the
-                  difference between learning and melting down. The data tracking for his IEP is
-                  phenomenal.&rdquo;
+                  {t("testimonial_2_quote")}
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="w-11 h-11 rounded-full bg-indigo-50 flex items-center justify-center font-bold text-sm text-indigo-700">
                     M.R.
                   </div>
                   <div>
-                    <p className="font-bold text-slate-900">Dr. Marcus R.</p>
+                    <p className="font-bold text-slate-900">{t("testimonial_2_name")}</p>
                     <p className="text-sm font-medium text-slate-500">
-                      Special Education Director &amp; Parent
+                      {t("testimonial_2_role")}
                     </p>
                   </div>
                 </div>
@@ -322,9 +301,7 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* CTA card — refined: tighter radius, gradient overlay, the
-            secondary action is a clean inverted button (white-on-indigo)
-            and the photo isn't rotated. */}
+        {/* CTA */}
         <section className="py-24 md:py-32" aria-labelledby="cta-heading">
           <div className="max-w-6xl mx-auto px-6 md:px-8">
             <div
@@ -341,31 +318,30 @@ export default async function Home() {
                     id="cta-heading"
                     className="font-heading text-3xl md:text-5xl font-bold mb-6 leading-tight tracking-tight"
                   >
-                    Ready to clone their brilliance?
+                    {t("cta_heading")}
                   </h2>
                   <p className="text-white/85 mb-9 text-base md:text-lg font-medium leading-relaxed">
-                    Start with a comprehensive baseline assessment. No credit card required for
-                    the first 14 days.
+                    {t("cta_body")}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3">
                     <a
                       href={`${WEB_APP_URL}/signup?plan=family`}
                       className="inline-flex items-center justify-center h-12 bg-white text-[var(--aivo-sensory-primary)] hover:bg-slate-50 rounded-xl text-[15px] font-bold px-6 min-h-[44px] transition"
                     >
-                      Start Family Trial
+                      {t("cta_primary")}
                     </a>
                     <Link
                       href="/for-districts"
                       className="inline-flex items-center justify-center h-12 text-white border border-white/30 hover:bg-white/10 rounded-xl text-[15px] font-semibold px-6 min-h-[44px] transition"
                     >
-                      Talk to District Sales
+                      {t("cta_secondary")}
                     </Link>
                   </div>
                 </div>
                 <div className="hidden md:flex items-center justify-center p-12 lg:p-16 relative">
                   <Image
                     src="/images/hero/mother-son-sofa.webp"
-                    alt="A parent and child learning together on a sofa"
+                    alt={t("cta_image_alt")}
                     width={560}
                     height={560}
                     className="w-full max-w-md object-cover rounded-2xl shadow-[0_30px_60px_-20px_rgba(0,0,0,0.4)] aspect-square"

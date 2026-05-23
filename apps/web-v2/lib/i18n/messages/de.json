@@ -1,0 +1,19 @@
+{
+  "common": {
+    "sign_in": "Anmelden",
+    "sign_out": "Abmelden",
+    "get_started": "Loslegen",
+    "loading": "Laden...",
+    "language": "Sprache"
+  },
+  "nav": {
+    "platform": "Plattform",
+    "research": "Forschung",
+    "for_districts": "Für Schulbezirke",
+    "families": "Familien",
+    "open": "Navigation öffnen"
+  },
+  "app": {
+    "tagline": "Personalisierte Lernabenteuer für jedes Kind."
+  }
+}
