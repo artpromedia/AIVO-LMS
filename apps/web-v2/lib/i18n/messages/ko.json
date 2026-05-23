@@ -1,19 +1,19 @@
 {
   "common": {
-    "sign_in": "Sign in",
-    "sign_out": "Sign out",
-    "get_started": "Get started",
-    "loading": "Loading...",
-    "language": "Language"
+    "sign_in": "로그인",
+    "sign_out": "로그아웃",
+    "get_started": "시작하기",
+    "loading": "로딩 중...",
+    "language": "언어"
   },
   "nav": {
-    "platform": "Platform",
-    "research": "Research",
-    "for_districts": "For Districts",
-    "families": "Families",
-    "open": "Open navigation"
+    "platform": "플랫폼",
+    "research": "연구",
+    "for_districts": "학군 대상",
+    "families": "가족",
+    "open": "내비게이션 열기"
   },
   "app": {
-    "tagline": "Personalized learning adventures for every child."
+    "tagline": "모든 어린이를 위한 맞춤형 학습 모험."
   }
 }

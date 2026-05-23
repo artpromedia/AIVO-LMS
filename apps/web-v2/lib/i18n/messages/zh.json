@@ -1,19 +1,19 @@
 {
   "common": {
-    "sign_in": "Sign in",
-    "sign_out": "Sign out",
-    "get_started": "Get started",
-    "loading": "Loading...",
-    "language": "Language"
+    "sign_in": "登录",
+    "sign_out": "退出登录",
+    "get_started": "开始使用",
+    "loading": "加载中...",
+    "language": "语言"
   },
   "nav": {
-    "platform": "Platform",
-    "research": "Research",
-    "for_districts": "For Districts",
-    "families": "Families",
-    "open": "Open navigation"
+    "platform": "平台",
+    "research": "研究",
+    "for_districts": "学区服务",
+    "families": "家庭",
+    "open": "打开导航"
   },
   "app": {
-    "tagline": "Personalized learning adventures for every child."
+    "tagline": "为每个孩子量身定制的学习冒险。"
   }
 }

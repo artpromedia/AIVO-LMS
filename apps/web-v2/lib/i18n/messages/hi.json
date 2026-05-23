@@ -1,19 +1,19 @@
 {
   "common": {
-    "sign_in": "Sign in",
-    "sign_out": "Sign out",
-    "get_started": "Get started",
-    "loading": "Loading...",
-    "language": "Language"
+    "sign_in": "साइन इन करें",
+    "sign_out": "साइन आउट करें",
+    "get_started": "शुरू करें",
+    "loading": "लोड हो रहा है...",
+    "language": "भाषा"
   },
   "nav": {
-    "platform": "Platform",
-    "research": "Research",
-    "for_districts": "For Districts",
-    "families": "Families",
-    "open": "Open navigation"
+    "platform": "प्लेटफ़ॉर्म",
+    "research": "अनुसंधान",
+    "for_districts": "ज़िलों के लिए",
+    "families": "परिवार",
+    "open": "नेविगेशन खोलें"
   },
   "app": {
-    "tagline": "Personalized learning adventures for every child."
+    "tagline": "हर बच्चे के लिए वैयक्तिकृत सीखने के रोमांच।"
   }
 }

@@ -81,7 +81,7 @@ export interface paths {
         /** List waitlist signups for the caller's tenant (or all, for platform admin) */
         get: operations["listWaitlistEntries"];
         put?: never;
-        /** Sign up for a waitlist on a coming-soon connector */
+        /** Join the early-access waitlist for a connector that is not yet generally available */
         post: operations["joinConnectorWaitlist"];
         delete?: never;
         options?: never;

@@ -53,7 +53,12 @@ export default function ProgressReports() {
           </Text>
           <AivoButton
             title={t("therapistClient.generateReport")}
-            onPress={() => Alert.alert("Report", "Report generation coming soon")}
+            onPress={() =>
+              Alert.alert(
+                t("therapistClient.generateReport"),
+                t("common.featureUnavailable"),
+              )
+            }
             style={{ marginTop: spacing.md }}
           />
         </AivoCard>

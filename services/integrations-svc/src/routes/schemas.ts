@@ -84,7 +84,7 @@ export const getConnectorSchema = {
 export const joinWaitlistSchema = {
   tags: ["Integrations"],
   operationId: "joinConnectorWaitlist",
-  summary: "Sign up for a waitlist on a coming-soon connector",
+  summary: "Join the early-access waitlist for a connector that is not yet generally available",
   body: {
     type: "object",
     required: ["connectorId", "contactEmail"],

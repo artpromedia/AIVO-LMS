@@ -173,7 +173,10 @@ export default function OnboardScreen() {
                 <AivoButton
                   title={t("parentOnboard.uploadIEP")}
                   onPress={() =>
-                    Alert.alert(t("parentOnboard.uploadIEP"), t("parentOnboard.uploadComingSoon"))
+                    Alert.alert(
+                      t("parentOnboard.uploadIEP"),
+                      t("parentOnboard.uploadIEPMobileUnavailable"),
+                    )
                   }
                   variant="outline"
                   size="sm"

@@ -17,7 +17,7 @@
     "buy": "Comprar",
     "approve": "Aprobar",
     "decline": "Rechazar",
-    "comingSoon": "Próximamente",
+    "featureUnavailable": "Esta función aún no está disponible en móvil. Por favor, usa la app web de AIVO para continuar.",
     "overview": "Resumen",
     "on": "Activado",
     "off": "Desactivado",
@@ -26,7 +26,7 @@
     "appVersion": "AIVO Learning v1.0.0",
     "unknownError": "Error desconocido",
     "done": "Listo",
-    "adjust": "Adjust"
+    "adjust": "Ajustar"
   },
   "auth": {
     "aiPoweredLearning": "Aprendizaje con IA",
@@ -318,7 +318,7 @@
     "uploadIEPOptional": "Subir PEI (Opcional)",
     "uploadIEPLater": "Puedes subir el PEI de tu hijo ahora o después",
     "uploadIEP": "Subir PEI",
-    "uploadComingSoon": "Carga de documentos próximamente",
+    "uploadIEPMobileUnavailable": "La carga del IEP está disponible en la app web de AIVO.",
     "skipContinue": "Omitir y Continuar",
     "review": "Revisar",
     "name": "Nombre",
@@ -521,7 +521,7 @@
     "noAssignments": "Aún no tienes tareas. ¡Toma una foto o sube un PDF para comenzar!",
     "problems": "{{count}} problemas",
     "openOnWeb": "Continúa esta tarea en la app web para conversar con tu tutor de IA.",
-    "comingSoon": "La captura con cámara estará disponible pronto. Por ahora, sube desde la app web.",
+    "cameraOnWeb": "La captura con cámara para tareas se realiza en la app web de AIVO. Por favor, abre esta página en la web para tomar una foto.",
     "status": {
       "PROCESSING": "Procesando…",
       "READY": "Listo",

@@ -1,19 +1,19 @@
 {
   "common": {
-    "sign_in": "Sign in",
-    "sign_out": "Sign out",
-    "get_started": "Get started",
-    "loading": "Loading...",
-    "language": "Language"
+    "sign_in": "تسجيل الدخول",
+    "sign_out": "تسجيل الخروج",
+    "get_started": "ابدأ الآن",
+    "loading": "جارٍ التحميل...",
+    "language": "اللغة"
   },
   "nav": {
-    "platform": "Platform",
-    "research": "Research",
-    "for_districts": "For Districts",
-    "families": "Families",
-    "open": "Open navigation"
+    "platform": "المنصة",
+    "research": "البحث",
+    "for_districts": "للمناطق التعليمية",
+    "families": "العائلات",
+    "open": "فتح القائمة"
   },
   "app": {
-    "tagline": "Personalized learning adventures for every child."
+    "tagline": "مغامرات تعلّم مخصّصة لكل طفل."
   }
 }

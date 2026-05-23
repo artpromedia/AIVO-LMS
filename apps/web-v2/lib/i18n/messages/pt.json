@@ -1,19 +1,19 @@
 {
   "common": {
-    "sign_in": "Sign in",
-    "sign_out": "Sign out",
-    "get_started": "Get started",
-    "loading": "Loading...",
-    "language": "Language"
+    "sign_in": "Entrar",
+    "sign_out": "Sair",
+    "get_started": "Começar",
+    "loading": "Carregando...",
+    "language": "Idioma"
   },
   "nav": {
-    "platform": "Platform",
-    "research": "Research",
-    "for_districts": "For Districts",
-    "families": "Families",
-    "open": "Open navigation"
+    "platform": "Plataforma",
+    "research": "Pesquisa",
+    "for_districts": "Para distritos",
+    "families": "Famílias",
+    "open": "Abrir navegação"
   },
   "app": {
-    "tagline": "Personalized learning adventures for every child."
+    "tagline": "Aventuras de aprendizagem personalizadas para cada criança."
   }
 }

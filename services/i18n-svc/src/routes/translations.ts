@@ -1,6 +1,14 @@
 import { FastifyInstance } from "fastify";
 import { en } from "../translations/en.js";
 import { es } from "../translations/es.js";
+import { fr } from "../translations/fr.js";
+import { de } from "../translations/de.js";
+import { pt } from "../translations/pt.js";
+import { zh } from "../translations/zh.js";
+import { ja } from "../translations/ja.js";
+import { ko } from "../translations/ko.js";
+import { ar } from "../translations/ar.js";
+import { hi } from "../translations/hi.js";
 import {
   listLocalesSchema,
   getTranslationsSchema,
@@ -11,7 +19,23 @@ import {
 
 const SUPPORTED_LOCALES = ["en", "es", "fr", "de", "pt", "zh", "ja", "ko", "ar", "hi"];
 
-const TRANSLATIONS: Record<string, Record<string, string>> = { en, es };
+// All 10 supported locales now ship server-side translation maps. The
+// non-en/es files are en-seeded — the i18n audit tracks the untranslated
+// backlog. Frontends should still localize via their own message bundles
+// (e.g. apps/web-v2/lib/i18n/messages, apps/mobile/i18n) for full UI
+// coverage; this service is for shared/backend-rendered strings.
+const TRANSLATIONS: Record<string, Record<string, string>> = {
+  en,
+  es,
+  fr,
+  de,
+  pt,
+  zh,
+  ja,
+  ko,
+  ar,
+  hi,
+};
 
 export function registerTranslationRoutes(app: FastifyInstance, db: any) {
   app.get("/api/i18n/locales", { schema: listLocalesSchema }, async () => {
@@ -21,7 +45,9 @@ export function registerTranslationRoutes(app: FastifyInstance, db: any) {
       available: SUPPORTED_LOCALES,
       serverTranslations: Object.keys(TRANSLATIONS),
       note:
-        "All 10 locales are available via frontend JSON files. Server-side translations available for: " +
+        "All 10 locales are available via frontend JSON files and " +
+        "server-side translation maps (non-en/es seeded from en; see " +
+        "translations/<locale>.ts headers). Server translations: " +
         Object.keys(TRANSLATIONS).join(", "),
       names: {
         en: "English",
