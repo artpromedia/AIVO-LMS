@@ -7,43 +7,71 @@ import { ShieldCheck } from "lucide-react";
  * apps/marketing's Footer: brand wordmark, COPPA·FERPA·SOC 2 trust pill,
  * four-column link grid, copyright. Authenticated dashboards do not
  * render this footer (AppShell handles their chrome instead).
+ *
+ * Marketing routes (about, pricing, legal, etc.) live on the marketing
+ * site, so those links resolve against NEXT_PUBLIC_MARKETING_URL (with
+ * NEXT_PUBLIC_SITE_URL as a secondary fallback) and ship as external
+ * links. App routes that exist inside web-v2 stay internal.
  */
+const MARKETING_SITE = (
+  process.env.NEXT_PUBLIC_MARKETING_URL ??
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  "https://aivolearning.com"
+).replace(/\/+$/, "");
+
+function marketingHref(path: string) {
+  return `${MARKETING_SITE}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
+type FooterLink = { label: string; href: string; external?: boolean };
+type FooterSection = { title: string; links: FooterLink[] };
+
 export function SiteFooter() {
-  const FOOTER_SECTIONS: { title: string; links: { label: string; href: string }[] }[] = [
+  const FOOTER_SECTIONS: FooterSection[] = [
     {
       title: "Platform",
       links: [
-        { label: "AI Tutors", href: "/learner/home" },
-        { label: "Adaptive Learning", href: "/parent/home" },
-        { label: "Brain Clone", href: "/parent/home" },
-        { label: "Sensory Modes", href: "/settings/accessibility" },
+        { label: "Features", href: marketingHref("/#features"), external: true },
+        { label: "Pricing", href: marketingHref("/pricing"), external: true },
+        { label: "AI Tutors", href: marketingHref("/tutors"), external: true },
+        { label: "Brain Clone", href: marketingHref("/#brain"), external: true },
+        { label: "Functioning Levels", href: marketingHref("/levels"), external: true },
       ],
     },
     {
       title: "Solutions",
       links: [
-        { label: "For Families", href: "/parent/home" },
-        { label: "For Teachers", href: "/teacher/home" },
-        { label: "For Schools", href: "/admin/school" },
-        { label: "For Districts", href: "/admin/district" },
+        { label: "For Families", href: marketingHref("/for-parents"), external: true },
+        { label: "For Schools", href: marketingHref("/for-schools"), external: true },
+        { label: "For Districts", href: marketingHref("/for-districts"), external: true },
+        {
+          label: "Special Education",
+          href: marketingHref("/for-special-education"),
+          external: true,
+        },
+        { label: "IEP Integration", href: marketingHref("/for-teachers"), external: true },
       ],
     },
     {
       title: "Company",
       links: [
-        { label: "About", href: "/" },
-        { label: "Trust Center", href: "/" },
-        { label: "Contact", href: "/" },
+        { label: "About AIVO", href: marketingHref("/about"), external: true },
+        { label: "Blog", href: marketingHref("/blog"), external: true },
+        { label: "Careers", href: marketingHref("/careers"), external: true },
+        { label: "Contact", href: marketingHref("/contact"), external: true },
       ],
     },
     {
       title: "Legal",
       links: [
-        { label: "Privacy Policy", href: "/" },
-        { label: "Terms of Service", href: "/" },
-        { label: "COPPA Compliance", href: "/" },
-        { label: "FERPA Compliance", href: "/" },
-        { label: "Accessibility", href: "/settings/accessibility" },
+        { label: "Privacy Policy", href: marketingHref("/privacy-policy"), external: true },
+        { label: "Terms of Service", href: marketingHref("/terms-of-service"), external: true },
+        { label: "Cookie Policy", href: marketingHref("/cookie-policy"), external: true },
+        { label: "COPPA Compliance", href: marketingHref("/coppa-compliance"), external: true },
+        { label: "FERPA Compliance", href: marketingHref("/ferpa-compliance"), external: true },
+        { label: "Accessibility", href: marketingHref("/accessibility"), external: true },
+        { label: "Security", href: marketingHref("/security"), external: true },
+        { label: "Trust", href: marketingHref("/trust"), external: true },
       ],
     },
   ];
@@ -81,12 +109,21 @@ export function SiteFooter() {
               <ul className="space-y-2.5">
                 {section.links.map((link) => (
                   <li key={`${section.title}-${link.label}`}>
-                    <Link
-                      href={link.href}
-                      className="text-sm text-iw-ink-muted transition hover:text-iw-primary"
-                    >
-                      {link.label}
-                    </Link>
+                    {link.external ? (
+                      <a
+                        href={link.href}
+                        className="text-sm text-iw-ink-muted transition hover:text-iw-primary"
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        className="text-sm text-iw-ink-muted transition hover:text-iw-primary"
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
