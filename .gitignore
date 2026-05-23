@@ -47,6 +47,8 @@ e2e/jwt-public.pem
 scripts/diag-*.mjs
 tmp_*
 tmp_*/
+# Translation pipeline review output (scripts/i18n-translate-batch.mjs)
+/tmp/
 
 # Replit / Nix workspace placeholder kept in repo root by mistake.
 # A real entrypoint lives in apps/marketing (see start.sh).
