@@ -161,6 +161,74 @@ export function extractRefreshToken(setCookies: string[]): string | null {
 }
 
 /**
+ * Shared implementation for the dedicated staff login endpoints. Both
+ * `/api/auth/admin-login` and `/api/auth/district-login` accept the same
+ * `{ email, password }` payload and return the same shape as
+ * `/api/auth/login` (including the `mfaPending` path — staff accounts
+ * are MFA-required server-side).
+ */
+async function identityStaffLogin(
+  path: "admin-login" | "district-login",
+  email: string,
+  password: string,
+): Promise<IdentityLoginResult> {
+  let res: Response;
+  try {
+    res = await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/auth/${path}`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ email, password }),
+      cache: "no-store",
+    });
+  } catch (err) {
+    return {
+      kind: "error",
+      status: 502,
+      error: `identity-svc unreachable: ${(err as Error).message}`,
+    };
+  }
+
+  const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+
+  if (!res.ok) {
+    return {
+      kind: "error",
+      status: res.status,
+      error: typeof json.error === "string" ? json.error : "Login failed",
+      redirectTo: typeof json.redirectTo === "string" ? json.redirectTo : undefined,
+      wrongSurface: typeof json.wrongSurface === "string" ? json.wrongSurface : undefined,
+    };
+  }
+
+  if (json.mfaPending) {
+    return {
+      kind: "mfa",
+      mfaToken: typeof json.mfaToken === "string" ? json.mfaToken : "",
+      mfaMethod: typeof json.mfaMethod === "string" ? json.mfaMethod : "",
+    };
+  }
+
+  return {
+    kind: "ok",
+    user: json.user as IdentityUser,
+    accessToken: typeof json.accessToken === "string" ? json.accessToken : "",
+    mustChangePassword: Boolean(json.mustChangePassword),
+    setCookies: readSetCookies(res.headers),
+  };
+}
+
+export function identityAdminLogin(email: string, password: string): Promise<IdentityLoginResult> {
+  return identityStaffLogin("admin-login", email, password);
+}
+
+export function identityDistrictLogin(
+  email: string,
+  password: string,
+): Promise<IdentityLoginResult> {
+  return identityStaffLogin("district-login", email, password);
+}
+
+/**
  * Complete an MFA challenge for one of the supported factors:
  *   - email OTP (6-digit)
  *   - TOTP authenticator code (6-digit)
