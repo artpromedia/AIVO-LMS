@@ -11,6 +11,8 @@
     "db:seed": "pnpm --filter @aivo/db db:seed",
     "i18n:audit": "node scripts/i18n-audit.mjs",
     "i18n:audit:verbose": "node scripts/i18n-audit.mjs --verbose",
+    "i18n:coverage": "node scripts/ci/check-i18n-coverage.mjs",
+    "check:no-coming-soon": "node scripts/ci/check-no-coming-soon.mjs",
     "test:integration": "vitest run --config tests/integration/vitest.config.ts",
     "test:enterprise": "vitest run --config tests/integration/vitest.enterprise.config.ts",
     "prod:check": "node scripts/production-readiness-check.mjs",

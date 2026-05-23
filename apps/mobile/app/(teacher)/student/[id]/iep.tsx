@@ -31,14 +31,14 @@ export default function TeacherIEPUpload() {
         <View style={styles.uploadActions}>
           <AivoButton
             title={t("teacherIEP.camera")}
-            onPress={() => Alert.alert(t("teacherIEP.camera"), t("common.comingSoon"))}
+            onPress={() => Alert.alert(t("teacherIEP.camera"), t("common.featureUnavailable"))}
             size="sm"
             icon={<Ionicons name="camera-outline" size={16} color="#FFF" />}
             style={{ flex: 1, marginRight: 8 }}
           />
           <AivoButton
             title={t("teacherIEP.pdf")}
-            onPress={() => Alert.alert(t("teacherIEP.pdf"), t("common.comingSoon"))}
+            onPress={() => Alert.alert(t("teacherIEP.pdf"), t("common.featureUnavailable"))}
             variant="outline"
             size="sm"
             icon={<Ionicons name="document-outline" size={16} color={colors.primary} />}

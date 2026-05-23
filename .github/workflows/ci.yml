@@ -38,6 +38,24 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+  i18n-and-completeness:
+    name: i18n Coverage & No "Coming Soon"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Check locale parity (web-v2, mobile, i18n-svc)
+        run: node scripts/ci/check-i18n-coverage.mjs
+
+      - name: Check no "coming soon" prose in production code
+        run: node scripts/ci/check-no-coming-soon.mjs
+
   build-node:
     name: Build All Node Services
     runs-on: ubuntu-latest

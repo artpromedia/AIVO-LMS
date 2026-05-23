@@ -17,8 +17,9 @@ import { type Typeface, type ReducedMotion } from "@/lib/a11y/typeface";
  * `lib/a11y/server.ts` so SSR + client agree on the very first paint.
  *
  * "Read aloud by default" and "Always show captions" are intentionally
- * not yet persisted — they belong on the learner preference profile
- * (per-learner override, not per-browser), wired in a follow-up.
+ * not persisted at the browser level — they belong on the learner
+ * preference profile (per-learner override) and are configured from
+ * each learner's accessibility profile page.
  */
 export interface A11yPreferencesTogglesProps {
   initialTypeface: Typeface;
@@ -83,14 +84,18 @@ export function A11yPreferencesToggles({
         <Checkbox id="read-aloud" disabled />
         <span>
           <span className="font-medium">Read aloud by default</span>
-          <span className="ml-2 text-iw-ink-muted">Per-learner setting — coming soon.</span>
+          <span className="ml-2 text-iw-ink-muted">
+            Configure per learner from each learner&apos;s accessibility profile.
+          </span>
         </span>
       </label>
       <label className="flex items-center gap-3 text-sm opacity-60">
         <Checkbox id="captions" disabled />
         <span>
           <span className="font-medium">Always show captions</span>
-          <span className="ml-2 text-iw-ink-muted">Per-learner setting — coming soon.</span>
+          <span className="ml-2 text-iw-ink-muted">
+            Configure per learner from each learner&apos;s accessibility profile.
+          </span>
         </span>
       </label>
     </fieldset>

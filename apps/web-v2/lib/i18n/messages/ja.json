@@ -1,19 +1,19 @@
 {
   "common": {
-    "sign_in": "Sign in",
-    "sign_out": "Sign out",
-    "get_started": "Get started",
-    "loading": "Loading...",
-    "language": "Language"
+    "sign_in": "サインイン",
+    "sign_out": "サインアウト",
+    "get_started": "はじめる",
+    "loading": "読み込み中...",
+    "language": "言語"
   },
   "nav": {
-    "platform": "Platform",
-    "research": "Research",
-    "for_districts": "For Districts",
-    "families": "Families",
-    "open": "Open navigation"
+    "platform": "プラットフォーム",
+    "research": "リサーチ",
+    "for_districts": "学区向け",
+    "families": "家族",
+    "open": "ナビゲーションを開く"
   },
   "app": {
-    "tagline": "Personalized learning adventures for every child."
+    "tagline": "すべての子どもにパーソナライズされた学びの冒険を。"
   }
 }

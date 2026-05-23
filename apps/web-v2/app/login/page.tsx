@@ -215,7 +215,7 @@ export default async function LoginPage({
             <AuthCard
               eyebrow="Sign in"
               title="Continue with your AIVO account"
-              subtitle="Email and password. Single sign-on coming soon."
+              subtitle="Sign in with your AIVO email and password."
               actions={
                 <>
                   <Button
