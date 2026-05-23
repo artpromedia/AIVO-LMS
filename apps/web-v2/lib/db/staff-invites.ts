@@ -30,7 +30,6 @@ type Registry = {
 };
 
 declare global {
-  // eslint-disable-next-line no-var
   var __aivoStaffInvites: Registry | undefined;
 }
 

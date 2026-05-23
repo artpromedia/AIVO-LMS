@@ -60,7 +60,6 @@ type Tables = {
 
 declare global {
   // Module-scoped singleton, sibling to globalThis.__aivoStore.
-  // eslint-disable-next-line no-var
   var __aivoTeamInvites: Tables | undefined;
 }
 
