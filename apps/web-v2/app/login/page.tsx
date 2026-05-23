@@ -92,6 +92,7 @@ async function signInAction(formData: FormData) {
   const profile = toSessionProfile(result.user);
   if (!profile) {
     redirect("/login?error=unsupported_role");
+    return;
   }
 
   const jar = await cookies();
