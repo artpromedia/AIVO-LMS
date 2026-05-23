@@ -22,7 +22,7 @@ export default async function Page() {
       navItems={CAREGIVER_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <PageHeader title="Learners" description="Detailed view coming soon." />
+      <PageHeader title="Learners" description="Detailed learner views land in a follow-up sprint." />
       <EmptyState
         title="Detailed learner views land soon"
         description="For now, your roster lives on the caregiver home."

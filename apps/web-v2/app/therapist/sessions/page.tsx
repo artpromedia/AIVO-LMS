@@ -19,7 +19,7 @@ export default async function Page() {
       navItems={THERAPIST_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <PageHeader title="Sessions" description="Coming soon." />
+      <PageHeader title="Sessions" description="Session logging lands in a follow-up sprint." />
       <EmptyState
         title="Session logging lands soon"
         description="Schedule and log therapy sessions here."
