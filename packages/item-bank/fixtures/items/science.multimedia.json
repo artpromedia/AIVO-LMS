@@ -1,0 +1,325 @@
+{
+  "subject": "science",
+  "items": [
+    {
+      "id": "science-media-01",
+      "subject": "science",
+      "skillId": "ngss.science.fixture.01",
+      "surfaceType": "video",
+      "prompt": "Watch or listen, then choose the best science explanation for item 1.",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "science-media-01-video",
+          "kind": "video",
+          "src": "https://example.com/aivo-fixtures/science/science-media-01.mp4",
+          "alt": "Science video fixture 1"
+        },
+        {
+          "id": "science-media-01-captions",
+          "kind": "captions",
+          "src": "./captions/science-media-01.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "science-media-02",
+      "subject": "science",
+      "skillId": "ngss.science.fixture.02",
+      "surfaceType": "audio",
+      "prompt": "Watch or listen, then choose the best science explanation for item 2.",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "science-media-02-audio",
+          "kind": "audio",
+          "src": "https://example.com/aivo-fixtures/science/science-media-02.mp3",
+          "alt": "Science audio fixture 2"
+        },
+        {
+          "id": "science-media-02-captions",
+          "kind": "captions",
+          "src": "./captions/science-media-02.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "science-media-03",
+      "subject": "science",
+      "skillId": "ngss.science.fixture.03",
+      "surfaceType": "video",
+      "prompt": "Watch or listen, then choose the best science explanation for item 3.",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "science-media-03-video",
+          "kind": "video",
+          "src": "https://example.com/aivo-fixtures/science/science-media-03.mp4",
+          "alt": "Science video fixture 3"
+        },
+        {
+          "id": "science-media-03-captions",
+          "kind": "captions",
+          "src": "./captions/science-media-03.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "science-media-04",
+      "subject": "science",
+      "skillId": "ngss.science.fixture.04",
+      "surfaceType": "audio",
+      "prompt": "Watch or listen, then choose the best science explanation for item 4.",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "science-media-04-audio",
+          "kind": "audio",
+          "src": "https://example.com/aivo-fixtures/science/science-media-04.mp3",
+          "alt": "Science audio fixture 4"
+        },
+        {
+          "id": "science-media-04-captions",
+          "kind": "captions",
+          "src": "./captions/science-media-04.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "science-media-05",
+      "subject": "science",
+      "skillId": "ngss.science.fixture.05",
+      "surfaceType": "video",
+      "prompt": "Watch or listen, then choose the best science explanation for item 5.",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "science-media-05-video",
+          "kind": "video",
+          "src": "https://example.com/aivo-fixtures/science/science-media-05.mp4",
+          "alt": "Science video fixture 5"
+        },
+        {
+          "id": "science-media-05-captions",
+          "kind": "captions",
+          "src": "./captions/science-media-05.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "science-media-06",
+      "subject": "science",
+      "skillId": "ngss.science.fixture.06",
+      "surfaceType": "audio",
+      "prompt": "Watch or listen, then choose the best science explanation for item 6.",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "science-media-06-audio",
+          "kind": "audio",
+          "src": "https://example.com/aivo-fixtures/science/science-media-06.mp3",
+          "alt": "Science audio fixture 6"
+        },
+        {
+          "id": "science-media-06-captions",
+          "kind": "captions",
+          "src": "./captions/science-media-06.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "science-media-07",
+      "subject": "science",
+      "skillId": "ngss.science.fixture.07",
+      "surfaceType": "video",
+      "prompt": "Watch or listen, then choose the best science explanation for item 7.",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "science-media-07-video",
+          "kind": "video",
+          "src": "https://example.com/aivo-fixtures/science/science-media-07.mp4",
+          "alt": "Science video fixture 7"
+        },
+        {
+          "id": "science-media-07-captions",
+          "kind": "captions",
+          "src": "./captions/science-media-07.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "science-media-08",
+      "subject": "science",
+      "skillId": "ngss.science.fixture.08",
+      "surfaceType": "audio",
+      "prompt": "Watch or listen, then choose the best science explanation for item 8.",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "science-media-08-audio",
+          "kind": "audio",
+          "src": "https://example.com/aivo-fixtures/science/science-media-08.mp3",
+          "alt": "Science audio fixture 8"
+        },
+        {
+          "id": "science-media-08-captions",
+          "kind": "captions",
+          "src": "./captions/science-media-08.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "science-media-09",
+      "subject": "science",
+      "skillId": "ngss.science.fixture.09",
+      "surfaceType": "video",
+      "prompt": "Watch or listen, then choose the best science explanation for item 9.",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "science-media-09-video",
+          "kind": "video",
+          "src": "https://example.com/aivo-fixtures/science/science-media-09.mp4",
+          "alt": "Science video fixture 9"
+        },
+        {
+          "id": "science-media-09-captions",
+          "kind": "captions",
+          "src": "./captions/science-media-09.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "science-media-10",
+      "subject": "science",
+      "skillId": "ngss.science.fixture.10",
+      "surfaceType": "audio",
+      "prompt": "Watch or listen, then choose the best science explanation for item 10.",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "science-media-10-audio",
+          "kind": "audio",
+          "src": "https://example.com/aivo-fixtures/science/science-media-10.mp3",
+          "alt": "Science audio fixture 10"
+        },
+        {
+          "id": "science-media-10-captions",
+          "kind": "captions",
+          "src": "./captions/science-media-10.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    }
+  ]
+}

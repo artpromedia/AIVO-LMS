@@ -16,7 +16,7 @@
  * - Honors accessibility prefs (reducedMotion, largeText, dyslexia font,
  *   highContrast) via wrapper classes + animation gating.
  */
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition, type SyntheticEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -47,6 +47,19 @@ type Beat =
       choices?: string[];
       hint: string;
       scaffold: string;
+      media?: {
+        surfaceType: "video" | "audio";
+        assets: Array<{
+          id: string;
+          kind: "video" | "audio" | "captions";
+          src: string;
+          alt?: string;
+          mimeType?: string;
+          language?: string;
+          label?: string;
+          default?: boolean;
+        }>;
+      };
     }
   | {
       kind: "check";
@@ -56,6 +69,19 @@ type Beat =
       expectedAnswer?: string;
       choices?: string[];
       supportIfWrong: string;
+      media?: {
+        surfaceType: "video" | "audio";
+        assets: Array<{
+          id: string;
+          kind: "video" | "audio" | "captions";
+          src: string;
+          alt?: string;
+          mimeType?: string;
+          language?: string;
+          label?: string;
+          default?: boolean;
+        }>;
+      };
     }
   | { kind: "celebrate"; key: string; body: string }
   | { kind: "progress"; key: string; body: string }
@@ -86,6 +112,7 @@ function buildBeats(plan: GeneratedLessonPlan, shorter: boolean): Beat[] {
       choices: g.choices,
       hint: g.hint,
       scaffold: g.scaffold,
+      media: g.media,
     }),
   );
   plan.checksForUnderstanding.forEach((c, i) =>
@@ -97,6 +124,7 @@ function buildBeats(plan: GeneratedLessonPlan, shorter: boolean): Beat[] {
       expectedAnswer: c.expectedAnswer,
       choices: c.choices,
       supportIfWrong: c.supportIfWrong,
+      media: c.media,
     }),
   );
   trimmed.push({ kind: "celebrate", key: "celebrate", body: plan.encouragement });
@@ -125,6 +153,73 @@ type Props = {
   accessibility: AccessibilityPreferences;
   initialStatus: LessonRunStatus;
 };
+
+type LessonMediaProps = {
+  media: NonNullable<
+    Extract<Beat, { kind: "guided" | "check" }>["media"]
+  >;
+  onTelemetry: (event: string) => void;
+};
+
+function toVttDataUri(vtt: string): string {
+  return `data:text/vtt;charset=utf-8,${encodeURIComponent(vtt)}`;
+}
+
+function LessonMedia({ media, onTelemetry }: LessonMediaProps) {
+  const mediaAsset = media.assets.find((asset) => asset.kind === media.surfaceType);
+  const captions = media.assets.find((asset) => asset.kind === "captions");
+  if (!mediaAsset || !captions) return null;
+  const source =
+    captions.src.startsWith("WEBVTT") || captions.src.includes("\n")
+      ? toVttDataUri(captions.src)
+      : captions.src.endsWith(".vtt")
+        ? captions.src
+        : toVttDataUri(captions.src);
+
+  const props = {
+    controls: true,
+    className: "w-full rounded-md border border-aivo-border",
+    onPlay: () => onTelemetry("play"),
+    onPause: () => onTelemetry("pause"),
+    onSeeked: () => onTelemetry("seek"),
+    onEnded: () => onTelemetry("complete"),
+    onLoadedMetadata: (event: SyntheticEvent<HTMLVideoElement | HTMLAudioElement>) => {
+      const track = event.currentTarget.textTracks?.[0];
+      if (track && track.mode !== "showing") {
+        track.mode = "showing";
+        onTelemetry("caption-on");
+      }
+    },
+  };
+
+  if (media.surfaceType === "video") {
+    return (
+      <video {...props} data-testid="lesson-media-video">
+        <source src={mediaAsset.src} />
+        <track
+          kind="captions"
+          srcLang={captions.language ?? "en"}
+          label={captions.label ?? "English"}
+          src={source}
+          default
+        />
+      </video>
+    );
+  }
+
+  return (
+    <audio {...props} data-testid="lesson-media-audio">
+      <source src={mediaAsset.src} />
+      <track
+        kind="captions"
+        srcLang={captions.language ?? "en"}
+        label={captions.label ?? "English"}
+        src={source}
+        default
+      />
+    </audio>
+  );
+}
 
 export function LessonPlayer({
   learnerId,
@@ -215,6 +310,19 @@ export function LessonPlayer({
       }).catch(() => {});
     }
   }, [stepIdx, beat, learnerId, lessonRunId, onBreak]);
+
+  function emitMediaTelemetry(surfaceType: "video" | "audio", event: string) {
+    fetch(`/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/step`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        stepKind: "answer_submitted",
+        stepRefId: beat.kind === "guided" ? beat.gpId : beat.kind === "check" ? beat.checkId : null,
+        response: `media:${surfaceType}:${event}`,
+        isCorrect: null,
+      }),
+    }).catch(() => {});
+  }
 
   function advance() {
     if (stepIdx < beats.length - 1) {
@@ -409,6 +517,12 @@ export function LessonPlayer({
                   aria-label="Your answer"
                 />
               )}
+              {beat.media ? (
+                <LessonMedia
+                  media={beat.media}
+                  onTelemetry={(event) => emitMediaTelemetry(beat.media.surfaceType, event)}
+                />
+              ) : null}
               {showHint && (
                 <p className="rounded-md bg-amber-50 p-3 text-sm text-amber-900">
                   Hint: <MathText>{beat.hint}</MathText>
@@ -465,6 +579,12 @@ export function LessonPlayer({
                   aria-label="Your answer"
                 />
               )}
+              {beat.media ? (
+                <LessonMedia
+                  media={beat.media}
+                  onTelemetry={(event) => emitMediaTelemetry(beat.media.surfaceType, event)}
+                />
+              ) : null}
               {feedback === "correct" && (
                 <p className="rounded-md bg-emerald-50 p-3 text-sm text-emerald-900">
                   Yes! You've got this.

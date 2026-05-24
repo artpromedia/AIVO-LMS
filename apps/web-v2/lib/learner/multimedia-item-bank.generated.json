@@ -1,0 +1,1031 @@
+{
+  "generatedAt": "2026-05-24T18:20:45.020Z",
+  "itemsBySubject": {
+    "math": [
+      {
+        "id": "math-media-01",
+        "subject": "math",
+        "skillId": "ccss.math.fixture.01",
+        "surfaceType": "video",
+        "prompt": "Watch or listen, then solve item 1: what is the best answer?",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "math-media-01-video",
+            "kind": "video",
+            "src": "https://example.com/aivo-fixtures/math/math-media-01.mp4",
+            "alt": "Math video fixture 1"
+          },
+          {
+            "id": "math-media-01-captions",
+            "kind": "captions",
+            "src": "./captions/math-media-01.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nMath fixture item 1: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/math-media-01.vtt"
+      },
+      {
+        "id": "math-media-02",
+        "subject": "math",
+        "skillId": "ccss.math.fixture.02",
+        "surfaceType": "audio",
+        "prompt": "Watch or listen, then solve item 2: what is the best answer?",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "math-media-02-audio",
+            "kind": "audio",
+            "src": "https://example.com/aivo-fixtures/math/math-media-02.mp3",
+            "alt": "Math audio fixture 2"
+          },
+          {
+            "id": "math-media-02-captions",
+            "kind": "captions",
+            "src": "./captions/math-media-02.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nMath fixture item 2: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/math-media-02.vtt"
+      },
+      {
+        "id": "math-media-03",
+        "subject": "math",
+        "skillId": "ccss.math.fixture.03",
+        "surfaceType": "video",
+        "prompt": "Watch or listen, then solve item 3: what is the best answer?",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "math-media-03-video",
+            "kind": "video",
+            "src": "https://example.com/aivo-fixtures/math/math-media-03.mp4",
+            "alt": "Math video fixture 3"
+          },
+          {
+            "id": "math-media-03-captions",
+            "kind": "captions",
+            "src": "./captions/math-media-03.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nMath fixture item 3: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/math-media-03.vtt"
+      },
+      {
+        "id": "math-media-04",
+        "subject": "math",
+        "skillId": "ccss.math.fixture.04",
+        "surfaceType": "audio",
+        "prompt": "Watch or listen, then solve item 4: what is the best answer?",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "math-media-04-audio",
+            "kind": "audio",
+            "src": "https://example.com/aivo-fixtures/math/math-media-04.mp3",
+            "alt": "Math audio fixture 4"
+          },
+          {
+            "id": "math-media-04-captions",
+            "kind": "captions",
+            "src": "./captions/math-media-04.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nMath fixture item 4: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/math-media-04.vtt"
+      },
+      {
+        "id": "math-media-05",
+        "subject": "math",
+        "skillId": "ccss.math.fixture.05",
+        "surfaceType": "video",
+        "prompt": "Watch or listen, then solve item 5: what is the best answer?",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "math-media-05-video",
+            "kind": "video",
+            "src": "https://example.com/aivo-fixtures/math/math-media-05.mp4",
+            "alt": "Math video fixture 5"
+          },
+          {
+            "id": "math-media-05-captions",
+            "kind": "captions",
+            "src": "./captions/math-media-05.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nMath fixture item 5: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/math-media-05.vtt"
+      },
+      {
+        "id": "math-media-06",
+        "subject": "math",
+        "skillId": "ccss.math.fixture.06",
+        "surfaceType": "audio",
+        "prompt": "Watch or listen, then solve item 6: what is the best answer?",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "math-media-06-audio",
+            "kind": "audio",
+            "src": "https://example.com/aivo-fixtures/math/math-media-06.mp3",
+            "alt": "Math audio fixture 6"
+          },
+          {
+            "id": "math-media-06-captions",
+            "kind": "captions",
+            "src": "./captions/math-media-06.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nMath fixture item 6: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/math-media-06.vtt"
+      },
+      {
+        "id": "math-media-07",
+        "subject": "math",
+        "skillId": "ccss.math.fixture.07",
+        "surfaceType": "video",
+        "prompt": "Watch or listen, then solve item 7: what is the best answer?",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "math-media-07-video",
+            "kind": "video",
+            "src": "https://example.com/aivo-fixtures/math/math-media-07.mp4",
+            "alt": "Math video fixture 7"
+          },
+          {
+            "id": "math-media-07-captions",
+            "kind": "captions",
+            "src": "./captions/math-media-07.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nMath fixture item 7: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/math-media-07.vtt"
+      },
+      {
+        "id": "math-media-08",
+        "subject": "math",
+        "skillId": "ccss.math.fixture.08",
+        "surfaceType": "audio",
+        "prompt": "Watch or listen, then solve item 8: what is the best answer?",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "math-media-08-audio",
+            "kind": "audio",
+            "src": "https://example.com/aivo-fixtures/math/math-media-08.mp3",
+            "alt": "Math audio fixture 8"
+          },
+          {
+            "id": "math-media-08-captions",
+            "kind": "captions",
+            "src": "./captions/math-media-08.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nMath fixture item 8: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/math-media-08.vtt"
+      },
+      {
+        "id": "math-media-09",
+        "subject": "math",
+        "skillId": "ccss.math.fixture.09",
+        "surfaceType": "video",
+        "prompt": "Watch or listen, then solve item 9: what is the best answer?",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "math-media-09-video",
+            "kind": "video",
+            "src": "https://example.com/aivo-fixtures/math/math-media-09.mp4",
+            "alt": "Math video fixture 9"
+          },
+          {
+            "id": "math-media-09-captions",
+            "kind": "captions",
+            "src": "./captions/math-media-09.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nMath fixture item 9: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/math-media-09.vtt"
+      },
+      {
+        "id": "math-media-10",
+        "subject": "math",
+        "skillId": "ccss.math.fixture.10",
+        "surfaceType": "audio",
+        "prompt": "Watch or listen, then solve item 10: what is the best answer?",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "math-media-10-audio",
+            "kind": "audio",
+            "src": "https://example.com/aivo-fixtures/math/math-media-10.mp3",
+            "alt": "Math audio fixture 10"
+          },
+          {
+            "id": "math-media-10-captions",
+            "kind": "captions",
+            "src": "./captions/math-media-10.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nMath fixture item 10: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/math-media-10.vtt"
+      }
+    ],
+    "ela": [
+      {
+        "id": "ela-media-01",
+        "subject": "ela",
+        "skillId": "ccss.ela.fixture.01",
+        "surfaceType": "video",
+        "prompt": "Watch or listen, then identify the best language answer for item 1.",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "ela-media-01-video",
+            "kind": "video",
+            "src": "https://example.com/aivo-fixtures/ela/ela-media-01.mp4",
+            "alt": "Ela video fixture 1"
+          },
+          {
+            "id": "ela-media-01-captions",
+            "kind": "captions",
+            "src": "./captions/ela-media-01.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nEla fixture item 1: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/ela-media-01.vtt"
+      },
+      {
+        "id": "ela-media-02",
+        "subject": "ela",
+        "skillId": "ccss.ela.fixture.02",
+        "surfaceType": "audio",
+        "prompt": "Watch or listen, then identify the best language answer for item 2.",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "ela-media-02-audio",
+            "kind": "audio",
+            "src": "https://example.com/aivo-fixtures/ela/ela-media-02.mp3",
+            "alt": "Ela audio fixture 2"
+          },
+          {
+            "id": "ela-media-02-captions",
+            "kind": "captions",
+            "src": "./captions/ela-media-02.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nEla fixture item 2: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/ela-media-02.vtt"
+      },
+      {
+        "id": "ela-media-03",
+        "subject": "ela",
+        "skillId": "ccss.ela.fixture.03",
+        "surfaceType": "video",
+        "prompt": "Watch or listen, then identify the best language answer for item 3.",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "ela-media-03-video",
+            "kind": "video",
+            "src": "https://example.com/aivo-fixtures/ela/ela-media-03.mp4",
+            "alt": "Ela video fixture 3"
+          },
+          {
+            "id": "ela-media-03-captions",
+            "kind": "captions",
+            "src": "./captions/ela-media-03.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nEla fixture item 3: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/ela-media-03.vtt"
+      },
+      {
+        "id": "ela-media-04",
+        "subject": "ela",
+        "skillId": "ccss.ela.fixture.04",
+        "surfaceType": "audio",
+        "prompt": "Watch or listen, then identify the best language answer for item 4.",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "ela-media-04-audio",
+            "kind": "audio",
+            "src": "https://example.com/aivo-fixtures/ela/ela-media-04.mp3",
+            "alt": "Ela audio fixture 4"
+          },
+          {
+            "id": "ela-media-04-captions",
+            "kind": "captions",
+            "src": "./captions/ela-media-04.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nEla fixture item 4: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/ela-media-04.vtt"
+      },
+      {
+        "id": "ela-media-05",
+        "subject": "ela",
+        "skillId": "ccss.ela.fixture.05",
+        "surfaceType": "video",
+        "prompt": "Watch or listen, then identify the best language answer for item 5.",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "ela-media-05-video",
+            "kind": "video",
+            "src": "https://example.com/aivo-fixtures/ela/ela-media-05.mp4",
+            "alt": "Ela video fixture 5"
+          },
+          {
+            "id": "ela-media-05-captions",
+            "kind": "captions",
+            "src": "./captions/ela-media-05.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nEla fixture item 5: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/ela-media-05.vtt"
+      },
+      {
+        "id": "ela-media-06",
+        "subject": "ela",
+        "skillId": "ccss.ela.fixture.06",
+        "surfaceType": "audio",
+        "prompt": "Watch or listen, then identify the best language answer for item 6.",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "ela-media-06-audio",
+            "kind": "audio",
+            "src": "https://example.com/aivo-fixtures/ela/ela-media-06.mp3",
+            "alt": "Ela audio fixture 6"
+          },
+          {
+            "id": "ela-media-06-captions",
+            "kind": "captions",
+            "src": "./captions/ela-media-06.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nEla fixture item 6: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/ela-media-06.vtt"
+      },
+      {
+        "id": "ela-media-07",
+        "subject": "ela",
+        "skillId": "ccss.ela.fixture.07",
+        "surfaceType": "video",
+        "prompt": "Watch or listen, then identify the best language answer for item 7.",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "ela-media-07-video",
+            "kind": "video",
+            "src": "https://example.com/aivo-fixtures/ela/ela-media-07.mp4",
+            "alt": "Ela video fixture 7"
+          },
+          {
+            "id": "ela-media-07-captions",
+            "kind": "captions",
+            "src": "./captions/ela-media-07.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nEla fixture item 7: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/ela-media-07.vtt"
+      },
+      {
+        "id": "ela-media-08",
+        "subject": "ela",
+        "skillId": "ccss.ela.fixture.08",
+        "surfaceType": "audio",
+        "prompt": "Watch or listen, then identify the best language answer for item 8.",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "ela-media-08-audio",
+            "kind": "audio",
+            "src": "https://example.com/aivo-fixtures/ela/ela-media-08.mp3",
+            "alt": "Ela audio fixture 8"
+          },
+          {
+            "id": "ela-media-08-captions",
+            "kind": "captions",
+            "src": "./captions/ela-media-08.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nEla fixture item 8: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/ela-media-08.vtt"
+      },
+      {
+        "id": "ela-media-09",
+        "subject": "ela",
+        "skillId": "ccss.ela.fixture.09",
+        "surfaceType": "video",
+        "prompt": "Watch or listen, then identify the best language answer for item 9.",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "ela-media-09-video",
+            "kind": "video",
+            "src": "https://example.com/aivo-fixtures/ela/ela-media-09.mp4",
+            "alt": "Ela video fixture 9"
+          },
+          {
+            "id": "ela-media-09-captions",
+            "kind": "captions",
+            "src": "./captions/ela-media-09.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nEla fixture item 9: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/ela-media-09.vtt"
+      },
+      {
+        "id": "ela-media-10",
+        "subject": "ela",
+        "skillId": "ccss.ela.fixture.10",
+        "surfaceType": "audio",
+        "prompt": "Watch or listen, then identify the best language answer for item 10.",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "ela-media-10-audio",
+            "kind": "audio",
+            "src": "https://example.com/aivo-fixtures/ela/ela-media-10.mp3",
+            "alt": "Ela audio fixture 10"
+          },
+          {
+            "id": "ela-media-10-captions",
+            "kind": "captions",
+            "src": "./captions/ela-media-10.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nEla fixture item 10: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/ela-media-10.vtt"
+      }
+    ],
+    "science": [
+      {
+        "id": "science-media-01",
+        "subject": "science",
+        "skillId": "ngss.science.fixture.01",
+        "surfaceType": "video",
+        "prompt": "Watch or listen, then choose the best science explanation for item 1.",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "science-media-01-video",
+            "kind": "video",
+            "src": "https://example.com/aivo-fixtures/science/science-media-01.mp4",
+            "alt": "Science video fixture 1"
+          },
+          {
+            "id": "science-media-01-captions",
+            "kind": "captions",
+            "src": "./captions/science-media-01.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nScience fixture item 1: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/science-media-01.vtt"
+      },
+      {
+        "id": "science-media-02",
+        "subject": "science",
+        "skillId": "ngss.science.fixture.02",
+        "surfaceType": "audio",
+        "prompt": "Watch or listen, then choose the best science explanation for item 2.",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "science-media-02-audio",
+            "kind": "audio",
+            "src": "https://example.com/aivo-fixtures/science/science-media-02.mp3",
+            "alt": "Science audio fixture 2"
+          },
+          {
+            "id": "science-media-02-captions",
+            "kind": "captions",
+            "src": "./captions/science-media-02.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nScience fixture item 2: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/science-media-02.vtt"
+      },
+      {
+        "id": "science-media-03",
+        "subject": "science",
+        "skillId": "ngss.science.fixture.03",
+        "surfaceType": "video",
+        "prompt": "Watch or listen, then choose the best science explanation for item 3.",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "science-media-03-video",
+            "kind": "video",
+            "src": "https://example.com/aivo-fixtures/science/science-media-03.mp4",
+            "alt": "Science video fixture 3"
+          },
+          {
+            "id": "science-media-03-captions",
+            "kind": "captions",
+            "src": "./captions/science-media-03.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nScience fixture item 3: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/science-media-03.vtt"
+      },
+      {
+        "id": "science-media-04",
+        "subject": "science",
+        "skillId": "ngss.science.fixture.04",
+        "surfaceType": "audio",
+        "prompt": "Watch or listen, then choose the best science explanation for item 4.",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "science-media-04-audio",
+            "kind": "audio",
+            "src": "https://example.com/aivo-fixtures/science/science-media-04.mp3",
+            "alt": "Science audio fixture 4"
+          },
+          {
+            "id": "science-media-04-captions",
+            "kind": "captions",
+            "src": "./captions/science-media-04.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nScience fixture item 4: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/science-media-04.vtt"
+      },
+      {
+        "id": "science-media-05",
+        "subject": "science",
+        "skillId": "ngss.science.fixture.05",
+        "surfaceType": "video",
+        "prompt": "Watch or listen, then choose the best science explanation for item 5.",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "science-media-05-video",
+            "kind": "video",
+            "src": "https://example.com/aivo-fixtures/science/science-media-05.mp4",
+            "alt": "Science video fixture 5"
+          },
+          {
+            "id": "science-media-05-captions",
+            "kind": "captions",
+            "src": "./captions/science-media-05.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nScience fixture item 5: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/science-media-05.vtt"
+      },
+      {
+        "id": "science-media-06",
+        "subject": "science",
+        "skillId": "ngss.science.fixture.06",
+        "surfaceType": "audio",
+        "prompt": "Watch or listen, then choose the best science explanation for item 6.",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "science-media-06-audio",
+            "kind": "audio",
+            "src": "https://example.com/aivo-fixtures/science/science-media-06.mp3",
+            "alt": "Science audio fixture 6"
+          },
+          {
+            "id": "science-media-06-captions",
+            "kind": "captions",
+            "src": "./captions/science-media-06.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nScience fixture item 6: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/science-media-06.vtt"
+      },
+      {
+        "id": "science-media-07",
+        "subject": "science",
+        "skillId": "ngss.science.fixture.07",
+        "surfaceType": "video",
+        "prompt": "Watch or listen, then choose the best science explanation for item 7.",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "science-media-07-video",
+            "kind": "video",
+            "src": "https://example.com/aivo-fixtures/science/science-media-07.mp4",
+            "alt": "Science video fixture 7"
+          },
+          {
+            "id": "science-media-07-captions",
+            "kind": "captions",
+            "src": "./captions/science-media-07.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nScience fixture item 7: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/science-media-07.vtt"
+      },
+      {
+        "id": "science-media-08",
+        "subject": "science",
+        "skillId": "ngss.science.fixture.08",
+        "surfaceType": "audio",
+        "prompt": "Watch or listen, then choose the best science explanation for item 8.",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "science-media-08-audio",
+            "kind": "audio",
+            "src": "https://example.com/aivo-fixtures/science/science-media-08.mp3",
+            "alt": "Science audio fixture 8"
+          },
+          {
+            "id": "science-media-08-captions",
+            "kind": "captions",
+            "src": "./captions/science-media-08.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nScience fixture item 8: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/science-media-08.vtt"
+      },
+      {
+        "id": "science-media-09",
+        "subject": "science",
+        "skillId": "ngss.science.fixture.09",
+        "surfaceType": "video",
+        "prompt": "Watch or listen, then choose the best science explanation for item 9.",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "science-media-09-video",
+            "kind": "video",
+            "src": "https://example.com/aivo-fixtures/science/science-media-09.mp4",
+            "alt": "Science video fixture 9"
+          },
+          {
+            "id": "science-media-09-captions",
+            "kind": "captions",
+            "src": "./captions/science-media-09.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nScience fixture item 9: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/science-media-09.vtt"
+      },
+      {
+        "id": "science-media-10",
+        "subject": "science",
+        "skillId": "ngss.science.fixture.10",
+        "surfaceType": "audio",
+        "prompt": "Watch or listen, then choose the best science explanation for item 10.",
+        "expectedAnswer": "B",
+        "choices": [
+          "A",
+          "B",
+          "C"
+        ],
+        "hint": "Re-play the media and focus on key words in the captions.",
+        "scaffold": "Use the captions to find the strongest evidence before choosing.",
+        "assets": [
+          {
+            "id": "science-media-10-audio",
+            "kind": "audio",
+            "src": "https://example.com/aivo-fixtures/science/science-media-10.mp3",
+            "alt": "Science audio fixture 10"
+          },
+          {
+            "id": "science-media-10-captions",
+            "kind": "captions",
+            "src": "./captions/science-media-10.vtt",
+            "mimeType": "text/vtt",
+            "language": "en",
+            "label": "English",
+            "default": true
+          }
+        ],
+        "captionText": "WEBVTT\n\n00:00:00.000 --> 00:00:02.500\nScience fixture item 10: focus on the key idea.\n\n00:00:02.500 --> 00:00:05.500\nUse this caption track to answer choice B.\n",
+        "captionPath": "./captions/science-media-10.vtt"
+      }
+    ]
+  }
+}

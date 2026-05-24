@@ -16,6 +16,7 @@ import type {
   Subject,
 } from "@/lib/db/types";
 import type { GeneratedLessonPlanInput } from "@/lib/validators/lesson";
+import { pickMultimediaFixtureForSubject } from "./multimedia-item-bank";
 
 const TUTOR_PERSONA_BY_SUBJECT: Record<string, string> = {
   reading: "Nimbus the Calm Explorer",
@@ -233,6 +234,24 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
     guidedRaw = genericPractice(subject.name, skill.name);
   }
   const guidedPractice = guidedRaw.map((g) => ({ ...g, skillId: skill.id }));
+  const multimedia = pickMultimediaFixtureForSubject(subject.slug, `${skill.id}:${learnerName}`);
+  if (multimedia && guidedPractice.length > 0) {
+    const [first, ...rest] = guidedPractice;
+    guidedPractice.splice(0, guidedPractice.length, {
+      ...first,
+      prompt: multimedia.prompt,
+      expectedAnswer: multimedia.expectedAnswer ?? first.expectedAnswer,
+      choices: multimedia.choices?.length ? multimedia.choices : first.choices,
+      hint: multimedia.hint ?? first.hint,
+      scaffold: multimedia.scaffold ?? first.scaffold,
+      media: {
+        surfaceType: multimedia.surfaceType,
+        assets: multimedia.assets.map((asset) =>
+          asset.kind === "captions" ? { ...asset, src: multimedia.captionText } : asset,
+        ),
+      },
+    }, ...rest);
+  }
 
   const checksForUnderstanding: GeneratedLessonPlanInput["checksForUnderstanding"] = [
     {

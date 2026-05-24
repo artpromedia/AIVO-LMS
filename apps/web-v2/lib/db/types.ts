@@ -606,6 +606,19 @@ export type GeneratedLessonPlan = {
     hint: string;
     scaffold: string;
     skillId: ID;
+    media?: {
+      surfaceType: "video" | "audio";
+      assets: Array<{
+        id: string;
+        kind: "video" | "audio" | "captions";
+        src: string;
+        alt?: string;
+        mimeType?: string;
+        language?: string;
+        label?: string;
+        default?: boolean;
+      }>;
+    };
   }>;
   checksForUnderstanding: Array<{
     id: ID;
@@ -613,6 +626,19 @@ export type GeneratedLessonPlan = {
     expectedAnswer?: string;
     choices?: string[];
     supportIfWrong: string;
+    media?: {
+      surfaceType: "video" | "audio";
+      assets: Array<{
+        id: string;
+        kind: "video" | "audio" | "captions";
+        src: string;
+        alt?: string;
+        mimeType?: string;
+        language?: string;
+        label?: string;
+        default?: boolean;
+      }>;
+    };
   }>;
   accessibilitySupports: string[];
   encouragement: string;
