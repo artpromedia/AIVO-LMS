@@ -78,6 +78,124 @@ jobs:
       - name: Build all packages and services
         run: pnpm build
 
+  # Sprint 0 Prompt 0.2 — BFF integration contract tests.
+  #
+  # Runs Playwright API tests at apps/web-v2/tests/integration/bff/*.spec.ts
+  # against a freshly-built web-v2 (AUTH_MODE=mock). These lock the
+  # canonical { ok, requestId, error|data } envelope and the auth /
+  # scope / validation status codes that packages/api-client consumers
+  # rely on. The job is path-gated to changes under apps/web-v2/app/api/bff/**
+  # or services/**/routes/**; non-matching runs short-circuit to a green
+  # no-op so the required-status check still reports success.
+  #
+  # TODO(sprint-0-followup): expand into a full docker-compose harness
+  # spinning up identity-svc + learning-svc + subject-brain-svc so we can
+  # exercise authenticated happy paths (real session cookie, real upstream
+  # contracts) on top of these envelope checks.
+  bff-integration:
+    name: BFF Integration (web-v2 contracts)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: lint-and-typecheck
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Detect BFF / service-route changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            bff:
+              - 'apps/web-v2/app/api/bff/**'
+              - 'apps/web-v2/lib/bff/**'
+              - 'apps/web-v2/tests/integration/bff/**'
+              - 'apps/web-v2/playwright.bff.config.ts'
+              - 'services/**/routes/**'
+              - 'packages/api-client/**'
+              - '.github/workflows/ci.yml'
+
+      - name: Skip (no BFF / service-route changes)
+        if: steps.filter.outputs.bff != 'true'
+        run: echo "No BFF or service-route changes detected — skipping integration suite."
+
+      - uses: pnpm/action-setup@v5
+        if: steps.filter.outputs.bff == 'true'
+
+      - uses: actions/setup-node@v5
+        if: steps.filter.outputs.bff == 'true'
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        if: steps.filter.outputs.bff == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browser deps
+        if: steps.filter.outputs.bff == 'true'
+        run: pnpm --filter @aivo/web-v2 exec playwright install --with-deps chromium
+
+      - name: Build web-v2
+        if: steps.filter.outputs.bff == 'true'
+        env:
+          NODE_ENV: development
+          AUTH_MODE: mock
+        run: pnpm --filter @aivo/web-v2 build
+
+      - name: Start web-v2 (background, AUTH_MODE=mock)
+        if: steps.filter.outputs.bff == 'true'
+        env:
+          NODE_ENV: development
+          AUTH_MODE: mock
+          PORT: "5000"
+        run: |
+          nohup pnpm --filter @aivo/web-v2 start > web-v2.log 2>&1 &
+          echo $! > web-v2.pid
+
+      - name: Wait for web-v2 to accept connections
+        if: steps.filter.outputs.bff == 'true'
+        run: |
+          for i in $(seq 1 60); do
+            if curl -fsS -o /dev/null http://127.0.0.1:5000/; then
+              echo "web-v2 is up after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::web-v2 did not become ready within 60s"
+          tail -n 200 web-v2.log || true
+          exit 1
+
+      - name: Run BFF integration suite
+        if: steps.filter.outputs.bff == 'true'
+        env:
+          WEB_V2_BASE_URL: http://127.0.0.1:5000
+        run: |
+          pnpm --filter @aivo/web-v2 exec playwright test \
+            --config=playwright.bff.config.ts
+
+      - name: Dump web-v2 logs on failure
+        if: failure() && steps.filter.outputs.bff == 'true'
+        run: tail -n 500 web-v2.log || true
+
+      - name: Stop web-v2
+        if: always() && steps.filter.outputs.bff == 'true'
+        run: |
+          if [ -f web-v2.pid ]; then
+            kill "$(cat web-v2.pid)" || true
+          fi
+
+      - name: Upload Playwright report
+        if: always() && steps.filter.outputs.bff == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: bff-playwright-report
+          path: |
+            apps/web-v2/playwright-report
+            apps/web-v2/test-results
+          if-no-files-found: ignore
+
   background-jobs-tests:
     name: Background Jobs & Scheduler Tests
     runs-on: ubuntu-latest
