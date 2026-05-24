@@ -2000,6 +2000,7 @@ export function createHomeworkSession(input: {
   tenantId: string;
   topic: string;
   subjectId: string | null;
+  attachment?: HomeworkHelpSession["attachment"];
 }): HomeworkHelpSession {
   const store = db();
   const session: HomeworkHelpSession = {
@@ -2008,6 +2009,7 @@ export function createHomeworkSession(input: {
     tenantId: input.tenantId,
     topic: input.topic,
     subjectId: input.subjectId,
+    attachment: input.attachment ?? null,
     messages: [],
     insight: null,
     followUpRunId: null,

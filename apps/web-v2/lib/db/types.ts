@@ -784,6 +784,23 @@ export type HomeworkHelpMessage = {
   occurredAt: ISODate;
 };
 
+/**
+ * Sprint 1 (learner roadmap): an optional attachment uploaded when the learner
+ * starts a homework session — a photo of their work or a PDF worksheet.
+ * Stored inline (base64) in dev/local; in production this would be moved
+ * to object storage with a signed URL.
+ */
+export type HomeworkAttachment = {
+  /** MIME type, restricted to a small allow-list (see lib/homework/attachments). */
+  mimeType: "image/png" | "image/jpeg" | "image/webp" | "application/pdf";
+  /** Original filename if provided by the learner; null for camera captures. */
+  filename: string | null;
+  /** Decoded byte size; used for the UI chip and to enforce the size cap. */
+  sizeBytes: number;
+  /** Base64-encoded payload (without the data: prefix). */
+  dataBase64: string;
+};
+
 export type HomeworkHelpSession = {
   id: ID;
   learnerId: ID;
@@ -791,6 +808,8 @@ export type HomeworkHelpSession = {
   topic: string;
   /** Subject classified from the topic when possible (e.g. "math", "reading"). */
   subjectId: ID | null;
+  /** Optional photo/PDF uploaded at session start. */
+  attachment: HomeworkAttachment | null;
   messages: HomeworkHelpMessage[];
   /** Plain-language insight written on complete — what the learner practiced. */
   insight: string | null;
