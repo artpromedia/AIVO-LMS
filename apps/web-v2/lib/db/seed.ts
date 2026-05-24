@@ -25,66 +25,36 @@ import type {
 import { CONSENT_TYPES, DATA_CLASSIFICATIONS } from "@/lib/db/types";
 import type { NotificationPreference, NotificationType, AICostEvent } from "@/lib/db/types";
 import type { Role } from "@/lib/auth/types";
+import { LEARNER_SUBJECTS } from "@aivo/brand";
 
-const SUBJECTS: Omit<Subject, "id">[] = [
-  // Six "Discovery Adventure" domains aligned with the legacy baseline:
-  // ELA/Sage, Math/Nova, Science/Spark, SEL/Harmony, Speech/Echo, ExecFn/Pixel.
-  {
-    slug: "reading",
-    name: "Reading & Language",
-    description: "Decoding, comprehension, vocabulary.",
-    iconKey: "book",
-  },
-  {
-    slug: "math",
-    name: "Math",
-    description: "Number sense, operations, problem solving.",
-    iconKey: "calculator",
-  },
-  {
-    slug: "science",
-    name: "Science",
-    description: "Observation, experimentation, nature.",
-    iconKey: "flask",
-  },
-  {
-    slug: "social",
-    name: "Social-Emotional",
-    description: "Feelings, friendships, self-regulation.",
-    iconKey: "people",
-  },
-  {
-    slug: "speech",
-    name: "Speech & Language",
-    description: "Sounds, rhyming, syllables, articulation.",
-    iconKey: "music",
-  },
-  {
-    slug: "executive-function",
-    name: "Executive Function",
-    description: "Patterns, memory, logic, multi-step thinking.",
-    iconKey: "puzzle",
-  },
-  // Non-baseline subjects kept for tutor / lesson coverage:
-  {
-    slug: "writing",
-    name: "Writing",
-    description: "Sentence building, narrative, expression.",
-    iconKey: "pencil",
-  },
-  {
-    slug: "life",
-    name: "Life skills",
-    description: "Daily routines, self-care, organization.",
-    iconKey: "home",
-  },
-  {
-    slug: "art",
-    name: "Art",
-    description: "Drawing, color, creative expression.",
-    iconKey: "palette",
-  },
-];
+// Subjects seeded into the web learner DB. Sourced from the canonical
+// `LEARNER_SUBJECTS` registry in `@aivo/brand` so that web slugs,
+// subject-brain ids, and tutor keys stay in lock-step across the
+// learner UI, BFF, and adaptive engines (Sprint 12). We filter to the
+// set the legacy web seed already shipped — new registry rows
+// (social-studies, world-languages, coding) are exposed through the
+// registry for new code to consume but are not auto-added to the
+// existing learner subjects grid to avoid surprising downstream
+// teacher / parent surfaces.
+const WEB_SEEDED_SUBJECT_SLUGS = new Set([
+  "reading",
+  "math",
+  "science",
+  "social",
+  "speech",
+  "executive-function",
+  "writing",
+  "life",
+  "art",
+]);
+const SUBJECTS: Omit<Subject, "id">[] = LEARNER_SUBJECTS.filter((s) =>
+  WEB_SEEDED_SUBJECT_SLUGS.has(s.slug),
+).map((s) => ({
+  slug: s.slug,
+  name: s.name,
+  description: s.description,
+  iconKey: s.iconKey,
+}));
 
 const SKILL_SEED: { subjectSlug: string; slug: string; name: string; gradeBand: string }[] = [
   { subjectSlug: "reading", slug: "phonics-cvc", name: "CVC words", gradeBand: "K-1" },
