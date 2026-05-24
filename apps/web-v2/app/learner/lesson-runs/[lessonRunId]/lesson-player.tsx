@@ -24,6 +24,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { PageHeader } from "@/components/layout/page-header";
 import { AudioControlBar, FocusMode } from "@/components/playful-calm";
+import { MathText } from "@/components/learning/math-text";
 import type {
   AccessibilityPreferences,
   GeneratedLessonPlan,
@@ -363,19 +364,27 @@ export function LessonPlayer({
           beat.kind === "celebrate" ||
           beat.kind === "progress" ||
           beat.kind === "next" ? (
-            <p className="font-display text-2xl">{beat.body}</p>
+            <p className="font-display text-2xl">
+              <MathText>{beat.body}</MathText>
+            </p>
           ) : null}
 
           {beat.kind === "example" && (
             <>
-              <p className="font-display text-2xl">{beat.prompt}</p>
-              <p className="text-aivo-ink-soft">{beat.explanation}</p>
+              <p className="font-display text-2xl">
+                <MathText>{beat.prompt}</MathText>
+              </p>
+              <p className="text-aivo-ink-soft">
+                <MathText>{beat.explanation}</MathText>
+              </p>
             </>
           )}
 
           {beat.kind === "guided" && (
             <>
-              <p className="font-display text-2xl">{beat.prompt}</p>
+              <p className="font-display text-2xl">
+                <MathText>{beat.prompt}</MathText>
+              </p>
               {beat.choices ? (
                 <div className="grid gap-2 sm:grid-cols-2">
                   {beat.choices.map((c) => (
@@ -384,7 +393,7 @@ export function LessonPlayer({
                       variant={answer === c ? "default" : "soft"}
                       onClick={() => setAnswer(c)}
                     >
-                      {c}
+                      <MathText>{c}</MathText>
                     </Button>
                   ))}
                 </div>
@@ -402,7 +411,7 @@ export function LessonPlayer({
               )}
               {showHint && (
                 <p className="rounded-md bg-amber-50 p-3 text-sm text-amber-900">
-                  Hint: {beat.hint}
+                  Hint: <MathText>{beat.hint}</MathText>
                 </p>
               )}
               {feedback === "correct" && (
@@ -410,7 +419,7 @@ export function LessonPlayer({
               )}
               {feedback === "incorrect" && (
                 <p className="rounded-md bg-rose-50 p-3 text-sm text-rose-900">
-                  Not quite — try again or use the hint. {beat.scaffold}
+                  Not quite — try again or use the hint. <MathText>{beat.scaffold}</MathText>
                 </p>
               )}
               <div className="flex flex-wrap gap-2">
@@ -429,7 +438,9 @@ export function LessonPlayer({
 
           {beat.kind === "check" && (
             <>
-              <p className="font-display text-2xl">{beat.prompt}</p>
+              <p className="font-display text-2xl">
+                <MathText>{beat.prompt}</MathText>
+              </p>
               {beat.choices ? (
                 <div className="grid gap-2 sm:grid-cols-2">
                   {beat.choices.map((c) => (
@@ -438,7 +449,7 @@ export function LessonPlayer({
                       variant={answer === c ? "default" : "soft"}
                       onClick={() => setAnswer(c)}
                     >
-                      {c}
+                      <MathText>{c}</MathText>
                     </Button>
                   ))}
                 </div>
@@ -461,7 +472,7 @@ export function LessonPlayer({
               )}
               {feedback === "incorrect" && (
                 <p className="rounded-md bg-rose-50 p-3 text-sm text-rose-900">
-                  Close — {beat.supportIfWrong}
+                  Close — <MathText>{beat.supportIfWrong}</MathText>
                 </p>
               )}
               <div className="flex gap-2">
