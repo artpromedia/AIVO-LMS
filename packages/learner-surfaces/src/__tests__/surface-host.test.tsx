@@ -14,7 +14,7 @@ const baseSurface: Omit<LearnerSurfaceSpec, "id" | "type" | "prompt"> = {
 };
 
 describe("SurfaceHost", () => {
-  it("renders scratchpad, geometry, choice-grid, video, and audio surfaces", () => {
+  it("renders scratchpad, geometry, choice-grid, and coding surfaces", () => {
     const scratchpadMarkup = renderToStaticMarkup(
       <SurfaceHost
         surface={{
@@ -59,47 +59,22 @@ describe("SurfaceHost", () => {
       />,
     );
 
-    const videoMarkup = renderToStaticMarkup(
+    const codingMarkup = renderToStaticMarkup(
       <SurfaceHost
         surface={{
           ...baseSurface,
-          id: "s5",
-          type: "video",
-          prompt: "Watch",
-          media: {
-            src: "https://example.invalid/video.m3u8",
-            mimeType: "application/x-mpegURL",
-            assets: [
-              {
-                type: "captions",
-                src: "data:text/vtt;charset=utf-8,WEBVTT",
-                lang: "en",
-                default: true,
-              },
-            ],
-          },
-        }}
-      />,
-    );
-
-    const audioMarkup = renderToStaticMarkup(
-      <SurfaceHost
-        surface={{
-          ...baseSurface,
-          id: "s6",
-          type: "audio",
-          prompt: "Listen",
-          media: {
-            src: "https://example.invalid/audio.mp3",
-            mimeType: "audio/mpeg",
-            assets: [
-              {
-                type: "captions",
-                src: "data:text/vtt;charset=utf-8,WEBVTT",
-                lang: "en",
-                default: true,
-              },
-            ],
+          id: "s4",
+          type: "coding_sandbox",
+          prompt: "Write a function",
+          codingSandbox: {
+            language: "javascript",
+            starterCode: "export function add(a, b) { return a + b; }",
+            correctness: {
+              type: "coding",
+              language: "javascript",
+              starterCode: "export function add(a, b) { return a + b; }",
+              tests: [{ name: "add", kind: "returns", input: [2, 3], expected: 5 }],
+            },
           },
         }}
       />,
@@ -108,8 +83,7 @@ describe("SurfaceHost", () => {
     expect(scratchpadMarkup).toContain("scratchpad-surface");
     expect(geometryMarkup).toContain("geometry-surface");
     expect(choiceMarkup).toContain("choice-grid-surface");
-    expect(videoMarkup).toContain("video-surface");
-    expect(audioMarkup).toContain("audio-surface");
+    expect(codingMarkup).toContain("coding-sandbox-surface");
   });
 
   it("renders fallback and emits telemetry for unsupported surfaces", () => {

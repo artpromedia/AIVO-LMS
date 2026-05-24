@@ -31,14 +31,9 @@ import { ART_DRAWING_FIXTURE_ITEMS } from "@/lib/db/art-drawing-fixtures";
 // Subjects seeded into the web learner DB. Sourced from the canonical
 // `LEARNER_SUBJECTS` registry in `@aivo/brand` so that web slugs,
 // subject-brain ids, and tutor keys stay in lock-step across the
-// learner UI, BFF, and adaptive engines (Sprint 12).
-//
-// Sprint 2.1 (Gap #7): we now seed *all 12 registry subjects*. The
-// last three (social-studies, world-languages, coding) get minimal
-// placeholder skills at grade K so the learner subjects grid renders
-// without crashing, and are tagged with the `SUBJECT_CONTENT_READY`
-// feature flag so the UI shows a "Coming soon" badge until item-bank
-// authoring (Sprint 2.2) finishes shipping items for them.
+// learner UI, BFF, and adaptive engines (Sprint 12). We filter to the
+// set the legacy web seed already shipped. Coding is now included so
+// learner surfaces can run full coding lessons in web-v2.
 const WEB_SEEDED_SUBJECT_SLUGS = new Set([
   "reading",
   "math",
@@ -49,8 +44,6 @@ const WEB_SEEDED_SUBJECT_SLUGS = new Set([
   "writing",
   "life",
   "art",
-  "social-studies",
-  "world-languages",
   "coding",
 ]);
 const SUBJECTS: Omit<Subject, "id">[] = LEARNER_SUBJECTS.filter((s) =>
@@ -224,11 +217,12 @@ const SKILL_SEED: { subjectSlug: string; slug: string; name: string; gradeBand: 
   },
   { subjectSlug: "life", slug: "morning-routine", name: "Morning routine", gradeBand: "K-2" },
   { subjectSlug: "art", slug: "primary-colors", name: "Primary colors", gradeBand: "PreK-K" },
-  { subjectSlug: "art", slug: "line-shapes", name: "Lines and shapes", gradeBand: "PreK-K" },
-  { subjectSlug: "art", slug: "warm-cool-colors", name: "Warm and cool colors", gradeBand: "PreK-K" },
-  { subjectSlug: "art", slug: "pattern-art", name: "Simple art patterns", gradeBand: "PreK-K" },
-  { subjectSlug: "art", slug: "draw-emotions", name: "Draw feelings", gradeBand: "PreK-K" },
-  { subjectSlug: "art", slug: "story-sketch", name: "Story sketching", gradeBand: "PreK-K" },
+  { subjectSlug: "coding", slug: "variables-basics", name: "Variables", gradeBand: "3-5" },
+  { subjectSlug: "coding", slug: "conditionals-if-else", name: "Conditionals", gradeBand: "3-5" },
+  { subjectSlug: "coding", slug: "loops-for-while", name: "Loops", gradeBand: "3-5" },
+  { subjectSlug: "coding", slug: "functions-basics", name: "Functions", gradeBand: "3-5" },
+  { subjectSlug: "coding", slug: "arrays-lists", name: "Arrays and lists", gradeBand: "6-8" },
+  { subjectSlug: "coding", slug: "debugging-strategies", name: "Debugging", gradeBand: "6-8" },
 ];
 
 export const SEEDED_ART_DRAWING_FIXTURES = ART_DRAWING_FIXTURE_ITEMS;
