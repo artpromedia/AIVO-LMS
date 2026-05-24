@@ -54,6 +54,46 @@ export const LessonStepInput = z
   .strict();
 export type LessonStepInput = z.infer<typeof LessonStepInput>;
 
+const LessonMediaAssetSchema = z.object({
+  id: z.string().min(1),
+  kind: z.enum(["video", "audio", "captions"]),
+  src: z.string().min(1),
+  alt: z.string().min(1).optional(),
+  mimeType: z.string().min(1).optional(),
+  language: z.string().min(1).optional(),
+  label: z.string().min(1).optional(),
+  default: z.boolean().optional(),
+});
+
+const LessonMediaPayloadSchema = z
+  .object({
+    surfaceType: z.enum(["video", "audio"]),
+    assets: z.array(LessonMediaAssetSchema).min(2),
+  })
+  .superRefine((media, ctx) => {
+    const hasSurfaceAsset = media.assets.some((asset) => asset.kind === media.surfaceType);
+    if (!hasSurfaceAsset) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `assets[] must include a ${media.surfaceType} asset`,
+      });
+    }
+    const captions = media.assets.find((asset) => asset.kind === "captions");
+    if (!captions) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "assets[] must include captions",
+      });
+      return;
+    }
+    if (!captions.src.endsWith(".vtt")) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "captions src must end with .vtt",
+      });
+    }
+  });
+
 /**
  * Strict schema for the AI-generated plan. We require non-empty arrays and
  * stable field names so the player can render every section.
@@ -80,6 +120,7 @@ export const GeneratedLessonPlanSchema = z
           hint: z.string().min(1).max(400),
           scaffold: z.string().min(1).max(400),
           skillId: z.string().min(1),
+          media: LessonMediaPayloadSchema.optional(),
         }),
       )
       .min(1)
@@ -91,6 +132,7 @@ export const GeneratedLessonPlanSchema = z
           expectedAnswer: z.string().min(1).max(400).optional(),
           choices: z.array(z.string().min(1).max(200)).min(2).max(6).optional(),
           supportIfWrong: z.string().min(1).max(400),
+          media: LessonMediaPayloadSchema.optional(),
         }),
       )
       .min(1)

@@ -30,6 +30,7 @@
     "consent:audit": "node scripts/consent-gate-audit.mjs",
     "auth:audit": "node scripts/auth-mode-audit.mjs",
     "curriculum:validate": "node scripts/curriculum-validate.mjs",
+    "item-bank:import-multimedia-fixtures": "node scripts/item-bank-import-multimedia-fixtures.mjs",
     "curriculum:validate-pack": "tsx scripts/validate-k8-curriculum-pack.ts",
     "item-bank:import": "pnpm --filter @aivo/item-bank item-bank:import",
     "onboarding:audit": "node scripts/onboarding-audit.mjs",

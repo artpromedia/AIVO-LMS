@@ -1,0 +1,325 @@
+{
+  "subject": "ela",
+  "items": [
+    {
+      "id": "ela-media-01",
+      "subject": "ela",
+      "skillId": "ccss.ela.fixture.01",
+      "surfaceType": "video",
+      "prompt": "Watch or listen, then identify the best language answer for item 1.",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "ela-media-01-video",
+          "kind": "video",
+          "src": "https://example.com/aivo-fixtures/ela/ela-media-01.mp4",
+          "alt": "Ela video fixture 1"
+        },
+        {
+          "id": "ela-media-01-captions",
+          "kind": "captions",
+          "src": "./captions/ela-media-01.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "ela-media-02",
+      "subject": "ela",
+      "skillId": "ccss.ela.fixture.02",
+      "surfaceType": "audio",
+      "prompt": "Watch or listen, then identify the best language answer for item 2.",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "ela-media-02-audio",
+          "kind": "audio",
+          "src": "https://example.com/aivo-fixtures/ela/ela-media-02.mp3",
+          "alt": "Ela audio fixture 2"
+        },
+        {
+          "id": "ela-media-02-captions",
+          "kind": "captions",
+          "src": "./captions/ela-media-02.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "ela-media-03",
+      "subject": "ela",
+      "skillId": "ccss.ela.fixture.03",
+      "surfaceType": "video",
+      "prompt": "Watch or listen, then identify the best language answer for item 3.",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "ela-media-03-video",
+          "kind": "video",
+          "src": "https://example.com/aivo-fixtures/ela/ela-media-03.mp4",
+          "alt": "Ela video fixture 3"
+        },
+        {
+          "id": "ela-media-03-captions",
+          "kind": "captions",
+          "src": "./captions/ela-media-03.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "ela-media-04",
+      "subject": "ela",
+      "skillId": "ccss.ela.fixture.04",
+      "surfaceType": "audio",
+      "prompt": "Watch or listen, then identify the best language answer for item 4.",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "ela-media-04-audio",
+          "kind": "audio",
+          "src": "https://example.com/aivo-fixtures/ela/ela-media-04.mp3",
+          "alt": "Ela audio fixture 4"
+        },
+        {
+          "id": "ela-media-04-captions",
+          "kind": "captions",
+          "src": "./captions/ela-media-04.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "ela-media-05",
+      "subject": "ela",
+      "skillId": "ccss.ela.fixture.05",
+      "surfaceType": "video",
+      "prompt": "Watch or listen, then identify the best language answer for item 5.",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "ela-media-05-video",
+          "kind": "video",
+          "src": "https://example.com/aivo-fixtures/ela/ela-media-05.mp4",
+          "alt": "Ela video fixture 5"
+        },
+        {
+          "id": "ela-media-05-captions",
+          "kind": "captions",
+          "src": "./captions/ela-media-05.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "ela-media-06",
+      "subject": "ela",
+      "skillId": "ccss.ela.fixture.06",
+      "surfaceType": "audio",
+      "prompt": "Watch or listen, then identify the best language answer for item 6.",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "ela-media-06-audio",
+          "kind": "audio",
+          "src": "https://example.com/aivo-fixtures/ela/ela-media-06.mp3",
+          "alt": "Ela audio fixture 6"
+        },
+        {
+          "id": "ela-media-06-captions",
+          "kind": "captions",
+          "src": "./captions/ela-media-06.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "ela-media-07",
+      "subject": "ela",
+      "skillId": "ccss.ela.fixture.07",
+      "surfaceType": "video",
+      "prompt": "Watch or listen, then identify the best language answer for item 7.",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "ela-media-07-video",
+          "kind": "video",
+          "src": "https://example.com/aivo-fixtures/ela/ela-media-07.mp4",
+          "alt": "Ela video fixture 7"
+        },
+        {
+          "id": "ela-media-07-captions",
+          "kind": "captions",
+          "src": "./captions/ela-media-07.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "ela-media-08",
+      "subject": "ela",
+      "skillId": "ccss.ela.fixture.08",
+      "surfaceType": "audio",
+      "prompt": "Watch or listen, then identify the best language answer for item 8.",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "ela-media-08-audio",
+          "kind": "audio",
+          "src": "https://example.com/aivo-fixtures/ela/ela-media-08.mp3",
+          "alt": "Ela audio fixture 8"
+        },
+        {
+          "id": "ela-media-08-captions",
+          "kind": "captions",
+          "src": "./captions/ela-media-08.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "ela-media-09",
+      "subject": "ela",
+      "skillId": "ccss.ela.fixture.09",
+      "surfaceType": "video",
+      "prompt": "Watch or listen, then identify the best language answer for item 9.",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "ela-media-09-video",
+          "kind": "video",
+          "src": "https://example.com/aivo-fixtures/ela/ela-media-09.mp4",
+          "alt": "Ela video fixture 9"
+        },
+        {
+          "id": "ela-media-09-captions",
+          "kind": "captions",
+          "src": "./captions/ela-media-09.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "ela-media-10",
+      "subject": "ela",
+      "skillId": "ccss.ela.fixture.10",
+      "surfaceType": "audio",
+      "prompt": "Watch or listen, then identify the best language answer for item 10.",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "ela-media-10-audio",
+          "kind": "audio",
+          "src": "https://example.com/aivo-fixtures/ela/ela-media-10.mp3",
+          "alt": "Ela audio fixture 10"
+        },
+        {
+          "id": "ela-media-10-captions",
+          "kind": "captions",
+          "src": "./captions/ela-media-10.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    }
+  ]
+}

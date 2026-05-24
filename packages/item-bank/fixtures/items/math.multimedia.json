@@ -1,0 +1,325 @@
+{
+  "subject": "math",
+  "items": [
+    {
+      "id": "math-media-01",
+      "subject": "math",
+      "skillId": "ccss.math.fixture.01",
+      "surfaceType": "video",
+      "prompt": "Watch or listen, then solve item 1: what is the best answer?",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "math-media-01-video",
+          "kind": "video",
+          "src": "https://example.com/aivo-fixtures/math/math-media-01.mp4",
+          "alt": "Math video fixture 1"
+        },
+        {
+          "id": "math-media-01-captions",
+          "kind": "captions",
+          "src": "./captions/math-media-01.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "math-media-02",
+      "subject": "math",
+      "skillId": "ccss.math.fixture.02",
+      "surfaceType": "audio",
+      "prompt": "Watch or listen, then solve item 2: what is the best answer?",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "math-media-02-audio",
+          "kind": "audio",
+          "src": "https://example.com/aivo-fixtures/math/math-media-02.mp3",
+          "alt": "Math audio fixture 2"
+        },
+        {
+          "id": "math-media-02-captions",
+          "kind": "captions",
+          "src": "./captions/math-media-02.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "math-media-03",
+      "subject": "math",
+      "skillId": "ccss.math.fixture.03",
+      "surfaceType": "video",
+      "prompt": "Watch or listen, then solve item 3: what is the best answer?",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "math-media-03-video",
+          "kind": "video",
+          "src": "https://example.com/aivo-fixtures/math/math-media-03.mp4",
+          "alt": "Math video fixture 3"
+        },
+        {
+          "id": "math-media-03-captions",
+          "kind": "captions",
+          "src": "./captions/math-media-03.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "math-media-04",
+      "subject": "math",
+      "skillId": "ccss.math.fixture.04",
+      "surfaceType": "audio",
+      "prompt": "Watch or listen, then solve item 4: what is the best answer?",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "math-media-04-audio",
+          "kind": "audio",
+          "src": "https://example.com/aivo-fixtures/math/math-media-04.mp3",
+          "alt": "Math audio fixture 4"
+        },
+        {
+          "id": "math-media-04-captions",
+          "kind": "captions",
+          "src": "./captions/math-media-04.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "math-media-05",
+      "subject": "math",
+      "skillId": "ccss.math.fixture.05",
+      "surfaceType": "video",
+      "prompt": "Watch or listen, then solve item 5: what is the best answer?",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "math-media-05-video",
+          "kind": "video",
+          "src": "https://example.com/aivo-fixtures/math/math-media-05.mp4",
+          "alt": "Math video fixture 5"
+        },
+        {
+          "id": "math-media-05-captions",
+          "kind": "captions",
+          "src": "./captions/math-media-05.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "math-media-06",
+      "subject": "math",
+      "skillId": "ccss.math.fixture.06",
+      "surfaceType": "audio",
+      "prompt": "Watch or listen, then solve item 6: what is the best answer?",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "math-media-06-audio",
+          "kind": "audio",
+          "src": "https://example.com/aivo-fixtures/math/math-media-06.mp3",
+          "alt": "Math audio fixture 6"
+        },
+        {
+          "id": "math-media-06-captions",
+          "kind": "captions",
+          "src": "./captions/math-media-06.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "math-media-07",
+      "subject": "math",
+      "skillId": "ccss.math.fixture.07",
+      "surfaceType": "video",
+      "prompt": "Watch or listen, then solve item 7: what is the best answer?",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "math-media-07-video",
+          "kind": "video",
+          "src": "https://example.com/aivo-fixtures/math/math-media-07.mp4",
+          "alt": "Math video fixture 7"
+        },
+        {
+          "id": "math-media-07-captions",
+          "kind": "captions",
+          "src": "./captions/math-media-07.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "math-media-08",
+      "subject": "math",
+      "skillId": "ccss.math.fixture.08",
+      "surfaceType": "audio",
+      "prompt": "Watch or listen, then solve item 8: what is the best answer?",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "math-media-08-audio",
+          "kind": "audio",
+          "src": "https://example.com/aivo-fixtures/math/math-media-08.mp3",
+          "alt": "Math audio fixture 8"
+        },
+        {
+          "id": "math-media-08-captions",
+          "kind": "captions",
+          "src": "./captions/math-media-08.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "math-media-09",
+      "subject": "math",
+      "skillId": "ccss.math.fixture.09",
+      "surfaceType": "video",
+      "prompt": "Watch or listen, then solve item 9: what is the best answer?",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "math-media-09-video",
+          "kind": "video",
+          "src": "https://example.com/aivo-fixtures/math/math-media-09.mp4",
+          "alt": "Math video fixture 9"
+        },
+        {
+          "id": "math-media-09-captions",
+          "kind": "captions",
+          "src": "./captions/math-media-09.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    },
+    {
+      "id": "math-media-10",
+      "subject": "math",
+      "skillId": "ccss.math.fixture.10",
+      "surfaceType": "audio",
+      "prompt": "Watch or listen, then solve item 10: what is the best answer?",
+      "expectedAnswer": "B",
+      "choices": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Re-play the media and focus on key words in the captions.",
+      "scaffold": "Use the captions to find the strongest evidence before choosing.",
+      "assets": [
+        {
+          "id": "math-media-10-audio",
+          "kind": "audio",
+          "src": "https://example.com/aivo-fixtures/math/math-media-10.mp3",
+          "alt": "Math audio fixture 10"
+        },
+        {
+          "id": "math-media-10-captions",
+          "kind": "captions",
+          "src": "./captions/math-media-10.vtt",
+          "mimeType": "text/vtt",
+          "language": "en",
+          "label": "English",
+          "default": true
+        }
+      ]
+    }
+  ]
+}
