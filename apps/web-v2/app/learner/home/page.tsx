@@ -44,6 +44,7 @@ import {
   createLessonRun,
   getIEPForLearner,
   getLearner,
+  getLearnerEngagement,
   getMasteryMap,
   listSubjects,
 } from "@/lib/db/repos";
@@ -185,9 +186,14 @@ export default async function LearnerHome({
 
   const blocker = params.blocker ?? (today.ready ? null : today.blocker);
   const supportsCount = iep?.acceptedAccommodations?.length ?? 0;
-  const streakDays = 0;
-  const levelNumber = Math.max(1, Math.round(overallAvg * 20) + 1);
-  const xp = Math.round(overallAvg * 5000) + 250;
+  // Sprint 6 (Gap #8): pull real streak/XP from engagement-svc-backed
+  // repo instead of synthesizing from mastery. `getLearnerEngagement`
+  // is the same source the BFF `/api/bff/learners/[id]/engagement`
+  // endpoint reads, so web + mobile render identical numbers.
+  const engagement = getLearnerEngagement(learnerId, session.tenantId);
+  const streakDays = engagement?.currentStreakDays ?? 0;
+  const levelNumber = engagement?.level ?? 1;
+  const xp = engagement?.totalXp ?? 0;
   const displayName = learner.preferredName || learner.firstName;
   const initialSource = learner.displayName || learner.firstName || displayName;
   const initials = initialSource
@@ -260,7 +266,13 @@ export default async function LearnerHome({
             <StatChip
               tone="primary"
               label="Streak"
-              value={streakDays > 0 ? `${streakDays} Days` : "Day 1"}
+              value={
+                streakDays === 0
+                  ? "Start today"
+                  : streakDays === 1
+                    ? "1 Day"
+                    : `${streakDays} Days`
+              }
               icon={
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                   <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" />

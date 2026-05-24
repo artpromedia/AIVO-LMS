@@ -130,3 +130,30 @@ strict K-8 enforcement.
 ```bash
 pnpm curriculum:coverage
 ```
+
+---
+
+## Sprint 5 deltas (2026-05-24)
+
+The four `brainSubject: null` rows in `packages/brand/src/subjects.ts`
+are eliminated. Each new brain is registered in
+`services/subject-brain-svc/src/services/index.ts` and ships its own
+README documenting the model.
+
+| Subject              | Brain class             | Skills | Items | Notes                          |
+| -------------------- | ----------------------- | ------ | ----- | ------------------------------ |
+| Social-Emotional     | `SocialEmotionalBrain`  | 5      | 20    | CASEL aligned; non-graded      |
+| Executive Function   | `ExecutiveFunctionBrain`| 5      | 5     | 3PL on latency-weighted score  |
+| Life Skills          | `LifeSkillsBrain`       | 5      | 5     | Mixed graded + procedural      |
+| Social Studies       | `SocialStudiesBrain`    | 36     | 30    | Civics/geo/history/econ K-8    |
+
+The `social-studies` slug was removed from
+`COMING_SOON_SUBJECT_SLUGS` in `apps/web-v2/lib/feature-flags.ts`.
+
+## Sprint 7 authoring cadence
+
+Sprint 7.3 sets a target of **200 items / sprint** across underserved
+grades. Goal: Math/ELA/Science at **Ready** for K-2 within 4 more
+sprints. PRs auto-run validation + IRT holdout calibration and update
+this matrix; a nightly job regenerates `coverage-dashboard.md`.
+
