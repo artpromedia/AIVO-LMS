@@ -95,4 +95,26 @@ describe("SurfaceHost", () => {
     expect(unsupportedMarkup).toContain("Activity type unavailable");
     expect(events.some((event) => event.type === "unsupported_surface")).toBe(true);
   });
+
+  it("renders art canvas surface via drawing canvas router", () => {
+    const markup = renderToStaticMarkup(
+      <SurfaceHost
+        surface={{
+          ...baseSurface,
+          id: "art-1",
+          type: "art_canvas",
+          prompt: "Draw a happy sun",
+          artCanvas: {
+            width: 320,
+            height: 200,
+            palette: ["#111111", "#ee5500"],
+            highContrastPalette: ["#000000", "#ffffff"],
+          },
+        }}
+      />,
+    );
+
+    expect(markup).toContain("drawing-canvas");
+    expect(markup).toContain("submit artwork");
+  });
 });

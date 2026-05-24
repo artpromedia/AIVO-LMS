@@ -22,7 +22,7 @@ export type {
   GeometryAction,
   CodingSandboxSpec,
   ArtCanvasSpec,
-  NumberLineSpec,
+  SurfaceAttachment,
   VoiceResponsePayload,
 } from "./types.js";
 
@@ -54,6 +54,13 @@ export {
   VoiceResponseSurface,
   type VoiceResponseSurfaceProps,
 } from "./surfaces/VoiceResponseSurface.js";
+export {
+  DrawingCanvas,
+  type DrawingCanvasProps,
+  buildDrawingSvg,
+  buildDrawingSvgDataUrl,
+  buildDrawingPngDataUrl,
+} from "./DrawingCanvas/index.js";
 
 export {
   isSurfaceEntitled,

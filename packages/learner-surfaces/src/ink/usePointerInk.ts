@@ -18,6 +18,7 @@ interface UsePointerInkOptions {
   disabled?: boolean;
   initialStrokes?: InkStroke[];
   tool?: InkTool;
+  color?: string;
   onEvent?: (event: SurfaceTelemetryEvent) => void;
   onChange?: (strokes: InkStroke[]) => void;
 }
@@ -29,6 +30,7 @@ interface PointerInkApi {
   onPointerUp: (event: PointerEvent<HTMLDivElement>) => void;
   onPointerCancel: (event: PointerEvent<HTMLDivElement>) => void;
   undo: () => void;
+  redo: () => void;
   clear: () => void;
   exportData: () => InkStroke[];
 }
@@ -60,10 +62,12 @@ export function usePointerInk({
   disabled = false,
   initialStrokes = [],
   tool = "pencil",
+  color,
   onEvent,
   onChange,
 }: UsePointerInkOptions): PointerInkApi {
   const [strokes, setStrokes] = useState<InkStroke[]>(initialStrokes);
+  const [redoStack, setRedoStack] = useState<InkStroke[]>([]);
   const [_activeByPointer, setActiveByPointer] = useState<Record<number, InkStroke>>({});
 
   const commit = useCallback(
@@ -91,6 +95,7 @@ export function usePointerInk({
       if (tool === "eraser") {
         const erased = eraseAtPoint(strokes, startPoint);
         commit(erased);
+        setRedoStack([]);
         onEvent?.(createSurfaceEvent(surfaceId, "ink_completed", { tool, erased: true }));
         return;
       }
@@ -98,10 +103,10 @@ export function usePointerInk({
       const width = tool === "highlighter" ? 8 : 3;
       setActiveByPointer((current) => ({
         ...current,
-        [event.pointerId]: createStroke(tool, startPoint, width),
+        [event.pointerId]: createStroke(tool, startPoint, width, undefined, color),
       }));
     },
-    [commit, disabled, onEvent, strokes, surfaceId, tool],
+    [color, commit, disabled, onEvent, strokes, surfaceId, tool],
   );
 
   const onPointerMove = useCallback(
@@ -139,6 +144,7 @@ export function usePointerInk({
         const finished = appendStrokePoint(stroke, pointFromEvent(event));
         const nextStrokes = addStroke(strokes, finished);
         commit(nextStrokes);
+        setRedoStack([]);
         onEvent?.(
           createSurfaceEvent(surfaceId, "ink_completed", {
             tool: finished.tool,
@@ -154,13 +160,26 @@ export function usePointerInk({
   );
 
   const undo = useCallback(() => {
+    if (strokes.length === 0) return;
+    const removed = strokes[strokes.length - 1];
     const next = undoStroke(strokes);
     commit(next);
+    setRedoStack((stack) => [removed, ...stack]);
     onEvent?.(createSurfaceEvent(surfaceId, "ink_undo", { strokeCount: next.length }));
   }, [commit, onEvent, strokes, surfaceId]);
 
+  const redo = useCallback(() => {
+    if (redoStack.length === 0) return;
+    const [restored, ...rest] = redoStack;
+    const next = addStroke(strokes, restored);
+    commit(next);
+    setRedoStack(rest);
+    onEvent?.(createSurfaceEvent(surfaceId, "ink_undo", { strokeCount: next.length, redo: true }));
+  }, [commit, onEvent, redoStack, strokes, surfaceId]);
+
   const clear = useCallback(() => {
     commit(clearStrokes());
+    setRedoStack([]);
     onEvent?.(createSurfaceEvent(surfaceId, "ink_clear"));
   }, [commit, onEvent, surfaceId]);
 
@@ -172,9 +191,10 @@ export function usePointerInk({
       onPointerUp: finishPointer,
       onPointerCancel: finishPointer,
       undo,
+      redo,
       clear,
       exportData: () => exportStrokes(strokes),
     }),
-    [clear, finishPointer, onPointerDown, onPointerMove, strokes, undo],
+    [clear, finishPointer, onPointerDown, onPointerMove, redo, strokes, undo],
   );
 }

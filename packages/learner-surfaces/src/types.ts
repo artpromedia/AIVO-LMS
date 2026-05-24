@@ -147,8 +147,20 @@ export interface ArtCanvasSpec {
   height?: number;
   /** Color swatches presented to the learner. Defaults to a warm palette. */
   palette?: string[];
+  /** Optional high-contrast palette to support low-vision accessibility. */
+  highContrastPalette?: string[];
   /** When true, the canvas starts with a faint grid for composition. */
   showGuides?: boolean;
+  /** Accessibility overrides mirrored from learner preferences. */
+  largeText?: boolean;
+  reducedMotion?: boolean;
+  dyslexiaFriendlyFont?: boolean;
+}
+
+export interface SurfaceAttachment {
+  type: "drawing";
+  mime: "image/png" | "image/svg+xml";
+  url: string;
 }
 
 export interface NumberLineSpec {
@@ -229,6 +241,7 @@ export interface SurfaceResponse {
   answer?: string | number | boolean;
   selectedChoiceId?: string;
   inkStrokes?: InkStroke[];
+  attachments?: SurfaceAttachment[];
   geometryActions?: GeometryAction[];
   durationMs?: number;
   /** Sprint 10 — set when type === "voice_response". */

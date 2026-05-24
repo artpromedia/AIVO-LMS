@@ -10,6 +10,7 @@ export interface InkStroke {
   tool: "pencil" | "highlighter" | "eraser";
   points: InkPoint[];
   width: number;
+  color?: string;
   createdAt: string;
 }
 
@@ -29,11 +30,13 @@ export function createStroke(
   point: InkPoint,
   width: number,
   id: string = createStrokeId(),
+  color?: string,
 ): InkStroke {
   return {
     id,
     tool,
     width,
+    color,
     createdAt: new Date(point.t).toISOString(),
     points: [point],
   };

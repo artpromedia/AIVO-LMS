@@ -36,7 +36,7 @@ components.
 | `scratchpad`         | `ScratchpadSurface`     |
 | `geometry_workspace` | `GeometrySurface`       |
 | `math_expression`    | `MathExpressionSurface` |
-| `number_line`        | `NumberLineSurface`     |
+| `art_canvas`         | `ArtCanvasSurface`      |
 
 Other types (`graph`, `drag_manipulative`, `reading_annotation`, `science_diagram`, `voice_response`,
 `multi_step_workspace`) are reserved in the type system and render the

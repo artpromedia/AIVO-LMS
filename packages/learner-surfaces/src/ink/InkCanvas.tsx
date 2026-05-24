@@ -10,6 +10,7 @@ export interface InkCanvasProps {
   disabled?: boolean;
   readOnly?: boolean;
   tool?: InkTool;
+  color?: string;
   initialStrokes?: InkStroke[];
   onChange?: (strokes: InkStroke[]) => void;
   onEvent?: (event: SurfaceTelemetryEvent) => void;
@@ -39,6 +40,7 @@ export function InkCanvas({
   disabled = false,
   readOnly = false,
   tool = "pencil",
+  color,
   initialStrokes,
   onChange,
   onEvent,
@@ -50,6 +52,7 @@ export function InkCanvas({
     disabled: disabled || readOnly,
     initialStrokes,
     tool,
+    color,
     onChange,
     onEvent,
   });
@@ -86,6 +89,14 @@ export function InkCanvas({
           </button>
           <button
             type="button"
+            aria-label="redo"
+            disabled={disabled || readOnly}
+            onClick={ink.redo}
+          >
+            redo
+          </button>
+          <button
+            type="button"
             aria-label="clear"
             disabled={disabled || readOnly}
             onClick={ink.clear}
@@ -118,7 +129,9 @@ export function InkCanvas({
               key={stroke.id}
               d={strokeToPath(stroke)}
               fill="none"
-              stroke={stroke.tool === "highlighter" ? "#f59e0b" : "#1f2937"}
+              stroke={
+                stroke.color ?? (stroke.tool === "highlighter" ? "#f59e0b" : "#1f2937")
+              }
               strokeOpacity={stroke.tool === "highlighter" ? 0.4 : 1}
               strokeWidth={stroke.width}
               strokeLinecap="round"
