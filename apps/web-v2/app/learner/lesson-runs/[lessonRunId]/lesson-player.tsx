@@ -204,7 +204,7 @@ export function LessonPlayer({
       eventType: "impression",
       payload: { lessonRunId, v2: v2Enabled, beatCount: beats.length },
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line
   }, []);
 
   // Persist current step in URL + emit lesson_step_viewed once per beat.

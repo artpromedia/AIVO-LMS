@@ -152,8 +152,8 @@ export function useCreateSession(opts?: {
   const client = getClient(opts?.client);
   const qc = useQueryClient();
   return useMutation<CreateSessionResponse, Error, CreateSessionRequest>({
-    mutationFn: (input) => client.createSession(input),
-    onSuccess: (_data, vars) => {
+    mutationFn: (input: CreateSessionRequest) => client.createSession(input),
+    onSuccess: (_data: CreateSessionResponse, vars: CreateSessionRequest) => {
       qc.invalidateQueries({ queryKey: learningKeys.sessionList(vars.learnerId) });
     },
     ...opts?.mutationOptions,
@@ -175,8 +175,24 @@ export function useAdvanceSession(opts?: {
   >;
 }) {
   const client = getClient(opts?.client);
-  return useMutation({
-    mutationFn: (input) =>
+  return useMutation<
+    CompleteSessionResponse,
+    Error,
+    {
+      sessionId: string;
+      stepKind: string;
+      stepRefId?: string | null;
+      response?: string;
+      isCorrect?: boolean;
+    }
+  >({
+    mutationFn: (input: {
+      sessionId: string;
+      stepKind: string;
+      stepRefId?: string | null;
+      response?: string;
+      isCorrect?: boolean;
+    }) =>
       client.advanceSession(input.sessionId, {
         stepKind: input.stepKind,
         stepRefId: input.stepRefId,
@@ -197,9 +213,23 @@ export function useCompleteSession(opts?: {
 }) {
   const client = getClient(opts?.client);
   const qc = useQueryClient();
-  return useMutation({
-    mutationFn: ({ sessionId, body }) => client.completeSession(sessionId, body ?? {}),
-    onSuccess: (_data, vars) => {
+  return useMutation<
+    CompleteSessionResponse,
+    Error,
+    { sessionId: string; learnerId?: string; body?: CompleteSessionRequest }
+  >({
+    mutationFn: ({
+      sessionId,
+      body,
+    }: {
+      sessionId: string;
+      learnerId?: string;
+      body?: CompleteSessionRequest;
+    }) => client.completeSession(sessionId, body ?? {}),
+    onSuccess: (
+      _data: CompleteSessionResponse,
+      vars: { sessionId: string; learnerId?: string; body?: CompleteSessionRequest },
+    ) => {
       if (vars.learnerId) {
         invalidateLearnerCaches(qc, vars.learnerId);
       }
@@ -219,9 +249,17 @@ export function useInitLearningPath(opts?: {
 }) {
   const client = getClient(opts?.client);
   const qc = useQueryClient();
-  return useMutation({
-    mutationFn: ({ learnerId, subject }) => client.initLearningPath(learnerId, subject),
-    onSuccess: (_data, vars) => {
+  return useMutation<
+    InitLearningPathResponse,
+    Error,
+    { learnerId: string; subject: string }
+  >({
+    mutationFn: ({ learnerId, subject }: { learnerId: string; subject: string }) =>
+      client.initLearningPath(learnerId, subject),
+    onSuccess: (
+      _data: InitLearningPathResponse,
+      vars: { learnerId: string; subject: string },
+    ) => {
       qc.invalidateQueries({ queryKey: learningKeys.path(vars.learnerId, vars.subject) });
     },
     ...opts?.mutationOptions,
@@ -238,9 +276,17 @@ export function useAdvanceLearningPath(opts?: {
 }) {
   const client = getClient(opts?.client);
   const qc = useQueryClient();
-  return useMutation({
-    mutationFn: ({ learnerId, subject }) => client.advanceLearningPath(learnerId, subject),
-    onSuccess: (_data, vars) => {
+  return useMutation<
+    AdvanceLearningPathResponse,
+    Error,
+    { learnerId: string; subject: string }
+  >({
+    mutationFn: ({ learnerId, subject }: { learnerId: string; subject: string }) =>
+      client.advanceLearningPath(learnerId, subject),
+    onSuccess: (
+      _data: AdvanceLearningPathResponse,
+      vars: { learnerId: string; subject: string },
+    ) => {
       qc.invalidateQueries({ queryKey: learningKeys.path(vars.learnerId, vars.subject) });
     },
     ...opts?.mutationOptions,
@@ -253,9 +299,9 @@ export function useUpdateGradebook(opts?: {
 }) {
   const client = getClient(opts?.client);
   const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (input) => client.updateGradebook(input),
-    onSuccess: (_data, vars) => {
+  return useMutation<UpdateGradebookResponse, Error, UpdateGradebookRequest>({
+    mutationFn: (input: UpdateGradebookRequest) => client.updateGradebook(input),
+    onSuccess: (_data: UpdateGradebookResponse, vars: UpdateGradebookRequest) => {
       qc.invalidateQueries({ queryKey: learningKeys.gradebook(vars.learnerId) });
     },
     ...opts?.mutationOptions,
@@ -267,8 +313,8 @@ export function useSurfaceTelemetry(opts?: {
   mutationOptions?: UseMutationOptions<void, Error, SurfaceTelemetryRequest>;
 }) {
   const client = getClient(opts?.client);
-  return useMutation({
-    mutationFn: (input) => client.surfaceTelemetry(input),
+  return useMutation<void, Error, SurfaceTelemetryRequest>({
+    mutationFn: (input: SurfaceTelemetryRequest) => client.surfaceTelemetry(input),
     // Telemetry is best-effort: surface failures only via logger,
     // never disrupt the lesson flow.
     retry: 0,

@@ -5,7 +5,7 @@
  * module) — when `typeof window === "undefined"` the buffer just
  * skips the localStorage layer.
  */
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   getTelemetryBuffer,
   __resetTelemetryBufferForTests,
