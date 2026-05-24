@@ -5,7 +5,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import "@/lib/i18n";
+import { restoreSavedLocale } from "@/lib/i18n";
 import { AuthContext, useAuthState } from "@/hooks/useAuth";
 import { colors } from "@/constants/colors";
 import { FONT_ASSETS } from "@/constants/typography";
@@ -35,6 +35,13 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [fontsLoaded, fontError]);
+
+  // Restore the learner's saved UI locale from a previous launch. Runs
+  // exactly once on mount and is intentionally fire-and-forget — the
+  // helper itself swallows AsyncStorage errors.
+  useEffect(() => {
+    void restoreSavedLocale();
+  }, []);
 
   if (!fontsLoaded && !fontError) {
     return null;

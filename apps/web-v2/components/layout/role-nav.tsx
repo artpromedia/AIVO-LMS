@@ -4,7 +4,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-export type RoleNavItem = { href: string; label: string; icon?: React.ReactNode };
+export type RoleNavItem = {
+  href: string;
+  label: string;
+  icon?: React.ReactNode;
+  /**
+   * Optional right-aligned slot (e.g. an unread-count badge). Rendered
+   * after the label. Pass a client component to drive live updates.
+   */
+  badgeSlot?: React.ReactNode;
+};
 
 /**
  * Nav links inside the sidebar. Uses the `--color-aivo-sidebar-*` tokens
@@ -29,7 +38,8 @@ export function RoleNav({ items, ariaLabel }: { items: RoleNavItem[]; ariaLabel:
             )}
           >
             {item.icon ? <span aria-hidden>{item.icon}</span> : null}
-            {item.label}
+            <span className="flex-1">{item.label}</span>
+            {item.badgeSlot ?? null}
           </Link>
         );
       })}

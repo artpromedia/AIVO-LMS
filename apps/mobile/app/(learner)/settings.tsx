@@ -10,8 +10,30 @@ import { fontFamilies } from "@/constants/typography";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { Card, Button, SensoryToggle } from "@/components/ui";
 import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
+import {
+  SUPPORTED_LOCALES,
+  setSavedLocale,
+  type SupportedLocale,
+} from "@/lib/i18n";
 
 const STORAGE_KEY = "aivo_learner_prefs_v1";
+
+/**
+ * Native-name labels for each supported locale. Kept in sync with
+ * `apps/web-v2/lib/i18n/config.ts` so both surfaces feel like one app.
+ */
+const LOCALE_LABELS: Record<SupportedLocale, string> = {
+  en: "English",
+  es: "Español",
+  fr: "Français",
+  de: "Deutsch",
+  pt: "Português",
+  zh: "中文",
+  ja: "日本語",
+  ko: "한국어",
+  ar: "العربية",
+  hi: "हिन्दी",
+};
 
 interface LearnerPrefs {
   soundEffects: boolean;
@@ -28,12 +50,15 @@ const DEFAULT_PREFS: LearnerPrefs = {
 };
 
 export default function LearnerSettingsScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const palette = useSensoryPalette();
   const [prefs, setPrefs] = useState<LearnerPrefs>(DEFAULT_PREFS);
   const [loaded, setLoaded] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [locale, setLocale] = useState<SupportedLocale>(
+    () => ((i18n.language as SupportedLocale) ?? "en"),
+  );
 
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY)
@@ -119,6 +144,48 @@ export default function LearnerSettingsScreen() {
           <Text style={[styles.profileValue, { color: palette.primary }]}>
             {t("learnerSettings.learner")}
           </Text>
+        </View>
+      </Card>
+
+      <Card tone="raised" style={styles.card}>
+        <Text style={[styles.sectionTitle, { color: palette.ink }]}>
+          {t("learnerSettings.language")}
+        </Text>
+        <Text style={[styles.toggleDesc, { color: palette.inkMuted, marginBottom: 12 }]}>
+          {t("learnerSettings.languageDesc")}
+        </Text>
+        <View style={styles.localeGrid}>
+          {SUPPORTED_LOCALES.map((code) => {
+            const active = code === locale;
+            return (
+              <Pressable
+                key={code}
+                accessibilityRole="button"
+                accessibilityState={{ selected: active }}
+                accessibilityLabel={LOCALE_LABELS[code]}
+                onPress={async () => {
+                  setLocale(code);
+                  await setSavedLocale(code);
+                }}
+                style={[
+                  styles.localeChip,
+                  {
+                    borderColor: active ? palette.primary : palette.border,
+                    backgroundColor: active ? palette.primary : palette.bgRaised,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.localeChipText,
+                    { color: active ? palette.bgRaised : palette.ink },
+                  ]}
+                >
+                  {LOCALE_LABELS[code]}
+                </Text>
+              </Pressable>
+            );
+          })}
         </View>
       </Card>
 
@@ -240,4 +307,19 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   savedText: { fontSize: 13, fontFamily: fontFamilies.bodyBold, color: "#16a34a" },
+  localeGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  localeChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+  },
+  localeChipText: {
+    fontSize: 13,
+    fontFamily: fontFamilies.bodyBold,
+  },
 });

@@ -26,6 +26,7 @@ import {
   Bell,
 } from "lucide-react";
 import type { RoleNavItem } from "@/components/layout/role-nav";
+import { LearnerUnreadNotificationsBadge } from "@/components/layout/learner-unread-notifications-badge";
 
 export const PARENT_NAV: RoleNavItem[] = [
   { href: "/parent/home", label: "Home", icon: <Home className="h-4 w-4" /> },
@@ -43,7 +44,13 @@ export const LEARNER_NAV: RoleNavItem[] = [
   { href: "/learner/missions", label: "Missions", icon: <Sparkles className="h-4 w-4" /> },
   { href: "/learner/library", label: "Library", icon: <BookOpen className="h-4 w-4" /> },
   { href: "/learner/rewards", label: "Rewards", icon: <Trophy className="h-4 w-4" /> },
-  { href: "/settings/accessibility", label: "Settings", icon: <Settings className="h-4 w-4" /> },
+  {
+    href: "/learner/notifications",
+    label: "Notifications",
+    icon: <Bell className="h-4 w-4" />,
+    badgeSlot: <LearnerUnreadNotificationsBadge />,
+  },
+  { href: "/learner/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
 ];
 
 export const TEACHER_NAV: RoleNavItem[] = [
