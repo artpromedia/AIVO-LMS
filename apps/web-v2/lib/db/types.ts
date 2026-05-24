@@ -254,6 +254,7 @@ export type LearnerBrainProfileState = {
     baselineAttempts: number;
   };
   tutorPersonaRecommendation: {
+    name?: string;
     style: "warm_coach" | "playful_friend" | "calm_guide" | "structured_mentor";
     rationale: string;
   };
@@ -606,6 +607,7 @@ export type GeneratedLessonPlan = {
     hint: string;
     scaffold: string;
     skillId: ID;
+    surfaceType?: string;
     media?: {
       surfaceType: "video" | "audio";
       assets: Array<{
@@ -626,6 +628,7 @@ export type GeneratedLessonPlan = {
     expectedAnswer?: string;
     choices?: string[];
     supportIfWrong: string;
+    surfaceType?: string;
     media?: {
       surfaceType: "video" | "audio";
       assets: Array<{

@@ -50,6 +50,10 @@ export interface LearnerSurfaceSpec {
   artCanvas?: ArtCanvasSpec;
   /** Sprint 4.3 — set when type === "voice_response". */
   voiceResponse?: VoiceResponseSpec;
+  /** Sprint — set when type === "number_line". */
+  numberLine?: NumberLineSpec;
+  /** Sprint — set when type === "video" | "audio" | "media". */
+  media?: MediaSurfaceSpec;
 }
 
 export interface SurfaceCaptureSpec {

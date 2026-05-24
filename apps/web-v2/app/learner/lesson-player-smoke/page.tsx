@@ -58,7 +58,7 @@ export default async function LessonPlayerSmokePage({ searchParams }: Props) {
     const fixture = pickMultimediaFixtureForSubject(mapped, `smoke:${mapped}`);
     if (!fixture) return <div data-testid="smoke-error">Fixture missing for smoke route.</div>;
     const now = nowIso();
-    lessonRun = {
+    lessonRun = ({
       id: newId("lr"),
       tenantId: session.tenantId,
       learnerId,
@@ -136,7 +136,7 @@ export default async function LessonPlayerSmokePage({ searchParams }: Props) {
       completedAt: null,
       createdAt: now,
       updatedAt: now,
-    };
+    } as unknown) as LessonRun;
     plan = {
       id: newId("plan"),
       lessonRunId: lessonRun.id,

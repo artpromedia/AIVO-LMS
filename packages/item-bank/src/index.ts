@@ -17,7 +17,7 @@
  * uses these primitives to choose the variant for each learner-attempt.
  * This package is pure and storage-agnostic.
  */
-export type { Item, ItemVariant, ItemBank, ItemDefect, ItemVariantStatus, ItemAsset } from "./types.js";
+export type { Item, ItemVariant, ItemBank, ItemDefect, ItemVariantStatus } from "./types.js";
 export { pickVariant, registerDefect, retireVariant } from "./routing.js";
 export {
   validateItemVariant,

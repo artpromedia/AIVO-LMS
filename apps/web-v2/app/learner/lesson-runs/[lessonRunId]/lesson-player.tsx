@@ -166,6 +166,9 @@ type Props = {
   plan: GeneratedLessonPlan;
   accessibility: AccessibilityPreferences;
   initialStatus: LessonRunStatus;
+  v2Enabled?: boolean;
+  sessionId?: string;
+  subjectSlug?: string | null;
 };
 
 type LessonMediaProps = {
@@ -563,36 +566,18 @@ export function LessonPlayer({
               <p className="font-display text-2xl">
                 <MathText>{beat.prompt}</MathText>
               </p>
-              {beat.choices ? (
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {beat.choices.map((c) => (
-                    <Button
-                      key={c}
-                      variant={answer === c ? "default" : "soft"}
-                      onClick={() => setAnswer(c)}
-                    >
-                      <MathText>{c}</MathText>
-                    </Button>
-                  ))}
-                </div>
-              ) : (
-                <input
-                  className="w-full rounded-md border border-aivo-border p-3"
-                  placeholder="Type your answer…"
-                  value={answer}
-                  onChange={(e) => setAnswer(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") submitAnswer();
-                  }}
-                  aria-label="Your answer"
-                />
-              )}
               {beat.media ? (
                 <LessonMedia
                   media={beat.media}
-                  onTelemetry={(event) => emitMediaTelemetry(beat.media.surfaceType, event)}
+                  onTelemetry={(event) => emitMediaTelemetry(beat.media!.surfaceType, event)}
                 />
               ) : null}
+              <SurfaceRouter
+                item={toSurfaceItem(beat)}
+                accessibilitySettings={accessibility}
+                onSubmitAndAdvance={submitSurface}
+                onEvent={emitSurfaceTelemetry}
+              />
               {showHint && (
                 <p className="rounded-md bg-amber-50 p-3 text-sm text-amber-900">
                   Hint: <MathText>{beat.hint}</MathText>
@@ -622,36 +607,18 @@ export function LessonPlayer({
               <p className="font-display text-2xl">
                 <MathText>{beat.prompt}</MathText>
               </p>
-              {beat.choices ? (
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {beat.choices.map((c) => (
-                    <Button
-                      key={c}
-                      variant={answer === c ? "default" : "soft"}
-                      onClick={() => setAnswer(c)}
-                    >
-                      <MathText>{c}</MathText>
-                    </Button>
-                  ))}
-                </div>
-              ) : (
-                <input
-                  className="w-full rounded-md border border-aivo-border p-3"
-                  placeholder="Type your answer…"
-                  value={answer}
-                  onChange={(e) => setAnswer(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") submitAnswer();
-                  }}
-                  aria-label="Your answer"
-                />
-              )}
               {beat.media ? (
                 <LessonMedia
                   media={beat.media}
-                  onTelemetry={(event) => emitMediaTelemetry(beat.media.surfaceType, event)}
+                  onTelemetry={(event) => emitMediaTelemetry(beat.media!.surfaceType, event)}
                 />
               ) : null}
+              <SurfaceRouter
+                item={toSurfaceItem(beat)}
+                accessibilitySettings={accessibility}
+                onSubmitAndAdvance={submitSurface}
+                onEvent={emitSurfaceTelemetry}
+              />
               {feedback === "correct" && (
                 <p className="rounded-md bg-emerald-50 p-3 text-sm text-emerald-900">
                   Yes! You've got this.
