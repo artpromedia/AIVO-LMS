@@ -22,10 +22,12 @@ export type {
   GeometryAction,
   CodingSandboxSpec,
   ArtCanvasSpec,
+  SurfaceAttachment,
   VoiceResponsePayload,
 } from "./types.js";
 
 export { SurfaceHost, type SurfaceHostProps } from "./SurfaceHost.js";
+export { SurfaceRouter } from "./SurfaceRouter.js";
 export { ScratchpadSurface, type ScratchpadSurfaceProps } from "./surfaces/ScratchpadSurface.js";
 export { GeometrySurface, type GeometrySurfaceProps } from "./surfaces/GeometrySurface.js";
 export { ChoiceGridSurface, type ChoiceGridSurfaceProps } from "./surfaces/ChoiceGridSurface.js";
@@ -45,6 +47,13 @@ export {
   VoiceResponseSurface,
   type VoiceResponseSurfaceProps,
 } from "./surfaces/VoiceResponseSurface.js";
+export {
+  DrawingCanvas,
+  type DrawingCanvasProps,
+  buildDrawingSvg,
+  buildDrawingSvgDataUrl,
+  buildDrawingPngDataUrl,
+} from "./DrawingCanvas/index.js";
 
 export {
   isSurfaceEntitled,

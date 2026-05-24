@@ -32,6 +32,7 @@ and never throws.
 | `scratchpad`         | `ScratchpadSurface`     |
 | `geometry_workspace` | `GeometrySurface`       |
 | `math_expression`    | `MathExpressionSurface` |
+| `art_canvas`         | `ArtCanvasSurface`      |
 
 Other types (`number_line`, `graph`, `drag_manipulative`,
 `reading_annotation`, `science_diagram`, `voice_response`,

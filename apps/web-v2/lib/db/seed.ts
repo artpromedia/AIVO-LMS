@@ -26,6 +26,7 @@ import { CONSENT_TYPES, DATA_CLASSIFICATIONS } from "@/lib/db/types";
 import type { NotificationPreference, NotificationType, AICostEvent } from "@/lib/db/types";
 import type { Role } from "@/lib/auth/types";
 import { LEARNER_SUBJECTS } from "@aivo/brand";
+import { ART_DRAWING_FIXTURE_ITEMS } from "@/lib/db/art-drawing-fixtures";
 
 // Subjects seeded into the web learner DB. Sourced from the canonical
 // `LEARNER_SUBJECTS` registry in `@aivo/brand` so that web slugs,
@@ -105,7 +106,14 @@ const SKILL_SEED: { subjectSlug: string; slug: string; name: string; gradeBand: 
   },
   { subjectSlug: "life", slug: "morning-routine", name: "Morning routine", gradeBand: "K-2" },
   { subjectSlug: "art", slug: "primary-colors", name: "Primary colors", gradeBand: "PreK-K" },
+  { subjectSlug: "art", slug: "line-shapes", name: "Lines and shapes", gradeBand: "PreK-K" },
+  { subjectSlug: "art", slug: "warm-cool-colors", name: "Warm and cool colors", gradeBand: "PreK-K" },
+  { subjectSlug: "art", slug: "pattern-art", name: "Simple art patterns", gradeBand: "PreK-K" },
+  { subjectSlug: "art", slug: "draw-emotions", name: "Draw feelings", gradeBand: "PreK-K" },
+  { subjectSlug: "art", slug: "story-sketch", name: "Story sketching", gradeBand: "PreK-K" },
 ];
+
+export const SEEDED_ART_DRAWING_FIXTURES = ART_DRAWING_FIXTURE_ITEMS;
 
 export function ensureSeeded(): void {
   const store = getStore();

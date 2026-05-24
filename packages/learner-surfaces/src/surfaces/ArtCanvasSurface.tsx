@@ -1,5 +1,9 @@
 import { useMemo, useState } from "react";
-import { InkCanvas } from "../ink/InkCanvas.js";
+import {
+  buildDrawingPngDataUrl,
+  buildDrawingSvgDataUrl,
+  DrawingCanvas,
+} from "../DrawingCanvas/index.js";
 import type { InkStroke } from "../ink/stroke-model.js";
 import { createSurfaceEvent, type SurfaceTelemetryEvent } from "../telemetry/surface-events.js";
 import type { LearnerSurfaceSpec, SurfaceResponse } from "../types.js";
@@ -38,20 +42,11 @@ export function ArtCanvasSurface({
   onEvent,
 }: ArtCanvasSurfaceProps) {
   const cfg = surface.artCanvas;
-  const palette = useMemo(
-    () => (cfg?.palette && cfg.palette.length > 0 ? cfg.palette : DEFAULT_PALETTE),
-    [cfg?.palette],
-  );
+  const palette = useMemo(() => {
+    if (cfg?.palette && cfg.palette.length > 0) return cfg.palette;
+    return DEFAULT_PALETTE;
+  }, [cfg?.palette]);
   const [strokes, setStrokes] = useState<InkStroke[]>([]);
-  const [selectedColor, setSelectedColor] = useState<string>(palette[0]);
-
-  const guidesStyle = cfg?.showGuides
-    ? {
-        backgroundImage:
-          "linear-gradient(to right, rgba(148,163,184,0.25) 1px, transparent 1px), linear-gradient(to bottom, rgba(148,163,184,0.25) 1px, transparent 1px)",
-        backgroundSize: "32px 32px",
-      }
-    : undefined;
 
   const submitDisabled =
     disabled || (surface.capture.finalAnswer && strokes.length === 0);
@@ -60,60 +55,43 @@ export function ArtCanvasSurface({
     <section aria-label="art-canvas-surface">
       <p>{surface.prompt}</p>
       {surface.instructions ? <p>{surface.instructions}</p> : null}
-      <div role="radiogroup" aria-label="color palette">
-        {palette.map((color) => {
-          const isSelected = color === selectedColor;
-          return (
-            <button
-              type="button"
-              key={color}
-              role="radio"
-              aria-checked={isSelected}
-              aria-label={`color ${color}`}
-              disabled={disabled}
-              onClick={() => {
-                setSelectedColor(color);
-                onEvent?.(
-                  createSurfaceEvent(surface.id, "tool_changed", { color }),
-                );
-              }}
-              style={{
-                width: 28,
-                height: 28,
-                margin: 4,
-                borderRadius: "50%",
-                background: color,
-                outline: isSelected ? "2px solid #1B1B1B" : "none",
-                outlineOffset: 2,
-              }}
-            />
-          );
-        })}
-      </div>
-      <div style={guidesStyle} data-testid="art-canvas-frame">
-        <InkCanvas
-          surfaceId={surface.id}
-          width={cfg?.width ?? 520}
-          height={cfg?.height ?? 320}
-          disabled={disabled}
-          tool="pencil"
-          showToolbar
-          onChange={setStrokes}
-          onEvent={onEvent}
-        />
-      </div>
+      <DrawingCanvas
+        surfaceId={surface.id}
+        width={cfg?.width ?? 520}
+        height={cfg?.height ?? 320}
+        disabled={disabled}
+        palette={palette}
+        highContrastPalette={cfg?.highContrastPalette}
+        showGuides={cfg?.showGuides}
+        largeText={cfg?.largeText}
+        reducedMotion={cfg?.reducedMotion}
+        dyslexiaFriendlyFont={cfg?.dyslexiaFriendlyFont}
+        onEvent={onEvent}
+        onChange={setStrokes}
+      />
       <button
         type="button"
         aria-label="submit artwork"
         disabled={submitDisabled}
-        onClick={() => {
+        onClick={async () => {
+          const width = cfg?.width ?? 520;
+          const height = cfg?.height ?? 320;
+          const pngUrl = await buildDrawingPngDataUrl(strokes, width, height);
+          const svgUrl = buildDrawingSvgDataUrl(strokes, width, height);
           onEvent?.(
             createSurfaceEvent(surface.id, "surface_submitted", {
               strokeCount: strokes.length,
-              color: selectedColor,
+              attachmentCount: 2,
             }),
           );
-          onSubmit?.({ surfaceId: surface.id, inkStrokes: strokes });
+          onSubmit?.({
+            surfaceId: surface.id,
+            inkStrokes: strokes,
+            attachments: [
+              { type: "drawing", mime: "image/png", url: pngUrl },
+              { type: "drawing", mime: "image/svg+xml", url: svgUrl },
+            ],
+          });
         }}
       >
         Submit artwork
