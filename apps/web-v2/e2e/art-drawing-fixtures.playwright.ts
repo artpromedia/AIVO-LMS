@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { ART_DRAWING_FIXTURE_ITEMS } from "../../../lib/db/art-drawing-fixtures";
+import { ART_DRAWING_FIXTURE_ITEMS } from "../lib/db/art-drawing-fixtures";
 
 test.describe("Art DrawingCanvas fixtures", () => {
   test("ships 10 PreK-K drawing fixtures with PNG+SVG outputs", async () => {

@@ -35,12 +35,12 @@ export function buildDrawingSvg(strokes: InkStroke[], width: number, height: num
       if (!d) return "";
       const strokeColor = stroke.color ?? (stroke.tool === "highlighter" ? "#f59e0b" : "#1f2937");
       const strokeOpacity = stroke.tool === "highlighter" ? 0.4 : 1;
-      return `<path d=\"${escapeXml(d)}\" fill=\"none\" stroke=\"${escapeXml(strokeColor)}\" stroke-opacity=\"${strokeOpacity}\" stroke-width=\"${stroke.width}\" stroke-linecap=\"round\" stroke-linejoin=\"round\" />`;
+      return `<path d="${escapeXml(d)}" fill="none" stroke="${escapeXml(strokeColor)}" stroke-opacity="${strokeOpacity}" stroke-width="${stroke.width}" stroke-linecap="round" stroke-linejoin="round" />`;
     })
     .filter(Boolean)
     .join("");
 
-  return `<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"${width}\" height=\"${height}\" viewBox=\"0 0 ${width} ${height}\">${paths}</svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">${paths}</svg>`;
 }
 
 export async function buildDrawingPngDataUrl(
