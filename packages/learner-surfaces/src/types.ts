@@ -45,6 +45,8 @@ export interface LearnerSurfaceSpec {
   codingSandbox?: CodingSandboxSpec;
   /** Sprint 9 — set when type === "art_canvas". */
   artCanvas?: ArtCanvasSpec;
+  /** Sprint 4.3 — set when type === "voice_response". */
+  voiceResponse?: VoiceResponseSpec;
 }
 
 export interface SurfaceCaptureSpec {
@@ -137,7 +139,24 @@ export interface CodingSandboxSpec {
 }
 
 /**
- * Sprint 9 — Art canvas surface config. Reuses the ink stroke model so
+ * Sprint 4.3 — Voice response surface config.
+ */
+export interface VoiceResponseSpec {
+  /** BCP-47 language code for ASR/scoring (e.g. "en-US", "es-MX"). */
+  language: string;
+  /** Target text the learner should read/say; used for pronunciation scoring. */
+  targetText?: string;
+  /** Max recording duration in seconds (default: 60). */
+  maxDurationSeconds?: number;
+  /**
+   * Base URL of the speech-eval-svc POST /evaluate endpoint.
+   * Defaults to `/api/speech-eval/evaluate` (same-origin proxy).
+   */
+  scoreServiceUrl?: string;
+}
+
+/**
+ * Sprint 4.3 — Art canvas surface config. Reuses the ink stroke model so
  * scoring + replay work the same way as scratchpad/geometry.
  */
 export interface ArtCanvasSpec {
@@ -228,19 +247,24 @@ export interface SurfaceResponse {
 }
 
 /**
- * Sprint 10 — Recorded learner audio. The blob is encoded as a base64
+ * Sprint 4.3 — Recorded learner audio. The blob is encoded as a base64
  * data URL so it can survive JSON transport to the scoring service;
  * the service is responsible for routing it to whatever STT/grading
- * pipeline applies (the same `/api/ai/transcribe` route used by
- * `useSpeechInput` is the obvious fit). The `transcript` field is
- * optional — populated when the browser's Web Speech API is available
- * and produced a usable hypothesis client-side.
+ * pipeline applies. The `transcript` and `scores` fields are populated
+ * after the surface uploads to speech-eval-svc.
  */
 export interface VoiceResponsePayload {
   audioDataUrl: string;
   mimeType: string;
   durationMs: number;
   transcript?: string;
+  scores?: {
+    pronunciation: number;
+    fluency: number;
+    perWord?: Array<{ word: string; score: number }>;
+  };
+  /** true when mock/degraded scores were returned by speech-eval-svc */
+  degraded?: boolean;
 }
 
 /**

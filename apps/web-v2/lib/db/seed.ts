@@ -46,6 +46,9 @@ const WEB_SEEDED_SUBJECT_SLUGS = new Set([
   "writing",
   "life",
   "art",
+  "social-studies",
+  "world-languages",
+  "coding",
 ]);
 const SUBJECTS: Omit<Subject, "id">[] = LEARNER_SUBJECTS.filter((s) =>
   WEB_SEEDED_SUBJECT_SLUGS.has(s.slug),
@@ -85,6 +88,119 @@ const SKILL_SEED: { subjectSlug: string; slug: string; name: string; gradeBand: 
   { subjectSlug: "speech", slug: "rhyming-words", name: "Rhyming words", gradeBand: "PreK-K" },
   { subjectSlug: "speech", slug: "syllable-count", name: "Syllable counting", gradeBand: "K-1" },
   { subjectSlug: "speech", slug: "synonyms-basics", name: "Synonyms", gradeBand: "1-3" },
+  // Sprint 4.3: additional speech skills for voice-response surface
+  {
+    subjectSlug: "speech",
+    slug: "speech-initial-sounds",
+    name: "Initial consonant sounds",
+    gradeBand: "PreK-K",
+  },
+  {
+    subjectSlug: "speech",
+    slug: "speech-blending",
+    name: "Blending phonemes",
+    gradeBand: "K-1",
+  },
+  {
+    subjectSlug: "speech",
+    slug: "speech-segmenting",
+    name: "Segmenting words into phonemes",
+    gradeBand: "K-1",
+  },
+  {
+    subjectSlug: "speech",
+    slug: "speech-articulation-s",
+    name: "Articulation: /s/ sound",
+    gradeBand: "K-2",
+  },
+  {
+    subjectSlug: "speech",
+    slug: "speech-articulation-r",
+    name: "Articulation: /r/ sound",
+    gradeBand: "1-3",
+  },
+  {
+    subjectSlug: "speech",
+    slug: "speech-fluency-phrases",
+    name: "Fluent phrase reading",
+    gradeBand: "1-3",
+  },
+  {
+    subjectSlug: "speech",
+    slug: "speech-sentence-repetition",
+    name: "Sentence repetition",
+    gradeBand: "2-4",
+  },
+  // Sprint 4.3: world-languages skills (10) for voice-response surface
+  {
+    subjectSlug: "world-languages",
+    slug: "wl-greetings-k",
+    name: "Greetings & introductions",
+    gradeBand: "K",
+  },
+  {
+    subjectSlug: "world-languages",
+    slug: "wl-numbers-1-10",
+    name: "Numbers 1–10",
+    gradeBand: "K-1",
+  },
+  {
+    subjectSlug: "world-languages",
+    slug: "wl-colors-basics",
+    name: "Colors",
+    gradeBand: "K-1",
+  },
+  {
+    subjectSlug: "world-languages",
+    slug: "wl-family-vocab",
+    name: "Family vocabulary",
+    gradeBand: "1-2",
+  },
+  {
+    subjectSlug: "world-languages",
+    slug: "wl-food-vocab",
+    name: "Food vocabulary",
+    gradeBand: "1-2",
+  },
+  {
+    subjectSlug: "world-languages",
+    slug: "wl-classroom-commands",
+    name: "Classroom commands",
+    gradeBand: "K-2",
+  },
+  {
+    subjectSlug: "world-languages",
+    slug: "wl-days-months",
+    name: "Days and months",
+    gradeBand: "1-3",
+  },
+  {
+    subjectSlug: "world-languages",
+    slug: "wl-basic-sentences",
+    name: "Basic sentence patterns",
+    gradeBand: "2-3",
+  },
+  {
+    subjectSlug: "world-languages",
+    slug: "wl-animals-vocab",
+    name: "Animal vocabulary",
+    gradeBand: "1-2",
+  },
+  {
+    subjectSlug: "world-languages",
+    slug: "wl-weather-phrases",
+    name: "Weather phrases",
+    gradeBand: "2-4",
+  },
+  // Sprint 4.1 placeholder for social-studies (grade K)
+  {
+    subjectSlug: "social-studies",
+    slug: "ss-community-helpers-k",
+    name: "Community helpers",
+    gradeBand: "K",
+  },
+  // Sprint 4.2 placeholder for coding (grade K)
+  { subjectSlug: "coding", slug: "code-sequences-k", name: "Sequences", gradeBand: "K" },
   {
     subjectSlug: "executive-function",
     slug: "pattern-complete",

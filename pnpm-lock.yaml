@@ -1871,6 +1871,37 @@ importers:
         specifier: ^2.0.0
         version: 2.1.9(@types/node@22.19.17)(jsdom@25.0.1)(lightningcss@1.32.0)(terser@5.46.1)
 
+  services/speech-eval-svc:
+    dependencies:
+      '@aivo/observability':
+        specifier: workspace:*
+        version: link:../../packages/observability
+      '@aivo/ops-alerts':
+        specifier: workspace:*
+        version: link:../../packages/ops-alerts
+      '@fastify/cors':
+        specifier: ^11.0.0
+        version: 11.2.0
+      '@fastify/multipart':
+        specifier: ^9.0.0
+        version: 9.4.0
+      '@fastify/swagger':
+        specifier: ^9.6.0
+        version: 9.7.0
+      '@fastify/swagger-ui':
+        specifier: ^5.2.2
+        version: 5.2.5
+      fastify:
+        specifier: '>=5.8.5'
+        version: 5.8.5
+    devDependencies:
+      tsx:
+        specifier: ^4.19.4
+        version: 4.21.0
+      typescript:
+        specifier: ^5.7.3
+        version: 5.8.3
+
   services/status-page-svc:
     dependencies:
       '@aivo/db':
