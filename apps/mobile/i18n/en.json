@@ -489,7 +489,9 @@
     "reducedMotion": "Reduced Motion",
     "reducedMotionDesc": "Minimize animations and motion effects.",
     "saveChanges": "Save Changes",
-    "saved": "Settings saved!"
+    "saved": "Settings saved!",
+    "language": "Language",
+    "languageDesc": "AIVO will use this language for buttons, menus, and helper messages."
   },
   "learnerLeaderboard": {
     "title": "Leaderboard",

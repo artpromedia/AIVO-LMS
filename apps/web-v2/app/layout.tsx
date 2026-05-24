@@ -5,6 +5,8 @@ import { getLocale, getMessages } from "next-intl/server";
 import "./globals.css";
 import { PlayfulCalmProvider } from "@/components/system/playful-calm-provider";
 import { SensoryModeProvider } from "@/components/system/sensory-mode-provider";
+import { PwaRegister } from "@/components/system/pwa-register";
+import { INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
 import { readSensoryModeFromCookies } from "@/lib/sensory-mode/server";
 import { readTypefaceFromCookies, readReducedMotionFromCookies } from "@/lib/a11y/server";
 
@@ -45,6 +47,13 @@ const atkinson = Atkinson_Hyperlegible({
 export const metadata: Metadata = {
   title: "AIVO Learning",
   description: "Personalized learning adventures for every child.",
+  manifest: "/manifest.webmanifest",
+  themeColor: INCLUSIVE_WARM_PALETTE.primary,
+  appleWebApp: {
+    capable: true,
+    title: "AIVO",
+    statusBarStyle: "default",
+  },
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -92,6 +101,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <SensoryModeProvider initialMode={sensoryMode}>
             <PlayfulCalmProvider>{children}</PlayfulCalmProvider>
           </SensoryModeProvider>
+          <PwaRegister />
         </NextIntlClientProvider>
       </body>
     </html>

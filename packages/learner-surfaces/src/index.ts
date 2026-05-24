@@ -20,6 +20,9 @@ export type {
   GeometryTool,
   SurfaceResponse,
   GeometryAction,
+  CodingSandboxSpec,
+  ArtCanvasSpec,
+  VoiceResponsePayload,
 } from "./types.js";
 
 export { SurfaceHost, type SurfaceHostProps } from "./SurfaceHost.js";
@@ -30,6 +33,25 @@ export {
   MathExpressionSurface,
   type MathExpressionSurfaceProps,
 } from "./surfaces/MathExpressionSurface.js";
+export {
+  CodingSandboxSurface,
+  type CodingSandboxSurfaceProps,
+} from "./surfaces/CodingSandboxSurface.js";
+export {
+  ArtCanvasSurface,
+  type ArtCanvasSurfaceProps,
+} from "./surfaces/ArtCanvasSurface.js";
+export {
+  VoiceResponseSurface,
+  type VoiceResponseSurfaceProps,
+} from "./surfaces/VoiceResponseSurface.js";
+
+export {
+  isSurfaceEntitled,
+  isPremiumSurface,
+  requiredTutorForSurface,
+  type SurfaceTutorKey,
+} from "./entitlement/required-tutor.js";
 
 export { InkCanvas, type InkCanvasProps } from "./ink/InkCanvas.js";
 export {

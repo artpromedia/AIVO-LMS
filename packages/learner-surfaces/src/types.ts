@@ -11,7 +11,9 @@ export type LearnerSurfaceType =
   | "reading_annotation"
   | "science_diagram"
   | "voice_response"
-  | "multi_step_workspace";
+  | "multi_step_workspace"
+  | "coding_sandbox"
+  | "art_canvas";
 
 export type FeedbackMode =
   | "immediate_supportive"
@@ -39,6 +41,10 @@ export interface LearnerSurfaceSpec {
   capture: SurfaceCaptureSpec;
   scoring: SurfaceScoringSpec;
   accessibility: SurfaceAccessibilitySpec;
+  /** Sprint 8 — set when type === "coding_sandbox". */
+  codingSandbox?: CodingSandboxSpec;
+  /** Sprint 9 — set when type === "art_canvas". */
+  artCanvas?: ArtCanvasSpec;
 }
 
 export interface SurfaceCaptureSpec {
@@ -112,6 +118,35 @@ export interface ChoiceOption {
   label: string;
   emoji?: string;
   isCorrect?: boolean;
+}
+
+/**
+ * Sprint 8 — Coding sandbox surface config. Plain text only; no
+ * runtime evaluation is performed in the client. The learner-svc /
+ * tutor-svc backend is responsible for any execution. We capture the
+ * code as the surface `answer` so existing scoring pipelines work
+ * without modification.
+ */
+export interface CodingSandboxSpec {
+  language: "python" | "javascript" | "blockly" | "pseudo";
+  starterCode?: string;
+  /** Optional non-editable preamble shown above the editor. */
+  prelude?: string;
+  /** Soft hint shown beneath the editor; not used for scoring. */
+  hint?: string;
+}
+
+/**
+ * Sprint 9 — Art canvas surface config. Reuses the ink stroke model so
+ * scoring + replay work the same way as scratchpad/geometry.
+ */
+export interface ArtCanvasSpec {
+  width?: number;
+  height?: number;
+  /** Color swatches presented to the learner. Defaults to a warm palette. */
+  palette?: string[];
+  /** When true, the canvas starts with a faint grid for composition. */
+  showGuides?: boolean;
 }
 
 export interface GeometryDiagramSpec {
@@ -188,6 +223,24 @@ export interface SurfaceResponse {
   inkStrokes?: InkStroke[];
   geometryActions?: GeometryAction[];
   durationMs?: number;
+  /** Sprint 10 — set when type === "voice_response". */
+  voiceResponse?: VoiceResponsePayload;
+}
+
+/**
+ * Sprint 10 — Recorded learner audio. The blob is encoded as a base64
+ * data URL so it can survive JSON transport to the scoring service;
+ * the service is responsible for routing it to whatever STT/grading
+ * pipeline applies (the same `/api/ai/transcribe` route used by
+ * `useSpeechInput` is the obvious fit). The `transcript` field is
+ * optional — populated when the browser's Web Speech API is available
+ * and produced a usable hypothesis client-side.
+ */
+export interface VoiceResponsePayload {
+  audioDataUrl: string;
+  mimeType: string;
+  durationMs: number;
+  transcript?: string;
 }
 
 /**

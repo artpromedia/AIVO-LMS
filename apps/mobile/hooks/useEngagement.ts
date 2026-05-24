@@ -1,37 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
 import { API } from "@/constants/api";
+import type {
+  EngagementBadge as Badge,
+  EngagementChallenge as Challenge,
+  EngagementProfile,
+} from "@/src/contracts/engagement";
 
-interface EngagementProfile {
-  userId: string;
-  xp: number;
-  level: number;
-  coins: number;
-  gems: number;
-  streakDays: number;
-  streakFrozen: boolean;
-  badges: Badge[];
-  activeChallenges: Challenge[];
-}
-
-interface Badge {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  rarity: "common" | "rare" | "epic" | "legendary";
-  earnedAt: string;
-}
-
-interface Challenge {
-  id: string;
-  title: string;
-  description: string;
-  type: "daily" | "weekly" | "multiplayer";
-  progress: number;
-  target: number;
-  reward: { xp: number; coins: number };
-}
+export type { EngagementProfile, Badge, Challenge };
 
 export function useEngagement(userId: string) {
   return useQuery<EngagementProfile>({

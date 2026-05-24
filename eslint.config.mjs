@@ -29,6 +29,8 @@ export default tseslint.config(
       // Build/test snapshot output.
       "**/__snapshots__/**",
       "**/*.snap",
+      // Public static assets — not source code, served as-is.
+      "apps/*/public/**",
     ],
   },
   {

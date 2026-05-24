@@ -11,6 +11,8 @@ import {
   appendHomeworkMessage,
 } from "@/lib/db/repos";
 import { classifySubject, generateGuidedReply } from "@/lib/homework/tutor";
+import { parseHomeworkAttachment } from "@/lib/homework/attachments";
+import type { HomeworkAttachment } from "@/lib/db/types";
 
 export const dynamic = "force-dynamic";
 
@@ -74,7 +76,10 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     );
     if (consentErr) return consentErr;
 
-    const body = (await req.json().catch(() => ({}))) as { topic?: unknown };
+    const body = (await req.json().catch(() => ({}))) as {
+      topic?: unknown;
+      attachment?: unknown;
+    };
     const topic = typeof body.topic === "string" ? body.topic.trim() : "";
     if (!topic || topic.length > 500) {
       return fail(
@@ -82,12 +87,30 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
         requestId,
       );
     }
+    let attachment: HomeworkAttachment | null = null;
+    if (body.attachment !== undefined && body.attachment !== null) {
+      const parsed = parseHomeworkAttachment(body.attachment);
+      if (!parsed.ok) {
+        const messageByReason: Record<typeof parsed.reason, string> = {
+          invalid_shape: "Attachment is malformed.",
+          invalid_mime: "Only PNG, JPEG, WEBP, or PDF attachments are allowed.",
+          invalid_base64: "Attachment data is not valid base64.",
+          too_large: "Attachment is larger than the 10 MB limit.",
+        };
+        return fail(
+          { ...ERRORS.VALIDATION_FAILED, message: messageByReason[parsed.reason] },
+          requestId,
+        );
+      }
+      attachment = parsed.attachment;
+    }
     const subjectId = classifySubject(topic);
     const created = createHomeworkSession({
       learnerId,
       tenantId: session!.tenantId,
       topic,
       subjectId,
+      attachment,
     });
     // Seed turn-0 tutor reply so the learner sees something to react to.
     const opener = generateGuidedReply({ topic, subjectId, turn: 0 });
@@ -98,7 +121,13 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     });
     audit(session!, "homework.start", requestId, {
       learnerId,
-      metadata: { sessionId: created.id, subjectId },
+      metadata: {
+        sessionId: created.id,
+        subjectId,
+        attachment: attachment
+          ? { mimeType: attachment.mimeType, sizeBytes: attachment.sizeBytes }
+          : null,
+      },
     });
     return ok({ session: withOpener ?? created }, requestId);
   } catch (e) {

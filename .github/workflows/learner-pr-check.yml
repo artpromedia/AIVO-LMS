@@ -1,0 +1,131 @@
+name: Learner PR Check
+
+# Sprint 13 — Pre-merge guardrail for the learner experience.
+#
+# Runs on every PR that touches code the learner shell depends on:
+#   - apps/web-v2/app/learner/**        (the learner pages themselves)
+#   - apps/web-v2/components/**         (shell + layout components)
+#   - apps/web-v2/lib/**                (BFF, db, learner helpers)
+#   - packages/learner-surfaces/**      (the surface renderer)
+#   - packages/brand/**                 (subject + tutor registries)
+#   - apps/web-v2/e2e/learner-smoke**   (the smoke test itself)
+#
+# Three gates, designed to fail fast:
+#   1. lint + typecheck for apps/web-v2 and the surfaces package
+#   2. unit tests for @aivo/learner-surfaces (vitest)
+#   3. the learner Playwright smoke (boots `pnpm dev`, walks the six
+#      top-level learner routes, asserts each renders the shell with
+#      no error overlay)
+#
+# Visual snapshots remain in their existing workflow — this check is
+# narrowly scoped so it can run on every learner PR without paying
+# the screenshot-update cost.
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "apps/web-v2/app/learner/**"
+      - "apps/web-v2/app/api/bff/**"
+      - "apps/web-v2/components/**"
+      - "apps/web-v2/lib/**"
+      - "apps/web-v2/e2e/learner-smoke.playwright.ts"
+      - "apps/web-v2/playwright.config.ts"
+      - "packages/learner-surfaces/**"
+      - "packages/brand/**"
+      - ".github/workflows/learner-pr-check.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: learner-pr-check-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22"
+
+jobs:
+  lint-typecheck:
+    name: Lint & Typecheck (learner scope)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build registries + nav + UI (typecheck deps)
+        run: pnpm --filter @aivo/brand --filter @aivo/nav --filter @aivo/ui --filter @aivo/learner-surfaces build
+
+      - name: Lint @aivo/web-v2
+        run: pnpm --filter @aivo/web-v2 lint
+
+      - name: Typecheck @aivo/web-v2
+        run: pnpm --filter @aivo/web-v2 typecheck
+
+  surfaces-tests:
+    name: Tests (@aivo/learner-surfaces)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build deps
+        run: pnpm --filter @aivo/brand build
+      - name: Test @aivo/learner-surfaces
+        run: pnpm --filter @aivo/learner-surfaces test
+
+  learner-smoke:
+    name: Playwright learner smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build registries + nav + UI + surfaces
+        run: pnpm --filter @aivo/brand --filter @aivo/nav --filter @aivo/ui --filter @aivo/learner-surfaces build
+
+      - name: Install Playwright browsers (chromium only)
+        working-directory: apps/web-v2
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run learner smoke
+        working-directory: apps/web-v2
+        env:
+          NODE_ENV: development
+        run: pnpm exec playwright test e2e/learner-smoke.playwright.ts --project=chromium
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: learner-smoke-playwright-report
+          path: apps/web-v2/playwright-report/
+          if-no-files-found: ignore
+          retention-days: 7

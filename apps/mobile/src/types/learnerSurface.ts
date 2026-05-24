@@ -9,7 +9,9 @@ export type LearnerSurfaceKind =
   | "number_line"
   | "fraction_bar"
   | "chart"
-  | "text_response";
+  | "text_response"
+  | "coding_sandbox"
+  | "art_canvas";
 
 export interface LearnerSurfaceSpec {
   kind: LearnerSurfaceKind;

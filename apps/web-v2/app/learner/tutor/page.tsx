@@ -3,7 +3,8 @@
  *
  * Calm landing for the AI tutor experience. Surfaces:
  *  - the active lesson run (Resume CTA) if any
- *  - a short tutor chat preview with safety + adapting status chips
+ *  - a real Socratic chat (Sprint 4) backed by
+ *    POST /api/bff/learners/[learnerId]/tutor/reply
  *  - subject quick-asks
  *  - parent/teacher visibility note so the learner knows who can see what
  */
@@ -11,15 +12,10 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
-import { Button } from "@/components/ui/button";
 import {
   AICompanionHero,
   PersonalizationChip,
-  TutorMessage,
   TutorInsightChip,
-  ExplanationCard,
-  PracticeCard,
-  LearnerChoiceCard,
   InsightChip,
   type PersonalizationVariant,
 } from "@aivo/ui";
@@ -30,6 +26,7 @@ import {
   listSubjects,
 } from "@/lib/db/repos";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
+import { LearnerTutorChat } from "./chat";
 
 export default async function LearnerTutorHome() {
   const session = await requirePageRole(["learner"]);
@@ -42,6 +39,9 @@ export default async function LearnerTutorHome() {
   const chips: PersonalizationVariant[] = ["ai_companion", "no_grades", "calm_mode"];
   if (iep?.confirmedAt) chips.unshift("iep");
 
+  const preferredName = learner.preferredName || learner.firstName;
+  const greeting = `Hi ${preferredName}! Ask me anything — I'll guide you with hints and questions instead of just handing over the answer. What are you working on?`;
+
   return (
     <AppShell
       role="learner"
@@ -51,7 +51,7 @@ export default async function LearnerTutorHome() {
     >
       <AICompanionHero
         eyebrow="AI tutor · always calm, always patient"
-        title={`Hi ${learner.preferredName || learner.firstName} — ask me anything.`}
+        title={`Hi ${preferredName} — ask me anything.`}
         body="I'll explain, give hints, walk you through examples, or just keep you company while you practice. No grades. Tap a subject to start, or pick up an open lesson."
         chips={chips.map((v) => (
           <PersonalizationChip key={v} variant={v} />
@@ -68,73 +68,12 @@ export default async function LearnerTutorHome() {
 
       <section className="mt-8 grid gap-4 lg:grid-cols-[1fr,320px]">
         <div className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold text-iw-text-strong">A peek at how I help</h2>
-          <TutorMessage
-            author="tutor"
-            name="AIVO"
-            avatar="✨"
-            insight={<TutorInsightChip kind="cited" />}
-          >
-            <p className="text-base leading-relaxed">
-              Think of a fraction like a pizza cut into slices. If you eat 3 of 8 slices, you've
-              had three-eighths. The bottom number tells you how many slices the pizza was cut
-              into.
-            </p>
-          </TutorMessage>
-          <TutorMessage author="learner" name="You" avatar="🙂">
-            <p>Got it! So 4/8 is the same as a half?</p>
-          </TutorMessage>
-          <TutorMessage
-            author="tutor"
-            name="AIVO"
-            avatar="✨"
-            insight={<TutorInsightChip kind="difficulty_adjusted" />}
-          >
-            <p className="text-base leading-relaxed">
-              Exactly — you can simplify 4/8 by dividing top and bottom by 4. That gives you 1/2.
-              Want to try one yourself?
-            </p>
-          </TutorMessage>
-          <TutorMessage author="system">Read-aloud available · No grades on practice</TutorMessage>
-
-          <ExplanationCard
-            kind="example"
-            step={1}
-            title="Worked example: simplifying fractions"
-            citation={
-              <span>
-                From your school's grade 3–5 Math unit · <Link href="#" className="font-semibold text-[var(--aivo-sensory-primary)] hover:underline">View source</Link>
-              </span>
-            }
-          >
-            <p className="mb-2">Let's simplify <span className="font-semibold">6/12</span>.</p>
-            <ol className="list-decimal list-inside space-y-1">
-              <li>Both 6 and 12 can be divided by 6.</li>
-              <li>6 ÷ 6 = 1.</li>
-              <li>12 ÷ 6 = 2.</li>
-              <li>So <span className="font-semibold">6/12 = 1/2</span>.</li>
-            </ol>
-          </ExplanationCard>
-
-          <PracticeCard
-            kind="practice"
-            subtitle="No grade. Just see how it feels."
-            prompt="Simplify 4/10."
-            actions={
-              <>
-                <Button type="button" variant="outline" size="sm">
-                  Need a hint?
-                </Button>
-                <Button type="button" size="sm">
-                  Submit
-                </Button>
-              </>
-            }
-          >
-            <LearnerChoiceCard name="demo.tutor" value="2/5" label="2/5" index={0} />
-            <LearnerChoiceCard name="demo.tutor" value="1/2" label="1/2" index={1} />
-            <LearnerChoiceCard name="demo.tutor" value="4/10" label="4/10 (already simplest)" index={2} />
-          </PracticeCard>
+          <h2 className="text-lg font-semibold text-iw-text-strong">Chat with your tutor</h2>
+          <LearnerTutorChat
+            learnerId={session.learnerId}
+            greeting={greeting}
+            preferredName={preferredName}
+          />
         </div>
 
         <aside className="flex flex-col gap-3">

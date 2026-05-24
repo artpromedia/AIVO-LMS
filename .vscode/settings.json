@@ -1,0 +1,53 @@
+{
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/.pnpm-store/**": true,
+    "**/.next/**": true,
+    "**/.turbo/**": true,
+    "**/dist/**": true,
+    "**/build/**": true,
+    "**/out/**": true,
+    "**/coverage/**": true,
+    "**/.cache/**": true,
+    "**/playwright-report/**": true,
+    "**/test-results/**": true,
+    "**/artifacts/**": true,
+    "**/.venv/**": true,
+    "**/__pycache__/**": true,
+    "**/*.log": true,
+    "**/tsconfig.tsbuildinfo": true
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/.next": true,
+    "**/.turbo": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/.pnpm-store": true,
+    "**/coverage": true,
+    "**/tsconfig.tsbuildinfo": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.next": true,
+    "**/.turbo": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/.pnpm-store": true,
+    "**/coverage": true,
+    "**/pnpm-lock.yaml": true,
+    "**/package-lock.json": true,
+    "**/artifacts": true,
+    "**/playwright-report": true,
+    "**/test-results": true
+  },
+  "typescript.tsserver.watchOptions": {
+    "watchFile": "useFsEventsOnParentDirectory",
+    "watchDirectory": "useFsEvents",
+    "fallbackPolling": "dynamicPriority"
+  },
+  "typescript.disableAutomaticTypeAcquisition": true
+}
