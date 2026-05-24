@@ -15,6 +15,13 @@ import {
 import { resolveTenantId, requireLearnerAccess } from "../lib/tenant.js";
 import { checkLearnerTutorAccess } from "../lib/entitlements.js";
 import {
+  DegradationTracker,
+  buildDegradedResponse,
+  failOpen,
+  reportDownstreamFailure,
+  type DowntreamCallContext,
+} from "../lib/downstream.js";
+import {
   createSessionSchema,
   completeSessionSchema,
   updateGradebookSchema,
@@ -36,14 +43,35 @@ function requireUrl(name: string, devDefault: string): string {
 }
 const BRAIN_SVC_URL = requireUrl("BRAIN_SVC_URL", "http://localhost:3002");
 
-async function fetchBrainContext(learnerId: string): Promise<Record<string, unknown>> {
+async function fetchBrainContext(
+  learnerId: string,
+  ctx: DowntreamCallContext = {},
+): Promise<Record<string, unknown>> {
+  const endpoint = "GET /api/brain/:learnerId";
   try {
     const res = await fetch(`${BRAIN_SVC_URL}/api/brain/${learnerId}`);
     if (res.ok) {
       const data = await res.json();
       return data.state || {};
     }
-  } catch {}
+    reportDownstreamFailure({
+      service: "brain-svc",
+      endpoint,
+      statusCode: res.status,
+      correlationId: ctx.correlationId,
+      learnerId: ctx.learnerId ?? learnerId,
+      tracker: ctx.tracker,
+    });
+  } catch (err) {
+    reportDownstreamFailure({
+      service: "brain-svc",
+      endpoint,
+      correlationId: ctx.correlationId,
+      learnerId: ctx.learnerId ?? learnerId,
+      err,
+      tracker: ctx.tracker,
+    });
+  }
   return {};
 }
 
@@ -63,24 +91,45 @@ function advancedContentGeneratorsEnabled(): boolean {
   return v === "1" || v === "true" || v === "yes" || v === "on";
 }
 
-async function fetchSubjectBrainContext(input: {
-  learnerId: string;
-  subject: string;
-  topic?: string;
-  brainContext: Record<string, unknown>;
-}): Promise<Record<string, unknown> | undefined> {
+async function fetchSubjectBrainContext(
+  input: {
+    learnerId: string;
+    subject: string;
+    topic?: string;
+    brainContext: Record<string, unknown>;
+  },
+  ctx: DowntreamCallContext = {},
+): Promise<Record<string, unknown> | undefined> {
   if (!advancedContentGeneratorsEnabled()) return undefined;
+  const endpoint = "POST /api/subject-brain/context";
   try {
     const res = await fetch(`${SUBJECT_BRAIN_SVC_URL}/api/subject-brain/context`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(input),
     });
-    if (!res.ok) return undefined;
-    return (await res.json()) as Record<string, unknown>;
-  } catch {
-    return undefined;
+    if (res.ok) {
+      return (await res.json()) as Record<string, unknown>;
+    }
+    reportDownstreamFailure({
+      service: "subject-brain-svc",
+      endpoint,
+      statusCode: res.status,
+      correlationId: ctx.correlationId,
+      learnerId: ctx.learnerId ?? input.learnerId,
+      tracker: ctx.tracker,
+    });
+  } catch (err) {
+    reportDownstreamFailure({
+      service: "subject-brain-svc",
+      endpoint,
+      correlationId: ctx.correlationId,
+      learnerId: ctx.learnerId ?? input.learnerId,
+      err,
+      tracker: ctx.tracker,
+    });
   }
+  return undefined;
 }
 
 // ---- Sprint 10 adapter: responsible-AI evaluation ----------------------
@@ -93,26 +142,51 @@ function responsibleAiGuardrailsEnabled(): boolean {
   return v === "1" || v === "true" || v === "yes" || v === "on";
 }
 
-async function evaluateResponsibleAi(input: {
-  learnerId: string;
-  contextType: "lesson" | "homework" | "chat" | "baseline" | "recommendation";
-  inputSummary: string;
-  output: unknown;
-  requiredSurfaces?: string[];
-  learnerProfileSummary?: Record<string, unknown>;
-}): Promise<{ allowed: boolean; severity: string; recommendedAction: string } | undefined> {
+async function evaluateResponsibleAi(
+  input: {
+    learnerId: string;
+    contextType: "lesson" | "homework" | "chat" | "baseline" | "recommendation";
+    inputSummary: string;
+    output: unknown;
+    requiredSurfaces?: string[];
+    learnerProfileSummary?: Record<string, unknown>;
+  },
+  ctx: DowntreamCallContext = {},
+): Promise<{ allowed: boolean; severity: string; recommendedAction: string } | undefined> {
   if (!responsibleAiGuardrailsEnabled()) return undefined;
+  const endpoint = "POST /api/responsible-ai/evaluate";
   try {
     const res = await fetch(`${RESPONSIBLE_AI_SVC_URL}/api/responsible-ai/evaluate`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ ...input, policyMode: "warn" }),
     });
-    if (!res.ok) return undefined;
-    return (await res.json()) as { allowed: boolean; severity: string; recommendedAction: string };
-  } catch {
-    return undefined;
+    if (res.ok) {
+      return (await res.json()) as {
+        allowed: boolean;
+        severity: string;
+        recommendedAction: string;
+      };
+    }
+    reportDownstreamFailure({
+      service: "responsible-ai-svc",
+      endpoint,
+      statusCode: res.status,
+      correlationId: ctx.correlationId,
+      learnerId: ctx.learnerId ?? input.learnerId,
+      tracker: ctx.tracker,
+    });
+  } catch (err) {
+    reportDownstreamFailure({
+      service: "responsible-ai-svc",
+      endpoint,
+      correlationId: ctx.correlationId,
+      learnerId: ctx.learnerId ?? input.learnerId,
+      err,
+      tracker: ctx.tracker,
+    });
   }
+  return undefined;
 }
 
 function problemSessionLedgerEnabled(): boolean {
@@ -122,17 +196,21 @@ function problemSessionLedgerEnabled(): boolean {
   return v === "1" || v === "true" || v === "yes" || v === "on";
 }
 
-async function recordProblemSessionForLesson(input: {
-  tenantId: string;
-  learnerId: string;
-  subject: string;
-  sourceSessionId: string;
-  tutorSku?: string;
-  topic?: string;
-}): Promise<void> {
+async function recordProblemSessionForLesson(
+  input: {
+    tenantId: string;
+    learnerId: string;
+    subject: string;
+    sourceSessionId: string;
+    tutorSku?: string;
+    topic?: string;
+  },
+  ctx: DowntreamCallContext = {},
+): Promise<void> {
   if (!problemSessionLedgerEnabled()) return;
+  const endpoint = "POST /api/problem-sessions";
   try {
-    await fetch(`${PROBLEM_SESSION_SVC_URL}/api/problem-sessions`, {
+    const res = await fetch(`${PROBLEM_SESSION_SVC_URL}/api/problem-sessions`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
@@ -145,8 +223,28 @@ async function recordProblemSessionForLesson(input: {
         metadata: { topic: input.topic, sourceService: "learning-svc" },
       }),
     });
-  } catch {
-    // Swallow — ledger failures must never break the lesson flow.
+    if (!res.ok) {
+      reportDownstreamFailure({
+        service: "problem-session-svc",
+        endpoint,
+        statusCode: res.status,
+        correlationId: ctx.correlationId,
+        learnerId: ctx.learnerId ?? input.learnerId,
+        tracker: ctx.tracker,
+      });
+    }
+  } catch (err) {
+    // Ledger failures still must never break the lesson flow — but they
+    // are no longer invisible. Log + count + (optionally) attach to the
+    // request's degradation tracker.
+    reportDownstreamFailure({
+      service: "problem-session-svc",
+      endpoint,
+      correlationId: ctx.correlationId,
+      learnerId: ctx.learnerId ?? input.learnerId,
+      err,
+      tracker: ctx.tracker,
+    });
   }
 }
 
@@ -249,18 +347,38 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
     }
 
     const subject = getSubjectForTutor(tutorSku);
-    const brainContext = await fetchBrainContext(learnerId);
+    const tracker = new DegradationTracker();
+    const downstreamCtx = {
+      tracker,
+      correlationId: request.id,
+      learnerId,
+    } as const;
+    const brainContext = await fetchBrainContext(learnerId, downstreamCtx);
+
+    // Sprint 0 — Guardrails: BRAIN_SVC is a critical subsystem. When it
+    // is unavailable and the service is not configured to fail open we
+    // surface a typed degraded response instead of fabricating a lesson
+    // off an empty brain snapshot.
+    if (tracker.has("brain-svc") && !failOpen()) {
+      return reply.code(503).send(
+        buildDegradedResponse(tracker, "Critical downstream subsystem unavailable"),
+      );
+    }
+
     const functioningLevel = (brainContext as any).functioning_level_profile?.level || "STANDARD";
 
     // Sprint 05: pull subject-brain context when the flag is on. The result
     // is merged into brainContext so the existing generator pipeline picks
     // it up without behavioral change when the flag is off.
-    const subjectBrainContext = await fetchSubjectBrainContext({
-      learnerId,
-      subject,
-      topic,
-      brainContext,
-    });
+    const subjectBrainContext = await fetchSubjectBrainContext(
+      {
+        learnerId,
+        subject,
+        topic,
+        brainContext,
+      },
+      downstreamCtx,
+    );
     const enrichedBrainContext = subjectBrainContext
       ? { ...brainContext, subjectBrain: subjectBrainContext }
       : brainContext;
@@ -282,14 +400,17 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
       .returning();
 
     // Sprint 02: fire-and-forget problem-session ledger record (flag-gated).
-    void recordProblemSessionForLesson({
-      tenantId,
-      learnerId,
-      subject,
-      sourceSessionId: session.id,
-      tutorSku,
-      topic,
-    });
+    void recordProblemSessionForLesson(
+      {
+        tenantId,
+        learnerId,
+        subject,
+        sourceSessionId: session.id,
+        tutorSku,
+        topic,
+      },
+      downstreamCtx,
+    );
 
     try {
       const generated = await generateLessonContent({
@@ -306,14 +427,17 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
       // the flag is on. We run in `warn` mode so a violation logs and
       // recommends a revise but does NOT block legacy delivery. Switching
       // to `block` mode is a one-line change once the team is ready.
-      const raiResult = await evaluateResponsibleAi({
-        learnerId,
-        contextType: "lesson",
-        inputSummary: topic || `Introduction to ${subject}`,
-        output: { content: generated.content, subject, topic },
-        requiredSurfaces: (subjectBrainContext as { recommendedSurfaces?: string[] } | undefined)
-          ?.recommendedSurfaces,
-      });
+      const raiResult = await evaluateResponsibleAi(
+        {
+          learnerId,
+          contextType: "lesson",
+          inputSummary: topic || `Introduction to ${subject}`,
+          output: { content: generated.content, subject, topic },
+          requiredSurfaces: (subjectBrainContext as { recommendedSurfaces?: string[] } | undefined)
+            ?.recommendedSurfaces,
+        },
+        downstreamCtx,
+      );
       if (raiResult && !raiResult.allowed) {
         app.log.warn(
           { learnerId, sessionId: session.id, severity: raiResult.severity },
@@ -364,6 +488,9 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
         status: "CONTENT_READY",
         content: generated.content,
         qualityScore: generated.qualityScore,
+        ...(tracker.isDegraded()
+          ? { degraded: true as const, degradedSubsystems: tracker.snapshot() }
+          : {}),
       };
     } catch (err: any) {
       await db
@@ -729,7 +856,10 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
         return reply.code(404).send({ error: "Learning path not found" });
       }
 
-      const brain = await fetchBrainContext(learnerId);
+      const brain = await fetchBrainContext(learnerId, {
+        correlationId: request.id,
+        learnerId,
+      });
       const masteryLevels = ((brain as any).mastery_levels || {}) as Record<string, number>;
       const subjectScores = Object.entries(masteryLevels)
         .filter(([k]) => k.toLowerCase().includes(subject.toLowerCase().split(" ")[0]))
@@ -792,7 +922,10 @@ export function registerSessionRoutes(app: FastifyInstance, db: any) {
         return { status: "path_complete", subject, completedCount: completed.length };
       }
 
-      const brain = await fetchBrainContext(learnerId);
+      const brain = await fetchBrainContext(learnerId, {
+        correlationId: request.id,
+        learnerId,
+      });
       const functioningLevel =
         ((brain as any).functioning_level_profile?.level as string) || "STANDARD";
       const threshold = MASTERY_THRESHOLDS[functioningLevel] ?? MASTERY_THRESHOLDS.STANDARD;
