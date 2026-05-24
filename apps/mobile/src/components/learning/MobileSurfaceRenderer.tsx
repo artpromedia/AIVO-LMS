@@ -33,6 +33,20 @@ import type { SurfaceBeat } from "@/src/types/stage";
 import type { LearnerSurfaceKind } from "@/src/types/learnerSurface";
 import { ScratchPad, type ScratchStroke } from "./ScratchPad";
 
+export type SurfaceTutorKey =
+  | "nova" | "sage" | "spark" | "chrono" | "pixel" | "echo" | "harmony"
+  | "atlas" | "cadence" | "vigor" | "lingua" | "forge" | "compass" | "muse";
+
+/**
+ * Mirror of the web `requiredTutorForSurface` map. Kept in this file
+ * so the mobile bundle doesn't have to import the web learner-surfaces
+ * package (which depends on `react-dom`). Keep these two in sync.
+ */
+const REQUIRED_TUTOR: Partial<Record<LearnerSurfaceKind, SurfaceTutorKey>> = {
+  coding_sandbox: "pixel",
+  art_canvas: "cadence",
+};
+
 export type SurfaceCommand =
   | { kind: "text_response"; text: string }
   | { kind: "number_line"; value: number }
@@ -40,6 +54,8 @@ export type SurfaceCommand =
   | { kind: "scratchpad"; strokes: ScratchStroke[] }
   | { kind: "geometry_workspace"; strokes: ScratchStroke[] }
   | { kind: "chart"; strokes: ScratchStroke[] }
+  | { kind: "coding_sandbox"; code: string; language: string }
+  | { kind: "art_canvas"; strokes: ScratchStroke[]; color: string }
   | { kind: "noop"; surfaceKind: LearnerSurfaceKind };
 
 interface Props {
@@ -47,6 +63,14 @@ interface Props {
   beat: SurfaceBeat;
   disabled?: boolean;
   onSubmit: (commands: SurfaceCommand) => void;
+  /**
+   * Sprint 8/9 — optional set of tutor keys the learner is entitled
+   * to. When supplied, premium surfaces (`coding_sandbox`,
+   * `art_canvas`) render a locked panel rather than the interactive
+   * UI if the required add-on is missing. Omit to default-allow
+   * during entitlement load (the server still gates session start).
+   */
+  entitledTutors?: ReadonlySet<SurfaceTutorKey> | readonly SurfaceTutorKey[];
 }
 
 function readNumber(config: Record<string, unknown> | undefined, key: string, fallback: number) {
@@ -55,12 +79,45 @@ function readNumber(config: Record<string, unknown> | undefined, key: string, fa
   return fallback;
 }
 
-export function MobileSurfaceRenderer({ theme, beat, disabled, onSubmit }: Props) {
+function readString(
+  config: Record<string, unknown> | undefined,
+  key: string,
+  fallback: string,
+): string {
+  const v = config?.[key];
+  return typeof v === "string" ? v : fallback;
+}
+
+function isEntitled(
+  kind: LearnerSurfaceKind,
+  entitled?: ReadonlySet<SurfaceTutorKey> | readonly SurfaceTutorKey[],
+): boolean {
+  const required = REQUIRED_TUTOR[kind];
+  if (!required) return true;
+  if (entitled === undefined) return true;
+  if (Array.isArray(entitled)) return entitled.includes(required);
+  return (entitled as ReadonlySet<SurfaceTutorKey>).has(required);
+}
+
+export function MobileSurfaceRenderer({ theme, beat, disabled, onSubmit, entitledTutors }: Props) {
   const styles = useMemo(() => createStyles(theme), [theme]);
   const kind = beat.surface.kind;
   const cfg = beat.surface.config;
 
   const title = kind.replace(/_/g, " ");
+
+  if (!isEntitled(kind, entitledTutors)) {
+    const required = REQUIRED_TUTOR[kind];
+    return (
+      <View style={styles.wrap}>
+        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.body}>
+          {`This activity needs the ${required ?? "premium"} tutor add-on.`}
+        </Text>
+        <Text style={styles.note}>Ask a grown-up to unlock it from the billing screen.</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.wrap}>
@@ -85,6 +142,16 @@ export function MobileSurfaceRenderer({ theme, beat, disabled, onSubmit }: Props
           denominator={Math.max(1, Math.min(12, readNumber(cfg, "denominator", 4)))}
           onSubmit={onSubmit}
         />
+      ) : kind === "coding_sandbox" ? (
+        <CodingSandboxSurface
+          theme={theme}
+          disabled={disabled}
+          language={readString(cfg, "language", "python")}
+          starterCode={readString(cfg, "starterCode", "")}
+          onSubmit={onSubmit}
+        />
+      ) : kind === "art_canvas" ? (
+        <ArtCanvasSurface theme={theme} disabled={disabled} onSubmit={onSubmit} />
       ) : (
         // scratchpad + the two fallback surfaces share the same workspace.
         <ScratchSurface theme={theme} disabled={disabled} surfaceKind={kind} onSubmit={onSubmit} />
@@ -272,6 +339,94 @@ function FractionBarSurface({
 }
 
 /* -------------------------------------------------------------------- */
+/* coding_sandbox (Sprint 8)                                            */
+/* -------------------------------------------------------------------- */
+
+function CodingSandboxSurface({
+  theme,
+  disabled,
+  language,
+  starterCode,
+  onSubmit,
+}: {
+  theme: TierThemeMobile;
+  disabled?: boolean;
+  language: string;
+  starterCode: string;
+  onSubmit: (c: SurfaceCommand) => void;
+}) {
+  const styles = useMemo(() => createStyles(theme), [theme]);
+  const [code, setCode] = useState<string>(starterCode);
+  const canSubmit = code.trim().length > 0 && !disabled;
+  return (
+    <View style={{ gap: 12 }}>
+      <Text style={styles.codeLanguageBadge}>{language}</Text>
+      <TextInput
+        value={code}
+        onChangeText={setCode}
+        multiline
+        editable={!disabled}
+        autoCorrect={false}
+        autoCapitalize="none"
+        spellCheck={false}
+        placeholder="// write your code here"
+        placeholderTextColor={theme.colors.text + "80"}
+        style={styles.codeInput}
+        accessibilityLabel={`code editor (${language})`}
+      />
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => onSubmit({ kind: "coding_sandbox", code, language })}
+        disabled={!canSubmit}
+        style={[styles.submit, !canSubmit && styles.submitDisabled]}
+      >
+        <Text style={styles.submitText}>Submit code</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+/* -------------------------------------------------------------------- */
+/* art_canvas (Sprint 9)                                                */
+/* -------------------------------------------------------------------- */
+
+function ArtCanvasSurface({
+  theme,
+  disabled,
+  onSubmit,
+}: {
+  theme: TierThemeMobile;
+  disabled?: boolean;
+  onSubmit: (c: SurfaceCommand) => void;
+}) {
+  const styles = useMemo(() => createStyles(theme), [theme]);
+  const [strokes, setStrokes] = useState<ScratchStroke[]>([]);
+  // The selected color is tracked for telemetry parity with the web
+  // ArtCanvasSurface; ScratchPad already exposes its own swatch picker.
+  const selectedColor = strokes.length > 0 ? strokes[strokes.length - 1].color : "#1B1B1B";
+  return (
+    <View style={{ gap: 12 }}>
+      <View style={styles.scratchHolder}>
+        <ScratchPad onChange={setStrokes} compactToolbar />
+      </View>
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => onSubmit({ kind: "art_canvas", strokes, color: selectedColor })}
+        disabled={disabled || strokes.length === 0}
+        style={[
+          styles.submit,
+          (disabled || strokes.length === 0) && styles.submitDisabled,
+        ]}
+      >
+        <Text style={styles.submitText}>
+          {strokes.length === 0 ? "Draw something first" : "Submit artwork"}
+        </Text>
+      </Pressable>
+    </View>
+  );
+}
+
+/* -------------------------------------------------------------------- */
 /* scratchpad / geometry_workspace / chart                              */
 /* -------------------------------------------------------------------- */
 
@@ -330,6 +485,7 @@ function createStyles(theme: TierThemeMobile) {
       textTransform: "capitalize",
     },
     body: { color: theme.colors.text, fontSize: 18 },
+    note: { color: theme.colors.text, opacity: 0.7, fontStyle: "italic" },
     submit: {
       backgroundColor: theme.colors.primary,
       borderRadius: 12,
@@ -349,6 +505,29 @@ function createStyles(theme: TierThemeMobile) {
       color: theme.colors.text,
       fontSize: 16,
       textAlignVertical: "top",
+    },
+    codeInput: {
+      minHeight: 200,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: theme.colors.text + "33",
+      backgroundColor: theme.colors.surface,
+      padding: 12,
+      color: theme.colors.text,
+      fontSize: 14,
+      fontFamily: "Courier",
+      textAlignVertical: "top",
+    },
+    codeLanguageBadge: {
+      alignSelf: "flex-start",
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: 999,
+      backgroundColor: theme.colors.primary + "22",
+      color: theme.colors.text,
+      fontSize: 12,
+      fontWeight: "700",
+      textTransform: "lowercase",
     },
     tick: {
       minWidth: 44,
