@@ -2,7 +2,7 @@
   "name": "@aivo/item-bank",
   "version": "0.1.0",
   "private": true,
-  "description": "Assessment item-bank primitives — versioned items, cohort A/B routing, defect tracking. Lets the assessment service ship multiple variants of an item, route a learner to a deterministic variant per cohort, and retire an item when defects accumulate (§9.3 Greenfield 6–8w).",
+  "description": "Assessment item-bank primitives — versioned items, cohort A/B routing, defect tracking, and the Sprint 2.2 authoring schema/CLI for importing item fixtures (§9.3 Greenfield 6–8w).",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,19 +11,38 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
+    },
+    "./schema": {
+      "types": "./dist/schema.d.ts",
+      "import": "./dist/schema.js",
+      "default": "./dist/schema.js"
+    },
+    "./cli": {
+      "types": "./dist/cli/import.d.ts",
+      "import": "./dist/cli/import.js",
+      "default": "./dist/cli/import.js"
     }
+  },
+  "bin": {
+    "item-bank-import": "./dist/cli/bin.js"
   },
   "files": [
     "dist",
+    "fixtures",
     "package.json"
   ],
   "scripts": {
     "build": "tsc",
     "prepare": "tsc",
-    "test": "vitest run"
+    "test": "vitest run",
+    "item-bank:import": "tsx src/cli/bin.ts"
+  },
+  "dependencies": {
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "tsx": "^4.19.4",
     "typescript": "^5.7.3",
     "vitest": "^2.0.0"
   }

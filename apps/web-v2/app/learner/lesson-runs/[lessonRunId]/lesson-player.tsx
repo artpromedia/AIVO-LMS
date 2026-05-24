@@ -31,6 +31,7 @@ import type {
   LessonRunStatus,
   LessonStepKind,
 } from "@/lib/db/types";
+import { recordSurfaceTelemetry } from "@/components/learning/surface-telemetry-buffer";
 
 type Beat =
   | { kind: "welcome"; key: string; body: string }
@@ -124,6 +125,25 @@ type Props = {
   plan: GeneratedLessonPlan;
   accessibility: AccessibilityPreferences;
   initialStatus: LessonRunStatus;
+  /**
+   * Sprint 1.2 — when `true`, the player routes through
+   * `/api/bff/learning/sessions/*` (real `learning-svc`) instead of the
+   * v1 `/api/bff/learners/.../lesson-runs/*` legacy BFF. Driven by the
+   * `LEARNER_LESSON_PLAYER_V2` flag on the server component.
+   */
+  v2Enabled?: boolean;
+  /**
+   * v2-only: the `learning-svc` session id created when the lesson run
+   * was started. The page server-component creates the session and
+   * threads it through so the player can post step/complete events.
+   */
+  sessionId?: string | null;
+  /**
+   * v2-only: subject slug the lesson is anchored to. Used to call
+   * `/path/advance` once the learner completes. Optional because some
+   * legacy runs predate the subject pin.
+   */
+  subjectSlug?: string | null;
 };
 
 export function LessonPlayer({
@@ -132,6 +152,9 @@ export function LessonPlayer({
   plan,
   accessibility,
   initialStatus,
+  v2Enabled = false,
+  sessionId = null,
+  subjectSlug = null,
 }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -174,6 +197,14 @@ export function LessonPlayer({
         method: "POST",
       }).catch(() => {});
     }
+    // Sprint 1.3: a single impression event for the lesson run.
+    recordSurfaceTelemetry({
+      learnerId,
+      sessionId: sessionId ?? lessonRunId,
+      eventType: "impression",
+      payload: { lessonRunId, v2: v2Enabled, beatCount: beats.length },
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Persist current step in URL + emit lesson_step_viewed once per beat.
@@ -204,17 +235,33 @@ export function LessonPlayer({
                         : beat.kind === "progress"
                           ? "progress_update"
                           : "next_step";
-      fetch(`/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/step`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          stepKind,
-          stepRefId:
-            beat.kind === "guided" ? beat.gpId : beat.kind === "check" ? beat.checkId : null,
-        }),
-      }).catch(() => {});
+      const stepRefId =
+        beat.kind === "guided" ? beat.gpId : beat.kind === "check" ? beat.checkId : null;
+      sendStep({ stepKind, stepRefId });
+      recordSurfaceTelemetry({
+        learnerId,
+        sessionId: sessionId ?? lessonRunId,
+        eventType: "impression",
+        payload: { stepKind, stepRefId, beatKey: beat.key, stepIdx },
+      });
     }
-  }, [stepIdx, beat, learnerId, lessonRunId, onBreak]);
+  }, [stepIdx, beat, learnerId, lessonRunId, onBreak, sessionId]);
+
+  function sendStep(payload: {
+    stepKind: string;
+    stepRefId?: string | null;
+    response?: string;
+    isCorrect?: boolean;
+  }): void {
+    const v1Url = `/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/step`;
+    const v2Url = sessionId ? `/api/bff/learning/sessions/${sessionId}/advance` : null;
+    const url = v2Enabled && v2Url ? v2Url : v1Url;
+    fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+    }).catch(() => {});
+  }
 
   function advance() {
     if (stepIdx < beats.length - 1) {
@@ -234,44 +281,41 @@ export function LessonPlayer({
       setChecksTotal((n) => n + 1);
       if (correct) setChecksCorrect((n) => n + 1);
     }
-    fetch(`/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/step`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        stepKind: "answer_submitted",
-        stepRefId: beat.kind === "guided" ? beat.gpId : beat.kind === "check" ? beat.checkId : null,
-        response: answer,
-        isCorrect: correct,
-      }),
-    }).catch(() => {});
+    const stepRefId =
+      beat.kind === "guided" ? beat.gpId : beat.kind === "check" ? beat.checkId : null;
+    sendStep({ stepKind: "answer_submitted", stepRefId, response: answer, isCorrect: correct });
+    recordSurfaceTelemetry({
+      learnerId,
+      sessionId: sessionId ?? lessonRunId,
+      eventType: "interaction",
+      payload: { kind: "answer_submitted", isCorrect: correct, stepRefId, beatKey: beat.key },
+    });
   }
 
   function requestHint() {
     if (beat.kind !== "guided") return;
     setShowHint(true);
     setHintsUsed((n) => n + 1);
-    fetch(`/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/step`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        stepKind: "hint_used",
-        stepRefId: beat.gpId,
-      }),
-    }).catch(() => {});
+    sendStep({ stepKind: "hint_used", stepRefId: beat.gpId });
+    recordSurfaceTelemetry({
+      learnerId,
+      sessionId: sessionId ?? lessonRunId,
+      eventType: "interaction",
+      payload: { kind: "hint_used", stepRefId: beat.gpId, beatKey: beat.key },
+    });
   }
 
   function useScaffold() {
     if (beat.kind !== "guided") return;
     setScaffoldsUsed((n) => n + 1);
     setAnswer(beat.expectedAnswer ?? "");
-    fetch(`/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/step`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        stepKind: "scaffold_used",
-        stepRefId: beat.gpId,
-      }),
-    }).catch(() => {});
+    sendStep({ stepKind: "scaffold_used", stepRefId: beat.gpId });
+    recordSurfaceTelemetry({
+      learnerId,
+      sessionId: sessionId ?? lessonRunId,
+      eventType: "interaction",
+      payload: { kind: "scaffold_used", stepRefId: beat.gpId, beatKey: beat.key },
+    });
   }
 
   function complete(abandoned: boolean) {
@@ -280,20 +324,47 @@ export function LessonPlayer({
     // only contributes `abandoned`, which is a UX signal not represented in
     // interactions.
     startTransition(async () => {
-      const res = await fetch(
-        `/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/complete`,
-        {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ outcome: { abandoned } }),
-        },
-      );
-      if (!res.ok) {
+      const v1Url = `/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/complete`;
+      const v2Url =
+        v2Enabled && sessionId ? `/api/bff/learning/sessions/${sessionId}/complete` : null;
+      // We always hit v1 to keep the lesson_run row consistent (badges,
+      // streaks, parent dashboards still read from it). When v2 is on we
+      // additionally call /learning/sessions/.../complete so the upstream
+      // gradebook + path/advance respond with real mastery.
+      const v1Res = await fetch(v1Url, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ outcome: { abandoned } }),
+      });
+      if (!v1Res.ok) {
         // Surface the failure instead of redirecting blindly — otherwise the
         // run would silently stay in_progress and mastery would never update.
         setCompleteError("We couldn't save this lesson. Please try the 'I'm done' button again.");
         return;
       }
+      if (v2Url) {
+        try {
+          await fetch(v2Url, {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ abandoned }),
+          });
+          if (subjectSlug) {
+            await fetch(
+              `/api/bff/learning/path/${learnerId}/${encodeURIComponent(subjectSlug)}/advance`,
+              { method: "POST" },
+            );
+          }
+        } catch {
+          // v2 completion is best-effort relative to v1.
+        }
+      }
+      recordSurfaceTelemetry({
+        learnerId,
+        sessionId: sessionId ?? lessonRunId,
+        eventType: "completion",
+        payload: { lessonRunId, abandoned, stepsViewed: seenBeats.current.size },
+      });
       router.push("/learner/home");
       router.refresh();
     });

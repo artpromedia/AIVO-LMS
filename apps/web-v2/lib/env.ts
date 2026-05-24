@@ -59,6 +59,10 @@ const serverSchema = z.object({
   // Base URL of the real identity-svc (Fastify) used when
   // AUTH_MODE !== "mock". Default to localhost for the dev workflow.
   IDENTITY_SVC_URL: z.string().url().default("http://localhost:3001"),
+  // Base URL of the real `learning-svc` (Fastify). The Sprint 1 lesson
+  // player v2 BFF routes proxy through this — v1 paths ignore it.
+  LEARNING_SVC_URL: z.string().url().default("http://localhost:3041"),
+  LEARNING_SVC_SERVICE_TOKEN: z.string().optional(),
   AI_PROVIDER: aiProviderSchema,
   ANTHROPIC_API_KEY: z.string().optional(),
   OPENAI_API_KEY: z.string().optional(),

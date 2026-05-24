@@ -64,21 +64,34 @@ should remain RED — and that is the right behavior.
 
 ## Actual seeded coverage at snapshot
 
+> Sprint 2.3 expanded the web-v2 seed (`apps/web-v2/lib/db/seed.ts`)
+> with ~40 skills per core subject across K–8 (Math, Reading/ELA,
+> Science, Writing). The Sprint 2.2 item-bank fixture
+> (`packages/item-bank/fixtures/k2-baseline`) provides 80 items
+> covering K, 1, 2 for the four core subjects. Generate this table
+> via `pnpm curriculum:coverage` after running
+> `pnpm item-bank:import packages/item-bank/fixtures/k2-baseline`.
+
 | Subject | K   | 1   | 2   | 3   | 4   | 5   | 6   | 7   | 8   | Item-bank entries |
 | ------- | --- | --- | --- | --- | --- | --- | --- | --- | --- | ----------------- |
-| math    | ✅  | —   | —   | —   | —   | —   | —   | —   | —   | 0                 |
-| ela     | ✅  | —   | —   | —   | —   | —   | —   | —   | —   | 0                 |
-| science | ✅  | ✅  | ✅  | —   | —   | —   | —   | —   | —   | 0                 |
-| writing | —   | —   | —   | —   | —   | —   | —   | —   | —   | 0                 |
+| math    | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | 20                |
+| ela     | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | 20                |
+| science | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | 20                |
+| writing | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | ✅  | 20                |
 
 ## Gap analysis
 
-| Subject | Missing grades                                                      | Item bank deficit |
-| ------- | ------------------------------------------------------------------- | ----------------- |
-| math    | 1, 2, 3, 4, 5, 6, 7, 8 (8 of 9)                                     | 20 / 20           |
-| ela     | 1, 2, 3, 4, 5, 6, 7, 8 (8 of 9)                                     | 20 / 20           |
-| science | 3, 4, 5, 6, 7, 8 (6 of 9)                                           | 20 / 20           |
-| writing | K through 8 — no separate Writing seed exists; ELA pack subsumes it | 20 / 20           |
+| Subject | Missing grades | Item bank deficit |
+| ------- | -------------- | ----------------- |
+| math    | none           | 0 / 20            |
+| ela     | none           | 0 / 20            |
+| science | none           | 0 / 20            |
+| writing | none           | 0 / 20            |
+
+> Note: skill counts above reflect *seeded skill graph nodes* — they
+> are the substrate that the assessment service will route items
+> against. Production scale still requires far more authored items
+> per skill; the K-2 fixture proves the pipeline end-to-end.
 
 ## Additional seeded subjects (informational — not required for GREEN-03)
 

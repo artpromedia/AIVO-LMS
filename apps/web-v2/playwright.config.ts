@@ -1,8 +1,10 @@
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
-  testDir: "./e2e",
-  testMatch: "**/*.playwright.ts",
+  // Two roots: the original `./e2e` (smoke + visual-a11y) and the
+  // Sprint 1.2 `./tests/e2e` (v2 lesson player + other feature specs).
+  testDir: ".",
+  testMatch: ["e2e/**/*.playwright.ts", "tests/e2e/**/*.spec.ts"],
   timeout: 60_000,
   use: {
     baseURL: "http://127.0.0.1:5000",
