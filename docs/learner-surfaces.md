@@ -24,6 +24,10 @@ import { SurfaceHost } from "@aivo/learner-surfaces";
 fallback section that emits an `unsupported_surface` telemetry event
 and never throws.
 
+`SurfaceRouter` provides lesson-player friendly routing by
+`item.surfaceType` and dispatches to the same underlying surface
+components.
+
 ## Surface types
 
 | `LearnerSurfaceType` | Component               |
@@ -32,9 +36,9 @@ and never throws.
 | `scratchpad`         | `ScratchpadSurface`     |
 | `geometry_workspace` | `GeometrySurface`       |
 | `math_expression`    | `MathExpressionSurface` |
+| `number_line`        | `NumberLineSurface`     |
 
-Other types (`number_line`, `graph`, `drag_manipulative`,
-`reading_annotation`, `science_diagram`, `voice_response`,
+Other types (`graph`, `drag_manipulative`, `reading_annotation`, `science_diagram`, `voice_response`,
 `multi_step_workspace`) are reserved in the type system and render the
 fallback until a dedicated component lands.
 

@@ -14,7 +14,7 @@ const baseSurface: Omit<LearnerSurfaceSpec, "id" | "type" | "prompt"> = {
 };
 
 describe("SurfaceHost", () => {
-  it("renders scratchpad, geometry, and choice-grid surfaces", () => {
+  it("renders scratchpad, geometry, choice-grid, and number-line surfaces", () => {
     const scratchpadMarkup = renderToStaticMarkup(
       <SurfaceHost
         surface={{
@@ -59,9 +59,22 @@ describe("SurfaceHost", () => {
       />,
     );
 
+    const numberLineMarkup = renderToStaticMarkup(
+      <SurfaceHost
+        surface={{
+          ...baseSurface,
+          id: "s4",
+          type: "number_line",
+          prompt: "Pick the number",
+          numberLine: { min: 0, max: 10, step: 1 },
+        }}
+      />,
+    );
+
     expect(scratchpadMarkup).toContain("scratchpad-surface");
     expect(geometryMarkup).toContain("geometry-surface");
     expect(choiceMarkup).toContain("choice-grid-surface");
+    expect(numberLineMarkup).toContain("number-line-surface");
   });
 
   it("renders fallback and emits telemetry for unsupported surfaces", () => {
@@ -71,7 +84,7 @@ describe("SurfaceHost", () => {
       <SurfaceHost
         surface={{
           ...baseSurface,
-          id: "s4",
+          id: "s5",
           type: "graph",
           prompt: "Unsupported",
         }}

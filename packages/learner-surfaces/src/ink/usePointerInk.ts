@@ -79,7 +79,12 @@ export function usePointerInk({
       if (disabled) {
         return;
       }
-      event.currentTarget.setPointerCapture(event.pointerId);
+      try {
+        event.currentTarget.setPointerCapture(event.pointerId);
+      } catch {
+        // Some automation/headless contexts can dispatch pointer sequences
+        // without a capturable pointer. Continue without hard-failing.
+      }
       const startPoint = pointFromEvent(event);
       onEvent?.(createSurfaceEvent(surfaceId, "ink_started", { pointerId: event.pointerId, tool }));
 

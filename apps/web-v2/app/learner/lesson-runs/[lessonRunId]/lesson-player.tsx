@@ -25,13 +25,18 @@ import { Progress } from "@/components/ui/progress";
 import { PageHeader } from "@/components/layout/page-header";
 import { AudioControlBar, FocusMode } from "@/components/playful-calm";
 import { MathText } from "@/components/learning/math-text";
+import {
+  SurfaceRouter,
+  type SurfaceRouterItem,
+  type SurfaceRouterSubmitResult,
+  type SurfaceTelemetryEvent,
+} from "@aivo/learner-surfaces";
 import type {
   AccessibilityPreferences,
   GeneratedLessonPlan,
   LessonRunStatus,
   LessonStepKind,
 } from "@/lib/db/types";
-import { recordSurfaceTelemetry } from "@/components/learning/surface-telemetry-buffer";
 
 type Beat =
   | { kind: "welcome"; key: string; body: string }
@@ -43,6 +48,7 @@ type Beat =
       kind: "guided";
       key: string;
       gpId: string;
+      surfaceType: SurfaceRouterItem["surfaceType"];
       prompt: string;
       expectedAnswer?: string;
       choices?: string[];
@@ -53,6 +59,7 @@ type Beat =
       kind: "check";
       key: string;
       checkId: string;
+      surfaceType: SurfaceRouterItem["surfaceType"];
       prompt: string;
       expectedAnswer?: string;
       choices?: string[];
@@ -82,6 +89,9 @@ function buildBeats(plan: GeneratedLessonPlan, shorter: boolean): Beat[] {
       kind: "guided",
       key: `gp-${i}`,
       gpId: g.id,
+      surfaceType:
+        ((g as { surfaceType?: SurfaceRouterItem["surfaceType"] }).surfaceType ??
+          (g.choices?.length ? "choice_grid" : "math_expression")),
       prompt: g.prompt,
       expectedAnswer: g.expectedAnswer,
       choices: g.choices,
@@ -94,6 +104,9 @@ function buildBeats(plan: GeneratedLessonPlan, shorter: boolean): Beat[] {
       kind: "check",
       key: `chk-${i}`,
       checkId: c.id,
+      surfaceType:
+        ((c as { surfaceType?: SurfaceRouterItem["surfaceType"] }).surfaceType ??
+          (c.choices?.length ? "choice_grid" : "math_expression")),
       prompt: c.prompt,
       expectedAnswer: c.expectedAnswer,
       choices: c.choices,
@@ -125,25 +138,6 @@ type Props = {
   plan: GeneratedLessonPlan;
   accessibility: AccessibilityPreferences;
   initialStatus: LessonRunStatus;
-  /**
-   * Sprint 1.2 — when `true`, the player routes through
-   * `/api/bff/learning/sessions/*` (real `learning-svc`) instead of the
-   * v1 `/api/bff/learners/.../lesson-runs/*` legacy BFF. Driven by the
-   * `LEARNER_LESSON_PLAYER_V2` flag on the server component.
-   */
-  v2Enabled?: boolean;
-  /**
-   * v2-only: the `learning-svc` session id created when the lesson run
-   * was started. The page server-component creates the session and
-   * threads it through so the player can post step/complete events.
-   */
-  sessionId?: string | null;
-  /**
-   * v2-only: subject slug the lesson is anchored to. Used to call
-   * `/path/advance` once the learner completes. Optional because some
-   * legacy runs predate the subject pin.
-   */
-  subjectSlug?: string | null;
 };
 
 export function LessonPlayer({
@@ -152,9 +146,6 @@ export function LessonPlayer({
   plan,
   accessibility,
   initialStatus,
-  v2Enabled = false,
-  sessionId = null,
-  subjectSlug = null,
 }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -168,7 +159,6 @@ export function LessonPlayer({
     return Math.min(raw, beats.length - 1);
   })();
   const [stepIdx, setStepIdx] = useState(startStep);
-  const [answer, setAnswer] = useState("");
   const [feedback, setFeedback] = useState<null | "correct" | "incorrect">(null);
   const [showHint, setShowHint] = useState(false);
   const [onBreak, setOnBreak] = useState(false);
@@ -197,14 +187,6 @@ export function LessonPlayer({
         method: "POST",
       }).catch(() => {});
     }
-    // Sprint 1.3: a single impression event for the lesson run.
-    recordSurfaceTelemetry({
-      learnerId,
-      sessionId: sessionId ?? lessonRunId,
-      eventType: "impression",
-      payload: { lessonRunId, v2: v2Enabled, beatCount: beats.length },
-    });
-    // eslint-disable-next-line
   }, []);
 
   // Persist current step in URL + emit lesson_step_viewed once per beat.
@@ -235,87 +217,131 @@ export function LessonPlayer({
                         : beat.kind === "progress"
                           ? "progress_update"
                           : "next_step";
-      const stepRefId =
-        beat.kind === "guided" ? beat.gpId : beat.kind === "check" ? beat.checkId : null;
-      sendStep({ stepKind, stepRefId });
-      recordSurfaceTelemetry({
-        learnerId,
-        sessionId: sessionId ?? lessonRunId,
-        eventType: "impression",
-        payload: { stepKind, stepRefId, beatKey: beat.key, stepIdx },
-      });
+      fetch(`/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/step`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          stepKind,
+          stepRefId:
+            beat.kind === "guided" ? beat.gpId : beat.kind === "check" ? beat.checkId : null,
+        }),
+      }).catch(() => {});
     }
-  }, [stepIdx, beat, learnerId, lessonRunId, onBreak, sessionId]);
-
-  function sendStep(payload: {
-    stepKind: string;
-    stepRefId?: string | null;
-    response?: string;
-    isCorrect?: boolean;
-  }): void {
-    const v1Url = `/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/step`;
-    const v2Url = sessionId ? `/api/bff/learning/sessions/${sessionId}/advance` : null;
-    const url = v2Enabled && v2Url ? v2Url : v1Url;
-    fetch(url, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(payload),
-    }).catch(() => {});
-  }
+  }, [stepIdx, beat, learnerId, lessonRunId, onBreak]);
 
   function advance() {
     if (stepIdx < beats.length - 1) {
       setStepIdx(stepIdx + 1);
-      setAnswer("");
       setFeedback(null);
       setShowHint(false);
     }
   }
 
-  function submitAnswer() {
-    if (!isInteractive || answer.trim().length === 0) return;
-    const expected = beat.kind === "guided" ? beat.expectedAnswer : beat.expectedAnswer;
-    const correct = isCorrect(expected, answer);
+  function emitSurfaceTelemetry(event: SurfaceTelemetryEvent) {
+    fetch("/api/learning/surface-telemetry", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        learnerId,
+        sessionId: lessonRunId,
+        eventType: event.type,
+        payload: event.payload ?? {},
+      }),
+    }).catch(() => {});
+  }
+
+  function toSurfaceItem(currentBeat: Extract<Beat, { kind: "guided" | "check" }>): SurfaceRouterItem {
+    return {
+      id: currentBeat.kind === "guided" ? currentBeat.gpId : currentBeat.checkId,
+      surfaceType: currentBeat.surfaceType,
+      prompt: currentBeat.prompt,
+      choices: currentBeat.choices,
+      expectedAnswer: currentBeat.expectedAnswer,
+      instructions:
+        currentBeat.kind === "guided"
+          ? "Solve the practice and submit your answer."
+          : "Complete the check and submit your answer.",
+      answerInput: { type: "text", label: "Your answer", placeholder: "Type your answer…" },
+      scratchpad: currentBeat.surfaceType === "scratchpad" ? { enabled: true, width: 520, height: 300 } : undefined,
+      diagram:
+        currentBeat.surfaceType === "geometry_workspace"
+          ? {
+              canvasMode: "svg",
+              width: 480,
+              height: 320,
+              shapes: [{ id: "fixture-rect", kind: "rectangle", x: 110, y: 70, width: 220, height: 150 }],
+            }
+          : undefined,
+      numberLine:
+        currentBeat.surfaceType === "number_line"
+          ? {
+              min: 0,
+              max: 10,
+              step: 1,
+            }
+          : undefined,
+    };
+  }
+
+  function submitSurface(result: SurfaceRouterSubmitResult) {
+    if (!isInteractive) return;
+    const interactiveBeat = beat.kind === "guided" || beat.kind === "check" ? beat : null;
+    if (!interactiveBeat) return;
+    const expected = interactiveBeat.expectedAnswer;
+    const candidate =
+      typeof result.response.answer === "string"
+        ? result.response.answer
+        : result.response.selectedChoiceId ?? "";
+    const correct =
+      result.isCorrect === null ? isCorrect(expected, candidate) : result.isCorrect;
+
     setFeedback(correct ? "correct" : "incorrect");
     if (beat.kind === "check") {
       setChecksTotal((n) => n + 1);
       if (correct) setChecksCorrect((n) => n + 1);
     }
-    const stepRefId =
-      beat.kind === "guided" ? beat.gpId : beat.kind === "check" ? beat.checkId : null;
-    sendStep({ stepKind: "answer_submitted", stepRefId, response: answer, isCorrect: correct });
-    recordSurfaceTelemetry({
-      learnerId,
-      sessionId: sessionId ?? lessonRunId,
-      eventType: "interaction",
-      payload: { kind: "answer_submitted", isCorrect: correct, stepRefId, beatKey: beat.key },
-    });
+    fetch(`/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/step`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        stepKind: "answer_submitted",
+        stepRefId:
+          interactiveBeat.kind === "guided"
+            ? interactiveBeat.gpId
+            : interactiveBeat.kind === "check"
+              ? interactiveBeat.checkId
+              : null,
+        response: candidate,
+        isCorrect: correct,
+      }),
+    }).catch(() => {});
   }
 
   function requestHint() {
     if (beat.kind !== "guided") return;
     setShowHint(true);
     setHintsUsed((n) => n + 1);
-    sendStep({ stepKind: "hint_used", stepRefId: beat.gpId });
-    recordSurfaceTelemetry({
-      learnerId,
-      sessionId: sessionId ?? lessonRunId,
-      eventType: "interaction",
-      payload: { kind: "hint_used", stepRefId: beat.gpId, beatKey: beat.key },
-    });
+    fetch(`/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/step`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        stepKind: "hint_used",
+        stepRefId: beat.gpId,
+      }),
+    }).catch(() => {});
   }
 
   function useScaffold() {
     if (beat.kind !== "guided") return;
     setScaffoldsUsed((n) => n + 1);
-    setAnswer(beat.expectedAnswer ?? "");
-    sendStep({ stepKind: "scaffold_used", stepRefId: beat.gpId });
-    recordSurfaceTelemetry({
-      learnerId,
-      sessionId: sessionId ?? lessonRunId,
-      eventType: "interaction",
-      payload: { kind: "scaffold_used", stepRefId: beat.gpId, beatKey: beat.key },
-    });
+    fetch(`/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/step`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        stepKind: "scaffold_used",
+        stepRefId: beat.gpId,
+      }),
+    }).catch(() => {});
   }
 
   function complete(abandoned: boolean) {
@@ -324,47 +350,20 @@ export function LessonPlayer({
     // only contributes `abandoned`, which is a UX signal not represented in
     // interactions.
     startTransition(async () => {
-      const v1Url = `/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/complete`;
-      const v2Url =
-        v2Enabled && sessionId ? `/api/bff/learning/sessions/${sessionId}/complete` : null;
-      // We always hit v1 to keep the lesson_run row consistent (badges,
-      // streaks, parent dashboards still read from it). When v2 is on we
-      // additionally call /learning/sessions/.../complete so the upstream
-      // gradebook + path/advance respond with real mastery.
-      const v1Res = await fetch(v1Url, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ outcome: { abandoned } }),
-      });
-      if (!v1Res.ok) {
+      const res = await fetch(
+        `/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/complete`,
+        {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ outcome: { abandoned } }),
+        },
+      );
+      if (!res.ok) {
         // Surface the failure instead of redirecting blindly — otherwise the
         // run would silently stay in_progress and mastery would never update.
         setCompleteError("We couldn't save this lesson. Please try the 'I'm done' button again.");
         return;
       }
-      if (v2Url) {
-        try {
-          await fetch(v2Url, {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({ abandoned }),
-          });
-          if (subjectSlug) {
-            await fetch(
-              `/api/bff/learning/path/${learnerId}/${encodeURIComponent(subjectSlug)}/advance`,
-              { method: "POST" },
-            );
-          }
-        } catch {
-          // v2 completion is best-effort relative to v1.
-        }
-      }
-      recordSurfaceTelemetry({
-        learnerId,
-        sessionId: sessionId ?? lessonRunId,
-        eventType: "completion",
-        payload: { lessonRunId, abandoned, stepsViewed: seenBeats.current.size },
-      });
       router.push("/learner/home");
       router.refresh();
     });
@@ -453,33 +452,12 @@ export function LessonPlayer({
 
           {beat.kind === "guided" && (
             <>
-              <p className="font-display text-2xl">
-                <MathText>{beat.prompt}</MathText>
-              </p>
-              {beat.choices ? (
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {beat.choices.map((c) => (
-                    <Button
-                      key={c}
-                      variant={answer === c ? "default" : "soft"}
-                      onClick={() => setAnswer(c)}
-                    >
-                      <MathText>{c}</MathText>
-                    </Button>
-                  ))}
-                </div>
-              ) : (
-                <input
-                  className="w-full rounded-md border border-aivo-border p-3"
-                  placeholder="Type your answer…"
-                  value={answer}
-                  onChange={(e) => setAnswer(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") submitAnswer();
-                  }}
-                  aria-label="Your answer"
-                />
-              )}
+              <SurfaceRouter
+                item={toSurfaceItem(beat)}
+                accessibilitySettings={accessibility}
+                onSubmitAndAdvance={submitSurface}
+                onEvent={emitSurfaceTelemetry}
+              />
               {showHint && (
                 <p className="rounded-md bg-amber-50 p-3 text-sm text-amber-900">
                   Hint: <MathText>{beat.hint}</MathText>
@@ -494,9 +472,6 @@ export function LessonPlayer({
                 </p>
               )}
               <div className="flex flex-wrap gap-2">
-                <Button onClick={submitAnswer} disabled={!answer.trim()}>
-                  Check
-                </Button>
                 <Button variant="soft" onClick={requestHint} disabled={showHint}>
                   Hint
                 </Button>
@@ -509,33 +484,12 @@ export function LessonPlayer({
 
           {beat.kind === "check" && (
             <>
-              <p className="font-display text-2xl">
-                <MathText>{beat.prompt}</MathText>
-              </p>
-              {beat.choices ? (
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {beat.choices.map((c) => (
-                    <Button
-                      key={c}
-                      variant={answer === c ? "default" : "soft"}
-                      onClick={() => setAnswer(c)}
-                    >
-                      <MathText>{c}</MathText>
-                    </Button>
-                  ))}
-                </div>
-              ) : (
-                <input
-                  className="w-full rounded-md border border-aivo-border p-3"
-                  placeholder="Type your answer…"
-                  value={answer}
-                  onChange={(e) => setAnswer(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") submitAnswer();
-                  }}
-                  aria-label="Your answer"
-                />
-              )}
+              <SurfaceRouter
+                item={toSurfaceItem(beat)}
+                accessibilitySettings={accessibility}
+                onSubmitAndAdvance={submitSurface}
+                onEvent={emitSurfaceTelemetry}
+              />
               {feedback === "correct" && (
                 <p className="rounded-md bg-emerald-50 p-3 text-sm text-emerald-900">
                   Yes! You've got this.
@@ -546,11 +500,6 @@ export function LessonPlayer({
                   Close — <MathText>{beat.supportIfWrong}</MathText>
                 </p>
               )}
-              <div className="flex gap-2">
-                <Button onClick={submitAnswer} disabled={!answer.trim() || feedback !== null}>
-                  Check
-                </Button>
-              </div>
             </>
           )}
         </div>
