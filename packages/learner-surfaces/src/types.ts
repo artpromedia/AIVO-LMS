@@ -223,6 +223,24 @@ export interface SurfaceResponse {
   inkStrokes?: InkStroke[];
   geometryActions?: GeometryAction[];
   durationMs?: number;
+  /** Sprint 10 — set when type === "voice_response". */
+  voiceResponse?: VoiceResponsePayload;
+}
+
+/**
+ * Sprint 10 — Recorded learner audio. The blob is encoded as a base64
+ * data URL so it can survive JSON transport to the scoring service;
+ * the service is responsible for routing it to whatever STT/grading
+ * pipeline applies (the same `/api/ai/transcribe` route used by
+ * `useSpeechInput` is the obvious fit). The `transcript` field is
+ * optional — populated when the browser's Web Speech API is available
+ * and produced a usable hypothesis client-side.
+ */
+export interface VoiceResponsePayload {
+  audioDataUrl: string;
+  mimeType: string;
+  durationMs: number;
+  transcript?: string;
 }
 
 /**

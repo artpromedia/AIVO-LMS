@@ -39,6 +39,7 @@ export type SurfaceTutorKey =
 const SURFACE_TO_REQUIRED_TUTOR: Partial<Record<LearnerSurfaceType, SurfaceTutorKey>> = {
   coding_sandbox: "pixel",
   art_canvas: "cadence",
+  voice_response: "lingua",
 };
 
 export function requiredTutorForSurface(type: LearnerSurfaceType): SurfaceTutorKey | undefined {

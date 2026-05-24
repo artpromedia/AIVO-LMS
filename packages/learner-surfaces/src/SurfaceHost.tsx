@@ -5,6 +5,7 @@ import { MathExpressionSurface } from "./surfaces/MathExpressionSurface.js";
 import { ScratchpadSurface } from "./surfaces/ScratchpadSurface.js";
 import { CodingSandboxSurface } from "./surfaces/CodingSandboxSurface.js";
 import { ArtCanvasSurface } from "./surfaces/ArtCanvasSurface.js";
+import { VoiceResponseSurface } from "./surfaces/VoiceResponseSurface.js";
 import { createSurfaceEvent, type SurfaceTelemetryEvent } from "./telemetry/surface-events.js";
 import type { LearnerSurfaceSpec, SurfaceResponse } from "./types.js";
 import {
@@ -117,6 +118,15 @@ export function SurfaceHost({
     case "art_canvas":
       return (
         <ArtCanvasSurface
+          surface={surface}
+          disabled={disabled}
+          onSubmit={onSubmit}
+          onEvent={onEvent}
+        />
+      );
+    case "voice_response":
+      return (
+        <VoiceResponseSurface
           surface={surface}
           disabled={disabled}
           onSubmit={onSubmit}

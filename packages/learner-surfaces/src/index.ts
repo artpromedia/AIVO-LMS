@@ -22,6 +22,7 @@ export type {
   GeometryAction,
   CodingSandboxSpec,
   ArtCanvasSpec,
+  VoiceResponsePayload,
 } from "./types.js";
 
 export { SurfaceHost, type SurfaceHostProps } from "./SurfaceHost.js";
@@ -40,6 +41,10 @@ export {
   ArtCanvasSurface,
   type ArtCanvasSurfaceProps,
 } from "./surfaces/ArtCanvasSurface.js";
+export {
+  VoiceResponseSurface,
+  type VoiceResponseSurfaceProps,
+} from "./surfaces/VoiceResponseSurface.js";
 
 export {
   isSurfaceEntitled,
