@@ -402,6 +402,14 @@ export function getStore(): Store {
   return globalThis.__aivoStore;
 }
 
+/**
+ * Reset the in-memory store. Used by unit tests so each `it()` block
+ * starts from a clean slate; never call from production code paths.
+ */
+export function resetStore(): void {
+  globalThis.__aivoStore = createStore();
+}
+
 export function newId(prefix: string): string {
   const r = Math.random().toString(36).slice(2, 10);
   return `${prefix}_${Date.now().toString(36)}${r}`;

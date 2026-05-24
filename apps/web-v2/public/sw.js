@@ -62,6 +62,35 @@ function isApiOrAuth(url) {
   );
 }
 
+// Sprint 1.3 — surface telemetry offline retry.
+// The lesson player buffers telemetry events in localStorage and posts
+// batches at /api/bff/learning/surface-telemetry. When the page is
+// hidden or going offline, it dispatches a "telemetry-sync" message
+// over postMessage; this SW handler triggers a Background Sync when
+// available so the browser retries the POST after connectivity comes
+// back. We deliberately don't cache POSTs (the buffer itself is the
+// source of truth) — Background Sync just wakes the client which
+// re-runs the queued flush.
+self.addEventListener("message", (event) => {
+  if (!event.data || event.data.type !== "telemetry-sync") return;
+  if (!("sync" in self.registration)) return;
+  // Tag is a no-op for the client — the SW just relays a "sync" event
+  // back to the active client when the platform fires it.
+  event.waitUntil(self.registration.sync.register("aivo-telemetry-sync").catch(() => undefined));
+});
+
+self.addEventListener("sync", (event) => {
+  if (event.tag !== "aivo-telemetry-sync") return;
+  event.waitUntil(
+    (async () => {
+      const clients = await self.clients.matchAll({ type: "window" });
+      for (const client of clients) {
+        client.postMessage({ type: "telemetry-flush" });
+      }
+    })(),
+  );
+});
+
 self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET") return;

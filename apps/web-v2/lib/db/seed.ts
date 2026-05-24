@@ -30,12 +30,14 @@ import { LEARNER_SUBJECTS } from "@aivo/brand";
 // Subjects seeded into the web learner DB. Sourced from the canonical
 // `LEARNER_SUBJECTS` registry in `@aivo/brand` so that web slugs,
 // subject-brain ids, and tutor keys stay in lock-step across the
-// learner UI, BFF, and adaptive engines (Sprint 12). We filter to the
-// set the legacy web seed already shipped — new registry rows
-// (social-studies, world-languages, coding) are exposed through the
-// registry for new code to consume but are not auto-added to the
-// existing learner subjects grid to avoid surprising downstream
-// teacher / parent surfaces.
+// learner UI, BFF, and adaptive engines (Sprint 12).
+//
+// Sprint 2.1 (Gap #7): we now seed *all 12 registry subjects*. The
+// last three (social-studies, world-languages, coding) get minimal
+// placeholder skills at grade K so the learner subjects grid renders
+// without crashing, and are tagged with the `SUBJECT_CONTENT_READY`
+// feature flag so the UI shows a "Coming soon" badge until item-bank
+// authoring (Sprint 2.2) finishes shipping items for them.
 const WEB_SEEDED_SUBJECT_SLUGS = new Set([
   "reading",
   "math",
@@ -46,6 +48,9 @@ const WEB_SEEDED_SUBJECT_SLUGS = new Set([
   "writing",
   "life",
   "art",
+  "social-studies",
+  "world-languages",
+  "coding",
 ]);
 const SUBJECTS: Omit<Subject, "id">[] = LEARNER_SUBJECTS.filter((s) =>
   WEB_SEEDED_SUBJECT_SLUGS.has(s.slug),
@@ -105,7 +110,243 @@ const SKILL_SEED: { subjectSlug: string; slug: string; name: string; gradeBand: 
   },
   { subjectSlug: "life", slug: "morning-routine", name: "Morning routine", gradeBand: "K-2" },
   { subjectSlug: "art", slug: "primary-colors", name: "Primary colors", gradeBand: "PreK-K" },
+  // Sprint 2.1 placeholder skills for newly added subjects (grade K).
+  // SUBJECT_CONTENT_READY=false hides any UI promises of authored items;
+  // these exist so the learner subjects grid renders without crashing
+  // when a subject card is opened.
+  {
+    subjectSlug: "social-studies",
+    slug: "ss-community-helpers-k",
+    name: "Community helpers",
+    gradeBand: "K",
+  },
+  {
+    subjectSlug: "world-languages",
+    slug: "wl-greetings-k",
+    name: "Greetings & introductions",
+    gradeBand: "K",
+  },
+  { subjectSlug: "coding", slug: "code-sequences-k", name: "Sequences", gradeBand: "K" },
+  // Sprint 2.3 K–8 expansion for Math / ELA / Science / Writing.
+  // Anchored to Common Core (Math, ELA), NGSS (Science), and the
+  // 6+1 Writing Traits (Writing). See packages/skill-graphs/src for
+  // the source frameworks; this seed is the *web-v2 view* of those
+  // graphs (subject-slug + grade-band + slug only — the full graph
+  // including standards refs is in @aivo/skill-graphs).
+  ...expandedSkillSeeds(),
 ];
+
+/**
+ * Sprint 2.3 — K–8 skill seeds for Math, ELA, Science, Writing.
+ *
+ * Each subject ships ~40 skills spread across grades K–8. Slugs are
+ * stable and human-readable so authoring tooling and learning-path
+ * topic ids can refer to them by name. The web-v2 seed treats these
+ * as "leaf" skills; the full prerequisite DAG lives in
+ * `@aivo/skill-graphs` so it can be consumed by adaptive engines and
+ * the recommender without bloating the in-memory store.
+ */
+function expandedSkillSeeds(): Array<{
+  subjectSlug: string;
+  slug: string;
+  name: string;
+  gradeBand: string;
+}> {
+  const out: Array<{ subjectSlug: string; slug: string; name: string; gradeBand: string }> = [];
+
+  // ---- Math (CCSS Math) — 40 skills, K through 8 ----
+  // Topic order mirrors CCSS domain progression: K Counting/Cardinality →
+  // 1-2 Operations & Place Value → 3-5 Fractions & Multiplicative
+  // Reasoning → 6-8 Ratios, Expressions, Geometry, Statistics.
+  const MATH: Array<[string, string, string]> = [
+    ["math-count-100", "Count to 100", "K"],
+    ["math-add-fluency-5", "Add fluently within 5", "K"],
+    ["math-shapes-2d", "Identify 2-D shapes", "K"],
+    ["math-compare-numbers", "Compare numbers to 10", "K"],
+    ["math-add-within-100", "Add within 100", "1"],
+    ["math-subtract-within-100", "Subtract within 100", "1"],
+    ["math-tell-time", "Tell time to the half hour", "1"],
+    ["math-measure-length", "Measure lengths in non-standard units", "1"],
+    ["math-add-within-1000", "Add within 1,000", "2"],
+    ["math-skip-count", "Skip count by 2s, 5s, 10s", "2"],
+    ["math-money-coins", "Identify coins & make change", "2"],
+    ["math-data-bar-graphs", "Read and create bar graphs", "2"],
+    ["math-multiplication-tables", "Multiplication facts to 10", "3"],
+    ["math-division-facts", "Division facts to 10", "3"],
+    ["math-fractions-unit", "Unit fractions on a number line", "3"],
+    ["math-area-rectangle", "Area of rectangles", "3"],
+    ["math-multi-digit-mult", "Multi-digit multiplication", "4"],
+    ["math-long-division", "Long division", "4"],
+    ["math-fraction-equiv", "Equivalent fractions", "4"],
+    ["math-angles-protractor", "Measure angles with a protractor", "4"],
+    ["math-decimal-operations", "Add, subtract, multiply decimals", "5"],
+    ["math-volume-prism", "Volume of rectangular prisms", "5"],
+    ["math-coordinate-plane", "Plot points on the coordinate plane", "5"],
+    ["math-divide-fractions", "Divide fractions by fractions", "5"],
+    ["math-ratios-rates", "Ratios and unit rates", "6"],
+    ["math-percent-of-number", "Percent of a number", "6"],
+    ["math-integers", "Add and subtract integers", "6"],
+    ["math-variables-expressions", "Write algebraic expressions", "6"],
+    ["math-proportional-reasoning", "Proportional relationships", "7"],
+    ["math-two-step-equations", "Solve two-step equations", "7"],
+    ["math-probability-basics", "Theoretical and experimental probability", "7"],
+    ["math-scale-drawings", "Scale drawings and similar figures", "7"],
+    ["math-linear-functions", "Linear functions and slope", "8"],
+    ["math-systems-equations", "Solve systems of equations", "8"],
+    ["math-pythagorean", "Pythagorean theorem", "8"],
+    ["math-transformations", "Rigid motions and transformations", "8"],
+    ["math-scatter-plots", "Scatter plots and lines of best fit", "8"],
+    ["math-exponents-laws", "Laws of exponents", "8"],
+    ["math-irrational-numbers", "Rational vs irrational numbers", "8"],
+    ["math-volume-cylinder", "Volume of cylinders and cones", "8"],
+  ];
+  for (const [slug, name, gb] of MATH) {
+    out.push({ subjectSlug: "math", slug, name, gradeBand: gb });
+  }
+
+  // ---- ELA / Reading (CCSS ELA) — 40 skills, K through 8 ----
+  const ELA: Array<[string, string, string]> = [
+    ["ela-letter-sounds", "Letter–sound correspondence", "K"],
+    ["ela-blend-cvc", "Blend CVC words", "K"],
+    ["ela-print-concepts", "Print concepts", "K"],
+    ["ela-ask-answer-key", "Ask & answer key questions", "K"],
+    ["ela-decoding-digraphs", "Decode digraphs (sh, ch, th)", "1"],
+    ["ela-fluency-grade1", "Read grade-level text fluently", "1"],
+    ["ela-retell-story", "Retell stories with details", "1"],
+    ["ela-context-clues-1", "Use context clues for unknown words", "1"],
+    ["ela-vowel-teams", "Vowel teams (ai, ee, oa)", "2"],
+    ["ela-character-traits", "Identify character traits", "2"],
+    ["ela-main-topic", "Main topic & key details", "2"],
+    ["ela-affixes-2", "Prefixes and suffixes", "2"],
+    ["ela-multi-syllable-3", "Decode multi-syllable words", "3"],
+    ["ela-summarize-3", "Summarize a passage", "3"],
+    ["ela-author-purpose-3", "Determine author's purpose", "3"],
+    ["ela-text-features", "Use text features (headings, captions)", "3"],
+    ["ela-inference-4", "Make inferences from text", "4"],
+    ["ela-figurative-language", "Identify figurative language", "4"],
+    ["ela-point-of-view", "Compare points of view", "4"],
+    ["ela-cite-evidence-4", "Cite textual evidence", "4"],
+    ["ela-theme-5", "Determine a theme", "5"],
+    ["ela-compare-texts", "Compare/contrast texts", "5"],
+    ["ela-greek-latin-roots", "Greek & Latin roots", "5"],
+    ["ela-genre-features-5", "Genre features (poem, drama, prose)", "5"],
+    ["ela-central-idea-6", "Central idea and supporting details", "6"],
+    ["ela-rhetorical-devices", "Identify rhetorical devices", "6"],
+    ["ela-tone-mood", "Distinguish tone from mood", "6"],
+    ["ela-summarize-objective", "Objective summary", "6"],
+    ["ela-text-structure-7", "Analyze text structure", "7"],
+    ["ela-claim-evidence-7", "Trace claim & supporting evidence", "7"],
+    ["ela-author-perspective-7", "Author's perspective vs reader's", "7"],
+    ["ela-allusions", "Recognize allusions", "7"],
+    ["ela-rhetorical-analysis-8", "Rhetorical analysis", "8"],
+    ["ela-counterclaims", "Address counterclaims", "8"],
+    ["ela-dramatic-irony", "Dramatic irony in literature", "8"],
+    ["ela-media-literacy-8", "Evaluate digital media for bias", "8"],
+    ["ela-themes-across-texts", "Theme across multiple texts", "8"],
+    ["ela-syntax-effects", "Effect of syntax on meaning", "8"],
+    ["ela-research-synthesis", "Synthesize research sources", "8"],
+    ["ela-precise-vocabulary", "Use precise domain vocabulary", "8"],
+  ];
+  for (const [slug, name, gb] of ELA) {
+    out.push({ subjectSlug: "reading", slug, name, gradeBand: gb });
+  }
+
+  // ---- Science (NGSS) — 40 skills, K through 8 ----
+  const SCI: Array<[string, string, string]> = [
+    ["sci-weather-patterns-k", "Daily weather patterns", "K"],
+    ["sci-plants-needs-k", "What plants need", "K"],
+    ["sci-push-pull-k", "Pushes and pulls", "K"],
+    ["sci-sun-moon-stars-k", "Sun, moon and stars", "K"],
+    ["sci-sound-vibration-1", "Sound is vibration", "1"],
+    ["sci-light-shadow-1", "Light and shadow", "1"],
+    ["sci-plant-parts-1", "Plant parts and functions", "1"],
+    ["sci-day-night-1", "Day and night cycle", "1"],
+    ["sci-states-of-matter-2", "States of matter", "2"],
+    ["sci-habitats-2", "Habitats and ecosystems", "2"],
+    ["sci-land-water-2", "Land and water on Earth", "2"],
+    ["sci-engineering-design-2", "Design a solution", "2"],
+    ["sci-life-cycles-3", "Life cycles", "3"],
+    ["sci-weather-climate-3", "Weather vs climate", "3"],
+    ["sci-forces-motion-3", "Forces and motion", "3"],
+    ["sci-traits-environment-3", "Traits & environment", "3"],
+    ["sci-energy-transfer-4", "Energy transfer", "4"],
+    ["sci-earth-features-4", "Earth's features", "4"],
+    ["sci-waves-4", "Waves and their properties", "4"],
+    ["sci-organisms-info-4", "How organisms receive information", "4"],
+    ["sci-matter-particles-5", "Matter is made of particles", "5"],
+    ["sci-ecosystems-5", "Ecosystem dynamics", "5"],
+    ["sci-earth-sun-system-5", "Earth–sun system", "5"],
+    ["sci-water-cycle-5", "Water cycle", "5"],
+    ["sci-cells-6", "Cells and life", "6"],
+    ["sci-plate-tectonics-6", "Plate tectonics", "6"],
+    ["sci-energy-thermal-6", "Thermal energy", "6"],
+    ["sci-photosynthesis-6", "Photosynthesis", "6"],
+    ["sci-heredity-7", "Heredity and genes", "7"],
+    ["sci-natural-selection-7", "Natural selection", "7"],
+    ["sci-chemical-reactions-7", "Chemical reactions", "7"],
+    ["sci-human-impact-7", "Human impact on the environment", "7"],
+    ["sci-newtons-laws-8", "Newton's laws of motion", "8"],
+    ["sci-atomic-model-8", "Atoms and the periodic table", "8"],
+    ["sci-electromagnetism-8", "Electromagnetic forces", "8"],
+    ["sci-evolution-evidence-8", "Evidence for evolution", "8"],
+    ["sci-climate-change-8", "Climate change", "8"],
+    ["sci-energy-conservation-8", "Conservation of energy", "8"],
+    ["sci-genetic-engineering-8", "Genetic engineering basics", "8"],
+    ["sci-engineering-iterate-8", "Iterative design process", "8"],
+  ];
+  for (const [slug, name, gb] of SCI) {
+    out.push({ subjectSlug: "science", slug, name, gradeBand: gb });
+  }
+
+  // ---- Writing (6+1 Traits) — 40 skills, K through 8 ----
+  const WRITE: Array<[string, string, string]> = [
+    ["wr-name-write-k", "Write my name", "K"],
+    ["wr-label-pictures-k", "Label pictures with letters", "K"],
+    ["wr-spaces-words-k", "Leave spaces between words", "K"],
+    ["wr-opinion-pic-k", "Draw + tell my opinion", "K"],
+    ["wr-complete-sentence-1", "Write a complete sentence", "1"],
+    ["wr-punctuation-end-1", "End punctuation (. ! ?)", "1"],
+    ["wr-narrative-2-events-1", "Narrative with 2 events", "1"],
+    ["wr-informative-fact-1", "Informative with a fact", "1"],
+    ["wr-paragraph-topic-2", "Paragraph with topic sentence", "2"],
+    ["wr-linking-words-2", "Use linking words (and, but, so)", "2"],
+    ["wr-revise-2", "Revise with peer feedback", "2"],
+    ["wr-handwriting-2", "Legible handwriting", "2"],
+    ["wr-organization-3", "Beginning, middle, end", "3"],
+    ["wr-descriptive-3", "Descriptive details", "3"],
+    ["wr-opinion-reasons-3", "Opinion with reasons", "3"],
+    ["wr-edit-3", "Edit for spelling & grammar", "3"],
+    ["wr-paragraph-multi-4", "Multi-paragraph essay", "4"],
+    ["wr-dialogue-4", "Dialogue and quotations", "4"],
+    ["wr-transitions-4", "Transitions between paragraphs", "4"],
+    ["wr-voice-4", "Develop voice", "4"],
+    ["wr-thesis-5", "Thesis statement", "5"],
+    ["wr-evidence-5", "Support claims with evidence", "5"],
+    ["wr-counterargument-5", "Acknowledge counterargument", "5"],
+    ["wr-conclusion-5", "Write a strong conclusion", "5"],
+    ["wr-argumentative-6", "Argumentative essay", "6"],
+    ["wr-research-cite-6", "Cite a source", "6"],
+    ["wr-tone-audience-6", "Adjust tone for audience", "6"],
+    ["wr-revise-substantive-6", "Substantive revision", "6"],
+    ["wr-organization-7", "Sophisticated organization", "7"],
+    ["wr-claim-evidence-7", "Sustain claim with evidence", "7"],
+    ["wr-style-7", "Develop personal style", "7"],
+    ["wr-narrative-7", "Narrative with arc & dialogue", "7"],
+    ["wr-argument-8", "Argument with counterclaim", "8"],
+    ["wr-research-synthesis-8", "Synthesize multiple sources", "8"],
+    ["wr-mla-citations-8", "MLA in-text citations", "8"],
+    ["wr-revise-clarity-8", "Revise for clarity & concision", "8"],
+    ["wr-figurative-8", "Use figurative language deliberately", "8"],
+    ["wr-rhetoric-8", "Ethos, pathos, logos", "8"],
+    ["wr-publishing-8", "Publish for an authentic audience", "8"],
+    ["wr-portfolio-8", "Curate a writing portfolio", "8"],
+  ];
+  for (const [slug, name, gb] of WRITE) {
+    out.push({ subjectSlug: "writing", slug, name, gradeBand: gb });
+  }
+
+  return out;
+}
 
 export function ensureSeeded(): void {
   const store = getStore();

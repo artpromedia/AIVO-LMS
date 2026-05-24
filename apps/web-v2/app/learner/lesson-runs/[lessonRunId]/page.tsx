@@ -21,9 +21,14 @@ import {
   getAccessibilityPrefs,
   getLearner,
   getLessonRun,
+  getSubjectById,
   parentCanAccessLearner,
 } from "@/lib/db/repos";
 import { LessonPlayer } from "./lesson-player";
+import { lessonPlayerV2Enabled } from "@/lib/feature-flags";
+
+// Re-export ergonomics: subject lookup by id used to pin the v2 player
+// to a learning-path subject slug.
 
 export const dynamic = "force-dynamic";
 
@@ -53,6 +58,8 @@ export default async function LearnerLessonRunPage({ params }: RouteParams) {
     if (active !== learner.id) redirect("/learner/select");
   }
   const a11y = getAccessibilityPrefs(learner.id, session.tenantId);
+  const lessonSubject = getSubjectById(lessonRun.subjectId);
+  const v2Enabled = lessonPlayerV2Enabled();
 
   // When the plan is still generating or has failed, we can't run the player.
   if (!plan || lessonRun.status === "generating" || lessonRun.status === "failed") {
@@ -106,6 +113,13 @@ export default async function LearnerLessonRunPage({ params }: RouteParams) {
         plan={plan}
         accessibility={a11y}
         initialStatus={lessonRun.status}
+        v2Enabled={v2Enabled}
+        // Treat the lesson-run id as the v2 session correlator when no
+        // separate `sessions` row has been minted yet. The v2 BFF
+        // accepts either — upstream learning-svc creates the session
+        // lazily on first advance.
+        sessionId={lessonRun.id}
+        subjectSlug={lessonSubject?.slug ?? null}
       />
     </AppShell>
   );

@@ -24,3 +24,27 @@ export {
   type ItemVariantIssue,
   type ItemVariantIssueCode,
 } from "./validate.js";
+
+// Sprint 2.2 — authoring schema + import pipeline.
+export {
+  AuthoredItem,
+  AuthoredItemBank,
+  ItemSurfaceType,
+  GradeBand,
+  ItemAsset,
+  Correctness,
+  IrtParams,
+  Accessibility,
+  ITEM_BANK_SCHEMA_VERSION,
+  buildCoverageReport,
+  type CoverageReport,
+  type CoverageRow,
+} from "./schema.js";
+export {
+  runImport,
+  NULL_PERSIST_ADAPTER,
+  type ImportSummary,
+  type ImportIssue,
+  type ImportOptions,
+  type PersistAdapter,
+} from "./cli/import.js";

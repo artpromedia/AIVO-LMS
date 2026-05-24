@@ -17,6 +17,7 @@ import {
   listSubjects,
 } from "@/lib/db/repos";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
+import { isSubjectComingSoon } from "@/lib/feature-flags";
 
 function masteryLabel(score: number): string {
   if (score >= 0.85) return "Strong";
@@ -86,18 +87,32 @@ export default async function LearnerSubjectsPage() {
             const entry = subjectScore.get(s.id);
             const avg = entry ? entry.score / entry.count : 0;
             const tutor = tutorForSubjectSlug(s.slug);
+            const comingSoon = isSubjectComingSoon(s.slug);
             return (
               <SubjectCard
                 key={s.id}
-                href={`/learner/subjects/${s.id}`}
+                href={comingSoon ? "#" : `/learner/subjects/${s.id}`}
                 name={s.name}
                 eyebrow={tutor ? `${tutor.name} · ${tutor.landmark}` : undefined}
-                masteryLabel={masteryLabel(avg)}
-                masteryPct={Math.round(avg * 100)}
+                masteryLabel={comingSoon ? "Coming soon" : masteryLabel(avg)}
+                masteryPct={comingSoon ? 0 : Math.round(avg * 100)}
                 accent={tutor?.color}
                 icon={tutor?.emoji ?? "📘"}
-                nextAction={avg > 0 ? "Pick where to start" : "Start your first skill"}
-                support={iep?.confirmedAt ? "Supports on" : undefined}
+                nextAction={
+                  comingSoon
+                    ? "Content is on the way"
+                    : avg > 0
+                      ? "Pick where to start"
+                      : "Start your first skill"
+                }
+                support={
+                  comingSoon
+                    ? "Coming soon"
+                    : iep?.confirmedAt
+                      ? "Supports on"
+                      : undefined
+                }
+                locked={comingSoon}
               />
             );
           })}

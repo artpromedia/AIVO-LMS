@@ -69,6 +69,10 @@ export function listSubjects(): Subject[] {
   return Array.from(db().subjects.values());
 }
 
+export function getSubjectById(subjectId: string): Subject | null {
+  return db().subjects.get(subjectId) ?? null;
+}
+
 export function listSkills(subjectId?: string): Skill[] {
   const all = Array.from(db().skills.values());
   return subjectId ? all.filter((s) => s.subjectId === subjectId) : all;

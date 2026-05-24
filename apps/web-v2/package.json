@@ -16,7 +16,10 @@
     "test:a11y": "playwright test --grep @a11y"
   },
   "dependencies": {
+    "@aivo/api-client": "workspace:*",
     "@aivo/brand": "workspace:*",
+    "@aivo/item-bank": "workspace:*",
+    "@aivo/learner-surfaces": "workspace:*",
     "@aivo/ui": "workspace:*",
     "@aivo/nav": "workspace:*",
     "@hookform/resolvers": "^3.9.1",

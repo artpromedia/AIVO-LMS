@@ -1,0 +1,659 @@
+{
+  "schemaVersion": 1,
+  "id": "k2-baseline-fall-2026",
+  "items": [
+    {
+      "id": "math.k.count.1",
+      "subjectSlug": "math",
+      "gradeBand": "K",
+      "skillIds": ["math-count-100"],
+      "surfaceType": "multiple_choice",
+      "stem": "How many apples are in this picture? 🍎🍎🍎",
+      "assets": [],
+      "correctness": { "kind": "exact", "answer": "3" },
+      "accessibility": { "altText": "Three red apples in a row." },
+      "locale": "en"
+    },
+    {
+      "id": "math.k.count.2",
+      "subjectSlug": "math",
+      "gradeBand": "K",
+      "skillIds": ["math-count-100"],
+      "surfaceType": "multiple_choice",
+      "stem": "What number comes right after 7?",
+      "correctness": { "kind": "exact", "answer": "8" }
+    },
+    {
+      "id": "math.k.add.1",
+      "subjectSlug": "math",
+      "gradeBand": "K",
+      "skillIds": ["math-add-fluency-5"],
+      "surfaceType": "short_response",
+      "stem": "2 + 2 = ?",
+      "correctness": { "kind": "exact", "answer": "4" }
+    },
+    {
+      "id": "math.k.shapes.1",
+      "subjectSlug": "math",
+      "gradeBand": "K",
+      "skillIds": ["math-shapes-2d"],
+      "surfaceType": "multiple_choice",
+      "stem": "Which shape has 3 sides?",
+      "correctness": { "kind": "set", "answers": ["triangle", "Triangle"] }
+    },
+    {
+      "id": "math.k.compare.1",
+      "subjectSlug": "math",
+      "gradeBand": "K",
+      "skillIds": ["math-compare-numbers"],
+      "surfaceType": "multiple_choice",
+      "stem": "Which is greater, 6 or 4?",
+      "correctness": { "kind": "exact", "answer": "6" }
+    },
+    {
+      "id": "math.1.add.1",
+      "subjectSlug": "math",
+      "gradeBand": "1",
+      "skillIds": ["math-add-within-100"],
+      "surfaceType": "short_response",
+      "stem": "23 + 14 = ?",
+      "correctness": { "kind": "exact", "answer": "37" }
+    },
+    {
+      "id": "math.1.sub.1",
+      "subjectSlug": "math",
+      "gradeBand": "1",
+      "skillIds": ["math-subtract-within-100"],
+      "surfaceType": "short_response",
+      "stem": "50 - 18 = ?",
+      "correctness": { "kind": "exact", "answer": "32" }
+    },
+    {
+      "id": "math.1.time.1",
+      "subjectSlug": "math",
+      "gradeBand": "1",
+      "skillIds": ["math-tell-time"],
+      "surfaceType": "multiple_choice",
+      "stem": "The big hand is on the 6 and the small hand is on the 3. What time is it?",
+      "correctness": { "kind": "set", "answers": ["3:30", "half past 3", "three thirty"] }
+    },
+    {
+      "id": "math.1.measure.1",
+      "subjectSlug": "math",
+      "gradeBand": "1",
+      "skillIds": ["math-measure-length"],
+      "surfaceType": "short_response",
+      "stem": "If a pencil is 5 paperclips long and the marker is 7 paperclips long, how much longer is the marker?",
+      "correctness": { "kind": "exact", "answer": "2" }
+    },
+    {
+      "id": "math.1.story.1",
+      "subjectSlug": "math",
+      "gradeBand": "1",
+      "skillIds": ["math-add-within-100"],
+      "surfaceType": "short_response",
+      "stem": "Mia has 8 stickers. Her friend gives her 7 more. How many stickers does Mia have now?",
+      "correctness": { "kind": "exact", "answer": "15" }
+    },
+    {
+      "id": "math.2.add1000.1",
+      "subjectSlug": "math",
+      "gradeBand": "2",
+      "skillIds": ["math-add-within-1000"],
+      "surfaceType": "short_response",
+      "stem": "245 + 168 = ?",
+      "correctness": { "kind": "exact", "answer": "413" }
+    },
+    {
+      "id": "math.2.skip.1",
+      "subjectSlug": "math",
+      "gradeBand": "2",
+      "skillIds": ["math-skip-count"],
+      "surfaceType": "short_response",
+      "stem": "Skip count by 5: 5, 10, 15, ?, 25",
+      "correctness": { "kind": "exact", "answer": "20" }
+    },
+    {
+      "id": "math.2.money.1",
+      "subjectSlug": "math",
+      "gradeBand": "2",
+      "skillIds": ["math-money-coins"],
+      "surfaceType": "short_response",
+      "stem": "How many cents are in 3 nickels and 2 dimes?",
+      "correctness": { "kind": "exact", "answer": "35" }
+    },
+    {
+      "id": "math.2.graph.1",
+      "subjectSlug": "math",
+      "gradeBand": "2",
+      "skillIds": ["math-data-bar-graphs"],
+      "surfaceType": "short_response",
+      "stem": "On a bar graph, the cat bar reaches 7 and the dog bar reaches 4. How many more cats than dogs?",
+      "correctness": { "kind": "exact", "answer": "3" }
+    },
+    {
+      "id": "math.2.placevalue.1",
+      "subjectSlug": "math",
+      "gradeBand": "2",
+      "skillIds": ["math-add-within-1000"],
+      "surfaceType": "multiple_choice",
+      "stem": "In the number 472, what digit is in the tens place?",
+      "correctness": { "kind": "exact", "answer": "7" }
+    },
+    {
+      "id": "ela.k.letter.1",
+      "subjectSlug": "reading",
+      "gradeBand": "K",
+      "skillIds": ["ela-letter-sounds"],
+      "surfaceType": "multiple_choice",
+      "stem": "What sound does the letter B make?",
+      "correctness": { "kind": "set", "answers": ["buh", "/b/", "B sound"] }
+    },
+    {
+      "id": "ela.k.blend.1",
+      "subjectSlug": "reading",
+      "gradeBand": "K",
+      "skillIds": ["ela-blend-cvc"],
+      "surfaceType": "short_response",
+      "stem": "Blend the sounds: /c/ /a/ /t/ — what word is it?",
+      "correctness": { "kind": "exact", "answer": "cat" }
+    },
+    {
+      "id": "ela.k.print.1",
+      "subjectSlug": "reading",
+      "gradeBand": "K",
+      "skillIds": ["ela-print-concepts"],
+      "surfaceType": "multiple_choice",
+      "stem": "Which direction do we read English?",
+      "correctness": { "kind": "set", "answers": ["left to right", "Left to right"] }
+    },
+    {
+      "id": "ela.k.story.1",
+      "subjectSlug": "reading",
+      "gradeBand": "K",
+      "skillIds": ["ela-ask-answer-key"],
+      "surfaceType": "short_response",
+      "stem": "Who is the main character in 'The Cat in the Hat'?",
+      "correctness": { "kind": "set", "answers": ["the cat", "Cat in the Hat", "the Cat"] }
+    },
+    {
+      "id": "ela.k.rhyme.1",
+      "subjectSlug": "reading",
+      "gradeBand": "K",
+      "skillIds": ["ela-letter-sounds"],
+      "surfaceType": "multiple_choice",
+      "stem": "Which word rhymes with 'cat'? bat / dog / sun",
+      "correctness": { "kind": "exact", "answer": "bat" }
+    },
+    {
+      "id": "ela.1.digraphs.1",
+      "subjectSlug": "reading",
+      "gradeBand": "1",
+      "skillIds": ["ela-decoding-digraphs"],
+      "surfaceType": "short_response",
+      "stem": "Read this word out loud: 'ship'. What two letters make the /sh/ sound?",
+      "correctness": { "kind": "set", "answers": ["sh", "s and h", "SH"] }
+    },
+    {
+      "id": "ela.1.fluency.1",
+      "subjectSlug": "reading",
+      "gradeBand": "1",
+      "skillIds": ["ela-fluency-grade1"],
+      "surfaceType": "voice_response",
+      "stem": "Read this sentence smoothly: 'The big red dog ran fast.'",
+      "correctness": {
+        "kind": "rubric",
+        "rubric": {
+          "criteria": [
+            { "id": "accuracy", "description": "Reads every word correctly", "weight": 0.5 },
+            { "id": "pace", "description": "Reads at a comfortable pace", "weight": 0.5 }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ela.1.retell.1",
+      "subjectSlug": "reading",
+      "gradeBand": "1",
+      "skillIds": ["ela-retell-story"],
+      "surfaceType": "short_response",
+      "stem": "After hearing 'The Three Little Pigs', what did the wolf do to the straw house?",
+      "correctness": { "kind": "set", "answers": ["blew it down", "huffed and puffed"] }
+    },
+    {
+      "id": "ela.1.context.1",
+      "subjectSlug": "reading",
+      "gradeBand": "1",
+      "skillIds": ["ela-context-clues-1"],
+      "surfaceType": "multiple_choice",
+      "stem": "In 'The dog gobbled the food', what does 'gobbled' mean?",
+      "correctness": { "kind": "set", "answers": ["ate quickly", "ate fast"] }
+    },
+    {
+      "id": "ela.1.sequence.1",
+      "subjectSlug": "reading",
+      "gradeBand": "1",
+      "skillIds": ["ela-retell-story"],
+      "surfaceType": "drag_drop",
+      "stem": "Put these story events in order: 'Ate breakfast', 'Got dressed', 'Went to school'",
+      "correctness": {
+        "kind": "exact",
+        "answer": "Got dressed,Ate breakfast,Went to school"
+      }
+    },
+    {
+      "id": "ela.2.vowel.1",
+      "subjectSlug": "reading",
+      "gradeBand": "2",
+      "skillIds": ["ela-vowel-teams"],
+      "surfaceType": "short_response",
+      "stem": "Underline the vowel team in 'rain': r-a-i-n",
+      "correctness": { "kind": "set", "answers": ["ai", "AI"] }
+    },
+    {
+      "id": "ela.2.character.1",
+      "subjectSlug": "reading",
+      "gradeBand": "2",
+      "skillIds": ["ela-character-traits"],
+      "surfaceType": "multiple_choice",
+      "stem": "If a character shares his lunch with a friend, he is ____.",
+      "correctness": { "kind": "set", "answers": ["kind", "generous", "helpful"] }
+    },
+    {
+      "id": "ela.2.main.1",
+      "subjectSlug": "reading",
+      "gradeBand": "2",
+      "skillIds": ["ela-main-topic"],
+      "surfaceType": "short_response",
+      "stem": "Read: 'Bees make honey. They collect nectar from flowers. They live in hives.' What is the main topic?",
+      "correctness": { "kind": "set", "answers": ["bees", "Bees", "how bees make honey"] }
+    },
+    {
+      "id": "ela.2.affix.1",
+      "subjectSlug": "reading",
+      "gradeBand": "2",
+      "skillIds": ["ela-affixes-2"],
+      "surfaceType": "short_response",
+      "stem": "What does the prefix 're-' usually mean? (As in 'redo')",
+      "correctness": { "kind": "set", "answers": ["again", "do again"] }
+    },
+    {
+      "id": "ela.2.compare.1",
+      "subjectSlug": "reading",
+      "gradeBand": "2",
+      "skillIds": ["ela-main-topic"],
+      "surfaceType": "multiple_choice",
+      "stem": "Two stories are about dogs. Story A is about a puppy losing a ball; Story B is about a service dog at school. They are MOSTLY about:",
+      "correctness": { "kind": "set", "answers": ["dogs", "dogs in different roles"] }
+    },
+    {
+      "id": "sci.k.weather.1",
+      "subjectSlug": "science",
+      "gradeBand": "K",
+      "skillIds": ["sci-weather-patterns-k"],
+      "surfaceType": "multiple_choice",
+      "stem": "Which season is usually the warmest?",
+      "correctness": { "kind": "exact", "answer": "summer" }
+    },
+    {
+      "id": "sci.k.plant.1",
+      "subjectSlug": "science",
+      "gradeBand": "K",
+      "skillIds": ["sci-plants-needs-k"],
+      "surfaceType": "short_response",
+      "stem": "Name one thing a plant needs to grow.",
+      "correctness": { "kind": "set", "answers": ["water", "sunlight", "sun", "air", "soil"] }
+    },
+    {
+      "id": "sci.k.push.1",
+      "subjectSlug": "science",
+      "gradeBand": "K",
+      "skillIds": ["sci-push-pull-k"],
+      "surfaceType": "multiple_choice",
+      "stem": "Opening a door — is that a push or a pull?",
+      "correctness": { "kind": "set", "answers": ["pull", "push or pull", "both"] }
+    },
+    {
+      "id": "sci.k.sun.1",
+      "subjectSlug": "science",
+      "gradeBand": "K",
+      "skillIds": ["sci-sun-moon-stars-k"],
+      "surfaceType": "multiple_choice",
+      "stem": "Where do we see the sun?",
+      "correctness": { "kind": "set", "answers": ["in the sky", "sky"] }
+    },
+    {
+      "id": "sci.k.observe.1",
+      "subjectSlug": "science",
+      "gradeBand": "K",
+      "skillIds": ["sci-plants-needs-k"],
+      "surfaceType": "short_response",
+      "stem": "Which sense do you use to know if a flower smells good?",
+      "correctness": { "kind": "set", "answers": ["smell", "nose"] }
+    },
+    {
+      "id": "sci.1.sound.1",
+      "subjectSlug": "science",
+      "gradeBand": "1",
+      "skillIds": ["sci-sound-vibration-1"],
+      "surfaceType": "multiple_choice",
+      "stem": "Sound is made when things ____.",
+      "correctness": { "kind": "set", "answers": ["vibrate", "shake"] }
+    },
+    {
+      "id": "sci.1.light.1",
+      "subjectSlug": "science",
+      "gradeBand": "1",
+      "skillIds": ["sci-light-shadow-1"],
+      "surfaceType": "multiple_choice",
+      "stem": "When does your shadow appear?",
+      "correctness": { "kind": "set", "answers": ["when light blocks", "when light is blocked", "in the sun"] }
+    },
+    {
+      "id": "sci.1.parts.1",
+      "subjectSlug": "science",
+      "gradeBand": "1",
+      "skillIds": ["sci-plant-parts-1"],
+      "surfaceType": "short_response",
+      "stem": "Which plant part takes water from the soil?",
+      "correctness": { "kind": "set", "answers": ["roots", "root"] }
+    },
+    {
+      "id": "sci.1.day.1",
+      "subjectSlug": "science",
+      "gradeBand": "1",
+      "skillIds": ["sci-day-night-1"],
+      "surfaceType": "multiple_choice",
+      "stem": "What causes day and night?",
+      "correctness": { "kind": "set", "answers": ["earth spinning", "earth's rotation"] }
+    },
+    {
+      "id": "sci.1.shadow.1",
+      "subjectSlug": "science",
+      "gradeBand": "1",
+      "skillIds": ["sci-light-shadow-1"],
+      "surfaceType": "short_response",
+      "stem": "If the sun is low, your shadow is ____ (long or short)?",
+      "correctness": { "kind": "exact", "answer": "long" }
+    },
+    {
+      "id": "sci.2.matter.1",
+      "subjectSlug": "science",
+      "gradeBand": "2",
+      "skillIds": ["sci-states-of-matter-2"],
+      "surfaceType": "multiple_choice",
+      "stem": "Which is a liquid: ice / water / steam?",
+      "correctness": { "kind": "exact", "answer": "water" }
+    },
+    {
+      "id": "sci.2.habitat.1",
+      "subjectSlug": "science",
+      "gradeBand": "2",
+      "skillIds": ["sci-habitats-2"],
+      "surfaceType": "short_response",
+      "stem": "Where does a fish live?",
+      "correctness": { "kind": "set", "answers": ["water", "in water", "ocean", "lake"] }
+    },
+    {
+      "id": "sci.2.land.1",
+      "subjectSlug": "science",
+      "gradeBand": "2",
+      "skillIds": ["sci-land-water-2"],
+      "surfaceType": "multiple_choice",
+      "stem": "Most of the Earth's surface is covered by ____.",
+      "correctness": { "kind": "set", "answers": ["water", "ocean"] }
+    },
+    {
+      "id": "sci.2.design.1",
+      "subjectSlug": "science",
+      "gradeBand": "2",
+      "skillIds": ["sci-engineering-design-2"],
+      "surfaceType": "short_response",
+      "stem": "If your tower keeps falling, what should you change first — the base or the top?",
+      "correctness": { "kind": "exact", "answer": "base" }
+    },
+    {
+      "id": "sci.2.melt.1",
+      "subjectSlug": "science",
+      "gradeBand": "2",
+      "skillIds": ["sci-states-of-matter-2"],
+      "surfaceType": "multiple_choice",
+      "stem": "Ice changes into water when it ____.",
+      "correctness": { "kind": "set", "answers": ["melts", "heats up", "warms up"] }
+    },
+    {
+      "id": "wr.k.name.1",
+      "subjectSlug": "writing",
+      "gradeBand": "K",
+      "skillIds": ["wr-name-write-k"],
+      "surfaceType": "ink_canvas",
+      "stem": "Write your first name on the line.",
+      "correctness": {
+        "kind": "rubric",
+        "rubric": {
+          "criteria": [
+            { "id": "legible", "description": "Letters are recognisable", "weight": 0.7 },
+            { "id": "left_to_right", "description": "Written left-to-right", "weight": 0.3 }
+          ]
+        }
+      }
+    },
+    {
+      "id": "wr.k.label.1",
+      "subjectSlug": "writing",
+      "gradeBand": "K",
+      "skillIds": ["wr-label-pictures-k"],
+      "surfaceType": "short_response",
+      "stem": "Look at the picture of a cat 🐱. Write one letter for the sound 'c-c-c' at the start of 'cat'.",
+      "correctness": { "kind": "exact", "answer": "c" }
+    },
+    {
+      "id": "wr.k.space.1",
+      "subjectSlug": "writing",
+      "gradeBand": "K",
+      "skillIds": ["wr-spaces-words-k"],
+      "surfaceType": "multiple_choice",
+      "stem": "Which is correct?  'Iliketocount' or 'I like to count'",
+      "correctness": { "kind": "exact", "answer": "I like to count" }
+    },
+    {
+      "id": "wr.k.opinion.1",
+      "subjectSlug": "writing",
+      "gradeBand": "K",
+      "skillIds": ["wr-opinion-pic-k"],
+      "surfaceType": "short_response",
+      "stem": "Draw your favorite snack. Then write one word for it.",
+      "correctness": {
+        "kind": "rubric",
+        "rubric": {
+          "criteria": [
+            { "id": "matches_picture", "description": "Word matches the picture", "weight": 1.0 }
+          ]
+        }
+      }
+    },
+    {
+      "id": "wr.k.letter.1",
+      "subjectSlug": "writing",
+      "gradeBand": "K",
+      "skillIds": ["wr-label-pictures-k"],
+      "surfaceType": "ink_canvas",
+      "stem": "Write the uppercase letter A.",
+      "correctness": {
+        "kind": "rubric",
+        "rubric": {
+          "criteria": [
+            { "id": "shape", "description": "Has three strokes forming A", "weight": 1.0 }
+          ]
+        }
+      }
+    },
+    {
+      "id": "wr.1.sentence.1",
+      "subjectSlug": "writing",
+      "gradeBand": "1",
+      "skillIds": ["wr-complete-sentence-1"],
+      "surfaceType": "short_response",
+      "stem": "Write a complete sentence about your favorite animal.",
+      "correctness": {
+        "kind": "rubric",
+        "rubric": {
+          "criteria": [
+            { "id": "subject_verb", "description": "Has a subject and a verb", "weight": 0.6 },
+            { "id": "capital", "description": "Starts with a capital letter", "weight": 0.2 },
+            { "id": "period", "description": "Ends with a period", "weight": 0.2 }
+          ]
+        }
+      }
+    },
+    {
+      "id": "wr.1.punct.1",
+      "subjectSlug": "writing",
+      "gradeBand": "1",
+      "skillIds": ["wr-punctuation-end-1"],
+      "surfaceType": "multiple_choice",
+      "stem": "Which punctuation finishes a question? 'How old are you ?'",
+      "correctness": { "kind": "exact", "answer": "?" }
+    },
+    {
+      "id": "wr.1.narr.1",
+      "subjectSlug": "writing",
+      "gradeBand": "1",
+      "skillIds": ["wr-narrative-2-events-1"],
+      "surfaceType": "short_response",
+      "stem": "Write two things you did this morning, in order.",
+      "correctness": {
+        "kind": "rubric",
+        "rubric": {
+          "criteria": [
+            { "id": "two_events", "description": "Mentions two distinct events", "weight": 0.7 },
+            { "id": "order", "description": "Events are in time order", "weight": 0.3 }
+          ]
+        }
+      }
+    },
+    {
+      "id": "wr.1.info.1",
+      "subjectSlug": "writing",
+      "gradeBand": "1",
+      "skillIds": ["wr-informative-fact-1"],
+      "surfaceType": "short_response",
+      "stem": "Write one fact about dogs.",
+      "correctness": {
+        "kind": "rubric",
+        "rubric": {
+          "criteria": [
+            { "id": "is_fact", "description": "States a factual statement, not an opinion", "weight": 1.0 }
+          ]
+        }
+      }
+    },
+    {
+      "id": "wr.1.capital.1",
+      "subjectSlug": "writing",
+      "gradeBand": "1",
+      "skillIds": ["wr-complete-sentence-1"],
+      "surfaceType": "multiple_choice",
+      "stem": "Which name should be capitalised? 'sam went to the park'",
+      "correctness": { "kind": "set", "answers": ["sam", "Sam"] }
+    },
+    {
+      "id": "wr.2.para.1",
+      "subjectSlug": "writing",
+      "gradeBand": "2",
+      "skillIds": ["wr-paragraph-topic-2"],
+      "surfaceType": "short_response",
+      "stem": "Write a topic sentence about the playground.",
+      "correctness": {
+        "kind": "rubric",
+        "rubric": {
+          "criteria": [
+            { "id": "topic_clear", "description": "States a clear topic", "weight": 1.0 }
+          ]
+        }
+      }
+    },
+    {
+      "id": "wr.2.linking.1",
+      "subjectSlug": "writing",
+      "gradeBand": "2",
+      "skillIds": ["wr-linking-words-2"],
+      "surfaceType": "multiple_choice",
+      "stem": "Pick the best linking word: 'I like pizza ____ pasta.'",
+      "correctness": { "kind": "exact", "answer": "and" }
+    },
+    {
+      "id": "wr.2.revise.1",
+      "subjectSlug": "writing",
+      "gradeBand": "2",
+      "skillIds": ["wr-revise-2"],
+      "surfaceType": "short_response",
+      "stem": "Rewrite this sentence to be clearer: 'The thing went over there'.",
+      "correctness": {
+        "kind": "rubric",
+        "rubric": {
+          "criteria": [
+            { "id": "specific_noun", "description": "Replaces 'thing' with a specific noun", "weight": 0.5 },
+            { "id": "specific_place", "description": "Replaces 'there' with a place", "weight": 0.5 }
+          ]
+        }
+      }
+    },
+    {
+      "id": "wr.2.handwriting.1",
+      "subjectSlug": "writing",
+      "gradeBand": "2",
+      "skillIds": ["wr-handwriting-2"],
+      "surfaceType": "ink_canvas",
+      "stem": "Write the sentence: 'I can read.'",
+      "correctness": {
+        "kind": "rubric",
+        "rubric": {
+          "criteria": [
+            { "id": "legible", "description": "Each letter is legible", "weight": 0.6 },
+            { "id": "spacing", "description": "Words are separated by spaces", "weight": 0.4 }
+          ]
+        }
+      }
+    },
+    {
+      "id": "wr.2.fix.1",
+      "subjectSlug": "writing",
+      "gradeBand": "2",
+      "skillIds": ["wr-linking-words-2"],
+      "surfaceType": "short_response",
+      "stem": "Combine: 'I am cold. I will get a coat.' using 'so'.",
+      "correctness": {
+        "kind": "set",
+        "answers": [
+          "I am cold so I will get a coat.",
+          "I am cold, so I will get a coat."
+        ]
+      }
+    },
+
+    { "id": "math.k.add.2", "subjectSlug": "math", "gradeBand": "K", "skillIds": ["math-add-fluency-5"], "surfaceType": "short_response", "stem": "1 + 3 = ?", "correctness": { "kind": "exact", "answer": "4" } },
+    { "id": "math.1.story.2", "subjectSlug": "math", "gradeBand": "1", "skillIds": ["math-add-within-100"], "surfaceType": "short_response", "stem": "Liam has 9 grapes and eats 4. How many are left?", "correctness": { "kind": "exact", "answer": "5" } },
+    { "id": "math.2.story.1", "subjectSlug": "math", "gradeBand": "2", "skillIds": ["math-add-within-1000"], "surfaceType": "short_response", "stem": "The library had 120 books. They added 65 more. How many now?", "correctness": { "kind": "exact", "answer": "185" } },
+    { "id": "math.k.compare.2", "subjectSlug": "math", "gradeBand": "K", "skillIds": ["math-compare-numbers"], "surfaceType": "multiple_choice", "stem": "Which is less, 2 or 5?", "correctness": { "kind": "exact", "answer": "2" } },
+    { "id": "math.1.measure.2", "subjectSlug": "math", "gradeBand": "1", "skillIds": ["math-measure-length"], "surfaceType": "short_response", "stem": "If a book is 8 inches and a notebook is 11 inches, how much longer is the notebook?", "correctness": { "kind": "exact", "answer": "3" } },
+
+    { "id": "ela.k.print.2", "subjectSlug": "reading", "gradeBand": "K", "skillIds": ["ela-print-concepts"], "surfaceType": "multiple_choice", "stem": "What is the first letter of the alphabet?", "correctness": { "kind": "set", "answers": ["A", "a"] } },
+    { "id": "ela.1.fluency.2", "subjectSlug": "reading", "gradeBand": "1", "skillIds": ["ela-fluency-grade1"], "surfaceType": "short_response", "stem": "Read: 'I see a fish in the pond.' How many words?", "correctness": { "kind": "exact", "answer": "7" } },
+    { "id": "ela.2.main.2", "subjectSlug": "reading", "gradeBand": "2", "skillIds": ["ela-main-topic"], "surfaceType": "short_response", "stem": "Read: 'Birds build nests. They lay eggs. They feed their young.' What is the topic?", "correctness": { "kind": "set", "answers": ["birds", "Birds"] } },
+    { "id": "ela.k.blend.2", "subjectSlug": "reading", "gradeBand": "K", "skillIds": ["ela-blend-cvc"], "surfaceType": "short_response", "stem": "Blend: /d/ /o/ /g/ — what word?", "correctness": { "kind": "exact", "answer": "dog" } },
+    { "id": "ela.2.character.2", "subjectSlug": "reading", "gradeBand": "2", "skillIds": ["ela-character-traits"], "surfaceType": "multiple_choice", "stem": "If a character refuses to give up, she is ____.", "correctness": { "kind": "set", "answers": ["determined", "persistent", "brave"] } },
+
+    { "id": "sci.k.weather.2", "subjectSlug": "science", "gradeBand": "K", "skillIds": ["sci-weather-patterns-k"], "surfaceType": "multiple_choice", "stem": "What do we wear when it rains?", "correctness": { "kind": "set", "answers": ["raincoat", "rain boots", "umbrella"] } },
+    { "id": "sci.1.parts.2", "subjectSlug": "science", "gradeBand": "1", "skillIds": ["sci-plant-parts-1"], "surfaceType": "multiple_choice", "stem": "Which plant part makes seeds?", "correctness": { "kind": "set", "answers": ["flower", "flowers"] } },
+    { "id": "sci.2.habitat.2", "subjectSlug": "science", "gradeBand": "2", "skillIds": ["sci-habitats-2"], "surfaceType": "multiple_choice", "stem": "A desert is mostly ____.", "correctness": { "kind": "set", "answers": ["hot and dry", "dry", "sandy"] } },
+    { "id": "sci.k.plant.2", "subjectSlug": "science", "gradeBand": "K", "skillIds": ["sci-plants-needs-k"], "surfaceType": "multiple_choice", "stem": "True or false: plants can grow in total darkness.", "correctness": { "kind": "exact", "answer": "false" } },
+    { "id": "sci.1.day.2", "subjectSlug": "science", "gradeBand": "1", "skillIds": ["sci-day-night-1"], "surfaceType": "multiple_choice", "stem": "We see the moon mostly during ____.", "correctness": { "kind": "set", "answers": ["night", "the night"] } },
+
+    { "id": "wr.k.opinion.2", "subjectSlug": "writing", "gradeBand": "K", "skillIds": ["wr-opinion-pic-k"], "surfaceType": "short_response", "stem": "Write one word that tells how you feel today.", "correctness": { "kind": "rubric", "rubric": { "criteria": [ { "id": "matches_emotion", "description": "Word names a feeling", "weight": 1.0 } ] } } },
+    { "id": "wr.1.punct.2", "subjectSlug": "writing", "gradeBand": "1", "skillIds": ["wr-punctuation-end-1"], "surfaceType": "multiple_choice", "stem": "Which punctuation ends 'Wow that is amazing'?", "correctness": { "kind": "exact", "answer": "!" } },
+    { "id": "wr.2.linking.2", "subjectSlug": "writing", "gradeBand": "2", "skillIds": ["wr-linking-words-2"], "surfaceType": "multiple_choice", "stem": "Pick the linking word: 'I was tired ____ I kept going.'", "correctness": { "kind": "set", "answers": ["but", "yet"] } },
+    { "id": "wr.k.space.2", "subjectSlug": "writing", "gradeBand": "K", "skillIds": ["wr-spaces-words-k"], "surfaceType": "multiple_choice", "stem": "Which has correct spaces? 'Iamhappy' or 'I am happy'?", "correctness": { "kind": "exact", "answer": "I am happy" } },
+    { "id": "wr.1.info.2", "subjectSlug": "writing", "gradeBand": "1", "skillIds": ["wr-informative-fact-1"], "surfaceType": "short_response", "stem": "Write one fact about the sun.", "correctness": { "kind": "rubric", "rubric": { "criteria": [ { "id": "is_fact", "description": "States a factual statement", "weight": 1.0 } ] } } }
+  ]
+}
