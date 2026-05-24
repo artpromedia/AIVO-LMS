@@ -8,7 +8,14 @@ export type SurfaceTelemetryEventType =
   | "answer_changed"
   | "tool_changed"
   | "geometry_action"
-  | "unsupported_surface";
+  | "unsupported_surface"
+  | "play"
+  | "pause"
+  | "seek"
+  | "complete"
+  | "caption-on"
+  | "caption-off"
+  | "captions_missing";
 
 export interface SurfaceTelemetryEvent {
   id: string;

@@ -21,7 +21,16 @@ export interface ItemVariant {
   body: Record<string, unknown>;
   /** Defect count — increments via `registerDefect`. */
   defectCount: number;
+  /** Optional learner surface type for runtime rendering. */
+  surfaceType?: "choice_grid" | "scratchpad" | "math_expression" | "geometry_workspace" | "video" | "audio";
+  /** Optional variant assets used by surface renderers. */
+  assets?: ItemAsset[];
 }
+
+export type ItemAsset =
+  | { type: "media"; src: string; mimeType?: string }
+  | { type: "image"; src: string; alt?: string }
+  | { type: "captions"; src: string; lang: string; label?: string; default?: boolean };
 
 export interface Item {
   /** Stable id, unique across all banks. */

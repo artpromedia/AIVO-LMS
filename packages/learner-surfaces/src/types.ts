@@ -5,6 +5,8 @@ export type LearnerSurfaceType =
   | "scratchpad"
   | "geometry_workspace"
   | "math_expression"
+  | "video"
+  | "audio"
   | "number_line"
   | "graph"
   | "drag_manipulative"
@@ -45,8 +47,8 @@ export interface LearnerSurfaceSpec {
   codingSandbox?: CodingSandboxSpec;
   /** Sprint 9 — set when type === "art_canvas". */
   artCanvas?: ArtCanvasSpec;
-  /** Sprint 31 — set when type === "number_line". */
-  numberLine?: NumberLineSpec;
+  /** Sprint 14 — set when type === "video" | "audio". */
+  media?: MediaSurfaceSpec;
 }
 
 export interface SurfaceCaptureSpec {
@@ -167,6 +169,36 @@ export interface NumberLineSpec {
   min: number;
   max: number;
   step: number;
+}
+
+export type SurfaceAssetDescriptor =
+  | {
+      type: "media";
+      src: string;
+      mimeType?: string;
+    }
+  | {
+      type: "captions";
+      src: string;
+      lang: string;
+      label?: string;
+      default?: boolean;
+    };
+
+export interface MediaSurfaceSpec {
+  src: string;
+  mimeType?: string;
+  poster?: string;
+  autoPlay?: boolean;
+  loop?: boolean;
+  assets: SurfaceAssetDescriptor[];
+}
+
+export interface SurfaceUserAccessibilityPreferences {
+  dyslexiaFriendlyFont?: boolean;
+  reducedMotion?: boolean;
+  largeText?: boolean;
+  captionsAlwaysOn?: boolean;
 }
 
 export interface GeometryDiagramSpec {

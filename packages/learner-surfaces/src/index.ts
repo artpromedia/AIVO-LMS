@@ -24,6 +24,9 @@ export type {
   ArtCanvasSpec,
   SurfaceAttachment,
   VoiceResponsePayload,
+  MediaSurfaceSpec,
+  SurfaceAssetDescriptor,
+  SurfaceUserAccessibilityPreferences,
 } from "./types.js";
 
 export { SurfaceHost, type SurfaceHostProps } from "./SurfaceHost.js";
@@ -54,13 +57,8 @@ export {
   VoiceResponseSurface,
   type VoiceResponseSurfaceProps,
 } from "./surfaces/VoiceResponseSurface.js";
-export {
-  DrawingCanvas,
-  type DrawingCanvasProps,
-  buildDrawingSvg,
-  buildDrawingSvgDataUrl,
-  buildDrawingPngDataUrl,
-} from "./DrawingCanvas/index.js";
+export { VideoSurface, type VideoSurfaceProps } from "./Video/VideoSurface.js";
+export { AudioSurface, type AudioSurfaceProps } from "./Audio/AudioSurface.js";
 
 export {
   isSurfaceEntitled,

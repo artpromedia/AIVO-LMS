@@ -14,7 +14,7 @@ const baseSurface: Omit<LearnerSurfaceSpec, "id" | "type" | "prompt"> = {
 };
 
 describe("SurfaceHost", () => {
-  it("renders scratchpad, geometry, choice-grid, and number-line surfaces", () => {
+  it("renders scratchpad, geometry, choice-grid, video, and audio surfaces", () => {
     const scratchpadMarkup = renderToStaticMarkup(
       <SurfaceHost
         surface={{
@@ -59,14 +59,48 @@ describe("SurfaceHost", () => {
       />,
     );
 
-    const numberLineMarkup = renderToStaticMarkup(
+    const videoMarkup = renderToStaticMarkup(
       <SurfaceHost
         surface={{
           ...baseSurface,
-          id: "s4",
-          type: "number_line",
-          prompt: "Pick the number",
-          numberLine: { min: 0, max: 10, step: 1 },
+          id: "s5",
+          type: "video",
+          prompt: "Watch",
+          media: {
+            src: "https://example.invalid/video.m3u8",
+            mimeType: "application/x-mpegURL",
+            assets: [
+              {
+                type: "captions",
+                src: "data:text/vtt;charset=utf-8,WEBVTT",
+                lang: "en",
+                default: true,
+              },
+            ],
+          },
+        }}
+      />,
+    );
+
+    const audioMarkup = renderToStaticMarkup(
+      <SurfaceHost
+        surface={{
+          ...baseSurface,
+          id: "s6",
+          type: "audio",
+          prompt: "Listen",
+          media: {
+            src: "https://example.invalid/audio.mp3",
+            mimeType: "audio/mpeg",
+            assets: [
+              {
+                type: "captions",
+                src: "data:text/vtt;charset=utf-8,WEBVTT",
+                lang: "en",
+                default: true,
+              },
+            ],
+          },
         }}
       />,
     );
@@ -74,7 +108,8 @@ describe("SurfaceHost", () => {
     expect(scratchpadMarkup).toContain("scratchpad-surface");
     expect(geometryMarkup).toContain("geometry-surface");
     expect(choiceMarkup).toContain("choice-grid-surface");
-    expect(numberLineMarkup).toContain("number-line-surface");
+    expect(videoMarkup).toContain("video-surface");
+    expect(audioMarkup).toContain("audio-surface");
   });
 
   it("renders fallback and emits telemetry for unsupported surfaces", () => {
@@ -96,25 +131,27 @@ describe("SurfaceHost", () => {
     expect(events.some((event) => event.type === "unsupported_surface")).toBe(true);
   });
 
-  it("renders art canvas surface via drawing canvas router", () => {
+  it("requires captions for media surfaces and emits telemetry", () => {
+    const events: Array<{ type: string }> = [];
+
     const markup = renderToStaticMarkup(
       <SurfaceHost
         surface={{
           ...baseSurface,
-          id: "art-1",
-          type: "art_canvas",
-          prompt: "Draw a happy sun",
-          artCanvas: {
-            width: 320,
-            height: 200,
-            palette: ["#111111", "#ee5500"],
-            highContrastPalette: ["#000000", "#ffffff"],
+          id: "s7",
+          type: "video",
+          prompt: "Needs captions",
+          media: {
+            src: "https://example.invalid/video.mp4",
+            mimeType: "video/mp4",
+            assets: [],
           },
         }}
+        onEvent={(event) => events.push({ type: event.type })}
       />,
     );
 
-    expect(markup).toContain("drawing-canvas");
-    expect(markup).toContain("submit artwork");
+    expect(markup).toContain("Captions are required");
+    expect(events.some((event) => event.type === "captions_missing")).toBe(true);
   });
 });

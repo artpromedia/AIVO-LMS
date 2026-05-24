@@ -18,10 +18,9 @@
   "dependencies": {
     "@aivo/api-client": "workspace:*",
     "@aivo/brand": "workspace:*",
-    "@aivo/item-bank": "workspace:*",
     "@aivo/learner-surfaces": "workspace:*",
-    "@aivo/ui": "workspace:*",
     "@aivo/nav": "workspace:*",
+    "@aivo/ui": "workspace:*",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-avatar": "^1.1.2",
     "@radix-ui/react-checkbox": "^1.1.3",

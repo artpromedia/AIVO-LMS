@@ -31,7 +31,7 @@ export interface Asset {
    * Asset kind. `image`/`audio`/`video` are CDN-hosted blobs; `inline_svg`
    * stores the SVG markup directly inside the pack (used for tiny shapes).
    */
-  kind: "image" | "audio" | "video" | "inline_svg";
+  kind: "image" | "audio" | "video" | "inline_svg" | "captions";
   /** CDN URL for blob assets, or the inline SVG markup for `inline_svg`. */
   src: string;
   /**
@@ -45,6 +45,12 @@ export interface Asset {
   durationMs?: number;
   /** SHA-256 of the asset bytes — used by the CMS to detect drift. */
   checksum?: string;
+  /** Caption track language (required when kind === "captions"). */
+  lang?: string;
+  /** Optional learner-visible label for captions track selectors. */
+  label?: string;
+  /** Default caption track. */
+  default?: boolean;
 }
 
 /** Activity types map to stage-runtime renderers. Keep in sync with
@@ -56,7 +62,9 @@ export type ActivityType =
   | "voice"
   | "draw"
   | "tap"
-  | "match";
+  | "match"
+  | "video"
+  | "audio";
 
 export type DifficultyLevel = "intro" | "core" | "stretch";
 
@@ -143,6 +151,7 @@ export type ContentPackIssueCode =
   | "no_correct_choice"
   | "multiple_correct_in_single_choice"
   | "voice_missing_expected"
+  | "missing_captions_asset"
   | "empty_pack"
   | "unsupported_schema_version";
 

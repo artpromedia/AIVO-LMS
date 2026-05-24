@@ -103,6 +103,8 @@ const ACTIVITY_TO_SURFACE_TYPE: Record<Activity["type"], string> = {
   draw: "scratchpad",
   tap: "choice_grid",
   match: "drag_manipulative",
+  video: "video",
+  audio: "audio",
 };
 
 function buildSurface(activity: Activity, suffix: string): TutorBeatSurface {
@@ -182,6 +184,8 @@ function buildInteractionBeat(activity: Activity): TutorBeat {
       case "match":
         return { type: "match", prompt: activity.prompt, choices: buildChoices(activity) };
       case "narration":
+      case "video":
+      case "audio":
       default:
         return undefined;
     }
