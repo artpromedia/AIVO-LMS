@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@aivo/brand": "workspace:*",
+    "@aivo/learner-surfaces": "workspace:*",
     "@aivo/ui": "workspace:*",
     "@aivo/nav": "workspace:*",
     "@hookform/resolvers": "^3.9.1",

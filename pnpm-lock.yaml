@@ -274,6 +274,9 @@ importers:
       '@aivo/brand':
         specifier: workspace:*
         version: link:../../packages/brand
+      '@aivo/learner-surfaces':
+        specifier: workspace:*
+        version: link:../../packages/learner-surfaces
       '@aivo/nav':
         specifier: workspace:*
         version: link:../../packages/nav

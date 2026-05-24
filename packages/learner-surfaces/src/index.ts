@@ -22,6 +22,7 @@ export type {
   GeometryAction,
   CodingSandboxSpec,
   ArtCanvasSpec,
+  NumberLineSpec,
   VoiceResponsePayload,
 } from "./types.js";
 
@@ -29,10 +30,18 @@ export { SurfaceHost, type SurfaceHostProps } from "./SurfaceHost.js";
 export { ScratchpadSurface, type ScratchpadSurfaceProps } from "./surfaces/ScratchpadSurface.js";
 export { GeometrySurface, type GeometrySurfaceProps } from "./surfaces/GeometrySurface.js";
 export { ChoiceGridSurface, type ChoiceGridSurfaceProps } from "./surfaces/ChoiceGridSurface.js";
+export { NumberLineSurface, type NumberLineSurfaceProps } from "./surfaces/NumberLineSurface.js";
 export {
   MathExpressionSurface,
   type MathExpressionSurfaceProps,
 } from "./surfaces/MathExpressionSurface.js";
+export {
+  SurfaceRouter,
+  type SurfaceRouterAccessibilitySettings,
+  type SurfaceRouterItem,
+  type SurfaceRouterProps,
+  type SurfaceRouterSubmitResult,
+} from "./SurfaceRouter/index.js";
 export {
   CodingSandboxSurface,
   type CodingSandboxSurfaceProps,

@@ -25,6 +25,12 @@ import { Progress } from "@/components/ui/progress";
 import { PageHeader } from "@/components/layout/page-header";
 import { AudioControlBar, FocusMode } from "@/components/playful-calm";
 import { MathText } from "@/components/learning/math-text";
+import {
+  SurfaceRouter,
+  type SurfaceRouterItem,
+  type SurfaceRouterSubmitResult,
+  type SurfaceTelemetryEvent,
+} from "@aivo/learner-surfaces";
 import type {
   AccessibilityPreferences,
   GeneratedLessonPlan,
@@ -42,6 +48,7 @@ type Beat =
       kind: "guided";
       key: string;
       gpId: string;
+      surfaceType: SurfaceRouterItem["surfaceType"];
       prompt: string;
       expectedAnswer?: string;
       choices?: string[];
@@ -52,6 +59,7 @@ type Beat =
       kind: "check";
       key: string;
       checkId: string;
+      surfaceType: SurfaceRouterItem["surfaceType"];
       prompt: string;
       expectedAnswer?: string;
       choices?: string[];
@@ -81,6 +89,9 @@ function buildBeats(plan: GeneratedLessonPlan, shorter: boolean): Beat[] {
       kind: "guided",
       key: `gp-${i}`,
       gpId: g.id,
+      surfaceType:
+        ((g as { surfaceType?: SurfaceRouterItem["surfaceType"] }).surfaceType ??
+          (g.choices?.length ? "choice_grid" : "math_expression")),
       prompt: g.prompt,
       expectedAnswer: g.expectedAnswer,
       choices: g.choices,
@@ -93,6 +104,9 @@ function buildBeats(plan: GeneratedLessonPlan, shorter: boolean): Beat[] {
       kind: "check",
       key: `chk-${i}`,
       checkId: c.id,
+      surfaceType:
+        ((c as { surfaceType?: SurfaceRouterItem["surfaceType"] }).surfaceType ??
+          (c.choices?.length ? "choice_grid" : "math_expression")),
       prompt: c.prompt,
       expectedAnswer: c.expectedAnswer,
       choices: c.choices,
@@ -145,7 +159,6 @@ export function LessonPlayer({
     return Math.min(raw, beats.length - 1);
   })();
   const [stepIdx, setStepIdx] = useState(startStep);
-  const [answer, setAnswer] = useState("");
   const [feedback, setFeedback] = useState<null | "correct" | "incorrect">(null);
   const [showHint, setShowHint] = useState(false);
   const [onBreak, setOnBreak] = useState(false);
@@ -219,16 +232,69 @@ export function LessonPlayer({
   function advance() {
     if (stepIdx < beats.length - 1) {
       setStepIdx(stepIdx + 1);
-      setAnswer("");
       setFeedback(null);
       setShowHint(false);
     }
   }
 
-  function submitAnswer() {
-    if (!isInteractive || answer.trim().length === 0) return;
-    const expected = beat.kind === "guided" ? beat.expectedAnswer : beat.expectedAnswer;
-    const correct = isCorrect(expected, answer);
+  function emitSurfaceTelemetry(event: SurfaceTelemetryEvent) {
+    fetch("/api/learning/surface-telemetry", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        learnerId,
+        sessionId: lessonRunId,
+        eventType: event.type,
+        payload: event.payload ?? {},
+      }),
+    }).catch(() => {});
+  }
+
+  function toSurfaceItem(currentBeat: Extract<Beat, { kind: "guided" | "check" }>): SurfaceRouterItem {
+    return {
+      id: currentBeat.kind === "guided" ? currentBeat.gpId : currentBeat.checkId,
+      surfaceType: currentBeat.surfaceType,
+      prompt: currentBeat.prompt,
+      choices: currentBeat.choices,
+      expectedAnswer: currentBeat.expectedAnswer,
+      instructions:
+        currentBeat.kind === "guided"
+          ? "Solve the practice and submit your answer."
+          : "Complete the check and submit your answer.",
+      answerInput: { type: "text", label: "Your answer", placeholder: "Type your answer…" },
+      scratchpad: currentBeat.surfaceType === "scratchpad" ? { enabled: true, width: 520, height: 300 } : undefined,
+      diagram:
+        currentBeat.surfaceType === "geometry_workspace"
+          ? {
+              canvasMode: "svg",
+              width: 480,
+              height: 320,
+              shapes: [{ id: "fixture-rect", kind: "rectangle", x: 110, y: 70, width: 220, height: 150 }],
+            }
+          : undefined,
+      numberLine:
+        currentBeat.surfaceType === "number_line"
+          ? {
+              min: 0,
+              max: 10,
+              step: 1,
+            }
+          : undefined,
+    };
+  }
+
+  function submitSurface(result: SurfaceRouterSubmitResult) {
+    if (!isInteractive) return;
+    const interactiveBeat = beat.kind === "guided" || beat.kind === "check" ? beat : null;
+    if (!interactiveBeat) return;
+    const expected = interactiveBeat.expectedAnswer;
+    const candidate =
+      typeof result.response.answer === "string"
+        ? result.response.answer
+        : result.response.selectedChoiceId ?? "";
+    const correct =
+      result.isCorrect === null ? isCorrect(expected, candidate) : result.isCorrect;
+
     setFeedback(correct ? "correct" : "incorrect");
     if (beat.kind === "check") {
       setChecksTotal((n) => n + 1);
@@ -239,8 +305,13 @@ export function LessonPlayer({
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         stepKind: "answer_submitted",
-        stepRefId: beat.kind === "guided" ? beat.gpId : beat.kind === "check" ? beat.checkId : null,
-        response: answer,
+        stepRefId:
+          interactiveBeat.kind === "guided"
+            ? interactiveBeat.gpId
+            : interactiveBeat.kind === "check"
+              ? interactiveBeat.checkId
+              : null,
+        response: candidate,
         isCorrect: correct,
       }),
     }).catch(() => {});
@@ -263,7 +334,6 @@ export function LessonPlayer({
   function useScaffold() {
     if (beat.kind !== "guided") return;
     setScaffoldsUsed((n) => n + 1);
-    setAnswer(beat.expectedAnswer ?? "");
     fetch(`/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/step`, {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -382,33 +452,12 @@ export function LessonPlayer({
 
           {beat.kind === "guided" && (
             <>
-              <p className="font-display text-2xl">
-                <MathText>{beat.prompt}</MathText>
-              </p>
-              {beat.choices ? (
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {beat.choices.map((c) => (
-                    <Button
-                      key={c}
-                      variant={answer === c ? "default" : "soft"}
-                      onClick={() => setAnswer(c)}
-                    >
-                      <MathText>{c}</MathText>
-                    </Button>
-                  ))}
-                </div>
-              ) : (
-                <input
-                  className="w-full rounded-md border border-aivo-border p-3"
-                  placeholder="Type your answer…"
-                  value={answer}
-                  onChange={(e) => setAnswer(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") submitAnswer();
-                  }}
-                  aria-label="Your answer"
-                />
-              )}
+              <SurfaceRouter
+                item={toSurfaceItem(beat)}
+                accessibilitySettings={accessibility}
+                onSubmitAndAdvance={submitSurface}
+                onEvent={emitSurfaceTelemetry}
+              />
               {showHint && (
                 <p className="rounded-md bg-amber-50 p-3 text-sm text-amber-900">
                   Hint: <MathText>{beat.hint}</MathText>
@@ -423,9 +472,6 @@ export function LessonPlayer({
                 </p>
               )}
               <div className="flex flex-wrap gap-2">
-                <Button onClick={submitAnswer} disabled={!answer.trim()}>
-                  Check
-                </Button>
                 <Button variant="soft" onClick={requestHint} disabled={showHint}>
                   Hint
                 </Button>
@@ -438,33 +484,12 @@ export function LessonPlayer({
 
           {beat.kind === "check" && (
             <>
-              <p className="font-display text-2xl">
-                <MathText>{beat.prompt}</MathText>
-              </p>
-              {beat.choices ? (
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {beat.choices.map((c) => (
-                    <Button
-                      key={c}
-                      variant={answer === c ? "default" : "soft"}
-                      onClick={() => setAnswer(c)}
-                    >
-                      <MathText>{c}</MathText>
-                    </Button>
-                  ))}
-                </div>
-              ) : (
-                <input
-                  className="w-full rounded-md border border-aivo-border p-3"
-                  placeholder="Type your answer…"
-                  value={answer}
-                  onChange={(e) => setAnswer(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") submitAnswer();
-                  }}
-                  aria-label="Your answer"
-                />
-              )}
+              <SurfaceRouter
+                item={toSurfaceItem(beat)}
+                accessibilitySettings={accessibility}
+                onSubmitAndAdvance={submitSurface}
+                onEvent={emitSurfaceTelemetry}
+              />
               {feedback === "correct" && (
                 <p className="rounded-md bg-emerald-50 p-3 text-sm text-emerald-900">
                   Yes! You've got this.
@@ -475,11 +500,6 @@ export function LessonPlayer({
                   Close — <MathText>{beat.supportIfWrong}</MathText>
                 </p>
               )}
-              <div className="flex gap-2">
-                <Button onClick={submitAnswer} disabled={!answer.trim() || feedback !== null}>
-                  Check
-                </Button>
-              </div>
             </>
           )}
         </div>

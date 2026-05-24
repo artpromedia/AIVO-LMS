@@ -45,6 +45,8 @@ export interface LearnerSurfaceSpec {
   codingSandbox?: CodingSandboxSpec;
   /** Sprint 9 — set when type === "art_canvas". */
   artCanvas?: ArtCanvasSpec;
+  /** Sprint 31 — set when type === "number_line". */
+  numberLine?: NumberLineSpec;
 }
 
 export interface SurfaceCaptureSpec {
@@ -147,6 +149,12 @@ export interface ArtCanvasSpec {
   palette?: string[];
   /** When true, the canvas starts with a faint grid for composition. */
   showGuides?: boolean;
+}
+
+export interface NumberLineSpec {
+  min: number;
+  max: number;
+  step: number;
 }
 
 export interface GeometryDiagramSpec {
