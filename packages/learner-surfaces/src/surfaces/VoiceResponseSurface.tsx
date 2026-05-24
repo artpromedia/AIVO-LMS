@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { LearnerSurfaceSpec, SurfaceResponse, VoiceResponsePayload } from "../types.js";
+import type {
+  LearnerSurfaceSpec,
+  SurfaceResponse,
+  VoiceResponsePayload,
+} from "../types.js";
 import { createSurfaceEvent, type SurfaceTelemetryEvent } from "../telemetry/surface-events.js";
 
 export interface VoiceResponseSurfaceProps {
@@ -9,10 +13,19 @@ export interface VoiceResponseSurfaceProps {
   onEvent?: (event: SurfaceTelemetryEvent) => void;
 }
 
-type RecorderState = "idle" | "recording" | "recorded" | "denied" | "unsupported";
+type RecorderState =
+  | "idle"
+  | "recording"
+  | "uploading"
+  | "recorded"
+  | "denied"
+  | "unsupported";
 
-const MAX_DURATION_MS = 60_000;
+const DEFAULT_MAX_DURATION_MS = 60_000;
 const MAX_RECORDED_BYTES = 5 * 1024 * 1024;
+const DEFAULT_SCORE_URL = "/api/speech-eval/evaluate";
+/** Number of frequency buckets visualised in the level meter bar. */
+const METER_BARS = 20;
 
 function pickMime(): string | undefined {
   if (typeof window === "undefined" || typeof MediaRecorder === "undefined") return undefined;
@@ -36,14 +49,42 @@ async function blobToDataUrl(blob: Blob): Promise<string> {
   });
 }
 
+interface ScoreResult {
+  transcript: string;
+  scores: {
+    pronunciation: number;
+    fluency: number;
+    perWord?: Array<{ word: string; score: number }>;
+  };
+  degraded: boolean;
+}
+
+async function uploadAndScore(
+  blob: Blob,
+  mimeType: string,
+  targetText: string,
+  language: string,
+  scoreServiceUrl: string,
+): Promise<ScoreResult> {
+  const form = new FormData();
+  form.append("audio", blob, `recording.${mimeType.split("/")[1]?.split(";")[0] ?? "webm"}`);
+  form.append("targetText", targetText);
+  form.append("language", language);
+  const res = await fetch(scoreServiceUrl, { method: "POST", body: form });
+  if (!res.ok) {
+    throw new Error(`speech-eval-svc returned ${res.status}`);
+  }
+  return res.json() as Promise<ScoreResult>;
+}
+
 /**
- * Sprint 10 — Voice response surface.
+ * Sprint 4.3 — Voice response surface.
  *
- * Captures a single take of learner audio via MediaRecorder and ships
- * it back as a base64 data URL on `response.voiceResponse`. Deliberately
- * does NOT call any transcription endpoint itself — the scoring
- * service decides whether to STT, score the waveform, or both. This
- * surface is mounted under the `lingua` (Languages) tutor entitlement.
+ * Captures learner audio via MediaRecorder, uploads to speech-eval-svc,
+ * and displays ASR transcript + pronunciation/fluency scores. Honors
+ * large-text and reduced-motion accessibility preferences. Emits
+ * voice-record-start, voice-record-stop, voice-upload, and
+ * voice-score-received telemetry events.
  */
 export function VoiceResponseSurface({
   surface,
@@ -51,9 +92,19 @@ export function VoiceResponseSurface({
   onSubmit,
   onEvent,
 }: VoiceResponseSurfaceProps) {
+  const spec = surface.voiceResponse;
+  const language = spec?.language ?? "en-US";
+  const targetText = spec?.targetText ?? surface.prompt;
+  const maxDurationMs = (spec?.maxDurationSeconds ?? 60) * 1_000;
+  const scoreServiceUrl = spec?.scoreServiceUrl ?? DEFAULT_SCORE_URL;
+  const reducedMotion = surface.accessibility.reduceMotionSafe;
+  const largeText = (surface.accessibility as any).largeText as boolean | undefined;
+
   const [state, setState] = useState<RecorderState>("idle");
   const [recording, setRecording] = useState<VoiceResponsePayload | null>(null);
   const [elapsed, setElapsed] = useState(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [meterLevel, setMeterLevel] = useState(0); // 0–1 normalised
 
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -63,6 +114,17 @@ export function VoiceResponseSurface({
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const mimeRef = useRef<string>("audio/webm");
   const bytesRef = useRef<number>(0);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const meterRafRef = useRef<number | null>(null);
+
+  const stopMeter = useCallback(() => {
+    if (meterRafRef.current !== null) {
+      cancelAnimationFrame(meterRafRef.current);
+      meterRafRef.current = null;
+    }
+    setMeterLevel(0);
+  }, []);
 
   const cleanup = useCallback(() => {
     if (timeoutRef.current) {
@@ -72,6 +134,14 @@ export function VoiceResponseSurface({
     if (tickRef.current) {
       clearInterval(tickRef.current);
       tickRef.current = null;
+    }
+    stopMeter();
+    if (analyserRef.current) {
+      analyserRef.current = null;
+    }
+    if (audioCtxRef.current) {
+      try { audioCtxRef.current.close(); } catch { /* already closed */ }
+      audioCtxRef.current = null;
     }
     if (recorderRef.current && recorderRef.current.state !== "inactive") {
       try {
@@ -85,13 +155,42 @@ export function VoiceResponseSurface({
       streamRef.current.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
     }
-  }, []);
+  }, [stopMeter]);
 
   useEffect(() => () => cleanup(), [cleanup]);
 
+  const startMeter = useCallback((stream: MediaStream) => {
+    if (reducedMotion) return; // skip animation when reduced-motion is on
+    try {
+      const ctx = new AudioContext();
+      audioCtxRef.current = ctx;
+      const source = ctx.createMediaStreamSource(stream);
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+      analyserRef.current = analyser;
+
+      const buf = new Uint8Array(analyser.frequencyBinCount);
+      const tick = () => {
+        if (!analyserRef.current) return;
+        analyserRef.current.getByteFrequencyData(buf);
+        const avg = buf.reduce((s, v) => s + v, 0) / buf.length;
+        setMeterLevel(avg / 255);
+        meterRafRef.current = requestAnimationFrame(tick);
+      };
+      meterRafRef.current = requestAnimationFrame(tick);
+    } catch {
+      // AudioContext not available (SSR / test env)
+    }
+  }, [reducedMotion]);
+
   const start = useCallback(async () => {
     if (disabled || state === "recording") return;
-    if (typeof window === "undefined" || typeof MediaRecorder === "undefined" || !navigator.mediaDevices?.getUserMedia) {
+    if (
+      typeof window === "undefined" ||
+      typeof MediaRecorder === "undefined" ||
+      !navigator.mediaDevices?.getUserMedia
+    ) {
       setState("unsupported");
       return;
     }
@@ -100,7 +199,9 @@ export function VoiceResponseSurface({
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     } catch (err) {
       const name = (err as { name?: string })?.name ?? "";
-      setState(name === "NotAllowedError" || name === "SecurityError" ? "denied" : "unsupported");
+      setState(
+        name === "NotAllowedError" || name === "SecurityError" ? "denied" : "unsupported",
+      );
       return;
     }
     streamRef.current = stream;
@@ -119,12 +220,7 @@ export function VoiceResponseSurface({
     recorder.ondataavailable = (event) => {
       if (!event.data || event.data.size === 0) return;
       if (bytesRef.current + event.data.size > MAX_RECORDED_BYTES) {
-        // Hard cap to keep the upload reasonable; stop early.
-        try {
-          recorder.stop();
-        } catch {
-          // already stopping
-        }
+        try { recorder.stop(); } catch { /* already stopping */ }
         return;
       }
       bytesRef.current += event.data.size;
@@ -138,12 +234,37 @@ export function VoiceResponseSurface({
         setState("idle");
         return;
       }
+
+      onEvent?.(createSurfaceEvent(surface.id, "tool_changed", { tool: "voice_record_stop", durationMs }));
+
+      setState("uploading");
+      setUploadError(null);
+      onEvent?.(createSurfaceEvent(surface.id, "tool_changed", { tool: "voice_upload", bytes: blob.size }));
+
+      let scoreResult: ScoreResult | null = null;
+      try {
+        scoreResult = await uploadAndScore(blob, mimeRef.current, targetText, language, scoreServiceUrl);
+        onEvent?.(
+          createSurfaceEvent(surface.id, "answer_changed", {
+            kind: "voice_score_received",
+            pronunciation: scoreResult.scores.pronunciation,
+            fluency: scoreResult.scores.fluency,
+            degraded: scoreResult.degraded,
+          }),
+        );
+      } catch (err: any) {
+        setUploadError(err?.message ?? "Upload failed");
+      }
+
       try {
         const dataUrl = await blobToDataUrl(blob);
         const payload: VoiceResponsePayload = {
           audioDataUrl: dataUrl,
           mimeType: mimeRef.current,
           durationMs,
+          transcript: scoreResult?.transcript,
+          scores: scoreResult?.scores,
+          degraded: scoreResult?.degraded,
         };
         setRecording(payload);
         setState("recorded");
@@ -161,28 +282,22 @@ export function VoiceResponseSurface({
     recorderRef.current = recorder;
     startedAtRef.current = Date.now();
     setElapsed(0);
+    setRecording(null);
     recorder.start();
     setState("recording");
     onEvent?.(createSurfaceEvent(surface.id, "tool_changed", { tool: "voice_record_start" }));
+    startMeter(stream);
     tickRef.current = setInterval(() => {
       setElapsed(Date.now() - startedAtRef.current);
     }, 250);
     timeoutRef.current = setTimeout(() => {
-      try {
-        recorder.stop();
-      } catch {
-        // already stopped
-      }
-    }, MAX_DURATION_MS);
-  }, [cleanup, disabled, onEvent, state, surface.id]);
+      try { recorder.stop(); } catch { /* already stopped */ }
+    }, Math.min(maxDurationMs, DEFAULT_MAX_DURATION_MS));
+  }, [cleanup, disabled, language, maxDurationMs, onEvent, scoreServiceUrl, startMeter, state, surface.id, targetText]);
 
   const stop = useCallback(() => {
     if (recorderRef.current && recorderRef.current.state === "recording") {
-      try {
-        recorderRef.current.stop();
-      } catch {
-        // already stopped
-      }
+      try { recorderRef.current.stop(); } catch { /* already stopped */ }
     }
   }, []);
 
@@ -190,38 +305,81 @@ export function VoiceResponseSurface({
     setRecording(null);
     setState("idle");
     setElapsed(0);
+    setUploadError(null);
   }, []);
 
   const submitDisabled =
     disabled ||
     (surface.capture.finalAnswer && !recording) ||
-    state === "recording";
+    state === "recording" ||
+    state === "uploading";
 
   const elapsedSeconds = Math.floor(elapsed / 1000);
+  const maxSeconds = Math.round(maxDurationMs / 1_000);
+  const textClass = largeText ? "text-lg" : "";
+
+  // Level meter: split 0–1 into METER_BARS buckets
+  const activeBars = Math.round(meterLevel * METER_BARS);
 
   return (
-    <section aria-label="voice-response-surface">
+    <section aria-label="voice-response-surface" className={textClass}>
       <p>{surface.prompt}</p>
       {surface.instructions ? <p>{surface.instructions}</p> : null}
 
       {state === "denied" ? (
-        <p role="alert">Microphone access was denied. Allow it in your browser settings to record an answer.</p>
+        <p role="alert">
+          Microphone access was denied. Allow it in your browser settings to record an answer.
+        </p>
       ) : state === "unsupported" ? (
         <p role="alert">Voice recording isn&apos;t supported on this device or browser.</p>
       ) : null}
 
+      {uploadError ? (
+        <p role="alert" aria-live="polite">
+          Score upload failed: {uploadError}. You can still submit your recording.
+        </p>
+      ) : null}
+
+      {/* Level meter — hidden when reduced-motion is on */}
+      {state === "recording" && !reducedMotion ? (
+        <div
+          role="img"
+          aria-label={`recording level ${Math.round(meterLevel * 100)}%`}
+          aria-hidden="true"
+          style={{ display: "flex", gap: 2, height: 16, alignItems: "flex-end" }}
+        >
+          {Array.from({ length: METER_BARS }, (_, i) => (
+            <div
+              key={i}
+              style={{
+                width: 6,
+                height: i < activeBars ? "100%" : "20%",
+                background: i < activeBars ? "#22c55e" : "#d1d5db",
+                borderRadius: 2,
+                transition: "height 0.1s",
+              }}
+            />
+          ))}
+        </div>
+      ) : null}
+
       <div role="group" aria-label="voice recorder">
         {state === "recording" ? (
-          <button type="button" aria-label="stop recording" onClick={stop} disabled={disabled}>
-            ■ Stop ({elapsedSeconds}s)
-          </button>
+          <>
+            <p aria-live="polite" aria-atomic="true">
+              Recording… {elapsedSeconds}s / {maxSeconds}s
+            </p>
+            <button type="button" aria-label="stop recording" onClick={stop} disabled={disabled}>
+              ■ Stop
+            </button>
+          </>
+        ) : state === "uploading" ? (
+          <p aria-live="polite" aria-atomic="true">Uploading and scoring…</p>
         ) : (
           <button
             type="button"
             aria-label="record voice answer"
-            onClick={() => {
-              void start();
-            }}
+            onClick={() => { void start(); }}
             disabled={disabled || state === "denied" || state === "unsupported"}
           >
             {recording ? "● Re-record" : "● Record"}
@@ -235,6 +393,33 @@ export function VoiceResponseSurface({
               controls
               aria-label="recorded voice answer playback"
             />
+            {recording.transcript ? (
+              <div aria-label="transcript">
+                <strong>Transcript:</strong> {recording.transcript}
+                {recording.degraded ? (
+                  <span title="Mock scores — real ASR not yet wired"> (preview)</span>
+                ) : null}
+              </div>
+            ) : null}
+            {recording.scores ? (
+              <div aria-label="scores">
+                <div>
+                  <strong>Pronunciation:</strong> {recording.scores.pronunciation}/100
+                </div>
+                <div>
+                  <strong>Fluency:</strong> {recording.scores.fluency}/100
+                </div>
+                {recording.scores.perWord && recording.scores.perWord.length > 0 ? (
+                  <ul aria-label="per-word pronunciation scores">
+                    {recording.scores.perWord.map((pw) => (
+                      <li key={pw.word}>
+                        {pw.word}: {pw.score}/100
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            ) : null}
             <button
               type="button"
               aria-label="discard recording"
@@ -256,6 +441,7 @@ export function VoiceResponseSurface({
             createSurfaceEvent(surface.id, "surface_submitted", {
               kind: "voice_response",
               durationMs: recording?.durationMs ?? 0,
+              hasScores: Boolean(recording?.scores),
             }),
           );
           onSubmit?.({
@@ -270,3 +456,4 @@ export function VoiceResponseSurface({
     </section>
   );
 }
+

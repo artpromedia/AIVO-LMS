@@ -22,7 +22,7 @@ export type {
   GeometryAction,
   CodingSandboxSpec,
   ArtCanvasSpec,
-  SurfaceAttachment,
+  VoiceResponseSpec,
   VoiceResponsePayload,
   MediaSurfaceSpec,
   SurfaceAssetDescriptor,
