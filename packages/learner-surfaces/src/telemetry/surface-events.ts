@@ -1,11 +1,15 @@
 export type SurfaceTelemetryEventType =
   | "surface_started"
   | "surface_submitted"
+  | "complete"
   | "ink_started"
   | "ink_completed"
   | "ink_undo"
   | "ink_clear"
   | "answer_changed"
+  | "code-run"
+  | "code-test-pass"
+  | "code-test-fail"
   | "tool_changed"
   | "geometry_action"
   | "unsupported_surface";

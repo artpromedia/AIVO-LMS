@@ -14,7 +14,7 @@ const baseSurface: Omit<LearnerSurfaceSpec, "id" | "type" | "prompt"> = {
 };
 
 describe("SurfaceHost", () => {
-  it("renders scratchpad, geometry, and choice-grid surfaces", () => {
+  it("renders scratchpad, geometry, choice-grid, and coding surfaces", () => {
     const scratchpadMarkup = renderToStaticMarkup(
       <SurfaceHost
         surface={{
@@ -59,9 +59,31 @@ describe("SurfaceHost", () => {
       />,
     );
 
+    const codingMarkup = renderToStaticMarkup(
+      <SurfaceHost
+        surface={{
+          ...baseSurface,
+          id: "s4",
+          type: "coding_sandbox",
+          prompt: "Write a function",
+          codingSandbox: {
+            language: "javascript",
+            starterCode: "export function add(a, b) { return a + b; }",
+            correctness: {
+              type: "coding",
+              language: "javascript",
+              starterCode: "export function add(a, b) { return a + b; }",
+              tests: [{ name: "add", kind: "returns", input: [2, 3], expected: 5 }],
+            },
+          },
+        }}
+      />,
+    );
+
     expect(scratchpadMarkup).toContain("scratchpad-surface");
     expect(geometryMarkup).toContain("geometry-surface");
     expect(choiceMarkup).toContain("choice-grid-surface");
+    expect(codingMarkup).toContain("coding-sandbox-surface");
   });
 
   it("renders fallback and emits telemetry for unsupported surfaces", () => {
@@ -71,7 +93,7 @@ describe("SurfaceHost", () => {
       <SurfaceHost
         surface={{
           ...baseSurface,
-          id: "s4",
+          id: "s5",
           type: "graph",
           prompt: "Unsupported",
         }}

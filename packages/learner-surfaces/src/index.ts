@@ -38,6 +38,17 @@ export {
   type CodingSandboxSurfaceProps,
 } from "./surfaces/CodingSandboxSurface.js";
 export {
+  runJavascriptRubricTests,
+  buildSnippetTelemetry,
+  type CodingRubric,
+  type CodingRubricTest,
+  type CodingLanguage,
+  type CodingRunResult,
+  type CodingTestResult,
+  CODING_FIXTURE_ITEMS,
+  type CodingFixtureItem,
+} from "./CodingSandbox/index.js";
+export {
   ArtCanvasSurface,
   type ArtCanvasSurfaceProps,
 } from "./surfaces/ArtCanvasSurface.js";

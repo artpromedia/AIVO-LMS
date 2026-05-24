@@ -31,11 +31,8 @@ import { LEARNER_SUBJECTS } from "@aivo/brand";
 // `LEARNER_SUBJECTS` registry in `@aivo/brand` so that web slugs,
 // subject-brain ids, and tutor keys stay in lock-step across the
 // learner UI, BFF, and adaptive engines (Sprint 12). We filter to the
-// set the legacy web seed already shipped — new registry rows
-// (social-studies, world-languages, coding) are exposed through the
-// registry for new code to consume but are not auto-added to the
-// existing learner subjects grid to avoid surprising downstream
-// teacher / parent surfaces.
+// set the legacy web seed already shipped. Coding is now included so
+// learner surfaces can run full coding lessons in web-v2.
 const WEB_SEEDED_SUBJECT_SLUGS = new Set([
   "reading",
   "math",
@@ -46,6 +43,7 @@ const WEB_SEEDED_SUBJECT_SLUGS = new Set([
   "writing",
   "life",
   "art",
+  "coding",
 ]);
 const SUBJECTS: Omit<Subject, "id">[] = LEARNER_SUBJECTS.filter((s) =>
   WEB_SEEDED_SUBJECT_SLUGS.has(s.slug),
@@ -105,6 +103,12 @@ const SKILL_SEED: { subjectSlug: string; slug: string; name: string; gradeBand: 
   },
   { subjectSlug: "life", slug: "morning-routine", name: "Morning routine", gradeBand: "K-2" },
   { subjectSlug: "art", slug: "primary-colors", name: "Primary colors", gradeBand: "PreK-K" },
+  { subjectSlug: "coding", slug: "variables-basics", name: "Variables", gradeBand: "3-5" },
+  { subjectSlug: "coding", slug: "conditionals-if-else", name: "Conditionals", gradeBand: "3-5" },
+  { subjectSlug: "coding", slug: "loops-for-while", name: "Loops", gradeBand: "3-5" },
+  { subjectSlug: "coding", slug: "functions-basics", name: "Functions", gradeBand: "3-5" },
+  { subjectSlug: "coding", slug: "arrays-lists", name: "Arrays and lists", gradeBand: "6-8" },
+  { subjectSlug: "coding", slug: "debugging-strategies", name: "Debugging", gradeBand: "6-8" },
 ];
 
 export function ensureSeeded(): void {

@@ -1,3 +1,4 @@
+import type { CodingLanguage, CodingRubricTest } from "./CodingSandbox/types.js";
 import type { InkStroke } from "./ink/stroke-model.js";
 
 export type LearnerSurfaceType =
@@ -128,12 +129,30 @@ export interface ChoiceOption {
  * without modification.
  */
 export interface CodingSandboxSpec {
-  language: "python" | "javascript" | "blockly" | "pseudo";
+  language: CodingLanguage;
   starterCode?: string;
+  /**
+   * Item correctness rubric used by the in-browser test runner.
+   * Hidden tests are executed but learner-visible output only shows
+   * pass/fail for those cases.
+   */
+  correctness?: {
+    type: "coding";
+    language: CodingLanguage;
+    starterCode: string;
+    tests: CodingRubricTest[];
+  };
+  /** Capture raw source in telemetry only when explicitly enabled. */
+  captureSource?: boolean;
   /** Optional non-editable preamble shown above the editor. */
   prelude?: string;
   /** Soft hint shown beneath the editor; not used for scoring. */
   hint?: string;
+  accessibility?: {
+    highContrast?: boolean;
+    largeText?: boolean;
+    dyslexiaFriendlyFont?: boolean;
+  };
 }
 
 /**
