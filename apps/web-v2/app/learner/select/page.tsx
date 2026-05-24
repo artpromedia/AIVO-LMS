@@ -48,19 +48,11 @@ export default async function LearnerSelectPage({
   const learners = listLearnersForParent(session.userId, session.tenantId);
   const params = await searchParams;
 
-  // Single learner → auto-select and proceed.
+  // Single learner → auto-select and proceed. Cookies can only be mutated in
+  // a Server Action or Route Handler in Next.js 15, so we bounce through the
+  // `/learner/select/auto` route handler which sets the cookie and redirects.
   if (learners.length === 1) {
-    const jar = await cookies();
-    jar.set({
-      name: ACTIVE_LEARNER_COOKIE,
-      value: learners[0].id,
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 30,
-    });
-    redirect("/learner/home");
+    redirect(`/learner/select/auto?learnerId=${encodeURIComponent(learners[0].id)}`);
   }
 
   return (
