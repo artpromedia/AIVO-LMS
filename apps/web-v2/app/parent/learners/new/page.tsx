@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -59,26 +60,26 @@ async function addLearnerAction(formData: FormData) {
 }
 
 const AGE_RANGES = ["3-5", "5-7", "7-9", "9-11", "11-13", "13-15", "15-18"];
-const GRADE_BANDS: { value: string; label: string }[] = [
-  { value: "preK", label: "Pre-K" },
-  { value: "K", label: "Kindergarten" },
-  { value: "1-2", label: "Grades 1–2" },
-  { value: "3-5", label: "Grades 3–5" },
-  { value: "6-8", label: "Grades 6–8" },
-  { value: "9-12", label: "Grades 9–12" },
-  { value: "post_secondary", label: "Post-secondary" },
+const GRADE_BANDS: { value: string; labelKey: string }[] = [
+  { value: "preK", labelKey: "grade_preK" },
+  { value: "K", labelKey: "grade_K" },
+  { value: "1-2", labelKey: "grade_1_2" },
+  { value: "3-5", labelKey: "grade_3_5" },
+  { value: "6-8", labelKey: "grade_6_8" },
+  { value: "9-12", labelKey: "grade_9_12" },
+  { value: "post_secondary", labelKey: "grade_post_secondary" },
 ];
-const SCHOOL_CONTEXT: { value: string; label: string }[] = [
-  { value: "in_school", label: "In school" },
-  { value: "homeschool", label: "Homeschool" },
-  { value: "hybrid", label: "Hybrid" },
-  { value: "not_in_school", label: "Not in school" },
+const SCHOOL_CONTEXT: { value: string; labelKey: string }[] = [
+  { value: "in_school", labelKey: "school_in_school" },
+  { value: "homeschool", labelKey: "school_homeschool" },
+  { value: "hybrid", labelKey: "school_hybrid" },
+  { value: "not_in_school", labelKey: "school_not_in_school" },
 ];
-const COMFORTS: { value: string; label: string }[] = [
-  { value: "new", label: "Just starting" },
-  { value: "growing", label: "Growing" },
-  { value: "confident", label: "Confident" },
-  { value: "advanced", label: "Advanced" },
+const COMFORTS: { value: string; labelKey: string }[] = [
+  { value: "new", labelKey: "comfort_new" },
+  { value: "growing", labelKey: "comfort_growing" },
+  { value: "confident", labelKey: "comfort_confident" },
+  { value: "advanced", labelKey: "comfort_advanced" },
 ];
 
 /**
@@ -111,6 +112,7 @@ export default async function NewLearnerPage({
   const session = await requirePageRole(["parent"]);
   const params = await searchParams;
   const currentYear = new Date().getFullYear();
+  const t = await getTranslations("parent.add_learner");
 
   return (
     <AppShell
@@ -121,15 +123,15 @@ export default async function NewLearnerPage({
     >
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
         <PageHeader
-          title="Add a learner"
-          description="Just the basics now — you can update everything later from learner settings."
+          title={t("title")}
+          description={t("description")}
         />
 
         {params.error === "invalid" && (
           <Banner
             tone="danger"
-            title="A few details still need fixing."
-            description="At minimum we need a first name and a valid birth year. Scroll up to see which fields are required."
+            title={t("error_invalid_title")}
+            description={t("error_invalid_description")}
           />
         )}
 
@@ -137,15 +139,15 @@ export default async function NewLearnerPage({
           {/* Section 1 — About your learner. */}
           <Card className="flex flex-col gap-5 p-6">
             <header className="flex flex-col gap-1">
-              <h2 className="text-base font-semibold text-iw-ink">About your learner</h2>
+              <h2 className="text-base font-semibold text-iw-ink">{t("section_about_title")}</h2>
               <p className="text-sm text-iw-ink-muted">
-                The name AIVO will use and a few identity basics.
+                {t("section_about_description")}
               </p>
             </header>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="firstName" required>
-                  First name
+                  {t("first_name")}
                 </Label>
                 <Input
                   id="firstName"
@@ -157,18 +159,18 @@ export default async function NewLearnerPage({
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="preferredName" optional>
-                  Preferred name
+                  {t("preferred_name")}
                 </Label>
                 <Input
                   id="preferredName"
                   name="preferredName"
                   maxLength={80}
-                  placeholder="Nickname AIVO should use"
+                  placeholder={t("preferred_name_placeholder")}
                 />
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="birthYear" required>
-                  Birth year
+                  {t("birth_year")}
                 </Label>
                 <Input
                   id="birthYear"
@@ -183,9 +185,9 @@ export default async function NewLearnerPage({
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="pronouns" optional>
-                  Pronouns
+                  {t("pronouns")}
                 </Label>
-                <Input id="pronouns" name="pronouns" maxLength={40} placeholder="e.g. she/her" />
+                <Input id="pronouns" name="pronouns" maxLength={40} placeholder={t("pronouns_placeholder")} />
               </div>
             </div>
           </Card>
@@ -193,15 +195,15 @@ export default async function NewLearnerPage({
           {/* Section 2 — School & language. */}
           <Card className="flex flex-col gap-5 p-6">
             <header className="flex flex-col gap-1">
-              <h2 className="text-base font-semibold text-iw-ink">School &amp; language</h2>
+              <h2 className="text-base font-semibold text-iw-ink">{t("section_school_title")}</h2>
               <p className="text-sm text-iw-ink-muted">
-                Helps AIVO match grade-level pacing and reading materials.
+                {t("section_school_description")}
               </p>
             </header>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="ageRange" optional>
-                  Age range
+                  {t("age_range")}
                 </Label>
                 <select
                   id="ageRange"
@@ -209,7 +211,7 @@ export default async function NewLearnerPage({
                   defaultValue=""
                   className="h-11 w-full rounded-iw-control border border-iw-border bg-iw-raised px-3 text-sm text-iw-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring"
                 >
-                  <option value="">Choose…</option>
+                  <option value="">{t("choose")}</option>
                   {AGE_RANGES.map((v) => (
                     <option key={v} value={v}>
                       {v}
@@ -219,7 +221,7 @@ export default async function NewLearnerPage({
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="gradeBand" optional>
-                  Grade band
+                  {t("grade_band")}
                 </Label>
                 <select
                   id="gradeBand"
@@ -227,17 +229,17 @@ export default async function NewLearnerPage({
                   defaultValue=""
                   className="h-11 w-full rounded-iw-control border border-iw-border bg-iw-raised px-3 text-sm text-iw-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring"
                 >
-                  <option value="">Choose…</option>
+                  <option value="">{t("choose")}</option>
                   {GRADE_BANDS.map((v) => (
                     <option key={v.value} value={v.value}>
-                      {v.label}
+                      {t(v.labelKey)}
                     </option>
                   ))}
                 </select>
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="schoolContext" optional>
-                  School context
+                  {t("school_context")}
                 </Label>
                 <select
                   id="schoolContext"
@@ -245,23 +247,23 @@ export default async function NewLearnerPage({
                   defaultValue=""
                   className="h-11 w-full rounded-iw-control border border-iw-border bg-iw-raised px-3 text-sm text-iw-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring"
                 >
-                  <option value="">Choose…</option>
+                  <option value="">{t("choose")}</option>
                   {SCHOOL_CONTEXT.map((v) => (
                     <option key={v.value} value={v.value}>
-                      {v.label}
+                      {t(v.labelKey)}
                     </option>
                   ))}
                 </select>
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="primaryLanguage" optional>
-                  Primary language
+                  {t("primary_language")}
                 </Label>
                 <Input
                   id="primaryLanguage"
                   name="primaryLanguage"
                   maxLength={60}
-                  placeholder="English"
+                  placeholder={t("primary_language_placeholder")}
                 />
               </div>
             </div>
@@ -270,15 +272,15 @@ export default async function NewLearnerPage({
           {/* Section 3 — Strengths & support. */}
           <Card className="flex flex-col gap-5 p-6">
             <header className="flex flex-col gap-1">
-              <h2 className="text-base font-semibold text-iw-ink">Strengths &amp; support</h2>
+              <h2 className="text-base font-semibold text-iw-ink">{t("section_strengths_title")}</h2>
               <p className="text-sm text-iw-ink-muted">
-                Anything you share here helps AIVO calibrate from day one. All optional.
+                {t("section_strengths_description")}
               </p>
             </header>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="readingComfort" optional>
-                  Reading comfort
+                  {t("reading_comfort")}
                 </Label>
                 <select
                   id="readingComfort"
@@ -286,17 +288,17 @@ export default async function NewLearnerPage({
                   defaultValue=""
                   className="h-11 w-full rounded-iw-control border border-iw-border bg-iw-raised px-3 text-sm text-iw-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring"
                 >
-                  <option value="">Choose…</option>
+                  <option value="">{t("choose")}</option>
                   {COMFORTS.map((v) => (
                     <option key={v.value} value={v.value}>
-                      {v.label}
+                      {t(v.labelKey)}
                     </option>
                   ))}
                 </select>
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="mathComfort" optional>
-                  Math comfort
+                  {t("math_comfort")}
                 </Label>
                 <select
                   id="mathComfort"
@@ -304,37 +306,37 @@ export default async function NewLearnerPage({
                   defaultValue=""
                   className="h-11 w-full rounded-iw-control border border-iw-border bg-iw-raised px-3 text-sm text-iw-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring"
                 >
-                  <option value="">Choose…</option>
+                  <option value="">{t("choose")}</option>
                   {COMFORTS.map((v) => (
                     <option key={v.value} value={v.value}>
-                      {v.label}
+                      {t(v.labelKey)}
                     </option>
                   ))}
                 </select>
               </div>
               <div className="flex flex-col gap-2 sm:col-span-2">
                 <Label htmlFor="knownStrengths" optional>
-                  Known strengths
+                  {t("known_strengths")}
                 </Label>
                 <Textarea
                   id="knownStrengths"
                   name="knownStrengths"
                   rows={3}
-                  placeholder="Loves animals · great at puzzles · remembers song lyrics"
+                  placeholder={t("known_strengths_placeholder")}
                 />
                 <p className="text-xs text-iw-ink-muted">
-                  One per line, or separate with commas. Up to 20 entries.
+                  {t("known_strengths_help")}
                 </p>
               </div>
               <div className="flex flex-col gap-2 sm:col-span-2">
                 <Label htmlFor="knownChallenges" optional>
-                  Known challenges
+                  {t("known_challenges")}
                 </Label>
                 <Textarea
                   id="knownChallenges"
                   name="knownChallenges"
                   rows={3}
-                  placeholder="Easily distracted by sound · reluctant to write"
+                  placeholder={t("known_challenges_placeholder")}
                 />
               </div>
             </div>
@@ -342,10 +344,10 @@ export default async function NewLearnerPage({
 
           <div className="flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-end">
             <Button asChild variant="ghost" size="md">
-              <a href="/parent/learners">Cancel</a>
+              <a href="/parent/learners">{t("cancel")}</a>
             </Button>
             <Button type="submit" variant="default" size="lg">
-              Add learner
+              {t("submit")}
             </Button>
           </div>
         </form>

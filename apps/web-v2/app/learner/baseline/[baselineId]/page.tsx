@@ -141,6 +141,19 @@ async function completeAction(formData: FormData) {
       },
     });
   }
+  // Sprint 14: when the brain clone landed cleanly, route into the
+  // awakening / watch sequence (the user-facing "wow" moment) instead of
+  // dropping the user back on a summary card. The clone routes themselves
+  // re-redirect to the baseline summary if their gates aren't met (e.g.
+  // schema validation failure left cloneStage === "pre_clone"), so this
+  // is safe even when `result.clonedBrainProfile` is null.
+  if (result?.clonedBrainProfile) {
+    redirect(
+      asParent
+        ? `/parent/learners/${learnerId}/brain-clone-watch`
+        : `/learner/brain-clone/${learnerId}`,
+    );
+  }
   redirect(asParent ? `/parent/learners/${learnerId}/baseline` : `/learner/baseline/${baselineId}`);
 }
 

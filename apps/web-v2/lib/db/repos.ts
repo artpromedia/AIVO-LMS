@@ -570,6 +570,35 @@ export function cloneBrainFromBaseline(
   return commitBrainClone(prepared);
 }
 
+/**
+ * Parent approval gate (Sprint 14 brain-clone watch). Transitions a cloned
+ * brain profile to `approved` (or `amended` if the parent adjusted any
+ * settings before approving). Idempotent: re-approving an already-approved
+ * profile is a no-op. Returns null when no clone exists or it's still in
+ * `pre_clone` (baseline not yet finished).
+ */
+export function approveBrainClone(
+  learnerId: string,
+  tenantId: string,
+  options: { amended?: boolean } = {},
+): LearnerBrainProfile | null {
+  const existing = getBrainProfile(learnerId, tenantId);
+  if (!existing) return null;
+  if (existing.cloneStage === "pre_clone") return null;
+  const status: LearnerBrainProfile["approvalStatus"] = options.amended
+    ? "amended"
+    : "approved";
+  const next: LearnerBrainProfile = {
+    ...existing,
+    approvedByParent: true,
+    approvalStatus: status,
+    cloneStage: "approved",
+    updatedAt: nowIso(),
+  };
+  db().brainProfiles.set(existing.id, next);
+  return next;
+}
+
 // ===== Baseline (Sprint 8) =====
 
 export function getActiveBaselineForLearner(
