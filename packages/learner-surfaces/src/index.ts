@@ -23,9 +23,13 @@ export type {
   CodingSandboxSpec,
   ArtCanvasSpec,
   VoiceResponsePayload,
+  MediaSurfaceSpec,
+  SurfaceAssetDescriptor,
+  SurfaceUserAccessibilityPreferences,
 } from "./types.js";
 
 export { SurfaceHost, type SurfaceHostProps } from "./SurfaceHost.js";
+export { SurfaceRouter, type SurfaceRouterProps } from "./SurfaceRouter.js";
 export { ScratchpadSurface, type ScratchpadSurfaceProps } from "./surfaces/ScratchpadSurface.js";
 export { GeometrySurface, type GeometrySurfaceProps } from "./surfaces/GeometrySurface.js";
 export { ChoiceGridSurface, type ChoiceGridSurfaceProps } from "./surfaces/ChoiceGridSurface.js";
@@ -45,6 +49,8 @@ export {
   VoiceResponseSurface,
   type VoiceResponseSurfaceProps,
 } from "./surfaces/VoiceResponseSurface.js";
+export { VideoSurface, type VideoSurfaceProps } from "./Video/VideoSurface.js";
+export { AudioSurface, type AudioSurfaceProps } from "./Audio/AudioSurface.js";
 
 export {
   isSurfaceEntitled,

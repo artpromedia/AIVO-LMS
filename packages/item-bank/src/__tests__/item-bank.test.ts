@@ -145,4 +145,23 @@ describe("validateItemVariant", () => {
     expect(codes).toContain("missing_published_at");
     expect(codes).toContain("empty_body");
   });
+
+  it("requires captions assets for video/audio variants", () => {
+    const missingCaptions = validateItemVariant({
+      ...variant("v-media-1", 1),
+      surfaceType: "video",
+      assets: [{ type: "media", src: "https://cdn.example/video.m3u8" }],
+    }).map((i) => i.code);
+    expect(missingCaptions).toContain("missing_captions_asset_for_media_surface");
+
+    const withCaptions = validateItemVariant({
+      ...variant("v-media-2", 1),
+      surfaceType: "audio",
+      assets: [
+        { type: "media", src: "https://cdn.example/audio.m3u8" },
+        { type: "captions", src: "https://cdn.example/audio.en.vtt", lang: "en", default: true },
+      ],
+    }).map((i) => i.code);
+    expect(withCaptions).not.toContain("missing_captions_asset_for_media_surface");
+  });
 });

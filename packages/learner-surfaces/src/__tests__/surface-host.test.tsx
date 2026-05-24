@@ -14,7 +14,7 @@ const baseSurface: Omit<LearnerSurfaceSpec, "id" | "type" | "prompt"> = {
 };
 
 describe("SurfaceHost", () => {
-  it("renders scratchpad, geometry, and choice-grid surfaces", () => {
+  it("renders scratchpad, geometry, choice-grid, video, and audio surfaces", () => {
     const scratchpadMarkup = renderToStaticMarkup(
       <SurfaceHost
         surface={{
@@ -59,9 +59,57 @@ describe("SurfaceHost", () => {
       />,
     );
 
+    const videoMarkup = renderToStaticMarkup(
+      <SurfaceHost
+        surface={{
+          ...baseSurface,
+          id: "s5",
+          type: "video",
+          prompt: "Watch",
+          media: {
+            src: "https://example.invalid/video.m3u8",
+            mimeType: "application/x-mpegURL",
+            assets: [
+              {
+                type: "captions",
+                src: "data:text/vtt;charset=utf-8,WEBVTT",
+                lang: "en",
+                default: true,
+              },
+            ],
+          },
+        }}
+      />,
+    );
+
+    const audioMarkup = renderToStaticMarkup(
+      <SurfaceHost
+        surface={{
+          ...baseSurface,
+          id: "s6",
+          type: "audio",
+          prompt: "Listen",
+          media: {
+            src: "https://example.invalid/audio.mp3",
+            mimeType: "audio/mpeg",
+            assets: [
+              {
+                type: "captions",
+                src: "data:text/vtt;charset=utf-8,WEBVTT",
+                lang: "en",
+                default: true,
+              },
+            ],
+          },
+        }}
+      />,
+    );
+
     expect(scratchpadMarkup).toContain("scratchpad-surface");
     expect(geometryMarkup).toContain("geometry-surface");
     expect(choiceMarkup).toContain("choice-grid-surface");
+    expect(videoMarkup).toContain("video-surface");
+    expect(audioMarkup).toContain("audio-surface");
   });
 
   it("renders fallback and emits telemetry for unsupported surfaces", () => {
@@ -81,5 +129,29 @@ describe("SurfaceHost", () => {
 
     expect(unsupportedMarkup).toContain("Activity type unavailable");
     expect(events.some((event) => event.type === "unsupported_surface")).toBe(true);
+  });
+
+  it("requires captions for media surfaces and emits telemetry", () => {
+    const events: Array<{ type: string }> = [];
+
+    const markup = renderToStaticMarkup(
+      <SurfaceHost
+        surface={{
+          ...baseSurface,
+          id: "s7",
+          type: "video",
+          prompt: "Needs captions",
+          media: {
+            src: "https://example.invalid/video.mp4",
+            mimeType: "video/mp4",
+            assets: [],
+          },
+        }}
+        onEvent={(event) => events.push({ type: event.type })}
+      />,
+    );
+
+    expect(markup).toContain("Captions are required");
+    expect(events.some((event) => event.type === "captions_missing")).toBe(true);
   });
 });

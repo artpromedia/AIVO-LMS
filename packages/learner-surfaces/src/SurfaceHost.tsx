@@ -1,13 +1,11 @@
 import { useRef } from "react";
-import { ChoiceGridSurface } from "./surfaces/ChoiceGridSurface.js";
-import { GeometrySurface } from "./surfaces/GeometrySurface.js";
-import { MathExpressionSurface } from "./surfaces/MathExpressionSurface.js";
-import { ScratchpadSurface } from "./surfaces/ScratchpadSurface.js";
-import { CodingSandboxSurface } from "./surfaces/CodingSandboxSurface.js";
-import { ArtCanvasSurface } from "./surfaces/ArtCanvasSurface.js";
-import { VoiceResponseSurface } from "./surfaces/VoiceResponseSurface.js";
+import { SurfaceRouter } from "./SurfaceRouter.js";
 import { createSurfaceEvent, type SurfaceTelemetryEvent } from "./telemetry/surface-events.js";
-import type { LearnerSurfaceSpec, SurfaceResponse } from "./types.js";
+import type {
+  LearnerSurfaceSpec,
+  SurfaceResponse,
+  SurfaceUserAccessibilityPreferences,
+} from "./types.js";
 import {
   isSurfaceEntitled,
   requiredTutorForSurface,
@@ -27,6 +25,7 @@ export interface SurfaceHostProps {
    * renders normally (default-allow while entitlement data loads).
    */
   entitledTutors?: ReadonlySet<SurfaceTutorKey> | readonly SurfaceTutorKey[];
+  accessibilityPreferences?: SurfaceUserAccessibilityPreferences;
 }
 
 export function SurfaceHost({
@@ -35,6 +34,7 @@ export function SurfaceHost({
   onSubmit,
   onEvent,
   entitledTutors,
+  accessibilityPreferences,
 }: SurfaceHostProps) {
   const startedRef = useRef(false);
   const unsupportedRef = useRef(false);
@@ -69,83 +69,40 @@ export function SurfaceHost({
     );
   }
 
-  switch (surface.type) {
-    case "choice_grid":
-      return (
-        <ChoiceGridSurface
-          surface={surface}
-          disabled={disabled}
-          onSubmit={onSubmit}
-          onEvent={onEvent}
-        />
-      );
-    case "scratchpad":
-      return (
-        <ScratchpadSurface
-          surface={surface}
-          disabled={disabled}
-          onSubmit={onSubmit}
-          onEvent={onEvent}
-        />
-      );
-    case "geometry_workspace":
-      return (
-        <GeometrySurface
-          surface={surface}
-          disabled={disabled}
-          onSubmit={onSubmit}
-          onEvent={onEvent}
-        />
-      );
-    case "math_expression":
-      return (
-        <MathExpressionSurface
-          surface={surface}
-          disabled={disabled}
-          onSubmit={onSubmit}
-          onEvent={onEvent}
-        />
-      );
-    case "coding_sandbox":
-      return (
-        <CodingSandboxSurface
-          surface={surface}
-          disabled={disabled}
-          onSubmit={onSubmit}
-          onEvent={onEvent}
-        />
-      );
-    case "art_canvas":
-      return (
-        <ArtCanvasSurface
-          surface={surface}
-          disabled={disabled}
-          onSubmit={onSubmit}
-          onEvent={onEvent}
-        />
-      );
-    case "voice_response":
-      return (
-        <VoiceResponseSurface
-          surface={surface}
-          disabled={disabled}
-          onSubmit={onSubmit}
-          onEvent={onEvent}
-        />
-      );
-    default: {
-      if (!unsupportedRef.current) {
-        onEvent?.(
-          createSurfaceEvent(surface.id, "unsupported_surface", { unsupportedType: surface.type }),
-        );
-        unsupportedRef.current = true;
-      }
+  const supportedTypes = new Set([
+    "choice_grid",
+    "scratchpad",
+    "geometry_workspace",
+    "math_expression",
+    "coding_sandbox",
+    "art_canvas",
+    "voice_response",
+    "video",
+    "audio",
+  ]);
 
-      return (
-        <section role="status" aria-live="polite" aria-label="unsupported learner surface">
-          <p>Activity type unavailable: {surface.type}</p>
-        </section>
-      );
-    }
+  if (supportedTypes.has(surface.type)) {
+    return (
+      <SurfaceRouter
+        surface={surface}
+        disabled={disabled}
+        onSubmit={onSubmit}
+        onEvent={onEvent}
+        accessibilityPreferences={accessibilityPreferences}
+      />
+    );
   }
+
+  if (!unsupportedRef.current) {
+    onEvent?.(
+      createSurfaceEvent(surface.id, "unsupported_surface", { unsupportedType: surface.type }),
+    );
+    unsupportedRef.current = true;
+  }
+
+  return (
+    <section role="status" aria-live="polite" aria-label="unsupported learner surface">
+      <p>Activity type unavailable: {surface.type}</p>
+    </section>
+  );
 }

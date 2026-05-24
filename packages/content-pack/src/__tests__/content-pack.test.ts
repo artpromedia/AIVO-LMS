@@ -167,4 +167,45 @@ describe("validateContentPack", () => {
       false,
     );
   });
+
+  it("requires captions assets for video/audio activities", () => {
+    const videoMissingCaptions = basePack({
+      assets: [{ id: "vid", kind: "video", src: "https://x/video.mp4", alt: "Video lesson" }],
+      activities: [
+        {
+          id: "video-1",
+          title: "Watch this",
+          skillId: "ccss-math.K.CC.A.1",
+          type: "video",
+          prompt: "Watch and answer.",
+          difficulty: "intro",
+          assetRefs: ["vid"],
+        },
+      ],
+    });
+    expect(
+      validateContentPack(videoMissingCaptions).some((i) => i.code === "missing_captions_asset"),
+    ).toBe(true);
+
+    const audioWithCaptions = basePack({
+      assets: [
+        { id: "aud", kind: "audio", src: "https://x/audio.mp3" },
+        { id: "cap-en", kind: "captions", src: "https://x/audio.en.vtt", lang: "en", default: true },
+      ],
+      activities: [
+        {
+          id: "audio-1",
+          title: "Listen",
+          skillId: "ccss-math.K.CC.A.1",
+          type: "audio",
+          prompt: "Listen and follow captions.",
+          difficulty: "intro",
+          assetRefs: ["aud", "cap-en"],
+        },
+      ],
+    });
+    expect(validateContentPack(audioWithCaptions).some((i) => i.code === "missing_captions_asset")).toBe(
+      false,
+    );
+  });
 });

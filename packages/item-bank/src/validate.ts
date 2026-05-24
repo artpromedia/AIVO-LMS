@@ -6,7 +6,8 @@ export type ItemVariantIssueCode =
   | "invalid_version"
   | "invalid_cohort_weight"
   | "missing_published_at"
-  | "empty_body";
+  | "empty_body"
+  | "missing_captions_asset_for_media_surface";
 
 export interface ItemVariantIssue {
   code: ItemVariantIssueCode;
@@ -36,6 +37,15 @@ export function validateItemVariant(v: ItemVariant): ItemVariantIssue[] {
   }
   if (!v.body || Object.keys(v.body).length === 0) {
     issues.push({ code: "empty_body", detail: "body must contain the item content." });
+  }
+  if (v.surfaceType === "video" || v.surfaceType === "audio") {
+    const hasCaptions = (v.assets ?? []).some((asset) => asset.type === "captions");
+    if (!hasCaptions) {
+      issues.push({
+        code: "missing_captions_asset_for_media_surface",
+        detail: `${v.surfaceType} variants must include at least one captions asset.`,
+      });
+    }
   }
   return issues;
 }

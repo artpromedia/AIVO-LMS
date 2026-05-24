@@ -47,7 +47,7 @@ function checkAsset(asset: Asset, issues: ContentPackIssue[]): void {
 
 function checkActivity(
   activity: Activity,
-  knownAssetIds: Set<string>,
+  knownAssets: Map<string, Asset>,
   issues: ContentPackIssue[],
 ): void {
   if (!nonEmpty(activity.id)) {
@@ -69,7 +69,7 @@ function checkActivity(
   }
 
   for (const ref of activity.assetRefs ?? []) {
-    if (!knownAssetIds.has(ref)) {
+    if (!knownAssets.has(ref)) {
       issues.push({
         code: "unknown_asset_ref",
         refId: activity.id,
@@ -104,6 +104,19 @@ function checkActivity(
       detail: `voice activity "${activity.id}" must define expectedAnswer (use "" for free-form talking practice).`,
     });
   }
+
+  if (activity.type === "video" || activity.type === "audio") {
+    const hasCaptions = (activity.assetRefs ?? []).some(
+      (ref) => knownAssets.get(ref)?.kind === "captions",
+    );
+    if (!hasCaptions) {
+      issues.push({
+        code: "missing_captions_asset",
+        refId: activity.id,
+        detail: `${activity.type} activity "${activity.id}" must reference at least one captions asset.`,
+      });
+    }
+  }
 }
 
 export function validateContentPack(pack: ContentPack): ContentPackIssue[] {
@@ -134,16 +147,16 @@ export function validateContentPack(pack: ContentPack): ContentPackIssue[] {
   }
 
   // Asset integrity
-  const assetIds = new Set<string>();
+  const assetsById = new Map<string, Asset>();
   for (const asset of pack.assets ?? []) {
-    if (assetIds.has(asset.id)) {
+    if (assetsById.has(asset.id)) {
       issues.push({
         code: "duplicate_asset_id",
         refId: asset.id,
         detail: `Asset id "${asset.id}" appears more than once.`,
       });
     }
-    assetIds.add(asset.id);
+    assetsById.set(asset.id, asset);
     checkAsset(asset, issues);
   }
 
@@ -158,7 +171,7 @@ export function validateContentPack(pack: ContentPack): ContentPackIssue[] {
       });
     }
     activityIds.add(activity.id);
-    checkActivity(activity, assetIds, issues);
+    checkActivity(activity, assetsById, issues);
   }
 
   return issues;
