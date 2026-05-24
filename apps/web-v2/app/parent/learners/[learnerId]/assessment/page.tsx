@@ -268,17 +268,17 @@ const SUBJECT_OPTIONS = [
 
 const COMFORT_SCALE = [
   {
-    value: "early",
+    value: "new",
     label: "Just starting",
     description: "Brand new to the topic. We'll start gently.",
   },
   {
-    value: "building",
+    value: "growing",
     label: "Building",
     description: "Recognises basics, still practising consistency.",
   },
   {
-    value: "on_grade",
+    value: "confident",
     label: "On grade",
     description: "Comfortable at age-typical work most days.",
   },
