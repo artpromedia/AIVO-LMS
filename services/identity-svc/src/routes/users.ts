@@ -11,7 +11,7 @@ import {
 } from "@aivo/db";
 import { verifyJWT } from "@aivo/security";
 import { and, eq, inArray } from "drizzle-orm";
-import { lookupCurriculum } from "../services/curriculum-lookup.js";
+import { lookupCurriculumAsync } from "../services/curriculum-lookup.js";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -313,7 +313,7 @@ export async function registerUserRoutes(app: FastifyInstance) {
           })
           .returning();
 
-        const curriculum = lookupCurriculum({
+        const curriculum = await lookupCurriculumAsync({
           zipCode: body.zipCode,
           country: body.country,
         });

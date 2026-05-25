@@ -7,7 +7,19 @@ export type Subject =
   | "social_studies"
   | "social_emotional"
   | "executive_function"
-  | "life_skills";
+  | "life_skills"
+  // Sprint D — completion plan additions. Brains live under
+  // services/subject-brain-svc/src/brains/{speech,creative-arts,stem-engineering}
+  // and are registered in services/index.ts.
+  | "speech"
+  | "creative_arts"
+  | "stem_engineering"
+  // Sprint C.2 — the remaining two brains. Music drives the `cadence`
+  // tutor (ADDON_TUTOR_ARTS); pe_health drives the `vigor` tutor
+  // (ADDON_TUTOR_PE_HEALTH). With these the catalog of 14 tutors is
+  // fully subject-brain-backed.
+  | "music"
+  | "pe_health";
 
 export type FunctioningLevel =
   | "NON_VERBAL"

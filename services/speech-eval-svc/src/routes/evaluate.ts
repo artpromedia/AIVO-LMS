@@ -17,6 +17,7 @@
 
 import { FastifyInstance } from "fastify";
 import type { MultipartFile } from "@fastify/multipart";
+import { getAsrProvider, type AsrTranscript } from "../services/asr-provider.js";
 
 export interface EvaluateResult {
   transcript: string;
@@ -168,11 +169,76 @@ export function registerEvaluateRoute(app: FastifyInstance) {
       return reply.send(result);
     }
 
-    // ── Live path (stub — gated behind SPEECH_EVAL_MODE=live) ───────────────
-    // TODO: invoke Whisper ASR + phoneme-alignment scorer here once hosted.
-    return reply.code(503).send({
-      error: "Live ASR not yet configured; set SPEECH_EVAL_MODE=mock to use mock scores",
-      degraded: true,
+    // ── Live path (Sprint F — completion plan) ─────────────────────────────
+    // Selects an ASR provider via env (ASR_PROVIDER=openai|azure). When
+    // no provider is configured the route falls back to the mock scorer
+    // rather than 503-ing — lessons advance under network failure.
+    const provider = getAsrProvider();
+    const audioBuf = (audioPart as { _buf?: Buffer })._buf ?? Buffer.alloc(0);
+    const asrResult = await provider.transcribe({
+      audio: audioBuf,
+      mimetype: audioPart.mimetype || "application/octet-stream",
+      filename: audioPart.filename,
+      language,
     });
+
+    if (asrResult.status === "ok") {
+      const result = scoreAgainstTarget(asrResult.transcript, targetText);
+      return reply.send(result);
+    }
+
+    // Provider unavailable — log the reason and fall back to mock scores
+    // so learner flow never blocks on infrastructure.
+    request.log.warn(
+      { provider: asrResult.provider, reason: asrResult.reason },
+      "ASR provider unavailable; falling back to mock scorer",
+    );
+    return reply.send(buildMockResult(targetText, language));
   });
+}
+
+// ── Live scorer: align ASR transcript against the target text ───────────────
+//
+// Lightweight token-level alignment so the learner-surface flow has real
+// per-word scores when a real ASR is wired. Phoneme-level alignment is
+// the next iteration (separate service); this is the engineering floor.
+function scoreAgainstTarget(transcript: AsrTranscript, targetText: string): EvaluateResult {
+  const targetWords = tokenize(targetText);
+  const heardWords = tokenize(transcript.text);
+  const heardSet = new Set(heardWords);
+
+  const perWord = targetWords.map((word) => ({
+    word,
+    score: heardSet.has(word) ? 95 : 35,
+  }));
+
+  const pronunciation =
+    perWord.length > 0
+      ? Math.round(perWord.reduce((s, pw) => s + pw.score, 0) / perWord.length)
+      : 70;
+
+  // Fluency = a coarse proxy for tempo + completeness. If the learner
+  // hit every target word, fluency tracks pronunciation; if half are
+  // missing, fluency drops sharply.
+  const coverage =
+    targetWords.length > 0
+      ? targetWords.filter((w) => heardSet.has(w)).length / targetWords.length
+      : 1;
+  const fluency = Math.round(pronunciation * (0.6 + 0.4 * coverage));
+
+  return {
+    transcript: transcript.text,
+    scores: { pronunciation, fluency, perWord },
+    degraded: false,
+    language: transcript.language,
+    durationMs: transcript.durationMs,
+  };
+}
+
+function tokenize(text: string): string[] {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s'-]/g, "")
+    .split(/\s+/)
+    .filter(Boolean);
 }

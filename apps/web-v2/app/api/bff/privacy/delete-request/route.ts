@@ -4,6 +4,8 @@ import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
 import { audit } from "@/lib/bff/audit";
 import { createDataDeletionRequest, listDataDeletionRequestsForUser } from "@/lib/db/repos";
+import { enterpriseFlags } from "@/lib/bff/feature-flags";
+import { requestDeletion } from "@/lib/bff/service-clients/data-governance";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -79,6 +81,33 @@ export async function POST(req: Request): Promise<NextResponse> {
       scope: parsed.data.scope,
       notes: parsed.data.notes ?? null,
     });
+
+    // Sprint G: when the data-governance flag is on, dispatch the
+    // deletion to data-governance-svc which owns the canonical
+    // retention-hold + workflow state machine. The local record stays
+    // as the parent-facing receipt. If exportBeforeDelete is set on
+    // the request the service handles the export step before
+    // approving.
+    if (enterpriseFlags.dataGovernanceCenter() && learnerId) {
+      const remote = await requestDeletion({
+        learnerId,
+        requesterId: session!.userId,
+        requesterRole: "parent",
+        exportBeforeDelete: parsed.data.scope === "account",
+      });
+      if (remote.ok) {
+        audit(session!, "privacy.delete_request.svc_dispatched", requestId, {
+          learnerId,
+          metadata: { localId: rec.id, remoteId: remote.data.id },
+        });
+      } else {
+        audit(session!, "privacy.delete_request.svc_failed", requestId, {
+          learnerId,
+          metadata: { localId: rec.id, reason: remote.reason },
+        });
+      }
+    }
+
     audit(session!, "privacy.delete_request.created", requestId, {
       learnerId,
       metadata: { requestId: rec.id, scope: rec.scope },

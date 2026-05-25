@@ -85,3 +85,50 @@ test("rejects duplicate beat ids", () => {
   assert.equal(result.valid, false);
   assert.ok(result.issues.some((i) => i.code === "duplicate_beat_id"));
 });
+
+// ── Sprint C — subject-brain evidence requirements ────────────────────────
+
+test("requireSubjectBrainEvidence: rejects plan with no evidence field", () => {
+  const result = validateStagePlan(validPlan, { requireSubjectBrainEvidence: true });
+  assert.equal(result.valid, false);
+  assert.ok(result.issues.some((i) => i.code === "missing_subject_brain_evidence"));
+});
+
+test("requireSubjectBrainEvidence: rejects empty evidence object", () => {
+  const withEmptyEvidence = JSON.parse(JSON.stringify(validPlan));
+  withEmptyEvidence.subjectBrainEvidenceUsed = { relevantSkills: [], standards: [] };
+  const result = validateStagePlan(withEmptyEvidence, {
+    requireSubjectBrainEvidence: true,
+  });
+  assert.equal(result.valid, false);
+  assert.ok(result.issues.some((i) => i.code === "empty_subject_brain_evidence"));
+});
+
+test("requireSubjectBrainEvidence: accepts evidence with at least one skill", () => {
+  const withSkill = JSON.parse(JSON.stringify(validPlan));
+  withSkill.subjectBrainEvidenceUsed = {
+    relevantSkills: ["MATH.GEOM.AREA"],
+    standards: [],
+    misconceptionRisks: [],
+  };
+  const result = validateStagePlan(withSkill, { requireSubjectBrainEvidence: true });
+  assert.equal(
+    result.issues.some((i) => i.code.startsWith("subject_brain")),
+    false,
+  );
+});
+
+test("requireSubjectBrainEvidence: accepts evidence with only standards (no skills)", () => {
+  const withStandards = JSON.parse(JSON.stringify(validPlan));
+  withStandards.subjectBrainEvidenceUsed = {
+    relevantSkills: [],
+    standards: [{ framework: "CCSS", code: "3.MD.7" }],
+  };
+  const result = validateStagePlan(withStandards, {
+    requireSubjectBrainEvidence: true,
+  });
+  assert.equal(
+    result.issues.some((i) => i.code === "empty_subject_brain_evidence"),
+    false,
+  );
+});

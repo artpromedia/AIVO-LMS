@@ -48,8 +48,9 @@ export const creativeArtsTutor: TutorDefinition = defineTutor({
   },
   authoringMeta: {
     owner: "curriculum-creative-arts",
-    status: "scaffold",
+    status: "alpha",
     aiSvcPersonaKey: "ADDON_TUTOR_CREATIVE_WRITING",
+    subjectBrain: "creative_arts",
   },
 });
 

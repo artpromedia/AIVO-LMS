@@ -4,17 +4,29 @@ metadata:
   name: aivo-enterprise-flags
   labels:
     app.kubernetes.io/part-of: aivo-enterprise
-# All flags default to "false" so legacy flows are unaffected.
-# Flip individual flags in this ConfigMap (or in an overlay patch) to
-# turn on the enterprise behaviors.
+# Defaults align with the completion-plan sprints:
+#   - AIVO_FEATURE_ADVANCED_CONTENT_GENERATORS (Sprint C): ON — activates
+#     subject-brain enrichment for all 14 tutor brains. Call sites swallow
+#     errors and fall back to legacy generation if subject-brain-svc is
+#     unreachable.
+#   - AIVO_FEATURE_RESPONSIBLE_AI_GUARDRAILS (Sprint G): ON — the
+#     responsible-ai-svc evaluator runs on every tutor chat and homework
+#     output. In production tutor-svc uses policyMode=block so confirmed
+#     prompt-injection or profile-adherence violations stop the output.
+#   - AIVO_FEATURE_DATA_GOVERNANCE_CENTER (Sprint G): ON — parent DSAR
+#     export and deletion requests fan out to data-governance-svc.
+#   - AIVO_FEATURE_SIS_SYNC and AIVO_FEATURE_LTI_13 (Sprint H): ON —
+#     admin rostering imports forward Clever / ClassLink exports to
+#     integration-svc; LTI 1.3 launch validator rejects unsigned tokens.
+# The remaining flags stay false until their sprints land.
 data:
   AIVO_FEATURE_PROBLEM_SESSION_LEDGER: "false"
   AIVO_FEATURE_TUTOR_SURFACE_PROTOCOL: "false"
   AIVO_FEATURE_PROFILE_RECOMMENDATIONS_V2: "false"
   AIVO_FEATURE_DISTRICT_ENTERPRISE_MODE: "false"
-  AIVO_FEATURE_SIS_SYNC: "false"
-  AIVO_FEATURE_LTI_13: "false"
-  AIVO_FEATURE_DATA_GOVERNANCE_CENTER: "false"
-  AIVO_FEATURE_RESPONSIBLE_AI_GUARDRAILS: "false"
-  AIVO_FEATURE_ADVANCED_CONTENT_GENERATORS: "false"
+  AIVO_FEATURE_SIS_SYNC: "true"
+  AIVO_FEATURE_LTI_13: "true"
+  AIVO_FEATURE_DATA_GOVERNANCE_CENTER: "true"
+  AIVO_FEATURE_RESPONSIBLE_AI_GUARDRAILS: "true"
+  AIVO_FEATURE_ADVANCED_CONTENT_GENERATORS: "true"
   AIVO_FEATURE_SELF_REGULATION_HUB: "false"

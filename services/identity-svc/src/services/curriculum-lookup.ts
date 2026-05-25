@@ -1038,6 +1038,16 @@ export interface CurriculumResult {
   };
 }
 
+/**
+ * Synchronous static-map zip lookup. Returns the legacy 21-major-
+ * district resolution if the zip prefix matches; otherwise null.
+ *
+ * This is the warm-start cache layer: it serves dev / CI / freshly-
+ * provisioned environments where the NCES seed has not been run, and
+ * it tail-covers any zip we never see in the DB. Prefer
+ * `lookupCurriculumByZipAsync` for production paths — it consults the
+ * DB-backed NCES resolver first and falls back here on miss.
+ */
 export function lookupCurriculumByZip(zipCode: string): CurriculumResult | null {
   const clean = zipCode.replace(/\D/g, "").slice(0, 5);
   if (clean.length < 3) return null;
@@ -1068,6 +1078,42 @@ export function lookupCurriculumByZip(zipCode: string): CurriculumResult | null 
       source: district ? "district_match" : "state_match",
     },
   };
+}
+
+/**
+ * DB-backed zip → district + curriculum lookup. Consults the NCES-
+ * seeded `zip_district` table for the dominant district, then layers
+ * the state-level framework on top. Falls back to the static map and
+ * finally to the country-level default. Never throws.
+ */
+export async function lookupCurriculumByZipAsync(
+  zipCode: string,
+): Promise<CurriculumResult | null> {
+  const { resolveZipToDistricts } = await import("./zip-district-resolver.js");
+  const resolution = await resolveZipToDistricts(zipCode);
+  if (resolution.source === "db" && resolution.dominant) {
+    const state = resolution.dominant.state;
+    const fw = US_STATE_FRAMEWORKS[state];
+    if (fw) {
+      return {
+        country: "US",
+        state,
+        districtId: resolution.dominant.ncesId,
+        districtName: resolution.dominant.name,
+        curriculumFramework: fw.framework,
+        standards: fw.standards,
+        curriculumAlignment: {
+          framework: fw.framework,
+          standards: fw.standards,
+          state,
+          districtId: resolution.dominant.ncesId,
+          districtName: resolution.dominant.name,
+          source: "nces_zip_district",
+        },
+      };
+    }
+  }
+  return lookupCurriculumByZip(zipCode);
 }
 
 export function lookupCurriculumByCountry(countryCode: string): CurriculumResult | null {
@@ -1112,6 +1158,12 @@ export function lookupCurriculumByCountry(countryCode: string): CurriculumResult
   };
 }
 
+/**
+ * Synchronous curriculum lookup. Uses the static major-district map
+ * only. Retained for legacy callers (sync hot paths and tests); new
+ * code should prefer `lookupCurriculumAsync`, which consults the
+ * NCES-seeded DB resolver first.
+ */
 export function lookupCurriculum(opts: { zipCode?: string; country?: string }): CurriculumResult {
   if (opts.zipCode) {
     const result = lookupCurriculumByZip(opts.zipCode);
@@ -1123,6 +1175,36 @@ export function lookupCurriculum(opts: { zipCode?: string; country?: string }): 
     if (result) return result;
   }
 
+  return {
+    country: opts.country || "US",
+    curriculumFramework: "Common Core State Standards",
+    standards: "CCSS",
+    curriculumAlignment: {
+      framework: "Common Core State Standards",
+      standards: "CCSS",
+      source: "default",
+    },
+  };
+}
+
+/**
+ * Async curriculum lookup. DB-backed NCES zip → district resolver
+ * first, static major-district map second, country-level default
+ * last. This is the entry point for new code (request handlers,
+ * BFF routes); old sync callers are migrated as they are touched.
+ */
+export async function lookupCurriculumAsync(opts: {
+  zipCode?: string;
+  country?: string;
+}): Promise<CurriculumResult> {
+  if (opts.zipCode) {
+    const result = await lookupCurriculumByZipAsync(opts.zipCode);
+    if (result) return result;
+  }
+  if (opts.country) {
+    const result = lookupCurriculumByCountry(opts.country);
+    if (result) return result;
+  }
   return {
     country: opts.country || "US",
     curriculumFramework: "Common Core State Standards",

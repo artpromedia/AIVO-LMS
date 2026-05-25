@@ -194,8 +194,10 @@ export function validateStagePlan(
   }
 
   // Sprint 05: when subject-brain context was fetched, the generated plan
-  // MUST record `subjectBrainEvidenceUsed`. This guarantees the LLM cannot
-  // silently ignore the subject brain context.
+  // MUST record `subjectBrainEvidenceUsed`. Sprint C harden: the field is
+  // no longer satisfied by an empty object — the generator must echo at
+  // least one `relevantSkills` entry back so a plan that ignored the
+  // brain's grounding cannot pass validation.
   if (opts?.requireSubjectBrainEvidence) {
     const evidence = (plan as { subjectBrainEvidenceUsed?: unknown }).subjectBrainEvidenceUsed;
     if (!evidence || typeof evidence !== "object") {
@@ -203,6 +205,20 @@ export function validateStagePlan(
         code: "missing_subject_brain_evidence",
         detail: "subjectBrainEvidenceUsed must be set when subject-brain context is available",
       });
+    } else {
+      const ev = evidence as {
+        relevantSkills?: unknown;
+        standards?: unknown;
+      };
+      const skills = Array.isArray(ev.relevantSkills) ? ev.relevantSkills : [];
+      const standards = Array.isArray(ev.standards) ? ev.standards : [];
+      if (skills.length === 0 && standards.length === 0) {
+        issues.push({
+          code: "empty_subject_brain_evidence",
+          detail:
+            "subjectBrainEvidenceUsed.relevantSkills or .standards must be non-empty",
+        });
+      }
     }
   }
 

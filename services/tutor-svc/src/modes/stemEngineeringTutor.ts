@@ -45,8 +45,9 @@ export const stemEngineeringTutor: TutorDefinition = defineTutor({
   },
   authoringMeta: {
     owner: "curriculum-stem",
-    status: "scaffold",
+    status: "alpha",
     aiSvcPersonaKey: "ADDON_TUTOR_STEM_DESIGN",
+    subjectBrain: "stem_engineering",
   },
 });
 

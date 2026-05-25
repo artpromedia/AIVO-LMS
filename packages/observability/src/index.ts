@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 export * from "./safe-logger.js";
 export * from "./learning-traces.js";
 export * from "./llm-traces.js";
+export * from "./subject-brain-metrics.js";
 
 // ── Sensitive-key sanitisation ─────────────────────────────────────────────
 

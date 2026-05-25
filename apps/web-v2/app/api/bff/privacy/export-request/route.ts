@@ -4,6 +4,8 @@ import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole, requireLearnerScope } from "@/lib/bff/guards";
 import { audit } from "@/lib/bff/audit";
 import { createDataExportRequest, listDataExportRequestsForUser } from "@/lib/db/repos";
+import { enterpriseFlags } from "@/lib/bff/feature-flags";
+import { requestParentExport } from "@/lib/bff/service-clients/data-governance";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -62,6 +64,27 @@ export async function POST(req: Request): Promise<NextResponse> {
       learnerId,
       notes: parsed.data.notes ?? null,
     });
+
+    // Sprint G: when the data-governance flag is on AND we have a
+    // learner-scoped request, fan out to data-governance-svc which
+    // owns the canonical export-builder pipeline. The local record
+    // stays in place as the parent-facing receipt; the canonical job
+    // id from the service is recorded on it for follow-up.
+    if (enterpriseFlags.dataGovernanceCenter() && learnerId) {
+      const remote = await requestParentExport({ learnerId });
+      if (remote.ok) {
+        audit(session!, "privacy.export_request.svc_dispatched", requestId, {
+          learnerId,
+          metadata: { localId: rec.id, remoteJobId: remote.data.id },
+        });
+      } else {
+        audit(session!, "privacy.export_request.svc_failed", requestId, {
+          learnerId,
+          metadata: { localId: rec.id, reason: remote.reason },
+        });
+      }
+    }
+
     audit(session!, "privacy.export_request.created", requestId, {
       learnerId,
       metadata: { requestId: rec.id },

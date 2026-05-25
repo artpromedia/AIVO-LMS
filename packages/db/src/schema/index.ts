@@ -13,6 +13,7 @@ export * from "./collaboration.js";
 export * from "./integrations.js";
 export * from "./admin.js";
 export * from "./district.js";
+export * from "./districts.js";
 export * from "./parent.js";
 export * from "./comms.js";
 export * from "./moderation.js";

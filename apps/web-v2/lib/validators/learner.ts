@@ -13,7 +13,13 @@ export const accessibilityDefaultsSchema = z.object({
   captionsAlwaysOn: z.boolean().default(false),
 });
 
-export const createLearnerSchema = z.object({
+const zipCodeSchema = z
+  .string()
+  .regex(/^\d{5}$/, "Zip code must be 5 digits")
+  .optional()
+  .nullable();
+
+const learnerShape = {
   firstName: z.string().min(1).max(80),
   preferredName: z.string().max(80).optional().nullable(),
   birthYear: z.number().int().min(1990).max(new Date().getFullYear()),
@@ -27,9 +33,29 @@ export const createLearnerSchema = z.object({
   knownStrengths: z.array(z.string().max(200)).max(20).optional(),
   knownChallenges: z.array(z.string().max(200)).max(20).optional(),
   accessibilityDefaults: accessibilityDefaultsSchema.optional(),
+  // Sprint A: zip + resolved district. All three are optional, but if
+  // a parent provides a zip the resolver populates the hidden district
+  // fields; the server cross-checks rather than re-resolving.
+  zipCode: zipCodeSchema,
+  districtId: z.string().max(64).optional().nullable(),
+  districtName: z.string().max(255).optional().nullable(),
+} as const;
+
+const baseLearnerSchema = z.object(learnerShape);
+
+export const createLearnerSchema = baseLearnerSchema.superRefine((value, ctx) => {
+  // If a district was claimed, require a zip — protects against the
+  // hidden inputs being submitted without the visible zip field.
+  if (value.districtId && !value.zipCode) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["zipCode"],
+      message: "Zip code is required when a district is selected.",
+    });
+  }
 });
 
 export type CreateLearnerInput = z.infer<typeof createLearnerSchema>;
 
-export const patchLearnerSchema = createLearnerSchema.partial();
+export const patchLearnerSchema = baseLearnerSchema.partial();
 export type PatchLearnerInput = z.infer<typeof patchLearnerSchema>;

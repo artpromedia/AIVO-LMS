@@ -1,0 +1,6 @@
+# Sprint A — NCES seed data is downloaded into this directory by
+# scripts/seed-nces-districts.mjs. We ignore the raw CSVs (large, public
+# data) but commit the small fixture used by tests.
+*.csv
+*.zip
+!nces-fixture.json

@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { eq, and, desc } from "drizzle-orm";
 import { TUTORS } from "@aivo/brand";
 import { tutorSessions, learners } from "@aivo/db";
-import { createLogger } from "@aivo/observability";
+import { createLogger, recordSubjectBrainCall } from "@aivo/observability";
 import { resolveTenantIdForLearner } from "../lib/tenant.js";
 import { checkTutorAccess } from "../lib/entitlements.js";
 import { computeTutorXp, computeTutorQuality, type TutorSignals } from "../services/scoring.js";
@@ -20,21 +20,33 @@ import {
 
 const logger = createLogger("tutor-svc.chat");
 
+/**
+ * Tutor SKU → subject-brain-svc subject key.
+ *
+ * Sprint C correction: pre-Sprint-C the map sent half the tutors to
+ * subjects that didn't exist in subject-brain-svc (`"history"`,
+ * `"sel"`, `"art"`, `"other"`) — which caused `fetchSubjectBrain*`
+ * to silently return undefined and the LLM to lose its grounding.
+ * The keys below match the canonical `Subject` union in
+ * `services/subject-brain-svc/src/services/types.ts`.
+ */
 const TUTOR_SKU_TO_SUBJECT: Record<string, string> = {
   ADDON_TUTOR_MATH: "math",
   ADDON_TUTOR_ELA: "ela",
   ADDON_TUTOR_SCIENCE: "science",
-  ADDON_TUTOR_HISTORY: "history",
+  ADDON_TUTOR_HISTORY: "social_studies",
   ADDON_TUTOR_CODING: "coding",
   ADDON_TUTOR_SPEECH: "speech",
-  ADDON_TUTOR_SEL: "sel",
-  ADDON_TUTOR_SOCIAL_STUDIES: "history",
-  ADDON_TUTOR_ARTS: "art",
-  ADDON_TUTOR_PE_HEALTH: "other",
-  ADDON_TUTOR_LANGUAGES: "ela",
-  ADDON_TUTOR_STEM_DESIGN: "science",
-  ADDON_TUTOR_LIFE_SKILLS: "sel",
-  ADDON_TUTOR_CREATIVE_WRITING: "ela",
+  ADDON_TUTOR_SEL: "social_emotional",
+  ADDON_TUTOR_SOCIAL_STUDIES: "social_studies",
+  // ADDON_TUTOR_ARTS is `cadence` (music tutor). The visual / writing
+  // creative-arts strand is `muse` → ADDON_TUTOR_CREATIVE_WRITING.
+  ADDON_TUTOR_ARTS: "music",
+  ADDON_TUTOR_PE_HEALTH: "pe_health",
+  ADDON_TUTOR_LANGUAGES: "world_language",
+  ADDON_TUTOR_STEM_DESIGN: "stem_engineering",
+  ADDON_TUTOR_LIFE_SKILLS: "life_skills",
+  ADDON_TUTOR_CREATIVE_WRITING: "creative_arts",
 };
 
 const IS_PROD = process.env.NODE_ENV === "production";
@@ -65,15 +77,31 @@ async function fetchSubjectBrainContextForChat(input: {
   functioningLevel?: string;
 }): Promise<Record<string, unknown> | undefined> {
   if (!advancedContentGeneratorsEnabled()) return undefined;
+  if (!input.subject) {
+    recordSubjectBrainCall("unknown", "miss_no_subject", { learnerId: input.learnerId });
+    return undefined;
+  }
   try {
     const res = await fetch(`${SUBJECT_BRAIN_SVC_URL}/api/subject-brain/context`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(input),
     });
-    if (!res.ok) return undefined;
-    return (await res.json()) as Record<string, unknown>;
-  } catch {
+    if (!res.ok) {
+      recordSubjectBrainCall(input.subject, "miss_error", {
+        learnerId: input.learnerId,
+        reason: `http_${res.status}`,
+      });
+      return undefined;
+    }
+    const json = (await res.json()) as Record<string, unknown>;
+    recordSubjectBrainCall(input.subject, "ok", { learnerId: input.learnerId });
+    return json;
+  } catch (err) {
+    recordSubjectBrainCall(input.subject, "miss_error", {
+      learnerId: input.learnerId,
+      reason: err instanceof Error ? err.message : String(err),
+    });
     return undefined;
   }
 }
@@ -95,6 +123,11 @@ async function evaluateResponsibleAiChat(input: {
   functioningLevel?: string;
 }): Promise<{ allowed: boolean; severity: string; recommendedAction: string } | undefined> {
   if (!responsibleAiGuardrailsEnabled()) return undefined;
+  // Sprint G: production runs `block` so a confirmed prompt-injection
+  // or profile-adherence violation actually stops the output. Non-prod
+  // stays on `warn` so authors see violations without blocking dev
+  // workflows.
+  const policyMode = process.env.NODE_ENV === "production" ? "block" : "warn";
   try {
     const res = await fetch(`${RESPONSIBLE_AI_SVC_URL}/api/responsible-ai/evaluate`, {
       method: "POST",
@@ -107,7 +140,7 @@ async function evaluateResponsibleAiChat(input: {
         learnerProfileSummary: input.functioningLevel
           ? { functioningLevel: input.functioningLevel }
           : undefined,
-        policyMode: "warn",
+        policyMode,
       }),
     });
     if (!res.ok) return undefined;

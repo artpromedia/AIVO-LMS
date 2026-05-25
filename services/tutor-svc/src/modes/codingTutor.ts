@@ -48,8 +48,9 @@ export const codingTutor: TutorDefinition = defineTutor({
   },
   authoringMeta: {
     owner: "curriculum-coding",
-    status: "scaffold",
+    status: "alpha",
     aiSvcPersonaKey: "ADDON_TUTOR_CODING",
+    subjectBrain: "coding",
   },
 });
 
