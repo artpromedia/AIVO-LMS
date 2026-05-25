@@ -179,6 +179,9 @@ export default async function LessonPlayerFixturePage({ searchParams }: FixtureP
           visualSupports: true,
           breakReminders: false,
           keyboardOptimized: true,
+          aacEnabled: false,
+          aacInputMethod: "touch",
+          aacScanDelayMs: 1000,
           updatedAt: new Date().toISOString(),
         }}
         initialStatus="in_progress"

@@ -101,6 +101,7 @@ export function readIdempotencyKey(req: Request): string | null {
   if (trimmed.length < 8 || trimmed.length > 128) return null;
   // Permissive: accept UUIDs, ULIDs, nanoid-ish slugs. Reject control
   // chars and pipe (our composite-key separator).
+  // eslint-disable-next-line no-control-regex -- intentional: rejecting control chars is the whole point.
   if (/[\x00-\x1f|]/.test(trimmed)) return null;
   return trimmed;
 }

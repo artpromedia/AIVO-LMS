@@ -91,7 +91,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
         skipped: parsed.data.skipped ?? false,
       },
     });
-    const response = ok({ interaction }, requestId);
+    const okResponse = ok({ interaction }, requestId);
     // Cache the response body+status for replay-safe idempotency.
     if (idemKey) {
       writeIdempotencyCache(
@@ -102,7 +102,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
         200,
       );
     }
-    return response;
+    return okResponse;
   } catch (e) {
     return failFromUnknown(e, requestId);
   }

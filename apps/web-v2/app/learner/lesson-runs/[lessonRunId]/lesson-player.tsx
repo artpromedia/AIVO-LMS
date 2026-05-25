@@ -687,9 +687,14 @@ export function LessonPlayer({
         // Mirror AAC activations into the existing surface-telemetry
         // sink so analytics can correlate them with lesson outcomes.
         emitSurfaceTelemetry({
+          id:
+            globalThis.crypto?.randomUUID?.() ??
+            `aac-${evt.targetId}-${Date.now()}`,
+          surfaceId: "aac",
           type: "answer_changed",
+          occurredAt: new Date().toISOString(),
           payload: { source: "aac", targetId: evt.targetId, method: evt.method },
-        } as SurfaceTelemetryEvent);
+        } satisfies SurfaceTelemetryEvent);
       }}
     >
       <AACScanRoot>{innerTree}</AACScanRoot>
