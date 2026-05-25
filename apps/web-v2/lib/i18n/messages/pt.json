@@ -96,5 +96,50 @@
     "watch_amend": "Add context & rebuild",
     "watch_back": "Back to learner",
     "watch_already_approved": "This brain has already been approved."
+  },
+  "learner": {
+    "errors": {
+      "title": "Hum — isso não deu certo",
+      "body": "Vamos respirar um pouco e tentar de novo.",
+      "retry": "Tentar de novo",
+      "back_home": "Voltar para o início"
+    },
+    "progress": {
+      "mastery_strong": "Forte",
+      "mastery_on_grade": "No nível",
+      "mastery_building": "Construindo",
+      "mastery_just_starting": "Começando",
+      "mastery_not_started": "Ainda não começou"
+    },
+    "notifications": {
+      "page_title": "Notificações",
+      "description": "Recados do seu professor e dos seus familiares.",
+      "empty_state": "Tudo em dia!"
+    },
+    "tutor": {
+      "page_eyebrow": "Tutor de IA",
+      "chat_heading": "Converse com seu tutor",
+      "input_placeholder": "Pergunte qualquer coisa — eu te guio, nunca dou a resposta pronta.",
+      "conversation_aria": "Conversa com o tutor"
+    },
+    "homework": {
+      "title": "Travou em algo? Me mostra.",
+      "body": "Tire uma foto ou envie um arquivo e eu te ajudo passo a passo.",
+      "input_placeholder": "Escreva o que você tentou ou faça uma pergunta…",
+      "conversation_aria": "Conversa",
+      "section_how_i_help": "Como eu ajudo",
+      "card_try": "Primeiro, peço para você tentar",
+      "card_hint": "Depois te dou uma dica pequena",
+      "card_walkthrough": "Se ainda estiver travado, a gente resolve junto"
+    },
+    "subjects": {
+      "page_title": "Escolha uma matéria",
+      "page_eyebrow": "Todas as matérias",
+      "page_description": "Cada matéria tem um tutor e um próximo passo recomendado. Toque em um cartão.",
+      "baseline_needed_title": "Termine a avaliação inicial primeiro",
+      "baseline_needed_body": "Suas páginas de matéria são liberadas depois da avaliação inicial.",
+      "baseline_needed_cta": "Começar avaliação",
+      "supports_on": "Apoios ativos"
+    }
   }
 }

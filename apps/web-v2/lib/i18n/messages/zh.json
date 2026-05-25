@@ -96,5 +96,50 @@
     "watch_amend": "Add context & rebuild",
     "watch_back": "Back to learner",
     "watch_already_approved": "This brain has already been approved."
+  },
+  "learner": {
+    "errors": {
+      "title": "嗯——这次没成功",
+      "body": "我们深呼吸一下，再试一次。",
+      "retry": "再试一次",
+      "back_home": "返回首页"
+    },
+    "progress": {
+      "mastery_strong": "扎实",
+      "mastery_on_grade": "达到年级水平",
+      "mastery_building": "逐步提升",
+      "mastery_just_starting": "刚刚开始",
+      "mastery_not_started": "尚未开始"
+    },
+    "notifications": {
+      "page_title": "通知",
+      "description": "来自老师和家人的消息。",
+      "empty_state": "全部看完啦！"
+    },
+    "tutor": {
+      "page_eyebrow": "AI 导师",
+      "chat_heading": "和你的导师聊聊",
+      "input_placeholder": "随便问——我会引导你，不会直接给答案。",
+      "conversation_aria": "导师对话"
+    },
+    "homework": {
+      "title": "卡住了？给我看看。",
+      "body": "拍张照片或上传文件，我会一步一步引导你。",
+      "input_placeholder": "写下你试过的方法或提一个问题……",
+      "conversation_aria": "对话",
+      "section_how_i_help": "我如何帮你",
+      "card_try": "首先，我会请你自己试一试",
+      "card_hint": "接着给你一个小提示",
+      "card_walkthrough": "如果还卡住，我们一起走一遍"
+    },
+    "subjects": {
+      "page_title": "选择一个科目",
+      "page_eyebrow": "所有科目",
+      "page_description": "每个科目都有一位导师和推荐的下一步。点击卡片即可开始。",
+      "baseline_needed_title": "请先完成入门评估",
+      "baseline_needed_body": "完成简短的入门评估后，科目页面就会激活。",
+      "baseline_needed_cta": "开始评估",
+      "supports_on": "支持已开启"
+    }
   }
 }

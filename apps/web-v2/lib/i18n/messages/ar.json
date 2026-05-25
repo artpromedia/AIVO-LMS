@@ -96,5 +96,50 @@
     "watch_amend": "Add context & rebuild",
     "watch_back": "Back to learner",
     "watch_already_approved": "This brain has already been approved."
+  },
+  "learner": {
+    "errors": {
+      "title": "هممم — لم ينجح ذلك",
+      "body": "لنأخذ نفسًا عميقًا ونحاول مرة أخرى.",
+      "retry": "حاول مرة أخرى",
+      "back_home": "العودة إلى الرئيسية"
+    },
+    "progress": {
+      "mastery_strong": "قوي",
+      "mastery_on_grade": "في المستوى",
+      "mastery_building": "في تطور",
+      "mastery_just_starting": "في البداية",
+      "mastery_not_started": "لم يبدأ بعد"
+    },
+    "notifications": {
+      "page_title": "الإشعارات",
+      "description": "رسائل من معلمك ومن أفراد عائلتك.",
+      "empty_state": "كل شيء على ما يرام!"
+    },
+    "tutor": {
+      "page_eyebrow": "مدرس الذكاء الاصطناعي",
+      "chat_heading": "تحدث مع مدرسك",
+      "input_placeholder": "اسأل أي شيء — سأرشدك، ولن أعطيك الإجابة.",
+      "conversation_aria": "محادثة مع المدرس"
+    },
+    "homework": {
+      "title": "عالق في شيء ما؟ أرني.",
+      "body": "التقط صورة أو ارفع ملفًا وسأرشدك خطوة بخطوة.",
+      "input_placeholder": "اكتب ما جربت أو اطرح سؤالًا…",
+      "conversation_aria": "محادثة",
+      "section_how_i_help": "كيف أساعد",
+      "card_try": "أولاً، أطلب منك المحاولة",
+      "card_hint": "ثم أعطيك تلميحًا صغيرًا",
+      "card_walkthrough": "إذا بقيت عالقًا، نحلها معًا"
+    },
+    "subjects": {
+      "page_title": "اختر مادة",
+      "page_eyebrow": "جميع المواد",
+      "page_description": "كل مادة لها مدرس وخطوة تالية موصى بها. اضغط على بطاقة لتبدأ.",
+      "baseline_needed_title": "أكمل التقييم الأولي أولاً",
+      "baseline_needed_body": "ستُفعَّل صفحات المواد بعد إكمال التقييم الأولي السريع.",
+      "baseline_needed_cta": "ابدأ التقييم",
+      "supports_on": "الدعم مفعل"
+    }
   }
 }

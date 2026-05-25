@@ -96,5 +96,50 @@
     "watch_amend": "Add context & rebuild",
     "watch_back": "Back to learner",
     "watch_already_approved": "This brain has already been approved."
+  },
+  "learner": {
+    "errors": {
+      "title": "Oups — ça n'a pas marché",
+      "body": "Respirons un instant et réessayons.",
+      "retry": "Réessayer",
+      "back_home": "Retour à l'accueil"
+    },
+    "progress": {
+      "mastery_strong": "Solide",
+      "mastery_on_grade": "Au niveau",
+      "mastery_building": "En progrès",
+      "mastery_just_starting": "Tout début",
+      "mastery_not_started": "Pas commencé"
+    },
+    "notifications": {
+      "page_title": "Notifications",
+      "description": "Messages de ton enseignant et de tes proches.",
+      "empty_state": "Tout est à jour !"
+    },
+    "tutor": {
+      "page_eyebrow": "Tuteur IA",
+      "chat_heading": "Discute avec ton tuteur",
+      "input_placeholder": "Pose n'importe quelle question — je te guide, sans jamais donner la réponse.",
+      "conversation_aria": "Conversation avec le tuteur"
+    },
+    "homework": {
+      "title": "Bloqué sur quelque chose ? Montre-moi.",
+      "body": "Prends une photo ou téléverse un fichier et je te guide étape par étape.",
+      "input_placeholder": "Écris ce que tu as essayé ou pose une question…",
+      "conversation_aria": "Conversation",
+      "section_how_i_help": "Comment je t'aide",
+      "card_try": "D'abord, je te demande d'essayer",
+      "card_hint": "Ensuite, je te donne un petit indice",
+      "card_walkthrough": "Si tu es toujours bloqué, on le fait ensemble"
+    },
+    "subjects": {
+      "page_title": "Choisis une matière",
+      "page_eyebrow": "Toutes les matières",
+      "page_description": "Chaque matière a un tuteur et une prochaine étape recommandée. Touche une carte pour commencer.",
+      "baseline_needed_title": "Termine d'abord l'évaluation de départ",
+      "baseline_needed_body": "Tes pages de matière s'activent après une petite évaluation de départ.",
+      "baseline_needed_cta": "Commencer l'évaluation",
+      "supports_on": "Aides activées"
+    }
   }
 }

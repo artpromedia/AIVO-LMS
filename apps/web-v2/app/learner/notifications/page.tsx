@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -9,6 +10,7 @@ import { listNotifications } from "@/lib/db/repos";
 
 export default async function Page() {
   const session = await requirePageRole(["learner"]);
+  const t = await getTranslations("learner.notifications");
   const notifications = listNotifications({ tenantId: session.tenantId, userId: session.userId });
 
   return (
@@ -18,13 +20,9 @@ export default async function Page() {
       navItems={LEARNER_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <PageHeader
-        eyebrow="You"
-        title="Your messages"
-        description="Notes from your teacher and your grown-ups."
-      />
+      <PageHeader eyebrow="You" title={t("page_title")} description={t("description")} />
       {notifications.length === 0 ? (
-        <EmptyState title="All caught up!" description="No new messages right now." />
+        <EmptyState title={t("empty_state")} description="No new messages right now." />
       ) : (
         <div className="space-y-3">
           {notifications.map((n) => (
