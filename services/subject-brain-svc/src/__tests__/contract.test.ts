@@ -15,6 +15,7 @@ import { buildSubjectContext, getSubjectBrain } from "../services/index.js";
 import type { Subject } from "../services/types.js";
 
 const SUBJECTS_TO_CHECK: Subject[] = [
+  // Sprint C — fully wired before Pair 2.
   "math",
   "science",
   "ela",
@@ -23,6 +24,11 @@ const SUBJECTS_TO_CHECK: Subject[] = [
   "social_emotional",
   "executive_function",
   "social_studies",
+  // Sprint D — new brains added in Pair 2.
+  "coding",
+  "speech",
+  "creative_arts",
+  "stem_engineering",
 ];
 
 describe("subject-brain-svc contract", () => {

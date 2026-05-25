@@ -7,7 +7,15 @@ export type Subject =
   | "social_studies"
   | "social_emotional"
   | "executive_function"
-  | "life_skills";
+  | "life_skills"
+  // Sprint D — completion plan additions. Brains live under
+  // services/subject-brain-svc/src/brains/{speech,creative-arts,stem-engineering}
+  // and are registered in services/index.ts. `pe_health`, `music`, and
+  // `geography` are intentionally NOT added here yet; they remain
+  // tutor-only until their brains land in Sprint C.2.
+  | "speech"
+  | "creative_arts"
+  | "stem_engineering";
 
 export type FunctioningLevel =
   | "NON_VERBAL"
