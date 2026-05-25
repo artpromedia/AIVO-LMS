@@ -195,7 +195,47 @@ Each subject needs a new `*-9-12.ts` skill-graph seed exported from
 | forge (stem) | 6–12 | extend `ngss-engineering-design-3-5` → `…-6-8` and `…-9-12` |
 | compass (life skills) | 9–12 + ADULT | author transition-planning + post-secondary content |
 
-## Phase 4 — Rolling quality gates
+## Phase 4 — Rolling quality gates ✅ (landed)
+
+Four gates now run on every `pnpm curriculum:coverage` invocation:
+
+1. **Promotion guard** — any `coverageMatrix` cell set to `"authored"`
+   is rejected unless at least one of the tutor's `skillGraphRefs`
+   that covers that band is (a) NOT at a `*-draft` version and (b)
+   has an entry in `docs/quality/tutor-content-signoffs.json`. The
+   graph-to-band mapping is inferred from the graph id pattern
+   (`-k`, `-k2`, `-1-8`, `-9-12`, `-early`, `-school-age`,
+   `-novice-low`, `-6-plus`, etc.).
+2. **SME sign-off ledger** — `docs/quality/tutor-content-signoffs.json`
+   records reviewer, role, date, and notes per skill-graph. The
+   promotion guard reads this; future work should extend the schema
+   with `spedReview` and `irtCalibrationDate` fields once those
+   pipelines ship.
+3. **Runtime gate** — `@aivo/tutor-runtime`'s `planSession` now
+   throws `TutorPolicyError("grade_band_not_production", …)` when
+   `LearnerContext.gradeBand` resolves to a `scaffold` or `missing`
+   cell on the tutor's `coverageMatrix`. Production hosts MUST pass
+   the learner's grade band; preview surfaces opt into scaffold
+   content via `opts.allowScaffold: true`. New SDK helpers
+   `isBandProductionReady`, `getProductionGradeBands`, and
+   `getCoverageStatus` are exported from `@aivo/tutor-sdk` so other
+   services can apply the same check.
+4. **Auto-regenerated dashboard** — `docs/quality/coverage-dashboard.md`
+   is rewritten on every run from the live `coverageMatrix` state.
+   CI should `pnpm curriculum:coverage && git diff --exit-code -- docs/quality/coverage-dashboard.md`
+   to catch stale dashboards.
+
+### Defense-in-depth recap
+
+| Surface | Defense |
+| --- | --- |
+| Authoring time (PR) | Promotion guard, regression ratchet, SDK validator |
+| Build time | Skill-graph `validateGraph` (cycles, missing prereqs) |
+| Runtime (session start) | `planSession` refuses non-`authored` bands by default |
+| Catalog UI | Reads `coverageMatrix`, surfaces "in progress" badge |
+| Documentation | Auto-regenerated `coverage-dashboard.md` |
+
+## Phase 4 — Rolling quality gates [ORIGINAL PLAN]
 
 - Flip `pnpm curriculum:coverage` from informational to **blocking** on
   the per-tutor matrix once Phase 1 lands.

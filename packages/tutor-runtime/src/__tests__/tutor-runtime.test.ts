@@ -145,6 +145,65 @@ describe("planSession", () => {
     ).toThrow(TutorPolicyError);
   });
 
+  it("refuses a session whose grade band is `scaffold` in coverageMatrix", () => {
+    const tutorWithMatrix: TutorDefinition = defineTutor({
+      ...tutor,
+      coverageMatrix: { K: "authored", "1": "scaffold", "2": "missing" },
+    });
+    try {
+      planSession(tutorWithMatrix, { ...baseCtx, gradeBand: "1" }, pack);
+      throw new Error("expected planSession to throw");
+    } catch (e) {
+      expect(e).toBeInstanceOf(TutorPolicyError);
+      expect((e as TutorPolicyError).code).toBe("grade_band_not_production");
+    }
+    try {
+      planSession(tutorWithMatrix, { ...baseCtx, gradeBand: "2" }, pack);
+      throw new Error("expected planSession to throw");
+    } catch (e) {
+      expect(e).toBeInstanceOf(TutorPolicyError);
+      expect((e as TutorPolicyError).code).toBe("grade_band_not_production");
+    }
+  });
+
+  it("refuses a session whose grade band is outside the catalog scope", () => {
+    try {
+      planSession(tutor, { ...baseCtx, gradeBand: "9" }, pack);
+      throw new Error("expected planSession to throw");
+    } catch (e) {
+      expect(e).toBeInstanceOf(TutorPolicyError);
+      expect((e as TutorPolicyError).code).toBe("grade_band_not_in_scope");
+    }
+  });
+
+  it("allows a session for an authored band", () => {
+    const tutorWithMatrix: TutorDefinition = defineTutor({
+      ...tutor,
+      coverageMatrix: { K: "authored", "1": "scaffold", "2": "missing" },
+    });
+    const plan = planSession(
+      tutorWithMatrix,
+      { ...baseCtx, gradeBand: "K" },
+      pack,
+      { maxActivities: 2, rng: () => 0 },
+    );
+    expect(plan.activities.length).toBeGreaterThan(0);
+  });
+
+  it("permits a scaffold band when opts.allowScaffold is set (preview mode)", () => {
+    const tutorWithMatrix: TutorDefinition = defineTutor({
+      ...tutor,
+      coverageMatrix: { K: "authored", "1": "scaffold", "2": "missing" },
+    });
+    const plan = planSession(
+      tutorWithMatrix,
+      { ...baseCtx, gradeBand: "1" },
+      pack,
+      { maxActivities: 2, rng: () => 0, allowScaffold: true },
+    );
+    expect(plan.activities.length).toBeGreaterThan(0);
+  });
+
   it("prefers intro difficulty when scaffolding suggests `model`", () => {
     const ctx: LearnerContext = {
       ...baseCtx,

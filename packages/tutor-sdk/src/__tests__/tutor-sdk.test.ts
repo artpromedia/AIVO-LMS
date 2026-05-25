@@ -3,6 +3,9 @@ import {
   defineTutor,
   validateTutorDefinition,
   assertValidTutorDefinition,
+  isBandProductionReady,
+  getProductionGradeBands,
+  getCoverageStatus,
   type TutorDefinition,
 } from "../index.js";
 
@@ -130,5 +133,38 @@ describe("defineTutor", () => {
   it("returns the input verbatim (identity at runtime)", () => {
     const out = defineTutor(valid);
     expect(out).toBe(valid);
+  });
+});
+
+describe("coverage helpers", () => {
+  const withMatrix: TutorDefinition = {
+    ...valid,
+    coverageMatrix: { PRE_K: "scaffold", K: "authored", "1": "authored", "2": "missing" },
+  };
+
+  it("isBandProductionReady returns true only for authored bands", () => {
+    expect(isBandProductionReady(withMatrix, "K")).toBe(true);
+    expect(isBandProductionReady(withMatrix, "1")).toBe(true);
+    expect(isBandProductionReady(withMatrix, "PRE_K")).toBe(false);
+    expect(isBandProductionReady(withMatrix, "2")).toBe(false);
+  });
+
+  it("isBandProductionReady returns false for bands outside gradeBands", () => {
+    expect(isBandProductionReady(withMatrix, "9")).toBe(false);
+  });
+
+  it("isBandProductionReady is permissive when coverageMatrix is omitted", () => {
+    expect(isBandProductionReady(valid, "K")).toBe(true);
+    expect(isBandProductionReady(valid, "9")).toBe(false);
+  });
+
+  it("getProductionGradeBands returns only authored bands", () => {
+    expect(getProductionGradeBands(withMatrix)).toEqual(["K", "1"]);
+  });
+
+  it("getCoverageStatus returns the matrix value or undefined", () => {
+    expect(getCoverageStatus(withMatrix, "K")).toBe("authored");
+    expect(getCoverageStatus(withMatrix, "2")).toBe("missing");
+    expect(getCoverageStatus(valid, "K")).toBeUndefined();
   });
 });
