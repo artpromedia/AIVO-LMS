@@ -489,7 +489,9 @@
     "reducedMotion": "تقليل الحركة",
     "reducedMotionDesc": "تقليل الرسوم المتحركة وتأثيرات الحركة.",
     "saveChanges": "حفظ التغييرات",
-    "saved": "تم حفظ الإعدادات!"
+    "saved": "تم حفظ الإعدادات!",
+    "language": "اللغة",
+    "languageDesc": "ستستخدم AIVO هذه اللغة للأزرار والقوائم ورسائل المساعدة."
   },
   "learnerLeaderboard": {
     "title": "Leaderboard",

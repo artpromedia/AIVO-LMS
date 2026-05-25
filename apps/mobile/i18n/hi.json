@@ -489,7 +489,9 @@
     "reducedMotion": "कम गति",
     "reducedMotionDesc": "एनिमेशन और गति प्रभाव कम करें।",
     "saveChanges": "बदलाव सहेजें",
-    "saved": "सेटिंग्स सहेजी गईं!"
+    "saved": "सेटिंग्स सहेजी गईं!",
+    "language": "भाषा",
+    "languageDesc": "AIVO बटन, मेन्यू और सहायक संदेशों के लिए यह भाषा उपयोग करेगा।"
   },
   "learnerLeaderboard": {
     "title": "Leaderboard",

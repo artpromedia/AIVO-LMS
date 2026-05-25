@@ -489,7 +489,9 @@
     "reducedMotion": "Movimiento Reducido",
     "reducedMotionDesc": "Minimiza animaciones y efectos de movimiento.",
     "saveChanges": "Guardar Cambios",
-    "saved": "¡Configuración guardada!"
+    "saved": "¡Configuración guardada!",
+    "language": "Idioma",
+    "languageDesc": "AIVO usará este idioma para los botones, menús y mensajes de ayuda."
   },
   "learnerLeaderboard": {
     "title": "Tabla de Clasificación",

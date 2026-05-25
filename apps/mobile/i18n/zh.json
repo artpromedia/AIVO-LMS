@@ -489,7 +489,9 @@
     "reducedMotion": "减少动效",
     "reducedMotionDesc": "尽量减少动画和移动效果。",
     "saveChanges": "保存修改",
-    "saved": "设置已保存!"
+    "saved": "设置已保存!",
+    "language": "语言",
+    "languageDesc": "AIVO 将使用此语言显示按钮、菜单和提示信息。"
   },
   "learnerLeaderboard": {
     "title": "Leaderboard",
