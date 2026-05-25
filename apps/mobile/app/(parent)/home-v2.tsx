@@ -6,6 +6,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { colors, spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
+import { useAuth } from "@/hooks/useAuth";
+import { useLearners } from "@/hooks/useLearners";
 
 /**
  * (parent)/home-v2 — REDESIGNED parent home (mobile parity).
@@ -83,8 +85,14 @@ function SectionRow({ iconName, title, subtitle, badge, onPress }: SectionRowPro
 export default function ParentHomeV2() {
   const insets = useSafeAreaInsets();
   const palette = useSensoryPalette();
-  const parentFirstName = "Ofem";
-  const learnerFirstName = "Emma";
+  // Sprint 7.1: pull real names from auth + learner profile API instead
+  // of hardcoded placeholders. Falls back to neutral copy while the
+  // queries are loading so the hero card never flashes "undefined".
+  const { user } = useAuth();
+  const learnersQuery = useLearners();
+  const parentFirstName = (user?.name ?? "").trim().split(/\s+/)[0] || "there";
+  const activeLearner = learnersQuery.data?.[0];
+  const learnerFirstName = activeLearner?.firstName ?? "Your learner";
 
   return (
     <ScrollView

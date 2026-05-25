@@ -15,6 +15,7 @@ import { registerChallengeRoutes } from "./routes/challenges.js";
 import { registerSelRoutes } from "./routes/sel.js";
 import { registerLessonPlanRoutes } from "./routes/lessonPlans.js";
 import { registerSiblingRoutes } from "./routes/siblings.js";
+import { registerEventRoutes } from "./routes/events.js";
 
 const logger = createLogger("engagement-svc");
 const PORT = parseInt(process.env.ENGAGEMENT_PORT || "3008", 10);
@@ -46,6 +47,7 @@ export async function buildApp(db = createDb(process.env.DATABASE_URL ?? "")) {
   registerSelRoutes(app, db);
   registerLessonPlanRoutes(app, db);
   registerSiblingRoutes(app, db);
+  registerEventRoutes(app, db);
 
   return app;
 }

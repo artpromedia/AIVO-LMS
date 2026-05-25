@@ -65,9 +65,12 @@ export function subjectContentReadyEnabled(): boolean {
  * Subjects that were added to the seed in Sprint 2.1 but don't yet
  * have a full item bank. The badge logic should consult both
  * `subjectContentReadyEnabled()` and this list.
+ *
+ * Sprint 5.3 shipped the social-studies brain + 30 fixture items, so
+ * "social-studies" is no longer in this set. world-languages and coding
+ * remain until their content ramps land.
  */
 export const COMING_SOON_SUBJECT_SLUGS = new Set([
-  "social-studies",
   "world-languages",
   "coding",
 ]);

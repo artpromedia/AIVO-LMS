@@ -23,9 +23,10 @@
  *
  * Notes:
  *   - `brainSubject: null` means "no adaptive subject-brain ships for
- *     this domain yet" (e.g. art, life skills, executive function).
- *     The tutor still works; only the brain-driven mastery overlays
- *     are skipped.
+ *     this domain yet" (e.g. art, speech). The tutor still works; only
+ *     the brain-driven mastery overlays are skipped. Sprint 5 added
+ *     brains for social-emotional, executive-function, life-skills, and
+ *     social-studies, leaving art and speech as the remaining null rows.
  *   - This module is intentionally dependency-free so every package
  *     can import it (BFF, mobile, subject-brain client, marketing).
  */
@@ -39,7 +40,10 @@ export type BrainSubject =
   | "ela"
   | "world_language"
   | "coding"
-  | "social_studies";
+  | "social_studies"
+  | "social_emotional"
+  | "executive_function"
+  | "life_skills";
 
 /**
  * A single learner-facing subject row. `slug` is the URL/database
@@ -97,7 +101,7 @@ export const LEARNER_SUBJECTS = [
     name: "Social-Emotional",
     description: "Feelings, friendships, self-regulation.",
     iconKey: "people",
-    brainSubject: null,
+    brainSubject: "social_emotional",
     tutorKey: "harmony",
     baselineDomain: true,
   },
@@ -115,7 +119,7 @@ export const LEARNER_SUBJECTS = [
     name: "Executive Function",
     description: "Patterns, memory, logic, multi-step thinking.",
     iconKey: "puzzle",
-    brainSubject: null,
+    brainSubject: "executive_function",
     tutorKey: "compass",
     baselineDomain: true,
   },
@@ -133,7 +137,7 @@ export const LEARNER_SUBJECTS = [
     name: "Life skills",
     description: "Daily routines, self-care, organization.",
     iconKey: "home",
-    brainSubject: null,
+    brainSubject: "life_skills",
     tutorKey: "compass",
     baselineDomain: false,
   },
