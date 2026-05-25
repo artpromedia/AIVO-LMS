@@ -63,6 +63,13 @@ const serverSchema = z.object({
   // player v2 BFF routes proxy through this — v1 paths ignore it.
   LEARNING_SVC_URL: z.string().url().default("http://localhost:3041"),
   LEARNING_SVC_SERVICE_TOKEN: z.string().optional(),
+  // Sprint G: real responsible-AI evaluator + data-governance services.
+  // BFF routes fan out to these only when the corresponding feature flag
+  // is on; the local mock store remains for development.
+  RESPONSIBLE_AI_SVC_URL: z.string().url().default("http://localhost:3071"),
+  DATA_GOVERNANCE_SVC_URL: z.string().url().default("http://localhost:3072"),
+  // Sprint H: SIS rostering + LTI 1.3.
+  INTEGRATION_SVC_URL: z.string().url().default("http://localhost:3060"),
   AI_PROVIDER: aiProviderSchema,
   ANTHROPIC_API_KEY: z.string().optional(),
   OPENAI_API_KEY: z.string().optional(),

@@ -5,6 +5,8 @@ import { ERRORS } from "@/lib/bff/errors";
 import { requireSession, requireRole } from "@/lib/bff/guards";
 import { audit } from "@/lib/bff/audit";
 import { getSchool, runRosterImport } from "@/lib/db/repos";
+import { enterpriseFlags } from "@/lib/bff/feature-flags";
+import { importSisExport } from "@/lib/bff/service-clients/integration";
 
 export const dynamic = "force-dynamic";
 
@@ -61,6 +63,49 @@ export async function POST(req: Request): Promise<NextResponse> {
       dryRun: parsed.data.dryRun,
       createdByUserId: session!.userId,
     });
+
+    // Sprint H: when the sisSync flag is on AND the source is a real
+    // SIS vendor (Clever / ClassLink), forward the canonical
+    // normalized roster to integration-svc so its provider adapters
+    // own the actual normalization. CSV / OneRoster imports continue
+    // to use the local pipeline. Failure is non-fatal — the local
+    // dry-run still surfaces to the admin.
+    if (
+      enterpriseFlags.sisSync() &&
+      (parsed.data.source === "clever" || parsed.data.source === "classlink") &&
+      !parsed.data.dryRun
+    ) {
+      // The local runRosterImport already produces a NormalizedRosterExport
+      // (job.normalized) for vendor-sourced imports. When that field is
+      // present, fan it out; otherwise treat as a CSV import.
+      const normalized = (job as { normalized?: unknown }).normalized;
+      if (normalized) {
+        const remote = await importSisExport({
+          vendor: parsed.data.source,
+          export: normalized,
+          tenantId: school.tenantId,
+        });
+        if (remote.ok) {
+          audit(session!, "rostering.import.svc_dispatched", requestId, {
+            metadata: {
+              jobId: job.id,
+              vendor: parsed.data.source,
+              schools: String(remote.data.summary.schools),
+              students: String(remote.data.summary.students),
+            },
+          });
+        } else {
+          audit(session!, "rostering.import.svc_failed", requestId, {
+            metadata: {
+              jobId: job.id,
+              vendor: parsed.data.source,
+              reason: remote.reason,
+            },
+          });
+        }
+      }
+    }
+
     audit(session!, "rostering.import", requestId, {
       metadata: {
         jobId: job.id,

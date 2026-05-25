@@ -123,6 +123,11 @@ async function evaluateResponsibleAiChat(input: {
   functioningLevel?: string;
 }): Promise<{ allowed: boolean; severity: string; recommendedAction: string } | undefined> {
   if (!responsibleAiGuardrailsEnabled()) return undefined;
+  // Sprint G: production runs `block` so a confirmed prompt-injection
+  // or profile-adherence violation actually stops the output. Non-prod
+  // stays on `warn` so authors see violations without blocking dev
+  // workflows.
+  const policyMode = process.env.NODE_ENV === "production" ? "block" : "warn";
   try {
     const res = await fetch(`${RESPONSIBLE_AI_SVC_URL}/api/responsible-ai/evaluate`, {
       method: "POST",
@@ -135,7 +140,7 @@ async function evaluateResponsibleAiChat(input: {
         learnerProfileSummary: input.functioningLevel
           ? { functioningLevel: input.functioningLevel }
           : undefined,
-        policyMode: "warn",
+        policyMode,
       }),
     });
     if (!res.ok) return undefined;
