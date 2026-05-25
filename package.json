@@ -10,6 +10,7 @@
     "db:push": "pnpm --filter @aivo/db db:push",
     "db:seed": "pnpm --filter @aivo/db db:seed",
     "seed:nces": "node scripts/seed-nces-districts.mjs",
+    "legacy:drift": "node scripts/legacy-drift-check.mjs",
     "i18n:audit": "node scripts/i18n-audit.mjs",
     "i18n:audit:verbose": "node scripts/i18n-audit.mjs --verbose",
     "i18n:coverage": "node scripts/ci/check-i18n-coverage.mjs",
