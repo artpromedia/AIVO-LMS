@@ -44,7 +44,7 @@ async function startBaselineAction(formData: FormData) {
   // Reuse an existing in-progress baseline before creating a new one.
   let baseline = getActiveBaselineForLearner(learnerId, session.tenantId);
   if (!baseline || baseline.status === "complete") {
-    const created = createBaseline({ learnerId, tenantId: session.tenantId });
+    const created = await createBaseline({ learnerId, tenantId: session.tenantId });
     if (!created) redirect(`/parent/learners/${learnerId}`);
     baseline = created!.baseline;
     audit(session, "baseline.create", newRequestId(), {

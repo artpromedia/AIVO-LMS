@@ -103,7 +103,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (!parsed.success) {
       return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.message }, requestId);
     }
-    const result = createBaseline({
+    const result = await createBaseline({
       learnerId,
       tenantId: session!.tenantId,
       subjectIds: parsed.data.subjectIds,

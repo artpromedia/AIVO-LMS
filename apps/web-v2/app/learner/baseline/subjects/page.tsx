@@ -34,7 +34,7 @@ async function startWithSubjectsAction(formData: FormData) {
   // Reuse the active baseline if one is already in flight; otherwise create fresh.
   let baseline = getActiveBaselineForLearner(learnerId, session.tenantId);
   if (!baseline || baseline.status === "complete") {
-    const created = createBaseline({ learnerId, tenantId: session.tenantId, subjectIds });
+    const created = await createBaseline({ learnerId, tenantId: session.tenantId, subjectIds });
     if (!created) redirect("/learner/home");
     baseline = created!.baseline;
     audit(session, "baseline.create", newRequestId(), {

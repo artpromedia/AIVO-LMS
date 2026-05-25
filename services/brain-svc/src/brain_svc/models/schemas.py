@@ -82,6 +82,13 @@ class BrainApproveRequest(BaseModel):
     consent_given: bool = False
     consent_version: str = "1.0"
     parent_modifications: list[ParentModification] = []
+    # Sprint A4 (Brain Clone Process Animation): the parent must
+    # explicitly acknowledge the Responsible-AI disclosures shown on
+    # the brain-clone review page before approval is accepted. The
+    # `rai_version` pins the disclosures to the clone version they
+    # reviewed so a later re-clone forces a fresh acknowledgement.
+    rai_acknowledged: bool = False
+    rai_version: Optional[str] = None
 
 class BrainAmendRequest(BaseModel):
     parent_notes: str

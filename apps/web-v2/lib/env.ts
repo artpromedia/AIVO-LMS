@@ -63,6 +63,10 @@ const serverSchema = z.object({
   // player v2 BFF routes proxy through this — v1 paths ignore it.
   LEARNING_SVC_URL: z.string().url().default("http://localhost:3041"),
   LEARNING_SVC_SERVICE_TOKEN: z.string().optional(),
+  // Sprint B1: base URL of the `assessment-svc` (Fastify). Used by the
+  // baseline-llm pipeline to call `/api/ai/generate-baseline`.
+  ASSESSMENT_SVC_URL: z.string().url().default("http://localhost:3071"),
+  ASSESSMENT_SVC_SERVICE_TOKEN: z.string().optional(),
   AI_PROVIDER: aiProviderSchema,
   ANTHROPIC_API_KEY: z.string().optional(),
   OPENAI_API_KEY: z.string().optional(),
