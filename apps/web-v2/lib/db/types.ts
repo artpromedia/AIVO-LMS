@@ -203,6 +203,54 @@ export type AccommodationSummary = {
 };
 
 /**
+ * Sprint A1: detailed XAI / RAI decision shapes mirroring the
+ * `services/brain-svc/src/brain_svc/services/clone_pipeline.py`
+ * `_build_xai_explanation` payload. Optional on `xaiExplanation` so
+ * the deterministic fallback (`lib/learner/brain-profile.ts`) can
+ * keep emitting only the flat string summaries while the real clone
+ * pipeline emits the richer arrays consumed by the upcoming
+ * BrainExplainabilityPanel (Sprint A2) + parent approval gate
+ * (Sprint A4).
+ */
+export type BrainRaiCompliance = {
+  dataSources: string[];
+  biasMitigations: string[];
+  transparency: string;
+  humanOversight: string;
+};
+
+export type BrainMasteryDecision = {
+  domain: string;
+  score: number;
+  displayLabel: string;
+  reasoning: string;
+  source?: "discovery_adventure" | "template_default" | string;
+  rawScore?: string;
+  difficulty?: string;
+};
+
+export type BrainAccommodationDecision = {
+  accommodation: string;
+  displayLabel: string;
+  reasoning: string;
+  source?: "functioning_level_template" | "parent_modification" | string;
+  removable?: boolean;
+};
+
+export type BrainTutorDecision = {
+  tutorKey: string;
+  reasoning: string;
+  source?: "functioning_level_template" | string;
+};
+
+export type BrainSignalDecision = {
+  signal: string;
+  value: string;
+  displayLabel: string;
+  reasoning: string;
+};
+
+/**
  * Sprint 7: typed snapshot of the AI-generated brain profile. Persisted via
  * `LearnerBrainProfile.state` and validated by the Zod schema in
  * `lib/validators/brain-profile.ts` before being stored.
@@ -292,13 +340,27 @@ export type LearnerBrainProfileState = {
     pulseRate: "calm" | "steady" | "energetic";
   };
   /** Explainable-AI breakdown: human-readable rationale for every decision
-   *  the clone made. Required for RAI compliance + parent review screens. */
+   *  the clone made. Required for RAI compliance + parent review screens.
+   *
+   *  Sprint A1 (Brain Clone Process Animation) added optional `*Detailed`
+   *  decision arrays + `raiComplianceDetail` to mirror the richer payload
+   *  produced by `services/brain-svc/src/brain_svc/services/clone_pipeline.py`
+   *  (`_build_xai_explanation`). The flat string arrays + boolean
+   *  `raiCompliance` remain for back-compat with the deterministic
+   *  fallback path in `lib/learner/brain-profile.ts`. New consumers
+   *  (RAI/XAI tabs, approval gate) should prefer the `*Detailed`
+   *  fields when present and fall back to the flat fields otherwise. */
   xaiExplanation: {
     summary: string;
     masteryDecisions: string[];
     accommodationDecisions: string[];
     tutorDecisions: string[];
     raiCompliance: boolean;
+    masteryDecisionsDetailed?: BrainMasteryDecision[];
+    accommodationDecisionsDetailed?: BrainAccommodationDecision[];
+    tutorDecisionsDetailed?: BrainTutorDecision[];
+    signalDecisionsDetailed?: BrainSignalDecision[];
+    raiComplianceDetail?: BrainRaiCompliance;
   };
   source: "ai_generated" | "deterministic_fallback";
   schemaVersion: number;

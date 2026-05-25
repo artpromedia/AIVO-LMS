@@ -23,6 +23,49 @@ const accessibilityDefaultsSchema = z.object({
   captionsAlwaysOn: z.boolean(),
 });
 
+/**
+ * Sprint A1: detailed XAI / RAI shapes mirroring the brain-svc clone
+ * pipeline output. All optional so the deterministic fallback path
+ * (which emits only the flat string arrays) continues to validate.
+ */
+const raiComplianceDetailSchema = z.object({
+  dataSources: z.array(z.string().max(500)),
+  biasMitigations: z.array(z.string().max(500)),
+  transparency: z.string().max(1000),
+  humanOversight: z.string().max(1000),
+});
+
+const masteryDecisionSchema = z.object({
+  domain: z.string().max(200),
+  score: z.number().min(0).max(1),
+  displayLabel: z.string().max(200),
+  reasoning: z.string().max(1000),
+  source: z.string().max(100).optional(),
+  rawScore: z.string().max(50).optional(),
+  difficulty: z.string().max(50).optional(),
+});
+
+const accommodationDecisionSchema = z.object({
+  accommodation: z.string().max(200),
+  displayLabel: z.string().max(200),
+  reasoning: z.string().max(1000),
+  source: z.string().max(100).optional(),
+  removable: z.boolean().optional(),
+});
+
+const tutorDecisionSchema = z.object({
+  tutorKey: z.string().max(200),
+  reasoning: z.string().max(1000),
+  source: z.string().max(100).optional(),
+});
+
+const signalDecisionSchema = z.object({
+  signal: z.string().max(200),
+  value: z.string().max(500),
+  displayLabel: z.string().max(200),
+  reasoning: z.string().max(1000),
+});
+
 export const brainProfileStateSchema = z.object({
   learnerProfileSnapshot: z.object({
     learnerId: z.string(),
@@ -105,6 +148,11 @@ export const brainProfileStateSchema = z.object({
     accommodationDecisions: z.array(z.string().max(300)),
     tutorDecisions: z.array(z.string().max(300)),
     raiCompliance: z.boolean(),
+    masteryDecisionsDetailed: z.array(masteryDecisionSchema).optional(),
+    accommodationDecisionsDetailed: z.array(accommodationDecisionSchema).optional(),
+    tutorDecisionsDetailed: z.array(tutorDecisionSchema).optional(),
+    signalDecisionsDetailed: z.array(signalDecisionSchema).optional(),
+    raiComplianceDetail: raiComplianceDetailSchema.optional(),
   }),
   source: z.enum(["ai_generated", "deterministic_fallback"]),
   schemaVersion: z.literal(BRAIN_PROFILE_SCHEMA_VERSION),

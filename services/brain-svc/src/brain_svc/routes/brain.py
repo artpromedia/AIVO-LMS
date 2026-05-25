@@ -329,6 +329,17 @@ async def approve_brain(learner_id: str, request: BrainApproveRequest, db: Sessi
     if not request.consent_given:
         raise HTTPException(status_code=400, detail="COPPA consent is required before approving the brain clone")
 
+    # Sprint A4: Responsible-AI disclosures must be explicitly
+    # acknowledged. The frontend gate (Sprint A4 frontend) disables
+    # the Approve button until the parent expands the RAI panel and
+    # checks the consent box; this is the server-side defense-in-depth
+    # guard so a misbehaving client cannot bypass it.
+    if not request.rai_acknowledged:
+        raise HTTPException(
+            status_code=400,
+            detail="Responsible-AI disclosures must be acknowledged before approving the brain clone",
+        )
+
     current = db.execute(
         text("SELECT * FROM brain_states WHERE learner_id = :lid ORDER BY version DESC LIMIT 1"),
         {"lid": learner_id}
@@ -402,6 +413,19 @@ async def approve_brain(learner_id: str, request: BrainApproveRequest, db: Sessi
     }
     xai["coppa_consent"] = consent_record
 
+    # Sprint A4: persist the RAI acknowledgement alongside the COPPA
+    # consent. `rai_version` defaults to the brain-state version the
+    # parent reviewed when the client doesn't pin it explicitly — that
+    # way a later re-clone (which bumps `version`) means a stale
+    # acknowledgement won't satisfy a future approval round.
+    rai_acknowledgement = {
+        "rai_acknowledged": True,
+        "rai_version": request.rai_version or str(current.get("version") or 1),
+        "rai_timestamp": now.isoformat(),
+        "parent_id": auth.sub,
+    }
+    xai["rai_acknowledgement"] = rai_acknowledgement
+
     db.execute(
         text("""UPDATE brain_states
                 SET approval_status = 'approved', parent_notes = :notes,
@@ -468,7 +492,13 @@ async def approve_brain(learner_id: str, request: BrainApproveRequest, db: Sessi
     except Exception:
         pass
 
-    return {"status": "approved", "version": new_version, "snapshot_id": snap_id, "consent": consent_record}
+    return {
+        "status": "approved",
+        "version": new_version,
+        "snapshot_id": snap_id,
+        "consent": consent_record,
+        "rai_acknowledgement": rai_acknowledgement,
+    }
 
 @router.post("/{learner_id}/amend")
 async def amend_brain(learner_id: str, request: BrainAmendRequest, db: Session = Depends(get_db), auth: AuthClaims = Depends(require_auth)):
