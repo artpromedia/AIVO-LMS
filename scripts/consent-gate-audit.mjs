@@ -45,6 +45,12 @@ const SENSITIVE_PATTERNS = [
   { match: /\/learners\/\[learnerId\]\/subjects(\/|$)/, required: true },
   { match: /\/learners\/\[learnerId\]\/today(\/|$)/, required: true },
   { match: /\/learners\/\[learnerId\]\/route\.ts$/, required: true },
+  // Sprint 10 — engagement (XP/badges/streaks) and tutor reply both
+  // touch personalised learner data and therefore require consent.
+  // Adding them here makes consent:audit reject any future sibling
+  // route that ships without requireLearnerConsent.
+  { match: /\/learners\/\[learnerId\]\/engagement(\/|$)/, required: true },
+  { match: /\/learners\/\[learnerId\]\/tutor(\/|$)/, required: true },
   // Allow-listed — consent management routes manage themselves.
   { match: /\/learners\/\[learnerId\]\/consent(\/|$)/, required: false },
   // Top-level listing endpoint scopes by parent ownership, not consent.
