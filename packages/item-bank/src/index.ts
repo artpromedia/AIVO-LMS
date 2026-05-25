@@ -48,3 +48,9 @@ export {
   type ImportOptions,
   type PersistAdapter,
 } from "./cli/import.js";
+
+// Sprint 2 — production seed banks (K-8 coverage for required subjects).
+export { MATH_PRODUCTION_ITEMS } from "./seed-math.js";
+export { ELA_PRODUCTION_ITEMS } from "./seed-ela.js";
+export { SCIENCE_PRODUCTION_ITEMS } from "./seed-science.js";
+export { WRITING_PRODUCTION_ITEMS } from "./seed-writing.js";

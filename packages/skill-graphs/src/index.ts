@@ -30,8 +30,12 @@ export {
 } from "./graph.js";
 
 export { ccssMathKindergarten } from "./seeds/ccss-math-k.js";
+export { ccssMath1To8 } from "./seeds/ccss-math-1-8.js";
 export { ngssK2PhysicalScience } from "./seeds/ngss-k2-physical-science.js";
+export { ngssScience3To8 } from "./seeds/ngss-science-3-8.js";
 export { ccssElaKindergarten } from "./seeds/ccss-ela-k.js";
+export { ccssEla1To8 } from "./seeds/ccss-ela-1-8.js";
+export { ccssWritingK8 } from "./seeds/ccss-writing-k-8.js";
 export { c3SocialStudiesK2 } from "./seeds/c3-social-studies-k2.js";
 export { ngsGeographyK2 } from "./seeds/ncge-geography-k2.js";
 export { cstaCodingK2 } from "./seeds/csta-coding-k2.js";
@@ -45,8 +49,12 @@ export { cecLifeSkills6Plus } from "./seeds/cec-life-skills-6-plus.js";
 export { ncasCreativeArtsK2 } from "./seeds/ncas-creative-arts-k2.js";
 
 import { ccssMathKindergarten } from "./seeds/ccss-math-k.js";
+import { ccssMath1To8 } from "./seeds/ccss-math-1-8.js";
 import { ngssK2PhysicalScience } from "./seeds/ngss-k2-physical-science.js";
+import { ngssScience3To8 } from "./seeds/ngss-science-3-8.js";
 import { ccssElaKindergarten } from "./seeds/ccss-ela-k.js";
+import { ccssEla1To8 } from "./seeds/ccss-ela-1-8.js";
+import { ccssWritingK8 } from "./seeds/ccss-writing-k-8.js";
 import { c3SocialStudiesK2 } from "./seeds/c3-social-studies-k2.js";
 import { ngsGeographyK2 } from "./seeds/ncge-geography-k2.js";
 import { cstaCodingK2 } from "./seeds/csta-coding-k2.js";
@@ -63,8 +71,12 @@ import type { SkillGraph } from "./types.js";
 /** All seed graphs that ship with this package, in registration order. */
 export const SEED_GRAPHS: readonly SkillGraph[] = [
   ccssMathKindergarten,
+  ccssMath1To8,
   ngssK2PhysicalScience,
+  ngssScience3To8,
   ccssElaKindergarten,
+  ccssEla1To8,
+  ccssWritingK8,
   c3SocialStudiesK2,
   ngsGeographyK2,
   cstaCodingK2,
