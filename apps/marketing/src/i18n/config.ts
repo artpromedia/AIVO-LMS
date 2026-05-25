@@ -2,6 +2,29 @@ export const locales = ["en", "es", "fr", "de", "pt", "zh", "ja", "ko", "ar", "h
 export type Locale = (typeof locales)[number];
 export const defaultLocale: Locale = "en";
 
+// Sprint 8 — RTL helpers, mirrored from apps/web-v2/lib/i18n/config.ts
+// so marketing's <html dir> stays in sync.
+export const RTL_LOCALES: ReadonlySet<string> = new Set([
+  "ar",
+  "he",
+  "fa",
+  "ur",
+  "ps",
+  "sd",
+  "yi",
+]);
+
+export type Direction = "rtl" | "ltr";
+
+export function isRTL(locale: string | Locale): boolean {
+  const primary = locale.split("-")[0]?.toLowerCase() ?? locale.toLowerCase();
+  return RTL_LOCALES.has(primary);
+}
+
+export function dirForLocale(locale: string | Locale): Direction {
+  return isRTL(locale) ? "rtl" : "ltr";
+}
+
 export const localeNames: Record<Locale, string> = {
   en: "English",
   es: "Español",

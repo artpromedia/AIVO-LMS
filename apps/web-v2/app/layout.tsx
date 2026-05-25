@@ -9,6 +9,7 @@ import { PwaRegister } from "@/components/system/pwa-register";
 import { INCLUSIVE_WARM_PALETTE } from "@aivo/brand";
 import { readSensoryModeFromCookies } from "@/lib/sensory-mode/server";
 import { readTypefaceFromCookies, readReducedMotionFromCookies } from "@/lib/a11y/server";
+import { dirForLocale } from "@/lib/i18n/config";
 
 // AIVO design language typography.
 //   - Body: Inter (via next/font/google, self-hosted).
@@ -70,7 +71,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html
       lang={locale}
-      dir={locale === "ar" ? "rtl" : "ltr"}
+      dir={dirForLocale(locale)}
       data-sensory-mode={sensoryMode}
       data-typeface={typeface}
       data-reduced-motion={reducedMotion}
