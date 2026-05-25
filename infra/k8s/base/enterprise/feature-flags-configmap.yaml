@@ -4,9 +4,14 @@ metadata:
   name: aivo-enterprise-flags
   labels:
     app.kubernetes.io/part-of: aivo-enterprise
-# All flags default to "false" so legacy flows are unaffected.
+# All flags default to "false" so legacy flows are unaffected, with the
+# exception of AIVO_FEATURE_ADVANCED_CONTENT_GENERATORS which is ON by
+# default — it activates subject-brain enrichment for the five fully-wired
+# subjects (math, ELA, science, world languages, life skills) and the
+# three EF/SEL/social-studies brains. Call sites swallow errors and fall
+# back to legacy generation if subject-brain-svc is unreachable.
 # Flip individual flags in this ConfigMap (or in an overlay patch) to
-# turn on the enterprise behaviors.
+# turn on the remaining enterprise behaviors.
 data:
   AIVO_FEATURE_PROBLEM_SESSION_LEDGER: "false"
   AIVO_FEATURE_TUTOR_SURFACE_PROTOCOL: "false"
@@ -16,5 +21,5 @@ data:
   AIVO_FEATURE_LTI_13: "false"
   AIVO_FEATURE_DATA_GOVERNANCE_CENTER: "false"
   AIVO_FEATURE_RESPONSIBLE_AI_GUARDRAILS: "false"
-  AIVO_FEATURE_ADVANCED_CONTENT_GENERATORS: "false"
+  AIVO_FEATURE_ADVANCED_CONTENT_GENERATORS: "true"
   AIVO_FEATURE_SELF_REGULATION_HUB: "false"
