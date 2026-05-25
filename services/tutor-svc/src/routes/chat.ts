@@ -39,7 +39,9 @@ const TUTOR_SKU_TO_SUBJECT: Record<string, string> = {
   ADDON_TUTOR_SPEECH: "speech",
   ADDON_TUTOR_SEL: "social_emotional",
   ADDON_TUTOR_SOCIAL_STUDIES: "social_studies",
-  ADDON_TUTOR_ARTS: "creative_arts",
+  // ADDON_TUTOR_ARTS is `cadence` (music tutor). The visual / writing
+  // creative-arts strand is `muse` → ADDON_TUTOR_CREATIVE_WRITING.
+  ADDON_TUTOR_ARTS: "music",
   ADDON_TUTOR_PE_HEALTH: "pe_health",
   ADDON_TUTOR_LANGUAGES: "world_language",
   ADDON_TUTOR_STEM_DESIGN: "stem_engineering",

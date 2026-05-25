@@ -673,6 +673,74 @@ const SKILL_NODES: SkillNode[] = [
     topicKeywords: ["improve", "iterate", "revise"],
     standards: ["NGSS.3-5-ETS1-3"],
   },
+
+  // ── Sprint C.2 — music (NCAS K-2) ────────────────────────────────────
+  {
+    code: "MUSIC.RHYTHM.STEADY_BEAT",
+    label: "Keep a steady beat",
+    subject: "music",
+    prerequisites: [],
+    topicKeywords: ["beat", "steady", "tempo", "rhythm"],
+    standards: ["NCAS.MU.Pr4.2.K"],
+  },
+  {
+    code: "MUSIC.RHYTHM.PATTERNS",
+    label: "Echo rhythmic patterns",
+    subject: "music",
+    prerequisites: ["MUSIC.RHYTHM.STEADY_BEAT"],
+    topicKeywords: ["pattern", "echo", "clap"],
+    standards: ["NCAS.MU.Cr1.1.K"],
+  },
+  {
+    code: "MUSIC.PITCH.HIGH_LOW",
+    label: "High vs low pitch",
+    subject: "music",
+    prerequisites: [],
+    topicKeywords: ["pitch", "high", "low", "melody"],
+    standards: ["NCAS.MU.Re7.2.K"],
+  },
+  {
+    code: "MUSIC.COMPOSE.SIMPLE",
+    label: "Compose a 4-beat pattern",
+    subject: "music",
+    prerequisites: ["MUSIC.RHYTHM.PATTERNS", "MUSIC.PITCH.HIGH_LOW"],
+    topicKeywords: ["compose", "create", "write music"],
+    standards: ["NCAS.MU.Cr2.1.K"],
+  },
+
+  // ── Sprint C.2 — pe_health (SHAPE K-2) ───────────────────────────────
+  {
+    code: "PE.MOTOR.LOCOMOTOR",
+    label: "Locomotor skills — walk, run, hop, skip",
+    subject: "pe_health",
+    prerequisites: [],
+    topicKeywords: ["walk", "run", "hop", "skip", "locomotor"],
+    standards: ["SHAPE.S1.E1"],
+  },
+  {
+    code: "PE.MOTOR.MANIPULATIVE",
+    label: "Throw / catch / kick basics",
+    subject: "pe_health",
+    prerequisites: ["PE.MOTOR.LOCOMOTOR"],
+    topicKeywords: ["throw", "catch", "kick", "ball"],
+    standards: ["SHAPE.S1.E13"],
+  },
+  {
+    code: "HEALTH.NUTRITION.FOOD_GROUPS",
+    label: "Identify food groups",
+    subject: "pe_health",
+    prerequisites: [],
+    topicKeywords: ["food", "nutrition", "vegetable", "fruit"],
+    standards: ["NHES.1.2.1"],
+  },
+  {
+    code: "HEALTH.HYGIENE.HAND_WASH",
+    label: "Hand-washing routine",
+    subject: "pe_health",
+    prerequisites: [],
+    topicKeywords: ["hygiene", "wash", "hand", "germ"],
+    standards: ["NHES.7.2.1"],
+  },
 ];
 
 export function findSkillsByTopic(subject: Subject, topic?: string): SkillNode[] {

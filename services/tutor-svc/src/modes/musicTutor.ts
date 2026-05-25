@@ -32,8 +32,9 @@ export const musicTutor: TutorDefinition = defineTutor({
   },
   authoringMeta: {
     owner: "curriculum-arts",
-    status: "scaffold",
+    status: "alpha",
     aiSvcPersonaKey: "ADDON_TUTOR_ARTS",
+    subjectBrain: "music",
   },
 });
 

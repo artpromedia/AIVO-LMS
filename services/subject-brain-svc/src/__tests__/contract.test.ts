@@ -29,6 +29,9 @@ const SUBJECTS_TO_CHECK: Subject[] = [
   "speech",
   "creative_arts",
   "stem_engineering",
+  // Sprint C.2 — final two brains; all 14 tutors covered.
+  "music",
+  "pe_health",
 ];
 
 describe("subject-brain-svc contract", () => {

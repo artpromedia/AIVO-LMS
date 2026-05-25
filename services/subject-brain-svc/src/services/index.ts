@@ -10,6 +10,8 @@ import { CodingBrain } from "../brains/coding/index.js";
 import { SpeechBrain } from "../brains/speech/index.js";
 import { CreativeArtsBrain } from "../brains/creative-arts/index.js";
 import { StemEngineeringBrain } from "../brains/stem-engineering/index.js";
+import { MusicBrain } from "../brains/music/index.js";
+import { PeHealthBrain } from "../brains/pe-health/index.js";
 import type {
   Subject,
   SubjectBrain,
@@ -31,6 +33,9 @@ const BRAINS: Record<string, SubjectBrain> = {
   speech: new SpeechBrain(),
   creative_arts: new CreativeArtsBrain(),
   stem_engineering: new StemEngineeringBrain(),
+  // Sprint C.2 — final two brains; catalog of 14 tutors now fully covered.
+  music: new MusicBrain(),
+  pe_health: new PeHealthBrain(),
 };
 
 export function getSubjectBrain(subject: Subject): SubjectBrain | undefined {
@@ -56,4 +61,6 @@ export { CodingBrain } from "../brains/coding/index.js";
 export { SpeechBrain } from "../brains/speech/index.js";
 export { CreativeArtsBrain } from "../brains/creative-arts/index.js";
 export { StemEngineeringBrain } from "../brains/stem-engineering/index.js";
+export { MusicBrain } from "../brains/music/index.js";
+export { PeHealthBrain } from "../brains/pe-health/index.js";
 export * from "./types.js";

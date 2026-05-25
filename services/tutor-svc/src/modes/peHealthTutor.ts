@@ -32,8 +32,9 @@ export const peHealthTutor: TutorDefinition = defineTutor({
   },
   authoringMeta: {
     owner: "curriculum-pe-health",
-    status: "scaffold",
+    status: "alpha",
     aiSvcPersonaKey: "ADDON_TUTOR_PE_HEALTH",
+    subjectBrain: "pe_health",
     tracks: "fitness,health,dape",
   },
 });
