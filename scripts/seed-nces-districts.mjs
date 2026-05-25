@@ -160,7 +160,7 @@ async function main() {
   for (let i = 0; i < districts.length; i += BATCH) {
     const chunk = districts.slice(i, i + BATCH);
     await sql`
-      INSERT INTO districts (nces_id, name, state, county_fips, lea_type, city)
+      INSERT INTO nces_districts (nces_id, name, state, county_fips, lea_type, city)
       SELECT * FROM ${sql(
         chunk.map((d) => [
           d.ncesId,
@@ -187,7 +187,7 @@ async function main() {
   for (let i = 0; i < zips.length; i += BATCH) {
     const chunk = zips.slice(i, i + BATCH);
     await sql`
-      INSERT INTO zip_district (zip, nces_id, weight, dominant)
+      INSERT INTO zip_nces_district (zip, nces_id, weight, dominant)
       SELECT * FROM ${sql(
         chunk.map((z) => [z.zip, z.ncesId, z.weight, z.dominant]),
       )}

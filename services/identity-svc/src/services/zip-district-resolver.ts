@@ -17,7 +17,7 @@
  * hot path of every keystroke.
  */
 import { eq, desc, and, ilike } from "drizzle-orm";
-import { createDb, districts, zipDistrict, type Database } from "@aivo/db";
+import { createDb, ncesDistricts, zipNcesDistrict, type Database } from "@aivo/db";
 
 export interface ResolvedDistrict {
   ncesId: string;
@@ -75,17 +75,17 @@ export async function resolveZipToDistricts(
   try {
     const rows = await db
       .select({
-        ncesId: zipDistrict.ncesId,
-        weight: zipDistrict.weight,
-        dominant: zipDistrict.dominant,
-        name: districts.name,
-        state: districts.state,
-        city: districts.city,
+        ncesId: zipNcesDistrict.ncesId,
+        weight: zipNcesDistrict.weight,
+        dominant: zipNcesDistrict.dominant,
+        name: ncesDistricts.name,
+        state: ncesDistricts.state,
+        city: ncesDistricts.city,
       })
-      .from(zipDistrict)
-      .innerJoin(districts, eq(districts.ncesId, zipDistrict.ncesId))
-      .where(eq(zipDistrict.zip, zip))
-      .orderBy(desc(zipDistrict.weight));
+      .from(zipNcesDistrict)
+      .innerJoin(ncesDistricts, eq(ncesDistricts.ncesId, zipNcesDistrict.ncesId))
+      .where(eq(zipNcesDistrict.zip, zip))
+      .orderBy(desc(zipNcesDistrict.weight));
 
     if (rows.length === 0) {
       return { zip, dominant: null, alternates: [], source: "miss" };
@@ -127,16 +127,16 @@ export async function searchDistricts(
 
   try {
     const filters = state
-      ? and(ilike(districts.name, `%${q}%`), eq(districts.state, state.toUpperCase()))
-      : ilike(districts.name, `%${q}%`);
+      ? and(ilike(ncesDistricts.name, `%${q}%`), eq(ncesDistricts.state, state.toUpperCase()))
+      : ilike(ncesDistricts.name, `%${q}%`);
     const rows = await db
       .select({
-        ncesId: districts.ncesId,
-        name: districts.name,
-        state: districts.state,
-        city: districts.city,
+        ncesId: ncesDistricts.ncesId,
+        name: ncesDistricts.name,
+        state: ncesDistricts.state,
+        city: ncesDistricts.city,
       })
-      .from(districts)
+      .from(ncesDistricts)
       .where(filters)
       .limit(25);
 
