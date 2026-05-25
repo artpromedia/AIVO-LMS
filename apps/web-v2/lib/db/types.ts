@@ -80,6 +80,12 @@ export type LearnerProfile = {
   knownStrengths: string[];
   knownChallenges: string[];
   accessibilityDefaults: LearnerAccessibilityDefaults;
+  /** Sprint A: parent-supplied US zip; null if not provided. */
+  zipCode: string | null;
+  /** Sprint A: NCES district ID resolved from the zip (or null). */
+  districtId: string | null;
+  /** Sprint A: human-readable district name for parent-facing UI. */
+  districtName: string | null;
   functioningLevel: FunctioningLevel | null;
   readinessState: ReadinessState;
   /**

@@ -14,6 +14,7 @@ import { createLearner } from "@/lib/db/repos";
 import { audit } from "@/lib/bff/audit";
 import { newRequestId } from "@/lib/observability/logger";
 import { createLearnerSchema } from "@/lib/validators/learner";
+import { ZipDistrictField } from "@/components/forms/zip-district-field";
 
 function asStringArray(raw: string): string[] {
   return raw
@@ -42,6 +43,9 @@ async function addLearnerAction(formData: FormData) {
     mathComfort: (String(formData.get("mathComfort") || "") || null) as never,
     knownStrengths: asStringArray(String(formData.get("knownStrengths") || "")),
     knownChallenges: asStringArray(String(formData.get("knownChallenges") || "")),
+    zipCode: String(formData.get("zipCode") || "").trim() || null,
+    districtId: String(formData.get("districtId") || "").trim() || null,
+    districtName: String(formData.get("districtName") || "").trim() || null,
   };
   const parsed = createLearnerSchema.safeParse(raw);
   if (!parsed.success) {
@@ -265,6 +269,9 @@ export default async function NewLearnerPage({
                   maxLength={60}
                   placeholder={t("primary_language_placeholder")}
                 />
+              </div>
+              <div className="sm:col-span-2">
+                <ZipDistrictField />
               </div>
             </div>
           </Card>

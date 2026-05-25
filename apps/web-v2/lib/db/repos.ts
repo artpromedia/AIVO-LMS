@@ -154,6 +154,9 @@ export function createLearner(input: {
     knownStrengths: d.knownStrengths ?? [],
     knownChallenges: d.knownChallenges ?? [],
     accessibilityDefaults: { ...DEFAULT_ACCESSIBILITY, ...(d.accessibilityDefaults ?? {}) },
+    zipCode: d.zipCode ?? null,
+    districtId: d.districtId ?? null,
+    districtName: d.districtName ?? null,
     functioningLevel: null,
     readinessState: "profile_created",
     iepDecision: null,
@@ -206,6 +209,13 @@ export function updateLearner(
     accessibilityDefaults: patch.accessibilityDefaults
       ? { ...existing.accessibilityDefaults, ...patch.accessibilityDefaults }
       : existing.accessibilityDefaults,
+    zipCode: patch.zipCode === undefined ? existing.zipCode : (patch.zipCode ?? null),
+    districtId:
+      patch.districtId === undefined ? existing.districtId : (patch.districtId ?? null),
+    districtName:
+      patch.districtName === undefined
+        ? existing.districtName
+        : (patch.districtName ?? null),
   };
   // Recompute displayName if name fields changed
   next.displayName = next.preferredName?.trim() || next.firstName.trim();
