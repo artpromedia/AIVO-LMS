@@ -79,3 +79,26 @@ export function isSubjectComingSoon(slug: string): boolean {
   if (subjectContentReadyEnabled()) return false;
   return COMING_SOON_SUBJECT_SLUGS.has(slug);
 }
+
+/**
+ * Sprint B2 (Baseline Assessment must use LLMs).
+ *
+ * `AIVO_FEATURE_BASELINE_LLM` gates `createBaseline` calling the
+ * assessment-svc `/api/ai/generate-baseline` path. When OFF (or on any
+ * failure) the deterministic BANK in `lib/learner/baseline.ts` is used
+ * instead, so the flag is a true kill switch — flipping it OFF cannot
+ * break baseline creation.
+ *
+ * Defaults: ON in dev/preview/test (so contributors exercise the LLM
+ * code path), OFF in production until the staging soak in Sprint B6
+ * promotes it.
+ */
+export function baselineLlmEnabled(): boolean {
+  const fromServer = process.env.AIVO_FEATURE_BASELINE_LLM;
+  if (isTruthy(fromServer)) return true;
+  if (isExplicitlyFalsy(fromServer)) return false;
+  const env = process.env.VERCEL_ENV ?? process.env.NEXT_PUBLIC_VERCEL_ENV;
+  if (env === "preview") return true;
+  if (process.env.NODE_ENV !== "production") return true;
+  return false;
+}

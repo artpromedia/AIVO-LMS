@@ -10,6 +10,7 @@ import type {
   AuditLog,
   BaselineAssessment,
   BaselineAttempt,
+  BaselineGenerationMetadata,
   BaselineQuestion,
   BaselineSummary,
   AccessibilityPreferences,
@@ -48,6 +49,12 @@ import type {
   CurriculumImportJob,
 } from "@/lib/db/types";
 import { defaultBaselineSubjectSlugs, generateBaselineQuestions } from "@/lib/learner/baseline";
+import {
+  generateBaselineQuestionsViaLLM,
+  mapLlmQuestionsToBaselineQuestions,
+} from "@/lib/learner/baseline-llm";
+import { baselineLlmEnabled } from "@/lib/feature-flags";
+import { logger } from "@/lib/observability/logger";
 import {
   buildBaselineSummary,
   computeSkillMasteryFromBaseline,
@@ -641,11 +648,27 @@ export function listBaselineAttempts(baselineId: string, tenantId: string): Base
  * the learner has a generated brain profile (Sprint 7 output) so the question
  * picks reflect comfort levels and accommodations.
  */
-export function createBaseline(input: {
+/**
+ * Sprint B2 — async, LLM-first baseline creation.
+ *
+ * When `AIVO_FEATURE_BASELINE_LLM` is enabled and the parent has a
+ * submitted assessment, this fetches questions from the assessment-svc
+ * `/api/ai/generate-baseline` proxy. Any failure (flag off, network
+ * timeout, validation, too-few questions, or no subject mapping) falls
+ * back to the deterministic BANK in `lib/learner/baseline.ts` and emits
+ * a structured `baseline.generation_fallback_used` log so the rollout
+ * dashboard can track fallback rates.
+ *
+ * Generation provenance (source, model, token counts, fallback reason)
+ * is persisted on `BaselineAssessment.generationMetadata` so the parent
+ * UI can render a "Personalized by AI" badge and audit can trace every
+ * baseline back to either an LLM call or the BANK.
+ */
+export async function createBaseline(input: {
   learnerId: string;
   tenantId: string;
   subjectIds?: string[];
-}): { baseline: BaselineAssessment; questions: BaselineQuestion[] } | null {
+}): Promise<{ baseline: BaselineAssessment; questions: BaselineQuestion[] } | null> {
   const store = db();
   const learner = store.learnerProfiles.get(input.learnerId);
   if (!learner || learner.tenantId !== input.tenantId) return null;
@@ -675,13 +698,117 @@ export function createBaseline(input: {
   };
 
   const brainProfile = getBrainProfile(input.learnerId, input.tenantId);
-  let questions = generateBaselineQuestions({
-    baselineId: baseline.id,
-    learner,
-    brainProfile,
-    subjects,
-    skills,
-  });
+  const parentAssessment = findParentAssessment(input.learnerId, input.tenantId);
+
+  let questions: BaselineQuestion[] = [];
+  let metadata: BaselineGenerationMetadata;
+
+  const accommodationTags = accommodationTagsForBaseline(brainProfile);
+  const llmFlag = baselineLlmEnabled();
+  const canCallLlm = llmFlag && parentAssessment != null && parentAssessment.submittedAt != null;
+
+  if (canCallLlm) {
+    const llmResult = await generateBaselineQuestionsViaLLM({
+      parent_assessment: parentAssessment!.answers as unknown as Record<string, unknown>,
+      functioning_level: brainProfile?.state.functioningLevel ?? "STANDARD",
+    });
+    if (llmResult.ok) {
+      const mapped = mapLlmQuestionsToBaselineQuestions({
+        baselineId: baseline.id,
+        llmResponse: llmResult.response,
+        subjects,
+        skills,
+        accommodationTags,
+      });
+      if (mapped.length > 0) {
+        questions = mapped;
+        metadata = {
+          source: "ai",
+          model: llmResult.response.model,
+          promptTokens: llmResult.response.prompt_tokens,
+          completionTokens: llmResult.response.completion_tokens,
+          generatedAt: nowIso(),
+        };
+      } else {
+        // LLM call succeeded but no questions mapped to the requested
+        // subjects — fall back so the parent never sees an empty
+        // baseline.
+        questions = generateBaselineQuestions({
+          baselineId: baseline.id,
+          learner,
+          brainProfile,
+          subjects,
+          skills,
+        });
+        metadata = {
+          source: "fallback",
+          fallbackReason: "no_subject_mapping",
+          generatedAt: nowIso(),
+        };
+        logger.info(
+          {
+            event: "baseline.generation_fallback_used",
+            learnerId: input.learnerId,
+            tenantId: input.tenantId,
+            baselineId: baseline.id,
+            reason: "no_subject_mapping",
+          },
+          "baseline: LLM result had no mappable subjects, used BANK fallback",
+        );
+      }
+    } else {
+      questions = generateBaselineQuestions({
+        baselineId: baseline.id,
+        learner,
+        brainProfile,
+        subjects,
+        skills,
+      });
+      metadata = {
+        source: "fallback",
+        fallbackReason: llmResult.reason,
+        generatedAt: nowIso(),
+      };
+      logger.info(
+        {
+          event: "baseline.generation_fallback_used",
+          learnerId: input.learnerId,
+          tenantId: input.tenantId,
+          baselineId: baseline.id,
+          reason: llmResult.reason,
+          message: llmResult.message,
+        },
+        "baseline: LLM generation failed, used BANK fallback",
+      );
+    }
+  } else {
+    questions = generateBaselineQuestions({
+      baselineId: baseline.id,
+      learner,
+      brainProfile,
+      subjects,
+      skills,
+    });
+    metadata = {
+      source: "fallback",
+      fallbackReason: llmFlag ? "no_submitted_parent_assessment" : "flag_off",
+      generatedAt: nowIso(),
+    };
+    if (llmFlag) {
+      // Only log when the flag was on — "flag off" is the steady-state
+      // production behaviour pre-rollout, not noise worth alerting on.
+      logger.info(
+        {
+          event: "baseline.generation_fallback_used",
+          learnerId: input.learnerId,
+          tenantId: input.tenantId,
+          baselineId: baseline.id,
+          reason: "no_submitted_parent_assessment",
+        },
+        "baseline: no submitted parent assessment, used BANK fallback",
+      );
+    }
+  }
 
   // S26: when a skill has an active AssessmentBlueprint, cap that skill's
   // question count to the blueprint's total item budget. The bank can be
@@ -709,9 +836,39 @@ export function createBaseline(input: {
     });
   }
 
-  store.baselineAssessments.set(baseline.id, baseline);
+  store.baselineAssessments.set(baseline.id, { ...baseline, generationMetadata: metadata });
+  baseline.generationMetadata = metadata;
   for (const q of questions) store.baselineQuestions.set(q.id, q);
   return { baseline, questions };
+}
+
+/**
+ * Sprint B2 — derive accommodation tags from the brain profile in a
+ * shape that mirrors the BANK generator's `accommodationTagsFor`
+ * (without exporting the BANK helper, which is internal to the
+ * deterministic path). Kept here so the LLM-mapped questions carry the
+ * same accommodation hints as the fallback questions, keeping the
+ * downstream player render identical.
+ */
+function accommodationTagsForBaseline(
+  brainProfile: ReturnType<typeof getBrainProfile>,
+): string[] {
+  if (!brainProfile) return [];
+  const s = brainProfile.state;
+  const tags = new Set<string>();
+  if (s.accessibilityPreferences?.audioFirst) tags.add("audio_first");
+  if (s.accessibilityPreferences?.largeText) tags.add("large_text");
+  if (s.accessibilityPreferences?.highContrast) tags.add("high_contrast");
+  if (s.accessibilityPreferences?.reducedMotion) tags.add("reduced_motion");
+  if (s.accessibilityPreferences?.captionsAlwaysOn) tags.add("captions");
+  const summary = s.accommodationSummary ?? "";
+  if (/extended.time/i.test(summary) || s.supportDefaults?.extendedTime) {
+    tags.add("extended_time");
+  }
+  if (/break/i.test(summary) || s.supportDefaults?.sensoryBreaks) {
+    tags.add("break_offered");
+  }
+  return Array.from(tags);
 }
 
 export function startBaseline(baselineId: string, tenantId: string): BaselineAssessment | null {

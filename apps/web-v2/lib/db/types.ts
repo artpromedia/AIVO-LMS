@@ -506,6 +506,27 @@ export type BaselineAssessment = {
   createdAt: ISODate;
   /** Summary computed when status transitions to complete. */
   summary: BaselineSummary | null;
+  /** Sprint B2: where the questions came from + token/model accounting
+   *  for the audit trail. Optional for back-compat with baselines
+   *  created before B2 (those rows simply have no metadata). */
+  generationMetadata?: BaselineGenerationMetadata;
+};
+
+/**
+ * Sprint B2: per-baseline provenance recorded when the BFF generates
+ * a question set. `source` is the discriminator the parent UI uses to
+ * render a "Personalized by AI" badge (when "ai") vs a "Calm starter"
+ * badge (when "fallback").
+ */
+export type BaselineGenerationMetadata = {
+  source: "ai" | "fallback";
+  /** Why we fell back (only set when source === "fallback"). */
+  fallbackReason?: string;
+  /** LLM model that produced the questions (only when source === "ai"). */
+  model?: string;
+  promptTokens?: number;
+  completionTokens?: number;
+  generatedAt: ISODate;
 };
 
 export type BaselineSummary = {
