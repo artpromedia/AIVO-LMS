@@ -32,10 +32,26 @@ export const mathTutor: TutorDefinition = defineTutor({
   },
   capabilities: ["chat", "voice_out", "image_in", "manipulatives", "draw"],
   subjects: ["math"],
-  gradeBands: ["PRE_K", "K", "1", "2"],
+  gradeBands: ["PRE_K", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
   functioningLevels: ["STANDARD", "SUPPORTED", "LOW_VERBAL", "NON_VERBAL"],
-  skillGraphRefs: ["ccss-math-k"],
+  skillGraphRefs: ["ccss-math-k", "ccss-math-1-8"],
   defaultContentPackRefs: ["math-k-fall-2026"],
+  coverageMatrix: {
+    PRE_K: "scaffold",
+    K: "authored",
+    "1": "authored",
+    "2": "authored",
+    "3": "authored",
+    "4": "authored",
+    "5": "authored",
+    "6": "authored",
+    "7": "authored",
+    "8": "authored",
+    "9": "missing",
+    "10": "missing",
+    "11": "missing",
+    "12": "missing",
+  },
   policy: {
     // `voice_out` is declared, so consent is required per the SDK
     // validator (`policy_consent_required_for_voice`). The runtime

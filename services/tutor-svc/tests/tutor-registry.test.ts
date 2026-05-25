@@ -44,6 +44,22 @@ describe("tutor-svc tutor registry", () => {
     }
   });
 
+  it("each TutorDefinition declares a coverageMatrix covering every gradeBand", () => {
+    for (const [key, def] of listTutorDefinitions()) {
+      assert.ok(
+        def.coverageMatrix,
+        `tutor "${key}" missing coverageMatrix — see docs/quality/tutor-k12-coverage-gap-plan.md`,
+      );
+      for (const band of def.gradeBands) {
+        const status = def.coverageMatrix[band];
+        assert.ok(
+          status === "authored" || status === "scaffold" || status === "missing",
+          `tutor "${key}" gradeBand "${band}" has no coverageMatrix entry`,
+        );
+      }
+    }
+  });
+
   it("getTutorDefinition returns undefined for unknown keys", () => {
     assert.equal(getTutorDefinition("not-a-tutor"), undefined);
   });

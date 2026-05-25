@@ -29,6 +29,18 @@ export const speechTutor: TutorDefinition = defineTutor({
   functioningLevels: ["STANDARD", "SUPPORTED", "LOW_VERBAL", "NON_VERBAL", "PRE_SYMBOLIC"],
   skillGraphRefs: ["asha-speech-early"],
   defaultContentPackRefs: ["speech-early-fall-2026"],
+  coverageMatrix: {
+    PRE_K: "authored",
+    K: "authored",
+    "1": "authored",
+    "2": "authored",
+    "3": "missing",
+    "4": "missing",
+    "5": "missing",
+    "6": "missing",
+    "7": "missing",
+    "8": "missing",
+  },
   policy: {
     // Voice sessions delegate to Speech Buddy, which enforces the full
     // consent + age + safety gate. Text/AAC sessions on this tutor

@@ -24,6 +24,18 @@ export const musicTutor: TutorDefinition = defineTutor({
   functioningLevels: ["STANDARD", "SUPPORTED", "LOW_VERBAL", "NON_VERBAL", "PRE_SYMBOLIC"],
   skillGraphRefs: ["ncas-music-k2"],
   defaultContentPackRefs: ["music-k2-fall-2026"],
+  coverageMatrix: {
+    PRE_K: "scaffold",
+    K: "authored",
+    "1": "authored",
+    "2": "authored",
+    "3": "missing",
+    "4": "missing",
+    "5": "missing",
+    "6": "missing",
+    "7": "missing",
+    "8": "missing",
+  },
   policy: {
     requiresConsent: true,
     minAgeYears: 4,

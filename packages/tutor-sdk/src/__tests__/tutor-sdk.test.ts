@@ -87,6 +87,34 @@ describe("validateTutorDefinition", () => {
   });
 });
 
+describe("coverageMatrix validation", () => {
+  it("accepts a well-formed matrix whose keys are all declared bands", () => {
+    const def: TutorDefinition = {
+      ...valid,
+      coverageMatrix: { PRE_K: "scaffold", K: "authored", "1": "authored", "2": "scaffold" },
+    };
+    expect(validateTutorDefinition(def)).toEqual([]);
+  });
+
+  it("flags a matrix key that is not declared in gradeBands", () => {
+    const def: TutorDefinition = {
+      ...valid,
+      coverageMatrix: { K: "authored", "9": "missing" },
+    };
+    const issues = validateTutorDefinition(def);
+    expect(issues.find((i) => i.code === "coverage_matrix_grade_not_declared")).toBeDefined();
+  });
+
+  it("flags an invalid status value", () => {
+    const def: TutorDefinition = {
+      ...valid,
+      coverageMatrix: { K: "todo" as any },
+    };
+    const issues = validateTutorDefinition(def);
+    expect(issues.find((i) => i.code === "coverage_matrix_invalid_status")).toBeDefined();
+  });
+});
+
 describe("assertValidTutorDefinition", () => {
   it("does not throw on a valid def", () => {
     expect(() => assertValidTutorDefinition(valid)).not.toThrow();

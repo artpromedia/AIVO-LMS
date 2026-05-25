@@ -26,6 +26,16 @@ export const lifeSkillsTutor: TutorDefinition = defineTutor({
   functioningLevels: ["STANDARD", "SUPPORTED", "LOW_VERBAL", "NON_VERBAL", "PRE_SYMBOLIC"],
   skillGraphRefs: ["cec-life-skills-6-plus"],
   defaultContentPackRefs: ["life-skills-6-plus-fall-2026"],
+  coverageMatrix: {
+    "6": "authored",
+    "7": "authored",
+    "8": "authored",
+    "9": "missing",
+    "10": "missing",
+    "11": "missing",
+    "12": "missing",
+    ADULT: "scaffold",
+  },
   policy: {
     requiresConsent: true,
     minAgeYears: 11,

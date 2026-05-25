@@ -183,6 +183,102 @@ for (const subj of subjects) {
 
 console.log("-".repeat(header.length * 8));
 
+// ---------------------------------------------------------------------------
+// 2b. Per-tutor coverage matrix — walks `services/tutor-svc/src/modes/*Tutor.ts`
+//     and reports each tutor's declared gradeBands × coverageMatrix status.
+//     Hard errors only when a declared grade band has no matrix entry at all
+//     (every band must be honestly classified as authored | scaffold | missing).
+// ---------------------------------------------------------------------------
+
+const tutorsDir = join(repoRoot, "services/tutor-svc/src/modes");
+const tutorFiles = existsSync(tutorsDir)
+  ? readdirSync(tutorsDir).filter((f) => f.endsWith("Tutor.ts"))
+  : [];
+
+const STATUS_GLYPH = { authored: "A", scaffold: "S", missing: "—" };
+const ALL_BANDS = [
+  "PRE_K",
+  "K",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+  "ADULT",
+];
+
+function parseArrayLiteral(src, key) {
+  const re = new RegExp(`${key}\\s*:\\s*\\[([^\\]]*)\\]`);
+  const m = src.match(re);
+  if (!m) return null;
+  return [...m[1].matchAll(/"([^"]+)"/g)].map((x) => x[1]);
+}
+function parseCoverageMatrix(src) {
+  const re = /coverageMatrix\s*:\s*\{([\s\S]*?)\n\s*\}/;
+  const m = src.match(re);
+  if (!m) return null;
+  const out = {};
+  for (const entry of m[1].matchAll(/(?:"?([A-Za-z0-9_]+)"?)\s*:\s*"([^"]+)"/g)) {
+    out[entry[1]] = entry[2];
+  }
+  return out;
+}
+
+const tutorRows = [];
+const tutorErrors = [];
+for (const file of tutorFiles) {
+  const src = readFileSync(join(tutorsDir, file), "utf8");
+  // Prefer the persona id (short name like "nova") — falls back to the
+  // tutor's full id stem ("math-coach"), then the filename stem.
+  const personaId = (src.match(/persona:\s*\{[\s\S]*?id:\s*"([^"]+)"/) || [])[1];
+  const id =
+    personaId ??
+    (src.match(/id:\s*"([^"@]+)@/) || [])[1] ??
+    file.replace(/Tutor\.ts$/, "");
+  const bands = parseArrayLiteral(src, "gradeBands") ?? [];
+  const matrix = parseCoverageMatrix(src);
+  if (bands.length === 0) continue;
+  if (!matrix) {
+    tutorErrors.push(`${id}: declares ${bands.length} gradeBand(s) but no coverageMatrix`);
+    tutorRows.push({ id, bands, matrix: {} });
+    continue;
+  }
+  for (const band of bands) {
+    if (!(band in matrix)) {
+      tutorErrors.push(`${id}: gradeBand "${band}" has no coverageMatrix entry`);
+    }
+  }
+  tutorRows.push({ id, bands, matrix });
+}
+
+if (tutorRows.length) {
+  console.log("\nPER-TUTOR COVERAGE MATRIX (A=authored, S=scaffold, —=missing)\n");
+  const headCells = ["tutor"].concat(ALL_BANDS);
+  console.log(headCells.map((h) => h.padEnd(8)).join(""));
+  console.log("-".repeat(headCells.length * 8));
+  for (const row of tutorRows.sort((a, b) => a.id.localeCompare(b.id))) {
+    const declared = new Set(row.bands);
+    const cells = ALL_BANDS.map((band) => {
+      if (!declared.has(band)) return "·".padEnd(8);
+      const s = row.matrix[band];
+      return (STATUS_GLYPH[s] ?? "?").padEnd(8);
+    });
+    console.log(row.id.padEnd(8) + cells.join(""));
+  }
+  console.log("-".repeat(headCells.length * 8));
+  console.log("legend: · = not in catalog scope for this tutor\n");
+  console.log("see docs/quality/tutor-k12-coverage-gap-plan.md for the rollout plan.");
+}
+
+errors.push(...tutorErrors);
+
 // Surplus subjects — informational
 const declaredSubjects = new Set(coverage.keys());
 const expected = new Set(subjects);

@@ -25,6 +25,15 @@ export const worldLanguagesTutor: TutorDefinition = defineTutor({
   functioningLevels: ["STANDARD", "SUPPORTED", "LOW_VERBAL", "NON_VERBAL"],
   skillGraphRefs: ["actfl-world-languages-novice-low"],
   defaultContentPackRefs: ["world-languages-novice-low-fall-2026"],
+  coverageMatrix: {
+    "6": "authored",
+    "7": "missing",
+    "8": "missing",
+    "9": "missing",
+    "10": "missing",
+    "11": "missing",
+    "12": "missing",
+  },
   policy: {
     requiresConsent: true,
     minAgeYears: 11,

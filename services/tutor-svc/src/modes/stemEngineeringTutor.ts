@@ -25,6 +25,18 @@ export const stemEngineeringTutor: TutorDefinition = defineTutor({
   functioningLevels: ["STANDARD", "SUPPORTED", "LOW_VERBAL", "NON_VERBAL", "PRE_SYMBOLIC"],
   skillGraphRefs: ["ngss-engineering-design-3-5"],
   defaultContentPackRefs: ["stem-engineering-3-5-fall-2026"],
+  coverageMatrix: {
+    "3": "authored",
+    "4": "authored",
+    "5": "authored",
+    "6": "missing",
+    "7": "missing",
+    "8": "missing",
+    "9": "missing",
+    "10": "missing",
+    "11": "missing",
+    "12": "missing",
+  },
   policy: {
     requiresConsent: true,
     minAgeYears: 8,

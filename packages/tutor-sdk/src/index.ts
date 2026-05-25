@@ -4,6 +4,7 @@ export type {
   TutorCapability,
   TutorFunctioningLevel,
   TutorPolicyGates,
+  TutorCoverageStatus,
   TutorDefinitionIssue,
   TutorDefinitionIssueCode,
 } from "./types.js";

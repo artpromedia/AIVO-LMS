@@ -24,6 +24,18 @@ export const historyTutor: TutorDefinition = defineTutor({
   functioningLevels: ["STANDARD", "SUPPORTED", "LOW_VERBAL", "NON_VERBAL"],
   skillGraphRefs: ["c3-social-studies-k2"],
   defaultContentPackRefs: ["history-3-5-fall-2026"],
+  coverageMatrix: {
+    "3": "missing",
+    "4": "missing",
+    "5": "missing",
+    "6": "missing",
+    "7": "missing",
+    "8": "missing",
+    "9": "missing",
+    "10": "missing",
+    "11": "missing",
+    "12": "missing",
+  },
   policy: {
     requiresConsent: true,
     minAgeYears: 8,
