@@ -19,3 +19,12 @@ export type {
 } from "./types.js";
 
 export { validateContentPack, isContentPackValid } from "./validate.js";
+
+export {
+  SEEDED_PACKS,
+  getSeededPack,
+  mathKFall2026,
+  elaKFall2026,
+  scienceKFall2026,
+  codingK2Fall2026,
+} from "./seeds/index.js";

@@ -1,3 +1,4 @@
+import { breakDownTask, nextStepPrompt } from "@aivo/executive-function";
 import { findSkillsByTopic, getPrerequisitesFor, getStandardsFor } from "../../services/skill-graph-store.js";
 import { buildProfileAdaptations } from "../../services/profile-adaptations.js";
 import type {
@@ -39,6 +40,23 @@ export class ExecutiveFunctionBrain implements SubjectBrain {
       "Pre-announce a switch (\"new rule next!\") to support flexibility.",
       "Chunk multi-step tasks; check off each step.",
     ];
+
+    // Sprint F — completion plan. When the request carries a topic, emit
+    // EF micro-step scaffolds from @aivo/executive-function so the tutor
+    // can render a next-step nudge inline. The breakdown is generic
+    // (4-step plan) when the caller doesn't supply authored steps; the
+    // host runtime overlays the real steps as the lesson progresses.
+    if (request.topic) {
+      const breakdown = breakDownTask({
+        taskId: `ef.${request.topic}`,
+        title: request.topic,
+      });
+      const nudge = nextStepPrompt({
+        breakdown,
+        completedStepIds: [],
+      });
+      recommendedScaffolds.push(nudge.message);
+    }
 
     const standards: StandardReference[] = getStandardsFor(relevantSkills).map((code) => ({
       framework: "EF",

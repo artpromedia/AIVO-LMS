@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@aivo/enterprise-core": "workspace:*",
+    "@aivo/executive-function": "workspace:*",
     "@aivo/feature-flags": "workspace:*",
     "@aivo/observability": "workspace:*",
     "@fastify/cors": "^11.0.0",
