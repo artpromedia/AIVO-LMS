@@ -13,9 +13,13 @@ node_modules
 .venv
 **/.venv
 
-# Env files
+# Env files (root + nested, e.g. apps/*/.env.local)
 .env
 .env.*
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.production
 
 # Build outputs
 **/dist
