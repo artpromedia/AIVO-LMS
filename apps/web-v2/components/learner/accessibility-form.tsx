@@ -14,11 +14,29 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import type { AccessibilityPreferences } from "@/lib/db/types";
 
+type ToggleKey = Extract<
+  keyof Omit<AccessibilityPreferences, "learnerId" | "tenantId" | "updatedAt">,
+  | "readAloud"
+  | "largeText"
+  | "dyslexiaFriendlyFont"
+  | "highContrast"
+  | "captionsAlwaysOn"
+  | "reducedMotion"
+  | "hapticsEnabled"
+  | "shorterSteps"
+  | "extraHints"
+  | "visualSupports"
+  | "breakReminders"
+  | "audioFirst"
+  | "keyboardOptimized"
+  | "aacEnabled"
+>;
+
 const TOGGLES: Array<{
-  key: keyof Omit<AccessibilityPreferences, "learnerId" | "tenantId" | "updatedAt">;
+  key: ToggleKey;
   label: string;
   help: string;
-  group: "reading" | "motion" | "support";
+  group: "reading" | "motion" | "support" | "aac";
 }> = [
   {
     key: "readAloud",
@@ -98,12 +116,25 @@ const TOGGLES: Array<{
     help: "Tune controls for keyboard navigation.",
     group: "support",
   },
+  // Sprint 7 — AAC bridge. Turning this on mounts the AACTargetProvider
+  // around the lesson player and tutor/homework chat composers. Input
+  // method + scan delay live on AccessibilityPreferences too; the form
+  // currently exposes the on/off toggle and defaults to single-switch
+  // touch input — the device-pairing UI is a follow-up.
+  {
+    key: "aacEnabled",
+    label: "AAC support",
+    help:
+      "Turn on switch-scan / eye-gaze input. Space activates; ArrowRight advances the scanner.",
+    group: "aac",
+  },
 ];
 
-const GROUP_LABEL: Record<"reading" | "motion" | "support", string> = {
+const GROUP_LABEL: Record<"reading" | "motion" | "support" | "aac", string> = {
   reading: "Reading & display",
   motion: "Motion & feedback",
   support: "Learning supports",
+  aac: "Assistive input (AAC)",
 };
 
 type Props = {

@@ -12,6 +12,21 @@ export { SwitchScanController } from "./SwitchScanController.js";
 export { useAACInput } from "./useAACInput.js";
 export type { UseAACInputResult } from "./useAACInput.js";
 
+// Sprint 7 — lightweight target registry for wrapping arbitrary UI
+// controls (lesson-player buttons, tutor chat composer, etc.) without
+// pre-building a SymbolBoard.
+export {
+  AACTargetProvider,
+  AACScanRoot,
+  useAACTarget,
+  useAACContext,
+  type AACTargetProviderProps,
+  type AACScanRootProps,
+  type AACTargetRegistration,
+  type AACProviderContextValue,
+  type UseAACTargetResult,
+} from "./AACTargetProvider.js";
+
 // OBF / OBZ
 export { parseOBF, parseOBZ, validateOBF } from "./obf/OBFImporter.js";
 export { exportToOBF } from "./obf/OBFExporter.js";

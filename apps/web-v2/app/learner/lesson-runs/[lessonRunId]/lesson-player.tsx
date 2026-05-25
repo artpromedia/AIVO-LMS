@@ -31,6 +31,7 @@ import {
   type SurfaceRouterSubmitResult,
   type SurfaceTelemetryEvent,
 } from "@aivo/learner-surfaces";
+import { AACTargetProvider, AACScanRoot } from "@aivo/aac-bridge";
 import type {
   AccessibilityPreferences,
   GeneratedLessonPlan,
@@ -518,7 +519,13 @@ export function LessonPlayer({
     );
   }
 
-  return (
+  // Sprint 7 — wrap the entire lesson-player tree in the AAC target
+  // provider when the learner has enabled AAC. Surfaces (ChoiceGrid,
+  // submit buttons) auto-register via useAACTarget; AACScanRoot listens
+  // for Space (activate) and ArrowRight (advance) so a single-switch
+  // device mapped to those keys can drive the whole flow.
+  const aacEnabled = accessibility.aacEnabled === true;
+  const innerTree = (
     <div className={rootClass}>
       <PageHeader
         eyebrow={plan.tutorPersona}
@@ -669,5 +676,24 @@ export function LessonPlayer({
       </Card>
       </FocusMode>
     </div>
+  );
+
+  if (!aacEnabled) return innerTree;
+  return (
+    <AACTargetProvider
+      enabled
+      inputMethod={accessibility.aacInputMethod}
+      scanDelayMs={accessibility.aacScanDelayMs}
+      onEvent={(evt) => {
+        // Mirror AAC activations into the existing surface-telemetry
+        // sink so analytics can correlate them with lesson outcomes.
+        emitSurfaceTelemetry({
+          type: "answer_changed",
+          payload: { source: "aac", targetId: evt.targetId, method: evt.method },
+        } as SurfaceTelemetryEvent);
+      }}
+    >
+      <AACScanRoot>{innerTree}</AACScanRoot>
+    </AACTargetProvider>
   );
 }
