@@ -54,3 +54,18 @@ export { MATH_PRODUCTION_ITEMS } from "./seed-math.js";
 export { ELA_PRODUCTION_ITEMS } from "./seed-ela.js";
 export { SCIENCE_PRODUCTION_ITEMS } from "./seed-science.js";
 export { WRITING_PRODUCTION_ITEMS } from "./seed-writing.js";
+
+// Sprint 3 — production loader. Use these helpers instead of importing
+// the seed-* modules directly so production callers can never accidentally
+// reach into fixtures.
+export {
+  getAllProductionItems,
+  getProductionItemsForSubject,
+  getProductionBankForSubject,
+  getCombinedProductionBank,
+  getProductionItemCounts,
+  type RequiredSubjectSlug,
+} from "./production.js";
+
+// Sprint 3 — surface-type routability check (mirror of SurfaceRouter coverage).
+export { ROUTABLE_SURFACE_TYPES } from "./validate.js";

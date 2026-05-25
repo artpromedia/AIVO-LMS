@@ -35,7 +35,8 @@
     "build": "tsc",
     "prepare": "tsc",
     "test": "vitest run",
-    "item-bank:import": "tsx src/cli/bin.ts"
+    "item-bank:import": "tsx src/cli/bin.ts",
+    "item-bank:validate": "node scripts/validate-production.mjs"
   },
   "dependencies": {
     "zod": "^3.24.1"
