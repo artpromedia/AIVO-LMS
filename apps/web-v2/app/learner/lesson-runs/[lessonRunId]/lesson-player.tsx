@@ -373,9 +373,12 @@ export function LessonPlayer({
           ? "Solve the practice and submit your answer."
           : "Complete the check and submit your answer.",
       answerInput: { type: "text", label: "Your answer", placeholder: "Type your answer…" },
-      scratchpad: currentBeat.surfaceType === "scratchpad" ? { enabled: true, width: 520, height: 300 } : undefined,
+      scratchpad:
+        currentBeat.surfaceType === "scratchpad" || currentBeat.surfaceType === "ink_canvas"
+          ? { enabled: true, width: 520, height: 300 }
+          : undefined,
       diagram:
-        currentBeat.surfaceType === "geometry_workspace"
+        currentBeat.surfaceType === "geometry_workspace" || currentBeat.surfaceType === "geometry"
           ? {
               canvasMode: "svg",
               width: 480,
@@ -391,6 +394,13 @@ export function LessonPlayer({
               step: 1,
             }
           : undefined,
+      codingSandbox:
+        currentBeat.surfaceType === "coding_sandbox"
+          ? { language: "javascript", starterCode: "// write your solution\n" }
+          : undefined,
+      artCanvas: currentBeat.surfaceType === "art_canvas" ? { showGuides: true } : undefined,
+      voiceResponse:
+        currentBeat.surfaceType === "voice_response" ? { language: "en-US" } : undefined,
     };
   }
 

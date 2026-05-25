@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { SurfaceRouter } from "./SurfaceRouter.js";
+import { SUPPORTED_RUNTIME_TYPES } from "./SurfaceRouter/surface-type-map.js";
 import { createSurfaceEvent, type SurfaceTelemetryEvent } from "./telemetry/surface-events.js";
 import type {
   LearnerSurfaceSpec,
@@ -69,19 +70,7 @@ export function SurfaceHost({
     );
   }
 
-  const supportedTypes = new Set([
-    "choice_grid",
-    "scratchpad",
-    "geometry_workspace",
-    "math_expression",
-    "coding_sandbox",
-    "art_canvas",
-    "voice_response",
-    "video",
-    "audio",
-  ]);
-
-  if (supportedTypes.has(surface.type)) {
+  if (SUPPORTED_RUNTIME_TYPES.has(surface.type)) {
     return (
       <SurfaceRouter
         surface={surface}

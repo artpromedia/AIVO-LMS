@@ -1,22 +1,40 @@
 import { useRef } from "react";
+import { ArtCanvasSurface } from "../surfaces/ArtCanvasSurface.js";
 import { ChoiceGridSurface } from "../surfaces/ChoiceGridSurface.js";
+import { CodingSandboxSurface } from "../surfaces/CodingSandboxSurface.js";
 import { GeometrySurface } from "../surfaces/GeometrySurface.js";
 import { MathExpressionSurface } from "../surfaces/MathExpressionSurface.js";
 import { NumberLineSurface } from "../surfaces/NumberLineSurface.js";
 import { ScratchpadSurface } from "../surfaces/ScratchpadSurface.js";
+import { VoiceResponseSurface } from "../surfaces/VoiceResponseSurface.js";
 import { createSurfaceEvent, type SurfaceTelemetryEvent } from "../telemetry/surface-events.js";
 import type {
   AnswerInputSpec,
+  ArtCanvasSpec,
+  CodingSandboxSpec,
   GeometryDiagramSpec,
   LearnerSurfaceSpec,
   ScratchpadSpec,
   SurfaceAccessibilitySpec,
   SurfaceResponse,
+  VoiceResponseSpec,
 } from "../types.js";
+import {
+  ITEM_TYPE_TO_RUNTIME,
+  type ItemAuthoredSurfaceType,
+  type RouterSurfaceType,
+  toRuntimeSurfaceType,
+} from "./surface-type-map.js";
 
 export type SurfaceRouterItem = {
   id: string;
-  surfaceType: "choice_grid" | "math_expression" | "scratchpad" | "geometry_workspace" | "number_line";
+  /**
+   * Either a runtime `LearnerSurfaceType` (what the lesson player emits
+   * from beats) or an authored item-bank surface type. The router
+   * normalises both via `toRuntimeSurfaceType` so callers can pass
+   * whichever they have.
+   */
+  surfaceType: RouterSurfaceType;
   prompt: string;
   instructions?: string;
   choices?: string[];
@@ -25,6 +43,9 @@ export type SurfaceRouterItem = {
   scratchpad?: ScratchpadSpec;
   diagram?: GeometryDiagramSpec;
   numberLine?: { min: number; max: number; step: number };
+  codingSandbox?: CodingSandboxSpec;
+  artCanvas?: ArtCanvasSpec;
+  voiceResponse?: VoiceResponseSpec;
   accessibility?: Partial<SurfaceAccessibilitySpec>;
 };
 
@@ -56,24 +77,43 @@ function normalizeAnswer(value: string): string {
     .trim();
 }
 
+function defaultAnswerInput(
+  runtimeType: LearnerSurfaceSpec["type"],
+  authoredType: RouterSurfaceType,
+): AnswerInputSpec {
+  if (runtimeType === "choice_grid" || runtimeType === "scratchpad") {
+    return { type: "none" };
+  }
+  if (authoredType === "fill_in_blank") {
+    return { type: "text", label: "Fill in the blank" };
+  }
+  if (authoredType === "short_response") {
+    return { type: "text", label: "Your answer" };
+  }
+  return { type: "text", label: "Your answer" };
+}
+
 function buildSurfaceSpec(item: SurfaceRouterItem): LearnerSurfaceSpec {
+  const runtimeType = toRuntimeSurfaceType(item.surfaceType);
   return {
     id: item.id,
-    type: item.surfaceType,
+    type: runtimeType,
     prompt: item.prompt,
     instructions: item.instructions,
     choices: item.choices?.map((label, index) => ({ id: `choice-${index + 1}`, label })),
     scratchpad: item.scratchpad,
     diagram: item.diagram,
-    answerInput:
-      item.answerInput ??
-      (item.surfaceType === "choice_grid" || item.surfaceType === "scratchpad"
-        ? { type: "none" }
-        : { type: "text", label: "Your answer" }),
+    answerInput: item.answerInput ?? defaultAnswerInput(runtimeType, item.surfaceType),
     numberLine: item.numberLine,
+    codingSandbox: item.codingSandbox,
+    artCanvas: item.artCanvas,
+    voiceResponse: item.voiceResponse,
     capture: {
       finalAnswer: true,
-      inkStrokes: item.surfaceType === "scratchpad" || item.surfaceType === "geometry_workspace",
+      inkStrokes:
+        runtimeType === "scratchpad" ||
+        runtimeType === "geometry_workspace" ||
+        runtimeType === "art_canvas",
       toolChanges: true,
     },
     scoring: { mode: "exact", correctAnswer: item.expectedAnswer },
@@ -130,48 +170,26 @@ export function SurfaceRouter({
     onSubmitAndAdvance({ response, isCorrect });
   };
 
+  const sharedProps = {
+    surface,
+    disabled,
+    onEvent,
+    onSubmit: (response: SurfaceResponse) => handleSubmit(response),
+  } as const;
+
   return (
     <div className={className}>
-      {item.surfaceType === "choice_grid" ? (
-        <ChoiceGridSurface
-          surface={surface}
-          disabled={disabled}
-          onEvent={onEvent}
-          onSubmit={(response) => handleSubmit(response)}
-        />
-      ) : null}
-      {item.surfaceType === "math_expression" ? (
-        <MathExpressionSurface
-          surface={surface}
-          disabled={disabled}
-          onEvent={onEvent}
-          onSubmit={(response) => handleSubmit(response)}
-        />
-      ) : null}
-      {item.surfaceType === "scratchpad" ? (
-        <ScratchpadSurface
-          surface={surface}
-          disabled={disabled}
-          onEvent={onEvent}
-          onSubmit={(response) => handleSubmit(response)}
-        />
-      ) : null}
-      {item.surfaceType === "geometry_workspace" ? (
-        <GeometrySurface
-          surface={surface}
-          disabled={disabled}
-          onEvent={onEvent}
-          onSubmit={(response) => handleSubmit(response)}
-        />
-      ) : null}
-      {item.surfaceType === "number_line" ? (
-        <NumberLineSurface
-          surface={surface}
-          disabled={disabled}
-          onEvent={onEvent}
-          onSubmit={(response) => handleSubmit(response)}
-        />
-      ) : null}
+      {surface.type === "choice_grid" ? <ChoiceGridSurface {...sharedProps} /> : null}
+      {surface.type === "math_expression" ? <MathExpressionSurface {...sharedProps} /> : null}
+      {surface.type === "scratchpad" ? <ScratchpadSurface {...sharedProps} /> : null}
+      {surface.type === "geometry_workspace" ? <GeometrySurface {...sharedProps} /> : null}
+      {surface.type === "number_line" ? <NumberLineSurface {...sharedProps} /> : null}
+      {surface.type === "coding_sandbox" ? <CodingSandboxSurface {...sharedProps} /> : null}
+      {surface.type === "art_canvas" ? <ArtCanvasSurface {...sharedProps} /> : null}
+      {surface.type === "voice_response" ? <VoiceResponseSurface {...sharedProps} /> : null}
     </div>
   );
 }
+
+/** Re-exported so callers can introspect the router's surface coverage. */
+export { ITEM_TYPE_TO_RUNTIME, type ItemAuthoredSurfaceType, type RouterSurfaceType };

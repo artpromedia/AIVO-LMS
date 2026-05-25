@@ -3,6 +3,7 @@ import { AuthCard } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 import { Button } from "@/components/ui/button";
 import type { Role } from "@/lib/auth/types";
+import { requireAnonymous } from "@/lib/auth/server";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
 import { LoginForm } from "@/app/login/_components/login-form";
@@ -103,6 +104,10 @@ export default async function AdminLoginPage({
 }: {
   readonly searchParams: Promise<{ error?: string }>;
 }) {
+  // Anonymous-access page: signed-out visitors render the sign-in form;
+  // already-authenticated admins are redirected to their role home so
+  // they don't see the login surface twice.
+  await requireAnonymous(ADMIN_ROLES);
   const { error } = await searchParams;
   const errorMessage = error ? (ERROR_COPY[error] ?? ERROR_COPY.login_failed) : null;
   return (

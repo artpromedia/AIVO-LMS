@@ -10,7 +10,9 @@
 // 3. No page.tsx under app/{role}/** ships literal placeholder copy
 //    ("Coming soon", "TBD", "Lorem ipsum") in JSX text.
 // 4. Every role-grouped page.tsx imports requirePageRole OR a role
-//    helper that calls it.
+//    helper that calls it. Sign-in surfaces may use `requireAnonymous`
+//    instead, which redirects already-authenticated visitors away while
+//    allowing logged-out users to render the form.
 
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
@@ -94,13 +96,13 @@ for (const role of ROLE_GROUPS) {
 
   const layoutFiles = walk(roleDir).filter((p) => p.endsWith("/layout.tsx"));
   const layoutCoversRole = layoutFiles.some((p) =>
-    /requirePageRole|requireSession/.test(readFileSync(p, "utf8")),
+    /requirePageRole|requireSession|requireAnonymous/.test(readFileSync(p, "utf8")),
   );
 
   const pages = walk(roleDir).filter((p) => p.endsWith("/page.tsx"));
   for (const p of pages) {
     const src = readFileSync(p, "utf8");
-    const callsGuard = /requirePageRole|requireSession\b/.test(src) || layoutCoversRole;
+    const callsGuard = /requirePageRole|requireSession|requireAnonymous\b/.test(src) || layoutCoversRole;
     if (!callsGuard) {
       errors.push(
         `${p.replace(repoRoot + "/", "")}: must call requirePageRole or be covered by a role-group layout that does.`,
