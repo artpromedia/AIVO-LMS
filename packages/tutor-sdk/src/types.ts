@@ -79,6 +79,14 @@ export interface TutorDefinition {
   skillGraphRefs: readonly string[];
   /** Default content-pack ids the tutor pulls activities from. */
   defaultContentPackRefs: readonly string[];
+  /**
+   * Per-grade-band authoring status, keyed by `GradeBand`. Optional for
+   * backward compatibility, but new tutors should declare it. When present,
+   * every entry's key must appear in `gradeBands` (enforced by the SDK
+   * validator) — the matrix is a refinement of the declared scope, not a
+   * second source of truth for which bands the tutor advertises.
+   */
+  coverageMatrix?: Partial<Record<GradeBand, TutorCoverageStatus>>;
   /** Policy gates — checked at session start. */
   policy: TutorPolicyGates;
   /**
@@ -87,6 +95,25 @@ export interface TutorDefinition {
    */
   authoringMeta?: Record<string, string>;
 }
+
+/**
+ * Per-grade-band authoring status. The tutor's `gradeBands` field declares
+ * the *catalog scope* (what the tutor advertises). `coverageMatrix` declares,
+ * for each of those bands, whether the underlying skill-graph + item-bank
+ * content actually exists. The runtime uses this to gate session-start
+ * (refuse to plan a session for a learner whose grade is `missing`).
+ *
+ * Values:
+ *   - `"authored"` — a real, standards-aligned skill graph exists for this
+ *     band and at least one item-bank entry is mapped against it.
+ *   - `"scaffold"` — the band is declared on the SDK side (graph stub or
+ *     persona prompt knows about it) but no production content is shipped
+ *     yet. Honest signal for the coverage gate.
+ *   - `"missing"` — explicitly known-absent. Same runtime behavior as a
+ *     missing key on the matrix; the difference is intent — `"missing"`
+ *     means "we plan to author it" vs. an absent key meaning "out of scope".
+ */
+export type TutorCoverageStatus = "authored" | "scaffold" | "missing";
 
 /** Issue codes surfaced by `validateTutorDefinition`. */
 export type TutorDefinitionIssueCode =
@@ -98,7 +125,9 @@ export type TutorDefinitionIssueCode =
   | "empty_functioning_levels"
   | "empty_skill_graph_refs"
   | "policy_consent_required_for_voice"
-  | "duplicate_capability";
+  | "duplicate_capability"
+  | "coverage_matrix_grade_not_declared"
+  | "coverage_matrix_invalid_status";
 
 export interface TutorDefinitionIssue {
   code: TutorDefinitionIssueCode;

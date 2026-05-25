@@ -31,63 +31,108 @@ export {
 
 export { ccssMathKindergarten } from "./seeds/ccss-math-k.js";
 export { ccssMath1To8 } from "./seeds/ccss-math-1-8.js";
+export { ccssMath9To12 } from "./seeds/ccss-math-9-12.js";
 export { ngssK2PhysicalScience } from "./seeds/ngss-k2-physical-science.js";
 export { ngssScience3To8 } from "./seeds/ngss-science-3-8.js";
+export { ngssScience9To12 } from "./seeds/ngss-science-9-12.js";
 export { ccssElaKindergarten } from "./seeds/ccss-ela-k.js";
 export { ccssEla1To8 } from "./seeds/ccss-ela-1-8.js";
+export { ccssEla9To12 } from "./seeds/ccss-ela-9-12.js";
 export { ccssWritingK8 } from "./seeds/ccss-writing-k-8.js";
 export { c3SocialStudiesK2 } from "./seeds/c3-social-studies-k2.js";
+export { c3SocialStudies3To8 } from "./seeds/c3-social-studies-3-8.js";
+export { c3SocialStudies9To12 } from "./seeds/c3-social-studies-9-12.js";
 export { ngsGeographyK2 } from "./seeds/ncge-geography-k2.js";
+export { ncgeGeography3To12 } from "./seeds/ncge-geography-3-12.js";
 export { cstaCodingK2 } from "./seeds/csta-coding-k2.js";
+export { cstaCoding3To12 } from "./seeds/csta-coding-3-12.js";
 export { ashaSpeechEarly } from "./seeds/asha-speech-early.js";
+export { ashaSpeechSchoolAge } from "./seeds/asha-speech-school-age.js";
 export { caselSelK2 } from "./seeds/casel-sel-k2.js";
+export { caselSel3To12 } from "./seeds/casel-sel-3-12.js";
 export { ncasMusicK2 } from "./seeds/ncas-music-k2.js";
+export { ncasMusic3To8 } from "./seeds/ncas-music-3-8.js";
 export { shapePeHealthK2 } from "./seeds/shape-pe-health-k2.js";
+export { shapePeHealth3To12 } from "./seeds/shape-pe-health-3-12.js";
 export { actflWorldLanguagesNoviceLow } from "./seeds/actfl-world-languages-novice-low.js";
+export { actflWorldLanguages7To12 } from "./seeds/actfl-world-languages-7-12.js";
 export { ngssEngineeringDesign35 } from "./seeds/ngss-engineering-design-3-5.js";
+export { ngssEngineeringDesign6To12 } from "./seeds/ngss-engineering-design-6-12.js";
 export { cecLifeSkills6Plus } from "./seeds/cec-life-skills-6-plus.js";
+export { cecLifeSkills9To12 } from "./seeds/cec-life-skills-9-12.js";
 export { ncasCreativeArtsK2 } from "./seeds/ncas-creative-arts-k2.js";
+export { ncasCreativeArts3To12 } from "./seeds/ncas-creative-arts-3-12.js";
 
 import { ccssMathKindergarten } from "./seeds/ccss-math-k.js";
 import { ccssMath1To8 } from "./seeds/ccss-math-1-8.js";
+import { ccssMath9To12 } from "./seeds/ccss-math-9-12.js";
 import { ngssK2PhysicalScience } from "./seeds/ngss-k2-physical-science.js";
 import { ngssScience3To8 } from "./seeds/ngss-science-3-8.js";
+import { ngssScience9To12 } from "./seeds/ngss-science-9-12.js";
 import { ccssElaKindergarten } from "./seeds/ccss-ela-k.js";
 import { ccssEla1To8 } from "./seeds/ccss-ela-1-8.js";
+import { ccssEla9To12 } from "./seeds/ccss-ela-9-12.js";
 import { ccssWritingK8 } from "./seeds/ccss-writing-k-8.js";
 import { c3SocialStudiesK2 } from "./seeds/c3-social-studies-k2.js";
+import { c3SocialStudies3To8 } from "./seeds/c3-social-studies-3-8.js";
+import { c3SocialStudies9To12 } from "./seeds/c3-social-studies-9-12.js";
 import { ngsGeographyK2 } from "./seeds/ncge-geography-k2.js";
+import { ncgeGeography3To12 } from "./seeds/ncge-geography-3-12.js";
 import { cstaCodingK2 } from "./seeds/csta-coding-k2.js";
+import { cstaCoding3To12 } from "./seeds/csta-coding-3-12.js";
 import { ashaSpeechEarly } from "./seeds/asha-speech-early.js";
+import { ashaSpeechSchoolAge } from "./seeds/asha-speech-school-age.js";
 import { caselSelK2 } from "./seeds/casel-sel-k2.js";
+import { caselSel3To12 } from "./seeds/casel-sel-3-12.js";
 import { ncasMusicK2 } from "./seeds/ncas-music-k2.js";
+import { ncasMusic3To8 } from "./seeds/ncas-music-3-8.js";
 import { shapePeHealthK2 } from "./seeds/shape-pe-health-k2.js";
+import { shapePeHealth3To12 } from "./seeds/shape-pe-health-3-12.js";
 import { actflWorldLanguagesNoviceLow } from "./seeds/actfl-world-languages-novice-low.js";
+import { actflWorldLanguages7To12 } from "./seeds/actfl-world-languages-7-12.js";
 import { ngssEngineeringDesign35 } from "./seeds/ngss-engineering-design-3-5.js";
+import { ngssEngineeringDesign6To12 } from "./seeds/ngss-engineering-design-6-12.js";
 import { cecLifeSkills6Plus } from "./seeds/cec-life-skills-6-plus.js";
+import { cecLifeSkills9To12 } from "./seeds/cec-life-skills-9-12.js";
 import { ncasCreativeArtsK2 } from "./seeds/ncas-creative-arts-k2.js";
+import { ncasCreativeArts3To12 } from "./seeds/ncas-creative-arts-3-12.js";
 import type { SkillGraph } from "./types.js";
 
 /** All seed graphs that ship with this package, in registration order. */
 export const SEED_GRAPHS: readonly SkillGraph[] = [
   ccssMathKindergarten,
   ccssMath1To8,
+  ccssMath9To12,
   ngssK2PhysicalScience,
   ngssScience3To8,
+  ngssScience9To12,
   ccssElaKindergarten,
   ccssEla1To8,
+  ccssEla9To12,
   ccssWritingK8,
   c3SocialStudiesK2,
+  c3SocialStudies3To8,
+  c3SocialStudies9To12,
   ngsGeographyK2,
+  ncgeGeography3To12,
   cstaCodingK2,
+  cstaCoding3To12,
   ashaSpeechEarly,
+  ashaSpeechSchoolAge,
   caselSelK2,
+  caselSel3To12,
   ncasMusicK2,
+  ncasMusic3To8,
   shapePeHealthK2,
+  shapePeHealth3To12,
   actflWorldLanguagesNoviceLow,
+  actflWorldLanguages7To12,
   ngssEngineeringDesign35,
+  ngssEngineeringDesign6To12,
   cecLifeSkills6Plus,
+  cecLifeSkills9To12,
   ncasCreativeArtsK2,
+  ncasCreativeArts3To12,
 ];
 
 /** Look up a seed graph by id. Returns `undefined` if not found. */

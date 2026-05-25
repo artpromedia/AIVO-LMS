@@ -2,8 +2,10 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import {
   buildLearnerContext,
+  isScaffoldAllowedByEnv,
   negotiateFunctioningLevel,
   normalizeFunctioningLevel,
+  normalizeGradeBand,
 } from "../src/lib/learnerContext.js";
 import type { TutorDefinition } from "@aivo/tutor-sdk";
 
@@ -73,6 +75,52 @@ describe("tutor-svc learnerContext loader", () => {
     assert.equal(ctx.recentOutcomes.length, 1);
     assert.deepEqual(ctx.recentlyCovered, ["s1"]);
     assert.equal(ctx.interestProfile, profile);
+  });
+});
+
+describe("tutor-svc normalizeGradeBand", () => {
+  it("accepts canonical forms unchanged", () => {
+    assert.equal(normalizeGradeBand("K"), "K");
+    assert.equal(normalizeGradeBand("PRE_K"), "PRE_K");
+    assert.equal(normalizeGradeBand("ADULT"), "ADULT");
+    assert.equal(normalizeGradeBand("9"), "9");
+  });
+
+  it("normalizes common variants", () => {
+    assert.equal(normalizeGradeBand("pre-k"), "PRE_K");
+    assert.equal(normalizeGradeBand("Pre K"), "PRE_K");
+    assert.equal(normalizeGradeBand("kindergarten"), "K");
+    assert.equal(normalizeGradeBand(" 7 "), "7");
+  });
+
+  it("returns undefined for unrecognised values", () => {
+    assert.equal(normalizeGradeBand(null), undefined);
+    assert.equal(normalizeGradeBand(""), undefined);
+    assert.equal(normalizeGradeBand("13"), undefined);
+    assert.equal(normalizeGradeBand("postgrad"), undefined);
+  });
+
+  it("threads gradeBand through buildLearnerContext", () => {
+    const ctx = buildLearnerContext({ learnerId: "l1", gradeBand: "3" });
+    assert.equal(ctx.gradeBand, "3");
+  });
+
+  it("buildLearnerContext omits gradeBand when not recognised", () => {
+    const ctx = buildLearnerContext({ learnerId: "l1", gradeBand: "thirteen" });
+    assert.equal(ctx.gradeBand, undefined);
+  });
+});
+
+describe("tutor-svc isScaffoldAllowedByEnv", () => {
+  it("defaults to false when env var is unset", () => {
+    assert.equal(isScaffoldAllowedByEnv({}), false);
+  });
+
+  it("enables only on exact truthy string", () => {
+    assert.equal(isScaffoldAllowedByEnv({ AIVO_ALLOW_SCAFFOLD_CONTENT: "true" }), true);
+    assert.equal(isScaffoldAllowedByEnv({ AIVO_ALLOW_SCAFFOLD_CONTENT: "TRUE" }), true);
+    assert.equal(isScaffoldAllowedByEnv({ AIVO_ALLOW_SCAFFOLD_CONTENT: "1" }), false);
+    assert.equal(isScaffoldAllowedByEnv({ AIVO_ALLOW_SCAFFOLD_CONTENT: "yes" }), false);
   });
 });
 

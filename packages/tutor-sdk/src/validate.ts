@@ -66,6 +66,29 @@ export function validateTutorDefinition(def: TutorDefinition): TutorDefinitionIs
     });
   }
 
+  // Coverage matrix: every key must be a declared grade band; every value
+  // must be one of the allowed statuses.
+  if (def.coverageMatrix) {
+    const declared = new Set<string>(def.gradeBands ?? []);
+    const allowedStatuses = new Set(["authored", "scaffold", "missing"]);
+    for (const [band, status] of Object.entries(def.coverageMatrix)) {
+      if (!declared.has(band)) {
+        issues.push({
+          code: "coverage_matrix_grade_not_declared",
+          detail: `coverageMatrix references grade "${band}" which is not in gradeBands.`,
+          path: `coverageMatrix.${band}`,
+        });
+      }
+      if (status !== undefined && !allowedStatuses.has(status)) {
+        issues.push({
+          code: "coverage_matrix_invalid_status",
+          detail: `coverageMatrix["${band}"] = "${String(status)}" is not one of authored|scaffold|missing.`,
+          path: `coverageMatrix.${band}`,
+        });
+      }
+    }
+  }
+
   // Capabilities must be unique.
   if (def.capabilities) {
     const seen = new Set<string>();

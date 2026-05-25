@@ -18,7 +18,8 @@
  */
 import type { Activity, ContentPack } from "@aivo/content-pack";
 import type { TutorDefinition, TutorFunctioningLevel } from "@aivo/tutor-sdk";
-import { assertValidTutorDefinition } from "@aivo/tutor-sdk";
+import { assertValidTutorDefinition, getCoverageStatus } from "@aivo/tutor-sdk";
+import type { GradeBand } from "@aivo/skill-graphs";
 import type { MasteryRecord, AnswerOutcome } from "@aivo/pedagogy";
 import { retrieve, scaffold, schedule } from "@aivo/pedagogy";
 import { transformActivity } from "@aivo/level-transforms";
@@ -43,6 +44,15 @@ export interface LearnerContext {
    * engine, not a distraction.
    */
   interestProfile?: LearnerInterestProfile;
+  /**
+   * Optional learner grade band. When supplied, the runtime checks the
+   * tutor's `coverageMatrix` and refuses to plan the session if the
+   * band is not `"authored"` (unless `opts.allowScaffold` is set).
+   * Hosts SHOULD pass this for production learners; previews / authoring
+   * tools that need to render scaffold content should omit it or pair
+   * it with `allowScaffold: true`.
+   */
+  gradeBand?: GradeBand;
 }
 
 export interface PlanSessionOptions {
@@ -52,6 +62,13 @@ export interface PlanSessionOptions {
   retrievalMinMastery?: number;
   /** Random source — defaults to `Math.random`. */
   rng?: () => number;
+  /**
+   * Bypass the production-readiness check for the learner's grade band.
+   * Use only for authoring / preview surfaces (catalog "try this tutor"
+   * panes, content-author tooling). Default false. Production learner
+   * sessions must NEVER set this to true.
+   */
+  allowScaffold?: boolean;
 }
 
 export interface SessionPlan {
@@ -125,6 +142,22 @@ export function planSession(
       "unsupported_functioning_level",
       `Tutor ${def.id} does not support functioning level "${ctx.functioningLevel}".`,
     );
+  }
+  if (ctx.gradeBand !== undefined && !opts.allowScaffold) {
+    if (!def.gradeBands.includes(ctx.gradeBand)) {
+      throw new TutorPolicyError(
+        "grade_band_not_in_scope",
+        `Tutor ${def.id} does not declare grade band "${ctx.gradeBand}" in its catalog scope.`,
+      );
+    }
+    const status = getCoverageStatus(def, ctx.gradeBand);
+    if (status !== undefined && status !== "authored") {
+      throw new TutorPolicyError(
+        "grade_band_not_production",
+        `Tutor ${def.id} grade band "${ctx.gradeBand}" is "${status}" (not "authored"). ` +
+          `Production sessions require authored content; pass opts.allowScaffold for previews.`,
+      );
+    }
   }
 
   const max = opts.maxActivities ?? 8;

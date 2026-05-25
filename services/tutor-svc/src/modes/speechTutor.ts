@@ -27,8 +27,20 @@ export const speechTutor: TutorDefinition = defineTutor({
   subjects: ["speech"],
   gradeBands: ["PRE_K", "K", "1", "2", "3", "4", "5", "6", "7", "8"],
   functioningLevels: ["STANDARD", "SUPPORTED", "LOW_VERBAL", "NON_VERBAL", "PRE_SYMBOLIC"],
-  skillGraphRefs: ["asha-speech-early"],
+  skillGraphRefs: ["asha-speech-early", "asha-speech-school-age"],
   defaultContentPackRefs: ["speech-early-fall-2026"],
+  coverageMatrix: {
+    PRE_K: "authored",
+    K: "authored",
+    "1": "authored",
+    "2": "authored",
+    "3": "scaffold",
+    "4": "scaffold",
+    "5": "scaffold",
+    "6": "scaffold",
+    "7": "scaffold",
+    "8": "scaffold",
+  },
   policy: {
     // Voice sessions delegate to Speech Buddy, which enforces the full
     // consent + age + safety gate. Text/AAC sessions on this tutor

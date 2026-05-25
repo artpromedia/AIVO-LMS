@@ -23,8 +23,17 @@ export const worldLanguagesTutor: TutorDefinition = defineTutor({
   subjects: ["world_languages"],
   gradeBands: ["6", "7", "8", "9", "10", "11", "12"],
   functioningLevels: ["STANDARD", "SUPPORTED", "LOW_VERBAL", "NON_VERBAL"],
-  skillGraphRefs: ["actfl-world-languages-novice-low"],
+  skillGraphRefs: ["actfl-world-languages-novice-low", "actfl-world-languages-7-12"],
   defaultContentPackRefs: ["world-languages-novice-low-fall-2026"],
+  coverageMatrix: {
+    "6": "authored",
+    "7": "scaffold",
+    "8": "scaffold",
+    "9": "scaffold",
+    "10": "scaffold",
+    "11": "scaffold",
+    "12": "scaffold",
+  },
   policy: {
     requiresConsent: true,
     minAgeYears: 11,

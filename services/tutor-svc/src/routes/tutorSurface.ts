@@ -13,7 +13,11 @@
  */
 
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { buildLearnerContext, negotiateFunctioningLevel } from "../lib/learnerContext.js";
+import {
+  buildLearnerContext,
+  isScaffoldAllowedByEnv,
+  negotiateFunctioningLevel,
+} from "../lib/learnerContext.js";
 import { planSession, TutorPolicyError, type LearnerContext } from "@aivo/tutor-runtime";
 import { getTutorDefinition } from "../modes/registry.js";
 import { getStarterContentPack } from "../content-packs/index.js";
@@ -28,6 +32,8 @@ interface SurfaceBeatsBody {
   recentOutcomes?: LearnerContext["recentOutcomes"];
   recentlyCovered?: LearnerContext["recentlyCovered"];
   interestProfile?: LearnerContext["interestProfile"];
+  /** Learner's grade band. See `POST /api/tutors/:tutorKey/plan`. */
+  gradeBand?: string;
 }
 
 export function registerTutorSurfaceRoutes(app: FastifyInstance): void {
@@ -63,6 +69,7 @@ export function registerTutorSurfaceRoutes(app: FastifyInstance): void {
         recentOutcomes: body.recentOutcomes,
         recentlyCovered: body.recentlyCovered,
         interestProfile: body.interestProfile,
+        gradeBand: body.gradeBand,
       });
       const negotiated = negotiateFunctioningLevel(baseCtx.functioningLevel, def);
       if (!negotiated) {
@@ -75,11 +82,24 @@ export function registerTutorSurfaceRoutes(app: FastifyInstance): void {
       try {
         const plan = planSession(def, ctx, contentPack, {
           maxActivities: body.maxActivities ?? 6,
+          allowScaffold: isScaffoldAllowedByEnv(),
         });
         const response = buildTutorSurfaceBeats(plan);
         return reply.send(response);
       } catch (err) {
         if (err instanceof TutorPolicyError) {
+          if (
+            err.code === "grade_band_not_production" ||
+            err.code === "grade_band_not_in_scope"
+          ) {
+            return reply.code(409).send({
+              error: err.message,
+              code: err.code,
+              tutorKey,
+              gradeBand: ctx.gradeBand,
+              authoringInProgress: true,
+            });
+          }
           return reply.code(400).send({ error: err.message, code: err.code });
         }
         const message = err instanceof Error ? err.message : String(err);

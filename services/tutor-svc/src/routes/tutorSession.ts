@@ -43,7 +43,11 @@ import type { MasteryRecord, AnswerOutcome } from "@aivo/pedagogy";
 import type { LearnerInterestProfile } from "@aivo/special-interest-engine";
 import type { DapeProfileSummary } from "@aivo/scoring";
 import { getTutorDefinition, listTutorDefinitions } from "../modes/registry.js";
-import { buildLearnerContext, negotiateFunctioningLevel } from "../lib/learnerContext.js";
+import {
+  buildLearnerContext,
+  isScaffoldAllowedByEnv,
+  negotiateFunctioningLevel,
+} from "../lib/learnerContext.js";
 import { getStarterContentPack } from "../content-packs/index.js";
 import { ConsentError, verifyTutorConsent } from "../lib/familyConsent.js";
 import {
@@ -64,6 +68,12 @@ interface PlanBody {
   recentOutcomes?: AnswerOutcome[];
   recentlyCovered?: string[];
   interestProfile?: LearnerInterestProfile;
+  /** Learner's grade band (K, 1..12, PRE_K, ADULT). When supplied,
+   *  the runtime refuses to plan a session if the tutor's
+   *  `coverageMatrix` marks that band as `scaffold` or `missing`
+   *  (unless the deployment opts into scaffold preview via the
+   *  `AIVO_ALLOW_SCAFFOLD_CONTENT` env var). */
+  gradeBand?: string;
   maxActivities?: number;
   /** Pre-loaded DAPE summary (used by Vigor). The chat layer attaches
    *  this to ai-svc `brain_context` so the prompt builder renders the
@@ -220,6 +230,7 @@ export function registerTutorSessionRoutes(app: FastifyInstance): void {
         recentOutcomes: body.recentOutcomes,
         recentlyCovered: body.recentlyCovered,
         interestProfile: body.interestProfile,
+        gradeBand: body.gradeBand,
       });
       const negotiated = negotiateFunctioningLevel(baseCtx.functioningLevel, def);
       if (!negotiated) {
@@ -232,6 +243,7 @@ export function registerTutorSessionRoutes(app: FastifyInstance): void {
       try {
         const plan = planSession(def, ctx, contentPack, {
           maxActivities: body.maxActivities,
+          allowScaffold: isScaffoldAllowedByEnv(),
         });
         const response: PlanResponse = {
           ...plan,
@@ -263,6 +275,23 @@ export function registerTutorSessionRoutes(app: FastifyInstance): void {
         return response;
       } catch (err) {
         if (err instanceof TutorPolicyError) {
+          // The coverage-matrix gates surface as 409 Conflict — the
+          // request is well-formed but the tutor isn't yet in
+          // production for this learner's grade band. The UI should
+          // render an "Authoring in progress" surface rather than
+          // treating this as a client bug.
+          if (
+            err.code === "grade_band_not_production" ||
+            err.code === "grade_band_not_in_scope"
+          ) {
+            return reply.code(409).send({
+              error: err.message,
+              code: err.code,
+              tutorKey,
+              gradeBand: ctx.gradeBand,
+              authoringInProgress: true,
+            });
+          }
           return reply.code(400).send({ error: err.message, code: err.code });
         }
         const message = err instanceof Error ? err.message : String(err);
