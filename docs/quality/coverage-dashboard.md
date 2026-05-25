@@ -11,7 +11,7 @@
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | atlas | · | A | A | A | S | S | S | S | S | S | S | S | S | S | · |
 | cadence | S | A | A | A | S | S | S | S | S | S | · | · | · | · | · |
-| chrono | · | · | · | · | A | S | S | S | S | S | S | S | S | S | · |
+| chrono | · | · | · | · | S | S | S | S | S | S | S | S | S | S | · |
 | compass | · | · | · | · | · | · | · | A | A | A | S | S | S | S | S |
 | echo | A | A | A | A | S | S | S | S | S | S | · | · | · | · | · |
 | forge | · | · | · | · | A | A | A | S | S | S | S | S | S | S | · |
@@ -28,8 +28,8 @@
 
 | Status | Count |
 | --- | ---: |
-| authored | 57 |
-| scaffold | 106 |
+| authored | 56 |
+| scaffold | 107 |
 | missing | 0 |
 
 See `docs/quality/tutor-k12-coverage-gap-plan.md` for the rollout plan and `docs/quality/tutor-content-signoffs.json` for the SME sign-off ledger.

@@ -26,6 +26,7 @@
  */
 import type { LearnerContext, TutorDefinition, TutorFunctioningLevel } from "@aivo/tutor-runtime";
 import type { AnswerOutcome, MasteryRecord } from "@aivo/pedagogy";
+import type { GradeBand } from "@aivo/skill-graphs";
 import type { LearnerInterestProfile } from "@aivo/special-interest-engine";
 
 const FUNCTIONING_LEVELS: ReadonlyArray<TutorFunctioningLevel> = [
@@ -34,6 +35,24 @@ const FUNCTIONING_LEVELS: ReadonlyArray<TutorFunctioningLevel> = [
   "LOW_VERBAL",
   "NON_VERBAL",
   "PRE_SYMBOLIC",
+];
+
+const GRADE_BANDS: ReadonlyArray<GradeBand> = [
+  "PRE_K",
+  "K",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+  "ADULT",
 ];
 
 /** Inputs accepted by `buildLearnerContext`. Every field is optional
@@ -51,6 +70,13 @@ export interface LearnerContextInputs {
   recentlyCovered?: readonly string[];
   /** Special-interest profile (caregiver intake, engagement, IEP). */
   interestProfile?: LearnerInterestProfile;
+  /**
+   * Learner's grade band. When supplied, the runtime checks the tutor's
+   * `coverageMatrix` and refuses to plan the session if the band is not
+   * `"authored"` (unless the host opts into scaffold preview mode).
+   * Hosts SHOULD pass this for production learners.
+   */
+  gradeBand?: string | null;
 }
 
 /** Coerce any string into a valid `TutorFunctioningLevel`, defaulting
@@ -61,6 +87,29 @@ export function normalizeFunctioningLevel(raw: string | null | undefined): Tutor
   return (FUNCTIONING_LEVELS as readonly string[]).includes(upper)
     ? (upper as TutorFunctioningLevel)
     : "STANDARD";
+}
+
+/**
+ * Coerce any string into a valid `GradeBand`. Accepts the canonical
+ * forms (`K`, `1`-`12`, `PRE_K`, `ADULT`) as well as common variants
+ * like `"kindergarten"`, `"pre-k"`, `"prek"`, and plain digits with
+ * surrounding whitespace. Returns `undefined` for inputs we can't
+ * confidently classify — the runtime gate then no-ops (preserving
+ * backward compatibility) rather than throwing an opaque error.
+ */
+export function normalizeGradeBand(raw: string | null | undefined): GradeBand | undefined {
+  if (!raw) return undefined;
+  const cleaned = raw.trim().toUpperCase().replace(/[-_\s]/g, "_");
+  if ((GRADE_BANDS as readonly string[]).includes(cleaned)) return cleaned as GradeBand;
+  if (cleaned === "KINDERGARTEN" || cleaned === "PREK") {
+    return cleaned === "PREK" ? "PRE_K" : "K";
+  }
+  const m = cleaned.match(/^(\d{1,2})$/);
+  if (m) {
+    const n = Number(m[1]);
+    if (n >= 1 && n <= 12) return String(n) as GradeBand;
+  }
+  return undefined;
 }
 
 /**
@@ -79,6 +128,7 @@ export function buildLearnerContext(input: LearnerContextInputs): LearnerContext
     recentOutcomes: [...(input.recentOutcomes ?? [])],
     recentlyCovered: input.recentlyCovered ? [...input.recentlyCovered] : undefined,
     interestProfile: input.interestProfile,
+    gradeBand: normalizeGradeBand(input.gradeBand),
   };
 }
 
@@ -93,6 +143,20 @@ export function buildLearnerContext(input: LearnerContextInputs): LearnerContext
  * callers can use this helper to negotiate a graceful fallback before
  * invoking `planSession()`.
  */
+/**
+ * Whether this service instance permits planning sessions on
+ * non-production (`"scaffold"`) coverageMatrix bands. Production
+ * deployments MUST leave this off — the runtime gate refuses unreviewed
+ * content. Staging / dev / preview environments opt in via the
+ * `AIVO_ALLOW_SCAFFOLD_CONTENT` env var so authors can iterate against
+ * AI-draft skill graphs without waiting on SME signoff.
+ *
+ * Defaults to off; explicit string `"true"` (case-insensitive) enables.
+ */
+export function isScaffoldAllowedByEnv(env: NodeJS.ProcessEnv = process.env): boolean {
+  return String(env.AIVO_ALLOW_SCAFFOLD_CONTENT ?? "").toLowerCase() === "true";
+}
+
 export function negotiateFunctioningLevel(
   requested: TutorFunctioningLevel,
   def: TutorDefinition,

@@ -173,4 +173,87 @@ describe("tutor-svc generic plan route", () => {
     });
     assert.equal(res.statusCode, 404);
   });
+
+  it("POST /api/tutors/:key/plan 409s on a scaffold band by default", async () => {
+    // chrono declares 3-12 with every band as `scaffold` (AI-draft) —
+    // production env should refuse to plan a session.
+    const prev = process.env.AIVO_ALLOW_SCAFFOLD_CONTENT;
+    delete process.env.AIVO_ALLOW_SCAFFOLD_CONTENT;
+    try {
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/tutors/chrono/plan",
+        payload: {
+          learnerId: "l1",
+          consentRecordId: "c1",
+          gradeBand: "5",
+          contentPack: makePack("c3.5.D2.His.3"),
+        },
+      });
+      assert.equal(res.statusCode, 409);
+      const body = res.json() as Record<string, unknown>;
+      assert.equal(body.code, "grade_band_not_production");
+      assert.equal(body.authoringInProgress, true);
+      assert.equal(body.gradeBand, "5");
+    } finally {
+      if (prev !== undefined) process.env.AIVO_ALLOW_SCAFFOLD_CONTENT = prev;
+    }
+  });
+
+  it("POST /api/tutors/:key/plan allows scaffold when AIVO_ALLOW_SCAFFOLD_CONTENT=true", async () => {
+    const prev = process.env.AIVO_ALLOW_SCAFFOLD_CONTENT;
+    process.env.AIVO_ALLOW_SCAFFOLD_CONTENT = "true";
+    try {
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/tutors/chrono/plan",
+        payload: {
+          learnerId: "l1",
+          consentRecordId: "c1",
+          gradeBand: "5",
+          contentPack: makePack("c3.5.D2.His.3"),
+        },
+      });
+      assert.equal(res.statusCode, 200);
+    } finally {
+      if (prev === undefined) delete process.env.AIVO_ALLOW_SCAFFOLD_CONTENT;
+      else process.env.AIVO_ALLOW_SCAFFOLD_CONTENT = prev;
+    }
+  });
+
+  it("POST /api/tutors/:key/plan succeeds for an authored band without scaffold opt-in", async () => {
+    // nova K is `authored` — production should serve it normally.
+    const prev = process.env.AIVO_ALLOW_SCAFFOLD_CONTENT;
+    delete process.env.AIVO_ALLOW_SCAFFOLD_CONTENT;
+    try {
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/tutors/nova/plan",
+        payload: {
+          learnerId: "l1",
+          consentRecordId: "c1",
+          gradeBand: "K",
+          contentPack: makePack("ccss-math.K.CC.A.1"),
+        },
+      });
+      assert.equal(res.statusCode, 200);
+    } finally {
+      if (prev !== undefined) process.env.AIVO_ALLOW_SCAFFOLD_CONTENT = prev;
+    }
+  });
+
+  it("POST /api/tutors/:key/plan ignores gradeBand when omitted (backward compat)", async () => {
+    // Existing callers that don't pass gradeBand should still work —
+    // the gate only fires when the field is present.
+    const res = await app.inject({
+      method: "POST",
+      url: "/api/tutors/chrono/plan",
+      payload: {
+        learnerId: "l1",
+        consentRecordId: "c1",
+        contentPack: makePack("c3.5.D2.His.3"),
+      },
+    });
+    assert.equal(res.statusCode, 200);
+  });
 });
