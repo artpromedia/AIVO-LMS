@@ -1,9 +1,13 @@
 /**
- * Sprint 7: Subjects-all page redesign.
+ * Subjects-all page.
  *
- * Renders every subject as a SubjectCard with a mastery ring + next
- * action chip. Empty state (no baseline yet) routes the learner to
- * /learner/baseline so they don't see hollow cards.
+ * Renders only production-ready subjects (`productionReady === true` in
+ * `@aivo/brand`'s LEARNER_SUBJECTS). Non-ready subjects are hidden from
+ * the learner grid until their curriculum + item bank lands; we no
+ * longer ship a "Coming soon" placeholder card (route-audit gate).
+ *
+ * Empty state (no baseline yet) routes the learner to /learner/baseline
+ * so they don't see hollow cards.
  */
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -18,7 +22,7 @@ import {
   listSubjects,
 } from "@/lib/db/repos";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
-import { isSubjectComingSoon } from "@/lib/feature-flags";
+import { getProductionReadySubjects } from "@aivo/brand";
 
 function masteryLabel(score: number, t: (key: string) => string): string {
   if (score >= 0.85) return t("mastery_strong");
@@ -36,7 +40,11 @@ export default async function LearnerSubjectsPage() {
   if (!learnerId) redirect("/learner/home");
 
   const { map, skillMasteries } = getMasteryMap(learnerId, session.tenantId);
-  const subjects = listSubjects();
+  // Intersect BFF-seeded subjects with the brand registry's production-
+  // ready set so non-ready slugs (currently world-languages, coding,
+  // and the other content-team-WIP rows) never reach the learner UI.
+  const productionReadySlugs = new Set(getProductionReadySubjects().map((s) => s.slug));
+  const subjects = listSubjects().filter((s) => productionReadySlugs.has(s.slug));
   const iep = getIEPForLearner(learnerId, session.tenantId);
   const baselineNeeded = !map;
 
@@ -90,32 +98,18 @@ export default async function LearnerSubjectsPage() {
             const entry = subjectScore.get(s.id);
             const avg = entry ? entry.score / entry.count : 0;
             const tutor = tutorForSubjectSlug(s.slug);
-            const comingSoon = isSubjectComingSoon(s.slug);
             return (
               <SubjectCard
                 key={s.id}
-                href={comingSoon ? "#" : `/learner/subjects/${s.id}`}
+                href={`/learner/subjects/${s.id}`}
                 name={s.name}
                 eyebrow={tutor ? `${tutor.name} · ${tutor.landmark}` : undefined}
-                masteryLabel={comingSoon ? "Coming soon" : masteryLabel(avg, tProgress)}
-                masteryPct={comingSoon ? 0 : Math.round(avg * 100)}
+                masteryLabel={masteryLabel(avg, tProgress)}
+                masteryPct={Math.round(avg * 100)}
                 accent={tutor?.color}
                 icon={tutor?.emoji ?? "📘"}
-                nextAction={
-                  comingSoon
-                    ? "Content is on the way"
-                    : avg > 0
-                      ? "Pick where to start"
-                      : "Start your first skill"
-                }
-                support={
-                  comingSoon
-                    ? "Coming soon"
-                    : iep?.confirmedAt
-                      ? tSubjects("supports_on")
-                      : undefined
-                }
-                locked={comingSoon}
+                nextAction={avg > 0 ? "Pick where to start" : "Start your first skill"}
+                support={iep?.confirmedAt ? tSubjects("supports_on") : undefined}
               />
             );
           })}

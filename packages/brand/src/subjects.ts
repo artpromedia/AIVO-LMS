@@ -61,6 +61,18 @@ export interface LearnerSubject {
   tutorKey: TutorKey;
   /** When `true`, the subject appears in the Discovery baseline flow. */
   baselineDomain: boolean;
+  /**
+   * Sprint 6 — production readiness flag. `false` means the subject
+   * exists in the brand/tutor/brain vocabularies (curriculum-content
+   * team is growing into it) but does NOT yet have enough production
+   * curriculum + items to deliver end-to-end. The learner UI filters
+   * these out via `getProductionReadySubjects()`; admin / marketing
+   * surfaces may still reference them.
+   *
+   * A subject flips to `true` once it ships K-8 skill seeds AND ≥20
+   * production items per `scripts/curriculum-coverage-check.mjs`.
+   */
+  productionReady: boolean;
 }
 
 /**
@@ -77,6 +89,7 @@ export const LEARNER_SUBJECTS = [
     brainSubject: "ela",
     tutorKey: "sage",
     baselineDomain: true,
+    productionReady: true,
   },
   {
     slug: "math",
@@ -86,6 +99,7 @@ export const LEARNER_SUBJECTS = [
     brainSubject: "math",
     tutorKey: "nova",
     baselineDomain: true,
+    productionReady: true,
   },
   {
     slug: "science",
@@ -95,6 +109,7 @@ export const LEARNER_SUBJECTS = [
     brainSubject: "science",
     tutorKey: "spark",
     baselineDomain: true,
+    productionReady: true,
   },
   {
     slug: "social",
@@ -104,6 +119,7 @@ export const LEARNER_SUBJECTS = [
     brainSubject: "social_emotional",
     tutorKey: "harmony",
     baselineDomain: true,
+    productionReady: false,
   },
   {
     slug: "speech",
@@ -113,6 +129,7 @@ export const LEARNER_SUBJECTS = [
     brainSubject: null,
     tutorKey: "echo",
     baselineDomain: true,
+    productionReady: false,
   },
   {
     slug: "executive-function",
@@ -122,6 +139,7 @@ export const LEARNER_SUBJECTS = [
     brainSubject: "executive_function",
     tutorKey: "compass",
     baselineDomain: true,
+    productionReady: false,
   },
   {
     slug: "writing",
@@ -131,6 +149,7 @@ export const LEARNER_SUBJECTS = [
     brainSubject: "ela",
     tutorKey: "sage",
     baselineDomain: false,
+    productionReady: true,
   },
   {
     slug: "life",
@@ -140,6 +159,7 @@ export const LEARNER_SUBJECTS = [
     brainSubject: "life_skills",
     tutorKey: "compass",
     baselineDomain: false,
+    productionReady: false,
   },
   {
     slug: "art",
@@ -149,6 +169,7 @@ export const LEARNER_SUBJECTS = [
     brainSubject: null,
     tutorKey: "muse",
     baselineDomain: false,
+    productionReady: false,
   },
   {
     slug: "social-studies",
@@ -158,6 +179,7 @@ export const LEARNER_SUBJECTS = [
     brainSubject: "social_studies",
     tutorKey: "chrono",
     baselineDomain: false,
+    productionReady: false,
   },
   {
     slug: "world-languages",
@@ -167,6 +189,7 @@ export const LEARNER_SUBJECTS = [
     brainSubject: "world_language",
     tutorKey: "lingua",
     baselineDomain: false,
+    productionReady: false,
   },
   {
     slug: "coding",
@@ -176,6 +199,7 @@ export const LEARNER_SUBJECTS = [
     brainSubject: "coding",
     tutorKey: "pixel",
     baselineDomain: false,
+    productionReady: false,
   },
 ] as const satisfies readonly LearnerSubject[];
 
@@ -195,6 +219,18 @@ for (const s of LEARNER_SUBJECTS) {
 
 export function getSubjectBySlug(slug: string): LearnerSubject | undefined {
   return BY_SLUG.get(slug);
+}
+
+/**
+ * Sprint 6 — the subset of LEARNER_SUBJECTS the learner UI should
+ * actually surface. Filters out any subject whose `productionReady`
+ * flag is `false` (curriculum / item bank not ready). Use this from
+ * any learner-facing page that renders the subject grid; admin /
+ * marketing / parent surfaces may still reference `LEARNER_SUBJECTS`
+ * directly when they want the full registry.
+ */
+export function getProductionReadySubjects(): readonly LearnerSubject[] {
+  return LEARNER_SUBJECTS.filter((s) => s.productionReady);
 }
 
 /**

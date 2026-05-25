@@ -12,9 +12,11 @@
  *   - `LEARNER_LESSON_PLAYER_V2`: defaults OFF in production, ON in
  *     preview/dev. Sprint 1 (Gap #3) — route the lesson player
  *     through the real `/sessions` + `/path` APIs.
- *   - `SUBJECT_CONTENT_READY`: defaults OFF until item-bank authoring
- *     completes. Sprint 2 (Gap #7) — gates the "Coming soon" badge
- *     on newly seeded subjects.
+ *
+ * Sprint 6 retired `SUBJECT_CONTENT_READY` and `isSubjectComingSoon`:
+ * the learner UI now filters subjects through `getProductionReadySubjects()`
+ * in `@aivo/brand`, so non-ready subjects are hidden entirely instead
+ * of rendered with a "Coming soon" placeholder.
  */
 
 type Truthy = "1" | "true" | "yes" | "on" | "y";
@@ -48,34 +50,3 @@ export function lessonPlayerV2Enabled(): boolean {
   return false;
 }
 
-/**
- * `SUBJECT_CONTENT_READY` controls whether newly seeded subjects
- * (Sprint 2.1) ship with a "Coming soon" badge. When item-bank
- * authoring catches up the badge is dropped by flipping this flag.
- */
-export function subjectContentReadyEnabled(): boolean {
-  const fromPublic = process.env.NEXT_PUBLIC_SUBJECT_CONTENT_READY;
-  const fromServer = process.env.SUBJECT_CONTENT_READY;
-  if (isTruthy(fromPublic) || isTruthy(fromServer)) return true;
-  // Default: not ready — show the badge for placeholder subjects.
-  return false;
-}
-
-/**
- * Subjects that were added to the seed in Sprint 2.1 but don't yet
- * have a full item bank. The badge logic should consult both
- * `subjectContentReadyEnabled()` and this list.
- *
- * Sprint 5.3 shipped the social-studies brain + 30 fixture items, so
- * "social-studies" is no longer in this set. world-languages and coding
- * remain until their content ramps land.
- */
-export const COMING_SOON_SUBJECT_SLUGS = new Set([
-  "world-languages",
-  "coding",
-]);
-
-export function isSubjectComingSoon(slug: string): boolean {
-  if (subjectContentReadyEnabled()) return false;
-  return COMING_SOON_SUBJECT_SLUGS.has(slug);
-}
