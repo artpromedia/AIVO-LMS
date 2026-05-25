@@ -13,22 +13,31 @@
  * log so on-call sees the failure pattern instead of it being
  * silently swallowed.
  */
-import { createCounter, createLogger } from "./index.js";
+import { createCounter, createLogger, type Logger } from "./index.js";
 
 export type SubjectBrainCallStatus = "ok" | "miss_no_subject" | "miss_error";
 
-const logger = createLogger("observability.subject-brain-metrics");
+// Lazy initialisation avoids a circular import edge case where `./index.js`
+// re-exports this module and evaluates the top-level statements before
+// `createLogger` / `createCounter` are themselves defined.
+let _logger: Logger | undefined;
+function logger(): Logger {
+  return (_logger ??= createLogger("observability.subject-brain-metrics"));
+}
 
-const subjectBrainCalls = createCounter("subject_brain_calls_total", ["subject", "status"]);
+let _subjectBrainCalls: ReturnType<typeof createCounter> | undefined;
+function subjectBrainCalls(): ReturnType<typeof createCounter> {
+  return (_subjectBrainCalls ??= createCounter("subject_brain_calls_total", ["subject", "status"]));
+}
 
 export function recordSubjectBrainCall(
   subject: string,
   status: SubjectBrainCallStatus,
   meta?: { learnerId?: string; correlationId?: string; reason?: string },
 ): void {
-  subjectBrainCalls.increment(1, { subject, status });
+  subjectBrainCalls().increment(1, { subject, status });
   if (status !== "ok") {
-    logger.warn("subject_brain_call_miss", {
+    logger().warn("subject_brain_call_miss", {
       subject,
       status,
       learnerId: meta?.learnerId,
