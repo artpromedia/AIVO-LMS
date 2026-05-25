@@ -14,6 +14,7 @@ import {
   getSubjectBySlug,
   getSubjectsByBrain,
   getBaselineSubjects,
+  getProductionReadySubjects,
   type BrainSubject,
 } from "@aivo/brand";
 
@@ -24,6 +25,11 @@ const VALID_BRAINS: ReadonlySet<BrainSubject> = new Set([
   "world_language",
   "coding",
   "social_studies",
+  // Sprint 6 — brand registry already exposes these brains via
+  // LEARNER_SUBJECTS; the test was lagging behind the registry.
+  "social_emotional",
+  "executive_function",
+  "life_skills",
 ]);
 
 describe("LEARNER_SUBJECTS registry", () => {
@@ -59,5 +65,46 @@ describe("LEARNER_SUBJECTS registry", () => {
   it("maps ELA brain to both reading and writing", () => {
     const elaSlugs = getSubjectsByBrain("ela").map((s) => s.slug);
     expect(elaSlugs).toEqual(expect.arrayContaining(["reading", "writing"]));
+  });
+
+  // Sprint 6 — `productionReady` flag contract.
+  describe("productionReady contract", () => {
+    it("every subject declares a productionReady boolean", () => {
+      for (const subject of LEARNER_SUBJECTS) {
+        expect(
+          typeof subject.productionReady,
+          `subject ${subject.slug}`,
+        ).toBe("boolean");
+      }
+    });
+
+    it("getProductionReadySubjects only returns productionReady rows", () => {
+      const ready = getProductionReadySubjects();
+      expect(ready.length).toBeGreaterThan(0);
+      for (const subject of ready) {
+        expect(subject.productionReady).toBe(true);
+      }
+    });
+
+    it("the four required-coverage subjects are productionReady", () => {
+      // Mirrors REQUIRED_COVERAGE in scripts/curriculum-coverage-check.mjs.
+      const REQUIRED_READY_SLUGS = ["math", "reading", "science", "writing"];
+      const readySlugs = new Set(getProductionReadySubjects().map((s) => s.slug));
+      for (const slug of REQUIRED_READY_SLUGS) {
+        expect(readySlugs, `subject ${slug} must be productionReady`).toContain(slug);
+      }
+    });
+
+    it("non-ready subjects keep their registry rows (admin/marketing keep them)", () => {
+      const allSlugs = LEARNER_SUBJECTS.map((s) => s.slug);
+      // world-languages and coding stay in the registry but are NOT
+      // production-ready — the brand registry is the canonical inventory
+      // for non-learner surfaces.
+      expect(allSlugs).toContain("world-languages");
+      expect(allSlugs).toContain("coding");
+      const ready = new Set(getProductionReadySubjects().map((s) => s.slug));
+      expect(ready.has("world-languages")).toBe(false);
+      expect(ready.has("coding")).toBe(false);
+    });
   });
 });

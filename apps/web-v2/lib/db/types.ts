@@ -356,6 +356,12 @@ export type AccessibilityPreferences = {
   visualSupports: boolean;
   breakReminders: boolean;
   keyboardOptimized: boolean;
+  // Sprint 7 — AAC bridge integration. When `aacEnabled` is true the
+  // lesson player and tutor chat mount the AACTargetProvider and route
+  // focus/selection through the configured input method.
+  aacEnabled: boolean;
+  aacInputMethod: "touch" | "switch_1" | "switch_2" | "eye_gaze" | "head_pointer";
+  aacScanDelayMs: number;
   updatedAt: ISODate;
 };
 
@@ -377,6 +383,9 @@ export const ACCESSIBILITY_DEFAULTS: Omit<
   visualSupports: false,
   breakReminders: false,
   keyboardOptimized: false,
+  aacEnabled: false,
+  aacInputMethod: "touch",
+  aacScanDelayMs: 1000,
 };
 
 // ===== Curriculum =====

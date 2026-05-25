@@ -391,6 +391,29 @@ jobs:
         working-directory: apps/mobile
         run: npx expo export --platform web || true
 
+  # Sprint 10 — mobile unit tests. Runs vitest against the pure-logic
+  # modules under apps/mobile (lib/feature-flags, lib/passwordStrength,
+  # lib/inboxLinks, design responsive helpers, i18n parity, and the
+  # learner route-shape smoke). Render-level RN tests require an Expo
+  # / React Native test renderer setup; that is a separate sprint.
+  mobile-tests:
+    name: Mobile Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Run vitest
+        working-directory: apps/mobile
+        run: pnpm test
+
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
@@ -475,6 +498,7 @@ jobs:
       - brain-svc
       - ai-svc
       - mobile-expo-check
+      - mobile-tests
       - security-scan
     steps:
       - name: Report job statuses
@@ -484,6 +508,7 @@ jobs:
           BRAIN: ${{ needs.brain-svc.result }}
           AI: ${{ needs.ai-svc.result }}
           MOBILE: ${{ needs.mobile-expo-check.result }}
+          MOBILE_TESTS: ${{ needs.mobile-tests.result }}
           SECURITY: ${{ needs.security-scan.result }}
         run: |
           echo "## CI Pipeline Summary" >> "$GITHUB_STEP_SUMMARY"
@@ -495,9 +520,10 @@ jobs:
           echo "| Brain Service | $BRAIN |" >> "$GITHUB_STEP_SUMMARY"
           echo "| AI Service | $AI |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Mobile Expo Check | $MOBILE |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Mobile Unit Tests | $MOBILE_TESTS |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Security Scan (non-blocking) | $SECURITY |" >> "$GITHUB_STEP_SUMMARY"
           # Fail summary only if a blocking job failed (security is non-blocking)
-          for r in "$LINT" "$BUILD" "$BRAIN" "$AI" "$MOBILE"; do
+          for r in "$LINT" "$BUILD" "$BRAIN" "$AI" "$MOBILE" "$MOBILE_TESTS"; do
             if [ "$r" = "failure" ] || [ "$r" = "cancelled" ]; then
               echo ""
               echo "❌ One or more blocking jobs failed."

@@ -31,6 +31,8 @@ import {
   type SurfaceRouterSubmitResult,
   type SurfaceTelemetryEvent,
 } from "@aivo/learner-surfaces";
+import { AACTargetProvider, AACScanRoot } from "@aivo/aac-bridge";
+import { enqueueOutbox, generateIdempotencyKey } from "@/lib/offline/outbox";
 import type {
   AccessibilityPreferences,
   GeneratedLessonPlan,
@@ -315,29 +317,45 @@ export function LessonPlayer({
                         : beat.kind === "progress"
                           ? "progress_update"
                           : "next_step";
-      fetch(`/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/step`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          stepKind,
-          stepRefId:
-            beat.kind === "guided" ? beat.gpId : beat.kind === "check" ? beat.checkId : null,
-        }),
-      }).catch(() => {});
+      postStep({
+        stepKind,
+        stepRefId:
+          beat.kind === "guided" ? beat.gpId : beat.kind === "check" ? beat.checkId : null,
+      });
     }
   }, [stepIdx, beat, learnerId, lessonRunId, onBreak]);
 
   function emitMediaTelemetry(surfaceType: "video" | "audio", event: string) {
-    fetch(`/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/step`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        stepKind: "answer_submitted",
-        stepRefId: beat.kind === "guided" ? beat.gpId : beat.kind === "check" ? beat.checkId : null,
-        response: `media:${surfaceType}:${event}`,
-        isCorrect: null,
-      }),
-    }).catch(() => {});
+    postStep({
+      stepKind: "answer_submitted",
+      stepRefId:
+        beat.kind === "guided" ? beat.gpId : beat.kind === "check" ? beat.checkId : null,
+      response: `media:${surfaceType}:${event}`,
+      isCorrect: null,
+    });
+  }
+
+  /**
+   * Sprint 9 — wrap every step POST with an Idempotency-Key and
+   * enqueue the call to the offline outbox when the network is down.
+   * The server short-circuits replays with the same key, so a
+   * mid-flight crash + reconnect can't double-record a step.
+   */
+  function postStep(payload: Record<string, unknown>): void {
+    const url = `/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/step`;
+    const idemKey = generateIdempotencyKey("lesson-step");
+    const headers = { "content-type": "application/json", "idempotency-key": idemKey };
+    const body = JSON.stringify(payload);
+    fetch(url, { method: "POST", headers, body }).catch(() => {
+      enqueueOutbox({
+        id: idemKey,
+        url,
+        method: "POST",
+        headers,
+        body,
+        label: `lesson-step ${String(payload.stepKind ?? "unknown")}`,
+      }).catch(() => undefined);
+    });
   }
 
   function advance() {
@@ -373,9 +391,12 @@ export function LessonPlayer({
           ? "Solve the practice and submit your answer."
           : "Complete the check and submit your answer.",
       answerInput: { type: "text", label: "Your answer", placeholder: "Type your answer…" },
-      scratchpad: currentBeat.surfaceType === "scratchpad" ? { enabled: true, width: 520, height: 300 } : undefined,
+      scratchpad:
+        currentBeat.surfaceType === "scratchpad" || currentBeat.surfaceType === "ink_canvas"
+          ? { enabled: true, width: 520, height: 300 }
+          : undefined,
       diagram:
-        currentBeat.surfaceType === "geometry_workspace"
+        currentBeat.surfaceType === "geometry_workspace" || currentBeat.surfaceType === "geometry"
           ? {
               canvasMode: "svg",
               width: 480,
@@ -391,6 +412,13 @@ export function LessonPlayer({
               step: 1,
             }
           : undefined,
+      codingSandbox:
+        currentBeat.surfaceType === "coding_sandbox"
+          ? { language: "javascript", starterCode: "// write your solution\n" }
+          : undefined,
+      artCanvas: currentBeat.surfaceType === "art_canvas" ? { showGuides: true } : undefined,
+      voiceResponse:
+        currentBeat.surfaceType === "voice_response" ? { language: "en-US" } : undefined,
     };
   }
 
@@ -411,48 +439,30 @@ export function LessonPlayer({
       setChecksTotal((n) => n + 1);
       if (correct) setChecksCorrect((n) => n + 1);
     }
-    fetch(`/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/step`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        stepKind: "answer_submitted",
-        stepRefId:
-          interactiveBeat.kind === "guided"
-            ? interactiveBeat.gpId
-            : interactiveBeat.kind === "check"
-              ? interactiveBeat.checkId
-              : null,
-        response: candidate,
-        isCorrect: correct,
-      }),
-    }).catch(() => {});
+    postStep({
+      stepKind: "answer_submitted",
+      stepRefId:
+        interactiveBeat.kind === "guided"
+          ? interactiveBeat.gpId
+          : interactiveBeat.kind === "check"
+            ? interactiveBeat.checkId
+            : null,
+      response: candidate,
+      isCorrect: correct,
+    });
   }
 
   function requestHint() {
     if (beat.kind !== "guided") return;
     setShowHint(true);
     setHintsUsed((n) => n + 1);
-    fetch(`/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/step`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        stepKind: "hint_used",
-        stepRefId: beat.gpId,
-      }),
-    }).catch(() => {});
+    postStep({ stepKind: "hint_used", stepRefId: beat.gpId });
   }
 
   function useScaffold() {
     if (beat.kind !== "guided") return;
     setScaffoldsUsed((n) => n + 1);
-    fetch(`/api/bff/learners/${learnerId}/lesson-runs/${lessonRunId}/step`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        stepKind: "scaffold_used",
-        stepRefId: beat.gpId,
-      }),
-    }).catch(() => {});
+    postStep({ stepKind: "scaffold_used", stepRefId: beat.gpId });
   }
 
   function complete(abandoned: boolean) {
@@ -508,7 +518,13 @@ export function LessonPlayer({
     );
   }
 
-  return (
+  // Sprint 7 — wrap the entire lesson-player tree in the AAC target
+  // provider when the learner has enabled AAC. Surfaces (ChoiceGrid,
+  // submit buttons) auto-register via useAACTarget; AACScanRoot listens
+  // for Space (activate) and ArrowRight (advance) so a single-switch
+  // device mapped to those keys can drive the whole flow.
+  const aacEnabled = accessibility.aacEnabled === true;
+  const innerTree = (
     <div className={rootClass}>
       <PageHeader
         eyebrow={plan.tutorPersona}
@@ -659,5 +675,24 @@ export function LessonPlayer({
       </Card>
       </FocusMode>
     </div>
+  );
+
+  if (!aacEnabled) return innerTree;
+  return (
+    <AACTargetProvider
+      enabled
+      inputMethod={accessibility.aacInputMethod}
+      scanDelayMs={accessibility.aacScanDelayMs}
+      onEvent={(evt) => {
+        // Mirror AAC activations into the existing surface-telemetry
+        // sink so analytics can correlate them with lesson outcomes.
+        emitSurfaceTelemetry({
+          type: "answer_changed",
+          payload: { source: "aac", targetId: evt.targetId, method: evt.method },
+        } as SurfaceTelemetryEvent);
+      }}
+    >
+      <AACScanRoot>{innerTree}</AACScanRoot>
+    </AACTargetProvider>
   );
 }

@@ -96,5 +96,50 @@
     "watch_amend": "Add context & rebuild",
     "watch_back": "Back to learner",
     "watch_already_approved": "This brain has already been approved."
+  },
+  "learner": {
+    "errors": {
+      "title": "음 — 잘 안 됐어요",
+      "body": "잠시 숨 고르고 다시 해봐요.",
+      "retry": "다시 시도",
+      "back_home": "홈으로"
+    },
+    "progress": {
+      "mastery_strong": "잘함",
+      "mastery_on_grade": "학년 수준",
+      "mastery_building": "성장 중",
+      "mastery_just_starting": "막 시작",
+      "mastery_not_started": "시작 안 함"
+    },
+    "notifications": {
+      "page_title": "알림",
+      "description": "선생님과 가족에게서 온 메시지.",
+      "empty_state": "모두 확인했어요!"
+    },
+    "tutor": {
+      "page_eyebrow": "AI 튜터",
+      "chat_heading": "튜터와 대화하기",
+      "input_placeholder": "무엇이든 물어보세요 — 답은 안 가르쳐 주고 안내해줄게요.",
+      "conversation_aria": "튜터 대화"
+    },
+    "homework": {
+      "title": "막혔어요? 보여주세요.",
+      "body": "사진을 찍거나 파일을 올리면 단계별로 도와줄게요.",
+      "input_placeholder": "시도한 것을 쓰거나 질문해 보세요…",
+      "conversation_aria": "대화",
+      "section_how_i_help": "도와주는 방법",
+      "card_try": "먼저 직접 해보세요",
+      "card_hint": "그다음 작은 힌트를 드릴게요",
+      "card_walkthrough": "그래도 막히면 함께 풀어봐요"
+    },
+    "subjects": {
+      "page_title": "과목 선택",
+      "page_eyebrow": "모든 과목",
+      "page_description": "각 과목에는 튜터와 추천 다음 단계가 있어요. 카드를 탭하세요.",
+      "baseline_needed_title": "먼저 기초 진단을 완료하세요",
+      "baseline_needed_body": "짧은 기초 진단을 마치면 과목 페이지가 활성화돼요.",
+      "baseline_needed_cta": "진단 시작",
+      "supports_on": "지원 활성"
+    }
   }
 }

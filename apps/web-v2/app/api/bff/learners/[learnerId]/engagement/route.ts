@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { requireSession, requireLearnerScope } from "@/lib/bff/guards";
+import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import { getLearnerEngagement, listLearnerBadges } from "@/lib/db/repos";
 import type { BadgeKey } from "@/lib/db/types";
 import type {
@@ -111,6 +112,16 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (response) return response;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
+    // Sprint 10 — engagement exposes personalised gamification data
+    // (XP, streaks, earned badges). consent:audit now classifies this
+    // route as `required: true`; without the gate it would fail CI.
+    const consentErr = requireLearnerConsent(
+      session!,
+      learnerId,
+      ["child_data_collection"],
+      requestId,
+    );
+    if (consentErr) return consentErr;
 
     const eng = getLearnerEngagement(learnerId, session!.tenantId);
     const earned = listLearnerBadges(learnerId, session!.tenantId);

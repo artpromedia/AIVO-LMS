@@ -11,6 +11,7 @@ import {
   locales,
   localeNames,
   localeFlags,
+  dirForLocale,
 } from "@/i18n/config";
 
 type Messages = Record<string, unknown>;
@@ -99,11 +100,7 @@ export function I18nProvider({
         setMessages(msgs);
         setLocaleState(newLocale);
         document.documentElement.lang = newLocale;
-        if (newLocale === "ar") {
-          document.documentElement.dir = "rtl";
-        } else {
-          document.documentElement.dir = "ltr";
-        }
+        document.documentElement.dir = dirForLocale(newLocale);
         // Re-render Server Components so server-rendered chunks pick up the cookie.
         router.refresh();
       });
@@ -113,9 +110,7 @@ export function I18nProvider({
 
   useEffect(() => {
     document.documentElement.lang = locale;
-    if (locale === "ar") {
-      document.documentElement.dir = "rtl";
-    }
+    document.documentElement.dir = dirForLocale(locale);
   }, [locale]);
 
   return (

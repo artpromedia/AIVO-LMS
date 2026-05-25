@@ -8,6 +8,7 @@
  */
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import {
@@ -46,16 +47,17 @@ function levelToMasteryCell(level: string): MasteryCell["level"] {
   }
 }
 
-function masteryLabel(score: number): string {
-  if (score >= 0.85) return "Strong";
-  if (score >= 0.65) return "On grade";
-  if (score >= 0.4) return "Building";
-  if (score > 0) return "Just starting";
-  return "Not started";
+function masteryLabel(score: number, t: (key: string) => string): string {
+  if (score >= 0.85) return t("mastery_strong");
+  if (score >= 0.65) return t("mastery_on_grade");
+  if (score >= 0.4) return t("mastery_building");
+  if (score > 0) return t("mastery_just_starting");
+  return t("mastery_not_started");
 }
 
 export default async function LearnerProgressPage() {
   const session = await requirePageRole(["learner", "parent"]);
+  const t = await getTranslations("learner.progress");
   const learnerId =
     session.role === "learner"
       ? (session.learnerId ?? null)
@@ -155,7 +157,7 @@ export default async function LearnerProgressPage() {
             <FloatingMetricCard
               label="Overall mastery"
               value={`${Math.round(overallAvg * 100)}%`}
-              description={masteryLabel(overallAvg)}
+              description={masteryLabel(overallAvg, t)}
               tone="success"
             />
             <FloatingMetricCard
@@ -228,7 +230,7 @@ export default async function LearnerProgressPage() {
                         tone={avg >= 0.65 ? "success" : avg >= 0.4 ? "primary" : "warning"}
                         size="md"
                       >
-                        {Math.round(avg * 100)}% · {masteryLabel(avg)}
+                        {Math.round(avg * 100)}% · {masteryLabel(avg, t)}
                       </InsightChip>
                     </header>
                     {cells.length === 0 ? (

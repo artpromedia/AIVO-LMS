@@ -96,5 +96,50 @@
     "watch_amend": "Add context & rebuild",
     "watch_back": "Back to learner",
     "watch_already_approved": "This brain has already been approved."
+  },
+  "learner": {
+    "errors": {
+      "title": "Hmm — that didn't work",
+      "body": "Let's take a quick breath and try again.",
+      "retry": "Try again",
+      "back_home": "Back home"
+    },
+    "progress": {
+      "mastery_strong": "Strong",
+      "mastery_on_grade": "On grade",
+      "mastery_building": "Building",
+      "mastery_just_starting": "Just starting",
+      "mastery_not_started": "Not started"
+    },
+    "notifications": {
+      "page_title": "Notifications",
+      "description": "Notes from your teacher and your grown-ups.",
+      "empty_state": "All caught up!"
+    },
+    "tutor": {
+      "page_eyebrow": "AI tutor",
+      "chat_heading": "Chat with your tutor",
+      "input_placeholder": "Ask anything — I'll guide you, never spoil the answer.",
+      "conversation_aria": "Tutor conversation"
+    },
+    "homework": {
+      "title": "Stuck on something? Show me.",
+      "body": "Snap a photo or upload a file and I'll walk you through it step by step.",
+      "input_placeholder": "Type what you tried or ask a question…",
+      "conversation_aria": "Conversation",
+      "section_how_i_help": "How I help",
+      "card_try": "First, I'll ask you to try",
+      "card_hint": "Then I give you a small hint",
+      "card_walkthrough": "If you're still stuck, we walk through it"
+    },
+    "subjects": {
+      "page_title": "Pick a subject",
+      "page_eyebrow": "All subjects",
+      "page_description": "Each subject has a tutor and a recommended next step. Tap a card to dive in.",
+      "baseline_needed_title": "Finish the baseline first",
+      "baseline_needed_body": "Your subject pages light up after you complete a quick baseline check-in.",
+      "baseline_needed_cta": "Start baseline",
+      "supports_on": "Supports on"
+    }
   }
 }

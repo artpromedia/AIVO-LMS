@@ -5,6 +5,9 @@ import { join, basename } from "node:path";
 const APPS = [
   { name: "marketing", dir: "apps/marketing/src/i18n/messages", base: "en" },
   { name: "mobile", dir: "apps/mobile/i18n", base: "en" },
+  // Sprint 4 — web learner UI catalog. Audited at warn-level until the
+  // learner-page extraction backlog (apps/web-v2/app/learner/**) lands.
+  { name: "web", dir: "apps/web-v2/lib/i18n/messages", base: "en" },
 ];
 
 const BRAND_TOKENS = new Set([

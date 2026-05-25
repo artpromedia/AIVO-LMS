@@ -489,7 +489,9 @@
     "reducedMotion": "動きを減らす",
     "reducedMotionDesc": "アニメーションや動きの演出を控えめにします。",
     "saveChanges": "変更を保存",
-    "saved": "設定を保存しました!"
+    "saved": "設定を保存しました!",
+    "language": "言語",
+    "languageDesc": "AIVOはこの言語をボタン、メニュー、ヘルプメッセージに使用します。"
   },
   "learnerLeaderboard": {
     "title": "Leaderboard",

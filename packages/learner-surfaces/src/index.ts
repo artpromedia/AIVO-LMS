@@ -40,10 +40,15 @@ export {
 } from "./surfaces/MathExpressionSurface.js";
 export {
   SurfaceRouter,
+  SUPPORTED_RUNTIME_TYPES,
+  ITEM_TYPE_TO_RUNTIME,
+  toRuntimeSurfaceType,
   type SurfaceRouterAccessibilitySettings,
   type SurfaceRouterItem,
   type SurfaceRouterProps,
   type SurfaceRouterSubmitResult,
+  type ItemAuthoredSurfaceType,
+  type RouterSurfaceType,
 } from "./SurfaceRouter/index.js";
 export {
   CodingSandboxSurface,

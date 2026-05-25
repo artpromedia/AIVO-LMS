@@ -96,5 +96,50 @@
     "watch_amend": "Add context & rebuild",
     "watch_back": "Back to learner",
     "watch_already_approved": "This brain has already been approved."
+  },
+  "learner": {
+    "errors": {
+      "title": "Hm — das hat nicht geklappt",
+      "body": "Atmen wir kurz durch und versuchen es noch einmal.",
+      "retry": "Erneut versuchen",
+      "back_home": "Zurück zur Startseite"
+    },
+    "progress": {
+      "mastery_strong": "Stark",
+      "mastery_on_grade": "Auf Klassenstufe",
+      "mastery_building": "Im Aufbau",
+      "mastery_just_starting": "Gerade angefangen",
+      "mastery_not_started": "Noch nicht gestartet"
+    },
+    "notifications": {
+      "page_title": "Benachrichtigungen",
+      "description": "Nachrichten von deiner Lehrkraft und deinen Erwachsenen.",
+      "empty_state": "Alles erledigt!"
+    },
+    "tutor": {
+      "page_eyebrow": "KI-Tutor",
+      "chat_heading": "Mit deinem Tutor chatten",
+      "input_placeholder": "Frag, was du willst — ich leite dich, ohne die Antwort zu verraten.",
+      "conversation_aria": "Tutor-Konversation"
+    },
+    "homework": {
+      "title": "Stehst du irgendwo fest? Zeig es mir.",
+      "body": "Mach ein Foto oder lade eine Datei hoch und ich führe dich Schritt für Schritt.",
+      "input_placeholder": "Schreibe, was du probiert hast, oder stelle eine Frage…",
+      "conversation_aria": "Konversation",
+      "section_how_i_help": "So helfe ich dir",
+      "card_try": "Zuerst bitte ich dich, es zu versuchen",
+      "card_hint": "Dann gebe ich dir einen kleinen Tipp",
+      "card_walkthrough": "Wenn du immer noch feststeckst, gehen wir es zusammen durch"
+    },
+    "subjects": {
+      "page_title": "Wähle ein Fach",
+      "page_eyebrow": "Alle Fächer",
+      "page_description": "Jedes Fach hat einen Tutor und einen empfohlenen nächsten Schritt. Tippe auf eine Karte.",
+      "baseline_needed_title": "Bitte zuerst den Einstufungstest abschließen",
+      "baseline_needed_body": "Deine Fachseiten werden aktiviert, sobald du den kurzen Einstufungstest absolviert hast.",
+      "baseline_needed_cta": "Einstufung starten",
+      "supports_on": "Hilfen aktiv"
+    }
   }
 }

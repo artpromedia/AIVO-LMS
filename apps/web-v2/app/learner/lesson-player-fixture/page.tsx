@@ -1,16 +1,104 @@
 import { LessonPlayer } from "@/app/learner/lesson-runs/[lessonRunId]/lesson-player";
+import { requirePageRole } from "@/lib/auth/server";
 import type { GeneratedLessonPlan } from "@/lib/db/types";
+
+/**
+ * Lesson-player fixture page. Exercises one surface type per visit via
+ * `?surfaceType=...`. Reachable in every environment but role-gated to
+ * `learner` and `parent` so the BFF lesson-player contract is never
+ * exposed to anonymous visitors (route-audit gate).
+ */
 
 type FixtureSurfaceType =
   | "choice_grid"
   | "math_expression"
   | "scratchpad"
   | "geometry_workspace"
-  | "number_line";
+  | "number_line"
+  | "coding_sandbox"
+  | "art_canvas"
+  | "voice_response"
+  | "multiple_choice"
+  | "short_response"
+  | "fill_in_blank"
+  | "drag_drop"
+  | "ink_canvas";
+
+const FIXTURE_SURFACE_TYPES: ReadonlySet<FixtureSurfaceType> = new Set([
+  "choice_grid",
+  "math_expression",
+  "scratchpad",
+  "geometry_workspace",
+  "number_line",
+  "coding_sandbox",
+  "art_canvas",
+  "voice_response",
+  "multiple_choice",
+  "short_response",
+  "fill_in_blank",
+  "drag_drop",
+  "ink_canvas",
+]);
 
 type FixturePageProps = {
   searchParams?: Promise<{ surfaceType?: string }>;
 };
+
+function fixturePrompt(surfaceType: FixtureSurfaceType): string {
+  switch (surfaceType) {
+    case "geometry_workspace":
+    case "geometry" as FixtureSurfaceType:
+      return "Move the shape and submit your answer.";
+    case "number_line":
+      return "Pick the number 4 on the number line.";
+    case "voice_response":
+      return "Say the word: cat";
+    case "coding_sandbox":
+      return "Return the sum of a and b.";
+    case "art_canvas":
+      return "Draw a circle.";
+    case "ink_canvas":
+    case "scratchpad":
+      return "Show your work on the scratchpad.";
+    case "fill_in_blank":
+      return "2 + ___ = 4";
+    case "short_response":
+      return "What is 2 + 2?";
+    case "drag_drop":
+    case "multiple_choice":
+    case "choice_grid":
+      return "What is 2 + 2?";
+    default:
+      return "What is 2 + 2?";
+  }
+}
+
+function fixtureChoices(surfaceType: FixtureSurfaceType): string[] | undefined {
+  if (
+    surfaceType === "choice_grid" ||
+    surfaceType === "multiple_choice" ||
+    surfaceType === "drag_drop"
+  ) {
+    return ["2", "3", "4", "5"];
+  }
+  return undefined;
+}
+
+function fixtureExpectedAnswer(surfaceType: FixtureSurfaceType): string | undefined {
+  switch (surfaceType) {
+    case "art_canvas":
+    case "scratchpad":
+    case "ink_canvas":
+    case "voice_response":
+    case "coding_sandbox":
+      // Open-ended / process-scored surfaces accept any submission.
+      return undefined;
+    case "fill_in_blank":
+      return "2";
+    default:
+      return "4";
+  }
+}
 
 function fixturePlan(surfaceType: FixtureSurfaceType): GeneratedLessonPlan {
   return {
@@ -31,17 +119,9 @@ function fixturePlan(surfaceType: FixtureSurfaceType): GeneratedLessonPlan {
     guidedPractice: [
       {
         id: `guided-fixture-${surfaceType}`,
-        prompt:
-          surfaceType === "geometry_workspace"
-            ? "Move the shape and submit your answer."
-            : surfaceType === "number_line"
-              ? "Pick the number 4 on the number line."
-              : "What is 2 + 2?",
-        expectedAnswer:
-          surfaceType === "choice_grid" || surfaceType === "math_expression" || surfaceType === "number_line"
-            ? "4"
-            : undefined,
-        choices: surfaceType === "choice_grid" ? ["2", "3", "4", "5"] : undefined,
+        prompt: fixturePrompt(surfaceType),
+        expectedAnswer: fixtureExpectedAnswer(surfaceType),
+        choices: fixtureChoices(surfaceType),
         hint: "Try counting up from two.",
         scaffold: "2 + 2 means two groups of two.",
         skillId: "sk_fixture",
@@ -65,26 +145,27 @@ function fixturePlan(surfaceType: FixtureSurfaceType): GeneratedLessonPlan {
 }
 
 export default async function LessonPlayerFixturePage({ searchParams }: FixturePageProps) {
+  const session = await requirePageRole(["learner", "parent"]);
   const params = await searchParams;
   const requested = params?.surfaceType;
-  const surfaceType: FixtureSurfaceType =
-    requested === "choice_grid" ||
-    requested === "math_expression" ||
-    requested === "scratchpad" ||
-    requested === "geometry_workspace" ||
-    requested === "number_line"
-      ? requested
-      : "choice_grid";
+  const surfaceType: FixtureSurfaceType = FIXTURE_SURFACE_TYPES.has(
+    requested as FixtureSurfaceType,
+  )
+    ? (requested as FixtureSurfaceType)
+    : "choice_grid";
+
+  const learnerId =
+    session.role === "learner" && session.learnerId ? session.learnerId : "lrn_demo_sky";
 
   return (
     <main className="mx-auto max-w-4xl p-6">
       <LessonPlayer
-        learnerId="lrn_demo_sky"
+        learnerId={learnerId}
         lessonRunId={`lesson-run-fixture-${surfaceType}`}
         plan={fixturePlan(surfaceType)}
         accessibility={{
-          learnerId: "lrn_demo_sky",
-          tenantId: "t_demo",
+          learnerId,
+          tenantId: session.tenantId ?? "t_demo",
           reducedMotion: true,
           highContrast: false,
           largeText: false,

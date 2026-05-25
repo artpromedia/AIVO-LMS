@@ -96,5 +96,50 @@
     "watch_amend": "Add context & rebuild",
     "watch_back": "Back to learner",
     "watch_already_approved": "This brain has already been approved."
+  },
+  "learner": {
+    "errors": {
+      "title": "うーん — うまくいきませんでした",
+      "body": "ひと息ついてもう一度試してみよう。",
+      "retry": "もう一度",
+      "back_home": "ホームに戻る"
+    },
+    "progress": {
+      "mastery_strong": "得意",
+      "mastery_on_grade": "学年通り",
+      "mastery_building": "成長中",
+      "mastery_just_starting": "始めたばかり",
+      "mastery_not_started": "未開始"
+    },
+    "notifications": {
+      "page_title": "お知らせ",
+      "description": "先生やおうちの人からのメッセージ。",
+      "empty_state": "全部チェック済み!"
+    },
+    "tutor": {
+      "page_eyebrow": "AIチューター",
+      "chat_heading": "チューターとチャット",
+      "input_placeholder": "何でも聞いてね — 答えを直接教えずに、ヒントで導きます。",
+      "conversation_aria": "チューターとの会話"
+    },
+    "homework": {
+      "title": "つまずいたら見せてね。",
+      "body": "写真を撮るかファイルをアップロードしてくれたら、一緒に進めるよ。",
+      "input_placeholder": "やってみたことを書くか、質問してね…",
+      "conversation_aria": "会話",
+      "section_how_i_help": "私のサポート方法",
+      "card_try": "まずは自分でやってみよう",
+      "card_hint": "次に小さなヒントを出すよ",
+      "card_walkthrough": "それでも難しいときは一緒に進めよう"
+    },
+    "subjects": {
+      "page_title": "教科をえらぼう",
+      "page_eyebrow": "すべての教科",
+      "page_description": "それぞれの教科にチューターと次のステップがあります。カードをタップ。",
+      "baseline_needed_title": "まずベースラインを終わらせよう",
+      "baseline_needed_body": "短いベースラインを終えると、教科ページが開きます。",
+      "baseline_needed_cta": "ベースラインを始める",
+      "supports_on": "サポートON"
+    }
   }
 }

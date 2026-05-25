@@ -96,5 +96,50 @@
     "watch_amend": "Add context & rebuild",
     "watch_back": "Back to learner",
     "watch_already_approved": "This brain has already been approved."
+  },
+  "learner": {
+    "errors": {
+      "title": "अरे — यह काम नहीं हुआ",
+      "body": "एक गहरी सांस लें और फिर से कोशिश करें।",
+      "retry": "फिर से कोशिश करें",
+      "back_home": "होम पर वापस जाएँ"
+    },
+    "progress": {
+      "mastery_strong": "मज़बूत",
+      "mastery_on_grade": "ग्रेड स्तर पर",
+      "mastery_building": "विकसित हो रहा है",
+      "mastery_just_starting": "अभी शुरुआत",
+      "mastery_not_started": "अभी शुरू नहीं हुआ"
+    },
+    "notifications": {
+      "page_title": "सूचनाएँ",
+      "description": "आपके शिक्षक और परिवार के संदेश।",
+      "empty_state": "सब कुछ देख लिया!"
+    },
+    "tutor": {
+      "page_eyebrow": "एआई ट्यूटर",
+      "chat_heading": "अपने ट्यूटर से बात करें",
+      "input_placeholder": "कुछ भी पूछें — मैं रास्ता दिखाता हूँ, उत्तर नहीं देता।",
+      "conversation_aria": "ट्यूटर बातचीत"
+    },
+    "homework": {
+      "title": "कहीं अटक गए? मुझे दिखाओ।",
+      "body": "एक फ़ोटो लो या फ़ाइल अपलोड करो — मैं चरण-दर-चरण मदद करूँगा।",
+      "input_placeholder": "जो आपने आज़माया उसे लिखें या प्रश्न पूछें…",
+      "conversation_aria": "बातचीत",
+      "section_how_i_help": "मैं कैसे मदद करता हूँ",
+      "card_try": "पहले, मैं आपसे प्रयास करने को कहता हूँ",
+      "card_hint": "फिर मैं छोटा सा संकेत देता हूँ",
+      "card_walkthrough": "अगर अब भी अटके हैं, साथ में हल करते हैं"
+    },
+    "subjects": {
+      "page_title": "एक विषय चुनें",
+      "page_eyebrow": "सभी विषय",
+      "page_description": "हर विषय में एक ट्यूटर और एक अगला सुझाव है। कार्ड पर टैप करें।",
+      "baseline_needed_title": "पहले आधारभूत आकलन पूरा करें",
+      "baseline_needed_body": "एक छोटा आधारभूत आकलन पूरा करने के बाद आपके विषय पेज सक्रिय होंगे।",
+      "baseline_needed_cta": "आकलन शुरू करें",
+      "supports_on": "सहायक चालू"
+    }
   }
 }

@@ -96,5 +96,50 @@
     "watch_amend": "Agregar contexto y reconstruir",
     "watch_back": "Volver al estudiante",
     "watch_already_approved": "Este cerebro ya ha sido aprobado."
+  },
+  "learner": {
+    "errors": {
+      "title": "Vaya — eso no funcionó",
+      "body": "Respiremos un momento e inténtalo de nuevo.",
+      "retry": "Intentar de nuevo",
+      "back_home": "Volver al inicio"
+    },
+    "progress": {
+      "mastery_strong": "Sólido",
+      "mastery_on_grade": "En nivel",
+      "mastery_building": "Construyendo",
+      "mastery_just_starting": "Comenzando",
+      "mastery_not_started": "Sin empezar"
+    },
+    "notifications": {
+      "page_title": "Notificaciones",
+      "description": "Notas de tu profesor y de tu familia.",
+      "empty_state": "¡Todo al día!"
+    },
+    "tutor": {
+      "page_eyebrow": "Tutor de IA",
+      "chat_heading": "Conversa con tu tutor",
+      "input_placeholder": "Pregunta lo que quieras — te guío, nunca te doy la respuesta.",
+      "conversation_aria": "Conversación con el tutor"
+    },
+    "homework": {
+      "title": "¿Atascado en algo? Muéstrame.",
+      "body": "Toma una foto o sube un archivo y te guío paso a paso.",
+      "input_placeholder": "Escribe lo que intentaste o haz una pregunta…",
+      "conversation_aria": "Conversación",
+      "section_how_i_help": "Cómo te ayudo",
+      "card_try": "Primero, te pido que lo intentes",
+      "card_hint": "Luego te doy una pequeña pista",
+      "card_walkthrough": "Si sigues atascado, lo resolvemos juntos"
+    },
+    "subjects": {
+      "page_title": "Elige una materia",
+      "page_eyebrow": "Todas las materias",
+      "page_description": "Cada materia tiene un tutor y un siguiente paso recomendado. Toca una tarjeta para entrar.",
+      "baseline_needed_title": "Primero termina la evaluación inicial",
+      "baseline_needed_body": "Tus páginas de materia se activan después de completar una breve evaluación.",
+      "baseline_needed_cta": "Empezar la evaluación",
+      "supports_on": "Apoyos activados"
+    }
   }
 }

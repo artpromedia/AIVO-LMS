@@ -6,6 +6,13 @@ import { requireLearnerConsent } from "@/lib/bff/consent-guard";
 import { audit } from "@/lib/bff/audit";
 import { LessonStepInput } from "@/lib/validators/lesson";
 import { getLessonRun, recordLessonStep } from "@/lib/db/repos";
+import {
+  readIdempotencyCache,
+  readIdempotencyKey,
+  writeIdempotencyCache,
+} from "@/lib/offline/idempotency";
+
+const IDEMPOTENCY_ROUTE = "POST /api/bff/learners/:learnerId/lesson-runs/:lessonRunId/step";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +35,20 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       requestId,
     );
     if (consentErr) return consentErr;
+    // Sprint 9 — idempotency-key short-circuit. The offline outbox
+    // replays mutating calls after the network recovers; if the
+    // original request already hit the server, return the cached
+    // response instead of re-recording the step.
+    const idemKey = readIdempotencyKey(req);
+    if (idemKey) {
+      const cached = readIdempotencyCache(session!.tenantId, IDEMPOTENCY_ROUTE, idemKey);
+      if (cached) {
+        return NextResponse.json(cached.body, {
+          status: cached.status,
+          headers: { "Idempotency-Replay": "true" },
+        });
+      }
+    }
     const body = await req.json().catch(() => null);
     const parsed = LessonStepInput.safeParse(body);
     if (!parsed.success) {
@@ -70,7 +91,18 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
         skipped: parsed.data.skipped ?? false,
       },
     });
-    return ok({ interaction }, requestId);
+    const response = ok({ interaction }, requestId);
+    // Cache the response body+status for replay-safe idempotency.
+    if (idemKey) {
+      writeIdempotencyCache(
+        session!.tenantId,
+        IDEMPOTENCY_ROUTE,
+        idemKey,
+        { interaction },
+        200,
+      );
+    }
+    return response;
   } catch (e) {
     return failFromUnknown(e, requestId);
   }
