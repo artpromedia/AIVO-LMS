@@ -78,6 +78,13 @@ are curriculum-authoring sprints.
   has no `coverageMatrix` entry.
 - Add tutor-registry assertion that every catalog tutor declares a
   complete `coverageMatrix` (`services/tutor-svc/tests/tutor-registry.test.ts`).
+- Lock in progress with a regression ratchet:
+  `docs/quality/tutor-coverage-baseline.json` records the
+  `(authored, scaffold, missing)` counts per tutor; the coverage
+  script hard-fails if any tutor's `authored` count drops or `missing`
+  count rises. Improvements are encouraged but must update the
+  baseline in the same PR (warning, not error). New tutors must add
+  a baseline entry on introduction.
 
 ## Phase 1 — Core academics, grades 3–8 (2 content sprints)
 

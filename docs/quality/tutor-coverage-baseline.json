@@ -1,0 +1,20 @@
+{
+  "_comment": "Baseline snapshot of per-tutor K-12 coverageMatrix as of 2026-05-25. Drift is checked by scripts/curriculum-coverage-check.mjs — any tutor's authored count decreasing or missing count increasing is a hard fail (locks in Phase 0 progress and forbids backsliding). Improvements (authored↑, missing↓) are encouraged and require updating this file in the same PR. See docs/quality/tutor-k12-coverage-gap-plan.md.",
+  "snapshotDate": "2026-05-25",
+  "tutors": {
+    "atlas": { "authored": 3, "scaffold": 0, "missing": 10 },
+    "cadence": { "authored": 3, "scaffold": 1, "missing": 6 },
+    "chrono": { "authored": 0, "scaffold": 0, "missing": 10 },
+    "compass": { "authored": 3, "scaffold": 1, "missing": 4 },
+    "echo": { "authored": 4, "scaffold": 0, "missing": 6 },
+    "forge": { "authored": 3, "scaffold": 0, "missing": 7 },
+    "harmony": { "authored": 3, "scaffold": 1, "missing": 10 },
+    "lingua": { "authored": 1, "scaffold": 0, "missing": 6 },
+    "muse": { "authored": 3, "scaffold": 0, "missing": 10 },
+    "nova": { "authored": 9, "scaffold": 1, "missing": 4 },
+    "pixel": { "authored": 3, "scaffold": 0, "missing": 10 },
+    "sage": { "authored": 9, "scaffold": 1, "missing": 4 },
+    "spark": { "authored": 9, "scaffold": 0, "missing": 4 },
+    "vigor": { "authored": 3, "scaffold": 1, "missing": 10 }
+  }
+}

@@ -279,6 +279,66 @@ if (tutorRows.length) {
 
 errors.push(...tutorErrors);
 
+// ---------------------------------------------------------------------------
+// 2c. Per-tutor regression ratchet — locks in coverage progress.
+//
+// Compares the live per-tutor matrix against the snapshot in
+// `docs/quality/tutor-coverage-baseline.json`. A tutor's `authored` count
+// MUST NOT decrease and its `missing` count MUST NOT increase. Improvements
+// (authored↑, missing↓) are encouraged but require updating the baseline
+// in the same PR — this prevents silent regressions and keeps the
+// baseline in sync with reality.
+// ---------------------------------------------------------------------------
+
+const baselinePath = join(repoRoot, "docs/quality/tutor-coverage-baseline.json");
+if (existsSync(baselinePath)) {
+  const baseline = JSON.parse(readFileSync(baselinePath, "utf8"));
+  const live = {};
+  for (const row of tutorRows) {
+    const counts = { authored: 0, scaffold: 0, missing: 0 };
+    for (const band of row.bands) {
+      const s = row.matrix[band];
+      if (s === "authored" || s === "scaffold" || s === "missing") counts[s]++;
+    }
+    live[row.id] = counts;
+  }
+  for (const [id, base] of Object.entries(baseline.tutors ?? {})) {
+    const now = live[id];
+    if (!now) {
+      errors.push(
+        `tutor "${id}" present in baseline but absent from registry — update tutor-coverage-baseline.json if this is intentional.`,
+      );
+      continue;
+    }
+    if (now.authored < base.authored) {
+      errors.push(
+        `tutor "${id}" regressed: authored ${base.authored} → ${now.authored}. Backsliding is not allowed.`,
+      );
+    }
+    if (now.missing > base.missing) {
+      errors.push(
+        `tutor "${id}" regressed: missing ${base.missing} → ${now.missing}. Backsliding is not allowed.`,
+      );
+    }
+    if (now.authored > base.authored || now.missing < base.missing) {
+      warnings.push(
+        `tutor "${id}" improved (authored ${base.authored}→${now.authored}, missing ${base.missing}→${now.missing}). Update tutor-coverage-baseline.json to lock in the gain.`,
+      );
+    }
+  }
+  for (const id of Object.keys(live)) {
+    if (!(id in (baseline.tutors ?? {}))) {
+      errors.push(
+        `tutor "${id}" exists in registry but not in tutor-coverage-baseline.json — add a baseline entry.`,
+      );
+    }
+  }
+} else {
+  warnings.push(
+    "docs/quality/tutor-coverage-baseline.json missing — regression ratchet is disabled.",
+  );
+}
+
 // Surplus subjects — informational
 const declaredSubjects = new Set(coverage.keys());
 const expected = new Set(subjects);
