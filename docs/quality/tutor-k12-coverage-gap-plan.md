@@ -1,9 +1,22 @@
 # Tutor K–12 Coverage Gap Plan
 
-> Snapshot taken: 2026-05-25. Source of truth at runtime:
+> Snapshot taken: 2026-05-25 (Phases 1–3 AI-draft authoring landed).
+> Source of truth at runtime:
 > `services/tutor-svc/src/modes/*Tutor.ts` (`coverageMatrix` field).
 > Machine-checked by `pnpm curriculum:coverage` — see the
 > **PER-TUTOR COVERAGE MATRIX** section of its output.
+>
+> **AI-draft provenance**: every `*-9-12`, `*-3-12`, `*-3-8`, and
+> `*-school-age` skill graph under `packages/skill-graphs/src/seeds/`
+> is marked `version: "0.1.0-draft"` and was authored by an LLM
+> against the public-domain standards framework named in its `source`
+> field. Tutors that reference these graphs mark the matching grade
+> bands as `"scaffold"` (not `"authored"`) in their `coverageMatrix`.
+> The runtime/catalog must continue to surface "content authoring in
+> progress" until a credentialed curriculum designer + SpEd
+> specialist signs off and the band flips to `"authored"`. Item-bank
+> authoring is unchanged: still required at ≥3 items per
+> difficulty band per skill before a band can flip to `"authored"`.
 
 ## Why this doc exists
 
@@ -43,11 +56,15 @@ Status legend: **A** = authored, **S** = scaffold (declared, no content),
 | compass (life_skills) | Life Skills / Exec Fn | · | · | · | · | · | · | · | A | A | A | — | — | — | — | S |
 | muse (creative_arts) | Creative Arts | · | A | A | A | — | — | — | — | — | — | — | — | — | — | · |
 
-**Aggregate**: 41 `authored` cells, 5 `scaffold`, 84 `missing` across
-the 14 tutors' declared catalog scopes. Three subjects (Math, ELA,
-Science) reach K–8 authored coverage today thanks to the
-`ccss-math-1-8`, `ccss-ela-1-8`, `ccss-writing-k-8`, and
-`ngss-science-3-8` skill graph seeds; every other tutor is K–2 only.
+**Aggregate (current)**: 56 `authored` cells, 107 `scaffold`,
+**0 `missing`** across the 14 tutors' declared catalog scopes. Every
+declared band now has at least an AI-draft skill graph behind it.
+
+**Aggregate (Phase 0 baseline)**: 41 `authored`, 5 `scaffold`,
+84 `missing`. The 84 missing cells were closed by Wave A–C
+AI-draft authoring (15 new skill-graph seed files), but the
+authoring requires SME review before any cell can be promoted from
+`scaffold` to `authored`.
 
 ## Why authoring (not engineering) is the bottleneck
 
@@ -86,7 +103,58 @@ are curriculum-authoring sprints.
   baseline in the same PR (warning, not error). New tutors must add
   a baseline entry on introduction.
 
-## Phase 1 — Core academics, grades 3–8 (2 content sprints)
+## Phases 1–3 — AI-draft authoring landed ⚠ pending SME review
+
+The original Phases 1–3 called for credentialed curriculum designers
+and SpEd specialists to author standards-aligned skill graphs and
+item-bank fixtures. Per project direction, an LLM produced
+**AI-draft** spines for every gap, each anchored to the real
+public-domain framework codes. The drafts are checked in with
+`version: "0.1.0-draft"`, `framework` populated, and learner-facing
+`"I can…"` descriptions, but the tutors' `coverageMatrix` continues
+to flag the corresponding bands as `"scaffold"` until SME sign-off.
+
+Files added under `packages/skill-graphs/src/seeds/`:
+
+| File | Tutor(s) | Bands | Framework |
+| --- | --- | --- | --- |
+| `c3-social-studies-3-8.ts` | chrono | 3–8 | C3 / NCSS |
+| `ccss-math-9-12.ts` | nova | 9–12 | CCSS-Math HS |
+| `ccss-ela-9-12.ts` | sage | 9–12 | CCSS-ELA HS |
+| `ngss-science-9-12.ts` | spark | 9–12 | NGSS HS (PS/LS/ESS/ETS) |
+| `c3-social-studies-9-12.ts` | chrono | 9–12 | C3 HS |
+| `asha-speech-school-age.ts` | echo | 3–8 | ASHA School-Age |
+| `ncas-music-3-8.ts` | cadence | 3–8 | NCAS Music |
+| `actfl-world-languages-7-12.ts` | lingua | 7–12 | ACTFL Novice-Mid → Int-Mid |
+| `ngss-engineering-design-6-12.ts` | forge | 6–12 | NGSS ETS1 MS+HS |
+| `cec-life-skills-9-12.ts` | compass | 9–12 + ADULT | CEC/DCDT Transition |
+| `ncge-geography-3-12.ts` | atlas | 3–12 | NCGE |
+| `casel-sel-3-12.ts` | harmony | 3–12 | CASEL |
+| `ncas-creative-arts-3-12.ts` | muse | 3–12 | NCAS Visual/Theater/Dance/Media |
+| `csta-coding-3-12.ts` | pixel | 3–12 | CSTA Levels 1B/2/3A/3B |
+| `shape-pe-health-3-12.ts` | vigor | 3–12 | SHAPE + NHES |
+
+### What still needs human work to flip `scaffold` → `authored`
+
+For every cell currently `scaffold`:
+
+1. **SME review** of each skill in the corresponding `*.ts` seed file
+   for accuracy, age-appropriateness, and alignment to its declared
+   framework code.
+2. **SpEd review** of the learner-facing `"I can…"` descriptions for
+   functioning-level adaptability (STANDARD / SUPPORTED / LOW_VERBAL
+   / NON_VERBAL / PRE_SYMBOLIC).
+3. **Item-bank authoring** at ≥3 items per skill per difficulty band
+   (intro / core / stretch), each with surface contract, response
+   type, and accessibility affordances per learner profile.
+4. **Bump version** in the seed file from `"0.1.0-draft"` to `"1.0.0"`.
+5. **Flip the `coverageMatrix` entry** on the tutor from
+   `"scaffold"` to `"authored"`.
+
+Until step 4–5, the runtime treats these bands as not-yet-production
+and the catalog UI surfaces a "content authoring in progress" badge.
+
+## Phase 1 — Core academics, grades 3–8 (2 content sprints) [ORIGINAL PLAN]
 
 Targets the seeded skill graphs that already exist but lack the item-
 bank depth called out in `curriculum-coverage-matrix.md` (≥3 items per

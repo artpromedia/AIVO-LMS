@@ -23,7 +23,7 @@ export const scienceTutor: TutorDefinition = defineTutor({
   subjects: ["science"],
   gradeBands: ["K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
   functioningLevels: ["STANDARD", "SUPPORTED", "LOW_VERBAL", "NON_VERBAL", "PRE_SYMBOLIC"],
-  skillGraphRefs: ["ngss-k2-physical-science", "ngss-science-3-8"],
+  skillGraphRefs: ["ngss-k2-physical-science", "ngss-science-3-8", "ngss-science-9-12"],
   defaultContentPackRefs: ["science-k2-fall-2026"],
   coverageMatrix: {
     K: "authored",
@@ -35,10 +35,10 @@ export const scienceTutor: TutorDefinition = defineTutor({
     "6": "authored",
     "7": "authored",
     "8": "authored",
-    "9": "missing",
-    "10": "missing",
-    "11": "missing",
-    "12": "missing",
+    "9": "scaffold",
+    "10": "scaffold",
+    "11": "scaffold",
+    "12": "scaffold",
   },
   policy: {
     requiresConsent: true,

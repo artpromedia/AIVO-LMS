@@ -23,7 +23,7 @@ export const elaTutor: TutorDefinition = defineTutor({
   subjects: ["ela"],
   gradeBands: ["PRE_K", "K", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"],
   functioningLevels: ["STANDARD", "SUPPORTED", "LOW_VERBAL", "NON_VERBAL", "PRE_SYMBOLIC"],
-  skillGraphRefs: ["ccss-ela-k", "ccss-ela-1-8", "ccss-writing-k-8"],
+  skillGraphRefs: ["ccss-ela-k", "ccss-ela-1-8", "ccss-writing-k-8", "ccss-ela-9-12"],
   defaultContentPackRefs: ["ela-k-fall-2026"],
   coverageMatrix: {
     PRE_K: "scaffold",
@@ -36,10 +36,10 @@ export const elaTutor: TutorDefinition = defineTutor({
     "6": "authored",
     "7": "authored",
     "8": "authored",
-    "9": "missing",
-    "10": "missing",
-    "11": "missing",
-    "12": "missing",
+    "9": "scaffold",
+    "10": "scaffold",
+    "11": "scaffold",
+    "12": "scaffold",
   },
   policy: {
     requiresConsent: true,
