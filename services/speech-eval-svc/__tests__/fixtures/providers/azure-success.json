@@ -1,0 +1,21 @@
+{
+  "RecognitionStatus": "Success",
+  "DisplayText": "The quick brown fox jumps over the lazy dog.",
+  "Duration": 34200000,
+  "NBest": [
+    {
+      "Display": "The quick brown fox jumps over the lazy dog.",
+      "Lexical": "the quick brown fox jumps over the lazy dog",
+      "PronunciationAssessment": {
+        "AccuracyScore": 87.5,
+        "FluencyScore": 91.0
+      },
+      "Words": [
+        { "Word": "the",   "PronunciationAssessment": { "AccuracyScore": 95 } },
+        { "Word": "quick", "PronunciationAssessment": { "AccuracyScore": 90 } },
+        { "Word": "brown", "PronunciationAssessment": { "AccuracyScore": 82 } },
+        { "Word": "fox",   "PronunciationAssessment": { "AccuracyScore": 88 } }
+      ]
+    }
+  ]
+}
