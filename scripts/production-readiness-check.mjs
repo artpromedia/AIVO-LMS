@@ -98,6 +98,103 @@ if (!surfaceOk) {
 }
 
 // ---------------------------------------------------------------------------
+// 2a. Sprint 12.7 — env manifest gate.
+// Flags:
+//   - any var in .env.example missing from the live env
+//   - any var matching placeholder patterns (change-me, your-key-here, …)
+//   - groups in scripts/env/required-prod-vars.json missing required vars
+// ---------------------------------------------------------------------------
+const manifestPath = resolve(REPO_ROOT, "scripts/env/required-prod-vars.json");
+let manifest = null;
+if (existsSync(manifestPath)) {
+  try {
+    manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+  } catch (err) {
+    warn("env:manifest-parse", `Could not parse required-prod-vars.json: ${err.message}`);
+  }
+}
+
+const envExamplePath = resolve(REPO_ROOT, ".env.example");
+const envExampleVars = new Set();
+if (existsSync(envExamplePath)) {
+  const lines = readFileSync(envExamplePath, "utf8").split("\n");
+  for (const line of lines) {
+    const m = line.match(/^([A-Z][A-Z0-9_]*)=/);
+    if (m) envExampleVars.add(m[1]);
+  }
+}
+
+const placeholderPatterns = (manifest?.placeholderPatterns ?? []).map(
+  (p) => new RegExp(p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"),
+);
+
+if (IS_PROD || STRICT) {
+  // Only enforce env-manifest checks when running against a real prod env.
+  // In dev a contributor will routinely have placeholder values; we don't
+  // want every developer's first pnpm prod:check run to fail.
+  for (const name of envExampleVars) {
+    const v = process.env[name];
+    if (v === undefined || v === "") continue; // unset is handled per-group
+    for (const pat of placeholderPatterns) {
+      if (pat.test(v)) {
+        blocker(`env:placeholder:${name}`, `${name} matches placeholder pattern ${pat}`);
+      }
+    }
+  }
+
+  if (manifest?.groups) {
+    for (const [groupName, group] of Object.entries(manifest.groups)) {
+      for (const v of group.required ?? []) {
+        if (!process.env[v]) {
+          blocker(
+            `env:missing:${v}`,
+            `Required production env var ${v} (${groupName}) is unset`,
+            `See scripts/env/required-prod-vars.json group="${groupName}".`,
+          );
+        }
+      }
+      for (const [v, min] of Object.entries(group.minLength ?? {})) {
+        if (process.env[v] && process.env[v].length < min) {
+          blocker(`env:short:${v}`, `${v} must be at least ${min} chars in production`);
+        }
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 2b. Optional /health partial-failure scan. Set HEALTH_CHECK_URLS to a
+// comma-separated list of base URLs to enable.
+// ---------------------------------------------------------------------------
+async function runHealthScan() {
+  const urls = (process.env.HEALTH_CHECK_URLS ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (!urls.length) return;
+  for (const base of urls) {
+    try {
+      const res = await fetch(`${base.replace(/\/$/, "")}/health`);
+      if (!res.ok) {
+        blocker(`health:${base}`, `Health check returned ${res.status}`);
+        continue;
+      }
+      const body = await res.json().catch(() => null);
+      if (body && body.status && body.status !== "healthy" && body.status !== "ok") {
+        // Partial failures — body usually carries `{status:"degraded", checks:{...}}`.
+        blocker(
+          `health:partial:${base}`,
+          `Service reports degraded status: ${JSON.stringify(body)}`,
+        );
+      }
+    } catch (err) {
+      blocker(`health:err:${base}`, `Health check failed: ${err.message}`);
+    }
+  }
+}
+await runHealthScan();
+
+// ---------------------------------------------------------------------------
 // 3. Report.
 // ---------------------------------------------------------------------------
 const blockers = findings.filter((f) => f.severity === "blocker");

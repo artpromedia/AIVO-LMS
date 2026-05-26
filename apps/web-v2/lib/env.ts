@@ -53,8 +53,18 @@ const serverSchema = z.object({
   DATABASE_URL: isProd ? z.string().url() : z.string().url().optional(),
   REDIS_URL: isProd ? z.string().url() : z.string().url().optional(),
   AUTH_MODE: authModeSchema,
+  // Sprint 12.7 — also reject the dev placeholder in production, not
+  // just empty / too-short values. A misconfigured deployment that
+  // forwards the dev string is functionally identical to leaving the
+  // secret blank.
   SESSION_SECRET: isProd
-    ? z.string().min(32, "SESSION_SECRET must be at least 32 chars in production")
+    ? z
+        .string()
+        .min(32, "SESSION_SECRET must be at least 32 chars in production")
+        .refine(
+          (v) => v !== "dev-session-secret-please-change-me",
+          "SESSION_SECRET must NOT be the dev placeholder in production",
+        )
     : z.string().min(8).default("dev-session-secret-please-change-me"),
   // Base URL of the real identity-svc (Fastify) used when
   // AUTH_MODE !== "mock". Default to localhost for the dev workflow.

@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: aivo/data-governance-svc:latest
+          image: aivo/data-governance-svc:${IMAGE_TAG:-latest}
           ports: [{ name: http, containerPort: 3070 }]
           env:
             - { name: NODE_ENV, value: production }

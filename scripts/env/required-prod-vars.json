@@ -1,0 +1,62 @@
+{
+  "$schema": "./required-prod-vars.schema.json",
+  "comment": "Sprint 12.7 — vars that MUST be set in production. The production-readiness-check.mjs script consults this manifest. Add new groups when introducing services; keep placeholder patterns in sync with .env.example.",
+  "placeholderPatterns": [
+    "change-me",
+    "replace-me",
+    "your-key-here",
+    "blank-when-required",
+    "dev-session-secret",
+    "aivo-dev-cookie-secret",
+    "change-me-to-a-random-32-char-secret",
+    "TODO",
+    "PLACEHOLDER",
+    "<insert"
+  ],
+  "groups": {
+    "core": {
+      "required": ["AUTH_SECRET", "COOKIE_SECRET", "DATABASE_URL", "APP_URL"],
+      "minLength": { "AUTH_SECRET": 32, "COOKIE_SECRET": 32 }
+    },
+    "identity-svc": {
+      "required": [
+        "JWT_PRIVATE_KEY",
+        "JWT_PUBLIC_KEY",
+        "INTERNAL_SERVICE_TOKEN",
+        "INTERNAL_AI_TOKEN",
+        "WEBAUTHN_RP_ID",
+        "WEBAUTHN_ORIGINS"
+      ]
+    },
+    "comms-svc": {
+      "required": ["POSTMARK_WEBHOOK_SECRET"],
+      "conditional": {
+        "OONRUMAIL_API_KEY": "if email delivery enabled",
+        "MAILGUN_WEBHOOK_SIGNING_KEY": "if mailgun provider enabled",
+        "AIVO_SNS_WEBHOOK_SECRET": "if SES via SNS enabled",
+        "FCM_SERVICE_ACCOUNT_JSON": "if FCM push enabled",
+        "APNS_KEY_ID": "if APNs push enabled",
+        "APNS_TEAM_ID": "if APNs push enabled",
+        "APNS_PRIVATE_KEY": "if APNs push enabled",
+        "APNS_BUNDLE_ID": "if APNs push enabled"
+      }
+    },
+    "billing-svc": {
+      "required": ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"]
+    },
+    "integration-svc": {
+      "required": ["LTI_PRIVATE_KEY", "LTI_PUBLIC_KEY", "LTI_KID"]
+    },
+    "ops-alerts": {
+      "required": [
+        "OPS_ALERTS_SLACK_WEBHOOK_URL",
+        "OPS_ALERTS_PAGERDUTY_ROUTING_KEY",
+        "OPS_ALERTS_OPSGENIE_API_KEY"
+      ]
+    },
+    "secrets": {
+      "required": ["SECRETS_PROVIDER"],
+      "comment": "SECRETS_PROVIDER selects Vault | aws-secrets-manager | env. The first two require additional creds resolved at runtime by packages/security/src/secrets-client.ts."
+    }
+  }
+}

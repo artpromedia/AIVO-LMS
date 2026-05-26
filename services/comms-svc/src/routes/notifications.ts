@@ -969,12 +969,79 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any) {
   );
 
   app.get("/api/comms/status", { schema: commsStatusSchema }, async () => {
+    // Sprint 12.7 — replaced `push: "stub"` with real adapter discovery.
+    // FCM and APNs are independent; we report each one's configured
+    // state. The actual fan-out runs through providers/push-router.ts.
+    const fcm = process.env.FCM_SERVICE_ACCOUNT_JSON ? "connected" : "not_configured";
+    const apns =
+      process.env.APNS_KEY_ID && process.env.APNS_TEAM_ID && process.env.APNS_PRIVATE_KEY
+        ? "connected"
+        : "not_configured";
+    const push =
+      fcm === "connected" || apns === "connected"
+        ? "connected"
+        : "not_configured";
     return {
       postmark: isConfigured() ? "connected" : "not_configured",
-      push: "stub",
+      push,
+      pushDetail: { fcm, apns },
       sms: "not_available",
     };
   });
+
+  // Sprint 12.7 — outbound push fan-out, durable retry mirroring the
+  // email outbox pattern. Bodies pass through the router to FCM/APNs.
+  app.post(
+    "/api/comms/push/send",
+    {
+      schema: {
+        body: {
+          type: "object",
+          required: ["targets", "message"],
+          properties: {
+            targets: {
+              type: "array",
+              items: {
+                type: "object",
+                required: ["token", "kind"],
+                properties: {
+                  token: { type: "string" },
+                  kind: { type: "string", enum: ["fcm", "apns"] },
+                  topic: { type: "string" },
+                },
+              },
+            },
+            message: {
+              type: "object",
+              properties: {
+                title: { type: "string" },
+                body: { type: "string" },
+                data: { type: "object", additionalProperties: { type: "string" } },
+                collapseId: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      const { defaultPushRouter } = await import("../providers/push-router.js");
+      const { targets, message } = request.body as any;
+      try {
+        const results = await defaultPushRouter.send(targets, message);
+        const invalidTokens = results.filter((r) => r.invalidToken).map((r) => r.token);
+        return {
+          sent: results.filter((r) => r.ok).length,
+          failed: results.filter((r) => !r.ok).length,
+          invalidTokens,
+          results,
+        };
+      } catch (err: any) {
+        logger.error({ err }, "push fan-out failed");
+        return reply.code(500).send({ error: "push_failed" });
+      }
+    },
+  );
 
   app.post("/api/comms/public/contact", { schema: publicContactSchema }, async (request, reply) => {
     const { name, email, message, source } = request.body as any;

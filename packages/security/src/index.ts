@@ -201,3 +201,9 @@ export {
   b64urlEncode,
   type SurfaceCookieClaims,
 } from "./surface-cookie.js";
+
+export {
+  getSecretsClient,
+  _resetSecretsClient,
+  type SecretsClient,
+} from "./secrets-client.js";

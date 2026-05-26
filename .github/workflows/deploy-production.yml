@@ -71,11 +71,33 @@ jobs:
             cd services/ai-svc && python -m py_compile src/main.py
           fi
 
+  prod-readiness:
+    # Sprint 12.7 — blocking production-readiness gate. Refuses the
+    # deploy when env manifest checks, placeholder scans, or downstream
+    # health checks fail.
+    name: Production readiness gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [build-node, build-python]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: pnpm prod:check (strict)
+        env:
+          NODE_ENV: production
+        run: pnpm prod:check --strict
+
   deploy:
     name: Deploy to Production
     runs-on: [self-hosted, hetzner, production]
     timeout-minutes: 25
-    needs: [build-node, build-python]
+    needs: [build-node, build-python, prod-readiness]
     environment: production
 
     steps:
@@ -87,8 +109,20 @@ jobs:
           if [ "${{ github.event_name }}" = "release" ]; then
             VERSION="${{ github.event.release.tag_name }}"
           else
-            VERSION="${{ inputs.version || 'latest' }}"
+            VERSION="${{ inputs.version || '' }}"
           fi
+          # Sprint 12.7 — refuse to deploy :latest. Force callers to
+          # supply a concrete tag (release tag name or commit SHA).
+          if [ -z "$VERSION" ] || [ "$VERSION" = "latest" ]; then
+            VERSION="${{ github.sha }}"
+            echo "No explicit version provided; falling back to commit SHA $VERSION"
+          fi
+          if [ "$VERSION" = "latest" ]; then
+            echo "Refusing to deploy :latest. Pass a concrete tag." >&2
+            exit 1
+          fi
+          export IMAGE_TAG="$VERSION"
+          echo "IMAGE_TAG=$VERSION" >> "$GITHUB_ENV"
           echo "tag=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Deploying version: $VERSION"
 

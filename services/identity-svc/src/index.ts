@@ -29,6 +29,7 @@ import { registerPublicBrandingRoutes } from "./routes/branding-public.js";
 import { registerDistrictAdminRoutes } from "./routes/district-admins.js";
 import { registerSsoRoutes } from "./routes/sso.js";
 import { registerScimRoutes } from "./routes/scim.js";
+import { registerOidcProviderRoutes } from "./routes/oidc-provider.js";
 import { registerAvatarRoutes } from "./routes/avatars.js";
 import {
   AVATAR_MAX_BYTES,
@@ -49,7 +50,77 @@ const PORT = parseInt(process.env.PORT || "3001", 10);
  * so tests can mount the same route surface and run boot-time checks
  * (route coverage, hook installation) against it.
  */
+/**
+ * Sprint 12.7 — fail-closed production env validation. Refuses to boot
+ * the identity service in production with unsafe defaults or missing
+ * shared secrets. In dev / test these checks are still run but only log
+ * warnings so the local workflow remains unblocked.
+ */
+function assertProductionEnv(): void {
+  const isProd = process.env.NODE_ENV === "production";
+  const problems: string[] = [];
+
+  const authSecret = process.env.AUTH_SECRET || "";
+  if (
+    !authSecret ||
+    authSecret.length < 32 ||
+    authSecret === "change-me-to-a-random-32-char-secret"
+  ) {
+    problems.push(
+      "AUTH_SECRET is missing, shorter than 32 chars, or still set to the placeholder. " +
+        "Generate a fresh secret with `openssl rand -hex 32`.",
+    );
+  }
+
+  if (!process.env.INTERNAL_SERVICE_TOKEN) {
+    problems.push(
+      "INTERNAL_SERVICE_TOKEN is unset. Service-to-service auth would silently fail open.",
+    );
+  }
+
+  if (!process.env.INTERNAL_AI_TOKEN) {
+    problems.push("INTERNAL_AI_TOKEN is unset. tutor-svc -> ai-svc calls would fail at runtime.");
+  }
+
+  if (
+    !process.env.COOKIE_SECRET ||
+    process.env.COOKIE_SECRET === "aivo-dev-cookie-secret-change-me"
+  ) {
+    problems.push(
+      "COOKIE_SECRET is missing or still set to the dev placeholder. Session cookies would " +
+        "be signed with a known-public value.",
+    );
+  }
+
+  // WebAuthn routes are always mounted by identity-svc; require the RP
+  // configuration. If we ever gate the routes behind a feature flag,
+  // this check should follow the same gate.
+  const webauthnMounted = true;
+  if (webauthnMounted && (!process.env.WEBAUTHN_ORIGINS || !process.env.WEBAUTHN_RP_ID)) {
+    problems.push(
+      "WebAuthn routes are mounted but WEBAUTHN_ORIGINS / WEBAUTHN_RP_ID are not configured. " +
+        "Passkey registration would silently fall back to the request origin.",
+    );
+  }
+
+  if (!problems.length) return;
+
+  if (isProd) {
+    /* eslint-disable no-console */
+    console.error("[identity-svc] FATAL: production environment validation failed:");
+    for (const p of problems) console.error(`  - ${p}`);
+    console.error(
+      "Fix the deployment secrets and redeploy. See docs/auth/scim-provisioning.md and " +
+        "docs/deploy/rollback-runbook.md for guidance.",
+    );
+    /* eslint-enable no-console */
+    process.exit(1);
+  }
+  for (const p of problems) logger.warn(`[env] ${p}`);
+}
+
 export async function buildApp() {
+  assertProductionEnv();
   await initKeys();
   // Fail fast at boot — never let an MFA-encryption-key misconfiguration
   // become a latent issue that only surfaces when a user tries to enroll
@@ -228,6 +299,7 @@ export async function buildApp() {
   await registerDistrictAdminRoutes(app);
   await registerSsoRoutes(app);
   await registerScimRoutes(app);
+  await registerOidcProviderRoutes(app);
   await registerAvatarRoutes(app);
   registerTestHelperRoutes(app);
 
