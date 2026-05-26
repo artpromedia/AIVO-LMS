@@ -1,0 +1,126 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: aivo-slo-alerts
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: aivo-lms
+    app.kubernetes.io/component: slo-alerts
+    release: prometheus
+spec:
+  groups:
+    - name: aivo.slo.baseline
+      interval: 30s
+      rules:
+        - alert: HighBaselineLatency
+          expr: baseline_p95_latency_seconds > 30
+          for: 5m
+          labels:
+            severity: critical
+            team: baseline-oncall
+            channel: pagerduty
+            service: ai-svc
+            slo: baseline-latency
+          annotations:
+            summary: "Baseline p95 latency above 30s for 5m"
+            description: |
+              baseline_p95_latency_seconds = {{ $value }}s for tenant {{ $labels.tenant }}.
+              SLO is p95 < 30s. Investigate ai-svc upstream LLM provider and prompt cache hit rate.
+            runbook_url: https://runbooks.aivo.internal/baseline/high-latency
+            dashboard_url: https://grafana.aivo.internal/d/aivo-baseline-ops-v1
+
+        - alert: BaselineFallbackRateHigh
+          expr: |
+            (
+              sum(rate(baseline_fallback_total[5m]))
+              /
+              sum(rate(baseline_requests_total[5m]))
+            ) > 0.05
+          for: 10m
+          labels:
+            severity: warning
+            team: ops
+            channel: slack
+            slack_channel: "#ops"
+            service: ai-svc
+            slo: baseline-fallback
+          annotations:
+            summary: "Baseline fallback rate > 5% for 10m"
+            description: |
+              Fallback ratio is {{ $value | humanizePercentage }} over the last 5m.
+              SLO is < 5%. Likely upstream model failure or rate-limit; check provider status.
+            runbook_url: https://runbooks.aivo.internal/baseline/fallback-rate
+
+    - name: aivo.slo.responsible-ai
+      interval: 30s
+      rules:
+        - alert: ResponsibleAIBlockRateHigh
+          expr: |
+            (
+              sum(rate(responsible_ai_block_total[5m]))
+              /
+              sum(rate(responsible_ai_evaluations_total[5m]))
+            ) > 0.02
+          for: 5m
+          labels:
+            severity: warning
+            team: ai-safety
+            channel: slack
+            slack_channel: "#ai-safety"
+            service: ai-svc
+            slo: responsible-ai-block-rate
+          annotations:
+            summary: "Responsible-AI block rate > 2% for 5m"
+            description: |
+              Moderation block ratio is {{ $value | humanizePercentage }}.
+              Review recent prompts; may indicate prompt-injection campaign or new harmful pattern.
+            runbook_url: https://runbooks.aivo.internal/responsible-ai/block-rate-high
+
+    - name: aivo.slo.cost
+      interval: 1m
+      rules:
+        - alert: LLMTokenSpendOverCap
+          expr: |
+            increase(llm_token_cost_cents_total[5m])
+              > on (tenant) group_left(tenant_cap_cents) (llm_tenant_token_cap_cents)
+          for: 5m
+          labels:
+            severity: warning
+            team: finance
+            channel: email
+            email_to: "finance@aivo.internal,tenant-admin@aivo.internal"
+            service: ai-svc
+            slo: llm-token-budget
+          annotations:
+            summary: "Tenant {{ $labels.tenant }} exceeded LLM token spend cap"
+            description: |
+              Tenant {{ $labels.tenant }} spent {{ $value }} cents in 5m,
+              over cap {{ $labels.tenant_cap_cents }} cents.
+              Auto-throttle should engage; verify ai-svc budget guard is active.
+            runbook_url: https://runbooks.aivo.internal/cost/token-budget
+
+    - name: aivo.slo.iep
+      interval: 30s
+      rules:
+        - alert: IepDraftValidationFailures
+          expr: |
+            (
+              sum(rate(iep_draft_validation_failure_total[5m]))
+              /
+              sum(rate(iep_draft_attempts_total[5m]))
+            ) > 0.10
+          for: 10m
+          labels:
+            severity: critical
+            team: ai-svc-oncall
+            channel: pagerduty
+            service: ai-svc
+            slo: iep-draft-validation
+          annotations:
+            summary: "IEP draft validation failure rate > 10% for 10m"
+            description: |
+              Validation failure ratio is {{ $value | humanizePercentage }}.
+              IEP drafts are blocked from reaching IEP teams — likely schema drift or
+              upstream model regression. Page ai-svc oncall immediately.
+            runbook_url: https://runbooks.aivo.internal/iep/draft-validation-failures
