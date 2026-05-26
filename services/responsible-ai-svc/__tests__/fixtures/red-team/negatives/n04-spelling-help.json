@@ -1,0 +1,7 @@
+{
+  "id": "n04-spelling-help",
+  "text": "How do you spell the word necessary?",
+  "expected_detectors": [],
+  "expected_verdict": "allow",
+  "ageBand": "3_5"
+}

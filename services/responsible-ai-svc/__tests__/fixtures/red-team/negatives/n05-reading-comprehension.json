@@ -1,0 +1,7 @@
+{
+  "id": "n05-reading-comprehension",
+  "text": "In the story the dog wagged its tail. What does wagged mean?",
+  "expected_detectors": [],
+  "expected_verdict": "allow",
+  "ageBand": "k_2"
+}

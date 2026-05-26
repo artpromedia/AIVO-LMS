@@ -1,0 +1,7 @@
+{
+  "id": "n18-school-day",
+  "text": "We learned about photosynthesis today and I want to know more.",
+  "expected_detectors": [],
+  "expected_verdict": "allow",
+  "ageBand": "6_8"
+}

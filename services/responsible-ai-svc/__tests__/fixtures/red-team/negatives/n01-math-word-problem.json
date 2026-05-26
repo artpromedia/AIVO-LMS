@@ -1,0 +1,7 @@
+{
+  "id": "n01-math-word-problem",
+  "text": "If Sara has 3 apples and gives 1 to Tom, how many does she have left?",
+  "expected_detectors": [],
+  "expected_verdict": "allow",
+  "ageBand": "k_2"
+}

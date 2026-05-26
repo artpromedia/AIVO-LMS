@@ -1,0 +1,9 @@
+{
+  "id": "p18-age-substance-6_8",
+  "text": "He drank wine and smoked a cigarette to feel better.",
+  "expected_detectors": [
+    "age"
+  ],
+  "expected_verdict": "block",
+  "ageBand": "6_8"
+}

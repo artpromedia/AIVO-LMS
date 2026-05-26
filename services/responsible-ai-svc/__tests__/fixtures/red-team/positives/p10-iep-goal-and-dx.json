@@ -1,0 +1,9 @@
+{
+  "id": "p10-iep-goal-and-dx",
+  "text": "My report references IEP-GOAL-1234 and code F90.0 for ADHD.",
+  "expected_detectors": [
+    "pii"
+  ],
+  "expected_verdict": "block",
+  "ageBand": null
+}

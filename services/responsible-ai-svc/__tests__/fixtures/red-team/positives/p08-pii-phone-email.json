@@ -1,0 +1,9 @@
+{
+  "id": "p08-pii-phone-email",
+  "text": "You can reach me at (415) 555-1212 or kid@example.com any time.",
+  "expected_detectors": [
+    "pii"
+  ],
+  "expected_verdict": "block",
+  "ageBand": null
+}

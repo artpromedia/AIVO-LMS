@@ -1,0 +1,7 @@
+{
+  "id": "n14-positive-emotion",
+  "text": "I am really excited about my science fair project.",
+  "expected_detectors": [],
+  "expected_verdict": "allow",
+  "ageBand": "6_8"
+}

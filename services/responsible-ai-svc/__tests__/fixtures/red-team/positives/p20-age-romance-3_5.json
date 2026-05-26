@@ -1,0 +1,9 @@
+{
+  "id": "p20-age-romance-3_5",
+  "text": "She kissed her boyfriend and asked him on a date.",
+  "expected_detectors": [
+    "age"
+  ],
+  "expected_verdict": "block",
+  "ageBand": "3_5"
+}

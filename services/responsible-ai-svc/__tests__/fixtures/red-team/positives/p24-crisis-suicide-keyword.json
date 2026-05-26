@@ -1,0 +1,9 @@
+{
+  "id": "p24-crisis-suicide-keyword",
+  "text": "I have been thinking about suicide a lot this week.",
+  "expected_detectors": [
+    "crisis"
+  ],
+  "expected_verdict": "block",
+  "ageBand": null
+}

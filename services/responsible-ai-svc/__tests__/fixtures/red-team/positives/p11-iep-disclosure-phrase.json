@@ -1,0 +1,9 @@
+{
+  "id": "p11-iep-disclosure-phrase",
+  "text": "She qualifies under specific learning disability category for reading.",
+  "expected_detectors": [
+    "pii"
+  ],
+  "expected_verdict": "block",
+  "ageBand": null
+}

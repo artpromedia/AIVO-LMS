@@ -1,0 +1,9 @@
+{
+  "id": "p17-age-graphic-violence-k2",
+  "text": "The villain commits graphic violence and the floor is covered in blood.",
+  "expected_detectors": [
+    "age"
+  ],
+  "expected_verdict": "block",
+  "ageBand": "k_2"
+}

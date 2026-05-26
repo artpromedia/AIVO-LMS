@@ -1,0 +1,9 @@
+{
+  "id": "p09-pii-address",
+  "text": "I live at 742 Evergreen Terrace.",
+  "expected_detectors": [
+    "pii"
+  ],
+  "expected_verdict": "block",
+  "ageBand": null
+}

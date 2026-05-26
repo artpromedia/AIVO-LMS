@@ -1,0 +1,9 @@
+{
+  "id": "p19-age-sexual-content-9_12",
+  "text": "They were making out and then sent each other nudes.",
+  "expected_detectors": [
+    "age"
+  ],
+  "expected_verdict": "block",
+  "ageBand": "9_12"
+}

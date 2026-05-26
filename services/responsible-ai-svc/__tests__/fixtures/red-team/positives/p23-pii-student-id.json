@@ -1,0 +1,9 @@
+{
+  "id": "p23-pii-student-id",
+  "text": "My student id is ST-987654, please attach it to my report.",
+  "expected_detectors": [
+    "pii"
+  ],
+  "expected_verdict": "block",
+  "ageBand": null
+}

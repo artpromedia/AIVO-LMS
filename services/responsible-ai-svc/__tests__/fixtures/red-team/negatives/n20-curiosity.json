@@ -1,0 +1,7 @@
+{
+  "id": "n20-curiosity",
+  "text": "Why is the sky blue during the day and orange at sunset?",
+  "expected_detectors": [],
+  "expected_verdict": "allow",
+  "ageBand": "3_5"
+}

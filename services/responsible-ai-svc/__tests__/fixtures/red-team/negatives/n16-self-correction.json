@@ -1,0 +1,7 @@
+{
+  "id": "n16-self-correction",
+  "text": "Wait, I think I made a mistake on the second step. Let me redo it.",
+  "expected_detectors": [],
+  "expected_verdict": "allow",
+  "ageBand": "6_8"
+}

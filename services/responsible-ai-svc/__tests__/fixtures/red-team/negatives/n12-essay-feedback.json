@@ -1,0 +1,7 @@
+{
+  "id": "n12-essay-feedback",
+  "text": "Can you review the introduction of my book report?",
+  "expected_detectors": [],
+  "expected_verdict": "allow",
+  "ageBand": "9_12"
+}

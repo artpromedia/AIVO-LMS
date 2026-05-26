@@ -1,0 +1,7 @@
+{
+  "id": "n07-praise-response",
+  "text": "Thanks, that explanation really helped me understand division.",
+  "expected_detectors": [],
+  "expected_verdict": "allow",
+  "ageBand": "3_5"
+}
