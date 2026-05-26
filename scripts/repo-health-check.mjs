@@ -24,6 +24,10 @@ const REQUIRED_PACKAGES = [
   "billing-entitlements",
   "brand",
   "content-pack",
+  // `curriculum-authoring` ships SME-review-gated K-8 content contracts
+  // (validators + adapters consumed by curriculum-svc + assessment-svc).
+  // Added to the required list in Sprint 12.6 (see ADR 0017 family).
+  "curriculum-authoring",
   "db",
   "enterprise-core",
   "events",
@@ -34,7 +38,14 @@ const REQUIRED_PACKAGES = [
   "learner-ui",
   "level-transforms",
   "mobile-ui",
+  // `nav` owns the shared route / role / permission registry consumed by
+  // every shell (web-v2, mobile, admin). Required workspace.
+  "nav",
   "observability",
+  // `ops-alerts` (plural) is the canonical durable-outbox alert pipeline.
+  // The singular `ops-alert` package is deprecated (ADR 0018, removal S16)
+  // and is intentionally still warned about below.
+  "ops-alerts",
   "pedagogy",
   "scheduling",
   "scoring",
@@ -47,6 +58,9 @@ const REQUIRED_PACKAGES = [
   "tutor-runtime",
   "tutor-sdk",
   "tutor-surface-protocol",
+  // `ui` is the shared surface/overlay/state primitive library (consumed
+  // by apps/web-v2 + apps/marketing). Required workspace.
+  "ui",
 ];
 
 const REQUIRED_SERVICES = [
@@ -65,6 +79,12 @@ const REQUIRED_SERVICES = [
   "homework-svc",
   "i18n-svc",
   "identity-svc",
+  // `integration-svc` (singular) is the Sprint 08 enterprise-core / SIS /
+  // LTI 1.3 validation service. `integrations-svc` (plural) is the Sprint 10
+  // OAuth connector marketplace with DB persistence. See ADR 0017 — they
+  // are intentionally distinct and not consolidation candidates today.
+  "integration-svc",
+  "integrations-svc",
   "learning-svc",
   "math-recognizer-svc",
   "problem-session-svc",
@@ -72,6 +92,9 @@ const REQUIRED_SERVICES = [
   "research-svc",
   "responsible-ai-svc",
   "science-solver-svc",
+  // `speech-eval-svc` is the speech / pronunciation evaluator (consumed
+  // by tutor-svc voice-response flows). Required workspace.
+  "speech-eval-svc",
   "status-page-svc",
   "subject-brain-svc",
   "tenant-svc",
