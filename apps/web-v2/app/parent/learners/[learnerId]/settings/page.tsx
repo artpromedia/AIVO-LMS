@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { AISuggestionsToolbar } from "@/components/forms/ai-suggestions-toolbar";
 import { PARENT_NAV } from "@/components/layout/role-shells";
 import { deleteLearner, getLearner, parentCanAccessLearner, updateLearner } from "@/lib/db/repos";
 import { audit } from "@/lib/bff/audit";
@@ -165,6 +166,11 @@ export default async function LearnerSettingsPage({
               rows={3}
               defaultValue={learner.knownStrengths.join("\n")}
             />
+            <AISuggestionsToolbar
+              targetId="knownStrengths"
+              fieldType="learner_strengths"
+              context={{ ageRange: learner.ageRange, gradeBand: learner.gradeBand }}
+            />
           </div>
           <div className="flex flex-col gap-1.5 sm:col-span-2">
             <Label htmlFor="knownChallenges">Challenges</Label>
@@ -173,6 +179,11 @@ export default async function LearnerSettingsPage({
               name="knownChallenges"
               rows={3}
               defaultValue={learner.knownChallenges.join("\n")}
+            />
+            <AISuggestionsToolbar
+              targetId="knownChallenges"
+              fieldType="learner_challenges"
+              context={{ ageRange: learner.ageRange, gradeBand: learner.gradeBand }}
             />
           </div>
           <fieldset className="sm:col-span-2 rounded-lg border border-aivo-border p-4">
