@@ -155,6 +155,64 @@ def is_model_disabled(model: str) -> bool:
         return True
 
 
+RESPONSIBLE_AI_SVC_URL = os.environ.get(
+    "RESPONSIBLE_AI_SVC_URL", "http://localhost:3071"
+).rstrip("/")
+
+
+class ModerationUnavailableError(RuntimeError):
+    """Raised when the moderation backend is unreachable or returns 5xx.
+
+    Callers should catch this and fall back to a deterministic local
+    decision (and emit the `ai_safety_judge_degraded_total` metric so
+    the degradation is observable).
+    """
+
+
+def classify_text(
+    text: str,
+    *,
+    source: str = "speech_buddy",
+    timeout_seconds: float = 1.5,
+) -> str | None:
+    """Synchronously ask the responsible-ai service to classify text.
+
+    Returns one of the SafetyFlagCategory strings if the service finds a
+    policy violation, ``None`` if the text is clean. Raises
+    ``ModerationUnavailableError`` on transport failure or 5xx — the
+    caller is expected to fall back to the deterministic regex stub.
+    """
+    body = {
+        "contextType": source,
+        "inputSummary": "",
+        "output": {"text": text},
+        "policyMode": "warn",
+    }
+    try:
+        with httpx.Client(timeout=timeout_seconds) as client:
+            response = client.post(
+                f"{RESPONSIBLE_AI_SVC_URL}/api/responsible-ai/classify",
+                json=body,
+                headers={"x-internal-key": INTERNAL_KEY},
+            )
+    except Exception as exc:
+        raise ModerationUnavailableError(f"responsible-ai unreachable: {exc}") from exc
+
+    if response.status_code >= 500:
+        raise ModerationUnavailableError(
+            f"responsible-ai returned {response.status_code}"
+        )
+    if response.status_code != 200:
+        # 4xx — treat as a non-flag result (the request was rejected for
+        # reasons that are not "the service is degraded").
+        return None
+    payload = response.json()
+    category = payload.get("category") if isinstance(payload, dict) else None
+    if not category:
+        return None
+    return str(category)
+
+
 def _send_admin_alert(payload: dict[str, Any]) -> None:
     try:
         with httpx.Client(timeout=2.5) as client:

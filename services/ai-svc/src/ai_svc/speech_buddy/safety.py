@@ -19,6 +19,7 @@ and the correlation id.
 from __future__ import annotations
 
 import logging
+import os
 import re
 import time
 import uuid
@@ -204,14 +205,15 @@ def _default_classifier(text: str) -> Optional[SafetyFlagCategory]:
 JudgeFn = Callable[[str, str], Optional[SafetyFlagCategory]]
 
 
-def _default_judge(text: str, source: str) -> Optional[SafetyFlagCategory]:
-    """Default LLM-judge stub: catches obvious paraphrases the regex+classifier missed.
+def _regex_stub_judge(text: str, _source: str) -> Optional[SafetyFlagCategory]:
+    """Deterministic regex-based LLM-judge stub.
 
-    Production deployments wire this to ``services.moderation_client``.
-    The stub stays deterministic so the red-team test suite runs offline.
+    Catches obvious paraphrases the regex+classifier layers missed. Used
+    as the *fallback* when the real responsible-ai-svc judge is
+    unreachable or 5xxs; also the default judge under pytest so the red-
+    team suite runs offline.
     """
     low = text.lower()
-    # Obvious paraphrases not covered by regex/classifier.
     if "want to disappear forever" in low or "stop existing" in low:
         return "self_harm"
     if "an adult is doing things to me" in low:
@@ -219,6 +221,54 @@ def _default_judge(text: str, source: str) -> Optional[SafetyFlagCategory]:
     if "show me how to make a weapon" in low:
         return "violence"
     return None
+
+
+def _default_judge(text: str, source: str) -> Optional[SafetyFlagCategory]:
+    """Production LLM judge.
+
+    Calls ``services.moderation_client.classify_text`` which talks to
+    responsible-ai-svc. On any unavailability (transport failure or 5xx)
+    we fall back to the deterministic regex stub AND emit the
+    ``ai_safety_judge_degraded_total`` Prometheus counter so the
+    degradation is observable. We never let a moderation outage open the
+    safety gate — the fallback only adds blocks, never removes them.
+
+    The real responsible-ai-svc returns one of the SafetyFlagCategory
+    strings (or null for "clean"). When NO judge backend has been
+    configured (e.g. tests, local dev without an AI gateway URL) we go
+    straight to the stub without recording a degradation — a missing
+    backend isn't a degradation, it's a different deployment topology.
+    """
+    # Defer the import so a missing responsible-ai-svc package can't
+    # break collection of this module under pytest.
+    try:
+        from ai_svc.services.moderation_client import (
+            ModerationUnavailableError,
+            classify_text,
+        )
+    except Exception:  # pragma: no cover - import guard
+        return _regex_stub_judge(text, source)
+
+    # Allow ops to disable the live call entirely (tests, smoke env).
+    if os.environ.get("AI_SAFETY_JUDGE_BACKEND", "").strip().lower() in {"", "stub", "none"}:
+        return _regex_stub_judge(text, source)
+
+    try:
+        return classify_text(text, source=f"speech_buddy.{source}")  # type: ignore[return-value]
+    except ModerationUnavailableError:
+        # Increment the degradation metric and log at WARN. The fallback
+        # stub still runs so the safety filter never opens up just
+        # because the backend is having a bad day.
+        try:
+            from ai_svc._observability import inc_counter
+            inc_counter("ai_safety_judge_degraded_total", {"source": source})
+        except Exception:  # pragma: no cover - metrics never block safety
+            pass
+        logger.warning(
+            "speech_buddy.safety.judge_degraded",
+            extra={"source": source},
+        )
+        return _regex_stub_judge(text, source)
 
 
 # ---------------------------------------------------------------------------

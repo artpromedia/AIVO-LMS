@@ -135,3 +135,77 @@ def test_routed_response_for_known_categories():
         es = routed_response(cat, "es")
         assert isinstance(en, str) and len(en) > 0
         assert isinstance(es, str) and len(es) > 0
+
+
+# ---------------------------------------------------------------------------
+# Sprint 12.5 — real LLM-judge wiring + degraded fallback
+# ---------------------------------------------------------------------------
+
+def test_default_judge_calls_responsible_ai_when_backend_configured(monkeypatch):
+    """When AI_SAFETY_JUDGE_BACKEND is set to a real value, the default
+    judge delegates to moderation_client.classify_text and returns its
+    result verbatim."""
+    from ai_svc.speech_buddy import safety as safety_mod
+    from ai_svc.services import moderation_client
+
+    calls: list[str] = []
+
+    def fake_classify(text, *, source="speech_buddy", timeout_seconds=1.5):
+        calls.append(text)
+        return "violence"
+
+    monkeypatch.setenv("AI_SAFETY_JUDGE_BACKEND", "responsible-ai")
+    monkeypatch.setattr(moderation_client, "classify_text", fake_classify)
+
+    result = safety_mod._default_judge("a wholly novel paraphrase", "child_input")
+    assert result == "violence"
+    assert calls == ["a wholly novel paraphrase"]
+
+
+def test_default_judge_falls_back_on_unavailability_and_records_metric(monkeypatch):
+    """When the backend raises ModerationUnavailableError, we fall back
+    to the regex stub *and* increment ai_safety_judge_degraded_total."""
+    from ai_svc.speech_buddy import safety as safety_mod
+    from ai_svc.services import moderation_client
+    from ai_svc import _observability
+
+    def boom(text, *, source="speech_buddy", timeout_seconds=1.5):
+        raise moderation_client.ModerationUnavailableError("503")
+
+    monkeypatch.setenv("AI_SAFETY_JUDGE_BACKEND", "responsible-ai")
+    monkeypatch.setattr(moderation_client, "classify_text", boom)
+
+    # Reset the in-process counter so we can read a delta.
+    _observability._counters.clear()
+
+    # The regex stub recognises "want to disappear forever" as self_harm.
+    result = safety_mod._default_judge("i just want to disappear forever", "child_input")
+    assert result == "self_harm"
+    # Metric was bumped.
+    assert "ai_safety_judge_degraded_total" in _observability._counters
+    bucket = _observability._counters["ai_safety_judge_degraded_total"]
+    assert sum(bucket.values()) >= 1.0
+
+
+def test_default_judge_skips_backend_when_unconfigured(monkeypatch):
+    """If AI_SAFETY_JUDGE_BACKEND is unset / "stub" / "none", we go
+    straight to the regex stub WITHOUT recording a degradation —
+    a missing backend is a deployment choice, not an outage."""
+    from ai_svc.speech_buddy import safety as safety_mod
+    from ai_svc.services import moderation_client
+    from ai_svc import _observability
+
+    sentinel_calls: list[str] = []
+
+    def fake(text, *, source="speech_buddy", timeout_seconds=1.5):
+        sentinel_calls.append(text)
+        return "violence"
+
+    monkeypatch.delenv("AI_SAFETY_JUDGE_BACKEND", raising=False)
+    monkeypatch.setattr(moderation_client, "classify_text", fake)
+    _observability._counters.clear()
+
+    result = safety_mod._default_judge("a clean sentence", "child_input")
+    assert result is None
+    assert sentinel_calls == []  # backend never called
+    assert "ai_safety_judge_degraded_total" not in _observability._counters

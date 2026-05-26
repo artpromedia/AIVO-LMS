@@ -3,19 +3,26 @@
 Delegates `safety.flag.raised`, `session.started`, `session.ended`,
 `turn.recorded`, and `skill.evidence` to:
 
-  - Structured logger (always)
+  - The event bus (HTTP POST to EVENT_BUS_URL or AUDIT_SVC_URL fallback)
+  - Structured logger (always, as a secondary observer for tail+forward)
   - comms-svc internal/speech-buddy-safety (hard flags only)
 
 The wire format mirrors the TS types in ``packages/events/src/index.ts``.
 Event ids are normalized via the constants in that package; we duplicate
 the strings here so this module stays import-safe in pytest with no JS
 dependencies.
+
+Sprint 12.5: the event bus is the *primary* transport. The structured
+log line stays as a secondary observer so existing tail-forward agents
+keep working during migration; a failure to publish to the bus is
+logged at WARN and never raises into the safety path.
 """
 from __future__ import annotations
 
 import hashlib
 import logging
 import os
+import threading
 from datetime import datetime, timezone
 from typing import Any, Optional
 
@@ -41,6 +48,62 @@ def hash_learner_id(learner_id: str) -> str:
 
 def _iso_now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+# ---------------------------------------------------------------------------
+# Sprint 12.5: real event bus transport.
+#
+# We POST AivoEvent envelopes (shape mirrored from packages/events/src/index.ts)
+# to a single HTTP endpoint. The default URL is EVENT_BUS_URL; if that is
+# unset we fall back to AUDIT_SVC_URL's /api/audit-events, which already
+# durably stores the same envelope shape. Failures are logged at WARN
+# and never block the caller.
+# ---------------------------------------------------------------------------
+
+EVENT_BUS_URL = os.environ.get("EVENT_BUS_URL", "").rstrip("/")
+AUDIT_SVC_URL = os.environ.get("AUDIT_SVC_URL", "http://localhost:3069").rstrip("/")
+
+
+class EventBusPublisher:
+    """Synchronous HTTP publisher for the AIVO event bus.
+
+    Uses a module-level httpx Client so connections are pooled and the
+    per-call cost is just a write. The client is built lazily on first
+    use and is thread-safe.
+    """
+
+    _client_lock = threading.Lock()
+    _client: httpx.Client | None = None
+
+    @classmethod
+    def _http(cls) -> httpx.Client:
+        if cls._client is None:
+            with cls._client_lock:
+                if cls._client is None:
+                    cls._client = httpx.Client(timeout=2.5)
+        return cls._client
+
+    @classmethod
+    def publish(cls, envelope: dict[str, Any]) -> bool:
+        """POST the envelope to the bus. Returns True on 2xx, False on
+        anything else (including transport errors). Never raises."""
+        target = EVENT_BUS_URL or f"{AUDIT_SVC_URL}/api/audit-events"
+        try:
+            r = cls._http().post(target, json=envelope)
+            if 200 <= r.status_code < 300:
+                return True
+            logger.warning(
+                "speech_buddy.event_bus.non_2xx",
+                extra={"status": r.status_code, "type": envelope.get("type")},
+            )
+            return False
+        except Exception:
+            logger.warning(
+                "speech_buddy.event_bus.publish_failed",
+                extra={"type": envelope.get("type")},
+                exc_info=True,
+            )
+            return False
 
 
 class EventEmitter:
@@ -74,9 +137,21 @@ class EventEmitter:
 
     def _emit(self, event_type: str, payload: dict[str, Any]) -> None:
         self.emitted.append((event_type, payload))
+        # Sprint 12.5: publish to the real event bus first (primary
+        # transport), then write the structured log line as a secondary
+        # observer for tail+forward agents during migration.
+        envelope = {
+            "id": hashlib.sha256(
+                (event_type + _iso_now() + str(len(self.emitted))).encode("utf-8")
+            ).hexdigest()[:32],
+            "type": event_type,
+            "tenantId": payload.get("tenantId", ""),
+            "timestamp": _iso_now(),
+            "source": "ai-svc.speech_buddy",
+            "payload": payload,
+        }
+        EventBusPublisher.publish(envelope)
         logger.info("speech_buddy.event", extra={"event": event_type, "payload": payload})
-        # In production this would publish to the event bus; for now the
-        # structured log line is the bus, consumed by tail+forward agents.
 
     # -- public emitters ------------------------------------------------------
 
