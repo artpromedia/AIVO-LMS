@@ -101,6 +101,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.TEST_DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/aivo_test' }}
 
+  # Will become blocking once all services in scripts/dump-openapi.mjs have typed OpenAPI contracts (tracked: docs/adr/0019-openapi-contract-coverage.md).
   api-client-drift-gate:
     name: API client drift (advisory)
     runs-on: ubuntu-latest

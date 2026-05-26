@@ -1,0 +1,260 @@
+name: Canary Soak (v1 cutover)
+
+# Progressive feature-flag rollout for v1 cutover. Each stage rolls a flag
+# to a higher percentage, soaks for 24h, then checks Prometheus alert state
+# before promoting. Aborts immediately if any AIVO SLO alert is firing.
+#
+# Wake-up pattern: every stage schedules a self-dispatch with a "stage"
+# input via the GitHub API. The soak waiting is done by the runner's
+# `sleep` over a long-running job — keep `timeout-minutes` set accordingly.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tenant_cohort:
+        description: Tenant cohort label (e.g. "wave-1", "all")
+        required: true
+        default: wave-1
+        type: string
+      flag_name:
+        description: Feature flag to roll
+        required: true
+        type: string
+      target_pct:
+        description: Final target percentage (5, 25, 100)
+        required: true
+        default: "100"
+        type: choice
+        options:
+          - "5"
+          - "25"
+          - "100"
+
+permissions:
+  contents: read
+  actions: write
+  id-token: write
+
+concurrency:
+  group: canary-soak-${{ inputs.flag_name }}
+  cancel-in-progress: false
+
+env:
+  PROM_URL: ${{ vars.PROMETHEUS_URL }}
+  FLAG_API_URL: ${{ vars.FLAG_API_URL }}
+  SOAK_HOURS: "24"
+
+jobs:
+  stage-5:
+    name: Stage 1 - roll to 5% and soak 24h
+    runs-on: ubuntu-latest
+    timeout-minutes: 1500
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Roll flag to 5%
+        env:
+          FLAG_API_TOKEN: ${{ secrets.FLAG_API_TOKEN }}
+        run: |
+          curl -fsSL -X POST "$FLAG_API_URL/flags/${{ inputs.flag_name }}/rollout" \
+            -H "Authorization: Bearer $FLAG_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"cohort":"${{ inputs.tenant_cohort }}","percentage":5}'
+
+      - name: Record start time
+        id: start
+        run: echo "start_ts=$(date -u +%s)" >> "$GITHUB_OUTPUT"
+
+      - name: Soak 24h
+        run: sleep $((SOAK_HOURS * 3600))
+
+      - name: Check Prometheus SLO alerts
+        run: |
+          status=$(curl -fsSL "$PROM_URL/api/v1/rules?type=alert" \
+            | jq -r '[.data.groups[].rules[]
+                | select(.name|startswith("HighBaselineLatency")
+                       or startswith("BaselineFallbackRateHigh")
+                       or startswith("ResponsibleAIBlockRateHigh")
+                       or startswith("LLMTokenSpendOverCap")
+                       or startswith("IepDraftValidationFailures"))
+                | select(.state=="firing")
+                | .name] | length')
+          echo "firing_alerts=$status"
+          if [ "$status" != "0" ]; then
+            echo "::error::SLO alerts firing during 5% soak — aborting promotion."
+            exit 1
+          fi
+
+      - name: Record stop time
+        id: stop
+        run: echo "stop_ts=$(date -u +%s)" >> "$GITHUB_OUTPUT"
+
+      - name: Write soak summary artifact
+        run: |
+          mkdir -p artifacts
+          cat > artifacts/stage-5-summary.json <<JSON
+          {
+            "stage": "5pct",
+            "flag": "${{ inputs.flag_name }}",
+            "cohort": "${{ inputs.tenant_cohort }}",
+            "start_ts": "${{ steps.start.outputs.start_ts }}",
+            "stop_ts": "${{ steps.stop.outputs.stop_ts }}",
+            "grafana_panels": [
+              "aivo-baseline-ops-v1/baseline-p95",
+              "aivo-baseline-ops-v1/fallback-rate",
+              "aivo-baseline-ops-v1/responsible-ai-block-rate",
+              "aivo-role-dashboards-v1"
+            ]
+          }
+          JSON
+
+      - name: Upload soak summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: canary-stage-5
+          path: artifacts/stage-5-summary.json
+          retention-days: 30
+
+  stage-25:
+    name: Stage 2 - roll to 25% and soak 24h
+    needs: stage-5
+    if: ${{ inputs.target_pct == '25' || inputs.target_pct == '100' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 1500
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Roll flag to 25%
+        env:
+          FLAG_API_TOKEN: ${{ secrets.FLAG_API_TOKEN }}
+        run: |
+          curl -fsSL -X POST "$FLAG_API_URL/flags/${{ inputs.flag_name }}/rollout" \
+            -H "Authorization: Bearer $FLAG_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"cohort":"${{ inputs.tenant_cohort }}","percentage":25}'
+
+      - name: Record start time
+        id: start
+        run: echo "start_ts=$(date -u +%s)" >> "$GITHUB_OUTPUT"
+
+      - name: Soak 24h
+        run: sleep $((SOAK_HOURS * 3600))
+
+      - name: Check Prometheus SLO alerts
+        run: |
+          status=$(curl -fsSL "$PROM_URL/api/v1/rules?type=alert" \
+            | jq -r '[.data.groups[].rules[]
+                | select(.name|startswith("HighBaselineLatency")
+                       or startswith("BaselineFallbackRateHigh")
+                       or startswith("ResponsibleAIBlockRateHigh")
+                       or startswith("LLMTokenSpendOverCap")
+                       or startswith("IepDraftValidationFailures"))
+                | select(.state=="firing")
+                | .name] | length')
+          echo "firing_alerts=$status"
+          if [ "$status" != "0" ]; then
+            echo "::error::SLO alerts firing during 25% soak — aborting promotion."
+            exit 1
+          fi
+
+      - name: Record stop time
+        id: stop
+        run: echo "stop_ts=$(date -u +%s)" >> "$GITHUB_OUTPUT"
+
+      - name: Write soak summary artifact
+        run: |
+          mkdir -p artifacts
+          cat > artifacts/stage-25-summary.json <<JSON
+          {
+            "stage": "25pct",
+            "flag": "${{ inputs.flag_name }}",
+            "cohort": "${{ inputs.tenant_cohort }}",
+            "start_ts": "${{ steps.start.outputs.start_ts }}",
+            "stop_ts": "${{ steps.stop.outputs.stop_ts }}",
+            "grafana_panels": [
+              "aivo-baseline-ops-v1/baseline-p95",
+              "aivo-baseline-ops-v1/fallback-rate",
+              "aivo-baseline-ops-v1/responsible-ai-block-rate",
+              "aivo-role-dashboards-v1"
+            ]
+          }
+          JSON
+
+      - name: Upload soak summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: canary-stage-25
+          path: artifacts/stage-25-summary.json
+          retention-days: 30
+
+  stage-100:
+    name: Stage 3 - roll to 100% and soak 24h
+    needs: stage-25
+    if: ${{ inputs.target_pct == '100' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 1500
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Roll flag to 100%
+        env:
+          FLAG_API_TOKEN: ${{ secrets.FLAG_API_TOKEN }}
+        run: |
+          curl -fsSL -X POST "$FLAG_API_URL/flags/${{ inputs.flag_name }}/rollout" \
+            -H "Authorization: Bearer $FLAG_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"cohort":"${{ inputs.tenant_cohort }}","percentage":100}'
+
+      - name: Record start time
+        id: start
+        run: echo "start_ts=$(date -u +%s)" >> "$GITHUB_OUTPUT"
+
+      - name: Soak 24h
+        run: sleep $((SOAK_HOURS * 3600))
+
+      - name: Check Prometheus SLO alerts
+        run: |
+          status=$(curl -fsSL "$PROM_URL/api/v1/rules?type=alert" \
+            | jq -r '[.data.groups[].rules[]
+                | select(.name|startswith("HighBaselineLatency")
+                       or startswith("BaselineFallbackRateHigh")
+                       or startswith("ResponsibleAIBlockRateHigh")
+                       or startswith("LLMTokenSpendOverCap")
+                       or startswith("IepDraftValidationFailures"))
+                | select(.state=="firing")
+                | .name] | length')
+          echo "firing_alerts=$status"
+          if [ "$status" != "0" ]; then
+            echo "::error::SLO alerts firing during 100% soak — aborting promotion."
+            exit 1
+          fi
+
+      - name: Record stop time
+        id: stop
+        run: echo "stop_ts=$(date -u +%s)" >> "$GITHUB_OUTPUT"
+
+      - name: Write soak summary artifact
+        run: |
+          mkdir -p artifacts
+          cat > artifacts/stage-100-summary.json <<JSON
+          {
+            "stage": "100pct",
+            "flag": "${{ inputs.flag_name }}",
+            "cohort": "${{ inputs.tenant_cohort }}",
+            "start_ts": "${{ steps.start.outputs.start_ts }}",
+            "stop_ts": "${{ steps.stop.outputs.stop_ts }}",
+            "grafana_panels": [
+              "aivo-baseline-ops-v1/baseline-p95",
+              "aivo-baseline-ops-v1/fallback-rate",
+              "aivo-baseline-ops-v1/responsible-ai-block-rate",
+              "aivo-role-dashboards-v1"
+            ]
+          }
+          JSON
+
+      - name: Upload soak summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: canary-stage-100
+          path: artifacts/stage-100-summary.json
+          retention-days: 30

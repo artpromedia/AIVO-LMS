@@ -1,0 +1,2 @@
+# k6 summary JSON files land here at run time. Tracked so CI can write
+# without mkdir, and to avoid empty-dir loss in git.
