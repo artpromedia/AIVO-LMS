@@ -15,6 +15,7 @@ import { audit } from "@/lib/bff/audit";
 import { newRequestId } from "@/lib/observability/logger";
 import { createLearnerSchema } from "@/lib/validators/learner";
 import { ZipDistrictField } from "@/components/forms/zip-district-field";
+import { AISuggestionsToolbar } from "@/components/forms/ai-suggestions-toolbar";
 
 function asStringArray(raw: string): string[] {
   return raw
@@ -331,6 +332,10 @@ export default async function NewLearnerPage({
                   rows={3}
                   placeholder={t("known_strengths_placeholder")}
                 />
+                <AISuggestionsToolbar
+                  targetId="knownStrengths"
+                  fieldType="learner_strengths"
+                />
                 <p className="text-xs text-iw-ink-muted">
                   {t("known_strengths_help")}
                 </p>
@@ -344,6 +349,10 @@ export default async function NewLearnerPage({
                   name="knownChallenges"
                   rows={3}
                   placeholder={t("known_challenges_placeholder")}
+                />
+                <AISuggestionsToolbar
+                  targetId="knownChallenges"
+                  fieldType="learner_challenges"
                 />
               </div>
             </div>

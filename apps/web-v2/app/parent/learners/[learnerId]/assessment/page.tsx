@@ -13,6 +13,8 @@ import {
   ASSESSMENT_GHOST_CLASS,
   ReassuranceCard,
 } from "@aivo/ui";
+import { AISuggestionsToolbar } from "@/components/forms/ai-suggestions-toolbar";
+import type { FieldType, SuggestionContext } from "@/lib/ai/suggestions";
 import {
   getLearner,
   getOrCreateParentAssessment,
@@ -465,9 +467,26 @@ function ReassuranceColumn({ stepNum }: { stepNum: number }) {
   return <>{cards}</>;
 }
 
+function aiBlock(
+  name: string,
+  fieldType: FieldType,
+  ctx: SuggestionContext,
+  separator: "newline" | "comma" = "newline",
+) {
+  return (
+    <AISuggestionsToolbar
+      targetId={name}
+      fieldType={fieldType}
+      context={ctx}
+      separator={separator}
+    />
+  );
+}
+
 function renderSection(
   sectionId: AssessmentSectionId,
   assessment: ParentAssessment,
+  aiContext: SuggestionContext,
 ): React.ReactElement {
   switch (sectionId) {
     case "basics":
@@ -530,52 +549,67 @@ function renderSection(
     case "strengths":
       return (
         <div className="flex flex-col gap-5" key={sectionId}>
-          <SoftTextField
-            name="strengths.loves"
-            multiline
-            label="What does your child love to talk about or do?"
-            helper="A passion, a hobby, a favourite show. AIVO weaves these into examples."
-            placeholder="Dinosaurs. Building with LEGO. Cooking with grandma."
-            defaultValue={fieldString(assessment, "strengths", "loves")}
-            maxLength={500}
-          />
-          <SoftTextField
-            name="strengths.goodAt"
-            label="Things your child is good at"
-            helper="Comma-separated. Up to 10."
-            placeholder="Memorising lyrics, building, drawing, kindness"
-            defaultValue={fieldString(assessment, "strengths", "goodAt")}
-          />
-          <SoftTextField
-            name="strengths.motivates"
-            multiline
-            label="What lights them up when learning?"
-            helper="A goal, a topic, a reward, a person they want to impress."
-            placeholder="Beating their own time. Showing dad. Cool space facts."
-            defaultValue={fieldString(assessment, "strengths", "motivates")}
-            maxLength={500}
-          />
+          <div className="flex flex-col gap-2">
+            <SoftTextField
+              name="strengths.loves"
+              multiline
+              label="What does your child love to talk about or do?"
+              helper="A passion, a hobby, a favourite show. AIVO weaves these into examples."
+              placeholder="Dinosaurs. Building with LEGO. Cooking with grandma."
+              defaultValue={fieldString(assessment, "strengths", "loves")}
+              maxLength={500}
+            />
+            {aiBlock("strengths.loves", "learner_loves", aiContext, "comma")}
+          </div>
+          <div className="flex flex-col gap-2">
+            <SoftTextField
+              name="strengths.goodAt"
+              label="Things your child is good at"
+              helper="Comma-separated. Up to 10."
+              placeholder="Memorising lyrics, building, drawing, kindness"
+              defaultValue={fieldString(assessment, "strengths", "goodAt")}
+            />
+            {aiBlock("strengths.goodAt", "good_at", aiContext, "comma")}
+          </div>
+          <div className="flex flex-col gap-2">
+            <SoftTextField
+              name="strengths.motivates"
+              multiline
+              label="What lights them up when learning?"
+              helper="A goal, a topic, a reward, a person they want to impress."
+              placeholder="Beating their own time. Showing dad. Cool space facts."
+              defaultValue={fieldString(assessment, "strengths", "motivates")}
+              maxLength={500}
+            />
+            {aiBlock("strengths.motivates", "learner_motivates", aiContext, "comma")}
+          </div>
         </div>
       );
     case "frustration":
       return (
         <div className="flex flex-col gap-5" key={sectionId}>
-          <SoftTextField
-            name="frustration.triggers"
-            multiline
-            label="What tends to make learning hard or frustrating?"
-            helper="One per line. AIVO will gently route around these in early sessions."
-            placeholder="Long reading passages.\nTimers.\nLoud rooms."
-            defaultValue={fieldString(assessment, "frustration", "triggers")}
-          />
-          <SoftTextField
-            name="frustration.calmingStrategies"
-            multiline
-            label="What helps your child reset?"
-            helper="One per line. AIVO can suggest these inside a session."
-            placeholder="A short walk.\nWater + 2 minutes off screen.\nNoise-cancelling headphones."
-            defaultValue={fieldString(assessment, "frustration", "calmingStrategies")}
-          />
+          <div className="flex flex-col gap-2">
+            <SoftTextField
+              name="frustration.triggers"
+              multiline
+              label="What tends to make learning hard or frustrating?"
+              helper="One per line. AIVO will gently route around these in early sessions."
+              placeholder="Long reading passages.\nTimers.\nLoud rooms."
+              defaultValue={fieldString(assessment, "frustration", "triggers")}
+            />
+            {aiBlock("frustration.triggers", "frustration_triggers", aiContext)}
+          </div>
+          <div className="flex flex-col gap-2">
+            <SoftTextField
+              name="frustration.calmingStrategies"
+              multiline
+              label="What helps your child reset?"
+              helper="One per line. AIVO can suggest these inside a session."
+              placeholder="A short walk.\nWater + 2 minutes off screen.\nNoise-cancelling headphones."
+              defaultValue={fieldString(assessment, "frustration", "calmingStrategies")}
+            />
+            {aiBlock("frustration.calmingStrategies", "calming_strategies", aiContext)}
+          </div>
         </div>
       );
     case "grade_subject":
@@ -682,14 +716,17 @@ function renderSection(
               </span>
             </span>
           </label>
-          <SoftTextField
-            name="communication.notes"
-            multiline
-            label="Anything else about communication?"
-            helper="Optional. e.g. echolalia patterns, processing time, picture supports."
-            defaultValue={fieldString(assessment, "communication", "notes")}
-            maxLength={500}
-          />
+          <div className="flex flex-col gap-2">
+            <SoftTextField
+              name="communication.notes"
+              multiline
+              label="Anything else about communication?"
+              helper="Optional. e.g. echolalia patterns, processing time, picture supports."
+              defaultValue={fieldString(assessment, "communication", "notes")}
+              maxLength={500}
+            />
+            {aiBlock("communication.notes", "communication_notes", aiContext)}
+          </div>
         </div>
       );
     case "learning_profile":
@@ -747,14 +784,17 @@ function renderSection(
             options={COMFORT_SCALE}
             defaultValue={fieldString(assessment, "reading", "comfort")}
           />
-          <SoftTextField
-            name="reading.notes"
-            multiline
-            label="Anything else AIVO should know about reading?"
-            helper="Optional. Decoding, sight words, comprehension, fluency, audio supports."
-            defaultValue={fieldString(assessment, "reading", "notes")}
-            maxLength={500}
-          />
+          <div className="flex flex-col gap-2">
+            <SoftTextField
+              name="reading.notes"
+              multiline
+              label="Anything else AIVO should know about reading?"
+              helper="Optional. Decoding, sight words, comprehension, fluency, audio supports."
+              defaultValue={fieldString(assessment, "reading", "notes")}
+              maxLength={500}
+            />
+            {aiBlock("reading.notes", "reading_notes", aiContext)}
+          </div>
         </div>
       );
     case "math":
@@ -767,14 +807,17 @@ function renderSection(
             options={COMFORT_SCALE}
             defaultValue={fieldString(assessment, "math", "comfort")}
           />
-          <SoftTextField
-            name="math.notes"
-            multiline
-            label="Anything else AIVO should know about math?"
-            helper="Optional. Facts fluency, word problems, anxiety, visual supports."
-            defaultValue={fieldString(assessment, "math", "notes")}
-            maxLength={500}
-          />
+          <div className="flex flex-col gap-2">
+            <SoftTextField
+              name="math.notes"
+              multiline
+              label="Anything else AIVO should know about math?"
+              helper="Optional. Facts fluency, word problems, anxiety, visual supports."
+              defaultValue={fieldString(assessment, "math", "notes")}
+              maxLength={500}
+            />
+            {aiBlock("math.notes", "math_notes", aiContext)}
+          </div>
         </div>
       );
     case "sensory":
@@ -802,15 +845,18 @@ function renderSection(
     case "accommodations":
       return (
         <div className="flex flex-col gap-5" key={sectionId}>
-          <SoftTextField
-            name="accommodations.known"
-            multiline
-            label="Known accommodations (one per line)"
-            helper="If you have an IEP, you can upload it next — but a quick list here helps too."
-            placeholder="Extended time on tests.\nFrequent movement breaks.\nQuiet testing environment."
-            defaultValue={fieldString(assessment, "accommodations", "known")}
-            maxLength={2000}
-          />
+          <div className="flex flex-col gap-2">
+            <SoftTextField
+              name="accommodations.known"
+              multiline
+              label="Known accommodations (one per line)"
+              helper="If you have an IEP, you can upload it next — but a quick list here helps too."
+              placeholder="Extended time on tests.\nFrequent movement breaks.\nQuiet testing environment."
+              defaultValue={fieldString(assessment, "accommodations", "known")}
+              maxLength={2000}
+            />
+            {aiBlock("accommodations.known", "accommodations", aiContext)}
+          </div>
           <div className="grid gap-3 sm:grid-cols-3">
             {(
               [
@@ -880,15 +926,18 @@ function renderSection(
     case "goals":
       return (
         <div className="flex flex-col gap-5" key={sectionId}>
-          <SoftTextField
-            name="goals.goals"
-            multiline
-            required
-            label="What would you like AIVO to help with?"
-            helper="One per line. Up to 8."
-            placeholder="Read for 15 minutes without quitting.\nFeel confident with multiplication.\nWrite a short story."
-            defaultValue={fieldString(assessment, "goals", "goals")}
-          />
+          <div className="flex flex-col gap-2">
+            <SoftTextField
+              name="goals.goals"
+              multiline
+              required
+              label="What would you like AIVO to help with?"
+              helper="One per line. Up to 8."
+              placeholder="Read for 15 minutes without quitting.\nFeel confident with multiplication.\nWrite a short story."
+              defaultValue={fieldString(assessment, "goals", "goals")}
+            />
+            {aiBlock("goals.goals", "goals", aiContext)}
+          </div>
           <PillCardGroup
             mode="single"
             name="goals.timeline"
@@ -902,34 +951,42 @@ function renderSection(
     case "motivation":
       return (
         <div className="flex flex-col gap-5" key={sectionId}>
-          <SoftTextField
-            name="motivation.rewardsThatHelp"
-            multiline
-            label="Rewards or motivators that help"
-            helper="One per line. AIVO can lean on these — sparingly."
-            defaultValue={fieldString(assessment, "motivation", "rewardsThatHelp")}
-          />
-          <SoftTextField
-            name="motivation.avoidanceFactors"
-            multiline
-            label="Things that make your child shut down"
-            helper="Optional. One per line."
-            defaultValue={fieldString(assessment, "motivation", "avoidanceFactors")}
-          />
+          <div className="flex flex-col gap-2">
+            <SoftTextField
+              name="motivation.rewardsThatHelp"
+              multiline
+              label="Rewards or motivators that help"
+              helper="One per line. AIVO can lean on these — sparingly."
+              defaultValue={fieldString(assessment, "motivation", "rewardsThatHelp")}
+            />
+            {aiBlock("motivation.rewardsThatHelp", "rewards_that_help", aiContext)}
+          </div>
+          <div className="flex flex-col gap-2">
+            <SoftTextField
+              name="motivation.avoidanceFactors"
+              multiline
+              label="Things that make your child shut down"
+              helper="Optional. One per line."
+              defaultValue={fieldString(assessment, "motivation", "avoidanceFactors")}
+            />
+            {aiBlock("motivation.avoidanceFactors", "avoidance_factors", aiContext)}
+          </div>
         </div>
       );
     case "concerns":
       return (
-        <SoftTextField
-          key={sectionId}
-          name="concerns.concerns"
-          multiline
-          label="Tell us anything else AIVO should know"
-          helper="Optional. Up to 2000 characters."
-          placeholder="Worried about confidence with reading. Recently moved schools. Big test in spring."
-          defaultValue={fieldString(assessment, "concerns", "concerns")}
-          maxLength={2000}
-        />
+        <div className="flex flex-col gap-2" key={sectionId}>
+          <SoftTextField
+            name="concerns.concerns"
+            multiline
+            label="Tell us anything else AIVO should know"
+            helper="Optional. Up to 2000 characters."
+            placeholder="Worried about confidence with reading. Recently moved schools. Big test in spring."
+            defaultValue={fieldString(assessment, "concerns", "concerns")}
+            maxLength={2000}
+          />
+          {aiBlock("concerns.concerns", "concerns", aiContext)}
+        </div>
       );
   }
 }
@@ -1065,7 +1122,12 @@ export default async function AssessmentWizard({
           }
         >
           <div className="flex flex-col gap-6">
-            {step.sections.map((s) => renderSection(s, assessment))}
+            {step.sections.map((s) =>
+              renderSection(s, assessment, {
+                ageRange: learner.ageRange,
+                gradeBand: learner.gradeBand,
+              }),
+            )}
           </div>
         </QuestionCard>
       </form>
