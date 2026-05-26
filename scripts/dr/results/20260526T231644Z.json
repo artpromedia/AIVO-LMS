@@ -1,0 +1,17 @@
+{
+  "timestamp": "20260526T231644Z",
+  "target": "smoke-test",
+  "dry_run": 1,
+  "restore_bin": "pgbackrest",
+  "rto_seconds": 300,
+  "rto_limit_seconds": 3600,
+  "rpo_observed_seconds": 120,
+  "rpo_limit_seconds": 300,
+  "audit_events_count": 1024,
+  "audit_events_with_prev_hash": 1023,
+  "orphan_learners": 0,
+  "orphan_sessions": 0,
+  "status": "PASS",
+  "failures": [
+  ]
+}

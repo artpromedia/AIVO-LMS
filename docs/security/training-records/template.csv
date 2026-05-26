@@ -1,0 +1,8 @@
+employee_id,name,role,training_name,completion_date,expires_at,evidence_link
+EMP-0001,Example Engineer,Eng,sec-aware-2026,2026-01-15,2027-01-15,https://lms.internal.aivo/cert/EMP-0001/sec-aware-2026
+EMP-0001,Example Engineer,Eng,privacy-2026,2026-01-20,2027-01-20,https://lms.internal.aivo/cert/EMP-0001/privacy-2026
+EMP-0001,Example Engineer,Eng,sec-coding-2026,2026-02-03,2027-02-03,https://lms.internal.aivo/cert/EMP-0001/sec-coding-2026
+EMP-0001,Example Engineer,Eng,ir-refresh-2026,2026-03-10,2027-03-10,https://lms.internal.aivo/cert/EMP-0001/ir-refresh-2026
+EMP-0001,Example Engineer,Eng,data-class-2026,2026-03-12,2027-03-12,https://lms.internal.aivo/cert/EMP-0001/data-class-2026
+EMP-0001,Example Engineer,Eng,mfa-enroll,2025-09-01,,https://hr.internal.aivo/acknowledge/EMP-0001/mfa-enroll
+EMP-0001,Example Engineer,Eng,tabletop-2026,2026-06-22,2027-06-22,https://lms.internal.aivo/cert/EMP-0001/tabletop-2026

@@ -1,7 +1,19 @@
 import { FastifyInstance } from "fastify";
 import { iepDocuments, iepProfiles, iepGoals, learners, learnerFunctioningLevels } from "@aivo/db";
-import { verifyJWT } from "@aivo/security";
+import { verifyJWT, encryptForLearnerWithTenant } from "@aivo/security";
 import { eq } from "drizzle-orm";
+
+/**
+ * Sprint 16 — envelope-encryption gating flag for IEP attachment
+ * payloads (the structured `parsedData` JSON that includes goals +
+ * accommodations + disability categories). When `IEP_ENCRYPT_AT_REST`
+ * is truthy at boot, the upload handler ships the sealed payload to
+ * the DB rather than the raw object; the read path in
+ * services/family-svc/src/routes/iep.ts unseals on demand. The flag
+ * lets us roll out at a per-environment cadence without a schema
+ * migration on day one.
+ */
+const ENCRYPT_IEP_AT_REST = process.env.IEP_ENCRYPT_AT_REST === "true";
 
 const IS_PROD = process.env.NODE_ENV === "production";
 function requireUrl(name: string, devDefault: string): string {
@@ -46,13 +58,33 @@ export async function registerIepRoutes(app: FastifyInstance) {
       const db = (app as any).db;
       const body = req.body as any;
 
+      // Sprint 16: when ENCRYPT_IEP_AT_REST is on, swap the cleartext
+      // parsedData blob for an envelope-sealed payload before
+      // persisting. Read path must call decryptForLearnerWithTenant.
+      let storedParsedData = body.parsedData;
+      if (ENCRYPT_IEP_AT_REST && body.parsedData) {
+        const [learner] = await db
+          .select({ tenantId: learners.tenantId })
+          .from(learners)
+          .where(eq(learners.id, body.learnerId))
+          .limit(1);
+        if (learner?.tenantId) {
+          const sealed = await encryptForLearnerWithTenant(
+            Buffer.from(JSON.stringify(body.parsedData), "utf8"),
+            body.learnerId,
+            learner.tenantId,
+          );
+          storedParsedData = { __sealed: true, ...sealed };
+        }
+      }
+
       const [doc] = await db
         .insert(iepDocuments)
         .values({
           learnerId: body.learnerId,
           fileName: body.fileName,
           fileUrl: body.fileUrl,
-          parsedData: body.parsedData,
+          parsedData: storedParsedData,
           status: body.parsedData ? "parsed" : "uploaded",
         })
         .returning();
