@@ -56,8 +56,12 @@ export class AssistiveWareAdapter implements AACInputAdapter {
   }
 
   highlight(_targetId: string): void {
-    // TODO: Implement via AssistiveWare x-callback-url when the native bridge
-    // supports reverse highlighting. Tracked in INTEGRATION_STATUS.md.
+    // TODO(sprint-15-followup): Implement reverse highlighting via the
+    // AssistiveWare x-callback-url scheme once the native iOS bridge ships.
+    // The gap was noted in the packages audit accompanying Sprint 15 and is
+    // intentionally deferred to a follow-up issue so this sprint isn't
+    // blocked on Proloquo2Go's commercial agreement + native bridge work.
+    // Tracked in packages/aac-bridge/docs/INTEGRATION_STATUS.md.
   }
 
   dispose(): void {
