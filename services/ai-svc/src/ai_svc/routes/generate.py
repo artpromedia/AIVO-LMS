@@ -15,6 +15,11 @@ from ..services.baseline_schemas import (
     validate_baseline_payload,
     validate_questions_subset,
 )
+from ..services.scaffold_enforcer import (
+    build_pre_symbolic_observation_payload,
+    enforce_batch as enforce_scaffold_batch,
+    normalize_level as normalize_functioning_level,
+)
 
 logger = logging.getLogger("ai-svc.generate")
 
@@ -223,6 +228,24 @@ class BaselineResponse(BaseModel):
 async def generate_baseline(req: BaselineRequest):
     from ..services.baseline_generator import SUBJECTS
 
+    # Sprint 5 — PRE_SYMBOLIC short-circuit. The LLM is bypassed
+    # entirely; instead we return a curated observation checklist
+    # because there is no MC item this learner can meaningfully
+    # respond to. The response still conforms to BaselineResponse so
+    # the parent UI doesn't need a separate render path.
+    functioning_level = normalize_functioning_level(req.functioning_level)
+    if functioning_level == "PRE_SYMBOLIC":
+        payload = build_pre_symbolic_observation_payload(
+            learner_id=(req.parent_assessment or {}).get("learnerId"),
+        )
+        return BaselineResponse(
+            questions=payload["questions"],
+            subjects=SUBJECTS,
+            model="pre-symbolic-observation",
+            prompt_tokens=0,
+            completion_tokens=0,
+        )
+
     # Sprint 1 — fetch district-scoped skill anchors before building the
     # prompt. Best-effort: returns an empty grounding when ZIP / grade /
     # curriculum-svc are unavailable, so the existing prompt still fires.
@@ -337,6 +360,29 @@ async def generate_baseline(req: BaselineRequest):
                 ),
             )
         questions_out = [q.model_dump(exclude_none=True) for q in payload.questions]
+
+    # Sprint 5 — functioning-level scaffold enforcement. Reject items
+    # whose shape contradicts the learner's level (e.g. 200-word stems
+    # for NON_VERBAL). We only enforce when ≥14 items still survive
+    # — otherwise enforcement would defeat the salvage path. The
+    # rejected items' violations are logged for ops review.
+    allowed, rejected = enforce_scaffold_batch(questions_out, functioning_level)
+    if rejected:
+        logger.info(
+            "baseline scaffold enforcement (%s): %d allowed, %d rejected",
+            functioning_level, len(allowed), len(rejected),
+        )
+    if len(allowed) >= 14:
+        questions_out = allowed
+    elif len(allowed) > 0:
+        # Mixed: log but ship what we have so the parent UI still gets
+        # a baseline; the safety gate / fallback path in assessment-svc
+        # handles any shortfall.
+        logger.warning(
+            "baseline scaffold left %d items — keeping (would block parent UI)",
+            len(allowed),
+        )
+        questions_out = allowed
 
     return BaselineResponse(
         questions=questions_out,
