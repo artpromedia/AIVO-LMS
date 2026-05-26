@@ -56,6 +56,36 @@ jobs:
       - name: Check no "coming soon" prose in production code
         run: node scripts/ci/check-no-coming-soon.mjs
 
+  audit-coverage:
+    name: Audit Coverage (every mutating route emits audit)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Sprint 16: every POST/PUT/PATCH/DELETE handler in services/**/routes
+      # must emit an audit event (appendAudit / emit_audit_event / etc.) or
+      # be annotated with `// @audit-exempt: <reason>`. The initial baseline
+      # is captured at scripts/ci/results/audit-coverage-initial.json; the
+      # gap list there is the work for the follow-up sprint to fix the
+      # 250+ identified handlers. Once the count is at zero, drop --warn
+      # to flip this job blocking.
+      - name: Run audit-coverage scanner
+        run: node scripts/ci/audit-coverage-check.mjs --warn
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-coverage-report
+          path: scripts/ci/results/audit-coverage-latest.json
+          if-no-files-found: warn
+
   build-node:
     name: Build All Node Services
     runs-on: ubuntu-latest
@@ -476,6 +506,7 @@ jobs:
       - ai-svc
       - mobile-expo-check
       - security-scan
+      - audit-coverage
     steps:
       - name: Report job statuses
         env:
@@ -485,6 +516,7 @@ jobs:
           AI: ${{ needs.ai-svc.result }}
           MOBILE: ${{ needs.mobile-expo-check.result }}
           SECURITY: ${{ needs.security-scan.result }}
+          AUDIT_COV: ${{ needs.audit-coverage.result }}
         run: |
           echo "## CI Pipeline Summary" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
@@ -496,6 +528,7 @@ jobs:
           echo "| AI Service | $AI |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Mobile Expo Check | $MOBILE |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Security Scan (non-blocking) | $SECURITY |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Audit Coverage (Sprint 16, --warn) | $AUDIT_COV |" >> "$GITHUB_STEP_SUMMARY"
           # Fail summary only if a blocking job failed (security is non-blocking)
           for r in "$LINT" "$BUILD" "$BRAIN" "$AI" "$MOBILE"; do
             if [ "$r" = "failure" ] || [ "$r" = "cancelled" ]; then

@@ -1,0 +1,1313 @@
+{
+  "generatedAt": "2026-05-26T23:07:05.655Z",
+  "totals": {
+    "mutating": 268,
+    "covered": 11,
+    "exempt": 0,
+    "missing": 257
+  },
+  "missingByService": {
+    "admin-svc": 12,
+    "ai-svc": 16,
+    "alerts-proxy-svc": 1,
+    "assessment-svc": 47,
+    "billing-svc": 15,
+    "brain-svc": 16,
+    "comms-svc": 20,
+    "engagement-svc": 18,
+    "family-svc": 18,
+    "identity-svc": 65,
+    "integrations-svc": 4,
+    "learning-svc": 7,
+    "speech-eval-svc": 1,
+    "status-page-svc": 1,
+    "tutor-svc": 16
+  },
+  "missing": [
+    {
+      "file": "services/admin-svc/src/routes/api-keys.ts",
+      "verb": "POST",
+      "route": "/api/admin-svc/api-keys"
+    },
+    {
+      "file": "services/admin-svc/src/routes/api-keys.ts",
+      "verb": "POST",
+      "route": "/api/admin-svc/api-keys/:id/revoke"
+    },
+    {
+      "file": "services/admin-svc/src/routes/api-keys.ts",
+      "verb": "POST",
+      "route": "/api/admin-svc/api-keys/:id/rotate"
+    },
+    {
+      "file": "services/admin-svc/src/routes/evidence.ts",
+      "verb": "POST",
+      "route": "/api/admin-svc/compliance/evidence/run"
+    },
+    {
+      "file": "services/admin-svc/src/routes/jobs.ts",
+      "verb": "POST",
+      "route": "/api/admin-svc/jobs/:jobName/run-now"
+    },
+    {
+      "file": "services/admin-svc/src/routes/jobs.ts",
+      "verb": "DELETE",
+      "route": "/api/admin-svc/jobs/discovery/:jobName"
+    },
+    {
+      "file": "services/admin-svc/src/routes/leads.ts",
+      "verb": "POST",
+      "route": "/api/admin-svc/leads"
+    },
+    {
+      "file": "services/admin-svc/src/routes/leads.ts",
+      "verb": "POST",
+      "route": "/api/admin-svc/newsletter"
+    },
+    {
+      "file": "services/admin-svc/src/routes/moderation.ts",
+      "verb": "POST",
+      "route": "/api/admin-svc/internal/moderation"
+    },
+    {
+      "file": "services/admin-svc/src/routes/moderation.ts",
+      "verb": "PATCH",
+      "route": "/api/admin-svc/moderation/:id"
+    },
+    {
+      "file": "services/admin-svc/src/routes/platform.ts",
+      "verb": "POST",
+      "route": "/api/admin-svc/ai/playground"
+    },
+    {
+      "file": "services/admin-svc/src/routes/platform.ts",
+      "verb": "PUT",
+      "route": "/api/admin-svc/config"
+    },
+    {
+      "file": "services/ai-svc/src/ai_svc/routes/budget_admin.py",
+      "verb": "POST",
+      "route": "/{tenant_id}/reset"
+    },
+    {
+      "file": "services/ai-svc/src/ai_svc/routes/curriculum.py",
+      "verb": "POST",
+      "route": "/parse"
+    },
+    {
+      "file": "services/ai-svc/src/ai_svc/routes/generate.py",
+      "verb": "POST",
+      "route": "/draft-goal"
+    },
+    {
+      "file": "services/ai-svc/src/ai_svc/routes/generate.py",
+      "verb": "POST",
+      "route": "/eligibility-suggest"
+    },
+    {
+      "file": "services/ai-svc/src/ai_svc/routes/generate.py",
+      "verb": "POST",
+      "route": "/generate"
+    },
+    {
+      "file": "services/ai-svc/src/ai_svc/routes/generate.py",
+      "verb": "POST",
+      "route": "/generate-baseline"
+    },
+    {
+      "file": "services/ai-svc/src/ai_svc/routes/generate.py",
+      "verb": "POST",
+      "route": "/generate-discovery-chapter"
+    },
+    {
+      "file": "services/ai-svc/src/ai_svc/routes/generate.py",
+      "verb": "POST",
+      "route": "/parse-iep"
+    },
+    {
+      "file": "services/ai-svc/src/ai_svc/routes/generate.py",
+      "verb": "POST",
+      "route": "/tutor/chat"
+    },
+    {
+      "file": "services/ai-svc/src/ai_svc/routes/homework.py",
+      "verb": "POST",
+      "route": "/adapt"
+    },
+    {
+      "file": "services/ai-svc/src/ai_svc/routes/homework.py",
+      "verb": "POST",
+      "route": "/chat"
+    },
+    {
+      "file": "services/ai-svc/src/ai_svc/routes/homework.py",
+      "verb": "POST",
+      "route": "/ocr"
+    },
+    {
+      "file": "services/ai-svc/src/ai_svc/routes/speech_buddy.py",
+      "verb": "POST",
+      "route": "/sessions"
+    },
+    {
+      "file": "services/ai-svc/src/ai_svc/routes/speech_buddy.py",
+      "verb": "POST",
+      "route": "/sessions/{session_id}/end"
+    },
+    {
+      "file": "services/ai-svc/src/ai_svc/routes/speech_buddy.py",
+      "verb": "POST",
+      "route": "/sessions/{session_id}/turn"
+    },
+    {
+      "file": "services/ai-svc/src/ai_svc/routes/transcribe.py",
+      "verb": "POST",
+      "route": "/transcribe"
+    },
+    {
+      "file": "services/alerts-proxy-svc/src/index.ts",
+      "verb": "POST",
+      "route": "/api/alerts/page"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/assessments.ts",
+      "verb": "POST",
+      "route": "/api/assessments"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/assessments.ts",
+      "verb": "POST",
+      "route": "/api/assessments/:id/complete"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/assessments.ts",
+      "verb": "POST",
+      "route": "/api/assessments/:id/responses"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-authoring.ts",
+      "verb": "POST",
+      "route": "/api/iep/drafts"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-authoring.ts",
+      "verb": "PATCH",
+      "route": "/api/iep/drafts/:id"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-authoring.ts",
+      "verb": "DELETE",
+      "route": "/api/iep/drafts/:id"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-authoring.ts",
+      "verb": "POST",
+      "route": "/api/iep/drafts/:id/goals"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-authoring.ts",
+      "verb": "PATCH",
+      "route": "/api/iep/drafts/:id/goals/:goalId"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-authoring.ts",
+      "verb": "DELETE",
+      "route": "/api/iep/drafts/:id/goals/:goalId"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-authoring.ts",
+      "verb": "PUT",
+      "route": "/api/iep/drafts/:id/present-levels/:area"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-authoring.ts",
+      "verb": "POST",
+      "route": "/api/iep/drafts/:id/services"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-authoring.ts",
+      "verb": "PATCH",
+      "route": "/api/iep/drafts/:id/services/:serviceId"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-authoring.ts",
+      "verb": "DELETE",
+      "route": "/api/iep/drafts/:id/services/:serviceId"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-authoring.ts",
+      "verb": "POST",
+      "route": "/api/iep/drafts/:id/transition"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-collab.ts",
+      "verb": "POST",
+      "route": "/api/iep/drafts/:id/comments"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-collab.ts",
+      "verb": "PATCH",
+      "route": "/api/iep/drafts/:id/comments/:cid"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-collab.ts",
+      "verb": "POST",
+      "route": "/api/iep/drafts/:id/notify-in-review"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-collab.ts",
+      "verb": "POST",
+      "route": "/api/iep/drafts/:id/revisions"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-collab.ts",
+      "verb": "POST",
+      "route": "/api/iep/drafts/:id/signatures"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-collab.ts",
+      "verb": "POST",
+      "route": "/api/iep/drafts/:id/team"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-collab.ts",
+      "verb": "DELETE",
+      "route": "/api/iep/drafts/:id/team/:memberId"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-evaluations.ts",
+      "verb": "POST",
+      "route": "/api/iep/evaluations"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-evaluations.ts",
+      "verb": "PATCH",
+      "route": "/api/iep/evaluations/:id"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-evaluations.ts",
+      "verb": "POST",
+      "route": "/api/iep/evaluations/:id/decision"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-evaluations.ts",
+      "verb": "POST",
+      "route": "/api/iep/evaluations/:id/submit"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-evaluations.ts",
+      "verb": "POST",
+      "route": "/api/iep/evaluations/:id/suggest"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-parent-share.ts",
+      "verb": "POST",
+      "route": "/api/iep/drafts/:id/share-links"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-parent-share.ts",
+      "verb": "POST",
+      "route": "/api/iep/drafts/:id/share-links/:linkId/revoke"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-updates.ts",
+      "verb": "POST",
+      "route": "/api/iep/amendments/:aid/respond"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-updates.ts",
+      "verb": "POST",
+      "route": "/api/iep/drafts/:id/amendments"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-updates.ts",
+      "verb": "POST",
+      "route": "/api/iep/drafts/:id/notes"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-updates.ts",
+      "verb": "POST",
+      "route": "/api/iep/drafts/:id/reports"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-updates.ts",
+      "verb": "PATCH",
+      "route": "/api/iep/drafts/:id/reports/:rid"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-updates.ts",
+      "verb": "POST",
+      "route": "/api/iep/drafts/:id/reports/:rid/send"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-updates.ts",
+      "verb": "POST",
+      "route": "/api/iep/internal/run-review-reminders"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep-updates.ts",
+      "verb": "PUT",
+      "route": "/api/iep/preferences"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep.ts",
+      "verb": "POST",
+      "route": "/api/iep/parse"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep.ts",
+      "verb": "POST",
+      "route": "/api/iep/upload"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/iep.ts",
+      "verb": "POST",
+      "route": "/api/iep/upload-pdf"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/learner-baseline.ts",
+      "verb": "POST",
+      "route": "/api/assessments/learner/discovery/:learnerId/chapter"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/learner-baseline.ts",
+      "verb": "POST",
+      "route": "/api/assessments/learner/discovery/:learnerId/complete"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/learner-profile.ts",
+      "verb": "POST",
+      "route": "/api/assessments/adaptive-baseline/:learnerId/finalize"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/learner-profile.ts",
+      "verb": "POST",
+      "route": "/api/assessments/adaptive-baseline/:learnerId/respond"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/learner-profile.ts",
+      "verb": "POST",
+      "route": "/api/assessments/adaptive-baseline/:learnerId/start"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/parent-assessment.ts",
+      "verb": "POST",
+      "route": "/api/assessments/parent"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/sensory-profile.ts",
+      "verb": "POST",
+      "route": "/api/assessments/sensory-profile"
+    },
+    {
+      "file": "services/assessment-svc/src/routes/teacher-assessment.ts",
+      "verb": "POST",
+      "route": "/api/assessments/teacher"
+    },
+    {
+      "file": "services/billing-svc/src/routes/coupons.ts",
+      "verb": "POST",
+      "route": "/api/billing/admin/coupons"
+    },
+    {
+      "file": "services/billing-svc/src/routes/coupons.ts",
+      "verb": "DELETE",
+      "route": "/api/billing/admin/coupons/:code"
+    },
+    {
+      "file": "services/billing-svc/src/routes/coupons.ts",
+      "verb": "POST",
+      "route": "/api/billing/coupons/redeem"
+    },
+    {
+      "file": "services/billing-svc/src/routes/coupons.ts",
+      "verb": "POST",
+      "route": "/api/billing/coupons/validate"
+    },
+    {
+      "file": "services/billing-svc/src/routes/plans.ts",
+      "verb": "POST",
+      "route": "/api/billing/addons"
+    },
+    {
+      "file": "services/billing-svc/src/routes/plans.ts",
+      "verb": "DELETE",
+      "route": "/api/billing/addons/:tenantId/:tutorId"
+    },
+    {
+      "file": "services/billing-svc/src/routes/plans.ts",
+      "verb": "POST",
+      "route": "/api/billing/checkout/session"
+    },
+    {
+      "file": "services/billing-svc/src/routes/plans.ts",
+      "verb": "POST",
+      "route": "/api/billing/portal/session"
+    },
+    {
+      "file": "services/billing-svc/src/routes/plans.ts",
+      "verb": "POST",
+      "route": "/api/billing/subscription"
+    },
+    {
+      "file": "services/billing-svc/src/routes/plans.ts",
+      "verb": "POST",
+      "route": "/api/billing/subscription/:tenantId/cancel"
+    },
+    {
+      "file": "services/billing-svc/src/routes/plans.ts",
+      "verb": "POST",
+      "route": "/api/billing/subscription/:tenantId/resume"
+    },
+    {
+      "file": "services/billing-svc/src/routes/test-helpers.ts",
+      "verb": "POST",
+      "route": "/api/__test__/billing/reset"
+    },
+    {
+      "file": "services/billing-svc/src/routes/test-helpers.ts",
+      "verb": "POST",
+      "route": "/api/__test__/billing/seed-addon"
+    },
+    {
+      "file": "services/billing-svc/src/routes/test-helpers.ts",
+      "verb": "POST",
+      "route": "/api/__test__/billing/seed-subscription"
+    },
+    {
+      "file": "services/billing-svc/src/routes/webhooks.ts",
+      "verb": "POST",
+      "route": "/api/billing/webhooks/stripe"
+    },
+    {
+      "file": "services/brain-svc/src/brain_svc/routes/analysis.py",
+      "verb": "POST",
+      "route": "/{learner_id}/ai-regression-analysis"
+    },
+    {
+      "file": "services/brain-svc/src/brain_svc/routes/analysis.py",
+      "verb": "POST",
+      "route": "/{learner_id}/ai-summary"
+    },
+    {
+      "file": "services/brain-svc/src/brain_svc/routes/brain.py",
+      "verb": "POST",
+      "route": "/{learner_id}/amend"
+    },
+    {
+      "file": "services/brain-svc/src/brain_svc/routes/brain.py",
+      "verb": "POST",
+      "route": "/{learner_id}/approve"
+    },
+    {
+      "file": "services/brain-svc/src/brain_svc/routes/brain.py",
+      "verb": "POST",
+      "route": "/{learner_id}/decline"
+    },
+    {
+      "file": "services/brain-svc/src/brain_svc/routes/brain.py",
+      "verb": "POST",
+      "route": "/{learner_id}/engagement"
+    },
+    {
+      "file": "services/brain-svc/src/brain_svc/routes/brain.py",
+      "verb": "POST",
+      "route": "/{learner_id}/regression-check"
+    },
+    {
+      "file": "services/brain-svc/src/brain_svc/routes/brain.py",
+      "verb": "POST",
+      "route": "/{learner_id}/rollback"
+    },
+    {
+      "file": "services/brain-svc/src/brain_svc/routes/brain.py",
+      "verb": "POST",
+      "route": "/clone"
+    },
+    {
+      "file": "services/brain-svc/src/brain_svc/routes/curriculum.py",
+      "verb": "POST",
+      "route": "/{learner_id}/pull-standards"
+    },
+    {
+      "file": "services/brain-svc/src/brain_svc/routes/curriculum.py",
+      "verb": "POST",
+      "route": "/{learner_id}/scope-sequence"
+    },
+    {
+      "file": "services/brain-svc/src/brain_svc/routes/curriculum.py",
+      "verb": "POST",
+      "route": "/{learner_id}/topic-sequence"
+    },
+    {
+      "file": "services/brain-svc/src/brain_svc/routes/playground.py",
+      "verb": "POST",
+      "route": "<dynamic>"
+    },
+    {
+      "file": "services/brain-svc/src/brain_svc/routes/recommendations.py",
+      "verb": "POST",
+      "route": "/"
+    },
+    {
+      "file": "services/brain-svc/src/brain_svc/routes/recommendations.py",
+      "verb": "PUT",
+      "route": "/{recommendation_id}/resolve"
+    },
+    {
+      "file": "services/brain-svc/src/brain_svc/routes/recommendations.py",
+      "verb": "POST",
+      "route": "/generate/{learner_id}"
+    },
+    {
+      "file": "services/comms-svc/src/routes/notifications.ts",
+      "verb": "POST",
+      "route": "/api/comms/email"
+    },
+    {
+      "file": "services/comms-svc/src/routes/notifications.ts",
+      "verb": "POST",
+      "route": "/api/comms/email/batch"
+    },
+    {
+      "file": "services/comms-svc/src/routes/notifications.ts",
+      "verb": "POST",
+      "route": "/api/comms/in-app-notifications/mark-read"
+    },
+    {
+      "file": "services/comms-svc/src/routes/notifications.ts",
+      "verb": "POST",
+      "route": "/api/comms/internal/admin-alert"
+    },
+    {
+      "file": "services/comms-svc/src/routes/notifications.ts",
+      "verb": "POST",
+      "route": "/api/comms/internal/billing-alert"
+    },
+    {
+      "file": "services/comms-svc/src/routes/notifications.ts",
+      "verb": "POST",
+      "route": "/api/comms/internal/district-admin-invite"
+    },
+    {
+      "file": "services/comms-svc/src/routes/notifications.ts",
+      "verb": "POST",
+      "route": "/api/comms/internal/iep-notify"
+    },
+    {
+      "file": "services/comms-svc/src/routes/notifications.ts",
+      "verb": "POST",
+      "route": "/api/comms/internal/in-app-notify"
+    },
+    {
+      "file": "services/comms-svc/src/routes/notifications.ts",
+      "verb": "POST",
+      "route": "/api/comms/internal/mfa-code"
+    },
+    {
+      "file": "services/comms-svc/src/routes/notifications.ts",
+      "verb": "POST",
+      "route": "/api/comms/internal/newsletter-confirm"
+    },
+    {
+      "file": "services/comms-svc/src/routes/notifications.ts",
+      "verb": "POST",
+      "route": "/api/comms/internal/password-reset"
+    },
+    {
+      "file": "services/comms-svc/src/routes/notifications.ts",
+      "verb": "POST",
+      "route": "/api/comms/internal/speech-buddy-safety"
+    },
+    {
+      "file": "services/comms-svc/src/routes/notifications.ts",
+      "verb": "POST",
+      "route": "/api/comms/internal/team-invite"
+    },
+    {
+      "file": "services/comms-svc/src/routes/notifications.ts",
+      "verb": "PUT",
+      "route": "/api/comms/preferences/:userId"
+    },
+    {
+      "file": "services/comms-svc/src/routes/notifications.ts",
+      "verb": "POST",
+      "route": "/api/comms/public/contact"
+    },
+    {
+      "file": "services/comms-svc/src/routes/notifications.ts",
+      "verb": "POST",
+      "route": "/api/comms/public/demo-request"
+    },
+    {
+      "file": "services/comms-svc/src/routes/notifications.ts",
+      "verb": "POST",
+      "route": "/api/comms/public/newsletter"
+    },
+    {
+      "file": "services/comms-svc/src/routes/notifications.ts",
+      "verb": "POST",
+      "route": "/api/comms/push"
+    },
+    {
+      "file": "services/comms-svc/src/routes/notifications.ts",
+      "verb": "POST",
+      "route": "/api/comms/send"
+    },
+    {
+      "file": "services/comms-svc/src/routes/webhook-email-events.ts",
+      "verb": "POST",
+      "route": "/api/comms/webhook/email-events"
+    },
+    {
+      "file": "services/engagement-svc/src/routes/challenges.ts",
+      "verb": "POST",
+      "route": "/api/engagement/challenges/:challengeId/answer"
+    },
+    {
+      "file": "services/engagement-svc/src/routes/challenges.ts",
+      "verb": "POST",
+      "route": "/api/engagement/challenges/create"
+    },
+    {
+      "file": "services/engagement-svc/src/routes/challenges.ts",
+      "verb": "POST",
+      "route": "/api/engagement/challenges/join"
+    },
+    {
+      "file": "services/engagement-svc/src/routes/lessonPlans.ts",
+      "verb": "PUT",
+      "route": "/api/engagement/lesson-plans/:planId"
+    },
+    {
+      "file": "services/engagement-svc/src/routes/lessonPlans.ts",
+      "verb": "POST",
+      "route": "/api/engagement/lesson-plans/create"
+    },
+    {
+      "file": "services/engagement-svc/src/routes/lessonPlans.ts",
+      "verb": "POST",
+      "route": "/api/engagement/lesson-plans/generate"
+    },
+    {
+      "file": "services/engagement-svc/src/routes/quests.ts",
+      "verb": "POST",
+      "route": "/api/engagement/quests/complete"
+    },
+    {
+      "file": "services/engagement-svc/src/routes/quests.ts",
+      "verb": "POST",
+      "route": "/api/engagement/quests/start"
+    },
+    {
+      "file": "services/engagement-svc/src/routes/sel.ts",
+      "verb": "POST",
+      "route": "/api/engagement/break/log"
+    },
+    {
+      "file": "services/engagement-svc/src/routes/sel.ts",
+      "verb": "POST",
+      "route": "/api/engagement/sel/checkin"
+    },
+    {
+      "file": "services/engagement-svc/src/routes/shop.ts",
+      "verb": "POST",
+      "route": "/api/engagement/shop/equip"
+    },
+    {
+      "file": "services/engagement-svc/src/routes/shop.ts",
+      "verb": "POST",
+      "route": "/api/engagement/shop/purchase"
+    },
+    {
+      "file": "services/engagement-svc/src/routes/siblings.ts",
+      "verb": "POST",
+      "route": "/api/engagement/siblings/link"
+    },
+    {
+      "file": "services/engagement-svc/src/routes/siblings.ts",
+      "verb": "DELETE",
+      "route": "/api/engagement/siblings/unlink"
+    },
+    {
+      "file": "services/engagement-svc/src/routes/xp.ts",
+      "verb": "POST",
+      "route": "/api/engagement/badge/award"
+    },
+    {
+      "file": "services/engagement-svc/src/routes/xp.ts",
+      "verb": "POST",
+      "route": "/api/engagement/streak/freeze"
+    },
+    {
+      "file": "services/engagement-svc/src/routes/xp.ts",
+      "verb": "POST",
+      "route": "/api/engagement/streak/update"
+    },
+    {
+      "file": "services/engagement-svc/src/routes/xp.ts",
+      "verb": "POST",
+      "route": "/api/engagement/xp/award"
+    },
+    {
+      "file": "services/family-svc/src/routes/collaboration.ts",
+      "verb": "POST",
+      "route": "/api/family/collaboration/:learnerId/insight"
+    },
+    {
+      "file": "services/family-svc/src/routes/collaboration.ts",
+      "verb": "POST",
+      "route": "/api/family/collaboration/:learnerId/invite/caregiver"
+    },
+    {
+      "file": "services/family-svc/src/routes/collaboration.ts",
+      "verb": "POST",
+      "route": "/api/family/collaboration/:learnerId/invite/teacher"
+    },
+    {
+      "file": "services/family-svc/src/routes/collaboration.ts",
+      "verb": "POST",
+      "route": "/api/family/collaboration/:learnerId/invite/therapist"
+    },
+    {
+      "file": "services/family-svc/src/routes/collaboration.ts",
+      "verb": "DELETE",
+      "route": "/api/family/collaboration/:learnerId/member/:memberId"
+    },
+    {
+      "file": "services/family-svc/src/routes/collaboration.ts",
+      "verb": "POST",
+      "route": "/api/family/collaboration/accept-invite"
+    },
+    {
+      "file": "services/family-svc/src/routes/interests.ts",
+      "verb": "POST",
+      "route": "/api/family/interests/:learnerId"
+    },
+    {
+      "file": "services/family-svc/src/routes/interests.ts",
+      "verb": "DELETE",
+      "route": "/api/family/interests/:learnerId/:signalId"
+    },
+    {
+      "file": "services/family-svc/src/routes/language-profile.ts",
+      "verb": "POST",
+      "route": "/api/family/language-profile/:learnerId"
+    },
+    {
+      "file": "services/family-svc/src/routes/language-profile.ts",
+      "verb": "POST",
+      "route": "/api/family/language-profile/:learnerId/coughdrop-sync"
+    },
+    {
+      "file": "services/family-svc/src/routes/observations.ts",
+      "verb": "POST",
+      "route": "/api/family/observations"
+    },
+    {
+      "file": "services/family-svc/src/routes/parent-dashboard.ts",
+      "verb": "PUT",
+      "route": "/api/family/inbox/:notificationId/dismiss"
+    },
+    {
+      "file": "services/family-svc/src/routes/parent-dashboard.ts",
+      "verb": "PUT",
+      "route": "/api/family/inbox/:notificationId/read"
+    },
+    {
+      "file": "services/family-svc/src/routes/parent-dashboard.ts",
+      "verb": "PUT",
+      "route": "/api/family/learner-settings/:learnerId"
+    },
+    {
+      "file": "services/family-svc/src/routes/recommendations.ts",
+      "verb": "POST",
+      "route": "/api/family/recommendations/:learnerId/:recId/respond"
+    },
+    {
+      "file": "services/family-svc/src/routes/speech-buddy-consent.ts",
+      "verb": "POST",
+      "route": "/api/family/internal/speech-buddy/consent/verify"
+    },
+    {
+      "file": "services/family-svc/src/routes/transition.ts",
+      "verb": "POST",
+      "route": "/api/family/transition/:learnerId"
+    },
+    {
+      "file": "services/family-svc/src/routes/whats-working.ts",
+      "verb": "POST",
+      "route": "/api/family/whats-working/:learnerId"
+    },
+    {
+      "file": "services/identity-svc/src/routes/admin.ts",
+      "verb": "POST",
+      "route": "/api/admin/create-district"
+    },
+    {
+      "file": "services/identity-svc/src/routes/admin.ts",
+      "verb": "POST",
+      "route": "/api/admin/create-team-member"
+    },
+    {
+      "file": "services/identity-svc/src/routes/admin.ts",
+      "verb": "PUT",
+      "route": "/api/admin/tenants/:id"
+    },
+    {
+      "file": "services/identity-svc/src/routes/admin.ts",
+      "verb": "PUT",
+      "route": "/api/admin/users/:id"
+    },
+    {
+      "file": "services/identity-svc/src/routes/admin.ts",
+      "verb": "DELETE",
+      "route": "/api/admin/users/:id"
+    },
+    {
+      "file": "services/identity-svc/src/routes/admin.ts",
+      "verb": "POST",
+      "route": "/api/admin/users/:id/reactivate"
+    },
+    {
+      "file": "services/identity-svc/src/routes/admin.ts",
+      "verb": "POST",
+      "route": "/api/admin/users/:id/reset-password"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "DELETE",
+      "route": "/api/auth/account"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "POST",
+      "route": "/api/auth/admin-login"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "POST",
+      "route": "/api/auth/district-login"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "POST",
+      "route": "/api/auth/forgot-password"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "POST",
+      "route": "/api/auth/google"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "DELETE",
+      "route": "/api/auth/learner/:learnerId"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "POST",
+      "route": "/api/auth/login"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "POST",
+      "route": "/api/auth/logout"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "POST",
+      "route": "/api/auth/mfa/confirm-enable"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "POST",
+      "route": "/api/auth/mfa/disable"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "POST",
+      "route": "/api/auth/mfa/enable"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "POST",
+      "route": "/api/auth/mfa/resend"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "POST",
+      "route": "/api/auth/mfa/totp/enroll"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "PATCH",
+      "route": "/api/auth/mfa/webauthn/credentials/:id"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "POST",
+      "route": "/api/auth/mfa/webauthn/login/options"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "POST",
+      "route": "/api/auth/mfa/webauthn/login/verify"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "POST",
+      "route": "/api/auth/mfa/webauthn/register/options"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "PUT",
+      "route": "/api/auth/password"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "POST",
+      "route": "/api/auth/pin-login"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "PUT",
+      "route": "/api/auth/profile"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "POST",
+      "route": "/api/auth/refresh"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "POST",
+      "route": "/api/auth/register"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "POST",
+      "route": "/api/auth/reset-password"
+    },
+    {
+      "file": "services/identity-svc/src/routes/auth.ts",
+      "verb": "PUT",
+      "route": "/api/auth/session/heartbeat"
+    },
+    {
+      "file": "services/identity-svc/src/routes/avatars.ts",
+      "verb": "POST",
+      "route": "/api/users/me/avatar"
+    },
+    {
+      "file": "services/identity-svc/src/routes/avatars.ts",
+      "verb": "DELETE",
+      "route": "/api/users/me/avatar"
+    },
+    {
+      "file": "services/identity-svc/src/routes/consent.ts",
+      "verb": "POST",
+      "route": "/api/consent"
+    },
+    {
+      "file": "services/identity-svc/src/routes/consent.ts",
+      "verb": "DELETE",
+      "route": "/api/consent/:id"
+    },
+    {
+      "file": "services/identity-svc/src/routes/district-admins.ts",
+      "verb": "POST",
+      "route": "/api/district/admins"
+    },
+    {
+      "file": "services/identity-svc/src/routes/district-admins.ts",
+      "verb": "POST",
+      "route": "/api/district/admins/:id/deactivate"
+    },
+    {
+      "file": "services/identity-svc/src/routes/district-admins.ts",
+      "verb": "POST",
+      "route": "/api/district/admins/:id/reactivate"
+    },
+    {
+      "file": "services/identity-svc/src/routes/district-admins.ts",
+      "verb": "POST",
+      "route": "/api/district/admins/:id/reset-password"
+    },
+    {
+      "file": "services/identity-svc/src/routes/district-admins.ts",
+      "verb": "PUT",
+      "route": "/api/district/admins/force-mfa"
+    },
+    {
+      "file": "services/identity-svc/src/routes/district-admins.ts",
+      "verb": "DELETE",
+      "route": "/api/district/admins/invites/:id"
+    },
+    {
+      "file": "services/identity-svc/src/routes/district-admins.ts",
+      "verb": "POST",
+      "route": "/api/district/admins/invites/:id/resend"
+    },
+    {
+      "file": "services/identity-svc/src/routes/district.ts",
+      "verb": "POST",
+      "route": "/api/district/classrooms"
+    },
+    {
+      "file": "services/identity-svc/src/routes/district.ts",
+      "verb": "POST",
+      "route": "/api/district/iep"
+    },
+    {
+      "file": "services/identity-svc/src/routes/district.ts",
+      "verb": "POST",
+      "route": "/api/district/interventions"
+    },
+    {
+      "file": "services/identity-svc/src/routes/district.ts",
+      "verb": "POST",
+      "route": "/api/district/schools"
+    },
+    {
+      "file": "services/identity-svc/src/routes/district.ts",
+      "verb": "PUT",
+      "route": "/api/district/schools/:id"
+    },
+    {
+      "file": "services/identity-svc/src/routes/district.ts",
+      "verb": "POST",
+      "route": "/api/district/seats/request"
+    },
+    {
+      "file": "services/identity-svc/src/routes/district.ts",
+      "verb": "PUT",
+      "route": "/api/district/settings"
+    },
+    {
+      "file": "services/identity-svc/src/routes/district.ts",
+      "verb": "POST",
+      "route": "/api/district/settings/branding/logo"
+    },
+    {
+      "file": "services/identity-svc/src/routes/district.ts",
+      "verb": "PUT",
+      "route": "/api/district/sso"
+    },
+    {
+      "file": "services/identity-svc/src/routes/district.ts",
+      "verb": "POST",
+      "route": "/api/district/staff"
+    },
+    {
+      "file": "services/identity-svc/src/routes/district.ts",
+      "verb": "PUT",
+      "route": "/api/district/staff/:id"
+    },
+    {
+      "file": "services/identity-svc/src/routes/district.ts",
+      "verb": "DELETE",
+      "route": "/api/district/staff/:id"
+    },
+    {
+      "file": "services/identity-svc/src/routes/scim.ts",
+      "verb": "POST",
+      "route": "/scim/v2/Users"
+    },
+    {
+      "file": "services/identity-svc/src/routes/scim.ts",
+      "verb": "PUT",
+      "route": "/scim/v2/Users/:id"
+    },
+    {
+      "file": "services/identity-svc/src/routes/scim.ts",
+      "verb": "PATCH",
+      "route": "/scim/v2/Users/:id"
+    },
+    {
+      "file": "services/identity-svc/src/routes/scim.ts",
+      "verb": "DELETE",
+      "route": "/scim/v2/Users/:id"
+    },
+    {
+      "file": "services/identity-svc/src/routes/sso.ts",
+      "verb": "POST",
+      "route": "/api/auth/discover"
+    },
+    {
+      "file": "services/identity-svc/src/routes/sso.ts",
+      "verb": "POST",
+      "route": "/api/sso/saml/:slug/acs"
+    },
+    {
+      "file": "services/identity-svc/src/routes/sso.ts",
+      "verb": "POST",
+      "route": "/api/sso/saml/:slug/slo"
+    },
+    {
+      "file": "services/identity-svc/src/routes/step-up.ts",
+      "verb": "POST",
+      "route": "/api/auth/step-up/initiate"
+    },
+    {
+      "file": "services/identity-svc/src/routes/step-up.ts",
+      "verb": "POST",
+      "route": "/api/auth/step-up/verify-internal"
+    },
+    {
+      "file": "services/identity-svc/src/routes/users.ts",
+      "verb": "POST",
+      "route": "/api/users/learners"
+    },
+    {
+      "file": "services/identity-svc/src/routes/users.ts",
+      "verb": "PUT",
+      "route": "/api/users/learners/:learnerId"
+    },
+    {
+      "file": "services/integrations-svc/src/routes/connectors.ts",
+      "verb": "POST",
+      "route": "/api/integrations/connect"
+    },
+    {
+      "file": "services/integrations-svc/src/routes/connectors.ts",
+      "verb": "DELETE",
+      "route": "/api/integrations/disconnect/:connectionId"
+    },
+    {
+      "file": "services/integrations-svc/src/routes/connectors.ts",
+      "verb": "POST",
+      "route": "/api/integrations/sync/:connectionId"
+    },
+    {
+      "file": "services/integrations-svc/src/routes/connectors.ts",
+      "verb": "POST",
+      "route": "/api/integrations/waitlist"
+    },
+    {
+      "file": "services/learning-svc/src/routes/sessions.ts",
+      "verb": "POST",
+      "route": "/api/learning/gradebook/update"
+    },
+    {
+      "file": "services/learning-svc/src/routes/sessions.ts",
+      "verb": "POST",
+      "route": "/api/learning/path/:learnerId/:subject/advance"
+    },
+    {
+      "file": "services/learning-svc/src/routes/sessions.ts",
+      "verb": "POST",
+      "route": "/api/learning/path/:learnerId/:subject/init"
+    },
+    {
+      "file": "services/learning-svc/src/routes/sessions.ts",
+      "verb": "POST",
+      "route": "/api/learning/path/:learnerId/:subject/refresh-topics"
+    },
+    {
+      "file": "services/learning-svc/src/routes/sessions.ts",
+      "verb": "POST",
+      "route": "/api/learning/sessions"
+    },
+    {
+      "file": "services/learning-svc/src/routes/sessions.ts",
+      "verb": "POST",
+      "route": "/api/learning/sessions/:sessionId/complete"
+    },
+    {
+      "file": "services/learning-svc/src/routes/sessions.ts",
+      "verb": "POST",
+      "route": "/api/learning/surface-telemetry"
+    },
+    {
+      "file": "services/speech-eval-svc/src/routes/evaluate.ts",
+      "verb": "POST",
+      "route": "/api/speech-eval/evaluate"
+    },
+    {
+      "file": "services/status-page-svc/src/routes/status.ts",
+      "verb": "POST",
+      "route": "/api/status/incidents"
+    },
+    {
+      "file": "services/tutor-svc/src/routes/chat.ts",
+      "verb": "POST",
+      "route": "/api/tutor/session/:sessionId/co-learn"
+    },
+    {
+      "file": "services/tutor-svc/src/routes/chat.ts",
+      "verb": "POST",
+      "route": "/api/tutor/session/:sessionId/complete"
+    },
+    {
+      "file": "services/tutor-svc/src/routes/chat.ts",
+      "verb": "POST",
+      "route": "/api/tutor/session/:sessionId/message"
+    },
+    {
+      "file": "services/tutor-svc/src/routes/chat.ts",
+      "verb": "POST",
+      "route": "/api/tutor/session/start"
+    },
+    {
+      "file": "services/tutor-svc/src/routes/curriculum.ts",
+      "verb": "DELETE",
+      "route": "/api/tutors/curriculum/:id"
+    },
+    {
+      "file": "services/tutor-svc/src/routes/curriculum.ts",
+      "verb": "POST",
+      "route": "/api/tutors/curriculum/parse-preview"
+    },
+    {
+      "file": "services/tutor-svc/src/routes/curriculum.ts",
+      "verb": "POST",
+      "route": "/api/tutors/curriculum/upload"
+    },
+    {
+      "file": "services/tutor-svc/src/routes/ef.ts",
+      "verb": "POST",
+      "route": "/api/ef/breakdown"
+    },
+    {
+      "file": "services/tutor-svc/src/routes/ef.ts",
+      "verb": "POST",
+      "route": "/api/ef/session-outcome"
+    },
+    {
+      "file": "services/tutor-svc/src/routes/homework.ts",
+      "verb": "POST",
+      "route": "/api/tutors/homework/session/:sessionId/complete"
+    },
+    {
+      "file": "services/tutor-svc/src/routes/homework.ts",
+      "verb": "POST",
+      "route": "/api/tutors/homework/session/:sessionId/message"
+    },
+    {
+      "file": "services/tutor-svc/src/routes/homework.ts",
+      "verb": "POST",
+      "route": "/api/tutors/homework/session/start"
+    },
+    {
+      "file": "services/tutor-svc/src/routes/homework.ts",
+      "verb": "POST",
+      "route": "/api/tutors/homework/upload"
+    },
+    {
+      "file": "services/tutor-svc/src/routes/store.ts",
+      "verb": "POST",
+      "route": "/api/tutors/subscribe"
+    },
+    {
+      "file": "services/tutor-svc/src/routes/store.ts",
+      "verb": "POST",
+      "route": "/api/tutors/subscribe-bundle"
+    },
+    {
+      "file": "services/tutor-svc/src/routes/store.ts",
+      "verb": "POST",
+      "route": "/api/tutors/unsubscribe"
+    }
+  ]
+}
