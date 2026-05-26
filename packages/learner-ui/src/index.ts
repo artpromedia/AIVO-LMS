@@ -106,3 +106,26 @@ export {
   resolvePlayfulCalmAgeMode,
 } from "./tokens/playful-calm-modes";
 export type { PlayfulCalmAgeMode } from "./tokens/playful-calm-modes";
+
+// Inclusive-mode providers + hooks (Sprint 15).
+export {
+  HighContrastTheme,
+  DyslexiaFontProvider,
+  ReducedMotionProvider,
+  useReducedMotion,
+  CaptionsContainer,
+  useCaptions,
+  useAccessibilityPreferences,
+  DEFAULT_ACCESSIBILITY_PREFERENCES,
+} from "./inclusive-mode";
+export type {
+  HighContrastThemeProps,
+  DyslexiaFontProviderProps,
+  ReducedMotionProviderProps,
+  ReducedMotionState,
+  CaptionsContainerProps,
+  CaptionsApi,
+  AccessibilityPreferences,
+  UseAccessibilityPreferencesOptions,
+  UseAccessibilityPreferencesResult,
+} from "./inclusive-mode";
