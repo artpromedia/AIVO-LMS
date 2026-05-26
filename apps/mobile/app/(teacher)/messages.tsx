@@ -80,11 +80,11 @@ export default function TeacherMessagesScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, padding: spacing.md, backgroundColor: colors.bg },
+  root: { flex: 1, padding: spacing.md, backgroundColor: colors.background },
   title: { fontSize: 24, fontWeight: "700", color: colors.text },
-  subtitle: { fontSize: 14, color: colors.textMuted, marginTop: spacing.xs },
-  error: { color: colors.danger, marginTop: spacing.md },
-  empty: { color: colors.textMuted, marginTop: spacing.md },
+  subtitle: { fontSize: 14, color: colors.textSecondary, marginTop: spacing.xs },
+  error: { color: colors.error, marginTop: spacing.md },
+  empty: { color: colors.textSecondary, marginTop: spacing.md },
   card: {
     backgroundColor: colors.surface,
     borderRadius: radius.md,
@@ -92,5 +92,5 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   cardTitle: { fontSize: 16, fontWeight: "600", color: colors.text, textTransform: "capitalize" },
-  cardMeta: { fontSize: 12, color: colors.textMuted, marginTop: spacing.xs },
+  cardMeta: { fontSize: 12, color: colors.textSecondary, marginTop: spacing.xs },
 });
