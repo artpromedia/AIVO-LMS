@@ -1,0 +1,96 @@
+# Sprint 12.7 — minimal docker-compose harness for the Sprint 12 e2e
+# suite. Brings up postgres + redis + the three services the suite
+# exercises end-to-end. Builds use the existing docker/Dockerfile.service.
+#
+# Usage from CI:
+#   docker compose -f docker-compose.e2e.yml up -d --wait
+#   pnpm exec playwright test e2e/tests/sprint12 --reporter=line
+#   docker compose -f docker-compose.e2e.yml down -v
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: aivo
+      POSTGRES_PASSWORD: aivo
+      POSTGRES_DB: aivo_e2e
+    ports:
+      - "55433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aivo -d aivo_e2e"]
+      interval: 3s
+      timeout: 2s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "56379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 2s
+      retries: 20
+
+  identity-svc:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_NAME: identity-svc
+    environment:
+      NODE_ENV: test
+      PORT: "3001"
+      DATABASE_URL: postgresql://aivo:aivo@postgres:5432/aivo_e2e
+      REDIS_URL: redis://redis:6379
+      AUTH_SECRET: e2e-test-secret-please-do-not-deploy-32-chars-min
+      COOKIE_SECRET: e2e-cookie-secret-test-only-32-chars-min-length
+      INTERNAL_SERVICE_TOKEN: e2e-internal-service-token
+      INTERNAL_AI_TOKEN: e2e-internal-ai-token
+      WEBAUTHN_RP_ID: localhost
+      WEBAUTHN_ORIGINS: http://localhost:5000
+    depends_on:
+      postgres: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    ports:
+      - "3001:3001"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  integration-svc:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_NAME: integration-svc
+    environment:
+      NODE_ENV: test
+      PORT: "3068"
+      INTEGRATION_PORT: "3068"
+      DATABASE_URL: postgresql://aivo:aivo@postgres:5432/aivo_e2e
+      INTERNAL_SERVICE_TOKEN: e2e-internal-service-token
+    depends_on:
+      postgres: { condition: service_healthy }
+    ports:
+      - "3068:3068"
+
+  comms-svc:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.service
+      args:
+        SERVICE_NAME: comms-svc
+    environment:
+      NODE_ENV: test
+      PORT: "3010"
+      DATABASE_URL: postgresql://aivo:aivo@postgres:5432/aivo_e2e
+      POSTMARK_WEBHOOK_SECRET: e2e-postmark-secret
+      MAILGUN_WEBHOOK_SIGNING_KEY: e2e-mailgun-key
+      AIVO_SNS_WEBHOOK_SECRET: e2e-sns-secret
+    depends_on:
+      postgres: { condition: service_healthy }
+    ports:
+      - "3010:3010"

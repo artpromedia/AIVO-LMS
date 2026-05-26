@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: aivo/problem-session-svc:latest
+          image: aivo/problem-session-svc:${IMAGE_TAG:-latest}
           imagePullPolicy: IfNotPresent
           ports:
             - name: http

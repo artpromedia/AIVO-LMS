@@ -88,10 +88,12 @@ jobs:
   # or services/**/routes/**; non-matching runs short-circuit to a green
   # no-op so the required-status check still reports success.
   #
-  # TODO(sprint-0-followup): expand into a full docker-compose harness
-  # spinning up identity-svc + learning-svc + subject-brain-svc so we can
-  # exercise authenticated happy paths (real session cookie, real upstream
-  # contracts) on top of these envelope checks.
+  # Sprint 12.7 — the BFF suite is fronted by a docker-compose harness
+  # (docker-compose.e2e.yml) that brings up the core service mesh
+  # (identity-svc, learning-svc, comms-svc, billing-svc, postgres, redis)
+  # and runs the Sprint 12 e2e suite. The previous TODO from sprint-0
+  # is now closed; the new e2e step lives in the `sprint12-e2e` job
+  # below.
   bff-integration:
     name: BFF Integration (web-v2 contracts)
     runs-on: ubuntu-latest
@@ -465,6 +467,55 @@ jobs:
               body,
             });
 
+  sprint12-e2e:
+    # Sprint 12.7 — full docker-compose harness for the sprint 12
+    # end-to-end suite (LTI launch, OIDC discovery, SCIM provisioning,
+    # push fan-out). Brings up postgres + redis + identity-svc +
+    # integration-svc + comms-svc, runs the Playwright sprint12 suite,
+    # and tears down on exit. Path-gated to changes that could plausibly
+    # affect the suite so non-relevant PRs skip the heavy build.
+    name: Sprint 12 e2e (compose harness)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs: lint-and-typecheck
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - name: Detect sprint 12 changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            sp12:
+              - 'services/identity-svc/**'
+              - 'services/integration-svc/**'
+              - 'services/comms-svc/**'
+              - 'e2e/tests/sprint12/**'
+              - 'docker-compose.e2e.yml'
+              - '.github/workflows/ci.yml'
+      - name: Skip when no sprint 12 changes
+        if: steps.filter.outputs.sp12 != 'true'
+        run: echo "skipped"
+      - name: Install dependencies
+        if: steps.filter.outputs.sp12 == 'true'
+        run: pnpm install --frozen-lockfile
+      - name: Bring up compose harness
+        if: steps.filter.outputs.sp12 == 'true'
+        run: docker compose -f docker-compose.e2e.yml up -d --build --wait || (docker compose -f docker-compose.e2e.yml logs && exit 1)
+      - name: Install Playwright browsers
+        if: steps.filter.outputs.sp12 == 'true'
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Run sprint 12 e2e suite
+        if: steps.filter.outputs.sp12 == 'true'
+        run: pnpm exec playwright test e2e/tests/sprint12 --reporter=line
+      - name: Tear down
+        if: always() && steps.filter.outputs.sp12 == 'true'
+        run: docker compose -f docker-compose.e2e.yml down -v
+
   ci-summary:
     name: CI Summary
     runs-on: ubuntu-latest
@@ -476,6 +527,7 @@ jobs:
       - ai-svc
       - mobile-expo-check
       - security-scan
+      - sprint12-e2e
     steps:
       - name: Report job statuses
         env:
@@ -485,6 +537,7 @@ jobs:
           AI: ${{ needs.ai-svc.result }}
           MOBILE: ${{ needs.mobile-expo-check.result }}
           SECURITY: ${{ needs.security-scan.result }}
+          E2E: ${{ needs.sprint12-e2e.result }}
         run: |
           echo "## CI Pipeline Summary" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"

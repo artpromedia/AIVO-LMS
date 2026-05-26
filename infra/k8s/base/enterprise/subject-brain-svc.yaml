@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: aivo/subject-brain-svc:latest
+          image: aivo/subject-brain-svc:${IMAGE_TAG:-latest}
           ports: [{ name: http, containerPort: 3064 }]
           env:
             - { name: NODE_ENV, value: production }

@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: aivo/integration-svc:latest
+          image: aivo/integration-svc:${IMAGE_TAG:-latest}
           ports: [{ name: http, containerPort: 3068 }]
           env:
             - { name: NODE_ENV, value: production }

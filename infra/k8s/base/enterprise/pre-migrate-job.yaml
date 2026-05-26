@@ -1,0 +1,41 @@
+# Sprint 12.7 — pre-deploy migration gate.
+#
+# Runs `pnpm db:migrate --dry-run` against the production database
+# before the helm rollout proceeds. The job is created with
+# `restartPolicy: Never` and `backoffLimit: 0` so a failed dry-run
+# halts the deploy instead of looping forever.
+#
+# Apply via:
+#   kubectl apply -f pre-migrate-job.yaml
+#   kubectl -n aivo wait --for=condition=complete job/pre-migrate-${IMAGE_TAG} --timeout=300s
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pre-migrate
+  labels:
+    app.kubernetes.io/part-of: aivo-enterprise
+    app.kubernetes.io/component: migration-gate
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels: { app: pre-migrate }
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migrate
+          image: aivo/db-migrate:${IMAGE_TAG:-latest}
+          command: ["pnpm", "db:migrate", "--dry-run"]
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: aivo-database
+                  key: url
+          resources:
+            requests: { cpu: 50m, memory: 256Mi }
+            limits: { cpu: 500m, memory: 1Gi }
