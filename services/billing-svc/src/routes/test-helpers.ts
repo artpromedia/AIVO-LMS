@@ -18,6 +18,8 @@
 import type { FastifyInstance } from "fastify";
 import { and, eq } from "drizzle-orm";
 import { subscriptions, tutorSubscriptions, invoices as invoicesTable } from "@aivo/db";
+import { dispatchStripeEvent } from "./webhooks.js";
+import type Stripe from "stripe";
 
 function testModeEnabled(): boolean {
   return process.env.BILLING_TEST_MODE === "1" && process.env.NODE_ENV !== "production";
@@ -114,5 +116,41 @@ export function registerBillingTestHelperRoutes(app: FastifyInstance, db: any): 
     await db.delete(tutorSubscriptions).where(eq(tutorSubscriptions.tenantId, body.tenantId));
     await db.delete(subscriptions).where(eq(subscriptions.tenantId, body.tenantId));
     return { status: "ok" };
+  });
+
+  // Drive the real Stripe webhook dispatcher with a synthetic event so
+  // the purchase → entitlement chain can be tested end-to-end without
+  // having to sign a payload with STRIPE_WEBHOOK_SECRET. Bypasses
+  // signature verification only; the handlers themselves are the real
+  // ones, including the stripeWebhookEvents idempotency row.
+  app.post("/api/__test__/billing/dispatch-webhook", async (req, reply) => {
+    if (!testModeEnabled()) return reply.code(404).send({ error: "not found" });
+    const body = req.body as {
+      type: string;
+      data: { object: Record<string, unknown> };
+      id?: string;
+      created?: number;
+    };
+    if (!body?.type || !body?.data?.object) {
+      return reply.code(400).send({ error: "type and data.object required" });
+    }
+    const event = {
+      id: body.id ?? `evt_test_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      object: "event",
+      api_version: "2024-06-20",
+      created: body.created ?? Math.floor(Date.now() / 1000),
+      data: body.data,
+      livemode: false,
+      pending_webhooks: 0,
+      request: null,
+      type: body.type,
+    } as unknown as Stripe.Event;
+    try {
+      await dispatchStripeEvent(db, event, app.log);
+      return { dispatched: true, type: event.type, id: event.id };
+    } catch (err: any) {
+      app.log.error({ err: err?.message, type: event.type }, "dispatch-webhook failed");
+      return reply.code(500).send({ error: "dispatch_failed", details: err?.message });
+    }
   });
 }
