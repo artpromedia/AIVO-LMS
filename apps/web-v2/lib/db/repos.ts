@@ -6363,3 +6363,96 @@ export function getGradebookDetail(
   };
   return { learnerId, rows, summary };
 }
+
+// ---------------------------------------------------------------------------
+// Sprint 12 — baseline pipeline observability.
+//
+// Rolls the in-memory mirror of the Sprint 4 baseline_item_audits
+// table into the counts the platform admin dashboard renders. When
+// the real postgres table is wired up the implementation moves to a
+// SQL aggregator; the interface stays the same so callers don't
+// flip-flop.
+// ---------------------------------------------------------------------------
+
+export interface BaselinePipelineMetrics {
+  windowStartIso: string;
+  windowEndIso: string;
+  totalEvaluatedItems: number;
+  /** % of evaluated items blocked by responsible-AI. */
+  blockRatePct: number;
+  /** % of shipped items that came from the fallback bank. */
+  fallbackShareOfShippedPct: number;
+  /** Histogram of recommendedAction values. */
+  byRecommendedAction: Record<string, number>;
+  /** Top violation codes by frequency. */
+  topViolations: Array<{ code: string; count: number }>;
+}
+
+interface BaselineAuditLike {
+  shipped?: string;
+  source?: string;
+  recommendedAction?: string;
+  violations?: Array<{ code?: string }>;
+  createdAt?: string;
+}
+
+export function getBaselinePipelineMetrics(
+  opts: { startIso?: string; endIso?: string } = {},
+): BaselinePipelineMetrics {
+  const endIso = opts.endIso ?? new Date().toISOString();
+  const startIso =
+    opts.startIso ?? new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const startMs = new Date(startIso).getTime();
+  const endMs = new Date(endIso).getTime();
+
+  // Pull from whichever in-memory map exists. The store has not had a
+  // dedicated baseline_item_audits map yet (the postgres table from
+  // Sprint 4 is the production surface); for now we aggregate from
+  // moderationEvents which captures the same shape during local dev.
+  const rows: BaselineAuditLike[] = Array.from(
+    db().moderationEvents.values(),
+  ).filter((m) => {
+    const t = m as { createdAt?: string };
+    const ms = new Date(t.createdAt ?? 0).getTime();
+    return ms >= startMs && ms <= endMs;
+  }) as BaselineAuditLike[];
+
+  const byAction: Record<string, number> = {};
+  const violationCounts = new Map<string, number>();
+  let shippedFromFallback = 0;
+  let shippedTotal = 0;
+  let blocked = 0;
+  for (const r of rows) {
+    const action = r.recommendedAction ?? "allow";
+    byAction[action] = (byAction[action] ?? 0) + 1;
+    if (action === "block") blocked += 1;
+    if (r.shipped === "yes") {
+      shippedTotal += 1;
+      if (r.source === "fallback") shippedFromFallback += 1;
+    }
+    for (const v of r.violations ?? []) {
+      const code = v?.code;
+      if (!code) continue;
+      violationCounts.set(code, (violationCounts.get(code) ?? 0) + 1);
+    }
+  }
+
+  const total = rows.length;
+  const blockRatePct = total === 0 ? 0 : Math.round((blocked / total) * 100);
+  const fallbackShareOfShippedPct =
+    shippedTotal === 0 ? 0 : Math.round((shippedFromFallback / shippedTotal) * 100);
+  const topViolations = Array.from(violationCounts.entries())
+    .map(([code, count]) => ({ code, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
+
+  return {
+    windowStartIso: startIso,
+    windowEndIso: endIso,
+    totalEvaluatedItems: total,
+    blockRatePct,
+    fallbackShareOfShippedPct,
+    byRecommendedAction: byAction,
+    topViolations,
+  };
+}
