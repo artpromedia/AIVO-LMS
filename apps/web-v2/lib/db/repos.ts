@@ -5735,3 +5735,229 @@ export function getSchoolDashboard(
     },
   };
 }
+
+// ---------------------------------------------------------------------------
+// Sprint 8 — school reports backend.
+//
+// Returns per-learner aggregate rows for the configurable date range so the
+// admin can drill into adoption, IEP compliance, and engagement. The shape
+// is deliberately tabular so the CSV export endpoint can serialize it
+// directly without bespoke transforms.
+// ---------------------------------------------------------------------------
+
+export interface SchoolReportRow {
+  learnerId: string;
+  learnerName: string;
+  classroomName: string | null;
+  gradeBand: string | null;
+  iepOnFile: boolean;
+  baselineCompleted: boolean;
+  lessonsCompleted: number;
+  lessonsInWindow: number;
+  consentOnFile: boolean;
+  lastActiveIso: string | null;
+}
+
+export interface SchoolReportSummary {
+  totalLearners: number;
+  lessonsInWindow: number;
+  iepCoveragePct: number;
+  consentCoveragePct: number;
+  windowStartIso: string;
+  windowEndIso: string;
+}
+
+export interface SchoolReportPayload {
+  summary: SchoolReportSummary;
+  rows: SchoolReportRow[];
+}
+
+export function getSchoolReport(
+  tenantId: string,
+  opts: { startIso?: string; endIso?: string } = {},
+): SchoolReportPayload {
+  const store = db();
+  const endIso = opts.endIso ?? new Date().toISOString();
+  const startIso =
+    opts.startIso ?? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const startMs = new Date(startIso).getTime();
+  const endMs = new Date(endIso).getTime();
+
+  const learners = Array.from(store.learnerProfiles.values()).filter(
+    (l) => l.tenantId === tenantId,
+  );
+  const classrooms = listClassrooms({ tenantId });
+  const classroomById = new Map(classrooms.map((c) => [c.id, c]));
+  const enrollmentByLearner = new Map<string, string>();
+  for (const e of Array.from(store.enrollments.values())) {
+    if (e.userId && !enrollmentByLearner.has(e.userId)) {
+      enrollmentByLearner.set(e.userId, e.classroomId);
+    }
+  }
+
+  const consentByLearner = new Set(
+    (store.consentRecords ?? [])
+      .filter((c) => c.tenantId === tenantId && c.learnerId)
+      .map((c) => c.learnerId as string),
+  );
+  const iepByLearner = new Set(
+    Array.from(store.iepDocuments.values()).map((d) => d.learnerId),
+  );
+
+  const lessonRunsByLearner = new Map<string, number>();
+  const lessonRunsInWindowByLearner = new Map<string, number>();
+  const lastActiveByLearner = new Map<string, string>();
+  for (const lr of Array.from(store.lessonRuns?.values?.() ?? [])) {
+    const t = lr as { learnerId?: string; createdAt?: string; completedAt?: string | null; tenantId?: string };
+    if (t.tenantId !== tenantId || !t.learnerId) continue;
+    lessonRunsByLearner.set(t.learnerId, (lessonRunsByLearner.get(t.learnerId) ?? 0) + 1);
+    const tMs = new Date(t.createdAt ?? 0).getTime();
+    if (tMs >= startMs && tMs <= endMs) {
+      lessonRunsInWindowByLearner.set(
+        t.learnerId,
+        (lessonRunsInWindowByLearner.get(t.learnerId) ?? 0) + 1,
+      );
+    }
+    const last = lastActiveByLearner.get(t.learnerId);
+    if (!last || (t.createdAt && new Date(t.createdAt).getTime() > new Date(last).getTime())) {
+      if (t.createdAt) lastActiveByLearner.set(t.learnerId, t.createdAt);
+    }
+  }
+
+  const rows: SchoolReportRow[] = learners.map((l) => {
+    const cls = enrollmentByLearner.get(l.id);
+    const classroom = cls ? classroomById.get(cls) ?? null : null;
+    return {
+      learnerId: l.id,
+      learnerName: l.displayName ?? l.id,
+      classroomName: classroom?.name ?? null,
+      gradeBand: classroom?.gradeBand ?? null,
+      iepOnFile: iepByLearner.has(l.id),
+      baselineCompleted: !!(l as { baselineCompletedAt?: string | null }).baselineCompletedAt,
+      lessonsCompleted: lessonRunsByLearner.get(l.id) ?? 0,
+      lessonsInWindow: lessonRunsInWindowByLearner.get(l.id) ?? 0,
+      consentOnFile: consentByLearner.has(l.id),
+      lastActiveIso: lastActiveByLearner.get(l.id) ?? null,
+    };
+  });
+
+  const lessonsInWindow = rows.reduce((sum, r) => sum + r.lessonsInWindow, 0);
+  const iepCoveragePct =
+    learners.length === 0
+      ? 100
+      : Math.round((rows.filter((r) => r.iepOnFile).length / learners.length) * 100);
+  const consentCoveragePct =
+    learners.length === 0
+      ? 100
+      : Math.round((rows.filter((r) => r.consentOnFile).length / learners.length) * 100);
+
+  return {
+    summary: {
+      totalLearners: learners.length,
+      lessonsInWindow,
+      iepCoveragePct,
+      consentCoveragePct,
+      windowStartIso: startIso,
+      windowEndIso: endIso,
+    },
+    rows: rows.sort((a, b) => a.learnerName.localeCompare(b.learnerName)),
+  };
+}
+
+/**
+ * Sprint 8 — render a school report payload as RFC 4180 CSV. Kept in
+ * the repo module so the BFF route stays lean and so the CSV shape is
+ * unit-testable without spinning up HTTP.
+ */
+export function renderSchoolReportCsv(payload: SchoolReportPayload): string {
+  const header = [
+    "learnerId",
+    "learnerName",
+    "classroomName",
+    "gradeBand",
+    "iepOnFile",
+    "baselineCompleted",
+    "lessonsCompleted",
+    "lessonsInWindow",
+    "consentOnFile",
+    "lastActiveIso",
+  ].join(",");
+  const escape = (v: unknown): string => {
+    if (v === null || v === undefined) return "";
+    const s = String(v);
+    if (s.includes(",") || s.includes('"') || s.includes("\n")) {
+      return `"${s.replace(/"/g, '""')}"`;
+    }
+    return s;
+  };
+  const body = payload.rows
+    .map((r) =>
+      [
+        r.learnerId,
+        r.learnerName,
+        r.classroomName ?? "",
+        r.gradeBand ?? "",
+        r.iepOnFile,
+        r.baselineCompleted,
+        r.lessonsCompleted,
+        r.lessonsInWindow,
+        r.consentOnFile,
+        r.lastActiveIso ?? "",
+      ]
+        .map(escape)
+        .join(","),
+    )
+    .join("\n");
+  return `${header}\n${body}\n`;
+}
+
+// ---------------------------------------------------------------------------
+// Sprint 8 — class CRUD authorised at the BFF / route layer. The two
+// helpers below are the destructive counterparts to listClassrooms;
+// `createClassroom` already exists above.
+// ---------------------------------------------------------------------------
+
+export function deleteClassroom(id: string, tenantId: string): boolean {
+  const c = getClassroom(id, tenantId);
+  if (!c) return false;
+  // Cascade: drop enrollments for this classroom.
+  for (const e of Array.from(db().enrollments.values())) {
+    if (e.classroomId === id) db().enrollments.delete(e.id);
+  }
+  db().classrooms.delete(id);
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+// Sprint 8 — staff add/remove. The previous /admin/school/staff page
+// could only LIST users; these helpers fill in the create + delete
+// half so the admin can complete invites and revoke access.
+// ---------------------------------------------------------------------------
+
+export function addStaffUser(input: {
+  tenantId: string;
+  email: string;
+  displayName: string;
+  role: "TEACHER" | "SCHOOL_ADMIN" | "THERAPIST" | "CAREGIVER";
+}): UserSummary {
+  const id = newId("user");
+  const rec = {
+    id,
+    tenantId: input.tenantId,
+    email: input.email,
+    displayName: input.displayName,
+    role: input.role,
+    status: "INVITED",
+    createdAt: nowIso(),
+  };
+  // Best-effort persistence — the in-memory store keeps users in a Map.
+  db().users.set(id, rec as never);
+  return rec as UserSummary;
+}
+
+export function removeStaffUser(userId: string, tenantId: string): boolean {
+  const u = db().users.get(userId) as ({ tenantId?: string } | undefined);
+  if (!u || u.tenantId !== tenantId) return false;
+  db().users.delete(userId);
+  return true;
+}
