@@ -26,6 +26,10 @@ import {
   buildBaselineFallback,
   type BaselineFallbackReason,
 } from "../services/baseline-fallback.js";
+import {
+  applySafetyGate,
+  persistAudits,
+} from "../services/baseline-safety-gate.js";
 
 // ---- Sprint 02 adapter: problem-session ledger ----------------------------
 // Flag-gated, fire-and-forget. Records a baseline-source problem session per
@@ -986,12 +990,50 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
             `received ${Array.isArray(data?.questions) ? data.questions.length : 0} questions`,
           );
         }
+
+        // Sprint 4 — responsible-AI gate. Evaluate every generated
+        // question; replace blocked items with fallback bank items;
+        // persist verdicts to baseline_item_audits. Fail-open: if the
+        // evaluator is unreachable the AI items ship as-is.
+        const gated = await applySafetyGate({
+          learnerId: learner.id,
+          questions: data.questions,
+          gradeLevel: learner.gradeLevel || null,
+          functioningLevel: learner.functioningLevel || null,
+          accommodations: iepContext?.accommodations
+            ?.map((a: any) => (typeof a === "string" ? a : a?.type || a?.description))
+            .filter(Boolean) as string[] | undefined,
+          policyMode: "block",
+        });
+
+        if (gated.hadReplacements) {
+          app.log.warn(
+            {
+              learnerId: learner.id,
+              blocked: gated.audits.filter((a) => a.shipped === "no").length,
+              shipped: gated.questions.length,
+            },
+            "[baseline] responsible-AI replaced AI items with fallback bank",
+          );
+        }
+
+        // Fire-and-forget audit write — must not block the response.
+        void persistAudits({
+          db,
+          tenantId: learner.tenantId,
+          learnerId: learner.id,
+          audits: gated.audits,
+          batchMetadata: { model: data.model, source: "ai" },
+          log: app.log,
+        });
+
         return reply.send({
           generated: true,
           learnerId: learner.id,
           functioningLevel: learner.functioningLevel,
-          source: "ai",
-          questions: data.questions,
+          source: gated.hadReplacements ? "ai+fallback" : "ai",
+          safetyEvaluated: !gated.evaluatorSilent,
+          questions: gated.questions,
           subjects: data.subjects,
           model: data.model,
         });

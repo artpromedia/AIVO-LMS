@@ -174,3 +174,34 @@ export const adaptiveBaselineSessions = pgTable("adaptive_baseline_sessions", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+/**
+ * Sprint 4 — responsible-AI audit verdicts for AI-generated baseline
+ * items. One row per evaluated question per generation attempt. Stored
+ * so ops can dashboard the block rate, and so we can replay a baseline
+ * to figure out why a learner saw or didn't see a particular item.
+ *
+ * Persistence is best-effort and parallel to the response shipped to
+ * the client — a write failure does NOT block the baseline.
+ */
+export const baselineItemAudits = pgTable("baseline_item_audits", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: uuid("tenant_id").references(() => tenants.id),
+  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
+  /** Stable id of the question evaluated (e.g. `m3`). */
+  questionId: varchar("question_id", { length: 200 }).notNull(),
+  /** One of math / ela / science / speech / sel / life_skills / executive_function. */
+  subject: varchar("subject", { length: 32 }).notNull(),
+  /** "ai" | "ai_retry" | "fallback" — which generator produced the item. */
+  source: varchar("source", { length: 16 }).notNull().default("ai"),
+  /** Evaluator's recommendedAction — "allow" | "revise" | "block" | "escalate". */
+  recommendedAction: varchar("recommended_action", { length: 16 }).notNull(),
+  /** Evaluator's severity — "none" | "low" | "medium" | "high" | "critical". */
+  severity: varchar("severity", { length: 16 }).notNull().default("none"),
+  /** Whether the item shipped to the parent UI (allowed) or was swapped. */
+  shipped: varchar("shipped", { length: 8 }).notNull().default("yes"),
+  /** Compact violation array — codes + messages. Full evidence in `metadata`. */
+  violations: jsonb("violations").notNull().default([]),
+  metadata: jsonb("metadata").notNull().default({}),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
