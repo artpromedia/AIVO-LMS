@@ -6,6 +6,7 @@
 import { getStore, newId, nowIso } from "@/lib/db/store";
 import { ensureSeeded } from "@/lib/db/seed";
 import { computeReadinessFor } from "@/lib/learner/readiness";
+import { listLearnersForMember as listLearnersForTeamMember } from "@/lib/db/team-invites";
 import type {
   AuditLog,
   BaselineAssessment,
@@ -5960,4 +5961,219 @@ export function removeStaffUser(userId: string, tenantId: string): boolean {
   if (!u || u.tenantId !== tenantId) return false;
   db().users.delete(userId);
   return true;
+}
+
+// ---------------------------------------------------------------------------
+// Sprint 9 — therapist domain repos. The therapist shell used to read
+// from shared LessonRun rows only; this layer gives the role a proper
+// caseload + session notes + goal tracking surface.
+// ---------------------------------------------------------------------------
+
+export interface TherapistCaseloadEntry {
+  learner: LearnerProfile;
+  /** Active IEP goals owned by this therapist for the learner. */
+  goals: import("./types").IepGoalRecord[];
+  /** Last session note authored, when any. */
+  lastSession: import("./types").TherapistSessionNote | null;
+  /** Next scheduled session ISO (placeholder — wired from scheduling
+   *  service in a later sprint). */
+  nextSessionIso: string | null;
+}
+
+export function listTherapistCaseload(
+  therapistUserId: string,
+  therapistEmail: string,
+  tenantId: string,
+): TherapistCaseloadEntry[] {
+  const store = db();
+  const learnerIds = new Set<string>(
+    listLearnersForTeamMember(therapistUserId, therapistEmail, "therapist"),
+  );
+  const goalsByLearner = new Map<string, import("./types").IepGoalRecord[]>();
+  for (const g of Array.from(store.iepGoalRecords.values())) {
+    if (g.tenantId !== tenantId) continue;
+    if (g.status === "discontinued") continue;
+    const arr = goalsByLearner.get(g.learnerId) ?? [];
+    arr.push(g);
+    goalsByLearner.set(g.learnerId, arr);
+  }
+  const lastSessionByLearner = new Map<string, import("./types").TherapistSessionNote>();
+  for (const note of Array.from(store.therapistSessionNotes.values())) {
+    if (note.tenantId !== tenantId || note.therapistUserId !== therapistUserId) continue;
+    const prev = lastSessionByLearner.get(note.learnerId);
+    if (!prev || note.sessionDate > prev.sessionDate) {
+      lastSessionByLearner.set(note.learnerId, note);
+    }
+  }
+  const out: TherapistCaseloadEntry[] = [];
+  for (const id of learnerIds) {
+    const l = store.learnerProfiles.get(id);
+    if (!l || l.tenantId !== tenantId) continue;
+    out.push({
+      learner: l,
+      goals: (goalsByLearner.get(id) ?? []).sort((a, b) =>
+        a.updatedAt < b.updatedAt ? 1 : -1,
+      ),
+      lastSession: lastSessionByLearner.get(id) ?? null,
+      nextSessionIso: null,
+    });
+  }
+  return out.sort((a, b) => a.learner.displayName.localeCompare(b.learner.displayName));
+}
+
+export function listIepGoals(
+  learnerId: string,
+  tenantId: string,
+): import("./types").IepGoalRecord[] {
+  return Array.from(db().iepGoalRecords.values())
+    .filter((g) => g.learnerId === learnerId && g.tenantId === tenantId)
+    .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
+}
+
+export function createIepGoal(input: {
+  tenantId: string;
+  learnerId: string;
+  authoredByUserId: string;
+  domain: string;
+  goalText: string;
+  baseline?: string;
+  targetCriteria?: string;
+  measurableCriteria?: string;
+}): import("./types").IepGoalRecord {
+  const now = nowIso();
+  const rec: import("./types").IepGoalRecord = {
+    id: newId("goal"),
+    tenantId: input.tenantId,
+    learnerId: input.learnerId,
+    authoredByUserId: input.authoredByUserId,
+    domain: input.domain,
+    goalText: input.goalText,
+    baseline: input.baseline ?? "",
+    targetCriteria: input.targetCriteria ?? "",
+    measurableCriteria: input.measurableCriteria ?? "",
+    status: "active",
+    progressPct: 0,
+    dataPoints: [],
+    createdAt: now,
+    updatedAt: now,
+  };
+  db().iepGoalRecords.set(rec.id, rec);
+  return rec;
+}
+
+export function updateIepGoalProgress(
+  goalId: string,
+  tenantId: string,
+  value: number,
+  note?: string,
+): import("./types").IepGoalRecord | null {
+  const g = db().iepGoalRecords.get(goalId);
+  if (!g || g.tenantId !== tenantId) return null;
+  const clamped = Math.max(0, Math.min(100, value));
+  g.progressPct = clamped;
+  g.dataPoints = [
+    ...g.dataPoints,
+    { date: nowIso(), value: clamped, note },
+  ].slice(-50);
+  g.updatedAt = nowIso();
+  if (clamped >= 100 && g.status === "active") g.status = "met";
+  return g;
+}
+
+export function listSessionNotes(
+  learnerId: string,
+  tenantId: string,
+): import("./types").TherapistSessionNote[] {
+  return Array.from(db().therapistSessionNotes.values())
+    .filter((n) => n.learnerId === learnerId && n.tenantId === tenantId)
+    .sort((a, b) => (a.sessionDate < b.sessionDate ? 1 : -1));
+}
+
+export function createSessionNote(input: {
+  tenantId: string;
+  learnerId: string;
+  therapistUserId: string;
+  sessionDate?: string;
+  durationMinutes: number;
+  subjective: string;
+  objective: string;
+  assessment: string;
+  plan: string;
+  goalIds: string[];
+}): import("./types").TherapistSessionNote {
+  const now = nowIso();
+  const rec: import("./types").TherapistSessionNote = {
+    id: newId("note"),
+    tenantId: input.tenantId,
+    learnerId: input.learnerId,
+    therapistUserId: input.therapistUserId,
+    sessionDate: input.sessionDate ?? now,
+    durationMinutes: input.durationMinutes,
+    subjective: input.subjective,
+    objective: input.objective,
+    assessment: input.assessment,
+    plan: input.plan,
+    goalIds: input.goalIds,
+    signedAt: null,
+    createdAt: now,
+    updatedAt: now,
+  };
+  db().therapistSessionNotes.set(rec.id, rec);
+  return rec;
+}
+
+export function signSessionNote(
+  id: string,
+  tenantId: string,
+): import("./types").TherapistSessionNote | null {
+  const n = db().therapistSessionNotes.get(id);
+  if (!n || n.tenantId !== tenantId) return null;
+  n.signedAt = nowIso();
+  n.updatedAt = nowIso();
+  return n;
+}
+
+// ---------------------------------------------------------------------------
+// Sprint 10 — caregiver observations.
+// ---------------------------------------------------------------------------
+
+export function listCaregiverObservations(
+  learnerId: string,
+  tenantId: string,
+  limit = 100,
+): import("./types").CaregiverObservation[] {
+  return Array.from(db().caregiverObservations.values())
+    .filter((o) => o.learnerId === learnerId && o.tenantId === tenantId)
+    .sort((a, b) => (a.observedAt < b.observedAt ? 1 : -1))
+    .slice(0, limit);
+}
+
+export function createCaregiverObservation(input: {
+  tenantId: string;
+  learnerId: string;
+  caregiverUserId: string;
+  observedAt?: string;
+  behaviour: string;
+  antecedent?: string;
+  consequence?: string;
+  durationMinutes?: number | null;
+  location?: string;
+  attachmentUrl?: string | null;
+}): import("./types").CaregiverObservation {
+  const rec: import("./types").CaregiverObservation = {
+    id: newId("obs"),
+    tenantId: input.tenantId,
+    learnerId: input.learnerId,
+    caregiverUserId: input.caregiverUserId,
+    observedAt: input.observedAt ?? nowIso(),
+    behaviour: input.behaviour,
+    antecedent: input.antecedent ?? "",
+    consequence: input.consequence ?? "",
+    durationMinutes: input.durationMinutes ?? null,
+    location: input.location ?? "home",
+    attachmentUrl: input.attachmentUrl ?? null,
+    createdAt: nowIso(),
+  };
+  db().caregiverObservations.set(rec.id, rec);
+  return rec;
 }

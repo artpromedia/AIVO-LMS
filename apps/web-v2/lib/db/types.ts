@@ -2352,3 +2352,73 @@ export type LearnerSensoryProfile = {
   notes: string;
   updatedAt: ISODate;
 };
+
+// ---------------------------------------------------------------------------
+// Sprint 9 / 10 — therapist + caregiver domain. Kept separate from the
+// IEPDocument extraction blob so goals can be edited, scored, and
+// progressed independently of the source PDF.
+// ---------------------------------------------------------------------------
+
+export type IepGoalStatus =
+  | "draft"
+  | "active"
+  | "met"
+  | "not_met"
+  | "discontinued";
+
+export type IepGoalRecord = {
+  id: ID;
+  tenantId: ID;
+  learnerId: ID;
+  /** Who authored the goal — typically the therapist or special-ed
+   *  teacher who owns the discipline. */
+  authoredByUserId: ID;
+  domain: string;
+  goalText: string;
+  baseline: string;
+  targetCriteria: string;
+  measurableCriteria: string;
+  status: IepGoalStatus;
+  /** Progress percentage 0..100 captured at the most recent session. */
+  progressPct: number;
+  /** Optional ordered list of {date, value, note} for trend reporting. */
+  dataPoints: Array<{ date: ISODate; value: number; note?: string }>;
+  createdAt: ISODate;
+  updatedAt: ISODate;
+};
+
+export type TherapistSessionNote = {
+  id: ID;
+  tenantId: ID;
+  learnerId: ID;
+  therapistUserId: ID;
+  sessionDate: ISODate;
+  durationMinutes: number;
+  /** SOAP template — Subjective / Objective / Assessment / Plan. */
+  subjective: string;
+  objective: string;
+  assessment: string;
+  plan: string;
+  /** Goals worked on this session (referenced for progress trending). */
+  goalIds: ID[];
+  /** Signed off when the therapist marks the note final. */
+  signedAt: ISODate | null;
+  createdAt: ISODate;
+  updatedAt: ISODate;
+};
+
+export type CaregiverObservation = {
+  id: ID;
+  tenantId: ID;
+  learnerId: ID;
+  caregiverUserId: ID;
+  observedAt: ISODate;
+  behaviour: string;
+  antecedent: string;
+  consequence: string;
+  durationMinutes: number | null;
+  location: string;
+  /** Optional attachment reference — image / video uploaded separately. */
+  attachmentUrl: string | null;
+  createdAt: ISODate;
+};

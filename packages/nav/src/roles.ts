@@ -1,11 +1,21 @@
 /**
- * The six AIVO roles. The mobile app is a single binary that supports all
- * five non-internal roles; "internal" is web-only.
+ * The eight AIVO roles. Mobile exposes the five learner-facing roles
+ * (learner / parent / teacher / therapist / caregiver) plus school-admin;
+ * "districtAdmin" and "internal" are web-only.
+ *
+ * Sprint 9 / 10 added `therapist` and `caregiver` to the canonical
+ * registry. Their shells already exist in apps/web-v2/app/{therapist,
+ * caregiver}/* and apps/mobile/app/(therapist|caregiver)/*, and the
+ * brand package has carried their themes since Sprint 03 — this enum
+ * is the last gate that needed to open before route-level RBAC can
+ * recognise them.
  */
 export type Role =
   | "learner"
   | "parent"
   | "teacher"
+  | "therapist"
+  | "caregiver"
   | "schoolAdmin"
   | "districtAdmin"
   | "internal";
@@ -14,6 +24,8 @@ export const ROLES: readonly Role[] = [
   "learner",
   "parent",
   "teacher",
+  "therapist",
+  "caregiver",
   "schoolAdmin",
   "districtAdmin",
   "internal",
@@ -54,6 +66,22 @@ export const ROLE_META: Record<Role, RoleMeta> = {
     id: "teacher",
     label: "Teacher",
     description: "Plan lessons, see class insights, message families.",
+    onMobile: true,
+    onWeb: true,
+    requiresStepUp: true,
+  },
+  therapist: {
+    id: "therapist",
+    label: "Therapist",
+    description: "Caseload, session notes, IEP goals, and progress reports.",
+    onMobile: true,
+    onWeb: true,
+    requiresStepUp: true,
+  },
+  caregiver: {
+    id: "caregiver",
+    label: "Caregiver",
+    description: "Day-to-day observations and progress on the children you support.",
     onMobile: true,
     onWeb: true,
     requiresStepUp: true,

@@ -118,6 +118,9 @@ import type {
   PlatformApiKey,
   PlatformEmailTemplate,
   PlatformWebhookEndpoint,
+  IepGoalRecord,
+  TherapistSessionNote,
+  CaregiverObservation,
 } from "@/lib/db/types";
 
 export type Store = {
@@ -229,6 +232,11 @@ export type Store = {
   notificationPreferences: Map<string, NotificationPreference>;
   notificationDeliveries: Map<string, NotificationDelivery>;
   digestSchedules: Map<string, DigestSchedule>;
+
+  // Sprint 9 / 10 — therapist + caregiver domain rows.
+  iepGoalRecords: Map<string, IepGoalRecord>;
+  therapistSessionNotes: Map<string, TherapistSessionNote>;
+  caregiverObservations: Map<string, CaregiverObservation>;
 
   // Sprint 30: Billing / AI Cost / Migration
   plans: Map<string, Plan>;
@@ -362,6 +370,10 @@ function createStore(): Store {
     notificationPreferences: new Map(),
     notificationDeliveries: new Map(),
     digestSchedules: new Map(),
+
+    iepGoalRecords: new Map(),
+    therapistSessionNotes: new Map(),
+    caregiverObservations: new Map(),
 
     plans: new Map(),
     prices: new Map(),
