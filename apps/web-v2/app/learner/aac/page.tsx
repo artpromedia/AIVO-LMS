@@ -30,6 +30,9 @@ export default async function AACPage(): Promise<JSX.Element> {
   if (!learnerId) redirect("/login");
   const learner = getLearner(learnerId, session.tenantId);
   if (!learner) redirect(session.role === "parent" ? "/learner/select" : "/login");
+  // Type-narrow after the redirect — Next.js throws inside redirect() so this
+  // assertion is safe at runtime.
+  const displayName = learner!.preferredName ?? learner!.firstName ?? learner!.displayName;
 
   return (
     <main
@@ -53,7 +56,7 @@ export default async function AACPage(): Promise<JSX.Element> {
           borderRadius: 8,
         }}
       >
-        <h1 style={{ margin: 0, fontSize: 24 }}>{learner.name}&rsquo;s board</h1>
+        <h1 style={{ margin: 0, fontSize: 24 }}>{displayName}&rsquo;s board</h1>
         <a
           href="/learner/home"
           style={{
@@ -68,7 +71,7 @@ export default async function AACPage(): Promise<JSX.Element> {
           Back to home
         </a>
       </header>
-      <SymbolBoard learnerId={learnerId} />
+      <SymbolBoard learnerId={learnerId!} />
     </main>
   );
 }
