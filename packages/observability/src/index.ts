@@ -275,3 +275,20 @@ export function propagateHeaders(
 
 // ── Re-export Fastify plugin for convenience ───────────────────────────────
 export { registerObservabilityPlugin } from "./fastify-plugin.js";
+
+// ── Sprint 14: AI safety + cost counters ──────────────────────────────────
+// Re-export the typed helpers so callers do `import { recordLlmCost } from
+// "@aivo/observability"` instead of reaching into the submodule path.
+export {
+  recordCrisisEscalation,
+  recordLlmCost,
+  recordPromptCacheLookup,
+  recordResponsibleAiBlock,
+  recordResponsibleAiEvaluation,
+  recordTenantLlmCapExceeded,
+} from "./metrics.js";
+export type {
+  LlmCostEvent,
+  PromptCacheEvent,
+  ResponsibleAiVerdict,
+} from "./metrics.js";
