@@ -36,6 +36,7 @@ export const ENTERPRISE_FLAG_ENV_VARS = {
   responsibleAiGuardrails: "AIVO_FEATURE_RESPONSIBLE_AI_GUARDRAILS",
   advancedContentGenerators: "AIVO_FEATURE_ADVANCED_CONTENT_GENERATORS",
   selfRegulationHub: "AIVO_FEATURE_SELF_REGULATION_HUB",
+  messaging: "AIVO_FEATURE_MESSAGING",
 } as const;
 
 export type EnterpriseFlagKey = keyof typeof ENTERPRISE_FLAG_ENV_VARS;
@@ -90,6 +91,7 @@ export function resolveEnterpriseFlags(
       ENTERPRISE_FLAG_ENV_VARS.selfRegulationHub,
       false,
     ),
+    messaging: readBooleanFromSource(source, ENTERPRISE_FLAG_ENV_VARS.messaging, false),
   };
 }
 
@@ -110,4 +112,5 @@ export const enterpriseFeatureFlags: EnterpriseFeatureFlags = {
     false,
   ),
   selfRegulationHub: booleanFromEnv(ENTERPRISE_FLAG_ENV_VARS.selfRegulationHub, false),
+  messaging: booleanFromEnv(ENTERPRISE_FLAG_ENV_VARS.messaging, false),
 };

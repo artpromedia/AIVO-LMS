@@ -43,6 +43,7 @@ describe("resolveEnterpriseFlags", () => {
       responsibleAiGuardrails: false,
       advancedContentGenerators: false,
       selfRegulationHub: false,
+      messaging: false,
     });
   });
 

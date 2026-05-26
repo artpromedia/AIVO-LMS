@@ -10,6 +10,10 @@ import { startSafeCron, createDrizzleAdvisoryLock, createDrizzleLedger } from "@
 import { registerHealthRoutes } from "./routes/health.js";
 import { registerNotificationRoutes } from "./routes/notifications.js";
 import { registerEmailEventsRoutes } from "./routes/webhook-email-events.js";
+import { registerThreadRoutes } from "./routes/threads.js";
+import { registerMessageRoutes } from "./routes/messages.js";
+import { registerAttachmentRoutes } from "./routes/attachments.js";
+import { registerSmsInboundRoutes } from "./routes/sms-inbound.js";
 import { runDigestCleanupOnce } from "./lib/digest-cleanup.js";
 
 const logger = createLogger("comms-svc");
@@ -37,6 +41,10 @@ export async function buildApp(db = createDb(process.env.DATABASE_URL ?? "")) {
   registerHealthRoutes(app);
   registerNotificationRoutes(app, db);
   registerEmailEventsRoutes(app);
+  registerThreadRoutes(app, db);
+  registerMessageRoutes(app, db);
+  registerAttachmentRoutes(app, db);
+  registerSmsInboundRoutes(app, db);
 
   return app;
 }
