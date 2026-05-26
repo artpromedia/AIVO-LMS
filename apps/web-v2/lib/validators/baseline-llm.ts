@@ -59,10 +59,28 @@ export const baselineLlmQuestionSchema = z
 
 export const baselineLlmResponseSchema = z.object({
   questions: z.array(baselineLlmQuestionSchema),
-  subjects: z.array(z.string()),
+  // The assessment-svc response surface lists the SUBJECTS taxonomy as
+  // an array of strings (legacy ai-svc) OR objects ({ key, label, emoji,
+  // color } — Sprint 3 fallback bank). Accept either shape so the
+  // graceful-degradation path doesn't get re-rejected on the BFF.
+  subjects: z.array(z.union([z.string(), z.record(z.unknown())])),
   model: z.string().min(1),
-  prompt_tokens: z.number().int().min(0),
-  completion_tokens: z.number().int().min(0),
+  // Sprint 3 — assessment-svc tags the response with a source so the UI
+  // can surface a "Using curated questions while we generate
+  // personalized ones" notice when the bank served the baseline.
+  source: z.enum(["ai", "fallback"]).optional(),
+  fallbackReason: z
+    .enum([
+      "ai_unreachable",
+      "ai_non_2xx",
+      "ai_invalid_json",
+      "ai_too_few_questions",
+      "ai_disabled",
+    ])
+    .optional(),
+  // The fallback payload doesn't carry token counts; AI responses do.
+  prompt_tokens: z.number().int().min(0).optional(),
+  completion_tokens: z.number().int().min(0).optional(),
 });
 
 export type BaselineLlmQuestion = z.infer<typeof baselineLlmQuestionSchema>;

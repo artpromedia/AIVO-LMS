@@ -15,6 +15,7 @@
     "@aivo/adaptive-baseline": "workspace:*",
     "@aivo/brand": "workspace:*",
     "@aivo/events": "workspace:*",
+    "@aivo/item-bank": "workspace:*",
     "@aivo/observability": "workspace:*",
     "@aivo/ops-alerts": "workspace:*",
     "@aivo/security": "workspace:*",

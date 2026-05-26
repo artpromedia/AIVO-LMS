@@ -69,3 +69,23 @@ export {
 
 // Sprint 3 — surface-type routability check (mirror of SurfaceRouter coverage).
 export { ROUTABLE_SURFACE_TYPES } from "./validate.js";
+
+// Sprint 3 (baseline) — fallback bank for assessment-svc when ai-svc
+// cannot generate a baseline. Spans all seven required baseline
+// subjects; kept separate from production.ts so the curriculum
+// coverage scanner stays scoped to math/ela/science/writing.
+export { SEL_PRODUCTION_ITEMS } from "./seed-sel.js";
+export { LIFE_SKILLS_PRODUCTION_ITEMS } from "./seed-life-skills.js";
+export { EXECUTIVE_FUNCTION_PRODUCTION_ITEMS } from "./seed-executive-function.js";
+export { SPEECH_PRODUCTION_ITEMS } from "./seed-speech.js";
+export {
+  BASELINE_FALLBACK_BANK,
+  BASELINE_FALLBACK_SUBJECTS,
+  gradeBandFromSkillId,
+  itemToBaselineQuestion,
+  pickFallbackBaseline,
+  type BaselineFallbackQuestion,
+  type BaselineFallbackSubject,
+  type PickFallbackBaselineParams,
+  type PickFallbackBaselineResult,
+} from "./seed-baseline-fallback.js";

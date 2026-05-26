@@ -22,6 +22,10 @@ import {
 import { deriveLearningProfile } from "../services/learning-profile.js";
 import { partitionChapterActivitiesPayload } from "../services/discovery-activity-validator.js";
 import { normalizeBaselineItems } from "../services/baselineSurfaceNormalizer.js";
+import {
+  buildBaselineFallback,
+  type BaselineFallbackReason,
+} from "../services/baseline-fallback.js";
 
 // ---- Sprint 02 adapter: problem-session ledger ----------------------------
 // Flag-gated, fire-and-forget. Records a baseline-source problem session per
@@ -914,6 +918,31 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
       const caregiverPerspectives = await loadCaregiverPerspectives(db, learner.id);
       const teacherContext = await loadTeacherContext(db, learner.id);
 
+      // Sprint 3 — graceful AI-failure fallback. When ai-svc is
+      // unreachable, returns a non-2xx, or returns invalid JSON, we
+      // serve the curated baseline bank with source:"fallback" instead
+      // of a 502. The UI surfaces a "Using curated questions while we
+      // generate personalized ones" notice; ops can dashboard the
+      // fallback rate via the structured log line below.
+      const fallback = (reason: BaselineFallbackReason, detail?: string) => {
+        const payload = buildBaselineFallback({
+          learnerId: learner.id,
+          gradeLevel: learner.gradeLevel || null,
+          functioningLevel: learner.functioningLevel || null,
+          reason,
+        });
+        app.log.warn(
+          {
+            learnerId: learner.id,
+            reason,
+            detail: detail ? detail.slice(0, 500) : undefined,
+            questionsCount: payload.questions.length,
+          },
+          "[baseline] AI failed — serving fallback bank",
+        );
+        return reply.send(payload);
+      };
+
       try {
         const aiRes = await fetch(`${AI_SVC_URL}/api/ai/generate-baseline`, {
           method: "POST",
@@ -942,20 +971,32 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
 
         if (!aiRes.ok) {
           const err = await aiRes.text();
-          return reply.status(502).send({ error: "AI generation failed", detail: err });
+          return fallback("ai_non_2xx", err);
         }
 
-        const data = (await aiRes.json()) as any;
+        let data: any;
+        try {
+          data = await aiRes.json();
+        } catch (e: any) {
+          return fallback("ai_invalid_json", e?.message);
+        }
+        if (!data || !Array.isArray(data.questions) || data.questions.length < 14) {
+          return fallback(
+            "ai_too_few_questions",
+            `received ${Array.isArray(data?.questions) ? data.questions.length : 0} questions`,
+          );
+        }
         return reply.send({
           generated: true,
           learnerId: learner.id,
           functioningLevel: learner.functioningLevel,
+          source: "ai",
           questions: data.questions,
           subjects: data.subjects,
           model: data.model,
         });
       } catch (e: any) {
-        return reply.status(502).send({ error: "Failed to reach AI service", detail: e.message });
+        return fallback("ai_unreachable", e?.message);
       }
     },
   );
