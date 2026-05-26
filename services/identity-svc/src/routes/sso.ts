@@ -202,9 +202,37 @@ export async function registerSsoRoutes(app: FastifyInstance) {
       return reply.status(400).send({ error: "SAML response missing email attribute" });
     }
     const name = extractName(profile, config) || email.split("@")[0];
-    const role = mapRole(profile, config);
+    let role = mapRole(profile, config);
 
-    if (!SAML_PROVISIONABLE_ROLES.has(role)) {
+    // Sprint 12.7 — narrowly permit PLATFORM_ADMIN via SAML when:
+    //   1. the IdP asserts a signed `platform-admin` attribute (the
+    //      assertion-level signature has already been validated by
+    //      validatePostResponseAsync above), AND
+    //   2. the target tenant is the platform tenant.
+    // Otherwise PLATFORM_ADMIN must never be assigned through SSO —
+    // strip it down to the existing restricted set so a misconfigured
+    // role-attribute mapping can't escalate.
+    const isPlatformTenant =
+      tenant.id === process.env.AIVO_PLATFORM_TENANT_ID ||
+      tenant.slug === "platform" ||
+      tenant.kind === "platform";
+    const platformAdminAttr =
+      profile?.attributes?.["platform-admin"] ??
+      profile?.attributes?.platformAdmin ??
+      profile?.["platform-admin"];
+    const platformAdminAsserted =
+      platformAdminAttr === true || platformAdminAttr === "true" || platformAdminAttr === "1";
+    if (role === "PLATFORM_ADMIN") {
+      if (!(isPlatformTenant && platformAdminAsserted)) {
+        req.log.warn(
+          { slug, email, isPlatformTenant, platformAdminAsserted },
+          "SAML JIT: PLATFORM_ADMIN role assertion rejected; downgrading to DISTRICT_ADMIN",
+        );
+        role = "DISTRICT_ADMIN";
+      }
+    }
+
+    if (role !== "PLATFORM_ADMIN" && !SAML_PROVISIONABLE_ROLES.has(role)) {
       req.log.warn({ slug, email, role }, "SAML JIT rejected: role not provisionable via SSO");
       return reply.status(403).send({
         error: "This account role cannot sign in via SSO. Contact your administrator.",

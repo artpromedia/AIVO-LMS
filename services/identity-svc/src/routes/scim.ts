@@ -26,7 +26,7 @@
 import { FastifyInstance } from "fastify";
 import crypto from "crypto";
 import { eq, and, or, sql, isNull } from "drizzle-orm";
-import { users, scimTokens, tenants } from "@aivo/db";
+import { users, scimTokens, tenants, adminAuditLog, appendAudit } from "@aivo/db";
 import {
   getScimV2ServiceProviderConfigSchema,
   getScimV2SchemasSchema,
@@ -40,6 +40,39 @@ import {
   getScimV2GroupsSchema,
   getScimV2GroupsByIdSchema,
 } from "./schemas.js";
+
+/**
+ * Emit a SCIM audit event into the hash-chained admin audit log. Errors
+ * are swallowed so a transient audit-write failure cannot break the
+ * SCIM contract — the underlying user mutation has already committed.
+ */
+async function emitScimAudit(
+  db: any,
+  action: string,
+  ctx: ScimContext,
+  resourceType: "user" | "group",
+  resourceId: string,
+  req: any,
+  details: Record<string, any> = {},
+) {
+  try {
+    await appendAudit(db, "admin_audit_log", adminAuditLog, {
+      action,
+      actorId: ctx.tokenId,
+      actorEmail: "scim-provisioner",
+      actorRole: "SCIM_TOKEN",
+      resourceType,
+      resourceId,
+      details: { ...details, provisioner: "scim" },
+      ipAddress:
+        (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.ip || null,
+      userAgent: (req.headers["user-agent"] as string) || null,
+      tenantId: ctx.tenantId,
+    });
+  } catch {
+    // intentionally swallowed — SCIM audit best-effort, see comment above
+  }
+}
 
 const SCIM_PROVISIONABLE_ROLES = new Set(["DISTRICT_ADMIN", "TEACHER", "CAREGIVER", "THERAPIST"]);
 
@@ -348,6 +381,11 @@ export async function registerScimRoutes(app: FastifyInstance) {
         externalId,
       } as any)
       .returning();
+    await emitScimAudit(db, "SCIM_USER_CREATED", req.scim as ScimContext, "user", created.id, req, {
+      email,
+      role,
+      externalId,
+    });
     reply.status(201).type("application/scim+json").send(userToScim(created));
   });
 
@@ -394,6 +432,9 @@ export async function registerScimRoutes(app: FastifyInstance) {
       patch.updatedAt = new Date();
 
       const [updated] = await db.update(users).set(patch).where(eq(users.id, id)).returning();
+      await emitScimAudit(db, "SCIM_USER_REPLACED", req.scim as ScimContext, "user", id, req, {
+        changes: Object.keys(patch),
+      });
       reply.type("application/scim+json").send(userToScim(updated));
     },
   );
@@ -466,6 +507,9 @@ export async function registerScimRoutes(app: FastifyInstance) {
         }
       }
       const [updated] = await db.update(users).set(patch).where(eq(users.id, id)).returning();
+      await emitScimAudit(db, "SCIM_USER_PATCHED", req.scim as ScimContext, "user", id, req, {
+        operations: ops.map((o) => ({ op: o.op, path: o.path })),
+      });
       reply.type("application/scim+json").send(userToScim(updated));
     },
   );
@@ -493,6 +537,9 @@ export async function registerScimRoutes(app: FastifyInstance) {
           updatedAt: new Date(),
         })
         .where(eq(users.id, id));
+      await emitScimAudit(db, "SCIM_USER_DEACTIVATED", req.scim as ScimContext, "user", id, req, {
+        email: u.email,
+      });
       reply.status(204).send();
     },
   );
@@ -510,6 +557,25 @@ export async function registerScimRoutes(app: FastifyInstance) {
       })),
     });
   });
+
+  // Groups are virtual (derived from AIVO role) per RFC 7644 §3.7 / 3.5.2:
+  // groups' membership mutations come from changing a user's role. The
+  // endpoints below are present for SCIM-conformant clients (Okta, Azure
+  // AD, JumpCloud) that POST/PUT/PATCH Groups during initial sync — we
+  // refuse the mutation with `mutability` so the client surfaces the
+  // limitation cleanly instead of silently 404-ing.
+  const rejectGroupMutation = (reply: any) =>
+    scimError(
+      reply,
+      400,
+      "Groups are derived from AIVO roles and cannot be mutated via SCIM. Update a user's `aivoRole` instead.",
+      "mutability",
+    );
+
+  app.post("/scim/v2/Groups", async (_req: any, reply) => rejectGroupMutation(reply));
+  app.put("/scim/v2/Groups/:id", async (_req: any, reply) => rejectGroupMutation(reply));
+  app.patch("/scim/v2/Groups/:id", async (_req: any, reply) => rejectGroupMutation(reply));
+  app.delete("/scim/v2/Groups/:id", async (_req: any, reply) => rejectGroupMutation(reply));
 
   app.get("/scim/v2/Groups/:id", { schema: getScimV2GroupsByIdSchema }, async (req: any, reply) => {
     const { tenantId } = req.scim as ScimContext;
