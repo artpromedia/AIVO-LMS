@@ -33,6 +33,17 @@ export const ENTERPRISE_FLAG_ENV_VARS = {
   sisSync: "AIVO_FEATURE_SIS_SYNC",
   lti13: "AIVO_FEATURE_LTI_13",
   dataGovernanceCenter: "AIVO_FEATURE_DATA_GOVERNANCE_CENTER",
+  // ─── Sprint 14: responsible AI guardrails ────────────────────────────────
+  // The four-detector pipeline (PII/IEP, prompt injection, crisis, age) ships
+  // wired but DEFAULTS TO FALSE so merging Sprint 14 does not flip it on in
+  // production. The flip itself is the canary-soak step described in
+  // docs/SPRINT_12_SECURITY_REVIEW.md:
+  //   1. enable in staging for 48h; verify red-team metrics & crisis paging
+  //   2. sign-off from Trust & Safety + Engineering + Legal
+  //   3. staged rollout 10% → 50% → 100% with 1h soak between steps
+  // See docs/ai-safety/pipeline-architecture.md for the failure-mode contract
+  // and docs/ai-safety/crisis-escalation-runbook.md for the operational
+  // policy that fires when this flag is on.
   responsibleAiGuardrails: "AIVO_FEATURE_RESPONSIBLE_AI_GUARDRAILS",
   advancedContentGenerators: "AIVO_FEATURE_ADVANCED_CONTENT_GENERATORS",
   selfRegulationHub: "AIVO_FEATURE_SELF_REGULATION_HUB",
