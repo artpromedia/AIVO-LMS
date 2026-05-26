@@ -8,6 +8,10 @@ export const userRoleEnum = pgEnum("user_role", [
   "THERAPIST",
   "PLATFORM_ADMIN",
   "DISTRICT_ADMIN",
+  // School-scoped general admin. Manages teachers, classrooms, and
+  // staff within a single school. Scoped via users.school_id; cannot
+  // see other schools in the tenant.
+  "SCHOOL_ADMIN",
   // School-scoped IEP admin (sprint task #12). Sits between
   // DISTRICT_ADMIN (district-wide) and TEACHER (per-learner). A
   // SPED_LEAD owns the IEP workflow inside one school: assigns case

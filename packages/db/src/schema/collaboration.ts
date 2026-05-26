@@ -1,7 +1,8 @@
-import { pgTable, uuid, varchar, timestamp, text, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, timestamp, text, jsonb, index } from "drizzle-orm/pg-core";
 import { learners } from "./learners.js";
 import { users } from "./users.js";
 import { tenants } from "./tenants.js";
+import { classrooms } from "./district.js";
 
 export const learnerTeachers = pgTable("learner_teachers", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -19,6 +20,11 @@ export const learnerTeachers = pgTable("learner_teachers", {
   status: varchar("status", { length: 20 }).default("PENDING").notNull(),
   role: varchar("role", { length: 50 }).default("teacher").notNull(),
   permissions: jsonb("permissions").default(["read_brain", "submit_insights"]),
+  // Sprint 4 (invite-flows): set when the same teacher also runs a
+  // classroom where this learner is enrolled. Lets the unified roster
+  // dedupe district-roster and parent-invite paths to a single entry
+  // per learner.
+  classroomId: uuid("classroom_id").references(() => classrooms.id),
   invitedAt: timestamp("invited_at").defaultNow().notNull(),
   acceptedAt: timestamp("accepted_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -129,6 +135,44 @@ export const caregiverObservations = pgTable("caregiver_observations", {
   date: timestamp("date").defaultNow().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// Sprint 3 (invite-flows): teachers can invite parents. Inverse of
+// learner_teachers (which is parent-initiated). Today the invite always
+// targets an existing learner row; child name fields are kept for the
+// forward case where the learner doesn't yet exist in AIVO.
+export const teacherParentInvites = pgTable(
+  "teacher_parent_invites",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    tenantId: uuid("tenant_id")
+      .references(() => tenants.id)
+      .notNull(),
+    teacherUserId: uuid("teacher_user_id")
+      .references(() => users.id)
+      .notNull(),
+    classroomId: uuid("classroom_id").references(() => classrooms.id),
+    learnerId: uuid("learner_id")
+      .references(() => learners.id)
+      .notNull(),
+    parentEmail: varchar("parent_email", { length: 255 }).notNull(),
+    childFirstName: varchar("child_first_name", { length: 120 }),
+    childLastName: varchar("child_last_name", { length: 120 }),
+    notes: text("notes"),
+    status: varchar("status", { length: 20 }).notNull().default("PENDING"),
+    tokenHash: varchar("token_hash", { length: 128 }).notNull().unique(),
+    expiresAt: timestamp("expires_at").notNull(),
+    acceptedAt: timestamp("accepted_at"),
+    acceptedUserId: uuid("accepted_user_id").references(() => users.id),
+    revokedAt: timestamp("revoked_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_teacher_parent_invites_teacher").on(table.teacherUserId),
+    index("idx_teacher_parent_invites_learner").on(table.learnerId),
+    index("idx_teacher_parent_invites_email").on(table.parentEmail),
+    index("idx_teacher_parent_invites_tenant").on(table.tenantId),
+  ],
+);
 
 export const collaborationInvites = pgTable("collaboration_invites", {
   id: uuid("id").defaultRandom().primaryKey(),
