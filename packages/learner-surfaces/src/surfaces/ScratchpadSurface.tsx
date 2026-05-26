@@ -48,10 +48,19 @@ export function ScratchpadSurface({
   const submitDisabled = disabled || (surface.capture.finalAnswer && strokes.length === 0);
 
   return (
-    <section aria-label="scratchpad-surface">
-      <p>{surface.prompt}</p>
-      {surface.instructions ? <p>{surface.instructions}</p> : null}
-      <div style={canvasStyle}>
+    <section aria-label="scratchpad-surface" className="flex flex-col gap-4">
+      <p className="text-lg font-semibold text-iw-text-strong leading-snug">
+        {surface.prompt}
+      </p>
+      {surface.instructions ? (
+        <p className="text-sm text-iw-text-muted leading-relaxed">
+          {surface.instructions}
+        </p>
+      ) : null}
+      <div
+        className="rounded-iw-card-lg border-2 border-iw-border bg-white p-3 shadow-sm"
+        style={canvasStyle}
+      >
         <InkCanvas
           surfaceId={surface.id}
           width={scratchpad?.width ?? 520}
@@ -67,22 +76,25 @@ export function ScratchpadSurface({
           onEvent={onEvent}
         />
       </div>
-      <button
-        type="button"
-        aria-label="submit scratchpad"
-        disabled={submitDisabled}
-        onClick={() => {
-          onEvent?.(
-            createSurfaceEvent(surface.id, "surface_submitted", { strokeCount: strokes.length }),
-          );
-          onSubmit?.({
-            surfaceId: surface.id,
-            inkStrokes: strokes,
-          });
-        }}
-      >
-        Submit
-      </button>
+      <div className="flex justify-end pt-1">
+        <button
+          type="button"
+          aria-label="submit scratchpad"
+          disabled={submitDisabled}
+          onClick={() => {
+            onEvent?.(
+              createSurfaceEvent(surface.id, "surface_submitted", { strokeCount: strokes.length }),
+            );
+            onSubmit?.({
+              surfaceId: surface.id,
+              inkStrokes: strokes,
+            });
+          }}
+          className="inline-flex items-center justify-center gap-2 rounded-iw-control px-6 py-3 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] shadow-[0_4px_12px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.3)] transition-all hover:brightness-110 focus:outline-none focus-visible:ring-4 focus-visible:ring-[var(--aivo-sensory-ringFocus)]/40 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+        >
+          Submit
+        </button>
+      </div>
     </section>
   );
 }

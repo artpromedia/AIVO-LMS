@@ -72,3 +72,23 @@ export function baselineLlmEnabled(): boolean {
   if (process.env.NODE_ENV !== "production") return true;
   return false;
 }
+
+/**
+ * Phase B — Discovery Adventure baseline. When ON, `createBaseline`
+ * first attempts per-chapter generation via the assessment-svc
+ * `/api/assessments/learner/discovery/:learnerId/chapter` route so
+ * picture-prompt questions arrive with `sceneEmoji` + `choiceEmojis`
+ * populated. Any failure falls through to the flat `/generate-baseline`
+ * path (gated by `baselineLlmEnabled`) and finally to the deterministic
+ * BANK. Independent kill switch so we can disable Discovery without
+ * losing the LLM baseline path.
+ */
+export function baselineDiscoveryEnabled(): boolean {
+  const fromServer = process.env.AIVO_FEATURE_BASELINE_DISCOVERY;
+  if (isTruthy(fromServer)) return true;
+  if (isExplicitlyFalsy(fromServer)) return false;
+  // Default ON wherever the flat LLM baseline is on, so the emoji-rich
+  // path is the steady-state behaviour and the flat path is the
+  // graceful-degradation tier.
+  return baselineLlmEnabled();
+}

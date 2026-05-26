@@ -33,6 +33,12 @@ export type BaselineLlmSubject = z.infer<typeof baselineLlmSubjectSchema>;
 export const baselineLlmOptionSchema = z.object({
   value: z.string().min(1).max(200),
   label: z.string().min(1).max(500),
+  /**
+   * Optional per-choice emoji emitted by ai-svc Discovery Adventure
+   * activities (and now baseline). Lets the renderer show 🐱 next to
+   * the "cat" option without forcing a real image asset.
+   */
+  emoji: z.string().max(32).optional(),
 });
 
 export const baselineLlmQuestionSchema = z
@@ -45,6 +51,14 @@ export const baselineLlmQuestionSchema = z
     // Optional metadata the ai-svc may attach (difficulty, explanation, etc.)
     difficulty: z.string().max(100).optional(),
     explanation: z.string().max(2000).optional(),
+    /**
+     * Optional scene emoji anchoring the prompt (e.g., 🐱 above the
+     * "Which word matches the picture of a cat?" prompt).
+     */
+    sceneEmoji: z.string().max(32).optional(),
+    /** Optional inline illustration URL with alt text. */
+    imageUrl: z.string().url().max(2000).optional(),
+    imageAlt: z.string().max(500).optional(),
   })
   .superRefine((q, ctx) => {
     const valid = new Set(q.options.map((o) => o.value));

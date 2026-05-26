@@ -13,6 +13,12 @@ module.exports = {
     // emitted into the bundle. Without this, pastel tutor tiles and
     // subject chips silently render unstyled.
     '../../packages/ui/src/**/*.{ts,tsx}',
-    '../../packages/ui/dist/**/*.js'
+    '../../packages/ui/dist/**/*.js',
+    // Learner surfaces (SurfaceHost, ChoiceGridSurface, ScratchpadSurface,
+    // …) live in their own package but are styled with the Playful Calm
+    // token utilities (`rounded-iw-card`, `bg-[var(--aivo-sensory-…)]`).
+    // Tailwind must scan them so those classes actually ship.
+    '../../packages/learner-surfaces/src/**/*.{ts,tsx}',
+    '../../packages/learner-surfaces/dist/**/*.js'
   ]
 };

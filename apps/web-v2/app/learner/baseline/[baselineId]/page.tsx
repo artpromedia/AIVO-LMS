@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requirePageRole } from "@/lib/auth/server";
@@ -33,6 +34,7 @@ import {
 import { audit } from "@/lib/bff/audit";
 import { newRequestId } from "@/lib/observability/logger";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
+import { resolveBaselineImage } from "@/lib/learner/baseline-image";
 
 /**
  * Sprint 6: calm baseline runner.
@@ -347,6 +349,40 @@ export default async function BaselineRunnerPage({
     return i < totalAnswered ? "pending" : "pending";
   });
 
+  // Sprint A — surface picture-prompt anchors above the prompt so
+  // picture-referencing questions ("…the picture of a cat") actually
+  // show the cat. `resolveBaselineImage` upgrades a `sceneEmoji` (or a
+  // keyword-matched fallback from the prompt text) into a Twemoji SVG
+  // so the learner sees a real cartoon picture instead of a tiny font
+  // glyph. Falls back to the bare emoji span when no URL resolves.
+  let promptHeader: ReactNode = null;
+  const resolvedImage = resolveBaselineImage({
+    imageUrl: next.imageUrl,
+    imageAlt: next.imageAlt,
+    sceneEmoji: next.sceneEmoji,
+    prompt: next.prompt,
+  });
+  if (resolvedImage.imageUrl) {
+    promptHeader = (
+      <img
+        src={resolvedImage.imageUrl}
+        alt={resolvedImage.imageAlt ?? ""}
+        className="block h-32 w-32 md:h-40 md:w-40 mb-3 object-contain select-none"
+        draggable={false}
+      />
+    );
+  } else if (next.sceneEmoji) {
+    promptHeader = (
+      <span
+        className="block text-6xl md:text-7xl mb-3 select-none"
+        role="img"
+        aria-label={next.imageAlt ?? "Prompt picture"}
+      >
+        {next.sceneEmoji}
+      </span>
+    );
+  }
+
   return (
     <LearnerBaselineShell
       topBanner={topBanner}
@@ -387,7 +423,12 @@ export default async function BaselineRunnerPage({
             </span>
           ) : null
         }
-        prompt={next.prompt}
+        prompt={
+          <>
+            {promptHeader}
+            <span>{next.prompt}</span>
+          </>
+        }
         readAloud={
           next.readAloudText ? <ReadAloudButton href={`?read=${next.id}`} /> : null
         }
@@ -428,16 +469,44 @@ export default async function BaselineRunnerPage({
           {next.choices && next.choices.length > 0 ? (
             <fieldset className="flex flex-col gap-3">
               <legend className="sr-only">Choose one</legend>
-              {next.choices.map((choice, i) => (
-                <LearnerChoiceCard
-                  key={choice}
-                  name="response"
-                  value={choice}
-                  label={choice}
-                  index={i}
-                  required
-                />
-              ))}
+              {next.choices.map((choice, i) => {
+                const emoji = next.choiceEmojis?.[i];
+                // Upgrade the bare emoji to a Twemoji SVG so each
+                // option looks like a real cartoon picture (dog, cat,
+                // car). Falls back to the raw emoji glyph if the
+                // codepoint isn't in Twemoji's pack.
+                const choiceImg = emoji
+                  ? resolveBaselineImage({ sceneEmoji: emoji })
+                  : undefined;
+                let lead: ReactNode = undefined;
+                if (choiceImg?.imageUrl) {
+                  lead = (
+                    <img
+                      src={choiceImg.imageUrl}
+                      alt=""
+                      className="h-10 w-10 object-contain select-none"
+                      draggable={false}
+                    />
+                  );
+                } else if (emoji) {
+                  lead = (
+                    <span className="text-3xl leading-none" aria-hidden="true">
+                      {emoji}
+                    </span>
+                  );
+                }
+                return (
+                  <LearnerChoiceCard
+                    key={choice}
+                    name="response"
+                    value={choice}
+                    label={choice}
+                    index={i}
+                    lead={lead}
+                    required
+                  />
+                );
+              })}
             </fieldset>
           ) : (
             <label className="flex flex-col gap-1.5">

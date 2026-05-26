@@ -249,6 +249,8 @@ export function mapLlmQuestionsToBaselineQuestions(
     if (!skill) continue;
 
     order += 1;
+    const choiceEmojis = q.options.map((o) => o.emoji ?? "");
+    const hasAnyEmoji = choiceEmojis.some((e) => e.length > 0);
     out.push({
       id: newId("bq"),
       baselineId,
@@ -257,6 +259,10 @@ export function mapLlmQuestionsToBaselineQuestions(
       order,
       prompt: q.questionText,
       choices: q.options.map((o) => o.label),
+      choiceEmojis: hasAnyEmoji ? choiceEmojis : undefined,
+      sceneEmoji: q.sceneEmoji,
+      imageUrl: q.imageUrl,
+      imageAlt: q.imageAlt,
       expectedAnswer: labelForValue(q.options, q.correctAnswer),
       hint: q.explanation,
       readAloudText: q.questionText,

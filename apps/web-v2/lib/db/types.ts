@@ -541,6 +541,20 @@ export type BaselineGenerationMetadata = {
   model?: string;
   promptTokens?: number;
   completionTokens?: number;
+  /**
+   * Phase B — present when the Discovery Adventure path produced
+   * questions. Lists the chapter IDs that succeeded so the parent
+   * dashboard can surface coverage gaps when one subject failed and
+   * was filled by a different path.
+   */
+  chaptersUsed?: string[];
+  /**
+   * Phase B — per-chapter failure reasons. Empty/omitted when every
+   * chapter succeeded. Populated even on the happy path when at least
+   * one chapter failed but others compensated, so rollout dashboards
+   * can track partial-failure rates.
+   */
+  chapterFailures?: { chapterId: string; reason: string }[];
   generatedAt: ISODate;
 };
 
@@ -569,6 +583,28 @@ export type BaselineQuestion = {
   order: number;
   prompt: string;
   choices?: string[];
+  /**
+   * Optional per-choice emoji parallel to `choices`. When present,
+   * the renderer uses it as the leading glyph on each choice card.
+   * Picture-referencing prompts (e.g., "Which word matches the
+   * picture of a cat?") MUST set this so the choice for "cat" shows
+   * a 🐱 rather than just the word.
+   */
+  choiceEmojis?: string[];
+  /**
+   * Optional scene emoji shown above the prompt as a visual anchor
+   * for picture-prompts (e.g., the cat picture above the cat
+   * question). Larger than the per-choice glyph.
+   */
+  sceneEmoji?: string;
+  /**
+   * Optional inline illustration URL. Reserved for the LLM /
+   * Discovery Adventure path when a model emits an actual image
+   * rather than an emoji.
+   */
+  imageUrl?: string;
+  /** Alt text for `imageUrl`. */
+  imageAlt?: string;
   expectedAnswer?: string;
   hint?: string;
   readAloudText?: string;

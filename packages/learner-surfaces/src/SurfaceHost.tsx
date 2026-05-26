@@ -63,9 +63,20 @@ export function SurfaceHost({
         aria-live="polite"
         aria-label="locked learner surface"
         data-locked-surface={surface.type}
+        className="flex flex-col items-center gap-3 rounded-iw-card-lg border border-iw-border bg-[var(--aivo-color-surface-sunken)] p-6 text-center"
       >
-        <p>{`This ${surface.type.replace(/_/g, " ")} activity needs the ${requiredTutor ?? "premium"} tutor.`}</p>
-        <p>Ask a grown-up to unlock it from the billing page.</p>
+        <span
+          aria-hidden="true"
+          className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-3xl shadow-sm"
+        >
+          {"\uD83D\uDD12"}
+        </span>
+        <p className="text-base font-semibold text-iw-text-strong">
+          {`This ${surface.type.replace(/_/g, " ")} activity needs the ${requiredTutor ?? "premium"} tutor.`}
+        </p>
+        <p className="text-sm text-iw-text-muted">
+          Ask a grown-up to unlock it from the billing page.
+        </p>
       </section>
     );
   }
@@ -90,8 +101,18 @@ export function SurfaceHost({
   }
 
   return (
-    <section role="status" aria-live="polite" aria-label="unsupported learner surface">
-      <p>Activity type unavailable: {surface.type}</p>
+    <section
+      role="status"
+      aria-live="polite"
+      aria-label="unsupported learner surface"
+      className="flex flex-col items-center gap-2 rounded-iw-card-lg border border-dashed border-iw-border bg-white p-6 text-center"
+    >
+      <p className="text-base font-semibold text-iw-text-strong">
+        This activity isn’t ready yet.
+      </p>
+      <p className="text-sm text-iw-text-muted">
+        Surface type: <code className="font-mono text-xs">{surface.type}</code>
+      </p>
     </section>
   );
 }

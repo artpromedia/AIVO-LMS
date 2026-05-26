@@ -54,7 +54,12 @@ import {
   generateBaselineQuestionsViaLLM,
   mapLlmQuestionsToBaselineQuestions,
 } from "@/lib/learner/baseline-llm";
-import { baselineLlmEnabled } from "@/lib/feature-flags";
+import {
+  ADVENTURE_CHAPTERS,
+  generateDiscoveryChapter,
+  mapDiscoveryActivitiesToBaselineQuestions,
+} from "@/lib/learner/baseline-discovery";
+import { baselineDiscoveryEnabled, baselineLlmEnabled } from "@/lib/feature-flags";
 import { logger } from "@/lib/observability/logger";
 import {
   buildBaselineSummary,
@@ -712,13 +717,103 @@ export async function createBaseline(input: {
   const parentAssessment = findParentAssessment(input.learnerId, input.tenantId);
 
   let questions: BaselineQuestion[] = [];
-  let metadata: BaselineGenerationMetadata;
+  // Definite-assignment: every code path below the discovery/LLM/BANK
+  // ladder assigns this, but TS can't follow the `discoverySucceeded`
+  // invariant across the chained `if / else if` branches.
+  let metadata!: BaselineGenerationMetadata;
 
   const accommodationTags = accommodationTagsForBaseline(brainProfile);
   const llmFlag = baselineLlmEnabled();
   const canCallLlm = llmFlag && parentAssessment != null && parentAssessment.submittedAt != null;
+  const discoveryFlag = baselineDiscoveryEnabled();
+  const canCallDiscovery = discoveryFlag && canCallLlm;
 
-  if (canCallLlm) {
+  // Phase B — Discovery Adventure: attempt per-chapter generation
+  // first so the parent gets the emoji-rich picture-prompt experience
+  // ported from the legacy aivo-ai-learning client. Each chapter is
+  // independent; partial successes are kept and the per-chapter
+  // failure reasons surface on `generationMetadata.chapterFailures`.
+  let discoverySucceeded = false;
+  if (canCallDiscovery) {
+    const settled = await Promise.allSettled(
+      ADVENTURE_CHAPTERS.map((chapter) =>
+        generateDiscoveryChapter({ learnerId: input.learnerId, chapter }),
+      ),
+    );
+    const collected: BaselineQuestion[] = [];
+    const chaptersUsed: string[] = [];
+    const chapterFailures: { chapterId: string; reason: string }[] = [];
+    let modelUsed: string | undefined;
+    let startOrder = 0;
+    for (let i = 0; i < ADVENTURE_CHAPTERS.length; i++) {
+      const chapter = ADVENTURE_CHAPTERS[i]!;
+      const r = settled[i]!;
+      if (r.status === "fulfilled" && r.value.ok) {
+        const { questions: mapped, nextOrder } =
+          mapDiscoveryActivitiesToBaselineQuestions({
+            baselineId: baseline.id,
+            chapter,
+            activities: r.value.response.activities,
+            subjects,
+            skills,
+            accommodationTags,
+            startOrder,
+          });
+        if (mapped.length > 0) {
+          modelUsed ??= r.value.response.model;
+          collected.push(...mapped);
+          startOrder = nextOrder;
+          chaptersUsed.push(chapter.id);
+        } else {
+          chapterFailures.push({
+            chapterId: chapter.id,
+            reason: "no_subject_mapping",
+          });
+        }
+      } else if (r.status === "fulfilled" && !r.value.ok) {
+        chapterFailures.push({ chapterId: chapter.id, reason: r.value.reason });
+      } else {
+        chapterFailures.push({ chapterId: chapter.id, reason: "promise_rejected" });
+      }
+    }
+    if (collected.length > 0) {
+      questions = collected;
+      metadata = {
+        source: "ai",
+        model: modelUsed ?? "discovery-adventure",
+        generatedAt: nowIso(),
+        chaptersUsed,
+        ...(chapterFailures.length ? { chapterFailures } : {}),
+      };
+      discoverySucceeded = true;
+      if (chapterFailures.length > 0) {
+        logger.info(
+          {
+            event: "baseline.discovery_partial_success",
+            learnerId: input.learnerId,
+            tenantId: input.tenantId,
+            baselineId: baseline.id,
+            chaptersUsed,
+            chapterFailures,
+          },
+          "baseline: discovery adventure produced partial chapter coverage",
+        );
+      }
+    } else {
+      logger.info(
+        {
+          event: "baseline.discovery_total_failure",
+          learnerId: input.learnerId,
+          tenantId: input.tenantId,
+          baselineId: baseline.id,
+          chapterFailures,
+        },
+        "baseline: discovery adventure produced no questions, falling back to flat LLM/BANK",
+      );
+    }
+  }
+
+  if (!discoverySucceeded && canCallLlm) {
     const llmResult = await generateBaselineQuestionsViaLLM({
       parent_assessment: parentAssessment!.answers as unknown as Record<string, unknown>,
       functioning_level: brainProfile?.state.functioningLevel ?? "STANDARD",
@@ -792,7 +887,7 @@ export async function createBaseline(input: {
         "baseline: LLM generation failed, used BANK fallback",
       );
     }
-  } else {
+  } else if (!discoverySucceeded) {
     questions = generateBaselineQuestions({
       baselineId: baseline.id,
       learner,

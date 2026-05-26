@@ -25,6 +25,18 @@ type BankItem = {
   expectedAnswer: string;
   hint: string;
   readAloudText: string;
+  /**
+   * Optional anchor emoji rendered above the prompt for
+   * picture-prompted items (e.g., the cat picture above the
+   * "Which word matches the picture of a cat?" question).
+   */
+  sceneEmoji?: string;
+  /**
+   * Optional emoji rendered as the leading glyph on each choice
+   * card, parallel index-for-index to `choices`. Lets a learner who
+   * can't read the word "cat" still pick the cat by recognising 🐱.
+   */
+  choiceEmojis?: string[];
 };
 
 const BANK: BankItem[] = [
@@ -37,6 +49,8 @@ const BANK: BankItem[] = [
     expectedAnswer: "cat",
     hint: "Listen to the first sound: /k/.",
     readAloudText: "Which word matches the picture of a cat? Choose one.",
+    sceneEmoji: "🐱",
+    choiceEmojis: ["🐱", "🐶", "🚗"],
   },
   {
     skillSlug: "phonics-cvc",
@@ -154,6 +168,8 @@ const BANK: BankItem[] = [
     expectedAnswer: "Touch",
     hint: "You feel cold with your skin.",
     readAloudText: "Which sense do you use to know if ice is cold?",
+    sceneEmoji: "🧊",
+    choiceEmojis: ["👀", "🤚", "👃"],
   },
   {
     skillSlug: "weather",
@@ -163,6 +179,8 @@ const BANK: BankItem[] = [
     expectedAnswer: "Summer",
     hint: "Think of the hottest season.",
     readAloudText: "Which one is usually warm?",
+    sceneEmoji: "☀️",
+    choiceEmojis: ["❄️", "☀️", "🌙"],
   },
   // Social
   {
@@ -173,6 +191,8 @@ const BANK: BankItem[] = [
     expectedAnswer: "Happy",
     hint: "Smiles usually mean a good feeling.",
     readAloudText: "What feeling does someone have when they smile and laugh?",
+    sceneEmoji: "😊",
+    choiceEmojis: ["😢", "😊", "😠"],
   },
   {
     skillSlug: "taking-turns",
@@ -202,6 +222,8 @@ const BANK: BankItem[] = [
     expectedAnswer: "Red",
     hint: "Primary colors mix to make others.",
     readAloudText: "Which one is a primary color?",
+    sceneEmoji: "🎨",
+    choiceEmojis: ["🟢", "🔴", "🟣"],
   },
   // Social-emotional (Harmony's Feelings Treehouse)
   {
@@ -221,6 +243,8 @@ const BANK: BankItem[] = [
     expectedAnswer: "Upset",
     hint: "Crossed arms and a frown usually mean a hard feeling.",
     readAloudText: "Someone is crossing their arms and frowning. They probably feel what?",
+    sceneEmoji: "😣",
+    choiceEmojis: ["🤩", "😣", "😴"],
   },
   // Speech & Language (Echo's Sound Studio)
   {
@@ -259,6 +283,8 @@ const BANK: BankItem[] = [
     expectedAnswer: "Red",
     hint: "The pattern goes red then blue, over and over.",
     readAloudText: "What comes next in the pattern: red, blue, red, blue, blank?",
+    sceneEmoji: "🔴🔵🔴🔵",
+    choiceEmojis: ["🔴", "🟢", "🟡"],
   },
   {
     skillSlug: "memory-sequence",
@@ -394,6 +420,8 @@ export function generateBaselineQuestions(input: GenerateBaselineInput): Baselin
         order,
         prompt: item.prompt,
         choices: item.choices,
+        choiceEmojis: item.choiceEmojis,
+        sceneEmoji: item.sceneEmoji,
         expectedAnswer: item.expectedAnswer,
         hint: item.hint,
         readAloudText: item.readAloudText,
