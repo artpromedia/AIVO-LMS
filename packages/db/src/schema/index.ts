@@ -24,3 +24,4 @@ export * from "./tenancy.js";
 export * from "./enterprise-integrations.js";
 export * from "./data-governance.js";
 export * from "./enterprise-audit.js";
+export * from "./dpa.js";

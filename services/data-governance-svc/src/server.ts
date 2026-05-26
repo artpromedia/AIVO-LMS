@@ -7,6 +7,7 @@ import { registerExportRoutes } from "./routes/exports.js";
 import { registerDeletionRoutes } from "./routes/deletion-requests.js";
 import { initDpaStoreFromDb, registerDpaRoutes } from "./routes/dpa.js";
 import { registerRetentionRoutes } from "./routes/retention.js";
+import { createDpaStore, type EnrichedDpaStore } from "./services/dpa-store.js";
 
 export interface BuildAppOptions {
   skipAuth?: boolean;
@@ -31,6 +32,12 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   // tests and local dev tolerate the in-memory store.
   const db = options.db ?? (process.env.DATABASE_URL ? createDb(process.env.DATABASE_URL) : null);
   initDpaStoreFromDb(db);
+
+  // Sprint 12.5: also construct the enriched DPA store. Currently used
+  // by internal callers; future API routes can pull it from `app.dpaStore`.
+  // Throws in production when neither `db` nor `DATABASE_URL` is set.
+  const enrichedDpaStore: EnrichedDpaStore = createDpaStore(db);
+  (app as any).dpaStore = enrichedDpaStore;
 
   registerExportRoutes(app);
   registerDeletionRoutes(app);

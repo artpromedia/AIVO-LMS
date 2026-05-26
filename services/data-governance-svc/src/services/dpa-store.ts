@@ -1,6 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { dpaAcceptances } from "@aivo/db";
 import { desc, eq } from "drizzle-orm";
+import {
+  InMemoryEnrichedDpaStore,
+  PostgresEnrichedDpaStore,
+  type EnrichedDpaStore,
+} from "./postgres-dpa-store.js";
 
 export interface DpaAcceptanceInput {
   districtId: string;
@@ -137,3 +142,37 @@ export function selectDpaStore(db: any | null | undefined): DpaStore {
   }
   return new InMemoryDpaStore();
 }
+
+/**
+ * Sprint 12.5 factory for the *enriched* DPA store (writes to the new
+ * `dpa_acceptance_records` table that includes tenant_id, school_id,
+ * signature_hash, addenda, etc.).
+ *
+ * Behaviour:
+ *   - If a drizzle client is provided OR `DATABASE_URL` is set, returns
+ *     the Postgres-backed store. The caller may pass `db` directly to
+ *     avoid double-constructing the client.
+ *   - If `NODE_ENV === "production"` and no drizzle client / DATABASE_URL
+ *     is available, throws — DPA records must persist in production.
+ *   - Otherwise (dev / test, no DB) returns the in-memory enriched store.
+ *
+ * The legacy `selectDpaStore` factory above remains for the older
+ * district-only acceptance surface used by `/api/dpa/accept`.
+ */
+export function createDpaStore(db?: any | null): EnrichedDpaStore {
+  if (db) return new PostgresEnrichedDpaStore(db);
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "data-governance-svc: DATABASE_URL / drizzle client required in production. " +
+        "InMemoryEnrichedDpaStore must NOT be used in production — DPA records would " +
+        "be lost on restart, breaking compliance audits.",
+    );
+  }
+  return new InMemoryEnrichedDpaStore();
+}
+
+export type { EnrichedDpaStore } from "./postgres-dpa-store.js";
+export {
+  InMemoryEnrichedDpaStore,
+  PostgresEnrichedDpaStore,
+} from "./postgres-dpa-store.js";
