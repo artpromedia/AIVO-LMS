@@ -19,6 +19,7 @@
     "@aivo/api-client": "workspace:*",
     "@aivo/brand": "workspace:*",
     "@aivo/learner-surfaces": "workspace:*",
+    "@aivo/learner-ui": "workspace:*",
     "@aivo/nav": "workspace:*",
     "@aivo/ui": "workspace:*",
     "@hookform/resolvers": "^3.9.1",
