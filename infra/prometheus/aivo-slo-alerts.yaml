@@ -1,0 +1,174 @@
+#
+# Sprint 12 — SLO alerts driving the AIVO production runbook.
+#
+# Each rule mirrors a threshold called out in
+# docs/SPRINT_12_PRODUCTION_READINESS.md. Severity routing:
+#
+#   page   → PagerDuty primary on-call (baseline / AI critical paths)
+#   ops    → Slack #aivo-ops (non-paging operational health)
+#   triage → Slack #aivo-ai-safety (AI safety + content review)
+#
+# Apply with:
+#   kubectl apply -f infra/prometheus/aivo-slo-alerts.yaml
+# Or load directly into a Prometheus instance via rule_files.
+#
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: aivo-slo-alerts
+  namespace: aivo-monitoring
+  labels:
+    app.kubernetes.io/part-of: aivo
+    aivo.runbook: sprint-12
+spec:
+  groups:
+    - name: baseline-pipeline.slo
+      interval: 30s
+      rules:
+        - alert: BaselineGenerationP95Slow
+          expr: |
+            histogram_quantile(
+              0.95,
+              sum by (le) (rate(aivo_baseline_latency_seconds_bucket[5m]))
+            ) > 30
+          for: 5m
+          labels:
+            severity: page
+            team: ai-svc
+          annotations:
+            summary: "Baseline p95 latency > 30 s for 5 minutes"
+            description: |
+              The /api/ai/generate-baseline endpoint is exceeding its p95 SLO of 30 s.
+              Check ai-svc logs for upstream LLM timeouts (Anthropic / Gemini / OpenAI),
+              and verify the curriculum-svc grounding lookup is responsive.
+            runbook_url: "https://docs.aivolms.com/runbooks/baseline-latency"
+
+        - alert: BaselineFallbackRateHigh
+          expr: |
+            (
+              sum(rate(aivo_baseline_fallback_total[10m]))
+              /
+              sum(rate(aivo_baseline_shipped_total[10m]))
+            ) > 0.05
+          for: 10m
+          labels:
+            severity: ops
+            team: ai-svc
+          annotations:
+            summary: "Baseline fallback rate > 5 % for 10 minutes"
+            description: |
+              More than 5 % of shipped baselines came from the Sprint 3 fallback bank.
+              This signals AI-svc instability, schema-validation failures, or model
+              chain exhaustion. Check llm_gateway logs.
+            runbook_url: "https://docs.aivolms.com/runbooks/baseline-fallback"
+
+        - alert: ResponsibleAIBlockRateHigh
+          expr: |
+            (
+              sum(rate(aivo_responsible_ai_verdicts_total{action="block"}[5m]))
+              /
+              sum(rate(aivo_responsible_ai_verdicts_total[5m]))
+            ) > 0.02
+          for: 5m
+          labels:
+            severity: triage
+            team: ai-safety
+          annotations:
+            summary: "Responsible-AI block rate > 2 %"
+            description: |
+              The evaluator is blocking more than 2 % of generated items. The prompt
+              or the evaluator policy is probably wrong — investigate the top
+              violation codes panel on the AIVO baseline ops dashboard.
+            runbook_url: "https://docs.aivolms.com/runbooks/responsible-ai"
+
+        - alert: LlmTokenSpendOverCap
+          expr: |
+            (
+              sum by (tenant_id) (rate(aivo_llm_cost_cents_total[5m])) * 60 * 24
+            ) > on (tenant_id) (aivo_tenant_llm_daily_cap_cents)
+          for: 10m
+          labels:
+            severity: ops
+            team: finance
+          annotations:
+            summary: "Tenant {{ $labels.tenant_id }} on pace to exceed daily LLM cap"
+            description: |
+              Projected 24h spend exceeds the configured cap. Sprint 4 budget guard
+              will start returning 429s once the cap hits; this alert gives ops + the
+              tenant admin a chance to raise the cap or investigate the cause first.
+            runbook_url: "https://docs.aivolms.com/runbooks/llm-spend"
+
+        - alert: IepDraftValidationFailureHigh
+          expr: |
+            (
+              sum(rate(aivo_iep_draft_validation_failure_total[5m]))
+              /
+              sum(rate(aivo_iep_draft_attempt_total[5m]))
+            ) > 0.10
+          for: 5m
+          labels:
+            severity: page
+            team: ai-svc
+          annotations:
+            summary: "IEP draft validation failures > 10 %"
+            description: |
+              More than 10 % of /api/ai/iep/draft responses fail pydantic validation
+              even after the auto-correction retry. The prompt or the schema has
+              drifted — check ai-svc logs for repeated "validation failed" entries.
+            runbook_url: "https://docs.aivolms.com/runbooks/iep-draft"
+
+    - name: bff.slo
+      interval: 30s
+      rules:
+        - alert: SchoolDashboardP95Slow
+          expr: |
+            histogram_quantile(
+              0.95,
+              sum by (le) (rate(aivo_bff_latency_seconds_bucket{surface="admin/school/dashboard"}[5m]))
+            ) > 0.5
+          for: 5m
+          labels:
+            severity: ops
+            team: web-bff
+          annotations:
+            summary: "School admin dashboard p95 > 500 ms"
+            description: |
+              The Sprint 7 dashboard repo is computing too slowly. Check tenant size
+              and consider adding a denormalised counter cache (Sprint 13 backlog).
+            runbook_url: "https://docs.aivolms.com/runbooks/school-dashboard"
+
+        - alert: BaselineMetricsP95Slow
+          expr: |
+            histogram_quantile(
+              0.95,
+              sum by (le) (rate(aivo_bff_latency_seconds_bucket{surface="admin/baseline-metrics"}[5m]))
+            ) > 0.6
+          for: 5m
+          labels:
+            severity: ops
+            team: web-bff
+          annotations:
+            summary: "Baseline metrics endpoint p95 > 600 ms"
+            runbook_url: "https://docs.aivolms.com/runbooks/baseline-metrics"
+
+    - name: caches.slo
+      interval: 1m
+      rules:
+        - alert: PromptCacheHitRateLow
+          expr: |
+            (
+              sum(rate(aivo_llm_cache_hit_total[10m]))
+              /
+              sum(rate(aivo_llm_completion_total[10m]))
+            ) < 0.5
+          for: 30m
+          labels:
+            severity: ops
+            team: ai-svc
+          annotations:
+            summary: "Prompt-cache hit rate < 50 % for 30 minutes"
+            description: |
+              The Sprint 1 Anthropic ephemeral cache is underperforming. Verify the
+              cache key segments (district, gradeBand, functioningLevel) are stable
+              across the load mix. SLO target is ≥ 70 % after warm-up.
+            runbook_url: "https://docs.aivolms.com/runbooks/prompt-cache"
