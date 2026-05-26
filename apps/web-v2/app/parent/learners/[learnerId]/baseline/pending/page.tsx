@@ -8,12 +8,24 @@ import {
   InsightChip,
 } from "@aivo/ui";
 import {
+  createBaseline,
   getActiveBaselineForLearner,
+  getBrainProfile,
   getIEPForLearner,
   getLearner,
   getOrCreateParentAssessment,
   parentCanAccessLearner,
+  refreshLearnerReadiness,
 } from "@/lib/db/repos";
+import { audit } from "@/lib/bff/audit";
+import { newRequestId } from "@/lib/observability/logger";
+
+// Pending is a transient SSR screen. There's no background worker that
+// generates baselines, so on first visit (after the parent submits the
+// assessment) we kick off `createBaseline` here and redirect into the
+// learner runner. On retries / refreshes we either reuse an in-progress
+// baseline or fall through to render the pending UI.
+export const dynamic = "force-dynamic";
 
 export default async function BaselinePendingPage({
   params,
@@ -33,15 +45,66 @@ export default async function BaselinePendingPage({
     redirect(`/parent/learners/${learner.id}/assessment`);
   }
 
+  // Brain profile is a hard prereq for baseline generation. If it's
+  // missing, sending the parent in circles on a "loading" screen is
+  // worse than telling them what to do — bounce to the brain-profile
+  // step explicitly.
+  if (!getBrainProfile(learnerId, session.tenantId)) {
+    redirect(`/parent/learners/${learner.id}/brain-profile`);
+  }
+
   const iep = getIEPForLearner(learnerId, session.tenantId);
   const active = getActiveBaselineForLearner(learnerId, session.tenantId);
 
   // If a baseline already exists and is ready, send the parent on.
-  if (active && active.status === "in_progress") {
+  if (active?.status === "in_progress") {
+    redirect(`/learner/baseline/${active.id}?as=parent`);
+  }
+  if (active?.status === "complete") {
     redirect(`/parent/learners/${learner.id}/baseline`);
   }
-  if (active && active.status === "complete") {
-    redirect(`/parent/learners/${learner.id}/baseline`);
+
+  // No active baseline yet — generate one now (this is what the pending
+  // screen has been "waiting" for). If creation succeeds we drop the
+  // parent straight into the learner runner. If it fails we render the
+  // pending UI so the parent can at least retry via "Check back later".
+  if (!active) {
+    try {
+      const created = await createBaseline({
+        learnerId,
+        tenantId: session.tenantId,
+      });
+      if (created) {
+        audit(session, "baseline.create", newRequestId(), {
+          learnerId,
+          metadata: {
+            baselineId: created.baseline.id,
+            questionCount: created.questions.length,
+            source: "pending-auto",
+          },
+        });
+        refreshLearnerReadiness(learnerId, session.tenantId);
+        redirect(`/learner/baseline/${created.baseline.id}?as=parent`);
+      }
+    } catch (err) {
+      // `redirect()` throws a NEXT_REDIRECT control-flow error — must
+      // re-throw or the user gets stuck on the pending screen.
+      if (
+        err &&
+        typeof err === "object" &&
+        "digest" in err &&
+        typeof (err as { digest?: unknown }).digest === "string" &&
+        (err as { digest: string }).digest.startsWith("NEXT_REDIRECT")
+      ) {
+        throw err;
+      }
+      console.error("baseline.pending.auto_create_failed", {
+        learnerId,
+        tenantId: session.tenantId,
+        message: err instanceof Error ? err.message : String(err),
+      });
+      // fall through and render the pending UI as a soft-fail state
+    }
   }
 
   const inputs: React.ReactNode[] = ["Parent assessment"];
