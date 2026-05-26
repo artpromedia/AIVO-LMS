@@ -1,0 +1,96 @@
+name: Quarterly DR Drill
+
+# Sprint 16 — Disaster Recovery drill scheduler.
+#
+# Runs scripts/dr/backup-restore-drill.sh on a cron once per quarter
+# and on-demand via workflow_dispatch. The cron uses --dry-run so the
+# default scheduled run produces a synthetic report without touching
+# any cluster; engineers invoking via workflow_dispatch can switch off
+# dry-run + select the target environment.
+#
+# Report artifacts land in scripts/dr/results/ and are uploaded as a
+# workflow artifact. The release-gate (scripts/release-gate.mjs)
+# requires at least one report < 90 days old before a production
+# release is permitted, so this workflow runs more frequently than
+# strictly necessary to stay green.
+
+on:
+  schedule:
+    # Quarterly: 09:00 UTC on the 1st of Jan, Apr, Jul, Oct.
+    - cron: "0 9 1 1,4,7,10 *"
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Target environment"
+        required: true
+        default: "smoke-test"
+        type: choice
+        options:
+          - smoke-test
+          - staging-shadow
+      dry_run:
+        description: "Run in --dry-run mode (no real restore)"
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quarterly-dr-drill
+  cancel-in-progress: false
+
+jobs:
+  drill:
+    name: Backup + restore drill
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Run drill
+        env:
+          DR_PG_SOURCE_HOST: ${{ secrets.DR_PG_SOURCE_HOST }}
+          DR_PG_SOURCE_PORT: ${{ secrets.DR_PG_SOURCE_PORT }}
+          DR_PG_SOURCE_DB: ${{ secrets.DR_PG_SOURCE_DB }}
+          DR_PG_TARGET_HOST: ${{ secrets.DR_PG_TARGET_HOST }}
+          DR_PG_TARGET_PORT: ${{ secrets.DR_PG_TARGET_PORT }}
+          DR_PG_TARGET_DB: ${{ secrets.DR_PG_TARGET_DB }}
+          DR_PG_TARGET_USER: ${{ secrets.DR_PG_TARGET_USER }}
+          PGPASSWORD: ${{ secrets.DR_PG_PASSWORD }}
+        run: |
+          set -euo pipefail
+          TARGET="${{ github.event.inputs.target || 'smoke-test' }}"
+          DRY="${{ github.event.inputs.dry_run || 'true' }}"
+          ARGS=( --target "${TARGET}" )
+          if [ "${DRY}" = "true" ]; then
+            ARGS+=( --dry-run )
+          fi
+          bash scripts/dr/backup-restore-drill.sh "${ARGS[@]}"
+
+      - name: Upload drill report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dr-drill-report
+          path: scripts/dr/results/*.json
+          if-no-files-found: warn
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## Quarterly DR Drill"
+            echo ""
+            echo "- Target: ${{ github.event.inputs.target || 'smoke-test' }}"
+            echo "- Dry-run: ${{ github.event.inputs.dry_run || 'true' }}"
+            echo ""
+            echo "Latest report:"
+            echo '```json'
+            cat $(ls -1t scripts/dr/results/*.json | head -1)
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
