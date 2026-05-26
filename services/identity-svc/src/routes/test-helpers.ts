@@ -24,6 +24,7 @@ import {
 } from "@aivo/db";
 import { eq, and, sql } from "drizzle-orm";
 import argon2 from "argon2";
+import { signJWT } from "@aivo/security";
 import {
   getTestLastMfaCodeByEmailSchema,
   testSeedDistrictAdminSchema,
@@ -42,6 +43,149 @@ export function registerTestHelperRoutes(app: FastifyInstance) {
   app.log.warn(
     "IDENTITY_TEST_MODE=1: registering /api/__test__/* helper routes. NEVER enable in production.",
   );
+
+  // Liveness probe consumed by `identityTestModeReachable()` in
+  // e2e/lib/fixtures.ts. When test mode is off this returns 404 (the
+  // module isn't registered at all), so probing for 200 == "test mode
+  // is on" is sufficient.
+  app.get("/api/__test__/health", async (_req, reply) => {
+    if (!testModeEnabled()) return reply.status(404).send({ error: "Not found" });
+    return { ok: true, mode: "test", service: "identity-svc" };
+  });
+
+  // Idempotent seed for a B2C_FAMILY parent. Used by the Stripe purchase
+  // → entitlement and learner lesson-loop e2e specs. Returns a real
+  // access token so the caller can drive authenticated requests against
+  // billing-svc / tutor-svc.
+  app.post<{ Body: { email: string; password: string; tenantName?: string } }>(
+    "/api/__test__/seed-parent",
+    async (req, reply) => {
+      if (!testModeEnabled()) return reply.status(404).send({ error: "Not found" });
+      const db = (app as any).db;
+      const { email, password, tenantName } = req.body ?? ({} as any);
+      if (!email || !password) {
+        return reply.status(400).send({ error: "email and password required" });
+      }
+      const lcEmail = email.toLowerCase();
+      const desiredTenantName = tenantName ?? `E2E Family ${lcEmail}`;
+
+      let [tenant] = await db
+        .select()
+        .from(tenants)
+        .where(eq(tenants.name, desiredTenantName))
+        .limit(1);
+      if (!tenant) {
+        [tenant] = await db
+          .insert(tenants)
+          .values({ name: desiredTenantName, type: "B2C_FAMILY" as any })
+          .returning();
+      }
+
+      const passwordHash = await argon2.hash(password);
+      let [user] = await db.select().from(users).where(eq(users.email, lcEmail)).limit(1);
+      if (user) {
+        await db
+          .update(users)
+          .set({
+            passwordHash,
+            role: "PARENT",
+            tenantId: tenant.id,
+            mfaEnabled: false,
+            deactivatedAt: null,
+          })
+          .where(eq(users.id, user.id));
+        [user] = await db.select().from(users).where(eq(users.id, user.id)).limit(1);
+      } else {
+        [user] = await db
+          .insert(users)
+          .values({
+            email: lcEmail,
+            name: "E2E Parent",
+            passwordHash,
+            role: "PARENT" as any,
+            tenantId: tenant.id,
+            mfaEnabled: false,
+          })
+          .returning();
+      }
+
+      const accessToken = await signJWT({
+        sub: user.id,
+        tenantId: tenant.id,
+        role: user.role,
+        email: user.email,
+        name: user.name,
+      });
+
+      return {
+        userId: user.id,
+        tenantId: tenant.id,
+        email: user.email,
+        role: user.role,
+        accessToken,
+      };
+    },
+  );
+
+  // Idempotent seed for a LEARNER child of an existing parent. The learner
+  // gets their own underlying users row (role=LEARNER) plus a learners
+  // row keyed by parentId so RLS-style scoping in family-svc works.
+  app.post<{
+    Body: { parentUserId: string; tenantId: string; name?: string; gradeLevel?: string };
+  }>("/api/__test__/seed-learner", async (req, reply) => {
+    if (!testModeEnabled()) return reply.status(404).send({ error: "Not found" });
+    const db = (app as any).db;
+    const { parentUserId, tenantId, name, gradeLevel } = req.body ?? ({} as any);
+    if (!parentUserId || !tenantId) {
+      return reply.status(400).send({ error: "parentUserId and tenantId required" });
+    }
+    const learnerName = name ?? `E2E Learner ${parentUserId.slice(0, 8)}`;
+    // Reuse an existing learner for this parent so the helper stays
+    // idempotent across reruns. Identified by (parentId, name).
+    const existing = await db
+      .select()
+      .from(learners)
+      .where(and(eq(learners.parentId, parentUserId), eq(learners.name, learnerName)))
+      .limit(1);
+    if (existing[0]) {
+      return {
+        learnerId: existing[0].id,
+        learnerUserId: existing[0].userId,
+        parentUserId,
+        tenantId,
+      };
+    }
+    // Underlying user row for the learner. argon2 hash is irrelevant —
+    // learners don't log in via password — but the column is NOT NULL.
+    const placeholderHash = await argon2.hash(`learner-placeholder-${Date.now()}`);
+    const [learnerUser] = await db
+      .insert(users)
+      .values({
+        email: `learner-${parentUserId.slice(0, 8)}-${Date.now()}@e2e.test`,
+        name: learnerName,
+        passwordHash: placeholderHash,
+        role: "LEARNER" as any,
+        tenantId,
+        mfaEnabled: false,
+      })
+      .returning();
+    const [learner] = await db
+      .insert(learners)
+      .values({
+        tenantId,
+        userId: learnerUser.id,
+        parentId: parentUserId,
+        name: learnerName,
+        gradeLevel: gradeLevel ?? "5",
+      })
+      .returning();
+    return {
+      learnerId: learner.id,
+      learnerUserId: learnerUser.id,
+      parentUserId,
+      tenantId,
+    };
+  });
 
   // Fetch the latest unused login MFA code for an email. Used by Playwright
   // happy-path specs to complete the MFA challenge for forced-MFA roles.
