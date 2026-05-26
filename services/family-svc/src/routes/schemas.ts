@@ -75,6 +75,7 @@ export const collaborationByLearnerIdInviteTeacherSchema = {
     403: errorResponse,
     404: errorResponse,
     409: errorResponse,
+    429: errorResponse,
   },
 } as const;
 
@@ -96,6 +97,7 @@ export const collaborationByLearnerIdInviteCaregiverSchema = {
     403: errorResponse,
     404: errorResponse,
     409: errorResponse,
+    429: errorResponse,
   },
 } as const;
 
@@ -117,6 +119,7 @@ export const collaborationByLearnerIdInviteTherapistSchema = {
     403: errorResponse,
     404: errorResponse,
     409: errorResponse,
+    429: errorResponse,
   },
 } as const;
 
@@ -226,6 +229,7 @@ export const collaborationInviteParentSchema = {
     403: errorResponse,
     404: errorResponse,
     409: errorResponse,
+    429: errorResponse,
   },
 } as const;
 
@@ -260,6 +264,41 @@ export const getCollaborationInviteParentByTeacherSchema = {
   operationId: "getCollaborationInviteParentByTeacher",
   summary: "GET /api/family/collaboration/invite-parent (teacher's outgoing invites)",
   response: { 200: passthroughObject, 403: errorResponse },
+} as const;
+
+// Sprint 5 (invite-flows): generic resend/revoke for any of the four
+// invite kinds (teacher, caregiver, therapist, teacher_parent). The
+// :kind param picks the table; :id picks the row.
+export const collaborationInviteResendSchema = {
+  tags: ["Family"],
+  operationId: "collaborationInviteResend",
+  summary: "POST /api/family/collaboration/invites/:kind/:id/resend",
+  params: {
+    type: "object",
+    required: ["kind", "id"],
+    additionalProperties: true,
+    properties: { kind: { type: "string" }, id: { type: "string" } },
+  },
+  response: {
+    200: passthroughObject,
+    400: errorResponse,
+    403: errorResponse,
+    404: errorResponse,
+    429: errorResponse,
+  },
+} as const;
+
+export const collaborationInviteRevokeSchema = {
+  tags: ["Family"],
+  operationId: "collaborationInviteRevoke",
+  summary: "DELETE /api/family/collaboration/invites/:kind/:id",
+  params: {
+    type: "object",
+    required: ["kind", "id"],
+    additionalProperties: true,
+    properties: { kind: { type: "string" }, id: { type: "string" } },
+  },
+  response: { 200: passthroughObject, 400: errorResponse, 403: errorResponse, 404: errorResponse },
 } as const;
 
 // Sprint 4 (invite-flows): unified teacher roster.

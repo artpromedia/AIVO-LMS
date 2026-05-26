@@ -35,12 +35,66 @@ import {
   collaborationInviteParentRevokeSchema,
   getCollaborationInviteParentByTeacherSchema,
   getTeacherRosterSchema,
+  collaborationInviteResendSchema,
+  collaborationInviteRevokeSchema,
 } from "./schemas.js";
 
 const INVITE_TTL_HOURS = 72;
 
 function hashInviteToken(raw: string): string {
   return crypto.createHash("sha256").update(raw).digest("hex");
+}
+
+// Sprint 5 (invite-flows): per-user invite rate limiting. Protects against
+// invite spam (e.g. a compromised account blasting addresses). Tracks two
+// rolling windows per inviter: 10 invites/hour and 50 invites/day. Counts
+// every successful create across all 4 invite kinds (teacher, caregiver,
+// therapist, teacher_parent). In-memory is sufficient for our single-pod
+// dev/staging setup; a future iteration can promote to Postgres if we run
+// multi-replica.
+const INVITE_RATE_HOUR_LIMIT = 10;
+const INVITE_RATE_DAY_LIMIT = 50;
+const HOUR_MS = 60 * 60 * 1000;
+const DAY_MS = 24 * HOUR_MS;
+interface RateBucket {
+  hourStart: number;
+  hourCount: number;
+  dayStart: number;
+  dayCount: number;
+}
+const inviteRateBuckets = new Map<string, RateBucket>();
+
+export function checkInviteRateLimit(
+  inviterId: string,
+  now = Date.now(),
+): { ok: true } | { ok: false; window: "hour" | "day"; retryAfterMs: number } {
+  let b = inviteRateBuckets.get(inviterId);
+  if (!b) {
+    b = { hourStart: now, hourCount: 0, dayStart: now, dayCount: 0 };
+    inviteRateBuckets.set(inviterId, b);
+  }
+  if (now - b.hourStart >= HOUR_MS) {
+    b.hourStart = now;
+    b.hourCount = 0;
+  }
+  if (now - b.dayStart >= DAY_MS) {
+    b.dayStart = now;
+    b.dayCount = 0;
+  }
+  if (b.hourCount >= INVITE_RATE_HOUR_LIMIT) {
+    return { ok: false, window: "hour", retryAfterMs: HOUR_MS - (now - b.hourStart) };
+  }
+  if (b.dayCount >= INVITE_RATE_DAY_LIMIT) {
+    return { ok: false, window: "day", retryAfterMs: DAY_MS - (now - b.dayStart) };
+  }
+  b.hourCount += 1;
+  b.dayCount += 1;
+  return { ok: true };
+}
+
+// Exposed for tests.
+export function resetInviteRateLimitsForTest() {
+  inviteRateBuckets.clear();
 }
 
 const IS_PROD = process.env.NODE_ENV === "production";
@@ -256,6 +310,16 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
       const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
       if (!isParent) return reply.code(403).send({ error: "Only parents can invite team members" });
 
+      const rl = checkInviteRateLimit(claims.sub);
+      if (!rl.ok) {
+        return reply
+          .code(429)
+          .header("Retry-After", Math.ceil(rl.retryAfterMs / 1000))
+          .send({
+            error: `Invite rate limit exceeded (${rl.window}). Try again later.`,
+          });
+      }
+
       const body = request.body as InviteTeacherBody;
       if (!body.email) return reply.code(400).send({ error: "Email is required" });
       const normalizedEmail = body.email.trim().toLowerCase();
@@ -316,6 +380,16 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
       const { learnerId } = request.params as LearnerId;
       const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
       if (!isParent) return reply.code(403).send({ error: "Only parents can invite team members" });
+
+      const rl = checkInviteRateLimit(claims.sub);
+      if (!rl.ok) {
+        return reply
+          .code(429)
+          .header("Retry-After", Math.ceil(rl.retryAfterMs / 1000))
+          .send({
+            error: `Invite rate limit exceeded (${rl.window}). Try again later.`,
+          });
+      }
 
       const body = request.body as InviteCaregiverBody;
       if (!body.email) return reply.code(400).send({ error: "Email is required" });
@@ -382,6 +456,16 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
       const { learnerId } = request.params as LearnerId;
       const isParent = await verifyParentOwnership(db, claims.sub, learnerId);
       if (!isParent) return reply.code(403).send({ error: "Only parents can invite team members" });
+
+      const rl = checkInviteRateLimit(claims.sub);
+      if (!rl.ok) {
+        return reply
+          .code(429)
+          .header("Retry-After", Math.ceil(rl.retryAfterMs / 1000))
+          .send({
+            error: `Invite rate limit exceeded (${rl.window}). Try again later.`,
+          });
+      }
 
       const body = request.body as InviteTherapistBody;
       if (!body.email) return reply.code(400).send({ error: "Email is required" });
@@ -1018,6 +1102,190 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
     },
   );
 
+  // ─── Sprint 5 (invite-flows): unified resend / revoke ───────────────
+  //
+  // The dedicated invite-parent/:id/{resend,revoke} endpoints from Sprint 3
+  // remain for backwards compatibility, but these generic endpoints work
+  // across all four kinds so the UI doesn't have to pick a URL based on
+  // the invite type.
+  app.post(
+    "/api/family/collaboration/invites/:kind/:id/resend",
+    { schema: collaborationInviteResendSchema },
+    async (request, reply) => {
+      const claims = await authenticateRequest(request, reply);
+      if (!claims) return;
+      const { kind, id } = request.params as { kind: string; id: string };
+
+      const rl = checkInviteRateLimit(claims.sub);
+      if (!rl.ok) {
+        return reply
+          .code(429)
+          .header("Retry-After", Math.ceil(rl.retryAfterMs / 1000))
+          .send({
+            error: `Invite rate limit exceeded (${rl.window}). Try again later.`,
+          });
+      }
+
+      if (kind === "teacher" || kind === "caregiver" || kind === "therapist") {
+        const table =
+          kind === "teacher"
+            ? learnerTeachers
+            : kind === "caregiver"
+              ? learnerCaregivers
+              : learnerTherapists;
+
+        const [row] = await db.select().from(table).where(eq(table.id, id)).limit(1);
+        if (!row) return reply.code(404).send({ error: "Invite not found" });
+
+        const isParent = await verifyParentOwnership(db, claims.sub, row.learnerId);
+        if (!isParent && claims.role !== "PLATFORM_ADMIN") {
+          return reply.code(403).send({ error: "Not authorized to resend this invite" });
+        }
+        if (row.status === "ACCEPTED")
+          return reply.code(400).send({ error: "Invite already accepted" });
+        if (row.status === "REVOKED")
+          return reply.code(400).send({ error: "Invite was revoked" });
+
+        await db
+          .update(table)
+          .set({ status: "PENDING", invitedAt: new Date(), updatedAt: new Date() } as any)
+          .where(eq(table.id, id));
+
+        const inviteEmail =
+          kind === "teacher"
+            ? (row as any).teacherEmail
+            : kind === "caregiver"
+              ? (row as any).caregiverEmail
+              : (row as any).therapistEmail;
+        const ctx = await loadInviteContext(db, claims.sub, row.learnerId);
+        void sendTeamInviteEmail(app, {
+          to: inviteEmail,
+          role: kind,
+          ...ctx,
+        });
+        return { success: true };
+      }
+
+      if (kind === "teacher_parent") {
+        const [row] = await db
+          .select()
+          .from(teacherParentInvites)
+          .where(eq(teacherParentInvites.id, id))
+          .limit(1);
+        if (!row) return reply.code(404).send({ error: "Invite not found" });
+        if (
+          row.teacherUserId !== claims.sub &&
+          !["SCHOOL_ADMIN", "DISTRICT_ADMIN", "PLATFORM_ADMIN"].includes(claims.role)
+        ) {
+          return reply.code(403).send({ error: "Not authorized to resend this invite" });
+        }
+        if (row.status === "ACCEPTED")
+          return reply.code(400).send({ error: "Invite already accepted" });
+        if (row.status === "REVOKED")
+          return reply.code(400).send({ error: "Invite was revoked" });
+
+        const rawToken = crypto.randomBytes(32).toString("base64url");
+        const tokenHash = hashInviteToken(rawToken);
+        const expiresAt = new Date(Date.now() + INVITE_TTL_HOURS * 3600 * 1000);
+        await db
+          .update(teacherParentInvites)
+          .set({ tokenHash, expiresAt, status: "PENDING" })
+          .where(eq(teacherParentInvites.id, id));
+
+        const [learner] = await db
+          .select({ name: learners.name, schoolId: learners.schoolId })
+          .from(learners)
+          .where(eq(learners.id, row.learnerId))
+          .limit(1);
+        const [teacher] = await db
+          .select({ name: users.name })
+          .from(users)
+          .where(eq(users.id, row.teacherUserId))
+          .limit(1);
+        let schoolName: string | undefined;
+        if (learner?.schoolId) {
+          const [s] = await db
+            .select({ name: schools.name })
+            .from(schools)
+            .where(eq(schools.id, learner.schoolId))
+            .limit(1);
+          schoolName = s?.name;
+        }
+        void sendTeacherParentInviteEmail(app, {
+          to: row.parentEmail,
+          teacherName: teacher?.name || "Your child's teacher",
+          schoolName: schoolName || "the school",
+          childName: learner?.name || "your child",
+          notes: row.notes,
+          token: rawToken,
+        });
+        return { success: true, expiresAt };
+      }
+
+      return reply
+        .code(400)
+        .send({ error: "kind must be teacher | caregiver | therapist | teacher_parent" });
+    },
+  );
+
+  app.delete(
+    "/api/family/collaboration/invites/:kind/:id",
+    { schema: collaborationInviteRevokeSchema },
+    async (request, reply) => {
+      const claims = await authenticateRequest(request, reply);
+      if (!claims) return;
+      const { kind, id } = request.params as { kind: string; id: string };
+
+      if (kind === "teacher" || kind === "caregiver" || kind === "therapist") {
+        const table =
+          kind === "teacher"
+            ? learnerTeachers
+            : kind === "caregiver"
+              ? learnerCaregivers
+              : learnerTherapists;
+        const [row] = await db.select().from(table).where(eq(table.id, id)).limit(1);
+        if (!row) return reply.code(404).send({ error: "Invite not found" });
+        const isParent = await verifyParentOwnership(db, claims.sub, row.learnerId);
+        if (!isParent && claims.role !== "PLATFORM_ADMIN") {
+          return reply.code(403).send({ error: "Not authorized to revoke this invite" });
+        }
+        if (row.status === "ACCEPTED")
+          return reply.code(400).send({ error: "Cannot revoke an accepted invite" });
+        await db
+          .update(table)
+          .set({ status: "REVOKED", updatedAt: new Date() } as any)
+          .where(eq(table.id, id));
+        return { success: true };
+      }
+
+      if (kind === "teacher_parent") {
+        const [row] = await db
+          .select()
+          .from(teacherParentInvites)
+          .where(eq(teacherParentInvites.id, id))
+          .limit(1);
+        if (!row) return reply.code(404).send({ error: "Invite not found" });
+        if (
+          row.teacherUserId !== claims.sub &&
+          !["SCHOOL_ADMIN", "DISTRICT_ADMIN", "PLATFORM_ADMIN"].includes(claims.role)
+        ) {
+          return reply.code(403).send({ error: "Not authorized to revoke this invite" });
+        }
+        if (row.status === "ACCEPTED")
+          return reply.code(400).send({ error: "Cannot revoke an accepted invite" });
+        await db
+          .update(teacherParentInvites)
+          .set({ status: "REVOKED", revokedAt: new Date() })
+          .where(eq(teacherParentInvites.id, id));
+        return { success: true };
+      }
+
+      return reply
+        .code(400)
+        .send({ error: "kind must be teacher | caregiver | therapist | teacher_parent" });
+    },
+  );
+
   // ─── Sprint 3 (invite-flows): teacher → parent invites ──────────────
 
   // POST /api/family/collaboration/invite-parent
@@ -1060,6 +1328,16 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
         role === "TEACHER" ? claims.sub : body.teacherUserId || claims.sub;
       if (!teacherUserId) {
         return reply.code(400).send({ error: "teacherUserId required" });
+      }
+
+      const rl = checkInviteRateLimit(claims.sub);
+      if (!rl.ok) {
+        return reply
+          .code(429)
+          .header("Retry-After", Math.ceil(rl.retryAfterMs / 1000))
+          .send({
+            error: `Invite rate limit exceeded (${rl.window}). Try again later.`,
+          });
       }
 
       const [learner] = await db
