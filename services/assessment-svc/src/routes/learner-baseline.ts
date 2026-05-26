@@ -167,6 +167,20 @@ function buildDistrictContext(learner: any) {
   };
 }
 
+/**
+ * Sprint 1 — surface the learner's enrollment ZIP code so ai-svc can
+ * call curriculum-svc and ground the baseline prompt in district-
+ * approved skill anchors. Returns null when no ZIP is on file; ai-svc
+ * degrades gracefully and the existing district-framework label still
+ * carries broad curriculum signal.
+ */
+function buildZipCode(learner: any): string | null {
+  const raw = learner?.zipCode;
+  if (typeof raw !== "string") return null;
+  const trimmed = raw.trim();
+  return trimmed.length >= 5 ? trimmed : null;
+}
+
 async function authenticate(req: any, reply: any) {
   const auth = req.headers.authorization;
   if (!auth?.startsWith("Bearer ")) return reply.status(401).send({ error: "Unauthorized" });
@@ -507,6 +521,8 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
             // Optional inputs — null/empty array when not on file.
             caregiver_perspectives: caregiverPerspectives,
             teacher_assessment: teacherContext,
+            // Sprint 1 — curriculum grounding via ai-svc → curriculum-svc.
+            zip_code: buildZipCode(learner),
           }),
         });
 
@@ -919,6 +935,8 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
             // Optional inputs — null/empty array when not on file.
             caregiver_perspectives: caregiverPerspectives,
             teacher_assessment: teacherContext,
+            // Sprint 1 — curriculum grounding via ai-svc → curriculum-svc.
+            zip_code: buildZipCode(learner),
           }),
         });
 

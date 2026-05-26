@@ -10,6 +10,7 @@ from ..audit import emit_ai_audit
 from ..services.quality_gate import run_quality_gate
 from ..services.baseline_generator import build_baseline_generation_prompt
 from ..services.responsible_ai_client import evaluate as evaluate_responsible_ai
+from ..services.curriculum_client import load_curriculum_grounding
 
 logger = logging.getLogger("ai-svc.generate")
 
@@ -198,6 +199,12 @@ class BaselineRequest(BaseModel):
     # a parent assessment still gets a baseline generation.
     caregiver_perspectives: Optional[list] = None
     teacher_assessment: Optional[dict] = None
+    # Sprint 1 — curriculum grounding. When the learner's ZIP code is
+    # known, ai-svc calls curriculum-svc to inject district-scoped skill
+    # anchors into the prompt. The lookup is best-effort: when ZIP is
+    # absent, the feature flag is off, or curriculum-svc is unreachable,
+    # the prompt falls back to framework-label-only context.
+    zip_code: Optional[str] = None
 
 
 class BaselineResponse(BaseModel):
@@ -212,6 +219,19 @@ class BaselineResponse(BaseModel):
 async def generate_baseline(req: BaselineRequest):
     from ..services.baseline_generator import SUBJECTS
 
+    # Sprint 1 — fetch district-scoped skill anchors before building the
+    # prompt. Best-effort: returns an empty grounding when ZIP / grade /
+    # curriculum-svc are unavailable, so the existing prompt still fires.
+    grade_for_grounding = (
+        (req.district or {}).get("gradeLevel")
+        if isinstance(req.district, dict)
+        else None
+    ) or (req.parent_assessment or {}).get("gradeLevel")
+    curriculum_grounding = await load_curriculum_grounding(
+        zip_code=req.zip_code,
+        grade_level=grade_for_grounding,
+    )
+
     system_prompt, user_prompt = build_baseline_generation_prompt(
         req.parent_assessment,
         iep=req.iep,
@@ -219,6 +239,7 @@ async def generate_baseline(req: BaselineRequest):
         interest_profile=req.interest_profile,
         caregiver_perspectives=req.caregiver_perspectives,
         teacher_assessment=req.teacher_assessment,
+        curriculum_grounding=curriculum_grounding,
     )
 
     try:
@@ -284,6 +305,7 @@ class DiscoveryChapterRequest(BaseModel):
     # Optional — see BaselineRequest for the same rationale.
     caregiver_perspectives: Optional[list] = None
     teacher_assessment: Optional[dict] = None
+    zip_code: Optional[str] = None
 
 
 class DiscoveryChapterResponse(BaseModel):
@@ -298,6 +320,19 @@ class DiscoveryChapterResponse(BaseModel):
 async def generate_discovery_chapter(req: DiscoveryChapterRequest):
     from ..services.baseline_generator import build_discovery_adventure_prompt
 
+    grade_for_grounding = (
+        (req.district or {}).get("gradeLevel")
+        if isinstance(req.district, dict)
+        else None
+    ) or (req.parent_assessment or {}).get("gradeLevel")
+    curriculum_grounding = await load_curriculum_grounding(
+        zip_code=req.zip_code,
+        grade_level=grade_for_grounding,
+        # Discovery chapters scope to one domain at a time — only fetch
+        # anchors for that domain (cheaper, sharper prompt).
+        subjects=(req.chapter.get("domain"),) if req.chapter.get("domain") else (),
+    )
+
     system_prompt, user_prompt = build_discovery_adventure_prompt(
         req.parent_assessment,
         req.chapter,
@@ -306,6 +341,7 @@ async def generate_discovery_chapter(req: DiscoveryChapterRequest):
         interest_profile=req.interest_profile,
         caregiver_perspectives=req.caregiver_perspectives,
         teacher_assessment=req.teacher_assessment,
+        curriculum_grounding=curriculum_grounding,
     )
 
     try:

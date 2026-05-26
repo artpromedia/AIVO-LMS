@@ -234,6 +234,71 @@ from the enrolled grade level, prefer the IEP grade level for difficulty
 calibration but keep terminology consistent with the district framework."""
 
 
+def _format_curriculum_grounding_block(grounding: Optional[dict]) -> str:
+    """Render the structured skill anchors fetched from curriculum-svc.
+
+    Each subject lists 3-5 standard-aligned skill nodes for the learner's
+    enrolled grade band in their district's approved content packs. The
+    LLM is instructed to anchor questions to these specific nodes rather
+    than inventing standard codes.
+
+    Returns an empty string when no grounding is available so the
+    surrounding prompt stays the same length and pre-existing prompt
+    caches aren't invalidated.
+    """
+    if not isinstance(grounding, dict):
+        return ""
+    subjects = grounding.get("subjects") or {}
+    if not isinstance(subjects, dict) or not subjects:
+        return ""
+
+    district = grounding.get("district") or {}
+    grade_band = grounding.get("gradeBand") or "unspecified"
+    district_line = (
+        f"district {district.get('name') or district.get('id') or '(unknown)'}"
+        f" / state {district.get('state') or '?'}"
+        f" / grade band {grade_band}"
+    )
+
+    def _fmt_skill(s: dict) -> str:
+        sid = s.get("id") or "(no-id)"
+        label = (s.get("label") or "").strip() or "(no label)"
+        summary = (s.get("summary") or "").strip()
+        prereqs = s.get("prerequisites") or []
+        pre_line = (
+            f" — builds on {', '.join(prereqs[:4])}" if isinstance(prereqs, list) and prereqs else ""
+        )
+        if summary:
+            return f"  - **{sid}** — {label}: {summary}{pre_line}"
+        return f"  - **{sid}** — {label}{pre_line}"
+
+    subject_blocks: list[str] = []
+    for subj_key, skills in subjects.items():
+        if not isinstance(skills, list) or not skills:
+            continue
+        lines = [f"### {subj_key} — district-approved anchors"]
+        for s in skills:
+            if isinstance(s, dict):
+                lines.append(_fmt_skill(s))
+        subject_blocks.append("\n".join(lines))
+
+    if not subject_blocks:
+        return ""
+
+    body = "\n\n".join(subject_blocks)
+    return f"""## District-Aligned Curriculum Anchors ({district_line})
+The learner's district has approved the skill nodes below for this grade.
+Anchor each generated question to ONE of these nodes when possible —
+include the skill id (e.g. `ccss-math.3.OA.A.1`) in the question's
+`standardRef` / `skillId` field and target the labelled skill in the
+question stem. Use the listed prerequisites to calibrate difficulty:
+items below grade level should target prerequisite skills; items at
+grade level should target the listed nodes; items above grade level
+should extend from them. Do NOT invent standard codes outside this list.
+
+{body}"""
+
+
 SUBJECTS = [
     {"key": "math", "label": "Math", "emoji": "🔢", "color": "#7C3AED"},
     {"key": "ela", "label": "Reading", "emoji": "📖", "color": "#10B981"},
@@ -322,6 +387,7 @@ def build_discovery_adventure_prompt(
     interest_profile: Optional[dict] = None,
     caregiver_perspectives: Optional[list] = None,
     teacher_assessment: Optional[dict] = None,
+    curriculum_grounding: Optional[dict] = None,
 ) -> tuple[str, str]:
     responses = parent_assessment.get("responses", {})
     communication_mode = parent_assessment.get("communicationMode", "verbal")
@@ -401,6 +467,8 @@ def build_discovery_adventure_prompt(
 {_format_teacher_block(teacher_assessment)}
 
 {_format_district_block(district)}
+
+{_format_curriculum_grounding_block(curriculum_grounding)}
 
 ## Current Chapter
 - Chapter: {chapter['title']}
@@ -485,6 +553,7 @@ def build_baseline_generation_prompt(
     interest_profile: Optional[dict] = None,
     caregiver_perspectives: Optional[list] = None,
     teacher_assessment: Optional[dict] = None,
+    curriculum_grounding: Optional[dict] = None,
 ) -> tuple[str, str]:
     responses = parent_assessment.get("responses", {})
     communication_mode = parent_assessment.get("communicationMode", "verbal")
@@ -555,6 +624,8 @@ def build_baseline_generation_prompt(
 {_format_teacher_block(teacher_assessment)}
 
 {_format_district_block(district)}
+
+{_format_curriculum_grounding_block(curriculum_grounding)}
 
 ## Rules
 1. Generate EXACTLY 6 questions per subject for these 7 subjects: math, ela, science, speech, sel, life_skills, executive_function (42 questions total)
