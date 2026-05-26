@@ -101,6 +101,15 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.TEST_DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/aivo_test' }}
 
+      # Sprint 16 release gate — wraps audit-coverage, the SOC 2 matrix
+      # zero-TODOs check, the DR drill freshness check (within 90 days),
+      # the security-review sign-off check, and the enterprise feature
+      # flag 100%-for-72h gate. Soft-fails until the `zero-todos` marker
+      # is flipped in soc2-control-matrix.md and the rollout ledger
+      # exists at infra/feature-flags/rollout.json.
+      - name: release:gate (Sprint 16 SOC 2 prereqs)
+        run: node scripts/release-gate.mjs
+
   api-client-drift-gate:
     name: API client drift (advisory)
     runs-on: ubuntu-latest
