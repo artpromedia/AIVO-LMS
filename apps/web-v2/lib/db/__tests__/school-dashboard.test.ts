@@ -87,7 +87,7 @@ describe("getSchoolDashboard", () => {
       action: "TEST_OLD",
       target: "test",
       metadata: {},
-      createdAt: oldIso,
+      occurredAt: oldIso,
     } as never);
     const recentIso = new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString();
     store.auditLogs.push({
@@ -97,7 +97,7 @@ describe("getSchoolDashboard", () => {
       action: "TEST_RECENT",
       target: "test",
       metadata: {},
-      createdAt: recentIso,
+      occurredAt: recentIso,
     } as never);
     const snap = getSchoolDashboard(tenant.id);
     // recent included, old excluded → at least 1 recent event.

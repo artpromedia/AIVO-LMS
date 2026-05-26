@@ -5659,7 +5659,7 @@ export function getSchoolDashboard(
   const auditLogs = listAuditLogsForTenants([tenantId], 1000);
   const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
   const auditEvents30d = auditLogs.filter(
-    (a) => new Date(a.createdAt).getTime() >= thirtyDaysAgo,
+    (a) => new Date(a.occurredAt).getTime() >= thirtyDaysAgo,
   ).length;
 
   const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
@@ -5716,7 +5716,7 @@ export function getSchoolDashboard(
 
   return {
     school: school
-      ? { id: school.id, name: school.name, districtId: school.districtId ?? null }
+      ? { id: school.id, name: school.name, districtId: null }
       : { id: null, name: tenant?.name ?? "(unnamed school)", districtId: null },
     counts: {
       learners: learners.length,
@@ -5791,8 +5791,8 @@ export function getSchoolReport(
   const classroomById = new Map(classrooms.map((c) => [c.id, c]));
   const enrollmentByLearner = new Map<string, string>();
   for (const e of Array.from(store.enrollments.values())) {
-    if (e.userId && !enrollmentByLearner.has(e.userId)) {
-      enrollmentByLearner.set(e.userId, e.classroomId);
+    if (e.role === "learner" && e.subjectId && !enrollmentByLearner.has(e.subjectId)) {
+      enrollmentByLearner.set(e.subjectId, e.classroomId);
     }
   }
 
@@ -5940,20 +5940,42 @@ export function addStaffUser(input: {
   email: string;
   displayName: string;
   role: "TEACHER" | "SCHOOL_ADMIN" | "THERAPIST" | "CAREGIVER";
-}): UserSummary {
+}): {
+  id: string;
+  tenantId: string;
+  email: string;
+  displayName: string;
+  role: "TEACHER" | "SCHOOL_ADMIN" | "THERAPIST" | "CAREGIVER";
+  status: "INVITED";
+  createdAt: string;
+} {
   const id = newId("user");
+  const createdAt = nowIso();
   const rec = {
     id,
     tenantId: input.tenantId,
     email: input.email,
     displayName: input.displayName,
     role: input.role,
-    status: "INVITED",
-    createdAt: nowIso(),
+    status: "INVITED" as const,
+    createdAt,
   };
   // Best-effort persistence — the in-memory store keeps users in a Map.
   db().users.set(id, rec as never);
-  return rec as UserSummary;
+  const roleMap: Record<string, Role> = {
+    TEACHER: "teacher",
+    SCHOOL_ADMIN: "school_admin",
+    THERAPIST: "therapist",
+    CAREGIVER: "caregiver",
+  };
+  const role = roleMap[input.role] ?? "teacher";
+  db().memberships.push({
+    userId: id,
+    tenantId: input.tenantId,
+    role,
+    joinedAt: createdAt,
+  } as never);
+  return rec;
 }
 
 export function removeStaffUser(userId: string, tenantId: string): boolean {
@@ -6334,7 +6356,7 @@ export function getGradebookDetail(
   }
 
   const rows: GradebookRow[] = [];
-  const entries = mastery?.entries ?? [];
+  const entries = mastery?.skillMasteries ?? [];
   for (const m of entries) {
     const sk = skills.get(m.skillId);
     if (!sk) continue;

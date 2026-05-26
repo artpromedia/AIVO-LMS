@@ -215,7 +215,7 @@ export async function applySafetyGate(
       continue;
     }
     seenIds.add(replacement.id);
-    out.push(replacement);
+    out.push(replacement as unknown as BaselineQuestionLike);
     hadReplacements = true;
     audits.push({
       questionId: replacement.id,

@@ -34,6 +34,8 @@ const PREVIEW_PATHS: Record<Role, string> = {
   learner: "/learner/home",
   parent: "/parent/home",
   teacher: "/teacher/home",
+  therapist: "/therapist/home",
+  caregiver: "/caregiver/home",
   schoolAdmin: "/admin/school",
   districtAdmin: "/admin/district",
   internal: "/admin/platform",

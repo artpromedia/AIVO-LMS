@@ -378,6 +378,22 @@ const MATRIX: Matrix = {
     homeworkHelper: { access: "linked", webRoute: "/admin/platform/ai" },
     aiTutor: { access: "linked", webRoute: "/admin/platform/ai" },
   },
+
+  /* ──────────────────────────── Therapist ──────────────────────────── */
+  therapist: {
+    home: { access: "full", webRoute: "/therapist/home", mobileRoute: "/(therapist)/home" },
+    learners: { access: "full", webRoute: "/therapist/sessions", mobileRoute: "/(therapist)/sessions" },
+    reports: { access: "linked", webRoute: "/therapist/reports" },
+    settings: { access: "linked", webRoute: "/therapist/settings" },
+  },
+
+  /* ──────────────────────────── Caregiver ──────────────────────────── */
+  caregiver: {
+    home: { access: "full", webRoute: "/caregiver/home", mobileRoute: "/(caregiver)/home" },
+    learners: { access: "full", webRoute: "/caregiver/learners", mobileRoute: "/(caregiver)/learners" },
+    messages: { access: "linked", webRoute: "/caregiver/messages" },
+    settings: { access: "linked", webRoute: "/caregiver/settings" },
+  },
 };
 
 /**
