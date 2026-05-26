@@ -164,6 +164,9 @@ export const iepRecords = pgTable(
 );
 
 // Sprint 8: invites for delegated district admin management.
+// Sprint 1 (invite-flows): also used for SCHOOL_ADMIN invites. The `role`
+// column distinguishes the two; `schoolId` is required for SCHOOL_ADMIN
+// and must reference a school within the same tenant.
 export const districtAdminInvites = pgTable(
   "district_admin_invites",
   {
@@ -173,6 +176,8 @@ export const districtAdminInvites = pgTable(
       .notNull(),
     email: varchar("email", { length: 255 }).notNull(),
     name: varchar("name", { length: 255 }).notNull(),
+    role: varchar("role", { length: 32 }).notNull().default("DISTRICT_ADMIN"),
+    schoolId: uuid("school_id").references(() => schools.id),
     invitedBy: uuid("invited_by")
       .references(() => users.id)
       .notNull(),
@@ -186,6 +191,7 @@ export const districtAdminInvites = pgTable(
   (table) => [
     index("idx_district_admin_invites_tenant").on(table.tenantId),
     index("idx_district_admin_invites_token").on(table.tokenHash),
+    index("idx_district_admin_invites_school").on(table.schoolId),
   ],
 );
 

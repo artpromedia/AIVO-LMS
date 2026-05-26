@@ -65,6 +65,10 @@ export function renderTemplate(
       return renderMfaCode(data);
     case "district_admin_invite":
       return renderDistrictAdminInvite(data);
+    case "school_admin_invite":
+      return renderSchoolAdminInvite(data);
+    case "staff_credentials":
+      return renderStaffCredentials(data);
     case "iep_in_review_parent":
       return renderIepInReviewParent(data);
     case "iep_finalised_parent":
@@ -265,6 +269,46 @@ function renderDistrictAdminInvite(data: TemplateData) {
     subject: `You're invited to administer ${districtName} on AIVO Learning`,
     html,
     text: `You've been invited as a district administrator for ${districtName} on AIVO Learning. Accept your invitation here: ${inviteUrl}\n\nThis link expires in 72 hours.`,
+  };
+}
+
+function renderSchoolAdminInvite(data: TemplateData) {
+  const name = (data.name as string) || "there";
+  const schoolName = (data.schoolName as string) || "your school";
+  const inviteUrl = (data.inviteUrl as string) || "#";
+  const html = baseLayout(`
+    <h1 class="title">You've been invited as a school administrator</h1>
+    <p class="body-text">Hi ${name},</p>
+    <p class="body-text">You've been invited to administer <span class="highlight">${schoolName}</span> on AIVO Learning. School admins manage teachers, classrooms, and staff within a single school.</p>
+    <p style="text-align:center"><a href="${inviteUrl}" class="btn">Accept Invitation</a></p>
+    <p class="body-text" style="font-size:13px;color:#6b7280">This invitation expires in 72 hours. After accepting, you'll be asked to set a password and enroll in multi-factor authentication. If you weren't expecting this, you can safely ignore this email.</p>
+  `);
+  return {
+    subject: `You're invited to administer ${schoolName} on AIVO Learning`,
+    html,
+    text: `You've been invited as a school administrator for ${schoolName} on AIVO Learning. Accept your invitation here: ${inviteUrl}\n\nThis link expires in 72 hours.`,
+  };
+}
+
+function renderStaffCredentials(data: TemplateData) {
+  const name = (data.name as string) || "there";
+  const roleLabel = (data.roleLabel as string) || "staff member";
+  const schoolName = (data.schoolName as string) || "your school";
+  const tempPassword = (data.tempPassword as string) || "";
+  const loginUrl = (data.loginUrl as string) || "#";
+  const html = baseLayout(`
+    <h1 class="title">Your AIVO Learning account is ready</h1>
+    <p class="body-text">Hi ${name},</p>
+    <p class="body-text">An administrator has created an AIVO Learning account for you as a ${roleLabel} at <span class="highlight">${schoolName}</span>.</p>
+    <p class="body-text"><strong>Temporary password:</strong></p>
+    <p style="text-align:center;font-family:monospace;font-size:18px;background:#F3F4F6;padding:12px 16px;border-radius:8px;letter-spacing:1px;">${tempPassword}</p>
+    <p style="text-align:center"><a href="${loginUrl}" class="btn">Sign in</a></p>
+    <p class="body-text" style="font-size:13px;color:#6b7280">You'll be required to change this password the first time you sign in. If you weren't expecting this email, please contact your school administrator.</p>
+  `);
+  return {
+    subject: `Your AIVO Learning account is ready`,
+    html,
+    text: `Your AIVO Learning account is ready. Temporary password: ${tempPassword}\nSign in here: ${loginUrl}\nYou'll be required to change this password on first sign-in.`,
   };
 }
 
@@ -494,6 +538,8 @@ export const AVAILABLE_TEMPLATES = [
   { id: "iep_update", name: "IEP Goal Update", channels: ["email", "push"] },
   { id: "mfa_code", name: "MFA Verification Code", channels: ["email"] },
   { id: "district_admin_invite", name: "District Admin Invite", channels: ["email"] },
+  { id: "school_admin_invite", name: "School Admin Invite", channels: ["email"] },
+  { id: "staff_credentials", name: "Staff Credentials (Temp Password)", channels: ["email"] },
   { id: "iep_in_review_parent", name: "IEP — In Review (Parent)", channels: ["email"] },
   { id: "iep_finalised_parent", name: "IEP — Finalised (Parent)", channels: ["email"] },
   { id: "iep_comment_mention", name: "IEP — Comment Mention", channels: ["email"] },

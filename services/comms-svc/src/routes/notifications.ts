@@ -18,6 +18,8 @@ import {
   internalTeamInviteSchema,
   internalPasswordResetSchema,
   internalDistrictAdminInviteSchema,
+  internalSchoolAdminInviteSchema,
+  internalStaffCredentialsSchema,
   internalAdminAlertSchema,
   internalSpeechBuddySafetySchema,
   internalBillingAlertSchema,
@@ -576,6 +578,94 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any) {
       } catch (err: any) {
         logger.error({ err, to }, "Failed to send district admin invite email");
         return reply.code(500).send({ error: "Failed to send invite" });
+      }
+    },
+  );
+
+  app.post(
+    "/api/comms/internal/school-admin-invite",
+    { schema: internalSchoolAdminInviteSchema },
+    async (request, reply) => {
+      const internalKey = request.headers["x-internal-key"];
+      const expectedKey =
+        process.env.INTERNAL_SERVICE_KEY ||
+        (process.env.NODE_ENV === "production" ? "" : "aivo-internal-dev-key");
+      if (!internalKey || !expectedKey || internalKey !== expectedKey) {
+        return reply.status(401).send({ error: "Unauthorized" });
+      }
+      const { to, name, schoolName, inviteUrl } = request.body as any;
+      if (!to || !inviteUrl) {
+        return reply.code(400).send({ error: "to and inviteUrl required" });
+      }
+      if (!isConfigured()) {
+        logger.warn(
+          { to },
+          "School admin invite requested but email not configured, link logged for dev",
+        );
+        return { status: "dev_mode", inviteUrl };
+      }
+      const rendered = renderTemplate("school_admin_invite", {
+        name: name || "there",
+        schoolName: schoolName || "your school",
+        inviteUrl,
+      });
+      try {
+        const result = await sendEmail({
+          to,
+          subject: rendered.subject,
+          htmlBody: rendered.html,
+          textBody: rendered.text,
+          tag: "school_admin_invite",
+        });
+        return { status: result.status, messageId: result.messageId };
+      } catch (err: any) {
+        logger.error({ err, to }, "Failed to send school admin invite email");
+        return reply.code(500).send({ error: "Failed to send invite" });
+      }
+    },
+  );
+
+  app.post(
+    "/api/comms/internal/staff-credentials",
+    { schema: internalStaffCredentialsSchema },
+    async (request, reply) => {
+      const internalKey = request.headers["x-internal-key"];
+      const expectedKey =
+        process.env.INTERNAL_SERVICE_KEY ||
+        (process.env.NODE_ENV === "production" ? "" : "aivo-internal-dev-key");
+      if (!internalKey || !expectedKey || internalKey !== expectedKey) {
+        return reply.status(401).send({ error: "Unauthorized" });
+      }
+      const { to, name, roleLabel, schoolName, tempPassword, loginUrl } = request.body as any;
+      if (!to || !tempPassword) {
+        return reply.code(400).send({ error: "to and tempPassword required" });
+      }
+      if (!isConfigured()) {
+        logger.warn(
+          { to },
+          "Staff credentials requested but email not configured, link logged for dev",
+        );
+        return { status: "dev_mode" };
+      }
+      const rendered = renderTemplate("staff_credentials", {
+        name: name || "there",
+        roleLabel: roleLabel || "staff member",
+        schoolName: schoolName || "your school",
+        tempPassword,
+        loginUrl: loginUrl || "#",
+      });
+      try {
+        const result = await sendEmail({
+          to,
+          subject: rendered.subject,
+          htmlBody: rendered.html,
+          textBody: rendered.text,
+          tag: "staff_credentials",
+        });
+        return { status: result.status, messageId: result.messageId };
+      } catch (err: any) {
+        logger.error({ err, to }, "Failed to send staff credentials email");
+        return reply.code(500).send({ error: "Failed to send credentials" });
       }
     },
   );

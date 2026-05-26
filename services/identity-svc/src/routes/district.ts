@@ -614,7 +614,7 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
       const [existing] = await db.select().from(users).where(eq(users.email, email)).limit(1);
       if (existing) return reply.status(409).send({ error: "Email already in use" });
 
-      const tempPassword = crypto.randomBytes(6).toString("base64url");
+      const tempPassword = crypto.randomBytes(12).toString("base64url");
       const [user] = await db
         .insert(users)
         .values({
@@ -623,10 +623,12 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
           email,
           role,
           passwordHash: await argon2.hash(tempPassword),
+          mustChangePassword: true,
           schoolId: assignSchoolId || null,
-        })
+        } as any)
         .returning();
 
+      let schoolName: string | undefined;
       if (assignSchoolId) {
         const [schoolExists] = await db
           .select()
@@ -634,11 +636,39 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
           .where(and(eq(schools.id, assignSchoolId), eq(schools.tenantId, tid)))
           .limit(1);
         if (schoolExists) {
+          schoolName = schoolExists.name;
           await db
             .insert(staffAssignments)
             .values({ userId: user.id, schoolId: assignSchoolId })
             .onConflictDoNothing();
         }
+      }
+
+      // Email the temporary password — never return it in the HTTP
+      // response. The admin used to copy-paste from the API result and
+      // hand it over out-of-band; now the staff member gets it directly
+      // in their inbox and is forced to rotate it on first sign-in.
+      const internalKey = process.env.INTERNAL_SERVICE_KEY || DEV_INTERNAL_KEY;
+      const loginUrl = `${process.env.WEB_BASE_URL || "https://app.aivolearning.com"}/login`;
+      const roleLabel =
+        role === "TEACHER" ? "teacher" : role === "THERAPIST" ? "therapist" : "caregiver";
+      try {
+        await fetch(`${COMMS_SVC_URL}/api/comms/internal/staff-credentials`, {
+          method: "POST",
+          headers: { "content-type": "application/json", "x-internal-key": internalKey },
+          body: JSON.stringify({
+            to: email,
+            name,
+            roleLabel,
+            schoolName,
+            tempPassword,
+            loginUrl,
+          }),
+        });
+      } catch (err) {
+        // Fail-soft: the account exists; an admin can issue a password
+        // reset to re-deliver credentials.
+        req.log?.warn?.({ err: String(err) }, "staff credentials email enqueue failed");
       }
 
       await logActivity(
@@ -649,12 +679,11 @@ export async function registerDistrictRoutes(app: FastifyInstance) {
         req.user.name || req.user.email,
         "user",
         user.id,
-        { name, email, role },
+        { name, email, role, schoolId: assignSchoolId || null },
       );
 
       return {
         user: { id: user.id, name: user.name, email: user.email, role: user.role },
-        temporaryPassword: tempPassword,
       };
     },
   );
