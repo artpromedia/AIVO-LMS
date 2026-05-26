@@ -5595,3 +5595,143 @@ export function upsertLearnerSensoryModality(
   store.learnerSensoryProfiles.set(learnerId, next);
   return next;
 }
+
+// ---------------------------------------------------------------------------
+// Sprint 7 — school admin dashboard. The previous `/admin/school` page
+// rendered hardcoded values (school name, learner count, consent %, etc.).
+// `getSchoolDashboard` collapses the relevant repos into one server-side
+// payload so the page can fetch real numbers and the test suite has one
+// observable surface to pin.
+// ---------------------------------------------------------------------------
+
+export interface SchoolDashboardSnapshot {
+  /** Returns null when no school/tenant maps to the caller. */
+  school: { id: string | null; name: string; districtId: string | null } | null;
+  counts: {
+    learners: number;
+    staff: number;
+    classes: number;
+    iepsOnFile: number;
+    auditEvents30d: number;
+    moderationFlagged7d: number;
+    consentCompletePct: number;
+  };
+  licenses: {
+    used: number;
+    total: number;
+    utilizationPct: number;
+  };
+  rostering: {
+    source: string;
+    lastSyncIso: string | null;
+    lastErrorIso: string | null;
+    status: "healthy" | "warning" | "error" | "unknown";
+  };
+}
+
+export function getSchoolDashboard(
+  tenantId: string,
+  schoolId?: string,
+): SchoolDashboardSnapshot {
+  const store = db();
+  const tenant = getTenantById(tenantId);
+  const schools = listSchools(tenantId);
+  const school =
+    schools.find((s) => (schoolId ? s.id === schoolId : true)) ?? schools[0] ?? null;
+
+  const learners = Array.from(store.learnerProfiles.values()).filter(
+    (l) => l.tenantId === tenantId,
+  );
+  const staff = listUsersForTenants([tenantId]).filter((u) =>
+    ["TEACHER", "SCHOOL_ADMIN", "DISTRICT_ADMIN", "THERAPIST"].includes(u.role as string),
+  );
+  const classes = listClassrooms({
+    tenantId,
+    schoolId: school?.id,
+  });
+
+  const ieps = Array.from(store.iepDocuments.values()).filter((d) => {
+    const l = store.learnerProfiles.get(d.learnerId);
+    return l?.tenantId === tenantId;
+  });
+
+  const auditLogs = listAuditLogsForTenants([tenantId], 1000);
+  const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+  const auditEvents30d = auditLogs.filter(
+    (a) => new Date(a.createdAt).getTime() >= thirtyDaysAgo,
+  ).length;
+
+  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const moderationFlagged7d = Array.from(store.moderationEvents.values()).filter(
+    (m) =>
+      m.tenantId === tenantId && new Date(m.createdAt).getTime() >= sevenDaysAgo,
+  ).length;
+
+  // Count UNIQUE learners with at least one consent record on file —
+  // the seed writes one record per consent version per learner, so a
+  // naïve rows/learners ratio over-reports (a learner with 5 versions
+  // would count as 500%). Cap at 100 % defensively too.
+  const consentedLearners = new Set(
+    (store.consentRecords ?? [])
+      .filter((c) => c.tenantId === tenantId)
+      .map((c) => c.learnerId)
+      .filter((id): id is string => typeof id === "string" && id.length > 0),
+  );
+  const consentCompletePct =
+    learners.length === 0
+      ? 100
+      : Math.min(
+          100,
+          Math.round((consentedLearners.size / learners.length) * 100),
+        );
+
+  // License pool — use tenant.seatLimit when present, fall back to learner+staff.
+  const totalSeats =
+    (tenant as { seatLimit?: number } | null)?.seatLimit ?? learners.length + staff.length;
+  const usedSeats = learners.length + staff.length;
+  const utilizationPct =
+    totalSeats === 0 ? 0 : Math.round((usedSeats / totalSeats) * 100);
+
+  // Rostering — last successful job if any, else "unknown".
+  const rosteringJobs = Array.from(store.aiGenerationJobs?.values?.() ?? []).filter(
+    (j) => (j as { tenantId?: string }).tenantId === tenantId && (j as { kind?: string }).kind === "rostering_import",
+  );
+  rosteringJobs.sort((a, b) => {
+    const ta = new Date((a as { updatedAt?: string }).updatedAt ?? 0).getTime();
+    const tb = new Date((b as { updatedAt?: string }).updatedAt ?? 0).getTime();
+    return tb - ta;
+  });
+  const lastJob = rosteringJobs[0] as
+    | { status?: string; updatedAt?: string; source?: string }
+    | undefined;
+  const lastSyncIso = lastJob?.updatedAt ?? null;
+  const status: SchoolDashboardSnapshot["rostering"]["status"] = !lastJob
+    ? "unknown"
+    : lastJob.status === "succeeded"
+      ? "healthy"
+      : lastJob.status === "failed"
+        ? "error"
+        : "warning";
+
+  return {
+    school: school
+      ? { id: school.id, name: school.name, districtId: school.districtId ?? null }
+      : { id: null, name: tenant?.name ?? "(unnamed school)", districtId: null },
+    counts: {
+      learners: learners.length,
+      staff: staff.length,
+      classes: classes.length,
+      iepsOnFile: ieps.length,
+      auditEvents30d,
+      moderationFlagged7d,
+      consentCompletePct,
+    },
+    licenses: { used: usedSeats, total: totalSeats, utilizationPct },
+    rostering: {
+      source: lastJob?.source ?? "manual",
+      lastSyncIso,
+      lastErrorIso: null,
+      status,
+    },
+  };
+}
