@@ -2422,3 +2422,68 @@ export type CaregiverObservation = {
   attachmentUrl: string | null;
   createdAt: ISODate;
 };
+
+// ---------------------------------------------------------------------------
+// Sprint 11 — AI-drafted IEPs surfaced to the teacher review queue.
+// Mirrors the iep_drafts postgres table introduced by services/ai-svc
+// Sprint 6; here we use it client-side so the teacher dashboard can
+// show / edit / approve drafts before the IEP team finalises.
+// ---------------------------------------------------------------------------
+
+export type IepAiDraftStatus =
+  | "ai_draft"
+  | "teacher_review"
+  | "admin_approved"
+  | "active"
+  | "archived";
+
+export type IepAiDraftGoal = {
+  domain: string;
+  goalText: string;
+  baseline: string;
+  targetCriteria: string;
+  measurableCriteria: string;
+  evidence: string[];
+};
+
+export type IepAiDraftAccommodation = {
+  type: string;
+  description: string;
+  frequency: string;
+  rationale: string;
+  priority: number;
+};
+
+export type IepAiDraftService = {
+  serviceType: string;
+  minutesPerWeek: number;
+  frequency: string;
+  location: string;
+  rationale: string;
+};
+
+export type IepAiDraftBody = {
+  summary: string;
+  goals: IepAiDraftGoal[];
+  accommodations: IepAiDraftAccommodation[];
+  services: IepAiDraftService[];
+  risks: string[];
+};
+
+export type IepAiDraftRecord = {
+  id: ID;
+  tenantId: ID;
+  learnerId: ID;
+  sourceAttemptId: ID | null;
+  status: IepAiDraftStatus;
+  draft: IepAiDraftBody;
+  model: string | null;
+  responsibleAi: Record<string, unknown>;
+  generatedAt: ISODate;
+  reviewedByUserId: ID | null;
+  reviewedAt: ISODate | null;
+  approvedByUserId: ID | null;
+  approvedAt: ISODate | null;
+  createdAt: ISODate;
+  updatedAt: ISODate;
+};

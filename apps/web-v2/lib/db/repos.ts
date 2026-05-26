@@ -6177,3 +6177,189 @@ export function createCaregiverObservation(input: {
   db().caregiverObservations.set(rec.id, rec);
   return rec;
 }
+
+// ---------------------------------------------------------------------------
+// Sprint 11 — teacher IEP authoring + gradebook detail.
+//
+// upsertIepAiDraft persists the response from POST /api/ai/iep/draft
+// so the teacher can review and progress the draft through the
+// lifecycle (ai_draft → teacher_review → admin_approved → active).
+// One row per learner; regenerations overwrite.
+// ---------------------------------------------------------------------------
+
+export function upsertIepAiDraft(input: {
+  tenantId: string;
+  learnerId: string;
+  sourceAttemptId?: string | null;
+  draft: import("./types").IepAiDraftBody;
+  model?: string | null;
+  responsibleAi?: Record<string, unknown>;
+}): import("./types").IepAiDraftRecord {
+  const store = db();
+  const now = nowIso();
+  const existing = Array.from(store.iepAiDrafts.values()).find(
+    (d) => d.learnerId === input.learnerId && d.tenantId === input.tenantId,
+  );
+  if (existing) {
+    existing.draft = input.draft;
+    existing.model = input.model ?? existing.model;
+    existing.responsibleAi = input.responsibleAi ?? existing.responsibleAi;
+    existing.generatedAt = now;
+    existing.updatedAt = now;
+    existing.status = "ai_draft";
+    existing.reviewedByUserId = null;
+    existing.reviewedAt = null;
+    existing.approvedByUserId = null;
+    existing.approvedAt = null;
+    return existing;
+  }
+  const rec: import("./types").IepAiDraftRecord = {
+    id: newId("iep-draft"),
+    tenantId: input.tenantId,
+    learnerId: input.learnerId,
+    sourceAttemptId: input.sourceAttemptId ?? null,
+    status: "ai_draft",
+    draft: input.draft,
+    model: input.model ?? null,
+    responsibleAi: input.responsibleAi ?? {},
+    generatedAt: now,
+    reviewedByUserId: null,
+    reviewedAt: null,
+    approvedByUserId: null,
+    approvedAt: null,
+    createdAt: now,
+    updatedAt: now,
+  };
+  store.iepAiDrafts.set(rec.id, rec);
+  return rec;
+}
+
+export function getIepAiDraft(
+  learnerId: string,
+  tenantId: string,
+): import("./types").IepAiDraftRecord | null {
+  return (
+    Array.from(db().iepAiDrafts.values()).find(
+      (d) => d.learnerId === learnerId && d.tenantId === tenantId,
+    ) ?? null
+  );
+}
+
+export function listIepAiDraftsForReviewer(
+  reviewerUserId: string,
+  tenantId: string,
+): import("./types").IepAiDraftRecord[] {
+  // Sprint 11: a teacher sees drafts for every learner on their roster.
+  const learnerIds = new Set(
+    listLearnersForTeacher(reviewerUserId, tenantId).map((l) => l.id),
+  );
+  return Array.from(db().iepAiDrafts.values())
+    .filter((d) => d.tenantId === tenantId && learnerIds.has(d.learnerId))
+    .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
+}
+
+export function progressIepAiDraft(
+  id: string,
+  tenantId: string,
+  userId: string,
+  next: import("./types").IepAiDraftStatus,
+): import("./types").IepAiDraftRecord | null {
+  const d = db().iepAiDrafts.get(id);
+  if (!d || d.tenantId !== tenantId) return null;
+  const allowed: Record<
+    import("./types").IepAiDraftStatus,
+    import("./types").IepAiDraftStatus[]
+  > = {
+    ai_draft: ["teacher_review", "archived"],
+    teacher_review: ["admin_approved", "ai_draft", "archived"],
+    admin_approved: ["active", "archived"],
+    active: ["archived"],
+    archived: [],
+  };
+  if (!allowed[d.status].includes(next)) return null;
+  d.status = next;
+  d.updatedAt = nowIso();
+  if (next === "teacher_review") {
+    d.reviewedByUserId = userId;
+    d.reviewedAt = nowIso();
+  }
+  if (next === "admin_approved") {
+    d.approvedByUserId = userId;
+    d.approvedAt = nowIso();
+  }
+  return d;
+}
+
+// ---------------------------------------------------------------------------
+// Teacher gradebook detail. Returns per-skill mastery summary across the
+// learner's enrolled subjects so the teacher can see WHERE the learner
+// is and WHERE they're stuck without scrolling through raw LessonRuns.
+// ---------------------------------------------------------------------------
+
+export interface GradebookRow {
+  subjectId: string;
+  subjectName: string;
+  skillId: string;
+  skillName: string;
+  level: "introduced" | "developing" | "secure" | "mastered" | "unattempted";
+  lastPracticedIso: string | null;
+  attempts: number;
+}
+
+export interface GradebookDetail {
+  learnerId: string;
+  rows: GradebookRow[];
+  summary: { mastered: number; secure: number; developing: number; introduced: number };
+}
+
+export function getGradebookDetail(
+  learnerId: string,
+  tenantId: string,
+): GradebookDetail {
+  const mastery = getMasteryMap(learnerId, tenantId);
+  const subjects = new Map(listSubjects().map((s) => [s.id, s]));
+  const skills = new Map(listSkills().map((s) => [s.id, s]));
+
+  // Count lesson runs per skill + last-practiced timestamp.
+  const lastByskill = new Map<string, string>();
+  const attemptsBySkill = new Map<string, number>();
+  for (const lr of Array.from(db().lessonRuns.values())) {
+    const t = lr as { learnerId?: string; tenantId?: string; skillId?: string; createdAt?: string };
+    if (t.tenantId !== tenantId || t.learnerId !== learnerId || !t.skillId) continue;
+    attemptsBySkill.set(t.skillId, (attemptsBySkill.get(t.skillId) ?? 0) + 1);
+    const prev = lastByskill.get(t.skillId);
+    if (!prev || (t.createdAt && t.createdAt > prev)) {
+      if (t.createdAt) lastByskill.set(t.skillId, t.createdAt);
+    }
+  }
+
+  const rows: GradebookRow[] = [];
+  const entries = mastery?.entries ?? [];
+  for (const m of entries) {
+    const sk = skills.get(m.skillId);
+    if (!sk) continue;
+    const subj = subjects.get(sk.subjectId);
+    if (!subj) continue;
+    rows.push({
+      subjectId: subj.id,
+      subjectName: subj.name,
+      skillId: sk.id,
+      skillName: sk.name,
+      level: m.level as GradebookRow["level"],
+      lastPracticedIso: lastByskill.get(sk.id) ?? null,
+      attempts: attemptsBySkill.get(sk.id) ?? 0,
+    });
+  }
+  rows.sort((a, b) => {
+    const order = { mastered: 0, secure: 1, developing: 2, introduced: 3, unattempted: 4 };
+    return (order[a.level] ?? 5) - (order[b.level] ?? 5) ||
+      a.subjectName.localeCompare(b.subjectName);
+  });
+  const summary = {
+    mastered: rows.filter((r) => r.level === "mastered").length,
+    secure: rows.filter((r) => r.level === "secure").length,
+    developing: rows.filter((r) => r.level === "developing").length,
+    introduced: rows.filter((r) => r.level === "introduced").length,
+  };
+  return { learnerId, rows, summary };
+}

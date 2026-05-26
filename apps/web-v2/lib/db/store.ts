@@ -121,6 +121,7 @@ import type {
   IepGoalRecord,
   TherapistSessionNote,
   CaregiverObservation,
+  IepAiDraftRecord,
 } from "@/lib/db/types";
 
 export type Store = {
@@ -237,6 +238,11 @@ export type Store = {
   iepGoalRecords: Map<string, IepGoalRecord>;
   therapistSessionNotes: Map<string, TherapistSessionNote>;
   caregiverObservations: Map<string, CaregiverObservation>;
+
+  // Sprint 11 — AI-drafted IEPs from services/ai-svc /api/ai/iep/draft.
+  // One row per learner; regenerations upsert. Tracks the review
+  // lifecycle so the teacher dashboard can render an inbox.
+  iepAiDrafts: Map<string, IepAiDraftRecord>;
 
   // Sprint 30: Billing / AI Cost / Migration
   plans: Map<string, Plan>;
@@ -374,6 +380,7 @@ function createStore(): Store {
     iepGoalRecords: new Map(),
     therapistSessionNotes: new Map(),
     caregiverObservations: new Map(),
+    iepAiDrafts: new Map(),
 
     plans: new Map(),
     prices: new Map(),
