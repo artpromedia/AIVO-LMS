@@ -1,0 +1,25 @@
+# CVE allow-list for the AIVO LMS security gates.
+#
+# Trivy / Bandit / pnpm audit now block the CI build on HIGH or CRITICAL
+# findings (Sprint 12.6). When a finding is acknowledged but cannot be
+# remediated immediately, add it here with an explicit expiry so the
+# build trips again when the suppression window closes.
+#
+# Format (every field is required):
+#
+# - id: CVE-XXXX-YYYY       # the upstream advisory id (CVE, GHSA, etc.)
+#   reason: "<one-line why>" # short rationale visible in the PR comment
+#   expires: "YYYY-MM-DD"    # ISO date; the build fails if today >= expires
+#   owner: "@github-handle"  # the human accountable for revisiting it
+#
+# Example (commented out):
+#
+# - id: CVE-2026-12345
+#   reason: "Upstream patch lands in foo@2.1; pinned mitigation in place."
+#   expires: "2026-08-31"
+#   owner: "@aivo-platform"
+#
+# Keep this file empty unless an active suppression is in flight — the
+# expiry check (scripts/ci/check-cve-allowlist-expiry.mjs) fails the
+# build the moment any entry expires.
+allowlist: []

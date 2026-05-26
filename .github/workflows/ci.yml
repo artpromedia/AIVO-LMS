@@ -250,6 +250,56 @@ jobs:
       - name: Run comms-svc tests (email-events webhook)
         run: pnpm --filter @aivo/comms-svc test
 
+  # Sprint 12.6 — gate `pnpm test:integration` and `pnpm test:enterprise`
+  # on every PR. Both suites were previously runnable but not wired into
+  # CI, so contract drift could land silently. The setup steps mirror
+  # the production-readiness-check job (Postgres service, frozen
+  # lockfile, root deps installed).
+  integration-and-enterprise-tests:
+    name: Integration & Enterprise Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs: lint-and-typecheck
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: aivo_test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build foundational packages
+        run: pnpm --filter @aivo/db --filter @aivo/security --filter @aivo/observability --filter @aivo/scheduling build
+
+      - name: Run integration tests
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/aivo_test_db
+        run: pnpm test:integration
+
+      - name: Run enterprise tests
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/aivo_test_db
+        run: pnpm test:enterprise
+
   brain-svc:
     name: Brain Service (Python)
     runs-on: ubuntu-latest
@@ -402,31 +452,49 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Sprint 12.6 — fail the build if any allow-list entry has expired
+      # BEFORE running the scanners so we surface the policy debt loudly.
+      - name: Check CVE allow-list expiry
+        run: node scripts/ci/check-cve-allowlist-expiry.mjs
+
       - name: Run Trivy vulnerability scanner
         id: trivy
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: fs
           scan-ref: .
-          severity: CRITICAL,HIGH
+          # Sprint 12.6 — gate on HIGH + CRITICAL only. Acknowledged
+          # CVEs are recorded in .github/CVE_ALLOWLIST.yml with an
+          # explicit expiry date.
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+          ignore-unfixed: true
           format: sarif
           output: trivy-results.sarif
-        continue-on-error: true
+        continue-on-error: false
 
       - name: Python security check (bandit)
         id: bandit
         run: |
           pip install bandit
-          bandit -r services/brain-svc/src -f json -o bandit-report.json
-        continue-on-error: true
+          # Sprint 12.6 — blocking; only HIGH severity findings stop the
+          # build. Lower-severity findings still land in the JSON
+          # artifact for triage.
+          bandit -r services/brain-svc/src --severity-level high -f json -o bandit-report.json
+        continue-on-error: false
 
       - name: pnpm audit
         id: pnpm_audit
         run: |
           corepack enable
           pnpm install --frozen-lockfile
+          # Sprint 12.6 — blocking at --audit-level=high.
           pnpm audit --audit-level=high
-        continue-on-error: true
+        continue-on-error: false
 
       - name: Upload security artifacts
         if: always()
@@ -448,15 +516,15 @@ jobs:
             const pnpmAudit = '${{ steps.pnpm_audit.outcome }}';
             const status = (s) => s === 'success' ? '✅ pass' : (s === 'failure' ? '⚠️ findings' : `ℹ️ ${s}`);
             const body = [
-              '### 🔒 Security Scan Summary (non-blocking)',
+              '### Security Scan Summary (blocking — Sprint 12.6)',
               '',
               `| Scanner | Result |`,
               `| --- | --- |`,
-              `| Trivy (filesystem CVEs) | ${status(trivy)} |`,
-              `| Bandit (Python SAST) | ${status(bandit)} |`,
-              `| pnpm audit (npm CVEs) | ${status(pnpmAudit)} |`,
+              `| Trivy (filesystem CVEs, HIGH+CRITICAL) | ${status(trivy)} |`,
+              `| Bandit (Python SAST, --severity-level high) | ${status(bandit)} |`,
+              `| pnpm audit (npm CVEs, --audit-level=high) | ${status(pnpmAudit)} |`,
               '',
-              'Findings are uploaded as the `security-scan-results` workflow artifact. These do not block merge but should be triaged.',
+              'Findings are uploaded as the `security-scan-results` workflow artifact. These now BLOCK merge — acknowledged CVEs must be added to `.github/CVE_ALLOWLIST.yml` with an explicit expiry.',
             ].join('\n');
             await github.rest.issues.createComment({
               issue_number: context.issue.number,
@@ -476,6 +544,7 @@ jobs:
       - ai-svc
       - mobile-expo-check
       - security-scan
+      - integration-and-enterprise-tests
     steps:
       - name: Report job statuses
         env:
@@ -485,6 +554,7 @@ jobs:
           AI: ${{ needs.ai-svc.result }}
           MOBILE: ${{ needs.mobile-expo-check.result }}
           SECURITY: ${{ needs.security-scan.result }}
+          INTEG: ${{ needs.integration-and-enterprise-tests.result }}
         run: |
           echo "## CI Pipeline Summary" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
@@ -495,14 +565,15 @@ jobs:
           echo "| Brain Service | $BRAIN |" >> "$GITHUB_STEP_SUMMARY"
           echo "| AI Service | $AI |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Mobile Expo Check | $MOBILE |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Security Scan (non-blocking) | $SECURITY |" >> "$GITHUB_STEP_SUMMARY"
-          # Fail summary only if a blocking job failed (security is non-blocking)
-          for r in "$LINT" "$BUILD" "$BRAIN" "$AI" "$MOBILE"; do
+          echo "| Security Scan (blocking — Sprint 12.6) | $SECURITY |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Integration & Enterprise Tests | $INTEG |" >> "$GITHUB_STEP_SUMMARY"
+          # Sprint 12.6 — security + integration suites now block the build.
+          for r in "$LINT" "$BUILD" "$BRAIN" "$AI" "$MOBILE" "$SECURITY" "$INTEG"; do
             if [ "$r" = "failure" ] || [ "$r" = "cancelled" ]; then
               echo ""
-              echo "❌ One or more blocking jobs failed."
+              echo "One or more blocking jobs failed."
               exit 1
             fi
           done
           echo ""
-          echo "✅ All blocking jobs passed."
+          echo "All blocking jobs passed."
