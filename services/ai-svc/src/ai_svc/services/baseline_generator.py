@@ -10,6 +10,7 @@ from .baseline_surface_contract import (
     render_prompt_section as render_surface_prompt_section,
 )
 from .baseline_item_templates import render_template_examples
+from .baseline_schemas import render_schema_prompt_section
 
 
 CURRICULUM_FRAMEWORK_GUIDANCE = {
@@ -683,5 +684,13 @@ Return ONLY the JSON object, no markdown formatting or code blocks."""
     surface_addendum += render_template_examples("math") + "\n\n"
     surface_addendum += render_template_examples("geometry") + "\n"
     user_prompt = user_prompt + surface_addendum
+
+    # Sprint 2 — append the strict output schema. Listed AFTER the
+    # legacy example so the schema's "no extra fields, exact subject
+    # enum" rules win on conflict — providers that read top-to-bottom
+    # (Anthropic, Gemini) bias toward the most recent guidance, and the
+    # validator on the route side enforces this contract regardless of
+    # which guidance the model decides to follow.
+    user_prompt += "\n\n" + render_schema_prompt_section()
 
     return system_prompt, user_prompt

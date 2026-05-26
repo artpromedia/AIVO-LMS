@@ -11,6 +11,10 @@ from ..services.quality_gate import run_quality_gate
 from ..services.baseline_generator import build_baseline_generation_prompt
 from ..services.responsible_ai_client import evaluate as evaluate_responsible_ai
 from ..services.curriculum_client import load_curriculum_grounding
+from ..services.baseline_schemas import (
+    validate_baseline_payload,
+    validate_questions_subset,
+)
 
 logger = logging.getLogger("ai-svc.generate")
 
@@ -242,52 +246,100 @@ async def generate_baseline(req: BaselineRequest):
         curriculum_grounding=curriculum_grounding,
     )
 
-    try:
-        result = await generate_completion(
+    # Sprint 2 — JSON-mode hint. Providers that natively support
+    # response_format (Anthropic, OpenAI, Gemini via LiteLLM) will bias
+    # toward strictly-formatted output; others fall back to the
+    # schema-instructed prompt and are still caught by the pydantic
+    # validator below.
+    response_format = {"type": "json_object"}
+
+    async def _call(extra_user: str = "") -> dict:
+        return await generate_completion(
             system_prompt=system_prompt,
-            user_prompt=user_prompt,
+            user_prompt=user_prompt + extra_user,
             max_tokens=4000,
             temperature=0.6,
+            response_format=response_format,
         )
+
+    try:
+        result = await _call()
     except Exception as e:
         raise HTTPException(status_code=503, detail=f"LLM baseline generation failed: {str(e)}")
 
-    raw = result["content"].strip()
-    if raw.startswith("```"):
-        raw = raw.split("\n", 1)[1] if "\n" in raw else raw[3:]
-        if raw.endswith("```"):
-            raw = raw[:-3]
+    def _parse_json(content: str) -> dict | None:
+        raw = (content or "").strip()
+        if raw.startswith("```"):
+            raw = raw.split("\n", 1)[1] if "\n" in raw else raw[3:]
+            if raw.endswith("```"):
+                raw = raw[:-3]
+        try:
+            obj = json.loads(raw)
+        except json.JSONDecodeError:
+            return None
+        return obj if isinstance(obj, dict) else None
 
-    try:
-        parsed = json.loads(raw)
-        questions = parsed.get("questions", [])
-    except json.JSONDecodeError:
-        logger.error(f"Failed to parse baseline JSON: {raw[:200]}")
-        raise HTTPException(status_code=502, detail="AI returned invalid JSON for baseline questions")
+    parsed = _parse_json(result["content"])
+    payload = None
+    errors: list[str] = []
+    if parsed is None:
+        errors = ["payload: response was not valid JSON"]
+    else:
+        payload, errors = validate_baseline_payload(parsed)
 
-    REQUIRED_SUBJECTS = {"math", "ela", "science", "speech", "sel", "life_skills", "executive_function"}
-    valid_questions = []
-    for q in questions:
-        if not isinstance(q, dict):
-            continue
-        if not all(k in q for k in ("id", "subject", "questionText", "options", "correctAnswer")):
-            continue
-        if not isinstance(q["options"], list) or len(q["options"]) < 2:
-            continue
-        valid_answers = {o.get("value") for o in q["options"] if isinstance(o, dict) and "value" in o}
-        if q["correctAnswer"] not in valid_answers:
-            continue
-        if q.get("subject") not in REQUIRED_SUBJECTS:
-            continue
-        valid_questions.append(q)
+    # Sprint 2 — one-shot auto-correction. If full-payload validation
+    # failed, send the structured error messages back to the LLM and
+    # ask it to repair the output. We do NOT loop forever: one retry,
+    # then we fall through to partial-validation salvage.
+    if payload is None and errors:
+        repair_addendum = (
+            "\n\n## REPAIR REQUEST\nYour previous output failed validation. "
+            "Fix EVERY error below and return a corrected JSON object that "
+            "matches the Output Schema above. Do not include any field not "
+            "listed in the schema.\n\n"
+            + "\n".join(f"- {e}" for e in errors[:25])
+        )
+        try:
+            result = await _call(extra_user=repair_addendum)
+            parsed = _parse_json(result["content"])
+            if parsed is not None:
+                payload, errors = validate_baseline_payload(parsed)
+        except Exception as e:  # noqa: BLE001 — retry is best-effort.
+            logger.warning(f"baseline repair retry failed: {e}")
 
-    if len(valid_questions) < 14:
-        raise HTTPException(status_code=502, detail=f"AI generated too few valid questions ({len(valid_questions)}), expected at least 14")
-
-    questions = valid_questions
+    # Sprint 2 — partial-success salvage. If full validation still
+    # fails, accept every individually-valid question rather than 502-ing
+    # the entire generation; the >=14 threshold guards against thin
+    # responses. This restores graceful degradation while preserving
+    # the strictness of per-item validation.
+    if payload is None:
+        valid_items, item_errors = validate_questions_subset(parsed or {})
+        logger.info(
+            "baseline structured-output salvage: %d valid items, %d errors",
+            len(valid_items), len(item_errors),
+        )
+        if len(valid_items) < 14:
+            raise HTTPException(
+                status_code=502,
+                detail=(
+                    f"AI generated too few valid questions ({len(valid_items)}), "
+                    f"expected at least 14"
+                ),
+            )
+        questions_out = [q.model_dump(exclude_none=True) for q in valid_items]
+    else:
+        if len(payload.questions) < 14:
+            raise HTTPException(
+                status_code=502,
+                detail=(
+                    f"AI generated too few valid questions ({len(payload.questions)}), "
+                    f"expected at least 14"
+                ),
+            )
+        questions_out = [q.model_dump(exclude_none=True) for q in payload.questions]
 
     return BaselineResponse(
-        questions=questions,
+        questions=questions_out,
         subjects=SUBJECTS,
         model=result["model"],
         prompt_tokens=result["prompt_tokens"],
