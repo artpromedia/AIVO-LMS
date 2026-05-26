@@ -1,4 +1,5 @@
 import { test, expect, request as pwRequest } from "@playwright/test";
+import { seedOrThrow } from "./sprint12/_seed";
 
 /**
  * Sprint 6 — parent billing happy path E2E.
@@ -37,18 +38,31 @@ const BILLING_BASE = process.env.BILLING_BASE_URL || "http://localhost:3009";
 const EMAIL = process.env.E2E_PARENT_EMAIL || "e2e-parent-billing@example.test";
 const PASSWORD = process.env.E2E_PARENT_PASSWORD || "E2eParent!Pass1";
 
-async function isBillingTestModeOn(): Promise<boolean> {
+// Sprint 12.6 — both reachability probes now throw with a descriptive
+// Error instead of returning null + letting the spec test.skip(). This
+// removes the silent false-green path that used to swallow real
+// seed-surface regressions.
+async function requireBillingTestMode(): Promise<void> {
+  let res;
   try {
     const ctx = await pwRequest.newContext({ baseURL: BILLING_BASE });
-    const res = await ctx.post("/api/__test__/billing/reset", {
+    res = await ctx.post("/api/__test__/billing/reset", {
       data: { tenantId: "00000000-0000-0000-0000-000000000000" },
       failOnStatusCode: false,
     });
     await ctx.dispose();
-    // Either ok or 400 ("tenantId required") proves the route exists.
-    return res.status() === 200 || res.status() === 400;
-  } catch {
-    return false;
+  } catch (err: any) {
+    throw new Error(
+      `Sprint12 seed failed for role=PARENT_BILLING: cannot reach billing-svc at ${BILLING_BASE}: ${err?.message ?? err}`,
+    );
+  }
+  // Either 200 or 400 ("tenantId required") proves the route is wired
+  // — anything else means BILLING_TEST_MODE is off.
+  if (res.status() !== 200 && res.status() !== 400) {
+    throw new Error(
+      `Sprint12 seed failed for role=PARENT_BILLING: ${BILLING_BASE}/api/__test__/billing/reset returned HTTP ${res.status()}. ` +
+        `Set BILLING_TEST_MODE=1 on billing-svc and restart.`,
+    );
   }
 }
 
@@ -56,19 +70,13 @@ async function seedParent(): Promise<{
   tenantId: string;
   userId: string;
   accessToken: string;
-} | null> {
-  try {
-    const ctx = await pwRequest.newContext({ baseURL: IDENTITY_BASE });
-    const res = await ctx.post("/api/__test__/seed-parent", {
-      data: { email: EMAIL, password: PASSWORD },
-      failOnStatusCode: false,
-    });
-    await ctx.dispose();
-    if (res.status() !== 200) return null;
-    return (await res.json()) as { tenantId: string; userId: string; accessToken: string };
-  } catch {
-    return null;
-  }
+}> {
+  return seedOrThrow<{ tenantId: string; userId: string; accessToken: string }>({
+    role: "PARENT_BILLING",
+    identityBaseUrl: IDENTITY_BASE,
+    endpoint: "/api/__test__/seed-parent",
+    body: { email: EMAIL, password: PASSWORD },
+  });
 }
 
 test.describe("parent billing flow", () => {
@@ -77,21 +85,11 @@ test.describe("parent billing flow", () => {
   let token: string;
 
   test.beforeAll(async () => {
-    const billingOn = await isBillingTestModeOn();
-    if (!billingOn) {
-      test.skip(
-        true,
-        "BILLING_TEST_MODE=1 is required on billing-svc for this spec. Set the env and restart.",
-      );
-    }
+    // Sprint 12.6 — both probes throw on failure. Playwright surfaces
+    // the descriptive Error and the suite goes red instead of silently
+    // green-passing on a misconfigured stack.
+    await requireBillingTestMode();
     const seeded = await seedParent();
-    if (!seeded) {
-      test.skip(
-        true,
-        "identity-svc /api/__test__/seed-parent not reachable. Enable IDENTITY_TEST_MODE=1.",
-      );
-      return;
-    }
     tenantId = seeded.tenantId;
     userId = seeded.userId;
     token = seeded.accessToken;

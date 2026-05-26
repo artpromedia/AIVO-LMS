@@ -1,4 +1,5 @@
-import { test, expect, request as pwRequest, type APIRequestContext } from "@playwright/test";
+import { test, expect, type APIRequestContext } from "@playwright/test";
+import { seedOrThrow } from "./sprint12/_seed";
 
 /**
  * Sprint — Phase D coverage for the parent IEP "Updates" timeline UI.
@@ -65,33 +66,27 @@ interface TimelineResponse {
   items?: TimelineItem[];
 }
 
+// Sprint 12.6 — assigned in beforeAll(); trySeed() now throws on failure
+// so we'll never read this as null at runtime, but the type still
+// reflects the pre-beforeAll state to keep strict-mode happy.
 let seed: SeedResult | null = null;
 
-async function trySeed(opts: { withInApp?: boolean } = {}): Promise<SeedResult | null> {
-  try {
-    const ctx = await pwRequest.newContext({ baseURL: IDENTITY_BASE });
-    const res = await ctx.post("/api/__test__/seed-iep-timeline-fixture", {
-      data: {
-        parentEmail: PARENT_EMAIL,
-        parentPassword: PARENT_PASSWORD,
-        teacherEmail: TEACHER_EMAIL,
-        teacherPassword: TEACHER_PASSWORD,
-        parentNoteBody: PARENT_NOTE,
-        internalNoteBody: INTERNAL_NOTE,
-        seedInAppUnread: !!opts.withInApp,
-      },
-      failOnStatusCode: false,
-    });
-    if (res.status() !== 200) {
-      await ctx.dispose();
-      return null;
-    }
-    const json = (await res.json()) as SeedResult;
-    await ctx.dispose();
-    return json;
-  } catch {
-    return null;
-  }
+// Sprint 12.6 — throws on seed failure instead of silently returning null.
+async function trySeed(opts: { withInApp?: boolean } = {}): Promise<SeedResult> {
+  return seedOrThrow<SeedResult>({
+    role: opts.withInApp ? "IEP_TIMELINE_INAPP" : "IEP_TIMELINE",
+    identityBaseUrl: IDENTITY_BASE,
+    endpoint: "/api/__test__/seed-iep-timeline-fixture",
+    body: {
+      parentEmail: PARENT_EMAIL,
+      parentPassword: PARENT_PASSWORD,
+      teacherEmail: TEACHER_EMAIL,
+      teacherPassword: TEACHER_PASSWORD,
+      parentNoteBody: PARENT_NOTE,
+      internalNoteBody: INTERNAL_NOTE,
+      seedInAppUnread: !!opts.withInApp,
+    },
+  });
 }
 
 async function loginViaApi(
@@ -113,11 +108,8 @@ async function loginViaApi(
 
 test.describe("parent IEP Updates timeline — UI + cross-tenant safety", () => {
   test.beforeAll(async () => {
+    // Sprint 12.6 — throws on failure; the silent skip path was removed.
     seed = await trySeed();
-    test.skip(
-      !seed,
-      `Requires identity-svc with IDENTITY_TEST_MODE=1 reachable at ${IDENTITY_BASE} (test-mode seeding helper unavailable).`,
-    );
   });
 
   test("parent sees only parent-visibility items on the Updates tab", async ({ page, context }) => {
@@ -243,14 +235,23 @@ test.describe("parent IEP Updates timeline — UI + cross-tenant safety", () => 
 // bell badge must reflect it on every page of the parent dashboard, not
 // just inside the per-learner Updates tab.
 test.describe("parent dashboard global bell — IEP in-app notifications surface in the header", () => {
+  // Sprint 12.6 — same pattern as `seed` above: assigned in beforeAll
+  // via a throw-on-failure helper, typed `| null` for strict-mode init.
   let bellSeed: SeedResult | null = null;
 
   test.beforeAll(async () => {
+    // Sprint 12.6 — throws on failure. The in-app variant additionally
+    // requires the server-side fixture to return a non-null
+    // inAppNotificationId; we surface that as a loud Error so a half-
+    // wired seed endpoint never silently green-passes the build.
     bellSeed = await trySeed({ withInApp: true });
-    test.skip(
-      !bellSeed || !bellSeed.inAppNotificationId,
-      `Requires identity-svc seed-iep-timeline-fixture with seedInAppUnread support at ${IDENTITY_BASE}.`,
-    );
+    if (!bellSeed!.inAppNotificationId) {
+      throw new Error(
+        "Sprint12 seed failed for role=IEP_TIMELINE_INAPP: " +
+          "seed-iep-timeline-fixture returned no inAppNotificationId. " +
+          "Verify seedInAppUnread support is wired in identity-svc.",
+      );
+    }
   });
 
   test("the bell badge picks up an unread IEP in-app notification on the dashboard home", async ({

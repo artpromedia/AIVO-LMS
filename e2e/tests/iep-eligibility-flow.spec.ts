@@ -1,4 +1,5 @@
-import { test, expect, request as pwRequest, type APIRequestContext } from "@playwright/test";
+import { test, expect, type APIRequestContext } from "@playwright/test";
+import { seedOrThrow } from "./sprint12/_seed";
 
 /**
  * Sprint task #11 — Playwright coverage for the eligibility-evaluation
@@ -38,28 +39,19 @@ interface SeedResult {
 
 let seed: SeedResult | null = null;
 
-async function trySeed(): Promise<SeedResult | null> {
-  try {
-    const ctx = await pwRequest.newContext({ baseURL: IDENTITY_BASE });
-    const res = await ctx.post("/api/__test__/seed-iep-evaluation-fixture", {
-      data: {
-        parentEmail: PARENT_EMAIL,
-        parentPassword: PARENT_PASSWORD,
-        teacherEmail: TEACHER_EMAIL,
-        teacherPassword: TEACHER_PASSWORD,
-      },
-      failOnStatusCode: false,
-    });
-    if (res.status() !== 200) {
-      await ctx.dispose();
-      return null;
-    }
-    const json = (await res.json()) as SeedResult;
-    await ctx.dispose();
-    return json;
-  } catch {
-    return null;
-  }
+// Sprint 12.6 — throw on seed failure instead of silently skipping.
+async function seedFixture(): Promise<SeedResult> {
+  return seedOrThrow<SeedResult>({
+    role: "IEP_EVALUATION",
+    identityBaseUrl: IDENTITY_BASE,
+    endpoint: "/api/__test__/seed-iep-evaluation-fixture",
+    body: {
+      parentEmail: PARENT_EMAIL,
+      parentPassword: PARENT_PASSWORD,
+      teacherEmail: TEACHER_EMAIL,
+      teacherPassword: TEACHER_PASSWORD,
+    },
+  });
 }
 
 async function loginViaApi(
@@ -80,11 +72,8 @@ async function loginViaApi(
 
 test.describe("IEP eligibility evaluation — teacher lifecycle + parent read-only", () => {
   test.beforeAll(async () => {
-    seed = await trySeed();
-    test.skip(
-      !seed,
-      `Requires identity-svc with IDENTITY_TEST_MODE=1 reachable at ${IDENTITY_BASE} (test-mode seeding helper unavailable).`,
-    );
+    // Sprint 12.6 — throws on failure; no more silent skip.
+    seed = await seedFixture();
   });
 
   test("teacher walks an evaluation from draft → submitted → eligible decision", async ({

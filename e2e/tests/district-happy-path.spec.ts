@@ -1,4 +1,5 @@
-import { test, expect, request as pwRequest } from "@playwright/test";
+import { test, expect } from "@playwright/test";
+import { seedOrThrow } from "./sprint12/_seed";
 
 /**
  * Sprint 1 — district admin happy-path login.
@@ -14,9 +15,10 @@ import { test, expect, request as pwRequest } from "@playwright/test";
  *   3. Land on /dashboard/district and assert authenticated chrome.
  *
  * Both test-helper endpoints are only registered when the identity-svc
- * process has IDENTITY_TEST_MODE=1 set. The spec auto-skips when those
- * helpers are not reachable, so the suite stays green in environments where
- * test-mode is intentionally off.
+ * process has IDENTITY_TEST_MODE=1 set. Sprint 12.6 — the spec now
+ * THROWS (loud) when the seed endpoint is unreachable / non-200,
+ * replacing the previous silent test.skip path that masked real
+ * seed-surface regressions.
  *
  * Required env (defaults provided):
  *   IDENTITY_BASE_URL  - default http://localhost:3001
@@ -30,38 +32,21 @@ const EMAIL = process.env.E2E_DISTRICT_ADMIN_EMAIL || "e2e-district-admin@exampl
 const PASSWORD = process.env.E2E_DISTRICT_ADMIN_PASSWORD || "E2eDistrict!Pass1";
 const MFA_ENABLED = process.env.E2E_DISTRICT_MFA_ENABLED === "1";
 
-async function isTestModeOn(): Promise<boolean> {
-  try {
-    const ctx = await pwRequest.newContext({ baseURL: IDENTITY_BASE });
-    const res = await ctx.post("/api/__test__/seed-district-admin", {
-      data: { email: EMAIL, password: PASSWORD, mfaEnabled: MFA_ENABLED },
-      failOnStatusCode: false,
-    });
-    await ctx.dispose();
-    return res.status() === 200;
-  } catch {
-    return false;
-  }
-}
-
 test.describe("district admin happy path", () => {
-  test.beforeAll(async () => {
-    const enabled = await isTestModeOn();
-    test.skip(
-      !enabled,
-      `Requires identity-svc with IDENTITY_TEST_MODE=1 reachable at ${IDENTITY_BASE}.`,
-    );
-  });
-
   test("seeded DISTRICT_ADMIN can sign in and reach /dashboard/district", async ({
     page,
     request,
   }) => {
-    // (1) Seed (idempotent).
-    const seedRes = await request.post(`${IDENTITY_BASE}/api/__test__/seed-district-admin`, {
-      data: { email: EMAIL, password: PASSWORD, mfaEnabled: MFA_ENABLED },
+    // (1) Seed (idempotent). Sprint 12.6 — seedOrThrow surfaces a
+    // descriptive Error("Sprint12 seed failed for role=DISTRICT_ADMIN: ...")
+    // when identity-svc is unreachable or IDENTITY_TEST_MODE is off,
+    // rather than silently skipping the test.
+    await seedOrThrow({
+      role: "DISTRICT_ADMIN",
+      identityBaseUrl: IDENTITY_BASE,
+      endpoint: "/api/__test__/seed-district-admin",
+      body: { email: EMAIL, password: PASSWORD, mfaEnabled: MFA_ENABLED },
     });
-    expect(seedRes.ok()).toBeTruthy();
 
     // (2) Submit the district login form.
     await page.goto("/district/login");
