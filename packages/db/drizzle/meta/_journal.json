@@ -169,6 +169,27 @@
       "when": 1779148800000,
       "tag": "0038_nces_districts_lookup",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1779580800000,
+      "tag": "0041_school_admin_role",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1779584400000,
+      "tag": "0042_teacher_parent_invites",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1779588000000,
+      "tag": "0043_learner_teachers_classroom",
+      "breakpoints": true
     }
   ]
 }

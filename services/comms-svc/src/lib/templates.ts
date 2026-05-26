@@ -69,6 +69,8 @@ export function renderTemplate(
       return renderSchoolAdminInvite(data);
     case "staff_credentials":
       return renderStaffCredentials(data);
+    case "teacher_invite_parent":
+      return renderTeacherInviteParent(data);
     case "iep_in_review_parent":
       return renderIepInReviewParent(data);
     case "iep_finalised_parent":
@@ -287,6 +289,27 @@ function renderSchoolAdminInvite(data: TemplateData) {
     subject: `You're invited to administer ${schoolName} on AIVO Learning`,
     html,
     text: `You've been invited as a school administrator for ${schoolName} on AIVO Learning. Accept your invitation here: ${inviteUrl}\n\nThis link expires in 72 hours.`,
+  };
+}
+
+function renderTeacherInviteParent(data: TemplateData) {
+  const teacherName = (data.teacherName as string) || "Your child's teacher";
+  const schoolName = (data.schoolName as string) || "the school";
+  const childName = (data.childName as string) || "your child";
+  const acceptUrl = (data.acceptUrl as string) || "#";
+  const notes = (data.notes as string) || "";
+  const html = baseLayout(`
+    <h1 class="title">${teacherName} would like to connect with you about ${childName}</h1>
+    <p class="body-text">Hi,</p>
+    <p class="body-text"><strong>${teacherName}</strong> at <span class="highlight">${schoolName}</span> has invited you to connect on AIVO Learning so they can share progress, observations, and goals for <strong>${childName}</strong> with you.</p>
+    ${notes ? `<p class="body-text" style="background:#F5F3FF;padding:12px 16px;border-radius:8px;border-left:3px solid ${BRAND_COLOR};"><em>"${notes}"</em></p>` : ""}
+    <p style="text-align:center"><a href="${acceptUrl}" class="btn">Accept invitation</a></p>
+    <p class="body-text" style="font-size:13px;color:#6b7280">This invitation expires in 72 hours. Sign in with the email this message was sent to. If you weren't expecting this, you can safely ignore the email.</p>
+  `);
+  return {
+    subject: `${teacherName} at ${schoolName} invited you to connect about ${childName}`,
+    html,
+    text: `${teacherName} at ${schoolName} has invited you to connect about ${childName} on AIVO Learning.${notes ? `\n\nNote: ${notes}` : ""}\nAccept: ${acceptUrl}\n\nThis link expires in 72 hours.`,
   };
 }
 
@@ -540,6 +563,7 @@ export const AVAILABLE_TEMPLATES = [
   { id: "district_admin_invite", name: "District Admin Invite", channels: ["email"] },
   { id: "school_admin_invite", name: "School Admin Invite", channels: ["email"] },
   { id: "staff_credentials", name: "Staff Credentials (Temp Password)", channels: ["email"] },
+  { id: "teacher_invite_parent", name: "Teacher → Parent Invite", channels: ["email"] },
   { id: "iep_in_review_parent", name: "IEP — In Review (Parent)", channels: ["email"] },
   { id: "iep_finalised_parent", name: "IEP — Finalised (Parent)", channels: ["email"] },
   { id: "iep_comment_mention", name: "IEP — Comment Mention", channels: ["email"] },

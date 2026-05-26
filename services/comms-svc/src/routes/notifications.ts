@@ -20,6 +20,7 @@ import {
   internalDistrictAdminInviteSchema,
   internalSchoolAdminInviteSchema,
   internalStaffCredentialsSchema,
+  internalTeacherInviteParentSchema,
   internalAdminAlertSchema,
   internalSpeechBuddySafetySchema,
   internalBillingAlertSchema,
@@ -620,6 +621,51 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any) {
         return { status: result.status, messageId: result.messageId };
       } catch (err: any) {
         logger.error({ err, to }, "Failed to send school admin invite email");
+        return reply.code(500).send({ error: "Failed to send invite" });
+      }
+    },
+  );
+
+  app.post(
+    "/api/comms/internal/teacher-invite-parent",
+    { schema: internalTeacherInviteParentSchema },
+    async (request, reply) => {
+      const internalKey = request.headers["x-internal-key"];
+      const expectedKey =
+        process.env.INTERNAL_SERVICE_KEY ||
+        (process.env.NODE_ENV === "production" ? "" : "aivo-internal-dev-key");
+      if (!internalKey || !expectedKey || internalKey !== expectedKey) {
+        return reply.status(401).send({ error: "Unauthorized" });
+      }
+      const { to, teacherName, schoolName, childName, notes, acceptUrl } = request.body as any;
+      if (!to || !acceptUrl) {
+        return reply.code(400).send({ error: "to and acceptUrl required" });
+      }
+      if (!isConfigured()) {
+        logger.warn(
+          { to },
+          "Teacher→parent invite requested but email not configured, link logged for dev",
+        );
+        return { status: "dev_mode", acceptUrl };
+      }
+      const rendered = renderTemplate("teacher_invite_parent", {
+        teacherName: teacherName || "Your child's teacher",
+        schoolName: schoolName || "the school",
+        childName: childName || "your child",
+        notes,
+        acceptUrl,
+      });
+      try {
+        const result = await sendEmail({
+          to,
+          subject: rendered.subject,
+          htmlBody: rendered.html,
+          textBody: rendered.text,
+          tag: "teacher_invite_parent",
+        });
+        return { status: result.status, messageId: result.messageId };
+      } catch (err: any) {
+        logger.error({ err, to }, "Failed to send teacher→parent invite email");
         return reply.code(500).send({ error: "Failed to send invite" });
       }
     },

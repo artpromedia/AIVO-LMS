@@ -213,6 +213,63 @@ export const getCollaborationPendingInvitesSchema = {
   response: { 200: passthroughObject, 400: errorResponse },
 } as const;
 
+// Sprint 3 (invite-flows): teacher → parent invites.
+export const collaborationInviteParentSchema = {
+  tags: ["Family"],
+  operationId: "collaborationInviteParent",
+  summary: "POST /api/family/collaboration/invite-parent",
+  body: passthroughObject,
+  response: {
+    200: passthroughObject,
+    201: passthroughObject,
+    400: errorResponse,
+    403: errorResponse,
+    404: errorResponse,
+    409: errorResponse,
+  },
+} as const;
+
+export const collaborationInviteParentResendSchema = {
+  tags: ["Family"],
+  operationId: "collaborationInviteParentResend",
+  summary: "POST /api/family/collaboration/invite-parent/:id/resend",
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
+  response: { 200: passthroughObject, 400: errorResponse, 403: errorResponse, 404: errorResponse },
+} as const;
+
+export const collaborationInviteParentRevokeSchema = {
+  tags: ["Family"],
+  operationId: "collaborationInviteParentRevoke",
+  summary: "DELETE /api/family/collaboration/invite-parent/:id",
+  params: {
+    type: "object",
+    required: ["id"],
+    additionalProperties: true,
+    properties: { id: { type: "string" } },
+  },
+  response: { 200: passthroughObject, 400: errorResponse, 403: errorResponse, 404: errorResponse },
+} as const;
+
+export const getCollaborationInviteParentByTeacherSchema = {
+  tags: ["Family"],
+  operationId: "getCollaborationInviteParentByTeacher",
+  summary: "GET /api/family/collaboration/invite-parent (teacher's outgoing invites)",
+  response: { 200: passthroughObject, 403: errorResponse },
+} as const;
+
+// Sprint 4 (invite-flows): unified teacher roster.
+export const getTeacherRosterSchema = {
+  tags: ["Family"],
+  operationId: "getTeacherRoster",
+  summary: "GET /api/teacher/roster",
+  response: { 200: passthroughArray, 403: errorResponse },
+} as const;
+
 export const getDataExportByLearnerIdSchema = {
   tags: ["Family"],
   operationId: "getDataExportByLearnerId",

@@ -252,6 +252,10 @@ export const internalStaffCredentialsSchema = internalSchema(
   "internalSendStaffCredentials",
   "Internal: send a staff temp-password welcome email",
 );
+export const internalTeacherInviteParentSchema = internalSchema(
+  "internalSendTeacherInviteParent",
+  "Internal: send a teacher → parent invitation email",
+);
 export const internalAdminAlertSchema = internalSchema(
   "internalSendAdminSafetyAlert",
   "Internal: dispatch an admin safety alert email",
