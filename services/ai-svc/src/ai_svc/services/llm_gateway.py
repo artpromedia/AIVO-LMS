@@ -126,6 +126,7 @@ async def generate_completion(
     preferred_model: Optional[str] = None,
     model_chain: Optional[list] = None,
     tenant_id: Optional[str] = None,
+    response_format: Optional[dict] = None,
 ) -> dict:
     # Per-tenant daily budget cap (§5 ai-svc cost/reliability). Pre-flight
     # check: if the tenant has already burned through their daily cap, fail
@@ -155,15 +156,24 @@ async def generate_completion(
             logger.warning("Skipping model %s (disabled by safety circuit breaker)", model)
             continue
         try:
-            response = await litellm.acompletion(
-                model=model,
-                messages=[
+            # Sprint 2 — forward response_format when the caller asks for
+            # structured output (typically {"type": "json_object"} for
+            # baseline / IEP / homework parsers). LiteLLM passes it through
+            # to the provider; providers that don't natively support it
+            # fall back to prompt-instructed JSON, which our pydantic
+            # validator in the route layer still catches.
+            kwargs: dict = {
+                "model": model,
+                "messages": [
                     _build_system_message(model, system_prompt),
                     {"role": "user", "content": user_prompt},
                 ],
-                temperature=temperature,
-                max_tokens=max_tokens,
-            )
+                "temperature": temperature,
+                "max_tokens": max_tokens,
+            }
+            if response_format is not None:
+                kwargs["response_format"] = response_format
+            response = await litellm.acompletion(**kwargs)
 
             content = response.choices[0].message.content
             usage = response.usage

@@ -5,4 +5,8 @@ export {
   type EnterpriseFeatureFlags,
   type EnterpriseFlagKey,
   ENTERPRISE_FLAG_ENV_VARS,
+  ENTERPRISE_FLAG_META,
+  listFlagMeta,
+  type FlagMeta,
+  type FlagRiskBand,
 } from "./enterprise-flags.js";

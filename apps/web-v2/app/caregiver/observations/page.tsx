@@ -1,9 +1,9 @@
 /**
- * Caregiver observations — feed of recent lesson activity across every
- * learner whose care team has invited the signed-in caregiver. Each
- * LessonRun is a real observation: which learner, which subject/skill,
- * status, and when it happened. Pulled from the shared LessonRun store
- * already populated by parent/teacher activity.
+ * Caregiver observations — Sprint 10 expands the previous read-only
+ * lesson-activity feed to also surface caregiver-AUTHORED observations
+ * (ABC: antecedent / behaviour / consequence + duration + location)
+ * and adds an authoring form that POSTs to
+ * /api/bff/caregiver/observations.
  */
 import * as React from "react";
 import { requirePageRole } from "@/lib/auth/server";
@@ -14,8 +14,15 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { listLearnersForMember } from "@/lib/db/team-invites";
-import { getLearner, listLessonRunsForLearner, listSubjects, listSkills } from "@/lib/db/repos";
+import {
+  getLearner,
+  listCaregiverObservations,
+  listLessonRunsForLearner,
+  listSkills,
+  listSubjects,
+} from "@/lib/db/repos";
 import type { LearnerProfile, LessonRun } from "@/lib/db/types";
+import { CaregiverObservationForm } from "./observation-form";
 
 export const dynamic = "force-dynamic";
 
@@ -36,10 +43,6 @@ function statusTone(status: LessonRun["status"]) {
     default:
       return "neutral" as const;
   }
-}
-
-function formatStatus(status: LessonRun["status"]): string {
-  return status.replaceAll("_", " ");
 }
 
 function formatWhen(iso: string): string {
@@ -63,27 +66,21 @@ export default async function CaregiverObservationsPage() {
   const subjectName = new Map(listSubjects().map((s) => [s.id, s.name]));
   const skillName = new Map(listSkills().map((s) => [s.id, s.name]));
 
+  // Sprint 10 — caregiver-authored observations across every learner
+  // they support, newest-first. Joined with the lesson activity feed
+  // below; the two surfaces stay distinct because they tell different
+  // stories (behaviour vs. lesson completion).
+  const authored = learners
+    .flatMap((l) => listCaregiverObservations(l.id, session.tenantId, 20))
+    .sort((a, b) => (a.observedAt < b.observedAt ? 1 : -1))
+    .slice(0, 20);
+
   const feed = learners
     .flatMap((l) => listLessonRunsForLearner(l.id, session.tenantId, { limit: FEED_LIMIT }))
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
     .slice(0, FEED_LIMIT);
 
-  let emptyState: React.ReactNode = null;
-  if (learners.length === 0) {
-    emptyState = (
-      <EmptyState
-        title="No learners yet"
-        description="Observations populate once a parent invites you to a learner's care team."
-      />
-    );
-  } else if (feed.length === 0) {
-    emptyState = (
-      <EmptyState
-        title="No lesson activity yet"
-        description="Once a learner you support starts a lesson, the observation lands here."
-      />
-    );
-  }
+  const noLearners = learners.length === 0;
 
   return (
     <AppShell
@@ -95,11 +92,71 @@ export default async function CaregiverObservationsPage() {
       <PageHeader
         eyebrow="Caregiver"
         title="Observations"
-        description="Recent lesson activity across the learners you support."
+        description="What you've noticed about the learners you support — plus their recent lesson activity."
       />
 
-      <SectionHeader title={`Activity feed (${feed.length})`} />
-      {emptyState ?? (
+      <SectionHeader title="Log an observation" />
+      {noLearners ? (
+        <EmptyState
+          title="No learners yet"
+          description="Observations populate once a parent invites you to a learner's care team."
+        />
+      ) : (
+        <CaregiverObservationForm
+          learners={learners.map((l) => ({ id: l.id, name: l.displayName }))}
+        />
+      )}
+
+      <SectionHeader title={`Your observations (${authored.length})`} />
+      {authored.length === 0 ? (
+        <p className="text-sm text-aivo-ink-soft">
+          No caregiver observations yet. Use the form above to record what you notice.
+        </p>
+      ) : (
+        <ul className="flex flex-col gap-3">
+          {authored.map((obs) => {
+            const learner = learnerById.get(obs.learnerId);
+            return (
+              <li key={obs.id}>
+                <Card className="flex flex-col gap-1 p-4">
+                  <p className="text-sm font-semibold">
+                    {learner?.displayName ?? "Learner"} ·{" "}
+                    <span className="text-aivo-ink-soft">{obs.location}</span>
+                  </p>
+                  <p className="text-xs text-aivo-ink-soft">
+                    {formatWhen(obs.observedAt)}
+                    {obs.durationMinutes !== null
+                      ? ` · ${obs.durationMinutes} min`
+                      : ""}
+                  </p>
+                  <dl className="mt-2 grid grid-cols-1 gap-1 text-sm md:grid-cols-3">
+                    <div>
+                      <dt className="iw-label text-aivo-ink-soft">Antecedent</dt>
+                      <dd>{obs.antecedent || "—"}</dd>
+                    </div>
+                    <div>
+                      <dt className="iw-label text-aivo-ink-soft">Behaviour</dt>
+                      <dd className="font-medium">{obs.behaviour}</dd>
+                    </div>
+                    <div>
+                      <dt className="iw-label text-aivo-ink-soft">Consequence</dt>
+                      <dd>{obs.consequence || "—"}</dd>
+                    </div>
+                  </dl>
+                </Card>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      <SectionHeader title={`Lesson activity (${feed.length})`} />
+      {feed.length === 0 ? (
+        <EmptyState
+          title="No lesson activity yet"
+          description="Once a learner you support starts a lesson, it lands here."
+        />
+      ) : (
         <ul className="flex flex-col gap-3">
           {feed.map((run) => {
             const learner = learnerById.get(run.learnerId);
@@ -117,7 +174,9 @@ export default async function CaregiverObservationsPage() {
                       {skillName.get(run.skillId) ?? "Skill"} · {formatWhen(run.createdAt)}
                     </p>
                   </div>
-                  <Badge tone={statusTone(run.status)}>{formatStatus(run.status)}</Badge>
+                  <Badge tone={statusTone(run.status)}>
+                    {run.status.replaceAll("_", " ")}
+                  </Badge>
                 </Card>
               </li>
             );

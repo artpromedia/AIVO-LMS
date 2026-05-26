@@ -22,6 +22,14 @@ import {
 import { deriveLearningProfile } from "../services/learning-profile.js";
 import { partitionChapterActivitiesPayload } from "../services/discovery-activity-validator.js";
 import { normalizeBaselineItems } from "../services/baselineSurfaceNormalizer.js";
+import {
+  buildBaselineFallback,
+  type BaselineFallbackReason,
+} from "../services/baseline-fallback.js";
+import {
+  applySafetyGate,
+  persistAudits,
+} from "../services/baseline-safety-gate.js";
 
 // ---- Sprint 02 adapter: problem-session ledger ----------------------------
 // Flag-gated, fire-and-forget. Records a baseline-source problem session per
@@ -165,6 +173,20 @@ function buildDistrictContext(learner: any) {
     curriculumFramework: learner.curriculumFramework || null,
     curriculumAlignment: learner.curriculumAlignment || {},
   };
+}
+
+/**
+ * Sprint 1 — surface the learner's enrollment ZIP code so ai-svc can
+ * call curriculum-svc and ground the baseline prompt in district-
+ * approved skill anchors. Returns null when no ZIP is on file; ai-svc
+ * degrades gracefully and the existing district-framework label still
+ * carries broad curriculum signal.
+ */
+function buildZipCode(learner: any): string | null {
+  const raw = learner?.zipCode;
+  if (typeof raw !== "string") return null;
+  const trimmed = raw.trim();
+  return trimmed.length >= 5 ? trimmed : null;
 }
 
 async function authenticate(req: any, reply: any) {
@@ -507,6 +529,8 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
             // Optional inputs — null/empty array when not on file.
             caregiver_perspectives: caregiverPerspectives,
             teacher_assessment: teacherContext,
+            // Sprint 1 — curriculum grounding via ai-svc → curriculum-svc.
+            zip_code: buildZipCode(learner),
           }),
         });
 
@@ -898,6 +922,31 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
       const caregiverPerspectives = await loadCaregiverPerspectives(db, learner.id);
       const teacherContext = await loadTeacherContext(db, learner.id);
 
+      // Sprint 3 — graceful AI-failure fallback. When ai-svc is
+      // unreachable, returns a non-2xx, or returns invalid JSON, we
+      // serve the curated baseline bank with source:"fallback" instead
+      // of a 502. The UI surfaces a "Using curated questions while we
+      // generate personalized ones" notice; ops can dashboard the
+      // fallback rate via the structured log line below.
+      const fallback = (reason: BaselineFallbackReason, detail?: string) => {
+        const payload = buildBaselineFallback({
+          learnerId: learner.id,
+          gradeLevel: learner.gradeLevel || null,
+          functioningLevel: learner.functioningLevel || null,
+          reason,
+        });
+        app.log.warn(
+          {
+            learnerId: learner.id,
+            reason,
+            detail: detail ? detail.slice(0, 500) : undefined,
+            questionsCount: payload.questions.length,
+          },
+          "[baseline] AI failed — serving fallback bank",
+        );
+        return reply.send(payload);
+      };
+
       try {
         const aiRes = await fetch(`${AI_SVC_URL}/api/ai/generate-baseline`, {
           method: "POST",
@@ -919,25 +968,77 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
             // Optional inputs — null/empty array when not on file.
             caregiver_perspectives: caregiverPerspectives,
             teacher_assessment: teacherContext,
+            // Sprint 1 — curriculum grounding via ai-svc → curriculum-svc.
+            zip_code: buildZipCode(learner),
           }),
         });
 
         if (!aiRes.ok) {
           const err = await aiRes.text();
-          return reply.status(502).send({ error: "AI generation failed", detail: err });
+          return fallback("ai_non_2xx", err);
         }
 
-        const data = (await aiRes.json()) as any;
+        let data: any;
+        try {
+          data = await aiRes.json();
+        } catch (e: any) {
+          return fallback("ai_invalid_json", e?.message);
+        }
+        if (!data || !Array.isArray(data.questions) || data.questions.length < 14) {
+          return fallback(
+            "ai_too_few_questions",
+            `received ${Array.isArray(data?.questions) ? data.questions.length : 0} questions`,
+          );
+        }
+
+        // Sprint 4 — responsible-AI gate. Evaluate every generated
+        // question; replace blocked items with fallback bank items;
+        // persist verdicts to baseline_item_audits. Fail-open: if the
+        // evaluator is unreachable the AI items ship as-is.
+        const gated = await applySafetyGate({
+          learnerId: learner.id,
+          questions: data.questions,
+          gradeLevel: learner.gradeLevel || null,
+          functioningLevel: learner.functioningLevel || null,
+          accommodations: iepContext?.accommodations
+            ?.map((a: any) => (typeof a === "string" ? a : a?.type || a?.description))
+            .filter(Boolean) as string[] | undefined,
+          policyMode: "block",
+        });
+
+        if (gated.hadReplacements) {
+          app.log.warn(
+            {
+              learnerId: learner.id,
+              blocked: gated.audits.filter((a) => a.shipped === "no").length,
+              shipped: gated.questions.length,
+            },
+            "[baseline] responsible-AI replaced AI items with fallback bank",
+          );
+        }
+
+        // Fire-and-forget audit write — must not block the response.
+        void persistAudits({
+          db,
+          tenantId: learner.tenantId,
+          learnerId: learner.id,
+          audits: gated.audits,
+          batchMetadata: { model: data.model, source: "ai" },
+          log: app.log,
+        });
+
         return reply.send({
           generated: true,
           learnerId: learner.id,
           functioningLevel: learner.functioningLevel,
-          questions: data.questions,
+          source: gated.hadReplacements ? "ai+fallback" : "ai",
+          safetyEvaluated: !gated.evaluatorSilent,
+          questions: gated.questions,
           subjects: data.subjects,
           model: data.model,
         });
       } catch (e: any) {
-        return reply.status(502).send({ error: "Failed to reach AI service", detail: e.message });
+        return fallback("ai_unreachable", e?.message);
       }
     },
   );

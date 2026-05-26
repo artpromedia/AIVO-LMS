@@ -1,0 +1,97 @@
+{
+  "$$schema": "https://grafana.com/api/dashboards/v1",
+  "title": "AIVO — User dashboards activity (Sprint 7-11)",
+  "uid": "aivo-role-dashboards",
+  "tags": ["aivo", "dashboards", "sprint-12"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "1m",
+  "time": { "from": "now-24h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "BFF request rate by surface (5m, requests/min)",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum by (surface) (rate(aivo_bff_request_total[5m])) * 60",
+          "legendFormat": "{{surface}}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] }
+      }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Therapist write rate (sessions + goals per min)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum(rate(aivo_bff_request_total{surface=~\"therapist/sessions|therapist/goals\", method=\"POST\"}[5m])) * 60",
+          "legendFormat": "writes/min",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Caregiver observation submissions (per min)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum(rate(aivo_bff_request_total{surface=\"caregiver/observations\", method=\"POST\"}[5m])) * 60",
+          "legendFormat": "observations/min",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "IEP draft lifecycle transitions (24h)",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 16 },
+      "targets": [
+        {
+          "expr": "sum by (to) (increase(aivo_iep_draft_transitions_total[24h]))",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "School dashboard p95 latency (Sprint 7)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+      "fieldConfig": { "defaults": { "unit": "ms" } },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(aivo_bff_latency_seconds_bucket{surface=\"admin/school/dashboard\"}[5m]))) * 1000",
+          "legendFormat": "p95",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Active sessions by role (5m)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
+      "targets": [
+        {
+          "expr": "sum by (role) (rate(aivo_auth_session_active_total[5m]))",
+          "legendFormat": "{{role}}",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}

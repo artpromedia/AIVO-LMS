@@ -10,6 +10,20 @@ from ..audit import emit_ai_audit
 from ..services.quality_gate import run_quality_gate
 from ..services.baseline_generator import build_baseline_generation_prompt
 from ..services.responsible_ai_client import evaluate as evaluate_responsible_ai
+from ..services.curriculum_client import load_curriculum_grounding
+from ..services.baseline_schemas import (
+    validate_baseline_payload,
+    validate_questions_subset,
+)
+from ..services.scaffold_enforcer import (
+    build_pre_symbolic_observation_payload,
+    enforce_batch as enforce_scaffold_batch,
+    normalize_level as normalize_functioning_level,
+)
+from ..services.iep_drafter import (
+    build_iep_draft_prompt,
+    validate_iep_draft,
+)
 
 logger = logging.getLogger("ai-svc.generate")
 
@@ -198,6 +212,12 @@ class BaselineRequest(BaseModel):
     # a parent assessment still gets a baseline generation.
     caregiver_perspectives: Optional[list] = None
     teacher_assessment: Optional[dict] = None
+    # Sprint 1 — curriculum grounding. When the learner's ZIP code is
+    # known, ai-svc calls curriculum-svc to inject district-scoped skill
+    # anchors into the prompt. The lookup is best-effort: when ZIP is
+    # absent, the feature flag is off, or curriculum-svc is unreachable,
+    # the prompt falls back to framework-label-only context.
+    zip_code: Optional[str] = None
 
 
 class BaselineResponse(BaseModel):
@@ -212,6 +232,37 @@ class BaselineResponse(BaseModel):
 async def generate_baseline(req: BaselineRequest):
     from ..services.baseline_generator import SUBJECTS
 
+    # Sprint 5 — PRE_SYMBOLIC short-circuit. The LLM is bypassed
+    # entirely; instead we return a curated observation checklist
+    # because there is no MC item this learner can meaningfully
+    # respond to. The response still conforms to BaselineResponse so
+    # the parent UI doesn't need a separate render path.
+    functioning_level = normalize_functioning_level(req.functioning_level)
+    if functioning_level == "PRE_SYMBOLIC":
+        payload = build_pre_symbolic_observation_payload(
+            learner_id=(req.parent_assessment or {}).get("learnerId"),
+        )
+        return BaselineResponse(
+            questions=payload["questions"],
+            subjects=SUBJECTS,
+            model="pre-symbolic-observation",
+            prompt_tokens=0,
+            completion_tokens=0,
+        )
+
+    # Sprint 1 — fetch district-scoped skill anchors before building the
+    # prompt. Best-effort: returns an empty grounding when ZIP / grade /
+    # curriculum-svc are unavailable, so the existing prompt still fires.
+    grade_for_grounding = (
+        (req.district or {}).get("gradeLevel")
+        if isinstance(req.district, dict)
+        else None
+    ) or (req.parent_assessment or {}).get("gradeLevel")
+    curriculum_grounding = await load_curriculum_grounding(
+        zip_code=req.zip_code,
+        grade_level=grade_for_grounding,
+    )
+
     system_prompt, user_prompt = build_baseline_generation_prompt(
         req.parent_assessment,
         iep=req.iep,
@@ -219,54 +270,126 @@ async def generate_baseline(req: BaselineRequest):
         interest_profile=req.interest_profile,
         caregiver_perspectives=req.caregiver_perspectives,
         teacher_assessment=req.teacher_assessment,
+        curriculum_grounding=curriculum_grounding,
     )
 
-    try:
-        result = await generate_completion(
+    # Sprint 2 — JSON-mode hint. Providers that natively support
+    # response_format (Anthropic, OpenAI, Gemini via LiteLLM) will bias
+    # toward strictly-formatted output; others fall back to the
+    # schema-instructed prompt and are still caught by the pydantic
+    # validator below.
+    response_format = {"type": "json_object"}
+
+    async def _call(extra_user: str = "") -> dict:
+        return await generate_completion(
             system_prompt=system_prompt,
-            user_prompt=user_prompt,
+            user_prompt=user_prompt + extra_user,
             max_tokens=4000,
             temperature=0.6,
+            response_format=response_format,
         )
+
+    try:
+        result = await _call()
     except Exception as e:
         raise HTTPException(status_code=503, detail=f"LLM baseline generation failed: {str(e)}")
 
-    raw = result["content"].strip()
-    if raw.startswith("```"):
-        raw = raw.split("\n", 1)[1] if "\n" in raw else raw[3:]
-        if raw.endswith("```"):
-            raw = raw[:-3]
+    def _parse_json(content: str) -> dict | None:
+        raw = (content or "").strip()
+        if raw.startswith("```"):
+            raw = raw.split("\n", 1)[1] if "\n" in raw else raw[3:]
+            if raw.endswith("```"):
+                raw = raw[:-3]
+        try:
+            obj = json.loads(raw)
+        except json.JSONDecodeError:
+            return None
+        return obj if isinstance(obj, dict) else None
 
-    try:
-        parsed = json.loads(raw)
-        questions = parsed.get("questions", [])
-    except json.JSONDecodeError:
-        logger.error(f"Failed to parse baseline JSON: {raw[:200]}")
-        raise HTTPException(status_code=502, detail="AI returned invalid JSON for baseline questions")
+    parsed = _parse_json(result["content"])
+    payload = None
+    errors: list[str] = []
+    if parsed is None:
+        errors = ["payload: response was not valid JSON"]
+    else:
+        payload, errors = validate_baseline_payload(parsed)
 
-    REQUIRED_SUBJECTS = {"math", "ela", "science", "speech", "sel", "life_skills", "executive_function"}
-    valid_questions = []
-    for q in questions:
-        if not isinstance(q, dict):
-            continue
-        if not all(k in q for k in ("id", "subject", "questionText", "options", "correctAnswer")):
-            continue
-        if not isinstance(q["options"], list) or len(q["options"]) < 2:
-            continue
-        valid_answers = {o.get("value") for o in q["options"] if isinstance(o, dict) and "value" in o}
-        if q["correctAnswer"] not in valid_answers:
-            continue
-        if q.get("subject") not in REQUIRED_SUBJECTS:
-            continue
-        valid_questions.append(q)
+    # Sprint 2 — one-shot auto-correction. If full-payload validation
+    # failed, send the structured error messages back to the LLM and
+    # ask it to repair the output. We do NOT loop forever: one retry,
+    # then we fall through to partial-validation salvage.
+    if payload is None and errors:
+        repair_addendum = (
+            "\n\n## REPAIR REQUEST\nYour previous output failed validation. "
+            "Fix EVERY error below and return a corrected JSON object that "
+            "matches the Output Schema above. Do not include any field not "
+            "listed in the schema.\n\n"
+            + "\n".join(f"- {e}" for e in errors[:25])
+        )
+        try:
+            result = await _call(extra_user=repair_addendum)
+            parsed = _parse_json(result["content"])
+            if parsed is not None:
+                payload, errors = validate_baseline_payload(parsed)
+        except Exception as e:  # noqa: BLE001 — retry is best-effort.
+            logger.warning(f"baseline repair retry failed: {e}")
 
-    if len(valid_questions) < 14:
-        raise HTTPException(status_code=502, detail=f"AI generated too few valid questions ({len(valid_questions)}), expected at least 14")
+    # Sprint 2 — partial-success salvage. If full validation still
+    # fails, accept every individually-valid question rather than 502-ing
+    # the entire generation; the >=14 threshold guards against thin
+    # responses. This restores graceful degradation while preserving
+    # the strictness of per-item validation.
+    if payload is None:
+        valid_items, item_errors = validate_questions_subset(parsed or {})
+        logger.info(
+            "baseline structured-output salvage: %d valid items, %d errors",
+            len(valid_items), len(item_errors),
+        )
+        if len(valid_items) < 14:
+            raise HTTPException(
+                status_code=502,
+                detail=(
+                    f"AI generated too few valid questions ({len(valid_items)}), "
+                    f"expected at least 14"
+                ),
+            )
+        questions_out = [q.model_dump(exclude_none=True) for q in valid_items]
+    else:
+        if len(payload.questions) < 14:
+            raise HTTPException(
+                status_code=502,
+                detail=(
+                    f"AI generated too few valid questions ({len(payload.questions)}), "
+                    f"expected at least 14"
+                ),
+            )
+        questions_out = [q.model_dump(exclude_none=True) for q in payload.questions]
 
-    questions = valid_questions
+    # Sprint 5 — functioning-level scaffold enforcement. Reject items
+    # whose shape contradicts the learner's level (e.g. 200-word stems
+    # for NON_VERBAL). We only enforce when ≥14 items still survive
+    # — otherwise enforcement would defeat the salvage path. The
+    # rejected items' violations are logged for ops review.
+    allowed, rejected = enforce_scaffold_batch(questions_out, functioning_level)
+    if rejected:
+        logger.info(
+            "baseline scaffold enforcement (%s): %d allowed, %d rejected",
+            functioning_level, len(allowed), len(rejected),
+        )
+    if len(allowed) >= 14:
+        questions_out = allowed
+    elif len(allowed) > 0:
+        # Mixed: log but ship what we have so the parent UI still gets
+        # a baseline; the safety gate / fallback path in assessment-svc
+        # handles any shortfall.
+        logger.warning(
+            "baseline scaffold left %d items — keeping (would block parent UI)",
+            len(allowed),
+        )
+        questions_out = allowed
 
     return BaselineResponse(
-        questions=questions,
+        questions=questions_out,
         subjects=SUBJECTS,
         model=result["model"],
         prompt_tokens=result["prompt_tokens"],
@@ -284,6 +407,7 @@ class DiscoveryChapterRequest(BaseModel):
     # Optional — see BaselineRequest for the same rationale.
     caregiver_perspectives: Optional[list] = None
     teacher_assessment: Optional[dict] = None
+    zip_code: Optional[str] = None
 
 
 class DiscoveryChapterResponse(BaseModel):
@@ -298,6 +422,19 @@ class DiscoveryChapterResponse(BaseModel):
 async def generate_discovery_chapter(req: DiscoveryChapterRequest):
     from ..services.baseline_generator import build_discovery_adventure_prompt
 
+    grade_for_grounding = (
+        (req.district or {}).get("gradeLevel")
+        if isinstance(req.district, dict)
+        else None
+    ) or (req.parent_assessment or {}).get("gradeLevel")
+    curriculum_grounding = await load_curriculum_grounding(
+        zip_code=req.zip_code,
+        grade_level=grade_for_grounding,
+        # Discovery chapters scope to one domain at a time — only fetch
+        # anchors for that domain (cheaper, sharper prompt).
+        subjects=(req.chapter.get("domain"),) if req.chapter.get("domain") else (),
+    )
+
     system_prompt, user_prompt = build_discovery_adventure_prompt(
         req.parent_assessment,
         req.chapter,
@@ -306,6 +443,7 @@ async def generate_discovery_chapter(req: DiscoveryChapterRequest):
         interest_profile=req.interest_profile,
         caregiver_perspectives=req.caregiver_perspectives,
         teacher_assessment=req.teacher_assessment,
+        curriculum_grounding=curriculum_grounding,
     )
 
     try:
@@ -655,4 +793,137 @@ Rules:
         target_criteria=str(parsed.get("target_criteria") or "").strip(),
         measurable_criteria=str(parsed.get("measurable_criteria") or "").strip(),
         model=result["model"],
+    )
+
+
+# ── Sprint 6 — Baseline → IEP draft ─────────────────────────────────
+
+
+class IEPDraftRequest(BaseModel):
+    parent_assessment: dict
+    """The full parent assessment payload (same shape as the baseline
+    request) — strengths, challenges, functioning level, diagnoses."""
+    learning_profile: Optional[dict] = None
+    """Derived profile from the completed adaptive baseline:
+    thetaPlacement, modalityFit, processingSpeedMs, frustrationRate,
+    frustrationTolerance, attentionRunLength. None when the learner
+    has no completed baseline yet — the drafter still produces a draft
+    but flags the missing input in risks[]."""
+    domain_scores: Optional[dict] = None
+    """Per-subject correctness from the baseline attempt."""
+    iep: Optional[dict] = None
+    """Existing IEP (disability categories, accommodations on file) when
+    this is a re-draft after an updated baseline. None for fresh
+    drafts."""
+    learner_id: Optional[str] = None
+    """Logged in the audit row only — not part of the prompt."""
+
+
+class IEPDraftResponse(BaseModel):
+    draft: dict
+    model: str
+    prompt_tokens: int
+    completion_tokens: int
+
+
+@router.post("/iep/draft", response_model=IEPDraftResponse)
+async def draft_iep_from_baseline(req: IEPDraftRequest):
+    """Generate a draft IEP from the baseline + parent assessment.
+
+    Sprint 6 — the response is decision-SUPPORT only. The
+    assessment-svc persists the result with `status = "ai_draft"` and
+    surfaces it in the teacher / parent review queue. The IEP is never
+    activated without human sign-off.
+    """
+    system_prompt, user_prompt = build_iep_draft_prompt(
+        parent_assessment=req.parent_assessment or {},
+        learning_profile=req.learning_profile,
+        domain_scores=req.domain_scores,
+        iep_context=req.iep,
+    )
+
+    try:
+        result = await generate_completion(
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            max_tokens=3500,
+            temperature=0.5,
+            response_format={"type": "json_object"},
+        )
+    except BudgetExceeded as e:
+        raise HTTPException(status_code=429, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"LLM IEP draft failed: {str(e)}")
+
+    raw = (result.get("content") or "").strip()
+    if raw.startswith("```"):
+        raw = raw.split("\n", 1)[1] if "\n" in raw else raw[3:]
+        if raw.endswith("```"):
+            raw = raw[:-3]
+    try:
+        parsed = json.loads(raw)
+    except json.JSONDecodeError:
+        logger.error("iep draft failed to parse JSON: %s", raw[:300])
+        raise HTTPException(status_code=502, detail="AI returned invalid JSON for IEP draft")
+    if not isinstance(parsed, dict):
+        raise HTTPException(status_code=502, detail="AI returned non-object for IEP draft")
+
+    payload, errors = validate_iep_draft(parsed)
+    if payload is None:
+        logger.warning("iep draft validation failed: %s", errors[:5])
+        # One repair retry — feed the errors back to the LLM.
+        repair = (
+            "\n\n## REPAIR REQUEST\nYour previous output failed validation. "
+            "Fix every error below and return a corrected JSON object.\n\n"
+            + "\n".join(f"- {e}" for e in errors[:20])
+        )
+        try:
+            result = await generate_completion(
+                system_prompt=system_prompt,
+                user_prompt=user_prompt + repair,
+                max_tokens=3500,
+                temperature=0.4,
+                response_format={"type": "json_object"},
+            )
+            raw = (result.get("content") or "").strip()
+            if raw.startswith("```"):
+                raw = raw.split("\n", 1)[1] if "\n" in raw else raw[3:]
+                if raw.endswith("```"):
+                    raw = raw[:-3]
+            parsed = json.loads(raw)
+            payload, errors = validate_iep_draft(parsed)
+        except Exception as e:  # noqa: BLE001 — retry is best-effort.
+            logger.warning("iep draft repair retry failed: %s", e)
+
+    if payload is None:
+        raise HTTPException(
+            status_code=502,
+            detail={"message": "AI IEP draft failed validation", "errors": errors[:10]},
+        )
+
+    # Sprint 4 reuse — responsible-AI evaluation on the synthesised draft.
+    # Warn-mode so the team still sees a draft even if the evaluator
+    # flags something; verdict lands in the response for the route layer
+    # to persist alongside the draft.
+    rai_result = await evaluate_responsible_ai(
+        learner_id=str(req.learner_id or ""),
+        context_type="recommendation",
+        input_summary="baseline → IEP draft",
+        output=payload.model_dump(exclude_none=True),
+        learner_profile_summary={
+            "functioningLevel": (req.parent_assessment or {}).get("functioningLevel"),
+            "accommodations": [],
+        },
+        policy_mode="warn",
+    )
+
+    draft_dict = payload.model_dump(exclude_none=True)
+    if rai_result:
+        draft_dict["_responsibleAi"] = rai_result
+
+    return IEPDraftResponse(
+        draft=draft_dict,
+        model=result.get("model", "unknown"),
+        prompt_tokens=result.get("prompt_tokens", 0),
+        completion_tokens=result.get("completion_tokens", 0),
     )

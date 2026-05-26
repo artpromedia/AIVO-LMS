@@ -1,0 +1,246 @@
+{
+  "$$schema": "https://grafana.com/api/dashboards/v1",
+  "title": "AIVO — Baseline & AI Ops",
+  "uid": "aivo-baseline-ops",
+  "tags": ["aivo", "ai-svc", "baseline", "sprint-12"],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-6h", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "tenant",
+        "label": "Tenant",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+        "query": "label_values(aivo_baseline_generated_total, tenant_id)",
+        "refresh": 1,
+        "multi": true,
+        "includeAll": true,
+        "current": { "selected": false, "text": "All", "value": "$__all" }
+      },
+      {
+        "name": "model",
+        "label": "Model",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+        "query": "label_values(aivo_llm_cost_cents_total, model)",
+        "refresh": 1,
+        "multi": true,
+        "includeAll": true,
+        "current": { "selected": false, "text": "All", "value": "$__all" }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Baselines generated (24h)",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(increase(aivo_baseline_generated_total{tenant_id=~\"$tenant\"}[24h]))",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "value",
+        "graphMode": "area"
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Fallback share of shipped (5m)",
+      "description": "% of shipped baselines that came from the curated bank (Sprint 3). SLO < 5 %.",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.03 },
+              { "color": "red", "value": 0.05 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(aivo_baseline_fallback_total[5m])) / sum(rate(aivo_baseline_shipped_total[5m]))",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Responsible-AI block rate (5m)",
+      "description": "Sprint 4 evaluator block rate. SLO < 2 %.",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.01 },
+              { "color": "red", "value": 0.02 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(aivo_responsible_ai_verdicts_total{action=\"block\"}[5m])) / sum(rate(aivo_responsible_ai_verdicts_total[5m]))",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Prompt-cache hit rate (5m)",
+      "description": "Sprint 1 cache key segmented by (district, gradeBand, functioningLevel). SLO ≥ 70 % after warm-up.",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 0.5 },
+              { "color": "green", "value": 0.7 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(aivo_llm_cache_hit_total[5m])) / sum(rate(aivo_llm_completion_total[5m]))",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Baseline generation p50 / p95 / p99 (s)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "fieldConfig": { "defaults": { "unit": "s" } },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum by (le) (rate(aivo_baseline_latency_seconds_bucket[5m])))",
+          "legendFormat": "p50",
+          "refId": "A"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(aivo_baseline_latency_seconds_bucket[5m])))",
+          "legendFormat": "p95",
+          "refId": "B"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(aivo_baseline_latency_seconds_bucket[5m])))",
+          "legendFormat": "p99",
+          "refId": "C"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": { "displayMode": "table", "placement": "bottom" }
+      }
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "LLM token spend per tenant (cents/min)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "fieldConfig": { "defaults": { "unit": "cents" } },
+      "targets": [
+        {
+          "expr": "sum by (tenant_id) (rate(aivo_llm_cost_cents_total{tenant_id=~\"$tenant\", model=~\"$model\"}[1m])) * 60",
+          "legendFormat": "{{tenant_id}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Source breakdown (per-minute)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "fieldConfig": { "defaults": { "unit": "short" } },
+      "targets": [
+        {
+          "expr": "sum by (source) (rate(aivo_baseline_shipped_total{tenant_id=~\"$tenant\"}[1m])) * 60",
+          "legendFormat": "{{source}}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": { "displayMode": "table", "placement": "bottom" }
+      }
+    },
+    {
+      "id": 8,
+      "type": "table",
+      "title": "Top responsible-AI violation codes (24h)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "targets": [
+        {
+          "expr": "topk(10, sum by (code) (increase(aivo_responsible_ai_violation_total[24h])))",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "stat",
+      "title": "IEP draft validation failure rate (5m)",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 20 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.05 },
+              { "color": "red", "value": 0.1 }
+            ]
+          }
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(aivo_iep_draft_validation_failure_total[5m])) / sum(rate(aivo_iep_draft_attempt_total[5m]))",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "stat",
+      "title": "PRE_SYMBOLIC short-circuit count (24h)",
+      "description": "Sprint 5 — count of learners who got the observation checklist instead of MC.",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 20 },
+      "targets": [
+        {
+          "expr": "sum(increase(aivo_baseline_generated_total{functioning_level=\"PRE_SYMBOLIC\"}[24h]))",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}

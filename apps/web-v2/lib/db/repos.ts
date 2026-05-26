@@ -6,6 +6,7 @@
 import { getStore, newId, nowIso } from "@/lib/db/store";
 import { ensureSeeded } from "@/lib/db/seed";
 import { computeReadinessFor } from "@/lib/learner/readiness";
+import { listLearnersForMember as listLearnersForTeamMember } from "@/lib/db/team-invites";
 import type {
   AuditLog,
   BaselineAssessment,
@@ -5594,4 +5595,864 @@ export function upsertLearnerSensoryModality(
   };
   store.learnerSensoryProfiles.set(learnerId, next);
   return next;
+}
+
+// ---------------------------------------------------------------------------
+// Sprint 7 — school admin dashboard. The previous `/admin/school` page
+// rendered hardcoded values (school name, learner count, consent %, etc.).
+// `getSchoolDashboard` collapses the relevant repos into one server-side
+// payload so the page can fetch real numbers and the test suite has one
+// observable surface to pin.
+// ---------------------------------------------------------------------------
+
+export interface SchoolDashboardSnapshot {
+  /** Returns null when no school/tenant maps to the caller. */
+  school: { id: string | null; name: string; districtId: string | null } | null;
+  counts: {
+    learners: number;
+    staff: number;
+    classes: number;
+    iepsOnFile: number;
+    auditEvents30d: number;
+    moderationFlagged7d: number;
+    consentCompletePct: number;
+  };
+  licenses: {
+    used: number;
+    total: number;
+    utilizationPct: number;
+  };
+  rostering: {
+    source: string;
+    lastSyncIso: string | null;
+    lastErrorIso: string | null;
+    status: "healthy" | "warning" | "error" | "unknown";
+  };
+}
+
+export function getSchoolDashboard(
+  tenantId: string,
+  schoolId?: string,
+): SchoolDashboardSnapshot {
+  const store = db();
+  const tenant = getTenantById(tenantId);
+  const schools = listSchools(tenantId);
+  const school =
+    schools.find((s) => (schoolId ? s.id === schoolId : true)) ?? schools[0] ?? null;
+
+  const learners = Array.from(store.learnerProfiles.values()).filter(
+    (l) => l.tenantId === tenantId,
+  );
+  const staff = listUsersForTenants([tenantId]).filter((u) =>
+    ["TEACHER", "SCHOOL_ADMIN", "DISTRICT_ADMIN", "THERAPIST"].includes(u.role as string),
+  );
+  const classes = listClassrooms({
+    tenantId,
+    schoolId: school?.id,
+  });
+
+  const ieps = Array.from(store.iepDocuments.values()).filter((d) => {
+    const l = store.learnerProfiles.get(d.learnerId);
+    return l?.tenantId === tenantId;
+  });
+
+  const auditLogs = listAuditLogsForTenants([tenantId], 1000);
+  const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+  const auditEvents30d = auditLogs.filter(
+    (a) => new Date(a.createdAt).getTime() >= thirtyDaysAgo,
+  ).length;
+
+  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const moderationFlagged7d = Array.from(store.moderationEvents.values()).filter(
+    (m) =>
+      m.tenantId === tenantId && new Date(m.createdAt).getTime() >= sevenDaysAgo,
+  ).length;
+
+  // Count UNIQUE learners with at least one consent record on file —
+  // the seed writes one record per consent version per learner, so a
+  // naïve rows/learners ratio over-reports (a learner with 5 versions
+  // would count as 500%). Cap at 100 % defensively too.
+  const consentedLearners = new Set(
+    (store.consentRecords ?? [])
+      .filter((c) => c.tenantId === tenantId)
+      .map((c) => c.learnerId)
+      .filter((id): id is string => typeof id === "string" && id.length > 0),
+  );
+  const consentCompletePct =
+    learners.length === 0
+      ? 100
+      : Math.min(
+          100,
+          Math.round((consentedLearners.size / learners.length) * 100),
+        );
+
+  // License pool — use tenant.seatLimit when present, fall back to learner+staff.
+  const totalSeats =
+    (tenant as { seatLimit?: number } | null)?.seatLimit ?? learners.length + staff.length;
+  const usedSeats = learners.length + staff.length;
+  const utilizationPct =
+    totalSeats === 0 ? 0 : Math.round((usedSeats / totalSeats) * 100);
+
+  // Rostering — last successful job if any, else "unknown".
+  const rosteringJobs = Array.from(store.aiGenerationJobs?.values?.() ?? []).filter(
+    (j) => (j as { tenantId?: string }).tenantId === tenantId && (j as { kind?: string }).kind === "rostering_import",
+  );
+  rosteringJobs.sort((a, b) => {
+    const ta = new Date((a as { updatedAt?: string }).updatedAt ?? 0).getTime();
+    const tb = new Date((b as { updatedAt?: string }).updatedAt ?? 0).getTime();
+    return tb - ta;
+  });
+  const lastJob = rosteringJobs[0] as
+    | { status?: string; updatedAt?: string; source?: string }
+    | undefined;
+  const lastSyncIso = lastJob?.updatedAt ?? null;
+  const status: SchoolDashboardSnapshot["rostering"]["status"] = !lastJob
+    ? "unknown"
+    : lastJob.status === "succeeded"
+      ? "healthy"
+      : lastJob.status === "failed"
+        ? "error"
+        : "warning";
+
+  return {
+    school: school
+      ? { id: school.id, name: school.name, districtId: school.districtId ?? null }
+      : { id: null, name: tenant?.name ?? "(unnamed school)", districtId: null },
+    counts: {
+      learners: learners.length,
+      staff: staff.length,
+      classes: classes.length,
+      iepsOnFile: ieps.length,
+      auditEvents30d,
+      moderationFlagged7d,
+      consentCompletePct,
+    },
+    licenses: { used: usedSeats, total: totalSeats, utilizationPct },
+    rostering: {
+      source: lastJob?.source ?? "manual",
+      lastSyncIso,
+      lastErrorIso: null,
+      status,
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Sprint 8 — school reports backend.
+//
+// Returns per-learner aggregate rows for the configurable date range so the
+// admin can drill into adoption, IEP compliance, and engagement. The shape
+// is deliberately tabular so the CSV export endpoint can serialize it
+// directly without bespoke transforms.
+// ---------------------------------------------------------------------------
+
+export interface SchoolReportRow {
+  learnerId: string;
+  learnerName: string;
+  classroomName: string | null;
+  gradeBand: string | null;
+  iepOnFile: boolean;
+  baselineCompleted: boolean;
+  lessonsCompleted: number;
+  lessonsInWindow: number;
+  consentOnFile: boolean;
+  lastActiveIso: string | null;
+}
+
+export interface SchoolReportSummary {
+  totalLearners: number;
+  lessonsInWindow: number;
+  iepCoveragePct: number;
+  consentCoveragePct: number;
+  windowStartIso: string;
+  windowEndIso: string;
+}
+
+export interface SchoolReportPayload {
+  summary: SchoolReportSummary;
+  rows: SchoolReportRow[];
+}
+
+export function getSchoolReport(
+  tenantId: string,
+  opts: { startIso?: string; endIso?: string } = {},
+): SchoolReportPayload {
+  const store = db();
+  const endIso = opts.endIso ?? new Date().toISOString();
+  const startIso =
+    opts.startIso ?? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const startMs = new Date(startIso).getTime();
+  const endMs = new Date(endIso).getTime();
+
+  const learners = Array.from(store.learnerProfiles.values()).filter(
+    (l) => l.tenantId === tenantId,
+  );
+  const classrooms = listClassrooms({ tenantId });
+  const classroomById = new Map(classrooms.map((c) => [c.id, c]));
+  const enrollmentByLearner = new Map<string, string>();
+  for (const e of Array.from(store.enrollments.values())) {
+    if (e.userId && !enrollmentByLearner.has(e.userId)) {
+      enrollmentByLearner.set(e.userId, e.classroomId);
+    }
+  }
+
+  const consentByLearner = new Set(
+    (store.consentRecords ?? [])
+      .filter((c) => c.tenantId === tenantId && c.learnerId)
+      .map((c) => c.learnerId as string),
+  );
+  const iepByLearner = new Set(
+    Array.from(store.iepDocuments.values()).map((d) => d.learnerId),
+  );
+
+  const lessonRunsByLearner = new Map<string, number>();
+  const lessonRunsInWindowByLearner = new Map<string, number>();
+  const lastActiveByLearner = new Map<string, string>();
+  for (const lr of Array.from(store.lessonRuns?.values?.() ?? [])) {
+    const t = lr as { learnerId?: string; createdAt?: string; completedAt?: string | null; tenantId?: string };
+    if (t.tenantId !== tenantId || !t.learnerId) continue;
+    lessonRunsByLearner.set(t.learnerId, (lessonRunsByLearner.get(t.learnerId) ?? 0) + 1);
+    const tMs = new Date(t.createdAt ?? 0).getTime();
+    if (tMs >= startMs && tMs <= endMs) {
+      lessonRunsInWindowByLearner.set(
+        t.learnerId,
+        (lessonRunsInWindowByLearner.get(t.learnerId) ?? 0) + 1,
+      );
+    }
+    const last = lastActiveByLearner.get(t.learnerId);
+    if (!last || (t.createdAt && new Date(t.createdAt).getTime() > new Date(last).getTime())) {
+      if (t.createdAt) lastActiveByLearner.set(t.learnerId, t.createdAt);
+    }
+  }
+
+  const rows: SchoolReportRow[] = learners.map((l) => {
+    const cls = enrollmentByLearner.get(l.id);
+    const classroom = cls ? classroomById.get(cls) ?? null : null;
+    return {
+      learnerId: l.id,
+      learnerName: l.displayName ?? l.id,
+      classroomName: classroom?.name ?? null,
+      gradeBand: classroom?.gradeBand ?? null,
+      iepOnFile: iepByLearner.has(l.id),
+      baselineCompleted: !!(l as { baselineCompletedAt?: string | null }).baselineCompletedAt,
+      lessonsCompleted: lessonRunsByLearner.get(l.id) ?? 0,
+      lessonsInWindow: lessonRunsInWindowByLearner.get(l.id) ?? 0,
+      consentOnFile: consentByLearner.has(l.id),
+      lastActiveIso: lastActiveByLearner.get(l.id) ?? null,
+    };
+  });
+
+  const lessonsInWindow = rows.reduce((sum, r) => sum + r.lessonsInWindow, 0);
+  const iepCoveragePct =
+    learners.length === 0
+      ? 100
+      : Math.round((rows.filter((r) => r.iepOnFile).length / learners.length) * 100);
+  const consentCoveragePct =
+    learners.length === 0
+      ? 100
+      : Math.round((rows.filter((r) => r.consentOnFile).length / learners.length) * 100);
+
+  return {
+    summary: {
+      totalLearners: learners.length,
+      lessonsInWindow,
+      iepCoveragePct,
+      consentCoveragePct,
+      windowStartIso: startIso,
+      windowEndIso: endIso,
+    },
+    rows: rows.sort((a, b) => a.learnerName.localeCompare(b.learnerName)),
+  };
+}
+
+/**
+ * Sprint 8 — render a school report payload as RFC 4180 CSV. Kept in
+ * the repo module so the BFF route stays lean and so the CSV shape is
+ * unit-testable without spinning up HTTP.
+ */
+export function renderSchoolReportCsv(payload: SchoolReportPayload): string {
+  const header = [
+    "learnerId",
+    "learnerName",
+    "classroomName",
+    "gradeBand",
+    "iepOnFile",
+    "baselineCompleted",
+    "lessonsCompleted",
+    "lessonsInWindow",
+    "consentOnFile",
+    "lastActiveIso",
+  ].join(",");
+  const escape = (v: unknown): string => {
+    if (v === null || v === undefined) return "";
+    const s = String(v);
+    if (s.includes(",") || s.includes('"') || s.includes("\n")) {
+      return `"${s.replace(/"/g, '""')}"`;
+    }
+    return s;
+  };
+  const body = payload.rows
+    .map((r) =>
+      [
+        r.learnerId,
+        r.learnerName,
+        r.classroomName ?? "",
+        r.gradeBand ?? "",
+        r.iepOnFile,
+        r.baselineCompleted,
+        r.lessonsCompleted,
+        r.lessonsInWindow,
+        r.consentOnFile,
+        r.lastActiveIso ?? "",
+      ]
+        .map(escape)
+        .join(","),
+    )
+    .join("\n");
+  return `${header}\n${body}\n`;
+}
+
+// ---------------------------------------------------------------------------
+// Sprint 8 — class CRUD authorised at the BFF / route layer. The two
+// helpers below are the destructive counterparts to listClassrooms;
+// `createClassroom` already exists above.
+// ---------------------------------------------------------------------------
+
+export function deleteClassroom(id: string, tenantId: string): boolean {
+  const c = getClassroom(id, tenantId);
+  if (!c) return false;
+  // Cascade: drop enrollments for this classroom.
+  for (const e of Array.from(db().enrollments.values())) {
+    if (e.classroomId === id) db().enrollments.delete(e.id);
+  }
+  db().classrooms.delete(id);
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+// Sprint 8 — staff add/remove. The previous /admin/school/staff page
+// could only LIST users; these helpers fill in the create + delete
+// half so the admin can complete invites and revoke access.
+// ---------------------------------------------------------------------------
+
+export function addStaffUser(input: {
+  tenantId: string;
+  email: string;
+  displayName: string;
+  role: "TEACHER" | "SCHOOL_ADMIN" | "THERAPIST" | "CAREGIVER";
+}): UserSummary {
+  const id = newId("user");
+  const rec = {
+    id,
+    tenantId: input.tenantId,
+    email: input.email,
+    displayName: input.displayName,
+    role: input.role,
+    status: "INVITED",
+    createdAt: nowIso(),
+  };
+  // Best-effort persistence — the in-memory store keeps users in a Map.
+  db().users.set(id, rec as never);
+  return rec as UserSummary;
+}
+
+export function removeStaffUser(userId: string, tenantId: string): boolean {
+  const u = db().users.get(userId) as ({ tenantId?: string } | undefined);
+  if (!u || u.tenantId !== tenantId) return false;
+  db().users.delete(userId);
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+// Sprint 9 — therapist domain repos. The therapist shell used to read
+// from shared LessonRun rows only; this layer gives the role a proper
+// caseload + session notes + goal tracking surface.
+// ---------------------------------------------------------------------------
+
+export interface TherapistCaseloadEntry {
+  learner: LearnerProfile;
+  /** Active IEP goals owned by this therapist for the learner. */
+  goals: import("./types").IepGoalRecord[];
+  /** Last session note authored, when any. */
+  lastSession: import("./types").TherapistSessionNote | null;
+  /** Next scheduled session ISO (placeholder — wired from scheduling
+   *  service in a later sprint). */
+  nextSessionIso: string | null;
+}
+
+export function listTherapistCaseload(
+  therapistUserId: string,
+  therapistEmail: string,
+  tenantId: string,
+): TherapistCaseloadEntry[] {
+  const store = db();
+  const learnerIds = new Set<string>(
+    listLearnersForTeamMember(therapistUserId, therapistEmail, "therapist"),
+  );
+  const goalsByLearner = new Map<string, import("./types").IepGoalRecord[]>();
+  for (const g of Array.from(store.iepGoalRecords.values())) {
+    if (g.tenantId !== tenantId) continue;
+    if (g.status === "discontinued") continue;
+    const arr = goalsByLearner.get(g.learnerId) ?? [];
+    arr.push(g);
+    goalsByLearner.set(g.learnerId, arr);
+  }
+  const lastSessionByLearner = new Map<string, import("./types").TherapistSessionNote>();
+  for (const note of Array.from(store.therapistSessionNotes.values())) {
+    if (note.tenantId !== tenantId || note.therapistUserId !== therapistUserId) continue;
+    const prev = lastSessionByLearner.get(note.learnerId);
+    if (!prev || note.sessionDate > prev.sessionDate) {
+      lastSessionByLearner.set(note.learnerId, note);
+    }
+  }
+  const out: TherapistCaseloadEntry[] = [];
+  for (const id of learnerIds) {
+    const l = store.learnerProfiles.get(id);
+    if (!l || l.tenantId !== tenantId) continue;
+    out.push({
+      learner: l,
+      goals: (goalsByLearner.get(id) ?? []).sort((a, b) =>
+        a.updatedAt < b.updatedAt ? 1 : -1,
+      ),
+      lastSession: lastSessionByLearner.get(id) ?? null,
+      nextSessionIso: null,
+    });
+  }
+  return out.sort((a, b) => a.learner.displayName.localeCompare(b.learner.displayName));
+}
+
+export function listIepGoals(
+  learnerId: string,
+  tenantId: string,
+): import("./types").IepGoalRecord[] {
+  return Array.from(db().iepGoalRecords.values())
+    .filter((g) => g.learnerId === learnerId && g.tenantId === tenantId)
+    .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
+}
+
+export function createIepGoal(input: {
+  tenantId: string;
+  learnerId: string;
+  authoredByUserId: string;
+  domain: string;
+  goalText: string;
+  baseline?: string;
+  targetCriteria?: string;
+  measurableCriteria?: string;
+}): import("./types").IepGoalRecord {
+  const now = nowIso();
+  const rec: import("./types").IepGoalRecord = {
+    id: newId("goal"),
+    tenantId: input.tenantId,
+    learnerId: input.learnerId,
+    authoredByUserId: input.authoredByUserId,
+    domain: input.domain,
+    goalText: input.goalText,
+    baseline: input.baseline ?? "",
+    targetCriteria: input.targetCriteria ?? "",
+    measurableCriteria: input.measurableCriteria ?? "",
+    status: "active",
+    progressPct: 0,
+    dataPoints: [],
+    createdAt: now,
+    updatedAt: now,
+  };
+  db().iepGoalRecords.set(rec.id, rec);
+  return rec;
+}
+
+export function updateIepGoalProgress(
+  goalId: string,
+  tenantId: string,
+  value: number,
+  note?: string,
+): import("./types").IepGoalRecord | null {
+  const g = db().iepGoalRecords.get(goalId);
+  if (!g || g.tenantId !== tenantId) return null;
+  const clamped = Math.max(0, Math.min(100, value));
+  g.progressPct = clamped;
+  g.dataPoints = [
+    ...g.dataPoints,
+    { date: nowIso(), value: clamped, note },
+  ].slice(-50);
+  g.updatedAt = nowIso();
+  if (clamped >= 100 && g.status === "active") g.status = "met";
+  return g;
+}
+
+export function listSessionNotes(
+  learnerId: string,
+  tenantId: string,
+): import("./types").TherapistSessionNote[] {
+  return Array.from(db().therapistSessionNotes.values())
+    .filter((n) => n.learnerId === learnerId && n.tenantId === tenantId)
+    .sort((a, b) => (a.sessionDate < b.sessionDate ? 1 : -1));
+}
+
+export function createSessionNote(input: {
+  tenantId: string;
+  learnerId: string;
+  therapistUserId: string;
+  sessionDate?: string;
+  durationMinutes: number;
+  subjective: string;
+  objective: string;
+  assessment: string;
+  plan: string;
+  goalIds: string[];
+}): import("./types").TherapistSessionNote {
+  const now = nowIso();
+  const rec: import("./types").TherapistSessionNote = {
+    id: newId("note"),
+    tenantId: input.tenantId,
+    learnerId: input.learnerId,
+    therapistUserId: input.therapistUserId,
+    sessionDate: input.sessionDate ?? now,
+    durationMinutes: input.durationMinutes,
+    subjective: input.subjective,
+    objective: input.objective,
+    assessment: input.assessment,
+    plan: input.plan,
+    goalIds: input.goalIds,
+    signedAt: null,
+    createdAt: now,
+    updatedAt: now,
+  };
+  db().therapistSessionNotes.set(rec.id, rec);
+  return rec;
+}
+
+export function signSessionNote(
+  id: string,
+  tenantId: string,
+): import("./types").TherapistSessionNote | null {
+  const n = db().therapistSessionNotes.get(id);
+  if (!n || n.tenantId !== tenantId) return null;
+  n.signedAt = nowIso();
+  n.updatedAt = nowIso();
+  return n;
+}
+
+// ---------------------------------------------------------------------------
+// Sprint 10 — caregiver observations.
+// ---------------------------------------------------------------------------
+
+export function listCaregiverObservations(
+  learnerId: string,
+  tenantId: string,
+  limit = 100,
+): import("./types").CaregiverObservation[] {
+  return Array.from(db().caregiverObservations.values())
+    .filter((o) => o.learnerId === learnerId && o.tenantId === tenantId)
+    .sort((a, b) => (a.observedAt < b.observedAt ? 1 : -1))
+    .slice(0, limit);
+}
+
+export function createCaregiverObservation(input: {
+  tenantId: string;
+  learnerId: string;
+  caregiverUserId: string;
+  observedAt?: string;
+  behaviour: string;
+  antecedent?: string;
+  consequence?: string;
+  durationMinutes?: number | null;
+  location?: string;
+  attachmentUrl?: string | null;
+}): import("./types").CaregiverObservation {
+  const rec: import("./types").CaregiverObservation = {
+    id: newId("obs"),
+    tenantId: input.tenantId,
+    learnerId: input.learnerId,
+    caregiverUserId: input.caregiverUserId,
+    observedAt: input.observedAt ?? nowIso(),
+    behaviour: input.behaviour,
+    antecedent: input.antecedent ?? "",
+    consequence: input.consequence ?? "",
+    durationMinutes: input.durationMinutes ?? null,
+    location: input.location ?? "home",
+    attachmentUrl: input.attachmentUrl ?? null,
+    createdAt: nowIso(),
+  };
+  db().caregiverObservations.set(rec.id, rec);
+  return rec;
+}
+
+// ---------------------------------------------------------------------------
+// Sprint 11 — teacher IEP authoring + gradebook detail.
+//
+// upsertIepAiDraft persists the response from POST /api/ai/iep/draft
+// so the teacher can review and progress the draft through the
+// lifecycle (ai_draft → teacher_review → admin_approved → active).
+// One row per learner; regenerations overwrite.
+// ---------------------------------------------------------------------------
+
+export function upsertIepAiDraft(input: {
+  tenantId: string;
+  learnerId: string;
+  sourceAttemptId?: string | null;
+  draft: import("./types").IepAiDraftBody;
+  model?: string | null;
+  responsibleAi?: Record<string, unknown>;
+}): import("./types").IepAiDraftRecord {
+  const store = db();
+  const now = nowIso();
+  const existing = Array.from(store.iepAiDrafts.values()).find(
+    (d) => d.learnerId === input.learnerId && d.tenantId === input.tenantId,
+  );
+  if (existing) {
+    existing.draft = input.draft;
+    existing.model = input.model ?? existing.model;
+    existing.responsibleAi = input.responsibleAi ?? existing.responsibleAi;
+    existing.generatedAt = now;
+    existing.updatedAt = now;
+    existing.status = "ai_draft";
+    existing.reviewedByUserId = null;
+    existing.reviewedAt = null;
+    existing.approvedByUserId = null;
+    existing.approvedAt = null;
+    return existing;
+  }
+  const rec: import("./types").IepAiDraftRecord = {
+    id: newId("iep-draft"),
+    tenantId: input.tenantId,
+    learnerId: input.learnerId,
+    sourceAttemptId: input.sourceAttemptId ?? null,
+    status: "ai_draft",
+    draft: input.draft,
+    model: input.model ?? null,
+    responsibleAi: input.responsibleAi ?? {},
+    generatedAt: now,
+    reviewedByUserId: null,
+    reviewedAt: null,
+    approvedByUserId: null,
+    approvedAt: null,
+    createdAt: now,
+    updatedAt: now,
+  };
+  store.iepAiDrafts.set(rec.id, rec);
+  return rec;
+}
+
+export function getIepAiDraft(
+  learnerId: string,
+  tenantId: string,
+): import("./types").IepAiDraftRecord | null {
+  return (
+    Array.from(db().iepAiDrafts.values()).find(
+      (d) => d.learnerId === learnerId && d.tenantId === tenantId,
+    ) ?? null
+  );
+}
+
+export function listIepAiDraftsForReviewer(
+  reviewerUserId: string,
+  tenantId: string,
+): import("./types").IepAiDraftRecord[] {
+  // Sprint 11: a teacher sees drafts for every learner on their roster.
+  const learnerIds = new Set(
+    listLearnersForTeacher(reviewerUserId, tenantId).map((l) => l.id),
+  );
+  return Array.from(db().iepAiDrafts.values())
+    .filter((d) => d.tenantId === tenantId && learnerIds.has(d.learnerId))
+    .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
+}
+
+export function progressIepAiDraft(
+  id: string,
+  tenantId: string,
+  userId: string,
+  next: import("./types").IepAiDraftStatus,
+): import("./types").IepAiDraftRecord | null {
+  const d = db().iepAiDrafts.get(id);
+  if (!d || d.tenantId !== tenantId) return null;
+  const allowed: Record<
+    import("./types").IepAiDraftStatus,
+    import("./types").IepAiDraftStatus[]
+  > = {
+    ai_draft: ["teacher_review", "archived"],
+    teacher_review: ["admin_approved", "ai_draft", "archived"],
+    admin_approved: ["active", "archived"],
+    active: ["archived"],
+    archived: [],
+  };
+  if (!allowed[d.status].includes(next)) return null;
+  d.status = next;
+  d.updatedAt = nowIso();
+  if (next === "teacher_review") {
+    d.reviewedByUserId = userId;
+    d.reviewedAt = nowIso();
+  }
+  if (next === "admin_approved") {
+    d.approvedByUserId = userId;
+    d.approvedAt = nowIso();
+  }
+  return d;
+}
+
+// ---------------------------------------------------------------------------
+// Teacher gradebook detail. Returns per-skill mastery summary across the
+// learner's enrolled subjects so the teacher can see WHERE the learner
+// is and WHERE they're stuck without scrolling through raw LessonRuns.
+// ---------------------------------------------------------------------------
+
+export interface GradebookRow {
+  subjectId: string;
+  subjectName: string;
+  skillId: string;
+  skillName: string;
+  level: "introduced" | "developing" | "secure" | "mastered" | "unattempted";
+  lastPracticedIso: string | null;
+  attempts: number;
+}
+
+export interface GradebookDetail {
+  learnerId: string;
+  rows: GradebookRow[];
+  summary: { mastered: number; secure: number; developing: number; introduced: number };
+}
+
+export function getGradebookDetail(
+  learnerId: string,
+  tenantId: string,
+): GradebookDetail {
+  const mastery = getMasteryMap(learnerId, tenantId);
+  const subjects = new Map(listSubjects().map((s) => [s.id, s]));
+  const skills = new Map(listSkills().map((s) => [s.id, s]));
+
+  // Count lesson runs per skill + last-practiced timestamp.
+  const lastByskill = new Map<string, string>();
+  const attemptsBySkill = new Map<string, number>();
+  for (const lr of Array.from(db().lessonRuns.values())) {
+    const t = lr as { learnerId?: string; tenantId?: string; skillId?: string; createdAt?: string };
+    if (t.tenantId !== tenantId || t.learnerId !== learnerId || !t.skillId) continue;
+    attemptsBySkill.set(t.skillId, (attemptsBySkill.get(t.skillId) ?? 0) + 1);
+    const prev = lastByskill.get(t.skillId);
+    if (!prev || (t.createdAt && t.createdAt > prev)) {
+      if (t.createdAt) lastByskill.set(t.skillId, t.createdAt);
+    }
+  }
+
+  const rows: GradebookRow[] = [];
+  const entries = mastery?.entries ?? [];
+  for (const m of entries) {
+    const sk = skills.get(m.skillId);
+    if (!sk) continue;
+    const subj = subjects.get(sk.subjectId);
+    if (!subj) continue;
+    rows.push({
+      subjectId: subj.id,
+      subjectName: subj.name,
+      skillId: sk.id,
+      skillName: sk.name,
+      level: m.level as GradebookRow["level"],
+      lastPracticedIso: lastByskill.get(sk.id) ?? null,
+      attempts: attemptsBySkill.get(sk.id) ?? 0,
+    });
+  }
+  rows.sort((a, b) => {
+    const order = { mastered: 0, secure: 1, developing: 2, introduced: 3, unattempted: 4 };
+    return (order[a.level] ?? 5) - (order[b.level] ?? 5) ||
+      a.subjectName.localeCompare(b.subjectName);
+  });
+  const summary = {
+    mastered: rows.filter((r) => r.level === "mastered").length,
+    secure: rows.filter((r) => r.level === "secure").length,
+    developing: rows.filter((r) => r.level === "developing").length,
+    introduced: rows.filter((r) => r.level === "introduced").length,
+  };
+  return { learnerId, rows, summary };
+}
+
+// ---------------------------------------------------------------------------
+// Sprint 12 — baseline pipeline observability.
+//
+// Rolls the in-memory mirror of the Sprint 4 baseline_item_audits
+// table into the counts the platform admin dashboard renders. When
+// the real postgres table is wired up the implementation moves to a
+// SQL aggregator; the interface stays the same so callers don't
+// flip-flop.
+// ---------------------------------------------------------------------------
+
+export interface BaselinePipelineMetrics {
+  windowStartIso: string;
+  windowEndIso: string;
+  totalEvaluatedItems: number;
+  /** % of evaluated items blocked by responsible-AI. */
+  blockRatePct: number;
+  /** % of shipped items that came from the fallback bank. */
+  fallbackShareOfShippedPct: number;
+  /** Histogram of recommendedAction values. */
+  byRecommendedAction: Record<string, number>;
+  /** Top violation codes by frequency. */
+  topViolations: Array<{ code: string; count: number }>;
+}
+
+interface BaselineAuditLike {
+  shipped?: string;
+  source?: string;
+  recommendedAction?: string;
+  violations?: Array<{ code?: string }>;
+  createdAt?: string;
+}
+
+export function getBaselinePipelineMetrics(
+  opts: { startIso?: string; endIso?: string } = {},
+): BaselinePipelineMetrics {
+  const endIso = opts.endIso ?? new Date().toISOString();
+  const startIso =
+    opts.startIso ?? new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const startMs = new Date(startIso).getTime();
+  const endMs = new Date(endIso).getTime();
+
+  // Pull from whichever in-memory map exists. The store has not had a
+  // dedicated baseline_item_audits map yet (the postgres table from
+  // Sprint 4 is the production surface); for now we aggregate from
+  // moderationEvents which captures the same shape during local dev.
+  const rows: BaselineAuditLike[] = Array.from(
+    db().moderationEvents.values(),
+  ).filter((m) => {
+    const t = m as { createdAt?: string };
+    const ms = new Date(t.createdAt ?? 0).getTime();
+    return ms >= startMs && ms <= endMs;
+  }) as BaselineAuditLike[];
+
+  const byAction: Record<string, number> = {};
+  const violationCounts = new Map<string, number>();
+  let shippedFromFallback = 0;
+  let shippedTotal = 0;
+  let blocked = 0;
+  for (const r of rows) {
+    const action = r.recommendedAction ?? "allow";
+    byAction[action] = (byAction[action] ?? 0) + 1;
+    if (action === "block") blocked += 1;
+    if (r.shipped === "yes") {
+      shippedTotal += 1;
+      if (r.source === "fallback") shippedFromFallback += 1;
+    }
+    for (const v of r.violations ?? []) {
+      const code = v?.code;
+      if (!code) continue;
+      violationCounts.set(code, (violationCounts.get(code) ?? 0) + 1);
+    }
+  }
+
+  const total = rows.length;
+  const blockRatePct = total === 0 ? 0 : Math.round((blocked / total) * 100);
+  const fallbackShareOfShippedPct =
+    shippedTotal === 0 ? 0 : Math.round((shippedFromFallback / shippedTotal) * 100);
+  const topViolations = Array.from(violationCounts.entries())
+    .map(([code, count]) => ({ code, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
+
+  return {
+    windowStartIso: startIso,
+    windowEndIso: endIso,
+    totalEvaluatedItems: total,
+    blockRatePct,
+    fallbackShareOfShippedPct,
+    byRecommendedAction: byAction,
+    topViolations,
+  };
 }

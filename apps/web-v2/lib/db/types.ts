@@ -2352,3 +2352,138 @@ export type LearnerSensoryProfile = {
   notes: string;
   updatedAt: ISODate;
 };
+
+// ---------------------------------------------------------------------------
+// Sprint 9 / 10 — therapist + caregiver domain. Kept separate from the
+// IEPDocument extraction blob so goals can be edited, scored, and
+// progressed independently of the source PDF.
+// ---------------------------------------------------------------------------
+
+export type IepGoalStatus =
+  | "draft"
+  | "active"
+  | "met"
+  | "not_met"
+  | "discontinued";
+
+export type IepGoalRecord = {
+  id: ID;
+  tenantId: ID;
+  learnerId: ID;
+  /** Who authored the goal — typically the therapist or special-ed
+   *  teacher who owns the discipline. */
+  authoredByUserId: ID;
+  domain: string;
+  goalText: string;
+  baseline: string;
+  targetCriteria: string;
+  measurableCriteria: string;
+  status: IepGoalStatus;
+  /** Progress percentage 0..100 captured at the most recent session. */
+  progressPct: number;
+  /** Optional ordered list of {date, value, note} for trend reporting. */
+  dataPoints: Array<{ date: ISODate; value: number; note?: string }>;
+  createdAt: ISODate;
+  updatedAt: ISODate;
+};
+
+export type TherapistSessionNote = {
+  id: ID;
+  tenantId: ID;
+  learnerId: ID;
+  therapistUserId: ID;
+  sessionDate: ISODate;
+  durationMinutes: number;
+  /** SOAP template — Subjective / Objective / Assessment / Plan. */
+  subjective: string;
+  objective: string;
+  assessment: string;
+  plan: string;
+  /** Goals worked on this session (referenced for progress trending). */
+  goalIds: ID[];
+  /** Signed off when the therapist marks the note final. */
+  signedAt: ISODate | null;
+  createdAt: ISODate;
+  updatedAt: ISODate;
+};
+
+export type CaregiverObservation = {
+  id: ID;
+  tenantId: ID;
+  learnerId: ID;
+  caregiverUserId: ID;
+  observedAt: ISODate;
+  behaviour: string;
+  antecedent: string;
+  consequence: string;
+  durationMinutes: number | null;
+  location: string;
+  /** Optional attachment reference — image / video uploaded separately. */
+  attachmentUrl: string | null;
+  createdAt: ISODate;
+};
+
+// ---------------------------------------------------------------------------
+// Sprint 11 — AI-drafted IEPs surfaced to the teacher review queue.
+// Mirrors the iep_drafts postgres table introduced by services/ai-svc
+// Sprint 6; here we use it client-side so the teacher dashboard can
+// show / edit / approve drafts before the IEP team finalises.
+// ---------------------------------------------------------------------------
+
+export type IepAiDraftStatus =
+  | "ai_draft"
+  | "teacher_review"
+  | "admin_approved"
+  | "active"
+  | "archived";
+
+export type IepAiDraftGoal = {
+  domain: string;
+  goalText: string;
+  baseline: string;
+  targetCriteria: string;
+  measurableCriteria: string;
+  evidence: string[];
+};
+
+export type IepAiDraftAccommodation = {
+  type: string;
+  description: string;
+  frequency: string;
+  rationale: string;
+  priority: number;
+};
+
+export type IepAiDraftService = {
+  serviceType: string;
+  minutesPerWeek: number;
+  frequency: string;
+  location: string;
+  rationale: string;
+};
+
+export type IepAiDraftBody = {
+  summary: string;
+  goals: IepAiDraftGoal[];
+  accommodations: IepAiDraftAccommodation[];
+  services: IepAiDraftService[];
+  risks: string[];
+};
+
+export type IepAiDraftRecord = {
+  id: ID;
+  tenantId: ID;
+  learnerId: ID;
+  sourceAttemptId: ID | null;
+  status: IepAiDraftStatus;
+  draft: IepAiDraftBody;
+  model: string | null;
+  responsibleAi: Record<string, unknown>;
+  generatedAt: ISODate;
+  reviewedByUserId: ID | null;
+  reviewedAt: ISODate | null;
+  approvedByUserId: ID | null;
+  approvedAt: ISODate | null;
+  createdAt: ISODate;
+  updatedAt: ISODate;
+};

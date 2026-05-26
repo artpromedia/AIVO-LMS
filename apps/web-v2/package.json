@@ -19,6 +19,7 @@
     "@aivo/aac-bridge": "workspace:*",
     "@aivo/api-client": "workspace:*",
     "@aivo/brand": "workspace:*",
+    "@aivo/feature-flags": "workspace:*",
     "@aivo/learner-surfaces": "workspace:*",
     "@aivo/nav": "workspace:*",
     "@aivo/ui": "workspace:*",
