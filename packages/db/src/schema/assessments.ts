@@ -176,6 +176,40 @@ export const adaptiveBaselineSessions = pgTable("adaptive_baseline_sessions", {
 });
 
 /**
+ * Sprint 6 — AI-drafted IEPs derived from the baseline + parent
+ * assessment. The status field tracks the review lifecycle:
+ *
+ *   ai_draft → teacher_review → admin_approved → active → archived
+ *
+ * The full draft body (goals, accommodations, services, rationale)
+ * lives in `draft` as a JSONB blob so we can evolve the schema without
+ * a destructive migration. Pinned at one ai_draft per learner —
+ * regenerations replace the existing draft via upsert.
+ */
+export const iepDrafts = pgTable("iep_drafts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: uuid("tenant_id").references(() => tenants.id),
+  learnerId: uuid("learner_id").references(() => learners.id).notNull(),
+  /** Source attempt that fed the draft. Nullable when generated from
+   *  parent assessment only (no completed baseline yet). */
+  sourceAttemptId: uuid("source_attempt_id").references(() => assessmentAttempts.id),
+  status: varchar("status", { length: 32 }).notNull().default("ai_draft"),
+  /** Full draft body — goals[], accommodations[], services[], rationale, summary. */
+  draft: jsonb("draft").notNull().default({}),
+  /** LLM model that produced this draft (for audit/replay). */
+  model: varchar("model", { length: 64 }),
+  /** Responsible-AI verdict captured at generation time. */
+  responsibleAi: jsonb("responsible_ai").default({}),
+  generatedAt: timestamp("generated_at").defaultNow().notNull(),
+  reviewedByUserId: uuid("reviewed_by_user_id").references(() => users.id),
+  reviewedAt: timestamp("reviewed_at"),
+  approvedByUserId: uuid("approved_by_user_id").references(() => users.id),
+  approvedAt: timestamp("approved_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+/**
  * Sprint 4 — responsible-AI audit verdicts for AI-generated baseline
  * items. One row per evaluated question per generation attempt. Stored
  * so ops can dashboard the block rate, and so we can replay a baseline

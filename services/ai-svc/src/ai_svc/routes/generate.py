@@ -20,6 +20,10 @@ from ..services.scaffold_enforcer import (
     enforce_batch as enforce_scaffold_batch,
     normalize_level as normalize_functioning_level,
 )
+from ..services.iep_drafter import (
+    build_iep_draft_prompt,
+    validate_iep_draft,
+)
 
 logger = logging.getLogger("ai-svc.generate")
 
@@ -789,4 +793,137 @@ Rules:
         target_criteria=str(parsed.get("target_criteria") or "").strip(),
         measurable_criteria=str(parsed.get("measurable_criteria") or "").strip(),
         model=result["model"],
+    )
+
+
+# ── Sprint 6 — Baseline → IEP draft ─────────────────────────────────
+
+
+class IEPDraftRequest(BaseModel):
+    parent_assessment: dict
+    """The full parent assessment payload (same shape as the baseline
+    request) — strengths, challenges, functioning level, diagnoses."""
+    learning_profile: Optional[dict] = None
+    """Derived profile from the completed adaptive baseline:
+    thetaPlacement, modalityFit, processingSpeedMs, frustrationRate,
+    frustrationTolerance, attentionRunLength. None when the learner
+    has no completed baseline yet — the drafter still produces a draft
+    but flags the missing input in risks[]."""
+    domain_scores: Optional[dict] = None
+    """Per-subject correctness from the baseline attempt."""
+    iep: Optional[dict] = None
+    """Existing IEP (disability categories, accommodations on file) when
+    this is a re-draft after an updated baseline. None for fresh
+    drafts."""
+    learner_id: Optional[str] = None
+    """Logged in the audit row only — not part of the prompt."""
+
+
+class IEPDraftResponse(BaseModel):
+    draft: dict
+    model: str
+    prompt_tokens: int
+    completion_tokens: int
+
+
+@router.post("/iep/draft", response_model=IEPDraftResponse)
+async def draft_iep_from_baseline(req: IEPDraftRequest):
+    """Generate a draft IEP from the baseline + parent assessment.
+
+    Sprint 6 — the response is decision-SUPPORT only. The
+    assessment-svc persists the result with `status = "ai_draft"` and
+    surfaces it in the teacher / parent review queue. The IEP is never
+    activated without human sign-off.
+    """
+    system_prompt, user_prompt = build_iep_draft_prompt(
+        parent_assessment=req.parent_assessment or {},
+        learning_profile=req.learning_profile,
+        domain_scores=req.domain_scores,
+        iep_context=req.iep,
+    )
+
+    try:
+        result = await generate_completion(
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            max_tokens=3500,
+            temperature=0.5,
+            response_format={"type": "json_object"},
+        )
+    except BudgetExceeded as e:
+        raise HTTPException(status_code=429, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"LLM IEP draft failed: {str(e)}")
+
+    raw = (result.get("content") or "").strip()
+    if raw.startswith("```"):
+        raw = raw.split("\n", 1)[1] if "\n" in raw else raw[3:]
+        if raw.endswith("```"):
+            raw = raw[:-3]
+    try:
+        parsed = json.loads(raw)
+    except json.JSONDecodeError:
+        logger.error("iep draft failed to parse JSON: %s", raw[:300])
+        raise HTTPException(status_code=502, detail="AI returned invalid JSON for IEP draft")
+    if not isinstance(parsed, dict):
+        raise HTTPException(status_code=502, detail="AI returned non-object for IEP draft")
+
+    payload, errors = validate_iep_draft(parsed)
+    if payload is None:
+        logger.warning("iep draft validation failed: %s", errors[:5])
+        # One repair retry — feed the errors back to the LLM.
+        repair = (
+            "\n\n## REPAIR REQUEST\nYour previous output failed validation. "
+            "Fix every error below and return a corrected JSON object.\n\n"
+            + "\n".join(f"- {e}" for e in errors[:20])
+        )
+        try:
+            result = await generate_completion(
+                system_prompt=system_prompt,
+                user_prompt=user_prompt + repair,
+                max_tokens=3500,
+                temperature=0.4,
+                response_format={"type": "json_object"},
+            )
+            raw = (result.get("content") or "").strip()
+            if raw.startswith("```"):
+                raw = raw.split("\n", 1)[1] if "\n" in raw else raw[3:]
+                if raw.endswith("```"):
+                    raw = raw[:-3]
+            parsed = json.loads(raw)
+            payload, errors = validate_iep_draft(parsed)
+        except Exception as e:  # noqa: BLE001 — retry is best-effort.
+            logger.warning("iep draft repair retry failed: %s", e)
+
+    if payload is None:
+        raise HTTPException(
+            status_code=502,
+            detail={"message": "AI IEP draft failed validation", "errors": errors[:10]},
+        )
+
+    # Sprint 4 reuse — responsible-AI evaluation on the synthesised draft.
+    # Warn-mode so the team still sees a draft even if the evaluator
+    # flags something; verdict lands in the response for the route layer
+    # to persist alongside the draft.
+    rai_result = await evaluate_responsible_ai(
+        learner_id=str(req.learner_id or ""),
+        context_type="recommendation",
+        input_summary="baseline → IEP draft",
+        output=payload.model_dump(exclude_none=True),
+        learner_profile_summary={
+            "functioningLevel": (req.parent_assessment or {}).get("functioningLevel"),
+            "accommodations": [],
+        },
+        policy_mode="warn",
+    )
+
+    draft_dict = payload.model_dump(exclude_none=True)
+    if rai_result:
+        draft_dict["_responsibleAi"] = rai_result
+
+    return IEPDraftResponse(
+        draft=draft_dict,
+        model=result.get("model", "unknown"),
+        prompt_tokens=result.get("prompt_tokens", 0),
+        completion_tokens=result.get("completion_tokens", 0),
     )
