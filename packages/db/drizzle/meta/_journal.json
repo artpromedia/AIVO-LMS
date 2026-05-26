@@ -190,6 +190,13 @@
       "when": 1779588000000,
       "tag": "0043_learner_teachers_classroom",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1779591600000,
+      "tag": "0044_email_outbox",
+      "breakpoints": true
     }
   ]
 }

@@ -1,6 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { verifyJWT } from "@aivo/security";
 import { sendEmail, sendBatchEmails, isConfigured } from "../lib/postmark.js";
+import { getOutboxCounts } from "../lib/email-outbox.js";
 import { renderTemplate, AVAILABLE_TEMPLATES } from "../lib/templates.js";
 import { createLogger } from "@aivo/observability";
 import { emitCommsAudit } from "../lib/audit.js";
@@ -1077,6 +1078,22 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any) {
         logger.error({ err, to }, "Failed to send newsletter confirmation email");
         // Fail-soft: subscription is already stored; email failure is non-fatal.
         return { status: "failed" };
+      }
+    },
+  );
+
+  // Outbox health snapshot. Used by the admin console + readiness probes
+  // to surface a growing dead_letter or pending backlog.
+  app.get(
+    "/api/comms/outbox/stats",
+    { preHandler: requireAdmin },
+    async (_req, reply) => {
+      try {
+        const counts = await getOutboxCounts(db);
+        return { counts };
+      } catch (err: any) {
+        logger.error({ err }, "failed to read email outbox counts");
+        return reply.code(500).send({ error: "outbox_stats_failed" });
       }
     },
   );
