@@ -1,0 +1,25 @@
+{
+  "description": "Moodle — Site administrator opening tool from admin nav.",
+  "issuer": "https://moodle.example.org",
+  "audience": "aivo-tool-client-id",
+  "deployment_id": "moodle-deploy-99",
+  "claims": {
+    "https://purl.imsglobal.org/spec/lti/claim/message_type": "LtiResourceLinkRequest",
+    "https://purl.imsglobal.org/spec/lti/claim/version": "1.3.0",
+    "https://purl.imsglobal.org/spec/lti/claim/deployment_id": "moodle-deploy-99",
+    "https://purl.imsglobal.org/spec/lti/claim/roles": [
+      "http://purl.imsglobal.org/vocab/lis/v2/system/person#SysAdmin"
+    ],
+    "https://purl.imsglobal.org/spec/lti/claim/context": {
+      "id": "moodle-ctx-1",
+      "title": "Site administration"
+    },
+    "https://purl.imsglobal.org/spec/lti/claim/resource_link": {
+      "id": "rl-moodle-admin"
+    },
+    "https://purl.imsglobal.org/spec/lti/claim/target_link_uri": "https://aivo.example/admin",
+    "email": "admin@example.org",
+    "name": "Carl Admin",
+    "nonce": "fixture-nonce-3"
+  }
+}
