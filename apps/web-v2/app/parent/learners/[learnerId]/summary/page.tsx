@@ -36,9 +36,9 @@ export default async function ParentSummaryPage({
   if (!learner) notFound();
 
   const summaries = listParentLessonSummaries(learnerId, session.tenantId, { limit: 5 });
-  const { skillMasteries } = getMasteryMap(learnerId, session.tenantId);
-  const subjects = listSubjects();
-  const skills = listSkills();
+  const { skillMasteries } = await getMasteryMap(learnerId, session.tenantId);
+  const subjects = await listSubjects();
+  const skills = await listSkills();
   const skillsById = new Map(skills.map((s) => [s.id, s]));
 
   // Top 3 strongest + 3 needs-work skills (skip empty mastery).

@@ -42,7 +42,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (response) return response;
     const roleErr = requireRole(session!, [...READ_ROLES], requestId);
     if (roleErr) return roleErr;
-    const skill = getSkill(skillId);
+    const skill = await getSkill(skillId);
     if (!skill) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Skill not found." }, requestId);
     }
@@ -103,7 +103,7 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
         notes: parsed.data.addPrerequisite.notes ?? null,
       });
       prereqResult = added ? "ok" : "cycle";
-      if (added) updated = getSkill(skillId) ?? updated;
+      if (added) updated = await getSkill(skillId) ?? updated;
       else {
         return fail(
           {

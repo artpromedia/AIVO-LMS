@@ -125,7 +125,7 @@ export default async function ParentBaselinePage({
   }
 
   const baseline = await getActiveBaselineForLearner(learnerId, session.tenantId);
-  const subjects = listSubjects();
+  const subjects = await listSubjects();
   const subjectsById = new Map(subjects.map((s) => [s.id, s]));
 
   const questions = baseline ? await listBaselineQuestions(baseline.id) : [];

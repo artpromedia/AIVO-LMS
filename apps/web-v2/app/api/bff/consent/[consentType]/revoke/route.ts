@@ -23,7 +23,7 @@ export async function POST(req: Request, { params }: Params) {
     const json = (await req.json().catch(() => ({}))) as {
       learnerId?: string | null;
     };
-    const rec = revokeConsent({
+    const rec = await revokeConsent({
       tenantId: session!.tenantId,
       parentUserId: session!.userId,
       learnerId: json.learnerId ?? null,

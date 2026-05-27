@@ -161,10 +161,10 @@ describe("getGradebookDetail", () => {
     ensureSeeded();
   });
 
-  it("returns the per-skill mastery rows + summary", () => {
+  it("returns the per-skill mastery rows + summary", async () => {
     const tenant = Array.from(getStore().tenants.values())[0]!;
     const learner = Array.from(getStore().learnerProfiles.values())[0]!;
-    const detail = getGradebookDetail(learner.id, tenant.id);
+    const detail = await getGradebookDetail(learner.id, tenant.id);
     expect(detail.learnerId).toBe(learner.id);
     expect(typeof detail.summary.mastered).toBe("number");
     expect(typeof detail.summary.secure).toBe("number");
@@ -178,9 +178,9 @@ describe("getGradebookDetail", () => {
     expect(totalLeveled).toBeLessThanOrEqual(detail.rows.length);
   });
 
-  it("returns an empty rows array for a learner with no mastery yet", () => {
+  it("returns an empty rows array for a learner with no mastery yet", async () => {
     const tenant = Array.from(getStore().tenants.values())[0]!;
-    const detail = getGradebookDetail("nonexistent-learner", tenant.id);
+    const detail = await getGradebookDetail("nonexistent-learner", tenant.id);
     expect(detail.rows).toEqual([]);
   });
 });

@@ -25,7 +25,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
       requestId,
     );
     if (consentErr) return consentErr;
-    const result = pickTodaysMission(learnerId, session!.tenantId);
+    const result = await pickTodaysMission(learnerId, session!.tenantId);
     return ok({ today: result }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

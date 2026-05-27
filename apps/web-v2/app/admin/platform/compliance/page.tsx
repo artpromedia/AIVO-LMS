@@ -24,7 +24,7 @@ export default async function Page() {
   const disclosures = listDisclosures(session.tenantId);
   const exports = listAllDataExportRequests();
   const deletes = listAllDataDeletionRequests();
-  const policies = listPolicyVersions();
+  const policies = await listPolicyVersions();
 
   const tiles: { href: string; label: string; v: number | string; icon: React.ReactNode }[] = [
     {

@@ -29,7 +29,7 @@ export default async function BaselineWhyPage() {
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) redirect("/learner/home");
   const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
-  const iep = getIEPForLearner(learnerId, session.tenantId);
+  const iep = await getIEPForLearner(learnerId, session.tenantId);
 
   const chips: PersonalizationVariant[] = ["parent_assessment", "no_grades"];
   if (iep && iep.confirmedAt) chips.unshift("iep");

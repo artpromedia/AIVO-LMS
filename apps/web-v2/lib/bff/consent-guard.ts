@@ -28,7 +28,7 @@ export async function requireLearnerConsent(
   consentTypes: ConsentType[],
   requestId: string,
 ): Promise<NextResponse<BffFailure> | null> {
-  const ageGate = getAgeGateForLearner(learnerId, session.tenantId);
+  const ageGate = await getAgeGateForLearner(learnerId, session.tenantId);
   if (!ageGate || !ageGate.requiresParentConsent) return null;
   const parentUserId = await findPrimaryParentForLearner(learnerId, session.tenantId);
   if (!parentUserId) {
@@ -41,8 +41,8 @@ export async function requireLearnerConsent(
     );
   }
   for (const type of consentTypes) {
-    const perLearner = getActiveConsentForUser(parentUserId, type, session.tenantId, learnerId);
-    const account = getActiveConsentForUser(parentUserId, type, session.tenantId, null);
+    const perLearner = await getActiveConsentForUser(parentUserId, type, session.tenantId, learnerId);
+    const account = await getActiveConsentForUser(parentUserId, type, session.tenantId, null);
     if (!perLearner && !account) {
       return fail(
         {
@@ -67,13 +67,13 @@ export async function hasLearnerConsent(
   learnerId: string,
   consentTypes: ConsentType[],
 ): Promise<boolean> {
-  const ageGate = getAgeGateForLearner(learnerId, tenantId);
+  const ageGate = await getAgeGateForLearner(learnerId, tenantId);
   if (!ageGate || !ageGate.requiresParentConsent) return true;
   const parentUserId = await findPrimaryParentForLearner(learnerId, tenantId);
   if (!parentUserId) return false;
   for (const type of consentTypes) {
-    const perLearner = getActiveConsentForUser(parentUserId, type, tenantId, learnerId);
-    const account = getActiveConsentForUser(parentUserId, type, tenantId, null);
+    const perLearner = await getActiveConsentForUser(parentUserId, type, tenantId, learnerId);
+    const account = await getActiveConsentForUser(parentUserId, type, tenantId, null);
     if (!perLearner && !account) return false;
   }
   return true;

@@ -25,9 +25,9 @@ export async function GET(req: Request): Promise<NextResponse> {
     if (response) return response;
     const roleErr = requireRole(session!, [...READ_ROLES], requestId);
     if (roleErr) return roleErr;
-    const subjects = listSubjects();
+    const subjects = await listSubjects();
     const skillCounts = new Map<string, number>();
-    for (const s of listSkills()) {
+    for (const s of await listSkills()) {
       skillCounts.set(s.subjectId, (skillCounts.get(s.subjectId) ?? 0) + 1);
     }
     return ok(
@@ -68,7 +68,8 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    if (listSubjects().some((s) => s.slug === parsed.data.slug)) {
+    const existingSubjects = await listSubjects();
+    if (existingSubjects.some((s) => s.slug === parsed.data.slug)) {
       return fail(
         { ...ERRORS.VALIDATION_FAILED, message: "Subject slug already exists." },
         requestId,

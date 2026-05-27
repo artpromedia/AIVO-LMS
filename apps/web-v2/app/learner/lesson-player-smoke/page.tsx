@@ -38,11 +38,11 @@ export default async function LessonPlayerSmokePage({ searchParams }: Props) {
       : requested === "science"
         ? "science"
         : "math";
-  const subject = listSubjects().find((s) => s.slug === mapped) ?? null;
+  const subject = (await listSubjects()).find((s) => s.slug === mapped) ?? null;
   if (!subject) {
     return <div data-testid="smoke-error">Missing subject for smoke route.</div>;
   }
-  const detail = getSubjectDetail(learnerId, session.tenantId, subject.id);
+  const detail = await getSubjectDetail(learnerId, session.tenantId, subject.id);
   const skillId = detail?.nextSkillId ?? detail?.skills[0]?.id ?? null;
   if (!skillId) {
     return <div data-testid="smoke-error">Missing skill for smoke route.</div>;

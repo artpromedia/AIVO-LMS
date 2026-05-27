@@ -41,7 +41,7 @@ export default async function BaselineReadinessPage({
   }
 
   const assessment = await getOrCreateParentAssessment(session.learnerId, session.tenantId);
-  const iep = getIEPForLearner(session.learnerId, session.tenantId);
+  const iep = await getIEPForLearner(session.learnerId, session.tenantId);
   const hasReadAloud = Boolean(
     learner.accessibilityDefaults.audioFirst || iep?.extraction?.readingSupport,
   );

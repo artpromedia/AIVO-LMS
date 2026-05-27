@@ -53,11 +53,11 @@ export default async function ParentGradebookPage({
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
-  const { map, skillMasteries } = getMasteryMap(learnerId, session.tenantId);
+  const { map, skillMasteries } = await getMasteryMap(learnerId, session.tenantId);
   const allLessonRuns = await listLessonRunsForLearner(learnerId, session.tenantId);
   const lessonRuns = allLessonRuns.slice(0, 20);
-  const subjects = listSubjects();
-  const skills = listSkills();
+  const subjects = await listSubjects();
+  const skills = await listSkills();
   const skillsById = new Map(skills.map((s) => [s.id, s]));
   const subjectsById = new Map(subjects.map((s) => [s.id, s]));
 

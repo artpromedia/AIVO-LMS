@@ -16,19 +16,30 @@ import type {
   BaselineAssessment,
   BaselineAttempt,
   BaselineQuestion,
+  ConsentRecord,
+  ConsentType,
   GeneratedLessonPlan,
+  IEPDocument,
   LearnerBrainProfile,
   LearnerProfile,
   LessonInteraction,
   LessonRun,
+  LearningPath,
+  MasteryMap,
   Notification,
   NotificationDelivery,
   ParentAssessment,
   ParentLessonSummary,
+  PolicyVersion,
   ReadinessState,
+  Skill,
+  SkillMastery,
+  Subject,
+  SubprocessorRecord,
   TenantMembership,
   User,
 } from "@/lib/db/types";
+import type { AgeGateRecord } from "@/lib/db/types";
 import type { Role } from "@/lib/auth/types";
 import type { CreateLearnerInput, PatchLearnerInput } from "@/lib/validators/learner";
 
@@ -236,6 +247,69 @@ export interface BrainProfileStore {
   upsert(profile: LearnerBrainProfile): Promise<LearnerBrainProfile>;
 }
 
+/**
+ * Curriculum domain — subjects + skills (seed-time reference data),
+ * plus per-learner masteryMaps + skillMasteries + learningPaths.
+ * Subjects/skills are read-heavy and effectively immutable post-seed;
+ * paths/masteries are per-learner mutable.
+ */
+export interface CurriculumStore {
+  listSubjects(): Promise<Subject[]>;
+  getSubjectById(subjectId: string): Promise<Subject | null>;
+  listSkills(subjectId?: string): Promise<Skill[]>;
+  getSkillById(skillId: string): Promise<Skill | null>;
+
+  getMasteryMapForLearner(
+    learnerId: string,
+    tenantId: string,
+  ): Promise<{ map: MasteryMap | null; skillMasteries: SkillMastery[] }>;
+
+  getLearningPath(learnerId: string, tenantId: string): Promise<LearningPath | null>;
+  /** Replace the learner's path atomically — delete prior + insert next. */
+  replaceLearningPath(
+    learnerId: string,
+    tenantId: string,
+    next: LearningPath,
+  ): Promise<LearningPath>;
+}
+
+/**
+ * Compliance domain — parental consent records, IEP documents, age
+ * gate, and the platform-wide policy + subprocessor catalog.
+ * Consent reads are the hot path (every BFF guard hits them).
+ */
+export interface ComplianceStore {
+  // Consent
+  getActiveConsentForUser(
+    parentUserId: string,
+    consentType: ConsentType,
+    tenantId: string,
+    learnerId: string | null,
+  ): Promise<ConsentRecord | null>;
+  listConsentsForUser(parentUserId: string, tenantId: string): Promise<ConsentRecord[]>;
+  /** Records belonging to a specific parent + learner triple. */
+  listConsentsForLearner(
+    parentUserId: string,
+    learnerId: string,
+    tenantId: string,
+  ): Promise<ConsentRecord[]>;
+  upsertConsent(record: ConsentRecord): Promise<ConsentRecord>;
+
+  // IEP
+  getIEPForLearner(learnerId: string, tenantId: string): Promise<IEPDocument | null>;
+  upsertIEP(doc: IEPDocument): Promise<IEPDocument>;
+  /** Hard delete the active IEP for a learner. Returns true on success. */
+  deleteIEP(learnerId: string, tenantId: string): Promise<boolean>;
+
+  // Age gate
+  getAgeGateForLearner(learnerId: string, tenantId: string): Promise<AgeGateRecord | null>;
+  upsertAgeGate(record: AgeGateRecord): Promise<AgeGateRecord>;
+
+  // Policy + subprocessor catalogs (platform-wide reference data)
+  listPolicyVersions(): Promise<PolicyVersion[]>;
+  listSubprocessors(): Promise<SubprocessorRecord[]>;
+}
+
 export interface Persistence {
   mode: PersistenceMode;
   notifications: NotificationStore;
@@ -245,6 +319,8 @@ export interface Persistence {
   assessments: AssessmentStore;
   lessonRuns: LessonRunStore;
   brainProfiles: BrainProfileStore;
+  curriculum: CurriculumStore;
+  compliance: ComplianceStore;
   /**
    * Future domains land here. Each new domain ships:
    *   1. An interface in this file.

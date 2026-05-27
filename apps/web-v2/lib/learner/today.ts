@@ -79,9 +79,12 @@ function learnerSafeReason(node: LearningPathNode, subj: Subject): string {
   }
 }
 
-export function pickTodaysMission(learnerId: string, tenantId: string): TodayMissionResult {
+export async function pickTodaysMission(
+  learnerId: string,
+  tenantId: string,
+): Promise<TodayMissionResult> {
   const store = getStore();
-  const learner = getLearner(learnerId, tenantId);
+  const learner = await getLearner(learnerId, tenantId);
   if (!learner) return { ready: false, blocker: "no_learner" };
 
   // 1. Resume in-progress LessonRun.
@@ -195,8 +198,8 @@ export function pickTodaysMission(learnerId: string, tenantId: string): TodayMis
   }
 
   // 3–5. Learning-path-driven missions.
-  const path = getLearningPath(learnerId, tenantId);
-  const { map } = getMasteryMap(learnerId, tenantId);
+  const path = await getLearningPath(learnerId, tenantId);
+  const { map } = await getMasteryMap(learnerId, tenantId);
   if (!map || !path || path.nodes.length === 0) {
     return { ready: false, blocker: map ? "no_path" : "no_baseline" };
   }

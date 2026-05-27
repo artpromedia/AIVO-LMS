@@ -58,7 +58,7 @@ export default async function LearnerLessonRunPage({ params }: RouteParams) {
     if (active !== learner.id) redirect("/learner/select");
   }
   const a11y = getAccessibilityPrefs(learner.id, session.tenantId);
-  const lessonSubject = getSubjectById(lessonRun.subjectId);
+  const lessonSubject = await getSubjectById(lessonRun.subjectId);
   const v2Enabled = lessonPlayerV2Enabled();
 
   // When the plan is still generating or has failed, we can't run the player.

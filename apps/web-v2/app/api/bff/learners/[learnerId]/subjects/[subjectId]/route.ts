@@ -31,7 +31,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     );
     if (consentErr) return consentErr;
 
-    const detail = getSubjectDetail(learnerId, session!.tenantId, subjectId);
+    const detail = await getSubjectDetail(learnerId, session!.tenantId, subjectId);
     if (!detail) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Subject not found" }, requestId);
     }

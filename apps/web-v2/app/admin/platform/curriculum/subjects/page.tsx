@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
-  const subjects = listSubjects();
+  const subjects = await listSubjects();
   return (
     <AppShell
       role="platform_admin"
@@ -24,9 +24,10 @@ export default async function Page() {
         description="Top-level subjects grouped by domain. Each skill belongs to one subject."
       />
       <div className="grid gap-3 md:grid-cols-2">
-        {subjects.map((s) => {
-          const doms = listDomains(s.id);
-          const sks = listSkills(s.id);
+        {await Promise.all(
+          subjects.map(async (s) => {
+            const doms = listDomains(s.id);
+            const sks = await listSkills(s.id);
           return (
             <Card key={s.id} className="p-[var(--aivo-density-card-pad)]">
               <div className="flex items-center justify-between">
@@ -48,7 +49,8 @@ export default async function Page() {
               </ul>
             </Card>
           );
-        })}
+          }),
+        )}
       </div>
     </AppShell>
   );

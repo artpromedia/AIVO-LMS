@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     });
     // Sprint 24: stamp an age-gate record at the moment of learner creation
     // so COPPA/under-13 status is recorded even if the parent skips IEP.
-    const ageGate = recordAgeGate({
+    const ageGate = await recordAgeGate({
       tenantId: session!.tenantId,
       learnerId: learner.id,
       recordedByUserId: session!.userId,

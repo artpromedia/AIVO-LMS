@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 export default async function TeacherAssignmentsPage() {
   const session = await requirePageRole(["teacher"]);
   const assignments = listTeacherAssignments(session.userId, session.tenantId);
-  const subjectsById = new Map(listSubjects().map((s) => [s.id, s]));
+  const subjectsById = new Map((await listSubjects()).map((s) => [s.id, s]));
 
   return (
     <AppShell

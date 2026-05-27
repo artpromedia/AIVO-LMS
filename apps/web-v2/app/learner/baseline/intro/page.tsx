@@ -42,15 +42,15 @@ export default async function BaselineIntroPage({
   const learner = await getLearner(session.learnerId, session.tenantId);
   if (!learner) redirect("/learner/home");
   const questions = await listBaselineQuestions(baseline.id);
-  const allSubjects = listSubjects();
+  const allSubjects = await listSubjects();
   const subjectsById = new Map(allSubjects.map((s) => [s.id, s]));
   const subjects = baseline.subjectIds
     .map((id) => subjectsById.get(id))
-    .filter(Boolean) as ReturnType<typeof listSubjects>;
+    .filter((s): s is NonNullable<typeof s> => Boolean(s));
   const tutors = subjects.map((s) => tutorForSubjectSlug(s.slug)).filter(Boolean);
   const firstTutor = tutors[0];
 
-  const iep = getIEPForLearner(session.learnerId, session.tenantId);
+  const iep = await getIEPForLearner(session.learnerId, session.tenantId);
   const chips: PersonalizationVariant[] = ["parent_assessment", "no_grades"];
   if (iep?.confirmedAt) chips.unshift("iep");
   chips.push("pacing");

@@ -26,7 +26,7 @@ export default async function Page() {
       </AppShell>
     );
   }
-  const subjectMap = new Map(listSubjects().map((s) => [s.id, s]));
+  const subjectMap = new Map((await listSubjects()).map((s) => [s.id, s]));
   const assignments = listActiveAssignmentsForLearner(learnerId, session.tenantId);
   const allRuns = await listLessonRunsForLearner(learnerId, session.tenantId);
   const runs = allRuns.filter((r) => r.status === "ready" || r.status === "in_progress");

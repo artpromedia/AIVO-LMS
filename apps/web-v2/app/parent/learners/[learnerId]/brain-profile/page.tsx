@@ -50,13 +50,13 @@ async function regenerateAction(formData: FormData) {
   if (!assessment.submittedAt) {
     redirect(`/parent/learners/${learnerId}/assessment`);
   }
-  const iep = getIEPForLearner(learnerId, session.tenantId);
+  const iep = await getIEPForLearner(learnerId, session.tenantId);
   const candidate = buildBrainProfile({
     learner: learner!,
     assessment,
     iepExtraction: iep?.extraction ?? null,
     iepUploaded: Boolean(iep),
-    subjects: listSubjects(),
+    subjects: await listSubjects(),
     baselineAttempts: 0,
   });
   const v = brainProfileStateSchema.safeParse(candidate);
@@ -112,7 +112,7 @@ export default async function BrainProfilePage({
     );
   }
 
-  const iep = getIEPForLearner(learnerId, session.tenantId);
+  const iep = await getIEPForLearner(learnerId, session.tenantId);
   // Auto-generate on first visit: builds from the deterministic fallback so a
   // parent always sees content, never an empty page. Subsequent visits hit the
   // cache; regenerate is an explicit user action.
@@ -123,7 +123,7 @@ export default async function BrainProfilePage({
       assessment,
       iepExtraction: iep?.extraction ?? null,
       iepUploaded: Boolean(iep),
-      subjects: listSubjects(),
+      subjects: await listSubjects(),
       baselineAttempts: 0,
     });
     const v = brainProfileStateSchema.safeParse(candidate);

@@ -40,9 +40,9 @@ export default async function ParentProgressPage({
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
-  const { map, skillMasteries } = getMasteryMap(learnerId, session.tenantId);
-  const subjects = listSubjects();
-  const skills = listSkills();
+  const { map, skillMasteries } = await getMasteryMap(learnerId, session.tenantId);
+  const subjects = await listSubjects();
+  const skills = await listSkills();
   const allRuns = await listLessonRunsForLearner(learnerId, session.tenantId);
   const completed = allRuns.filter((r) => r.status === "completed");
 

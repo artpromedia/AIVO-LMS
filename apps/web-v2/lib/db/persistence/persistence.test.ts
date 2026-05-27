@@ -295,6 +295,86 @@ describe("persistence adapter — notifications (memory)", () => {
     expect(listed.some((r) => r.id === "lr-test-1")).toBe(true);
   });
 
+  it("curriculum: listSubjects returns the seeded set", async () => {
+    const subjects = await getPersistence().curriculum.listSubjects();
+    expect(subjects.length).toBeGreaterThan(0);
+  });
+
+  it("curriculum: listSkills filters by subjectId", async () => {
+    const subjects = await getPersistence().curriculum.listSubjects();
+    const target = subjects[0]!;
+    const inSubject = await getPersistence().curriculum.listSkills(target.id);
+    for (const s of inSubject) expect(s.subjectId).toBe(target.id);
+  });
+
+  it("compliance: IEP upsert + getForLearner + delete round-trip", async () => {
+    const compliance = getPersistence().compliance;
+    const now = new Date().toISOString();
+    const doc = {
+      id: "iep-test-1",
+      learnerId: "lrn_demo_sky",
+      tenantId: "t_demo",
+      fileName: "iep.pdf",
+      mimeType: "application/pdf",
+      bytes: 1234,
+      uploadedAt: now,
+      status: "pending" as const,
+      extraction: null,
+      acceptedAccommodations: null,
+      confirmedAt: null,
+    };
+    await compliance.upsertIEP(doc);
+    const fetched = await compliance.getIEPForLearner("lrn_demo_sky", "t_demo");
+    expect(fetched?.id).toBe(doc.id);
+    expect(await compliance.deleteIEP("lrn_demo_sky", "t_demo")).toBe(true);
+    expect(await compliance.getIEPForLearner("lrn_demo_sky", "t_demo")).toBeNull();
+  });
+
+  it("compliance: getActiveConsentForUser respects revokedAt", async () => {
+    const compliance = getPersistence().compliance;
+    const tenantId = "t_demo";
+    const parentUserId = "u_demo_parent";
+    const now = new Date().toISOString();
+    await compliance.upsertConsent({
+      id: "c-active-1",
+      tenantId,
+      parentUserId,
+      learnerId: null,
+      consentType: "child_data_collection",
+      version: "v1",
+      acceptedAt: now,
+      revokedAt: null,
+      ipHash: null,
+      userAgent: null,
+    });
+    const active = await compliance.getActiveConsentForUser(
+      parentUserId,
+      "child_data_collection",
+      tenantId,
+      null,
+    );
+    expect(active?.id).toBe("c-active-1");
+    await compliance.upsertConsent({
+      id: "c-active-1",
+      tenantId,
+      parentUserId,
+      learnerId: null,
+      consentType: "child_data_collection",
+      version: "v1",
+      acceptedAt: now,
+      revokedAt: new Date().toISOString(),
+      ipHash: null,
+      userAgent: null,
+    });
+    const afterRevoke = await compliance.getActiveConsentForUser(
+      parentUserId,
+      "child_data_collection",
+      tenantId,
+      null,
+    );
+    expect(afterRevoke).toBeNull();
+  });
+
   it("markNotificationsRead does not bleed across tenants", async () => {
     const { notification } = await createNotification({
       tenantId: "t_demo",

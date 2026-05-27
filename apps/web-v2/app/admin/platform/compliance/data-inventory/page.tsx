@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
   const items = listDataInventory();
-  const subs = listSubprocessors();
+  const subs = await listSubprocessors();
 
   return (
     <AppShell

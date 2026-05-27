@@ -15,8 +15,8 @@ import { getStore } from "@/lib/db/store";
 export default async function Page() {
   const session = await requirePageRole(["teacher"]);
   const learners = await listLearnersForTeacher(session.userId, session.tenantId);
-  const subjectMap = new Map(listSubjects().map((s) => [s.id, s]));
-  const skillMap = new Map(listSkills().map((s) => [s.id, s]));
+  const subjectMap = new Map((await listSubjects()).map((s) => [s.id, s]));
+  const skillMap = new Map((await listSkills()).map((s) => [s.id, s]));
 
   return (
     <AppShell

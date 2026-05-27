@@ -50,7 +50,7 @@ async function uploadAction(formData: FormData) {
   if (!meta.success) {
     redirect(`/parent/learners/${learnerId}/iep?error=invalid_file`);
   }
-  uploadIEPDocument({
+  await uploadIEPDocument({
     learnerId,
     tenantId: session.tenantId,
     ...meta.data,
@@ -68,7 +68,7 @@ async function uploadAction(formData: FormData) {
       assessment,
       hasUploadedDocument: true,
     });
-    setIEPExtraction(learnerId, session.tenantId, extraction);
+    await setIEPExtraction(learnerId, session.tenantId, extraction);
   }
   await refreshLearnerReadiness(learnerId, session.tenantId);
   redirect(`/parent/learners/${learnerId}/iep/review`);
@@ -83,7 +83,7 @@ async function skipAction(formData: FormData) {
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     redirect("/parent/learners");
   }
-  recordIEPSkip(learnerId, session.tenantId);
+  await recordIEPSkip(learnerId, session.tenantId);
   await refreshLearnerReadiness(learnerId, session.tenantId);
   audit(session, "iep.skip", newRequestId(), { learnerId });
   redirect(`/parent/learners/${learnerId}/assessment/submitted?skipped=iep`);
@@ -99,7 +99,7 @@ async function deleteAction(formData: FormData) {
     redirect("/parent/learners");
   }
   const { deleteIEPForLearner } = await import("@/lib/db/repos");
-  deleteIEPForLearner(learnerId, session.tenantId);
+  await deleteIEPForLearner(learnerId, session.tenantId);
   await refreshLearnerReadiness(learnerId, session.tenantId);
   audit(session, "iep.delete", newRequestId(), { learnerId });
   redirect(`/parent/learners/${learnerId}/iep`);
@@ -196,7 +196,7 @@ export default async function IEPUploadPage({
     );
   }
 
-  const existing = getIEPForLearner(learnerId, session.tenantId);
+  const existing = await getIEPForLearner(learnerId, session.tenantId);
   const errorMessage = sp.error ? ERROR_MESSAGES[sp.error] : undefined;
 
   return (

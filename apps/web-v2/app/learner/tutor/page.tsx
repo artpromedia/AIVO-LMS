@@ -33,8 +33,8 @@ export default async function LearnerTutorHome() {
   if (!session.learnerId) redirect("/learner/home");
   const learner = await getLearner(session.learnerId, session.tenantId);
   if (!learner) redirect("/learner/home");
-  const subjects = listSubjects();
-  const iep = getIEPForLearner(session.learnerId, session.tenantId);
+  const subjects = await listSubjects();
+  const iep = await getIEPForLearner(session.learnerId, session.tenantId);
 
   const chips: PersonalizationVariant[] = ["ai_companion", "no_grades", "calm_mode"];
   if (iep?.confirmedAt) chips.unshift("iep");

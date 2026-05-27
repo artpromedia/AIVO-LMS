@@ -66,11 +66,14 @@ export default async function LearnerProgressPage() {
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) redirect("/login");
 
-  const { map, skillMasteries } = getMasteryMap(learnerId, session.tenantId);
-  const subjects = listSubjects().map((s) => ({
-    ...s,
-    skills: listSkills(s.id),
-  }));
+  const { map, skillMasteries } = await getMasteryMap(learnerId, session.tenantId);
+  const allSubjects = await listSubjects();
+  const subjects = await Promise.all(
+    allSubjects.map(async (s) => ({
+      ...s,
+      skills: await listSkills(s.id),
+    })),
+  );
   const recentRuns = await listLessonRunsForLearner(learnerId, session.tenantId, {
     limit: 14,
   });

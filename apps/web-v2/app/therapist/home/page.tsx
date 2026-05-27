@@ -31,9 +31,13 @@ export default async function TherapistHomePage() {
   const refreshed = await Promise.all(
     learners.map((l) => getLearner(l.id, session.tenantId)),
   );
-  const fresh = refreshed
-    .filter((l): l is LearnerProfile => Boolean(l))
-    .map((l) => ({ ...l, iep: getIEPForLearner(l.id, session.tenantId) }));
+  const freshLearners = refreshed.filter((l): l is LearnerProfile => Boolean(l));
+  const fresh = await Promise.all(
+    freshLearners.map(async (l) => ({
+      ...l,
+      iep: await getIEPForLearner(l.id, session.tenantId),
+    })),
+  );
   const iepCount = fresh.filter((l) => l.iep !== null).length;
 
   return (

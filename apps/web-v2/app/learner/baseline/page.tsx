@@ -74,7 +74,7 @@ export default async function LearnerBaselineIndex() {
     );
   }
 
-  const iep = getIEPForLearner(learnerId, session.tenantId);
+  const iep = await getIEPForLearner(learnerId, session.tenantId);
   const chips: PersonalizationVariant[] = ["parent_assessment", "no_grades"];
   if (iep?.confirmedAt) chips.unshift("iep");
   chips.push("pacing", "ai_companion");

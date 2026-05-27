@@ -27,6 +27,10 @@ import { memoryLessonRuns } from "./memory/lesson-runs";
 import { drizzleLessonRuns } from "./drizzle/lesson-runs";
 import { memoryBrainProfiles } from "./memory/brain-profiles";
 import { drizzleBrainProfiles } from "./drizzle/brain-profiles";
+import { memoryCurriculum } from "./memory/curriculum";
+import { drizzleCurriculum } from "./drizzle/curriculum";
+import { memoryCompliance } from "./memory/compliance";
+import { drizzleCompliance } from "./drizzle/compliance";
 
 type DomainKey =
   | "notifications"
@@ -35,7 +39,9 @@ type DomainKey =
   | "learners"
   | "assessments"
   | "lessonRuns"
-  | "brainProfiles";
+  | "brainProfiles"
+  | "curriculum"
+  | "compliance";
 
 function resolveMode(domain: DomainKey): PersistenceMode {
   const overrides: Record<DomainKey, PersistenceMode | undefined> = {
@@ -46,6 +52,8 @@ function resolveMode(domain: DomainKey): PersistenceMode {
     assessments: serverEnv.AIVO_PERSISTENCE_ASSESSMENTS,
     lessonRuns: serverEnv.AIVO_PERSISTENCE_LESSON_RUNS,
     brainProfiles: serverEnv.AIVO_PERSISTENCE_BRAIN_PROFILES,
+    curriculum: serverEnv.AIVO_PERSISTENCE_CURRICULUM,
+    compliance: serverEnv.AIVO_PERSISTENCE_COMPLIANCE,
   };
   return overrides[domain] ?? serverEnv.AIVO_PERSISTENCE;
 }
@@ -61,6 +69,8 @@ export function getPersistence(): Persistence {
   const assessmentsMode = resolveMode("assessments");
   const lessonRunsMode = resolveMode("lessonRuns");
   const brainProfilesMode = resolveMode("brainProfiles");
+  const curriculumMode = resolveMode("curriculum");
+  const complianceMode = resolveMode("compliance");
   cached = {
     // The aggregate `mode` is the global value; per-domain modes are
     // visible on the individual stores at construction time (above).
@@ -77,6 +87,8 @@ export function getPersistence(): Persistence {
       lessonRunsMode === "postgres" ? drizzleLessonRuns : memoryLessonRuns,
     brainProfiles:
       brainProfilesMode === "postgres" ? drizzleBrainProfiles : memoryBrainProfiles,
+    curriculum: curriculumMode === "postgres" ? drizzleCurriculum : memoryCurriculum,
+    compliance: complianceMode === "postgres" ? drizzleCompliance : memoryCompliance,
   };
   return cached;
 }

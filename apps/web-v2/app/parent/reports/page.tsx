@@ -28,7 +28,7 @@ import {
 export default async function Page() {
   const session = await requirePageRole(["parent"]);
   const learners = await listLearnersForParent(session.userId, session.tenantId);
-  const subjectMap = new Map(listSubjects().map((s) => [s.id, s]));
+  const subjectMap = new Map((await listSubjects()).map((s) => [s.id, s]));
 
   return (
     <AppShell
@@ -62,12 +62,12 @@ export default async function Page() {
               const summaries = listParentLessonSummaries(l.id, session.tenantId).slice(0, 6);
               const runs = await listLessonRunsForLearner(l.id, session.tenantId);
               const completed = runs.filter((r) => r.status === "completed").length;
-              const { skillMasteries } = getMasteryMap(l.id, session.tenantId);
+              const { skillMasteries } = await getMasteryMap(l.id, session.tenantId);
               const overallAvg =
               skillMasteries.length === 0
                 ? 0
                 : skillMasteries.reduce((a, m) => a + m.score, 0) / skillMasteries.length;
-            const iep = getIEPForLearner(l.id, session.tenantId);
+            const iep = await getIEPForLearner(l.id, session.tenantId);
             const supportsCount = iep?.acceptedAccommodations?.length ?? 0;
 
             return (

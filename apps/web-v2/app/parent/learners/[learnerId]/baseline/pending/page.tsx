@@ -53,7 +53,7 @@ export default async function BaselinePendingPage({
     redirect(`/parent/learners/${learner.id}/brain-profile`);
   }
 
-  const iep = getIEPForLearner(learnerId, session.tenantId);
+  const iep = await getIEPForLearner(learnerId, session.tenantId);
   const active = await getActiveBaselineForLearner(learnerId, session.tenantId);
 
   // If a baseline already exists and is ready, send the parent on.

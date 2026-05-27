@@ -42,7 +42,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       requestId,
     );
     if (consentErr) return consentErr;
-    const picked = pickTodaysMission(learnerId, session!.tenantId);
+    const picked = await pickTodaysMission(learnerId, session!.tenantId);
     if (!picked.ready) {
       return fail(
         {

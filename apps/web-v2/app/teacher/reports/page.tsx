@@ -22,20 +22,22 @@ export default async function TeacherReportsPage() {
   const store = db();
   const learners = await listLearnersForTeacher(session.userId, session.tenantId);
 
-  const rows = learners.map((learner) => {
-    const { skillMasteries } = getMasteryMap(learner.id, session.tenantId);
-    const skillsCount = skillMasteries.length;
-    const total = skillMasteries.reduce((acc, s) => acc + s.score, 0);
-    const avg = skillsCount > 0 ? total / skillsCount : 0;
-    const onGrade = skillMasteries.filter(
-      (s) => s.level === "on_grade_level" || s.level === "stretching",
-    ).length;
-    const emerging = skillMasteries.filter(
-      (s) => s.level === "emerging" || s.level === "approaching",
-    ).length;
-    const iep = getIEPForLearner(learner.id, session.tenantId);
-    return { learner, avg, skillsCount, onGrade, emerging, iep };
-  });
+  const rows = await Promise.all(
+    learners.map(async (learner) => {
+      const { skillMasteries } = await getMasteryMap(learner.id, session.tenantId);
+      const skillsCount = skillMasteries.length;
+      const total = skillMasteries.reduce((acc, s) => acc + s.score, 0);
+      const avg = skillsCount > 0 ? total / skillsCount : 0;
+      const onGrade = skillMasteries.filter(
+        (s) => s.level === "on_grade_level" || s.level === "stretching",
+      ).length;
+      const emerging = skillMasteries.filter(
+        (s) => s.level === "emerging" || s.level === "approaching",
+      ).length;
+      const iep = await getIEPForLearner(learner.id, session.tenantId);
+      return { learner, avg, skillsCount, onGrade, emerging, iep };
+    }),
+  );
 
   const classroomAvg = rows.length > 0 ? rows.reduce((acc, r) => acc + r.avg, 0) / rows.length : 0;
   const learnersWithIep = rows.filter((r) => r.iep).length;
@@ -50,7 +52,7 @@ export default async function TeacherReportsPage() {
     { label: "Not started", count: 0 },
   ];
   for (const learner of learners) {
-    const { skillMasteries } = getMasteryMap(learner.id, session.tenantId);
+    const { skillMasteries } = await getMasteryMap(learner.id, session.tenantId);
     for (const sm of skillMasteries) {
       const idx =
         sm.level === "stretching"

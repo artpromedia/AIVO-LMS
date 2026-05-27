@@ -57,7 +57,7 @@ export default async function BaselineSubjectsPage({
   const session = await requirePageRole(["learner"]);
   const sp = await searchParams;
   if (!session.learnerId) redirect("/learner/home");
-  const subjects = listSubjects();
+  const subjects = await listSubjects();
   const focusSubjects =
     ((await await getOrCreateParentAssessment(session.learnerId, session.tenantId)).answers
       .grade_subject as { focusSubjects?: string[] } | undefined)?.focusSubjects ?? [];

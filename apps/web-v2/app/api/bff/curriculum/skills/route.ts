@@ -37,7 +37,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     if (roleErr) return roleErr;
     const url = new URL(req.url);
     const subjectId = url.searchParams.get("subjectId") ?? undefined;
-    const skills = listSkills(subjectId);
+    const skills = await listSkills(subjectId);
     const enriched = skills.map((s) => ({
       ...s,
       currentVersion: getCurrentSkillVersion(s.id),
@@ -75,10 +75,12 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    if (!listSubjects().some((s) => s.id === parsed.data.subjectId)) {
+    const subjectsForCheck = await listSubjects();
+    if (!subjectsForCheck.some((s) => s.id === parsed.data.subjectId)) {
       return fail({ ...ERRORS.VALIDATION_FAILED, message: "subjectId not found." }, requestId);
     }
-    if (listSkills().some((s) => s.slug === parsed.data.slug)) {
+    const skillsForCheck = await listSkills();
+    if (skillsForCheck.some((s) => s.slug === parsed.data.slug)) {
       return fail(
         { ...ERRORS.VALIDATION_FAILED, message: "Skill slug already exists." },
         requestId,

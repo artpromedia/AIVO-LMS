@@ -64,8 +64,8 @@ export default async function CaregiverObservationsPage() {
   const learners = maybeLearners.filter((l): l is LearnerProfile => Boolean(l));
   const learnerById = new Map(learners.map((l) => [l.id, l]));
 
-  const subjectName = new Map(listSubjects().map((s) => [s.id, s.name]));
-  const skillName = new Map(listSkills().map((s) => [s.id, s.name]));
+  const subjectName = new Map((await listSubjects()).map((s) => [s.id, s.name]));
+  const skillName = new Map((await listSkills()).map((s) => [s.id, s.name]));
 
   // Sprint 10 — caregiver-authored observations across every learner
   // they support, newest-first. Joined with the lesson activity feed

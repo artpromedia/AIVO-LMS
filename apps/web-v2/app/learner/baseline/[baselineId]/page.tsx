@@ -183,7 +183,7 @@ export default async function BaselineRunnerPage({
   }
 
   const learner = await getLearner(baseline.learnerId, session.tenantId);
-  const subjects = listSubjects();
+  const subjects = await listSubjects();
   const subjectsById = new Map(subjects.map((s) => [s.id, s]));
   const questions = await listBaselineQuestions(baseline.id);
   const attempts = await listBaselineAttempts(baseline.id, session.tenantId);
@@ -191,7 +191,7 @@ export default async function BaselineRunnerPage({
   const totalAnswered = attempts.length;
   const next = questions.find((q) => !answeredQids.has(q.id));
 
-  const iep = getIEPForLearner(baseline.learnerId, session.tenantId);
+  const iep = await getIEPForLearner(baseline.learnerId, session.tenantId);
   const assessment = await getOrCreateParentAssessment(baseline.learnerId, session.tenantId);
   const sensorySensitivities =
     (assessment.answers.sensory as { sensitivities?: string[] })?.sensitivities ?? [];

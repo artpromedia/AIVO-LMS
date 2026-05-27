@@ -79,17 +79,19 @@ function db() {
 }
 
 // ===== Subjects / Skills =====
-export function listSubjects(): Subject[] {
-  return Array.from(db().subjects.values());
+// Routed through the persistence adapter (ADR 0007 step 8). Subjects
+// and skills are effectively immutable post-seed; in postgres mode
+// each call is a cached SELECT.
+export async function listSubjects(): Promise<Subject[]> {
+  return getPersistence().curriculum.listSubjects();
 }
 
-export function getSubjectById(subjectId: string): Subject | null {
-  return db().subjects.get(subjectId) ?? null;
+export async function getSubjectById(subjectId: string): Promise<Subject | null> {
+  return getPersistence().curriculum.getSubjectById(subjectId);
 }
 
-export function listSkills(subjectId?: string): Skill[] {
-  const all = Array.from(db().skills.values());
-  return subjectId ? all.filter((s) => s.subjectId === subjectId) : all;
+export async function listSkills(subjectId?: string): Promise<Skill[]> {
+  return getPersistence().curriculum.listSkills(subjectId);
 }
 
 // ===== Learner =====
@@ -252,25 +254,27 @@ export async function submitParentAssessment(
 }
 
 // ===== IEP (Sprint 6) =====
-export function getIEPForLearner(learnerId: string, tenantId: string): IEPDocument | null {
-  const store = db();
-  for (const doc of store.iepDocuments.values()) {
-    if (doc.learnerId === learnerId && doc.tenantId === tenantId) return doc;
-  }
-  return null;
+// Routed through the persistence adapter (ADR 0007 step 9). The
+// learner.iepDecision side-effect stays in repos.ts so the upsert /
+// delete / extraction pipeline remains atomic with the learner row.
+export async function getIEPForLearner(
+  learnerId: string,
+  tenantId: string,
+): Promise<IEPDocument | null> {
+  return getPersistence().compliance.getIEPForLearner(learnerId, tenantId);
 }
 
-export function uploadIEPDocument(input: {
+export async function uploadIEPDocument(input: {
   learnerId: string;
   tenantId: string;
   fileName: string;
   mimeType: string;
   bytes: number;
-}): IEPDocument {
-  const store = db();
+}): Promise<IEPDocument> {
+  const compliance = getPersistence().compliance;
   // Single IEP per learner — overwrite any prior pending doc.
-  const existing = getIEPForLearner(input.learnerId, input.tenantId);
-  if (existing) store.iepDocuments.delete(existing.id);
+  const existing = await compliance.getIEPForLearner(input.learnerId, input.tenantId);
+  if (existing) await compliance.deleteIEP(input.learnerId, input.tenantId);
   const doc: IEPDocument = {
     id: newId("iep"),
     learnerId: input.learnerId,
@@ -284,38 +288,38 @@ export function uploadIEPDocument(input: {
     acceptedAccommodations: null,
     confirmedAt: null,
   };
-  store.iepDocuments.set(doc.id, doc);
-  // Mark learner as having decided "uploaded"
-  const learner = store.learnerProfiles.get(input.learnerId);
-  if (learner && learner.tenantId === input.tenantId) {
-    store.learnerProfiles.set(input.learnerId, { ...learner, iepDecision: "uploaded" });
+  await compliance.upsertIEP(doc);
+  // Mark learner as having decided "uploaded".
+  const learner = await getLearner(input.learnerId, input.tenantId);
+  if (learner) {
+    db().learnerProfiles.set(input.learnerId, { ...learner, iepDecision: "uploaded" });
   }
   return doc;
 }
 
-export function deleteIEPForLearner(learnerId: string, tenantId: string): boolean {
-  const store = db();
-  const existing = getIEPForLearner(learnerId, tenantId);
-  if (!existing) return false;
-  store.iepDocuments.delete(existing.id);
-  const learner = store.learnerProfiles.get(learnerId);
-  if (learner && learner.tenantId === tenantId) {
-    store.learnerProfiles.set(learnerId, { ...learner, iepDecision: null });
+export async function deleteIEPForLearner(
+  learnerId: string,
+  tenantId: string,
+): Promise<boolean> {
+  const removed = await getPersistence().compliance.deleteIEP(learnerId, tenantId);
+  if (!removed) return false;
+  const learner = await getLearner(learnerId, tenantId);
+  if (learner) {
+    db().learnerProfiles.set(learnerId, { ...learner, iepDecision: null });
   }
   return true;
 }
 
-export function setIEPExtraction(
+export async function setIEPExtraction(
   learnerId: string,
   tenantId: string,
   extraction: IEPExtraction,
-): IEPDocument | null {
-  const store = db();
-  const existing = getIEPForLearner(learnerId, tenantId);
+): Promise<IEPDocument | null> {
+  const compliance = getPersistence().compliance;
+  const existing = await compliance.getIEPForLearner(learnerId, tenantId);
   if (!existing) return null;
   const next: IEPDocument = { ...existing, extraction, status: "parsed" };
-  store.iepDocuments.set(existing.id, next);
-  return next;
+  return compliance.upsertIEP(next);
 }
 
 /**
@@ -324,13 +328,12 @@ export function setIEPExtraction(
  * also stamp `confirmedAt` so readiness / brain-profile generation can
  * trust the document was actively reviewed.
  */
-export function confirmIEPExtraction(
+export async function confirmIEPExtraction(
   learnerId: string,
   tenantId: string,
   acceptedAccommodations: string[],
-): IEPDocument | null {
-  const store = db();
-  const existing = getIEPForLearner(learnerId, tenantId);
+): Promise<IEPDocument | null> {
+  const existing = await getIEPForLearner(learnerId, tenantId);
   if (!existing) return null;
   // Defensive: only allow consent on labels that exist in the extraction.
   const allowed = new Set(existing.extraction?.accommodations ?? []);
@@ -340,19 +343,19 @@ export function confirmIEPExtraction(
     acceptedAccommodations: accepted,
     confirmedAt: nowIso(),
   };
-  store.iepDocuments.set(existing.id, next);
-  return next;
+  return getPersistence().compliance.upsertIEP(next);
 }
 
-export function recordIEPSkip(learnerId: string, tenantId: string): LearnerProfile | null {
-  const store = db();
-  const learner = store.learnerProfiles.get(learnerId);
-  if (!learner || learner.tenantId !== tenantId) return null;
+export async function recordIEPSkip(
+  learnerId: string,
+  tenantId: string,
+): Promise<LearnerProfile | null> {
+  const learner = await getLearner(learnerId, tenantId);
+  if (!learner) return null;
   // Remove any prior uploaded doc — skip is an explicit decision.
-  const prior = getIEPForLearner(learnerId, tenantId);
-  if (prior) store.iepDocuments.delete(prior.id);
+  await getPersistence().compliance.deleteIEP(learnerId, tenantId);
   const next: LearnerProfile = { ...learner, iepDecision: "skipped" };
-  store.learnerProfiles.set(learnerId, next);
+  db().learnerProfiles.set(learnerId, next);
   return next;
 }
 
@@ -440,8 +443,8 @@ async function prepareBrainCloneFromSummary(
   // Read-only: must not mutate the store on the preflight path, otherwise
   // a clone-prep failure would still leave a draft parent assessment behind.
   const assessment = await findParentAssessment(learnerId, tenantId);
-  const iep = getIEPForLearner(learnerId, tenantId);
-  const subjects = listSubjects();
+  const iep = await getIEPForLearner(learnerId, tenantId);
+  const subjects = await listSubjects();
   const candidate = buildBrainProfile({
     learner,
     assessment,
@@ -1123,44 +1126,35 @@ export async function completeBaseline(
   };
 }
 
-// ===== Mastery + Learning Path (Sprint 9) =====
-export function getMasteryMap(
+// ===== Mastery + Learning Path =====
+export async function getMasteryMap(
   learnerId: string,
   tenantId: string,
-): {
+): Promise<{
   map: MasteryMap | null;
   skillMasteries: SkillMastery[];
-} {
-  const store = db();
-  let map: MasteryMap | null = null;
-  for (const m of store.masteryMaps.values()) {
-    if (m.learnerId === learnerId && m.tenantId === tenantId) {
-      map = m;
-      break;
-    }
-  }
-  const skillMasteries = store.skillMasteries.filter(
-    (s) => s.learnerId === learnerId && s.tenantId === tenantId,
-  );
-  return { map, skillMasteries };
+}> {
+  return getPersistence().curriculum.getMasteryMapForLearner(learnerId, tenantId);
 }
 
-export function getLearningPath(learnerId: string, tenantId: string): LearningPath | null {
-  for (const p of db().learningPaths.values()) {
-    if (p.learnerId === learnerId && p.tenantId === tenantId) return p;
-  }
-  return null;
+export async function getLearningPath(
+  learnerId: string,
+  tenantId: string,
+): Promise<LearningPath | null> {
+  return getPersistence().curriculum.getLearningPath(learnerId, tenantId);
 }
 
 /**
  * Re-generate the learning path from the current MasteryMap. Used when the
  * parent or a tutor wants a fresh path after lesson activity.
  */
-export function regenerateLearningPath(learnerId: string, tenantId: string): LearningPath | null {
-  const store = db();
-  const { map, skillMasteries } = getMasteryMap(learnerId, tenantId);
+export async function regenerateLearningPath(
+  learnerId: string,
+  tenantId: string,
+): Promise<LearningPath | null> {
+  const { map, skillMasteries } = await getMasteryMap(learnerId, tenantId);
   if (!map || skillMasteries.length === 0) return null;
-  const skills = Array.from(store.skills.values());
+  const skills = await listSkills();
   // Find a "recommended first" skill: lowest-scoring, prefer reading.
   const sorted = skillMasteries.slice().sort((a, b) => a.score - b.score);
   const recommended = sorted[0]?.skillId ?? null;
@@ -1172,13 +1166,7 @@ export function regenerateLearningPath(learnerId: string, tenantId: string): Lea
     skills,
     recommendedStartSkillId: recommended,
   });
-  for (const [id, p] of store.learningPaths) {
-    if (p.learnerId === learnerId && p.tenantId === tenantId) {
-      store.learningPaths.delete(id);
-    }
-  }
-  store.learningPaths.set(next.id, next);
-  return next;
+  return getPersistence().curriculum.replaceLearningPath(learnerId, tenantId, next);
 }
 
 export type SubjectDetail = {
@@ -1192,17 +1180,17 @@ export type SubjectDetail = {
   pathNodesForSubject: LearningPath["nodes"];
 };
 
-export function getSubjectDetail(
+export async function getSubjectDetail(
   learnerId: string,
   tenantId: string,
   subjectId: string,
-): SubjectDetail | null {
+): Promise<SubjectDetail | null> {
   const store = db();
   const subject = store.subjects.get(subjectId);
   if (!subject) return null;
 
   const skills = Array.from(store.skills.values()).filter((s) => s.subjectId === subjectId);
-  const { skillMasteries } = getMasteryMap(learnerId, tenantId);
+  const { skillMasteries } = await getMasteryMap(learnerId, tenantId);
   const masteryBySkillId = new Map(skillMasteries.map((m) => [m.skillId, m]));
   const annotated = skills.map((s) => ({
     ...s,
@@ -1232,7 +1220,7 @@ export function getSubjectDetail(
   const nextSkill =
     sortedForNext.find((s) => !s.mastery || s.mastery.score < 0.65) ?? annotated[0] ?? null;
 
-  const path = getLearningPath(learnerId, tenantId);
+  const path = await getLearningPath(learnerId, tenantId);
   const pathNodesForSubject = path?.nodes.filter((n) => n.subjectId === subjectId) ?? [];
 
   const tutorByYubject: Record<string, string> = {
@@ -1331,13 +1319,13 @@ function buildAccommodationSnapshotFrom(
   };
 }
 
-function buildMasterySnapshot(input: {
+async function buildMasterySnapshot(input: {
   learnerId: string;
   tenantId: string;
   subjectId: string;
   skillId: string;
-}): LessonMasterySnapshot {
-  const { skillMasteries } = getMasteryMap(input.learnerId, input.tenantId);
+}): Promise<LessonMasterySnapshot> {
+  const { skillMasteries } = await getMasteryMap(input.learnerId, input.tenantId);
   const own = skillMasteries.find((m) => m.skillId === input.skillId);
   const subjectContext = skillMasteries
     .filter((m) => m.subjectId === input.subjectId && m.skillId !== input.skillId)
@@ -1427,7 +1415,7 @@ export async function createLessonRun(
     };
   }
 
-  const masterySnapshot = buildMasterySnapshot({
+  const masterySnapshot = await buildMasterySnapshot({
     learnerId: input.learnerId,
     tenantId: input.tenantId,
     subjectId: input.subjectId,
@@ -2668,64 +2656,61 @@ export function getActiveConsentVersion(type: ConsentType): ConsentVersion | nul
   return all.sort((a, b) => b.effectiveAt.localeCompare(a.effectiveAt))[0];
 }
 
-export function listConsentsForUser(parentUserId: string, tenantId: string): ConsentRecord[] {
-  return db().consentRecords.filter(
-    (r) => r.parentUserId === parentUserId && r.tenantId === tenantId,
-  );
+export async function listConsentsForUser(
+  parentUserId: string,
+  tenantId: string,
+): Promise<ConsentRecord[]> {
+  return getPersistence().compliance.listConsentsForUser(parentUserId, tenantId);
 }
 
-export function listConsentsForLearner(
+export async function listConsentsForLearner(
   parentUserId: string,
   learnerId: string,
   tenantId: string,
-): ConsentRecord[] {
-  return db().consentRecords.filter(
-    (r) => r.parentUserId === parentUserId && r.learnerId === learnerId && r.tenantId === tenantId,
+): Promise<ConsentRecord[]> {
+  return getPersistence().compliance.listConsentsForLearner(
+    parentUserId,
+    learnerId,
+    tenantId,
   );
 }
 
-export function getActiveConsentForUser(
+export async function getActiveConsentForUser(
   parentUserId: string,
   type: ConsentType,
   tenantId: string,
   learnerId: string | null = null,
-): ConsentRecord | null {
-  const rows = db().consentRecords.filter(
-    (r) =>
-      r.parentUserId === parentUserId &&
-      r.tenantId === tenantId &&
-      r.consentType === type &&
-      (r.learnerId ?? null) === (learnerId ?? null) &&
-      r.revokedAt === null,
+): Promise<ConsentRecord | null> {
+  return getPersistence().compliance.getActiveConsentForUser(
+    parentUserId,
+    type,
+    tenantId,
+    learnerId,
   );
-  if (!rows.length) return null;
-  return rows.sort((a, b) => b.acceptedAt.localeCompare(a.acceptedAt))[0];
 }
 
-export function recordConsent(input: {
+export async function recordConsent(input: {
   tenantId: string;
   parentUserId: string;
   learnerId: string | null;
   consentType: ConsentType;
   ipHash?: string | null;
   userAgent?: string | null;
-}): ConsentRecord {
+}): Promise<ConsentRecord> {
   const version = getActiveConsentVersion(input.consentType);
   // Auto-revoke any prior active records in the same scope so revoke is a
   // single-step operation. Without this, duplicate accepts pile up and a
   // single revoke leaves an older active row that nullifies the revocation.
   const now = nowIso();
-  const records = db().consentRecords;
-  for (let i = 0; i < records.length; i++) {
-    const r = records[i]!;
+  const compliance = getPersistence().compliance;
+  const existing = await compliance.listConsentsForUser(input.parentUserId, input.tenantId);
+  for (const r of existing) {
     if (
-      r.tenantId === input.tenantId &&
-      r.parentUserId === input.parentUserId &&
       r.consentType === input.consentType &&
       (r.learnerId ?? null) === (input.learnerId ?? null) &&
       r.revokedAt === null
     ) {
-      records[i] = { ...r, revokedAt: now };
+      await compliance.upsertConsent({ ...r, revokedAt: now });
     }
   }
   const rec: ConsentRecord = {
@@ -2740,33 +2725,29 @@ export function recordConsent(input: {
     ipHash: input.ipHash ?? null,
     userAgent: input.userAgent ?? null,
   };
-  records.push(rec);
-  return rec;
+  return compliance.upsertConsent(rec);
 }
 
-export function revokeConsent(input: {
+export async function revokeConsent(input: {
   tenantId: string;
   parentUserId: string;
   learnerId: string | null;
   consentType: ConsentType;
-}): ConsentRecord | null {
+}): Promise<ConsentRecord | null> {
   // Revoke every active row for this scope, not just the latest, so a single
   // revoke deterministically disables the consent even if duplicates exist.
   const now = nowIso();
-  const records = db().consentRecords;
+  const compliance = getPersistence().compliance;
+  const records = await compliance.listConsentsForUser(input.parentUserId, input.tenantId);
   let last: ConsentRecord | null = null;
-  for (let i = 0; i < records.length; i++) {
-    const r = records[i]!;
+  for (const r of records) {
     if (
-      r.tenantId === input.tenantId &&
-      r.parentUserId === input.parentUserId &&
       r.consentType === input.consentType &&
       (r.learnerId ?? null) === (input.learnerId ?? null) &&
       r.revokedAt === null
     ) {
       const updated: ConsentRecord = { ...r, revokedAt: now };
-      records[i] = updated;
-      last = updated;
+      last = await compliance.upsertConsent(updated);
     }
   }
   return last;
@@ -2788,20 +2769,21 @@ export function recordTermsAcceptance(input: {
   return t;
 }
 
-export function getAgeGateForLearner(learnerId: string, tenantId: string): AgeGateRecord | null {
-  const rec = db().ageGateRecords.get(learnerId);
-  if (!rec || rec.tenantId !== tenantId) return null;
-  return rec;
+export async function getAgeGateForLearner(
+  learnerId: string,
+  tenantId: string,
+): Promise<AgeGateRecord | null> {
+  return getPersistence().compliance.getAgeGateForLearner(learnerId, tenantId);
 }
 
 const UNDER_13_AGE_RANGES = new Set(["3-5", "5-7", "7-9", "9-11", "11-13"]);
 
-export function recordAgeGate(input: {
+export async function recordAgeGate(input: {
   tenantId: string;
   learnerId: string;
   recordedByUserId: string;
   ageRange: string | null;
-}): AgeGateRecord {
+}): Promise<AgeGateRecord> {
   const rec: AgeGateRecord = {
     id: newId("agr"),
     tenantId: input.tenantId,
@@ -2811,8 +2793,7 @@ export function recordAgeGate(input: {
     requiresParentConsent: input.ageRange ? UNDER_13_AGE_RANGES.has(input.ageRange) : true,
     recordedAt: nowIso(),
   };
-  db().ageGateRecords.set(input.learnerId, rec);
-  return rec;
+  return getPersistence().compliance.upsertAgeGate(rec);
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -3042,12 +3023,13 @@ export function listIepAccessForLearner(
     .sort((a, b) => b.accessedAt.localeCompare(a.accessedAt));
 }
 
-export function listPolicyVersions(): PolicyVersion[] {
-  return Array.from(db().policyVersions.values()).sort((a, b) => a.kind.localeCompare(b.kind));
+export async function listPolicyVersions(): Promise<PolicyVersion[]> {
+  return getPersistence().compliance.listPolicyVersions();
 }
 
-export function listSubprocessors(): SubprocessorRecord[] {
-  return Array.from(db().subprocessors.values()).sort((a, b) => a.name.localeCompare(b.name));
+export async function listSubprocessors(): Promise<SubprocessorRecord[]> {
+  const all = await getPersistence().compliance.listSubprocessors();
+  return all.slice().sort((a, b) => a.name.localeCompare(b.name));
 }
 
 // ===== Sprint 26: Curriculum / Standards / Skill Graph =====
@@ -3126,8 +3108,8 @@ export function createSubject(input: {
   return rec;
 }
 
-export function getSkill(id: string): Skill | null {
-  return db().skills.get(id) ?? null;
+export async function getSkill(id: string): Promise<Skill | null> {
+  return getPersistence().curriculum.getSkillById(id);
 }
 
 export function createSkill(input: {
@@ -6251,13 +6233,13 @@ export interface GradebookDetail {
   summary: { mastered: number; secure: number; developing: number; introduced: number };
 }
 
-export function getGradebookDetail(
+export async function getGradebookDetail(
   learnerId: string,
   tenantId: string,
-): GradebookDetail {
-  const mastery = getMasteryMap(learnerId, tenantId);
-  const subjects = new Map(listSubjects().map((s) => [s.id, s]));
-  const skills = new Map(listSkills().map((s) => [s.id, s]));
+): Promise<GradebookDetail> {
+  const mastery = await getMasteryMap(learnerId, tenantId);
+  const subjects = new Map((await listSubjects()).map((s) => [s.id, s]));
+  const skills = new Map((await listSkills()).map((s) => [s.id, s]));
 
   // Count lesson runs per skill + last-practiced timestamp.
   const lastByskill = new Map<string, string>();

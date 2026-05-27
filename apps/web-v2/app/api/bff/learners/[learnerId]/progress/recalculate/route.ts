@@ -39,7 +39,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     const learner = getLearner(learnerId, session!.tenantId);
     if (!learner) return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
 
-    const path = regenerateLearningPath(learnerId, session!.tenantId);
+    const path = await regenerateLearningPath(learnerId, session!.tenantId);
     audit(session!, "progress.recalculate", requestId, { learnerId });
     return ok({ learningPathId: path?.id ?? null }, requestId);
   } catch (e) {

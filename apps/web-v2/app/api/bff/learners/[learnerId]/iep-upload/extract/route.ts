@@ -41,7 +41,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (!learner) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
     }
-    const doc = getIEPForLearner(learnerId, session!.tenantId);
+    const doc = await getIEPForLearner(learnerId, session!.tenantId);
     if (!doc) {
       return fail({ ...ERRORS.PRECONDITION_FAILED, message: "No IEP uploaded yet" }, requestId);
     }
@@ -71,7 +71,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
         requestId,
       );
     }
-    const next = setIEPExtraction(learnerId, session!.tenantId, v.data);
+    const next = await setIEPExtraction(learnerId, session!.tenantId, v.data);
     await refreshLearnerReadiness(learnerId, session!.tenantId);
     logIepAccess({
       tenantId: session!.tenantId,

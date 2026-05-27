@@ -59,25 +59,27 @@ export default async function TherapistReportsPage() {
   );
   const learners = maybeLearners.filter((l): l is LearnerProfile => Boolean(l));
 
-  const skillNameById = new Map(listSkills().map((s) => [s.id, s.name]));
+  const skillNameById = new Map((await listSkills()).map((s) => [s.id, s.name]));
 
-  const rows = learners.map((l) => {
-    const { skillMasteries } = getMasteryMap(l.id, session.tenantId);
-    const tracked = skillMasteries.length;
-    const avg =
-      tracked > 0
-        ? skillMasteries.reduce((sum, m) => sum + m.score, 0) / tracked
-        : 0;
-    const focus = skillMasteries.slice().sort((a, b) => a.score - b.score)[0] ?? null;
-    return {
-      learner: l,
-      tracked,
-      avg,
-      level: highestLevel(skillMasteries),
-      focusSkillName: focus ? (skillNameById.get(focus.skillId) ?? null) : null,
-      focusScore: focus?.score ?? null,
-    };
-  });
+  const rows = await Promise.all(
+    learners.map(async (l) => {
+      const { skillMasteries } = await getMasteryMap(l.id, session.tenantId);
+      const tracked = skillMasteries.length;
+      const avg =
+        tracked > 0
+          ? skillMasteries.reduce((sum, m) => sum + m.score, 0) / tracked
+          : 0;
+      const focus = skillMasteries.slice().sort((a, b) => a.score - b.score)[0] ?? null;
+      return {
+        learner: l,
+        tracked,
+        avg,
+        level: highestLevel(skillMasteries),
+        focusSkillName: focus ? (skillNameById.get(focus.skillId) ?? null) : null,
+        focusScore: focus?.score ?? null,
+      };
+    }),
+  );
 
   return (
     <AppShell

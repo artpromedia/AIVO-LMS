@@ -43,7 +43,7 @@ async function reextractAction(formData: FormData) {
     assessment,
     hasUploadedDocument: true,
   });
-  setIEPExtraction(learnerId, session.tenantId, extraction);
+  await setIEPExtraction(learnerId, session.tenantId, extraction);
   await refreshLearnerReadiness(learnerId, session.tenantId);
   audit(session, "iep.reextract", newRequestId(), { learnerId });
   redirect(`/parent/learners/${learnerId}/iep/review`);
@@ -63,7 +63,7 @@ async function confirmAction(formData: FormData) {
   if (!usageConsent) {
     redirect(`/parent/learners/${learnerId}/iep/review?error=consent_required`);
   }
-  confirmIEPExtraction(learnerId, session.tenantId, accepted);
+  await confirmIEPExtraction(learnerId, session.tenantId, accepted);
   await refreshLearnerReadiness(learnerId, session.tenantId);
   audit(session, "iep.confirm", newRequestId(), {
     learnerId,
@@ -82,7 +82,7 @@ async function deleteAction(formData: FormData) {
     redirect("/parent/learners");
   }
   const { deleteIEPForLearner } = await import("@/lib/db/repos");
-  deleteIEPForLearner(learnerId, session.tenantId);
+  await deleteIEPForLearner(learnerId, session.tenantId);
   await refreshLearnerReadiness(learnerId, session.tenantId);
   audit(session, "iep.delete", newRequestId(), { learnerId });
   redirect(`/parent/learners/${learnerId}/iep`);
@@ -129,7 +129,7 @@ export default async function IEPReviewPage({
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
-  const doc = getIEPForLearner(learnerId, session.tenantId);
+  const doc = await getIEPForLearner(learnerId, session.tenantId);
   if (!doc) {
     return (
       <AssessmentShell eyebrow={`IEP review for ${learner.displayName}`}>

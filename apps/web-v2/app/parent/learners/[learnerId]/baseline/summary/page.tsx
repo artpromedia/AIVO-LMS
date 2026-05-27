@@ -56,7 +56,7 @@ export default async function BaselineSummaryPage({
     );
   }
 
-  const iep = getIEPForLearner(learnerId, session.tenantId);
+  const iep = await getIEPForLearner(learnerId, session.tenantId);
   const ex = iep?.extraction ?? null;
   const summary = baseline.summary;
 

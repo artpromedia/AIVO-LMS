@@ -16,7 +16,7 @@ import {
 export default async function Page() {
   const session = await requirePageRole(["parent"]);
   const learners = await listLearnersForParent(session.userId, session.tenantId);
-  const subjectMap = new Map(listSubjects().map((s) => [s.id, s]));
+  const subjectMap = new Map((await listSubjects()).map((s) => [s.id, s]));
 
   return (
     <AppShell

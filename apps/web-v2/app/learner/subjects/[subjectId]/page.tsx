@@ -48,11 +48,11 @@ export default async function LearnerSubjectDetailPage({
   if (!learnerId) redirect("/learner/home");
 
   const { subjectId } = await params;
-  const detail = getSubjectDetail(learnerId, session.tenantId, subjectId);
+  const detail = await getSubjectDetail(learnerId, session.tenantId, subjectId);
   if (!detail) notFound();
 
-  const { map } = getMasteryMap(learnerId, session.tenantId);
-  const iep = getIEPForLearner(learnerId, session.tenantId);
+  const { map } = await getMasteryMap(learnerId, session.tenantId);
+  const iep = await getIEPForLearner(learnerId, session.tenantId);
   const tutor = tutorForSubjectSlug(detail.subject.slug);
   const accent = tutor?.color ?? "var(--aivo-sensory-primary)";
 

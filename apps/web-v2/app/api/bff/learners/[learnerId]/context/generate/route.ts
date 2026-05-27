@@ -67,13 +67,13 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
         requestId,
       );
     }
-    const iep = getIEPForLearner(learnerId, session!.tenantId);
+    const iep = await getIEPForLearner(learnerId, session!.tenantId);
     const candidate = buildBrainProfile({
       learner,
       assessment,
       iepExtraction: iep?.extraction ?? null,
       iepUploaded: Boolean(iep),
-      subjects: listSubjects(),
+      subjects: await listSubjects(),
       baselineAttempts: 0,
     });
     const v = brainProfileStateSchema.safeParse(candidate);

@@ -34,11 +34,11 @@ export default async function TeacherLearnerDetailPage({
   if (!learner) notFound();
 
   const recent = await listLessonRunsForLearner(learnerId, session.tenantId, { limit: 10 });
-  const { skillMasteries } = getMasteryMap(learnerId, session.tenantId);
-  const iep = getIEPForLearner(learnerId, session.tenantId);
+  const { skillMasteries } = await getMasteryMap(learnerId, session.tenantId);
+  const iep = await getIEPForLearner(learnerId, session.tenantId);
   const assignments = listActiveAssignmentsForLearner(learnerId, session.tenantId);
-  const subjectsById = new Map(listSubjects().map((s) => [s.id, s]));
-  const skillsById = new Map(listSkills().map((s) => [s.id, s]));
+  const subjectsById = new Map((await listSubjects()).map((s) => [s.id, s]));
+  const skillsById = new Map((await listSkills()).map((s) => [s.id, s]));
 
   // Skill gaps = lowest mastery (≤ 0.5).
   const gaps = skillMasteries

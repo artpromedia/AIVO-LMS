@@ -51,10 +51,10 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
       return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
     }
 
-    const { map, skillMasteries } = getMasteryMap(learnerId, session!.tenantId);
-    const subjects = listSubjects();
+    const { map, skillMasteries } = await getMasteryMap(learnerId, session!.tenantId);
+    const subjects = await listSubjects();
     const subjectsById = new Map(subjects.map((s) => [s.id, s]));
-    const skills = listSkills();
+    const skills = await listSkills();
     const skillsById = new Map(skills.map((s) => [s.id, s]));
 
     const recentRuns = await listLessonRunsForLearner(learnerId, session!.tenantId, {

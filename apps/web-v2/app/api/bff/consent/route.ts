@@ -19,7 +19,7 @@ export async function GET(req: Request) {
     const { session, response } = await requireSession(req, requestId);
     if (response) return response;
     const versions = listConsentVersions();
-    const records = listConsentsForUser(session!.userId, session!.tenantId);
+    const records = await listConsentsForUser(session!.userId, session!.tenantId);
     return ok({ versions, records }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     if (!isConsentType(json.consentType)) {
       return fail({ ...ERRORS.VALIDATION_FAILED, message: "Unknown consentType" }, requestId);
     }
-    const rec = recordConsent({
+    const rec = await recordConsent({
       tenantId: session!.tenantId,
       parentUserId: session!.userId,
       learnerId: null,

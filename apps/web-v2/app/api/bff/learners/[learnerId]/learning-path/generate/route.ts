@@ -28,7 +28,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     );
     if (consentErr) return consentErr;
 
-    const path = regenerateLearningPath(learnerId, session!.tenantId);
+    const path = await regenerateLearningPath(learnerId, session!.tenantId);
     if (!path) {
       return fail(
         {
