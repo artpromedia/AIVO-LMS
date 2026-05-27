@@ -9,7 +9,7 @@
  */
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { requirePageRole } from "@/lib/auth/server";
+import { requireLearnerSession } from "@/lib/auth/learner-session";
 import { readActiveLearnerFromCookies } from "@/lib/auth/active-learner";
 import { AppShell } from "@/components/layout/app-shell";
 import { LEARNER_NAV } from "@/components/layout/role-shells";
@@ -36,7 +36,7 @@ type RouteParams = { params: Promise<{ lessonRunId: string }> };
 
 export default async function LearnerLessonRunPage({ params }: RouteParams) {
   const { lessonRunId } = await params;
-  const session = await requirePageRole(["learner", "parent"]);
+  const session = await requireLearnerSession(["learner", "parent"]);
   const found = getLessonRun(lessonRunId, session.tenantId);
   if (!found) redirect("/learner/home");
   const { lessonRun, plan } = found;

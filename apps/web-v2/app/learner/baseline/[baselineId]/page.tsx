@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { requirePageRole } from "@/lib/auth/server";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,11 +31,65 @@ import {
   recordBaselineAttempt,
   refreshLearnerReadiness,
   startBaseline,
+  updateBrainProfilePipelineState,
 } from "@/lib/db/repos";
 import { audit } from "@/lib/bff/audit";
-import { newRequestId } from "@/lib/observability/logger";
+import { logger, newRequestId } from "@/lib/observability/logger";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
 import { resolveBaselineImage } from "@/lib/learner/baseline-image";
+import { IDENTITY_ACCESS_TOKEN_COOKIE } from "@/lib/auth/identity-client";
+import { normalizeCloneStage } from "@/lib/learner/brain-clone-stage";
+import type { BrainProfileCloneStage } from "@/lib/db/types";
+
+type BrainClonePipelineResult = { brainProfileId: string | null; cloneStage: BrainProfileCloneStage };
+
+async function triggerBrainClonePipeline(input: {
+  learnerId: string;
+  tenantId: string;
+  baselineId: string;
+  parentAssessmentId: string;
+}): Promise<BrainClonePipelineResult | null> {
+  const url = `${(process.env.BRAIN_SVC_URL ?? "http://localhost:3033").replace(/\/+$/, "")}/api/brain/clone`;
+  const jar = await cookies();
+  const token = jar.get(IDENTITY_ACCESS_TOKEN_COOKIE)?.value;
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        ...(token ? { authorization: ["Bearer", token].join(" ") } : {}),
+        ...(process.env.BRAIN_SVC_SERVICE_TOKEN
+          ? {
+              "x-internal-service": "web-v2",
+              "x-service-token": process.env.BRAIN_SVC_SERVICE_TOKEN,
+            }
+          : {}),
+      },
+      body: JSON.stringify({
+        learner_id: input.learnerId,
+        tenant_id: input.tenantId,
+        assessment_id: input.baselineId,
+        parent_assessment_id: input.parentAssessmentId,
+      }),
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      logger.warn(
+        { learnerId: input.learnerId, status: res.status },
+        "brain clone pipeline trigger failed",
+      );
+      return null;
+    }
+    const json = (await res.json()) as Record<string, unknown>;
+    return {
+      brainProfileId: typeof json.id === "string" ? json.id : null,
+      cloneStage: normalizeCloneStage(json.cloneStage ?? json.approvalStatus ?? json.approval_status),
+    };
+  } catch {
+    logger.warn({ learnerId: input.learnerId }, "brain clone pipeline request failed");
+    return null;
+  }
+}
 
 /**
  * Sprint 6: calm baseline runner.
@@ -131,8 +186,24 @@ async function completeAction(formData: FormData) {
   }
 
   const result = completeBaseline(baselineId, session.tenantId);
-  refreshLearnerReadiness(learnerId, session.tenantId);
   if (result) {
+    const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
+    const pipeline = await triggerBrainClonePipeline({
+      learnerId,
+      tenantId: session.tenantId,
+      baselineId,
+      parentAssessmentId: assessment.id,
+    });
+    if (pipeline) {
+      updateBrainProfilePipelineState(learnerId, session.tenantId, {
+        cloneStage: pipeline.cloneStage,
+        brainProfileId: pipeline.brainProfileId,
+      });
+    } else {
+      updateBrainProfilePipelineState(learnerId, session.tenantId, {
+        cloneStage: "building",
+      });
+    }
     audit(session, "baseline.complete", newRequestId(), {
       learnerId,
       metadata: {
@@ -140,9 +211,11 @@ async function completeAction(formData: FormData) {
         correct: result.summary.correctCount,
         answered: result.summary.totalAnswered,
         brainCloned: Boolean(result.clonedBrainProfile),
+        cloneStage: pipeline?.cloneStage ?? "building",
       },
     });
   }
+  refreshLearnerReadiness(learnerId, session.tenantId);
   // Sprint 14: when the brain clone landed cleanly, route into the
   // awakening / watch sequence (the user-facing "wow" moment) instead of
   // dropping the user back on a summary card. The clone routes themselves

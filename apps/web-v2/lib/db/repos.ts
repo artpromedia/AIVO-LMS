@@ -493,6 +493,7 @@ export function upsertBrainProfile(
       approvedByParent: false,
       approvalStatus: "pending_parent_review",
       cloneStage: "pre_clone",
+      awakening_seen: false,
       clonedAt: null,
       generatedAt: now,
     };
@@ -507,6 +508,7 @@ export function upsertBrainProfile(
     approvedByParent: false,
     approvalStatus: "pending_parent_review",
     cloneStage: "pre_clone",
+    awakening_seen: false,
     clonedAt: null,
     generatedAt: now,
     updatedAt: now,
@@ -562,7 +564,17 @@ function prepareBrainCloneFromSummary(
   return {
     ...existing,
     state: parsed.data,
-    cloneStage: existing.cloneStage === "approved" ? "approved" : "cloned",
+    cloneStage:
+      existing.cloneStage === "approved"
+        ? "approved"
+        : existing.cloneStage === "computing"
+          ? "computing"
+          : existing.cloneStage === "awaiting_approval"
+            ? "awaiting_approval"
+            : "building",
+    approvalStatus: existing.cloneStage === "approved" ? existing.approvalStatus : "pending_parent_review",
+    approvedByParent: existing.cloneStage === "approved",
+    awakening_seen: existing.cloneStage === "approved" ? existing.awakening_seen : false,
     clonedAt: existing.clonedAt ?? now,
     updatedAt: now,
   };
@@ -611,7 +623,13 @@ export function approveBrainClone(
 ): LearnerBrainProfile | null {
   const existing = getBrainProfile(learnerId, tenantId);
   if (!existing) return null;
-  if (existing.cloneStage === "pre_clone") return null;
+  if (
+    existing.cloneStage === "pre_clone" ||
+    existing.cloneStage === "computing" ||
+    existing.cloneStage === "building"
+  ) {
+    return null;
+  }
   const status: LearnerBrainProfile["approvalStatus"] = options.amended
     ? "amended"
     : "approved";
@@ -620,6 +638,41 @@ export function approveBrainClone(
     approvedByParent: true,
     approvalStatus: status,
     cloneStage: "approved",
+    updatedAt: nowIso(),
+  };
+  db().brainProfiles.set(existing.id, next);
+  return next;
+}
+
+export function updateBrainProfilePipelineState(
+  learnerId: string,
+  tenantId: string,
+  input: { cloneStage: LearnerBrainProfile["cloneStage"]; brainProfileId?: string | null },
+): LearnerBrainProfile | null {
+  const existing = getBrainProfile(learnerId, tenantId);
+  if (!existing) return null;
+  const next: LearnerBrainProfile = {
+    ...existing,
+    id: input.brainProfileId?.trim() ? input.brainProfileId.trim() : existing.id,
+    cloneStage: input.cloneStage,
+    updatedAt: nowIso(),
+  };
+  db().brainProfiles.set(next.id, next);
+  if (next.id !== existing.id) {
+    db().brainProfiles.delete(existing.id);
+  }
+  return next;
+}
+
+export function markBrainAwakeningSeen(
+  learnerId: string,
+  tenantId: string,
+): LearnerBrainProfile | null {
+  const existing = getBrainProfile(learnerId, tenantId);
+  if (!existing || existing.awakening_seen) return existing;
+  const next: LearnerBrainProfile = {
+    ...existing,
+    awakening_seen: true,
     updatedAt: nowIso(),
   };
   db().brainProfiles.set(existing.id, next);

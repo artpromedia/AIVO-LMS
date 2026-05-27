@@ -14,6 +14,7 @@ import {
   DrawerContent,
 } from "@/components/ui/drawer";
 import { cn } from "@/lib/utils";
+import { readLearnerSessionFromCookies } from "@/lib/auth/learner-session";
 
 /**
  * Map a session role to the visual theme it should render under.
@@ -134,7 +135,7 @@ function SidebarBody({
  * (page bg, card surfaces, ring focus, etc.) the moment the user clicks
  * it — no per-page wiring required.
  */
-export function AppShell({
+export async function AppShell({
   role,
   roleLabel,
   navItems,
@@ -154,6 +155,7 @@ export function AppShell({
    */
   variant?: "standard" | "immersive";
 }) {
+  const learnerSession = await readLearnerSessionFromCookies();
   const theme = roleToTheme(role);
   const chrome = THEME_CHROME[theme];
   const isDarkSidebar = chrome.sidebarTone === "dark";
@@ -234,6 +236,21 @@ export function AppShell({
           </Link>
 
           <div className="ml-auto flex items-center gap-2 sm:gap-3">
+            {learnerSession?.actsAsLearner ? (
+              <form action="/api/bff/auth/end-learner-session" method="post">
+                <input
+                  type="hidden"
+                  name="returnTo"
+                  value={`/parent/learners/${learnerSession.learnerId}`}
+                />
+                <button
+                  type="submit"
+                  className="inline-flex rounded-full border border-iw-border bg-iw-card px-3 py-1 text-xs font-semibold text-iw-ink hover:bg-iw-bg"
+                >
+                  ← Return to parent dashboard
+                </button>
+              </form>
+            ) : null}
             {immersive ? null : <SensoryModePopover />}
             {immersive ? null : <LanguageSwitcher />}
             <span className="hidden text-right sm:block">
