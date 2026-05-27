@@ -15,8 +15,8 @@
  *     learner home (the awakening is a once-per-learner moment).
  */
 import { redirect } from "next/navigation";
-import { requirePageRole } from "@/lib/auth/server";
-import { getBrainProfile, getLearner } from "@/lib/db/repos";
+import { requireLearnerSession } from "@/lib/auth/learner-session";
+import { getBrainProfile, getLearner, markBrainAwakeningSeen } from "@/lib/db/repos";
 import { AwakeningClient } from "./awakening-client";
 
 export default async function BrainCloneAwakeningPage({
@@ -24,7 +24,7 @@ export default async function BrainCloneAwakeningPage({
 }: {
   params: Promise<{ learnerId: string }>;
 }) {
-  const session = await requirePageRole(["learner"]);
+  const session = await requireLearnerSession();
   const { learnerId } = await params;
   // The learner role is always scoped to a single learnerId via the session.
   // Defense-in-depth: never let a learner load some other learner's awakening.
@@ -34,14 +34,14 @@ export default async function BrainCloneAwakeningPage({
   const learner = getLearner(learnerId, session.tenantId);
   if (!learner) redirect("/learner/home");
   const profile = getBrainProfile(learnerId, session.tenantId);
-  if (!profile) redirect("/learner/baseline");
-  if (profile.cloneStage === "pre_clone") {
-    redirect("/learner/baseline");
+  if (!profile || profile.cloneStage !== "approved") {
+    redirect(`/parent/learners/${learnerId}/brain-clone-watch`);
   }
-  if (profile.cloneStage === "approved") {
+  if (profile.awakening_seen) {
     // Already lived this moment; skip.
     redirect("/learner/home");
   }
+  markBrainAwakeningSeen(learnerId, session.tenantId);
 
   const state = profile.state;
   // Top strongest subjects power the "memories" phase of the sequence.

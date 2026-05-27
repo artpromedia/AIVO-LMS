@@ -45,6 +45,8 @@ export type ReadinessState =
   | "assessment_needed"
   | "iep_optional"
   | "baseline_needed"
+  | "brain_building"
+  | "brain_review_needed"
   | "ready_for_today_mission"
   | "active_learning";
 
@@ -379,7 +381,13 @@ export type LearnerBrainProfileState = {
  *               (mirrors brain-svc `/api/brain/clone` in production).
  *   approved  — parent reviewed the cloned profile and accepted it.
  */
-export type BrainProfileCloneStage = "pre_clone" | "cloned" | "approved";
+export type BrainProfileCloneStage =
+  | "pre_clone"
+  | "computing"
+  | "building"
+  | "awaiting_approval"
+  | "cloned"
+  | "approved";
 
 /**
  * Approval lifecycle for a cloned brain profile, mirrors legacy
@@ -401,6 +409,7 @@ export type LearnerBrainProfile = {
   approvedByParent: boolean;
   approvalStatus: BrainProfileApprovalStatus;
   cloneStage: BrainProfileCloneStage;
+  awakening_seen: boolean;
   /** Timestamp of the post-baseline clone, null while in pre_clone. */
   clonedAt: ISODate | null;
   generatedAt: ISODate;

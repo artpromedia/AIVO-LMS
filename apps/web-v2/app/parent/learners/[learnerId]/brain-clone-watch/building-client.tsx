@@ -19,7 +19,7 @@
  * brief shimmer while "computing", then settle. No external runtime
  * deps. Honours `prefers-reduced-motion`.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
 type StageItem = { label: string; value?: string };
@@ -30,8 +30,6 @@ type Stage = {
   items?: StageItem[];
   swatches?: string[];
 };
-
-const STAGE_INTERVAL_MS = 2400;
 
 export function BrainBuildingClient({
   learnerId,
@@ -44,6 +42,7 @@ export function BrainBuildingClient({
   backLabel,
   alreadyApprovedLabel,
   alreadyApproved,
+  initialCloneStage,
   stages,
   primaryHue,
   approveAction,
@@ -58,11 +57,14 @@ export function BrainBuildingClient({
   backLabel: string;
   alreadyApprovedLabel: string;
   alreadyApproved: boolean;
+  initialCloneStage: string;
   stages: Stage[];
   primaryHue: string;
   approveAction: (formData: FormData) => void | Promise<void>;
 }) {
-  const [active, setActive] = useState(0);
+  const [active, setActive] = useState(alreadyApproved ? stages.length : 0);
+  const [cloneStage, setCloneStage] = useState(initialCloneStage);
+  const [completedSteps, setCompletedSteps] = useState(alreadyApproved ? stages.length : 0);
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -72,16 +74,59 @@ export function BrainBuildingClient({
 
   useEffect(() => {
     if (alreadyApproved) {
+      setCloneStage("approved");
+      setCompletedSteps(stages.length);
       setActive(stages.length);
       return;
     }
-    if (active >= stages.length) return;
-    const dur = reducedMotion ? 600 : STAGE_INTERVAL_MS;
-    const t = window.setTimeout(() => setActive((a) => a + 1), dur);
-    return () => window.clearTimeout(t);
-  }, [active, alreadyApproved, reducedMotion, stages.length]);
+    let cancelled = false;
+    const poll = async () => {
+      try {
+        const res = await fetch(`/api/bff/learners/${learnerId}/brain-clone/status`, {
+          cache: "no-store",
+        });
+        if (!res.ok) return;
+        const status = (await res.json()) as {
+          cloneStage?: string;
+          completedSteps?: number;
+          totalSteps?: number;
+          currentStep?: string | null;
+        };
+        if (cancelled) return;
+        const nextStage = status.cloneStage ?? cloneStage;
+        const done = Math.max(0, Math.min(stages.length, status.completedSteps ?? 0));
+        setCloneStage(nextStage);
+        setCompletedSteps(done);
+        if (nextStage === "awaiting_approval" || nextStage === "approved") {
+          setActive(stages.length);
+          return;
+        }
+        if (status.currentStep) {
+          const idx = stages.findIndex((s) => s.key === status.currentStep);
+          if (idx >= 0) {
+            setActive(idx);
+            return;
+          }
+        }
+        setActive(Math.min(stages.length - 1, done));
+      } catch {
+        // keep last known stage on transient poll failures
+      }
+    };
+    void poll();
+    const timer = window.setInterval(poll, reducedMotion ? 3000 : 2000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
+  }, [alreadyApproved, learnerId, reducedMotion, stages, stages.length, cloneStage]);
 
-  const allDone = active >= stages.length;
+  const canApprove = alreadyApproved || cloneStage === "awaiting_approval" || cloneStage === "approved";
+  const allDone = canApprove || active >= stages.length;
+  const progressLabel = useMemo(() => {
+    if (allDone) return doneLabel;
+    return `${completedSteps} / ${stages.length}`;
+  }, [allDone, completedSteps, doneLabel, stages.length]);
 
   return (
     <div
@@ -142,7 +187,7 @@ export function BrainBuildingClient({
         ) : (
           <>
             <p className="bc-watch-done-label" aria-live="polite">
-              {allDone ? doneLabel : `${active} / ${stages.length}`}
+              {progressLabel}
             </p>
             <div className="bc-watch-buttons">
               <Link
@@ -156,8 +201,8 @@ export function BrainBuildingClient({
                 <button
                   type="submit"
                   className="bc-watch-approve-btn"
-                  disabled={!allDone}
-                  aria-disabled={!allDone}
+                  disabled={!canApprove}
+                  aria-disabled={!canApprove}
                 >
                   {approveLabel}
                 </button>

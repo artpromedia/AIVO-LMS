@@ -25,7 +25,7 @@
  */
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { requirePageRole } from "@/lib/auth/server";
+import { requireLearnerSession } from "@/lib/auth/learner-session";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import {
@@ -58,7 +58,7 @@ import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
 async function startMissionAction(formData: FormData) {
   "use server";
   const learnerId = String(formData.get("learnerId") ?? "");
-  const session = await requirePageRole(["learner", "parent"]);
+  const session = await requireLearnerSession(["learner", "parent"]);
   if (session.role === "learner" && session.learnerId !== learnerId) {
     redirect("/learner/home");
   }
@@ -147,7 +147,7 @@ export default async function LearnerHome({
 }: {
   searchParams: Promise<{ blocker?: string }>;
 }) {
-  const session = await requirePageRole(["learner", "parent"]);
+  const session = await requireLearnerSession(["learner", "parent"]);
   const params = await searchParams;
 
   let learnerId: string | null = null;
@@ -374,8 +374,12 @@ export default async function LearnerHome({
               <h2 className="text-2xl font-bold text-iw-text-strong">Let's get you set up</h2>
               <p className="text-base text-iw-text-muted">
                 {blocker === "no_baseline"
-                  ? "We need a quick baseline check so we can build a lesson plan just for you."
-                  : "Just a moment — we're picking something special."}
+                  ? "Mission blocker: no_baseline. We need a quick baseline check so we can build a lesson plan just for you."
+                  : blocker === "no_learner"
+                    ? "Mission blocker: no_learner. We couldn't find the learner profile for this session."
+                    : blocker === "no_path"
+                      ? "Mission blocker: no_path. We don't have a learning path yet."
+                      : "Just a moment — we're picking something special."}
               </p>
               <Link
                 href={blocker === "no_baseline" ? "/learner/baseline" : "/learner/home"}

@@ -6,6 +6,8 @@ export const READINESS_LABEL: Record<ReadinessState, string> = {
   assessment_needed: "Assessment needed",
   iep_optional: "Add an IEP (optional)",
   baseline_needed: "Baseline assessment ready",
+  brain_building: "Building your child's brain",
+  brain_review_needed: "Review and approve your child's brain",
   ready_for_today_mission: "Ready for today's mission",
   active_learning: "Active learning",
 };
@@ -16,6 +18,8 @@ export const READINESS_TONE: Record<ReadinessState, "neutral" | "warning" | "pri
     assessment_needed: "warning",
     iep_optional: "primary",
     baseline_needed: "primary",
+    brain_building: "primary",
+    brain_review_needed: "primary",
     ready_for_today_mission: "success",
     active_learning: "success",
   };
@@ -39,13 +43,21 @@ export const READINESS_NEXT_STEP: Record<ReadinessState, { label: string; hrefTe
       label: "Start baseline assessment",
       hrefTemplate: "/parent/learners/{learnerId}/baseline",
     },
+    brain_building: {
+      label: "Watch the build",
+      hrefTemplate: "/parent/learners/{learnerId}/brain-clone-watch",
+    },
+    brain_review_needed: {
+      label: "Review and approve",
+      hrefTemplate: "/parent/learners/{learnerId}/brain-clone-watch",
+    },
     ready_for_today_mission: {
       label: "Open today's mission",
-      hrefTemplate: "/parent/learners/{learnerId}",
+      hrefTemplate: "/parent/learners/{learnerId}/handoff",
     },
     active_learning: {
       label: "See growth report",
-      hrefTemplate: "/parent/learners/{learnerId}",
+      hrefTemplate: "/parent/learners/{learnerId}/handoff",
     },
   };
 
@@ -78,12 +90,29 @@ export function computeReadinessFor(learnerId: string, tenantId: string): Readin
   const baseline = Array.from(store.baselineAssessments.values()).find(
     (b) => b.learnerId === learnerId && b.tenantId === tenantId && b.status === "complete",
   );
+  const brainProfile = Array.from(store.brainProfiles.values()).find(
+    (b) => b.learnerId === learnerId && b.tenantId === tenantId,
+  );
   const lessonRunCount = Array.from(store.lessonRuns.values()).filter(
     (l) => l.learnerId === learnerId && l.tenantId === tenantId,
   ).length;
 
   if (lessonRunCount > 0) return "active_learning";
-  if (baseline) return "ready_for_today_mission";
+  if (baseline) {
+    if (!brainProfile) return "brain_building";
+    if (
+      brainProfile.cloneStage === "pre_clone" ||
+      brainProfile.cloneStage === "computing" ||
+      brainProfile.cloneStage === "building"
+    ) {
+      return "brain_building";
+    }
+    if (brainProfile.cloneStage === "awaiting_approval" || brainProfile.cloneStage === "cloned") {
+      return "brain_review_needed";
+    }
+    if (brainProfile.cloneStage === "approved") return "ready_for_today_mission";
+    return "brain_building";
+  }
   if (assessment?.submittedAt) {
     return iepDecided ? "baseline_needed" : "iep_optional";
   }

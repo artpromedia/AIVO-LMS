@@ -43,6 +43,9 @@ async function approveBrainCloneAction(formData: FormData) {
     learnerId,
     metadata: { amended, ok: Boolean(result) },
   });
+  if (!result) {
+    redirect(`/parent/learners/${learnerId}/brain-clone-watch`);
+  }
   redirect(`/parent/learners/${learnerId}`);
 }
 
@@ -59,7 +62,7 @@ export default async function BrainCloneWatchPage({
   const learner = getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
   const profile = getBrainProfile(learnerId, session.tenantId);
-  if (!profile || profile.cloneStage === "pre_clone") {
+  if (!profile) {
     redirect(`/parent/learners/${learnerId}/baseline`);
   }
   const t = await getTranslations("brain_clone");
@@ -130,6 +133,7 @@ export default async function BrainCloneWatchPage({
         backLabel={t("watch_back")}
         alreadyApprovedLabel={t("watch_already_approved")}
         alreadyApproved={alreadyApproved}
+        initialCloneStage={profile.cloneStage}
         stages={stages}
         primaryHue={s.visualIdentity.primaryHue}
         approveAction={approveBrainCloneAction}
