@@ -6,6 +6,7 @@ export const READINESS_LABEL: Record<ReadinessState, string> = {
   assessment_needed: "Assessment needed",
   iep_optional: "Add an IEP (optional)",
   baseline_needed: "Baseline assessment ready",
+  brain_clone_review_needed: "Brain clone ready for review",
   ready_for_today_mission: "Ready for today's mission",
   active_learning: "Active learning",
 };
@@ -16,6 +17,7 @@ export const READINESS_TONE: Record<ReadinessState, "neutral" | "warning" | "pri
     assessment_needed: "warning",
     iep_optional: "primary",
     baseline_needed: "primary",
+    brain_clone_review_needed: "primary",
     ready_for_today_mission: "success",
     active_learning: "success",
   };
@@ -39,13 +41,20 @@ export const READINESS_NEXT_STEP: Record<ReadinessState, { label: string; hrefTe
       label: "Start baseline assessment",
       hrefTemplate: "/parent/learners/{learnerId}/baseline",
     },
+    brain_clone_review_needed: {
+      label: "Review brain clone",
+      hrefTemplate: "/parent/learners/{learnerId}/brain-clone-watch",
+    },
     ready_for_today_mission: {
+      // Bounces through the active-learner route handler so the cookie is
+      // set and the parent lands on the learner home — without it the CTA
+      // would self-link back to this same parent detail page.
       label: "Open today's mission",
-      hrefTemplate: "/parent/learners/{learnerId}",
+      hrefTemplate: "/learner/select/auto?learnerId={learnerId}",
     },
     active_learning: {
       label: "See growth report",
-      hrefTemplate: "/parent/learners/{learnerId}",
+      hrefTemplate: "/parent/learners/{learnerId}/gradebook",
     },
   };
 
@@ -58,9 +67,6 @@ export function nextStepFor(learner: Pick<LearnerProfile, "id" | "readinessState
  * Compute readiness from the source-of-truth records. The learner's stored
  * `readinessState` is a cache updated whenever progress is made; this function
  * is the canonical re-derivation.
- *
- * Sprints 6–8 will plug in real IEP + baseline + lesson-run checks; today
- * the only signal available is parent assessment submission.
  */
 export function computeReadinessFor(learnerId: string, tenantId: string): ReadinessState {
   const store = getStore();
@@ -81,9 +87,21 @@ export function computeReadinessFor(learnerId: string, tenantId: string): Readin
   const lessonRunCount = Array.from(store.lessonRuns.values()).filter(
     (l) => l.learnerId === learnerId && l.tenantId === tenantId,
   ).length;
+  const brainProfile = Array.from(store.brainProfiles.values()).find(
+    (p) => p.learnerId === learnerId && p.tenantId === tenantId,
+  );
 
   if (lessonRunCount > 0) return "active_learning";
-  if (baseline) return "ready_for_today_mission";
+  if (baseline) {
+    // Baseline finished — gate today's mission on the parent reviewing the
+    // freshly cloned brain profile. If no clone is on file (legacy data or
+    // an unexpected race), don't block the learner; fall through to
+    // ready_for_today_mission so the CTA still works.
+    if (brainProfile && brainProfile.cloneStage === "cloned") {
+      return "brain_clone_review_needed";
+    }
+    return "ready_for_today_mission";
+  }
   if (assessment?.submittedAt) {
     return iepDecided ? "baseline_needed" : "iep_optional";
   }

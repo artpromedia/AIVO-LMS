@@ -1,29 +1,39 @@
 /**
- * Sprint 12: "Today's Mission" picker. Always returns a single best next
- * action (or `null` if the learner cannot start a lesson yet — e.g. no
+ * "Today's Mission" picker. Always returns a single best next action (or
+ * a blocker reason if the learner cannot start a lesson yet — e.g. no
  * baseline). The home page renders this; `POST /today/start` creates the
  * matching LessonRun.
  *
- * Priority order (per Sprint 12 spec):
+ * Priority order:
  *   1. Resume in-progress LessonRun
- *   2. Continue active quest lesson           (Sprint 16 — stub)
- *   3. Address baseline weakness              (first_skill path node)
- *   4. Continue next unmastered skill         (next_unmastered path node)
- *   5. Schedule review                        (review path node OR ReviewSchedule)
- *   6. Parent-assigned lesson                 (Sprint 14 — stub)
- *   7. Teacher-assigned lesson                (Sprint 18 — stub)
+ *   2. Continue active quest chapter
+ *   3. Teacher-assigned work (surfaces even pre-baseline)
+ *   4. Address baseline weakness              (first_skill path node)
+ *   5. Schedule review                        (review path node)
+ *   6. Continue next unmastered skill         (next_unmastered path node)
+ *   7. Stretch goal                           (stretch path node)
  */
 import { getStore } from "@/lib/db/store";
 import {
   getLearner,
   getLearningPath,
   getMasteryMap,
+  getQuestProgress,
+  isQuestChapterUnlocked,
   listActiveAssignmentsForLearner,
+  listQuestChapters,
+  listQuestProgressForLearner,
 } from "@/lib/db/repos";
 import type { LearningPathNode, LessonRun, LessonRunSource, Subject } from "@/lib/db/types";
 
 export type TodayMissionPlan = {
-  kind: "resume_in_progress" | "baseline_followup" | "next_unmastered" | "review" | "subject_path";
+  kind:
+    | "resume_in_progress"
+    | "quest"
+    | "baseline_followup"
+    | "next_unmastered"
+    | "review"
+    | "subject_path";
   source: LessonRunSource;
   /** Existing in-progress LessonRun to resume (null when we'd create a new one). */
   existingRunId: string | null;
@@ -104,17 +114,45 @@ export function pickTodaysMission(learnerId: string, tenantId: string): TodayMis
     }
   }
 
-  // 2. Quest stub: skipped until Sprint 16 implements QuestProgress writes.
+  // 2. Continue an active quest chapter. We consider a world "active" once
+  // the learner has any QuestProgress row in it. Within that world, pick
+  // the first unlocked chapter that isn't yet complete.
+  const learnerQuestProgress = listQuestProgressForLearner(learnerId, tenantId);
+  if (learnerQuestProgress.length > 0) {
+    const activeWorldIds = Array.from(new Set(learnerQuestProgress.map((p) => p.questWorldId)));
+    for (const worldId of activeWorldIds) {
+      const chapters = listQuestChapters(worldId);
+      for (const ch of chapters) {
+        if (ch.skillIds.length === 0) continue;
+        const prog = getQuestProgress(learnerId, tenantId, ch.id);
+        if (prog && prog.progress >= 1) continue;
+        if (!isQuestChapterUnlocked(learnerId, tenantId, ch)) continue;
+        const subj = store.subjects.get(ch.subjectId);
+        const skill = store.skills.get(ch.skillIds[0]);
+        if (!subj || !skill) continue;
+        return {
+          ready: true,
+          mission: {
+            kind: "quest",
+            source: "quest",
+            existingRunId: null,
+            subjectId: subj.id,
+            subjectName: subj.name,
+            skillId: skill.id,
+            skillName: skill.name,
+            sourceRefId: ch.id,
+            estimatedMinutes: 12,
+            reason: `Quest chapter: ${ch.title} (${subj.name} · ${skill.name}).`,
+            learnerReason: `Your quest is waiting — time for ${ch.title}.`,
+          },
+        };
+      }
+    }
+  }
 
-  // 6. Teacher-assigned work (Sprint 18). Per spec this slots between
-  // subject_path and parent_assigned, but parent_assigned isn't wired yet
-  // and teachers can legitimately assign work to a learner who hasn't
-  // completed their baseline — so we hoist this above the no_baseline
-  // blocker. Path-based picks still win for learners who *have* finished
-  // baseline, because we only land here when path candidate selection
-  // fell through below… actually we want teacher work to surface even
-  // when a path candidate exists. Use a "first uncompleted assignment"
-  // rule and return it before path selection runs.
+  // 3. Teacher-assigned work. Surfaces even pre-baseline since teachers can
+  // legitimately assign work to a learner who hasn't finished their baseline,
+  // and the assignment-skill mapping doesn't depend on the learning path.
   const assignments = listActiveAssignmentsForLearner(learnerId, tenantId);
   if (assignments.length > 0) {
     const completedAssignmentIds = new Set(

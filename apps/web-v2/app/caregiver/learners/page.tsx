@@ -25,6 +25,7 @@ function readinessTone(state: LearnerProfile["readinessState"]) {
     case "assessment_needed":
     case "baseline_needed":
     case "iep_optional":
+    case "brain_clone_review_needed":
       return "warning" as const;
     default:
       return "neutral" as const;
