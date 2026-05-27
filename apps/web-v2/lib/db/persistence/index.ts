@@ -21,8 +21,10 @@ import { memoryIdentity } from "./memory/identity";
 import { drizzleIdentity } from "./drizzle/identity";
 import { memoryLearners } from "./memory/learners";
 import { drizzleLearners } from "./drizzle/learners";
+import { memoryAssessments } from "./memory/assessments";
+import { drizzleAssessments } from "./drizzle/assessments";
 
-type DomainKey = "notifications" | "audit" | "identity" | "learners";
+type DomainKey = "notifications" | "audit" | "identity" | "learners" | "assessments";
 
 function resolveMode(domain: DomainKey): PersistenceMode {
   const overrides: Record<DomainKey, PersistenceMode | undefined> = {
@@ -30,6 +32,7 @@ function resolveMode(domain: DomainKey): PersistenceMode {
     audit: serverEnv.AIVO_PERSISTENCE_AUDIT,
     identity: serverEnv.AIVO_PERSISTENCE_IDENTITY,
     learners: serverEnv.AIVO_PERSISTENCE_LEARNERS,
+    assessments: serverEnv.AIVO_PERSISTENCE_ASSESSMENTS,
   };
   return overrides[domain] ?? serverEnv.AIVO_PERSISTENCE;
 }
@@ -42,6 +45,7 @@ export function getPersistence(): Persistence {
   const auditMode = resolveMode("audit");
   const identityMode = resolveMode("identity");
   const learnersMode = resolveMode("learners");
+  const assessmentsMode = resolveMode("assessments");
   cached = {
     // The aggregate `mode` is the global value; per-domain modes are
     // visible on the individual stores at construction time (above).
@@ -52,6 +56,8 @@ export function getPersistence(): Persistence {
     audit: auditMode === "postgres" ? drizzleAudit : memoryAudit,
     identity: identityMode === "postgres" ? drizzleIdentity : memoryIdentity,
     learners: learnersMode === "postgres" ? drizzleLearners : memoryLearners,
+    assessments:
+      assessmentsMode === "postgres" ? drizzleAssessments : memoryAssessments,
   };
   return cached;
 }

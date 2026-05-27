@@ -71,7 +71,7 @@ export default async function AssessmentIntro({
   }
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
-  const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
+  const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
   const hasProgress = Object.values(assessment.answers ?? {}).some(
     (v) => v && Object.keys(v).length > 0,
   );

@@ -28,10 +28,10 @@ export default async function LearnerBaselineIndex() {
   const learnerId = session.learnerId;
   if (!learnerId) redirect("/learner/home");
 
-  const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
+  const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
   const ready =
     Boolean(assessment.submittedAt) && Boolean(getBrainProfile(learnerId, session.tenantId));
-  const baseline = getActiveBaselineForLearner(learnerId, session.tenantId);
+  const baseline = await getActiveBaselineForLearner(learnerId, session.tenantId);
 
   // Already mid-way? Drop the learner straight into the runner.
   if (baseline && baseline.status === "in_progress") {

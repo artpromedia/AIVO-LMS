@@ -61,7 +61,7 @@ async function uploadAction(formData: FormData) {
   });
   // Kick off the synthesized extraction so the review step always has a populated card.
   const learner = await getLearner(learnerId, session.tenantId);
-  const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
+  const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
   if (learner) {
     const extraction = buildIEPExtraction({
       learner,
@@ -149,7 +149,7 @@ export default async function IEPUploadPage({
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
-  const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
+  const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
   if (!assessment.submittedAt) {
     return (
       <AssessmentShell

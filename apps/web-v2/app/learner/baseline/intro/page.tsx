@@ -33,15 +33,15 @@ export default async function BaselineIntroPage({
   if (!session.learnerId) redirect("/learner/home");
   const sp = await searchParams;
   const baseline = sp.b
-    ? getBaselineById(sp.b, session.tenantId)
-    : getActiveBaselineForLearner(session.learnerId, session.tenantId);
+    ? await getBaselineById(sp.b, session.tenantId)
+    : await getActiveBaselineForLearner(session.learnerId, session.tenantId);
   if (!baseline || baseline.learnerId !== session.learnerId) {
     redirect("/learner/baseline/subjects");
   }
 
   const learner = await getLearner(session.learnerId, session.tenantId);
   if (!learner) redirect("/learner/home");
-  const questions = listBaselineQuestions(baseline.id);
+  const questions = await listBaselineQuestions(baseline.id);
   const allSubjects = listSubjects();
   const subjectsById = new Map(allSubjects.map((s) => [s.id, s]));
   const subjects = baseline.subjectIds

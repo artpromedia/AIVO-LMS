@@ -29,7 +29,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     );
     if (consentErr) return consentErr;
 
-    const baseline = getBaselineById(baselineId, session!.tenantId);
+    const baseline = await getBaselineById(baselineId, session!.tenantId);
     if (!baseline || baseline.learnerId !== learnerId) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Baseline not found" }, requestId);
     }
@@ -54,7 +54,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (!parsed.success) {
       return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.message }, requestId);
     }
-    const attempt = recordBaselineAttempt({
+    const attempt = await recordBaselineAttempt({
       baselineId,
       questionId: parsed.data.questionId,
       learnerId,

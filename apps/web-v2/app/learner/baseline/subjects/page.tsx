@@ -27,12 +27,12 @@ async function startWithSubjectsAction(formData: FormData) {
   if (subjectIds.length === 0) {
     redirect("/learner/baseline/subjects?error=pick_one");
   }
-  const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
+  const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
   if (!assessment.submittedAt) redirect("/learner/home");
   if (!getBrainProfile(learnerId, session.tenantId)) redirect("/learner/home");
 
   // Reuse the active baseline if one is already in flight; otherwise create fresh.
-  let baseline = getActiveBaselineForLearner(learnerId, session.tenantId);
+  let baseline = await getActiveBaselineForLearner(learnerId, session.tenantId);
   if (!baseline || baseline.status === "complete") {
     const created = await createBaseline({ learnerId, tenantId: session.tenantId, subjectIds });
     if (!created) redirect("/learner/home");
@@ -59,7 +59,7 @@ export default async function BaselineSubjectsPage({
   if (!session.learnerId) redirect("/learner/home");
   const subjects = listSubjects();
   const focusSubjects =
-    ((await getOrCreateParentAssessment(session.learnerId, session.tenantId)).answers
+    ((await await getOrCreateParentAssessment(session.learnerId, session.tenantId)).answers
       .grade_subject as { focusSubjects?: string[] } | undefined)?.focusSubjects ?? [];
 
   // Highlight focus subjects from the parent assessment with a tag.

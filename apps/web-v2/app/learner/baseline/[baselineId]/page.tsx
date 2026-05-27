@@ -51,12 +51,12 @@ import { resolveBaselineImage } from "@/lib/learner/baseline-image";
  */
 const BREAK_EVERY = 5;
 
-function assertBaselineMatchesLearner(
+async function assertBaselineMatchesLearner(
   baselineId: string,
   learnerId: string,
   tenantId: string,
-): boolean {
-  const b = getBaselineById(baselineId, tenantId);
+): Promise<boolean> {
+  const b = await getBaselineById(baselineId, tenantId);
   return Boolean(b && b.learnerId === learnerId);
 }
 
@@ -82,12 +82,12 @@ async function answerAction(formData: FormData) {
     redirect("/login");
   }
 
-  if (!assertBaselineMatchesLearner(baselineId, learnerId, session.tenantId)) {
+  if (!(await assertBaselineMatchesLearner(baselineId, learnerId, session.tenantId))) {
     redirect(session.role === "parent" ? "/parent/learners" : "/learner/home");
   }
 
-  startBaseline(baselineId, session.tenantId);
-  const attempt = recordBaselineAttempt({
+  await startBaseline(baselineId, session.tenantId);
+  const attempt = await recordBaselineAttempt({
     baselineId,
     questionId,
     learnerId,
@@ -126,11 +126,11 @@ async function completeAction(formData: FormData) {
     redirect("/login");
   }
 
-  if (!assertBaselineMatchesLearner(baselineId, learnerId, session.tenantId)) {
+  if (!(await assertBaselineMatchesLearner(baselineId, learnerId, session.tenantId))) {
     redirect(session.role === "parent" ? "/parent/learners" : "/learner/home");
   }
 
-  const result = completeBaseline(baselineId, session.tenantId);
+  const result = await completeBaseline(baselineId, session.tenantId);
   await refreshLearnerReadiness(learnerId, session.tenantId);
   if (result) {
     audit(session, "baseline.complete", newRequestId(), {
@@ -171,7 +171,7 @@ export default async function BaselineRunnerPage({
   const session = await requirePageRole(asParent ? ["parent"] : ["learner", "parent"]);
   const { baselineId } = await params;
 
-  const baseline = getBaselineById(baselineId, session.tenantId);
+  const baseline = await getBaselineById(baselineId, session.tenantId);
   if (!baseline) notFound();
 
   if (session.role === "parent") {
@@ -185,14 +185,14 @@ export default async function BaselineRunnerPage({
   const learner = await getLearner(baseline.learnerId, session.tenantId);
   const subjects = listSubjects();
   const subjectsById = new Map(subjects.map((s) => [s.id, s]));
-  const questions = listBaselineQuestions(baseline.id);
-  const attempts = listBaselineAttempts(baseline.id, session.tenantId);
+  const questions = await listBaselineQuestions(baseline.id);
+  const attempts = await listBaselineAttempts(baseline.id, session.tenantId);
   const answeredQids = new Set(attempts.map((a) => a.questionId));
   const totalAnswered = attempts.length;
   const next = questions.find((q) => !answeredQids.has(q.id));
 
   const iep = getIEPForLearner(baseline.learnerId, session.tenantId);
-  const assessment = getOrCreateParentAssessment(baseline.learnerId, session.tenantId);
+  const assessment = await getOrCreateParentAssessment(baseline.learnerId, session.tenantId);
   const sensorySensitivities =
     (assessment.answers.sensory as { sensitivities?: string[] })?.sensitivities ?? [];
   const calmMode = sensorySensitivities.length > 0;

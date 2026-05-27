@@ -34,13 +34,13 @@ export default async function BaselineReadinessPage({
   if (!learner) redirect("/learner/home");
 
   const baseline = sp.b
-    ? getBaselineById(sp.b, session.tenantId)
-    : getActiveBaselineForLearner(session.learnerId, session.tenantId);
+    ? await getBaselineById(sp.b, session.tenantId)
+    : await getActiveBaselineForLearner(session.learnerId, session.tenantId);
   if (!baseline || baseline.learnerId !== session.learnerId) {
     redirect("/learner/baseline/subjects");
   }
 
-  const assessment = getOrCreateParentAssessment(session.learnerId, session.tenantId);
+  const assessment = await getOrCreateParentAssessment(session.learnerId, session.tenantId);
   const iep = getIEPForLearner(session.learnerId, session.tenantId);
   const hasReadAloud = Boolean(
     learner.accessibilityDefaults.audioFirst || iep?.extraction?.readingSupport,

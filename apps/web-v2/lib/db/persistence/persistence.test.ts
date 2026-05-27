@@ -15,17 +15,21 @@ import {
   createLearner,
   createNotification,
   deleteLearner,
+  findParentAssessment,
   findPrimaryParentForLearner,
   getLearner,
+  getOrCreateParentAssessment,
   listAuditLogsForTenants,
   listDeliveriesFor,
   listLearnersForParent,
   listNotifications,
   markNotificationsRead,
   parentCanAccessLearner,
+  patchParentAssessmentSection,
   recentAuditLogs,
   recordAudit,
   refreshLearnerReadiness,
+  submitParentAssessment,
   updateLearner,
 } from "@/lib/db/repos";
 import { getPersistence, resetPersistence } from "@/lib/db/persistence";
@@ -205,6 +209,31 @@ describe("persistence adapter — notifications (memory)", () => {
     });
     const state = await refreshLearnerReadiness(created.id, "t_demo");
     expect(state).not.toBeNull();
+  });
+
+  it("parent assessment: getOrCreate returns the same row twice", async () => {
+    const a = await getOrCreateParentAssessment("lrn_demo_sky", "t_demo");
+    const b = await getOrCreateParentAssessment("lrn_demo_sky", "t_demo");
+    expect(a.id).toBe(b.id);
+    expect(b.submittedAt).toBeNull();
+  });
+
+  it("parent assessment: patchSection accumulates completed sections", async () => {
+    const updated = await patchParentAssessmentSection(
+      "lrn_demo_sky",
+      "t_demo",
+      "academic",
+      { sample: "ok" },
+    );
+    expect(updated.completedSections).toContain("academic");
+    const refetched = await findParentAssessment("lrn_demo_sky", "t_demo");
+    expect(refetched?.id).toBe(updated.id);
+  });
+
+  it("parent assessment: submit stamps submittedAt", async () => {
+    await getOrCreateParentAssessment("lrn_demo_sky", "t_demo");
+    const submitted = await submitParentAssessment("lrn_demo_sky", "t_demo");
+    expect(submitted?.submittedAt).not.toBeNull();
   });
 
   it("markNotificationsRead does not bleed across tenants", async () => {

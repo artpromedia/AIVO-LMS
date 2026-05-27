@@ -224,7 +224,7 @@ async function saveStepAction(formData: FormData) {
       failures.push(sectionId);
       continue;
     }
-    patchParentAssessmentSection(learnerId, session.tenantId, sectionId, v.data);
+    await patchParentAssessmentSection(learnerId, session.tenantId, sectionId, v.data);
     audit(session, "parent_assessment.section.patch", newRequestId(), {
       learnerId,
       metadata: { section: sectionId, source: "ui" },
@@ -1009,7 +1009,7 @@ export default async function AssessmentWizard({
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
-  const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
+  const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
 
   // Brand-new assessment: send the parent to the calm intro screen first.
   const hasAnyAnswers = Object.values(assessment.answers ?? {}).some(

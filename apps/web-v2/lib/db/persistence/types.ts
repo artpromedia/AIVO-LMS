@@ -13,9 +13,13 @@
  */
 import type {
   AuditLog,
+  BaselineAssessment,
+  BaselineAttempt,
+  BaselineQuestion,
   LearnerProfile,
   Notification,
   NotificationDelivery,
+  ParentAssessment,
   ReadinessState,
   TenantMembership,
   User,
@@ -150,12 +154,48 @@ export interface LearnerStore {
   ): Promise<LearnerProfile | null>;
 }
 
+/**
+ * Assessment domain — parent intake assessment + per-learner baseline
+ * runs (assessment + questions + attempts). Orchestration that builds
+ * masteries, learning paths, and the brain clone stays in repos.ts;
+ * the store owns only the raw row-level reads + writes.
+ */
+export interface AssessmentStore {
+  // Parent assessment
+  findParentAssessment(learnerId: string, tenantId: string): Promise<ParentAssessment | null>;
+  upsertParentAssessment(assessment: ParentAssessment): Promise<ParentAssessment>;
+
+  // Baseline assessments
+  getBaselineById(baselineId: string, tenantId: string): Promise<BaselineAssessment | null>;
+  /** Most-recent baseline (by createdAt) for the learner, regardless of status. */
+  getActiveBaselineForLearner(
+    learnerId: string,
+    tenantId: string,
+  ): Promise<BaselineAssessment | null>;
+  upsertBaseline(baseline: BaselineAssessment): Promise<BaselineAssessment>;
+
+  // Baseline questions + attempts
+  listBaselineQuestions(baselineId: string): Promise<BaselineQuestion[]>;
+  appendBaselineQuestions(questions: BaselineQuestion[]): Promise<void>;
+  listBaselineAttempts(baselineId: string, tenantId: string): Promise<BaselineAttempt[]>;
+  /**
+   * Replace attempts for a specific (questionId, learnerId) pair, then
+   * append the new attempt. The "latest-attempt-wins" semantics are
+   * baked into the store so callers don't need a transaction.
+   */
+  recordBaselineAttempt(
+    attempt: BaselineAttempt,
+    replaceWhere: { questionId: string; learnerId: string },
+  ): Promise<BaselineAttempt>;
+}
+
 export interface Persistence {
   mode: PersistenceMode;
   notifications: NotificationStore;
   audit: AuditStore;
   identity: IdentityStore;
   learners: LearnerStore;
+  assessments: AssessmentStore;
   /**
    * Future domains land here. Each new domain ships:
    *   1. An interface in this file.

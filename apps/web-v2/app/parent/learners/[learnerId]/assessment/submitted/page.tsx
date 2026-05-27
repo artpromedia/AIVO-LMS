@@ -29,7 +29,7 @@ export default async function AssessmentSubmittedPage({
   }
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
-  const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
+  const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
   const iep = getIEPForLearner(learnerId, session.tenantId);
 
   const iepSkipped = sp.skipped === "iep";

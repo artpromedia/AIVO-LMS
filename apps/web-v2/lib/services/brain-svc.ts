@@ -77,7 +77,7 @@ export async function cloneBrainFromBaseline(
   | { ok: false; reason: "no_baseline" | "service_unavailable"; message?: string }
 > {
   if (!brainSvcEnabled()) {
-    const profile = cloneBrainFromBaselineLocal(learnerId, tenantId);
+    const profile = await cloneBrainFromBaselineLocal(learnerId, tenantId);
     if (!profile) return { ok: false, reason: "no_baseline" };
     return { ok: true, profile };
   }

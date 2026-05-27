@@ -37,7 +37,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     );
     if (consentErr) return consentErr;
 
-    const current = getOrCreateParentAssessment(learnerId, session!.tenantId);
+    const current = await getOrCreateParentAssessment(learnerId, session!.tenantId);
     const missing: AssessmentSectionId[] = [];
     for (const sec of ASSESSMENT_SECTION_ORDER) {
       // `?? {}` keeps optional sections (basics, strengths, background,
@@ -56,7 +56,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       );
     }
 
-    const submitted = submitParentAssessment(learnerId, session!.tenantId);
+    const submitted = await submitParentAssessment(learnerId, session!.tenantId);
     refreshLearnerReadiness(learnerId, session!.tenantId);
     audit(session, "parent_assessment.submit", requestId, { learnerId });
     return ok({ assessment: submitted }, requestId);

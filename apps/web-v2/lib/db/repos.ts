@@ -189,17 +189,18 @@ function emptyAnswers(): ParentAssessment["answers"] {
  * null if none has been started yet — does NOT create a draft. Use this in
  * read paths and preflight validators that must remain mutation-free.
  */
-export function findParentAssessment(learnerId: string, tenantId: string): ParentAssessment | null {
-  const store = db();
-  for (const a of store.parentAssessments.values()) {
-    if (a.learnerId === learnerId && a.tenantId === tenantId) return a;
-  }
-  return null;
+export async function findParentAssessment(
+  learnerId: string,
+  tenantId: string,
+): Promise<ParentAssessment | null> {
+  return getPersistence().assessments.findParentAssessment(learnerId, tenantId);
 }
 
-export function getOrCreateParentAssessment(learnerId: string, tenantId: string): ParentAssessment {
-  const store = db();
-  const existing = findParentAssessment(learnerId, tenantId);
+export async function getOrCreateParentAssessment(
+  learnerId: string,
+  tenantId: string,
+): Promise<ParentAssessment> {
+  const existing = await findParentAssessment(learnerId, tenantId);
   if (existing) return existing;
   const id = newId("pa");
   const now = nowIso();
@@ -213,17 +214,16 @@ export function getOrCreateParentAssessment(learnerId: string, tenantId: string)
     updatedAt: now,
     submittedAt: null,
   };
-  store.parentAssessments.set(id, assessment);
-  return assessment;
+  return getPersistence().assessments.upsertParentAssessment(assessment);
 }
 
-export function patchParentAssessmentSection(
+export async function patchParentAssessmentSection(
   learnerId: string,
   tenantId: string,
   section: ParentAssessmentSectionId,
   data: Record<string, unknown>,
-): ParentAssessment {
-  const current = getOrCreateParentAssessment(learnerId, tenantId);
+): Promise<ParentAssessment> {
+  const current = await getOrCreateParentAssessment(learnerId, tenantId);
   const completed = new Set(current.completedSections);
   completed.add(section);
   const next: ParentAssessment = {
@@ -235,22 +235,20 @@ export function patchParentAssessmentSection(
     completedSections: Array.from(completed),
     updatedAt: nowIso(),
   };
-  getStore().parentAssessments.set(current.id, next);
-  return next;
+  return getPersistence().assessments.upsertParentAssessment(next);
 }
 
-export function submitParentAssessment(
+export async function submitParentAssessment(
   learnerId: string,
   tenantId: string,
-): ParentAssessment | null {
-  const current = getOrCreateParentAssessment(learnerId, tenantId);
+): Promise<ParentAssessment | null> {
+  const current = await getOrCreateParentAssessment(learnerId, tenantId);
   const submitted: ParentAssessment = {
     ...current,
     submittedAt: nowIso(),
     updatedAt: nowIso(),
   };
-  getStore().parentAssessments.set(current.id, submitted);
-  return submitted;
+  return getPersistence().assessments.upsertParentAssessment(submitted);
 }
 
 // ===== IEP (Sprint 6) =====
@@ -429,11 +427,11 @@ export function upsertBrainProfile(
  * gate in `completeBaseline` — by deferring all writes until after this
  * validation passes, a clone failure leaves no partial mutations behind.
  */
-function prepareBrainCloneFromSummary(
+async function prepareBrainCloneFromSummary(
   learnerId: string,
   tenantId: string,
   summary: BaselineSummary,
-): LearnerBrainProfile | null {
+): Promise<LearnerBrainProfile | null> {
   const store = db();
   const learner = store.learnerProfiles.get(learnerId);
   if (!learner || learner.tenantId !== tenantId) return null;
@@ -442,7 +440,7 @@ function prepareBrainCloneFromSummary(
 
   // Read-only: must not mutate the store on the preflight path, otherwise
   // a clone-prep failure would still leave a draft parent assessment behind.
-  const assessment = findParentAssessment(learnerId, tenantId);
+  const assessment = await findParentAssessment(learnerId, tenantId);
   const iep = getIEPForLearner(learnerId, tenantId);
   const subjects = listSubjects();
   const candidate = buildBrainProfile({
@@ -479,10 +477,10 @@ function commitBrainClone(profile: LearnerBrainProfile): LearnerBrainProfile {
  * future scheduled re-clone). Inside `completeBaseline` we use the prepare +
  * commit primitives directly to keep the whole transition atomic.
  */
-export function cloneBrainFromBaseline(
+export async function cloneBrainFromBaseline(
   learnerId: string,
   tenantId: string,
-): LearnerBrainProfile | null {
+): Promise<LearnerBrainProfile | null> {
   const store = db();
   let latest: BaselineAssessment | null = null;
   for (const b of store.baselineAssessments.values()) {
@@ -491,7 +489,7 @@ export function cloneBrainFromBaseline(
     if (!latest || b.completedAt! > latest.completedAt!) latest = b;
   }
   if (!latest || !latest.summary) return null;
-  const prepared = prepareBrainCloneFromSummary(learnerId, tenantId, latest.summary);
+  const prepared = await prepareBrainCloneFromSummary(learnerId, tenantId, latest.summary);
   if (!prepared) return null;
   return commitBrainClone(prepared);
 }
@@ -527,35 +525,29 @@ export function approveBrainClone(
 
 // ===== Baseline (Sprint 8) =====
 
-export function getActiveBaselineForLearner(
+export async function getActiveBaselineForLearner(
   learnerId: string,
   tenantId: string,
-): BaselineAssessment | null {
-  const store = db();
-  let latest: BaselineAssessment | null = null;
-  for (const b of store.baselineAssessments.values()) {
-    if (b.learnerId !== learnerId || b.tenantId !== tenantId) continue;
-    if (!latest || b.createdAt > latest.createdAt) latest = b;
-  }
-  return latest;
+): Promise<BaselineAssessment | null> {
+  return getPersistence().assessments.getActiveBaselineForLearner(learnerId, tenantId);
 }
 
-export function getBaselineById(baselineId: string, tenantId: string): BaselineAssessment | null {
-  const b = db().baselineAssessments.get(baselineId);
-  if (!b || b.tenantId !== tenantId) return null;
-  return b;
+export async function getBaselineById(
+  baselineId: string,
+  tenantId: string,
+): Promise<BaselineAssessment | null> {
+  return getPersistence().assessments.getBaselineById(baselineId, tenantId);
 }
 
-export function listBaselineQuestions(baselineId: string): BaselineQuestion[] {
-  return Array.from(db().baselineQuestions.values())
-    .filter((q) => q.baselineId === baselineId)
-    .sort((a, b) => a.order - b.order);
+export async function listBaselineQuestions(baselineId: string): Promise<BaselineQuestion[]> {
+  return getPersistence().assessments.listBaselineQuestions(baselineId);
 }
 
-export function listBaselineAttempts(baselineId: string, tenantId: string): BaselineAttempt[] {
-  return db().baselineAttempts.filter(
-    (a) => a.baselineId === baselineId && a.tenantId === tenantId,
-  );
+export async function listBaselineAttempts(
+  baselineId: string,
+  tenantId: string,
+): Promise<BaselineAttempt[]> {
+  return getPersistence().assessments.listBaselineAttempts(baselineId, tenantId);
 }
 
 /**
@@ -613,7 +605,7 @@ export async function createBaseline(input: {
   };
 
   const brainProfile = getBrainProfile(input.learnerId, input.tenantId);
-  const parentAssessment = findParentAssessment(input.learnerId, input.tenantId);
+  const parentAssessment = await findParentAssessment(input.learnerId, input.tenantId);
 
   let questions: BaselineQuestion[] = [];
   // Definite-assignment: every code path below the discovery/LLM/BANK
@@ -841,10 +833,13 @@ export async function createBaseline(input: {
     });
   }
 
-  store.baselineAssessments.set(baseline.id, { ...baseline, generationMetadata: metadata });
+  const persistedBaseline = await getPersistence().assessments.upsertBaseline({
+    ...baseline,
+    generationMetadata: metadata,
+  });
   baseline.generationMetadata = metadata;
-  for (const q of questions) store.baselineQuestions.set(q.id, q);
-  return { baseline, questions };
+  await getPersistence().assessments.appendBaselineQuestions(questions);
+  return { baseline: persistedBaseline, questions };
 }
 
 /**
@@ -876,40 +871,41 @@ function accommodationTagsForBaseline(
   return Array.from(tags);
 }
 
-export function startBaseline(baselineId: string, tenantId: string): BaselineAssessment | null {
-  const store = db();
-  const b = store.baselineAssessments.get(baselineId);
-  if (!b || b.tenantId !== tenantId) return null;
+export async function startBaseline(
+  baselineId: string,
+  tenantId: string,
+): Promise<BaselineAssessment | null> {
+  const store = getPersistence().assessments;
+  const b = await store.getBaselineById(baselineId, tenantId);
+  if (!b) return null;
   if (b.status === "complete") return b;
   const next: BaselineAssessment = {
     ...b,
     status: "in_progress",
     startedAt: b.startedAt ?? nowIso(),
   };
-  store.baselineAssessments.set(baselineId, next);
-  return next;
+  return store.upsertBaseline(next);
 }
 
-export function recordBaselineAttempt(input: {
+export async function recordBaselineAttempt(input: {
   baselineId: string;
   questionId: string;
   learnerId: string;
   tenantId: string;
   response: string;
   skipped?: boolean;
-}): BaselineAttempt | null {
-  const store = db();
-  const baseline = store.baselineAssessments.get(input.baselineId);
-  if (!baseline || baseline.tenantId !== input.tenantId) return null;
+}): Promise<BaselineAttempt | null> {
+  const store = getPersistence().assessments;
+  const baseline = await store.getBaselineById(input.baselineId, input.tenantId);
+  if (!baseline) return null;
   if (baseline.learnerId !== input.learnerId) return null;
   if (baseline.status === "complete") return null;
-  const q = store.baselineQuestions.get(input.questionId);
-  if (!q || q.baselineId !== input.baselineId) return null;
-
-  // Replace any prior attempt on the same question (latest wins).
-  store.baselineAttempts = store.baselineAttempts.filter(
-    (a) => !(a.questionId === input.questionId && a.learnerId === input.learnerId),
-  );
+  // Question lookup still hits the legacy Map directly via `listBaselineQuestions`
+  // — single-row lookup by id without a full scan is cheap and keeps the
+  // adapter surface narrow. Drizzle impl can add a `getQuestionById`.
+  const questions = await store.listBaselineQuestions(input.baselineId);
+  const q = questions.find((x) => x.id === input.questionId);
+  if (!q) return null;
 
   const skipped = Boolean(input.skipped);
   const trimmed = (input.response ?? "").trim();
@@ -929,11 +925,14 @@ export function recordBaselineAttempt(input: {
     skipped,
     respondedAt: nowIso(),
   };
-  store.baselineAttempts.push(attempt);
+  await store.recordBaselineAttempt(attempt, {
+    questionId: input.questionId,
+    learnerId: input.learnerId,
+  });
 
   // Promote to in_progress if it was still not_started.
   if (baseline.status === "not_started") {
-    store.baselineAssessments.set(input.baselineId, {
+    await store.upsertBaseline({
       ...baseline,
       status: "in_progress",
       startedAt: baseline.startedAt ?? nowIso(),
@@ -946,10 +945,10 @@ export function recordBaselineAttempt(input: {
  * Complete the baseline: compute summary, mastery rows, learning path, review
  * schedule. Idempotent — calling twice returns the existing summary.
  */
-export function completeBaseline(
+export async function completeBaseline(
   baselineId: string,
   tenantId: string,
-): {
+): Promise<{
   baseline: BaselineAssessment;
   summary: BaselineSummary;
   masteryMap: MasteryMap;
@@ -958,10 +957,10 @@ export function completeBaseline(
   reviewSchedules: ReviewSchedule[];
   /** Post-baseline clone of the brain profile; null if no pre-clone existed. */
   clonedBrainProfile: LearnerBrainProfile | null;
-} | null {
+} | null> {
   const store = db();
-  const baseline = store.baselineAssessments.get(baselineId);
-  if (!baseline || baseline.tenantId !== tenantId) return null;
+  const baseline = await getPersistence().assessments.getBaselineById(baselineId, tenantId);
+  if (!baseline) return null;
   const learner = store.learnerProfiles.get(baseline.learnerId);
   if (!learner) return null;
 
@@ -1003,8 +1002,8 @@ export function completeBaseline(
     // Fall through if any derived artifact is missing — we'll rebuild.
   }
 
-  const questions = listBaselineQuestions(baselineId);
-  const attempts = listBaselineAttempts(baselineId, tenantId);
+  const questions = await listBaselineQuestions(baselineId);
+  const attempts = await listBaselineAttempts(baselineId, tenantId);
   const subjects = Array.from(store.subjects.values()).filter((s) =>
     baseline.subjectIds.includes(s.id),
   );
@@ -1068,7 +1067,11 @@ export function completeBaseline(
   // missing pre-clone profile) we bail out atomically — no skill-mastery,
   // mastery-map, learning-path, review-schedule, or status mutations land in
   // the store, so the parent can simply retry without observable partial state.
-  const preparedClone = prepareBrainCloneFromSummary(baseline.learnerId, tenantId, summary);
+  const preparedClone = await prepareBrainCloneFromSummary(
+    baseline.learnerId,
+    tenantId,
+    summary,
+  );
   if (!preparedClone) return null;
 
   // --- Commit (atomic from this point: validation has already passed) ---
@@ -1109,7 +1112,7 @@ export function completeBaseline(
     completedAt: baseline.completedAt ?? nowIso(),
     summary,
   };
-  store.baselineAssessments.set(baselineId, completed);
+  await getPersistence().assessments.upsertBaseline(completed);
 
   return {
     baseline: completed,

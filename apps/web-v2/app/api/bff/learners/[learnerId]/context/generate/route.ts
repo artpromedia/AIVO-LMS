@@ -57,7 +57,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (!learner) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
     }
-    const assessment = getOrCreateParentAssessment(learnerId, session!.tenantId);
+    const assessment = await getOrCreateParentAssessment(learnerId, session!.tenantId);
     if (!assessment.submittedAt) {
       return fail(
         {

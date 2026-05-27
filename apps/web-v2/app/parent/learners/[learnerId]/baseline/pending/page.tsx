@@ -39,7 +39,7 @@ export default async function BaselinePendingPage({
   }
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
-  const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
+  const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
   if (!assessment.submittedAt) {
     // The pending screen only makes sense after the assessment is submitted.
     redirect(`/parent/learners/${learner.id}/assessment`);
@@ -54,7 +54,7 @@ export default async function BaselinePendingPage({
   }
 
   const iep = getIEPForLearner(learnerId, session.tenantId);
-  const active = getActiveBaselineForLearner(learnerId, session.tenantId);
+  const active = await getActiveBaselineForLearner(learnerId, session.tenantId);
 
   // If a baseline already exists and is ready, send the parent on.
   if (active?.status === "in_progress") {

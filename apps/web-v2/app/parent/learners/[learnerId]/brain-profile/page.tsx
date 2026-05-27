@@ -45,7 +45,7 @@ async function regenerateAction(formData: FormData) {
     redirect("/parent/learners");
   }
   const learner = await getLearner(learnerId, session.tenantId);
-  const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
+  const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
   if (!learner) redirect("/parent/learners");
   if (!assessment.submittedAt) {
     redirect(`/parent/learners/${learnerId}/assessment`);
@@ -84,7 +84,7 @@ export default async function BrainProfilePage({
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
-  const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
+  const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
   if (!assessment.submittedAt) {
     return (
       <AppShell

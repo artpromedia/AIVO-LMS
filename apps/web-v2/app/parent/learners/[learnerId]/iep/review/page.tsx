@@ -36,7 +36,7 @@ async function reextractAction(formData: FormData) {
     redirect("/parent/learners");
   }
   const learner = await getLearner(learnerId, session.tenantId);
-  const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
+  const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
   if (!learner) redirect("/parent/learners");
   const extraction = buildIEPExtraction({
     learner: learner!,

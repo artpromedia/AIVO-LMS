@@ -49,11 +49,11 @@ function makeValidLlmResponse(count = 14) {
   };
 }
 
-function primeSubmittedParentAssessment(): void {
+async function primeSubmittedParentAssessment(): Promise<void> {
   // Mark the seeded parent assessment as submitted so the LLM gate
   // (which requires `parentAssessment.submittedAt`) is satisfied.
-  getOrCreateParentAssessment(LEARNER_ID, TENANT_ID);
-  submitParentAssessment(LEARNER_ID, TENANT_ID);
+  await getOrCreateParentAssessment(LEARNER_ID, TENANT_ID);
+  await submitParentAssessment(LEARNER_ID, TENANT_ID);
 }
 
 describe("createBaseline — Sprint B2 LLM wiring", () => {
@@ -76,7 +76,7 @@ describe("createBaseline — Sprint B2 LLM wiring", () => {
   it("falls back to BANK when AIVO_FEATURE_BASELINE_LLM is OFF", async () => {
     vi.stubEnv("AIVO_FEATURE_BASELINE_LLM", "false");
     vi.stubEnv("NODE_ENV", "production"); // also turn off the dev default
-    primeSubmittedParentAssessment();
+    await primeSubmittedParentAssessment();
 
     const fetchSpy = vi.fn();
     globalThis.fetch = fetchSpy as unknown as typeof fetch;
@@ -93,7 +93,7 @@ describe("createBaseline — Sprint B2 LLM wiring", () => {
 
   it("uses the LLM path when the flag is ON and the call succeeds", async () => {
     vi.stubEnv("AIVO_FEATURE_BASELINE_LLM", "true");
-    primeSubmittedParentAssessment();
+    await primeSubmittedParentAssessment();
 
     // The createBaseline flow tries the Discovery Adventure first (one fetch
     // per chapter), then falls back to the flat /api/ai/generate-baseline
@@ -150,7 +150,7 @@ describe("createBaseline — Sprint B2 LLM wiring", () => {
 
   it("falls back to BANK on a timeout, with reason=timeout", async () => {
     vi.stubEnv("AIVO_FEATURE_BASELINE_LLM", "true");
-    primeSubmittedParentAssessment();
+    await primeSubmittedParentAssessment();
 
     const fetchMock = vi.fn().mockImplementation(() => {
       const e = new Error("aborted");
@@ -170,7 +170,7 @@ describe("createBaseline — Sprint B2 LLM wiring", () => {
 
   it("falls back to BANK on schema-invalid JSON", async () => {
     vi.stubEnv("AIVO_FEATURE_BASELINE_LLM", "true");
-    primeSubmittedParentAssessment();
+    await primeSubmittedParentAssessment();
 
     const bad = makeValidLlmResponse(14);
     bad.questions[0]!.correctAnswer = "not-in-options";

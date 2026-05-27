@@ -45,7 +45,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (!doc) {
       return fail({ ...ERRORS.PRECONDITION_FAILED, message: "No IEP uploaded yet" }, requestId);
     }
-    const assessment = getOrCreateParentAssessment(learnerId, session!.tenantId);
+    const assessment = await getOrCreateParentAssessment(learnerId, session!.tenantId);
     // Gate on a submitted assessment: extraction reads from assessment fields,
     // so an unfinished one produces a hollow IEPExtraction. The IEP step is
     // only reachable after assessment submission anyway, but defending the

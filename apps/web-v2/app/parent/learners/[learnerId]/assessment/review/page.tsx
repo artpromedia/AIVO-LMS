@@ -36,7 +36,7 @@ async function submitAction(formData: FormData) {
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     redirect("/parent/learners");
   }
-  const current = getOrCreateParentAssessment(learnerId, session.tenantId);
+  const current = await getOrCreateParentAssessment(learnerId, session.tenantId);
   for (const sec of ASSESSMENT_SECTION_ORDER) {
     const v = validateSection(sec, current.answers[sec] ?? {});
     if (!v.ok) {
@@ -47,7 +47,7 @@ async function submitAction(formData: FormData) {
       );
     }
   }
-  submitParentAssessment(learnerId, session.tenantId);
+  await submitParentAssessment(learnerId, session.tenantId);
   await refreshLearnerReadiness(learnerId, session.tenantId);
   audit(session, "parent_assessment.submit", newRequestId(), {
     learnerId,
@@ -89,7 +89,7 @@ export default async function AssessmentReviewPage({
   }
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
-  const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
+  const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
 
   const stepStatus = WIZARD_STEPS.map((step) => {
     const sectionStatus = step.sections.map((sec) => {

@@ -33,7 +33,7 @@ export default async function BaselineSummaryPage({
   }
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
-  const baseline = getActiveBaselineForLearner(learnerId, session.tenantId);
+  const baseline = await getActiveBaselineForLearner(learnerId, session.tenantId);
   if (!baseline || baseline.status !== "complete" || !baseline.summary) {
     return (
       <AssessmentShell eyebrow={`Baseline summary for ${learner.displayName}`}>
