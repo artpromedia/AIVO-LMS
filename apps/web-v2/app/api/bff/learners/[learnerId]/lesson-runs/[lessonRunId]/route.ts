@@ -30,11 +30,11 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
       requestId,
     );
     if (consentErr) return consentErr;
-    const found = getLessonRun(lessonRunId, session!.tenantId);
+    const found = await getLessonRun(lessonRunId, session!.tenantId);
     if (!found || found.lessonRun.learnerId !== learnerId) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Lesson run not found" }, requestId);
     }
-    const interactions = listLessonInteractions(lessonRunId, session!.tenantId);
+    const interactions = await listLessonInteractions(lessonRunId, session!.tenantId);
     return ok({ lessonRun: found.lessonRun, plan: found.plan, interactions }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

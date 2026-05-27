@@ -43,7 +43,7 @@ export async function getBrainProfile(
   tenantId: string,
   ctx: BrainSvcContext = {},
 ): Promise<LearnerBrainProfile | null> {
-  if (!brainSvcEnabled()) return getBrainProfileLocal(learnerId, tenantId);
+  if (!brainSvcEnabled()) return await getBrainProfileLocal(learnerId, tenantId);
   const result = await callService<{ profile: LearnerBrainProfile | null }>({
     service: "brain-svc",
     baseUrl: serverEnv.BRAIN_SVC_URL,
@@ -60,7 +60,7 @@ export async function getBrainProfile(
     operation: "getBrainProfile",
     reason: result.reason,
   });
-  return getBrainProfileLocal(learnerId, tenantId);
+  return await getBrainProfileLocal(learnerId, tenantId);
 }
 
 /**
@@ -109,7 +109,7 @@ export async function approveBrainClone(
   | { ok: false; reason: "not_found" | "pre_clone" | "service_unavailable"; message?: string }
 > {
   if (!brainSvcEnabled()) {
-    const profile = approveBrainCloneLocal(learnerId, tenantId, options);
+    const profile = await approveBrainCloneLocal(learnerId, tenantId, options);
     if (!profile) return { ok: false, reason: "not_found" };
     return { ok: true, profile };
   }

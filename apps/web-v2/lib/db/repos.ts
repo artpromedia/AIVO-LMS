@@ -357,29 +357,31 @@ export function recordIEPSkip(learnerId: string, tenantId: string): LearnerProfi
 }
 
 // ===== Brain profile (Sprint 7) =====
-export function getBrainProfile(learnerId: string, tenantId: string): LearnerBrainProfile | null {
-  const store = db();
-  for (const p of store.brainProfiles.values()) {
-    if (p.learnerId === learnerId && p.tenantId === tenantId) return p;
-  }
-  return null;
+// Routed through the persistence adapter (ADR 0007 step 7). When
+// AIVO_USE_BRAIN_SVC=true the service-client path in
+// lib/services/brain-svc.ts bypasses the adapter entirely and talks
+// to services/brain-svc — see ADR 0009.
+export async function getBrainProfile(
+  learnerId: string,
+  tenantId: string,
+): Promise<LearnerBrainProfile | null> {
+  return getPersistence().brainProfiles.getForLearner(learnerId, tenantId);
 }
 
-export function upsertBrainProfile(
+export async function upsertBrainProfile(
   learnerId: string,
   tenantId: string,
   state: LearnerBrainProfileState,
-): LearnerBrainProfile {
-  const store = db();
+): Promise<LearnerBrainProfile> {
   // Defense-in-depth: BFF guards already enforce tenant scope, but a future
   // caller forgetting the guard would otherwise be able to create a brain
   // profile under the wrong tenantId. Verify the learner actually belongs
   // here before mutating.
-  const learner = store.learnerProfiles.get(learnerId);
-  if (!learner || learner.tenantId !== tenantId) {
+  const learner = await getLearner(learnerId, tenantId);
+  if (!learner) {
     throw new Error(`upsertBrainProfile: learner ${learnerId} not found in tenant ${tenantId}`);
   }
-  const existing = getBrainProfile(learnerId, tenantId);
+  const existing = await getBrainProfile(learnerId, tenantId);
   const now = nowIso();
   if (existing) {
     const next: LearnerBrainProfile = {
@@ -393,8 +395,7 @@ export function upsertBrainProfile(
       clonedAt: null,
       generatedAt: now,
     };
-    store.brainProfiles.set(existing.id, next);
-    return next;
+    return getPersistence().brainProfiles.upsert(next);
   }
   const profile: LearnerBrainProfile = {
     id: newId("brp"),
@@ -408,8 +409,7 @@ export function upsertBrainProfile(
     generatedAt: now,
     updatedAt: now,
   };
-  store.brainProfiles.set(profile.id, profile);
-  return profile;
+  return getPersistence().brainProfiles.upsert(profile);
 }
 
 /**
@@ -432,10 +432,9 @@ async function prepareBrainCloneFromSummary(
   tenantId: string,
   summary: BaselineSummary,
 ): Promise<LearnerBrainProfile | null> {
-  const store = db();
-  const learner = store.learnerProfiles.get(learnerId);
-  if (!learner || learner.tenantId !== tenantId) return null;
-  const existing = getBrainProfile(learnerId, tenantId);
+  const learner = await getLearner(learnerId, tenantId);
+  if (!learner) return null;
+  const existing = await getBrainProfile(learnerId, tenantId);
   if (!existing) return null;
 
   // Read-only: must not mutate the store on the preflight path, otherwise
@@ -466,9 +465,8 @@ async function prepareBrainCloneFromSummary(
 }
 
 /** Internal: commit a prepared brain clone to the store. */
-function commitBrainClone(profile: LearnerBrainProfile): LearnerBrainProfile {
-  db().brainProfiles.set(profile.id, profile);
-  return profile;
+async function commitBrainClone(profile: LearnerBrainProfile): Promise<LearnerBrainProfile> {
+  return getPersistence().brainProfiles.upsert(profile);
 }
 
 /**
@@ -481,13 +479,14 @@ export async function cloneBrainFromBaseline(
   learnerId: string,
   tenantId: string,
 ): Promise<LearnerBrainProfile | null> {
-  const store = db();
-  let latest: BaselineAssessment | null = null;
-  for (const b of store.baselineAssessments.values()) {
-    if (b.learnerId !== learnerId || b.tenantId !== tenantId) continue;
-    if (b.status !== "complete" || !b.summary) continue;
-    if (!latest || b.completedAt! > latest.completedAt!) latest = b;
-  }
+  // Most-recent completed baseline for the learner — uses the
+  // assessment store so this is also drizzle-ready.
+  const active = await getPersistence().assessments.getActiveBaselineForLearner(
+    learnerId,
+    tenantId,
+  );
+  const latest =
+    active && active.status === "complete" && active.summary ? active : null;
   if (!latest || !latest.summary) return null;
   const prepared = await prepareBrainCloneFromSummary(learnerId, tenantId, latest.summary);
   if (!prepared) return null;
@@ -501,12 +500,12 @@ export async function cloneBrainFromBaseline(
  * profile is a no-op. Returns null when no clone exists or it's still in
  * `pre_clone` (baseline not yet finished).
  */
-export function approveBrainClone(
+export async function approveBrainClone(
   learnerId: string,
   tenantId: string,
   options: { amended?: boolean } = {},
-): LearnerBrainProfile | null {
-  const existing = getBrainProfile(learnerId, tenantId);
+): Promise<LearnerBrainProfile | null> {
+  const existing = await getBrainProfile(learnerId, tenantId);
   if (!existing) return null;
   if (existing.cloneStage === "pre_clone") return null;
   const status: LearnerBrainProfile["approvalStatus"] = options.amended
@@ -519,8 +518,7 @@ export function approveBrainClone(
     cloneStage: "approved",
     updatedAt: nowIso(),
   };
-  db().brainProfiles.set(existing.id, next);
-  return next;
+  return getPersistence().brainProfiles.upsert(next);
 }
 
 // ===== Baseline (Sprint 8) =====
@@ -604,7 +602,7 @@ export async function createBaseline(input: {
     summary: null,
   };
 
-  const brainProfile = getBrainProfile(input.learnerId, input.tenantId);
+  const brainProfile = await getBrainProfile(input.learnerId, input.tenantId);
   const parentAssessment = await findParentAssessment(input.learnerId, input.tenantId);
 
   let questions: BaselineQuestion[] = [];
@@ -851,7 +849,7 @@ export async function createBaseline(input: {
  * downstream player render identical.
  */
 function accommodationTagsForBaseline(
-  brainProfile: ReturnType<typeof getBrainProfile>,
+  brainProfile: LearnerBrainProfile | null,
 ): string[] {
   if (!brainProfile) return [];
   const s = brainProfile.state;
@@ -996,7 +994,7 @@ export async function completeBaseline(
         skillMasteries: existingMasteries,
         learningPath: existingPath,
         reviewSchedules: existingReviews,
-        clonedBrainProfile: getBrainProfile(baseline.learnerId, tenantId),
+        clonedBrainProfile: await getBrainProfile(baseline.learnerId, tenantId),
       };
     }
     // Fall through if any derived artifact is missing — we'll rebuild.
@@ -1104,7 +1102,7 @@ export async function completeBaseline(
   );
   store.reviewSchedules.push(...reviewSchedules);
 
-  const clonedBrainProfile = commitBrainClone(preparedClone);
+  const clonedBrainProfile = await commitBrainClone(preparedClone);
 
   const completed: BaselineAssessment = {
     ...baseline,
@@ -1408,8 +1406,8 @@ export async function createLessonRun(
   provider: TutorProvider = MockTutorProvider,
 ): Promise<CreateLessonRunResult> {
   const store = db();
-  const learner = store.learnerProfiles.get(input.learnerId);
-  if (!learner || learner.tenantId !== input.tenantId) {
+  const learner = await getLearner(input.learnerId, input.tenantId);
+  if (!learner) {
     return { ok: false, code: "learner_not_found", message: "Learner not in tenant" };
   }
   const subject = store.subjects.get(input.subjectId);
@@ -1420,7 +1418,7 @@ export async function createLessonRun(
   if (!skill || skill.subjectId !== input.subjectId) {
     return { ok: false, code: "skill_not_found", message: "Skill not in subject" };
   }
-  const brain = getBrainProfile(input.learnerId, input.tenantId);
+  const brain = await getBrainProfile(input.learnerId, input.tenantId);
   if (!brain) {
     return {
       ok: false,
@@ -1473,7 +1471,7 @@ export async function createLessonRun(
     createdAt: now,
     updatedAt: now,
   };
-  store.lessonRuns.set(run.id, run);
+  await getPersistence().lessonRuns.upsertRun(run);
 
   try {
     const { plan, telemetry } = await generateLessonPlanWithRetry(provider, {
@@ -1503,7 +1501,7 @@ export async function createLessonRun(
       generatedAt: nowIso(),
       generation: telemetry,
     };
-    store.generatedLessonPlans.set(planRecord.id, planRecord);
+    await getPersistence().lessonRuns.upsertPlan(planRecord);
 
     const ready: LessonRun = {
       ...run,
@@ -1511,7 +1509,7 @@ export async function createLessonRun(
       lessonPlanId: planRecord.id,
       updatedAt: nowIso(),
     };
-    store.lessonRuns.set(ready.id, ready);
+    await getPersistence().lessonRuns.upsertRun(ready);
     return { ok: true, lessonRun: ready, plan: planRecord };
   } catch (e) {
     const failed: LessonRun = {
@@ -1520,7 +1518,7 @@ export async function createLessonRun(
       failureReason: e instanceof Error ? e.message : String(e),
       updatedAt: nowIso(),
     };
-    store.lessonRuns.set(failed.id, failed);
+    await getPersistence().lessonRuns.upsertRun(failed);
     return {
       ok: false,
       code: "generation_failed",
@@ -1530,39 +1528,32 @@ export async function createLessonRun(
   }
 }
 
-export function getLessonRun(
+export async function getLessonRun(
   lessonRunId: string,
   tenantId: string,
-): { lessonRun: LessonRun; plan: GeneratedLessonPlan | null } | null {
-  const store = db();
-  const run = store.lessonRuns.get(lessonRunId);
-  if (!run || run.tenantId !== tenantId) return null;
-  const plan = run.lessonPlanId ? (store.generatedLessonPlans.get(run.lessonPlanId) ?? null) : null;
-  return { lessonRun: run, plan: plan && plan.tenantId === tenantId ? plan : null };
+): Promise<{ lessonRun: LessonRun; plan: GeneratedLessonPlan | null } | null> {
+  const store = getPersistence().lessonRuns;
+  const run = await store.getRunById(lessonRunId, tenantId);
+  if (!run) return null;
+  const plan = run.lessonPlanId ? await store.getPlanById(run.lessonPlanId, tenantId) : null;
+  return { lessonRun: run, plan };
 }
 
-export function listLessonRunsForLearner(
+export async function listLessonRunsForLearner(
   learnerId: string,
   tenantId: string,
   opts?: { limit?: number; status?: LessonRun["status"] },
-): LessonRun[] {
-  const limit = opts?.limit ?? 50;
-  const all = Array.from(db().lessonRuns.values()).filter(
-    (r) =>
-      r.learnerId === learnerId &&
-      r.tenantId === tenantId &&
-      (!opts?.status || r.status === opts.status),
-  );
-  return all.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1)).slice(0, limit);
+): Promise<LessonRun[]> {
+  return getPersistence().lessonRuns.listForLearner(learnerId, tenantId, opts);
 }
 
 export async function startLessonRun(
   lessonRunId: string,
   tenantId: string,
 ): Promise<LessonRun | null> {
-  const store = db();
-  const run = store.lessonRuns.get(lessonRunId);
-  if (!run || run.tenantId !== tenantId) return null;
+  const store = getPersistence().lessonRuns;
+  const run = await store.getRunById(lessonRunId, tenantId);
+  if (!run) return null;
   if (run.status === "completed" || run.status === "abandoned") return run;
   // Idempotent: only set startedAt the first time.
   const next: LessonRun = {
@@ -1571,13 +1562,13 @@ export async function startLessonRun(
     startedAt: run.startedAt ?? nowIso(),
     updatedAt: nowIso(),
   };
-  store.lessonRuns.set(next.id, next);
+  await store.upsertRun(next);
   // Promote learner readiness once they're actively learning.
   await refreshLearnerReadiness(run.learnerId, tenantId);
   return next;
 }
 
-export function recordLessonStep(input: {
+export async function recordLessonStep(input: {
   lessonRunId: string;
   tenantId: string;
   learnerId: string;
@@ -1586,10 +1577,10 @@ export function recordLessonStep(input: {
   response?: string | null;
   isCorrect?: boolean | null;
   skipped?: boolean;
-}): LessonInteraction | null {
-  const store = db();
-  const run = store.lessonRuns.get(input.lessonRunId);
-  if (!run || run.tenantId !== input.tenantId) return null;
+}): Promise<LessonInteraction | null> {
+  const store = getPersistence().lessonRuns;
+  const run = await store.getRunById(input.lessonRunId, input.tenantId);
+  if (!run) return null;
   if (run.learnerId !== input.learnerId) return null;
   const interaction: LessonInteraction = {
     id: newId("li"),
@@ -1603,25 +1594,26 @@ export function recordLessonStep(input: {
     skipped: input.skipped ?? false,
     occurredAt: nowIso(),
   };
-  store.lessonInteractions.push(interaction);
+  await store.appendInteraction(interaction);
   // Keep run in_progress on first interaction.
   if (run.status === "ready") {
-    store.lessonRuns.set(run.id, {
+    await store.upsertRun({
       ...run,
       status: "in_progress",
       startedAt: run.startedAt ?? nowIso(),
       updatedAt: nowIso(),
     });
   } else {
-    store.lessonRuns.set(run.id, { ...run, updatedAt: nowIso() });
+    await store.upsertRun({ ...run, updatedAt: nowIso() });
   }
   return interaction;
 }
 
-export function listLessonInteractions(lessonRunId: string, tenantId: string): LessonInteraction[] {
-  return db().lessonInteractions.filter(
-    (i) => i.lessonRunId === lessonRunId && i.tenantId === tenantId,
-  );
+export async function listLessonInteractions(
+  lessonRunId: string,
+  tenantId: string,
+): Promise<LessonInteraction[]> {
+  return getPersistence().lessonRuns.listInteractions(lessonRunId, tenantId);
 }
 
 /**
@@ -1849,9 +1841,9 @@ export async function completeLessonRun(
   tenantId: string,
   outcome?: LessonOutcome,
 ): Promise<LessonRun | null> {
-  const store = db();
-  const run = store.lessonRuns.get(lessonRunId);
-  if (!run || run.tenantId !== tenantId) return null;
+  const runStore = getPersistence().lessonRuns;
+  const run = await runStore.getRunById(lessonRunId, tenantId);
+  if (!run) return null;
   // Idempotent: a second call returns the existing completed run without
   // re-applying mastery or re-emitting a parent summary.
   if (run.status === "completed") return run;
@@ -1870,10 +1862,10 @@ export async function completeLessonRun(
     startedAt: run.startedAt ?? nowIso(),
     updatedAt: nowIso(),
   };
-  store.lessonRuns.set(next.id, next);
+  await runStore.upsertRun(next);
   const delta = applyOutcomeToMastery(next, effectiveOutcome);
   const summary = buildParentLessonSummary(next, effectiveOutcome, delta);
-  store.parentLessonSummaries.set(summary.id, summary);
+  await runStore.upsertParentSummary(summary);
   await refreshLearnerReadiness(run.learnerId, tenantId);
   // Sprint 16: bump QuestProgress when the run was launched from a quest
   // chapter. Progress is binary per chapter today — we just record the
@@ -2051,15 +2043,11 @@ export function listParentLessonSummaries(
   return opts?.limit ? all.slice(0, opts.limit) : all;
 }
 
-export function getParentLessonSummaryForRun(
+export async function getParentLessonSummaryForRun(
   lessonRunId: string,
   tenantId: string,
-): ParentLessonSummary | null {
-  const store = db();
-  for (const s of store.parentLessonSummaries.values()) {
-    if (s.lessonRunId === lessonRunId && s.tenantId === tenantId) return s;
-  }
-  return null;
+): Promise<ParentLessonSummary | null> {
+  return getPersistence().lessonRuns.getParentSummaryForRun(lessonRunId, tenantId);
 }
 
 /**
@@ -2080,14 +2068,15 @@ export async function retryLessonRun(
   plan: GeneratedLessonPlan | null;
 }> {
   const store = db();
-  const run = store.lessonRuns.get(lessonRunId);
-  if (!run || run.tenantId !== tenantId) {
+  const runStore = getPersistence().lessonRuns;
+  const run = await runStore.getRunById(lessonRunId, tenantId);
+  if (!run) {
     throw new Error("LessonRun not found");
   }
   if (run.status !== "failed" && run.status !== "generating") {
     // Not retryable from this state — surface a precondition error to caller.
     const plan = run.lessonPlanId
-      ? (store.generatedLessonPlans.get(run.lessonPlanId) ?? null)
+      ? await runStore.getPlanById(run.lessonPlanId, tenantId)
       : null;
     return { ok: false, code: "not_retryable", lessonRun: run, plan };
   }
@@ -2126,7 +2115,7 @@ export async function retryLessonRun(
       generatedAt: nowIso(),
       generation: { ...telemetry, schemaVersion: LESSON_PLAN_SCHEMA_VERSION },
     };
-    store.generatedLessonPlans.set(planRecord.id, planRecord);
+    await runStore.upsertPlan(planRecord);
     const ready: LessonRun = {
       ...run,
       status: "ready",
@@ -2135,7 +2124,7 @@ export async function retryLessonRun(
       failureReason: null,
       updatedAt: nowIso(),
     };
-    store.lessonRuns.set(ready.id, ready);
+    await runStore.upsertRun(ready);
     return { ok: true, lessonRun: ready, plan: planRecord };
   } catch (e) {
     const failed: LessonRun = {
@@ -2145,7 +2134,7 @@ export async function retryLessonRun(
       failureReason: e instanceof Error ? e.message : String(e),
       updatedAt: nowIso(),
     };
-    store.lessonRuns.set(failed.id, failed);
+    await runStore.upsertRun(failed);
     return { ok: false, lessonRun: failed, plan: null };
   }
 }

@@ -38,7 +38,7 @@ async function approveBrainCloneAction(formData: FormData) {
     redirect("/parent/learners");
   }
   const amended = String(formData.get("amended") ?? "") === "true";
-  const result = approveBrainClone(learnerId, session.tenantId, { amended });
+  const result = await approveBrainClone(learnerId, session.tenantId, { amended });
   audit(session, "brain_profile.approve", newRequestId(), {
     learnerId,
     metadata: { amended, ok: Boolean(result) },
@@ -58,7 +58,7 @@ export default async function BrainCloneWatchPage({
   }
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
-  const profile = getBrainProfile(learnerId, session.tenantId);
+  const profile = await getBrainProfile(learnerId, session.tenantId);
   if (!profile || profile.cloneStage === "pre_clone") {
     redirect(`/parent/learners/${learnerId}/baseline`);
   }

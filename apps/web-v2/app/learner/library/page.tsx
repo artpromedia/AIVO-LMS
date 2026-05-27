@@ -22,7 +22,8 @@ export default async function Page() {
       </AppShell>
     );
   }
-  const runs = listLessonRunsForLearner(learnerId, session.tenantId)
+  const allRuns = await listLessonRunsForLearner(learnerId, session.tenantId);
+  const runs = allRuns
     .filter((r) => r.status === "completed")
     .sort((a, b) => (b.completedAt ?? "").localeCompare(a.completedAt ?? ""));
 

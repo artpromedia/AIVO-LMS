@@ -37,7 +37,7 @@ type RouteParams = { params: Promise<{ lessonRunId: string }> };
 export default async function LearnerLessonRunPage({ params }: RouteParams) {
   const { lessonRunId } = await params;
   const session = await requirePageRole(["learner", "parent"]);
-  const found = getLessonRun(lessonRunId, session.tenantId);
+  const found = await getLessonRun(lessonRunId, session.tenantId);
   if (!found) redirect("/learner/home");
   const { lessonRun, plan } = found;
   const learner = await getLearner(lessonRun.learnerId, session.tenantId);

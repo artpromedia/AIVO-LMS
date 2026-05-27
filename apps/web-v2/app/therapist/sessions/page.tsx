@@ -71,8 +71,13 @@ export default async function TherapistSessionsPage() {
   const subjectName = new Map(listSubjects().map((s) => [s.id, s.name]));
   const skillName = new Map(listSkills().map((s) => [s.id, s.name]));
 
-  const log = learners
-    .flatMap((l) => listLessonRunsForLearner(l.id, session.tenantId, { limit: LOG_LIMIT }))
+  const runBatches = await Promise.all(
+    learners.map((l) =>
+      listLessonRunsForLearner(l.id, session.tenantId, { limit: LOG_LIMIT }),
+    ),
+  );
+  const log = runBatches
+    .flat()
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
     .slice(0, LOG_LIMIT);
 

@@ -45,7 +45,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       requestId,
     );
     if (consentErr) return consentErr;
-    const found = getLessonRun(lessonRunId, session!.tenantId);
+    const found = await getLessonRun(lessonRunId, session!.tenantId);
     if (!found || found.lessonRun.learnerId !== learnerId) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Lesson run not found" }, requestId);
     }

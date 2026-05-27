@@ -71,7 +71,7 @@ export default async function LearnerProgressPage() {
     ...s,
     skills: listSkills(s.id),
   }));
-  const recentRuns = listLessonRunsForLearner(learnerId, session.tenantId, {
+  const recentRuns = await listLessonRunsForLearner(learnerId, session.tenantId, {
     limit: 14,
   });
 

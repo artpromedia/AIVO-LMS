@@ -23,8 +23,19 @@ import { memoryLearners } from "./memory/learners";
 import { drizzleLearners } from "./drizzle/learners";
 import { memoryAssessments } from "./memory/assessments";
 import { drizzleAssessments } from "./drizzle/assessments";
+import { memoryLessonRuns } from "./memory/lesson-runs";
+import { drizzleLessonRuns } from "./drizzle/lesson-runs";
+import { memoryBrainProfiles } from "./memory/brain-profiles";
+import { drizzleBrainProfiles } from "./drizzle/brain-profiles";
 
-type DomainKey = "notifications" | "audit" | "identity" | "learners" | "assessments";
+type DomainKey =
+  | "notifications"
+  | "audit"
+  | "identity"
+  | "learners"
+  | "assessments"
+  | "lessonRuns"
+  | "brainProfiles";
 
 function resolveMode(domain: DomainKey): PersistenceMode {
   const overrides: Record<DomainKey, PersistenceMode | undefined> = {
@@ -33,6 +44,8 @@ function resolveMode(domain: DomainKey): PersistenceMode {
     identity: serverEnv.AIVO_PERSISTENCE_IDENTITY,
     learners: serverEnv.AIVO_PERSISTENCE_LEARNERS,
     assessments: serverEnv.AIVO_PERSISTENCE_ASSESSMENTS,
+    lessonRuns: serverEnv.AIVO_PERSISTENCE_LESSON_RUNS,
+    brainProfiles: serverEnv.AIVO_PERSISTENCE_BRAIN_PROFILES,
   };
   return overrides[domain] ?? serverEnv.AIVO_PERSISTENCE;
 }
@@ -46,6 +59,8 @@ export function getPersistence(): Persistence {
   const identityMode = resolveMode("identity");
   const learnersMode = resolveMode("learners");
   const assessmentsMode = resolveMode("assessments");
+  const lessonRunsMode = resolveMode("lessonRuns");
+  const brainProfilesMode = resolveMode("brainProfiles");
   cached = {
     // The aggregate `mode` is the global value; per-domain modes are
     // visible on the individual stores at construction time (above).
@@ -58,6 +73,10 @@ export function getPersistence(): Persistence {
     learners: learnersMode === "postgres" ? drizzleLearners : memoryLearners,
     assessments:
       assessmentsMode === "postgres" ? drizzleAssessments : memoryAssessments,
+    lessonRuns:
+      lessonRunsMode === "postgres" ? drizzleLessonRuns : memoryLessonRuns,
+    brainProfiles:
+      brainProfilesMode === "postgres" ? drizzleBrainProfiles : memoryBrainProfiles,
   };
   return cached;
 }

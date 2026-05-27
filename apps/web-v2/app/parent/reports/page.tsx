@@ -57,12 +57,13 @@ export default async function Page() {
         </div>
       ) : (
         <div className="flex flex-col gap-10">
-          {learners.map((l) => {
-            const summaries = listParentLessonSummaries(l.id, session.tenantId).slice(0, 6);
-            const runs = listLessonRunsForLearner(l.id, session.tenantId);
-            const completed = runs.filter((r) => r.status === "completed").length;
-            const { skillMasteries } = getMasteryMap(l.id, session.tenantId);
-            const overallAvg =
+          {await Promise.all(
+            learners.map(async (l) => {
+              const summaries = listParentLessonSummaries(l.id, session.tenantId).slice(0, 6);
+              const runs = await listLessonRunsForLearner(l.id, session.tenantId);
+              const completed = runs.filter((r) => r.status === "completed").length;
+              const { skillMasteries } = getMasteryMap(l.id, session.tenantId);
+              const overallAvg =
               skillMasteries.length === 0
                 ? 0
                 : skillMasteries.reduce((a, m) => a + m.score, 0) / skillMasteries.length;
@@ -145,7 +146,8 @@ export default async function Page() {
                 </div>
               </section>
             );
-          })}
+            }),
+          )}
         </div>
       )}
     </AppShell>

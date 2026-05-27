@@ -54,7 +54,8 @@ export default async function ParentGradebookPage({
   if (!learner) notFound();
 
   const { map, skillMasteries } = getMasteryMap(learnerId, session.tenantId);
-  const lessonRuns = listLessonRunsForLearner(learnerId, session.tenantId).slice(0, 20);
+  const allLessonRuns = await listLessonRunsForLearner(learnerId, session.tenantId);
+  const lessonRuns = allLessonRuns.slice(0, 20);
   const subjects = listSubjects();
   const skills = listSkills();
   const skillsById = new Map(skills.map((s) => [s.id, s]));

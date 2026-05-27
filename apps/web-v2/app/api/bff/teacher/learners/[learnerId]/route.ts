@@ -33,7 +33,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const learner = await getLearner(learnerId, session!.tenantId);
     if (!learner) return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found." }, requestId);
-    const recentRuns = listLessonRunsForLearner(learnerId, session!.tenantId, {
+    const recentRuns = await listLessonRunsForLearner(learnerId, session!.tenantId, {
       limit: 10,
     });
     const mastery = getMasteryMap(learnerId, session!.tenantId);

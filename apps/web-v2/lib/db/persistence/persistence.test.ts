@@ -222,10 +222,10 @@ describe("persistence adapter — notifications (memory)", () => {
     const updated = await patchParentAssessmentSection(
       "lrn_demo_sky",
       "t_demo",
-      "academic",
+      "goals",
       { sample: "ok" },
     );
-    expect(updated.completedSections).toContain("academic");
+    expect(updated.completedSections).toContain("goals");
     const refetched = await findParentAssessment("lrn_demo_sky", "t_demo");
     expect(refetched?.id).toBe(updated.id);
   });
@@ -234,6 +234,65 @@ describe("persistence adapter — notifications (memory)", () => {
     await getOrCreateParentAssessment("lrn_demo_sky", "t_demo");
     const submitted = await submitParentAssessment("lrn_demo_sky", "t_demo");
     expect(submitted?.submittedAt).not.toBeNull();
+  });
+
+  it("brain profile: upsert + getForLearner round-trips", async () => {
+    const learner = await createLearner({
+      tenantId: "t_demo",
+      parentUserId: "u_demo_parent",
+      data: { firstName: "Brain", birthYear: 2016 },
+    });
+    const persistence = getPersistence();
+    const profile = await persistence.brainProfiles.upsert({
+      id: "brp-test-1",
+      learnerId: learner.id,
+      tenantId: "t_demo",
+      // Cast: the persistence layer is shape-agnostic here; the
+      // builder pipeline owns the state schema.
+      state: { tutors: [] } as unknown as Parameters<
+        typeof persistence.brainProfiles.upsert
+      >[0]["state"],
+      approvedByParent: false,
+      approvalStatus: "pending_parent_review",
+      cloneStage: "pre_clone",
+      clonedAt: null,
+      generatedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+    const fetched = await persistence.brainProfiles.getForLearner(learner.id, "t_demo");
+    expect(fetched?.id).toBe(profile.id);
+  });
+
+  it("lesson runs: upsert + getRunById + listForLearner round-trips", async () => {
+    const persistence = getPersistence();
+    const now = new Date().toISOString();
+    const run = {
+      id: "lr-test-1",
+      tenantId: "t_demo",
+      learnerId: "lrn_demo_sky",
+      subjectId: "sub-x",
+      skillId: "skl-x",
+      source: "today_mission" as const,
+      sourceRefId: null,
+      tutorPersona: "Nimbus",
+      learnerContextSnapshot: {} as never,
+      masterySnapshot: {} as never,
+      accommodationSnapshot: {} as never,
+      brainStateSnapshot: {} as never,
+      lessonPlanId: null,
+      status: "ready" as const,
+      retryCount: 0,
+      failureReason: null,
+      startedAt: null,
+      completedAt: null,
+      createdAt: now,
+      updatedAt: now,
+    };
+    await persistence.lessonRuns.upsertRun(run);
+    const fetched = await persistence.lessonRuns.getRunById("lr-test-1", "t_demo");
+    expect(fetched?.id).toBe("lr-test-1");
+    const listed = await persistence.lessonRuns.listForLearner("lrn_demo_sky", "t_demo");
+    expect(listed.some((r) => r.id === "lr-test-1")).toBe(true);
   });
 
   it("markNotificationsRead does not bleed across tenants", async () => {

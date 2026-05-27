@@ -16,10 +16,15 @@ import type {
   BaselineAssessment,
   BaselineAttempt,
   BaselineQuestion,
+  GeneratedLessonPlan,
+  LearnerBrainProfile,
   LearnerProfile,
+  LessonInteraction,
+  LessonRun,
   Notification,
   NotificationDelivery,
   ParentAssessment,
+  ParentLessonSummary,
   ReadinessState,
   TenantMembership,
   User,
@@ -189,6 +194,48 @@ export interface AssessmentStore {
   ): Promise<BaselineAttempt>;
 }
 
+/**
+ * Lesson-run domain — LessonRun rows, the GeneratedLessonPlan content
+ * they reference, the per-step interaction log, and the parent-facing
+ * summary row created on completion. Higher-level orchestration
+ * (createLessonRun, completeLessonRun, retryLessonRun) stays in
+ * repos.ts; the store owns the raw row-level reads + writes.
+ */
+export interface LessonRunStore {
+  getRunById(lessonRunId: string, tenantId: string): Promise<LessonRun | null>;
+  upsertRun(run: LessonRun): Promise<LessonRun>;
+  listForLearner(
+    learnerId: string,
+    tenantId: string,
+    opts?: { limit?: number; status?: LessonRun["status"] },
+  ): Promise<LessonRun[]>;
+  /** Count completed/in-progress runs — drives readiness promotion. */
+  countForLearner(learnerId: string, tenantId: string): Promise<number>;
+
+  getPlanById(planId: string, tenantId: string): Promise<GeneratedLessonPlan | null>;
+  upsertPlan(plan: GeneratedLessonPlan): Promise<GeneratedLessonPlan>;
+
+  appendInteraction(interaction: LessonInteraction): Promise<void>;
+  listInteractions(lessonRunId: string, tenantId: string): Promise<LessonInteraction[]>;
+
+  upsertParentSummary(summary: ParentLessonSummary): Promise<ParentLessonSummary>;
+  getParentSummaryForRun(
+    lessonRunId: string,
+    tenantId: string,
+  ): Promise<ParentLessonSummary | null>;
+}
+
+/**
+ * Brain-profile domain — per-learner brain profile lifecycle
+ * (pre_clone → cloned → approved). Cross-domain logic (e.g. brain-clone
+ * preparation from a BaselineSummary) stays in repos.ts and composes
+ * these primitives.
+ */
+export interface BrainProfileStore {
+  getForLearner(learnerId: string, tenantId: string): Promise<LearnerBrainProfile | null>;
+  upsert(profile: LearnerBrainProfile): Promise<LearnerBrainProfile>;
+}
+
 export interface Persistence {
   mode: PersistenceMode;
   notifications: NotificationStore;
@@ -196,6 +243,8 @@ export interface Persistence {
   identity: IdentityStore;
   learners: LearnerStore;
   assessments: AssessmentStore;
+  lessonRuns: LessonRunStore;
+  brainProfiles: BrainProfileStore;
   /**
    * Future domains land here. Each new domain ships:
    *   1. An interface in this file.

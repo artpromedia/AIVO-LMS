@@ -57,7 +57,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     const skills = listSkills();
     const skillsById = new Map(skills.map((s) => [s.id, s]));
 
-    const recentRuns = listLessonRunsForLearner(learnerId, session!.tenantId, {
+    const recentRuns = await listLessonRunsForLearner(learnerId, session!.tenantId, {
       limit: 20,
     });
     const completedRuns = recentRuns.filter((r) => r.status === "completed");

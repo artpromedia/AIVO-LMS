@@ -61,7 +61,7 @@ async function regenerateAction(formData: FormData) {
   });
   const v = brainProfileStateSchema.safeParse(candidate);
   if (v.success) {
-    upsertBrainProfile(learnerId, session.tenantId, v.data);
+    await upsertBrainProfile(learnerId, session.tenantId, v.data);
   }
   await refreshLearnerReadiness(learnerId, session.tenantId);
   audit(session, "brain_profile.regenerate", newRequestId(), {
@@ -116,7 +116,7 @@ export default async function BrainProfilePage({
   // Auto-generate on first visit: builds from the deterministic fallback so a
   // parent always sees content, never an empty page. Subsequent visits hit the
   // cache; regenerate is an explicit user action.
-  let profile = getBrainProfile(learnerId, session.tenantId);
+  let profile = await getBrainProfile(learnerId, session.tenantId);
   if (!profile) {
     const candidate = buildBrainProfile({
       learner,
@@ -128,7 +128,7 @@ export default async function BrainProfilePage({
     });
     const v = brainProfileStateSchema.safeParse(candidate);
     if (v.success) {
-      profile = upsertBrainProfile(learnerId, session.tenantId, v.data);
+      profile = await upsertBrainProfile(learnerId, session.tenantId, v.data);
       await refreshLearnerReadiness(learnerId, session.tenantId);
       audit(session, "brain_profile.auto_generate", newRequestId(), { learnerId });
     }

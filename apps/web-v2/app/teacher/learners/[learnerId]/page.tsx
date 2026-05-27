@@ -33,7 +33,7 @@ export default async function TeacherLearnerDetailPage({
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
-  const recent = listLessonRunsForLearner(learnerId, session.tenantId, { limit: 10 });
+  const recent = await listLessonRunsForLearner(learnerId, session.tenantId, { limit: 10 });
   const { skillMasteries } = getMasteryMap(learnerId, session.tenantId);
   const iep = getIEPForLearner(learnerId, session.tenantId);
   const assignments = listActiveAssignmentsForLearner(learnerId, session.tenantId);

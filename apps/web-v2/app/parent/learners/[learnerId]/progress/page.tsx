@@ -43,9 +43,8 @@ export default async function ParentProgressPage({
   const { map, skillMasteries } = getMasteryMap(learnerId, session.tenantId);
   const subjects = listSubjects();
   const skills = listSkills();
-  const completed = listLessonRunsForLearner(learnerId, session.tenantId).filter(
-    (r) => r.status === "completed",
-  );
+  const allRuns = await listLessonRunsForLearner(learnerId, session.tenantId);
+  const completed = allRuns.filter((r) => r.status === "completed");
 
   const bySubject = subjects
     .map((subject) => {

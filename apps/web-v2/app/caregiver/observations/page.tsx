@@ -76,8 +76,13 @@ export default async function CaregiverObservationsPage() {
     .sort((a, b) => (a.observedAt < b.observedAt ? 1 : -1))
     .slice(0, 20);
 
-  const feed = learners
-    .flatMap((l) => listLessonRunsForLearner(l.id, session.tenantId, { limit: FEED_LIMIT }))
+  const runBatches = await Promise.all(
+    learners.map((l) =>
+      listLessonRunsForLearner(l.id, session.tenantId, { limit: FEED_LIMIT }),
+    ),
+  );
+  const feed = runBatches
+    .flat()
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
     .slice(0, FEED_LIMIT);
 

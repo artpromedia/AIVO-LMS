@@ -104,6 +104,8 @@ const serverSchema = z.object({
   AIVO_PERSISTENCE_IDENTITY: z.enum(["memory", "postgres"]).optional(),
   AIVO_PERSISTENCE_LEARNERS: z.enum(["memory", "postgres"]).optional(),
   AIVO_PERSISTENCE_ASSESSMENTS: z.enum(["memory", "postgres"]).optional(),
+  AIVO_PERSISTENCE_LESSON_RUNS: z.enum(["memory", "postgres"]).optional(),
+  AIVO_PERSISTENCE_BRAIN_PROFILES: z.enum(["memory", "postgres"]).optional(),
   // ADR 0009 — service-stack parity flags. `AIVO_USE_SERVICE_STACK`
   // is the global default; per-service flags override it.
   AIVO_USE_SERVICE_STACK: z

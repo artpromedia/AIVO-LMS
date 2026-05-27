@@ -37,9 +37,10 @@ export default async function Page() {
         />
       ) : (
         <div className="space-y-4">
-          {learners.map((l) => {
-            const runs = listLessonRunsForLearner(l.id, session.tenantId);
-            const completed = runs.filter((r) => r.status === "completed").length;
+          {await Promise.all(
+            learners.map(async (l) => {
+              const runs = await listLessonRunsForLearner(l.id, session.tenantId);
+              const completed = runs.filter((r) => r.status === "completed").length;
             const masteries = getStore()
               .skillMasteries.filter((m) => m.learnerId === l.id)
               .sort((a, b) => b.score - a.score)
@@ -77,7 +78,8 @@ export default async function Page() {
                 )}
               </Card>
             );
-          })}
+            }),
+          )}
         </div>
       )}
     </AppShell>
