@@ -8,6 +8,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert";
+import { createHmac } from "node:crypto";
 import {
   verifyPostmarkSignature,
   verifyMailgunSignature,
@@ -17,8 +18,7 @@ import {
 test("Postmark signature: tampered body is rejected", () => {
   const secret = "topsecret";
   const body = '{"RecordType":"Delivery","MessageID":"abc"}';
-  const crypto = require("node:crypto");
-  const good = crypto.createHmac("sha1", secret).update(body).digest("base64");
+  const good = createHmac("sha1", secret).update(body).digest("base64");
   assert.strictEqual(verifyPostmarkSignature(body, good, secret), true);
   assert.strictEqual(verifyPostmarkSignature(body + "x", good, secret), false);
   assert.strictEqual(verifyPostmarkSignature(body, good + "x", secret), false);
@@ -28,8 +28,7 @@ test("Mailgun signature: bad signature rejected", () => {
   const secret = "mailgun-key";
   const ts = "1690000000";
   const tok = "abc";
-  const crypto = require("node:crypto");
-  const good = crypto.createHmac("sha256", secret).update(ts + tok).digest("hex");
+  const good = createHmac("sha256", secret).update(ts + tok).digest("hex");
   assert.strictEqual(
     verifyMailgunSignature({ timestamp: ts, token: tok, signature: good }, secret),
     true,

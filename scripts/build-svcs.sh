@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 TAG="$1"
 shift
 cd /opt/aivo-deploy/AIVO-LMS
