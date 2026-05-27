@@ -13,7 +13,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     if (response) return response;
     const roleErr = requireRole(session!, ["teacher"], requestId);
     if (roleErr) return roleErr;
-    const learners = listLearnersForTeacher(session!.userId, session!.tenantId);
+    const learners = await listLearnersForTeacher(session!.userId, session!.tenantId);
     return ok(
       {
         learners: learners.map((l) => ({

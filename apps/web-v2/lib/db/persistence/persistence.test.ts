@@ -12,13 +12,21 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { ensureSeeded } from "@/lib/db/seed";
 import { resetStore } from "@/lib/db/store";
 import {
+  createLearner,
   createNotification,
+  deleteLearner,
+  findPrimaryParentForLearner,
+  getLearner,
   listAuditLogsForTenants,
   listDeliveriesFor,
+  listLearnersForParent,
   listNotifications,
   markNotificationsRead,
+  parentCanAccessLearner,
   recentAuditLogs,
   recordAudit,
+  refreshLearnerReadiness,
+  updateLearner,
 } from "@/lib/db/repos";
 import { getPersistence, resetPersistence } from "@/lib/db/persistence";
 
@@ -119,6 +127,84 @@ describe("persistence adapter — notifications (memory)", () => {
     const scoped = await listAuditLogsForTenants(["t_demo"], 100);
     expect(scoped.some((l) => l.action === "test.audit.scope.included")).toBe(true);
     expect(scoped.some((l) => l.action === "test.audit.scope.excluded")).toBe(false);
+  });
+
+  it("learner create + getById round-trips through the adapter", async () => {
+    const created = await createLearner({
+      tenantId: "t_demo",
+      parentUserId: "u_demo_parent",
+      data: {
+        firstName: "Test",
+        birthYear: new Date().getFullYear() - 8,
+      },
+    });
+    const fetched = await getLearner(created.id, "t_demo");
+    expect(fetched?.id).toBe(created.id);
+    expect(fetched?.firstName).toBe("Test");
+  });
+
+  it("parentCanAccessLearner rejects unrelated parent", async () => {
+    const created = await createLearner({
+      tenantId: "t_demo",
+      parentUserId: "u_demo_parent",
+      data: { firstName: "Alpha", birthYear: 2018 },
+    });
+    expect(await parentCanAccessLearner("u_demo_parent", created.id, "t_demo")).toBe(true);
+    expect(await parentCanAccessLearner("u_other", created.id, "t_demo")).toBe(false);
+  });
+
+  it("listLearnersForParent scopes to a single parent", async () => {
+    await createLearner({
+      tenantId: "t_demo",
+      parentUserId: "u_demo_parent",
+      data: { firstName: "Solo", birthYear: 2017 },
+    });
+    const list = await listLearnersForParent("u_demo_parent", "t_demo");
+    expect(list.some((l) => l.firstName === "Solo")).toBe(true);
+    const otherList = await listLearnersForParent("u_other_parent", "t_demo");
+    expect(otherList.some((l) => l.firstName === "Solo")).toBe(false);
+  });
+
+  it("update patches in place and recomputes displayName", async () => {
+    const created = await createLearner({
+      tenantId: "t_demo",
+      parentUserId: "u_demo_parent",
+      data: { firstName: "Casey", birthYear: 2016 },
+    });
+    const updated = await updateLearner(created.id, "t_demo", { firstName: "Casey-Lee" });
+    expect(updated?.firstName).toBe("Casey-Lee");
+    expect(updated?.displayName).toBe("Casey-Lee");
+  });
+
+  it("delete cascades the parent/learner relationship", async () => {
+    const created = await createLearner({
+      tenantId: "t_demo",
+      parentUserId: "u_demo_parent",
+      data: { firstName: "Doomed", birthYear: 2015 },
+    });
+    expect(await deleteLearner(created.id, "t_demo")).toBe(true);
+    expect(await getLearner(created.id, "t_demo")).toBeNull();
+    expect(await parentCanAccessLearner("u_demo_parent", created.id, "t_demo")).toBe(false);
+  });
+
+  it("findPrimaryParent returns the first relationship's parent", async () => {
+    const created = await createLearner({
+      tenantId: "t_demo",
+      parentUserId: "u_demo_parent",
+      data: { firstName: "Linked", birthYear: 2015 },
+    });
+    const primary = await findPrimaryParentForLearner(created.id, "t_demo");
+    expect(primary).toBe("u_demo_parent");
+  });
+
+  it("refreshLearnerReadiness returns a state for an existing learner", async () => {
+    const created = await createLearner({
+      tenantId: "t_demo",
+      parentUserId: "u_demo_parent",
+      data: { firstName: "Fresh", birthYear: 2017 },
+    });
+    const state = await refreshLearnerReadiness(created.id, "t_demo");
+    expect(state).not.toBeNull();
   });
 
   it("markNotificationsRead does not bleed across tenants", async () => {

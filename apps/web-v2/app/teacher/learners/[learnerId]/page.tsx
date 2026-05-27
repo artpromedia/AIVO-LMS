@@ -30,7 +30,7 @@ export default async function TeacherLearnerDetailPage({
 }) {
   const session = await requirePageRole(["teacher"]);
   const { learnerId } = await params;
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
   const recent = listLessonRunsForLearner(learnerId, session.tenantId, { limit: 10 });

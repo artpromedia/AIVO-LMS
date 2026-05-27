@@ -39,7 +39,7 @@ export default async function BaselineIntroPage({
     redirect("/learner/baseline/subjects");
   }
 
-  const learner = getLearner(session.learnerId, session.tenantId);
+  const learner = await getLearner(session.learnerId, session.tenantId);
   if (!learner) redirect("/learner/home");
   const questions = listBaselineQuestions(baseline.id);
   const allSubjects = listSubjects();

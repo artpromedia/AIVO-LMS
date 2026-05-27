@@ -67,7 +67,7 @@ async function startMissionAction(formData: FormData) {
     if (active !== learnerId) redirect("/learner/select");
   }
   if (
-    !hasLearnerConsent(session.tenantId, learnerId, [
+    !await hasLearnerConsent(session.tenantId, learnerId, [
       "child_data_collection",
       "ai_personalization",
     ])
@@ -158,7 +158,7 @@ export default async function LearnerHome({
     if (!learnerId) redirect("/learner/select");
   }
   if (!learnerId) redirect("/login");
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) redirect(session.role === "parent" ? "/learner/select" : "/login");
 
   const today = pickTodaysMission(learnerId, session.tenantId);

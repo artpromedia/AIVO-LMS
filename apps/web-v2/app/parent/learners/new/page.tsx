@@ -52,7 +52,7 @@ async function addLearnerAction(formData: FormData) {
   if (!parsed.success) {
     redirect("/parent/learners/new?error=invalid");
   }
-  const learner = createLearner({
+  const learner = await createLearner({
     tenantId: session.tenantId,
     parentUserId: session.userId,
     data: parsed.data,

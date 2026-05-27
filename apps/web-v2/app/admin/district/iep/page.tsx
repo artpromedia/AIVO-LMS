@@ -12,7 +12,7 @@ export default async function Page() {
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const tenantIds = tenants.map((t) => t.id);
   const stats = getDistrictStats(tenantIds);
-  const rows = listDistrictLearners(tenantIds);
+  const rows = await listDistrictLearners(tenantIds);
 
   const pct = stats.learners > 0 ? Math.round((stats.ieps / stats.learners) * 100) : 0;
 

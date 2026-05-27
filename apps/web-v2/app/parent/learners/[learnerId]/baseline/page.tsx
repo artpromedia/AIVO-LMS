@@ -31,7 +31,7 @@ async function startBaselineAction(formData: FormData) {
   const session = await readMockSessionFromCookies();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     redirect("/parent/learners");
   }
   const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
@@ -52,7 +52,7 @@ async function startBaselineAction(formData: FormData) {
       metadata: { baselineId: baseline.id, questionCount: created!.questions.length },
     });
   }
-  refreshLearnerReadiness(learnerId, session.tenantId);
+  await refreshLearnerReadiness(learnerId, session.tenantId);
   redirect(`/learner/baseline/${baseline.id}?as=parent`);
 }
 
@@ -63,10 +63,10 @@ export default async function ParentBaselinePage({
 }) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
   const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);

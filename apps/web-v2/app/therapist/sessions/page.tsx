@@ -62,9 +62,10 @@ function durationLabel(run: LessonRun): string {
 export default async function TherapistSessionsPage() {
   const session = await requirePageRole(["therapist", "platform_admin"]);
   const learnerIds = listLearnersForMember(session.userId, session.email, "therapist");
-  const learners = learnerIds
-    .map((id) => getLearner(id, session.tenantId))
-    .filter((l): l is LearnerProfile => Boolean(l));
+  const maybeLearners = await Promise.all(
+    learnerIds.map((id) => getLearner(id, session.tenantId)),
+  );
+  const learners = maybeLearners.filter((l): l is LearnerProfile => Boolean(l));
   const learnerById = new Map(learners.map((l) => [l.id, l]));
 
   const subjectName = new Map(listSubjects().map((s) => [s.id, s.name]));

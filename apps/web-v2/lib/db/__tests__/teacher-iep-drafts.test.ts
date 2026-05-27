@@ -141,7 +141,7 @@ describe("listIepAiDraftsForReviewer", () => {
     ensureSeeded();
   });
 
-  it("returns drafts only for learners on the teacher's roster", () => {
+  it("returns drafts only for learners on the teacher's roster", async () => {
     const tenant = Array.from(getStore().tenants.values())[0]!;
     const learner = Array.from(getStore().learnerProfiles.values())[0]!;
     upsertIepAiDraft({
@@ -150,7 +150,7 @@ describe("listIepAiDraftsForReviewer", () => {
       draft: SAMPLE_DRAFT,
     });
     // Unknown teacher → no drafts visible.
-    const out = listIepAiDraftsForReviewer("unknown-teacher", tenant.id);
+    const out = await listIepAiDraftsForReviewer("unknown-teacher", tenant.id);
     expect(out).toEqual([]);
   });
 });

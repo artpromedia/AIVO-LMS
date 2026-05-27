@@ -51,13 +51,16 @@ export async function readActiveLearnerFromRequest(
  * session is permitted to view that learner, otherwise null. Parents must
  * have a ParentLearnerRelationship; staff must share tenant.
  */
-export function verifyActiveLearner(session: SessionProfile, candidate: string): string | null {
+export async function verifyActiveLearner(
+  session: SessionProfile,
+  candidate: string,
+): Promise<string | null> {
   if (session.role === "parent") {
-    const linked = listLearnersForParent(session.userId, session.tenantId);
+    const linked = await listLearnersForParent(session.userId, session.tenantId);
     return linked.some((l) => l.id === candidate) ? candidate : null;
   }
   // teacher / school_admin / district_admin / platform_admin must at least
   // share the tenant. (Classroom-level scoping arrives in Sprint 18.)
-  const learner = getLearner(candidate, session.tenantId);
+  const learner = await getLearner(candidate, session.tenantId);
   return learner ? candidate : null;
 }

@@ -25,10 +25,10 @@ const PER_LEARNER_TYPES: ConsentType[] = [
 export default async function Page({ params }: { params: Promise<{ learnerId: string }> }) {
   const { learnerId } = await params;
   const session = await requirePageRole(["parent"]);
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
   const versions = listConsentVersions();
   const records = listConsentsForLearner(session.userId, learnerId, session.tenantId);

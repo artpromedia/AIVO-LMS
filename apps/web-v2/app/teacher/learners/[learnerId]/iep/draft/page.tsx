@@ -32,10 +32,10 @@ export default async function TeacherIepDraftPage({
 }) {
   const session = await requirePageRole(["teacher"]);
   const { learnerId } = await params;
-  if (!teacherCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await teacherCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
   const iep = getIEPForLearner(learnerId, session.tenantId);

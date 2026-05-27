@@ -44,7 +44,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (response) return response;
     const scopeErr = requireLearnerScope(session!, learnerId, requestId);
     if (scopeErr) return scopeErr;
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["child_data_collection"],

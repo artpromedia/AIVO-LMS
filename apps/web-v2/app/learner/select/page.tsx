@@ -24,7 +24,7 @@ async function chooseLearner(formData: FormData) {
   "use server";
   const learnerId = String(formData.get("learnerId") ?? "");
   const session = await requirePageRole(["parent"]);
-  const ok = verifyActiveLearner(session, learnerId);
+  const ok = await verifyActiveLearner(session, learnerId);
   if (!ok) redirect("/learner/select?error=forbidden");
   const jar = await cookies();
   jar.set({
@@ -45,7 +45,7 @@ export default async function LearnerSelectPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const session = await requirePageRole(["parent"]);
-  const learners = listLearnersForParent(session.userId, session.tenantId);
+  const learners = await listLearnersForParent(session.userId, session.tenantId);
   const params = await searchParams;
 
   // Single learner → auto-select and proceed. Cookies can only be mutated in

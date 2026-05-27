@@ -19,10 +19,10 @@ export default async function ParentAccessibilityPage({
 }) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
   const prefs = getAccessibilityPrefs(learnerId, session.tenantId);
 

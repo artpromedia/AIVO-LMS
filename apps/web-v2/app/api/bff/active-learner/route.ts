@@ -44,7 +44,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     if (!parsed.success) {
       return fail({ ...ERRORS.VALIDATION_FAILED, message: "learnerId required" }, requestId);
     }
-    const authorized = verifyActiveLearner(session!, parsed.data.learnerId);
+    const authorized = await verifyActiveLearner(session!, parsed.data.learnerId);
     if (!authorized) {
       return fail({ ...ERRORS.FORBIDDEN_LEARNER, message: "Not your learner" }, requestId);
     }

@@ -74,8 +74,8 @@ export default async function TeacherHome() {
   const session = await requirePageRole(["teacher"]);
   const first = greetingName(session.displayName);
 
-  const learners = listLearnersForTeacher(session.userId, session.tenantId);
-  for (const l of learners) refreshLearnerReadiness(l.id, session.tenantId);
+  const learners = await listLearnersForTeacher(session.userId, session.tenantId);
+  for (const l of learners) await refreshLearnerReadiness(l.id, session.tenantId);
   const fresh = learners.map((l) => ({
     ...l,
     iep: getIEPForLearner(l.id, session.tenantId),

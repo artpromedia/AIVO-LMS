@@ -34,7 +34,7 @@ async function approveBrainCloneAction(formData: FormData) {
   const session = await readMockSessionFromCookies();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") ?? "");
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     redirect("/parent/learners");
   }
   const amended = String(formData.get("amended") ?? "") === "true";
@@ -53,10 +53,10 @@ export default async function BrainCloneWatchPage({
 }) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
   const profile = getBrainProfile(learnerId, session.tenantId);
   if (!profile || profile.cloneStage === "pre_clone") {

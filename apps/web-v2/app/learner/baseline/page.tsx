@@ -38,7 +38,7 @@ export default async function LearnerBaselineIndex() {
     redirect(`/learner/baseline/${baseline.id}`);
   }
 
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) redirect("/learner/home");
 
   if (!ready) {

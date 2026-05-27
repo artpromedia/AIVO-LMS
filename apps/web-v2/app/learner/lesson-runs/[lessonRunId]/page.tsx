@@ -40,7 +40,7 @@ export default async function LearnerLessonRunPage({ params }: RouteParams) {
   const found = getLessonRun(lessonRunId, session.tenantId);
   if (!found) redirect("/learner/home");
   const { lessonRun, plan } = found;
-  const learner = getLearner(lessonRun.learnerId, session.tenantId);
+  const learner = await getLearner(lessonRun.learnerId, session.tenantId);
   if (!learner) redirect("/learner/home");
   // Tenant scope is already enforced by getLessonRun. Now enforce
   // learner-level scope to prevent SSR IDOR — a parent in the same tenant
@@ -51,7 +51,7 @@ export default async function LearnerLessonRunPage({ params }: RouteParams) {
     // Parent (or other shadowing role): require ownership + active-learner
     // cookie match so a parent can only play under the learner they've
     // explicitly switched to.
-    if (!parentCanAccessLearner(session.userId, learner.id, session.tenantId)) {
+    if (!await parentCanAccessLearner(session.userId, learner.id, session.tenantId)) {
       redirect("/learner/select");
     }
     const active = await readActiveLearnerFromCookies(session);

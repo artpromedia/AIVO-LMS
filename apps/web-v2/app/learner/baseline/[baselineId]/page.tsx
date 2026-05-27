@@ -73,7 +73,7 @@ async function answerAction(formData: FormData) {
   const asParent = String(formData.get("asParent") || "") === "1";
 
   if (session.role === "parent") {
-    if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+    if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
       redirect("/parent/learners");
     }
   } else if (session.role === "learner") {
@@ -117,7 +117,7 @@ async function completeAction(formData: FormData) {
   const asParent = String(formData.get("asParent") || "") === "1";
 
   if (session.role === "parent") {
-    if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+    if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
       redirect("/parent/learners");
     }
   } else if (session.role === "learner") {
@@ -131,7 +131,7 @@ async function completeAction(formData: FormData) {
   }
 
   const result = completeBaseline(baselineId, session.tenantId);
-  refreshLearnerReadiness(learnerId, session.tenantId);
+  await refreshLearnerReadiness(learnerId, session.tenantId);
   if (result) {
     audit(session, "baseline.complete", newRequestId(), {
       learnerId,
@@ -175,14 +175,14 @@ export default async function BaselineRunnerPage({
   if (!baseline) notFound();
 
   if (session.role === "parent") {
-    if (!parentCanAccessLearner(session.userId, baseline.learnerId, session.tenantId)) {
+    if (!await parentCanAccessLearner(session.userId, baseline.learnerId, session.tenantId)) {
       notFound();
     }
   } else if (session.role === "learner") {
     if (session.learnerId !== baseline.learnerId) notFound();
   }
 
-  const learner = getLearner(baseline.learnerId, session.tenantId);
+  const learner = await getLearner(baseline.learnerId, session.tenantId);
   const subjects = listSubjects();
   const subjectsById = new Map(subjects.map((s) => [s.id, s]));
   const questions = listBaselineQuestions(baseline.id);

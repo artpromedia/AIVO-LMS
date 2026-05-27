@@ -96,7 +96,7 @@ async function saveStepAction(formData: FormData) {
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
   const stepNum = Number.parseInt(String(formData.get("step") || "1"), 10);
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     redirect("/parent/learners");
   }
   const step = WIZARD_STEPS.find((s) => s.id === stepNum);
@@ -230,7 +230,7 @@ async function saveStepAction(formData: FormData) {
       metadata: { section: sectionId, source: "ui" },
     });
   }
-  refreshLearnerReadiness(learnerId, session.tenantId);
+  await refreshLearnerReadiness(learnerId, session.tenantId);
 
   if (failures.length > 0) {
     redirect(
@@ -1003,10 +1003,10 @@ export default async function AssessmentWizard({
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
   const sp = await searchParams;
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
   const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);

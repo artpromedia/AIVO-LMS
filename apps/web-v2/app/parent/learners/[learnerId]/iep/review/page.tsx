@@ -32,10 +32,10 @@ async function reextractAction(formData: FormData) {
   const session = await readMockSessionFromCookies();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     redirect("/parent/learners");
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
   if (!learner) redirect("/parent/learners");
   const extraction = buildIEPExtraction({
@@ -44,7 +44,7 @@ async function reextractAction(formData: FormData) {
     hasUploadedDocument: true,
   });
   setIEPExtraction(learnerId, session.tenantId, extraction);
-  refreshLearnerReadiness(learnerId, session.tenantId);
+  await refreshLearnerReadiness(learnerId, session.tenantId);
   audit(session, "iep.reextract", newRequestId(), { learnerId });
   redirect(`/parent/learners/${learnerId}/iep/review`);
 }
@@ -55,7 +55,7 @@ async function confirmAction(formData: FormData) {
   const session = await readMockSessionFromCookies();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     redirect("/parent/learners");
   }
   const accepted = formData.getAll("accepted").map(String);
@@ -64,7 +64,7 @@ async function confirmAction(formData: FormData) {
     redirect(`/parent/learners/${learnerId}/iep/review?error=consent_required`);
   }
   confirmIEPExtraction(learnerId, session.tenantId, accepted);
-  refreshLearnerReadiness(learnerId, session.tenantId);
+  await refreshLearnerReadiness(learnerId, session.tenantId);
   audit(session, "iep.confirm", newRequestId(), {
     learnerId,
     metadata: { acceptedCount: accepted.length },
@@ -78,12 +78,12 @@ async function deleteAction(formData: FormData) {
   const session = await readMockSessionFromCookies();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     redirect("/parent/learners");
   }
   const { deleteIEPForLearner } = await import("@/lib/db/repos");
   deleteIEPForLearner(learnerId, session.tenantId);
-  refreshLearnerReadiness(learnerId, session.tenantId);
+  await refreshLearnerReadiness(learnerId, session.tenantId);
   audit(session, "iep.delete", newRequestId(), { learnerId });
   redirect(`/parent/learners/${learnerId}/iep`);
 }
@@ -123,10 +123,10 @@ export default async function IEPReviewPage({
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
   const sp = await searchParams;
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
   const doc = getIEPForLearner(learnerId, session.tenantId);

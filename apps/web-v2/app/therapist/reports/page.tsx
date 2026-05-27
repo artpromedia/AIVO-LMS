@@ -54,9 +54,10 @@ function formatLevel(level: SkillMastery["level"]): string {
 export default async function TherapistReportsPage() {
   const session = await requirePageRole(["therapist", "platform_admin"]);
   const learnerIds = listLearnersForMember(session.userId, session.email, "therapist");
-  const learners = learnerIds
-    .map((id) => getLearner(id, session.tenantId))
-    .filter((l): l is LearnerProfile => Boolean(l));
+  const maybeLearners = await Promise.all(
+    learnerIds.map((id) => getLearner(id, session.tenantId)),
+  );
+  const learners = maybeLearners.filter((l): l is LearnerProfile => Boolean(l));
 
   const skillNameById = new Map(listSkills().map((s) => [s.id, s.name]));
 

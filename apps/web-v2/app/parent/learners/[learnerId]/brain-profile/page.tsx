@@ -41,10 +41,10 @@ async function regenerateAction(formData: FormData) {
   const session = await readMockSessionFromCookies();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     redirect("/parent/learners");
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
   if (!learner) redirect("/parent/learners");
   if (!assessment.submittedAt) {
@@ -63,7 +63,7 @@ async function regenerateAction(formData: FormData) {
   if (v.success) {
     upsertBrainProfile(learnerId, session.tenantId, v.data);
   }
-  refreshLearnerReadiness(learnerId, session.tenantId);
+  await refreshLearnerReadiness(learnerId, session.tenantId);
   audit(session, "brain_profile.regenerate", newRequestId(), {
     learnerId,
     metadata: { ok: v.success },
@@ -78,10 +78,10 @@ export default async function BrainProfilePage({
 }) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
   const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
@@ -129,7 +129,7 @@ export default async function BrainProfilePage({
     const v = brainProfileStateSchema.safeParse(candidate);
     if (v.success) {
       profile = upsertBrainProfile(learnerId, session.tenantId, v.data);
-      refreshLearnerReadiness(learnerId, session.tenantId);
+      await refreshLearnerReadiness(learnerId, session.tenantId);
       audit(session, "brain_profile.auto_generate", newRequestId(), { learnerId });
     }
   }

@@ -31,7 +31,7 @@ import { LearnerTutorChat } from "./chat";
 export default async function LearnerTutorHome() {
   const session = await requirePageRole(["learner"]);
   if (!session.learnerId) redirect("/learner/home");
-  const learner = getLearner(session.learnerId, session.tenantId);
+  const learner = await getLearner(session.learnerId, session.tenantId);
   if (!learner) redirect("/learner/home");
   const subjects = listSubjects();
   const iep = getIEPForLearner(session.learnerId, session.tenantId);

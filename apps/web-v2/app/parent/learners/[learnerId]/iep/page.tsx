@@ -34,7 +34,7 @@ async function uploadAction(formData: FormData) {
   const session = await readMockSessionFromCookies();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     redirect("/parent/learners");
   }
   const file = formData.get("file");
@@ -60,7 +60,7 @@ async function uploadAction(formData: FormData) {
     metadata: { fileName: meta.data.fileName, bytes: meta.data.bytes, source: "ui" },
   });
   // Kick off the synthesized extraction so the review step always has a populated card.
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
   if (learner) {
     const extraction = buildIEPExtraction({
@@ -70,7 +70,7 @@ async function uploadAction(formData: FormData) {
     });
     setIEPExtraction(learnerId, session.tenantId, extraction);
   }
-  refreshLearnerReadiness(learnerId, session.tenantId);
+  await refreshLearnerReadiness(learnerId, session.tenantId);
   redirect(`/parent/learners/${learnerId}/iep/review`);
 }
 
@@ -80,11 +80,11 @@ async function skipAction(formData: FormData) {
   const session = await readMockSessionFromCookies();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     redirect("/parent/learners");
   }
   recordIEPSkip(learnerId, session.tenantId);
-  refreshLearnerReadiness(learnerId, session.tenantId);
+  await refreshLearnerReadiness(learnerId, session.tenantId);
   audit(session, "iep.skip", newRequestId(), { learnerId });
   redirect(`/parent/learners/${learnerId}/assessment/submitted?skipped=iep`);
 }
@@ -95,12 +95,12 @@ async function deleteAction(formData: FormData) {
   const session = await readMockSessionFromCookies();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     redirect("/parent/learners");
   }
   const { deleteIEPForLearner } = await import("@/lib/db/repos");
   deleteIEPForLearner(learnerId, session.tenantId);
-  refreshLearnerReadiness(learnerId, session.tenantId);
+  await refreshLearnerReadiness(learnerId, session.tenantId);
   audit(session, "iep.delete", newRequestId(), { learnerId });
   redirect(`/parent/learners/${learnerId}/iep`);
 }
@@ -143,10 +143,10 @@ export default async function IEPUploadPage({
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
   const sp = await searchParams;
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
   const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);

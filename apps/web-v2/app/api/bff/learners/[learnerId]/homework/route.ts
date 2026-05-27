@@ -68,7 +68,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       requestId,
     );
     if (limited) return limited;
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["child_data_collection", "ai_personalization"],

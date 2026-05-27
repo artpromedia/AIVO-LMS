@@ -15,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { listLearnersForMember } from "@/lib/db/team-invites";
 import { getIEPForLearner, getLearner, refreshLearnerReadiness } from "@/lib/db/repos";
+import type { LearnerProfile } from "@/lib/db/types";
 import { READINESS_LABEL, READINESS_TONE } from "@/lib/learner/readiness";
 
 export const dynamic = "force-dynamic";
@@ -22,13 +23,16 @@ export const dynamic = "force-dynamic";
 export default async function TherapistHomePage() {
   const session = await requirePageRole(["therapist", "platform_admin"]);
   const learnerIds = listLearnersForMember(session.userId, session.email, "therapist");
-  const learners = learnerIds
-    .map((id) => getLearner(id, session.tenantId))
-    .filter((l): l is NonNullable<ReturnType<typeof getLearner>> => Boolean(l));
-  for (const l of learners) refreshLearnerReadiness(l.id, session.tenantId);
-  const fresh = learners
-    .map((l) => getLearner(l.id, session.tenantId)!)
-    .filter(Boolean)
+  const maybeLearners = await Promise.all(
+    learnerIds.map((id) => getLearner(id, session.tenantId)),
+  );
+  const learners = maybeLearners.filter((l): l is LearnerProfile => Boolean(l));
+  for (const l of learners) await refreshLearnerReadiness(l.id, session.tenantId);
+  const refreshed = await Promise.all(
+    learners.map((l) => getLearner(l.id, session.tenantId)),
+  );
+  const fresh = refreshed
+    .filter((l): l is LearnerProfile => Boolean(l))
     .map((l) => ({ ...l, iep: getIEPForLearner(l.id, session.tenantId) }));
   const iepCount = fresh.filter((l) => l.iep !== null).length;
 

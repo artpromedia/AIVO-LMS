@@ -35,7 +35,7 @@ export default async function Page() {
 
   // Precompute counts so the table renders without per-row N+1 scans.
   const users = await listUsersForTenants(tenantIds);
-  const learners = listLearnersForTenants(tenantIds);
+  const learners = await listLearnersForTenants(tenantIds);
   const billingRows = listBillingForTenants(tenantIds);
   const billingByTenant = new Map(billingRows.map((b) => [b.tenantId, b]));
   const tenantById = new Map(tenants.map((t) => [t.id, t]));

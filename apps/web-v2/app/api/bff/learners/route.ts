@@ -19,12 +19,12 @@ export async function GET(req: Request) {
     if (response) return response;
     const roleErr = requireRole(session!, ["parent"], requestId);
     if (roleErr) return roleErr;
-    const learners = listLearnersForParent(session!.userId, session!.tenantId).map((l) => {
-      refreshLearnerReadiness(l.id, session!.tenantId);
-      return l;
-    });
+    const learners = await listLearnersForParent(session!.userId, session!.tenantId);
+    for (const l of learners) {
+      await refreshLearnerReadiness(l.id, session!.tenantId);
+    }
     // Re-fetch after refresh so readinessState reflects any recomputation.
-    const fresh = listLearnersForParent(session!.userId, session!.tenantId);
+    const fresh = await listLearnersForParent(session!.userId, session!.tenantId);
     return ok({ learners: fresh.length ? fresh : learners }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
@@ -43,7 +43,7 @@ export async function POST(req: Request) {
     if (!parsed.success) {
       return fail({ ...ERRORS.VALIDATION_FAILED, message: parsed.error.message }, requestId);
     }
-    const learner = createLearner({
+    const learner = await createLearner({
       tenantId: session!.tenantId,
       parentUserId: session!.userId,
       data: parsed.data,

@@ -30,7 +30,7 @@ export default async function BaselineReadinessPage({
   const session = await requirePageRole(["learner"]);
   if (!session.learnerId) redirect("/learner/home");
   const sp = await searchParams;
-  const learner = getLearner(session.learnerId, session.tenantId);
+  const learner = await getLearner(session.learnerId, session.tenantId);
   if (!learner) redirect("/learner/home");
 
   const baseline = sp.b

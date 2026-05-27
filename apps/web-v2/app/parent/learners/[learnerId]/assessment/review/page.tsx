@@ -33,7 +33,7 @@ async function submitAction(formData: FormData) {
   const session = await readMockSessionFromCookies();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     redirect("/parent/learners");
   }
   const current = getOrCreateParentAssessment(learnerId, session.tenantId);
@@ -48,7 +48,7 @@ async function submitAction(formData: FormData) {
     }
   }
   submitParentAssessment(learnerId, session.tenantId);
-  refreshLearnerReadiness(learnerId, session.tenantId);
+  await refreshLearnerReadiness(learnerId, session.tenantId);
   audit(session, "parent_assessment.submit", newRequestId(), {
     learnerId,
     metadata: { source: "ui" },
@@ -84,10 +84,10 @@ export default async function AssessmentReviewPage({
 }) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
   const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
 

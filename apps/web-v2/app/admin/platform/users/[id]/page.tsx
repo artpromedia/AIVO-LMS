@@ -55,9 +55,10 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
   // If parent, list the learners they manage (across all their tenants).
   const parentMemberships = memberships.filter((m) => m.role === "parent");
-  const managedLearners = parentMemberships.flatMap((m) =>
-    listLearnersForParent(user.id, m.tenantId),
+  const managedNested = await Promise.all(
+    parentMemberships.map((m) => listLearnersForParent(user.id, m.tenantId)),
   );
+  const managedLearners = managedNested.flat();
 
   return (
     <AppShell

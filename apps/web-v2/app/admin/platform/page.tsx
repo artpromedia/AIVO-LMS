@@ -29,7 +29,7 @@ export default async function PlatformAdminHome() {
   const tenantIds = tenants.map((t) => t.id);
   const h = computeSystemHealth(tenantIds);
   const users = await listUsersForTenants(tenantIds);
-  const learners = listLearnersForTenants(tenantIds);
+  const learners = await listLearnersForTenants(tenantIds);
   const billing = listBillingForTenants(tenantIds);
   const recentJobs = listAiGenerationJobs(tenantIds, 8);
 

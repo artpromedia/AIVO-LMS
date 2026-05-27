@@ -93,172 +93,70 @@ export function listSkills(subjectId?: string): Skill[] {
 }
 
 // ===== Learner =====
-export function listLearnersForParent(parentUserId: string, tenantId: string): LearnerProfile[] {
-  const store = db();
-  const learnerIds = new Set(
-    store.parentLearnerRelationships
-      .filter((r) => r.parentUserId === parentUserId && r.tenantId === tenantId)
-      .map((r) => r.learnerId),
-  );
-  return Array.from(store.learnerProfiles.values()).filter(
-    (l) => l.tenantId === tenantId && learnerIds.has(l.id),
-  );
+// Routed through the persistence adapter (ADR 0007 step 4). The cross-
+// domain logic — readiness recomputation, IEP cascade — stays here;
+// the store owns only the learner row + relationship cascade on delete.
+
+export async function listLearnersForParent(
+  parentUserId: string,
+  tenantId: string,
+): Promise<LearnerProfile[]> {
+  return getPersistence().learners.listForParent(parentUserId, tenantId);
 }
 
-export function getLearner(id: string, tenantId: string): LearnerProfile | null {
-  const learner = db().learnerProfiles.get(id);
-  if (!learner || learner.tenantId !== tenantId) return null;
-  return learner;
+export async function getLearner(id: string, tenantId: string): Promise<LearnerProfile | null> {
+  return getPersistence().learners.getById(id, tenantId);
 }
 
-export function parentCanAccessLearner(
+export async function parentCanAccessLearner(
   parentUserId: string,
   learnerId: string,
   tenantId: string,
-): boolean {
-  return db().parentLearnerRelationships.some(
-    (r) => r.parentUserId === parentUserId && r.learnerId === learnerId && r.tenantId === tenantId,
-  );
+): Promise<boolean> {
+  return getPersistence().learners.parentCanAccess(parentUserId, learnerId, tenantId);
 }
 
 /**
- * Sprint 24: find the primary (or first) parent-of-record for a learner.
- * Used by consent enforcement so learner/teacher requests are still blocked
+ * Find the primary (or first) parent-of-record for a learner. Used by
+ * consent enforcement so learner/teacher requests are still blocked
  * when the parent has revoked consent.
  */
-export function findPrimaryParentForLearner(learnerId: string, tenantId: string): string | null {
-  const rels = db().parentLearnerRelationships.filter(
-    (r) => r.learnerId === learnerId && r.tenantId === tenantId,
-  );
-  if (!rels.length) return null;
-  return (rels.find((r) => r.isPrimary) ?? rels[0]!).parentUserId;
+export async function findPrimaryParentForLearner(
+  learnerId: string,
+  tenantId: string,
+): Promise<string | null> {
+  return getPersistence().learners.findPrimaryParent(learnerId, tenantId);
 }
 
-const DEFAULT_ACCESSIBILITY = {
-  reducedMotion: false,
-  highContrast: false,
-  largeText: false,
-  audioFirst: false,
-  captionsAlwaysOn: false,
-};
-
-export function createLearner(input: {
+export async function createLearner(input: {
   tenantId: string;
   parentUserId: string;
   data: CreateLearnerInput;
-}): LearnerProfile {
-  const store = db();
-  const id = newId("lrn");
-  const d = input.data;
-  const display = d.preferredName?.trim() || d.firstName.trim();
-  const learner: LearnerProfile = {
-    id,
-    tenantId: input.tenantId,
-    displayName: display,
-    firstName: d.firstName.trim(),
-    preferredName: d.preferredName?.trim() || null,
-    birthYear: d.birthYear,
-    pronouns: d.pronouns ?? undefined,
-    ageRange: d.ageRange ?? null,
-    gradeBand: d.gradeBand ?? null,
-    schoolContext: d.schoolContext ?? null,
-    primaryLanguage: d.primaryLanguage ?? null,
-    readingComfort: d.readingComfort ?? null,
-    mathComfort: d.mathComfort ?? null,
-    knownStrengths: d.knownStrengths ?? [],
-    knownChallenges: d.knownChallenges ?? [],
-    accessibilityDefaults: { ...DEFAULT_ACCESSIBILITY, ...(d.accessibilityDefaults ?? {}) },
-    zipCode: d.zipCode ?? null,
-    districtId: d.districtId ?? null,
-    districtName: d.districtName ?? null,
-    functioningLevel: null,
-    readinessState: "profile_created",
-    iepDecision: null,
-    createdAt: nowIso(),
-  };
-  store.learnerProfiles.set(id, learner);
-  const rel: ParentLearnerRelationship = {
-    id: newId("plr"),
-    parentUserId: input.parentUserId,
-    learnerId: id,
-    tenantId: input.tenantId,
-    relation: "parent",
-    isPrimary: store.parentLearnerRelationships.every((r) => r.parentUserId !== input.parentUserId),
-  };
-  store.parentLearnerRelationships.push(rel);
-  return learner;
+}): Promise<LearnerProfile> {
+  return getPersistence().learners.create(input);
 }
 
-export function updateLearner(
+export async function updateLearner(
   id: string,
   tenantId: string,
   patch: PatchLearnerInput,
-): LearnerProfile | null {
-  const store = db();
-  const existing = store.learnerProfiles.get(id);
-  if (!existing || existing.tenantId !== tenantId) return null;
-  const next: LearnerProfile = {
-    ...existing,
-    firstName: patch.firstName ?? existing.firstName,
-    preferredName:
-      patch.preferredName === undefined
-        ? existing.preferredName
-        : patch.preferredName?.trim() || null,
-    birthYear: patch.birthYear ?? existing.birthYear,
-    pronouns: patch.pronouns === undefined ? existing.pronouns : (patch.pronouns ?? undefined),
-    ageRange: patch.ageRange === undefined ? existing.ageRange : (patch.ageRange ?? null),
-    gradeBand: patch.gradeBand === undefined ? existing.gradeBand : (patch.gradeBand ?? null),
-    schoolContext:
-      patch.schoolContext === undefined ? existing.schoolContext : (patch.schoolContext ?? null),
-    primaryLanguage:
-      patch.primaryLanguage === undefined
-        ? existing.primaryLanguage
-        : (patch.primaryLanguage ?? null),
-    readingComfort:
-      patch.readingComfort === undefined ? existing.readingComfort : (patch.readingComfort ?? null),
-    mathComfort:
-      patch.mathComfort === undefined ? existing.mathComfort : (patch.mathComfort ?? null),
-    knownStrengths: patch.knownStrengths ?? existing.knownStrengths,
-    knownChallenges: patch.knownChallenges ?? existing.knownChallenges,
-    accessibilityDefaults: patch.accessibilityDefaults
-      ? { ...existing.accessibilityDefaults, ...patch.accessibilityDefaults }
-      : existing.accessibilityDefaults,
-    zipCode: patch.zipCode === undefined ? existing.zipCode : (patch.zipCode ?? null),
-    districtId:
-      patch.districtId === undefined ? existing.districtId : (patch.districtId ?? null),
-    districtName:
-      patch.districtName === undefined
-        ? existing.districtName
-        : (patch.districtName ?? null),
-  };
-  // Recompute displayName if name fields changed
-  next.displayName = next.preferredName?.trim() || next.firstName.trim();
-  store.learnerProfiles.set(id, next);
-  return next;
+): Promise<LearnerProfile | null> {
+  return getPersistence().learners.update(id, tenantId, patch);
 }
 
-export function deleteLearner(id: string, tenantId: string): boolean {
-  const store = db();
-  const existing = store.learnerProfiles.get(id);
-  if (!existing || existing.tenantId !== tenantId) return false;
-  store.learnerProfiles.delete(id);
-  // Cascade: relationships, assessments
-  store.parentLearnerRelationships = store.parentLearnerRelationships.filter(
-    (r) => r.learnerId !== id,
-  );
-  for (const [aid, a] of store.parentAssessments) {
-    if (a.learnerId === id) store.parentAssessments.delete(aid);
-  }
-  return true;
+export async function deleteLearner(id: string, tenantId: string): Promise<boolean> {
+  return getPersistence().learners.delete(id, tenantId);
 }
 
-export function refreshLearnerReadiness(id: string, tenantId: string): ReadinessState | null {
-  const store = db();
-  const existing = store.learnerProfiles.get(id);
-  if (!existing || existing.tenantId !== tenantId) return null;
+export async function refreshLearnerReadiness(
+  id: string,
+  tenantId: string,
+): Promise<ReadinessState | null> {
+  const existing = await getPersistence().learners.getById(id, tenantId);
+  if (!existing) return null;
   const state = computeReadinessFor(id, tenantId);
   if (state !== existing.readinessState) {
-    store.learnerProfiles.set(id, { ...existing, readinessState: state });
+    await getPersistence().learners.setReadinessState(id, tenantId, state);
   }
   return state;
 }
@@ -1655,7 +1553,10 @@ export function listLessonRunsForLearner(
   return all.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1)).slice(0, limit);
 }
 
-export function startLessonRun(lessonRunId: string, tenantId: string): LessonRun | null {
+export async function startLessonRun(
+  lessonRunId: string,
+  tenantId: string,
+): Promise<LessonRun | null> {
   const store = db();
   const run = store.lessonRuns.get(lessonRunId);
   if (!run || run.tenantId !== tenantId) return null;
@@ -1669,7 +1570,7 @@ export function startLessonRun(lessonRunId: string, tenantId: string): LessonRun
   };
   store.lessonRuns.set(next.id, next);
   // Promote learner readiness once they're actively learning.
-  refreshLearnerReadiness(run.learnerId, tenantId);
+  await refreshLearnerReadiness(run.learnerId, tenantId);
   return next;
 }
 
@@ -1940,11 +1841,11 @@ function buildParentLessonSummary(
   };
 }
 
-export function completeLessonRun(
+export async function completeLessonRun(
   lessonRunId: string,
   tenantId: string,
   outcome?: LessonOutcome,
-): LessonRun | null {
+): Promise<LessonRun | null> {
   const store = db();
   const run = store.lessonRuns.get(lessonRunId);
   if (!run || run.tenantId !== tenantId) return null;
@@ -1970,7 +1871,7 @@ export function completeLessonRun(
   const delta = applyOutcomeToMastery(next, effectiveOutcome);
   const summary = buildParentLessonSummary(next, effectiveOutcome, delta);
   store.parentLessonSummaries.set(summary.id, summary);
-  refreshLearnerReadiness(run.learnerId, tenantId);
+  await refreshLearnerReadiness(run.learnerId, tenantId);
   // Sprint 16: bump QuestProgress when the run was launched from a quest
   // chapter. Progress is binary per chapter today — we just record the
   // completed chapter so prerequisite gating works for boss unlock.
@@ -2511,45 +2412,23 @@ export function listActiveAssignmentsForLearner(
  * but excludes any private fields a teacher shouldn't see (raw IEP text is
  * never on the LearnerProfile anyway — it lives behind AccommodationSummary).
  */
-export function listLearnersForTeacher(teacherId: string, tenantId: string): LearnerProfile[] {
-  const store = db();
-  // Classrooms this teacher leads in this tenant.
-  const classroomIds = new Set(
-    Array.from(store.classrooms.values())
-      .filter((c) => c.tenantId === tenantId && c.teacherUserId === teacherId)
-      .map((c) => c.id),
-  );
-  // Also include classrooms where the teacher is enrolled with role=teacher
-  // (co-teaching support).
-  for (const e of store.enrollments.values()) {
-    if (e.tenantId === tenantId && e.role === "teacher" && e.subjectId === teacherId) {
-      classroomIds.add(e.classroomId);
-    }
-  }
-  if (classroomIds.size === 0) return [];
-  // Learner enrollments scoped to those classrooms.
-  const learnerIds = new Set<string>();
-  for (const e of store.enrollments.values()) {
-    if (e.tenantId === tenantId && e.role === "learner" && classroomIds.has(e.classroomId)) {
-      learnerIds.add(e.subjectId);
-    }
-  }
-  return Array.from(store.learnerProfiles.values()).filter(
-    (l) => l.tenantId === tenantId && learnerIds.has(l.id),
-  );
+export async function listLearnersForTeacher(
+  teacherId: string,
+  tenantId: string,
+): Promise<LearnerProfile[]> {
+  return getPersistence().learners.listForTeacher(teacherId, tenantId);
 }
 
 /**
  * True if `teacherUserId` has access to `learnerId` via a shared classroom in
  * the given tenant. Use this in teacher pages before reading a learner's data.
  */
-export function teacherCanAccessLearner(
+export async function teacherCanAccessLearner(
   teacherUserId: string,
   learnerId: string,
   tenantId: string,
-): boolean {
-  const learners = listLearnersForTeacher(teacherUserId, tenantId);
-  return learners.some((l) => l.id === learnerId);
+): Promise<boolean> {
+  return getPersistence().learners.teacherCanAccess(teacherUserId, learnerId, tenantId);
 }
 
 // ===== Sprints 19–21: Admin / Ops repos =====
@@ -5376,11 +5255,9 @@ export function updateTenantSettings(
 }
 
 /** Every learner whose tenant is in `tenantIds`. */
-export function listLearnersForTenants(tenantIds: string[]): LearnerProfile[] {
-  const ids = new Set(tenantIds);
-  return Array.from(db().learnerProfiles.values())
-    .filter((l) => ids.has(l.tenantId))
-    .sort((a, b) => a.displayName.localeCompare(b.displayName));
+export async function listLearnersForTenants(tenantIds: string[]): Promise<LearnerProfile[]> {
+  const all = await getPersistence().learners.listForTenants(tenantIds);
+  return all.slice().sort((a, b) => a.displayName.localeCompare(b.displayName));
 }
 
 /** Number of IEPDocuments whose owning learner sits inside this tenant set. */
@@ -5474,8 +5351,10 @@ export type DistrictLearnerRow = {
   hasIep: boolean;
 };
 
-export function listDistrictLearners(tenantIds: string[]): DistrictLearnerRow[] {
-  const learners = listLearnersForTenants(tenantIds);
+export async function listDistrictLearners(
+  tenantIds: string[],
+): Promise<DistrictLearnerRow[]> {
+  const learners = await listLearnersForTenants(tenantIds);
   const iepLearnerIds = new Set(Array.from(db().iepDocuments.values()).map((d) => d.learnerId));
   return learners.map((l) => {
     const family = db().tenants.get(l.tenantId);
@@ -6314,14 +6193,13 @@ export function getIepAiDraft(
   );
 }
 
-export function listIepAiDraftsForReviewer(
+export async function listIepAiDraftsForReviewer(
   reviewerUserId: string,
   tenantId: string,
-): import("./types").IepAiDraftRecord[] {
+): Promise<import("./types").IepAiDraftRecord[]> {
   // Sprint 11: a teacher sees drafts for every learner on their roster.
-  const learnerIds = new Set(
-    listLearnersForTeacher(reviewerUserId, tenantId).map((l) => l.id),
-  );
+  const reviewerLearners = await listLearnersForTeacher(reviewerUserId, tenantId);
+  const learnerIds = new Set(reviewerLearners.map((l) => l.id));
   return Array.from(db().iepAiDrafts.values())
     .filter((d) => d.tenantId === tenantId && learnerIds.has(d.learnerId))
     .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));

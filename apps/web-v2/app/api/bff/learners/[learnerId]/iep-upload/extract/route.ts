@@ -29,7 +29,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["iep_document_storage", "child_data_collection"],
@@ -37,7 +37,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     );
     if (consentErr) return consentErr;
 
-    const learner = getLearner(learnerId, session!.tenantId);
+    const learner = await getLearner(learnerId, session!.tenantId);
     if (!learner) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
     }
@@ -72,7 +72,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       );
     }
     const next = setIEPExtraction(learnerId, session!.tenantId, v.data);
-    refreshLearnerReadiness(learnerId, session!.tenantId);
+    await refreshLearnerReadiness(learnerId, session!.tenantId);
     logIepAccess({
       tenantId: session!.tenantId,
       learnerId,

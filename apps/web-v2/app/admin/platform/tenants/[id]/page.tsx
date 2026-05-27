@@ -63,7 +63,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const allScopeIds = [tenant.id, ...descendants.map((t) => t.id)];
 
   const users = await listUsersForTenants(allScopeIds);
-  const learners = listLearnersForTenants(allScopeIds);
+  const learners = await listLearnersForTenants(allScopeIds);
   const billing = getBillingForTenant(tenant.id);
   const jobs = listAiGenerationJobs(allScopeIds, 5);
   const auditLogs = await listAuditLogsForTenants(allScopeIds, 8);

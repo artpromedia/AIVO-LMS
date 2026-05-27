@@ -20,7 +20,7 @@ export const dynamic = "force-dynamic";
 export default async function TeacherReportsPage() {
   const session = await requirePageRole(["teacher"]);
   const store = db();
-  const learners = listLearnersForTeacher(session.userId, session.tenantId);
+  const learners = await listLearnersForTeacher(session.userId, session.tenantId);
 
   const rows = learners.map((learner) => {
     const { skillMasteries } = getMasteryMap(learner.id, session.tenantId);

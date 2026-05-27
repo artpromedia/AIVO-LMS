@@ -63,7 +63,7 @@ export default async function LearnerProgressPage() {
       ? (session.learnerId ?? null)
       : await readActiveLearnerFromCookies(session);
   if (!learnerId) redirect(session.role === "parent" ? "/learner/select" : "/login");
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) redirect("/login");
 
   const { map, skillMasteries } = getMasteryMap(learnerId, session.tenantId);
