@@ -4,6 +4,7 @@
  * Postgres a body-only replacement (signatures stay stable).
  */
 import { getStore, newId, nowIso } from "@/lib/db/store";
+import { getPersistence } from "@/lib/db/persistence";
 import { ensureSeeded } from "@/lib/db/seed";
 import { computeReadinessFor } from "@/lib/learner/readiness";
 import { listLearnersForMember as listLearnersForTeamMember } from "@/lib/db/team-invites";
@@ -4508,8 +4509,12 @@ export function updateNotificationPreference(
  * channel. The dispatch is "mock-send" — in production this is replaced by
  * a real provider call. Sensitive learner-context never includes raw IEP
  * text (callers must pass already-redacted body strings).
+ *
+ * Routed through the persistence adapter (ADR 0007). The adapter is
+ * memory-backed by default; flip AIVO_PERSISTENCE_NOTIFICATIONS=postgres
+ * once `packages/db` ships the notifications schema.
  */
-export function createNotification(input: {
+export async function createNotification(input: {
   tenantId: string;
   userId: string;
   type: NotificationType;
@@ -4517,7 +4522,7 @@ export function createNotification(input: {
   body: string;
   href: string | null;
   learnerId: string | null;
-}): { notification: Notification; deliveries: NotificationDelivery[] } {
+}): Promise<{ notification: Notification; deliveries: NotificationDelivery[] }> {
   const rec: Notification = {
     id: newId("nfn"),
     tenantId: input.tenantId,
@@ -4530,13 +4535,11 @@ export function createNotification(input: {
     readAt: null,
     createdAt: nowIso(),
   };
-  db().notifications.set(rec.id, rec);
   const pref = getNotificationPreference(input.userId, input.tenantId);
   const channels: NotificationChannel[] = ["in_app", "email", "push"];
-  const deliveries: NotificationDelivery[] = [];
-  for (const ch of channels) {
+  const deliveries: NotificationDelivery[] = channels.map((ch) => {
     const enabled = pref.preferences[`${input.type}:${ch}`] ?? false;
-    const d: NotificationDelivery = {
+    return {
       id: newId("ndlv"),
       notificationId: rec.id,
       channel: ch,
@@ -4545,40 +4548,30 @@ export function createNotification(input: {
       errorMessage: null,
       attemptedAt: nowIso(),
     };
-    db().notificationDeliveries.set(d.id, d);
-    deliveries.push(d);
-  }
-  return { notification: rec, deliveries };
+  });
+  return getPersistence().notifications.create({ notification: rec, deliveries });
 }
 
-export function listNotifications(opts: {
+export async function listNotifications(opts: {
   tenantId: string;
   userId: string;
   unreadOnly?: boolean;
-}): Notification[] {
-  let arr = Array.from(db().notifications.values()).filter(
-    (n) => n.tenantId === opts.tenantId && n.userId === opts.userId,
-  );
-  if (opts.unreadOnly) arr = arr.filter((n) => n.readAt === null);
-  return arr.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}): Promise<Notification[]> {
+  return getPersistence().notifications.list(opts);
 }
 
-export function markNotificationsRead(userId: string, tenantId: string, ids: string[]): number {
-  let count = 0;
-  for (const id of ids) {
-    const n = db().notifications.get(id);
-    if (n && n.userId === userId && n.tenantId === tenantId && n.readAt === null) {
-      n.readAt = nowIso();
-      count += 1;
-    }
-  }
-  return count;
+export async function markNotificationsRead(
+  userId: string,
+  tenantId: string,
+  ids: string[],
+): Promise<number> {
+  return getPersistence().notifications.markRead({ userId, tenantId, ids });
 }
 
-export function listDeliveriesFor(notificationId: string): NotificationDelivery[] {
-  return Array.from(db().notificationDeliveries.values()).filter(
-    (d) => d.notificationId === notificationId,
-  );
+export async function listDeliveriesFor(
+  notificationId: string,
+): Promise<NotificationDelivery[]> {
+  return getPersistence().notifications.listDeliveries(notificationId);
 }
 
 export function listDigestSchedules(tenantId: string, userId?: string): DigestSchedule[] {

@@ -9,7 +9,10 @@ import { NotificationsList } from "./notifications-list";
 export default async function Page() {
   const session = await requirePageRole(["learner"]);
   const t = await getTranslations("learner.notifications");
-  const notifications = listNotifications({ tenantId: session.tenantId, userId: session.userId });
+  const notifications = await listNotifications({
+    tenantId: session.tenantId,
+    userId: session.userId,
+  });
 
   // Server renders the initial list (SEO + first paint), then the
   // client list hydrates and subscribes to live updates via

@@ -44,6 +44,27 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: SECURITY_HEADERS }];
   },
+  // Topology aliases (ADR 0010). Older docs and external integrations
+  // sometimes reference apps that don't exist as separate deployables
+  // — every role-scoped UI lives under apps/web-v2 with a route prefix.
+  // Permanent-redirect the expected URLs to the real ones so links keep
+  // working.
+  async redirects() {
+    return [
+      { source: "/parent-portal", destination: "/parent", permanent: true },
+      {
+        source: "/parent-portal/:path*",
+        destination: "/parent/:path*",
+        permanent: true,
+      },
+      { source: "/learner-app", destination: "/learner", permanent: true },
+      {
+        source: "/learner-app/:path*",
+        destination: "/learner/:path*",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default withNextIntl(nextConfig);

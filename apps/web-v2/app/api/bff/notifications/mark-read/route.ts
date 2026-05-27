@@ -32,7 +32,11 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    const count = markNotificationsRead(session!.userId, session!.tenantId, parsed.data.ids);
+    const count = await markNotificationsRead(
+      session!.userId,
+      session!.tenantId,
+      parsed.data.ids,
+    );
     return ok({ marked: count }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

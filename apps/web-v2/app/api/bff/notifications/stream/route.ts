@@ -26,9 +26,8 @@ export async function GET(req: Request): Promise<Response> {
 
   const tenantId = session!.tenantId;
   const userId = session!.userId;
-  const seenIds = new Set<string>(
-    listNotifications({ tenantId, userId }).map((n) => n.id),
-  );
+  const initial = await listNotifications({ tenantId, userId });
+  const seenIds = new Set<string>(initial.map((n) => n.id));
 
   const stream = new ReadableStream<Uint8Array>({
     start(controller) {
@@ -43,17 +42,18 @@ export async function GET(req: Request): Promise<Response> {
       send("hello", { ok: true, requestId });
 
       const pollHandle = setInterval(() => {
-        try {
-          const current = listNotifications({ tenantId, userId });
-          for (const n of current) {
-            if (seenIds.has(n.id)) continue;
-            seenIds.add(n.id);
-            send("message", { type: "notification", item: n });
-          }
-        } catch {
-          // Swallow: the next tick will retry. Don't close the stream
-          // for transient errors.
-        }
+        listNotifications({ tenantId, userId })
+          .then((current) => {
+            for (const n of current) {
+              if (seenIds.has(n.id)) continue;
+              seenIds.add(n.id);
+              send("message", { type: "notification", item: n });
+            }
+          })
+          .catch(() => {
+            // Swallow: the next tick will retry. Don't close the stream
+            // for transient errors.
+          });
       }, POLL_MS);
 
       const keepaliveHandle = setInterval(() => {

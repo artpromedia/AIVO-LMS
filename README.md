@@ -162,10 +162,13 @@ The repository is a Turborepo + pnpm workspace containing three apps, twelve sha
 
 ## Repository Layout
 
+> **See [docs/TOPOLOGY.md](docs/TOPOLOGY.md) for the canonical, always-current map.** The summary below
+> is a quick-reference; if it disagrees with TOPOLOGY.md, the doc wins.
+
 ```
 aivo-ai-learning/
 ├── apps/
-│   ├── web/            Next.js 15 — main dashboards & auth
+│   ├── web-v2/         Next.js 15 — every role-scoped UI + the BFF API
 │   ├── marketing/      Next.js 15 — public marketing site
 │   └── mobile/         React Native (Expo) — iOS & Android
 ├── packages/
