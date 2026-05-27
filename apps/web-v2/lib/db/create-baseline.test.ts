@@ -95,21 +95,47 @@ describe("createBaseline — Sprint B2 LLM wiring", () => {
     vi.stubEnv("AIVO_FEATURE_BASELINE_LLM", "true");
     primeSubmittedParentAssessment();
 
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      async json() {
-        return makeValidLlmResponse(14);
-      },
-      async text() {
-        return "";
-      },
+    // The createBaseline flow tries the Discovery Adventure first (one fetch
+    // per chapter), then falls back to the flat /api/ai/generate-baseline
+    // path. This test exercises the flat-LLM happy path, so we 404 the
+    // discovery chapter calls (forcing the discovery fallback) and serve
+    // the LLM fixture only on the flat endpoint.
+    const fetchMock = vi.fn().mockImplementation((url: string | URL) => {
+      const href = typeof url === "string" ? url : url.toString();
+      if (href.includes("/api/ai/generate-baseline")) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          async json() {
+            return makeValidLlmResponse(14);
+          },
+          async text() {
+            return "";
+          },
+        });
+      }
+      // Force discovery to bail so the flat-LLM branch executes.
+      return Promise.resolve({
+        ok: false,
+        status: 404,
+        async json() {
+          return {};
+        },
+        async text() {
+          return "";
+        },
+      });
     });
     globalThis.fetch = fetchMock as unknown as typeof fetch;
 
     const result = await createBaseline({ learnerId: LEARNER_ID, tenantId: TENANT_ID });
     expect(result).not.toBeNull();
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const flatLlmCalls = fetchMock.mock.calls.filter((c) => {
+      const u = c[0];
+      const href = typeof u === "string" ? u : u instanceof URL ? u.toString() : "";
+      return href.includes("/api/ai/generate-baseline");
+    });
+    expect(flatLlmCalls).toHaveLength(1);
     const meta = result!.baseline.generationMetadata;
     expect(meta).toMatchObject({
       source: "ai",
