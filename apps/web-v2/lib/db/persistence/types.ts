@@ -11,7 +11,7 @@
  * See `docs/adr/0007-web-v2-persistence-migration.md` for the
  * decision record + migration order.
  */
-import type { Notification, NotificationDelivery } from "@/lib/db/types";
+import type { AuditLog, Notification, NotificationDelivery } from "@/lib/db/types";
 
 export type PersistenceMode = "memory" | "postgres";
 
@@ -42,9 +42,21 @@ export interface NotificationStore {
   listDeliveries(notificationId: string): Promise<NotificationDelivery[]>;
 }
 
+/**
+ * Append-only audit log. Reads are tenant-scoped; writes never delete
+ * or rewrite (the `AuditLog` table is the canonical source for
+ * compliance review).
+ */
+export interface AuditStore {
+  append(entry: AuditLog): Promise<AuditLog>;
+  recentForTenant(tenantId: string, limit: number): Promise<AuditLog[]>;
+  recentForTenants(tenantIds: string[], limit: number): Promise<AuditLog[]>;
+}
+
 export interface Persistence {
   mode: PersistenceMode;
   notifications: NotificationStore;
+  audit: AuditStore;
   /**
    * Future domains land here. Each new domain ships:
    *   1. An interface in this file.

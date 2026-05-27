@@ -14,7 +14,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     const roleErr = requireRole(session!, [...ADMIN_ROLES], requestId);
     if (roleErr) return roleErr;
     const scope = adminScopeForSession(session!);
-    const logs = listAuditLogsForTenants(scope.tenantIds, 200);
+    const logs = await listAuditLogsForTenants(scope.tenantIds, 200);
     return ok({ logs }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

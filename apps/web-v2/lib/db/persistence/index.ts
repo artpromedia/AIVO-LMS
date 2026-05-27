@@ -15,6 +15,8 @@ import { serverEnv } from "@/lib/env";
 import type { Persistence, PersistenceMode } from "./types";
 import { memoryNotifications } from "./memory/notifications";
 import { drizzleNotifications } from "./drizzle/notifications";
+import { memoryAudit } from "./memory/audit";
+import { drizzleAudit } from "./drizzle/audit";
 
 type DomainKey = "notifications" | "audit" | "identity" | "learners";
 
@@ -33,6 +35,7 @@ let cached: Persistence | null = null;
 export function getPersistence(): Persistence {
   if (cached) return cached;
   const notificationsMode = resolveMode("notifications");
+  const auditMode = resolveMode("audit");
   cached = {
     // The aggregate `mode` is the global value; per-domain modes are
     // visible on the individual stores at construction time (above).
@@ -40,6 +43,7 @@ export function getPersistence(): Persistence {
     mode: serverEnv.AIVO_PERSISTENCE,
     notifications:
       notificationsMode === "postgres" ? drizzleNotifications : memoryNotifications,
+    audit: auditMode === "postgres" ? drizzleAudit : memoryAudit,
   };
   return cached;
 }

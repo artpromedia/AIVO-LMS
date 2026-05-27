@@ -13,17 +13,17 @@ import { ensureSeeded } from "@/lib/db/seed";
 import { resetStore, getStore } from "@/lib/db/store";
 import { getSchoolDashboard } from "@/lib/db/repos";
 
-describe("getSchoolDashboard", () => {
-  beforeEach(() => {
+describe("getSchoolDashboard", async () => {
+  beforeEach(async () => {
     resetStore();
     ensureSeeded();
   });
 
-  it("returns live counts derived from the seeded store", () => {
+  it("returns live counts derived from the seeded store", async () => {
     const store = getStore();
     const tenant = Array.from(store.tenants.values())[0];
     expect(tenant, "seed should expose at least one tenant").toBeDefined();
-    const snap = getSchoolDashboard(tenant!.id);
+    const snap = await getSchoolDashboard(tenant!.id);
 
     expect(snap.school).not.toBeNull();
     expect(typeof snap.counts.learners).toBe("number");
@@ -35,16 +35,16 @@ describe("getSchoolDashboard", () => {
     expect(snap.licenses.utilizationPct).toBeLessThanOrEqual(100);
   });
 
-  it("returns a 100% consent value when there are zero learners", () => {
+  it("returns a 100% consent value when there are zero learners", async () => {
     resetStore();
     // No seed — empty store.
-    const snap = getSchoolDashboard("nonexistent-tenant");
+    const snap = await getSchoolDashboard("nonexistent-tenant");
     expect(snap.counts.learners).toBe(0);
     expect(snap.counts.consentCompletePct).toBe(100);
     expect(snap.licenses.used).toBe(0);
   });
 
-  it("falls back to tenant name when no school record exists", () => {
+  it("falls back to tenant name when no school record exists", async () => {
     resetStore();
     const store = getStore();
     store.tenants.set("t-1", {
@@ -53,12 +53,12 @@ describe("getSchoolDashboard", () => {
       slug: "acme",
       // satisfy other required Tenant fields if any — runtime only
     } as never);
-    const snap = getSchoolDashboard("t-1");
+    const snap = await getSchoolDashboard("t-1");
     expect(snap.school?.id).toBeNull();
     expect(snap.school?.name).toBe("Acme Academy");
   });
 
-  it("rostering status is 'unknown' when no rostering jobs exist", () => {
+  it("rostering status is 'unknown' when no rostering jobs exist", async () => {
     resetStore();
     ensureSeeded();
     const store = getStore();
@@ -69,12 +69,12 @@ describe("getSchoolDashboard", () => {
         store.aiGenerationJobs.delete(k);
       }
     }
-    const snap = getSchoolDashboard(tenant.id);
+    const snap = await getSchoolDashboard(tenant.id);
     expect(snap.rostering.status).toBe("unknown");
     expect(snap.rostering.lastSyncIso).toBeNull();
   });
 
-  it("captures audit events within the last 30 days only", () => {
+  it("captures audit events within the last 30 days only", async () => {
     resetStore();
     ensureSeeded();
     const store = getStore();
@@ -99,7 +99,7 @@ describe("getSchoolDashboard", () => {
       metadata: {},
       occurredAt: recentIso,
     } as never);
-    const snap = getSchoolDashboard(tenant.id);
+    const snap = await getSchoolDashboard(tenant.id);
     // recent included, old excluded → at least 1 recent event.
     expect(snap.counts.auditEvents30d).toBeGreaterThanOrEqual(1);
   });

@@ -44,7 +44,7 @@ export default async function SchoolAdminHome() {
   // we still render the shell with an empty-state banner.
   let snap: SchoolDashboardSnapshot | null = null;
   if (tenantId) {
-    snap = getSchoolDashboard(tenantId);
+    snap = await getSchoolDashboard(tenantId);
   }
 
   const schoolName = snap?.school?.name ?? "Your school";

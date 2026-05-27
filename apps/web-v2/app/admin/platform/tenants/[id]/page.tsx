@@ -66,7 +66,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const learners = listLearnersForTenants(allScopeIds);
   const billing = getBillingForTenant(tenant.id);
   const jobs = listAiGenerationJobs(allScopeIds, 5);
-  const auditLogs = listAuditLogsForTenants(allScopeIds, 8);
+  const auditLogs = await listAuditLogsForTenants(allScopeIds, 8);
   const invoices = listInvoicesForTenants([tenant.id]).slice(0, 5);
   const parent = tenant.parentTenantId ? getTenantById(tenant.parentTenantId) : null;
 

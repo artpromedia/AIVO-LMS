@@ -13,9 +13,12 @@ import { ensureSeeded } from "@/lib/db/seed";
 import { resetStore } from "@/lib/db/store";
 import {
   createNotification,
+  listAuditLogsForTenants,
   listDeliveriesFor,
   listNotifications,
   markNotificationsRead,
+  recentAuditLogs,
+  recordAudit,
 } from "@/lib/db/repos";
 import { getPersistence, resetPersistence } from "@/lib/db/persistence";
 
@@ -87,6 +90,35 @@ describe("persistence adapter — notifications (memory)", () => {
     const deliveries = await listDeliveriesFor(notification.id);
     // in_app, email, push are the three canonical channels.
     expect(deliveries.length).toBe(3);
+  });
+
+  it("audit append + recentForTenant round-trips", async () => {
+    await recordAudit({
+      userId: "u_demo_parent",
+      tenantId: "t_demo",
+      action: "test.audit.entry",
+      requestId: "req-test-1",
+    });
+    const recent = await recentAuditLogs("t_demo", 50);
+    expect(recent.some((l) => l.action === "test.audit.entry")).toBe(true);
+  });
+
+  it("audit recentForTenants filters by tenant set", async () => {
+    await recordAudit({
+      userId: "u_demo_parent",
+      tenantId: "t_demo",
+      action: "test.audit.scope.included",
+      requestId: "req-test-2",
+    });
+    await recordAudit({
+      userId: "u_demo_parent",
+      tenantId: "t_other",
+      action: "test.audit.scope.excluded",
+      requestId: "req-test-3",
+    });
+    const scoped = await listAuditLogsForTenants(["t_demo"], 100);
+    expect(scoped.some((l) => l.action === "test.audit.scope.included")).toBe(true);
+    expect(scoped.some((l) => l.action === "test.audit.scope.excluded")).toBe(false);
   });
 
   it("markNotificationsRead does not bleed across tenants", async () => {

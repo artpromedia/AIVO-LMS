@@ -1357,14 +1357,19 @@ export function getSubjectDetail(
 }
 
 // ===== Audit =====
-export function recordAudit(input: {
+// Routed through the persistence adapter (ADR 0007 step 2). The
+// memory implementation writes to the existing append-only array;
+// the Drizzle implementation lands once `packages/db` exports an
+// audit_logs table. `recordAudit` synthesises the row synchronously
+// so callers can use the returned id without awaiting the store.
+export async function recordAudit(input: {
   userId: string | null;
   tenantId: string | null;
   learnerId?: string | null;
   action: string;
   metadata?: Record<string, unknown>;
   requestId: string;
-}): AuditLog {
+}): Promise<AuditLog> {
   const log: AuditLog = {
     id: newId("aud"),
     userId: input.userId,
@@ -1375,15 +1380,11 @@ export function recordAudit(input: {
     requestId: input.requestId,
     occurredAt: nowIso(),
   };
-  db().auditLogs.push(log);
-  return log;
+  return getPersistence().audit.append(log);
 }
 
-export function recentAuditLogs(tenantId: string, limit = 50): AuditLog[] {
-  return db()
-    .auditLogs.filter((l) => l.tenantId === tenantId)
-    .slice(-limit)
-    .reverse();
+export async function recentAuditLogs(tenantId: string, limit = 50): Promise<AuditLog[]> {
+  return getPersistence().audit.recentForTenant(tenantId, limit);
 }
 
 // ===== Lesson Runs (Sprints 10–11) =====
@@ -2656,13 +2657,12 @@ export function updateUserDisplayName(userId: string, displayName: string): User
   return next;
 }
 
-/** Audit logs scoped to a tenant set. */
-export function listAuditLogsForTenants(tenantIds: string[], limit = 100): AuditLog[] {
-  const ids = new Set(tenantIds);
-  return db()
-    .auditLogs.filter((l) => (l.tenantId ? ids.has(l.tenantId) : false))
-    .slice(-limit)
-    .reverse();
+/** Audit logs scoped to a tenant set. Routed through the persistence adapter. */
+export async function listAuditLogsForTenants(
+  tenantIds: string[],
+  limit = 100,
+): Promise<AuditLog[]> {
+  return getPersistence().audit.recentForTenants(tenantIds, limit);
 }
 
 /** AI generation jobs scoped to a tenant set, newest first. */
@@ -5718,10 +5718,10 @@ export interface SchoolDashboardSnapshot {
   };
 }
 
-export function getSchoolDashboard(
+export async function getSchoolDashboard(
   tenantId: string,
   schoolId?: string,
-): SchoolDashboardSnapshot {
+): Promise<SchoolDashboardSnapshot> {
   const store = db();
   const tenant = getTenantById(tenantId);
   const schools = listSchools(tenantId);
@@ -5744,7 +5744,7 @@ export function getSchoolDashboard(
     return l?.tenantId === tenantId;
   });
 
-  const auditLogs = listAuditLogsForTenants([tenantId], 1000);
+  const auditLogs = await listAuditLogsForTenants([tenantId], 1000);
   const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
   const auditEvents30d = auditLogs.filter(
     (a) => new Date(a.occurredAt).getTime() >= thirtyDaysAgo,
