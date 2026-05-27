@@ -2632,29 +2632,15 @@ export type UserSummary = {
   role: Role;
   joinedAt: string;
 };
-export function listUsersForTenants(tenantIds: string[]): UserSummary[] {
-  const ids = new Set(tenantIds);
-  const rows: UserSummary[] = [];
-  for (const m of db().memberships) {
-    if (!ids.has(m.tenantId)) continue;
-    const u = db().users.get(m.userId);
-    if (!u) continue;
-    rows.push({
-      user: u,
-      tenantId: m.tenantId,
-      role: m.role,
-      joinedAt: m.createdAt,
-    });
-  }
-  return rows.sort((a, b) => a.user.displayName.localeCompare(b.user.displayName));
+export async function listUsersForTenants(tenantIds: string[]): Promise<UserSummary[]> {
+  return getPersistence().identity.listUsersForTenants(tenantIds);
 }
 
-export function updateUserDisplayName(userId: string, displayName: string): User | null {
-  const u = db().users.get(userId);
-  if (!u) return null;
-  const next: User = { ...u, displayName };
-  db().users.set(userId, next);
-  return next;
+export async function updateUserDisplayName(
+  userId: string,
+  displayName: string,
+): Promise<User | null> {
+  return getPersistence().identity.updateUserDisplayName(userId, displayName);
 }
 
 /** Audit logs scoped to a tenant set. Routed through the persistence adapter. */
@@ -5468,9 +5454,13 @@ export function getDistrictStats(tenantIds: string[]): DistrictStats {
  * Users in this tenant set holding an admin/teacher/etc. role. Used by the
  * district admins + staff pages. `roles` filters the result.
  */
-export function listMembersByRole(tenantIds: string[], roles: Role[]): UserSummary[] {
+export async function listMembersByRole(
+  tenantIds: string[],
+  roles: Role[],
+): Promise<UserSummary[]> {
   const wanted = new Set(roles);
-  return listUsersForTenants(tenantIds).filter((u) => wanted.has(u.role));
+  const all = await listUsersForTenants(tenantIds);
+  return all.filter((u) => wanted.has(u.role));
 }
 
 /**
@@ -5532,16 +5522,13 @@ export function listDistrictSchools(tenantIds: string[]): DistrictSchoolRow[] {
 }
 
 /** Look up a single user by id. Returns null when not found. */
-export function getUserById(id: string): User | null {
-  return db().users.get(id) ?? null;
+export async function getUserById(id: string): Promise<User | null> {
+  return getPersistence().identity.getUserById(id);
 }
 
 /** List all memberships for a single user, newest first. */
-export function listMembershipsForUser(userId: string): TenantMembership[] {
-  return db()
-    .memberships.filter((m) => m.userId === userId)
-    .slice()
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+export async function listMembershipsForUser(userId: string): Promise<TenantMembership[]> {
+  return getPersistence().identity.listMembershipsForUser(userId);
 }
 
 /** Invoices across many tenants, newest first. */
@@ -5731,7 +5718,8 @@ export async function getSchoolDashboard(
   const learners = Array.from(store.learnerProfiles.values()).filter(
     (l) => l.tenantId === tenantId,
   );
-  const staff = listUsersForTenants([tenantId]).filter((u) =>
+  const allStaff = await listUsersForTenants([tenantId]);
+  const staff = allStaff.filter((u) =>
     ["TEACHER", "SCHOOL_ADMIN", "DISTRICT_ADMIN", "THERAPIST"].includes(u.role as string),
   );
   const classes = listClassrooms({
@@ -6023,12 +6011,12 @@ export function deleteClassroom(id: string, tenantId: string): boolean {
 // half so the admin can complete invites and revoke access.
 // ---------------------------------------------------------------------------
 
-export function addStaffUser(input: {
+export async function addStaffUser(input: {
   tenantId: string;
   email: string;
   displayName: string;
   role: "TEACHER" | "SCHOOL_ADMIN" | "THERAPIST" | "CAREGIVER";
-}): {
+}): Promise<{
   id: string;
   tenantId: string;
   email: string;
@@ -6036,41 +6024,12 @@ export function addStaffUser(input: {
   role: "TEACHER" | "SCHOOL_ADMIN" | "THERAPIST" | "CAREGIVER";
   status: "INVITED";
   createdAt: string;
-} {
-  const id = newId("user");
-  const createdAt = nowIso();
-  const rec = {
-    id,
-    tenantId: input.tenantId,
-    email: input.email,
-    displayName: input.displayName,
-    role: input.role,
-    status: "INVITED" as const,
-    createdAt,
-  };
-  // Best-effort persistence — the in-memory store keeps users in a Map.
-  db().users.set(id, rec as never);
-  const roleMap: Record<string, Role> = {
-    TEACHER: "teacher",
-    SCHOOL_ADMIN: "school_admin",
-    THERAPIST: "therapist",
-    CAREGIVER: "caregiver",
-  };
-  const role = roleMap[input.role] ?? "teacher";
-  db().memberships.push({
-    userId: id,
-    tenantId: input.tenantId,
-    role,
-    joinedAt: createdAt,
-  } as never);
-  return rec;
+}> {
+  return getPersistence().identity.addStaffUser(input);
 }
 
-export function removeStaffUser(userId: string, tenantId: string): boolean {
-  const u = db().users.get(userId) as ({ tenantId?: string } | undefined);
-  if (!u || u.tenantId !== tenantId) return false;
-  db().users.delete(userId);
-  return true;
+export async function removeStaffUser(userId: string, tenantId: string): Promise<boolean> {
+  return getPersistence().identity.removeStaffUser(userId, tenantId);
 }
 
 // ---------------------------------------------------------------------------

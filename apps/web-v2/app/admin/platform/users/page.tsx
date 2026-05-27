@@ -44,7 +44,7 @@ const ROLE_ORDER: Role[] = [
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
-  const users = listUsersForTenants(tenants.map((t) => t.id));
+  const users = await listUsersForTenants(tenants.map((t) => t.id));
   const tenantById = new Map(tenants.map((t) => [t.id, t]));
 
   const byRole = users.reduce<Record<string, number>>((acc, u) => {

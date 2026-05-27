@@ -154,9 +154,9 @@ describe("staff add / remove repo helpers", () => {
     ensureSeeded();
   });
 
-  it("addStaffUser inserts a user with INVITED status", () => {
+  it("addStaffUser inserts a user with INVITED status", async () => {
     const tenant = Array.from(getStore().tenants.values())[0]!;
-    const user = addStaffUser({
+    const user = await addStaffUser({
       tenantId: tenant.id,
       email: "new.teacher@example.com",
       displayName: "Avery Teacher",
@@ -166,16 +166,16 @@ describe("staff add / remove repo helpers", () => {
     expect((user as { status?: string }).status).toBe("INVITED");
   });
 
-  it("removeStaffUser returns false for a foreign tenant", () => {
+  it("removeStaffUser returns false for a foreign tenant", async () => {
     const tenant = Array.from(getStore().tenants.values())[0]!;
-    const user = addStaffUser({
+    const user = await addStaffUser({
       tenantId: tenant.id,
       email: "x@example.com",
       displayName: "X",
       role: "TEACHER",
     });
-    expect(removeStaffUser(user.id, "other-tenant")).toBe(false);
-    expect(removeStaffUser(user.id, tenant.id)).toBe(true);
-    expect(removeStaffUser(user.id, tenant.id)).toBe(false); // already gone
+    expect(await removeStaffUser(user.id, "other-tenant")).toBe(false);
+    expect(await removeStaffUser(user.id, tenant.id)).toBe(true);
+    expect(await removeStaffUser(user.id, tenant.id)).toBe(false); // already gone
   });
 });

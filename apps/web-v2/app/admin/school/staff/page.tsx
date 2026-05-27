@@ -11,9 +11,8 @@ export default async function Page() {
   const session = await requirePageRole(["school_admin"]);
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const tenantMap = new Map(tenants.map((t) => [t.id, t]));
-  const staff = listUsersForTenants(tenants.map((t) => t.id)).filter(
-    (u) => u.role !== "parent" && u.role !== "learner",
-  );
+  const allStaff = await listUsersForTenants(tenants.map((t) => t.id));
+  const staff = allStaff.filter((u) => u.role !== "parent" && u.role !== "learner");
 
   return (
     <AppShell

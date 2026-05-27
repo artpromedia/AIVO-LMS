@@ -33,7 +33,7 @@ export async function PATCH(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    const user = updateUserDisplayName(session!.userId, displayName);
+    const user = await updateUserDisplayName(session!.userId, displayName);
     audit(session!, "account.update", requestId, {});
     return ok({ user }, requestId);
   } catch (e) {

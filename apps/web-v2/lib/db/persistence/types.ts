@@ -11,7 +11,14 @@
  * See `docs/adr/0007-web-v2-persistence-migration.md` for the
  * decision record + migration order.
  */
-import type { AuditLog, Notification, NotificationDelivery } from "@/lib/db/types";
+import type {
+  AuditLog,
+  Notification,
+  NotificationDelivery,
+  TenantMembership,
+  User,
+} from "@/lib/db/types";
+import type { Role } from "@/lib/auth/types";
 
 export type PersistenceMode = "memory" | "postgres";
 
@@ -53,10 +60,55 @@ export interface AuditStore {
   recentForTenants(tenantIds: string[], limit: number): Promise<AuditLog[]>;
 }
 
+/**
+ * Identity domain — users + tenant memberships. Sessions live in the
+ * mock-session cookie + (eventually) `services/identity-svc` and are
+ * deliberately out of scope for this store.
+ */
+export type StaffUserRole = "TEACHER" | "SCHOOL_ADMIN" | "THERAPIST" | "CAREGIVER";
+
+export interface StaffUserRecord {
+  id: string;
+  tenantId: string;
+  email: string;
+  displayName: string;
+  role: StaffUserRole;
+  status: "INVITED";
+  createdAt: string;
+}
+
+export interface UserSummary {
+  user: User;
+  tenantId: string;
+  role: Role;
+  joinedAt: string;
+}
+
+export interface IdentityStore {
+  getUserById(id: string): Promise<User | null>;
+  listUsersForTenants(tenantIds: string[]): Promise<UserSummary[]>;
+  listMembershipsForUser(userId: string): Promise<TenantMembership[]>;
+  updateUserDisplayName(userId: string, displayName: string): Promise<User | null>;
+  /**
+   * Add a "INVITED" staff user with a default tenant membership.
+   * Idempotency / re-invite semantics are caller-controlled; the
+   * store does no dedupe on email.
+   */
+  addStaffUser(input: {
+    tenantId: string;
+    email: string;
+    displayName: string;
+    role: StaffUserRole;
+  }): Promise<StaffUserRecord>;
+  /** Hard delete; returns false if the user isn't in this tenant. */
+  removeStaffUser(userId: string, tenantId: string): Promise<boolean>;
+}
+
 export interface Persistence {
   mode: PersistenceMode;
   notifications: NotificationStore;
   audit: AuditStore;
+  identity: IdentityStore;
   /**
    * Future domains land here. Each new domain ships:
    *   1. An interface in this file.

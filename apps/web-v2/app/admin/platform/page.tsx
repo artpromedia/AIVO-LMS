@@ -28,7 +28,7 @@ export default async function PlatformAdminHome() {
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const tenantIds = tenants.map((t) => t.id);
   const h = computeSystemHealth(tenantIds);
-  const users = listUsersForTenants(tenantIds);
+  const users = await listUsersForTenants(tenantIds);
   const learners = listLearnersForTenants(tenantIds);
   const billing = listBillingForTenants(tenantIds);
   const recentJobs = listAiGenerationJobs(tenantIds, 8);

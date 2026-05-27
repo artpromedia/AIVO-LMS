@@ -59,7 +59,7 @@ export default async function ParentTeamPage({
   // this is the single source of truth for who is linked to *this* learner.
   for (const rel of store.parentLearnerRelationships) {
     if (rel.learnerId !== learner.id || rel.tenantId !== session.tenantId) continue;
-    const u = getUserById(rel.parentUserId);
+    const u = await getUserById(rel.parentUserId);
     if (!u) continue;
     const role =
       rel.relation === "caregiver"
@@ -98,7 +98,7 @@ export default async function ParentTeamPage({
         e.role === "teacher",
     );
     for (const tEnr of teacherEnrs) {
-      const u = getUserById(tEnr.subjectId);
+      const u = await getUserById(tEnr.subjectId);
       if (!u || members.has(u.id)) continue;
       members.set(u.id, {
         userId: u.id,

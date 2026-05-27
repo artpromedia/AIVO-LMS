@@ -21,7 +21,8 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
     // Confirm the target user lives inside the admin's tenant scope before
     // touching them — prevents school admins editing district admin records.
     const scope = adminScopeForSession(session!);
-    const inScope = listUsersForTenants(scope.tenantIds).some((u) => u.user.id === userId);
+    const scopeUsers = await listUsersForTenants(scope.tenantIds);
+    const inScope = scopeUsers.some((u) => u.user.id === userId);
     if (!inScope) {
       return fail({ ...ERRORS.NOT_FOUND, message: "User not found." }, requestId);
     }
@@ -33,7 +34,7 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
         requestId,
       );
     }
-    const user = updateUserDisplayName(userId, displayName);
+    const user = await updateUserDisplayName(userId, displayName);
     audit(session!, "admin.user.update", requestId, { metadata: { userId } });
     return ok({ user }, requestId);
   } catch (e) {

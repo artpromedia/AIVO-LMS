@@ -30,7 +30,7 @@ export default async function Page() {
   // Precompute creator map: one lookup per distinct creator, not per row.
   const creatorById = new Map<string, User>();
   for (const id of new Set(keys.map((k) => k.createdByUserId))) {
-    const u = getUserById(id);
+    const u = await getUserById(id);
     if (u) creatorById.set(id, u);
   }
 

@@ -17,6 +17,8 @@ import { memoryNotifications } from "./memory/notifications";
 import { drizzleNotifications } from "./drizzle/notifications";
 import { memoryAudit } from "./memory/audit";
 import { drizzleAudit } from "./drizzle/audit";
+import { memoryIdentity } from "./memory/identity";
+import { drizzleIdentity } from "./drizzle/identity";
 
 type DomainKey = "notifications" | "audit" | "identity" | "learners";
 
@@ -36,6 +38,7 @@ export function getPersistence(): Persistence {
   if (cached) return cached;
   const notificationsMode = resolveMode("notifications");
   const auditMode = resolveMode("audit");
+  const identityMode = resolveMode("identity");
   cached = {
     // The aggregate `mode` is the global value; per-domain modes are
     // visible on the individual stores at construction time (above).
@@ -44,6 +47,7 @@ export function getPersistence(): Persistence {
     notifications:
       notificationsMode === "postgres" ? drizzleNotifications : memoryNotifications,
     audit: auditMode === "postgres" ? drizzleAudit : memoryAudit,
+    identity: identityMode === "postgres" ? drizzleIdentity : memoryIdentity,
   };
   return cached;
 }

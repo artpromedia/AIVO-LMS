@@ -63,7 +63,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    const user = addStaffUser({
+    const user = await addStaffUser({
       tenantId,
       email: body.email,
       displayName: body.displayName,
@@ -96,7 +96,7 @@ export async function DELETE(req: Request): Promise<NextResponse> {
         { code: "validation_error", message: "id is required", userMessage: "User id is required.", status: 400 },
         requestId,
       );
-    const removed = removeStaffUser(id, tenantId);
+    const removed = await removeStaffUser(id, tenantId);
     if (!removed)
       return fail(
         { code: "not_found", message: "Staff user not found", userMessage: "That staff member is no longer on the roster.", status: 404 },
