@@ -1229,7 +1229,9 @@ export type PolicyKind =
   | "terms_of_service"
   | "coppa_notice"
   | "ferpa_notice"
-  | "dpa_template";
+  | "dpa_template"
+  | "accessibility_statement"
+  | "security_overview";
 
 export type PolicyVersion = {
   id: ID;

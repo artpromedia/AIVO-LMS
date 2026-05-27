@@ -1097,6 +1097,24 @@ export function ensureSeeded(): void {
       summary: "Standard data-processing agreement template for schools.",
       url: null,
     },
+    {
+      kind: "accessibility_statement",
+      version: "2025-01-01",
+      effectiveAt: "2025-01-01T00:00:00.000Z",
+      summary:
+        "AIVO targets WCAG 2.1 AA. Lessons include read-aloud, captions, " +
+        "AAC support, large text, reduced motion, and keyboard-only paths.",
+      url: null,
+    },
+    {
+      kind: "security_overview",
+      version: "2025-01-01",
+      effectiveAt: "2025-01-01T00:00:00.000Z",
+      summary:
+        "Data is encrypted in transit (TLS) and at rest. Access is " +
+        "role-scoped per tenant; SOC 2 Type II controls govern operations.",
+      url: null,
+    },
   ];
   for (const p of policies) {
     const id = newId("pol");

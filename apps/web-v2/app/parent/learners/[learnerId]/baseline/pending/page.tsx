@@ -137,13 +137,13 @@ export default async function BaselinePendingPage({
         <BaselinePendingCard
           learnerName={learner.preferredName || learner.firstName}
           inputs={inputs}
-          estimate="Usually under 2 minutes. You can leave this page — we'll keep going in the background."
+          estimate="Usually under 2 minutes. Stay on this page — we'll redirect you as soon as the first question set is ready."
           secondary={
             <Link
-              href={`/parent/learners/${learner.id}`}
+              href={`/parent/learners/${learner.id}/baseline/pending`}
               className="inline-flex items-center gap-1.5 rounded-iw-control px-4 py-2 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
             >
-              Check back later
+              Try again
             </Link>
           }
         />

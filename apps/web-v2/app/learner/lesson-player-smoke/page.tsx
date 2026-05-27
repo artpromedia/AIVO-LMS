@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
 import { LEARNER_NAV } from "@/components/layout/role-shells";
 import { requirePageRole } from "@/lib/auth/server";
@@ -20,6 +21,10 @@ type Props = {
 };
 
 export default async function LessonPlayerSmokePage({ searchParams }: Props) {
+  // Dev/test affordance only — refuse to render this smoke surface in
+  // production. The fixture wires mock data through the production
+  // lesson-player and would otherwise be navigable by real users.
+  if (process.env.NODE_ENV === "production") notFound();
   const session = await requirePageRole(["learner", "parent"]);
   const learnerId =
     session.role === "learner" ? (session.learnerId ?? "lrn_demo_sky") : await readActiveLearnerFromCookies(session);

@@ -1,12 +1,13 @@
+import { notFound } from "next/navigation";
 import { LessonPlayer } from "@/app/learner/lesson-runs/[lessonRunId]/lesson-player";
 import { requirePageRole } from "@/lib/auth/server";
 import type { GeneratedLessonPlan } from "@/lib/db/types";
 
 /**
  * Lesson-player fixture page. Exercises one surface type per visit via
- * `?surfaceType=...`. Reachable in every environment but role-gated to
- * `learner` and `parent` so the BFF lesson-player contract is never
- * exposed to anonymous visitors (route-audit gate).
+ * `?surfaceType=...`. Role-gated to `learner` and `parent`, and
+ * additionally locked out of production builds (NODE_ENV=production)
+ * so this dev-only surface never reaches real users.
  */
 
 type FixtureSurfaceType =
@@ -145,6 +146,9 @@ function fixturePlan(surfaceType: FixtureSurfaceType): GeneratedLessonPlan {
 }
 
 export default async function LessonPlayerFixturePage({ searchParams }: FixturePageProps) {
+  // Dev/test affordance only — refuse to render the fixture in
+  // production builds even if a role-authorised user navigates here.
+  if (process.env.NODE_ENV === "production") notFound();
   const session = await requirePageRole(["learner", "parent"]);
   const params = await searchParams;
   const requested = params?.surfaceType;
