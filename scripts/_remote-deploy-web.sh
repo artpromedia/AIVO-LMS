@@ -40,4 +40,4 @@ kubectl -n aivo set image deployment/web "web=ghcr.io/artpromedia/web:$TAG"
 kubectl -n aivo rollout status deployment/web --timeout=240s
 echo "$TAG" > /opt/aivo-deploy/TAG.web
 echo "==> Pods"
-kubectl -n aivo get pods -l app=web -o wide
+kubectl -n aivo get pods -l app.kubernetes.io/name=web -o wide

@@ -93,7 +93,7 @@ Invoke-Ssh "SKIP_KEY_ENSURE=$skipFlag bash /opt/aivo-deploy/_remote-deploy-web.s
 # 4. Quick post-deploy probe.
 # ---------------------------------------------------------------------------
 Write-Host '==> Post-deploy pods' -ForegroundColor Cyan
-Invoke-Ssh 'kubectl -n aivo get pods -l app=web -o wide'
+Invoke-Ssh 'kubectl -n aivo get pods -l app.kubernetes.io/name=web -o wide'
 
 Write-Host ''
 Write-Host "Done. Tag: $Tag" -ForegroundColor Green
