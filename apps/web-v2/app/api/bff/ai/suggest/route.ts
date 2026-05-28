@@ -1,6 +1,5 @@
 import { fail, failFromUnknown, getRequestId, ok } from "@/lib/bff/response";
 import { ERRORS } from "@/lib/bff/errors";
-import { requireSession } from "@/lib/bff/guards";
 import {
   generateSuggestions,
   isFieldType,
@@ -36,10 +35,6 @@ function asStringArray(v: unknown, max = 40): string[] {
 export async function POST(req: Request) {
   const requestId = getRequestId(req);
   try {
-    const { session, response } = await requireSession(req, requestId);
-    if (response) return response;
-    void session;
-
     const body = (await req.json().catch(() => ({}))) as Body;
     if (!isFieldType(body.fieldType)) {
       return fail(

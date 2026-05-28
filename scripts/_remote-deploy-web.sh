@@ -1,7 +1,27 @@
 #!/usr/bin/env bash
 set -euo pipefail
 TAG="${1:?tag required}"
+SKIP_KEY_ENSURE="${SKIP_KEY_ENSURE:-0}"
 cd /opt/aivo-deploy
+
+# One-time: pin NEXT_SERVER_ACTIONS_ENCRYPTION_KEY on the web Deployment so
+# Server Action IDs stay stable across pod replicas and redeploys.
+# Done in bash (not the PS driver) to avoid PowerShell<->ssh quoting issues
+# around the jsonpath expression.
+if [ "$SKIP_KEY_ENSURE" != "1" ]; then
+  echo "==> Ensuring NEXT_SERVER_ACTIONS_ENCRYPTION_KEY is pinned"
+  HAS_KEY="$(kubectl -n aivo get deployment/web \
+    -o jsonpath='{.spec.template.spec.containers[?(@.name=="web")].env[?(@.name=="NEXT_SERVER_ACTIONS_ENCRYPTION_KEY")].name}' \
+    2>/dev/null || true)"
+  if [ -z "$HAS_KEY" ]; then
+    echo "    setting new key (one-time)"
+    KEY="$(openssl rand -base64 32)"
+    kubectl -n aivo set env deployment/web "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=$KEY"
+  else
+    echo "    already set — leaving as-is"
+  fi
+fi
+
 echo "==> Extract"
 rm -rf AIVO-LMS
 mkdir AIVO-LMS

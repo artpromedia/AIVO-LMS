@@ -42,12 +42,47 @@ const TWEMOJI_CDN_BASE =
  * by server components / server actions in web-v2. On the client the
  * env var would be undefined and we'd silently fall back to Twemoji.
  */
+/**
+ * Returns ``true`` when the given URL is safe to serve to a browser:
+ * https-scheme and a publicly-resolvable hostname. Internal cluster
+ * URLs (``*.svc.cluster.local``, bare service names like ``ai-svc``,
+ * loopback addresses) are rejected so they never leak into an
+ * ``<img src>`` rendered on a public page.
+ */
+function isPublicHttpsUrl(raw: string): boolean {
+  let u: URL;
+  try {
+    u = new URL(raw);
+  } catch {
+    return false;
+  }
+  if (u.protocol !== "https:") return false;
+  const host = u.hostname.toLowerCase();
+  if (!host || host === "localhost") return false;
+  if (host.endsWith(".svc.cluster.local")) return false;
+  if (host.endsWith(".local")) return false;
+  // Bare single-label hostnames (e.g. ``ai-svc``) only resolve inside
+  // the cluster — refuse to emit them to the browser.
+  if (!host.includes(".")) return false;
+  // Loopback / link-local literals.
+  if (host === "127.0.0.1" || host === "::1" || host.startsWith("169.254.")) {
+    return false;
+  }
+  return true;
+}
+
 function getAiSvcImageBase(): string | undefined {
   // Prefer the explicit override, then derive from AI_SVC_URL.
   const explicit = process.env.AIVO_BASELINE_IMAGE_BASE_URL?.trim();
-  if (explicit) return explicit.replace(/\/+$/, "");
+  if (explicit) {
+    const trimmed = explicit.replace(/\/+$/, "");
+    return isPublicHttpsUrl(trimmed) ? trimmed : undefined;
+  }
   const aiSvc = process.env.AI_SVC_URL?.trim();
-  if (aiSvc) return `${aiSvc.replace(/\/+$/, "")}/api/ai/baseline-image`;
+  if (aiSvc) {
+    const candidate = `${aiSvc.replace(/\/+$/, "")}/api/ai/baseline-image`;
+    return isPublicHttpsUrl(candidate) ? candidate : undefined;
+  }
   return undefined;
 }
 

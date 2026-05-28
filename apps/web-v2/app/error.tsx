@@ -1,7 +1,20 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+
+/**
+ * Detects the Next.js ``UnrecognizedActionError`` — a Server Action ID
+ * baked into the cached client bundle no longer exists on the server
+ * after a redeploy. The user's tab is stale; a hard reload pulls the
+ * fresh bundle whose action IDs match the server.
+ */
+function isStaleServerActionError(error: Error): boolean {
+  const msg = `${error.name} ${error.message}`;
+  return /UnrecognizedActionError|Server Action .* was not found/i.test(msg);
+}
+
+const RELOAD_FLAG_KEY = "aivo:auto-reloaded-for-stale-action";
 
 export default function ErrorPage({
   error,
@@ -10,10 +23,47 @@ export default function ErrorPage({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const [autoRecovering, setAutoRecovering] = useState(false);
+
   useEffect(() => {
-    // Surface to console in dev; production errors are already captured server-side.
     console.error("[app/error]", error);
+
+    if (typeof window === "undefined") return;
+    if (!isStaleServerActionError(error)) return;
+    // Guard against an infinite reload loop: only auto-reload once per
+    // session. If the error persists after a hard reload, fall through
+    // to the normal error UI so the user can see it.
+    try {
+      if (window.sessionStorage.getItem(RELOAD_FLAG_KEY)) return;
+      window.sessionStorage.setItem(RELOAD_FLAG_KEY, "1");
+    } catch {
+      // sessionStorage may be unavailable (private mode); skip auto-reload.
+      return;
+    }
+    setAutoRecovering(true);
+    // Use ``replace`` so the broken state isn't kept in history, and
+    // append a cache-buster so any intermediate proxy can't serve a
+    // stale HTML document.
+    const url = new URL(window.location.href);
+    url.searchParams.set("_r", Date.now().toString(36));
+    window.location.replace(url.toString());
   }, [error]);
+
+  if (autoRecovering) {
+    return (
+      <main
+        id="main"
+        className="mx-auto flex min-h-[70vh] max-w-xl flex-col items-center justify-center px-6 py-16 text-center"
+      >
+        <p className="text-sm font-medium uppercase tracking-wide text-aivo-ink-soft">
+          Refreshing
+        </p>
+        <h1 className="mt-2 font-display text-3xl font-bold">
+          One moment — getting the latest version…
+        </h1>
+      </main>
+    );
+  }
 
   return (
     <main

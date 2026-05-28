@@ -50,6 +50,13 @@ export const metadata: Metadata = {
   description: "Personalized learning adventures for every child.",
   manifest: "/manifest.webmanifest",
   themeColor: INCLUSIVE_WARM_PALETTE.primary,
+  icons: {
+    icon: [
+      { url: "/images/favicon-192.png", type: "image/png", sizes: "192x192" },
+    ],
+    apple: [{ url: "/images/favicon-192.png", sizes: "192x192" }],
+    shortcut: ["/images/favicon-192.png"],
+  },
   appleWebApp: {
     capable: true,
     title: "AIVO",

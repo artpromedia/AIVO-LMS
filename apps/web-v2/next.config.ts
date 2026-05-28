@@ -41,6 +41,12 @@ const nextConfig: NextConfig = {
   // mobile screenshots and isn't useful day-to-day. Production builds
   // never render it; this flag silences it in dev too.
   devIndicators: false,
+  // NOTE: Set ``NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`` (32+ random bytes,
+  // base64) in the deployment env so Server Action IDs are stable
+  // across pod replicas and across redeploys of the same build.
+  // Without a pinned key Next auto-generates a per-build value, which
+  // causes ``UnrecognizedActionError`` 404s on the login form for users
+  // who have a stale tab after a rolling deploy.
   async headers() {
     return [{ source: "/:path*", headers: SECURITY_HEADERS }];
   },
