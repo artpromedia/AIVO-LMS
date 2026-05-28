@@ -12,10 +12,10 @@ type Params = { params: Promise<{ classId: string }> };
 export default async function Page({ params }: Params) {
   const session = await requirePageRole(["school_admin", "district_admin", "platform_admin"]);
   const { classId } = await params;
-  const classroom = getClassroom(classId, session.tenantId);
+  const classroom = await getClassroom(classId, session.tenantId);
   if (!classroom) notFound();
-  const school = getSchool(classroom.schoolId);
-  const enrollments = listEnrollments(classroom.id);
+  const school = await getSchool(classroom.schoolId);
+  const enrollments = await listEnrollments(classroom.id);
   const teachers = enrollments.filter((e) => e.role === "teacher" || e.role === "co_teacher");
   const learners = enrollments.filter((e) => e.role === "learner");
 

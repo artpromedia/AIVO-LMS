@@ -27,7 +27,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     if (roleErr) return roleErr;
     const url = new URL(req.url);
     const schoolId = url.searchParams.get("schoolId") ?? undefined;
-    const classrooms = listClassrooms({ tenantId: session!.tenantId, schoolId });
+    const classrooms = await listClassrooms({ tenantId: session!.tenantId, schoolId });
     return ok({ classrooms }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
@@ -57,7 +57,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    const school = getSchool(parsed.data.schoolId);
+    const school = await getSchool(parsed.data.schoolId);
     if (!school) {
       return fail({ ...ERRORS.NOT_FOUND, message: "School not found." }, requestId);
     }
@@ -67,7 +67,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    const rec = createClassroom({
+    const rec = await createClassroom({
       tenantId: school.tenantId,
       schoolId: parsed.data.schoolId,
       name: parsed.data.name,

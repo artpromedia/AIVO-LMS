@@ -38,7 +38,7 @@ export default async function Page() {
       ) : (
         await Promise.all(
           learners.map(async (l) => {
-            const assignments = listActiveAssignmentsForLearner(l.id, session.tenantId);
+            const assignments = await listActiveAssignmentsForLearner(l.id, session.tenantId);
             const allActive = await listLessonRunsForLearner(l.id, session.tenantId);
             const activeRuns = allActive.filter(
               (r) => r.status === "ready" || r.status === "in_progress",

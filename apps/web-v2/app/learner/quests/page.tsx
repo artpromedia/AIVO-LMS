@@ -35,13 +35,14 @@ export default async function LearnerQuestsPage() {
     if (!learnerId) redirect("/learner/select");
   }
 
-  const worlds = listQuestWorlds();
-  const progress = listQuestProgressForLearner(learnerId, session.tenantId);
+  const worlds = await listQuestWorlds();
+  const progress = await listQuestProgressForLearner(learnerId, session.tenantId);
   const completedChapterIds = new Set(
     progress.filter((p) => p.progress >= 1).map((p) => p.chapterId),
   );
 
-  const totalChapters = worlds.reduce((acc, w) => acc + listQuestChapters(w.id).length, 0);
+  const chaptersByWorld = await Promise.all(worlds.map((w) => listQuestChapters(w.id)));
+  const totalChapters = chaptersByWorld.reduce((acc, list) => acc + list.length, 0);
   const completedCount = completedChapterIds.size;
 
   return (
@@ -90,9 +91,10 @@ export default async function LearnerQuestsPage() {
           </section>
 
           <section className="mt-6 grid gap-4 md:grid-cols-2" aria-label="Quest worlds">
-            {worlds.map((w) => {
-              const chapters = listQuestChapters(w.id);
-              const normal = chapters.filter((c) => !c.isBoss);
+            {await Promise.all(
+              worlds.map(async (w) => {
+                const chapters = await listQuestChapters(w.id);
+                const normal = chapters.filter((c) => !c.isBoss);
               const boss = chapters.find((c) => c.isBoss);
               const done = normal.filter((c) => completedChapterIds.has(c.id)).length;
               const bossDone = boss ? completedChapterIds.has(boss.id) : false;
@@ -140,8 +142,9 @@ export default async function LearnerQuestsPage() {
                     </svg>
                   </Link>
                 </GlassCard>
-              );
-            })}
+                );
+              }),
+            )}
           </section>
         </>
       )}

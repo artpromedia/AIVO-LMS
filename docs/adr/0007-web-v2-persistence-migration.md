@@ -1,9 +1,30 @@
 # 0007 — Web-v2 persistence migration (in-memory → Drizzle/Postgres)
 
-- **Status:** Accepted
+- **Status:** Accepted — adapter rollout complete (memory mode), drizzle wiring deferred per-domain
 - **Date:** 2026-05-27
 - **Deciders:** web-v2 platform team
 - **Related:** AIVO-LMS audit gap #4 ("web-v2 core runtime still in-memory/mock-backed")
+
+## Rollout status (as of 2026-05-28)
+
+All 11 migration steps have routed their repo functions through the
+`Persistence` adapter. The memory adapter is the default in every
+mode; the drizzle adapter is a per-domain stub awaiting the schema
+wiring listed in each `drizzle/*.ts` file's header comment.
+
+| # | Domain                                  | Status      | Notes                                                                |
+| - | --------------------------------------- | ----------- | -------------------------------------------------------------------- |
+| 1 | notifications                           | ✅ memory   | drizzle stub; awaits notifications schema in packages/db             |
+| 2 | audit log                               | ✅ memory   | drizzle stub; awaits audit_logs schema                               |
+| 3 | identity (users + memberships)          | ✅ memory   | drizzle wiring deferred (schemas exist in packages/db/users)         |
+| 4 | learners + parent/learner relationships | ✅ memory   | drizzle wiring deferred (schemas exist in packages/db/learners)      |
+| 5 | assessments + baseline runs             | ✅ memory   | drizzle wiring deferred (schemas exist in packages/db/assessments)   |
+| 6 | lesson runs + generated lesson plans    | ✅ memory   | drizzle wiring deferred (schemas exist in packages/db/learning)      |
+| 7 | brain profile / clone                   | ✅ memory   | drizzle wiring deferred; bypassed when AIVO_USE_BRAIN_SVC=true       |
+| 8 | curriculum (subjects/skills/path/mastery)| ✅ memory  | drizzle wiring deferred (schemas exist in packages/db/curriculum)    |
+| 9 | care team + consent + privacy           | ✅ memory   | drizzle wiring deferred (schemas exist in packages/db/data-governance)|
+| 10| quests / gamification                   | ✅ memory   | drizzle stub; awaits quests schema in packages/db                    |
+| 11| teacher / school / district admin       | ✅ memory   | drizzle wiring deferred (schemas exist in packages/db/tenancy)       |
 
 ## Context
 

@@ -38,7 +38,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     });
     const mastery = await getMasteryMap(learnerId, session!.tenantId);
     const iep = await getIEPForLearner(learnerId, session!.tenantId);
-    const assignments = listActiveAssignmentsForLearner(learnerId, session!.tenantId);
+    const assignments = await listActiveAssignmentsForLearner(learnerId, session!.tenantId);
     return ok(
       {
         learner: {

@@ -16,8 +16,10 @@ import type {
   BaselineAssessment,
   BaselineAttempt,
   BaselineQuestion,
+  Classroom,
   ConsentRecord,
   ConsentType,
+  Enrollment,
   GeneratedLessonPlan,
   IEPDocument,
   LearnerBrainProfile,
@@ -31,11 +33,16 @@ import type {
   ParentAssessment,
   ParentLessonSummary,
   PolicyVersion,
+  QuestChapter,
+  QuestProgress,
+  QuestWorld,
   ReadinessState,
+  School,
   Skill,
   SkillMastery,
   Subject,
   SubprocessorRecord,
+  TeacherAssignment,
   TenantMembership,
   User,
 } from "@/lib/db/types";
@@ -310,6 +317,80 @@ export interface ComplianceStore {
   listSubprocessors(): Promise<SubprocessorRecord[]>;
 }
 
+/**
+ * Quest / gamification domain — QuestWorlds and QuestChapters are
+ * seed-time reference data; QuestProgress is per-learner mutable.
+ * Higher-level orchestration (startQuestChapter, the LessonRun
+ * coupling on completion) stays in repos.ts.
+ */
+export interface QuestStore {
+  listWorlds(): Promise<QuestWorld[]>;
+  getWorldById(worldId: string): Promise<QuestWorld | null>;
+  listChaptersForWorld(worldId: string): Promise<QuestChapter[]>;
+  getChapterById(chapterId: string): Promise<QuestChapter | null>;
+  /** All progress rows for the learner, optionally scoped to a world. */
+  listProgressForLearner(
+    learnerId: string,
+    tenantId: string,
+    worldId?: string,
+  ): Promise<QuestProgress[]>;
+  getProgressForChapter(
+    learnerId: string,
+    tenantId: string,
+    chapterId: string,
+  ): Promise<QuestProgress | null>;
+  upsertProgress(progress: QuestProgress): Promise<QuestProgress>;
+}
+
+/**
+ * Admin domain — schools, classrooms, enrollments, and teacher
+ * assignments. Cross-tenant defense-in-depth (e.g. dropping
+ * learnerIds that don't belong to the tenant) stays in repos.ts;
+ * the store does raw row-level reads + writes.
+ */
+export interface AdminStore {
+  // Schools (typically one per tenant, but lookups accept either scope).
+  listSchools(tenantId?: string): Promise<School[]>;
+  getSchoolById(id: string): Promise<School | null>;
+
+  // Classrooms
+  listClassrooms(opts: {
+    tenantId: string;
+    schoolId?: string;
+    teacherUserId?: string;
+  }): Promise<Classroom[]>;
+  getClassroomById(id: string, tenantId: string): Promise<Classroom | null>;
+  upsertClassroom(classroom: Classroom): Promise<Classroom>;
+
+  // Enrollments
+  listEnrollmentsForClassroom(classroomId: string): Promise<Enrollment[]>;
+  upsertEnrollment(enrollment: Enrollment): Promise<Enrollment>;
+  /** Atomic ensure-by-natural-key for (classroomId, subjectId, role). */
+  findEnrollmentByNaturalKey(input: {
+    classroomId: string;
+    subjectId: string;
+    role: Enrollment["role"];
+  }): Promise<Enrollment | null>;
+
+  // Teacher assignments
+  listTeacherAssignments(
+    teacherId: string,
+    tenantId: string,
+    opts?: { status?: "active" | "archived" },
+  ): Promise<TeacherAssignment[]>;
+  getTeacherAssignmentById(
+    assignmentId: string,
+    teacherId: string,
+    tenantId: string,
+  ): Promise<TeacherAssignment | null>;
+  upsertTeacherAssignment(assignment: TeacherAssignment): Promise<TeacherAssignment>;
+  deleteTeacherAssignment(
+    assignmentId: string,
+    teacherId: string,
+    tenantId: string,
+  ): Promise<boolean>;
+}
+
 export interface Persistence {
   mode: PersistenceMode;
   notifications: NotificationStore;
@@ -321,6 +402,8 @@ export interface Persistence {
   brainProfiles: BrainProfileStore;
   curriculum: CurriculumStore;
   compliance: ComplianceStore;
+  quests: QuestStore;
+  admin: AdminStore;
   /**
    * Future domains land here. Each new domain ships:
    *   1. An interface in this file.

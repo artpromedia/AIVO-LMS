@@ -88,7 +88,7 @@ export default async function TeacherHome() {
   ).length;
   const iepCount = fresh.filter((l) => l.iep !== null).length;
   const baselinePending = fresh.filter((l) => l.readinessState === "baseline_needed").length;
-  const activeAssignments = listTeacherAssignments(session.userId, session.tenantId, {
+  const activeAssignments = await listTeacherAssignments(session.userId, session.tenantId, {
     status: "active",
   });
   const dueThisWeek = activeAssignments.filter((a) => {

@@ -9,7 +9,7 @@ import { listClassrooms, listEnrollments } from "@/lib/db/repos";
 
 export default async function Page() {
   const session = await requirePageRole(["teacher"]);
-  const classrooms = listClassrooms({ tenantId: session.tenantId, teacherUserId: session.userId });
+  const classrooms = await listClassrooms({ tenantId: session.tenantId, teacherUserId: session.userId });
 
   return (
     <AppShell
@@ -30,10 +30,11 @@ export default async function Page() {
         />
       ) : (
         <div className="grid gap-3">
-          {classrooms.map((c) => {
-            const enrollments = listEnrollments(c.id);
-            const learners = enrollments.filter((e) => e.role === "learner").length;
-            return (
+          {await Promise.all(
+            classrooms.map(async (c) => {
+              const enrollments = await listEnrollments(c.id);
+              const learners = enrollments.filter((e) => e.role === "learner").length;
+              return (
               <Link
                 key={c.id}
                 href={`/teacher/classes/${c.id}`}
@@ -49,8 +50,9 @@ export default async function Page() {
                   <Badge tone="primary">{c.gradeBand}</Badge>
                 </div>
               </Link>
-            );
-          })}
+              );
+            }),
+          )}
         </div>
       )}
     </AppShell>

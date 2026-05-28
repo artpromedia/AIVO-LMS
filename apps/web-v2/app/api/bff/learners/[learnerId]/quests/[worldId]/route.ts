@@ -39,18 +39,20 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     );
     if (consentErr) return consentErr;
 
-    const world = getQuestWorld(worldId);
+    const world = await getQuestWorld(worldId);
     if (!world) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Quest world not found" }, requestId);
     }
-    const chapters = listQuestChapters(worldId);
-    const progress = listQuestProgressForLearner(learnerId, session!.tenantId, worldId);
+    const chapters = await listQuestChapters(worldId);
+    const progress = await listQuestProgressForLearner(learnerId, session!.tenantId, worldId);
     const progressByChapter = new Map(progress.map((p) => [p.chapterId, p]));
-    const decorated = chapters.map((c) => ({
-      ...c,
-      unlocked: isQuestChapterUnlocked(learnerId, session!.tenantId, c),
-      completed: (progressByChapter.get(c.id)?.progress ?? 0) >= 1,
-    }));
+    const decorated = await Promise.all(
+      chapters.map(async (c) => ({
+        ...c,
+        unlocked: await isQuestChapterUnlocked(learnerId, session!.tenantId, c),
+        completed: (progressByChapter.get(c.id)?.progress ?? 0) >= 1,
+      })),
+    );
     return ok({ world, chapters: decorated }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

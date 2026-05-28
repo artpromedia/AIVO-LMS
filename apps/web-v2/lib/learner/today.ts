@@ -120,16 +120,16 @@ export async function pickTodaysMission(
   // 2. Continue an active quest chapter. We consider a world "active" once
   // the learner has any QuestProgress row in it. Within that world, pick
   // the first unlocked chapter that isn't yet complete.
-  const learnerQuestProgress = listQuestProgressForLearner(learnerId, tenantId);
+  const learnerQuestProgress = await listQuestProgressForLearner(learnerId, tenantId);
   if (learnerQuestProgress.length > 0) {
     const activeWorldIds = Array.from(new Set(learnerQuestProgress.map((p) => p.questWorldId)));
     for (const worldId of activeWorldIds) {
-      const chapters = listQuestChapters(worldId);
+      const chapters = await listQuestChapters(worldId);
       for (const ch of chapters) {
         if (ch.skillIds.length === 0) continue;
-        const prog = getQuestProgress(learnerId, tenantId, ch.id);
+        const prog = await getQuestProgress(learnerId, tenantId, ch.id);
         if (prog && prog.progress >= 1) continue;
-        if (!isQuestChapterUnlocked(learnerId, tenantId, ch)) continue;
+        if (!await isQuestChapterUnlocked(learnerId, tenantId, ch)) continue;
         const subj = store.subjects.get(ch.subjectId);
         const skill = store.skills.get(ch.skillIds[0]);
         if (!subj || !skill) continue;
@@ -156,7 +156,7 @@ export async function pickTodaysMission(
   // 3. Teacher-assigned work. Surfaces even pre-baseline since teachers can
   // legitimately assign work to a learner who hasn't finished their baseline,
   // and the assignment-skill mapping doesn't depend on the learning path.
-  const assignments = listActiveAssignmentsForLearner(learnerId, tenantId);
+  const assignments = await listActiveAssignmentsForLearner(learnerId, tenantId);
   if (assignments.length > 0) {
     const completedAssignmentIds = new Set(
       Array.from(store.lessonRuns.values())

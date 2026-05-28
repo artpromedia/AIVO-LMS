@@ -31,6 +31,10 @@ import { memoryCurriculum } from "./memory/curriculum";
 import { drizzleCurriculum } from "./drizzle/curriculum";
 import { memoryCompliance } from "./memory/compliance";
 import { drizzleCompliance } from "./drizzle/compliance";
+import { memoryQuests } from "./memory/quests";
+import { drizzleQuests } from "./drizzle/quests";
+import { memoryAdmin } from "./memory/admin";
+import { drizzleAdmin } from "./drizzle/admin";
 
 type DomainKey =
   | "notifications"
@@ -41,7 +45,9 @@ type DomainKey =
   | "lessonRuns"
   | "brainProfiles"
   | "curriculum"
-  | "compliance";
+  | "compliance"
+  | "quests"
+  | "admin";
 
 function resolveMode(domain: DomainKey): PersistenceMode {
   const overrides: Record<DomainKey, PersistenceMode | undefined> = {
@@ -54,6 +60,8 @@ function resolveMode(domain: DomainKey): PersistenceMode {
     brainProfiles: serverEnv.AIVO_PERSISTENCE_BRAIN_PROFILES,
     curriculum: serverEnv.AIVO_PERSISTENCE_CURRICULUM,
     compliance: serverEnv.AIVO_PERSISTENCE_COMPLIANCE,
+    quests: serverEnv.AIVO_PERSISTENCE_QUESTS,
+    admin: serverEnv.AIVO_PERSISTENCE_ADMIN,
   };
   return overrides[domain] ?? serverEnv.AIVO_PERSISTENCE;
 }
@@ -71,6 +79,8 @@ export function getPersistence(): Persistence {
   const brainProfilesMode = resolveMode("brainProfiles");
   const curriculumMode = resolveMode("curriculum");
   const complianceMode = resolveMode("compliance");
+  const questsMode = resolveMode("quests");
+  const adminMode = resolveMode("admin");
   cached = {
     // The aggregate `mode` is the global value; per-domain modes are
     // visible on the individual stores at construction time (above).
@@ -89,6 +99,8 @@ export function getPersistence(): Persistence {
       brainProfilesMode === "postgres" ? drizzleBrainProfiles : memoryBrainProfiles,
     curriculum: curriculumMode === "postgres" ? drizzleCurriculum : memoryCurriculum,
     compliance: complianceMode === "postgres" ? drizzleCompliance : memoryCompliance,
+    quests: questsMode === "postgres" ? drizzleQuests : memoryQuests,
+    admin: adminMode === "postgres" ? drizzleAdmin : memoryAdmin,
   };
   return cached;
 }

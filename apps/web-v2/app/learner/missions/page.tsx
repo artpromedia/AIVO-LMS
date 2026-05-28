@@ -27,7 +27,7 @@ export default async function Page() {
     );
   }
   const subjectMap = new Map((await listSubjects()).map((s) => [s.id, s]));
-  const assignments = listActiveAssignmentsForLearner(learnerId, session.tenantId);
+  const assignments = await listActiveAssignmentsForLearner(learnerId, session.tenantId);
   const allRuns = await listLessonRunsForLearner(learnerId, session.tenantId);
   const runs = allRuns.filter((r) => r.status === "ready" || r.status === "in_progress");
 

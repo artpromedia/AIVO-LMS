@@ -12,8 +12,8 @@ type Params = { searchParams: Promise<{ schoolId?: string }> };
 export default async function Page({ searchParams }: Params) {
   const session = await requirePageRole(["school_admin", "district_admin", "platform_admin"]);
   const params = await searchParams;
-  const schools = listSchools(session.role === "platform_admin" ? undefined : session.tenantId);
-  const classrooms = listClassrooms({ tenantId: session.tenantId, schoolId: params.schoolId });
+  const schools = await listSchools(session.role === "platform_admin" ? undefined : session.tenantId);
+  const classrooms = await listClassrooms({ tenantId: session.tenantId, schoolId: params.schoolId });
 
   return (
     <AppShell
@@ -55,9 +55,12 @@ export default async function Page({ searchParams }: Params) {
         />
       ) : (
         <div className="grid gap-3">
-          {classrooms.map((c) => {
-            const learners = listEnrollments(c.id).filter((e) => e.role === "learner").length;
-            return (
+          {await Promise.all(
+            classrooms.map(async (c) => {
+              const learners = (await listEnrollments(c.id)).filter(
+                (e) => e.role === "learner",
+              ).length;
+              return (
               <Link
                 key={c.id}
                 href={`/admin/school/classes/${c.id}`}
@@ -76,8 +79,9 @@ export default async function Page({ searchParams }: Params) {
                   </div>
                 </div>
               </Link>
-            );
-          })}
+              );
+            }),
+          )}
         </div>
       )}
     </AppShell>

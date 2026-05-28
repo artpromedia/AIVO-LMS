@@ -105,7 +105,7 @@ export async function DELETE(req: Request): Promise<NextResponse> {
         { code: "validation_error", message: "id is required", userMessage: "Class id is required.", status: 400 },
         requestId,
       );
-    const removed = deleteClassroom(id, tenantId);
+    const removed = await deleteClassroom(id, tenantId);
     if (!removed)
       return fail(
         { code: "not_found", message: "Classroom not found", userMessage: "That class is not in this school.", status: 404 },

@@ -28,8 +28,8 @@ export default async function Page() {
       </AppShell>
     );
   }
-  const worlds = listQuestWorlds();
-  const progress = listQuestProgressForLearner(learnerId, session.tenantId);
+  const worlds = await listQuestWorlds();
+  const progress = await listQuestProgressForLearner(learnerId, session.tenantId);
   const completedByChapter = new Map(
     progress.map((p) => [p.chapterId, p.progress >= 1]),
   );
@@ -50,10 +50,11 @@ export default async function Page() {
         <StickerBook earned={progress.filter((p) => p.progress >= 1).length} total={Math.max(progress.length, 1)} />
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
-        {worlds.map((w) => {
-          const chapters = listQuestChapters(w.id);
-          const done = chapters.filter((c) => completedByChapter.get(c.id)).length;
-          return (
+        {await Promise.all(
+          worlds.map(async (w) => {
+            const chapters = await listQuestChapters(w.id);
+            const done = chapters.filter((c) => completedByChapter.get(c.id)).length;
+            return (
             <Card key={w.id} className="p-[var(--aivo-density-card-pad)]">
               <div className="flex items-center justify-between">
                 <p className="font-display text-lg font-semibold">{w.name}</p>
@@ -69,8 +70,9 @@ export default async function Page() {
                 Open world →
               </Link>
             </Card>
-          );
-        })}
+            );
+          }),
+        )}
       </div>
     </AppShell>
   );

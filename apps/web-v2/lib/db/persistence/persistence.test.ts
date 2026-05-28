@@ -375,6 +375,79 @@ describe("persistence adapter — notifications (memory)", () => {
     expect(afterRevoke).toBeNull();
   });
 
+  it("quests: progress upsert + getProgressForChapter round-trip", async () => {
+    const quests = getPersistence().quests;
+    const worlds = await quests.listWorlds();
+    expect(worlds.length).toBeGreaterThan(0);
+    const world = worlds[0]!;
+    const chapters = await quests.listChaptersForWorld(world.id);
+    expect(chapters.length).toBeGreaterThan(0);
+    const chapter = chapters[0]!;
+    const now = new Date().toISOString();
+    await quests.upsertProgress({
+      id: "qp-test-1",
+      learnerId: "lrn_demo_sky",
+      tenantId: "t_demo",
+      questWorldId: world.id,
+      chapterId: chapter.id,
+      progress: 1,
+      updatedAt: now,
+    });
+    const got = await quests.getProgressForChapter("lrn_demo_sky", "t_demo", chapter.id);
+    expect(got?.progress).toBe(1);
+  });
+
+  it("admin: classroom upsert + listClassrooms by tenant", async () => {
+    const admin = getPersistence().admin;
+    const before = await admin.listClassrooms({ tenantId: "t_demo" });
+    const now = new Date().toISOString();
+    await admin.upsertClassroom({
+      id: "cls-test-1",
+      tenantId: "t_demo",
+      schoolId: "school-test",
+      name: "Adapter Test Class",
+      gradeBand: "3" as never,
+      teacherUserId: "user-test",
+      courseId: null,
+      createdAt: now,
+    });
+    const after = await admin.listClassrooms({ tenantId: "t_demo" });
+    expect(after.length).toBe(before.length + 1);
+    expect(after.some((c) => c.id === "cls-test-1")).toBe(true);
+  });
+
+  it("admin: teacher-assignment upsert + delete round-trip", async () => {
+    const admin = getPersistence().admin;
+    const now = new Date().toISOString();
+    await admin.upsertTeacherAssignment({
+      id: "ta-test-1",
+      teacherId: "u_demo_teacher",
+      tenantId: "t_demo",
+      classId: null,
+      title: "Adapter Test Assignment",
+      instructions: "Please complete.",
+      subjectId: "sub-x",
+      skillIds: ["skl-x"],
+      learnerIds: ["lrn_demo_sky"],
+      status: "active",
+      dueAt: null,
+      createdAt: now,
+      updatedAt: now,
+    });
+    const fetched = await admin.getTeacherAssignmentById(
+      "ta-test-1",
+      "u_demo_teacher",
+      "t_demo",
+    );
+    expect(fetched?.title).toBe("Adapter Test Assignment");
+    expect(
+      await admin.deleteTeacherAssignment("ta-test-1", "u_demo_teacher", "t_demo"),
+    ).toBe(true);
+    expect(
+      await admin.getTeacherAssignmentById("ta-test-1", "u_demo_teacher", "t_demo"),
+    ).toBeNull();
+  });
+
   it("markNotificationsRead does not bleed across tenants", async () => {
     const { notification } = await createNotification({
       tenantId: "t_demo",

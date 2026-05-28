@@ -1859,67 +1859,54 @@ export async function completeLessonRun(
   // chapter. Progress is binary per chapter today — we just record the
   // completed chapter so prerequisite gating works for boss unlock.
   if (next.source === "quest" && next.sourceRefId) {
-    upsertQuestProgressFromCompletion(next);
+    await upsertQuestProgressFromCompletion(next);
   }
   return next;
 }
 
-// ===== Sprint 16: Quest worlds + progress =====
+// ===== Quest worlds + progress (ADR 0007 step 10) =====
 
-export function listQuestWorlds(): QuestWorld[] {
-  return Array.from(db().questWorlds.values()).sort((a, b) => a.name.localeCompare(b.name));
+export async function listQuestWorlds(): Promise<QuestWorld[]> {
+  return getPersistence().quests.listWorlds();
 }
 
-export function getQuestWorld(worldId: string): QuestWorld | null {
-  return db().questWorlds.get(worldId) ?? null;
+export async function getQuestWorld(worldId: string): Promise<QuestWorld | null> {
+  return getPersistence().quests.getWorldById(worldId);
 }
 
-export function listQuestChapters(worldId: string): QuestChapter[] {
-  return Array.from(db().questChapters.values())
-    .filter((c) => c.questWorldId === worldId)
-    .sort((a, b) => a.order - b.order);
+export async function listQuestChapters(worldId: string): Promise<QuestChapter[]> {
+  return getPersistence().quests.listChaptersForWorld(worldId);
 }
 
-export function listQuestProgressForLearner(
+export async function listQuestProgressForLearner(
   learnerId: string,
   tenantId: string,
   worldId?: string,
-): QuestProgress[] {
-  return Array.from(db().questProgress.values()).filter(
-    (p) =>
-      p.learnerId === learnerId &&
-      p.tenantId === tenantId &&
-      (!worldId || p.questWorldId === worldId),
-  );
+): Promise<QuestProgress[]> {
+  return getPersistence().quests.listProgressForLearner(learnerId, tenantId, worldId);
 }
 
-export function getQuestProgress(
+export async function getQuestProgress(
   learnerId: string,
   tenantId: string,
   chapterId: string,
-): QuestProgress | null {
-  for (const p of db().questProgress.values()) {
-    if (p.learnerId === learnerId && p.tenantId === tenantId && p.chapterId === chapterId) {
-      return p;
-    }
-  }
-  return null;
+): Promise<QuestProgress | null> {
+  return getPersistence().quests.getProgressForChapter(learnerId, tenantId, chapterId);
 }
 
 /**
  * Chapter is unlocked when every prerequisite chapter has progress === 1.
  * Non-boss chapters with empty `prerequisiteChapterIds` are always unlocked.
  */
-export function isQuestChapterUnlocked(
+export async function isQuestChapterUnlocked(
   learnerId: string,
   tenantId: string,
   chapter: QuestChapter,
-): boolean {
+): Promise<boolean> {
   if (chapter.prerequisiteChapterIds.length === 0) return true;
+  const progress = await listQuestProgressForLearner(learnerId, tenantId);
   const completedChapterIds = new Set(
-    listQuestProgressForLearner(learnerId, tenantId)
-      .filter((p) => p.progress >= 1)
-      .map((p) => p.chapterId),
+    progress.filter((p) => p.progress >= 1).map((p) => p.chapterId),
   );
   return chapter.prerequisiteChapterIds.every((id) => completedChapterIds.has(id));
 }
@@ -1943,11 +1930,11 @@ export async function startQuestChapter(input: {
     }
 > {
   const store = db();
-  const chapter = store.questChapters.get(input.chapterId);
+  const chapter = await getPersistence().quests.getChapterById(input.chapterId);
   if (!chapter || chapter.questWorldId !== input.worldId) {
     return { ok: false, code: "chapter_not_found", message: "Quest chapter not found" };
   }
-  if (!isQuestChapterUnlocked(input.learnerId, input.tenantId, chapter)) {
+  if (!(await isQuestChapterUnlocked(input.learnerId, input.tenantId, chapter))) {
     return {
       ok: false,
       code: "locked",
@@ -1992,22 +1979,21 @@ export async function startQuestChapter(input: {
   return { ok: true, lessonRunId: result.lessonRun.id };
 }
 
-function upsertQuestProgressFromCompletion(run: LessonRun): void {
+async function upsertQuestProgressFromCompletion(run: LessonRun): Promise<void> {
   if (!run.sourceRefId) return;
-  const store = db();
-  const chapter = store.questChapters.get(run.sourceRefId);
+  const quests = getPersistence().quests;
+  const chapter = await quests.getChapterById(run.sourceRefId);
   if (!chapter) return;
-  const existing = getQuestProgress(run.learnerId, run.tenantId, chapter.id);
+  const existing = await quests.getProgressForChapter(run.learnerId, run.tenantId, chapter.id);
   if (existing) {
-    const next: QuestProgress = {
+    await quests.upsertProgress({
       ...existing,
       progress: 1,
       updatedAt: nowIso(),
-    };
-    store.questProgress.set(existing.id, next);
+    });
     return;
   }
-  const rec: QuestProgress = {
+  await quests.upsertProgress({
     id: newId("qp"),
     learnerId: run.learnerId,
     tenantId: run.tenantId,
@@ -2015,8 +2001,7 @@ function upsertQuestProgressFromCompletion(run: LessonRun): void {
     chapterId: chapter.id,
     progress: 1,
     updatedAt: nowIso(),
-  };
-  store.questProgress.set(rec.id, rec);
+  });
 }
 
 export function listParentLessonSummaries(
@@ -2265,29 +2250,23 @@ export function completeHomeworkSession(
 
 // ===== Sprint 18: Teacher assignments =====
 
-export function listTeacherAssignments(
+export async function listTeacherAssignments(
   teacherId: string,
   tenantId: string,
   opts?: { status?: "active" | "archived" },
-): TeacherAssignment[] {
-  const store = db();
-  const all = Array.from(store.teacherAssignments.values())
-    .filter((a) => a.teacherId === teacherId && a.tenantId === tenantId)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  return opts?.status ? all.filter((a) => a.status === opts.status) : all;
+): Promise<TeacherAssignment[]> {
+  return getPersistence().admin.listTeacherAssignments(teacherId, tenantId, opts);
 }
 
-export function getTeacherAssignment(
+export async function getTeacherAssignment(
   assignmentId: string,
   teacherId: string,
   tenantId: string,
-): TeacherAssignment | null {
-  const a = db().teacherAssignments.get(assignmentId);
-  if (!a || a.tenantId !== tenantId || a.teacherId !== teacherId) return null;
-  return a;
+): Promise<TeacherAssignment | null> {
+  return getPersistence().admin.getTeacherAssignmentById(assignmentId, teacherId, tenantId);
 }
 
-export function createTeacherAssignment(input: {
+export async function createTeacherAssignment(input: {
   teacherId: string;
   tenantId: string;
   title: string;
@@ -2297,7 +2276,7 @@ export function createTeacherAssignment(input: {
   learnerIds: string[];
   classId?: string | null;
   dueAt?: string | null;
-}): TeacherAssignment {
+}): Promise<TeacherAssignment> {
   const store = db();
   // Defense-in-depth: drop learner IDs not in this tenant. The BFF layer
   // also filters before calling this, but we double-check here so a
@@ -2322,11 +2301,10 @@ export function createTeacherAssignment(input: {
     createdAt: now,
     updatedAt: now,
   };
-  store.teacherAssignments.set(assignment.id, assignment);
-  return assignment;
+  return getPersistence().admin.upsertTeacherAssignment(assignment);
 }
 
-export function updateTeacherAssignment(
+export async function updateTeacherAssignment(
   assignmentId: string,
   teacherId: string,
   tenantId: string,
@@ -2336,9 +2314,9 @@ export function updateTeacherAssignment(
       "title" | "instructions" | "skillIds" | "learnerIds" | "dueAt" | "status"
     >
   >,
-): TeacherAssignment | null {
+): Promise<TeacherAssignment | null> {
   const store = db();
-  const existing = getTeacherAssignment(assignmentId, teacherId, tenantId);
+  const existing = await getTeacherAssignment(assignmentId, teacherId, tenantId);
   if (!existing) return null;
   let learnerIds = existing.learnerIds;
   if (patch.learnerIds) {
@@ -2353,19 +2331,15 @@ export function updateTeacherAssignment(
     learnerIds,
     updatedAt: nowIso(),
   };
-  store.teacherAssignments.set(next.id, next);
-  return next;
+  return getPersistence().admin.upsertTeacherAssignment(next);
 }
 
-export function deleteTeacherAssignment(
+export async function deleteTeacherAssignment(
   assignmentId: string,
   teacherId: string,
   tenantId: string,
-): boolean {
-  const existing = getTeacherAssignment(assignmentId, teacherId, tenantId);
-  if (!existing) return false;
-  db().teacherAssignments.delete(assignmentId);
-  return true;
+): Promise<boolean> {
+  return getPersistence().admin.deleteTeacherAssignment(assignmentId, teacherId, tenantId);
 }
 
 /**
@@ -2373,10 +2347,15 @@ export function deleteTeacherAssignment(
  * Used by `pickTodaysMission` to surface teacher-assigned work as a
  * higher priority than the default learning path.
  */
-export function listActiveAssignmentsForLearner(
+export async function listActiveAssignmentsForLearner(
   learnerId: string,
   tenantId: string,
-): TeacherAssignment[] {
+): Promise<TeacherAssignment[]> {
+  // No teacher-scoping here — we need every assignment in the tenant
+  // that targets this learner. We iterate the per-teacher buckets via
+  // a tenant-wide scan in the memory adapter; the Drizzle impl will
+  // replace this with a single `WHERE tenant_id = ? AND ?  =
+  // ANY(learner_ids) AND status = 'active'` query.
   const all = Array.from(db().teacherAssignments.values())
     .filter(
       (a) => a.tenantId === tenantId && a.status === "active" && a.learnerIds.includes(learnerId),
@@ -3893,85 +3872,82 @@ import type {
   SISConnection,
 } from "@/lib/db/types";
 
-/** All schools visible to a given session. */
-export function listSchools(tenantId?: string): School[] {
-  let arr = Array.from(db().schools.values());
-  if (tenantId) arr = arr.filter((s) => s.tenantId === tenantId);
-  return arr.sort((a, b) => a.name.localeCompare(b.name));
+// ===== Admin domain (ADR 0007 step 11) =====
+// Schools, classrooms, enrollments, teacher assignments — all routed
+// through the persistence adapter.
+
+export async function listSchools(tenantId?: string): Promise<School[]> {
+  return getPersistence().admin.listSchools(tenantId);
 }
 
-export function getSchool(id: string): School | null {
-  return db().schools.get(id) ?? null;
+export async function getSchool(id: string): Promise<School | null> {
+  return getPersistence().admin.getSchoolById(id);
 }
 
-export function listClassrooms(opts: {
+export async function listClassrooms(opts: {
   tenantId: string;
   schoolId?: string;
   teacherUserId?: string;
-}): Classroom[] {
-  let arr = Array.from(db().classrooms.values()).filter((c) => c.tenantId === opts.tenantId);
-  if (opts.schoolId) arr = arr.filter((c) => c.schoolId === opts.schoolId);
-  if (opts.teacherUserId) arr = arr.filter((c) => c.teacherUserId === opts.teacherUserId);
-  return arr.sort((a, b) => a.name.localeCompare(b.name));
+}): Promise<Classroom[]> {
+  return getPersistence().admin.listClassrooms(opts);
 }
 
-export function getClassroom(id: string, tenantId: string): Classroom | null {
-  const c = db().classrooms.get(id);
-  return c && c.tenantId === tenantId ? c : null;
+export async function getClassroom(id: string, tenantId: string): Promise<Classroom | null> {
+  return getPersistence().admin.getClassroomById(id, tenantId);
 }
 
-export function createClassroom(input: {
+export async function createClassroom(input: {
   tenantId: string;
   schoolId: string;
   name: string;
   gradeBand: Classroom["gradeBand"];
   teacherUserId: string;
   courseId: string | null;
-}): Classroom {
+}): Promise<Classroom> {
   const rec: Classroom = { id: newId("cls"), createdAt: nowIso(), ...input };
-  db().classrooms.set(rec.id, rec);
-  return rec;
+  return getPersistence().admin.upsertClassroom(rec);
 }
 
-export function updateClassroom(
+export async function updateClassroom(
   id: string,
   tenantId: string,
   patch: Partial<Pick<Classroom, "name" | "gradeBand" | "teacherUserId" | "courseId">>,
-): Classroom | null {
-  const c = getClassroom(id, tenantId);
-  if (!c) return null;
-  if (patch.name !== undefined) c.name = patch.name;
-  if (patch.gradeBand !== undefined) c.gradeBand = patch.gradeBand;
-  if (patch.teacherUserId !== undefined) c.teacherUserId = patch.teacherUserId;
-  if (patch.courseId !== undefined) c.courseId = patch.courseId;
-  return c;
+): Promise<Classroom | null> {
+  const existing = await getClassroom(id, tenantId);
+  if (!existing) return null;
+  const next: Classroom = {
+    ...existing,
+    name: patch.name ?? existing.name,
+    gradeBand: patch.gradeBand ?? existing.gradeBand,
+    teacherUserId: patch.teacherUserId ?? existing.teacherUserId,
+    courseId: patch.courseId !== undefined ? patch.courseId : existing.courseId,
+  };
+  return getPersistence().admin.upsertClassroom(next);
 }
 
-export function listEnrollments(classroomId: string): Enrollment[] {
-  return Array.from(db().enrollments.values())
-    .filter((e) => e.classroomId === classroomId)
-    .sort((a, b) => a.role.localeCompare(b.role));
+export async function listEnrollments(classroomId: string): Promise<Enrollment[]> {
+  return getPersistence().admin.listEnrollmentsForClassroom(classroomId);
 }
 
-export function createEnrollment(input: Omit<Enrollment, "id" | "createdAt">): Enrollment {
+export async function createEnrollment(
+  input: Omit<Enrollment, "id" | "createdAt">,
+): Promise<Enrollment> {
   const rec: Enrollment = { id: newId("enr"), createdAt: nowIso(), ...input };
-  db().enrollments.set(rec.id, rec);
-  return rec;
+  return getPersistence().admin.upsertEnrollment(rec);
 }
 
 /** Idempotent: returns the existing enrollment if (classroomId, subjectId, role) already exists. */
-function ensureEnrollment(input: Omit<Enrollment, "id" | "createdAt">): {
+async function ensureEnrollment(input: Omit<Enrollment, "id" | "createdAt">): Promise<{
   rec: Enrollment;
   created: boolean;
-} {
-  const existing = Array.from(db().enrollments.values()).find(
-    (e) =>
-      e.classroomId === input.classroomId &&
-      e.subjectId === input.subjectId &&
-      e.role === input.role,
-  );
+}> {
+  const existing = await getPersistence().admin.findEnrollmentByNaturalKey({
+    classroomId: input.classroomId,
+    subjectId: input.subjectId,
+    role: input.role,
+  });
   if (existing) return { rec: existing, created: false };
-  return { rec: createEnrollment(input), created: true };
+  return { rec: await createEnrollment(input), created: true };
 }
 
 /**
@@ -4067,16 +4043,16 @@ function parseRosterCsv(text: string): {
  * the same parse/validation pipeline runs so the admin can review the
  * counts + error rows before committing.
  */
-export function runRosterImport(input: {
+export async function runRosterImport(input: {
   tenantId: string;
   schoolId: string;
   source: RosterImportSource;
   csvText: string;
   dryRun: boolean;
   createdByUserId: string;
-}): RosterImportJob {
+}): Promise<RosterImportJob> {
   const store = db();
-  const school = getSchool(input.schoolId);
+  const school = await getSchool(input.schoolId);
   if (!school || school.tenantId !== input.tenantId) {
     const errId = newId("job");
     const failed: RosterImportJob = {
@@ -4150,7 +4126,7 @@ export function runRosterImport(input: {
           job.createdRows += 1;
           continue;
         }
-        classroom = createClassroom({
+        classroom = await createClassroom({
           tenantId: input.tenantId,
           schoolId: input.schoolId,
           name: row.classroomName,
@@ -4168,7 +4144,7 @@ export function runRosterImport(input: {
       }
       const enrollRole: Enrollment["role"] =
         row.role === "teacher" ? "teacher" : row.role === "co_teacher" ? "co_teacher" : "learner";
-      const { created } = ensureEnrollment({
+      const { created } = await ensureEnrollment({
         tenantId: input.tenantId,
         classroomId: classroom.id,
         subjectId: row.externalId,
@@ -5564,7 +5540,7 @@ export async function getSchoolDashboard(
 ): Promise<SchoolDashboardSnapshot> {
   const store = db();
   const tenant = getTenantById(tenantId);
-  const schools = listSchools(tenantId);
+  const schools = await listSchools(tenantId);
   const school =
     schools.find((s) => (schoolId ? s.id === schoolId : true)) ?? schools[0] ?? null;
 
@@ -5575,7 +5551,7 @@ export async function getSchoolDashboard(
   const staff = allStaff.filter((u) =>
     ["TEACHER", "SCHOOL_ADMIN", "DISTRICT_ADMIN", "THERAPIST"].includes(u.role as string),
   );
-  const classes = listClassrooms({
+  const classes = await listClassrooms({
     tenantId,
     schoolId: school?.id,
   });
@@ -5702,10 +5678,10 @@ export interface SchoolReportPayload {
   rows: SchoolReportRow[];
 }
 
-export function getSchoolReport(
+export async function getSchoolReport(
   tenantId: string,
   opts: { startIso?: string; endIso?: string } = {},
-): SchoolReportPayload {
+): Promise<SchoolReportPayload> {
   const store = db();
   const endIso = opts.endIso ?? new Date().toISOString();
   const startIso =
@@ -5716,7 +5692,7 @@ export function getSchoolReport(
   const learners = Array.from(store.learnerProfiles.values()).filter(
     (l) => l.tenantId === tenantId,
   );
-  const classrooms = listClassrooms({ tenantId });
+  const classrooms = await listClassrooms({ tenantId });
   const classroomById = new Map(classrooms.map((c) => [c.id, c]));
   const enrollmentByLearner = new Map<string, string>();
   for (const e of Array.from(store.enrollments.values())) {
@@ -5847,8 +5823,8 @@ export function renderSchoolReportCsv(payload: SchoolReportPayload): string {
 // `createClassroom` already exists above.
 // ---------------------------------------------------------------------------
 
-export function deleteClassroom(id: string, tenantId: string): boolean {
-  const c = getClassroom(id, tenantId);
+export async function deleteClassroom(id: string, tenantId: string): Promise<boolean> {
+  const c = await getClassroom(id, tenantId);
   if (!c) return false;
   // Cascade: drop enrollments for this classroom.
   for (const e of Array.from(db().enrollments.values())) {
