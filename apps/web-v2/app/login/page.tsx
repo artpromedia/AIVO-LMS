@@ -77,6 +77,15 @@ async function signInAction(formData: FormData) {
   }
 
   if (result.kind === "error") {
+    // 403 + redirectTo: identity-svc is telling us the user belongs on a
+    // different portal (admin / district). Forward them straight there
+    // instead of stranding them on the consumer login with an opaque error.
+    if (result.status === 403 && result.redirectTo) {
+      const { isSafeSurfaceRedirect } = await import("@/lib/auth/surface-redirect");
+      if (isSafeSurfaceRedirect(result.redirectTo)) {
+        redirect(result.redirectTo);
+      }
+    }
     let code: string;
     if (result.status === 401) {
       code = "invalid_credentials";

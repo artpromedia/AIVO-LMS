@@ -64,6 +64,12 @@ async function signInAction(formData: FormData): Promise<void> {
   }
 
   if (result.kind === "error") {
+    if (result.status === 403 && result.redirectTo) {
+      const { isSafeSurfaceRedirect } = await import("@/lib/auth/surface-redirect");
+      if (isSafeSurfaceRedirect(result.redirectTo)) {
+        redirect(result.redirectTo);
+      }
+    }
     let code: string;
     if (result.status === 401) {
       code = "invalid_credentials";
