@@ -31,7 +31,7 @@ export default async function Page() {
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const tenantIds = tenants.map((t) => t.id);
   const stats = getDistrictStats(tenantIds);
-  const staff = listMembersByRole(tenantIds, ["district_admin", "school_admin", "teacher"]);
+  const staff = await listMembersByRole(tenantIds, ["district_admin", "school_admin", "teacher"]);
   const pendingInvites = listStaffInvitesForTenants(tenantIds).map((i) => ({
     id: i.id,
     email: i.email,

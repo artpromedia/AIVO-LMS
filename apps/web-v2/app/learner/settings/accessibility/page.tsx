@@ -32,11 +32,11 @@ export default async function LearnerAccessibilitySettingsPage() {
     learnerId = await readActiveLearnerFromCookies(session);
     if (!learnerId) redirect("/learner/select");
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) redirect("/learner/select");
   if (
     session.role !== "learner" &&
-    !parentCanAccessLearner(session.userId, learnerId, session.tenantId)
+    !await parentCanAccessLearner(session.userId, learnerId, session.tenantId)
   ) {
     redirect("/learner/select");
   }

@@ -29,16 +29,16 @@ export default async function ParentSummaryPage({
 }) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
   const summaries = listParentLessonSummaries(learnerId, session.tenantId, { limit: 5 });
-  const { skillMasteries } = getMasteryMap(learnerId, session.tenantId);
-  const subjects = listSubjects();
-  const skills = listSkills();
+  const { skillMasteries } = await getMasteryMap(learnerId, session.tenantId);
+  const subjects = await listSubjects();
+  const skills = await listSkills();
   const skillsById = new Map(skills.map((s) => [s.id, s]));
 
   // Top 3 strongest + 3 needs-work skills (skip empty mastery).

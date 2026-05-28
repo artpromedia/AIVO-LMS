@@ -29,9 +29,9 @@ describe("getSchoolReport", () => {
     ensureSeeded();
   });
 
-  it("returns a summary + per-learner rows for the seeded tenant", () => {
+  it("returns a summary + per-learner rows for the seeded tenant", async () => {
     const tenant = Array.from(getStore().tenants.values())[0]!;
-    const report = getSchoolReport(tenant.id);
+    const report = await getSchoolReport(tenant.id);
     expect(report.summary.totalLearners).toBeGreaterThanOrEqual(0);
     expect(report.summary.iepCoveragePct).toBeGreaterThanOrEqual(0);
     expect(report.summary.iepCoveragePct).toBeLessThanOrEqual(100);
@@ -46,12 +46,12 @@ describe("getSchoolReport", () => {
     }
   });
 
-  it("respects a custom date range for lessonsInWindow", () => {
+  it("respects a custom date range for lessonsInWindow", async () => {
     const tenant = Array.from(getStore().tenants.values())[0]!;
     const start = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString();
     const end = new Date().toISOString();
-    const wide = getSchoolReport(tenant.id, { startIso: start, endIso: end });
-    const narrow = getSchoolReport(tenant.id, {
+    const wide = await getSchoolReport(tenant.id, { startIso: start, endIso: end });
+    const narrow = await getSchoolReport(tenant.id, {
       startIso: new Date(Date.now() - 60 * 1000).toISOString(),
       endIso: end,
     });
@@ -61,14 +61,14 @@ describe("getSchoolReport", () => {
 });
 
 describe("renderSchoolReportCsv", () => {
-  it("emits a stable header and RFC-4180-safe rows", () => {
+  it("emits a stable header and RFC-4180-safe rows", async () => {
     const tenant = Array.from(getStore().tenants.values())[0] ?? null;
     if (!tenant) {
       resetStore();
       ensureSeeded();
     }
     const t = Array.from(getStore().tenants.values())[0]!;
-    const report = getSchoolReport(t.id);
+    const report = await getSchoolReport(t.id);
     const csv = renderSchoolReportCsv(report);
     const firstLine = csv.split("\n")[0];
     expect(firstLine).toBe(
@@ -125,10 +125,10 @@ describe("class CRUD repo helpers", () => {
     ensureSeeded();
   });
 
-  it("createClassroom + deleteClassroom round trip", () => {
+  it("createClassroom + deleteClassroom round trip", async () => {
     const tenant = Array.from(getStore().tenants.values())[0]!;
-    const before = listClassrooms({ tenantId: tenant.id }).length;
-    const created = createClassroom({
+    const before = (await listClassrooms({ tenantId: tenant.id })).length;
+    const created = await createClassroom({
       tenantId: tenant.id,
       schoolId: "school-1",
       name: "Test Room",
@@ -136,15 +136,15 @@ describe("class CRUD repo helpers", () => {
       teacherUserId: "user-1",
       courseId: null,
     });
-    expect(listClassrooms({ tenantId: tenant.id }).length).toBe(before + 1);
-    const removed = deleteClassroom(created.id, tenant.id);
+    expect((await listClassrooms({ tenantId: tenant.id })).length).toBe(before + 1);
+    const removed = await deleteClassroom(created.id, tenant.id);
     expect(removed).toBe(true);
-    expect(listClassrooms({ tenantId: tenant.id }).length).toBe(before);
+    expect((await listClassrooms({ tenantId: tenant.id })).length).toBe(before);
   });
 
-  it("deleteClassroom returns false for an unknown id", () => {
+  it("deleteClassroom returns false for an unknown id", async () => {
     const tenant = Array.from(getStore().tenants.values())[0]!;
-    expect(deleteClassroom("nonexistent", tenant.id)).toBe(false);
+    expect(await deleteClassroom("nonexistent", tenant.id)).toBe(false);
   });
 });
 
@@ -154,9 +154,9 @@ describe("staff add / remove repo helpers", () => {
     ensureSeeded();
   });
 
-  it("addStaffUser inserts a user with INVITED status", () => {
+  it("addStaffUser inserts a user with INVITED status", async () => {
     const tenant = Array.from(getStore().tenants.values())[0]!;
-    const user = addStaffUser({
+    const user = await addStaffUser({
       tenantId: tenant.id,
       email: "new.teacher@example.com",
       displayName: "Avery Teacher",
@@ -166,16 +166,16 @@ describe("staff add / remove repo helpers", () => {
     expect((user as { status?: string }).status).toBe("INVITED");
   });
 
-  it("removeStaffUser returns false for a foreign tenant", () => {
+  it("removeStaffUser returns false for a foreign tenant", async () => {
     const tenant = Array.from(getStore().tenants.values())[0]!;
-    const user = addStaffUser({
+    const user = await addStaffUser({
       tenantId: tenant.id,
       email: "x@example.com",
       displayName: "X",
       role: "TEACHER",
     });
-    expect(removeStaffUser(user.id, "other-tenant")).toBe(false);
-    expect(removeStaffUser(user.id, tenant.id)).toBe(true);
-    expect(removeStaffUser(user.id, tenant.id)).toBe(false); // already gone
+    expect(await removeStaffUser(user.id, "other-tenant")).toBe(false);
+    expect(await removeStaffUser(user.id, tenant.id)).toBe(true);
+    expect(await removeStaffUser(user.id, tenant.id)).toBe(false); // already gone
   });
 });

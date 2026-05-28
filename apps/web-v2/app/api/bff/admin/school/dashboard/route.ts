@@ -33,7 +33,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     }
     const url = new URL(req.url);
     const schoolId = url.searchParams.get("schoolId") ?? undefined;
-    const snapshot = getSchoolDashboard(tenantId, schoolId);
+    const snapshot = await getSchoolDashboard(tenantId, schoolId);
     return ok({ snapshot }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

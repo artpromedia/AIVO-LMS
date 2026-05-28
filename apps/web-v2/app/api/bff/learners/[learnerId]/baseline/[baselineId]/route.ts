@@ -23,7 +23,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["child_data_collection"],
@@ -31,12 +31,12 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     );
     if (consentErr) return consentErr;
 
-    const baseline = getBaselineById(baselineId, session!.tenantId);
+    const baseline = await getBaselineById(baselineId, session!.tenantId);
     if (!baseline || baseline.learnerId !== learnerId) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Baseline not found" }, requestId);
     }
-    const questions = listBaselineQuestions(baseline.id);
-    const attempts = listBaselineAttempts(baseline.id, session!.tenantId);
+    const questions = await listBaselineQuestions(baseline.id);
+    const attempts = await listBaselineAttempts(baseline.id, session!.tenantId);
     return ok({ baseline, questions, attempts }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

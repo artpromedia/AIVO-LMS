@@ -19,7 +19,7 @@ import {
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
-  const recent = listAuditLogsForTenants(
+  const recent = await listAuditLogsForTenants(
     tenants.map((t) => t.id),
     10,
   );

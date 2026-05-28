@@ -20,7 +20,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["child_data_collection", "ai_personalization"],
@@ -28,7 +28,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     );
     if (consentErr) return consentErr;
 
-    const path = regenerateLearningPath(learnerId, session!.tenantId);
+    const path = await regenerateLearningPath(learnerId, session!.tenantId);
     if (!path) {
       return fail(
         {

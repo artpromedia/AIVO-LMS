@@ -16,7 +16,7 @@ export default async function Page() {
   const session = await requirePageRole(["district_admin"]);
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const tenantIds = tenants.map((t) => t.id);
-  const admins = listMembersByRole(tenantIds, ["district_admin", "school_admin"]);
+  const admins = await listMembersByRole(tenantIds, ["district_admin", "school_admin"]);
 
   return (
     <AppShell

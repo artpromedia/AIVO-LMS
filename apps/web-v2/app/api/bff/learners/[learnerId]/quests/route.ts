@@ -24,7 +24,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["child_data_collection", "ai_personalization"],
@@ -32,29 +32,31 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     );
     if (consentErr) return consentErr;
 
-    const worlds = listQuestWorlds();
-    const progress = listQuestProgressForLearner(learnerId, session!.tenantId);
+    const worlds = await listQuestWorlds();
+    const progress = await listQuestProgressForLearner(learnerId, session!.tenantId);
     const completedChapterIds = new Set(
       progress.filter((p) => p.progress >= 1).map((p) => p.chapterId),
     );
-    const worldsWithProgress = worlds.map((w) => {
-      const chapters = listQuestChapters(w.id);
-      const normal = chapters.filter((c) => !c.isBoss);
-      const boss = chapters.find((c) => c.isBoss);
-      const chaptersCompleted = normal.filter((c) => completedChapterIds.has(c.id)).length;
-      const bossDone = boss ? completedChapterIds.has(boss.id) : false;
-      const bossUnlocked = boss
-        ? boss.prerequisiteChapterIds.every((id) => completedChapterIds.has(id))
-        : false;
-      return {
-        ...w,
-        chaptersTotal: normal.length,
-        chaptersCompleted,
-        hasBoss: Boolean(boss),
-        bossUnlocked,
-        bossDone,
-      };
-    });
+    const worldsWithProgress = await Promise.all(
+      worlds.map(async (w) => {
+        const chapters = await listQuestChapters(w.id);
+        const normal = chapters.filter((c) => !c.isBoss);
+        const boss = chapters.find((c) => c.isBoss);
+        const chaptersCompleted = normal.filter((c) => completedChapterIds.has(c.id)).length;
+        const bossDone = boss ? completedChapterIds.has(boss.id) : false;
+        const bossUnlocked = boss
+          ? boss.prerequisiteChapterIds.every((id) => completedChapterIds.has(id))
+          : false;
+        return {
+          ...w,
+          chaptersTotal: normal.length,
+          chaptersCompleted,
+          hasBoss: Boolean(boss),
+          bossUnlocked,
+          bossDone,
+        };
+      }),
+    );
     return ok({ worlds: worldsWithProgress }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

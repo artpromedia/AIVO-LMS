@@ -25,7 +25,7 @@ export async function POST(req: Request, ctx: Params): Promise<NextResponse> {
     const { learnerId } = await ctx.params;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["ai_personalization", "child_data_collection"],

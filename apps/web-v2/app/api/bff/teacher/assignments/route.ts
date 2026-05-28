@@ -15,7 +15,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     if (response) return response;
     const roleErr = requireRole(session!, ["teacher"], requestId);
     if (roleErr) return roleErr;
-    const assignments = listTeacherAssignments(session!.userId, session!.tenantId);
+    const assignments = await listTeacherAssignments(session!.userId, session!.tenantId);
     return ok({ assignments }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
@@ -84,7 +84,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    const created = createTeacherAssignment({
+    const created = await createTeacherAssignment({
       teacherId: session!.userId,
       tenantId: session!.tenantId,
       title,

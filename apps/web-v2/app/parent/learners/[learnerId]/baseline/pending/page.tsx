@@ -34,12 +34,12 @@ export default async function BaselinePendingPage({
 }) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
-  const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
+  const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
   if (!assessment.submittedAt) {
     // The pending screen only makes sense after the assessment is submitted.
     redirect(`/parent/learners/${learner.id}/assessment`);
@@ -53,8 +53,8 @@ export default async function BaselinePendingPage({
     redirect(`/parent/learners/${learner.id}/brain-profile`);
   }
 
-  const iep = getIEPForLearner(learnerId, session.tenantId);
-  const active = getActiveBaselineForLearner(learnerId, session.tenantId);
+  const iep = await getIEPForLearner(learnerId, session.tenantId);
+  const active = await getActiveBaselineForLearner(learnerId, session.tenantId);
 
   // If a baseline already exists and is ready, send the parent on.
   if (active?.status === "in_progress") {
@@ -83,7 +83,7 @@ export default async function BaselinePendingPage({
             source: "pending-auto",
           },
         });
-        refreshLearnerReadiness(learnerId, session.tenantId);
+        await refreshLearnerReadiness(learnerId, session.tenantId);
         redirect(`/learner/baseline/${created.baseline.id}?as=parent`);
       }
     } catch (err) {
@@ -137,13 +137,13 @@ export default async function BaselinePendingPage({
         <BaselinePendingCard
           learnerName={learner.preferredName || learner.firstName}
           inputs={inputs}
-          estimate="Usually under 2 minutes. You can leave this page — we'll keep going in the background."
+          estimate="Usually under 2 minutes. Stay on this page — we'll redirect you as soon as the first question set is ready."
           secondary={
             <Link
-              href={`/parent/learners/${learner.id}`}
+              href={`/parent/learners/${learner.id}/baseline/pending`}
               className="inline-flex items-center gap-1.5 rounded-iw-control px-4 py-2 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
             >
-              Check back later
+              Try again
             </Link>
           }
         />

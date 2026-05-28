@@ -28,12 +28,12 @@ export default async function BaselineSummaryPage({
 }) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
-  const baseline = getActiveBaselineForLearner(learnerId, session.tenantId);
+  const baseline = await getActiveBaselineForLearner(learnerId, session.tenantId);
   if (!baseline || baseline.status !== "complete" || !baseline.summary) {
     return (
       <AssessmentShell eyebrow={`Baseline summary for ${learner.displayName}`}>
@@ -56,7 +56,7 @@ export default async function BaselineSummaryPage({
     );
   }
 
-  const iep = getIEPForLearner(learnerId, session.tenantId);
+  const iep = await getIEPForLearner(learnerId, session.tenantId);
   const ex = iep?.extraction ?? null;
   const summary = baseline.summary;
 

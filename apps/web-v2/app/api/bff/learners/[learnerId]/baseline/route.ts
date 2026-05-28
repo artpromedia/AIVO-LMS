@@ -31,7 +31,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["child_data_collection"],
@@ -39,11 +39,11 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     );
     if (consentErr) return consentErr;
 
-    const baseline = getActiveBaselineForLearner(learnerId, session!.tenantId);
+    const baseline = await getActiveBaselineForLearner(learnerId, session!.tenantId);
     if (!baseline) {
       return ok({ baseline: null, questions: [] }, requestId);
     }
-    const questions = listBaselineQuestions(baseline.id);
+    const questions = await listBaselineQuestions(baseline.id);
     return ok({ baseline, questions }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
@@ -60,7 +60,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["child_data_collection"],
@@ -69,7 +69,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (consentErr) return consentErr;
 
     // Preconditions: parent assessment submitted + brain profile exists.
-    const assessment = getOrCreateParentAssessment(learnerId, session!.tenantId);
+    const assessment = await getOrCreateParentAssessment(learnerId, session!.tenantId);
     if (!assessment.submittedAt) {
       return fail(
         {

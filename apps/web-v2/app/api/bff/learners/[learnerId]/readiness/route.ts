@@ -24,7 +24,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["child_data_collection"],
@@ -32,9 +32,11 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     );
     if (consentErr) return consentErr;
 
-    const learner = getLearner(learnerId, session!.tenantId);
+    const learner = await getLearner(learnerId, session!.tenantId);
     if (!learner) return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
-    const state = refreshLearnerReadiness(learnerId, session!.tenantId)!;
+    const state = await refreshLearnerReadiness(learnerId, session!.tenantId);
+    if (!state)
+      return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
     const next = nextStepFor({ id: learnerId, readinessState: state });
     return ok(
       {

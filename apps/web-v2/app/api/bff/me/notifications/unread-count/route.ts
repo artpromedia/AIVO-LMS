@@ -17,11 +17,12 @@ export async function GET(req: Request): Promise<NextResponse> {
   try {
     const { session, response } = await requireSession(req, requestId);
     if (response) return response;
-    const unread = listNotifications({
+    const unreadList = await listNotifications({
       tenantId: session!.tenantId,
       userId: session!.userId,
       unreadOnly: true,
-    }).length;
+    });
+    const unread = unreadList.length;
     return ok({ unread }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

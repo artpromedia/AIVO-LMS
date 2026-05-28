@@ -47,16 +47,17 @@ export default async function ParentGradebookPage({
 }) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
-  const { map, skillMasteries } = getMasteryMap(learnerId, session.tenantId);
-  const lessonRuns = listLessonRunsForLearner(learnerId, session.tenantId).slice(0, 20);
-  const subjects = listSubjects();
-  const skills = listSkills();
+  const { map, skillMasteries } = await getMasteryMap(learnerId, session.tenantId);
+  const allLessonRuns = await listLessonRunsForLearner(learnerId, session.tenantId);
+  const lessonRuns = allLessonRuns.slice(0, 20);
+  const subjects = await listSubjects();
+  const skills = await listSkills();
   const skillsById = new Map(skills.map((s) => [s.id, s]));
   const subjectsById = new Map(subjects.map((s) => [s.id, s]));
 

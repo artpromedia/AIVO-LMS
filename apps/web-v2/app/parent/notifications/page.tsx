@@ -20,7 +20,10 @@ import { PreferencesForm } from "./preferences-form";
 
 export default async function Page() {
   const session = await requirePageRole(["parent"]);
-  const notifications = listNotifications({ tenantId: session.tenantId, userId: session.userId });
+  const notifications = await listNotifications({
+    tenantId: session.tenantId,
+    userId: session.userId,
+  });
   const pref = getNotificationPreference(session.userId, session.tenantId);
 
   const unreadCount = notifications.filter((n) => !n.readAt).length;

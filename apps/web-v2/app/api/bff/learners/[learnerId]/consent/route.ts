@@ -29,8 +29,8 @@ export async function GET(req: Request, { params }: Params) {
     if (scope) return scope;
     return ok(
       {
-        records: listConsentsForLearner(session!.userId, learnerId, session!.tenantId),
-        ageGate: getAgeGateForLearner(learnerId, session!.tenantId),
+        records: await listConsentsForLearner(session!.userId, learnerId, session!.tenantId),
+        ageGate: await getAgeGateForLearner(learnerId, session!.tenantId),
         applicableTypes: PER_LEARNER_TYPES,
       },
       requestId,
@@ -64,7 +64,7 @@ export async function POST(req: Request, { params }: Params) {
         requestId,
       );
     }
-    const rec = recordConsent({
+    const rec = await recordConsent({
       tenantId: session!.tenantId,
       parentUserId: session!.userId,
       learnerId,

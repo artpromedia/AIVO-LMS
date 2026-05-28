@@ -41,29 +41,29 @@ async function regenerateAction(formData: FormData) {
   const session = await readMockSessionFromCookies();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     redirect("/parent/learners");
   }
-  const learner = getLearner(learnerId, session.tenantId);
-  const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
+  const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
   if (!learner) redirect("/parent/learners");
   if (!assessment.submittedAt) {
     redirect(`/parent/learners/${learnerId}/assessment`);
   }
-  const iep = getIEPForLearner(learnerId, session.tenantId);
+  const iep = await getIEPForLearner(learnerId, session.tenantId);
   const candidate = buildBrainProfile({
     learner: learner!,
     assessment,
     iepExtraction: iep?.extraction ?? null,
     iepUploaded: Boolean(iep),
-    subjects: listSubjects(),
+    subjects: await listSubjects(),
     baselineAttempts: 0,
   });
   const v = brainProfileStateSchema.safeParse(candidate);
   if (v.success) {
-    upsertBrainProfile(learnerId, session.tenantId, v.data);
+    await upsertBrainProfile(learnerId, session.tenantId, v.data);
   }
-  refreshLearnerReadiness(learnerId, session.tenantId);
+  await refreshLearnerReadiness(learnerId, session.tenantId);
   audit(session, "brain_profile.regenerate", newRequestId(), {
     learnerId,
     metadata: { ok: v.success },
@@ -78,13 +78,13 @@ export default async function BrainProfilePage({
 }) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
-  const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
+  const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
   if (!assessment.submittedAt) {
     return (
       <AppShell
@@ -112,24 +112,24 @@ export default async function BrainProfilePage({
     );
   }
 
-  const iep = getIEPForLearner(learnerId, session.tenantId);
+  const iep = await getIEPForLearner(learnerId, session.tenantId);
   // Auto-generate on first visit: builds from the deterministic fallback so a
   // parent always sees content, never an empty page. Subsequent visits hit the
   // cache; regenerate is an explicit user action.
-  let profile = getBrainProfile(learnerId, session.tenantId);
+  let profile = await getBrainProfile(learnerId, session.tenantId);
   if (!profile) {
     const candidate = buildBrainProfile({
       learner,
       assessment,
       iepExtraction: iep?.extraction ?? null,
       iepUploaded: Boolean(iep),
-      subjects: listSubjects(),
+      subjects: await listSubjects(),
       baselineAttempts: 0,
     });
     const v = brainProfileStateSchema.safeParse(candidate);
     if (v.success) {
-      profile = upsertBrainProfile(learnerId, session.tenantId, v.data);
-      refreshLearnerReadiness(learnerId, session.tenantId);
+      profile = await upsertBrainProfile(learnerId, session.tenantId, v.data);
+      await refreshLearnerReadiness(learnerId, session.tenantId);
       audit(session, "brain_profile.auto_generate", newRequestId(), { learnerId });
     }
   }

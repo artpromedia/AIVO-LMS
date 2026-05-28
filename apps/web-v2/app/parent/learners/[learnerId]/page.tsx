@@ -19,11 +19,11 @@ export default async function LearnerDetailPage({
 }) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
-  refreshLearnerReadiness(learnerId, session.tenantId);
-  const learner = getLearner(learnerId, session.tenantId);
+  await refreshLearnerReadiness(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
   const next = nextStepFor(learner);

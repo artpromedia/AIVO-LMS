@@ -45,7 +45,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       requestId,
     );
     if (limited) return limited;
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["child_data_collection", "ai_personalization"],
@@ -53,11 +53,11 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     );
     if (consentErr) return consentErr;
 
-    const learner = getLearner(learnerId, session!.tenantId);
+    const learner = await getLearner(learnerId, session!.tenantId);
     if (!learner) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
     }
-    const assessment = getOrCreateParentAssessment(learnerId, session!.tenantId);
+    const assessment = await getOrCreateParentAssessment(learnerId, session!.tenantId);
     if (!assessment.submittedAt) {
       return fail(
         {
@@ -67,13 +67,13 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
         requestId,
       );
     }
-    const iep = getIEPForLearner(learnerId, session!.tenantId);
+    const iep = await getIEPForLearner(learnerId, session!.tenantId);
     const candidate = buildBrainProfile({
       learner,
       assessment,
       iepExtraction: iep?.extraction ?? null,
       iepUploaded: Boolean(iep),
-      subjects: listSubjects(),
+      subjects: await listSubjects(),
       baselineAttempts: 0,
     });
     const v = brainProfileStateSchema.safeParse(candidate);
@@ -87,7 +87,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       );
     }
     const profile = upsertBrainProfile(learnerId, session!.tenantId, v.data);
-    refreshLearnerReadiness(learnerId, session!.tenantId);
+    await refreshLearnerReadiness(learnerId, session!.tenantId);
     audit(session, "brain_profile.generate", requestId, {
       learnerId,
       metadata: { source: v.data.source },

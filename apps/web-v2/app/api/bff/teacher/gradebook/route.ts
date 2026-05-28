@@ -41,7 +41,7 @@ export async function GET(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    const detail = getGradebookDetail(learnerId, session!.tenantId);
+    const detail = await getGradebookDetail(learnerId, session!.tenantId);
     return ok({ detail }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

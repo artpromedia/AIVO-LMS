@@ -19,7 +19,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["child_data_collection"],
@@ -27,14 +27,14 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     );
     if (consentErr) return consentErr;
 
-    const world = getQuestWorld(worldId);
+    const world = await getQuestWorld(worldId);
     if (!world) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Quest world not found" }, requestId);
     }
-    const chapters = listQuestChapters(worldId);
+    const chapters = await listQuestChapters(worldId);
     const normal = chapters.filter((c) => !c.isBoss);
     const boss = chapters.find((c) => c.isBoss);
-    const progress = listQuestProgressForLearner(learnerId, session!.tenantId, worldId);
+    const progress = await listQuestProgressForLearner(learnerId, session!.tenantId, worldId);
     const completedIds = new Set(progress.filter((p) => p.progress >= 1).map((p) => p.chapterId));
     return ok(
       {

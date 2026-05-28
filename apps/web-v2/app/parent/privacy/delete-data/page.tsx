@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 export default async function Page() {
   const session = await requirePageRole(["parent"]);
-  const learners = listLearnersForParent(session.userId, session.tenantId);
+  const learners = await listLearnersForParent(session.userId, session.tenantId);
   const requests = listDataDeletionRequestsForUser(session.userId, session.tenantId);
 
   return (

@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 
 export default async function TeacherLearnersPage() {
   const session = await requirePageRole(["teacher"]);
-  const learners = listLearnersForTeacher(session.userId, session.tenantId);
+  const learners = await listLearnersForTeacher(session.userId, session.tenantId);
   return (
     <AppShell
       role="teacher"

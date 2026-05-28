@@ -31,7 +31,7 @@ export default async function QuestChapterStartPage({ params }: Params) {
     learnerId = await readActiveLearnerFromCookies(session);
     if (!learnerId) redirect("/learner/select");
   }
-  const world = getQuestWorld(worldId);
+  const world = await getQuestWorld(worldId);
   if (!world) notFound();
 
   const result = await startQuestChapter({

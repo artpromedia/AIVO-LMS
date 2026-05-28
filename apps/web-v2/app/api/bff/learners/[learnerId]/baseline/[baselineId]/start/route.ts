@@ -20,7 +20,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["child_data_collection"],
@@ -28,11 +28,11 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     );
     if (consentErr) return consentErr;
 
-    const existing = getBaselineById(baselineId, session!.tenantId);
+    const existing = await getBaselineById(baselineId, session!.tenantId);
     if (!existing || existing.learnerId !== learnerId) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Baseline not found" }, requestId);
     }
-    const next = startBaseline(baselineId, session!.tenantId);
+    const next = await startBaseline(baselineId, session!.tenantId);
     if (!next) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Baseline not found" }, requestId);
     }

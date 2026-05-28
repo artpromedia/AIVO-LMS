@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Sprint 10 — notification stream client hook.
+ * Notification stream client hook.
  *
  * Real-time notifications without a websocket dependency: the hook
  * subscribes to an SSE endpoint when available and falls back to a
@@ -9,11 +9,8 @@
  * subscription-style interface (`{ notifications, lastUpdatedAt,
  * markRead, refresh }`).
  *
- * The server-side SSE endpoint at services/comms-svc is a follow-up;
- * until it lands the hook auto-polls every `pollIntervalMs` (default
- * 30 s) — that gives the learner a sub-minute notification latency
- * with zero new infrastructure. When the SSE endpoint ships, the hook
- * picks it up automatically (controlled by the `sseUrl` prop).
+ * Pass `sseUrl` (e.g. `/api/bff/notifications/stream`) to opt in to
+ * server-pushed updates; omit it to run on the polling fallback only.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 

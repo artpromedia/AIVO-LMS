@@ -4,6 +4,7 @@
  * Postgres a body-only replacement (signatures stay stable).
  */
 import { getStore, newId, nowIso } from "@/lib/db/store";
+import { getPersistence } from "@/lib/db/persistence";
 import { ensureSeeded } from "@/lib/db/seed";
 import { computeReadinessFor } from "@/lib/learner/readiness";
 import { listLearnersForMember as listLearnersForTeamMember } from "@/lib/db/team-invites";
@@ -78,186 +79,86 @@ function db() {
 }
 
 // ===== Subjects / Skills =====
-export function listSubjects(): Subject[] {
-  return Array.from(db().subjects.values());
+// Routed through the persistence adapter (ADR 0007 step 8). Subjects
+// and skills are effectively immutable post-seed; in postgres mode
+// each call is a cached SELECT.
+export async function listSubjects(): Promise<Subject[]> {
+  return getPersistence().curriculum.listSubjects();
 }
 
-export function getSubjectById(subjectId: string): Subject | null {
-  return db().subjects.get(subjectId) ?? null;
+export async function getSubjectById(subjectId: string): Promise<Subject | null> {
+  return getPersistence().curriculum.getSubjectById(subjectId);
 }
 
-export function listSkills(subjectId?: string): Skill[] {
-  const all = Array.from(db().skills.values());
-  return subjectId ? all.filter((s) => s.subjectId === subjectId) : all;
+export async function listSkills(subjectId?: string): Promise<Skill[]> {
+  return getPersistence().curriculum.listSkills(subjectId);
 }
 
 // ===== Learner =====
-export function listLearnersForParent(parentUserId: string, tenantId: string): LearnerProfile[] {
-  const store = db();
-  const learnerIds = new Set(
-    store.parentLearnerRelationships
-      .filter((r) => r.parentUserId === parentUserId && r.tenantId === tenantId)
-      .map((r) => r.learnerId),
-  );
-  return Array.from(store.learnerProfiles.values()).filter(
-    (l) => l.tenantId === tenantId && learnerIds.has(l.id),
-  );
+// Routed through the persistence adapter (ADR 0007 step 4). The cross-
+// domain logic — readiness recomputation, IEP cascade — stays here;
+// the store owns only the learner row + relationship cascade on delete.
+
+export async function listLearnersForParent(
+  parentUserId: string,
+  tenantId: string,
+): Promise<LearnerProfile[]> {
+  return getPersistence().learners.listForParent(parentUserId, tenantId);
 }
 
-export function getLearner(id: string, tenantId: string): LearnerProfile | null {
-  const learner = db().learnerProfiles.get(id);
-  if (!learner || learner.tenantId !== tenantId) return null;
-  return learner;
+export async function getLearner(id: string, tenantId: string): Promise<LearnerProfile | null> {
+  return getPersistence().learners.getById(id, tenantId);
 }
 
-export function parentCanAccessLearner(
+export async function parentCanAccessLearner(
   parentUserId: string,
   learnerId: string,
   tenantId: string,
-): boolean {
-  return db().parentLearnerRelationships.some(
-    (r) => r.parentUserId === parentUserId && r.learnerId === learnerId && r.tenantId === tenantId,
-  );
+): Promise<boolean> {
+  return getPersistence().learners.parentCanAccess(parentUserId, learnerId, tenantId);
 }
 
 /**
- * Sprint 24: find the primary (or first) parent-of-record for a learner.
- * Used by consent enforcement so learner/teacher requests are still blocked
+ * Find the primary (or first) parent-of-record for a learner. Used by
+ * consent enforcement so learner/teacher requests are still blocked
  * when the parent has revoked consent.
  */
-export function findPrimaryParentForLearner(learnerId: string, tenantId: string): string | null {
-  const rels = db().parentLearnerRelationships.filter(
-    (r) => r.learnerId === learnerId && r.tenantId === tenantId,
-  );
-  if (!rels.length) return null;
-  return (rels.find((r) => r.isPrimary) ?? rels[0]!).parentUserId;
+export async function findPrimaryParentForLearner(
+  learnerId: string,
+  tenantId: string,
+): Promise<string | null> {
+  return getPersistence().learners.findPrimaryParent(learnerId, tenantId);
 }
 
-const DEFAULT_ACCESSIBILITY = {
-  reducedMotion: false,
-  highContrast: false,
-  largeText: false,
-  audioFirst: false,
-  captionsAlwaysOn: false,
-};
-
-export function createLearner(input: {
+export async function createLearner(input: {
   tenantId: string;
   parentUserId: string;
   data: CreateLearnerInput;
-}): LearnerProfile {
-  const store = db();
-  const id = newId("lrn");
-  const d = input.data;
-  const display = d.preferredName?.trim() || d.firstName.trim();
-  const learner: LearnerProfile = {
-    id,
-    tenantId: input.tenantId,
-    displayName: display,
-    firstName: d.firstName.trim(),
-    preferredName: d.preferredName?.trim() || null,
-    birthYear: d.birthYear,
-    pronouns: d.pronouns ?? undefined,
-    ageRange: d.ageRange ?? null,
-    gradeBand: d.gradeBand ?? null,
-    schoolContext: d.schoolContext ?? null,
-    primaryLanguage: d.primaryLanguage ?? null,
-    readingComfort: d.readingComfort ?? null,
-    mathComfort: d.mathComfort ?? null,
-    knownStrengths: d.knownStrengths ?? [],
-    knownChallenges: d.knownChallenges ?? [],
-    accessibilityDefaults: { ...DEFAULT_ACCESSIBILITY, ...(d.accessibilityDefaults ?? {}) },
-    zipCode: d.zipCode ?? null,
-    districtId: d.districtId ?? null,
-    districtName: d.districtName ?? null,
-    functioningLevel: null,
-    readinessState: "profile_created",
-    iepDecision: null,
-    createdAt: nowIso(),
-  };
-  store.learnerProfiles.set(id, learner);
-  const rel: ParentLearnerRelationship = {
-    id: newId("plr"),
-    parentUserId: input.parentUserId,
-    learnerId: id,
-    tenantId: input.tenantId,
-    relation: "parent",
-    isPrimary: store.parentLearnerRelationships.every((r) => r.parentUserId !== input.parentUserId),
-  };
-  store.parentLearnerRelationships.push(rel);
-  return learner;
+}): Promise<LearnerProfile> {
+  return getPersistence().learners.create(input);
 }
 
-export function updateLearner(
+export async function updateLearner(
   id: string,
   tenantId: string,
   patch: PatchLearnerInput,
-): LearnerProfile | null {
-  const store = db();
-  const existing = store.learnerProfiles.get(id);
-  if (!existing || existing.tenantId !== tenantId) return null;
-  const next: LearnerProfile = {
-    ...existing,
-    firstName: patch.firstName ?? existing.firstName,
-    preferredName:
-      patch.preferredName === undefined
-        ? existing.preferredName
-        : patch.preferredName?.trim() || null,
-    birthYear: patch.birthYear ?? existing.birthYear,
-    pronouns: patch.pronouns === undefined ? existing.pronouns : (patch.pronouns ?? undefined),
-    ageRange: patch.ageRange === undefined ? existing.ageRange : (patch.ageRange ?? null),
-    gradeBand: patch.gradeBand === undefined ? existing.gradeBand : (patch.gradeBand ?? null),
-    schoolContext:
-      patch.schoolContext === undefined ? existing.schoolContext : (patch.schoolContext ?? null),
-    primaryLanguage:
-      patch.primaryLanguage === undefined
-        ? existing.primaryLanguage
-        : (patch.primaryLanguage ?? null),
-    readingComfort:
-      patch.readingComfort === undefined ? existing.readingComfort : (patch.readingComfort ?? null),
-    mathComfort:
-      patch.mathComfort === undefined ? existing.mathComfort : (patch.mathComfort ?? null),
-    knownStrengths: patch.knownStrengths ?? existing.knownStrengths,
-    knownChallenges: patch.knownChallenges ?? existing.knownChallenges,
-    accessibilityDefaults: patch.accessibilityDefaults
-      ? { ...existing.accessibilityDefaults, ...patch.accessibilityDefaults }
-      : existing.accessibilityDefaults,
-    zipCode: patch.zipCode === undefined ? existing.zipCode : (patch.zipCode ?? null),
-    districtId:
-      patch.districtId === undefined ? existing.districtId : (patch.districtId ?? null),
-    districtName:
-      patch.districtName === undefined
-        ? existing.districtName
-        : (patch.districtName ?? null),
-  };
-  // Recompute displayName if name fields changed
-  next.displayName = next.preferredName?.trim() || next.firstName.trim();
-  store.learnerProfiles.set(id, next);
-  return next;
+): Promise<LearnerProfile | null> {
+  return getPersistence().learners.update(id, tenantId, patch);
 }
 
-export function deleteLearner(id: string, tenantId: string): boolean {
-  const store = db();
-  const existing = store.learnerProfiles.get(id);
-  if (!existing || existing.tenantId !== tenantId) return false;
-  store.learnerProfiles.delete(id);
-  // Cascade: relationships, assessments
-  store.parentLearnerRelationships = store.parentLearnerRelationships.filter(
-    (r) => r.learnerId !== id,
-  );
-  for (const [aid, a] of store.parentAssessments) {
-    if (a.learnerId === id) store.parentAssessments.delete(aid);
-  }
-  return true;
+export async function deleteLearner(id: string, tenantId: string): Promise<boolean> {
+  return getPersistence().learners.delete(id, tenantId);
 }
 
-export function refreshLearnerReadiness(id: string, tenantId: string): ReadinessState | null {
-  const store = db();
-  const existing = store.learnerProfiles.get(id);
-  if (!existing || existing.tenantId !== tenantId) return null;
+export async function refreshLearnerReadiness(
+  id: string,
+  tenantId: string,
+): Promise<ReadinessState | null> {
+  const existing = await getPersistence().learners.getById(id, tenantId);
+  if (!existing) return null;
   const state = computeReadinessFor(id, tenantId);
   if (state !== existing.readinessState) {
-    store.learnerProfiles.set(id, { ...existing, readinessState: state });
+    await getPersistence().learners.setReadinessState(id, tenantId, state);
   }
   return state;
 }
@@ -290,17 +191,18 @@ function emptyAnswers(): ParentAssessment["answers"] {
  * null if none has been started yet — does NOT create a draft. Use this in
  * read paths and preflight validators that must remain mutation-free.
  */
-export function findParentAssessment(learnerId: string, tenantId: string): ParentAssessment | null {
-  const store = db();
-  for (const a of store.parentAssessments.values()) {
-    if (a.learnerId === learnerId && a.tenantId === tenantId) return a;
-  }
-  return null;
+export async function findParentAssessment(
+  learnerId: string,
+  tenantId: string,
+): Promise<ParentAssessment | null> {
+  return getPersistence().assessments.findParentAssessment(learnerId, tenantId);
 }
 
-export function getOrCreateParentAssessment(learnerId: string, tenantId: string): ParentAssessment {
-  const store = db();
-  const existing = findParentAssessment(learnerId, tenantId);
+export async function getOrCreateParentAssessment(
+  learnerId: string,
+  tenantId: string,
+): Promise<ParentAssessment> {
+  const existing = await findParentAssessment(learnerId, tenantId);
   if (existing) return existing;
   const id = newId("pa");
   const now = nowIso();
@@ -314,17 +216,16 @@ export function getOrCreateParentAssessment(learnerId: string, tenantId: string)
     updatedAt: now,
     submittedAt: null,
   };
-  store.parentAssessments.set(id, assessment);
-  return assessment;
+  return getPersistence().assessments.upsertParentAssessment(assessment);
 }
 
-export function patchParentAssessmentSection(
+export async function patchParentAssessmentSection(
   learnerId: string,
   tenantId: string,
   section: ParentAssessmentSectionId,
   data: Record<string, unknown>,
-): ParentAssessment {
-  const current = getOrCreateParentAssessment(learnerId, tenantId);
+): Promise<ParentAssessment> {
+  const current = await getOrCreateParentAssessment(learnerId, tenantId);
   const completed = new Set(current.completedSections);
   completed.add(section);
   const next: ParentAssessment = {
@@ -336,44 +237,44 @@ export function patchParentAssessmentSection(
     completedSections: Array.from(completed),
     updatedAt: nowIso(),
   };
-  getStore().parentAssessments.set(current.id, next);
-  return next;
+  return getPersistence().assessments.upsertParentAssessment(next);
 }
 
-export function submitParentAssessment(
+export async function submitParentAssessment(
   learnerId: string,
   tenantId: string,
-): ParentAssessment | null {
-  const current = getOrCreateParentAssessment(learnerId, tenantId);
+): Promise<ParentAssessment | null> {
+  const current = await getOrCreateParentAssessment(learnerId, tenantId);
   const submitted: ParentAssessment = {
     ...current,
     submittedAt: nowIso(),
     updatedAt: nowIso(),
   };
-  getStore().parentAssessments.set(current.id, submitted);
-  return submitted;
+  return getPersistence().assessments.upsertParentAssessment(submitted);
 }
 
 // ===== IEP (Sprint 6) =====
-export function getIEPForLearner(learnerId: string, tenantId: string): IEPDocument | null {
-  const store = db();
-  for (const doc of store.iepDocuments.values()) {
-    if (doc.learnerId === learnerId && doc.tenantId === tenantId) return doc;
-  }
-  return null;
+// Routed through the persistence adapter (ADR 0007 step 9). The
+// learner.iepDecision side-effect stays in repos.ts so the upsert /
+// delete / extraction pipeline remains atomic with the learner row.
+export async function getIEPForLearner(
+  learnerId: string,
+  tenantId: string,
+): Promise<IEPDocument | null> {
+  return getPersistence().compliance.getIEPForLearner(learnerId, tenantId);
 }
 
-export function uploadIEPDocument(input: {
+export async function uploadIEPDocument(input: {
   learnerId: string;
   tenantId: string;
   fileName: string;
   mimeType: string;
   bytes: number;
-}): IEPDocument {
-  const store = db();
+}): Promise<IEPDocument> {
+  const compliance = getPersistence().compliance;
   // Single IEP per learner — overwrite any prior pending doc.
-  const existing = getIEPForLearner(input.learnerId, input.tenantId);
-  if (existing) store.iepDocuments.delete(existing.id);
+  const existing = await compliance.getIEPForLearner(input.learnerId, input.tenantId);
+  if (existing) await compliance.deleteIEP(input.learnerId, input.tenantId);
   const doc: IEPDocument = {
     id: newId("iep"),
     learnerId: input.learnerId,
@@ -387,38 +288,38 @@ export function uploadIEPDocument(input: {
     acceptedAccommodations: null,
     confirmedAt: null,
   };
-  store.iepDocuments.set(doc.id, doc);
-  // Mark learner as having decided "uploaded"
-  const learner = store.learnerProfiles.get(input.learnerId);
-  if (learner && learner.tenantId === input.tenantId) {
-    store.learnerProfiles.set(input.learnerId, { ...learner, iepDecision: "uploaded" });
+  await compliance.upsertIEP(doc);
+  // Mark learner as having decided "uploaded".
+  const learner = await getLearner(input.learnerId, input.tenantId);
+  if (learner) {
+    db().learnerProfiles.set(input.learnerId, { ...learner, iepDecision: "uploaded" });
   }
   return doc;
 }
 
-export function deleteIEPForLearner(learnerId: string, tenantId: string): boolean {
-  const store = db();
-  const existing = getIEPForLearner(learnerId, tenantId);
-  if (!existing) return false;
-  store.iepDocuments.delete(existing.id);
-  const learner = store.learnerProfiles.get(learnerId);
-  if (learner && learner.tenantId === tenantId) {
-    store.learnerProfiles.set(learnerId, { ...learner, iepDecision: null });
+export async function deleteIEPForLearner(
+  learnerId: string,
+  tenantId: string,
+): Promise<boolean> {
+  const removed = await getPersistence().compliance.deleteIEP(learnerId, tenantId);
+  if (!removed) return false;
+  const learner = await getLearner(learnerId, tenantId);
+  if (learner) {
+    db().learnerProfiles.set(learnerId, { ...learner, iepDecision: null });
   }
   return true;
 }
 
-export function setIEPExtraction(
+export async function setIEPExtraction(
   learnerId: string,
   tenantId: string,
   extraction: IEPExtraction,
-): IEPDocument | null {
-  const store = db();
-  const existing = getIEPForLearner(learnerId, tenantId);
+): Promise<IEPDocument | null> {
+  const compliance = getPersistence().compliance;
+  const existing = await compliance.getIEPForLearner(learnerId, tenantId);
   if (!existing) return null;
   const next: IEPDocument = { ...existing, extraction, status: "parsed" };
-  store.iepDocuments.set(existing.id, next);
-  return next;
+  return compliance.upsertIEP(next);
 }
 
 /**
@@ -427,13 +328,12 @@ export function setIEPExtraction(
  * also stamp `confirmedAt` so readiness / brain-profile generation can
  * trust the document was actively reviewed.
  */
-export function confirmIEPExtraction(
+export async function confirmIEPExtraction(
   learnerId: string,
   tenantId: string,
   acceptedAccommodations: string[],
-): IEPDocument | null {
-  const store = db();
-  const existing = getIEPForLearner(learnerId, tenantId);
+): Promise<IEPDocument | null> {
+  const existing = await getIEPForLearner(learnerId, tenantId);
   if (!existing) return null;
   // Defensive: only allow consent on labels that exist in the extraction.
   const allowed = new Set(existing.extraction?.accommodations ?? []);
@@ -443,46 +343,48 @@ export function confirmIEPExtraction(
     acceptedAccommodations: accepted,
     confirmedAt: nowIso(),
   };
-  store.iepDocuments.set(existing.id, next);
-  return next;
+  return getPersistence().compliance.upsertIEP(next);
 }
 
-export function recordIEPSkip(learnerId: string, tenantId: string): LearnerProfile | null {
-  const store = db();
-  const learner = store.learnerProfiles.get(learnerId);
-  if (!learner || learner.tenantId !== tenantId) return null;
+export async function recordIEPSkip(
+  learnerId: string,
+  tenantId: string,
+): Promise<LearnerProfile | null> {
+  const learner = await getLearner(learnerId, tenantId);
+  if (!learner) return null;
   // Remove any prior uploaded doc — skip is an explicit decision.
-  const prior = getIEPForLearner(learnerId, tenantId);
-  if (prior) store.iepDocuments.delete(prior.id);
+  await getPersistence().compliance.deleteIEP(learnerId, tenantId);
   const next: LearnerProfile = { ...learner, iepDecision: "skipped" };
-  store.learnerProfiles.set(learnerId, next);
+  db().learnerProfiles.set(learnerId, next);
   return next;
 }
 
 // ===== Brain profile (Sprint 7) =====
-export function getBrainProfile(learnerId: string, tenantId: string): LearnerBrainProfile | null {
-  const store = db();
-  for (const p of store.brainProfiles.values()) {
-    if (p.learnerId === learnerId && p.tenantId === tenantId) return p;
-  }
-  return null;
+// Routed through the persistence adapter (ADR 0007 step 7). When
+// AIVO_USE_BRAIN_SVC=true the service-client path in
+// lib/services/brain-svc.ts bypasses the adapter entirely and talks
+// to services/brain-svc — see ADR 0009.
+export async function getBrainProfile(
+  learnerId: string,
+  tenantId: string,
+): Promise<LearnerBrainProfile | null> {
+  return getPersistence().brainProfiles.getForLearner(learnerId, tenantId);
 }
 
-export function upsertBrainProfile(
+export async function upsertBrainProfile(
   learnerId: string,
   tenantId: string,
   state: LearnerBrainProfileState,
-): LearnerBrainProfile {
-  const store = db();
+): Promise<LearnerBrainProfile> {
   // Defense-in-depth: BFF guards already enforce tenant scope, but a future
   // caller forgetting the guard would otherwise be able to create a brain
   // profile under the wrong tenantId. Verify the learner actually belongs
   // here before mutating.
-  const learner = store.learnerProfiles.get(learnerId);
-  if (!learner || learner.tenantId !== tenantId) {
+  const learner = await getLearner(learnerId, tenantId);
+  if (!learner) {
     throw new Error(`upsertBrainProfile: learner ${learnerId} not found in tenant ${tenantId}`);
   }
-  const existing = getBrainProfile(learnerId, tenantId);
+  const existing = await getBrainProfile(learnerId, tenantId);
   const now = nowIso();
   if (existing) {
     const next: LearnerBrainProfile = {
@@ -496,8 +398,7 @@ export function upsertBrainProfile(
       clonedAt: null,
       generatedAt: now,
     };
-    store.brainProfiles.set(existing.id, next);
-    return next;
+    return getPersistence().brainProfiles.upsert(next);
   }
   const profile: LearnerBrainProfile = {
     id: newId("brp"),
@@ -511,8 +412,7 @@ export function upsertBrainProfile(
     generatedAt: now,
     updatedAt: now,
   };
-  store.brainProfiles.set(profile.id, profile);
-  return profile;
+  return getPersistence().brainProfiles.upsert(profile);
 }
 
 /**
@@ -530,22 +430,21 @@ export function upsertBrainProfile(
  * gate in `completeBaseline` — by deferring all writes until after this
  * validation passes, a clone failure leaves no partial mutations behind.
  */
-function prepareBrainCloneFromSummary(
+async function prepareBrainCloneFromSummary(
   learnerId: string,
   tenantId: string,
   summary: BaselineSummary,
-): LearnerBrainProfile | null {
-  const store = db();
-  const learner = store.learnerProfiles.get(learnerId);
-  if (!learner || learner.tenantId !== tenantId) return null;
-  const existing = getBrainProfile(learnerId, tenantId);
+): Promise<LearnerBrainProfile | null> {
+  const learner = await getLearner(learnerId, tenantId);
+  if (!learner) return null;
+  const existing = await getBrainProfile(learnerId, tenantId);
   if (!existing) return null;
 
   // Read-only: must not mutate the store on the preflight path, otherwise
   // a clone-prep failure would still leave a draft parent assessment behind.
-  const assessment = findParentAssessment(learnerId, tenantId);
-  const iep = getIEPForLearner(learnerId, tenantId);
-  const subjects = listSubjects();
+  const assessment = await findParentAssessment(learnerId, tenantId);
+  const iep = await getIEPForLearner(learnerId, tenantId);
+  const subjects = await listSubjects();
   const candidate = buildBrainProfile({
     learner,
     assessment,
@@ -569,9 +468,8 @@ function prepareBrainCloneFromSummary(
 }
 
 /** Internal: commit a prepared brain clone to the store. */
-function commitBrainClone(profile: LearnerBrainProfile): LearnerBrainProfile {
-  db().brainProfiles.set(profile.id, profile);
-  return profile;
+async function commitBrainClone(profile: LearnerBrainProfile): Promise<LearnerBrainProfile> {
+  return getPersistence().brainProfiles.upsert(profile);
 }
 
 /**
@@ -580,19 +478,20 @@ function commitBrainClone(profile: LearnerBrainProfile): LearnerBrainProfile {
  * future scheduled re-clone). Inside `completeBaseline` we use the prepare +
  * commit primitives directly to keep the whole transition atomic.
  */
-export function cloneBrainFromBaseline(
+export async function cloneBrainFromBaseline(
   learnerId: string,
   tenantId: string,
-): LearnerBrainProfile | null {
-  const store = db();
-  let latest: BaselineAssessment | null = null;
-  for (const b of store.baselineAssessments.values()) {
-    if (b.learnerId !== learnerId || b.tenantId !== tenantId) continue;
-    if (b.status !== "complete" || !b.summary) continue;
-    if (!latest || b.completedAt! > latest.completedAt!) latest = b;
-  }
+): Promise<LearnerBrainProfile | null> {
+  // Most-recent completed baseline for the learner — uses the
+  // assessment store so this is also drizzle-ready.
+  const active = await getPersistence().assessments.getActiveBaselineForLearner(
+    learnerId,
+    tenantId,
+  );
+  const latest =
+    active && active.status === "complete" && active.summary ? active : null;
   if (!latest || !latest.summary) return null;
-  const prepared = prepareBrainCloneFromSummary(learnerId, tenantId, latest.summary);
+  const prepared = await prepareBrainCloneFromSummary(learnerId, tenantId, latest.summary);
   if (!prepared) return null;
   return commitBrainClone(prepared);
 }
@@ -604,12 +503,12 @@ export function cloneBrainFromBaseline(
  * profile is a no-op. Returns null when no clone exists or it's still in
  * `pre_clone` (baseline not yet finished).
  */
-export function approveBrainClone(
+export async function approveBrainClone(
   learnerId: string,
   tenantId: string,
   options: { amended?: boolean } = {},
-): LearnerBrainProfile | null {
-  const existing = getBrainProfile(learnerId, tenantId);
+): Promise<LearnerBrainProfile | null> {
+  const existing = await getBrainProfile(learnerId, tenantId);
   if (!existing) return null;
   if (existing.cloneStage === "pre_clone") return null;
   const status: LearnerBrainProfile["approvalStatus"] = options.amended
@@ -622,41 +521,34 @@ export function approveBrainClone(
     cloneStage: "approved",
     updatedAt: nowIso(),
   };
-  db().brainProfiles.set(existing.id, next);
-  return next;
+  return getPersistence().brainProfiles.upsert(next);
 }
 
 // ===== Baseline (Sprint 8) =====
 
-export function getActiveBaselineForLearner(
+export async function getActiveBaselineForLearner(
   learnerId: string,
   tenantId: string,
-): BaselineAssessment | null {
-  const store = db();
-  let latest: BaselineAssessment | null = null;
-  for (const b of store.baselineAssessments.values()) {
-    if (b.learnerId !== learnerId || b.tenantId !== tenantId) continue;
-    if (!latest || b.createdAt > latest.createdAt) latest = b;
-  }
-  return latest;
+): Promise<BaselineAssessment | null> {
+  return getPersistence().assessments.getActiveBaselineForLearner(learnerId, tenantId);
 }
 
-export function getBaselineById(baselineId: string, tenantId: string): BaselineAssessment | null {
-  const b = db().baselineAssessments.get(baselineId);
-  if (!b || b.tenantId !== tenantId) return null;
-  return b;
+export async function getBaselineById(
+  baselineId: string,
+  tenantId: string,
+): Promise<BaselineAssessment | null> {
+  return getPersistence().assessments.getBaselineById(baselineId, tenantId);
 }
 
-export function listBaselineQuestions(baselineId: string): BaselineQuestion[] {
-  return Array.from(db().baselineQuestions.values())
-    .filter((q) => q.baselineId === baselineId)
-    .sort((a, b) => a.order - b.order);
+export async function listBaselineQuestions(baselineId: string): Promise<BaselineQuestion[]> {
+  return getPersistence().assessments.listBaselineQuestions(baselineId);
 }
 
-export function listBaselineAttempts(baselineId: string, tenantId: string): BaselineAttempt[] {
-  return db().baselineAttempts.filter(
-    (a) => a.baselineId === baselineId && a.tenantId === tenantId,
-  );
+export async function listBaselineAttempts(
+  baselineId: string,
+  tenantId: string,
+): Promise<BaselineAttempt[]> {
+  return getPersistence().assessments.listBaselineAttempts(baselineId, tenantId);
 }
 
 /**
@@ -713,8 +605,8 @@ export async function createBaseline(input: {
     summary: null,
   };
 
-  const brainProfile = getBrainProfile(input.learnerId, input.tenantId);
-  const parentAssessment = findParentAssessment(input.learnerId, input.tenantId);
+  const brainProfile = await getBrainProfile(input.learnerId, input.tenantId);
+  const parentAssessment = await findParentAssessment(input.learnerId, input.tenantId);
 
   let questions: BaselineQuestion[] = [];
   // Definite-assignment: every code path below the discovery/LLM/BANK
@@ -942,10 +834,13 @@ export async function createBaseline(input: {
     });
   }
 
-  store.baselineAssessments.set(baseline.id, { ...baseline, generationMetadata: metadata });
+  const persistedBaseline = await getPersistence().assessments.upsertBaseline({
+    ...baseline,
+    generationMetadata: metadata,
+  });
   baseline.generationMetadata = metadata;
-  for (const q of questions) store.baselineQuestions.set(q.id, q);
-  return { baseline, questions };
+  await getPersistence().assessments.appendBaselineQuestions(questions);
+  return { baseline: persistedBaseline, questions };
 }
 
 /**
@@ -957,7 +852,7 @@ export async function createBaseline(input: {
  * downstream player render identical.
  */
 function accommodationTagsForBaseline(
-  brainProfile: ReturnType<typeof getBrainProfile>,
+  brainProfile: LearnerBrainProfile | null,
 ): string[] {
   if (!brainProfile) return [];
   const s = brainProfile.state;
@@ -977,40 +872,41 @@ function accommodationTagsForBaseline(
   return Array.from(tags);
 }
 
-export function startBaseline(baselineId: string, tenantId: string): BaselineAssessment | null {
-  const store = db();
-  const b = store.baselineAssessments.get(baselineId);
-  if (!b || b.tenantId !== tenantId) return null;
+export async function startBaseline(
+  baselineId: string,
+  tenantId: string,
+): Promise<BaselineAssessment | null> {
+  const store = getPersistence().assessments;
+  const b = await store.getBaselineById(baselineId, tenantId);
+  if (!b) return null;
   if (b.status === "complete") return b;
   const next: BaselineAssessment = {
     ...b,
     status: "in_progress",
     startedAt: b.startedAt ?? nowIso(),
   };
-  store.baselineAssessments.set(baselineId, next);
-  return next;
+  return store.upsertBaseline(next);
 }
 
-export function recordBaselineAttempt(input: {
+export async function recordBaselineAttempt(input: {
   baselineId: string;
   questionId: string;
   learnerId: string;
   tenantId: string;
   response: string;
   skipped?: boolean;
-}): BaselineAttempt | null {
-  const store = db();
-  const baseline = store.baselineAssessments.get(input.baselineId);
-  if (!baseline || baseline.tenantId !== input.tenantId) return null;
+}): Promise<BaselineAttempt | null> {
+  const store = getPersistence().assessments;
+  const baseline = await store.getBaselineById(input.baselineId, input.tenantId);
+  if (!baseline) return null;
   if (baseline.learnerId !== input.learnerId) return null;
   if (baseline.status === "complete") return null;
-  const q = store.baselineQuestions.get(input.questionId);
-  if (!q || q.baselineId !== input.baselineId) return null;
-
-  // Replace any prior attempt on the same question (latest wins).
-  store.baselineAttempts = store.baselineAttempts.filter(
-    (a) => !(a.questionId === input.questionId && a.learnerId === input.learnerId),
-  );
+  // Question lookup still hits the legacy Map directly via `listBaselineQuestions`
+  // — single-row lookup by id without a full scan is cheap and keeps the
+  // adapter surface narrow. Drizzle impl can add a `getQuestionById`.
+  const questions = await store.listBaselineQuestions(input.baselineId);
+  const q = questions.find((x) => x.id === input.questionId);
+  if (!q) return null;
 
   const skipped = Boolean(input.skipped);
   const trimmed = (input.response ?? "").trim();
@@ -1030,11 +926,14 @@ export function recordBaselineAttempt(input: {
     skipped,
     respondedAt: nowIso(),
   };
-  store.baselineAttempts.push(attempt);
+  await store.recordBaselineAttempt(attempt, {
+    questionId: input.questionId,
+    learnerId: input.learnerId,
+  });
 
   // Promote to in_progress if it was still not_started.
   if (baseline.status === "not_started") {
-    store.baselineAssessments.set(input.baselineId, {
+    await store.upsertBaseline({
       ...baseline,
       status: "in_progress",
       startedAt: baseline.startedAt ?? nowIso(),
@@ -1047,10 +946,10 @@ export function recordBaselineAttempt(input: {
  * Complete the baseline: compute summary, mastery rows, learning path, review
  * schedule. Idempotent — calling twice returns the existing summary.
  */
-export function completeBaseline(
+export async function completeBaseline(
   baselineId: string,
   tenantId: string,
-): {
+): Promise<{
   baseline: BaselineAssessment;
   summary: BaselineSummary;
   masteryMap: MasteryMap;
@@ -1059,10 +958,10 @@ export function completeBaseline(
   reviewSchedules: ReviewSchedule[];
   /** Post-baseline clone of the brain profile; null if no pre-clone existed. */
   clonedBrainProfile: LearnerBrainProfile | null;
-} | null {
+} | null> {
   const store = db();
-  const baseline = store.baselineAssessments.get(baselineId);
-  if (!baseline || baseline.tenantId !== tenantId) return null;
+  const baseline = await getPersistence().assessments.getBaselineById(baselineId, tenantId);
+  if (!baseline) return null;
   const learner = store.learnerProfiles.get(baseline.learnerId);
   if (!learner) return null;
 
@@ -1098,14 +997,14 @@ export function completeBaseline(
         skillMasteries: existingMasteries,
         learningPath: existingPath,
         reviewSchedules: existingReviews,
-        clonedBrainProfile: getBrainProfile(baseline.learnerId, tenantId),
+        clonedBrainProfile: await getBrainProfile(baseline.learnerId, tenantId),
       };
     }
     // Fall through if any derived artifact is missing — we'll rebuild.
   }
 
-  const questions = listBaselineQuestions(baselineId);
-  const attempts = listBaselineAttempts(baselineId, tenantId);
+  const questions = await listBaselineQuestions(baselineId);
+  const attempts = await listBaselineAttempts(baselineId, tenantId);
   const subjects = Array.from(store.subjects.values()).filter((s) =>
     baseline.subjectIds.includes(s.id),
   );
@@ -1169,7 +1068,11 @@ export function completeBaseline(
   // missing pre-clone profile) we bail out atomically — no skill-mastery,
   // mastery-map, learning-path, review-schedule, or status mutations land in
   // the store, so the parent can simply retry without observable partial state.
-  const preparedClone = prepareBrainCloneFromSummary(baseline.learnerId, tenantId, summary);
+  const preparedClone = await prepareBrainCloneFromSummary(
+    baseline.learnerId,
+    tenantId,
+    summary,
+  );
   if (!preparedClone) return null;
 
   // --- Commit (atomic from this point: validation has already passed) ---
@@ -1202,7 +1105,7 @@ export function completeBaseline(
   );
   store.reviewSchedules.push(...reviewSchedules);
 
-  const clonedBrainProfile = commitBrainClone(preparedClone);
+  const clonedBrainProfile = await commitBrainClone(preparedClone);
 
   const completed: BaselineAssessment = {
     ...baseline,
@@ -1210,7 +1113,7 @@ export function completeBaseline(
     completedAt: baseline.completedAt ?? nowIso(),
     summary,
   };
-  store.baselineAssessments.set(baselineId, completed);
+  await getPersistence().assessments.upsertBaseline(completed);
 
   return {
     baseline: completed,
@@ -1223,44 +1126,35 @@ export function completeBaseline(
   };
 }
 
-// ===== Mastery + Learning Path (Sprint 9) =====
-export function getMasteryMap(
+// ===== Mastery + Learning Path =====
+export async function getMasteryMap(
   learnerId: string,
   tenantId: string,
-): {
+): Promise<{
   map: MasteryMap | null;
   skillMasteries: SkillMastery[];
-} {
-  const store = db();
-  let map: MasteryMap | null = null;
-  for (const m of store.masteryMaps.values()) {
-    if (m.learnerId === learnerId && m.tenantId === tenantId) {
-      map = m;
-      break;
-    }
-  }
-  const skillMasteries = store.skillMasteries.filter(
-    (s) => s.learnerId === learnerId && s.tenantId === tenantId,
-  );
-  return { map, skillMasteries };
+}> {
+  return getPersistence().curriculum.getMasteryMapForLearner(learnerId, tenantId);
 }
 
-export function getLearningPath(learnerId: string, tenantId: string): LearningPath | null {
-  for (const p of db().learningPaths.values()) {
-    if (p.learnerId === learnerId && p.tenantId === tenantId) return p;
-  }
-  return null;
+export async function getLearningPath(
+  learnerId: string,
+  tenantId: string,
+): Promise<LearningPath | null> {
+  return getPersistence().curriculum.getLearningPath(learnerId, tenantId);
 }
 
 /**
  * Re-generate the learning path from the current MasteryMap. Used when the
  * parent or a tutor wants a fresh path after lesson activity.
  */
-export function regenerateLearningPath(learnerId: string, tenantId: string): LearningPath | null {
-  const store = db();
-  const { map, skillMasteries } = getMasteryMap(learnerId, tenantId);
+export async function regenerateLearningPath(
+  learnerId: string,
+  tenantId: string,
+): Promise<LearningPath | null> {
+  const { map, skillMasteries } = await getMasteryMap(learnerId, tenantId);
   if (!map || skillMasteries.length === 0) return null;
-  const skills = Array.from(store.skills.values());
+  const skills = await listSkills();
   // Find a "recommended first" skill: lowest-scoring, prefer reading.
   const sorted = skillMasteries.slice().sort((a, b) => a.score - b.score);
   const recommended = sorted[0]?.skillId ?? null;
@@ -1272,13 +1166,7 @@ export function regenerateLearningPath(learnerId: string, tenantId: string): Lea
     skills,
     recommendedStartSkillId: recommended,
   });
-  for (const [id, p] of store.learningPaths) {
-    if (p.learnerId === learnerId && p.tenantId === tenantId) {
-      store.learningPaths.delete(id);
-    }
-  }
-  store.learningPaths.set(next.id, next);
-  return next;
+  return getPersistence().curriculum.replaceLearningPath(learnerId, tenantId, next);
 }
 
 export type SubjectDetail = {
@@ -1292,17 +1180,17 @@ export type SubjectDetail = {
   pathNodesForSubject: LearningPath["nodes"];
 };
 
-export function getSubjectDetail(
+export async function getSubjectDetail(
   learnerId: string,
   tenantId: string,
   subjectId: string,
-): SubjectDetail | null {
+): Promise<SubjectDetail | null> {
   const store = db();
   const subject = store.subjects.get(subjectId);
   if (!subject) return null;
 
   const skills = Array.from(store.skills.values()).filter((s) => s.subjectId === subjectId);
-  const { skillMasteries } = getMasteryMap(learnerId, tenantId);
+  const { skillMasteries } = await getMasteryMap(learnerId, tenantId);
   const masteryBySkillId = new Map(skillMasteries.map((m) => [m.skillId, m]));
   const annotated = skills.map((s) => ({
     ...s,
@@ -1332,7 +1220,7 @@ export function getSubjectDetail(
   const nextSkill =
     sortedForNext.find((s) => !s.mastery || s.mastery.score < 0.65) ?? annotated[0] ?? null;
 
-  const path = getLearningPath(learnerId, tenantId);
+  const path = await getLearningPath(learnerId, tenantId);
   const pathNodesForSubject = path?.nodes.filter((n) => n.subjectId === subjectId) ?? [];
 
   const tutorByYubject: Record<string, string> = {
@@ -1356,14 +1244,19 @@ export function getSubjectDetail(
 }
 
 // ===== Audit =====
-export function recordAudit(input: {
+// Routed through the persistence adapter (ADR 0007 step 2). The
+// memory implementation writes to the existing append-only array;
+// the Drizzle implementation lands once `packages/db` exports an
+// audit_logs table. `recordAudit` synthesises the row synchronously
+// so callers can use the returned id without awaiting the store.
+export async function recordAudit(input: {
   userId: string | null;
   tenantId: string | null;
   learnerId?: string | null;
   action: string;
   metadata?: Record<string, unknown>;
   requestId: string;
-}): AuditLog {
+}): Promise<AuditLog> {
   const log: AuditLog = {
     id: newId("aud"),
     userId: input.userId,
@@ -1374,15 +1267,11 @@ export function recordAudit(input: {
     requestId: input.requestId,
     occurredAt: nowIso(),
   };
-  db().auditLogs.push(log);
-  return log;
+  return getPersistence().audit.append(log);
 }
 
-export function recentAuditLogs(tenantId: string, limit = 50): AuditLog[] {
-  return db()
-    .auditLogs.filter((l) => l.tenantId === tenantId)
-    .slice(-limit)
-    .reverse();
+export async function recentAuditLogs(tenantId: string, limit = 50): Promise<AuditLog[]> {
+  return getPersistence().audit.recentForTenant(tenantId, limit);
 }
 
 // ===== Lesson Runs (Sprints 10–11) =====
@@ -1430,13 +1319,13 @@ function buildAccommodationSnapshotFrom(
   };
 }
 
-function buildMasterySnapshot(input: {
+async function buildMasterySnapshot(input: {
   learnerId: string;
   tenantId: string;
   subjectId: string;
   skillId: string;
-}): LessonMasterySnapshot {
-  const { skillMasteries } = getMasteryMap(input.learnerId, input.tenantId);
+}): Promise<LessonMasterySnapshot> {
+  const { skillMasteries } = await getMasteryMap(input.learnerId, input.tenantId);
   const own = skillMasteries.find((m) => m.skillId === input.skillId);
   const subjectContext = skillMasteries
     .filter((m) => m.subjectId === input.subjectId && m.skillId !== input.skillId)
@@ -1505,8 +1394,8 @@ export async function createLessonRun(
   provider: TutorProvider = MockTutorProvider,
 ): Promise<CreateLessonRunResult> {
   const store = db();
-  const learner = store.learnerProfiles.get(input.learnerId);
-  if (!learner || learner.tenantId !== input.tenantId) {
+  const learner = await getLearner(input.learnerId, input.tenantId);
+  if (!learner) {
     return { ok: false, code: "learner_not_found", message: "Learner not in tenant" };
   }
   const subject = store.subjects.get(input.subjectId);
@@ -1517,7 +1406,7 @@ export async function createLessonRun(
   if (!skill || skill.subjectId !== input.subjectId) {
     return { ok: false, code: "skill_not_found", message: "Skill not in subject" };
   }
-  const brain = getBrainProfile(input.learnerId, input.tenantId);
+  const brain = await getBrainProfile(input.learnerId, input.tenantId);
   if (!brain) {
     return {
       ok: false,
@@ -1526,7 +1415,7 @@ export async function createLessonRun(
     };
   }
 
-  const masterySnapshot = buildMasterySnapshot({
+  const masterySnapshot = await buildMasterySnapshot({
     learnerId: input.learnerId,
     tenantId: input.tenantId,
     subjectId: input.subjectId,
@@ -1570,7 +1459,7 @@ export async function createLessonRun(
     createdAt: now,
     updatedAt: now,
   };
-  store.lessonRuns.set(run.id, run);
+  await getPersistence().lessonRuns.upsertRun(run);
 
   try {
     const { plan, telemetry } = await generateLessonPlanWithRetry(provider, {
@@ -1600,7 +1489,7 @@ export async function createLessonRun(
       generatedAt: nowIso(),
       generation: telemetry,
     };
-    store.generatedLessonPlans.set(planRecord.id, planRecord);
+    await getPersistence().lessonRuns.upsertPlan(planRecord);
 
     const ready: LessonRun = {
       ...run,
@@ -1608,7 +1497,7 @@ export async function createLessonRun(
       lessonPlanId: planRecord.id,
       updatedAt: nowIso(),
     };
-    store.lessonRuns.set(ready.id, ready);
+    await getPersistence().lessonRuns.upsertRun(ready);
     return { ok: true, lessonRun: ready, plan: planRecord };
   } catch (e) {
     const failed: LessonRun = {
@@ -1617,7 +1506,7 @@ export async function createLessonRun(
       failureReason: e instanceof Error ? e.message : String(e),
       updatedAt: nowIso(),
     };
-    store.lessonRuns.set(failed.id, failed);
+    await getPersistence().lessonRuns.upsertRun(failed);
     return {
       ok: false,
       code: "generation_failed",
@@ -1627,36 +1516,32 @@ export async function createLessonRun(
   }
 }
 
-export function getLessonRun(
+export async function getLessonRun(
   lessonRunId: string,
   tenantId: string,
-): { lessonRun: LessonRun; plan: GeneratedLessonPlan | null } | null {
-  const store = db();
-  const run = store.lessonRuns.get(lessonRunId);
-  if (!run || run.tenantId !== tenantId) return null;
-  const plan = run.lessonPlanId ? (store.generatedLessonPlans.get(run.lessonPlanId) ?? null) : null;
-  return { lessonRun: run, plan: plan && plan.tenantId === tenantId ? plan : null };
+): Promise<{ lessonRun: LessonRun; plan: GeneratedLessonPlan | null } | null> {
+  const store = getPersistence().lessonRuns;
+  const run = await store.getRunById(lessonRunId, tenantId);
+  if (!run) return null;
+  const plan = run.lessonPlanId ? await store.getPlanById(run.lessonPlanId, tenantId) : null;
+  return { lessonRun: run, plan };
 }
 
-export function listLessonRunsForLearner(
+export async function listLessonRunsForLearner(
   learnerId: string,
   tenantId: string,
   opts?: { limit?: number; status?: LessonRun["status"] },
-): LessonRun[] {
-  const limit = opts?.limit ?? 50;
-  const all = Array.from(db().lessonRuns.values()).filter(
-    (r) =>
-      r.learnerId === learnerId &&
-      r.tenantId === tenantId &&
-      (!opts?.status || r.status === opts.status),
-  );
-  return all.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1)).slice(0, limit);
+): Promise<LessonRun[]> {
+  return getPersistence().lessonRuns.listForLearner(learnerId, tenantId, opts);
 }
 
-export function startLessonRun(lessonRunId: string, tenantId: string): LessonRun | null {
-  const store = db();
-  const run = store.lessonRuns.get(lessonRunId);
-  if (!run || run.tenantId !== tenantId) return null;
+export async function startLessonRun(
+  lessonRunId: string,
+  tenantId: string,
+): Promise<LessonRun | null> {
+  const store = getPersistence().lessonRuns;
+  const run = await store.getRunById(lessonRunId, tenantId);
+  if (!run) return null;
   if (run.status === "completed" || run.status === "abandoned") return run;
   // Idempotent: only set startedAt the first time.
   const next: LessonRun = {
@@ -1665,13 +1550,13 @@ export function startLessonRun(lessonRunId: string, tenantId: string): LessonRun
     startedAt: run.startedAt ?? nowIso(),
     updatedAt: nowIso(),
   };
-  store.lessonRuns.set(next.id, next);
+  await store.upsertRun(next);
   // Promote learner readiness once they're actively learning.
-  refreshLearnerReadiness(run.learnerId, tenantId);
+  await refreshLearnerReadiness(run.learnerId, tenantId);
   return next;
 }
 
-export function recordLessonStep(input: {
+export async function recordLessonStep(input: {
   lessonRunId: string;
   tenantId: string;
   learnerId: string;
@@ -1680,10 +1565,10 @@ export function recordLessonStep(input: {
   response?: string | null;
   isCorrect?: boolean | null;
   skipped?: boolean;
-}): LessonInteraction | null {
-  const store = db();
-  const run = store.lessonRuns.get(input.lessonRunId);
-  if (!run || run.tenantId !== input.tenantId) return null;
+}): Promise<LessonInteraction | null> {
+  const store = getPersistence().lessonRuns;
+  const run = await store.getRunById(input.lessonRunId, input.tenantId);
+  if (!run) return null;
   if (run.learnerId !== input.learnerId) return null;
   const interaction: LessonInteraction = {
     id: newId("li"),
@@ -1697,25 +1582,26 @@ export function recordLessonStep(input: {
     skipped: input.skipped ?? false,
     occurredAt: nowIso(),
   };
-  store.lessonInteractions.push(interaction);
+  await store.appendInteraction(interaction);
   // Keep run in_progress on first interaction.
   if (run.status === "ready") {
-    store.lessonRuns.set(run.id, {
+    await store.upsertRun({
       ...run,
       status: "in_progress",
       startedAt: run.startedAt ?? nowIso(),
       updatedAt: nowIso(),
     });
   } else {
-    store.lessonRuns.set(run.id, { ...run, updatedAt: nowIso() });
+    await store.upsertRun({ ...run, updatedAt: nowIso() });
   }
   return interaction;
 }
 
-export function listLessonInteractions(lessonRunId: string, tenantId: string): LessonInteraction[] {
-  return db().lessonInteractions.filter(
-    (i) => i.lessonRunId === lessonRunId && i.tenantId === tenantId,
-  );
+export async function listLessonInteractions(
+  lessonRunId: string,
+  tenantId: string,
+): Promise<LessonInteraction[]> {
+  return getPersistence().lessonRuns.listInteractions(lessonRunId, tenantId);
 }
 
 /**
@@ -1938,14 +1824,14 @@ function buildParentLessonSummary(
   };
 }
 
-export function completeLessonRun(
+export async function completeLessonRun(
   lessonRunId: string,
   tenantId: string,
   outcome?: LessonOutcome,
-): LessonRun | null {
-  const store = db();
-  const run = store.lessonRuns.get(lessonRunId);
-  if (!run || run.tenantId !== tenantId) return null;
+): Promise<LessonRun | null> {
+  const runStore = getPersistence().lessonRuns;
+  const run = await runStore.getRunById(lessonRunId, tenantId);
+  if (!run) return null;
   // Idempotent: a second call returns the existing completed run without
   // re-applying mastery or re-emitting a parent summary.
   if (run.status === "completed") return run;
@@ -1964,76 +1850,63 @@ export function completeLessonRun(
     startedAt: run.startedAt ?? nowIso(),
     updatedAt: nowIso(),
   };
-  store.lessonRuns.set(next.id, next);
+  await runStore.upsertRun(next);
   const delta = applyOutcomeToMastery(next, effectiveOutcome);
   const summary = buildParentLessonSummary(next, effectiveOutcome, delta);
-  store.parentLessonSummaries.set(summary.id, summary);
-  refreshLearnerReadiness(run.learnerId, tenantId);
+  await runStore.upsertParentSummary(summary);
+  await refreshLearnerReadiness(run.learnerId, tenantId);
   // Sprint 16: bump QuestProgress when the run was launched from a quest
   // chapter. Progress is binary per chapter today — we just record the
   // completed chapter so prerequisite gating works for boss unlock.
   if (next.source === "quest" && next.sourceRefId) {
-    upsertQuestProgressFromCompletion(next);
+    await upsertQuestProgressFromCompletion(next);
   }
   return next;
 }
 
-// ===== Sprint 16: Quest worlds + progress =====
+// ===== Quest worlds + progress (ADR 0007 step 10) =====
 
-export function listQuestWorlds(): QuestWorld[] {
-  return Array.from(db().questWorlds.values()).sort((a, b) => a.name.localeCompare(b.name));
+export async function listQuestWorlds(): Promise<QuestWorld[]> {
+  return getPersistence().quests.listWorlds();
 }
 
-export function getQuestWorld(worldId: string): QuestWorld | null {
-  return db().questWorlds.get(worldId) ?? null;
+export async function getQuestWorld(worldId: string): Promise<QuestWorld | null> {
+  return getPersistence().quests.getWorldById(worldId);
 }
 
-export function listQuestChapters(worldId: string): QuestChapter[] {
-  return Array.from(db().questChapters.values())
-    .filter((c) => c.questWorldId === worldId)
-    .sort((a, b) => a.order - b.order);
+export async function listQuestChapters(worldId: string): Promise<QuestChapter[]> {
+  return getPersistence().quests.listChaptersForWorld(worldId);
 }
 
-export function listQuestProgressForLearner(
+export async function listQuestProgressForLearner(
   learnerId: string,
   tenantId: string,
   worldId?: string,
-): QuestProgress[] {
-  return Array.from(db().questProgress.values()).filter(
-    (p) =>
-      p.learnerId === learnerId &&
-      p.tenantId === tenantId &&
-      (!worldId || p.questWorldId === worldId),
-  );
+): Promise<QuestProgress[]> {
+  return getPersistence().quests.listProgressForLearner(learnerId, tenantId, worldId);
 }
 
-export function getQuestProgress(
+export async function getQuestProgress(
   learnerId: string,
   tenantId: string,
   chapterId: string,
-): QuestProgress | null {
-  for (const p of db().questProgress.values()) {
-    if (p.learnerId === learnerId && p.tenantId === tenantId && p.chapterId === chapterId) {
-      return p;
-    }
-  }
-  return null;
+): Promise<QuestProgress | null> {
+  return getPersistence().quests.getProgressForChapter(learnerId, tenantId, chapterId);
 }
 
 /**
  * Chapter is unlocked when every prerequisite chapter has progress === 1.
  * Non-boss chapters with empty `prerequisiteChapterIds` are always unlocked.
  */
-export function isQuestChapterUnlocked(
+export async function isQuestChapterUnlocked(
   learnerId: string,
   tenantId: string,
   chapter: QuestChapter,
-): boolean {
+): Promise<boolean> {
   if (chapter.prerequisiteChapterIds.length === 0) return true;
+  const progress = await listQuestProgressForLearner(learnerId, tenantId);
   const completedChapterIds = new Set(
-    listQuestProgressForLearner(learnerId, tenantId)
-      .filter((p) => p.progress >= 1)
-      .map((p) => p.chapterId),
+    progress.filter((p) => p.progress >= 1).map((p) => p.chapterId),
   );
   return chapter.prerequisiteChapterIds.every((id) => completedChapterIds.has(id));
 }
@@ -2057,11 +1930,11 @@ export async function startQuestChapter(input: {
     }
 > {
   const store = db();
-  const chapter = store.questChapters.get(input.chapterId);
+  const chapter = await getPersistence().quests.getChapterById(input.chapterId);
   if (!chapter || chapter.questWorldId !== input.worldId) {
     return { ok: false, code: "chapter_not_found", message: "Quest chapter not found" };
   }
-  if (!isQuestChapterUnlocked(input.learnerId, input.tenantId, chapter)) {
+  if (!(await isQuestChapterUnlocked(input.learnerId, input.tenantId, chapter))) {
     return {
       ok: false,
       code: "locked",
@@ -2106,22 +1979,21 @@ export async function startQuestChapter(input: {
   return { ok: true, lessonRunId: result.lessonRun.id };
 }
 
-function upsertQuestProgressFromCompletion(run: LessonRun): void {
+async function upsertQuestProgressFromCompletion(run: LessonRun): Promise<void> {
   if (!run.sourceRefId) return;
-  const store = db();
-  const chapter = store.questChapters.get(run.sourceRefId);
+  const quests = getPersistence().quests;
+  const chapter = await quests.getChapterById(run.sourceRefId);
   if (!chapter) return;
-  const existing = getQuestProgress(run.learnerId, run.tenantId, chapter.id);
+  const existing = await quests.getProgressForChapter(run.learnerId, run.tenantId, chapter.id);
   if (existing) {
-    const next: QuestProgress = {
+    await quests.upsertProgress({
       ...existing,
       progress: 1,
       updatedAt: nowIso(),
-    };
-    store.questProgress.set(existing.id, next);
+    });
     return;
   }
-  const rec: QuestProgress = {
+  await quests.upsertProgress({
     id: newId("qp"),
     learnerId: run.learnerId,
     tenantId: run.tenantId,
@@ -2129,8 +2001,7 @@ function upsertQuestProgressFromCompletion(run: LessonRun): void {
     chapterId: chapter.id,
     progress: 1,
     updatedAt: nowIso(),
-  };
-  store.questProgress.set(rec.id, rec);
+  });
 }
 
 export function listParentLessonSummaries(
@@ -2145,15 +2016,11 @@ export function listParentLessonSummaries(
   return opts?.limit ? all.slice(0, opts.limit) : all;
 }
 
-export function getParentLessonSummaryForRun(
+export async function getParentLessonSummaryForRun(
   lessonRunId: string,
   tenantId: string,
-): ParentLessonSummary | null {
-  const store = db();
-  for (const s of store.parentLessonSummaries.values()) {
-    if (s.lessonRunId === lessonRunId && s.tenantId === tenantId) return s;
-  }
-  return null;
+): Promise<ParentLessonSummary | null> {
+  return getPersistence().lessonRuns.getParentSummaryForRun(lessonRunId, tenantId);
 }
 
 /**
@@ -2174,14 +2041,15 @@ export async function retryLessonRun(
   plan: GeneratedLessonPlan | null;
 }> {
   const store = db();
-  const run = store.lessonRuns.get(lessonRunId);
-  if (!run || run.tenantId !== tenantId) {
+  const runStore = getPersistence().lessonRuns;
+  const run = await runStore.getRunById(lessonRunId, tenantId);
+  if (!run) {
     throw new Error("LessonRun not found");
   }
   if (run.status !== "failed" && run.status !== "generating") {
     // Not retryable from this state — surface a precondition error to caller.
     const plan = run.lessonPlanId
-      ? (store.generatedLessonPlans.get(run.lessonPlanId) ?? null)
+      ? await runStore.getPlanById(run.lessonPlanId, tenantId)
       : null;
     return { ok: false, code: "not_retryable", lessonRun: run, plan };
   }
@@ -2220,7 +2088,7 @@ export async function retryLessonRun(
       generatedAt: nowIso(),
       generation: { ...telemetry, schemaVersion: LESSON_PLAN_SCHEMA_VERSION },
     };
-    store.generatedLessonPlans.set(planRecord.id, planRecord);
+    await runStore.upsertPlan(planRecord);
     const ready: LessonRun = {
       ...run,
       status: "ready",
@@ -2229,7 +2097,7 @@ export async function retryLessonRun(
       failureReason: null,
       updatedAt: nowIso(),
     };
-    store.lessonRuns.set(ready.id, ready);
+    await runStore.upsertRun(ready);
     return { ok: true, lessonRun: ready, plan: planRecord };
   } catch (e) {
     const failed: LessonRun = {
@@ -2239,7 +2107,7 @@ export async function retryLessonRun(
       failureReason: e instanceof Error ? e.message : String(e),
       updatedAt: nowIso(),
     };
-    store.lessonRuns.set(failed.id, failed);
+    await runStore.upsertRun(failed);
     return { ok: false, lessonRun: failed, plan: null };
   }
 }
@@ -2382,29 +2250,23 @@ export function completeHomeworkSession(
 
 // ===== Sprint 18: Teacher assignments =====
 
-export function listTeacherAssignments(
+export async function listTeacherAssignments(
   teacherId: string,
   tenantId: string,
   opts?: { status?: "active" | "archived" },
-): TeacherAssignment[] {
-  const store = db();
-  const all = Array.from(store.teacherAssignments.values())
-    .filter((a) => a.teacherId === teacherId && a.tenantId === tenantId)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  return opts?.status ? all.filter((a) => a.status === opts.status) : all;
+): Promise<TeacherAssignment[]> {
+  return getPersistence().admin.listTeacherAssignments(teacherId, tenantId, opts);
 }
 
-export function getTeacherAssignment(
+export async function getTeacherAssignment(
   assignmentId: string,
   teacherId: string,
   tenantId: string,
-): TeacherAssignment | null {
-  const a = db().teacherAssignments.get(assignmentId);
-  if (!a || a.tenantId !== tenantId || a.teacherId !== teacherId) return null;
-  return a;
+): Promise<TeacherAssignment | null> {
+  return getPersistence().admin.getTeacherAssignmentById(assignmentId, teacherId, tenantId);
 }
 
-export function createTeacherAssignment(input: {
+export async function createTeacherAssignment(input: {
   teacherId: string;
   tenantId: string;
   title: string;
@@ -2414,7 +2276,7 @@ export function createTeacherAssignment(input: {
   learnerIds: string[];
   classId?: string | null;
   dueAt?: string | null;
-}): TeacherAssignment {
+}): Promise<TeacherAssignment> {
   const store = db();
   // Defense-in-depth: drop learner IDs not in this tenant. The BFF layer
   // also filters before calling this, but we double-check here so a
@@ -2439,11 +2301,10 @@ export function createTeacherAssignment(input: {
     createdAt: now,
     updatedAt: now,
   };
-  store.teacherAssignments.set(assignment.id, assignment);
-  return assignment;
+  return getPersistence().admin.upsertTeacherAssignment(assignment);
 }
 
-export function updateTeacherAssignment(
+export async function updateTeacherAssignment(
   assignmentId: string,
   teacherId: string,
   tenantId: string,
@@ -2453,9 +2314,9 @@ export function updateTeacherAssignment(
       "title" | "instructions" | "skillIds" | "learnerIds" | "dueAt" | "status"
     >
   >,
-): TeacherAssignment | null {
+): Promise<TeacherAssignment | null> {
   const store = db();
-  const existing = getTeacherAssignment(assignmentId, teacherId, tenantId);
+  const existing = await getTeacherAssignment(assignmentId, teacherId, tenantId);
   if (!existing) return null;
   let learnerIds = existing.learnerIds;
   if (patch.learnerIds) {
@@ -2470,19 +2331,15 @@ export function updateTeacherAssignment(
     learnerIds,
     updatedAt: nowIso(),
   };
-  store.teacherAssignments.set(next.id, next);
-  return next;
+  return getPersistence().admin.upsertTeacherAssignment(next);
 }
 
-export function deleteTeacherAssignment(
+export async function deleteTeacherAssignment(
   assignmentId: string,
   teacherId: string,
   tenantId: string,
-): boolean {
-  const existing = getTeacherAssignment(assignmentId, teacherId, tenantId);
-  if (!existing) return false;
-  db().teacherAssignments.delete(assignmentId);
-  return true;
+): Promise<boolean> {
+  return getPersistence().admin.deleteTeacherAssignment(assignmentId, teacherId, tenantId);
 }
 
 /**
@@ -2490,10 +2347,15 @@ export function deleteTeacherAssignment(
  * Used by `pickTodaysMission` to surface teacher-assigned work as a
  * higher priority than the default learning path.
  */
-export function listActiveAssignmentsForLearner(
+export async function listActiveAssignmentsForLearner(
   learnerId: string,
   tenantId: string,
-): TeacherAssignment[] {
+): Promise<TeacherAssignment[]> {
+  // No teacher-scoping here — we need every assignment in the tenant
+  // that targets this learner. We iterate the per-teacher buckets via
+  // a tenant-wide scan in the memory adapter; the Drizzle impl will
+  // replace this with a single `WHERE tenant_id = ? AND ?  =
+  // ANY(learner_ids) AND status = 'active'` query.
   const all = Array.from(db().teacherAssignments.values())
     .filter(
       (a) => a.tenantId === tenantId && a.status === "active" && a.learnerIds.includes(learnerId),
@@ -2509,45 +2371,23 @@ export function listActiveAssignmentsForLearner(
  * but excludes any private fields a teacher shouldn't see (raw IEP text is
  * never on the LearnerProfile anyway — it lives behind AccommodationSummary).
  */
-export function listLearnersForTeacher(teacherId: string, tenantId: string): LearnerProfile[] {
-  const store = db();
-  // Classrooms this teacher leads in this tenant.
-  const classroomIds = new Set(
-    Array.from(store.classrooms.values())
-      .filter((c) => c.tenantId === tenantId && c.teacherUserId === teacherId)
-      .map((c) => c.id),
-  );
-  // Also include classrooms where the teacher is enrolled with role=teacher
-  // (co-teaching support).
-  for (const e of store.enrollments.values()) {
-    if (e.tenantId === tenantId && e.role === "teacher" && e.subjectId === teacherId) {
-      classroomIds.add(e.classroomId);
-    }
-  }
-  if (classroomIds.size === 0) return [];
-  // Learner enrollments scoped to those classrooms.
-  const learnerIds = new Set<string>();
-  for (const e of store.enrollments.values()) {
-    if (e.tenantId === tenantId && e.role === "learner" && classroomIds.has(e.classroomId)) {
-      learnerIds.add(e.subjectId);
-    }
-  }
-  return Array.from(store.learnerProfiles.values()).filter(
-    (l) => l.tenantId === tenantId && learnerIds.has(l.id),
-  );
+export async function listLearnersForTeacher(
+  teacherId: string,
+  tenantId: string,
+): Promise<LearnerProfile[]> {
+  return getPersistence().learners.listForTeacher(teacherId, tenantId);
 }
 
 /**
  * True if `teacherUserId` has access to `learnerId` via a shared classroom in
  * the given tenant. Use this in teacher pages before reading a learner's data.
  */
-export function teacherCanAccessLearner(
+export async function teacherCanAccessLearner(
   teacherUserId: string,
   learnerId: string,
   tenantId: string,
-): boolean {
-  const learners = listLearnersForTeacher(teacherUserId, tenantId);
-  return learners.some((l) => l.id === learnerId);
+): Promise<boolean> {
+  return getPersistence().learners.teacherCanAccess(teacherUserId, learnerId, tenantId);
 }
 
 // ===== Sprints 19–21: Admin / Ops repos =====
@@ -2630,38 +2470,23 @@ export type UserSummary = {
   role: Role;
   joinedAt: string;
 };
-export function listUsersForTenants(tenantIds: string[]): UserSummary[] {
-  const ids = new Set(tenantIds);
-  const rows: UserSummary[] = [];
-  for (const m of db().memberships) {
-    if (!ids.has(m.tenantId)) continue;
-    const u = db().users.get(m.userId);
-    if (!u) continue;
-    rows.push({
-      user: u,
-      tenantId: m.tenantId,
-      role: m.role,
-      joinedAt: m.createdAt,
-    });
-  }
-  return rows.sort((a, b) => a.user.displayName.localeCompare(b.user.displayName));
+export async function listUsersForTenants(tenantIds: string[]): Promise<UserSummary[]> {
+  return getPersistence().identity.listUsersForTenants(tenantIds);
 }
 
-export function updateUserDisplayName(userId: string, displayName: string): User | null {
-  const u = db().users.get(userId);
-  if (!u) return null;
-  const next: User = { ...u, displayName };
-  db().users.set(userId, next);
-  return next;
+export async function updateUserDisplayName(
+  userId: string,
+  displayName: string,
+): Promise<User | null> {
+  return getPersistence().identity.updateUserDisplayName(userId, displayName);
 }
 
-/** Audit logs scoped to a tenant set. */
-export function listAuditLogsForTenants(tenantIds: string[], limit = 100): AuditLog[] {
-  const ids = new Set(tenantIds);
-  return db()
-    .auditLogs.filter((l) => (l.tenantId ? ids.has(l.tenantId) : false))
-    .slice(-limit)
-    .reverse();
+/** Audit logs scoped to a tenant set. Routed through the persistence adapter. */
+export async function listAuditLogsForTenants(
+  tenantIds: string[],
+  limit = 100,
+): Promise<AuditLog[]> {
+  return getPersistence().audit.recentForTenants(tenantIds, limit);
 }
 
 /** AI generation jobs scoped to a tenant set, newest first. */
@@ -2810,64 +2635,61 @@ export function getActiveConsentVersion(type: ConsentType): ConsentVersion | nul
   return all.sort((a, b) => b.effectiveAt.localeCompare(a.effectiveAt))[0];
 }
 
-export function listConsentsForUser(parentUserId: string, tenantId: string): ConsentRecord[] {
-  return db().consentRecords.filter(
-    (r) => r.parentUserId === parentUserId && r.tenantId === tenantId,
-  );
+export async function listConsentsForUser(
+  parentUserId: string,
+  tenantId: string,
+): Promise<ConsentRecord[]> {
+  return getPersistence().compliance.listConsentsForUser(parentUserId, tenantId);
 }
 
-export function listConsentsForLearner(
+export async function listConsentsForLearner(
   parentUserId: string,
   learnerId: string,
   tenantId: string,
-): ConsentRecord[] {
-  return db().consentRecords.filter(
-    (r) => r.parentUserId === parentUserId && r.learnerId === learnerId && r.tenantId === tenantId,
+): Promise<ConsentRecord[]> {
+  return getPersistence().compliance.listConsentsForLearner(
+    parentUserId,
+    learnerId,
+    tenantId,
   );
 }
 
-export function getActiveConsentForUser(
+export async function getActiveConsentForUser(
   parentUserId: string,
   type: ConsentType,
   tenantId: string,
   learnerId: string | null = null,
-): ConsentRecord | null {
-  const rows = db().consentRecords.filter(
-    (r) =>
-      r.parentUserId === parentUserId &&
-      r.tenantId === tenantId &&
-      r.consentType === type &&
-      (r.learnerId ?? null) === (learnerId ?? null) &&
-      r.revokedAt === null,
+): Promise<ConsentRecord | null> {
+  return getPersistence().compliance.getActiveConsentForUser(
+    parentUserId,
+    type,
+    tenantId,
+    learnerId,
   );
-  if (!rows.length) return null;
-  return rows.sort((a, b) => b.acceptedAt.localeCompare(a.acceptedAt))[0];
 }
 
-export function recordConsent(input: {
+export async function recordConsent(input: {
   tenantId: string;
   parentUserId: string;
   learnerId: string | null;
   consentType: ConsentType;
   ipHash?: string | null;
   userAgent?: string | null;
-}): ConsentRecord {
+}): Promise<ConsentRecord> {
   const version = getActiveConsentVersion(input.consentType);
   // Auto-revoke any prior active records in the same scope so revoke is a
   // single-step operation. Without this, duplicate accepts pile up and a
   // single revoke leaves an older active row that nullifies the revocation.
   const now = nowIso();
-  const records = db().consentRecords;
-  for (let i = 0; i < records.length; i++) {
-    const r = records[i]!;
+  const compliance = getPersistence().compliance;
+  const existing = await compliance.listConsentsForUser(input.parentUserId, input.tenantId);
+  for (const r of existing) {
     if (
-      r.tenantId === input.tenantId &&
-      r.parentUserId === input.parentUserId &&
       r.consentType === input.consentType &&
       (r.learnerId ?? null) === (input.learnerId ?? null) &&
       r.revokedAt === null
     ) {
-      records[i] = { ...r, revokedAt: now };
+      await compliance.upsertConsent({ ...r, revokedAt: now });
     }
   }
   const rec: ConsentRecord = {
@@ -2882,33 +2704,29 @@ export function recordConsent(input: {
     ipHash: input.ipHash ?? null,
     userAgent: input.userAgent ?? null,
   };
-  records.push(rec);
-  return rec;
+  return compliance.upsertConsent(rec);
 }
 
-export function revokeConsent(input: {
+export async function revokeConsent(input: {
   tenantId: string;
   parentUserId: string;
   learnerId: string | null;
   consentType: ConsentType;
-}): ConsentRecord | null {
+}): Promise<ConsentRecord | null> {
   // Revoke every active row for this scope, not just the latest, so a single
   // revoke deterministically disables the consent even if duplicates exist.
   const now = nowIso();
-  const records = db().consentRecords;
+  const compliance = getPersistence().compliance;
+  const records = await compliance.listConsentsForUser(input.parentUserId, input.tenantId);
   let last: ConsentRecord | null = null;
-  for (let i = 0; i < records.length; i++) {
-    const r = records[i]!;
+  for (const r of records) {
     if (
-      r.tenantId === input.tenantId &&
-      r.parentUserId === input.parentUserId &&
       r.consentType === input.consentType &&
       (r.learnerId ?? null) === (input.learnerId ?? null) &&
       r.revokedAt === null
     ) {
       const updated: ConsentRecord = { ...r, revokedAt: now };
-      records[i] = updated;
-      last = updated;
+      last = await compliance.upsertConsent(updated);
     }
   }
   return last;
@@ -2930,20 +2748,21 @@ export function recordTermsAcceptance(input: {
   return t;
 }
 
-export function getAgeGateForLearner(learnerId: string, tenantId: string): AgeGateRecord | null {
-  const rec = db().ageGateRecords.get(learnerId);
-  if (!rec || rec.tenantId !== tenantId) return null;
-  return rec;
+export async function getAgeGateForLearner(
+  learnerId: string,
+  tenantId: string,
+): Promise<AgeGateRecord | null> {
+  return getPersistence().compliance.getAgeGateForLearner(learnerId, tenantId);
 }
 
 const UNDER_13_AGE_RANGES = new Set(["3-5", "5-7", "7-9", "9-11", "11-13"]);
 
-export function recordAgeGate(input: {
+export async function recordAgeGate(input: {
   tenantId: string;
   learnerId: string;
   recordedByUserId: string;
   ageRange: string | null;
-}): AgeGateRecord {
+}): Promise<AgeGateRecord> {
   const rec: AgeGateRecord = {
     id: newId("agr"),
     tenantId: input.tenantId,
@@ -2953,8 +2772,7 @@ export function recordAgeGate(input: {
     requiresParentConsent: input.ageRange ? UNDER_13_AGE_RANGES.has(input.ageRange) : true,
     recordedAt: nowIso(),
   };
-  db().ageGateRecords.set(input.learnerId, rec);
-  return rec;
+  return getPersistence().compliance.upsertAgeGate(rec);
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -3184,12 +3002,13 @@ export function listIepAccessForLearner(
     .sort((a, b) => b.accessedAt.localeCompare(a.accessedAt));
 }
 
-export function listPolicyVersions(): PolicyVersion[] {
-  return Array.from(db().policyVersions.values()).sort((a, b) => a.kind.localeCompare(b.kind));
+export async function listPolicyVersions(): Promise<PolicyVersion[]> {
+  return getPersistence().compliance.listPolicyVersions();
 }
 
-export function listSubprocessors(): SubprocessorRecord[] {
-  return Array.from(db().subprocessors.values()).sort((a, b) => a.name.localeCompare(b.name));
+export async function listSubprocessors(): Promise<SubprocessorRecord[]> {
+  const all = await getPersistence().compliance.listSubprocessors();
+  return all.slice().sort((a, b) => a.name.localeCompare(b.name));
 }
 
 // ===== Sprint 26: Curriculum / Standards / Skill Graph =====
@@ -3268,8 +3087,8 @@ export function createSubject(input: {
   return rec;
 }
 
-export function getSkill(id: string): Skill | null {
-  return db().skills.get(id) ?? null;
+export async function getSkill(id: string): Promise<Skill | null> {
+  return getPersistence().curriculum.getSkillById(id);
 }
 
 export function createSkill(input: {
@@ -4053,85 +3872,82 @@ import type {
   SISConnection,
 } from "@/lib/db/types";
 
-/** All schools visible to a given session. */
-export function listSchools(tenantId?: string): School[] {
-  let arr = Array.from(db().schools.values());
-  if (tenantId) arr = arr.filter((s) => s.tenantId === tenantId);
-  return arr.sort((a, b) => a.name.localeCompare(b.name));
+// ===== Admin domain (ADR 0007 step 11) =====
+// Schools, classrooms, enrollments, teacher assignments — all routed
+// through the persistence adapter.
+
+export async function listSchools(tenantId?: string): Promise<School[]> {
+  return getPersistence().admin.listSchools(tenantId);
 }
 
-export function getSchool(id: string): School | null {
-  return db().schools.get(id) ?? null;
+export async function getSchool(id: string): Promise<School | null> {
+  return getPersistence().admin.getSchoolById(id);
 }
 
-export function listClassrooms(opts: {
+export async function listClassrooms(opts: {
   tenantId: string;
   schoolId?: string;
   teacherUserId?: string;
-}): Classroom[] {
-  let arr = Array.from(db().classrooms.values()).filter((c) => c.tenantId === opts.tenantId);
-  if (opts.schoolId) arr = arr.filter((c) => c.schoolId === opts.schoolId);
-  if (opts.teacherUserId) arr = arr.filter((c) => c.teacherUserId === opts.teacherUserId);
-  return arr.sort((a, b) => a.name.localeCompare(b.name));
+}): Promise<Classroom[]> {
+  return getPersistence().admin.listClassrooms(opts);
 }
 
-export function getClassroom(id: string, tenantId: string): Classroom | null {
-  const c = db().classrooms.get(id);
-  return c && c.tenantId === tenantId ? c : null;
+export async function getClassroom(id: string, tenantId: string): Promise<Classroom | null> {
+  return getPersistence().admin.getClassroomById(id, tenantId);
 }
 
-export function createClassroom(input: {
+export async function createClassroom(input: {
   tenantId: string;
   schoolId: string;
   name: string;
   gradeBand: Classroom["gradeBand"];
   teacherUserId: string;
   courseId: string | null;
-}): Classroom {
+}): Promise<Classroom> {
   const rec: Classroom = { id: newId("cls"), createdAt: nowIso(), ...input };
-  db().classrooms.set(rec.id, rec);
-  return rec;
+  return getPersistence().admin.upsertClassroom(rec);
 }
 
-export function updateClassroom(
+export async function updateClassroom(
   id: string,
   tenantId: string,
   patch: Partial<Pick<Classroom, "name" | "gradeBand" | "teacherUserId" | "courseId">>,
-): Classroom | null {
-  const c = getClassroom(id, tenantId);
-  if (!c) return null;
-  if (patch.name !== undefined) c.name = patch.name;
-  if (patch.gradeBand !== undefined) c.gradeBand = patch.gradeBand;
-  if (patch.teacherUserId !== undefined) c.teacherUserId = patch.teacherUserId;
-  if (patch.courseId !== undefined) c.courseId = patch.courseId;
-  return c;
+): Promise<Classroom | null> {
+  const existing = await getClassroom(id, tenantId);
+  if (!existing) return null;
+  const next: Classroom = {
+    ...existing,
+    name: patch.name ?? existing.name,
+    gradeBand: patch.gradeBand ?? existing.gradeBand,
+    teacherUserId: patch.teacherUserId ?? existing.teacherUserId,
+    courseId: patch.courseId !== undefined ? patch.courseId : existing.courseId,
+  };
+  return getPersistence().admin.upsertClassroom(next);
 }
 
-export function listEnrollments(classroomId: string): Enrollment[] {
-  return Array.from(db().enrollments.values())
-    .filter((e) => e.classroomId === classroomId)
-    .sort((a, b) => a.role.localeCompare(b.role));
+export async function listEnrollments(classroomId: string): Promise<Enrollment[]> {
+  return getPersistence().admin.listEnrollmentsForClassroom(classroomId);
 }
 
-export function createEnrollment(input: Omit<Enrollment, "id" | "createdAt">): Enrollment {
+export async function createEnrollment(
+  input: Omit<Enrollment, "id" | "createdAt">,
+): Promise<Enrollment> {
   const rec: Enrollment = { id: newId("enr"), createdAt: nowIso(), ...input };
-  db().enrollments.set(rec.id, rec);
-  return rec;
+  return getPersistence().admin.upsertEnrollment(rec);
 }
 
 /** Idempotent: returns the existing enrollment if (classroomId, subjectId, role) already exists. */
-function ensureEnrollment(input: Omit<Enrollment, "id" | "createdAt">): {
+async function ensureEnrollment(input: Omit<Enrollment, "id" | "createdAt">): Promise<{
   rec: Enrollment;
   created: boolean;
-} {
-  const existing = Array.from(db().enrollments.values()).find(
-    (e) =>
-      e.classroomId === input.classroomId &&
-      e.subjectId === input.subjectId &&
-      e.role === input.role,
-  );
+}> {
+  const existing = await getPersistence().admin.findEnrollmentByNaturalKey({
+    classroomId: input.classroomId,
+    subjectId: input.subjectId,
+    role: input.role,
+  });
   if (existing) return { rec: existing, created: false };
-  return { rec: createEnrollment(input), created: true };
+  return { rec: await createEnrollment(input), created: true };
 }
 
 /**
@@ -4227,16 +4043,16 @@ function parseRosterCsv(text: string): {
  * the same parse/validation pipeline runs so the admin can review the
  * counts + error rows before committing.
  */
-export function runRosterImport(input: {
+export async function runRosterImport(input: {
   tenantId: string;
   schoolId: string;
   source: RosterImportSource;
   csvText: string;
   dryRun: boolean;
   createdByUserId: string;
-}): RosterImportJob {
+}): Promise<RosterImportJob> {
   const store = db();
-  const school = getSchool(input.schoolId);
+  const school = await getSchool(input.schoolId);
   if (!school || school.tenantId !== input.tenantId) {
     const errId = newId("job");
     const failed: RosterImportJob = {
@@ -4310,7 +4126,7 @@ export function runRosterImport(input: {
           job.createdRows += 1;
           continue;
         }
-        classroom = createClassroom({
+        classroom = await createClassroom({
           tenantId: input.tenantId,
           schoolId: input.schoolId,
           name: row.classroomName,
@@ -4328,7 +4144,7 @@ export function runRosterImport(input: {
       }
       const enrollRole: Enrollment["role"] =
         row.role === "teacher" ? "teacher" : row.role === "co_teacher" ? "co_teacher" : "learner";
-      const { created } = ensureEnrollment({
+      const { created } = await ensureEnrollment({
         tenantId: input.tenantId,
         classroomId: classroom.id,
         subjectId: row.externalId,
@@ -4508,8 +4324,12 @@ export function updateNotificationPreference(
  * channel. The dispatch is "mock-send" — in production this is replaced by
  * a real provider call. Sensitive learner-context never includes raw IEP
  * text (callers must pass already-redacted body strings).
+ *
+ * Routed through the persistence adapter (ADR 0007). The adapter is
+ * memory-backed by default; flip AIVO_PERSISTENCE_NOTIFICATIONS=postgres
+ * once `packages/db` ships the notifications schema.
  */
-export function createNotification(input: {
+export async function createNotification(input: {
   tenantId: string;
   userId: string;
   type: NotificationType;
@@ -4517,7 +4337,7 @@ export function createNotification(input: {
   body: string;
   href: string | null;
   learnerId: string | null;
-}): { notification: Notification; deliveries: NotificationDelivery[] } {
+}): Promise<{ notification: Notification; deliveries: NotificationDelivery[] }> {
   const rec: Notification = {
     id: newId("nfn"),
     tenantId: input.tenantId,
@@ -4530,13 +4350,11 @@ export function createNotification(input: {
     readAt: null,
     createdAt: nowIso(),
   };
-  db().notifications.set(rec.id, rec);
   const pref = getNotificationPreference(input.userId, input.tenantId);
   const channels: NotificationChannel[] = ["in_app", "email", "push"];
-  const deliveries: NotificationDelivery[] = [];
-  for (const ch of channels) {
+  const deliveries: NotificationDelivery[] = channels.map((ch) => {
     const enabled = pref.preferences[`${input.type}:${ch}`] ?? false;
-    const d: NotificationDelivery = {
+    return {
       id: newId("ndlv"),
       notificationId: rec.id,
       channel: ch,
@@ -4545,40 +4363,30 @@ export function createNotification(input: {
       errorMessage: null,
       attemptedAt: nowIso(),
     };
-    db().notificationDeliveries.set(d.id, d);
-    deliveries.push(d);
-  }
-  return { notification: rec, deliveries };
+  });
+  return getPersistence().notifications.create({ notification: rec, deliveries });
 }
 
-export function listNotifications(opts: {
+export async function listNotifications(opts: {
   tenantId: string;
   userId: string;
   unreadOnly?: boolean;
-}): Notification[] {
-  let arr = Array.from(db().notifications.values()).filter(
-    (n) => n.tenantId === opts.tenantId && n.userId === opts.userId,
-  );
-  if (opts.unreadOnly) arr = arr.filter((n) => n.readAt === null);
-  return arr.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}): Promise<Notification[]> {
+  return getPersistence().notifications.list(opts);
 }
 
-export function markNotificationsRead(userId: string, tenantId: string, ids: string[]): number {
-  let count = 0;
-  for (const id of ids) {
-    const n = db().notifications.get(id);
-    if (n && n.userId === userId && n.tenantId === tenantId && n.readAt === null) {
-      n.readAt = nowIso();
-      count += 1;
-    }
-  }
-  return count;
+export async function markNotificationsRead(
+  userId: string,
+  tenantId: string,
+  ids: string[],
+): Promise<number> {
+  return getPersistence().notifications.markRead({ userId, tenantId, ids });
 }
 
-export function listDeliveriesFor(notificationId: string): NotificationDelivery[] {
-  return Array.from(db().notificationDeliveries.values()).filter(
-    (d) => d.notificationId === notificationId,
-  );
+export async function listDeliveriesFor(
+  notificationId: string,
+): Promise<NotificationDelivery[]> {
+  return getPersistence().notifications.listDeliveries(notificationId);
 }
 
 export function listDigestSchedules(tenantId: string, userId?: string): DigestSchedule[] {
@@ -5397,11 +5205,9 @@ export function updateTenantSettings(
 }
 
 /** Every learner whose tenant is in `tenantIds`. */
-export function listLearnersForTenants(tenantIds: string[]): LearnerProfile[] {
-  const ids = new Set(tenantIds);
-  return Array.from(db().learnerProfiles.values())
-    .filter((l) => ids.has(l.tenantId))
-    .sort((a, b) => a.displayName.localeCompare(b.displayName));
+export async function listLearnersForTenants(tenantIds: string[]): Promise<LearnerProfile[]> {
+  const all = await getPersistence().learners.listForTenants(tenantIds);
+  return all.slice().sort((a, b) => a.displayName.localeCompare(b.displayName));
 }
 
 /** Number of IEPDocuments whose owning learner sits inside this tenant set. */
@@ -5475,9 +5281,13 @@ export function getDistrictStats(tenantIds: string[]): DistrictStats {
  * Users in this tenant set holding an admin/teacher/etc. role. Used by the
  * district admins + staff pages. `roles` filters the result.
  */
-export function listMembersByRole(tenantIds: string[], roles: Role[]): UserSummary[] {
+export async function listMembersByRole(
+  tenantIds: string[],
+  roles: Role[],
+): Promise<UserSummary[]> {
   const wanted = new Set(roles);
-  return listUsersForTenants(tenantIds).filter((u) => wanted.has(u.role));
+  const all = await listUsersForTenants(tenantIds);
+  return all.filter((u) => wanted.has(u.role));
 }
 
 /**
@@ -5491,8 +5301,10 @@ export type DistrictLearnerRow = {
   hasIep: boolean;
 };
 
-export function listDistrictLearners(tenantIds: string[]): DistrictLearnerRow[] {
-  const learners = listLearnersForTenants(tenantIds);
+export async function listDistrictLearners(
+  tenantIds: string[],
+): Promise<DistrictLearnerRow[]> {
+  const learners = await listLearnersForTenants(tenantIds);
   const iepLearnerIds = new Set(Array.from(db().iepDocuments.values()).map((d) => d.learnerId));
   return learners.map((l) => {
     const family = db().tenants.get(l.tenantId);
@@ -5539,16 +5351,13 @@ export function listDistrictSchools(tenantIds: string[]): DistrictSchoolRow[] {
 }
 
 /** Look up a single user by id. Returns null when not found. */
-export function getUserById(id: string): User | null {
-  return db().users.get(id) ?? null;
+export async function getUserById(id: string): Promise<User | null> {
+  return getPersistence().identity.getUserById(id);
 }
 
 /** List all memberships for a single user, newest first. */
-export function listMembershipsForUser(userId: string): TenantMembership[] {
-  return db()
-    .memberships.filter((m) => m.userId === userId)
-    .slice()
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+export async function listMembershipsForUser(userId: string): Promise<TenantMembership[]> {
+  return getPersistence().identity.listMembershipsForUser(userId);
 }
 
 /** Invoices across many tenants, newest first. */
@@ -5725,23 +5534,24 @@ export interface SchoolDashboardSnapshot {
   };
 }
 
-export function getSchoolDashboard(
+export async function getSchoolDashboard(
   tenantId: string,
   schoolId?: string,
-): SchoolDashboardSnapshot {
+): Promise<SchoolDashboardSnapshot> {
   const store = db();
   const tenant = getTenantById(tenantId);
-  const schools = listSchools(tenantId);
+  const schools = await listSchools(tenantId);
   const school =
     schools.find((s) => (schoolId ? s.id === schoolId : true)) ?? schools[0] ?? null;
 
   const learners = Array.from(store.learnerProfiles.values()).filter(
     (l) => l.tenantId === tenantId,
   );
-  const staff = listUsersForTenants([tenantId]).filter((u) =>
+  const allStaff = await listUsersForTenants([tenantId]);
+  const staff = allStaff.filter((u) =>
     ["TEACHER", "SCHOOL_ADMIN", "DISTRICT_ADMIN", "THERAPIST"].includes(u.role as string),
   );
-  const classes = listClassrooms({
+  const classes = await listClassrooms({
     tenantId,
     schoolId: school?.id,
   });
@@ -5751,7 +5561,7 @@ export function getSchoolDashboard(
     return l?.tenantId === tenantId;
   });
 
-  const auditLogs = listAuditLogsForTenants([tenantId], 1000);
+  const auditLogs = await listAuditLogsForTenants([tenantId], 1000);
   const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
   const auditEvents30d = auditLogs.filter(
     (a) => new Date(a.occurredAt).getTime() >= thirtyDaysAgo,
@@ -5868,10 +5678,10 @@ export interface SchoolReportPayload {
   rows: SchoolReportRow[];
 }
 
-export function getSchoolReport(
+export async function getSchoolReport(
   tenantId: string,
   opts: { startIso?: string; endIso?: string } = {},
-): SchoolReportPayload {
+): Promise<SchoolReportPayload> {
   const store = db();
   const endIso = opts.endIso ?? new Date().toISOString();
   const startIso =
@@ -5882,7 +5692,7 @@ export function getSchoolReport(
   const learners = Array.from(store.learnerProfiles.values()).filter(
     (l) => l.tenantId === tenantId,
   );
-  const classrooms = listClassrooms({ tenantId });
+  const classrooms = await listClassrooms({ tenantId });
   const classroomById = new Map(classrooms.map((c) => [c.id, c]));
   const enrollmentByLearner = new Map<string, string>();
   for (const e of Array.from(store.enrollments.values())) {
@@ -6013,8 +5823,8 @@ export function renderSchoolReportCsv(payload: SchoolReportPayload): string {
 // `createClassroom` already exists above.
 // ---------------------------------------------------------------------------
 
-export function deleteClassroom(id: string, tenantId: string): boolean {
-  const c = getClassroom(id, tenantId);
+export async function deleteClassroom(id: string, tenantId: string): Promise<boolean> {
+  const c = await getClassroom(id, tenantId);
   if (!c) return false;
   // Cascade: drop enrollments for this classroom.
   for (const e of Array.from(db().enrollments.values())) {
@@ -6030,12 +5840,12 @@ export function deleteClassroom(id: string, tenantId: string): boolean {
 // half so the admin can complete invites and revoke access.
 // ---------------------------------------------------------------------------
 
-export function addStaffUser(input: {
+export async function addStaffUser(input: {
   tenantId: string;
   email: string;
   displayName: string;
   role: "TEACHER" | "SCHOOL_ADMIN" | "THERAPIST" | "CAREGIVER";
-}): {
+}): Promise<{
   id: string;
   tenantId: string;
   email: string;
@@ -6043,41 +5853,12 @@ export function addStaffUser(input: {
   role: "TEACHER" | "SCHOOL_ADMIN" | "THERAPIST" | "CAREGIVER";
   status: "INVITED";
   createdAt: string;
-} {
-  const id = newId("user");
-  const createdAt = nowIso();
-  const rec = {
-    id,
-    tenantId: input.tenantId,
-    email: input.email,
-    displayName: input.displayName,
-    role: input.role,
-    status: "INVITED" as const,
-    createdAt,
-  };
-  // Best-effort persistence — the in-memory store keeps users in a Map.
-  db().users.set(id, rec as never);
-  const roleMap: Record<string, Role> = {
-    TEACHER: "teacher",
-    SCHOOL_ADMIN: "school_admin",
-    THERAPIST: "therapist",
-    CAREGIVER: "caregiver",
-  };
-  const role = roleMap[input.role] ?? "teacher";
-  db().memberships.push({
-    userId: id,
-    tenantId: input.tenantId,
-    role,
-    joinedAt: createdAt,
-  } as never);
-  return rec;
+}> {
+  return getPersistence().identity.addStaffUser(input);
 }
 
-export function removeStaffUser(userId: string, tenantId: string): boolean {
-  const u = db().users.get(userId) as ({ tenantId?: string } | undefined);
-  if (!u || u.tenantId !== tenantId) return false;
-  db().users.delete(userId);
-  return true;
+export async function removeStaffUser(userId: string, tenantId: string): Promise<boolean> {
+  return getPersistence().identity.removeStaffUser(userId, tenantId);
 }
 
 // ---------------------------------------------------------------------------
@@ -6362,14 +6143,13 @@ export function getIepAiDraft(
   );
 }
 
-export function listIepAiDraftsForReviewer(
+export async function listIepAiDraftsForReviewer(
   reviewerUserId: string,
   tenantId: string,
-): import("./types").IepAiDraftRecord[] {
+): Promise<import("./types").IepAiDraftRecord[]> {
   // Sprint 11: a teacher sees drafts for every learner on their roster.
-  const learnerIds = new Set(
-    listLearnersForTeacher(reviewerUserId, tenantId).map((l) => l.id),
-  );
+  const reviewerLearners = await listLearnersForTeacher(reviewerUserId, tenantId);
+  const learnerIds = new Set(reviewerLearners.map((l) => l.id));
   return Array.from(db().iepAiDrafts.values())
     .filter((d) => d.tenantId === tenantId && learnerIds.has(d.learnerId))
     .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
@@ -6429,13 +6209,13 @@ export interface GradebookDetail {
   summary: { mastered: number; secure: number; developing: number; introduced: number };
 }
 
-export function getGradebookDetail(
+export async function getGradebookDetail(
   learnerId: string,
   tenantId: string,
-): GradebookDetail {
-  const mastery = getMasteryMap(learnerId, tenantId);
-  const subjects = new Map(listSubjects().map((s) => [s.id, s]));
-  const skills = new Map(listSkills().map((s) => [s.id, s]));
+): Promise<GradebookDetail> {
+  const mastery = await getMasteryMap(learnerId, tenantId);
+  const subjects = new Map((await listSubjects()).map((s) => [s.id, s]));
+  const skills = new Map((await listSkills()).map((s) => [s.id, s]));
 
   // Count lesson runs per skill + last-practiced timestamp.
   const lastByskill = new Map<string, string>();

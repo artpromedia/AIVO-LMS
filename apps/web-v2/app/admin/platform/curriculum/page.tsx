@@ -20,8 +20,8 @@ export const dynamic = "force-dynamic";
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
   const frameworks = listStandardsFrameworks();
-  const subjects = listSubjects();
-  const skills = listSkills();
+  const subjects = await listSubjects();
+  const skills = await listSkills();
   const standards = listStandards();
   const blueprints = listAssessmentBlueprints();
   const objectives = listLessonObjectiveTemplates();

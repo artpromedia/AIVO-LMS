@@ -31,14 +31,14 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (response) return response;
     const roleErr = requireRole(session!, ["teacher"], requestId);
     if (roleErr) return roleErr;
-    const learner = getLearner(learnerId, session!.tenantId);
+    const learner = await getLearner(learnerId, session!.tenantId);
     if (!learner) return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found." }, requestId);
-    const recentRuns = listLessonRunsForLearner(learnerId, session!.tenantId, {
+    const recentRuns = await listLessonRunsForLearner(learnerId, session!.tenantId, {
       limit: 10,
     });
-    const mastery = getMasteryMap(learnerId, session!.tenantId);
-    const iep = getIEPForLearner(learnerId, session!.tenantId);
-    const assignments = listActiveAssignmentsForLearner(learnerId, session!.tenantId);
+    const mastery = await getMasteryMap(learnerId, session!.tenantId);
+    const iep = await getIEPForLearner(learnerId, session!.tenantId);
+    const assignments = await listActiveAssignmentsForLearner(learnerId, session!.tenantId);
     return ok(
       {
         learner: {

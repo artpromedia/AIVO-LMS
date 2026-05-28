@@ -1,12 +1,11 @@
 "use client";
 
 /**
- * Sprint 10 — client-side notifications list with live updates.
+ * Client-side notifications list with live updates.
  *
  * Hydrates from the server-rendered initial list, then subscribes via
- * `useNotificationStream` (polling fallback; SSE auto-takeover when
- * services/comms-svc ships the endpoint). Mark-as-read is optimistic;
- * the server reconciles on the next refresh tick.
+ * `useNotificationStream` (SSE primary, polling fallback). Mark-as-read
+ * is optimistic; the server reconciles on the next refresh tick.
  */
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

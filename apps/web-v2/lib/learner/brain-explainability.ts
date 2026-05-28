@@ -112,11 +112,11 @@ export function selectBrainExplainability(
  * profile exists yet (pre-clone) so callers can branch on profile
  * presence without dereferencing.
  */
-export function getBrainExplainability(
+export async function getBrainExplainability(
   learnerId: string,
   tenantId: string,
-): BrainExplainability | null {
-  const profile = getBrainProfile(learnerId, tenantId);
+): Promise<BrainExplainability | null> {
+  const profile = await getBrainProfile(learnerId, tenantId);
   if (!profile) return null;
   return selectBrainExplainability(profile.state);
 }

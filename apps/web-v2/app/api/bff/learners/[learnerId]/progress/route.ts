@@ -38,7 +38,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["child_data_collection"],
@@ -46,18 +46,18 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     );
     if (consentErr) return consentErr;
 
-    const learner = getLearner(learnerId, session!.tenantId);
+    const learner = await getLearner(learnerId, session!.tenantId);
     if (!learner) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
     }
 
-    const { map, skillMasteries } = getMasteryMap(learnerId, session!.tenantId);
-    const subjects = listSubjects();
+    const { map, skillMasteries } = await getMasteryMap(learnerId, session!.tenantId);
+    const subjects = await listSubjects();
     const subjectsById = new Map(subjects.map((s) => [s.id, s]));
-    const skills = listSkills();
+    const skills = await listSkills();
     const skillsById = new Map(skills.map((s) => [s.id, s]));
 
-    const recentRuns = listLessonRunsForLearner(learnerId, session!.tenantId, {
+    const recentRuns = await listLessonRunsForLearner(learnerId, session!.tenantId, {
       limit: 20,
     });
     const completedRuns = recentRuns.filter((r) => r.status === "completed");

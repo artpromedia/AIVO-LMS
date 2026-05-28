@@ -34,18 +34,17 @@ export default async function ParentProgressPage({
 }) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
-  const { map, skillMasteries } = getMasteryMap(learnerId, session.tenantId);
-  const subjects = listSubjects();
-  const skills = listSkills();
-  const completed = listLessonRunsForLearner(learnerId, session.tenantId).filter(
-    (r) => r.status === "completed",
-  );
+  const { map, skillMasteries } = await getMasteryMap(learnerId, session.tenantId);
+  const subjects = await listSubjects();
+  const skills = await listSkills();
+  const allRuns = await listLessonRunsForLearner(learnerId, session.tenantId);
+  const completed = allRuns.filter((r) => r.status === "completed");
 
   const bySubject = subjects
     .map((subject) => {

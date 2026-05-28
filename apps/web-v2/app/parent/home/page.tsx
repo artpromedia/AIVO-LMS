@@ -14,9 +14,9 @@ const READY_STATES = new Set(["ready_for_today_mission", "active_learning"]);
 
 export default async function ParentHome() {
   const session = await requirePageRole(["parent"]);
-  const initial = listLearnersForParent(session.userId, session.tenantId);
-  for (const l of initial) refreshLearnerReadiness(l.id, session.tenantId);
-  const learners = listLearnersForParent(session.userId, session.tenantId);
+  const initial = await listLearnersForParent(session.userId, session.tenantId);
+  for (const l of initial) await refreshLearnerReadiness(l.id, session.tenantId);
+  const learners = await listLearnersForParent(session.userId, session.tenantId);
 
   const firstName = session.displayName.split(" ")[0];
   const primary = learners[0];

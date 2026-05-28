@@ -31,10 +31,10 @@ async function startBaselineAction(formData: FormData) {
   const session = await readMockSessionFromCookies();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     redirect("/parent/learners");
   }
-  const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
+  const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
   if (!assessment.submittedAt) {
     redirect(`/parent/learners/${learnerId}/assessment`);
   }
@@ -42,7 +42,7 @@ async function startBaselineAction(formData: FormData) {
     redirect(`/parent/learners/${learnerId}/brain-profile`);
   }
   // Reuse an existing in-progress baseline before creating a new one.
-  let baseline = getActiveBaselineForLearner(learnerId, session.tenantId);
+  let baseline = await getActiveBaselineForLearner(learnerId, session.tenantId);
   if (!baseline || baseline.status === "complete") {
     const created = await createBaseline({ learnerId, tenantId: session.tenantId });
     if (!created) redirect(`/parent/learners/${learnerId}`);
@@ -52,7 +52,7 @@ async function startBaselineAction(formData: FormData) {
       metadata: { baselineId: baseline.id, questionCount: created!.questions.length },
     });
   }
-  refreshLearnerReadiness(learnerId, session.tenantId);
+  await refreshLearnerReadiness(learnerId, session.tenantId);
   redirect(`/learner/baseline/${baseline.id}?as=parent`);
 }
 
@@ -63,13 +63,13 @@ export default async function ParentBaselinePage({
 }) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
-  const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
+  const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
   if (!assessment.submittedAt) {
     return (
       <AppShell
@@ -124,12 +124,12 @@ export default async function ParentBaselinePage({
     );
   }
 
-  const baseline = getActiveBaselineForLearner(learnerId, session.tenantId);
-  const subjects = listSubjects();
+  const baseline = await getActiveBaselineForLearner(learnerId, session.tenantId);
+  const subjects = await listSubjects();
   const subjectsById = new Map(subjects.map((s) => [s.id, s]));
 
-  const questions = baseline ? listBaselineQuestions(baseline.id) : [];
-  const attempts = baseline ? listBaselineAttempts(baseline.id, session.tenantId) : [];
+  const questions = baseline ? await listBaselineQuestions(baseline.id) : [];
+  const attempts = baseline ? await listBaselineAttempts(baseline.id, session.tenantId) : [];
 
   return (
     <AppShell

@@ -28,7 +28,8 @@ export default async function TeacherLessonPlansPage() {
 
   // Scope to classroom learners only — a teacher should not see lesson plans
   // for learners in other classrooms within the same school tenant.
-  const learnerIds = new Set(listLearnersForTeacher(session.userId, tenantId).map((l) => l.id));
+  const teacherLearners = await listLearnersForTeacher(session.userId, tenantId);
+  const learnerIds = new Set(teacherLearners.map((l) => l.id));
   const allowedRunIds = new Set(
     Array.from(store.lessonRuns.values())
       .filter((r) => r.tenantId === tenantId && learnerIds.has(r.learnerId))

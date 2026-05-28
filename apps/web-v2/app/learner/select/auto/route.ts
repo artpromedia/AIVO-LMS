@@ -25,7 +25,7 @@ export async function GET(req: Request): Promise<NextResponse> {
 
   const url = new URL(req.url);
   const learnerId = (url.searchParams.get("learnerId") ?? "").trim();
-  const authorized = learnerId ? verifyActiveLearner(session, learnerId) : null;
+  const authorized = learnerId ? await verifyActiveLearner(session, learnerId) : null;
   if (!authorized) {
     return NextResponse.redirect(new URL("/learner/select?error=forbidden", req.url));
   }

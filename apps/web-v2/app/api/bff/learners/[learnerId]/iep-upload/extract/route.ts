@@ -29,7 +29,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["iep_document_storage", "child_data_collection"],
@@ -37,15 +37,15 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     );
     if (consentErr) return consentErr;
 
-    const learner = getLearner(learnerId, session!.tenantId);
+    const learner = await getLearner(learnerId, session!.tenantId);
     if (!learner) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Learner not found" }, requestId);
     }
-    const doc = getIEPForLearner(learnerId, session!.tenantId);
+    const doc = await getIEPForLearner(learnerId, session!.tenantId);
     if (!doc) {
       return fail({ ...ERRORS.PRECONDITION_FAILED, message: "No IEP uploaded yet" }, requestId);
     }
-    const assessment = getOrCreateParentAssessment(learnerId, session!.tenantId);
+    const assessment = await getOrCreateParentAssessment(learnerId, session!.tenantId);
     // Gate on a submitted assessment: extraction reads from assessment fields,
     // so an unfinished one produces a hollow IEPExtraction. The IEP step is
     // only reachable after assessment submission anyway, but defending the
@@ -71,8 +71,8 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
         requestId,
       );
     }
-    const next = setIEPExtraction(learnerId, session!.tenantId, v.data);
-    refreshLearnerReadiness(learnerId, session!.tenantId);
+    const next = await setIEPExtraction(learnerId, session!.tenantId, v.data);
+    await refreshLearnerReadiness(learnerId, session!.tenantId);
     logIepAccess({
       tenantId: session!.tenantId,
       learnerId,

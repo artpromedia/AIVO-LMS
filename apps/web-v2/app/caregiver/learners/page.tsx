@@ -25,6 +25,7 @@ function readinessTone(state: LearnerProfile["readinessState"]) {
     case "assessment_needed":
     case "baseline_needed":
     case "iep_optional":
+    case "brain_clone_review_needed":
       return "warning" as const;
     default:
       return "neutral" as const;
@@ -38,9 +39,10 @@ function formatReadiness(state: LearnerProfile["readinessState"]): string {
 export default async function CaregiverLearnersPage() {
   const session = await requirePageRole(["caregiver", "platform_admin"]);
   const learnerIds = listLearnersForMember(session.userId, session.email, "caregiver");
-  const learners = learnerIds
-    .map((id) => getLearner(id, session.tenantId))
-    .filter((l): l is LearnerProfile => Boolean(l));
+  const maybeLearners = await Promise.all(
+    learnerIds.map((id) => getLearner(id, session.tenantId)),
+  );
+  const learners = maybeLearners.filter((l): l is LearnerProfile => Boolean(l));
 
   return (
     <AppShell

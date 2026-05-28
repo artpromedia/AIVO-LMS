@@ -58,13 +58,14 @@ function formatWhen(iso: string): string {
 export default async function CaregiverObservationsPage() {
   const session = await requirePageRole(["caregiver", "platform_admin"]);
   const learnerIds = listLearnersForMember(session.userId, session.email, "caregiver");
-  const learners = learnerIds
-    .map((id) => getLearner(id, session.tenantId))
-    .filter((l): l is LearnerProfile => Boolean(l));
+  const maybeLearners = await Promise.all(
+    learnerIds.map((id) => getLearner(id, session.tenantId)),
+  );
+  const learners = maybeLearners.filter((l): l is LearnerProfile => Boolean(l));
   const learnerById = new Map(learners.map((l) => [l.id, l]));
 
-  const subjectName = new Map(listSubjects().map((s) => [s.id, s.name]));
-  const skillName = new Map(listSkills().map((s) => [s.id, s.name]));
+  const subjectName = new Map((await listSubjects()).map((s) => [s.id, s.name]));
+  const skillName = new Map((await listSkills()).map((s) => [s.id, s.name]));
 
   // Sprint 10 — caregiver-authored observations across every learner
   // they support, newest-first. Joined with the lesson activity feed
@@ -75,8 +76,13 @@ export default async function CaregiverObservationsPage() {
     .sort((a, b) => (a.observedAt < b.observedAt ? 1 : -1))
     .slice(0, 20);
 
-  const feed = learners
-    .flatMap((l) => listLessonRunsForLearner(l.id, session.tenantId, { limit: FEED_LIMIT }))
+  const runBatches = await Promise.all(
+    learners.map((l) =>
+      listLessonRunsForLearner(l.id, session.tenantId, { limit: FEED_LIMIT }),
+    ),
+  );
+  const feed = runBatches
+    .flat()
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
     .slice(0, FEED_LIMIT);
 

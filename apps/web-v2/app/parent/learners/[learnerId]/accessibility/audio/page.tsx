@@ -19,10 +19,10 @@ type PageProps = { params: Promise<{ learnerId: string }> };
 export default async function Page({ params }: PageProps) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
   const pref =
     getLearnerVoicePreference(learnerId) ??

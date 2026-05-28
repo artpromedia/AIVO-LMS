@@ -15,8 +15,8 @@ import {
 
 export default async function Page() {
   const session = await requirePageRole(["parent"]);
-  const learners = listLearnersForParent(session.userId, session.tenantId);
-  const subjectMap = new Map(listSubjects().map((s) => [s.id, s]));
+  const learners = await listLearnersForParent(session.userId, session.tenantId);
+  const subjectMap = new Map((await listSubjects()).map((s) => [s.id, s]));
 
   return (
     <AppShell
@@ -36,11 +36,13 @@ export default async function Page() {
           description="Add a learner to see their upcoming work here."
         />
       ) : (
-        learners.map((l) => {
-          const assignments = listActiveAssignmentsForLearner(l.id, session.tenantId);
-          const activeRuns = listLessonRunsForLearner(l.id, session.tenantId).filter(
-            (r) => r.status === "ready" || r.status === "in_progress",
-          );
+        await Promise.all(
+          learners.map(async (l) => {
+            const assignments = await listActiveAssignmentsForLearner(l.id, session.tenantId);
+            const allActive = await listLessonRunsForLearner(l.id, session.tenantId);
+            const activeRuns = allActive.filter(
+              (r) => r.status === "ready" || r.status === "in_progress",
+            );
           return (
             <section key={l.id} className="mb-10">
               <SectionHeader
@@ -87,7 +89,8 @@ export default async function Page() {
               </div>
             </section>
           );
-        })
+          }),
+        )
       )}
     </AppShell>
   );

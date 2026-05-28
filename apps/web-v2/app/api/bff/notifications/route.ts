@@ -12,7 +12,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     if (response) return response;
     const url = new URL(req.url);
     const unreadOnly = url.searchParams.get("unread") === "1";
-    const notifications = listNotifications({
+    const notifications = await listNotifications({
       tenantId: session!.tenantId,
       userId: session!.userId,
       unreadOnly,

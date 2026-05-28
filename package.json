@@ -32,6 +32,7 @@
     "brand:check": "node scripts/brand-asset-check.mjs",
     "consent:audit": "node scripts/consent-gate-audit.mjs",
     "auth:audit": "node scripts/auth-mode-audit.mjs",
+    "api:boundary": "node scripts/check-api-boundary.mjs",
     "curriculum:validate": "node scripts/curriculum-validate.mjs",
     "item-bank:import-multimedia-fixtures": "node scripts/item-bank-import-multimedia-fixtures.mjs",
     "curriculum:validate-pack": "tsx scripts/validate-k8-curriculum-pack.ts",

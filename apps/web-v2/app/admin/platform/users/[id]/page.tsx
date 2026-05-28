@@ -41,22 +41,24 @@ const ROLE_TONE: Record<Role, "primary" | "success" | "neutral" | "warning"> = {
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await requirePageRole(["platform_admin"]);
-  const user = getUserById(id);
+  const user = await getUserById(id);
   if (!user) notFound();
 
   // Only show memberships inside the caller's visible tenant scope.
   const visibleTenants = scopeTenantsForSession(session.role, session.tenantId);
   const visibleIds = new Set(visibleTenants.map((t) => t.id));
-  const memberships = listMembershipsForUser(user.id).filter((m) => visibleIds.has(m.tenantId));
+  const allMemberships = await listMembershipsForUser(user.id);
+  const memberships = allMemberships.filter((m) => visibleIds.has(m.tenantId));
   if (memberships.length === 0) notFound();
 
   const tenantById = new Map(visibleTenants.map((t) => [t.id, t]));
 
   // If parent, list the learners they manage (across all their tenants).
   const parentMemberships = memberships.filter((m) => m.role === "parent");
-  const managedLearners = parentMemberships.flatMap((m) =>
-    listLearnersForParent(user.id, m.tenantId),
+  const managedNested = await Promise.all(
+    parentMemberships.map((m) => listLearnersForParent(user.id, m.tenantId)),
   );
+  const managedLearners = managedNested.flat();
 
   return (
     <AppShell

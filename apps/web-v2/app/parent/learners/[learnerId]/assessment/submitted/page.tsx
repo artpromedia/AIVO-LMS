@@ -24,13 +24,13 @@ export default async function AssessmentSubmittedPage({
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
   const sp = await searchParams;
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
-  const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
-  const iep = getIEPForLearner(learnerId, session.tenantId);
+  const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
+  const iep = await getIEPForLearner(learnerId, session.tenantId);
 
   const iepSkipped = sp.skipped === "iep";
   const iepConfirmed = !!iep && !!iep.confirmedAt;

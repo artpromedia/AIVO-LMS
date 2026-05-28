@@ -28,15 +28,15 @@ export default async function ParentLessonsPage({
 }) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
   const summaries = listParentLessonSummaries(learnerId, session.tenantId, { limit: 50 });
-  const subjectsById = new Map(listSubjects().map((s) => [s.id, s]));
-  const skillsById = new Map(listSkills().map((s) => [s.id, s]));
+  const subjectsById = new Map((await listSubjects()).map((s) => [s.id, s]));
+  const skillsById = new Map((await listSkills()).map((s) => [s.id, s]));
 
   return (
     <AppShell

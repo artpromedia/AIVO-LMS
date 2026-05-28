@@ -9,10 +9,13 @@ export async function GET(req: Request) {
   try {
     const { session, response } = await requireSession(req, requestId);
     if (response) return response;
-    const subjects = listSubjects().map((s) => ({
-      ...s,
-      skillCount: listSkills(s.id).length,
-    }));
+    const allSubjects = await listSubjects();
+    const subjects = await Promise.all(
+      allSubjects.map(async (s) => ({
+        ...s,
+        skillCount: (await listSkills(s.id)).length,
+      })),
+    );
     return ok({ subjects, sessionTenantId: session!.tenantId }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

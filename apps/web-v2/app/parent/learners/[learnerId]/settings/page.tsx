@@ -28,7 +28,7 @@ async function saveAction(formData: FormData) {
   const session = await readMockSessionFromCookies();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     redirect("/parent/learners");
   }
 
@@ -53,7 +53,7 @@ async function saveAction(formData: FormData) {
   if (!parsed.success) {
     redirect(`/parent/learners/${learnerId}/settings?error=invalid`);
   }
-  updateLearner(learnerId, session.tenantId, parsed.data);
+  await updateLearner(learnerId, session.tenantId, parsed.data);
   audit(session, "learner.update", newRequestId(), {
     learnerId,
     metadata: { source: "ui", fields: Object.keys(parsed.data) },
@@ -67,14 +67,14 @@ async function deleteAction(formData: FormData) {
   const session = await readMockSessionFromCookies();
   if (!session || session.role !== "parent") redirect("/login");
   const learnerId = String(formData.get("learnerId") || "");
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     redirect("/parent/learners");
   }
   const confirm = String(formData.get("confirm") || "");
   if (confirm !== "DELETE") {
     redirect(`/parent/learners/${learnerId}/settings?error=confirm`);
   }
-  deleteLearner(learnerId, session.tenantId);
+  await deleteLearner(learnerId, session.tenantId);
   audit(session, "learner.delete", newRequestId(), { learnerId, metadata: { source: "ui" } });
   redirect("/parent/learners");
 }
@@ -89,10 +89,10 @@ export default async function LearnerSettingsPage({
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
   const sp = await searchParams;
-  if (!parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
+  if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
 
   return (

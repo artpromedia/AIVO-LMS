@@ -27,14 +27,14 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (response) return response;
     const roleErr = requireRole(session!, [...ADMIN_ROLES, "teacher"], requestId);
     if (roleErr) return roleErr;
-    const classroom = getClassroom(classId, session!.tenantId);
+    const classroom = await getClassroom(classId, session!.tenantId);
     if (!classroom) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Class not found." }, requestId);
     }
     if (session!.role === "teacher" && classroom.teacherUserId !== session!.userId) {
       return fail({ ...ERRORS.FORBIDDEN_ROLE, message: "You do not teach this class." }, requestId);
     }
-    return ok({ classroom, enrollments: listEnrollments(classId) }, requestId);
+    return ok({ classroom, enrollments: await listEnrollments(classId) }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
   }
@@ -64,7 +64,7 @@ export async function PATCH(req: Request, { params }: Params): Promise<NextRespo
         requestId,
       );
     }
-    const rec = updateClassroom(classId, session!.tenantId, parsed.data);
+    const rec = await updateClassroom(classId, session!.tenantId, parsed.data);
     if (!rec) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Class not found." }, requestId);
     }

@@ -13,13 +13,15 @@ export const dynamic = "force-dynamic";
 
 export default async function NewAssignmentPage() {
   const session = await requirePageRole(["teacher"]);
-  const subjects = listSubjects();
-  const learners = listLearnersForTeacher(session.userId, session.tenantId);
-  const subjectsWithSkills = subjects.map((s) => ({
-    id: s.id,
-    name: s.name,
-    skills: listSkills(s.id).map((sk) => ({ id: sk.id, name: sk.name })),
-  }));
+  const subjects = await listSubjects();
+  const learners = await listLearnersForTeacher(session.userId, session.tenantId);
+  const subjectsWithSkills = await Promise.all(
+    subjects.map(async (s) => ({
+      id: s.id,
+      name: s.name,
+      skills: (await listSkills(s.id)).map((sk) => ({ id: sk.id, name: sk.name })),
+    })),
+  );
 
   return (
     <AppShell

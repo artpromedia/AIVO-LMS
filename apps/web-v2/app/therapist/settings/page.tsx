@@ -1,17 +1,25 @@
 /**
- * Therapist settings — placeholder route. Profile + notification preferences
- * land in a follow-up sprint.
+ * Therapist settings — profile + notification preferences summary.
  */
+import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
-import { PageHeader } from "@/components/layout/page-header";
+import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { THERAPIST_NAV } from "@/components/layout/role-shells";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { getNotificationPreference } from "@/lib/db/repos";
 
 export const dynamic = "force-dynamic";
 
 export default async function Page() {
   const session = await requirePageRole(["therapist", "platform_admin"]);
+  const prefs = getNotificationPreference(session.userId, session.tenantId);
+  const channelCount = (channel: "in_app" | "email" | "push") =>
+    Object.entries(prefs.preferences).filter(
+      ([key, enabled]) => key.endsWith(`:${channel}`) && enabled,
+    ).length;
+
   return (
     <AppShell
       role="therapist"
@@ -20,6 +28,8 @@ export default async function Page() {
       user={{ displayName: session.displayName, email: session.email }}
     >
       <PageHeader title="Settings" description="Your profile and preferences." />
+
+      <SectionHeader title="Profile" />
       <Card className="p-4">
         <dl className="grid grid-cols-[120px_1fr] gap-y-2 text-sm">
           <dt className="font-medium text-aivo-muted">Name</dt>
@@ -29,6 +39,26 @@ export default async function Page() {
           <dt className="font-medium text-aivo-muted">Role</dt>
           <dd>Therapist</dd>
         </dl>
+      </Card>
+
+      <SectionHeader title="Notifications" />
+      <Card className="p-4">
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          <Badge tone="primary">In-app · {channelCount("in_app")}</Badge>
+          <Badge tone="neutral">Email · {channelCount("email")}</Badge>
+          <Badge tone="neutral">Push · {channelCount("push")}</Badge>
+          <span className="text-aivo-ink-soft">
+            Digest cadence: {prefs.digestCadence}
+            {prefs.quietHours ? ` · quiet ${prefs.quietHours}` : ""}
+          </span>
+        </div>
+        <p className="mt-3 text-xs text-aivo-ink-soft">
+          Edit channels and quiet hours from the{" "}
+          <Link href="/parent/notifications" className="text-aivo-accent hover:underline">
+            notifications surface
+          </Link>
+          .
+        </p>
       </Card>
     </AppShell>
   );

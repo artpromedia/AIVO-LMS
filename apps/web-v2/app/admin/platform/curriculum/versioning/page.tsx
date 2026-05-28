@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
-  const skills = listSkills();
+  const skills = await listSkills();
   const skillById = new Map(skills.map((s) => [s.id, s]));
   const versions = listSkillVersions();
   const objectives = listLessonObjectiveTemplates();

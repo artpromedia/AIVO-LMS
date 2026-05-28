@@ -115,7 +115,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     // Sprint 10 — engagement exposes personalised gamification data
     // (XP, streaks, earned badges). consent:audit now classifies this
     // route as `required: true`; without the gate it would fail CI.
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["child_data_collection"],

@@ -112,7 +112,7 @@ export async function PATCH(req: Request) {
     sso: ssoPatch,
   });
 
-  recordAudit({
+  await recordAudit({
     userId: session.userId,
     tenantId: session.tenantId,
     learnerId: null,

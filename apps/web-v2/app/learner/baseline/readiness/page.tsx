@@ -30,18 +30,18 @@ export default async function BaselineReadinessPage({
   const session = await requirePageRole(["learner"]);
   if (!session.learnerId) redirect("/learner/home");
   const sp = await searchParams;
-  const learner = getLearner(session.learnerId, session.tenantId);
+  const learner = await getLearner(session.learnerId, session.tenantId);
   if (!learner) redirect("/learner/home");
 
   const baseline = sp.b
-    ? getBaselineById(sp.b, session.tenantId)
-    : getActiveBaselineForLearner(session.learnerId, session.tenantId);
+    ? await getBaselineById(sp.b, session.tenantId)
+    : await getActiveBaselineForLearner(session.learnerId, session.tenantId);
   if (!baseline || baseline.learnerId !== session.learnerId) {
     redirect("/learner/baseline/subjects");
   }
 
-  const assessment = getOrCreateParentAssessment(session.learnerId, session.tenantId);
-  const iep = getIEPForLearner(session.learnerId, session.tenantId);
+  const assessment = await getOrCreateParentAssessment(session.learnerId, session.tenantId);
+  const iep = await getIEPForLearner(session.learnerId, session.tenantId);
   const hasReadAloud = Boolean(
     learner.accessibilityDefaults.audioFirst || iep?.extraction?.readingSupport,
   );

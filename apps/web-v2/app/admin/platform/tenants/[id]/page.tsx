@@ -62,11 +62,11 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const directChildren = descendants.filter((t) => t.parentTenantId === tenant.id);
   const allScopeIds = [tenant.id, ...descendants.map((t) => t.id)];
 
-  const users = listUsersForTenants(allScopeIds);
-  const learners = listLearnersForTenants(allScopeIds);
+  const users = await listUsersForTenants(allScopeIds);
+  const learners = await listLearnersForTenants(allScopeIds);
   const billing = getBillingForTenant(tenant.id);
   const jobs = listAiGenerationJobs(allScopeIds, 5);
-  const auditLogs = listAuditLogsForTenants(allScopeIds, 8);
+  const auditLogs = await listAuditLogsForTenants(allScopeIds, 8);
   const invoices = listInvoicesForTenants([tenant.id]).slice(0, 5);
   const parent = tenant.parentTenantId ? getTenantById(tenant.parentTenantId) : null;
 

@@ -33,24 +33,24 @@ export default async function BaselineIntroPage({
   if (!session.learnerId) redirect("/learner/home");
   const sp = await searchParams;
   const baseline = sp.b
-    ? getBaselineById(sp.b, session.tenantId)
-    : getActiveBaselineForLearner(session.learnerId, session.tenantId);
+    ? await getBaselineById(sp.b, session.tenantId)
+    : await getActiveBaselineForLearner(session.learnerId, session.tenantId);
   if (!baseline || baseline.learnerId !== session.learnerId) {
     redirect("/learner/baseline/subjects");
   }
 
-  const learner = getLearner(session.learnerId, session.tenantId);
+  const learner = await getLearner(session.learnerId, session.tenantId);
   if (!learner) redirect("/learner/home");
-  const questions = listBaselineQuestions(baseline.id);
-  const allSubjects = listSubjects();
+  const questions = await listBaselineQuestions(baseline.id);
+  const allSubjects = await listSubjects();
   const subjectsById = new Map(allSubjects.map((s) => [s.id, s]));
   const subjects = baseline.subjectIds
     .map((id) => subjectsById.get(id))
-    .filter(Boolean) as ReturnType<typeof listSubjects>;
+    .filter((s): s is NonNullable<typeof s> => Boolean(s));
   const tutors = subjects.map((s) => tutorForSubjectSlug(s.slug)).filter(Boolean);
   const firstTutor = tutors[0];
 
-  const iep = getIEPForLearner(session.learnerId, session.tenantId);
+  const iep = await getIEPForLearner(session.learnerId, session.tenantId);
   const chips: PersonalizationVariant[] = ["parent_assessment", "no_grades"];
   if (iep?.confirmedAt) chips.unshift("iep");
   chips.push("pacing");

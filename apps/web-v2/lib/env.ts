@@ -91,13 +91,65 @@ const serverSchema = z.object({
   OBJECT_STORAGE_BUCKET: z.string().optional(),
   OBJECT_STORAGE_REGION: z.string().optional(),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace"]).default("info"),
+  // ADR 0007 — persistence adapter selection. `memory` keeps the
+  // process-local Map store; `postgres` routes ported domains through
+  // packages/db (Drizzle). Default to `memory` until the production
+  // database connection is configured.
+  AIVO_PERSISTENCE: z.enum(["memory", "postgres"]).default("memory"),
+  // Per-domain overrides for the persistence adapter. Each value, when
+  // set, wins over AIVO_PERSISTENCE for that domain. See
+  // lib/db/persistence/index.ts for the list of known domains.
+  AIVO_PERSISTENCE_NOTIFICATIONS: z.enum(["memory", "postgres"]).optional(),
+  AIVO_PERSISTENCE_AUDIT: z.enum(["memory", "postgres"]).optional(),
+  AIVO_PERSISTENCE_IDENTITY: z.enum(["memory", "postgres"]).optional(),
+  AIVO_PERSISTENCE_LEARNERS: z.enum(["memory", "postgres"]).optional(),
+  AIVO_PERSISTENCE_ASSESSMENTS: z.enum(["memory", "postgres"]).optional(),
+  AIVO_PERSISTENCE_LESSON_RUNS: z.enum(["memory", "postgres"]).optional(),
+  AIVO_PERSISTENCE_BRAIN_PROFILES: z.enum(["memory", "postgres"]).optional(),
+  AIVO_PERSISTENCE_CURRICULUM: z.enum(["memory", "postgres"]).optional(),
+  AIVO_PERSISTENCE_COMPLIANCE: z.enum(["memory", "postgres"]).optional(),
+  AIVO_PERSISTENCE_QUESTS: z.enum(["memory", "postgres"]).optional(),
+  AIVO_PERSISTENCE_ADMIN: z.enum(["memory", "postgres"]).optional(),
+  // ADR 0009 — service-stack parity flags. `AIVO_USE_SERVICE_STACK`
+  // is the global default; per-service flags override it.
+  AIVO_USE_SERVICE_STACK: z
+    .union([z.literal("true"), z.literal("false")])
+    .default("false")
+    .transform((v) => v === "true"),
+  AIVO_USE_BRAIN_SVC: z
+    .union([z.literal("true"), z.literal("false")])
+    .optional()
+    .transform((v) => (v === undefined ? undefined : v === "true")),
+  AIVO_USE_AI_SVC: z
+    .union([z.literal("true"), z.literal("false")])
+    .optional()
+    .transform((v) => (v === undefined ? undefined : v === "true")),
+  AIVO_USE_ASSESSMENT_SVC: z
+    .union([z.literal("true"), z.literal("false")])
+    .optional()
+    .transform((v) => (v === undefined ? undefined : v === "true")),
+  AIVO_USE_COMMS_SVC: z
+    .union([z.literal("true"), z.literal("false")])
+    .optional()
+    .transform((v) => (v === undefined ? undefined : v === "true")),
+  AIVO_USE_IDENTITY_SVC: z
+    .union([z.literal("true"), z.literal("false")])
+    .optional()
+    .transform((v) => (v === undefined ? undefined : v === "true")),
+  BRAIN_SVC_URL: z.string().url().default("http://localhost:3081"),
+  BRAIN_SVC_SERVICE_TOKEN: z.string().optional(),
+  COMMS_SVC_URL: z.string().url().default("http://localhost:3091"),
+  COMMS_SVC_SERVICE_TOKEN: z.string().optional(),
+  // Shared upstream timeout (ms) for service calls; the client uses
+  // AbortController with this deadline.
+  AIVO_SERVICE_TIMEOUT_MS: z.coerce.number().int().positive().default(5000),
 });
 
 const clientSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:5000"),
 });
 
-function parse<T>(name: string, schema: z.ZodType<T>, input: unknown): T {
+function parse<S extends z.ZodTypeAny>(name: string, schema: S, input: unknown): z.infer<S> {
   const result = schema.safeParse(input);
   if (!result.success) {
     const flat = result.error.flatten();

@@ -28,17 +28,17 @@ export default async function LearnerBaselineIndex() {
   const learnerId = session.learnerId;
   if (!learnerId) redirect("/learner/home");
 
-  const assessment = getOrCreateParentAssessment(learnerId, session.tenantId);
+  const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
   const ready =
     Boolean(assessment.submittedAt) && Boolean(getBrainProfile(learnerId, session.tenantId));
-  const baseline = getActiveBaselineForLearner(learnerId, session.tenantId);
+  const baseline = await getActiveBaselineForLearner(learnerId, session.tenantId);
 
   // Already mid-way? Drop the learner straight into the runner.
   if (baseline && baseline.status === "in_progress") {
     redirect(`/learner/baseline/${baseline.id}`);
   }
 
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) redirect("/learner/home");
 
   if (!ready) {
@@ -74,7 +74,7 @@ export default async function LearnerBaselineIndex() {
     );
   }
 
-  const iep = getIEPForLearner(learnerId, session.tenantId);
+  const iep = await getIEPForLearner(learnerId, session.tenantId);
   const chips: PersonalizationVariant[] = ["parent_assessment", "no_grades"];
   if (iep?.confirmedAt) chips.unshift("iep");
   chips.push("pacing", "ai_companion");

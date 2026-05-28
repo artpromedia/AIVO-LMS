@@ -67,7 +67,7 @@ async function startMissionAction(formData: FormData) {
     if (active !== learnerId) redirect("/learner/select");
   }
   if (
-    !hasLearnerConsent(session.tenantId, learnerId, [
+    !await hasLearnerConsent(session.tenantId, learnerId, [
       "child_data_collection",
       "ai_personalization",
     ])
@@ -82,7 +82,7 @@ async function startMissionAction(formData: FormData) {
   ) {
     redirect("/learner/home?blocker=rate_limit");
   }
-  const picked = pickTodaysMission(learnerId, session.tenantId);
+  const picked = await pickTodaysMission(learnerId, session.tenantId);
   if (!picked.ready) redirect("/learner/home?blocker=" + picked.blocker);
   if (picked.mission.existingRunId) {
     redirect(`/learner/lesson-runs/${picked.mission.existingRunId}`);
@@ -158,13 +158,13 @@ export default async function LearnerHome({
     if (!learnerId) redirect("/learner/select");
   }
   if (!learnerId) redirect("/login");
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) redirect(session.role === "parent" ? "/learner/select" : "/login");
 
-  const today = pickTodaysMission(learnerId, session.tenantId);
-  const allSubjects = listSubjects();
-  const { skillMasteries } = getMasteryMap(learnerId, session.tenantId);
-  const iep = getIEPForLearner(learnerId, session.tenantId);
+  const today = await pickTodaysMission(learnerId, session.tenantId);
+  const allSubjects = await listSubjects();
+  const { skillMasteries } = await getMasteryMap(learnerId, session.tenantId);
+  const iep = await getIEPForLearner(learnerId, session.tenantId);
   const typeface = await readTypefaceFromCookies();
 
   const subjectScore = new Map<string, { score: number; count: number }>();

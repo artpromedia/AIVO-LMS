@@ -27,14 +27,14 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["iep_document_storage", "child_data_collection"],
       requestId,
     );
     if (consentErr) return consentErr;
-    const doc = getIEPForLearner(learnerId, session!.tenantId);
+    const doc = await getIEPForLearner(learnerId, session!.tenantId);
     if (doc) {
       logIepAccess({
         tenantId: session!.tenantId,
@@ -60,7 +60,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["iep_document_storage", "child_data_collection"],
@@ -107,7 +107,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
         requestId,
       );
     }
-    const doc = uploadIEPDocument({
+    const doc = await uploadIEPDocument({
       learnerId,
       tenantId: session!.tenantId,
       ...v.data,
@@ -143,15 +143,15 @@ export async function DELETE(req: Request, { params }: Params): Promise<NextResp
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["iep_document_storage", "child_data_collection"],
       requestId,
     );
     if (consentErr) return consentErr;
-    const existing = getIEPForLearner(learnerId, session!.tenantId);
-    const removed = deleteIEPForLearner(learnerId, session!.tenantId);
+    const existing = await getIEPForLearner(learnerId, session!.tenantId);
+    const removed = await deleteIEPForLearner(learnerId, session!.tenantId);
     if (!removed) {
       return fail({ ...ERRORS.NOT_FOUND, message: "No IEP on file" }, requestId);
     }

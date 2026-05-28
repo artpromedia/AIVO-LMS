@@ -45,7 +45,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    const school = getSchool(parsed.data.schoolId);
+    const school = await getSchool(parsed.data.schoolId);
     if (!school) {
       return fail({ ...ERRORS.NOT_FOUND, message: "School not found." }, requestId);
     }
@@ -55,7 +55,7 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
-    const job = runRosterImport({
+    const job = await runRosterImport({
       tenantId: school.tenantId,
       schoolId: parsed.data.schoolId,
       source: parsed.data.source,

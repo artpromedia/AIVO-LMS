@@ -36,7 +36,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["child_data_collection"],
@@ -61,7 +61,7 @@ async function applyPatch(
   if (roleErr) return roleErr;
   const scope = requireLearnerScope(session!, learnerId, requestId);
   if (scope) return scope;
-  const consentErr = requireLearnerConsent(
+  const consentErr = await requireLearnerConsent(
     session!,
     learnerId,
     ["child_data_collection"],

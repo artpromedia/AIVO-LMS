@@ -31,9 +31,9 @@ export default async function BrainCloneAwakeningPage({
   if (!session.learnerId || session.learnerId !== learnerId) {
     redirect("/learner/home");
   }
-  const learner = getLearner(learnerId, session.tenantId);
+  const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) redirect("/learner/home");
-  const profile = getBrainProfile(learnerId, session.tenantId);
+  const profile = await getBrainProfile(learnerId, session.tenantId);
   if (!profile) redirect("/learner/baseline");
   if (profile.cloneStage === "pre_clone") {
     redirect("/learner/baseline");

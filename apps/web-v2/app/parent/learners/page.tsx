@@ -11,9 +11,9 @@ import { LearnerCard } from "@/components/parent/learner-card";
 
 export default async function ParentLearnersPage() {
   const session = await requirePageRole(["parent"]);
-  const learners = listLearnersForParent(session.userId, session.tenantId);
-  for (const l of learners) refreshLearnerReadiness(l.id, session.tenantId);
-  const fresh = listLearnersForParent(session.userId, session.tenantId);
+  const learners = await listLearnersForParent(session.userId, session.tenantId);
+  for (const l of learners) await refreshLearnerReadiness(l.id, session.tenantId);
+  const fresh = await listLearnersForParent(session.userId, session.tenantId);
 
   return (
     <AppShell

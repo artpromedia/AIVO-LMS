@@ -45,6 +45,7 @@ export type ReadinessState =
   | "assessment_needed"
   | "iep_optional"
   | "baseline_needed"
+  | "brain_clone_review_needed"
   | "ready_for_today_mission"
   | "active_learning";
 
@@ -1228,7 +1229,9 @@ export type PolicyKind =
   | "terms_of_service"
   | "coppa_notice"
   | "ferpa_notice"
-  | "dpa_template";
+  | "dpa_template"
+  | "accessibility_statement"
+  | "security_overview";
 
 export type PolicyVersion = {
   id: ID;

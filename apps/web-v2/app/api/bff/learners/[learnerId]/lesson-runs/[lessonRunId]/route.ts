@@ -23,18 +23,18 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["child_data_collection", "ai_personalization"],
       requestId,
     );
     if (consentErr) return consentErr;
-    const found = getLessonRun(lessonRunId, session!.tenantId);
+    const found = await getLessonRun(lessonRunId, session!.tenantId);
     if (!found || found.lessonRun.learnerId !== learnerId) {
       return fail({ ...ERRORS.NOT_FOUND, message: "Lesson run not found" }, requestId);
     }
-    const interactions = listLessonInteractions(lessonRunId, session!.tenantId);
+    const interactions = await listLessonInteractions(lessonRunId, session!.tenantId);
     return ok({ lessonRun: found.lessonRun, plan: found.plan, interactions }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

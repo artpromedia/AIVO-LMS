@@ -35,14 +35,14 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
       requestId,
     );
     if (limited) return limited;
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["child_data_collection", "ai_personalization"],
       requestId,
     );
     if (consentErr) return consentErr;
-    const picked = pickTodaysMission(learnerId, session!.tenantId);
+    const picked = await pickTodaysMission(learnerId, session!.tenantId);
     if (!picked.ready) {
       return fail(
         {
@@ -59,7 +59,7 @@ export async function POST(req: Request, { params }: Params): Promise<NextRespon
     }
     // Resume case → return existing run + plan.
     if (picked.mission.existingRunId) {
-      const existing = getLessonRun(picked.mission.existingRunId, session!.tenantId);
+      const existing = await getLessonRun(picked.mission.existingRunId, session!.tenantId);
       if (!existing) {
         return fail({ ...ERRORS.NOT_FOUND, message: "Run vanished" }, requestId);
       }

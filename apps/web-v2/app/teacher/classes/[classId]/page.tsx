@@ -12,9 +12,9 @@ type Params = { params: Promise<{ classId: string }> };
 export default async function Page({ params }: Params) {
   const session = await requirePageRole(["teacher"]);
   const { classId } = await params;
-  const classroom = getClassroom(classId, session.tenantId);
+  const classroom = await getClassroom(classId, session.tenantId);
   if (!classroom || classroom.teacherUserId !== session.userId) notFound();
-  const enrollments = listEnrollments(classroom.id);
+  const enrollments = await listEnrollments(classroom.id);
   const learners = enrollments.filter((e) => e.role === "learner");
 
   return (

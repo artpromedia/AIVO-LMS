@@ -17,8 +17,8 @@ export const dynamic = "force-dynamic";
 
 export default async function Page() {
   const session = await requirePageRole(["parent"]);
-  const policies = listPolicyVersions();
-  const subs = listSubprocessors();
+  const policies = await listPolicyVersions();
+  const subs = await listSubprocessors();
   const exportReqs = listDataExportRequestsForUser(session.userId, session.tenantId);
   const deleteReqs = listDataDeletionRequestsForUser(session.userId, session.tenantId);
 

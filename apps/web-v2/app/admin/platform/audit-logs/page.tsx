@@ -9,7 +9,7 @@ import { listAuditLogsForTenants, scopeTenantsForSession, getTenantById } from "
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
-  const logs = listAuditLogsForTenants(
+  const logs = await listAuditLogsForTenants(
     tenants.map((t) => t.id),
     200,
   );

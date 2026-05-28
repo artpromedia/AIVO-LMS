@@ -26,7 +26,7 @@ const FL_TONE: Record<string, "primary" | "success" | "neutral" | "warning"> = {
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
-  const learners = listLearnersForTenants(tenants.map((t) => t.id));
+  const learners = await listLearnersForTenants(tenants.map((t) => t.id));
   const tenantById = new Map(tenants.map((t) => [t.id, t]));
 
   const flCounts = learners.reduce<Record<string, number>>((acc, l) => {

@@ -49,11 +49,11 @@ function makeValidLlmResponse(count = 14) {
   };
 }
 
-function primeSubmittedParentAssessment(): void {
+async function primeSubmittedParentAssessment(): Promise<void> {
   // Mark the seeded parent assessment as submitted so the LLM gate
   // (which requires `parentAssessment.submittedAt`) is satisfied.
-  getOrCreateParentAssessment(LEARNER_ID, TENANT_ID);
-  submitParentAssessment(LEARNER_ID, TENANT_ID);
+  await getOrCreateParentAssessment(LEARNER_ID, TENANT_ID);
+  await submitParentAssessment(LEARNER_ID, TENANT_ID);
 }
 
 describe("createBaseline — Sprint B2 LLM wiring", () => {
@@ -76,7 +76,7 @@ describe("createBaseline — Sprint B2 LLM wiring", () => {
   it("falls back to BANK when AIVO_FEATURE_BASELINE_LLM is OFF", async () => {
     vi.stubEnv("AIVO_FEATURE_BASELINE_LLM", "false");
     vi.stubEnv("NODE_ENV", "production"); // also turn off the dev default
-    primeSubmittedParentAssessment();
+    await primeSubmittedParentAssessment();
 
     const fetchSpy = vi.fn();
     globalThis.fetch = fetchSpy as unknown as typeof fetch;
@@ -93,23 +93,49 @@ describe("createBaseline — Sprint B2 LLM wiring", () => {
 
   it("uses the LLM path when the flag is ON and the call succeeds", async () => {
     vi.stubEnv("AIVO_FEATURE_BASELINE_LLM", "true");
-    primeSubmittedParentAssessment();
+    await primeSubmittedParentAssessment();
 
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      async json() {
-        return makeValidLlmResponse(14);
-      },
-      async text() {
-        return "";
-      },
+    // The createBaseline flow tries the Discovery Adventure first (one fetch
+    // per chapter), then falls back to the flat /api/ai/generate-baseline
+    // path. This test exercises the flat-LLM happy path, so we 404 the
+    // discovery chapter calls (forcing the discovery fallback) and serve
+    // the LLM fixture only on the flat endpoint.
+    const fetchMock = vi.fn().mockImplementation((url: string | URL) => {
+      const href = typeof url === "string" ? url : url.toString();
+      if (href.includes("/api/ai/generate-baseline")) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          async json() {
+            return makeValidLlmResponse(14);
+          },
+          async text() {
+            return "";
+          },
+        });
+      }
+      // Force discovery to bail so the flat-LLM branch executes.
+      return Promise.resolve({
+        ok: false,
+        status: 404,
+        async json() {
+          return {};
+        },
+        async text() {
+          return "";
+        },
+      });
     });
     globalThis.fetch = fetchMock as unknown as typeof fetch;
 
     const result = await createBaseline({ learnerId: LEARNER_ID, tenantId: TENANT_ID });
     expect(result).not.toBeNull();
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const flatLlmCalls = fetchMock.mock.calls.filter((c) => {
+      const u = c[0];
+      const href = typeof u === "string" ? u : u instanceof URL ? u.toString() : "";
+      return href.includes("/api/ai/generate-baseline");
+    });
+    expect(flatLlmCalls).toHaveLength(1);
     const meta = result!.baseline.generationMetadata;
     expect(meta).toMatchObject({
       source: "ai",
@@ -124,7 +150,7 @@ describe("createBaseline — Sprint B2 LLM wiring", () => {
 
   it("falls back to BANK on a timeout, with reason=timeout", async () => {
     vi.stubEnv("AIVO_FEATURE_BASELINE_LLM", "true");
-    primeSubmittedParentAssessment();
+    await primeSubmittedParentAssessment();
 
     const fetchMock = vi.fn().mockImplementation(() => {
       const e = new Error("aborted");
@@ -144,7 +170,7 @@ describe("createBaseline — Sprint B2 LLM wiring", () => {
 
   it("falls back to BANK on schema-invalid JSON", async () => {
     vi.stubEnv("AIVO_FEATURE_BASELINE_LLM", "true");
-    primeSubmittedParentAssessment();
+    await primeSubmittedParentAssessment();
 
     const bad = makeValidLlmResponse(14);
     bad.questions[0]!.correctAnswer = "not-in-options";

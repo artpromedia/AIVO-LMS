@@ -39,13 +39,13 @@ export default async function LearnerSubjectsPage() {
   const learnerId = session.learnerId;
   if (!learnerId) redirect("/learner/home");
 
-  const { map, skillMasteries } = getMasteryMap(learnerId, session.tenantId);
+  const { map, skillMasteries } = await getMasteryMap(learnerId, session.tenantId);
   // Intersect BFF-seeded subjects with the brand registry's production-
   // ready set so non-ready slugs (currently world-languages, coding,
   // and the other content-team-WIP rows) never reach the learner UI.
   const productionReadySlugs = new Set(getProductionReadySubjects().map((s) => s.slug));
-  const subjects = listSubjects().filter((s) => productionReadySlugs.has(s.slug));
-  const iep = getIEPForLearner(learnerId, session.tenantId);
+  const subjects = (await listSubjects()).filter((s) => productionReadySlugs.has(s.slug));
+  const iep = await getIEPForLearner(learnerId, session.tenantId);
   const baselineNeeded = !map;
 
   const subjectScore = new Map<string, { score: number; count: number }>();

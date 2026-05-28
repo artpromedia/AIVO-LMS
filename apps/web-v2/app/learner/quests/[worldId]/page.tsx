@@ -35,10 +35,10 @@ export default async function QuestWorldPage({ params }: Params) {
     learnerId = await readActiveLearnerFromCookies(session);
     if (!learnerId) redirect("/learner/select");
   }
-  const world = getQuestWorld(worldId);
+  const world = await getQuestWorld(worldId);
   if (!world) notFound();
-  const chapters = listQuestChapters(worldId);
-  const progress = listQuestProgressForLearner(learnerId, session.tenantId, worldId);
+  const chapters = await listQuestChapters(worldId);
+  const progress = await listQuestProgressForLearner(learnerId, session.tenantId, worldId);
   const completed = new Set(progress.filter((p) => p.progress >= 1).map((p) => p.chapterId));
 
   return (
@@ -50,8 +50,9 @@ export default async function QuestWorldPage({ params }: Params) {
     >
       <PageHeader eyebrow="Quest" title={world.name} description={world.description} />
       <ul className="grid gap-3" aria-label="Quest chapters">
-        {chapters.map((c) => {
-          const unlocked = isQuestChapterUnlocked(learnerId!, session.tenantId, c);
+        {await Promise.all(
+          chapters.map(async (c) => {
+            const unlocked = await isQuestChapterUnlocked(learnerId!, session.tenantId, c);
           const isDone = completed.has(c.id);
           const inner = (
             <Card
@@ -92,8 +93,9 @@ export default async function QuestWorldPage({ params }: Params) {
                 {inner}
               </Link>
             </li>
-          );
-        })}
+            );
+          }),
+        )}
       </ul>
     </AppShell>
   );

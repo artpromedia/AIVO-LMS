@@ -11,7 +11,7 @@ import { ConsentToggle } from "./consent-toggle";
 export default async function Page() {
   const session = await requirePageRole(["parent"]);
   const versions = listConsentVersions();
-  const records = listConsentsForUser(session.userId, session.tenantId);
+  const records = await listConsentsForUser(session.userId, session.tenantId);
 
   const accountTypes = CONSENT_TYPES.filter(
     (t) => !["child_data_collection", "iep_document_storage", "teacher_access"].includes(t),

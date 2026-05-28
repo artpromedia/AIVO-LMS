@@ -31,7 +31,7 @@ export async function GET(req: Request): Promise<NextResponse> {
     const endIso = url.searchParams.get("endIso") ?? undefined;
     const format = url.searchParams.get("format");
 
-    const report = getSchoolReport(tenantId, { startIso, endIso });
+    const report = await getSchoolReport(tenantId, { startIso, endIso });
     if (format === "csv") {
       const csv = renderSchoolReportCsv(report);
       return new NextResponse(csv, {

@@ -22,7 +22,7 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["child_data_collection"],
@@ -30,16 +30,19 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     );
     if (consentErr) return consentErr;
 
-    const subjects = listSubjects().map((s) => {
-      const detail = getSubjectDetail(learnerId, session!.tenantId, s.id);
-      return {
-        subject: s,
-        currentLevel: detail?.currentLevel ?? "not_started",
-        nextSkillId: detail?.nextSkillId ?? null,
-        skillCount: detail?.skills.length ?? 0,
-        recommendedTutorPersona: detail?.recommendedTutorPersona ?? null,
-      };
-    });
+    const allSubjects = await listSubjects();
+    const subjects = await Promise.all(
+      allSubjects.map(async (s) => {
+        const detail = await getSubjectDetail(learnerId, session!.tenantId, s.id);
+        return {
+          subject: s,
+          currentLevel: detail?.currentLevel ?? "not_started",
+          nextSkillId: detail?.nextSkillId ?? null,
+          skillCount: detail?.skills.length ?? 0,
+          recommendedTutorPersona: detail?.recommendedTutorPersona ?? null,
+        };
+      }),
+    );
     return ok({ subjects }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);

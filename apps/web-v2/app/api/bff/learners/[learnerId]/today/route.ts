@@ -18,14 +18,14 @@ export async function GET(req: Request, { params }: Params): Promise<NextRespons
     if (roleErr) return roleErr;
     const scope = requireLearnerScope(session!, learnerId, requestId);
     if (scope) return scope;
-    const consentErr = requireLearnerConsent(
+    const consentErr = await requireLearnerConsent(
       session!,
       learnerId,
       ["child_data_collection", "ai_personalization"],
       requestId,
     );
     if (consentErr) return consentErr;
-    const result = pickTodaysMission(learnerId, session!.tenantId);
+    const result = await pickTodaysMission(learnerId, session!.tenantId);
     return ok({ today: result }, requestId);
   } catch (e) {
     return failFromUnknown(e, requestId);
