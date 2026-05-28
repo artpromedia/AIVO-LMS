@@ -250,7 +250,52 @@ export async function submitParentAssessment(
     submittedAt: nowIso(),
     updatedAt: nowIso(),
   };
-  return getPersistence().assessments.upsertParentAssessment(submitted);
+  const result = await getPersistence().assessments.upsertParentAssessment(submitted);
+
+  // Auto-generate the pre-clone brain profile on submit so the parent sees
+  // a brain in the UI immediately and `completeBaseline` has a profile to
+  // upgrade to "cloned". Without this, the brain clone never lands unless
+  // the parent first visits the brain-profile page manually.
+  try {
+    const existingProfile = await getBrainProfile(learnerId, tenantId);
+    if (!existingProfile) {
+      const learner = await getLearner(learnerId, tenantId);
+      if (learner) {
+        const iep = await getIEPForLearner(learnerId, tenantId);
+        const subjects = await listSubjects();
+        const candidate = buildBrainProfile({
+          learner,
+          assessment: result ?? submitted,
+          iepExtraction: iep?.extraction ?? null,
+          iepUploaded: Boolean(iep),
+          subjects,
+          baselineAttempts: 0,
+        });
+        const v = brainProfileStateSchema.safeParse(candidate);
+        if (v.success) {
+          await upsertBrainProfile(learnerId, tenantId, v.data);
+        } else {
+          logger.warn({
+            event: "parent_assessment.preclone_skipped",
+            learnerId,
+            tenantId,
+            reason: "schema_validation_failed",
+          });
+        }
+      }
+    }
+  } catch (err) {
+    // Pre-clone generation is a best-effort side effect. Failing here must
+    // not block the parent assessment submission.
+    logger.warn({
+      event: "parent_assessment.preclone_failed",
+      learnerId,
+      tenantId,
+      err: err instanceof Error ? err.message : String(err),
+    });
+  }
+
+  return result;
 }
 
 // ===== IEP (Sprint 6) =====
@@ -458,6 +503,25 @@ async function prepareBrainCloneFromSummary(
   if (!parsed.success) return null;
 
   const now = nowIso();
+  if (!existing) {
+    // No pre-clone profile yet (e.g. legacy parent who never visited the
+    // brain-profile page and submitParentAssessment ran before the
+    // auto-generate fix). Build one straight into "cloned" stage so the
+    // baseline completion still produces a brain clone the parent can
+    // approve.
+    return {
+      id: newId("brp"),
+      learnerId,
+      tenantId,
+      state: parsed.data,
+      approvedByParent: false,
+      approvalStatus: "pending_parent_review",
+      cloneStage: "cloned",
+      clonedAt: now,
+      generatedAt: now,
+      updatedAt: now,
+    };
+  }
   return {
     ...existing,
     state: parsed.data,
