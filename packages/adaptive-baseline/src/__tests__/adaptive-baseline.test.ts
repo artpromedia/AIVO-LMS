@@ -8,6 +8,9 @@ import {
   finalize,
   assessFrustration,
   FRUSTRATION_CEILING,
+  itemProbability,
+  itemInformation,
+  pickNextItem as pick2,
   type BaselineItem,
   type BaselineState,
 } from "../index.js";
@@ -240,6 +243,82 @@ describe("adaptive-baseline", () => {
         response: { itemId: "wrong", correct: true, responseTimeMs: 100 },
       }),
     ).toThrow(/itemId mismatch/);
+  });
+});
+
+describe("2-PL discrimination", () => {
+  function item(id: string, b: number, a?: number): BaselineItem {
+    return {
+      id,
+      skillId: id,
+      difficulty: b,
+      modalities: ["reading"],
+      lightReading: false,
+      ...(a !== undefined ? { discrimination: a } : {}),
+    };
+  }
+
+  it("collapses to 1-PL when discrimination is omitted (a=1)", () => {
+    const it1 = item("x", 0.5);
+    expect(itemProbability(0, it1)).toBeCloseTo(1 / (1 + Math.exp(0.5)), 10);
+    expect(itemInformation(0.5, it1)).toBeCloseTo(0.25, 10); // p=.5 → a²·.25 = .25
+  });
+
+  it("a higher discrimination yields a steeper curve + more information at b", () => {
+    const low = item("l", 0, 0.5);
+    const high = item("h", 0, 2.0);
+    // At θ=b both are p=.5, but Fisher info scales with a².
+    expect(itemInformation(0, high)).toBeCloseTo(2.0 * 2.0 * 0.25, 10);
+    expect(itemInformation(0, low)).toBeCloseTo(0.5 * 0.5 * 0.25, 10);
+    expect(itemInformation(0, high)).toBeGreaterThan(itemInformation(0, low));
+    // Away from b, the high-a item is more confidently scored.
+    expect(itemProbability(1, high)).toBeGreaterThan(itemProbability(1, low));
+  });
+
+  it("a high-discrimination answer moves θ more and adds more info", () => {
+    const base = initBaseline();
+    const lowA = recordResponse({
+      state: base,
+      item: item("l", 0, 0.5),
+      response: { itemId: "l", correct: true, responseTimeMs: 100 },
+    });
+    const highA = recordResponse({
+      state: base,
+      item: item("h", 0, 2.0),
+      response: { itemId: "h", correct: true, responseTimeMs: 100 },
+    });
+    expect(highA.theta).toBeGreaterThan(lowA.theta);
+    expect(highA.infoSum).toBeGreaterThan(lowA.infoSum);
+  });
+
+  it("a=1 reproduces the exact legacy 1-PL θ update", () => {
+    const s = initBaseline();
+    const next = recordResponse({
+      state: s,
+      item: item("x", 0.0),
+      response: { itemId: "x", correct: true, responseTimeMs: 100 },
+    });
+    // Legacy: p=sigmoid(0-0)=.5, θ = 0 + 0.4*(1-.5) = 0.2.
+    expect(next.theta).toBeCloseTo(0.2, 10);
+  });
+
+  it("prefers the more discriminating item among equal-difficulty candidates", () => {
+    const s = initBaseline(); // θ=0
+    const bankD: BaselineItem[] = [item("plain", 0.0, 1.0), item("sharp", 0.0, 2.0)];
+    expect(pick2(s, bankD)?.id).toBe("sharp");
+  });
+
+  it("reaches the SE stop sooner with high-discrimination items", () => {
+    const hi = item("a", 0, 2.5);
+    const lo = item("b", 0, 0.6);
+    let sHi = initBaseline();
+    let sLo = initBaseline();
+    for (let i = 0; i < 6; i++) {
+      sHi = recordResponse({ state: sHi, item: hi, response: { itemId: "a", correct: i % 2 === 0, responseTimeMs: 1 } });
+      sLo = recordResponse({ state: sLo, item: lo, response: { itemId: "b", correct: i % 2 === 0, responseTimeMs: 1 } });
+    }
+    // More info accumulated ⇒ smaller SE.
+    expect(shouldStop(sHi).se).toBeLessThan(shouldStop(sLo).se);
   });
 });
 

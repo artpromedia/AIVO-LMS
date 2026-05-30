@@ -87,6 +87,12 @@ describe("questionToBaselineItem", () => {
     expect(item.lightReading).toBe(false);
     expect(item.modalities).toEqual(["reading"]);
   });
+
+  it("passes a calibrated discrimination through to the engine item (2-PL)", () => {
+    expect(questionToBaselineItem(q("grade_level")).discrimination).toBeUndefined();
+    const calibrated = questionToBaselineItem(q("grade_level", { discrimination: 1.8 }));
+    expect(calibrated.discrimination).toBe(1.8);
+  });
 });
 
 describe("cold-start prior", () => {

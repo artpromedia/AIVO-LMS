@@ -616,6 +616,12 @@ export type BaselineQuestion = {
   hint?: string;
   readAloudText?: string;
   difficulty: BaselineDifficulty;
+  /**
+   * Optional IRT 2-PL discrimination (`a`) for this item. When present it
+   * flows into the adaptive engine's selection + scoring; when omitted the
+   * engine treats it as 1 (pure 1-PL). Populated by calibrated banks.
+   */
+  discrimination?: number;
   accommodationTags: string[];
 };
 

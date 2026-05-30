@@ -127,6 +127,9 @@ export function questionToBaselineItem(
     difficulty: override ?? difficultyToTheta(q.difficulty),
     modalities,
     lightReading,
+    // 2-PL: carries through to the engine when the question is calibrated
+    // with a discrimination; omitted ⇒ engine defaults to a=1 (1-PL).
+    ...(q.discrimination !== undefined ? { discrimination: q.discrimination } : {}),
   };
 }
 

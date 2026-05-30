@@ -47,6 +47,30 @@ export interface BaselineItem {
   lightReading: boolean;
   /** Optional grade-band hint; the placement step uses this. */
   gradeBand?: string;
+  /**
+   * IRT 2-PL discrimination (`a`) — how sharply the item separates
+   * learners around its difficulty. Higher `a` ⇒ a steeper response curve
+   * and more Fisher information near θ=b. Optional: when omitted it
+   * defaults to 1, which makes the 2-PL math collapse to the original
+   * 1-PL behaviour, so 1-PL banks are unaffected.
+   */
+  discrimination?: number;
+}
+
+/** 2-PL discrimination default — `a=1` reduces every formula to 1-PL. */
+export const DEFAULT_DISCRIMINATION = 1;
+
+/** P(correct | θ, item) under the 2-PL model: sigmoid(a·(θ − b)). */
+export function itemProbability(theta: number, item: BaselineItem): number {
+  const a = item.discrimination ?? DEFAULT_DISCRIMINATION;
+  return 1 / (1 + Math.exp(-a * (theta - item.difficulty)));
+}
+
+/** Fisher information the item carries about θ: a²·p·(1−p). */
+export function itemInformation(theta: number, item: BaselineItem): number {
+  const a = item.discrimination ?? DEFAULT_DISCRIMINATION;
+  const p = itemProbability(theta, item);
+  return a * a * p * (1 - p);
 }
 
 export interface ItemResponse {
@@ -156,10 +180,20 @@ export function assessFrustration(state: BaselineState): FrustrationRead {
   return { level, ceiling, struggleStreak: streak };
 }
 
+/**
+ * Selection cost (lower = preferred): distance of the item difficulty from
+ * θ, minus a discrimination preference (a more discriminating item carries
+ * more Fisher information near θ), plus the covered-skill and
+ * reading-difficulty nudges. The discrimination term is 0 when a=1, so
+ * 1-PL banks select exactly as before.
+ */
+const DISCRIMINATION_PREF = 0.3;
+
 function bestByScore(state: BaselineState, candidates: BaselineItem[]): BaselineItem {
   const score = (it: BaselineItem) => {
     const gap = Math.abs(it.difficulty - state.theta);
     let s = gap;
+    s -= DISCRIMINATION_PREF * ((it.discrimination ?? DEFAULT_DISCRIMINATION) - 1);
     if (state.coveredSkills.has(it.skillId.toLowerCase())) s += 0.25;
     if (state.readingDifficulty && !it.lightReading) s += 0.5;
     return s;
@@ -229,10 +263,14 @@ export function recordResponse(input: RecordResponseInput): BaselineState {
       `recordResponse: itemId mismatch (response=${response.itemId} item=${item.id})`,
     );
   }
-  const p = 1 / (1 + Math.exp(-(state.theta - item.difficulty)));
+  const a = item.discrimination ?? DEFAULT_DISCRIMINATION;
+  const p = itemProbability(state.theta, item);
   const correct = response.correct ? 1 : 0;
-  const nextTheta = state.theta + K * (correct - p);
-  const info = p * (1 - p);
+  // 2-PL stochastic-gradient θ update: the log-likelihood gradient wrt θ
+  // is a·(correct − p), so a high-discrimination answer moves θ more.
+  const nextTheta = state.theta + K * a * (correct - p);
+  // 2-PL Fisher information: a²·p·(1−p).
+  const info = a * a * p * (1 - p);
   const nextCovered = new Set(state.coveredSkills);
   nextCovered.add(item.skillId.toLowerCase());
   return {
