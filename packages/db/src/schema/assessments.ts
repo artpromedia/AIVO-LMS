@@ -196,13 +196,12 @@ export const baselineItemResponseLogs = pgTable(
   "baseline_item_response_logs",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    tenantId: uuid("tenant_id")
-      .references(() => tenants.id)
-      .notNull(),
-    learnerId: uuid("learner_id")
-      .references(() => learners.id)
-      .notNull(),
-    /** Source baseline run (web-v2 id space; no cross-schema FK). */
+    // Denormalized id columns (varchar, no FK): this is an append-only,
+    // high-volume analytics log written from web-v2's string id space, so
+    // it intentionally trades referential integrity for write simplicity.
+    tenantId: varchar("tenant_id", { length: 128 }).notNull(),
+    learnerId: varchar("learner_id", { length: 128 }).notNull(),
+    /** Source baseline run. */
     baselineId: varchar("baseline_id", { length: 128 }).notNull(),
     /** Stable calibration key: `${skillId}|${difficulty}`. */
     itemKey: varchar("item_key", { length: 160 }).notNull(),
