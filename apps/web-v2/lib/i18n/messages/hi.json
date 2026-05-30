@@ -95,7 +95,18 @@
     "watch_approve": "Approve & activate",
     "watch_amend": "Add context & rebuild",
     "watch_back": "Back to learner",
-    "watch_already_approved": "This brain has already been approved."
+    "watch_already_approved": "This brain has already been approved.",
+    "clone_eyebrow": "ब्रेन क्लोन हो रहा है",
+    "clone_aria": "AIVO के लर्निंग मॉडल को {name} के निजी ब्रेन में क्लोन किया जा रहा है",
+    "clone_master_label": "AIVO मास्टर ब्रेन",
+    "clone_child_label": "{name} का ब्रेन",
+    "clone_caption": "AIVO के लर्निंग मॉडल को {name} के निजी ब्रेन में क्लोन किया जा रहा है…",
+    "clone_personalising": "{name} के ग्रेड और प्रोफ़ाइल के अनुसार वैयक्तिकृत किया जा रहा है",
+    "clone_finalising": "लगभग तैयार — वैयक्तिकृत ब्रेन को अंतिम रूप दिया जा रहा है",
+    "clone_privacy_pii": "कोई भी निजी डेटा बिना एन्क्रिप्शन के इस डिवाइस से बाहर नहीं जाता",
+    "clone_privacy_versioned": "वर्शन सहित · कभी भी पहले जैसा करें",
+    "clone_skip": "एनिमेशन छोड़ें",
+    "clone_replay": "क्लोन एनिमेशन फिर से चलाएँ"
   },
   "learner": {
     "errors": {

@@ -95,7 +95,18 @@
     "watch_approve": "Approve & activate",
     "watch_amend": "Add context & rebuild",
     "watch_back": "Back to learner",
-    "watch_already_approved": "This brain has already been approved."
+    "watch_already_approved": "This brain has already been approved.",
+    "clone_eyebrow": "ブレインをクローン中",
+    "clone_aria": "AIVO の学習モデルを {name} 専用のブレインにクローンしています",
+    "clone_master_label": "AIVO マスターブレイン",
+    "clone_child_label": "{name} のブレイン",
+    "clone_caption": "AIVO の学習モデルを {name} 専用のブレインにクローンしています…",
+    "clone_personalising": "{name} の学年とプロフィールに合わせて調整中",
+    "clone_finalising": "まもなく完了 — パーソナライズされたブレインを仕上げています",
+    "clone_privacy_pii": "個人データが暗号化されずにこの端末から出ることはありません",
+    "clone_privacy_versioned": "バージョン管理 · いつでもロールバック可能",
+    "clone_skip": "アニメーションをスキップ",
+    "clone_replay": "クローンアニメーションを再生"
   },
   "learner": {
     "errors": {

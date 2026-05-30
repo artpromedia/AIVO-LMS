@@ -95,7 +95,18 @@
     "watch_approve": "Approve & activate",
     "watch_amend": "Add context & rebuild",
     "watch_back": "Back to learner",
-    "watch_already_approved": "This brain has already been approved."
+    "watch_already_approved": "This brain has already been approved.",
+    "clone_eyebrow": "جارٍ استنساخ العقل",
+    "clone_aria": "جارٍ استنساخ نموذج التعلّم من AIVO إلى العقل الشخصي لـ {name}",
+    "clone_master_label": "العقل الرئيسي لـ AIVO",
+    "clone_child_label": "عقل {name}",
+    "clone_caption": "جارٍ استنساخ نموذج التعلّم من AIVO إلى العقل الشخصي لـ {name}…",
+    "clone_personalising": "تخصيص حسب صف {name} وملفه التعليمي",
+    "clone_finalising": "أوشك على الانتهاء — جارٍ إنهاء العقل المخصّص",
+    "clone_privacy_pii": "لا تغادر أي بيانات شخصية هذا الجهاز دون تشفير",
+    "clone_privacy_versioned": "محفوظ بالإصدارات · يمكن التراجع في أي وقت",
+    "clone_skip": "تخطّي الرسوم المتحركة",
+    "clone_replay": "إعادة تشغيل رسوم الاستنساخ"
   },
   "learner": {
     "errors": {

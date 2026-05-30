@@ -129,9 +129,11 @@ export default async function BrainCloneWatchPage({
         amendLabel={t("watch_amend")}
         backLabel={t("watch_back")}
         alreadyApprovedLabel={t("watch_already_approved")}
+        replayCloneLabel={t("clone_replay")}
         alreadyApproved={alreadyApproved}
         stages={stages}
         primaryHue={s.visualIdentity.primaryHue}
+        secondaryHues={s.visualIdentity.secondaryHues}
         approveAction={approveBrainCloneAction}
       />
     </AppShell>

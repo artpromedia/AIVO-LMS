@@ -95,7 +95,18 @@
     "watch_approve": "Approve & activate",
     "watch_amend": "Add context & rebuild",
     "watch_back": "Back to learner",
-    "watch_already_approved": "This brain has already been approved."
+    "watch_already_approved": "This brain has already been approved.",
+    "clone_eyebrow": "Gehirn wird geklont",
+    "clone_aria": "AIVOs Lernmodell wird in das persönliche Gehirn von {name} geklont",
+    "clone_master_label": "AIVO-Master-Gehirn",
+    "clone_child_label": "Gehirn von {name}",
+    "clone_caption": "AIVOs Lernmodell wird in das persönliche Gehirn von {name} geklont…",
+    "clone_personalising": "Anpassung an Klassenstufe und Profil von {name}",
+    "clone_finalising": "Fast fertig – das personalisierte Gehirn wird finalisiert",
+    "clone_privacy_pii": "Keine personenbezogenen Daten verlassen dieses Gerät unverschlüsselt",
+    "clone_privacy_versioned": "Versioniert · jederzeit zurücksetzbar",
+    "clone_skip": "Animation überspringen",
+    "clone_replay": "Klon-Animation erneut abspielen"
   },
   "learner": {
     "errors": {

@@ -95,7 +95,18 @@
     "watch_approve": "Approve & activate",
     "watch_amend": "Add context & rebuild",
     "watch_back": "Back to learner",
-    "watch_already_approved": "This brain has already been approved."
+    "watch_already_approved": "This brain has already been approved.",
+    "clone_eyebrow": "브레인 복제 중",
+    "clone_aria": "AIVO의 학습 모델을 {name}의 개인 브레인으로 복제하는 중",
+    "clone_master_label": "AIVO 마스터 브레인",
+    "clone_child_label": "{name}의 브레인",
+    "clone_caption": "AIVO의 학습 모델을 {name}의 개인 브레인으로 복제하는 중…",
+    "clone_personalising": "{name}의 학년과 프로필에 맞게 개인화하는 중",
+    "clone_finalising": "거의 완료 — 개인화된 브레인을 마무리하는 중",
+    "clone_privacy_pii": "개인 데이터는 암호화되지 않은 채로 이 기기를 벗어나지 않습니다",
+    "clone_privacy_versioned": "버전 관리 · 언제든 되돌리기 가능",
+    "clone_skip": "애니메이션 건너뛰기",
+    "clone_replay": "복제 애니메이션 다시 보기"
   },
   "learner": {
     "errors": {

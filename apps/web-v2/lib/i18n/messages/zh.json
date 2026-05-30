@@ -95,7 +95,18 @@
     "watch_approve": "Approve & activate",
     "watch_amend": "Add context & rebuild",
     "watch_back": "Back to learner",
-    "watch_already_approved": "This brain has already been approved."
+    "watch_already_approved": "This brain has already been approved.",
+    "clone_eyebrow": "正在克隆大脑",
+    "clone_aria": "正在将 AIVO 的学习模型克隆到 {name} 的专属大脑中",
+    "clone_master_label": "AIVO 主大脑",
+    "clone_child_label": "{name} 的大脑",
+    "clone_caption": "正在将 AIVO 的学习模型克隆到 {name} 的专属大脑中…",
+    "clone_personalising": "正在根据 {name} 的年级和学习档案进行个性化",
+    "clone_finalising": "即将完成——正在生成个性化大脑",
+    "clone_privacy_pii": "任何个人数据都不会以未加密的形式离开此设备",
+    "clone_privacy_versioned": "版本化 · 可随时回滚",
+    "clone_skip": "跳过动画",
+    "clone_replay": "重新播放克隆动画"
   },
   "learner": {
     "errors": {

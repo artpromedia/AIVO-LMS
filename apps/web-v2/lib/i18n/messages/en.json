@@ -95,7 +95,18 @@
     "watch_approve": "Approve & activate",
     "watch_amend": "Add context & rebuild",
     "watch_back": "Back to learner",
-    "watch_already_approved": "This brain has already been approved."
+    "watch_already_approved": "This brain has already been approved.",
+    "clone_eyebrow": "Cloning Brain",
+    "clone_aria": "Cloning AIVO's learning model into {name}'s personal brain",
+    "clone_master_label": "AIVO Master Brain",
+    "clone_child_label": "{name}'s Brain",
+    "clone_caption": "Cloning AIVO's learning model into {name}'s personal brain…",
+    "clone_personalising": "Personalising for {name}'s grade and profile",
+    "clone_finalising": "Almost ready — finalising the personalised brain",
+    "clone_privacy_pii": "No personal data leaves this device unencrypted",
+    "clone_privacy_versioned": "Versioned · rollback any time",
+    "clone_skip": "Skip animation",
+    "clone_replay": "Replay clone animation"
   },
   "learner": {
     "errors": {

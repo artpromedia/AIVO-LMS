@@ -21,6 +21,8 @@
  */
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import MasterToChildClone from "@/components/brain/master-to-child-clone";
+import { hasSeenClone } from "@/lib/clone-flags";
 
 type StageItem = { label: string; value?: string };
 type Stage = {
@@ -43,9 +45,11 @@ export function BrainBuildingClient({
   amendLabel,
   backLabel,
   alreadyApprovedLabel,
+  replayCloneLabel,
   alreadyApproved,
   stages,
   primaryHue,
+  secondaryHues,
   approveAction,
 }: {
   learnerId: string;
@@ -57,31 +61,62 @@ export function BrainBuildingClient({
   amendLabel: string;
   backLabel: string;
   alreadyApprovedLabel: string;
+  replayCloneLabel: string;
   alreadyApproved: boolean;
   stages: Stage[];
   primaryHue: string;
+  secondaryHues: string[];
   approveAction: (formData: FormData) => void | Promise<void>;
 }) {
   const [active, setActive] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
+  // The master→child clone animation plays first, then reveals the build
+  // timeline. Skipped automatically once the parent has seen it in full,
+  // and always skipped for an already-approved brain (no first-run moment
+  // left to deliver). `null` = undecided until we read localStorage so SSR
+  // and first client render agree.
+  const [showClone, setShowClone] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  }, []);
+    setShowClone(!alreadyApproved && !hasSeenClone(learnerId));
+  }, [alreadyApproved, learnerId]);
 
   useEffect(() => {
     if (alreadyApproved) {
       setActive(stages.length);
       return;
     }
+    // Hold the build timeline until the master→child clone intro has
+    // finished, otherwise stages silently auto-advance behind it and the
+    // parent returns to a half-complete timeline.
+    if (showClone !== false) return;
     if (active >= stages.length) return;
     const dur = reducedMotion ? 600 : STAGE_INTERVAL_MS;
     const t = window.setTimeout(() => setActive((a) => a + 1), dur);
     return () => window.clearTimeout(t);
-  }, [active, alreadyApproved, reducedMotion, stages.length]);
+  }, [active, alreadyApproved, reducedMotion, stages.length, showClone]);
 
   const allDone = active >= stages.length;
+
+  // Phase 0 — the master→child cloning animation. While `showClone` is
+  // undecided (null) we render nothing visible to avoid a flash of the
+  // timeline before the clone intro takes over on the client.
+  if (showClone === null) return <div className="bc-watch-root" aria-hidden="true" />;
+  if (showClone) {
+    return (
+      <div className="bc-watch-root">
+        <MasterToChildClone
+          learnerName={learnerName}
+          learnerId={learnerId}
+          primaryHue={primaryHue}
+          secondaryHues={secondaryHues}
+          onComplete={() => setShowClone(false)}
+        />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -92,6 +127,13 @@ export function BrainBuildingClient({
         <p className="bc-watch-eyebrow">For {learnerName}</p>
         <h1 className="bc-watch-title">{title}</h1>
         <p className="bc-watch-description">{description}</p>
+        <button
+          type="button"
+          onClick={() => setShowClone(true)}
+          className="bc-watch-replay-btn"
+        >
+          {replayCloneLabel}
+        </button>
       </header>
 
       <ol className="bc-watch-timeline">
@@ -200,6 +242,21 @@ export function BrainBuildingClient({
           color: var(--iw-ink-muted, #4b5573);
           font-size: 1rem;
           line-height: 1.5;
+        }
+        .bc-watch-replay-btn {
+          margin-top: 0.75rem;
+          padding: 0.4rem 0.9rem;
+          font-size: 0.82rem;
+          font-weight: 600;
+          color: var(--bc-primary);
+          background: color-mix(in oklch, var(--bc-primary) 10%, transparent);
+          border: 1px solid color-mix(in oklch, var(--bc-primary) 35%, transparent);
+          border-radius: 9999px;
+          cursor: pointer;
+          transition: background 200ms ease;
+        }
+        .bc-watch-replay-btn:hover {
+          background: color-mix(in oklch, var(--bc-primary) 18%, transparent);
         }
         .bc-watch-timeline {
           list-style: none;
