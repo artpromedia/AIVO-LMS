@@ -381,5 +381,8 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
         : mastery.score < 0.7
           ? `Continue with the next skill in ${subject.name}.`
           : `Try a small challenge in ${subject.name}.`,
+    // Phase 4: tag break-week lessons so the learner UI can badge them as
+    // optional holiday-prep enrichment; class-aligned lessons as school_sync.
+    lessonMode: isHolidayPrep ? "holiday_prep" : schoolTopic ? "school_sync" : undefined,
   };
 }
