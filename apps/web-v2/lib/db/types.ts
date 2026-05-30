@@ -626,6 +626,70 @@ export type BaselineAttempt = {
   respondedAt: ISODate;
 };
 
+// ===== Adaptive baseline telemetry + recalibration =====
+export type BaselineResponseModality = "visual" | "auditory" | "kinesthetic" | "reading";
+
+/**
+ * Per-item psychometric telemetry captured when an adaptive baseline is
+ * finalized. One row per administered question, carrying the ability
+ * estimate before/after the answer so the recalibration job can refine
+ * item difficulty from live data without re-deriving the θ trajectory.
+ */
+export type BaselineItemResponseLog = {
+  id: ID;
+  tenantId: ID;
+  learnerId: ID;
+  baselineId: ID;
+  questionId: ID;
+  /** Stable calibration key across baselines: `${skillId}|${difficulty}`. */
+  itemKey: string;
+  skillId: ID;
+  subjectId: ID;
+  difficulty: BaselineDifficulty;
+  /** Seed θ (`b`) the item was served at (derived from the difficulty band). */
+  difficultyTheta: number;
+  correct: boolean;
+  skipped: boolean;
+  /** Ability estimate immediately before answering this item. */
+  thetaBefore: number;
+  /** Ability estimate after recording the answer (== thetaBefore if skipped). */
+  thetaAfter: number;
+  /** Response latency in ms, when the client captured it. */
+  latencyMs?: number;
+  modality: BaselineResponseModality;
+  recordedAt: ISODate;
+};
+
+/** Aggregated psychometrics for one item-key across many learners. */
+export type ItemPsychometrics = {
+  itemKey: string;
+  skillId: ID;
+  difficulty: BaselineDifficulty;
+  /** Seed θ the band was calibrated to. */
+  seedTheta: number;
+  /** Total administrations (including skipped). */
+  exposure: number;
+  /** Scored (non-skipped) administrations. */
+  scored: number;
+  correct: number;
+  /** Proportion correct among scored administrations. */
+  pValue: number;
+  /** Proportion of administrations the learner skipped. */
+  skipRate: number;
+  /** Refined θ from live data (== seedTheta when data is insufficient). */
+  estimatedTheta: number;
+  /** estimatedTheta − seedTheta. */
+  thetaDelta: number;
+  /** Difficulty band the refined θ snaps to. */
+  suggestedDifficulty: BaselineDifficulty;
+  /** True once `scored` clears the minimum-exposure bar. */
+  sufficientData: boolean;
+  /** Misfit / quality reasons; empty when the item looks healthy. */
+  defectReasons: string[];
+  /** True when the item should be pulled for authoring review. */
+  recommendRetire: boolean;
+};
+
 // ===== Learning Path (Sprint 9) =====
 export type LearningPathNodeKind = "first_skill" | "next_unmastered" | "review" | "stretch";
 

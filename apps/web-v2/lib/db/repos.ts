@@ -13,8 +13,10 @@ import type {
   BaselineAssessment,
   BaselineAttempt,
   BaselineGenerationMetadata,
+  BaselineItemResponseLog,
   BaselineQuestion,
   BaselineSummary,
+  ItemPsychometrics,
   AccessibilityPreferences,
   ID,
 } from "@/lib/db/types";
@@ -54,6 +56,10 @@ import {
   generateAdaptiveBaselinePool,
   generateBaselineQuestions,
 } from "@/lib/learner/baseline";
+import {
+  aggregateItemPsychometrics,
+  buildRunTelemetry,
+} from "@/lib/learner/baseline-telemetry";
 import {
   generateBaselineQuestionsViaLLM,
   mapLlmQuestionsToBaselineQuestions,
@@ -1194,6 +1200,35 @@ export async function completeBaseline(
   };
   await getPersistence().assessments.upsertBaseline(completed);
 
+  // EPIC 5 — capture per-item psychometric telemetry on finalize so the
+  // recalibration job has live data to refine item difficulty. Adaptive
+  // path only; idempotent (the main finalize path runs once per baseline,
+  // but guard anyway so a replay never double-writes).
+  if (baselineAdaptiveEnabled()) {
+    const already = store.baselineItemResponseLogs.some((l) => l.baselineId === completed.id);
+    if (!already) {
+      const telemetry = buildRunTelemetry({
+        baseline: { id: completed.id, learnerId: completed.learnerId, tenantId },
+        questions,
+        attempts,
+        learner,
+      });
+      if (telemetry.length > 0) {
+        store.baselineItemResponseLogs.push(...telemetry);
+        logger.info(
+          {
+            event: "baseline.telemetry_captured",
+            learnerId: completed.learnerId,
+            tenantId,
+            baselineId: completed.id,
+            items: telemetry.length,
+          },
+          "baseline: captured per-item adaptive telemetry on finalize",
+        );
+      }
+    }
+  }
+
   return {
     baseline: completed,
     summary,
@@ -1203,6 +1238,34 @@ export async function completeBaseline(
     reviewSchedules,
     clonedBrainProfile,
   };
+}
+
+/**
+ * Read the raw per-item telemetry logs for a tenant (admin / batch job).
+ * Optionally narrow to a single learner.
+ */
+export function listBaselineTelemetry(input: {
+  tenantId: string;
+  learnerId?: string;
+}): BaselineItemResponseLog[] {
+  const store = db();
+  return store.baselineItemResponseLogs.filter(
+    (l) =>
+      l.tenantId === input.tenantId &&
+      (input.learnerId === undefined || l.learnerId === input.learnerId),
+  );
+}
+
+/**
+ * Aggregate the tenant's telemetry into per-item psychometrics +
+ * recalibration suggestions (EPIC 2 loop / EPIC 5 admin view).
+ */
+export function getBaselineRecalibration(input: {
+  tenantId: string;
+  minExposure?: number;
+}): ItemPsychometrics[] {
+  const logs = listBaselineTelemetry({ tenantId: input.tenantId });
+  return aggregateItemPsychometrics(logs, { minExposure: input.minExposure });
 }
 
 // ===== Mastery + Learning Path =====
