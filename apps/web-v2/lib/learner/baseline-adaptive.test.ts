@@ -12,6 +12,7 @@ import {
   priorThetaForLearner,
   learnerHasReadingDifficulty,
   selectNextAdaptiveQuestion,
+  itemKeyFor,
 } from "./baseline-adaptive";
 
 let qSeq = 0;
@@ -178,6 +179,31 @@ describe("selectNextAdaptiveQuestion", () => {
       attempts: [ans("x1", true), ans("x2", false)],
     });
     expect(sel.next).toBeNull();
+  });
+
+  it("honors a calibration override when selecting (refined θ replaces seed band)", () => {
+    // A "foundational" item recalibrated to a hard θ should be treated as
+    // hard: from a high prior, the calibrated item becomes the nearest.
+    const hardFoundational = q("foundational", { id: "f-hard", skillId: "skX" });
+    const trueStretch = q("stretch", { id: "s-real", skillId: "skY" });
+    const calibration = { [itemKeyFor(hardFoundational)]: 1.3 };
+
+    const withCal = selectNextAdaptiveQuestion({
+      questions: [hardFoundational, trueStretch],
+      attempts: [],
+      priorTheta: 1.3,
+      calibration,
+    });
+    // Seed θ would put foundational at -1.0 (far from 1.3); the override
+    // (1.3) makes it the exact nearest item, beating stretch (seed 1.2).
+    expect(withCal.next?.id).toBe("f-hard");
+
+    const withoutCal = selectNextAdaptiveQuestion({
+      questions: [hardFoundational, trueStretch],
+      attempts: [],
+      priorTheta: 1.3,
+    });
+    expect(withoutCal.next?.id).toBe("s-real");
   });
 
   it("stops at the max-item cap even with pool remaining", () => {

@@ -26,7 +26,6 @@ import {
 } from "@aivo/adaptive-baseline";
 import type {
   BaselineAttempt,
-  BaselineDifficulty,
   BaselineItemResponseLog,
   BaselineQuestion,
   ItemPsychometrics,
@@ -35,11 +34,17 @@ import type {
 import { newId } from "@/lib/db/store";
 import {
   difficultyToTheta,
+  itemKeyFor,
   learnerHasReadingDifficulty,
   priorThetaForLearner,
   questionToBaselineItem,
   thetaToDifficulty,
+  type CalibrationMap,
 } from "./baseline-adaptive";
+
+// Re-exported so existing importers (`itemKeyFor`) keep a stable surface
+// while the canonical definition lives with the calibration logic.
+export { itemKeyFor } from "./baseline-adaptive";
 
 /** Minimum scored administrations before we trust a recalibration. */
 export const MIN_RECALIBRATION_EXPOSURE = 5;
@@ -53,16 +58,18 @@ function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
-/** Stable calibration key for an item across baselines. */
-export function itemKeyFor(q: { skillId: string; difficulty: BaselineDifficulty }): string {
-  return `${q.skillId}|${q.difficulty}`;
-}
-
 export interface BuildRunTelemetryInput {
   baseline: { id: string; learnerId: string; tenantId: string };
   questions: BaselineQuestion[];
   attempts: BaselineAttempt[];
   learner: LearnerProfile | null;
+  /**
+   * The calibration override in effect during the run. Passing it here
+   * keeps the replayed θ trajectory identical to what selection used, so
+   * the recorded `thetaBefore` values are the abilities the recalibration
+   * fit should be conditioned on.
+   */
+  calibration?: CalibrationMap;
 }
 
 /**
@@ -72,7 +79,7 @@ export interface BuildRunTelemetryInput {
  * when it served the item.
  */
 export function buildRunTelemetry(input: BuildRunTelemetryInput): BaselineItemResponseLog[] {
-  const { baseline, questions, attempts, learner } = input;
+  const { baseline, questions, attempts, learner, calibration } = input;
   const qById = new Map(questions.map((q) => [q.id, q]));
   const ordered = [...attempts].sort((a, b) => a.respondedAt.localeCompare(b.respondedAt));
 
@@ -85,7 +92,7 @@ export function buildRunTelemetry(input: BuildRunTelemetryInput): BaselineItemRe
   for (const attempt of ordered) {
     const q = qById.get(attempt.questionId);
     if (!q) continue;
-    const item = questionToBaselineItem(q);
+    const item = questionToBaselineItem(q, calibration);
     const thetaBefore = state.theta;
     let thetaAfter = thetaBefore;
 

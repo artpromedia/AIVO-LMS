@@ -96,13 +96,35 @@ export function questionModalities(q: BaselineQuestion): {
     : { modalities: ["reading"], lightReading: false };
 }
 
-/** Map a product question onto the engine's item contract. */
-export function questionToBaselineItem(q: BaselineQuestion): BaselineItem {
+/**
+ * Calibration override: item-key (`${skillId}|${difficulty}`) → refined θ
+ * (`b`) learned from live data. Only confident estimates belong here (the
+ * recalibration job gates on exposure), so the mere presence of a key is
+ * the confidence gate — absent keys fall back to the seed band θ.
+ */
+export type CalibrationMap = Record<string, number>;
+
+/** Stable calibration key for a question across baselines. */
+export function itemKeyFor(q: { skillId: string; difficulty: BaselineDifficulty }): string {
+  return `${q.skillId}|${q.difficulty}`;
+}
+
+/**
+ * Map a product question onto the engine's item contract. When a
+ * `calibration` override carries a refined θ for this item's key, the
+ * refined value replaces the seed band θ — this is how live recalibration
+ * feeds back into selection.
+ */
+export function questionToBaselineItem(
+  q: BaselineQuestion,
+  calibration?: CalibrationMap,
+): BaselineItem {
   const { modalities, lightReading } = questionModalities(q);
+  const override = calibration?.[itemKeyFor(q)];
   return {
     id: q.id,
     skillId: q.skillId,
-    difficulty: difficultyToTheta(q.difficulty),
+    difficulty: override ?? difficultyToTheta(q.difficulty),
     modalities,
     lightReading,
   };
@@ -148,9 +170,11 @@ export function learnerHasReadingDifficulty(learner: LearnerProfile | null): boo
 export function reconstructAdaptiveState(
   questions: BaselineQuestion[],
   attempts: BaselineAttempt[],
-  opts: { priorTheta?: number; readingDifficulty?: boolean } = {},
+  opts: { priorTheta?: number; readingDifficulty?: boolean; calibration?: CalibrationMap } = {},
 ): BaselineState {
-  const itemByQid = new Map(questions.map((q) => [q.id, questionToBaselineItem(q)]));
+  const itemByQid = new Map(
+    questions.map((q) => [q.id, questionToBaselineItem(q, opts.calibration)]),
+  );
   const ordered = [...attempts].sort((a, b) => a.respondedAt.localeCompare(b.respondedAt));
 
   let state = initBaseline({
@@ -190,6 +214,8 @@ export interface SelectNextInput {
   attempts: BaselineAttempt[];
   priorTheta?: number;
   readingDifficulty?: boolean;
+  /** Live recalibration overrides; absent keys use the seed band θ. */
+  calibration?: CalibrationMap;
 }
 
 /**
@@ -199,10 +225,11 @@ export interface SelectNextInput {
  * finish screen, which is how early-stop surfaces without UI changes.
  */
 export function selectNextAdaptiveQuestion(input: SelectNextInput): AdaptiveSelection {
-  const { questions, attempts } = input;
+  const { questions, attempts, calibration } = input;
   const state = reconstructAdaptiveState(questions, attempts, {
     priorTheta: input.priorTheta,
     readingDifficulty: input.readingDifficulty,
+    calibration,
   });
 
   const stop = shouldStop(state);
@@ -217,7 +244,7 @@ export function selectNextAdaptiveQuestion(input: SelectNextInput): AdaptiveSele
   const questionById = new Map(questions.map((q) => [q.id, q]));
   const candidateBank: BaselineItem[] = questions
     .filter((q) => !seen.has(q.id))
-    .map(questionToBaselineItem);
+    .map((q) => questionToBaselineItem(q, calibration));
 
   const pick = pickNextItem(state, candidateBank);
   const next = pick ? (questionById.get(pick.id) ?? null) : null;

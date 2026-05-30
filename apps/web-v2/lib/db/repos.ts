@@ -59,6 +59,7 @@ import {
 import {
   aggregateItemPsychometrics,
   buildRunTelemetry,
+  recalibrationMap,
 } from "@/lib/learner/baseline-telemetry";
 import {
   generateBaselineQuestionsViaLLM,
@@ -1207,11 +1208,15 @@ export async function completeBaseline(
   if (baselineAdaptiveEnabled()) {
     const already = store.baselineItemResponseLogs.some((l) => l.baselineId === completed.id);
     if (!already) {
+      // Use the same calibration the runner used during the run so the
+      // replayed θ trajectory (thetaBefore) matches what selection saw.
+      const calibration = getBaselineCalibrationMap({ tenantId });
       const telemetry = buildRunTelemetry({
         baseline: { id: completed.id, learnerId: completed.learnerId, tenantId },
         questions,
         attempts,
         learner,
+        calibration,
       });
       if (telemetry.length > 0) {
         store.baselineItemResponseLogs.push(...telemetry);
@@ -1281,6 +1286,21 @@ export function getBaselineRecalibrationForTenants(input: {
   const set = new Set(input.tenantIds);
   const logs = store.baselineItemResponseLogs.filter((l) => set.has(l.tenantId));
   return aggregateItemPsychometrics(logs, { minExposure: input.minExposure });
+}
+
+/**
+ * Confidence-gated calibration overrides for a tenant — item-key → refined
+ * θ for items with enough live data. Consumed by `selectNextAdaptiveQuestion`
+ * so the adaptive baseline serves items at their *observed* difficulty,
+ * not just the seed band. Returns an empty map until items clear the
+ * exposure floor, so early on selection behaves exactly as before.
+ */
+export function getBaselineCalibrationMap(input: {
+  tenantId: string;
+  minExposure?: number;
+}): Record<string, number> {
+  const logs = listBaselineTelemetry({ tenantId: input.tenantId });
+  return recalibrationMap(logs, { minExposure: input.minExposure });
 }
 
 // ===== Mastery + Learning Path =====

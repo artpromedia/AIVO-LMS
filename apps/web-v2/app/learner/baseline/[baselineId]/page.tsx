@@ -20,6 +20,7 @@ import {
 import {
   completeBaseline,
   getBaselineById,
+  getBaselineCalibrationMap,
   getIEPForLearner,
   getLearner,
   getOrCreateParentAssessment,
@@ -209,6 +210,9 @@ export default async function BaselineRunnerPage({
       attempts,
       priorTheta: priorThetaForLearner(learner),
       readingDifficulty: learnerHasReadingDifficulty(learner),
+      // Live recalibration feedback: serve items at their observed
+      // difficulty once they clear the exposure floor (empty map = seed θ).
+      calibration: getBaselineCalibrationMap({ tenantId: session.tenantId }),
     });
     next = selection.next ?? undefined;
   } else {

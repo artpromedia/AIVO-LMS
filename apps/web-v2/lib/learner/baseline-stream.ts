@@ -68,7 +68,7 @@ export type FinalizeRunResult = ({ ok: true } & FinalizeRunResponse) | Fail;
 
 /** Map the persisted question set into the engine's candidate bank. */
 export function questionsToBank(questions: BaselineQuestion[]): BaselineItem[] {
-  return questions.map(questionToBaselineItem);
+  return questions.map((q) => questionToBaselineItem(q));
 }
 
 export function adaptiveBaselineEndpoint(
