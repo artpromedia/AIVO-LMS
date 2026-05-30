@@ -1488,6 +1488,8 @@ import type {
   HomeworkHelpMessage,
   HomeworkHelpSession,
   TeacherAssignment,
+  CurriculumUpload,
+  CurriculumFocus,
 } from "@/lib/db/types";
 import {
   generateLessonPlanWithRetry,
@@ -1619,6 +1621,14 @@ export async function createLessonRun(
     subjectId: input.subjectId,
     skillId: input.skillId,
   });
+  // Phase 1: sync the lesson to what the learner is doing in school this week,
+  // if a parent/teacher uploaded a curriculum for this subject. Best-effort —
+  // generation proceeds normally when there's no active focus.
+  const curriculumFocus = await getActiveCurriculumFocus(
+    input.learnerId,
+    input.tenantId,
+    subject.slug,
+  );
   const accommodationSnapshot = buildAccommodationSnapshotFrom(brain.state);
   const contextSnapshot = buildContextSnapshot(learner, brain.state);
   const tutorPersona =
@@ -1671,6 +1681,7 @@ export async function createLessonRun(
       objectiveTemplate: getActiveLessonObjectiveTemplate(skill.id),
       mastery: masterySnapshot,
       accommodations: accommodationSnapshot,
+      curriculumFocus,
       source: input.source,
     });
 
@@ -2560,6 +2571,146 @@ export async function listActiveAssignmentsForLearner(
     )
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
   return all;
+}
+
+// ===== Phase 1: weekly curriculum sync =====
+
+/**
+ * List curriculum uploads for a learner (newest first), optionally filtered
+ * by subject slug and/or status. Tenant-scoped.
+ */
+export async function listCurriculumUploadsForLearner(
+  learnerId: string,
+  tenantId: string,
+  opts?: { subject?: string; status?: CurriculumUpload["status"] },
+): Promise<CurriculumUpload[]> {
+  return Array.from(db().curriculumUploads.values())
+    .filter(
+      (u) =>
+        u.learnerId === learnerId &&
+        u.tenantId === tenantId &&
+        (!opts?.subject || u.subject === opts.subject) &&
+        (!opts?.status || u.status === opts.status),
+    )
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+/**
+ * Persist a new curriculum upload. Archives any prior ACTIVE upload for the
+ * same (learner, subject) whose week window does not extend past the new
+ * plan's start, mirroring tutor-svc's archival rule so the active focus is
+ * unambiguous.
+ */
+export async function createCurriculumUpload(input: {
+  tenantId: string;
+  learnerId: string;
+  uploadedBy: string;
+  uploaderRole: CurriculumUpload["uploaderRole"];
+  subject: string;
+  title: string;
+  sourceType: CurriculumUpload["sourceType"];
+  fileName?: string | null;
+  rawText?: string;
+  parsedFocus: CurriculumFocus;
+  weekStart?: string | null;
+  weekEnd?: string | null;
+  notes?: string | null;
+}): Promise<CurriculumUpload> {
+  const store = db();
+  const now = nowIso();
+  const weekStart = input.weekStart ?? input.parsedFocus.weekStart ?? null;
+  const weekEnd = input.weekEnd ?? input.parsedFocus.weekEnd ?? null;
+  const newStartMs = weekStart ? new Date(weekStart).getTime() : -Infinity;
+
+  // Archive prior ACTIVE uploads for the same (learner, subject) that have
+  // already ended before this plan starts. A still-current plan and a
+  // future-dated plan can coexist; getActiveCurriculumFocus disambiguates.
+  for (const u of store.curriculumUploads.values()) {
+    if (
+      u.learnerId === input.learnerId &&
+      u.tenantId === input.tenantId &&
+      u.subject === input.subject &&
+      u.status === "active"
+    ) {
+      const endMs = u.weekEnd ? new Date(u.weekEnd).getTime() + 24 * 3600 * 1000 : Infinity;
+      const newIsFuture = weekStart ? newStartMs > Date.now() : false;
+      if (!newIsFuture || endMs <= newStartMs) {
+        store.curriculumUploads.set(u.id, { ...u, status: "archived", updatedAt: now });
+      }
+    }
+  }
+
+  const upload: CurriculumUpload = {
+    id: newId("cu"),
+    tenantId: input.tenantId,
+    learnerId: input.learnerId,
+    uploadedBy: input.uploadedBy,
+    uploaderRole: input.uploaderRole,
+    subject: input.subject,
+    title: input.title,
+    sourceType: input.sourceType,
+    fileName: input.fileName ?? null,
+    rawText: (input.rawText ?? "").slice(0, 32000),
+    parsedFocus: { ...input.parsedFocus, weekStart, weekEnd },
+    weekStart,
+    weekEnd,
+    status: "active",
+    notes: input.notes ?? null,
+    createdAt: now,
+    updatedAt: now,
+  };
+  store.curriculumUploads.set(upload.id, upload);
+  return upload;
+}
+
+/** Delete an upload by id, tenant-scoped. Returns true if removed. */
+export async function deleteCurriculumUpload(
+  uploadId: string,
+  tenantId: string,
+): Promise<boolean> {
+  const store = db();
+  const existing = store.curriculumUploads.get(uploadId);
+  if (!existing || existing.tenantId !== tenantId) return false;
+  return store.curriculumUploads.delete(uploadId);
+}
+
+/**
+ * The curriculum focus the tutor should teach to right now for a (learner,
+ * subject). Picks the most recent ACTIVE upload whose week window contains
+ * today (null edges mean "always started" / "never expires"); falls back to
+ * the most recent undated ACTIVE upload. Subject-specific uploads win over
+ * "other". Returns null when there's nothing to sync to.
+ */
+export async function getActiveCurriculumFocus(
+  learnerId: string,
+  tenantId: string,
+  subject?: string,
+): Promise<CurriculumFocus | null> {
+  const now = Date.now();
+  const active = Array.from(db().curriculumUploads.values())
+    .filter(
+      (u) =>
+        u.learnerId === learnerId &&
+        u.tenantId === tenantId &&
+        u.status === "active" &&
+        (!subject || u.subject === subject || u.subject === "other"),
+    )
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+  const inWindow = active.filter((u) => {
+    const startMs = u.weekStart ? new Date(u.weekStart).getTime() : -Infinity;
+    const endMs = u.weekEnd ? new Date(u.weekEnd).getTime() + 24 * 3600 * 1000 : Infinity;
+    return startMs <= now && now <= endMs;
+  });
+
+  // Prefer subject-specific over "other" when both are candidates.
+  const pick = (rows: CurriculumUpload[]): CurriculumUpload | undefined => {
+    if (!subject) return rows[0];
+    return rows.find((u) => u.subject === subject) ?? rows[0];
+  };
+
+  const row = pick(inWindow) ?? pick(active.filter((u) => !u.weekStart && !u.weekEnd));
+  return row ? row.parsedFocus : null;
 }
 
 /**

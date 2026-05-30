@@ -84,6 +84,14 @@ const serverSchema = z.object({
   DATA_GOVERNANCE_SVC_URL: z.string().url().default("http://localhost:3072"),
   // Sprint H: SIS rostering + LTI 1.3.
   INTEGRATION_SVC_URL: z.string().url().default("http://localhost:3060"),
+  // Phase 1 (curriculum sync): base URL + internal trust token of `ai-svc`,
+  // used by the weekly-curriculum parser to extract topics/vocabulary/
+  // standards from an uploaded syllabus. `INTERNAL_AI_TOKEN` is the same
+  // shared secret tutor-svc/ai-svc use (sent as `X-Internal-Auth`). Both are
+  // optional — when the token is absent the parser falls back to a local
+  // heuristic so the upload flow still works.
+  AI_SVC_URL: z.string().url().default("http://localhost:3004"),
+  INTERNAL_AI_TOKEN: z.string().optional(),
   AI_PROVIDER: aiProviderSchema,
   ANTHROPIC_API_KEY: z.string().optional(),
   OPENAI_API_KEY: z.string().optional(),

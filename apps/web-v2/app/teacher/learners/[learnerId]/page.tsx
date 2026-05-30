@@ -4,6 +4,7 @@
  * here), and active assignments. Tenant-scoped: a teacher visiting a learner
  * from another tenant gets a 404.
  */
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
@@ -58,6 +59,16 @@ export default async function TeacherLearnerDetailPage({
         title={learner.displayName}
         description={`Functioning level ${learner.functioningLevel} · ${learner.readinessState}`}
       />
+
+      <Link href={`/teacher/learners/${learner.id}/curriculum`}>
+        <Card className="p-4 transition hover:border-aivo-accent">
+          <p className="font-medium">This week at school →</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Add the week&apos;s scope so AIVO&apos;s tutor teaches the same topics, fitted to this
+            learner&apos;s profile.
+          </p>
+        </Card>
+      </Link>
 
       <section className="grid gap-3">
         <SectionHeader title="Active assignments" />
