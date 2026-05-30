@@ -120,3 +120,18 @@ export function baselineAdaptiveEnabled(): boolean {
   if (process.env.NODE_ENV !== "production") return true;
   return false;
 }
+
+/**
+ * Adaptive baseline *streaming* — drive the assessment-svc session run-loop
+ * (`/api/assessments/adaptive-baseline/:learnerId/{start,respond,finalize}`)
+ * so item selection + θ state live server-side and survive interruptions,
+ * instead of adapting over a locally pre-generated pool (the
+ * `baselineAdaptiveEnabled` path).
+ *
+ * Explicit opt-in (OFF everywhere until the runner cutover + a staging
+ * soak): this gates an external, stateful service call per item, so it
+ * should only flip on once the transport is proven in an environment.
+ */
+export function baselineStreamingEnabled(): boolean {
+  return isTruthy(process.env.AIVO_FEATURE_BASELINE_STREAMING);
+}

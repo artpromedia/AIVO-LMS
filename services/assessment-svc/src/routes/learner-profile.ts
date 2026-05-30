@@ -23,44 +23,15 @@ import { FastifyInstance } from "fastify";
 import { learners, learnerProfiles, adaptiveBaselineSessions } from "@aivo/db";
 import { verifyJWT } from "@aivo/security";
 import { eq, desc } from "drizzle-orm";
+import { shouldStop, type BaselineItem, type ItemResponse } from "@aivo/adaptive-baseline";
 import {
-  initBaseline,
-  pickNextItem,
-  recordResponse,
-  shouldStop,
-  finalize,
-  type BaselineItem,
-  type BaselineState,
-  type ItemResponse,
-} from "@aivo/adaptive-baseline";
-
-interface SerializedState {
-  theta: number;
-  infoSum: number;
-  administered: ItemResponse[];
-  coveredSkills: string[];
-  readingDifficulty: boolean;
-}
-
-function serialize(s: BaselineState): SerializedState {
-  return {
-    theta: s.theta,
-    infoSum: s.infoSum,
-    administered: s.administered,
-    coveredSkills: [...s.coveredSkills],
-    readingDifficulty: s.readingDifficulty,
-  };
-}
-
-function hydrate(s: SerializedState): BaselineState {
-  return {
-    theta: s.theta,
-    infoSum: s.infoSum,
-    administered: s.administered,
-    coveredSkills: new Set(s.coveredSkills),
-    readingDifficulty: !!s.readingDifficulty,
-  };
-}
+  startRun,
+  respondToItem,
+  finalizeRun,
+  serializeSession,
+  hydrateSession,
+  type SerializedRunSession,
+} from "../services/adaptive-baseline-runner.js";
 
 async function authenticate(req: any, reply: any) {
   const auth = req.headers.authorization;
@@ -185,12 +156,12 @@ export async function registerLearnerProfileRoutes(app: FastifyInstance) {
         return reply.status(403).send({ error: "Access denied" });
       }
 
-      const state = initBaseline({
+      const bank = Array.isArray(body.bank) ? body.bank : [];
+      const { session, nextItem, stop } = startRun({
+        bank,
         readingDifficulty: body.readingDifficulty,
         priorTheta: body.priorTheta,
       });
-      const bank = Array.isArray(body.bank) ? body.bank : [];
-      const nextItem = bank.length > 0 ? pickNextItem(state, bank) : null;
 
       const [row] = await db
         .insert(adaptiveBaselineSessions)
@@ -198,7 +169,7 @@ export async function registerLearnerProfileRoutes(app: FastifyInstance) {
           tenantId: learner.tenantId,
           learnerId: learner.id,
           status: "in_progress",
-          state: serialize(state),
+          state: serializeSession(session),
         })
         .returning();
 
@@ -206,7 +177,7 @@ export async function registerLearnerProfileRoutes(app: FastifyInstance) {
         sessionId: row.id,
         learnerId: learner.id,
         nextItem,
-        stop: shouldStop(state),
+        stop,
       });
     },
   );
@@ -268,22 +239,41 @@ export async function registerLearnerProfileRoutes(app: FastifyInstance) {
         return reply.status(409).send({ error: "Session already completed" });
       }
 
-      const state = hydrate(row.state as SerializedState);
-      const next = recordResponse({
-        state,
-        item: body.item,
-        response: body.response,
-      });
-      const stop = shouldStop(next);
+      const session = hydrateSession(row.state as SerializedRunSession);
       const bank = Array.isArray(body.bank) ? body.bank : [];
-      const nextItem = !stop.stop && bank.length > 0 ? pickNextItem(next, bank) : null;
+      // Accept the legacy `{ item, response }` body and the leaner
+      // `{ itemId, correct, ... }` form; the item is re-resolved from the
+      // server-supplied bank either way so difficulty cannot be spoofed.
+      const itemId = (body as any).itemId ?? body.item?.id;
+      const resp = (body.response ?? {}) as Partial<ItemResponse>;
+      if (typeof itemId !== "string") {
+        return reply.status(400).send({ error: "itemId (or item.id) is required" });
+      }
+
+      const outcome = respondToItem({
+        session,
+        itemId,
+        correct: !!resp.correct,
+        bank,
+        responseTimeMs: resp.responseTimeMs,
+        affect: resp.affect,
+        consumedModality: resp.consumedModality,
+      });
+      if (!outcome.ok) {
+        return reply.status(409).send({ error: "response_rejected", reason: outcome.reason });
+      }
 
       await db
         .update(adaptiveBaselineSessions)
-        .set({ state: serialize(next), updatedAt: new Date() })
+        .set({ state: serializeSession(outcome.session), updatedAt: new Date() })
         .where(eq(adaptiveBaselineSessions.id, row.id));
 
-      return reply.send({ sessionId: row.id, nextItem, stop, theta: next.theta });
+      return reply.send({
+        sessionId: row.id,
+        nextItem: outcome.nextItem,
+        stop: outcome.stop,
+        theta: outcome.theta,
+      });
     },
   );
 
@@ -334,13 +324,13 @@ export async function registerLearnerProfileRoutes(app: FastifyInstance) {
         return reply.status(403).send({ error: "Session does not belong to learner" });
       }
 
-      const state = hydrate(row.state as SerializedState);
-      const result = finalize(state, body.bank);
+      const session = hydrateSession(row.state as SerializedRunSession);
+      const result = finalizeRun(session, body.bank);
 
       await db
         .update(adaptiveBaselineSessions)
         .set({
-          state: serialize(state),
+          state: serializeSession(session),
           status: "completed",
           completedAt: new Date(),
           updatedAt: new Date(),
@@ -428,14 +418,15 @@ export async function registerLearnerProfileRoutes(app: FastifyInstance) {
       if (!row || row.status !== "in_progress") {
         return reply.send({ active: false });
       }
-      const state = hydrate(row.state as SerializedState);
+      const session = hydrateSession(row.state as SerializedRunSession);
       return reply.send({
         active: true,
         sessionId: row.id,
         startedAt: row.startedAt,
-        theta: state.theta,
-        itemsAdministered: state.administered.length,
-        stop: shouldStop(state),
+        theta: session.state.theta,
+        itemsAdministered: session.state.administered.length,
+        lastServedItemId: session.lastServedItemId,
+        stop: shouldStop(session.state),
       });
     },
   );
