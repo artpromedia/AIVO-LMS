@@ -332,4 +332,11 @@ export const JOB_REGISTRY: JobRegistryEntry[] = [
     description: "Delete orphaned periodic_job_runs and billing_daily_job_runs rows.",
     periodMs: DEFAULT_PERIOD_MS,
   },
+  {
+    jobName: "curriculum.pacing-advance",
+    service: "admin-svc",
+    description:
+      "Advance learner_pacing_weeks.status (planned/active/done) to match the calendar for active pacing plans.",
+    periodMs: DEFAULT_PERIOD_MS,
+  },
 ];

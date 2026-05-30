@@ -84,9 +84,32 @@ Wiring:
 - Tests: `apps/web-v2/lib/bff/brain-pacing.test.ts` (mapping, break-skip, safe
   read, token gating).
 
+## Weekly cron — pacing advancement (implemented)
+
+`curriculum.pacing-advance` (`services/admin-svc/src/lib/pacing-advance.ts`,
+registered in `admin-svc` via `startSafeCron` + `packages/scheduling`
+`JOB_REGISTRY`) keeps `learner_pacing_weeks.status` in step with the calendar
+for every `active` plan:
+
+- week fully in the past → `done`
+- week containing today → `active`
+- week still in the future → `planned`
+
+It's a single idempotent SQL `UPDATE` (only changed rows are written), runs
+daily, and is fleet-safe via the shared SafeCron advisory lock (one replica
+wins). `computeWeekStatus` is the pure rule, unit-tested alongside the job.
+
+**Why it does not pre-generate `LessonRun`s:** lessons are generated **on
+demand** when a learner starts, and Today's Mission already reads the current
+pacing week live via `getActiveCurriculumFocus` (Phase 2b) — so a started lesson
+is already pacing-synced and there's nothing stale to pre-warm for correctness.
+Pre-materializing runs would also require a standard→web-v2-`skillId` mapping
+that doesn't exist yet and would create runs that may never be used. The cron's
+job is to keep week *status* current (drives progress display + the upcoming
+holiday-prep selection). Pre-generation can be revisited as a cache-warm
+optimization once standard→skill mapping lands.
+
 ## Not in this phase (next steps)
 
-- **Weekly cron** to flip the current week to `active`/`done` and pre-generate
-  the next week's `LessonRun`s (`packages/scheduling` `JOB_REGISTRY`).
 - **Holiday prep (Phase 4):** generate review+preview content for `kind="break"`
   weeks ahead of school resumption.
