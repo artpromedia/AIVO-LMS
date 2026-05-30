@@ -48,8 +48,17 @@ The shared handlers live in `lib/bff/curriculum.ts`.
 
 ## Data
 
-- Type: `CurriculumUpload` / `CurriculumFocus` (`lib/db/types.ts`), stored in the
-  web-v2 store map `curriculumUploads`.
+- Type: `CurriculumUpload` / `CurriculumFocus` (`lib/db/types.ts`).
+- **Persistence**: a dedicated `weeklyCurriculum` domain in the web-v2
+  persistence adapter (`lib/db/persistence/{memory,drizzle}/weeklyCurriculum.ts`).
+  In production (`AIVO_PERSISTENCE=postgres`, or
+  `AIVO_PERSISTENCE_WEEKLY_CURRICULUM=postgres`) it reads/writes the **shared
+  `curriculum_uploads` Postgres table** (`packages/db`, migration `0028`) — the
+  same table `tutor-svc` owns. That makes web-v2 and tutor-svc a **single
+  source of truth**: an upload saved from the parent/teacher UI is visible to
+  the tutor-svc chat/homework paths and vice-versa. The in-memory adapter is
+  dev/test only. Status/role are stored uppercase (`ACTIVE`, `PARENT`, …) to
+  match tutor-svc and normalized to web-v2's lowercase enums on read.
 - `getActiveCurriculumFocus(learnerId, tenantId, subjectSlug)` picks the most
   recent active upload whose week window contains today (subject-specific wins
   over `other`); falls back to an undated active upload.

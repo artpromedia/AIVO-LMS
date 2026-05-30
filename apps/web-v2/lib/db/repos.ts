@@ -2577,29 +2577,22 @@ export async function listActiveAssignmentsForLearner(
 
 /**
  * List curriculum uploads for a learner (newest first), optionally filtered
- * by subject slug and/or status. Tenant-scoped.
+ * by subject slug and/or status. Tenant-scoped. Backed by the persistence
+ * adapter (Postgres `curriculum_uploads` in production), never the raw store.
  */
 export async function listCurriculumUploadsForLearner(
   learnerId: string,
   tenantId: string,
   opts?: { subject?: string; status?: CurriculumUpload["status"] },
 ): Promise<CurriculumUpload[]> {
-  return Array.from(db().curriculumUploads.values())
-    .filter(
-      (u) =>
-        u.learnerId === learnerId &&
-        u.tenantId === tenantId &&
-        (!opts?.subject || u.subject === opts.subject) &&
-        (!opts?.status || u.status === opts.status),
-    )
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  return getPersistence().weeklyCurriculum.listForLearner(learnerId, tenantId, opts);
 }
 
 /**
  * Persist a new curriculum upload. Archives any prior ACTIVE upload for the
  * same (learner, subject) whose week window does not extend past the new
  * plan's start, mirroring tutor-svc's archival rule so the active focus is
- * unambiguous.
+ * unambiguous. Backed by the persistence adapter.
  */
 export async function createCurriculumUpload(input: {
   tenantId: string;
@@ -2616,29 +2609,9 @@ export async function createCurriculumUpload(input: {
   weekEnd?: string | null;
   notes?: string | null;
 }): Promise<CurriculumUpload> {
-  const store = db();
   const now = nowIso();
   const weekStart = input.weekStart ?? input.parsedFocus.weekStart ?? null;
   const weekEnd = input.weekEnd ?? input.parsedFocus.weekEnd ?? null;
-  const newStartMs = weekStart ? new Date(weekStart).getTime() : -Infinity;
-
-  // Archive prior ACTIVE uploads for the same (learner, subject) that have
-  // already ended before this plan starts. A still-current plan and a
-  // future-dated plan can coexist; getActiveCurriculumFocus disambiguates.
-  for (const u of store.curriculumUploads.values()) {
-    if (
-      u.learnerId === input.learnerId &&
-      u.tenantId === input.tenantId &&
-      u.subject === input.subject &&
-      u.status === "active"
-    ) {
-      const endMs = u.weekEnd ? new Date(u.weekEnd).getTime() + 24 * 3600 * 1000 : Infinity;
-      const newIsFuture = weekStart ? newStartMs > Date.now() : false;
-      if (!newIsFuture || endMs <= newStartMs) {
-        store.curriculumUploads.set(u.id, { ...u, status: "archived", updatedAt: now });
-      }
-    }
-  }
 
   const upload: CurriculumUpload = {
     id: newId("cu"),
@@ -2659,8 +2632,10 @@ export async function createCurriculumUpload(input: {
     createdAt: now,
     updatedAt: now,
   };
-  store.curriculumUploads.set(upload.id, upload);
-  return upload;
+  return getPersistence().weeklyCurriculum.create({
+    upload,
+    archiveSupersededBefore: weekStart,
+  });
 }
 
 /** Delete an upload by id, tenant-scoped. Returns true if removed. */
@@ -2668,10 +2643,7 @@ export async function deleteCurriculumUpload(
   uploadId: string,
   tenantId: string,
 ): Promise<boolean> {
-  const store = db();
-  const existing = store.curriculumUploads.get(uploadId);
-  if (!existing || existing.tenantId !== tenantId) return false;
-  return store.curriculumUploads.delete(uploadId);
+  return getPersistence().weeklyCurriculum.delete(uploadId, tenantId);
 }
 
 /**
@@ -2687,15 +2659,11 @@ export async function getActiveCurriculumFocus(
   subject?: string,
 ): Promise<CurriculumFocus | null> {
   const now = Date.now();
-  const active = Array.from(db().curriculumUploads.values())
-    .filter(
-      (u) =>
-        u.learnerId === learnerId &&
-        u.tenantId === tenantId &&
-        u.status === "active" &&
-        (!subject || u.subject === subject || u.subject === "other"),
-    )
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const active = (
+    await getPersistence().weeklyCurriculum.listForLearner(learnerId, tenantId, {
+      status: "active",
+    })
+  ).filter((u) => !subject || u.subject === subject || u.subject === "other");
 
   const inWindow = active.filter((u) => {
     const startMs = u.weekStart ? new Date(u.weekStart).getTime() : -Infinity;

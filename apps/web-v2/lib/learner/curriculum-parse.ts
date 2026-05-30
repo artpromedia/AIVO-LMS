@@ -12,6 +12,7 @@
  * Always go through a `/api/bff/.../curriculum/...` route handler.
  */
 import { serverEnv } from "@/lib/env";
+import { logger } from "@/lib/observability/logger";
 import type { CurriculumFocus } from "@/lib/db/types";
 
 const VALID_SUBJECTS = new Set([
@@ -108,7 +109,16 @@ export async function parseCurriculumFocus(input: ParseInput): Promise<ParseResu
   const aiUrl = serverEnv.AI_SVC_URL;
   const token = serverEnv.INTERNAL_AI_TOKEN;
   // No token configured → don't attempt the upstream call; use the heuristic.
-  if (!token) return heuristicParse(input);
+  // In production this is a misconfiguration worth surfacing (the AI parse is
+  // the intended path), but we still degrade gracefully so the human-reviewed
+  // upload flow never hard-fails.
+  if (!token) {
+    logger.warn(
+      { feature: "weekly-curriculum-parse" },
+      "[curriculum-parse] INTERNAL_AI_TOKEN unset — using local heuristic fallback",
+    );
+    return heuristicParse(input);
+  }
 
   try {
     const res = await fetch(`${aiUrl}/api/ai/curriculum/parse`, {
@@ -127,7 +137,13 @@ export async function parseCurriculumFocus(input: ParseInput): Promise<ParseResu
       }),
       signal: AbortSignal.timeout(serverEnv.AIVO_SERVICE_TIMEOUT_MS),
     });
-    if (!res.ok) return heuristicParse(input);
+    if (!res.ok) {
+      logger.warn(
+        { feature: "weekly-curriculum-parse", status: res.status },
+        "[curriculum-parse] ai-svc returned non-OK — using local heuristic fallback",
+      );
+      return heuristicParse(input);
+    }
     const data = (await res.json()) as Record<string, unknown>;
     return {
       focus: {
@@ -146,7 +162,14 @@ export async function parseCurriculumFocus(input: ParseInput): Promise<ParseResu
         typeof data.raw_text === "string" ? data.raw_text : (input.text ?? "").slice(0, MAX_TEXT_LEN),
       usedFallback: false,
     };
-  } catch {
+  } catch (err) {
+    logger.warn(
+      {
+        feature: "weekly-curriculum-parse",
+        err: err instanceof Error ? err.message : String(err),
+      },
+      "[curriculum-parse] ai-svc call failed — using local heuristic fallback",
+    );
     return heuristicParse(input);
   }
 }
