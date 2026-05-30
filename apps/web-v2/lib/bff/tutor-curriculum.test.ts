@@ -65,9 +65,9 @@ describe("tutor-curriculum live proxy", () => {
     expect(rows[0].uploaderRole).toBe("teacher");
     expect(rows[0].parsedFocus.topics).toContain("Fractions");
     // Sent x-service-token + uppercased status filter.
-    const [, init] = fetchMock.mock.calls[0];
-    expect((init as RequestInit).headers).toMatchObject({ "x-service-token": TOKEN });
-    expect(fetchMock.mock.calls[0][0]).toContain("status=ACTIVE");
+    const call = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    expect(call[1].headers).toMatchObject({ "x-service-token": TOKEN });
+    expect(call[0]).toContain("status=ACTIVE");
   });
 
   it("active focus returns null when tutor-svc has none", async () => {
