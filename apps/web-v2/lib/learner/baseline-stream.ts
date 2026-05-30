@@ -61,14 +61,29 @@ export interface FinalizeRunResponse {
   itemsAdministered: number;
   learningProfile: unknown;
 }
+export interface ActiveRunResponse {
+  active: boolean;
+  sessionId?: string;
+  theta?: number;
+  itemsAdministered?: number;
+  lastServedItemId?: string | null;
+  stop?: StopDecision;
+}
 
 export type StartRunResult = ({ ok: true } & StartRunResponse) | Fail;
 export type RespondRunResult = ({ ok: true } & RespondRunResponse) | Fail;
 export type FinalizeRunResult = ({ ok: true } & FinalizeRunResponse) | Fail;
+export type ActiveRunResult = ({ ok: true } & ActiveRunResponse) | Fail;
 
-/** Map the persisted question set into the engine's candidate bank. */
-export function questionsToBank(questions: BaselineQuestion[]): BaselineItem[] {
-  return questions.map((q) => questionToBaselineItem(q));
+/**
+ * Map the persisted question set into the engine's candidate bank. Pass a
+ * calibration override to send the service items at their refined θ.
+ */
+export function questionsToBank(
+  questions: BaselineQuestion[],
+  calibration?: Parameters<typeof questionToBaselineItem>[1],
+): BaselineItem[] {
+  return questions.map((q) => questionToBaselineItem(q, calibration));
 }
 
 export function adaptiveBaselineEndpoint(
@@ -227,4 +242,51 @@ export async function finalizeAdaptiveBaselineRun(
     opts,
   );
   return r.ok ? { ok: true, ...r.data } : r;
+}
+
+export interface ActiveRunInput extends CallOptions {
+  learnerId: string;
+}
+
+/** Fetch the learner's in-progress session, if any (resume support). */
+export async function activeAdaptiveBaselineRun(
+  input: ActiveRunInput,
+): Promise<ActiveRunResult> {
+  const {
+    authToken,
+    timeoutMs = DEFAULT_STREAM_TIMEOUT_MS,
+    fetchImpl = globalThis.fetch,
+    baseUrl,
+    learnerId,
+  } = input;
+  const endpoint = adaptiveBaselineEndpoint(learnerId, "active", baseUrl);
+  const controller = new AbortController();
+  const handle = setTimeout(() => controller.abort(), timeoutMs);
+
+  let res: Response;
+  try {
+    res = await fetchImpl(endpoint, {
+      method: "GET",
+      headers: { authorization: `Bearer ${authToken}` },
+      signal: controller.signal,
+    });
+  } catch (err) {
+    const aborted =
+      typeof err === "object" && err !== null && "name" in err &&
+      (err as { name?: string }).name === "AbortError";
+    const reason: StreamFailureReason = aborted ? "timeout" : "network_error";
+    const message = err instanceof Error ? err.message : String(err);
+    return { ok: false, reason, message };
+  } finally {
+    clearTimeout(handle);
+  }
+
+  if (!res.ok) {
+    return { ok: false, reason: "non_2xx", status: res.status, message: `assessment-svc returned ${res.status}` };
+  }
+  try {
+    return { ok: true, ...((await res.json()) as ActiveRunResponse) };
+  } catch (err) {
+    return { ok: false, reason: "invalid_json", message: err instanceof Error ? err.message : "invalid JSON" };
+  }
 }

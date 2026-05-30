@@ -526,6 +526,12 @@ export type BaselineAssessment = {
    *  for the audit trail. Optional for back-compat with baselines
    *  created before B2 (those rows simply have no metadata). */
   generationMetadata?: BaselineGenerationMetadata;
+  /**
+   * assessment-svc adaptive-baseline session id, set when the streaming
+   * run-loop drives this baseline (feature-flagged). Absent on the local
+   * adaptive / fixed-form paths.
+   */
+  adaptiveSessionId?: string;
 };
 
 /**

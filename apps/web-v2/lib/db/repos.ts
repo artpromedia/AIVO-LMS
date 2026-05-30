@@ -1303,6 +1303,20 @@ export function getBaselineCalibrationMap(input: {
   return recalibrationMap(logs, { minExposure: input.minExposure });
 }
 
+/**
+ * Persist the assessment-svc streaming session id on a baseline so the
+ * runner can resume the same server-side session across renders.
+ */
+export async function setBaselineAdaptiveSessionId(
+  baselineId: string,
+  tenantId: string,
+  sessionId: string,
+): Promise<void> {
+  const baseline = await getPersistence().assessments.getBaselineById(baselineId, tenantId);
+  if (!baseline || baseline.adaptiveSessionId === sessionId) return;
+  await getPersistence().assessments.upsertBaseline({ ...baseline, adaptiveSessionId: sessionId });
+}
+
 // ===== Mastery + Learning Path =====
 export async function getMasteryMap(
   learnerId: string,

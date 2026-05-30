@@ -21,6 +21,7 @@ import {
   completeBaseline,
   getBaselineById,
   getBaselineCalibrationMap,
+  setBaselineAdaptiveSessionId,
   getIEPForLearner,
   getLearner,
   getOrCreateParentAssessment,
@@ -36,12 +37,14 @@ import { audit } from "@/lib/bff/audit";
 import { newRequestId } from "@/lib/observability/logger";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
 import { resolveBaselineImage } from "@/lib/learner/baseline-image";
-import { baselineAdaptiveEnabled } from "@/lib/feature-flags";
+import { baselineAdaptiveEnabled, baselineStreamingEnabled } from "@/lib/feature-flags";
 import {
   selectNextAdaptiveQuestion,
   priorThetaForLearner,
   learnerHasReadingDifficulty,
 } from "@/lib/learner/baseline-adaptive";
+import { streamNextQuestion, makeHttpStreamClient } from "@/lib/learner/baseline-session";
+import { serverEnv } from "@/lib/env";
 import type { BaselineQuestion } from "@/lib/db/types";
 
 /**
@@ -205,16 +208,43 @@ export default async function BaselineRunnerPage({
   // the original static order (first unanswered question).
   let next: BaselineQuestion | undefined;
   if (baselineAdaptiveEnabled()) {
-    const selection = selectNextAdaptiveQuestion({
-      questions,
-      attempts,
-      priorTheta: priorThetaForLearner(learner),
-      readingDifficulty: learnerHasReadingDifficulty(learner),
-      // Live recalibration feedback: serve items at their observed
-      // difficulty once they clear the exposure floor (empty map = seed θ).
-      calibration: getBaselineCalibrationMap({ tenantId: session.tenantId }),
-    });
-    next = selection.next ?? undefined;
+    const calibration = getBaselineCalibrationMap({ tenantId: session.tenantId });
+
+    // Prefer the server-authoritative streaming session when enabled and a
+    // service token is configured. Any failure falls through to the local
+    // adaptive path below, so streaming can never dead-end the runner.
+    let streamed = false;
+    const streamToken = serverEnv.ASSESSMENT_SVC_SERVICE_TOKEN;
+    if (baselineStreamingEnabled() && streamToken) {
+      const outcome = await streamNextQuestion({
+        learnerId: baseline.learnerId,
+        baseline,
+        questions,
+        attempts,
+        learner,
+        calibration,
+        client: makeHttpStreamClient(streamToken, serverEnv.ASSESSMENT_SVC_URL),
+        persistSessionId: (sessionId) =>
+          setBaselineAdaptiveSessionId(baseline.id, session.tenantId, sessionId),
+      });
+      if (outcome.mode === "streaming") {
+        next = outcome.next ?? undefined;
+        streamed = true;
+      }
+    }
+
+    if (!streamed) {
+      const selection = selectNextAdaptiveQuestion({
+        questions,
+        attempts,
+        priorTheta: priorThetaForLearner(learner),
+        readingDifficulty: learnerHasReadingDifficulty(learner),
+        // Live recalibration feedback: serve items at their observed
+        // difficulty once they clear the exposure floor (empty map = seed θ).
+        calibration,
+      });
+      next = selection.next ?? undefined;
+    }
   } else {
     next = questions.find((q) => !answeredQids.has(q.id));
   }
