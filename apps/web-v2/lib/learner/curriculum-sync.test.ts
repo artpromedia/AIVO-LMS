@@ -131,6 +131,7 @@ describe("lesson generation + curriculum focus", () => {
     expect(plan.microLesson).toContain("firefighter");
     expect(plan.storyHook).toContain("Community helpers");
     expect(plan.parentSummary).toContain("synced");
+    expect(plan.lessonMode).toBe("school_sync");
   });
 
   it("frames a holiday_prep focus as break review/preview, not 'in class this week'", async () => {
@@ -149,5 +150,6 @@ describe("lesson generation + curriculum focus", () => {
     expect(plan.microLesson).toContain("on a break");
     expect(plan.microLesson).not.toContain("in class this week");
     expect(plan.parentSummary).toContain("Holiday-prep");
+    expect(plan.lessonMode).toBe("holiday_prep");
   });
 });

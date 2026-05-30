@@ -870,6 +870,10 @@ export type GeneratedLessonPlan = {
   encouragement: string;
   parentSummary: string;
   nextRecommendedStep: string;
+  /** Phase 4: "holiday_prep" badges a break-week lesson as optional
+   *  enrichment in the learner UI; "school_sync" marks a class-aligned
+   *  lesson. Omitted for ordinary lessons. */
+  lessonMode?: "school_sync" | "holiday_prep";
   generatedAt: ISODate;
   /** Generator telemetry. */
   generation: {
