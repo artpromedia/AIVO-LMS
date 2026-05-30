@@ -22,6 +22,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import MasterToChildClone from "@/components/brain/master-to-child-clone";
+import BrainBuildingSequence, {
+  type MasteryDecisionDTO,
+  type AccommodationDecisionDTO,
+  type TutorDecisionDTO,
+} from "@/components/brain/brain-building-sequence";
 import { hasSeenClone } from "@/lib/clone-flags";
 
 type StageItem = { label: string; value?: string };
@@ -33,7 +38,14 @@ type Stage = {
   swatches?: string[];
 };
 
-const STAGE_INTERVAL_MS = 2400;
+export type BuildingSequenceData = {
+  enrolledGrade: number;
+  functioningLevel: string;
+  masteryDecisions: MasteryDecisionDTO[];
+  accommodationDecisions: AccommodationDecisionDTO[];
+  tutorDecisions: TutorDecisionDTO[];
+  pulseRate: "calm" | "steady" | "energetic";
+};
 
 export function BrainBuildingClient({
   learnerId,
@@ -50,6 +62,7 @@ export function BrainBuildingClient({
   stages,
   primaryHue,
   secondaryHues,
+  sequence,
   approveAction,
 }: {
   learnerId: string;
@@ -66,37 +79,35 @@ export function BrainBuildingClient({
   stages: Stage[];
   primaryHue: string;
   secondaryHues: string[];
+  sequence: BuildingSequenceData;
   approveAction: (formData: FormData) => void | Promise<void>;
 }) {
   const [active, setActive] = useState(0);
-  const [reducedMotion, setReducedMotion] = useState(false);
   // The master→child clone animation plays first, then reveals the build
   // timeline. Skipped automatically once the parent has seen it in full,
   // and always skipped for an already-approved brain (no first-run moment
   // left to deliver). `null` = undecided until we read localStorage so SSR
   // and first client render agree.
   const [showClone, setShowClone] = useState<boolean | null>(null);
+  // The cinematic build sequence plays after the clone intro and before
+  // the approval recap. Already-approved brains skip straight to the recap.
+  const [sequenceDone, setSequenceDone] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-    setShowClone(!alreadyApproved && !hasSeenClone(learnerId));
+    const seen = hasSeenClone(learnerId);
+    setShowClone(!alreadyApproved && !seen);
+    // If the parent has already lived the moment (or the brain is approved),
+    // jump past the cinematic sequence to the recap + approval gate.
+    setSequenceDone(alreadyApproved || seen);
   }, [alreadyApproved, learnerId]);
 
+  // The recap timeline below the cinematic sequence shows the finished
+  // build steps. Since the cinematic `BrainBuildingSequence` now owns the
+  // pacing, the recap renders fully complete once we reach it.
   useEffect(() => {
-    if (alreadyApproved) {
-      setActive(stages.length);
-      return;
-    }
-    // Hold the build timeline until the master→child clone intro has
-    // finished, otherwise stages silently auto-advance behind it and the
-    // parent returns to a half-complete timeline.
-    if (showClone !== false) return;
-    if (active >= stages.length) return;
-    const dur = reducedMotion ? 600 : STAGE_INTERVAL_MS;
-    const t = window.setTimeout(() => setActive((a) => a + 1), dur);
-    return () => window.clearTimeout(t);
-  }, [active, alreadyApproved, reducedMotion, stages.length, showClone]);
+    if (sequenceDone) setActive(stages.length);
+  }, [sequenceDone, stages.length]);
 
   const allDone = active >= stages.length;
 
@@ -113,6 +124,31 @@ export function BrainBuildingClient({
           primaryHue={primaryHue}
           secondaryHues={secondaryHues}
           onComplete={() => setShowClone(false)}
+        />
+      </div>
+    );
+  }
+
+  // Phase 1 — the cinematic build sequence (grade ladders, accommodations,
+  // the living WebGL brain activating, tutor calibration). On completion we
+  // reveal the recap timeline + approval gate below.
+  if (!sequenceDone) {
+    return (
+      <div className="bc-watch-root">
+        <BrainBuildingSequence
+          learnerName={learnerName}
+          enrolledGrade={sequence.enrolledGrade}
+          functioningLevel={sequence.functioningLevel}
+          masteryDecisions={sequence.masteryDecisions}
+          accommodationDecisions={sequence.accommodationDecisions}
+          tutorDecisions={sequence.tutorDecisions}
+          primaryHue={primaryHue}
+          secondaryHues={secondaryHues}
+          pulseRate={sequence.pulseRate}
+          onSequenceComplete={() => {
+            setActive(stages.length);
+            setSequenceDone(true);
+          }}
         />
       </div>
     );

@@ -67,6 +67,73 @@ export default async function BrainCloneWatchPage({
   const s = profile.state;
   const alreadyApproved = profile.cloneStage === "approved";
 
+  // Representative grade number for the cinematic build sequence's grade
+  // ladders (the snapshot stores a band like "6-8", not a single grade).
+  const GRADE_BAND_TO_NUMBER: Record<string, number> = {
+    preK: 0,
+    K: 0,
+    "1-2": 2,
+    "3-5": 4,
+    "6-8": 7,
+    "9-12": 10,
+    post_secondary: 13,
+  };
+  const enrolledGrade = GRADE_BAND_TO_NUMBER[s.learnerProfileSnapshot.gradeBand ?? ""] ?? 6;
+
+  // The cinematic BrainBuildingSequence prefers the rich `*Detailed` XAI
+  // arrays (camelCase decision objects). When the deterministic fallback
+  // path produced only flat string arrays, synthesise equivalents so the
+  // sequence still renders meaningful cards.
+  const xai = s.xaiExplanation;
+  const masteryDecisions =
+    xai.masteryDecisionsDetailed?.map((d) => ({
+      domain: d.domain,
+      score: d.score,
+      displayLabel: d.displayLabel,
+      reasoning: d.reasoning,
+    })) ??
+    s.masteryOverview.map((m) => ({
+      domain: m.subjectId,
+      // Map the qualitative estimate to a rough normalised score so the
+      // grade ladder has something to plot.
+      score:
+        m.estimate === "advanced"
+          ? 0.95
+          : m.estimate === "confident"
+            ? 0.8
+            : m.estimate === "growing"
+              ? 0.55
+              : 0.3,
+      displayLabel: m.subjectName,
+      reasoning: "",
+    }));
+  const accommodationDecisions =
+    xai.accommodationDecisionsDetailed?.map((d) => ({
+      accommodation: d.accommodation,
+      displayLabel: d.displayLabel,
+      reasoning: d.reasoning,
+      source: d.source,
+    })) ??
+    xai.accommodationDecisions.map((label, i) => ({
+      accommodation: `acc_${i}`,
+      displayLabel: label,
+      reasoning: "",
+    }));
+  const tutorDecisions =
+    xai.tutorDecisionsDetailed?.map((d) => ({
+      tutorKey: d.tutorKey,
+      reasoning: d.reasoning,
+    })) ?? s.activeTutors.map((slug) => ({ tutorKey: slug, reasoning: "" }));
+
+  const sequence = {
+    enrolledGrade,
+    functioningLevel: s.functioningLevel,
+    masteryDecisions,
+    accommodationDecisions,
+    tutorDecisions,
+    pulseRate: s.visualIdentity.pulseRate,
+  };
+
   // Hand the client component just the data it needs to render the seven
   // build stages with real XAI annotations. We keep the parent-facing
   // copy in the i18n bundle and only pass dynamic data here.
@@ -134,6 +201,7 @@ export default async function BrainCloneWatchPage({
         stages={stages}
         primaryHue={s.visualIdentity.primaryHue}
         secondaryHues={s.visualIdentity.secondaryHues}
+        sequence={sequence}
         approveAction={approveBrainCloneAction}
       />
     </AppShell>
