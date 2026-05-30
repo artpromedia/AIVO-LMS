@@ -61,6 +61,7 @@ import {
   buildRunTelemetry,
   recalibrationMap,
 } from "@/lib/learner/baseline-telemetry";
+import type { CalibrationMap } from "@/lib/learner/baseline-adaptive";
 import {
   generateBaselineQuestionsViaLLM,
   mapLlmQuestionsToBaselineQuestions,
@@ -1304,7 +1305,7 @@ export async function getBaselineRecalibrationForTenants(input: {
 export async function getBaselineCalibrationMap(input: {
   tenantId: string;
   minExposure?: number;
-}): Promise<Record<string, number>> {
+}): Promise<CalibrationMap> {
   const logs = await listBaselineTelemetry({ tenantId: input.tenantId });
   return recalibrationMap(logs, { minExposure: input.minExposure });
 }

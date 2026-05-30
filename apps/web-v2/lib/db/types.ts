@@ -702,6 +702,8 @@ export type ItemPsychometrics = {
   estimatedTheta: number;
   /** estimatedTheta − seedTheta. */
   thetaDelta: number;
+  /** Refined 2-PL discrimination (a) from live data; 1 when unidentifiable. */
+  estimatedDiscrimination: number;
   /** Difficulty band the refined θ snaps to. */
   suggestedDifficulty: BaselineDifficulty;
   /** True once `scored` clears the minimum-exposure bar. */

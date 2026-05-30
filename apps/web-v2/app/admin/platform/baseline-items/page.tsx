@@ -116,6 +116,7 @@ export default async function Page() {
                   <th className="p-3 text-right">Seed θ</th>
                   <th className="p-3 text-right">Est. θ̂</th>
                   <th className="p-3 text-right">Δθ</th>
+                  <th className="p-3 text-right">Disc. (a)</th>
                   <th className="p-3">Suggested band</th>
                   <th className="p-3">Status</th>
                 </tr>
@@ -147,6 +148,9 @@ export default async function Page() {
                       </td>
                       <td className="p-3 text-right text-aivo-ink-soft">
                         {row.sufficientData ? signed(row.thetaDelta) : "—"}
+                      </td>
+                      <td className="p-3 text-right text-aivo-ink-soft">
+                        {row.sufficientData ? row.estimatedDiscrimination.toFixed(2) : "—"}
                       </td>
                       <td className="p-3">
                         {row.sufficientData ? (

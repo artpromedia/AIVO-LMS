@@ -169,6 +169,67 @@ export function estimateDifficultyTheta(
   return round2((lo + hi) / 2);
 }
 
+function clamp(x: number, lo: number, hi: number): number {
+  return x < lo ? lo : x > hi ? hi : x;
+}
+
+/** Bounds on the recovered 2-PL discrimination (typical IRT range). */
+const A_MIN = 0.3;
+const A_MAX = 2.5;
+/** θ spread below which `a` is not identifiable from the data. */
+const MIN_THETA_SPREAD = 0.5;
+
+export interface TwoPlEstimate {
+  /** Difficulty (b). */
+  b: number;
+  /** Discrimination (a); 1 when the data can't identify it. */
+  a: number;
+  /** True when `a` was actually estimated (enough θ spread). */
+  identifiedA: boolean;
+}
+
+/**
+ * Joint 2-PL difficulty + discrimination estimate from
+ * (ability, correct) pairs, by gradient ascent on the 2-PL log-likelihood:
+ *
+ *   p_i = σ(a·(θ_i − b))
+ *   ∂LL/∂a = Σ (y_i − p_i)·(θ_i − b)
+ *   ∂LL/∂b = −a·Σ (y_i − p_i)
+ *
+ * Discrimination is only identifiable when the abilities vary, so with too
+ * little θ spread (or too little data) it falls back to a=1 and the 1-PL
+ * difficulty estimate.
+ */
+export function estimate2PL(
+  samples: { thetaBefore: number; correct: boolean }[],
+  fallbackB = 0,
+): TwoPlEstimate {
+  const n = samples.length;
+  const b0 = estimateDifficultyTheta(samples, fallbackB);
+  if (n < 2) return { b: b0, a: 1, identifiedA: false };
+
+  const thetas = samples.map((s) => s.thetaBefore);
+  const spread = Math.max(...thetas) - Math.min(...thetas);
+  if (spread < MIN_THETA_SPREAD) return { b: b0, a: 1, identifiedA: false };
+
+  let a = 1;
+  let b = b0;
+  const lr = 0.1;
+  for (let iter = 0; iter < 800; iter++) {
+    let ga = 0;
+    let gb = 0;
+    for (const s of samples) {
+      const p = 1 / (1 + Math.exp(-a * (s.thetaBefore - b)));
+      const err = (s.correct ? 1 : 0) - p;
+      ga += err * (s.thetaBefore - b);
+      gb += -a * err;
+    }
+    a = clamp(a + (lr * ga) / n, A_MIN, A_MAX);
+    b = clamp(b + (lr * gb) / n, -4, 4);
+  }
+  return { b: round2(b), a: round2(a), identifiedA: true };
+}
+
 export interface AggregateOptions {
   minExposure?: number;
 }
@@ -205,12 +266,14 @@ export function aggregateItemPsychometrics(
     const seedTheta = group[0]!.difficultyTheta;
     const sufficientData = scored >= minExposure;
 
-    const estimatedTheta = sufficientData
-      ? estimateDifficultyTheta(
+    const fit = sufficientData
+      ? estimate2PL(
           scoredLogs.map((g) => ({ thetaBefore: g.thetaBefore, correct: g.correct })),
           seedTheta,
         )
-      : seedTheta;
+      : { b: seedTheta, a: 1, identifiedA: false };
+    const estimatedTheta = fit.b;
+    const estimatedDiscrimination = fit.a;
     const thetaDelta = round2(estimatedTheta - seedTheta);
 
     const defectReasons: string[] = [];
@@ -242,6 +305,7 @@ export function aggregateItemPsychometrics(
       medianLatencyMs,
       estimatedTheta,
       thetaDelta,
+      estimatedDiscrimination,
       suggestedDifficulty: thetaToDifficulty(estimatedTheta),
       sufficientData,
       defectReasons,
@@ -254,17 +318,25 @@ export function aggregateItemPsychometrics(
 }
 
 /**
- * Recalibration map: item-key → refined θ (`b`), limited to items with
- * enough live data to trust. This is what a future selection-time override
- * would consume to replace the seed band θ.
+ * Recalibration map: item-key → refined `{difficulty, discrimination}`,
+ * limited to items with enough live data to trust. Consumed by
+ * `selectNextAdaptiveQuestion` to serve items at their observed 2-PL
+ * parameters. Discrimination is included only when the data identified it
+ * (and it differs from the 1-PL default), so 1-PL items stay 1-PL.
  */
 export function recalibrationMap(
   logs: BaselineItemResponseLog[],
   opts: AggregateOptions = {},
-): Record<string, number> {
-  const out: Record<string, number> = {};
+): CalibrationMap {
+  const out: CalibrationMap = {};
   for (const row of aggregateItemPsychometrics(logs, opts)) {
-    if (row.sufficientData) out[row.itemKey] = row.estimatedTheta;
+    if (!row.sufficientData) continue;
+    out[row.itemKey] = {
+      difficulty: row.estimatedTheta,
+      ...(row.estimatedDiscrimination !== 1
+        ? { discrimination: row.estimatedDiscrimination }
+        : {}),
+    };
   }
   return out;
 }

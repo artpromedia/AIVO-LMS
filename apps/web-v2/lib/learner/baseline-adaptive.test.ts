@@ -93,6 +93,15 @@ describe("questionToBaselineItem", () => {
     const calibrated = questionToBaselineItem(q("grade_level", { discrimination: 1.8 }));
     expect(calibrated.discrimination).toBe(1.8);
   });
+
+  it("a live-calibrated {b,a} entry overrides both difficulty and discrimination", () => {
+    const qq = q("grade_level", { skillId: "skc", id: "qc" });
+    const item = questionToBaselineItem(qq, {
+      [itemKeyFor(qq)]: { difficulty: 0.2, discrimination: 1.9 },
+    });
+    expect(item.difficulty).toBe(0.2);
+    expect(item.discrimination).toBe(1.9);
+  });
 });
 
 describe("cold-start prior", () => {
@@ -276,7 +285,7 @@ describe("selectNextAdaptiveQuestion", () => {
     // hard: from a high prior, the calibrated item becomes the nearest.
     const hardFoundational = q("foundational", { id: "f-hard", skillId: "skX" });
     const trueStretch = q("stretch", { id: "s-real", skillId: "skY" });
-    const calibration = { [itemKeyFor(hardFoundational)]: 1.3 };
+    const calibration = { [itemKeyFor(hardFoundational)]: { difficulty: 1.3 } };
 
     const withCal = selectNextAdaptiveQuestion({
       questions: [hardFoundational, trueStretch],
@@ -301,7 +310,10 @@ describe("selectNextAdaptiveQuestion", () => {
     // calibration override to pin exact difficulties.
     const qHi = q("grade_level", { id: "hi", skillId: "shi" });
     const qLo = q("foundational", { id: "lo", skillId: "slo" });
-    const calibration = { [itemKeyFor(qHi)]: 0.3, [itemKeyFor(qLo)]: -0.8 };
+    const calibration = {
+      [itemKeyFor(qHi)]: { difficulty: 0.3 },
+      [itemKeyFor(qLo)]: { difficulty: -0.8 },
+    };
 
     // No struggle → nearest (qHi) is within the base ceiling.
     const calm = selectNextAdaptiveQuestion({

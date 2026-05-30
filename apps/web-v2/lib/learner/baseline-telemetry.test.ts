@@ -9,9 +9,26 @@ import {
   itemKeyFor,
   buildRunTelemetry,
   estimateDifficultyTheta,
+  estimate2PL,
   aggregateItemPsychometrics,
   recalibrationMap,
 } from "./baseline-telemetry";
+
+/** Generate (ability, correct) pairs from a known 2-PL item. */
+function synth2PL(
+  a: number,
+  b: number,
+  thetas: number[],
+  perTheta: number,
+): { thetaBefore: number; correct: boolean }[] {
+  const out: { thetaBefore: number; correct: boolean }[] = [];
+  for (const t of thetas) {
+    const p = 1 / (1 + Math.exp(-a * (t - b)));
+    const c = Math.round(p * perTheta);
+    for (let i = 0; i < perTheta; i++) out.push({ thetaBefore: t, correct: i < c });
+  }
+  return out;
+}
 
 let qSeq = 0;
 function q(difficulty: BaselineDifficulty, opts: Partial<BaselineQuestion> = {}): BaselineQuestion {
@@ -157,6 +174,35 @@ describe("estimateDifficultyTheta (1-PL conditional MLE)", () => {
   });
 });
 
+describe("estimate2PL", () => {
+  it("recovers a and b from spread-ability data", () => {
+    const samples = synth2PL(1.5, 0.3, [-2, -1, 0, 1, 2], 40);
+    const fit = estimate2PL(samples);
+    expect(fit.identifiedA).toBe(true);
+    expect(fit.a).toBeGreaterThan(1.1);
+    expect(fit.a).toBeLessThan(2.0);
+    expect(fit.b).toBeGreaterThan(-0.2);
+    expect(fit.b).toBeLessThan(0.8);
+  });
+
+  it("distinguishes a sharp item from a flat one", () => {
+    const sharp = estimate2PL(synth2PL(2.2, 0, [-2, -1, 0, 1, 2], 40));
+    const flat = estimate2PL(synth2PL(0.5, 0, [-2, -1, 0, 1, 2], 40));
+    expect(sharp.a).toBeGreaterThan(flat.a);
+  });
+
+  it("falls back to a=1 when ability has no spread (unidentifiable)", () => {
+    const samples = [
+      ...Array.from({ length: 10 }, () => ({ thetaBefore: 0, correct: true })),
+      ...Array.from({ length: 10 }, () => ({ thetaBefore: 0, correct: false })),
+    ];
+    const fit = estimate2PL(samples);
+    expect(fit.identifiedA).toBe(false);
+    expect(fit.a).toBe(1);
+    expect(fit.b).toBeCloseTo(0, 1);
+  });
+});
+
 describe("aggregateItemPsychometrics", () => {
   it("flags a 'foundational' item that able learners keep failing as miscalibrated", () => {
     // seed theta -1.0 (foundational), but learners at θ≈0 fail 9/10 → the
@@ -177,6 +223,20 @@ describe("aggregateItemPsychometrics", () => {
     expect(row!.thetaDelta).toBeGreaterThan(1.5);
     expect(row!.defectReasons).toContain("harder_than_calibrated");
     expect(row!.recommendRetire).toBe(true);
+  });
+
+  it("recovers a 2-PL discrimination > 1 for a sharp item", () => {
+    const logs = [];
+    for (const t of [-1.5, -0.5, 0.5, 1.5]) {
+      const p = 1 / (1 + Math.exp(-1.8 * (t - 0)));
+      const k = 12;
+      const c = Math.round(p * k);
+      for (let i = 0; i < k; i++) {
+        logs.push(log({ itemKey: "skd|grade_level", skillId: "skd", thetaBefore: t, correct: i < c }));
+      }
+    }
+    const [row] = aggregateItemPsychometrics(logs, { minExposure: 5 });
+    expect(row!.estimatedDiscrimination).toBeGreaterThan(1.0);
   });
 
   it("does not recalibrate below the exposure floor", () => {

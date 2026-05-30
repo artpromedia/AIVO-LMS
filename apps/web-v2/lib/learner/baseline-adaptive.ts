@@ -97,12 +97,23 @@ export function questionModalities(q: BaselineQuestion): {
 }
 
 /**
- * Calibration override: item-key (`${skillId}|${difficulty}`) → refined θ
- * (`b`) learned from live data. Only confident estimates belong here (the
- * recalibration job gates on exposure), so the mere presence of a key is
- * the confidence gate — absent keys fall back to the seed band θ.
+ * Per-item calibration learned from live data: a refined θ-space difficulty
+ * (`b`) and, when the data identifies it, a 2-PL discrimination (`a`).
  */
-export type CalibrationMap = Record<string, number>;
+export interface CalibrationEntry {
+  /** Refined θ-space difficulty (b). */
+  difficulty: number;
+  /** Refined 2-PL discrimination (a); omitted ⇒ engine treats it as 1. */
+  discrimination?: number;
+}
+
+/**
+ * Calibration override: item-key (`${skillId}|${difficulty}`) → refined
+ * `{b, a}` learned from live data. Only confident estimates belong here
+ * (the recalibration job gates on exposure), so the mere presence of a key
+ * is the confidence gate — absent keys fall back to the seed band θ.
+ */
+export type CalibrationMap = Record<string, CalibrationEntry>;
 
 /** Stable calibration key for a question across baselines. */
 export function itemKeyFor(q: { skillId: string; difficulty: BaselineDifficulty }): string {
@@ -120,16 +131,17 @@ export function questionToBaselineItem(
   calibration?: CalibrationMap,
 ): BaselineItem {
   const { modalities, lightReading } = questionModalities(q);
-  const override = calibration?.[itemKeyFor(q)];
+  const entry = calibration?.[itemKeyFor(q)];
+  // Discrimination precedence: live-calibrated a > the question's authored
+  // a > none (engine defaults to a=1 / 1-PL).
+  const discrimination = entry?.discrimination ?? q.discrimination;
   return {
     id: q.id,
     skillId: q.skillId,
-    difficulty: override ?? difficultyToTheta(q.difficulty),
+    difficulty: entry?.difficulty ?? difficultyToTheta(q.difficulty),
     modalities,
     lightReading,
-    // 2-PL: carries through to the engine when the question is calibrated
-    // with a discrimination; omitted ⇒ engine defaults to a=1 (1-PL).
-    ...(q.discrimination !== undefined ? { discrimination: q.discrimination } : {}),
+    ...(discrimination !== undefined ? { discrimination } : {}),
   };
 }
 
