@@ -30,7 +30,6 @@ import type {
   MasteryMap,
   ParentAssessment,
   ParentAssessmentSectionId,
-  ParentLearnerRelationship,
   ParentLessonSummary,
   ReadinessState,
   ReviewSchedule,

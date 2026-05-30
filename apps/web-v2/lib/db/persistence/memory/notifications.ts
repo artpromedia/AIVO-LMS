@@ -5,7 +5,7 @@
  * (selected when AIVO_PERSISTENCE_NOTIFICATIONS=memory).
  */
 import { getStore, nowIso } from "@/lib/db/store";
-import type { Notification, NotificationDelivery } from "@/lib/db/types";
+import type { NotificationDelivery } from "@/lib/db/types";
 import type { NotificationStore } from "../types";
 
 export const memoryNotifications: NotificationStore = {

@@ -11,7 +11,6 @@ import { getStore } from "@/lib/db/store";
 import type {
   GeneratedLessonPlan,
   LessonInteraction,
-  LessonRun,
   ParentLessonSummary,
 } from "@/lib/db/types";
 import type { LessonRunStore } from "../types";

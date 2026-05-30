@@ -17,7 +17,6 @@ import type {
   BaselineAssessment,
   BaselineAttempt,
   BaselineQuestion,
-  ParentAssessment,
 } from "@/lib/db/types";
 import type { AssessmentStore } from "../types";
 
