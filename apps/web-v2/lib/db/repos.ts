@@ -1268,6 +1268,21 @@ export function getBaselineRecalibration(input: {
   return aggregateItemPsychometrics(logs, { minExposure: input.minExposure });
 }
 
+/**
+ * Recalibration across a set of tenants (platform-admin view). Aggregates
+ * the combined telemetry so an item-key that appears under multiple
+ * tenants is calibrated from all of its observations.
+ */
+export function getBaselineRecalibrationForTenants(input: {
+  tenantIds: string[];
+  minExposure?: number;
+}): ItemPsychometrics[] {
+  const store = db();
+  const set = new Set(input.tenantIds);
+  const logs = store.baselineItemResponseLogs.filter((l) => set.has(l.tenantId));
+  return aggregateItemPsychometrics(logs, { minExposure: input.minExposure });
+}
+
 // ===== Mastery + Learning Path =====
 export async function getMasteryMap(
   learnerId: string,
