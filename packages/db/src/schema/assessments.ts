@@ -1,4 +1,15 @@
-import { pgTable, uuid, varchar, timestamp, integer, jsonb, text, real } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  uuid,
+  varchar,
+  timestamp,
+  integer,
+  jsonb,
+  text,
+  real,
+  boolean,
+  index,
+} from "drizzle-orm/pg-core";
 import { assessmentModeEnum, assessmentStatusEnum } from "./enums.js";
 import { learners } from "./learners.js";
 import { tenants } from "./tenants.js";
@@ -174,6 +185,50 @@ export const adaptiveBaselineSessions = pgTable("adaptive_baseline_sessions", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+/**
+ * Per-item adaptive-baseline telemetry — one row per administered item,
+ * capturing the ability estimate before/after the answer so the
+ * recalibration job can refine item difficulty from live data. Append-only;
+ * aggregated per `itemKey` (`${skillId}|${difficulty}`) across learners.
+ */
+export const baselineItemResponseLogs = pgTable(
+  "baseline_item_response_logs",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    tenantId: uuid("tenant_id")
+      .references(() => tenants.id)
+      .notNull(),
+    learnerId: uuid("learner_id")
+      .references(() => learners.id)
+      .notNull(),
+    /** Source baseline run (web-v2 id space; no cross-schema FK). */
+    baselineId: varchar("baseline_id", { length: 128 }).notNull(),
+    /** Stable calibration key: `${skillId}|${difficulty}`. */
+    itemKey: varchar("item_key", { length: 160 }).notNull(),
+    skillId: varchar("skill_id", { length: 128 }).notNull(),
+    subjectId: varchar("subject_id", { length: 128 }).notNull(),
+    questionId: varchar("question_id", { length: 128 }).notNull(),
+    /** Difficulty band: foundational | approaching | grade_level | stretch. */
+    difficulty: varchar("difficulty", { length: 32 }).notNull(),
+    /** Seed θ (`b`) the item was served at. */
+    difficultyTheta: real("difficulty_theta").notNull(),
+    correct: boolean("correct").notNull(),
+    skipped: boolean("skipped").notNull().default(false),
+    thetaBefore: real("theta_before").notNull(),
+    thetaAfter: real("theta_after").notNull(),
+    latencyMs: integer("latency_ms"),
+    modality: varchar("modality", { length: 16 }).notNull(),
+    recordedAt: timestamp("recorded_at").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("idx_bir_tenant").on(table.tenantId),
+    index("idx_bir_tenant_item").on(table.tenantId, table.itemKey),
+    index("idx_bir_learner").on(table.learnerId),
+    index("idx_bir_baseline").on(table.baselineId),
+  ],
+);
 
 /**
  * Sprint 6 — AI-drafted IEPs derived from the baseline + parent

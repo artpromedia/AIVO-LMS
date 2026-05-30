@@ -44,23 +44,23 @@ describe("baseline telemetry repo reads", () => {
     for (let i = 0; i < 6; i++) pushLog("tenantB", "skB|stretch", false);
   });
 
-  it("listBaselineTelemetry returns only the requested tenant's logs", () => {
-    const a = listBaselineTelemetry({ tenantId: "tenantA" });
+  it("listBaselineTelemetry returns only the requested tenant's logs", async () => {
+    const a = await listBaselineTelemetry({ tenantId: "tenantA" });
     expect(a).toHaveLength(6);
     expect(a.every((l) => l.tenantId === "tenantA")).toBe(true);
   });
 
-  it("getBaselineRecalibration is tenant-scoped (no cross-tenant leak)", () => {
-    const a = getBaselineRecalibration({ tenantId: "tenantA" });
+  it("getBaselineRecalibration is tenant-scoped (no cross-tenant leak)", async () => {
+    const a = await getBaselineRecalibration({ tenantId: "tenantA" });
     expect(a.map((r) => r.itemKey)).toEqual(["skA|grade_level"]);
     expect(a.map((r) => r.itemKey)).not.toContain("skB|stretch");
   });
 
-  it("getBaselineRecalibrationForTenants aggregates the requested set", () => {
-    const both = getBaselineRecalibrationForTenants({ tenantIds: ["tenantA", "tenantB"] });
+  it("getBaselineRecalibrationForTenants aggregates the requested set", async () => {
+    const both = await getBaselineRecalibrationForTenants({ tenantIds: ["tenantA", "tenantB"] });
     expect(both.map((r) => r.itemKey).sort()).toEqual(["skA|grade_level", "skB|stretch"]);
 
-    const onlyB = getBaselineRecalibrationForTenants({ tenantIds: ["tenantB"] });
+    const onlyB = await getBaselineRecalibrationForTenants({ tenantIds: ["tenantB"] });
     expect(onlyB.map((r) => r.itemKey)).toEqual(["skB|stretch"]);
   });
 });

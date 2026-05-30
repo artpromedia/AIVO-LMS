@@ -1213,11 +1213,15 @@ export async function completeBaseline(
   // path only; idempotent (the main finalize path runs once per baseline,
   // but guard anyway so a replay never double-writes).
   if (baselineAdaptiveEnabled()) {
-    const already = store.baselineItemResponseLogs.some((l) => l.baselineId === completed.id);
+    const existing = await getPersistence().assessments.listBaselineTelemetry({
+      tenantId,
+      learnerId: completed.learnerId,
+    });
+    const already = existing.some((l) => l.baselineId === completed.id);
     if (!already) {
       // Use the same calibration the runner used during the run so the
       // replayed θ trajectory (thetaBefore) matches what selection saw.
-      const calibration = getBaselineCalibrationMap({ tenantId });
+      const calibration = await getBaselineCalibrationMap({ tenantId });
       const telemetry = buildRunTelemetry({
         baseline: { id: completed.id, learnerId: completed.learnerId, tenantId },
         questions,
@@ -1226,7 +1230,7 @@ export async function completeBaseline(
         calibration,
       });
       if (telemetry.length > 0) {
-        store.baselineItemResponseLogs.push(...telemetry);
+        await getPersistence().assessments.appendBaselineTelemetry(telemetry);
         logger.info(
           {
             event: "baseline.telemetry_captured",
@@ -1256,27 +1260,22 @@ export async function completeBaseline(
  * Read the raw per-item telemetry logs for a tenant (admin / batch job).
  * Optionally narrow to a single learner.
  */
-export function listBaselineTelemetry(input: {
+export async function listBaselineTelemetry(input: {
   tenantId: string;
   learnerId?: string;
-}): BaselineItemResponseLog[] {
-  const store = db();
-  return store.baselineItemResponseLogs.filter(
-    (l) =>
-      l.tenantId === input.tenantId &&
-      (input.learnerId === undefined || l.learnerId === input.learnerId),
-  );
+}): Promise<BaselineItemResponseLog[]> {
+  return getPersistence().assessments.listBaselineTelemetry(input);
 }
 
 /**
  * Aggregate the tenant's telemetry into per-item psychometrics +
  * recalibration suggestions (EPIC 2 loop / EPIC 5 admin view).
  */
-export function getBaselineRecalibration(input: {
+export async function getBaselineRecalibration(input: {
   tenantId: string;
   minExposure?: number;
-}): ItemPsychometrics[] {
-  const logs = listBaselineTelemetry({ tenantId: input.tenantId });
+}): Promise<ItemPsychometrics[]> {
+  const logs = await listBaselineTelemetry({ tenantId: input.tenantId });
   return aggregateItemPsychometrics(logs, { minExposure: input.minExposure });
 }
 
@@ -1285,14 +1284,14 @@ export function getBaselineRecalibration(input: {
  * the combined telemetry so an item-key that appears under multiple
  * tenants is calibrated from all of its observations.
  */
-export function getBaselineRecalibrationForTenants(input: {
+export async function getBaselineRecalibrationForTenants(input: {
   tenantIds: string[];
   minExposure?: number;
-}): ItemPsychometrics[] {
-  const store = db();
-  const set = new Set(input.tenantIds);
-  const logs = store.baselineItemResponseLogs.filter((l) => set.has(l.tenantId));
-  return aggregateItemPsychometrics(logs, { minExposure: input.minExposure });
+}): Promise<ItemPsychometrics[]> {
+  const perTenant = await Promise.all(
+    input.tenantIds.map((tenantId) => listBaselineTelemetry({ tenantId })),
+  );
+  return aggregateItemPsychometrics(perTenant.flat(), { minExposure: input.minExposure });
 }
 
 /**
@@ -1302,11 +1301,11 @@ export function getBaselineRecalibrationForTenants(input: {
  * not just the seed band. Returns an empty map until items clear the
  * exposure floor, so early on selection behaves exactly as before.
  */
-export function getBaselineCalibrationMap(input: {
+export async function getBaselineCalibrationMap(input: {
   tenantId: string;
   minExposure?: number;
-}): Record<string, number> {
-  const logs = listBaselineTelemetry({ tenantId: input.tenantId });
+}): Promise<Record<string, number>> {
+  const logs = await listBaselineTelemetry({ tenantId: input.tenantId });
   return recalibrationMap(logs, { minExposure: input.minExposure });
 }
 

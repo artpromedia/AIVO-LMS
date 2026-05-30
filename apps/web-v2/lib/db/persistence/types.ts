@@ -15,6 +15,7 @@ import type {
   AuditLog,
   BaselineAssessment,
   BaselineAttempt,
+  BaselineItemResponseLog,
   BaselineQuestion,
   Classroom,
   ConsentRecord,
@@ -210,6 +211,15 @@ export interface AssessmentStore {
     attempt: BaselineAttempt,
     replaceWhere: { questionId: string; learnerId: string },
   ): Promise<BaselineAttempt>;
+
+  // Adaptive-baseline telemetry (per-item psychometric logs). Append-only;
+  // read back per tenant (optionally narrowed to a learner) for the
+  // recalibration job + admin psychometrics.
+  appendBaselineTelemetry(logs: BaselineItemResponseLog[]): Promise<void>;
+  listBaselineTelemetry(filter: {
+    tenantId: string;
+    learnerId?: string;
+  }): Promise<BaselineItemResponseLog[]>;
 }
 
 /**

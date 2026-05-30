@@ -51,7 +51,7 @@ export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const tenantIds = tenants.map((t) => t.id);
-  const items = getBaselineRecalibrationForTenants({ tenantIds });
+  const items = await getBaselineRecalibrationForTenants({ tenantIds });
 
   const calibratable = items.filter((i) => i.sufficientData).length;
   const flagged = items.filter((i) => i.defectReasons.length > 0).length;

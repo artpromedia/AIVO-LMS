@@ -214,7 +214,7 @@ export default async function BaselineRunnerPage({
   // the original static order (first unanswered question).
   let next: BaselineQuestion | undefined;
   if (baselineAdaptiveEnabled()) {
-    const calibration = getBaselineCalibrationMap({ tenantId: session.tenantId });
+    const calibration = await getBaselineCalibrationMap({ tenantId: session.tenantId });
 
     // Prefer the server-authoritative streaming session when enabled and a
     // service token is configured. Any failure falls through to the local

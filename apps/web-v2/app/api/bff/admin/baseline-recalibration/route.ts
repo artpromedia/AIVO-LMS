@@ -34,7 +34,7 @@ export async function GET(req: Request): Promise<NextResponse> {
         ? parsedMin
         : undefined;
 
-    const items = getBaselineRecalibration({ tenantId: session!.tenantId, minExposure });
+    const items = await getBaselineRecalibration({ tenantId: session!.tenantId, minExposure });
 
     // Headline rollups so the dashboard doesn't re-derive them client-side.
     const summary = {
