@@ -92,6 +92,14 @@ const serverSchema = z.object({
   // heuristic so the upload flow still works.
   AI_SVC_URL: z.string().url().default("http://localhost:3004"),
   INTERNAL_AI_TOKEN: z.string().optional(),
+  // Weekly curriculum sync (live): tutor-svc owns the shared
+  // `curriculum_uploads` Postgres table. The web-v2 BFF proxies parent/teacher
+  // uploads and the lesson-generation focus read to tutor-svc using the shared
+  // `INTERNAL_SERVICE_TOKEN` (sent as `x-service-token`). In production both
+  // MUST be set — the curriculum data path then runs fully live (no in-memory
+  // store). In dev/test, when unset, web-v2 falls back to its in-memory store.
+  TUTOR_SVC_URL: z.string().url().default("http://localhost:3006"),
+  INTERNAL_SERVICE_TOKEN: z.string().optional(),
   AI_PROVIDER: aiProviderSchema,
   ANTHROPIC_API_KEY: z.string().optional(),
   OPENAI_API_KEY: z.string().optional(),

@@ -46,22 +46,32 @@ later, a lesson starts ──▶ createLessonRun ──▶ getActiveCurriculumFo
 All routes go through `requireSession` + `requireRole` + `requireLearnerScope`.
 The shared handlers live in `lib/bff/curriculum.ts`.
 
-## Data
+## Data — live, single source of truth
 
 - Type: `CurriculumUpload` / `CurriculumFocus` (`lib/db/types.ts`).
-- **Persistence**: a dedicated `weeklyCurriculum` domain in the web-v2
-  persistence adapter (`lib/db/persistence/{memory,drizzle}/weeklyCurriculum.ts`).
-  In production (`AIVO_PERSISTENCE=postgres`, or
-  `AIVO_PERSISTENCE_WEEKLY_CURRICULUM=postgres`) it reads/writes the **shared
-  `curriculum_uploads` Postgres table** (`packages/db`, migration `0028`) — the
-  same table `tutor-svc` owns. That makes web-v2 and tutor-svc a **single
-  source of truth**: an upload saved from the parent/teacher UI is visible to
-  the tutor-svc chat/homework paths and vice-versa. The in-memory adapter is
-  dev/test only. Status/role are stored uppercase (`ACTIVE`, `PARENT`, …) to
-  match tutor-svc and normalized to web-v2's lowercase enums on read.
-- `getActiveCurriculumFocus(learnerId, tenantId, subjectSlug)` picks the most
-  recent active upload whose week window contains today (subject-specific wins
-  over `other`); falls back to an undated active upload.
+- **Persistence is owned by `tutor-svc`**, which writes the shared
+  `curriculum_uploads` Postgres table (`packages/db`, migration `0028`). web-v2
+  does **not** keep its own copy in production. The web-v2 repo functions
+  (`lib/db/repos.ts`) proxy to tutor-svc via `lib/bff/tutor-curriculum.ts`:
+  - **Live when `INTERNAL_SERVICE_TOKEN` is set** (REQUIRED in production). The
+    BFF calls tutor-svc's curriculum endpoints with `x-service-token`; tutor-svc
+    trusts the token (web-v2 already enforced session + role + learner-scope)
+    and resolves the learner's tenant itself. `assertLiveConfigured()` makes
+    production **fail closed** rather than silently using an in-memory store.
+  - In dev/test without the token, web-v2 falls back to its in-memory store so
+    the app runs without tutor-svc. There is **no mock path in production**.
+  - This makes web-v2 and tutor-svc a single source of truth: an upload saved
+    from the parent/teacher UI is the same row the tutor-svc chat/homework
+    paths read, and vice-versa.
+  - tutor-svc stores `status`/`uploaderRole` uppercase (`ACTIVE`, `PARENT`);
+    the proxy normalizes them to web-v2's lowercase enums on read.
+- `getActiveCurriculumFocus(learnerId, tenantId, subjectSlug)` resolves to
+  tutor-svc's `…/curriculum/learner/:id/active` in live mode (most recent active
+  upload whose week window contains today; subject-specific wins over `other`).
+  The read is best-effort: a tutor-svc outage degrades to no-sync rather than
+  blocking lesson generation.
+- Config (web-v2 env): `TUTOR_SVC_URL` (default `http://localhost:3006`) +
+  `INTERNAL_SERVICE_TOKEN` (shared secret, also used by tutor-svc/learning-svc).
 - Generation consumes it via `TutorGenerationInputs.curriculumFocus`
   (`lib/ai/tutor.ts`) → `generateDeterministicLessonPlan` (`lib/learner/lesson-plan.ts`),
   which anchors the title, intro/`microLesson`, story hook, worked example, and

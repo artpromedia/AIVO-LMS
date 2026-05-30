@@ -5,6 +5,14 @@
  */
 import { getStore, newId, nowIso } from "@/lib/db/store";
 import { getPersistence } from "@/lib/db/persistence";
+import {
+  assertLiveConfigured,
+  isLiveCurriculum,
+  tutorActiveFocusSafe,
+  tutorCreateCurriculum,
+  tutorDeleteCurriculum,
+  tutorListCurriculum,
+} from "@/lib/bff/tutor-curriculum";
 import { ensureSeeded } from "@/lib/db/seed";
 import { computeReadinessFor } from "@/lib/learner/readiness";
 import { listLearnersForMember as listLearnersForTeamMember } from "@/lib/db/team-invites";
@@ -2574,25 +2582,44 @@ export async function listActiveAssignmentsForLearner(
 }
 
 // ===== Phase 1: weekly curriculum sync =====
+//
+// LIVE data path: when INTERNAL_SERVICE_TOKEN is configured (REQUIRED in
+// production), these functions proxy to tutor-svc, the owner of the shared
+// `curriculum_uploads` Postgres table — so web-v2 and tutor-svc share one
+// source of truth. In dev/test without the token they fall back to the
+// in-memory store. `assertLiveConfigured()` makes production fail closed
+// rather than silently using the in-memory store.
 
 /**
  * List curriculum uploads for a learner (newest first), optionally filtered
- * by subject slug and/or status. Tenant-scoped. Backed by the persistence
- * adapter (Postgres `curriculum_uploads` in production), never the raw store.
+ * by subject slug and/or status. Tenant-scoped (tenant resolved by tutor-svc
+ * in live mode).
  */
 export async function listCurriculumUploadsForLearner(
   learnerId: string,
   tenantId: string,
   opts?: { subject?: string; status?: CurriculumUpload["status"] },
 ): Promise<CurriculumUpload[]> {
-  return getPersistence().weeklyCurriculum.listForLearner(learnerId, tenantId, opts);
+  assertLiveConfigured();
+  if (isLiveCurriculum()) {
+    return tutorListCurriculum(learnerId, opts);
+  }
+  return Array.from(db().curriculumUploads.values())
+    .filter(
+      (u) =>
+        u.learnerId === learnerId &&
+        u.tenantId === tenantId &&
+        (!opts?.subject || u.subject === opts.subject) &&
+        (!opts?.status || u.status === opts.status),
+    )
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
 /**
  * Persist a new curriculum upload. Archives any prior ACTIVE upload for the
  * same (learner, subject) whose week window does not extend past the new
  * plan's start, mirroring tutor-svc's archival rule so the active focus is
- * unambiguous. Backed by the persistence adapter.
+ * unambiguous. In live mode tutor-svc performs the archival + insert.
  */
 export async function createCurriculumUpload(input: {
   tenantId: string;
@@ -2609,9 +2636,46 @@ export async function createCurriculumUpload(input: {
   weekEnd?: string | null;
   notes?: string | null;
 }): Promise<CurriculumUpload> {
-  const now = nowIso();
+  assertLiveConfigured();
   const weekStart = input.weekStart ?? input.parsedFocus.weekStart ?? null;
   const weekEnd = input.weekEnd ?? input.parsedFocus.weekEnd ?? null;
+
+  if (isLiveCurriculum()) {
+    return tutorCreateCurriculum({
+      learnerId: input.learnerId,
+      subject: input.subject,
+      title: input.title,
+      rawText: (input.rawText ?? "").slice(0, 32000),
+      sourceType: input.sourceType,
+      fileName: input.fileName ?? null,
+      parsedFocus: { ...input.parsedFocus, weekStart, weekEnd },
+      weekStart,
+      weekEnd,
+      notes: input.notes ?? null,
+    });
+  }
+
+  const store = db();
+  const now = nowIso();
+  const newStartMs = weekStart ? new Date(weekStart).getTime() : -Infinity;
+
+  // Archive prior ACTIVE uploads for the same (learner, subject) that have
+  // already ended before this plan starts. A still-current plan and a
+  // future-dated plan can coexist; getActiveCurriculumFocus disambiguates.
+  for (const u of store.curriculumUploads.values()) {
+    if (
+      u.learnerId === input.learnerId &&
+      u.tenantId === input.tenantId &&
+      u.subject === input.subject &&
+      u.status === "active"
+    ) {
+      const endMs = u.weekEnd ? new Date(u.weekEnd).getTime() + 24 * 3600 * 1000 : Infinity;
+      const newIsFuture = weekStart ? newStartMs > Date.now() : false;
+      if (!newIsFuture || endMs <= newStartMs) {
+        store.curriculumUploads.set(u.id, { ...u, status: "archived", updatedAt: now });
+      }
+    }
+  }
 
   const upload: CurriculumUpload = {
     id: newId("cu"),
@@ -2632,10 +2696,8 @@ export async function createCurriculumUpload(input: {
     createdAt: now,
     updatedAt: now,
   };
-  return getPersistence().weeklyCurriculum.create({
-    upload,
-    archiveSupersededBefore: weekStart,
-  });
+  store.curriculumUploads.set(upload.id, upload);
+  return upload;
 }
 
 /** Delete an upload by id, tenant-scoped. Returns true if removed. */
@@ -2643,27 +2705,41 @@ export async function deleteCurriculumUpload(
   uploadId: string,
   tenantId: string,
 ): Promise<boolean> {
-  return getPersistence().weeklyCurriculum.delete(uploadId, tenantId);
+  assertLiveConfigured();
+  if (isLiveCurriculum()) {
+    return tutorDeleteCurriculum(uploadId);
+  }
+  const store = db();
+  const existing = store.curriculumUploads.get(uploadId);
+  if (!existing || existing.tenantId !== tenantId) return false;
+  return store.curriculumUploads.delete(uploadId);
 }
 
 /**
  * The curriculum focus the tutor should teach to right now for a (learner,
- * subject). Picks the most recent ACTIVE upload whose week window contains
- * today (null edges mean "always started" / "never expires"); falls back to
- * the most recent undated ACTIVE upload. Subject-specific uploads win over
- * "other". Returns null when there's nothing to sync to.
+ * subject). In live mode tutor-svc resolves the active focus (most recent
+ * ACTIVE upload whose week window contains today; subject-specific wins over
+ * "other"). Best-effort: a tutor-svc outage degrades to no-sync rather than
+ * blocking lesson generation. Returns null when there's nothing to sync to.
  */
 export async function getActiveCurriculumFocus(
   learnerId: string,
   tenantId: string,
   subject?: string,
 ): Promise<CurriculumFocus | null> {
+  if (isLiveCurriculum()) {
+    return tutorActiveFocusSafe(learnerId, subject);
+  }
   const now = Date.now();
-  const active = (
-    await getPersistence().weeklyCurriculum.listForLearner(learnerId, tenantId, {
-      status: "active",
-    })
-  ).filter((u) => !subject || u.subject === subject || u.subject === "other");
+  const active = Array.from(db().curriculumUploads.values())
+    .filter(
+      (u) =>
+        u.learnerId === learnerId &&
+        u.tenantId === tenantId &&
+        u.status === "active" &&
+        (!subject || u.subject === subject || u.subject === "other"),
+    )
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
   const inWindow = active.filter((u) => {
     const startMs = u.weekStart ? new Date(u.weekStart).getTime() : -Infinity;
