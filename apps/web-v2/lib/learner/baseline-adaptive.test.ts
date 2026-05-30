@@ -13,6 +13,8 @@ import {
   learnerHasReadingDifficulty,
   selectNextAdaptiveQuestion,
   itemKeyFor,
+  assessFrustration,
+  FRUSTRATION_CEILING_LOGITS,
 } from "./baseline-adaptive";
 
 let qSeq = 0;
@@ -122,6 +124,54 @@ describe("cold-start prior", () => {
   });
 });
 
+describe("assessFrustration", () => {
+  it("reports no frustration on a clean run", () => {
+    const f = assessFrustration([ans("q1", true), ans("q2", true)]);
+    expect(f.level).toBe("none");
+    expect(f.ceiling).toBe(FRUSTRATION_CEILING_LOGITS);
+    expect(f.struggleStreak).toBe(0);
+  });
+
+  it("escalates to mild then high as the wrong/skip run grows", () => {
+    expect(assessFrustration([ans("a", true), ans("b", false), ans("c", false)]).level).toBe("mild");
+    const high = assessFrustration([ans("a", false), ans("b", false), ans("c", false)]);
+    expect(high.level).toBe("high");
+    expect(high.struggleStreak).toBe(3);
+    expect(high.ceiling).toBeLessThan(FRUSTRATION_CEILING_LOGITS);
+  });
+
+  it("resets the streak after a correct answer", () => {
+    const f = assessFrustration([ans("a", false), ans("b", false), ans("c", true)]);
+    expect(f.level).toBe("none");
+    expect(f.struggleStreak).toBe(0);
+  });
+
+  it("counts skips as struggle", () => {
+    const f = assessFrustration([
+      ans("a", false, true),
+      ans("b", false, true),
+      ans("c", false, true),
+    ]);
+    expect(f.level).toBe("high");
+  });
+
+  it("nudges the level up after an unusually slow answer", () => {
+    const slow: BaselineAttempt = {
+      id: "x",
+      baselineId: "b",
+      questionId: "q",
+      learnerId: "l",
+      tenantId: "t",
+      response: "r",
+      isCorrect: true,
+      skipped: false,
+      latencyMs: 60_000,
+      respondedAt: new Date().toISOString(),
+    };
+    expect(assessFrustration([slow]).level).toBe("mild");
+  });
+});
+
 describe("selectNextAdaptiveQuestion", () => {
   it("opens near the cold-start prior", () => {
     const pool = [q("foundational"), q("approaching"), q("grade_level"), q("stretch")];
@@ -204,6 +254,40 @@ describe("selectNextAdaptiveQuestion", () => {
       priorTheta: 1.3,
     });
     expect(withoutCal.next?.id).toBe("s-real");
+  });
+
+  it("G5: a struggling learner is served an easier item under the tightened ceiling", () => {
+    // qHi sits just above θ (nearest); qLo is further but easier. Use a
+    // calibration override to pin exact difficulties.
+    const qHi = q("grade_level", { id: "hi", skillId: "shi" });
+    const qLo = q("foundational", { id: "lo", skillId: "slo" });
+    const calibration = { [itemKeyFor(qHi)]: 0.3, [itemKeyFor(qLo)]: -0.8 };
+
+    // No struggle → nearest (qHi) is within the base ceiling.
+    const calm = selectNextAdaptiveQuestion({
+      questions: [qHi, qLo],
+      attempts: [],
+      priorTheta: 0,
+      calibration,
+    });
+    expect(calm.next?.id).toBe("hi");
+
+    // Three skipped dummies → high frustration; θ stays at the prior (skips
+    // don't move it), the ceiling tightens, and qHi (0.3 > θ+0.25) is
+    // excluded in favour of the easier qLo.
+    const dummies = [
+      q("grade_level", { id: "d1", skillId: "sd1" }),
+      q("grade_level", { id: "d2", skillId: "sd2" }),
+      q("grade_level", { id: "d3", skillId: "sd3" }),
+    ];
+    const struggling = selectNextAdaptiveQuestion({
+      questions: [...dummies, qHi, qLo],
+      attempts: dummies.map((d) => ans(d.id, false, true)),
+      priorTheta: 0,
+      calibration,
+    });
+    expect(struggling.frustration.level).toBe("high");
+    expect(struggling.next?.id).toBe("lo");
   });
 
   it("stops at the max-item cap even with pool remaining", () => {

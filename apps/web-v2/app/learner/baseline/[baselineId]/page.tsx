@@ -42,6 +42,8 @@ import {
   selectNextAdaptiveQuestion,
   priorThetaForLearner,
   learnerHasReadingDifficulty,
+  assessFrustration,
+  STREAK_HIGH,
 } from "@/lib/learner/baseline-adaptive";
 import { streamNextQuestion, makeHttpStreamClient } from "@/lib/learner/baseline-session";
 import { serverEnv } from "@/lib/env";
@@ -360,8 +362,15 @@ export default async function BaselineRunnerPage({
   /* --------- Break screen (between question blocks) --------- */
   // Show a break every BREAK_EVERY answered questions, but only if the
   // learner hasn't already passed it (sp.resume=1 skips the break).
+  // Kindness tightening (G5): also offer a break the moment a struggle
+  // run reaches the high threshold — fired once (== STREAK_HIGH) so a
+  // hard patch doesn't break on every question.
+  const frustration = assessFrustration(attempts);
+  const frustrationBreak = frustration.struggleStreak === STREAK_HIGH;
   const dueForBreak =
-    totalAnswered > 0 && totalAnswered % BREAK_EVERY === 0 && sp.resume !== "1";
+    totalAnswered > 0 &&
+    sp.resume !== "1" &&
+    (totalAnswered % BREAK_EVERY === 0 || frustrationBreak);
   if (dueForBreak) {
     return (
       <LearnerBaselineShell

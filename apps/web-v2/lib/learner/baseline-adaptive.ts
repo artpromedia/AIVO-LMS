@@ -198,6 +198,57 @@ export function reconstructAdaptiveState(
   return state;
 }
 
+// --- Kindness guardrails (G5) -------------------------------------------
+// The engine homes in on θ, but a struggling learner should never be
+// pushed *above* their level — overshooting is what triggers frustration
+// and shutdown. We cap the hardest item we'll serve at θ + a ceiling, and
+// tighten that ceiling as recent struggle mounts.
+
+/** Base ceiling: never serve an item harder than θ + 1.0 logits. */
+export const FRUSTRATION_CEILING_LOGITS = 1.0;
+const CEILING_MILD = 0.5;
+const CEILING_HIGH = 0.25;
+/** Trailing wrong/skip run lengths that escalate the frustration level. */
+const STREAK_MILD = 2;
+export const STREAK_HIGH = 3;
+/** A single very slow answer (ms) nudges the level up one notch. */
+const LONG_LATENCY_MS = 45_000;
+
+export type FrustrationLevel = "none" | "mild" | "high";
+
+export interface FrustrationAssessment {
+  level: FrustrationLevel;
+  /** Logits above θ that selection will not exceed at this level. */
+  ceiling: number;
+  /** Length of the trailing wrong-or-skipped run. */
+  struggleStreak: number;
+}
+
+/**
+ * Read recent struggle from the answer history. Affect signals aren't
+ * captured by this client yet, so we proxy frustration from a trailing run
+ * of wrong/skipped answers, escalated by an unusually slow last answer.
+ */
+export function assessFrustration(attempts: BaselineAttempt[]): FrustrationAssessment {
+  const ordered = [...attempts].sort((a, b) => a.respondedAt.localeCompare(b.respondedAt));
+  let streak = 0;
+  for (let i = ordered.length - 1; i >= 0; i--) {
+    const a = ordered[i]!;
+    if (a.skipped || !a.isCorrect) streak += 1;
+    else break;
+  }
+  let level: FrustrationLevel = streak >= STREAK_HIGH ? "high" : streak >= STREAK_MILD ? "mild" : "none";
+
+  const last = ordered[ordered.length - 1];
+  if (last && typeof last.latencyMs === "number" && last.latencyMs >= LONG_LATENCY_MS) {
+    level = level === "none" ? "mild" : "high";
+  }
+
+  const ceiling =
+    level === "high" ? CEILING_HIGH : level === "mild" ? CEILING_MILD : FRUSTRATION_CEILING_LOGITS;
+  return { level, ceiling, struggleStreak: streak };
+}
+
 export interface AdaptiveSelection {
   /** The next question to administer, or `null` when the run should end. */
   next: BaselineQuestion | null;
@@ -207,6 +258,8 @@ export interface AdaptiveSelection {
   theta: number;
   /** Count of scored (non-skipped) answers replayed into θ. */
   answeredCount: number;
+  /** Recent-struggle read used to gate the difficulty ceiling. */
+  frustration: FrustrationAssessment;
 }
 
 export interface SelectNextInput {
@@ -234,8 +287,9 @@ export function selectNextAdaptiveQuestion(input: SelectNextInput): AdaptiveSele
 
   const stop = shouldStop(state);
   const answeredCount = state.administered.length;
+  const frustration = assessFrustration(attempts);
   if (stop.stop) {
-    return { next: null, stop, theta: state.theta, answeredCount };
+    return { next: null, stop, theta: state.theta, answeredCount, frustration };
   }
 
   // Exclude every already-seen question (answered AND skipped) so a skipped
@@ -246,7 +300,21 @@ export function selectNextAdaptiveQuestion(input: SelectNextInput): AdaptiveSele
     .filter((q) => !seen.has(q.id))
     .map((q) => questionToBaselineItem(q, calibration));
 
-  const pick = pickNextItem(state, candidateBank);
+  if (candidateBank.length === 0) {
+    return { next: null, stop, theta: state.theta, answeredCount, frustration };
+  }
+
+  // Kindness ceiling: never serve an item harder than θ + ceiling. When
+  // the whole remaining pool is above the ceiling, serve the *easiest*
+  // item (undershoot) rather than the nearest, so a struggling learner is
+  // never pushed further past their level.
+  const ceiling = state.theta + frustration.ceiling;
+  const withinCeiling = candidateBank.filter((it) => it.difficulty <= ceiling);
+  const pick =
+    withinCeiling.length > 0
+      ? pickNextItem(state, withinCeiling)
+      : candidateBank.reduce((easiest, it) => (it.difficulty < easiest.difficulty ? it : easiest));
+
   const next = pick ? (questionById.get(pick.id) ?? null) : null;
-  return { next, stop, theta: state.theta, answeredCount };
+  return { next, stop, theta: state.theta, answeredCount, frustration };
 }
