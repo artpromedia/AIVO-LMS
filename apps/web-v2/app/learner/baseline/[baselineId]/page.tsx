@@ -46,6 +46,7 @@ import {
   STREAK_HIGH,
 } from "@/lib/learner/baseline-adaptive";
 import { streamNextQuestion, makeHttpStreamClient } from "@/lib/learner/baseline-session";
+import { mintAssessmentSvcToken } from "@/lib/learner/assessment-svc-auth";
 import { serverEnv } from "@/lib/env";
 import { LatencyTimer } from "./latency-timer";
 import type { BaselineQuestion } from "@/lib/db/types";
@@ -220,7 +221,11 @@ export default async function BaselineRunnerPage({
     // service token is configured. Any failure falls through to the local
     // adaptive path below, so streaming can never dead-end the runner.
     let streamed = false;
-    const streamToken = serverEnv.ASSESSMENT_SVC_SERVICE_TOKEN;
+    // Prefer a short-lived learner-scoped JWT (so assessment-svc checkAccess
+    // passes); fall back to the configured service token.
+    const streamToken =
+      (await mintAssessmentSvcToken({ userId: session.userId, role: session.role })) ??
+      serverEnv.ASSESSMENT_SVC_SERVICE_TOKEN;
     if (baselineStreamingEnabled() && streamToken) {
       const outcome = await streamNextQuestion({
         learnerId: baseline.learnerId,
