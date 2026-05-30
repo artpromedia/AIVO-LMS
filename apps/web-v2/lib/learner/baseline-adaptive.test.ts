@@ -124,6 +124,40 @@ describe("cold-start prior", () => {
   });
 });
 
+describe("G7: accessibility parity on the adaptive path", () => {
+  it("returns the question with its accessibility fields intact", () => {
+    const rich = q("grade_level", {
+      id: "rich",
+      readAloudText: "Listen: which one is the cat?",
+      hint: "Start with the /k/ sound.",
+      choices: ["cat", "dog"],
+      choiceEmojis: ["🐱", "🐶"],
+      sceneEmoji: "🐱",
+      accommodationTags: ["read_aloud", "large_text"],
+    });
+    const sel = selectNextAdaptiveQuestion({ questions: [rich], attempts: [], priorTheta: 0.4 });
+    expect(sel.next?.readAloudText).toBe("Listen: which one is the cat?");
+    expect(sel.next?.hint).toBe("Start with the /k/ sound.");
+    expect(sel.next?.choiceEmojis).toEqual(["🐱", "🐶"]);
+    expect(sel.next?.sceneEmoji).toBe("🐱");
+    expect(sel.next?.accommodationTags).toContain("read_aloud");
+  });
+
+  it("prefers a reading-light item for a reading-difficulty learner on a tie", () => {
+    const qPic = q("grade_level", { id: "pic", skillId: "sp", sceneEmoji: "🐱" });
+    const qText = q("grade_level", { id: "text", skillId: "st" });
+    // θ at the band so both items tie on difficulty; reading difficulty
+    // up-weights the picture (reading-light) item.
+    const sel = selectNextAdaptiveQuestion({
+      questions: [qText, qPic],
+      attempts: [],
+      priorTheta: 0.4,
+      readingDifficulty: true,
+    });
+    expect(sel.next?.id).toBe("pic");
+  });
+});
+
 describe("assessFrustration", () => {
   it("reports no frustration on a clean run", () => {
     const f = assessFrustration([ans("q1", true), ans("q2", true)]);

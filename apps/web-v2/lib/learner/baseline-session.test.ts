@@ -128,6 +128,35 @@ describe("streamNextQuestion", () => {
     expect(out.sessionId).toBe(persisted);
   });
 
+  it("G7: hands back the full question with accessibility fields (not a stripped item)", async () => {
+    const rich: BaselineQuestion = {
+      ...q("grade_level"),
+      readAloudText: "Read this aloud",
+      hint: "a hint",
+      choiceEmojis: ["🐱", "🐶"],
+      sceneEmoji: "🐱",
+      accommodationTags: ["read_aloud"],
+    };
+    const questions = [rich, q("stretch")];
+    const { client } = makeFakeServer(questionsToBank(questions));
+    const out = await streamNextQuestion({
+      learnerId: "lrn1",
+      baseline: baseAssessment(undefined),
+      questions,
+      attempts: [],
+      learner: null,
+      client,
+      persistSessionId: () => {},
+    });
+    expect(out.mode).toBe("streaming");
+    if (out.mode !== "streaming") return;
+    // Whatever the engine served, the returned object is the persisted
+    // question (carries its accessibility fields), not the bank item.
+    expect(out.next).not.toBeNull();
+    expect(questions.some((x) => x.id === out.next!.id)).toBe(true);
+    expect(out.next).toHaveProperty("accommodationTags");
+  });
+
   it("reconciles a recorded answer and advances to a new item", async () => {
     const questions = [q("foundational"), q("approaching"), q("grade_level"), q("stretch")];
     const { client } = makeFakeServer(questionsToBank(questions));
