@@ -13,6 +13,7 @@ import {
   tutorDeleteCurriculum,
   tutorListCurriculum,
 } from "@/lib/bff/tutor-curriculum";
+import { brainPacingFocusSafe } from "@/lib/bff/brain-pacing";
 import { ensureSeeded } from "@/lib/db/seed";
 import { computeReadinessFor } from "@/lib/learner/readiness";
 import { listLearnersForMember as listLearnersForTeamMember } from "@/lib/db/team-invites";
@@ -2716,13 +2717,12 @@ export async function deleteCurriculumUpload(
 }
 
 /**
- * The curriculum focus the tutor should teach to right now for a (learner,
- * subject). In live mode tutor-svc resolves the active focus (most recent
- * ACTIVE upload whose week window contains today; subject-specific wins over
- * "other"). Best-effort: a tutor-svc outage degrades to no-sync rather than
- * blocking lesson generation. Returns null when there's nothing to sync to.
+ * The manual "this week at school" focus (Phase 1): a parent/teacher upload. In
+ * live mode tutor-svc resolves it (most recent ACTIVE upload whose week window
+ * contains today; subject-specific wins over "other"); otherwise the in-memory
+ * dev store is consulted. Best-effort — a tutor-svc outage degrades to null.
  */
-export async function getActiveCurriculumFocus(
+async function getManualCurriculumFocus(
   learnerId: string,
   tenantId: string,
   subject?: string,
@@ -2755,6 +2755,32 @@ export async function getActiveCurriculumFocus(
 
   const row = pick(inWindow) ?? pick(active.filter((u) => !u.weekStart && !u.weekEnd));
   return row ? row.parsedFocus : null;
+}
+
+/**
+ * The curriculum focus the tutor should teach to right now for a (learner,
+ * subject). Priority:
+ *   1. A parent/teacher manual upload (Phase 1) — the explicit "this is what
+ *      we're doing in class this week" signal wins.
+ *   2. The automated calendar pacing plan (Phase 2) — brain-svc's current
+ *      instructional week from the district scope-&-sequence.
+ * Both reads are best-effort: a service outage degrades to no-sync rather than
+ * blocking lesson generation. Returns null when there's nothing to sync to.
+ */
+export async function getActiveCurriculumFocus(
+  learnerId: string,
+  tenantId: string,
+  subject?: string,
+): Promise<CurriculumFocus | null> {
+  const manual = await getManualCurriculumFocus(learnerId, tenantId, subject);
+  if (manual) return manual;
+
+  // Pacing is per-subject; only fall back when a subject is in scope.
+  if (subject) {
+    const paced = await brainPacingFocusSafe(learnerId, subject);
+    if (paced) return paced;
+  }
+  return null;
 }
 
 /**

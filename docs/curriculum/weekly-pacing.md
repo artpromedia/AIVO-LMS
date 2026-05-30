@@ -55,13 +55,37 @@ The plan reuses the existing `generate_scope_sequence` (brain-svc curriculum
 engine), the learner's framework/grade/mastery/accommodations, and persists via
 raw SQL (same pattern as `routes/curriculum.py`).
 
+## Lesson consumption (Phase 2b — implemented)
+
+The pacing plan now actually drives lessons. `getActiveCurriculumFocus`
+(`apps/web-v2/lib/db/repos.ts`) resolves the focus the tutor teaches to with
+this priority:
+
+1. **Manual upload (Phase 1)** — a parent/teacher "this week at school" upload
+   from tutor-svc wins (the explicit signal).
+2. **Automated pacing (Phase 2)** — if there's no manual upload, web-v2 reads
+   brain-svc's current instructional week and maps it to a `CurriculumFocus`.
+
+Wiring:
+
+- **brain-svc service-token auth** (`services/brain-svc/.../auth.py`): `require_auth`
+  now accepts the shared `INTERNAL_SERVICE_TOKEN` via `x-service-token` and
+  returns a `service` principal (mirrors tutor-svc). `verify_learner_access`
+  already trusts the `service` role; the calling BFF enforced learner-scope.
+- **web-v2 proxy** (`apps/web-v2/lib/bff/brain-pacing.ts`): server-side client for
+  `…/pacing/current`. `weekToFocus` maps an `instruction` week to a focus
+  (topics, vocabulary→keywords, standards, objectives→skills, `confidence: 1`).
+  A `break` week returns **null** (holidays are the Phase 4 track, not a normal
+  lesson). `brainPacingFocusSafe` never throws — a brain-svc outage or unset
+  token degrades to no-sync.
+- Config (web-v2 env): `BRAIN_SVC_URL` (default `http://localhost:3081`) +
+  `INTERNAL_SERVICE_TOKEN` (shared secret). When the token is unset the pacing
+  fallback is disabled (dev), so the app still runs without brain-svc.
+- Tests: `apps/web-v2/lib/bff/brain-pacing.test.ts` (mapping, break-skip, safe
+  read, token gating).
+
 ## Not in this phase (next steps)
 
-- **Lesson consumption (Phase 2b):** wire web-v2's `getActiveCurriculumFocus`
-  to fall back to brain-svc `…/pacing/current` when there's no manual Phase-1
-  upload, so the structured lesson player teaches the pacing week's topics. This
-  needs a service-token path on brain-svc (mirroring the one added to tutor-svc)
-  + a `weekly_curriculum` `LessonRunSource`.
 - **Weekly cron** to flip the current week to `active`/`done` and pre-generate
   the next week's `LessonRun`s (`packages/scheduling` `JOB_REGISTRY`).
 - **Holiday prep (Phase 4):** generate review+preview content for `kind="break"`
