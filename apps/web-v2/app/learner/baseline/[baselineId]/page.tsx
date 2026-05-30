@@ -45,6 +45,7 @@ import {
 } from "@/lib/learner/baseline-adaptive";
 import { streamNextQuestion, makeHttpStreamClient } from "@/lib/learner/baseline-session";
 import { serverEnv } from "@/lib/env";
+import { LatencyTimer } from "./latency-timer";
 import type { BaselineQuestion } from "@/lib/db/types";
 
 /**
@@ -82,6 +83,8 @@ async function answerAction(formData: FormData) {
   const response = String(formData.get("response") || "");
   const skipped = String(formData.get("skipped") || "") === "1";
   const asParent = String(formData.get("asParent") || "") === "1";
+  const latencyRaw = Number.parseInt(String(formData.get("latencyMs") || ""), 10);
+  const latencyMs = Number.isFinite(latencyRaw) && latencyRaw >= 0 ? latencyRaw : undefined;
 
   if (session.role === "parent") {
     if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
@@ -105,6 +108,7 @@ async function answerAction(formData: FormData) {
     tenantId: session.tenantId,
     response,
     skipped,
+    latencyMs,
   });
   if (attempt) {
     audit(session, "baseline.answer", newRequestId(), {
@@ -523,6 +527,9 @@ export default async function BaselineRunnerPage({
           <input type="hidden" name="learnerId" value={baseline.learnerId} />
           <input type="hidden" name="questionId" value={next.id} />
           {asParent ? <input type="hidden" name="asParent" value="1" /> : null}
+          {/* Stamps time-on-item into `latencyMs` at submit. Keyed by
+              question id so the timer resets for each new item. */}
+          <LatencyTimer key={next.id} />
 
           {next.choices && next.choices.length > 0 ? (
             <fieldset className="flex flex-col gap-3">

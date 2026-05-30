@@ -30,7 +30,11 @@ function q(difficulty: BaselineDifficulty, opts: Partial<BaselineQuestion> = {})
 }
 
 let aSeq = 0;
-function ans(questionId: string, isCorrect: boolean, skipped = false): BaselineAttempt {
+function ans(
+  questionId: string,
+  isCorrect: boolean,
+  opts: { skipped?: boolean; latencyMs?: number } = {},
+): BaselineAttempt {
   aSeq += 1;
   return {
     id: `a${aSeq}`,
@@ -40,7 +44,8 @@ function ans(questionId: string, isCorrect: boolean, skipped = false): BaselineA
     tenantId: "t1",
     response: "x",
     isCorrect,
-    skipped,
+    skipped: opts.skipped ?? false,
+    ...(opts.latencyMs !== undefined ? { latencyMs: opts.latencyMs } : {}),
     respondedAt: new Date(Date.UTC(2026, 0, 1, 0, 0, aSeq)).toISOString(),
   };
 }
@@ -97,12 +102,23 @@ describe("buildRunTelemetry", () => {
     expect(logs[0]!.difficultyTheta).toBeCloseTo(0.4, 5);
   });
 
+  it("carries the client-measured latency onto the log", () => {
+    const q1 = q("grade_level", { id: "qa" });
+    const logs = buildRunTelemetry({
+      baseline: { id: "bas1", learnerId: "l1", tenantId: "t1" },
+      questions: [q1],
+      attempts: [ans("qa", true, { latencyMs: 4200 })],
+      learner: null,
+    });
+    expect(logs[0]!.latencyMs).toBe(4200);
+  });
+
   it("records skips without moving theta", () => {
     const q1 = q("grade_level", { id: "qa" });
     const logs = buildRunTelemetry({
       baseline: { id: "bas1", learnerId: "l1", tenantId: "t1" },
       questions: [q1],
-      attempts: [ans("qa", false, true)],
+      attempts: [ans("qa", false, { skipped: true })],
       learner: null,
     });
     expect(logs).toHaveLength(1);
@@ -171,6 +187,24 @@ describe("aggregateItemPsychometrics", () => {
     expect(row!.sufficientData).toBe(false);
     expect(row!.estimatedTheta).toBe(row!.seedTheta);
     expect(row!.defectReasons).not.toContain("harder_than_calibrated");
+  });
+
+  it("reports the median latency over scored responses that captured one", () => {
+    const logs = [
+      log({ skipped: false, correct: true, latencyMs: 1000 }),
+      log({ skipped: false, correct: false, latencyMs: 3000 }),
+      log({ skipped: false, correct: true, latencyMs: 2000 }),
+      log({ skipped: true, correct: false, latencyMs: 99999 }), // skip excluded
+      log({ skipped: false, correct: true }), // no latency → ignored
+    ];
+    const [row] = aggregateItemPsychometrics(logs, { minExposure: 1 });
+    expect(row!.medianLatencyMs).toBe(2000);
+  });
+
+  it("returns null median latency when nothing captured one", () => {
+    const logs = [log({ skipped: false, correct: true }), log({ skipped: false, correct: false })];
+    const [row] = aggregateItemPsychometrics(logs, { minExposure: 1 });
+    expect(row!.medianLatencyMs).toBeNull();
   });
 
   it("flags high skip rate", () => {

@@ -112,6 +112,7 @@ export default async function Page() {
                   <th className="p-3 text-right">Exposure</th>
                   <th className="p-3 text-right">Scored</th>
                   <th className="p-3 text-right">p-value</th>
+                  <th className="p-3 text-right">Median time</th>
                   <th className="p-3 text-right">Seed θ</th>
                   <th className="p-3 text-right">Est. θ̂</th>
                   <th className="p-3 text-right">Δθ</th>
@@ -134,6 +135,9 @@ export default async function Page() {
                       <td className="p-3 text-right text-aivo-ink-soft">{row.scored}</td>
                       <td className="p-3 text-right text-aivo-ink-soft">
                         {row.scored > 0 ? row.pValue.toFixed(2) : "—"}
+                      </td>
+                      <td className="p-3 text-right text-aivo-ink-soft">
+                        {row.medianLatencyMs !== null ? `${(row.medianLatencyMs / 1000).toFixed(1)}s` : "—"}
                       </td>
                       <td className="p-3 text-right text-aivo-ink-soft">
                         {row.seedTheta.toFixed(2)}

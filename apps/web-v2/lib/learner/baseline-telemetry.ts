@@ -58,6 +58,16 @@ function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
+/** Median of a numeric list, rounded; null when empty. */
+function medianOf(values: number[]): number | null {
+  if (values.length === 0) return null;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 1
+    ? sorted[mid]!
+    : Math.round((sorted[mid - 1]! + sorted[mid]!) / 2);
+}
+
 export interface BuildRunTelemetryInput {
   baseline: { id: string; learnerId: string; tenantId: string };
   questions: BaselineQuestion[];
@@ -100,9 +110,7 @@ export function buildRunTelemetry(input: BuildRunTelemetryInput): BaselineItemRe
       const response: ItemResponse = {
         itemId: item.id,
         correct: attempt.isCorrect,
-        // Latency is not yet captured by BaselineAttempt; 0 is benign here
-        // (latency feeds the profile, not difficulty estimation).
-        responseTimeMs: 0,
+        responseTimeMs: attempt.latencyMs ?? 0,
         consumedModality: item.modalities[0],
       };
       state = recordResponse({ state, item, response });
@@ -124,6 +132,7 @@ export function buildRunTelemetry(input: BuildRunTelemetryInput): BaselineItemRe
       skipped: attempt.skipped,
       thetaBefore: round2(thetaBefore),
       thetaAfter: round2(thetaAfter),
+      ...(attempt.latencyMs !== undefined ? { latencyMs: attempt.latencyMs } : {}),
       modality: item.modalities[0]!,
       recordedAt: attempt.respondedAt,
     });
@@ -188,6 +197,11 @@ export function aggregateItemPsychometrics(
     const correct = scoredLogs.reduce((acc, g) => acc + (g.correct ? 1 : 0), 0);
     const pValue = scored > 0 ? round2(correct / scored) : 0;
     const skipRate = exposure > 0 ? round2((exposure - scored) / exposure) : 0;
+    const medianLatencyMs = medianOf(
+      scoredLogs
+        .map((g) => g.latencyMs)
+        .filter((v): v is number => typeof v === "number" && v >= 0),
+    );
     const seedTheta = group[0]!.difficultyTheta;
     const sufficientData = scored >= minExposure;
 
@@ -225,6 +239,7 @@ export function aggregateItemPsychometrics(
       correct,
       pValue,
       skipRate,
+      medianLatencyMs,
       estimatedTheta,
       thetaDelta,
       suggestedDifficulty: thetaToDifficulty(estimatedTheta),

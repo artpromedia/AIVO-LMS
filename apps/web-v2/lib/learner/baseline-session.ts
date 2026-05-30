@@ -137,7 +137,7 @@ export async function streamNextQuestion(input: StreamNextInput): Promise<Stream
           itemId: item.id,
           // A skip carries no correctness signal; treat as incorrect for θ.
           correct: attempt.skipped ? false : attempt.isCorrect,
-          responseTimeMs: 0,
+          responseTimeMs: attempt.latencyMs ?? 0,
         },
         bank,
       });

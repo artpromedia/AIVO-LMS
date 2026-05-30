@@ -981,6 +981,8 @@ export async function recordBaselineAttempt(input: {
   tenantId: string;
   response: string;
   skipped?: boolean;
+  /** Client-measured time-on-item in ms; stored when finite and ≥ 0. */
+  latencyMs?: number;
 }): Promise<BaselineAttempt | null> {
   const store = getPersistence().assessments;
   const baseline = await store.getBaselineById(input.baselineId, input.tenantId);
@@ -1001,6 +1003,10 @@ export async function recordBaselineAttempt(input: {
     : q.expectedAnswer
       ? trimmed.toLowerCase() === q.expectedAnswer.trim().toLowerCase()
       : false;
+  const latencyMs =
+    typeof input.latencyMs === "number" && Number.isFinite(input.latencyMs) && input.latencyMs >= 0
+      ? Math.round(input.latencyMs)
+      : undefined;
   const attempt: BaselineAttempt = {
     id: newId("bat"),
     baselineId: input.baselineId,
@@ -1010,6 +1016,7 @@ export async function recordBaselineAttempt(input: {
     response: skipped ? "" : trimmed,
     isCorrect,
     skipped,
+    ...(latencyMs !== undefined ? { latencyMs } : {}),
     respondedAt: nowIso(),
   };
   await store.recordBaselineAttempt(attempt, {

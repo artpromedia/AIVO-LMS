@@ -629,6 +629,13 @@ export type BaselineAttempt = {
   isCorrect: boolean;
   /** Whether the learner skipped (vs gave a real answer). */
   skipped: boolean;
+  /**
+   * Time the learner spent on the item before submitting, in ms, as
+   * measured client-side. Optional/omitted when the client did not report
+   * it (older clients, or the skip path). Feeds processing-speed +
+   * recalibration telemetry.
+   */
+  latencyMs?: number;
   respondedAt: ISODate;
 };
 
@@ -682,6 +689,9 @@ export type ItemPsychometrics = {
   pValue: number;
   /** Proportion of administrations the learner skipped. */
   skipRate: number;
+  /** Median response latency (ms) over scored administrations that
+   *  reported one, or null when no latency was captured. */
+  medianLatencyMs: number | null;
   /** Refined θ from live data (== seedTheta when data is insufficient). */
   estimatedTheta: number;
   /** estimatedTheta − seedTheta. */
