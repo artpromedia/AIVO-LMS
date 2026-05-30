@@ -92,7 +92,7 @@ export function startRun(input: StartInput): StartResult {
     readingDifficulty: input.readingDifficulty,
   });
   const stop = shouldStop(state);
-  const nextItem = !stop.stop ? pickNextItem(state, input.bank) : null;
+  const nextItem = !stop.stop ? pickNextItem(state, input.bank, { applyFrustrationCeiling: true }) : null;
   return {
     session: { state, lastServedItemId: nextItem?.id ?? null },
     nextItem,
@@ -153,7 +153,7 @@ export function respondToItem(input: RespondInput): RespondResult {
   };
   const state = recordResponse({ state: session.state, item, response });
   const stop = shouldStop(state);
-  const nextItem = !stop.stop ? pickNextItem(state, bank) : null;
+  const nextItem = !stop.stop ? pickNextItem(state, bank, { applyFrustrationCeiling: true }) : null;
 
   return {
     ok: true,

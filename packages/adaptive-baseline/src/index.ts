@@ -114,14 +114,49 @@ export function initBaseline(opts: InitBaselineOptions = {}): BaselineState {
  *
  * Returns `null` when the bank is exhausted.
  */
-export function pickNextItem(
-  state: BaselineState,
-  bank: readonly BaselineItem[],
-): BaselineItem | null {
-  const seen = new Set(state.administered.map((r) => r.itemId));
-  const candidates = bank.filter((it) => !seen.has(it.id));
-  if (candidates.length === 0) return null;
+// --- Kindness guardrail (G5) --------------------------------------------
+// Base ceiling: never serve an item harder than θ + this, tightening as
+// recent struggle mounts. Overshooting a struggling learner is what
+// triggers frustration / shutdown.
+export const FRUSTRATION_CEILING = 1.0;
+const CEILING_MILD = 0.5;
+const CEILING_HIGH = 0.25;
+const STREAK_MILD = 2;
+const STREAK_HIGH = 3;
 
+export type FrustrationLevel = "none" | "mild" | "high";
+
+export interface FrustrationRead {
+  level: FrustrationLevel;
+  /** Logits above θ that selection should not exceed at this level. */
+  ceiling: number;
+  /** Trailing run of incorrect / affect-flagged answers. */
+  struggleStreak: number;
+}
+
+/**
+ * Read recent struggle from the administered responses: a trailing run of
+ * incorrect answers and/or in-band frustration/disengagement affect
+ * signals. Unlike the web client (which also sees skips + latency), the
+ * engine works from what it records — correctness + affect.
+ */
+export function assessFrustration(state: BaselineState): FrustrationRead {
+  let streak = 0;
+  for (let i = state.administered.length - 1; i >= 0; i--) {
+    const r = state.administered[i]!;
+    const affectStruggle =
+      r.affect?.some((a) => a === "frustration" || a === "disengagement") ?? false;
+    if (!r.correct || affectStruggle) streak += 1;
+    else break;
+  }
+  const level: FrustrationLevel =
+    streak >= STREAK_HIGH ? "high" : streak >= STREAK_MILD ? "mild" : "none";
+  const ceiling =
+    level === "high" ? CEILING_HIGH : level === "mild" ? CEILING_MILD : FRUSTRATION_CEILING;
+  return { level, ceiling, struggleStreak: streak };
+}
+
+function bestByScore(state: BaselineState, candidates: BaselineItem[]): BaselineItem {
   const score = (it: BaselineItem) => {
     const gap = Math.abs(it.difficulty - state.theta);
     let s = gap;
@@ -129,17 +164,48 @@ export function pickNextItem(
     if (state.readingDifficulty && !it.lightReading) s += 0.5;
     return s;
   };
-
-  let best = candidates[0];
+  let best = candidates[0]!;
   let bestScore = score(best);
   for (let i = 1; i < candidates.length; i++) {
-    const s = score(candidates[i]);
+    const s = score(candidates[i]!);
     if (s < bestScore) {
-      best = candidates[i];
+      best = candidates[i]!;
       bestScore = s;
     }
   }
   return best;
+}
+
+export interface PickOptions {
+  /**
+   * When true, cap the hardest item at θ + the frustration ceiling. If the
+   * whole remaining pool is above the cap, serve the *easiest* item
+   * (undershoot) rather than the nearest. Opt-in so existing callers keep
+   * the pure nearest-θ behaviour.
+   */
+  applyFrustrationCeiling?: boolean;
+}
+
+export function pickNextItem(
+  state: BaselineState,
+  bank: readonly BaselineItem[],
+  opts: PickOptions = {},
+): BaselineItem | null {
+  const seen = new Set(state.administered.map((r) => r.itemId));
+  const candidates = bank.filter((it) => !seen.has(it.id));
+  if (candidates.length === 0) return null;
+
+  if (opts.applyFrustrationCeiling) {
+    const cap = state.theta + assessFrustration(state).ceiling;
+    const within = candidates.filter((it) => it.difficulty <= cap);
+    if (within.length === 0) {
+      // Everything left is above the kindness ceiling — undershoot.
+      return candidates.reduce((easiest, it) => (it.difficulty < easiest.difficulty ? it : easiest));
+    }
+    return bestByScore(state, within);
+  }
+
+  return bestByScore(state, candidates);
 }
 
 export interface RecordResponseInput {

@@ -117,6 +117,29 @@ test("a full run terminates and finalize emits a profile", () => {
   assert.ok(Array.isArray(result.profile.modalityFit));
 });
 
+test("G5 parity: a struggling run is served the easier item under the ceiling", () => {
+  // A session with a trailing wrong run; answering the current item wrong
+  // pushes it to a high frustration level, tightening the ceiling so the
+  // (nearer) hard item is excluded in favour of the easier one.
+  const bank = [item("cur", "sc", 0.0), item("hard", "sh", 0.4), item("easy", "se", -0.8)];
+  const session = hydrateSession({
+    theta: 0,
+    infoSum: 0,
+    administered: [
+      { itemId: "d0", correct: false, responseTimeMs: 0 },
+      { itemId: "d1", correct: false, responseTimeMs: 0 },
+      { itemId: "d2", correct: false, responseTimeMs: 0 },
+    ],
+    coveredSkills: [],
+    readingDifficulty: false,
+    lastServedItemId: "cur",
+  });
+  const out = respondToItem({ session, itemId: "cur", correct: false, bank });
+  assert.equal(out.ok, true);
+  if (!out.ok) return;
+  assert.equal(out.nextItem?.id, "easy");
+});
+
 test("serialize/hydrate round-trips the session incl. lastServedItemId", () => {
   const start = startRun({ bank: BANK, priorTheta: 0.2 });
   const out = respondToItem({
