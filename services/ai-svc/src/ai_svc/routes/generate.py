@@ -284,7 +284,7 @@ async def generate_baseline(req: BaselineRequest):
         return await generate_completion(
             system_prompt=system_prompt,
             user_prompt=user_prompt + extra_user,
-            max_tokens=4000,
+            max_tokens=8000,
             temperature=0.6,
             response_format=response_format,
         )
@@ -450,7 +450,7 @@ async def generate_discovery_chapter(req: DiscoveryChapterRequest):
         result = await generate_completion(
             system_prompt=system_prompt,
             user_prompt=user_prompt,
-            max_tokens=4000,
+            max_tokens=8000,
             temperature=0.7,
         )
     except Exception as e:

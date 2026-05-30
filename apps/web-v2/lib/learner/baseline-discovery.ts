@@ -28,7 +28,7 @@ import type {
   Subject,
 } from "@/lib/db/types";
 
-export const DEFAULT_DISCOVERY_CHAPTER_TIMEOUT_MS = 30_000;
+export const DEFAULT_DISCOVERY_CHAPTER_TIMEOUT_MS = 180_000;
 
 /**
  * Discovery Adventure chapter catalog. Mirrors the legacy

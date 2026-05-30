@@ -35,11 +35,12 @@ import {
 
 /**
  * Default request timeout for the LLM baseline call. The ai-svc
- * upstream typically completes in 6–20 s; we set the budget high
- * enough to avoid clipping a healthy response and rely on the
- * fallback path in B2 to handle a real timeout.
+ * upstream typically takes 60–150 s end-to-end (Claude Opus 4.7
+ * emitting 14+ structured questions, plus an optional structured-
+ * output repair retry). We budget 180 s so a healthy response is
+ * never clipped; the fallback path in B2 handles a real timeout.
  */
-export const DEFAULT_BASELINE_LLM_TIMEOUT_MS = 30_000;
+export const DEFAULT_BASELINE_LLM_TIMEOUT_MS = 180_000;
 
 export type BaselineLlmFailureReason =
   | "network_error"

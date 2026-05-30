@@ -16,6 +16,15 @@ MODEL_PRIORITY = [
     "openai/gpt-5.5",
 ]
 
+# Models that reject the `temperature` request parameter (Anthropic
+# deprecated tunable temperature on some Claude 4.5+ "extended
+# thinking" SKUs). For these we omit the field so the provider uses
+# its default; otherwise the call 400s and we cascade to a fallback
+# model that is both more expensive AND lower quality for our use.
+MODELS_WITHOUT_TEMPERATURE = {
+    "anthropic/claude-opus-4-7",
+}
+
 COST_PER_1K_TOKENS = {
     "anthropic/claude-opus-4-7": {"prompt": 0.015, "completion": 0.075},
     "anthropic/claude-sonnet-4-6": {"prompt": 0.003, "completion": 0.015},
@@ -168,9 +177,10 @@ async def generate_completion(
                     _build_system_message(model, system_prompt),
                     {"role": "user", "content": user_prompt},
                 ],
-                "temperature": temperature,
                 "max_tokens": max_tokens,
             }
+            if model not in MODELS_WITHOUT_TEMPERATURE:
+                kwargs["temperature"] = temperature
             if response_format is not None:
                 kwargs["response_format"] = response_format
             response = await litellm.acompletion(**kwargs)
@@ -242,21 +252,17 @@ async def generate_chat_completion(
             continue
         try:
             shaped_messages = _mark_first_system_message_cached(messages, model)
+            chat_kwargs: dict = {
+                "model": model,
+                "messages": shaped_messages,
+                "max_tokens": max_tokens,
+            }
+            if model not in MODELS_WITHOUT_TEMPERATURE:
+                chat_kwargs["temperature"] = temperature
             if stream:
-                return litellm.acompletion(
-                    model=model,
-                    messages=shaped_messages,
-                    temperature=temperature,
-                    max_tokens=max_tokens,
-                    stream=True,
-                ), model
+                return litellm.acompletion(**chat_kwargs, stream=True), model
             else:
-                response = await litellm.acompletion(
-                    model=model,
-                    messages=shaped_messages,
-                    temperature=temperature,
-                    max_tokens=max_tokens,
-                )
+                response = await litellm.acompletion(**chat_kwargs)
                 content = response.choices[0].message.content
                 usage = response.usage
                 prompt_tokens = usage.prompt_tokens if usage else 0

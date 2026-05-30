@@ -190,6 +190,23 @@ function buildZipCode(learner: any): string | null {
 }
 
 async function authenticate(req: any, reply: any) {
+  // Internal service-to-service bypass: trusted callers (e.g. the
+  // web-v2 BFF generating an AI baseline on behalf of a learner)
+  // present a shared secret instead of a learner JWT. When the
+  // INTERNAL_SERVICE_TOKEN env var is set and the header matches, we
+  // mint a synthetic SERVICE principal so downstream role checks
+  // (LEARNER/PARENT/CAREGIVER/...) all fall through cleanly.
+  const internalToken = process.env.INTERNAL_SERVICE_TOKEN;
+  const presented = req.headers["x-service-token"];
+  if (internalToken && typeof presented === "string" && presented === internalToken) {
+    req.user = {
+      sub: `service:${req.headers["x-internal-service"] || "unknown"}`,
+      role: "SERVICE",
+      tenantId: "*",
+    };
+    return;
+  }
+
   const auth = req.headers.authorization;
   if (!auth?.startsWith("Bearer ")) return reply.status(401).send({ error: "Unauthorized" });
   try {
@@ -1039,6 +1056,61 @@ export async function registerLearnerBaselineRoutes(app: FastifyInstance) {
         });
       } catch (e: any) {
         return fallback("ai_unreachable", e?.message);
+      }
+    },
+  );
+
+  // Sprint B1 — thin proxy used by the web-v2 BFF
+  // (`apps/web-v2/lib/learner/baseline-llm.ts`) when the orchestrated
+  // discovery-chapter path is unavailable or disabled. The web BFF
+  // already has the parent assessment in hand and posts it directly;
+  // this route forwards the payload to ai-svc unchanged and returns
+  // the raw BaselineResponse so the BFF's zod validator + BANK
+  // fallback can branch on the result.
+  app.post(
+    "/api/ai/generate-baseline",
+    {
+      schema: {
+        tags: ["Baseline LLM"],
+        security: [{ bearerAuth: [] }],
+        body: {
+          type: "object",
+          required: ["parent_assessment"],
+          properties: {
+            parent_assessment: { type: "object" },
+            functioning_level: { type: "string" },
+            iep: { type: "object", nullable: true },
+            district: { type: "object", nullable: true },
+            interest_profile: { type: "object", nullable: true },
+            caregiver_perspectives: { type: "array", nullable: true },
+            teacher_assessment: { type: "object", nullable: true },
+            zip_code: { type: "string", nullable: true },
+          },
+        },
+      },
+      preHandler: authenticate,
+    },
+    async (req, reply) => {
+      try {
+        const aiRes = await fetch(`${AI_SVC_URL}/api/ai/generate-baseline`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(req.body ?? {}),
+        });
+        const text = await aiRes.text();
+        reply.status(aiRes.status);
+        const contentType = aiRes.headers.get("content-type") || "application/json";
+        reply.header("content-type", contentType);
+        return reply.send(text);
+      } catch (e: any) {
+        app.log.error(
+          { err: e?.message },
+          "[baseline-llm-proxy] ai-svc unreachable",
+        );
+        return reply.status(502).send({
+          error: "ai_unreachable",
+          detail: e?.message ?? "unknown",
+        });
       }
     },
   );
