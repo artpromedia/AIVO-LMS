@@ -1113,6 +1113,14 @@ export type CurriculumFocus = {
   summary: string;
   /** 0–1 extraction confidence (1 when manually entered/edited). */
   confidence: number;
+  /**
+   * How the tutor should frame the lesson:
+   *  - "school_sync" (default): teach the same topic the learner is covering in
+   *    class this week.
+   *  - "holiday_prep": school is on a break — review recent units and preview
+   *    the next one to stay ready for resumption (Phase 4).
+   */
+  mode?: "school_sync" | "holiday_prep";
 };
 
 /**

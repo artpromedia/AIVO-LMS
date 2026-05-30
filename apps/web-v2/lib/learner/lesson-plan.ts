@@ -239,6 +239,9 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
     input;
   const schoolTopic = schoolTopicPhrase(curriculumFocus);
   const weekVocab = (curriculumFocus?.keywords ?? []).filter((k) => k && k.trim()).slice(0, 5);
+  // Phase 4: a break-week focus is framed as "get ready for resumption" rather
+  // than "what you're doing in class this week" (school is closed).
+  const isHolidayPrep = curriculumFocus?.mode === "holiday_prep";
   const tutorPersona = TUTOR_PERSONA_BY_SUBJECT[subject.slug] ?? "Nimbus the Calm Explorer";
   const greeting =
     TUTOR_GREETING_BY_STYLE[brainState.tutorPersonaRecommendation.style](learnerName);
@@ -306,9 +309,11 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
 
   const microLesson =
     `${scaffoldLine} The big idea today: ${skill.name}. ` +
-    (schoolTopic
-      ? `This is the same thing you're working on in class this week (${schoolTopic}), so we'll practice it together. `
-      : "") +
+    (isHolidayPrep && schoolTopic
+      ? `School is on a break, so we'll review what you learned and get a head start on what's coming up (${schoolTopic}). `
+      : schoolTopic
+        ? `This is the same thing you're working on in class this week (${schoolTopic}), so we'll practice it together. `
+        : "") +
     (weekVocab.length > 0 ? `Words to listen for: ${weekVocab.join(", ")}. ` : "") +
     (tier.difficulty === "starter"
       ? `We'll go slow, with pictures and small steps.`
@@ -325,23 +330,31 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
       : `Watch how I read it and notice one important detail.`;
 
   return {
-    title: schoolTopic
-      ? `This week at school: ${schoolTopic}`
-      : `${skill.name} with ${tutorPersona.split(" ")[0]}`,
-    objective: schoolTopic
-      ? `Stay in sync with class by practicing ${schoolTopic} (${skill.name}).`
-      : objective,
+    title: isHolidayPrep && schoolTopic
+      ? `Holiday prep: getting ready for ${schoolTopic}`
+      : schoolTopic
+        ? `This week at school: ${schoolTopic}`
+        : `${skill.name} with ${tutorPersona.split(" ")[0]}`,
+    objective: isHolidayPrep && schoolTopic
+      ? `Stay sharp over the break and get ready for ${schoolTopic} (${skill.name}).`
+      : schoolTopic
+        ? `Stay in sync with class by practicing ${schoolTopic} (${skill.name}).`
+        : objective,
     estimatedMinutes: tier.estimatedMinutes,
     tutorPersona,
     tutorGreeting: greeting,
-    storyHook: schoolTopic
-      ? `Your class is exploring ${schoolTopic} this week. Let's look at it together, ${learnerName}, one small step at a time.`
-      : storyHook,
+    storyHook: isHolidayPrep && schoolTopic
+      ? `School's on a break, ${learnerName}. Let's keep your skills warm and peek at what's coming up: ${schoolTopic}.`
+      : schoolTopic
+        ? `Your class is exploring ${schoolTopic} this week. Let's look at it together, ${learnerName}, one small step at a time.`
+        : storyHook,
     microLesson,
     example: {
-      prompt: schoolTopic
-        ? `Here's a worked example of ${schoolTopic}, just like in class.`
-        : `Here's a small example of ${skill.name}.`,
+      prompt: isHolidayPrep && schoolTopic
+        ? `Here's a warm-up example for ${schoolTopic}.`
+        : schoolTopic
+          ? `Here's a worked example of ${schoolTopic}, just like in class.`
+          : `Here's a small example of ${skill.name}.`,
       explanation: exampleExplanationBase,
     },
     guidedPractice,
@@ -355,7 +368,11 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
           : `Strong work, ${learnerName}. You're stretching beautifully.`,
     parentSummary:
       `${learnerName} practiced ${skill.name} in ${subject.name} at a ${tier.difficulty} level. ` +
-      (schoolTopic ? `This lesson was synced to this week's class topic (${schoolTopic}). ` : "") +
+      (isHolidayPrep && schoolTopic
+        ? `Holiday-prep lesson: reviewing recent work and previewing ${schoolTopic} for school resumption. `
+        : schoolTopic
+          ? `This lesson was synced to this week's class topic (${schoolTopic}). `
+          : "") +
       `Plan emphasizes ${brainState.preferredModalities[0] ?? "visual"} cues` +
       `${accommodations.tags.length > 0 ? `, with supports for ${accommodations.tags.slice(0, 3).join(", ")}.` : "."}`,
     nextRecommendedStep:

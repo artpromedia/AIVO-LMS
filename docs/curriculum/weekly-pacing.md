@@ -109,7 +109,34 @@ job is to keep week *status* current (drives progress display + the upcoming
 holiday-prep selection). Pre-generation can be revisited as a cache-warm
 optimization once standard→skill mapping lands.
 
+## Holiday prep (Phase 4 — implemented)
+
+Break weeks are no longer "no-sync" dead time — they become **holiday-prep
+lessons** so the learner stays ready for school resumption:
+
+- **brain-svc** `build_holiday_prep(weeks, break_week_index)` (pure) reviews the
+  nearest instruction weeks *before* the break and previews the next
+  instruction week *after* it, returning combined review/preview topics,
+  standards and vocabulary + the prior/next unit titles. `/pacing/current`
+  includes a `holidayPrep` payload whenever the current week is a break.
+- **web-v2** `holidayPrepToFocus` (`lib/bff/brain-pacing.ts`) maps that payload
+  into a `CurriculumFocus` with `mode: "holiday_prep"` (topics = review first,
+  then preview). `brainPacingFocus` returns it for a break week; an
+  instructional week still returns a normal `mode: "school_sync"` focus.
+- **Generator** (`lib/learner/lesson-plan.ts`) branches on
+  `curriculumFocus.mode`: a holiday-prep lesson is framed as *"School's on a
+  break — let's review and get a head start on what's coming up"* (title, story
+  hook, micro-lesson, worked example and parent summary all adjust) instead of
+  *"the same thing you're doing in class this week."*
+
+`CurriculumFocus.mode` defaults to `school_sync` (Phase 1 uploads + Phase 2
+instruction weeks), so existing behavior is unchanged.
+
+Tests: `build_holiday_prep` cases in `test_pacing_engine.py`; `holidayPrepToFocus`
++ break-week mapping in `brain-pacing.test.ts`; the holiday-prep generator
+framing in `curriculum-sync.test.ts`.
+
 ## Not in this phase (next steps)
 
-- **Holiday prep (Phase 4):** generate review+preview content for `kind="break"`
-  weeks ahead of school resumption.
+- A learner-visible "holiday prep" surface/badge so the break-week lessons are
+  presented as optional enrichment rather than required school-sync work.

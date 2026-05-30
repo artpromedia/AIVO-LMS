@@ -5,7 +5,11 @@ Run with: pytest services/brain-svc/tests/test_pacing_engine.py -v
 
 from datetime import date
 
-from brain_svc.services.pacing_engine import build_pacing_weeks, flatten_unit_weeks
+from brain_svc.services.pacing_engine import (
+    build_holiday_prep,
+    build_pacing_weeks,
+    flatten_unit_weeks,
+)
 
 SCOPE = {
     "subject": "math",
@@ -98,3 +102,42 @@ def test_invalid_start_raises():
 
 def test_empty_scope_produces_no_weeks():
     assert build_pacing_weeks({"terms": []}, [], "2026-08-17") == []
+
+
+# A plan with a break sandwiched between instruction weeks.
+PREP_WEEKS = [
+    {"week_index": 0, "kind": "instruction", "unit_title": "Place value",
+     "topics": ["Round to 10"], "standards": ["3.NBT.A.1"], "vocabulary": ["round"]},
+    {"week_index": 1, "kind": "instruction", "unit_title": "Place value",
+     "topics": ["Round to 100"], "standards": ["3.NBT.A.1"], "vocabulary": ["place value"]},
+    {"week_index": 2, "kind": "break", "unit_title": "Winter break",
+     "topics": [], "standards": [], "vocabulary": []},
+    {"week_index": 3, "kind": "instruction", "unit_title": "Addition",
+     "topics": ["Add within 1000"], "standards": ["3.NBT.A.2"], "vocabulary": ["sum"]},
+]
+
+
+def test_holiday_prep_reviews_prior_and_previews_next():
+    prep = build_holiday_prep(PREP_WEEKS, break_week_index=2)
+    assert prep is not None
+    # Review = the two instruction weeks before the break (most recent first).
+    assert prep["review_topics"] == ["Round to 100", "Round to 10"]
+    assert prep["prior_unit_title"] == "Place value"
+    # Preview = the next instruction week after the break.
+    assert prep["preview_topics"] == ["Add within 1000"]
+    assert prep["next_unit_title"] == "Addition"
+    assert "3.NBT.A.2" in prep["preview_standards"]
+
+
+def test_holiday_prep_respects_review_and_preview_counts():
+    prep = build_holiday_prep(PREP_WEEKS, break_week_index=2, review_n=1, preview_n=1)
+    assert prep["review_topics"] == ["Round to 100"]
+
+
+def test_holiday_prep_none_when_index_missing():
+    assert build_holiday_prep(PREP_WEEKS, break_week_index=99) is None
+
+
+def test_holiday_prep_none_when_no_instruction_around():
+    only_break = [{"week_index": 0, "kind": "break", "topics": [], "standards": []}]
+    assert build_holiday_prep(only_break, break_week_index=0) is None

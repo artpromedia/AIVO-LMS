@@ -132,4 +132,22 @@ describe("lesson generation + curriculum focus", () => {
     expect(plan.storyHook).toContain("Community helpers");
     expect(plan.parentSummary).toContain("synced");
   });
+
+  it("frames a holiday_prep focus as break review/preview, not 'in class this week'", async () => {
+    const prepFocus: CurriculumFocus = { ...focus, mode: "holiday_prep" };
+    const { plan } = await generateLessonPlanWithRetry(MockTutorProvider, {
+      learnerName: "Sam",
+      brainState: brain,
+      subject,
+      skill,
+      mastery,
+      accommodations,
+      curriculumFocus: prepFocus,
+      source: "today_mission",
+    });
+    expect(plan.title.toLowerCase()).toContain("holiday prep");
+    expect(plan.microLesson).toContain("on a break");
+    expect(plan.microLesson).not.toContain("in class this week");
+    expect(plan.parentSummary).toContain("Holiday-prep");
+  });
 });

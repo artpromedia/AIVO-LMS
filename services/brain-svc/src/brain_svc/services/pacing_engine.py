@@ -137,3 +137,72 @@ def build_pacing_weeks(
         week_index += 1
         cursor = we + timedelta(days=1)
     return weeks
+
+
+def _uniq(xs: list[str]) -> list[str]:
+    seen: set[str] = set()
+    out: list[str] = []
+    for x in xs:
+        if x and x not in seen:
+            seen.add(x)
+            out.append(x)
+    return out
+
+
+def build_holiday_prep(
+    weeks: list[dict],
+    break_week_index: int,
+    review_n: int = 2,
+    preview_n: int = 1,
+) -> dict | None:
+    """Build a holiday-prep payload for a break week.
+
+    During a break, the tutor keeps the learner ready for school resumption by
+    (a) **reviewing** the most recent instruction weeks before the break and
+    (b) **previewing** the next instruction week(s) after it. Pure: operates on
+    the already-ordered pacing weeks.
+
+    Returns ``None`` if the index isn't found or there's no instructional
+    content on either side (nothing to prep with).
+    """
+    pos = next(
+        (i for i, w in enumerate(weeks) if w.get("week_index") == break_week_index),
+        None,
+    )
+    if pos is None:
+        return None
+
+    def take_instruction(seq) -> list[dict]:
+        picked: list[dict] = []
+        for w in seq:
+            if w.get("kind") == "instruction":
+                picked.append(w)
+        return picked
+
+    # Nearest instruction weeks before (most recent first) and after the break.
+    before = take_instruction(reversed(weeks[:pos]))[:review_n]
+    after = take_instruction(weeks[pos + 1 :])[:preview_n]
+
+    def gather(items: list[dict], key: str) -> list[str]:
+        out: list[str] = []
+        for w in items:
+            vals = w.get(key) or []
+            if isinstance(vals, list):
+                out.extend(str(v) for v in vals if v)
+        return _uniq(out)
+
+    review_topics = gather(before, "topics")
+    preview_topics = gather(after, "topics")
+    if not review_topics and not preview_topics:
+        return None
+
+    return {
+        "review_topics": review_topics,
+        "review_standards": gather(before, "standards"),
+        "review_vocabulary": gather(before, "vocabulary"),
+        "preview_topics": preview_topics,
+        "preview_standards": gather(after, "standards"),
+        "preview_vocabulary": gather(after, "vocabulary"),
+        "prior_unit_title": before[0].get("unit_title") if before else None,
+        "next_unit_title": after[0].get("unit_title") if after else None,
+    }

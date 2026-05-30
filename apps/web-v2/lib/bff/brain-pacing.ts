@@ -45,6 +45,17 @@ type PacingWeek = {
   status: string;
 };
 
+type HolidayPrep = {
+  review_topics?: unknown;
+  review_standards?: unknown;
+  review_vocabulary?: unknown;
+  preview_topics?: unknown;
+  preview_standards?: unknown;
+  preview_vocabulary?: unknown;
+  prior_unit_title?: string | null;
+  next_unit_title?: string | null;
+};
+
 function strList(v: unknown): string[] {
   return Array.isArray(v) ? v.map(String).filter((s) => s.trim().length > 0) : [];
 }
@@ -56,9 +67,45 @@ function isoDate(v: unknown): string | null {
 }
 
 /**
+ * Build a holiday-prep CurriculumFocus from a break week's review/preview
+ * payload: review recent units + preview the next so the learner stays ready
+ * for school resumption. Returns null when there's nothing to prep with.
+ */
+export function holidayPrepToFocus(
+  prep: HolidayPrep | null | undefined,
+  week: PacingWeek | null,
+  subject: string,
+): CurriculumFocus | null {
+  if (!prep) return null;
+  const reviewTopics = strList(prep.review_topics);
+  const previewTopics = strList(prep.preview_topics);
+  if (reviewTopics.length === 0 && previewTopics.length === 0) return null;
+  const nextUnit = (prep.next_unit_title ?? "").trim();
+  const title = nextUnit ? `Holiday prep: get ready for ${nextUnit}` : "Holiday prep";
+  const summaryParts: string[] = [];
+  if (reviewTopics.length) summaryParts.push(`review ${reviewTopics.slice(0, 3).join("; ")}`);
+  if (previewTopics.length) summaryParts.push(`preview ${previewTopics.slice(0, 2).join("; ")}`);
+  return {
+    title,
+    subject,
+    weekStart: isoDate(week?.weekStart),
+    weekEnd: isoDate(week?.weekEnd),
+    // Topics blend review (first, to warm up) then preview (to look ahead).
+    topics: [...reviewTopics, ...previewTopics],
+    keywords: [...strList(prep.review_vocabulary), ...strList(prep.preview_vocabulary)],
+    standards: [...strList(prep.review_standards), ...strList(prep.preview_standards)],
+    skills: previewTopics,
+    summary: summaryParts.length
+      ? `School's on a break — ${summaryParts.join(", and ")}.`
+      : title,
+    confidence: 1,
+    mode: "holiday_prep",
+  };
+}
+
+/**
  * Map an instructional pacing week into a CurriculumFocus. Returns null for a
- * non-instructional week (e.g. `kind="break"` — holidays are handled by the
- * Phase 4 holiday-prep track, not by syncing a normal lesson).
+ * non-instructional week (break weeks are handled by `holidayPrepToFocus`).
  */
 export function weekToFocus(week: PacingWeek | null, subject: string): CurriculumFocus | null {
   if (!week || week.kind !== "instruction") return null;
@@ -80,6 +127,7 @@ export function weekToFocus(week: PacingWeek | null, subject: string): Curriculu
       : title,
     // District-aligned pacing is authoritative, not an AI guess.
     confidence: 1,
+    mode: "school_sync",
   };
 }
 
@@ -96,8 +144,17 @@ export async function brainPacingFocus(
     { headers: headers(), signal: AbortSignal.timeout(serverEnv.AIVO_SERVICE_TIMEOUT_MS) },
   );
   if (!res.ok) throw new Error(`brain-svc pacing/current failed (${res.status})`);
-  const data = (await res.json()) as { current?: PacingWeek | null };
-  return weekToFocus(data.current ?? null, subject);
+  const data = (await res.json()) as {
+    current?: PacingWeek | null;
+    holidayPrep?: HolidayPrep | null;
+  };
+  const current = data.current ?? null;
+  // A break week becomes a holiday-prep lesson (review + preview); an
+  // instructional week syncs to the school topic.
+  if (current && current.kind !== "instruction") {
+    return holidayPrepToFocus(data.holidayPrep, current, subject);
+  }
+  return weekToFocus(current, subject);
 }
 
 /**

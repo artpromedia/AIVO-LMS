@@ -63,6 +63,49 @@ describe("weekToFocus", () => {
   });
 });
 
+const HOLIDAY_PREP = {
+  review_topics: ["Round to 100", "Round to 10"],
+  review_standards: ["3.NBT.A.1"],
+  review_vocabulary: ["round"],
+  preview_topics: ["Add within 1000"],
+  preview_standards: ["3.NBT.A.2"],
+  preview_vocabulary: ["sum"],
+  prior_unit_title: "Place value",
+  next_unit_title: "Addition",
+};
+const BREAK_WEEK = {
+  ...INSTRUCTION_WEEK,
+  kind: "break",
+  unitTitle: "Winter break",
+  topics: [],
+  standards: [],
+  objectives: [],
+  vocabulary: [],
+};
+
+describe("holidayPrepToFocus", () => {
+  it("builds a review+preview focus tagged holiday_prep", async () => {
+    const mod = await load();
+    const focus = mod.holidayPrepToFocus(HOLIDAY_PREP, BREAK_WEEK, "math");
+    expect(focus).not.toBeNull();
+    expect(focus!.mode).toBe("holiday_prep");
+    expect(focus!.title).toContain("Addition");
+    // review topics come first, then preview.
+    expect(focus!.topics).toEqual(["Round to 100", "Round to 10", "Add within 1000"]);
+    expect(focus!.keywords).toEqual(["round", "sum"]);
+    expect(focus!.standards).toEqual(["3.NBT.A.1", "3.NBT.A.2"]);
+    expect(focus!.summary).toMatch(/break/i);
+  });
+
+  it("returns null when there's nothing to prep with", async () => {
+    const mod = await load();
+    expect(mod.holidayPrepToFocus(null, BREAK_WEEK, "math")).toBeNull();
+    expect(
+      mod.holidayPrepToFocus({ review_topics: [], preview_topics: [] }, BREAK_WEEK, "math"),
+    ).toBeNull();
+  });
+});
+
 describe("brainPacingFocusSafe", () => {
   it("reads the current instructional week from brain-svc", async () => {
     const fetchMock = vi.fn(
@@ -77,6 +120,22 @@ describe("brainPacingFocusSafe", () => {
     expect(call[1].headers).toMatchObject({ "x-service-token": TOKEN });
     expect(call[0]).toContain("/api/brain/pacing/lrn_1/pacing/current");
     expect(call[0]).toContain("subject=math");
+  });
+
+  it("turns a break week into a holiday-prep focus from the holidayPrep payload", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        async () =>
+          new Response(JSON.stringify({ current: BREAK_WEEK, holidayPrep: HOLIDAY_PREP }), {
+            status: 200,
+          }),
+      ),
+    );
+    const mod = await load();
+    const focus = await mod.brainPacingFocusSafe("lrn_1", "math");
+    expect(focus?.mode).toBe("holiday_prep");
+    expect(focus?.topics).toContain("Add within 1000");
   });
 
   it("degrades to null when brain-svc errors", async () => {

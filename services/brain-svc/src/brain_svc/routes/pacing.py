@@ -19,7 +19,7 @@ from brain_svc.auth import AuthClaims, require_auth
 from brain_svc.models.database import get_db
 from brain_svc.services.access_control import safe_json_parse, verify_learner_access
 from brain_svc.services.curriculum_engine import generate_scope_sequence
-from brain_svc.services.pacing_engine import build_pacing_weeks
+from brain_svc.services.pacing_engine import build_holiday_prep, build_pacing_weeks
 
 logger = logging.getLogger("brain-svc.pacing")
 
@@ -308,6 +308,31 @@ async def get_current_pacing_week(
         {"pid": plan["id"], "on": on_date},
     ).mappings().first()
 
+    # When the current week is a break, build a holiday-prep payload (review the
+    # prior units + preview the next) so the learner stays ready for resumption.
+    holiday_prep = None
+    if current and current["kind"] in ("break", "holiday_prep"):
+        all_weeks = db.execute(
+            text(
+                """SELECT week_index, kind, unit_title, topics, standards, vocabulary
+                   FROM learner_pacing_weeks
+                   WHERE pacing_plan_id = :pid ORDER BY week_index ASC"""
+            ),
+            {"pid": plan["id"]},
+        ).mappings().all()
+        ordered = [
+            {
+                "week_index": w["week_index"],
+                "kind": w["kind"],
+                "unit_title": w["unit_title"],
+                "topics": safe_json_parse(w["topics"], []),
+                "standards": safe_json_parse(w["standards"], []),
+                "vocabulary": safe_json_parse(w["vocabulary"], []),
+            }
+            for w in all_weeks
+        ]
+        holiday_prep = build_holiday_prep(ordered, current["week_index"])
+
     return {
         "learnerId": learner_id,
         "subject": subject,
@@ -315,6 +340,7 @@ async def get_current_pacing_week(
         "on": on_date,
         "current": _serialize_week(current) if current else None,
         "next": _serialize_week(nxt) if nxt else None,
+        "holidayPrep": holiday_prep,
     }
 
 
