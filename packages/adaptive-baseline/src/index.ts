@@ -47,6 +47,30 @@ export interface BaselineItem {
   lightReading: boolean;
   /** Optional grade-band hint; the placement step uses this. */
   gradeBand?: string;
+  /**
+   * IRT 2-PL discrimination (`a`) — how sharply the item separates
+   * learners around its difficulty. Higher `a` ⇒ a steeper response curve
+   * and more Fisher information near θ=b. Optional: when omitted it
+   * defaults to 1, which makes the 2-PL math collapse to the original
+   * 1-PL behaviour, so 1-PL banks are unaffected.
+   */
+  discrimination?: number;
+}
+
+/** 2-PL discrimination default — `a=1` reduces every formula to 1-PL. */
+export const DEFAULT_DISCRIMINATION = 1;
+
+/** P(correct | θ, item) under the 2-PL model: sigmoid(a·(θ − b)). */
+export function itemProbability(theta: number, item: BaselineItem): number {
+  const a = item.discrimination ?? DEFAULT_DISCRIMINATION;
+  return 1 / (1 + Math.exp(-a * (theta - item.difficulty)));
+}
+
+/** Fisher information the item carries about θ: a²·p·(1−p). */
+export function itemInformation(theta: number, item: BaselineItem): number {
+  const a = item.discrimination ?? DEFAULT_DISCRIMINATION;
+  const p = itemProbability(theta, item);
+  return a * a * p * (1 - p);
 }
 
 export interface ItemResponse {
@@ -114,32 +138,108 @@ export function initBaseline(opts: InitBaselineOptions = {}): BaselineState {
  *
  * Returns `null` when the bank is exhausted.
  */
+// --- Kindness guardrail (G5) --------------------------------------------
+// Base ceiling: never serve an item harder than θ + this, tightening as
+// recent struggle mounts. Overshooting a struggling learner is what
+// triggers frustration / shutdown.
+export const FRUSTRATION_CEILING = 1.0;
+const CEILING_MILD = 0.5;
+const CEILING_HIGH = 0.25;
+const STREAK_MILD = 2;
+const STREAK_HIGH = 3;
+
+export type FrustrationLevel = "none" | "mild" | "high";
+
+export interface FrustrationRead {
+  level: FrustrationLevel;
+  /** Logits above θ that selection should not exceed at this level. */
+  ceiling: number;
+  /** Trailing run of incorrect / affect-flagged answers. */
+  struggleStreak: number;
+}
+
+/**
+ * Read recent struggle from the administered responses: a trailing run of
+ * incorrect answers and/or in-band frustration/disengagement affect
+ * signals. Unlike the web client (which also sees skips + latency), the
+ * engine works from what it records — correctness + affect.
+ */
+export function assessFrustration(state: BaselineState): FrustrationRead {
+  let streak = 0;
+  for (let i = state.administered.length - 1; i >= 0; i--) {
+    const r = state.administered[i]!;
+    const affectStruggle =
+      r.affect?.some((a) => a === "frustration" || a === "disengagement") ?? false;
+    if (!r.correct || affectStruggle) streak += 1;
+    else break;
+  }
+  const level: FrustrationLevel =
+    streak >= STREAK_HIGH ? "high" : streak >= STREAK_MILD ? "mild" : "none";
+  const ceiling =
+    level === "high" ? CEILING_HIGH : level === "mild" ? CEILING_MILD : FRUSTRATION_CEILING;
+  return { level, ceiling, struggleStreak: streak };
+}
+
+/**
+ * Selection cost (lower = preferred): distance of the item difficulty from
+ * θ, minus a discrimination preference (a more discriminating item carries
+ * more Fisher information near θ), plus the covered-skill and
+ * reading-difficulty nudges. The discrimination term is 0 when a=1, so
+ * 1-PL banks select exactly as before.
+ */
+const DISCRIMINATION_PREF = 0.3;
+
+function bestByScore(state: BaselineState, candidates: BaselineItem[]): BaselineItem {
+  const score = (it: BaselineItem) => {
+    const gap = Math.abs(it.difficulty - state.theta);
+    let s = gap;
+    s -= DISCRIMINATION_PREF * ((it.discrimination ?? DEFAULT_DISCRIMINATION) - 1);
+    if (state.coveredSkills.has(it.skillId.toLowerCase())) s += 0.25;
+    if (state.readingDifficulty && !it.lightReading) s += 0.5;
+    return s;
+  };
+  let best = candidates[0]!;
+  let bestScore = score(best);
+  for (let i = 1; i < candidates.length; i++) {
+    const s = score(candidates[i]!);
+    if (s < bestScore) {
+      best = candidates[i]!;
+      bestScore = s;
+    }
+  }
+  return best;
+}
+
+export interface PickOptions {
+  /**
+   * When true, cap the hardest item at θ + the frustration ceiling. If the
+   * whole remaining pool is above the cap, serve the *easiest* item
+   * (undershoot) rather than the nearest. Opt-in so existing callers keep
+   * the pure nearest-θ behaviour.
+   */
+  applyFrustrationCeiling?: boolean;
+}
+
 export function pickNextItem(
   state: BaselineState,
   bank: readonly BaselineItem[],
+  opts: PickOptions = {},
 ): BaselineItem | null {
   const seen = new Set(state.administered.map((r) => r.itemId));
   const candidates = bank.filter((it) => !seen.has(it.id));
   if (candidates.length === 0) return null;
 
-  const score = (it: BaselineItem) => {
-    const gap = Math.abs(it.difficulty - state.theta);
-    let s = gap;
-    if (state.coveredSkills.has(it.skillId.toLowerCase())) s += 0.25;
-    if (state.readingDifficulty && !it.lightReading) s += 0.5;
-    return s;
-  };
-
-  let best = candidates[0];
-  let bestScore = score(best);
-  for (let i = 1; i < candidates.length; i++) {
-    const s = score(candidates[i]);
-    if (s < bestScore) {
-      best = candidates[i];
-      bestScore = s;
+  if (opts.applyFrustrationCeiling) {
+    const cap = state.theta + assessFrustration(state).ceiling;
+    const within = candidates.filter((it) => it.difficulty <= cap);
+    if (within.length === 0) {
+      // Everything left is above the kindness ceiling — undershoot.
+      return candidates.reduce((easiest, it) => (it.difficulty < easiest.difficulty ? it : easiest));
     }
+    return bestByScore(state, within);
   }
-  return best;
+
+  return bestByScore(state, candidates);
 }
 
 export interface RecordResponseInput {
@@ -163,10 +263,14 @@ export function recordResponse(input: RecordResponseInput): BaselineState {
       `recordResponse: itemId mismatch (response=${response.itemId} item=${item.id})`,
     );
   }
-  const p = 1 / (1 + Math.exp(-(state.theta - item.difficulty)));
+  const a = item.discrimination ?? DEFAULT_DISCRIMINATION;
+  const p = itemProbability(state.theta, item);
   const correct = response.correct ? 1 : 0;
-  const nextTheta = state.theta + K * (correct - p);
-  const info = p * (1 - p);
+  // 2-PL stochastic-gradient θ update: the log-likelihood gradient wrt θ
+  // is a·(correct − p), so a high-discrimination answer moves θ more.
+  const nextTheta = state.theta + K * a * (correct - p);
+  // 2-PL Fisher information: a²·p·(1−p).
+  const info = a * a * p * (1 - p);
   const nextCovered = new Set(state.coveredSkills);
   nextCovered.add(item.skillId.toLowerCase());
   return {

@@ -7,7 +7,6 @@
  * and return most-recent-first.
  */
 import { getStore } from "@/lib/db/store";
-import type { AuditLog } from "@/lib/db/types";
 import type { AuditStore } from "../types";
 
 export const memoryAudit: AuditStore = {

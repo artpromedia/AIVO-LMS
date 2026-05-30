@@ -13,6 +13,7 @@ import type {
   AuditLog,
   BaselineAssessment,
   BaselineAttempt,
+  BaselineItemResponseLog,
   BaselineQuestion,
   BillingAccount,
   GeneratedLessonPlan,
@@ -147,6 +148,8 @@ export type Store = {
   baselineAssessments: Map<string, BaselineAssessment>;
   baselineQuestions: Map<string, BaselineQuestion>;
   baselineAttempts: BaselineAttempt[];
+  /** Per-item adaptive-baseline telemetry; append-only, written on finalize. */
+  baselineItemResponseLogs: BaselineItemResponseLog[];
 
   lessonRuns: Map<string, LessonRun>;
   generatedLessonPlans: Map<string, GeneratedLessonPlan>;
@@ -310,6 +313,7 @@ function createStore(): Store {
     baselineAssessments: new Map(),
     baselineQuestions: new Map(),
     baselineAttempts: [],
+    baselineItemResponseLogs: [],
     lessonRuns: new Map(),
     generatedLessonPlans: new Map(),
     lessonInteractions: [],

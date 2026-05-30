@@ -131,6 +131,11 @@ export const PLATFORM_NAV: RoleNavItem[] = [
     icon: <Cpu className="h-4 w-4" />,
   },
   {
+    href: "/admin/platform/baseline-items",
+    label: "Baseline items",
+    icon: <GraduationCap className="h-4 w-4" />,
+  },
+  {
     href: "/admin/platform/audit-logs",
     label: "Audit logs",
     icon: <ScrollText className="h-4 w-4" />,

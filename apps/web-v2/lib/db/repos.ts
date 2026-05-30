@@ -13,8 +13,10 @@ import type {
   BaselineAssessment,
   BaselineAttempt,
   BaselineGenerationMetadata,
+  BaselineItemResponseLog,
   BaselineQuestion,
   BaselineSummary,
+  ItemPsychometrics,
   AccessibilityPreferences,
   ID,
 } from "@/lib/db/types";
@@ -30,7 +32,6 @@ import type {
   MasteryMap,
   ParentAssessment,
   ParentAssessmentSectionId,
-  ParentLearnerRelationship,
   ParentLessonSummary,
   ReadinessState,
   ReviewSchedule,
@@ -50,7 +51,17 @@ import type {
   AssessmentBlueprint,
   CurriculumImportJob,
 } from "@/lib/db/types";
-import { defaultBaselineSubjectSlugs, generateBaselineQuestions } from "@/lib/learner/baseline";
+import {
+  defaultBaselineSubjectSlugs,
+  generateAdaptiveBaselinePool,
+  generateBaselineQuestions,
+} from "@/lib/learner/baseline";
+import {
+  aggregateItemPsychometrics,
+  buildRunTelemetry,
+  recalibrationMap,
+} from "@/lib/learner/baseline-telemetry";
+import type { CalibrationMap } from "@/lib/learner/baseline-adaptive";
 import {
   generateBaselineQuestionsViaLLM,
   mapLlmQuestionsToBaselineQuestions,
@@ -60,7 +71,11 @@ import {
   generateDiscoveryChapter,
   mapDiscoveryActivitiesToBaselineQuestions,
 } from "@/lib/learner/baseline-discovery";
-import { baselineDiscoveryEnabled, baselineLlmEnabled } from "@/lib/feature-flags";
+import {
+  baselineAdaptiveEnabled,
+  baselineDiscoveryEnabled,
+  baselineLlmEnabled,
+} from "@/lib/feature-flags";
 import { logger } from "@/lib/observability/logger";
 import {
   buildBaselineSummary,
@@ -684,6 +699,14 @@ export async function createBaseline(input: {
   const discoveryFlag = baselineDiscoveryEnabled();
   const canCallDiscovery = discoveryFlag && canCallLlm;
 
+  // Phase 0 — when the adaptive baseline is enabled, the BANK fallback uses
+  // a wider, difficulty-spread pool so the runner's adaptive selector has
+  // room to move (see `generateAdaptiveBaselinePool`). Off → identical
+  // fixed-form behaviour as before.
+  const bankGenerator = baselineAdaptiveEnabled()
+    ? generateAdaptiveBaselinePool
+    : generateBaselineQuestions;
+
   // Phase B — Discovery Adventure: attempt per-chapter generation
   // first so the parent gets the emoji-rich picture-prompt experience
   // ported from the legacy aivo-ai-learning client. Each chapter is
@@ -795,7 +818,7 @@ export async function createBaseline(input: {
         // LLM call succeeded but no questions mapped to the requested
         // subjects — fall back so the parent never sees an empty
         // baseline.
-        questions = generateBaselineQuestions({
+        questions = bankGenerator({
           baselineId: baseline.id,
           learner,
           brainProfile,
@@ -819,7 +842,7 @@ export async function createBaseline(input: {
         );
       }
     } else {
-      questions = generateBaselineQuestions({
+      questions = bankGenerator({
         baselineId: baseline.id,
         learner,
         brainProfile,
@@ -844,7 +867,7 @@ export async function createBaseline(input: {
       );
     }
   } else if (!discoverySucceeded) {
-    questions = generateBaselineQuestions({
+    questions = bankGenerator({
       baselineId: baseline.id,
       learner,
       brainProfile,
@@ -959,6 +982,8 @@ export async function recordBaselineAttempt(input: {
   tenantId: string;
   response: string;
   skipped?: boolean;
+  /** Client-measured time-on-item in ms; stored when finite and ≥ 0. */
+  latencyMs?: number;
 }): Promise<BaselineAttempt | null> {
   const store = getPersistence().assessments;
   const baseline = await store.getBaselineById(input.baselineId, input.tenantId);
@@ -979,6 +1004,10 @@ export async function recordBaselineAttempt(input: {
     : q.expectedAnswer
       ? trimmed.toLowerCase() === q.expectedAnswer.trim().toLowerCase()
       : false;
+  const latencyMs =
+    typeof input.latencyMs === "number" && Number.isFinite(input.latencyMs) && input.latencyMs >= 0
+      ? Math.round(input.latencyMs)
+      : undefined;
   const attempt: BaselineAttempt = {
     id: newId("bat"),
     baselineId: input.baselineId,
@@ -988,6 +1017,7 @@ export async function recordBaselineAttempt(input: {
     response: skipped ? "" : trimmed,
     isCorrect,
     skipped,
+    ...(latencyMs !== undefined ? { latencyMs } : {}),
     respondedAt: nowIso(),
   };
   await store.recordBaselineAttempt(attempt, {
@@ -1179,6 +1209,43 @@ export async function completeBaseline(
   };
   await getPersistence().assessments.upsertBaseline(completed);
 
+  // EPIC 5 — capture per-item psychometric telemetry on finalize so the
+  // recalibration job has live data to refine item difficulty. Adaptive
+  // path only; idempotent (the main finalize path runs once per baseline,
+  // but guard anyway so a replay never double-writes).
+  if (baselineAdaptiveEnabled()) {
+    const existing = await getPersistence().assessments.listBaselineTelemetry({
+      tenantId,
+      learnerId: completed.learnerId,
+    });
+    const already = existing.some((l) => l.baselineId === completed.id);
+    if (!already) {
+      // Use the same calibration the runner used during the run so the
+      // replayed θ trajectory (thetaBefore) matches what selection saw.
+      const calibration = await getBaselineCalibrationMap({ tenantId });
+      const telemetry = buildRunTelemetry({
+        baseline: { id: completed.id, learnerId: completed.learnerId, tenantId },
+        questions,
+        attempts,
+        learner,
+        calibration,
+      });
+      if (telemetry.length > 0) {
+        await getPersistence().assessments.appendBaselineTelemetry(telemetry);
+        logger.info(
+          {
+            event: "baseline.telemetry_captured",
+            learnerId: completed.learnerId,
+            tenantId,
+            baselineId: completed.id,
+            items: telemetry.length,
+          },
+          "baseline: captured per-item adaptive telemetry on finalize",
+        );
+      }
+    }
+  }
+
   return {
     baseline: completed,
     summary,
@@ -1188,6 +1255,73 @@ export async function completeBaseline(
     reviewSchedules,
     clonedBrainProfile,
   };
+}
+
+/**
+ * Read the raw per-item telemetry logs for a tenant (admin / batch job).
+ * Optionally narrow to a single learner.
+ */
+export async function listBaselineTelemetry(input: {
+  tenantId: string;
+  learnerId?: string;
+}): Promise<BaselineItemResponseLog[]> {
+  return getPersistence().assessments.listBaselineTelemetry(input);
+}
+
+/**
+ * Aggregate the tenant's telemetry into per-item psychometrics +
+ * recalibration suggestions (EPIC 2 loop / EPIC 5 admin view).
+ */
+export async function getBaselineRecalibration(input: {
+  tenantId: string;
+  minExposure?: number;
+}): Promise<ItemPsychometrics[]> {
+  const logs = await listBaselineTelemetry({ tenantId: input.tenantId });
+  return aggregateItemPsychometrics(logs, { minExposure: input.minExposure });
+}
+
+/**
+ * Recalibration across a set of tenants (platform-admin view). Aggregates
+ * the combined telemetry so an item-key that appears under multiple
+ * tenants is calibrated from all of its observations.
+ */
+export async function getBaselineRecalibrationForTenants(input: {
+  tenantIds: string[];
+  minExposure?: number;
+}): Promise<ItemPsychometrics[]> {
+  const perTenant = await Promise.all(
+    input.tenantIds.map((tenantId) => listBaselineTelemetry({ tenantId })),
+  );
+  return aggregateItemPsychometrics(perTenant.flat(), { minExposure: input.minExposure });
+}
+
+/**
+ * Confidence-gated calibration overrides for a tenant — item-key → refined
+ * θ for items with enough live data. Consumed by `selectNextAdaptiveQuestion`
+ * so the adaptive baseline serves items at their *observed* difficulty,
+ * not just the seed band. Returns an empty map until items clear the
+ * exposure floor, so early on selection behaves exactly as before.
+ */
+export async function getBaselineCalibrationMap(input: {
+  tenantId: string;
+  minExposure?: number;
+}): Promise<CalibrationMap> {
+  const logs = await listBaselineTelemetry({ tenantId: input.tenantId });
+  return recalibrationMap(logs, { minExposure: input.minExposure });
+}
+
+/**
+ * Persist the assessment-svc streaming session id on a baseline so the
+ * runner can resume the same server-side session across renders.
+ */
+export async function setBaselineAdaptiveSessionId(
+  baselineId: string,
+  tenantId: string,
+  sessionId: string,
+): Promise<void> {
+  const baseline = await getPersistence().assessments.getBaselineById(baselineId, tenantId);
+  if (!baseline || baseline.adaptiveSessionId === sessionId) return;
+  await getPersistence().assessments.upsertBaseline({ ...baseline, adaptiveSessionId: sessionId });
 }
 
 // ===== Mastery + Learning Path =====

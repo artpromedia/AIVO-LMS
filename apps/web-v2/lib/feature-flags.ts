@@ -92,3 +92,46 @@ export function baselineDiscoveryEnabled(): boolean {
   // graceful-degradation tier.
   return baselineLlmEnabled();
 }
+
+/**
+ * Phase 0 — Adaptive baseline. When ON, two things change:
+ *
+ *   1. `createBaseline` widens the BANK-fallback pool
+ *      (`generateAdaptiveBaselinePool`) so the selector has a real
+ *      difficulty spread to move across instead of a fixed 2-level window.
+ *   2. The baseline runner picks each *next* question from the
+ *      `@aivo/adaptive-baseline` engine (`selectNextAdaptiveQuestion`),
+ *      so item difficulty adapts to the learner's running accuracy and the
+ *      run can stop early once the ability estimate is confident.
+ *
+ * When OFF (the production default until the parity soak), the baseline
+ * behaves exactly as before: fixed-form generation + static next-question
+ * order. This makes the flag a true, reversible kill switch.
+ *
+ * Defaults: ON in dev/preview/test so contributors exercise the adaptive
+ * path; OFF in production.
+ */
+export function baselineAdaptiveEnabled(): boolean {
+  const fromServer = process.env.AIVO_FEATURE_BASELINE_ADAPTIVE;
+  if (isTruthy(fromServer)) return true;
+  if (isExplicitlyFalsy(fromServer)) return false;
+  const env = process.env.VERCEL_ENV ?? process.env.NEXT_PUBLIC_VERCEL_ENV;
+  if (env === "preview") return true;
+  if (process.env.NODE_ENV !== "production") return true;
+  return false;
+}
+
+/**
+ * Adaptive baseline *streaming* — drive the assessment-svc session run-loop
+ * (`/api/assessments/adaptive-baseline/:learnerId/{start,respond,finalize}`)
+ * so item selection + θ state live server-side and survive interruptions,
+ * instead of adapting over a locally pre-generated pool (the
+ * `baselineAdaptiveEnabled` path).
+ *
+ * Explicit opt-in (OFF everywhere until the runner cutover + a staging
+ * soak): this gates an external, stateful service call per item, so it
+ * should only flip on once the transport is proven in an environment.
+ */
+export function baselineStreamingEnabled(): boolean {
+  return isTruthy(process.env.AIVO_FEATURE_BASELINE_STREAMING);
+}

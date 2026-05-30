@@ -16,8 +16,8 @@ import { getStore } from "@/lib/db/store";
 import type {
   BaselineAssessment,
   BaselineAttempt,
+  BaselineItemResponseLog,
   BaselineQuestion,
-  ParentAssessment,
 } from "@/lib/db/types";
 import type { AssessmentStore } from "../types";
 
@@ -78,5 +78,15 @@ export const memoryAssessments: AssessmentStore = {
     );
     store.baselineAttempts.push(attempt);
     return attempt;
+  },
+
+  async appendBaselineTelemetry(logs: BaselineItemResponseLog[]) {
+    if (logs.length > 0) getStore().baselineItemResponseLogs.push(...logs);
+  },
+
+  async listBaselineTelemetry({ tenantId, learnerId }) {
+    return getStore().baselineItemResponseLogs.filter(
+      (l) => l.tenantId === tenantId && (learnerId === undefined || l.learnerId === learnerId),
+    );
   },
 };

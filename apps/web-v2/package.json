@@ -17,11 +17,13 @@
   },
   "dependencies": {
     "@aivo/aac-bridge": "workspace:*",
+    "@aivo/adaptive-baseline": "workspace:*",
     "@aivo/api-client": "workspace:*",
     "@aivo/brand": "workspace:*",
     "@aivo/feature-flags": "workspace:*",
     "@aivo/learner-surfaces": "workspace:*",
     "@aivo/nav": "workspace:*",
+    "@aivo/security": "workspace:*",
     "@aivo/ui": "workspace:*",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-avatar": "^1.1.2",

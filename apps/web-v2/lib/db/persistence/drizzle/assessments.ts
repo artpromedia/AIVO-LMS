@@ -52,4 +52,10 @@ export const drizzleAssessments: AssessmentStore = {
   async recordBaselineAttempt() {
     return notImplemented("recordBaselineAttempt");
   },
+  async appendBaselineTelemetry() {
+    return notImplemented("appendBaselineTelemetry");
+  },
+  async listBaselineTelemetry() {
+    return notImplemented("listBaselineTelemetry");
+  },
 };

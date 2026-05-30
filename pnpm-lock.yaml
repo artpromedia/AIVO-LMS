@@ -274,6 +274,9 @@ importers:
       '@aivo/aac-bridge':
         specifier: workspace:*
         version: link:../../packages/aac-bridge
+      '@aivo/adaptive-baseline':
+        specifier: workspace:*
+        version: link:../../packages/adaptive-baseline
       '@aivo/api-client':
         specifier: workspace:*
         version: link:../../packages/api-client
@@ -289,6 +292,9 @@ importers:
       '@aivo/nav':
         specifier: workspace:*
         version: link:../../packages/nav
+      '@aivo/security':
+        specifier: workspace:*
+        version: link:../../packages/security
       '@aivo/ui':
         specifier: workspace:*
         version: link:../../packages/ui

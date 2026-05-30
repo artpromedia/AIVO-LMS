@@ -20,6 +20,8 @@ import {
 import {
   completeBaseline,
   getBaselineById,
+  getBaselineCalibrationMap,
+  setBaselineAdaptiveSessionId,
   getIEPForLearner,
   getLearner,
   getOrCreateParentAssessment,
@@ -35,6 +37,19 @@ import { audit } from "@/lib/bff/audit";
 import { newRequestId } from "@/lib/observability/logger";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
 import { resolveBaselineImage } from "@/lib/learner/baseline-image";
+import { baselineAdaptiveEnabled, baselineStreamingEnabled } from "@/lib/feature-flags";
+import {
+  selectNextAdaptiveQuestion,
+  priorThetaForLearner,
+  learnerHasReadingDifficulty,
+  assessFrustration,
+  STREAK_HIGH,
+} from "@/lib/learner/baseline-adaptive";
+import { streamNextQuestion, makeHttpStreamClient } from "@/lib/learner/baseline-session";
+import { mintAssessmentSvcToken } from "@/lib/learner/assessment-svc-auth";
+import { serverEnv } from "@/lib/env";
+import { LatencyTimer } from "./latency-timer";
+import type { BaselineQuestion } from "@/lib/db/types";
 
 /**
  * Sprint 6: calm baseline runner.
@@ -71,6 +86,8 @@ async function answerAction(formData: FormData) {
   const response = String(formData.get("response") || "");
   const skipped = String(formData.get("skipped") || "") === "1";
   const asParent = String(formData.get("asParent") || "") === "1";
+  const latencyRaw = Number.parseInt(String(formData.get("latencyMs") || ""), 10);
+  const latencyMs = Number.isFinite(latencyRaw) && latencyRaw >= 0 ? latencyRaw : undefined;
 
   if (session.role === "parent") {
     if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
@@ -94,6 +111,7 @@ async function answerAction(formData: FormData) {
     tenantId: session.tenantId,
     response,
     skipped,
+    latencyMs,
   });
   if (attempt) {
     audit(session, "baseline.answer", newRequestId(), {
@@ -189,7 +207,58 @@ export default async function BaselineRunnerPage({
   const attempts = await listBaselineAttempts(baseline.id, session.tenantId);
   const answeredQids = new Set(attempts.map((a) => a.questionId));
   const totalAnswered = attempts.length;
-  const next = questions.find((q) => !answeredQids.has(q.id));
+
+  // Phase 0 — adaptive next-question selection. When the flag is on, the
+  // engine picks the next item from the pool based on the learner's running
+  // accuracy (item N+1 difficulty depends on item N), seeded by a cold-start
+  // prior from comfort signals, and can stop early. When off, fall back to
+  // the original static order (first unanswered question).
+  let next: BaselineQuestion | undefined;
+  if (baselineAdaptiveEnabled()) {
+    const calibration = await getBaselineCalibrationMap({ tenantId: session.tenantId });
+
+    // Prefer the server-authoritative streaming session when enabled and a
+    // service token is configured. Any failure falls through to the local
+    // adaptive path below, so streaming can never dead-end the runner.
+    let streamed = false;
+    // Prefer a short-lived learner-scoped JWT (so assessment-svc checkAccess
+    // passes); fall back to the configured service token.
+    const streamToken =
+      (await mintAssessmentSvcToken({ userId: session.userId, role: session.role })) ??
+      serverEnv.ASSESSMENT_SVC_SERVICE_TOKEN;
+    if (baselineStreamingEnabled() && streamToken) {
+      const outcome = await streamNextQuestion({
+        learnerId: baseline.learnerId,
+        baseline,
+        questions,
+        attempts,
+        learner,
+        calibration,
+        client: makeHttpStreamClient(streamToken, serverEnv.ASSESSMENT_SVC_URL),
+        persistSessionId: (sessionId) =>
+          setBaselineAdaptiveSessionId(baseline.id, session.tenantId, sessionId),
+      });
+      if (outcome.mode === "streaming") {
+        next = outcome.next ?? undefined;
+        streamed = true;
+      }
+    }
+
+    if (!streamed) {
+      const selection = selectNextAdaptiveQuestion({
+        questions,
+        attempts,
+        priorTheta: priorThetaForLearner(learner),
+        readingDifficulty: learnerHasReadingDifficulty(learner),
+        // Live recalibration feedback: serve items at their observed
+        // difficulty once they clear the exposure floor (empty map = seed θ).
+        calibration,
+      });
+      next = selection.next ?? undefined;
+    }
+  } else {
+    next = questions.find((q) => !answeredQids.has(q.id));
+  }
 
   const iep = await getIEPForLearner(baseline.learnerId, session.tenantId);
   const assessment = await getOrCreateParentAssessment(baseline.learnerId, session.tenantId);
@@ -298,8 +367,15 @@ export default async function BaselineRunnerPage({
   /* --------- Break screen (between question blocks) --------- */
   // Show a break every BREAK_EVERY answered questions, but only if the
   // learner hasn't already passed it (sp.resume=1 skips the break).
+  // Kindness tightening (G5): also offer a break the moment a struggle
+  // run reaches the high threshold — fired once (== STREAK_HIGH) so a
+  // hard patch doesn't break on every question.
+  const frustration = assessFrustration(attempts);
+  const frustrationBreak = frustration.struggleStreak === STREAK_HIGH;
   const dueForBreak =
-    totalAnswered > 0 && totalAnswered % BREAK_EVERY === 0 && sp.resume !== "1";
+    totalAnswered > 0 &&
+    sp.resume !== "1" &&
+    (totalAnswered % BREAK_EVERY === 0 || frustrationBreak);
   if (dueForBreak) {
     return (
       <LearnerBaselineShell
@@ -465,6 +541,9 @@ export default async function BaselineRunnerPage({
           <input type="hidden" name="learnerId" value={baseline.learnerId} />
           <input type="hidden" name="questionId" value={next.id} />
           {asParent ? <input type="hidden" name="asParent" value="1" /> : null}
+          {/* Stamps time-on-item into `latencyMs` at submit. Keyed by
+              question id so the timer resets for each new item. */}
+          <LatencyTimer key={next.id} />
 
           {next.choices && next.choices.length > 0 ? (
             <fieldset className="flex flex-col gap-3">

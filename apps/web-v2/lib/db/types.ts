@@ -526,6 +526,12 @@ export type BaselineAssessment = {
    *  for the audit trail. Optional for back-compat with baselines
    *  created before B2 (those rows simply have no metadata). */
   generationMetadata?: BaselineGenerationMetadata;
+  /**
+   * assessment-svc adaptive-baseline session id, set when the streaming
+   * run-loop drives this baseline (feature-flagged). Absent on the local
+   * adaptive / fixed-form paths.
+   */
+  adaptiveSessionId?: string;
 };
 
 /**
@@ -610,6 +616,12 @@ export type BaselineQuestion = {
   hint?: string;
   readAloudText?: string;
   difficulty: BaselineDifficulty;
+  /**
+   * Optional IRT 2-PL discrimination (`a`) for this item. When present it
+   * flows into the adaptive engine's selection + scoring; when omitted the
+   * engine treats it as 1 (pure 1-PL). Populated by calibrated banks.
+   */
+  discrimination?: number;
   accommodationTags: string[];
 };
 
@@ -623,7 +635,83 @@ export type BaselineAttempt = {
   isCorrect: boolean;
   /** Whether the learner skipped (vs gave a real answer). */
   skipped: boolean;
+  /**
+   * Time the learner spent on the item before submitting, in ms, as
+   * measured client-side. Optional/omitted when the client did not report
+   * it (older clients, or the skip path). Feeds processing-speed +
+   * recalibration telemetry.
+   */
+  latencyMs?: number;
   respondedAt: ISODate;
+};
+
+// ===== Adaptive baseline telemetry + recalibration =====
+export type BaselineResponseModality = "visual" | "auditory" | "kinesthetic" | "reading";
+
+/**
+ * Per-item psychometric telemetry captured when an adaptive baseline is
+ * finalized. One row per administered question, carrying the ability
+ * estimate before/after the answer so the recalibration job can refine
+ * item difficulty from live data without re-deriving the θ trajectory.
+ */
+export type BaselineItemResponseLog = {
+  id: ID;
+  tenantId: ID;
+  learnerId: ID;
+  baselineId: ID;
+  questionId: ID;
+  /** Stable calibration key across baselines: `${skillId}|${difficulty}`. */
+  itemKey: string;
+  skillId: ID;
+  subjectId: ID;
+  difficulty: BaselineDifficulty;
+  /** Seed θ (`b`) the item was served at (derived from the difficulty band). */
+  difficultyTheta: number;
+  correct: boolean;
+  skipped: boolean;
+  /** Ability estimate immediately before answering this item. */
+  thetaBefore: number;
+  /** Ability estimate after recording the answer (== thetaBefore if skipped). */
+  thetaAfter: number;
+  /** Response latency in ms, when the client captured it. */
+  latencyMs?: number;
+  modality: BaselineResponseModality;
+  recordedAt: ISODate;
+};
+
+/** Aggregated psychometrics for one item-key across many learners. */
+export type ItemPsychometrics = {
+  itemKey: string;
+  skillId: ID;
+  difficulty: BaselineDifficulty;
+  /** Seed θ the band was calibrated to. */
+  seedTheta: number;
+  /** Total administrations (including skipped). */
+  exposure: number;
+  /** Scored (non-skipped) administrations. */
+  scored: number;
+  correct: number;
+  /** Proportion correct among scored administrations. */
+  pValue: number;
+  /** Proportion of administrations the learner skipped. */
+  skipRate: number;
+  /** Median response latency (ms) over scored administrations that
+   *  reported one, or null when no latency was captured. */
+  medianLatencyMs: number | null;
+  /** Refined θ from live data (== seedTheta when data is insufficient). */
+  estimatedTheta: number;
+  /** estimatedTheta − seedTheta. */
+  thetaDelta: number;
+  /** Refined 2-PL discrimination (a) from live data; 1 when unidentifiable. */
+  estimatedDiscrimination: number;
+  /** Difficulty band the refined θ snaps to. */
+  suggestedDifficulty: BaselineDifficulty;
+  /** True once `scored` clears the minimum-exposure bar. */
+  sufficientData: boolean;
+  /** Misfit / quality reasons; empty when the item looks healthy. */
+  defectReasons: string[];
+  /** True when the item should be pulled for authoring review. */
+  recommendRetire: boolean;
 };
 
 // ===== Learning Path (Sprint 9) =====
