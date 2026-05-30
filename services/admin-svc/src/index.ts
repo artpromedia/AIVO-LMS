@@ -30,6 +30,7 @@ import { startEvidenceCron } from "./lib/soc2-evidence.js";
 import { startWatchdog, configureWatchdogAlerts } from "./lib/watchdog.js";
 import { runJanitorOnce } from "./lib/janitor.js";
 import { runAuditRetentionOnce } from "./lib/audit-retention.js";
+import { runPacingAdvanceOnce } from "./lib/pacing-advance.js";
 
 const logger = createLogger("admin-svc");
 const PORT = parseInt(process.env.ADMIN_SVC_PORT || "3013", 10);
@@ -117,9 +118,19 @@ async function start() {
     log: logger,
     run: () => runAuditRetentionOnce(db),
   });
+  // Phase 2: keep learner_pacing_weeks.status (planned/active/done) in step
+  // with the calendar. Daily, fleet-safe via the shared advisory lock.
+  const pacingAdvanceHandle = startSafeCron({
+    jobName: "curriculum.pacing-advance",
+    ledger,
+    lock,
+    log: logger,
+    run: () => runPacingAdvanceOnce(db),
+  });
   handles["admin.soc2-evidence"] = evidenceHandle;
   handles["admin.run-history-janitor"] = janitorHandle;
   handles["admin.audit-retention"] = retentionHandle;
+  handles["curriculum.pacing-advance"] = pacingAdvanceHandle;
 
   await app.listen({ port: PORT, host: "0.0.0.0" });
   logger.info(`AIVO Admin Service listening on port ${PORT}`);

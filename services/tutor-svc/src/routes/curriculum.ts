@@ -38,7 +38,31 @@ const VALID_SUBJECTS = new Set([
   "other",
 ]);
 
+// Shared secret for trusted inter-service calls (e.g. the web-v2 BFF, which
+// has already enforced session + role + learner-scope before proxying here).
+const INTERNAL_SERVICE_TOKEN = process.env.INTERNAL_SERVICE_TOKEN || "";
+if (process.env.NODE_ENV === "production" && !INTERNAL_SERVICE_TOKEN) {
+  throw new Error(
+    "tutor-svc: INTERNAL_SERVICE_TOKEN must be set in production (shared secret for inter-service calls).",
+  );
+}
+
+/** Synthetic principal for a trusted service-to-service caller. */
+const SERVICE_ROLE = "SERVICE";
+
 async function extractAuth(request: FastifyRequest): Promise<JWTPayload | null> {
+  // Trusted inter-service caller: a valid shared service token stands in for a
+  // user. The calling service is responsible for its own authz (web-v2's BFF
+  // runs requireSession + requireRole + requireLearnerScope before proxying).
+  const serviceToken = request.headers["x-service-token"];
+  if (
+    INTERNAL_SERVICE_TOKEN &&
+    typeof serviceToken === "string" &&
+    serviceToken === INTERNAL_SERVICE_TOKEN
+  ) {
+    return { sub: "service", role: SERVICE_ROLE, tenantId: "" } as JWTPayload;
+  }
+
   const authHeader = request.headers.authorization;
   if (!authHeader?.startsWith("Bearer ")) {
     const cookieHeader = request.headers.cookie || "";
@@ -62,6 +86,17 @@ async function verifyLearnerOwnership(
   learnerId: string,
   authUser: JWTPayload,
 ): Promise<{ ok: boolean; tenantId?: string }> {
+  // Trusted service principal: the calling service already authorized the user
+  // and verified learner scope. Resolve the learner's tenant so inserts/reads
+  // stay tenant-correct, but don't require a parent/teacher link.
+  if (authUser.role === SERVICE_ROLE) {
+    const [l] = await db
+      .select({ tenantId: learners.tenantId })
+      .from(learners)
+      .where(eq(learners.id, learnerId));
+    return { ok: !!l, tenantId: l?.tenantId };
+  }
+
   if (authUser.role === "PLATFORM_ADMIN" || authUser.role === "DISTRICT_ADMIN") {
     const [l] = await db
       .select({ tenantId: learners.tenantId })

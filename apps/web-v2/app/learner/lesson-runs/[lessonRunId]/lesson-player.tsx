@@ -526,6 +526,11 @@ export function LessonPlayer({
   const aacEnabled = accessibility.aacEnabled === true;
   const innerTree = (
     <div className={rootClass}>
+      {plan.lessonMode === "holiday_prep" ? (
+        <span className="mb-3 inline-flex w-fit items-center gap-1 rounded-full bg-iw-accent-soft px-3 py-1 text-xs font-medium text-iw-ink">
+          🌟 Holiday prep · optional enrichment
+        </span>
+      ) : null}
       <PageHeader
         eyebrow={plan.tutorPersona}
         title={plan.title}

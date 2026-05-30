@@ -1,6 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight, Settings, Trophy, Sparkles, Users as UsersIcon, BookOpen } from "lucide-react";
+import {
+  ArrowRight,
+  Settings,
+  Trophy,
+  Sparkles,
+  Users as UsersIcon,
+  BookOpen,
+  CalendarDays,
+} from "lucide-react";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
@@ -100,6 +108,12 @@ export default async function LearnerDetailPage({
             label: "Care team",
             desc: "Parents, teachers, therapists, caregivers.",
             Icon: UsersIcon,
+          },
+          {
+            href: `/parent/learners/${learner.id}/curriculum`,
+            label: "This week at school",
+            desc: "Add the week's lessons so AIVO teaches in sync with class.",
+            Icon: CalendarDays,
           },
         ].map((q) => (
           <Link key={q.href} href={q.href}>

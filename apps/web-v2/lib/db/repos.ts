@@ -5,6 +5,15 @@
  */
 import { getStore, newId, nowIso } from "@/lib/db/store";
 import { getPersistence } from "@/lib/db/persistence";
+import {
+  assertLiveConfigured,
+  isLiveCurriculum,
+  tutorActiveFocusSafe,
+  tutorCreateCurriculum,
+  tutorDeleteCurriculum,
+  tutorListCurriculum,
+} from "@/lib/bff/tutor-curriculum";
+import { brainPacingFocusSafe } from "@/lib/bff/brain-pacing";
 import { ensureSeeded } from "@/lib/db/seed";
 import { computeReadinessFor } from "@/lib/learner/readiness";
 import { listLearnersForMember as listLearnersForTeamMember } from "@/lib/db/team-invites";
@@ -1488,6 +1497,8 @@ import type {
   HomeworkHelpMessage,
   HomeworkHelpSession,
   TeacherAssignment,
+  CurriculumUpload,
+  CurriculumFocus,
 } from "@/lib/db/types";
 import {
   generateLessonPlanWithRetry,
@@ -1619,6 +1630,14 @@ export async function createLessonRun(
     subjectId: input.subjectId,
     skillId: input.skillId,
   });
+  // Phase 1: sync the lesson to what the learner is doing in school this week,
+  // if a parent/teacher uploaded a curriculum for this subject. Best-effort —
+  // generation proceeds normally when there's no active focus.
+  const curriculumFocus = await getActiveCurriculumFocus(
+    input.learnerId,
+    input.tenantId,
+    subject.slug,
+  );
   const accommodationSnapshot = buildAccommodationSnapshotFrom(brain.state);
   const contextSnapshot = buildContextSnapshot(learner, brain.state);
   const tutorPersona =
@@ -1671,6 +1690,7 @@ export async function createLessonRun(
       objectiveTemplate: getActiveLessonObjectiveTemplate(skill.id),
       mastery: masterySnapshot,
       accommodations: accommodationSnapshot,
+      curriculumFocus,
       source: input.source,
     });
 
@@ -2560,6 +2580,207 @@ export async function listActiveAssignmentsForLearner(
     )
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
   return all;
+}
+
+// ===== Phase 1: weekly curriculum sync =====
+//
+// LIVE data path: when INTERNAL_SERVICE_TOKEN is configured (REQUIRED in
+// production), these functions proxy to tutor-svc, the owner of the shared
+// `curriculum_uploads` Postgres table — so web-v2 and tutor-svc share one
+// source of truth. In dev/test without the token they fall back to the
+// in-memory store. `assertLiveConfigured()` makes production fail closed
+// rather than silently using the in-memory store.
+
+/**
+ * List curriculum uploads for a learner (newest first), optionally filtered
+ * by subject slug and/or status. Tenant-scoped (tenant resolved by tutor-svc
+ * in live mode).
+ */
+export async function listCurriculumUploadsForLearner(
+  learnerId: string,
+  tenantId: string,
+  opts?: { subject?: string; status?: CurriculumUpload["status"] },
+): Promise<CurriculumUpload[]> {
+  assertLiveConfigured();
+  if (isLiveCurriculum()) {
+    return tutorListCurriculum(learnerId, opts);
+  }
+  return Array.from(db().curriculumUploads.values())
+    .filter(
+      (u) =>
+        u.learnerId === learnerId &&
+        u.tenantId === tenantId &&
+        (!opts?.subject || u.subject === opts.subject) &&
+        (!opts?.status || u.status === opts.status),
+    )
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+/**
+ * Persist a new curriculum upload. Archives any prior ACTIVE upload for the
+ * same (learner, subject) whose week window does not extend past the new
+ * plan's start, mirroring tutor-svc's archival rule so the active focus is
+ * unambiguous. In live mode tutor-svc performs the archival + insert.
+ */
+export async function createCurriculumUpload(input: {
+  tenantId: string;
+  learnerId: string;
+  uploadedBy: string;
+  uploaderRole: CurriculumUpload["uploaderRole"];
+  subject: string;
+  title: string;
+  sourceType: CurriculumUpload["sourceType"];
+  fileName?: string | null;
+  rawText?: string;
+  parsedFocus: CurriculumFocus;
+  weekStart?: string | null;
+  weekEnd?: string | null;
+  notes?: string | null;
+}): Promise<CurriculumUpload> {
+  assertLiveConfigured();
+  const weekStart = input.weekStart ?? input.parsedFocus.weekStart ?? null;
+  const weekEnd = input.weekEnd ?? input.parsedFocus.weekEnd ?? null;
+
+  if (isLiveCurriculum()) {
+    return tutorCreateCurriculum({
+      learnerId: input.learnerId,
+      subject: input.subject,
+      title: input.title,
+      rawText: (input.rawText ?? "").slice(0, 32000),
+      sourceType: input.sourceType,
+      fileName: input.fileName ?? null,
+      parsedFocus: { ...input.parsedFocus, weekStart, weekEnd },
+      weekStart,
+      weekEnd,
+      notes: input.notes ?? null,
+    });
+  }
+
+  const store = db();
+  const now = nowIso();
+  const newStartMs = weekStart ? new Date(weekStart).getTime() : -Infinity;
+
+  // Archive prior ACTIVE uploads for the same (learner, subject) that have
+  // already ended before this plan starts. A still-current plan and a
+  // future-dated plan can coexist; getActiveCurriculumFocus disambiguates.
+  for (const u of store.curriculumUploads.values()) {
+    if (
+      u.learnerId === input.learnerId &&
+      u.tenantId === input.tenantId &&
+      u.subject === input.subject &&
+      u.status === "active"
+    ) {
+      const endMs = u.weekEnd ? new Date(u.weekEnd).getTime() + 24 * 3600 * 1000 : Infinity;
+      const newIsFuture = weekStart ? newStartMs > Date.now() : false;
+      if (!newIsFuture || endMs <= newStartMs) {
+        store.curriculumUploads.set(u.id, { ...u, status: "archived", updatedAt: now });
+      }
+    }
+  }
+
+  const upload: CurriculumUpload = {
+    id: newId("cu"),
+    tenantId: input.tenantId,
+    learnerId: input.learnerId,
+    uploadedBy: input.uploadedBy,
+    uploaderRole: input.uploaderRole,
+    subject: input.subject,
+    title: input.title,
+    sourceType: input.sourceType,
+    fileName: input.fileName ?? null,
+    rawText: (input.rawText ?? "").slice(0, 32000),
+    parsedFocus: { ...input.parsedFocus, weekStart, weekEnd },
+    weekStart,
+    weekEnd,
+    status: "active",
+    notes: input.notes ?? null,
+    createdAt: now,
+    updatedAt: now,
+  };
+  store.curriculumUploads.set(upload.id, upload);
+  return upload;
+}
+
+/** Delete an upload by id, tenant-scoped. Returns true if removed. */
+export async function deleteCurriculumUpload(
+  uploadId: string,
+  tenantId: string,
+): Promise<boolean> {
+  assertLiveConfigured();
+  if (isLiveCurriculum()) {
+    return tutorDeleteCurriculum(uploadId);
+  }
+  const store = db();
+  const existing = store.curriculumUploads.get(uploadId);
+  if (!existing || existing.tenantId !== tenantId) return false;
+  return store.curriculumUploads.delete(uploadId);
+}
+
+/**
+ * The manual "this week at school" focus (Phase 1): a parent/teacher upload. In
+ * live mode tutor-svc resolves it (most recent ACTIVE upload whose week window
+ * contains today; subject-specific wins over "other"); otherwise the in-memory
+ * dev store is consulted. Best-effort — a tutor-svc outage degrades to null.
+ */
+async function getManualCurriculumFocus(
+  learnerId: string,
+  tenantId: string,
+  subject?: string,
+): Promise<CurriculumFocus | null> {
+  if (isLiveCurriculum()) {
+    return tutorActiveFocusSafe(learnerId, subject);
+  }
+  const now = Date.now();
+  const active = Array.from(db().curriculumUploads.values())
+    .filter(
+      (u) =>
+        u.learnerId === learnerId &&
+        u.tenantId === tenantId &&
+        u.status === "active" &&
+        (!subject || u.subject === subject || u.subject === "other"),
+    )
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+  const inWindow = active.filter((u) => {
+    const startMs = u.weekStart ? new Date(u.weekStart).getTime() : -Infinity;
+    const endMs = u.weekEnd ? new Date(u.weekEnd).getTime() + 24 * 3600 * 1000 : Infinity;
+    return startMs <= now && now <= endMs;
+  });
+
+  // Prefer subject-specific over "other" when both are candidates.
+  const pick = (rows: CurriculumUpload[]): CurriculumUpload | undefined => {
+    if (!subject) return rows[0];
+    return rows.find((u) => u.subject === subject) ?? rows[0];
+  };
+
+  const row = pick(inWindow) ?? pick(active.filter((u) => !u.weekStart && !u.weekEnd));
+  return row ? row.parsedFocus : null;
+}
+
+/**
+ * The curriculum focus the tutor should teach to right now for a (learner,
+ * subject). Priority:
+ *   1. A parent/teacher manual upload (Phase 1) — the explicit "this is what
+ *      we're doing in class this week" signal wins.
+ *   2. The automated calendar pacing plan (Phase 2) — brain-svc's current
+ *      instructional week from the district scope-&-sequence.
+ * Both reads are best-effort: a service outage degrades to no-sync rather than
+ * blocking lesson generation. Returns null when there's nothing to sync to.
+ */
+export async function getActiveCurriculumFocus(
+  learnerId: string,
+  tenantId: string,
+  subject?: string,
+): Promise<CurriculumFocus | null> {
+  const manual = await getManualCurriculumFocus(learnerId, tenantId, subject);
+  if (manual) return manual;
+
+  // Pacing is per-subject; only fall back when a subject is in scope.
+  if (subject) {
+    const paced = await brainPacingFocusSafe(learnerId, subject);
+    if (paced) return paced;
+  }
+  return null;
 }
 
 /**

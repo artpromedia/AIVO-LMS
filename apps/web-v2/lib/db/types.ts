@@ -870,6 +870,10 @@ export type GeneratedLessonPlan = {
   encouragement: string;
   parentSummary: string;
   nextRecommendedStep: string;
+  /** Phase 4: "holiday_prep" badges a break-week lesson as optional
+   *  enrichment in the learner UI; "school_sync" marks a class-aligned
+   *  lesson. Omitted for ordinary lessons. */
+  lessonMode?: "school_sync" | "holiday_prep";
   generatedAt: ISODate;
   /** Generator telemetry. */
   generation: {
@@ -1084,6 +1088,69 @@ export type TeacherAssignment = {
   learnerIds: ID[];
   status: "active" | "archived";
   dueAt: ISODate | null;
+  createdAt: ISODate;
+  updatedAt: ISODate;
+};
+
+// ===== Phase 1: weekly curriculum sync =====
+/**
+ * Structured, plain-language description of what a learner is doing in school
+ * for a given week. Extracted (by AI or manual entry) from a syllabus / weekly
+ * outline a parent or teacher uploads. Frozen onto a LessonRun at creation so
+ * the tutor teaches what the learner is seeing in class that week.
+ */
+export type CurriculumFocus = {
+  title: string;
+  /** Subject slug this focus applies to (matches Subject.slug), or "other". */
+  subject: string;
+  /** ISO date (YYYY-MM-DD) bounds of the school week, when known. */
+  weekStart: string | null;
+  weekEnd: string | null;
+  topics: string[];
+  /** Vocabulary the learner will encounter this week. */
+  keywords: string[];
+  /** Standard codes (e.g. CCSS.MATH.3.OA.A.1), when present. */
+  standards: string[];
+  /** Free-text skill descriptions referenced by the source material. */
+  skills: string[];
+  /** 1–3 sentence plain-English summary of the week. */
+  summary: string;
+  /** 0–1 extraction confidence (1 when manually entered/edited). */
+  confidence: number;
+  /**
+   * How the tutor should frame the lesson:
+   *  - "school_sync" (default): teach the same topic the learner is covering in
+   *    class this week.
+   *  - "holiday_prep": school is on a break — review recent units and preview
+   *    the next one to stay ready for resumption (Phase 4).
+   */
+  mode?: "school_sync" | "holiday_prep";
+};
+
+/**
+ * A curriculum document a parent or teacher uploaded for a learner, used to
+ * keep the AI tutor in sync with the learner's school week. Mirrors the
+ * `curriculum_uploads` table served by tutor-svc, persisted here in web-v2's
+ * own store so the structured lesson player can consume it directly.
+ */
+export type CurriculumUpload = {
+  id: ID;
+  tenantId: ID;
+  learnerId: ID;
+  /** User id of the parent/teacher who uploaded it. */
+  uploadedBy: ID;
+  uploaderRole: "parent" | "teacher" | "caregiver" | "school_admin" | "district_admin";
+  subject: string;
+  title: string;
+  sourceType: "text" | "file";
+  fileName: string | null;
+  /** Raw pasted/extracted text (clamped). */
+  rawText: string;
+  parsedFocus: CurriculumFocus;
+  weekStart: ISODate | null;
+  weekEnd: ISODate | null;
+  status: "active" | "archived";
+  notes: string | null;
   createdAt: ISODate;
   updatedAt: ISODate;
 };

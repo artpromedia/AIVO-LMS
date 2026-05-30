@@ -9,6 +9,7 @@
  * accessibility supports, story hook).
  */
 import type {
+  CurriculumFocus,
   LearnerBrainProfileState,
   LessonAccommodationSnapshot,
   LessonMasterySnapshot,
@@ -212,11 +213,35 @@ export type LessonPlanInputs = {
   skill: Skill;
   mastery: LessonMasterySnapshot;
   accommodations: LessonAccommodationSnapshot;
+  /** Phase 1: active school-week curriculum to teach in sync with class. */
+  curriculumFocus?: CurriculumFocus | null;
   source: string;
 };
 
+/**
+ * Phase 1 helper: a short, learner-friendly phrase describing this week's
+ * school topic, derived from an uploaded curriculum focus. Returns null when
+ * there's nothing meaningful to anchor to.
+ */
+function schoolTopicPhrase(focus: CurriculumFocus | null | undefined): string | null {
+  if (!focus) return null;
+  const topic = (focus.topics ?? []).find((t) => t && t.trim().length > 0)?.trim();
+  if (topic) return topic;
+  if (focus.title && focus.title.trim().length > 0) return focus.title.trim();
+  if (focus.summary && focus.summary.trim().length > 0) {
+    return focus.summary.trim().split(/[.!?]/)[0];
+  }
+  return null;
+}
+
 export function generateDeterministicLessonPlan(input: LessonPlanInputs): GeneratedLessonPlanInput {
-  const { learnerName, brainState, subject, skill, mastery, accommodations } = input;
+  const { learnerName, brainState, subject, skill, mastery, accommodations, curriculumFocus } =
+    input;
+  const schoolTopic = schoolTopicPhrase(curriculumFocus);
+  const weekVocab = (curriculumFocus?.keywords ?? []).filter((k) => k && k.trim()).slice(0, 5);
+  // Phase 4: a break-week focus is framed as "get ready for resumption" rather
+  // than "what you're doing in class this week" (school is closed).
+  const isHolidayPrep = curriculumFocus?.mode === "holiday_prep";
   const tutorPersona = TUTOR_PERSONA_BY_SUBJECT[subject.slug] ?? "Nimbus the Calm Explorer";
   const greeting =
     TUTOR_GREETING_BY_STYLE[brainState.tutorPersonaRecommendation.style](learnerName);
@@ -284,26 +309,53 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
 
   const microLesson =
     `${scaffoldLine} The big idea today: ${skill.name}. ` +
+    (isHolidayPrep && schoolTopic
+      ? `School is on a break, so we'll review what you learned and get a head start on what's coming up (${schoolTopic}). `
+      : schoolTopic
+        ? `This is the same thing you're working on in class this week (${schoolTopic}), so we'll practice it together. `
+        : "") +
+    (weekVocab.length > 0 ? `Words to listen for: ${weekVocab.join(", ")}. ` : "") +
     (tier.difficulty === "starter"
       ? `We'll go slow, with pictures and small steps.`
       : tier.difficulty === "core"
         ? `We'll try a few examples and check what feels solid.`
         : `We'll try a slightly harder version to stretch your thinking.`);
 
+  // When we know the school topic, lead with an intro that connects AIVO's
+  // lesson to what the learner is seeing in class, and theme the worked
+  // example to that topic.
+  const exampleExplanationBase =
+    subject.slug === "math"
+      ? `Watch how I solve it step by step — I'll narrate each move.`
+      : `Watch how I read it and notice one important detail.`;
+
   return {
-    title: `${skill.name} with ${tutorPersona.split(" ")[0]}`,
-    objective,
+    title: isHolidayPrep && schoolTopic
+      ? `Holiday prep: getting ready for ${schoolTopic}`
+      : schoolTopic
+        ? `This week at school: ${schoolTopic}`
+        : `${skill.name} with ${tutorPersona.split(" ")[0]}`,
+    objective: isHolidayPrep && schoolTopic
+      ? `Stay sharp over the break and get ready for ${schoolTopic} (${skill.name}).`
+      : schoolTopic
+        ? `Stay in sync with class by practicing ${schoolTopic} (${skill.name}).`
+        : objective,
     estimatedMinutes: tier.estimatedMinutes,
     tutorPersona,
     tutorGreeting: greeting,
-    storyHook,
+    storyHook: isHolidayPrep && schoolTopic
+      ? `School's on a break, ${learnerName}. Let's keep your skills warm and peek at what's coming up: ${schoolTopic}.`
+      : schoolTopic
+        ? `Your class is exploring ${schoolTopic} this week. Let's look at it together, ${learnerName}, one small step at a time.`
+        : storyHook,
     microLesson,
     example: {
-      prompt: `Here's a small example of ${skill.name}.`,
-      explanation:
-        subject.slug === "math"
-          ? `Watch how I solve it step by step — I'll narrate each move.`
-          : `Watch how I read it and notice one important detail.`,
+      prompt: isHolidayPrep && schoolTopic
+        ? `Here's a warm-up example for ${schoolTopic}.`
+        : schoolTopic
+          ? `Here's a worked example of ${schoolTopic}, just like in class.`
+          : `Here's a small example of ${skill.name}.`,
+      explanation: exampleExplanationBase,
     },
     guidedPractice,
     checksForUnderstanding,
@@ -316,6 +368,11 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
           : `Strong work, ${learnerName}. You're stretching beautifully.`,
     parentSummary:
       `${learnerName} practiced ${skill.name} in ${subject.name} at a ${tier.difficulty} level. ` +
+      (isHolidayPrep && schoolTopic
+        ? `Holiday-prep lesson: reviewing recent work and previewing ${schoolTopic} for school resumption. `
+        : schoolTopic
+          ? `This lesson was synced to this week's class topic (${schoolTopic}). `
+          : "") +
       `Plan emphasizes ${brainState.preferredModalities[0] ?? "visual"} cues` +
       `${accommodations.tags.length > 0 ? `, with supports for ${accommodations.tags.slice(0, 3).join(", ")}.` : "."}`,
     nextRecommendedStep:
@@ -324,5 +381,8 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
         : mastery.score < 0.7
           ? `Continue with the next skill in ${subject.name}.`
           : `Try a small challenge in ${subject.name}.`,
+    // Phase 4: tag break-week lessons so the learner UI can badge them as
+    // optional holiday-prep enrichment; class-aligned lessons as school_sync.
+    lessonMode: isHolidayPrep ? "holiday_prep" : schoolTopic ? "school_sync" : undefined,
   };
 }

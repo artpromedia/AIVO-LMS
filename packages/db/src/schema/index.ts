@@ -27,3 +27,4 @@ export * from "./data-governance.js";
 export * from "./enterprise-audit.js";
 export * from "./oidc_signing_keys.js";
 export * from "./lti_runtime.js";
+export * from "./pacing.js";

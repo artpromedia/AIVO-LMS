@@ -12,6 +12,7 @@
  * import. No call site needs to change.
  */
 import type {
+  CurriculumFocus,
   LearnerBrainProfileState,
   LessonAccommodationSnapshot,
   LessonMasterySnapshot,
@@ -43,6 +44,13 @@ export type TutorGenerationInputs = {
   objectiveTemplate?: LessonObjectiveTemplate | null;
   mastery: LessonMasterySnapshot;
   accommodations: LessonAccommodationSnapshot;
+  /**
+   * Phase 1: the learner's active school-week curriculum for this subject, when
+   * a parent/teacher uploaded one. When present the generator anchors the
+   * lesson (title, intro, worked example, parent summary) to this week's school
+   * topic so AIVO teaches in sync with class. Null when there's nothing to sync.
+   */
+  curriculumFocus?: CurriculumFocus | null;
   source: string;
 };
 
