@@ -433,6 +433,78 @@ export function generateBaselineQuestions(input: GenerateBaselineInput): Baselin
   return questions;
 }
 
+/**
+ * Phase 0 — adaptive candidate pool. Unlike {@link generateBaselineQuestions}
+ * (which narrows to a fixed 2-level window up front), this returns a pool
+ * that spans the difficulty range per subject — foundational → stretch — so
+ * the adaptive engine has somewhere to move as it homes in on the learner's
+ * level. The runner then selects the *next* item from this pool via
+ * `selectNextAdaptiveQuestion`; it does not show every item.
+ *
+ * Drop-in for `generateBaselineQuestions` (same input shape) so
+ * `createBaseline` can swap generators behind `baselineAdaptiveEnabled()`.
+ */
+export function generateAdaptiveBaselinePool(
+  input: GenerateBaselineInput,
+  maxPerSubject = 4,
+): BaselineQuestion[] {
+  const { baselineId, brainProfile, subjects, skills } = input;
+  const accTags = accommodationTagsFor(brainProfile);
+
+  const skillsBySubject = new Map<string, Skill[]>();
+  for (const s of skills) {
+    const list = skillsBySubject.get(s.subjectId) ?? [];
+    list.push(s);
+    skillsBySubject.set(s.subjectId, list);
+  }
+
+  const questions: BaselineQuestion[] = [];
+  let order = 0;
+  for (const subject of subjects) {
+    const subjSkills = skillsBySubject.get(subject.id) ?? [];
+    if (subjSkills.length === 0) continue;
+    const subjSkillsBySlug = new Map(subjSkills.map((s) => [s.slug, s]));
+    const candidates = BANK.filter((b) => subjSkillsBySlug.has(b.skillSlug));
+    if (candidates.length === 0) continue;
+
+    // Spread across difficulty bands first (one per band, easy → hard),
+    // then top up with any remaining items until we hit the cap.
+    const picked: BankItem[] = [];
+    for (const diff of DIFFICULTY_ORDER) {
+      if (picked.length >= maxPerSubject) break;
+      const match = candidates.find((c) => c.difficulty === diff && !picked.includes(c));
+      if (match) picked.push(match);
+    }
+    for (const c of candidates) {
+      if (picked.length >= maxPerSubject) break;
+      if (!picked.includes(c)) picked.push(c);
+    }
+
+    for (const item of picked) {
+      const skill = subjSkillsBySlug.get(item.skillSlug);
+      if (!skill) continue;
+      order += 1;
+      questions.push({
+        id: newId("bq"),
+        baselineId,
+        subjectId: subject.id,
+        skillId: skill.id,
+        order,
+        prompt: item.prompt,
+        choices: item.choices,
+        choiceEmojis: item.choiceEmojis,
+        sceneEmoji: item.sceneEmoji,
+        expectedAnswer: item.expectedAnswer,
+        hint: item.hint,
+        readAloudText: item.readAloudText,
+        difficulty: item.difficulty,
+        accommodationTags: accTags,
+      });
+    }
+  }
+  return questions;
+}
+
 /** Default subjects covered by an onboarding baseline. Six Discovery
  *  Adventure domains, mirroring the legacy chapter set. */
 export function defaultBaselineSubjectSlugs(): string[] {

@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@aivo/aac-bridge": "workspace:*",
+    "@aivo/adaptive-baseline": "workspace:*",
     "@aivo/api-client": "workspace:*",
     "@aivo/brand": "workspace:*",
     "@aivo/feature-flags": "workspace:*",

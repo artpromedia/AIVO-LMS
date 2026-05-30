@@ -35,6 +35,13 @@ import { audit } from "@/lib/bff/audit";
 import { newRequestId } from "@/lib/observability/logger";
 import { tutorForSubjectSlug } from "@/lib/learner/baseline-tutors";
 import { resolveBaselineImage } from "@/lib/learner/baseline-image";
+import { baselineAdaptiveEnabled } from "@/lib/feature-flags";
+import {
+  selectNextAdaptiveQuestion,
+  priorThetaForLearner,
+  learnerHasReadingDifficulty,
+} from "@/lib/learner/baseline-adaptive";
+import type { BaselineQuestion } from "@/lib/db/types";
 
 /**
  * Sprint 6: calm baseline runner.
@@ -189,7 +196,24 @@ export default async function BaselineRunnerPage({
   const attempts = await listBaselineAttempts(baseline.id, session.tenantId);
   const answeredQids = new Set(attempts.map((a) => a.questionId));
   const totalAnswered = attempts.length;
-  const next = questions.find((q) => !answeredQids.has(q.id));
+
+  // Phase 0 — adaptive next-question selection. When the flag is on, the
+  // engine picks the next item from the pool based on the learner's running
+  // accuracy (item N+1 difficulty depends on item N), seeded by a cold-start
+  // prior from comfort signals, and can stop early. When off, fall back to
+  // the original static order (first unanswered question).
+  let next: BaselineQuestion | undefined;
+  if (baselineAdaptiveEnabled()) {
+    const selection = selectNextAdaptiveQuestion({
+      questions,
+      attempts,
+      priorTheta: priorThetaForLearner(learner),
+      readingDifficulty: learnerHasReadingDifficulty(learner),
+    });
+    next = selection.next ?? undefined;
+  } else {
+    next = questions.find((q) => !answeredQids.has(q.id));
+  }
 
   const iep = await getIEPForLearner(baseline.learnerId, session.tenantId);
   const assessment = await getOrCreateParentAssessment(baseline.learnerId, session.tenantId);

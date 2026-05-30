@@ -50,7 +50,11 @@ import type {
   AssessmentBlueprint,
   CurriculumImportJob,
 } from "@/lib/db/types";
-import { defaultBaselineSubjectSlugs, generateBaselineQuestions } from "@/lib/learner/baseline";
+import {
+  defaultBaselineSubjectSlugs,
+  generateAdaptiveBaselinePool,
+  generateBaselineQuestions,
+} from "@/lib/learner/baseline";
 import {
   generateBaselineQuestionsViaLLM,
   mapLlmQuestionsToBaselineQuestions,
@@ -60,7 +64,11 @@ import {
   generateDiscoveryChapter,
   mapDiscoveryActivitiesToBaselineQuestions,
 } from "@/lib/learner/baseline-discovery";
-import { baselineDiscoveryEnabled, baselineLlmEnabled } from "@/lib/feature-flags";
+import {
+  baselineAdaptiveEnabled,
+  baselineDiscoveryEnabled,
+  baselineLlmEnabled,
+} from "@/lib/feature-flags";
 import { logger } from "@/lib/observability/logger";
 import {
   buildBaselineSummary,
@@ -684,6 +692,14 @@ export async function createBaseline(input: {
   const discoveryFlag = baselineDiscoveryEnabled();
   const canCallDiscovery = discoveryFlag && canCallLlm;
 
+  // Phase 0 — when the adaptive baseline is enabled, the BANK fallback uses
+  // a wider, difficulty-spread pool so the runner's adaptive selector has
+  // room to move (see `generateAdaptiveBaselinePool`). Off → identical
+  // fixed-form behaviour as before.
+  const bankGenerator = baselineAdaptiveEnabled()
+    ? generateAdaptiveBaselinePool
+    : generateBaselineQuestions;
+
   // Phase B — Discovery Adventure: attempt per-chapter generation
   // first so the parent gets the emoji-rich picture-prompt experience
   // ported from the legacy aivo-ai-learning client. Each chapter is
@@ -795,7 +811,7 @@ export async function createBaseline(input: {
         // LLM call succeeded but no questions mapped to the requested
         // subjects — fall back so the parent never sees an empty
         // baseline.
-        questions = generateBaselineQuestions({
+        questions = bankGenerator({
           baselineId: baseline.id,
           learner,
           brainProfile,
@@ -819,7 +835,7 @@ export async function createBaseline(input: {
         );
       }
     } else {
-      questions = generateBaselineQuestions({
+      questions = bankGenerator({
         baselineId: baseline.id,
         learner,
         brainProfile,
@@ -844,7 +860,7 @@ export async function createBaseline(input: {
       );
     }
   } else if (!discoverySucceeded) {
-    questions = generateBaselineQuestions({
+    questions = bankGenerator({
       baselineId: baseline.id,
       learner,
       brainProfile,
