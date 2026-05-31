@@ -589,6 +589,16 @@ jobs:
           AIVO_TEST_DATABASE_URL: postgresql://test_user:test_password@localhost:5432/aivo_test_db
         run: pnpm --filter @aivo/web-v2 exec vitest run lib/db/persistence
 
+      - name: Apply migrations to the service database
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/aivo_test_db
+        run: pnpm --filter @aivo/db run db:migrate
+
+      - name: Verify persistence schema (web_* tables present)
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/aivo_test_db
+        run: node scripts/ci/verify-postgres-rows.mjs
+
   ci-summary:
     name: CI Summary
     runs-on: ubuntu-latest

@@ -74,10 +74,17 @@ tables).
   archiving** to enable PITR. Target **RPO ≤ 5 min, RTO ≤ 1 h**.
 - Retention: 30 days of PITR window; 90 days of weekly snapshots.
 - **Restore drill** quarterly: restore to a scratch instance, run
-  `pnpm --filter @aivo/db run db:migrate` (no-op if current), and the
-  persistence contracts against it (`AIVO_TEST_DATABASE_URL=…`).
-- The `backup-verify.yml` workflow exercises restore integrity; extend
-  its row-count checks to the `web_*` tables when this DB goes live.
+  `pnpm --filter @aivo/db run db:migrate` (no-op if current), then the
+  persistence row check:
+  ```bash
+  AIVO_VERIFY_SEEDED=1 DATABASE_URL=… node scripts/ci/verify-postgres-rows.mjs
+  ```
+  It asserts every `web_*` / lesson / brain table exists and (with
+  `AIVO_VERIFY_SEEDED=1`) that the reference tables came back non-empty.
+- CI runs the same script (schema mode) in the `persistence-contract`
+  job after `db:migrate`, so migration drift on these tables fails the
+  build. Add `verify-postgres-rows.mjs` (seeded mode) to
+  `backup-verify.yml`'s post-restore checks when this DB goes live.
 
 ## Migrations & schema drift
 
