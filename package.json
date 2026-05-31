@@ -43,6 +43,8 @@
     "onboarding:audit": "node scripts/onboarding-audit.mjs",
     "lessonrun:audit": "node scripts/lessonrun-audit.mjs",
     "route:audit": "node scripts/route-audit.mjs",
+    "shell:audit": "node scripts/single-shell-audit.mjs",
+    "rbac:audit": "node scripts/rbac-matrix-audit.mjs",
     "mobile:audit": "node scripts/mobile-unified-audit.mjs",
     "marketing:audit": "node scripts/marketing-audit.mjs",
     "billing:audit": "node scripts/billing-audit.mjs",

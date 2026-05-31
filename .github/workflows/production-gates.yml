@@ -66,6 +66,12 @@ jobs:
       - name: route:audit
         run: pnpm route:audit
 
+      - name: shell:audit
+        run: pnpm shell:audit
+
+      - name: rbac:audit
+        run: pnpm rbac:audit
+
       - name: mobile:audit
         run: pnpm mobile:audit
 
