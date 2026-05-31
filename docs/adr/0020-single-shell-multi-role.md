@@ -225,3 +225,97 @@ The real-mode `identity-svc` refresh-token flow (issuing a JWT whose
 slice — tracked separately; the BFF contract above is the gate that
 unblocks the client refactor in Phase 1's "Client" bullet.
 
+
+## Phase 3 — Cross-role data & navigation
+
+A user with overlapping roles (parent + caregiver, teacher + therapist)
+must see a coherent picture of each learner, and every entry path
+(deep link, push notification, in-app link) must route them to the
+right slice with the right active role. Phase 3 lands four pieces:
+
+1. **Learner-centric query model** —
+   `packages/api-client/src/react/learner-scoped.ts` exports
+   `learnerScopedQueryKey(learnerId, viewerRole, resource, …)` and
+   `useLearnerScopedQuery({ learnerId, viewerRole, resource, fetcher })`.
+   Every learner-scoped React Query key is namespaced by the tuple
+   `(learnerId, viewerRole)` so role switches never serve a stale
+   parent slice to a teacher viewer. `LearnerProfileProvider` (in
+   `packages/ui/src/learner-dashboard/LearnerProfileContext.tsx`)
+   threads the same pair through to every panel so the dashboard
+   never duplicates per-role copies.
+
+2. **Deep-link resolver** —
+   `packages/nav/src/deep-links.ts` exports a pure
+   `resolveDeepLink(url, session, surface)` that parses the path,
+   classifies it onto a `NavArea`, and produces one of
+   `allow | switch-role | locked | forbidden | unmatched`. Both
+   shells consume the same resolver so a notification opened on web
+   and the same URL pasted into the mobile share sheet end up in the
+   same place. `buildRoleSwitchHref()` produces the canonical
+   `/role-switch?to=&next=&reason=` URL so the two shells stay in
+   lockstep on the query-string contract.
+
+3. **Role-aware notifications** —
+   `packages/nav/src/notifications-contract.ts` defines
+   `RoleAwareNotificationPayload` with the required `targetRole` and
+   optional `targetLearnerId`. The web `Notification` row
+   (`apps/web-v2/lib/db/types.ts`) and the SSE
+   `NotificationItem` (`apps/web-v2/lib/notifications/useNotificationStream.ts`)
+   gained an optional `targetRole` so older notifications without a
+   stamp continue to land on the active role. Push handlers route
+   `href` through `resolveDeepLink` so `targetRole !== activeRole`
+   auto-switches the role (with step-up if required) before
+   navigating.
+
+4. **Matrix coverage** — the existing matrix-coverage gate
+   (`packages/nav/src/__tests__/matrix-coverage.test.ts`) now also
+   asserts every `NavArea` referenced by a deep-link rule has a
+   defined permission for every role. New deep-link rules that point
+   at a partially-classified area fail the gate at CI time.
+
+## Phase 4 — Build, release & store presence
+
+The single-shell contract is honoured at release time: one Next.js
+deployable (`apps/web-v2`), one Expo app (`apps/mobile`) producing
+one iOS bundle id and one Android package id, one App Store listing
+("AIVO — Learn, Teach, Support"), one Play Store listing, no
+per-role build profiles. Cross-cutting plumbing makes the multi-role
+shape visible in CI, in the app store, and in analytics:
+
+- **Mobile listing** — `apps/mobile/app.json` carries the multi-role
+  name, the `applinks:` associated domains, and Android intent
+  filters that cover every role-segmented path under one entry. EAS
+  build profiles are exactly `development`, `staging`, and
+  `production`; no per-role profile is permitted.
+  `apps/mobile/scripts/check-single-listing.mjs` fails CI if a
+  sibling app config or a per-role bundle id appears.
+- **Universal & app links** —
+  `apps/web-v2/public/.well-known/apple-app-site-association` and
+  `assetlinks.json` list the production and staging bundle ids and
+  cover every role-segmented and cross-cutting route. A smoke test
+  in `scripts/well-known-links-smoke.mjs` validates JSON + path
+  coverage as part of the release workflow.
+- **Store copy & screenshots** — `apps/mobile/store-assets/`
+  enumerates Learner / Parent / Teacher / Therapist / Caregiver in
+  the description, the keywords, the "what's new" notes, and the
+  per-resolution screenshot directories. The release manager swaps
+  copy from this folder, not from ad-hoc docs.
+- **Per-role rollout flag** — `@aivo/feature-flags` exports
+  `isRoleEnabled(role, env)` and `resolveRoleRolloutFlags(env)`
+  backed by env vars (`AIVO_ROLE_<ROLE>_ENABLED`). `@aivo/nav`'s
+  `getRolesForSurface` filters disabled roles, and
+  `apps/web-v2/lib/auth/role-session.ts buildRoleSession` never
+  advertises a role the env hasn't enabled. A "dark-launched"
+  therapist role is invisible in the switcher and resolves as
+  `forbidden` in `canAccessArea` until enabled — no app
+  re-submission required.
+- **Observability** — `@aivo/observability` exports
+  `withRoleContext(payload, session)` and
+  `roleContextBase(session)` so every emitted log, metric label,
+  and trace span carries `activeRole`, `availableRoles`, and
+  `tenantId`. Missing-session paths stamp a sentinel
+  `activeRole: "anonymous"` rather than dropping the field.
+- **Release checklist** — `docs/release/multi-role-checklist.md`
+  pins the gates the release manager runs before each store
+  submission: one bundle id, store copy lists five roles, universal
+  links cover all role paths, role flags set per env.

@@ -10,3 +10,14 @@ export {
   type FlagMeta,
   type FlagRiskBand,
 } from "./enterprise-flags.js";
+export {
+  filterEnabledRoles,
+  isRoleEnabled,
+  resolveRoleRolloutFlags,
+  ROLE_ROLLOUT_DEFAULTS,
+  ROLE_ROLLOUT_ENV_VARS,
+  ROLE_ROLLOUT_ROLES,
+  type RoleRolloutEnv,
+  type RoleRolloutFlags,
+  type RoleRolloutRoleId,
+} from "./role-rollout.js";

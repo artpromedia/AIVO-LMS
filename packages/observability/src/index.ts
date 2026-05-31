@@ -6,6 +6,7 @@ export * from "./learning-traces.js";
 export * from "./llm-traces.js";
 export * from "./subject-brain-metrics.js";
 export * from "./health-check.js";
+export * from "./role-context.js";
 
 // ── Sensitive-key sanitisation ─────────────────────────────────────────────
 
