@@ -10,9 +10,10 @@
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { beforeAll, beforeEach, describe, it, expect } from "vitest";
+import { beforeAll, afterAll, beforeEach, describe, it, expect } from "vitest";
 import { sql } from "drizzle-orm";
 import { createDb, type Database } from "@aivo/db";
+import { __setDbClient, __resetDbClient, getDb, withTenantContext } from "../drizzle/client";
 
 const TEST_URL = process.env.AIVO_TEST_DATABASE_URL;
 const here = dirname(fileURLToPath(import.meta.url));
@@ -39,7 +40,12 @@ async function applyMigrations(): Promise<void> {
 beforeAll(async () => {
   if (!TEST_URL) return;
   db = createDb(TEST_URL);
+  __setDbClient(db);
   await applyMigrations();
+});
+
+afterAll(() => {
+  __resetDbClient();
 });
 
 if (TEST_URL) {
