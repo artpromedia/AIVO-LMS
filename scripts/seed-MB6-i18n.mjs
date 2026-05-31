@@ -1,0 +1,1176 @@
+import { readFileSync, writeFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const repoRoot = resolve(__dirname, "..");
+const dir = join(repoRoot, "apps/mobile/i18n");
+
+const DATA = {
+  ar: {
+    parentMilestones: {
+      title: "الإنجازات والشارات",
+      currentStreak: "السلسلة الحالية",
+      longestStreak: "أطول سلسلة",
+      badgeCollection: "مجموعة الشارات",
+      timeline: "الجدول الزمني للإنجازات",
+      empty: "ستظهر الإنجازات هنا مع تقدم طفلك!",
+      open: "الإنجازات",
+      badges: {
+        first_session: {
+          name: "الجلسة الأولى",
+          description: "أكمل أول جلسة تعليمية"
+        },
+        on_fire: {
+          name: "متقد",
+          description: "سلسلة 7 أيام"
+        },
+        brain_activated: {
+          name: "الدماغ نشط",
+          description: "تمت الموافقة على ملف الدماغ"
+        },
+        bookworm: {
+          name: "قارئ نهم",
+          description: "أُكملت 10 جلسات"
+        },
+        mastery_champion: {
+          name: "بطل الإتقان",
+          description: "أي مادة أعلى من 75٪"
+        },
+        goal_getter: {
+          name: "محقق الأهداف",
+          description: "تم تحقيق هدف IEP"
+        },
+        team_player: {
+          name: "لاعب الفريق",
+          description: "فريق تعليمي كامل"
+        },
+        multi_subject: {
+          name: "متعدد المواد",
+          description: "نشط في 3 مواد أو أكثر"
+        },
+        speed_learner: {
+          name: "متعلم سريع",
+          description: "أفضل 25٪ في وقت الجلسة"
+        },
+        explorer: {
+          name: "مستكشف",
+          description: "تم استكشاف جميع المجالات"
+        }
+      }
+    },
+    parentTeam: {
+      title: "فريق الرعاية",
+      subtitle: "إدارة من لديه حق الوصول إلى ملف {{name}}",
+      addMember: "إضافة عضو في الفريق",
+      membersHeader: "أعضاء الفريق",
+      teacher: "معلم",
+      caregiver: "مقدم الرعاية",
+      therapist: "معالج",
+      teachers: "المعلمون",
+      caregivers: "مقدمو الرعاية",
+      therapists: "المعالجون",
+      noTeamMembers: "لا يوجد أعضاء في الفريق",
+      noTeamMessage: "ادعُ المعلمين ومقدمي الرعاية والمعالجين للتعاون.",
+      seatsUsed: "مقاعد مستخدمة",
+      emailRequired: "يرجى إدخال البريد الإلكتروني",
+      emailPlaceholder: "أدخل عنوان البريد الإلكتروني",
+      inviteSent: "تم إرسال الدعوة!",
+      inviteFailed: "فشل إرسال الدعوة",
+      sendInvite: "إرسال الدعوة",
+      specialty: "التخصص",
+      specialtyPlaceholder: "مثل: أمراض النطق واللغة",
+      credentials: "المؤهلات",
+      credentialsPlaceholder: "مثل: CCC-SLP, M.Ed",
+      relationship: "العلاقة",
+      relationshipPlaceholder: "مثل: والد مشارك، جد"
+    },
+    therapistClient: {
+      overview: "ملف {{name}}",
+      brainProfile: "ملف الدماغ وبيانات العلاج",
+      goalsTitle: "أهداف العلاج",
+      goalsSubtitle: "تتبع وإدارة أهداف العلاج",
+      noGoalsTitle: "لا توجد أهداف محددة",
+      noGoalsMessage: "أضف أهداف علاج لهذا العميل.",
+      addGoal: "إضافة هدف",
+      notesTitle: "ملاحظات الجلسة",
+      notesSubtitle: "تسجيل ملاحظات جلسة العلاج",
+      noNotesTitle: "لا توجد ملاحظات بعد",
+      noNotesMessage: "أضف ملاحظات الجلسة بعد كل جلسة علاج.",
+      addNote: "إضافة ملاحظة",
+      reportsTitle: "تقارير التقدم",
+      reportsSubtitle: "إنشاء وعرض تقارير تقدم العلاج",
+      noReportsTitle: "لا توجد تقارير",
+      noReportsMessage: "أنشئ تقرير تقدم عند الاستعداد.",
+      generateReport: "إنشاء تقرير"
+    },
+    parentInbox: {
+      title: "صندوق الوارد",
+      tabs: {
+        all: "الكل",
+        action: "يتطلب إجراءً",
+        celebrations: "الاحتفالات",
+        archived: "الأرشيف"
+      },
+      empty: {
+        all: "صندوق الوارد فارغ. سنعلمك عند الحاجة إلى اتخاذ إجراء.",
+        action: "لا توجد عناصر تتطلب إجراءً.",
+        celebrations: "لا توجد احتفالات.",
+        archived: "لا توجد عناصر مؤرشفة."
+      },
+      markRead: "تحديد كمقروء",
+      dismiss: "رفض",
+      view: "عرض",
+      openOnWeb: "افتح هذا الإشعار على تطبيق الويب لاتخاذ إجراء."
+    },
+    teacherStudent: {
+      brain: "دماغ {{name}}",
+      readOnlyProfile: "ملف دماغ للقراءة فقط",
+      level: "المستوى: {{level}}",
+      enrolled: "ملتحق: {{grade}}",
+      functioning: "الأداء: {{grade}}",
+      submitInsight: "إرسال ملاحظة",
+      uploadIEP: "رفع IEP"
+    },
+    teacherInsight: {
+      title: "إرسال ملاحظة",
+      subtitle: "شارك ملاحظة حول تعلم هذا الطالب",
+      yourInsight: "ملاحظتك",
+      placeholder: "صِف ما لاحظته بشأن هذا الطالب...",
+      submitted: "تم إرسال الملاحظة إلى صندوق وارد ولي الأمر"
+    },
+    learnerQuests: {
+      title: "عوالم المهام",
+      subtitle: "استكشف مغامرات التعلم مع معلميك",
+      world: "عالم {{name}}",
+      chapter: "الفصل {{current}} من {{total}}"
+    },
+    learnerGradebook: {
+      title: "دفتر الدرجات",
+      subtitle: "إتقانك للمواد",
+      functioningAt: "الأداء في الصف {{functioning}} (المسجل: {{enrolled}})"
+    }
+  },
+  de: {
+    parentMilestones: {
+      title: "Meilensteine & Abzeichen",
+      currentStreak: "Aktuelle Serie",
+      longestStreak: "Längste Serie",
+      badgeCollection: "Abzeichensammlung",
+      timeline: "Leistungszeitstrahl",
+      empty: "Leistungen erscheinen hier, wenn dein Kind Fortschritte macht!",
+      open: "Meilensteine",
+      badges: {
+        first_session: {
+          name: "Erste Sitzung",
+          description: "Erste Tutoringstunde abgeschlossen"
+        },
+        on_fire: {
+          name: "In Fahrt",
+          description: "7-Tage-Serie"
+        },
+        brain_activated: {
+          name: "Gehirn aktiviert",
+          description: "Gehirnprofil genehmigt"
+        },
+        bookworm: {
+          name: "Bücherwurm",
+          description: "10 Sitzungen abgeschlossen"
+        },
+        mastery_champion: {
+          name: "Meisterschaftssieger",
+          description: "Jedes Fach über 75 %"
+        },
+        goal_getter: {
+          name: "Zielerreicher",
+          description: "IEP-Ziel erfüllt"
+        },
+        team_player: {
+          name: "Teamplayer",
+          description: "Vollständiges Lernteam"
+        },
+        multi_subject: {
+          name: "Multifach",
+          description: "In 3+ Fächern aktiv"
+        },
+        speed_learner: {
+          name: "Schnelllerner",
+          description: "Top 25 % der Sitzungszeit"
+        },
+        explorer: {
+          name: "Entdecker",
+          description: "Alle Fachbereiche erkundet"
+        }
+      }
+    },
+    parentTeam: {
+      title: "Betreuungsteam",
+      subtitle: "Verwalte, wer Zugriff auf {{name}}s Profil hat",
+      addMember: "Teammitglied hinzufügen",
+      membersHeader: "Teammitglieder",
+      teacher: "Lehrer/in",
+      caregiver: "Betreuer/in",
+      therapist: "Therapeut/in",
+      teachers: "Lehrer/innen",
+      caregivers: "Betreuer/innen",
+      therapists: "Therapeut/innen",
+      noTeamMembers: "Keine Teammitglieder",
+      noTeamMessage: "Lade Lehrer, Betreuer und Therapeuten zur Zusammenarbeit ein.",
+      seatsUsed: "belegte Plätze",
+      emailRequired: "Bitte E-Mail-Adresse eingeben",
+      emailPlaceholder: "E-Mail-Adresse eingeben",
+      inviteSent: "Einladung gesendet!",
+      inviteFailed: "Einladung konnte nicht gesendet werden",
+      sendInvite: "Einladung senden",
+      specialty: "Fachgebiet",
+      specialtyPlaceholder: "z. B. Sprach- und Sprechtherapie",
+      credentials: "Qualifikationen",
+      credentialsPlaceholder: "z. B. CCC-SLP, M.Ed",
+      relationship: "Beziehung",
+      relationshipPlaceholder: "z. B. Mitsorgeberechtigte/r, Großelternteil"
+    },
+    therapistClient: {
+      overview: "{{name}}s Profil",
+      brainProfile: "Gehirnprofil und Therapiedaten",
+      goalsTitle: "Therapieziele",
+      goalsSubtitle: "Therapieziele verfolgen und verwalten",
+      noGoalsTitle: "Keine Ziele festgelegt",
+      noGoalsMessage: "Füge Therapieziele für diesen Klienten hinzu.",
+      addGoal: "Ziel hinzufügen",
+      notesTitle: "Sitzungsnotizen",
+      notesSubtitle: "Beobachtungen aus der Therapiesitzung aufzeichnen",
+      noNotesTitle: "Noch keine Notizen",
+      noNotesMessage: "Füge nach jeder Therapiesitzung Notizen hinzu.",
+      addNote: "Notiz hinzufügen",
+      reportsTitle: "Fortschrittsberichte",
+      reportsSubtitle: "Therapiefortschrittsberichte erstellen und ansehen",
+      noReportsTitle: "Keine Berichte",
+      noReportsMessage: "Erstelle einen Fortschrittsbericht, wenn du bereit bist.",
+      generateReport: "Bericht erstellen"
+    },
+    parentInbox: {
+      title: "Posteingang",
+      tabs: {
+        all: "Alle",
+        action: "Handlungsbedarf",
+        celebrations: "Erfolge",
+        archived: "Archiv"
+      },
+      empty: {
+        all: "Dein Posteingang ist leer. Wir benachrichtigen dich, wenn etwas Aufmerksamkeit erfordert.",
+        action: "Keine Aufgaben vorhanden.",
+        celebrations: "Keine Erfolge vorhanden.",
+        archived: "Keine archivierten Einträge."
+      },
+      markRead: "Als gelesen markieren",
+      dismiss: "Schließen",
+      view: "Ansehen",
+      openOnWeb: "Öffne diese Benachrichtigung in der Web-App, um eine Aktion durchzuführen."
+    },
+    teacherStudent: {
+      brain: "{{name}}s Gehirn",
+      readOnlyProfile: "Gehirnprofil (nur lesen)",
+      level: "Stufe: {{level}}",
+      enrolled: "Eingeschrieben: {{grade}}",
+      functioning: "Funktionsniveau: {{grade}}",
+      submitInsight: "Einblick einreichen",
+      uploadIEP: "IEP hochladen"
+    },
+    teacherInsight: {
+      title: "Einblick einreichen",
+      subtitle: "Teile eine Beobachtung über das Lernen dieses Schülers",
+      yourInsight: "Dein Einblick",
+      placeholder: "Beschreibe, was du bei diesem Schüler beobachtet hast...",
+      submitted: "Einblick an den Posteingang der Eltern gesendet"
+    },
+    learnerQuests: {
+      title: "Abenteuerwelten",
+      subtitle: "Erkunde Lernabenteuern mit deinen Tutoren",
+      world: "{{name}}s Welt",
+      chapter: "Kapitel {{current}} von {{total}}"
+    },
+    learnerGradebook: {
+      title: "Notenbuch",
+      subtitle: "Deine Fachbeherrschung",
+      functioningAt: "Funktionsniveau Klasse {{functioning}} (Eingeschrieben: {{enrolled}})"
+    }
+  },
+  fr: {
+    parentMilestones: {
+      title: "Jalons et badges",
+      currentStreak: "Série actuelle",
+      longestStreak: "Série la plus longue",
+      badgeCollection: "Collection de badges",
+      timeline: "Chronologie des réussites",
+      empty: "Les réussites apparaîtront ici à mesure que votre enfant progresse !",
+      open: "Jalons",
+      badges: {
+        first_session: {
+          name: "Première séance",
+          description: "Terminer la première séance de tutorat"
+        },
+        on_fire: {
+          name: "En feu",
+          description: "Série de 7 jours"
+        },
+        brain_activated: {
+          name: "Cerveau activé",
+          description: "Profil cérébral approuvé"
+        },
+        bookworm: {
+          name: "Rat de bibliothèque",
+          description: "10 séances terminées"
+        },
+        mastery_champion: {
+          name: "Champion de la maîtrise",
+          description: "N'importe quelle matière au-dessus de 75 %"
+        },
+        goal_getter: {
+          name: "Atteigneur d'objectifs",
+          description: "Objectif IEP atteint"
+        },
+        team_player: {
+          name: "Joueur d'équipe",
+          description: "Équipe d'apprentissage complète"
+        },
+        multi_subject: {
+          name: "Multidisciplinaire",
+          description: "Actif dans 3+ matières"
+        },
+        speed_learner: {
+          name: "Apprenant rapide",
+          description: "Top 25 % en temps de séance"
+        },
+        explorer: {
+          name: "Explorateur",
+          description: "Toutes les matières explorées"
+        }
+      }
+    },
+    parentTeam: {
+      title: "Équipe de soins",
+      subtitle: "Gérer qui a accès au profil de {{name}}",
+      addMember: "Ajouter un membre",
+      membersHeader: "Membres de l'équipe",
+      teacher: "Enseignant(e)",
+      caregiver: "Aidant(e)",
+      therapist: "Thérapeute",
+      teachers: "Enseignants",
+      caregivers: "Aidants",
+      therapists: "Thérapeutes",
+      noTeamMembers: "Aucun membre dans l'équipe",
+      noTeamMessage: "Invitez des enseignants, des aidants et des thérapeutes à collaborer.",
+      seatsUsed: "places utilisées",
+      emailRequired: "Veuillez saisir un e-mail",
+      emailPlaceholder: "Saisir une adresse e-mail",
+      inviteSent: "Invitation envoyée !",
+      inviteFailed: "Échec de l'envoi de l'invitation",
+      sendInvite: "Envoyer l'invitation",
+      specialty: "Spécialité",
+      specialtyPlaceholder: "ex. Orthophonie",
+      credentials: "Qualifications",
+      credentialsPlaceholder: "ex. CCC-SLP, M.Ed",
+      relationship: "Relation",
+      relationshipPlaceholder: "ex. Co-parent, Grand-parent"
+    },
+    therapistClient: {
+      overview: "Profil de {{name}}",
+      brainProfile: "Profil cérébral et données thérapeutiques",
+      goalsTitle: "Objectifs thérapeutiques",
+      goalsSubtitle: "Suivre et gérer les objectifs thérapeutiques",
+      noGoalsTitle: "Aucun objectif défini",
+      noGoalsMessage: "Ajoutez des objectifs thérapeutiques pour ce client.",
+      addGoal: "Ajouter un objectif",
+      notesTitle: "Notes de séance",
+      notesSubtitle: "Enregistrer les observations de la séance de thérapie",
+      noNotesTitle: "Aucune note pour l'instant",
+      noNotesMessage: "Ajoutez des notes après chaque séance de thérapie.",
+      addNote: "Ajouter une note",
+      reportsTitle: "Rapports de progression",
+      reportsSubtitle: "Générer et consulter les rapports de progression thérapeutique",
+      noReportsTitle: "Aucun rapport",
+      noReportsMessage: "Générez un rapport de progression quand vous êtes prêt.",
+      generateReport: "Générer un rapport"
+    },
+    parentInbox: {
+      title: "Boîte de réception",
+      tabs: {
+        all: "Tous",
+        action: "Action requise",
+        celebrations: "Célébrations",
+        archived: "Archives"
+      },
+      empty: {
+        all: "Votre boîte de réception est vide. Nous vous préviendrons quand quelque chose nécessitera votre attention.",
+        action: "Aucun élément à traiter.",
+        celebrations: "Aucune célébration.",
+        archived: "Aucun élément archivé."
+      },
+      markRead: "Marquer comme lu",
+      dismiss: "Ignorer",
+      view: "Voir",
+      openOnWeb: "Ouvrez cette notification sur l'application web pour agir."
+    },
+    teacherStudent: {
+      brain: "Le cerveau de {{name}}",
+      readOnlyProfile: "Profil cérébral en lecture seule",
+      level: "Niveau : {{level}}",
+      enrolled: "Inscrit : {{grade}}",
+      functioning: "Fonctionnement : {{grade}}",
+      submitInsight: "Soumettre une observation",
+      uploadIEP: "Téléverser l'IEP"
+    },
+    teacherInsight: {
+      title: "Soumettre une observation",
+      subtitle: "Partagez une observation sur l'apprentissage de cet élève",
+      yourInsight: "Votre observation",
+      placeholder: "Décrivez ce que vous avez observé chez cet élève...",
+      submitted: "Observation envoyée dans la boîte de réception des parents"
+    },
+    learnerQuests: {
+      title: "Mondes de quêtes",
+      subtitle: "Explorez des aventures d'apprentissage avec vos tuteurs",
+      world: "Le monde de {{name}}",
+      chapter: "Chapitre {{current}} sur {{total}}"
+    },
+    learnerGradebook: {
+      title: "Carnet de notes",
+      subtitle: "Votre maîtrise des matières",
+      functioningAt: "Fonctionnement au niveau {{functioning}} (Inscrit : {{enrolled}})"
+    }
+  },
+  hi: {
+    parentMilestones: {
+      title: "माइलस्टोन और बैज",
+      currentStreak: "वर्तमान स्ट्रीक",
+      longestStreak: "सबसे लंबी स्ट्रीक",
+      badgeCollection: "बैज संग्रह",
+      timeline: "उपलब्धि टाइमलाइन",
+      empty: "जैसे-जैसे आपका बच्चा प्रगति करेगा, उपलब्धियां यहाँ दिखेंगी!",
+      open: "माइलस्टोन",
+      badges: {
+        first_session: {
+          name: "पहला सत्र",
+          description: "पहला ट्यूटरिंग सत्र पूरा करें"
+        },
+        on_fire: {
+          name: "जोशीला",
+          description: "7 दिन की स्ट्रीक"
+        },
+        brain_activated: {
+          name: "दिमाग सक्रिय",
+          description: "ब्रेन प्रोफ़ाइल स्वीकृत"
+        },
+        bookworm: {
+          name: "किताबी कीड़ा",
+          description: "10 सत्र पूरे किए"
+        },
+        mastery_champion: {
+          name: "महारत चैंपियन",
+          description: "कोई भी विषय 75% से ऊपर"
+        },
+        goal_getter: {
+          name: "लक्ष्य प्राप्तकर्ता",
+          description: "IEP लक्ष्य पूरा हुआ"
+        },
+        team_player: {
+          name: "टीम खिलाड़ी",
+          description: "पूरी शिक्षण टीम"
+        },
+        multi_subject: {
+          name: "बहु-विषयक",
+          description: "3+ विषयों में सक्रिय"
+        },
+        speed_learner: {
+          name: "तेज़ शिक्षार्थी",
+          description: "सत्र समय में शीर्ष 25%"
+        },
+        explorer: {
+          name: "अन्वेषक",
+          description: "सभी विषय क्षेत्रों का अन्वेषण"
+        }
+      }
+    },
+    parentTeam: {
+      title: "देखभाल टीम",
+      subtitle: "प्रबंधित करें कि {{name}} की प्रोफ़ाइल तक किसकी पहुंच है",
+      addMember: "टीम सदस्य जोड़ें",
+      membersHeader: "टीम के सदस्य",
+      teacher: "शिक्षक",
+      caregiver: "देखभालकर्ता",
+      therapist: "थेरेपिस्ट",
+      teachers: "शिक्षक",
+      caregivers: "देखभालकर्ता",
+      therapists: "थेरेपिस्ट",
+      noTeamMembers: "कोई टीम सदस्य नहीं",
+      noTeamMessage: "शिक्षकों, देखभालकर्ताओं और थेरेपिस्ट को सहयोग के लिए आमंत्रित करें।",
+      seatsUsed: "सीटें उपयोग में",
+      emailRequired: "कृपया ईमेल दर्ज करें",
+      emailPlaceholder: "ईमेल पता दर्ज करें",
+      inviteSent: "निमंत्रण भेजा गया!",
+      inviteFailed: "निमंत्रण भेजने में विफल",
+      sendInvite: "निमंत्रण भेजें",
+      specialty: "विशेषज्ञता",
+      specialtyPlaceholder: "जैसे: स्पीच-लैंग्वेज पैथोलॉजी",
+      credentials: "योग्यताएं",
+      credentialsPlaceholder: "जैसे: CCC-SLP, M.Ed",
+      relationship: "संबंध",
+      relationshipPlaceholder: "जैसे: सह-माता-पिता, दादा-दादी"
+    },
+    therapistClient: {
+      overview: "{{name}} की प्रोफ़ाइल",
+      brainProfile: "ब्रेन प्रोफ़ाइल और थेरेपी डेटा",
+      goalsTitle: "थेरेपी लक्ष्य",
+      goalsSubtitle: "थेरेपी लक्ष्यों को ट्रैक और प्रबंधित करें",
+      noGoalsTitle: "कोई लक्ष्य नहीं",
+      noGoalsMessage: "इस क्लाइंट के लिए थेरेपी लक्ष्य जोड़ें।",
+      addGoal: "लक्ष्य जोड़ें",
+      notesTitle: "सत्र नोट्स",
+      notesSubtitle: "थेरेपी सत्र की टिप्पणियां दर्ज करें",
+      noNotesTitle: "अभी तक कोई नोट नहीं",
+      noNotesMessage: "प्रत्येक थेरेपी सत्र के बाद नोट्स जोड़ें।",
+      addNote: "नोट जोड़ें",
+      reportsTitle: "प्रगति रिपोर्ट",
+      reportsSubtitle: "थेरेपी प्रगति रिपोर्ट तैयार करें और देखें",
+      noReportsTitle: "कोई रिपोर्ट नहीं",
+      noReportsMessage: "तैयार होने पर प्रगति रिपोर्ट बनाएं।",
+      generateReport: "रिपोर्ट बनाएं"
+    },
+    parentInbox: {
+      title: "इनबॉक्स",
+      tabs: {
+        all: "सभी",
+        action: "कार्रवाई आवश्यक",
+        celebrations: "उपलब्धियां",
+        archived: "संग्रहीत"
+      },
+      empty: {
+        all: "आपका इनबॉक्स खाली है। जब कुछ ध्यान देने की ज़रूरत होगी, हम बताएंगे।",
+        action: "कोई कार्य आइटम नहीं।",
+        celebrations: "कोई उपलब्धि नहीं।",
+        archived: "कोई संग्रहीत आइटम नहीं।"
+      },
+      markRead: "पढ़ा हुआ चिह्नित करें",
+      dismiss: "हटाएं",
+      view: "देखें",
+      openOnWeb: "कार्रवाई के लिए इस सूचना को वेब ऐप पर खोलें।"
+    },
+    teacherStudent: {
+      brain: "{{name}} का दिमाग",
+      readOnlyProfile: "केवल-पठन ब्रेन प्रोफ़ाइल",
+      level: "स्तर: {{level}}",
+      enrolled: "नामांकित: {{grade}}",
+      functioning: "कार्यक्षमता: {{grade}}",
+      submitInsight: "अंतर्दृष्टि सबमिट करें",
+      uploadIEP: "IEP अपलोड करें"
+    },
+    teacherInsight: {
+      title: "अंतर्दृष्टि सबमिट करें",
+      subtitle: "इस छात्र के सीखने के बारे में एक टिप्पणी साझा करें",
+      yourInsight: "आपकी अंतर्दृष्टि",
+      placeholder: "इस छात्र के बारे में जो आपने देखा है उसे बताएं...",
+      submitted: "अंतर्दृष्टि अभिभावक के इनबॉक्स में भेजी गई"
+    },
+    learnerQuests: {
+      title: "क्वेस्ट वर्ल्ड्स",
+      subtitle: "अपने ट्यूटर्स के साथ सीखने के साहसिक कार्य खोजें",
+      world: "{{name}} की दुनिया",
+      chapter: "अध्याय {{current}} में से {{total}}"
+    },
+    learnerGradebook: {
+      title: "ग्रेड बुक",
+      subtitle: "आपकी विषय महारत",
+      functioningAt: "कक्षा {{functioning}} पर कार्यरत (नामांकित: {{enrolled}})"
+    }
+  },
+  ja: {
+    parentMilestones: {
+      title: "マイルストーン＆バッジ",
+      currentStreak: "現在のストリーク",
+      longestStreak: "最長ストリーク",
+      badgeCollection: "バッジコレクション",
+      timeline: "達成タイムライン",
+      empty: "お子様の成長とともに達成記録がここに表示されます！",
+      open: "マイルストーン",
+      badges: {
+        first_session: {
+          name: "初回セッション",
+          description: "最初の個別指導セッションを完了"
+        },
+        on_fire: {
+          name: "燃えている",
+          description: "7日連続ストリーク"
+        },
+        brain_activated: {
+          name: "ブレイン起動",
+          description: "ブレインプロフィール承認済み"
+        },
+        bookworm: {
+          name: "本の虫",
+          description: "セッション10回完了"
+        },
+        mastery_champion: {
+          name: "マスタリーチャンピオン",
+          description: "いずれかの科目が75%以上"
+        },
+        goal_getter: {
+          name: "目標達成者",
+          description: "IEP目標達成"
+        },
+        team_player: {
+          name: "チームプレイヤー",
+          description: "学習チームが揃った"
+        },
+        multi_subject: {
+          name: "マルチ科目",
+          description: "3科目以上でアクティブ"
+        },
+        speed_learner: {
+          name: "スピードラーナー",
+          description: "セッション時間上位25%"
+        },
+        explorer: {
+          name: "エクスプローラー",
+          description: "全教科エリア探索済み"
+        }
+      }
+    },
+    parentTeam: {
+      title: "ケアチーム",
+      subtitle: "{{name}}のプロフィールへのアクセス権を管理",
+      addMember: "チームメンバーを追加",
+      membersHeader: "チームメンバー",
+      teacher: "教師",
+      caregiver: "介護者",
+      therapist: "セラピスト",
+      teachers: "教師",
+      caregivers: "介護者",
+      therapists: "セラピスト",
+      noTeamMembers: "チームメンバーなし",
+      noTeamMessage: "教師、介護者、セラピストを協力に招待してください。",
+      seatsUsed: "使用中の席",
+      emailRequired: "メールアドレスを入力してください",
+      emailPlaceholder: "メールアドレスを入力",
+      inviteSent: "招待を送信しました！",
+      inviteFailed: "招待の送信に失敗しました",
+      sendInvite: "招待を送信",
+      specialty: "専門分野",
+      specialtyPlaceholder: "例：言語聴覚療法",
+      credentials: "資格",
+      credentialsPlaceholder: "例：CCC-SLP, M.Ed",
+      relationship: "関係",
+      relationshipPlaceholder: "例：共同親権者、祖父母"
+    },
+    therapistClient: {
+      overview: "{{name}}のプロフィール",
+      brainProfile: "ブレインプロフィールとセラピーデータ",
+      goalsTitle: "セラピー目標",
+      goalsSubtitle: "セラピー目標の追跡と管理",
+      noGoalsTitle: "目標未設定",
+      noGoalsMessage: "このクライアントのセラピー目標を追加してください。",
+      addGoal: "目標を追加",
+      notesTitle: "セッションノート",
+      notesSubtitle: "セラピーセッションの観察を記録",
+      noNotesTitle: "まだノートなし",
+      noNotesMessage: "各セラピーセッション後にノートを追加してください。",
+      addNote: "ノートを追加",
+      reportsTitle: "進捗レポート",
+      reportsSubtitle: "セラピー進捗レポートの作成と閲覧",
+      noReportsTitle: "レポートなし",
+      noReportsMessage: "準備ができたら進捗レポートを作成してください。",
+      generateReport: "レポートを作成"
+    },
+    parentInbox: {
+      title: "受信トレイ",
+      tabs: {
+        all: "すべて",
+        action: "対応が必要",
+        celebrations: "お祝い",
+        archived: "アーカイブ"
+      },
+      empty: {
+        all: "受信トレイは空です。対応が必要になればお知らせします。",
+        action: "対応項目なし。",
+        celebrations: "お祝いなし。",
+        archived: "アーカイブ済み項目なし。"
+      },
+      markRead: "既読にする",
+      dismiss: "閉じる",
+      view: "表示",
+      openOnWeb: "アクションを行うには、このお知らせをウェブアプリで開いてください。"
+    },
+    teacherStudent: {
+      brain: "{{name}}のブレイン",
+      readOnlyProfile: "読み取り専用ブレインプロフィール",
+      level: "レベル：{{level}}",
+      enrolled: "在籍：{{grade}}",
+      functioning: "機能レベル：{{grade}}",
+      submitInsight: "インサイトを送信",
+      uploadIEP: "IEPをアップロード"
+    },
+    teacherInsight: {
+      title: "インサイトを送信",
+      subtitle: "この生徒の学習に関する観察を共有する",
+      yourInsight: "あなたのインサイト",
+      placeholder: "この生徒について観察したことを説明してください...",
+      submitted: "インサイトを保護者の受信トレイに送信しました"
+    },
+    learnerQuests: {
+      title: "クエストワールド",
+      subtitle: "チューターと一緒に学習の冒険を探索しよう",
+      world: "{{name}}のワールド",
+      chapter: "チャプター{{current}}／{{total}}"
+    },
+    learnerGradebook: {
+      title: "成績帳",
+      subtitle: "教科の習熟度",
+      functioningAt: "{{functioning}}年生レベルで機能中（在籍：{{enrolled}}）"
+    }
+  },
+  ko: {
+    parentMilestones: {
+      title: "마일스톤 및 배지",
+      currentStreak: "현재 연속 기록",
+      longestStreak: "최장 연속 기록",
+      badgeCollection: "배지 컬렉션",
+      timeline: "성취 타임라인",
+      empty: "아이가 성장하면서 성취 기록이 여기에 표시됩니다!",
+      open: "마일스톤",
+      badges: {
+        first_session: {
+          name: "첫 번째 세션",
+          description: "첫 튜터링 세션 완료"
+        },
+        on_fire: {
+          name: "불꽃",
+          description: "7일 연속 기록"
+        },
+        brain_activated: {
+          name: "브레인 활성화",
+          description: "브레인 프로필 승인됨"
+        },
+        bookworm: {
+          name: "독서광",
+          description: "세션 10회 완료"
+        },
+        mastery_champion: {
+          name: "마스터리 챔피언",
+          description: "어느 과목이든 75% 이상"
+        },
+        goal_getter: {
+          name: "목표 달성자",
+          description: "IEP 목표 달성"
+        },
+        team_player: {
+          name: "팀 플레이어",
+          description: "학습 팀 완성"
+        },
+        multi_subject: {
+          name: "다과목",
+          description: "3개 이상 과목에서 활동 중"
+        },
+        speed_learner: {
+          name: "빠른 학습자",
+          description: "세션 시간 상위 25%"
+        },
+        explorer: {
+          name: "탐험가",
+          description: "모든 교과 영역 탐색 완료"
+        }
+      }
+    },
+    parentTeam: {
+      title: "돌봄 팀",
+      subtitle: "{{name}}의 프로필에 접근할 수 있는 사람 관리",
+      addMember: "팀원 추가",
+      membersHeader: "팀원",
+      teacher: "교사",
+      caregiver: "돌봄 제공자",
+      therapist: "치료사",
+      teachers: "교사들",
+      caregivers: "돌봄 제공자들",
+      therapists: "치료사들",
+      noTeamMembers: "팀원 없음",
+      noTeamMessage: "교사, 돌봄 제공자, 치료사를 협력에 초대하세요.",
+      seatsUsed: "사용 중인 자리",
+      emailRequired: "이메일을 입력하세요",
+      emailPlaceholder: "이메일 주소 입력",
+      inviteSent: "초대장 전송 완료!",
+      inviteFailed: "초대 전송 실패",
+      sendInvite: "초대장 보내기",
+      specialty: "전문 분야",
+      specialtyPlaceholder: "예: 언어병리학",
+      credentials: "자격증",
+      credentialsPlaceholder: "예: CCC-SLP, M.Ed",
+      relationship: "관계",
+      relationshipPlaceholder: "예: 공동 부모, 조부모"
+    },
+    therapistClient: {
+      overview: "{{name}}의 프로필",
+      brainProfile: "브레인 프로필 및 치료 데이터",
+      goalsTitle: "치료 목표",
+      goalsSubtitle: "치료 목표 추적 및 관리",
+      noGoalsTitle: "설정된 목표 없음",
+      noGoalsMessage: "이 내담자를 위한 치료 목표를 추가하세요.",
+      addGoal: "목표 추가",
+      notesTitle: "세션 노트",
+      notesSubtitle: "치료 세션 관찰 기록",
+      noNotesTitle: "아직 노트 없음",
+      noNotesMessage: "치료 세션 후 노트를 추가하세요.",
+      addNote: "노트 추가",
+      reportsTitle: "진행 보고서",
+      reportsSubtitle: "치료 진행 보고서 생성 및 조회",
+      noReportsTitle: "보고서 없음",
+      noReportsMessage: "준비가 되면 진행 보고서를 생성하세요.",
+      generateReport: "보고서 생성"
+    },
+    parentInbox: {
+      title: "받은 편지함",
+      tabs: {
+        all: "전체",
+        action: "조치 필요",
+        celebrations: "축하",
+        archived: "보관함"
+      },
+      empty: {
+        all: "받은 편지함이 비어 있습니다. 주의가 필요할 때 알려드리겠습니다.",
+        action: "처리할 항목 없음.",
+        celebrations: "축하 항목 없음.",
+        archived: "보관된 항목 없음."
+      },
+      markRead: "읽음 표시",
+      dismiss: "닫기",
+      view: "보기",
+      openOnWeb: "조치를 취하려면 웹 앱에서 이 알림을 여세요."
+    },
+    teacherStudent: {
+      brain: "{{name}}의 브레인",
+      readOnlyProfile: "읽기 전용 브레인 프로필",
+      level: "레벨: {{level}}",
+      enrolled: "등록: {{grade}}",
+      functioning: "기능 수준: {{grade}}",
+      submitInsight: "인사이트 제출",
+      uploadIEP: "IEP 업로드"
+    },
+    teacherInsight: {
+      title: "인사이트 제출",
+      subtitle: "이 학생의 학습에 대한 관찰을 공유하세요",
+      yourInsight: "인사이트",
+      placeholder: "이 학생에 대해 관찰한 내용을 설명해 주세요...",
+      submitted: "인사이트가 학부모 받은 편지함으로 전송되었습니다"
+    },
+    learnerQuests: {
+      title: "퀘스트 월드",
+      subtitle: "튜터와 함께 학습 모험을 탐험하세요",
+      world: "{{name}}의 월드",
+      chapter: "챕터 {{current}} / {{total}}"
+    },
+    learnerGradebook: {
+      title: "성적표",
+      subtitle: "교과 숙달도",
+      functioningAt: "{{functioning}}학년 수준으로 기능 중 (등록: {{enrolled}})"
+    }
+  },
+  pt: {
+    parentMilestones: {
+      title: "Marcos e emblemas",
+      currentStreak: "Sequência atual",
+      longestStreak: "Maior sequência",
+      badgeCollection: "Coleção de emblemas",
+      timeline: "Linha do tempo de conquistas",
+      empty: "As conquistas aparecerão aqui conforme seu filho progride!",
+      open: "Marcos",
+      badges: {
+        first_session: {
+          name: "Primeira sessão",
+          description: "Completar a primeira sessão de tutoria"
+        },
+        on_fire: {
+          name: "Em chamas",
+          description: "Sequência de 7 dias"
+        },
+        brain_activated: {
+          name: "Cérebro ativado",
+          description: "Perfil cerebral aprovado"
+        },
+        bookworm: {
+          name: "Rato de biblioteca",
+          description: "10 sessões concluídas"
+        },
+        mastery_champion: {
+          name: "Campeão de domínio",
+          description: "Qualquer matéria acima de 75%"
+        },
+        goal_getter: {
+          name: "Atingidor de metas",
+          description: "Meta IEP alcançada"
+        },
+        team_player: {
+          name: "Jogador de equipe",
+          description: "Equipe de aprendizado completa"
+        },
+        multi_subject: {
+          name: "Multidisciplinar",
+          description: "Ativo em 3+ matérias"
+        },
+        speed_learner: {
+          name: "Aprendiz rápido",
+          description: "Top 25% no tempo de sessão"
+        },
+        explorer: {
+          name: "Explorador",
+          description: "Todas as áreas de matérias exploradas"
+        }
+      }
+    },
+    parentTeam: {
+      title: "Equipe de cuidados",
+      subtitle: "Gerenciar quem tem acesso ao perfil de {{name}}",
+      addMember: "Adicionar membro",
+      membersHeader: "Membros da equipe",
+      teacher: "Professor(a)",
+      caregiver: "Cuidador(a)",
+      therapist: "Terapeuta",
+      teachers: "Professores",
+      caregivers: "Cuidadores",
+      therapists: "Terapeutas",
+      noTeamMembers: "Nenhum membro na equipe",
+      noTeamMessage: "Convide professores, cuidadores e terapeutas para colaborar.",
+      seatsUsed: "assentos usados",
+      emailRequired: "Por favor, insira um e-mail",
+      emailPlaceholder: "Inserir endereço de e-mail",
+      inviteSent: "Convite enviado!",
+      inviteFailed: "Falha ao enviar convite",
+      sendInvite: "Enviar convite",
+      specialty: "Especialidade",
+      specialtyPlaceholder: "ex.: Fonoaudiologia",
+      credentials: "Credenciais",
+      credentialsPlaceholder: "ex.: CCC-SLP, M.Ed",
+      relationship: "Relacionamento",
+      relationshipPlaceholder: "ex.: Co-responsável, Avô/Avó"
+    },
+    therapistClient: {
+      overview: "Perfil de {{name}}",
+      brainProfile: "Perfil cerebral e dados de terapia",
+      goalsTitle: "Metas de terapia",
+      goalsSubtitle: "Rastrear e gerenciar metas de terapia",
+      noGoalsTitle: "Nenhuma meta definida",
+      noGoalsMessage: "Adicione metas de terapia para este cliente.",
+      addGoal: "Adicionar meta",
+      notesTitle: "Notas de sessão",
+      notesSubtitle: "Registrar observações da sessão de terapia",
+      noNotesTitle: "Nenhuma nota ainda",
+      noNotesMessage: "Adicione notas após cada sessão de terapia.",
+      addNote: "Adicionar nota",
+      reportsTitle: "Relatórios de progresso",
+      reportsSubtitle: "Gerar e visualizar relatórios de progresso terapêutico",
+      noReportsTitle: "Nenhum relatório",
+      noReportsMessage: "Gere um relatório de progresso quando estiver pronto.",
+      generateReport: "Gerar relatório"
+    },
+    parentInbox: {
+      title: "Caixa de entrada",
+      tabs: {
+        all: "Todos",
+        action: "Ação necessária",
+        celebrations: "Celebrações",
+        archived: "Arquivados"
+      },
+      empty: {
+        all: "Sua caixa de entrada está vazia. Avisaremos quando algo precisar de atenção.",
+        action: "Nenhum item de ação.",
+        celebrations: "Nenhuma celebração.",
+        archived: "Nenhum item arquivado."
+      },
+      markRead: "Marcar como lido",
+      dismiss: "Dispensar",
+      view: "Ver",
+      openOnWeb: "Abra esta notificação no aplicativo web para tomar uma ação."
+    },
+    teacherStudent: {
+      brain: "Cérebro de {{name}}",
+      readOnlyProfile: "Perfil cerebral somente leitura",
+      level: "Nível: {{level}}",
+      enrolled: "Matriculado: {{grade}}",
+      functioning: "Funcionamento: {{grade}}",
+      submitInsight: "Enviar observação",
+      uploadIEP: "Enviar IEP"
+    },
+    teacherInsight: {
+      title: "Enviar observação",
+      subtitle: "Compartilhe uma observação sobre o aprendizado deste aluno",
+      yourInsight: "Sua observação",
+      placeholder: "Descreva o que você observou sobre este aluno...",
+      submitted: "Observação enviada para a caixa de entrada dos pais"
+    },
+    learnerQuests: {
+      title: "Mundos de missões",
+      subtitle: "Explore aventuras de aprendizado com seus tutores",
+      world: "O mundo de {{name}}",
+      chapter: "Capítulo {{current}} de {{total}}"
+    },
+    learnerGradebook: {
+      title: "Boletim",
+      subtitle: "Seu domínio por matéria",
+      functioningAt: "Funcionando no nível {{functioning}} (Matriculado: {{enrolled}})"
+    }
+  },
+  zh: {
+    parentMilestones: {
+      title: "里程碑与徽章",
+      currentStreak: "当前连续记录",
+      longestStreak: "最长连续记录",
+      badgeCollection: "徽章收藏",
+      timeline: "成就时间轴",
+      empty: "随着孩子的进步，成就将在此处显示！",
+      open: "里程碑",
+      badges: {
+        first_session: {
+          name: "首次会话",
+          description: "完成第一次辅导课程"
+        },
+        on_fire: {
+          name: "燃烧状态",
+          description: "连续7天记录"
+        },
+        brain_activated: {
+          name: "大脑激活",
+          description: "脑力档案已审批"
+        },
+        bookworm: {
+          name: "书虫",
+          description: "完成10次会话"
+        },
+        mastery_champion: {
+          name: "掌握冠军",
+          description: "任何科目超过75%"
+        },
+        goal_getter: {
+          name: "目标达成者",
+          description: "IEP目标已实现"
+        },
+        team_player: {
+          name: "团队合作者",
+          description: "完整学习团队"
+        },
+        multi_subject: {
+          name: "多科目",
+          description: "活跃于3个以上科目"
+        },
+        speed_learner: {
+          name: "快速学习者",
+          description: "会话时间前25%"
+        },
+        explorer: {
+          name: "探索者",
+          description: "探索了所有学科领域"
+        }
+      }
+    },
+    parentTeam: {
+      title: "照护团队",
+      subtitle: "管理谁可以访问{{name}}的档案",
+      addMember: "添加团队成员",
+      membersHeader: "团队成员",
+      teacher: "教师",
+      caregiver: "照护者",
+      therapist: "治疗师",
+      teachers: "教师们",
+      caregivers: "照护者们",
+      therapists: "治疗师们",
+      noTeamMembers: "没有团队成员",
+      noTeamMessage: "邀请教师、照护者和治疗师共同协作。",
+      seatsUsed: "已使用席位",
+      emailRequired: "请输入电子邮件",
+      emailPlaceholder: "输入电子邮件地址",
+      inviteSent: "邀请已发送！",
+      inviteFailed: "发送邀请失败",
+      sendInvite: "发送邀请",
+      specialty: "专业领域",
+      specialtyPlaceholder: "例：言语语言病理学",
+      credentials: "资质证书",
+      credentialsPlaceholder: "例：CCC-SLP, M.Ed",
+      relationship: "关系",
+      relationshipPlaceholder: "例：共同监护人、祖父母"
+    },
+    therapistClient: {
+      overview: "{{name}}的档案",
+      brainProfile: "脑力档案与治疗数据",
+      goalsTitle: "治疗目标",
+      goalsSubtitle: "跟踪和管理治疗目标",
+      noGoalsTitle: "未设定目标",
+      noGoalsMessage: "为此客户添加治疗目标。",
+      addGoal: "添加目标",
+      notesTitle: "会话记录",
+      notesSubtitle: "记录治疗会话观察",
+      noNotesTitle: "暂无记录",
+      noNotesMessage: "每次治疗会话后添加记录。",
+      addNote: "添加记录",
+      reportsTitle: "进展报告",
+      reportsSubtitle: "生成并查看治疗进展报告",
+      noReportsTitle: "暂无报告",
+      noReportsMessage: "准备好后生成进展报告。",
+      generateReport: "生成报告"
+    },
+    parentInbox: {
+      title: "收件箱",
+      tabs: {
+        all: "全部",
+        action: "需要处理",
+        celebrations: "庆祝",
+        archived: "已归档"
+      },
+      empty: {
+        all: "收件箱为空。当有需要关注的事项时，我们会通知您。",
+        action: "没有待处理项目。",
+        celebrations: "没有庆祝项目。",
+        archived: "没有已归档项目。"
+      },
+      markRead: "标记为已读",
+      dismiss: "忽略",
+      view: "查看",
+      openOnWeb: "请在网页应用中打开此通知以采取行动。"
+    },
+    teacherStudent: {
+      brain: "{{name}}的大脑",
+      readOnlyProfile: "只读脑力档案",
+      level: "级别：{{level}}",
+      enrolled: "就读：{{grade}}",
+      functioning: "能力水平：{{grade}}",
+      submitInsight: "提交观察",
+      uploadIEP: "上传IEP"
+    },
+    teacherInsight: {
+      title: "提交观察",
+      subtitle: "分享对该学生学习情况的观察",
+      yourInsight: "您的观察",
+      placeholder: "描述您对该学生的观察...",
+      submitted: "观察已发送至家长收件箱"
+    },
+    learnerQuests: {
+      title: "任务世界",
+      subtitle: "与导师一起探索学习冒险",
+      world: "{{name}}的世界",
+      chapter: "第{{current}}章，共{{total}}章"
+    },
+    learnerGradebook: {
+      title: "成绩册",
+      subtitle: "您的科目掌握情况",
+      functioningAt: "在{{functioning}}年级水平运作（就读：{{enrolled}}）"
+    }
+  },
+};
+
+function deepMerge(t, s){for(const[k,v]of Object.entries(s)){
+  if(v&&typeof v==="object"&&!Array.isArray(v)){if(!t[k]||typeof t[k]!=="object")t[k]={};deepMerge(t[k],v);}
+  else t[k]=v;}return t;}
+
+let n=0;
+for (const [locale, roots] of Object.entries(DATA)) {
+  const file = join(dir, `${locale}.json`);
+  const json = JSON.parse(readFileSync(file, "utf8"));
+  deepMerge(json, roots);
+  writeFileSync(file, JSON.stringify(json, null, 2) + "\n");
+  n++;
+  console.log(`seed-MB6: ${locale}`);
+}
+console.log(`seed-MB6: done — ${n} locales`);
