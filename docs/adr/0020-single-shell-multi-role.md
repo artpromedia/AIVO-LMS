@@ -140,3 +140,35 @@ would deny.
   in the implementation map's Phase 2.
 - It does **not** address marketing-site architecture beyond noting
   that `apps/marketing` is not a role surface.
+
+## Phase 2 — cross-cutting surface migration
+
+The Phase 2 work the Consequences section refers to migrates four
+cross-cutting features off their per-role routes onto top-level
+routes that read `activeRole` and filter content accordingly. The
+typed registry that pins the sequence and canonical destinations
+lives in `packages/nav/src/cross-cutting.ts` (`CROSS_CUTTING_REGISTRY`).
+Migrations happen in phase order; each phase is its own PR.
+
+| Phase | Surface         | Web route        | Mobile route     | Anchored NavArea | Why this order                                                                 |
+| ----- | --------------- | ---------------- | ---------------- | ---------------- | ------------------------------------------------------------------------------ |
+| 1     | `notifications` | `/notifications` | `/notifications` | `messages`       | Lowest risk; mobile already has a partial unified inbox to lift from.          |
+| 2     | `messages`      | `/messages`      | `/messages`      | `messages`       | Shares unread counters with notifications; ships once Phase 1 is stable.       |
+| 3     | `settings`      | `/settings`      | `/settings`      | `settings`       | Needs `activeRole`-aware section visibility; every shell ships a bespoke one. |
+| 4     | `billing`       | `/billing`       | `/billing`       | `billing`        | Highest risk: Stripe surfaces + copy varies most by role (self-pay vs PO).     |
+
+Rules each migration PR must follow:
+
+1. **Anchor RBAC on `canAccessArea`.** The top-level route consults
+   `canAccessArea(session, area, surface)` (where `area` is the
+   `navArea` field of the registry entry) and renders the same four
+   outcomes `<RoleGate>` / `useNavAccess` produce. No new RBAC table.
+2. **Delete or 301 every legacy per-role route** in
+   `CROSS_CUTTING_REGISTRY[id].legacyRoutes` for the surface being
+   migrated. The route audit will flag any that remain.
+3. **Update the registry, not the prose.** If the migration changes a
+   canonical destination, edit `cross-cutting.ts` and the matrix
+   coverage test will catch downstream drift; do not rely on this
+   ADR's table being kept in sync.
+4. **Ship one surface per PR.** The phase numbers exist so a future
+   automation gate can fail PRs that mix phases or skip ahead.

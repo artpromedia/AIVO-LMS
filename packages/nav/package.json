@@ -30,6 +30,10 @@
     "./session": {
       "types": "./dist/session.d.ts",
       "import": "./dist/session.js"
+    },
+    "./cross-cutting": {
+      "types": "./dist/cross-cutting.d.ts",
+      "import": "./dist/cross-cutting.js"
     }
   },
   "files": [
