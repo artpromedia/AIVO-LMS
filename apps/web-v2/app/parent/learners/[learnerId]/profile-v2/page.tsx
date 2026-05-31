@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { FloatingMetricCard, LearningHero } from "@aivo/ui/hero";
 import { AivoIcon } from "@aivo/ui/icon";
 import { requirePageRole } from "@/lib/auth/server";
@@ -20,6 +21,7 @@ interface ProfileV2Props {
  */
 export default async function LearnerProfileV2({ params }: ProfileV2Props) {
   await requirePageRole(["parent"]);
+  const t = await getTranslations("parent.learner_profile_v2");
   const { learnerId } = params;
   // Placeholder display data; sprint 4 commit 4 wires to repo.
   const learnerName = "Emma";
@@ -39,14 +41,14 @@ export default async function LearnerProfileV2({ params }: ProfileV2Props) {
                 className="inline-flex items-center gap-2 h-11 px-5 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold shadow-sm hover:opacity-95"
               >
                 <AivoIcon name="curriculum" size={18} />
-                Open today's lessons
+                {t("open_lessons")}
               </Link>
               <Link
                 href={`${base}/settings`}
                 className="inline-flex items-center gap-2 h-11 px-5 rounded-iw-control bg-white text-iw-text-strong font-semibold border border-iw-border hover:border-iw-text-muted"
               >
                 <AivoIcon name="care" size={18} />
-                Profile settings
+                {t("profile_settings")}
               </Link>
             </>
           }
@@ -54,7 +56,7 @@ export default async function LearnerProfileV2({ params }: ProfileV2Props) {
 
         <section>
           <h2 className="iw-label uppercase tracking-wider text-iw-text-muted mb-3">
-            Learning identity
+            {t("learning_identity")}
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <FloatingMetricCard

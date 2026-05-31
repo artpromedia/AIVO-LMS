@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
@@ -8,6 +9,7 @@ type LearnerOpt = { id: string; displayName: string };
 type Scope = "account" | "learner" | "iep_only";
 
 export function DeleteRequestForm({ learners }: { learners: LearnerOpt[] }) {
+  const t = useTranslations("parent.privacy_delete");
   const router = useRouter();
   const [scope, setScope] = useState<Scope>("account");
   const [learnerId, setLearnerId] = useState<string>(learners[0]?.id ?? "");
@@ -21,7 +23,7 @@ export function DeleteRequestForm({ learners }: { learners: LearnerOpt[] }) {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (confirm !== "DELETE") {
-      setError("Type DELETE to confirm.");
+      setError(t("form_confirm_error"));
       return;
     }
     setBusy(true);
@@ -52,7 +54,7 @@ export function DeleteRequestForm({ learners }: { learners: LearnerOpt[] }) {
     <form onSubmit={submit} className="space-y-4">
       <div>
         <label className="block text-sm font-medium" htmlFor="scope">
-          What do you want to delete?
+          {t("form_question")}
         </label>
         <select
           id="scope"
@@ -60,16 +62,16 @@ export function DeleteRequestForm({ learners }: { learners: LearnerOpt[] }) {
           value={scope}
           onChange={(e) => setScope(e.target.value as Scope)}
         >
-          <option value="account">My whole account (every learner, all history)</option>
-          <option value="learner">A single learner (all of their data)</option>
-          <option value="iep_only">Just an uploaded IEP document</option>
+          <option value="account">{t("form_scope_account")}</option>
+          <option value="learner">{t("form_scope_learner")}</option>
+          <option value="iep_only">{t("form_scope_iep")}</option>
         </select>
       </div>
 
       {requiresLearner && (
         <div>
           <label className="block text-sm font-medium" htmlFor="learner">
-            Learner
+            {t("form_learner_label")}
           </label>
           <select
             id="learner"
@@ -78,7 +80,7 @@ export function DeleteRequestForm({ learners }: { learners: LearnerOpt[] }) {
             onChange={(e) => setLearnerId(e.target.value)}
             required
           >
-            {learners.length === 0 && <option value="">No learners</option>}
+            {learners.length === 0 && <option value="">{t("form_no_learners")}</option>}
             {learners.map((l) => (
               <option key={l.id} value={l.id}>
                 {l.displayName}
@@ -90,7 +92,7 @@ export function DeleteRequestForm({ learners }: { learners: LearnerOpt[] }) {
 
       <div>
         <label className="block text-sm font-medium" htmlFor="notes">
-          Notes (optional)
+          {t("form_notes_label")}
         </label>
         <textarea
           id="notes"
@@ -104,7 +106,9 @@ export function DeleteRequestForm({ learners }: { learners: LearnerOpt[] }) {
 
       <div>
         <label className="block text-sm font-medium" htmlFor="confirm">
-          Type <span className="font-mono">DELETE</span> to confirm
+          {t.rich("form_confirm_label", {
+            mono: (chunks) => <span className="font-mono">{chunks}</span>,
+          })}
         </label>
         <input
           id="confirm"

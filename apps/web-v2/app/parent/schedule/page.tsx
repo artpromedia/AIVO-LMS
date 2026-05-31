@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -14,6 +15,7 @@ import {
 } from "@/lib/db/repos";
 
 export default async function Page() {
+  const t = await getTranslations("parent.schedule");
   const session = await requirePageRole(["parent"]);
   const learners = await listLearnersForParent(session.userId, session.tenantId);
   const subjectMap = new Map((await listSubjects()).map((s) => [s.id, s]));
@@ -27,12 +29,12 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Parent"
-        title="Schedule"
+        title={t("title")}
         description="What each learner is working on next."
       />
       {learners.length === 0 ? (
         <EmptyState
-          title="No learners yet"
+          title={t("no_learners_title")}
           description="Add a learner to see their upcoming work here."
         />
       ) : (
@@ -60,7 +62,7 @@ export default async function Page() {
                           {a.dueAt ? ` · due ${new Date(a.dueAt).toLocaleDateString()}` : ""}
                         </p>
                       </div>
-                      <Badge tone="primary">Teacher</Badge>
+                      <Badge tone="primary">{t("teacher")}</Badge>
                     </div>
                   </Card>
                 ))}
@@ -68,14 +70,14 @@ export default async function Page() {
                   <Card key={r.id} className="p-4">
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <p className="font-medium">In-progress lesson</p>
+                        <p className="font-medium">{t("in_progress_lesson")}</p>
                         <p className="text-sm text-aivo-ink-soft">Source: {r.source}</p>
                       </div>
                       <Link
                         href={`/learner/lesson-runs/${r.id}`}
                         className="text-xs font-medium text-aivo-primary hover:underline"
                       >
-                        Open →
+                        {t("open_arrow")}
                       </Link>
                     </div>
                   </Card>

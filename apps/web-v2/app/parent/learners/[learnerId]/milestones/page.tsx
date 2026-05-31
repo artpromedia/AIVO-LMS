@@ -6,6 +6,7 @@
  */
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import {
   Flame,
   Star,
@@ -90,6 +91,7 @@ export default async function ParentMilestonesPage({
 }) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
+  const t = await getTranslations("parent.learner_milestones");
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
@@ -113,21 +115,21 @@ export default async function ParentMilestonesPage({
     >
       <PageHeader
         eyebrow={learner.displayName}
-        title="Milestones"
-        description="Experience points, streaks, currency, and badges earned across the program."
+        title={t("title")}
+        description={t("description")}
       />
 
       {!eng ? (
         <EmptyState
           icon={<Award className="h-6 w-6" />}
-          title="No engagement data yet"
-          description="Once your learner completes their first session we will start tracking XP, streaks, and badges."
+          title={t("no_engagement_data")}
+          description={t("no_engagement_desc")}
           action={
             <Link
               href={`/parent/learners/${learner.id}`}
               className="text-aivo-accent underline underline-offset-4"
             >
-              Back to learner overview
+              {t("back_to_overview")}
             </Link>
           }
         />
@@ -136,7 +138,7 @@ export default async function ParentMilestonesPage({
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Card className="p-[var(--aivo-density-card-pad)]">
               <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
-                Total XP
+                {t("total_xp")}
               </p>
               <p className="mt-1 font-display text-3xl font-semibold">
                 {eng.totalXp.toLocaleString()}
@@ -154,12 +156,12 @@ export default async function ParentMilestonesPage({
               </p>
               <p className="mt-1 font-display text-3xl font-semibold">{eng.level}</p>
               <p className="mt-3 text-xs text-aivo-ink-soft">
-                Levels unlock new avatars, customizations, and quest worlds.
+                {t("levels_desc")}
               </p>
             </Card>
             <Card className="p-[var(--aivo-density-card-pad)]">
               <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
-                Current Streak
+                {t("current_streak")}
               </p>
               <p className="mt-1 flex items-center gap-2 font-display text-3xl font-semibold">
                 <Flame className="h-7 w-7 text-orange-500" />
@@ -171,7 +173,7 @@ export default async function ParentMilestonesPage({
             </Card>
             <Card className="p-[var(--aivo-density-card-pad)]">
               <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
-                Wallet
+                {t("wallet")}
               </p>
               <div className="mt-1 flex items-baseline gap-4">
                 <span className="font-display text-2xl font-semibold">{eng.coins} ¢</span>
@@ -180,12 +182,12 @@ export default async function ParentMilestonesPage({
                 </span>
               </div>
               <p className="mt-3 text-xs text-aivo-ink-soft">
-                Coins earned per session. Gems unlocked for big wins.
+                {t("wallet_desc")}
               </p>
             </Card>
           </div>
 
-          <SectionHeader title="Badge collection" />
+          <SectionHeader title={t("badge_collection")} />
           <p className="-mt-3 mb-3 text-sm text-aivo-ink-soft">
             {earned.length} of {ALL_KEYS.length} earned.
           </p>
@@ -210,9 +212,9 @@ export default async function ParentMilestonesPage({
                       <div className="flex items-center gap-2">
                         <p className="truncate font-medium">{def.name}</p>
                         {isEarned ? (
-                          <Badge tone="success">Earned</Badge>
+                          <Badge tone="success">{t("earned")}</Badge>
                         ) : (
-                          <Badge tone="neutral">Locked</Badge>
+                          <Badge tone="neutral">{t("locked")}</Badge>
                         )}
                       </div>
                       <p className="mt-1 text-sm text-aivo-ink-soft">{def.description}</p>
@@ -223,7 +225,7 @@ export default async function ParentMilestonesPage({
             })}
           </div>
 
-          <SectionHeader title="How XP works" />
+          <SectionHeader title={t("how_xp_works")} />
           <Card className="p-[var(--aivo-density-card-pad)]">
             <div className="flex items-start gap-3">
               <HelpCircle className="mt-0.5 h-5 w-5 shrink-0 text-aivo-ink-soft" />

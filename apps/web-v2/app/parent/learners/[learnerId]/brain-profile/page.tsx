@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { ArrowRight, RefreshCw, Sparkles } from "lucide-react";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
@@ -77,6 +78,7 @@ export default async function BrainProfilePage({
   params: Promise<{ learnerId: string }>;
 }) {
   const session = await requirePageRole(["parent"]);
+  const t = await getTranslations("parent.learner_brain_profile");
   const { learnerId } = await params;
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
@@ -95,15 +97,15 @@ export default async function BrainProfilePage({
       >
         <PageHeader
           eyebrow={`Brain profile for ${learner.displayName}`}
-          title="Finish the parent assessment first"
+          title={t("finish_assessment_first")}
           description="The brain profile is built from your assessment plus any IEP you share. Submit the assessment and we'll generate it automatically."
         />
         <EmptyState
-          title="Assessment not yet submitted"
+          title={t("assessment_not_submitted")}
           action={
             <Button asChild>
               <Link href={`/parent/learners/${learner.id}/assessment`}>
-                Continue assessment <ArrowRight className="ml-1 h-4 w-4" />
+                {t("continue_assessment")} <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             </Button>
           }
@@ -144,13 +146,13 @@ export default async function BrainProfilePage({
       >
         <PageHeader
           eyebrow={`Brain profile for ${learner.displayName}`}
-          title="We couldn't generate the profile"
+          title={t("could_not_generate")}
           description="Something went wrong. Try again — we keep a deterministic fallback so this should always work."
         />
         <form action={regenerateAction}>
           <input type="hidden" name="learnerId" value={learner.id} />
           <Button type="submit">
-            <RefreshCw className="mr-1 h-4 w-4" /> Try again
+            <RefreshCw className="mr-1 h-4 w-4" /> {t("try_again")}
           </Button>
         </form>
       </AppShell>
@@ -168,13 +170,13 @@ export default async function BrainProfilePage({
     >
       <PageHeader
         eyebrow={`Brain profile for ${learner.displayName}`}
-        title="How AIVO will work with your learner"
+        title={t("page_title")}
         description="Generated from your assessment and any IEP you shared. You can re-generate at any time after updating your inputs."
         actions={
           <form action={regenerateAction}>
             <input type="hidden" name="learnerId" value={learner.id} />
             <Button type="submit" variant="outline">
-              <RefreshCw className="mr-1 h-4 w-4" /> Regenerate
+              <RefreshCw className="mr-1 h-4 w-4" /> {t("regenerate")}
             </Button>
           </form>
         }
@@ -183,7 +185,7 @@ export default async function BrainProfilePage({
       <Card className="mb-4 flex items-start gap-3 p-4">
         <Sparkles className="h-5 w-5 shrink-0 text-aivo-primary" />
         <div className="text-sm">
-          <p className="font-medium">Recommended tutor persona</p>
+          <p className="font-medium">{t("recommended_tutor_persona")}</p>
           <p className="mt-1 text-aivo-ink-soft">
             <span className="font-semibold text-aivo-ink">
               {PERSONA_LABEL[s.tutorPersonaRecommendation.style]}
@@ -219,25 +221,25 @@ export default async function BrainProfilePage({
         </div>
       </Card>
 
-      <SectionHeader title="Parent assessment summary" />
+      <SectionHeader title={t("parent_assessment_summary")} />
       <Card className="p-[var(--aivo-density-card-pad)] text-sm">{s.parentAssessmentSummary}</Card>
 
-      <SectionHeader title="Accommodation summary" className="mt-6" />
+      <SectionHeader title={t("accommodation_summary")} className="mt-6" />
       <Card className="p-[var(--aivo-density-card-pad)] text-sm">{s.accommodationSummary}</Card>
 
-      <SectionHeader title="Learning profile" className="mt-6" />
+      <SectionHeader title={t("learning_profile")} className="mt-6" />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
-            Sensory profile
+            {t("sensory_profile")}
           </p>
           <dl className="mt-2 space-y-1 text-sm">
             <div className="flex justify-between gap-2">
-              <dt className="text-aivo-ink-soft">Pattern</dt>
+              <dt className="text-aivo-ink-soft">{t("pattern")}</dt>
               <dd className="capitalize">{s.sensoryProfile.seekingOrAvoiding}</dd>
             </div>
             <div>
-              <dt className="text-aivo-ink-soft">Sensitivities</dt>
+              <dt className="text-aivo-ink-soft">{t("sensitivities")}</dt>
               <dd className="mt-1 flex flex-wrap gap-1">
                 {s.sensoryProfile.sensitivities.length === 0
                   ? "none"
@@ -253,29 +255,29 @@ export default async function BrainProfilePage({
 
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
-            Attention
+            {t("attention")}
           </p>
           <dl className="mt-2 space-y-1 text-sm">
             <div className="flex justify-between gap-2">
-              <dt className="text-aivo-ink-soft">Focus window</dt>
+              <dt className="text-aivo-ink-soft">{t("focus_window")}</dt>
               <dd>{s.attentionProfile.focusWindowMinutes} min</dd>
             </div>
             <div className="flex justify-between gap-2">
-              <dt className="text-aivo-ink-soft">Breaks</dt>
+              <dt className="text-aivo-ink-soft">{t("breaks")}</dt>
               <dd className="capitalize">{s.attentionProfile.breakStyle.replaceAll("_", " ")}</dd>
             </div>
             <div className="flex justify-between gap-2">
-              <dt className="text-aivo-ink-soft">Movement helps</dt>
+              <dt className="text-aivo-ink-soft">{t("movement_helps")}</dt>
               <dd>{s.attentionProfile.movementHelps ? "Yes" : "No"}</dd>
             </div>
           </dl>
         </Card>
 
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">Comfort</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">{t("comfort")}</p>
           <dl className="mt-2 space-y-1 text-sm">
             <div className="flex justify-between gap-2">
-              <dt className="text-aivo-ink-soft">Reading</dt>
+              <dt className="text-aivo-ink-soft">{t("reading")}</dt>
               <dd className="capitalize">{s.readingComfort}</dd>
             </div>
             <div className="flex justify-between gap-2">
@@ -287,7 +289,7 @@ export default async function BrainProfilePage({
 
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
-            Preferred modalities
+            {t("preferred_modalities")}
           </p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {s.preferredModalities.map((m) => (
@@ -300,7 +302,7 @@ export default async function BrainProfilePage({
 
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
-            Support defaults
+            {t("support_defaults")}
           </p>
           <ul className="mt-2 space-y-1 text-sm">
             <li>Extended time: {s.supportDefaults.extendedTime ? "Yes" : "No"}</li>
@@ -313,9 +315,9 @@ export default async function BrainProfilePage({
 
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
-            Motivation
+            {t("motivation")}
           </p>
-          <p className="mt-2 text-xs text-aivo-ink-soft">Rewards that help</p>
+          <p className="mt-2 text-xs text-aivo-ink-soft">{t("rewards_that_help")}</p>
           <ul className="mt-1 list-disc pl-5 text-sm">
             {s.motivationProfile.rewardsThatHelp.length === 0 ? (
               <li className="list-none text-aivo-ink-soft">none recorded</li>
@@ -325,7 +327,7 @@ export default async function BrainProfilePage({
           </ul>
           {s.motivationProfile.avoidanceFactors.length > 0 ? (
             <>
-              <p className="mt-3 text-xs text-aivo-ink-soft">Avoidance factors</p>
+              <p className="mt-3 text-xs text-aivo-ink-soft">{t("avoidance_factors")}</p>
               <ul className="mt-1 list-disc pl-5 text-sm">
                 {s.motivationProfile.avoidanceFactors.map((r) => (
                   <li key={r}>{r}</li>
@@ -336,7 +338,7 @@ export default async function BrainProfilePage({
         </Card>
       </div>
 
-      <SectionHeader title="Subjects at a glance" className="mt-6" />
+      <SectionHeader title={t("subjects_at_a_glance")} className="mt-6" />
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {s.masteryOverview.map((row) => (
           <Card key={row.subjectId} className="p-4">
@@ -356,7 +358,7 @@ export default async function BrainProfilePage({
         </p>
         <Button asChild>
           <Link href={`/parent/learners/${learner.id}`}>
-            Back to learner <ArrowRight className="ml-1 h-4 w-4" />
+            {t("back_to_learner")} <ArrowRight className="ml-1 h-4 w-4" />
           </Link>
         </Button>
       </div>

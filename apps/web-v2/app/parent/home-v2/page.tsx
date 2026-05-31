@@ -6,6 +6,7 @@ import {
   type SetupStep,
 } from "@aivo/ui/hero";
 import { AivoIcon } from "@aivo/ui/icon";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PARENT_NAV } from "@/components/layout/role-shells";
@@ -33,6 +34,7 @@ import { SectionCard } from "./_components/SectionCard";
  */
 export default async function ParentHomeV2() {
   const session = await requirePageRole(["parent"]);
+  const t = await getTranslations("parent.home_v2");
 
   // Placeholder content data — wiring to listLearnersForParent is a
   // separate task and is intentionally out of scope here.
@@ -80,7 +82,7 @@ export default async function ParentHomeV2() {
                 className="inline-flex items-center gap-2 h-11 px-5 rounded-iw-control bg-white text-iw-text-strong font-semibold border border-iw-border hover:border-iw-text-muted"
               >
                 <AivoIcon name="rosterStudents" size={18} />
-                Add another learner
+                {t("add_another_learner")}
               </Link>
             </>
           }
@@ -88,9 +90,9 @@ export default async function ParentHomeV2() {
 
         <SetupProgressTrack steps={setupSteps} />
 
-        <section aria-label="Today at a glance">
+        <section aria-label={t("today_at_a_glance")}>
           <h2 className="iw-label uppercase tracking-wider text-iw-text-muted mb-3">
-            Today at a glance
+            {t("today_at_a_glance")}
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <FloatingMetricCard
@@ -145,9 +147,9 @@ export default async function ParentHomeV2() {
           </div>
         </section>
 
-        <section aria-label="Details" className="grid gap-4 lg:grid-cols-2">
+        <section aria-label={t("details")} className="grid gap-4 lg:grid-cols-2">
           <SectionCard
-            title="Learning readiness"
+            title={t("learning_readiness")}
             iconName="aiBrain"
             subtitle="How prepared today's plan is for Emma right now."
             badge="Ready"
@@ -156,22 +158,22 @@ export default async function ParentHomeV2() {
           >
             <ul className="space-y-2">
               <li className="flex justify-between gap-3">
-                <span className="text-iw-text-muted">Plan generated</span>
+                <span className="text-iw-text-muted">{t("plan_generated")}</span>
                 <span>This morning, 6:42 AM</span>
               </li>
               <li className="flex justify-between gap-3">
-                <span className="text-iw-text-muted">Pacing</span>
-                <span>Calm — extended time on</span>
+                <span className="text-iw-text-muted">{t("pacing")}</span>
+                <span>{t("calm_extended_time_on")}</span>
               </li>
               <li className="flex justify-between gap-3">
-                <span className="text-iw-text-muted">Sensory mode</span>
-                <span>Warm + reduced motion</span>
+                <span className="text-iw-text-muted">{t("sensory_mode")}</span>
+                <span>{t("warm_reduced_motion")}</span>
               </li>
             </ul>
           </SectionCard>
 
           <SectionCard
-            title="Assessment status"
+            title={t("assessment_status")}
             iconName="aiSparkle"
             subtitle="Where Emma is in the discovery adventure baseline."
             badge="60% done"
@@ -185,7 +187,7 @@ export default async function ParentHomeV2() {
           </SectionCard>
 
           <SectionCard
-            title="IEP / support upload"
+            title={t("iep_support_upload")}
             iconName="iep"
             subtitle="Extracted accommodations and goals."
             badge="3 accommodations"
@@ -200,7 +202,7 @@ export default async function ParentHomeV2() {
           </SectionCard>
 
           <SectionCard
-            title="Consent checklist"
+            title={t("consent_checklist")}
             iconName="consentCheck"
             subtitle="What you've approved and what's still optional."
             badge="2 of 3"
@@ -209,22 +211,22 @@ export default async function ParentHomeV2() {
           >
             <ul className="space-y-2">
               <li className="flex justify-between gap-3">
-                <span>Parent / guardian consent</span>
-                <span className="text-[var(--aivo-domain-completion-complete-strong)] font-semibold">Approved</span>
+                <span>{t("parent_guardian_consent")}</span>
+                <span className="text-[var(--aivo-domain-completion-complete-strong)] font-semibold">{t("approved")}</span>
               </li>
               <li className="flex justify-between gap-3">
-                <span>AI personalization</span>
-                <span className="text-[var(--aivo-domain-completion-complete-strong)] font-semibold">Approved</span>
+                <span>{t("ai_personalization")}</span>
+                <span className="text-[var(--aivo-domain-completion-complete-strong)] font-semibold">{t("approved")}</span>
               </li>
               <li className="flex justify-between gap-3">
-                <span>School data sharing</span>
-                <span className="text-iw-text-muted">Optional — not set</span>
+                <span>{t("school_data_sharing")}</span>
+                <span className="text-iw-text-muted">{t("optional_not_set")}</span>
               </li>
             </ul>
           </SectionCard>
 
           <SectionCard
-            title="Today's recommended actions"
+            title={t("todays_recommended_actions")}
             iconName="goal"
             subtitle="Just two small things. Both take under a minute."
             badge="2 items"
@@ -234,25 +236,25 @@ export default async function ParentHomeV2() {
             <ul className="space-y-3">
               <li>
                 <span className="font-semibold text-iw-text-strong">
-                  Approve voice mode
+                  {t("approve_voice_mode")}
                 </span>
                 <p className="text-iw-text-muted text-sm">
-                  Lets Emma talk to the AI tutor out loud during lessons.
+                  {t("approve_voice_mode_desc")}
                 </p>
               </li>
               <li>
                 <span className="font-semibold text-iw-text-strong">
-                  Upload IEP (optional)
+                  {t("upload_iep_optional")}
                 </span>
                 <p className="text-iw-text-muted text-sm">
-                  Add accommodations so AIVO applies them from day one.
+                  {t("upload_iep_desc")}
                 </p>
               </li>
             </ul>
           </SectionCard>
 
           <SectionCard
-            title="Notifications"
+            title={t("notifications_title")}
             iconName="aiWand"
             subtitle="Quiet, recent, parent-relevant only."
             badge="1 new"
@@ -261,22 +263,22 @@ export default async function ParentHomeV2() {
           >
             <ul className="space-y-2">
               <li>
-                <span className="text-iw-text-strong font-semibold">New milestone:</span>{" "}
+                <span className="text-iw-text-strong font-semibold">{t("new_milestone")}</span>{" "}
                 <span className="text-iw-text-muted">
-                  Read a 200-word passage independently.
+                  {t("new_milestone_desc")}
                 </span>
               </li>
               <li>
-                <span className="text-iw-text-strong font-semibold">Tutor note:</span>{" "}
+                <span className="text-iw-text-strong font-semibold">{t("tutor_note")}</span>{" "}
                 <span className="text-iw-text-muted">
-                  Pacing looks great this week.
+                  {t("tutor_note_desc")}
                 </span>
               </li>
             </ul>
           </SectionCard>
 
           <SectionCard
-            title="Billing"
+            title={t("billing_title")}
             iconName="billingCard"
             subtitle="Plan + next renewal."
             badge="Family · monthly"
@@ -286,21 +288,21 @@ export default async function ParentHomeV2() {
             <ul className="space-y-2">
               <li className="flex justify-between gap-3">
                 <span className="text-iw-text-muted">Plan</span>
-                <span>Family — 2 learners</span>
+                <span>{t("family_2_learners")}</span>
               </li>
               <li className="flex justify-between gap-3">
-                <span className="text-iw-text-muted">Next renewal</span>
+                <span className="text-iw-text-muted">{t("next_renewal")}</span>
                 <span>Apr 14</span>
               </li>
               <li className="flex justify-between gap-3">
-                <span className="text-iw-text-muted">Payment method</span>
+                <span className="text-iw-text-muted">{t("payment_method")}</span>
                 <span>Visa · 4242</span>
               </li>
             </ul>
           </SectionCard>
 
           <SectionCard
-            title="School connection"
+            title={t("school_connection")}
             iconName="rosterSchool"
             subtitle="Sync with the classroom, if Emma's school uses AIVO."
             badge="Not linked"

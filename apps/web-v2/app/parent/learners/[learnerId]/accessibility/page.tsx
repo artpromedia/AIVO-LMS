@@ -3,6 +3,7 @@
  * loads current prefs and hands them to the shared client form.
  */
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -19,6 +20,7 @@ export default async function ParentAccessibilityPage({
 }) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
+  const t = await getTranslations("parent.learner_accessibility");
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
@@ -35,7 +37,7 @@ export default async function ParentAccessibilityPage({
     >
       <PageHeader
         eyebrow={learner.displayName}
-        title="Accessibility"
+        title={t("title")}
         description="These settings change how lessons look, sound, and pace for this learner."
       />
       <AccessibilityForm learnerId={learnerId} initial={prefs} />

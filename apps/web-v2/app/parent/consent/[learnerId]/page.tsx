@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -25,6 +26,7 @@ const PER_LEARNER_TYPES: ConsentType[] = [
 export default async function Page({ params }: { params: Promise<{ learnerId: string }> }) {
   const { learnerId } = await params;
   const session = await requirePageRole(["parent"]);
+  const t = await getTranslations("parent.consent");
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
@@ -43,13 +45,13 @@ export default async function Page({ params }: { params: Promise<{ learnerId: st
     >
       <PageHeader
         eyebrow={`Consent · ${learner.displayName}`}
-        title="Per-learner consents"
-        description="Per-learner consents apply only to this child."
+        title={t("title")}
+        description={t("description")}
       />
       {ageGate?.requiresParentConsent ? (
         <Card className="p-4 mb-4 bg-amber-50 border-amber-200">
           <p className="text-sm text-amber-900">
-            This learner is under 13. Parent consent is required for data collection per COPPA.
+            {t("coppa_notice")}
           </p>
         </Card>
       ) : null}
@@ -63,9 +65,9 @@ export default async function Page({ params }: { params: Promise<{ learnerId: st
                 <div className="flex items-center gap-2">
                   <h3 className="font-display text-base font-semibold">{humanize(type)}</h3>
                   {active ? (
-                    <Badge tone="success">Accepted</Badge>
+                    <Badge tone="success">{t("accepted")}</Badge>
                   ) : (
-                    <Badge tone="neutral">Not accepted</Badge>
+                    <Badge tone="neutral">{t("not_accepted")}</Badge>
                   )}
                 </div>
                 <p className="text-sm text-aivo-ink-soft mt-1">

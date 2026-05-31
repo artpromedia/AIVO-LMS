@@ -5,6 +5,7 @@
  */
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
@@ -47,6 +48,7 @@ export default async function ParentGradebookPage({
 }) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
+  const t = await getTranslations("parent.learner_gradebook");
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
@@ -87,7 +89,7 @@ export default async function ParentGradebookPage({
     >
       <PageHeader
         eyebrow={learner.displayName}
-        title="Gradebook"
+        title={t("title")}
         description={
           map
             ? `Last evaluated ${new Date(map.updatedAt).toLocaleDateString()}.`
@@ -97,20 +99,20 @@ export default async function ParentGradebookPage({
 
       {subjectRows.length === 0 ? (
         <EmptyState
-          title="No mastery data yet"
+          title={t("no_mastery_data")}
           description="Complete the baseline assessment to start tracking skill-by-skill progress."
           action={
             <Link
               href={`/parent/learners/${learner.id}/assessment`}
               className="text-aivo-accent underline underline-offset-4"
             >
-              Start baseline assessment
+              {t("start_baseline")}
             </Link>
           }
         />
       ) : (
         <>
-          <SectionHeader title="Subject averages" />
+          <SectionHeader title={t("subject_averages")} />
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {subjectRows.map((r) => (
               <Card key={r.subject!.id} className="p-[var(--aivo-density-card-pad)]">
@@ -133,17 +135,17 @@ export default async function ParentGradebookPage({
             ))}
           </div>
 
-          <SectionHeader title="Skill-level mastery" />
+          <SectionHeader title={t("skill_mastery")} />
           <Card className="overflow-hidden p-0">
             <div className="max-h-[480px] overflow-y-auto">
               <table className="w-full text-sm">
                 <thead className="sticky top-0 bg-aivo-surface-soft text-xs uppercase tracking-wide text-aivo-ink-soft">
                   <tr>
                     <th className="px-4 py-2 text-left">Skill</th>
-                    <th className="px-4 py-2 text-left">Subject</th>
+                    <th className="px-4 py-2 text-left">{t("col_subject")}</th>
                     <th className="px-4 py-2 text-left">Level</th>
                     <th className="px-4 py-2 text-right">Score</th>
-                    <th className="px-4 py-2 text-right">Confidence</th>
+                    <th className="px-4 py-2 text-right">{t("col_confidence")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -178,20 +180,20 @@ export default async function ParentGradebookPage({
         </>
       )}
 
-      <SectionHeader title="Recent sessions" />
+      <SectionHeader title={t("recent_sessions")} />
       {lessonRuns.length === 0 ? (
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-sm text-aivo-ink-soft">No sessions yet.</p>
+          <p className="text-sm text-aivo-ink-soft">{t("no_sessions")}</p>
         </Card>
       ) : (
         <Card className="overflow-hidden p-0">
           <table className="w-full text-sm">
             <thead className="bg-aivo-surface-soft text-xs uppercase tracking-wide text-aivo-ink-soft">
               <tr>
-                <th className="px-4 py-2 text-left">Started</th>
-                <th className="px-4 py-2 text-left">Subject</th>
-                <th className="px-4 py-2 text-left">Source</th>
-                <th className="px-4 py-2 text-left">Status</th>
+                <th className="px-4 py-2 text-left">{t("col_started")}</th>
+                <th className="px-4 py-2 text-left">{t("col_subject")}</th>
+                <th className="px-4 py-2 text-left">{t("col_source")}</th>
+                <th className="px-4 py-2 text-left">{t("col_status")}</th>
               </tr>
             </thead>
             <tbody>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import {
   AssessmentShell,
@@ -418,12 +419,12 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 /* ----- screen renderer ------------------------------------------------------ */
 
-function ReassuranceColumn({ stepNum }: { stepNum: number }) {
+function ReassuranceColumn({ stepNum, t }: { stepNum: number; t: (key: string) => string }) {
   const cards: Array<React.ReactElement> = [
     <ReassuranceCard
       key="privacy"
       tone="privacy"
-      title="Private by default"
+      title={t("reassurance_private_title")}
       body="Your answers are kept on your account. We never show your raw assessment to your learner."
       icon={
         <svg
@@ -459,7 +460,7 @@ function ReassuranceColumn({ stepNum }: { stepNum: number }) {
       <ReassuranceCard
         key="safety"
         tone="safety"
-        title="No diagnosis required"
+        title={t("reassurance_no_diagnosis_title")}
         body="Pick what feels right. AIVO doesn't need a formal label — only what helps day to day."
       />,
     );
@@ -487,6 +488,7 @@ function renderSection(
   sectionId: AssessmentSectionId,
   assessment: ParentAssessment,
   aiContext: SuggestionContext,
+  t: (key: string) => string,
 ): React.ReactElement {
   switch (sectionId) {
     case "basics":
@@ -503,7 +505,7 @@ function renderSection(
             name="basics.pronouns"
             label="Pronouns"
             helper="Optional. We'll honour these everywhere."
-            placeholder="she / her, he / him, they / them…"
+            placeholder={t("placeholder_pronouns")}
             defaultValue={fieldString(assessment, "basics", "pronouns")}
             maxLength={40}
           />
@@ -512,7 +514,7 @@ function renderSection(
             name="basics.languages"
             label="Languages at home"
             helper="Optional. Separate with commas. Up to 5."
-            placeholder="English, Spanish"
+            placeholder={t("placeholder_languages")}
             defaultValue={fieldString(assessment, "basics", "languages")}
           />
         </div>
@@ -533,7 +535,7 @@ function renderSection(
             name="background.diagnosesOther"
             label="Anything else to add"
             helper="Optional. Separate with commas."
-            placeholder="e.g. APD, mild hearing loss"
+            placeholder={t("placeholder_diagnoses_other")}
           />
           <PillCardGroup
             mode="multi"
@@ -555,7 +557,7 @@ function renderSection(
               multiline
               label="What does your child love to talk about or do?"
               helper="A passion, a hobby, a favourite show. AIVO weaves these into examples."
-              placeholder="Dinosaurs. Building with LEGO. Cooking with grandma."
+              placeholder={t("placeholder_loves")}
               defaultValue={fieldString(assessment, "strengths", "loves")}
               maxLength={500}
             />
@@ -566,7 +568,7 @@ function renderSection(
               name="strengths.goodAt"
               label="Things your child is good at"
               helper="Comma-separated. Up to 10."
-              placeholder="Memorising lyrics, building, drawing, kindness"
+              placeholder={t("placeholder_good_at")}
               defaultValue={fieldString(assessment, "strengths", "goodAt")}
             />
             {aiBlock("strengths.goodAt", "good_at", aiContext, "comma")}
@@ -577,7 +579,7 @@ function renderSection(
               multiline
               label="What lights them up when learning?"
               helper="A goal, a topic, a reward, a person they want to impress."
-              placeholder="Beating their own time. Showing dad. Cool space facts."
+              placeholder={t("placeholder_motivates")}
               defaultValue={fieldString(assessment, "strengths", "motivates")}
               maxLength={500}
             />
@@ -594,7 +596,7 @@ function renderSection(
               multiline
               label="What tends to make learning hard or frustrating?"
               helper="One per line. AIVO will gently route around these in early sessions."
-              placeholder="Long reading passages.\nTimers.\nLoud rooms."
+              placeholder={t("placeholder_frustration_triggers")}
               defaultValue={fieldString(assessment, "frustration", "triggers")}
             />
             {aiBlock("frustration.triggers", "frustration_triggers", aiContext)}
@@ -605,7 +607,7 @@ function renderSection(
               multiline
               label="What helps your child reset?"
               helper="One per line. AIVO can suggest these inside a session."
-              placeholder="A short walk.\nWater + 2 minutes off screen.\nNoise-cancelling headphones."
+              placeholder={t("placeholder_calming_strategies")}
               defaultValue={fieldString(assessment, "frustration", "calmingStrategies")}
             />
             {aiBlock("frustration.calmingStrategies", "calming_strategies", aiContext)}
@@ -668,10 +670,10 @@ function renderSection(
             />
             <span className="flex-1">
               <span className="block text-sm font-semibold text-iw-text-strong">
-                Movement helps my child focus
+                {t("movement_helps_label")}
               </span>
               <span className="block text-xs text-iw-text-muted mt-0.5">
-                AIVO can suggest stretch / walk breaks between question blocks.
+                {t("movement_helps_body")}
               </span>
             </span>
           </label>
@@ -709,10 +711,10 @@ function renderSection(
             />
             <span className="flex-1">
               <span className="block text-sm font-semibold text-iw-text-strong">
-                My child uses an AAC device or app
+                {t("aac_label")}
               </span>
               <span className="block text-xs text-iw-text-muted mt-0.5">
-                AIVO will switch to AAC-friendly response patterns.
+                {t("aac_body")}
               </span>
             </span>
           </label>
@@ -851,7 +853,7 @@ function renderSection(
               multiline
               label="Known accommodations (one per line)"
               helper="If you have an IEP, you can upload it next — but a quick list here helps too."
-              placeholder="Extended time on tests.\nFrequent movement breaks.\nQuiet testing environment."
+              placeholder={t("placeholder_accommodations")}
               defaultValue={fieldString(assessment, "accommodations", "known")}
               maxLength={2000}
             />
@@ -914,10 +916,10 @@ function renderSection(
             />
             <span className="flex-1">
               <span className="block text-sm font-semibold text-iw-text-strong">
-                My child needs help getting started with homework
+                {t("homework_coaching_label")}
               </span>
               <span className="block text-xs text-iw-text-muted mt-0.5">
-                AIVO will offer scaffolded start-up nudges.
+                {t("homework_coaching_body")}
               </span>
             </span>
           </label>
@@ -933,7 +935,7 @@ function renderSection(
               required
               label="What would you like AIVO to help with?"
               helper="One per line. Up to 8."
-              placeholder="Read for 15 minutes without quitting.\nFeel confident with multiplication.\nWrite a short story."
+              placeholder={t("placeholder_goals")}
               defaultValue={fieldString(assessment, "goals", "goals")}
             />
             {aiBlock("goals.goals", "goals", aiContext)}
@@ -981,7 +983,7 @@ function renderSection(
             multiline
             label="Tell us anything else AIVO should know"
             helper="Optional. Up to 2000 characters."
-            placeholder="Worried about confidence with reading. Recently moved schools. Big test in spring."
+            placeholder={t("placeholder_concerns")}
             defaultValue={fieldString(assessment, "concerns", "concerns")}
             maxLength={2000}
           />
@@ -1001,6 +1003,7 @@ export default async function AssessmentWizard({
   searchParams: Promise<{ step?: string; error?: string }>;
 }) {
   const session = await requirePageRole(["parent"]);
+  const t = await getTranslations("parent.learner_assessment");
   const { learnerId } = await params;
   const sp = await searchParams;
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
@@ -1063,10 +1066,10 @@ export default async function AssessmentWizard({
           >
             <polyline points="20 6 9 17 4 12" />
           </svg>
-          Answers autosave as you move forward
+          {t("autosave_indicator")}
         </span>
       }
-      reassurance={<ReassuranceColumn stepNum={stepNum} />}
+      reassurance={<ReassuranceColumn stepNum={stepNum} t={t} />}
     >
       <form action={saveStepAction}>
         <input type="hidden" name="learnerId" value={learner.id} />
@@ -1105,7 +1108,7 @@ export default async function AssessmentWizard({
                     href={`/parent/learners/${learner.id}/assessment/intro`}
                     className={ASSESSMENT_BACK_CLASS}
                   >
-                    Back to intro
+                    {t("back_to_intro")}
                   </Link>
                 )
               }
@@ -1114,7 +1117,7 @@ export default async function AssessmentWizard({
                   href={`/parent/learners/${learner.id}`}
                   className={ASSESSMENT_GHOST_CLASS}
                 >
-                  Save & exit
+                  {t("save_exit")}
                 </Link>
               }
               primaryLabel={isLast ? "Review answers" : "Save & continue"}
@@ -1126,7 +1129,7 @@ export default async function AssessmentWizard({
               renderSection(s, assessment, {
                 ageRange: learner.ageRange,
                 gradeBand: learner.gradeBand,
-              }),
+              }, t),
             )}
           </div>
         </QuestionCard>

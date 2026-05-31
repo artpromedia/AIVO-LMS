@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import {
   AssessmentShell,
   QuestionCard,
@@ -121,6 +122,7 @@ export default async function IEPReviewPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const session = await requirePageRole(["parent"]);
+  const t = await getTranslations("parent.learner_iep_review");
   const { learnerId } = await params;
   const sp = await searchParams;
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
@@ -135,7 +137,7 @@ export default async function IEPReviewPage({
       <AssessmentShell eyebrow={`IEP review for ${learner.displayName}`}>
         <QuestionCard
           eyebrow="Nothing to review yet"
-          title="No IEP on file"
+          title={t("no_iep_on_file_title")}
           helper="Upload an IEP, 504 plan, or accommodation letter to see the extracted supports here."
           actions={
             <AssessmentFooter
@@ -144,7 +146,7 @@ export default async function IEPReviewPage({
                   href={`/parent/learners/${learner.id}/iep`}
                   className="inline-flex items-center gap-2 rounded-iw-control px-5 py-2.5 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
                 >
-                  Go to IEP upload
+                  {t("go_to_iep_upload")}
                 </Link>
               }
             />
@@ -190,12 +192,12 @@ export default async function IEPReviewPage({
         <>
           <ReassuranceCard
             tone="safety"
-            title="Learner never sees this"
+            title={t("learner_never_sees_title")}
             body="Your child only sees a calm, supportive summary — never clinical or diagnostic language."
           />
           <ReassuranceCard
             tone="privacy"
-            title="You can deselect anything"
+            title={t("you_can_deselect_title")}
             body="Toggle off any support you'd rather not have AIVO apply. You can also remove the whole document."
           />
         </>
@@ -213,13 +215,13 @@ export default async function IEPReviewPage({
               <form action={reextractAction}>
                 <input type="hidden" name="learnerId" value={learner.id} />
                 <Button type="submit" variant="outline" size="sm">
-                  Re-run extraction
+                  {t("re_run_extraction")}
                 </Button>
               </form>
               <form action={deleteAction}>
                 <input type="hidden" name="learnerId" value={learner.id} />
                 <Button type="submit" variant="danger" size="sm">
-                  Remove
+                  {t("remove")}
                 </Button>
               </form>
             </div>
@@ -229,7 +231,7 @@ export default async function IEPReviewPage({
         {!ex ? (
           <QuestionCard
             eyebrow="Extraction in progress"
-            title="Reading the document"
+            title={t("reading_document_title")}
             helper="This usually takes about a minute. We'll let you know when the supports are ready."
           >
             <p className="text-sm text-iw-text-muted">
@@ -242,7 +244,7 @@ export default async function IEPReviewPage({
             <input type="hidden" name="learnerId" value={learner.id} />
             <QuestionCard
               eyebrow="Extracted supports"
-              title="Confirm what AIVO can apply"
+              title={t("confirm_what_aivo_applies_title")}
               helper="Each support below comes from your IEP. Untick any you'd rather skip. You can change this later from the learner's settings."
               tag={`${ex.accommodations.length} found`}
               error={errorMessage}
@@ -253,7 +255,7 @@ export default async function IEPReviewPage({
                       href={`/parent/learners/${learner.id}/iep`}
                       className={ASSESSMENT_BACK_CLASS}
                     >
-                      Back to upload
+                      {t("back_to_upload")}
                     </Link>
                   }
                   saveExit={
@@ -261,7 +263,7 @@ export default async function IEPReviewPage({
                       href={`/parent/learners/${learner.id}`}
                       className={ASSESSMENT_GHOST_CLASS}
                     >
-                      Save & exit
+                      {t("save_and_exit")}
                     </Link>
                   }
                   primaryLabel="Confirm & continue"
@@ -295,9 +297,9 @@ export default async function IEPReviewPage({
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-iw-card border border-iw-border bg-white p-4">
-                  <p className="iw-label text-iw-text-muted mb-2">Service areas</p>
+                  <p className="iw-label text-iw-text-muted mb-2">{t("service_areas")}</p>
                   {ex.serviceAreas.length === 0 ? (
-                    <p className="text-sm text-iw-text-muted">None flagged.</p>
+                    <p className="text-sm text-iw-text-muted">{t("none_flagged")}</p>
                   ) : (
                     <ul className="flex flex-wrap gap-2">
                       {ex.serviceAreas.map((s) => (
@@ -309,9 +311,9 @@ export default async function IEPReviewPage({
                   )}
                 </div>
                 <div className="rounded-iw-card border border-iw-border bg-white p-4">
-                  <p className="iw-label text-iw-text-muted mb-2">Assistive technology</p>
+                  <p className="iw-label text-iw-text-muted mb-2">{t("assistive_technology")}</p>
                   {ex.assistiveTechnologyNeeds.length === 0 ? (
-                    <p className="text-sm text-iw-text-muted">None recorded.</p>
+                    <p className="text-sm text-iw-text-muted">{t("none_recorded")}</p>
                   ) : (
                     <ul className="flex flex-wrap gap-2">
                       {ex.assistiveTechnologyNeeds.map((s) => (
@@ -325,7 +327,7 @@ export default async function IEPReviewPage({
               </div>
 
               <div className="rounded-iw-card border border-iw-border bg-[var(--aivo-aivoPurple-50)]/40 p-4">
-                <p className="iw-label text-iw-text-muted mb-2">Learner-safe summary</p>
+                <p className="iw-label text-iw-text-muted mb-2">{t("learner_safe_summary")}</p>
                 <p className="text-sm text-iw-text-strong leading-relaxed">
                   {ex.learnerSafeSummary}
                 </p>

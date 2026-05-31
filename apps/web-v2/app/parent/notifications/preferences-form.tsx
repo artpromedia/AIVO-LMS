@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import type { NotificationPreference } from "@/lib/db/types";
 
@@ -21,6 +22,7 @@ const TYPES: { value: string; label: string }[] = [
 const CHANNELS = ["in_app", "email", "push"] as const;
 
 export function PreferencesForm({ preference }: { preference: NotificationPreference }) {
+  const t = useTranslations("parent.notifications");
   const [prefs, setPrefs] = useState<Record<string, boolean>>(preference.preferences);
   const [quietHours, setQuietHours] = useState(preference.quietHours ?? "");
   const [cadence, setCadence] = useState(preference.digestCadence);
@@ -99,11 +101,11 @@ export function PreferencesForm({ preference }: { preference: NotificationPrefer
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="block text-sm">
           <span className="block text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            Quiet hours
+            {t("prefs_quiet_hours")}
           </span>
           <input
             type="text"
-            placeholder="e.g. 22:00-07:00"
+            placeholder={t("prefs_quiet_hours_placeholder")}
             value={quietHours}
             onChange={(e) => {
               setQuietHours(e.target.value);
@@ -115,7 +117,7 @@ export function PreferencesForm({ preference }: { preference: NotificationPrefer
         </label>
         <label className="block text-sm">
           <span className="block text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            Digest cadence
+            {t("prefs_digest_cadence")}
           </span>
           <select
             value={cadence}
@@ -125,18 +127,18 @@ export function PreferencesForm({ preference }: { preference: NotificationPrefer
             }}
             className="mt-1 w-full rounded-md border border-aivo-border bg-aivo-surface px-3 py-2 text-sm"
           >
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="off">Off</option>
+            <option value="daily">{t("prefs_cadence_daily")}</option>
+            <option value="weekly">{t("prefs_cadence_weekly")}</option>
+            <option value="off">{t("prefs_cadence_off")}</option>
           </select>
         </label>
       </div>
 
       <div className="flex items-center gap-3">
         <Button onClick={save} disabled={saving}>
-          {saving ? "Saving…" : "Save preferences"}
+          {saving ? t("prefs_saving") : t("prefs_save")}
         </Button>
-        {saved ? <span className="text-sm text-aivo-success">Saved.</span> : null}
+        {saved ? <span className="text-sm text-aivo-success">{t("prefs_saved")}</span> : null}
         {err ? (
           <span role="alert" className="text-sm text-aivo-danger">
             {err}

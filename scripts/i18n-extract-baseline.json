@@ -1,5 +1,5 @@
 {
-  "total": 573,
+  "total": 212,
   "areas": {
     "accept-invite": 11,
     "caregiver": 35,
@@ -8,7 +8,6 @@
     "learner": 15,
     "login": 1,
     "onboarding": 4,
-    "parent": 361,
     "settings": 16,
     "signup": 1,
     "teacher": 86,

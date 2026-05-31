@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
@@ -23,6 +24,7 @@ export function SubscribeForm({
   plans: PlanRow[];
   activePlanId: string | null;
 }) {
+  const t = useTranslations("parent.billing");
   const router = useRouter();
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +63,7 @@ export function SubscribeForm({
               </div>
               {isActive ? (
                 <span className="rounded-full bg-aivo-success/10 px-2 py-0.5 text-xs font-medium text-aivo-success">
-                  Current
+                  {t("sub_current_badge")}
                 </span>
               ) : null}
             </div>
@@ -72,7 +74,9 @@ export function SubscribeForm({
               </span>
             </p>
             {price && price.trialDays > 0 ? (
-              <p className="mt-1 text-xs text-aivo-ink-soft">{price.trialDays}-day free trial</p>
+              <p className="mt-1 text-xs text-aivo-ink-soft">
+                {t("sub_free_trial", { days: price.trialDays })}
+              </p>
             ) : null}
             <ul className="mt-3 space-y-1 text-sm text-aivo-ink-soft">
               {row.plan.features.map((f) => (
@@ -85,7 +89,7 @@ export function SubscribeForm({
               disabled={pending || isActive || !price}
               onClick={() => price && subscribe(row.plan.id, price.id)}
             >
-              {isActive ? "Current plan" : pending ? "Working..." : "Switch to this plan"}
+              {isActive ? t("sub_current_plan") : pending ? t("sub_working") : t("sub_switch")}
             </Button>
           </div>
         );
@@ -102,11 +106,12 @@ export function CancelButton({
   subscriptionId: string;
   cancelAtPeriodEnd: boolean;
 }) {
+  const t = useTranslations("parent.billing");
   const router = useRouter();
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
   if (cancelAtPeriodEnd) {
-    return <p className="text-sm text-aivo-ink-soft">Set to cancel at period end.</p>;
+    return <p className="text-sm text-aivo-ink-soft">{t("sub_set_to_cancel")}</p>;
   }
   return (
     <div>
@@ -131,7 +136,7 @@ export function CancelButton({
           });
         }}
       >
-        {pending ? "Canceling..." : "Cancel at period end"}
+        {t(pending ? "sub_canceling" : "sub_cancel_at_period_end")}
       </Button>
       {error ? <p className="mt-2 text-sm text-aivo-danger">{error}</p> : null}
     </div>

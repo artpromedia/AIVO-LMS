@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -86,6 +87,7 @@ export default async function LearnerSettingsPage({
   params: Promise<{ learnerId: string }>;
   searchParams: Promise<{ error?: string }>;
 }) {
+  const t = await getTranslations("parent.learner_settings");
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
   const sp = await searchParams;
@@ -109,12 +111,12 @@ export default async function LearnerSettingsPage({
       />
       {sp.error === "invalid" ? (
         <div className="mb-4 rounded-md border border-aivo-danger bg-aivo-danger/5 px-3 py-2 text-sm text-aivo-danger">
-          Some details look off. Please review and try again.
+          {t("error_invalid")}
         </div>
       ) : null}
       {sp.error === "confirm" ? (
         <div className="mb-4 rounded-md border border-aivo-danger bg-aivo-danger/5 px-3 py-2 text-sm text-aivo-danger">
-          Type DELETE in the confirm box to remove this learner.
+          {t("error_confirm")}
         </div>
       ) : null}
 
@@ -122,7 +124,7 @@ export default async function LearnerSettingsPage({
         <form action={saveAction} className="grid gap-4 sm:grid-cols-2">
           <input type="hidden" name="learnerId" value={learner.id} />
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="firstName">First name</Label>
+            <Label htmlFor="firstName">{t("first_name")}</Label>
             <Input
               id="firstName"
               name="firstName"
@@ -132,7 +134,7 @@ export default async function LearnerSettingsPage({
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="preferredName">Preferred name</Label>
+            <Label htmlFor="preferredName">{t("preferred_name")}</Label>
             <Input
               id="preferredName"
               name="preferredName"
@@ -141,7 +143,7 @@ export default async function LearnerSettingsPage({
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="pronouns">Pronouns</Label>
+            <Label htmlFor="pronouns">{t("pronouns")}</Label>
             <Input
               id="pronouns"
               name="pronouns"
@@ -150,7 +152,7 @@ export default async function LearnerSettingsPage({
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="primaryLanguage">Primary language</Label>
+            <Label htmlFor="primaryLanguage">{t("primary_language")}</Label>
             <Input
               id="primaryLanguage"
               name="primaryLanguage"
@@ -159,7 +161,7 @@ export default async function LearnerSettingsPage({
             />
           </div>
           <div className="flex flex-col gap-1.5 sm:col-span-2">
-            <Label htmlFor="knownStrengths">Strengths</Label>
+            <Label htmlFor="knownStrengths">{t("strengths")}</Label>
             <Textarea
               id="knownStrengths"
               name="knownStrengths"
@@ -173,7 +175,7 @@ export default async function LearnerSettingsPage({
             />
           </div>
           <div className="flex flex-col gap-1.5 sm:col-span-2">
-            <Label htmlFor="knownChallenges">Challenges</Label>
+            <Label htmlFor="knownChallenges">{t("challenges")}</Label>
             <Textarea
               id="knownChallenges"
               name="knownChallenges"
@@ -187,7 +189,7 @@ export default async function LearnerSettingsPage({
             />
           </div>
           <fieldset className="sm:col-span-2 rounded-lg border border-aivo-border p-4">
-            <legend className="px-2 text-sm font-medium">Accessibility defaults</legend>
+            <legend className="px-2 text-sm font-medium">{t("accessibility_defaults")}</legend>
             <div className="grid gap-2 sm:grid-cols-2">
               {(
                 [
@@ -211,23 +213,23 @@ export default async function LearnerSettingsPage({
             </div>
           </fieldset>
           <div className="sm:col-span-2 flex justify-end gap-2">
-            <Button type="submit">Save changes</Button>
+            <Button type="submit">{t("save_changes")}</Button>
           </div>
         </form>
       </Card>
 
       <SectionHeader
-        title="Danger zone"
+        title={t("danger_zone")}
         description="Removing a learner deletes their profile and assessment data."
       />
       <Card className="max-w-2xl border-aivo-danger/40 p-6">
         <form action={deleteAction} className="flex flex-col gap-3">
           <input type="hidden" name="learnerId" value={learner.id} />
-          <Label htmlFor="confirm">Type DELETE to confirm</Label>
+          <Label htmlFor="confirm">{t("delete_confirm_label")}</Label>
           <Input id="confirm" name="confirm" placeholder="DELETE" />
           <div className="flex justify-end">
             <Button type="submit" variant="danger">
-              Remove learner
+              {t("remove_learner")}
             </Button>
           </div>
         </form>

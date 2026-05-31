@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import {
   AssessmentShell,
   ReassuranceCard,
@@ -27,6 +28,7 @@ export default async function BaselineSummaryPage({
   params: Promise<{ learnerId: string }>;
 }) {
   const session = await requirePageRole(["parent"]);
+  const t = await getTranslations("parent.learner_baseline_summary");
   const { learnerId } = await params;
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
@@ -39,7 +41,7 @@ export default async function BaselineSummaryPage({
       <AssessmentShell eyebrow={`Baseline summary for ${learner.displayName}`}>
         <article className="rounded-iw-card-lg bg-white border border-iw-border p-6 md:p-8 flex flex-col gap-4">
           <h1 className="text-2xl font-semibold text-iw-text-strong">
-            No completed baseline yet
+            {t("no_baseline_yet")}
           </h1>
           <p className="text-sm text-iw-text-muted leading-relaxed">
             Once your learner finishes the baseline, you'll see a calm summary here — including
@@ -49,7 +51,7 @@ export default async function BaselineSummaryPage({
             href={`/parent/learners/${learner.id}/baseline`}
             className="self-start inline-flex items-center gap-2 rounded-iw-control px-5 py-2.5 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
           >
-            Manage baseline
+            {t("manage_baseline")}
           </Link>
         </article>
       </AssessmentShell>
@@ -67,13 +69,13 @@ export default async function BaselineSummaryPage({
         <>
           <ReassuranceCard
             tone="info"
-            title="Starting points, not scores"
+            title={t("starting_points_title")}
             body="Every figure here is where lessons will start — not how your learner performed. AIVO will adjust as it sees how sessions go."
           />
           {iep?.confirmedAt ? (
             <ReassuranceCard
               tone="safety"
-              title="IEP supports stay on"
+              title={t("iep_supports_stay_on_title")}
               body={`AIVO will keep applying the ${
                 iep.acceptedAccommodations?.length ?? 0
               } support${(iep.acceptedAccommodations?.length ?? 0) === 1 ? "" : "s"} you confirmed.`}
@@ -81,7 +83,7 @@ export default async function BaselineSummaryPage({
           ) : (
             <ReassuranceCard
               tone="privacy"
-              title="No IEP needed"
+              title={t("no_iep_needed_title")}
               body="AIVO uses your assessment alone for personalization. You can upload an IEP any time."
             />
           )}
@@ -89,7 +91,7 @@ export default async function BaselineSummaryPage({
       }
     >
       <header className="flex flex-col gap-2">
-        <p className="iw-label text-iw-text-muted">Baseline complete</p>
+        <p className="iw-label text-iw-text-muted">{t("baseline_complete")}</p>
         <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong leading-snug">
           AIVO has what it needs to plan calm, just-right lessons for{" "}
           {learner.preferredName || learner.firstName}.
@@ -102,17 +104,17 @@ export default async function BaselineSummaryPage({
 
       <section className="grid gap-3 md:grid-cols-3">
         <article className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-1">
-          <p className="iw-label text-iw-text-muted">Questions answered</p>
+          <p className="iw-label text-iw-text-muted">{t("questions_answered")}</p>
           <p className="text-3xl font-semibold text-iw-text-strong tabular-nums">
             {summary.totalAnswered}
             <span className="text-iw-text-muted text-base">/{summary.totalQuestions}</span>
           </p>
           <p className="text-xs text-iw-text-muted leading-relaxed">
-            Skipped questions are useful too — they tell AIVO what to ease into slowly.
+            {t("skipped_questions_note")}
           </p>
         </article>
         <article className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-1">
-          <p className="iw-label text-iw-text-muted">Subjects covered</p>
+          <p className="iw-label text-iw-text-muted">{t("subjects_covered")}</p>
           <p className="text-3xl font-semibold text-iw-text-strong tabular-nums">
             {summary.perSubject.length}
           </p>
@@ -121,10 +123,10 @@ export default async function BaselineSummaryPage({
           </p>
         </article>
         <article className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-1">
-          <p className="iw-label text-iw-text-muted">Personalization</p>
+          <p className="iw-label text-iw-text-muted">{t("personalization")}</p>
           <div className="flex flex-wrap gap-1.5 mt-1">
             <InsightChip tone="primary" size="md">
-              Parent assessment
+              {t("parent_assessment")}
             </InsightChip>
             {iep?.confirmedAt ? (
               <InsightChip tone="accent" size="md">
@@ -132,14 +134,14 @@ export default async function BaselineSummaryPage({
               </InsightChip>
             ) : null}
             <InsightChip tone="info" size="md">
-              Pacing
+              {t("pacing")}
             </InsightChip>
           </div>
         </article>
       </section>
 
       <section className="rounded-iw-card-lg bg-white border border-iw-border p-6 flex flex-col gap-4">
-        <h2 className="text-lg font-semibold text-iw-text-strong">Where lessons start</h2>
+        <h2 className="text-lg font-semibold text-iw-text-strong">{t("where_lessons_start")}</h2>
         <ul className="grid gap-3 md:grid-cols-2">
           {summary.perSubject.map((s) => (
             <li
@@ -172,23 +174,23 @@ export default async function BaselineSummaryPage({
 
       <section className="grid gap-3 md:grid-cols-2">
         <article className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-2">
-          <p className="iw-label text-iw-text-muted">For you</p>
+          <p className="iw-label text-iw-text-muted">{t("for_you")}</p>
           <p className="text-sm leading-relaxed text-iw-text-strong">{summary.parentSummary}</p>
         </article>
         <article className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-2">
-          <p className="iw-label text-iw-text-muted">What your learner sees</p>
+          <p className="iw-label text-iw-text-muted">{t("what_learner_sees")}</p>
           <p className="text-sm leading-relaxed text-iw-text-strong">
             {summary.learnerSafeSummary}
           </p>
           <p className="text-xs text-iw-text-muted mt-1">
-            This is the only version your learner sees — no scores, no clinical language.
+            {t("learner_only_version_note")}
           </p>
         </article>
       </section>
 
       {ex && ex.accommodations.length > 0 ? (
         <section className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-3">
-          <p className="iw-label text-iw-text-muted">IEP supports in effect</p>
+          <p className="iw-label text-iw-text-muted">{t("iep_supports_in_effect")}</p>
           <ul className="flex flex-wrap gap-1.5">
             {(iep?.acceptedAccommodations ?? ex.accommodations).slice(0, 12).map((a) => (
               <InsightChip key={a} tone="accent" size="md">
@@ -204,13 +206,13 @@ export default async function BaselineSummaryPage({
           href={`/parent/learners/${learner.id}`}
           className="inline-flex items-center gap-2 rounded-iw-control px-5 py-2.5 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
         >
-          Back to learner home
+          {t("back_to_learner_home")}
         </Link>
         <Link
           href={`/parent/learners/${learner.id}/baseline`}
           className="inline-flex items-center gap-1.5 rounded-iw-control px-4 py-2.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
         >
-          Run another baseline
+          {t("run_another_baseline")}
         </Link>
       </div>
     </AssessmentShell>

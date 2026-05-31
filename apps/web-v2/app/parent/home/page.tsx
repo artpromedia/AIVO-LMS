@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Plus, Users, Sparkles, ShieldCheck, ArrowRight } from "lucide-react";
 import { FloatingMetricCard } from "@aivo/ui/hero";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { SectionHeader } from "@/components/layout/page-header";
@@ -14,6 +15,7 @@ const READY_STATES = new Set(["ready_for_today_mission", "active_learning"]);
 
 export default async function ParentHome() {
   const session = await requirePageRole(["parent"]);
+  const t = await getTranslations("parent.home");
   const initial = await listLearnersForParent(session.userId, session.tenantId);
   for (const l of initial) await refreshLearnerReadiness(l.id, session.tenantId);
   const learners = await listLearnersForParent(session.userId, session.tenantId);
@@ -39,7 +41,7 @@ export default async function ParentHome() {
       user={{ displayName: session.displayName, email: session.email }}
     >
       <section
-        aria-label="Greeting"
+        aria-label={t("greeting")}
         className="relative overflow-hidden rounded-iw-hero bg-gradient-to-br from-[var(--aivo-aivoPurple-100)] via-white to-[var(--aivo-aivoTeal-100)] px-6 py-8 sm:px-10 sm:py-10 lg:px-12 lg:py-12 shadow-[0_40px_100px_-50px_rgba(124,58,237,0.25)]"
       >
         <div
@@ -51,7 +53,7 @@ export default async function ParentHome() {
           className="pointer-events-none absolute -bottom-16 -left-10 h-56 w-56 rounded-full bg-gradient-to-tr from-[var(--aivo-aivoTeal-100)] to-transparent blur-3xl"
         />
         <div className="relative flex max-w-2xl flex-col gap-4">
-          <p className="text-sm font-medium text-iw-text-muted">Family workspace</p>
+          <p className="text-sm font-medium text-iw-text-muted">{t("family_workspace")}</p>
           <h1 className="font-iw-display text-3xl font-bold leading-[1.1] tracking-tight text-iw-text-strong sm:text-4xl lg:text-5xl">
             Hi, {firstName}.
           </h1>
@@ -59,14 +61,14 @@ export default async function ParentHome() {
           <div className="flex flex-wrap gap-3 pt-2">
             <Button asChild size="lg">
               <Link href={primary ? `/parent/learners/${primary.id}` : "/parent/learners/new"}>
-                {primary ? `Open ${primaryFirst}'s profile` : "Add your first learner"}
+                {primary ? `Open ${primaryFirst}'s profile` : t("add_your_first_learner")}
                 <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             </Button>
             {primary ? (
               <Button asChild variant="outline" size="lg">
                 <Link href="/parent/learners/new">
-                  <Plus className="mr-1 h-4 w-4" /> Add another learner
+                  <Plus className="mr-1 h-4 w-4" /> {t("add_another_learner")}
                 </Link>
               </Button>
             ) : null}
@@ -76,7 +78,7 @@ export default async function ParentHome() {
 
       {learners.length > 0 ? (
         <section
-          aria-label="Today at a glance"
+          aria-label={t("today_at_a_glance")}
           className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
         >
           <FloatingMetricCard
@@ -117,16 +119,16 @@ export default async function ParentHome() {
 
       <div className="space-y-4">
         <SectionHeader
-          title="Your learners"
+          title={t("your_learners")}
           description="Each card shows the next step we need from you."
         />
         {learners.length === 0 ? (
           <EmptyState
-            title="No learners yet"
+            title={t("no_learners_yet")}
             description="Add your first learner to begin assessment and personalize their learning path."
             action={
               <Button asChild>
-                <Link href="/parent/learners/new">Add your first learner</Link>
+                <Link href="/parent/learners/new">{t("add_your_first_learner")}</Link>
               </Button>
             }
           />

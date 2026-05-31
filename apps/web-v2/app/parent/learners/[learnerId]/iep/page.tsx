@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import {
   AssessmentShell,
   QuestionCard,
@@ -141,6 +142,7 @@ export default async function IEPUploadPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const session = await requirePageRole(["parent"]);
+  const t = await getTranslations("parent.learner_iep");
   const { learnerId } = await params;
   const sp = await searchParams;
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
@@ -157,14 +159,14 @@ export default async function IEPUploadPage({
         reassurance={
           <ReassuranceCard
             tone="info"
-            title="Why we ask for assessment first"
+            title={t("why_assessment_first_title")}
             body="Your answers and the IEP work together. We use both to apply the right supports — never one without the other."
           />
         }
       >
         <QuestionCard
           eyebrow="One step back"
-          title="Finish the parent assessment first"
+          title={t("finish_assessment_first_title")}
           helper="When that's submitted, you'll come right back here to upload an IEP — or skip and use your assessment alone."
           actions={
             <AssessmentFooter
@@ -173,7 +175,7 @@ export default async function IEPUploadPage({
                   href={`/parent/learners/${learner.id}`}
                   className={ASSESSMENT_BACK_CLASS}
                 >
-                  Back to learner
+                  {t("back_to_learner")}
                 </Link>
               }
               primary={
@@ -181,7 +183,7 @@ export default async function IEPUploadPage({
                   href={`/parent/learners/${learner.id}/assessment`}
                   className="inline-flex items-center gap-2 rounded-iw-control px-5 py-2.5 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
                 >
-                  Continue assessment
+                  {t("continue_assessment")}
                 </Link>
               }
             />
@@ -206,7 +208,7 @@ export default async function IEPUploadPage({
         <>
           <ReassuranceCard
             tone="safety"
-            title="The IEP stays private"
+            title={t("iep_stays_private_title")}
             body="Your learner never sees the raw document. We only keep a structured list of supports, plus a learner-safe summary."
             icon={
               <svg
@@ -225,7 +227,7 @@ export default async function IEPUploadPage({
           />
           <ReassuranceCard
             tone="privacy"
-            title="You stay in control"
+            title={t("you_stay_in_control_title")}
             body="You can review every extracted support, deselect any you'd rather skip, and remove the document at any time."
           />
         </>
@@ -233,7 +235,7 @@ export default async function IEPUploadPage({
     >
       <QuestionCard
         eyebrow="Optional · IEP, 504, or accommodation letter"
-        title="Share a document so we apply the right supports"
+        title={t("share_document_title")}
         helper="Drop the file here, pick from your device, or take a photo on mobile. We'll extract the supports — never the diagnosis language — and let you review before anything turns on."
         tag="Optional"
         error={errorMessage}
@@ -251,7 +253,7 @@ export default async function IEPUploadPage({
               <form action={skipAction}>
                 <input type="hidden" name="learnerId" value={learner.id} />
                 <Button type="submit" variant="ghost" size="sm">
-                  Skip for now
+                  {t("skip_for_now")}
                 </Button>
               </form>
             }
@@ -261,7 +263,7 @@ export default async function IEPUploadPage({
                   href={`/parent/learners/${learner.id}/iep/review`}
                   className="inline-flex items-center gap-2 rounded-iw-control px-5 py-2.5 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
                 >
-                  Review extracted supports
+                  {t("review_extracted_supports")}
                   <svg
                     className="w-4 h-4"
                     viewBox="0 0 24 24"
@@ -308,7 +310,7 @@ export default async function IEPUploadPage({
                       <path d="M10 11v6" />
                       <path d="M14 11v6" />
                     </svg>
-                    Remove
+                    {t("remove")}
                   </Button>
                 </form>
               }
@@ -336,7 +338,7 @@ export default async function IEPUploadPage({
               enableCameraCapture
             />
             <Button type="submit" className="self-end">
-              Upload & extract supports
+              {t("upload_extract_supports")}
               <svg
                 className="w-4 h-4"
                 viewBox="0 0 24 24"

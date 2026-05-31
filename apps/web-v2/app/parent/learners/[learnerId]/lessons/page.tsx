@@ -4,6 +4,7 @@
  */
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -28,6 +29,7 @@ export default async function ParentLessonsPage({
 }) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
+  const t = await getTranslations("parent.learner_lessons");
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
@@ -47,11 +49,11 @@ export default async function ParentLessonsPage({
     >
       <PageHeader
         eyebrow={learner.displayName}
-        title="Lessons"
+        title={t("title")}
         description="A plain-language recap of every completed lesson."
         actions={
           <Button asChild variant="outline">
-            <Link href={`/parent/learners/${learnerId}/progress`}>See progress</Link>
+            <Link href={`/parent/learners/${learnerId}/progress`}>{t("see_progress")}</Link>
           </Button>
         }
       />
@@ -82,21 +84,21 @@ export default async function ParentLessonsPage({
                 </div>
                 <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
                   <div>
-                    <dt className="text-aivo-ink-soft">Worked on</dt>
+                    <dt className="text-aivo-ink-soft">{t("worked_on")}</dt>
                     <dd>{s.highlights.whatWorkedOn}</dd>
                   </div>
                   <div>
-                    <dt className="text-aivo-ink-soft">Went well</dt>
+                    <dt className="text-aivo-ink-soft">{t("went_well")}</dt>
                     <dd>{s.highlights.wentWell}</dd>
                   </div>
                   {s.highlights.neededHelp && (
                     <div>
-                      <dt className="text-aivo-ink-soft">Needed help</dt>
+                      <dt className="text-aivo-ink-soft">{t("needed_help")}</dt>
                       <dd>{s.highlights.neededHelp}</dd>
                     </div>
                   )}
                   <div>
-                    <dt className="text-aivo-ink-soft">Up next</dt>
+                    <dt className="text-aivo-ink-soft">{t("up_next")}</dt>
                     <dd>{s.highlights.recommendedNext}</dd>
                   </div>
                 </dl>
