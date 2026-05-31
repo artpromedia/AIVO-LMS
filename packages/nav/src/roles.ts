@@ -1,7 +1,7 @@
 /**
- * The eight AIVO roles. Mobile exposes the five learner-facing roles
- * (learner / parent / teacher / therapist / caregiver) plus school-admin;
- * "districtAdmin" and "internal" are web-only.
+ * The eight AIVO roles. Mobile exposes only the five learner-facing
+ * roles (learner / parent / teacher / therapist / caregiver). All admin
+ * roles — "schoolAdmin", "districtAdmin", and "internal" — are web-only.
  *
  * Sprint 9 / 10 added `therapist` and `caregiver` to the canonical
  * registry. Their shells already exist in apps/web-v2/app/{therapist,
@@ -90,7 +90,7 @@ export const ROLE_META: Record<Role, RoleMeta> = {
     id: "schoolAdmin",
     label: "School admin",
     description: "Manage your school's roster, staff, billing, and reports.",
-    onMobile: true,
+    onMobile: false,
     onWeb: true,
     requiresStepUp: true,
   },
