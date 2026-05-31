@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -9,6 +10,8 @@ import { listLessonRunsForLearner } from "@/lib/db/repos";
 
 export default async function Page() {
   const session = await requirePageRole(["learner"]);
+  const t = await getTranslations("learner.library");
+  const tc = await getTranslations("learner.common");
   const learnerId = session.learnerId;
   if (!learnerId) {
     return (
@@ -18,7 +21,7 @@ export default async function Page() {
         navItems={LEARNER_NAV}
         user={{ displayName: session.displayName, email: session.email }}
       >
-        <EmptyState title="No learner profile linked" />
+        <EmptyState title={tc("no_profile")} />
       </AppShell>
     );
   }
@@ -35,31 +38,31 @@ export default async function Page() {
       user={{ displayName: session.displayName, email: session.email }}
     >
       <PageHeader
-        eyebrow="Learner"
-        title="Library"
-        description="Replay lessons you've already finished."
+        eyebrow={tc("learner_eyebrow")}
+        title={t("title")}
+        description={t("description")}
       />
       {runs.length === 0 ? (
         <EmptyState
-          title="Nothing finished yet"
-          description="Complete a lesson from Today's Mission and it will land here."
+          title={t("nothing_finished")}
+          description={t("nothing_finished_desc")}
         />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {runs.map((r) => (
             <Card key={r.id} className="p-4">
-              <p className="font-medium">Lesson</p>
+              <p className="font-medium">{t("lesson")}</p>
               <p className="text-sm text-aivo-ink-soft">
-                Source: {r.source}
+                {tc("source", { source: r.source })}
                 {r.completedAt
-                  ? ` · completed ${new Date(r.completedAt).toLocaleDateString()}`
+                  ? ` · ${t("completed", { date: new Date(r.completedAt).toLocaleDateString() })}`
                   : ""}
               </p>
               <Link
                 href={`/learner/lesson-runs/${r.id}`}
                 className="mt-2 inline-block text-xs font-medium text-aivo-primary hover:underline"
               >
-                Replay →
+                {t("replay")}
               </Link>
             </Card>
           ))}

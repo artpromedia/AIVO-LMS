@@ -1,4 +1,5 @@
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -10,6 +11,7 @@ export const dynamic = "force-dynamic";
 
 export default async function Page() {
   const session = await requirePageRole(["learner"]);
+  const t = await getTranslations("learner.settings_audio");
   if (!session.learnerId) {
     return (
       <AppShell
@@ -18,9 +20,9 @@ export default async function Page() {
         navItems={LEARNER_NAV}
         user={{ displayName: session.displayName, email: session.email }}
       >
-        <PageHeader title="Audio" />
+        <PageHeader title={t("no_learner_title")} />
         <Card className="p-[var(--aivo-density-card-pad)] text-aivo-muted">
-          Sign in as a learner to view audio settings.
+          {t("no_learner_body")}
         </Card>
       </AppShell>
     );
@@ -41,9 +43,9 @@ export default async function Page() {
       user={{ displayName: session.displayName, email: session.email }}
     >
       <PageHeader
-        eyebrow="Settings"
-        title="Read-aloud"
-        description="Pick a voice and playback speed. Your grown-up controls whether read-aloud is turned on."
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        description={t("description")}
       />
       <Card className="p-[var(--aivo-density-card-pad)]">
         <AudioPrefForm learnerId={session.learnerId} initial={pref} canToggleEnabled={false} />

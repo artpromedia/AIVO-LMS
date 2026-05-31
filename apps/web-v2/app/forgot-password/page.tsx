@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { AuthCard, AuthInput } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 import { Button } from "@/components/ui/button";
@@ -40,17 +41,14 @@ async function forgotPasswordAction(formData: FormData) {
   redirect("/forgot-password?sent=1");
 }
 
-const ERROR_COPY: Record<string, string> = {
-  invalid_email: "Enter a valid email address so we can find your account.",
-};
-
 export default async function ForgotPasswordPage({
   searchParams,
 }: {
   readonly searchParams: Promise<{ error?: string; sent?: string }>;
 }) {
   const { error, sent } = await searchParams;
-  const errorMessage = error ? (ERROR_COPY[error] ?? null) : null;
+  const t = await getTranslations("auth.forgot");
+  const errorMessage = error === "invalid_email" ? t("error_invalid_email") : null;
   const sentAcknowledged = sent === "1";
 
   return (
@@ -68,47 +66,43 @@ export default async function ForgotPasswordPage({
             <AivoIcon name="aiSparkle" size={22} />
           </span>
           <h2 className="font-iw-display text-2xl font-bold leading-tight text-iw-ink">
-            Reset your password
+            {t("heading")}
           </h2>
         </div>
 
         {sentAcknowledged ? (
           <AuthCard
-            eyebrow="Check your inbox"
-            title="If that email is registered, a reset link is on the way."
-            subtitle="For your security, we don't reveal whether an account exists. The link expires in 1 hour."
+            eyebrow={t("sent_eyebrow")}
+            title={t("sent_title")}
+            subtitle={t("sent_subtitle")}
             actions={
               <>
                 <Link
                   href="/login"
                   className="inline-flex w-full items-center justify-center rounded-iw-card bg-iw-primary px-4 py-3 font-semibold text-iw-on-primary hover:bg-iw-primary-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring focus-visible:ring-offset-2 focus-visible:ring-offset-iw-bg"
                 >
-                  Back to sign in
+                  {t("back_to_sign_in")}
                 </Link>
                 <p className="text-sm text-iw-ink-muted text-center">
-                  Didn't get it?{" "}
+                  {t("didnt_get_it")}{" "}
                   <Link
                     href="/forgot-password"
                     className="font-semibold text-iw-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring focus-visible:ring-offset-2 focus-visible:ring-offset-iw-bg rounded"
                   >
-                    Try a different email
+                    {t("try_different_email")}
                   </Link>
                   .
                 </p>
               </>
             }
           >
-            <p className="text-sm text-iw-ink-muted">
-              Check spam or promotions if you don't see it after a minute. The link
-              works once and then expires — request a new one if you need to start
-              over.
-            </p>
+            <p className="text-sm text-iw-ink-muted">{t("sent_body")}</p>
           </AuthCard>
         ) : (
           <AuthCard
-            eyebrow="Forgot password"
-            title="Enter the email on your account"
-            subtitle="We'll email you a secure link to set a new password."
+            eyebrow={t("form_eyebrow")}
+            title={t("form_title")}
+            subtitle={t("form_subtitle")}
             actions={
               <>
                 <Button
@@ -118,15 +112,15 @@ export default async function ForgotPasswordPage({
                   size="lg"
                   className="w-full"
                 >
-                  Send reset link
+                  {t("submit")}
                 </Button>
                 <p className="text-sm text-iw-ink-muted text-center">
-                  Remembered it?{" "}
+                  {t("remembered")}{" "}
                   <Link
                     href="/login"
                     className="font-semibold text-iw-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring focus-visible:ring-offset-2 focus-visible:ring-offset-iw-bg rounded"
                   >
-                    Sign in
+                    {t("sign_in")}
                   </Link>
                   .
                 </p>
@@ -141,7 +135,7 @@ export default async function ForgotPasswordPage({
               <AuthInput
                 id="email"
                 name="email"
-                label="Email"
+                label={t("email_label")}
                 type="email"
                 inputMode="email"
                 autoComplete="email"

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { AuthCard } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 import { Button } from "@/components/ui/button";
@@ -64,19 +65,18 @@ async function resetPasswordAction(formData: FormData) {
   redirect("/login?notice=password_reset");
 }
 
-const ERROR_COPY: Record<string, string> = {
-  missing_token:
-    "This reset link is missing its security token. Request a new link from the forgot-password page.",
-  weak_password: "Your new password must be at least 12 characters long.",
-  mismatch: "The two passwords don't match yet. Try entering them again.",
-  invalid_token:
-    "This reset link has expired or has already been used. Request a new link to continue.",
-  policy_violation:
-    "That password doesn't meet our policy. See the details below and try a stronger one.",
-  reset_failed: "We couldn't reset your password. Please try again in a moment.",
-  mock_mode:
-    "Password reset is disabled in mock mode. Run with AUTH_MODE=custom and the identity service to test this flow.",
-};
+// Recognized reset error codes — the copy lives in the i18n catalog under
+// auth.reset.errors. This set just gates which search-param values map to
+// a real, translated message (anything else falls back to reset_failed).
+const ERROR_CODES = new Set([
+  "missing_token",
+  "weak_password",
+  "mismatch",
+  "invalid_token",
+  "policy_violation",
+  "reset_failed",
+  "mock_mode",
+]);
 
 export default async function ResetPasswordPage({
   searchParams,
@@ -88,7 +88,10 @@ export default async function ResetPasswordPage({
   }>;
 }) {
   const { token = "", error, detail } = await searchParams;
-  const errorMessage = error ? (ERROR_COPY[error] ?? ERROR_COPY.reset_failed) : null;
+  const t = await getTranslations("auth.reset");
+  const errorMessage = error
+    ? t(`errors.${ERROR_CODES.has(error) ? error : "reset_failed"}` as never)
+    : null;
   const reasons = error === "policy_violation" && detail ? detail.split("|") : null;
   const hasToken = token.length > 0;
 
@@ -107,33 +110,31 @@ export default async function ResetPasswordPage({
             <AivoIcon name="safetyOk" size={22} />
           </span>
           <h2 className="font-iw-display text-2xl font-bold leading-tight text-iw-ink">
-            Choose a new password
+            {t("heading")}
           </h2>
         </div>
 
         {!hasToken ? (
           <AuthCard
-            eyebrow="Reset password"
-            title="This reset link is incomplete"
-            subtitle="The link in your email is missing its security token. Request a new one to continue."
+            eyebrow={t("no_token_eyebrow")}
+            title={t("no_token_title")}
+            subtitle={t("no_token_subtitle")}
             actions={
               <Link
                 href="/forgot-password"
                 className="inline-flex w-full items-center justify-center rounded-iw-card bg-iw-primary px-4 py-3 font-semibold text-iw-on-primary hover:bg-iw-primary-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring focus-visible:ring-offset-2 focus-visible:ring-offset-iw-bg"
               >
-                Request a new link
+                {t("no_token_cta")}
               </Link>
             }
           >
-            <p className="text-sm text-iw-ink-muted">
-              For your security, reset links expire after 1 hour and can only be used once.
-            </p>
+            <p className="text-sm text-iw-ink-muted">{t("no_token_body")}</p>
           </AuthCard>
         ) : (
           <AuthCard
-            eyebrow="Reset password"
-            title="Set your new password"
-            subtitle="Choose something memorable but hard to guess. We'll sign you out of every device once you're done."
+            eyebrow={t("form_eyebrow")}
+            title={t("form_title")}
+            subtitle={t("form_subtitle")}
             actions={
               <>
                 <Button
@@ -143,15 +144,15 @@ export default async function ResetPasswordPage({
                   size="lg"
                   className="w-full"
                 >
-                  Save new password
+                  {t("submit")}
                 </Button>
                 <p className="text-sm text-iw-ink-muted text-center">
-                  Need a new link?{" "}
+                  {t("need_link")}{" "}
                   <Link
                     href="/forgot-password"
                     className="font-semibold text-iw-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring focus-visible:ring-offset-2 focus-visible:ring-offset-iw-bg rounded"
                   >
-                    Start over
+                    {t("start_over")}
                   </Link>
                   .
                 </p>

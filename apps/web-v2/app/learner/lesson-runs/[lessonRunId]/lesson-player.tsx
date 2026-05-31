@@ -18,6 +18,7 @@
  */
 import { useEffect, useMemo, useRef, useState, useTransition, type SyntheticEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -249,6 +250,7 @@ export function LessonPlayer({
 }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations("learner.lesson_player");
   const beats = useMemo(
     () => buildBeats(plan, accessibility.shorterSteps),
     [plan, accessibility.shorterSteps],
@@ -388,9 +390,9 @@ export function LessonPlayer({
       expectedAnswer: currentBeat.expectedAnswer,
       instructions:
         currentBeat.kind === "guided"
-          ? "Solve the practice and submit your answer."
-          : "Complete the check and submit your answer.",
-      answerInput: { type: "text", label: "Your answer", placeholder: "Type your answer…" },
+          ? t("instructions_guided")
+          : t("instructions_check"),
+      answerInput: { type: "text", label: t("answer_label"), placeholder: t("answer_placeholder") },
       scratchpad:
         currentBeat.surfaceType === "scratchpad" || currentBeat.surfaceType === "ink_canvas"
           ? { enabled: true, width: 520, height: 300 }
@@ -482,7 +484,7 @@ export function LessonPlayer({
       if (!res.ok) {
         // Surface the failure instead of redirecting blindly — otherwise the
         // run would silently stay in_progress and mastery would never update.
-        setCompleteError("We couldn't save this lesson. Please try the 'I'm done' button again.");
+        setCompleteError(t("complete_error"));
         return;
       }
       router.push("/learner/home");
@@ -504,14 +506,14 @@ export function LessonPlayer({
     return (
       <Card className={`p-8 text-center ${rootClass}`}>
         <PageHeader
-          eyebrow="Break"
-          title="Take a breath."
-          description="When you're ready, come back to keep going."
+          eyebrow={t("break_eyebrow")}
+          title={t("break_title")}
+          description={t("break_desc")}
         />
         <div className="mt-6 flex justify-center gap-3">
-          <Button onClick={() => setOnBreak(false)}>I'm ready to keep going</Button>
+          <Button onClick={() => setOnBreak(false)}>{t("break_resume")}</Button>
           <Button variant="soft" onClick={() => complete(true)} disabled={completing}>
-            End for now
+            {t("break_end")}
           </Button>
         </div>
       </Card>
@@ -528,7 +530,7 @@ export function LessonPlayer({
     <div className={rootClass}>
       {plan.lessonMode === "holiday_prep" ? (
         <span className="mb-3 inline-flex w-fit items-center gap-1 rounded-full bg-iw-accent-soft px-3 py-1 text-xs font-medium text-iw-ink">
-          🌟 Holiday prep · optional enrichment
+          {t("holiday_prep")}
         </span>
       ) : null}
       <PageHeader
@@ -537,9 +539,9 @@ export function LessonPlayer({
         description={plan.objective}
         actions={
           <div className="flex items-center gap-2">
-            <Badge tone="neutral">≈ {plan.estimatedMinutes} min</Badge>
+            <Badge tone="neutral">{t("min", { n: plan.estimatedMinutes })}</Badge>
             <Button variant="ghost" onClick={() => setOnBreak(true)}>
-              Take a break
+              {t("take_break")}
             </Button>
           </div>
         }
@@ -551,11 +553,11 @@ export function LessonPlayer({
       <div className="mb-4">
         <Progress value={((stepIdx + 1) / beats.length) * 100} />
         <p className="mt-1 text-xs text-aivo-ink-soft" aria-live="polite">
-          Step {stepIdx + 1} of {beats.length}
+          {t("step_of", { current: stepIdx + 1, total: beats.length })}
         </p>
       </div>
 
-      <FocusMode title={beat.kind === "check" ? "Knowledge check" : "Lesson focus"}>
+      <FocusMode title={beat.kind === "check" ? t("focus_check") : t("focus_lesson")}>
       <Card className={`p-6 ${transitionClass}`}>
         {/* Each beat sets aria-live so read-aloud announces it. */}
         <div aria-live="polite" className="space-y-4">
@@ -601,23 +603,23 @@ export function LessonPlayer({
               />
               {showHint && (
                 <p className="rounded-md bg-amber-50 p-3 text-sm text-amber-900">
-                  Hint: <MathText>{beat.hint}</MathText>
+                  {t("hint_prefix")} <MathText>{beat.hint}</MathText>
                 </p>
               )}
               {feedback === "correct" && (
-                <p className="rounded-md bg-emerald-50 p-3 text-sm text-emerald-900">Nice work!</p>
+                <p className="rounded-md bg-emerald-50 p-3 text-sm text-emerald-900">{t("nice_work")}</p>
               )}
               {feedback === "incorrect" && (
                 <p className="rounded-md bg-rose-50 p-3 text-sm text-rose-900">
-                  Not quite — try again or use the hint. <MathText>{beat.scaffold}</MathText>
+                  {t("not_quite")} <MathText>{beat.scaffold}</MathText>
                 </p>
               )}
               <div className="flex flex-wrap gap-2">
                 <Button variant="soft" onClick={requestHint} disabled={showHint}>
-                  Hint
+                  {t("hint_btn")}
                 </Button>
                 <Button variant="ghost" onClick={useScaffold}>
-                  Show me how
+                  {t("show_me_how")}
                 </Button>
               </div>
             </>
@@ -642,12 +644,12 @@ export function LessonPlayer({
               />
               {feedback === "correct" && (
                 <p className="rounded-md bg-emerald-50 p-3 text-sm text-emerald-900">
-                  Yes! You've got this.
+                  {t("check_correct")}
                 </p>
               )}
               {feedback === "incorrect" && (
                 <p className="rounded-md bg-rose-50 p-3 text-sm text-rose-900">
-                  Close — <MathText>{beat.supportIfWrong}</MathText>
+                  {t("check_close")} <MathText>{beat.supportIfWrong}</MathText>
                 </p>
               )}
             </>
@@ -660,15 +662,15 @@ export function LessonPlayer({
             onClick={() => setStepIdx(Math.max(0, stepIdx - 1))}
             disabled={stepIdx === 0}
           >
-            Back
+            {t("back")}
           </Button>
           {!isLastBeat ? (
             <Button onClick={advance} disabled={isInteractive && feedback === null}>
-              Next
+              {t("next")}
             </Button>
           ) : (
             <Button onClick={() => complete(false)} disabled={completing}>
-              {completing ? "Saving…" : "I'm done"}
+              {completing ? t("saving") : t("done")}
             </Button>
           )}
         </div>

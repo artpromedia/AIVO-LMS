@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { AuthCard } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 import { Button } from "@/components/ui/button";
@@ -132,23 +133,20 @@ async function signInAction(formData: FormData) {
  * `iw-*` Tailwind utilities so the sensory-mode toggle repaints the
  * surface without re-wiring.
  */
-const ERROR_COPY: Record<string, string> = {
-  invalid_credentials: "Email or password is incorrect.",
-  invalid_role: "That role isn't available for this account.",
-  missing_credentials: "Enter your email and password to sign in.",
-  mfa_required:
-    "We need a verification code to finish signing you in. Please enter it on the next screen.",
-  mfa_session_expired: "Your verification session expired. Please sign in again.",
-  wrong_surface:
-    "This account signs in on a different surface (district or admin). Use the correct portal.",
-  unsupported_role: "Your account role isn't supported on this surface yet.",
-  login_failed: "We couldn't sign you in. Please try again.",
-};
-
-const NOTICE_COPY: Record<string, string> = {
-  password_reset: "Your password has been reset. Please sign in with your new password.",
-  logged_out: "You've been signed out.",
-};
+// Recognized error / notice codes. The copy itself lives in the i18n
+// catalog under auth.login.errors / auth.login.notices — these sets just
+// gate which search-param values map to a real, translated message.
+const ERROR_CODES = new Set([
+  "invalid_credentials",
+  "invalid_role",
+  "missing_credentials",
+  "mfa_required",
+  "mfa_session_expired",
+  "wrong_surface",
+  "unsupported_role",
+  "login_failed",
+]);
+const NOTICE_CODES = new Set(["password_reset", "logged_out"]);
 
 export default async function LoginPage({
   searchParams,
@@ -156,8 +154,12 @@ export default async function LoginPage({
   readonly searchParams: Promise<{ error?: string; notice?: string }>;
 }) {
   const { error, notice } = await searchParams;
-  const errorMessage = error ? (ERROR_COPY[error] ?? ERROR_COPY.login_failed) : null;
-  const noticeMessage = notice ? (NOTICE_COPY[notice] ?? null) : null;
+  const t = await getTranslations("auth.login");
+  const errorMessage = error
+    ? t(`errors.${ERROR_CODES.has(error) ? error : "login_failed"}` as never)
+    : null;
+  const noticeMessage =
+    notice && NOTICE_CODES.has(notice) ? t(`notices.${notice}` as never) : null;
   return (
     <>
       <SiteHeader />
@@ -178,11 +180,10 @@ export default async function LoginPage({
               <AivoIcon name="aiSparkle" size={28} />
             </span>
             <h2 className="font-iw-display text-3xl font-bold leading-[1.1] text-iw-ink">
-              Sign in to continue your AIVO journey.
+              {t("brand_heading")}
             </h2>
             <p className="text-base leading-relaxed text-iw-ink-muted">
-              Your tutors, missions, and family insights — all in one place,
-              tuned for how your learner thinks.
+              {t("brand_body")}
             </p>
             {/* Quiet trust block. Mirrors the chrome strip in the marketing
                 footer (COPPA · FERPA · SOC 2) so the brand side has the same
@@ -191,16 +192,12 @@ export default async function LoginPage({
             <div className="mt-2 flex flex-col gap-3">
               <div className="inline-flex items-center gap-2 self-start rounded-full bg-iw-accent-soft px-3 py-1.5 text-xs font-semibold text-iw-primary">
                 <AivoIcon name="safetyOk" size={14} />
-                <span>COPPA · FERPA · SOC 2</span>
+                <span>{t("trust_badge")}</span>
               </div>
               <blockquote className="border-l-2 border-iw-border pl-4 text-sm leading-relaxed text-iw-ink-muted">
-                <p>
-                  &ldquo;AIVO adapts to how my daughter actually learns. The
-                  first platform that didn&rsquo;t make us feel like we were
-                  fighting it.&rdquo;
-                </p>
+                <p>&ldquo;{t("quote")}&rdquo;</p>
                 <footer className="mt-2 text-xs font-semibold not-italic text-iw-ink-muted">
-                  — Parent of a Grade 3 learner
+                  {t("quote_attribution")}
                 </footer>
               </blockquote>
             </div>
@@ -217,14 +214,14 @@ export default async function LoginPage({
                 <AivoIcon name="aiSparkle" size={22} />
               </span>
               <h2 className="font-iw-display text-2xl font-bold leading-tight text-iw-ink">
-                Welcome back.
+                {t("welcome_back")}
               </h2>
             </div>
 
             <AuthCard
-              eyebrow="Sign in"
-              title="Continue with your AIVO account"
-              subtitle="Sign in with your AIVO email and password."
+              eyebrow={t("card_eyebrow")}
+              title={t("card_title")}
+              subtitle={t("card_subtitle")}
               actions={
                 <>
                   <Button
@@ -234,15 +231,15 @@ export default async function LoginPage({
                     size="lg"
                     className="w-full"
                   >
-                    Sign in
+                    {t("submit")}
                   </Button>
                   <p className="text-sm text-iw-ink-muted text-center">
-                    New here?{" "}
+                    {t("new_here")}{" "}
                     <Link
                       href="/signup"
                       className="font-semibold text-iw-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring focus-visible:ring-offset-2 focus-visible:ring-offset-iw-bg rounded"
                     >
-                      Create an account
+                      {t("create_account")}
                     </Link>
                     .
                   </p>
@@ -275,12 +272,12 @@ export default async function LoginPage({
             {/* Single-line privacy reassurance. Replaces the previous
                 ReassuranceCard so the screen has one visual focus, not two. */}
             <p className="text-xs text-iw-ink-muted text-center">
-              We never sell your data.{" "}
+              {t("privacy_lead")}{" "}
               <Link
                 href="/onboarding/privacy"
                 className="font-semibold text-iw-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring focus-visible:ring-offset-2 focus-visible:ring-offset-iw-bg rounded"
               >
-                Read the privacy notice
+                {t("privacy_link")}
               </Link>
               .
             </p>

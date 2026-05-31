@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import {
   LearnerBaselineShell,
@@ -30,6 +31,7 @@ export default async function BaselineReadinessPage({
   const session = await requirePageRole(["learner"]);
   if (!session.learnerId) redirect("/learner/home");
   const sp = await searchParams;
+  const t = await getTranslations("learner.baseline");
   const learner = await getLearner(session.learnerId, session.tenantId);
   if (!learner) redirect("/learner/home");
 
@@ -67,7 +69,7 @@ export default async function BaselineReadinessPage({
             <path d="M19 12H5" />
             <path d="m12 19-7-7 7-7" />
           </svg>
-          Back
+          {t("back")}
         </Link>
       }
       headerRight={<PersonalizationChip variant="pacing" />}
@@ -76,12 +78,12 @@ export default async function BaselineReadinessPage({
       ))}
     >
       <section className="flex flex-col gap-2">
-        <p className="iw-label text-iw-text-muted">Step 2 of 3</p>
+        <p className="iw-label text-iw-text-muted">{t("readiness.step")}</p>
         <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong leading-snug">
-          Quick check before we start
+          {t("readiness.title")}
         </h1>
         <p className="text-base text-iw-text-muted max-w-2xl">
-          Nothing here is a test. Just a few things AIVO turns on so the baseline feels just right.
+          {t("readiness.body")}
         </p>
       </section>
 
@@ -101,12 +103,12 @@ export default async function BaselineReadinessPage({
                   : "text-xs font-semibold text-iw-text-muted"
               }
             >
-              {hasReadAloud ? "On" : "You can turn it on per question"}
+              {hasReadAloud ? t("readiness.status_on") : t("readiness.readaloud_off")}
             </span>
           </header>
-          <p className="font-semibold text-iw-text-strong">Read-aloud</p>
+          <p className="font-semibold text-iw-text-strong">{t("readiness.readaloud_title")}</p>
           <p className="text-sm text-iw-text-muted leading-relaxed">
-            Tap the speaker on any question to hear the words. No one will know — promise.
+            {t("readiness.readaloud_body")}
           </p>
         </li>
         <li className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-2">
@@ -123,12 +125,12 @@ export default async function BaselineReadinessPage({
                   : "text-xs font-semibold text-iw-text-muted"
               }
             >
-              {calmMode ? "On" : "Default"}
+              {calmMode ? t("readiness.status_on") : t("readiness.status_default")}
             </span>
           </header>
-          <p className="font-semibold text-iw-text-strong">Calm screen</p>
+          <p className="font-semibold text-iw-text-strong">{t("readiness.calm_title")}</p>
           <p className="text-sm text-iw-text-muted leading-relaxed">
-            Soft colors and quiet motion so it's easier to focus. You can change this any time.
+            {t("readiness.calm_body")}
           </p>
         </li>
         <li className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-2">
@@ -140,12 +142,12 @@ export default async function BaselineReadinessPage({
               </svg>
             </span>
             <span className="text-xs font-semibold text-[var(--aivo-status-success)]">
-              Always
+              {t("readiness.status_always")}
             </span>
           </header>
-          <p className="font-semibold text-iw-text-strong">Breaks are good</p>
+          <p className="font-semibold text-iw-text-strong">{t("readiness.breaks_title")}</p>
           <p className="text-sm text-iw-text-muted leading-relaxed">
-            You can pause whenever. AIVO will remember and pick up where you left off.
+            {t("readiness.breaks_body")}
           </p>
         </li>
         <li className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-2">
@@ -163,12 +165,12 @@ export default async function BaselineReadinessPage({
                   : "text-xs font-semibold text-iw-text-muted"
               }
             >
-              {extendedTime ? "On" : "Off"}
+              {extendedTime ? t("readiness.status_on") : t("readiness.status_off")}
             </span>
           </header>
-          <p className="font-semibold text-iw-text-strong">Extra time</p>
+          <p className="font-semibold text-iw-text-strong">{t("readiness.extratime_title")}</p>
           <p className="text-sm text-iw-text-muted leading-relaxed">
-            There's no clock anyway. Take all the time you need.
+            {t("readiness.extratime_body")}
           </p>
         </li>
       </ul>
@@ -178,13 +180,13 @@ export default async function BaselineReadinessPage({
           href="/learner/baseline/why"
           className="inline-flex items-center gap-1.5 rounded-iw-control px-4 py-2.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
         >
-          Tell me more
+          {t("readiness.tell_me_more")}
         </Link>
         <Link
           href={`/learner/baseline/intro?b=${baseline.id}`}
           className="inline-flex items-center gap-2 rounded-iw-control px-5 py-3 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 shadow-[0_4px_12px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.3)]"
         >
-          I'm ready
+          {t("readiness.im_ready")}
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M5 12h14" />
             <path d="m13 5 7 7-7 7" />

@@ -1,6 +1,7 @@
 "use client";
 import * as React from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   AuthShell,
   AuthCard,
@@ -10,14 +11,16 @@ import {
 } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 
-const STEPS = [
-  { label: "About you" },
-  { label: "Role" },
-  { label: "Join district" },
-  { label: "Consent" },
-] as const;
-
 export default function DistrictInvitePage() {
+  const t = useTranslations("onboarding.invite_district");
+  const tc = useTranslations("onboarding.common");
+  const ts = useTranslations("onboarding.steps");
+  const STEPS = [
+    { label: ts("about_you") },
+    { label: ts("role") },
+    { label: ts("join_district") },
+    { label: ts("consent") },
+  ] as const;
   const [code, setCode] = React.useState("");
   const [adminEmail, setAdminEmail] = React.useState("");
 
@@ -27,14 +30,14 @@ export default function DistrictInvitePage() {
         <StepperHeader steps={STEPS} current={2} />
         <AuthCard
           icon={<AivoIcon name="rosterDistrict" size={32} />}
-          eyebrow="District invite"
-          title="Join your district on AIVO."
-          subtitle="District admin invites are issued by AIVO during onboarding. Your district success manager will send you a one-time code."
+          eyebrow={t("eyebrow")}
+          title={t("title")}
+          subtitle={t("subtitle")}
           reassurance={
             <ReassuranceCard
               tone="safety"
-              title="District admin step-up is enforced."
-              body="Every sign-in for this role requires a fresh biometric or PIN check. AIVO never lets a single password unlock district data."
+              title={t("reassure_title")}
+              body={t("reassure_body")}
             />
           }
           actions={
@@ -43,11 +46,11 @@ export default function DistrictInvitePage() {
                 href="/onboarding/consent"
                 className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold flex items-center justify-center hover:opacity-95"
               >
-                Continue
+                {tc("continue")}
               </Link>
               <p className="text-xs text-iw-text-muted text-center">
                 <Link href="/onboarding/role" className="hover:underline">
-                  Back
+                  {tc("back")}
                 </Link>
               </p>
             </>
@@ -55,7 +58,7 @@ export default function DistrictInvitePage() {
         >
           <AuthInput
             id="dcode"
-            label="District invite code"
+            label={t("code_label")}
             value={code}
             onChange={(e) => setCode(e.target.value)}
             placeholder="e.g. DISTRICT-9F2L-2025"
@@ -63,7 +66,7 @@ export default function DistrictInvitePage() {
           />
           <AuthInput
             id="admin-email"
-            label="Your district email"
+            label={t("email_label")}
             type="email"
             inputMode="email"
             value={adminEmail}

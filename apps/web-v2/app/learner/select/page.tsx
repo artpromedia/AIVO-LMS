@@ -8,6 +8,7 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -45,6 +46,7 @@ export default async function LearnerSelectPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const session = await requirePageRole(["parent"]);
+  const t = await getTranslations("learner.select");
   const learners = await listLearnersForParent(session.userId, session.tenantId);
   const params = await searchParams;
 
@@ -63,22 +65,22 @@ export default async function LearnerSelectPage({
       user={{ displayName: session.displayName, email: session.email }}
     >
       <PageHeader
-        eyebrow="View as"
-        title="Pick a child"
-        description="Choose which child's learner experience to view."
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        description={t("description")}
       />
       {params.error === "forbidden" && (
         <Card className="mb-4 border-red-200 bg-red-50 p-4 text-sm text-red-900">
-          That learner isn't linked to your account.
+          {t("forbidden")}
         </Card>
       )}
       {learners.length === 0 ? (
         <EmptyState
-          title="No learners yet"
-          description="Add a child to your account before viewing the learner experience."
+          title={t("no_learners")}
+          description={t("no_learners_desc")}
           action={
             <Button asChild>
-              <Link href="/parent/learners/new">Add a learner</Link>
+              <Link href="/parent/learners/new">{t("add_learner")}</Link>
             </Button>
           }
         />
@@ -90,18 +92,18 @@ export default async function LearnerSelectPage({
               <button
                 type="submit"
                 className="block w-full text-left"
-                aria-label={`View as ${l.displayName}`}
+                aria-label={t("view_as_aria", { name: l.displayName })}
               >
                 <Card className="flex items-center gap-4 p-[var(--aivo-density-card-pad)] transition hover:border-aivo-primary hover:shadow-md">
                   <LearnerAvatar name={l.displayName} size="lg" />
                   <div className="flex-1">
                     <p className="font-display text-lg font-semibold">{l.displayName}</p>
                     <p className="text-sm text-aivo-ink-soft">
-                      {l.ageRange ?? "Age not set"}
+                      {l.ageRange ?? t("age_not_set")}
                       {l.gradeBand ? ` · ${l.gradeBand}` : ""}
                     </p>
                     <div className="mt-2">
-                      <Badge tone="neutral">Readiness: {l.readinessState.replace(/_/g, " ")}</Badge>
+                      <Badge tone="neutral">{t("readiness", { state: l.readinessState.replace(/_/g, " ") })}</Badge>
                     </div>
                   </div>
                 </Card>

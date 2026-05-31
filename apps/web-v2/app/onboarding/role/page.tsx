@@ -1,14 +1,15 @@
 "use client";
 import * as React from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { AuthShell, AuthCard, StepperHeader, ReassuranceCard } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 import type { AivoIconName } from "@aivo/ui/icon";
 
 interface RoleOption {
   id: "parent" | "teacher" | "schoolAdmin" | "districtAdmin";
-  label: string;
-  description: string;
+  labelKey: string;
+  descKey: string;
   icon: AivoIconName;
   next: string;
 }
@@ -16,41 +17,43 @@ interface RoleOption {
 const ROLES: ReadonlyArray<RoleOption> = [
   {
     id: "parent",
-    label: "A parent or caregiver",
-    description: "Set up AIVO for one or more children at home.",
+    labelKey: "parent_label",
+    descKey: "parent_desc",
     icon: "care",
     next: "/onboarding/parent-setup",
   },
   {
     id: "teacher",
-    label: "A teacher",
-    description: "Join a school that already uses AIVO, or start a class.",
+    labelKey: "teacher_label",
+    descKey: "teacher_desc",
     icon: "classroom",
     next: "/onboarding/invite/school",
   },
   {
     id: "schoolAdmin",
-    label: "A school administrator",
-    description: "Manage staff, classes, and compliance for a school.",
+    labelKey: "school_admin_label",
+    descKey: "school_admin_desc",
     icon: "rosterSchool",
     next: "/onboarding/invite/school",
   },
   {
     id: "districtAdmin",
-    label: "A district administrator",
-    description: "Oversee multiple schools, billing, and reporting.",
+    labelKey: "district_admin_label",
+    descKey: "district_admin_desc",
     icon: "rosterDistrict",
     next: "/onboarding/invite/district",
   },
 ];
 
-const STEPS = [
-  { label: "About you" },
-  { label: "Role" },
-  { label: "Consent" },
-] as const;
-
 export default function RoleSelectionPage() {
+  const t = useTranslations("onboarding.role");
+  const tc = useTranslations("onboarding.common");
+  const ts = useTranslations("onboarding.steps");
+  const STEPS = [
+    { label: ts("about_you") },
+    { label: ts("role") },
+    { label: ts("consent") },
+  ] as const;
   const [selected, setSelected] = React.useState<RoleOption["id"] | null>(null);
   const selectedRole = ROLES.find((r) => r.id === selected) ?? null;
 
@@ -60,14 +63,14 @@ export default function RoleSelectionPage() {
         <StepperHeader steps={STEPS} current={1} />
         <AuthCard
           icon={<AivoIcon name="aiSparkle" size={32} />}
-          eyebrow="Choose your role"
-          title="Who are you setting up AIVO for?"
-          subtitle="We'll customize the next steps. You can add other roles later — many adults are both a parent and a teacher."
+          eyebrow={t("eyebrow")}
+          title={t("title")}
+          subtitle={t("subtitle")}
           reassurance={
             <ReassuranceCard
               tone="info"
-              title="Children don't pick a role."
-              body="A parent or teacher adds a learner. The learner sees a kid-friendly view with their schoolwork — never this page."
+              title={t("reassure_title")}
+              body={t("reassure_body")}
             />
           }
           actions={
@@ -81,11 +84,11 @@ export default function RoleSelectionPage() {
                     : "bg-[var(--aivo-sensory-primary)]/50 pointer-events-none"
                 }`}
               >
-                Continue
+                {tc("continue")}
               </Link>
               <p className="text-xs text-iw-text-muted text-center">
                 <Link href="/onboarding/signup" className="hover:underline">
-                  Back
+                  {tc("back")}
                 </Link>
               </p>
             </>
@@ -114,10 +117,10 @@ export default function RoleSelectionPage() {
                   </span>
                   <span className="flex-1 min-w-0">
                     <span className="block text-sm font-semibold text-iw-text-strong">
-                      {r.label}
+                      {t(r.labelKey)}
                     </span>
                     <span className="block text-xs text-iw-text-muted leading-relaxed mt-0.5">
-                      {r.description}
+                      {t(r.descKey)}
                     </span>
                   </span>
                 </button>

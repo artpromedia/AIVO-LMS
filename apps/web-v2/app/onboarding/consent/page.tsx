@@ -10,12 +10,13 @@ import {
   LegalCollapse,
 } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
+import { useTranslations } from "next-intl";
 
 const STEPS = [
-  { label: "About you" },
-  { label: "Role" },
-  { label: "Family" },
-  { label: "Consent" },
+  { label: "about_you" },
+  { label: "role" },
+  { label: "family" },
+  { label: "consent" },
 ] as const;
 
 /**
@@ -31,6 +32,9 @@ const STEPS = [
  * sharing and AI personalization buckets are independent and optional.
  */
 export default function ConsentReviewPage() {
+  const t = useTranslations("onboarding.consent");
+  const tc = useTranslations("onboarding.common");
+  const ts = useTranslations("onboarding.steps");
   const [parentConsent, setParentConsent] = React.useState(true);
   const [schoolShare, setSchoolShare] = React.useState(false);
   const [aiPersonalize, setAiPersonalize] = React.useState(false);
@@ -39,18 +43,21 @@ export default function ConsentReviewPage() {
   return (
     <AuthShell>
       <div className="flex flex-col gap-5">
-        <StepperHeader steps={STEPS} current={3} />
+        <StepperHeader
+          steps={STEPS.map((s) => ({ label: ts(s.label) }))}
+          current={3}
+        />
         <AuthCard
           icon={<AivoIcon name="consentCheck" size={32} />}
-          eyebrow="Your consent — your control"
-          title="Choose what AIVO can do."
-          subtitle="Each row is a separate choice. You can change any of these later from Settings → Privacy."
+          eyebrow={t("eyebrow")}
+          title={t("title")}
+          subtitle={t("subtitle")}
           reassurance={
             <ReassuranceCard
               tone="privacy"
-              title="No bundles. No dark patterns."
-              body="School data sharing and AI personalization are independent. You can say yes to one and no to the other."
-              link={{ href: "/onboarding/privacy", label: "Read the full privacy notice" }}
+              title={t("reassure_title")}
+              body={t("reassure_body")}
+              link={{ href: "/onboarding/privacy", label: t("reassure_link") }}
             />
           }
           actions={
@@ -64,71 +71,64 @@ export default function ConsentReviewPage() {
                     : "bg-[var(--aivo-sensory-primary)]/50 pointer-events-none"
                 }`}
               >
-                Continue
+                {tc("continue")}
               </Link>
               <p className="text-xs text-iw-text-muted text-center">
-                You'll be asked to re-confirm any choice that affects your
-                child later — never silently changed.
+                {t("footer_note")}
               </p>
             </>
           }
         >
           <ConsentRow
             id="c-parent"
-            title="Parent / guardian consent"
-            description="I confirm I am the parent or legal guardian for the learners on this account, and I agree to AIVO's Terms."
+            title={t("row_parent_title")}
+            description={t("row_parent_desc")}
             checked={parentConsent}
             onChange={setParentConsent}
             required
-            badge="Required"
+            badge={tc("badge_required")}
             icon={<AivoIcon name="care" size={18} />}
           />
           <ConsentRow
             id="c-school"
-            title="Share progress with my child's school"
-            description="Lets your child's teachers see mastery, lessons, and IEP supports. Independent from any AI choice below."
+            title={t("row_school_title")}
+            description={t("row_school_desc")}
             checked={schoolShare}
             onChange={setSchoolShare}
-            badge="Optional"
+            badge={tc("badge_optional")}
             icon={<AivoIcon name="rosterSchool" size={18} />}
           />
           <ConsentRow
             id="c-ai"
-            title="Use AI to personalize learning"
-            description="AIVO uses your child's responses to adjust pacing, examples, and hints. We never sell this data. Turning this off keeps your child in non-personalized lessons."
+            title={t("row_ai_title")}
+            description={t("row_ai_desc")}
             checked={aiPersonalize}
             onChange={setAiPersonalize}
-            badge="Optional"
+            badge={tc("badge_optional")}
             icon={<AivoIcon name="aiSparkle" size={18} />}
           />
           <ConsentRow
             id="c-mkt"
-            title="Send me product news"
-            description="A short monthly email. Never sent to learners."
+            title={t("row_mkt_title")}
+            description={t("row_mkt_desc")}
             checked={marketing}
             onChange={setMarketing}
-            badge="Optional"
+            badge={tc("badge_optional")}
             icon={<AivoIcon name="aiWand" size={18} />}
           />
-          <LegalCollapse summary="What each choice actually changes (plain English).">
+          <LegalCollapse summary={t("legal_summary")}>
             <ul className="list-disc list-inside space-y-1">
               <li>
-                <strong>Parent / guardian:</strong> required to create accounts
-                for anyone under 18. Verifies you are the legal guardian.
+                <strong>{t("legal_parent_label")}</strong> {t("legal_parent_body")}
               </li>
               <li>
-                <strong>School sharing:</strong> teachers see mastery, lessons,
-                and (if uploaded) IEP supports. No marketing or third-party
-                sharing.
+                <strong>{t("legal_school_label")}</strong> {t("legal_school_body")}
               </li>
               <li>
-                <strong>AI personalization:</strong> AIVO adapts pacing and
-                hints to your child. Training data is never used to identify
-                an individual learner.
+                <strong>{t("legal_ai_label")}</strong> {t("legal_ai_body")}
               </li>
               <li>
-                <strong>Product news:</strong> a low-volume email list.
-                Unsubscribe in one click.
+                <strong>{t("legal_mkt_label")}</strong> {t("legal_mkt_body")}
               </li>
             </ul>
           </LegalCollapse>

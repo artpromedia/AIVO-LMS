@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
   ALLOWED_HOMEWORK_MIME_TYPES,
@@ -34,6 +35,7 @@ function fileToBase64(file: File): Promise<string> {
 
 export function StartHomeworkForm({ learnerId }: { learnerId: string }) {
   const router = useRouter();
+  const t = useTranslations("learner.homework");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [topic, setTopic] = useState("");
   const [attachment, setAttachment] = useState<SelectedAttachment | null>(null);
@@ -46,18 +48,18 @@ export function StartHomeworkForm({ learnerId }: { learnerId: string }) {
     e.target.value = "";
     if (!file) return;
     if (!(ALLOWED_HOMEWORK_MIME_TYPES as readonly string[]).includes(file.type)) {
-      setError("Please choose a PNG, JPEG, WEBP, or PDF file.");
+      setError(t("err_file_type"));
       return;
     }
     if (file.size > MAX_HOMEWORK_ATTACHMENT_BYTES) {
-      setError("That file is larger than 10 MB.");
+      setError(t("err_file_size"));
       return;
     }
     try {
       const dataBase64 = await fileToBase64(file);
       setAttachment({ file, dataBase64 });
     } catch {
-      setError("Could not read that file. Try a different one.");
+      setError(t("err_file_read"));
     }
   }
 
@@ -71,7 +73,7 @@ export function StartHomeworkForm({ learnerId }: { learnerId: string }) {
     setError(null);
     const trimmed = topic.trim();
     if (!trimmed) {
-      setError("Please describe what you're working on.");
+      setError(t("err_topic_required"));
       return;
     }
     setBusy(true);
@@ -95,13 +97,13 @@ export function StartHomeworkForm({ learnerId }: { learnerId: string }) {
         error?: { message: string };
       };
       if (!res.ok || !body.ok || !body.data) {
-        setError(body.error?.message ?? "Couldn't start a session. Try again.");
+        setError(body.error?.message ?? t("err_start"));
         setBusy(false);
         return;
       }
       router.push(`/learner/homework/${body.data.session.id}`);
     } catch {
-      setError("Couldn't reach the helper. Check your connection and try again.");
+      setError(t("err_start_network"));
       setBusy(false);
     }
   }
@@ -109,7 +111,7 @@ export function StartHomeworkForm({ learnerId }: { learnerId: string }) {
   return (
     <form onSubmit={onSubmit} className="grid gap-3">
       <label htmlFor="hw-topic" className="text-sm font-medium">
-        What do you need help with?
+        {t("topic_label")}
       </label>
       <textarea
         id="hw-topic"
@@ -118,14 +120,14 @@ export function StartHomeworkForm({ learnerId }: { learnerId: string }) {
         maxLength={500}
         value={topic}
         onChange={(e) => setTopic(e.target.value)}
-        placeholder="e.g. I have to add 27 + 14 and I don't know how to carry"
+        placeholder={t("topic_placeholder")}
         className="w-full rounded-md border border-input bg-background p-3 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         required
       />
 
       <div className="flex flex-col gap-2">
         <label htmlFor="hw-attachment" className="text-sm font-medium">
-          Add a photo or PDF (optional)
+          {t("attach_label")}
         </label>
         <input
           ref={fileInputRef}
@@ -145,7 +147,7 @@ export function StartHomeworkForm({ learnerId }: { learnerId: string }) {
               onClick={removeAttachment}
               className="text-sm text-muted-foreground hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
-              Remove
+              {t("remove")}
             </button>
           </div>
         ) : null}
@@ -158,7 +160,7 @@ export function StartHomeworkForm({ learnerId }: { learnerId: string }) {
       )}
       <div>
         <Button type="submit" disabled={busy}>
-          {busy ? "Starting…" : "Get help"}
+          {busy ? t("starting") : t("get_help")}
         </Button>
       </div>
     </form>

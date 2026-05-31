@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { AuthShell, AuthCard, ReassuranceCard } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 
@@ -14,6 +15,7 @@ export default function OnboardingErrorPage({
 }: {
   searchParams: { reason?: string };
 }) {
+  const t = useTranslations("onboarding.error");
   const reason = searchParams.reason ?? "generic";
   const v = VARIANTS[reason] ?? VARIANTS.generic;
 
@@ -21,11 +23,15 @@ export default function OnboardingErrorPage({
     <AuthShell>
       <AuthCard
         icon={<AivoIcon name={v.icon} size={32} />}
-        eyebrow={v.eyebrow}
-        title={v.title}
-        subtitle={v.subtitle}
+        eyebrow={t(`${v.key}_eyebrow`)}
+        title={t(`${v.key}_title`)}
+        subtitle={t(`${v.key}_subtitle`)}
         reassurance={
-          <ReassuranceCard tone={v.tone} title={v.reassure.title} body={v.reassure.body} />
+          <ReassuranceCard
+            tone={v.tone}
+            title={t(`${v.key}_reassure_title`)}
+            body={t(`${v.key}_reassure_body`)}
+          />
         }
         actions={
           <>
@@ -33,91 +39,59 @@ export default function OnboardingErrorPage({
               href={v.primary.href}
               className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold flex items-center justify-center hover:opacity-95"
             >
-              {v.primary.label}
+              {t(`${v.key}_primary`)}
             </Link>
             {v.secondary ? (
               <Link
                 href={v.secondary.href}
                 className="text-xs text-iw-text-muted text-center hover:underline"
               >
-                {v.secondary.label}
+                {t(`${v.key}_secondary`)}
               </Link>
             ) : null}
           </>
         }
       >
-        <p className="text-sm text-iw-text-muted">{v.body}</p>
+        <p className="text-sm text-iw-text-muted">{t(`${v.key}_body`)}</p>
       </AuthCard>
     </AuthShell>
   );
 }
 
 type Variant = {
+  key: "expired_invite" | "offline" | "blocked" | "generic";
   icon: "consentLock" | "safetyAlert";
-  eyebrow: string;
-  title: string;
-  subtitle: string;
   tone: "info" | "safety" | "privacy";
-  body: string;
-  reassure: { title: string; body: string };
-  primary: { href: string; label: string };
-  secondary?: { href: string; label: string };
+  primary: { href: string };
+  secondary?: { href: string };
 };
 
 const VARIANTS: Record<string, Variant> = {
   "expired-invite": {
-    icon: "consentLock" as const,
-    eyebrow: "Invite expired",
-    title: "This invite isn't valid anymore.",
-    subtitle: "Invites expire after 30 days. Ask the person who sent it to issue a new one.",
-    tone: "info" as const,
-    body: "If your school or district sent this, contact your admin. AIVO support can also re-send if you provide the original code.",
-    reassure: {
-      title: "We didn't lose your spot.",
-      body: "Your seat at the school or district is still reserved — only the link expired.",
-    },
-    primary: { href: "/onboarding/welcome", label: "Back to welcome" },
-    secondary: { href: "/onboarding/recovery", label: "Need help signing in?" },
+    key: "expired_invite",
+    icon: "consentLock",
+    tone: "info",
+    primary: { href: "/onboarding/welcome" },
+    secondary: { href: "/onboarding/recovery" },
   },
   offline: {
-    icon: "safetyAlert" as const,
-    eyebrow: "Offline",
-    title: "We can't reach AIVO right now.",
-    subtitle: "Check your connection and try again.",
-    tone: "info" as const,
-    body: "Some learner activities work offline once a lesson has loaded — but setup needs a live connection.",
-    reassure: {
-      title: "Nothing was lost.",
-      body: "We'll pick up exactly where you left off as soon as you're back online.",
-    },
-    primary: { href: "/onboarding/welcome", label: "Try again" },
+    key: "offline",
+    icon: "safetyAlert",
+    tone: "info",
+    primary: { href: "/onboarding/welcome" },
   },
   blocked: {
-    icon: "safetyAlert" as const,
-    eyebrow: "Account blocked",
-    title: "This account is paused.",
-    subtitle: "AIVO support has paused this account. This is usually a billing or compliance review.",
-    tone: "safety" as const,
-    body: "You'll get an email at the address on file once the review finishes, usually within one business day.",
-    reassure: {
-      title: "Your child's data is safe.",
-      body: "We don't delete anything during a review — pause and resume only.",
-    },
-    primary: { href: "/onboarding/welcome", label: "Back to welcome" },
-    secondary: { href: "mailto:support@aivolearning.com", label: "Contact support" },
+    key: "blocked",
+    icon: "safetyAlert",
+    tone: "safety",
+    primary: { href: "/onboarding/welcome" },
+    secondary: { href: "mailto:support@aivolearning.com" },
   },
   generic: {
-    icon: "safetyAlert" as const,
-    eyebrow: "Something went wrong",
-    title: "We hit a snag.",
-    subtitle: "It's probably temporary — try again in a moment.",
-    tone: "info" as const,
-    body: "If this keeps happening, please contact AIVO support and mention what you were trying to do.",
-    reassure: {
-      title: "Nothing was charged or saved incorrectly.",
-      body: "AIVO never persists half-finished setup data.",
-    },
-    primary: { href: "/onboarding/welcome", label: "Start over" },
-    secondary: { href: "mailto:support@aivolearning.com", label: "Contact support" },
+    key: "generic",
+    icon: "safetyAlert",
+    tone: "info",
+    primary: { href: "/onboarding/welcome" },
+    secondary: { href: "mailto:support@aivolearning.com" },
   },
 };

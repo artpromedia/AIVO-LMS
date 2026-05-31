@@ -9,15 +9,19 @@ import {
   StepperHeader,
 } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
+import { useTranslations } from "next-intl";
 
 const STEPS = [
-  { label: "About you" },
-  { label: "Role" },
-  { label: "Family" },
-  { label: "Consent" },
+  { label: "about_you" },
+  { label: "role" },
+  { label: "family" },
+  { label: "consent" },
 ] as const;
 
 export default function DevicePermissionsPage() {
+  const t = useTranslations("onboarding.permissions");
+  const tc = useTranslations("onboarding.common");
+  const ts = useTranslations("onboarding.steps");
   const [mic, setMic] = React.useState(false);
   const [cam, setCam] = React.useState(false);
   const [notifs, setNotifs] = React.useState(true);
@@ -25,17 +29,20 @@ export default function DevicePermissionsPage() {
   return (
     <AuthShell>
       <div className="flex flex-col gap-5">
-        <StepperHeader steps={STEPS} current={3} />
+        <StepperHeader
+          steps={STEPS.map((s) => ({ label: ts(s.label) }))}
+          current={3}
+        />
         <AuthCard
           icon={<AivoIcon name="safetyOk" size={32} />}
-          eyebrow="Device permissions"
-          title="What may AIVO use on this device?"
-          subtitle="These are the only device features AIVO ever asks for. We never request location, contacts, or photo library access."
+          eyebrow={t("eyebrow")}
+          title={t("title")}
+          subtitle={t("subtitle")}
           reassurance={
             <ReassuranceCard
               tone="safety"
-              title="Your browser asks for these too."
-              body="When AIVO actually needs the microphone or camera, your browser will pop its own permission prompt — you can deny it even if you said yes here."
+              title={t("reassure_title")}
+              body={t("reassure_body")}
             />
           }
           actions={
@@ -43,35 +50,35 @@ export default function DevicePermissionsPage() {
               href="/onboarding/pin"
               className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold flex items-center justify-center hover:opacity-95"
             >
-              Continue — set up a PIN
+              {t("continue")}
             </Link>
           }
         >
           <ConsentRow
             id="p-mic"
-            title="Microphone"
-            description="Used only for speak-to-read lessons and AI tutor voice mode. Off by default — turn on if your child wants to read aloud."
+            title={t("mic_title")}
+            description={t("mic_desc")}
             checked={mic}
             onChange={setMic}
-            badge="Optional"
+            badge={tc("badge_optional")}
             icon={<AivoIcon name="aiWand" size={18} />}
           />
           <ConsentRow
             id="p-cam"
-            title="Camera"
-            description="Used only when scanning a homework page or document. AIVO never records video."
+            title={t("cam_title")}
+            description={t("cam_desc")}
             checked={cam}
             onChange={setCam}
-            badge="Optional"
+            badge={tc("badge_optional")}
             icon={<AivoIcon name="curriculum" size={18} />}
           />
           <ConsentRow
             id="p-notifs"
-            title="Notifications"
-            description="Approval requests, weekly progress digests, and safety messages. Lesson reminders are off by default — you can enable them later."
+            title={t("notifs_title")}
+            description={t("notifs_desc")}
             checked={notifs}
             onChange={setNotifs}
-            badge="Recommended"
+            badge={tc("badge_recommended")}
             icon={<AivoIcon name="safetyOk" size={18} />}
           />
         </AuthCard>

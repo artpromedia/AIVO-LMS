@@ -7,6 +7,7 @@
  * facing copy, reassurance column that frames why each toggle helps.
  */
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { LEARNER_NAV } from "@/components/layout/role-shells";
@@ -41,6 +42,7 @@ export default async function LearnerAccessibilitySettingsPage() {
     redirect("/learner/select");
   }
   const prefs = getAccessibilityPrefs(learnerId, session.tenantId);
+  const t = await getTranslations("learner.settings_a11y");
 
   return (
     <AppShell
@@ -50,9 +52,9 @@ export default async function LearnerAccessibilitySettingsPage() {
       user={{ displayName: session.displayName, email: session.email }}
     >
       <AICompanionHero
-        eyebrow={`Settings · for ${learner.displayName}`}
-        title="How you like to learn"
-        body="Tweak these any time — your lessons will follow along. Every option is built into the calm AIVO experience, never a separate mode."
+        eyebrow={t("eyebrow", { name: learner.displayName })}
+        title={t("title")}
+        body={t("body")}
         chips={
           <>
             <PersonalizationChip variant="calm_mode" />
@@ -66,8 +68,8 @@ export default async function LearnerAccessibilitySettingsPage() {
         <GlassCard
           elevation="raised"
           density="comfortable"
-          title="Reading & display"
-          description="Big text, dyslexia-friendly font, extra spacing, high contrast."
+          title={t("card_title")}
+          description={t("card_desc")}
         >
           <AccessibilityForm learnerId={learnerId} initial={prefs} />
         </GlassCard>
@@ -75,18 +77,18 @@ export default async function LearnerAccessibilitySettingsPage() {
         <aside className="flex flex-col gap-3">
           <ReassuranceCard
             tone="info"
-            title="WCAG 2.2 AA"
-            body="Every AIVO screen meets WCAG 2.2 AA out of the box. These settings let you push further when you need to."
+            title={t("reassure_wcag_title")}
+            body={t("reassure_wcag_body")}
           />
           <ReassuranceCard
             tone="privacy"
-            title="Same product, no labels"
-            body="Turning on supports never marks your learner as different — the interface stays calm and premium."
+            title={t("reassure_labels_title")}
+            body={t("reassure_labels_body")}
           />
           <ReassuranceCard
             tone="safety"
-            title="Teachers honour these"
-            body="Whatever you turn on here is applied during lessons, homework, and the AI tutor — no extra setup."
+            title={t("reassure_teachers_title")}
+            body={t("reassure_teachers_body")}
           />
         </aside>
       </section>

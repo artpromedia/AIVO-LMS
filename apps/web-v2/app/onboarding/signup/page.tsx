@@ -2,6 +2,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   AuthShell,
   AuthCard,
@@ -11,13 +12,15 @@ import {
 } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 
-const STEPS = [
-  { label: "About you" },
-  { label: "Role" },
-  { label: "Consent" },
-] as const;
-
 export default function SignUpPage() {
+  const t = useTranslations("onboarding.signup");
+  const tc = useTranslations("onboarding.common");
+  const ts = useTranslations("onboarding.steps");
+  const STEPS = [
+    { label: ts("about_you") },
+    { label: ts("role") },
+    { label: ts("consent") },
+  ] as const;
   const search = useSearchParams();
   const viaInvite = search.get("via") === "invite";
   const [name, setName] = React.useState("");
@@ -30,10 +33,10 @@ export default function SignUpPage() {
       footer={
         <div className="flex flex-wrap gap-3 justify-center">
           <Link href="/onboarding/terms" className="hover:underline">
-            Terms
+            {tc("terms")}
           </Link>
           <Link href="/onboarding/privacy" className="hover:underline">
-            Privacy
+            {tc("privacy")}
           </Link>
         </div>
       }
@@ -42,18 +45,14 @@ export default function SignUpPage() {
         <StepperHeader steps={STEPS} current={0} />
         <AuthCard
           icon={<AivoIcon name="aiSparkle" size={32} />}
-          eyebrow="Create your account"
-          title={viaInvite ? "Accept your invite" : "Tell us a little about you"}
-          subtitle={
-            viaInvite
-              ? "Paste the code from your school or district invitation. You can finish setting up your role next."
-              : "We'll personalize the next steps based on who you are setting up AIVO for."
-          }
+          eyebrow={t("eyebrow")}
+          title={viaInvite ? t("title_invite") : t("title_default")}
+          subtitle={viaInvite ? t("subtitle_invite") : t("subtitle_default")}
           reassurance={
             <ReassuranceCard
               tone="safety"
-              title="Adults set up accounts, not children."
-              body="If you are creating an account for a child, you'll add them on the next step. AIVO never asks a child to create their own account."
+              title={t("reassure_title")}
+              body={t("reassure_body")}
             />
           }
           actions={
@@ -62,15 +61,15 @@ export default function SignUpPage() {
                 href="/onboarding/role"
                 className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold flex items-center justify-center hover:opacity-95"
               >
-                Continue
+                {tc("continue")}
               </Link>
               <p className="text-xs text-iw-text-muted text-center">
-                Already have an account?{" "}
+                {t("already_have")}{" "}
                 <Link
                   href="/onboarding/signin"
                   className="font-semibold text-[var(--aivo-sensory-primary)] hover:underline"
                 >
-                  Sign in
+                  {t("sign_in")}
                 </Link>
               </p>
             </>
@@ -79,17 +78,17 @@ export default function SignUpPage() {
           {viaInvite ? (
             <AuthInput
               id="invite"
-              label="Invite code"
+              label={t("invite_label")}
               value={invite}
               onChange={(e) => setInvite(e.target.value)}
               placeholder="e.g. SCHOOL-7Q4M-2025"
-              helper="Your school or district sent this in the welcome email."
+              helper={t("invite_helper")}
               autoComplete="one-time-code"
             />
           ) : null}
           <AuthInput
             id="name"
-            label="Your name"
+            label={t("name_label")}
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="First and last name"
@@ -97,7 +96,7 @@ export default function SignUpPage() {
           />
           <AuthInput
             id="email"
-            label="Email"
+            label={tc("email")}
             type="email"
             inputMode="email"
             value={email}
@@ -107,11 +106,11 @@ export default function SignUpPage() {
           />
           <AuthInput
             id="password"
-            label="Password"
+            label={tc("password")}
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            helper="At least 12 characters. We'll check it isn't in any known leak before saving it."
+            helper={t("password_helper")}
             autoComplete="new-password"
           />
         </AuthCard>

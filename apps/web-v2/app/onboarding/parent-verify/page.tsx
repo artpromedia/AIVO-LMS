@@ -1,6 +1,7 @@
 "use client";
 import * as React from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { AuthShell, AuthCard, AuthInput, ReassuranceCard } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,8 @@ import { Button } from "@/components/ui/button";
  * duplicate check.
  */
 export default function ParentVerifyPage() {
+  const t = useTranslations("onboarding.parent_verify");
+  const tc = useTranslations("onboarding.common");
   const [phone, setPhone] = React.useState("");
   const [code, setCode] = React.useState("");
   const [stage, setStage] = React.useState<"phone" | "code">("phone");
@@ -22,18 +25,14 @@ export default function ParentVerifyPage() {
     <AuthShell>
       <AuthCard
         icon={<AivoIcon name="safetyOk" size={32} />}
-        eyebrow="Parent verification"
-        title={stage === "phone" ? "Verify it's really you." : "Enter the 6-digit code."}
-        subtitle={
-          stage === "phone"
-            ? "We'll text a one-time code to confirm you're the adult on this account. We never use this number for marketing."
-            : "We sent a code to your phone. It expires in 10 minutes."
-        }
+        eyebrow={t("eyebrow")}
+        title={stage === "phone" ? t("title_phone") : t("title_code")}
+        subtitle={stage === "phone" ? t("subtitle_phone") : t("subtitle_code")}
         reassurance={
           <ReassuranceCard
             tone="safety"
-            title="Children can't bypass this step."
-            body="A child profile becomes active only after a parent has verified. This is how AIVO enforces parental approval."
+            title={t("reassure_title")}
+            body={t("reassure_body")}
           />
         }
         actions={
@@ -44,7 +43,7 @@ export default function ParentVerifyPage() {
               className="w-full"
               onClick={() => setStage(stage === "phone" ? "code" : "phone")}
             >
-              {stage === "phone" ? "Send code" : "Verify and continue"}
+              {stage === "phone" ? t("send_code") : t("verify_continue")}
             </Button>
             {stage === "code" ? (
               <Button
@@ -54,14 +53,14 @@ export default function ParentVerifyPage() {
                 onClick={() => setStage("phone")}
                 className="text-xs text-iw-text-muted hover:underline"
               >
-                Use a different phone number
+                {t("use_diff_phone")}
               </Button>
             ) : (
               <Link
                 href="/onboarding/consent"
                 className="text-xs text-iw-text-muted text-center hover:underline"
               >
-                Back
+                {tc("back")}
               </Link>
             )}
           </>
@@ -70,19 +69,19 @@ export default function ParentVerifyPage() {
         {stage === "phone" ? (
           <AuthInput
             id="phone"
-            label="Mobile phone"
+            label={t("phone_label")}
             type="tel"
             inputMode="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder="+1 555 0123"
             autoComplete="tel"
-            helper="We use this only for verification and account recovery."
+            helper={t("phone_helper")}
           />
         ) : (
           <AuthInput
             id="code"
-            label="6-digit code"
+            label={t("code_label")}
             inputMode="numeric"
             value={code}
             onChange={(e) =>

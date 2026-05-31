@@ -7,6 +7,7 @@
  */
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { readActiveLearnerFromCookies } from "@/lib/auth/active-learner";
 import { AppShell } from "@/components/layout/app-shell";
@@ -44,6 +45,7 @@ export default async function LearnerQuestsPage() {
   const chaptersByWorld = await Promise.all(worlds.map((w) => listQuestChapters(w.id)));
   const totalChapters = chaptersByWorld.reduce((acc, list) => acc + list.length, 0);
   const completedCount = completedChapterIds.size;
+  const t = await getTranslations("learner.quests");
 
   return (
     <AppShell
@@ -53,9 +55,9 @@ export default async function LearnerQuestsPage() {
       user={{ displayName: session.displayName, email: session.email }}
     >
       <AICompanionHero
-        eyebrow="Quests · curriculum-aligned, never points-for-points"
-        title="Pick a quest"
-        body="Every chapter is a real lesson AIVO picked for you. No badges to collect — just one calm step at a time, with a tutor by your side."
+        eyebrow={t("hero_eyebrow")}
+        title={t("hero_title")}
+        body={t("hero_body")}
         chips={
           <>
             <PersonalizationChip variant="no_grades" />
@@ -68,29 +70,29 @@ export default async function LearnerQuestsPage() {
       {worlds.length === 0 ? (
         <div className="mt-6 rounded-iw-card-lg bg-white border border-iw-border p-6">
           <EmptyState
-            title="No quests yet"
-            body="Quests will appear here once your learning path is ready. Check back soon!"
+            title={t("no_quests_title")}
+            body={t("no_quests_body")}
           />
         </div>
       ) : (
         <>
           <section className="mt-6 rounded-iw-card-lg bg-white border border-iw-border p-5 flex items-center justify-between gap-3 flex-wrap">
             <div className="flex flex-col gap-1">
-              <p className="iw-label text-iw-text-muted">Across all quests</p>
+              <p className="iw-label text-iw-text-muted">{t("across_all")}</p>
               <p className="text-lg font-semibold text-iw-text-strong">
-                {completedCount} chapter{completedCount === 1 ? "" : "s"} complete{" "}
-                <span className="text-iw-text-muted">of {totalChapters}</span>
+                {t("chapters_complete", { count: completedCount })}{" "}
+                <span className="text-iw-text-muted">{t("of_total", { total: totalChapters })}</span>
               </p>
             </div>
             <BaselineProgressDots
               states={Array.from({ length: totalChapters }, (_, i): DotState =>
                 i < completedCount ? "answered" : "pending",
               )}
-              ariaLabel="Total quest progress"
+              ariaLabel={t("total_progress_aria")}
             />
           </section>
 
-          <section className="mt-6 grid gap-4 md:grid-cols-2" aria-label="Quest worlds">
+          <section className="mt-6 grid gap-4 md:grid-cols-2" aria-label={t("worlds_aria")}>
             {await Promise.all(
               worlds.map(async (w) => {
                 const chapters = await listQuestChapters(w.id);
@@ -121,21 +123,19 @@ export default async function LearnerQuestsPage() {
                       {done}/{normal.length}
                     </InsightChip>
                   </header>
-                  <BaselineProgressDots states={states} ariaLabel={`${w.name} progress`} />
+                  <BaselineProgressDots states={states} ariaLabel={t("world_progress_aria", { name: w.name })} />
                   {boss ? (
                     <p className="mt-3 text-xs text-iw-text-muted">
                       {bossDone
-                        ? "Boss chapter complete"
-                        : `Boss chapter unlocks after ${boss.prerequisiteChapterIds.length} chapter${
-                            boss.prerequisiteChapterIds.length === 1 ? "" : "s"
-                          }`}
+                        ? t("boss_complete")
+                        : t("boss_unlocks", { count: boss.prerequisiteChapterIds.length })}
                     </p>
                   ) : null}
                   <Link
                     href={`/learner/quests/${w.id}`}
                     className="mt-4 inline-flex items-center gap-2 self-start rounded-iw-control px-4 py-2 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
                   >
-                    {done > 0 ? "Continue" : "Start quest"}
+                    {done > 0 ? t("continue") : t("start_quest")}
                     <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                       <path d="M5 12h14" />
                       <path d="m13 5 7 7-7 7" />

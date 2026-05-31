@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Eye, EyeOff } from "lucide-react";
 import { AuthInput } from "@aivo/ui/auth";
 
@@ -21,6 +22,7 @@ export function LoginForm({
   readonly id: string;
   readonly action: ((formData: FormData) => Promise<void>) | undefined;
 }) {
+  const t = useTranslations("auth");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [showPw, setShowPw] = React.useState(false);
@@ -31,7 +33,7 @@ export function LoginForm({
       <AuthInput
         id="email"
         name="email"
-        label="Email"
+        label={t("common.email")}
         type="email"
         inputMode="email"
         autoComplete="email"
@@ -43,7 +45,7 @@ export function LoginForm({
       <AuthInput
         id="password"
         name="password"
-        label="Password"
+        label={t("common.password")}
         type={showPw ? "text" : "password"}
         autoComplete="current-password"
         value={password}
@@ -53,7 +55,7 @@ export function LoginForm({
           <button
             type="button"
             onClick={() => setShowPw((value) => !value)}
-            aria-label={showPw ? "Hide password" : "Show password"}
+            aria-label={showPw ? t("common.hide_password") : t("common.show_password")}
             aria-pressed={showPw}
             className="inline-flex h-7 w-7 items-center justify-center rounded-full text-iw-ink-muted hover:bg-iw-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring focus-visible:ring-offset-2 focus-visible:ring-offset-iw-bg"
           >
@@ -70,7 +72,7 @@ export function LoginForm({
           href="/forgot-password"
           className="text-sm font-semibold text-iw-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring focus-visible:ring-offset-2 focus-visible:ring-offset-iw-bg rounded"
         >
-          Forgot password?
+          {t("login.forgot_password")}
         </Link>
       </div>
     </form>

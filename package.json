@@ -15,6 +15,8 @@
     "i18n:audit:verbose": "node scripts/i18n-audit.mjs --verbose",
     "i18n:coverage": "node scripts/ci/check-i18n-coverage.mjs",
     "i18n:extract": "node scripts/i18n-extract.mjs",
+    "i18n:extract:gate": "node scripts/i18n-extract.mjs --gate",
+    "i18n:extract:baseline": "node scripts/i18n-extract.mjs --update-baseline",
     "check:no-coming-soon": "node scripts/ci/check-no-coming-soon.mjs",
     "test:integration": "vitest run --config tests/integration/vitest.config.ts",
     "test:enterprise": "vitest run --config tests/integration/vitest.enterprise.config.ts",

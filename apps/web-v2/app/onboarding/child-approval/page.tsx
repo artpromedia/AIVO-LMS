@@ -1,6 +1,7 @@
 "use client";
 import * as React from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   AuthShell,
   AuthCard,
@@ -21,6 +22,8 @@ import { AivoIcon } from "@aivo/ui/icon";
  *   "Child cannot bypass parent approval."
  */
 export default function ChildApprovalPage() {
+  const t = useTranslations("onboarding.child_approval");
+  const tc = useTranslations("onboarding.common");
   const [communication, setCommunication] = React.useState(true);
   const [aiTutor, setAiTutor] = React.useState(true);
   const [voiceMode, setVoiceMode] = React.useState(false);
@@ -29,14 +32,14 @@ export default function ChildApprovalPage() {
     <AuthShell>
       <AuthCard
         icon={<AivoIcon name="care" size={32} />}
-        eyebrow="Final step"
-        title="Approve your child's access."
-        subtitle="These are the experiences your child can use on AIVO. You can change any of these from their profile later."
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        subtitle={t("subtitle")}
         reassurance={
           <ReassuranceCard
             tone="safety"
-            title="Your child is waiting on you."
-            body="Until you press Approve, this profile is in a holding state. Your child cannot sign in or start lessons."
+            title={t("reassure_title")}
+            body={t("reassure_body")}
           />
         }
         actions={
@@ -45,40 +48,39 @@ export default function ChildApprovalPage() {
               href="/parent/home"
               className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold flex items-center justify-center hover:opacity-95"
             >
-              Approve and finish
+              {t("approve")}
             </Link>
             <p className="text-xs text-iw-text-muted text-center">
-              You'll arrive on the parent home with your child set up and
-              ready.
+              {t("footer_note")}
             </p>
           </>
         }
       >
         <ConsentRow
           id="ca-comm"
-          title="Messages with teachers"
-          description="Your child can read messages from teachers and reply with adult-moderated quick responses."
+          title={t("comm_title")}
+          description={t("comm_desc")}
           checked={communication}
           onChange={setCommunication}
-          badge="Recommended"
+          badge={tc("badge_recommended")}
           icon={<AivoIcon name="classroom" size={18} />}
         />
         <ConsentRow
           id="ca-ai"
-          title="AI tutor"
-          description="A conversational tutor that explains concepts, never produces final answers, and routes safety topics to an adult."
+          title={t("ai_title")}
+          description={t("ai_desc")}
           checked={aiTutor}
           onChange={setAiTutor}
-          badge="Recommended"
+          badge={tc("badge_recommended")}
           icon={<AivoIcon name="aiBrain" size={18} />}
         />
         <ConsentRow
           id="ca-voice"
-          title="Voice mode"
-          description="Lets your child speak to the tutor and listen back. Off by default — uses the microphone."
+          title={t("voice_title")}
+          description={t("voice_desc")}
           checked={voiceMode}
           onChange={setVoiceMode}
-          badge="Optional"
+          badge={tc("badge_optional")}
           icon={<AivoIcon name="aiWand" size={18} />}
         />
       </AuthCard>

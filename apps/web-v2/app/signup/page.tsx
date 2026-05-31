@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   AuthCard,
   AuthInput,
@@ -20,6 +21,7 @@ import { Button } from "@/components/ui/button";
  * intentionally deferred until a real identity provider is wired.
  */
 export default function SignupPage() {
+  const t = useTranslations("auth.signup");
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -53,9 +55,9 @@ export default function SignupPage() {
           <aside className="flex flex-col gap-5">
             <AuthCard
               icon={<AivoIcon name="aiSparkle" size={32} />}
-              eyebrow="Start your family trial"
-              title="A warmer way to learn — for every child in the family."
-              subtitle="Set up learners in minutes. Adaptive AI tutors, sensory-friendly modes, and progress every parent can see."
+              eyebrow={t("promo_eyebrow")}
+              title={t("promo_title")}
+              subtitle={t("promo_subtitle")}
             >
               <ul className="flex flex-col gap-3 text-sm text-iw-ink">
                 <li className="flex items-start gap-3">
@@ -65,7 +67,7 @@ export default function SignupPage() {
                   >
                     <AivoIcon name="aiSparkle" size={16} />
                   </span>
-                  <span>Adaptive AI tutors that meet every learner where they are.</span>
+                  <span>{t("benefit_tutors")}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span
@@ -74,7 +76,7 @@ export default function SignupPage() {
                   >
                     <AivoIcon name="safetyOk" size={16} />
                   </span>
-                  <span>Sensory-friendly modes: Standard, Calm, High Contrast.</span>
+                  <span>{t("benefit_sensory")}</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span
@@ -83,29 +85,29 @@ export default function SignupPage() {
                   >
                     <AivoIcon name="curriculum" size={16} />
                   </span>
-                  <span>Progress every parent can see — IEP-aware and quietly honest.</span>
+                  <span>{t("benefit_progress")}</span>
                 </li>
               </ul>
             </AuthCard>
             <ReassuranceCard
               tone="safety"
-              title="Adults set up accounts, not children."
-              body="You'll add learners on the next step. AIVO never asks a child to create their own account, and COPPA / FERPA / SOC 2 protections apply to everything from day one."
+              title={t("reassurance_title")}
+              body={t("reassurance_body")}
             />
           </aside>
 
           <AuthCard
             icon={<AivoIcon name="aiSparkle" size={32} />}
-            eyebrow="Create your account"
-            title="Tell us a little about you"
+            eyebrow={t("card_eyebrow")}
+            title={t("card_title")}
             subtitle={
               <>
-                Already have one?{" "}
+                {t("already_have")}{" "}
                 <Link
                   href="/login"
                   className="font-semibold text-[var(--aivo-sensory-primary)] hover:underline"
                 >
-                  Sign in
+                  {t("sign_in")}
                 </Link>
                 .
               </>
@@ -119,7 +121,7 @@ export default function SignupPage() {
                   disabled={!canSubmit}
                   className="w-full"
                 >
-                  {submitting ? "Creating your account…" : "Create account"}
+                  {submitting ? t("submitting") : t("submit")}
                 </Button>
               </>
             }
@@ -132,7 +134,7 @@ export default function SignupPage() {
             >
               <AuthInput
                 id="name"
-                label="Your name"
+                label={t("name_label")}
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 placeholder="Riley Parent"
@@ -141,7 +143,7 @@ export default function SignupPage() {
               />
               <AuthInput
                 id="email"
-                label="Email"
+                label={t("email_label")}
                 type="email"
                 inputMode="email"
                 value={email}
@@ -152,11 +154,11 @@ export default function SignupPage() {
               />
               <AuthInput
                 id="password"
-                label="Password"
+                label={t("password_label")}
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                helper="At least 8 characters with a number and a symbol."
+                helper={t("password_helper")}
                 autoComplete="new-password"
                 required
               />

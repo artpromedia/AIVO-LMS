@@ -7,6 +7,7 @@
  */
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { readActiveLearnerFromCookies } from "@/lib/auth/active-learner";
 import { AppShell } from "@/components/layout/app-shell";
@@ -44,6 +45,8 @@ export default async function QuestChapterStartPage({ params }: Params) {
     redirect(`/learner/lesson-runs/${result.lessonRunId}`);
   }
 
+  const t = await getTranslations("learner.quests");
+
   // Locked / not-found / failed — show a recovery panel with a retry path.
   return (
     <AppShell
@@ -53,9 +56,9 @@ export default async function QuestChapterStartPage({ params }: Params) {
       user={{ displayName: session.displayName, email: session.email }}
     >
       <PageHeader
-        eyebrow="Quest"
+        eyebrow={t("world_eyebrow")}
         title={world.name}
-        description="We couldn't start this chapter yet."
+        description={t("couldnt_start")}
       />
       <Card className="p-[var(--aivo-density-card-pad)]">
         <p className="text-sm" role="alert">
@@ -63,10 +66,10 @@ export default async function QuestChapterStartPage({ params }: Params) {
         </p>
         <div className="mt-4 flex gap-2">
           <Button asChild variant="soft">
-            <Link href={`/learner/quests/${worldId}`}>Back to chapter map</Link>
+            <Link href={`/learner/quests/${worldId}`}>{t("back_to_map")}</Link>
           </Button>
           <Button asChild>
-            <Link href="/learner/quests">All quests</Link>
+            <Link href="/learner/quests">{t("all_quests")}</Link>
           </Button>
         </div>
       </Card>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -13,6 +14,8 @@ import {
 
 export default async function Page() {
   const session = await requirePageRole(["learner"]);
+  const t = await getTranslations("learner.missions");
+  const tc = await getTranslations("learner.common");
   const learnerId = session.learnerId;
   if (!learnerId) {
     return (
@@ -22,7 +25,7 @@ export default async function Page() {
         navItems={LEARNER_NAV}
         user={{ displayName: session.displayName, email: session.email }}
       >
-        <EmptyState title="No learner profile linked" />
+        <EmptyState title={tc("no_profile")} />
       </AppShell>
     );
   }
@@ -39,16 +42,16 @@ export default async function Page() {
       user={{ displayName: session.displayName, email: session.email }}
     >
       <PageHeader
-        eyebrow="Learner"
-        title="Missions"
-        description="Your active assignments and lessons in progress."
+        eyebrow={tc("learner_eyebrow")}
+        title={t("title")}
+        description={t("description")}
       />
       <div className="space-y-3">
         {assignments.map((a) => (
           <Card key={a.id} className="p-4">
             <p className="font-medium">{a.title}</p>
             <p className="text-sm text-aivo-ink-soft">
-              {subjectMap.get(a.subjectId)?.name ?? "Subject"} · from your teacher
+              {t("from_teacher", { subject: subjectMap.get(a.subjectId)?.name ?? t("subject_fallback") })}
             </p>
           </Card>
         ))}
@@ -56,28 +59,28 @@ export default async function Page() {
           <Card key={r.id} className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Lesson in progress</p>
-                <p className="text-sm text-aivo-ink-soft">Source: {r.source}</p>
+                <p className="font-medium">{t("lesson_in_progress")}</p>
+                <p className="text-sm text-aivo-ink-soft">{tc("source", { source: r.source })}</p>
               </div>
               <Link
                 href={`/learner/lesson-runs/${r.id}`}
                 className="text-xs font-medium text-aivo-primary hover:underline"
               >
-                Continue →
+                {t("continue")}
               </Link>
             </div>
           </Card>
         ))}
         {assignments.length === 0 && runs.length === 0 ? (
           <EmptyState
-            title="Nothing waiting"
-            description="Head to Today to pick your next mission."
+            title={t("nothing_waiting")}
+            description={t("nothing_desc")}
             action={
               <Link
                 href="/learner/home"
                 className="text-sm font-medium text-aivo-primary hover:underline"
               >
-                Go to Today →
+                {t("go_today")}
               </Link>
             }
           />

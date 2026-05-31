@@ -1,11 +1,14 @@
 "use client";
 import * as React from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { AuthShell, AuthCard, AuthInput, ReassuranceCard } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 import { Button } from "@/components/ui/button";
 
 export default function SignInPage() {
+  const t = useTranslations("onboarding.signin");
+  const tc = useTranslations("onboarding.common");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [showPw, setShowPw] = React.useState(false);
@@ -15,47 +18,47 @@ export default function SignInPage() {
       footer={
         <div className="flex flex-wrap gap-3 justify-center">
           <Link href="/onboarding/terms" className="hover:underline">
-            Terms
+            {tc("terms")}
           </Link>
           <Link href="/onboarding/privacy" className="hover:underline">
-            Privacy
+            {tc("privacy")}
           </Link>
           <Link href="/onboarding/recovery" className="hover:underline">
-            Trouble signing in?
+            {t("trouble")}
           </Link>
         </div>
       }
     >
       <AuthCard
         icon={<AivoIcon name="aiSparkle" size={32} />}
-        eyebrow="Welcome back"
-        title="Sign in"
-        subtitle="Use the email you set up with your family, school, or district."
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        subtitle={t("subtitle")}
         reassurance={
           <ReassuranceCard
             tone="privacy"
-            title="We never sell your data."
-            body="Your email is used only to identify your account. Read the privacy notice for more."
-            link={{ href: "/onboarding/privacy", label: "Read the privacy notice" }}
+            title={t("reassure_title")}
+            body={t("reassure_body")}
+            link={{ href: "/onboarding/privacy", label: t("reassure_link") }}
           />
         }
         actions={
           <>
             <Button type="submit" size="lg" className="w-full">
-              Sign in
+              {t("submit")}
             </Button>
             <div className="flex justify-between text-sm">
               <Link
                 href="/onboarding/recovery"
                 className="text-iw-text-muted hover:underline"
               >
-                Forgot password?
+                {t("forgot")}
               </Link>
               <Link
                 href="/onboarding/signup"
                 className="font-semibold text-[var(--aivo-sensory-primary)] hover:underline"
               >
-                Create an account
+                {t("create_account")}
               </Link>
             </div>
           </>
@@ -63,7 +66,7 @@ export default function SignInPage() {
       >
         <AuthInput
           id="email"
-          label="Email"
+          label={tc("email")}
           type="email"
           autoComplete="email"
           inputMode="email"
@@ -73,7 +76,7 @@ export default function SignInPage() {
         />
         <AuthInput
           id="password"
-          label="Password"
+          label={tc("password")}
           type={showPw ? "text" : "password"}
           autoComplete="current-password"
           value={password}
@@ -83,9 +86,9 @@ export default function SignInPage() {
               type="button"
               onClick={() => setShowPw((v) => !v)}
               className="text-xs font-semibold text-[var(--aivo-sensory-primary)] hover:underline"
-              aria-label={showPw ? "Hide password" : "Show password"}
+              aria-label={showPw ? tc("hide_password") : tc("show_password")}
             >
-              {showPw ? "Hide" : "Show"}
+              {showPw ? tc("hide") : tc("show")}
             </button>
           }
         />

@@ -1,6 +1,7 @@
 "use client";
 import * as React from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   AuthShell,
   AuthCard,
@@ -21,6 +22,8 @@ import { AivoIcon } from "@aivo/ui/icon";
  * input becomes interactive. Skipping is always allowed.
  */
 export default function IepUploadPage() {
+  const t = useTranslations("onboarding.iep_upload");
+  const tc = useTranslations("onboarding.common");
   const [explicitConsent, setExplicitConsent] = React.useState(false);
   const [file, setFile] = React.useState<File | null>(null);
 
@@ -28,15 +31,15 @@ export default function IepUploadPage() {
     <AuthShell>
       <AuthCard
         icon={<AivoIcon name="iep" size={32} />}
-        eyebrow="IEP / 504 supports"
-        title="Add your child's plan — only if you want to."
-        subtitle="If you have an IEP or 504, AIVO can extract accommodations (extra time, read-aloud, etc.) so lessons match it from day one. You can do this later, or never."
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        subtitle={t("subtitle")}
         reassurance={
           <ReassuranceCard
             tone="privacy"
-            title="This is a sensitive document."
-            body="Only you, any co-parent, and teachers at the schools you've opted in to will see it. AI extraction runs in-tenant. The original file is encrypted at rest."
-            link={{ href: "/onboarding/privacy", label: "How IEPs are handled" }}
+            title={t("reassure_title")}
+            body={t("reassure_body")}
+            link={{ href: "/onboarding/privacy", label: t("reassure_link") }}
           />
         }
         actions={
@@ -45,21 +48,21 @@ export default function IepUploadPage() {
               href="/onboarding/parent-verify"
               className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold flex items-center justify-center hover:opacity-95"
             >
-              {file ? "Upload and continue" : "Skip for now"}
+              {file ? t("upload_continue") : t("skip")}
             </Link>
             <p className="text-xs text-iw-text-muted text-center">
-              You can upload later from your learner's profile.
+              {t("footer_note")}
             </p>
           </>
         }
       >
         <ConsentRow
           id="iep-consent"
-          title="I explicitly consent to upload an IEP / 504 plan"
-          description="AIVO will store the document, extract listed accommodations, and apply them to lessons. You can delete it any time."
+          title={t("consent_title")}
+          description={t("consent_desc")}
           checked={explicitConsent}
           onChange={setExplicitConsent}
-          badge="Explicit"
+          badge={tc("badge_explicit")}
           icon={<AivoIcon name="consentLock" size={18} />}
         />
         <div
@@ -84,26 +87,22 @@ export default function IepUploadPage() {
             }`}
           >
             <AivoIcon name="curriculum" size={18} />
-            {file ? file.name : "Choose a PDF or Word file"}
+            {file ? file.name : t("choose_file")}
           </label>
-          <p className="text-xs text-iw-text-muted mt-3">
-            Files up to 20 MB. We&apos;ll show a preview of what we extracted
-            before applying anything.
-          </p>
+          <p className="text-xs text-iw-text-muted mt-3">{t("file_help")}</p>
         </div>
-        <LegalCollapse summary="What gets extracted, and what doesn't.">
+        <LegalCollapse summary={t("legal_summary")}>
           <ul className="list-disc list-inside space-y-1">
             <li>
-              <strong>Extracted:</strong> accommodation list (extra time, read
-              aloud, breaks), goal categories, support service hours.
+              <strong>{t("legal_extracted_label")}</strong>{" "}
+              {t("legal_extracted_body")}
             </li>
             <li>
-              <strong>Never extracted:</strong> medical diagnoses,
-              psychological evaluations, parent statements, signatures.
+              <strong>{t("legal_never_label")}</strong> {t("legal_never_body")}
             </li>
             <li>
-              <strong>Visible to teachers:</strong> only the accommodations
-              list, only at schools you've opted in to.
+              <strong>{t("legal_teachers_label")}</strong>{" "}
+              {t("legal_teachers_body")}
             </li>
           </ul>
         </LegalCollapse>

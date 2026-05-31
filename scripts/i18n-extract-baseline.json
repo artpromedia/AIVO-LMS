@@ -1,0 +1,18 @@
+{
+  "total": 1080,
+  "areas": {
+    "accept-invite": 11,
+    "admin": 507,
+    "caregiver": 35,
+    "district": 6,
+    "(root)": 18,
+    "learner": 15,
+    "login": 1,
+    "onboarding": 4,
+    "parent": 361,
+    "settings": 16,
+    "signup": 1,
+    "teacher": 86,
+    "therapist": 19
+  }
+}

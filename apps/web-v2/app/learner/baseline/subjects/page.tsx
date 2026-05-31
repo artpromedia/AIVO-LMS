@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { Button } from "@/components/ui/button";
 import {
@@ -55,6 +56,7 @@ export default async function BaselineSubjectsPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const session = await requirePageRole(["learner"]);
+  const t = await getTranslations("learner.baseline");
   const sp = await searchParams;
   if (!session.learnerId) redirect("/learner/home");
   const subjects = await listSubjects();
@@ -76,19 +78,18 @@ export default async function BaselineSubjectsPage({
             <path d="M19 12H5" />
             <path d="m12 19-7-7 7-7" />
           </svg>
-          Back
+          {t("back")}
         </Link>
       }
       headerRight={<PersonalizationChip variant="parent_assessment" />}
     >
       <section className="flex flex-col gap-2">
-        <p className="iw-label text-iw-text-muted">Step 1 of 3</p>
+        <p className="iw-label text-iw-text-muted">{t("subjects.step")}</p>
         <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong leading-snug">
-          Where do you want to start?
+          {t("subjects.title")}
         </h1>
         <p className="text-base text-iw-text-muted max-w-2xl">
-          Pick one or more subjects. AIVO will pick a small handful of friendly questions just for
-          you.
+          {t("subjects.body")}
         </p>
       </section>
 
@@ -97,13 +98,13 @@ export default async function BaselineSubjectsPage({
           role="alert"
           className="rounded-iw-card border border-[var(--aivo-status-warning)] bg-iw-warm-soft text-[var(--aivo-status-warning)] px-4 py-2.5 text-sm"
         >
-          Pick at least one subject to start.
+          {t("subjects.error_pick_one")}
         </p>
       ) : null}
 
       <form action={startWithSubjectsAction} className="flex flex-col gap-4">
         <fieldset>
-          <legend className="sr-only">Choose subjects</legend>
+          <legend className="sr-only">{t("subjects.legend")}</legend>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {subjects.map((s) => {
               const tutor = tutorForSubjectSlug(s.slug);
@@ -157,12 +158,12 @@ export default async function BaselineSubjectsPage({
                   </div>
                   {tutor ? (
                     <p className="text-xs text-iw-text-muted mt-1">
-                      With {tutor.name} · {tutor.landmark}
+                      {t("subjects.with_tutor", { name: tutor.name, landmark: tutor.landmark })}
                     </p>
                   ) : null}
                   {isFocus ? (
                     <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-iw-chip text-[10px] font-semibold uppercase tracking-wide bg-[var(--aivo-aivoOrange-50)] text-[var(--aivo-aivoOrange-700)]">
-                      Picked by grown-up
+                      {t("subjects.picked_by_grownup")}
                     </span>
                   ) : null}
                 </label>
@@ -173,10 +174,10 @@ export default async function BaselineSubjectsPage({
 
         <div className="flex items-center justify-between gap-3 pt-2 flex-wrap">
           <p className="text-xs text-iw-text-muted">
-            Subjects with a "Picked by grown-up" tag come from your parent's setup.
+            {t("subjects.picked_note")}
           </p>
           <Button type="submit" size="lg">
-            Get ready
+            {t("subjects.get_ready")}
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M5 12h14" />
               <path d="m13 5 7 7-7 7" />
