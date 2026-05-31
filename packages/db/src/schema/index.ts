@@ -10,6 +10,7 @@ export * from "./audit.js";
 export * from "./learning.js";
 export * from "./lesson-runs.js";
 export * from "./learner-brain-profiles.js";
+export * from "./web-domain.js";
 export * from "./homework.js";
 export * from "./collaboration.js";
 export * from "./integrations.js";

@@ -21,20 +21,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, "..");
 const DRIZZLE_DIR = join(repoRoot, "apps/web-v2/lib/db/persistence/drizzle");
 
-// Domains still backed by an explicit `notImplemented` stub. Shrink this
-// as adapters land; the goal is an empty list (then this gate flips to
-// "no stubs allowed at all").
-const STILL_STUBBED = new Set([
-  "admin.ts",
-  "assessments.ts",
-  "audit.ts",
-  "compliance.ts",
-  "curriculum.ts",
-  "identity.ts",
-  "learners.ts",
-  "notifications.ts",
-  "quests.ts",
-]);
+// Domains still backed by an explicit `notImplemented` stub. The cutover
+// is complete — this is empty, so the gate now forbids any stub at all.
+const STILL_STUBBED = new Set([]);
 
 const STUB_MARKER = /notImplemented\(/;
 

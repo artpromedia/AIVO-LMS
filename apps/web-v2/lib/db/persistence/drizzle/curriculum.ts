@@ -1,46 +1,93 @@
 /**
- * Drizzle-backed CurriculumStore — stub.
- *
- * `packages/db/src/schema/curriculum.ts` already ships subjects +
- * skills tables. The Drizzle implementation is a follow-up:
- *
- *   1. listSubjects / listSkills — straightforward SELECTs.
- *   2. getMasteryMapForLearner — a single round-trip joining
- *      mastery_maps and skill_masteries.
- *   3. replaceLearningPath — DELETE WHERE learner_id = ? + INSERT,
- *      both inside a single transaction so retries don't lose the
- *      old path.
+ * Drizzle-backed CurriculumStore. Subjects/skills are reference data;
+ * masteryMaps/skillMasteries/learningPaths are per-learner. Mirrors the
+ * memory store, including the delete-prior-then-insert sequence in
+ * replaceLearningPath.
  */
+import { and, eq } from "drizzle-orm";
+import {
+  webSubjects,
+  webSkills,
+  webMasteryMaps,
+  webSkillMasteries,
+  webLearningPaths,
+} from "@aivo/db";
+import type { LearningPath, MasteryMap, Skill, SkillMastery, Subject } from "@/lib/db/types";
 import type { CurriculumStore } from "../types";
-
-function notImplemented(method: string): never {
-  throw new Error(
-    `[persistence.drizzle.curriculum.${method}] not implemented. ` +
-      `Wire packages/db/src/schema/curriculum.ts into the adapter ` +
-      `before flipping AIVO_PERSISTENCE_CURRICULUM=postgres.`,
-  );
-}
+import { getDb } from "./client";
 
 export const drizzleCurriculum: CurriculumStore = {
   async listSubjects() {
-    return notImplemented("listSubjects");
+    const rows = await getDb().select().from(webSubjects);
+    return rows.map((r) => r.data as Subject);
   },
-  async getSubjectById() {
-    return notImplemented("getSubjectById");
+
+  async getSubjectById(subjectId) {
+    const [row] = await getDb()
+      .select()
+      .from(webSubjects)
+      .where(eq(webSubjects.id, subjectId))
+      .limit(1);
+    return row ? (row.data as Subject) : null;
   },
-  async listSkills() {
-    return notImplemented("listSkills");
+
+  async listSkills(subjectId) {
+    const db = getDb();
+    const rows = subjectId
+      ? await db.select().from(webSkills).where(eq(webSkills.subjectId, subjectId))
+      : await db.select().from(webSkills);
+    return rows.map((r) => r.data as Skill);
   },
-  async getSkillById() {
-    return notImplemented("getSkillById");
+
+  async getSkillById(skillId) {
+    const [row] = await getDb().select().from(webSkills).where(eq(webSkills.id, skillId)).limit(1);
+    return row ? (row.data as Skill) : null;
   },
-  async getMasteryMapForLearner() {
-    return notImplemented("getMasteryMapForLearner");
+
+  async getMasteryMapForLearner(learnerId, tenantId) {
+    const db = getDb();
+    const [mapRow] = await db
+      .select()
+      .from(webMasteryMaps)
+      .where(and(eq(webMasteryMaps.learnerId, learnerId), eq(webMasteryMaps.tenantId, tenantId)))
+      .limit(1);
+    const masteryRows = await db
+      .select()
+      .from(webSkillMasteries)
+      .where(
+        and(eq(webSkillMasteries.learnerId, learnerId), eq(webSkillMasteries.tenantId, tenantId)),
+      );
+    return {
+      map: mapRow ? (mapRow.data as MasteryMap) : null,
+      skillMasteries: masteryRows.map((r) => r.data as SkillMastery),
+    };
   },
-  async getLearningPath() {
-    return notImplemented("getLearningPath");
+
+  async getLearningPath(learnerId, tenantId) {
+    const [row] = await getDb()
+      .select()
+      .from(webLearningPaths)
+      .where(
+        and(eq(webLearningPaths.learnerId, learnerId), eq(webLearningPaths.tenantId, tenantId)),
+      )
+      .limit(1);
+    return row ? (row.data as LearningPath) : null;
   },
-  async replaceLearningPath() {
-    return notImplemented("replaceLearningPath");
+
+  async replaceLearningPath(learnerId, tenantId, next) {
+    const db = getDb();
+    await db
+      .delete(webLearningPaths)
+      .where(
+        and(eq(webLearningPaths.learnerId, learnerId), eq(webLearningPaths.tenantId, tenantId)),
+      );
+    await db
+      .insert(webLearningPaths)
+      .values({ id: next.id, learnerId, tenantId, data: next })
+      .onConflictDoUpdate({
+        target: webLearningPaths.id,
+        set: { learnerId, tenantId, data: next },
+      });
+    return next;
   },
 };
