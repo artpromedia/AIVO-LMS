@@ -85,6 +85,27 @@ const nextConfig: NextConfig = {
         destination: "/notifications",
         permanent: true,
       },
+      // ADR 0020 Phase 2, slice 2 — `messages` moved to the canonical
+      // top-level `/messages` surface anchored on the `messages` nav
+      // area. Mirrors `CROSS_CUTTING_REGISTRY.messages.legacyRoutes`
+      // (web). No legacy per-role messages pages exist on disk; the
+      // redirects future-proof any external links that may still
+      // reference the per-role URLs.
+      {
+        source: "/parent/messages",
+        destination: "/messages",
+        permanent: true,
+      },
+      {
+        source: "/teacher/messages",
+        destination: "/messages",
+        permanent: true,
+      },
+      {
+        source: "/caregiver/messages",
+        destination: "/messages",
+        permanent: true,
+      },
     ];
   },
 };
