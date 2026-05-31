@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -16,6 +17,7 @@ import { SettingsTogglesForm } from "./toggles-form";
 
 export default async function Page() {
   const session = await requirePageRole(["district_admin"]);
+  const t = await getTranslations("admin.district_settings");
   const tenant = getTenantById(session.tenantId);
   const settings = getTenantSettings(session.tenantId);
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
@@ -63,36 +65,36 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="District admin"
-        title="Settings"
+        title={t("title")}
         description={`Org defaults and product controls for ${districtName}.`}
       />
 
       <div className="space-y-6">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="font-display text-lg font-semibold">Organisation</p>
+          <p className="font-display text-lg font-semibold">{t("org_section")}</p>
           <dl className="mt-3 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
             <div className="flex justify-between gap-4">
-              <dt className="text-aivo-ink-soft">Tenant name</dt>
+              <dt className="text-aivo-ink-soft">{t("tenant_name")}</dt>
               <dd className="font-medium">{tenant?.name ?? "—"}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-aivo-ink-soft">Tenant ID</dt>
+              <dt className="text-aivo-ink-soft">{t("tenant_id")}</dt>
               <dd className="font-mono text-xs">{session.tenantId}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-aivo-ink-soft">Schools</dt>
+              <dt className="text-aivo-ink-soft">{t("schools")}</dt>
               <dd className="font-medium">{stats.schools.toLocaleString()}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-aivo-ink-soft">Learners</dt>
+              <dt className="text-aivo-ink-soft">{t("learners")}</dt>
               <dd className="font-medium">{stats.learners.toLocaleString()}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-aivo-ink-soft">Support email</dt>
+              <dt className="text-aivo-ink-soft">{t("support_email")}</dt>
               <dd className="font-medium">{settings.branding.supportEmail ?? "—"}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-aivo-ink-soft">Last update</dt>
+              <dt className="text-aivo-ink-soft">{t("last_update")}</dt>
               <dd className="text-xs text-aivo-ink-soft">
                 {new Date(settings.updatedAt).toLocaleString()}
               </dd>
@@ -120,7 +122,7 @@ export default async function Page() {
                 <p className="mt-3 font-display text-lg font-semibold">{title}</p>
                 <p className="mt-1 text-sm text-aivo-ink-soft">{description}</p>
                 <p className="mt-3 inline-flex items-center text-sm font-medium text-aivo-primary">
-                  Manage <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                  {t("manage")} <ArrowRight className="ml-1 h-3.5 w-3.5" />
                 </p>
               </Card>
             </Link>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -43,6 +44,7 @@ const ROLE_ORDER: Role[] = [
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_users");
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const users = await listUsersForTenants(tenants.map((t) => t.id));
   const tenantById = new Map(tenants.map((t) => [t.id, t]));
@@ -65,7 +67,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform"
-        title="Users"
+        title={t("title")}
         description="Every user across every tenant on the platform."
         actions={
           <Badge tone="neutral">
@@ -88,7 +90,7 @@ export default async function Page() {
       </div>
 
       {users.length === 0 ? (
-        <EmptyState title="No users" />
+        <EmptyState title={t("empty")} />
       ) : (
         <Card className="overflow-hidden">
           <div className="border-b border-aivo-border px-4 py-3 text-sm font-medium">
@@ -101,8 +103,8 @@ export default async function Page() {
                   <th className="px-4 py-2">Name</th>
                   <th className="px-4 py-2">Email</th>
                   <th className="px-4 py-2">Role</th>
-                  <th className="px-4 py-2">Tenant</th>
-                  <th className="px-4 py-2">Joined</th>
+                  <th className="px-4 py-2">{t("col_tenant")}</th>
+                  <th className="px-4 py-2">{t("col_joined")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-aivo-border">

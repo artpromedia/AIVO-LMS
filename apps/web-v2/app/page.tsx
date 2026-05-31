@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Building2, ShieldCheck } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { readMockSessionFromCookies } from "@/lib/auth/mock-session";
 import { ROLE_HOME, ROLE_LABEL } from "@/lib/auth/types";
@@ -9,6 +10,7 @@ import { SiteFooter } from "@/components/marketing/site-footer";
 import { HeroVisual } from "@/components/marketing/hero-visual";
 
 export default async function Home() {
+  const t = await getTranslations("root.home");
   const session = await readMockSessionFromCookies();
 
   return (
@@ -19,7 +21,7 @@ export default async function Home() {
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-iw-border bg-iw-card px-4 py-1.5 text-iw-primary shadow-soft-1">
               <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-              <span className="text-sm font-bold tracking-wide">FERPA &amp; COPPA Compliant</span>
+              <span className="text-sm font-bold tracking-wide">{t("ferpa_coppa")}</span>
             </div>
             <h1 className="mt-6 font-iw-display text-5xl font-bold leading-[1.05] tracking-tight text-iw-ink sm:text-6xl lg:text-7xl">
               Learning that{" "}
@@ -50,14 +52,14 @@ export default async function Home() {
                     </Link>
                   </Button>
                   <Button asChild size="lg" variant="outline">
-                    <Link href="/login">Switch role</Link>
+                    <Link href="/login">{t("switch_role")}</Link>
                   </Button>
                 </>
               ) : (
                 <>
                   <Button asChild size="lg">
                     <Link href="/signup" className="group">
-                      Start Family Trial
+                      {t("start_family_trial")}
                       <ArrowRight
                         className="h-5 w-5 transition-transform group-hover:translate-x-1"
                         aria-hidden="true"
@@ -67,7 +69,7 @@ export default async function Home() {
                   <Button asChild size="lg" variant="outline">
                     <Link href="/admin/district">
                       <Building2 className="h-5 w-5" aria-hidden="true" />
-                      For School Districts
+                      {t("for_school_districts")}
                     </Link>
                   </Button>
                 </>
@@ -77,7 +79,7 @@ export default async function Home() {
                 cluster (S / M / J pills) competed with the CTAs for
                 attention without conveying meaningful information. */}
             <p className="mt-8 text-sm text-iw-ink-muted">
-              Trusted by 1,200+ specialists and parents.
+              {t("trusted_by")}
             </p>
           </div>
 

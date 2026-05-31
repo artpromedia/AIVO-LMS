@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import {
   AssessmentShell,
   BaselinePendingCard,
@@ -33,6 +34,7 @@ export default async function BaselinePendingPage({
   params: Promise<{ learnerId: string }>;
 }) {
   const session = await requirePageRole(["parent"]);
+  const t = await getTranslations("parent.learner_baseline_pending");
   const { learnerId } = await params;
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
@@ -126,12 +128,12 @@ export default async function BaselinePendingPage({
         <>
           <ReassuranceCard
             tone="info"
-            title="No generic quiz"
+            title={t("no_generic_quiz_title")}
             body="The baseline is generated fresh from your inputs. Your learner will see questions that match their level and supports."
           />
           <ReassuranceCard
             tone="privacy"
-            title="Calm by default"
+            title={t("calm_by_default_title")}
             body="Read-aloud, extended time, and sensory-aware pacing turn on automatically when supports call for them."
           />
         </>
@@ -147,46 +149,46 @@ export default async function BaselinePendingPage({
               href={`/parent/learners/${learner.id}/baseline/pending`}
               className="inline-flex items-center gap-1.5 rounded-iw-control px-4 py-2 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
             >
-              Try again
+              {t("try_again")}
             </Link>
           }
         />
 
         <section className="grid gap-3 sm:grid-cols-3">
           <div className="rounded-iw-card border border-iw-border bg-white p-4 flex flex-col gap-1">
-            <p className="iw-label text-iw-text-muted">Step 1 · Skill graph</p>
+            <p className="iw-label text-iw-text-muted">{t("step1_label")}</p>
             <p className="text-sm font-semibold text-iw-text-strong">
-              Picking the right starting skills
+              {t("step1_heading")}
             </p>
             <p className="text-xs text-iw-text-muted leading-relaxed">
-              We map your learner's grade band and confidence answers onto the curriculum.
+              {t("step1_body")}
             </p>
             <InsightChip tone="success" size="sm" className="self-start mt-1">
               Done
             </InsightChip>
           </div>
           <div className="rounded-iw-card border border-iw-border bg-white p-4 flex flex-col gap-1">
-            <p className="iw-label text-iw-text-muted">Step 2 · Personalization</p>
+            <p className="iw-label text-iw-text-muted">{t("step2_label")}</p>
             <p className="text-sm font-semibold text-iw-text-strong">
-              Applying supports and pacing
+              {t("step2_heading")}
             </p>
             <p className="text-xs text-iw-text-muted leading-relaxed">
-              We respect every accommodation you confirmed plus the sensory profile.
+              {t("step2_body")}
             </p>
             <InsightChip tone="primary" size="sm" className="self-start mt-1">
-              In progress
+              {t("in_progress")}
             </InsightChip>
           </div>
           <div className="rounded-iw-card border border-iw-border bg-white p-4 flex flex-col gap-1">
-            <p className="iw-label text-iw-text-muted">Step 3 · Question set</p>
+            <p className="iw-label text-iw-text-muted">{t("step3_label")}</p>
             <p className="text-sm font-semibold text-iw-text-strong">
-              Drafting the first questions
+              {t("step3_heading")}
             </p>
             <p className="text-xs text-iw-text-muted leading-relaxed">
-              Short, calm, no time pressure. Your learner can pause anytime.
+              {t("step3_body")}
             </p>
             <InsightChip tone="neutral" size="sm" className="self-start mt-1">
-              Up next
+              {t("up_next")}
             </InsightChip>
           </div>
         </section>

@@ -1252,6 +1252,303 @@
       "cta_primary": "ابدأ التجربة العائلية",
       "cta_secondary": "تحدّث إلى مبيعات المناطق التعليمية",
       "cta_image_alt": "ولي أمر وطفل يتعلّمان معًا على أريكة"
+    },
+    "page_reset_password": {
+      "logo_aria": "الصفحة الرئيسية لـ AIVO",
+      "heading": "إعادة تعيين كلمة المرور",
+      "subheading": "اختر كلمة مرور جديدة لحسابك.",
+      "success_heading": "تم تحديث كلمة المرور",
+      "back_to_sign_in": "العودة إلى تسجيل الدخول",
+      "label_new_password": "كلمة المرور الجديدة",
+      "placeholder_new_password": "لا تقل عن 12 حرفاً",
+      "label_confirm_password": "تأكيد كلمة المرور الجديدة",
+      "placeholder_confirm_password": "أعد إدخال كلمة المرور الجديدة",
+      "passwords_mismatch": "كلمتا المرور لا تتطابقان بعد",
+      "btn_updating": "جاري التحديث…",
+      "btn_submit": "تحديث كلمة المرور",
+      "trust_badge": "مصمّم لدعم COPPA · FERPA · SOC 2",
+      "loading": "جاري التحميل…"
+    },
+    "page_features_homework_helper": {
+      "page_title": "مساعدة موجّهة، ليس إلقاء إجابات",
+      "callout_title": "مساعد الواجبات لن يعطي الإجابات مباشرةً",
+      "get_help_cta": "احصل على مساعدة ←",
+      "clarifying_question": "قبل الحل — ماذا تعني لك “في المجموع” في هذه المسألة؟",
+      "your_answer_label": "إجابتك:",
+      "explanation_text": "لقد جمعت 3 أربع مرات. هذا مثل 3 × 4. يُسمّى ذلك",
+      "mastery_updated": "تم تحديث الإتقان: الضرب كجمع متكرّر · قيد البناء.",
+      "recommended_next_label": "موصى به تالياً",
+      "recommended_lesson_title": "مضاعفة الأعداد 3 · LessonRun",
+      "recommended_lesson_meta": "مع Atlas · حوالي 15 دقيقة",
+      "added_to_session": "أضيف إلى جلسة Maya التالية."
+    },
+    "page_waitlist": {
+      "page_title": "احجز مكانك.",
+      "form_heading": "أخبرنا عن متعلّمك",
+      "form_subheading": "حقلان مطلوبان. الباقي يساعدنا في اختيار مسار الإعداد المناسب عند فتح مكانك.",
+      "promise_heading": "ما نعد به",
+      "promise_no_spam_title": "لا بريد مزعج",
+      "promise_no_spam_body": "رسالة واحدة عند فتح مكانك. ربما ثانية إن لم ترد.",
+      "promise_no_sharing_title": "لا مشاركة للبيانات",
+      "promise_no_sharing_body": "لا نبيع بياناتك الشخصية أو نشاركها أبداً. راجع سياسة الخصوصية.",
+      "promise_easy_out_title": "خروج سهل",
+      "promise_easy_out_body": "رد بـ“إزالة” على أي بريد من قائمة الانتظار وسنحذف سجلك."
+    },
+    "page_resources": {
+      "cta_get_started": "ابدأ الآن",
+      "badge": "موارد",
+      "heading": "أدلة وتمهيدات ومسارات قراءة",
+      "guides_heading": "أدلة",
+      "guides_subheading": "أدلة عملية تفصيلية للمدارس والمناطق وفرق المشتريات.",
+      "blog_heading": "من المدوّنة",
+      "blog_subheading": "مقالات قصيرة حول كيفية عمل حلقة التعلّم فعلياً."
+    },
+    "page_for_teachers": {
+      "assignment_title": "مضاعفة الأعداد 3 — الأسبوع 4",
+      "roster_label": "كشف الطلاب",
+      "roster_value": "الفصل 3B · 22 متعلّماً",
+      "assign_cta": "تعيين للصف",
+      "callout_summaries_title": "ملخصات بلغة بسيطة سترسلها فعلاً إلى المنزل",
+      "callout_accommodation_title": "ملخصات التسهيلات آمنة للمعلّمين"
+    },
+    "page_contact": {
+      "page_title": "تحدث مع شخص حقيقي.",
+      "form_heading": "أرسل لنا رسالة",
+      "form_subheading": "أخبرنا عما تبحث وسنحوّلها إلى الفريق المناسب.",
+      "inboxes_heading": "طرق أخرى للتواصل"
+    },
+    "page_blog": {
+      "nav_resources": "موارد",
+      "cta_get_started": "ابدأ الآن",
+      "heading": "ملاحظات من فريق AIVO"
+    },
+    "page_for_schools": {
+      "callout_workflow_title": "التعلّم الشخصي يفشل حين يُثقل عبء المعلّم",
+      "callout_neurodiverse_title": "مبني مع مراعاة المتعلّمين عصبياً متنوعين",
+      "progress_summary": "تُظهِر Maya تقدماً مطّرداً في القراءة."
+    },
+    "page_subjects": {
+      "page_title": "معلّم واحد لكل مادة. نسخة دماغية واحدة لطفلك."
+    },
+    "page_signup": {
+      "logo_aria_label": "الصفحة الرئيسية لـ AIVO",
+      "start_free_today": "ابدأ مجاناً اليوم",
+      "create_your_account": "أنشئ حسابك",
+      "label_full_name": "الاسم الكامل",
+      "placeholder_name": "محمد علي",
+      "label_password": "كلمة المرور",
+      "placeholder_password": "8 أحرف على الأقل",
+      "password_hint": "امزج الأحرف والأرقام والرموز للحصول على أقوى نتيجة.",
+      "creating_account": "جارٍ إنشاء الحساب...",
+      "create_account": "إنشاء حساب",
+      "no_credit_card": "لا حاجة لبطاقة ائتمان",
+      "privacy_policy": "سياسة الخصوصية",
+      "coppa_ferpa_badge": "مصمم لدعم COPPA وFERPA",
+      "sign_in": "تسجيل الدخول",
+      "footer_privacy": "الخصوصية"
+    },
+    "page_forgot_password": {
+      "logo_aria_label": "الصفحة الرئيسية لـ AIVO",
+      "heading": "هل نسيت كلمة المرور؟",
+      "subheading": "أدخل بريدك الإلكتروني وسنرسل لك رابطاً لإعادة تعيين كلمة المرور.",
+      "check_inbox": "تحقق من بريدك الوارد",
+      "if_account_exists": "إذا كان هناك حساب مرتبط بـ",
+      "back_to_sign_in": "العودة إلى تسجيل الدخول",
+      "sending": "جارٍ الإرسال...",
+      "send_reset_link": "إرسال رابط إعادة التعيين",
+      "back_to_sign_in_form": "العودة إلى تسجيل الدخول",
+      "coppa_ferpa_soc2_badge": "مصمم لدعم COPPA · FERPA · SOC 2"
+    },
+    "page_press_kit": {
+      "media_resources": "موارد الإعلام",
+      "company_overview": "نظرة عامة على الشركة",
+      "quick_facts": "حقائق سريعة",
+      "brand_assets": "أصول العلامة التجارية",
+      "logo_purple_alt": "شعار AIVO البنفسجي",
+      "primary_logo_purple": "الشعار الأساسي (بنفسجي)",
+      "logo_white_alt": "شعار AIVO الأبيض",
+      "logo_dark_bg": "الشعار على خلفية داكنة",
+      "brand_colors": "ألوان العلامة التجارية",
+      "media_contact": "التواصل مع الصحافة"
+    },
+    "page_features_todays_mission": {
+      "page_title": "أفضل إجراء تعليمي واحد، كل يوم",
+      "problem_title": "يضيع المتعلمون في لوحات التحكم",
+      "mockup_todays_mission": "مهمة اليوم",
+      "mockup_lesson_title": "الضرب في 3",
+      "mockup_lesson_meta": "مع Atlas · حوالي 15 دقيقة · رياضيات",
+      "mockup_start_mission": "بدء المهمة ←",
+      "mockup_accessibility_note": "وضع القراءة بصوت عالٍ والاستراحة مفعّلان لـ Maya.",
+      "visibility_title": "رؤية بلغة واضحة، لا تفريغاً للبيانات"
+    },
+    "page_for_districts": {
+      "rostering_title": "جاهز لـ OneRoster، متوافق مع CSV، أو يدوي عند الضرورة",
+      "licensing_heading": "ترخيص المقاعد، أسعار المقاطعات",
+      "accessibility_title": "WCAG 2.2 AA كهدف تصميم",
+      "accessibility_gaps_note": "نحتفظ ببيان إمكانية الوصول وننشر الثغرات المعروفة — لا مجرد ادعاءات.",
+      "dpa_title": "طلب حزمة الأمان واتفاقية معالجة البيانات"
+    },
+    "page_guides": {
+      "nav_resources": "الموارد",
+      "nav_get_started": "ابدأ الآن",
+      "badge": "أدلة",
+      "heading": "أدلة عملية",
+      "subheading": "قراءة متعمقة وملائمة للمشتريات للمدارس والمقاطعات والعائلات."
+    },
+    "page_compare": {
+      "eyebrow": "مقارنة",
+      "heading": "اختر دورك لترى كيف يناسبك AIVO.",
+      "see_comparison": "عرض المقارنة ←"
+    },
+    "page_for_special_education": {
+      "support_title": "يجب أن يلتقي الدعم المتعلمَ أينما كان",
+      "iep_sharing_title": "مشاركة سياق IEP أو التسهيلات",
+      "teacher_summaries_title": "ملخصات الدعم الآمنة للمعلمين"
+    },
+    "page_tutors": {
+      "page_title": "أربعة عشر معلماً بالذكاء الاصطناعي. Brain Clone واحد لطفلك."
+    },
+    "page_about": {
+      "get_started": "ابدأ الآن",
+      "our_mission": "مهمتنا",
+      "no_learner_left_behind": "لا يُترك أي متعلّم خلف الركب",
+      "core_principles": "المبادئ الأساسية",
+      "core_principles_sub": "الأسس التي توجّه كل ما نبنيه.",
+      "our_values": "قيمنا",
+      "our_values_sub": "ما نؤمن به كشركة وكمعلمين.",
+      "meet_our_leadership": "تعرّف على فريق القيادة",
+      "linkedin_profile": "ملف LinkedIn",
+      "join_our_mission": "انضم إلى مهمتنا",
+      "view_open_positions": "عرض الوظائف المتاحة",
+      "contact_us": "اتصل بنا",
+      "privacy": "الخصوصية",
+      "accessibility": "إمكانية الوصول"
+    },
+    "page_for_parents": {
+      "iep_title": "سياق IEP أو التسهيلات، يُعالَج باهتمام",
+      "reading_question": "كيف يشعر طفلك تجاه القراءة؟",
+      "answers_saved": "يتم حفظ الإجابات تلقائيًا.",
+      "aivo_disclaimer": "AIVO لا يشخّص. AIVO لا يحلّ محلّ المعالجين أو فرق IEP أو المتخصصين.",
+      "take_a_breath": "خذ نفسًا عميقًا. لا يوجد مؤقت.",
+      "which_word_means": "أي كلمة تعني نفس معنى",
+      "need_a_break": "هل تحتاج إلى استراحة؟",
+      "todays_mission": "مهمة اليوم",
+      "multiplying_by_3s": "الضرب في 3",
+      "with_atlas": "مع Atlas · ~15 دقيقة",
+      "start_mission": "ابدأ المهمة →",
+      "maya_strong_week": "قضت مايا أسبوعًا رائعًا!"
+    },
+    "page_demo": {
+      "hero_title": "شاهد AIVO في العمل.",
+      "form_heading": "أخبرنا قليلاً عن بيئتك",
+      "form_subheading": "كلما عرفنا أكثر، كان العرض أكثر فائدة. الحقول المطلوبة مُعلَّمة.",
+      "what_happens_next": "ما الذي يحدث بعد ذلك",
+      "step1_label": "الخطوة 1 · خلال يوم عمل واحد",
+      "step2_label": "الخطوة 2 · جولة استعراضية لمدة 30 دقيقة",
+      "step2_body": "نعرض مشاهد المتعلّم والوالد والمعلم — ونجيب على أسئلتك مباشرةً.",
+      "step3_label": "الخطوة 3 · تجريبي أو مقترح",
+      "step3_body": "إذا كان هناك توافق، نخطط لتجربة قصيرة أو نرسل مقترحًا مكتوبًا — دون ضغط."
+    },
+    "page_features_lessonrun": {
+      "hero_title": "وحدة التعلم الشخصية وراء كل درس في AIVO",
+      "voice_support_title": "دعم صوتي في كل خطوة",
+      "break_mode_title": "توقف هادئ — لا انسحاب غاضب",
+      "count_by_3s_prompt": "لنعدّ من 3 إلى 3 حتى 12. ابدأ من 3. ما الذي يأتي بعده؟",
+      "hint_counting_fingers": "حاول العدّ على أصابعك: 3 · 6 · ? — ما الرقم الذي يأتي ثلاثة أكثر من 6؟",
+      "need_another_hint": "هل تحتاج إلى تلميح آخر؟",
+      "maya_strong_week": "قضت مايا أسبوعًا رائعًا!"
+    },
+    "page_careers": {
+      "page_title": "انضم إلى فريق AIVO",
+      "why_work_heading": "لماذا تعمل في AIVO؟",
+      "open_positions_heading": "الوظائف المتاحة",
+      "apply_now": "قدّم الآن",
+      "no_role_heading": "لم تجد دورك؟",
+      "send_general_application": "أرسل طلبًا عامًا"
+    },
+    "page_pricing": {
+      "hero_title": "أسعار شفافة. لا مفاجآت.",
+      "for_families": "للعائلات",
+      "family_disclaimer": "اشتراك شهري. إلغاء في أي وقت. ضمان استرداد الأموال لمدة 30 يومًا على الخطط المدفوعة.",
+      "for_schools": "للمدارس والمناطق التعليمية",
+      "pricing_faq_heading": "الأسئلة الشائعة حول الأسعار"
+    },
+    "page_features": {
+      "eyebrow": "الميزات",
+      "heading": "تجارب تعلّم حقيقية، لا مجرد قوائم ميزات.",
+      "learn_more": "اعرف المزيد →"
+    },
+    "page_thank_you": {
+      "hero_title": "تلقّيناه — شكرًا لك.",
+      "while_you_wait": "في انتظارك"
+    },
+    "page_levels": {
+      "hero_title": "خمسة مستويات. منصة واحدة. كل متعلّم."
+    },
+    "page_accessibility": {
+      "title": "AIVO Accessibility Statement"
+    },
+    "page_cookie_policy": {
+      "title": "Cookie Policy"
+    },
+    "page_coppa_compliance": {
+      "title": "COPPA Compliance Statement"
+    },
+    "page_ferpa_compliance": {
+      "title": "FERPA Compliance Statement"
+    },
+    "page_privacy_policy": {
+      "title": "AIVO Privacy Policy"
+    },
+    "page_security": {
+      "title": "How we protect your data."
+    },
+    "page_subprocessors": {
+      "get_started": "Get Started",
+      "badge": "Subprocessors",
+      "heading": "AIVO subprocessors",
+      "current_subprocessors": "Current subprocessors",
+      "col_subprocessor": "Subprocessor",
+      "col_purpose": "Purpose",
+      "col_data_category": "Data category",
+      "col_region": "Region",
+      "col_status": "Status",
+      "how_we_use_heading": "How we use this list",
+      "reporting_heading": "Reporting subprocessor changes",
+      "questions_heading": "Questions?",
+      "footer_privacy": "Privacy",
+      "footer_security": "Security",
+      "footer_accessibility": "Accessibility"
+    },
+    "page_terms_of_service": {
+      "title": "AIVO Terms of Service"
+    },
+    "page_trust": {
+      "title": "What we promise — and how to check."
+    },
+    "page_compare_detail": {
+      "aivo_best_for": "AIVO الأنسب لـ",
+      "side_by_side": "مقارنة جنبًا إلى جنب",
+      "col_feature": "الميزة",
+      "honest_note": "ملاحظة صادقة منّا",
+      "other_comparisons": "مقارنات أخرى"
+    },
+    "page_levels_detail": {
+      "who_its_for": "لمن هو مخصص",
+      "whats_included": "ما يتضمنه",
+      "builtin_accommodations": "التسهيلات المدمجة",
+      "sample_activities": "أنشطة نموذجية",
+      "other_levels": "مستويات أخرى"
+    },
+    "page_subjects_detail": {
+      "key_features": "الميزات الرئيسية",
+      "topics_covered": "المواضيع المغطاة",
+      "other_subjects": "مواد أخرى"
+    },
+    "page_tutors_detail": {
+      "built_for_every_learner": "مصمم لكل متعلم",
+      "other_tutors": "مدرسو AIVO الآخرون",
+      "see_all_tutors": "عرض جميع الـ 14 مدرسًا →"
     }
   }
 }

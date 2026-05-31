@@ -1,4 +1,5 @@
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -8,6 +9,7 @@ import { computeSystemHealth, scopeTenantsForSession } from "@/lib/db/repos";
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_system_health");
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const h = computeSystemHealth(tenants.map((t) => t.id));
   const ok = h.generationSuccessRate >= 0.9 && h.lessonRunsTotal > 0;
@@ -53,7 +55,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Observability"
-        title="System health"
+        title={t("title")}
         description="Live snapshot of the platform's posture."
         actions={
           <Badge tone={ok ? "success" : "warning"}>{ok ? "All systems green" : "Degraded"}</Badge>

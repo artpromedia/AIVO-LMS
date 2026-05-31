@@ -5,10 +5,12 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
 import { listDomains, listSkills, listSubjects } from "@/lib/db/repos";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function Page() {
+  const t = await getTranslations("admin.platform_curriculum_subjects");
   const session = await requirePageRole(["platform_admin"]);
   const subjects = await listSubjects();
   return (
@@ -20,7 +22,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Curriculum"
-        title="Subjects and domains"
+        title={t("title")}
         description="Top-level subjects grouped by domain. Each skill belongs to one subject."
       />
       <div className="grid gap-3 md:grid-cols-2">
@@ -37,7 +39,7 @@ export default async function Page() {
               <p className="text-xs text-aivo-muted mt-1">{s.description}</p>
               <ul className="mt-3 space-y-1 text-sm">
                 {doms.length === 0 ? (
-                  <li className="text-aivo-muted">No domains yet.</li>
+                  <li className="text-aivo-muted">{t("no_domains_yet")}</li>
                 ) : (
                   doms.map((d) => (
                     <li key={d.id} className="flex items-start justify-between gap-2">

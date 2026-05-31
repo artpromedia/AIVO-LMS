@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { SITE_URL } from "@/lib/constants";
 
 const FEATURES = [
@@ -30,12 +31,13 @@ export const metadata: Metadata = {
   alternates: { canonical: `${SITE_URL}/features` },
 };
 
-export default function FeaturesPage() {
+export default async function FeaturesPage() {
+  const t = await getTranslations("marketing.page_features");
   return (
     <main id="main" className="mx-auto max-w-4xl px-6 py-16">
-      <p className="text-sm font-medium uppercase tracking-wide text-aivo-purple">Features</p>
+      <p className="text-sm font-medium uppercase tracking-wide text-aivo-purple">{t("eyebrow")}</p>
       <h1 className="mt-2 font-display text-4xl font-bold">
-        Real learning experiences, not feature checklists.
+        {t("heading")}
       </h1>
       <p className="mt-3 text-aivo-ink-soft">
         AIVO is built around three flows learners use every day. Each one is adaptive, accessible,
@@ -55,7 +57,7 @@ export default function FeaturesPage() {
               <h2 className="font-display text-xl font-semibold text-aivo-ink">{f.title}</h2>
               <p className="mt-2 text-sm text-aivo-ink-soft">{f.description}</p>
               <span className="mt-3 inline-block text-sm font-medium text-aivo-purple">
-                Learn more →
+                {t("learn_more")}
               </span>
             </Link>
           </li>

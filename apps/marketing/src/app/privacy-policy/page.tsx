@@ -1,11 +1,13 @@
 import { MARKETING_ACCENTS } from "@aivo/brand";
+import { getTranslations } from "next-intl/server";
 import { LegalPageLayout } from "@/components/marketing/legal/LegalPageLayout";
 
-export default function PrivacyPolicyPage() {
+export default async function PrivacyPolicyPage() {
+  const t = await getTranslations("marketing.page_privacy_policy");
   return (
     <LegalPageLayout
       badge="Legal"
-      title="AIVO Privacy Policy"
+      title={t("title")}
       subtitle={
         "AIVO's mission is to provide a free, world-class adaptive education for every neurodivergent learner, anywhere. We take privacy seriously, and we're committed to giving learners, parents, teachers, and schools the information and controls they need to feel confident about how we collect, use, and share information. This Privacy Policy describes the information we collect through the AIVO website, mobile applications, and other services we provide (collectively, the \"Services\"), how we use it, and the choices you have."
       }

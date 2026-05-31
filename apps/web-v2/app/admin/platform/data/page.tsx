@@ -1,4 +1,5 @@
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -7,6 +8,7 @@ import { getStore } from "@/lib/db/store";
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_data");
   const s = getStore();
   const rows = [
     { k: "Tenants", v: s.tenants.size },
@@ -29,7 +31,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Data"
-        title="Data inventory"
+        title={t("title")}
         description="Counts across every table in the in-memory demo store."
       />
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

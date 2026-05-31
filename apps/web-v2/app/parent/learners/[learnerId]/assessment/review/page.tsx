@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import {
   AssessmentShell,
@@ -83,6 +84,7 @@ export default async function AssessmentReviewPage({
   params: Promise<{ learnerId: string }>;
 }) {
   const session = await requirePageRole(["parent"]);
+  const t = await getTranslations("parent.learner_assessment_review");
   const { learnerId } = await params;
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
@@ -114,12 +116,12 @@ export default async function AssessmentReviewPage({
         <>
           <ReassuranceCard
             tone="info"
-            title="One more pass before we apply this"
+            title={t("reassurance_review_title")}
             body="After submit, AIVO uses these answers to generate a personalized baseline. You'll still be able to edit everything later."
           />
           <ReassuranceCard
             tone="privacy"
-            title="What happens next"
+            title={t("reassurance_next_title")}
             body="We'll route you to the optional IEP step. If you'd rather skip, your assessment alone is plenty for AIVO to start."
           />
         </>
@@ -143,7 +145,7 @@ export default async function AssessmentReviewPage({
                   href={`/parent/learners/${learner.id}/assessment?step=${WIZARD_STEPS.length}`}
                   className={ASSESSMENT_BACK_CLASS}
                 >
-                  Back to last step
+                  {t("back_to_last_step")}
                 </Link>
               }
               saveExit={
@@ -151,7 +153,7 @@ export default async function AssessmentReviewPage({
                   href={`/parent/learners/${learner.id}`}
                   className={ASSESSMENT_GHOST_CLASS}
                 >
-                  Save & exit
+                  {t("save_exit")}
                 </Link>
               }
               primaryLabel="Submit assessment"
@@ -190,7 +192,7 @@ export default async function AssessmentReviewPage({
                       {answers}
                     </p>
                   ) : (
-                    <p className="text-xs text-iw-text-muted italic">Not yet answered.</p>
+                    <p className="text-xs text-iw-text-muted italic">{t("not_yet_answered")}</p>
                   )}
                   <div className="flex flex-wrap gap-1.5 mt-1">
                     {step.sections.map((sec) => (
@@ -207,7 +209,7 @@ export default async function AssessmentReviewPage({
                     href={`/parent/learners/${learner.id}/assessment?step=${step.id}`}
                     className="self-start text-xs font-semibold text-[var(--aivo-sensory-primary)] hover:underline mt-1"
                   >
-                    Edit answers →
+                    {t("edit_answers")}
                   </Link>
                 </li>
               );

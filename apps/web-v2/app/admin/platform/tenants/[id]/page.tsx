@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -36,6 +37,7 @@ const BILLING_TONE: Record<string, "success" | "neutral" | "warning" | "danger">
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_tenants_detail");
   const visibleTenants = scopeTenantsForSession(session.role, session.tenantId);
   const tenant = visibleTenants.find((t) => t.id === id) ?? null;
   if (!tenant) notFound();
@@ -86,7 +88,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         href="/admin/platform/tenants"
         className="mb-3 inline-flex items-center text-sm text-aivo-ink-soft hover:text-aivo-ink"
       >
-        <ArrowLeft className="mr-1 h-3.5 w-3.5" /> All tenants
+        <ArrowLeft className="mr-1 h-3.5 w-3.5" /> {t("all_tenants")}
       </Link>
       <PageHeader
         eyebrow={`Platform · ${tenant.type}`}
@@ -115,13 +117,13 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           <p className="mt-1 text-xs text-aivo-ink-soft">across this scope</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">Learners</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{t("stat_learners")}</p>
           <p className="mt-1 font-display text-3xl font-bold">{learners.length.toLocaleString()}</p>
           <p className="mt-1 text-xs text-aivo-ink-soft">enrolled profiles</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            Sub-tenants
+            {t("stat_sub_tenants")}
           </p>
           <p className="mt-1 font-display text-3xl font-bold">
             {descendants.length.toLocaleString()}
@@ -129,7 +131,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           <p className="mt-1 text-xs text-aivo-ink-soft">schools / families nested</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">Created</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{t("stat_created")}</p>
           <p className="mt-1 font-display text-xl font-semibold">
             {new Date(tenant.createdAt).toLocaleDateString()}
           </p>
@@ -139,7 +141,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="font-display text-lg font-semibold">User mix</p>
+          <p className="font-display text-lg font-semibold">{t("user_mix")}</p>
           <ul className="mt-3 space-y-2 text-sm">
             {Object.entries(usersByRole)
               .sort((a, b) => b[1] - a[1])
@@ -150,21 +152,21 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                 </li>
               ))}
             {users.length === 0 ? (
-              <li className="text-xs text-aivo-ink-soft">No users yet.</li>
+              <li className="text-xs text-aivo-ink-soft">{t("no_users")}</li>
             ) : null}
           </ul>
         </Card>
 
         <Card className="p-[var(--aivo-density-card-pad)] lg:col-span-2">
           <div className="flex items-center justify-between">
-            <p className="font-display text-lg font-semibold">Direct children</p>
+            <p className="font-display text-lg font-semibold">{t("direct_children")}</p>
             {descendants.length > directChildren.length ? (
               <Badge tone="neutral">{descendants.length.toLocaleString()} total nested</Badge>
             ) : null}
           </div>
           {directChildren.length === 0 ? (
             <p className="mt-2 text-sm text-aivo-ink-soft">
-              No tenants nested directly under this one.
+              {t("no_nested_tenants")}
             </p>
           ) : (
             <ul className="mt-3 divide-y divide-aivo-border">
@@ -192,13 +194,13 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <Card className="p-[var(--aivo-density-card-pad)]">
           <div className="mb-3 flex items-center justify-between">
-            <p className="font-display text-lg font-semibold">Recent AI jobs</p>
+            <p className="font-display text-lg font-semibold">{t("recent_ai_jobs")}</p>
             <Link href="/admin/platform/jobs" className="text-sm text-aivo-primary hover:underline">
-              View all
+              {t("view_all")}
             </Link>
           </div>
           {jobs.length === 0 ? (
-            <EmptyState title="No AI generation activity" />
+            <EmptyState title={t("no_ai_jobs")} />
           ) : (
             <ul className="space-y-2 text-sm">
               {jobs.map((j) => (
@@ -225,16 +227,16 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
         <Card className="p-[var(--aivo-density-card-pad)]">
           <div className="mb-3 flex items-center justify-between">
-            <p className="font-display text-lg font-semibold">Recent invoices</p>
+            <p className="font-display text-lg font-semibold">{t("recent_invoices")}</p>
             <Link
               href="/admin/platform/billing/invoices"
               className="text-sm text-aivo-primary hover:underline"
             >
-              View all
+              {t("view_all")}
             </Link>
           </div>
           {invoices.length === 0 ? (
-            <EmptyState title="No invoices yet" />
+            <EmptyState title={t("no_invoices")} />
           ) : (
             <ul className="space-y-2 text-sm">
               {invoices.map((inv) => (
@@ -261,16 +263,16 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
       <Card className="mt-6 p-[var(--aivo-density-card-pad)]">
         <div className="mb-3 flex items-center justify-between">
-          <p className="font-display text-lg font-semibold">Audit trail</p>
+          <p className="font-display text-lg font-semibold">{t("audit_trail")}</p>
           <Link
             href="/admin/platform/audit-logs"
             className="text-sm text-aivo-primary hover:underline"
           >
-            View all
+            {t("view_all")}
           </Link>
         </div>
         {auditLogs.length === 0 ? (
-          <EmptyState title="No audited activity" />
+          <EmptyState title={t("no_audit")} />
         ) : (
           <ul className="divide-y divide-aivo-border text-sm">
             {auditLogs.map((log) => (

@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import {
   LearnerBaselineShell,
@@ -188,6 +189,7 @@ export default async function BaselineRunnerPage({
   const asParent = sp.as === "parent";
   const session = await requirePageRole(asParent ? ["parent"] : ["learner", "parent"]);
   const { baselineId } = await params;
+  const t = await getTranslations("learner.baseline_runner");
 
   const baseline = await getBaselineById(baselineId, session.tenantId);
   if (!baseline) notFound();
@@ -284,7 +286,7 @@ export default async function BaselineRunnerPage({
           href={`/parent/learners/${baseline.learnerId}/baseline`}
           className="inline-flex items-center gap-1 text-xs font-semibold underline-offset-2 hover:underline"
         >
-          Exit proctor view
+          {t("exit_proctor_view")}
         </Link>
       }
     />
@@ -343,15 +345,15 @@ export default async function BaselineRunnerPage({
       <LearnerBaselineShell topBanner={topBanner}>
         <CompletionHero
           learnerName={learner?.preferredName || learner?.firstName}
-          title="One last tap"
-          body="You answered every question. Send your answers when you're ready."
+          title={t("ready_title")}
+          body={t("ready_body")}
           primary={
             <form action={completeAction}>
               <input type="hidden" name="baselineId" value={baseline.id} />
               <input type="hidden" name="learnerId" value={baseline.learnerId} />
               {asParent ? <input type="hidden" name="asParent" value="1" /> : null}
               <Button type="submit" size="lg">
-                Finish baseline
+                {t("finish_baseline")}
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M5 12h14" />
                   <path d="m13 5 7 7-7 7" />
@@ -394,7 +396,7 @@ export default async function BaselineRunnerPage({
               href={`/learner/baseline/${baseline.id}?resume=1${asParent ? "&as=parent" : ""}`}
               className="inline-flex items-center gap-2 rounded-iw-control px-5 py-3 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
             >
-              Resume
+              {t("resume")}
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <polygon points="5 3 19 12 5 21 5 3" />
               </svg>
@@ -405,7 +407,7 @@ export default async function BaselineRunnerPage({
               href={asParent ? `/parent/learners/${baseline.learnerId}/baseline` : "/learner/home"}
               className="inline-flex items-center gap-1.5 rounded-iw-control px-4 py-2.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
             >
-              Stop for today
+              {t("stop_for_today")}
             </Link>
           }
         />
@@ -547,7 +549,7 @@ export default async function BaselineRunnerPage({
 
           {next.choices && next.choices.length > 0 ? (
             <fieldset className="flex flex-col gap-3">
-              <legend className="sr-only">Choose one</legend>
+              <legend className="sr-only">{t("choose_one")}</legend>
               {next.choices.map((choice, i) => {
                 const emoji = next.choiceEmojis?.[i];
                 // Upgrade the bare emoji to a Twemoji SVG so each
@@ -589,12 +591,12 @@ export default async function BaselineRunnerPage({
             </fieldset>
           ) : (
             <label className="flex flex-col gap-1.5">
-              <span className="sr-only">Type your answer</span>
+              <span className="sr-only">{t("type_answer")}</span>
               <input
                 type="text"
                 name="response"
                 required
-                placeholder="Type your answer"
+                placeholder={t("type_answer")}
                 className="w-full rounded-iw-control border border-iw-border bg-white px-4 py-3 text-base text-iw-text-strong placeholder:text-iw-text-muted/70 focus:outline-none focus:border-[var(--aivo-sensory-primary)] focus:ring-2 focus:ring-[var(--aivo-sensory-ringFocus)]/40"
               />
             </label>

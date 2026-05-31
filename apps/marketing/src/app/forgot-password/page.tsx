@@ -3,8 +3,10 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Mail, ArrowLeft, ArrowRight, ShieldCheck, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function ForgotPasswordPage() {
+  const t = useTranslations("marketing.page_forgot_password");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -28,7 +30,7 @@ export default function ForgotPasswordPage() {
       </div>
 
       <header className="relative z-30 flex items-center justify-between p-6">
-        <Link href="/" aria-label="AIVO home">
+        <Link href="/" aria-label={t("logo_aria_label")}>
           <Image
             src="/images/aivo-logo-purple.png"
             alt="AIVO"
@@ -47,18 +49,18 @@ export default function ForgotPasswordPage() {
               <Mail size={28} strokeWidth={2.5} aria-hidden="true" />
             </div>
             <h1 className="text-3xl font-heading font-bold text-slate-900 text-center leading-tight">
-              Forgot password?
+              {t("heading")}
             </h1>
             <p className="text-slate-500 font-body text-center mt-2">
-              Enter your email and we&apos;ll send you a link to reset your password.
+              {t("subheading")}
             </p>
 
             {submitted ? (
               <div className="mt-7 text-center">
                 <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-5">
-                  <p className="text-emerald-800 font-bold">Check your inbox</p>
+                  <p className="text-emerald-800 font-bold">{t("check_inbox")}</p>
                   <p className="text-sm text-emerald-700 mt-2 font-body">
-                    If an account exists for <strong>{email}</strong>, a reset link is on its way.
+                    {t("if_account_exists")} <strong>{email}</strong>, a reset link is on its way.
                     The link expires in 1 hour.
                   </p>
                   <p className="text-xs text-emerald-700/80 mt-3 font-body">
@@ -70,7 +72,7 @@ export default function ForgotPasswordPage() {
                   className="inline-flex items-center gap-2 mt-6 text-sm font-bold text-[hsl(var(--visual-primary))] hover:underline"
                 >
                   <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-                  Back to sign in
+                  {t("back_to_sign_in")}
                 </Link>
               </div>
             ) : (
@@ -115,11 +117,11 @@ export default function ForgotPasswordPage() {
                         className="motion-safe:animate-spin"
                         aria-hidden="true"
                       />
-                      Sending...
+                      {t("sending")}
                     </>
                   ) : (
                     <>
-                      Send reset link
+                      {t("send_reset_link")}
                       <ArrowRight className="w-5 h-5" aria-hidden="true" />
                     </>
                   )}
@@ -130,7 +132,7 @@ export default function ForgotPasswordPage() {
                     className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-[hsl(var(--visual-primary))] transition"
                   >
                     <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-                    Back to sign in
+                    {t("back_to_sign_in_form")}
                   </Link>
                 </div>
               </form>
@@ -143,7 +145,7 @@ export default function ForgotPasswordPage() {
                 className="w-4 h-4 text-[hsl(var(--visual-primary))]"
                 aria-hidden="true"
               />
-              Designed to support COPPA · FERPA · SOC 2
+              {t("coppa_ferpa_soc2_badge")}
             </div>
           </div>
         </div>

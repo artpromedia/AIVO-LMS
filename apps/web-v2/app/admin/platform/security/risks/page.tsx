@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -16,6 +17,7 @@ const TREATMENT_LABEL = {
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_security_risks");
   const risks = listRisks();
 
   return (
@@ -27,11 +29,11 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Security"
-        title="Risk register"
+        title={t("title")}
         description="Inherent vs residual severity per risk, with treatment and owner."
       />
       {risks.length === 0 ? (
-        <Card className="p-6 text-sm text-aivo-ink-soft">No risks tracked yet.</Card>
+        <Card className="p-6 text-sm text-aivo-ink-soft">{t("empty_body")}</Card>
       ) : (
         <div className="space-y-3">
           {risks.map((r) => (
@@ -47,7 +49,7 @@ export default async function Page() {
               </div>
               <p className="mb-2 text-sm text-aivo-ink-soft">{r.description}</p>
               <p className="text-xs text-aivo-muted">
-                Treatment: <span className="text-aivo-ink">{TREATMENT_LABEL[r.treatment]}</span> ·
+                {t("label_treatment")} <span className="text-aivo-ink">{TREATMENT_LABEL[r.treatment]}</span> ·
                 Owner: <span className="text-aivo-ink">{r.owner}</span> · Updated{" "}
                 {new Date(r.updatedAt).toLocaleDateString()}
               </p>

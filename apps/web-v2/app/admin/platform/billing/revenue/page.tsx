@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -27,6 +28,7 @@ function ymKey(iso: string): string {
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_billing_revenue");
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const tenantIds = tenants.map((t) => t.id);
   const tenantById = new Map(tenants.map((t) => [t.id, t]));
@@ -79,14 +81,14 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Billing"
-        title="Revenue"
+        title={t("title")}
         description="Collected revenue derived from paid invoices across every tenant."
         actions={
           <Link
             href="/admin/platform/billing/invoices"
             className="text-sm font-medium text-aivo-primary hover:underline"
           >
-            All invoices →
+            {t("link_all_invoices")}
           </Link>
         }
       />
@@ -94,7 +96,7 @@ export default async function Page() {
       <div className="grid gap-4 sm:grid-cols-3">
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            Lifetime collected
+            {t("stat_lifetime_collected")}
           </p>
           <p className="mt-1 font-display text-3xl font-bold">{fmtUsd(lifetimeCents)}</p>
           <p className="mt-1 text-xs text-aivo-ink-soft">
@@ -103,14 +105,14 @@ export default async function Page() {
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            Last 30 days
+            {t("stat_last_30_days")}
           </p>
           <p className="mt-1 font-display text-3xl font-bold">{fmtUsd(last30Cents)}</p>
           <p className="mt-1 text-xs text-aivo-ink-soft">rolling window of paid invoices</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            Active subscriptions
+            {t("stat_active_subscriptions")}
           </p>
           <p className="mt-1 font-display text-3xl font-bold">
             {billing.filter((b) => b.status === "active").length.toLocaleString()}
@@ -122,9 +124,9 @@ export default async function Page() {
       </div>
 
       <Card className="mt-6 p-[var(--aivo-density-card-pad)]">
-        <p className="font-display text-lg font-semibold">Monthly collected · last 12 months</p>
+        <p className="font-display text-lg font-semibold">{t("section_monthly_collected")}</p>
         {months.length === 0 ? (
-          <p className="mt-3 text-sm text-aivo-ink-soft">No paid invoices yet.</p>
+          <p className="mt-3 text-sm text-aivo-ink-soft">{t("no_paid_invoices")}</p>
         ) : (
           <ul className="mt-4 space-y-2 text-sm">
             {months.map(([month, cents]) => {
@@ -150,9 +152,9 @@ export default async function Page() {
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="font-display text-lg font-semibold">Top revenue tenants</p>
+          <p className="font-display text-lg font-semibold">{t("section_top_tenants")}</p>
           {topTenants.length === 0 ? (
-            <EmptyState title="No collections yet" />
+            <EmptyState title={t("empty_title")} />
           ) : (
             <ul className="mt-3 divide-y divide-aivo-border text-sm">
               {topTenants.map(([tenantId, cents]) => {
@@ -178,7 +180,7 @@ export default async function Page() {
         </Card>
 
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="font-display text-lg font-semibold">Plan mix</p>
+          <p className="font-display text-lg font-semibold">{t("section_plan_mix")}</p>
           <ul className="mt-3 space-y-2 text-sm">
             {["free", "family", "school", "district"].map((plan) => {
               const n = byPlan[plan] ?? 0;

@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Notification } from "@/lib/db/types";
 
 export function NotificationList({ notifications: initial }: { notifications: Notification[] }) {
+  const t = useTranslations("parent.notifications");
   const [items, setItems] = useState(initial);
   const [pending, startTransition] = useTransition();
 
@@ -30,7 +32,7 @@ export function NotificationList({ notifications: initial }: { notifications: No
     <div className="space-y-3">
       {unread.length > 0 ? (
         <div className="flex items-center justify-between">
-          <p className="text-xs text-aivo-muted">{unread.length} unread</p>
+          <p className="text-xs text-aivo-muted">{t("unread_count", { count: unread.length })}</p>
           <Button
             size="sm"
             variant="outline"
@@ -41,7 +43,7 @@ export function NotificationList({ notifications: initial }: { notifications: No
               })
             }
           >
-            Mark all read
+            {t("mark_all_read")}
           </Button>
         </div>
       ) : null}
@@ -51,7 +53,7 @@ export function NotificationList({ notifications: initial }: { notifications: No
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <p className="font-medium">{n.title}</p>
-                {!n.readAt ? <Badge tone="primary">New</Badge> : null}
+                {!n.readAt ? <Badge tone="primary">{t("new_badge")}</Badge> : null}
               </div>
               <p className="mt-1 text-sm text-aivo-ink-soft">{n.body}</p>
               <p className="mt-1 text-xs text-aivo-muted">
@@ -69,7 +71,7 @@ export function NotificationList({ notifications: initial }: { notifications: No
                   })
                 }
               >
-                Mark read
+                {t("mark_read")}
               </Button>
             ) : null}
           </div>

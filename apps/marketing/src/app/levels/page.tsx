@@ -2,6 +2,7 @@ import { MARKETING_ACCENTS } from "@aivo/brand";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { LEVELS } from "@/lib/landing-content";
 import { SITE_URL } from "@/lib/constants";
@@ -22,12 +23,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function LevelsIndex() {
+export default async function LevelsIndex() {
+  const t = await getTranslations("marketing.page_levels");
   return (
     <LandingPageLayout
       badge="Functioning Levels"
       badgeColor={MARKETING_ACCENTS.purple}
-      title="Five levels. One platform. Every learner."
+      title={t("hero_title")}
       subtitle="AIVO is the only AI learning platform built to serve learners across the full spectrum — from grade-level academics down to pre-symbolic, partner-assisted communication."
       breadcrumbs={[
         { name: "Home", href: "/" },

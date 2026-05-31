@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -14,6 +15,7 @@ function toneFor(decision: "allow" | "review" | "block") {
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_safety_moderation");
   const events = listModerationEvents({ limit: 200 });
   return (
     <AppShell
@@ -24,7 +26,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Safety"
-        title="Moderation events"
+        title={t("title")}
         description="Every classification with decision review or block. Allow-decisions are recorded only at debug level."
       />
       <Card className="p-0 overflow-hidden">
@@ -32,18 +34,18 @@ export default async function Page() {
           <thead className="bg-aivo-surface-2 text-xs uppercase text-aivo-muted">
             <tr>
               <th className="px-4 py-2 text-left">When</th>
-              <th className="px-4 py-2 text-left">Subject</th>
-              <th className="px-4 py-2 text-left">Decision</th>
-              <th className="px-4 py-2 text-left">Categories</th>
-              <th className="px-4 py-2 text-left">Severity</th>
-              <th className="px-4 py-2 text-left">Excerpt</th>
+              <th className="px-4 py-2 text-left">{t("col_subject")}</th>
+              <th className="px-4 py-2 text-left">{t("col_decision")}</th>
+              <th className="px-4 py-2 text-left">{t("col_categories")}</th>
+              <th className="px-4 py-2 text-left">{t("col_severity")}</th>
+              <th className="px-4 py-2 text-left">{t("col_excerpt")}</th>
             </tr>
           </thead>
           <tbody className="divide-y">
             {events.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-4 py-6 text-center text-aivo-muted">
-                  No moderation events recorded yet.
+                  {t("empty_body")}
                 </td>
               </tr>
             ) : (

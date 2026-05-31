@@ -91,7 +91,20 @@
       "reassure_safety_title": "安全に関する項目は常に緊急",
       "reassure_safety_body": "安全に関するものが現れた場合は、このリストの先頭に置かれ、すぐに通知します。",
       "prefs_title": "配信設定",
-      "prefs_desc": "各チャネルでどの更新を受け取るかを選びます。"
+      "prefs_desc": "各チャネルでどの更新を受け取るかを選びます。",
+      "mark_all_read": "すべて既読にする",
+      "mark_read": "既読にする",
+      "new_badge": "新着",
+      "unread_count": "未読 {count} 件",
+      "prefs_quiet_hours": "サイレント時間",
+      "prefs_quiet_hours_placeholder": "例: 22:00-07:00",
+      "prefs_digest_cadence": "ダイジェストの頻度",
+      "prefs_cadence_daily": "毎日",
+      "prefs_cadence_weekly": "毎週",
+      "prefs_cadence_off": "オフ",
+      "prefs_saving": "保存中…",
+      "prefs_save": "設定を保存",
+      "prefs_saved": "保存しました。"
     },
     "privacy": {
       "eyebrow": "プライバシー",
@@ -123,7 +136,16 @@
       "th_scope": "範囲",
       "th_target": "対象",
       "th_status": "ステータス",
-      "whole_account": "アカウント全体"
+      "whole_account": "アカウント全体",
+      "form_confirm_error": "確認するには DELETE と入力してください。",
+      "form_question": "何を削除しますか？",
+      "form_scope_account": "アカウント全体（すべての学習者、すべての履歴）",
+      "form_scope_learner": "1 人の学習者（そのすべてのデータ）",
+      "form_scope_iep": "アップロードした IEP 文書のみ",
+      "form_learner_label": "学習者",
+      "form_no_learners": "学習者なし",
+      "form_notes_label": "メモ（任意）",
+      "form_confirm_label": "確認するには <mono>DELETE</mono> と入力してください"
     },
     "privacy_export": {
       "eyebrow": "プライバシー",
@@ -135,7 +157,15 @@
       "th_scope": "範囲",
       "th_status": "ステータス",
       "th_completed": "完了日時",
-      "all_my_data": "私のすべてのデータ"
+      "all_my_data": "私のすべてのデータ",
+      "form_scope_label": "範囲",
+      "form_all_my_data_full": "すべてのデータ（アカウント + すべての学習者）",
+      "form_just_learner": "{name} のみ",
+      "form_notes_label": "メモ（任意）",
+      "form_notes_placeholder": "お知らせいただくことはありますか？",
+      "form_submitting": "送信中…",
+      "form_submit": "エクスポートをリクエスト",
+      "form_email_when_ready": "エクスポートの準備が整いましたらメールでお知らせします。エクスポートは通常 24 時間以内に完了します。"
     },
     "billing": {
       "eyebrow": "設定 · 請求",
@@ -159,7 +189,434 @@
       "choose_plan": "プランを選ぶ",
       "recent_invoices": "最近の請求書",
       "no_invoices_title": "まだ請求書はありません",
-      "no_invoices_body": "各請求期間が締められると、請求書がここに表示されます。"
+      "no_invoices_body": "各請求期間が締められると、請求書がここに表示されます。",
+      "sub_current_badge": "現在",
+      "sub_set_to_cancel": "期間終了時に解約するよう設定されています。",
+      "sub_free_trial": "{days} 日間の無料トライアル",
+      "sub_current_plan": "現在のプラン",
+      "sub_working": "処理中...",
+      "sub_switch": "このプランに変更",
+      "sub_canceling": "解約中...",
+      "sub_cancel_at_period_end": "期間終了時に解約"
+    },
+    "learner_assessment_intro": {
+      "reassurance_privacy_title": "回答はあなただけのものです",
+      "reassurance_no_diagnosis_title": "診断は必要ありません",
+      "not_now": "今はしない"
+    },
+    "learner_assessment": {
+      "placeholder_pronouns": "彼女 / 彼女の、彼 / 彼の、they / them…",
+      "placeholder_languages": "日本語、英語",
+      "placeholder_diagnoses_other": "例: APD、軽度の聴覚障害",
+      "placeholder_loves": "恐竜。レゴで作ること。おばあちゃんと料理。",
+      "placeholder_good_at": "歌詞を覚える、作ること、絵を描くこと、優しさ",
+      "placeholder_motivates": "自分の記録を更新する。お父さんに見せる。宇宙のクールな雑学。",
+      "placeholder_frustration_triggers": "長い読解文章。\nタイマー。\nうるさい部屋。",
+      "placeholder_calming_strategies": "短い散歩。\n水を飲む + 2 分の画面離れ。\nノイズキャンセリングヘッドフォン。",
+      "placeholder_accommodations": "テストの延長時間。\n頻繁な運動休憩。\n静かなテスト環境。",
+      "placeholder_goals": "15 分間やめずに読む。\n掛け算に自信を持つ。\n短い話を書く。",
+      "placeholder_concerns": "読書への自信が心配。最近転校した。春に重要なテストがある。",
+      "reassurance_private_title": "デフォルトで非公開",
+      "reassurance_no_diagnosis_title": "診断は必要ありません",
+      "movement_helps_label": "運動が子どもの集中に役立ちます",
+      "movement_helps_body": "AIVO は質問ブロックの間にストレッチ / 歩行休憩を提案できます。",
+      "aac_label": "子どもが AAC デバイスやアプリを使っています",
+      "aac_body": "AIVO は AAC に対応した回答パターンに切り替えます。",
+      "homework_coaching_label": "子どもは宿題を始めるのに助けが必要です",
+      "homework_coaching_body": "AIVO はスキャフォールドされた開始促進を提供します。",
+      "autosave_indicator": "進めると回答は自動的に保存されます",
+      "back_to_intro": "はじめに戻る",
+      "save_exit": "保存して終了"
+    },
+    "learner_assessment_review": {
+      "reassurance_review_title": "適用前にもう一度確認",
+      "reassurance_next_title": "次に何が起きるか",
+      "back_to_last_step": "最後のステップに戻る",
+      "save_exit": "保存して終了",
+      "not_yet_answered": "まだ回答されていません。",
+      "edit_answers": "回答を編集 →"
+    },
+    "learner_assessment_submitted": {
+      "reassurance_usage_title": "これを何に使いますか",
+      "reassurance_iep_active_title": "IEP サポートが有効",
+      "reassurance_no_iep_title": "IEP なし",
+      "back_to_learner_home": "学習者のホームに戻る",
+      "personalization_inputs": "パーソナライズ入力",
+      "parent_assessment_chip": "保護者評価",
+      "what_learners_never_see": "学習者には決して見えないもの",
+      "want_to_change": "何か変更したいですか？",
+      "edit_assessment_answers": "評価の回答を編集 →",
+      "manage_iep_supports": "IEP サポートを管理 →",
+      "upload_iep": "IEP をアップロード →",
+      "setting_it_up": "準備中…",
+      "see_baseline_cta": "ベースラインが出来上がる様子を見る"
+    },
+    "learner_brain_profile": {
+      "finish_assessment_first": "まず保護者評価を完了してください",
+      "assessment_not_submitted": "評価がまだ提出されていません",
+      "continue_assessment": "評価を続ける",
+      "could_not_generate": "プロフィールを生成できませんでした",
+      "try_again": "再試行",
+      "page_title": "AIVO があなたの学習者とどのように取り組むか",
+      "regenerate": "再生成",
+      "recommended_tutor_persona": "推奨チューターペルソナ",
+      "parent_assessment_summary": "保護者評価の要約",
+      "accommodation_summary": "合理的配慮の要約",
+      "learning_profile": "学習プロフィール",
+      "sensory_profile": "感覚プロフィール",
+      "pattern": "パターン",
+      "sensitivities": "感覚の過敏",
+      "attention": "注意",
+      "focus_window": "集中時間の窓",
+      "breaks": "休憩",
+      "movement_helps": "運動が役に立つ",
+      "comfort": "快適さ",
+      "reading": "読書",
+      "preferred_modalities": "好みの学習様式",
+      "support_defaults": "デフォルトのサポート",
+      "motivation": "モチベーション",
+      "rewards_that_help": "効果的な報酬",
+      "avoidance_factors": "回避要因",
+      "subjects_at_a_glance": "教科の概要",
+      "back_to_learner": "学習者に戻る"
+    },
+    "learner_baseline": {
+      "finish_assessment_first": "まず保護者評価を完了してください",
+      "assessment_not_submitted": "評価がまだ提出されていません",
+      "review_brain_profile_first": "まず脳プロファイルを確認してください",
+      "brain_profile_not_generated": "脳プロファイルが生成されていません",
+      "discovery_adventure_title": "ディスカバリーアドベンチャーのチェックイン",
+      "per_chapter": "章ごと",
+      "the_six_chapters": "六つの章",
+      "continue_assessment": "評価を続ける",
+      "open_brain_profile": "脳プロファイルを開く",
+      "ready_to_start": "開始準備完了",
+      "start_baseline": "ベースラインを開始",
+      "baseline_in_progress": "ベースライン進行中",
+      "continue_baseline": "ベースラインを続ける",
+      "restart": "再起動",
+      "baseline_complete": "ベースライン完了",
+      "back_to_learner": "学習者に戻る",
+      "restart_baseline": "ベースラインを再開始",
+      "in_set": "セット内",
+      "preview": "プレビュー"
+    },
+    "learner_baseline_pending": {
+      "no_generic_quiz_title": "汎用クイズなし",
+      "calm_by_default_title": "デフォルトで落ち着いた設定",
+      "try_again": "もう一度試す",
+      "step1_label": "ステップ 1 · スキルグラフ",
+      "step1_heading": "適切な開始スキルを選ぶ",
+      "step1_body": "学習者の学年帯と自信の回答をカリキュラムにマッピングします。",
+      "step2_label": "ステップ 2 · 個別化",
+      "step2_heading": "サポートとペースを適用",
+      "step2_body": "確認したすべての配慮事項と感覚プロファイルを尊重します。",
+      "in_progress": "進行中",
+      "step3_label": "ステップ 3 · 問題セット",
+      "step3_heading": "最初の問題を作成中",
+      "step3_body": "短く、落ち着いて、時間のプレッシャーなし。学習者はいつでも一時停止できます。",
+      "up_next": "次に控えています"
+    },
+    "learner_baseline_summary": {
+      "starting_points_title": "出発点であり、スコアではない",
+      "iep_supports_stay_on_title": "IEP サポートは継続",
+      "no_iep_needed_title": "IEP は不要",
+      "no_baseline_yet": "完了したベースラインはまだありません",
+      "manage_baseline": "ベースラインを管理",
+      "baseline_complete": "ベースライン完了",
+      "questions_answered": "回答済みの質問",
+      "skipped_questions_note": "スキップした質問も役立ちます — AIVO がゆっくり導入すべき内容を示します。",
+      "subjects_covered": "カバーした科目",
+      "personalization": "個別化",
+      "parent_assessment": "保護者評価",
+      "pacing": "ペース",
+      "where_lessons_start": "レッスンの開始地点",
+      "for_you": "保護者向け",
+      "what_learner_sees": "学習者が見るもの",
+      "learner_only_version_note": "これは学習者が見る唯一のバージョンです — スコアも臨床用語もありません。",
+      "iep_supports_in_effect": "IEP サポート有効中",
+      "back_to_learner_home": "学習者のホームに戻る",
+      "run_another_baseline": "別のベースラインを実行"
+    },
+    "learner_iep": {
+      "why_assessment_first_title": "最初に評価をお願いする理由",
+      "finish_assessment_first_title": "まず保護者評価を完了してください",
+      "iep_stays_private_title": "IEP は非公開のまま",
+      "you_stay_in_control_title": "あなたがコントロールを維持",
+      "share_document_title": "適切なサポートを適用できるようにドキュメントを共有",
+      "back_to_learner": "学習者に戻る",
+      "continue_assessment": "評価を続ける",
+      "skip_for_now": "今はスキップ",
+      "review_extracted_supports": "抽出されたサポートを確認",
+      "remove": "削除",
+      "upload_extract_supports": "アップロードしてサポートを抽出"
+    },
+    "learner_iep_review": {
+      "no_iep_on_file_title": "IEP が登録されていません",
+      "learner_never_sees_title": "学習者はこれを見ることがない",
+      "you_can_deselect_title": "何でも選択解除できます",
+      "reading_document_title": "ドキュメントを読んでいます",
+      "confirm_what_aivo_applies_title": "AIVO が適用できる内容を確認",
+      "go_to_iep_upload": "IEP アップロードへ移動",
+      "re_run_extraction": "抽出を再実行",
+      "remove": "削除",
+      "back_to_upload": "アップロードに戻る",
+      "save_and_exit": "保存して終了",
+      "service_areas": "サービス領域",
+      "none_flagged": "なし。",
+      "assistive_technology": "支援技術",
+      "none_recorded": "記録なし。",
+      "learner_safe_summary": "学習者向け安全なサマリー"
+    },
+    "consent": {
+      "title": "学習者ごとの同意",
+      "description": "学習者ごとの同意はこの子どもにのみ適用されます。",
+      "coppa_notice": "この学習者は13歳未満です。COPPA に基づき、データ収集には保護者の同意が必要です。",
+      "accepted": "承認済み",
+      "not_accepted": "未承認"
+    },
+    "learner_accessibility_audio": {
+      "title": "読み上げ"
+    },
+    "learner_accessibility": {
+      "title": "アクセシビリティ"
+    },
+    "learner_gradebook": {
+      "title": "成績簿",
+      "no_mastery_data": "まだ習熟度データがありません",
+      "start_baseline": "ベースライン評価を開始",
+      "subject_averages": "科目別平均",
+      "skill_mastery": "スキル別習熟度",
+      "col_subject": "科目",
+      "col_confidence": "確信度",
+      "recent_sessions": "最近のセッション",
+      "no_sessions": "まだセッションがありません。",
+      "col_started": "開始日時",
+      "col_source": "ソース",
+      "col_status": "ステータス"
+    },
+    "learner_lessons": {
+      "title": "レッスン",
+      "see_progress": "進捗を見る",
+      "worked_on": "取り組んだ内容",
+      "went_well": "うまくいったこと",
+      "needed_help": "助けが必要だったこと",
+      "up_next": "次の内容"
+    },
+    "learner_milestones": {
+      "title": "マイルストーン",
+      "description": "プログラム全体で獲得した経験値、ストリーク、通貨、バッジ。",
+      "no_engagement_data": "まだエンゲージメントデータがありません",
+      "no_engagement_desc": "学習者が最初のセッションを完了すると、XP・ストリーク・バッジの追跡を開始します。",
+      "back_to_overview": "学習者の概要に戻る",
+      "total_xp": "合計 XP",
+      "levels_desc": "レベルアップで新しいアバター、カスタマイズ、クエストワールドが解放されます。",
+      "current_streak": "現在のストリーク",
+      "wallet": "ウォレット",
+      "wallet_desc": "セッションごとにコインを獲得。大きな成果でジェムが解放されます。",
+      "badge_collection": "バッジコレクション",
+      "earned": "獲得済み",
+      "locked": "ロック済み",
+      "how_xp_works": "XP の仕組み"
+    },
+    "learner_profile_v2": {
+      "open_lessons": "今日のレッスンを開く",
+      "profile_settings": "プロフィール設定",
+      "learning_identity": "学習アイデンティティ"
+    },
+    "learner_progress": {
+      "title": "進捗",
+      "description": "取り組んでいる科目全体の習熟度。",
+      "lessons_link": "レッスン",
+      "summary_link": "わかりやすい要約",
+      "lessons_done": "完了したレッスン",
+      "time_learning": "学習時間",
+      "skills_tracked": "追跡スキル数",
+      "mastered": "習得済み",
+      "by_subject": "科目別"
+    },
+    "learner_summary": {
+      "title": "わかりやすい要約",
+      "description": "1ページのスナップショット — 何が機能しているか、次は何か。",
+      "progress_link": "進捗",
+      "lessons_link": "レッスン",
+      "whats_going_well": "うまくいっていること",
+      "fill_after_lessons": "最初の数レッスンの後に記入します。",
+      "keep_practicing": "引き続き練習すること",
+      "no_skills_flagged": "まだフラグが立てられたスキルはありません。",
+      "recent_lessons": "最近のレッスン"
+    },
+    "learners": {
+      "title": "あなたの学習者",
+      "description": "各子どもを一度設定するだけで、一か所から成長を見守れます。",
+      "add_learner": "学習者を追加",
+      "no_learners": "まだ学習者がいません",
+      "no_learners_desc": "最初の子どもを追加して準備フローを開始してください。",
+      "add_a_learner": "学習者を追加する"
+    },
+    "reports": {
+      "eyebrow": "保護者",
+      "title": "週間学習サマリー",
+      "no_learners": "まだ学習者がいません",
+      "no_learners_body": "ホームページから学習者を追加して進捗レポートの生成を始めてください。",
+      "open_learner": "学習者を開く →",
+      "recent_lessons": "最近のレッスン"
+    },
+    "settings_account_form": {
+      "display_name": "表示名",
+      "saved": "保存しました。"
+    },
+    "settings": {
+      "eyebrow": "設定",
+      "title": "アカウント設定",
+      "description": "プロフィール、ファミリープラン、世帯の設定を管理します。",
+      "account_label": "アカウント",
+      "billing_label": "請求",
+      "privacy_label": "プライバシー",
+      "privacy_desc": "COPPA・FERPA・データエクスポートツールはプラットフォームチームが担当しています。エクスポートが必要な場合はサポートチケットをお送りください。"
+    },
+    "learner_overview": {
+      "settings": "設定",
+      "next_step": "次のステップ",
+      "explore": "探索",
+      "profile_basics": "プロフィール基本情報",
+      "comfort_levels": "快適度",
+      "reading": "読書",
+      "strengths": "得意なこと",
+      "none_recorded": "まだ記録がありません。",
+      "challenges": "苦手なこと",
+      "accessibility_defaults": "アクセシビリティのデフォルト設定"
+    },
+    "learner_sensory": {
+      "title": "感覚プロファイル",
+      "modalities": "感覚モダリティ",
+      "notes": "メモ",
+      "hyper_sensitive": "過敏",
+      "hypo_sensitive": "鈍感"
+    },
+    "learner_settings": {
+      "danger_zone": "危険ゾーン",
+      "error_invalid": "一部の情報に誤りがあります。確認してもう一度お試しください。",
+      "error_confirm": "この学習者を削除するには、確認ボックスに DELETE と入力してください。",
+      "first_name": "名前",
+      "preferred_name": "呼び名",
+      "pronouns": "代名詞",
+      "primary_language": "主要言語",
+      "strengths": "得意なこと",
+      "challenges": "苦手なこと",
+      "accessibility_defaults": "アクセシビリティのデフォルト設定",
+      "save_changes": "変更を保存",
+      "delete_confirm_label": "DELETE と入力して確認",
+      "remove_learner": "学習者を削除"
+    },
+    "learner_snapshot": {
+      "open_full_profile": "フルプロファイルを開く",
+      "this_week": "今週"
+    },
+    "learner_team": {
+      "title": "サポートチーム",
+      "invite_member": "チームメンバーを招待",
+      "no_members_title": "まだチームメンバーがいません",
+      "primary": "主担当",
+      "how_collab_works": "コラボレーションの仕組み",
+      "collab_parents": "保護者は学習者のすべてのデータにフルアクセスできます。",
+      "collab_teachers": "教師はクラス単位の進捗を確認でき、IEP 目標を作成できます。",
+      "collab_therapists": "セラピストとケアギバーは明示的に権限昇格されない限り、読み取り専用の要約のみ閲覧できます。",
+      "cancel_invite": "招待をキャンセル",
+      "email_address": "メールアドレス",
+      "relationship_optional": "続柄（任意）",
+      "relationship_placeholder": "例：共同親権者、祖父母",
+      "specialty_optional": "専門分野（任意）",
+      "specialty_placeholder": "例：言語聴覚",
+      "credentials_optional": "資格・認定（任意）",
+      "credentials_placeholder": "例：M.S., CCC-SLP",
+      "cancel": "キャンセル",
+      "care_team_invites": "サポートチームへの招待",
+      "revoke": "取り消し"
+    },
+    "schedule": {
+      "title": "スケジュール",
+      "no_learners_title": "まだ学習者がいません",
+      "teacher": "先生",
+      "in_progress_lesson": "進行中のレッスン",
+      "open_arrow": "開く →"
+    },
+    "settings_account": {
+      "title": "アカウント",
+      "signed_in_as": "ログイン中"
+    },
+    "home_v2": {
+      "error_heading": "現在ホームを読み込めませんでした。",
+      "error_reference": "参照番号：",
+      "error_retry": "再試行",
+      "open_legacy_home": "旧ホームを開く",
+      "loading": "保護者ホームを読み込んでいます…",
+      "not_found_heading": "そのページはまだ存在しません。",
+      "back_to_home": "保護者ホームに戻る",
+      "add_another_learner": "学習者を追加する",
+      "today_at_a_glance": "今日の概要",
+      "details": "詳細",
+      "learning_readiness": "学習準備状況",
+      "assessment_status": "評価ステータス",
+      "iep_support_upload": "IEP / サポートをアップロード",
+      "consent_checklist": "同意チェックリスト",
+      "todays_recommended_actions": "今日のおすすめアクション",
+      "notifications_title": "通知",
+      "billing_title": "請求",
+      "school_connection": "学校との接続",
+      "plan_generated": "プラン生成済み",
+      "pacing": "ペース",
+      "calm_extended_time_on": "穏やか — 延長時間オン",
+      "sensory_mode": "感覚モード",
+      "warm_reduced_motion": "温かみ + 動きを抑える",
+      "parent_guardian_consent": "保護者 / 後見人の同意",
+      "approved": "承認済み",
+      "ai_personalization": "AI パーソナライゼーション",
+      "school_data_sharing": "学校データ共有",
+      "optional_not_set": "任意 — 未設定",
+      "approve_voice_mode": "音声モードを承認",
+      "approve_voice_mode_desc": "Emma がレッスン中に AI チューターと声で話せるようになります。",
+      "upload_iep_optional": "IEP をアップロード（任意）",
+      "upload_iep_desc": "AIVO が初日から適用できるよう、配慮事項を追加してください。",
+      "new_milestone": "新しいマイルストーン：",
+      "new_milestone_desc": "200 語のパッセージを自力で読んだ。",
+      "tutor_note": "チューターメモ：",
+      "tutor_note_desc": "今週のペースは素晴らしい。",
+      "family_2_learners": "家族 — 学習者 2 名",
+      "next_renewal": "次回更新日",
+      "payment_method": "支払い方法"
+    },
+    "home": {
+      "greeting": "挨拶",
+      "today_at_a_glance": "今日の概要",
+      "family_workspace": "家族ワークスペース",
+      "add_your_first_learner": "最初の学習者を追加",
+      "add_another_learner": "学習者を追加する",
+      "your_learners": "あなたの学習者",
+      "no_learners_yet": "まだ学習者がいません"
+    },
+    "error": {
+      "eyebrow": "エラー",
+      "heading": "問題が発生しました",
+      "body": "お子様のデータは安全です。このページの読み込み中に予期しないエラーが発生しました。再試行するか、保護者ホームに戻ってください。",
+      "reference": "参照: {digest}",
+      "retry": "再試行",
+      "home_link": "保護者ホームに戻る"
+    },
+    "not_found": {
+      "eyebrow": "見つかりません",
+      "heading": "そのページが見つかりませんでした",
+      "body": "リンクが移動したか、学習者がアカウントに関連付けられていない可能性があります。ホームにお戻りください。",
+      "home_link": "ホームへ移動",
+      "all_learners": "すべての学習者"
+    },
+    "learner_homework": {
+      "title": "宿題の履歴",
+      "description": "お子様が宿題ヘルパーで取り組んだ内容です。メッセージの内容はお子様とチューターの間だけに保たれます。",
+      "empty": "まだ宿題セッションはありません。",
+      "messages_count": "{count} 件のメッセージ",
+      "status_done": "完了",
+      "status_open": "進行中"
     }
   },
   "brain_clone": {
@@ -222,7 +679,8 @@
     "building_tutors_caption": "各 AI チューターを {name} のレベルに調整中",
     "building_complete_title": "{name} のブレインが完成しました",
     "building_complete_caption": "{name} の評価データからブレインが構築されました。下の詳細を確認し、次のステップを決めてください。",
-    "building_complete_cta": "確認して決定"
+    "building_complete_cta": "確認して決定",
+    "skip_animation": "アニメーションをスキップ"
   },
   "learner": {
     "errors": {
@@ -641,6 +1099,19 @@
       "saving": "保存中…",
       "done": "できた",
       "complete_error": "このレッスンを保存できませんでした。「できた」ボタンをもう一度試してください。"
+    },
+    "baseline_runner": {
+      "exit_proctor_view": "監督ビューを終了",
+      "ready_title": "あと一回タップ",
+      "ready_body": "すべての質問に回答しました。準備ができたら回答を送信してください。",
+      "finish_baseline": "ベースラインを完了",
+      "resume": "再開",
+      "stop_for_today": "今日はここまで",
+      "choose_one": "1つ選んでください",
+      "type_answer": "回答を入力"
+    },
+    "lesson_run": {
+      "back_to_today": "今日に戻る"
     }
   },
   "auth": {
@@ -699,7 +1170,8 @@
       "name_label": "お名前",
       "email_label": "メールアドレス",
       "password_label": "パスワード",
-      "password_helper": "数字と記号を含む 8 文字以上。"
+      "password_helper": "数字と記号を含む 8 文字以上。",
+      "name_placeholder": "Riley Parent"
     },
     "forgot": {
       "heading": "パスワードをリセット",
@@ -840,7 +1312,9 @@
       "invite_label": "招待コード",
       "invite_helper": "学校または学区がウェルカムメールで送信しました。",
       "name_label": "お名前",
-      "password_helper": "8 文字以上ではなく 12 文字以上。保存前に、既知の漏えいに含まれていないか確認します。"
+      "password_helper": "8 文字以上ではなく 12 文字以上。保存前に、既知の漏えいに含まれていないか確認します。",
+      "code_placeholder": "例: SCHOOL-7Q4M-2025",
+      "name_placeholder": "姓名"
     },
     "role": {
       "eyebrow": "役割を選ぶ",
@@ -1045,7 +1519,8 @@
       "join": "学校に参加",
       "code_label": "招待コード",
       "email_label": "学校のメールアドレス",
-      "email_helper": "管理者が招待したメールアドレスと一致している必要があります。"
+      "email_helper": "管理者が招待したメールアドレスと一致している必要があります。",
+      "code_placeholder": "例: SCHOOL-7Q4M-2025"
     },
     "invite_district": {
       "eyebrow": "学区への招待",
@@ -1054,7 +1529,8 @@
       "reassure_title": "学区管理者の追加認証が強制されます。",
       "reassure_body": "この役割のサインインごとに、新しい生体認証または PIN の確認が必要です。AIVO は、単一のパスワードで学区データのロックを解除させることは決してありません。",
       "code_label": "学区の招待コード",
-      "email_label": "学区のメールアドレス"
+      "email_label": "学区のメールアドレス",
+      "code_placeholder": "例: DISTRICT-9F2L-2025"
     },
     "error": {
       "expired_invite_eyebrow": "招待の期限切れ",
@@ -1089,5 +1565,913 @@
       "blocked_secondary": "サポートに問い合わせる",
       "generic_secondary": "サポートに問い合わせる"
     }
+  },
+  "admin": {
+    "district_overview": {
+      "eyebrow": "地区管理者",
+      "description": "学校間の監督、名簿管理、レポート。カードをクリックして学校を管理します。",
+      "fl_distribution_title": "機能レベルの分布",
+      "no_learners": "まだ学習者が割り当てられていません。",
+      "platform_health_title": "プラットフォームの健全性",
+      "lessons_completed": "完了したレッスン",
+      "lessons_attempted": "試みたレッスン",
+      "ai_jobs_in_queue": "キュー内の AI ジョブ",
+      "ai_failures": "AI の失敗"
+    },
+    "district_billing": {
+      "title": "請求",
+      "empty_title": "請求情報がありません",
+      "col_tenant": "テナント",
+      "col_status": "ステータス"
+    },
+    "district_compliance": {
+      "title": "コンプライアンス"
+    },
+    "district_iep": {
+      "title": "IEP コンプライアンス",
+      "empty_title": "この地区にはまだ学習者がいません",
+      "col_learner": "学習者",
+      "col_school": "学校",
+      "col_family": "家族"
+    },
+    "district_reports": {
+      "title": "地区レポート"
+    },
+    "district_schools": {
+      "title": "学校",
+      "empty_title": "この地区にはまだ学校がありません",
+      "col_school": "学校",
+      "col_learners": "学習者",
+      "col_families": "家族",
+      "view_staff": "スタッフを見る"
+    },
+    "district_settings_admins": {
+      "title": "管理者",
+      "empty_title": "まだ管理者がいません",
+      "invite_note": "管理者の招待は、AIVO の地区オンボーディング担当者が行います。",
+      "col_joined": "参加日"
+    },
+    "district_settings_branding": {
+      "title": "ブランディング",
+      "display_name": "表示名",
+      "display_name_hint": "製品ヘッダー、メール、保護者ポータルに表示されます。",
+      "support_email": "サポートメール",
+      "support_email_hint": "この地区の家族とスタッフはすべてのヘルプページでこれを確認できます。",
+      "primary_colour": "プライマリブランドカラー",
+      "primary_colour_aria": "プライマリブランドカラー",
+      "sample": "サンプル"
+    },
+    "district_settings": {
+      "title": "設定",
+      "org_section": "組織",
+      "tenant_name": "テナント名",
+      "tenant_id": "テナント ID",
+      "schools": "学校",
+      "learners": "学習者",
+      "support_email": "サポートメール",
+      "last_update": "最終更新",
+      "manage": "管理",
+      "notifications_heading": "通知設定",
+      "notifications_desc": "地区管理者にメールで通知される内容。",
+      "features_heading": "機能の上書き",
+      "features_desc": "この地区のすべての学校に適用される地区レベルのトグル。"
+    },
+    "district_settings_sso": {
+      "title": "SSO & SCIM",
+      "status_heading": "ステータス",
+      "last_scim_rotation": "最後の SCIM ローテーション",
+      "sign_in_mode": "サインインモード",
+      "idp_name_label": "IDプロバイダー名",
+      "idp_name_placeholder": "例: 地区 Okta",
+      "scim_provisioning": "SCIM プロビジョニング",
+      "enable_scim": "SCIM を有効にする",
+      "scim_rotate_warning": "SCIM トークンをローテーションすると、古い資格情報を使用している IdP 統合が無効になります。",
+      "rotate_scim_token": "SCIM トークンをローテーション"
+    },
+    "district_staff": {
+      "title": "スタッフディレクトリ",
+      "invitations_heading": "招待",
+      "active_staff_heading": "在籍スタッフ",
+      "empty_title": "この地区にはまだスタッフがいません",
+      "col_joined": "参加日",
+      "pending_invitations": "保留中の招待",
+      "invite_staff_btn": "スタッフを招待",
+      "invite_staff_member": "スタッフメンバーを招待",
+      "close_aria": "閉じる",
+      "field_display_name": "表示名",
+      "role_teacher": "教師",
+      "role_school_admin": "学校管理者",
+      "role_district_admin": "地区管理者",
+      "assign_to_school": "学校に割り当て",
+      "pick_school": "学校を選択…",
+      "cancel": "キャンセル",
+      "sending": "送信中…",
+      "invited_success": "{name} を招待しました",
+      "temporary_password": "仮パスワード"
+    },
+    "error": {
+      "eyebrow": "管理コンソール",
+      "heading": "このページの読み込み中にエラーが発生しました。",
+      "body": "エラーは記録されました。今すぐ再試行するか、管理者ホームに戻ってください。",
+      "retry": "再試行",
+      "home_link": "管理ホーム"
+    },
+    "login": {
+      "heading": "管理者サインイン",
+      "security_badge": "MFA 必須 · SOC 2 · FERPA",
+      "card_title": "管理コンソールにサインイン",
+      "sign_in_btn": "サインイン",
+      "standard_sign_in": "標準サインインを使用"
+    },
+    "not_found": {
+      "eyebrow": "管理コンソール · 404",
+      "heading": "このページは存在しません。",
+      "body": "移動されたか、リソースが削除された可能性があります。",
+      "home_link": "管理ホーム"
+    },
+    "platform_tenants_detail": {
+      "all_tenants": "すべてのテナント",
+      "stat_learners": "学習者",
+      "stat_sub_tenants": "サブテナント",
+      "stat_created": "作成日",
+      "user_mix": "ユーザー構成",
+      "no_users": "まだユーザーがいません。",
+      "direct_children": "直接の子",
+      "no_nested_tenants": "このテナントの直接下にネストされたテナントはありません。",
+      "recent_ai_jobs": "最近の AI ジョブ",
+      "no_ai_jobs": "AI 生成アクティビティなし",
+      "view_all": "すべて表示",
+      "recent_invoices": "最近の請求書",
+      "no_invoices": "まだ請求書がありません",
+      "audit_trail": "監査証跡",
+      "no_audit": "監査済みアクティビティなし"
+    },
+    "platform_tenants": {
+      "title": "テナント",
+      "empty_title": "テナントなし",
+      "col_parent": "親",
+      "col_admins": "管理者",
+      "col_learners": "学習者",
+      "col_billing": "請求",
+      "col_created": "作成日",
+      "open_billing": "請求を開く"
+    },
+    "platform_audit_logs": {
+      "title": "監査ログ",
+      "empty": "監査イベントはまだありません",
+      "col_action": "アクション",
+      "col_tenant": "テナント",
+      "col_request_id": "リクエスト ID"
+    },
+    "platform_data": {
+      "title": "データインベントリ"
+    },
+    "platform_feature_flags": {
+      "title": "フィーチャーフラグ",
+      "section_ai": "AI とコンテンツ",
+      "section_enterprise": "エンタープライズ",
+      "section_integrations": "インテグレーション",
+      "section_ux": "学習者体験"
+    },
+    "platform_jobs": {
+      "title": "バックグラウンドジョブ",
+      "empty": "AI 生成アクティビティはまだありません",
+      "by_kind": "種類別",
+      "latency": "レイテンシ",
+      "lesson_runs": "レッスン実行",
+      "lesson_runs_desc": "AI 生成の下流にある学習者向けパイプライン。",
+      "recent_jobs": "最近のジョブ · 最新順",
+      "col_status": "ステータス",
+      "col_tenant": "テナント",
+      "col_started": "開始",
+      "col_duration": "所要時間"
+    },
+    "platform_learners": {
+      "title": "学習者",
+      "empty": "学習者はまだいません",
+      "iep_on_file": "IEP 登録済み",
+      "iep_skipped": "IEP スキップ済み",
+      "parent_opt_out": "保護者のオプトアウト記録済み",
+      "iep_pending": "IEP 保留中",
+      "no_decision": "未決定",
+      "fl_mix": "機能レベルの内訳",
+      "grade_band": "学年帯",
+      "col_learner": "学習者",
+      "col_tenant": "テナント",
+      "col_fl": "機能レベル",
+      "col_created": "作成日",
+      "unassigned": "未割り当て"
+    },
+    "platform_migration": {
+      "title": "v1 → v2 移行",
+      "empty": "移行ジョブはまだありません",
+      "recent_jobs": "最近のジョブ",
+      "col_source": "ソース",
+      "col_status": "ステータス",
+      "col_results": "結果",
+      "col_started": "開始",
+      "dry_run": "ドライラン（プレビューのみ）",
+      "source_records": "ソースレコード (JSON)"
+    },
+    "platform_support": {
+      "title": "サポートチケット",
+      "empty": "受信トレイは空です"
+    },
+    "platform_system_health": {
+      "title": "システムヘルス"
+    },
+    "platform_users_detail": {
+      "empty": "あなたのスコープにメンバーシップがありません",
+      "all_users": "全ユーザー",
+      "user_id": "ユーザー ID",
+      "col_created": "作成日",
+      "managed_learners": "管理中の学習者",
+      "memberships": "メンバーシップ",
+      "col_tenant": "テナント",
+      "col_permissions": "権限",
+      "col_joined": "参加日",
+      "col_learner": "学習者"
+    },
+    "platform_users": {
+      "title": "ユーザー",
+      "empty": "ユーザーがいません",
+      "col_tenant": "テナント",
+      "col_joined": "参加日"
+    },
+    "school_billing": {
+      "title": "請求とシート",
+      "no_subscription": "サブスクリプションなし",
+      "no_seat_licenses": "シートライセンスなし",
+      "no_invoices": "請求書なし",
+      "seat_licenses": "シートライセンス",
+      "no_seats_assigned": "まだシートが割り当てられていません。",
+      "col_subject": "対象",
+      "col_assigned": "割り当て済み",
+      "invoices": "請求書",
+      "col_number": "番号",
+      "col_period": "期間",
+      "col_amount": "金額",
+      "col_status": "ステータス"
+    },
+    "school_classes_detail": {
+      "teachers": "教師",
+      "none_yet": "まだいません。",
+      "learners": "学習者",
+      "no_learners_enrolled": "在籍している学習者がいません。"
+    },
+    "school_classes": {
+      "title": "クラス",
+      "empty": "クラスはまだありません"
+    },
+    "school_compliance": {
+      "title": "コンプライアンス"
+    },
+    "school_learners": {
+      "title": "学習者",
+      "empty": "ロスターに学習者がいません",
+      "col_learner": "学習者",
+      "col_readiness": "準備状態",
+      "col_fl": "機能レベル"
+    },
+    "school_overview": {
+      "school_admin": "学校管理者",
+      "card_rostering_health": "ロスターの状態",
+      "card_consent_compliance": "同意とコンプライアンス",
+      "card_ai_safety": "AI 安全性",
+      "card_license_util": "ライセンス使用率",
+      "source": "ソース",
+      "last_sync": "最終同期",
+      "manage_rostering": "ロスターを管理 →",
+      "consent_complete": "同意完了",
+      "ieps_on_file": "IEP 登録済み",
+      "audit_events_30d": "監査イベント（30日）",
+      "open_compliance": "コンプライアンスを開く →",
+      "flagged_7d": "フラグ付き（7日）",
+      "review_safety_logs": "安全ログを確認 →",
+      "open_reports": "レポートを開く →"
+    },
+    "school_reports": {
+      "title": "レポート"
+    },
+    "school_rostering": {
+      "title": "ロスター",
+      "section_schools": "学校",
+      "empty_schools": "学校はまだありません",
+      "section_sis": "SIS 接続",
+      "empty_sis": "SIS 接続はまだありません",
+      "section_recent_imports": "最近のインポートジョブ",
+      "empty_imports": "インポートはまだありません",
+      "start_csv_import": "CSV インポートを開始",
+      "btn_classes": "クラス",
+      "btn_import_csv": "CSV をインポート",
+      "import_total": "合計：",
+      "import_created": "作成済み：",
+      "import_skipped": "スキップ済み：",
+      "import_errors": "エラー："
+    },
+    "school_settings": {
+      "title": "設定",
+      "signed_in_as": "ログイン中"
+    },
+    "school_staff": {
+      "title": "スタッフ",
+      "empty": "スタッフはまだいません",
+      "col_tenant": "テナント"
+    },
+    "platform_billing_overview": {
+      "title": "請求",
+      "empty_title": "請求アカウントなし",
+      "col_tenant": "テナント",
+      "col_status": "ステータス",
+      "col_created": "作成日"
+    },
+    "platform_billing_revenue": {
+      "title": "収益",
+      "empty_title": "まだ回収がありません",
+      "link_all_invoices": "すべての請求書 →",
+      "stat_lifetime_collected": "累計回収額",
+      "stat_last_30_days": "過去30日間",
+      "stat_active_subscriptions": "有効なサブスクリプション",
+      "section_monthly_collected": "月次回収額 · 過去12ヶ月",
+      "no_paid_invoices": "まだ支払済み請求書はありません。",
+      "section_top_tenants": "収益上位テナント",
+      "section_plan_mix": "プラン構成"
+    },
+    "platform_compliance_data_inventory": {
+      "title": "データインベントリ",
+      "col_classification": "分類",
+      "col_lawful_basis": "処理根拠",
+      "col_purposes": "利用目的",
+      "col_child_data": "子どものデータ",
+      "subprocessors_heading": "サブプロセッサー"
+    },
+    "platform_compliance_disclosures": {
+      "title": "FERPA 開示ログ",
+      "record_heading": "開示を記録する",
+      "col_recipient": "受取人",
+      "col_reason": "理由",
+      "col_ferpa_basis": "FERPA 根拠",
+      "empty_body": "まだ開示は記録されていません。",
+      "label_recipient_type": "受取人の種別",
+      "label_recipient_name": "受取人の名前",
+      "label_ferpa_basis": "FERPA 根拠",
+      "placeholder_ferpa_basis": "school_official_exception",
+      "label_learner_id": "学習者 ID（任意）",
+      "label_reason": "理由"
+    },
+    "platform_compliance_dsar": {
+      "title": "データ主体リクエスト",
+      "col_requested": "申請日時",
+      "col_parent": "保護者",
+      "col_learner": "学習者",
+      "col_status": "ステータス",
+      "col_completed": "完了日時",
+      "col_target": "対象",
+      "no_requests": "リクエストはありません。"
+    },
+    "platform_compliance_overview": {
+      "title": "コンプライアンス",
+      "link_open_queue": "キューを開く →",
+      "active_policies_heading": "有効なポリシー"
+    },
+    "platform_compliance_retention": {
+      "title": "保持ポリシー",
+      "col_classification": "分類",
+      "col_retention_days": "保持（日数）",
+      "col_archive_days": "アーカイブ（日数）",
+      "col_description": "説明"
+    },
+    "platform_safety_moderation": {
+      "title": "モデレーションイベント",
+      "col_subject": "対象",
+      "col_decision": "判定",
+      "col_categories": "カテゴリ",
+      "col_severity": "重要度",
+      "col_excerpt": "抜粋",
+      "empty_body": "まだモデレーションイベントは記録されていません。"
+    },
+    "platform_safety_overview": {
+      "title": "AI セーフティ",
+      "recent_blocked_heading": "最近ブロックされた生成"
+    },
+    "platform_safety_policies": {
+      "title": "ポリシーバージョン",
+      "label_block_threshold": "ブロック閾値",
+      "label_review_threshold": "レビュー閾値",
+      "label_auto_review_categories": "自動レビューカテゴリ",
+      "label_auto_block_categories": "自動ブロックカテゴリ"
+    },
+    "platform_safety_red_team": {
+      "title": "レッドチームスイート",
+      "col_prompt": "プロンプト",
+      "col_expected": "期待値",
+      "col_observed": "実測値",
+      "col_result": "結果"
+    },
+    "platform_safety_review_queue": {
+      "title": "レビューキュー",
+      "empty_body": "まだレビューケースはありません。",
+      "placeholder_reviewer_note": "レビュアーメモ（任意）",
+      "btn_escalate": "エスカレート"
+    },
+    "platform_security_controls": {
+      "title": "SOC 2 コントロール",
+      "label_owner": "オーナー："
+    },
+    "platform_security_incidents": {
+      "title": "インシデント",
+      "open_incident_heading": "インシデントを開く",
+      "empty_body": "インシデントは記録されていません。",
+      "badge_customer_impact": "顧客への影響",
+      "badge_regulator_notify": "監督機関へ通知"
+    },
+    "platform_security_overview": {
+      "title": "セキュリティ体制",
+      "recent_activity_heading": "最近のアクティビティ",
+      "no_events": "まだイベントはありません。",
+      "link_audit_log": "監査ログ全体を表示 →"
+    },
+    "platform_security_risks": {
+      "title": "リスク台帳",
+      "empty_body": "まだリスクは追跡されていません。",
+      "label_treatment": "対処方針："
+    },
+    "platform_security_state_privacy": {
+      "title": "州プライバシー法マトリクス",
+      "label_obligation": "義務：",
+      "no_control_mapped": "まだコントロールが割り当てられていません — これはギャップです。"
+    },
+    "platform_security_vendors": {
+      "title": "ベンダー・サブプロセッサーインベントリ",
+      "subprocessors_heading": "サブプロセッサー（学習者データを処理）",
+      "badge_learner_data": "学習者データ"
+    },
+    "platform_security_vulnerabilities": {
+      "title": "脆弱性管理",
+      "empty_body": "現在追跡中の脆弱性はありません。"
+    },
+    "platform_overview": {
+      "title": "システム稼働状況",
+      "tenant_footprint": "テナント分布",
+      "tenant_footprint_desc": "この環境で現在プロビジョニングされているテナントの分布。",
+      "billing_status": "請求ステータス",
+      "recent_ai_jobs": "最近の AI ジョブ",
+      "no_ai_activity_yet": "まだ AI 生成アクティビティはありません。",
+      "view_all": "すべて表示",
+      "operations_centres": "オペレーションセンター",
+      "signed_in_as": "サインイン中：",
+      "platform_settings": "プラットフォーム設定"
+    },
+    "platform_ai_moderation": {
+      "title": "AI モデレーション",
+      "no_block_or_review_events": "ブロックまたは審査イベントなし",
+      "top_categories": "上位カテゴリ（ブロック＋審査）",
+      "no_categorised_events": "カテゴリ分けされたイベントはありません。",
+      "col_tenant": "テナント",
+      "col_decision": "決定",
+      "col_categories": "カテゴリ",
+      "col_signals": "シグナル",
+      "col_excerpt": "抜粋"
+    },
+    "platform_ai_playground": {
+      "title": "AI プレイグラウンド",
+      "how_it_works": "仕組み",
+      "responses_moderated": "レスポンスは出力モデレーションを経てからここに返されます。",
+      "playground_responses_are": "プレイグラウンドのレスポンスは",
+      "presets": "プリセット",
+      "model_claude": "Claude Opus 4.7（プライマリ）",
+      "model_gemini": "Gemini 3.0 Pro（フォールバック）",
+      "model_gpt": "GPT-5.5（フォールバック）",
+      "system_prompt": "システムプロンプト",
+      "user_prompt": "ユーザープロンプト"
+    },
+    "platform_ai_costs": {
+      "title": "AI コスト管理",
+      "no_cost_events_yet": "コストイベントはまだありません",
+      "spend_mtd": "今月の支出",
+      "approaching_cap": "上限に近づいています",
+      "over_cap": "上限超過",
+      "tenants": "テナント",
+      "col_tenant": "テナント",
+      "col_status": "ステータス",
+      "col_budget": "予算",
+      "recent_cost_events": "最近のコストイベント",
+      "col_feature": "機能",
+      "col_provider_model": "プロバイダー / モデル",
+      "col_tokens": "トークン",
+      "aria_monthly_cap": "月間上限（USD）",
+      "aria_warn_at": "警告比率"
+    },
+    "platform_ai_generation": {
+      "title": "AI 生成",
+      "recent_jobs": "最近のジョブ",
+      "no_jobs_yet": "AI 生成ジョブはまだありません",
+      "col_tenant": "テナント",
+      "col_status": "ステータス",
+      "col_duration": "所要時間"
+    },
+    "platform_audio": {
+      "title": "音声と読み上げ",
+      "pronunciation_overrides": "発音オーバーライド",
+      "playbacks": "再生回数",
+      "cache_hit_rate": "キャッシュヒット率",
+      "total_cost": "総コスト",
+      "unique_clips": "ユニーククリップ",
+      "recent_playbacks": "最近の再生",
+      "col_context": "コンテキスト",
+      "no_playbacks_yet": "まだ再生が記録されていません。",
+      "recently_generated_clips": "最近生成されたクリップ"
+    },
+    "platform_audio_pronunciation": {
+      "title": "発音オーバーライド",
+      "add_override": "オーバーライドを追加",
+      "replacement": "置換",
+      "encoding": "エンコーディング",
+      "notes_optional": "メモ（任意）",
+      "no_overrides_yet": "まだオーバーライドはありません。",
+      "placeholder_token": "例：AIVO",
+      "placeholder_replacement": "例：ay-voh"
+    },
+    "platform_baseline_items": {
+      "title": "ベースライン項目の心理測定",
+      "items_by_exposure": "出題数別の項目",
+      "no_telemetry_yet": "まだベースラインテレメトリはありません",
+      "col_item": "項目（スキル・バンド）",
+      "col_exposure": "出題数",
+      "col_scored": "採点済み",
+      "col_median_time": "中央値時間",
+      "col_seed_theta": "θ シード値",
+      "col_est_theta": "θ̂ 推定値",
+      "col_disc": "識別力 (a)",
+      "col_suggested_band": "推奨バンド",
+      "col_status": "ステータス",
+      "status_healthy": "正常",
+      "status_collecting": "収集中",
+      "status_retire": "廃止"
+    },
+    "platform_curriculum_overview": {
+      "title": "カリキュラム"
+    },
+    "platform_curriculum_frameworks": {
+      "title": "標準フレームワーク",
+      "homepage_link": "ホームページ →"
+    },
+    "platform_curriculum_import": {
+      "title": "標準をインポート",
+      "start_an_import": "インポートを開始",
+      "recent_jobs": "最近のジョブ",
+      "no_import_jobs_yet": "インポートジョブはまだありません。",
+      "framework": "フレームワーク",
+      "source": "ソース",
+      "source_placeholder": "manual、s3://…、https://…"
+    },
+    "platform_curriculum_skills": {
+      "title": "スキル",
+      "col_subject": "教科",
+      "col_grade_band": "学年バンド",
+      "col_version": "バージョン",
+      "col_prereqs": "前提条件",
+      "col_standards": "標準",
+      "col_constraints": "制約"
+    },
+    "platform_curriculum_subjects": {
+      "title": "教科とドメイン",
+      "no_domains_yet": "まだドメインはありません。"
+    },
+    "platform_curriculum_versioning": {
+      "title": "バージョン・目標・ブループリント",
+      "skill_versions": "スキルバージョン",
+      "objective_templates": "目標テンプレート",
+      "assessment_blueprints": "評価ブループリント",
+      "col_blueprint": "ブループリント",
+      "col_status": "ステータス"
+    },
+    "platform_settings_overview": {
+      "title": "設定",
+      "signed_in_as": "サインイン中："
+    },
+    "platform_settings_api_keys": {
+      "title": "API キー",
+      "no_keys_yet": "API キーはまだありません",
+      "col_prefix": "プレフィックス",
+      "col_scopes": "スコープ",
+      "col_status": "ステータス",
+      "col_created_by": "作成者",
+      "col_last_used": "最終使用",
+      "col_created": "作成日"
+    },
+    "platform_settings_emails": {
+      "title": "メールテンプレート",
+      "no_templates_configured": "メールテンプレートが設定されていません",
+      "col_template": "テンプレート",
+      "col_subject": "件名",
+      "col_status": "ステータス",
+      "col_last_sent": "最終送信",
+      "col_updated": "更新日"
+    },
+    "platform_settings_webhooks": {
+      "title": "Webhooks",
+      "no_endpoints_configured": "Webhook エンドポイントが設定されていません",
+      "col_endpoint": "エンドポイント",
+      "col_events": "イベント",
+      "col_secret": "シークレット",
+      "col_status": "ステータス",
+      "col_last_delivery": "最終配信",
+      "col_failures": "失敗数"
+    },
+    "platform_billing_coupons": {
+      "title": "クーポン",
+      "empty_title": "まだクーポンはありません",
+      "col_discount": "割引",
+      "col_applies_to": "適用対象",
+      "col_status": "ステータス",
+      "col_redemptions": "利用回数",
+      "col_valid_window": "有効期間"
+    },
+    "platform_billing_daily_batch": {
+      "title": "日次請求バッチ",
+      "empty_title": "まだバッチ実行はありません",
+      "col_run_date": "実行日",
+      "col_window": "期間",
+      "col_status": "ステータス",
+      "col_generated": "生成数",
+      "col_failed": "失敗数",
+      "col_total_billed": "請求合計"
+    },
+    "platform_billing_invoices": {
+      "title": "請求書",
+      "link_revenue_summary": "収益サマリー",
+      "stat_total_invoices": "請求書総数",
+      "stat_outstanding": "未払い",
+      "empty_title": "まだ請求書はありません",
+      "col_number": "番号",
+      "col_tenant": "テナント",
+      "col_amount": "金額",
+      "col_status": "ステータス",
+      "col_period": "期間"
+    }
+  },
+  "teacher": {
+    "home": {
+      "open_needs_support_list": "サポートが必要なリストを開く",
+      "open_arrow": "開く →",
+      "your_roster": "受け持ちの学習者",
+      "see_all_learners": "すべての学習者を見る →",
+      "no_learners_yet": "まだ学習者はいません",
+      "connect_roster": "名簿を連携する",
+      "roster_snapshot": "名簿の概要",
+      "add_another_class": "別のクラスを追加する"
+    },
+    "lesson_plans": {
+      "page_title": "AI 授業計画",
+      "new_assignment": "新しい課題",
+      "generated_recent": "生成済み（最近）",
+      "ai_jobs": "AI ジョブ",
+      "fallback_chain": "フォールバックチェーン",
+      "fallback_primary_model": "Claude Opus 4.7",
+      "latest_lesson_plans": "最新の授業計画",
+      "no_lesson_plans_yet": "授業計画はまだありません",
+      "generation_activity": "生成アクティビティ",
+      "no_ai_jobs": "この期間に AI 生成ジョブはありません。",
+      "col_started": "開始",
+      "col_status": "ステータス",
+      "col_completed": "完了"
+    },
+    "reports": {
+      "title": "クラスレポート",
+      "col_learners": "学習者",
+      "class_mastery": "クラス習熟度",
+      "on_track": "順調",
+      "avg_mastery_threshold": "平均 ≥ 70% 習熟度",
+      "ieps_on_file": "登録済み IEP",
+      "mastery_distribution": "習熟度分布",
+      "no_mastery_data": "習熟度データはまだありません — 学習者がベースライン評価を完了すると、分布が表示されます。",
+      "learner_rollup": "学習者まとめ",
+      "no_learners_assigned": "学習者が割り当てられていません",
+      "col_learner": "学習者",
+      "col_skills": "スキル",
+      "col_avg_mastery": "平均習熟度",
+      "col_on_grade": "学年相当",
+      "col_emerging": "発展途上",
+      "col_actions": "アクション",
+      "iep_on_file": "登録済み"
+    },
+    "learner_overview": {
+      "this_week_at_school": "今週の学校の様子 →",
+      "active_assignments": "進行中の課題",
+      "no_active_assignments": "この学習者の進行中の課題はありません。",
+      "recent_lessons": "最近のレッスン",
+      "no_lessons_started": "まだレッスンが開始されていません。",
+      "skill_gaps": "スキルのギャップ",
+      "no_notable_gaps": "目立ったギャップはまだありません — このまま続けましょう。",
+      "accommodations_teacher_summary": "配慮事項（教師向け概要）"
+    },
+    "learner_iep_draft": {
+      "page_title": "IEP 目標草案",
+      "no_iep_on_file": "IEP は登録されていません",
+      "current_iep": "現在の IEP",
+      "existing_learning_goals": "既存の学習目標",
+      "none_on_file": "登録なし。",
+      "accommodations": "配慮事項",
+      "none_recorded": "記録なし。",
+      "suggested_goal_drafts": "推奨される目標草案",
+      "how_drafts_generated": "草案の生成方法"
+    },
+    "classes": {
+      "title": "あなたのクラス",
+      "empty_title": "クラスが割り当てられていません"
+    },
+    "error": {
+      "eyebrow": "教師エリア",
+      "heading": "このページの読み込み中にエラーが発生しました。",
+      "body": "クラスデータは安全です。再試行するか、教師ホームに戻ってください。",
+      "retry": "再試行",
+      "home_link": "教師ホーム"
+    },
+    "insights": {
+      "title": "インサイト",
+      "empty_title": "テナントに学習者がいません"
+    },
+    "learners": {
+      "title": "あなたの名簿",
+      "empty": "まだ学習者が割り当てられていません。"
+    },
+    "not_found": {
+      "eyebrow": "教師エリア · 404",
+      "heading": "ページが見つかりませんでした。",
+      "body": "リンクが変更されたか、その学習者がクラスから退学した可能性があります。",
+      "home_link": "教師ホーム",
+      "classes_link": "マイクラス"
+    },
+    "settings": {
+      "title": "設定",
+      "signed_in_as": "ログイン中"
+    },
+    "assignments_new": {
+      "title": "新しい課題",
+      "instructions_label": "指示",
+      "subject_label": "教科",
+      "skills_label": "スキル",
+      "assign_label": "割り当て先",
+      "no_learners": "学習者がいません",
+      "due_date_label": "期限"
+    },
+    "assignments": {
+      "title": "課題",
+      "new_assignment": "新しい課題",
+      "empty": "まだ課題はありません。"
+    },
+    "classes_class": {
+      "roster": "名簿",
+      "no_learners": "学習者がいません"
+    }
+  },
+  "therapist": {
+    "home": {
+      "stat_caseload": "ケースロード",
+      "stat_ieps": "登録済み IEP",
+      "quick_links": "クイックリンク",
+      "link_sessions": "セッション →",
+      "link_reports": "レポート →",
+      "section_caseload": "ケースロード",
+      "empty_title": "まだ学習者がいません"
+    },
+    "reports": {
+      "title": "レポート",
+      "empty_title": "まだケースロードがありません",
+      "focus_label": "注力分野：",
+      "skills_tracked": "追跡中のスキル",
+      "avg_score": "平均スコア"
+    },
+    "sessions": {
+      "title": "セッション",
+      "empty_no_caseload": "まだケースロードがありません",
+      "empty_no_sessions": "まだセッションが記録されていません"
+    },
+    "settings": {
+      "title": "設定",
+      "section_profile": "プロフィール",
+      "role_label": "セラピスト",
+      "section_notifications": "通知"
+    }
+  },
+  "caregiver": {
+    "home": {
+      "on_care_team": "ケアチームのメンバー",
+      "active_or_ready": "学習中または準備完了",
+      "quick_links": "クイックリンク",
+      "link_observations": "観察記録 →",
+      "link_roster": "一覧 →",
+      "your_learners": "担当の学習者",
+      "no_learners_yet": "まだ学習者がいません"
+    },
+    "learners": {
+      "title": "学習者",
+      "no_learners_yet": "まだ学習者がいません",
+      "primary_language": "主要言語",
+      "reading_comfort": "読解能力",
+      "math_comfort": "算数・数学の能力"
+    },
+    "observations": {
+      "page_title": "観察記録",
+      "section_log": "観察を記録する",
+      "no_learners_yet": "まだ学習者がいません",
+      "no_lesson_activity_yet": "まだレッスン活動がありません",
+      "no_observations_yet": "まだ介護者の観察記録がありません。上のフォームを使用して気づいたことを記録してください。",
+      "label_antecedent": "先行事象",
+      "label_behaviour": "行動",
+      "label_consequence": "後続事象",
+      "field_learner": "学習者",
+      "choose_learner": "学習者を選択…",
+      "field_location": "場所",
+      "loc_school": "学校",
+      "loc_community": "地域",
+      "loc_therapy": "療法",
+      "field_behaviour": "行動（何を見ましたか？）",
+      "behaviour_placeholder": "行動を簡潔に説明してください。",
+      "field_antecedent": "先行事象（その前に何がありましたか？）",
+      "field_consequence": "後続事象（その後に何がありましたか？）",
+      "field_duration": "持続時間（分、任意）"
+    },
+    "settings": {
+      "page_title": "設定",
+      "section_profile": "プロフィール",
+      "section_notifications": "通知",
+      "role_label": "介護者"
+    }
+  },
+  "accept_invite": {
+    "page": {
+      "accept_heading": "招待を承認する",
+      "invited_to_join": "学習チームへの参加招待が届いています。",
+      "create_account": "新しいアカウントを作成する",
+      "signed_in_as": "現在のログインアカウント：",
+      "sign_in_different": "別のアカウントでサインインする"
+    },
+    "actions": {
+      "no_pending_for": "保留中の招待が見つかりませんでした：",
+      "continue": "続ける",
+      "added_to": "追加されました：",
+      "continue_to_dashboard": "ダッシュボードへ進む",
+      "signed_in_as": "ログイン中：",
+      "accepting": "承認中…"
+    }
+  },
+  "root": {
+    "error": {
+      "refreshing": "更新中",
+      "one_moment": "少々お待ちください — 最新バージョンを取得しています…",
+      "something_went_wrong": "問題が発生しました",
+      "lets_try_again": "もう一度試してみましょう。",
+      "unexpected_error": "予期しないエラーが発生しました。今すぐ再試行するか、ホームに戻ってしばらくしてから再度お試しください。",
+      "try_again": "再試行",
+      "back_to_home": "ホームに戻る"
+    },
+    "global_error": {
+      "heading": "深刻なエラーが発生しました。",
+      "body": "もう一度お試しください。問題が続く場合は、サポートにお問い合わせください。",
+      "try_again": "再試行"
+    },
+    "layout": {
+      "skip_to_main": "メインコンテンツへスキップ"
+    },
+    "not_found": {
+      "heading": "そのページが見つかりませんでした。",
+      "back_to_home": "ホームに戻る"
+    },
+    "home": {
+      "ferpa_coppa": "FERPA・COPPA 準拠",
+      "switch_role": "ロールを切り替え",
+      "start_family_trial": "ファミリートライアルを開始",
+      "for_school_districts": "学区向け",
+      "trusted_by": "1,200 人以上の専門家と保護者に信頼されています。"
+    }
+  },
+  "settings_accessibility": {
+    "nav_label": "アクセシビリティ",
+    "page_title": "アクセシビリティ",
+    "sensory_mode": "感覚モード",
+    "text_and_reading": "テキストと読み取り",
+    "age_mode": "年齢モード",
+    "choose_age_mode": "年齢モードを選択",
+    "age_sprout": "Sprout（4〜7歳）",
+    "age_spark": "Spark（8〜12歳）",
+    "age_scholar": "Scholar（13歳以上）",
+    "choose_theme": "テーマを選択",
+    "high_contrast": "ハイコントラスト",
+    "text_size": "文字サイズ",
+    "language": "言語",
+    "choose_language": "言語を選択",
+    "lang_en_us": "English (US)",
+    "lang_es": "Español",
+    "lang_fr": "Français"
+  },
+  "district_login": {
+    "heading": "学区管理",
+    "security_badge": "MFA 必須 · SOC 2 · FERPA",
+    "mobile_heading": "学区サインイン",
+    "card_title": "学区コンソールにサインイン",
+    "sign_in_btn": "サインイン",
+    "standard_sign_in": "標準サインインを使用"
   }
 }

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -19,6 +20,7 @@ export const dynamic = "force-dynamic";
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_compliance_overview");
   const store = getStore();
   const inventory = listDataInventory();
   const disclosures = listDisclosures(session.tenantId);
@@ -66,7 +68,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform"
-        title="Compliance"
+        title={t("title")}
         description="Data inventory, disclosure log, retention, and parent DSAR queue."
       />
 
@@ -89,14 +91,14 @@ export default async function Page() {
           <p className="text-sm">
             <strong>{pending} pending</strong> DSAR{pending === 1 ? "" : "s"} awaiting review.{" "}
             <Link className="underline" href="/admin/platform/compliance/dsar">
-              Open the queue →
+              {t("link_open_queue")}
             </Link>
           </p>
         </Card>
       )}
 
       <Card className="mt-4 p-[var(--aivo-density-card-pad)]">
-        <h2 className="font-display font-semibold">Active policies</h2>
+        <h2 className="font-display font-semibold">{t("active_policies_heading")}</h2>
         <ul className="mt-2 divide-y text-sm">
           {policies.map((p) => (
             <li key={p.id} className="py-2 flex items-center justify-between">

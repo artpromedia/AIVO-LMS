@@ -6,6 +6,7 @@
  */
 import * as React from "react";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { THERAPIST_NAV } from "@/components/layout/role-shells";
@@ -60,6 +61,7 @@ function durationLabel(run: LessonRun): string {
 }
 
 export default async function TherapistSessionsPage() {
+  const t = await getTranslations("therapist.sessions");
   const session = await requirePageRole(["therapist", "platform_admin"]);
   const learnerIds = listLearnersForMember(session.userId, session.email, "therapist");
   const maybeLearners = await Promise.all(
@@ -85,14 +87,14 @@ export default async function TherapistSessionsPage() {
   if (learners.length === 0) {
     emptyState = (
       <EmptyState
-        title="No caseload yet"
+        title={t("empty_no_caseload")}
         description="Sessions appear here once a parent invites you to a learner's care team."
       />
     );
   } else if (log.length === 0) {
     emptyState = (
       <EmptyState
-        title="No sessions logged yet"
+        title={t("empty_no_sessions")}
         description="When a learner on your caseload starts a lesson, the session lands here."
       />
     );
@@ -107,7 +109,7 @@ export default async function TherapistSessionsPage() {
     >
       <PageHeader
         eyebrow="Therapist"
-        title="Sessions"
+        title={t("title")}
         description="Session log across every learner on your caseload."
       />
 

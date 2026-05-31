@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -19,6 +20,7 @@ type PageProps = { params: Promise<{ learnerId: string }> };
 export default async function Page({ params }: PageProps) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
+  const t = await getTranslations("parent.learner_accessibility_audio");
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
@@ -39,7 +41,7 @@ export default async function Page({ params }: PageProps) {
     >
       <PageHeader
         eyebrow={`${learner.displayName} · Accessibility`}
-        title="Read-aloud"
+        title={t("title")}
         description="Choose the voice your learner hears and decide whether read-aloud is turned on at all. Captions can be displayed alongside playback."
       />
       <Card className="p-[var(--aivo-density-card-pad)]">

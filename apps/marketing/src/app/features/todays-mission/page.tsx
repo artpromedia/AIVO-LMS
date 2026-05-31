@@ -1,5 +1,6 @@
 import { MARKETING_ACCENTS } from "@aivo/brand";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { SITE_URL } from "@/lib/constants";
 import { NumberedSteps, CalloutCard, MockupShowcase } from "@/components/marketing/sections";
@@ -48,12 +49,13 @@ const PRIORITY_LOGIC = [
   },
 ];
 
-export default function Page() {
+export default async function Page() {
+  const t = await getTranslations("marketing.page_features_todays_mission");
   return (
     <LandingPageLayout
       badge="Feature · Today's Mission"
       badgeColor={MARKETING_ACCENTS.purple}
-      title="One next-best learning action, every day"
+      title={t("page_title")}
       subtitle="Today's Mission is the calm answer to “what should my child work on right now?” — one clear lesson, picked for this learner, today."
       primaryCtaLabel="Start parent setup"
       secondaryCtaLabel="See how LessonRun works"
@@ -67,7 +69,7 @@ export default function Page() {
       {/* §2 Problem */}
       <CalloutCard
         eyebrow="The problem"
-        title="Learners get lost in dashboards"
+        title={t("problem_title")}
         body={
           <p>
             Most learning products give kids a menu — units, lessons, badges, streaks — and ask a
@@ -92,14 +94,14 @@ export default function Page() {
         mockup={
           <div className="space-y-3">
             <div className="rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 p-4 text-white">
-              <p className="text-xs uppercase tracking-wider text-purple-100">Today's mission</p>
-              <h3 className="mt-1 font-heading text-xl font-bold">Multiplying by 3s</h3>
-              <p className="mt-1 text-xs text-purple-100">With Atlas · ~15 minutes · Math</p>
+              <p className="text-xs uppercase tracking-wider text-purple-100">{t("mockup_todays_mission")}</p>
+              <h3 className="mt-1 font-heading text-xl font-bold">{t("mockup_lesson_title")}</h3>
+              <p className="mt-1 text-xs text-purple-100">{t("mockup_lesson_meta")}</p>
             </div>
             <div className="rounded-lg bg-slate-900 py-2.5 text-center text-sm font-semibold text-white">
-              Start mission →
+              {t("mockup_start_mission")}
             </div>
-            <p className="text-xs text-slate-500">Read-aloud and break mode are on for Maya.</p>
+            <p className="text-xs text-slate-500">{t("mockup_accessibility_note")}</p>
           </div>
         }
       />
@@ -149,7 +151,7 @@ export default function Page() {
       {/* §6 Parent / teacher visibility */}
       <CalloutCard
         eyebrow="For parents and teachers"
-        title="Plain-language visibility, not a data dump"
+        title={t("visibility_title")}
         body={
           <>
             <p>

@@ -1,5 +1,6 @@
 import { MARKETING_ACCENTS } from "@aivo/brand";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { LegalPageLayout } from "@/components/marketing/legal/LegalPageLayout";
 import { SITE_URL } from "@/lib/constants";
 
@@ -10,11 +11,12 @@ export const metadata: Metadata = {
   alternates: { canonical: `${SITE_URL}/security` },
 };
 
-export default function SecurityPage() {
+export default async function SecurityPage() {
+  const t = await getTranslations("marketing.page_security");
   return (
     <LegalPageLayout
       badge="Security"
-      title="How we protect your data."
+      title={t("title")}
       subtitle="AIVO is designed to support the security expectations of families and schools. This page is procurement-friendly: it describes what we actually do today, what we're building toward, and how to reach our security team."
       icon="🛡️"
       accentColor={MARKETING_ACCENTS.tealDeep}

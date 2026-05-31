@@ -81,7 +81,7 @@ export default function SignUpPage() {
               label={t("invite_label")}
               value={invite}
               onChange={(e) => setInvite(e.target.value)}
-              placeholder="e.g. SCHOOL-7Q4M-2025"
+              placeholder={t("code_placeholder")}
               helper={t("invite_helper")}
               autoComplete="one-time-code"
             />
@@ -91,7 +91,7 @@ export default function SignUpPage() {
             label={t("name_label")}
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="First and last name"
+            placeholder={t("name_placeholder")}
             autoComplete="name"
           />
           <AuthInput

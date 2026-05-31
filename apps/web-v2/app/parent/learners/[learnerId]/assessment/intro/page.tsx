@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import {
   AssessmentShell,
@@ -65,6 +66,7 @@ export default async function AssessmentIntro({
   params: Promise<{ learnerId: string }>;
 }) {
   const session = await requirePageRole(["parent"]);
+  const t = await getTranslations("parent.learner_assessment_intro");
   const { learnerId } = await params;
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
@@ -83,7 +85,7 @@ export default async function AssessmentIntro({
         <>
           <ReassuranceCard
             tone="privacy"
-            title="Your answers stay with you"
+            title={t("reassurance_privacy_title")}
             body="Stored on your account. Never displayed to your learner or shared with other parents."
             icon={
               <svg
@@ -104,7 +106,7 @@ export default async function AssessmentIntro({
           />
           <ReassuranceCard
             tone="info"
-            title="No diagnosis required"
+            title={t("reassurance_no_diagnosis_title")}
             body="Pick whatever feels right. AIVO doesn't need a formal label — only what helps day to day."
           />
         </>
@@ -121,7 +123,7 @@ export default async function AssessmentIntro({
                 href={`/parent/learners/${learner.id}`}
                 className={ASSESSMENT_BACK_CLASS}
               >
-                Not now
+                {t("not_now")}
               </Link>
             }
             primary={

@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -10,6 +11,7 @@ const TIER_TONE = { tier1: "danger", tier2: "warning", tier3: "neutral" } as con
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_security_vendors");
   const vendors = listVendors();
   const subprocessors = vendors.filter((v) => v.processesLearnerData);
 
@@ -22,12 +24,12 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Security"
-        title="Vendor & subprocessor inventory"
+        title={t("title")}
         description="Anyone processing learner data appears in the public subprocessor list."
       />
       <Card className="mb-6 p-[var(--aivo-density-card-pad)]">
         <p className="mb-1 font-display text-base font-semibold">
-          Subprocessors (process learner data)
+          {t("subprocessors_heading")}
         </p>
         <p className="mb-3 text-xs text-aivo-muted">
           {subprocessors.length} on file · IL SOPPA + NY 2-d compliant disclosure.
@@ -61,7 +63,7 @@ export default async function Page() {
                 <Badge tone={v.approved ? "success" : "warning"}>
                   {v.approved ? "Approved" : "Pending"}
                 </Badge>
-                {v.processesLearnerData && <Badge tone="warning">Learner data</Badge>}
+                {v.processesLearnerData && <Badge tone="warning">{t("badge_learner_data")}</Badge>}
               </div>
             </div>
             {v.notes && <p className="mb-2 text-sm text-aivo-ink-soft">{v.notes}</p>}

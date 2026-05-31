@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
+import { getTranslations } from "next-intl/server";
 import {
   getCurrentSkillVersion,
   listAssessmentBlueprints,
@@ -18,6 +19,7 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function Page() {
+  const t = await getTranslations("admin.platform_curriculum_skills");
   const session = await requirePageRole(["platform_admin"]);
   const subjects = await listSubjects();
   const subjectById = new Map(subjects.map((s) => [s.id, s]));
@@ -33,7 +35,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Curriculum"
-        title="Skills"
+        title={t("title")}
         description="Every skill maps to a subject, a grade band, and (optionally) one or more standards. AI generation refuses to write a lesson that has no active skill version."
       />
       <Card className="p-0 overflow-hidden">
@@ -41,12 +43,12 @@ export default async function Page() {
           <thead className="bg-aivo-surface-2 text-xs uppercase text-aivo-muted">
             <tr>
               <th className="px-4 py-2 text-left">Skill</th>
-              <th className="px-4 py-2 text-left">Subject</th>
-              <th className="px-4 py-2 text-left">Grade band</th>
-              <th className="px-4 py-2 text-left">Version</th>
-              <th className="px-4 py-2 text-left">Prereqs</th>
-              <th className="px-4 py-2 text-left">Standards</th>
-              <th className="px-4 py-2 text-left">Constraints</th>
+              <th className="px-4 py-2 text-left">{t("col_subject")}</th>
+              <th className="px-4 py-2 text-left">{t("col_grade_band")}</th>
+              <th className="px-4 py-2 text-left">{t("col_version")}</th>
+              <th className="px-4 py-2 text-left">{t("col_prereqs")}</th>
+              <th className="px-4 py-2 text-left">{t("col_standards")}</th>
+              <th className="px-4 py-2 text-left">{t("col_constraints")}</th>
             </tr>
           </thead>
           <tbody className="divide-y">

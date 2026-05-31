@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -9,6 +10,7 @@ import { listBillingForTenants, scopeTenantsForSession, getTenantById } from "@/
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_billing_overview");
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const accounts = listBillingForTenants(tenants.map((t) => t.id));
   const counts = accounts.reduce<Record<string, number>>((acc, a) => {
@@ -25,7 +27,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Billing"
-        title="Billing"
+        title={t("title")}
         description="Every billing account on the platform."
       />
       <div className="mb-6 grid gap-4 sm:grid-cols-4">
@@ -37,17 +39,17 @@ export default async function Page() {
         ))}
       </div>
       {accounts.length === 0 ? (
-        <EmptyState title="No billing accounts" />
+        <EmptyState title={t("empty_title")} />
       ) : (
         <Card className="overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-aivo-surface-2 text-left">
               <tr>
-                <th className="p-3">Tenant</th>
+                <th className="p-3">{t("col_tenant")}</th>
                 <th className="p-3">Type</th>
                 <th className="p-3">Plan</th>
-                <th className="p-3">Status</th>
-                <th className="p-3">Created</th>
+                <th className="p-3">{t("col_status")}</th>
+                <th className="p-3">{t("col_created")}</th>
               </tr>
             </thead>
             <tbody>

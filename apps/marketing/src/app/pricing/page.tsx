@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { SITE_URL, WEB_APP_URL } from "@/lib/constants";
 
@@ -122,11 +123,12 @@ const FAQ = [
   },
 ];
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const t = await getTranslations("marketing.page_pricing");
   return (
     <LandingPageLayout
       badge="Pricing"
-      title="Honest pricing. No surprises."
+      title={t("hero_title")}
       subtitle="Free to start. Family plans by the month. Schools and districts get a written quote — never a black-box invoice."
       breadcrumbs={[{ name: "Pricing", href: "/pricing" }]}
       finalCta={{
@@ -138,10 +140,10 @@ export default function PricingPage() {
     >
       <section aria-labelledby="family-pricing-heading">
         <h2 id="family-pricing-heading" className="font-heading text-2xl font-bold text-slate-900">
-          For families
+          {t("for_families")}
         </h2>
         <p className="mt-1 font-body text-slate-600">
-          Month-to-month. Cancel any time. 30-day money-back guarantee on paid plans.
+          {t("family_disclaimer")}
         </p>
         <div className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-3">
           {FAMILY_PLANS.map((p) => (
@@ -204,7 +206,7 @@ export default function PricingPage() {
 
       <section aria-labelledby="institutional-heading" className="mt-14">
         <h2 id="institutional-heading" className="font-heading text-2xl font-bold text-slate-900">
-          For schools and districts
+          {t("for_schools")}
         </h2>
         <p className="mt-1 font-body text-slate-600">
           Annual pricing scales with learner count and program scope. We send a written quote — not
@@ -252,7 +254,7 @@ export default function PricingPage() {
 
       <section aria-labelledby="pricing-faq-heading" className="mt-14">
         <h2 id="pricing-faq-heading" className="font-heading text-2xl font-bold text-slate-900">
-          Pricing FAQ
+          {t("pricing_faq_heading")}
         </h2>
         <dl className="mt-5 space-y-4">
           {FAQ.map((item) => (

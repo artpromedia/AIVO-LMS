@@ -1252,6 +1252,303 @@
       "cta_primary": "开始家庭试用",
       "cta_secondary": "联系学区销售",
       "cta_image_alt": "家长与孩子在沙发上一起学习"
+    },
+    "page_reset_password": {
+      "logo_aria": "AIVO 首页",
+      "heading": "重置密码",
+      "subheading": "请为您的账户选择新密码。",
+      "success_heading": "密码已更新",
+      "back_to_sign_in": "返回登录",
+      "label_new_password": "新密码",
+      "placeholder_new_password": "至少 12 个字符",
+      "label_confirm_password": "确认新密码",
+      "placeholder_confirm_password": "再次输入新密码",
+      "passwords_mismatch": "密码尚不匹配",
+      "btn_updating": "更新中……",
+      "btn_submit": "更新密码",
+      "trust_badge": "已设计以支持 COPPA · FERPA · SOC 2",
+      "loading": "加载中……"
+    },
+    "page_features_homework_helper": {
+      "page_title": "引导式帮助，绝不直接刹答案",
+      "callout_title": "作业助手不会直接给出答案",
+      "get_help_cta": "获取帮助 →",
+      "clarifying_question": "在解题之前，“总共”在这个问题中对你意味着什么？",
+      "your_answer_label": "你的回答：",
+      "explanation_text": "你把 3 加了四次，这和 3 × 4 是一样的。这就叫做",
+      "mastery_updated": "掌握度已更新：重复加法表示乘法 · 建构中。",
+      "recommended_next_label": "推荐接下来",
+      "recommended_lesson_title": "3 的乘法 · LessonRun",
+      "recommended_lesson_meta": "与 Atlas 一起 · 约 15 分钟",
+      "added_to_session": "已添加到 Maya 的下一次课程。"
+    },
+    "page_waitlist": {
+      "page_title": "预留您的位置。",
+      "form_heading": "告诉我们您孩子的情况",
+      "form_subheading": "两个必填字段。其余信息帮助我们在您的位置开放时选择正确的入学流程。",
+      "promise_heading": "我们的承诺",
+      "promise_no_spam_title": "没有垃圾邮件",
+      "promise_no_spam_body": "当您的位置开放时发一封邮件。如果您没有回复，可能会再发一封。",
+      "promise_no_sharing_title": "不分享信息",
+      "promise_no_sharing_body": "我们永远不会出售或共享您的联系信息。请查看我们的隐私政策。",
+      "promise_easy_out_title": "轻松退出",
+      "promise_easy_out_body": "回复任何候务名单邮件“移除”，我们就将删除您的记录。"
+    },
+    "page_resources": {
+      "cta_get_started": "开始",
+      "badge": "资源",
+      "heading": "指南、入门读物和阅读路径",
+      "guides_heading": "指南",
+      "guides_subheading": "适合学校、学区和采购团队的详尽实用指南。",
+      "blog_heading": "博客文章",
+      "blog_subheading": "关于学习循环如何实际运作的短文。"
+    },
+    "page_for_teachers": {
+      "assignment_title": "3 的乘法 — 第 4 周",
+      "roster_label": "名单",
+      "roster_value": "3B 班 · 22 名学生",
+      "assign_cta": "布置给全班",
+      "callout_summaries_title": "您真正会带回家的通俗语言总结",
+      "callout_accommodation_title": "适合教师查阅的支持措施总结"
+    },
+    "page_contact": {
+      "page_title": "与真实的人交流。",
+      "form_heading": "发送消息",
+      "form_subheading": "告诉我们您的需求，我们将将其转小给正确的团队。",
+      "inboxes_heading": "其他联系方式"
+    },
+    "page_blog": {
+      "nav_resources": "资源",
+      "cta_get_started": "开始",
+      "heading": "AIVO 团队笔记"
+    },
+    "page_for_schools": {
+      "callout_workflow_title": "个性化学习当它增加教师工作负担时就会失败",
+      "callout_neurodiverse_title": "专为神经多样性学习者打造",
+      "progress_summary": "Maya 的阅读正在稳定进步。"
+    },
+    "page_subjects": {
+      "page_title": "每科一位导师，专属为您孩子打造的大脑克隆。"
+    },
+    "page_signup": {
+      "logo_aria_label": "AIVO 首页",
+      "start_free_today": "今天免费开始",
+      "create_your_account": "创建您的账户",
+      "label_full_name": "全名",
+      "placeholder_name": "张三",
+      "label_password": "密码",
+      "placeholder_password": "至少 8 个字符",
+      "password_hint": "混合字母、数字和符号以获得最强安全性。",
+      "creating_account": "正在创建账户...",
+      "create_account": "创建账户",
+      "no_credit_card": "无需信用卡",
+      "privacy_policy": "隐私政策",
+      "coppa_ferpa_badge": "专为支持 COPPA 和 FERPA 设计",
+      "sign_in": "登录",
+      "footer_privacy": "隐私"
+    },
+    "page_forgot_password": {
+      "logo_aria_label": "AIVO 首页",
+      "heading": "忘记密码？",
+      "subheading": "输入您的电子邮件，我们将向您发送重置密码的链接。",
+      "check_inbox": "检查您的收件箱",
+      "if_account_exists": "如果以下邮箱存在账户：",
+      "back_to_sign_in": "返回登录",
+      "sending": "发送中...",
+      "send_reset_link": "发送重置链接",
+      "back_to_sign_in_form": "返回登录",
+      "coppa_ferpa_soc2_badge": "专为支持 COPPA · FERPA · SOC 2 设计"
+    },
+    "page_press_kit": {
+      "media_resources": "媒体资源",
+      "company_overview": "公司概览",
+      "quick_facts": "快速事实",
+      "brand_assets": "品牌资产",
+      "logo_purple_alt": "AIVO 紫色标志",
+      "primary_logo_purple": "主标志（紫色）",
+      "logo_white_alt": "AIVO 白色标志",
+      "logo_dark_bg": "深色背景上的标志",
+      "brand_colors": "品牌色彩",
+      "media_contact": "媒体联系"
+    },
+    "page_features_todays_mission": {
+      "page_title": "每天一个最佳学习行动",
+      "problem_title": "学习者在仪表板中迷失方向",
+      "mockup_todays_mission": "今日任务",
+      "mockup_lesson_title": "乘以 3",
+      "mockup_lesson_meta": "与 Atlas · 约 15 分钟 · 数学",
+      "mockup_start_mission": "开始任务 →",
+      "mockup_accessibility_note": "Maya 的朗读和休息模式已开启。",
+      "visibility_title": "清晰语言的可见性，而非数据转储"
+    },
+    "page_for_districts": {
+      "rostering_title": "支持 OneRoster、CSV 或手动名册管理",
+      "licensing_heading": "按座位授权，学区定价",
+      "accessibility_title": "以 WCAG 2.2 AA 为设计目标",
+      "accessibility_gaps_note": "我们维护无障碍声明并公布已知差距——而非仅发表声明。",
+      "dpa_title": "申请我们的安全和 DPA 套件"
+    },
+    "page_guides": {
+      "nav_resources": "资源",
+      "nav_get_started": "开始",
+      "badge": "指南",
+      "heading": "实用指南",
+      "subheading": "面向学校、学区和家庭的深度、采购友好型阅读材料。"
+    },
+    "page_compare": {
+      "eyebrow": "比较",
+      "heading": "选择您的角色，看看 AIVO 如何适合您。",
+      "see_comparison": "查看比较 →"
+    },
+    "page_for_special_education": {
+      "support_title": "支持应在学习者所在的地方与其相遇",
+      "iep_sharing_title": "共享 IEP 或住宿背景",
+      "teacher_summaries_title": "适合教师的支持摘要"
+    },
+    "page_tutors": {
+      "page_title": "十四位 AI 导师。为您的孩子量身定制的 Brain Clone。"
+    },
+    "page_about": {
+      "get_started": "立即开始",
+      "our_mission": "我们的使命",
+      "no_learner_left_behind": "不让任何学习者掉队",
+      "core_principles": "核心原则",
+      "core_principles_sub": "指导我们一切工作的基础。",
+      "our_values": "我们的价值观",
+      "our_values_sub": "作为公司和教育者，我们所坚守的信念。",
+      "meet_our_leadership": "认识我们的领导团队",
+      "linkedin_profile": "LinkedIn 主页",
+      "join_our_mission": "加入我们的使命",
+      "view_open_positions": "查看开放职位",
+      "contact_us": "联系我们",
+      "privacy": "隐私政策",
+      "accessibility": "无障碍"
+    },
+    "page_for_parents": {
+      "iep_title": "IEP 或无障碍支持信息，妥善处理",
+      "reading_question": "您的孩子对阅读的感受如何？",
+      "answers_saved": "答案已自动保存。",
+      "aivo_disclaimer": "AIVO 不做诊断。AIVO 不能替代治疗师、IEP 团队或专科医生。",
+      "take_a_breath": "深呼吸。没有计时器。",
+      "which_word_means": "哪个词与",
+      "need_a_break": "需要休息一下？",
+      "todays_mission": "今日任务",
+      "multiplying_by_3s": "乘以 3",
+      "with_atlas": "与 Atlas · 约 15 分钟",
+      "start_mission": "开始任务 →",
+      "maya_strong_week": "Maya 这周表现非常出色！"
+    },
+    "page_demo": {
+      "hero_title": "亲眼见证 AIVO 的实力。",
+      "form_heading": "请简单介绍一下您的使用场景",
+      "form_subheading": "我们了解得越多，演示就越有针对性。必填字段已标注。",
+      "what_happens_next": "接下来会发生什么",
+      "step1_label": "第 1 步 · 1 个工作日内",
+      "step2_label": "第 2 步 · 30 分钟演示",
+      "step2_body": "我们展示学习者、家长和教师的视图，并现场回答您的问题。",
+      "step3_label": "第 3 步 · 试点或提案",
+      "step3_body": "如果合适，我们会安排一次短期试点或发送书面提案——没有任何压力。"
+    },
+    "page_features_lessonrun": {
+      "hero_title": "每节 AIVO 课程背后的个性化学习单元",
+      "voice_support_title": "每个步骤均提供语音支持",
+      "break_mode_title": "平静的暂停——而非愤怒退出",
+      "count_by_3s_prompt": "让我们以 3 为单位数到 12。从 3 开始，下一个是什么？",
+      "hint_counting_fingers": "试着用手指数数：3 · 6 · ?——比 6 多三的数字是什么？",
+      "need_another_hint": "需要再来一个提示吗？",
+      "maya_strong_week": "Maya 这周表现非常出色！"
+    },
+    "page_careers": {
+      "page_title": "加入 AIVO 团队",
+      "why_work_heading": "为什么在 AIVO 工作？",
+      "open_positions_heading": "开放职位",
+      "apply_now": "立即申请",
+      "no_role_heading": "没有看到适合您的职位？",
+      "send_general_application": "发送通用申请"
+    },
+    "page_pricing": {
+      "hero_title": "诚实定价，没有隐藏费用。",
+      "for_families": "面向家庭",
+      "family_disclaimer": "按月计费，随时取消，付费计划享有 30 天退款保证。",
+      "for_schools": "面向学校和学区",
+      "pricing_faq_heading": "定价常见问题"
+    },
+    "page_features": {
+      "eyebrow": "功能特色",
+      "heading": "真实的学习体验，而非功能清单。",
+      "learn_more": "了解更多 →"
+    },
+    "page_thank_you": {
+      "hero_title": "已收到——感谢您！",
+      "while_you_wait": "在等待期间"
+    },
+    "page_levels": {
+      "hero_title": "五个级别。一个平台。每位学习者。"
+    },
+    "page_accessibility": {
+      "title": "AIVO Accessibility Statement"
+    },
+    "page_cookie_policy": {
+      "title": "Cookie Policy"
+    },
+    "page_coppa_compliance": {
+      "title": "COPPA Compliance Statement"
+    },
+    "page_ferpa_compliance": {
+      "title": "FERPA Compliance Statement"
+    },
+    "page_privacy_policy": {
+      "title": "AIVO Privacy Policy"
+    },
+    "page_security": {
+      "title": "How we protect your data."
+    },
+    "page_subprocessors": {
+      "get_started": "Get Started",
+      "badge": "Subprocessors",
+      "heading": "AIVO subprocessors",
+      "current_subprocessors": "Current subprocessors",
+      "col_subprocessor": "Subprocessor",
+      "col_purpose": "Purpose",
+      "col_data_category": "Data category",
+      "col_region": "Region",
+      "col_status": "Status",
+      "how_we_use_heading": "How we use this list",
+      "reporting_heading": "Reporting subprocessor changes",
+      "questions_heading": "Questions?",
+      "footer_privacy": "Privacy",
+      "footer_security": "Security",
+      "footer_accessibility": "Accessibility"
+    },
+    "page_terms_of_service": {
+      "title": "AIVO Terms of Service"
+    },
+    "page_trust": {
+      "title": "What we promise — and how to check."
+    },
+    "page_compare_detail": {
+      "aivo_best_for": "AIVO 最适合",
+      "side_by_side": "并排比较",
+      "col_feature": "功能",
+      "honest_note": "来自我们的诚实说明",
+      "other_comparisons": "其他比较"
+    },
+    "page_levels_detail": {
+      "who_its_for": "适合人群",
+      "whats_included": "包含内容",
+      "builtin_accommodations": "内置适应功能",
+      "sample_activities": "示例活动",
+      "other_levels": "其他级别"
+    },
+    "page_subjects_detail": {
+      "key_features": "主要功能",
+      "topics_covered": "涵盖主题",
+      "other_subjects": "其他科目"
+    },
+    "page_tutors_detail": {
+      "built_for_every_learner": "为每位学习者而建",
+      "other_tutors": "其他 AIVO 辅导员",
+      "see_all_tutors": "查看全部 14 位辅导员 →"
     }
   }
 }

@@ -1,4 +1,5 @@
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -14,6 +15,7 @@ export default async function Page() {
   const stats = getDistrictStats(tenantIds);
   const rows = await listDistrictLearners(tenantIds);
 
+  const t = await getTranslations("admin.district_iep");
   const pct = stats.learners > 0 ? Math.round((stats.ieps / stats.learners) * 100) : 0;
 
   const decisionTone = (d: "uploaded" | "skipped" | null): "success" | "neutral" | "warning" =>
@@ -31,7 +33,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="District admin"
-        title="IEP compliance"
+        title={t("title")}
         description="Track which district learners have IEPs uploaded, skipped, or still pending."
       />
 
@@ -64,14 +66,14 @@ export default async function Page() {
           </p>
         </div>
         {rows.length === 0 ? (
-          <EmptyState title="No learners in this district yet" />
+          <EmptyState title={t("empty_title")} />
         ) : (
           <table className="w-full text-sm">
             <thead className="bg-aivo-surface-2 text-left text-xs font-semibold uppercase tracking-wide text-aivo-muted">
               <tr>
-                <th className="px-4 py-2">Learner</th>
-                <th className="px-4 py-2">School</th>
-                <th className="px-4 py-2">Family</th>
+                <th className="px-4 py-2">{t("col_learner")}</th>
+                <th className="px-4 py-2">{t("col_school")}</th>
+                <th className="px-4 py-2">{t("col_family")}</th>
                 <th className="px-4 py-2">Grade</th>
                 <th className="px-4 py-2">IEP</th>
               </tr>

@@ -6,6 +6,7 @@
  */
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Eye, Ear, Hand, Compass, Dumbbell } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { requirePageRole } from "@/lib/auth/server";
@@ -90,6 +91,7 @@ export default async function ParentSensoryPage({
 }: {
   params: Promise<{ learnerId: string }>;
 }) {
+  const t = await getTranslations("parent.learner_sensory");
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
@@ -109,11 +111,11 @@ export default async function ParentSensoryPage({
     >
       <PageHeader
         eyebrow={learner.displayName}
-        title="Sensory profile"
+        title={t("title")}
         description="How your learner responds to sensory input. Lessons are adapted in real time to match this profile."
       />
 
-      <SectionHeader title="Modalities" />
+      <SectionHeader title={t("modalities")} />
       <div className="grid gap-4 lg:grid-cols-2">
         {MODALITIES.map((m) => {
           const Icon = m.icon;
@@ -133,11 +135,11 @@ export default async function ParentSensoryPage({
                   <p className="mt-1 text-sm text-aivo-ink-soft">{m.question}</p>
                   <dl className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
                     <div className="rounded-md bg-aivo-surface-soft p-2">
-                      <dt className="font-medium text-aivo-ink">Hyper-sensitive</dt>
+                      <dt className="font-medium text-aivo-ink">{t("hyper_sensitive")}</dt>
                       <dd className="text-aivo-ink-soft">{m.hyper}</dd>
                     </div>
                     <div className="rounded-md bg-aivo-surface-soft p-2">
-                      <dt className="font-medium text-aivo-ink">Hypo-sensitive</dt>
+                      <dt className="font-medium text-aivo-ink">{t("hypo_sensitive")}</dt>
                       <dd className="text-aivo-ink-soft">{m.hypo}</dd>
                     </div>
                   </dl>
@@ -148,7 +150,7 @@ export default async function ParentSensoryPage({
         })}
       </div>
 
-      <SectionHeader title="Notes" />
+      <SectionHeader title={t("notes")} />
       <Card className="p-[var(--aivo-density-card-pad)]">
         {profile?.notes ? (
           <p className="text-sm">{profile.notes}</p>

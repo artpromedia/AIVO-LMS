@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +12,7 @@ type Params = { searchParams: Promise<{ schoolId?: string }> };
 
 export default async function Page({ searchParams }: Params) {
   const session = await requirePageRole(["school_admin", "district_admin", "platform_admin"]);
+  const t = await getTranslations("admin.school_classes");
   const params = await searchParams;
   const schools = await listSchools(session.role === "platform_admin" ? undefined : session.tenantId);
   const classrooms = await listClassrooms({ tenantId: session.tenantId, schoolId: params.schoolId });
@@ -24,7 +26,7 @@ export default async function Page({ searchParams }: Params) {
     >
       <PageHeader
         eyebrow="School admin"
-        title="Classes"
+        title={t("title")}
         description="Every classroom in your tenant. Filter by school using the links below."
       />
 
@@ -50,7 +52,7 @@ export default async function Page({ searchParams }: Params) {
 
       {classrooms.length === 0 ? (
         <EmptyState
-          title="No classes yet"
+          title={t("empty")}
           description="Run a roster import or use the AIVO API to create classes."
         />
       ) : (

@@ -1,4 +1,5 @@
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -10,6 +11,7 @@ import { getStore } from "@/lib/db/store";
 
 export default async function Page() {
   const session = await requirePageRole(["school_admin"]);
+  const t = await getTranslations("admin.school_learners");
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const ids = new Set(tenants.map((t) => t.id));
   const learners = Array.from(getStore().learnerProfiles.values()).filter((l) =>
@@ -25,20 +27,20 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="School admin"
-        title="Learners"
+        title={t("title")}
         description="Every learner whose family is rostered under this school."
       />
       {learners.length === 0 ? (
-        <EmptyState title="No learners rostered" />
+        <EmptyState title={t("empty")} />
       ) : (
         <Card className="overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-aivo-surface-2 text-left">
               <tr>
-                <th className="p-3">Learner</th>
+                <th className="p-3">{t("col_learner")}</th>
                 <th className="p-3">Grade</th>
-                <th className="p-3">Readiness</th>
-                <th className="p-3">Functioning level</th>
+                <th className="p-3">{t("col_readiness")}</th>
+                <th className="p-3">{t("col_fl")}</th>
               </tr>
             </thead>
             <tbody>

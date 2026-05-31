@@ -8,6 +8,7 @@
  * deep into the actionable surface.
  */
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
@@ -72,6 +73,7 @@ function greetingName(displayName: string): string {
 
 export default async function TeacherHome() {
   const session = await requirePageRole(["teacher"]);
+  const t = await getTranslations("teacher.home");
   const first = greetingName(session.displayName);
 
   const learners = await listLearnersForTeacher(session.userId, session.tenantId);
@@ -174,7 +176,7 @@ export default async function TeacherHome() {
             href="/teacher/insights?filter=needs_support"
             className="inline-flex items-center gap-2 rounded-iw-control px-5 py-3 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
           >
-            Open the needs-support list
+            {t("open_needs_support_list")}
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M5 12h14" />
               <path d="m13 5 7 7-7 7" />
@@ -236,7 +238,7 @@ export default async function TeacherHome() {
               <p className="text-xs text-iw-text-muted leading-relaxed">{i.body}</p>
             </div>
             <span className="text-xs font-semibold text-[var(--aivo-sensory-primary)] group-hover:underline">
-              Open →
+              {t("open_arrow")}
             </span>
           </Link>
         ))}
@@ -244,23 +246,23 @@ export default async function TeacherHome() {
 
       <section className="mt-8 flex flex-col gap-3">
         <header className="flex items-center justify-between gap-3 flex-wrap">
-          <h2 className="text-xl font-semibold text-iw-text-strong">Your roster</h2>
+          <h2 className="text-xl font-semibold text-iw-text-strong">{t("your_roster")}</h2>
           <Link
             href="/teacher/learners"
             className="text-sm font-semibold text-[var(--aivo-sensory-primary)] hover:underline"
           >
-            See all learners →
+            {t("see_all_learners")}
           </Link>
         </header>
         <div className="grid gap-3 md:grid-cols-2">
           {learners.length === 0 ? (
             <div className="md:col-span-2 rounded-iw-card-lg border-2 border-dashed border-iw-border bg-white p-5 flex items-center justify-center">
               <EmptyState
-                title="No learners yet"
+                title={t("no_learners_yet")}
                 body="When a parent invites you to a learner's care team, they'll appear here."
                 action={
                   <Button type="button" variant="outline" size="sm" disabled>
-                    Connect roster
+                    {t("connect_roster")}
                   </Button>
                 }
               />
@@ -269,7 +271,7 @@ export default async function TeacherHome() {
             <GlassCard
               elevation="raised"
               density="comfortable"
-              title="Roster snapshot"
+              title={t("roster_snapshot")}
               description={`${learners.length} learner${learners.length === 1 ? "" : "s"} · ${iepCount} IEP${iepCount === 1 ? "" : "s"} · ${baselinePending} awaiting baseline`}
             >
               <div className="flex items-center justify-between gap-3 mt-2">
@@ -322,11 +324,11 @@ export default async function TeacherHome() {
           {learners.length > 0 ? (
             <div className="rounded-iw-card-lg border-2 border-dashed border-iw-border bg-white p-5 flex items-center justify-center">
               <EmptyState
-                title="Add another class"
+                title={t("add_another_class")}
                 body="Roster sync from Google Classroom, Clever, or ClassLink lands here."
                 action={
                   <Button type="button" variant="outline" size="sm" disabled>
-                    Connect roster
+                    {t("connect_roster")}
                   </Button>
                 }
               />

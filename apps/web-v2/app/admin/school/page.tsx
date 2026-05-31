@@ -6,6 +6,7 @@
  */
 import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import {
   FloatingMetricCard,
@@ -38,6 +39,7 @@ function relativeTime(iso: string | null): string {
 
 export default async function SchoolAdminHome() {
   const session = await requirePageRole(["school_admin"]);
+  const t = await getTranslations("admin.school_overview");
   const tenantId = (session as { tenantId?: string }).tenantId ?? "";
 
   // Server-side fetch — no client round-trip. If no tenant is in scope
@@ -84,7 +86,7 @@ export default async function SchoolAdminHome() {
       user={{ displayName: session.displayName, email: session.email }}
     >
       <header className="flex flex-col gap-2 mb-6">
-        <p className="iw-label text-iw-text-muted">School admin</p>
+        <p className="iw-label text-iw-text-muted">{t("school_admin")}</p>
         <h1
           className="text-2xl md:text-3xl font-semibold text-iw-text-strong"
           data-testid="school-name"
@@ -131,7 +133,7 @@ export default async function SchoolAdminHome() {
         <GlassCard
           elevation="raised"
           density="comfortable"
-          title="Rostering health"
+          title={t("card_rostering_health")}
           description={`Last sync · ${relativeTime(ros.lastSyncIso)}`}
           actions={
             <InsightChip tone={rosteringTone === "error" ? "warning" : rosteringTone} size="md">
@@ -147,11 +149,11 @@ export default async function SchoolAdminHome() {
         >
           <ul className="text-sm space-y-1.5 text-iw-text-muted">
             <li className="flex items-center justify-between">
-              <span>Source</span>
+              <span>{t("source")}</span>
               <span className="text-iw-text-strong font-semibold">{ros.source}</span>
             </li>
             <li className="flex items-center justify-between">
-              <span>Last sync</span>
+              <span>{t("last_sync")}</span>
               <span className="text-iw-text-strong">{relativeTime(ros.lastSyncIso)}</span>
             </li>
           </ul>
@@ -159,14 +161,14 @@ export default async function SchoolAdminHome() {
             href="/admin/school/staff"
             className="text-sm font-semibold text-[var(--aivo-sensory-primary)] hover:underline mt-2"
           >
-            Manage rostering →
+            {t("manage_rostering")}
           </Link>
         </GlassCard>
 
         <GlassCard
           elevation="raised"
           density="comfortable"
-          title="Consent & compliance"
+          title={t("card_consent_compliance")}
           description="COPPA / FERPA / IEP"
           actions={
             <InsightChip tone={consentTone} size="md">
@@ -176,15 +178,15 @@ export default async function SchoolAdminHome() {
         >
           <ul className="text-sm space-y-1.5 text-iw-text-muted">
             <li className="flex items-center justify-between">
-              <span>Consent complete</span>
+              <span>{t("consent_complete")}</span>
               <span className="text-iw-text-strong font-semibold tabular-nums">{consentPct}%</span>
             </li>
             <li className="flex items-center justify-between">
-              <span>IEPs on file</span>
+              <span>{t("ieps_on_file")}</span>
               <span className="text-iw-text-strong font-semibold tabular-nums">{ieps}</span>
             </li>
             <li className="flex items-center justify-between">
-              <span>Audit events (30d)</span>
+              <span>{t("audit_events_30d")}</span>
               <span className="text-iw-text-strong font-semibold tabular-nums">{audit30}</span>
             </li>
           </ul>
@@ -192,14 +194,14 @@ export default async function SchoolAdminHome() {
             href="/admin/school/compliance"
             className="text-sm font-semibold text-[var(--aivo-sensory-primary)] hover:underline mt-2"
           >
-            Open compliance →
+            {t("open_compliance")}
           </Link>
         </GlassCard>
 
         <GlassCard
           elevation="raised"
           density="comfortable"
-          title="AI safety"
+          title={t("card_ai_safety")}
           description="Tutor & lesson filters"
           actions={
             <InsightChip tone={safetyTone} size="md">
@@ -209,7 +211,7 @@ export default async function SchoolAdminHome() {
         >
           <ul className="text-sm space-y-1.5 text-iw-text-muted">
             <li className="flex items-center justify-between">
-              <span>Flagged (7d)</span>
+              <span>{t("flagged_7d")}</span>
               <span className="text-iw-text-strong font-semibold tabular-nums">{flagged7}</span>
             </li>
           </ul>
@@ -217,14 +219,14 @@ export default async function SchoolAdminHome() {
             href="/admin/school/compliance"
             className="text-sm font-semibold text-[var(--aivo-sensory-primary)] hover:underline mt-2"
           >
-            Review safety logs →
+            {t("review_safety_logs")}
           </Link>
         </GlassCard>
 
         <GlassCard
           elevation="raised"
           density="comfortable"
-          title="License utilization"
+          title={t("card_license_util")}
           description="Family + school plans"
           actions={
             <InsightChip tone={lic.utilizationPct > 90 ? "warning" : "info"} size="md">
@@ -249,7 +251,7 @@ export default async function SchoolAdminHome() {
             href="/admin/school/reports"
             className="text-sm font-semibold text-[var(--aivo-sensory-primary)] hover:underline mt-2"
           >
-            Open reports →
+            {t("open_reports")}
           </Link>
         </GlassCard>
       </section>

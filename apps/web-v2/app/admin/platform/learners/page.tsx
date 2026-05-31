@@ -1,4 +1,5 @@
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -25,6 +26,7 @@ const FL_TONE: Record<string, "primary" | "success" | "neutral" | "warning"> = {
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_learners");
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const learners = await listLearnersForTenants(tenants.map((t) => t.id));
   const tenantById = new Map(tenants.map((t) => [t.id, t]));
@@ -59,7 +61,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform"
-        title="Learners"
+        title={t("title")}
         description="Every learner profile across every tenant on the platform."
         actions={<Badge tone="neutral">{learners.length.toLocaleString()} learners</Badge>}
       />
@@ -67,7 +69,7 @@ export default async function Page() {
       <div className="grid gap-4 sm:grid-cols-3">
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            IEPs on file
+            {t("iep_on_file")}
           </p>
           <p className="mt-1 font-display text-3xl font-bold">{iepOnFile.toLocaleString()}</p>
           <p className="mt-1 text-xs text-aivo-ink-soft">
@@ -78,23 +80,23 @@ export default async function Page() {
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            IEP skipped
+            {t("iep_skipped")}
           </p>
           <p className="mt-1 font-display text-3xl font-bold">{iepSkipped.toLocaleString()}</p>
-          <p className="mt-1 text-xs text-aivo-ink-soft">Parent opt-out recorded</p>
+          <p className="mt-1 text-xs text-aivo-ink-soft">{t("parent_opt_out")}</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            IEP pending
+            {t("iep_pending")}
           </p>
           <p className="mt-1 font-display text-3xl font-bold">{iepPending.toLocaleString()}</p>
-          <p className="mt-1 text-xs text-aivo-ink-soft">No decision yet</p>
+          <p className="mt-1 text-xs text-aivo-ink-soft">{t("no_decision")}</p>
         </Card>
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="font-display text-lg font-semibold">Functioning level mix</p>
+          <p className="font-display text-lg font-semibold">{t("fl_mix")}</p>
           <ul className="mt-3 space-y-2 text-sm">
             {Object.entries(FL_LABEL).map(([k, label]) => {
               const n = flCounts[k] ?? 0;
@@ -125,7 +127,7 @@ export default async function Page() {
         </Card>
 
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="font-display text-lg font-semibold">Grade band</p>
+          <p className="font-display text-lg font-semibold">{t("grade_band")}</p>
           <ul className="mt-3 grid grid-cols-2 gap-2 text-sm">
             {Object.entries(byGrade)
               .sort((a, b) => b[1] - a[1])
@@ -149,18 +151,18 @@ export default async function Page() {
           </p>
         </div>
         {recent.length === 0 ? (
-          <EmptyState title="No learners yet" />
+          <EmptyState title={t("empty")} />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-aivo-surface-2 text-left text-xs font-semibold uppercase tracking-wide text-aivo-muted">
                 <tr>
-                  <th className="px-4 py-2">Learner</th>
-                  <th className="px-4 py-2">Tenant</th>
+                  <th className="px-4 py-2">{t("col_learner")}</th>
+                  <th className="px-4 py-2">{t("col_tenant")}</th>
                   <th className="px-4 py-2">Grade</th>
-                  <th className="px-4 py-2">Functioning level</th>
+                  <th className="px-4 py-2">{t("col_fl")}</th>
                   <th className="px-4 py-2">IEP</th>
-                  <th className="px-4 py-2">Created</th>
+                  <th className="px-4 py-2">{t("col_created")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-aivo-border">
@@ -177,7 +179,7 @@ export default async function Page() {
                         {fl ? (
                           <Badge tone={FL_TONE[fl] ?? "neutral"}>{FL_LABEL[fl]}</Badge>
                         ) : (
-                          <span className="text-xs text-aivo-ink-soft">Unassigned</span>
+                          <span className="text-xs text-aivo-ink-soft">{t("unassigned")}</span>
                         )}
                       </td>
                       <td className="px-4 py-3">

@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -19,6 +20,7 @@ const STATUS_TONE = {
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_security_state_privacy");
   const reqs = listStatePrivacyRequirements();
   const controls = listSecurityControls();
 
@@ -31,7 +33,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Security"
-        title="State privacy law matrix"
+        title={t("title")}
         description="FERPA, COPPA, SOPIPA, NY 2-d, IL SOPPA, Colorado, Connecticut, and the Student Privacy Pledge — mapped to our controls."
       />
       <div className="space-y-3">
@@ -48,7 +50,7 @@ export default async function Page() {
               </div>
               <p className="mb-2 text-sm text-aivo-ink-soft">{r.summary}</p>
               <p className="mb-3 text-sm">
-                <span className="font-semibold">Obligation: </span>
+                <span className="font-semibold">{t("label_obligation")} </span>
                 {r.obligation}
               </p>
               <div className="rounded-lg border border-aivo-border bg-aivo-surface-soft p-3">
@@ -56,7 +58,7 @@ export default async function Page() {
                   Mapped controls ({mappings.length})
                 </p>
                 {mappings.length === 0 ? (
-                  <p className="text-sm text-aivo-danger">No control mapped yet — this is a gap.</p>
+                  <p className="text-sm text-aivo-danger">{t("no_control_mapped")}</p>
                 ) : (
                   <ul className="space-y-2 text-sm">
                     {mappings.map((m) => {

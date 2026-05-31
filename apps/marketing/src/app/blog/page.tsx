@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { WEB_APP_URL, SITE_URL } from "@/lib/constants";
 import { getArticlesByKind } from "@/lib/content";
@@ -12,7 +13,8 @@ export const metadata: Metadata = {
   alternates: { canonical: `${SITE_URL}/blog` },
 };
 
-export default function BlogIndexPage() {
+export default async function BlogIndexPage() {
+  const t = await getTranslations("marketing.page_blog");
   const posts = getArticlesByKind("blog");
   return (
     <div className="min-h-screen bg-white">
@@ -34,13 +36,13 @@ export default function BlogIndexPage() {
               href="/resources"
               className="hidden min-h-[44px] items-center rounded-lg px-5 py-2 font-semibold text-slate-600 transition hover:text-primary sm:inline-flex"
             >
-              Resources
+              {t("nav_resources")}
             </Link>
             <a
               href={`${WEB_APP_URL}/signup?plan=free`}
               className="inline-flex min-h-[44px] items-center rounded-full bg-primary px-5 py-2.5 font-bold text-white shadow-lg shadow-purple-200 transition hover:bg-primary-dark"
             >
-              Get Started
+              {t("cta_get_started")}
             </a>
           </div>
         </div>
@@ -52,7 +54,7 @@ export default function BlogIndexPage() {
             Blog
           </span>
           <h1 className="mt-4 font-heading text-4xl font-bold leading-tight text-slate-900 md:text-5xl">
-            Notes from the AIVO team
+            {t("heading")}
           </h1>
           <p className="mt-3 max-w-2xl font-body text-lg text-slate-500">
             Short, honest writing about how personalized learning actually works — for parents,

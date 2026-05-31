@@ -91,7 +91,20 @@
       "reassure_safety_title": "안전 항목은 항상 긴급합니다",
       "reassure_safety_body": "안전 관련 항목이 나타나면 이 목록 맨 위로 올라가고 즉시 알려드립니다.",
       "prefs_title": "전달 환경설정",
-      "prefs_desc": "각 채널로 어떤 업데이트를 받을지 선택하세요."
+      "prefs_desc": "각 채널로 어떤 업데이트를 받을지 선택하세요.",
+      "mark_all_read": "모두 읽음으로 표시",
+      "mark_read": "읽음으로 표시",
+      "new_badge": "새 항목",
+      "unread_count": "읽지 않음 {count}개",
+      "prefs_quiet_hours": "방해 금지 시간",
+      "prefs_quiet_hours_placeholder": "예: 22:00-07:00",
+      "prefs_digest_cadence": "요약 주기",
+      "prefs_cadence_daily": "매일",
+      "prefs_cadence_weekly": "매주",
+      "prefs_cadence_off": "끄기",
+      "prefs_saving": "저장 중…",
+      "prefs_save": "환경설정 저장",
+      "prefs_saved": "저장됨."
     },
     "privacy": {
       "eyebrow": "개인정보",
@@ -123,7 +136,16 @@
       "th_scope": "범위",
       "th_target": "대상",
       "th_status": "상태",
-      "whole_account": "계정 전체"
+      "whole_account": "계정 전체",
+      "form_confirm_error": "확인하려면 DELETE를 입력하세요.",
+      "form_question": "무엇을 삭제하시겠습니까?",
+      "form_scope_account": "내 계정 전체(모든 학습자, 모든 기록)",
+      "form_scope_learner": "학습자 한 명(해당 학습자의 모든 데이터)",
+      "form_scope_iep": "업로드한 IEP 문서만",
+      "form_learner_label": "학습자",
+      "form_no_learners": "학습자 없음",
+      "form_notes_label": "메모(선택 사항)",
+      "form_confirm_label": "확인하려면 <mono>DELETE</mono>를 입력하세요"
     },
     "privacy_export": {
       "eyebrow": "개인정보",
@@ -135,7 +157,15 @@
       "th_scope": "범위",
       "th_status": "상태",
       "th_completed": "완료일",
-      "all_my_data": "내 모든 데이터"
+      "all_my_data": "내 모든 데이터",
+      "form_scope_label": "범위",
+      "form_all_my_data_full": "내 모든 데이터(계정 + 모든 학습자)",
+      "form_just_learner": "{name}만",
+      "form_notes_label": "메모(선택 사항)",
+      "form_notes_placeholder": "알려주실 내용이 있나요?",
+      "form_submitting": "제출 중…",
+      "form_submit": "내보내기 요청",
+      "form_email_when_ready": "내보내기가 준비되면 이메일로 알려드립니다. 내보내기는 보통 24시간 이내에 완료됩니다."
     },
     "billing": {
       "eyebrow": "설정 · 결제",
@@ -159,7 +189,434 @@
       "choose_plan": "요금제 선택",
       "recent_invoices": "최근 청구서",
       "no_invoices_title": "아직 청구서가 없습니다",
-      "no_invoices_body": "각 결제 기간이 마감되면 청구서가 여기에 표시됩니다."
+      "no_invoices_body": "각 결제 기간이 마감되면 청구서가 여기에 표시됩니다.",
+      "sub_current_badge": "현재",
+      "sub_set_to_cancel": "기간 종료 시 취소되도록 설정됨.",
+      "sub_free_trial": "{days}일 무료 체험",
+      "sub_current_plan": "현재 요금제",
+      "sub_working": "처리 중...",
+      "sub_switch": "이 요금제로 변경",
+      "sub_canceling": "취소 중...",
+      "sub_cancel_at_period_end": "기간 종료 시 취소"
+    },
+    "learner_assessment_intro": {
+      "reassurance_privacy_title": "답변은 나만 볼 수 있어요",
+      "reassurance_no_diagnosis_title": "진단이 필요하지 않아요",
+      "not_now": "지금은 아니에요"
+    },
+    "learner_assessment": {
+      "placeholder_pronouns": "그녀 / 그녀의, 그 / 그의, they / them…",
+      "placeholder_languages": "한국어, 영어",
+      "placeholder_diagnoses_other": "예: APD, 경도 난청",
+      "placeholder_loves": "공룡. 레고로 만들기. 할머니와 요리하기.",
+      "placeholder_good_at": "가사 외우기, 만들기, 그림 그리기, 친절함",
+      "placeholder_motivates": "자신의 기록 깨기. 아빠에게 보여주기. 멋진 우주 사실.",
+      "placeholder_frustration_triggers": "긴 독해 지문.\n타이머.\n시끄러운 공간.",
+      "placeholder_calming_strategies": "짧은 산책.\n물 마시기 + 2분 화면 쉬기.\n노이즈 캔슬링 헤드폰.",
+      "placeholder_accommodations": "시험 시간 연장.\n잦은 움직임 휴식.\n조용한 시험 환경.",
+      "placeholder_goals": "15분 동안 멈추지 않고 읽기.\n곱셈에 자신감 갖기.\n짧은 이야기 쓰기.",
+      "placeholder_concerns": "읽기 자신감이 걱정됩니다. 최근에 전학했어요. 봄에 중요한 시험이 있어요.",
+      "reassurance_private_title": "기본적으로 비공개",
+      "reassurance_no_diagnosis_title": "진단이 필요하지 않아요",
+      "movement_helps_label": "움직임이 아이의 집중에 도움이 돼요",
+      "movement_helps_body": "AIVO가 질문 블록 사이에 스트레칭 / 걷기 휴식을 제안할 수 있어요.",
+      "aac_label": "아이가 AAC 기기나 앱을 사용해요",
+      "aac_body": "AIVO가 AAC 친화적 응답 패턴으로 전환합니다.",
+      "homework_coaching_label": "아이가 숙제를 시작할 때 도움이 필요해요",
+      "homework_coaching_body": "AIVO가 단계적 시작 유도를 제공합니다.",
+      "autosave_indicator": "앞으로 나아가면 답변이 자동 저장돼요",
+      "back_to_intro": "소개로 돌아가기",
+      "save_exit": "저장하고 나가기"
+    },
+    "learner_assessment_review": {
+      "reassurance_review_title": "적용 전 마지막으로 한번 검토해요",
+      "reassurance_next_title": "다음에 무슨 일이 일어나나요",
+      "back_to_last_step": "마지막 단계로 돌아가기",
+      "save_exit": "저장하고 나가기",
+      "not_yet_answered": "아직 답변되지 않았어요.",
+      "edit_answers": "답변 수정하기 →"
+    },
+    "learner_assessment_submitted": {
+      "reassurance_usage_title": "이 정보를 어디에 활용하나요",
+      "reassurance_iep_active_title": "IEP 지원 활성화됨",
+      "reassurance_no_iep_title": "IEP 없음",
+      "back_to_learner_home": "학습자 홈으로 돌아가기",
+      "personalization_inputs": "개인화 입력",
+      "parent_assessment_chip": "학부모 평가",
+      "what_learners_never_see": "학습자가 절대 볼 수 없는 것",
+      "want_to_change": "변경하고 싶은 게 있나요?",
+      "edit_assessment_answers": "평가 답변 수정하기 →",
+      "manage_iep_supports": "IEP 지원 관리하기 →",
+      "upload_iep": "IEP 업로드하기 →",
+      "setting_it_up": "설정 중…",
+      "see_baseline_cta": "기준선이 만들어지는 것을 확인하세요"
+    },
+    "learner_brain_profile": {
+      "finish_assessment_first": "먼저 학부모 평가를 완료해 주세요",
+      "assessment_not_submitted": "평가가 아직 제출되지 않았어요",
+      "continue_assessment": "평가 계속하기",
+      "could_not_generate": "프로필을 생성할 수 없었어요",
+      "try_again": "다시 시도",
+      "page_title": "AIVO가 학습자와 어떻게 함께할지",
+      "regenerate": "재생성",
+      "recommended_tutor_persona": "추천 튜터 페르소나",
+      "parent_assessment_summary": "학부모 평가 요약",
+      "accommodation_summary": "조정 사항 요약",
+      "learning_profile": "학습 프로필",
+      "sensory_profile": "감각 프로필",
+      "pattern": "패턴",
+      "sensitivities": "감각 민감도",
+      "attention": "주의력",
+      "focus_window": "집중 시간대",
+      "breaks": "휴식",
+      "movement_helps": "움직임이 도움돼요",
+      "comfort": "편안함",
+      "reading": "독서",
+      "preferred_modalities": "선호 학습 방식",
+      "support_defaults": "기본 지원",
+      "motivation": "동기",
+      "rewards_that_help": "도움이 되는 보상",
+      "avoidance_factors": "회피 요인",
+      "subjects_at_a_glance": "과목 한눈에 보기",
+      "back_to_learner": "학습자로 돌아가기"
+    },
+    "learner_baseline": {
+      "finish_assessment_first": "먼저 학부모 평가를 완료하세요",
+      "assessment_not_submitted": "평가가 아직 제출되지 않았습니다",
+      "review_brain_profile_first": "먼저 뇌 프로필을 검토하세요",
+      "brain_profile_not_generated": "뇌 프로필이 생성되지 않았습니다",
+      "discovery_adventure_title": "탐색 어드벤처 체크인",
+      "per_chapter": "챕터별",
+      "the_six_chapters": "여섯 개의 챕터",
+      "continue_assessment": "평가 계속하기",
+      "open_brain_profile": "뇌 프로필 열기",
+      "ready_to_start": "시작 준비 완료",
+      "start_baseline": "기준선 시작",
+      "baseline_in_progress": "기준선 진행 중",
+      "continue_baseline": "기준선 계속하기",
+      "restart": "재시작",
+      "baseline_complete": "기준선 완료",
+      "back_to_learner": "학습자로 돌아가기",
+      "restart_baseline": "기준선 재시작",
+      "in_set": "세트에 포함됨",
+      "preview": "미리보기"
+    },
+    "learner_baseline_pending": {
+      "no_generic_quiz_title": "일반 퀴즈 없음",
+      "calm_by_default_title": "기본적으로 차분한 설정",
+      "try_again": "다시 시도",
+      "step1_label": "1단계 · 기술 그래프",
+      "step1_heading": "적합한 시작 기술 선택하기",
+      "step1_body": "학습자의 학년대와 자신감 응답을 교육 과정에 매핑합니다.",
+      "step2_label": "2단계 · 개인화",
+      "step2_heading": "지원 및 속도 적용",
+      "step2_body": "확인하신 모든 편의 사항과 감각 프로필을 존중합니다.",
+      "in_progress": "진행 중",
+      "step3_label": "3단계 · 문제 세트",
+      "step3_heading": "첫 번째 질문 작성 중",
+      "step3_body": "짧고, 차분하며, 시간 압박이 없습니다. 학습자는 언제든지 일시 정지할 수 있습니다.",
+      "up_next": "다음 차례"
+    },
+    "learner_baseline_summary": {
+      "starting_points_title": "점수가 아닌 출발점",
+      "iep_supports_stay_on_title": "IEP 지원 유지",
+      "no_iep_needed_title": "IEP 불필요",
+      "no_baseline_yet": "아직 완료된 기준선이 없습니다",
+      "manage_baseline": "기준선 관리",
+      "baseline_complete": "기준선 완료",
+      "questions_answered": "답변된 질문",
+      "skipped_questions_note": "건너뛴 질문도 유용합니다 — AIVO가 천천히 소개할 내용을 알려줍니다.",
+      "subjects_covered": "다룬 과목",
+      "personalization": "개인화",
+      "parent_assessment": "학부모 평가",
+      "pacing": "속도",
+      "where_lessons_start": "수업이 시작되는 곳",
+      "for_you": "학부모용",
+      "what_learner_sees": "학습자가 보는 것",
+      "learner_only_version_note": "이것은 학습자가 보는 유일한 버전입니다 — 점수도, 임상 언어도 없습니다.",
+      "iep_supports_in_effect": "IEP 지원 적용 중",
+      "back_to_learner_home": "학습자 홈으로 돌아가기",
+      "run_another_baseline": "다른 기준선 실행"
+    },
+    "learner_iep": {
+      "why_assessment_first_title": "먼저 평가를 요청하는 이유",
+      "finish_assessment_first_title": "먼저 학부모 평가를 완료하세요",
+      "iep_stays_private_title": "IEP는 비공개 유지",
+      "you_stay_in_control_title": "귀하가 제어권을 유지합니다",
+      "share_document_title": "올바른 지원을 적용할 수 있도록 문서를 공유하세요",
+      "back_to_learner": "학습자로 돌아가기",
+      "continue_assessment": "평가 계속하기",
+      "skip_for_now": "지금은 건너뛰기",
+      "review_extracted_supports": "추출된 지원 검토",
+      "remove": "제거",
+      "upload_extract_supports": "업로드 및 지원 추출"
+    },
+    "learner_iep_review": {
+      "no_iep_on_file_title": "IEP가 등록되지 않았습니다",
+      "learner_never_sees_title": "학습자는 이것을 볼 수 없습니다",
+      "you_can_deselect_title": "원하는 항목을 선택 취소할 수 있습니다",
+      "reading_document_title": "문서 읽는 중",
+      "confirm_what_aivo_applies_title": "AIVO가 적용할 수 있는 내용 확인",
+      "go_to_iep_upload": "IEP 업로드로 이동",
+      "re_run_extraction": "추출 다시 실행",
+      "remove": "제거",
+      "back_to_upload": "업로드로 돌아가기",
+      "save_and_exit": "저장 후 종료",
+      "service_areas": "서비스 영역",
+      "none_flagged": "표시된 항목 없음.",
+      "assistive_technology": "보조 기술",
+      "none_recorded": "기록된 항목 없음.",
+      "learner_safe_summary": "학습자 안전 요약"
+    },
+    "consent": {
+      "title": "학습자별 동의",
+      "description": "학습자별 동의는 이 아이에게만 적용됩니다.",
+      "coppa_notice": "이 학습자는 13세 미만입니다. COPPA에 따라 데이터 수집에는 부모 동의가 필요합니다.",
+      "accepted": "수락됨",
+      "not_accepted": "수락되지 않음"
+    },
+    "learner_accessibility_audio": {
+      "title": "소리 내어 읽기"
+    },
+    "learner_accessibility": {
+      "title": "접근성"
+    },
+    "learner_gradebook": {
+      "title": "성적부",
+      "no_mastery_data": "아직 숙달도 데이터 없음",
+      "start_baseline": "기준 평가 시작",
+      "subject_averages": "과목별 평균",
+      "skill_mastery": "기술별 숙달도",
+      "col_subject": "과목",
+      "col_confidence": "확신도",
+      "recent_sessions": "최근 세션",
+      "no_sessions": "아직 세션이 없습니다.",
+      "col_started": "시작일",
+      "col_source": "출처",
+      "col_status": "상태"
+    },
+    "learner_lessons": {
+      "title": "수업",
+      "see_progress": "진도 보기",
+      "worked_on": "학습한 내용",
+      "went_well": "잘된 점",
+      "needed_help": "도움이 필요했던 부분",
+      "up_next": "다음 내용"
+    },
+    "learner_milestones": {
+      "title": "마일스톤",
+      "description": "프로그램 전반에서 획득한 경험치, 연속 학습, 통화 및 배지.",
+      "no_engagement_data": "아직 참여 데이터 없음",
+      "no_engagement_desc": "학습자가 첫 번째 세션을 완료하면 XP, 연속 학습, 배지 추적을 시작합니다.",
+      "back_to_overview": "학습자 개요로 돌아가기",
+      "total_xp": "총 XP",
+      "levels_desc": "레벨을 올리면 새로운 아바타, 커스터마이징, 퀘스트 세계가 열립니다.",
+      "current_streak": "현재 연속 학습",
+      "wallet": "지갑",
+      "wallet_desc": "세션마다 코인 획득. 큰 성과로 젬 잠금 해제.",
+      "badge_collection": "배지 컬렉션",
+      "earned": "획득됨",
+      "locked": "잠김",
+      "how_xp_works": "XP 작동 방식"
+    },
+    "learner_profile_v2": {
+      "open_lessons": "오늘의 수업 열기",
+      "profile_settings": "프로필 설정",
+      "learning_identity": "학습 정체성"
+    },
+    "learner_progress": {
+      "title": "진도",
+      "description": "학습 중인 과목 전반의 숙달도.",
+      "lessons_link": "수업",
+      "summary_link": "알기 쉬운 요약",
+      "lessons_done": "완료한 수업",
+      "time_learning": "학습 시간",
+      "skills_tracked": "추적 기술 수",
+      "mastered": "숙달됨",
+      "by_subject": "과목별"
+    },
+    "learner_summary": {
+      "title": "알기 쉬운 요약",
+      "description": "1페이지 스냅샷 — 무엇이 효과적이고 다음은 무엇인지.",
+      "progress_link": "진도",
+      "lessons_link": "수업",
+      "whats_going_well": "잘 되고 있는 것",
+      "fill_after_lessons": "첫 몇 수업 후에 채워드리겠습니다.",
+      "keep_practicing": "계속 연습할 부분",
+      "no_skills_flagged": "아직 표시된 기술이 없습니다.",
+      "recent_lessons": "최근 수업"
+    },
+    "learners": {
+      "title": "내 학습자",
+      "description": "각 자녀를 한 번만 설정하면 한 곳에서 성장을 지켜볼 수 있습니다.",
+      "add_learner": "학습자 추가",
+      "no_learners": "아직 학습자 없음",
+      "no_learners_desc": "첫 번째 자녀를 추가하여 준비 플로우를 시작하세요.",
+      "add_a_learner": "학습자 추가하기"
+    },
+    "reports": {
+      "eyebrow": "보호자",
+      "title": "주간 학습 요약",
+      "no_learners": "아직 학습자 없음",
+      "no_learners_body": "홈 페이지에서 학습자를 추가하여 진도 보고서 생성을 시작하세요.",
+      "open_learner": "학습자 열기 →",
+      "recent_lessons": "최근 수업"
+    },
+    "settings_account_form": {
+      "display_name": "표시 이름",
+      "saved": "저장되었습니다."
+    },
+    "settings": {
+      "eyebrow": "설정",
+      "title": "계정 설정",
+      "description": "프로필, 가족 요금제 및 가정 환경설정을 관리합니다.",
+      "account_label": "계정",
+      "billing_label": "결제",
+      "privacy_label": "개인정보",
+      "privacy_desc": "COPPA, FERPA 및 데이터 내보내기 도구는 플랫폼 팀에서 관리합니다. 내보내기가 필요하면 지원 티켓을 제출하세요."
+    },
+    "learner_overview": {
+      "settings": "설정",
+      "next_step": "다음 단계",
+      "explore": "탐색",
+      "profile_basics": "프로필 기본 정보",
+      "comfort_levels": "편안함 수준",
+      "reading": "독서",
+      "strengths": "강점",
+      "none_recorded": "아직 기록된 항목이 없습니다.",
+      "challenges": "어려운 점",
+      "accessibility_defaults": "접근성 기본 설정"
+    },
+    "learner_sensory": {
+      "title": "감각 프로필",
+      "modalities": "감각 유형",
+      "notes": "메모",
+      "hyper_sensitive": "과민 반응",
+      "hypo_sensitive": "저민 반응"
+    },
+    "learner_settings": {
+      "danger_zone": "위험 구역",
+      "error_invalid": "일부 내용이 잘못된 것 같습니다. 확인 후 다시 시도해 주세요.",
+      "error_confirm": "이 학습자를 삭제하려면 확인란에 DELETE를 입력하세요.",
+      "first_name": "이름",
+      "preferred_name": "선호 이름",
+      "pronouns": "대명사",
+      "primary_language": "주요 언어",
+      "strengths": "강점",
+      "challenges": "어려운 점",
+      "accessibility_defaults": "접근성 기본 설정",
+      "save_changes": "변경 사항 저장",
+      "delete_confirm_label": "DELETE를 입력하여 확인",
+      "remove_learner": "학습자 삭제"
+    },
+    "learner_snapshot": {
+      "open_full_profile": "전체 프로필 열기",
+      "this_week": "이번 주"
+    },
+    "learner_team": {
+      "title": "돌봄 팀",
+      "invite_member": "팀원 초대",
+      "no_members_title": "아직 팀원이 없습니다",
+      "primary": "주 담당",
+      "how_collab_works": "협력 방식 안내",
+      "collab_parents": "부모와 보호자는 학습자의 모든 데이터에 완전히 접근할 수 있습니다.",
+      "collab_teachers": "교사는 학급 범위의 진도를 확인하고 IEP 목표를 작성할 수 있습니다.",
+      "collab_therapists": "치료사와 돌봄 제공자는 명시적으로 권한이 부여되지 않는 한 읽기 전용 요약만 볼 수 있습니다.",
+      "cancel_invite": "초대 취소",
+      "email_address": "이메일 주소",
+      "relationship_optional": "관계 (선택 사항)",
+      "relationship_placeholder": "예: 공동 부모, 조부모",
+      "specialty_optional": "전문 분야 (선택 사항)",
+      "specialty_placeholder": "예: 언어 치료",
+      "credentials_optional": "자격증 (선택 사항)",
+      "credentials_placeholder": "예: M.S., CCC-SLP",
+      "cancel": "취소",
+      "care_team_invites": "돌봄 팀 초대",
+      "revoke": "취소"
+    },
+    "schedule": {
+      "title": "일정",
+      "no_learners_title": "아직 학습자가 없습니다",
+      "teacher": "선생님",
+      "in_progress_lesson": "진행 중인 수업",
+      "open_arrow": "열기 →"
+    },
+    "settings_account": {
+      "title": "계정",
+      "signed_in_as": "로그인됨"
+    },
+    "home_v2": {
+      "error_heading": "지금은 홈을 불러올 수 없습니다.",
+      "error_reference": "참조:",
+      "error_retry": "다시 시도",
+      "open_legacy_home": "이전 홈 열기",
+      "loading": "학부모 홈을 불러오는 중…",
+      "not_found_heading": "해당 페이지는 아직 없습니다.",
+      "back_to_home": "학부모 홈으로 돌아가기",
+      "add_another_learner": "학습자 추가",
+      "today_at_a_glance": "오늘 한눈에 보기",
+      "details": "세부 정보",
+      "learning_readiness": "학습 준비 상태",
+      "assessment_status": "평가 상태",
+      "iep_support_upload": "IEP / 지원 자료 업로드",
+      "consent_checklist": "동의 체크리스트",
+      "todays_recommended_actions": "오늘의 권장 작업",
+      "notifications_title": "알림",
+      "billing_title": "청구",
+      "school_connection": "학교 연결",
+      "plan_generated": "플랜 생성됨",
+      "pacing": "학습 속도",
+      "calm_extended_time_on": "차분함 — 연장 시간 켜짐",
+      "sensory_mode": "감각 모드",
+      "warm_reduced_motion": "따뜻함 + 모션 줄임",
+      "parent_guardian_consent": "학부모 / 보호자 동의",
+      "approved": "승인됨",
+      "ai_personalization": "AI 개인화",
+      "school_data_sharing": "학교 데이터 공유",
+      "optional_not_set": "선택 사항 — 설정 안 됨",
+      "approve_voice_mode": "음성 모드 승인",
+      "approve_voice_mode_desc": "Emma가 수업 중 AI 튜터와 소리 내어 대화할 수 있습니다.",
+      "upload_iep_optional": "IEP 업로드 (선택)",
+      "upload_iep_desc": "AIVO가 첫날부터 적용할 수 있도록 지원 내용을 추가하세요.",
+      "new_milestone": "새 이정표:",
+      "new_milestone_desc": "200단어 지문을 혼자 읽었습니다.",
+      "tutor_note": "튜터 메모:",
+      "tutor_note_desc": "이번 주 학습 속도가 훌륭합니다.",
+      "family_2_learners": "가족 — 학습자 2명",
+      "next_renewal": "다음 갱신일",
+      "payment_method": "결제 수단"
+    },
+    "home": {
+      "greeting": "인사말",
+      "today_at_a_glance": "오늘 한눈에 보기",
+      "family_workspace": "가족 작업 공간",
+      "add_your_first_learner": "첫 번째 학습자 추가",
+      "add_another_learner": "학습자 추가",
+      "your_learners": "내 학습자",
+      "no_learners_yet": "아직 학습자가 없습니다"
+    },
+    "error": {
+      "eyebrow": "오류",
+      "heading": "문제가 발생했습니다",
+      "body": "자녀의 데이터는 안전합니다. 이 페이지를 불러오는 중 예기치 않은 오류가 발생했습니다. 다시 시도하거나 학부모 홈으로 돌아갈 수 있습니다.",
+      "reference": "참조: {digest}",
+      "retry": "다시 시도",
+      "home_link": "학부모 홈으로 돌아가기"
+    },
+    "not_found": {
+      "eyebrow": "찾을 수 없음",
+      "heading": "해당 페이지를 찾을 수 없습니다",
+      "body": "링크가 이동되었거나 학습자가 더 이상 계정에 연결되어 있지 않을 수 있습니다. 홈으로 돌려보내 드리겠습니다.",
+      "home_link": "홈으로 이동",
+      "all_learners": "모든 학습자"
+    },
+    "learner_homework": {
+      "title": "숙제 기록",
+      "description": "자녀가 숙제 도우미와 함께 작업한 내용입니다. 메시지 내용은 자녀와 튜터 사이에만 유지됩니다.",
+      "empty": "아직 숙제 세션이 없습니다.",
+      "messages_count": "메시지 {count}개",
+      "status_done": "완료",
+      "status_open": "진행 중"
     }
   },
   "brain_clone": {
@@ -222,7 +679,8 @@
     "building_tutors_caption": "각 AI 튜터를 {name}의 수준에 맞춰 보정하는 중",
     "building_complete_title": "{name}의 브레인이 준비되었습니다",
     "building_complete_caption": "{name}의 평가 데이터로 브레인이 구축되었습니다. 아래 세부 정보를 검토하고 다음 단계를 결정하세요.",
-    "building_complete_cta": "검토 후 결정"
+    "building_complete_cta": "검토 후 결정",
+    "skip_animation": "애니메이션 건너뛰기"
   },
   "learner": {
     "errors": {
@@ -403,7 +861,7 @@
     },
     "baseline": {
       "back": "뒤로",
-      "back_home": "홈으로",
+      "back_home": "홈으로 돌아가기",
       "index": {
         "notready_eyebrow": "거의 다 됐어요",
         "notready_title": "어른이 아직 설정하고 있어요",
@@ -641,6 +1099,19 @@
       "saving": "저장 중…",
       "done": "다 했어",
       "complete_error": "이 수업을 저장하지 못했어. '다 했어' 버튼을 다시 눌러 줘."
+    },
+    "baseline_runner": {
+      "exit_proctor_view": "감독 보기 종료",
+      "ready_title": "마지막 한 번",
+      "ready_body": "모든 질문에 답했습니다. 준비되면 답안을 제출하세요.",
+      "finish_baseline": "기초 평가 완료",
+      "resume": "계속하기",
+      "stop_for_today": "오늘은 여기까지",
+      "choose_one": "하나를 선택하세요",
+      "type_answer": "답을 입력하세요"
+    },
+    "lesson_run": {
+      "back_to_today": "오늘로 돌아가기"
     }
   },
   "auth": {
@@ -699,7 +1170,8 @@
       "name_label": "이름",
       "email_label": "이메일",
       "password_label": "비밀번호",
-      "password_helper": "숫자와 기호를 포함해 8자 이상."
+      "password_helper": "숫자와 기호를 포함해 8자 이상.",
+      "name_placeholder": "Riley Parent"
     },
     "forgot": {
       "heading": "비밀번호 재설정",
@@ -840,7 +1312,9 @@
       "invite_label": "초대 코드",
       "invite_helper": "학교나 교육구가 환영 이메일로 보냈습니다.",
       "name_label": "이름",
-      "password_helper": "12자 이상. 저장하기 전에 알려진 유출에 포함되어 있지 않은지 확인합니다."
+      "password_helper": "12자 이상. 저장하기 전에 알려진 유출에 포함되어 있지 않은지 확인합니다.",
+      "code_placeholder": "예: SCHOOL-7Q4M-2025",
+      "name_placeholder": "이름과 성"
     },
     "role": {
       "eyebrow": "역할 선택",
@@ -1045,7 +1519,8 @@
       "join": "학교 참여",
       "code_label": "초대 코드",
       "email_label": "학교 이메일",
-      "email_helper": "관리자가 초대한 이메일과 일치해야 합니다."
+      "email_helper": "관리자가 초대한 이메일과 일치해야 합니다.",
+      "code_placeholder": "예: SCHOOL-7Q4M-2025"
     },
     "invite_district": {
       "eyebrow": "교육구 초대",
@@ -1054,7 +1529,8 @@
       "reassure_title": "교육구 관리자의 강화 인증이 적용됩니다.",
       "reassure_body": "이 역할의 모든 로그인에는 새로운 생체 인식 또는 PIN 확인이 필요합니다. AIVO는 단일 비밀번호로 교육구 데이터를 잠금 해제하도록 절대 허용하지 않습니다.",
       "code_label": "교육구 초대 코드",
-      "email_label": "교육구 이메일"
+      "email_label": "교육구 이메일",
+      "code_placeholder": "예: DISTRICT-9F2L-2025"
     },
     "error": {
       "expired_invite_eyebrow": "초대 만료됨",
@@ -1089,5 +1565,913 @@
       "blocked_secondary": "지원팀에 문의",
       "generic_secondary": "지원팀에 문의"
     }
+  },
+  "admin": {
+    "district_overview": {
+      "eyebrow": "학구 관리자",
+      "description": "학교 간 감독, 명단 관리 및 보고서. 카드를 클릭하여 학교를 관리하세요.",
+      "fl_distribution_title": "기능 수준 분포",
+      "no_learners": "아직 학습자가 배정되지 않았습니다.",
+      "platform_health_title": "플랫폼 상태",
+      "lessons_completed": "완료된 수업",
+      "lessons_attempted": "시도한 수업",
+      "ai_jobs_in_queue": "대기 중인 AI 작업",
+      "ai_failures": "AI 실패"
+    },
+    "district_billing": {
+      "title": "청구",
+      "empty_title": "청구 정보 없음",
+      "col_tenant": "테넌트",
+      "col_status": "상태"
+    },
+    "district_compliance": {
+      "title": "준수"
+    },
+    "district_iep": {
+      "title": "IEP 준수",
+      "empty_title": "이 학구에는 아직 학습자가 없습니다",
+      "col_learner": "학습자",
+      "col_school": "학교",
+      "col_family": "가족"
+    },
+    "district_reports": {
+      "title": "학구 보고서"
+    },
+    "district_schools": {
+      "title": "학교",
+      "empty_title": "이 학구에는 아직 학교가 없습니다",
+      "col_school": "학교",
+      "col_learners": "학습자",
+      "col_families": "가족",
+      "view_staff": "교직원 보기"
+    },
+    "district_settings_admins": {
+      "title": "관리자",
+      "empty_title": "아직 관리자가 없습니다",
+      "invite_note": "관리자 초대는 AIVO의 학구 온보딩 담당자가 처리합니다.",
+      "col_joined": "가입일"
+    },
+    "district_settings_branding": {
+      "title": "브랜딩",
+      "display_name": "표시 이름",
+      "display_name_hint": "제품 헤더, 이메일, 학부모 포털에 표시됩니다.",
+      "support_email": "지원 이메일",
+      "support_email_hint": "이 학구의 가족과 교직원이 모든 도움말 페이지에서 확인합니다.",
+      "primary_colour": "주요 브랜드 색상",
+      "primary_colour_aria": "주요 브랜드 색상",
+      "sample": "샘플"
+    },
+    "district_settings": {
+      "title": "설정",
+      "org_section": "조직",
+      "tenant_name": "테넌트 이름",
+      "tenant_id": "테넌트 ID",
+      "schools": "학교",
+      "learners": "학습자",
+      "support_email": "지원 이메일",
+      "last_update": "마지막 업데이트",
+      "manage": "관리",
+      "notifications_heading": "알림 설정",
+      "notifications_desc": "학구 관리자에게 이메일로 전송되는 내용.",
+      "features_heading": "기능 재정의",
+      "features_desc": "이 학구의 모든 학교에 적용되는 학구 수준 토글."
+    },
+    "district_settings_sso": {
+      "title": "SSO 및 SCIM",
+      "status_heading": "상태",
+      "last_scim_rotation": "마지막 SCIM 교체",
+      "sign_in_mode": "로그인 모드",
+      "idp_name_label": "ID 공급자 이름",
+      "idp_name_placeholder": "예: 학구 Okta",
+      "scim_provisioning": "SCIM 프로비저닝",
+      "enable_scim": "SCIM 활성화",
+      "scim_rotate_warning": "SCIM 토큰을 교체하면 이전 자격 증명을 사용하는 모든 IdP 통합이 무효화됩니다.",
+      "rotate_scim_token": "SCIM 토큰 교체"
+    },
+    "district_staff": {
+      "title": "교직원 디렉토리",
+      "invitations_heading": "초대",
+      "active_staff_heading": "재직 중인 교직원",
+      "empty_title": "이 학구에는 아직 교직원이 없습니다",
+      "col_joined": "가입일",
+      "pending_invitations": "대기 중인 초대",
+      "invite_staff_btn": "교직원 초대",
+      "invite_staff_member": "교직원 초대",
+      "close_aria": "닫기",
+      "field_display_name": "표시 이름",
+      "role_teacher": "교사",
+      "role_school_admin": "학교 관리자",
+      "role_district_admin": "학구 관리자",
+      "assign_to_school": "학교에 배정",
+      "pick_school": "학교를 선택하세요…",
+      "cancel": "취소",
+      "sending": "전송 중…",
+      "invited_success": "{name}을(를) 초대했습니다",
+      "temporary_password": "임시 비밀번호"
+    },
+    "error": {
+      "eyebrow": "관리 콘솔",
+      "heading": "이 페이지를 로드하는 중 오류가 발생했습니다.",
+      "body": "오류가 기록되었습니다. 지금 다시 시도하거나 관리자 홈으로 돌아가세요.",
+      "retry": "다시 시도",
+      "home_link": "관리자 홈"
+    },
+    "login": {
+      "heading": "관리자 로그인",
+      "security_badge": "MFA 적용 · SOC 2 · FERPA",
+      "card_title": "관리 콘솔에 로그인",
+      "sign_in_btn": "로그인",
+      "standard_sign_in": "표준 로그인 사용"
+    },
+    "not_found": {
+      "eyebrow": "관리 콘솔 · 404",
+      "heading": "해당 페이지가 없습니다.",
+      "body": "이동되었거나 리소스가 삭제되었을 수 있습니다.",
+      "home_link": "관리자 홈"
+    },
+    "platform_tenants_detail": {
+      "all_tenants": "모든 테넌트",
+      "stat_learners": "학습자",
+      "stat_sub_tenants": "하위 테넌트",
+      "stat_created": "생성일",
+      "user_mix": "사용자 구성",
+      "no_users": "아직 사용자가 없습니다.",
+      "direct_children": "직접 하위 항목",
+      "no_nested_tenants": "이 테넌트 바로 아래에 중첩된 테넌트가 없습니다.",
+      "recent_ai_jobs": "최근 AI 작업",
+      "no_ai_jobs": "AI 생성 활동 없음",
+      "view_all": "모두 보기",
+      "recent_invoices": "최근 청구서",
+      "no_invoices": "아직 청구서가 없습니다",
+      "audit_trail": "감사 추적",
+      "no_audit": "감사된 활동 없음"
+    },
+    "platform_tenants": {
+      "title": "테넌트",
+      "empty_title": "테넌트 없음",
+      "col_parent": "상위",
+      "col_admins": "관리자",
+      "col_learners": "학습자",
+      "col_billing": "청구",
+      "col_created": "생성일",
+      "open_billing": "청구 열기"
+    },
+    "platform_audit_logs": {
+      "title": "감사 로그",
+      "empty": "아직 감사 이벤트가 없습니다",
+      "col_action": "작업",
+      "col_tenant": "테넌트",
+      "col_request_id": "요청 ID"
+    },
+    "platform_data": {
+      "title": "데이터 인벤토리"
+    },
+    "platform_feature_flags": {
+      "title": "기능 플래그",
+      "section_ai": "AI 및 콘텐츠",
+      "section_enterprise": "엔터프라이즈",
+      "section_integrations": "통합",
+      "section_ux": "학습자 경험"
+    },
+    "platform_jobs": {
+      "title": "백그라운드 작업",
+      "empty": "아직 AI 생성 활동이 없습니다",
+      "by_kind": "유형별",
+      "latency": "지연 시간",
+      "lesson_runs": "레슨 실행",
+      "lesson_runs_desc": "AI 생성 하류의 학습자 대면 파이프라인.",
+      "recent_jobs": "최근 작업 · 최신순",
+      "col_status": "상태",
+      "col_tenant": "테넌트",
+      "col_started": "시작",
+      "col_duration": "소요 시간"
+    },
+    "platform_learners": {
+      "title": "학습자",
+      "empty": "아직 학습자가 없습니다",
+      "iep_on_file": "IEP 등록됨",
+      "iep_skipped": "IEP 건너뜀",
+      "parent_opt_out": "학부모 거부 기록됨",
+      "iep_pending": "IEP 대기 중",
+      "no_decision": "아직 결정 없음",
+      "fl_mix": "기능 수준 분포",
+      "grade_band": "학년 범위",
+      "col_learner": "학습자",
+      "col_tenant": "테넌트",
+      "col_fl": "기능 수준",
+      "col_created": "생성일",
+      "unassigned": "미배정"
+    },
+    "platform_migration": {
+      "title": "v1 → v2 마이그레이션",
+      "empty": "아직 마이그레이션 작업이 없습니다",
+      "recent_jobs": "최근 작업",
+      "col_source": "소스",
+      "col_status": "상태",
+      "col_results": "결과",
+      "col_started": "시작",
+      "dry_run": "드라이런 (미리보기만)",
+      "source_records": "소스 레코드 (JSON)"
+    },
+    "platform_support": {
+      "title": "지원 티켓",
+      "empty": "받은편지함이 비어 있습니다"
+    },
+    "platform_system_health": {
+      "title": "시스템 상태"
+    },
+    "platform_users_detail": {
+      "empty": "범위 내 멤버십이 없습니다",
+      "all_users": "모든 사용자",
+      "user_id": "사용자 ID",
+      "col_created": "생성일",
+      "managed_learners": "관리 중인 학습자",
+      "memberships": "멤버십",
+      "col_tenant": "테넌트",
+      "col_permissions": "권한",
+      "col_joined": "가입일",
+      "col_learner": "학습자"
+    },
+    "platform_users": {
+      "title": "사용자",
+      "empty": "사용자가 없습니다",
+      "col_tenant": "테넌트",
+      "col_joined": "가입일"
+    },
+    "school_billing": {
+      "title": "청구 및 시트",
+      "no_subscription": "구독 없음",
+      "no_seat_licenses": "시트 라이선스 없음",
+      "no_invoices": "청구서 없음",
+      "seat_licenses": "시트 라이선스",
+      "no_seats_assigned": "아직 시트가 배정되지 않았습니다.",
+      "col_subject": "대상",
+      "col_assigned": "배정됨",
+      "invoices": "청구서",
+      "col_number": "번호",
+      "col_period": "기간",
+      "col_amount": "금액",
+      "col_status": "상태"
+    },
+    "school_classes_detail": {
+      "teachers": "교사",
+      "none_yet": "아직 없습니다.",
+      "learners": "학습자",
+      "no_learners_enrolled": "등록된 학습자가 없습니다."
+    },
+    "school_classes": {
+      "title": "수업",
+      "empty": "아직 수업이 없습니다"
+    },
+    "school_compliance": {
+      "title": "규정 준수"
+    },
+    "school_learners": {
+      "title": "학습자",
+      "empty": "로스터에 학습자가 없습니다",
+      "col_learner": "학습자",
+      "col_readiness": "준비 상태",
+      "col_fl": "기능 수준"
+    },
+    "school_overview": {
+      "school_admin": "학교 관리자",
+      "card_rostering_health": "로스터 상태",
+      "card_consent_compliance": "동의 및 규정 준수",
+      "card_ai_safety": "AI 안전",
+      "card_license_util": "라이선스 활용률",
+      "source": "소스",
+      "last_sync": "마지막 동기화",
+      "manage_rostering": "로스터 관리 →",
+      "consent_complete": "동의 완료",
+      "ieps_on_file": "IEP 등록됨",
+      "audit_events_30d": "감사 이벤트 (30일)",
+      "open_compliance": "규정 준수 열기 →",
+      "flagged_7d": "플래그 지정됨 (7일)",
+      "review_safety_logs": "안전 로그 검토 →",
+      "open_reports": "보고서 열기 →"
+    },
+    "school_reports": {
+      "title": "보고서"
+    },
+    "school_rostering": {
+      "title": "로스터",
+      "section_schools": "학교",
+      "empty_schools": "아직 학교가 없습니다",
+      "section_sis": "SIS 연결",
+      "empty_sis": "아직 SIS 연결이 없습니다",
+      "section_recent_imports": "최근 가져오기 작업",
+      "empty_imports": "아직 가져오기가 없습니다",
+      "start_csv_import": "CSV 가져오기 시작",
+      "btn_classes": "수업",
+      "btn_import_csv": "CSV 가져오기",
+      "import_total": "총계:",
+      "import_created": "생성됨:",
+      "import_skipped": "건너뜀:",
+      "import_errors": "오류:"
+    },
+    "school_settings": {
+      "title": "설정",
+      "signed_in_as": "로그인 계정"
+    },
+    "school_staff": {
+      "title": "교직원",
+      "empty": "아직 교직원이 없습니다",
+      "col_tenant": "테넌트"
+    },
+    "platform_billing_overview": {
+      "title": "청구",
+      "empty_title": "청구 계정 없음",
+      "col_tenant": "테넌트",
+      "col_status": "상태",
+      "col_created": "생성일"
+    },
+    "platform_billing_revenue": {
+      "title": "수익",
+      "empty_title": "아직 수금 내역이 없습니다",
+      "link_all_invoices": "모든 청구서 →",
+      "stat_lifetime_collected": "누적 수금액",
+      "stat_last_30_days": "최근 30일",
+      "stat_active_subscriptions": "활성 구독",
+      "section_monthly_collected": "월별 수금액 · 최근 12개월",
+      "no_paid_invoices": "아직 지급 완료된 청구서가 없습니다.",
+      "section_top_tenants": "상위 수익 테넌트",
+      "section_plan_mix": "플랜 구성"
+    },
+    "platform_compliance_data_inventory": {
+      "title": "데이터 인벤토리",
+      "col_classification": "분류",
+      "col_lawful_basis": "법적 근거",
+      "col_purposes": "처리 목적",
+      "col_child_data": "아동 데이터",
+      "subprocessors_heading": "하위 처리자"
+    },
+    "platform_compliance_disclosures": {
+      "title": "FERPA 공개 로그",
+      "record_heading": "공개 기록하기",
+      "col_recipient": "수신자",
+      "col_reason": "사유",
+      "col_ferpa_basis": "FERPA 근거",
+      "empty_body": "아직 공개 기록이 없습니다.",
+      "label_recipient_type": "수신자 유형",
+      "label_recipient_name": "수신자 이름",
+      "label_ferpa_basis": "FERPA 근거",
+      "placeholder_ferpa_basis": "school_official_exception",
+      "label_learner_id": "학습자 ID (선택)",
+      "label_reason": "사유"
+    },
+    "platform_compliance_dsar": {
+      "title": "데이터 주체 요청",
+      "col_requested": "요청일",
+      "col_parent": "보호자",
+      "col_learner": "학습자",
+      "col_status": "상태",
+      "col_completed": "완료일",
+      "col_target": "대상",
+      "no_requests": "요청 없음."
+    },
+    "platform_compliance_overview": {
+      "title": "컴플라이언스",
+      "link_open_queue": "대기열 열기 →",
+      "active_policies_heading": "활성 정책"
+    },
+    "platform_compliance_retention": {
+      "title": "보존 정책",
+      "col_classification": "분류",
+      "col_retention_days": "보존 (일)",
+      "col_archive_days": "보관 (일)",
+      "col_description": "설명"
+    },
+    "platform_safety_moderation": {
+      "title": "모더레이션 이벤트",
+      "col_subject": "주제",
+      "col_decision": "결정",
+      "col_categories": "카테고리",
+      "col_severity": "심각도",
+      "col_excerpt": "발췌",
+      "empty_body": "아직 모더레이션 이벤트가 없습니다."
+    },
+    "platform_safety_overview": {
+      "title": "AI 안전",
+      "recent_blocked_heading": "최근 차단된 생성"
+    },
+    "platform_safety_policies": {
+      "title": "정책 버전",
+      "label_block_threshold": "차단 임계값",
+      "label_review_threshold": "검토 임계값",
+      "label_auto_review_categories": "자동 검토 카테고리",
+      "label_auto_block_categories": "자동 차단 카테고리"
+    },
+    "platform_safety_red_team": {
+      "title": "레드팀 스위트",
+      "col_prompt": "프롬프트",
+      "col_expected": "예상 결과",
+      "col_observed": "실제 결과",
+      "col_result": "결과"
+    },
+    "platform_safety_review_queue": {
+      "title": "검토 대기열",
+      "empty_body": "아직 검토 케이스가 없습니다.",
+      "placeholder_reviewer_note": "검토자 메모 (선택)",
+      "btn_escalate": "에스컬레이션"
+    },
+    "platform_security_controls": {
+      "title": "SOC 2 통제항목",
+      "label_owner": "담당자:"
+    },
+    "platform_security_incidents": {
+      "title": "인시던트",
+      "open_incident_heading": "인시던트 열기",
+      "empty_body": "기록된 인시던트가 없습니다.",
+      "badge_customer_impact": "고객 영향",
+      "badge_regulator_notify": "규제기관 통보"
+    },
+    "platform_security_overview": {
+      "title": "보안 상태",
+      "recent_activity_heading": "최근 활동",
+      "no_events": "아직 이벤트가 없습니다.",
+      "link_audit_log": "전체 감사 로그 보기 →"
+    },
+    "platform_security_risks": {
+      "title": "리스크 등록부",
+      "empty_body": "아직 추적 중인 리스크가 없습니다.",
+      "label_treatment": "처리 방안:"
+    },
+    "platform_security_state_privacy": {
+      "title": "주 개인정보 보호법 매트릭스",
+      "label_obligation": "의무:",
+      "no_control_mapped": "아직 매핑된 통제항목 없음 — 이것은 격차입니다."
+    },
+    "platform_security_vendors": {
+      "title": "공급업체 및 하위 처리자 인벤토리",
+      "subprocessors_heading": "하위 처리자 (학습자 데이터 처리)",
+      "badge_learner_data": "학습자 데이터"
+    },
+    "platform_security_vulnerabilities": {
+      "title": "취약점 관리",
+      "empty_body": "현재 추적 중인 취약점이 없습니다."
+    },
+    "platform_overview": {
+      "title": "시스템 상태",
+      "tenant_footprint": "테넌트 현황",
+      "tenant_footprint_desc": "현재 이 환경에 프로비저닝된 테넌트 분포.",
+      "billing_status": "청구 상태",
+      "recent_ai_jobs": "최근 AI 작업",
+      "no_ai_activity_yet": "아직 AI 생성 활동이 없습니다.",
+      "view_all": "모두 보기",
+      "operations_centres": "운영 센터",
+      "signed_in_as": "로그인됨:",
+      "platform_settings": "플랫폼 설정"
+    },
+    "platform_ai_moderation": {
+      "title": "AI 콘텐츠 조정",
+      "no_block_or_review_events": "차단 또는 검토 이벤트 없음",
+      "top_categories": "주요 카테고리 (차단 + 검토)",
+      "no_categorised_events": "분류된 이벤트가 없습니다.",
+      "col_tenant": "테넌트",
+      "col_decision": "결정",
+      "col_categories": "카테고리",
+      "col_signals": "신호",
+      "col_excerpt": "발췌"
+    },
+    "platform_ai_playground": {
+      "title": "AI 플레이그라운드",
+      "how_it_works": "작동 방식",
+      "responses_moderated": "응답은 출력 조정을 거쳐 여기에 반환됩니다.",
+      "playground_responses_are": "플레이그라운드 응답은",
+      "presets": "프리셋",
+      "model_claude": "Claude Opus 4.7 (기본)",
+      "model_gemini": "Gemini 3.0 Pro (대체)",
+      "model_gpt": "GPT-5.5 (대체)",
+      "system_prompt": "시스템 프롬프트",
+      "user_prompt": "사용자 프롬프트"
+    },
+    "platform_ai_costs": {
+      "title": "AI 비용 관리",
+      "no_cost_events_yet": "아직 비용 이벤트 없음",
+      "spend_mtd": "이번 달 지출",
+      "approaching_cap": "한도 근접",
+      "over_cap": "한도 초과",
+      "tenants": "테넌트",
+      "col_tenant": "테넌트",
+      "col_status": "상태",
+      "col_budget": "예산",
+      "recent_cost_events": "최근 비용 이벤트",
+      "col_feature": "기능",
+      "col_provider_model": "공급자 / 모델",
+      "col_tokens": "토큰",
+      "aria_monthly_cap": "월별 한도 (USD)",
+      "aria_warn_at": "경고 비율"
+    },
+    "platform_ai_generation": {
+      "title": "AI 생성",
+      "recent_jobs": "최근 작업",
+      "no_jobs_yet": "아직 AI 생성 작업이 없습니다",
+      "col_tenant": "테넌트",
+      "col_status": "상태",
+      "col_duration": "소요 시간"
+    },
+    "platform_audio": {
+      "title": "오디오 및 읽어주기",
+      "pronunciation_overrides": "발음 재정의",
+      "playbacks": "재생 횟수",
+      "cache_hit_rate": "캐시 적중률",
+      "total_cost": "총 비용",
+      "unique_clips": "고유 클립",
+      "recent_playbacks": "최근 재생",
+      "col_context": "컨텍스트",
+      "no_playbacks_yet": "아직 기록된 재생이 없습니다.",
+      "recently_generated_clips": "최근 생성된 클립"
+    },
+    "platform_audio_pronunciation": {
+      "title": "발음 재정의",
+      "add_override": "재정의 추가",
+      "replacement": "대체",
+      "encoding": "인코딩",
+      "notes_optional": "메모 (선택 사항)",
+      "no_overrides_yet": "아직 재정의가 없습니다.",
+      "placeholder_token": "예: AIVO",
+      "placeholder_replacement": "예: ay-voh"
+    },
+    "platform_baseline_items": {
+      "title": "기준선 항목 심리 측정",
+      "items_by_exposure": "노출별 항목",
+      "no_telemetry_yet": "아직 기준선 원격 측정 데이터 없음",
+      "col_item": "항목 (기술 · 밴드)",
+      "col_exposure": "노출",
+      "col_scored": "채점됨",
+      "col_median_time": "중앙값 시간",
+      "col_seed_theta": "θ 시드값",
+      "col_est_theta": "θ̂ 추정값",
+      "col_disc": "변별도 (a)",
+      "col_suggested_band": "권장 밴드",
+      "col_status": "상태",
+      "status_healthy": "정상",
+      "status_collecting": "수집 중",
+      "status_retire": "폐기"
+    },
+    "platform_curriculum_overview": {
+      "title": "교육과정"
+    },
+    "platform_curriculum_frameworks": {
+      "title": "표준 프레임워크",
+      "homepage_link": "홈페이지 →"
+    },
+    "platform_curriculum_import": {
+      "title": "표준 가져오기",
+      "start_an_import": "가져오기 시작",
+      "recent_jobs": "최근 작업",
+      "no_import_jobs_yet": "아직 가져오기 작업이 없습니다.",
+      "framework": "프레임워크",
+      "source": "소스",
+      "source_placeholder": "manual, s3://…, https://…"
+    },
+    "platform_curriculum_skills": {
+      "title": "기술",
+      "col_subject": "교과",
+      "col_grade_band": "학년 밴드",
+      "col_version": "버전",
+      "col_prereqs": "선수 조건",
+      "col_standards": "표준",
+      "col_constraints": "제약"
+    },
+    "platform_curriculum_subjects": {
+      "title": "교과 및 도메인",
+      "no_domains_yet": "아직 도메인이 없습니다."
+    },
+    "platform_curriculum_versioning": {
+      "title": "버전·목표·청사진",
+      "skill_versions": "기술 버전",
+      "objective_templates": "목표 템플릿",
+      "assessment_blueprints": "평가 청사진",
+      "col_blueprint": "청사진",
+      "col_status": "상태"
+    },
+    "platform_settings_overview": {
+      "title": "설정",
+      "signed_in_as": "로그인됨:"
+    },
+    "platform_settings_api_keys": {
+      "title": "API 키",
+      "no_keys_yet": "아직 API 키가 없습니다",
+      "col_prefix": "접두사",
+      "col_scopes": "범위",
+      "col_status": "상태",
+      "col_created_by": "생성자",
+      "col_last_used": "마지막 사용",
+      "col_created": "생성일"
+    },
+    "platform_settings_emails": {
+      "title": "이메일 템플릿",
+      "no_templates_configured": "이메일 템플릿이 구성되지 않음",
+      "col_template": "템플릿",
+      "col_subject": "제목",
+      "col_status": "상태",
+      "col_last_sent": "마지막 전송",
+      "col_updated": "업데이트"
+    },
+    "platform_settings_webhooks": {
+      "title": "웹훅",
+      "no_endpoints_configured": "웹훅 엔드포인트가 구성되지 않음",
+      "col_endpoint": "엔드포인트",
+      "col_events": "이벤트",
+      "col_secret": "시크릿",
+      "col_status": "상태",
+      "col_last_delivery": "마지막 전달",
+      "col_failures": "실패"
+    },
+    "platform_billing_coupons": {
+      "title": "쿠폰",
+      "empty_title": "아직 쿠폰이 없습니다",
+      "col_discount": "할인",
+      "col_applies_to": "적용 대상",
+      "col_status": "상태",
+      "col_redemptions": "사용 횟수",
+      "col_valid_window": "유효 기간"
+    },
+    "platform_billing_daily_batch": {
+      "title": "일일 청구 배치",
+      "empty_title": "아직 배치 실행이 없습니다",
+      "col_run_date": "실행 날짜",
+      "col_window": "기간",
+      "col_status": "상태",
+      "col_generated": "생성됨",
+      "col_failed": "실패",
+      "col_total_billed": "총 청구액"
+    },
+    "platform_billing_invoices": {
+      "title": "인보이스",
+      "link_revenue_summary": "수익 요약",
+      "stat_total_invoices": "총 인보이스",
+      "stat_outstanding": "미결제",
+      "empty_title": "아직 인보이스가 없습니다",
+      "col_number": "번호",
+      "col_tenant": "테넌트",
+      "col_amount": "금액",
+      "col_status": "상태",
+      "col_period": "기간"
+    }
+  },
+  "teacher": {
+    "home": {
+      "open_needs_support_list": "지원이 필요한 목록 열기",
+      "open_arrow": "열기 →",
+      "your_roster": "내 학습자 명단",
+      "see_all_learners": "모든 학습자 보기 →",
+      "no_learners_yet": "아직 학습자가 없습니다",
+      "connect_roster": "명단 연결",
+      "roster_snapshot": "명단 개요",
+      "add_another_class": "다른 학급 추가"
+    },
+    "lesson_plans": {
+      "page_title": "AI 수업 계획",
+      "new_assignment": "새 과제",
+      "generated_recent": "생성됨 (최근)",
+      "ai_jobs": "AI 작업",
+      "fallback_chain": "폴백 체인",
+      "fallback_primary_model": "Claude Opus 4.7",
+      "latest_lesson_plans": "최신 수업 계획",
+      "no_lesson_plans_yet": "아직 수업 계획이 없습니다",
+      "generation_activity": "생성 활동",
+      "no_ai_jobs": "이 기간에 AI 생성 작업이 없습니다.",
+      "col_started": "시작",
+      "col_status": "상태",
+      "col_completed": "완료"
+    },
+    "reports": {
+      "title": "교실 보고서",
+      "col_learners": "학습자",
+      "class_mastery": "학급 숙달도",
+      "on_track": "정상 진행",
+      "avg_mastery_threshold": "평균 ≥ 70% 숙달도",
+      "ieps_on_file": "등록된 IEP",
+      "mastery_distribution": "숙달도 분포",
+      "no_mastery_data": "아직 숙달도 데이터가 없습니다 — 학습자가 기초 평가를 완료하면 분포가 표시됩니다.",
+      "learner_rollup": "학습자 요약",
+      "no_learners_assigned": "배정된 학습자 없음",
+      "col_learner": "학습자",
+      "col_skills": "기술",
+      "col_avg_mastery": "평균 숙달도",
+      "col_on_grade": "학년 수준",
+      "col_emerging": "발전 중",
+      "col_actions": "작업",
+      "iep_on_file": "등록됨"
+    },
+    "learner_overview": {
+      "this_week_at_school": "이번 주 학교에서 →",
+      "active_assignments": "진행 중인 과제",
+      "no_active_assignments": "이 학습자에게 진행 중인 과제가 없습니다.",
+      "recent_lessons": "최근 수업",
+      "no_lessons_started": "아직 시작된 수업이 없습니다.",
+      "skill_gaps": "기술 격차",
+      "no_notable_gaps": "아직 눈에 띄는 격차 없음 — 계속 진행하세요.",
+      "accommodations_teacher_summary": "조정 사항 (교사 요약)"
+    },
+    "learner_iep_draft": {
+      "page_title": "IEP 목표 초안",
+      "no_iep_on_file": "등록된 IEP 없음",
+      "current_iep": "현재 IEP",
+      "existing_learning_goals": "기존 학습 목표",
+      "none_on_file": "등록된 항목 없음.",
+      "accommodations": "조정 사항",
+      "none_recorded": "기록된 항목 없음.",
+      "suggested_goal_drafts": "제안된 목표 초안",
+      "how_drafts_generated": "초안 생성 방법"
+    },
+    "classes": {
+      "title": "내 반",
+      "empty_title": "배정된 반 없음"
+    },
+    "error": {
+      "eyebrow": "교사 영역",
+      "heading": "페이지를 불러오는 중 오류가 발생했습니다.",
+      "body": "학급 데이터는 안전합니다. 다시 시도하거나 교사 홈으로 돌아가세요.",
+      "retry": "다시 시도",
+      "home_link": "교사 홈"
+    },
+    "insights": {
+      "title": "인사이트",
+      "empty_title": "테넌트에 학습자가 없습니다"
+    },
+    "learners": {
+      "title": "내 학생 명단",
+      "empty": "아직 배정된 학습자가 없습니다."
+    },
+    "not_found": {
+      "eyebrow": "교사 영역 · 404",
+      "heading": "해당 페이지를 찾을 수 없습니다.",
+      "body": "링크가 변경되었거나 학습자가 더 이상 학급에 등록되어 있지 않을 수 있습니다.",
+      "home_link": "교사 홈",
+      "classes_link": "내 반"
+    },
+    "settings": {
+      "title": "설정",
+      "signed_in_as": "로그인 계정"
+    },
+    "assignments_new": {
+      "title": "새 과제",
+      "instructions_label": "안내",
+      "subject_label": "과목",
+      "skills_label": "역량",
+      "assign_label": "배정 대상",
+      "no_learners": "학습자 없음",
+      "due_date_label": "마감일"
+    },
+    "assignments": {
+      "title": "과제",
+      "new_assignment": "새 과제",
+      "empty": "아직 과제가 없습니다."
+    },
+    "classes_class": {
+      "roster": "명단",
+      "no_learners": "학습자 없음"
+    }
+  },
+  "therapist": {
+    "home": {
+      "stat_caseload": "케이스로드",
+      "stat_ieps": "등록된 IEP",
+      "quick_links": "빠른 링크",
+      "link_sessions": "세션 →",
+      "link_reports": "보고서 →",
+      "section_caseload": "케이스로드",
+      "empty_title": "아직 학습자가 없습니다"
+    },
+    "reports": {
+      "title": "보고서",
+      "empty_title": "아직 케이스로드가 없습니다",
+      "focus_label": "집중 영역:",
+      "skills_tracked": "추적 중인 기술",
+      "avg_score": "평균 점수"
+    },
+    "sessions": {
+      "title": "세션",
+      "empty_no_caseload": "아직 케이스로드가 없습니다",
+      "empty_no_sessions": "아직 기록된 세션이 없습니다"
+    },
+    "settings": {
+      "title": "설정",
+      "section_profile": "프로필",
+      "role_label": "치료사",
+      "section_notifications": "알림"
+    }
+  },
+  "caregiver": {
+    "home": {
+      "on_care_team": "케어팀 구성원",
+      "active_or_ready": "학습 중 또는 준비 완료",
+      "quick_links": "빠른 링크",
+      "link_observations": "관찰 기록 →",
+      "link_roster": "명단 →",
+      "your_learners": "담당 학습자",
+      "no_learners_yet": "아직 학습자가 없습니다"
+    },
+    "learners": {
+      "title": "학습자",
+      "no_learners_yet": "아직 학습자가 없습니다",
+      "primary_language": "주요 언어",
+      "reading_comfort": "읽기 수준",
+      "math_comfort": "수학 수준"
+    },
+    "observations": {
+      "page_title": "관찰 기록",
+      "section_log": "관찰 기록하기",
+      "no_learners_yet": "아직 학습자가 없습니다",
+      "no_lesson_activity_yet": "아직 수업 활동이 없습니다",
+      "no_observations_yet": "아직 보호자 관찰 기록이 없습니다. 위의 양식을 사용하여 관찰 내용을 기록하세요.",
+      "label_antecedent": "선행 사건",
+      "label_behaviour": "행동",
+      "label_consequence": "후속 사건",
+      "field_learner": "학습자",
+      "choose_learner": "학습자 선택…",
+      "field_location": "장소",
+      "loc_school": "학교",
+      "loc_community": "지역사회",
+      "loc_therapy": "치료",
+      "field_behaviour": "행동 (무엇을 관찰했나요?)",
+      "behaviour_placeholder": "행동을 간략히 설명하세요.",
+      "field_antecedent": "선행 사건 (이전에 무슨 일이 있었나요?)",
+      "field_consequence": "후속 사건 (이후에 무슨 일이 있었나요?)",
+      "field_duration": "지속 시간 (분, 선택 사항)"
+    },
+    "settings": {
+      "page_title": "설정",
+      "section_profile": "프로필",
+      "section_notifications": "알림",
+      "role_label": "보호자"
+    }
+  },
+  "accept_invite": {
+    "page": {
+      "accept_heading": "초대 수락하기",
+      "invited_to_join": "학습팀에 참여하도록 초대받았습니다.",
+      "create_account": "새 계정 만들기",
+      "signed_in_as": "현재 로그인된 계정:",
+      "sign_in_different": "다른 계정으로 로그인"
+    },
+    "actions": {
+      "no_pending_for": "다음 주소에 대한 대기 중인 초대를 찾을 수 없습니다:",
+      "continue": "계속",
+      "added_to": "추가되었습니다:",
+      "continue_to_dashboard": "대시보드로 이동",
+      "signed_in_as": "로그인 계정:",
+      "accepting": "수락 중…"
+    }
+  },
+  "root": {
+    "error": {
+      "refreshing": "새로고침 중",
+      "one_moment": "잠시만요 — 최신 버전을 가져오는 중입니다…",
+      "something_went_wrong": "문제가 발생했습니다",
+      "lets_try_again": "다시 시도해 보겠습니다.",
+      "unexpected_error": "예기치 않은 오류가 발생했습니다. 지금 다시 시도하거나 홈으로 이동한 후 잠시 후 돌아오세요.",
+      "try_again": "다시 시도",
+      "back_to_home": "홈으로 돌아가기"
+    },
+    "global_error": {
+      "heading": "심각한 오류가 발생했습니다.",
+      "body": "다시 시도해 주세요. 이 문제가 계속 발생하면 지원팀에 문의하세요.",
+      "try_again": "다시 시도"
+    },
+    "layout": {
+      "skip_to_main": "주요 콘텐츠로 건너뛰기"
+    },
+    "not_found": {
+      "heading": "해당 페이지를 찾을 수 없습니다.",
+      "back_to_home": "홈으로 돌아가기"
+    },
+    "home": {
+      "ferpa_coppa": "FERPA 및 COPPA 준수",
+      "switch_role": "역할 전환",
+      "start_family_trial": "가족 체험 시작",
+      "for_school_districts": "학구를 위한 서비스",
+      "trusted_by": "1,200명 이상의 전문가와 학부모가 신뢰합니다."
+    }
+  },
+  "settings_accessibility": {
+    "nav_label": "접근성",
+    "page_title": "접근성",
+    "sensory_mode": "감각 모드",
+    "text_and_reading": "텍스트 및 읽기",
+    "age_mode": "연령 모드",
+    "choose_age_mode": "연령 모드 선택",
+    "age_sprout": "Sprout (4–7세)",
+    "age_spark": "Spark (8–12세)",
+    "age_scholar": "Scholar (13세 이상)",
+    "choose_theme": "테마 선택",
+    "high_contrast": "고대비",
+    "text_size": "텍스트 크기",
+    "language": "언어",
+    "choose_language": "언어 선택",
+    "lang_en_us": "English (US)",
+    "lang_es": "Español",
+    "lang_fr": "Français"
+  },
+  "district_login": {
+    "heading": "학구 행정",
+    "security_badge": "MFA 적용 · SOC 2 · FERPA",
+    "mobile_heading": "학구 로그인",
+    "card_title": "학구 콘솔에 로그인",
+    "sign_in_btn": "로그인",
+    "standard_sign_in": "표준 로그인 사용"
   }
 }

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -11,6 +12,7 @@ import { Building2, Users, GraduationCap } from "lucide-react";
 
 export default async function Page() {
   const session = await requirePageRole(["district_admin"]);
+  const t = await getTranslations("admin.district_schools");
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const schools = listDistrictSchools(tenants.map((t) => t.id));
 
@@ -23,12 +25,12 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="District admin"
-        title="Schools"
+        title={t("title")}
         description="Every school operating under this district, with staff and learner counts."
       />
 
       {schools.length === 0 ? (
-        <EmptyState title="No schools in this district yet" />
+        <EmptyState title={t("empty_title")} />
       ) : (
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {schools.map((row) => (
@@ -38,13 +40,13 @@ export default async function Page() {
                   <p className="font-display text-lg font-semibold">{row.school.name}</p>
                   <p className="mt-0.5 font-mono text-xs text-aivo-muted">{row.school.id}</p>
                 </div>
-                <Badge tone="primary">School</Badge>
+                <Badge tone="primary">{t("col_school")}</Badge>
               </div>
               <dl className="mt-4 grid grid-cols-3 gap-3 text-sm">
                 <div>
                   <dt className="flex items-center gap-1 text-xs text-aivo-ink-soft">
                     <GraduationCap className="h-3.5 w-3.5" />
-                    Learners
+                    {t("col_learners")}
                   </dt>
                   <dd className="mt-0.5 font-display text-xl font-semibold">
                     {row.learnerCount.toLocaleString()}
@@ -62,7 +64,7 @@ export default async function Page() {
                 <div>
                   <dt className="flex items-center gap-1 text-xs text-aivo-ink-soft">
                     <Building2 className="h-3.5 w-3.5" />
-                    Families
+                    {t("col_families")}
                   </dt>
                   <dd className="mt-0.5 font-display text-xl font-semibold">
                     {row.familyCount.toLocaleString()}
@@ -75,7 +77,7 @@ export default async function Page() {
                   href={`/admin/district/staff`}
                   className="font-medium text-aivo-primary hover:underline"
                 >
-                  View staff
+                  {t("view_staff")}
                 </Link>
               </div>
             </Card>

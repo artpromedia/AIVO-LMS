@@ -1,4 +1,5 @@
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -9,6 +10,7 @@ import { listBillingForTenants, scopeTenantsForSession, getTenantById } from "@/
 
 export default async function Page() {
   const session = await requirePageRole(["district_admin"]);
+  const t = await getTranslations("admin.district_billing");
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const accounts = listBillingForTenants(tenants.map((t) => t.id));
 
@@ -21,20 +23,20 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="District admin"
-        title="Billing"
+        title={t("title")}
         description="Plan and payment status across schools and families in the district."
       />
       {accounts.length === 0 ? (
-        <EmptyState title="No billing on file" />
+        <EmptyState title={t("empty_title")} />
       ) : (
         <Card className="overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-aivo-surface-2 text-left">
               <tr>
-                <th className="p-3">Tenant</th>
+                <th className="p-3">{t("col_tenant")}</th>
                 <th className="p-3">Type</th>
                 <th className="p-3">Plan</th>
-                <th className="p-3">Status</th>
+                <th className="p-3">{t("col_status")}</th>
               </tr>
             </thead>
             <tbody>

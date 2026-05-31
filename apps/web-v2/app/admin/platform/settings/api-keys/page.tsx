@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
 import { listPlatformApiKeys, getUserById } from "@/lib/db/repos";
 import type { User } from "@/lib/db/types";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +25,7 @@ function relativeTime(iso: string | null): string {
 }
 
 export default async function Page() {
+  const t = await getTranslations("admin.platform_settings_api_keys");
   const session = await requirePageRole(["platform_admin"]);
   const keys = listPlatformApiKeys();
 
@@ -54,7 +56,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Settings"
-        title="API keys"
+        title={t("title")}
         description="Long-lived credentials used by internal systems and trusted integrations. Secrets are shown once at creation and are never displayed here again."
       />
 
@@ -70,7 +72,7 @@ export default async function Page() {
       <Card className="mt-6 overflow-hidden p-0">
         {keys.length === 0 ? (
           <EmptyState
-            title="No API keys yet"
+            title={t("no_keys_yet")}
             description="Create a key when you need to grant a system access to the platform API."
           />
         ) : (
@@ -78,12 +80,12 @@ export default async function Page() {
             <thead className="bg-aivo-surface-2 text-xs uppercase tracking-wide text-aivo-ink-soft">
               <tr>
                 <th className="px-4 py-3 text-left">Label</th>
-                <th className="px-4 py-3 text-left">Prefix</th>
-                <th className="px-4 py-3 text-left">Scopes</th>
-                <th className="px-4 py-3 text-left">Status</th>
-                <th className="px-4 py-3 text-left">Created by</th>
-                <th className="px-4 py-3 text-left">Last used</th>
-                <th className="px-4 py-3 text-left">Created</th>
+                <th className="px-4 py-3 text-left">{t("col_prefix")}</th>
+                <th className="px-4 py-3 text-left">{t("col_scopes")}</th>
+                <th className="px-4 py-3 text-left">{t("col_status")}</th>
+                <th className="px-4 py-3 text-left">{t("col_created_by")}</th>
+                <th className="px-4 py-3 text-left">{t("col_last_used")}</th>
+                <th className="px-4 py-3 text-left">{t("col_created")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-aivo-border">

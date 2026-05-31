@@ -6,6 +6,7 @@
  */
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
@@ -30,6 +31,7 @@ export default async function TeacherLearnerDetailPage({
   params: Promise<{ learnerId: string }>;
 }) {
   const session = await requirePageRole(["teacher"]);
+  const t = await getTranslations("teacher.learner_overview");
   const { learnerId } = await params;
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) notFound();
@@ -62,7 +64,7 @@ export default async function TeacherLearnerDetailPage({
 
       <Link href={`/teacher/learners/${learner.id}/curriculum`}>
         <Card className="p-4 transition hover:border-aivo-accent">
-          <p className="font-medium">This week at school →</p>
+          <p className="font-medium">{t("this_week_at_school")}</p>
           <p className="mt-0.5 text-xs text-muted-foreground">
             Add the week&apos;s scope so AIVO&apos;s tutor teaches the same topics, fitted to this
             learner&apos;s profile.
@@ -71,10 +73,10 @@ export default async function TeacherLearnerDetailPage({
       </Link>
 
       <section className="grid gap-3">
-        <SectionHeader title="Active assignments" />
+        <SectionHeader title={t("active_assignments")} />
         {assignments.length === 0 ? (
           <Card className="p-4 text-sm text-muted-foreground">
-            No active assignments for this learner.
+            {t("no_active_assignments")}
           </Card>
         ) : (
           <ul className="grid gap-2">
@@ -94,9 +96,9 @@ export default async function TeacherLearnerDetailPage({
       </section>
 
       <section className="grid gap-3 mt-6">
-        <SectionHeader title="Recent lessons" />
+        <SectionHeader title={t("recent_lessons")} />
         {recent.length === 0 ? (
-          <Card className="p-4 text-sm text-muted-foreground">No lessons started yet.</Card>
+          <Card className="p-4 text-sm text-muted-foreground">{t("no_lessons_started")}</Card>
         ) : (
           <ul className="grid gap-2">
             {recent.map((r) => {
@@ -128,10 +130,10 @@ export default async function TeacherLearnerDetailPage({
       </section>
 
       <section className="grid gap-3 mt-6">
-        <SectionHeader title="Skill gaps" />
+        <SectionHeader title={t("skill_gaps")} />
         {gaps.length === 0 ? (
           <Card className="p-4 text-sm text-muted-foreground">
-            No notable gaps yet — keep going.
+            {t("no_notable_gaps")}
           </Card>
         ) : (
           <ul className="grid gap-2">
@@ -154,7 +156,7 @@ export default async function TeacherLearnerDetailPage({
 
       {iep?.extraction && (
         <section className="grid gap-3 mt-6">
-          <SectionHeader title="Accommodations (teacher summary)" />
+          <SectionHeader title={t("accommodations_teacher_summary")} />
           <Card className="p-4">
             {/*
               SAFETY: We render only `teacherSummary` + the structured

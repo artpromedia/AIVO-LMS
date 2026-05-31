@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -18,6 +19,7 @@ function statusTone(s: string) {
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_safety_review_queue");
   const cases = listHumanReviewCases({});
   return (
     <AppShell
@@ -28,13 +30,13 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Safety"
-        title="Review queue"
+        title={t("title")}
         description="Moderation events that need a human decision. Resolving a case allows or blocks the original content and is auditable."
       />
       <div className="space-y-3">
         {cases.length === 0 ? (
           <Card className="p-[var(--aivo-density-card-pad)] text-aivo-muted text-sm">
-            No review cases yet.
+            {t("empty_body")}
           </Card>
         ) : (
           cases.map((c) => {

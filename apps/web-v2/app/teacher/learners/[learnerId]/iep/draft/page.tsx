@@ -7,6 +7,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { FileText, Target, Sparkles } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
@@ -31,6 +32,7 @@ export default async function TeacherIepDraftPage({
   params: Promise<{ learnerId: string }>;
 }) {
   const session = await requirePageRole(["teacher"]);
+  const t = await getTranslations("teacher.learner_iep_draft");
   const { learnerId } = await params;
   if (!await teacherCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
@@ -76,7 +78,7 @@ export default async function TeacherIepDraftPage({
     >
       <PageHeader
         eyebrow={learner.displayName}
-        title="IEP goal draft"
+        title={t("page_title")}
         description="Draft SMART goals from current mastery + accommodations. Drafts are not shared with the parent until you submit."
         actions={
           <Link
@@ -91,12 +93,12 @@ export default async function TeacherIepDraftPage({
       {!iep ? (
         <EmptyState
           icon={<FileText className="h-6 w-6" />}
-          title="No IEP on file"
+          title={t("no_iep_on_file")}
           description="The parent or guardian needs to upload an IEP document before you can draft new goals. You can still see mastery insights below."
         />
       ) : (
         <>
-          <SectionHeader title="Current IEP" />
+          <SectionHeader title={t("current_iep")} />
           <Card className="p-[var(--aivo-density-card-pad)]">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
@@ -122,10 +124,10 @@ export default async function TeacherIepDraftPage({
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
-                    Existing learning goals
+                    {t("existing_learning_goals")}
                   </p>
                   {iep.extraction.learningGoals.length === 0 ? (
-                    <p className="mt-1 text-sm text-aivo-ink-soft">None on file.</p>
+                    <p className="mt-1 text-sm text-aivo-ink-soft">{t("none_on_file")}</p>
                   ) : (
                     <ul className="mt-1 list-disc space-y-0.5 pl-5 text-sm">
                       {iep.extraction.learningGoals.map((g) => (
@@ -136,10 +138,10 @@ export default async function TeacherIepDraftPage({
                 </div>
                 <div>
                   <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
-                    Accommodations
+                    {t("accommodations")}
                   </p>
                   {iep.extraction.accommodations.length === 0 ? (
-                    <p className="mt-1 text-sm text-aivo-ink-soft">None recorded.</p>
+                    <p className="mt-1 text-sm text-aivo-ink-soft">{t("none_recorded")}</p>
                   ) : (
                     <ul className="mt-1 list-disc space-y-0.5 pl-5 text-sm">
                       {iep.extraction.accommodations.slice(0, 6).map((a) => (
@@ -154,7 +156,7 @@ export default async function TeacherIepDraftPage({
         </>
       )}
 
-      <SectionHeader title="Suggested goal drafts" />
+      <SectionHeader title={t("suggested_goal_drafts")} />
       {drafts.length === 0 ? (
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-sm text-aivo-ink-soft">
@@ -187,7 +189,7 @@ export default async function TeacherIepDraftPage({
         </ul>
       )}
 
-      <SectionHeader title="How drafts are generated" />
+      <SectionHeader title={t("how_drafts_generated")} />
       <Card className="p-[var(--aivo-density-card-pad)]">
         <div className="flex items-start gap-3">
           <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-aivo-accent" />

@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
+import { getTranslations } from "next-intl/server";
 import {
   listAssessmentBlueprints,
   listLessonObjectiveTemplates,
@@ -14,6 +15,7 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function Page() {
+  const t = await getTranslations("admin.platform_curriculum_versioning");
   const session = await requirePageRole(["platform_admin"]);
   const skills = await listSkills();
   const skillById = new Map(skills.map((s) => [s.id, s]));
@@ -29,12 +31,12 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Curriculum"
-        title="Versioning, objectives, and blueprints"
+        title={t("title")}
         description="One skill version is current at a time. AI generation reads the current version's objective summary + the active blueprint as its hard scope."
       />
       <div className="grid gap-3 md:grid-cols-2">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <h2 className="font-display font-semibold mb-2">Skill versions</h2>
+          <h2 className="font-display font-semibold mb-2">{t("skill_versions")}</h2>
           <ul className="divide-y text-sm">
             {versions.map((v) => (
               <li key={v.id} className="py-2 flex items-center justify-between gap-2">
@@ -53,7 +55,7 @@ export default async function Page() {
           </ul>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <h2 className="font-display font-semibold mb-2">Objective templates</h2>
+          <h2 className="font-display font-semibold mb-2">{t("objective_templates")}</h2>
           <ul className="divide-y text-sm">
             {objectives.map((o) => (
               <li key={o.id} className="py-2">
@@ -70,14 +72,14 @@ export default async function Page() {
           </ul>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)] md:col-span-2">
-          <h2 className="font-display font-semibold mb-2">Assessment blueprints</h2>
+          <h2 className="font-display font-semibold mb-2">{t("assessment_blueprints")}</h2>
           <table className="w-full text-sm">
             <thead className="text-xs uppercase text-aivo-muted">
               <tr>
                 <th className="text-left py-1">Skill</th>
-                <th className="text-left py-1">Blueprint</th>
+                <th className="text-left py-1">{t("col_blueprint")}</th>
                 <th className="text-left py-1">Items</th>
-                <th className="text-left py-1">Status</th>
+                <th className="text-left py-1">{t("col_status")}</th>
               </tr>
             </thead>
             <tbody className="divide-y">

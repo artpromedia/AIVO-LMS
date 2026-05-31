@@ -5,6 +5,7 @@
  * data already maintained by the lesson pipeline.
  */
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { THERAPIST_NAV } from "@/components/layout/role-shells";
@@ -52,6 +53,7 @@ function formatLevel(level: SkillMastery["level"]): string {
 }
 
 export default async function TherapistReportsPage() {
+  const t = await getTranslations("therapist.reports");
   const session = await requirePageRole(["therapist", "platform_admin"]);
   const learnerIds = listLearnersForMember(session.userId, session.email, "therapist");
   const maybeLearners = await Promise.all(
@@ -90,14 +92,14 @@ export default async function TherapistReportsPage() {
     >
       <PageHeader
         eyebrow="Therapist"
-        title="Reports"
+        title={t("title")}
         description="Mastery snapshot for every learner on your caseload."
       />
 
       <SectionHeader title={`Caseload (${rows.length})`} />
       {rows.length === 0 ? (
         <EmptyState
-          title="No caseload yet"
+          title={t("empty_title")}
           description="Once a parent invites you to a learner's care team, that learner's report appears here."
         />
       ) : (
@@ -112,18 +114,18 @@ export default async function TherapistReportsPage() {
                   </p>
                   {r.focusSkillName ? (
                     <p className="mt-1 text-xs text-aivo-ink-soft">
-                      Focus: <span className="text-iw-ink">{r.focusSkillName}</span>
+                      {t("focus_label")} <span className="text-iw-ink">{r.focusSkillName}</span>
                       {r.focusScore === null ? "" : ` (${Math.round(r.focusScore * 100)}%)`}
                     </p>
                   ) : null}
                 </div>
                 <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                   <div className="text-right">
-                    <p className="text-xs text-aivo-ink-soft">Skills tracked</p>
+                    <p className="text-xs text-aivo-ink-soft">{t("skills_tracked")}</p>
                     <p className="text-base font-semibold">{r.tracked}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-aivo-ink-soft">Avg score</p>
+                    <p className="text-xs text-aivo-ink-soft">{t("avg_score")}</p>
                     <p className="text-base font-semibold">
                       {r.tracked > 0 ? `${Math.round(r.avg * 100)}%` : "—"}
                     </p>

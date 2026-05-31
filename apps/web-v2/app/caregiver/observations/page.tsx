@@ -6,6 +6,7 @@
  * /api/bff/caregiver/observations.
  */
 import * as React from "react";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
@@ -56,6 +57,7 @@ function formatWhen(iso: string): string {
 }
 
 export default async function CaregiverObservationsPage() {
+  const t = await getTranslations("caregiver.observations");
   const session = await requirePageRole(["caregiver", "platform_admin"]);
   const learnerIds = listLearnersForMember(session.userId, session.email, "caregiver");
   const maybeLearners = await Promise.all(
@@ -97,14 +99,14 @@ export default async function CaregiverObservationsPage() {
     >
       <PageHeader
         eyebrow="Caregiver"
-        title="Observations"
+        title={t("page_title")}
         description="What you've noticed about the learners you support — plus their recent lesson activity."
       />
 
-      <SectionHeader title="Log an observation" />
+      <SectionHeader title={t("section_log")} />
       {noLearners ? (
         <EmptyState
-          title="No learners yet"
+          title={t("no_learners_yet")}
           description="Observations populate once a parent invites you to a learner's care team."
         />
       ) : (
@@ -116,7 +118,7 @@ export default async function CaregiverObservationsPage() {
       <SectionHeader title={`Your observations (${authored.length})`} />
       {authored.length === 0 ? (
         <p className="text-sm text-aivo-ink-soft">
-          No caregiver observations yet. Use the form above to record what you notice.
+          {t("no_observations_yet")}
         </p>
       ) : (
         <ul className="flex flex-col gap-3">
@@ -137,15 +139,15 @@ export default async function CaregiverObservationsPage() {
                   </p>
                   <dl className="mt-2 grid grid-cols-1 gap-1 text-sm md:grid-cols-3">
                     <div>
-                      <dt className="iw-label text-aivo-ink-soft">Antecedent</dt>
+                      <dt className="iw-label text-aivo-ink-soft">{t("label_antecedent")}</dt>
                       <dd>{obs.antecedent || "—"}</dd>
                     </div>
                     <div>
-                      <dt className="iw-label text-aivo-ink-soft">Behaviour</dt>
+                      <dt className="iw-label text-aivo-ink-soft">{t("label_behaviour")}</dt>
                       <dd className="font-medium">{obs.behaviour}</dd>
                     </div>
                     <div>
-                      <dt className="iw-label text-aivo-ink-soft">Consequence</dt>
+                      <dt className="iw-label text-aivo-ink-soft">{t("label_consequence")}</dt>
                       <dd>{obs.consequence || "—"}</dd>
                     </div>
                   </dl>
@@ -159,7 +161,7 @@ export default async function CaregiverObservationsPage() {
       <SectionHeader title={`Lesson activity (${feed.length})`} />
       {feed.length === 0 ? (
         <EmptyState
-          title="No lesson activity yet"
+          title={t("no_lesson_activity_yet")}
           description="Once a learner you support starts a lesson, it lands here."
         />
       ) : (

@@ -6,10 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
 import { listPronunciationOverrides } from "@/lib/db/repos";
 import { CreateOverrideForm } from "./form";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function Page() {
+  const t = await getTranslations("admin.platform_audio_pronunciation");
   const session = await requirePageRole(["platform_admin"]);
   const overrides = listPronunciationOverrides();
   return (
@@ -21,11 +23,11 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Audio"
-        title="Pronunciation overrides"
+        title={t("title")}
         description="Tokens the TTS provider should pronounce differently. Platform-scope overrides apply everywhere; tenant-scope rows apply to one tenant."
       />
       <Card className="mb-4 p-[var(--aivo-density-card-pad)]">
-        <h2 className="font-display font-semibold mb-3">Add override</h2>
+        <h2 className="font-display font-semibold mb-3">{t("add_override")}</h2>
         <CreateOverrideForm canPublishPlatform={true} />
       </Card>
       <Card className="p-0 overflow-hidden">
@@ -33,8 +35,8 @@ export default async function Page() {
           <thead className="bg-aivo-surface-2 text-xs uppercase text-aivo-muted">
             <tr>
               <th className="px-4 py-2 text-left">Token</th>
-              <th className="px-4 py-2 text-left">Replacement</th>
-              <th className="px-4 py-2 text-left">Encoding</th>
+              <th className="px-4 py-2 text-left">{t("replacement")}</th>
+              <th className="px-4 py-2 text-left">{t("encoding")}</th>
               <th className="px-4 py-2 text-left">Scope</th>
               <th className="px-4 py-2 text-left">Notes</th>
             </tr>
@@ -43,7 +45,7 @@ export default async function Page() {
             {overrides.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-4 py-6 text-center text-aivo-muted">
-                  No overrides yet.
+                  {t("no_overrides_yet")}
                 </td>
               </tr>
             ) : (

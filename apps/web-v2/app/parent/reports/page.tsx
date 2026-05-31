@@ -7,6 +7,7 @@
  * no spreadsheets, no jargon.
  */
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import {
@@ -27,6 +28,7 @@ import {
 
 export default async function Page() {
   const session = await requirePageRole(["parent"]);
+  const t = await getTranslations("parent.reports");
   const learners = await listLearnersForParent(session.userId, session.tenantId);
   const subjectMap = new Map((await listSubjects()).map((s) => [s.id, s]));
 
@@ -38,9 +40,9 @@ export default async function Page() {
       user={{ displayName: session.displayName, email: session.email }}
     >
       <header className="flex flex-col gap-2 mb-6">
-        <p className="iw-label text-iw-text-muted">Parent</p>
+        <p className="iw-label text-iw-text-muted">{t("eyebrow")}</p>
         <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong">
-          Weekly learning summary
+          {t("title")}
         </h1>
         <p className="text-sm md:text-base text-iw-text-muted max-w-2xl">
           A plain-language view of each learner's last few sessions. Numbers are starting points,
@@ -51,8 +53,8 @@ export default async function Page() {
       {learners.length === 0 ? (
         <div className="rounded-iw-card-lg bg-white border border-iw-border p-6">
           <EmptyState
-            title="No learners yet"
-            body="Add a learner from the home page to begin generating progress reports."
+            title={t("no_learners")}
+            body={t("no_learners_body")}
           />
         </div>
       ) : (
@@ -83,7 +85,7 @@ export default async function Page() {
                     href={`/parent/learners/${l.id}`}
                     className="inline-flex items-center gap-1.5 rounded-iw-control px-3 py-1.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
                   >
-                    Open learner →
+                    {t("open_learner")}
                   </Link>
                 </header>
 
@@ -115,7 +117,7 @@ export default async function Page() {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <h3 className="text-base font-semibold text-iw-text-strong">Recent lessons</h3>
+                  <h3 className="text-base font-semibold text-iw-text-strong">{t("recent_lessons")}</h3>
                   {summaries.length === 0 ? (
                     <p className="rounded-iw-card-lg bg-white border border-iw-border p-5 text-sm text-iw-text-muted">
                       No completed lessons yet for {l.displayName}.

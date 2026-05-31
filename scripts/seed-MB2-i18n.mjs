@@ -1,0 +1,1159 @@
+import { readFileSync, writeFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const repoRoot = resolve(__dirname, "..");
+const dir = join(repoRoot, "apps/mobile/i18n");
+
+const DATA = {
+  ar: {
+    learnerStage: {
+      letsSolve: "لنحلّ هذا معًا!",
+      learner: "المتعلم",
+      loading: "جارٍ تحضير جلستك…",
+      sessionMap: "خريطة الجلسة",
+      beatLabel: "مرحلة {{index}}",
+      nav: {
+        map: "الخريطة",
+        brain: "الدماغ",
+        stats: "الإحصاءات",
+        settings: "الإعدادات"
+      },
+      header: {
+        closeSession: "إغلاق الجلسة",
+        pauseSession: "إيقاف الجلسة مؤقتًا",
+        openScratchpad: "فتح لوحة المسودة",
+        closeScratchpad: "إغلاق لوحة المسودة"
+      },
+      error: {
+        missingId: "معرّف الجلسة مفقود",
+        couldNotLoad: "تعذّر تحميل هذه الجلسة.",
+        tryAgain: "حاول مجددًا",
+        backToHome: "العودة إلى الرئيسية"
+      },
+      pause: {
+        titleSoft: "إيقاف الجلسة مؤقتًا",
+        titleStandard: "إيقاف الجلسة مؤقتًا",
+        message: "سيتم حفظ تقدمك. هل تريد المتابعة لاحقًا؟",
+        keepGoingSoft: "استمر!",
+        keepGoing: "استمر",
+        exit: "إيقاف والخروج"
+      },
+      saveError: {
+        title: "تحذير",
+        message: "تعذّر حفظ إجابتك. قد لا تُسجَّل."
+      },
+      offline: {
+        title: "حُفظ دون اتصال",
+        message: "ستُزامَن نتائج جلستك عند عودة الاتصال."
+      },
+      level: "المستوى {{level}}",
+      completion: {
+        score: "{{correct}} / {{total}} صحيح ({{score}}%)",
+        xpEarned: "+{{xp}} XP مكتسبة"
+      },
+      voice: {
+        early: {
+          encourage: "🎉 رائع! أحسنت!",
+          miss: "تقريبًا! تقول سورا أن الإجابة {{answer}}!",
+          completionTitle: "اكتملت المغامرة!",
+          nextLabel: "التالي →",
+          finishLabel: "رائع! انتهينا",
+          homeLabel: "العودة إلى المرج",
+          intro: "لنحلّ هذا معًا!"
+        },
+        middle: {
+          encourage: "جيد. كاي يومئ بالموافقة.",
+          miss: "قريب. كانت الإجابة {{answer}}.",
+          completionTitle: "انتهت الجلسة",
+          nextLabel: "السؤال التالي",
+          finishLabel: "إنهاء الجلسة",
+          homeLabel: "العودة إلى البيت الشجري",
+          intro: "خذ وقتك."
+        },
+        high: {
+          encourage: "صحيح.",
+          miss: "ليس تمامًا — الإجابة: {{answer}}",
+          completionTitle: "اكتملت الجلسة",
+          nextLabel: "التالي",
+          finishLabel: "إنهاء",
+          homeLabel: "العودة إلى لوحة التحكم",
+          intro: "ابدأ عندما تكون مستعدًا."
+        }
+      }
+    },
+    teacherLessonPlan: {
+      title: "خطط الدروس",
+      subtitle: "منشئ خطط دروس مستنير بالدماغ",
+      generateNew: "إنشاء خطة جديدة",
+      generateDesc: "اختر الطلاب ودع AI يُنشئ خطة درس متمايزة بناءً على ملفات الدماغ الخاصة بهم",
+      createPlan: "إنشاء خطة درس",
+      recentPlans: "الخطط الأخيرة",
+      noPlansTitle: "لا توجد خطط دروس بعد",
+      noPlansMessage: "أنشئ أول خطة درس مستنيرة بالدماغ أعلاه.",
+      learner: "المتعلم",
+      noLearnersHint: "تواصل مع المتعلمين لإنشاء خطط لهم.",
+      noLearnerError: "يرجى اختيار متعلم قبل إنشاء الخطة.",
+      generateError: "فشل في إنشاء خطة الدرس",
+      networkError: "خطأ في الشبكة. يرجى المحاولة مجددًا.",
+      objective: "الهدف",
+      overview: "نظرة عامة",
+      duration: "المدة",
+      activities: "الأنشطة",
+      accommodations: "التسهيلات"
+    },
+    teacherAnalytics: {
+      title: "تحليلات الفصل",
+      subtitle: "توزيع مستوى الأداء والتقدم",
+      standard: "قياسي",
+      supported: "مدعوم",
+      lowVerbal: "لفظي منخفض",
+      domainProgress: "تقدم المجال",
+      engagementTrends: "اتجاهات التفاعل",
+      avgSessionsWeek: "متوسط الجلسات/الأسبوع",
+      avgSessionDuration: "متوسط مدة الجلسة",
+      tutorUsageRate: "معدل استخدام المدرس"
+    },
+    learnerLeaderboard: {
+      title: "لوحة المتصدرين",
+      subtitle: "تعرّف على ترتيبك مقارنةً بالمتعلمين الآخرين.",
+      scopeGlobal: "عالمي",
+      scopeClass: "الفصل",
+      scopeSchool: "المدرسة",
+      empty: "لا توجد إدخالات بعد. اكسب XP للتصاعد في الترتيب!",
+      youSuffix: "{{name}} (أنت)",
+      learnerName: "المتعلم {{id}}",
+      weeklyXp: "+{{xp}} هذا الأسبوع"
+    },
+    caregiverObservation: {
+      title: "تقديم ملاحظة",
+      subtitle: "شارك ما لاحظته اليوم",
+      prompt: "كيف كان أداء الطفل اليوم؟",
+      placeholder: "شارك ملاحظتك…",
+      submitBtn: "تقديم الملاحظة",
+      submitted: "تم حفظ الملاحظة في رؤى الدماغ"
+    },
+    caregiverNotifications: {
+      title: "الإشعارات",
+      subtitle: "التنبيهات والإنجازات",
+      noNotificationsTitle: "لا توجد إشعارات",
+      noNotificationsMessage: "ستصلك تنبيهات حول أهداف IEP والتغييرات في مستوى الأداء وإنجازات الاستمرارية."
+    },
+    parentProgress: {
+      title: "تقدم {{name}}",
+      subtitle: "تقدم التعلم عبر الزمن"
+    },
+    teacherSettings: {
+      title: "الإعدادات"
+    }
+  },
+
+  de: {
+    learnerStage: {
+      letsSolve: "Lass uns das gemeinsam lösen!",
+      learner: "Lernender",
+      loading: "Deine Sitzung wird vorbereitet…",
+      sessionMap: "Sitzungskarte",
+      beatLabel: "Abschnitt {{index}}",
+      nav: {
+        map: "Karte",
+        brain: "Gehirn",
+        stats: "Statistiken",
+        settings: "Einstellungen"
+      },
+      header: {
+        closeSession: "Sitzung schließen",
+        pauseSession: "Sitzung pausieren",
+        openScratchpad: "Notizblock öffnen",
+        closeScratchpad: "Notizblock schließen"
+      },
+      error: {
+        missingId: "Sitzungs-ID fehlt",
+        couldNotLoad: "Diese Sitzung konnte nicht geladen werden.",
+        tryAgain: "Erneut versuchen",
+        backToHome: "Zurück zur Startseite"
+      },
+      pause: {
+        titleSoft: "Sitzung pausieren",
+        titleStandard: "Sitzung pausieren",
+        message: "Dein Fortschritt wird gespeichert. Später weitermachen?",
+        keepGoingSoft: "Weiter so!",
+        keepGoing: "Weitermachen",
+        exit: "Pausieren & beenden"
+      },
+      saveError: {
+        title: "Warnung",
+        message: "Deine Antwort konnte nicht gespeichert werden. Sie wird möglicherweise nicht aufgezeichnet."
+      },
+      offline: {
+        title: "Offline gespeichert",
+        message: "Deine Sitzungsergebnisse werden synchronisiert, sobald du wieder online bist."
+      },
+      level: "Stufe {{level}}",
+      completion: {
+        score: "{{correct}} / {{total}} richtig ({{score}}%)",
+        xpEarned: "+{{xp}} XP verdient"
+      },
+      voice: {
+        early: {
+          encourage: "🎉 Toll! Das hast du geschafft!",
+          miss: "Fast! Sora sagt, es ist {{answer}}!",
+          completionTitle: "Abenteuer abgeschlossen!",
+          nextLabel: "Weiter →",
+          finishLabel: "Super! Alles erledigt",
+          homeLabel: "Zurück zur Wiese",
+          intro: "Lass uns das gemeinsam lösen!"
+        },
+        middle: {
+          encourage: "Gut. Kai nickt zustimmend.",
+          miss: "Nah dran. Die Antwort war {{answer}}.",
+          completionTitle: "Sitzung abgeschlossen",
+          nextLabel: "Nächste Frage",
+          finishLabel: "Sitzung beenden",
+          homeLabel: "Zurück zum Baumhaus",
+          intro: "Lass dir Zeit."
+        },
+        high: {
+          encourage: "Richtig.",
+          miss: "Nicht ganz — Antwort: {{answer}}",
+          completionTitle: "Sitzung abgeschlossen",
+          nextLabel: "Weiter",
+          finishLabel: "Beenden",
+          homeLabel: "Zurück zum Dashboard",
+          intro: "Beginne, wenn du bereit bist."
+        }
+      }
+    },
+    teacherLessonPlan: {
+      title: "Unterrichtspläne",
+      subtitle: "KI-gestützter Unterrichtsplangenerator",
+      generateNew: "Neuen Plan erstellen",
+      generateDesc: "Wähle Schüler aus und lass AI einen differenzierten Unterrichtsplan auf Basis ihrer Gehirnprofile erstellen",
+      createPlan: "Unterrichtsplan erstellen",
+      recentPlans: "Neueste Pläne",
+      noPlansTitle: "Noch keine Unterrichtspläne",
+      noPlansMessage: "Erstelle oben deinen ersten gehirnbasierten Unterrichtsplan.",
+      learner: "Lernender",
+      noLearnersHint: "Verbinde dich mit Lernenden, um Pläne für sie zu erstellen.",
+      noLearnerError: "Bitte wähle einen Lernenden aus, bevor du einen Plan erstellst.",
+      generateError: "Unterrichtsplan konnte nicht erstellt werden",
+      networkError: "Netzwerkfehler. Bitte versuche es erneut.",
+      objective: "Ziel",
+      overview: "Übersicht",
+      duration: "Dauer",
+      activities: "Aktivitäten",
+      accommodations: "Anpassungen"
+    },
+    teacherAnalytics: {
+      title: "Klassenanalyse",
+      subtitle: "Leistungsniveauverteilung und Fortschritt",
+      standard: "Standard",
+      supported: "Unterstützt",
+      lowVerbal: "Wenig verbal",
+      domainProgress: "Bereichsfortschritt",
+      engagementTrends: "Engagementtrends",
+      avgSessionsWeek: "Durchschn. Sitzungen/Woche",
+      avgSessionDuration: "Durchschn. Sitzungsdauer",
+      tutorUsageRate: "Nachhilfenutzungsrate"
+    },
+    learnerLeaderboard: {
+      title: "Rangliste",
+      subtitle: "Sieh, wie du im Vergleich zu anderen Lernenden abschneidest.",
+      scopeGlobal: "Global",
+      scopeClass: "Klasse",
+      scopeSchool: "Schule",
+      empty: "Noch keine Einträge. Verdiene XP, um aufzusteigen!",
+      youSuffix: "{{name}} (Du)",
+      learnerName: "Lernender {{id}}",
+      weeklyXp: "+{{xp}} diese Woche"
+    },
+    caregiverObservation: {
+      title: "Beobachtung einreichen",
+      subtitle: "Teile mit, was du heute bemerkt hast",
+      prompt: "Wie hat das Kind heute abgeschnitten?",
+      placeholder: "Teile deine Beobachtung…",
+      submitBtn: "Beobachtung einreichen",
+      submitted: "Beobachtung in Gehirnerkenntnissen gespeichert"
+    },
+    caregiverNotifications: {
+      title: "Benachrichtigungen",
+      subtitle: "Meldungen und Meilensteine",
+      noNotificationsTitle: "Keine Benachrichtigungen",
+      noNotificationsMessage: "Du erhältst Meldungen zu IEP-Zielen, Leistungsänderungen und Streak-Erfolgen."
+    },
+    parentProgress: {
+      title: "Fortschritt von {{name}}",
+      subtitle: "Lernfortschritt im Zeitverlauf"
+    },
+    teacherSettings: {
+      title: "Einstellungen"
+    }
+  },
+
+  fr: {
+    learnerStage: {
+      letsSolve: "Résolvons ça ensemble !",
+      learner: "Apprenant",
+      loading: "Préparation de votre session…",
+      sessionMap: "Carte de session",
+      beatLabel: "Étape {{index}}",
+      nav: {
+        map: "Carte",
+        brain: "Cerveau",
+        stats: "Statistiques",
+        settings: "Paramètres"
+      },
+      header: {
+        closeSession: "Fermer la session",
+        pauseSession: "Mettre en pause",
+        openScratchpad: "Ouvrir le brouillon",
+        closeScratchpad: "Fermer le brouillon"
+      },
+      error: {
+        missingId: "Identifiant de session manquant",
+        couldNotLoad: "Impossible de charger cette session.",
+        tryAgain: "Réessayer",
+        backToHome: "Retour à l'accueil"
+      },
+      pause: {
+        titleSoft: "Pause session",
+        titleStandard: "Pause session",
+        message: "Votre progression sera sauvegardée. Continuer plus tard ?",
+        keepGoingSoft: "Continue !",
+        keepGoing: "Continuer",
+        exit: "Pause et quitter"
+      },
+      saveError: {
+        title: "Avertissement",
+        message: "Impossible de sauvegarder votre réponse. Elle pourrait ne pas être enregistrée."
+      },
+      offline: {
+        title: "Sauvegardé hors ligne",
+        message: "Les résultats de votre session seront synchronisés à la reconnexion."
+      },
+      level: "Niveau {{level}}",
+      completion: {
+        score: "{{correct}} / {{total}} correct ({{score}}%)",
+        xpEarned: "+{{xp}} XP gagnés"
+      },
+      voice: {
+        early: {
+          encourage: "🎉 Super ! Tu as réussi !",
+          miss: "Presque ! Sora dit que c'est {{answer}} !",
+          completionTitle: "Aventure terminée !",
+          nextLabel: "Suivant →",
+          finishLabel: "Super ! Tout fini",
+          homeLabel: "Retour à la prairie",
+          intro: "Résolvons ça ensemble !"
+        },
+        middle: {
+          encourage: "Bien joué. Kai approuve d'un signe de tête.",
+          miss: "Proche. La réponse était {{answer}}.",
+          completionTitle: "Session terminée",
+          nextLabel: "Question suivante",
+          finishLabel: "Terminer la session",
+          homeLabel: "Retour à la cabane",
+          intro: "Prends ton temps."
+        },
+        high: {
+          encourage: "Correct.",
+          miss: "Pas tout à fait — réponse : {{answer}}",
+          completionTitle: "Session complète",
+          nextLabel: "Suivant",
+          finishLabel: "Terminer",
+          homeLabel: "Retour au tableau de bord",
+          intro: "Commence quand tu es prêt."
+        }
+      }
+    },
+    teacherLessonPlan: {
+      title: "Plans de leçon",
+      subtitle: "Générateur de plans de leçon basé sur le profil cérébral",
+      generateNew: "Générer un nouveau plan",
+      generateDesc: "Sélectionne des élèves et laisse l'AI créer un plan de leçon différencié basé sur leurs profils cérébraux",
+      createPlan: "Créer un plan de leçon",
+      recentPlans: "Plans récents",
+      noPlansTitle: "Aucun plan de leçon",
+      noPlansMessage: "Génère ton premier plan de leçon basé sur le profil cérébral ci-dessus.",
+      learner: "Apprenant",
+      noLearnersHint: "Connecte-toi avec des apprenants pour générer des plans pour eux.",
+      noLearnerError: "Sélectionne un apprenant avant de générer un plan.",
+      generateError: "Échec de la génération du plan de leçon",
+      networkError: "Erreur réseau. Veuillez réessayer.",
+      objective: "Objectif",
+      overview: "Aperçu",
+      duration: "Durée",
+      activities: "Activités",
+      accommodations: "Aménagements"
+    },
+    teacherAnalytics: {
+      title: "Analyses de classe",
+      subtitle: "Répartition des niveaux de fonctionnement et progression",
+      standard: "Standard",
+      supported: "Accompagné",
+      lowVerbal: "Faible verbal",
+      domainProgress: "Progression par domaine",
+      engagementTrends: "Tendances d'engagement",
+      avgSessionsWeek: "Moy. sessions/semaine",
+      avgSessionDuration: "Durée moy. de session",
+      tutorUsageRate: "Taux d'utilisation du tuteur"
+    },
+    learnerLeaderboard: {
+      title: "Classement",
+      subtitle: "Découvrez votre rang parmi les autres apprenants.",
+      scopeGlobal: "Mondial",
+      scopeClass: "Classe",
+      scopeSchool: "École",
+      empty: "Aucune entrée pour l'instant. Gagne des XP pour grimper dans le classement !",
+      youSuffix: "{{name}} (Toi)",
+      learnerName: "Apprenant {{id}}",
+      weeklyXp: "+{{xp}} cette semaine"
+    },
+    caregiverObservation: {
+      title: "Soumettre une observation",
+      subtitle: "Partage ce que tu as remarqué aujourd'hui",
+      prompt: "Comment s'est passée la journée de l'enfant ?",
+      placeholder: "Partage ton observation…",
+      submitBtn: "Soumettre l'observation",
+      submitted: "Observation enregistrée dans les insights cérébraux"
+    },
+    caregiverNotifications: {
+      title: "Notifications",
+      subtitle: "Alertes et jalons",
+      noNotificationsTitle: "Aucune notification",
+      noNotificationsMessage: "Tu recevras des alertes pour les objectifs IEP, les changements de niveau et les séries de réussite."
+    },
+    parentProgress: {
+      title: "Progrès de {{name}}",
+      subtitle: "Progression de l'apprentissage dans le temps"
+    },
+    teacherSettings: {
+      title: "Paramètres"
+    }
+  },
+
+  hi: {
+    learnerStage: {
+      letsSolve: "आइए इसे मिलकर हल करें!",
+      learner: "विद्यार्थी",
+      loading: "आपका सत्र तैयार हो रहा है…",
+      sessionMap: "सत्र मानचित्र",
+      beatLabel: "चरण {{index}}",
+      nav: {
+        map: "मानचित्र",
+        brain: "ब्रेन",
+        stats: "आँकड़े",
+        settings: "सेटिंग्स"
+      },
+      header: {
+        closeSession: "सत्र बंद करें",
+        pauseSession: "सत्र रोकें",
+        openScratchpad: "स्क्रैचपैड खोलें",
+        closeScratchpad: "स्क्रैचपैड बंद करें"
+      },
+      error: {
+        missingId: "सत्र ID अनुपलब्ध है",
+        couldNotLoad: "यह सत्र लोड नहीं हो सका।",
+        tryAgain: "पुनः प्रयास करें",
+        backToHome: "होम पर वापस जाएँ"
+      },
+      pause: {
+        titleSoft: "सत्र रोकें",
+        titleStandard: "सत्र रोकें",
+        message: "आपकी प्रगति सहेजी जाएगी। बाद में जारी रखें?",
+        keepGoingSoft: "जारी रखो!",
+        keepGoing: "जारी रखें",
+        exit: "रोकें और बाहर निकलें"
+      },
+      saveError: {
+        title: "चेतावनी",
+        message: "आपका उत्तर सहेजा नहीं जा सका। यह दर्ज नहीं हो सकता।"
+      },
+      offline: {
+        title: "ऑफलाइन सहेजा गया",
+        message: "ऑनलाइन होने पर आपके सत्र के परिणाम सिंक हो जाएँगे।"
+      },
+      level: "स्तर {{level}}",
+      completion: {
+        score: "{{correct}} / {{total}} सही ({{score}}%)",
+        xpEarned: "+{{xp}} XP अर्जित"
+      },
+      voice: {
+        early: {
+          encourage: "🎉 वाह! आपने कर दिखाया!",
+          miss: "लगभग सही! सोरा कहती है यह {{answer}} है!",
+          completionTitle: "साहसिक कार्य पूरा!",
+          nextLabel: "अगला →",
+          finishLabel: "बढ़िया! सब हो गया",
+          homeLabel: "मैदान पर वापस जाएँ",
+          intro: "आइए इसे मिलकर हल करें!"
+        },
+        middle: {
+          encourage: "बढ़िया। काई सहमति में सिर हिलाता है।",
+          miss: "करीब था। उत्तर था {{answer}}।",
+          completionTitle: "सत्र समाप्त",
+          nextLabel: "अगला प्रश्न",
+          finishLabel: "सत्र समाप्त करें",
+          homeLabel: "ट्रीहाउस पर वापस जाएँ",
+          intro: "समय लें।"
+        },
+        high: {
+          encourage: "सही।",
+          miss: "बिल्कुल नहीं — उत्तर: {{answer}}",
+          completionTitle: "सत्र पूर्ण",
+          nextLabel: "अगला",
+          finishLabel: "समाप्त",
+          homeLabel: "डैशबोर्ड पर वापस जाएँ",
+          intro: "तैयार होने पर शुरू करें।"
+        }
+      }
+    },
+    teacherLessonPlan: {
+      title: "पाठ योजनाएँ",
+      subtitle: "ब्रेन-आधारित पाठ योजना जनरेटर",
+      generateNew: "नई योजना बनाएँ",
+      generateDesc: "छात्रों का चयन करें और AI को उनके ब्रेन प्रोफ़ाइल के आधार पर विभेदित पाठ योजना बनाने दें",
+      createPlan: "पाठ योजना बनाएँ",
+      recentPlans: "हाल की योजनाएँ",
+      noPlansTitle: "अभी तक कोई पाठ योजना नहीं",
+      noPlansMessage: "ऊपर अपनी पहली ब्रेन-आधारित पाठ योजना बनाएँ।",
+      learner: "विद्यार्थी",
+      noLearnersHint: "उनके लिए योजनाएँ बनाने हेतु विद्यार्थियों से जुड़ें।",
+      noLearnerError: "योजना बनाने से पहले एक विद्यार्थी चुनें।",
+      generateError: "पाठ योजना बनाने में विफल",
+      networkError: "नेटवर्क त्रुटि। कृपया पुनः प्रयास करें।",
+      objective: "उद्देश्य",
+      overview: "अवलोकन",
+      duration: "अवधि",
+      activities: "गतिविधियाँ",
+      accommodations: "समायोजन"
+    },
+    teacherAnalytics: {
+      title: "कक्षा विश्लेषण",
+      subtitle: "कार्य स्तर वितरण और प्रगति",
+      standard: "मानक",
+      supported: "समर्थित",
+      lowVerbal: "कम मौखिक",
+      domainProgress: "क्षेत्र प्रगति",
+      engagementTrends: "सहभागिता प्रवृत्तियाँ",
+      avgSessionsWeek: "औसत सत्र/सप्ताह",
+      avgSessionDuration: "औसत सत्र अवधि",
+      tutorUsageRate: "ट्यूटर उपयोग दर"
+    },
+    learnerLeaderboard: {
+      title: "लीडरबोर्ड",
+      subtitle: "देखें कि आप अन्य विद्यार्थियों की तुलना में कहाँ हैं।",
+      scopeGlobal: "वैश्विक",
+      scopeClass: "कक्षा",
+      scopeSchool: "विद्यालय",
+      empty: "अभी तक कोई प्रविष्टि नहीं। रैंक में ऊपर जाने के लिए XP अर्जित करें!",
+      youSuffix: "{{name}} (आप)",
+      learnerName: "विद्यार्थी {{id}}",
+      weeklyXp: "+{{xp}} इस सप्ताह"
+    },
+    caregiverObservation: {
+      title: "अवलोकन प्रस्तुत करें",
+      subtitle: "आज आपने जो देखा उसे साझा करें",
+      prompt: "आज बच्चे ने कैसा प्रदर्शन किया?",
+      placeholder: "अपना अवलोकन साझा करें…",
+      submitBtn: "अवलोकन प्रस्तुत करें",
+      submitted: "अवलोकन ब्रेन इनसाइट्स में सहेजा गया"
+    },
+    caregiverNotifications: {
+      title: "सूचनाएँ",
+      subtitle: "अलर्ट और मील के पत्थर",
+      noNotificationsTitle: "कोई सूचना नहीं",
+      noNotificationsMessage: "आपको IEP लक्ष्य मील के पत्थर, कार्य स्तर परिवर्तन और स्ट्रीक उपलब्धियों के लिए अलर्ट मिलेंगे।"
+    },
+    parentProgress: {
+      title: "{{name}} की प्रगति",
+      subtitle: "समय के साथ सीखने की प्रगति"
+    },
+    teacherSettings: {
+      title: "सेटिंग्स"
+    }
+  },
+
+  ja: {
+    learnerStage: {
+      letsSolve: "一緒に解いてみよう！",
+      learner: "学習者",
+      loading: "セッションを準備中…",
+      sessionMap: "セッションマップ",
+      beatLabel: "ビート {{index}}",
+      nav: {
+        map: "マップ",
+        brain: "ブレイン",
+        stats: "統計",
+        settings: "設定"
+      },
+      header: {
+        closeSession: "セッションを閉じる",
+        pauseSession: "セッションを一時停止",
+        openScratchpad: "メモ帳を開く",
+        closeScratchpad: "メモ帳を閉じる"
+      },
+      error: {
+        missingId: "セッションIDがありません",
+        couldNotLoad: "このセッションを読み込めませんでした。",
+        tryAgain: "もう一度試す",
+        backToHome: "ホームに戻る"
+      },
+      pause: {
+        titleSoft: "セッションを一時停止",
+        titleStandard: "セッションを一時停止",
+        message: "進捗は保存されます。後で続けますか？",
+        keepGoingSoft: "続けよう！",
+        keepGoing: "続ける",
+        exit: "一時停止して終了"
+      },
+      saveError: {
+        title: "警告",
+        message: "回答を保存できませんでした。記録されない可能性があります。"
+      },
+      offline: {
+        title: "オフラインで保存済み",
+        message: "オンラインに戻ったときにセッション結果が同期されます。"
+      },
+      level: "レベル {{level}}",
+      completion: {
+        score: "{{correct}} / {{total}} 正解 ({{score}}%)",
+        xpEarned: "+{{xp}} XP 獲得"
+      },
+      voice: {
+        early: {
+          encourage: "🎉 やったね！正解！",
+          miss: "惜しい！ソーラによると答えは {{answer}} だよ！",
+          completionTitle: "アドベンチャー完了！",
+          nextLabel: "次へ →",
+          finishLabel: "やった！全部完了",
+          homeLabel: "草原に戻る",
+          intro: "一緒に解いてみよう！"
+        },
+        middle: {
+          encourage: "いいね。カイが頷いている。",
+          miss: "惜しい。答えは {{answer}} でした。",
+          completionTitle: "セッション終了",
+          nextLabel: "次の問題",
+          finishLabel: "セッションを終わる",
+          homeLabel: "ツリーハウスに戻る",
+          intro: "ゆっくり考えて。"
+        },
+        high: {
+          encourage: "正解。",
+          miss: "惜しい — 答え: {{answer}}",
+          completionTitle: "セッション完了",
+          nextLabel: "次へ",
+          finishLabel: "終了",
+          homeLabel: "ダッシュボードに戻る",
+          intro: "準備ができたら始めてください。"
+        }
+      }
+    },
+    teacherLessonPlan: {
+      title: "授業計画",
+      subtitle: "ブレイン対応授業計画ジェネレーター",
+      generateNew: "新しい計画を作成",
+      generateDesc: "生徒を選択し、AI がブレインプロファイルに基づいた差別化授業計画を作成します",
+      createPlan: "授業計画を作成",
+      recentPlans: "最近の計画",
+      noPlansTitle: "授業計画がまだありません",
+      noPlansMessage: "上のフォームから最初のブレイン対応授業計画を作成してください。",
+      learner: "学習者",
+      noLearnersHint: "学習者とつながって計画を作成しましょう。",
+      noLearnerError: "計画を作成する前に学習者を選択してください。",
+      generateError: "授業計画の生成に失敗しました",
+      networkError: "ネットワークエラー。もう一度お試しください。",
+      objective: "目標",
+      overview: "概要",
+      duration: "所要時間",
+      activities: "活動",
+      accommodations: "配慮事項"
+    },
+    teacherAnalytics: {
+      title: "クラス分析",
+      subtitle: "機能レベル分布と進捗",
+      standard: "標準",
+      supported: "サポートあり",
+      lowVerbal: "ロー・バーバル",
+      domainProgress: "領域別進捗",
+      engagementTrends: "エンゲージメントの傾向",
+      avgSessionsWeek: "平均セッション数/週",
+      avgSessionDuration: "平均セッション時間",
+      tutorUsageRate: "チューター利用率"
+    },
+    learnerLeaderboard: {
+      title: "ランキング",
+      subtitle: "他の学習者と比べて自分の順位を確認しましょう。",
+      scopeGlobal: "グローバル",
+      scopeClass: "クラス",
+      scopeSchool: "学校",
+      empty: "まだランキングがありません。XP を獲得して順位を上げよう！",
+      youSuffix: "{{name}}（あなた）",
+      learnerName: "学習者 {{id}}",
+      weeklyXp: "+{{xp}} 今週"
+    },
+    caregiverObservation: {
+      title: "観察を提出",
+      subtitle: "今日気づいたことを共有してください",
+      prompt: "今日の子どもの様子はどうでしたか？",
+      placeholder: "観察内容を共有してください…",
+      submitBtn: "観察を提出",
+      submitted: "観察をブレインインサイトに保存しました"
+    },
+    caregiverNotifications: {
+      title: "通知",
+      subtitle: "アラートとマイルストーン",
+      noNotificationsTitle: "通知なし",
+      noNotificationsMessage: "IEP 目標のマイルストーン、機能レベルの変化、ストリーク達成についてのアラートが届きます。"
+    },
+    parentProgress: {
+      title: "{{name}} の進捗",
+      subtitle: "学習の進捗の推移"
+    },
+    teacherSettings: {
+      title: "設定"
+    }
+  },
+
+  ko: {
+    learnerStage: {
+      letsSolve: "함께 풀어봐요!",
+      learner: "학습자",
+      loading: "세션을 준비 중…",
+      sessionMap: "세션 맵",
+      beatLabel: "{{index}}번 구간",
+      nav: {
+        map: "맵",
+        brain: "브레인",
+        stats: "통계",
+        settings: "설정"
+      },
+      header: {
+        closeSession: "세션 닫기",
+        pauseSession: "세션 일시정지",
+        openScratchpad: "메모장 열기",
+        closeScratchpad: "메모장 닫기"
+      },
+      error: {
+        missingId: "세션 ID가 없습니다",
+        couldNotLoad: "이 세션을 불러올 수 없습니다.",
+        tryAgain: "다시 시도",
+        backToHome: "홈으로 돌아가기"
+      },
+      pause: {
+        titleSoft: "세션 일시정지",
+        titleStandard: "세션 일시정지",
+        message: "진행 상황이 저장됩니다. 나중에 계속하시겠어요?",
+        keepGoingSoft: "계속해요!",
+        keepGoing: "계속하기",
+        exit: "일시정지 후 종료"
+      },
+      saveError: {
+        title: "경고",
+        message: "답변을 저장할 수 없습니다. 기록되지 않을 수 있습니다."
+      },
+      offline: {
+        title: "오프라인 저장됨",
+        message: "인터넷에 연결되면 세션 결과가 동기화됩니다."
+      },
+      level: "레벨 {{level}}",
+      completion: {
+        score: "{{correct}} / {{total}} 정답 ({{score}}%)",
+        xpEarned: "+{{xp}} XP 획득"
+      },
+      voice: {
+        early: {
+          encourage: "🎉 와! 해냈어요!",
+          miss: "거의 다 왔어요! 소라가 말하기를 답은 {{answer}}래요!",
+          completionTitle: "어드벤처 완료!",
+          nextLabel: "다음 →",
+          finishLabel: "야호! 모두 완료",
+          homeLabel: "초원으로 돌아가기",
+          intro: "함께 풀어봐요!"
+        },
+        middle: {
+          encourage: "잘했어요. 카이가 고개를 끄덕입니다.",
+          miss: "아깝네요. 정답은 {{answer}}였어요.",
+          completionTitle: "세션 완료",
+          nextLabel: "다음 문제",
+          finishLabel: "세션 마치기",
+          homeLabel: "나무집으로 돌아가기",
+          intro: "천천히 생각해요."
+        },
+        high: {
+          encourage: "정답.",
+          miss: "틀렸네요 — 정답: {{answer}}",
+          completionTitle: "세션 완료",
+          nextLabel: "다음",
+          finishLabel: "완료",
+          homeLabel: "대시보드로 돌아가기",
+          intro: "준비되면 시작하세요."
+        }
+      }
+    },
+    teacherLessonPlan: {
+      title: "수업 계획",
+      subtitle: "브레인 기반 수업 계획 생성기",
+      generateNew: "새 계획 생성",
+      generateDesc: "학생을 선택하면 AI가 브레인 프로파일을 기반으로 차별화된 수업 계획을 생성합니다",
+      createPlan: "수업 계획 만들기",
+      recentPlans: "최근 계획",
+      noPlansTitle: "아직 수업 계획이 없습니다",
+      noPlansMessage: "위에서 첫 번째 브레인 기반 수업 계획을 생성하세요.",
+      learner: "학습자",
+      noLearnersHint: "학습자와 연결하여 계획을 생성하세요.",
+      noLearnerError: "계획을 생성하기 전에 학습자를 선택하세요.",
+      generateError: "수업 계획 생성 실패",
+      networkError: "네트워크 오류. 다시 시도해 주세요.",
+      objective: "목표",
+      overview: "개요",
+      duration: "수업 시간",
+      activities: "활동",
+      accommodations: "지원 사항"
+    },
+    teacherAnalytics: {
+      title: "학급 분석",
+      subtitle: "기능 수준 분포 및 진행 상황",
+      standard: "표준",
+      supported: "지원됨",
+      lowVerbal: "낮은 언어",
+      domainProgress: "영역별 진행",
+      engagementTrends: "참여 트렌드",
+      avgSessionsWeek: "평균 세션 수/주",
+      avgSessionDuration: "평균 세션 시간",
+      tutorUsageRate: "튜터 사용률"
+    },
+    learnerLeaderboard: {
+      title: "리더보드",
+      subtitle: "다른 학습자들과 비교해 내 순위를 확인하세요.",
+      scopeGlobal: "전체",
+      scopeClass: "학급",
+      scopeSchool: "학교",
+      empty: "아직 순위가 없습니다. XP를 쌓아 순위를 올리세요!",
+      youSuffix: "{{name}} (나)",
+      learnerName: "학습자 {{id}}",
+      weeklyXp: "+{{xp}} 이번 주"
+    },
+    caregiverObservation: {
+      title: "관찰 제출",
+      subtitle: "오늘 발견한 것을 공유하세요",
+      prompt: "오늘 아이는 어떻게 지냈나요?",
+      placeholder: "관찰 내용을 공유하세요…",
+      submitBtn: "관찰 제출",
+      submitted: "관찰이 브레인 인사이트에 저장되었습니다"
+    },
+    caregiverNotifications: {
+      title: "알림",
+      subtitle: "알림 및 마일스톤",
+      noNotificationsTitle: "알림 없음",
+      noNotificationsMessage: "IEP 목표 마일스톤, 기능 수준 변화, 연속 달성에 대한 알림을 받게 됩니다."
+    },
+    parentProgress: {
+      title: "{{name}}의 진행 상황",
+      subtitle: "시간에 따른 학습 진행"
+    },
+    teacherSettings: {
+      title: "설정"
+    }
+  },
+
+  pt: {
+    learnerStage: {
+      letsSolve: "Vamos resolver juntos!",
+      learner: "Aluno",
+      loading: "Preparando sua sessão…",
+      sessionMap: "Mapa da sessão",
+      beatLabel: "Etapa {{index}}",
+      nav: {
+        map: "Mapa",
+        brain: "Cérebro",
+        stats: "Estatísticas",
+        settings: "Configurações"
+      },
+      header: {
+        closeSession: "Fechar sessão",
+        pauseSession: "Pausar sessão",
+        openScratchpad: "Abrir rascunho",
+        closeScratchpad: "Fechar rascunho"
+      },
+      error: {
+        missingId: "ID da sessão ausente",
+        couldNotLoad: "Não foi possível carregar esta sessão.",
+        tryAgain: "Tentar novamente",
+        backToHome: "Voltar ao início"
+      },
+      pause: {
+        titleSoft: "Pausar sessão",
+        titleStandard: "Pausar sessão",
+        message: "Seu progresso será salvo. Continuar mais tarde?",
+        keepGoingSoft: "Continue assim!",
+        keepGoing: "Continuar",
+        exit: "Pausar e sair"
+      },
+      saveError: {
+        title: "Aviso",
+        message: "Não foi possível salvar sua resposta. Ela pode não ser registrada."
+      },
+      offline: {
+        title: "Salvo offline",
+        message: "Os resultados da sua sessão serão sincronizados quando você voltar online."
+      },
+      level: "Nível {{level}}",
+      completion: {
+        score: "{{correct}} / {{total}} corretos ({{score}}%)",
+        xpEarned: "+{{xp}} XP ganhos"
+      },
+      voice: {
+        early: {
+          encourage: "🎉 Eba! Você conseguiu!",
+          miss: "Quase! Sora diz que é {{answer}}!",
+          completionTitle: "Aventura concluída!",
+          nextLabel: "Próximo →",
+          finishLabel: "Eba! Tudo pronto",
+          homeLabel: "Voltar ao prado",
+          intro: "Vamos resolver juntos!"
+        },
+        middle: {
+          encourage: "Ótimo. Kai acena com aprovação.",
+          miss: "Perto. A resposta era {{answer}}.",
+          completionTitle: "Sessão encerrada",
+          nextLabel: "Próxima pergunta",
+          finishLabel: "Encerrar sessão",
+          homeLabel: "Voltar à cabana na árvore",
+          intro: "Tome o seu tempo."
+        },
+        high: {
+          encourage: "Correto.",
+          miss: "Não exatamente — resposta: {{answer}}",
+          completionTitle: "Sessão completa",
+          nextLabel: "Próximo",
+          finishLabel: "Concluir",
+          homeLabel: "Voltar ao painel",
+          intro: "Comece quando estiver pronto."
+        }
+      }
+    },
+    teacherLessonPlan: {
+      title: "Planos de Aula",
+      subtitle: "Gerador de planos de aula baseado no perfil cerebral",
+      generateNew: "Gerar novo plano",
+      generateDesc: "Selecione alunos e deixe a AI criar um plano de aula diferenciado com base em seus perfis cerebrais",
+      createPlan: "Criar plano de aula",
+      recentPlans: "Planos recentes",
+      noPlansTitle: "Nenhum plano de aula ainda",
+      noPlansMessage: "Gere seu primeiro plano de aula baseado no perfil cerebral acima.",
+      learner: "Aluno",
+      noLearnersHint: "Conecte-se com alunos para gerar planos para eles.",
+      noLearnerError: "Selecione um aluno antes de gerar um plano.",
+      generateError: "Falha ao gerar plano de aula",
+      networkError: "Erro de rede. Por favor, tente novamente.",
+      objective: "Objetivo",
+      overview: "Visão geral",
+      duration: "Duração",
+      activities: "Atividades",
+      accommodations: "Adaptações"
+    },
+    teacherAnalytics: {
+      title: "Análises da Turma",
+      subtitle: "Distribuição de nível de funcionamento e progresso",
+      standard: "Padrão",
+      supported: "Com suporte",
+      lowVerbal: "Pouco verbal",
+      domainProgress: "Progresso por domínio",
+      engagementTrends: "Tendências de engajamento",
+      avgSessionsWeek: "Média de sessões/semana",
+      avgSessionDuration: "Duração média da sessão",
+      tutorUsageRate: "Taxa de uso do tutor"
+    },
+    learnerLeaderboard: {
+      title: "Classificação",
+      subtitle: "Veja como você se classifica em relação a outros alunos.",
+      scopeGlobal: "Global",
+      scopeClass: "Turma",
+      scopeSchool: "Escola",
+      empty: "Nenhuma entrada ainda. Ganhe XP para subir no ranking!",
+      youSuffix: "{{name}} (Você)",
+      learnerName: "Aluno {{id}}",
+      weeklyXp: "+{{xp}} esta semana"
+    },
+    caregiverObservation: {
+      title: "Enviar observação",
+      subtitle: "Compartilhe o que você notou hoje",
+      prompt: "Como a criança foi hoje?",
+      placeholder: "Compartilhe sua observação…",
+      submitBtn: "Enviar observação",
+      submitted: "Observação salva nos insights do Cérebro"
+    },
+    caregiverNotifications: {
+      title: "Notificações",
+      subtitle: "Alertas e marcos",
+      noNotificationsTitle: "Nenhuma notificação",
+      noNotificationsMessage: "Você receberá alertas sobre metas IEP, mudanças de nível de funcionamento e conquistas de sequência."
+    },
+    parentProgress: {
+      title: "Progresso de {{name}}",
+      subtitle: "Progresso de aprendizado ao longo do tempo"
+    },
+    teacherSettings: {
+      title: "Configurações"
+    }
+  },
+
+  zh: {
+    learnerStage: {
+      letsSolve: "让我们一起解决吧！",
+      learner: "学习者",
+      loading: "正在准备您的课程…",
+      sessionMap: "课程地图",
+      beatLabel: "第 {{index}} 关",
+      nav: {
+        map: "地图",
+        brain: "大脑",
+        stats: "统计",
+        settings: "设置"
+      },
+      header: {
+        closeSession: "关闭课程",
+        pauseSession: "暂停课程",
+        openScratchpad: "打开草稿板",
+        closeScratchpad: "关闭草稿板"
+      },
+      error: {
+        missingId: "缺少课程 ID",
+        couldNotLoad: "无法加载此课程。",
+        tryAgain: "重试",
+        backToHome: "返回首页"
+      },
+      pause: {
+        titleSoft: "暂停课程",
+        titleStandard: "暂停课程",
+        message: "您的进度将被保存。稍后继续？",
+        keepGoingSoft: "继续加油！",
+        keepGoing: "继续",
+        exit: "暂停并退出"
+      },
+      saveError: {
+        title: "警告",
+        message: "无法保存您的答案，可能不会被记录。"
+      },
+      offline: {
+        title: "已离线保存",
+        message: "恢复网络后，您的课程结果将自动同步。"
+      },
+      level: "等级 {{level}}",
+      completion: {
+        score: "{{correct}} / {{total}} 正确（{{score}}%）",
+        xpEarned: "+{{xp}} XP 已获得"
+      },
+      voice: {
+        early: {
+          encourage: "🎉 太棒了！你做到了！",
+          miss: "差一点！索拉说答案是 {{answer}}！",
+          completionTitle: "冒险完成！",
+          nextLabel: "下一步 →",
+          finishLabel: "太好了！全部完成",
+          homeLabel: "回到草地",
+          intro: "让我们一起解决吧！"
+        },
+        middle: {
+          encourage: "不错。凯点头表示赞许。",
+          miss: "接近了。答案是 {{answer}}。",
+          completionTitle: "课程结束",
+          nextLabel: "下一题",
+          finishLabel: "结束课程",
+          homeLabel: "回到树屋",
+          intro: "慢慢来。"
+        },
+        high: {
+          encourage: "正确。",
+          miss: "不太对——答案：{{answer}}",
+          completionTitle: "课程完成",
+          nextLabel: "下一步",
+          finishLabel: "完成",
+          homeLabel: "返回仪表盘",
+          intro: "准备好后开始。"
+        }
+      }
+    },
+    teacherLessonPlan: {
+      title: "课程计划",
+      subtitle: "基于大脑档案的课程计划生成器",
+      generateNew: "生成新计划",
+      generateDesc: "选择学生，让 AI 根据其大脑档案生成差异化课程计划",
+      createPlan: "创建课程计划",
+      recentPlans: "最近的计划",
+      noPlansTitle: "暂无课程计划",
+      noPlansMessage: "在上方生成您的第一个基于大脑档案的课程计划。",
+      learner: "学习者",
+      noLearnersHint: "与学习者建立联系以为其生成计划。",
+      noLearnerError: "请先选择一名学习者再生成计划。",
+      generateError: "课程计划生成失败",
+      networkError: "网络错误，请重试。",
+      objective: "目标",
+      overview: "概述",
+      duration: "时长",
+      activities: "活动",
+      accommodations: "调整措施"
+    },
+    teacherAnalytics: {
+      title: "班级分析",
+      subtitle: "功能水平分布与进度",
+      standard: "标准",
+      supported: "有支持",
+      lowVerbal: "低语言",
+      domainProgress: "领域进度",
+      engagementTrends: "参与趋势",
+      avgSessionsWeek: "平均课程次数/周",
+      avgSessionDuration: "平均课程时长",
+      tutorUsageRate: "辅导使用率"
+    },
+    learnerLeaderboard: {
+      title: "排行榜",
+      subtitle: "查看您在其他学习者中的排名。",
+      scopeGlobal: "全球",
+      scopeClass: "班级",
+      scopeSchool: "学校",
+      empty: "暂无排行榜数据。赚取 XP 提升排名！",
+      youSuffix: "{{name}}（你）",
+      learnerName: "学习者 {{id}}",
+      weeklyXp: "+{{xp}} 本周"
+    },
+    caregiverObservation: {
+      title: "提交观察",
+      subtitle: "分享您今天注意到的情况",
+      prompt: "今天孩子表现如何？",
+      placeholder: "分享您的观察…",
+      submitBtn: "提交观察",
+      submitted: "观察已保存至大脑洞察"
+    },
+    caregiverNotifications: {
+      title: "通知",
+      subtitle: "提醒与里程碑",
+      noNotificationsTitle: "暂无通知",
+      noNotificationsMessage: "您将收到有关 IEP 目标里程碑、功能水平变化和连续学习成就的提醒。"
+    },
+    parentProgress: {
+      title: "{{name}} 的进度",
+      subtitle: "随时间推移的学习进度"
+    },
+    teacherSettings: {
+      title: "设置"
+    }
+  }
+};
+
+function deepMerge(t, s){for(const[k,v]of Object.entries(s)){
+  if(v&&typeof v==="object"&&!Array.isArray(v)){if(!t[k]||typeof t[k]!=="object")t[k]={};deepMerge(t[k],v);}
+  else t[k]=v;}return t;}
+
+let n=0;
+for (const [locale, roots] of Object.entries(DATA)) {
+  const file = join(dir, `${locale}.json`);
+  const json = JSON.parse(readFileSync(file, "utf8"));
+  deepMerge(json, roots);
+  writeFileSync(file, JSON.stringify(json, null, 2) + "\n");
+  n++;
+  console.log(`seed-MB2: ${locale}`);
+}
+console.log(`seed-MB2: done — ${n} locales`);

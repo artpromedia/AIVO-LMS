@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -11,6 +12,7 @@ import { listRosterImportJobs, listSISConnections, listSchools } from "@/lib/db/
 
 export default async function Page() {
   const session = await requirePageRole(["school_admin", "district_admin", "platform_admin"]);
+  const t = await getTranslations("admin.school_rostering");
   const schools = await listSchools(session.role === "platform_admin" ? undefined : session.tenantId);
   const connections = listSISConnections(session.tenantId);
   const jobs = listRosterImportJobs(session.tenantId).slice(0, 25);
@@ -24,21 +26,21 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="School admin"
-        title="Rostering"
+        title={t("title")}
         description="Connect your SIS or upload a CSV to import schools, classrooms, teachers, and learners."
         actions={
           schools.length > 0 ? (
             <Link href={`/admin/school/rostering/import?schoolId=${schools[0]!.id}`}>
-              <Button>Start CSV import</Button>
+              <Button>{t("start_csv_import")}</Button>
             </Link>
           ) : null
         }
       />
 
-      <SectionHeader title="Schools" description="Every school in your tenant." />
+      <SectionHeader title={t("section_schools")} description="Every school in your tenant." />
       {schools.length === 0 ? (
         <EmptyState
-          title="No schools yet"
+          title={t("empty_schools")}
           description="A school is created automatically on first roster import."
         />
       ) : (
@@ -55,11 +57,11 @@ export default async function Page() {
               <div className="mt-3 flex gap-2">
                 <Link href={`/admin/school/classes?schoolId=${s.id}`}>
                   <Button variant="outline" size="sm">
-                    Classes
+                    {t("btn_classes")}
                   </Button>
                 </Link>
                 <Link href={`/admin/school/rostering/import?schoolId=${s.id}`}>
-                  <Button size="sm">Import CSV</Button>
+                  <Button size="sm">{t("btn_import_csv")}</Button>
                 </Link>
               </div>
             </Card>
@@ -69,12 +71,12 @@ export default async function Page() {
 
       <SectionHeader
         className="mt-10"
-        title="SIS connections"
+        title={t("section_sis")}
         description="Clever, ClassLink, OneRoster, or Google Classroom."
       />
       {connections.length === 0 ? (
         <EmptyState
-          title="No SIS connection yet"
+          title={t("empty_sis")}
           description="OAuth setup for Clever and ClassLink lands in a follow-up sprint. CSV import is available now."
         />
       ) : (
@@ -101,11 +103,11 @@ export default async function Page() {
 
       <SectionHeader
         className="mt-10"
-        title="Recent import jobs"
+        title={t("section_recent_imports")}
         description="Audit trail of every roster sync."
       />
       {jobs.length === 0 ? (
-        <EmptyState title="No imports yet" description="Run your first CSV import above." />
+        <EmptyState title={t("empty_imports")} description="Run your first CSV import above." />
       ) : (
         <Card className="divide-y divide-aivo-border">
           {jobs.map((j) => (

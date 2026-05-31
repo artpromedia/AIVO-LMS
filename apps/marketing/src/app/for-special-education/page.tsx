@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { audienceMetadata } from "@/components/marketing/AudiencePage";
 import { AUDIENCES } from "@/lib/landing-content";
@@ -82,7 +83,8 @@ const SE_FAQS = [
   ...audience.faqs.slice(0, 2),
 ];
 
-export default function Page() {
+export default async function Page() {
+  const t = await getTranslations("marketing.page_for_special_education");
   return (
     <LandingPageLayout
       badge={audience.badge}
@@ -100,7 +102,7 @@ export default function Page() {
     >
       {/* §2 Support should meet the learner where they are */}
       <CalloutCard
-        title="Support should meet the learner where they are"
+        title={t("support_title")}
         body={
           <>
             <p>
@@ -127,7 +129,7 @@ export default function Page() {
       {/* §4 Optional IEP / accommodation explanation */}
       <CalloutCard
         eyebrow="Optional — never required"
-        title="Sharing IEP or accommodation context"
+        title={t("iep_sharing_title")}
         body={
           <>
             <p>
@@ -178,7 +180,7 @@ export default function Page() {
       {/* §7 Teacher-safe summaries */}
       <CalloutCard
         eyebrow="For teachers and specialists"
-        title="Teacher-safe support summaries"
+        title={t("teacher_summaries_title")}
         body="Teachers see the pacing, scaffolds, and supports each learner needs — without raw IEP text, eligibility details, or clinical language exposed in the product."
         ctaLabel="See the teacher page"
         ctaHref="/for-teachers"

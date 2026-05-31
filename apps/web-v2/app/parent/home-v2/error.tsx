@@ -1,6 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { AivoIcon } from "@aivo/ui/icon";
 import { Button } from "@/components/ui/button";
 
@@ -18,6 +19,7 @@ export default function ParentHomeV2Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations("parent.home_v2");
   useEffect(() => {
     console.error("[parent/home-v2]", error);
   }, [error]);
@@ -29,7 +31,7 @@ export default function ParentHomeV2Error({
           <AivoIcon name="safetyFlag" size={28} />
         </div>
         <h1 className="text-xl font-semibold text-iw-text-strong">
-          We couldn't load your home just now.
+          {t("error_heading")}
         </h1>
         <p className="text-sm text-iw-text-muted">
           Nothing has changed for your learner. Try again — and if it
@@ -37,15 +39,15 @@ export default function ParentHomeV2Error({
         </p>
         {error.digest ? (
           <p className="text-xs text-iw-text-muted">
-            Reference: <code className="px-1 rounded bg-iw-card">{error.digest}</code>
+            {t("error_reference")} <code className="px-1 rounded bg-iw-card">{error.digest}</code>
           </p>
         ) : null}
         <div className="flex flex-col sm:flex-row gap-2 justify-center pt-2">
           <Button type="button" onClick={reset}>
-            Try again
+            {t("error_retry")}
           </Button>
           <Button asChild variant="outline">
-            <Link href="/parent/home">Open legacy home</Link>
+            <Link href="/parent/home">{t("open_legacy_home")}</Link>
           </Button>
         </div>
       </div>

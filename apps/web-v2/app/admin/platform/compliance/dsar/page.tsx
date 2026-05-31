@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -17,6 +18,7 @@ function statusTone(s: string): "success" | "warning" | "neutral" | "danger" {
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_compliance_dsar");
   const exports = listAllDataExportRequests();
   const deletes = listAllDataDeletionRequests();
 
@@ -29,7 +31,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Compliance"
-        title="Data subject requests"
+        title={t("title")}
         description="Every parent-initiated export and deletion request. Acceptance / completion is handled outside the demo store."
       />
 
@@ -40,18 +42,18 @@ export default async function Page() {
         <table className="w-full text-sm">
           <thead className="text-left">
             <tr>
-              <th className="p-3">Requested</th>
-              <th className="p-3">Parent</th>
-              <th className="p-3">Learner</th>
-              <th className="p-3">Status</th>
-              <th className="p-3">Completed</th>
+              <th className="p-3">{t("col_requested")}</th>
+              <th className="p-3">{t("col_parent")}</th>
+              <th className="p-3">{t("col_learner")}</th>
+              <th className="p-3">{t("col_status")}</th>
+              <th className="p-3">{t("col_completed")}</th>
             </tr>
           </thead>
           <tbody>
             {exports.length === 0 ? (
               <tr>
                 <td colSpan={5} className="p-6 text-center text-aivo-ink-soft">
-                  No requests.
+                  {t("no_requests")}
                 </td>
               </tr>
             ) : (
@@ -82,18 +84,18 @@ export default async function Page() {
         <table className="w-full text-sm">
           <thead className="text-left">
             <tr>
-              <th className="p-3">Requested</th>
-              <th className="p-3">Parent</th>
+              <th className="p-3">{t("col_requested")}</th>
+              <th className="p-3">{t("col_parent")}</th>
               <th className="p-3">Scope</th>
-              <th className="p-3">Target</th>
-              <th className="p-3">Status</th>
+              <th className="p-3">{t("col_target")}</th>
+              <th className="p-3">{t("col_status")}</th>
             </tr>
           </thead>
           <tbody>
             {deletes.length === 0 ? (
               <tr>
                 <td colSpan={5} className="p-6 text-center text-aivo-ink-soft">
-                  No requests.
+                  {t("no_requests")}
                 </td>
               </tr>
             ) : (

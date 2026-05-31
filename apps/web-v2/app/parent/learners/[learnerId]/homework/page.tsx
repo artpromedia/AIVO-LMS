@@ -5,6 +5,7 @@
  */
 import { notFound } from "next/navigation";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -19,6 +20,7 @@ export default async function ParentHomeworkHistoryPage({
 }: {
   params: Promise<{ learnerId: string }>;
 }) {
+  const t = await getTranslations("parent.learner_homework");
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
@@ -37,11 +39,11 @@ export default async function ParentHomeworkHistoryPage({
     >
       <PageHeader
         eyebrow={learner.displayName}
-        title="Homework history"
-        description="What your child has been working on with the Homework Helper. Message contents stay between your child and the tutor."
+        title={t("title")}
+        description={t("description")}
       />
       {sessions.length === 0 ? (
-        <Card className="p-6 text-sm text-muted-foreground">No homework sessions yet.</Card>
+        <Card className="p-6 text-sm text-muted-foreground">{t("empty")}</Card>
       ) : (
         <ul className="grid gap-3">
           {sessions.map((s) => (
@@ -51,12 +53,13 @@ export default async function ParentHomeworkHistoryPage({
                   <div>
                     <p className="font-medium">{s.topic}</p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {new Date(s.startedAt).toLocaleString()} · {s.messages.length} messages
+                      {new Date(s.startedAt).toLocaleString()} ·{" "}
+                      {t("messages_count", { count: s.messages.length })}
                     </p>
                     {s.insight && <p className="text-sm mt-2">{s.insight}</p>}
                   </div>
                   <Badge tone={s.endedAt ? "neutral" : "primary"}>
-                    {s.endedAt ? "Done" : "Open"}
+                    {s.endedAt ? t("status_done") : t("status_open")}
                   </Badge>
                 </div>
               </Card>

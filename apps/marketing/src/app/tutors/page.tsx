@@ -2,6 +2,7 @@ import { MARKETING_ACCENTS } from "@aivo/brand";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { TUTORS } from "@/components/marketing/data";
 import { SITE_URL } from "@/lib/constants";
@@ -22,12 +23,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function TutorsIndex() {
+export default async function TutorsIndex() {
+  const t = await getTranslations("marketing.page_tutors");
   return (
     <LandingPageLayout
       badge="AI Tutors"
       badgeColor={MARKETING_ACCENTS.purple}
-      title="Fourteen AI tutors. One Brain Clone for your child."
+      title={t("page_title")}
       subtitle="Each AIVO tutor is a specialist with a personality. They share what they learn about your child so every session picks up exactly where the last one left off."
       breadcrumbs={[
         { name: "Home", href: "/" },

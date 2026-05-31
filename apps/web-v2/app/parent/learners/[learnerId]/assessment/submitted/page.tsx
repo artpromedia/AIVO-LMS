@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import {
   AssessmentShell,
@@ -23,6 +24,7 @@ export default async function AssessmentSubmittedPage({
   searchParams: Promise<{ skipped?: string }>;
 }) {
   const session = await requirePageRole(["parent"]);
+  const t = await getTranslations("parent.learner_assessment_submitted");
   const { learnerId } = await params;
   const sp = await searchParams;
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
@@ -44,19 +46,19 @@ export default async function AssessmentSubmittedPage({
         <>
           <ReassuranceCard
             tone="info"
-            title="What we use this for"
+            title={t("reassurance_usage_title")}
             body="Your answers feed straight into baseline generation. No generic quiz — every question your learner sees is shaped by what you shared."
           />
           {iepConfirmed ? (
             <ReassuranceCard
               tone="safety"
-              title="IEP supports active"
+              title={t("reassurance_iep_active_title")}
               body={`AIVO will apply the ${supportsCount} support${supportsCount === 1 ? "" : "s"} you confirmed. Adjust anytime from the learner's settings.`}
             />
           ) : (
             <ReassuranceCard
               tone="privacy"
-              title="No IEP on file"
+              title={t("reassurance_no_iep_title")}
               body="That's fine. AIVO will use your assessment alone for personalization. You can upload an IEP whenever you're ready."
             />
           )}
@@ -114,17 +116,17 @@ export default async function AssessmentSubmittedPage({
             href={`/parent/learners/${learner.id}`}
             className="inline-flex items-center gap-1.5 rounded-iw-control px-4 py-2.5 text-sm font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
           >
-            Back to learner home
+            {t("back_to_learner_home")}
           </Link>
         }
       />
 
       <section className="mt-6 grid gap-3 sm:grid-cols-3">
         <div className="rounded-iw-card border border-iw-border bg-white p-4">
-          <p className="iw-label text-iw-text-muted mb-2">Personalization inputs</p>
+          <p className="iw-label text-iw-text-muted mb-2">{t("personalization_inputs")}</p>
           <div className="flex flex-wrap gap-1.5">
             <InsightChip tone="primary" size="md">
-              Parent assessment
+              {t("parent_assessment_chip")}
             </InsightChip>
             {iepConfirmed ? (
               <InsightChip tone="accent" size="md">
@@ -137,7 +139,7 @@ export default async function AssessmentSubmittedPage({
           </div>
         </div>
         <div className="rounded-iw-card border border-iw-border bg-white p-4">
-          <p className="iw-label text-iw-text-muted mb-2">What learners never see</p>
+          <p className="iw-label text-iw-text-muted mb-2">{t("what_learners_never_see")}</p>
           <ul className="space-y-1 text-xs text-iw-text-muted leading-relaxed">
             <li>· The raw IEP document</li>
             <li>· Diagnoses or clinical language</li>
@@ -145,26 +147,26 @@ export default async function AssessmentSubmittedPage({
           </ul>
         </div>
         <div className="rounded-iw-card border border-iw-border bg-white p-4">
-          <p className="iw-label text-iw-text-muted mb-2">Want to change something?</p>
+          <p className="iw-label text-iw-text-muted mb-2">{t("want_to_change")}</p>
           <Link
             href={`/parent/learners/${learner.id}/assessment`}
             className="text-sm font-semibold text-[var(--aivo-sensory-primary)] hover:underline block"
           >
-            Edit assessment answers →
+            {t("edit_assessment_answers")}
           </Link>
           {iep ? (
             <Link
               href={`/parent/learners/${learner.id}/iep/review`}
               className="text-sm font-semibold text-[var(--aivo-sensory-primary)] hover:underline block mt-1"
             >
-              Manage IEP supports →
+              {t("manage_iep_supports")}
             </Link>
           ) : (
             <Link
               href={`/parent/learners/${learner.id}/iep`}
               className="text-sm font-semibold text-[var(--aivo-sensory-primary)] hover:underline block mt-1"
             >
-              Upload an IEP →
+              {t("upload_iep")}
             </Link>
           )}
         </div>

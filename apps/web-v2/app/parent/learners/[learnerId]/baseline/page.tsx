@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowRight, CheckCircle2, Play, Sparkles } from "lucide-react";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -62,6 +63,7 @@ export default async function ParentBaselinePage({
   params: Promise<{ learnerId: string }>;
 }) {
   const session = await requirePageRole(["parent"]);
+  const t = await getTranslations("parent.learner_baseline");
   const { learnerId } = await params;
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
@@ -80,15 +82,15 @@ export default async function ParentBaselinePage({
       >
         <PageHeader
           eyebrow={`Baseline for ${learner.displayName}`}
-          title="Finish the parent assessment first"
+          title={t("finish_assessment_first")}
           description="The baseline is built from your assessment plus the brain profile."
         />
         <EmptyState
-          title="Assessment not yet submitted"
+          title={t("assessment_not_submitted")}
           action={
             <Button asChild>
               <Link href={`/parent/learners/${learner.id}/assessment`}>
-                Continue assessment <ArrowRight className="ml-1 h-4 w-4" />
+                {t("continue_assessment")} <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             </Button>
           }
@@ -107,15 +109,15 @@ export default async function ParentBaselinePage({
       >
         <PageHeader
           eyebrow={`Baseline for ${learner.displayName}`}
-          title="Review the brain profile first"
+          title={t("review_brain_profile_first")}
           description="We use the brain profile to personalize the questions."
         />
         <EmptyState
-          title="Brain profile not generated"
+          title={t("brain_profile_not_generated")}
           action={
             <Button asChild>
               <Link href={`/parent/learners/${learner.id}/brain-profile`}>
-                Open brain profile <ArrowRight className="ml-1 h-4 w-4" />
+                {t("open_brain_profile")} <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             </Button>
           }
@@ -140,7 +142,7 @@ export default async function ParentBaselinePage({
     >
       <PageHeader
         eyebrow={`Baseline for ${learner.displayName}`}
-        title="A Discovery Adventure check-in"
+        title={t("discovery_adventure_title")}
         description="Six short chapters — Reading, Math, Science, Social-Emotional, Speech, and Executive Function — each guided by a friendly tutor. We use the results to start at the right level."
       />
 
@@ -148,7 +150,7 @@ export default async function ParentBaselinePage({
         <Card className="flex flex-col gap-3 p-[var(--aivo-density-card-pad)] sm:flex-row sm:items-center">
           <Sparkles className="h-6 w-6 text-aivo-primary" />
           <div className="flex-1">
-            <p className="font-display text-lg font-semibold">Ready to start</p>
+            <p className="font-display text-lg font-semibold">{t("ready_to_start")}</p>
             <p className="text-sm text-aivo-ink-soft">
               We'll generate {`${learner.displayName}'s`} personalized baseline now.
             </p>
@@ -156,7 +158,7 @@ export default async function ParentBaselinePage({
           <form action={startBaselineAction}>
             <input type="hidden" name="learnerId" value={learner.id} />
             <Button type="submit">
-              <Play className="mr-1 h-4 w-4" /> Start baseline
+              <Play className="mr-1 h-4 w-4" /> {t("start_baseline")}
             </Button>
           </form>
         </Card>
@@ -164,20 +166,20 @@ export default async function ParentBaselinePage({
         <Card className="flex flex-col gap-3 p-[var(--aivo-density-card-pad)] sm:flex-row sm:items-center">
           <Play className="h-6 w-6 text-aivo-primary" />
           <div className="flex-1">
-            <p className="font-display text-lg font-semibold">Baseline in progress</p>
+            <p className="font-display text-lg font-semibold">{t("baseline_in_progress")}</p>
             <p className="text-sm text-aivo-ink-soft">
               {attempts.length} of {questions.length} answered so far.
             </p>
           </div>
           <Button asChild>
             <Link href={`/learner/baseline/${baseline.id}?as=parent`}>
-              Continue baseline <ArrowRight className="ml-1 h-4 w-4" />
+              {t("continue_baseline")} <ArrowRight className="ml-1 h-4 w-4" />
             </Link>
           </Button>
           <form action={startBaselineAction}>
             <input type="hidden" name="learnerId" value={learner.id} />
             <Button type="submit" variant="outline">
-              Restart
+              {t("restart")}
             </Button>
           </form>
         </Card>
@@ -186,12 +188,12 @@ export default async function ParentBaselinePage({
           <Card className="flex items-start gap-3 p-[var(--aivo-density-card-pad)]">
             <CheckCircle2 className="mt-0.5 h-6 w-6 text-aivo-success" />
             <div>
-              <p className="font-display text-lg font-semibold">Baseline complete</p>
+              <p className="font-display text-lg font-semibold">{t("baseline_complete")}</p>
               <p className="mt-1 text-sm">{baseline.summary?.parentSummary}</p>
             </div>
           </Card>
 
-          <SectionHeader title="Per chapter" className="mt-6" />
+          <SectionHeader title={t("per_chapter")} className="mt-6" />
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {baseline.summary?.perSubject.map((row) => {
               const subj = subjectsById.get(row.subjectId);
@@ -230,58 +232,58 @@ export default async function ParentBaselinePage({
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <Button asChild>
               <Link href={`/parent/learners/${learner.id}`}>
-                Back to learner <ArrowRight className="ml-1 h-4 w-4" />
+                {t("back_to_learner")} <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             </Button>
             <form action={startBaselineAction}>
               <input type="hidden" name="learnerId" value={learner.id} />
               <Button type="submit" variant="outline">
-                Restart baseline
+                {t("restart_baseline")}
               </Button>
             </form>
           </div>
         </>
       )}
 
-      <SectionHeader title="The six chapters" className="mt-8" />
+      <SectionHeader title={t("the_six_chapters")} className="mt-8" />
       <p className="-mt-2 mb-3 text-sm text-aivo-ink-soft">
         Each chapter is hosted by a tutor character. They introduce themselves and adapt the
         difficulty as your learner answers.
       </p>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {BASELINE_TUTORS.map((t) => {
-          const subj = subjects.find((s) => s.slug === t.subjectSlug);
+        {BASELINE_TUTORS.map((tutor) => {
+          const subj = subjects.find((s) => s.slug === tutor.subjectSlug);
           const summaryRow = subj
             ? baseline?.summary?.perSubject.find((r) => r.subjectId === subj.id)
             : undefined;
           const covered = subj ? (baseline?.subjectIds ?? []).includes(subj.id) : false;
           return (
-            <Card key={t.id} className="p-4">
+            <Card key={tutor.id} className="p-4">
               <div className="flex items-start gap-3">
                 <div
                   className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg"
-                  style={{ backgroundColor: `${t.color}1A`, color: t.color }}
+                  style={{ backgroundColor: `${tutor.color}1A`, color: tutor.color }}
                   aria-hidden
                 >
-                  {t.emoji}
+                  {tutor.emoji}
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold">
-                    {t.name}'s {t.landmark}
+                    {tutor.name}'s {tutor.landmark}
                   </p>
-                  <p className="text-xs text-aivo-ink-soft">{t.subtitle}</p>
+                  <p className="text-xs text-aivo-ink-soft">{tutor.subtitle}</p>
                 </div>
                 {summaryRow ? (
                   <Badge tone="success" className="capitalize">
                     {summaryRow.estimate.replaceAll("_", " ")}
                   </Badge>
                 ) : covered ? (
-                  <Badge tone="primary">In set</Badge>
+                  <Badge tone="primary">{t("in_set")}</Badge>
                 ) : (
-                  <Badge tone="neutral">Preview</Badge>
+                  <Badge tone="neutral">{t("preview")}</Badge>
                 )}
               </div>
-              <p className="mt-2 text-xs text-aivo-ink-soft">{t.scene}</p>
+              <p className="mt-2 text-xs text-aivo-ink-soft">{tutor.scene}</p>
             </Card>
           );
         })}

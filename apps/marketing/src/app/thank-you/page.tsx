@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { SITE_URL } from "@/lib/constants";
 
@@ -31,11 +32,12 @@ const NEXT_STEPS = [
   },
 ];
 
-export default function ThankYouPage() {
+export default async function ThankYouPage() {
+  const t = await getTranslations("marketing.page_thank_you");
   return (
     <LandingPageLayout
       badge="Thank you"
-      title="We got it — thanks."
+      title={t("hero_title")}
       subtitle="A real person will read your note and reply soon. While you wait, here are a few things worth a look."
       breadcrumbs={[{ name: "Thank you", href: "/thank-you" }]}
       finalCta={{
@@ -47,7 +49,7 @@ export default function ThankYouPage() {
     >
       <section aria-labelledby="next-steps-heading">
         <h2 id="next-steps-heading" className="font-heading text-2xl font-bold text-slate-900">
-          While you wait
+          {t("while_you_wait")}
         </h2>
         <ul className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
           {NEXT_STEPS.map((s) => (

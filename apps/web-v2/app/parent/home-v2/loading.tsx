@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 /**
  * /parent/home-v2 — loading skeleton.
  *
@@ -6,6 +8,7 @@
  * hero + 6-card metric grid + section grid.
  */
 export default function ParentHomeV2Loading() {
+  const t = useTranslations("parent.home_v2");
   return (
     <main className="min-h-screen bg-[var(--aivo-color-surface-canvas)]">
       <div
@@ -13,7 +16,7 @@ export default function ParentHomeV2Loading() {
         aria-busy="true"
         aria-live="polite"
       >
-        <span className="sr-only">Loading your parent home…</span>
+        <span className="sr-only">{t("loading")}</span>
 
         {/* Hero skeleton */}
         <div className="rounded-iw-card-lg bg-white border border-iw-border shadow-[0_18px_50px_-30px_rgba(15,23,42,0.18)] p-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">

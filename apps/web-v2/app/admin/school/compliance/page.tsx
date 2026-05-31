@@ -1,4 +1,5 @@
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -22,6 +23,7 @@ const ITEMS = [
 
 export default async function Page() {
   const session = await requirePageRole(["school_admin"]);
+  const t = await getTranslations("admin.school_compliance");
   return (
     <AppShell
       role="school_admin"
@@ -31,7 +33,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="School admin"
-        title="Compliance"
+        title={t("title")}
         description="Snapshot of student-data protections for this school."
       />
       <div className="grid gap-3 sm:grid-cols-2">

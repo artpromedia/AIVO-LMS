@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -41,6 +42,7 @@ const ROLE_TONE: Record<Role, "primary" | "success" | "neutral" | "warning"> = {
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_users_detail");
   const user = await getUserById(id);
   if (!user) notFound();
 
@@ -71,7 +73,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         href="/admin/platform/users"
         className="mb-3 inline-flex items-center text-sm text-aivo-ink-soft hover:text-aivo-ink"
       >
-        <ArrowLeft className="mr-1 h-3.5 w-3.5" /> All users
+        <ArrowLeft className="mr-1 h-3.5 w-3.5" /> {t("all_users")}
       </Link>
       <PageHeader
         eyebrow="Platform · User"
@@ -86,18 +88,18 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
       <div className="grid gap-4 sm:grid-cols-3">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">User ID</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{t("user_id")}</p>
           <p className="mt-1 font-mono text-sm">{user.id}</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">Created</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{t("col_created")}</p>
           <p className="mt-1 text-sm font-medium">
             {new Date(user.createdAt).toLocaleDateString()}
           </p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            Managed learners
+            {t("managed_learners")}
           </p>
           <p className="mt-1 font-display text-2xl font-bold">
             {managedLearners.length.toLocaleString()}
@@ -107,20 +109,20 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
       <Card className="mt-6 overflow-hidden">
         <div className="border-b border-aivo-border px-4 py-3">
-          <p className="font-display text-lg font-semibold">Memberships</p>
+          <p className="font-display text-lg font-semibold">{t("memberships")}</p>
         </div>
         {memberships.length === 0 ? (
-          <EmptyState title="No memberships in your scope" />
+          <EmptyState title={t("empty")} />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-aivo-surface-2 text-left text-xs font-semibold uppercase tracking-wide text-aivo-muted">
                 <tr>
-                  <th className="px-4 py-2">Tenant</th>
+                  <th className="px-4 py-2">{t("col_tenant")}</th>
                   <th className="px-4 py-2">Type</th>
                   <th className="px-4 py-2">Role</th>
-                  <th className="px-4 py-2">Permissions</th>
-                  <th className="px-4 py-2">Joined</th>
+                  <th className="px-4 py-2">{t("col_permissions")}</th>
+                  <th className="px-4 py-2">{t("col_joined")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-aivo-border">
@@ -158,16 +160,16 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
       {managedLearners.length > 0 ? (
         <Card className="mt-6 overflow-hidden">
           <div className="border-b border-aivo-border px-4 py-3">
-            <p className="font-display text-lg font-semibold">Managed learners</p>
+            <p className="font-display text-lg font-semibold">{t("managed_learners")}</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-aivo-surface-2 text-left text-xs font-semibold uppercase tracking-wide text-aivo-muted">
                 <tr>
-                  <th className="px-4 py-2">Learner</th>
+                  <th className="px-4 py-2">{t("col_learner")}</th>
                   <th className="px-4 py-2">Grade</th>
-                  <th className="px-4 py-2">Tenant</th>
-                  <th className="px-4 py-2">Created</th>
+                  <th className="px-4 py-2">{t("col_tenant")}</th>
+                  <th className="px-4 py-2">{t("col_created")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-aivo-border">

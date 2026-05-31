@@ -1,10 +1,12 @@
 "use client";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export function AccountForm({ initial }: { initial: { displayName: string } }) {
+  const t = useTranslations("parent.settings_account_form");
   const router = useRouter();
   const [displayName, setDisplayName] = useState(initial.displayName);
   const [pending, startTransition] = useTransition();
@@ -35,7 +37,7 @@ export function AccountForm({ initial }: { initial: { displayName: string } }) {
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
         <label className="block text-sm font-medium" htmlFor="displayName">
-          Display name
+          {t("display_name")}
         </label>
         <Input
           id="displayName"
@@ -47,7 +49,7 @@ export function AccountForm({ initial }: { initial: { displayName: string } }) {
         />
       </div>
       {error ? <p className="text-sm text-aivo-danger">{error}</p> : null}
-      {saved ? <p className="text-sm text-aivo-success">Saved.</p> : null}
+      {saved ? <p className="text-sm text-aivo-success">{t("saved")}</p> : null}
       <Button type="submit" disabled={pending || displayName.trim().length === 0}>
         {pending ? "Saving…" : "Save"}
       </Button>

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
 import { listPlatformEmailTemplates } from "@/lib/db/repos";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,7 @@ function relativeTime(iso: string | null): string {
 }
 
 export default async function Page() {
+  const t = await getTranslations("admin.platform_settings_emails");
   const session = await requirePageRole(["platform_admin"]);
   const templates = listPlatformEmailTemplates();
 
@@ -45,7 +47,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Settings"
-        title="Email templates"
+        title={t("title")}
         description="Transactional + lifecycle messages sent through Postmark. Editing copy or routing is reserved for the comms team."
       />
 
@@ -61,20 +63,20 @@ export default async function Page() {
       <Card className="mt-6 overflow-hidden p-0">
         {templates.length === 0 ? (
           <EmptyState
-            title="No email templates configured"
+            title={t("no_templates_configured")}
             description="Register templates in comms-svc to make them available here."
           />
         ) : (
           <table className="w-full text-sm">
             <thead className="bg-aivo-surface-2 text-xs uppercase tracking-wide text-aivo-ink-soft">
               <tr>
-                <th className="px-4 py-3 text-left">Template</th>
+                <th className="px-4 py-3 text-left">{t("col_template")}</th>
                 <th className="px-4 py-3 text-left">From</th>
-                <th className="px-4 py-3 text-left">Subject</th>
-                <th className="px-4 py-3 text-left">Status</th>
+                <th className="px-4 py-3 text-left">{t("col_subject")}</th>
+                <th className="px-4 py-3 text-left">{t("col_status")}</th>
                 <th className="px-4 py-3 text-right">Sends</th>
-                <th className="px-4 py-3 text-left">Last sent</th>
-                <th className="px-4 py-3 text-left">Updated</th>
+                <th className="px-4 py-3 text-left">{t("col_last_sent")}</th>
+                <th className="px-4 py-3 text-left">{t("col_updated")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-aivo-border">

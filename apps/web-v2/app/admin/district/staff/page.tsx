@@ -1,4 +1,5 @@
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -28,6 +29,7 @@ const ROLE_TONE: Record<string, "primary" | "neutral" | "success"> = {
 
 export default async function Page() {
   const session = await requirePageRole(["district_admin"]);
+  const t = await getTranslations("admin.district_staff");
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const tenantIds = tenants.map((t) => t.id);
   const stats = getDistrictStats(tenantIds);
@@ -53,7 +55,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="District admin"
-        title="Staff directory"
+        title={t("title")}
         description="Every administrator and teacher across this district's schools."
       />
 
@@ -70,10 +72,10 @@ export default async function Page() {
         ))}
       </div>
 
-      <SectionHeader title="Invitations" />
+      <SectionHeader title={t("invitations_heading")} />
       <StaffInviteSection schools={schools} pendingInvites={pendingInvites} />
 
-      <SectionHeader title="Active staff" />
+      <SectionHeader title={t("active_staff_heading")} />
       <Card className="overflow-hidden">
         <div className="border-b border-aivo-border px-4 py-3">
           <p className="text-sm font-medium">
@@ -81,7 +83,7 @@ export default async function Page() {
           </p>
         </div>
         {staff.length === 0 ? (
-          <EmptyState title="No staff in this district yet" />
+          <EmptyState title={t("empty_title")} />
         ) : (
           <table className="w-full text-sm">
             <thead className="bg-aivo-surface-2 text-left text-xs font-semibold uppercase tracking-wide text-aivo-muted">
@@ -90,7 +92,7 @@ export default async function Page() {
                 <th className="px-4 py-2">Role</th>
                 <th className="px-4 py-2">Site</th>
                 <th className="px-4 py-2">Email</th>
-                <th className="px-4 py-2">Joined</th>
+                <th className="px-4 py-2">{t("col_joined")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-aivo-border">

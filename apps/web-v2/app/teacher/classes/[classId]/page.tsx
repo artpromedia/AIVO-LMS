@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -10,6 +11,7 @@ import { getClassroom, listEnrollments } from "@/lib/db/repos";
 type Params = { params: Promise<{ classId: string }> };
 
 export default async function Page({ params }: Params) {
+  const t = await getTranslations("teacher.classes_class");
   const session = await requirePageRole(["teacher"]);
   const { classId } = await params;
   const classroom = await getClassroom(classId, session.tenantId);
@@ -30,10 +32,10 @@ export default async function Page({ params }: Params) {
         description={`${learners.length} learner${learners.length === 1 ? "" : "s"} enrolled.`}
       />
       <Card className="p-[var(--aivo-density-card-pad)]">
-        <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">Roster</p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{t("roster")}</p>
         {learners.length === 0 ? (
           <p className="mt-2 text-sm text-aivo-muted">
-            No learners yet. Ask your school admin to assign learners or run a roster import.
+            {t("no_learners")}
           </p>
         ) : (
           <ul className="mt-2 space-y-1 text-sm">

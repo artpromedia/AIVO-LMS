@@ -1,6 +1,7 @@
 "use client";
 import { MARKETING_ACCENTS } from "@aivo/brand";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { CompanyPageLayout } from "@/components/marketing/legal/CompanyPageLayout";
 
 const FACTS = [
@@ -13,17 +14,18 @@ const FACTS = [
 ];
 
 export default function PressKitPage() {
+  const t = useTranslations("marketing.page_press_kit");
   return (
     <CompanyPageLayout
       badge="Press Kit"
       breadcrumbSlug="press-kit"
-      title="Media Resources"
+      title={t("media_resources")}
       subtitle="Everything you need to tell the AIVO story. Download logos, read our fact sheet, and get in touch with our press team."
       icon="📰"
       accentColor={MARKETING_ACCENTS.amberDeep}
     >
       <section className="mb-16">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-6">Company Overview</h2>
+        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-6">{t("company_overview")}</h2>
         <div className="bg-white rounded-2xl border border-slate-100 p-8">
           <p className="text-slate-600 font-body leading-relaxed mb-6">
             AIVO Learning is an AI-powered adaptive learning platform designed for students of all
@@ -41,7 +43,7 @@ export default function PressKitPage() {
       </section>
 
       <section className="mb-16">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-6">Quick Facts</h2>
+        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-6">{t("quick_facts")}</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {FACTS.map((f) => (
             <div
@@ -56,35 +58,35 @@ export default function PressKitPage() {
       </section>
 
       <section className="mb-16">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-6">Brand Assets</h2>
+        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-6">{t("brand_assets")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white rounded-2xl border border-slate-100 p-8 flex flex-col items-center">
             <div className="bg-white rounded-xl p-6 mb-4 w-full flex items-center justify-center border border-slate-50">
               <Image
                 src="/images/aivo-logo-purple.png"
-                alt="AIVO Logo Purple"
+                alt={t("logo_purple_alt")}
                 width={200}
                 height={60}
                 style={{ width: "auto", height: "auto" }}
               />
             </div>
-            <p className="text-sm text-slate-500 font-body">Primary Logo (Purple)</p>
+            <p className="text-sm text-slate-500 font-body">{t("primary_logo_purple")}</p>
           </div>
           <div className="bg-slate-900 rounded-2xl border border-slate-700 p-8 flex flex-col items-center">
             <div className="rounded-xl p-6 mb-4 w-full flex items-center justify-center">
               <Image
                 src="/images/aivo-logo-white.png"
-                alt="AIVO Logo White"
+                alt={t("logo_white_alt")}
                 width={200}
                 height={60}
                 style={{ width: "auto", height: "auto" }}
               />
             </div>
-            <p className="text-sm text-slate-400 font-body">Logo on Dark Background</p>
+            <p className="text-sm text-slate-400 font-body">{t("logo_dark_bg")}</p>
           </div>
         </div>
         <div className="mt-6 p-6 bg-slate-50 rounded-2xl border border-slate-100">
-          <h3 className="font-heading font-bold text-slate-900 mb-3">Brand Colors</h3>
+          <h3 className="font-heading font-bold text-slate-900 mb-3">{t("brand_colors")}</h3>
           <div className="flex flex-wrap gap-4">
             {[
               { name: "AIVO Purple", hex: MARKETING_ACCENTS.purple, textWhite: true },
@@ -111,7 +113,7 @@ export default function PressKitPage() {
 
       <section>
         <div className="bg-amber-50 rounded-3xl border border-amber-100 p-8 md:p-12">
-          <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">Media Contact</h2>
+          <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">{t("media_contact")}</h2>
           <p className="text-slate-600 font-body mb-6">
             For press inquiries, interview requests, or media resources, please reach out to our
             communications team.

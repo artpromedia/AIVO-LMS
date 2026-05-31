@@ -3,6 +3,7 @@
  * picker data; client component submits to the BFF.
  */
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { TEACHER_NAV } from "@/components/layout/role-shells";
@@ -12,6 +13,7 @@ import { NewAssignmentForm } from "./new-form";
 export const dynamic = "force-dynamic";
 
 export default async function NewAssignmentPage() {
+  const t = await getTranslations("teacher.assignments_new");
   const session = await requirePageRole(["teacher"]);
   const subjects = await listSubjects();
   const learners = await listLearnersForTeacher(session.userId, session.tenantId);
@@ -32,7 +34,7 @@ export default async function NewAssignmentPage() {
     >
       <PageHeader
         eyebrow="Assignments"
-        title="New assignment"
+        title={t("title")}
         description="Pick a subject and skills, choose learners, and add instructions."
       />
       <NewAssignmentForm

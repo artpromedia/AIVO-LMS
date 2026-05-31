@@ -1,4 +1,5 @@
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -18,6 +19,7 @@ const STATUS_TONE: Record<string, "success" | "warning" | "danger" | "neutral" |
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_migration");
   const jobs = listMigrationJobs();
   return (
     <AppShell
@@ -28,15 +30,15 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Migration"
-        title="v1 → v2 migration"
+        title={t("title")}
         description="Preview and run data migrations from legacy systems. Always dry-run first."
       />
       <RunForm />
 
-      <h2 className="mb-3 font-display text-lg font-semibold">Recent jobs</h2>
+      <h2 className="mb-3 font-display text-lg font-semibold">{t("recent_jobs")}</h2>
       {jobs.length === 0 ? (
         <EmptyState
-          title="No migration jobs yet"
+          title={t("empty")}
           description="Use the form above to start a dry-run."
         />
       ) : (
@@ -45,11 +47,11 @@ export default async function Page() {
             <thead className="bg-aivo-surface-2 text-left">
               <tr>
                 <th className="p-3">Job</th>
-                <th className="p-3">Source</th>
+                <th className="p-3">{t("col_source")}</th>
                 <th className="p-3">Kind</th>
-                <th className="p-3">Status</th>
-                <th className="p-3">Results</th>
-                <th className="p-3">Started</th>
+                <th className="p-3">{t("col_status")}</th>
+                <th className="p-3">{t("col_results")}</th>
+                <th className="p-3">{t("col_started")}</th>
               </tr>
             </thead>
             <tbody>

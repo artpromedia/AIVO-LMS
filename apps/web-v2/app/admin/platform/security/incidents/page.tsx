@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -23,6 +24,7 @@ const STATUS_TONE = {
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_security_incidents");
   const incidents = listIncidents();
 
   return (
@@ -34,15 +36,15 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Security"
-        title="Incidents"
+        title={t("title")}
         description="Open, investigate, mitigate, resolve. Timeline is preserved for the post-mortem."
       />
       <Card className="mb-6 p-[var(--aivo-density-card-pad)]">
-        <p className="mb-3 font-display text-lg font-semibold">Open an incident</p>
+        <p className="mb-3 font-display text-lg font-semibold">{t("open_incident_heading")}</p>
         <OpenIncidentForm />
       </Card>
       {incidents.length === 0 ? (
-        <Card className="p-6 text-sm text-aivo-ink-soft">No incidents on file.</Card>
+        <Card className="p-6 text-sm text-aivo-ink-soft">{t("empty_body")}</Card>
       ) : (
         <div className="space-y-3">
           {incidents.map((i) => {
@@ -54,9 +56,9 @@ export default async function Page() {
                   <div className="flex items-center gap-2">
                     <Badge tone={SEVERITY_TONE[i.severity]}>{i.severity.toUpperCase()}</Badge>
                     <Badge tone={STATUS_TONE[i.status]}>{i.status.replace("_", " ")}</Badge>
-                    {i.customerImpact && <Badge tone="warning">Customer impact</Badge>}
+                    {i.customerImpact && <Badge tone="warning">{t("badge_customer_impact")}</Badge>}
                     {i.regulatorNotificationRequired && (
-                      <Badge tone="danger">Regulator notify</Badge>
+                      <Badge tone="danger">{t("badge_regulator_notify")}</Badge>
                     )}
                   </div>
                 </div>

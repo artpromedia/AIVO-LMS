@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CreditCard, User } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
@@ -10,6 +11,7 @@ import { getBillingForTenant, getTenantById } from "@/lib/db/repos";
 
 export default async function Page() {
   const session = await requirePageRole(["parent"]);
+  const t = await getTranslations("parent.settings");
   const billing = getBillingForTenant(session.tenantId);
   const tenant = getTenantById(session.tenantId);
 
@@ -21,16 +23,16 @@ export default async function Page() {
       user={{ displayName: session.displayName, email: session.email }}
     >
       <PageHeader
-        eyebrow="Settings"
-        title="Account settings"
-        description="Manage your profile, family plan, and household preferences."
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        description={t("description")}
       />
       <div className="grid gap-4 sm:grid-cols-2">
         <Link href="/parent/settings/account" className="block">
           <Card className="p-[var(--aivo-density-card-pad)] hover:bg-aivo-surface-2">
             <div className="flex items-center gap-3">
               <User className="h-5 w-5 text-aivo-primary" />
-              <h3 className="font-display text-lg font-semibold">Account</h3>
+              <h3 className="font-display text-lg font-semibold">{t("account_label")}</h3>
             </div>
             <p className="mt-2 text-sm text-aivo-ink-soft">
               {session.displayName} · {session.email}
@@ -41,7 +43,7 @@ export default async function Page() {
           <Card className="p-[var(--aivo-density-card-pad)] hover:bg-aivo-surface-2">
             <div className="flex items-center gap-3">
               <CreditCard className="h-5 w-5 text-aivo-primary" />
-              <h3 className="font-display text-lg font-semibold">Billing</h3>
+              <h3 className="font-display text-lg font-semibold">{t("billing_label")}</h3>
             </div>
             <p className="mt-2 text-sm text-aivo-ink-soft">
               {tenant?.name ?? "Your family"} ·{" "}
@@ -57,8 +59,8 @@ export default async function Page() {
       </div>
       <SectionHeader
         className="mt-10"
-        title="Privacy"
-        description="COPPA, FERPA, and data export tools live with the platform team — file a support ticket if you need an export."
+        title={t("privacy_label")}
+        description={t("privacy_desc")}
       />
     </AppShell>
   );

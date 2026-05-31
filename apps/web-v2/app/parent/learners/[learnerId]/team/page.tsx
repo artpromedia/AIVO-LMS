@@ -9,6 +9,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Mail } from "lucide-react";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { PARENT_NAV } from "@/components/layout/role-shells";
@@ -44,6 +45,7 @@ export default async function ParentTeamPage({
 }: {
   params: Promise<{ learnerId: string }>;
 }) {
+  const t = await getTranslations("parent.learner_team");
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
@@ -128,17 +130,17 @@ export default async function ParentTeamPage({
     >
       <PageHeader
         eyebrow={learner.displayName}
-        title="Care team"
+        title={t("title")}
         description="Everyone supporting this learner. Parents, teachers, therapists, and caregivers can all see progress."
       />
 
-      <SectionHeader title="Invite a team member" />
+      <SectionHeader title={t("invite_member")} />
       <TeamInviteSection learnerId={learner.id} careTeam={getCareTeam(learner.id)} />
 
       <SectionHeader title={`${list.length} member${list.length === 1 ? "" : "s"}`} />
       {list.length === 0 ? (
         <EmptyState
-          title="No team members yet"
+          title={t("no_members_title")}
           description="Once a teacher is enrolled in your learner's classroom or a therapist joins your family tenant, they'll appear here."
         />
       ) : (
@@ -149,7 +151,7 @@ export default async function ParentTeamPage({
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="truncate font-medium">{m.displayName}</p>
-                    {m.isPrimary ? <Badge tone="success">Primary</Badge> : null}
+                    {m.isPrimary ? <Badge tone="success">{t("primary")}</Badge> : null}
                     <Badge tone="neutral">{ROLE_LABEL[m.role] ?? m.role}</Badge>
                   </div>
                   <p className="mt-0.5 truncate text-xs text-aivo-ink-soft">{m.context}</p>
@@ -166,12 +168,12 @@ export default async function ParentTeamPage({
         </ul>
       )}
 
-      <SectionHeader title="How collaboration works" />
+      <SectionHeader title={t("how_collab_works")} />
       <Card className="p-[var(--aivo-density-card-pad)]">
         <ul className="list-disc space-y-1 pl-5 text-sm text-aivo-ink-soft">
-          <li>Parents and guardians have full access to all learner data.</li>
-          <li>Teachers see classroom-scoped progress and may draft IEP goals.</li>
-          <li>Therapists and caregivers see read-only summaries unless explicitly elevated.</li>
+          <li>{t("collab_parents")}</li>
+          <li>{t("collab_teachers")}</li>
+          <li>{t("collab_therapists")}</li>
           <li>
             Any member can be removed at any time from{" "}
             <Link

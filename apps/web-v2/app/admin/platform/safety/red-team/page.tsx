@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -79,6 +80,7 @@ const CASES: {
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_safety_red_team");
   const policy = getActiveSafetyPolicy();
   const results = CASES.map((c) => {
     const cls = SAFETY_CLASSIFY(c.text, { subjectKind: c.kind, policy });
@@ -105,7 +107,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Safety"
-        title="Red-team suite"
+        title={t("title")}
         description="Deterministic adversarial prompts run through the live classifier. CI imports the same harness so a regression here fails the build."
       />
       <Card className="p-[var(--aivo-density-card-pad)] mb-3">
@@ -121,10 +123,10 @@ export default async function Page() {
           <thead className="bg-aivo-surface-2 text-xs uppercase text-aivo-muted">
             <tr>
               <th className="px-4 py-2 text-left">Case</th>
-              <th className="px-4 py-2 text-left">Prompt</th>
-              <th className="px-4 py-2 text-left">Expected</th>
-              <th className="px-4 py-2 text-left">Observed</th>
-              <th className="px-4 py-2 text-left">Result</th>
+              <th className="px-4 py-2 text-left">{t("col_prompt")}</th>
+              <th className="px-4 py-2 text-left">{t("col_expected")}</th>
+              <th className="px-4 py-2 text-left">{t("col_observed")}</th>
+              <th className="px-4 py-2 text-left">{t("col_result")}</th>
             </tr>
           </thead>
           <tbody className="divide-y">

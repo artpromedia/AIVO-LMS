@@ -1252,6 +1252,303 @@
       "cta_primary": "Démarrer l’essai familial",
       "cta_secondary": "Contacter les ventes districts",
       "cta_image_alt": "Un parent et un enfant apprenant ensemble sur un canapé"
+    },
+    "page_reset_password": {
+      "logo_aria": "Accueil AIVO",
+      "heading": "Réinitialisez votre mot de passe",
+      "subheading": "Choisissez un nouveau mot de passe pour votre compte.",
+      "success_heading": "Mot de passe mis à jour",
+      "back_to_sign_in": "Retour à la connexion",
+      "label_new_password": "Nouveau mot de passe",
+      "placeholder_new_password": "Au moins 12 caractères",
+      "label_confirm_password": "Confirmer le nouveau mot de passe",
+      "placeholder_confirm_password": "Ressaisissez votre nouveau mot de passe",
+      "passwords_mismatch": "Les mots de passe ne correspondent pas encore",
+      "btn_updating": "Mise à jour...",
+      "btn_submit": "Mettre à jour le mot de passe",
+      "trust_badge": "Conçu pour respecter COPPA · FERPA · SOC 2",
+      "loading": "Chargement..."
+    },
+    "page_features_homework_helper": {
+      "page_title": "Une aide guidée, jamais une réponse toute faite",
+      "callout_title": "L’Assistant devoirs ne donnera pas les réponses directement",
+      "get_help_cta": "Obtenir de l’aide →",
+      "clarifying_question": "Avant de résoudre — que signifie « en tout » pour toi dans ce problème ?",
+      "your_answer_label": "Ta réponse :",
+      "explanation_text": "Tu as ajouté 3 quatre fois. C’est la même chose que 3 × 4. Ça s’appelle",
+      "mastery_updated": "Maîtrise mise à jour : Multiplication comme addition répétée · en cours.",
+      "recommended_next_label": "Recommandé ensuite",
+      "recommended_lesson_title": "Multiplier par 3 · LessonRun",
+      "recommended_lesson_meta": "Avec Atlas · ~15 minutes",
+      "added_to_session": "Ajouté à la prochaine session de Maya."
+    },
+    "page_waitlist": {
+      "page_title": "Réservez votre place.",
+      "form_heading": "Parlez-nous de votre apprenant",
+      "form_subheading": "Deux champs obligatoires. Le reste nous aide à choisir la bonne intégration quand votre place sera disponible.",
+      "promise_heading": "Ce que nous promettons",
+      "promise_no_spam_title": "Pas de spam",
+      "promise_no_spam_body": "Un e-mail quand votre place s’ouvre. Peut-être un second si vous ne répondez pas.",
+      "promise_no_sharing_title": "Pas de partage",
+      "promise_no_sharing_body": "Nous ne vendons ni ne partageons vos coordonnées — jamais. Consultez notre politique de confidentialité.",
+      "promise_easy_out_title": "Sortie facile",
+      "promise_easy_out_body": "Répondez « supprimer » à n’importe quel e-mail de liste d’attente et nous supprimons votre enregistrement."
+    },
+    "page_resources": {
+      "cta_get_started": "Commencer",
+      "badge": "Ressources",
+      "heading": "Guides, introductions et parcours de lecture",
+      "guides_heading": "Guides",
+      "guides_subheading": "Guides pratiques détaillés pour les écoles, les districts et les équipes d’approvisionnement.",
+      "blog_heading": "Du blog",
+      "blog_subheading": "Articles courts sur le fonctionnement réel de la boucle d’apprentissage."
+    },
+    "page_for_teachers": {
+      "assignment_title": "Multiplier par 3 — semaine 4",
+      "roster_label": "Liste de classe",
+      "roster_value": "Classe 3B · 22 apprenants",
+      "assign_cta": "Assigner à la classe",
+      "callout_summaries_title": "Des résumés en langage clair que vous enverriez vraiment à la maison",
+      "callout_accommodation_title": "Résumés d’aménagements sécurisés pour les enseignants"
+    },
+    "page_contact": {
+      "page_title": "Parlez à une vraie personne.",
+      "form_heading": "Envoyez-nous un message",
+      "form_subheading": "Dites-nous ce que vous cherchez et nous l’acheminerons vers la bonne équipe.",
+      "inboxes_heading": "Autres façons de nous joindre"
+    },
+    "page_blog": {
+      "nav_resources": "Ressources",
+      "cta_get_started": "Commencer",
+      "heading": "Notes de l’équipe AIVO"
+    },
+    "page_for_schools": {
+      "callout_workflow_title": "L’apprentissage personnalisé échoue quand il alourdit le travail des enseignants",
+      "callout_neurodiverse_title": "Conçu en pensant aux apprenants neurodivergents",
+      "progress_summary": "Maya montre des progrès constants en lecture."
+    },
+    "page_subjects": {
+      "page_title": "Un tuteur par matière. Un Clone Mental pour votre enfant."
+    },
+    "page_signup": {
+      "logo_aria_label": "Accueil AIVO",
+      "start_free_today": "Commencez gratuitement aujourd'hui",
+      "create_your_account": "Créez votre compte",
+      "label_full_name": "Nom complet",
+      "placeholder_name": "Alex Parker",
+      "label_password": "Mot de passe",
+      "placeholder_password": "Au moins 8 caractères",
+      "password_hint": "Mélangez lettres, chiffres et un symbole pour plus de sécurité.",
+      "creating_account": "Création du compte...",
+      "create_account": "Créer un compte",
+      "no_credit_card": "Aucune carte de crédit requise",
+      "privacy_policy": "Politique de confidentialité",
+      "coppa_ferpa_badge": "Conçu pour respecter COPPA et FERPA",
+      "sign_in": "Se connecter",
+      "footer_privacy": "Confidentialité"
+    },
+    "page_forgot_password": {
+      "logo_aria_label": "Accueil AIVO",
+      "heading": "Mot de passe oublié ?",
+      "subheading": "Saisissez votre e-mail et nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+      "check_inbox": "Vérifiez votre boîte de réception",
+      "if_account_exists": "Si un compte existe pour",
+      "back_to_sign_in": "Retour à la connexion",
+      "sending": "Envoi en cours...",
+      "send_reset_link": "Envoyer le lien de réinitialisation",
+      "back_to_sign_in_form": "Retour à la connexion",
+      "coppa_ferpa_soc2_badge": "Conçu pour respecter COPPA · FERPA · SOC 2"
+    },
+    "page_press_kit": {
+      "media_resources": "Ressources médias",
+      "company_overview": "Présentation de l'entreprise",
+      "quick_facts": "Chiffres clés",
+      "brand_assets": "Ressources de marque",
+      "logo_purple_alt": "Logo AIVO violet",
+      "primary_logo_purple": "Logo principal (violet)",
+      "logo_white_alt": "Logo AIVO blanc",
+      "logo_dark_bg": "Logo sur fond sombre",
+      "brand_colors": "Couleurs de marque",
+      "media_contact": "Contact presse"
+    },
+    "page_features_todays_mission": {
+      "page_title": "La meilleure action d'apprentissage suivante, chaque jour",
+      "problem_title": "Les apprenants se perdent dans les tableaux de bord",
+      "mockup_todays_mission": "Mission du jour",
+      "mockup_lesson_title": "Multiplier par 3",
+      "mockup_lesson_meta": "Avec Atlas · ~15 minutes · Mathématiques",
+      "mockup_start_mission": "Démarrer la mission →",
+      "mockup_accessibility_note": "La lecture à voix haute et le mode pause sont activés pour Maya.",
+      "visibility_title": "Une visibilité en langage clair, pas un déversement de données"
+    },
+    "page_for_districts": {
+      "rostering_title": "Compatible OneRoster, CSV ou saisie manuelle",
+      "licensing_heading": "Licences par siège, tarification pour les districts",
+      "accessibility_title": "WCAG 2.2 AA comme objectif de conception",
+      "accessibility_gaps_note": "Nous maintenons une déclaration d'accessibilité et publions les lacunes connues — pas seulement des affirmations.",
+      "dpa_title": "Demander notre dossier sécurité et DPA"
+    },
+    "page_guides": {
+      "nav_resources": "Ressources",
+      "nav_get_started": "Commencer",
+      "badge": "Guides",
+      "heading": "Guides pratiques",
+      "subheading": "Des lectures approfondies et adaptées aux marchés publics pour les écoles, les districts et les familles."
+    },
+    "page_compare": {
+      "eyebrow": "Comparer",
+      "heading": "Choisissez votre rôle pour voir comment AIVO s'adapte.",
+      "see_comparison": "Voir la comparaison →"
+    },
+    "page_for_special_education": {
+      "support_title": "Le soutien doit rejoindre l'apprenant là où il en est",
+      "iep_sharing_title": "Partager le contexte IEP ou les aménagements",
+      "teacher_summaries_title": "Résumés de soutien sûrs pour les enseignants"
+    },
+    "page_tutors": {
+      "page_title": "Quatorze tuteurs IA. Un Brain Clone pour votre enfant."
+    },
+    "page_about": {
+      "get_started": "Commencer",
+      "our_mission": "Notre Mission",
+      "no_learner_left_behind": "Aucun Apprenant Laissé Pour Compte",
+      "core_principles": "Principes Fondamentaux",
+      "core_principles_sub": "Les fondations qui guident tout ce que nous construisons.",
+      "our_values": "Nos Valeurs",
+      "our_values_sub": "Ce que nous défendons en tant qu'entreprise et éducateurs.",
+      "meet_our_leadership": "Rencontrez Notre Direction",
+      "linkedin_profile": "Profil LinkedIn",
+      "join_our_mission": "Rejoignez Notre Mission",
+      "view_open_positions": "Voir les Postes Ouverts",
+      "contact_us": "Contactez-Nous",
+      "privacy": "Confidentialité",
+      "accessibility": "Accessibilité"
+    },
+    "page_for_parents": {
+      "iep_title": "Contexte IEP ou d'adaptation, géré avec soin",
+      "reading_question": "Comment votre enfant se sent-il face à la lecture ?",
+      "answers_saved": "Les réponses sont enregistrées automatiquement.",
+      "aivo_disclaimer": "AIVO ne pose pas de diagnostic. AIVO ne remplace pas les thérapeutes, les équipes IEP ni les spécialistes.",
+      "take_a_breath": "Respirez. Il n'y a pas de minuterie.",
+      "which_word_means": "Quel mot signifie la même chose que",
+      "need_a_break": "Besoin d'une pause ?",
+      "todays_mission": "La mission du jour",
+      "multiplying_by_3s": "Multiplier par 3",
+      "with_atlas": "Avec Atlas · ~15 minutes",
+      "start_mission": "Démarrer la mission →",
+      "maya_strong_week": "Maya a eu une excellente semaine !"
+    },
+    "page_demo": {
+      "hero_title": "Découvrez AIVO en action.",
+      "form_heading": "Parlez-nous un peu de votre contexte",
+      "form_subheading": "Plus nous en savons, plus la démonstration sera utile. Les champs obligatoires sont indiqués.",
+      "what_happens_next": "Ce qui se passe ensuite",
+      "step1_label": "Étape 1 · Dans 1 jour ouvrable",
+      "step2_label": "Étape 2 · Démonstration de 30 minutes",
+      "step2_body": "Nous montrons les vues de l'apprenant, du parent et de l'enseignant — et répondons à vos questions en direct.",
+      "step3_label": "Étape 3 · Pilote ou proposition",
+      "step3_body": "Si c'est une bonne adéquation, nous cadrons un pilote court ou envoyons une proposition écrite — sans pression."
+    },
+    "page_features_lessonrun": {
+      "hero_title": "L'unité d'apprentissage personnalisée derrière chaque leçon AIVO",
+      "voice_support_title": "Assistance vocale à chaque étape",
+      "break_mode_title": "Une pause sereine — pas un abandon",
+      "count_by_3s_prompt": "Comptons par 3 jusqu'à 12. On commence à 3. Qu'est-ce qui vient ensuite ?",
+      "hint_counting_fingers": "Essaie de compter sur tes doigts : 3 · 6 · ? — quel nombre vient trois de plus que 6 ?",
+      "need_another_hint": "Besoin d'un autre indice ?",
+      "maya_strong_week": "Maya a eu une excellente semaine !"
+    },
+    "page_careers": {
+      "page_title": "Rejoignez l'Équipe AIVO",
+      "why_work_heading": "Pourquoi travailler chez AIVO ?",
+      "open_positions_heading": "Postes Ouverts",
+      "apply_now": "Postuler",
+      "no_role_heading": "Vous ne voyez pas votre poste ?",
+      "send_general_application": "Envoyer une Candidature Spontanée"
+    },
+    "page_pricing": {
+      "hero_title": "Des tarifs honnêtes. Sans surprises.",
+      "for_families": "Pour les familles",
+      "family_disclaimer": "Mois par mois. Annulez à tout moment. Garantie de remboursement de 30 jours sur les plans payants.",
+      "for_schools": "Pour les écoles et les districts",
+      "pricing_faq_heading": "FAQ Tarification"
+    },
+    "page_features": {
+      "eyebrow": "Fonctionnalités",
+      "heading": "De vraies expériences d'apprentissage, pas des listes de fonctionnalités.",
+      "learn_more": "En savoir plus →"
+    },
+    "page_thank_you": {
+      "hero_title": "Nous l'avons reçu — merci.",
+      "while_you_wait": "En attendant"
+    },
+    "page_levels": {
+      "hero_title": "Cinq niveaux. Une plateforme. Chaque apprenant."
+    },
+    "page_accessibility": {
+      "title": "AIVO Accessibility Statement"
+    },
+    "page_cookie_policy": {
+      "title": "Cookie Policy"
+    },
+    "page_coppa_compliance": {
+      "title": "COPPA Compliance Statement"
+    },
+    "page_ferpa_compliance": {
+      "title": "FERPA Compliance Statement"
+    },
+    "page_privacy_policy": {
+      "title": "AIVO Privacy Policy"
+    },
+    "page_security": {
+      "title": "How we protect your data."
+    },
+    "page_subprocessors": {
+      "get_started": "Get Started",
+      "badge": "Subprocessors",
+      "heading": "AIVO subprocessors",
+      "current_subprocessors": "Current subprocessors",
+      "col_subprocessor": "Subprocessor",
+      "col_purpose": "Purpose",
+      "col_data_category": "Data category",
+      "col_region": "Region",
+      "col_status": "Status",
+      "how_we_use_heading": "How we use this list",
+      "reporting_heading": "Reporting subprocessor changes",
+      "questions_heading": "Questions?",
+      "footer_privacy": "Privacy",
+      "footer_security": "Security",
+      "footer_accessibility": "Accessibility"
+    },
+    "page_terms_of_service": {
+      "title": "AIVO Terms of Service"
+    },
+    "page_trust": {
+      "title": "What we promise — and how to check."
+    },
+    "page_compare_detail": {
+      "aivo_best_for": "AIVO est idéal pour",
+      "side_by_side": "Comparaison côte à côte",
+      "col_feature": "Fonctionnalité",
+      "honest_note": "Une note honnête de notre part",
+      "other_comparisons": "Autres comparaisons"
+    },
+    "page_levels_detail": {
+      "who_its_for": "Pour qui",
+      "whats_included": "Ce qui est inclus",
+      "builtin_accommodations": "Adaptations intégrées",
+      "sample_activities": "Activités exemples",
+      "other_levels": "Autres niveaux"
+    },
+    "page_subjects_detail": {
+      "key_features": "Fonctionnalités clés",
+      "topics_covered": "Sujets couverts",
+      "other_subjects": "Autres matières"
+    },
+    "page_tutors_detail": {
+      "built_for_every_learner": "Conçu pour chaque apprenant",
+      "other_tutors": "Autres tuteurs AIVO",
+      "see_all_tutors": "Voir les 14 tuteurs →"
     }
   }
 }

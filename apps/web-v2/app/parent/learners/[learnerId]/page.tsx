@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import {
   ArrowRight,
   Settings,
@@ -25,6 +26,7 @@ export default async function LearnerDetailPage({
 }: {
   params: Promise<{ learnerId: string }>;
 }) {
+  const t = await getTranslations("parent.learner_overview");
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
@@ -54,7 +56,7 @@ export default async function LearnerDetailPage({
         actions={
           <Button asChild variant="outline">
             <Link href={`/parent/learners/${learner.id}/settings`}>
-              <Settings className="mr-1 h-4 w-4" /> Settings
+              <Settings className="mr-1 h-4 w-4" /> {t("settings")}
             </Link>
           </Button>
         }
@@ -63,7 +65,7 @@ export default async function LearnerDetailPage({
       <Card className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center">
         <LearnerAvatar name={learner.displayName} size="lg" />
         <div className="flex-1">
-          <p className="text-xs text-aivo-ink-soft">Next step</p>
+          <p className="text-xs text-aivo-ink-soft">{t("next_step")}</p>
           <p className="font-display text-lg font-semibold">{next.label}</p>
           <div className="mt-2 flex flex-wrap gap-2">
             <Badge tone={tone}>{READINESS_LABEL[learner.readinessState]}</Badge>
@@ -82,7 +84,7 @@ export default async function LearnerDetailPage({
         </Button>
       </Card>
 
-      <SectionHeader title="Explore" />
+      <SectionHeader title={t("explore")} />
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
           {
@@ -126,14 +128,14 @@ export default async function LearnerDetailPage({
         ))}
       </div>
 
-      <SectionHeader title="Profile basics" />
+      <SectionHeader title={t("profile_basics")} />
       <div className="grid gap-4 sm:grid-cols-2">
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
-            Comfort levels
+            {t("comfort_levels")}
           </p>
           <dl className="mt-2 grid grid-cols-2 gap-y-2 text-sm">
-            <dt className="text-aivo-ink-soft">Reading</dt>
+            <dt className="text-aivo-ink-soft">{t("reading")}</dt>
             <dd>{learner.readingComfort ?? "—"}</dd>
             <dt className="text-aivo-ink-soft">Math</dt>
             <dd>{learner.mathComfort ?? "—"}</dd>
@@ -141,10 +143,10 @@ export default async function LearnerDetailPage({
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
-            Strengths
+            {t("strengths")}
           </p>
           {learner.knownStrengths.length === 0 ? (
-            <p className="mt-2 text-sm text-aivo-ink-soft">None recorded yet.</p>
+            <p className="mt-2 text-sm text-aivo-ink-soft">{t("none_recorded")}</p>
           ) : (
             <ul className="mt-2 list-disc pl-5 text-sm">
               {learner.knownStrengths.map((s) => (
@@ -155,10 +157,10 @@ export default async function LearnerDetailPage({
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
-            Challenges
+            {t("challenges")}
           </p>
           {learner.knownChallenges.length === 0 ? (
-            <p className="mt-2 text-sm text-aivo-ink-soft">None recorded yet.</p>
+            <p className="mt-2 text-sm text-aivo-ink-soft">{t("none_recorded")}</p>
           ) : (
             <ul className="mt-2 list-disc pl-5 text-sm">
               {learner.knownChallenges.map((s) => (
@@ -169,7 +171,7 @@ export default async function LearnerDetailPage({
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
-            Accessibility defaults
+            {t("accessibility_defaults")}
           </p>
           <ul className="mt-2 space-y-1 text-sm">
             <li>Reduced motion: {learner.accessibilityDefaults.reducedMotion ? "On" : "Off"}</li>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { WEB_APP_URL, SITE_URL } from "@/lib/constants";
 import { getAllArticles } from "@/lib/content";
@@ -12,7 +13,8 @@ export const metadata: Metadata = {
   alternates: { canonical: `${SITE_URL}/resources` },
 };
 
-export default function ResourcesPage() {
+export default async function ResourcesPage() {
+  const t = await getTranslations("marketing.page_resources");
   const all = getAllArticles();
   const guides = all.filter((a) => a.kind === "guide");
   const blog = all.filter((a) => a.kind === "blog");
@@ -43,7 +45,7 @@ export default function ResourcesPage() {
               href={`${WEB_APP_URL}/signup?plan=free`}
               className="inline-flex min-h-[44px] items-center rounded-full bg-primary px-5 py-2.5 font-bold text-white shadow-lg shadow-purple-200 transition hover:bg-primary-dark"
             >
-              Get Started
+              {t("cta_get_started")}
             </a>
           </div>
         </div>
@@ -52,10 +54,10 @@ export default function ResourcesPage() {
       <section className="bg-gradient-to-b from-purple-50/40 via-white to-white py-16 md:py-20">
         <div className="mx-auto max-w-5xl px-6 md:px-8">
           <span className="inline-flex items-center gap-2 rounded-full bg-purple-100 px-4 py-1 text-sm font-bold text-purple-700">
-            Resources
+            {t("badge")}
           </span>
           <h1 className="mt-4 font-heading text-4xl font-bold leading-tight text-slate-900 md:text-5xl">
-            Guides, primers, and reading paths
+            {t("heading")}
           </h1>
           <p className="mt-3 max-w-2xl font-body text-lg text-slate-500">
             Plain-language reference material for parents, teachers, and school leaders.
@@ -67,10 +69,10 @@ export default function ResourcesPage() {
       <main className="mx-auto max-w-5xl space-y-16 px-6 py-12 md:px-8 md:py-16">
         <section aria-labelledby="guides-heading">
           <h2 id="guides-heading" className="font-heading text-2xl font-bold text-slate-900">
-            Guides
+            {t("guides_heading")}
           </h2>
           <p className="mt-1 font-body text-slate-600">
-            Longer-form practical guides for schools, districts, and procurement teams.
+            {t("guides_subheading")}
           </p>
           <div className="mt-6 grid gap-6 md:grid-cols-2">
             {guides.map((g) => (
@@ -97,10 +99,10 @@ export default function ResourcesPage() {
 
         <section aria-labelledby="blog-heading">
           <h2 id="blog-heading" className="font-heading text-2xl font-bold text-slate-900">
-            From the blog
+            {t("blog_heading")}
           </h2>
           <p className="mt-1 font-body text-slate-600">
-            Short articles on how the learning loop actually works.
+            {t("blog_subheading")}
           </p>
           <div className="mt-6 grid gap-6 md:grid-cols-2">
             {blog.map((p) => (

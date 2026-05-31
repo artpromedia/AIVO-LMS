@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { TUTORS } from "@/components/marketing/data";
 import { SITE_URL } from "@/lib/constants";
@@ -33,6 +34,7 @@ export default async function TutorPage({ params }: Props) {
   const { slug } = await params;
   const tutor = TUTORS.find((t) => t.name.toLowerCase() === slug);
   if (!tutor) notFound();
+  const t = await getTranslations("marketing.page_tutors_detail");
 
   return (
     <LandingPageLayout
@@ -85,7 +87,7 @@ export default async function TutorPage({ params }: Props) {
 
       <section className="mb-12">
         <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">
-          Built for every learner
+          {t("built_for_every_learner")}
         </h2>
         <p className="text-slate-600 font-body leading-relaxed">
           {tutor.name} adapts across all 5 functioning levels — from grade-aligned content for
@@ -96,7 +98,7 @@ export default async function TutorPage({ params }: Props) {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">Other AIVO tutors</h2>
+        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">{t("other_tutors")}</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {TUTORS.filter((t) => t.name !== tutor.name)
             .slice(0, 6)
@@ -126,7 +128,7 @@ export default async function TutorPage({ params }: Props) {
             ))}
         </div>
         <Link href="/tutors" className="inline-block mt-4 text-primary font-bold hover:underline">
-          See all 14 tutors →
+          {t("see_all_tutors")}
         </Link>
       </section>
     </LandingPageLayout>

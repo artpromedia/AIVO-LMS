@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { WEB_APP_URL, SITE_URL } from "@/lib/constants";
 import { getArticlesByKind } from "@/lib/content";
@@ -12,7 +13,8 @@ export const metadata: Metadata = {
   alternates: { canonical: `${SITE_URL}/guides` },
 };
 
-export default function GuidesIndexPage() {
+export default async function GuidesIndexPage() {
+  const t = await getTranslations("marketing.page_guides");
   const guides = getArticlesByKind("guide");
   return (
     <div className="min-h-screen bg-white">
@@ -34,13 +36,13 @@ export default function GuidesIndexPage() {
               href="/resources"
               className="hidden min-h-[44px] items-center rounded-lg px-5 py-2 font-semibold text-slate-600 transition hover:text-primary sm:inline-flex"
             >
-              Resources
+              {t("nav_resources")}
             </Link>
             <a
               href={`${WEB_APP_URL}/signup?plan=free`}
               className="inline-flex min-h-[44px] items-center rounded-full bg-primary px-5 py-2.5 font-bold text-white shadow-lg shadow-purple-200 transition hover:bg-primary-dark"
             >
-              Get Started
+              {t("nav_get_started")}
             </a>
           </div>
         </div>
@@ -49,13 +51,13 @@ export default function GuidesIndexPage() {
       <section className="bg-gradient-to-b from-purple-50/40 via-white to-white py-16 md:py-20">
         <div className="mx-auto max-w-5xl px-6 md:px-8">
           <span className="inline-flex items-center gap-2 rounded-full bg-purple-100 px-4 py-1 text-sm font-bold text-purple-700">
-            Guides
+            {t("badge")}
           </span>
           <h1 className="mt-4 font-heading text-4xl font-bold leading-tight text-slate-900 md:text-5xl">
-            Practical guides
+            {t("heading")}
           </h1>
           <p className="mt-3 max-w-2xl font-body text-lg text-slate-500">
-            Longer-form, procurement-friendly reading for schools, districts, and families.
+            {t("subheading")}
           </p>
         </div>
       </section>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { audienceMetadata } from "@/components/marketing/AudiencePage";
 import { AUDIENCES } from "@/lib/landing-content";
@@ -40,7 +41,8 @@ const SCHOOL_WORKFLOW = [
   },
 ];
 
-export default function Page() {
+export default async function Page() {
+  const t = await getTranslations("marketing.page_for_schools");
   return (
     <LandingPageLayout
       badge={audience.badge}
@@ -58,7 +60,7 @@ export default function Page() {
       {/* §2 Why personalized learning fails without workflow */}
       <CalloutCard
         eyebrow="The honest version"
-        title="Personalized learning fails when it adds teacher workflow"
+        title={t("callout_workflow_title")}
         body={
           <p>
             Schools have been promised &ldquo;personalized learning&rdquo; for a decade. Most
@@ -155,7 +157,7 @@ export default function Page() {
         mockup={
           <div className="space-y-2">
             <p className="text-sm font-semibold text-slate-900">
-              Maya is showing steady reading progress.
+              {t("progress_summary")}
             </p>
             <div className="space-y-1.5">
               {[
@@ -175,7 +177,7 @@ export default function Page() {
       {/* §7 Special education support */}
       <CalloutCard
         eyebrow="Special education"
-        title="Built with neurodiverse learners in mind"
+        title={t("callout_neurodiverse_title")}
         body="AIVO can use parent-provided context and optional accommodation information to adapt pacing, scaffolds, read-aloud, and lesson structure — without exposing learners to clinical labels."
         ctaLabel="See the special-education page"
         ctaHref="/for-special-education"

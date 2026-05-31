@@ -2,6 +2,7 @@ import Link from "next/link";
 import { FloatingMetricCard, LearningHero } from "@aivo/ui/hero";
 import { AivoIcon } from "@aivo/ui/icon";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 
 interface SnapshotProps {
   params: { learnerId: string };
@@ -16,6 +17,7 @@ interface SnapshotProps {
  * All cards have real destinations."
  */
 export default async function LearnerSnapshot({ params }: SnapshotProps) {
+  const t = await getTranslations("parent.learner_snapshot");
   await requirePageRole(["parent"]);
   const { learnerId } = params;
   const learnerName = "Emma";
@@ -33,14 +35,14 @@ export default async function LearnerSnapshot({ params }: SnapshotProps) {
               className="inline-flex items-center gap-2 h-11 px-5 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold shadow-sm hover:opacity-95"
             >
               <AivoIcon name="aiBrain" size={18} />
-              Open full profile
+              {t("open_full_profile")}
             </Link>
           }
         />
 
         <section>
           <h2 className="iw-label uppercase tracking-wider text-iw-text-muted mb-3">
-            This week
+            {t("this_week")}
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <FloatingMetricCard

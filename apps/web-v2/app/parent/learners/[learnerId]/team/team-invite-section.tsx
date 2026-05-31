@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { GraduationCap, HeartHandshake, Brain, UserPlus, X } from "lucide-react";
 import {
   inviteTeamMemberAction,
@@ -39,6 +40,7 @@ const ROLE_META: Record<TeamRole, { label: string; icon: React.ReactNode; accent
 const initialState: InviteFormState = { ok: false, error: null };
 
 export function TeamInviteSection({ learnerId, careTeam }: Props) {
+  const t = useTranslations("parent.learner_team");
   const [openRole, setOpenRole] = useState<TeamRole | null>(null);
   const [state, formAction, pending] = useActionState(inviteTeamMemberAction, initialState);
   const [revokePending, startRevoke] = useTransition();
@@ -89,7 +91,7 @@ export function TeamInviteSection({ learnerId, careTeam }: Props) {
           <button
             type="button"
             onClick={() => setOpenRole(null)}
-            aria-label="Cancel invite"
+            aria-label={t("cancel_invite")}
             className="absolute right-3 top-3 text-aivo-ink-soft hover:text-aivo-ink"
           >
             <X className="h-4 w-4" />
@@ -105,7 +107,7 @@ export function TeamInviteSection({ learnerId, careTeam }: Props) {
                 htmlFor="invite-email"
                 className="mb-1 block text-xs font-medium text-aivo-ink"
               >
-                Email address
+                {t("email_address")}
               </label>
               <Input id="invite-email" name="email" type="email" required autoFocus />
             </div>
@@ -115,13 +117,13 @@ export function TeamInviteSection({ learnerId, careTeam }: Props) {
                   htmlFor="invite-relationship"
                   className="mb-1 block text-xs font-medium text-aivo-ink"
                 >
-                  Relationship (optional)
+                  {t("relationship_optional")}
                 </label>
                 <Input
                   id="invite-relationship"
                   name="relationship"
                   type="text"
-                  placeholder="e.g. Co-parent, Grandparent"
+                  placeholder={t("relationship_placeholder")}
                 />
               </div>
             ) : null}
@@ -132,13 +134,13 @@ export function TeamInviteSection({ learnerId, careTeam }: Props) {
                     htmlFor="invite-specialty"
                     className="mb-1 block text-xs font-medium text-aivo-ink"
                   >
-                    Specialty (optional)
+                    {t("specialty_optional")}
                   </label>
                   <Input
                     id="invite-specialty"
                     name="specialty"
                     type="text"
-                    placeholder="e.g. Speech-language"
+                    placeholder={t("specialty_placeholder")}
                   />
                 </div>
                 <div>
@@ -146,13 +148,13 @@ export function TeamInviteSection({ learnerId, careTeam }: Props) {
                     htmlFor="invite-credentials"
                     className="mb-1 block text-xs font-medium text-aivo-ink"
                   >
-                    Credentials (optional)
+                    {t("credentials_optional")}
                   </label>
                   <Input
                     id="invite-credentials"
                     name="credentials"
                     type="text"
-                    placeholder="e.g. M.S., CCC-SLP"
+                    placeholder={t("credentials_placeholder")}
                   />
                 </div>
               </>
@@ -175,7 +177,7 @@ export function TeamInviteSection({ learnerId, careTeam }: Props) {
                 size="sm"
                 onClick={() => setOpenRole(null)}
               >
-                Cancel
+                {t("cancel")}
               </Button>
             </div>
           </form>
@@ -203,6 +205,7 @@ function PendingInviteList({
   onRevoke: (formData: FormData) => void;
   revoking: boolean;
 }) {
+  const t = useTranslations("parent.learner_team");
   const rows = (
     [
       ["teacher", careTeam.teachers],
@@ -213,7 +216,7 @@ function PendingInviteList({
   if (rows.length === 0) return null;
   return (
     <Card className="p-4">
-      <h3 className="mb-2 text-sm font-semibold">Care-team invites</h3>
+      <h3 className="mb-2 text-sm font-semibold">{t("care_team_invites")}</h3>
       <ul className="divide-y divide-aivo-border">
         {rows.map(({ role, record }) => {
           const meta = ROLE_META[role];
@@ -250,7 +253,7 @@ function PendingInviteList({
                   disabled={revoking}
                   className="text-rose-700"
                 >
-                  Revoke
+                  {t("revoke")}
                 </Button>
               </form>
             </li>

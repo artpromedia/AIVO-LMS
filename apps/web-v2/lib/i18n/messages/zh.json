@@ -91,7 +91,20 @@
       "reassure_safety_title": "安全事项始终紧急",
       "reassure_safety_body": "如果出现任何与安全相关的内容，它会置于此列表顶部并立即提醒你。",
       "prefs_title": "送达偏好",
-      "prefs_desc": "选择各渠道向你送达哪些更新。"
+      "prefs_desc": "选择各渠道向你送达哪些更新。",
+      "mark_all_read": "全部标为已读",
+      "mark_read": "标为已读",
+      "new_badge": "新",
+      "unread_count": "{count} 条未读",
+      "prefs_quiet_hours": "免打扰时间",
+      "prefs_quiet_hours_placeholder": "例如 22:00-07:00",
+      "prefs_digest_cadence": "摘要频率",
+      "prefs_cadence_daily": "每天",
+      "prefs_cadence_weekly": "每周",
+      "prefs_cadence_off": "关闭",
+      "prefs_saving": "正在保存…",
+      "prefs_save": "保存偏好设置",
+      "prefs_saved": "已保存。"
     },
     "privacy": {
       "eyebrow": "隐私",
@@ -123,7 +136,16 @@
       "th_scope": "范围",
       "th_target": "对象",
       "th_status": "状态",
-      "whole_account": "整个账户"
+      "whole_account": "整个账户",
+      "form_confirm_error": "输入 DELETE 以确认。",
+      "form_question": "您想删除什么？",
+      "form_scope_account": "我的整个账户（每位学习者、所有历史记录）",
+      "form_scope_learner": "单个学习者（其所有数据）",
+      "form_scope_iep": "仅上传的 IEP 文档",
+      "form_learner_label": "学习者",
+      "form_no_learners": "没有学习者",
+      "form_notes_label": "备注（可选）",
+      "form_confirm_label": "输入 <mono>DELETE</mono> 以确认"
     },
     "privacy_export": {
       "eyebrow": "隐私",
@@ -135,7 +157,15 @@
       "th_scope": "范围",
       "th_status": "状态",
       "th_completed": "完成时间",
-      "all_my_data": "我的所有数据"
+      "all_my_data": "我的所有数据",
+      "form_scope_label": "范围",
+      "form_all_my_data_full": "我的全部数据（账户 + 每位学习者）",
+      "form_just_learner": "仅 {name}",
+      "form_notes_label": "备注（可选）",
+      "form_notes_placeholder": "有什么需要我们知道的吗？",
+      "form_submitting": "正在提交…",
+      "form_submit": "请求导出",
+      "form_email_when_ready": "导出准备就绪后，我们会通过电子邮件通知您。导出通常需要不到 24 小时。"
     },
     "billing": {
       "eyebrow": "设置 · 账单",
@@ -159,7 +189,434 @@
       "choose_plan": "选择计划",
       "recent_invoices": "最近的发票",
       "no_invoices_title": "暂无发票",
-      "no_invoices_body": "每个账单周期结束后，发票会显示在这里。"
+      "no_invoices_body": "每个账单周期结束后，发票会显示在这里。",
+      "sub_current_badge": "当前",
+      "sub_set_to_cancel": "已设置为在周期结束时取消。",
+      "sub_free_trial": "{days} 天免费试用",
+      "sub_current_plan": "当前套餐",
+      "sub_working": "处理中...",
+      "sub_switch": "切换到此套餐",
+      "sub_canceling": "正在取消...",
+      "sub_cancel_at_period_end": "在周期结束时取消"
+    },
+    "learner_assessment_intro": {
+      "reassurance_privacy_title": "您的回答只属于您自己",
+      "reassurance_no_diagnosis_title": "无需诊断",
+      "not_now": "暂不填写"
+    },
+    "learner_assessment": {
+      "placeholder_pronouns": "她 / 她的，他 / 他的，TA / TA 的…",
+      "placeholder_languages": "中文，英文",
+      "placeholder_diagnoses_other": "例如：APD、轻度听力损失",
+      "placeholder_loves": "恐龙。用乐高积木搭建。和奶奶一起做饭。",
+      "placeholder_good_at": "记歌词、搭建、画画、善良",
+      "placeholder_motivates": "超越自己的纪录。给爸爸看。酷炫的太空知识。",
+      "placeholder_frustration_triggers": "长篇阅读段落。\n计时器。\n嘈杂的房间。",
+      "placeholder_calming_strategies": "短暂散步。\n喝水 + 2 分钟远离屏幕。\n降噪耳机。",
+      "placeholder_accommodations": "考试延时。\n频繁的运动休息。\n安静的测试环境。",
+      "placeholder_goals": "不间断阅读 15 分钟。\n对乘法充满信心。\n写一篇短故事。",
+      "placeholder_concerns": "担心阅读自信心。最近转学。春季有重要考试。",
+      "reassurance_private_title": "默认私密",
+      "reassurance_no_diagnosis_title": "无需诊断",
+      "movement_helps_label": "运动有助于我的孩子集中注意力",
+      "movement_helps_body": "AIVO 可以在问题组之间建议伸展 / 步行休息。",
+      "aac_label": "我的孩子使用辅助沟通（AAC）设备或应用",
+      "aac_body": "AIVO 将切换至适合 AAC 的回应模式。",
+      "homework_coaching_label": "我的孩子需要帮助才能开始做作业",
+      "homework_coaching_body": "AIVO 将提供脚手架式的启动提示。",
+      "autosave_indicator": "前进时答案自动保存",
+      "back_to_intro": "返回介绍",
+      "save_exit": "保存并退出"
+    },
+    "learner_assessment_review": {
+      "reassurance_review_title": "应用前再过一遍",
+      "reassurance_next_title": "接下来会发生什么",
+      "back_to_last_step": "返回上一步",
+      "save_exit": "保存并退出",
+      "not_yet_answered": "尚未回答。",
+      "edit_answers": "编辑答案 →"
+    },
+    "learner_assessment_submitted": {
+      "reassurance_usage_title": "我们如何使用这些信息",
+      "reassurance_iep_active_title": "IEP 支持已激活",
+      "reassurance_no_iep_title": "暂无 IEP",
+      "back_to_learner_home": "返回学习者主页",
+      "personalization_inputs": "个性化输入",
+      "parent_assessment_chip": "家长评估",
+      "what_learners_never_see": "学习者永远看不到的内容",
+      "want_to_change": "想更改什么？",
+      "edit_assessment_answers": "编辑评估答案 →",
+      "manage_iep_supports": "管理 IEP 支持 →",
+      "upload_iep": "上传 IEP →",
+      "setting_it_up": "正在设置…",
+      "see_baseline_cta": "查看基线测试的形成过程"
+    },
+    "learner_brain_profile": {
+      "finish_assessment_first": "请先完成家长评估",
+      "assessment_not_submitted": "评估尚未提交",
+      "continue_assessment": "继续评估",
+      "could_not_generate": "无法生成档案",
+      "try_again": "重试",
+      "page_title": "AIVO 将如何与您的学习者合作",
+      "regenerate": "重新生成",
+      "recommended_tutor_persona": "推荐的辅导老师风格",
+      "parent_assessment_summary": "家长评估摘要",
+      "accommodation_summary": "调整摘要",
+      "learning_profile": "学习档案",
+      "sensory_profile": "感官档案",
+      "pattern": "模式",
+      "sensitivities": "感官敏感",
+      "attention": "注意力",
+      "focus_window": "专注时间窗",
+      "breaks": "休息",
+      "movement_helps": "运动有帮助",
+      "comfort": "舒适度",
+      "reading": "阅读",
+      "preferred_modalities": "偏好学习方式",
+      "support_defaults": "默认支持",
+      "motivation": "动力",
+      "rewards_that_help": "有效的奖励",
+      "avoidance_factors": "回避因素",
+      "subjects_at_a_glance": "学科一览",
+      "back_to_learner": "返回学习者"
+    },
+    "learner_baseline": {
+      "finish_assessment_first": "请先完成家长评估",
+      "assessment_not_submitted": "评估尚未提交",
+      "review_brain_profile_first": "请先查看脑部档案",
+      "brain_profile_not_generated": "脑部档案尚未生成",
+      "discovery_adventure_title": "探索冒险检查",
+      "per_chapter": "按章节",
+      "the_six_chapters": "六个章节",
+      "continue_assessment": "继续评估",
+      "open_brain_profile": "打开脑部档案",
+      "ready_to_start": "准备开始",
+      "start_baseline": "开始基线",
+      "baseline_in_progress": "基线进行中",
+      "continue_baseline": "继续基线",
+      "restart": "重新开始",
+      "baseline_complete": "基线已完成",
+      "back_to_learner": "返回学习者",
+      "restart_baseline": "重新开始基线",
+      "in_set": "已在集合中",
+      "preview": "预览"
+    },
+    "learner_baseline_pending": {
+      "no_generic_quiz_title": "无通用测验",
+      "calm_by_default_title": "默认平静模式",
+      "try_again": "重试",
+      "step1_label": "步骤 1 · 技能图",
+      "step1_heading": "选择正确的起始技能",
+      "step1_body": "我们将学习者的年级段和信心答案映射到课程上。",
+      "step2_label": "步骤 2 · 个性化",
+      "step2_heading": "应用支持和节奏",
+      "step2_body": "我们尊重您确认的每项调整以及感觉档案。",
+      "in_progress": "进行中",
+      "step3_label": "步骤 3 · 问题集",
+      "step3_heading": "起草第一批问题",
+      "step3_body": "简短、平静、无时间压力。您的学习者可以随时暂停。",
+      "up_next": "即将进行"
+    },
+    "learner_baseline_summary": {
+      "starting_points_title": "起始点，而非分数",
+      "iep_supports_stay_on_title": "IEP 支持保持开启",
+      "no_iep_needed_title": "无需 IEP",
+      "no_baseline_yet": "尚无已完成的基线",
+      "manage_baseline": "管理基线",
+      "baseline_complete": "基线已完成",
+      "questions_answered": "已回答问题",
+      "skipped_questions_note": "跳过的问题也有用——它们告诉 AIVO 要缓慢引入的内容。",
+      "subjects_covered": "涵盖科目",
+      "personalization": "个性化",
+      "parent_assessment": "家长评估",
+      "pacing": "节奏",
+      "where_lessons_start": "课程从哪里开始",
+      "for_you": "给您",
+      "what_learner_sees": "您的学习者看到的内容",
+      "learner_only_version_note": "这是您的学习者看到的唯一版本——没有分数，没有临床语言。",
+      "iep_supports_in_effect": "IEP 支持生效中",
+      "back_to_learner_home": "返回学习者主页",
+      "run_another_baseline": "再次运行基线"
+    },
+    "learner_iep": {
+      "why_assessment_first_title": "为什么我们先要求评估",
+      "finish_assessment_first_title": "请先完成家长评估",
+      "iep_stays_private_title": "IEP 保持私密",
+      "you_stay_in_control_title": "您保持控制权",
+      "share_document_title": "分享文件以便我们应用正确的支持",
+      "back_to_learner": "返回学习者",
+      "continue_assessment": "继续评估",
+      "skip_for_now": "暂时跳过",
+      "review_extracted_supports": "查看提取的支持",
+      "remove": "删除",
+      "upload_extract_supports": "上传并提取支持"
+    },
+    "learner_iep_review": {
+      "no_iep_on_file_title": "没有 IEP 记录",
+      "learner_never_sees_title": "学习者从不看到这些",
+      "you_can_deselect_title": "您可以取消选择任何内容",
+      "reading_document_title": "正在读取文档",
+      "confirm_what_aivo_applies_title": "确认 AIVO 可以应用的内容",
+      "go_to_iep_upload": "前往 IEP 上传",
+      "re_run_extraction": "重新运行提取",
+      "remove": "删除",
+      "back_to_upload": "返回上传",
+      "save_and_exit": "保存并退出",
+      "service_areas": "服务领域",
+      "none_flagged": "无标记内容。",
+      "assistive_technology": "辅助技术",
+      "none_recorded": "无记录内容。",
+      "learner_safe_summary": "学习者安全摘要"
+    },
+    "consent": {
+      "title": "每位学习者的同意",
+      "description": "每位学习者的同意仅适用于该子女。",
+      "coppa_notice": "该学习者未满 13 岁。根据 COPPA，数据收集需要家长同意。",
+      "accepted": "已接受",
+      "not_accepted": "未接受"
+    },
+    "learner_accessibility_audio": {
+      "title": "朗读"
+    },
+    "learner_accessibility": {
+      "title": "辅助功能"
+    },
+    "learner_gradebook": {
+      "title": "成绩册",
+      "no_mastery_data": "暂无掌握数据",
+      "start_baseline": "开始基线评估",
+      "subject_averages": "各科平均分",
+      "skill_mastery": "技能掌握程度",
+      "col_subject": "科目",
+      "col_confidence": "置信度",
+      "recent_sessions": "最近课程",
+      "no_sessions": "暂无课程记录。",
+      "col_started": "开始时间",
+      "col_source": "来源",
+      "col_status": "状态"
+    },
+    "learner_lessons": {
+      "title": "课程",
+      "see_progress": "查看进度",
+      "worked_on": "学习内容",
+      "went_well": "表现良好",
+      "needed_help": "需要帮助",
+      "up_next": "下一步"
+    },
+    "learner_milestones": {
+      "title": "里程碑",
+      "description": "在整个项目中获得的经验值、连续打卡、货币和徽章。",
+      "no_engagement_data": "暂无参与数据",
+      "no_engagement_desc": "一旦你的学习者完成第一次课程，我们将开始追踪 XP、连续打卡和徽章。",
+      "back_to_overview": "返回学习者概览",
+      "total_xp": "总 XP",
+      "levels_desc": "升级可解锁新头像、个性化设置和任务世界。",
+      "current_streak": "当前连续打卡",
+      "wallet": "钱包",
+      "wallet_desc": "每次课程获得金币，完成大挑战解锁宝石。",
+      "badge_collection": "徽章收藏",
+      "earned": "已获得",
+      "locked": "已锁定",
+      "how_xp_works": "XP 的运作方式"
+    },
+    "learner_profile_v2": {
+      "open_lessons": "打开今天的课程",
+      "profile_settings": "档案设置",
+      "learning_identity": "学习特质"
+    },
+    "learner_progress": {
+      "title": "进度",
+      "description": "我们正在学习的各科目掌握情况。",
+      "lessons_link": "课程",
+      "summary_link": "简明摘要",
+      "lessons_done": "已完成课程",
+      "time_learning": "学习时间",
+      "skills_tracked": "追踪技能",
+      "mastered": "已掌握",
+      "by_subject": "按科目"
+    },
+    "learner_summary": {
+      "title": "简明摘要",
+      "description": "一页式快照——哪里有进展，下一步是什么。",
+      "progress_link": "进度",
+      "lessons_link": "课程",
+      "whats_going_well": "进展良好的方面",
+      "fill_after_lessons": "完成最初几节课后，我们将填写此内容。",
+      "keep_practicing": "我们将继续练习的方面",
+      "no_skills_flagged": "暂无标记技能。",
+      "recent_lessons": "最近课程"
+    },
+    "learners": {
+      "title": "你的学习者",
+      "description": "为每个孩子设置一次，然后在一个地方观察他们的成长。",
+      "add_learner": "添加学习者",
+      "no_learners": "暂无学习者",
+      "no_learners_desc": "添加你的第一个孩子以开始准备流程。",
+      "add_a_learner": "添加学习者"
+    },
+    "reports": {
+      "eyebrow": "家长",
+      "title": "每周学习摘要",
+      "no_learners": "暂无学习者",
+      "no_learners_body": "从主页添加学习者，开始生成进度报告。",
+      "open_learner": "打开学习者 →",
+      "recent_lessons": "最近课程"
+    },
+    "settings_account_form": {
+      "display_name": "显示名称",
+      "saved": "已保存。"
+    },
+    "settings": {
+      "eyebrow": "设置",
+      "title": "账户设置",
+      "description": "管理你的档案、家庭计划和家庭偏好。",
+      "account_label": "账户",
+      "billing_label": "账单",
+      "privacy_label": "隐私",
+      "privacy_desc": "COPPA、FERPA 和数据导出工具由平台团队负责——如需导出，请提交支持工单。"
+    },
+    "learner_overview": {
+      "settings": "设置",
+      "next_step": "下一步",
+      "explore": "探索",
+      "profile_basics": "基本资料",
+      "comfort_levels": "舒适度",
+      "reading": "阅读",
+      "strengths": "优势",
+      "none_recorded": "暂无记录。",
+      "challenges": "挑战",
+      "accessibility_defaults": "无障碍默认设置"
+    },
+    "learner_sensory": {
+      "title": "感觉处理档案",
+      "modalities": "感觉类型",
+      "notes": "备注",
+      "hyper_sensitive": "过度敏感",
+      "hypo_sensitive": "感觉迟钝"
+    },
+    "learner_settings": {
+      "danger_zone": "危险区域",
+      "error_invalid": "部分信息有误，请检查后重试。",
+      "error_confirm": "请在确认框中输入 DELETE 以移除该学习者。",
+      "first_name": "名字",
+      "preferred_name": "常用名",
+      "pronouns": "代词",
+      "primary_language": "主要语言",
+      "strengths": "优势",
+      "challenges": "挑战",
+      "accessibility_defaults": "无障碍默认设置",
+      "save_changes": "保存更改",
+      "delete_confirm_label": "输入 DELETE 以确认",
+      "remove_learner": "移除学习者"
+    },
+    "learner_snapshot": {
+      "open_full_profile": "查看完整档案",
+      "this_week": "本周"
+    },
+    "learner_team": {
+      "title": "关爱团队",
+      "invite_member": "邀请团队成员",
+      "no_members_title": "暂无团队成员",
+      "primary": "主要",
+      "how_collab_works": "协作方式说明",
+      "collab_parents": "家长和监护人可完整访问所有学习者数据。",
+      "collab_teachers": "教师可查看课堂范围的进度，并可起草 IEP 目标。",
+      "collab_therapists": "治疗师和护理人员除非被明确授权，否则只能查看只读摘要。",
+      "cancel_invite": "取消邀请",
+      "email_address": "电子邮件地址",
+      "relationship_optional": "关系（可选）",
+      "relationship_placeholder": "例如：共同监护人、祖父母",
+      "specialty_optional": "专业方向（可选）",
+      "specialty_placeholder": "例如：言语与语言",
+      "credentials_optional": "资质证书（可选）",
+      "credentials_placeholder": "例如：M.S., CCC-SLP",
+      "cancel": "取消",
+      "care_team_invites": "关爱团队邀请",
+      "revoke": "撤销"
+    },
+    "schedule": {
+      "title": "课程安排",
+      "no_learners_title": "暂无学习者",
+      "teacher": "教师",
+      "in_progress_lesson": "进行中的课程",
+      "open_arrow": "打开 →"
+    },
+    "settings_account": {
+      "title": "账户",
+      "signed_in_as": "当前登录账号"
+    },
+    "home_v2": {
+      "error_heading": "目前无法加载您的主页。",
+      "error_reference": "参考编号：",
+      "error_retry": "重试",
+      "open_legacy_home": "打开旧版主页",
+      "loading": "正在加载您的家长主页…",
+      "not_found_heading": "该页面尚不存在。",
+      "back_to_home": "返回家长主页",
+      "add_another_learner": "添加其他学习者",
+      "today_at_a_glance": "今日概览",
+      "details": "详情",
+      "learning_readiness": "学习准备情况",
+      "assessment_status": "评估状态",
+      "iep_support_upload": "上传 IEP / 支持文件",
+      "consent_checklist": "同意确认清单",
+      "todays_recommended_actions": "今日推荐操作",
+      "notifications_title": "通知",
+      "billing_title": "账单",
+      "school_connection": "学校连接",
+      "plan_generated": "计划已生成",
+      "pacing": "学习节奏",
+      "calm_extended_time_on": "平静 — 延长时间已开启",
+      "sensory_mode": "感官模式",
+      "warm_reduced_motion": "温暖 + 减少动效",
+      "parent_guardian_consent": "家长 / 监护人同意",
+      "approved": "已批准",
+      "ai_personalization": "AI 个性化",
+      "school_data_sharing": "学校数据共享",
+      "optional_not_set": "可选 — 未设置",
+      "approve_voice_mode": "批准语音模式",
+      "approve_voice_mode_desc": "允许 Emma 在课程中大声与 AI 导师交流。",
+      "upload_iep_optional": "上传 IEP（可选）",
+      "upload_iep_desc": "添加调整措施，让 AIVO 从第一天起就应用它们。",
+      "new_milestone": "新里程碑：",
+      "new_milestone_desc": "独立阅读了一篇 200 字的文章。",
+      "tutor_note": "导师备注：",
+      "tutor_note_desc": "本周学习节奏非常不错。",
+      "family_2_learners": "家庭 — 2 名学习者",
+      "next_renewal": "下次续费",
+      "payment_method": "支付方式"
+    },
+    "home": {
+      "greeting": "问候",
+      "today_at_a_glance": "今日概览",
+      "family_workspace": "家庭工作区",
+      "add_your_first_learner": "添加您的第一位学习者",
+      "add_another_learner": "添加其他学习者",
+      "your_learners": "您的学习者",
+      "no_learners_yet": "暂无学习者"
+    },
+    "error": {
+      "eyebrow": "错误",
+      "heading": "出了点问题",
+      "body": "您孩子的数据是安全的。加载此页面时发生了意外错误。您可以重试，或返回家长主页。",
+      "reference": "参考编号：{digest}",
+      "retry": "重试",
+      "home_link": "返回家长主页"
+    },
+    "not_found": {
+      "eyebrow": "未找到",
+      "heading": "我们找不到该页面",
+      "body": "该链接可能已移动，或该学习者已不再关联到您的账户。让我们带您回到主页。",
+      "home_link": "前往主页",
+      "all_learners": "所有学习者"
+    },
+    "learner_homework": {
+      "title": "作业记录",
+      "description": "您的孩子在作业助手中所做的内容。消息内容仅在您的孩子与导师之间可见。",
+      "empty": "还没有作业会话。",
+      "messages_count": "{count} 条消息",
+      "status_done": "已完成",
+      "status_open": "进行中"
     }
   },
   "brain_clone": {
@@ -222,7 +679,8 @@
     "building_tutors_caption": "正在将每位 AI 导师校准到 {name} 的水平",
     "building_complete_title": "{name} 的大脑已就绪",
     "building_complete_caption": "大脑已根据 {name} 的评估数据构建完成。请查看下方详情并决定下一步。",
-    "building_complete_cta": "查看并决定"
+    "building_complete_cta": "查看并决定",
+    "skip_animation": "跳过动画"
   },
   "learner": {
     "errors": {
@@ -641,6 +1099,19 @@
       "saving": "正在保存…",
       "done": "我做完了",
       "complete_error": "我们无法保存这节课。请再次点击「我做完了」按钮。"
+    },
+    "baseline_runner": {
+      "exit_proctor_view": "退出监考视图",
+      "ready_title": "最后一步",
+      "ready_body": "你已回答所有问题。准备好后即可提交答案。",
+      "finish_baseline": "完成基线评估",
+      "resume": "继续",
+      "stop_for_today": "今天就到这里",
+      "choose_one": "选择一项",
+      "type_answer": "输入你的答案"
+    },
+    "lesson_run": {
+      "back_to_today": "返回今天"
     }
   },
   "auth": {
@@ -699,7 +1170,8 @@
       "name_label": "你的姓名",
       "email_label": "电子邮箱",
       "password_label": "密码",
-      "password_helper": "至少 8 个字符，包含一个数字和一个符号。"
+      "password_helper": "至少 8 个字符，包含一个数字和一个符号。",
+      "name_placeholder": "Riley Parent"
     },
     "forgot": {
       "heading": "重置你的密码",
@@ -840,7 +1312,9 @@
       "invite_label": "邀请码",
       "invite_helper": "你的学校或学区在欢迎邮件中发送了它。",
       "name_label": "你的姓名",
-      "password_helper": "至少 12 个字符。保存前我们会检查它是否出现在任何已知的泄露中。"
+      "password_helper": "至少 12 个字符。保存前我们会检查它是否出现在任何已知的泄露中。",
+      "code_placeholder": "例如 SCHOOL-7Q4M-2025",
+      "name_placeholder": "名和姓"
     },
     "role": {
       "eyebrow": "选择你的角色",
@@ -1045,7 +1519,8 @@
       "join": "加入学校",
       "code_label": "邀请码",
       "email_label": "你的学校邮箱",
-      "email_helper": "必须与管理员邀请的邮箱一致。"
+      "email_helper": "必须与管理员邀请的邮箱一致。",
+      "code_placeholder": "例如 SCHOOL-7Q4M-2025"
     },
     "invite_district": {
       "eyebrow": "学区邀请",
@@ -1054,7 +1529,8 @@
       "reassure_title": "学区管理员的强化验证为强制要求。",
       "reassure_body": "此角色的每次登录都需要一次全新的生物识别或 PIN 检查。AIVO 绝不允许单个密码解锁学区数据。",
       "code_label": "学区邀请码",
-      "email_label": "你的学区邮箱"
+      "email_label": "你的学区邮箱",
+      "code_placeholder": "例如 DISTRICT-9F2L-2025"
     },
     "error": {
       "expired_invite_eyebrow": "邀请已过期",
@@ -1089,5 +1565,913 @@
       "blocked_secondary": "联系支持",
       "generic_secondary": "联系支持"
     }
+  },
+  "admin": {
+    "district_overview": {
+      "eyebrow": "学区管理员",
+      "description": "跨校监督、名册管理与报告。点击卡片以管理一所学校。",
+      "fl_distribution_title": "功能水平分布",
+      "no_learners": "尚未分配学习者。",
+      "platform_health_title": "平台健康状态",
+      "lessons_completed": "已完成课程",
+      "lessons_attempted": "已尝试课程",
+      "ai_jobs_in_queue": "AI 队列中的任务",
+      "ai_failures": "AI 失败"
+    },
+    "district_billing": {
+      "title": "账单",
+      "empty_title": "暂无账单记录",
+      "col_tenant": "租户",
+      "col_status": "状态"
+    },
+    "district_compliance": {
+      "title": "合规"
+    },
+    "district_iep": {
+      "title": "IEP 合规",
+      "empty_title": "该学区目前暂无学习者",
+      "col_learner": "学习者",
+      "col_school": "学校",
+      "col_family": "家庭"
+    },
+    "district_reports": {
+      "title": "学区报告"
+    },
+    "district_schools": {
+      "title": "学校",
+      "empty_title": "该学区目前暂无学校",
+      "col_school": "学校",
+      "col_learners": "学习者",
+      "col_families": "家庭",
+      "view_staff": "查看员工"
+    },
+    "district_settings_admins": {
+      "title": "管理员",
+      "empty_title": "暂无管理员",
+      "invite_note": "邀请管理员由贵学区在 AIVO 的入驻联系人负责处理。",
+      "col_joined": "加入时间"
+    },
+    "district_settings_branding": {
+      "title": "品牌形象",
+      "display_name": "显示名称",
+      "display_name_hint": "显示在产品页眉、电子邮件及家长门户中。",
+      "support_email": "支持邮箱",
+      "support_email_hint": "该学区的家庭和员工在每个帮助页面上都能看到此邮箱。",
+      "primary_colour": "主品牌颜色",
+      "primary_colour_aria": "主品牌颜色",
+      "sample": "示例"
+    },
+    "district_settings": {
+      "title": "设置",
+      "org_section": "组织",
+      "tenant_name": "租户名称",
+      "tenant_id": "租户 ID",
+      "schools": "学校",
+      "learners": "学习者",
+      "support_email": "支持邮箱",
+      "last_update": "最后更新",
+      "manage": "管理",
+      "notifications_heading": "通知偏好",
+      "notifications_desc": "学区管理员将收到哪些邮件通知。",
+      "features_heading": "功能覆盖",
+      "features_desc": "应用于该学区所有学校的学区级开关。"
+    },
+    "district_settings_sso": {
+      "title": "SSO 与 SCIM",
+      "status_heading": "状态",
+      "last_scim_rotation": "最后 SCIM 轮换",
+      "sign_in_mode": "登录模式",
+      "idp_name_label": "身份提供商名称",
+      "idp_name_placeholder": "例如：学区 Okta",
+      "scim_provisioning": "SCIM 预配",
+      "enable_scim": "启用 SCIM",
+      "scim_rotate_warning": "轮换 SCIM 令牌将使所有使用旧凭证的 IdP 集成失效。",
+      "rotate_scim_token": "轮换 SCIM 令牌"
+    },
+    "district_staff": {
+      "title": "员工目录",
+      "invitations_heading": "邀请",
+      "active_staff_heading": "在职员工",
+      "empty_title": "该学区目前暂无员工",
+      "col_joined": "加入时间",
+      "pending_invitations": "待处理邀请",
+      "invite_staff_btn": "邀请员工",
+      "invite_staff_member": "邀请员工成员",
+      "close_aria": "关闭",
+      "field_display_name": "显示名称",
+      "role_teacher": "教师",
+      "role_school_admin": "学校管理员",
+      "role_district_admin": "学区管理员",
+      "assign_to_school": "分配到学校",
+      "pick_school": "选择一所学校…",
+      "cancel": "取消",
+      "sending": "发送中…",
+      "invited_success": "已邀请 {name}",
+      "temporary_password": "临时密码"
+    },
+    "error": {
+      "eyebrow": "管理控制台",
+      "heading": "加载此页面时出错。",
+      "body": "错误已记录。请立即重试或返回管理主页。",
+      "retry": "重试",
+      "home_link": "管理主页"
+    },
+    "login": {
+      "heading": "管理员登录",
+      "security_badge": "强制 MFA · SOC 2 · FERPA",
+      "card_title": "登录管理控制台",
+      "sign_in_btn": "登录",
+      "standard_sign_in": "使用标准登录"
+    },
+    "not_found": {
+      "eyebrow": "管理控制台 · 404",
+      "heading": "该页面不存在。",
+      "body": "它可能已被移动，或相关资源已被删除。",
+      "home_link": "管理主页"
+    },
+    "platform_tenants_detail": {
+      "all_tenants": "所有租户",
+      "stat_learners": "学习者",
+      "stat_sub_tenants": "子租户",
+      "stat_created": "创建时间",
+      "user_mix": "用户构成",
+      "no_users": "暂无用户。",
+      "direct_children": "直接子级",
+      "no_nested_tenants": "该租户下没有直接嵌套的租户。",
+      "recent_ai_jobs": "最近的 AI 任务",
+      "no_ai_jobs": "暂无 AI 生成活动",
+      "view_all": "查看全部",
+      "recent_invoices": "最近发票",
+      "no_invoices": "暂无发票",
+      "audit_trail": "审计日志",
+      "no_audit": "暂无已审计活动"
+    },
+    "platform_tenants": {
+      "title": "租户",
+      "empty_title": "暂无租户",
+      "col_parent": "上级",
+      "col_admins": "管理员",
+      "col_learners": "学习者",
+      "col_billing": "账单",
+      "col_created": "创建时间",
+      "open_billing": "打开账单"
+    },
+    "platform_audit_logs": {
+      "title": "审计日志",
+      "empty": "暂无审计事件",
+      "col_action": "操作",
+      "col_tenant": "租户",
+      "col_request_id": "请求 ID"
+    },
+    "platform_data": {
+      "title": "数据目录"
+    },
+    "platform_feature_flags": {
+      "title": "功能标志",
+      "section_ai": "AI 与内容",
+      "section_enterprise": "企业版",
+      "section_integrations": "集成",
+      "section_ux": "学习者体验"
+    },
+    "platform_jobs": {
+      "title": "后台任务",
+      "empty": "暂无 AI 生成活动",
+      "by_kind": "按类型",
+      "latency": "延迟",
+      "lesson_runs": "课程运行",
+      "lesson_runs_desc": "AI 生成下游的学习者侧流水线。",
+      "recent_jobs": "最近任务 · 最新优先",
+      "col_status": "状态",
+      "col_tenant": "租户",
+      "col_started": "开始时间",
+      "col_duration": "持续时间"
+    },
+    "platform_learners": {
+      "title": "学习者",
+      "empty": "暂无学习者",
+      "iep_on_file": "已存档 IEP",
+      "iep_skipped": "已跳过 IEP",
+      "parent_opt_out": "已记录家长退出",
+      "iep_pending": "IEP 待处理",
+      "no_decision": "暂无决定",
+      "fl_mix": "功能水平分布",
+      "grade_band": "年级范围",
+      "col_learner": "学习者",
+      "col_tenant": "租户",
+      "col_fl": "功能水平",
+      "col_created": "创建时间",
+      "unassigned": "未分配"
+    },
+    "platform_migration": {
+      "title": "v1 → v2 迁移",
+      "empty": "暂无迁移任务",
+      "recent_jobs": "最近任务",
+      "col_source": "来源",
+      "col_status": "状态",
+      "col_results": "结果",
+      "col_started": "开始时间",
+      "dry_run": "模拟运行（仅预览）",
+      "source_records": "源记录 (JSON)"
+    },
+    "platform_support": {
+      "title": "支持工单",
+      "empty": "收件箱为空"
+    },
+    "platform_system_health": {
+      "title": "系统健康"
+    },
+    "platform_users_detail": {
+      "empty": "您的范围内没有成员资格",
+      "all_users": "所有用户",
+      "user_id": "用户 ID",
+      "col_created": "创建时间",
+      "managed_learners": "管理的学习者",
+      "memberships": "成员资格",
+      "col_tenant": "租户",
+      "col_permissions": "权限",
+      "col_joined": "加入时间",
+      "col_learner": "学习者"
+    },
+    "platform_users": {
+      "title": "用户",
+      "empty": "暂无用户",
+      "col_tenant": "租户",
+      "col_joined": "加入时间"
+    },
+    "school_billing": {
+      "title": "账单与席位",
+      "no_subscription": "无订阅",
+      "no_seat_licenses": "无席位许可证",
+      "no_invoices": "无发票",
+      "seat_licenses": "席位许可证",
+      "no_seats_assigned": "暂未分配席位。",
+      "col_subject": "对象",
+      "col_assigned": "已分配",
+      "invoices": "发票",
+      "col_number": "编号",
+      "col_period": "周期",
+      "col_amount": "金额",
+      "col_status": "状态"
+    },
+    "school_classes_detail": {
+      "teachers": "教师",
+      "none_yet": "暂无。",
+      "learners": "学习者",
+      "no_learners_enrolled": "暂无学习者入班。"
+    },
+    "school_classes": {
+      "title": "班级",
+      "empty": "暂无班级"
+    },
+    "school_compliance": {
+      "title": "合规"
+    },
+    "school_learners": {
+      "title": "学习者",
+      "empty": "花名册中暂无学习者",
+      "col_learner": "学习者",
+      "col_readiness": "准备状态",
+      "col_fl": "功能水平"
+    },
+    "school_overview": {
+      "school_admin": "学校管理员",
+      "card_rostering_health": "花名册健康状态",
+      "card_consent_compliance": "同意与合规",
+      "card_ai_safety": "AI 安全",
+      "card_license_util": "许可证使用率",
+      "source": "来源",
+      "last_sync": "上次同步",
+      "manage_rostering": "管理花名册 →",
+      "consent_complete": "同意已完成",
+      "ieps_on_file": "已存档 IEP",
+      "audit_events_30d": "审计事件（30天）",
+      "open_compliance": "打开合规 →",
+      "flagged_7d": "已标记（7天）",
+      "review_safety_logs": "查看安全日志 →",
+      "open_reports": "打开报告 →"
+    },
+    "school_reports": {
+      "title": "报告"
+    },
+    "school_rostering": {
+      "title": "花名册",
+      "section_schools": "学校",
+      "empty_schools": "暂无学校",
+      "section_sis": "SIS 连接",
+      "empty_sis": "暂无 SIS 连接",
+      "section_recent_imports": "最近导入任务",
+      "empty_imports": "暂无导入",
+      "start_csv_import": "开始 CSV 导入",
+      "btn_classes": "班级",
+      "btn_import_csv": "导入 CSV",
+      "import_total": "总计：",
+      "import_created": "已创建：",
+      "import_skipped": "已跳过：",
+      "import_errors": "错误："
+    },
+    "school_settings": {
+      "title": "设置",
+      "signed_in_as": "已登录为"
+    },
+    "school_staff": {
+      "title": "教职员工",
+      "empty": "暂无教职员工",
+      "col_tenant": "租户"
+    },
+    "platform_billing_overview": {
+      "title": "账单",
+      "empty_title": "暂无账单账户",
+      "col_tenant": "租户",
+      "col_status": "状态",
+      "col_created": "创建时间"
+    },
+    "platform_billing_revenue": {
+      "title": "收入",
+      "empty_title": "暂无收款记录",
+      "link_all_invoices": "所有发票 →",
+      "stat_lifetime_collected": "累计收款",
+      "stat_last_30_days": "近 30 天",
+      "stat_active_subscriptions": "活跃订阅",
+      "section_monthly_collected": "月度收款 · 近 12 个月",
+      "no_paid_invoices": "暂无已付发票。",
+      "section_top_tenants": "收入最高的租户",
+      "section_plan_mix": "计划分布"
+    },
+    "platform_compliance_data_inventory": {
+      "title": "数据清单",
+      "col_classification": "分类",
+      "col_lawful_basis": "法律依据",
+      "col_purposes": "处理目的",
+      "col_child_data": "儿童数据",
+      "subprocessors_heading": "子处理方"
+    },
+    "platform_compliance_disclosures": {
+      "title": "FERPA 披露日志",
+      "record_heading": "记录披露",
+      "col_recipient": "接收方",
+      "col_reason": "原因",
+      "col_ferpa_basis": "FERPA 依据",
+      "empty_body": "暂无披露记录。",
+      "label_recipient_type": "接收方类型",
+      "label_recipient_name": "接收方名称",
+      "label_ferpa_basis": "FERPA 依据",
+      "placeholder_ferpa_basis": "school_official_exception",
+      "label_learner_id": "学习者 ID（可选）",
+      "label_reason": "原因"
+    },
+    "platform_compliance_dsar": {
+      "title": "数据主体请求",
+      "col_requested": "申请时间",
+      "col_parent": "家长",
+      "col_learner": "学习者",
+      "col_status": "状态",
+      "col_completed": "完成时间",
+      "col_target": "对象",
+      "no_requests": "暂无请求。"
+    },
+    "platform_compliance_overview": {
+      "title": "合规",
+      "link_open_queue": "打开队列 →",
+      "active_policies_heading": "活跃政策"
+    },
+    "platform_compliance_retention": {
+      "title": "保留政策",
+      "col_classification": "分类",
+      "col_retention_days": "保留（天）",
+      "col_archive_days": "归档（天）",
+      "col_description": "描述"
+    },
+    "platform_safety_moderation": {
+      "title": "审核事件",
+      "col_subject": "对象",
+      "col_decision": "决定",
+      "col_categories": "类别",
+      "col_severity": "严重程度",
+      "col_excerpt": "摘录",
+      "empty_body": "暂无审核事件记录。"
+    },
+    "platform_safety_overview": {
+      "title": "AI 安全",
+      "recent_blocked_heading": "近期被拦截的生成内容"
+    },
+    "platform_safety_policies": {
+      "title": "策略版本",
+      "label_block_threshold": "拦截阈值",
+      "label_review_threshold": "审核阈值",
+      "label_auto_review_categories": "自动审核类别",
+      "label_auto_block_categories": "自动拦截类别"
+    },
+    "platform_safety_red_team": {
+      "title": "红队测试套件",
+      "col_prompt": "提示词",
+      "col_expected": "预期结果",
+      "col_observed": "实际结果",
+      "col_result": "测试结果"
+    },
+    "platform_safety_review_queue": {
+      "title": "审核队列",
+      "empty_body": "暂无审核案例。",
+      "placeholder_reviewer_note": "审核人备注（可选）",
+      "btn_escalate": "升级处理"
+    },
+    "platform_security_controls": {
+      "title": "SOC 2 控制项",
+      "label_owner": "负责人："
+    },
+    "platform_security_incidents": {
+      "title": "安全事件",
+      "open_incident_heading": "创建安全事件",
+      "empty_body": "暂无安全事件记录。",
+      "badge_customer_impact": "影响客户",
+      "badge_regulator_notify": "需通知监管机构"
+    },
+    "platform_security_overview": {
+      "title": "安全态势",
+      "recent_activity_heading": "近期活动",
+      "no_events": "暂无事件。",
+      "link_audit_log": "查看完整审计日志 →"
+    },
+    "platform_security_risks": {
+      "title": "风险登记册",
+      "empty_body": "暂无追踪的风险。",
+      "label_treatment": "处置方式："
+    },
+    "platform_security_state_privacy": {
+      "title": "州隐私法律矩阵",
+      "label_obligation": "义务：",
+      "no_control_mapped": "尚未映射控制项——这是一个缺口。"
+    },
+    "platform_security_vendors": {
+      "title": "供应商与子处理方清单",
+      "subprocessors_heading": "子处理方（处理学习者数据）",
+      "badge_learner_data": "学习者数据"
+    },
+    "platform_security_vulnerabilities": {
+      "title": "漏洞管理",
+      "empty_body": "当前暂无追踪的漏洞。"
+    },
+    "platform_overview": {
+      "title": "系统健康状态",
+      "tenant_footprint": "租户分布",
+      "tenant_footprint_desc": "当前环境中已部署的租户分布情况。",
+      "billing_status": "账单状态",
+      "recent_ai_jobs": "近期 AI 作业",
+      "no_ai_activity_yet": "暂无 AI 生成活动。",
+      "view_all": "查看全部",
+      "operations_centres": "运营中心",
+      "signed_in_as": "当前登录为",
+      "platform_settings": "平台设置"
+    },
+    "platform_ai_moderation": {
+      "title": "AI 内容审核",
+      "no_block_or_review_events": "无拦截或审核事件",
+      "top_categories": "主要类别（拦截 + 审核）",
+      "no_categorised_events": "暂无分类事件。",
+      "col_tenant": "租户",
+      "col_decision": "决策",
+      "col_categories": "类别",
+      "col_signals": "信号",
+      "col_excerpt": "摘录"
+    },
+    "platform_ai_playground": {
+      "title": "AI 试验场",
+      "how_it_works": "工作原理",
+      "responses_moderated": "响应在返回此处之前经过输出审核处理。",
+      "playground_responses_are": "试验场响应",
+      "presets": "预设",
+      "model_claude": "Claude Opus 4.7（主要）",
+      "model_gemini": "Gemini 3.0 Pro（备用）",
+      "model_gpt": "GPT-5.5（备用）",
+      "system_prompt": "系统提示",
+      "user_prompt": "用户提示"
+    },
+    "platform_ai_costs": {
+      "title": "AI 成本控制",
+      "no_cost_events_yet": "暂无成本事件",
+      "spend_mtd": "本月花费",
+      "approaching_cap": "接近上限",
+      "over_cap": "超出上限",
+      "tenants": "租户",
+      "col_tenant": "租户",
+      "col_status": "状态",
+      "col_budget": "预算",
+      "recent_cost_events": "近期成本事件",
+      "col_feature": "功能",
+      "col_provider_model": "提供商 / 模型",
+      "col_tokens": "令牌数",
+      "aria_monthly_cap": "月度上限（美元）",
+      "aria_warn_at": "警告比例"
+    },
+    "platform_ai_generation": {
+      "title": "AI 生成",
+      "recent_jobs": "近期作业",
+      "no_jobs_yet": "暂无 AI 生成作业",
+      "col_tenant": "租户",
+      "col_status": "状态",
+      "col_duration": "时长"
+    },
+    "platform_audio": {
+      "title": "音频与朗读",
+      "pronunciation_overrides": "发音覆盖",
+      "playbacks": "播放次数",
+      "cache_hit_rate": "缓存命中率",
+      "total_cost": "总成本",
+      "unique_clips": "唯一片段",
+      "recent_playbacks": "近期播放",
+      "col_context": "上下文",
+      "no_playbacks_yet": "暂无播放记录。",
+      "recently_generated_clips": "近期生成的片段"
+    },
+    "platform_audio_pronunciation": {
+      "title": "发音覆盖",
+      "add_override": "添加覆盖",
+      "replacement": "替换",
+      "encoding": "编码",
+      "notes_optional": "备注（可选）",
+      "no_overrides_yet": "暂无覆盖规则。",
+      "placeholder_token": "例如 AIVO",
+      "placeholder_replacement": "例如 ay-voh"
+    },
+    "platform_baseline_items": {
+      "title": "基线题目心理测量",
+      "items_by_exposure": "按曝光量排列的题目",
+      "no_telemetry_yet": "暂无基线遥测数据",
+      "col_item": "题目（技能 · 等级）",
+      "col_exposure": "曝光量",
+      "col_scored": "已评分",
+      "col_median_time": "中位时间",
+      "col_seed_theta": "θ 初始值",
+      "col_est_theta": "θ̂ 估计值",
+      "col_disc": "区分度 (a)",
+      "col_suggested_band": "建议等级",
+      "col_status": "状态",
+      "status_healthy": "正常",
+      "status_collecting": "数据收集中",
+      "status_retire": "退役"
+    },
+    "platform_curriculum_overview": {
+      "title": "课程"
+    },
+    "platform_curriculum_frameworks": {
+      "title": "标准框架",
+      "homepage_link": "主页 →"
+    },
+    "platform_curriculum_import": {
+      "title": "导入标准",
+      "start_an_import": "开始导入",
+      "recent_jobs": "近期作业",
+      "no_import_jobs_yet": "暂无导入作业。",
+      "framework": "框架",
+      "source": "来源",
+      "source_placeholder": "manual、s3://…、https://…"
+    },
+    "platform_curriculum_skills": {
+      "title": "技能",
+      "col_subject": "学科",
+      "col_grade_band": "年级段",
+      "col_version": "版本",
+      "col_prereqs": "前置条件",
+      "col_standards": "标准",
+      "col_constraints": "约束"
+    },
+    "platform_curriculum_subjects": {
+      "title": "学科与领域",
+      "no_domains_yet": "暂无领域。"
+    },
+    "platform_curriculum_versioning": {
+      "title": "版本、目标与蓝图",
+      "skill_versions": "技能版本",
+      "objective_templates": "目标模板",
+      "assessment_blueprints": "评估蓝图",
+      "col_blueprint": "蓝图",
+      "col_status": "状态"
+    },
+    "platform_settings_overview": {
+      "title": "设置",
+      "signed_in_as": "当前登录为"
+    },
+    "platform_settings_api_keys": {
+      "title": "API 密钥",
+      "no_keys_yet": "暂无 API 密钥",
+      "col_prefix": "前缀",
+      "col_scopes": "权限范围",
+      "col_status": "状态",
+      "col_created_by": "创建者",
+      "col_last_used": "最后使用",
+      "col_created": "创建时间"
+    },
+    "platform_settings_emails": {
+      "title": "电子邮件模板",
+      "no_templates_configured": "未配置电子邮件模板",
+      "col_template": "模板",
+      "col_subject": "主题",
+      "col_status": "状态",
+      "col_last_sent": "最后发送",
+      "col_updated": "更新时间"
+    },
+    "platform_settings_webhooks": {
+      "title": "Webhooks",
+      "no_endpoints_configured": "未配置 webhook 端点",
+      "col_endpoint": "端点",
+      "col_events": "事件",
+      "col_secret": "密钥",
+      "col_status": "状态",
+      "col_last_delivery": "最后投递",
+      "col_failures": "失败次数"
+    },
+    "platform_billing_coupons": {
+      "title": "优惠券",
+      "empty_title": "暂无优惠券",
+      "col_discount": "折扣",
+      "col_applies_to": "适用于",
+      "col_status": "状态",
+      "col_redemptions": "兑换次数",
+      "col_valid_window": "有效期"
+    },
+    "platform_billing_daily_batch": {
+      "title": "每日计费批处理",
+      "empty_title": "暂无批处理运行",
+      "col_run_date": "运行日期",
+      "col_window": "时间窗口",
+      "col_status": "状态",
+      "col_generated": "已生成",
+      "col_failed": "失败",
+      "col_total_billed": "计费总额"
+    },
+    "platform_billing_invoices": {
+      "title": "发票",
+      "link_revenue_summary": "收入摘要",
+      "stat_total_invoices": "发票总数",
+      "stat_outstanding": "未结清",
+      "empty_title": "暂无发票",
+      "col_number": "编号",
+      "col_tenant": "租户",
+      "col_amount": "金额",
+      "col_status": "状态",
+      "col_period": "周期"
+    }
+  },
+  "teacher": {
+    "home": {
+      "open_needs_support_list": "打开需要支持的列表",
+      "open_arrow": "打开 →",
+      "your_roster": "您的学员名单",
+      "see_all_learners": "查看所有学员 →",
+      "no_learners_yet": "暂无学员",
+      "connect_roster": "连接名单",
+      "roster_snapshot": "名单概览",
+      "add_another_class": "添加另一个班级"
+    },
+    "lesson_plans": {
+      "page_title": "AI 课程计划",
+      "new_assignment": "新作业",
+      "generated_recent": "已生成（最近）",
+      "ai_jobs": "AI 任务",
+      "fallback_chain": "备用链",
+      "fallback_primary_model": "Claude Opus 4.7",
+      "latest_lesson_plans": "最新课程计划",
+      "no_lesson_plans_yet": "暂无课程计划",
+      "generation_activity": "生成活动",
+      "no_ai_jobs": "此时间段内没有 AI 生成任务。",
+      "col_started": "开始时间",
+      "col_status": "状态",
+      "col_completed": "完成时间"
+    },
+    "reports": {
+      "title": "课堂报告",
+      "col_learners": "学员",
+      "class_mastery": "班级掌握度",
+      "on_track": "进度正常",
+      "avg_mastery_threshold": "平均 ≥ 70% 掌握度",
+      "ieps_on_file": "已存档的 IEP",
+      "mastery_distribution": "掌握度分布",
+      "no_mastery_data": "暂无掌握度数据 — 学员完成基础评估后，分布图将自动生成。",
+      "learner_rollup": "学员汇总",
+      "no_learners_assigned": "未分配学员",
+      "col_learner": "学员",
+      "col_skills": "技能",
+      "col_avg_mastery": "平均掌握度",
+      "col_on_grade": "年级水平",
+      "col_emerging": "发展中",
+      "col_actions": "操作",
+      "iep_on_file": "已存档"
+    },
+    "learner_overview": {
+      "this_week_at_school": "本周在校情况 →",
+      "active_assignments": "当前作业",
+      "no_active_assignments": "该学员暂无当前作业。",
+      "recent_lessons": "最近课程",
+      "no_lessons_started": "暂未开始任何课程。",
+      "skill_gaps": "技能差距",
+      "no_notable_gaps": "暂无明显差距 — 继续加油。",
+      "accommodations_teacher_summary": "调整措施（教师摘要）"
+    },
+    "learner_iep_draft": {
+      "page_title": "IEP 目标草稿",
+      "no_iep_on_file": "无 IEP 存档",
+      "current_iep": "当前 IEP",
+      "existing_learning_goals": "现有学习目标",
+      "none_on_file": "无存档记录。",
+      "accommodations": "调整措施",
+      "none_recorded": "无记录。",
+      "suggested_goal_drafts": "建议目标草稿",
+      "how_drafts_generated": "草稿生成方式"
+    },
+    "classes": {
+      "title": "您的班级",
+      "empty_title": "暂无分配班级"
+    },
+    "error": {
+      "eyebrow": "教师区域",
+      "heading": "加载此页面时出现错误。",
+      "body": "您的班级数据是安全的。请重试，或返回教师主页。",
+      "retry": "重试",
+      "home_link": "教师主页"
+    },
+    "insights": {
+      "title": "洞察",
+      "empty_title": "您的租户中暂无学习者"
+    },
+    "learners": {
+      "title": "您的学生名单",
+      "empty": "您目前尚未分配任何学习者。"
+    },
+    "not_found": {
+      "eyebrow": "教师区域 · 404",
+      "heading": "找不到该页面。",
+      "body": "链接可能已更改，或该学习者已不再注册于您的班级。",
+      "home_link": "教师主页",
+      "classes_link": "我的班级"
+    },
+    "settings": {
+      "title": "设置",
+      "signed_in_as": "当前登录账号"
+    },
+    "assignments_new": {
+      "title": "新作业",
+      "instructions_label": "说明",
+      "subject_label": "科目",
+      "skills_label": "技能",
+      "assign_label": "分配给",
+      "no_learners": "没有学习者",
+      "due_date_label": "截止日期"
+    },
+    "assignments": {
+      "title": "作业",
+      "new_assignment": "新作业",
+      "empty": "暂无作业。"
+    },
+    "classes_class": {
+      "roster": "名单",
+      "no_learners": "没有学习者"
+    }
+  },
+  "therapist": {
+    "home": {
+      "stat_caseload": "案例负荷",
+      "stat_ieps": "已存档 IEP",
+      "quick_links": "快捷链接",
+      "link_sessions": "会话 →",
+      "link_reports": "报告 →",
+      "section_caseload": "案例负荷",
+      "empty_title": "暂无学习者"
+    },
+    "reports": {
+      "title": "报告",
+      "empty_title": "暂无案例负荷",
+      "focus_label": "重点：",
+      "skills_tracked": "已追踪技能",
+      "avg_score": "平均分"
+    },
+    "sessions": {
+      "title": "会话",
+      "empty_no_caseload": "暂无案例负荷",
+      "empty_no_sessions": "暂无已记录会话"
+    },
+    "settings": {
+      "title": "设置",
+      "section_profile": "个人资料",
+      "role_label": "治疗师",
+      "section_notifications": "通知"
+    }
+  },
+  "caregiver": {
+    "home": {
+      "on_care_team": "您的护理团队",
+      "active_or_ready": "学习中或已准备好",
+      "quick_links": "快速链接",
+      "link_observations": "观察记录 →",
+      "link_roster": "花名册 →",
+      "your_learners": "您的学习者",
+      "no_learners_yet": "暂无学习者"
+    },
+    "learners": {
+      "title": "学习者",
+      "no_learners_yet": "暂无学习者",
+      "primary_language": "主要语言",
+      "reading_comfort": "阅读能力",
+      "math_comfort": "数学能力"
+    },
+    "observations": {
+      "page_title": "观察记录",
+      "section_log": "记录观察",
+      "no_learners_yet": "暂无学习者",
+      "no_lesson_activity_yet": "暂无课程活动",
+      "no_observations_yet": "暂无护理人员观察记录。请使用上方表单记录您的观察。",
+      "label_antecedent": "前因",
+      "label_behaviour": "行为",
+      "label_consequence": "后果",
+      "field_learner": "学习者",
+      "choose_learner": "选择学习者…",
+      "field_location": "地点",
+      "loc_school": "学校",
+      "loc_community": "社区",
+      "loc_therapy": "治疗",
+      "field_behaviour": "行为（您观察到了什么？）",
+      "behaviour_placeholder": "简要描述该行为。",
+      "field_antecedent": "前因（发生之前是什么？）",
+      "field_consequence": "后果（发生之后是什么？）",
+      "field_duration": "持续时间（分钟，可选）"
+    },
+    "settings": {
+      "page_title": "设置",
+      "section_profile": "个人资料",
+      "section_notifications": "通知",
+      "role_label": "护理人员"
+    }
+  },
+  "accept_invite": {
+    "page": {
+      "accept_heading": "接受您的邀请",
+      "invited_to_join": "您已被邀请加入学习团队。",
+      "create_account": "创建新账户",
+      "signed_in_as": "您当前登录的账户为",
+      "sign_in_different": "使用其他账户登录"
+    },
+    "actions": {
+      "no_pending_for": "未找到待处理的邀请，邮箱：",
+      "continue": "继续",
+      "added_to": "您已被添加到",
+      "continue_to_dashboard": "前往您的仪表板",
+      "signed_in_as": "当前登录账户：",
+      "accepting": "正在接受…"
+    }
+  },
+  "root": {
+    "error": {
+      "refreshing": "正在刷新",
+      "one_moment": "请稍候 — 正在加载最新版本…",
+      "something_went_wrong": "出了点问题",
+      "lets_try_again": "让我们再试一次。",
+      "unexpected_error": "遇到了意外错误。您可以立即重试，或返回主页稍后再来。",
+      "try_again": "重试",
+      "back_to_home": "返回主页"
+    },
+    "global_error": {
+      "heading": "出现了严重错误。",
+      "body": "请重试。如果问题持续出现，请联系支持团队。",
+      "try_again": "重试"
+    },
+    "layout": {
+      "skip_to_main": "跳转至主要内容"
+    },
+    "not_found": {
+      "heading": "我们找不到该页面。",
+      "back_to_home": "返回主页"
+    },
+    "home": {
+      "ferpa_coppa": "符合 FERPA 和 COPPA 规定",
+      "switch_role": "切换角色",
+      "start_family_trial": "开始家庭试用",
+      "for_school_districts": "面向学区",
+      "trusted_by": "深受 1,200 余名专业人士和家长的信赖。"
+    }
+  },
+  "settings_accessibility": {
+    "nav_label": "无障碍设置",
+    "page_title": "无障碍设置",
+    "sensory_mode": "感官模式",
+    "text_and_reading": "文字与阅读",
+    "age_mode": "年龄模式",
+    "choose_age_mode": "选择年龄模式",
+    "age_sprout": "Sprout（4–7 岁）",
+    "age_spark": "Spark（8–12 岁）",
+    "age_scholar": "Scholar（13 岁以上）",
+    "choose_theme": "选择主题",
+    "high_contrast": "高对比度",
+    "text_size": "文字大小",
+    "language": "语言",
+    "choose_language": "选择语言",
+    "lang_en_us": "English (US)",
+    "lang_es": "Español",
+    "lang_fr": "Français"
+  },
+  "district_login": {
+    "heading": "学区管理",
+    "security_badge": "强制 MFA · SOC 2 · FERPA",
+    "mobile_heading": "学区登录",
+    "card_title": "登录学区控制台",
+    "sign_in_btn": "登录",
+    "standard_sign_in": "使用标准登录"
   }
 }

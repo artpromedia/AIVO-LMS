@@ -1,5 +1,6 @@
 import { readMockSessionFromCookies } from "@/lib/auth/mock-session";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,20 +20,21 @@ import { SENSORY_MODE_LABELS, SENSORY_MODES } from "@/lib/sensory-mode/constants
 import { A11yPreferencesToggles } from "@/components/system/a11y-preferences-toggles";
 import { readTypefaceFromCookies, readReducedMotionFromCookies } from "@/lib/a11y/server";
 
-const NAV = [
-  {
-    href: "/settings/accessibility",
-    label: "Accessibility",
-    icon: <Settings className="h-4 w-4" />,
-  },
-];
-
 export default async function AccessibilitySettings() {
   const session = await readMockSessionFromCookies();
   if (!session) redirect("/login");
 
+  const t = await getTranslations("settings_accessibility");
   const typeface = await readTypefaceFromCookies();
   const reducedMotion = await readReducedMotionFromCookies();
+
+  const NAV = [
+    {
+      href: "/settings/accessibility",
+      label: t("nav_label"),
+      icon: <Settings className="h-4 w-4" />,
+    },
+  ];
 
   return (
     <AppShell
@@ -43,7 +45,7 @@ export default async function AccessibilitySettings() {
     >
       <PageHeader
         eyebrow="Settings"
-        title="Accessibility"
+        title={t("page_title")}
         description="These defaults flow into every learner experience and can be overridden per learner."
       />
 
@@ -51,7 +53,7 @@ export default async function AccessibilitySettings() {
           load-bearing differentiator of the Inclusive-Warm rollout. */}
       <Card variant="elevated">
         <CardHeader>
-          <CardTitle>Sensory mode</CardTitle>
+          <CardTitle>{t("sensory_mode")}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4">
           <p className="text-sm text-iw-ink-muted">
@@ -74,19 +76,19 @@ export default async function AccessibilitySettings() {
         </CardContent>
       </Card>
 
-      <SectionHeader className="mt-10" title="Text and reading" />
+      <SectionHeader className="mt-10" title={t("text_and_reading")} />
       <Card>
         <CardContent className="grid gap-5 pt-5">
           <fieldset className="grid gap-2 sm:max-w-md">
-            <Label>Age mode</Label>
+            <Label>{t("age_mode")}</Label>
             <Select defaultValue="spark">
               <SelectTrigger>
-                <SelectValue placeholder="Choose age mode" />
+                <SelectValue placeholder={t("choose_age_mode")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="sprout">Sprout (4–7)</SelectItem>
-                <SelectItem value="spark">Spark (8–12)</SelectItem>
-                <SelectItem value="scholar">Scholar (13+)</SelectItem>
+                <SelectItem value="sprout">{t("age_sprout")}</SelectItem>
+                <SelectItem value="spark">{t("age_spark")}</SelectItem>
+                <SelectItem value="scholar">{t("age_scholar")}</SelectItem>
               </SelectContent>
             </Select>
           </fieldset>
@@ -94,17 +96,17 @@ export default async function AccessibilitySettings() {
             <Label>Theme</Label>
             <Select defaultValue="light">
               <SelectTrigger>
-                <SelectValue placeholder="Choose theme" />
+                <SelectValue placeholder={t("choose_theme")} />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="light">Light</SelectItem>
                 <SelectItem value="dark">Dark</SelectItem>
-                <SelectItem value="high-contrast">High contrast</SelectItem>
+                <SelectItem value="high-contrast">{t("high_contrast")}</SelectItem>
               </SelectContent>
             </Select>
           </fieldset>
           <fieldset>
-            <Label className="mb-2 block">Text size</Label>
+            <Label className="mb-2 block">{t("text_size")}</Label>
             <RadioGroup defaultValue="medium" className="grid grid-cols-3 gap-2 sm:max-w-md">
               {(["small", "medium", "large"] as const).map((s) => (
                 <label
@@ -122,15 +124,15 @@ export default async function AccessibilitySettings() {
             initialReducedMotion={reducedMotion}
           />
           <fieldset className="grid gap-2 sm:max-w-md">
-            <Label>Language</Label>
+            <Label>{t("language")}</Label>
             <Select defaultValue="en-US">
               <SelectTrigger>
-                <SelectValue placeholder="Choose language" />
+                <SelectValue placeholder={t("choose_language")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="en-US">English (US)</SelectItem>
-                <SelectItem value="es-ES">Español</SelectItem>
-                <SelectItem value="fr-FR">Français</SelectItem>
+                <SelectItem value="en-US">{t("lang_en_us")}</SelectItem>
+                <SelectItem value="es-ES">{t("lang_es")}</SelectItem>
+                <SelectItem value="fr-FR">{t("lang_fr")}</SelectItem>
               </SelectContent>
             </Select>
           </fieldset>

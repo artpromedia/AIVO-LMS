@@ -1,4 +1,5 @@
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -16,6 +17,7 @@ const TONE: Record<string, "warning" | "primary" | "success"> = {
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_support");
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const tickets = listSupportTickets(tenants.map((t) => t.id));
   const users = getStore().users;
@@ -29,11 +31,11 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Support"
-        title="Support tickets"
+        title={t("title")}
         description="Inbound requests from parents, teachers, and admins."
       />
       {tickets.length === 0 ? (
-        <EmptyState title="Inbox is empty" />
+        <EmptyState title={t("empty")} />
       ) : (
         <div className="space-y-3">
           {tickets.map((t) => (

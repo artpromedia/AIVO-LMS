@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { DemoRequestForm } from "@/components/marketing/forms";
 import { SITE_URL } from "@/lib/constants";
@@ -10,11 +11,12 @@ export const metadata: Metadata = {
   alternates: { canonical: `${SITE_URL}/demo` },
 };
 
-export default function DemoPage() {
+export default async function DemoPage() {
+  const t = await getTranslations("marketing.page_demo");
   return (
     <LandingPageLayout
       badge="Demo"
-      title="See AIVO in action."
+      title={t("hero_title")}
       subtitle="A 30-minute walkthrough tailored to your role — teacher, special education lead, principal, or district. We'll show you Today's Mission, LessonRun, the parent view, and how rostering works."
       breadcrumbs={[{ name: "Demo", href: "/demo" }]}
       finalCta={{
@@ -29,10 +31,10 @@ export default function DemoPage() {
         className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8"
       >
         <h2 id="demo-form-heading" className="font-heading text-2xl font-bold text-slate-900">
-          Tell us a little about your setting
+          {t("form_heading")}
         </h2>
         <p className="mt-1 mb-6 font-body text-slate-600">
-          The more we know, the more useful the walkthrough. Required fields are marked.
+          {t("form_subheading")}
         </p>
         <DemoRequestForm />
       </section>
@@ -45,12 +47,12 @@ export default function DemoPage() {
           id="demo-what-happens-heading"
           className="font-heading text-xl font-bold text-slate-900"
         >
-          What happens next
+          {t("what_happens_next")}
         </h2>
         <ol className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
           <li className="rounded-2xl border border-slate-200 bg-white p-5">
             <span className="font-heading text-sm font-bold text-purple-700">
-              Step 1 · Within 1 business day
+              {t("step1_label")}
             </span>
             <p className="mt-1 font-body text-slate-700">
               A team member emails to confirm your goals and pick a time.
@@ -58,18 +60,18 @@ export default function DemoPage() {
           </li>
           <li className="rounded-2xl border border-slate-200 bg-white p-5">
             <span className="font-heading text-sm font-bold text-purple-700">
-              Step 2 · 30-minute walkthrough
+              {t("step2_label")}
             </span>
             <p className="mt-1 font-body text-slate-700">
-              We show learner, parent, and teacher views — and answer your questions live.
+              {t("step2_body")}
             </p>
           </li>
           <li className="rounded-2xl border border-slate-200 bg-white p-5">
             <span className="font-heading text-sm font-bold text-purple-700">
-              Step 3 · Pilot or proposal
+              {t("step3_label")}
             </span>
             <p className="mt-1 font-body text-slate-700">
-              If it&apos;s a fit, we scope a short pilot or send a written proposal — no pressure.
+              {t("step3_body")}
             </p>
           </li>
         </ol>

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { SUBJECTS } from "@/lib/landing-content";
 import { SITE_URL } from "@/lib/constants";
@@ -40,6 +41,7 @@ export default async function SubjectPage({ params }: Props) {
   const { slug } = await params;
   const subject = SUBJECTS.find((s) => s.slug === slug);
   if (!subject) notFound();
+  const t = await getTranslations("marketing.page_subjects_detail");
 
   return (
     <LandingPageLayout
@@ -61,7 +63,7 @@ export default async function SubjectPage({ params }: Props) {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">Key features</h2>
+        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">{t("key_features")}</h2>
         <ul className="space-y-2">
           {subject.features.map((f) => (
             <li key={f} className="flex items-start gap-3 text-slate-700 font-body">
@@ -76,7 +78,7 @@ export default async function SubjectPage({ params }: Props) {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">Topics covered</h2>
+        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">{t("topics_covered")}</h2>
         <div className="flex flex-wrap gap-2">
           {subject.topics.map((topic) => (
             <span
@@ -90,7 +92,7 @@ export default async function SubjectPage({ params }: Props) {
       </section>
 
       <section className="mt-14 pt-8 border-t border-slate-100">
-        <h2 className="text-xl font-heading font-bold text-slate-900 mb-4">Other subjects</h2>
+        <h2 className="text-xl font-heading font-bold text-slate-900 mb-4">{t("other_subjects")}</h2>
         <div className="flex flex-wrap gap-3">
           {SUBJECTS.filter((s) => s.slug !== subject.slug).map((other) => (
             <Link

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -11,6 +12,7 @@ import { LearnerCard } from "@/components/parent/learner-card";
 
 export default async function ParentLearnersPage() {
   const session = await requirePageRole(["parent"]);
+  const t = await getTranslations("parent.learners");
   const learners = await listLearnersForParent(session.userId, session.tenantId);
   for (const l of learners) await refreshLearnerReadiness(l.id, session.tenantId);
   const fresh = await listLearnersForParent(session.userId, session.tenantId);
@@ -24,23 +26,23 @@ export default async function ParentLearnersPage() {
     >
       <PageHeader
         eyebrow="Parent"
-        title="Your learners"
-        description="Set up each child once, then watch their growth from one place."
+        title={t("title")}
+        description={t("description")}
         actions={
           <Button asChild>
             <Link href="/parent/learners/new">
-              <Plus className="mr-1 h-4 w-4" /> Add learner
+              <Plus className="mr-1 h-4 w-4" /> {t("add_learner")}
             </Link>
           </Button>
         }
       />
       {fresh.length === 0 ? (
         <EmptyState
-          title="No learners yet"
-          description="Add your first child to begin the readiness flow."
+          title={t("no_learners")}
+          description={t("no_learners_desc")}
           action={
             <Button asChild>
-              <Link href="/parent/learners/new">Add a learner</Link>
+              <Link href="/parent/learners/new">{t("add_a_learner")}</Link>
             </Button>
           }
         />

@@ -7,6 +7,7 @@
  */
 import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { THERAPIST_NAV } from "@/components/layout/role-shells";
@@ -21,6 +22,7 @@ import { READINESS_LABEL, READINESS_TONE } from "@/lib/learner/readiness";
 export const dynamic = "force-dynamic";
 
 export default async function TherapistHomePage() {
+  const t = await getTranslations("therapist.home");
   const session = await requirePageRole(["therapist", "platform_admin"]);
   const learnerIds = listLearnersForMember(session.userId, session.email, "therapist");
   const maybeLearners = await Promise.all(
@@ -55,31 +57,31 @@ export default async function TherapistHomePage() {
       {fresh.length > 0 ? (
         <div className="grid gap-3 sm:grid-cols-3">
           <Card className="p-4">
-            <p className="text-xs text-aivo-ink-soft">Caseload</p>
+            <p className="text-xs text-aivo-ink-soft">{t("stat_caseload")}</p>
             <p className="font-display text-2xl font-semibold">{fresh.length}</p>
           </Card>
           <Card className="p-4">
-            <p className="text-xs text-aivo-ink-soft">IEPs on file</p>
+            <p className="text-xs text-aivo-ink-soft">{t("stat_ieps")}</p>
             <p className="font-display text-2xl font-semibold">{iepCount}</p>
           </Card>
           <Card className="p-4">
-            <p className="text-xs text-aivo-ink-soft">Quick links</p>
+            <p className="text-xs text-aivo-ink-soft">{t("quick_links")}</p>
             <div className="mt-1 flex flex-col gap-1 text-sm">
               <Link href="/therapist/sessions" className="text-aivo-accent hover:underline">
-                Sessions →
+                {t("link_sessions")}
               </Link>
               <Link href="/therapist/reports" className="text-aivo-accent hover:underline">
-                Reports →
+                {t("link_reports")}
               </Link>
             </div>
           </Card>
         </div>
       ) : null}
 
-      <SectionHeader title="Caseload" />
+      <SectionHeader title={t("section_caseload")} />
       {fresh.length === 0 ? (
         <EmptyState
-          title="No learners yet"
+          title={t("empty_title")}
           description="Once a parent invites you and you accept, your assigned learners will appear here."
         />
       ) : (

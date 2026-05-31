@@ -5,6 +5,7 @@
  */
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
@@ -29,6 +30,7 @@ export default async function ParentSummaryPage({
 }) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
+  const t = await getTranslations("parent.learner_summary");
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
@@ -59,15 +61,15 @@ export default async function ParentSummaryPage({
     >
       <PageHeader
         eyebrow={learner.displayName}
-        title="Plain-language summary"
-        description="One-page snapshot — what's working and what's next."
+        title={t("title")}
+        description={t("description")}
         actions={
           <div className="flex gap-2">
             <Button asChild variant="outline">
-              <Link href={`/parent/learners/${learnerId}/progress`}>Progress</Link>
+              <Link href={`/parent/learners/${learnerId}/progress`}>{t("progress_link")}</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href={`/parent/learners/${learnerId}/lessons`}>Lessons</Link>
+              <Link href={`/parent/learners/${learnerId}/lessons`}>{t("lessons_link")}</Link>
             </Button>
           </div>
         }
@@ -81,10 +83,10 @@ export default async function ParentSummaryPage({
         </p>
       </Card>
 
-      <SectionHeader className="mt-8" title="What's going well" />
+      <SectionHeader className="mt-8" title={t("whats_going_well")} />
       <Card className="p-[var(--aivo-density-card-pad)]">
         {strongest.length === 0 ? (
-          <p className="text-aivo-ink-soft">We'll fill this in after the first few lessons.</p>
+          <p className="text-aivo-ink-soft">{t("fill_after_lessons")}</p>
         ) : (
           <ul className="grid gap-2 text-sm">
             {strongest.map((m) => (
@@ -99,10 +101,10 @@ export default async function ParentSummaryPage({
         )}
       </Card>
 
-      <SectionHeader className="mt-8" title="Where we'll keep practicing" />
+      <SectionHeader className="mt-8" title={t("keep_practicing")} />
       <Card className="p-[var(--aivo-density-card-pad)]">
         {needsWork.length === 0 ? (
-          <p className="text-aivo-ink-soft">No skills flagged yet.</p>
+          <p className="text-aivo-ink-soft">{t("no_skills_flagged")}</p>
         ) : (
           <ul className="grid gap-2 text-sm">
             {needsWork.map((m) => (
@@ -119,7 +121,7 @@ export default async function ParentSummaryPage({
 
       {summaries.length > 0 && (
         <>
-          <SectionHeader className="mt-8" title="Recent lessons" />
+          <SectionHeader className="mt-8" title={t("recent_lessons")} />
           <div className="grid gap-3">
             {summaries.map((s) => (
               <Card key={s.id} className="p-[var(--aivo-density-card-pad)]">

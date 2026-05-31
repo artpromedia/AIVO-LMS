@@ -4,6 +4,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
+import { getTranslations } from "next-intl/server";
 import {
   listAssessmentBlueprints,
   listCurriculumImportJobs,
@@ -18,6 +19,7 @@ import { BookOpen, GraduationCap, Layers, ScrollText, ListTree, Upload } from "l
 export const dynamic = "force-dynamic";
 
 export default async function Page() {
+  const t = await getTranslations("admin.platform_curriculum_overview");
   const session = await requirePageRole(["platform_admin"]);
   const frameworks = listStandardsFrameworks();
   const subjects = await listSubjects();
@@ -75,7 +77,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform"
-        title="Curriculum"
+        title={t("title")}
         description="Standards frameworks, subjects, skills, prereqs, and assessment blueprints that AI generation reads as constraints."
       />
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

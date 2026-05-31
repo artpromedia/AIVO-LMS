@@ -1,4 +1,5 @@
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -14,6 +15,7 @@ const ROLE_LABEL: Record<string, string> = {
 
 export default async function Page() {
   const session = await requirePageRole(["district_admin"]);
+  const t = await getTranslations("admin.district_settings_admins");
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const tenantIds = tenants.map((t) => t.id);
   const admins = await listMembersByRole(tenantIds, ["district_admin", "school_admin"]);
@@ -27,7 +29,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="District settings"
-        title="Admins"
+        title={t("title")}
         description="Every district and school administrator with access to this district."
       />
 
@@ -37,11 +39,11 @@ export default async function Page() {
             {admins.length} {admins.length === 1 ? "administrator" : "administrators"}
           </p>
           <p className="text-xs text-aivo-ink-soft">
-            Inviting admins is handled by your district&rsquo;s onboarding contact at AIVO.
+            {t("invite_note")}
           </p>
         </div>
         {admins.length === 0 ? (
-          <EmptyState title="No administrators yet" />
+          <EmptyState title={t("empty_title")} />
         ) : (
           <table className="w-full text-sm">
             <thead className="bg-aivo-surface-2 text-left text-xs font-semibold uppercase tracking-wide text-aivo-muted">
@@ -50,7 +52,7 @@ export default async function Page() {
                 <th className="px-4 py-2">Email</th>
                 <th className="px-4 py-2">Role</th>
                 <th className="px-4 py-2">Scope</th>
-                <th className="px-4 py-2">Joined</th>
+                <th className="px-4 py-2">{t("col_joined")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-aivo-border">

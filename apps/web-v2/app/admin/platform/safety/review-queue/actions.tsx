@@ -2,10 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
 export function ReviewActions({ caseId }: { caseId: string }) {
   const router = useRouter();
+  const t = useTranslations("admin.platform_safety_review_queue");
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -35,7 +37,7 @@ export function ReviewActions({ caseId }: { caseId: string }) {
         value={note}
         onChange={(e) => setNote(e.target.value)}
         rows={2}
-        placeholder="Reviewer note (optional)"
+        placeholder={t("placeholder_reviewer_note")}
         className="w-full rounded border px-2 py-1 text-sm"
       />
       <div className="flex gap-2">
@@ -63,7 +65,7 @@ export function ReviewActions({ caseId }: { caseId: string }) {
           onClick={() => resolve("escalated")}
           disabled={busy}
         >
-          Escalate
+          {t("btn_escalate")}
         </Button>
       </div>
       {err && <p className="text-xs text-red-600">{err}</p>}

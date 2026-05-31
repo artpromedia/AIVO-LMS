@@ -2,6 +2,7 @@ import { MARKETING_ACCENTS } from "@aivo/brand";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { SUBJECTS } from "@/lib/landing-content";
 import { SITE_URL } from "@/lib/constants";
@@ -22,12 +23,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function SubjectsIndex() {
+export default async function SubjectsIndex() {
+  const t = await getTranslations("marketing.page_subjects");
   return (
     <LandingPageLayout
       badge="Subjects"
       badgeColor={MARKETING_ACCENTS.cyanDeep}
-      title="One tutor per subject. One Brain Clone for your child."
+      title={t("page_title")}
       subtitle="AIVO covers every core academic subject — and the often-neglected ones like speech, social-emotional learning, and life skills — with specialist AI tutors that share what they learn."
       breadcrumbs={[
         { name: "Home", href: "/" },

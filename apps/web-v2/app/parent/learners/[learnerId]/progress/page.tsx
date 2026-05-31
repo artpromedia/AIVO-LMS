@@ -8,6 +8,7 @@
  */
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
@@ -34,6 +35,7 @@ export default async function ParentProgressPage({
 }) {
   const session = await requirePageRole(["parent"]);
   const { learnerId } = await params;
+  const t = await getTranslations("parent.learner_progress");
   if (!await parentCanAccessLearner(session.userId, learnerId, session.tenantId)) {
     notFound();
   }
@@ -76,15 +78,15 @@ export default async function ParentProgressPage({
     >
       <PageHeader
         eyebrow={learner.displayName}
-        title="Progress"
-        description="Mastery across the subjects we're working on."
+        title={t("title")}
+        description={t("description")}
         actions={
           <div className="flex gap-2">
             <Button asChild variant="outline">
-              <Link href={`/parent/learners/${learnerId}/lessons`}>Lessons</Link>
+              <Link href={`/parent/learners/${learnerId}/lessons`}>{t("lessons_link")}</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href={`/parent/learners/${learnerId}/summary`}>Plain-language summary</Link>
+              <Link href={`/parent/learners/${learnerId}/summary`}>{t("summary_link")}</Link>
             </Button>
           </div>
         }
@@ -92,19 +94,19 @@ export default async function ParentProgressPage({
 
       <div className="grid gap-4 sm:grid-cols-4">
         <Card className="p-4">
-          <p className="text-xs uppercase text-aivo-ink-soft">Lessons done</p>
+          <p className="text-xs uppercase text-aivo-ink-soft">{t("lessons_done")}</p>
           <p className="text-2xl font-semibold">{completed.length}</p>
         </Card>
         <Card className="p-4">
-          <p className="text-xs uppercase text-aivo-ink-soft">Time learning</p>
+          <p className="text-xs uppercase text-aivo-ink-soft">{t("time_learning")}</p>
           <p className="text-2xl font-semibold">{totalMinutes} min</p>
         </Card>
         <Card className="p-4">
-          <p className="text-xs uppercase text-aivo-ink-soft">Skills tracked</p>
+          <p className="text-xs uppercase text-aivo-ink-soft">{t("skills_tracked")}</p>
           <p className="text-2xl font-semibold">{skillMasteries.length}</p>
         </Card>
         <Card className="p-4">
-          <p className="text-xs uppercase text-aivo-ink-soft">Mastered</p>
+          <p className="text-xs uppercase text-aivo-ink-soft">{t("mastered")}</p>
           <p className="text-2xl font-semibold">
             {
               skillMasteries.filter((m) => m.level === "on_grade_level" || m.level === "stretching")
@@ -116,7 +118,7 @@ export default async function ParentProgressPage({
 
       <SectionHeader
         className="mt-8"
-        title="By subject"
+        title={t("by_subject")}
         description={
           map
             ? `Last updated ${new Date(map.updatedAt).toLocaleDateString()}.`

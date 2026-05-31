@@ -137,7 +137,7 @@ export default function SignupPage() {
                 label={t("name_label")}
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                placeholder="Riley Parent"
+                placeholder={t("name_placeholder")}
                 autoComplete="name"
                 required
               />

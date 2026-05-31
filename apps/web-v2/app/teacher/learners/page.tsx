@@ -4,6 +4,7 @@
  */
 import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { TEACHER_NAV } from "@/components/layout/role-shells";
@@ -14,6 +15,7 @@ import { listLearnersForTeacher } from "@/lib/db/repos";
 export const dynamic = "force-dynamic";
 
 export default async function TeacherLearnersPage() {
+  const t = await getTranslations("teacher.learners");
   const session = await requirePageRole(["teacher"]);
   const learners = await listLearnersForTeacher(session.userId, session.tenantId);
   return (
@@ -25,12 +27,12 @@ export default async function TeacherLearnersPage() {
     >
       <PageHeader
         eyebrow="Learners"
-        title="Your roster"
+        title={t("title")}
         description="Open a learner to see recent lessons, skill progress, and accommodations."
       />
       {learners.length === 0 ? (
         <Card className="p-6 text-sm text-muted-foreground">
-          No learners are assigned to you yet.
+          {t("empty")}
         </Card>
       ) : (
         <ul className="grid gap-3">

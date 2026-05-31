@@ -1,4 +1,5 @@
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -13,6 +14,7 @@ import {
 import { getStore } from "@/lib/db/store";
 
 export default async function Page() {
+  const t = await getTranslations("teacher.insights");
   const session = await requirePageRole(["teacher"]);
   const learners = await listLearnersForTeacher(session.userId, session.tenantId);
   const subjectMap = new Map((await listSubjects()).map((s) => [s.id, s]));
@@ -27,12 +29,12 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Teacher"
-        title="Insights"
+        title={t("title")}
         description="Recent mastery and lesson activity across your roster."
       />
       {learners.length === 0 ? (
         <EmptyState
-          title="No learners in your tenant"
+          title={t("empty_title")}
           description="Once learners are rostered, their skill mastery and lesson activity will appear here."
         />
       ) : (

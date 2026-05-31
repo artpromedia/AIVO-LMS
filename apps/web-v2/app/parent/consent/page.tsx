@@ -1,4 +1,5 @@
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -9,6 +10,7 @@ import { CONSENT_TYPES } from "@/lib/db/types";
 import { ConsentToggle } from "./consent-toggle";
 
 export default async function Page() {
+  const t = await getTranslations("parent.consent");
   const session = await requirePageRole(["parent"]);
   const versions = listConsentVersions();
   const records = await listConsentsForUser(session.userId, session.tenantId);
@@ -26,7 +28,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Privacy"
-        title="Consent center"
+        title={t("title")}
         description="Each consent is versioned. Revoking disables the related feature without deleting required audit history."
       />
       <Card className="divide-y divide-iw-border p-0">
@@ -41,9 +43,9 @@ export default async function Page() {
                 <div className="flex items-center gap-2">
                   <h3 className="font-iw-display text-base font-semibold text-iw-ink">{humanize(type)}</h3>
                   {active ? (
-                    <Badge tone="success">Accepted</Badge>
+                    <Badge tone="success">{t("accepted")}</Badge>
                   ) : (
-                    <Badge tone="warning">Not accepted</Badge>
+                    <Badge tone="warning">{t("not_accepted")}</Badge>
                   )}
                 </div>
                 <p className="mt-1 text-sm text-iw-ink-muted">
