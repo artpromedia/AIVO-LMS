@@ -1,52 +1,75 @@
-import React from "react";
-import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useResponsiveType } from "@/src/design/useResponsiveType";
 import { AivoCard, AivoButton } from "@aivo/mobile-ui";
+import { IepDraftCard } from "@/src/components/IepDraftCard";
 import { colors, spacing } from "@/constants/colors";
+
+async function pickDoc(): Promise<{ name: string } | null> {
+  try {
+    const DP: any = await import("expo-document-picker");
+    const res = await DP.getDocumentAsync({
+      type: ["application/pdf", "image/*"],
+      copyToCacheDirectory: true,
+    });
+    if (res?.canceled) return null;
+    const a = res?.assets?.[0];
+    return a ? { name: a.name ?? "document" } : null;
+  } catch {
+    return null;
+  }
+}
 
 export default function TeacherIEPUpload() {
   const { t } = useTranslation();
   const type = useResponsiveType();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- route param reserved for future use
-  const { id: _id } = useLocalSearchParams<{ id: string }>();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
+  const [uploaded, setUploaded] = useState<string | null>(null);
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + 16 }]}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingTop: insets.top + 16, paddingBottom: 32, gap: spacing.md }}
+    >
       <Pressable onPress={() => router.back()} style={styles.backRow}>
         <Ionicons name="arrow-back" size={20} color={colors.primary} />
         <Text style={styles.backText}>{t("common.back")}</Text>
       </Pressable>
-      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>{t("teacherIEP.title")}</Text>
+      <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>
+        {t("teacherIEP.title")}
+      </Text>
       <Text style={styles.subtitle}>{t("teacherIEP.subtitle")}</Text>
 
+      {/* AI SMART-goal drafts from the student's lowest-scoring skills. */}
+      <IepDraftCard learnerId={id ?? ""} />
+
       <AivoCard style={styles.uploadCard}>
-        <Ionicons name="cloud-upload-outline" size={40} color={colors.primary} />
-        <Text style={styles.uploadTitle}>{t("teacherIEP.uploadDocument")}</Text>
+        <Ionicons
+          name={uploaded ? "document-text" : "cloud-upload-outline"}
+          size={40}
+          color={colors.primary}
+        />
+        <Text style={styles.uploadTitle}>{uploaded ?? t("teacherIEP.uploadDocument")}</Text>
         <Text style={styles.uploadDesc}>{t("teacherIEP.uploadDesc")}</Text>
         <View style={styles.uploadActions}>
           <AivoButton
-            title={t("teacherIEP.camera")}
-            onPress={() => Alert.alert(t("teacherIEP.camera"), t("common.featureUnavailable"))}
-            size="sm"
-            icon={<Ionicons name="camera-outline" size={16} color="#FFF" />}
-            style={{ flex: 1, marginRight: 8 }}
-          />
-          <AivoButton
             title={t("teacherIEP.pdf")}
-            onPress={() => Alert.alert(t("teacherIEP.pdf"), t("common.featureUnavailable"))}
-            variant="outline"
+            onPress={async () => {
+              const d = await pickDoc();
+              if (d) setUploaded(d.name);
+            }}
             size="sm"
-            icon={<Ionicons name="document-outline" size={16} color={colors.primary} />}
+            icon={<Ionicons name="document-outline" size={16} color="#FFF" />}
             style={{ flex: 1 }}
           />
         </View>
       </AivoCard>
-    </View>
+    </ScrollView>
   );
 }
 

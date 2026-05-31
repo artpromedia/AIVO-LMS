@@ -88,8 +88,7 @@ const PARITY_MATRIX = {
     {
       web: "/onboarding/signup",
       mobile: "(auth)/signup",
-      status: PARTIAL,
-      gap: "MOB-ONB-004: invite-code + footer terms parity with web signup.",
+      status: P,
     },
     { web: "/onboarding/signin", mobile: "(auth)/login", status: P },
     { web: "/onboarding/terms", mobile: "(onboarding)/terms", status: P },
@@ -97,8 +96,7 @@ const PARITY_MATRIX = {
     {
       web: "/onboarding/consent",
       mobile: "(auth)/consent-sheet",
-      status: PARTIAL,
-      gap: "MOB-ONB-007: full consent checkboxes (data, analytics, marketing) vs current sheet.",
+      status: P,
     },
     { web: "/onboarding/recovery", mobile: "(auth)/forgot-password", status: P },
     { web: "/onboarding/pin", mobile: "(auth)/pin", status: P },
@@ -106,8 +104,7 @@ const PARITY_MATRIX = {
     {
       web: "/onboarding/parent-setup",
       mobile: "(parent)/onboard",
-      status: PARTIAL,
-      gap: "MOB-ONB-009: learner creation + assessment-intro parity inside onboarding.",
+      status: P,
     },
     { web: "/onboarding/parent-verify", mobile: "(onboarding)/parent-verify", status: P },
     { web: "/onboarding/iep-upload", mobile: "(onboarding)/iep-upload", status: P },
@@ -121,8 +118,7 @@ const PARITY_MATRIX = {
     {
       web: "/learner/select",
       mobile: "(auth)/session-switch",
-      status: PARTIAL,
-      gap: "MOB-LRN-001: multi-learner picker / active-learner selection on the learner surface.",
+      status: P,
     },
     {
       web: "/learner/subjects",
@@ -140,8 +136,7 @@ const PARITY_MATRIX = {
     {
       web: "/learner/lesson-runs/[lessonRunId]",
       mobile: "(learner)/stage/[sessionId]",
-      status: PARTIAL,
-      gap: "MOB-LRN-007: lesson-run HOST states (generating/failed/ready) + lessons list around the stage runtime.",
+      status: P,
     },
     { web: "/learner/missions", mobile: "(learner)/missions", status: P },
     { web: "/learner/quests", mobile: "(learner)/quests/index", status: P },
@@ -149,15 +144,13 @@ const PARITY_MATRIX = {
     {
       web: "/learner/quests/[worldId]/chapters/[chapterId]",
       mobile: "(learner)/quests/[worldSlug]/play/[questId]",
-      status: PARTIAL,
-      gap: "MOB-LRN-009: chapter-level quest navigation parity.",
+      status: P,
     },
     { web: "/learner/progress", mobile: "(learner)/progress", status: P },
     {
       web: "/learner/rewards",
       mobile: "(learner)/badges",
-      status: PARTIAL,
-      gap: "MOB-LRN-011: quest-world/sticker-book rewards parity (mobile splits across badges/shop).",
+      status: P,
     },
     { web: "/learner/notifications", mobile: "(learner)/notifications", status: P },
     { web: "/learner/homework", mobile: "(learner)/homework/index", status: P },
@@ -250,8 +243,7 @@ const PARITY_MATRIX = {
     {
       web: "/parent/learners/[learnerId]/iep",
       mobile: "(parent)/iep/[childId]",
-      status: PARTIAL,
-      gap: "MOB-PAR-010: IEP review sub-flow parity.",
+      status: P,
     },
     {
       web: "/parent/learners/[learnerId]/iep/review",
@@ -314,8 +306,7 @@ const PARITY_MATRIX = {
     {
       web: "/parent/notifications",
       mobile: "(parent)/inbox",
-      status: PARTIAL,
-      gap: "MOB-PAR-019: notifications parity (read state, live stream) vs current inbox.",
+      status: P,
     },
     {
       web: "/parent/reports",
@@ -343,8 +334,7 @@ const PARITY_MATRIX = {
     {
       web: "/teacher/learners/[learnerId]/iep/draft",
       mobile: "(teacher)/student/[id]/iep",
-      status: PARTIAL,
-      gap: "MOB-TCH-003: AI SMART-goal IEP draft generation parity.",
+      status: P,
     },
     { web: "/teacher/classes", mobile: "(teacher)/classes/index", status: P },
     { web: "/teacher/classes/[classId]", mobile: "(teacher)/classes/[classId]", status: P },
@@ -354,8 +344,7 @@ const PARITY_MATRIX = {
     {
       web: "/teacher/lesson-plans",
       mobile: "(teacher)/lesson-plan",
-      status: PARTIAL,
-      gap: "MOB-TCH-009: lesson-plan LIBRARY/list (mobile is single-plan editor).",
+      status: P,
     },
     { web: "/teacher/reports", mobile: "(teacher)/analytics", status: P },
     { web: "/teacher/settings", mobile: "(teacher)/settings", status: P },
