@@ -13,6 +13,7 @@ import {
   getOrCreateParentAssessment,
   parentCanAccessLearner,
 } from "@/lib/db/repos";
+import { SeeBaselineCta } from "./see-baseline-cta";
 
 export default async function AssessmentSubmittedPage({
   params,
@@ -106,25 +107,7 @@ export default async function AssessmentSubmittedPage({
           },
         ]}
         primary={
-          <Link
-            href={`/parent/learners/${learner.id}/baseline/pending`}
-            className="inline-flex items-center gap-2 rounded-iw-control px-5 py-2.5 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 shadow-[0_2px_6px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.18)] focus:outline-none focus:ring-2 focus:ring-[var(--aivo-sensory-ringFocus)] focus:ring-offset-2 focus:ring-offset-white"
-          >
-            See the baseline come together
-            <svg
-              className="w-4 h-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.25"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M5 12h14" />
-              <path d="m13 5 7 7-7 7" />
-            </svg>
-          </Link>
+          <SeeBaselineCta href={`/parent/learners/${learner.id}/baseline/pending`} />
         }
         secondary={
           <Link
