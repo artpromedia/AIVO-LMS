@@ -76,9 +76,8 @@ const PARITY_MATRIX = {
     { web: "/accept-invite", mobile: "accept-invite", status: P },
     {
       web: "/settings/accessibility",
-      mobile: null,
-      status: MISSING,
-      gap: "MOB-A11Y-001: global accessibility settings screen (reduced motion, high contrast, large text, audio-first, captions).",
+      mobile: "settings/accessibility",
+      status: P,
     },
   ],
 
@@ -273,15 +272,13 @@ const PARITY_MATRIX = {
     { web: "/learner/settings", mobile: "(learner)/settings", status: P },
     {
       web: "/learner/settings/accessibility",
-      mobile: null,
-      status: MISSING,
-      gap: "MOB-LRN-013: learner accessibility settings sub-screen.",
+      mobile: "(learner)/accessibility",
+      status: P,
     },
     {
       web: "/learner/settings/audio",
-      mobile: null,
-      status: MISSING,
-      gap: "MOB-LRN-014: learner audio/voice preference sub-screen.",
+      mobile: "(learner)/audio",
+      status: P,
     },
     {
       web: "/learner/brain-clone/[learnerId]",

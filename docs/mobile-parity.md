@@ -15,25 +15,25 @@ sub-feature is missing · **Missing** not yet on mobile.
 
 | Status             | Count   |
 | ------------------ | ------- |
-| Parity             | 34      |
+| Parity             | 37      |
 | Partial            | 15      |
-| Missing            | 64      |
+| Missing            | 61      |
 | **In-scope total** | **113** |
 
-Full parity: **30%**. 90 web-only routes excluded.
+Full parity: **33%**. 90 web-only routes excluded.
 
 ## Auth & Shared
 
-| Web route                 | Mobile screen            | Status      | Gap / Ticket                                                                                                           |
-| ------------------------- | ------------------------ | ----------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `/`                       | `index`                  | Parity      | —                                                                                                                      |
-| `/login`                  | `(auth)/login`           | Parity      | —                                                                                                                      |
-| `/login/mfa`              | `(auth)/verify-mfa`      | Parity      | —                                                                                                                      |
-| `/signup`                 | `(auth)/signup`          | Parity      | —                                                                                                                      |
-| `/forgot-password`        | `(auth)/forgot-password` | Parity      | —                                                                                                                      |
-| `/reset-password`         | `(auth)/reset-password`  | Parity      | —                                                                                                                      |
-| `/accept-invite`          | `accept-invite`          | Parity      | —                                                                                                                      |
-| `/settings/accessibility` | —                        | **Missing** | MOB-A11Y-001: global accessibility settings screen (reduced motion, high contrast, large text, audio-first, captions). |
+| Web route                 | Mobile screen            | Status | Gap / Ticket |
+| ------------------------- | ------------------------ | ------ | ------------ |
+| `/`                       | `index`                  | Parity | —            |
+| `/login`                  | `(auth)/login`           | Parity | —            |
+| `/login/mfa`              | `(auth)/verify-mfa`      | Parity | —            |
+| `/signup`                 | `(auth)/signup`          | Parity | —            |
+| `/forgot-password`        | `(auth)/forgot-password` | Parity | —            |
+| `/reset-password`         | `(auth)/reset-password`  | Parity | —            |
+| `/accept-invite`          | `accept-invite`          | Parity | —            |
+| `/settings/accessibility` | `settings/accessibility` | Parity | —            |
 
 ## Onboarding
 
@@ -84,8 +84,8 @@ Full parity: **30%**. 90 web-only routes excluded.
 | `/learner/homework/[sessionId]`                  | `(learner)/homework/[sessionId]`              | Parity      | —                                                                                                      |
 | `/learner/tutor`                                 | `(learner)/tutor/[tutorSlug]`                 | Parity      | —                                                                                                      |
 | `/learner/settings`                              | `(learner)/settings`                          | Parity      | —                                                                                                      |
-| `/learner/settings/accessibility`                | —                                             | **Missing** | MOB-LRN-013: learner accessibility settings sub-screen.                                                |
-| `/learner/settings/audio`                        | —                                             | **Missing** | MOB-LRN-014: learner audio/voice preference sub-screen.                                                |
+| `/learner/settings/accessibility`                | `(learner)/accessibility`                     | Parity      | —                                                                                                      |
+| `/learner/settings/audio`                        | `(learner)/audio`                             | Parity      | —                                                                                                      |
 | `/learner/brain-clone/[learnerId]`               | `(learner)/brain`                             | **Partial** | MOB-LRN-015: learner brain-clone view parity (mobile brain screen lacks clone build/XAI annotations).  |
 
 ## Parent

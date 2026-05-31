@@ -132,60 +132,62 @@ function ThemedLearnerTabs() {
   ];
   return (
     <RoleTabletShell destinations={railDestinations}>
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: theme.colors.tabBarActive,
-        tabBarInactiveTintColor: theme.colors.tabBarInactive,
-        tabBarStyle,
-        tabBarLabelStyle: TAB_BAR_LABEL_STYLE,
-        sceneStyle: {
-          backgroundColor: theme.colors.bg,
-        },
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: t("tabs.worldMap"),
-          tabBarIcon: ({ color, size }) => <Ionicons name="map" size={size} color={color} />,
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarActiveTintColor: theme.colors.tabBarActive,
+          tabBarInactiveTintColor: theme.colors.tabBarInactive,
+          tabBarStyle,
+          tabBarLabelStyle: TAB_BAR_LABEL_STYLE,
+          sceneStyle: {
+            backgroundColor: theme.colors.bg,
+          },
         }}
-      />
-      <Tabs.Screen
-        name="brain"
-        options={{
-          title: t("tabs.brain"),
-          tabBarIcon: ({ color, size }) => <Ionicons name="bulb" size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="shop"
-        options={{
-          title: t("tabs.shop"),
-          tabBarIcon: ({ color, size }) => <Ionicons name="cart" size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="gamification"
-        options={{
-          title: t("tabs.profile"),
-          tabBarIcon: ({ color, size }) => <Ionicons name="trophy" size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen name="stage/[sessionId]" options={{ href: null }} />
-      <Tabs.Screen name="adventure" options={{ href: null }} />
-      <Tabs.Screen name="tutor/[tutorSlug]" options={{ href: null }} />
-      <Tabs.Screen name="homework/index" options={{ href: null }} />
-      <Tabs.Screen name="homework/[sessionId]" options={{ href: null }} />
-      <Tabs.Screen name="quests/index" options={{ href: null }} />
-      <Tabs.Screen name="quests/[worldSlug]/index" options={{ href: null }} />
-      <Tabs.Screen name="quests/[worldSlug]/play/[questId]" options={{ href: null }} />
-      <Tabs.Screen name="challenges" options={{ href: null }} />
-      <Tabs.Screen name="badges" options={{ href: null }} />
-      <Tabs.Screen name="gradebook" options={{ href: null }} />
-      <Tabs.Screen name="settings" options={{ href: null }} />
-      <Tabs.Screen name="leaderboard" options={{ href: null }} />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: t("tabs.worldMap"),
+            tabBarIcon: ({ color, size }) => <Ionicons name="map" size={size} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="brain"
+          options={{
+            title: t("tabs.brain"),
+            tabBarIcon: ({ color, size }) => <Ionicons name="bulb" size={size} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="shop"
+          options={{
+            title: t("tabs.shop"),
+            tabBarIcon: ({ color, size }) => <Ionicons name="cart" size={size} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="gamification"
+          options={{
+            title: t("tabs.profile"),
+            tabBarIcon: ({ color, size }) => <Ionicons name="trophy" size={size} color={color} />,
+          }}
+        />
+        <Tabs.Screen name="stage/[sessionId]" options={{ href: null }} />
+        <Tabs.Screen name="adventure" options={{ href: null }} />
+        <Tabs.Screen name="tutor/[tutorSlug]" options={{ href: null }} />
+        <Tabs.Screen name="homework/index" options={{ href: null }} />
+        <Tabs.Screen name="homework/[sessionId]" options={{ href: null }} />
+        <Tabs.Screen name="quests/index" options={{ href: null }} />
+        <Tabs.Screen name="quests/[worldSlug]/index" options={{ href: null }} />
+        <Tabs.Screen name="quests/[worldSlug]/play/[questId]" options={{ href: null }} />
+        <Tabs.Screen name="challenges" options={{ href: null }} />
+        <Tabs.Screen name="badges" options={{ href: null }} />
+        <Tabs.Screen name="gradebook" options={{ href: null }} />
+        <Tabs.Screen name="settings" options={{ href: null }} />
+        <Tabs.Screen name="accessibility" options={{ href: null }} />
+        <Tabs.Screen name="audio" options={{ href: null }} />
+        <Tabs.Screen name="leaderboard" options={{ href: null }} />
+      </Tabs>
     </RoleTabletShell>
   );
 }
