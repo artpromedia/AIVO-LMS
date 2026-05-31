@@ -10,7 +10,6 @@ import {
   setStoredLocale,
   locales,
   localeNames,
-  localeFlags,
   dirForLocale,
 } from "@/i18n/config";
 
@@ -21,7 +20,6 @@ interface I18nContextValue {
   setLocale: (locale: Locale) => void;
   locales: readonly Locale[];
   localeNames: Record<string, string>;
-  localeFlags: Record<string, string>;
 }
 
 const I18nContext = createContext<I18nContextValue>({
@@ -29,7 +27,6 @@ const I18nContext = createContext<I18nContextValue>({
   setLocale: () => {},
   locales,
   localeNames,
-  localeFlags,
 });
 
 export function useLocale() {
@@ -114,7 +111,7 @@ export function I18nProvider({
   }, [locale]);
 
   return (
-    <I18nContext.Provider value={{ locale, setLocale, locales, localeNames, localeFlags }}>
+    <I18nContext.Provider value={{ locale, setLocale, locales, localeNames }}>
       <NextIntlClientProvider locale={locale} messages={messages} timeZone="America/New_York">
         {children}
       </NextIntlClientProvider>

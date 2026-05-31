@@ -15,19 +15,6 @@ export const localeNames: Record<Locale, string> = {
   hi: "हिन्दी",
 };
 
-export const localeFlags: Record<Locale, string> = {
-  en: "🇺🇸",
-  es: "🇪🇸",
-  fr: "🇫🇷",
-  de: "🇩🇪",
-  pt: "🇧🇷",
-  zh: "🇨🇳",
-  ja: "🇯🇵",
-  ko: "🇰🇷",
-  ar: "🇸🇦",
-  hi: "🇮🇳",
-};
-
 export const LOCALE_COOKIE_NAME = "aivo_locale";
 
 export function isValidLocale(locale: string): locale is Locale {

@@ -7,8 +7,9 @@
  * versa (orphan keys).
  *
  * Scope:
- *   - apps/web-v2/lib/i18n/messages/<locale>.json  (10 locales)
- *   - apps/mobile/i18n/<locale>.json               (10 locales)
+ *   - apps/web-v2/lib/i18n/messages/<locale>.json     (10 locales)
+ *   - apps/marketing/src/i18n/messages/<locale>.json  (10 locales)
+ *   - apps/mobile/i18n/<locale>.json                  (10 locales)
  *   - services/i18n-svc/src/translations/<locale>.ts (10 locales,
  *     file-presence only; TypeScript build enforces shape parity)
  *
@@ -30,6 +31,12 @@ const TARGETS = [
     name: "web-v2",
     type: "json",
     dir: "apps/web-v2/lib/i18n/messages",
+    ext: ".json",
+  },
+  {
+    name: "marketing",
+    type: "json",
+    dir: "apps/marketing/src/i18n/messages",
     ext: ".json",
   },
   {

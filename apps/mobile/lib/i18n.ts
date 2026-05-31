@@ -1,4 +1,5 @@
 import i18n, { init, changeLanguage } from "i18next";
+import { I18nManager } from "react-native";
 import * as Localization from "expo-localization";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import en from "@/i18n/en.json";
@@ -64,9 +65,35 @@ export function isSupportedLocale(value: unknown): value is SupportedLocale {
   );
 }
 
+// Right-to-left locales. Only `ar` ships today, but the wider set mirrors
+// apps/web-v2/lib/i18n/config.ts so a future RTL locale is a one-line add.
+const RTL_LOCALES: ReadonlySet<string> = new Set(["ar", "he", "fa", "ur"]);
+
+export function isRTLLocale(locale: string): boolean {
+  return RTL_LOCALES.has(locale.split("-")[0]?.toLowerCase() ?? locale);
+}
+
+/**
+ * Align React Native's native layout direction with the active locale.
+ * `I18nManager.forceRTL` is persisted by the OS and applied at the next app
+ * launch (React Native lays out direction once at startup), so a live switch
+ * flips text immediately via i18next and the full native mirroring lands on
+ * the next launch — the standard behaviour for apps without a reload bridge.
+ */
+function syncWritingDirection(locale: string): void {
+  const shouldRTL = isRTLLocale(locale);
+  I18nManager.allowRTL(true);
+  if (I18nManager.isRTL !== shouldRTL) {
+    I18nManager.forceRTL(shouldRTL);
+  }
+}
+
+const initialLocale = pickInitialLocale();
+syncWritingDirection(initialLocale);
+
 init({
   resources,
-  lng: pickInitialLocale(),
+  lng: initialLocale,
   fallbackLng: "en",
   interpolation: { escapeValue: false },
   compatibilityJSON: "v4",
@@ -80,8 +107,11 @@ init({
 export async function restoreSavedLocale(): Promise<void> {
   try {
     const raw = await AsyncStorage.getItem(LOCALE_STORAGE_KEY);
-    if (isSupportedLocale(raw) && raw !== i18n.language) {
-      await changeLanguage(raw);
+    if (isSupportedLocale(raw)) {
+      syncWritingDirection(raw);
+      if (raw !== i18n.language) {
+        await changeLanguage(raw);
+      }
     }
   } catch {
     // AsyncStorage failures are non-fatal — fall back to the device locale.
@@ -94,6 +124,7 @@ export async function restoreSavedLocale(): Promise<void> {
  * already reflects the change optimistically.
  */
 export async function setSavedLocale(locale: SupportedLocale): Promise<void> {
+  syncWritingDirection(locale);
   await Promise.allSettled([
     AsyncStorage.setItem(LOCALE_STORAGE_KEY, locale),
     changeLanguage(locale),

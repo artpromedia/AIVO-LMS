@@ -4,7 +4,7 @@ import { useLocale } from "@/providers/i18n-provider";
 import type { Locale } from "@/i18n/config";
 
 export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
-  const { locale, setLocale, locales, localeNames, localeFlags } = useLocale();
+  const { locale, setLocale, locales, localeNames } = useLocale();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -27,8 +27,11 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
         }`}
         aria-label="Change language"
       >
-        <span className="text-base">{localeFlags[locale]}</span>
-        {!compact && <span>{localeNames[locale]}</span>}
+        {compact ? (
+          <span className="font-semibold uppercase">{locale}</span>
+        ) : (
+          <span>{localeNames[locale]}</span>
+        )}
         <svg
           className="w-3 h-3 text-slate-400"
           fill="none"
@@ -52,7 +55,7 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
                 l === locale ? "bg-purple-50 text-purple-700 font-semibold" : "text-slate-700"
               }`}
             >
-              <span className="text-base">{localeFlags[l]}</span>
+              <span className="w-6 text-xs font-semibold uppercase opacity-60">{l}</span>
               <span>{localeNames[l]}</span>
               {l === locale && (
                 <svg
