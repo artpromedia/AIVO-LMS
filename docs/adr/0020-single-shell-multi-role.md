@@ -172,3 +172,56 @@ Rules each migration PR must follow:
    ADR's table being kept in sync.
 4. **Ship one surface per PR.** The phase numbers exist so a future
    automation gate can fail PRs that mix phases or skip ahead.
+
+## Phase 1 — Unified identity & role switching (backend)
+
+The backend half of the multi-role contract landed alongside this
+ADR. The implementation lives entirely in `apps/web-v2` so it can be
+exercised end-to-end without a real identity-svc:
+
+- **`GET /api/bff/me`** (`apps/web-v2/app/api/bff/me/route.ts`)
+  returns the canonical `{ id, tenantId, roles[], activeRole,
+  capabilities[] }` payload via `buildRoleSession()`
+  (`apps/web-v2/lib/auth/role-session.ts`).
+- **`POST /api/bff/me/active-role`**
+  (`apps/web-v2/app/api/bff/me/active-role/route.ts`) flips the
+  active role. The pure decision logic lives in
+  `apps/web-v2/lib/auth/active-role.ts` (`decideActiveRoleSwitch`)
+  so it is unit-testable under vitest.
+  - Validates `target ∈ session.roles[]`; otherwise 403
+    `FORBIDDEN_ROLE`.
+  - When `ROLE_META[target].requiresStepUp === true`, requires a
+    fresh `x-step-up-token` header verified by
+    `verifyRoleChangeStepUp()`
+    (`apps/web-v2/lib/auth/step-up-verify.ts`). Real-mode delegates
+    to `@aivo/security` `verifyJWT` (`purpose: "step-up"`,
+    `scope: "role:change"`, `sub === session.userId`); mock-mode
+    accepts a deterministic `mock-stepup.<role>.<exp>` token so dev
+    flows work without identity-svc.
+  - On success sets `aivo_active_role` and re-mints the
+    `aivo_session_role` surface cookie via
+    `signSurfaceCookieValue()` from `@aivo/security`. Edge
+    middleware now reads the **active** role, satisfying ADR 0020
+    §4 ("backend authorization keys off active role, not any role
+    the user happens to hold").
+- **Mock multi-role overlay** (`apps/web-v2/lib/auth/mock-session.ts`)
+  layers two cookies on top of the existing mock session so dev
+  fixtures can hold multiple roles:
+  - `aivo_session_roles` — comma-separated list of extra roles
+    (e.g. `parent,teacher,caregiver`).
+  - `aivo_active_role` — the currently active role; when set, the
+    underlying `MOCK_USERS` fixture is swapped so `session.role`,
+    `displayName`, and `permissions` reflect the active surface
+    while `userId` / `tenantId` stay stable.
+
+The web ↔ nav role-id mapping (`school_admin` ↔ `schoolAdmin`,
+`platform_admin` ↔ `internal`, etc.) is centralised in
+`apps/web-v2/lib/auth/role-session.ts` so role registry additions in
+`packages/nav/src/roles.ts` only need a single mapping update on the
+web side.
+
+The real-mode `identity-svc` refresh-token flow (issuing a JWT whose
+`role` claim follows `activeRole` on rotation) is the remaining
+slice — tracked separately; the BFF contract above is the gate that
+unblocks the client refactor in Phase 1's "Client" bullet.
+

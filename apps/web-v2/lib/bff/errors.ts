@@ -64,6 +64,12 @@ export const ERRORS = {
     retryable: false,
     status: 412,
   },
+  STEP_UP_REQUIRED: {
+    code: "STEP_UP_REQUIRED",
+    userMessage: "Please verify it's you to switch into that role.",
+    retryable: false,
+    status: 403,
+  },
   INTERNAL_ERROR: {
     code: "INTERNAL_ERROR",
     userMessage: "Something went wrong. Please try again in a moment.",
