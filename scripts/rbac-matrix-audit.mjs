@@ -83,14 +83,18 @@ if (roles && areas) {
     }
     const block = m[1];
 
-    // Pull out each "areaKey: { access: "...", webRoute: "...", ... }".
+    // Pull out each "areaKey: { access: "...", webRoute: "...", ... }"
+    // OR a single-line shorthand "areaKey: HIDDEN,".
     const areaRe = /^\s{4}([A-Za-z][A-Za-z0-9]*):\s*\{([\s\S]*?)\},?$/gm;
+    const shorthandRe = /^\s{4}([A-Za-z][A-Za-z0-9]*):\s*HIDDEN,?$/gm;
     let entryCount = 0;
+    const declared = new Set();
     let am;
     while ((am = areaRe.exec(block)) !== null) {
       entryCount++;
       const areaKey = am[1];
       const body = am[2];
+      declared.add(areaKey);
 
       if (!areaSet.has(areaKey)) {
         errors.push(
@@ -132,6 +136,34 @@ if (roles && areas) {
             `<LockedScreen> will render an empty explanation.`,
         );
       }
+    }
+
+    // Shorthand "area: HIDDEN," entries — count as declared.
+    let sm;
+    while ((sm = shorthandRe.exec(block)) !== null) {
+      const areaKey = sm[1];
+      if (!areaSet.has(areaKey)) {
+        errors.push(
+          `Role "${role}" references unknown NavArea "${areaKey}" in MATRIX ` +
+            `(HIDDEN shorthand). Add it to NAV_AREAS in areas.ts first.`,
+        );
+        continue;
+      }
+      entryCount++;
+      declared.add(areaKey);
+    }
+
+    // ADR 0020 §Consequences — matrix coverage. Every Role × NavArea pair
+    // must be classified explicitly so a new role or area cannot silently
+    // default to hidden. The fallthrough default still applies at runtime,
+    // but authors must make the decision visible in code.
+    const undeclared = areas.filter((a) => !declared.has(a));
+    if (undeclared.length > 0) {
+      errors.push(
+        `Role "${role}" is missing explicit MATRIX entries for: ${undeclared.join(", ")}. ` +
+          `Add each as "area: HIDDEN," or with an explicit access record so the ` +
+          `Role × NavArea coverage gate (ADR 0020) is satisfied.`,
+      );
     }
 
     if (entryCount === 0) {

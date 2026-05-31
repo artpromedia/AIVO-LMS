@@ -382,17 +382,77 @@ const MATRIX: Matrix = {
   /* ──────────────────────────── Therapist ──────────────────────────── */
   therapist: {
     home: { access: "full", webRoute: "/therapist/home", mobileRoute: "/(therapist)/home" },
-    learners: { access: "full", webRoute: "/therapist/sessions", mobileRoute: "/(therapist)/sessions" },
+    learners: {
+      access: "full",
+      webRoute: "/therapist/sessions",
+      mobileRoute: "/(therapist)/sessions",
+    },
     reports: { access: "linked", webRoute: "/therapist/reports" },
     settings: { access: "linked", webRoute: "/therapist/settings" },
+    iep: {
+      access: "linked",
+      webRoute: "/therapist/sessions",
+      mobileRoute: "/(therapist)/client",
+    },
+    progress: {
+      access: "linked",
+      webRoute: "/therapist/reports",
+      mobileRoute: "/(therapist)/client",
+    },
+    messages: {
+      access: "linked",
+      webRoute: "/therapist/sessions",
+      mobileRoute: "/(therapist)/client",
+    },
+    baseline: {
+      access: "locked",
+      lockReason:
+        "Baselines are administered by the learner's teacher. Open a client to read the latest results.",
+    },
+    subjects: HIDDEN,
+    lessons: HIDDEN,
+    homeworkHelper: HIDDEN,
+    aiTutor: HIDDEN,
+    approvals: HIDDEN,
+    billing: HIDDEN,
+    admin: HIDDEN,
+    safety: HIDDEN,
   },
 
   /* ──────────────────────────── Caregiver ──────────────────────────── */
   caregiver: {
     home: { access: "full", webRoute: "/caregiver/home", mobileRoute: "/(caregiver)/home" },
-    learners: { access: "full", webRoute: "/caregiver/learners", mobileRoute: "/(caregiver)/learners" },
-    messages: { access: "linked", webRoute: "/caregiver/messages" },
+    learners: {
+      access: "full",
+      webRoute: "/caregiver/learners",
+      mobileRoute: "/(caregiver)/learners",
+    },
+    messages: {
+      access: "linked",
+      webRoute: "/caregiver/messages",
+      mobileRoute: "/(caregiver)/child",
+    },
     settings: { access: "linked", webRoute: "/caregiver/settings" },
+    progress: {
+      access: "linked",
+      webRoute: "/caregiver/learners",
+      mobileRoute: "/(caregiver)/child",
+    },
+    iep: {
+      access: "locked",
+      lockReason:
+        "Care-plan goals are managed by the learner's therapist and parent. You can record observations on each child's page.",
+    },
+    subjects: HIDDEN,
+    baseline: HIDDEN,
+    lessons: HIDDEN,
+    homeworkHelper: HIDDEN,
+    aiTutor: HIDDEN,
+    approvals: HIDDEN,
+    billing: HIDDEN,
+    admin: HIDDEN,
+    safety: HIDDEN,
+    reports: HIDDEN,
   },
 };
 
