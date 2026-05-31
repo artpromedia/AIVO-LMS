@@ -7,7 +7,6 @@ import { useTranslations } from "next-intl";
 import {
   locales,
   localeNames,
-  localeFlags,
   LOCALE_COOKIE_NAME,
   type Locale,
 } from "@/lib/i18n/config";
@@ -80,8 +79,7 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
         className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-iw-border bg-iw-bg px-3 py-1.5 text-sm font-semibold text-iw-ink-muted transition hover:bg-iw-warm-soft hover:text-iw-ink"
       >
         <Globe className="h-4 w-4" aria-hidden="true" />
-        <span aria-hidden="true">{localeFlags[current]}</span>
-        <span className="hidden sm:inline">{current.toUpperCase()}</span>
+        <span>{current.toUpperCase()}</span>
       </button>
       {open ? (
         <ul
@@ -103,9 +101,6 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
                       : "text-iw-ink-muted hover:bg-iw-warm-soft hover:text-iw-ink"
                   }`}
                 >
-                  <span aria-hidden="true" className="text-base">
-                    {localeFlags[locale]}
-                  </span>
                   <span className="flex-1">{localeNames[locale]}</span>
                   <span className="text-xs uppercase opacity-60">{locale}</span>
                 </button>
