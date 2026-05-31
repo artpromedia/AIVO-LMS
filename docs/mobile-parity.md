@@ -15,12 +15,12 @@ sub-feature is missing · **Missing** not yet on mobile.
 
 | Status             | Count   |
 | ------------------ | ------- |
-| Parity             | 37      |
-| Partial            | 15      |
-| Missing            | 61      |
+| Parity             | 38      |
+| Partial            | 17      |
+| Missing            | 58      |
 | **In-scope total** | **113** |
 
-Full parity: **33%**. 90 web-only routes excluded.
+Full parity: **34%**. 90 web-only routes excluded.
 
 ## Auth & Shared
 
@@ -59,34 +59,34 @@ Full parity: **33%**. 90 web-only routes excluded.
 
 ## Learner
 
-| Web route                                        | Mobile screen                                 | Status      | Gap / Ticket                                                                                           |
-| ------------------------------------------------ | --------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------ |
-| `/learner/home`                                  | `(learner)/index`                             | Parity      | —                                                                                                      |
-| `/learner/select`                                | `(auth)/session-switch`                       | **Partial** | MOB-LRN-001: multi-learner picker / active-learner selection on the learner surface.                   |
-| `/learner/subjects`                              | —                                             | **Missing** | MOB-LRN-002: subjects grid with mastery progress + baseline gating.                                    |
-| `/learner/subjects/[subjectId]`                  | —                                             | **Missing** | MOB-LRN-003: subject detail (tutor hero, next-up, skill path, mastery grid).                           |
-| `/learner/baseline`                              | —                                             | **Missing** | MOB-LRN-004: baseline hub.                                                                             |
-| `/learner/baseline/intro`                        | —                                             | **Missing** | MOB-LRN-004: baseline intro (question count, subjects, time).                                          |
-| `/learner/baseline/why`                          | —                                             | **Missing** | MOB-LRN-004: baseline 'why' reassurance screen.                                                        |
-| `/learner/baseline/readiness`                    | —                                             | **Missing** | MOB-LRN-004: 4-check readiness pre-flight.                                                             |
-| `/learner/baseline/subjects`                     | —                                             | **Missing** | MOB-LRN-004: baseline subject multi-select.                                                            |
-| `/learner/baseline/[baselineId]`                 | —                                             | **Missing** | MOB-LRN-005: adaptive baseline RUNNER (IRT/streaming, breaks, supports, completion hero).              |
-| `/learner/library`                               | —                                             | **Missing** | MOB-LRN-006: completed-lessons replay library.                                                         |
-| `/learner/lesson-runs/[lessonRunId]`             | `(learner)/stage/[sessionId]`                 | **Partial** | MOB-LRN-007: lesson-run HOST states (generating/failed/ready) + lessons list around the stage runtime. |
-| `/learner/missions`                              | —                                             | **Missing** | MOB-LRN-008: assignments + in-progress lessons ('missions') screen.                                    |
-| `/learner/quests`                                | `(learner)/quests/index`                      | Parity      | —                                                                                                      |
-| `/learner/quests/[worldId]`                      | `(learner)/quests/[worldSlug]/index`          | Parity      | —                                                                                                      |
-| `/learner/quests/[worldId]/chapters/[chapterId]` | `(learner)/quests/[worldSlug]/play/[questId]` | **Partial** | MOB-LRN-009: chapter-level quest navigation parity.                                                    |
-| `/learner/progress`                              | —                                             | **Missing** | MOB-LRN-010: premium progress charts (mastery %, trend, heatstrips, recent activity).                  |
-| `/learner/rewards`                               | `(learner)/badges`                            | **Partial** | MOB-LRN-011: quest-world/sticker-book rewards parity (mobile splits across badges/shop).               |
-| `/learner/notifications`                         | —                                             | **Missing** | MOB-LRN-012: learner notifications (SSE + polling).                                                    |
-| `/learner/homework`                              | `(learner)/homework/index`                    | Parity      | —                                                                                                      |
-| `/learner/homework/[sessionId]`                  | `(learner)/homework/[sessionId]`              | Parity      | —                                                                                                      |
-| `/learner/tutor`                                 | `(learner)/tutor/[tutorSlug]`                 | Parity      | —                                                                                                      |
-| `/learner/settings`                              | `(learner)/settings`                          | Parity      | —                                                                                                      |
-| `/learner/settings/accessibility`                | `(learner)/accessibility`                     | Parity      | —                                                                                                      |
-| `/learner/settings/audio`                        | `(learner)/audio`                             | Parity      | —                                                                                                      |
-| `/learner/brain-clone/[learnerId]`               | `(learner)/brain`                             | **Partial** | MOB-LRN-015: learner brain-clone view parity (mobile brain screen lacks clone build/XAI annotations).  |
+| Web route                                        | Mobile screen                                 | Status      | Gap / Ticket                                                                                                                                                                 |
+| ------------------------------------------------ | --------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/learner/home`                                  | `(learner)/index`                             | Parity      | —                                                                                                                                                                            |
+| `/learner/select`                                | `(auth)/session-switch`                       | **Partial** | MOB-LRN-001: multi-learner picker / active-learner selection on the learner surface.                                                                                         |
+| `/learner/subjects`                              | `(learner)/subjects/index`                    | Parity      | —                                                                                                                                                                            |
+| `/learner/subjects/[subjectId]`                  | `(learner)/subjects/[subjectId]`              | **Partial** | MOB-LRN-003: per-skill mastery grid + recommended skill path pending a skills REST endpoint (mobile shows domain mastery, tutors, supports).                                 |
+| `/learner/baseline`                              | —                                             | **Missing** | MOB-LRN-004: baseline hub.                                                                                                                                                   |
+| `/learner/baseline/intro`                        | —                                             | **Missing** | MOB-LRN-004: baseline intro (question count, subjects, time).                                                                                                                |
+| `/learner/baseline/why`                          | —                                             | **Missing** | MOB-LRN-004: baseline 'why' reassurance screen.                                                                                                                              |
+| `/learner/baseline/readiness`                    | —                                             | **Missing** | MOB-LRN-004: 4-check readiness pre-flight.                                                                                                                                   |
+| `/learner/baseline/subjects`                     | —                                             | **Missing** | MOB-LRN-004: baseline subject multi-select.                                                                                                                                  |
+| `/learner/baseline/[baselineId]`                 | —                                             | **Missing** | MOB-LRN-005: adaptive baseline RUNNER (IRT/streaming, breaks, supports, completion hero).                                                                                    |
+| `/learner/library`                               | —                                             | **Missing** | MOB-LRN-006: completed-lessons replay library.                                                                                                                               |
+| `/learner/lesson-runs/[lessonRunId]`             | `(learner)/stage/[sessionId]`                 | **Partial** | MOB-LRN-007: lesson-run HOST states (generating/failed/ready) + lessons list around the stage runtime.                                                                       |
+| `/learner/missions`                              | —                                             | **Missing** | MOB-LRN-008: assignments + in-progress lessons ('missions') screen.                                                                                                          |
+| `/learner/quests`                                | `(learner)/quests/index`                      | Parity      | —                                                                                                                                                                            |
+| `/learner/quests/[worldId]`                      | `(learner)/quests/[worldSlug]/index`          | Parity      | —                                                                                                                                                                            |
+| `/learner/quests/[worldId]/chapters/[chapterId]` | `(learner)/quests/[worldSlug]/play/[questId]` | **Partial** | MOB-LRN-009: chapter-level quest navigation parity.                                                                                                                          |
+| `/learner/progress`                              | `(learner)/progress`                          | **Partial** | MOB-LRN-010: lessons-by-day trend + recent-activity list pending a lesson-runs REST endpoint (mobile shows overall/per-subject mastery, heatstrip, comparison dots, streak). |
+| `/learner/rewards`                               | `(learner)/badges`                            | **Partial** | MOB-LRN-011: quest-world/sticker-book rewards parity (mobile splits across badges/shop).                                                                                     |
+| `/learner/notifications`                         | —                                             | **Missing** | MOB-LRN-012: learner notifications (SSE + polling).                                                                                                                          |
+| `/learner/homework`                              | `(learner)/homework/index`                    | Parity      | —                                                                                                                                                                            |
+| `/learner/homework/[sessionId]`                  | `(learner)/homework/[sessionId]`              | Parity      | —                                                                                                                                                                            |
+| `/learner/tutor`                                 | `(learner)/tutor/[tutorSlug]`                 | Parity      | —                                                                                                                                                                            |
+| `/learner/settings`                              | `(learner)/settings`                          | Parity      | —                                                                                                                                                                            |
+| `/learner/settings/accessibility`                | `(learner)/accessibility`                     | Parity      | —                                                                                                                                                                            |
+| `/learner/settings/audio`                        | `(learner)/audio`                             | Parity      | —                                                                                                                                                                            |
+| `/learner/brain-clone/[learnerId]`               | `(learner)/brain`                             | **Partial** | MOB-LRN-015: learner brain-clone view parity (mobile brain screen lacks clone build/XAI annotations).                                                                        |
 
 ## Parent
 

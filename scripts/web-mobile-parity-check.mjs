@@ -181,15 +181,14 @@ const PARITY_MATRIX = {
     },
     {
       web: "/learner/subjects",
-      mobile: null,
-      status: MISSING,
-      gap: "MOB-LRN-002: subjects grid with mastery progress + baseline gating.",
+      mobile: "(learner)/subjects/index",
+      status: P,
     },
     {
       web: "/learner/subjects/[subjectId]",
-      mobile: null,
-      status: MISSING,
-      gap: "MOB-LRN-003: subject detail (tutor hero, next-up, skill path, mastery grid).",
+      mobile: "(learner)/subjects/[subjectId]",
+      status: PARTIAL,
+      gap: "MOB-LRN-003: per-skill mastery grid + recommended skill path pending a skills REST endpoint (mobile shows domain mastery, tutors, supports).",
     },
     { web: "/learner/baseline", mobile: null, status: MISSING, gap: "MOB-LRN-004: baseline hub." },
     {
@@ -250,9 +249,9 @@ const PARITY_MATRIX = {
     },
     {
       web: "/learner/progress",
-      mobile: null,
-      status: MISSING,
-      gap: "MOB-LRN-010: premium progress charts (mastery %, trend, heatstrips, recent activity).",
+      mobile: "(learner)/progress",
+      status: PARTIAL,
+      gap: "MOB-LRN-010: lessons-by-day trend + recent-activity list pending a lesson-runs REST endpoint (mobile shows overall/per-subject mastery, heatstrip, comparison dots, streak).",
     },
     {
       web: "/learner/rewards",
