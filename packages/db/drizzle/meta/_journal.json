@@ -232,6 +232,13 @@
       "when": 1779940800000,
       "tag": "0049_web_domain",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1780027200000,
+      "tag": "0050_web_domain_rls",
+      "breakpoints": true
     }
   ]
 }
