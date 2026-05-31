@@ -25,3 +25,8 @@ export function getDb(): Database {
 export function __resetDbClient(): void {
   cached = null;
 }
+
+/** Test seam — inject a Database (e.g. a throwaway test-container client). */
+export function __setDbClient(db: Database): void {
+  cached = db;
+}

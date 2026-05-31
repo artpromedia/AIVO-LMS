@@ -44,6 +44,7 @@
     "lessonrun:audit": "node scripts/lessonrun-audit.mjs",
     "route:audit": "node scripts/route-audit.mjs",
     "mobile:audit": "node scripts/mobile-unified-audit.mjs",
+    "persistence:stubs": "node scripts/check-persistence-stubs.mjs",
     "mobile:parity": "node scripts/web-mobile-parity-check.mjs",
     "mobile:parity:strict": "node scripts/web-mobile-parity-check.mjs --strict",
     "mobile:parity:md": "node scripts/web-mobile-parity-check.mjs --markdown > docs/mobile-parity.md",
