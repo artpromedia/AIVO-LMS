@@ -130,26 +130,26 @@ export default async function LearnerProgressPage() {
       user={{ displayName: session.displayName, email: session.email }}
     >
       <header className="flex flex-col gap-2 mb-6">
-        <p className="iw-label text-iw-text-muted">Progress</p>
+        <p className="iw-label text-iw-text-muted">{t("eyebrow")}</p>
         <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong">
-          How {learner.preferredName || learner.firstName} is growing
+          {t("title", { name: learner.preferredName || learner.firstName })}
         </h1>
         <p className="text-sm md:text-base text-iw-text-muted max-w-2xl">
-          A calm snapshot of mastery across subjects, recent lessons, and where to focus next.
+          {t("description")}
         </p>
       </header>
 
       {!map ? (
         <div className="rounded-iw-card-lg border border-iw-border bg-white p-6">
           <EmptyState
-            title="No mastery yet"
-            body="Finish a baseline assessment so we can start tracking growth."
+            title={t("empty_title")}
+            body={t("empty_body")}
             action={
               <Link
                 href={session.role === "parent" ? `/parent/learners/${learnerId}` : "/learner/baseline"}
                 className="inline-flex items-center gap-2 rounded-iw-control px-5 py-2.5 text-sm font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110"
               >
-                {session.role === "parent" ? "Open setup" : "Start baseline"}
+                {session.role === "parent" ? t("empty_cta_parent") : t("empty_cta_learner")}
               </Link>
             }
           />
@@ -158,27 +158,27 @@ export default async function LearnerProgressPage() {
         <>
           <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <FloatingMetricCard
-              label="Overall mastery"
+              label={t("metric_overall")}
               value={`${Math.round(overallAvg * 100)}%`}
               description={masteryLabel(overallAvg, t)}
               tone="success"
             />
             <FloatingMetricCard
-              label="Skills mastered"
+              label={t("metric_mastered")}
               value={`${masteredCount}`}
-              description={`of ${skillMasteries.length}`}
+              description={t("metric_of", { count: skillMasteries.length })}
               tone="info"
             />
             <FloatingMetricCard
-              label="Needs support"
+              label={t("metric_needs")}
               value={`${needsSupportCount}`}
-              description={needsSupportCount === 0 ? "All comfortable" : "Soft areas"}
+              description={needsSupportCount === 0 ? t("needs_zero") : t("needs_some")}
               tone={needsSupportCount === 0 ? "success" : "warning"}
             />
             <FloatingMetricCard
-              label="Recent lessons"
+              label={t("metric_recent")}
               value={`${recentRuns.length}`}
-              description="last 2 weeks"
+              description={t("recent_desc")}
               tone="neutral"
             />
           </section>
@@ -187,29 +187,29 @@ export default async function LearnerProgressPage() {
             <GlassCard
               elevation="raised"
               density="comfortable"
-              title="Lessons completed"
-              description="Last 14 days"
+              title={t("lessons_completed")}
+              description={t("last_14")}
             >
               {trendPoints.length > 0 ? (
-                <SoftLine data={trendPoints} ariaLabel="Lessons completed per day" filled />
+                <SoftLine data={trendPoints} ariaLabel={t("lessons_aria")} filled />
               ) : (
                 <p className="text-sm text-iw-text-muted">
-                  No lessons yet. Today's mission is waiting on your home page.
+                  {t("no_lessons_waiting")}
                 </p>
               )}
             </GlassCard>
             <GlassCard
               elevation="raised"
               density="comfortable"
-              title="Mastery by subject"
-              description="Calm dot view — height = average mastery"
+              title={t("mastery_by_subject")}
+              description={t("dot_view_desc")}
             >
-              <DotChart data={subjectDots} ariaLabel="Mastery by subject" />
+              <DotChart data={subjectDots} ariaLabel={t("mastery_by_subject")} />
             </GlassCard>
           </section>
 
           <section className="mt-6 flex flex-col gap-3">
-            <h2 className="text-xl font-semibold text-iw-text-strong">Skill mastery map</h2>
+            <h2 className="text-xl font-semibold text-iw-text-strong">{t("skill_map")}</h2>
             <div className="grid gap-3 md:grid-cols-2">
               {subjects.map((subj) => {
                 const masteries = bySubject.get(subj.id) ?? [];
@@ -237,10 +237,10 @@ export default async function LearnerProgressPage() {
                       </InsightChip>
                     </header>
                     {cells.length === 0 ? (
-                      <p className="text-sm text-iw-text-muted">No mastery data yet.</p>
+                      <p className="text-sm text-iw-text-muted">{t("no_mastery_data")}</p>
                     ) : (
                       <>
-                        <MasteryHeatStrip cells={cells} ariaLabel={`${subj.name} mastery heat strip`} />
+                        <MasteryHeatStrip cells={cells} ariaLabel={t("heat_aria", { name: subj.name })} />
                         <ProgressCurve value={avg} className="mt-3" />
                       </>
                     )}
@@ -251,10 +251,10 @@ export default async function LearnerProgressPage() {
           </section>
 
           <section className="mt-6 flex flex-col gap-3">
-            <h2 className="text-xl font-semibold text-iw-text-strong">Recent lessons</h2>
+            <h2 className="text-xl font-semibold text-iw-text-strong">{t("recent_lessons")}</h2>
             {recentRuns.length === 0 ? (
               <p className="rounded-iw-card-lg bg-white border border-iw-border p-5 text-sm text-iw-text-muted">
-                No lessons yet. Today's mission is on your home page.
+                {t("no_lessons_home")}
               </p>
             ) : (
               <ul className="grid gap-2 md:grid-cols-2">
