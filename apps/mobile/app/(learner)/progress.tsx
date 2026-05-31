@@ -13,6 +13,7 @@ import {
   MasteryBar,
   MasteryHeatStrip,
   DotChart,
+  TrendChart,
   LoadingState,
   EmptyState,
   type MasteryCell,
@@ -21,16 +22,17 @@ import {
 import { Card } from "@/components/ui";
 import { summarizeDomains } from "@/lib/learner-progress";
 import { subjectAccent } from "@/lib/subject-display";
+import { useLessonSessions } from "@/hooks/useGradebook";
+import { lessonsByDay } from "@/lib/gradebook-logic";
 import { spacing } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 /**
  * Learner progress — mirror of web's `/learner/progress` (MOB-LRN-010).
- * Calm mastery analytics built from the per-domain mastery the app
- * already has (brain-svc) plus the engagement streak. Uses the mobile
- * chart kit (MasteryBar / MasteryHeatStrip / DotChart). The
- * lessons-by-day trend + recent-activity list are pending a lesson-runs
- * REST endpoint on mobile (Partial).
+ * Calm mastery analytics built from per-domain mastery (brain-svc) + the
+ * engagement streak, plus the lessons-by-day trend and recent activity
+ * from learning-svc. Uses the mobile chart kit (MasteryBar /
+ * MasteryHeatStrip / DotChart / TrendChart).
  */
 export default function LearnerProgressScreen() {
   const { t } = useTranslation();
@@ -38,6 +40,9 @@ export default function LearnerProgressScreen() {
   const palette = useSensoryPalette();
   const { domains, isLoading } = useBrainDomains(user?.id ?? "");
   const { data: engagement } = useEngagement(user?.id ?? "");
+  const { data: lessonSessions } = useLessonSessions(user?.id ?? "");
+  const trend = useMemo(() => lessonsByDay(lessonSessions ?? []), [lessonSessions]);
+  const recent = useMemo(() => (lessonSessions ?? []).slice(0, 5), [lessonSessions]);
 
   const summary = useMemo(
     () =>
@@ -137,6 +142,19 @@ export default function LearnerProgressScreen() {
             </View>
           </Card>
 
+          {/* Lessons completed per day */}
+          <Card tone="raised" style={styles.card}>
+            <Text style={[styles.sectionTitle, { color: palette.ink }]}>
+              {t("progress.lessonsByDay", "Lessons this week")}
+            </Text>
+            <View style={{ marginTop: spacing.sm }}>
+              <TrendChart
+                data={trend}
+                ariaLabel={t("progress.lessonsByDayAria", "Lessons completed per day")}
+              />
+            </View>
+          </Card>
+
           {/* Heat strip + comparison dots */}
           <Card tone="raised" style={styles.card}>
             <Text style={[styles.sectionTitle, { color: palette.ink }]}>
@@ -149,10 +167,59 @@ export default function LearnerProgressScreen() {
               <DotChart data={points} ariaLabel={t("progress.compareAria", "Mastery by subject")} />
             </View>
           </Card>
+
+          {recent.length > 0 && (
+            <Card tone="raised" style={styles.card}>
+              <Text style={[styles.sectionTitle, { color: palette.ink }]}>
+                {t("progress.recent", "Recent activity")}
+              </Text>
+              <View style={{ gap: 10, marginTop: spacing.sm }}>
+                {recent.map((ls) => (
+                  <View key={ls.id} style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                    <View
+                      style={{
+                        width: 8,
+                        height: 8,
+                        borderRadius: 4,
+                        backgroundColor: subjectAccent(ls.subject),
+                      }}
+                    />
+                    <Text
+                      style={{
+                        flex: 1,
+                        fontSize: 14,
+                        fontFamily: fontFamilies.bodyBold,
+                        color: palette.ink,
+                      }}
+                    >
+                      {ls.subject}
+                    </Text>
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        fontFamily: fontFamilies.bodyRegular,
+                        color: palette.inkMuted,
+                      }}
+                    >
+                      {fmtDate(ls.completedAt ?? ls.startedAt)}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </Card>
+          )}
         </>
       )}
     </ResponsiveScreen>
   );
+}
+
+function fmtDate(iso?: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime())
+    ? ""
+    : d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
 const styles = StyleSheet.create({

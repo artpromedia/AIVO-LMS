@@ -17,14 +17,16 @@ import {
 } from "@aivo/mobile-ui";
 import { summarizeDomains } from "@/lib/learner-progress";
 import { subjectAccent } from "@/lib/subject-display";
+import { useGradebook } from "@/hooks/useGradebook";
+import { groupBySubject } from "@/lib/gradebook-logic";
 import { spacing } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 /**
  * Parent gradebook (MOB-PAR-008) — mirror of web's
  * `/parent/learners/[learnerId]/gradebook`. Subject averages + a mastery
- * heat overview for one child, built from brain-svc mastery via the
- * mobile chart kit.
+ * heat overview plus a per-skill breakdown for one child, from brain-svc
+ * mastery and the learning-svc gradebook.
  */
 export default function ParentGradebookScreen() {
   const { t } = useTranslation();

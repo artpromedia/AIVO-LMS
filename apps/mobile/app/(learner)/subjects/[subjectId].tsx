@@ -7,17 +7,25 @@ import { useAuth } from "@/hooks/useAuth";
 import { useBrainDomains } from "@/hooks/useBrain";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
-import { MasteryBar, LoadingState, EmptyState } from "@aivo/mobile-ui";
+import {
+  MasteryBar,
+  MasteryHeatStrip,
+  LoadingState,
+  EmptyState,
+  type MasteryCell,
+} from "@aivo/mobile-ui";
 import { Card } from "@/components/ui";
+import { useGradebook } from "@/hooks/useGradebook";
+import { skillsForSubject } from "@/lib/gradebook-logic";
 import { subjectAccent, masteryLabel } from "@/lib/subject-display";
 import { spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 /**
  * Learner subject detail — mirror of web's `/learner/subjects/[subjectId]`
- * (MOB-LRN-003). Shows the subject's mastery, the supports + tutors the
- * brain has switched on for it, and a CTA into a lesson. The per-skill
- * mastery grid is pending a skills REST endpoint on mobile (Partial).
+ * (MOB-LRN-003). Shows the subject's mastery, its per-skill mastery grid
+ * (from the learning-svc gradebook), the supports + tutors the brain has
+ * switched on for it, and a CTA into a lesson.
  */
 export default function SubjectDetailScreen() {
   const { t } = useTranslation();
@@ -32,6 +40,8 @@ export default function SubjectDetailScreen() {
     [domains, name],
   );
   const accent = subjectAccent(name);
+  const { data: gradebook } = useGradebook(user?.id ?? "");
+  const skills = useMemo(() => skillsForSubject(gradebook ?? [], name), [gradebook, name]);
 
   return (
     <ResponsiveScreen maxWidth="reading" background={palette.bgPage}>
@@ -73,6 +83,26 @@ export default function SubjectDetailScreen() {
               caption={t("subjects.masteryCaption", "Your mastery so far")}
             />
           </Card>
+
+          {skills.length > 0 && (
+            <Card tone="raised" style={styles.card}>
+              <Text style={[styles.sectionTitle, { color: palette.ink }]}>
+                {t("subjects.skills", "Skills")}
+              </Text>
+              <View style={{ marginTop: spacing.sm }}>
+                <MasteryHeatStrip
+                  cells={skills.map(
+                    (sk): MasteryCell => ({ code: sk.skill, name: sk.skill, level: sk.level }),
+                  )}
+                />
+              </View>
+              <View style={{ gap: 12, marginTop: spacing.md }}>
+                {skills.map((sk) => (
+                  <MasteryBar key={sk.skill} label={sk.skill} value={sk.score} tone={accent} />
+                ))}
+              </View>
+            </Card>
+          )}
 
           {domain.tutors.length > 0 && (
             <Card tone="raised" style={styles.card}>
