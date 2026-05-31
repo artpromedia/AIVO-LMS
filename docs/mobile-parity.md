@@ -15,12 +15,12 @@ sub-feature is missing · **Missing** not yet on mobile.
 
 | Status             | Count   |
 | ------------------ | ------- |
-| Parity             | 51      |
+| Parity             | 53      |
 | Partial            | 18      |
-| Missing            | 44      |
+| Missing            | 42      |
 | **In-scope total** | **113** |
 
-Full parity: **45%**. 90 web-only routes excluded.
+Full parity: **47%**. 90 web-only routes excluded.
 
 ## Auth & Shared
 
@@ -71,9 +71,9 @@ Full parity: **45%**. 90 web-only routes excluded.
 | `/learner/baseline/readiness`                    | —                                             | **Missing** | MOB-LRN-004: 4-check readiness pre-flight.                                                                                                                                   |
 | `/learner/baseline/subjects`                     | —                                             | **Missing** | MOB-LRN-004: baseline subject multi-select.                                                                                                                                  |
 | `/learner/baseline/[baselineId]`                 | —                                             | **Missing** | MOB-LRN-005: adaptive baseline RUNNER (IRT/streaming, breaks, supports, completion hero).                                                                                    |
-| `/learner/library`                               | —                                             | **Missing** | MOB-LRN-006: completed-lessons replay library.                                                                                                                               |
+| `/learner/library`                               | `(learner)/library`                           | Parity      | —                                                                                                                                                                            |
 | `/learner/lesson-runs/[lessonRunId]`             | `(learner)/stage/[sessionId]`                 | **Partial** | MOB-LRN-007: lesson-run HOST states (generating/failed/ready) + lessons list around the stage runtime.                                                                       |
-| `/learner/missions`                              | —                                             | **Missing** | MOB-LRN-008: assignments + in-progress lessons ('missions') screen.                                                                                                          |
+| `/learner/missions`                              | `(learner)/missions`                          | Parity      | —                                                                                                                                                                            |
 | `/learner/quests`                                | `(learner)/quests/index`                      | Parity      | —                                                                                                                                                                            |
 | `/learner/quests/[worldId]`                      | `(learner)/quests/[worldSlug]/index`          | Parity      | —                                                                                                                                                                            |
 | `/learner/quests/[worldId]/chapters/[chapterId]` | `(learner)/quests/[worldSlug]/play/[questId]` | **Partial** | MOB-LRN-009: chapter-level quest navigation parity.                                                                                                                          |

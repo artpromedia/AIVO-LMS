@@ -186,24 +186,14 @@ const PARITY_MATRIX = {
       status: MISSING,
       gap: "MOB-LRN-005: adaptive baseline RUNNER (IRT/streaming, breaks, supports, completion hero).",
     },
-    {
-      web: "/learner/library",
-      mobile: null,
-      status: MISSING,
-      gap: "MOB-LRN-006: completed-lessons replay library.",
-    },
+    { web: "/learner/library", mobile: "(learner)/library", status: P },
     {
       web: "/learner/lesson-runs/[lessonRunId]",
       mobile: "(learner)/stage/[sessionId]",
       status: PARTIAL,
       gap: "MOB-LRN-007: lesson-run HOST states (generating/failed/ready) + lessons list around the stage runtime.",
     },
-    {
-      web: "/learner/missions",
-      mobile: null,
-      status: MISSING,
-      gap: "MOB-LRN-008: assignments + in-progress lessons ('missions') screen.",
-    },
+    { web: "/learner/missions", mobile: "(learner)/missions", status: P },
     { web: "/learner/quests", mobile: "(learner)/quests/index", status: P },
     { web: "/learner/quests/[worldId]", mobile: "(learner)/quests/[worldSlug]/index", status: P },
     {

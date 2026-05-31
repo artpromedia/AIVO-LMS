@@ -296,6 +296,20 @@ export default function LearnerWorldMap() {
               tintSoft={palette.warmSoft}
               onPress={() => router.push("/(learner)/progress" as Href)}
             />
+            <QuickAction
+              icon="flag"
+              label={t("learner.missions", "Missions")}
+              tint={palette.accent}
+              tintSoft={palette.accentSoft}
+              onPress={() => router.push("/(learner)/missions" as Href)}
+            />
+            <QuickAction
+              icon="library"
+              label={t("learner.library", "Library")}
+              tint={palette.primary}
+              tintSoft={INCLUSIVE_WARM_PALETTE.primarySoft}
+              onPress={() => router.push("/(learner)/library" as Href)}
+            />
           </View>
         </View>
       </ScrollView>
