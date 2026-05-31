@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -17,6 +18,7 @@ export const dynamic = "force-dynamic";
 
 export default async function Page() {
   const session = await requirePageRole(["parent"]);
+  const t = await getTranslations("parent.privacy");
   const policies = await listPolicyVersions();
   const subs = await listSubprocessors();
   const exportReqs = listDataExportRequestsForUser(session.userId, session.tenantId);
@@ -25,20 +27,20 @@ export default async function Page() {
   const links: { href: string; label: string; description: string; icon: React.ReactNode }[] = [
     {
       href: "/parent/consent",
-      label: "Consent center",
-      description: "Review and revoke account- and learner-level consents.",
+      label: t("link_consent_label"),
+      description: t("link_consent_desc"),
       icon: <ShieldCheck className="h-4 w-4" />,
     },
     {
       href: "/parent/privacy/data-export",
-      label: "Request a data export",
-      description: "Download a copy of your family's data.",
+      label: t("link_export_label"),
+      description: t("link_export_desc"),
       icon: <Download className="h-4 w-4" />,
     },
     {
       href: "/parent/privacy/delete-data",
-      label: "Delete data",
-      description: "Request deletion of an account, a learner, or just IEP files.",
+      label: t("link_delete_label"),
+      description: t("link_delete_desc"),
       icon: <Trash2 className="h-4 w-4" />,
     },
   ];
@@ -51,9 +53,9 @@ export default async function Page() {
       user={{ displayName: session.displayName, email: session.email }}
     >
       <PageHeader
-        eyebrow="Privacy"
-        title="Privacy & your data"
-        description="See what AIVO stores, who processes it, and request export or deletion at any time."
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        description={t("description")}
       />
 
       <div className="grid gap-3 sm:grid-cols-3">
@@ -73,7 +75,7 @@ export default async function Page() {
 
       <Card className="mt-6 p-[var(--aivo-density-card-pad)]">
         <h2 className="font-display text-lg font-semibold flex items-center gap-2">
-          <FileText className="h-4 w-4" /> Current policies
+          <FileText className="h-4 w-4" /> {t("policies_title")}
         </h2>
         <ul className="mt-3 divide-y">
           {policies.map((p) => (
@@ -89,9 +91,9 @@ export default async function Page() {
       </Card>
 
       <Card className="mt-4 p-[var(--aivo-density-card-pad)]">
-        <h2 className="font-display text-lg font-semibold">Subprocessors</h2>
+        <h2 className="font-display text-lg font-semibold">{t("subprocessors_title")}</h2>
         <p className="text-sm text-aivo-ink-soft">
-          Third parties AIVO uses to deliver the service.
+          {t("subprocessors_desc")}
         </p>
         <ul className="mt-3 grid gap-2 sm:grid-cols-2">
           {subs.map((s) => (
@@ -101,7 +103,7 @@ export default async function Page() {
                 <Badge tone={s.status === "active" ? "success" : "neutral"}>{s.status}</Badge>
               </div>
               <p className="text-aivo-ink-soft">{s.purpose}</p>
-              <p className="text-xs text-aivo-muted">Region: {s.region}</p>
+              <p className="text-xs text-aivo-muted">{t("region", { region: s.region })}</p>
             </li>
           ))}
         </ul>
@@ -109,9 +111,9 @@ export default async function Page() {
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <h3 className="font-display font-semibold">Your export requests</h3>
+          <h3 className="font-display font-semibold">{t("export_requests_title")}</h3>
           {exportReqs.length === 0 ? (
-            <p className="mt-2 text-sm text-aivo-ink-soft">No requests yet.</p>
+            <p className="mt-2 text-sm text-aivo-ink-soft">{t("no_requests")}</p>
           ) : (
             <ul className="mt-2 divide-y text-sm">
               {exportReqs.slice(0, 5).map((r) => (
@@ -124,9 +126,9 @@ export default async function Page() {
           )}
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <h3 className="font-display font-semibold">Your deletion requests</h3>
+          <h3 className="font-display font-semibold">{t("deletion_requests_title")}</h3>
           {deleteReqs.length === 0 ? (
-            <p className="mt-2 text-sm text-aivo-ink-soft">No requests yet.</p>
+            <p className="mt-2 text-sm text-aivo-ink-soft">{t("no_requests")}</p>
           ) : (
             <ul className="mt-2 divide-y text-sm">
               {deleteReqs.slice(0, 5).map((r) => (

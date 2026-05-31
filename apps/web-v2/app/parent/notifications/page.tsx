@@ -6,6 +6,7 @@
  * each surface; preferences live behind a subtle disclosure.
  */
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import {
   FloatingMetricCard,
@@ -20,6 +21,7 @@ import { PreferencesForm } from "./preferences-form";
 
 export default async function Page() {
   const session = await requirePageRole(["parent"]);
+  const t = await getTranslations("parent.notifications");
   const notifications = await listNotifications({
     tenantId: session.tenantId,
     userId: session.userId,
@@ -46,33 +48,32 @@ export default async function Page() {
       user={{ displayName: session.displayName, email: session.email }}
     >
       <header className="flex flex-col gap-2 mb-6">
-        <p className="iw-label text-iw-text-muted">Parent</p>
+        <p className="iw-label text-iw-text-muted">{t("eyebrow")}</p>
         <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong">
-          Notifications & approvals
+          {t("title")}
         </h1>
         <p className="text-sm md:text-base text-iw-text-muted max-w-2xl">
-          Every notification here has a clear action. Approvals link straight into the workflow
-          they unblock.
+          {t("description")}
         </p>
       </header>
 
       <section className="grid grid-cols-2 md:grid-cols-3 gap-3">
         <FloatingMetricCard
-          label="Unread"
+          label={t("unread_label")}
           value={`${unreadCount}`}
-          description={unreadCount === 0 ? "All caught up" : "Tap to read"}
+          description={unreadCount === 0 ? t("unread_zero") : t("unread_some")}
           tone={unreadCount === 0 ? "success" : "info"}
         />
         <FloatingMetricCard
-          label="Approvals"
+          label={t("approvals_label")}
           value={`${approvalsCount}`}
-          description={approvalsCount === 0 ? "None pending" : "Action needed"}
+          description={approvalsCount === 0 ? t("approvals_zero") : t("approvals_some")}
           tone={approvalsCount === 0 ? "success" : "warning"}
         />
         <FloatingMetricCard
-          label="Urgent"
+          label={t("urgent_label")}
           value={`${urgentCount}`}
-          description={urgentCount === 0 ? "Nothing urgent" : "Please review"}
+          description={urgentCount === 0 ? t("urgent_zero") : t("urgent_some")}
           tone={urgentCount === 0 ? "success" : "warning"}
         />
       </section>
@@ -81,13 +82,13 @@ export default async function Page() {
         <GlassCard
           elevation="raised"
           density="comfortable"
-          title="Inbox"
-          description="Tap an item to mark it read. Unread items show a soft dot."
+          title={t("inbox_title")}
+          description={t("inbox_desc")}
         >
           {notifications.length === 0 ? (
             <EmptyState
-              title="No notifications yet"
-              body="You'll see updates here when activity occurs."
+              title={t("empty_title")}
+              body={t("empty_body")}
             />
           ) : (
             <NotificationList notifications={notifications} />
@@ -97,25 +98,25 @@ export default async function Page() {
         <aside className="flex flex-col gap-3">
           <ReassuranceCard
             tone="info"
-            title="Every notification is actionable"
-            body="If a notification can't be acted on, we don't send it. Reduces noise."
+            title={t("reassure_actionable_title")}
+            body={t("reassure_actionable_body")}
           />
           <ReassuranceCard
             tone="privacy"
-            title="Learners see less"
-            body="Only age-appropriate messages reach your learner — never approvals, billing, or admin items."
+            title={t("reassure_learners_title")}
+            body={t("reassure_learners_body")}
           />
           <ReassuranceCard
             tone="safety"
-            title="Safety items always urgent"
-            body="If anything safety-related ever appears, it goes to the top of this list and pings you immediately."
+            title={t("reassure_safety_title")}
+            body={t("reassure_safety_body")}
           />
         </aside>
       </section>
 
       <section className="mt-8 flex flex-col gap-3">
-        <h2 className="text-xl font-semibold text-iw-text-strong">Delivery preferences</h2>
-        <p className="text-sm text-iw-text-muted">Choose which updates reach you on each channel.</p>
+        <h2 className="text-xl font-semibold text-iw-text-strong">{t("prefs_title")}</h2>
+        <p className="text-sm text-iw-text-muted">{t("prefs_desc")}</p>
         <GlassCard elevation="raised" density="comfortable">
           <PreferencesForm preference={pref} />
         </GlassCard>

@@ -7,6 +7,7 @@
  * friction so trust is preserved.
  */
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import {
   FloatingMetricCard,
@@ -41,6 +42,7 @@ const INV_TONE: Record<string, "success" | "warning" | "error" | "neutral"> = {
 
 export default async function Page() {
   const session = await requirePageRole(["parent"]);
+  const t = await getTranslations("parent.billing");
   const tenant = getTenantById(session.tenantId);
   const sub = getActiveSubscriptionForTenant(session.tenantId);
   const plans = listPlans("family");
@@ -59,24 +61,24 @@ export default async function Page() {
       user={{ displayName: session.displayName, email: session.email }}
     >
       <header className="flex flex-col gap-2 mb-6">
-        <p className="iw-label text-iw-text-muted">Settings · Billing</p>
+        <p className="iw-label text-iw-text-muted">{t("eyebrow")}</p>
         <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong">
-          Family plan & billing
+          {t("title")}
         </h1>
         <p className="text-sm md:text-base text-iw-text-muted max-w-2xl">
-          Plan, payment, and invoice history for {tenant?.name ?? "your family"}.
+          {t("description", { name: tenant?.name ?? t("family_fallback") })}
         </p>
       </header>
 
       <section className="grid grid-cols-2 md:grid-cols-3 gap-3">
         <FloatingMetricCard
-          label="Current plan"
-          value={activePlan?.name ?? "No plan"}
-          description={sub?.status ?? "Pick one to start"}
+          label={t("plan_label")}
+          value={activePlan?.name ?? t("plan_none")}
+          description={sub?.status ?? t("plan_pick")}
           tone={sub?.status === "active" ? "success" : "info"}
         />
         <FloatingMetricCard
-          label="Next renewal"
+          label={t("renewal_label")}
           value={
             sub?.currentPeriodEndAt
               ? new Date(sub.currentPeriodEndAt).toLocaleDateString(undefined, {
@@ -85,13 +87,13 @@ export default async function Page() {
                 })
               : "—"
           }
-          description={sub?.cancelAtPeriodEnd ? "Will not renew" : "Auto-renews"}
+          description={sub?.cancelAtPeriodEnd ? t("will_not_renew") : t("auto_renews")}
           tone={sub?.cancelAtPeriodEnd ? "warning" : "neutral"}
         />
         <FloatingMetricCard
-          label="Total paid"
+          label={t("total_label")}
           value={`$${(totalPaidCents / 100).toFixed(2)}`}
-          description={`${invoices.length} invoice${invoices.length === 1 ? "" : "s"}`}
+          description={t("invoices_count", { count: invoices.length })}
           tone="neutral"
         />
       </section>
@@ -119,36 +121,36 @@ export default async function Page() {
           </GlassCard>
         ) : (
           <GlassCard elevation="raised" density="comfortable">
-            <EmptyState title="No active plan" body="Pick a plan below to get started." />
+            <EmptyState title={t("no_active_plan_title")} body={t("no_active_plan_body")} />
           </GlassCard>
         )}
 
         <aside className="flex flex-col gap-3">
           <ReassuranceCard
             tone="privacy"
-            title="Billing stays out of learner view"
-            body="Your learner never sees plan, payment, or invoice surfaces. Even when they switch into your account, billing is hidden."
+            title={t("reassure_hidden_title")}
+            body={t("reassure_hidden_body")}
           />
           <ReassuranceCard
             tone="info"
-            title="Cancel any time, no friction"
-            body="Cancellation keeps your learning history intact and you'll keep access until the period ends."
+            title={t("reassure_cancel_title")}
+            body={t("reassure_cancel_body")}
           />
         </aside>
       </section>
 
       <section className="mt-8 flex flex-col gap-3">
-        <h2 className="text-xl font-semibold text-iw-text-strong">Choose a plan</h2>
+        <h2 className="text-xl font-semibold text-iw-text-strong">{t("choose_plan")}</h2>
         <SubscribeForm plans={plans} activePlanId={sub?.planId ?? null} />
       </section>
 
       <section className="mt-8 flex flex-col gap-3">
-        <h2 className="text-xl font-semibold text-iw-text-strong">Recent invoices</h2>
+        <h2 className="text-xl font-semibold text-iw-text-strong">{t("recent_invoices")}</h2>
         {invoices.length === 0 ? (
           <GlassCard elevation="raised" density="comfortable">
             <EmptyState
-              title="No invoices yet"
-              body="Invoices appear here after each billing period closes."
+              title={t("no_invoices_title")}
+              body={t("no_invoices_body")}
             />
           </GlassCard>
         ) : (
