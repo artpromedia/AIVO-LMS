@@ -42,12 +42,14 @@ import { readTypefaceFromCookies } from "@/lib/a11y/server";
 import { LEARNER_NAV } from "@/components/layout/role-shells";
 import {
   createLessonRun,
+  getBrainProfile,
   getIEPForLearner,
   getLearner,
   getLearnerEngagement,
   getMasteryMap,
   listSubjects,
 } from "@/lib/db/repos";
+import LivingBrainIndicator from "@/components/brain/living-brain-indicator";
 import { pickTodaysMission } from "@/lib/learner/today";
 import { readActiveLearnerFromCookies } from "@/lib/auth/active-learner";
 import { audit } from "@/lib/bff/audit";
@@ -161,6 +163,16 @@ export default async function LearnerHome({
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) redirect(session.role === "parent" ? "/learner/select" : "/login");
 
+  // The learner's brain colour signature powers the persistent "living
+  // brain" indicator in the top bar. Only an approved clone gets the
+  // indicator — before approval the learner shouldn't see a brain that the
+  // parent hasn't signed off on yet.
+  const brainProfile = await getBrainProfile(learnerId, session.tenantId);
+  const livingBrain =
+    brainProfile && brainProfile.cloneStage === "approved"
+      ? brainProfile.state.visualIdentity
+      : null;
+
   const today = await pickTodaysMission(learnerId, session.tenantId);
   const allSubjects = await listSubjects();
   const { skillMasteries } = await getMasteryMap(learnerId, session.tenantId);
@@ -241,6 +253,16 @@ export default async function LearnerHome({
       navItems={LEARNER_NAV}
       user={{ displayName: session.displayName, email: session.email }}
       variant="immersive"
+      topBarSlot={
+        livingBrain ? (
+          <LivingBrainIndicator
+            primaryHue={livingBrain.primaryHue}
+            secondaryHues={livingBrain.secondaryHues}
+            pulseRate={livingBrain.pulseRate}
+            learnerName={learner.displayName}
+          />
+        ) : undefined
+      }
     >
       <div className="grid gap-6 md:grid-cols-[280px_1fr] lg:grid-cols-[300px_1fr]">
         <LearnerWorkspaceRail

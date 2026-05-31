@@ -31,6 +31,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import PixiBrainSphere from "@/components/brain/pixi-brain-sphere";
 
 type PulseRate = "calm" | "steady" | "energetic";
 
@@ -122,6 +123,26 @@ export function AwakeningClient({
   const narrationKey = `awakening_narration_${phase}` as const;
   const phaseTitleKey = `awakening_phase_${phase}` as const;
   const showFinalCta = phase === "settling";
+
+  // The GPU brain sphere fades in once the orbs collapse (formation) and
+  // brightens through reveal. Before formation it stays hidden so the orb
+  // convergence reads clearly. Maps each phase to a 0..1 "aliveness".
+  const sphereIntensity = useMemo<number>(() => {
+    switch (phase) {
+      case "formation":
+        return 0.7;
+      case "memories":
+        return 0.85;
+      case "reveal":
+        return 1;
+      case "settling":
+        return 0.9;
+      default:
+        return 0; // gathering / convergence — sphere not yet formed
+    }
+  }, [phase]);
+  const showSphere = sphereIntensity > 0;
+  const pulseForSphere: PulseRate = phase === "reveal" ? "energetic" : pulseRate;
   const onContinue = () => router.push("/learner/home");
   const onSkip = () => router.push("/learner/home");
 
@@ -161,6 +182,17 @@ export function AwakeningClient({
           />
         ))}
         <div className="awakening-sphere" aria-hidden="true" />
+        {showSphere ? (
+          <div className="awakening-pixi" data-phase={phase} aria-hidden="true">
+            <PixiBrainSphere
+              primaryHue={primaryHue}
+              secondaryHues={secondaryHues}
+              pulseRate={pulseForSphere}
+              intensity={sphereIntensity}
+              size={260}
+            />
+          </div>
+        ) : null}
         <div className="awakening-memories" aria-hidden={phase !== "memories"}>
           {memories.slice(0, 5).map((m, idx) => (
             <span
@@ -298,6 +330,31 @@ export function AwakeningClient({
         .awakening-root[data-phase="settling"] .awakening-sphere {
           opacity: 0.85;
           transform: scale(0.55) translateY(15vh);
+        }
+        .awakening-pixi {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%) scale(0.85);
+          z-index: 2;
+          opacity: 0;
+          line-height: 0;
+          filter: drop-shadow(0 0 60px color-mix(in oklch, var(--bc-primary) 50%, transparent));
+          transition: opacity 1200ms ease, transform 1200ms ease;
+          pointer-events: none;
+        }
+        .awakening-root[data-phase="formation"] .awakening-pixi,
+        .awakening-root[data-phase="memories"] .awakening-pixi {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1);
+        }
+        .awakening-root[data-phase="reveal"] .awakening-pixi {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1.12);
+        }
+        .awakening-root[data-phase="settling"] .awakening-pixi {
+          opacity: 0.92;
+          transform: translate(-50%, -50%) scale(0.6) translateY(15vh);
         }
         .awakening-memories {
           position: absolute;

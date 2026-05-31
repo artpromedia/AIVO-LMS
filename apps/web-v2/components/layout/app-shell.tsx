@@ -141,6 +141,7 @@ export function AppShell({
   user,
   children,
   variant = "standard",
+  topBarSlot,
 }: {
   role: string;
   roleLabel: string;
@@ -153,6 +154,12 @@ export function AppShell({
    * the rail is a sensory-preferences panel rather than nav).
    */
   variant?: "standard" | "immersive";
+  /**
+   * Optional element rendered in the top bar, just before the
+   * profile/avatar cluster. The learner shell uses this for the
+   * persistent "living brain" indicator.
+   */
+  topBarSlot?: React.ReactNode;
 }) {
   const theme = roleToTheme(role);
   const chrome = THEME_CHROME[theme];
@@ -234,6 +241,7 @@ export function AppShell({
           </Link>
 
           <div className="ml-auto flex items-center gap-2 sm:gap-3">
+            {topBarSlot}
             {immersive ? null : <SensoryModePopover />}
             {immersive ? null : <LanguageSwitcher />}
             <span className="hidden text-right sm:block">
