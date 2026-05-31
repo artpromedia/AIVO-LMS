@@ -10,12 +10,13 @@ import {
 } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 const STEPS = [
-  { label: "About you" },
-  { label: "Role" },
-  { label: "Family" },
-  { label: "Consent" },
+  { label: "about_you" },
+  { label: "role" },
+  { label: "family" },
+  { label: "consent" },
 ] as const;
 
 const GRADE_BANDS = [
@@ -27,6 +28,9 @@ const GRADE_BANDS = [
 ];
 
 export default function NewLearnerPage() {
+  const t = useTranslations("onboarding.learner_new");
+  const tc = useTranslations("onboarding.common");
+  const ts = useTranslations("onboarding.steps");
   const [firstName, setFirstName] = React.useState("");
   const [grade, setGrade] = React.useState("");
   const [hasIep, setHasIep] = React.useState<"yes" | "no" | "unsure" | null>(null);
@@ -34,18 +38,21 @@ export default function NewLearnerPage() {
   return (
     <AuthShell>
       <div className="flex flex-col gap-5">
-        <StepperHeader steps={STEPS} current={2} />
+        <StepperHeader
+          steps={STEPS.map((s) => ({ label: ts(s.label) }))}
+          current={2}
+        />
         <AuthCard
           icon={<AivoIcon name="care" size={32} />}
-          eyebrow="Add a learner"
-          title="Tell us about your child."
-          subtitle="Use only what you'd say out loud — first name is fine. You can add more learners later from your home screen."
+          eyebrow={t("eyebrow")}
+          title={t("title")}
+          subtitle={t("subtitle")}
           reassurance={
             <ReassuranceCard
               tone="privacy"
-              title="We collect the minimum needed."
-              body="No surname, no date of birth, no address required here. You'll see exactly what teachers and AI use on the consent step."
-              link={{ href: "/onboarding/privacy", label: "What we use" }}
+              title={t("reassure_title")}
+              body={t("reassure_body")}
+              link={{ href: "/onboarding/privacy", label: t("reassure_link") }}
             />
           }
           actions={
@@ -54,11 +61,11 @@ export default function NewLearnerPage() {
                 href="/onboarding/consent"
                 className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold flex items-center justify-center hover:opacity-95"
               >
-                Continue to consent
+                {t("continue")}
               </Link>
               <p className="text-xs text-iw-text-muted text-center">
                 <Link href="/onboarding/parent-setup" className="hover:underline">
-                  Back
+                  {tc("back")}
                 </Link>
               </p>
             </>
@@ -66,10 +73,10 @@ export default function NewLearnerPage() {
         >
           <AuthInput
             id="learner-first"
-            label="Learner first name (or nickname)"
+            label={t("first_name_label")}
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-            placeholder="e.g. Emma"
+            placeholder={t("first_name_placeholder")}
             autoComplete="off"
           />
           <div className="flex flex-col gap-1.5">
@@ -77,7 +84,7 @@ export default function NewLearnerPage() {
               htmlFor="grade"
               className="text-sm font-medium text-iw-text-strong"
             >
-              Grade band
+              {t("grade_band_label")}
             </label>
             <select
               id="grade"
@@ -86,7 +93,7 @@ export default function NewLearnerPage() {
               className="h-12 px-3 rounded-iw-control bg-white border border-iw-border text-base text-iw-text-strong focus:border-[var(--aivo-sensory-primary)] focus:ring-2 focus:ring-[var(--aivo-sensory-primary)]/20 outline-none"
             >
               <option value="" disabled>
-                Pick a band
+                {t("grade_band_placeholder")}
               </option>
               {GRADE_BANDS.map((b) => (
                 <option key={b} value={b}>
@@ -95,17 +102,16 @@ export default function NewLearnerPage() {
               ))}
             </select>
             <p className="text-xs text-iw-text-muted">
-              We use a band, not a birthday. You can change it any time.
+              {t("grade_band_help")}
             </p>
           </div>
 
           <fieldset className="flex flex-col gap-2">
             <legend className="text-sm font-medium text-iw-text-strong">
-              Does your child have an IEP or 504 plan?
+              {t("iep_legend")}
             </legend>
             <p className="text-xs text-iw-text-muted">
-              You can upload it on the next steps — only with your explicit
-              consent. Skip if you'd rather decide later.
+              {t("iep_help")}
             </p>
             <div className="flex flex-wrap gap-2 mt-1">
               {(["yes", "no", "unsure"] as const).map((v) => (
@@ -116,9 +122,8 @@ export default function NewLearnerPage() {
                   variant={hasIep === v ? "default" : "outline"}
                   aria-pressed={hasIep === v}
                   onClick={() => setHasIep(v)}
-                  className="capitalize"
                 >
-                  {v === "unsure" ? "Not sure yet" : v}
+                  {t(`iep_${v}`)}
                 </Button>
               ))}
             </div>

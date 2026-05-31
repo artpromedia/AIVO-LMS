@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { AuthShell, AuthCard, LegalCollapse, ReassuranceCard } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 
@@ -12,18 +13,20 @@ import { AivoIcon } from "@aivo/ui/icon";
  * away, not the default reading experience.
  */
 export default function PrivacyExplanationPage() {
+  const t = useTranslations("onboarding.privacy");
+  const tc = useTranslations("onboarding.common");
   return (
     <AuthShell>
       <AuthCard
         icon={<AivoIcon name="consentDoc" size={32} />}
-        eyebrow="Privacy"
-        title="What AIVO does — in plain English."
-        subtitle="Below is the short version. Each section opens to the full legal text. You can re-read this any time from Settings."
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        subtitle={t("subtitle")}
         reassurance={
           <ReassuranceCard
             tone="privacy"
-            title="One promise above everything else."
-            body="We never sell student data. Not to advertisers, not to vendors, not to AI training partners."
+            title={t("reassure_title")}
+            body={t("reassure_body")}
           />
         }
         actions={
@@ -31,53 +34,30 @@ export default function PrivacyExplanationPage() {
             href="/onboarding/consent"
             className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold flex items-center justify-center hover:opacity-95"
           >
-            Back to consent
+            {tc("back_to_consent")}
           </Link>
         }
       >
-        <LegalCollapse
-          summary="What we collect — only what's needed to teach."
-          defaultOpen
-        >
+        <LegalCollapse summary={t("collect_summary")} defaultOpen>
           <ul className="list-disc list-inside space-y-1">
-            <li>Account: parent / staff name, email.</li>
-            <li>
-              Learner: first name or nickname, grade band, optional
-              accommodations (IEP / 504), responses to lessons.
-            </li>
-            <li>Device: browser, OS, app version — for debugging only.</li>
+            <li>{t("collect_account")}</li>
+            <li>{t("collect_learner")}</li>
+            <li>{t("collect_device")}</li>
           </ul>
         </LegalCollapse>
-        <LegalCollapse summary="How AI is used.">
-          <p>
-            When AI personalization is on, your child's responses adjust their
-            next lesson — pacing, examples, hints. We do not use these
-            responses to identify your child. We do not train foundation
-            models on identifiable student work. Model providers are bound by
-            contract to delete prompt and completion data within 30 days.
-          </p>
+        <LegalCollapse summary={t("ai_summary")}>
+          <p>{t("ai_body")}</p>
         </LegalCollapse>
-        <LegalCollapse summary="Who sees what.">
+        <LegalCollapse summary={t("who_summary")}>
           <ul className="list-disc list-inside space-y-1">
-            <li>You and any co-parent you added: full progress.</li>
-            <li>
-              Teachers at the school you opted in to: lesson mastery and IEP
-              supports for their classes only.
-            </li>
-            <li>
-              AIVO staff: encrypted access for support, with audit logs. We
-              never browse student work casually.
-            </li>
-            <li>Advertisers: never.</li>
+            <li>{t("who_you")}</li>
+            <li>{t("who_teachers")}</li>
+            <li>{t("who_staff")}</li>
+            <li>{t("who_advertisers")}</li>
           </ul>
         </LegalCollapse>
-        <LegalCollapse summary="Your rights and how to delete.">
-          <p>
-            You can export every record AIVO holds about your account or your
-            child from Settings → Privacy → Export. You can delete the
-            account the same way. Deletion is permanent within 30 days; you
-            can cancel during the grace period.
-          </p>
+        <LegalCollapse summary={t("rights_summary")}>
+          <p>{t("rights_body")}</p>
         </LegalCollapse>
       </AuthCard>
     </AuthShell>

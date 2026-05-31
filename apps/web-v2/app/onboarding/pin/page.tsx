@@ -3,6 +3,7 @@ import * as React from "react";
 import Link from "next/link";
 import { AuthShell, AuthCard, ReassuranceCard } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
+import { useTranslations } from "next-intl";
 
 /**
  * /onboarding/pin
@@ -14,6 +15,7 @@ import { AivoIcon } from "@aivo/ui/icon";
  * with a verified parent account.
  */
 export default function PinSetupPage() {
+  const t = useTranslations("onboarding.pin");
   const [pin, setPin] = React.useState("");
   const [confirm, setConfirm] = React.useState("");
   const mismatch = confirm.length === 4 && confirm !== pin;
@@ -23,14 +25,14 @@ export default function PinSetupPage() {
     <AuthShell>
       <AuthCard
         icon={<AivoIcon name="consentLock" size={32} />}
-        eyebrow="Learner PIN"
-        title="Pick a 4-digit PIN for your child."
-        subtitle="Your child uses this PIN to unlock their learning on this device. The PIN never replaces your parent sign-in."
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        subtitle={t("subtitle")}
         reassurance={
           <ReassuranceCard
             tone="safety"
-            title="A PIN is a soft lock, not a vault."
-            body="It keeps a sibling from opening the wrong profile. Sensitive actions still require a parent sign-in."
+            title={t("reassure_title")}
+            body={t("reassure_body")}
           />
         }
         actions={
@@ -44,23 +46,23 @@ export default function PinSetupPage() {
                   : "bg-[var(--aivo-sensory-primary)]/50 pointer-events-none"
               }`}
             >
-              Save PIN
+              {t("save")}
             </Link>
             <Link
               href="/onboarding/parent-verify"
               className="text-xs text-iw-text-muted text-center hover:underline"
             >
-              Skip — set a PIN later from Settings
+              {t("skip")}
             </Link>
           </>
         }
       >
-        <PinRing label="Choose PIN" value={pin} onChange={setPin} />
+        <PinRing label={t("choose_pin")} value={pin} onChange={setPin} />
         <PinRing
-          label="Confirm PIN"
+          label={t("confirm_pin")}
           value={confirm}
           onChange={setConfirm}
-          error={mismatch ? "Those don't match. Try again." : undefined}
+          error={mismatch ? t("mismatch") : undefined}
         />
       </AuthCard>
     </AuthShell>

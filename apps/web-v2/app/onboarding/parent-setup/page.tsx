@@ -9,33 +9,40 @@ import {
   StepperHeader,
 } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
+import { useTranslations } from "next-intl";
 
 const STEPS = [
-  { label: "About you" },
-  { label: "Role" },
-  { label: "Family" },
-  { label: "Consent" },
+  { label: "about_you" },
+  { label: "role" },
+  { label: "family" },
+  { label: "consent" },
 ] as const;
 
 export default function ParentSetupPage() {
+  const t = useTranslations("onboarding.parent_setup");
+  const tc = useTranslations("onboarding.common");
+  const ts = useTranslations("onboarding.steps");
   const [household, setHousehold] = React.useState("");
   const [coParentEmail, setCoParentEmail] = React.useState("");
 
   return (
     <AuthShell>
       <div className="flex flex-col gap-5">
-        <StepperHeader steps={STEPS} current={2} />
+        <StepperHeader
+          steps={STEPS.map((s) => ({ label: ts(s.label) }))}
+          current={2}
+        />
         <AuthCard
           icon={<AivoIcon name="care" size={32} />}
-          eyebrow="Family setup"
-          title="Tell us about your household."
-          subtitle="You'll add your children on the next step. This information helps us route invitations and share progress with the right grown-ups."
+          eyebrow={t("eyebrow")}
+          title={t("title")}
+          subtitle={t("subtitle")}
           reassurance={
             <ReassuranceCard
               tone="privacy"
-              title="Household details stay private."
-              body="We never sell household information. Co-parents only see learners they are added to."
-              link={{ href: "/onboarding/privacy", label: "What we collect" }}
+              title={t("reassure_title")}
+              body={t("reassure_body")}
+              link={{ href: "/onboarding/privacy", label: t("reassure_link") }}
             />
           }
           actions={
@@ -44,11 +51,11 @@ export default function ParentSetupPage() {
                 href="/onboarding/learner/new"
                 className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold flex items-center justify-center hover:opacity-95"
               >
-                Continue — add a learner
+                {t("continue")}
               </Link>
               <p className="text-xs text-iw-text-muted text-center">
                 <Link href="/onboarding/role" className="hover:underline">
-                  Back
+                  {tc("back")}
                 </Link>
               </p>
             </>
@@ -56,21 +63,21 @@ export default function ParentSetupPage() {
         >
           <AuthInput
             id="household"
-            label="Household name (optional)"
+            label={t("household_label")}
             value={household}
             onChange={(e) => setHousehold(e.target.value)}
-            placeholder="e.g. The Okafor family"
-            helper="Shown to teachers when they message you. You can change it later."
+            placeholder={t("household_placeholder")}
+            helper={t("household_helper")}
           />
           <AuthInput
             id="coparent"
-            label="Invite a co-parent or caregiver (optional)"
+            label={t("coparent_label")}
             type="email"
             inputMode="email"
             value={coParentEmail}
             onChange={(e) => setCoParentEmail(e.target.value)}
             placeholder="coparent@example.com"
-            helper="They'll get an email with their own sign-in. You can both approve consents and view progress."
+            helper={t("coparent_helper")}
           />
         </AuthCard>
       </div>
