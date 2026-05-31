@@ -484,6 +484,53 @@
       "msg_supports_body": "朗读、平和的节奏，以及来自你 IEP 的{count, plural, other {另外 # 项支持}}都已启用。",
       "msg_break_title": "休息是好事",
       "msg_break_body": "伸个懒腰、喝点水、看看窗外。AIVO 会保存你的位置。"
+    },
+    "common": {
+      "learner_eyebrow": "学习者",
+      "no_profile": "未关联学习者档案",
+      "source": "来源：{source}"
+    },
+    "missions": {
+      "title": "任务",
+      "description": "你正在进行的作业和课程。",
+      "from_teacher": "{subject} · 来自你的老师",
+      "subject_fallback": "学科",
+      "lesson_in_progress": "课程进行中",
+      "continue": "继续 →",
+      "nothing_waiting": "没有待办",
+      "nothing_desc": "前往「今天」挑选你的下一个任务。",
+      "go_today": "前往今天 →"
+    },
+    "library": {
+      "title": "图书馆",
+      "description": "重温你已经完成的课程。",
+      "nothing_finished": "还没有完成任何内容",
+      "nothing_finished_desc": "完成「今日任务」中的一节课，它就会出现在这里。",
+      "lesson": "课程",
+      "completed": "完成于 {date}",
+      "replay": "重玩 →"
+    },
+    "rewards": {
+      "title": "奖励",
+      "description": "追踪你在各个任务世界中完成的每一章。",
+      "open_world": "打开世界 →"
+    },
+    "select": {
+      "eyebrow": "查看身份",
+      "title": "选择一个孩子",
+      "description": "选择要查看哪个孩子的学习者体验。",
+      "forbidden": "该学习者未关联到你的账户。",
+      "no_learners": "还没有学习者",
+      "no_learners_desc": "在查看学习者体验之前，请先把一个孩子添加到你的账户。",
+      "add_learner": "添加学习者",
+      "view_as_aria": "以 {name} 的身份查看",
+      "age_not_set": "年龄未设置",
+      "readiness": "准备情况：{state}"
+    },
+    "not_found": {
+      "title": "我找不到那个。",
+      "body": "我们回到你的主页，挑选下一个任务吧。",
+      "cta": "前往我的主页"
     }
   },
   "auth": {

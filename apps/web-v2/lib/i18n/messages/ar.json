@@ -484,6 +484,53 @@
       "msg_supports_body": "القراءة الجهرية والإيقاع الهادئ و{count, plural, other {# وسيلة دعم أخرى}} من خطة الـ IEP الخاصة بك مفعّلة.",
       "msg_break_title": "الاستراحات جيّدة",
       "msg_break_body": "تمدّد، واشرب الماء، وانظر من النافذة. سيحفظ AIVO مكانك."
+    },
+    "common": {
+      "learner_eyebrow": "المتعلّم",
+      "no_profile": "لا يوجد ملف متعلّم مرتبط",
+      "source": "المصدر: {source}"
+    },
+    "missions": {
+      "title": "المهام",
+      "description": "واجباتك النشطة ودروسك الجارية.",
+      "from_teacher": "{subject} · من معلّمك",
+      "subject_fallback": "المادة",
+      "lesson_in_progress": "درس قيد التقدّم",
+      "continue": "متابعة →",
+      "nothing_waiting": "لا شيء في الانتظار",
+      "nothing_desc": "اذهب إلى «اليوم» لتختار مهمتك التالية.",
+      "go_today": "الذهاب إلى اليوم →"
+    },
+    "library": {
+      "title": "المكتبة",
+      "description": "أعد تشغيل الدروس التي أنهيتها بالفعل.",
+      "nothing_finished": "لم تُنهِ شيئًا بعد",
+      "nothing_finished_desc": "أكمل درسًا من مهمة اليوم وسيظهر هنا.",
+      "lesson": "درس",
+      "completed": "اكتمل في {date}",
+      "replay": "إعادة →"
+    },
+    "rewards": {
+      "title": "المكافآت",
+      "description": "تتبّع كل فصل أنهيته عبر عوالم المغامرات.",
+      "open_world": "فتح العالم →"
+    },
+    "select": {
+      "eyebrow": "العرض بصفة",
+      "title": "اختر طفلًا",
+      "description": "اختر تجربة المتعلّم لأي طفل تريد عرضها.",
+      "forbidden": "هذا المتعلّم غير مرتبط بحسابك.",
+      "no_learners": "لا يوجد متعلّمون بعد",
+      "no_learners_desc": "أضف طفلًا إلى حسابك قبل عرض تجربة المتعلّم.",
+      "add_learner": "إضافة متعلّم",
+      "view_as_aria": "العرض بصفة {name}",
+      "age_not_set": "العمر غير محدّد",
+      "readiness": "الجاهزية: {state}"
+    },
+    "not_found": {
+      "title": "لا أستطيع العثور على ذلك.",
+      "body": "لنعد إلى صفحتك الرئيسية ونختر مهمتك التالية.",
+      "cta": "الذهاب إلى صفحتي الرئيسية"
     }
   },
   "auth": {

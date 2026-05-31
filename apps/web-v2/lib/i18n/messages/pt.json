@@ -484,6 +484,53 @@
       "msg_supports_body": "Leitura em voz alta, ritmo calmo e {count, plural, one {# outro apoio} other {# outros apoios}} do seu IEP estão ativos.",
       "msg_break_title": "Pausas são boas",
       "msg_break_body": "Alongue-se, beba água, olhe pela janela. A AIVO guardará seu lugar."
+    },
+    "common": {
+      "learner_eyebrow": "Aluno",
+      "no_profile": "Nenhum perfil de aluno vinculado",
+      "source": "Fonte: {source}"
+    },
+    "missions": {
+      "title": "Missões",
+      "description": "Suas tarefas ativas e lições em andamento.",
+      "from_teacher": "{subject} · do seu professor",
+      "subject_fallback": "Matéria",
+      "lesson_in_progress": "Lição em andamento",
+      "continue": "Continuar →",
+      "nothing_waiting": "Nada esperando",
+      "nothing_desc": "Vá para Hoje e escolha sua próxima missão.",
+      "go_today": "Ir para Hoje →"
+    },
+    "library": {
+      "title": "Biblioteca",
+      "description": "Reproduza de novo lições que você já terminou.",
+      "nothing_finished": "Nada terminado ainda",
+      "nothing_finished_desc": "Conclua uma lição da missão de hoje e ela aparecerá aqui.",
+      "lesson": "Lição",
+      "completed": "concluída em {date}",
+      "replay": "Repetir →"
+    },
+    "rewards": {
+      "title": "Recompensas",
+      "description": "Acompanhe cada capítulo que você concluiu nos mundos de aventura.",
+      "open_world": "Abrir mundo →"
+    },
+    "select": {
+      "eyebrow": "Ver como",
+      "title": "Escolha uma criança",
+      "description": "Escolha a experiência de aluno de qual criança visualizar.",
+      "forbidden": "Esse aluno não está vinculado à sua conta.",
+      "no_learners": "Ainda não há alunos",
+      "no_learners_desc": "Adicione uma criança à sua conta antes de ver a experiência do aluno.",
+      "add_learner": "Adicionar um aluno",
+      "view_as_aria": "Ver como {name}",
+      "age_not_set": "Idade não definida",
+      "readiness": "Prontidão: {state}"
+    },
+    "not_found": {
+      "title": "Não consigo encontrar isso.",
+      "body": "Vamos voltar ao seu início e escolher sua próxima missão.",
+      "cta": "Ir para meu início"
     }
   },
   "auth": {

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -15,6 +16,8 @@ import { StickerBook } from "@/components/playful-calm";
 
 export default async function Page() {
   const session = await requirePageRole(["learner"]);
+  const t = await getTranslations("learner.rewards");
+  const tc = await getTranslations("learner.common");
   const learnerId = session.learnerId;
   if (!learnerId) {
     return (
@@ -24,7 +27,7 @@ export default async function Page() {
         navItems={LEARNER_NAV}
         user={{ displayName: session.displayName, email: session.email }}
       >
-        <EmptyState title="No learner profile linked" />
+        <EmptyState title={tc("no_profile")} />
       </AppShell>
     );
   }
@@ -42,9 +45,9 @@ export default async function Page() {
       user={{ displayName: session.displayName, email: session.email }}
     >
       <PageHeader
-        eyebrow="Learner"
-        title="Rewards"
-        description="Track every chapter you've completed across the quest worlds."
+        eyebrow={tc("learner_eyebrow")}
+        title={t("title")}
+        description={t("description")}
       />
       <div className="mb-4">
         <StickerBook earned={progress.filter((p) => p.progress >= 1).length} total={Math.max(progress.length, 1)} />
@@ -67,7 +70,7 @@ export default async function Page() {
                 href={`/learner/quests/${w.id}`}
                 className="mt-3 inline-block text-xs font-medium text-aivo-primary hover:underline"
               >
-                Open world →
+                {t("open_world")}
               </Link>
             </Card>
             );

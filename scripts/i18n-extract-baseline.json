@@ -1,12 +1,12 @@
 {
-  "total": 1135,
+  "total": 1115,
   "areas": {
     "accept-invite": 11,
     "admin": 507,
     "caregiver": 35,
     "district": 6,
     "(root)": 18,
-    "learner": 70,
+    "learner": 50,
     "login": 1,
     "onboarding": 4,
     "parent": 361,

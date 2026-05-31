@@ -484,6 +484,53 @@
       "msg_supports_body": "La lectura en voz alta, el ritmo tranquilo y {count, plural, one {# apoyo más} other {# apoyos más}} de tu IEP están activos.",
       "msg_break_title": "Los descansos son buenos",
       "msg_break_body": "Estírate, bebe agua, mira por la ventana. AIVO guardará tu lugar."
+    },
+    "common": {
+      "learner_eyebrow": "Estudiante",
+      "no_profile": "No hay un perfil de estudiante vinculado",
+      "source": "Fuente: {source}"
+    },
+    "missions": {
+      "title": "Misiones",
+      "description": "Tus tareas activas y lecciones en curso.",
+      "from_teacher": "{subject} · de tu docente",
+      "subject_fallback": "Materia",
+      "lesson_in_progress": "Lección en curso",
+      "continue": "Continuar →",
+      "nothing_waiting": "Nada pendiente",
+      "nothing_desc": "Ve a Hoy para elegir tu próxima misión.",
+      "go_today": "Ir a Hoy →"
+    },
+    "library": {
+      "title": "Biblioteca",
+      "description": "Vuelve a reproducir lecciones que ya terminaste.",
+      "nothing_finished": "Aún no has terminado nada",
+      "nothing_finished_desc": "Completa una lección desde la misión de hoy y aparecerá aquí.",
+      "lesson": "Lección",
+      "completed": "completada el {date}",
+      "replay": "Repetir →"
+    },
+    "rewards": {
+      "title": "Recompensas",
+      "description": "Sigue cada capítulo que has completado en los mundos de aventuras.",
+      "open_world": "Abrir mundo →"
+    },
+    "select": {
+      "eyebrow": "Ver como",
+      "title": "Elige un niño",
+      "description": "Elige la experiencia de qué niño quieres ver.",
+      "forbidden": "Ese estudiante no está vinculado a tu cuenta.",
+      "no_learners": "Aún no hay estudiantes",
+      "no_learners_desc": "Añade un niño a tu cuenta antes de ver la experiencia del estudiante.",
+      "add_learner": "Añadir un estudiante",
+      "view_as_aria": "Ver como {name}",
+      "age_not_set": "Edad no establecida",
+      "readiness": "Preparación: {state}"
+    },
+    "not_found": {
+      "title": "No encuentro eso.",
+      "body": "Volvamos a tu inicio y elige tu próxima misión.",
+      "cta": "Ir a mi inicio"
     }
   },
   "auth": {

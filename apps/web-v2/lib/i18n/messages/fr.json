@@ -484,6 +484,53 @@
       "msg_supports_body": "La lecture à voix haute, le rythme apaisé et {count, plural, one {# autre aide} other {# autres aides}} de ton IEP sont actifs.",
       "msg_break_title": "Les pauses, c'est bien",
       "msg_break_body": "Étire-toi, bois de l'eau, regarde par la fenêtre. AIVO gardera ta place."
+    },
+    "common": {
+      "learner_eyebrow": "Apprenant",
+      "no_profile": "Aucun profil d'apprenant associé",
+      "source": "Source : {source}"
+    },
+    "missions": {
+      "title": "Missions",
+      "description": "Tes devoirs en cours et tes leçons en cours.",
+      "from_teacher": "{subject} · de ton enseignant",
+      "subject_fallback": "Matière",
+      "lesson_in_progress": "Leçon en cours",
+      "continue": "Continuer →",
+      "nothing_waiting": "Rien en attente",
+      "nothing_desc": "Va dans Aujourd'hui pour choisir ta prochaine mission.",
+      "go_today": "Aller à Aujourd'hui →"
+    },
+    "library": {
+      "title": "Bibliothèque",
+      "description": "Rejoue les leçons que tu as déjà terminées.",
+      "nothing_finished": "Rien de terminé pour l'instant",
+      "nothing_finished_desc": "Termine une leçon depuis la mission du jour et elle apparaîtra ici.",
+      "lesson": "Leçon",
+      "completed": "terminée le {date}",
+      "replay": "Rejouer →"
+    },
+    "rewards": {
+      "title": "Récompenses",
+      "description": "Suis chaque chapitre que tu as terminé dans les mondes de quête.",
+      "open_world": "Ouvrir le monde →"
+    },
+    "select": {
+      "eyebrow": "Voir en tant que",
+      "title": "Choisis un enfant",
+      "description": "Choisis l'expérience d'apprenant de quel enfant afficher.",
+      "forbidden": "Cet apprenant n'est pas rattaché à ton compte.",
+      "no_learners": "Aucun apprenant pour l'instant",
+      "no_learners_desc": "Ajoute un enfant à ton compte avant d'afficher l'expérience d'apprenant.",
+      "add_learner": "Ajouter un apprenant",
+      "view_as_aria": "Voir en tant que {name}",
+      "age_not_set": "Âge non défini",
+      "readiness": "Préparation : {state}"
+    },
+    "not_found": {
+      "title": "Je ne trouve pas ça.",
+      "body": "Revenons à ton accueil et choisis ta prochaine mission.",
+      "cta": "Aller à mon accueil"
     }
   },
   "auth": {

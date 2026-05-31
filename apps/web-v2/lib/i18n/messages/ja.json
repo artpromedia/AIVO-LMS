@@ -484,6 +484,53 @@
       "msg_supports_body": "読み上げ、落ち着いたペース、そして IEP からの{count, plural, other {他 # 件のサポート}}が有効です。",
       "msg_break_title": "休憩はいいこと",
       "msg_break_body": "伸びをして、水を飲んで、窓の外を見てね。AIVO があなたの場所を覚えています。"
+    },
+    "common": {
+      "learner_eyebrow": "学習者",
+      "no_profile": "学習者プロフィールが関連付けられていません",
+      "source": "ソース：{source}"
+    },
+    "missions": {
+      "title": "ミッション",
+      "description": "進行中の課題とレッスン。",
+      "from_teacher": "{subject} · 先生から",
+      "subject_fallback": "教科",
+      "lesson_in_progress": "レッスン進行中",
+      "continue": "続ける →",
+      "nothing_waiting": "待っているものはありません",
+      "nothing_desc": "「今日」に行って次のミッションを選ぼう。",
+      "go_today": "今日へ →"
+    },
+    "library": {
+      "title": "ライブラリ",
+      "description": "もう終えたレッスンをもう一度再生しよう。",
+      "nothing_finished": "まだ何も終えていません",
+      "nothing_finished_desc": "今日のミッションのレッスンを終えると、ここに表示されます。",
+      "lesson": "レッスン",
+      "completed": "{date} に完了",
+      "replay": "もう一度 →"
+    },
+    "rewards": {
+      "title": "ごほうび",
+      "description": "クエストの世界で終えた章をすべて記録します。",
+      "open_world": "世界を開く →"
+    },
+    "select": {
+      "eyebrow": "表示の切り替え",
+      "title": "お子さまを選ぶ",
+      "description": "どのお子さまの学習者体験を表示するか選びます。",
+      "forbidden": "その学習者はあなたのアカウントに関連付けられていません。",
+      "no_learners": "まだ学習者がいません",
+      "no_learners_desc": "学習者体験を表示する前に、お子さまをアカウントに追加してください。",
+      "add_learner": "学習者を追加",
+      "view_as_aria": "{name} として表示",
+      "age_not_set": "年齢未設定",
+      "readiness": "準備状況：{state}"
+    },
+    "not_found": {
+      "title": "それが見つかりません。",
+      "body": "ホームに戻って、次のミッションを選ぼう。",
+      "cta": "マイホームへ"
     }
   },
   "auth": {

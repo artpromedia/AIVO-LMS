@@ -616,6 +616,53 @@
       "msg_supports_body": "Read-aloud, calm pacing, and {count, plural, one {# other support} other {# other supports}} from your IEP are active.",
       "msg_break_title": "Breaks are good",
       "msg_break_body": "Stretch, sip water, look out the window. AIVO will save your place."
+    },
+    "common": {
+      "learner_eyebrow": "Learner",
+      "no_profile": "No learner profile linked",
+      "source": "Source: {source}"
+    },
+    "missions": {
+      "title": "Missions",
+      "description": "Your active assignments and lessons in progress.",
+      "from_teacher": "{subject} · from your teacher",
+      "subject_fallback": "Subject",
+      "lesson_in_progress": "Lesson in progress",
+      "continue": "Continue →",
+      "nothing_waiting": "Nothing waiting",
+      "nothing_desc": "Head to Today to pick your next mission.",
+      "go_today": "Go to Today →"
+    },
+    "library": {
+      "title": "Library",
+      "description": "Replay lessons you've already finished.",
+      "nothing_finished": "Nothing finished yet",
+      "nothing_finished_desc": "Complete a lesson from Today's Mission and it will land here.",
+      "lesson": "Lesson",
+      "completed": "completed {date}",
+      "replay": "Replay →"
+    },
+    "rewards": {
+      "title": "Rewards",
+      "description": "Track every chapter you've completed across the quest worlds.",
+      "open_world": "Open world →"
+    },
+    "select": {
+      "eyebrow": "View as",
+      "title": "Pick a child",
+      "description": "Choose which child's learner experience to view.",
+      "forbidden": "That learner isn't linked to your account.",
+      "no_learners": "No learners yet",
+      "no_learners_desc": "Add a child to your account before viewing the learner experience.",
+      "add_learner": "Add a learner",
+      "view_as_aria": "View as {name}",
+      "age_not_set": "Age not set",
+      "readiness": "Readiness: {state}"
+    },
+    "not_found": {
+      "title": "I can't find that one.",
+      "body": "Let's head back to your home and pick your next mission.",
+      "cta": "Go to my home"
     }
   },
   "onboarding": {
