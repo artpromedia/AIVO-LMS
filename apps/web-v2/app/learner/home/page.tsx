@@ -25,6 +25,7 @@
  */
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
@@ -109,25 +110,26 @@ async function startMissionAction(formData: FormData) {
   redirect(`/learner/lesson-runs/${result.lessonRun.id}`);
 }
 
-function masteryLabel(score: number): string {
-  if (score >= 0.85) return "Strong";
-  if (score >= 0.65) return "On grade";
-  if (score >= 0.4) return "Building";
-  if (score > 0) return "Just starting";
-  return "Not started";
+// Maps a mastery score to its learner.progress.* catalog key.
+function masteryKey(score: number): string {
+  if (score >= 0.85) return "mastery_strong";
+  if (score >= 0.65) return "mastery_on_grade";
+  if (score >= 0.4) return "mastery_building";
+  if (score > 0) return "mastery_just_starting";
+  return "mastery_not_started";
 }
 
-function adaptiveLevel(score: number): string {
-  if (score >= 0.85) return "Soaring";
-  if (score >= 0.65) return "Confident";
-  if (score >= 0.4) return "Growing";
-  return "Emerging";
+// Maps an overall average to its learner.home.level_* catalog key.
+function adaptiveLevelKey(score: number): string {
+  if (score >= 0.85) return "level_soaring";
+  if (score >= 0.65) return "level_confident";
+  if (score >= 0.4) return "level_growing";
+  return "level_emerging";
 }
 
-function timeOfDayGreeting(name: string): string {
+function greetingSlot(): "morning" | "afternoon" | "evening" {
   const hour = new Date().getHours();
-  const slot = hour < 12 ? "morning" : hour < 18 ? "afternoon" : "evening";
-  return `Good ${slot}, ${name}!`;
+  return hour < 12 ? "morning" : hour < 18 ? "afternoon" : "evening";
 }
 
 // Subject-slug → category tile color tone for the featured lesson chip
@@ -151,6 +153,8 @@ export default async function LearnerHome({
 }) {
   const session = await requirePageRole(["learner", "parent"]);
   const params = await searchParams;
+  const t = await getTranslations("learner.home");
+  const tp = await getTranslations("learner.progress");
 
   let learnerId: string | null = null;
   if (session.role === "learner") {
@@ -277,8 +281,8 @@ export default async function LearnerHome({
           <div className="flex items-center gap-3 p-4 rounded-3xl bg-white border border-iw-border/60 flex-wrap">
             <StatChip
               tone="warm"
-              label={`Level ${levelNumber}`}
-              value={`${xp.toLocaleString()} XP`}
+              label={t("stat_level", { level: levelNumber })}
+              value={t("stat_xp", { xp: xp.toLocaleString() })}
               icon={
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                   <path d="m12 2 2.6 6.4 6.9.5-5.3 4.4 1.7 6.7L12 16.8 6.1 20l1.7-6.7L2.5 8.9l6.9-.5L12 2Z" />
@@ -287,14 +291,8 @@ export default async function LearnerHome({
             />
             <StatChip
               tone="primary"
-              label="Streak"
-              value={
-                streakDays === 0
-                  ? "Start today"
-                  : streakDays === 1
-                    ? "1 Day"
-                    : `${streakDays} Days`
-              }
+              label={t("streak_label")}
+              value={t("streak_value", { days: streakDays })}
               icon={
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                   <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" />
@@ -302,13 +300,13 @@ export default async function LearnerHome({
               }
             />
             <span className="ml-auto">
-              <LearnerLevelBadge level={adaptiveLevel(overallAvg)} />
+              <LearnerLevelBadge level={t(adaptiveLevelKey(overallAvg))} />
             </span>
           </div>
 
           {/* Greeting */}
           <h1 className="text-3xl md:text-4xl font-bold text-iw-text-strong leading-tight">
-            {timeOfDayGreeting(displayName)}
+            {t(`greeting_${greetingSlot()}`, { name: displayName })}
           </h1>
 
           {/* Featured lesson */}
@@ -317,12 +315,14 @@ export default async function LearnerHome({
               subject={today.mission.subjectName}
               subjectTone={featuredTones.lessonTone}
               durationLabel={`${today.mission.estimatedMinutes} mins`}
-              difficultyLabel={overallAvg >= 0.65 ? "Steady" : "Easy"}
+              difficultyLabel={overallAvg >= 0.65 ? t("diff_steady") : t("diff_easy")}
               title={today.mission.skillName}
               description={today.mission.learnerReason}
-              tutorName={featuredTutor?.name ?? "Your tutor"}
+              tutorName={featuredTutor?.name ?? t("tutor_fallback")}
               tutorPersonality={
-                featuredTutor ? `${featuredTutor.subtitle} guide` : "Patient & Encouraging"
+                featuredTutor
+                  ? t("tutor_personality", { subtitle: featuredTutor.subtitle })
+                  : t("tutor_personality_default")
               }
               tutorGlyph={featuredTutor?.emoji ?? "🤖"}
               tutorTone={featuredTones.tutorTone}
@@ -347,7 +347,7 @@ export default async function LearnerHome({
                       </svg>
                     }
                   >
-                    Read Aloud
+                    {t("read_aloud")}
                   </LessonSecondaryAction>
                   <LessonSecondaryAction
                     icon={
@@ -369,7 +369,7 @@ export default async function LearnerHome({
                       </svg>
                     }
                   >
-                    Overview
+                    {t("overview")}
                   </LessonSecondaryAction>
                 </>
               }
@@ -386,24 +386,24 @@ export default async function LearnerHome({
                     >
                       <path d="M8 5v14l11-7L8 5Z" />
                     </svg>
-                    {today.mission.existingRunId ? "Resume Lesson" : "Start Lesson"}
+                    {today.mission.existingRunId ? t("resume_lesson") : t("start_lesson")}
                   </Button>
                 </form>
               }
             />
           ) : (
             <div className="rounded-[28px] bg-white border border-iw-border/60 p-8 flex flex-col gap-4">
-              <h2 className="text-2xl font-bold text-iw-text-strong">Let's get you set up</h2>
+              <h2 className="text-2xl font-bold text-iw-text-strong">{t("setup_title")}</h2>
               <p className="text-base text-iw-text-muted">
                 {blocker === "no_baseline"
-                  ? "We need a quick baseline check so we can build a lesson plan just for you."
-                  : "Just a moment — we're picking something special."}
+                  ? t("setup_body_baseline")
+                  : t("setup_body_wait")}
               </p>
               <Link
                 href={blocker === "no_baseline" ? "/learner/baseline" : "/learner/home"}
                 className="self-start inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl text-base font-bold text-white bg-[var(--color-aivo-primary)] hover:brightness-110 transition"
               >
-                {blocker === "no_baseline" ? "Finish the baseline" : "Refresh"}
+                {blocker === "no_baseline" ? t("setup_cta_baseline") : t("setup_cta_refresh")}
               </Link>
             </div>
           )}
@@ -412,12 +412,12 @@ export default async function LearnerHome({
           {tutorTiles.length > 0 ? (
             <section className="flex flex-col gap-4">
               <header className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-iw-text-strong">Your AI Tutors</h2>
+                <h2 className="text-xl font-bold text-iw-text-strong">{t("tutors_title")}</h2>
                 <Link
                   href="/learner/subjects"
                   className="text-sm font-bold text-[var(--color-aivo-primary)] hover:underline"
                 >
-                  See All
+                  {t("see_all")}
                 </Link>
               </header>
               <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
@@ -438,12 +438,12 @@ export default async function LearnerHome({
           {/* Subjects */}
           <section className="flex flex-col gap-4">
             <header className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-iw-text-strong">Your Subjects</h2>
+              <h2 className="text-xl font-bold text-iw-text-strong">{t("subjects_title")}</h2>
               <Link
                 href="/learner/subjects"
                 className="text-sm font-bold text-[var(--color-aivo-primary)] hover:underline"
               >
-                See All
+                {t("see_all")}
               </Link>
             </header>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -455,17 +455,17 @@ export default async function LearnerHome({
                     key={s.id}
                     href={`/learner/subjects/${s.id}`}
                     name={s.name}
-                    eyebrow={tutor ? `${tutor.name} · ${tutor.landmark}` : undefined}
-                    masteryLabel={masteryLabel(avg)}
+                    eyebrow={tutor ? t("subject_eyebrow", { name: tutor.name, landmark: tutor.landmark }) : undefined}
+                    masteryLabel={tp(masteryKey(avg))}
                     masteryPct={Math.round(avg * 100)}
                     accent={tutor?.color}
                     icon={tutor?.emoji ?? "📘"}
                     nextAction={
                       today.ready && today.mission.subjectId === s.id
                         ? today.mission.skillName
-                        : "Pick where to start"
+                        : t("next_default")
                     }
-                    support={iep?.confirmedAt ? "Supports on" : undefined}
+                    support={iep?.confirmedAt ? t("supports_on") : undefined}
                     locked={avg === 0 && !today.ready}
                   />
                 );
@@ -475,29 +475,27 @@ export default async function LearnerHome({
 
           {/* Messages */}
           <section className="flex flex-col gap-4">
-            <h2 className="text-xl font-bold text-iw-text-strong">For You Today</h2>
+            <h2 className="text-xl font-bold text-iw-text-strong">{t("messages_title")}</h2>
             <div className="grid gap-4 md:grid-cols-2">
               <MessageCard
                 from="tutor"
                 sender="AIVO"
-                title="Need a hint? I'm here."
-                body="Tap the read-aloud speaker on any question to hear it. No grades — just exploring together."
+                title={t("msg_hint_title")}
+                body={t("msg_hint_body")}
                 avatar="✨"
               />
               {iep?.confirmedAt ? (
                 <MessageCard
                   from="system"
-                  title="Your supports are on"
-                  body={`Read-aloud, calm pacing, and ${supportsCount} other support${
-                    supportsCount === 1 ? "" : "s"
-                  } from your IEP are active.`}
+                  title={t("msg_supports_title")}
+                  body={t("msg_supports_body", { count: supportsCount })}
                   avatar="🛡"
                 />
               ) : (
                 <MessageCard
                   from="break"
-                  title="Breaks are good"
-                  body="Stretch, sip water, look out the window. AIVO will save your place."
+                  title={t("msg_break_title")}
+                  body={t("msg_break_body")}
                   avatar="🌿"
                 />
               )}
