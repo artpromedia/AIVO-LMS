@@ -19,6 +19,10 @@ export default function OnboardingLayout() {
       <Stack.Screen name="privacy" />
       <Stack.Screen name="permissions" />
       <Stack.Screen name="error" />
+      <Stack.Screen name="parent-verify" />
+      <Stack.Screen name="iep-upload" />
+      <Stack.Screen name="child-approval" />
+      <Stack.Screen name="learner/new" />
     </Stack>
   );
 }

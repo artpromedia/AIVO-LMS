@@ -120,6 +120,26 @@ export default function ParentLayout() {
         <Tabs.Screen name="summary/[childId]" options={{ href: null }} />
         <Tabs.Screen name="snapshot/[childId]" options={{ href: null }} />
         <Tabs.Screen name="reports" options={{ href: null }} />
+        <Tabs.Screen name="sensory/[childId]" options={{ href: null }} />
+        <Tabs.Screen name="lessons/[childId]" options={{ href: null }} />
+        <Tabs.Screen name="homework/[childId]" options={{ href: null }} />
+        <Tabs.Screen name="curriculum/[childId]" options={{ href: null }} />
+        <Tabs.Screen name="schedule/[childId]" options={{ href: null }} />
+        <Tabs.Screen name="profile-v2/[childId]" options={{ href: null }} />
+        <Tabs.Screen name="settings-learner/[childId]" options={{ href: null }} />
+        <Tabs.Screen name="settings-account/index" options={{ href: null }} />
+        <Tabs.Screen name="accessibility/[childId]" options={{ href: null }} />
+        <Tabs.Screen name="accessibility/audio/[childId]" options={{ href: null }} />
+        <Tabs.Screen name="consent/index" options={{ href: null }} />
+        <Tabs.Screen name="consent/[learnerId]" options={{ href: null }} />
+        <Tabs.Screen name="privacy/index" options={{ href: null }} />
+        <Tabs.Screen name="privacy/data-export" options={{ href: null }} />
+        <Tabs.Screen name="privacy/delete-data" options={{ href: null }} />
+        <Tabs.Screen name="baseline/[childId]" options={{ href: null }} />
+        <Tabs.Screen name="brain-clone-watch/[childId]" options={{ href: null }} />
+        <Tabs.Screen name="iep-review/[childId]" options={{ href: null }} />
+        <Tabs.Screen name="learner-new/index" options={{ href: null }} />
+        <Tabs.Screen name="assessment/[childId]" options={{ href: null }} />
       </Tabs>
     </RoleTabletShell>
   );

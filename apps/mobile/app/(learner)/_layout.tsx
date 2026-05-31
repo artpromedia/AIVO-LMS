@@ -191,6 +191,9 @@ function ThemedLearnerTabs() {
         <Tabs.Screen name="progress" options={{ href: null }} />
         <Tabs.Screen name="library" options={{ href: null }} />
         <Tabs.Screen name="missions" options={{ href: null }} />
+        <Tabs.Screen name="notifications" options={{ href: null }} />
+        <Tabs.Screen name="baseline/index" options={{ href: null }} />
+        <Tabs.Screen name="baseline/run" options={{ href: null }} />
         <Tabs.Screen name="leaderboard" options={{ href: null }} />
       </Tabs>
     </RoleTabletShell>
