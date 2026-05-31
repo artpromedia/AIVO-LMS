@@ -82,24 +82,9 @@ const PARITY_MATRIX = {
   ],
 
   Onboarding: [
-    {
-      web: "/onboarding",
-      mobile: null,
-      status: MISSING,
-      gap: "MOB-ONB-001: onboarding entry/router screen.",
-    },
-    {
-      web: "/onboarding/welcome",
-      mobile: null,
-      status: MISSING,
-      gap: "MOB-ONB-002: brand welcome + sign-in/up entry.",
-    },
-    {
-      web: "/onboarding/role",
-      mobile: null,
-      status: MISSING,
-      gap: "MOB-ONB-003: role selector (parent/teacher).",
-    },
+    { web: "/onboarding", mobile: "(onboarding)/index", status: P },
+    { web: "/onboarding/welcome", mobile: "(onboarding)/welcome", status: P },
+    { web: "/onboarding/role", mobile: "(onboarding)/role", status: P },
     {
       web: "/onboarding/signup",
       mobile: "(auth)/signup",
@@ -107,18 +92,8 @@ const PARITY_MATRIX = {
       gap: "MOB-ONB-004: invite-code + footer terms parity with web signup.",
     },
     { web: "/onboarding/signin", mobile: "(auth)/login", status: P },
-    {
-      web: "/onboarding/terms",
-      mobile: null,
-      status: MISSING,
-      gap: "MOB-ONB-005: terms acceptance screen.",
-    },
-    {
-      web: "/onboarding/privacy",
-      mobile: null,
-      status: MISSING,
-      gap: "MOB-ONB-006: privacy policy + CCPA/GDPR summary screen.",
-    },
+    { web: "/onboarding/terms", mobile: "(onboarding)/terms", status: P },
+    { web: "/onboarding/privacy", mobile: "(onboarding)/privacy", status: P },
     {
       web: "/onboarding/consent",
       mobile: "(auth)/consent-sheet",
@@ -127,12 +102,7 @@ const PARITY_MATRIX = {
     },
     { web: "/onboarding/recovery", mobile: "(auth)/forgot-password", status: P },
     { web: "/onboarding/pin", mobile: "(auth)/pin", status: P },
-    {
-      web: "/onboarding/permissions",
-      mobile: null,
-      status: MISSING,
-      gap: "MOB-ONB-008: device camera/mic/notification permission priming.",
-    },
+    { web: "/onboarding/permissions", mobile: "(onboarding)/permissions", status: P },
     {
       web: "/onboarding/parent-setup",
       mobile: "(parent)/onboard",
@@ -163,12 +133,7 @@ const PARITY_MATRIX = {
       status: MISSING,
       gap: "MOB-ONB-013: learner self-signup form.",
     },
-    {
-      web: "/onboarding/error",
-      mobile: null,
-      status: MISSING,
-      gap: "MOB-ONB-014: onboarding error/recovery fallback screen.",
-    },
+    { web: "/onboarding/error", mobile: "(onboarding)/error", status: P },
   ],
 
   Learner: [
