@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { getTranslations } from "next-intl/server";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { WEB_APP_URL, SITE_URL } from "@/lib/constants";
 
@@ -80,7 +81,8 @@ const STATUS_STYLES: Record<Subprocessor["status"], string> = {
   Planned: "bg-amber-100 text-amber-800",
 };
 
-export default function SubprocessorsPage() {
+export default async function SubprocessorsPage() {
+  const t = await getTranslations("marketing.page_subprocessors");
   return (
     <div className="min-h-screen bg-white">
       <header className="sticky top-0 z-50 border-b border-slate-100 bg-white">
@@ -107,7 +109,7 @@ export default function SubprocessorsPage() {
               href={`${WEB_APP_URL}/signup?plan=free`}
               className="inline-flex min-h-[44px] items-center rounded-full bg-primary px-5 py-2.5 font-bold text-white shadow-lg shadow-purple-200 transition hover:bg-primary-dark"
             >
-              Get Started
+              {t("get_started")}
             </a>
           </div>
         </div>
@@ -116,10 +118,10 @@ export default function SubprocessorsPage() {
       <section className="relative overflow-hidden bg-gradient-to-b from-purple-50/40 via-white to-white py-16 md:py-20">
         <div className="mx-auto max-w-4xl px-6 md:px-8">
           <span className="inline-flex items-center gap-2 rounded-full bg-purple-100 px-4 py-1 text-sm font-bold text-purple-700">
-            <span aria-hidden="true">🔗</span> Subprocessors
+            <span aria-hidden="true">🔗</span> {t("badge")}
           </span>
           <h1 className="mt-4 font-heading text-4xl font-bold leading-tight text-slate-900 md:text-5xl">
-            AIVO subprocessors
+            {t("heading")}
           </h1>
           <p className="mt-3 max-w-2xl font-body text-lg text-slate-500">
             The companies AIVO uses to deliver the platform. We keep this list short on purpose.
@@ -135,7 +137,7 @@ export default function SubprocessorsPage() {
             id="subprocessors-table-heading"
             className="font-heading text-2xl font-bold text-slate-900"
           >
-            Current subprocessors
+            {t("current_subprocessors")}
           </h2>
           <p className="mt-1 font-body text-slate-600">
             Each row describes what the subprocessor does and what data category it may handle. None
@@ -154,31 +156,31 @@ export default function SubprocessorsPage() {
                     scope="col"
                     className="px-4 py-3 text-xs font-bold uppercase tracking-wide text-slate-600"
                   >
-                    Subprocessor
+                    {t("col_subprocessor")}
                   </th>
                   <th
                     scope="col"
                     className="px-4 py-3 text-xs font-bold uppercase tracking-wide text-slate-600"
                   >
-                    Purpose
+                    {t("col_purpose")}
                   </th>
                   <th
                     scope="col"
                     className="px-4 py-3 text-xs font-bold uppercase tracking-wide text-slate-600"
                   >
-                    Data category
+                    {t("col_data_category")}
                   </th>
                   <th
                     scope="col"
                     className="px-4 py-3 text-xs font-bold uppercase tracking-wide text-slate-600"
                   >
-                    Region
+                    {t("col_region")}
                   </th>
                   <th
                     scope="col"
                     className="px-4 py-3 text-xs font-bold uppercase tracking-wide text-slate-600"
                   >
-                    Status
+                    {t("col_status")}
                   </th>
                 </tr>
               </thead>
@@ -213,7 +215,7 @@ export default function SubprocessorsPage() {
           className="mt-12 space-y-3 rounded-2xl border border-slate-200 bg-slate-50/60 p-6 md:p-8"
         >
           <h2 id="how-we-use-heading" className="font-heading text-xl font-bold text-slate-900">
-            How we use this list
+            {t("how_we_use_heading")}
           </h2>
           <p className="font-body text-slate-700">
             Schools and districts can rely on this page for procurement review. If you need a signed
@@ -231,7 +233,7 @@ export default function SubprocessorsPage() {
           className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 md:p-8"
         >
           <h2 id="changes-heading" className="font-heading text-xl font-bold text-slate-900">
-            Reporting subprocessor changes
+            {t("reporting_heading")}
           </h2>
           <p className="mt-2 font-body text-slate-700">
             Subscribe to subprocessor change notifications by writing to{" "}
@@ -247,7 +249,7 @@ export default function SubprocessorsPage() {
         </section>
 
         <div className="mt-12 rounded-3xl border border-purple-100 bg-purple-50/40 p-8">
-          <h3 className="font-heading text-xl font-bold text-slate-900">Questions?</h3>
+          <h3 className="font-heading text-xl font-bold text-slate-900">{t("questions_heading")}</h3>
           <p className="mt-2 font-body text-slate-600">
             Contact our compliance team for a signed DPA, subprocessor exhibits, or procurement
             review.
@@ -276,7 +278,7 @@ export default function SubprocessorsPage() {
                 href="/privacy-policy"
                 className="text-sm text-slate-400 transition hover:text-white"
               >
-                Privacy
+                {t("footer_privacy")}
               </Link>
               <Link
                 href="/terms-of-service"
@@ -285,7 +287,7 @@ export default function SubprocessorsPage() {
                 Terms
               </Link>
               <Link href="/security" className="text-sm text-slate-400 transition hover:text-white">
-                Security
+                {t("footer_security")}
               </Link>
               <Link href="/trust" className="text-sm text-slate-400 transition hover:text-white">
                 Trust
@@ -294,7 +296,7 @@ export default function SubprocessorsPage() {
                 href="/accessibility"
                 className="text-sm text-slate-400 transition hover:text-white"
               >
-                Accessibility
+                {t("footer_accessibility")}
               </Link>
             </nav>
           </div>

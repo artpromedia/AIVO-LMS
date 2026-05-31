@@ -1,5 +1,6 @@
 import { MARKETING_ACCENTS } from "@aivo/brand";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { SITE_URL } from "@/lib/constants";
 import { NumberedSteps, CalloutCard, MockupShowcase } from "@/components/marketing/sections";
@@ -35,12 +36,13 @@ const FLOW = [
   },
 ];
 
-export default function Page() {
+export default async function Page() {
+  const t = await getTranslations("marketing.page_features_lessonrun");
   return (
     <LandingPageLayout
       badge="Feature · LessonRun"
       badgeColor={MARKETING_ACCENTS.blue}
-      title="The personalized learning unit behind every AIVO lesson"
+      title={t("hero_title")}
       subtitle="LessonRun is what happens after the learner taps Start. Tutor-guided, scaffolded, sensory-aware — and quietly building a real picture of mastery."
       primaryCtaLabel="Start parent setup"
       secondaryCtaLabel="See Today's Mission"
@@ -79,7 +81,7 @@ export default function Page() {
               <p className="text-sm font-bold text-slate-900">Atlas</p>
             </div>
             <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3 text-sm text-slate-700">
-              Let's count by 3s up to 12. Start at 3. What comes next?
+              {t("count_by_3s_prompt")}
             </div>
             <div className="grid grid-cols-2 gap-2">
               {["5", "6", "7", "9"].map((w) => (
@@ -110,11 +112,11 @@ export default function Page() {
         mockup={
           <div className="space-y-3">
             <div className="rounded-xl bg-purple-50 p-3 text-sm text-slate-700 border border-purple-100">
-              Try counting on your fingers: 3 · 6 · ? — what number comes three more than 6?
+              {t("hint_counting_fingers")}
             </div>
             <div className="flex justify-between text-xs text-slate-500">
               <span>🔊 Read this aloud</span>
-              <span>Need another hint?</span>
+              <span>{t("need_another_hint")}</span>
             </div>
           </div>
         }
@@ -123,7 +125,7 @@ export default function Page() {
       {/* §5 Read-aloud */}
       <CalloutCard
         eyebrow="Read-aloud"
-        title="Voice support on every step"
+        title={t("voice_support_title")}
         body="Instructions, hints, answer choices, and tutor feedback can all be read aloud. Voice settings persist per learner — once it's on, it stays on. Read-aloud is treated as a learning support, not a luxury feature."
         tone="blue"
       />
@@ -131,7 +133,7 @@ export default function Page() {
       {/* §6 Break mode */}
       <CalloutCard
         eyebrow="Break mode"
-        title="A calm pause — not a rage-quit"
+        title={t("break_mode_title")}
         body={
           <>
             <p>
@@ -193,7 +195,7 @@ export default function Page() {
         mockup={
           <div className="space-y-3">
             <h3 className="font-heading text-base font-bold text-slate-900">
-              Maya had a strong week!
+              {t("maya_strong_week")}
             </h3>
             <p className="text-sm text-slate-600">
               5 of 5 missions completed. Skip-counting clicked.

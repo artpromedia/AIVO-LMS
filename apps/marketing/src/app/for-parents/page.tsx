@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { audienceMetadata } from "@/components/marketing/AudiencePage";
 import { AUDIENCES } from "@/lib/landing-content";
@@ -48,7 +49,8 @@ const ACCESSIBILITY_ITEMS = [
   { title: "Keyboard & switch access", body: "Full operability without a mouse." },
 ];
 
-export default function Page() {
+export default async function Page() {
+  const t = await getTranslations("marketing.page_for_parents");
   return (
     <LandingPageLayout
       badge={audience.badge}
@@ -103,7 +105,7 @@ export default function Page() {
         mockup={
           <div className="space-y-3">
             <p className="text-sm font-semibold text-slate-900">
-              How does your child feel about reading?
+              {t("reading_question")}
             </p>
             <div className="grid grid-cols-2 gap-2">
               {["Loves it", "Mixed", "Avoids it", "Not sure"].map((o) => (
@@ -116,7 +118,7 @@ export default function Page() {
               ))}
             </div>
             <div className="rounded-lg bg-slate-50 p-3 text-xs text-slate-500">
-              Answers are saved automatically.
+              {t("answers_saved")}
             </div>
           </div>
         }
@@ -125,7 +127,7 @@ export default function Page() {
       {/* §5 Optional IEP / accommodation */}
       <CalloutCard
         eyebrow="Optional — only if you have one"
-        title="IEP or accommodation context, handled with care"
+        title={t("iep_title")}
         body={
           <>
             <p>
@@ -134,7 +136,7 @@ export default function Page() {
               never to label your child or expose raw plan text inside the product.
             </p>
             <p className="mt-3 text-sm text-slate-600">
-              AIVO does not diagnose. AIVO does not replace therapists, IEP teams, or specialists.
+              {t("aivo_disclaimer")}
             </p>
           </>
         }
@@ -157,9 +159,9 @@ export default function Page() {
         mockupTitle="Baseline · Reading · Activity 3"
         mockup={
           <div className="space-y-3">
-            <p className="text-xs text-slate-500">Take a breath. There's no timer.</p>
+            <p className="text-xs text-slate-500">{t("take_a_breath")}</p>
             <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4 text-sm text-slate-700">
-              Which word means the same as <span className="font-bold">happy</span>?
+              {t("which_word_means")} <span className="font-bold">happy</span>?
             </div>
             <div className="grid grid-cols-2 gap-2">
               {["joyful", "tired", "loud", "quiet"].map((w) => (
@@ -173,7 +175,7 @@ export default function Page() {
             </div>
             <div className="flex justify-between text-xs text-slate-500">
               <span>🔊 Read aloud</span>
-              <span>Need a break?</span>
+              <span>{t("need_a_break")}</span>
             </div>
           </div>
         }
@@ -193,12 +195,12 @@ export default function Page() {
         mockup={
           <div className="space-y-3">
             <div className="rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 p-4 text-white">
-              <p className="text-xs uppercase tracking-wider text-purple-100">Today's mission</p>
-              <h3 className="mt-1 font-heading text-xl font-bold">Multiplying by 3s</h3>
-              <p className="mt-1 text-xs text-purple-100">With Atlas · ~15 minutes</p>
+              <p className="text-xs uppercase tracking-wider text-purple-100">{t("todays_mission")}</p>
+              <h3 className="mt-1 font-heading text-xl font-bold">{t("multiplying_by_3s")}</h3>
+              <p className="mt-1 text-xs text-purple-100">{t("with_atlas")}</p>
             </div>
             <div className="rounded-lg bg-slate-900 py-2.5 text-center text-sm font-semibold text-white">
-              Start mission →
+              {t("start_mission")}
             </div>
           </div>
         }
@@ -219,7 +221,7 @@ export default function Page() {
         mockup={
           <div className="space-y-3">
             <h3 className="font-heading text-base font-bold text-slate-900">
-              Maya had a strong week!
+              {t("maya_strong_week")}
             </h3>
             <p className="text-sm text-slate-600">
               5 of 5 missions completed. Focus areas adapted twice.

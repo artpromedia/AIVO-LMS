@@ -2,6 +2,7 @@
 import { Suspense, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   Mail,
   Lock,
@@ -43,6 +44,7 @@ const VALUE_PROPS = [
 ];
 
 function SignupInner() {
+  const t = useTranslations("marketing.page_signup");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -76,7 +78,7 @@ function SignupInner() {
       </div>
 
       <header className="relative z-30 flex items-center justify-between p-6">
-        <Link href="/" aria-label="AIVO home">
+        <Link href="/" aria-label={t("logo_aria_label")}>
           <Image
             src="/images/aivo-logo-purple.png"
             alt="AIVO"
@@ -94,10 +96,10 @@ function SignupInner() {
             <div className="text-center mb-7">
               <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-100 text-violet-700 font-bold text-xs uppercase tracking-wider mb-3">
                 <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
-                Start free today
+                {t("start_free_today")}
               </span>
               <h1 className="text-3xl font-heading font-bold text-slate-900 leading-tight">
-                Create your account
+                {t("create_your_account")}
               </h1>
               <p className="text-slate-500 font-body mt-1.5">
                 A friendly home for every kind of learner.
@@ -152,7 +154,7 @@ function SignupInner() {
                   htmlFor="signup-name"
                   className="block text-sm font-bold text-slate-700 ml-1"
                 >
-                  Full name
+                  {t("label_full_name")}
                 </label>
                 <div className="relative">
                   <User
@@ -168,7 +170,7 @@ function SignupInner() {
                     autoComplete="name"
                     style={{ minHeight: 44 }}
                     className="w-full h-14 pl-12 pr-4 rounded-2xl bg-slate-50 border-2 border-slate-100 text-slate-900 font-body focus:bg-white focus:border-[hsl(var(--visual-primary))] focus:ring-4 focus:ring-[hsl(var(--visual-primary)/0.15)] outline-none transition"
-                    placeholder="Alex Parker"
+                    placeholder={t("placeholder_name")}
                   />
                 </div>
               </div>
@@ -204,7 +206,7 @@ function SignupInner() {
                   htmlFor="signup-password"
                   className="block text-sm font-bold text-slate-700 ml-1"
                 >
-                  Password
+                  {t("label_password")}
                 </label>
                 <div className="relative">
                   <Lock
@@ -221,7 +223,7 @@ function SignupInner() {
                     autoComplete="new-password"
                     style={{ minHeight: 44 }}
                     className="w-full h-14 pl-12 pr-12 rounded-2xl bg-slate-50 border-2 border-slate-100 text-slate-900 font-body focus:bg-white focus:border-[hsl(var(--visual-primary))] focus:ring-4 focus:ring-[hsl(var(--visual-primary)/0.15)] outline-none transition"
-                    placeholder="At least 8 characters"
+                    placeholder={t("placeholder_password")}
                   />
                   <button
                     type="button"
@@ -233,7 +235,7 @@ function SignupInner() {
                   </button>
                 </div>
                 <p className="text-xs text-slate-500 font-body mt-1.5 ml-1">
-                  Mix letters, numbers, and a symbol for the strongest result.
+                  {t("password_hint")}
                 </p>
               </div>
 
@@ -252,11 +254,11 @@ function SignupInner() {
                       className="motion-safe:animate-spin"
                       aria-hidden="true"
                     />
-                    Creating account...
+                    {t("creating_account")}
                   </>
                 ) : (
                   <>
-                    Create account
+                    {t("create_account")}
                     <ArrowRight className="w-5 h-5" aria-hidden="true" />
                   </>
                 )}
@@ -270,7 +272,7 @@ function SignupInner() {
               </span>
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">
                 <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
-                No credit card required
+                {t("no_credit_card")}
               </span>
             </div>
 
@@ -287,7 +289,7 @@ function SignupInner() {
                 href="/privacy-policy"
                 className="text-[hsl(var(--visual-primary))] hover:underline font-bold"
               >
-                Privacy Policy
+                {t("privacy_policy")}
               </Link>
               .
             </p>
@@ -299,7 +301,7 @@ function SignupInner() {
                 className="w-4 h-4 text-[hsl(var(--visual-primary))]"
                 aria-hidden="true"
               />
-              Designed to support COPPA &amp; FERPA
+              {t("coppa_ferpa_badge")}
             </div>
             <p className="text-sm font-medium text-slate-500 mt-5">
               Already have an account?{" "}
@@ -307,7 +309,7 @@ function SignupInner() {
                 href="/login"
                 className="text-[hsl(var(--visual-primary))] font-bold hover:underline"
               >
-                Sign in
+                {t("sign_in")}
               </Link>
             </p>
           </div>
@@ -316,7 +318,7 @@ function SignupInner() {
 
       <footer className="relative z-10 flex items-center justify-center gap-6 pb-6 text-xs text-slate-500 font-body font-semibold">
         <Link href="/privacy-policy" className="hover:text-[hsl(var(--visual-primary))] transition">
-          Privacy
+          {t("footer_privacy")}
         </Link>
         <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
         <Link

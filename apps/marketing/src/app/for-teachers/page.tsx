@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { audienceMetadata } from "@/components/marketing/AudiencePage";
 import { AUDIENCES } from "@/lib/landing-content";
@@ -8,7 +9,8 @@ const audience = AUDIENCES.find((a) => a.slug === "for-teachers")!;
 
 export const metadata: Metadata = audienceMetadata(audience);
 
-export default function Page() {
+export default async function Page() {
+  const t = await getTranslations("marketing.page_for_teachers");
   return (
     <LandingPageLayout
       badge={audience.badge}
@@ -100,15 +102,15 @@ export default function Page() {
             <div className="rounded-lg border border-slate-200 bg-white p-3">
               <p className="text-xs font-semibold text-slate-500">Title</p>
               <p className="font-heading text-sm font-bold text-slate-900">
-                Multiplying by 3s — week 4
+                {t("assignment_title")}
               </p>
             </div>
             <div className="rounded-lg border border-slate-200 bg-white p-3">
-              <p className="text-xs font-semibold text-slate-500">Roster</p>
-              <p className="text-sm text-slate-700">Class 3B · 22 learners</p>
+              <p className="text-xs font-semibold text-slate-500">{t("roster_label")}</p>
+              <p className="text-sm text-slate-700">{t("roster_value")}</p>
             </div>
             <div className="rounded-lg bg-purple-600 py-2 text-center text-sm font-semibold text-white">
-              Assign to class
+              {t("assign_cta")}
             </div>
           </div>
         }
@@ -149,7 +151,7 @@ export default function Page() {
       {/* §6 Instructional support summaries */}
       <CalloutCard
         eyebrow="Instructional summaries"
-        title="Plain-language summaries you'd actually send home"
+        title={t("callout_summaries_title")}
         body="AIVO writes per-learner instructional summaries in the tone of a thoughtful teacher — strengths first, growth areas named in non-clinical language, and next steps you can act on."
         tone="blue"
       />
@@ -157,7 +159,7 @@ export default function Page() {
       {/* §7 Privacy-aware accommodation view */}
       <CalloutCard
         eyebrow="Accommodation view"
-        title="Teacher-safe accommodation summaries"
+        title={t("callout_accommodation_title")}
         body={
           <>
             <p>

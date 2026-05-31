@@ -1,5 +1,6 @@
 import { MARKETING_ACCENTS } from "@aivo/brand";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { LegalPageLayout } from "@/components/marketing/legal/LegalPageLayout";
 import { SITE_URL } from "@/lib/constants";
 
@@ -10,11 +11,12 @@ export const metadata: Metadata = {
   alternates: { canonical: `${SITE_URL}/trust` },
 };
 
-export default function TrustPage() {
+export default async function TrustPage() {
+  const t = await getTranslations("marketing.page_trust");
   return (
     <LegalPageLayout
       badge="Trust"
-      title="What we promise — and how to check."
+      title={t("title")}
       subtitle="A short, honest summary of how AIVO behaves around learners, families, and teachers. Every claim here is something we can show evidence for if you ask."
       icon="🤝"
       accentColor={MARKETING_ACCENTS.purple}

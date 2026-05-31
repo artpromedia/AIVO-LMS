@@ -1,11 +1,13 @@
 import { MARKETING_ACCENTS } from "@aivo/brand";
+import { getTranslations } from "next-intl/server";
 import { LegalPageLayout } from "@/components/marketing/legal/LegalPageLayout";
 
-export default function FerpaCompliancePage() {
+export default async function FerpaCompliancePage() {
+  const t = await getTranslations("marketing.page_ferpa_compliance");
   return (
     <LegalPageLayout
       badge="Education Privacy"
-      title="FERPA Compliance Statement"
+      title={t("title")}
       subtitle={`This statement describes how Aivo AI Learning Technologies Inc. complies with the Family Educational Rights and Privacy Act of 1974, as amended (20 U.S.C. § 1232g), and the U.S. Department of Education's implementing regulations at 34 C.F.R. Part 99 (collectively, "FERPA"). It is intended to be read together with our Privacy Policy, COPPA Compliance Statement, and our standard Data Privacy Agreement for schools and districts.`}
       icon="🎓"
       accentColor={MARKETING_ACCENTS.blue}

@@ -1,5 +1,6 @@
 "use client";
 import { MARKETING_ACCENTS } from "@aivo/brand";
+import { useTranslations } from "next-intl";
 import { CompanyPageLayout } from "@/components/marketing/legal/CompanyPageLayout";
 
 const PERKS = [
@@ -70,17 +71,18 @@ const DEPARTMENTS = [
 ];
 
 export default function CareersPage() {
+  const t = useTranslations("marketing.page_careers");
   return (
     <CompanyPageLayout
       badge="Careers"
       breadcrumbSlug="careers"
-      title="Join the AIVO Team"
+      title={t("page_title")}
       subtitle="Help us build a world where every student gets the personalized education they deserve. We're always looking for passionate people."
       icon="🚀"
       accentColor={MARKETING_ACCENTS.emeraldDeep}
     >
       <section className="mb-16">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-8">Why Work at AIVO?</h2>
+        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-8">{t("why_work_heading")}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {PERKS.map((perk) => (
             <div
@@ -96,7 +98,7 @@ export default function CareersPage() {
       </section>
 
       <section>
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-8">Open Positions</h2>
+        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-8">{t("open_positions_heading")}</h2>
         <div className="space-y-8">
           {DEPARTMENTS.map((dept) => (
             <div key={dept.name}>
@@ -124,7 +126,7 @@ export default function CareersPage() {
                       className="inline-flex items-center px-5 py-2 rounded-full text-sm font-bold text-white transition hover:opacity-90 flex-shrink-0"
                       style={{ backgroundColor: dept.color }}
                     >
-                      Apply Now
+                      {t("apply_now")}
                     </a>
                   </div>
                 ))}
@@ -135,7 +137,7 @@ export default function CareersPage() {
       </section>
 
       <div className="mt-16 p-8 rounded-3xl bg-emerald-50 border border-emerald-100 text-center">
-        <h3 className="text-xl font-heading font-bold text-slate-900 mb-2">Don't see your role?</h3>
+        <h3 className="text-xl font-heading font-bold text-slate-900 mb-2">{t("no_role_heading")}</h3>
         <p className="text-slate-600 font-body mb-6">
           We are always interested in hearing from talented people passionate about education and
           technology.
@@ -144,7 +146,7 @@ export default function CareersPage() {
           href="mailto:careers@aivolearning.com?subject=General Application"
           className="inline-flex items-center gap-2 px-8 py-3 rounded-full bg-emerald-600 text-white font-bold hover:bg-emerald-700 transition shadow-lg"
         >
-          Send General Application
+          {t("send_general_application")}
         </a>
       </div>
     </CompanyPageLayout>

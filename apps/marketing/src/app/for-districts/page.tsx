@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { audienceMetadata } from "@/components/marketing/AudiencePage";
 import { AUDIENCES } from "@/lib/landing-content";
@@ -40,7 +41,8 @@ const DEPLOYMENT_STEPS = [
   },
 ];
 
-export default function Page() {
+export default async function Page() {
+  const t = await getTranslations("marketing.page_for_districts");
   return (
     <LandingPageLayout
       badge={audience.badge}
@@ -66,7 +68,7 @@ export default function Page() {
       {/* §3 Rostering / SIS */}
       <CalloutCard
         eyebrow="Rostering"
-        title="OneRoster-ready, CSV-friendly, manual if you must"
+        title={t("rostering_title")}
         body={
           <>
             <p>
@@ -89,7 +91,7 @@ export default function Page() {
           id="licensing-heading"
           className="text-2xl md:text-3xl font-heading font-bold text-slate-900 mb-3"
         >
-          Seat licensing, district pricing
+          {t("licensing_heading")}
         </h2>
         <p className="text-slate-600 font-body mb-6 leading-relaxed">
           Per-learner seats with district volume tiers. Multi-year commitments carry lock-in
@@ -118,7 +120,7 @@ export default function Page() {
       {/* §6 Accessibility */}
       <CalloutCard
         eyebrow="Accessibility"
-        title="WCAG 2.2 AA as the design target"
+        title={t("accessibility_title")}
         body={
           <>
             <p>
@@ -127,7 +129,7 @@ export default function Page() {
               high-contrast, and large-text modes.
             </p>
             <p className="mt-3 text-sm text-slate-600">
-              We maintain an accessibility statement and publish known gaps — not just claims.
+              {t("accessibility_gaps_note")}
             </p>
           </>
         }
@@ -169,7 +171,7 @@ export default function Page() {
       {/* §8 DPA / security packet CTA (inline because it's the primary district ask) */}
       <CalloutCard
         eyebrow="For procurement"
-        title="Request our security and DPA packet"
+        title={t("dpa_title")}
         body="Architecture diagram, data flow, subprocessor list, accessibility statement, and a draft Data Processing Agreement — sent the same business day."
         ctaLabel="Request the packet"
         ctaHref="/contact?intent=district-packet"

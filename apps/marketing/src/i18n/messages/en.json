@@ -1252,6 +1252,303 @@
       "cta_primary": "Start Family Trial",
       "cta_secondary": "Talk to District Sales",
       "cta_image_alt": "A parent and child learning together on a sofa"
+    },
+    "page_reset_password": {
+      "logo_aria": "AIVO home",
+      "heading": "Reset your password",
+      "subheading": "Choose a new password for your account.",
+      "success_heading": "Password updated",
+      "back_to_sign_in": "Back to sign in",
+      "label_new_password": "New password",
+      "placeholder_new_password": "At least 12 characters",
+      "label_confirm_password": "Confirm new password",
+      "placeholder_confirm_password": "Re-enter your new password",
+      "passwords_mismatch": "Passwords don't match yet",
+      "btn_updating": "Updating...",
+      "btn_submit": "Update password",
+      "trust_badge": "Designed to support COPPA · FERPA · SOC 2",
+      "loading": "Loading..."
+    },
+    "page_features_homework_helper": {
+      "page_title": "Guided help, never an answer dump",
+      "callout_title": "Homework Helper will not dump answers",
+      "get_help_cta": "Get help →",
+      "clarifying_question": "Before we solve it — what does “in all” mean to you in this problem?",
+      "your_answer_label": "Your answer:",
+      "explanation_text": "You added 3 four times. That’s the same as 3 × 4. That’s called",
+      "mastery_updated": "Mastery updated: Multiplying as repeated addition · building.",
+      "recommended_next_label": "Recommended next",
+      "recommended_lesson_title": "Multiplying by 3s · LessonRun",
+      "recommended_lesson_meta": "With Atlas · ~15 minutes",
+      "added_to_session": "Added to Maya’s next session."
+    },
+    "page_waitlist": {
+      "page_title": "Save your spot.",
+      "form_heading": "Tell us about your learner",
+      "form_subheading": "Two required fields. The rest helps us pick the right onboarding when your spot opens.",
+      "promise_heading": "What we promise",
+      "promise_no_spam_title": "No spam",
+      "promise_no_spam_body": "One email when your spot opens. Maybe a second if you don’t reply.",
+      "promise_no_sharing_title": "No sharing",
+      "promise_no_sharing_body": "We don’t sell or share your contact info — ever. See our privacy policy.",
+      "promise_easy_out_title": "Easy out",
+      "promise_easy_out_body": "Reply “remove” to any waitlist email and we delete your record."
+    },
+    "page_resources": {
+      "cta_get_started": "Get Started",
+      "badge": "Resources",
+      "heading": "Guides, primers, and reading paths",
+      "guides_heading": "Guides",
+      "guides_subheading": "Longer-form practical guides for schools, districts, and procurement teams.",
+      "blog_heading": "From the blog",
+      "blog_subheading": "Short articles on how the learning loop actually works."
+    },
+    "page_for_teachers": {
+      "assignment_title": "Multiplying by 3s — week 4",
+      "roster_label": "Roster",
+      "roster_value": "Class 3B · 22 learners",
+      "assign_cta": "Assign to class",
+      "callout_summaries_title": "Plain-language summaries you’d actually send home",
+      "callout_accommodation_title": "Teacher-safe accommodation summaries"
+    },
+    "page_contact": {
+      "page_title": "Talk to a real person.",
+      "form_heading": "Send us a message",
+      "form_subheading": "Tell us what you’re looking for and we’ll route it to the right team.",
+      "inboxes_heading": "Other ways to reach us"
+    },
+    "page_blog": {
+      "nav_resources": "Resources",
+      "cta_get_started": "Get Started",
+      "heading": "Notes from the AIVO team"
+    },
+    "page_for_schools": {
+      "callout_workflow_title": "Personalized learning fails when it adds teacher workflow",
+      "callout_neurodiverse_title": "Built with neurodiverse learners in mind",
+      "progress_summary": "Maya is showing steady reading progress."
+    },
+    "page_subjects": {
+      "page_title": "One tutor per subject. One Brain Clone for your child."
+    },
+    "page_signup": {
+      "logo_aria_label": "AIVO home",
+      "start_free_today": "Start free today",
+      "create_your_account": "Create your account",
+      "label_full_name": "Full name",
+      "placeholder_name": "Alex Parker",
+      "label_password": "Password",
+      "placeholder_password": "At least 8 characters",
+      "password_hint": "Mix letters, numbers, and a symbol for the strongest result.",
+      "creating_account": "Creating account...",
+      "create_account": "Create account",
+      "no_credit_card": "No credit card required",
+      "privacy_policy": "Privacy Policy",
+      "coppa_ferpa_badge": "Designed to support COPPA & FERPA",
+      "sign_in": "Sign in",
+      "footer_privacy": "Privacy"
+    },
+    "page_forgot_password": {
+      "logo_aria_label": "AIVO home",
+      "heading": "Forgot password?",
+      "subheading": "Enter your email and we'll send you a link to reset your password.",
+      "check_inbox": "Check your inbox",
+      "if_account_exists": "If an account exists for",
+      "back_to_sign_in": "Back to sign in",
+      "sending": "Sending...",
+      "send_reset_link": "Send reset link",
+      "back_to_sign_in_form": "Back to sign in",
+      "coppa_ferpa_soc2_badge": "Designed to support COPPA · FERPA · SOC 2"
+    },
+    "page_press_kit": {
+      "media_resources": "Media Resources",
+      "company_overview": "Company Overview",
+      "quick_facts": "Quick Facts",
+      "brand_assets": "Brand Assets",
+      "logo_purple_alt": "AIVO Logo Purple",
+      "primary_logo_purple": "Primary Logo (Purple)",
+      "logo_white_alt": "AIVO Logo White",
+      "logo_dark_bg": "Logo on Dark Background",
+      "brand_colors": "Brand Colors",
+      "media_contact": "Media Contact"
+    },
+    "page_features_todays_mission": {
+      "page_title": "One next-best learning action, every day",
+      "problem_title": "Learners get lost in dashboards",
+      "mockup_todays_mission": "Today's mission",
+      "mockup_lesson_title": "Multiplying by 3s",
+      "mockup_lesson_meta": "With Atlas · ~15 minutes · Math",
+      "mockup_start_mission": "Start mission →",
+      "mockup_accessibility_note": "Read-aloud and break mode are on for Maya.",
+      "visibility_title": "Plain-language visibility, not a data dump"
+    },
+    "page_for_districts": {
+      "rostering_title": "OneRoster-ready, CSV-friendly, manual if you must",
+      "licensing_heading": "Seat licensing, district pricing",
+      "accessibility_title": "WCAG 2.2 AA as the design target",
+      "accessibility_gaps_note": "We maintain an accessibility statement and publish known gaps — not just claims.",
+      "dpa_title": "Request our security and DPA packet"
+    },
+    "page_guides": {
+      "nav_resources": "Resources",
+      "nav_get_started": "Get Started",
+      "badge": "Guides",
+      "heading": "Practical guides",
+      "subheading": "Longer-form, procurement-friendly reading for schools, districts, and families."
+    },
+    "page_compare": {
+      "eyebrow": "Compare",
+      "heading": "Choose your role to see how AIVO fits.",
+      "see_comparison": "See the comparison →"
+    },
+    "page_for_special_education": {
+      "support_title": "Support should meet the learner where they are",
+      "iep_sharing_title": "Sharing IEP or accommodation context",
+      "teacher_summaries_title": "Teacher-safe support summaries"
+    },
+    "page_tutors": {
+      "page_title": "Fourteen AI tutors. One Brain Clone for your child."
+    },
+    "page_about": {
+      "get_started": "Get Started",
+      "our_mission": "Our Mission",
+      "no_learner_left_behind": "No Learner Left Behind",
+      "core_principles": "Core Principles",
+      "core_principles_sub": "The foundations that guide everything we build.",
+      "our_values": "Our Values",
+      "our_values_sub": "What we stand for as a company and as educators.",
+      "meet_our_leadership": "Meet Our Leadership",
+      "linkedin_profile": "LinkedIn Profile",
+      "join_our_mission": "Join Our Mission",
+      "view_open_positions": "View Open Positions",
+      "contact_us": "Contact Us",
+      "privacy": "Privacy",
+      "accessibility": "Accessibility"
+    },
+    "page_for_parents": {
+      "iep_title": "IEP or accommodation context, handled with care",
+      "reading_question": "How does your child feel about reading?",
+      "answers_saved": "Answers are saved automatically.",
+      "aivo_disclaimer": "AIVO does not diagnose. AIVO does not replace therapists, IEP teams, or specialists.",
+      "take_a_breath": "Take a breath. There's no timer.",
+      "which_word_means": "Which word means the same as",
+      "need_a_break": "Need a break?",
+      "todays_mission": "Today's mission",
+      "multiplying_by_3s": "Multiplying by 3s",
+      "with_atlas": "With Atlas · ~15 minutes",
+      "start_mission": "Start mission →",
+      "maya_strong_week": "Maya had a strong week!"
+    },
+    "page_demo": {
+      "hero_title": "See AIVO in action.",
+      "form_heading": "Tell us a little about your setting",
+      "form_subheading": "The more we know, the more useful the walkthrough. Required fields are marked.",
+      "what_happens_next": "What happens next",
+      "step1_label": "Step 1 · Within 1 business day",
+      "step2_label": "Step 2 · 30-minute walkthrough",
+      "step2_body": "We show learner, parent, and teacher views — and answer your questions live.",
+      "step3_label": "Step 3 · Pilot or proposal",
+      "step3_body": "If it's a fit, we scope a short pilot or send a written proposal — no pressure."
+    },
+    "page_features_lessonrun": {
+      "hero_title": "The personalized learning unit behind every AIVO lesson",
+      "voice_support_title": "Voice support on every step",
+      "break_mode_title": "A calm pause — not a rage-quit",
+      "count_by_3s_prompt": "Let's count by 3s up to 12. Start at 3. What comes next?",
+      "hint_counting_fingers": "Try counting on your fingers: 3 · 6 · ? — what number comes three more than 6?",
+      "need_another_hint": "Need another hint?",
+      "maya_strong_week": "Maya had a strong week!"
+    },
+    "page_careers": {
+      "page_title": "Join the AIVO Team",
+      "why_work_heading": "Why Work at AIVO?",
+      "open_positions_heading": "Open Positions",
+      "apply_now": "Apply Now",
+      "no_role_heading": "Don't see your role?",
+      "send_general_application": "Send General Application"
+    },
+    "page_pricing": {
+      "hero_title": "Honest pricing. No surprises.",
+      "for_families": "For families",
+      "family_disclaimer": "Month-to-month. Cancel any time. 30-day money-back guarantee on paid plans.",
+      "for_schools": "For schools and districts",
+      "pricing_faq_heading": "Pricing FAQ"
+    },
+    "page_features": {
+      "eyebrow": "Features",
+      "heading": "Real learning experiences, not feature checklists.",
+      "learn_more": "Learn more →"
+    },
+    "page_thank_you": {
+      "hero_title": "We got it — thanks.",
+      "while_you_wait": "While you wait"
+    },
+    "page_levels": {
+      "hero_title": "Five levels. One platform. Every learner."
+    },
+    "page_accessibility": {
+      "title": "AIVO Accessibility Statement"
+    },
+    "page_cookie_policy": {
+      "title": "Cookie Policy"
+    },
+    "page_coppa_compliance": {
+      "title": "COPPA Compliance Statement"
+    },
+    "page_ferpa_compliance": {
+      "title": "FERPA Compliance Statement"
+    },
+    "page_privacy_policy": {
+      "title": "AIVO Privacy Policy"
+    },
+    "page_security": {
+      "title": "How we protect your data."
+    },
+    "page_subprocessors": {
+      "get_started": "Get Started",
+      "badge": "Subprocessors",
+      "heading": "AIVO subprocessors",
+      "current_subprocessors": "Current subprocessors",
+      "col_subprocessor": "Subprocessor",
+      "col_purpose": "Purpose",
+      "col_data_category": "Data category",
+      "col_region": "Region",
+      "col_status": "Status",
+      "how_we_use_heading": "How we use this list",
+      "reporting_heading": "Reporting subprocessor changes",
+      "questions_heading": "Questions?",
+      "footer_privacy": "Privacy",
+      "footer_security": "Security",
+      "footer_accessibility": "Accessibility"
+    },
+    "page_terms_of_service": {
+      "title": "AIVO Terms of Service"
+    },
+    "page_trust": {
+      "title": "What we promise — and how to check."
+    },
+    "page_compare_detail": {
+      "aivo_best_for": "AIVO is best for",
+      "side_by_side": "Side-by-side comparison",
+      "col_feature": "Feature",
+      "honest_note": "An honest note from us",
+      "other_comparisons": "Other comparisons"
+    },
+    "page_levels_detail": {
+      "who_its_for": "Who it's for",
+      "whats_included": "What's included",
+      "builtin_accommodations": "Built-in accommodations",
+      "sample_activities": "Sample activities",
+      "other_levels": "Other levels"
+    },
+    "page_subjects_detail": {
+      "key_features": "Key features",
+      "topics_covered": "Topics covered",
+      "other_subjects": "Other subjects"
+    },
+    "page_tutors_detail": {
+      "built_for_every_learner": "Built for every learner",
+      "other_tutors": "Other AIVO tutors",
+      "see_all_tutors": "See all 14 tutors →"
     }
   }
 }

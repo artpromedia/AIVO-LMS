@@ -1252,6 +1252,303 @@
       "cta_primary": "ファミリートライアルを開始",
       "cta_secondary": "学区向けセールスに相談",
       "cta_image_alt": "ソファで一緒に学ぶ保護者と子ども"
+    },
+    "page_reset_password": {
+      "logo_aria": "AIVO ホーム",
+      "heading": "パスワードをリセット",
+      "subheading": "アカウントの新しいパスワードを選んでください。",
+      "success_heading": "パスワードを更新しました",
+      "back_to_sign_in": "サインインに戻る",
+      "label_new_password": "新しいパスワード",
+      "placeholder_new_password": "少なくとも 12 文字",
+      "label_confirm_password": "新しいパスワードを確認",
+      "placeholder_confirm_password": "新しいパスワードを再入力",
+      "passwords_mismatch": "パスワードがまだ一致していません",
+      "btn_updating": "更新中…",
+      "btn_submit": "パスワードを更新",
+      "trust_badge": "COPPA · FERPA · SOC 2 に対応する設計",
+      "loading": "読み込み中…"
+    },
+    "page_features_homework_helper": {
+      "page_title": "段階的なサポート、答えをそのまま渡すことはしません",
+      "callout_title": "孟題ヘルパーは答えをそのまま渡しません",
+      "get_help_cta": "ヘルプを得る →",
+      "clarifying_question": "解く前に—「合わせて」はこの問題で何を意味すると思いますか？",
+      "your_answer_label": "あなたの答え：",
+      "explanation_text": "3 を4 回足しました。これは 3 × 4 と同じです。これを",
+      "mastery_updated": "习熟度更新：繰り返しの足し算としての掛け算 · 学習中。",
+      "recommended_next_label": "次のおすすめ",
+      "recommended_lesson_title": "3 の掛け算 · LessonRun",
+      "recommended_lesson_meta": "Atlas と · 約2 15 分",
+      "added_to_session": "Maya の次のセッションに追加しました。"
+    },
+    "page_waitlist": {
+      "page_title": "お席を確保してください。",
+      "form_heading": "学習者について教えてください",
+      "form_subheading": "必須項目は 2 つです。残りは、お席が開いたときに最適なオンボーディングを選ぶために使用します。",
+      "promise_heading": "私たちの約浟",
+      "promise_no_spam_title": "スパムなし",
+      "promise_no_spam_body": "お席が開いたときに 1 通のメール。返信がなければもう 1 通届くことがあります。",
+      "promise_no_sharing_title": "情報の共有なし",
+      "promise_no_sharing_body": "連絡先情報を販売または共有することは一切ありません。プライバシーポリシーをご確認ください。",
+      "promise_easy_out_title": "簡単に退出",
+      "promise_easy_out_body": "待機リストのメールに「削除」と返信すると登録を削除します。"
+    },
+    "page_resources": {
+      "cta_get_started": "はじめる",
+      "badge": "リソース",
+      "heading": "ガイド、入門資料、読み進めパス",
+      "guides_heading": "ガイド",
+      "guides_subheading": "学校、学区、調達チーム向けの詳細な実用ガイド。",
+      "blog_heading": "ブログから",
+      "blog_subheading": "学習ループが実際にどう機能するかについての短い記事。"
+    },
+    "page_for_teachers": {
+      "assignment_title": "3 の掛け算 — 第 4 週",
+      "roster_label": "名簿",
+      "roster_value": "3B クラス · 22 名の学習者",
+      "assign_cta": "クラスに割り当てる",
+      "callout_summaries_title": "実際に保護者に送れるわかりやすい言葉のまとめ",
+      "callout_accommodation_title": "教師が安心して閲覧できる配慮まとめ"
+    },
+    "page_contact": {
+      "page_title": "リアルな人に相談。",
+      "form_heading": "メッセージを送る",
+      "form_subheading": "お求めの内容をお知らせください。最適なチームに転送します。",
+      "inboxes_heading": "その他のお問い合わせ方法"
+    },
+    "page_blog": {
+      "nav_resources": "リソース",
+      "cta_get_started": "はじめる",
+      "heading": "AIVO チームからのノート"
+    },
+    "page_for_schools": {
+      "callout_workflow_title": "個別最適化学習は教師の業務を増やすと失敗する",
+      "callout_neurodiverse_title": "神経多様性の学習者を意識した設計",
+      "progress_summary": "Maya の読み取りは着実に進歩しています。"
+    },
+    "page_subjects": {
+      "page_title": "科目ごとに一人の家庭教師。お子さまのためのブレインクローン。"
+    },
+    "page_signup": {
+      "logo_aria_label": "AIVO ホーム",
+      "start_free_today": "今日から無料で始める",
+      "create_your_account": "アカウントを作成する",
+      "label_full_name": "フルネーム",
+      "placeholder_name": "山田太郎",
+      "label_password": "パスワード",
+      "placeholder_password": "8文字以上",
+      "password_hint": "文字、数字、記号を組み合わせると最も安全です。",
+      "creating_account": "アカウントを作成中...",
+      "create_account": "アカウントを作成",
+      "no_credit_card": "クレジットカード不要",
+      "privacy_policy": "プライバシーポリシー",
+      "coppa_ferpa_badge": "COPPA・FERPAへの準拠を支援する設計",
+      "sign_in": "サインイン",
+      "footer_privacy": "プライバシー"
+    },
+    "page_forgot_password": {
+      "logo_aria_label": "AIVO ホーム",
+      "heading": "パスワードをお忘れですか？",
+      "subheading": "メールアドレスを入力してください。パスワード再設定リンクをお送りします。",
+      "check_inbox": "受信トレイを確認してください",
+      "if_account_exists": "このアドレスにアカウントが存在する場合：",
+      "back_to_sign_in": "サインインに戻る",
+      "sending": "送信中...",
+      "send_reset_link": "再設定リンクを送信",
+      "back_to_sign_in_form": "サインインに戻る",
+      "coppa_ferpa_soc2_badge": "COPPA · FERPA · SOC 2 への準拠を支援する設計"
+    },
+    "page_press_kit": {
+      "media_resources": "メディアリソース",
+      "company_overview": "会社概要",
+      "quick_facts": "クイックファクト",
+      "brand_assets": "ブランドアセット",
+      "logo_purple_alt": "AIVO ロゴ パープル",
+      "primary_logo_purple": "プライマリロゴ（パープル）",
+      "logo_white_alt": "AIVO ロゴ ホワイト",
+      "logo_dark_bg": "ダーク背景のロゴ",
+      "brand_colors": "ブランドカラー",
+      "media_contact": "メディア連絡先"
+    },
+    "page_features_todays_mission": {
+      "page_title": "毎日一つ、次のベスト学習アクション",
+      "problem_title": "学習者はダッシュボードで迷子になる",
+      "mockup_todays_mission": "今日のミッション",
+      "mockup_lesson_title": "3の掛け算",
+      "mockup_lesson_meta": "Atlasと · 約15分 · 算数",
+      "mockup_start_mission": "ミッションを開始 →",
+      "mockup_accessibility_note": "Mayaの読み上げと休憩モードがオンです。",
+      "visibility_title": "平易な言葉での可視化、データダンプではなく"
+    },
+    "page_for_districts": {
+      "rostering_title": "OneRoster対応、CSVフレンドリー、手動も可",
+      "licensing_heading": "座席ライセンス、学区価格",
+      "accessibility_title": "WCAG 2.2 AAをデザイン目標に",
+      "accessibility_gaps_note": "アクセシビリティ声明を維持し、既知のギャップを公開しています — 主張だけではありません。",
+      "dpa_title": "セキュリティおよびDPAパッケージを請求する"
+    },
+    "page_guides": {
+      "nav_resources": "リソース",
+      "nav_get_started": "始める",
+      "badge": "ガイド",
+      "heading": "実践的ガイド",
+      "subheading": "学校、学区、家族向けの詳細で調達に役立つ読み物。"
+    },
+    "page_compare": {
+      "eyebrow": "比較",
+      "heading": "あなたの役割を選んで、AIVOがどう合うか見てみましょう。",
+      "see_comparison": "比較を見る →"
+    },
+    "page_for_special_education": {
+      "support_title": "サポートは学習者がいる場所に届くべき",
+      "iep_sharing_title": "IEPまたは合理的配慮のコンテキストを共有する",
+      "teacher_summaries_title": "教師向け安全なサポートサマリー"
+    },
+    "page_tutors": {
+      "page_title": "14人のAIチューター。お子様のためのBrain Clone。"
+    },
+    "page_about": {
+      "get_started": "始める",
+      "our_mission": "私たちのミッション",
+      "no_learner_left_behind": "誰一人置き去りにしない",
+      "core_principles": "中核原則",
+      "core_principles_sub": "私たちのすべての開発を導く基盤です。",
+      "our_values": "私たちの価値観",
+      "our_values_sub": "企業として、教育者として、私たちが大切にしていること。",
+      "meet_our_leadership": "リーダーシップチームをご紹介",
+      "linkedin_profile": "LinkedInプロフィール",
+      "join_our_mission": "私たちのミッションに参加する",
+      "view_open_positions": "募集中のポジションを見る",
+      "contact_us": "お問い合わせ",
+      "privacy": "プライバシー",
+      "accessibility": "アクセシビリティ"
+    },
+    "page_for_parents": {
+      "iep_title": "IEPまたは合理的配慮の文脈を、丁寧に扱います",
+      "reading_question": "お子さんは読書に対してどのような気持ちですか？",
+      "answers_saved": "回答は自動的に保存されます。",
+      "aivo_disclaimer": "AIVOは診断を行いません。AIVOはセラピスト、IEPチーム、または専門家の代わりにはなりません。",
+      "take_a_breath": "深呼吸してください。タイマーはありません。",
+      "which_word_means": "と同じ意味の言葉はどれですか",
+      "need_a_break": "休憩が必要ですか？",
+      "todays_mission": "今日のミッション",
+      "multiplying_by_3s": "3の掛け算",
+      "with_atlas": "Atlasと · 約15分",
+      "start_mission": "ミッションを開始 →",
+      "maya_strong_week": "マヤは今週、頑張りました！"
+    },
+    "page_demo": {
+      "hero_title": "AIVOの実力をご覧ください。",
+      "form_heading": "あなたの状況を少し教えてください",
+      "form_subheading": "情報が多いほど、デモはより役立つものになります。必須項目はマークされています。",
+      "what_happens_next": "次に何が起こるか",
+      "step1_label": "ステップ 1 · 1営業日以内",
+      "step2_label": "ステップ 2 · 30分間のウォークスルー",
+      "step2_body": "学習者、保護者、教師のビューをお見せし、ご質問にライブでお答えします。",
+      "step3_label": "ステップ 3 · パイロットまたは提案",
+      "step3_body": "適合すれば、短いパイロットを設定するか、書面による提案をお送りします — プレッシャーはありません。"
+    },
+    "page_features_lessonrun": {
+      "hero_title": "すべてのAIVOレッスンの背後にある個別化学習ユニット",
+      "voice_support_title": "すべてのステップでの音声サポート",
+      "break_mode_title": "穏やかな休憩 — 怒りのやめ方ではなく",
+      "count_by_3s_prompt": "3ずつ数えて12まで数えましょう。3から始めます。次は何ですか？",
+      "hint_counting_fingers": "指で数えてみて：3 · 6 · ? — 6よりも3多い数は何ですか？",
+      "need_another_hint": "別のヒントが必要ですか？",
+      "maya_strong_week": "マヤは今週、頑張りました！"
+    },
+    "page_careers": {
+      "page_title": "AIVOチームに参加する",
+      "why_work_heading": "なぜAIVOで働くのか？",
+      "open_positions_heading": "募集中のポジション",
+      "apply_now": "今すぐ応募",
+      "no_role_heading": "あなたのポジションが見つかりませんか？",
+      "send_general_application": "一般応募を送る"
+    },
+    "page_pricing": {
+      "hero_title": "誠実な価格設定。サプライズなし。",
+      "for_families": "ご家庭向け",
+      "family_disclaimer": "月額払い。いつでもキャンセル可能。有料プランは30日間返金保証。",
+      "for_schools": "学校・学区向け",
+      "pricing_faq_heading": "料金に関するよくある質問"
+    },
+    "page_features": {
+      "eyebrow": "機能",
+      "heading": "機能リストではなく、本物の学習体験。",
+      "learn_more": "詳しく見る →"
+    },
+    "page_thank_you": {
+      "hero_title": "受け取りました — ありがとうございます。",
+      "while_you_wait": "お待ちの間に"
+    },
+    "page_levels": {
+      "hero_title": "5つのレベル。1つのプラットフォーム。すべての学習者。"
+    },
+    "page_accessibility": {
+      "title": "AIVO Accessibility Statement"
+    },
+    "page_cookie_policy": {
+      "title": "Cookie Policy"
+    },
+    "page_coppa_compliance": {
+      "title": "COPPA Compliance Statement"
+    },
+    "page_ferpa_compliance": {
+      "title": "FERPA Compliance Statement"
+    },
+    "page_privacy_policy": {
+      "title": "AIVO Privacy Policy"
+    },
+    "page_security": {
+      "title": "How we protect your data."
+    },
+    "page_subprocessors": {
+      "get_started": "Get Started",
+      "badge": "Subprocessors",
+      "heading": "AIVO subprocessors",
+      "current_subprocessors": "Current subprocessors",
+      "col_subprocessor": "Subprocessor",
+      "col_purpose": "Purpose",
+      "col_data_category": "Data category",
+      "col_region": "Region",
+      "col_status": "Status",
+      "how_we_use_heading": "How we use this list",
+      "reporting_heading": "Reporting subprocessor changes",
+      "questions_heading": "Questions?",
+      "footer_privacy": "Privacy",
+      "footer_security": "Security",
+      "footer_accessibility": "Accessibility"
+    },
+    "page_terms_of_service": {
+      "title": "AIVO Terms of Service"
+    },
+    "page_trust": {
+      "title": "What we promise — and how to check."
+    },
+    "page_compare_detail": {
+      "aivo_best_for": "AIVO が最適なのは",
+      "side_by_side": "並べて比較",
+      "col_feature": "機能",
+      "honest_note": "私たちからの正直なコメント",
+      "other_comparisons": "他の比較"
+    },
+    "page_levels_detail": {
+      "who_its_for": "対象ユーザー",
+      "whats_included": "含まれる内容",
+      "builtin_accommodations": "組み込みの配慮機能",
+      "sample_activities": "サンプル活動",
+      "other_levels": "他のレベル"
+    },
+    "page_subjects_detail": {
+      "key_features": "主な機能",
+      "topics_covered": "対象トピック",
+      "other_subjects": "他の教科"
+    },
+    "page_tutors_detail": {
+      "built_for_every_learner": "すべての学習者のために",
+      "other_tutors": "他の AIVO チューター",
+      "see_all_tutors": "全 14 人のチューターを見る →"
     }
   }
 }

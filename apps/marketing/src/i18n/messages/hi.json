@@ -1252,6 +1252,303 @@
       "cta_primary": "फ़ैमिली ट्रायल शुरू करें",
       "cta_secondary": "ज़िला बिक्री से बात करें",
       "cta_image_alt": "सोफ़े पर साथ बैठकर सीखते हुए एक अभिभावक और बच्चा"
+    },
+    "page_reset_password": {
+      "logo_aria": "AIVO होम",
+      "heading": "पासवर्ड रीसेट करें",
+      "subheading": "अपने खाते के लिए नया पासवर्ड चुनें।",
+      "success_heading": "पासवर्ड अपडेट हो गया",
+      "back_to_sign_in": "साइन इन पर वापस जाएं",
+      "label_new_password": "नया पासवर्ड",
+      "placeholder_new_password": "कम से कम 12 अक्षर",
+      "label_confirm_password": "नया पासवर्ड कनफ़र्म करें",
+      "placeholder_confirm_password": "नया पासवर्ड पुनः दर्ज करें",
+      "passwords_mismatch": "पासवर्ड अभी मेल नहीं खाते",
+      "btn_updating": "अपडेट हो रहा है...",
+      "btn_submit": "पासवर्ड अपडेट करें",
+      "trust_badge": "COPPA · FERPA · SOC 2 के समर्थन हेतु डिज़ाइन किया गया",
+      "loading": "लोड हो रहा है..."
+    },
+    "page_features_homework_helper": {
+      "page_title": "मार्गदर्शित सहायता, कभी सीधा जवाब नहीं",
+      "callout_title": "होमवर्क हेल्पर सीधे जवाब नहीं देगा",
+      "get_help_cta": "सहायता पाएं →",
+      "clarifying_question": "हल करने से पहले — इस समस्या में “कुल मिलाकर” आपके लिए क्या अर्थ रखता है?",
+      "your_answer_label": "आपका जवाब:",
+      "explanation_text": "आपने 3 चार बार जोड़ा। यह 3 × 4 के समान है। इसे कहते हैं",
+      "mastery_updated": "दक्षता अपडेट: दोहरावे के रूप में गुणन · निर्माण हो रहा है।",
+      "recommended_next_label": "आगे की सिफ़ारिश",
+      "recommended_lesson_title": "3 से गुणा · LessonRun",
+      "recommended_lesson_meta": "Atlas के साथ · लगभग 15 मिनट",
+      "added_to_session": "Maya के अगले सेशन में जोड़ा गया।"
+    },
+    "page_waitlist": {
+      "page_title": "अपनी जगह सुरक्षित करें।",
+      "form_heading": "अपने सीखने वाले के बारे में बताएं",
+      "form_subheading": "दो आवश्यक फ़ील्ड। बाकी हमें आपकी जगह खुलने पर सही ओनबोर्डिंग चुनने में मदद करता है।",
+      "promise_heading": "हमारा वादा",
+      "promise_no_spam_title": "कोई स्पैम नहीं",
+      "promise_no_spam_body": "जब आपकी जगह खुले तो एक ईमेल। यदि आप नहीं जवाब देते तो शायद एक और।",
+      "promise_no_sharing_title": "कोई साझाकरी नहीं",
+      "promise_no_sharing_body": "हम आपकी संपर्क जानकारी कभी नहीं बेचते या साझा करते। हमारी गोपनीयता नीति देखें।",
+      "promise_easy_out_title": "आसान विदायी",
+      "promise_easy_out_body": "किसी भी वेटलिस्ट ईमेल पर “हटाएं” की प्रतिक्रिया दें और हम आपका रिकॉर्ड हटा देंगे।"
+    },
+    "page_resources": {
+      "cta_get_started": "शुरू करें",
+      "badge": "संसाधन",
+      "heading": "गाइड, प्राइमर और पढ़ने के मार्ग",
+      "guides_heading": "गाइड",
+      "guides_subheading": "विद्यालयों, जिलों और खरीद टीमों के लिए विस्तृत व्यावहारिक गाइड।",
+      "blog_heading": "ब्लॉग से",
+      "blog_subheading": "सीखने की प्रक्रिया वास्तव में कैसे काम करती है इस पर छोटे लेख।"
+    },
+    "page_for_teachers": {
+      "assignment_title": "3 से गुणा — सप्ताह 4",
+      "roster_label": "रोस्टर",
+      "roster_value": "कक्षा 3B · 22 शिक्षार्थी",
+      "assign_cta": "कक्षा को असाइन करें",
+      "callout_summaries_title": "सरल भाषा में सारांश जो आप वास्तव में घर भेजेंगे",
+      "callout_accommodation_title": "शिक्षकों के लिए सुरक्षित सुविधा सारांश"
+    },
+    "page_contact": {
+      "page_title": "किसी वास्तविक व्यक्ति से बात करें।",
+      "form_heading": "हमें संदेश भेजें",
+      "form_subheading": "हमें बताएं कि आप क्या ढूंढ रहे हैं और हम सही टीम को रूट करेंगे।",
+      "inboxes_heading": "संपर्क के अन्य तरीके"
+    },
+    "page_blog": {
+      "nav_resources": "संसाधन",
+      "cta_get_started": "शुरू करें",
+      "heading": "AIVO टीम के नोट्स"
+    },
+    "page_for_schools": {
+      "callout_workflow_title": "व्यक्तिगत शिक्षा तब विफल होती है जब वह शिक्षक का कामबोझ बढ़ाती है",
+      "callout_neurodiverse_title": "न्यूरोडाइवर्स शिक्षार्थियों को ध्यान में रखकर बनाया गया",
+      "progress_summary": "Maya पढ़ने में स्थिर प्रगति दिखा रही है।"
+    },
+    "page_subjects": {
+      "page_title": "प्रत्येक विषय के लिए एक ट्यूटर। आपके बच्चे के लिए एक ब्रेन क्लोन।"
+    },
+    "page_signup": {
+      "logo_aria_label": "AIVO होम",
+      "start_free_today": "आज मुफ्त में शुरू करें",
+      "create_your_account": "अपना खाता बनाएं",
+      "label_full_name": "पूरा नाम",
+      "placeholder_name": "राम शर्मा",
+      "label_password": "पासवर्ड",
+      "placeholder_password": "कम से कम 8 अक्षर",
+      "password_hint": "सबसे मजबूत परिणाम के लिए अक्षर, संख्याएं और एक प्रतीक मिलाएं।",
+      "creating_account": "खाता बनाया जा रहा है...",
+      "create_account": "खाता बनाएं",
+      "no_credit_card": "कोई क्रेडिट कार्ड आवश्यक नहीं",
+      "privacy_policy": "गोपनीयता नीति",
+      "coppa_ferpa_badge": "COPPA और FERPA का समर्थन करने के लिए डिज़ाइन किया गया",
+      "sign_in": "साइन इन करें",
+      "footer_privacy": "गोपनीयता"
+    },
+    "page_forgot_password": {
+      "logo_aria_label": "AIVO होम",
+      "heading": "पासवर्ड भूल गए?",
+      "subheading": "अपना ईमेल दर्ज करें और हम आपको पासवर्ड रीसेट करने का लिंक भेजेंगे।",
+      "check_inbox": "अपना इनबॉक्स जांचें",
+      "if_account_exists": "यदि इस पते के लिए कोई खाता मौजूद है:",
+      "back_to_sign_in": "साइन इन पर वापस जाएं",
+      "sending": "भेजा जा रहा है...",
+      "send_reset_link": "रीसेट लिंक भेजें",
+      "back_to_sign_in_form": "साइन इन पर वापस जाएं",
+      "coppa_ferpa_soc2_badge": "COPPA · FERPA · SOC 2 का समर्थन करने के लिए डिज़ाइन किया गया"
+    },
+    "page_press_kit": {
+      "media_resources": "मीडिया संसाधन",
+      "company_overview": "कंपनी का अवलोकन",
+      "quick_facts": "त्वरित तथ्य",
+      "brand_assets": "ब्रांड संपत्तियां",
+      "logo_purple_alt": "AIVO लोगो बैंगनी",
+      "primary_logo_purple": "प्राथमिक लोगो (बैंगनी)",
+      "logo_white_alt": "AIVO लोगो सफेद",
+      "logo_dark_bg": "गहरे पृष्ठभूमि पर लोगो",
+      "brand_colors": "ब्रांड रंग",
+      "media_contact": "मीडिया संपर्क"
+    },
+    "page_features_todays_mission": {
+      "page_title": "हर दिन एक सर्वोत्तम अगली सीखने की क्रिया",
+      "problem_title": "सीखने वाले डैशबोर्ड में खो जाते हैं",
+      "mockup_todays_mission": "आज का मिशन",
+      "mockup_lesson_title": "3 से गुणा करना",
+      "mockup_lesson_meta": "Atlas के साथ · ~15 मिनट · गणित",
+      "mockup_start_mission": "मिशन शुरू करें →",
+      "mockup_accessibility_note": "Maya के लिए पढ़कर सुनाना और विराम मोड चालू है।",
+      "visibility_title": "सरल भाषा में दृश्यता, डेटा का ढेर नहीं"
+    },
+    "page_for_districts": {
+      "rostering_title": "OneRoster-तैयार, CSV-अनुकूल, जरूरत पर मैन्युअल",
+      "licensing_heading": "सीट लाइसेंसिंग, जिला मूल्य निर्धारण",
+      "accessibility_title": "डिज़ाइन लक्ष्य के रूप में WCAG 2.2 AA",
+      "accessibility_gaps_note": "हम एक पहुंच-योग्यता विवरण बनाए रखते हैं और ज्ञात कमियां प्रकाशित करते हैं — केवल दावे नहीं।",
+      "dpa_title": "हमारा सुरक्षा और DPA पैकेट अनुरोध करें"
+    },
+    "page_guides": {
+      "nav_resources": "संसाधन",
+      "nav_get_started": "शुरू करें",
+      "badge": "गाइड",
+      "heading": "व्यावहारिक गाइड",
+      "subheading": "स्कूलों, जिलों और परिवारों के लिए विस्तृत, खरीद-अनुकूल पठन सामग्री।"
+    },
+    "page_compare": {
+      "eyebrow": "तुलना करें",
+      "heading": "अपनी भूमिका चुनें यह देखने के लिए कि AIVO कैसे उपयुक्त है।",
+      "see_comparison": "तुलना देखें →"
+    },
+    "page_for_special_education": {
+      "support_title": "सहायता को सीखने वाले से वहीं मिलना चाहिए जहां वे हैं",
+      "iep_sharing_title": "IEP या आवास संदर्भ साझा करना",
+      "teacher_summaries_title": "शिक्षकों के लिए सुरक्षित सहायता सारांश"
+    },
+    "page_tutors": {
+      "page_title": "चौदह AI ट्यूटर। आपके बच्चे के लिए एक Brain Clone।"
+    },
+    "page_about": {
+      "get_started": "शुरू करें",
+      "our_mission": "हमारा मिशन",
+      "no_learner_left_behind": "कोई भी सीखने वाला पीछे न छूटे",
+      "core_principles": "मूल सिद्धांत",
+      "core_principles_sub": "वे आधार जो हम जो कुछ भी बनाते हैं उसे दिशा देते हैं।",
+      "our_values": "हमारे मूल्य",
+      "our_values_sub": "एक कंपनी और शिक्षक के रूप में हम किसके लिए खड़े हैं।",
+      "meet_our_leadership": "हमारे नेतृत्व से मिलें",
+      "linkedin_profile": "LinkedIn प्रोफ़ाइल",
+      "join_our_mission": "हमारे मिशन से जुड़ें",
+      "view_open_positions": "खुले पद देखें",
+      "contact_us": "संपर्क करें",
+      "privacy": "गोपनीयता",
+      "accessibility": "अभिगम्यता"
+    },
+    "page_for_parents": {
+      "iep_title": "IEP या सुविधा का संदर्भ, ध्यानपूर्वक संभाला गया",
+      "reading_question": "आपका बच्चा पढ़ने के बारे में कैसा महसूस करता है?",
+      "answers_saved": "उत्तर स्वचालित रूप से सहेजे जाते हैं।",
+      "aivo_disclaimer": "AIVO निदान नहीं करता। AIVO थेरेपिस्ट, IEP टीम या विशेषज्ञों की जगह नहीं लेता।",
+      "take_a_breath": "सांस लें। कोई टाइमर नहीं है।",
+      "which_word_means": "इस शब्द का समान अर्थ कौन-सा है",
+      "need_a_break": "क्या आपको विराम चाहिए?",
+      "todays_mission": "आज का मिशन",
+      "multiplying_by_3s": "3 से गुणा करना",
+      "with_atlas": "Atlas के साथ · ~15 मिनट",
+      "start_mission": "मिशन शुरू करें →",
+      "maya_strong_week": "माया का यह सप्ताह बहुत अच्छा रहा!"
+    },
+    "page_demo": {
+      "hero_title": "AIVO को कार्यरत देखें।",
+      "form_heading": "हमें अपने परिवेश के बारे में थोड़ा बताएं",
+      "form_subheading": "हम जितना अधिक जानेंगे, वॉकथ्रू उतना ही उपयोगी होगा। आवश्यक फ़ील्ड चिह्नित हैं।",
+      "what_happens_next": "आगे क्या होता है",
+      "step1_label": "चरण 1 · 1 कार्य दिवस के भीतर",
+      "step2_label": "चरण 2 · 30 मिनट का वॉकथ्रू",
+      "step2_body": "हम सीखने वाले, अभिभावक और शिक्षक के दृश्य दिखाते हैं — और आपके प्रश्नों का लाइव उत्तर देते हैं।",
+      "step3_label": "चरण 3 · पायलट या प्रस्ताव",
+      "step3_body": "यदि यह उपयुक्त है, तो हम एक छोटा पायलट तय करते हैं या लिखित प्रस्ताव भेजते हैं — कोई दबाव नहीं।"
+    },
+    "page_features_lessonrun": {
+      "hero_title": "AIVO की हर पाठ के पीछे की व्यक्तिगत शिक्षण इकाई",
+      "voice_support_title": "हर चरण पर वॉयस सपोर्ट",
+      "break_mode_title": "एक शांत विराम — क्रोध में छोड़ना नहीं",
+      "count_by_3s_prompt": "चलो 3-3 करके 12 तक गिनते हैं। 3 से शुरू करें। आगे क्या आता है?",
+      "hint_counting_fingers": "अपनी उंगलियों पर गिनने की कोशिश करें: 3 · 6 · ? — 6 से तीन अधिक कौन-सी संख्या है?",
+      "need_another_hint": "क्या आपको और संकेत चाहिए?",
+      "maya_strong_week": "माया का यह सप्ताह बहुत अच्छा रहा!"
+    },
+    "page_careers": {
+      "page_title": "AIVO टीम से जुड़ें",
+      "why_work_heading": "AIVO में काम क्यों करें?",
+      "open_positions_heading": "खुले पद",
+      "apply_now": "अभी आवेदन करें",
+      "no_role_heading": "अपनी भूमिका नहीं दिखती?",
+      "send_general_application": "सामान्य आवेदन भेजें"
+    },
+    "page_pricing": {
+      "hero_title": "ईमानदार मूल्य। कोई आश्चर्य नहीं।",
+      "for_families": "परिवारों के लिए",
+      "family_disclaimer": "महीने-दर-महीने। कभी भी रद्द करें। भुगतान प्लान पर 30-दिन की मनी-बैक गारंटी।",
+      "for_schools": "स्कूलों और जिलों के लिए",
+      "pricing_faq_heading": "मूल्य निर्धारण FAQ"
+    },
+    "page_features": {
+      "eyebrow": "विशेषताएँ",
+      "heading": "वास्तविक शिक्षण अनुभव, न कि सुविधाओं की सूचियाँ।",
+      "learn_more": "और जानें →"
+    },
+    "page_thank_you": {
+      "hero_title": "मिल गया — धन्यवाद।",
+      "while_you_wait": "प्रतीक्षा के दौरान"
+    },
+    "page_levels": {
+      "hero_title": "पाँच स्तर। एक प्लेटफ़ॉर्म। हर सीखने वाला।"
+    },
+    "page_accessibility": {
+      "title": "AIVO Accessibility Statement"
+    },
+    "page_cookie_policy": {
+      "title": "Cookie Policy"
+    },
+    "page_coppa_compliance": {
+      "title": "COPPA Compliance Statement"
+    },
+    "page_ferpa_compliance": {
+      "title": "FERPA Compliance Statement"
+    },
+    "page_privacy_policy": {
+      "title": "AIVO Privacy Policy"
+    },
+    "page_security": {
+      "title": "How we protect your data."
+    },
+    "page_subprocessors": {
+      "get_started": "Get Started",
+      "badge": "Subprocessors",
+      "heading": "AIVO subprocessors",
+      "current_subprocessors": "Current subprocessors",
+      "col_subprocessor": "Subprocessor",
+      "col_purpose": "Purpose",
+      "col_data_category": "Data category",
+      "col_region": "Region",
+      "col_status": "Status",
+      "how_we_use_heading": "How we use this list",
+      "reporting_heading": "Reporting subprocessor changes",
+      "questions_heading": "Questions?",
+      "footer_privacy": "Privacy",
+      "footer_security": "Security",
+      "footer_accessibility": "Accessibility"
+    },
+    "page_terms_of_service": {
+      "title": "AIVO Terms of Service"
+    },
+    "page_trust": {
+      "title": "What we promise — and how to check."
+    },
+    "page_compare_detail": {
+      "aivo_best_for": "AIVO सबसे उपयुक्त है",
+      "side_by_side": "साथ-साथ तुलना",
+      "col_feature": "सुविधा",
+      "honest_note": "हमारी ओर से एक ईमानदार टिप्पणी",
+      "other_comparisons": "अन्य तुलनाएं"
+    },
+    "page_levels_detail": {
+      "who_its_for": "यह किसके लिए है",
+      "whats_included": "क्या शामिल है",
+      "builtin_accommodations": "अंतर्निर्मित सुविधाएं",
+      "sample_activities": "नमूना गतिविधियां",
+      "other_levels": "अन्य स्तर"
+    },
+    "page_subjects_detail": {
+      "key_features": "मुख्य विशेषताएं",
+      "topics_covered": "शामिल विषय",
+      "other_subjects": "अन्य विषय"
+    },
+    "page_tutors_detail": {
+      "built_for_every_learner": "हर शिक्षार्थी के लिए बनाया गया",
+      "other_tutors": "अन्य AIVO ट्यूटर",
+      "see_all_tutors": "सभी 14 ट्यूटर देखें →"
     }
   }
 }

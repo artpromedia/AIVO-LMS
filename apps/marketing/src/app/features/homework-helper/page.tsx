@@ -1,5 +1,6 @@
 import { MARKETING_ACCENTS } from "@aivo/brand";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { SITE_URL } from "@/lib/constants";
 import { CalloutCard, MockupShowcase } from "@/components/marketing/sections";
@@ -21,12 +22,13 @@ export const metadata: Metadata = {
   alternates: { canonical: `${SITE_URL}/features/homework-helper` },
 };
 
-export default function Page() {
+export default async function Page() {
+  const t = await getTranslations("marketing.page_features_homework_helper");
   return (
     <LandingPageLayout
       badge="Feature · Homework Helper"
       badgeColor={MARKETING_ACCENTS.emeraldDeep}
-      title="Guided help, never an answer dump"
+      title={t("page_title")}
       subtitle="Homework Helper walks learners through the problem step by step — clarifying, scaffolding, and recommending what to learn next. It is designed to teach, not to cheat."
       primaryCtaLabel="Start parent setup"
       secondaryCtaLabel="See how LessonRun works"
@@ -60,7 +62,7 @@ export default function Page() {
               value="Maya has 4 bags of marbles. Each bag has 3 marbles. How many in all?"
             />
             <div className="rounded-lg bg-slate-900 py-2 text-center text-sm font-semibold text-white">
-              Get help →
+              {t("get_help_cta")}
             </div>
           </div>
         }
@@ -81,7 +83,7 @@ export default function Page() {
         mockup={
           <div className="space-y-3">
             <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3 text-sm text-slate-700">
-              Before we solve it — what does “in all” mean to you in this problem?
+              {t("clarifying_question")}
             </div>
             <div className="grid grid-cols-2 gap-2">
               {["Add them up", "Multiply", "Not sure", "Show me an example"].map((w) => (
@@ -115,7 +117,7 @@ export default function Page() {
               draw the first bag together. How many marbles go in bag 1?
             </div>
             <div className="rounded-lg bg-white border border-slate-200 p-2 text-sm text-slate-700">
-              Your answer: <span className="font-mono">3</span>
+              {t("your_answer_label")} <span className="font-mono">3</span>
             </div>
           </div>
         }
@@ -136,11 +138,11 @@ export default function Page() {
         mockup={
           <div className="space-y-3">
             <div className="rounded-xl bg-emerald-50 border border-emerald-100 p-3 text-sm text-slate-700">
-              You added 3 four times. That's the same as 3 × 4. That's called
+              {t("explanation_text")}
               <span className="font-semibold"> multiplication as repeated addition.</span>
             </div>
             <p className="text-xs text-slate-500">
-              Mastery updated: Multiplying as repeated addition · building.
+              {t("mastery_updated")}
             </p>
           </div>
         }
@@ -160,13 +162,13 @@ export default function Page() {
         mockup={
           <div className="space-y-2">
             <div className="rounded-xl bg-gradient-to-br from-purple-600 to-blue-600 p-3 text-white">
-              <p className="text-xs uppercase tracking-wider text-purple-100">Recommended next</p>
+              <p className="text-xs uppercase tracking-wider text-purple-100">{t("recommended_next_label")}</p>
               <h3 className="mt-1 font-heading text-base font-bold">
-                Multiplying by 3s · LessonRun
+                {t("recommended_lesson_title")}
               </h3>
-              <p className="mt-0.5 text-xs text-purple-100">With Atlas · ~15 minutes</p>
+              <p className="mt-0.5 text-xs text-purple-100">{t("recommended_lesson_meta")}</p>
             </div>
-            <p className="text-xs text-slate-500">Added to Maya's next session.</p>
+            <p className="text-xs text-slate-500">{t("added_to_session")}</p>
           </div>
         }
       />
@@ -174,7 +176,7 @@ export default function Page() {
       {/* §7 Safety + anti-answer-dump */}
       <CalloutCard
         eyebrow="Safety · the line we hold"
-        title="Homework Helper will not dump answers"
+        title={t("callout_title")}
         body={
           <>
             <p>

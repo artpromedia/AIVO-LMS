@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { WaitlistForm } from "@/components/marketing/forms";
 import { SITE_URL } from "@/lib/constants";
@@ -10,11 +11,12 @@ export const metadata: Metadata = {
   alternates: { canonical: `${SITE_URL}/waitlist` },
 };
 
-export default function WaitlistPage() {
+export default async function WaitlistPage() {
+  const t = await getTranslations("marketing.page_waitlist");
   return (
     <LandingPageLayout
       badge="Waitlist"
-      title="Save your spot."
+      title={t("page_title")}
       subtitle="AIVO opens to new families in small batches so every learner gets a real onboarding. Drop your email and we'll let you know when it's your turn."
       breadcrumbs={[{ name: "Waitlist", href: "/waitlist" }]}
       finalCta={{
@@ -29,10 +31,10 @@ export default function WaitlistPage() {
         className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8"
       >
         <h2 id="waitlist-form-heading" className="font-heading text-2xl font-bold text-slate-900">
-          Tell us about your learner
+          {t("form_heading")}
         </h2>
         <p className="mt-1 mb-6 font-body text-slate-600">
-          Two required fields. The rest helps us pick the right onboarding when your spot opens.
+          {t("form_subheading")}
         </p>
         <WaitlistForm />
       </section>
@@ -42,25 +44,25 @@ export default function WaitlistPage() {
         className="mt-10 rounded-3xl border border-slate-200 bg-slate-50/60 p-6 md:p-8"
       >
         <h2 id="waitlist-promise-heading" className="font-heading text-xl font-bold text-slate-900">
-          What we promise
+          {t("promise_heading")}
         </h2>
         <ul className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
           <li className="rounded-2xl border border-slate-200 bg-white p-5">
-            <span className="font-heading text-sm font-bold text-emerald-700">No spam</span>
+            <span className="font-heading text-sm font-bold text-emerald-700">{t("promise_no_spam_title")}</span>
             <p className="mt-1 font-body text-slate-700">
-              One email when your spot opens. Maybe a second if you don't reply.
+              {t("promise_no_spam_body")}
             </p>
           </li>
           <li className="rounded-2xl border border-slate-200 bg-white p-5">
-            <span className="font-heading text-sm font-bold text-emerald-700">No sharing</span>
+            <span className="font-heading text-sm font-bold text-emerald-700">{t("promise_no_sharing_title")}</span>
             <p className="mt-1 font-body text-slate-700">
-              We don't sell or share your contact info — ever. See our privacy policy.
+              {t("promise_no_sharing_body")}
             </p>
           </li>
           <li className="rounded-2xl border border-slate-200 bg-white p-5">
-            <span className="font-heading text-sm font-bold text-emerald-700">Easy out</span>
+            <span className="font-heading text-sm font-bold text-emerald-700">{t("promise_easy_out_title")}</span>
             <p className="mt-1 font-body text-slate-700">
-              Reply &quot;remove&quot; to any waitlist email and we delete your record.
+              {t("promise_easy_out_body")}
             </p>
           </li>
         </ul>

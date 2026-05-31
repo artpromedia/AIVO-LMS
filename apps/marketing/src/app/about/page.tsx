@@ -2,6 +2,7 @@
 import { MARKETING_ACCENTS } from "@aivo/brand";
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { trackCTAClick, trackSignupInitiation } from "@/lib/analytics";
 import { WEB_APP_URL } from "@/lib/constants";
@@ -119,6 +120,7 @@ const LEADERS = [
 ];
 
 export default function AboutPage() {
+  const t = useTranslations("marketing.page_about");
   return (
     <div className="min-h-screen bg-white">
       <header className="bg-white border-b border-slate-100 sticky top-0 z-50">
@@ -149,7 +151,7 @@ export default function AboutPage() {
               }}
               className="px-5 py-2.5 rounded-full bg-primary text-white font-bold hover:bg-primary-dark transition shadow-lg shadow-purple-200"
             >
-              Get Started
+              {t("get_started")}
             </a>
           </div>
         </div>
@@ -170,11 +172,11 @@ export default function AboutPage() {
           <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-purple-50/80 border border-purple-100 mb-6">
             <span className="text-lg">🎯</span>
             <span className="text-sm font-bold text-primary uppercase tracking-widest">
-              Our Mission
+              {t("our_mission")}
             </span>
           </div>
           <h1 className="text-4xl md:text-6xl font-heading font-bold text-slate-900 mb-6 leading-tight">
-            No Learner Left Behind
+            {t("no_learner_left_behind")}
           </h1>
           <p className="text-lg md:text-xl text-slate-500 font-body max-w-3xl mx-auto leading-relaxed">
             AIVO Learning was founded on a simple belief: every student deserves a learning
@@ -190,10 +192,10 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto px-6 md:px-8">
           <div className="text-center mb-14">
             <h2 className="text-3xl md:text-4xl font-heading font-bold text-slate-900 mb-4">
-              Core Principles
+              {t("core_principles")}
             </h2>
             <p className="text-lg text-slate-500 font-body">
-              The foundations that guide everything we build.
+              {t("core_principles_sub")}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
@@ -220,10 +222,10 @@ export default function AboutPage() {
         <div className="max-w-5xl mx-auto px-6 md:px-8">
           <div className="text-center mb-14">
             <h2 className="text-3xl md:text-4xl font-heading font-bold text-slate-900 mb-4">
-              Our Values
+              {t("our_values")}
             </h2>
             <p className="text-lg text-slate-500 font-body">
-              What we stand for as a company and as educators.
+              {t("our_values_sub")}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -252,7 +254,7 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto px-6 md:px-8">
           <div className="text-center mb-14">
             <h2 className="text-3xl md:text-4xl font-heading font-bold text-slate-900 mb-4">
-              Meet Our Leadership
+              {t("meet_our_leadership")}
             </h2>
             <p className="text-lg text-slate-500 font-body max-w-3xl mx-auto">
               AIVO is led by a team of seasoned executives who bring decades of cross-sector
@@ -308,7 +310,7 @@ export default function AboutPage() {
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                     </svg>
-                    LinkedIn Profile
+                    {t("linkedin_profile")}
                   </a>
                 </div>
               </div>
@@ -320,7 +322,7 @@ export default function AboutPage() {
       <section className="py-16 md:py-20">
         <div className="max-w-4xl mx-auto px-6 md:px-8 text-center">
           <div className="bg-gradient-to-r from-primary to-purple-600 rounded-3xl p-10 md:p-16 text-white">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">Join Our Mission</h2>
+            <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">{t("join_our_mission")}</h2>
             <p className="text-lg text-white/80 font-body mb-8 max-w-2xl mx-auto">
               Help us build a world where every student gets the personalized education they
               deserve.
@@ -330,13 +332,13 @@ export default function AboutPage() {
                 href="/careers"
                 className="inline-flex items-center justify-center px-8 py-3.5 rounded-full bg-white text-primary font-bold text-lg hover:bg-purple-50 transition shadow-xl min-h-[44px]"
               >
-                View Open Positions
+                {t("view_open_positions")}
               </Link>
               <Link
                 href="/contact"
                 className="inline-flex items-center justify-center px-8 py-3.5 rounded-full border-2 border-white/30 text-white font-bold text-lg hover:bg-white/10 transition min-h-[44px]"
               >
-                Contact Us
+                {t("contact_us")}
               </Link>
             </div>
           </div>
@@ -358,7 +360,7 @@ export default function AboutPage() {
                 href="/privacy-policy"
                 className="text-sm text-slate-400 hover:text-white transition"
               >
-                Privacy
+                {t("privacy")}
               </Link>
               <Link
                 href="/terms-of-service"
@@ -382,7 +384,7 @@ export default function AboutPage() {
                 href="/accessibility"
                 className="text-sm text-slate-400 hover:text-white transition"
               >
-                Accessibility
+                {t("accessibility")}
               </Link>
             </nav>
           </div>

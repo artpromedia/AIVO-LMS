@@ -2,6 +2,7 @@ import { MARKETING_ACCENTS } from "@aivo/brand";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { COMPARISONS } from "@/lib/landing-content";
 import { SITE_URL } from "@/lib/constants";
@@ -34,6 +35,7 @@ export default async function ComparePage({ params }: Props) {
   const { slug } = await params;
   const comp = COMPARISONS.find((c) => c.slug === slug);
   if (!comp) notFound();
+  const t = await getTranslations("marketing.page_compare_detail");
 
   return (
     <LandingPageLayout
@@ -52,7 +54,7 @@ export default async function ComparePage({ params }: Props) {
 
       <section className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-12">
         <div className="rounded-3xl border border-purple-200 bg-purple-50/40 p-6">
-          <h2 className="font-heading font-bold text-slate-900 mb-2">AIVO is best for</h2>
+          <h2 className="font-heading font-bold text-slate-900 mb-2">{t("aivo_best_for")}</h2>
           <p className="text-slate-700 font-body text-sm leading-relaxed">{comp.bestFor.aivo}</p>
         </div>
         <div className="rounded-3xl border border-slate-200 bg-white p-6">
@@ -67,7 +69,7 @@ export default async function ComparePage({ params }: Props) {
 
       <section className="mb-12">
         <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">
-          Side-by-side comparison
+          {t("side_by_side")}
         </h2>
         <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
           <table className="w-full text-sm">
@@ -75,7 +77,7 @@ export default async function ComparePage({ params }: Props) {
             <thead className="bg-slate-50 text-slate-700">
               <tr>
                 <th scope="col" className="text-left font-heading font-bold p-4">
-                  Feature
+                  {t("col_feature")}
                 </th>
                 <th scope="col" className="text-left font-heading font-bold p-4 text-primary">
                   AIVO
@@ -104,7 +106,7 @@ export default async function ComparePage({ params }: Props) {
       </section>
 
       <section className="mb-12 rounded-3xl border border-slate-200 bg-slate-50 p-6">
-        <h2 className="font-heading font-bold text-slate-900 mb-2">An honest note from us</h2>
+        <h2 className="font-heading font-bold text-slate-900 mb-2">{t("honest_note")}</h2>
         <p className="text-slate-700 font-body text-sm leading-relaxed">{comp.honest}</p>
       </section>
 
@@ -113,7 +115,7 @@ export default async function ComparePage({ params }: Props) {
       </section>
 
       <section className="mt-14 pt-8 border-t border-slate-100">
-        <h2 className="text-xl font-heading font-bold text-slate-900 mb-4">Other comparisons</h2>
+        <h2 className="text-xl font-heading font-bold text-slate-900 mb-4">{t("other_comparisons")}</h2>
         <div className="flex flex-wrap gap-3">
           {COMPARISONS.filter((c) => c.slug !== comp.slug).map((other) => (
             <Link

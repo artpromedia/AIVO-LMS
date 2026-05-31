@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { COMPARISONS } from "@/lib/landing-content";
 import { SITE_URL } from "@/lib/constants";
 
@@ -10,12 +11,13 @@ export const metadata: Metadata = {
   alternates: { canonical: `${SITE_URL}/compare` },
 };
 
-export default function ComparePage() {
+export default async function ComparePage() {
+  const t = await getTranslations("marketing.page_compare");
   return (
     <main id="main" className="mx-auto max-w-4xl px-6 py-16">
-      <p className="text-sm font-medium uppercase tracking-wide text-aivo-purple">Compare</p>
+      <p className="text-sm font-medium uppercase tracking-wide text-aivo-purple">{t("eyebrow")}</p>
       <h1 className="mt-2 font-display text-4xl font-bold">
-        Choose your role to see how AIVO fits.
+        {t("heading")}
       </h1>
       <p className="mt-3 text-aivo-ink-soft">
         Every learner is different and every role uses AIVO differently. Pick yours below to see the
@@ -43,7 +45,7 @@ export default function ComparePage() {
                 <h2 className="font-display text-xl font-semibold text-aivo-ink">{cardTitle}</h2>
                 <p className="mt-2 text-sm text-aivo-ink-soft">{cardSubtitle}</p>
                 <span className="mt-3 inline-block text-sm font-medium text-aivo-purple">
-                  See the comparison →
+                  {t("see_comparison")}
                 </span>
               </Link>
             </li>

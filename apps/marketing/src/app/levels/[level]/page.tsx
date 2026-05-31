@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { LandingPageLayout } from "@/components/marketing/LandingPageLayout";
 import { LEVELS } from "@/lib/landing-content";
 import { SITE_URL } from "@/lib/constants";
@@ -35,6 +36,7 @@ export default async function LevelPage({ params }: Props) {
   const { level } = await params;
   const lvl = LEVELS.find((l) => l.slug === level);
   if (!lvl) notFound();
+  const t = await getTranslations("marketing.page_levels_detail");
 
   return (
     <LandingPageLayout
@@ -49,12 +51,12 @@ export default async function LevelPage({ params }: Props) {
       ]}
     >
       <section className="mb-12">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-3">Who it's for</h2>
+        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-3">{t("who_its_for")}</h2>
         <p className="text-slate-700 font-body leading-relaxed">{lvl.who}</p>
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">What's included</h2>
+        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">{t("whats_included")}</h2>
         <ul className="space-y-2">
           {lvl.features.map((f) => (
             <li key={f} className="flex items-start gap-3 text-slate-700 font-body">
@@ -70,7 +72,7 @@ export default async function LevelPage({ params }: Props) {
 
       <section className="mb-12">
         <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">
-          Built-in accommodations
+          {t("builtin_accommodations")}
         </h2>
         <ul className="space-y-2">
           {lvl.accommodations.map((a) => (
@@ -86,7 +88,7 @@ export default async function LevelPage({ params }: Props) {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">Sample activities</h2>
+        <h2 className="text-2xl font-heading font-bold text-slate-900 mb-4">{t("sample_activities")}</h2>
         <ul className="space-y-2">
           {lvl.sample.map((s) => (
             <li key={s} className="flex items-start gap-3 text-slate-700 font-body">
@@ -101,7 +103,7 @@ export default async function LevelPage({ params }: Props) {
       </section>
 
       <section className="mt-14 pt-8 border-t border-slate-100">
-        <h2 className="text-xl font-heading font-bold text-slate-900 mb-4">Other levels</h2>
+        <h2 className="text-xl font-heading font-bold text-slate-900 mb-4">{t("other_levels")}</h2>
         <div className="flex flex-wrap gap-3">
           {LEVELS.filter((l) => l.slug !== lvl.slug).map((other) => (
             <Link

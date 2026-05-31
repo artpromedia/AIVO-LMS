@@ -1,11 +1,13 @@
 import { MARKETING_ACCENTS } from "@aivo/brand";
+import { getTranslations } from "next-intl/server";
 import { LegalPageLayout } from "@/components/marketing/legal/LegalPageLayout";
 
-export default function AccessibilityPage() {
+export default async function AccessibilityPage() {
+  const t = await getTranslations("marketing.page_accessibility");
   return (
     <LegalPageLayout
       badge="Accessibility"
-      title="AIVO Accessibility Statement"
+      title={t("title")}
       subtitle={`At AIVO, accessibility is a direct extension of our mission to deliver a free, world-class adaptive education to every neurodivergent learner. We design our products to be usable by the widest possible range of people, including learners and adults with cognitive, sensory, motor, or speech disabilities, and we measure our work against established standards for digital accessibility.`}
       icon="♿"
       accentColor={MARKETING_ACCENTS.violet}

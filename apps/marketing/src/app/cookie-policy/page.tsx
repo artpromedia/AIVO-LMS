@@ -1,11 +1,13 @@
 import { MARKETING_ACCENTS } from "@aivo/brand";
+import { getTranslations } from "next-intl/server";
 import { LegalPageLayout } from "@/components/marketing/legal/LegalPageLayout";
 
-export default function CookiePolicyPage() {
+export default async function CookiePolicyPage() {
+  const t = await getTranslations("marketing.page_cookie_policy");
   return (
     <LegalPageLayout
       badge="Legal"
-      title="Cookie Policy"
+      title={t("title")}
       subtitle={`This Cookie Policy explains how Aivo AI Learning Technologies Inc. ("AIVO", "we", "us") uses cookies and similar technologies on aivolearning.com, app.aivolearning.com, and our mobile and tablet applications (together, the "Services"). It tells you what cookies we use, why we use them, how long they last, and the choices you have.`}
       icon="🍪"
       accentColor={MARKETING_ACCENTS.orange}

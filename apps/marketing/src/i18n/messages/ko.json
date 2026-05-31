@@ -1252,6 +1252,303 @@
       "cta_primary": "가족 체험 시작",
       "cta_secondary": "학군 영업팀과 상담",
       "cta_image_alt": "소파에서 함께 학습하는 부모와 아이"
+    },
+    "page_reset_password": {
+      "logo_aria": "AIVO 홈",
+      "heading": "비밀번호 재설정",
+      "subheading": "계정의 새 비밀번호를 선택하세요.",
+      "success_heading": "비밀번호가 업데이트되었습니다",
+      "back_to_sign_in": "로그인으로 돌아가기",
+      "label_new_password": "새 비밀번호",
+      "placeholder_new_password": "최소 12자",
+      "label_confirm_password": "새 비밀번호 확인",
+      "placeholder_confirm_password": "새 비밀번호를 다시 입력하세요",
+      "passwords_mismatch": "비밀번호가 아직 일치하지 않습니다",
+      "btn_updating": "업데이트 중다...",
+      "btn_submit": "비밀번호 업데이트",
+      "trust_badge": "COPPA · FERPA · SOC 2 지원 설계",
+      "loading": "로딩 중..."
+    },
+    "page_features_homework_helper": {
+      "page_title": "안내된 도움, 답 좌류는 없습니다",
+      "callout_title": "숨제 도우미는 답을 직접 주지 않습니다",
+      "get_help_cta": "도움 받기 →",
+      "clarifying_question": "풀기 전에 — 이 문제에서 ‘모두 합하면’이 당신에게 어륬 의미인가요?",
+      "your_answer_label": "답변:",
+      "explanation_text": "3을 네 번 더했습니다. 이것은 3 × 4와 같습니다. 이를",
+      "mastery_updated": "숙달도 업데이트: 반복 덧셈으로서의 곱셈 · 학습 중.",
+      "recommended_next_label": "다음 추천",
+      "recommended_lesson_title": "3의 배수 · LessonRun",
+      "recommended_lesson_meta": "Atlas와 함께 · 약 15분",
+      "added_to_session": "Maya의 다음 세션에 추가되었습니다."
+    },
+    "page_waitlist": {
+      "page_title": "자리를 확보하세요.",
+      "form_heading": "학습자에 대해 알려주세요",
+      "form_subheading": "필수 항목 2개. 나머지는 자리가 열렸을 때 올바른 온보딩을 선택하는 데 도움이 됩니다.",
+      "promise_heading": "저희의 약속",
+      "promise_no_spam_title": "스팸 없음",
+      "promise_no_spam_body": "자리가 열리면 이메일 한 통을 보냅니다. 답장이 없으면 한 통 더 보낼 수 있습니다.",
+      "promise_no_sharing_title": "정보 공유 없음",
+      "promise_no_sharing_body": "연락정보를 판매하거나 공유하지 않습니다 — 절대로. 개인정보선을 확인하세요.",
+      "promise_easy_out_title": "쉽게 탈퇴",
+      "promise_easy_out_body": "대기자 이메일에 ‘제거’라고 답장하면 레코드를 삭제합니다."
+    },
+    "page_resources": {
+      "cta_get_started": "시작하기",
+      "badge": "리소스",
+      "heading": "가이드, 입문서, 읽기 경로",
+      "guides_heading": "가이드",
+      "guides_subheading": "학교, 학구, 구매 팀을 위한 상세한 실용 가이드.",
+      "blog_heading": "블로그에서",
+      "blog_subheading": "학습 루프가 실제로 어떻게 작동하는지에 대한 짧은 글."
+    },
+    "page_for_teachers": {
+      "assignment_title": "3의 배수 — 4주차",
+      "roster_label": "명단",
+      "roster_value": "3B반 · 22명 학습자",
+      "assign_cta": "반에 배정",
+      "callout_summaries_title": "실제로 집에 보낼 만한 쉽은 언어 요약",
+      "callout_accommodation_title": "교사에게 안전한 지원 요약"
+    },
+    "page_contact": {
+      "page_title": "실제 사람과 상담하세요.",
+      "form_heading": "메시지 보내기",
+      "form_subheading": "무엇을 찾는지 알려주세요. 적절한 팀으로 연결해드리겠습니다.",
+      "inboxes_heading": "다른 연락 방법"
+    },
+    "page_blog": {
+      "nav_resources": "리소스",
+      "cta_get_started": "시작하기",
+      "heading": "AIVO 팀의 노트"
+    },
+    "page_for_schools": {
+      "callout_workflow_title": "개인맞춤 학습은 교사 업무를 늘리면 실패합니다",
+      "callout_neurodiverse_title": "신경다양성 학습자를 거념하여 설계",
+      "progress_summary": "Maya는 독서에서 코준한 진전을 보이고 있습니다."
+    },
+    "page_subjects": {
+      "page_title": "과목마다 전담 튜터. 내 아이를 위한 하나의 브레인 클론."
+    },
+    "page_signup": {
+      "logo_aria_label": "AIVO 홈",
+      "start_free_today": "오늘 무료로 시작하기",
+      "create_your_account": "계정 만들기",
+      "label_full_name": "이름",
+      "placeholder_name": "홍길동",
+      "label_password": "비밀번호",
+      "placeholder_password": "최소 8자 이상",
+      "password_hint": "문자, 숫자, 기호를 조합하면 가장 강력한 보안을 유지할 수 있습니다.",
+      "creating_account": "계정 생성 중...",
+      "create_account": "계정 만들기",
+      "no_credit_card": "신용카드 불필요",
+      "privacy_policy": "개인정보 처리방침",
+      "coppa_ferpa_badge": "COPPA 및 FERPA 준수를 위해 설계됨",
+      "sign_in": "로그인",
+      "footer_privacy": "개인정보"
+    },
+    "page_forgot_password": {
+      "logo_aria_label": "AIVO 홈",
+      "heading": "비밀번호를 잊으셨나요?",
+      "subheading": "이메일을 입력하시면 비밀번호 재설정 링크를 보내드립니다.",
+      "check_inbox": "받은 편지함을 확인하세요",
+      "if_account_exists": "해당 이메일로 계정이 존재하는 경우",
+      "back_to_sign_in": "로그인으로 돌아가기",
+      "sending": "전송 중...",
+      "send_reset_link": "재설정 링크 보내기",
+      "back_to_sign_in_form": "로그인으로 돌아가기",
+      "coppa_ferpa_soc2_badge": "COPPA · FERPA · SOC 2 준수를 위해 설계됨"
+    },
+    "page_press_kit": {
+      "media_resources": "미디어 리소스",
+      "company_overview": "회사 개요",
+      "quick_facts": "주요 정보",
+      "brand_assets": "브랜드 자산",
+      "logo_purple_alt": "AIVO 로고 보라색",
+      "primary_logo_purple": "기본 로고 (보라색)",
+      "logo_white_alt": "AIVO 로고 흰색",
+      "logo_dark_bg": "어두운 배경의 로고",
+      "brand_colors": "브랜드 색상",
+      "media_contact": "언론 연락처"
+    },
+    "page_features_todays_mission": {
+      "page_title": "매일 하나의 최선의 학습 행동",
+      "problem_title": "학습자들은 대시보드에서 길을 잃습니다",
+      "mockup_todays_mission": "오늘의 미션",
+      "mockup_lesson_title": "3 곱하기",
+      "mockup_lesson_meta": "Atlas와 함께 · 약 15분 · 수학",
+      "mockup_start_mission": "미션 시작 →",
+      "mockup_accessibility_note": "Maya를 위한 읽기 소리와 휴식 모드가 켜져 있습니다.",
+      "visibility_title": "데이터 덤프가 아닌 쉬운 언어로 된 가시성"
+    },
+    "page_for_districts": {
+      "rostering_title": "OneRoster 지원, CSV 친화적, 수동 입력도 가능",
+      "licensing_heading": "자리 라이선스, 학군 가격",
+      "accessibility_title": "WCAG 2.2 AA를 디자인 목표로",
+      "accessibility_gaps_note": "접근성 성명서를 유지하고 알려진 격차를 공개합니다 — 단순한 주장이 아닙니다.",
+      "dpa_title": "보안 및 DPA 패킷 요청"
+    },
+    "page_guides": {
+      "nav_resources": "리소스",
+      "nav_get_started": "시작하기",
+      "badge": "가이드",
+      "heading": "실용 가이드",
+      "subheading": "학교, 교육구, 가족을 위한 심층적이고 조달 친화적인 읽을거리."
+    },
+    "page_compare": {
+      "eyebrow": "비교",
+      "heading": "역할을 선택하여 AIVO가 어떻게 맞는지 확인하세요.",
+      "see_comparison": "비교 보기 →"
+    },
+    "page_for_special_education": {
+      "support_title": "지원은 학습자가 있는 곳에서 시작해야 합니다",
+      "iep_sharing_title": "IEP 또는 편의 제공 맥락 공유",
+      "teacher_summaries_title": "교사에게 안전한 지원 요약"
+    },
+    "page_tutors": {
+      "page_title": "14명의 AI 튜터. 자녀를 위한 하나의 Brain Clone."
+    },
+    "page_about": {
+      "get_started": "시작하기",
+      "our_mission": "우리의 미션",
+      "no_learner_left_behind": "어떤 학습자도 뒤처지지 않도록",
+      "core_principles": "핵심 원칙",
+      "core_principles_sub": "우리가 만드는 모든 것을 이끄는 기초입니다.",
+      "our_values": "우리의 가치",
+      "our_values_sub": "기업으로서, 교육자로서 우리가 지향하는 것.",
+      "meet_our_leadership": "리더십 팀 소개",
+      "linkedin_profile": "LinkedIn 프로필",
+      "join_our_mission": "우리의 미션에 함께하세요",
+      "view_open_positions": "채용 공고 보기",
+      "contact_us": "문의하기",
+      "privacy": "개인정보 처리방침",
+      "accessibility": "접근성"
+    },
+    "page_for_parents": {
+      "iep_title": "IEP 또는 편의 제공 맥락, 세심하게 처리",
+      "reading_question": "자녀가 읽기에 대해 어떻게 느끼나요?",
+      "answers_saved": "답변은 자동으로 저장됩니다.",
+      "aivo_disclaimer": "AIVO는 진단하지 않습니다. AIVO는 치료사, IEP 팀 또는 전문가를 대체하지 않습니다.",
+      "take_a_breath": "숨 한 번 쉬세요. 타이머는 없습니다.",
+      "which_word_means": "와 같은 의미를 가진 단어는 무엇인가요",
+      "need_a_break": "잠깐 쉬어야 할까요?",
+      "todays_mission": "오늘의 미션",
+      "multiplying_by_3s": "3의 곱셈",
+      "with_atlas": "Atlas와 함께 · 약 15분",
+      "start_mission": "미션 시작 →",
+      "maya_strong_week": "Maya가 이번 주 정말 잘했어요!"
+    },
+    "page_demo": {
+      "hero_title": "AIVO를 직접 확인해 보세요.",
+      "form_heading": "사용 환경에 대해 조금 알려주세요",
+      "form_subheading": "더 많이 알수록 더 유용한 데모를 제공할 수 있습니다. 필수 항목은 표시되어 있습니다.",
+      "what_happens_next": "다음에 일어나는 일",
+      "step1_label": "단계 1 · 영업일 기준 1일 이내",
+      "step2_label": "단계 2 · 30분 데모",
+      "step2_body": "학습자, 학부모, 교사의 화면을 보여드리고 질문에 실시간으로 답변해 드립니다.",
+      "step3_label": "단계 3 · 파일럿 또는 제안서",
+      "step3_body": "적합하다면 짧은 파일럿을 진행하거나 서면 제안서를 보내드립니다 — 부담 없이."
+    },
+    "page_features_lessonrun": {
+      "hero_title": "모든 AIVO 수업 뒤에 있는 개인화 학습 단위",
+      "voice_support_title": "모든 단계에서 음성 지원",
+      "break_mode_title": "차분한 휴식 — 분노의 종료가 아닌",
+      "count_by_3s_prompt": "3씩 세어 12까지 가 봅시다. 3에서 시작합니다. 다음은 무엇인가요?",
+      "hint_counting_fingers": "손가락으로 세어 보세요: 3 · 6 · ? — 6보다 3 많은 숫자는 무엇인가요?",
+      "need_another_hint": "힌트가 더 필요한가요?",
+      "maya_strong_week": "Maya가 이번 주 정말 잘했어요!"
+    },
+    "page_careers": {
+      "page_title": "AIVO 팀에 합류하세요",
+      "why_work_heading": "왜 AIVO에서 일할까요?",
+      "open_positions_heading": "채용 공고",
+      "apply_now": "지금 지원하기",
+      "no_role_heading": "원하는 직무가 없으신가요?",
+      "send_general_application": "일반 지원서 보내기"
+    },
+    "page_pricing": {
+      "hero_title": "솔직한 가격. 숨겨진 비용 없음.",
+      "for_families": "가족을 위해",
+      "family_disclaimer": "월별 결제. 언제든지 취소 가능. 유료 플랜 30일 환불 보장.",
+      "for_schools": "학교 및 교육구를 위해",
+      "pricing_faq_heading": "가격 자주 묻는 질문"
+    },
+    "page_features": {
+      "eyebrow": "기능",
+      "heading": "기능 목록이 아닌 진짜 학습 경험.",
+      "learn_more": "자세히 알아보기 →"
+    },
+    "page_thank_you": {
+      "hero_title": "잘 받았습니다 — 감사합니다.",
+      "while_you_wait": "기다리는 동안"
+    },
+    "page_levels": {
+      "hero_title": "다섯 레벨. 하나의 플랫폼. 모든 학습자."
+    },
+    "page_accessibility": {
+      "title": "AIVO Accessibility Statement"
+    },
+    "page_cookie_policy": {
+      "title": "Cookie Policy"
+    },
+    "page_coppa_compliance": {
+      "title": "COPPA Compliance Statement"
+    },
+    "page_ferpa_compliance": {
+      "title": "FERPA Compliance Statement"
+    },
+    "page_privacy_policy": {
+      "title": "AIVO Privacy Policy"
+    },
+    "page_security": {
+      "title": "How we protect your data."
+    },
+    "page_subprocessors": {
+      "get_started": "Get Started",
+      "badge": "Subprocessors",
+      "heading": "AIVO subprocessors",
+      "current_subprocessors": "Current subprocessors",
+      "col_subprocessor": "Subprocessor",
+      "col_purpose": "Purpose",
+      "col_data_category": "Data category",
+      "col_region": "Region",
+      "col_status": "Status",
+      "how_we_use_heading": "How we use this list",
+      "reporting_heading": "Reporting subprocessor changes",
+      "questions_heading": "Questions?",
+      "footer_privacy": "Privacy",
+      "footer_security": "Security",
+      "footer_accessibility": "Accessibility"
+    },
+    "page_terms_of_service": {
+      "title": "AIVO Terms of Service"
+    },
+    "page_trust": {
+      "title": "What we promise — and how to check."
+    },
+    "page_compare_detail": {
+      "aivo_best_for": "AIVO가 가장 적합한 경우",
+      "side_by_side": "나란히 비교",
+      "col_feature": "기능",
+      "honest_note": "우리의 솔직한 한마디",
+      "other_comparisons": "다른 비교"
+    },
+    "page_levels_detail": {
+      "who_its_for": "대상 학습자",
+      "whats_included": "포함된 내용",
+      "builtin_accommodations": "기본 제공 지원 기능",
+      "sample_activities": "샘플 활동",
+      "other_levels": "다른 레벨"
+    },
+    "page_subjects_detail": {
+      "key_features": "주요 기능",
+      "topics_covered": "다루는 주제",
+      "other_subjects": "다른 과목"
+    },
+    "page_tutors_detail": {
+      "built_for_every_learner": "모든 학습자를 위해 설계됨",
+      "other_tutors": "다른 AIVO 튜터",
+      "see_all_tutors": "14명의 튜터 모두 보기 →"
     }
   }
 }

@@ -2,6 +2,7 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import {
   Lock,
   Eye,
@@ -29,6 +30,7 @@ interface PolicyCheck {
 }
 
 function ResetPasswordInner() {
+  const t = useTranslations("marketing.page_reset_password");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -88,7 +90,7 @@ function ResetPasswordInner() {
       </div>
 
       <header className="relative z-30 flex items-center justify-between p-6">
-        <Link href="/" aria-label="AIVO home">
+        <Link href="/" aria-label={t("logo_aria")}>
           <Image
             src="/images/aivo-logo-purple.png"
             alt="AIVO"
@@ -107,10 +109,10 @@ function ResetPasswordInner() {
               <Lock size={28} strokeWidth={2.5} aria-hidden="true" />
             </div>
             <h1 className="text-3xl font-heading font-bold text-slate-900 text-center leading-tight">
-              Reset your password
+              {t("heading")}
             </h1>
             <p className="text-slate-500 font-body text-center mt-2">
-              Choose a new password for your account.
+              {t("subheading")}
             </p>
 
             {success ? (
@@ -119,7 +121,7 @@ function ResetPasswordInner() {
                   <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3">
                     <CheckCircle2 size={24} strokeWidth={2.5} aria-hidden="true" />
                   </div>
-                  <p className="text-emerald-800 font-bold">Password updated</p>
+                  <p className="text-emerald-800 font-bold">{t("success_heading")}</p>
                   <p className="text-sm text-emerald-700 mt-1 font-body">
                     You&apos;d be redirected to sign in next. (Demo preview — no real reset
                     performed.)
@@ -130,7 +132,7 @@ function ResetPasswordInner() {
                   className="inline-flex items-center gap-2 mt-6 text-sm font-bold text-[hsl(var(--visual-primary))] hover:underline"
                 >
                   <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-                  Back to sign in
+                  {t("back_to_sign_in")}
                 </Link>
               </div>
             ) : (
@@ -140,7 +142,7 @@ function ResetPasswordInner() {
                     htmlFor="reset-password-new"
                     className="block text-sm font-bold text-slate-700 ml-1"
                   >
-                    New password
+                    {t("label_new_password")}
                   </label>
                   <div className="relative">
                     <Lock
@@ -155,7 +157,7 @@ function ResetPasswordInner() {
                       required
                       minLength={12}
                       autoComplete="new-password"
-                      placeholder="At least 12 characters"
+                      placeholder={t("placeholder_new_password")}
                       style={{ minHeight: 44 }}
                       className="w-full h-14 pl-12 pr-12 rounded-2xl bg-slate-50 border-2 border-slate-100 text-slate-900 font-body focus:bg-white focus:border-[hsl(var(--visual-primary))] focus:ring-4 focus:ring-[hsl(var(--visual-primary)/0.15)] outline-none transition"
                     />
@@ -199,7 +201,7 @@ function ResetPasswordInner() {
                     htmlFor="reset-password-confirm"
                     className="block text-sm font-bold text-slate-700 ml-1"
                   >
-                    Confirm new password
+                    {t("label_confirm_password")}
                   </label>
                   <div className="relative">
                     <Lock
@@ -214,14 +216,14 @@ function ResetPasswordInner() {
                       required
                       minLength={12}
                       autoComplete="new-password"
-                      placeholder="Re-enter your new password"
+                      placeholder={t("placeholder_confirm_password")}
                       style={{ minHeight: 44 }}
                       className="w-full h-14 pl-12 pr-4 rounded-2xl bg-slate-50 border-2 border-slate-100 text-slate-900 font-body focus:bg-white focus:border-[hsl(var(--visual-primary))] focus:ring-4 focus:ring-[hsl(var(--visual-primary)/0.15)] outline-none transition"
                     />
                   </div>
                   {confirm && confirm !== password && (
                     <p className="text-xs text-rose-600 font-bold ml-1">
-                      Passwords don&apos;t match yet
+                      {t("passwords_mismatch")}
                     </p>
                   )}
                 </div>
@@ -241,11 +243,11 @@ function ResetPasswordInner() {
                         className="motion-safe:animate-spin"
                         aria-hidden="true"
                       />
-                      Updating...
+                      {t("btn_updating")}
                     </>
                   ) : (
                     <>
-                      Update password
+                      {t("btn_submit")}
                       <ArrowRight className="w-5 h-5" aria-hidden="true" />
                     </>
                   )}
@@ -257,7 +259,7 @@ function ResetPasswordInner() {
                     className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-[hsl(var(--visual-primary))] transition"
                   >
                     <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-                    Back to sign in
+                    {t("back_to_sign_in")}
                   </Link>
                 </div>
               </form>
@@ -270,7 +272,7 @@ function ResetPasswordInner() {
                 className="w-4 h-4 text-[hsl(var(--visual-primary))]"
                 aria-hidden="true"
               />
-              Designed to support COPPA · FERPA · SOC 2
+              {t("trust_badge")}
             </div>
           </div>
         </div>
@@ -279,15 +281,18 @@ function ResetPasswordInner() {
   );
 }
 
+function LoadingFallback() {
+  const t = useTranslations("marketing.page_reset_password");
+  return (
+    <div className="min-h-screen flex items-center justify-center text-slate-400">
+      {t("loading")}
+    </div>
+  );
+}
+
 export default function ResetPasswordPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center text-slate-400">
-          Loading...
-        </div>
-      }
-    >
+    <Suspense fallback={<LoadingFallback />}>
       <ResetPasswordInner />
     </Suspense>
   );
