@@ -707,6 +707,10 @@ export async function createBaseline(input: {
   const canCallLlm = llmFlag && parentAssessment != null && parentAssessment.submittedAt != null;
   const discoveryFlag = baselineDiscoveryEnabled();
   const canCallDiscovery = discoveryFlag && canCallLlm;
+  // eslint-disable-next-line no-console
+  console.error(
+    `[BASELINE_DIAG] start baselineId=${baseline.id} learnerId=${input.learnerId} llmFlag=${llmFlag} discoveryFlag=${discoveryFlag} canCallLlm=${canCallLlm} canCallDiscovery=${canCallDiscovery} hasParentAssessment=${parentAssessment != null} submittedAt=${parentAssessment?.submittedAt ?? "null"} hasBrainProfile=${brainProfile != null} subjects=${subjects.map((s) => s.slug).join(",")} skillsCount=${skills.length}`,
+  );
 
   // Phase 0 — when the adaptive baseline is enabled, the BANK fallback uses
   // a wider, difficulty-spread pool so the runner's adaptive selector has
@@ -788,6 +792,10 @@ export async function createBaseline(input: {
         );
       }
     } else {
+      // eslint-disable-next-line no-console
+      console.error(
+        `[BASELINE_DIAG] discovery_total_failure baselineId=${baseline.id} failures=${JSON.stringify(chapterFailures)}`,
+      );
       logger.info(
         {
           event: "baseline.discovery_total_failure",
@@ -799,6 +807,12 @@ export async function createBaseline(input: {
         "baseline: discovery adventure produced no questions, falling back to flat LLM/BANK",
       );
     }
+    if (discoverySucceeded) {
+      // eslint-disable-next-line no-console
+      console.error(
+        `[BASELINE_DIAG] discovery_succeeded baselineId=${baseline.id} questions=${questions.length} chapters=${chaptersUsed.join(",")}`,
+      );
+    }
   }
 
   if (!discoverySucceeded && canCallLlm) {
@@ -806,6 +820,10 @@ export async function createBaseline(input: {
       parent_assessment: parentAssessment!.answers as unknown as Record<string, unknown>,
       functioning_level: brainProfile?.state.functioningLevel ?? "STANDARD",
     });
+    // eslint-disable-next-line no-console
+    console.error(
+      `[BASELINE_DIAG] llm_call_result baselineId=${baseline.id} ok=${llmResult.ok} ${llmResult.ok ? `questions=${llmResult.response.questions.length} model=${llmResult.response.model}` : `reason=${llmResult.reason} message=${(llmResult as { message?: string }).message ?? ""}`}`,
+    );
     if (llmResult.ok) {
       const mapped = mapLlmQuestionsToBaselineQuestions({
         baselineId: baseline.id,
@@ -814,6 +832,10 @@ export async function createBaseline(input: {
         skills,
         accommodationTags,
       });
+      // eslint-disable-next-line no-console
+      console.error(
+        `[BASELINE_DIAG] llm_mapped baselineId=${baseline.id} mappedCount=${mapped.length} llmSubjects=${[...new Set(llmResult.response.questions.map((q) => q.subject))].join(",")} subjectSlugs=${subjects.map((s) => s.slug).join(",")}`,
+      );
       if (mapped.length > 0) {
         questions = mapped;
         metadata = {
