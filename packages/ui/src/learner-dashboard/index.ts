@@ -19,6 +19,7 @@
 export * from "./StatChip.js";
 export * from "./LearnerLevelBadge.js";
 export * from "./LearnerProfileCard.js";
+export * from "./LearnerProfileContext.js";
 export * from "./SensoryControlGroup.js";
 export * from "./TutorAvatar.js";
 export * from "./TutorAvatarCard.js";

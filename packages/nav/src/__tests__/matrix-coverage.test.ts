@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { NAV_AREAS, type NavArea } from "../areas.js";
-import { _MATRIX } from "../permissions.js";
+import { _MATRIX, getPermission } from "../permissions.js";
 import { ROLES, type Role } from "../roles.js";
+import { getDeepLinkAreas } from "../deep-links.js";
 
 /**
  * Matrix coverage gate — ADR 0020 §Consequences.
@@ -24,5 +25,35 @@ describe("MATRIX coverage (ADR 0020)", () => {
           `explicit access record so the coverage gate is satisfied.`,
       ).toEqual([]);
     });
+  }
+});
+
+/**
+ * Deep-link coverage gate — ADR 0020 Phase 3.
+ *
+ * Every `NavArea` reachable through the deep-link resolver must have
+ * a defined permission for every role. This prevents a future
+ * deep-link rule from pointing at an area whose row only declares
+ * some of the roles — which would let `canAccessArea` silently fall
+ * through to `HIDDEN` and 404 a user who really *should* have been
+ * sent to `/role-switch`.
+ */
+describe("Deep-link coverage (ADR 0020 Phase 3)", () => {
+  const deepLinkAreas = getDeepLinkAreas();
+
+  it("exposes at least one deep-link area", () => {
+    expect(deepLinkAreas.length).toBeGreaterThan(0);
+  });
+
+  for (const role of ROLES) {
+    for (const area of deepLinkAreas) {
+      it(`role "${role}" has a resolvable permission for deep-link area "${area}"`, () => {
+        const perm = getPermission(role, area);
+        expect(
+          ["full", "linked", "locked", "hidden"],
+          `Role "${role}" / area "${area}" returned an unknown access kind`,
+        ).toContain(perm.access);
+      });
+    }
   }
 });
