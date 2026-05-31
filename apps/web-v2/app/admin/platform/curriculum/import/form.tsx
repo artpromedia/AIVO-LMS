@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 const FRAMEWORK_OPTIONS = [
   { value: "common-core-math", label: "Common Core Math" },
@@ -13,6 +14,7 @@ const FRAMEWORK_OPTIONS = [
 ] as const;
 
 export function ImportForm() {
+  const t = useTranslations("admin.platform_curriculum_import");
   const router = useRouter();
   const [frameworkSlug, setFrameworkSlug] = useState<string>("common-core-math");
   const [source, setSource] = useState("manual");
@@ -44,7 +46,7 @@ export function ImportForm() {
   return (
     <form onSubmit={submit} className="space-y-3">
       <label className="block text-sm">
-        Framework
+        {t("framework")}
         <select
           value={frameworkSlug}
           onChange={(e) => setFrameworkSlug(e.target.value)}
@@ -58,12 +60,12 @@ export function ImportForm() {
         </select>
       </label>
       <label className="block text-sm">
-        Source
+        {t("source")}
         <input
           value={source}
           onChange={(e) => setSource(e.target.value)}
           className="mt-1 block w-full rounded border px-2 py-1"
-          placeholder="manual, s3://…, https://…"
+          placeholder={t("source_placeholder")}
         />
       </label>
       {error && <p className="text-sm text-red-600">{error}</p>}

@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
+import { getTranslations } from "next-intl/server";
 import {
   computeSystemHealth,
   scopeTenantsForSession,
@@ -24,6 +25,7 @@ import {
 } from "lucide-react";
 
 export default async function PlatformAdminHome() {
+  const t = await getTranslations("admin.platform_overview");
   const session = await requirePageRole(["platform_admin"]);
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const tenantIds = tenants.map((t) => t.id);
@@ -144,7 +146,7 @@ export default async function PlatformAdminHome() {
     >
       <PageHeader
         eyebrow="Platform"
-        title="System health"
+        title={t("title")}
         description="Operations and observability across every tenant on AIVO."
         actions={<Badge tone={health.tone}>{health.label}</Badge>}
       />
@@ -183,9 +185,9 @@ export default async function PlatformAdminHome() {
         <Card className="p-[var(--aivo-density-card-pad)] lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <p className="font-display text-lg font-semibold">Tenant footprint</p>
+              <p className="font-display text-lg font-semibold">{t("tenant_footprint")}</p>
               <p className="text-xs text-aivo-ink-soft">
-                Distribution of tenants currently provisioned in this environment.
+                {t("tenant_footprint_desc")}
               </p>
             </div>
             <Badge tone="neutral">{tenants.length.toLocaleString()} tenants</Badge>
@@ -207,7 +209,7 @@ export default async function PlatformAdminHome() {
           </dl>
 
           <div className="mt-6">
-            <p className="text-sm font-semibold">Billing status</p>
+            <p className="text-sm font-semibold">{t("billing_status")}</p>
             <ul className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
               {["trialing", "active", "past_due", "canceled"].map((s) => {
                 const n = billingByStatus[s] ?? 0;
@@ -236,10 +238,10 @@ export default async function PlatformAdminHome() {
         <Card className="p-[var(--aivo-density-card-pad)]">
           <div className="mb-3 flex items-center gap-2">
             <Activity className="h-4 w-4 text-aivo-primary" />
-            <p className="font-display text-lg font-semibold">Recent AI jobs</p>
+            <p className="font-display text-lg font-semibold">{t("recent_ai_jobs")}</p>
           </div>
           {recentJobs.length === 0 ? (
-            <p className="text-sm text-aivo-ink-soft">No AI generation activity yet.</p>
+            <p className="text-sm text-aivo-ink-soft">{t("no_ai_activity_yet")}</p>
           ) : (
             <ul className="space-y-2">
               {recentJobs.map((j) => {
@@ -269,13 +271,13 @@ export default async function PlatformAdminHome() {
             href="/admin/platform/ai-generation"
             className="mt-4 inline-flex items-center text-sm font-medium text-aivo-primary"
           >
-            View all <ArrowRight className="ml-1 h-3.5 w-3.5" />
+            {t("view_all")} <ArrowRight className="ml-1 h-3.5 w-3.5" />
           </Link>
         </Card>
       </div>
 
       <section className="mt-6">
-        <p className="mb-3 font-display text-lg font-semibold">Operations centres</p>
+        <p className="mb-3 font-display text-lg font-semibold">{t("operations_centres")}</p>
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {operationsCards.map((c) => (
             <Link
@@ -302,14 +304,14 @@ export default async function PlatformAdminHome() {
         <div className="flex items-center gap-2 text-aivo-ink-soft">
           <DollarSign className="h-4 w-4" />
           <span>
-            Signed in as <strong>{session.email}</strong> · platform admin
+            {t("signed_in_as")} <strong>{session.email}</strong> · platform admin
           </span>
         </div>
         <Link
           href="/admin/platform/settings"
           className="font-medium text-aivo-primary hover:underline"
         >
-          Platform settings
+          {t("platform_settings")}
         </Link>
       </div>
     </AppShell>

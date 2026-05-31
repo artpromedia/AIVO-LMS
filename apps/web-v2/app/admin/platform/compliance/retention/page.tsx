@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -10,6 +11,7 @@ export const dynamic = "force-dynamic";
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_compliance_retention");
   const policies = listRetentionPolicies();
 
   return (
@@ -21,7 +23,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Compliance"
-        title="Retention policies"
+        title={t("title")}
         description="Retention and archive windows per data classification."
       />
 
@@ -29,10 +31,10 @@ export default async function Page() {
         <table className="w-full text-sm">
           <thead className="bg-aivo-surface-2 text-left">
             <tr>
-              <th className="p-3">Classification</th>
-              <th className="p-3">Retention (days)</th>
-              <th className="p-3">Archive (days)</th>
-              <th className="p-3">Description</th>
+              <th className="p-3">{t("col_classification")}</th>
+              <th className="p-3">{t("col_retention_days")}</th>
+              <th className="p-3">{t("col_archive_days")}</th>
+              <th className="p-3">{t("col_description")}</th>
               <th className="p-3"></th>
             </tr>
           </thead>

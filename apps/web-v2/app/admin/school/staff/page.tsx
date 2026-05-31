@@ -1,4 +1,5 @@
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -9,6 +10,7 @@ import { listUsersForTenants, scopeTenantsForSession } from "@/lib/db/repos";
 
 export default async function Page() {
   const session = await requirePageRole(["school_admin"]);
+  const t = await getTranslations("admin.school_staff");
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const tenantMap = new Map(tenants.map((t) => [t.id, t]));
   const allStaff = await listUsersForTenants(tenants.map((t) => t.id));
@@ -23,11 +25,11 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="School admin"
-        title="Staff"
+        title={t("title")}
         description="Teachers and admins assigned to this school."
       />
       {staff.length === 0 ? (
-        <EmptyState title="No staff yet" />
+        <EmptyState title={t("empty")} />
       ) : (
         <Card className="overflow-hidden">
           <table className="w-full text-sm">
@@ -36,7 +38,7 @@ export default async function Page() {
                 <th className="p-3">Name</th>
                 <th className="p-3">Email</th>
                 <th className="p-3">Role</th>
-                <th className="p-3">Tenant</th>
+                <th className="p-3">{t("col_tenant")}</th>
               </tr>
             </thead>
             <tbody>

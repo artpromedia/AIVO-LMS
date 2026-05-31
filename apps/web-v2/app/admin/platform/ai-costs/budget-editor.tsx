@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useTranslations } from "next-intl";
 
 export function BudgetEditor({
   tenantId,
@@ -17,6 +18,7 @@ export function BudgetEditor({
   warnAt: number;
   hardStop: boolean;
 }) {
+  const t = useTranslations("admin.platform_ai_costs");
   const router = useRouter();
   const [pending, start] = useTransition();
   const [cap, setCap] = useState(monthlyCapCents === null ? "" : String(monthlyCapCents / 100));
@@ -63,14 +65,14 @@ export function BudgetEditor({
         value={cap}
         onChange={(e) => setCap(e.target.value)}
         placeholder="∞"
-        aria-label="Monthly cap USD"
+        aria-label={t("aria_monthly_cap")}
       />
       <span className="text-xs text-aivo-ink-soft">cap $</span>
       <Input
         className="w-20"
         value={warn}
         onChange={(e) => setWarn(e.target.value)}
-        aria-label="Warn at ratio"
+        aria-label={t("aria_warn_at")}
       />
       <span className="text-xs text-aivo-ink-soft">warn @</span>
       <label className="flex items-center gap-1 text-xs">

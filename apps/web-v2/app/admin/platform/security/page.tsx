@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -18,6 +19,7 @@ import {
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_security_overview");
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const recent = await listAuditLogsForTenants(
     tenants.map((t) => t.id),
@@ -87,7 +89,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Security"
-        title="Security posture"
+        title={t("title")}
         description="SOC 2 controls, incidents, vendors, and the state-privacy matrix in one place."
       />
       <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -110,9 +112,9 @@ export default async function Page() {
         ))}
       </div>
       <Card className="p-[var(--aivo-density-card-pad)]">
-        <p className="mb-3 font-display text-lg font-semibold">Recent activity</p>
+        <p className="mb-3 font-display text-lg font-semibold">{t("recent_activity_heading")}</p>
         {recent.length === 0 ? (
-          <p className="text-sm text-aivo-ink-soft">No events yet.</p>
+          <p className="text-sm text-aivo-ink-soft">{t("no_events")}</p>
         ) : (
           <ul className="space-y-1 text-sm">
             {recent.map((l) => (
@@ -130,7 +132,7 @@ export default async function Page() {
           href="/admin/platform/audit-logs"
           className="mt-3 inline-block text-xs font-medium text-aivo-primary hover:underline"
         >
-          See full audit log →
+          {t("link_audit_log")}
         </Link>
       </Card>
     </AppShell>

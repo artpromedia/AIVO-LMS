@@ -1,4 +1,5 @@
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -24,6 +25,7 @@ const STATUS_TONE: Record<string, "success" | "warning" | "danger" | "neutral"> 
 
 export default async function Page() {
   const session = await requirePageRole(["school_admin"]);
+  const t = await getTranslations("admin.school_billing");
   const tenant = getTenantById(session.tenantId);
   const sub = getActiveSubscriptionForTenant(session.tenantId);
   const licenses = listSeatLicensesForTenant(session.tenantId);
@@ -38,7 +40,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="School admin"
-        title="Billing & seats"
+        title={t("title")}
         description={`Plan, invoices, and seat assignments for ${tenant?.name ?? "this school"}.`}
       />
 
@@ -59,14 +61,14 @@ export default async function Page() {
         </Card>
       ) : (
         <EmptyState
-          title="No subscription"
+          title={t("no_subscription")}
           description="Contact platform billing to provision a school subscription."
         />
       )}
 
-      <h2 className="mb-3 font-display text-lg font-semibold">Seat licenses</h2>
+      <h2 className="mb-3 font-display text-lg font-semibold">{t("seat_licenses")}</h2>
       {licenses.length === 0 ? (
-        <EmptyState title="No seat licenses" />
+        <EmptyState title={t("no_seat_licenses")} />
       ) : (
         <div className="space-y-4">
           {licenses.map(({ license, assigned, remaining }) => {
@@ -83,14 +85,14 @@ export default async function Page() {
                 </div>
                 <AssignSeatRow licenseId={license.id} remaining={remaining} />
                 {assignments.length === 0 ? (
-                  <p className="p-4 text-sm text-aivo-ink-soft">No seats assigned yet.</p>
+                  <p className="p-4 text-sm text-aivo-ink-soft">{t("no_seats_assigned")}</p>
                 ) : (
                   <table className="w-full text-sm">
                     <thead className="bg-aivo-surface-2 text-left">
                       <tr>
-                        <th className="p-3">Subject</th>
+                        <th className="p-3">{t("col_subject")}</th>
                         <th className="p-3">Kind</th>
-                        <th className="p-3">Assigned</th>
+                        <th className="p-3">{t("col_assigned")}</th>
                         <th className="p-3" />
                       </tr>
                     </thead>
@@ -116,18 +118,18 @@ export default async function Page() {
         </div>
       )}
 
-      <h2 className="mb-3 mt-8 font-display text-lg font-semibold">Invoices</h2>
+      <h2 className="mb-3 mt-8 font-display text-lg font-semibold">{t("invoices")}</h2>
       {invoices.length === 0 ? (
-        <EmptyState title="No invoices" />
+        <EmptyState title={t("no_invoices")} />
       ) : (
         <Card className="overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-aivo-surface-2 text-left">
               <tr>
-                <th className="p-3">Number</th>
-                <th className="p-3">Period</th>
-                <th className="p-3">Amount</th>
-                <th className="p-3">Status</th>
+                <th className="p-3">{t("col_number")}</th>
+                <th className="p-3">{t("col_period")}</th>
+                <th className="p-3">{t("col_amount")}</th>
+                <th className="p-3">{t("col_status")}</th>
               </tr>
             </thead>
             <tbody>

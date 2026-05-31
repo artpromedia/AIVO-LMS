@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -10,6 +11,7 @@ export const dynamic = "force-dynamic";
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_safety_policies");
   const policies = listSafetyPolicyVersions();
   return (
     <AppShell
@@ -20,7 +22,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Safety"
-        title="Policy versions"
+        title={t("title")}
         description="The active SafetyPolicyVersion drives every classification. Versions are immutable; new thresholds ship as a new version."
       />
       <div className="space-y-3">
@@ -37,15 +39,15 @@ export default async function Page() {
             </div>
             <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
               <div>
-                <dt className="text-aivo-muted text-xs uppercase">Block threshold</dt>
+                <dt className="text-aivo-muted text-xs uppercase">{t("label_block_threshold")}</dt>
                 <dd className="font-medium">{p.ruleset.blockThreshold}</dd>
               </div>
               <div>
-                <dt className="text-aivo-muted text-xs uppercase">Review threshold</dt>
+                <dt className="text-aivo-muted text-xs uppercase">{t("label_review_threshold")}</dt>
                 <dd className="font-medium">{p.ruleset.reviewThreshold}</dd>
               </div>
               <div className="col-span-2">
-                <dt className="text-aivo-muted text-xs uppercase">Auto-review categories</dt>
+                <dt className="text-aivo-muted text-xs uppercase">{t("label_auto_review_categories")}</dt>
                 <dd className="flex flex-wrap gap-1 mt-1">
                   {p.ruleset.autoReviewCategories.map((c) => (
                     <Badge key={c} tone="warning">
@@ -55,7 +57,7 @@ export default async function Page() {
                 </dd>
               </div>
               <div className="col-span-2">
-                <dt className="text-aivo-muted text-xs uppercase">Auto-block categories</dt>
+                <dt className="text-aivo-muted text-xs uppercase">{t("label_auto_block_categories")}</dt>
                 <dd className="flex flex-wrap gap-1 mt-1">
                   {p.ruleset.autoBlockCategories.map((c) => (
                     <Badge key={c} tone="danger">

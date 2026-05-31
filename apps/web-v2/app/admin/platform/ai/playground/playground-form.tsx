@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { runPlaygroundPrompt, type PlaygroundResult } from "./actions";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 const PRESETS: Array<{ label: string; system: string; prompt: string }> = [
   {
@@ -23,6 +24,7 @@ const PRESETS: Array<{ label: string; system: string; prompt: string }> = [
 ];
 
 export function PlaygroundForm() {
+  const t = useTranslations("admin.platform_ai_playground");
   const [systemPrompt, setSystemPrompt] = useState(PRESETS[0]!.system);
   const [prompt, setPrompt] = useState(PRESETS[0]!.prompt);
   const [model, setModel] = useState<"claude-opus-4-7" | "gemini-3-pro" | "gpt-5-5">(
@@ -50,7 +52,7 @@ export function PlaygroundForm() {
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
         <label className="mb-1 block text-xs uppercase tracking-wide text-aivo-ink-soft">
-          Presets
+          {t("presets")}
         </label>
         <div className="flex flex-wrap gap-2">
           {PRESETS.map((p, i) => (
@@ -82,9 +84,9 @@ export function PlaygroundForm() {
           }
           className="w-full rounded-md border border-aivo-border bg-aivo-surface px-3 py-2 text-sm"
         >
-          <option value="claude-opus-4-7">Claude Opus 4.7 (primary)</option>
-          <option value="gemini-3-pro">Gemini 3.0 Pro (fallback)</option>
-          <option value="gpt-5-5">GPT-5.5 (fallback)</option>
+          <option value="claude-opus-4-7">{t("model_claude")}</option>
+          <option value="gemini-3-pro">{t("model_gemini")}</option>
+          <option value="gpt-5-5">{t("model_gpt")}</option>
         </select>
       </div>
 
@@ -93,7 +95,7 @@ export function PlaygroundForm() {
           htmlFor="systemPrompt"
           className="mb-1 block text-xs uppercase tracking-wide text-aivo-ink-soft"
         >
-          System prompt
+          {t("system_prompt")}
         </label>
         <textarea
           id="systemPrompt"
@@ -109,7 +111,7 @@ export function PlaygroundForm() {
           htmlFor="prompt"
           className="mb-1 block text-xs uppercase tracking-wide text-aivo-ink-soft"
         >
-          User prompt
+          {t("user_prompt")}
         </label>
         <textarea
           id="prompt"

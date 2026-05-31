@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -16,6 +17,7 @@ const STATUS_TONE = {
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_security_vulnerabilities");
   const vulns = listVulnerabilities();
 
   return (
@@ -27,12 +29,12 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Security"
-        title="Vulnerability management"
+        title={t("title")}
         description="Dependency, container, IaC, and pen-test findings — triaged centrally."
       />
       {vulns.length === 0 ? (
         <Card className="p-6 text-sm text-aivo-ink-soft">
-          No vulnerabilities currently tracked.
+          {t("empty_body")}
         </Card>
       ) : (
         <div className="space-y-3">

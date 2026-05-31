@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
 import { listPlatformWebhookEndpoints } from "@/lib/db/repos";
 import type { PlatformWebhookDeliveryStatus, PlatformWebhookStatus } from "@/lib/db/types";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +34,7 @@ function relativeTime(iso: string | null): string {
 }
 
 export default async function Page() {
+  const t = await getTranslations("admin.platform_settings_webhooks");
   const session = await requirePageRole(["platform_admin"]);
   const hooks = listPlatformWebhookEndpoints();
 
@@ -56,7 +58,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Settings"
-        title="Webhooks"
+        title={t("title")}
         description="Outbound HTTPS endpoints we POST to when platform events fire. Each delivery is signed with the endpoint's secret."
       />
 
@@ -72,19 +74,19 @@ export default async function Page() {
       <Card className="mt-6 overflow-hidden p-0">
         {hooks.length === 0 ? (
           <EmptyState
-            title="No webhook endpoints configured"
+            title={t("no_endpoints_configured")}
             description="Register an endpoint to receive platform events from systems outside AIVO."
           />
         ) : (
           <table className="w-full text-sm">
             <thead className="bg-aivo-surface-2 text-xs uppercase tracking-wide text-aivo-ink-soft">
               <tr>
-                <th className="px-4 py-3 text-left">Endpoint</th>
-                <th className="px-4 py-3 text-left">Events</th>
-                <th className="px-4 py-3 text-left">Secret</th>
-                <th className="px-4 py-3 text-left">Status</th>
-                <th className="px-4 py-3 text-left">Last delivery</th>
-                <th className="px-4 py-3 text-right">Failures</th>
+                <th className="px-4 py-3 text-left">{t("col_endpoint")}</th>
+                <th className="px-4 py-3 text-left">{t("col_events")}</th>
+                <th className="px-4 py-3 text-left">{t("col_secret")}</th>
+                <th className="px-4 py-3 text-left">{t("col_status")}</th>
+                <th className="px-4 py-3 text-left">{t("col_last_delivery")}</th>
+                <th className="px-4 py-3 text-right">{t("col_failures")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-aivo-border">

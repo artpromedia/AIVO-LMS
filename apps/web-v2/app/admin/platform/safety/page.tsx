@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -16,6 +17,7 @@ export const dynamic = "force-dynamic";
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_safety_overview");
   const events = listModerationEvents({});
   const cases = listHumanReviewCases({});
   const blocked = listBlockedGenerations();
@@ -55,7 +57,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform"
-        title="AI Safety"
+        title={t("title")}
         description="Moderation events, human review queue, blocked generations, and the safety policy that governs them all."
       />
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -73,7 +75,7 @@ export default async function Page() {
       </div>
       {blocked.length > 0 && (
         <Card className="mt-4 p-[var(--aivo-density-card-pad)]">
-          <h2 className="font-display font-semibold">Recent blocked generations</h2>
+          <h2 className="font-display font-semibold">{t("recent_blocked_heading")}</h2>
           <ul className="mt-2 divide-y text-sm">
             {blocked.slice(0, 5).map((b) => (
               <li key={b.id} className="py-2 flex items-center justify-between">

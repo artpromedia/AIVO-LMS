@@ -1,4 +1,5 @@
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -9,6 +10,7 @@ import { SSOForm } from "./sso-form";
 
 export default async function Page() {
   const session = await requirePageRole(["district_admin"]);
+  const t = await getTranslations("admin.district_settings_sso");
   const settings = getTenantSettings(session.tenantId);
 
   return (
@@ -20,7 +22,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="District settings"
-        title="SSO & SCIM"
+        title={t("title")}
         description="Single sign-on and automated user provisioning from your identity provider."
       />
 
@@ -30,7 +32,7 @@ export default async function Page() {
         </Card>
 
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="font-display text-lg font-semibold">Status</p>
+          <p className="font-display text-lg font-semibold">{t("status_heading")}</p>
           <dl className="mt-3 space-y-3 text-sm">
             <div className="flex items-center justify-between">
               <dt className="text-aivo-ink-soft">Mode</dt>
@@ -49,7 +51,7 @@ export default async function Page() {
               </dd>
             </div>
             <div>
-              <dt className="text-aivo-ink-soft">Last SCIM rotation</dt>
+              <dt className="text-aivo-ink-soft">{t("last_scim_rotation")}</dt>
               <dd className="mt-1 text-xs">
                 {settings.sso.lastScimRotationAt
                   ? new Date(settings.sso.lastScimRotationAt).toLocaleString()

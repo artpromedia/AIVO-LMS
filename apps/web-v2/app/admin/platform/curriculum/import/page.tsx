@@ -6,10 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
 import { listCurriculumImportJobs } from "@/lib/db/repos";
 import { ImportForm } from "./form";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function Page() {
+  const t = await getTranslations("admin.platform_curriculum_import");
   const session = await requirePageRole(["platform_admin"]);
   const jobs = listCurriculumImportJobs();
   return (
@@ -21,18 +23,18 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Curriculum"
-        title="Import standards"
+        title={t("title")}
         description="Trigger a curriculum import job. Each job records what was added so admins can audit catalog changes over time."
       />
       <div className="grid gap-3 md:grid-cols-[2fr_3fr]">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <h2 className="font-display font-semibold mb-3">Start an import</h2>
+          <h2 className="font-display font-semibold mb-3">{t("start_an_import")}</h2>
           <ImportForm />
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <h2 className="font-display font-semibold mb-3">Recent jobs</h2>
+          <h2 className="font-display font-semibold mb-3">{t("recent_jobs")}</h2>
           {jobs.length === 0 ? (
-            <p className="text-sm text-aivo-muted">No import jobs yet.</p>
+            <p className="text-sm text-aivo-muted">{t("no_import_jobs_yet")}</p>
           ) : (
             <ul className="divide-y text-sm">
               {jobs.slice(0, 20).map((j) => (

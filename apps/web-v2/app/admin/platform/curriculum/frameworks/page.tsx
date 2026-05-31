@@ -5,10 +5,12 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
 import { listStandardDocuments, listStandards, listStandardsFrameworks } from "@/lib/db/repos";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function Page() {
+  const t = await getTranslations("admin.platform_curriculum_frameworks");
   const session = await requirePageRole(["platform_admin"]);
   const frameworks = listStandardsFrameworks();
   const docs = listStandardDocuments();
@@ -22,7 +24,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Curriculum"
-        title="Standards frameworks"
+        title={t("title")}
         description="Public and AIVO-defined standards frameworks the skill graph aligns to."
       />
       <div className="space-y-3">
@@ -51,7 +53,7 @@ export default async function Page() {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    Homepage →
+                    {t("homepage_link")}
                   </a>
                 )}
               </div>

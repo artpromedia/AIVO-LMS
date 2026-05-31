@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
 export default function AdminError({
@@ -11,6 +12,7 @@ export default function AdminError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations("admin.error");
   useEffect(() => {
     console.error("[admin/error]", error);
   }, [error]);
@@ -20,20 +22,20 @@ export default function AdminError({
       id="main"
       className="mx-auto flex min-h-[70vh] max-w-xl flex-col items-center justify-center px-6 py-16 text-center"
     >
-      <p className="text-sm font-medium uppercase tracking-wide text-aivo-danger">Admin console</p>
+      <p className="text-sm font-medium uppercase tracking-wide text-aivo-danger">{t("eyebrow")}</p>
       <h1 className="mt-2 font-display text-4xl font-bold">
-        Something went wrong loading this page.
+        {t("heading")}
       </h1>
       <p className="mt-3 text-aivo-ink-soft">
-        The error has been logged. Retry now or head back to the admin home.
+        {t("body")}
       </p>
       {error.digest ? (
         <p className="mt-2 text-xs text-aivo-muted">Reference: {error.digest}</p>
       ) : null}
       <div className="mt-6 flex gap-3">
-        <Button onClick={() => reset()}>Try again</Button>
+        <Button onClick={() => reset()}>{t("retry")}</Button>
         <Button variant="outline" asChild>
-          <Link href="/admin">Admin home</Link>
+          <Link href="/admin">{t("home_link")}</Link>
         </Button>
       </div>
     </main>

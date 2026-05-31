@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -30,6 +31,7 @@ const BILLING_TONE: Record<string, "success" | "neutral" | "warning" | "danger">
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_tenants");
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const tenantIds = tenants.map((t) => t.id);
 
@@ -80,7 +82,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform"
-        title="Tenants"
+        title={t("title")}
         description="Every tenant currently provisioned in this environment."
       />
 
@@ -99,7 +101,7 @@ export default async function Page() {
       </div>
 
       {tenants.length === 0 ? (
-        <EmptyState title="No tenants" />
+        <EmptyState title={t("empty_title")} />
       ) : (
         <Card className="overflow-hidden">
           <div className="border-b border-aivo-border px-4 py-3 text-sm font-medium">
@@ -111,12 +113,12 @@ export default async function Page() {
                 <tr>
                   <th className="px-4 py-2">Name</th>
                   <th className="px-4 py-2">Type</th>
-                  <th className="px-4 py-2">Parent</th>
+                  <th className="px-4 py-2">{t("col_parent")}</th>
                   <th className="px-4 py-2 text-right">Users</th>
-                  <th className="px-4 py-2 text-right">Admins</th>
-                  <th className="px-4 py-2 text-right">Learners</th>
-                  <th className="px-4 py-2">Billing</th>
-                  <th className="px-4 py-2">Created</th>
+                  <th className="px-4 py-2 text-right">{t("col_admins")}</th>
+                  <th className="px-4 py-2 text-right">{t("col_learners")}</th>
+                  <th className="px-4 py-2">{t("col_billing")}</th>
+                  <th className="px-4 py-2">{t("col_created")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-aivo-border">
@@ -180,7 +182,7 @@ export default async function Page() {
           href="/admin/platform/billing"
           className="font-medium text-aivo-primary hover:underline"
         >
-          Open billing
+          {t("open_billing")}
         </Link>
         .
       </p>

@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -10,6 +11,7 @@ export const dynamic = "force-dynamic";
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_compliance_data_inventory");
   const items = listDataInventory();
   const subs = await listSubprocessors();
 
@@ -22,7 +24,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Compliance"
-        title="Data inventory"
+        title={t("title")}
         description="Every sensitive data category, its classification, lawful basis, and processing purposes."
       />
 
@@ -31,11 +33,11 @@ export default async function Page() {
           <thead className="bg-aivo-surface-2 text-left">
             <tr>
               <th className="p-3">Key</th>
-              <th className="p-3">Classification</th>
-              <th className="p-3">Lawful basis</th>
-              <th className="p-3">Purposes</th>
+              <th className="p-3">{t("col_classification")}</th>
+              <th className="p-3">{t("col_lawful_basis")}</th>
+              <th className="p-3">{t("col_purposes")}</th>
               <th className="p-3">Store</th>
-              <th className="p-3">Child data</th>
+              <th className="p-3">{t("col_child_data")}</th>
             </tr>
           </thead>
           <tbody>
@@ -64,7 +66,7 @@ export default async function Page() {
       </Card>
 
       <Card className="mt-4 p-[var(--aivo-density-card-pad)]">
-        <h2 className="font-display font-semibold">Subprocessors</h2>
+        <h2 className="font-display font-semibold">{t("subprocessors_heading")}</h2>
         <ul className="mt-2 grid gap-2 sm:grid-cols-2">
           {subs.map((s) => (
             <li key={s.id} className="rounded border border-aivo-border p-3 text-sm">

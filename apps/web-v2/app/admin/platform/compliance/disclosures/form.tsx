@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
 const RECIPIENT_TYPES = [
@@ -16,6 +17,7 @@ const RECIPIENT_TYPES = [
 
 export function DisclosureForm() {
   const router = useRouter();
+  const t = useTranslations("admin.platform_compliance_disclosures");
   const [recipientType, setRecipientType] =
     useState<(typeof RECIPIENT_TYPES)[number]>("school_official");
   const [recipientName, setRecipientName] = useState("");
@@ -58,7 +60,7 @@ export function DisclosureForm() {
     <form onSubmit={submit} className="mt-3 grid gap-3 sm:grid-cols-2">
       <div>
         <label className="block text-sm font-medium" htmlFor="rtype">
-          Recipient type
+          {t("label_recipient_type")}
         </label>
         <select
           id="rtype"
@@ -75,7 +77,7 @@ export function DisclosureForm() {
       </div>
       <div>
         <label className="block text-sm font-medium" htmlFor="rname">
-          Recipient name
+          {t("label_recipient_name")}
         </label>
         <input
           id="rname"
@@ -88,7 +90,7 @@ export function DisclosureForm() {
       </div>
       <div>
         <label className="block text-sm font-medium" htmlFor="fbasis">
-          FERPA basis
+          {t("label_ferpa_basis")}
         </label>
         <input
           id="fbasis"
@@ -97,12 +99,12 @@ export function DisclosureForm() {
           maxLength={200}
           value={ferpaBasis}
           onChange={(e) => setFerpaBasis(e.target.value)}
-          placeholder="school_official_exception"
+          placeholder={t("placeholder_ferpa_basis")}
         />
       </div>
       <div>
         <label className="block text-sm font-medium" htmlFor="lid">
-          Learner ID (optional)
+          {t("label_learner_id")}
         </label>
         <input
           id="lid"
@@ -114,7 +116,7 @@ export function DisclosureForm() {
       </div>
       <div className="sm:col-span-2">
         <label className="block text-sm font-medium" htmlFor="reason">
-          Reason
+          {t("label_reason")}
         </label>
         <textarea
           id="reason"

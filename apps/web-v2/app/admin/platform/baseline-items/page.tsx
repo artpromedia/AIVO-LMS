@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
 import { scopeTenantsForSession, getBaselineRecalibrationForTenants } from "@/lib/db/repos";
 import type { ItemPsychometrics } from "@/lib/db/types";
+import { getTranslations } from "next-intl/server";
 
 /**
  * Platform · Baseline item psychometrics (EPIC 5 / EPIC 2 admin view).
@@ -48,6 +49,7 @@ function rowTone(row: ItemPsychometrics): "danger" | "warning" | "neutral" {
 }
 
 export default async function Page() {
+  const t = await getTranslations("admin.platform_baseline_items");
   const session = await requirePageRole(["platform_admin"]);
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const tenantIds = tenants.map((t) => t.id);
@@ -74,7 +76,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Assessment quality"
-        title="Baseline item psychometrics"
+        title={t("title")}
         description="Live recalibration of adaptive-baseline items: exposure, p-value, and difficulty drift from learner responses."
       />
 
@@ -89,7 +91,7 @@ export default async function Page() {
 
       <SectionHeader
         className="mt-8"
-        title="Items by exposure"
+        title={t("items_by_exposure")}
         description={
           items.length === 0
             ? "No baseline telemetry captured yet."
@@ -99,7 +101,7 @@ export default async function Page() {
 
       {items.length === 0 ? (
         <EmptyState
-          title="No baseline telemetry yet"
+          title={t("no_telemetry_yet")}
           description="Once learners complete adaptive baselines, per-item psychometrics appear here."
         />
       ) : (
@@ -108,17 +110,17 @@ export default async function Page() {
             <table className="w-full text-sm">
               <thead className="bg-aivo-surface-2 text-left">
                 <tr>
-                  <th className="p-3">Item (skill · band)</th>
-                  <th className="p-3 text-right">Exposure</th>
-                  <th className="p-3 text-right">Scored</th>
+                  <th className="p-3">{t("col_item")}</th>
+                  <th className="p-3 text-right">{t("col_exposure")}</th>
+                  <th className="p-3 text-right">{t("col_scored")}</th>
                   <th className="p-3 text-right">p-value</th>
-                  <th className="p-3 text-right">Median time</th>
-                  <th className="p-3 text-right">Seed θ</th>
-                  <th className="p-3 text-right">Est. θ̂</th>
+                  <th className="p-3 text-right">{t("col_median_time")}</th>
+                  <th className="p-3 text-right">{t("col_seed_theta")}</th>
+                  <th className="p-3 text-right">{t("col_est_theta")}</th>
                   <th className="p-3 text-right">Δθ</th>
-                  <th className="p-3 text-right">Disc. (a)</th>
-                  <th className="p-3">Suggested band</th>
-                  <th className="p-3">Status</th>
+                  <th className="p-3 text-right">{t("col_disc")}</th>
+                  <th className="p-3">{t("col_suggested_band")}</th>
+                  <th className="p-3">{t("col_status")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -164,13 +166,13 @@ export default async function Page() {
                       <td className="p-3">
                         {tone === "neutral" ? (
                           row.sufficientData ? (
-                            <Badge tone="success">Healthy</Badge>
+                            <Badge tone="success">{t("status_healthy")}</Badge>
                           ) : (
-                            <Badge tone="neutral">Collecting</Badge>
+                            <Badge tone="neutral">{t("status_collecting")}</Badge>
                           )
                         ) : (
                           <div className="flex flex-col gap-1">
-                            {row.recommendRetire ? <Badge tone="danger">Retire</Badge> : null}
+                            {row.recommendRetire ? <Badge tone="danger">{t("status_retire")}</Badge> : null}
                             {row.defectReasons.map((d) => (
                               <Badge key={d} tone="warning">
                                 {DEFECT_LABELS[d] ?? d}

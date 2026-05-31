@@ -1,4 +1,5 @@
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -8,6 +9,7 @@ import { listAuditLogsForTenants, scopeTenantsForSession, getTenantById } from "
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_audit_logs");
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const logs = await listAuditLogsForTenants(
     tenants.map((t) => t.id),
@@ -23,21 +25,21 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Observability"
-        title="Audit logs"
+        title={t("title")}
         description="Every privileged or state-changing BFF call. Newest first."
       />
       {logs.length === 0 ? (
-        <EmptyState title="No audit events yet" />
+        <EmptyState title={t("empty")} />
       ) : (
         <Card className="overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-aivo-surface-2 text-left">
               <tr>
                 <th className="p-3">When</th>
-                <th className="p-3">Action</th>
+                <th className="p-3">{t("col_action")}</th>
                 <th className="p-3">Actor</th>
-                <th className="p-3">Tenant</th>
-                <th className="p-3">Request ID</th>
+                <th className="p-3">{t("col_tenant")}</th>
+                <th className="p-3">{t("col_request_id")}</th>
               </tr>
             </thead>
             <tbody>

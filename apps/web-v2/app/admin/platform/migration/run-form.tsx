@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,6 +16,7 @@ const KIND_HINT: Record<string, string> = {
 };
 
 export function RunForm() {
+  const t = useTranslations("admin.platform_migration");
   const router = useRouter();
   const [pending, start] = useTransition();
   const [source, setSource] = useState("v1-postgres");
@@ -74,7 +76,7 @@ export function RunForm() {
       <div className="grid gap-3 sm:grid-cols-3">
         <div>
           <label className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            Source
+            {t("col_source")}
           </label>
           <Input value={source} onChange={(e) => setSource(e.target.value)} />
         </div>
@@ -100,13 +102,13 @@ export function RunForm() {
         <div className="flex items-end">
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" checked={dryRun} onChange={(e) => setDryRun(e.target.checked)} />
-            Dry run (preview only)
+            {t("dry_run")}
           </label>
         </div>
       </div>
       <div className="mt-3">
         <label className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-          Source records (JSON)
+          {t("source_records")}
         </label>
         <Textarea
           rows={6}

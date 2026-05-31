@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -45,6 +46,7 @@ function formatRange(startIso: string, endIso: string | null): string {
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_billing_daily_batch");
   const batches = listDailyBillingBatches();
 
   const last30 = batches.slice(0, 30);
@@ -70,7 +72,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Billing"
-        title="Daily invoice batch"
+        title={t("title")}
         description="The 02:00 UTC job that closes the previous day's metered usage and generates invoices for every active subscription."
       />
 
@@ -86,19 +88,19 @@ export default async function Page() {
       <Card className="mt-6 overflow-hidden p-0">
         {batches.length === 0 ? (
           <EmptyState
-            title="No batch history yet"
+            title={t("empty_title")}
             description="The first daily batch will appear once the 02:00 UTC scheduler has fired."
           />
         ) : (
           <table className="w-full text-sm">
             <thead className="bg-aivo-surface-2 text-xs uppercase tracking-wide text-aivo-ink-soft">
               <tr>
-                <th className="px-4 py-3 text-left">Run date</th>
-                <th className="px-4 py-3 text-left">Window</th>
-                <th className="px-4 py-3 text-left">Status</th>
-                <th className="px-4 py-3 text-right">Generated</th>
-                <th className="px-4 py-3 text-right">Failed</th>
-                <th className="px-4 py-3 text-right">Total billed</th>
+                <th className="px-4 py-3 text-left">{t("col_run_date")}</th>
+                <th className="px-4 py-3 text-left">{t("col_window")}</th>
+                <th className="px-4 py-3 text-left">{t("col_status")}</th>
+                <th className="px-4 py-3 text-right">{t("col_generated")}</th>
+                <th className="px-4 py-3 text-right">{t("col_failed")}</th>
+                <th className="px-4 py-3 text-right">{t("col_total_billed")}</th>
                 <th className="px-4 py-3 text-left">Notes</th>
               </tr>
             </thead>

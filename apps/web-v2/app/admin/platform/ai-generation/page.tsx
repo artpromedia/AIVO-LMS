@@ -11,6 +11,7 @@ import {
   scopeTenantsForSession,
   getTenantById,
 } from "@/lib/db/repos";
+import { getTranslations } from "next-intl/server";
 
 const STATUS_TONE: Record<string, "success" | "warning" | "danger" | "neutral"> = {
   complete: "success",
@@ -20,6 +21,7 @@ const STATUS_TONE: Record<string, "success" | "warning" | "danger" | "neutral"> 
 };
 
 export default async function Page() {
+  const t = await getTranslations("admin.platform_ai_generation");
   const session = await requirePageRole(["platform_admin"]);
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const tenantIds = tenants.map((t) => t.id);
@@ -41,7 +43,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · AI governance"
-        title="AI generation"
+        title={t("title")}
         description="Live ledger of every LLM call the platform has made."
       />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -52,9 +54,9 @@ export default async function Page() {
           </Card>
         ))}
       </div>
-      <SectionHeader className="mt-8" title="Recent jobs" description="Newest first." />
+      <SectionHeader className="mt-8" title={t("recent_jobs")} description="Newest first." />
       {jobs.length === 0 ? (
-        <EmptyState title="No AI generation jobs yet" />
+        <EmptyState title={t("no_jobs_yet")} />
       ) : (
         <Card className="overflow-hidden">
           <table className="w-full text-sm">
@@ -62,9 +64,9 @@ export default async function Page() {
               <tr>
                 <th className="p-3">When</th>
                 <th className="p-3">Kind</th>
-                <th className="p-3">Tenant</th>
-                <th className="p-3">Status</th>
-                <th className="p-3">Duration</th>
+                <th className="p-3">{t("col_tenant")}</th>
+                <th className="p-3">{t("col_status")}</th>
+                <th className="p-3">{t("col_duration")}</th>
               </tr>
             </thead>
             <tbody>

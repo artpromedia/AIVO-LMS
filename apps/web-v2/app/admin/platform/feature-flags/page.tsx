@@ -7,6 +7,7 @@
  * truth so the production runbook and the UI never disagree.
  */
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -72,6 +73,7 @@ function SurfaceSection({
 
 export default async function PlatformFeatureFlagsPage() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_feature_flags");
 
   const env = (process.env ?? {}) as Record<string, string | undefined>;
   const resolved = resolveEnterpriseFlags(env);
@@ -94,14 +96,14 @@ export default async function PlatformFeatureFlagsPage() {
     >
       <PageHeader
         eyebrow="Platform"
-        title="Feature flags"
+        title={t("title")}
         description="Source of truth is the AIVO_FEATURE_* env vars. This page surfaces what's live so the runbook and the runtime can never drift."
       />
 
-      <SurfaceSection title="AI & content" flags={grouped.ai} />
-      <SurfaceSection title="Enterprise" flags={grouped.enterprise} />
-      <SurfaceSection title="Integrations" flags={grouped.integrations} />
-      <SurfaceSection title="Learner experience" flags={grouped.ux} />
+      <SurfaceSection title={t("section_ai")} flags={grouped.ai} />
+      <SurfaceSection title={t("section_enterprise")} flags={grouped.enterprise} />
+      <SurfaceSection title={t("section_integrations")} flags={grouped.integrations} />
+      <SurfaceSection title={t("section_ux")} flags={grouped.ux} />
     </AppShell>
   );
 }

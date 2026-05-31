@@ -1089,5 +1089,619 @@
       "blocked_secondary": "지원팀에 문의",
       "generic_secondary": "지원팀에 문의"
     }
+  },
+  "admin": {
+    "district_overview": {
+      "eyebrow": "학구 관리자",
+      "description": "학교 간 감독, 명단 관리 및 보고서. 카드를 클릭하여 학교를 관리하세요.",
+      "fl_distribution_title": "기능 수준 분포",
+      "no_learners": "아직 학습자가 배정되지 않았습니다.",
+      "platform_health_title": "플랫폼 상태",
+      "lessons_completed": "완료된 수업",
+      "lessons_attempted": "시도한 수업",
+      "ai_jobs_in_queue": "대기 중인 AI 작업",
+      "ai_failures": "AI 실패"
+    },
+    "district_billing": {
+      "title": "청구",
+      "empty_title": "청구 정보 없음",
+      "col_tenant": "테넌트",
+      "col_status": "상태"
+    },
+    "district_compliance": {
+      "title": "준수"
+    },
+    "district_iep": {
+      "title": "IEP 준수",
+      "empty_title": "이 학구에는 아직 학습자가 없습니다",
+      "col_learner": "학습자",
+      "col_school": "학교",
+      "col_family": "가족"
+    },
+    "district_reports": {
+      "title": "학구 보고서"
+    },
+    "district_schools": {
+      "title": "학교",
+      "empty_title": "이 학구에는 아직 학교가 없습니다",
+      "col_school": "학교",
+      "col_learners": "학습자",
+      "col_families": "가족",
+      "view_staff": "교직원 보기"
+    },
+    "district_settings_admins": {
+      "title": "관리자",
+      "empty_title": "아직 관리자가 없습니다",
+      "invite_note": "관리자 초대는 AIVO의 학구 온보딩 담당자가 처리합니다.",
+      "col_joined": "가입일"
+    },
+    "district_settings_branding": {
+      "title": "브랜딩",
+      "display_name": "표시 이름",
+      "display_name_hint": "제품 헤더, 이메일, 학부모 포털에 표시됩니다.",
+      "support_email": "지원 이메일",
+      "support_email_hint": "이 학구의 가족과 교직원이 모든 도움말 페이지에서 확인합니다.",
+      "primary_colour": "주요 브랜드 색상",
+      "primary_colour_aria": "주요 브랜드 색상",
+      "sample": "샘플"
+    },
+    "district_settings": {
+      "title": "설정",
+      "org_section": "조직",
+      "tenant_name": "테넌트 이름",
+      "tenant_id": "테넌트 ID",
+      "schools": "학교",
+      "learners": "학습자",
+      "support_email": "지원 이메일",
+      "last_update": "마지막 업데이트",
+      "manage": "관리",
+      "notifications_heading": "알림 설정",
+      "notifications_desc": "학구 관리자에게 이메일로 전송되는 내용.",
+      "features_heading": "기능 재정의",
+      "features_desc": "이 학구의 모든 학교에 적용되는 학구 수준 토글."
+    },
+    "district_settings_sso": {
+      "title": "SSO 및 SCIM",
+      "status_heading": "상태",
+      "last_scim_rotation": "마지막 SCIM 교체",
+      "sign_in_mode": "로그인 모드",
+      "idp_name_label": "ID 공급자 이름",
+      "idp_name_placeholder": "예: 학구 Okta",
+      "scim_provisioning": "SCIM 프로비저닝",
+      "enable_scim": "SCIM 활성화",
+      "scim_rotate_warning": "SCIM 토큰을 교체하면 이전 자격 증명을 사용하는 모든 IdP 통합이 무효화됩니다.",
+      "rotate_scim_token": "SCIM 토큰 교체"
+    },
+    "district_staff": {
+      "title": "교직원 디렉토리",
+      "invitations_heading": "초대",
+      "active_staff_heading": "재직 중인 교직원",
+      "empty_title": "이 학구에는 아직 교직원이 없습니다",
+      "col_joined": "가입일",
+      "pending_invitations": "대기 중인 초대",
+      "invite_staff_btn": "교직원 초대",
+      "invite_staff_member": "교직원 초대",
+      "close_aria": "닫기",
+      "field_display_name": "표시 이름",
+      "role_teacher": "교사",
+      "role_school_admin": "학교 관리자",
+      "role_district_admin": "학구 관리자",
+      "assign_to_school": "학교에 배정",
+      "pick_school": "학교를 선택하세요…",
+      "cancel": "취소",
+      "sending": "전송 중…",
+      "invited_success": "{name}을(를) 초대했습니다",
+      "temporary_password": "임시 비밀번호"
+    },
+    "error": {
+      "eyebrow": "관리 콘솔",
+      "heading": "이 페이지를 로드하는 중 오류가 발생했습니다.",
+      "body": "오류가 기록되었습니다. 지금 다시 시도하거나 관리자 홈으로 돌아가세요.",
+      "retry": "다시 시도",
+      "home_link": "관리자 홈"
+    },
+    "login": {
+      "heading": "관리자 로그인",
+      "security_badge": "MFA 적용 · SOC 2 · FERPA",
+      "card_title": "관리 콘솔에 로그인",
+      "sign_in_btn": "로그인",
+      "standard_sign_in": "표준 로그인 사용"
+    },
+    "not_found": {
+      "eyebrow": "관리 콘솔 · 404",
+      "heading": "해당 페이지가 없습니다.",
+      "body": "이동되었거나 리소스가 삭제되었을 수 있습니다.",
+      "home_link": "관리자 홈"
+    },
+    "platform_tenants_detail": {
+      "all_tenants": "모든 테넌트",
+      "stat_learners": "학습자",
+      "stat_sub_tenants": "하위 테넌트",
+      "stat_created": "생성일",
+      "user_mix": "사용자 구성",
+      "no_users": "아직 사용자가 없습니다.",
+      "direct_children": "직접 하위 항목",
+      "no_nested_tenants": "이 테넌트 바로 아래에 중첩된 테넌트가 없습니다.",
+      "recent_ai_jobs": "최근 AI 작업",
+      "no_ai_jobs": "AI 생성 활동 없음",
+      "view_all": "모두 보기",
+      "recent_invoices": "최근 청구서",
+      "no_invoices": "아직 청구서가 없습니다",
+      "audit_trail": "감사 추적",
+      "no_audit": "감사된 활동 없음"
+    },
+    "platform_tenants": {
+      "title": "테넌트",
+      "empty_title": "테넌트 없음",
+      "col_parent": "상위",
+      "col_admins": "관리자",
+      "col_learners": "학습자",
+      "col_billing": "청구",
+      "col_created": "생성일",
+      "open_billing": "청구 열기"
+    },
+    "platform_audit_logs": {
+      "title": "감사 로그",
+      "empty": "아직 감사 이벤트가 없습니다",
+      "col_action": "작업",
+      "col_tenant": "테넌트",
+      "col_request_id": "요청 ID"
+    },
+    "platform_data": {
+      "title": "데이터 인벤토리"
+    },
+    "platform_feature_flags": {
+      "title": "기능 플래그",
+      "section_ai": "AI 및 콘텐츠",
+      "section_enterprise": "엔터프라이즈",
+      "section_integrations": "통합",
+      "section_ux": "학습자 경험"
+    },
+    "platform_jobs": {
+      "title": "백그라운드 작업",
+      "empty": "아직 AI 생성 활동이 없습니다",
+      "by_kind": "유형별",
+      "latency": "지연 시간",
+      "lesson_runs": "레슨 실행",
+      "lesson_runs_desc": "AI 생성 하류의 학습자 대면 파이프라인.",
+      "recent_jobs": "최근 작업 · 최신순",
+      "col_status": "상태",
+      "col_tenant": "테넌트",
+      "col_started": "시작",
+      "col_duration": "소요 시간"
+    },
+    "platform_learners": {
+      "title": "학습자",
+      "empty": "아직 학습자가 없습니다",
+      "iep_on_file": "IEP 등록됨",
+      "iep_skipped": "IEP 건너뜀",
+      "parent_opt_out": "학부모 거부 기록됨",
+      "iep_pending": "IEP 대기 중",
+      "no_decision": "아직 결정 없음",
+      "fl_mix": "기능 수준 분포",
+      "grade_band": "학년 범위",
+      "col_learner": "학습자",
+      "col_tenant": "테넌트",
+      "col_fl": "기능 수준",
+      "col_created": "생성일",
+      "unassigned": "미배정"
+    },
+    "platform_migration": {
+      "title": "v1 → v2 마이그레이션",
+      "empty": "아직 마이그레이션 작업이 없습니다",
+      "recent_jobs": "최근 작업",
+      "col_source": "소스",
+      "col_status": "상태",
+      "col_results": "결과",
+      "col_started": "시작",
+      "dry_run": "드라이런 (미리보기만)",
+      "source_records": "소스 레코드 (JSON)"
+    },
+    "platform_support": {
+      "title": "지원 티켓",
+      "empty": "받은편지함이 비어 있습니다"
+    },
+    "platform_system_health": {
+      "title": "시스템 상태"
+    },
+    "platform_users_detail": {
+      "empty": "범위 내 멤버십이 없습니다",
+      "all_users": "모든 사용자",
+      "user_id": "사용자 ID",
+      "col_created": "생성일",
+      "managed_learners": "관리 중인 학습자",
+      "memberships": "멤버십",
+      "col_tenant": "테넌트",
+      "col_permissions": "권한",
+      "col_joined": "가입일",
+      "col_learner": "학습자"
+    },
+    "platform_users": {
+      "title": "사용자",
+      "empty": "사용자가 없습니다",
+      "col_tenant": "테넌트",
+      "col_joined": "가입일"
+    },
+    "school_billing": {
+      "title": "청구 및 시트",
+      "no_subscription": "구독 없음",
+      "no_seat_licenses": "시트 라이선스 없음",
+      "no_invoices": "청구서 없음",
+      "seat_licenses": "시트 라이선스",
+      "no_seats_assigned": "아직 시트가 배정되지 않았습니다.",
+      "col_subject": "대상",
+      "col_assigned": "배정됨",
+      "invoices": "청구서",
+      "col_number": "번호",
+      "col_period": "기간",
+      "col_amount": "금액",
+      "col_status": "상태"
+    },
+    "school_classes_detail": {
+      "teachers": "교사",
+      "none_yet": "아직 없습니다.",
+      "learners": "학습자",
+      "no_learners_enrolled": "등록된 학습자가 없습니다."
+    },
+    "school_classes": {
+      "title": "수업",
+      "empty": "아직 수업이 없습니다"
+    },
+    "school_compliance": {
+      "title": "규정 준수"
+    },
+    "school_learners": {
+      "title": "학습자",
+      "empty": "로스터에 학습자가 없습니다",
+      "col_learner": "학습자",
+      "col_readiness": "준비 상태",
+      "col_fl": "기능 수준"
+    },
+    "school_overview": {
+      "school_admin": "학교 관리자",
+      "card_rostering_health": "로스터 상태",
+      "card_consent_compliance": "동의 및 규정 준수",
+      "card_ai_safety": "AI 안전",
+      "card_license_util": "라이선스 활용률",
+      "source": "소스",
+      "last_sync": "마지막 동기화",
+      "manage_rostering": "로스터 관리 →",
+      "consent_complete": "동의 완료",
+      "ieps_on_file": "IEP 등록됨",
+      "audit_events_30d": "감사 이벤트 (30일)",
+      "open_compliance": "규정 준수 열기 →",
+      "flagged_7d": "플래그 지정됨 (7일)",
+      "review_safety_logs": "안전 로그 검토 →",
+      "open_reports": "보고서 열기 →"
+    },
+    "school_reports": {
+      "title": "보고서"
+    },
+    "school_rostering": {
+      "title": "로스터",
+      "section_schools": "학교",
+      "empty_schools": "아직 학교가 없습니다",
+      "section_sis": "SIS 연결",
+      "empty_sis": "아직 SIS 연결이 없습니다",
+      "section_recent_imports": "최근 가져오기 작업",
+      "empty_imports": "아직 가져오기가 없습니다",
+      "start_csv_import": "CSV 가져오기 시작",
+      "btn_classes": "수업",
+      "btn_import_csv": "CSV 가져오기",
+      "import_total": "총계:",
+      "import_created": "생성됨:",
+      "import_skipped": "건너뜀:",
+      "import_errors": "오류:"
+    },
+    "school_settings": {
+      "title": "설정",
+      "signed_in_as": "로그인 계정"
+    },
+    "school_staff": {
+      "title": "교직원",
+      "empty": "아직 교직원이 없습니다",
+      "col_tenant": "테넌트"
+    },
+    "platform_billing_overview": {
+      "title": "청구",
+      "empty_title": "청구 계정 없음",
+      "col_tenant": "테넌트",
+      "col_status": "상태",
+      "col_created": "생성일"
+    },
+    "platform_billing_revenue": {
+      "title": "수익",
+      "empty_title": "아직 수금 내역이 없습니다",
+      "link_all_invoices": "모든 청구서 →",
+      "stat_lifetime_collected": "누적 수금액",
+      "stat_last_30_days": "최근 30일",
+      "stat_active_subscriptions": "활성 구독",
+      "section_monthly_collected": "월별 수금액 · 최근 12개월",
+      "no_paid_invoices": "아직 지급 완료된 청구서가 없습니다.",
+      "section_top_tenants": "상위 수익 테넌트",
+      "section_plan_mix": "플랜 구성"
+    },
+    "platform_compliance_data_inventory": {
+      "title": "데이터 인벤토리",
+      "col_classification": "분류",
+      "col_lawful_basis": "법적 근거",
+      "col_purposes": "처리 목적",
+      "col_child_data": "아동 데이터",
+      "subprocessors_heading": "하위 처리자"
+    },
+    "platform_compliance_disclosures": {
+      "title": "FERPA 공개 로그",
+      "record_heading": "공개 기록하기",
+      "col_recipient": "수신자",
+      "col_reason": "사유",
+      "col_ferpa_basis": "FERPA 근거",
+      "empty_body": "아직 공개 기록이 없습니다.",
+      "label_recipient_type": "수신자 유형",
+      "label_recipient_name": "수신자 이름",
+      "label_ferpa_basis": "FERPA 근거",
+      "placeholder_ferpa_basis": "school_official_exception",
+      "label_learner_id": "학습자 ID (선택)",
+      "label_reason": "사유"
+    },
+    "platform_compliance_dsar": {
+      "title": "데이터 주체 요청",
+      "col_requested": "요청일",
+      "col_parent": "보호자",
+      "col_learner": "학습자",
+      "col_status": "상태",
+      "col_completed": "완료일",
+      "col_target": "대상",
+      "no_requests": "요청 없음."
+    },
+    "platform_compliance_overview": {
+      "title": "컴플라이언스",
+      "link_open_queue": "대기열 열기 →",
+      "active_policies_heading": "활성 정책"
+    },
+    "platform_compliance_retention": {
+      "title": "보존 정책",
+      "col_classification": "분류",
+      "col_retention_days": "보존 (일)",
+      "col_archive_days": "보관 (일)",
+      "col_description": "설명"
+    },
+    "platform_safety_moderation": {
+      "title": "모더레이션 이벤트",
+      "col_subject": "주제",
+      "col_decision": "결정",
+      "col_categories": "카테고리",
+      "col_severity": "심각도",
+      "col_excerpt": "발췌",
+      "empty_body": "아직 모더레이션 이벤트가 없습니다."
+    },
+    "platform_safety_overview": {
+      "title": "AI 안전",
+      "recent_blocked_heading": "최근 차단된 생성"
+    },
+    "platform_safety_policies": {
+      "title": "정책 버전",
+      "label_block_threshold": "차단 임계값",
+      "label_review_threshold": "검토 임계값",
+      "label_auto_review_categories": "자동 검토 카테고리",
+      "label_auto_block_categories": "자동 차단 카테고리"
+    },
+    "platform_safety_red_team": {
+      "title": "레드팀 스위트",
+      "col_prompt": "프롬프트",
+      "col_expected": "예상 결과",
+      "col_observed": "실제 결과",
+      "col_result": "결과"
+    },
+    "platform_safety_review_queue": {
+      "title": "검토 대기열",
+      "empty_body": "아직 검토 케이스가 없습니다.",
+      "placeholder_reviewer_note": "검토자 메모 (선택)",
+      "btn_escalate": "에스컬레이션"
+    },
+    "platform_security_controls": {
+      "title": "SOC 2 통제항목",
+      "label_owner": "담당자:"
+    },
+    "platform_security_incidents": {
+      "title": "인시던트",
+      "open_incident_heading": "인시던트 열기",
+      "empty_body": "기록된 인시던트가 없습니다.",
+      "badge_customer_impact": "고객 영향",
+      "badge_regulator_notify": "규제기관 통보"
+    },
+    "platform_security_overview": {
+      "title": "보안 상태",
+      "recent_activity_heading": "최근 활동",
+      "no_events": "아직 이벤트가 없습니다.",
+      "link_audit_log": "전체 감사 로그 보기 →"
+    },
+    "platform_security_risks": {
+      "title": "리스크 등록부",
+      "empty_body": "아직 추적 중인 리스크가 없습니다.",
+      "label_treatment": "처리 방안:"
+    },
+    "platform_security_state_privacy": {
+      "title": "주 개인정보 보호법 매트릭스",
+      "label_obligation": "의무:",
+      "no_control_mapped": "아직 매핑된 통제항목 없음 — 이것은 격차입니다."
+    },
+    "platform_security_vendors": {
+      "title": "공급업체 및 하위 처리자 인벤토리",
+      "subprocessors_heading": "하위 처리자 (학습자 데이터 처리)",
+      "badge_learner_data": "학습자 데이터"
+    },
+    "platform_security_vulnerabilities": {
+      "title": "취약점 관리",
+      "empty_body": "현재 추적 중인 취약점이 없습니다."
+    },
+    "platform_overview": {
+      "title": "시스템 상태",
+      "tenant_footprint": "테넌트 현황",
+      "tenant_footprint_desc": "현재 이 환경에 프로비저닝된 테넌트 분포.",
+      "billing_status": "청구 상태",
+      "recent_ai_jobs": "최근 AI 작업",
+      "no_ai_activity_yet": "아직 AI 생성 활동이 없습니다.",
+      "view_all": "모두 보기",
+      "operations_centres": "운영 센터",
+      "signed_in_as": "로그인됨:",
+      "platform_settings": "플랫폼 설정"
+    },
+    "platform_ai_moderation": {
+      "title": "AI 콘텐츠 조정",
+      "no_block_or_review_events": "차단 또는 검토 이벤트 없음",
+      "top_categories": "주요 카테고리 (차단 + 검토)",
+      "no_categorised_events": "분류된 이벤트가 없습니다.",
+      "col_tenant": "테넌트",
+      "col_decision": "결정",
+      "col_categories": "카테고리",
+      "col_signals": "신호",
+      "col_excerpt": "발췌"
+    },
+    "platform_ai_playground": {
+      "title": "AI 플레이그라운드",
+      "how_it_works": "작동 방식",
+      "responses_moderated": "응답은 출력 조정을 거쳐 여기에 반환됩니다.",
+      "playground_responses_are": "플레이그라운드 응답은",
+      "presets": "프리셋",
+      "model_claude": "Claude Opus 4.7 (기본)",
+      "model_gemini": "Gemini 3.0 Pro (대체)",
+      "model_gpt": "GPT-5.5 (대체)",
+      "system_prompt": "시스템 프롬프트",
+      "user_prompt": "사용자 프롬프트"
+    },
+    "platform_ai_costs": {
+      "title": "AI 비용 관리",
+      "no_cost_events_yet": "아직 비용 이벤트 없음",
+      "spend_mtd": "이번 달 지출",
+      "approaching_cap": "한도 근접",
+      "over_cap": "한도 초과",
+      "tenants": "테넌트",
+      "col_tenant": "테넌트",
+      "col_status": "상태",
+      "col_budget": "예산",
+      "recent_cost_events": "최근 비용 이벤트",
+      "col_feature": "기능",
+      "col_provider_model": "공급자 / 모델",
+      "col_tokens": "토큰",
+      "aria_monthly_cap": "월별 한도 (USD)",
+      "aria_warn_at": "경고 비율"
+    },
+    "platform_ai_generation": {
+      "title": "AI 생성",
+      "recent_jobs": "최근 작업",
+      "no_jobs_yet": "아직 AI 생성 작업이 없습니다",
+      "col_tenant": "테넌트",
+      "col_status": "상태",
+      "col_duration": "소요 시간"
+    },
+    "platform_audio": {
+      "title": "오디오 및 읽어주기",
+      "pronunciation_overrides": "발음 재정의",
+      "playbacks": "재생 횟수",
+      "cache_hit_rate": "캐시 적중률",
+      "total_cost": "총 비용",
+      "unique_clips": "고유 클립",
+      "recent_playbacks": "최근 재생",
+      "col_context": "컨텍스트",
+      "no_playbacks_yet": "아직 기록된 재생이 없습니다.",
+      "recently_generated_clips": "최근 생성된 클립"
+    },
+    "platform_audio_pronunciation": {
+      "title": "발음 재정의",
+      "add_override": "재정의 추가",
+      "replacement": "대체",
+      "encoding": "인코딩",
+      "notes_optional": "메모 (선택 사항)",
+      "no_overrides_yet": "아직 재정의가 없습니다.",
+      "placeholder_token": "예: AIVO",
+      "placeholder_replacement": "예: ay-voh"
+    },
+    "platform_baseline_items": {
+      "title": "기준선 항목 심리 측정",
+      "items_by_exposure": "노출별 항목",
+      "no_telemetry_yet": "아직 기준선 원격 측정 데이터 없음",
+      "col_item": "항목 (기술 · 밴드)",
+      "col_exposure": "노출",
+      "col_scored": "채점됨",
+      "col_median_time": "중앙값 시간",
+      "col_seed_theta": "θ 시드값",
+      "col_est_theta": "θ̂ 추정값",
+      "col_disc": "변별도 (a)",
+      "col_suggested_band": "권장 밴드",
+      "col_status": "상태",
+      "status_healthy": "정상",
+      "status_collecting": "수집 중",
+      "status_retire": "폐기"
+    },
+    "platform_curriculum_overview": {
+      "title": "교육과정"
+    },
+    "platform_curriculum_frameworks": {
+      "title": "표준 프레임워크",
+      "homepage_link": "홈페이지 →"
+    },
+    "platform_curriculum_import": {
+      "title": "표준 가져오기",
+      "start_an_import": "가져오기 시작",
+      "recent_jobs": "최근 작업",
+      "no_import_jobs_yet": "아직 가져오기 작업이 없습니다.",
+      "framework": "프레임워크",
+      "source": "소스",
+      "source_placeholder": "manual, s3://…, https://…"
+    },
+    "platform_curriculum_skills": {
+      "title": "기술",
+      "col_subject": "교과",
+      "col_grade_band": "학년 밴드",
+      "col_version": "버전",
+      "col_prereqs": "선수 조건",
+      "col_standards": "표준",
+      "col_constraints": "제약"
+    },
+    "platform_curriculum_subjects": {
+      "title": "교과 및 도메인",
+      "no_domains_yet": "아직 도메인이 없습니다."
+    },
+    "platform_curriculum_versioning": {
+      "title": "버전·목표·청사진",
+      "skill_versions": "기술 버전",
+      "objective_templates": "목표 템플릿",
+      "assessment_blueprints": "평가 청사진",
+      "col_blueprint": "청사진",
+      "col_status": "상태"
+    },
+    "platform_settings_overview": {
+      "title": "설정",
+      "signed_in_as": "로그인됨:"
+    },
+    "platform_settings_api_keys": {
+      "title": "API 키",
+      "no_keys_yet": "아직 API 키가 없습니다",
+      "col_prefix": "접두사",
+      "col_scopes": "범위",
+      "col_status": "상태",
+      "col_created_by": "생성자",
+      "col_last_used": "마지막 사용",
+      "col_created": "생성일"
+    },
+    "platform_settings_emails": {
+      "title": "이메일 템플릿",
+      "no_templates_configured": "이메일 템플릿이 구성되지 않음",
+      "col_template": "템플릿",
+      "col_subject": "제목",
+      "col_status": "상태",
+      "col_last_sent": "마지막 전송",
+      "col_updated": "업데이트"
+    },
+    "platform_settings_webhooks": {
+      "title": "웹훅",
+      "no_endpoints_configured": "웹훅 엔드포인트가 구성되지 않음",
+      "col_endpoint": "엔드포인트",
+      "col_events": "이벤트",
+      "col_secret": "시크릿",
+      "col_status": "상태",
+      "col_last_delivery": "마지막 전달",
+      "col_failures": "실패"
+    }
   }
 }

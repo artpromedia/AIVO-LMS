@@ -3,8 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 export function CreateOverrideForm({ canPublishPlatform }: { canPublishPlatform: boolean }) {
+  const t = useTranslations("admin.platform_audio_pronunciation");
   const router = useRouter();
   const [token, setToken] = useState("");
   const [replacement, setReplacement] = useState("");
@@ -44,20 +46,20 @@ export function CreateOverrideForm({ canPublishPlatform }: { canPublishPlatform:
           value={token}
           onChange={(e) => setToken(e.target.value)}
           className="mt-1 w-full rounded border px-2 py-1"
-          placeholder="e.g. AIVO"
+          placeholder={t("placeholder_token")}
         />
       </label>
       <label className="text-sm">
-        Replacement
+        {t("replacement")}
         <input
           value={replacement}
           onChange={(e) => setReplacement(e.target.value)}
           className="mt-1 w-full rounded border px-2 py-1"
-          placeholder="e.g. ay-voh"
+          placeholder={t("placeholder_replacement")}
         />
       </label>
       <label className="text-sm">
-        Encoding
+        {t("encoding")}
         <select
           value={encoding}
           onChange={(e) => setEncoding(e.target.value as typeof encoding)}
@@ -80,7 +82,7 @@ export function CreateOverrideForm({ canPublishPlatform }: { canPublishPlatform:
         </select>
       </label>
       <label className="text-sm sm:col-span-2">
-        Notes (optional)
+        {t("notes_optional")}
         <input
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
@@ -94,7 +96,7 @@ export function CreateOverrideForm({ canPublishPlatform }: { canPublishPlatform:
           onClick={submit}
           disabled={busy || !token.trim() || !replacement.trim()}
         >
-          Add override
+          {t("add_override")}
         </Button>
         {err && <span className="text-xs text-red-600">{err}</span>}
       </div>

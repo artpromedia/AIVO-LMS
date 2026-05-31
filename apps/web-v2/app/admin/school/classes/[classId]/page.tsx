@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -11,6 +12,7 @@ type Params = { params: Promise<{ classId: string }> };
 
 export default async function Page({ params }: Params) {
   const session = await requirePageRole(["school_admin", "district_admin", "platform_admin"]);
+  const t = await getTranslations("admin.school_classes_detail");
   const { classId } = await params;
   const classroom = await getClassroom(classId, session.tenantId);
   if (!classroom) notFound();
@@ -34,9 +36,9 @@ export default async function Page({ params }: Params) {
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">Teachers</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{t("teachers")}</p>
           {teachers.length === 0 ? (
-            <p className="mt-2 text-sm text-aivo-muted">None yet.</p>
+            <p className="mt-2 text-sm text-aivo-muted">{t("none_yet")}</p>
           ) : (
             <ul className="mt-2 space-y-1 text-sm">
               {teachers.map((e) => (
@@ -50,10 +52,10 @@ export default async function Page({ params }: Params) {
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            Learners <span className="text-aivo-ink-soft">({learners.length})</span>
+            {t("learners")} <span className="text-aivo-ink-soft">({learners.length})</span>
           </p>
           {learners.length === 0 ? (
-            <p className="mt-2 text-sm text-aivo-muted">No learners enrolled.</p>
+            <p className="mt-2 text-sm text-aivo-muted">{t("no_learners_enrolled")}</p>
           ) : (
             <ul className="mt-2 space-y-1 text-sm">
               {learners.slice(0, 50).map((e) => (

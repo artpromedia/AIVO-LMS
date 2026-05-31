@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -23,6 +24,7 @@ const CRITERION_LABEL = {
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_security_controls");
   const controls = listSecurityControls();
 
   return (
@@ -34,7 +36,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Security"
-        title="SOC 2 controls"
+        title={t("title")}
         description="Trust Services Criteria coverage with evidence ready for the auditor."
       />
       <div className="space-y-3">
@@ -54,7 +56,7 @@ export default async function Page() {
               </div>
               <p className="mb-3 text-sm text-aivo-ink-soft">{c.description}</p>
               <p className="text-xs text-aivo-muted">
-                Owner: <span className="text-aivo-ink">{c.owner}</span> · Last reviewed{" "}
+                {t("label_owner")} <span className="text-aivo-ink">{c.owner}</span> · Last reviewed{" "}
                 {new Date(c.lastReviewedAt).toLocaleDateString()}
               </p>
               {evidence.length > 0 && (

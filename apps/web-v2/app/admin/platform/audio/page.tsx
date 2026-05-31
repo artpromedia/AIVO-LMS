@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
 import { listAudioAssets, listReadAloudUsage, summarizeAudioUsage } from "@/lib/db/repos";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,7 @@ function fmtUsd(microUsd: number): string {
 }
 
 export default async function Page() {
+  const t = await getTranslations("admin.platform_audio");
   const session = await requirePageRole(["platform_admin"]);
   const summary = summarizeAudioUsage();
   const events = listReadAloudUsage().slice(0, 20);
@@ -27,38 +29,38 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform"
-        title="Audio & Read-Aloud"
+        title={t("title")}
         description="TTS usage, cache effectiveness, and pronunciation overrides across the platform."
         actions={
           <Link
             href="/admin/platform/audio/pronunciation"
             className="rounded-md border border-aivo-line bg-aivo-surface px-3 py-1.5 text-sm font-medium"
           >
-            Pronunciation overrides
+            {t("pronunciation_overrides")}
           </Link>
         }
       />
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-semibold uppercase text-aivo-muted">Playbacks</p>
+          <p className="text-xs font-semibold uppercase text-aivo-muted">{t("playbacks")}</p>
           <p className="mt-1 font-display text-3xl font-bold">
             {summary.totalPlaybacks.toLocaleString()}
           </p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-semibold uppercase text-aivo-muted">Cache hit rate</p>
+          <p className="text-xs font-semibold uppercase text-aivo-muted">{t("cache_hit_rate")}</p>
           <p className="mt-1 font-display text-3xl font-bold">
             {(summary.cacheHitRate * 100).toFixed(0)}%
           </p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-semibold uppercase text-aivo-muted">Total cost</p>
+          <p className="text-xs font-semibold uppercase text-aivo-muted">{t("total_cost")}</p>
           <p className="mt-1 font-display text-3xl font-bold">
             {fmtUsd(summary.totalCostMicroUsd)}
           </p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-semibold uppercase text-aivo-muted">Unique clips</p>
+          <p className="text-xs font-semibold uppercase text-aivo-muted">{t("unique_clips")}</p>
           <p className="mt-1 font-display text-3xl font-bold">
             {summary.uniqueAssets.toLocaleString()}
           </p>
@@ -67,13 +69,13 @@ export default async function Page() {
 
       <Card className="mt-4 p-0 overflow-hidden">
         <div className="border-b px-4 py-3">
-          <h2 className="font-display font-semibold">Recent playbacks</h2>
+          <h2 className="font-display font-semibold">{t("recent_playbacks")}</h2>
         </div>
         <table className="w-full text-sm">
           <thead className="bg-aivo-surface-2 text-xs uppercase text-aivo-muted">
             <tr>
               <th className="px-4 py-2 text-left">When</th>
-              <th className="px-4 py-2 text-left">Context</th>
+              <th className="px-4 py-2 text-left">{t("col_context")}</th>
               <th className="px-4 py-2 text-left">Cache</th>
               <th className="px-4 py-2 text-left">Cost</th>
             </tr>
@@ -82,7 +84,7 @@ export default async function Page() {
             {events.length === 0 ? (
               <tr>
                 <td colSpan={4} className="px-4 py-6 text-center text-aivo-muted">
-                  No playbacks recorded yet.
+                  {t("no_playbacks_yet")}
                 </td>
               </tr>
             ) : (
@@ -107,7 +109,7 @@ export default async function Page() {
 
       {assets.length > 0 && (
         <Card className="mt-4 p-[var(--aivo-density-card-pad)]">
-          <h2 className="font-display font-semibold">Recently generated clips</h2>
+          <h2 className="font-display font-semibold">{t("recently_generated_clips")}</h2>
           <ul className="mt-2 divide-y text-sm">
             {assets.map((a) => (
               <li key={a.id} className="py-2 flex items-center justify-between gap-2">

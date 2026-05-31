@@ -1089,5 +1089,619 @@
       "blocked_secondary": "Support kontaktieren",
       "generic_secondary": "Support kontaktieren"
     }
+  },
+  "admin": {
+    "district_overview": {
+      "eyebrow": "Bezirksadministrator",
+      "description": "Schulübergreifende Aufsicht, Rostering und Berichte. Klicke auf eine Karte, um eine Schule zu verwalten.",
+      "fl_distribution_title": "Verteilung der Funktionsniveaus",
+      "no_learners": "Noch keine Lernenden zugewiesen.",
+      "platform_health_title": "Plattformzustand",
+      "lessons_completed": "Abgeschlossene Lektionen",
+      "lessons_attempted": "Begonnene Lektionen",
+      "ai_jobs_in_queue": "AI-Aufgaben in der Warteschlange",
+      "ai_failures": "AI-Fehler"
+    },
+    "district_billing": {
+      "title": "Abrechnung",
+      "empty_title": "Keine Abrechnung vorhanden",
+      "col_tenant": "Tenant",
+      "col_status": "Status"
+    },
+    "district_compliance": {
+      "title": "Compliance"
+    },
+    "district_iep": {
+      "title": "IEP-Compliance",
+      "empty_title": "Noch keine Lernenden in diesem Bezirk",
+      "col_learner": "Lernende/r",
+      "col_school": "Schule",
+      "col_family": "Familie"
+    },
+    "district_reports": {
+      "title": "Bezirksberichte"
+    },
+    "district_schools": {
+      "title": "Schulen",
+      "empty_title": "Noch keine Schulen in diesem Bezirk",
+      "col_school": "Schule",
+      "col_learners": "Lernende",
+      "col_families": "Familien",
+      "view_staff": "Personal anzeigen"
+    },
+    "district_settings_admins": {
+      "title": "Administratoren",
+      "empty_title": "Noch keine Administratoren",
+      "invite_note": "Die Einladung von Administratoren erfolgt durch den Onboarding-Kontakt Ihres Bezirks bei AIVO.",
+      "col_joined": "Beigetreten"
+    },
+    "district_settings_branding": {
+      "title": "Branding",
+      "display_name": "Anzeigename",
+      "display_name_hint": "Wird in der Produktkopfzeile, E-Mails und im Elternportal angezeigt.",
+      "support_email": "Support-E-Mail",
+      "support_email_hint": "Familien und Personal in diesem Bezirk sehen dies auf jeder Hilfeseite.",
+      "primary_colour": "Primäre Markenfarbe",
+      "primary_colour_aria": "Primäre Markenfarbe",
+      "sample": "Beispiel"
+    },
+    "district_settings": {
+      "title": "Einstellungen",
+      "org_section": "Organisation",
+      "tenant_name": "Tenant-Name",
+      "tenant_id": "Tenant-ID",
+      "schools": "Schulen",
+      "learners": "Lernende",
+      "support_email": "Support-E-Mail",
+      "last_update": "Letzte Aktualisierung",
+      "manage": "Verwalten",
+      "notifications_heading": "Benachrichtigungseinstellungen",
+      "notifications_desc": "Worüber Bezirksadministratoren per E-Mail informiert werden.",
+      "features_heading": "Funktionsüberschreibungen",
+      "features_desc": "Einstellungen auf Bezirksebene, die auf alle Schulen des Bezirks angewendet werden."
+    },
+    "district_settings_sso": {
+      "title": "SSO & SCIM",
+      "status_heading": "Status",
+      "last_scim_rotation": "Letzte SCIM-Rotation",
+      "sign_in_mode": "Anmeldemodus",
+      "idp_name_label": "Name des Identitätsanbieters",
+      "idp_name_placeholder": "z. B. Bezirks-Okta",
+      "scim_provisioning": "SCIM-Bereitstellung",
+      "enable_scim": "SCIM aktivieren",
+      "scim_rotate_warning": "Das Rotieren des SCIM-Tokens macht jede IdP-Integration ungültig, die die alte Anmeldedaten verwendet.",
+      "rotate_scim_token": "SCIM-Token rotieren"
+    },
+    "district_staff": {
+      "title": "Personalverzeichnis",
+      "invitations_heading": "Einladungen",
+      "active_staff_heading": "Aktives Personal",
+      "empty_title": "Noch kein Personal in diesem Bezirk",
+      "col_joined": "Beigetreten",
+      "pending_invitations": "Ausstehende Einladungen",
+      "invite_staff_btn": "Personal einladen",
+      "invite_staff_member": "Personalmitglied einladen",
+      "close_aria": "Schließen",
+      "field_display_name": "Anzeigename",
+      "role_teacher": "Lehrkraft",
+      "role_school_admin": "Schuladministrator",
+      "role_district_admin": "Bezirksadministrator",
+      "assign_to_school": "Einer Schule zuweisen",
+      "pick_school": "Schule auswählen…",
+      "cancel": "Abbrechen",
+      "sending": "Wird gesendet…",
+      "invited_success": "{name} wurde eingeladen",
+      "temporary_password": "Temporäres Passwort"
+    },
+    "error": {
+      "eyebrow": "Administrationskonsole",
+      "heading": "Beim Laden dieser Seite ist ein Fehler aufgetreten.",
+      "body": "Der Fehler wurde protokolliert. Versuche es erneut oder kehre zur Admin-Startseite zurück.",
+      "retry": "Erneut versuchen",
+      "home_link": "Admin-Startseite"
+    },
+    "login": {
+      "heading": "Administrator-Anmeldung",
+      "security_badge": "MFA erzwungen · SOC 2 · FERPA",
+      "card_title": "Melde dich bei der Administrationskonsole an",
+      "sign_in_btn": "Anmelden",
+      "standard_sign_in": "Standard-Anmeldung verwenden"
+    },
+    "not_found": {
+      "eyebrow": "Administrationskonsole · 404",
+      "heading": "Diese Seite existiert nicht.",
+      "body": "Sie wurde möglicherweise verschoben oder die Ressource wurde entfernt.",
+      "home_link": "Admin-Startseite"
+    },
+    "platform_tenants_detail": {
+      "all_tenants": "Alle Tenants",
+      "stat_learners": "Lernende",
+      "stat_sub_tenants": "Unter-Tenants",
+      "stat_created": "Erstellt",
+      "user_mix": "Benutzerzusammensetzung",
+      "no_users": "Noch keine Benutzer.",
+      "direct_children": "Direkte Untergruppen",
+      "no_nested_tenants": "Keine Tenants direkt unter diesem verschachtelt.",
+      "recent_ai_jobs": "Aktuelle AI-Aufgaben",
+      "no_ai_jobs": "Keine AI-Generierungsaktivität",
+      "view_all": "Alle anzeigen",
+      "recent_invoices": "Aktuelle Rechnungen",
+      "no_invoices": "Noch keine Rechnungen",
+      "audit_trail": "Prüfprotokoll",
+      "no_audit": "Keine geprüfte Aktivität"
+    },
+    "platform_tenants": {
+      "title": "Tenants",
+      "empty_title": "Keine Tenants",
+      "col_parent": "Übergeordnet",
+      "col_admins": "Administratoren",
+      "col_learners": "Lernende",
+      "col_billing": "Abrechnung",
+      "col_created": "Erstellt",
+      "open_billing": "Abrechnung öffnen"
+    },
+    "platform_audit_logs": {
+      "title": "Audit-Protokolle",
+      "empty": "Noch keine Audit-Ereignisse",
+      "col_action": "Aktion",
+      "col_tenant": "Mandant",
+      "col_request_id": "Anfrage-ID"
+    },
+    "platform_data": {
+      "title": "Dateninventar"
+    },
+    "platform_feature_flags": {
+      "title": "Feature-Flags",
+      "section_ai": "AI & Inhalte",
+      "section_enterprise": "Enterprise",
+      "section_integrations": "Integrationen",
+      "section_ux": "Lernendenerfahrung"
+    },
+    "platform_jobs": {
+      "title": "Hintergrundjobs",
+      "empty": "Noch keine AI-Generierungsaktivität",
+      "by_kind": "Nach Typ",
+      "latency": "Latenz",
+      "lesson_runs": "Lektionsdurchläufe",
+      "lesson_runs_desc": "Lernenden-seitige Pipeline, nachgelagert der AI-Generierung.",
+      "recent_jobs": "Neueste Jobs · neueste zuerst",
+      "col_status": "Status",
+      "col_tenant": "Mandant",
+      "col_started": "Gestartet",
+      "col_duration": "Dauer"
+    },
+    "platform_learners": {
+      "title": "Lernende",
+      "empty": "Noch keine Lernenden",
+      "iep_on_file": "IEPs erfasst",
+      "iep_skipped": "IEP übersprungen",
+      "parent_opt_out": "Elternaustritt erfasst",
+      "iep_pending": "IEP ausstehend",
+      "no_decision": "Noch keine Entscheidung",
+      "fl_mix": "Verteilung Funktionsniveau",
+      "grade_band": "Jahrgangsstufe",
+      "col_learner": "Lernende/r",
+      "col_tenant": "Mandant",
+      "col_fl": "Funktionsniveau",
+      "col_created": "Erstellt",
+      "unassigned": "Nicht zugewiesen"
+    },
+    "platform_migration": {
+      "title": "Migration v1 → v2",
+      "empty": "Noch keine Migrationsjobs",
+      "recent_jobs": "Neueste Jobs",
+      "col_source": "Quelle",
+      "col_status": "Status",
+      "col_results": "Ergebnisse",
+      "col_started": "Gestartet",
+      "dry_run": "Probelauf (nur Vorschau)",
+      "source_records": "Quelldatensätze (JSON)"
+    },
+    "platform_support": {
+      "title": "Support-Tickets",
+      "empty": "Posteingang ist leer"
+    },
+    "platform_system_health": {
+      "title": "Systemzustand"
+    },
+    "platform_users_detail": {
+      "empty": "Keine Mitgliedschaften in Ihrem Bereich",
+      "all_users": "Alle Benutzer",
+      "user_id": "Benutzer-ID",
+      "col_created": "Erstellt",
+      "managed_learners": "Verwaltete Lernende",
+      "memberships": "Mitgliedschaften",
+      "col_tenant": "Mandant",
+      "col_permissions": "Berechtigungen",
+      "col_joined": "Beigetreten",
+      "col_learner": "Lernende/r"
+    },
+    "platform_users": {
+      "title": "Benutzer",
+      "empty": "Keine Benutzer",
+      "col_tenant": "Mandant",
+      "col_joined": "Beigetreten"
+    },
+    "school_billing": {
+      "title": "Abrechnung & Plätze",
+      "no_subscription": "Kein Abonnement",
+      "no_seat_licenses": "Keine Platzlizenzen",
+      "no_invoices": "Keine Rechnungen",
+      "seat_licenses": "Platzlizenzen",
+      "no_seats_assigned": "Noch keine Plätze zugewiesen.",
+      "col_subject": "Objekt",
+      "col_assigned": "Zugewiesen",
+      "invoices": "Rechnungen",
+      "col_number": "Nummer",
+      "col_period": "Zeitraum",
+      "col_amount": "Betrag",
+      "col_status": "Status"
+    },
+    "school_classes_detail": {
+      "teachers": "Lehrkräfte",
+      "none_yet": "Noch keine.",
+      "learners": "Lernende",
+      "no_learners_enrolled": "Keine Lernenden eingeschrieben."
+    },
+    "school_classes": {
+      "title": "Klassen",
+      "empty": "Noch keine Klassen"
+    },
+    "school_compliance": {
+      "title": "Compliance"
+    },
+    "school_learners": {
+      "title": "Lernende",
+      "empty": "Keine Lernenden im Roster",
+      "col_learner": "Lernende/r",
+      "col_readiness": "Bereitschaft",
+      "col_fl": "Funktionsniveau"
+    },
+    "school_overview": {
+      "school_admin": "Schuladministrator",
+      "card_rostering_health": "Roster-Gesundheit",
+      "card_consent_compliance": "Einwilligung & Compliance",
+      "card_ai_safety": "AI-Sicherheit",
+      "card_license_util": "Lizenzauslastung",
+      "source": "Quelle",
+      "last_sync": "Letzte Synchronisierung",
+      "manage_rostering": "Roster verwalten →",
+      "consent_complete": "Einwilligung vollständig",
+      "ieps_on_file": "IEPs erfasst",
+      "audit_events_30d": "Audit-Ereignisse (30T)",
+      "open_compliance": "Compliance öffnen →",
+      "flagged_7d": "Markiert (7T)",
+      "review_safety_logs": "Sicherheitsprotokolle prüfen →",
+      "open_reports": "Berichte öffnen →"
+    },
+    "school_reports": {
+      "title": "Berichte"
+    },
+    "school_rostering": {
+      "title": "Roster",
+      "section_schools": "Schulen",
+      "empty_schools": "Noch keine Schulen",
+      "section_sis": "SIS-Verbindungen",
+      "empty_sis": "Noch keine SIS-Verbindung",
+      "section_recent_imports": "Neueste Importjobs",
+      "empty_imports": "Noch keine Importe",
+      "start_csv_import": "CSV-Import starten",
+      "btn_classes": "Klassen",
+      "btn_import_csv": "CSV importieren",
+      "import_total": "Gesamt:",
+      "import_created": "Erstellt:",
+      "import_skipped": "Übersprungen:",
+      "import_errors": "Fehler:"
+    },
+    "school_settings": {
+      "title": "Einstellungen",
+      "signed_in_as": "Angemeldet als"
+    },
+    "school_staff": {
+      "title": "Personal",
+      "empty": "Noch kein Personal",
+      "col_tenant": "Mandant"
+    },
+    "platform_billing_overview": {
+      "title": "Abrechnung",
+      "empty_title": "Keine Abrechnungskonten",
+      "col_tenant": "Mandant",
+      "col_status": "Status",
+      "col_created": "Erstellt"
+    },
+    "platform_billing_revenue": {
+      "title": "Umsatz",
+      "empty_title": "Noch keine Einzüge",
+      "link_all_invoices": "Alle Rechnungen →",
+      "stat_lifetime_collected": "Gesamt eingezogen",
+      "stat_last_30_days": "Letzte 30 Tage",
+      "stat_active_subscriptions": "Aktive Abonnements",
+      "section_monthly_collected": "Monatliche Einzüge · letzte 12 Monate",
+      "no_paid_invoices": "Noch keine bezahlten Rechnungen.",
+      "section_top_tenants": "Top-Mandanten nach Umsatz",
+      "section_plan_mix": "Tarifmix"
+    },
+    "platform_compliance_data_inventory": {
+      "title": "Dateninventar",
+      "col_classification": "Klassifizierung",
+      "col_lawful_basis": "Rechtsgrundlage",
+      "col_purposes": "Zwecke",
+      "col_child_data": "Kinderdaten",
+      "subprocessors_heading": "Unterauftragsverarbeiter"
+    },
+    "platform_compliance_disclosures": {
+      "title": "FERPA-Offenlegungsprotokoll",
+      "record_heading": "Offenlegung erfassen",
+      "col_recipient": "Empfänger",
+      "col_reason": "Grund",
+      "col_ferpa_basis": "FERPA-Grundlage",
+      "empty_body": "Noch keine Offenlegungen erfasst.",
+      "label_recipient_type": "Empfängertyp",
+      "label_recipient_name": "Name des Empfängers",
+      "label_ferpa_basis": "FERPA-Grundlage",
+      "placeholder_ferpa_basis": "school_official_exception",
+      "label_learner_id": "Lernenden-ID (optional)",
+      "label_reason": "Grund"
+    },
+    "platform_compliance_dsar": {
+      "title": "Betroffenenanfragen",
+      "col_requested": "Angefordert",
+      "col_parent": "Elternteil",
+      "col_learner": "Lernender",
+      "col_status": "Status",
+      "col_completed": "Abgeschlossen",
+      "col_target": "Ziel",
+      "no_requests": "Keine Anfragen."
+    },
+    "platform_compliance_overview": {
+      "title": "Compliance",
+      "link_open_queue": "Warteschlange öffnen →",
+      "active_policies_heading": "Aktive Richtlinien"
+    },
+    "platform_compliance_retention": {
+      "title": "Aufbewahrungsrichtlinien",
+      "col_classification": "Klassifizierung",
+      "col_retention_days": "Aufbewahrung (Tage)",
+      "col_archive_days": "Archivierung (Tage)",
+      "col_description": "Beschreibung"
+    },
+    "platform_safety_moderation": {
+      "title": "Moderationsereignisse",
+      "col_subject": "Betreff",
+      "col_decision": "Entscheidung",
+      "col_categories": "Kategorien",
+      "col_severity": "Schweregrad",
+      "col_excerpt": "Auszug",
+      "empty_body": "Noch keine Moderationsereignisse erfasst."
+    },
+    "platform_safety_overview": {
+      "title": "KI-Sicherheit",
+      "recent_blocked_heading": "Kürzlich blockierte Generierungen"
+    },
+    "platform_safety_policies": {
+      "title": "Richtlinienversionen",
+      "label_block_threshold": "Blockschwellenwert",
+      "label_review_threshold": "Prüfschwellenwert",
+      "label_auto_review_categories": "Kategorien für automatische Prüfung",
+      "label_auto_block_categories": "Kategorien für automatische Sperrung"
+    },
+    "platform_safety_red_team": {
+      "title": "Red-Team-Suite",
+      "col_prompt": "Prompt",
+      "col_expected": "Erwartet",
+      "col_observed": "Beobachtet",
+      "col_result": "Ergebnis"
+    },
+    "platform_safety_review_queue": {
+      "title": "Prüfwarteschlange",
+      "empty_body": "Noch keine Prüffälle vorhanden.",
+      "placeholder_reviewer_note": "Prüfernotiz (optional)",
+      "btn_escalate": "Eskalieren"
+    },
+    "platform_security_controls": {
+      "title": "SOC 2-Kontrollen",
+      "label_owner": "Verantwortlicher:"
+    },
+    "platform_security_incidents": {
+      "title": "Vorfälle",
+      "open_incident_heading": "Vorfall öffnen",
+      "empty_body": "Keine Vorfälle erfasst.",
+      "badge_customer_impact": "Kundenauswirkung",
+      "badge_regulator_notify": "Behörde benachrichtigen"
+    },
+    "platform_security_overview": {
+      "title": "Sicherheitslage",
+      "recent_activity_heading": "Letzte Aktivität",
+      "no_events": "Noch keine Ereignisse.",
+      "link_audit_log": "Vollständiges Auditprotokoll anzeigen →"
+    },
+    "platform_security_risks": {
+      "title": "Risikoregister",
+      "empty_body": "Noch keine Risiken verfolgt.",
+      "label_treatment": "Behandlung:"
+    },
+    "platform_security_state_privacy": {
+      "title": "Datenschutzgesetze der Bundesstaaten – Matrix",
+      "label_obligation": "Verpflichtung:",
+      "no_control_mapped": "Noch keine Kontrolle zugeordnet — dies ist eine Lücke."
+    },
+    "platform_security_vendors": {
+      "title": "Anbieter- und Unterauftragsverarbeiter-Inventar",
+      "subprocessors_heading": "Unterauftragsverarbeiter (verarbeiten Lernendendaten)",
+      "badge_learner_data": "Lernendendaten"
+    },
+    "platform_security_vulnerabilities": {
+      "title": "Schwachstellenmanagement",
+      "empty_body": "Derzeit werden keine Schwachstellen verfolgt."
+    },
+    "platform_overview": {
+      "title": "Systemzustand",
+      "tenant_footprint": "Mandanten-Übersicht",
+      "tenant_footprint_desc": "Verteilung der derzeit in dieser Umgebung bereitgestellten Mandanten.",
+      "billing_status": "Abrechnungsstatus",
+      "recent_ai_jobs": "Aktuelle AI-Aufträge",
+      "no_ai_activity_yet": "Noch keine AI-Generierungsaktivität.",
+      "view_all": "Alle anzeigen",
+      "operations_centres": "Betriebszentren",
+      "signed_in_as": "Angemeldet als",
+      "platform_settings": "Plattformeinstellungen"
+    },
+    "platform_ai_moderation": {
+      "title": "AI-Moderation",
+      "no_block_or_review_events": "Keine Sperr- oder Überprüfungsereignisse",
+      "top_categories": "Top-Kategorien (Sperre + Überprüfung)",
+      "no_categorised_events": "Keine kategorisierten Ereignisse.",
+      "col_tenant": "Mandant",
+      "col_decision": "Entscheidung",
+      "col_categories": "Kategorien",
+      "col_signals": "Signale",
+      "col_excerpt": "Auszug"
+    },
+    "platform_ai_playground": {
+      "title": "AI-Spielwiese",
+      "how_it_works": "So funktioniert es",
+      "responses_moderated": "Antworten durchlaufen die Ausgabe-Moderation, bevor sie hier angezeigt werden.",
+      "playground_responses_are": "Spielwiesen-Antworten werden",
+      "presets": "Voreinstellungen",
+      "model_claude": "Claude Opus 4.7 (primär)",
+      "model_gemini": "Gemini 3.0 Pro (Ausweich)",
+      "model_gpt": "GPT-5.5 (Ausweich)",
+      "system_prompt": "Systemanweisung",
+      "user_prompt": "Benutzeranweisung"
+    },
+    "platform_ai_costs": {
+      "title": "AI-Kostenkontrolle",
+      "no_cost_events_yet": "Noch keine Kostenereignisse",
+      "spend_mtd": "Ausgaben (lfd. Monat)",
+      "approaching_cap": "Limit wird erreicht",
+      "over_cap": "Limit überschritten",
+      "tenants": "Mandanten",
+      "col_tenant": "Mandant",
+      "col_status": "Status",
+      "col_budget": "Budget",
+      "recent_cost_events": "Aktuelle Kostenereignisse",
+      "col_feature": "Funktion",
+      "col_provider_model": "Anbieter / Modell",
+      "col_tokens": "Tokens",
+      "aria_monthly_cap": "Monatliches Limit in USD",
+      "aria_warn_at": "Warnen bei Ratio"
+    },
+    "platform_ai_generation": {
+      "title": "AI-Generierung",
+      "recent_jobs": "Aktuelle Aufträge",
+      "no_jobs_yet": "Noch keine AI-Generierungsaufträge",
+      "col_tenant": "Mandant",
+      "col_status": "Status",
+      "col_duration": "Dauer"
+    },
+    "platform_audio": {
+      "title": "Audio & Vorlesen",
+      "pronunciation_overrides": "Aussprache-Überschreibungen",
+      "playbacks": "Wiedergaben",
+      "cache_hit_rate": "Cache-Trefferrate",
+      "total_cost": "Gesamtkosten",
+      "unique_clips": "Einzigartige Clips",
+      "recent_playbacks": "Aktuelle Wiedergaben",
+      "col_context": "Kontext",
+      "no_playbacks_yet": "Noch keine Wiedergaben aufgezeichnet.",
+      "recently_generated_clips": "Kürzlich generierte Clips"
+    },
+    "platform_audio_pronunciation": {
+      "title": "Aussprache-Überschreibungen",
+      "add_override": "Überschreibung hinzufügen",
+      "replacement": "Ersatz",
+      "encoding": "Kodierung",
+      "notes_optional": "Notizen (optional)",
+      "no_overrides_yet": "Noch keine Überschreibungen.",
+      "placeholder_token": "z. B. AIVO",
+      "placeholder_replacement": "z. B. ay-voh"
+    },
+    "platform_baseline_items": {
+      "title": "Psychometrie der Basis-Aufgaben",
+      "items_by_exposure": "Aufgaben nach Exposition",
+      "no_telemetry_yet": "Noch keine Basis-Telemetrie",
+      "col_item": "Aufgabe (Kompetenz · Band)",
+      "col_exposure": "Exposition",
+      "col_scored": "Bewertet",
+      "col_median_time": "Medianzeit",
+      "col_seed_theta": "θ Startwert",
+      "col_est_theta": "θ̂ geschätzt",
+      "col_disc": "Disk. (a)",
+      "col_suggested_band": "Vorgeschlagenes Band",
+      "col_status": "Status",
+      "status_healthy": "Gesund",
+      "status_collecting": "Daten sammeln",
+      "status_retire": "Zurückziehen"
+    },
+    "platform_curriculum_overview": {
+      "title": "Lehrplan"
+    },
+    "platform_curriculum_frameworks": {
+      "title": "Standards-Rahmenwerke",
+      "homepage_link": "Startseite →"
+    },
+    "platform_curriculum_import": {
+      "title": "Standards importieren",
+      "start_an_import": "Import starten",
+      "recent_jobs": "Aktuelle Aufträge",
+      "no_import_jobs_yet": "Noch keine Importaufträge.",
+      "framework": "Rahmenwerk",
+      "source": "Quelle",
+      "source_placeholder": "manual, s3://…, https://…"
+    },
+    "platform_curriculum_skills": {
+      "title": "Kompetenzen",
+      "col_subject": "Fach",
+      "col_grade_band": "Klassenstufe",
+      "col_version": "Version",
+      "col_prereqs": "Voraussetzungen",
+      "col_standards": "Standards",
+      "col_constraints": "Einschränkungen"
+    },
+    "platform_curriculum_subjects": {
+      "title": "Fächer und Domänen",
+      "no_domains_yet": "Noch keine Domänen."
+    },
+    "platform_curriculum_versioning": {
+      "title": "Versionen, Ziele und Blueprints",
+      "skill_versions": "Kompetenzversionen",
+      "objective_templates": "Zielvorlagen",
+      "assessment_blueprints": "Bewertungs-Blueprints",
+      "col_blueprint": "Blueprint",
+      "col_status": "Status"
+    },
+    "platform_settings_overview": {
+      "title": "Einstellungen",
+      "signed_in_as": "Angemeldet als"
+    },
+    "platform_settings_api_keys": {
+      "title": "API-Schlüssel",
+      "no_keys_yet": "Noch keine API-Schlüssel",
+      "col_prefix": "Präfix",
+      "col_scopes": "Bereiche",
+      "col_status": "Status",
+      "col_created_by": "Erstellt von",
+      "col_last_used": "Zuletzt verwendet",
+      "col_created": "Erstellt"
+    },
+    "platform_settings_emails": {
+      "title": "E-Mail-Vorlagen",
+      "no_templates_configured": "Keine E-Mail-Vorlagen konfiguriert",
+      "col_template": "Vorlage",
+      "col_subject": "Betreff",
+      "col_status": "Status",
+      "col_last_sent": "Zuletzt gesendet",
+      "col_updated": "Aktualisiert"
+    },
+    "platform_settings_webhooks": {
+      "title": "Webhooks",
+      "no_endpoints_configured": "Keine Webhook-Endpunkte konfiguriert",
+      "col_endpoint": "Endpunkt",
+      "col_events": "Ereignisse",
+      "col_secret": "Geheimnis",
+      "col_status": "Status",
+      "col_last_delivery": "Letzte Zustellung",
+      "col_failures": "Fehler"
+    }
   }
 }

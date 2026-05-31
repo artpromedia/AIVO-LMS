@@ -1089,5 +1089,619 @@
       "blocked_secondary": "التواصل مع الدعم",
       "generic_secondary": "التواصل مع الدعم"
     }
+  },
+  "admin": {
+    "district_overview": {
+      "eyebrow": "مدير المنطقة",
+      "description": "الإشراف عبر المدارس وإدارة القوائم وإعداد التقارير. انقر على بطاقة لإدارة مدرسة.",
+      "fl_distribution_title": "توزيع مستوى الأداء الوظيفي",
+      "no_learners": "لم يُعيَّن أي متعلّم بعد.",
+      "platform_health_title": "صحة المنصة",
+      "lessons_completed": "الدروس المكتملة",
+      "lessons_attempted": "الدروس المحاولة",
+      "ai_jobs_in_queue": "مهام AI في قائمة الانتظار",
+      "ai_failures": "إخفاقات AI"
+    },
+    "district_billing": {
+      "title": "الفوترة",
+      "empty_title": "لا توجد بيانات فوترة",
+      "col_tenant": "المستأجر",
+      "col_status": "الحالة"
+    },
+    "district_compliance": {
+      "title": "الامتثال"
+    },
+    "district_iep": {
+      "title": "امتثال IEP",
+      "empty_title": "لا يوجد متعلّمون في هذه المنطقة بعد",
+      "col_learner": "المتعلّم",
+      "col_school": "المدرسة",
+      "col_family": "الأسرة"
+    },
+    "district_reports": {
+      "title": "تقارير المنطقة"
+    },
+    "district_schools": {
+      "title": "المدارس",
+      "empty_title": "لا توجد مدارس في هذه المنطقة بعد",
+      "col_school": "المدرسة",
+      "col_learners": "المتعلّمون",
+      "col_families": "الأسر",
+      "view_staff": "عرض الموظفين"
+    },
+    "district_settings_admins": {
+      "title": "المديرون",
+      "empty_title": "لا يوجد مديرون بعد",
+      "invite_note": "يتولّى جهة الاتصال المسؤولة عن الإعداد في AIVO دعوة المديرين لمنطقتك.",
+      "col_joined": "تاريخ الانضمام"
+    },
+    "district_settings_branding": {
+      "title": "الهوية البصرية",
+      "display_name": "اسم العرض",
+      "display_name_hint": "يظهر في رأس المنتج والبريد الإلكتروني وبوابة أولياء الأمور.",
+      "support_email": "بريد الدعم",
+      "support_email_hint": "تراه الأسر والموظفون في هذه المنطقة على كل صفحة مساعدة.",
+      "primary_colour": "لون العلامة التجارية الأساسي",
+      "primary_colour_aria": "لون العلامة التجارية الأساسي",
+      "sample": "نموذج"
+    },
+    "district_settings": {
+      "title": "الإعدادات",
+      "org_section": "المؤسسة",
+      "tenant_name": "اسم المستأجر",
+      "tenant_id": "معرّف المستأجر",
+      "schools": "المدارس",
+      "learners": "المتعلّمون",
+      "support_email": "بريد الدعم",
+      "last_update": "آخر تحديث",
+      "manage": "إدارة",
+      "notifications_heading": "تفضيلات الإشعارات",
+      "notifications_desc": "ما يُرسَل بالبريد الإلكتروني إلى مديري المنطقة.",
+      "features_heading": "تجاوزات الميزات",
+      "features_desc": "أزرار تبديل على مستوى المنطقة تُطبَّق على كل مدرسة في المنطقة."
+    },
+    "district_settings_sso": {
+      "title": "SSO و SCIM",
+      "status_heading": "الحالة",
+      "last_scim_rotation": "آخر تدوير لـ SCIM",
+      "sign_in_mode": "وضع تسجيل الدخول",
+      "idp_name_label": "اسم موفّر الهوية",
+      "idp_name_placeholder": "مثال: Okta المنطقة",
+      "scim_provisioning": "توفير SCIM",
+      "enable_scim": "تفعيل SCIM",
+      "scim_rotate_warning": "تدوير رمز SCIM يُبطل أي تكامل IdP يستخدم البيانات الاعتمادية القديمة.",
+      "rotate_scim_token": "تدوير رمز SCIM"
+    },
+    "district_staff": {
+      "title": "دليل الموظفين",
+      "invitations_heading": "الدعوات",
+      "active_staff_heading": "الموظفون النشطون",
+      "empty_title": "لا يوجد موظفون في هذه المنطقة بعد",
+      "col_joined": "تاريخ الانضمام",
+      "pending_invitations": "الدعوات المعلّقة",
+      "invite_staff_btn": "دعوة موظف",
+      "invite_staff_member": "دعوة عضو من الموظفين",
+      "close_aria": "إغلاق",
+      "field_display_name": "اسم العرض",
+      "role_teacher": "معلّم",
+      "role_school_admin": "مدير مدرسة",
+      "role_district_admin": "مدير منطقة",
+      "assign_to_school": "التعيين إلى مدرسة",
+      "pick_school": "اختر مدرسة…",
+      "cancel": "إلغاء",
+      "sending": "جارٍ الإرسال…",
+      "invited_success": "تمّت دعوة {name}",
+      "temporary_password": "كلمة المرور المؤقتة"
+    },
+    "error": {
+      "eyebrow": "لوحة تحكم الإدارة",
+      "heading": "حدث خطأ أثناء تحميل هذه الصفحة.",
+      "body": "تم تسجيل الخطأ. أعد المحاولة الآن أو ارجع إلى الصفحة الرئيسية للإدارة.",
+      "retry": "إعادة المحاولة",
+      "home_link": "الصفحة الرئيسية للإدارة"
+    },
+    "login": {
+      "heading": "تسجيل دخول المدير",
+      "security_badge": "MFA مُفعَّل · SOC 2 · FERPA",
+      "card_title": "سجّل دخولك إلى لوحة تحكم الإدارة",
+      "sign_in_btn": "تسجيل الدخول",
+      "standard_sign_in": "استخدام تسجيل الدخول القياسي"
+    },
+    "not_found": {
+      "eyebrow": "لوحة تحكم الإدارة · 404",
+      "heading": "هذه الصفحة غير موجودة.",
+      "body": "ربما تم نقلها أو حذف المورد.",
+      "home_link": "الصفحة الرئيسية للإدارة"
+    },
+    "platform_tenants_detail": {
+      "all_tenants": "جميع المستأجرين",
+      "stat_learners": "المتعلّمون",
+      "stat_sub_tenants": "المستأجرون الفرعيون",
+      "stat_created": "تاريخ الإنشاء",
+      "user_mix": "تركيبة المستخدمين",
+      "no_users": "لا يوجد مستخدمون بعد.",
+      "direct_children": "العناصر التابعة المباشرة",
+      "no_nested_tenants": "لا يوجد مستأجرون متداخلون مباشرةً أسفل هذا المستأجر.",
+      "recent_ai_jobs": "مهام AI الأخيرة",
+      "no_ai_jobs": "لا يوجد نشاط توليد AI",
+      "view_all": "عرض الكل",
+      "recent_invoices": "الفواتير الأخيرة",
+      "no_invoices": "لا توجد فواتير بعد",
+      "audit_trail": "مسار التدقيق",
+      "no_audit": "لا يوجد نشاط مُدقَّق"
+    },
+    "platform_tenants": {
+      "title": "المستأجرون",
+      "empty_title": "لا يوجد مستأجرون",
+      "col_parent": "الأصل",
+      "col_admins": "المديرون",
+      "col_learners": "المتعلّمون",
+      "col_billing": "الفوترة",
+      "col_created": "تاريخ الإنشاء",
+      "open_billing": "فتح الفوترة"
+    },
+    "platform_audit_logs": {
+      "title": "سجلات التدقيق",
+      "empty": "لا توجد أحداث تدقيق بعد",
+      "col_action": "الإجراء",
+      "col_tenant": "المستأجر",
+      "col_request_id": "معرّف الطلب"
+    },
+    "platform_data": {
+      "title": "جرد البيانات"
+    },
+    "platform_feature_flags": {
+      "title": "علامات الميزات",
+      "section_ai": "AI والمحتوى",
+      "section_enterprise": "المؤسسة",
+      "section_integrations": "التكاملات",
+      "section_ux": "تجربة المتعلّم"
+    },
+    "platform_jobs": {
+      "title": "المهام في الخلفية",
+      "empty": "لا يوجد نشاط توليد AI بعد",
+      "by_kind": "حسب النوع",
+      "latency": "زمن الاستجابة",
+      "lesson_runs": "تشغيلات الدروس",
+      "lesson_runs_desc": "خط الأنابيب الموجّه للمتعلّم، في اتجاه مجرى توليد AI.",
+      "recent_jobs": "المهام الأخيرة · الأحدث أولاً",
+      "col_status": "الحالة",
+      "col_tenant": "المستأجر",
+      "col_started": "بدأ",
+      "col_duration": "المدة"
+    },
+    "platform_learners": {
+      "title": "المتعلّمون",
+      "empty": "لا يوجد متعلّمون بعد",
+      "iep_on_file": "IEP مُسجَّلة",
+      "iep_skipped": "تم تخطي IEP",
+      "parent_opt_out": "تم تسجيل انسحاب ولي الأمر",
+      "iep_pending": "IEP معلّقة",
+      "no_decision": "لا يوجد قرار بعد",
+      "fl_mix": "توزيع مستوى الأداء",
+      "grade_band": "نطاق الصف",
+      "col_learner": "المتعلّم",
+      "col_tenant": "المستأجر",
+      "col_fl": "مستوى الأداء",
+      "col_created": "تاريخ الإنشاء",
+      "unassigned": "غير مُعيَّن"
+    },
+    "platform_migration": {
+      "title": "الترحيل v1 → v2",
+      "empty": "لا توجد مهام ترحيل بعد",
+      "recent_jobs": "المهام الأخيرة",
+      "col_source": "المصدر",
+      "col_status": "الحالة",
+      "col_results": "النتائج",
+      "col_started": "بدأ",
+      "dry_run": "تشغيل تجريبي (معاينة فقط)",
+      "source_records": "سجلات المصدر (JSON)"
+    },
+    "platform_support": {
+      "title": "تذاكر الدعم",
+      "empty": "صندوق الوارد فارغ"
+    },
+    "platform_system_health": {
+      "title": "صحة النظام"
+    },
+    "platform_users_detail": {
+      "empty": "لا توجد عضويات ضمن نطاقك",
+      "all_users": "جميع المستخدمين",
+      "user_id": "معرّف المستخدم",
+      "col_created": "تاريخ الإنشاء",
+      "managed_learners": "المتعلّمون المُدارون",
+      "memberships": "العضويات",
+      "col_tenant": "المستأجر",
+      "col_permissions": "الأذونات",
+      "col_joined": "تاريخ الانضمام",
+      "col_learner": "المتعلّم"
+    },
+    "platform_users": {
+      "title": "المستخدمون",
+      "empty": "لا يوجد مستخدمون",
+      "col_tenant": "المستأجر",
+      "col_joined": "تاريخ الانضمام"
+    },
+    "school_billing": {
+      "title": "الفوترة والمقاعد",
+      "no_subscription": "لا يوجد اشتراك",
+      "no_seat_licenses": "لا توجد تراخيص مقاعد",
+      "no_invoices": "لا توجد فواتير",
+      "seat_licenses": "تراخيص المقاعد",
+      "no_seats_assigned": "لم يتم تخصيص مقاعد بعد.",
+      "col_subject": "الموضوع",
+      "col_assigned": "مُخصَّص",
+      "invoices": "الفواتير",
+      "col_number": "الرقم",
+      "col_period": "الفترة",
+      "col_amount": "المبلغ",
+      "col_status": "الحالة"
+    },
+    "school_classes_detail": {
+      "teachers": "المعلّمون",
+      "none_yet": "لا أحد بعد.",
+      "learners": "المتعلّمون",
+      "no_learners_enrolled": "لا يوجد متعلّمون مُسجَّلون."
+    },
+    "school_classes": {
+      "title": "الفصول",
+      "empty": "لا توجد فصول بعد"
+    },
+    "school_compliance": {
+      "title": "الامتثال"
+    },
+    "school_learners": {
+      "title": "المتعلّمون",
+      "empty": "لا يوجد متعلّمون في القائمة",
+      "col_learner": "المتعلّم",
+      "col_readiness": "الاستعداد",
+      "col_fl": "مستوى الأداء"
+    },
+    "school_overview": {
+      "school_admin": "مسؤول المدرسة",
+      "card_rostering_health": "صحة القائمة",
+      "card_consent_compliance": "الموافقة والامتثال",
+      "card_ai_safety": "سلامة AI",
+      "card_license_util": "استخدام التراخيص",
+      "source": "المصدر",
+      "last_sync": "آخر مزامنة",
+      "manage_rostering": "إدارة القائمة →",
+      "consent_complete": "الموافقة مكتملة",
+      "ieps_on_file": "IEP مُسجَّلة",
+      "audit_events_30d": "أحداث التدقيق (30 يومًا)",
+      "open_compliance": "فتح الامتثال →",
+      "flagged_7d": "مُعلَّم (7 أيام)",
+      "review_safety_logs": "مراجعة سجلات الأمان →",
+      "open_reports": "فتح التقارير →"
+    },
+    "school_reports": {
+      "title": "التقارير"
+    },
+    "school_rostering": {
+      "title": "القائمة",
+      "section_schools": "المدارس",
+      "empty_schools": "لا توجد مدارس بعد",
+      "section_sis": "اتصالات SIS",
+      "empty_sis": "لا يوجد اتصال SIS بعد",
+      "section_recent_imports": "مهام الاستيراد الأخيرة",
+      "empty_imports": "لا توجد استيرادات بعد",
+      "start_csv_import": "بدء استيراد CSV",
+      "btn_classes": "الفصول",
+      "btn_import_csv": "استيراد CSV",
+      "import_total": "الإجمالي:",
+      "import_created": "تم الإنشاء:",
+      "import_skipped": "تم التخطي:",
+      "import_errors": "الأخطاء:"
+    },
+    "school_settings": {
+      "title": "الإعدادات",
+      "signed_in_as": "تم تسجيل الدخول باسم"
+    },
+    "school_staff": {
+      "title": "الكادر التعليمي",
+      "empty": "لا يوجد كادر بعد",
+      "col_tenant": "المستأجر"
+    },
+    "platform_billing_overview": {
+      "title": "الفوترة",
+      "empty_title": "لا توجد حسابات فوترة",
+      "col_tenant": "المستأجر",
+      "col_status": "الحالة",
+      "col_created": "تاريخ الإنشاء"
+    },
+    "platform_billing_revenue": {
+      "title": "الإيرادات",
+      "empty_title": "لا توجد تحصيلات بعد",
+      "link_all_invoices": "جميع الفواتير →",
+      "stat_lifetime_collected": "إجمالي المحصّل",
+      "stat_last_30_days": "آخر 30 يومًا",
+      "stat_active_subscriptions": "الاشتراكات النشطة",
+      "section_monthly_collected": "التحصيل الشهري · آخر 12 شهرًا",
+      "no_paid_invoices": "لا توجد فواتير مدفوعة بعد.",
+      "section_top_tenants": "أعلى المستأجرين إيرادًا",
+      "section_plan_mix": "توزيع الخطط"
+    },
+    "platform_compliance_data_inventory": {
+      "title": "جرد البيانات",
+      "col_classification": "التصنيف",
+      "col_lawful_basis": "الأساس القانوني",
+      "col_purposes": "الأغراض",
+      "col_child_data": "بيانات الأطفال",
+      "subprocessors_heading": "المعالجون الفرعيون"
+    },
+    "platform_compliance_disclosures": {
+      "title": "سجل إفصاحات FERPA",
+      "record_heading": "تسجيل إفصاح",
+      "col_recipient": "المستلم",
+      "col_reason": "السبب",
+      "col_ferpa_basis": "أساس FERPA",
+      "empty_body": "لم يُسجَّل أي إفصاح بعد.",
+      "label_recipient_type": "نوع المستلم",
+      "label_recipient_name": "اسم المستلم",
+      "label_ferpa_basis": "أساس FERPA",
+      "placeholder_ferpa_basis": "school_official_exception",
+      "label_learner_id": "معرّف المتعلّم (اختياري)",
+      "label_reason": "السبب"
+    },
+    "platform_compliance_dsar": {
+      "title": "طلبات أصحاب البيانات",
+      "col_requested": "وقت الطلب",
+      "col_parent": "ولي الأمر",
+      "col_learner": "المتعلّم",
+      "col_status": "الحالة",
+      "col_completed": "وقت الإكمال",
+      "col_target": "الهدف",
+      "no_requests": "لا توجد طلبات."
+    },
+    "platform_compliance_overview": {
+      "title": "الامتثال",
+      "link_open_queue": "فتح قائمة الانتظار →",
+      "active_policies_heading": "السياسات النشطة"
+    },
+    "platform_compliance_retention": {
+      "title": "سياسات الاحتفاظ",
+      "col_classification": "التصنيف",
+      "col_retention_days": "الاحتفاظ (أيام)",
+      "col_archive_days": "الأرشفة (أيام)",
+      "col_description": "الوصف"
+    },
+    "platform_safety_moderation": {
+      "title": "أحداث الإشراف",
+      "col_subject": "الموضوع",
+      "col_decision": "القرار",
+      "col_categories": "الفئات",
+      "col_severity": "الخطورة",
+      "col_excerpt": "مقتطف",
+      "empty_body": "لم تُسجَّل أي أحداث إشراف بعد."
+    },
+    "platform_safety_overview": {
+      "title": "سلامة AI",
+      "recent_blocked_heading": "الأجيال المحظورة مؤخرًا"
+    },
+    "platform_safety_policies": {
+      "title": "إصدارات السياسة",
+      "label_block_threshold": "عتبة الحظر",
+      "label_review_threshold": "عتبة المراجعة",
+      "label_auto_review_categories": "فئات المراجعة التلقائية",
+      "label_auto_block_categories": "فئات الحظر التلقائي"
+    },
+    "platform_safety_red_team": {
+      "title": "مجموعة اختبار الفريق الأحمر",
+      "col_prompt": "الطلب",
+      "col_expected": "المتوقع",
+      "col_observed": "الملاحظ",
+      "col_result": "النتيجة"
+    },
+    "platform_safety_review_queue": {
+      "title": "قائمة انتظار المراجعة",
+      "empty_body": "لا توجد حالات مراجعة بعد.",
+      "placeholder_reviewer_note": "ملاحظة المراجع (اختياري)",
+      "btn_escalate": "تصعيد"
+    },
+    "platform_security_controls": {
+      "title": "ضوابط SOC 2",
+      "label_owner": "المسؤول:"
+    },
+    "platform_security_incidents": {
+      "title": "الحوادث",
+      "open_incident_heading": "فتح حادثة",
+      "empty_body": "لا توجد حوادث مسجّلة.",
+      "badge_customer_impact": "تأثير على العملاء",
+      "badge_regulator_notify": "إشعار الجهة التنظيمية"
+    },
+    "platform_security_overview": {
+      "title": "الوضع الأمني",
+      "recent_activity_heading": "النشاط الأخير",
+      "no_events": "لا توجد أحداث بعد.",
+      "link_audit_log": "عرض سجلّ التدقيق الكامل →"
+    },
+    "platform_security_risks": {
+      "title": "سجلّ المخاطر",
+      "empty_body": "لا توجد مخاطر مُتتَبَّعة بعد.",
+      "label_treatment": "المعالجة:"
+    },
+    "platform_security_state_privacy": {
+      "title": "مصفوفة قوانين خصوصية الولايات",
+      "label_obligation": "الالتزام:",
+      "no_control_mapped": "لم يُعيَّن أي ضابط بعد — هذه ثغرة."
+    },
+    "platform_security_vendors": {
+      "title": "جرد البائعين والمعالجين الفرعيين",
+      "subprocessors_heading": "المعالجون الفرعيون (يعالجون بيانات المتعلّمين)",
+      "badge_learner_data": "بيانات المتعلّمين"
+    },
+    "platform_security_vulnerabilities": {
+      "title": "إدارة الثغرات الأمنية",
+      "empty_body": "لا توجد ثغرات أمنية مُتتَبَّعة حاليًا."
+    },
+    "platform_overview": {
+      "title": "صحة النظام",
+      "tenant_footprint": "بصمة المستأجرين",
+      "tenant_footprint_desc": "توزيع المستأجرين المُقدَّمين حاليًا في هذه البيئة.",
+      "billing_status": "حالة الفوترة",
+      "recent_ai_jobs": "مهام AI الأخيرة",
+      "no_ai_activity_yet": "لا يوجد نشاط لتوليد AI حتى الآن.",
+      "view_all": "عرض الكل",
+      "operations_centres": "مراكز العمليات",
+      "signed_in_as": "مسجّل الدخول باسم",
+      "platform_settings": "إعدادات المنصة"
+    },
+    "platform_ai_moderation": {
+      "title": "اعتدال AI",
+      "no_block_or_review_events": "لا توجد أحداث حظر أو مراجعة",
+      "top_categories": "أبرز الفئات (الحظر + المراجعة)",
+      "no_categorised_events": "لا توجد أحداث مصنّفة.",
+      "col_tenant": "المستأجر",
+      "col_decision": "القرار",
+      "col_categories": "الفئات",
+      "col_signals": "الإشارات",
+      "col_excerpt": "مقتطف"
+    },
+    "platform_ai_playground": {
+      "title": "ملعب AI",
+      "how_it_works": "طريقة العمل",
+      "responses_moderated": "تمر الردود عبر اعتدال المخرجات قبل إعادتها هنا.",
+      "playground_responses_are": "ردود الملعب",
+      "presets": "الإعدادات المسبقة",
+      "model_claude": "Claude Opus 4.7 (الأساسي)",
+      "model_gemini": "Gemini 3.0 Pro (بديل)",
+      "model_gpt": "GPT-5.5 (بديل)",
+      "system_prompt": "موجّه النظام",
+      "user_prompt": "موجّه المستخدم"
+    },
+    "platform_ai_costs": {
+      "title": "التحكم في تكاليف AI",
+      "no_cost_events_yet": "لا توجد أحداث تكلفة حتى الآن",
+      "spend_mtd": "الإنفاق (الشهر الحالي)",
+      "approaching_cap": "الاقتراب من الحد",
+      "over_cap": "تجاوز الحد",
+      "tenants": "المستأجرون",
+      "col_tenant": "المستأجر",
+      "col_status": "الحالة",
+      "col_budget": "الميزانية",
+      "recent_cost_events": "أحداث التكلفة الأخيرة",
+      "col_feature": "الميزة",
+      "col_provider_model": "المزود / النموذج",
+      "col_tokens": "الرموز",
+      "aria_monthly_cap": "الحد الشهري بالدولار الأمريكي",
+      "aria_warn_at": "التحذير عند النسبة"
+    },
+    "platform_ai_generation": {
+      "title": "توليد AI",
+      "recent_jobs": "المهام الأخيرة",
+      "no_jobs_yet": "لا توجد مهام توليد AI حتى الآن",
+      "col_tenant": "المستأجر",
+      "col_status": "الحالة",
+      "col_duration": "المدة"
+    },
+    "platform_audio": {
+      "title": "الصوت والقراءة بصوت عالٍ",
+      "pronunciation_overrides": "تجاوزات النطق",
+      "playbacks": "مرات التشغيل",
+      "cache_hit_rate": "معدل إصابة ذاكرة التخزين المؤقت",
+      "total_cost": "التكلفة الإجمالية",
+      "unique_clips": "مقاطع فريدة",
+      "recent_playbacks": "عمليات التشغيل الأخيرة",
+      "col_context": "السياق",
+      "no_playbacks_yet": "لا توجد عمليات تشغيل مسجّلة حتى الآن.",
+      "recently_generated_clips": "المقاطع المُولَّدة مؤخرًا"
+    },
+    "platform_audio_pronunciation": {
+      "title": "تجاوزات النطق",
+      "add_override": "إضافة تجاوز",
+      "replacement": "البديل",
+      "encoding": "الترميز",
+      "notes_optional": "ملاحظات (اختياري)",
+      "no_overrides_yet": "لا توجد تجاوزات حتى الآن.",
+      "placeholder_token": "مثال: AIVO",
+      "placeholder_replacement": "مثال: ay-voh"
+    },
+    "platform_baseline_items": {
+      "title": "القياس النفسي لبنود الخط الأساسي",
+      "items_by_exposure": "البنود حسب التعرض",
+      "no_telemetry_yet": "لا توجد بيانات قياس عن بُعد للخط الأساسي حتى الآن",
+      "col_item": "البند (المهارة · الفئة)",
+      "col_exposure": "التعرض",
+      "col_scored": "مُقيَّم",
+      "col_median_time": "الوقت الوسيط",
+      "col_seed_theta": "θ البذرة",
+      "col_est_theta": "θ̂ المُقدَّر",
+      "col_disc": "التمييز (a)",
+      "col_suggested_band": "الفئة المقترحة",
+      "col_status": "الحالة",
+      "status_healthy": "سليم",
+      "status_collecting": "جمع البيانات",
+      "status_retire": "إيقاف"
+    },
+    "platform_curriculum_overview": {
+      "title": "المنهج الدراسي"
+    },
+    "platform_curriculum_frameworks": {
+      "title": "أُطر المعايير",
+      "homepage_link": "الصفحة الرئيسية →"
+    },
+    "platform_curriculum_import": {
+      "title": "استيراد المعايير",
+      "start_an_import": "بدء الاستيراد",
+      "recent_jobs": "المهام الأخيرة",
+      "no_import_jobs_yet": "لا توجد مهام استيراد حتى الآن.",
+      "framework": "الإطار",
+      "source": "المصدر",
+      "source_placeholder": "manual, s3://…, https://…"
+    },
+    "platform_curriculum_skills": {
+      "title": "المهارات",
+      "col_subject": "المادة",
+      "col_grade_band": "فئة الصف",
+      "col_version": "الإصدار",
+      "col_prereqs": "المتطلبات السابقة",
+      "col_standards": "المعايير",
+      "col_constraints": "القيود"
+    },
+    "platform_curriculum_subjects": {
+      "title": "المواد والمجالات",
+      "no_domains_yet": "لا توجد مجالات حتى الآن."
+    },
+    "platform_curriculum_versioning": {
+      "title": "الإصدارات والأهداف والمخططات",
+      "skill_versions": "إصدارات المهارات",
+      "objective_templates": "قوالب الأهداف",
+      "assessment_blueprints": "مخططات التقييم",
+      "col_blueprint": "المخطط",
+      "col_status": "الحالة"
+    },
+    "platform_settings_overview": {
+      "title": "الإعدادات",
+      "signed_in_as": "مسجّل الدخول باسم"
+    },
+    "platform_settings_api_keys": {
+      "title": "مفاتيح API",
+      "no_keys_yet": "لا توجد مفاتيح API حتى الآن",
+      "col_prefix": "البادئة",
+      "col_scopes": "النطاقات",
+      "col_status": "الحالة",
+      "col_created_by": "أنشأه",
+      "col_last_used": "آخر استخدام",
+      "col_created": "تاريخ الإنشاء"
+    },
+    "platform_settings_emails": {
+      "title": "قوالب البريد الإلكتروني",
+      "no_templates_configured": "لم يتم تكوين قوالب بريد إلكتروني",
+      "col_template": "القالب",
+      "col_subject": "الموضوع",
+      "col_status": "الحالة",
+      "col_last_sent": "آخر إرسال",
+      "col_updated": "تاريخ التحديث"
+    },
+    "platform_settings_webhooks": {
+      "title": "Webhooks",
+      "no_endpoints_configured": "لم يتم تكوين نقاط نهاية للـ webhook",
+      "col_endpoint": "نقطة النهاية",
+      "col_events": "الأحداث",
+      "col_secret": "السر",
+      "col_status": "الحالة",
+      "col_last_delivery": "آخر تسليم",
+      "col_failures": "الأخطاء"
+    }
   }
 }

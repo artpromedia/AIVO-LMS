@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +16,7 @@ const MODES: Array<{ value: TenantSSOConfig["mode"]; label: string; desc: string
 
 export function SSOForm({ initial }: { initial: TenantSSOConfig }) {
   const router = useRouter();
+  const t = useTranslations("admin.district_settings_sso");
   const [mode, setMode] = useState<TenantSSOConfig["mode"]>(initial.mode);
   const [idpName, setIdpName] = useState(initial.idpName ?? "");
   const [metadataUrl, setMetadataUrl] = useState(initial.metadataUrl ?? "");
@@ -64,7 +66,7 @@ export function SSOForm({ initial }: { initial: TenantSSOConfig }) {
   return (
     <form onSubmit={(e) => submit(e, false)} className="space-y-5">
       <div>
-        <p className="text-sm font-medium">Sign-in mode</p>
+        <p className="text-sm font-medium">{t("sign_in_mode")}</p>
         <div className="mt-2 grid gap-2 sm:grid-cols-3">
           {MODES.map((m) => (
             <label
@@ -91,12 +93,12 @@ export function SSOForm({ initial }: { initial: TenantSSOConfig }) {
       </div>
 
       <div>
-        <Label htmlFor="idpName">Identity provider name</Label>
+        <Label htmlFor="idpName">{t("idp_name_label")}</Label>
         <Input
           id="idpName"
           value={idpName}
           onChange={(e) => setIdpName(e.target.value)}
-          placeholder="e.g. District Okta"
+          placeholder={t("idp_name_placeholder")}
           maxLength={120}
           className="mt-1"
           disabled={mode === "off"}
@@ -121,7 +123,7 @@ export function SSOForm({ initial }: { initial: TenantSSOConfig }) {
       <div className="rounded-md border border-aivo-border bg-aivo-surface-2 p-4">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold">SCIM provisioning</p>
+            <p className="text-sm font-semibold">{t("scim_provisioning")}</p>
             <p className="text-xs text-aivo-ink-soft">
               Allow your IdP to create, update, and deactivate users in this district automatically.
               Requires a SAML or OIDC mode.
@@ -135,12 +137,12 @@ export function SSOForm({ initial }: { initial: TenantSSOConfig }) {
               disabled={mode === "off"}
               className="h-4 w-4 rounded border-aivo-border text-aivo-primary"
             />
-            Enable SCIM
+            {t("enable_scim")}
           </label>
         </div>
         <div className="mt-3 flex items-center justify-between">
           <p className="text-xs text-aivo-ink-soft">
-            Rotating the SCIM token invalidates any IdP integration using the old credential.
+            {t("scim_rotate_warning")}
           </p>
           <Button
             type="button"
@@ -149,7 +151,7 @@ export function SSOForm({ initial }: { initial: TenantSSOConfig }) {
             onClick={(e) => submit(e as unknown as React.FormEvent, true)}
             disabled={pending || !scimEnabled}
           >
-            Rotate SCIM token
+            {t("rotate_scim_token")}
           </Button>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import {
   FloatingMetricCard,
@@ -32,6 +33,7 @@ export default async function DistrictAdminHome() {
   const settings = getTenantSettings(session.tenantId);
   const tenant = getTenantById(session.tenantId);
   const health = computeSystemHealth(tenantIds);
+  const t = await getTranslations("admin.district_overview");
   const districtName = settings.branding.displayName ?? tenant?.name ?? "District";
 
   const kpis: Array<{
@@ -80,10 +82,10 @@ export default async function DistrictAdminHome() {
       user={{ displayName: session.displayName, email: session.email }}
     >
       <header className="flex flex-col gap-2 mb-6">
-        <p className="iw-label text-iw-text-muted">District admin</p>
+        <p className="iw-label text-iw-text-muted">{t("eyebrow")}</p>
         <h1 className="text-2xl md:text-3xl font-semibold text-iw-text-strong">{districtName}</h1>
         <p className="text-sm md:text-base text-iw-text-muted max-w-2xl">
-          Cross-school oversight, rostering, and reporting. Drill into a card to manage a school.
+          {t("description")}
         </p>
       </header>
 
@@ -103,13 +105,13 @@ export default async function DistrictAdminHome() {
         <GlassCard
           elevation="raised"
           density="comfortable"
-          title="Functioning level distribution"
+          title={t("fl_distribution_title")}
           description={`${flTotal.toLocaleString()} learners across five AIVO levels`}
           actions={<InsightChip tone="neutral" size="md">{flTotal.toLocaleString()}</InsightChip>}
           className="lg:col-span-2"
         >
           {flTotal === 0 ? (
-            <p className="text-sm text-iw-text-muted">No learners assigned yet.</p>
+            <p className="text-sm text-iw-text-muted">{t("no_learners")}</p>
           ) : (
             <ul className="space-y-3 mt-2">
               {stats.flDistribution.map((row) => {
@@ -142,7 +144,7 @@ export default async function DistrictAdminHome() {
         <GlassCard
           elevation="raised"
           density="comfortable"
-          title="Platform health"
+          title={t("platform_health_title")}
           description="Last 30 days"
           actions={
             <InsightChip
@@ -155,19 +157,19 @@ export default async function DistrictAdminHome() {
         >
           <dl className="space-y-2.5 text-sm mt-2">
             <div className="flex items-center justify-between">
-              <dt className="text-iw-text-muted">Lessons completed</dt>
+              <dt className="text-iw-text-muted">{t("lessons_completed")}</dt>
               <dd className="font-semibold text-iw-text-strong tabular-nums">{health.lessonRunsCompleted.toLocaleString()}</dd>
             </div>
             <div className="flex items-center justify-between">
-              <dt className="text-iw-text-muted">Lessons attempted</dt>
+              <dt className="text-iw-text-muted">{t("lessons_attempted")}</dt>
               <dd className="font-semibold text-iw-text-strong tabular-nums">{health.lessonRunsTotal.toLocaleString()}</dd>
             </div>
             <div className="flex items-center justify-between">
-              <dt className="text-iw-text-muted">AI jobs in queue</dt>
+              <dt className="text-iw-text-muted">{t("ai_jobs_in_queue")}</dt>
               <dd className="font-semibold text-iw-text-strong tabular-nums">{health.generationQueuedCount.toLocaleString()}</dd>
             </div>
             <div className="flex items-center justify-between">
-              <dt className="text-iw-text-muted">AI failures</dt>
+              <dt className="text-iw-text-muted">{t("ai_failures")}</dt>
               <dd className="font-semibold text-iw-text-strong tabular-nums">{health.generationFailureCount.toLocaleString()}</dd>
             </div>
           </dl>

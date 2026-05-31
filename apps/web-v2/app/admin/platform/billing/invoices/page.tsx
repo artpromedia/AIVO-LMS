@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -26,6 +27,7 @@ function fmtCurrency(cents: number, currency: string): string {
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_billing_invoices");
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const tenantById = new Map(tenants.map((t) => [t.id, t]));
   const invoices = listInvoicesForTenants(tenants.map((t) => t.id));
@@ -52,14 +54,14 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Billing"
-        title="Invoices"
+        title={t("title")}
         description="Every invoice issued across every tenant."
         actions={
           <Link
             href="/admin/platform/billing/revenue"
             className="text-sm font-medium text-aivo-primary hover:underline"
           >
-            Revenue summary →
+            {t("link_revenue_summary")}
           </Link>
         }
       />
@@ -67,7 +69,7 @@ export default async function Page() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            Total invoices
+            {t("stat_total_invoices")}
           </p>
           <p className="mt-1 font-display text-3xl font-bold">{invoices.length.toLocaleString()}</p>
         </Card>
@@ -89,7 +91,7 @@ export default async function Page() {
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            Outstanding
+            {t("stat_outstanding")}
           </p>
           <p className="mt-1 font-display text-3xl font-bold">
             {fmtCurrency(outstandingCents, "USD")}
@@ -103,17 +105,17 @@ export default async function Page() {
           {invoices.length.toLocaleString()} {invoices.length === 1 ? "invoice" : "invoices"}
         </div>
         {invoices.length === 0 ? (
-          <EmptyState title="No invoices yet" />
+          <EmptyState title={t("empty_title")} />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-aivo-surface-2 text-left text-xs font-semibold uppercase tracking-wide text-aivo-muted">
                 <tr>
-                  <th className="px-4 py-2">Number</th>
-                  <th className="px-4 py-2">Tenant</th>
-                  <th className="px-4 py-2 text-right">Amount</th>
-                  <th className="px-4 py-2">Status</th>
-                  <th className="px-4 py-2">Period</th>
+                  <th className="px-4 py-2">{t("col_number")}</th>
+                  <th className="px-4 py-2">{t("col_tenant")}</th>
+                  <th className="px-4 py-2 text-right">{t("col_amount")}</th>
+                  <th className="px-4 py-2">{t("col_status")}</th>
+                  <th className="px-4 py-2">{t("col_period")}</th>
                   <th className="px-4 py-2">Paid</th>
                 </tr>
               </thead>

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import type { TenantFeatureOverrides, TenantNotificationPrefs } from "@/lib/db/types";
@@ -91,6 +92,7 @@ function Toggle({
 
 export function SettingsTogglesForm({ initial }: { initial: Initial }) {
   const router = useRouter();
+  const t = useTranslations("admin.district_settings");
   const [notifications, setNotifications] = useState(initial.notifications);
   const [features, setFeatures] = useState(initial.features);
   const [pending, startTransition] = useTransition();
@@ -130,8 +132,8 @@ export function SettingsTogglesForm({ initial }: { initial: Initial }) {
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <Card className="p-[var(--aivo-density-card-pad)]">
-        <p className="font-display text-lg font-semibold">Notification preferences</p>
-        <p className="text-sm text-aivo-ink-soft">What district admins are emailed about.</p>
+        <p className="font-display text-lg font-semibold">{t("notifications_heading")}</p>
+        <p className="text-sm text-aivo-ink-soft">{t("notifications_desc")}</p>
         <ul className="mt-4 divide-y divide-aivo-border">
           {NOTIFICATION_ROWS.map((row) => (
             <li key={row.key} className="flex items-start justify-between gap-4 py-3">
@@ -150,9 +152,9 @@ export function SettingsTogglesForm({ initial }: { initial: Initial }) {
       </Card>
 
       <Card className="p-[var(--aivo-density-card-pad)]">
-        <p className="font-display text-lg font-semibold">Feature overrides</p>
+        <p className="font-display text-lg font-semibold">{t("features_heading")}</p>
         <p className="text-sm text-aivo-ink-soft">
-          District-level toggles applied to every school under this district.
+          {t("features_desc")}
         </p>
         <ul className="mt-4 divide-y divide-aivo-border">
           {FEATURE_ROWS.map((row) => (

@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
@@ -28,6 +29,7 @@ function formatDate(iso: string | null): string {
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_billing_coupons");
   const coupons = listCoupons();
 
   const active = coupons.filter((c) => c.status === "active");
@@ -55,7 +57,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Billing"
-        title="Coupons"
+        title={t("title")}
         description="Promo codes across all plans. Track redemptions, validity windows, and plan eligibility."
       />
 
@@ -71,7 +73,7 @@ export default async function Page() {
       <Card className="mt-6 overflow-hidden p-0">
         {coupons.length === 0 ? (
           <EmptyState
-            title="No coupons configured"
+            title={t("empty_title")}
             description="Create your first promo code to attach a discount to family, school, or district plans."
           />
         ) : (
@@ -79,11 +81,11 @@ export default async function Page() {
             <thead className="bg-aivo-surface-2 text-xs uppercase tracking-wide text-aivo-ink-soft">
               <tr>
                 <th className="px-4 py-3 text-left">Code</th>
-                <th className="px-4 py-3 text-left">Discount</th>
-                <th className="px-4 py-3 text-left">Applies to</th>
-                <th className="px-4 py-3 text-left">Status</th>
-                <th className="px-4 py-3 text-right">Redemptions</th>
-                <th className="px-4 py-3 text-left">Valid window</th>
+                <th className="px-4 py-3 text-left">{t("col_discount")}</th>
+                <th className="px-4 py-3 text-left">{t("col_applies_to")}</th>
+                <th className="px-4 py-3 text-left">{t("col_status")}</th>
+                <th className="px-4 py-3 text-right">{t("col_redemptions")}</th>
+                <th className="px-4 py-3 text-left">{t("col_valid_window")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-aivo-border">

@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { CopyIcon, Loader2, UserPlus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -28,6 +29,7 @@ export function StaffInviteSection({
     schoolId: string | null;
   }>;
 }) {
+  const t = useTranslations("admin.district_staff");
   const [open, setOpen] = useState(false);
   const [state, formAction, pending] = useActionState(
     inviteStaffAction,
@@ -51,7 +53,7 @@ export function StaffInviteSection({
       <div className="mb-3 flex items-center justify-between">
         <div>
           <h2 className="text-sm font-semibold uppercase tracking-wide text-aivo-muted">
-            Pending invitations
+            {t("pending_invitations")}
           </h2>
           <p className="mt-0.5 text-xs text-aivo-ink-soft">
             {pendingInvites.length === 0
@@ -60,7 +62,7 @@ export function StaffInviteSection({
           </p>
         </div>
         <Button onClick={() => setOpen(true)} size="sm">
-          <UserPlus className="mr-1.5 h-4 w-4" /> Invite staff
+          <UserPlus className="mr-1.5 h-4 w-4" /> {t("invite_staff_btn")}
         </Button>
       </div>
 
@@ -92,12 +94,12 @@ export function StaffInviteSection({
         >
           <Card className="w-full max-w-md p-6">
             <div className="mb-4 flex items-start justify-between">
-              <h3 className="text-lg font-bold">Invite staff member</h3>
+              <h3 className="text-lg font-bold">{t("invite_staff_member")}</h3>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 className="rounded p-1 hover:bg-aivo-surface-2"
-                aria-label="Close"
+                aria-label={t("close_aria")}
               >
                 <X className="h-4 w-4" />
               </button>
@@ -108,7 +110,7 @@ export function StaffInviteSection({
             ) : (
               <form ref={formRef} action={formAction} className="space-y-3">
                 <label className="block">
-                  <span className="text-xs font-medium">Display name</span>
+                  <span className="text-xs font-medium">{t("field_display_name")}</span>
                   <Input name="displayName" required minLength={2} />
                 </label>
                 <label className="block">
@@ -125,20 +127,20 @@ export function StaffInviteSection({
                     }
                     className="mt-1 block w-full rounded-md border border-aivo-border bg-aivo-surface px-3 py-2 text-sm"
                   >
-                    <option value="teacher">Teacher</option>
-                    <option value="school_admin">School admin</option>
-                    <option value="district_admin">District admin</option>
+                    <option value="teacher">{t("role_teacher")}</option>
+                    <option value="school_admin">{t("role_school_admin")}</option>
+                    <option value="district_admin">{t("role_district_admin")}</option>
                   </select>
                 </label>
                 {role !== "district_admin" ? (
                   <label className="block">
-                    <span className="text-xs font-medium">Assign to school</span>
+                    <span className="text-xs font-medium">{t("assign_to_school")}</span>
                     <select
                       name="schoolId"
                       required
                       className="mt-1 block w-full rounded-md border border-aivo-border bg-aivo-surface px-3 py-2 text-sm"
                     >
-                      <option value="">Pick a school…</option>
+                      <option value="">{t("pick_school")}</option>
                       {schools.map((s) => (
                         <option key={s.id} value={s.id}>
                           {s.name}
@@ -161,12 +163,12 @@ export function StaffInviteSection({
                     variant="outline"
                     onClick={() => setOpen(false)}
                   >
-                    Cancel
+                    {t("cancel")}
                   </Button>
                   <Button type="submit" disabled={pending}>
                     {pending ? (
                       <span className="inline-flex items-center gap-2">
-                        <Loader2 className="h-4 w-4 animate-spin" /> Sending…
+                        <Loader2 className="h-4 w-4 animate-spin" /> {t("sending")}
                       </span>
                     ) : (
                       "Send invitation"
@@ -189,15 +191,16 @@ function SuccessPanel({
   state: { status: "success"; email: string; temporaryPassword: string; displayName: string };
   onClose: () => void;
 }) {
+  const t = useTranslations("admin.district_staff");
   const [copied, setCopied] = useState(false);
   return (
     <div className="space-y-3">
       <div className="rounded-lg bg-emerald-50 px-3 py-2 text-sm">
-        Invited <strong>{state.displayName}</strong> ({state.email}).
+        {t("invited_success", { name: state.displayName })} ({state.email}).
       </div>
       <div className="rounded-lg border border-aivo-border bg-aivo-surface-2 p-3">
         <p className="text-xs font-medium uppercase tracking-wide text-aivo-muted">
-          Temporary password
+          {t("temporary_password")}
         </p>
         <div className="mt-1 flex items-center gap-2">
           <code className="flex-1 rounded bg-aivo-surface px-2 py-1 font-mono text-sm">

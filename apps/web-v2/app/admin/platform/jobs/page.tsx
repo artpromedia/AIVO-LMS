@@ -1,4 +1,5 @@
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
@@ -38,6 +39,7 @@ function formatDuration(ms: number | null): string {
 
 export default async function Page() {
   const session = await requirePageRole(["platform_admin"]);
+  const t = await getTranslations("admin.platform_jobs");
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const tenantIds = tenants.map((t) => t.id);
   const jobs = listAiGenerationJobs(tenantIds, 200);
@@ -76,7 +78,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · Jobs"
-        title="Background jobs"
+        title={t("title")}
         description="AI generation pipeline — completions, failures, and queue depth across every tenant."
         actions={
           <Badge
@@ -142,7 +144,7 @@ export default async function Page() {
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="font-display text-lg font-semibold">By kind</p>
+          <p className="font-display text-lg font-semibold">{t("by_kind")}</p>
           <ul className="mt-3 space-y-2 text-sm">
             {Object.entries(KIND_LABEL).map(([k, label]) => (
               <li key={k} className="flex items-center justify-between">
@@ -155,7 +157,7 @@ export default async function Page() {
           </ul>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="font-display text-lg font-semibold">Latency</p>
+          <p className="font-display text-lg font-semibold">{t("latency")}</p>
           <p className="mt-1 text-xs text-aivo-ink-soft">
             Median completed-job duration across the last {jobs.length} jobs.
           </p>
@@ -165,9 +167,9 @@ export default async function Page() {
           </p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="font-display text-lg font-semibold">Lesson runs</p>
+          <p className="font-display text-lg font-semibold">{t("lesson_runs")}</p>
           <p className="mt-1 text-xs text-aivo-ink-soft">
-            Learner-facing pipeline downstream of AI generation.
+            {t("lesson_runs_desc")}
           </p>
           <p className="mt-3 font-display text-3xl font-bold">
             {h.lessonRunsCompleted.toLocaleString()}
@@ -180,20 +182,20 @@ export default async function Page() {
 
       <Card className="mt-6 overflow-hidden">
         <div className="border-b border-aivo-border px-4 py-3 text-sm font-medium">
-          Recent jobs · newest first
+          {t("recent_jobs")}
         </div>
         {jobs.length === 0 ? (
-          <EmptyState title="No AI generation activity yet" />
+          <EmptyState title={t("empty")} />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-aivo-surface-2 text-left text-xs font-semibold uppercase tracking-wide text-aivo-muted">
                 <tr>
                   <th className="px-4 py-2">Kind</th>
-                  <th className="px-4 py-2">Status</th>
-                  <th className="px-4 py-2">Tenant</th>
-                  <th className="px-4 py-2">Started</th>
-                  <th className="px-4 py-2 text-right">Duration</th>
+                  <th className="px-4 py-2">{t("col_status")}</th>
+                  <th className="px-4 py-2">{t("col_tenant")}</th>
+                  <th className="px-4 py-2">{t("col_started")}</th>
+                  <th className="px-4 py-2 text-right">{t("col_duration")}</th>
                   <th className="px-4 py-2">Input</th>
                 </tr>
               </thead>

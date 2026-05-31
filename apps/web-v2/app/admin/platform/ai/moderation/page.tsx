@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PLATFORM_NAV } from "@/components/layout/role-shells";
 import { listModerationEvents, scopeTenantsForSession, getTenantById } from "@/lib/db/repos";
+import { getTranslations } from "next-intl/server";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +25,7 @@ function relativeTime(iso: string): string {
 }
 
 export default async function Page() {
+  const t = await getTranslations("admin.platform_ai_moderation");
   const session = await requirePageRole(["platform_admin"]);
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const tenantIds = new Set(tenants.map((t) => t.id));
@@ -36,9 +38,8 @@ export default async function Page() {
   const allowed = all.filter((e) => e.classification.decision === "allow");
   const injectionFlagged = all.filter((e) => e.injectionSignals.length > 0).length;
   const crisisFlagged = all.filter((e) => e.crisisSignals.length > 0).length;
-  const last24h = all.filter(
-    (e) => Date.now() - new Date(e.createdAt).getTime() < 24 * 3600_000,
-  ).length;
+  const cutoff24h = Date.now() - 24 * 3600_000;
+  const last24h = all.filter((e) => new Date(e.createdAt).getTime() > cutoff24h).length;
 
   // Category mix from blocked/review events (allow events typically lack categories).
   const categoryCount = new Map<string, number>();
@@ -74,7 +75,7 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · AI"
-        title="AI moderation"
+        title={t("title")}
         description="Every classification produced by the safety pipeline. Allow decisions are recorded only at debug volume; the table below focuses on block + review."
       />
 
@@ -89,9 +90,9 @@ export default async function Page() {
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         <Card className="p-[var(--aivo-density-card-pad)] lg:col-span-1">
-          <p className="font-display text-lg font-semibold">Top categories (block + review)</p>
+          <p className="font-display text-lg font-semibold">{t("top_categories")}</p>
           {topCategories.length === 0 ? (
-            <p className="mt-2 text-sm text-aivo-ink-soft">No categorised events.</p>
+            <p className="mt-2 text-sm text-aivo-ink-soft">{t("no_categorised_events")}</p>
           ) : (
             <ul className="mt-3 space-y-2">
               {topCategories.map(([cat, count]) => (
@@ -107,7 +108,7 @@ export default async function Page() {
         <Card className="overflow-hidden p-0 lg:col-span-2">
           {focus.length === 0 ? (
             <EmptyState
-              title="No block or review events"
+              title={t("no_block_or_review_events")}
               description="The safety pipeline allowed every recent classification."
             />
           ) : (
@@ -115,11 +116,11 @@ export default async function Page() {
               <thead className="bg-aivo-surface-2 text-xs uppercase tracking-wide text-aivo-ink-soft">
                 <tr>
                   <th className="px-4 py-3 text-left">When</th>
-                  <th className="px-4 py-3 text-left">Tenant</th>
-                  <th className="px-4 py-3 text-left">Decision</th>
-                  <th className="px-4 py-3 text-left">Categories</th>
-                  <th className="px-4 py-3 text-left">Signals</th>
-                  <th className="px-4 py-3 text-left">Excerpt</th>
+                  <th className="px-4 py-3 text-left">{t("col_tenant")}</th>
+                  <th className="px-4 py-3 text-left">{t("col_decision")}</th>
+                  <th className="px-4 py-3 text-left">{t("col_categories")}</th>
+                  <th className="px-4 py-3 text-left">{t("col_signals")}</th>
+                  <th className="px-4 py-3 text-left">{t("col_excerpt")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-aivo-border">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -17,6 +18,7 @@ type JobResult = {
 type ImportError = { rowNumber: number; message: string };
 
 export function RosterImportForm({ schoolId, sampleCsv }: { schoolId: string; sampleCsv: string }) {
+  const t = useTranslations("admin.school_rostering");
   const [csv, setCsv] = useState(sampleCsv);
   const [running, setRunning] = useState(false);
   const [job, setJob] = useState<JobResult | null>(null);
@@ -98,16 +100,16 @@ export function RosterImportForm({ schoolId, sampleCsv }: { schoolId: string; sa
           </div>
           <div className="mt-2 grid grid-cols-4 gap-2 text-sm">
             <div>
-              <span className="text-aivo-muted">Total:</span> {job.totalRows}
+              <span className="text-aivo-muted">{t("import_total")}</span> {job.totalRows}
             </div>
             <div>
-              <span className="text-aivo-muted">Created:</span> {job.createdRows}
+              <span className="text-aivo-muted">{t("import_created")}</span> {job.createdRows}
             </div>
             <div>
-              <span className="text-aivo-muted">Skipped:</span> {job.skippedRows}
+              <span className="text-aivo-muted">{t("import_skipped")}</span> {job.skippedRows}
             </div>
             <div>
-              <span className="text-aivo-muted">Errors:</span> {job.errorRows}
+              <span className="text-aivo-muted">{t("import_errors")}</span> {job.errorRows}
             </div>
           </div>
           {errors.length > 0 ? (

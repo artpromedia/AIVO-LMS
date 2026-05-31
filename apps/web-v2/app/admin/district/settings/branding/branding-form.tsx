@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,6 +33,7 @@ export function BrandingForm({
   fallbackName: string;
 }) {
   const router = useRouter();
+  const t = useTranslations("admin.district_settings_branding");
   const [displayName, setDisplayName] = useState(initial.displayName ?? fallbackName);
   const [supportEmail, setSupportEmail] = useState(initial.supportEmail ?? "");
   // eslint-disable-next-line no-restricted-syntax -- district admin chooses tenant brand color; default is product brand mark, not a tier surface
@@ -85,7 +87,7 @@ export function BrandingForm({
   return (
     <form onSubmit={submit} className="space-y-5">
       <div>
-        <Label htmlFor="displayName">Display name</Label>
+        <Label htmlFor="displayName">{t("display_name")}</Label>
         <Input
           id="displayName"
           value={displayName}
@@ -94,12 +96,12 @@ export function BrandingForm({
           className="mt-1"
         />
         <p className="mt-1 text-xs text-aivo-ink-soft">
-          Shown in the product header, emails, and parent portal.
+          {t("display_name_hint")}
         </p>
       </div>
 
       <div>
-        <Label htmlFor="supportEmail">Support email</Label>
+        <Label htmlFor="supportEmail">{t("support_email")}</Label>
         <Input
           id="supportEmail"
           type="email"
@@ -110,12 +112,12 @@ export function BrandingForm({
           className="mt-1"
         />
         <p className="mt-1 text-xs text-aivo-ink-soft">
-          Families and staff in this district see this on every help page.
+          {t("support_email_hint")}
         </p>
       </div>
 
       <div>
-        <Label htmlFor="primaryColor">Primary brand colour</Label>
+        <Label htmlFor="primaryColor">{t("primary_colour")}</Label>
         <div className="mt-1 flex items-center gap-3">
           <input
             id="primaryColor"
@@ -123,7 +125,7 @@ export function BrandingForm({
             value={primaryColor}
             onChange={(e) => setPrimaryColor(e.target.value)}
             className="h-10 w-14 cursor-pointer rounded border border-aivo-border bg-transparent p-0"
-            aria-label="Primary brand colour"
+            aria-label={t("primary_colour_aria")}
           />
           <Input
             value={primaryColor}
@@ -137,7 +139,7 @@ export function BrandingForm({
             className="inline-flex h-10 items-center rounded-md px-3 text-sm font-semibold text-white"
             style={{ background: primaryColor }}
           >
-            Sample
+            {t("sample")}
           </span>
         </div>
         {contrastBadge ? (

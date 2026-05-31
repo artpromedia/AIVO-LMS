@@ -13,12 +13,14 @@ import {
   scopeTenantsForSession,
 } from "@/lib/db/repos";
 import { BudgetEditor } from "./budget-editor";
+import { getTranslations } from "next-intl/server";
 
 function fmtCents(c: number): string {
   return `$${(c / 100).toFixed(2)}`;
 }
 
 export default async function Page() {
+  const t = await getTranslations("admin.platform_ai_costs");
   const session = await requirePageRole(["platform_admin"]);
   const tenants = scopeTenantsForSession(session.role, session.tenantId);
   const rows = tenants.map((t) => ({
@@ -45,38 +47,38 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Platform · AI costs"
-        title="AI cost controls"
+        title={t("title")}
         description="Per-tenant LLM and TTS spend, with monthly caps and hard stops."
       />
 
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            Spend (MTD)
+            {t("spend_mtd")}
           </p>
           <p className="mt-1 font-display text-3xl font-bold">{fmtCents(totalSpent)}</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">
-            Approaching cap
+            {t("approaching_cap")}
           </p>
           <p className="mt-1 font-display text-3xl font-bold">{warning}</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">Over cap</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-aivo-muted">{t("over_cap")}</p>
           <p className="mt-1 font-display text-3xl font-bold">{overBudget}</p>
         </Card>
       </div>
 
-      <h2 className="mb-3 font-display text-lg font-semibold">Tenants</h2>
+      <h2 className="mb-3 font-display text-lg font-semibold">{t("tenants")}</h2>
       <Card className="mb-8 overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-aivo-surface-2 text-left">
             <tr>
-              <th className="p-3">Tenant</th>
+              <th className="p-3">{t("col_tenant")}</th>
               <th className="p-3">Spend</th>
-              <th className="p-3">Status</th>
-              <th className="p-3">Budget</th>
+              <th className="p-3">{t("col_status")}</th>
+              <th className="p-3">{t("col_budget")}</th>
             </tr>
           </thead>
           <tbody>
@@ -136,10 +138,10 @@ export default async function Page() {
         </table>
       </Card>
 
-      <h2 className="mb-3 font-display text-lg font-semibold">Recent cost events</h2>
+      <h2 className="mb-3 font-display text-lg font-semibold">{t("recent_cost_events")}</h2>
       {events.length === 0 ? (
         <EmptyState
-          title="No cost events yet"
+          title={t("no_cost_events_yet")}
           description="AI generations will appear here as they run."
         />
       ) : (
@@ -148,10 +150,10 @@ export default async function Page() {
             <thead className="bg-aivo-surface-2 text-left">
               <tr>
                 <th className="p-3">Time</th>
-                <th className="p-3">Tenant</th>
-                <th className="p-3">Feature</th>
-                <th className="p-3">Provider / model</th>
-                <th className="p-3">Tokens</th>
+                <th className="p-3">{t("col_tenant")}</th>
+                <th className="p-3">{t("col_feature")}</th>
+                <th className="p-3">{t("col_provider_model")}</th>
+                <th className="p-3">{t("col_tokens")}</th>
                 <th className="p-3">Cost</th>
               </tr>
             </thead>
