@@ -137,7 +137,7 @@ export function buildRoleSession(profile: SessionProfile): RoleSessionPayload {
   for (const extra of profile.roles ?? []) {
     if (extra === activeWeb) continue;
     const nav = toNavRole(extra);
-    if (!nav || seen.has(nav)) continue;
+    if (seen.has(nav)) continue;
     seen.add(nav);
     roles.push(nav);
   }
