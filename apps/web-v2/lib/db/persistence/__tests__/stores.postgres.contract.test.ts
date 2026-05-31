@@ -1,23 +1,49 @@
 /**
- * Runs the shared store contracts against the Drizzle (postgres)
+ * Runs every shared store contract against the Drizzle (postgres)
  * adapters. Skipped unless AIVO_TEST_DATABASE_URL points at a throwaway
- * Postgres (e.g. a CI test container). Creates the tables it needs and
- * truncates between cases, so it is self-contained and does not depend
- * on a migrated database.
+ * Postgres (CI brings one up). Applies the real migration SQL (0047–
+ * 0049) so the schema is identical to production, then truncates
+ * between cases.
  *
  *   AIVO_TEST_DATABASE_URL=postgres://… pnpm --filter @aivo/web-v2 \
  *     vitest run lib/db/persistence/__tests__/stores.postgres.contract.test.ts
  */
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { beforeAll, afterAll, describe, it } from "vitest";
 import { sql } from "drizzle-orm";
 import { createDb, type Database } from "@aivo/db";
 import { __setDbClient, __resetDbClient } from "../drizzle/client";
 import { drizzleBrainProfiles } from "../drizzle/brain-profiles";
 import { drizzleLessonRuns } from "../drizzle/lesson-runs";
+import { drizzleNotifications } from "../drizzle/notifications";
+import { drizzleAudit } from "../drizzle/audit";
+import { drizzleIdentity } from "../drizzle/identity";
+import { drizzleLearners } from "../drizzle/learners";
+import { drizzleAssessments } from "../drizzle/assessments";
+import { drizzleCurriculum } from "../drizzle/curriculum";
+import { drizzleCompliance } from "../drizzle/compliance";
+import { drizzleQuests } from "../drizzle/quests";
+import { drizzleAdmin } from "../drizzle/admin";
 import { brainProfileStoreContract } from "./contract/brain-profiles.contract";
 import { lessonRunStoreContract } from "./contract/lesson-runs.contract";
+import {
+  notificationStoreContract,
+  auditStoreContract,
+  identityStoreContract,
+  learnerStoreContract,
+  assessmentStoreContract,
+  curriculumStoreContract,
+  complianceStoreContract,
+  questStoreContract,
+  adminStoreContract,
+} from "./contract/stores.contract";
 
 const TEST_URL = process.env.AIVO_TEST_DATABASE_URL;
+const here = dirname(fileURLToPath(import.meta.url));
+const migrationsDir = resolve(here, "../../../../../../packages/db/drizzle");
+const MIGRATIONS = ["0047_lesson_runs", "0048_learner_brain_profiles", "0049_web_domain"];
 
 const TABLES = [
   "lesson_parent_summaries",
@@ -25,38 +51,77 @@ const TABLES = [
   "generated_lesson_plans",
   "lesson_runs",
   "learner_brain_profiles",
-];
-
-const CREATE = [
-  `CREATE TABLE IF NOT EXISTS "learner_brain_profiles" ("id" TEXT PRIMARY KEY, "learner_id" TEXT NOT NULL, "tenant_id" TEXT NOT NULL, "approval_status" TEXT, "clone_stage" TEXT, "approved_by_parent" BOOLEAN NOT NULL DEFAULT false, "cloned_at" TEXT, "generated_at" TEXT NOT NULL, "updated_at" TEXT NOT NULL, "state" JSONB NOT NULL DEFAULT '{}'::jsonb)`,
-  `CREATE TABLE IF NOT EXISTS "lesson_runs" ("id" TEXT PRIMARY KEY, "tenant_id" TEXT NOT NULL, "learner_id" TEXT NOT NULL, "subject_id" TEXT, "skill_id" TEXT, "source" TEXT, "source_ref_id" TEXT, "tutor_persona" TEXT, "lesson_plan_id" TEXT, "status" TEXT NOT NULL, "retry_count" INTEGER NOT NULL DEFAULT 0, "failure_reason" TEXT, "started_at" TEXT, "completed_at" TEXT, "created_at" TEXT NOT NULL, "updated_at" TEXT NOT NULL, "snapshots" JSONB NOT NULL DEFAULT '{}'::jsonb)`,
-  `CREATE TABLE IF NOT EXISTS "generated_lesson_plans" ("id" TEXT PRIMARY KEY, "tenant_id" TEXT NOT NULL, "lesson_run_id" TEXT, "data" JSONB NOT NULL)`,
-  `CREATE TABLE IF NOT EXISTS "lesson_interactions" ("id" TEXT PRIMARY KEY, "lesson_run_id" TEXT NOT NULL, "learner_id" TEXT NOT NULL, "tenant_id" TEXT NOT NULL, "step_kind" TEXT NOT NULL, "step_ref_id" TEXT, "response" TEXT, "is_correct" BOOLEAN, "skipped" BOOLEAN NOT NULL DEFAULT false, "occurred_at" TEXT NOT NULL)`,
-  `CREATE TABLE IF NOT EXISTS "lesson_parent_summaries" ("id" TEXT PRIMARY KEY, "lesson_run_id" TEXT NOT NULL, "tenant_id" TEXT NOT NULL, "learner_id" TEXT NOT NULL, "data" JSONB NOT NULL)`,
+  "web_notifications",
+  "web_notification_deliveries",
+  "web_audit_logs",
+  "web_users",
+  "web_memberships",
+  "web_learner_profiles",
+  "web_parent_learner_relationships",
+  "web_parent_assessments",
+  "web_baseline_assessments",
+  "web_baseline_questions",
+  "web_baseline_attempts",
+  "web_baseline_telemetry",
+  "web_subjects",
+  "web_skills",
+  "web_mastery_maps",
+  "web_skill_masteries",
+  "web_learning_paths",
+  "web_consent_records",
+  "web_iep_documents",
+  "web_age_gate_records",
+  "web_policy_versions",
+  "web_subprocessors",
+  "web_quest_worlds",
+  "web_quest_chapters",
+  "web_quest_progress",
+  "web_schools",
+  "web_classrooms",
+  "web_enrollments",
+  "web_teacher_assignments",
 ];
 
 let db: Database;
 
+async function applyMigrations(): Promise<void> {
+  for (const name of MIGRATIONS) {
+    const file = readFileSync(resolve(migrationsDir, `${name}.sql`), "utf8");
+    for (const stmt of file.split("--> statement-breakpoint")) {
+      const trimmed = stmt.trim();
+      if (trimmed) await db.execute(sql.raw(trimmed));
+    }
+  }
+}
+
 async function truncateAll(): Promise<void> {
-  await db.execute(sql.raw(`TRUNCATE ${TABLES.map((t) => `"${t}"`).join(", ")}`));
+  await db.execute(sql.raw(`TRUNCATE ${TABLES.map((t) => `"${t}"`).join(", ")} RESTART IDENTITY`));
 }
 
 beforeAll(async () => {
   if (!TEST_URL) return;
   db = createDb(TEST_URL);
   __setDbClient(db);
-  for (const stmt of CREATE) await db.execute(sql.raw(stmt));
+  await applyMigrations();
 });
 
 afterAll(() => {
   __resetDbClient();
 });
 
-const describeMaybe = TEST_URL ? "postgres" : "postgres (skipped — set AIVO_TEST_DATABASE_URL)";
-
 if (TEST_URL) {
-  brainProfileStoreContract(describeMaybe, () => drizzleBrainProfiles, truncateAll);
-  lessonRunStoreContract(describeMaybe, () => drizzleLessonRuns, truncateAll);
+  const P = "postgres";
+  brainProfileStoreContract(P, () => drizzleBrainProfiles, truncateAll);
+  lessonRunStoreContract(P, () => drizzleLessonRuns, truncateAll);
+  notificationStoreContract(P, () => drizzleNotifications, truncateAll);
+  auditStoreContract(P, () => drizzleAudit, truncateAll);
+  identityStoreContract(P, () => drizzleIdentity, truncateAll);
+  learnerStoreContract(P, () => drizzleLearners, truncateAll);
+  assessmentStoreContract(P, () => drizzleAssessments, truncateAll);
+  curriculumStoreContract(P, () => drizzleCurriculum, truncateAll);
+  complianceStoreContract(P, () => drizzleCompliance, truncateAll);
+  questStoreContract(P, () => drizzleQuests, truncateAll);
+  adminStoreContract(P, () => drizzleAdmin, truncateAll);
 } else {
   describe("postgres store contracts", () => {
     it.skip("skipped — set AIVO_TEST_DATABASE_URL to run against Postgres", () => {});
