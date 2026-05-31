@@ -5,6 +5,7 @@
  * `/dashboard/teacher/reports` page.
  */
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
@@ -19,6 +20,7 @@ export const dynamic = "force-dynamic";
 
 export default async function TeacherReportsPage() {
   const session = await requirePageRole(["teacher"]);
+  const t = await getTranslations("teacher.reports");
   const store = db();
   const learners = await listLearnersForTeacher(session.userId, session.tenantId);
 
@@ -83,41 +85,41 @@ export default async function TeacherReportsPage() {
     >
       <PageHeader
         eyebrow="Teacher"
-        title="Classroom reports"
+        title={t("title")}
         description="Mastery aggregates and IEP flags across every learner you support."
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">Learners</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">{t("col_learners")}</p>
           <p className="mt-1 font-display text-3xl font-semibold">{learners.length}</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
-            Class mastery
+            {t("class_mastery")}
           </p>
           <p className="mt-1 font-display text-3xl font-semibold">
             {Math.round(classroomAvg * 100)}%
           </p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">On track</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">{t("on_track")}</p>
           <p className="mt-1 font-display text-3xl font-semibold">{learnersOnTrack}</p>
-          <p className="mt-1 text-xs text-aivo-ink-soft">Avg ≥ 70% mastery</p>
+          <p className="mt-1 text-xs text-aivo-ink-soft">{t("avg_mastery_threshold")}</p>
         </Card>
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-xs font-medium uppercase tracking-wide text-aivo-ink-soft">
-            IEPs on file
+            {t("ieps_on_file")}
           </p>
           <p className="mt-1 font-display text-3xl font-semibold">{learnersWithIep}</p>
         </Card>
       </div>
 
-      <SectionHeader title="Mastery distribution" />
+      <SectionHeader title={t("mastery_distribution")} />
       {distTotal === 0 ? (
         <Card className="p-[var(--aivo-density-card-pad)]">
           <p className="text-sm text-aivo-ink-soft">
-            No mastery data yet — once learners complete baselines, distribution will populate.
+            {t("no_mastery_data")}
           </p>
         </Card>
       ) : (
@@ -143,10 +145,10 @@ export default async function TeacherReportsPage() {
         </Card>
       )}
 
-      <SectionHeader title="Learner roll-up" />
+      <SectionHeader title={t("learner_rollup")} />
       {rows.length === 0 ? (
         <EmptyState
-          title="No learners assigned"
+          title={t("no_learners_assigned")}
           description={
             classrooms.length === 0
               ? "Once your school admin assigns you to a classroom, learners will appear here."
@@ -158,13 +160,13 @@ export default async function TeacherReportsPage() {
           <table className="w-full text-sm">
             <thead className="bg-aivo-surface-soft text-xs uppercase tracking-wide text-aivo-ink-soft">
               <tr>
-                <th className="px-4 py-2 text-left">Learner</th>
-                <th className="px-4 py-2 text-right">Skills</th>
-                <th className="px-4 py-2 text-right">Avg mastery</th>
-                <th className="px-4 py-2 text-right">On grade</th>
-                <th className="px-4 py-2 text-right">Emerging</th>
+                <th className="px-4 py-2 text-left">{t("col_learner")}</th>
+                <th className="px-4 py-2 text-right">{t("col_skills")}</th>
+                <th className="px-4 py-2 text-right">{t("col_avg_mastery")}</th>
+                <th className="px-4 py-2 text-right">{t("col_on_grade")}</th>
+                <th className="px-4 py-2 text-right">{t("col_emerging")}</th>
                 <th className="px-4 py-2 text-left">IEP</th>
-                <th className="px-4 py-2 text-right">Actions</th>
+                <th className="px-4 py-2 text-right">{t("col_actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -179,7 +181,7 @@ export default async function TeacherReportsPage() {
                     <td className="px-4 py-2 text-right font-mono">{r.emerging}</td>
                     <td className="px-4 py-2">
                       {r.iep ? (
-                        <Badge tone="primary">On file</Badge>
+                        <Badge tone="primary">{t("iep_on_file")}</Badge>
                       ) : (
                         <Badge tone="neutral">—</Badge>
                       )}

@@ -4,6 +4,7 @@
  * (grade band, age range, language, comfort levels, strengths) and the
  * current readiness state.
  */
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
@@ -37,6 +38,7 @@ function formatReadiness(state: LearnerProfile["readinessState"]): string {
 }
 
 export default async function CaregiverLearnersPage() {
+  const t = await getTranslations("caregiver.learners");
   const session = await requirePageRole(["caregiver", "platform_admin"]);
   const learnerIds = listLearnersForMember(session.userId, session.email, "caregiver");
   const maybeLearners = await Promise.all(
@@ -53,14 +55,14 @@ export default async function CaregiverLearnersPage() {
     >
       <PageHeader
         eyebrow="Caregiver"
-        title="Learners"
+        title={t("title")}
         description="Every learner whose care team has invited you."
       />
 
       <SectionHeader title={`Your roster (${learners.length})`} />
       {learners.length === 0 ? (
         <EmptyState
-          title="No learners yet"
+          title={t("no_learners_yet")}
           description="When a parent invites you and you accept, the learners you support appear here."
         />
       ) : (
@@ -81,11 +83,11 @@ export default async function CaregiverLearnersPage() {
                   </Badge>
                 </div>
                 <dl className="grid grid-cols-2 gap-y-1 text-xs text-aivo-ink-soft">
-                  <dt>Primary language</dt>
+                  <dt>{t("primary_language")}</dt>
                   <dd className="text-right text-iw-ink">{l.primaryLanguage ?? "—"}</dd>
-                  <dt>Reading comfort</dt>
+                  <dt>{t("reading_comfort")}</dt>
                   <dd className="text-right text-iw-ink">{l.readingComfort ?? "—"}</dd>
-                  <dt>Math comfort</dt>
+                  <dt>{t("math_comfort")}</dt>
                   <dd className="text-right text-iw-ink">{l.mathComfort ?? "—"}</dd>
                 </dl>
                 {l.knownStrengths.length > 0 ? (

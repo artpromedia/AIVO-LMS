@@ -8,11 +8,13 @@
  */
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Card } from "@/components/ui/card";
 
 type LearnerOption = { id: string; name: string };
 
 export function CaregiverObservationForm({ learners }: { learners: LearnerOption[] }) {
+  const t = useTranslations("caregiver.observations");
   const router = useRouter();
   const [pending, setPending] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -61,13 +63,13 @@ export function CaregiverObservationForm({ learners }: { learners: LearnerOption
         className="grid grid-cols-1 gap-3 md:grid-cols-2"
       >
         <label className="flex flex-col gap-1 text-sm">
-          <span className="iw-label text-aivo-ink-soft">Learner</span>
+          <span className="iw-label text-aivo-ink-soft">{t("field_learner")}</span>
           <select
             name="learnerId"
             required
             className="rounded border border-aivo-border px-2 py-1.5"
           >
-            <option value="">Choose a learner…</option>
+            <option value="">{t("choose_learner")}</option>
             {learners.map((l) => (
               <option key={l.id} value={l.id}>
                 {l.name}
@@ -76,30 +78,30 @@ export function CaregiverObservationForm({ learners }: { learners: LearnerOption
           </select>
         </label>
         <label className="flex flex-col gap-1 text-sm">
-          <span className="iw-label text-aivo-ink-soft">Location</span>
+          <span className="iw-label text-aivo-ink-soft">{t("field_location")}</span>
           <select
             name="location"
             defaultValue="home"
             className="rounded border border-aivo-border px-2 py-1.5"
           >
             <option value="home">Home</option>
-            <option value="school">School</option>
-            <option value="community">Community</option>
-            <option value="therapy">Therapy</option>
+            <option value="school">{t("loc_school")}</option>
+            <option value="community">{t("loc_community")}</option>
+            <option value="therapy">{t("loc_therapy")}</option>
           </select>
         </label>
         <label className="flex flex-col gap-1 text-sm md:col-span-2">
-          <span className="iw-label text-aivo-ink-soft">Behaviour (what did you see?)</span>
+          <span className="iw-label text-aivo-ink-soft">{t("field_behaviour")}</span>
           <textarea
             name="behaviour"
             required
             rows={2}
-            placeholder="Describe the behaviour briefly."
+            placeholder={t("behaviour_placeholder")}
             className="rounded border border-aivo-border px-2 py-1.5"
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
-          <span className="iw-label text-aivo-ink-soft">Antecedent (what came before?)</span>
+          <span className="iw-label text-aivo-ink-soft">{t("field_antecedent")}</span>
           <textarea
             name="antecedent"
             rows={2}
@@ -107,7 +109,7 @@ export function CaregiverObservationForm({ learners }: { learners: LearnerOption
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
-          <span className="iw-label text-aivo-ink-soft">Consequence (what came after?)</span>
+          <span className="iw-label text-aivo-ink-soft">{t("field_consequence")}</span>
           <textarea
             name="consequence"
             rows={2}
@@ -115,7 +117,7 @@ export function CaregiverObservationForm({ learners }: { learners: LearnerOption
           />
         </label>
         <label className="flex flex-col gap-1 text-sm">
-          <span className="iw-label text-aivo-ink-soft">Duration (minutes, optional)</span>
+          <span className="iw-label text-aivo-ink-soft">{t("field_duration")}</span>
           <input
             type="number"
             name="durationMinutes"

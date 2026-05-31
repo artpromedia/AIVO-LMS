@@ -2,6 +2,7 @@
  * Caregiver settings — profile + notification preferences summary.
  */
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
@@ -13,6 +14,7 @@ import { getNotificationPreference } from "@/lib/db/repos";
 export const dynamic = "force-dynamic";
 
 export default async function Page() {
+  const t = await getTranslations("caregiver.settings");
   const session = await requirePageRole(["caregiver", "platform_admin"]);
   const prefs = getNotificationPreference(session.userId, session.tenantId);
   const channelCount = (channel: "in_app" | "email" | "push") =>
@@ -27,9 +29,9 @@ export default async function Page() {
       navItems={CAREGIVER_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <PageHeader title="Settings" description="Your profile and preferences." />
+      <PageHeader title={t("page_title")} description="Your profile and preferences." />
 
-      <SectionHeader title="Profile" />
+      <SectionHeader title={t("section_profile")} />
       <Card className="p-4">
         <dl className="grid grid-cols-[120px_1fr] gap-y-2 text-sm">
           <dt className="font-medium text-aivo-muted">Name</dt>
@@ -37,11 +39,11 @@ export default async function Page() {
           <dt className="font-medium text-aivo-muted">Email</dt>
           <dd>{session.email}</dd>
           <dt className="font-medium text-aivo-muted">Role</dt>
-          <dd>Caregiver</dd>
+          <dd>{t("role_label")}</dd>
         </dl>
       </Card>
 
-      <SectionHeader title="Notifications" />
+      <SectionHeader title={t("section_notifications")} />
       <Card className="p-4">
         <div className="flex flex-wrap items-center gap-2 text-sm">
           <Badge tone="primary">In-app · {channelCount("in_app")}</Badge>

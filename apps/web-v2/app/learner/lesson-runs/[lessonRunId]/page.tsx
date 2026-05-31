@@ -9,6 +9,7 @@
  */
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { readActiveLearnerFromCookies } from "@/lib/auth/active-learner";
 import { AppShell } from "@/components/layout/app-shell";
@@ -37,6 +38,7 @@ type RouteParams = { params: Promise<{ lessonRunId: string }> };
 export default async function LearnerLessonRunPage({ params }: RouteParams) {
   const { lessonRunId } = await params;
   const session = await requirePageRole(["learner", "parent"]);
+  const t = await getTranslations("learner.lesson_run");
   const found = await getLessonRun(lessonRunId, session.tenantId);
   if (!found) redirect("/learner/home");
   const { lessonRun, plan } = found;
@@ -92,7 +94,7 @@ export default async function LearnerLessonRunPage({ params }: RouteParams) {
           )}
           <div className="mt-4 flex gap-2">
             <Button asChild variant="soft">
-              <Link href="/learner/home">Back to today</Link>
+              <Link href="/learner/home">{t("back_to_today")}</Link>
             </Button>
           </div>
         </Card>

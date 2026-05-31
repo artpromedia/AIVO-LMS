@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Atkinson_Hyperlegible } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import "./globals.css";
 import { PlayfulCalmProvider } from "@/components/system/playful-calm-provider";
 import { SensoryModeProvider } from "@/components/system/sensory-mode-provider";
@@ -74,6 +74,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const reducedMotion = await readReducedMotionFromCookies();
   const locale = await getLocale();
   const messages = await getMessages();
+  const t = await getTranslations("root.layout");
 
   return (
     <html
@@ -103,7 +104,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         className={`${inter.variable} ${interDisplay.variable} ${atkinson.variable} font-iw-body bg-iw-bg text-iw-ink antialiased`}
       >
         <a href="#main" className="skip-link">
-          Skip to main content
+          {t("skip_to_main")}
         </a>
         <NextIntlClientProvider locale={locale} messages={messages} timeZone="America/New_York">
           <SensoryModeProvider initialMode={sensoryMode}>

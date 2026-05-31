@@ -679,7 +679,8 @@
     "building_tutors_caption": "معايرة كل معلّم ذكاء اصطناعي وفق مستويات {name}",
     "building_complete_title": "عقل {name} جاهز",
     "building_complete_caption": "تم بناء العقل من بيانات تقييم {name}. راجِع التفاصيل أدناه وقرّر ما يحدث بعد ذلك.",
-    "building_complete_cta": "مراجعة واتخاذ القرار"
+    "building_complete_cta": "مراجعة واتخاذ القرار",
+    "skip_animation": "تخطّي الرسوم المتحركة"
   },
   "learner": {
     "errors": {
@@ -1098,6 +1099,19 @@
       "saving": "جارٍ الحفظ…",
       "done": "انتهيت",
       "complete_error": "تعذّر علينا حفظ هذا الدرس. يرجى تجربة زر «انتهيت» مرة أخرى."
+    },
+    "baseline_runner": {
+      "exit_proctor_view": "الخروج من عرض المراقب",
+      "ready_title": "نقرة أخيرة",
+      "ready_body": "لقد أجبت عن كل الأسئلة. أرسل إجاباتك عندما تكون جاهزًا.",
+      "finish_baseline": "إنهاء التقييم المبدئي",
+      "resume": "متابعة",
+      "stop_for_today": "التوقف لهذا اليوم",
+      "choose_one": "اختر واحدة",
+      "type_answer": "اكتب إجابتك"
+    },
+    "lesson_run": {
+      "back_to_today": "العودة إلى اليوم"
     }
   },
   "auth": {
@@ -1156,7 +1170,8 @@
       "name_label": "اسمك",
       "email_label": "البريد الإلكتروني",
       "password_label": "كلمة المرور",
-      "password_helper": "‏8 أحرف على الأقل مع رقم ورمز."
+      "password_helper": "‏8 أحرف على الأقل مع رقم ورمز.",
+      "name_placeholder": "Riley Parent"
     },
     "forgot": {
       "heading": "أعد تعيين كلمة المرور",
@@ -1297,7 +1312,9 @@
       "invite_label": "رمز الدعوة",
       "invite_helper": "أرسلته مدرستك أو منطقتك التعليمية في رسالة الترحيب.",
       "name_label": "اسمك",
-      "password_helper": "‏12 حرفًا على الأقل. سنتحقّق من أنها ليست ضمن أي تسريب معروف قبل حفظها."
+      "password_helper": "‏12 حرفًا على الأقل. سنتحقّق من أنها ليست ضمن أي تسريب معروف قبل حفظها.",
+      "code_placeholder": "مثال: SCHOOL-7Q4M-2025",
+      "name_placeholder": "الاسم الأول واسم العائلة"
     },
     "role": {
       "eyebrow": "اختر دورك",
@@ -1502,7 +1519,8 @@
       "join": "الانضمام إلى المدرسة",
       "code_label": "رمز الدعوة",
       "email_label": "بريدك المدرسي",
-      "email_helper": "يجب أن يطابق البريد الذي دعاك إليه المدير."
+      "email_helper": "يجب أن يطابق البريد الذي دعاك إليه المدير.",
+      "code_placeholder": "مثال: SCHOOL-7Q4M-2025"
     },
     "invite_district": {
       "eyebrow": "دعوة المنطقة التعليمية",
@@ -1511,7 +1529,8 @@
       "reassure_title": "يُفرض التحقّق المعزّز لمدير المنطقة التعليمية.",
       "reassure_body": "يتطلّب كل تسجيل دخول لهذا الدور تحقّقًا بيومتريًا جديدًا أو برمز PIN. لا تسمح AIVO أبدًا لكلمة مرور واحدة بفتح بيانات المنطقة التعليمية.",
       "code_label": "رمز دعوة المنطقة التعليمية",
-      "email_label": "بريد منطقتك التعليمية"
+      "email_label": "بريد منطقتك التعليمية",
+      "code_placeholder": "مثال: DISTRICT-9F2L-2025"
     },
     "error": {
       "expired_invite_eyebrow": "انتهت صلاحية الدعوة",
@@ -2159,6 +2178,300 @@
       "col_status": "الحالة",
       "col_last_delivery": "آخر تسليم",
       "col_failures": "الأخطاء"
+    },
+    "platform_billing_coupons": {
+      "title": "القسائم",
+      "empty_title": "لا توجد قسائم بعد",
+      "col_discount": "الخصم",
+      "col_applies_to": "ينطبق على",
+      "col_status": "الحالة",
+      "col_redemptions": "الاستخدامات",
+      "col_valid_window": "فترة الصلاحية"
+    },
+    "platform_billing_daily_batch": {
+      "title": "دفعة الفوترة اليومية",
+      "empty_title": "لا توجد عمليات تشغيل بعد",
+      "col_run_date": "تاريخ التشغيل",
+      "col_window": "النافذة",
+      "col_status": "الحالة",
+      "col_generated": "تم إنشاؤها",
+      "col_failed": "فشلت",
+      "col_total_billed": "إجمالي الفوترة"
+    },
+    "platform_billing_invoices": {
+      "title": "الفواتير",
+      "link_revenue_summary": "ملخص الإيرادات",
+      "stat_total_invoices": "إجمالي الفواتير",
+      "stat_outstanding": "غير مسددة",
+      "empty_title": "لا توجد فواتير بعد",
+      "col_number": "الرقم",
+      "col_tenant": "المستأجر",
+      "col_amount": "المبلغ",
+      "col_status": "الحالة",
+      "col_period": "الفترة"
     }
+  },
+  "teacher": {
+    "home": {
+      "open_needs_support_list": "فتح قائمة المحتاجين للدعم",
+      "open_arrow": "فتح →",
+      "your_roster": "قائمة متعلّميك",
+      "see_all_learners": "عرض جميع المتعلّمين →",
+      "no_learners_yet": "لا يوجد متعلّمون بعد",
+      "connect_roster": "ربط القائمة",
+      "roster_snapshot": "لمحة عن القائمة",
+      "add_another_class": "إضافة فصل آخر"
+    },
+    "lesson_plans": {
+      "page_title": "خطط الدروس بالذكاء الاصطناعي",
+      "new_assignment": "مهمة جديدة",
+      "generated_recent": "تم إنشاؤها (مؤخرًا)",
+      "ai_jobs": "مهام الذكاء الاصطناعي",
+      "fallback_chain": "سلسلة الاحتياط",
+      "fallback_primary_model": "Claude Opus 4.7",
+      "latest_lesson_plans": "أحدث خطط الدروس",
+      "no_lesson_plans_yet": "لا توجد خطط دروس بعد",
+      "generation_activity": "نشاط الإنشاء",
+      "no_ai_jobs": "لا توجد مهام إنشاء بالذكاء الاصطناعي في هذه الفترة.",
+      "col_started": "البداية",
+      "col_status": "الحالة",
+      "col_completed": "اكتمل"
+    },
+    "reports": {
+      "title": "تقارير الفصل الدراسي",
+      "col_learners": "المتعلّمون",
+      "class_mastery": "إتقان الفصل",
+      "on_track": "على المسار الصحيح",
+      "avg_mastery_threshold": "متوسط ≥ 70% إتقانًا",
+      "ieps_on_file": "IEP مسجّلة",
+      "mastery_distribution": "توزيع الإتقان",
+      "no_mastery_data": "لا توجد بيانات إتقان بعد — بمجرد أن يكمل المتعلّمون التقييمات الأساسية، سيظهر التوزيع.",
+      "learner_rollup": "ملخّص المتعلّمين",
+      "no_learners_assigned": "لا يوجد متعلّمون مُعيَّنون",
+      "col_learner": "المتعلّم",
+      "col_skills": "المهارات",
+      "col_avg_mastery": "متوسط الإتقان",
+      "col_on_grade": "بمستوى الصف",
+      "col_emerging": "في طور النمو",
+      "col_actions": "الإجراءات",
+      "iep_on_file": "مسجّل"
+    },
+    "learner_overview": {
+      "this_week_at_school": "هذا الأسبوع في المدرسة →",
+      "active_assignments": "المهام النشطة",
+      "no_active_assignments": "لا توجد مهام نشطة لهذا المتعلّم.",
+      "recent_lessons": "الدروس الأخيرة",
+      "no_lessons_started": "لم تبدأ أي دروس بعد.",
+      "skill_gaps": "ثغرات المهارات",
+      "no_notable_gaps": "لا ثغرات بارزة حتى الآن — استمر.",
+      "accommodations_teacher_summary": "التعديلات (ملخّص المعلّم)"
+    },
+    "learner_iep_draft": {
+      "page_title": "مسودة أهداف IEP",
+      "no_iep_on_file": "لا يوجد IEP مسجّل",
+      "current_iep": "IEP الحالي",
+      "existing_learning_goals": "أهداف التعلّم الحالية",
+      "none_on_file": "لا شيء مسجّل.",
+      "accommodations": "التعديلات",
+      "none_recorded": "لم يُسجَّل أي شيء.",
+      "suggested_goal_drafts": "مسودات الأهداف المقترحة",
+      "how_drafts_generated": "كيف تُنشأ المسودات"
+    },
+    "classes": {
+      "title": "فصولك الدراسية",
+      "empty_title": "لا توجد فصول مُعيَّنة"
+    },
+    "error": {
+      "eyebrow": "منطقة المعلم",
+      "heading": "حدث خطأ أثناء تحميل هذه الصفحة.",
+      "body": "بيانات فصلك الدراسي آمنة. أعد المحاولة الآن أو عد إلى صفحة المعلم الرئيسية.",
+      "retry": "إعادة المحاولة",
+      "home_link": "صفحة المعلم الرئيسية"
+    },
+    "insights": {
+      "title": "رؤى",
+      "empty_title": "لا يوجد متعلّمون في مساحتك"
+    },
+    "learners": {
+      "title": "قائمة طلابك",
+      "empty": "لم يتم تعيين أي متعلّمين لك بعد."
+    },
+    "not_found": {
+      "eyebrow": "منطقة المعلم · 404",
+      "heading": "لم نتمكن من العثور على تلك الصفحة.",
+      "body": "ربما تغيّر الرابط أو لم يعد المتعلّم مسجّلاً في فصلك.",
+      "home_link": "صفحة المعلم الرئيسية",
+      "classes_link": "فصولي الدراسية"
+    },
+    "settings": {
+      "title": "الإعدادات",
+      "signed_in_as": "تم تسجيل الدخول بوصفك"
+    },
+    "assignments_new": {
+      "title": "مهمة جديدة",
+      "instructions_label": "التعليمات",
+      "subject_label": "المادة",
+      "skills_label": "المهارات",
+      "assign_label": "إسناد إلى",
+      "no_learners": "لا يوجد متعلّمون",
+      "due_date_label": "تاريخ الاستحقاق"
+    },
+    "assignments": {
+      "title": "المهام",
+      "new_assignment": "مهمة جديدة",
+      "empty": "لا توجد مهام بعد."
+    },
+    "classes_class": {
+      "roster": "قائمة الطلاب",
+      "no_learners": "لا يوجد متعلّمون"
+    }
+  },
+  "therapist": {
+    "home": {
+      "stat_caseload": "حجم الحالات",
+      "stat_ieps": "IEP المسجّلة",
+      "quick_links": "روابط سريعة",
+      "link_sessions": "الجلسات →",
+      "link_reports": "التقارير →",
+      "section_caseload": "حجم الحالات",
+      "empty_title": "لا يوجد متعلّمون بعد"
+    },
+    "reports": {
+      "title": "التقارير",
+      "empty_title": "لا يوجد حجم حالات بعد",
+      "focus_label": "محور التركيز:",
+      "skills_tracked": "المهارات المتابَعة",
+      "avg_score": "متوسط الدرجات"
+    },
+    "sessions": {
+      "title": "الجلسات",
+      "empty_no_caseload": "لا يوجد حجم حالات بعد",
+      "empty_no_sessions": "لم يتم تسجيل أي جلسات بعد"
+    },
+    "settings": {
+      "title": "الإعدادات",
+      "section_profile": "الملف الشخصي",
+      "role_label": "معالج",
+      "section_notifications": "الإشعارات"
+    }
+  },
+  "caregiver": {
+    "home": {
+      "on_care_team": "في فريق الرعاية الخاص بك",
+      "active_or_ready": "نشط أو جاهز",
+      "quick_links": "روابط سريعة",
+      "link_observations": "الملاحظات ←",
+      "link_roster": "القائمة ←",
+      "your_learners": "المتعلّمون لديك",
+      "no_learners_yet": "لا يوجد متعلّمون بعد"
+    },
+    "learners": {
+      "title": "المتعلّمون",
+      "no_learners_yet": "لا يوجد متعلّمون بعد",
+      "primary_language": "اللغة الأساسية",
+      "reading_comfort": "مستوى القراءة",
+      "math_comfort": "مستوى الرياضيات"
+    },
+    "observations": {
+      "page_title": "الملاحظات",
+      "section_log": "تسجيل ملاحظة",
+      "no_learners_yet": "لا يوجد متعلّمون بعد",
+      "no_lesson_activity_yet": "لا يوجد نشاط دروس بعد",
+      "no_observations_yet": "لا توجد ملاحظات من مقدّم الرعاية بعد. استخدم النموذج أعلاه لتسجيل ما تلاحظه.",
+      "label_antecedent": "المثير",
+      "label_behaviour": "السلوك",
+      "label_consequence": "النتيجة",
+      "field_learner": "المتعلّم",
+      "choose_learner": "اختر متعلّمًا…",
+      "field_location": "المكان",
+      "loc_school": "المدرسة",
+      "loc_community": "المجتمع",
+      "loc_therapy": "العلاج",
+      "field_behaviour": "السلوك (ماذا رأيت؟)",
+      "behaviour_placeholder": "صف السلوك بإيجاز.",
+      "field_antecedent": "المثير (ماذا حدث قبله؟)",
+      "field_consequence": "النتيجة (ماذا حدث بعده؟)",
+      "field_duration": "المدة (بالدقائق، اختياري)"
+    },
+    "settings": {
+      "page_title": "الإعدادات",
+      "section_profile": "الملف الشخصي",
+      "section_notifications": "الإشعارات",
+      "role_label": "مقدّم الرعاية"
+    }
+  },
+  "accept_invite": {
+    "page": {
+      "accept_heading": "قبول دعوتك",
+      "invited_to_join": "لقد تمت دعوتك للانضمام إلى فريق التعلم.",
+      "create_account": "إنشاء حساب جديد",
+      "signed_in_as": "أنت مسجّل دخولك بحساب",
+      "sign_in_different": "تسجيل الدخول بحساب مختلف"
+    },
+    "actions": {
+      "no_pending_for": "لم يتم العثور على دعوات معلّقة للبريد",
+      "continue": "متابعة",
+      "added_to": "تمت إضافتك إلى",
+      "continue_to_dashboard": "الانتقال إلى لوحة التحكم",
+      "signed_in_as": "مسجّل دخول بحساب",
+      "accepting": "جارٍ القبول…"
+    }
+  },
+  "root": {
+    "error": {
+      "refreshing": "جارٍ التحديث",
+      "one_moment": "لحظة من فضلك — جارٍ جلب أحدث إصدار…",
+      "something_went_wrong": "حدث خطأ ما",
+      "lets_try_again": "لنحاول مرة أخرى.",
+      "unexpected_error": "واجهنا خطأً غير متوقع. يمكنك إعادة المحاولة الآن أو العودة إلى الصفحة الرئيسية والرجوع بعد لحظة.",
+      "try_again": "إعادة المحاولة",
+      "back_to_home": "العودة إلى الصفحة الرئيسية"
+    },
+    "global_error": {
+      "heading": "حدث خطأ بالغ.",
+      "body": "يرجى المحاولة مجدّدًا. إذا استمرت المشكلة، تواصل مع الدعم الفني.",
+      "try_again": "إعادة المحاولة"
+    },
+    "layout": {
+      "skip_to_main": "الانتقال إلى المحتوى الرئيسي"
+    },
+    "not_found": {
+      "heading": "تعذّر العثور على تلك الصفحة.",
+      "back_to_home": "العودة إلى الصفحة الرئيسية"
+    },
+    "home": {
+      "ferpa_coppa": "متوافق مع FERPA و COPPA",
+      "switch_role": "تبديل الدور",
+      "start_family_trial": "بدء تجربة العائلة",
+      "for_school_districts": "للمناطق التعليمية",
+      "trusted_by": "يثق به أكثر من 1200 متخصص وولي أمر."
+    }
+  },
+  "settings_accessibility": {
+    "nav_label": "إمكانية الوصول",
+    "page_title": "إمكانية الوصول",
+    "sensory_mode": "الوضع الحسي",
+    "text_and_reading": "النص والقراءة",
+    "age_mode": "وضع العمر",
+    "choose_age_mode": "اختر وضع العمر",
+    "age_sprout": "Sprout (4–7)",
+    "age_spark": "Spark (8–12)",
+    "age_scholar": "Scholar (13+)",
+    "choose_theme": "اختر مظهرًا",
+    "high_contrast": "تباين عالٍ",
+    "text_size": "حجم النص",
+    "language": "اللغة",
+    "choose_language": "اختر لغة",
+    "lang_en_us": "English (US)",
+    "lang_es": "Español",
+    "lang_fr": "Français"
+  },
+  "district_login": {
+    "heading": "إدارة المنطقة التعليمية",
+    "security_badge": "MFA مُفعَّل · SOC 2 · FERPA",
+    "mobile_heading": "تسجيل دخول المنطقة",
+    "card_title": "سجّل دخولك إلى لوحة تحكم المنطقة",
+    "sign_in_btn": "تسجيل الدخول",
+    "standard_sign_in": "استخدام تسجيل الدخول القياسي"
   }
 }

@@ -13,6 +13,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { Mail } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { readMockSessionFromCookies } from "@/lib/auth/mock-session";
 import { ROLE_HOME } from "@/lib/auth/types";
 import { listPendingInvitesForEmail } from "@/lib/db/team-invites";
@@ -29,6 +30,7 @@ export default async function AcceptInvitePage({
 }: {
   searchParams: SearchParams;
 }) {
+  const t = await getTranslations("accept_invite.page");
   const params = await searchParams;
   const invitedEmail = (params.email ?? "").trim().toLowerCase();
   const session = await readMockSessionFromCookies();
@@ -39,7 +41,7 @@ export default async function AcceptInvitePage({
       invitedEmail ? `?email=${encodeURIComponent(invitedEmail)}` : ""
     }`;
     return (
-      <Shell>
+      <Shell heading={t("accept_heading")}>
         <p className="text-center text-sm text-aivo-ink-soft">
           {invitedEmail ? (
             <>
@@ -47,7 +49,7 @@ export default async function AcceptInvitePage({
               <strong className="text-aivo-ink">{invitedEmail}</strong>.
             </>
           ) : (
-            <>You&apos;ve been invited to join a learning team.</>
+            <>{t("invited_to_join")}</>
           )}
         </p>
         <div className="flex flex-col gap-3">
@@ -64,7 +66,7 @@ export default async function AcceptInvitePage({
             className="block w-full"
           >
             <Button variant="outline" className="w-full">
-              Create a new account
+              {t("create_account")}
             </Button>
           </Link>
         </div>
@@ -75,16 +77,16 @@ export default async function AcceptInvitePage({
   // Wrong-email check: surface a clear error rather than silently accepting.
   if (invitedEmail && session.email.toLowerCase() !== invitedEmail) {
     return (
-      <Shell>
+      <Shell heading={t("accept_heading")}>
         <Card className="border-rose-200 bg-rose-50 p-4">
           <p className="text-sm text-aivo-ink">
-            You&apos;re signed in as <strong>{session.email}</strong>, but this
+            {t("signed_in_as")} <strong>{session.email}</strong>, but this
             invitation is for <strong>{invitedEmail}</strong>. Sign out and sign
             in with the invited address.
           </p>
         </Card>
         <Link href="/login" className="block w-full">
-          <Button className="w-full">Sign in with a different account</Button>
+          <Button className="w-full">{t("sign_in_different")}</Button>
         </Link>
       </Shell>
     );
@@ -94,7 +96,7 @@ export default async function AcceptInvitePage({
   const continueHref = ROLE_HOME[session.role] ?? "/parent/home";
 
   return (
-    <Shell>
+    <Shell heading={t("accept_heading")}>
       <Suspense fallback={null}>
         <AcceptInviteActions
           pendingCount={pending.length}
@@ -106,14 +108,14 @@ export default async function AcceptInvitePage({
   );
 }
 
-function Shell({ children }: { children: React.ReactNode }) {
+function Shell({ heading, children }: { heading: string; children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-aivo-surface-soft p-6">
       <Card className="w-full max-w-md space-y-5 p-8">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-aivo-accent/10 text-aivo-accent">
           <Mail className="h-7 w-7" />
         </div>
-        <h1 className="text-center text-2xl font-bold">Accept your invitation</h1>
+        <h1 className="text-center text-2xl font-bold">{heading}</h1>
         {children}
       </Card>
     </div>

@@ -3,6 +3,7 @@
  */
 import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { TEACHER_NAV } from "@/components/layout/role-shells";
@@ -14,6 +15,7 @@ import { listSubjects, listTeacherAssignments } from "@/lib/db/repos";
 export const dynamic = "force-dynamic";
 
 export default async function TeacherAssignmentsPage() {
+  const t = await getTranslations("teacher.assignments");
   const session = await requirePageRole(["teacher"]);
   const assignments = await listTeacherAssignments(session.userId, session.tenantId);
   const subjectsById = new Map((await listSubjects()).map((s) => [s.id, s]));
@@ -27,17 +29,17 @@ export default async function TeacherAssignmentsPage() {
     >
       <PageHeader
         eyebrow="Assignments"
-        title="Assignments"
+        title={t("title")}
         description="Set work for individual learners. Assigned work appears on the learner's Today screen."
       />
       <div className="mb-4">
         <Button asChild>
-          <Link href="/teacher/assignments/new">New assignment</Link>
+          <Link href="/teacher/assignments/new">{t("new_assignment")}</Link>
         </Button>
       </div>
       {assignments.length === 0 ? (
         <Card className="p-6 text-sm text-muted-foreground">
-          No assignments yet. Create one to give a learner targeted practice.
+          {t("empty")}
         </Card>
       ) : (
         <ul className="grid gap-3">

@@ -61,7 +61,7 @@ export default function DistrictInvitePage() {
             label={t("code_label")}
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            placeholder="e.g. DISTRICT-9F2L-2025"
+            placeholder={t("code_placeholder")}
             autoComplete="one-time-code"
           />
           <AuthInput

@@ -1,16 +1,7 @@
 {
-  "total": 212,
+  "total": 5,
   "areas": {
-    "accept-invite": 11,
-    "caregiver": 35,
-    "district": 6,
-    "(root)": 18,
-    "learner": 15,
-    "login": 1,
-    "onboarding": 4,
-    "settings": 16,
-    "signup": 1,
-    "teacher": 86,
-    "therapist": 19
+    "learner": 4,
+    "login": 1
   }
 }

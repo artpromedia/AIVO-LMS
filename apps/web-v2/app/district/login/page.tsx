@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { AuthCard } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 import { Button } from "@/components/ui/button";
@@ -108,6 +109,7 @@ export default async function DistrictLoginPage({
 }: {
   readonly searchParams: Promise<{ error?: string }>;
 }) {
+  const t = await getTranslations("district_login");
   const { error } = await searchParams;
   const errorMessage = error ? (ERROR_COPY[error] ?? ERROR_COPY.login_failed) : null;
   return (
@@ -123,7 +125,7 @@ export default async function DistrictLoginPage({
               <AivoIcon name="aiSparkle" size={28} />
             </span>
             <h2 className="font-iw-display text-3xl font-bold leading-[1.1] text-iw-ink">
-              District administration
+              {t("heading")}
             </h2>
             <p className="text-base leading-relaxed text-iw-ink-muted">
               Manage schools, classrooms, staff, and learners across your district. Monitor usage,
@@ -131,7 +133,7 @@ export default async function DistrictLoginPage({
             </p>
             <div className="mt-2 inline-flex items-center gap-2 self-start rounded-full bg-iw-accent-soft px-3 py-1.5 text-xs font-semibold text-iw-primary">
               <AivoIcon name="safetyOk" size={14} />
-              <span>MFA enforced · SOC 2 · FERPA</span>
+              <span>{t("security_badge")}</span>
             </div>
           </aside>
 
@@ -144,13 +146,13 @@ export default async function DistrictLoginPage({
                 <AivoIcon name="aiSparkle" size={22} />
               </span>
               <h2 className="font-iw-display text-2xl font-bold leading-tight text-iw-ink">
-                District sign-in
+                {t("mobile_heading")}
               </h2>
             </div>
 
             <AuthCard
               eyebrow="District"
-              title="Sign in to the district console"
+              title={t("card_title")}
               subtitle="For district administrators and platform administrators."
               actions={
                 <>
@@ -161,7 +163,7 @@ export default async function DistrictLoginPage({
                     size="lg"
                     className="w-full"
                   >
-                    Sign in
+                    {t("sign_in_btn")}
                   </Button>
                   <p className="text-sm text-iw-ink-muted text-center">
                     Not a district administrator?{" "}
@@ -169,7 +171,7 @@ export default async function DistrictLoginPage({
                       href="/login"
                       className="font-semibold text-iw-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring focus-visible:ring-offset-2 focus-visible:ring-offset-iw-bg rounded"
                     >
-                      Use the standard sign-in
+                      {t("standard_sign_in")}
                     </Link>
                     .
                   </p>

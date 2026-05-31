@@ -1,0 +1,686 @@
+#!/usr/bin/env node
+/**
+ * seed-R_C1-i18n — fills caregiver and accept_invite namespaces:
+ *   caregiver/home/page.tsx              -> caregiver.home.*
+ *   caregiver/learners/page.tsx          -> caregiver.learners.*
+ *   caregiver/observations/page.tsx      -> caregiver.observations.*
+ *   caregiver/observations/observation-form.tsx -> caregiver.observations.*  (shared)
+ *   caregiver/settings/page.tsx          -> caregiver.settings.*
+ *   accept-invite/page.tsx               -> accept_invite.page.*
+ *   accept-invite/accept-invite-actions.tsx -> accept_invite.actions.*
+ *
+ * Re-runnable. Run with: node scripts/seed-R_C1-i18n.mjs
+ */
+import { readFileSync, writeFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const repoRoot = resolve(__dirname, "..");
+const messagesDir = join(repoRoot, "apps/web-v2/lib/i18n/messages");
+
+const DATA = {
+  en: {
+    caregiver: {
+      home: {
+        on_care_team: "On your care team",
+        active_or_ready: "Active or ready",
+        quick_links: "Quick links",
+        link_observations: "Observations →",
+        link_roster: "Roster →",
+        your_learners: "Your learners",
+        no_learners_yet: "No learners yet",
+      },
+      learners: {
+        title: "Learners",
+        no_learners_yet: "No learners yet",
+        primary_language: "Primary language",
+        reading_comfort: "Reading comfort",
+        math_comfort: "Math comfort",
+      },
+      observations: {
+        page_title: "Observations",
+        section_log: "Log an observation",
+        no_learners_yet: "No learners yet",
+        no_lesson_activity_yet: "No lesson activity yet",
+        no_observations_yet:
+          "No caregiver observations yet. Use the form above to record what you notice.",
+        label_antecedent: "Antecedent",
+        label_behaviour: "Behaviour",
+        label_consequence: "Consequence",
+        field_learner: "Learner",
+        choose_learner: "Choose a learner…",
+        field_location: "Location",
+        loc_school: "School",
+        loc_community: "Community",
+        loc_therapy: "Therapy",
+        field_behaviour: "Behaviour (what did you see?)",
+        behaviour_placeholder: "Describe the behaviour briefly.",
+        field_antecedent: "Antecedent (what came before?)",
+        field_consequence: "Consequence (what came after?)",
+        field_duration: "Duration (minutes, optional)",
+      },
+      settings: {
+        page_title: "Settings",
+        section_profile: "Profile",
+        section_notifications: "Notifications",
+        role_label: "Caregiver",
+      },
+    },
+    accept_invite: {
+      page: {
+        accept_heading: "Accept your invitation",
+        invited_to_join: "You've been invited to join a learning team.",
+        create_account: "Create a new account",
+        signed_in_as: "You're signed in as",
+        sign_in_different: "Sign in with a different account",
+      },
+      actions: {
+        no_pending_for: "No pending invitations were found for",
+        continue: "Continue",
+        added_to: "You've been added to",
+        continue_to_dashboard: "Continue to your dashboard",
+        signed_in_as: "Signed in as",
+        accepting: "Accepting…",
+      },
+    },
+  },
+  es: {
+    caregiver: {
+      home: {
+        on_care_team: "En tu equipo de cuidado",
+        active_or_ready: "Activo o listo",
+        quick_links: "Accesos rápidos",
+        link_observations: "Observaciones →",
+        link_roster: "Lista →",
+        your_learners: "Tus estudiantes",
+        no_learners_yet: "Aún no hay estudiantes",
+      },
+      learners: {
+        title: "Estudiantes",
+        no_learners_yet: "Aún no hay estudiantes",
+        primary_language: "Idioma principal",
+        reading_comfort: "Comodidad lectora",
+        math_comfort: "Comodidad matemática",
+      },
+      observations: {
+        page_title: "Observaciones",
+        section_log: "Registrar una observación",
+        no_learners_yet: "Aún no hay estudiantes",
+        no_lesson_activity_yet: "Aún no hay actividad de lecciones",
+        no_observations_yet:
+          "Aún no hay observaciones del cuidador. Usa el formulario de arriba para registrar lo que notes.",
+        label_antecedent: "Antecedente",
+        label_behaviour: "Conducta",
+        label_consequence: "Consecuencia",
+        field_learner: "Estudiante",
+        choose_learner: "Elige un estudiante…",
+        field_location: "Lugar",
+        loc_school: "Escuela",
+        loc_community: "Comunidad",
+        loc_therapy: "Terapia",
+        field_behaviour: "Conducta (¿qué observaste?)",
+        behaviour_placeholder: "Describe brevemente la conducta.",
+        field_antecedent: "Antecedente (¿qué ocurrió antes?)",
+        field_consequence: "Consecuencia (¿qué ocurrió después?)",
+        field_duration: "Duración (minutos, opcional)",
+      },
+      settings: {
+        page_title: "Configuración",
+        section_profile: "Perfil",
+        section_notifications: "Notificaciones",
+        role_label: "Cuidador",
+      },
+    },
+    accept_invite: {
+      page: {
+        accept_heading: "Acepta tu invitación",
+        invited_to_join: "Has sido invitado a unirte a un equipo de aprendizaje.",
+        create_account: "Crear una cuenta nueva",
+        signed_in_as: "Has iniciado sesión como",
+        sign_in_different: "Iniciar sesión con otra cuenta",
+      },
+      actions: {
+        no_pending_for: "No se encontraron invitaciones pendientes para",
+        continue: "Continuar",
+        added_to: "Has sido añadido a",
+        continue_to_dashboard: "Ir a tu panel de control",
+        signed_in_as: "Sesión iniciada como",
+        accepting: "Aceptando…",
+      },
+    },
+  },
+  fr: {
+    caregiver: {
+      home: {
+        on_care_team: "Dans votre équipe de soins",
+        active_or_ready: "Actif ou prêt",
+        quick_links: "Liens rapides",
+        link_observations: "Observations →",
+        link_roster: "Liste →",
+        your_learners: "Vos apprenants",
+        no_learners_yet: "Aucun apprenant pour le moment",
+      },
+      learners: {
+        title: "Apprenants",
+        no_learners_yet: "Aucun apprenant pour le moment",
+        primary_language: "Langue principale",
+        reading_comfort: "Aisance en lecture",
+        math_comfort: "Aisance en mathématiques",
+      },
+      observations: {
+        page_title: "Observations",
+        section_log: "Enregistrer une observation",
+        no_learners_yet: "Aucun apprenant pour le moment",
+        no_lesson_activity_yet: "Aucune activité de leçon pour le moment",
+        no_observations_yet:
+          "Aucune observation du proche aidant pour l'instant. Utilisez le formulaire ci-dessus pour noter ce que vous observez.",
+        label_antecedent: "Antécédent",
+        label_behaviour: "Comportement",
+        label_consequence: "Conséquence",
+        field_learner: "Apprenant",
+        choose_learner: "Choisir un apprenant…",
+        field_location: "Lieu",
+        loc_school: "École",
+        loc_community: "Communauté",
+        loc_therapy: "Thérapie",
+        field_behaviour: "Comportement (qu'avez-vous vu ?)",
+        behaviour_placeholder: "Décrivez brièvement le comportement.",
+        field_antecedent: "Antécédent (qu'est-il arrivé avant ?)",
+        field_consequence: "Conséquence (qu'est-il arrivé après ?)",
+        field_duration: "Durée (minutes, facultatif)",
+      },
+      settings: {
+        page_title: "Paramètres",
+        section_profile: "Profil",
+        section_notifications: "Notifications",
+        role_label: "Aidant",
+      },
+    },
+    accept_invite: {
+      page: {
+        accept_heading: "Acceptez votre invitation",
+        invited_to_join: "Vous avez été invité à rejoindre une équipe d'apprentissage.",
+        create_account: "Créer un nouveau compte",
+        signed_in_as: "Vous êtes connecté en tant que",
+        sign_in_different: "Se connecter avec un autre compte",
+      },
+      actions: {
+        no_pending_for: "Aucune invitation en attente n'a été trouvée pour",
+        continue: "Continuer",
+        added_to: "Vous avez été ajouté à",
+        continue_to_dashboard: "Accéder à votre tableau de bord",
+        signed_in_as: "Connecté en tant que",
+        accepting: "Acceptation…",
+      },
+    },
+  },
+  de: {
+    caregiver: {
+      home: {
+        on_care_team: "In Ihrem Betreuungsteam",
+        active_or_ready: "Aktiv oder bereit",
+        quick_links: "Schnellzugriffe",
+        link_observations: "Beobachtungen →",
+        link_roster: "Liste →",
+        your_learners: "Ihre Lernenden",
+        no_learners_yet: "Noch keine Lernenden",
+      },
+      learners: {
+        title: "Lernende",
+        no_learners_yet: "Noch keine Lernenden",
+        primary_language: "Hauptsprache",
+        reading_comfort: "Lesekompetenz",
+        math_comfort: "Mathematikkompetenz",
+      },
+      observations: {
+        page_title: "Beobachtungen",
+        section_log: "Beobachtung erfassen",
+        no_learners_yet: "Noch keine Lernenden",
+        no_lesson_activity_yet: "Noch keine Unterrichtsaktivität",
+        no_observations_yet:
+          "Noch keine Beobachtungen der Betreuungsperson. Nutzen Sie das obige Formular, um Ihre Notizen festzuhalten.",
+        label_antecedent: "Auslöser",
+        label_behaviour: "Verhalten",
+        label_consequence: "Folge",
+        field_learner: "Lernende/r",
+        choose_learner: "Lernende/n auswählen…",
+        field_location: "Ort",
+        loc_school: "Schule",
+        loc_community: "Gemeinschaft",
+        loc_therapy: "Therapie",
+        field_behaviour: "Verhalten (was haben Sie beobachtet?)",
+        behaviour_placeholder: "Beschreiben Sie das Verhalten kurz.",
+        field_antecedent: "Auslöser (was kam davor?)",
+        field_consequence: "Folge (was kam danach?)",
+        field_duration: "Dauer (Minuten, optional)",
+      },
+      settings: {
+        page_title: "Einstellungen",
+        section_profile: "Profil",
+        section_notifications: "Benachrichtigungen",
+        role_label: "Betreuungsperson",
+      },
+    },
+    accept_invite: {
+      page: {
+        accept_heading: "Einladung annehmen",
+        invited_to_join: "Sie wurden eingeladen, einem Lernteam beizutreten.",
+        create_account: "Neues Konto erstellen",
+        signed_in_as: "Sie sind angemeldet als",
+        sign_in_different: "Mit einem anderen Konto anmelden",
+      },
+      actions: {
+        no_pending_for: "Keine ausstehenden Einladungen gefunden für",
+        continue: "Weiter",
+        added_to: "Sie wurden hinzugefügt zu",
+        continue_to_dashboard: "Zum Dashboard",
+        signed_in_as: "Angemeldet als",
+        accepting: "Wird akzeptiert…",
+      },
+    },
+  },
+  pt: {
+    caregiver: {
+      home: {
+        on_care_team: "Na sua equipe de cuidados",
+        active_or_ready: "Ativo ou pronto",
+        quick_links: "Atalhos rápidos",
+        link_observations: "Observações →",
+        link_roster: "Lista →",
+        your_learners: "Seus alunos",
+        no_learners_yet: "Ainda não há alunos",
+      },
+      learners: {
+        title: "Alunos",
+        no_learners_yet: "Ainda não há alunos",
+        primary_language: "Idioma principal",
+        reading_comfort: "Conforto em leitura",
+        math_comfort: "Conforto em matemática",
+      },
+      observations: {
+        page_title: "Observações",
+        section_log: "Registrar uma observação",
+        no_learners_yet: "Ainda não há alunos",
+        no_lesson_activity_yet: "Ainda não há atividade de aulas",
+        no_observations_yet:
+          "Ainda não há observações do cuidador. Use o formulário acima para registrar o que você notar.",
+        label_antecedent: "Antecedente",
+        label_behaviour: "Comportamento",
+        label_consequence: "Consequência",
+        field_learner: "Aluno",
+        choose_learner: "Escolha um aluno…",
+        field_location: "Local",
+        loc_school: "Escola",
+        loc_community: "Comunidade",
+        loc_therapy: "Terapia",
+        field_behaviour: "Comportamento (o que você viu?)",
+        behaviour_placeholder: "Descreva brevemente o comportamento.",
+        field_antecedent: "Antecedente (o que aconteceu antes?)",
+        field_consequence: "Consequência (o que aconteceu depois?)",
+        field_duration: "Duração (minutos, opcional)",
+      },
+      settings: {
+        page_title: "Configurações",
+        section_profile: "Perfil",
+        section_notifications: "Notificações",
+        role_label: "Cuidador",
+      },
+    },
+    accept_invite: {
+      page: {
+        accept_heading: "Aceite seu convite",
+        invited_to_join: "Você foi convidado a participar de uma equipe de aprendizado.",
+        create_account: "Criar uma nova conta",
+        signed_in_as: "Você está conectado como",
+        sign_in_different: "Entrar com outra conta",
+      },
+      actions: {
+        no_pending_for: "Nenhum convite pendente foi encontrado para",
+        continue: "Continuar",
+        added_to: "Você foi adicionado a",
+        continue_to_dashboard: "Ir para o seu painel",
+        signed_in_as: "Conectado como",
+        accepting: "Aceitando…",
+      },
+    },
+  },
+  zh: {
+    caregiver: {
+      home: {
+        on_care_team: "您的护理团队",
+        active_or_ready: "学习中或已准备好",
+        quick_links: "快速链接",
+        link_observations: "观察记录 →",
+        link_roster: "花名册 →",
+        your_learners: "您的学习者",
+        no_learners_yet: "暂无学习者",
+      },
+      learners: {
+        title: "学习者",
+        no_learners_yet: "暂无学习者",
+        primary_language: "主要语言",
+        reading_comfort: "阅读能力",
+        math_comfort: "数学能力",
+      },
+      observations: {
+        page_title: "观察记录",
+        section_log: "记录观察",
+        no_learners_yet: "暂无学习者",
+        no_lesson_activity_yet: "暂无课程活动",
+        no_observations_yet: "暂无护理人员观察记录。请使用上方表单记录您的观察。",
+        label_antecedent: "前因",
+        label_behaviour: "行为",
+        label_consequence: "后果",
+        field_learner: "学习者",
+        choose_learner: "选择学习者…",
+        field_location: "地点",
+        loc_school: "学校",
+        loc_community: "社区",
+        loc_therapy: "治疗",
+        field_behaviour: "行为（您观察到了什么？）",
+        behaviour_placeholder: "简要描述该行为。",
+        field_antecedent: "前因（发生之前是什么？）",
+        field_consequence: "后果（发生之后是什么？）",
+        field_duration: "持续时间（分钟，可选）",
+      },
+      settings: {
+        page_title: "设置",
+        section_profile: "个人资料",
+        section_notifications: "通知",
+        role_label: "护理人员",
+      },
+    },
+    accept_invite: {
+      page: {
+        accept_heading: "接受您的邀请",
+        invited_to_join: "您已被邀请加入学习团队。",
+        create_account: "创建新账户",
+        signed_in_as: "您当前登录的账户为",
+        sign_in_different: "使用其他账户登录",
+      },
+      actions: {
+        no_pending_for: "未找到待处理的邀请，邮箱：",
+        continue: "继续",
+        added_to: "您已被添加到",
+        continue_to_dashboard: "前往您的仪表板",
+        signed_in_as: "当前登录账户：",
+        accepting: "正在接受…",
+      },
+    },
+  },
+  ja: {
+    caregiver: {
+      home: {
+        on_care_team: "ケアチームのメンバー",
+        active_or_ready: "学習中または準備完了",
+        quick_links: "クイックリンク",
+        link_observations: "観察記録 →",
+        link_roster: "一覧 →",
+        your_learners: "担当の学習者",
+        no_learners_yet: "まだ学習者がいません",
+      },
+      learners: {
+        title: "学習者",
+        no_learners_yet: "まだ学習者がいません",
+        primary_language: "主要言語",
+        reading_comfort: "読解能力",
+        math_comfort: "算数・数学の能力",
+      },
+      observations: {
+        page_title: "観察記録",
+        section_log: "観察を記録する",
+        no_learners_yet: "まだ学習者がいません",
+        no_lesson_activity_yet: "まだレッスン活動がありません",
+        no_observations_yet:
+          "まだ介護者の観察記録がありません。上のフォームを使用して気づいたことを記録してください。",
+        label_antecedent: "先行事象",
+        label_behaviour: "行動",
+        label_consequence: "後続事象",
+        field_learner: "学習者",
+        choose_learner: "学習者を選択…",
+        field_location: "場所",
+        loc_school: "学校",
+        loc_community: "地域",
+        loc_therapy: "療法",
+        field_behaviour: "行動（何を見ましたか？）",
+        behaviour_placeholder: "行動を簡潔に説明してください。",
+        field_antecedent: "先行事象（その前に何がありましたか？）",
+        field_consequence: "後続事象（その後に何がありましたか？）",
+        field_duration: "持続時間（分、任意）",
+      },
+      settings: {
+        page_title: "設定",
+        section_profile: "プロフィール",
+        section_notifications: "通知",
+        role_label: "介護者",
+      },
+    },
+    accept_invite: {
+      page: {
+        accept_heading: "招待を承認する",
+        invited_to_join: "学習チームへの参加招待が届いています。",
+        create_account: "新しいアカウントを作成する",
+        signed_in_as: "現在のログインアカウント：",
+        sign_in_different: "別のアカウントでサインインする",
+      },
+      actions: {
+        no_pending_for: "保留中の招待が見つかりませんでした：",
+        continue: "続ける",
+        added_to: "追加されました：",
+        continue_to_dashboard: "ダッシュボードへ進む",
+        signed_in_as: "ログイン中：",
+        accepting: "承認中…",
+      },
+    },
+  },
+  ko: {
+    caregiver: {
+      home: {
+        on_care_team: "케어팀 구성원",
+        active_or_ready: "학습 중 또는 준비 완료",
+        quick_links: "빠른 링크",
+        link_observations: "관찰 기록 →",
+        link_roster: "명단 →",
+        your_learners: "담당 학습자",
+        no_learners_yet: "아직 학습자가 없습니다",
+      },
+      learners: {
+        title: "학습자",
+        no_learners_yet: "아직 학습자가 없습니다",
+        primary_language: "주요 언어",
+        reading_comfort: "읽기 수준",
+        math_comfort: "수학 수준",
+      },
+      observations: {
+        page_title: "관찰 기록",
+        section_log: "관찰 기록하기",
+        no_learners_yet: "아직 학습자가 없습니다",
+        no_lesson_activity_yet: "아직 수업 활동이 없습니다",
+        no_observations_yet:
+          "아직 보호자 관찰 기록이 없습니다. 위의 양식을 사용하여 관찰 내용을 기록하세요.",
+        label_antecedent: "선행 사건",
+        label_behaviour: "행동",
+        label_consequence: "후속 사건",
+        field_learner: "학습자",
+        choose_learner: "학습자 선택…",
+        field_location: "장소",
+        loc_school: "학교",
+        loc_community: "지역사회",
+        loc_therapy: "치료",
+        field_behaviour: "행동 (무엇을 관찰했나요?)",
+        behaviour_placeholder: "행동을 간략히 설명하세요.",
+        field_antecedent: "선행 사건 (이전에 무슨 일이 있었나요?)",
+        field_consequence: "후속 사건 (이후에 무슨 일이 있었나요?)",
+        field_duration: "지속 시간 (분, 선택 사항)",
+      },
+      settings: {
+        page_title: "설정",
+        section_profile: "프로필",
+        section_notifications: "알림",
+        role_label: "보호자",
+      },
+    },
+    accept_invite: {
+      page: {
+        accept_heading: "초대 수락하기",
+        invited_to_join: "학습팀에 참여하도록 초대받았습니다.",
+        create_account: "새 계정 만들기",
+        signed_in_as: "현재 로그인된 계정:",
+        sign_in_different: "다른 계정으로 로그인",
+      },
+      actions: {
+        no_pending_for: "다음 주소에 대한 대기 중인 초대를 찾을 수 없습니다:",
+        continue: "계속",
+        added_to: "추가되었습니다:",
+        continue_to_dashboard: "대시보드로 이동",
+        signed_in_as: "로그인 계정:",
+        accepting: "수락 중…",
+      },
+    },
+  },
+  ar: {
+    caregiver: {
+      home: {
+        on_care_team: "في فريق الرعاية الخاص بك",
+        active_or_ready: "نشط أو جاهز",
+        quick_links: "روابط سريعة",
+        link_observations: "الملاحظات ←",
+        link_roster: "القائمة ←",
+        your_learners: "المتعلّمون لديك",
+        no_learners_yet: "لا يوجد متعلّمون بعد",
+      },
+      learners: {
+        title: "المتعلّمون",
+        no_learners_yet: "لا يوجد متعلّمون بعد",
+        primary_language: "اللغة الأساسية",
+        reading_comfort: "مستوى القراءة",
+        math_comfort: "مستوى الرياضيات",
+      },
+      observations: {
+        page_title: "الملاحظات",
+        section_log: "تسجيل ملاحظة",
+        no_learners_yet: "لا يوجد متعلّمون بعد",
+        no_lesson_activity_yet: "لا يوجد نشاط دروس بعد",
+        no_observations_yet:
+          "لا توجد ملاحظات من مقدّم الرعاية بعد. استخدم النموذج أعلاه لتسجيل ما تلاحظه.",
+        label_antecedent: "المثير",
+        label_behaviour: "السلوك",
+        label_consequence: "النتيجة",
+        field_learner: "المتعلّم",
+        choose_learner: "اختر متعلّمًا…",
+        field_location: "المكان",
+        loc_school: "المدرسة",
+        loc_community: "المجتمع",
+        loc_therapy: "العلاج",
+        field_behaviour: "السلوك (ماذا رأيت؟)",
+        behaviour_placeholder: "صف السلوك بإيجاز.",
+        field_antecedent: "المثير (ماذا حدث قبله؟)",
+        field_consequence: "النتيجة (ماذا حدث بعده؟)",
+        field_duration: "المدة (بالدقائق، اختياري)",
+      },
+      settings: {
+        page_title: "الإعدادات",
+        section_profile: "الملف الشخصي",
+        section_notifications: "الإشعارات",
+        role_label: "مقدّم الرعاية",
+      },
+    },
+    accept_invite: {
+      page: {
+        accept_heading: "قبول دعوتك",
+        invited_to_join: "لقد تمت دعوتك للانضمام إلى فريق التعلم.",
+        create_account: "إنشاء حساب جديد",
+        signed_in_as: "أنت مسجّل دخولك بحساب",
+        sign_in_different: "تسجيل الدخول بحساب مختلف",
+      },
+      actions: {
+        no_pending_for: "لم يتم العثور على دعوات معلّقة للبريد",
+        continue: "متابعة",
+        added_to: "تمت إضافتك إلى",
+        continue_to_dashboard: "الانتقال إلى لوحة التحكم",
+        signed_in_as: "مسجّل دخول بحساب",
+        accepting: "جارٍ القبول…",
+      },
+    },
+  },
+  hi: {
+    caregiver: {
+      home: {
+        on_care_team: "आपकी देखभाल टीम में",
+        active_or_ready: "सक्रिय या तैयार",
+        quick_links: "त्वरित लिंक",
+        link_observations: "अवलोकन →",
+        link_roster: "सूची →",
+        your_learners: "आपके सीखने वाले",
+        no_learners_yet: "अभी तक कोई सीखने वाला नहीं",
+      },
+      learners: {
+        title: "सीखने वाले",
+        no_learners_yet: "अभी तक कोई सीखने वाला नहीं",
+        primary_language: "प्राथमिक भाषा",
+        reading_comfort: "पढ़ने की क्षमता",
+        math_comfort: "गणित की क्षमता",
+      },
+      observations: {
+        page_title: "अवलोकन",
+        section_log: "अवलोकन दर्ज करें",
+        no_learners_yet: "अभी तक कोई सीखने वाला नहीं",
+        no_lesson_activity_yet: "अभी तक कोई पाठ गतिविधि नहीं",
+        no_observations_yet:
+          "अभी तक कोई देखभालकर्ता अवलोकन नहीं है। जो आपने देखा उसे रिकॉर्ड करने के लिए ऊपर का फ़ॉर्म भरें।",
+        label_antecedent: "पूर्ववर्ती घटना",
+        label_behaviour: "व्यवहार",
+        label_consequence: "परिणाम",
+        field_learner: "सीखने वाला",
+        choose_learner: "सीखने वाला चुनें…",
+        field_location: "स्थान",
+        loc_school: "विद्यालय",
+        loc_community: "समुदाय",
+        loc_therapy: "चिकित्सा",
+        field_behaviour: "व्यवहार (आपने क्या देखा?)",
+        behaviour_placeholder: "व्यवहार का संक्षिप्त विवरण दें।",
+        field_antecedent: "पूर्ववर्ती घटना (पहले क्या हुआ था?)",
+        field_consequence: "परिणाम (बाद में क्या हुआ?)",
+        field_duration: "अवधि (मिनट, वैकल्पिक)",
+      },
+      settings: {
+        page_title: "सेटिंग्स",
+        section_profile: "प्रोफ़ाइल",
+        section_notifications: "सूचनाएँ",
+        role_label: "देखभालकर्ता",
+      },
+    },
+    accept_invite: {
+      page: {
+        accept_heading: "अपना निमंत्रण स्वीकार करें",
+        invited_to_join: "आपको एक शिक्षण दल में शामिल होने के लिए आमंत्रित किया गया है।",
+        create_account: "नया खाता बनाएँ",
+        signed_in_as: "आप इस रूप में साइन इन हैं",
+        sign_in_different: "किसी अन्य खाते से साइन इन करें",
+      },
+      actions: {
+        no_pending_for: "इस ईमेल के लिए कोई लंबित निमंत्रण नहीं मिला:",
+        continue: "जारी रखें",
+        added_to: "आपको जोड़ा गया:",
+        continue_to_dashboard: "अपने डैशबोर्ड पर जाएँ",
+        signed_in_as: "साइन इन किया हुआ:",
+        accepting: "स्वीकार किया जा रहा है…",
+      },
+    },
+  },
+};
+
+for (const [locale, roots] of Object.entries(DATA)) {
+  const file = join(messagesDir, `${locale}.json`);
+  const json = JSON.parse(readFileSync(file, "utf8"));
+  for (const [root, subs] of Object.entries(roots)) {
+    json[root] = json[root] ?? {};
+    for (const [ns, keys] of Object.entries(subs)) {
+      json[root][ns] = { ...(json[root][ns] ?? {}), ...keys };
+    }
+  }
+  writeFileSync(file, JSON.stringify(json, null, 2) + "\n");
+  console.log(`seed-R_C1-i18n: merged caregiver + accept_invite keys → messages/${locale}.json`);
+}
+console.log(`\nseed-R_C1-i18n: done — ${Object.keys(DATA).length} locale catalogs updated.`);

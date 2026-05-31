@@ -72,7 +72,8 @@
       "name_label": "Your name",
       "email_label": "Email",
       "password_label": "Password",
-      "password_helper": "At least 8 characters with a number and a symbol."
+      "password_helper": "At least 8 characters with a number and a symbol.",
+      "name_placeholder": "Riley Parent"
     },
     "forgot": {
       "heading": "Reset your password",
@@ -811,7 +812,8 @@
     "building_tutors_caption": "Calibrating each AI tutor to {name}'s levels",
     "building_complete_title": "{name}'s Brain is ready",
     "building_complete_caption": "The Brain has been built from {name}'s assessment data. Review the details below and decide what happens next.",
-    "building_complete_cta": "Review & decide"
+    "building_complete_cta": "Review & decide",
+    "skip_animation": "Skip animation"
   },
   "learner": {
     "errors": {
@@ -1230,6 +1232,19 @@
       "saving": "Saving…",
       "done": "I'm done",
       "complete_error": "We couldn't save this lesson. Please try the 'I'm done' button again."
+    },
+    "baseline_runner": {
+      "exit_proctor_view": "Exit proctor view",
+      "ready_title": "One last tap",
+      "ready_body": "You answered every question. Send your answers when you're ready.",
+      "finish_baseline": "Finish baseline",
+      "resume": "Resume",
+      "stop_for_today": "Stop for today",
+      "choose_one": "Choose one",
+      "type_answer": "Type your answer"
+    },
+    "lesson_run": {
+      "back_to_today": "Back to today"
     }
   },
   "onboarding": {
@@ -1297,7 +1312,9 @@
       "invite_label": "Invite code",
       "invite_helper": "Your school or district sent this in the welcome email.",
       "name_label": "Your name",
-      "password_helper": "At least 12 characters. We'll check it isn't in any known leak before saving it."
+      "password_helper": "At least 12 characters. We'll check it isn't in any known leak before saving it.",
+      "code_placeholder": "e.g. SCHOOL-7Q4M-2025",
+      "name_placeholder": "First and last name"
     },
     "role": {
       "eyebrow": "Choose your role",
@@ -1502,7 +1519,8 @@
       "join": "Join school",
       "code_label": "Invite code",
       "email_label": "Your school email",
-      "email_helper": "Must match the email the admin invited."
+      "email_helper": "Must match the email the admin invited.",
+      "code_placeholder": "e.g. SCHOOL-7Q4M-2025"
     },
     "invite_district": {
       "eyebrow": "District invite",
@@ -1511,7 +1529,8 @@
       "reassure_title": "District admin step-up is enforced.",
       "reassure_body": "Every sign-in for this role requires a fresh biometric or PIN check. AIVO never lets a single password unlock district data.",
       "code_label": "District invite code",
-      "email_label": "Your district email"
+      "email_label": "Your district email",
+      "code_placeholder": "e.g. DISTRICT-9F2L-2025"
     },
     "error": {
       "expired_invite_eyebrow": "Invite expired",
@@ -2159,6 +2178,300 @@
       "col_status": "Status",
       "col_last_delivery": "Last delivery",
       "col_failures": "Failures"
+    },
+    "platform_billing_coupons": {
+      "title": "Coupons",
+      "empty_title": "No coupons yet",
+      "col_discount": "Discount",
+      "col_applies_to": "Applies to",
+      "col_status": "Status",
+      "col_redemptions": "Redemptions",
+      "col_valid_window": "Valid window"
+    },
+    "platform_billing_daily_batch": {
+      "title": "Daily billing batch",
+      "empty_title": "No batch runs yet",
+      "col_run_date": "Run date",
+      "col_window": "Window",
+      "col_status": "Status",
+      "col_generated": "Generated",
+      "col_failed": "Failed",
+      "col_total_billed": "Total billed"
+    },
+    "platform_billing_invoices": {
+      "title": "Invoices",
+      "link_revenue_summary": "Revenue summary",
+      "stat_total_invoices": "Total invoices",
+      "stat_outstanding": "Outstanding",
+      "empty_title": "No invoices yet",
+      "col_number": "Number",
+      "col_tenant": "Tenant",
+      "col_amount": "Amount",
+      "col_status": "Status",
+      "col_period": "Period"
     }
+  },
+  "teacher": {
+    "home": {
+      "open_needs_support_list": "Open the needs-support list",
+      "open_arrow": "Open →",
+      "your_roster": "Your roster",
+      "see_all_learners": "See all learners →",
+      "no_learners_yet": "No learners yet",
+      "connect_roster": "Connect roster",
+      "roster_snapshot": "Roster snapshot",
+      "add_another_class": "Add another class"
+    },
+    "lesson_plans": {
+      "page_title": "AI lesson plans",
+      "new_assignment": "New assignment",
+      "generated_recent": "Generated (recent)",
+      "ai_jobs": "AI jobs",
+      "fallback_chain": "Fallback chain",
+      "fallback_primary_model": "Claude Opus 4.7",
+      "latest_lesson_plans": "Latest lesson plans",
+      "no_lesson_plans_yet": "No lesson plans yet",
+      "generation_activity": "Generation activity",
+      "no_ai_jobs": "No AI generation jobs in this window.",
+      "col_started": "Started",
+      "col_status": "Status",
+      "col_completed": "Completed"
+    },
+    "reports": {
+      "title": "Classroom reports",
+      "col_learners": "Learners",
+      "class_mastery": "Class mastery",
+      "on_track": "On track",
+      "avg_mastery_threshold": "Avg ≥ 70% mastery",
+      "ieps_on_file": "IEPs on file",
+      "mastery_distribution": "Mastery distribution",
+      "no_mastery_data": "No mastery data yet — once learners complete baselines, distribution will populate.",
+      "learner_rollup": "Learner roll-up",
+      "no_learners_assigned": "No learners assigned",
+      "col_learner": "Learner",
+      "col_skills": "Skills",
+      "col_avg_mastery": "Avg mastery",
+      "col_on_grade": "On grade",
+      "col_emerging": "Emerging",
+      "col_actions": "Actions",
+      "iep_on_file": "On file"
+    },
+    "learner_overview": {
+      "this_week_at_school": "This week at school →",
+      "active_assignments": "Active assignments",
+      "no_active_assignments": "No active assignments for this learner.",
+      "recent_lessons": "Recent lessons",
+      "no_lessons_started": "No lessons started yet.",
+      "skill_gaps": "Skill gaps",
+      "no_notable_gaps": "No notable gaps yet — keep going.",
+      "accommodations_teacher_summary": "Accommodations (teacher summary)"
+    },
+    "learner_iep_draft": {
+      "page_title": "IEP goal draft",
+      "no_iep_on_file": "No IEP on file",
+      "current_iep": "Current IEP",
+      "existing_learning_goals": "Existing learning goals",
+      "none_on_file": "None on file.",
+      "accommodations": "Accommodations",
+      "none_recorded": "None recorded.",
+      "suggested_goal_drafts": "Suggested goal drafts",
+      "how_drafts_generated": "How drafts are generated"
+    },
+    "classes": {
+      "title": "Your classes",
+      "empty_title": "No classes assigned"
+    },
+    "error": {
+      "eyebrow": "Teacher area",
+      "heading": "Something went wrong loading this page.",
+      "body": "Your class data is safe. Retry now or head back to your teacher home.",
+      "retry": "Try again",
+      "home_link": "Teacher home"
+    },
+    "insights": {
+      "title": "Insights",
+      "empty_title": "No learners in your tenant"
+    },
+    "learners": {
+      "title": "Your roster",
+      "empty": "No learners are assigned to you yet."
+    },
+    "not_found": {
+      "eyebrow": "Teacher area · 404",
+      "heading": "We couldn't find that page.",
+      "body": "The link may have moved, or the learner is no longer enrolled in your class.",
+      "home_link": "Teacher home",
+      "classes_link": "My classes"
+    },
+    "settings": {
+      "title": "Settings",
+      "signed_in_as": "Signed in as"
+    },
+    "assignments_new": {
+      "title": "New assignment",
+      "instructions_label": "Instructions",
+      "subject_label": "Subject",
+      "skills_label": "Skills",
+      "assign_label": "Assign to",
+      "no_learners": "No learners",
+      "due_date_label": "Due date"
+    },
+    "assignments": {
+      "title": "Assignments",
+      "new_assignment": "New assignment",
+      "empty": "No assignments yet."
+    },
+    "classes_class": {
+      "roster": "Roster",
+      "no_learners": "No learners"
+    }
+  },
+  "therapist": {
+    "home": {
+      "stat_caseload": "Caseload",
+      "stat_ieps": "IEPs on file",
+      "quick_links": "Quick links",
+      "link_sessions": "Sessions →",
+      "link_reports": "Reports →",
+      "section_caseload": "Caseload",
+      "empty_title": "No learners yet"
+    },
+    "reports": {
+      "title": "Reports",
+      "empty_title": "No caseload yet",
+      "focus_label": "Focus:",
+      "skills_tracked": "Skills tracked",
+      "avg_score": "Avg score"
+    },
+    "sessions": {
+      "title": "Sessions",
+      "empty_no_caseload": "No caseload yet",
+      "empty_no_sessions": "No sessions logged yet"
+    },
+    "settings": {
+      "title": "Settings",
+      "section_profile": "Profile",
+      "role_label": "Therapist",
+      "section_notifications": "Notifications"
+    }
+  },
+  "caregiver": {
+    "home": {
+      "on_care_team": "On your care team",
+      "active_or_ready": "Active or ready",
+      "quick_links": "Quick links",
+      "link_observations": "Observations →",
+      "link_roster": "Roster →",
+      "your_learners": "Your learners",
+      "no_learners_yet": "No learners yet"
+    },
+    "learners": {
+      "title": "Learners",
+      "no_learners_yet": "No learners yet",
+      "primary_language": "Primary language",
+      "reading_comfort": "Reading comfort",
+      "math_comfort": "Math comfort"
+    },
+    "observations": {
+      "page_title": "Observations",
+      "section_log": "Log an observation",
+      "no_learners_yet": "No learners yet",
+      "no_lesson_activity_yet": "No lesson activity yet",
+      "no_observations_yet": "No caregiver observations yet. Use the form above to record what you notice.",
+      "label_antecedent": "Antecedent",
+      "label_behaviour": "Behaviour",
+      "label_consequence": "Consequence",
+      "field_learner": "Learner",
+      "choose_learner": "Choose a learner…",
+      "field_location": "Location",
+      "loc_school": "School",
+      "loc_community": "Community",
+      "loc_therapy": "Therapy",
+      "field_behaviour": "Behaviour (what did you see?)",
+      "behaviour_placeholder": "Describe the behaviour briefly.",
+      "field_antecedent": "Antecedent (what came before?)",
+      "field_consequence": "Consequence (what came after?)",
+      "field_duration": "Duration (minutes, optional)"
+    },
+    "settings": {
+      "page_title": "Settings",
+      "section_profile": "Profile",
+      "section_notifications": "Notifications",
+      "role_label": "Caregiver"
+    }
+  },
+  "accept_invite": {
+    "page": {
+      "accept_heading": "Accept your invitation",
+      "invited_to_join": "You've been invited to join a learning team.",
+      "create_account": "Create a new account",
+      "signed_in_as": "You're signed in as",
+      "sign_in_different": "Sign in with a different account"
+    },
+    "actions": {
+      "no_pending_for": "No pending invitations were found for",
+      "continue": "Continue",
+      "added_to": "You've been added to",
+      "continue_to_dashboard": "Continue to your dashboard",
+      "signed_in_as": "Signed in as",
+      "accepting": "Accepting…"
+    }
+  },
+  "root": {
+    "error": {
+      "refreshing": "Refreshing",
+      "one_moment": "One moment — getting the latest version…",
+      "something_went_wrong": "Something went wrong",
+      "lets_try_again": "Let's try that again.",
+      "unexpected_error": "We hit an unexpected error. You can retry now, or head home and come back in a moment.",
+      "try_again": "Try again",
+      "back_to_home": "Back to home"
+    },
+    "global_error": {
+      "heading": "Something went very wrong.",
+      "body": "Please try again. If this keeps happening, contact support.",
+      "try_again": "Try again"
+    },
+    "layout": {
+      "skip_to_main": "Skip to main content"
+    },
+    "not_found": {
+      "heading": "We couldn't find that page.",
+      "back_to_home": "Back to home"
+    },
+    "home": {
+      "ferpa_coppa": "FERPA & COPPA Compliant",
+      "switch_role": "Switch role",
+      "start_family_trial": "Start Family Trial",
+      "for_school_districts": "For School Districts",
+      "trusted_by": "Trusted by 1,200+ specialists and parents."
+    }
+  },
+  "settings_accessibility": {
+    "nav_label": "Accessibility",
+    "page_title": "Accessibility",
+    "sensory_mode": "Sensory mode",
+    "text_and_reading": "Text and reading",
+    "age_mode": "Age mode",
+    "choose_age_mode": "Choose age mode",
+    "age_sprout": "Sprout (4–7)",
+    "age_spark": "Spark (8–12)",
+    "age_scholar": "Scholar (13+)",
+    "choose_theme": "Choose theme",
+    "high_contrast": "High contrast",
+    "text_size": "Text size",
+    "language": "Language",
+    "choose_language": "Choose language",
+    "lang_en_us": "English (US)",
+    "lang_es": "Español",
+    "lang_fr": "Français"
+  },
+  "district_login": {
+    "heading": "District administration",
+    "security_badge": "MFA enforced · SOC 2 · FERPA",
+    "mobile_heading": "District sign-in",
+    "card_title": "Sign in to the district console",
+    "sign_in_btn": "Sign in",
+    "standard_sign_in": "Use the standard sign-in"
   }
 }

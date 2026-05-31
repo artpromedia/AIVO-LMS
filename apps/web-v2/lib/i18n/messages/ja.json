@@ -679,7 +679,8 @@
     "building_tutors_caption": "各 AI チューターを {name} のレベルに調整中",
     "building_complete_title": "{name} のブレインが完成しました",
     "building_complete_caption": "{name} の評価データからブレインが構築されました。下の詳細を確認し、次のステップを決めてください。",
-    "building_complete_cta": "確認して決定"
+    "building_complete_cta": "確認して決定",
+    "skip_animation": "アニメーションをスキップ"
   },
   "learner": {
     "errors": {
@@ -1098,6 +1099,19 @@
       "saving": "保存中…",
       "done": "できた",
       "complete_error": "このレッスンを保存できませんでした。「できた」ボタンをもう一度試してください。"
+    },
+    "baseline_runner": {
+      "exit_proctor_view": "監督ビューを終了",
+      "ready_title": "あと一回タップ",
+      "ready_body": "すべての質問に回答しました。準備ができたら回答を送信してください。",
+      "finish_baseline": "ベースラインを完了",
+      "resume": "再開",
+      "stop_for_today": "今日はここまで",
+      "choose_one": "1つ選んでください",
+      "type_answer": "回答を入力"
+    },
+    "lesson_run": {
+      "back_to_today": "今日に戻る"
     }
   },
   "auth": {
@@ -1156,7 +1170,8 @@
       "name_label": "お名前",
       "email_label": "メールアドレス",
       "password_label": "パスワード",
-      "password_helper": "数字と記号を含む 8 文字以上。"
+      "password_helper": "数字と記号を含む 8 文字以上。",
+      "name_placeholder": "Riley Parent"
     },
     "forgot": {
       "heading": "パスワードをリセット",
@@ -1297,7 +1312,9 @@
       "invite_label": "招待コード",
       "invite_helper": "学校または学区がウェルカムメールで送信しました。",
       "name_label": "お名前",
-      "password_helper": "8 文字以上ではなく 12 文字以上。保存前に、既知の漏えいに含まれていないか確認します。"
+      "password_helper": "8 文字以上ではなく 12 文字以上。保存前に、既知の漏えいに含まれていないか確認します。",
+      "code_placeholder": "例: SCHOOL-7Q4M-2025",
+      "name_placeholder": "姓名"
     },
     "role": {
       "eyebrow": "役割を選ぶ",
@@ -1502,7 +1519,8 @@
       "join": "学校に参加",
       "code_label": "招待コード",
       "email_label": "学校のメールアドレス",
-      "email_helper": "管理者が招待したメールアドレスと一致している必要があります。"
+      "email_helper": "管理者が招待したメールアドレスと一致している必要があります。",
+      "code_placeholder": "例: SCHOOL-7Q4M-2025"
     },
     "invite_district": {
       "eyebrow": "学区への招待",
@@ -1511,7 +1529,8 @@
       "reassure_title": "学区管理者の追加認証が強制されます。",
       "reassure_body": "この役割のサインインごとに、新しい生体認証または PIN の確認が必要です。AIVO は、単一のパスワードで学区データのロックを解除させることは決してありません。",
       "code_label": "学区の招待コード",
-      "email_label": "学区のメールアドレス"
+      "email_label": "学区のメールアドレス",
+      "code_placeholder": "例: DISTRICT-9F2L-2025"
     },
     "error": {
       "expired_invite_eyebrow": "招待の期限切れ",
@@ -2159,6 +2178,300 @@
       "col_status": "ステータス",
       "col_last_delivery": "最終配信",
       "col_failures": "失敗数"
+    },
+    "platform_billing_coupons": {
+      "title": "クーポン",
+      "empty_title": "まだクーポンはありません",
+      "col_discount": "割引",
+      "col_applies_to": "適用対象",
+      "col_status": "ステータス",
+      "col_redemptions": "利用回数",
+      "col_valid_window": "有効期間"
+    },
+    "platform_billing_daily_batch": {
+      "title": "日次請求バッチ",
+      "empty_title": "まだバッチ実行はありません",
+      "col_run_date": "実行日",
+      "col_window": "期間",
+      "col_status": "ステータス",
+      "col_generated": "生成数",
+      "col_failed": "失敗数",
+      "col_total_billed": "請求合計"
+    },
+    "platform_billing_invoices": {
+      "title": "請求書",
+      "link_revenue_summary": "収益サマリー",
+      "stat_total_invoices": "請求書総数",
+      "stat_outstanding": "未払い",
+      "empty_title": "まだ請求書はありません",
+      "col_number": "番号",
+      "col_tenant": "テナント",
+      "col_amount": "金額",
+      "col_status": "ステータス",
+      "col_period": "期間"
     }
+  },
+  "teacher": {
+    "home": {
+      "open_needs_support_list": "サポートが必要なリストを開く",
+      "open_arrow": "開く →",
+      "your_roster": "受け持ちの学習者",
+      "see_all_learners": "すべての学習者を見る →",
+      "no_learners_yet": "まだ学習者はいません",
+      "connect_roster": "名簿を連携する",
+      "roster_snapshot": "名簿の概要",
+      "add_another_class": "別のクラスを追加する"
+    },
+    "lesson_plans": {
+      "page_title": "AI 授業計画",
+      "new_assignment": "新しい課題",
+      "generated_recent": "生成済み（最近）",
+      "ai_jobs": "AI ジョブ",
+      "fallback_chain": "フォールバックチェーン",
+      "fallback_primary_model": "Claude Opus 4.7",
+      "latest_lesson_plans": "最新の授業計画",
+      "no_lesson_plans_yet": "授業計画はまだありません",
+      "generation_activity": "生成アクティビティ",
+      "no_ai_jobs": "この期間に AI 生成ジョブはありません。",
+      "col_started": "開始",
+      "col_status": "ステータス",
+      "col_completed": "完了"
+    },
+    "reports": {
+      "title": "クラスレポート",
+      "col_learners": "学習者",
+      "class_mastery": "クラス習熟度",
+      "on_track": "順調",
+      "avg_mastery_threshold": "平均 ≥ 70% 習熟度",
+      "ieps_on_file": "登録済み IEP",
+      "mastery_distribution": "習熟度分布",
+      "no_mastery_data": "習熟度データはまだありません — 学習者がベースライン評価を完了すると、分布が表示されます。",
+      "learner_rollup": "学習者まとめ",
+      "no_learners_assigned": "学習者が割り当てられていません",
+      "col_learner": "学習者",
+      "col_skills": "スキル",
+      "col_avg_mastery": "平均習熟度",
+      "col_on_grade": "学年相当",
+      "col_emerging": "発展途上",
+      "col_actions": "アクション",
+      "iep_on_file": "登録済み"
+    },
+    "learner_overview": {
+      "this_week_at_school": "今週の学校の様子 →",
+      "active_assignments": "進行中の課題",
+      "no_active_assignments": "この学習者の進行中の課題はありません。",
+      "recent_lessons": "最近のレッスン",
+      "no_lessons_started": "まだレッスンが開始されていません。",
+      "skill_gaps": "スキルのギャップ",
+      "no_notable_gaps": "目立ったギャップはまだありません — このまま続けましょう。",
+      "accommodations_teacher_summary": "配慮事項（教師向け概要）"
+    },
+    "learner_iep_draft": {
+      "page_title": "IEP 目標草案",
+      "no_iep_on_file": "IEP は登録されていません",
+      "current_iep": "現在の IEP",
+      "existing_learning_goals": "既存の学習目標",
+      "none_on_file": "登録なし。",
+      "accommodations": "配慮事項",
+      "none_recorded": "記録なし。",
+      "suggested_goal_drafts": "推奨される目標草案",
+      "how_drafts_generated": "草案の生成方法"
+    },
+    "classes": {
+      "title": "あなたのクラス",
+      "empty_title": "クラスが割り当てられていません"
+    },
+    "error": {
+      "eyebrow": "教師エリア",
+      "heading": "このページの読み込み中にエラーが発生しました。",
+      "body": "クラスデータは安全です。再試行するか、教師ホームに戻ってください。",
+      "retry": "再試行",
+      "home_link": "教師ホーム"
+    },
+    "insights": {
+      "title": "インサイト",
+      "empty_title": "テナントに学習者がいません"
+    },
+    "learners": {
+      "title": "あなたの名簿",
+      "empty": "まだ学習者が割り当てられていません。"
+    },
+    "not_found": {
+      "eyebrow": "教師エリア · 404",
+      "heading": "ページが見つかりませんでした。",
+      "body": "リンクが変更されたか、その学習者がクラスから退学した可能性があります。",
+      "home_link": "教師ホーム",
+      "classes_link": "マイクラス"
+    },
+    "settings": {
+      "title": "設定",
+      "signed_in_as": "ログイン中"
+    },
+    "assignments_new": {
+      "title": "新しい課題",
+      "instructions_label": "指示",
+      "subject_label": "教科",
+      "skills_label": "スキル",
+      "assign_label": "割り当て先",
+      "no_learners": "学習者がいません",
+      "due_date_label": "期限"
+    },
+    "assignments": {
+      "title": "課題",
+      "new_assignment": "新しい課題",
+      "empty": "まだ課題はありません。"
+    },
+    "classes_class": {
+      "roster": "名簿",
+      "no_learners": "学習者がいません"
+    }
+  },
+  "therapist": {
+    "home": {
+      "stat_caseload": "ケースロード",
+      "stat_ieps": "登録済み IEP",
+      "quick_links": "クイックリンク",
+      "link_sessions": "セッション →",
+      "link_reports": "レポート →",
+      "section_caseload": "ケースロード",
+      "empty_title": "まだ学習者がいません"
+    },
+    "reports": {
+      "title": "レポート",
+      "empty_title": "まだケースロードがありません",
+      "focus_label": "注力分野：",
+      "skills_tracked": "追跡中のスキル",
+      "avg_score": "平均スコア"
+    },
+    "sessions": {
+      "title": "セッション",
+      "empty_no_caseload": "まだケースロードがありません",
+      "empty_no_sessions": "まだセッションが記録されていません"
+    },
+    "settings": {
+      "title": "設定",
+      "section_profile": "プロフィール",
+      "role_label": "セラピスト",
+      "section_notifications": "通知"
+    }
+  },
+  "caregiver": {
+    "home": {
+      "on_care_team": "ケアチームのメンバー",
+      "active_or_ready": "学習中または準備完了",
+      "quick_links": "クイックリンク",
+      "link_observations": "観察記録 →",
+      "link_roster": "一覧 →",
+      "your_learners": "担当の学習者",
+      "no_learners_yet": "まだ学習者がいません"
+    },
+    "learners": {
+      "title": "学習者",
+      "no_learners_yet": "まだ学習者がいません",
+      "primary_language": "主要言語",
+      "reading_comfort": "読解能力",
+      "math_comfort": "算数・数学の能力"
+    },
+    "observations": {
+      "page_title": "観察記録",
+      "section_log": "観察を記録する",
+      "no_learners_yet": "まだ学習者がいません",
+      "no_lesson_activity_yet": "まだレッスン活動がありません",
+      "no_observations_yet": "まだ介護者の観察記録がありません。上のフォームを使用して気づいたことを記録してください。",
+      "label_antecedent": "先行事象",
+      "label_behaviour": "行動",
+      "label_consequence": "後続事象",
+      "field_learner": "学習者",
+      "choose_learner": "学習者を選択…",
+      "field_location": "場所",
+      "loc_school": "学校",
+      "loc_community": "地域",
+      "loc_therapy": "療法",
+      "field_behaviour": "行動（何を見ましたか？）",
+      "behaviour_placeholder": "行動を簡潔に説明してください。",
+      "field_antecedent": "先行事象（その前に何がありましたか？）",
+      "field_consequence": "後続事象（その後に何がありましたか？）",
+      "field_duration": "持続時間（分、任意）"
+    },
+    "settings": {
+      "page_title": "設定",
+      "section_profile": "プロフィール",
+      "section_notifications": "通知",
+      "role_label": "介護者"
+    }
+  },
+  "accept_invite": {
+    "page": {
+      "accept_heading": "招待を承認する",
+      "invited_to_join": "学習チームへの参加招待が届いています。",
+      "create_account": "新しいアカウントを作成する",
+      "signed_in_as": "現在のログインアカウント：",
+      "sign_in_different": "別のアカウントでサインインする"
+    },
+    "actions": {
+      "no_pending_for": "保留中の招待が見つかりませんでした：",
+      "continue": "続ける",
+      "added_to": "追加されました：",
+      "continue_to_dashboard": "ダッシュボードへ進む",
+      "signed_in_as": "ログイン中：",
+      "accepting": "承認中…"
+    }
+  },
+  "root": {
+    "error": {
+      "refreshing": "更新中",
+      "one_moment": "少々お待ちください — 最新バージョンを取得しています…",
+      "something_went_wrong": "問題が発生しました",
+      "lets_try_again": "もう一度試してみましょう。",
+      "unexpected_error": "予期しないエラーが発生しました。今すぐ再試行するか、ホームに戻ってしばらくしてから再度お試しください。",
+      "try_again": "再試行",
+      "back_to_home": "ホームに戻る"
+    },
+    "global_error": {
+      "heading": "深刻なエラーが発生しました。",
+      "body": "もう一度お試しください。問題が続く場合は、サポートにお問い合わせください。",
+      "try_again": "再試行"
+    },
+    "layout": {
+      "skip_to_main": "メインコンテンツへスキップ"
+    },
+    "not_found": {
+      "heading": "そのページが見つかりませんでした。",
+      "back_to_home": "ホームに戻る"
+    },
+    "home": {
+      "ferpa_coppa": "FERPA・COPPA 準拠",
+      "switch_role": "ロールを切り替え",
+      "start_family_trial": "ファミリートライアルを開始",
+      "for_school_districts": "学区向け",
+      "trusted_by": "1,200 人以上の専門家と保護者に信頼されています。"
+    }
+  },
+  "settings_accessibility": {
+    "nav_label": "アクセシビリティ",
+    "page_title": "アクセシビリティ",
+    "sensory_mode": "感覚モード",
+    "text_and_reading": "テキストと読み取り",
+    "age_mode": "年齢モード",
+    "choose_age_mode": "年齢モードを選択",
+    "age_sprout": "Sprout（4〜7歳）",
+    "age_spark": "Spark（8〜12歳）",
+    "age_scholar": "Scholar（13歳以上）",
+    "choose_theme": "テーマを選択",
+    "high_contrast": "ハイコントラスト",
+    "text_size": "文字サイズ",
+    "language": "言語",
+    "choose_language": "言語を選択",
+    "lang_en_us": "English (US)",
+    "lang_es": "Español",
+    "lang_fr": "Français"
+  },
+  "district_login": {
+    "heading": "学区管理",
+    "security_badge": "MFA 必須 · SOC 2 · FERPA",
+    "mobile_heading": "学区サインイン",
+    "card_title": "学区コンソールにサインイン",
+    "sign_in_btn": "サインイン",
+    "standard_sign_in": "標準サインインを使用"
   }
 }

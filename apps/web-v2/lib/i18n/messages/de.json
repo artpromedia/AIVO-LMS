@@ -679,7 +679,8 @@
     "building_tutors_caption": "Kalibrierung jedes KI-Tutors auf {name}s Niveau",
     "building_complete_title": "{name}s Gehirn ist bereit",
     "building_complete_caption": "Das Gehirn wurde aus {name}s Bewertungsdaten erstellt. Sieh dir die Details unten an und entscheide, wie es weitergeht.",
-    "building_complete_cta": "Prüfen & entscheiden"
+    "building_complete_cta": "Prüfen & entscheiden",
+    "skip_animation": "Animation überspringen"
   },
   "learner": {
     "errors": {
@@ -1098,6 +1099,19 @@
       "saving": "Wird gespeichert…",
       "done": "Ich bin fertig",
       "complete_error": "Wir konnten diese Lektion nicht speichern. Bitte versuch die Schaltfläche „Ich bin fertig“ erneut."
+    },
+    "baseline_runner": {
+      "exit_proctor_view": "Aufsichtsansicht verlassen",
+      "ready_title": "Ein letzter Tipp",
+      "ready_body": "Sie haben alle Fragen beantwortet. Senden Sie Ihre Antworten, wenn Sie bereit sind.",
+      "finish_baseline": "Einstufung abschließen",
+      "resume": "Fortsetzen",
+      "stop_for_today": "Für heute beenden",
+      "choose_one": "Wählen Sie eine aus",
+      "type_answer": "Geben Sie Ihre Antwort ein"
+    },
+    "lesson_run": {
+      "back_to_today": "Zurück zu heute"
     }
   },
   "auth": {
@@ -1156,7 +1170,8 @@
       "name_label": "Dein Name",
       "email_label": "E-Mail",
       "password_label": "Passwort",
-      "password_helper": "Mindestens 8 Zeichen mit einer Zahl und einem Symbol."
+      "password_helper": "Mindestens 8 Zeichen mit einer Zahl und einem Symbol.",
+      "name_placeholder": "Riley Parent"
     },
     "forgot": {
       "heading": "Setze dein Passwort zurück",
@@ -1297,7 +1312,9 @@
       "invite_label": "Einladungscode",
       "invite_helper": "Deine Schule oder dein Bezirk hat ihn in der Willkommens-E-Mail gesendet.",
       "name_label": "Dein Name",
-      "password_helper": "Mindestens 12 Zeichen. Wir prüfen vor dem Speichern, dass es in keinem bekannten Leak vorkommt."
+      "password_helper": "Mindestens 12 Zeichen. Wir prüfen vor dem Speichern, dass es in keinem bekannten Leak vorkommt.",
+      "code_placeholder": "z. B. SCHOOL-7Q4M-2025",
+      "name_placeholder": "Vor- und Nachname"
     },
     "role": {
       "eyebrow": "Wähle deine Rolle",
@@ -1502,7 +1519,8 @@
       "join": "Schule beitreten",
       "code_label": "Einladungscode",
       "email_label": "Deine Schul-E-Mail",
-      "email_helper": "Muss mit der E-Mail übereinstimmen, zu der die Administration dich eingeladen hat."
+      "email_helper": "Muss mit der E-Mail übereinstimmen, zu der die Administration dich eingeladen hat.",
+      "code_placeholder": "z. B. SCHOOL-7Q4M-2025"
     },
     "invite_district": {
       "eyebrow": "Bezirkseinladung",
@@ -1511,7 +1529,8 @@
       "reassure_title": "Die verstärkte Authentifizierung für Bezirksadministratoren ist verpflichtend.",
       "reassure_body": "Jede Anmeldung für diese Rolle erfordert eine erneute biometrische oder PIN-Prüfung. AIVO lässt niemals zu, dass ein einzelnes Passwort Bezirksdaten entsperrt.",
       "code_label": "Bezirks-Einladungscode",
-      "email_label": "Deine Bezirks-E-Mail"
+      "email_label": "Deine Bezirks-E-Mail",
+      "code_placeholder": "z. B. DISTRICT-9F2L-2025"
     },
     "error": {
       "expired_invite_eyebrow": "Einladung abgelaufen",
@@ -2159,6 +2178,300 @@
       "col_status": "Status",
       "col_last_delivery": "Letzte Zustellung",
       "col_failures": "Fehler"
+    },
+    "platform_billing_coupons": {
+      "title": "Gutscheine",
+      "empty_title": "Noch keine Gutscheine",
+      "col_discount": "Rabatt",
+      "col_applies_to": "Gilt für",
+      "col_status": "Status",
+      "col_redemptions": "Einlösungen",
+      "col_valid_window": "Gültigkeitszeitraum"
+    },
+    "platform_billing_daily_batch": {
+      "title": "Täglicher Abrechnungslauf",
+      "empty_title": "Noch keine Lauf-Durchläufe",
+      "col_run_date": "Lauf-Datum",
+      "col_window": "Zeitfenster",
+      "col_status": "Status",
+      "col_generated": "Erstellt",
+      "col_failed": "Fehlgeschlagen",
+      "col_total_billed": "Gesamt abgerechnet"
+    },
+    "platform_billing_invoices": {
+      "title": "Rechnungen",
+      "link_revenue_summary": "Umsatzübersicht",
+      "stat_total_invoices": "Rechnungen gesamt",
+      "stat_outstanding": "Ausstehend",
+      "empty_title": "Noch keine Rechnungen",
+      "col_number": "Nummer",
+      "col_tenant": "Mandant",
+      "col_amount": "Betrag",
+      "col_status": "Status",
+      "col_period": "Zeitraum"
     }
+  },
+  "teacher": {
+    "home": {
+      "open_needs_support_list": "Unterstützungsliste öffnen",
+      "open_arrow": "Öffnen →",
+      "your_roster": "Ihre Lernendenliste",
+      "see_all_learners": "Alle Lernenden anzeigen →",
+      "no_learners_yet": "Noch keine Lernenden",
+      "connect_roster": "Liste verbinden",
+      "roster_snapshot": "Listenübersicht",
+      "add_another_class": "Weitere Klasse hinzufügen"
+    },
+    "lesson_plans": {
+      "page_title": "KI-Unterrichtspläne",
+      "new_assignment": "Neue Aufgabe",
+      "generated_recent": "Generiert (aktuell)",
+      "ai_jobs": "KI-Aufgaben",
+      "fallback_chain": "Fallback-Kette",
+      "fallback_primary_model": "Claude Opus 4.7",
+      "latest_lesson_plans": "Neueste Unterrichtspläne",
+      "no_lesson_plans_yet": "Noch keine Unterrichtspläne",
+      "generation_activity": "Generierungsaktivität",
+      "no_ai_jobs": "Keine KI-Generierungsaufgaben in diesem Zeitraum.",
+      "col_started": "Gestartet",
+      "col_status": "Status",
+      "col_completed": "Abgeschlossen"
+    },
+    "reports": {
+      "title": "Klassenberichte",
+      "col_learners": "Lernende",
+      "class_mastery": "Klassen-Beherrschungsgrad",
+      "on_track": "Im Plan",
+      "avg_mastery_threshold": "Ø ≥ 70% Beherrschungsgrad",
+      "ieps_on_file": "IEP archiviert",
+      "mastery_distribution": "Beherrschungsverteilung",
+      "no_mastery_data": "Noch keine Beherrschungsdaten — sobald Lernende die Basistests abgeschlossen haben, wird die Verteilung angezeigt.",
+      "learner_rollup": "Lernenden-Übersicht",
+      "no_learners_assigned": "Keine Lernenden zugewiesen",
+      "col_learner": "Lernender",
+      "col_skills": "Fähigkeiten",
+      "col_avg_mastery": "Ø Beherrschung",
+      "col_on_grade": "Klassenstufe",
+      "col_emerging": "Im Aufbau",
+      "col_actions": "Aktionen",
+      "iep_on_file": "Archiviert"
+    },
+    "learner_overview": {
+      "this_week_at_school": "Diese Woche in der Schule →",
+      "active_assignments": "Aktive Aufgaben",
+      "no_active_assignments": "Keine aktiven Aufgaben für diesen Lernenden.",
+      "recent_lessons": "Letzte Lektionen",
+      "no_lessons_started": "Noch keine Lektionen gestartet.",
+      "skill_gaps": "Kompetenzlücken",
+      "no_notable_gaps": "Noch keine nennenswerten Lücken — weiter so.",
+      "accommodations_teacher_summary": "Anpassungen (Lehrerzusammenfassung)"
+    },
+    "learner_iep_draft": {
+      "page_title": "IEP-Zielentwurf",
+      "no_iep_on_file": "Kein IEP archiviert",
+      "current_iep": "Aktueller IEP",
+      "existing_learning_goals": "Vorhandene Lernziele",
+      "none_on_file": "Keine archiviert.",
+      "accommodations": "Anpassungen",
+      "none_recorded": "Keine erfasst.",
+      "suggested_goal_drafts": "Vorgeschlagene Zielentwürfe",
+      "how_drafts_generated": "Wie Entwürfe generiert werden"
+    },
+    "classes": {
+      "title": "Ihre Klassen",
+      "empty_title": "Keine Klassen zugewiesen"
+    },
+    "error": {
+      "eyebrow": "Lehrerbereich",
+      "heading": "Beim Laden dieser Seite ist ein Fehler aufgetreten.",
+      "body": "Ihre Klassendaten sind sicher. Versuchen Sie es erneut oder kehren Sie zu Ihrer Lehrerstartseite zurück.",
+      "retry": "Erneut versuchen",
+      "home_link": "Lehrerstartseite"
+    },
+    "insights": {
+      "title": "Einblicke",
+      "empty_title": "Keine Lernenden in Ihrem Bereich"
+    },
+    "learners": {
+      "title": "Ihre Schülerliste",
+      "empty": "Ihnen sind noch keine Lernenden zugewiesen."
+    },
+    "not_found": {
+      "eyebrow": "Lehrerbereich · 404",
+      "heading": "Diese Seite konnten wir nicht finden.",
+      "body": "Der Link wurde möglicherweise verschoben oder der Lernende ist nicht mehr in Ihrer Klasse eingeschrieben.",
+      "home_link": "Lehrerstartseite",
+      "classes_link": "Meine Klassen"
+    },
+    "settings": {
+      "title": "Einstellungen",
+      "signed_in_as": "Angemeldet als"
+    },
+    "assignments_new": {
+      "title": "Neue Aufgabe",
+      "instructions_label": "Anweisungen",
+      "subject_label": "Fach",
+      "skills_label": "Kompetenzen",
+      "assign_label": "Zuweisen an",
+      "no_learners": "Keine Lernenden",
+      "due_date_label": "Fälligkeitsdatum"
+    },
+    "assignments": {
+      "title": "Aufgaben",
+      "new_assignment": "Neue Aufgabe",
+      "empty": "Noch keine Aufgaben."
+    },
+    "classes_class": {
+      "roster": "Teilnehmerliste",
+      "no_learners": "Keine Lernenden"
+    }
+  },
+  "therapist": {
+    "home": {
+      "stat_caseload": "Fallaufkommen",
+      "stat_ieps": "IEPs erfasst",
+      "quick_links": "Schnellzugriffe",
+      "link_sessions": "Sitzungen →",
+      "link_reports": "Berichte →",
+      "section_caseload": "Fallaufkommen",
+      "empty_title": "Noch keine Lernenden"
+    },
+    "reports": {
+      "title": "Berichte",
+      "empty_title": "Noch kein Fallaufkommen",
+      "focus_label": "Schwerpunkt:",
+      "skills_tracked": "Verfolgte Fähigkeiten",
+      "avg_score": "Durchschnittliche Punktzahl"
+    },
+    "sessions": {
+      "title": "Sitzungen",
+      "empty_no_caseload": "Noch kein Fallaufkommen",
+      "empty_no_sessions": "Noch keine Sitzungen protokolliert"
+    },
+    "settings": {
+      "title": "Einstellungen",
+      "section_profile": "Profil",
+      "role_label": "Therapeut",
+      "section_notifications": "Benachrichtigungen"
+    }
+  },
+  "caregiver": {
+    "home": {
+      "on_care_team": "In Ihrem Betreuungsteam",
+      "active_or_ready": "Aktiv oder bereit",
+      "quick_links": "Schnellzugriffe",
+      "link_observations": "Beobachtungen →",
+      "link_roster": "Liste →",
+      "your_learners": "Ihre Lernenden",
+      "no_learners_yet": "Noch keine Lernenden"
+    },
+    "learners": {
+      "title": "Lernende",
+      "no_learners_yet": "Noch keine Lernenden",
+      "primary_language": "Hauptsprache",
+      "reading_comfort": "Lesekompetenz",
+      "math_comfort": "Mathematikkompetenz"
+    },
+    "observations": {
+      "page_title": "Beobachtungen",
+      "section_log": "Beobachtung erfassen",
+      "no_learners_yet": "Noch keine Lernenden",
+      "no_lesson_activity_yet": "Noch keine Unterrichtsaktivität",
+      "no_observations_yet": "Noch keine Beobachtungen der Betreuungsperson. Nutzen Sie das obige Formular, um Ihre Notizen festzuhalten.",
+      "label_antecedent": "Auslöser",
+      "label_behaviour": "Verhalten",
+      "label_consequence": "Folge",
+      "field_learner": "Lernende/r",
+      "choose_learner": "Lernende/n auswählen…",
+      "field_location": "Ort",
+      "loc_school": "Schule",
+      "loc_community": "Gemeinschaft",
+      "loc_therapy": "Therapie",
+      "field_behaviour": "Verhalten (was haben Sie beobachtet?)",
+      "behaviour_placeholder": "Beschreiben Sie das Verhalten kurz.",
+      "field_antecedent": "Auslöser (was kam davor?)",
+      "field_consequence": "Folge (was kam danach?)",
+      "field_duration": "Dauer (Minuten, optional)"
+    },
+    "settings": {
+      "page_title": "Einstellungen",
+      "section_profile": "Profil",
+      "section_notifications": "Benachrichtigungen",
+      "role_label": "Betreuungsperson"
+    }
+  },
+  "accept_invite": {
+    "page": {
+      "accept_heading": "Einladung annehmen",
+      "invited_to_join": "Sie wurden eingeladen, einem Lernteam beizutreten.",
+      "create_account": "Neues Konto erstellen",
+      "signed_in_as": "Sie sind angemeldet als",
+      "sign_in_different": "Mit einem anderen Konto anmelden"
+    },
+    "actions": {
+      "no_pending_for": "Keine ausstehenden Einladungen gefunden für",
+      "continue": "Weiter",
+      "added_to": "Sie wurden hinzugefügt zu",
+      "continue_to_dashboard": "Zum Dashboard",
+      "signed_in_as": "Angemeldet als",
+      "accepting": "Wird akzeptiert…"
+    }
+  },
+  "root": {
+    "error": {
+      "refreshing": "Wird aktualisiert",
+      "one_moment": "Einen Moment — neueste Version wird geladen…",
+      "something_went_wrong": "Etwas ist schiefgelaufen",
+      "lets_try_again": "Lass es uns noch einmal versuchen.",
+      "unexpected_error": "Ein unerwarteter Fehler ist aufgetreten. Sie können es jetzt erneut versuchen oder zur Startseite gehen und in einem Moment zurückkehren.",
+      "try_again": "Erneut versuchen",
+      "back_to_home": "Zurück zur Startseite"
+    },
+    "global_error": {
+      "heading": "Etwas ist sehr schiefgelaufen.",
+      "body": "Bitte versuchen Sie es erneut. Wenn das Problem weiterhin besteht, wenden Sie sich an den Support.",
+      "try_again": "Erneut versuchen"
+    },
+    "layout": {
+      "skip_to_main": "Zum Hauptinhalt springen"
+    },
+    "not_found": {
+      "heading": "Wir konnten diese Seite nicht finden.",
+      "back_to_home": "Zurück zur Startseite"
+    },
+    "home": {
+      "ferpa_coppa": "FERPA- & COPPA-konform",
+      "switch_role": "Rolle wechseln",
+      "start_family_trial": "Familientest starten",
+      "for_school_districts": "Für Schulbezirke",
+      "trusted_by": "Von über 1.200 Fachleuten und Eltern genutzt."
+    }
+  },
+  "settings_accessibility": {
+    "nav_label": "Barrierefreiheit",
+    "page_title": "Barrierefreiheit",
+    "sensory_mode": "Sensorischer Modus",
+    "text_and_reading": "Text und Lesen",
+    "age_mode": "Altersmodus",
+    "choose_age_mode": "Altersmodus wählen",
+    "age_sprout": "Sprout (4–7)",
+    "age_spark": "Spark (8–12)",
+    "age_scholar": "Scholar (13+)",
+    "choose_theme": "Thema wählen",
+    "high_contrast": "Hoher Kontrast",
+    "text_size": "Textgröße",
+    "language": "Sprache",
+    "choose_language": "Sprache wählen",
+    "lang_en_us": "English (US)",
+    "lang_es": "Español",
+    "lang_fr": "Français"
+  },
+  "district_login": {
+    "heading": "Bezirksverwaltung",
+    "security_badge": "MFA erzwungen · SOC 2 · FERPA",
+    "mobile_heading": "Bezirks-Anmeldung",
+    "card_title": "Bei der Bezirkskonsole anmelden",
+    "sign_in_btn": "Anmelden",
+    "standard_sign_in": "Standard-Anmeldung verwenden"
   }
 }

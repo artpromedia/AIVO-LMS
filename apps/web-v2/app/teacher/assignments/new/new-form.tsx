@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -18,6 +19,7 @@ export function NewAssignmentForm({
   subjects: SubjectOption[];
   learners: LearnerOption[];
 }) {
+  const t = useTranslations("teacher.assignments_new");
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [instructions, setInstructions] = useState("");
@@ -94,7 +96,7 @@ export function NewAssignmentForm({
 
         <div className="grid gap-2">
           <label htmlFor="a-instr" className="text-sm font-medium">
-            Instructions (optional)
+            {t("instructions_label")}
           </label>
           <textarea
             id="a-instr"
@@ -108,7 +110,7 @@ export function NewAssignmentForm({
 
         <div className="grid gap-2">
           <label htmlFor="a-subj" className="text-sm font-medium">
-            Subject
+            {t("subject_label")}
           </label>
           <select
             id="a-subj"
@@ -128,7 +130,7 @@ export function NewAssignmentForm({
         </div>
 
         <fieldset className="grid gap-2">
-          <legend className="text-sm font-medium">Skills</legend>
+          <legend className="text-sm font-medium">{t("skills_label")}</legend>
           <ul className="grid gap-1 sm:grid-cols-2">
             {currentSkills.map((sk) => (
               <li key={sk.id}>
@@ -146,9 +148,9 @@ export function NewAssignmentForm({
         </fieldset>
 
         <fieldset className="grid gap-2">
-          <legend className="text-sm font-medium">Assign to learners</legend>
+          <legend className="text-sm font-medium">{t("assign_label")}</legend>
           {learners.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No learners in your roster.</p>
+            <p className="text-sm text-muted-foreground">{t("no_learners")}</p>
           ) : (
             <ul className="grid gap-1 sm:grid-cols-2">
               {learners.map((l) => (
@@ -169,7 +171,7 @@ export function NewAssignmentForm({
 
         <div className="grid gap-2">
           <label htmlFor="a-due" className="text-sm font-medium">
-            Due date (optional)
+            {t("due_date_label")}
           </label>
           <input
             id="a-due"

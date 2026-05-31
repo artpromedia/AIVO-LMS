@@ -6,6 +6,7 @@
  * invite.
  */
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader, SectionHeader } from "@/components/layout/page-header";
@@ -21,6 +22,7 @@ import { READINESS_LABEL, READINESS_TONE } from "@/lib/learner/readiness";
 export const dynamic = "force-dynamic";
 
 export default async function CaregiverHomePage() {
+  const t = await getTranslations("caregiver.home");
   const session = await requirePageRole(["caregiver", "platform_admin"]);
   const learnerIds = listLearnersForMember(session.userId, session.email, "caregiver");
   const maybeLearners = await Promise.all(
@@ -52,31 +54,31 @@ export default async function CaregiverHomePage() {
       {fresh.length > 0 ? (
         <div className="grid gap-3 sm:grid-cols-3">
           <Card className="p-4">
-            <p className="text-xs text-aivo-ink-soft">On your care team</p>
+            <p className="text-xs text-aivo-ink-soft">{t("on_care_team")}</p>
             <p className="font-display text-2xl font-semibold">{fresh.length}</p>
           </Card>
           <Card className="p-4">
-            <p className="text-xs text-aivo-ink-soft">Active or ready</p>
+            <p className="text-xs text-aivo-ink-soft">{t("active_or_ready")}</p>
             <p className="font-display text-2xl font-semibold">{learningNow}</p>
           </Card>
           <Card className="p-4">
-            <p className="text-xs text-aivo-ink-soft">Quick links</p>
+            <p className="text-xs text-aivo-ink-soft">{t("quick_links")}</p>
             <div className="mt-1 flex flex-col gap-1 text-sm">
               <Link href="/caregiver/observations" className="text-aivo-accent hover:underline">
-                Observations →
+                {t("link_observations")}
               </Link>
               <Link href="/caregiver/learners" className="text-aivo-accent hover:underline">
-                Roster →
+                {t("link_roster")}
               </Link>
             </div>
           </Card>
         </div>
       ) : null}
 
-      <SectionHeader title="Your learners" />
+      <SectionHeader title={t("your_learners")} />
       {fresh.length === 0 ? (
         <EmptyState
-          title="No learners yet"
+          title={t("no_learners_yet")}
           description="Once a parent invites you and you accept, the learners you support will appear here."
         />
       ) : (

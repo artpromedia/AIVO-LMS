@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requirePageRole } from "@/lib/auth/server";
+import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
 import { PageHeader } from "@/components/layout/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +9,7 @@ import { TEACHER_NAV } from "@/components/layout/role-shells";
 import { listClassrooms, listEnrollments } from "@/lib/db/repos";
 
 export default async function Page() {
+  const t = await getTranslations("teacher.classes");
   const session = await requirePageRole(["teacher"]);
   const classrooms = await listClassrooms({ tenantId: session.tenantId, teacherUserId: session.userId });
 
@@ -20,12 +22,12 @@ export default async function Page() {
     >
       <PageHeader
         eyebrow="Teacher"
-        title="Your classes"
+        title={t("title")}
         description="Every classroom assigned to you. Tap a class to see its roster."
       />
       {classrooms.length === 0 ? (
         <EmptyState
-          title="No classes assigned"
+          title={t("empty_title")}
           description="Your school admin can assign you classes from the Rostering page."
         />
       ) : (

@@ -225,7 +225,7 @@ export function AwakeningClient({
           type="button"
           onClick={onSkip}
           className="awakening-skip"
-          aria-label="Skip animation"
+          aria-label={t("skip_animation")}
         >
           Skip
         </button>

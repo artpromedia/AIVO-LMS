@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
 /**
@@ -23,6 +24,7 @@ export default function ErrorPage({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations("root.error");
   const [autoRecovering, setAutoRecovering] = useState(false);
 
   useEffect(() => {
@@ -56,10 +58,10 @@ export default function ErrorPage({
         className="mx-auto flex min-h-[70vh] max-w-xl flex-col items-center justify-center px-6 py-16 text-center"
       >
         <p className="text-sm font-medium uppercase tracking-wide text-aivo-ink-soft">
-          Refreshing
+          {t("refreshing")}
         </p>
         <h1 className="mt-2 font-display text-3xl font-bold">
-          One moment — getting the latest version…
+          {t("one_moment")}
         </h1>
       </main>
     );
@@ -71,19 +73,19 @@ export default function ErrorPage({
       className="mx-auto flex min-h-[70vh] max-w-xl flex-col items-center justify-center px-6 py-16 text-center"
     >
       <p className="text-sm font-medium uppercase tracking-wide text-aivo-danger">
-        Something went wrong
+        {t("something_went_wrong")}
       </p>
-      <h1 className="mt-2 font-display text-4xl font-bold">Let's try that again.</h1>
+      <h1 className="mt-2 font-display text-4xl font-bold">{t("lets_try_again")}</h1>
       <p className="mt-3 text-aivo-ink-soft">
-        We hit an unexpected error. You can retry now, or head home and come back in a moment.
+        {t("unexpected_error")}
       </p>
       {error.digest ? (
         <p className="mt-2 text-xs text-aivo-muted">Reference: {error.digest}</p>
       ) : null}
       <div className="mt-6 flex gap-3">
-        <Button onClick={() => reset()}>Try again</Button>
+        <Button onClick={() => reset()}>{t("try_again")}</Button>
         <Button variant="outline" onClick={() => (window.location.href = "/")}>
-          Back to home
+          {t("back_to_home")}
         </Button>
       </div>
     </main>

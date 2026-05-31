@@ -679,7 +679,8 @@
     "building_tutors_caption": "प्रत्येक AI ट्यूटर को {name} के स्तर के अनुसार समायोजित किया जा रहा है",
     "building_complete_title": "{name} का ब्रेन तैयार है",
     "building_complete_caption": "{name} के मूल्यांकन डेटा से ब्रेन बनाया गया है। नीचे विवरण देखें और तय करें कि आगे क्या हो।",
-    "building_complete_cta": "समीक्षा करें और तय करें"
+    "building_complete_cta": "समीक्षा करें और तय करें",
+    "skip_animation": "एनिमेशन छोड़ें"
   },
   "learner": {
     "errors": {
@@ -860,7 +861,7 @@
     },
     "baseline": {
       "back": "वापस",
-      "back_home": "होम पर वापस",
+      "back_home": "होम पर वापस जाएँ",
       "index": {
         "notready_eyebrow": "बस तैयार ही है",
         "notready_title": "एक बड़ा अब भी इसे सेट कर रहा है",
@@ -1098,6 +1099,19 @@
       "saving": "सहेजा जा रहा है…",
       "done": "मैं पूरा कर चुका",
       "complete_error": "हम यह पाठ सहेज नहीं सके। कृपया 'मैं पूरा कर चुका' बटन फिर से आज़माएँ।"
+    },
+    "baseline_runner": {
+      "exit_proctor_view": "प्रॉक्टर व्यू से बाहर निकलें",
+      "ready_title": "बस एक आख़िरी टैप",
+      "ready_body": "आपने हर प्रश्न का उत्तर दे दिया। तैयार होने पर अपने उत्तर भेजें।",
+      "finish_baseline": "बेसलाइन पूरा करें",
+      "resume": "फिर से शुरू करें",
+      "stop_for_today": "आज के लिए रोकें",
+      "choose_one": "एक चुनें",
+      "type_answer": "अपना उत्तर लिखें"
+    },
+    "lesson_run": {
+      "back_to_today": "आज पर वापस जाएँ"
     }
   },
   "auth": {
@@ -1156,7 +1170,8 @@
       "name_label": "आपका नाम",
       "email_label": "ईमेल",
       "password_label": "पासवर्ड",
-      "password_helper": "एक संख्या और एक प्रतीक के साथ कम से कम 8 अक्षर।"
+      "password_helper": "एक संख्या और एक प्रतीक के साथ कम से कम 8 अक्षर।",
+      "name_placeholder": "Riley Parent"
     },
     "forgot": {
       "heading": "अपना पासवर्ड रीसेट करें",
@@ -1297,7 +1312,9 @@
       "invite_label": "आमंत्रण कोड",
       "invite_helper": "आपके स्कूल या ज़िले ने इसे स्वागत ईमेल में भेजा था।",
       "name_label": "आपका नाम",
-      "password_helper": "कम से कम 12 अक्षर। सहेजने से पहले हम जाँचेंगे कि यह किसी ज्ञात लीक में नहीं है।"
+      "password_helper": "कम से कम 12 अक्षर। सहेजने से पहले हम जाँचेंगे कि यह किसी ज्ञात लीक में नहीं है।",
+      "code_placeholder": "जैसे SCHOOL-7Q4M-2025",
+      "name_placeholder": "पहला और अंतिम नाम"
     },
     "role": {
       "eyebrow": "अपनी भूमिका चुनें",
@@ -1502,7 +1519,8 @@
       "join": "स्कूल से जुड़ें",
       "code_label": "आमंत्रण कोड",
       "email_label": "आपका स्कूल ईमेल",
-      "email_helper": "उस ईमेल से मेल खाना चाहिए जिस पर प्रशासक ने आपको आमंत्रित किया।"
+      "email_helper": "उस ईमेल से मेल खाना चाहिए जिस पर प्रशासक ने आपको आमंत्रित किया।",
+      "code_placeholder": "जैसे SCHOOL-7Q4M-2025"
     },
     "invite_district": {
       "eyebrow": "ज़िला आमंत्रण",
@@ -1511,7 +1529,8 @@
       "reassure_title": "ज़िला प्रशासक की प्रबलित जाँच लागू है।",
       "reassure_body": "इस भूमिका के हर साइन-इन के लिए एक नई बायोमेट्रिक या PIN जाँच आवश्यक है। AIVO कभी किसी एकल पासवर्ड को ज़िला डेटा अनलॉक नहीं करने देता।",
       "code_label": "ज़िला आमंत्रण कोड",
-      "email_label": "आपका ज़िला ईमेल"
+      "email_label": "आपका ज़िला ईमेल",
+      "code_placeholder": "जैसे DISTRICT-9F2L-2025"
     },
     "error": {
       "expired_invite_eyebrow": "आमंत्रण समाप्त",
@@ -2159,6 +2178,300 @@
       "col_status": "स्थिति",
       "col_last_delivery": "अंतिम डिलीवरी",
       "col_failures": "विफलताएँ"
+    },
+    "platform_billing_coupons": {
+      "title": "कूपन",
+      "empty_title": "अभी कोई कूपन नहीं",
+      "col_discount": "छूट",
+      "col_applies_to": "लागू होता है",
+      "col_status": "स्थिति",
+      "col_redemptions": "मोचन",
+      "col_valid_window": "वैधता अवधि"
+    },
+    "platform_billing_daily_batch": {
+      "title": "दैनिक बिलिंग बैच",
+      "empty_title": "अभी कोई बैच रन नहीं",
+      "col_run_date": "रन तिथि",
+      "col_window": "विंडो",
+      "col_status": "स्थिति",
+      "col_generated": "जनरेट हुए",
+      "col_failed": "विफल",
+      "col_total_billed": "कुल बिल"
+    },
+    "platform_billing_invoices": {
+      "title": "चालान",
+      "link_revenue_summary": "राजस्व सारांश",
+      "stat_total_invoices": "कुल चालान",
+      "stat_outstanding": "बकाया",
+      "empty_title": "अभी कोई चालान नहीं",
+      "col_number": "संख्या",
+      "col_tenant": "टेनेंट",
+      "col_amount": "राशि",
+      "col_status": "स्थिति",
+      "col_period": "अवधि"
     }
+  },
+  "teacher": {
+    "home": {
+      "open_needs_support_list": "सहायता की ज़रूरत वाली सूची खोलें",
+      "open_arrow": "खोलें →",
+      "your_roster": "आपकी सूची",
+      "see_all_learners": "सभी शिक्षार्थी देखें →",
+      "no_learners_yet": "अभी कोई शिक्षार्थी नहीं",
+      "connect_roster": "सूची जोड़ें",
+      "roster_snapshot": "सूची का सारांश",
+      "add_another_class": "एक और कक्षा जोड़ें"
+    },
+    "lesson_plans": {
+      "page_title": "AI पाठ योजनाएँ",
+      "new_assignment": "नया असाइनमेंट",
+      "generated_recent": "जेनरेट किए गए (हाल के)",
+      "ai_jobs": "AI कार्य",
+      "fallback_chain": "फ़ॉलबैक श्रृंखला",
+      "fallback_primary_model": "Claude Opus 4.7",
+      "latest_lesson_plans": "नवीनतम पाठ योजनाएँ",
+      "no_lesson_plans_yet": "अभी कोई पाठ योजना नहीं",
+      "generation_activity": "जेनरेशन गतिविधि",
+      "no_ai_jobs": "इस अवधि में कोई AI जेनरेशन कार्य नहीं।",
+      "col_started": "शुरू हुआ",
+      "col_status": "स्थिति",
+      "col_completed": "पूर्ण"
+    },
+    "reports": {
+      "title": "कक्षा रिपोर्ट",
+      "col_learners": "शिक्षार्थी",
+      "class_mastery": "कक्षा दक्षता",
+      "on_track": "सही रास्ते पर",
+      "avg_mastery_threshold": "औसत ≥ 70% दक्षता",
+      "ieps_on_file": "दर्ज IEP",
+      "mastery_distribution": "दक्षता वितरण",
+      "no_mastery_data": "अभी कोई दक्षता डेटा नहीं — जब शिक्षार्थी बेसलाइन पूरी कर लेंगे, तो वितरण दिखेगा।",
+      "learner_rollup": "शिक्षार्थी सारांश",
+      "no_learners_assigned": "कोई शिक्षार्थी नियुक्त नहीं",
+      "col_learner": "शिक्षार्थी",
+      "col_skills": "कौशल",
+      "col_avg_mastery": "औसत दक्षता",
+      "col_on_grade": "ग्रेड स्तर पर",
+      "col_emerging": "उभरता हुआ",
+      "col_actions": "क्रियाएँ",
+      "iep_on_file": "दर्ज"
+    },
+    "learner_overview": {
+      "this_week_at_school": "इस सप्ताह स्कूल में →",
+      "active_assignments": "सक्रिय असाइनमेंट",
+      "no_active_assignments": "इस शिक्षार्थी के लिए कोई सक्रिय असाइनमेंट नहीं।",
+      "recent_lessons": "हाल के पाठ",
+      "no_lessons_started": "अभी तक कोई पाठ शुरू नहीं हुआ।",
+      "skill_gaps": "कौशल की कमियाँ",
+      "no_notable_gaps": "अभी कोई उल्लेखनीय कमी नहीं — जारी रखें।",
+      "accommodations_teacher_summary": "समायोजन (शिक्षक सारांश)"
+    },
+    "learner_iep_draft": {
+      "page_title": "IEP लक्ष्य मसौदा",
+      "no_iep_on_file": "कोई IEP दर्ज नहीं",
+      "current_iep": "वर्तमान IEP",
+      "existing_learning_goals": "मौजूदा सीखने के लक्ष्य",
+      "none_on_file": "कोई दर्ज नहीं।",
+      "accommodations": "समायोजन",
+      "none_recorded": "कोई दर्ज नहीं।",
+      "suggested_goal_drafts": "सुझाए गए लक्ष्य मसौदे",
+      "how_drafts_generated": "मसौदे कैसे बनाए जाते हैं"
+    },
+    "classes": {
+      "title": "आपकी कक्षाएँ",
+      "empty_title": "कोई कक्षा नहीं सौंपी गई"
+    },
+    "error": {
+      "eyebrow": "शिक्षक क्षेत्र",
+      "heading": "इस पृष्ठ को लोड करते समय कुछ गलत हो गया।",
+      "body": "आपकी कक्षा का डेटा सुरक्षित है। दोबारा प्रयास करें या अपने शिक्षक होम पर वापस जाएँ।",
+      "retry": "पुनः प्रयास करें",
+      "home_link": "शिक्षक होम"
+    },
+    "insights": {
+      "title": "अंतर्दृष्टि",
+      "empty_title": "आपके टेनेंट में कोई सीखने वाला नहीं"
+    },
+    "learners": {
+      "title": "आपकी छात्र सूची",
+      "empty": "अभी तक आपको कोई सीखने वाला नहीं सौंपा गया है।"
+    },
+    "not_found": {
+      "eyebrow": "शिक्षक क्षेत्र · 404",
+      "heading": "हम वह पृष्ठ नहीं ढूँढ़ सके।",
+      "body": "हो सकता है लिंक बदल गया हो, या सीखने वाला अब आपकी कक्षा में नामांकित नहीं है।",
+      "home_link": "शिक्षक होम",
+      "classes_link": "मेरी कक्षाएँ"
+    },
+    "settings": {
+      "title": "सेटिंग्स",
+      "signed_in_as": "इस रूप में लॉग इन किया"
+    },
+    "assignments_new": {
+      "title": "नया असाइनमेंट",
+      "instructions_label": "निर्देश",
+      "subject_label": "विषय",
+      "skills_label": "कौशल",
+      "assign_label": "इन्हें सौंपें",
+      "no_learners": "कोई सीखने वाला नहीं",
+      "due_date_label": "नियत तिथि"
+    },
+    "assignments": {
+      "title": "असाइनमेंट",
+      "new_assignment": "नया असाइनमेंट",
+      "empty": "अभी कोई असाइनमेंट नहीं।"
+    },
+    "classes_class": {
+      "roster": "रोस्टर",
+      "no_learners": "कोई सीखने वाला नहीं"
+    }
+  },
+  "therapist": {
+    "home": {
+      "stat_caseload": "केसलोड",
+      "stat_ieps": "दर्ज IEP",
+      "quick_links": "त्वरित लिंक",
+      "link_sessions": "सत्र →",
+      "link_reports": "रिपोर्ट →",
+      "section_caseload": "केसलोड",
+      "empty_title": "अभी कोई सीखने वाला नहीं"
+    },
+    "reports": {
+      "title": "रिपोर्ट",
+      "empty_title": "अभी कोई केसलोड नहीं",
+      "focus_label": "फोकस:",
+      "skills_tracked": "ट्रैक किए गए कौशल",
+      "avg_score": "औसत स्कोर"
+    },
+    "sessions": {
+      "title": "सत्र",
+      "empty_no_caseload": "अभी कोई केसलोड नहीं",
+      "empty_no_sessions": "अभी तक कोई सत्र दर्ज नहीं हुआ"
+    },
+    "settings": {
+      "title": "सेटिंग्स",
+      "section_profile": "प्रोफ़ाइल",
+      "role_label": "चिकित्सक",
+      "section_notifications": "सूचनाएँ"
+    }
+  },
+  "caregiver": {
+    "home": {
+      "on_care_team": "आपकी देखभाल टीम में",
+      "active_or_ready": "सक्रिय या तैयार",
+      "quick_links": "त्वरित लिंक",
+      "link_observations": "अवलोकन →",
+      "link_roster": "सूची →",
+      "your_learners": "आपके सीखने वाले",
+      "no_learners_yet": "अभी तक कोई सीखने वाला नहीं"
+    },
+    "learners": {
+      "title": "सीखने वाले",
+      "no_learners_yet": "अभी तक कोई सीखने वाला नहीं",
+      "primary_language": "प्राथमिक भाषा",
+      "reading_comfort": "पढ़ने की क्षमता",
+      "math_comfort": "गणित की क्षमता"
+    },
+    "observations": {
+      "page_title": "अवलोकन",
+      "section_log": "अवलोकन दर्ज करें",
+      "no_learners_yet": "अभी तक कोई सीखने वाला नहीं",
+      "no_lesson_activity_yet": "अभी तक कोई पाठ गतिविधि नहीं",
+      "no_observations_yet": "अभी तक कोई देखभालकर्ता अवलोकन नहीं है। जो आपने देखा उसे रिकॉर्ड करने के लिए ऊपर का फ़ॉर्म भरें।",
+      "label_antecedent": "पूर्ववर्ती घटना",
+      "label_behaviour": "व्यवहार",
+      "label_consequence": "परिणाम",
+      "field_learner": "सीखने वाला",
+      "choose_learner": "सीखने वाला चुनें…",
+      "field_location": "स्थान",
+      "loc_school": "विद्यालय",
+      "loc_community": "समुदाय",
+      "loc_therapy": "चिकित्सा",
+      "field_behaviour": "व्यवहार (आपने क्या देखा?)",
+      "behaviour_placeholder": "व्यवहार का संक्षिप्त विवरण दें।",
+      "field_antecedent": "पूर्ववर्ती घटना (पहले क्या हुआ था?)",
+      "field_consequence": "परिणाम (बाद में क्या हुआ?)",
+      "field_duration": "अवधि (मिनट, वैकल्पिक)"
+    },
+    "settings": {
+      "page_title": "सेटिंग्स",
+      "section_profile": "प्रोफ़ाइल",
+      "section_notifications": "सूचनाएँ",
+      "role_label": "देखभालकर्ता"
+    }
+  },
+  "accept_invite": {
+    "page": {
+      "accept_heading": "अपना निमंत्रण स्वीकार करें",
+      "invited_to_join": "आपको एक शिक्षण दल में शामिल होने के लिए आमंत्रित किया गया है।",
+      "create_account": "नया खाता बनाएँ",
+      "signed_in_as": "आप इस रूप में साइन इन हैं",
+      "sign_in_different": "किसी अन्य खाते से साइन इन करें"
+    },
+    "actions": {
+      "no_pending_for": "इस ईमेल के लिए कोई लंबित निमंत्रण नहीं मिला:",
+      "continue": "जारी रखें",
+      "added_to": "आपको जोड़ा गया:",
+      "continue_to_dashboard": "अपने डैशबोर्ड पर जाएँ",
+      "signed_in_as": "साइन इन किया हुआ:",
+      "accepting": "स्वीकार किया जा रहा है…"
+    }
+  },
+  "root": {
+    "error": {
+      "refreshing": "रिफ्रेश हो रहा है",
+      "one_moment": "एक पल — नवीनतम संस्करण लाया जा रहा है…",
+      "something_went_wrong": "कुछ गलत हो गया",
+      "lets_try_again": "चलिए फिर से प्रयास करते हैं।",
+      "unexpected_error": "एक अप्रत्याशित त्रुटि हुई। आप अभी पुनः प्रयास कर सकते हैं, या होम पर जाएँ और कुछ देर बाद वापस आएँ।",
+      "try_again": "पुनः प्रयास करें",
+      "back_to_home": "होम पर वापस जाएँ"
+    },
+    "global_error": {
+      "heading": "कुछ बहुत गलत हो गया।",
+      "body": "कृपया पुनः प्रयास करें। यदि यह समस्या बनी रहती है, तो सहायता से संपर्क करें।",
+      "try_again": "पुनः प्रयास करें"
+    },
+    "layout": {
+      "skip_to_main": "मुख्य सामग्री पर जाएँ"
+    },
+    "not_found": {
+      "heading": "हम वह पृष्ठ नहीं ढूँढ़ सके।",
+      "back_to_home": "होम पर वापस जाएँ"
+    },
+    "home": {
+      "ferpa_coppa": "FERPA और COPPA अनुपालित",
+      "switch_role": "भूमिका बदलें",
+      "start_family_trial": "पारिवारिक ट्रायल शुरू करें",
+      "for_school_districts": "स्कूल जिलों के लिए",
+      "trusted_by": "1,200 से अधिक विशेषज्ञों और अभिभावकों का विश्वास।"
+    }
+  },
+  "settings_accessibility": {
+    "nav_label": "पहुँच-क्षमता",
+    "page_title": "पहुँच-क्षमता",
+    "sensory_mode": "संवेदी मोड",
+    "text_and_reading": "पाठ और पठन",
+    "age_mode": "आयु मोड",
+    "choose_age_mode": "आयु मोड चुनें",
+    "age_sprout": "Sprout (4–7)",
+    "age_spark": "Spark (8–12)",
+    "age_scholar": "Scholar (13+)",
+    "choose_theme": "थीम चुनें",
+    "high_contrast": "उच्च कंट्रास्ट",
+    "text_size": "पाठ आकार",
+    "language": "भाषा",
+    "choose_language": "भाषा चुनें",
+    "lang_en_us": "English (US)",
+    "lang_es": "Español",
+    "lang_fr": "Français"
+  },
+  "district_login": {
+    "heading": "जिला प्रशासन",
+    "security_badge": "MFA अनिवार्य · SOC 2 · FERPA",
+    "mobile_heading": "जिला साइन-इन",
+    "card_title": "जिला कंसोल में साइन इन करें",
+    "sign_in_btn": "साइन इन करें",
+    "standard_sign_in": "मानक साइन-इन का उपयोग करें"
   }
 }

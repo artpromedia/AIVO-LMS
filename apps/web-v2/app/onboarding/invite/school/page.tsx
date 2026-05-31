@@ -64,7 +64,7 @@ export default function SchoolInvitePage() {
             label={t("code_label")}
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            placeholder="e.g. SCHOOL-7Q4M-2025"
+            placeholder={t("code_placeholder")}
             autoComplete="one-time-code"
             error={error ?? undefined}
           />
