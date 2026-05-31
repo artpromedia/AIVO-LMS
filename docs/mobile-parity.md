@@ -15,12 +15,12 @@ sub-feature is missing · **Missing** not yet on mobile.
 
 | Status             | Count   |
 | ------------------ | ------- |
-| Parity             | 45      |
-| Partial            | 17      |
-| Missing            | 51      |
+| Parity             | 48      |
+| Partial            | 18      |
+| Missing            | 47      |
 | **In-scope total** | **113** |
 
-Full parity: **40%**. 90 web-only routes excluded.
+Full parity: **42%**. 90 web-only routes excluded.
 
 ## Auth & Shared
 
@@ -90,49 +90,49 @@ Full parity: **40%**. 90 web-only routes excluded.
 
 ## Parent
 
-| Web route                                           | Mobile screen                    | Status      | Gap / Ticket                                                                                  |
-| --------------------------------------------------- | -------------------------------- | ----------- | --------------------------------------------------------------------------------------------- |
-| `/parent/home`                                      | `(parent)/index`                 | Parity      | —                                                                                             |
-| `/parent/home-v2`                                   | `(parent)/home-v2`               | Parity      | —                                                                                             |
-| `/parent/learners`                                  | —                                | **Missing** | MOB-PAR-001: parent learners LIST area (mobile only shows children inline on home).           |
-| `/parent/learners/new`                              | —                                | **Missing** | MOB-PAR-002: add-learner form (district lookup, AI strength suggestions).                     |
-| `/parent/learners/[learnerId]`                      | —                                | **Missing** | MOB-PAR-003: learner profile hub (quick-access + exploration grid + profile basics).          |
-| `/parent/learners/[learnerId]/assessment`           | —                                | **Missing** | MOB-PAR-004: parent assessment wizard (17+ steps, autosave, AI suggestions).                  |
-| `/parent/learners/[learnerId]/assessment/intro`     | —                                | **Missing** | MOB-PAR-004: assessment intro.                                                                |
-| `/parent/learners/[learnerId]/assessment/review`    | —                                | **Missing** | MOB-PAR-004: assessment review.                                                               |
-| `/parent/learners/[learnerId]/assessment/submitted` | —                                | **Missing** | MOB-PAR-004: assessment submitted confirmation.                                               |
-| `/parent/learners/[learnerId]/baseline`             | —                                | **Missing** | MOB-PAR-005: parent baseline status + start/restart.                                          |
-| `/parent/learners/[learnerId]/baseline/pending`     | —                                | **Missing** | MOB-PAR-005: baseline pending state.                                                          |
-| `/parent/learners/[learnerId]/baseline/summary`     | —                                | **Missing** | MOB-PAR-005: baseline summary.                                                                |
-| `/parent/learners/[learnerId]/brain-clone-watch`    | —                                | **Missing** | MOB-PAR-006: brain-clone build/approval cinematic (mobile-only parents cannot approve today). |
-| `/parent/learners/[learnerId]/brain-profile`        | `(parent)/brain/[childId]/index` | Parity      | —                                                                                             |
-| `/parent/learners/[learnerId]/curriculum`           | —                                | **Missing** | MOB-PAR-007: upload school curriculum (CurriculumManager).                                    |
-| `/parent/learners/[learnerId]/gradebook`            | —                                | **Missing** | MOB-PAR-008: parent gradebook (subject averages, per-skill table, recent runs).               |
-| `/parent/learners/[learnerId]/homework`             | —                                | **Missing** | MOB-PAR-009: parent homework summary view.                                                    |
-| `/parent/learners/[learnerId]/iep`                  | `(parent)/iep/[childId]`         | **Partial** | MOB-PAR-010: IEP review sub-flow parity.                                                      |
-| `/parent/learners/[learnerId]/iep/review`           | —                                | **Missing** | MOB-PAR-010: IEP review screen.                                                               |
-| `/parent/learners/[learnerId]/lessons`              | —                                | **Missing** | MOB-PAR-011: plain-language per-lesson recaps.                                                |
-| `/parent/learners/[learnerId]/milestones`           | `(parent)/milestones/[childId]`  | Parity      | —                                                                                             |
-| `/parent/learners/[learnerId]/profile-v2`           | —                                | **Missing** | MOB-PAR-012: profile-v2 metric hub.                                                           |
-| `/parent/learners/[learnerId]/progress`             | `(parent)/progress/[childId]`    | Parity      | —                                                                                             |
-| `/parent/learners/[learnerId]/sensory`              | —                                | **Missing** | MOB-PAR-013: sensory profile (5 modality cards).                                              |
-| `/parent/learners/[learnerId]/settings`             | —                                | **Missing** | MOB-PAR-014: per-learner settings + delete learner.                                           |
-| `/parent/learners/[learnerId]/snapshot`             | —                                | **Missing** | MOB-PAR-015: weekly one-glance snapshot.                                                      |
-| `/parent/learners/[learnerId]/summary`              | —                                | **Missing** | MOB-PAR-016: learner overall summary.                                                         |
-| `/parent/learners/[learnerId]/team`                 | `(parent)/team/[childId]`        | Parity      | —                                                                                             |
-| `/parent/learners/[learnerId]/accessibility`        | —                                | **Missing** | MOB-PAR-017: per-learner accessibility form.                                                  |
-| `/parent/learners/[learnerId]/accessibility/audio`  | —                                | **Missing** | MOB-PAR-017: per-learner audio prefs.                                                         |
-| `/parent/consent`                                   | —                                | **Missing** | MOB-PAR-018: ongoing consent/approvals center (account-level).                                |
-| `/parent/consent/[learnerId]`                       | —                                | **Missing** | MOB-PAR-018: per-learner consent (COPPA notice).                                              |
-| `/parent/notifications`                             | `(parent)/inbox`                 | **Partial** | MOB-PAR-019: notifications parity (read state, live stream) vs current inbox.                 |
-| `/parent/reports`                                   | —                                | **Missing** | MOB-PAR-020: parent reports (weekly metrics + recaps per learner).                            |
-| `/parent/schedule`                                  | —                                | **Missing** | MOB-PAR-021: parent schedule (assignments + active lessons).                                  |
-| `/parent/privacy`                                   | —                                | **Missing** | MOB-PAR-022: privacy hub.                                                                     |
-| `/parent/privacy/data-export`                       | —                                | **Missing** | MOB-PAR-022: data export request.                                                             |
-| `/parent/privacy/delete-data`                       | —                                | **Missing** | MOB-PAR-022: data deletion request.                                                           |
-| `/parent/settings`                                  | `(parent)/settings`              | Parity      | —                                                                                             |
-| `/parent/settings/account`                          | —                                | **Missing** | MOB-PAR-023: account settings sub-screen (display name etc.).                                 |
-| `/parent/settings/billing`                          | `(parent)/billing`               | Parity      | —                                                                                             |
+| Web route                                           | Mobile screen                    | Status      | Gap / Ticket                                                                                                                          |
+| --------------------------------------------------- | -------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `/parent/home`                                      | `(parent)/index`                 | Parity      | —                                                                                                                                     |
+| `/parent/home-v2`                                   | `(parent)/home-v2`               | Parity      | —                                                                                                                                     |
+| `/parent/learners`                                  | `(parent)/learners/index`        | Parity      | —                                                                                                                                     |
+| `/parent/learners/new`                              | —                                | **Missing** | MOB-PAR-002: add-learner form (district lookup, AI strength suggestions).                                                             |
+| `/parent/learners/[learnerId]`                      | `(parent)/learners/[learnerId]`  | Parity      | —                                                                                                                                     |
+| `/parent/learners/[learnerId]/assessment`           | —                                | **Missing** | MOB-PAR-004: parent assessment wizard (17+ steps, autosave, AI suggestions).                                                          |
+| `/parent/learners/[learnerId]/assessment/intro`     | —                                | **Missing** | MOB-PAR-004: assessment intro.                                                                                                        |
+| `/parent/learners/[learnerId]/assessment/review`    | —                                | **Missing** | MOB-PAR-004: assessment review.                                                                                                       |
+| `/parent/learners/[learnerId]/assessment/submitted` | —                                | **Missing** | MOB-PAR-004: assessment submitted confirmation.                                                                                       |
+| `/parent/learners/[learnerId]/baseline`             | —                                | **Missing** | MOB-PAR-005: parent baseline status + start/restart.                                                                                  |
+| `/parent/learners/[learnerId]/baseline/pending`     | —                                | **Missing** | MOB-PAR-005: baseline pending state.                                                                                                  |
+| `/parent/learners/[learnerId]/baseline/summary`     | —                                | **Missing** | MOB-PAR-005: baseline summary.                                                                                                        |
+| `/parent/learners/[learnerId]/brain-clone-watch`    | —                                | **Missing** | MOB-PAR-006: brain-clone build/approval cinematic (mobile-only parents cannot approve today).                                         |
+| `/parent/learners/[learnerId]/brain-profile`        | `(parent)/brain/[childId]/index` | Parity      | —                                                                                                                                     |
+| `/parent/learners/[learnerId]/curriculum`           | —                                | **Missing** | MOB-PAR-007: upload school curriculum (CurriculumManager).                                                                            |
+| `/parent/learners/[learnerId]/gradebook`            | `(parent)/gradebook/[childId]`   | **Partial** | MOB-PAR-008: per-skill table + recent runs pending a skills/lesson-runs REST endpoint (mobile shows subject averages + mastery heat). |
+| `/parent/learners/[learnerId]/homework`             | —                                | **Missing** | MOB-PAR-009: parent homework summary view.                                                                                            |
+| `/parent/learners/[learnerId]/iep`                  | `(parent)/iep/[childId]`         | **Partial** | MOB-PAR-010: IEP review sub-flow parity.                                                                                              |
+| `/parent/learners/[learnerId]/iep/review`           | —                                | **Missing** | MOB-PAR-010: IEP review screen.                                                                                                       |
+| `/parent/learners/[learnerId]/lessons`              | —                                | **Missing** | MOB-PAR-011: plain-language per-lesson recaps.                                                                                        |
+| `/parent/learners/[learnerId]/milestones`           | `(parent)/milestones/[childId]`  | Parity      | —                                                                                                                                     |
+| `/parent/learners/[learnerId]/profile-v2`           | —                                | **Missing** | MOB-PAR-012: profile-v2 metric hub.                                                                                                   |
+| `/parent/learners/[learnerId]/progress`             | `(parent)/progress/[childId]`    | Parity      | —                                                                                                                                     |
+| `/parent/learners/[learnerId]/sensory`              | —                                | **Missing** | MOB-PAR-013: sensory profile (5 modality cards).                                                                                      |
+| `/parent/learners/[learnerId]/settings`             | —                                | **Missing** | MOB-PAR-014: per-learner settings + delete learner.                                                                                   |
+| `/parent/learners/[learnerId]/snapshot`             | —                                | **Missing** | MOB-PAR-015: weekly one-glance snapshot.                                                                                              |
+| `/parent/learners/[learnerId]/summary`              | `(parent)/summary/[childId]`     | Parity      | —                                                                                                                                     |
+| `/parent/learners/[learnerId]/team`                 | `(parent)/team/[childId]`        | Parity      | —                                                                                                                                     |
+| `/parent/learners/[learnerId]/accessibility`        | —                                | **Missing** | MOB-PAR-017: per-learner accessibility form.                                                                                          |
+| `/parent/learners/[learnerId]/accessibility/audio`  | —                                | **Missing** | MOB-PAR-017: per-learner audio prefs.                                                                                                 |
+| `/parent/consent`                                   | —                                | **Missing** | MOB-PAR-018: ongoing consent/approvals center (account-level).                                                                        |
+| `/parent/consent/[learnerId]`                       | —                                | **Missing** | MOB-PAR-018: per-learner consent (COPPA notice).                                                                                      |
+| `/parent/notifications`                             | `(parent)/inbox`                 | **Partial** | MOB-PAR-019: notifications parity (read state, live stream) vs current inbox.                                                         |
+| `/parent/reports`                                   | —                                | **Missing** | MOB-PAR-020: parent reports (weekly metrics + recaps per learner).                                                                    |
+| `/parent/schedule`                                  | —                                | **Missing** | MOB-PAR-021: parent schedule (assignments + active lessons).                                                                          |
+| `/parent/privacy`                                   | —                                | **Missing** | MOB-PAR-022: privacy hub.                                                                                                             |
+| `/parent/privacy/data-export`                       | —                                | **Missing** | MOB-PAR-022: data export request.                                                                                                     |
+| `/parent/privacy/delete-data`                       | —                                | **Missing** | MOB-PAR-022: data deletion request.                                                                                                   |
+| `/parent/settings`                                  | `(parent)/settings`              | Parity      | —                                                                                                                                     |
+| `/parent/settings/account`                          | —                                | **Missing** | MOB-PAR-023: account settings sub-screen (display name etc.).                                                                         |
+| `/parent/settings/billing`                          | `(parent)/billing`               | Parity      | —                                                                                                                                     |
 
 ## Teacher
 

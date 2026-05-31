@@ -255,24 +255,14 @@ const PARITY_MATRIX = {
   Parent: [
     { web: "/parent/home", mobile: "(parent)/index", status: P },
     { web: "/parent/home-v2", mobile: "(parent)/home-v2", status: P },
-    {
-      web: "/parent/learners",
-      mobile: null,
-      status: MISSING,
-      gap: "MOB-PAR-001: parent learners LIST area (mobile only shows children inline on home).",
-    },
+    { web: "/parent/learners", mobile: "(parent)/learners/index", status: P },
     {
       web: "/parent/learners/new",
       mobile: null,
       status: MISSING,
       gap: "MOB-PAR-002: add-learner form (district lookup, AI strength suggestions).",
     },
-    {
-      web: "/parent/learners/[learnerId]",
-      mobile: null,
-      status: MISSING,
-      gap: "MOB-PAR-003: learner profile hub (quick-access + exploration grid + profile basics).",
-    },
+    { web: "/parent/learners/[learnerId]", mobile: "(parent)/learners/[learnerId]", status: P },
     {
       web: "/parent/learners/[learnerId]/assessment",
       mobile: null,
@@ -334,9 +324,9 @@ const PARITY_MATRIX = {
     },
     {
       web: "/parent/learners/[learnerId]/gradebook",
-      mobile: null,
-      status: MISSING,
-      gap: "MOB-PAR-008: parent gradebook (subject averages, per-skill table, recent runs).",
+      mobile: "(parent)/gradebook/[childId]",
+      status: PARTIAL,
+      gap: "MOB-PAR-008: per-skill table + recent runs pending a skills/lesson-runs REST endpoint (mobile shows subject averages + mastery heat).",
     },
     {
       web: "/parent/learners/[learnerId]/homework",
@@ -398,9 +388,8 @@ const PARITY_MATRIX = {
     },
     {
       web: "/parent/learners/[learnerId]/summary",
-      mobile: null,
-      status: MISSING,
-      gap: "MOB-PAR-016: learner overall summary.",
+      mobile: "(parent)/summary/[childId]",
+      status: P,
     },
     { web: "/parent/learners/[learnerId]/team", mobile: "(parent)/team/[childId]", status: P },
     {
