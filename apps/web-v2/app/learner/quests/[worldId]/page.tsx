@@ -6,6 +6,7 @@
  */
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { readActiveLearnerFromCookies } from "@/lib/auth/active-learner";
 import { AppShell } from "@/components/layout/app-shell";
@@ -40,6 +41,7 @@ export default async function QuestWorldPage({ params }: Params) {
   const chapters = await listQuestChapters(worldId);
   const progress = await listQuestProgressForLearner(learnerId, session.tenantId, worldId);
   const completed = new Set(progress.filter((p) => p.progress >= 1).map((p) => p.chapterId));
+  const t = await getTranslations("learner.quests");
 
   return (
     <AppShell
@@ -48,8 +50,8 @@ export default async function QuestWorldPage({ params }: Params) {
       navItems={LEARNER_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <PageHeader eyebrow="Quest" title={world.name} description={world.description} />
-      <ul className="grid gap-3" aria-label="Quest chapters">
+      <PageHeader eyebrow={t("world_eyebrow")} title={world.name} description={world.description} />
+      <ul className="grid gap-3" aria-label={t("chapters_aria")}>
         {await Promise.all(
           chapters.map(async (c) => {
             const unlocked = await isQuestChapterUnlocked(learnerId!, session.tenantId, c);
@@ -62,13 +64,13 @@ export default async function QuestWorldPage({ params }: Params) {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs uppercase tracking-wide text-muted-foreground">
-                      Chapter {c.order}
-                      {c.isBoss ? " · Boss" : ""}
+                      {t("chapter_label", { order: c.order })}
+                      {c.isBoss ? t("boss_suffix") : ""}
                     </span>
                     {isDone ? (
-                      <Badge tone="success">Done</Badge>
+                      <Badge tone="success">{t("status_done")}</Badge>
                     ) : !unlocked ? (
-                      <Badge tone="neutral">Locked</Badge>
+                      <Badge tone="neutral">{t("status_locked")}</Badge>
                     ) : null}
                   </div>
                   <h2 className="text-lg font-semibold mt-1">{c.title}</h2>
