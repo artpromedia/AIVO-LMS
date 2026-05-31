@@ -61,4 +61,18 @@ describe("cross-cutting surface registry (ADR 0020 Phase 2)", () => {
     expect(meta?.navArea).toBe("messages");
     expect(meta?.phase).toBe(1);
   });
+
+  it("pins messages (Phase 2 slice 2) to /messages on both shells", () => {
+    // ADR 0020 §Phase 2 row 2: the canonical destination for the
+    // messages surface is /messages on web and mobile, anchored on
+    // the same `messages` NavArea as notifications. Phase 2 slice 2
+    // (apps/web-v2/app/messages + apps/mobile/app/messages.tsx)
+    // reads this pin directly, so a registry edit that drops or
+    // moves it would silently break the migration.
+    const meta = getCrossCuttingSurface("messages");
+    expect(meta?.webRoute).toBe("/messages");
+    expect(meta?.mobileRoute).toBe("/messages");
+    expect(meta?.navArea).toBe("messages");
+    expect(meta?.phase).toBe(2);
+  });
 });
