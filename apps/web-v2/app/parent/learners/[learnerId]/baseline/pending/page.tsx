@@ -48,8 +48,12 @@ export default async function BaselinePendingPage({
   // Brain profile is a hard prereq for baseline generation. If it's
   // missing, sending the parent in circles on a "loading" screen is
   // worse than telling them what to do — bounce to the brain-profile
-  // step explicitly.
-  if (!getBrainProfile(learnerId, session.tenantId)) {
+  // step explicitly. (Note: `getBrainProfile` is async — without the
+  // await this check was `!Promise` ⇒ always false, so the redirect
+  // never fired and the parent's "Setting it up…" CTA span forever
+  // while `createBaseline` below hung on the missing prereq.)
+  const brainProfile = await getBrainProfile(learnerId, session.tenantId);
+  if (!brainProfile) {
     redirect(`/parent/learners/${learner.id}/brain-profile`);
   }
 

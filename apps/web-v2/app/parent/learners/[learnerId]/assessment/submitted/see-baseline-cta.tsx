@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 /**
@@ -17,12 +17,35 @@ import { useRouter } from "next/navigation";
  * Wrapping the navigation in `useTransition` lets us flip the button
  * into a disabled "Setting it up…" state immediately on click so the
  * parent always sees that the click was registered.
+ *
+ * Safety net: a transition can in principle stay pending indefinitely
+ * if the destination RSC hangs (e.g. brain-svc unreachable). After
+ * `STALL_MS` we surface a "still working…" message + a hard-refresh
+ * link so the parent never gets stuck on an opaque spinner.
  */
+const STALL_MS = 25_000;
+
 export function SeeBaselineCta({ href }: { href: string }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [stalled, setStalled] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (isPending) {
+      setStalled(false);
+      timerRef.current = setTimeout(() => setStalled(true), STALL_MS);
+    } else {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [isPending]);
 
   return (
+    <div className="flex flex-col gap-2">
     <button
       type="button"
       onClick={() => {
@@ -69,5 +92,23 @@ export function SeeBaselineCta({ href }: { href: string }) {
         </>
       )}
     </button>
+      {stalled ? (
+        <p
+          role="status"
+          aria-live="polite"
+          className="text-xs text-iw-text-muted leading-relaxed max-w-md"
+        >
+          This is taking longer than usual. Baseline generation can be slow on the first
+          run.{" "}
+          <a
+            href={href}
+            className="font-semibold text-[var(--aivo-sensory-primary)] hover:underline"
+          >
+            Open the setup page directly
+          </a>{" "}
+          or try again in a minute.
+        </p>
+      ) : null}
+    </div>
   );
 }
