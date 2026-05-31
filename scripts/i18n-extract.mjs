@@ -109,10 +109,16 @@ function areaOf(file) {
   return seg.endsWith(".tsx") || seg.endsWith(".jsx") ? "(root)" : seg;
 }
 
+// Internal developer tooling — not shipped product UI, so intentionally
+// out of the translation scope. The component gallery (design-system) and
+// the surface-preview harness exist for engineers, never end users.
+const IGNORED_AREAS = new Set(["design-system", "surface-preview"]);
+
 const findings = [];
 for (const file of walk(appRoot)) {
   const area = areaOf(file);
   if (SCOPE && area !== SCOPE) continue;
+  if (IGNORED_AREAS.has(area) && SCOPE !== area) continue;
   const src = readFileSync(file, "utf8");
   for (const { kind, re } of PATTERNS) {
     re.lastIndex = 0;

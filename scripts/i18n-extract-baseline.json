@@ -1,10 +1,9 @@
 {
-  "total": 1368,
+  "total": 1239,
   "areas": {
     "accept-invite": 11,
     "admin": 507,
     "caregiver": 35,
-    "design-system": 128,
     "district": 6,
     "(root)": 18,
     "learner": 174,
@@ -13,7 +12,6 @@
     "parent": 361,
     "settings": 16,
     "signup": 1,
-    "surface-preview": 1,
     "teacher": 86,
     "therapist": 19
   }
