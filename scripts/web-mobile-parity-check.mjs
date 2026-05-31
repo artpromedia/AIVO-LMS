@@ -149,12 +149,7 @@ const PARITY_MATRIX = {
       mobile: "(learner)/subjects/index",
       status: P,
     },
-    {
-      web: "/learner/subjects/[subjectId]",
-      mobile: "(learner)/subjects/[subjectId]",
-      status: PARTIAL,
-      gap: "MOB-LRN-003: per-skill mastery grid + recommended skill path pending a skills REST endpoint (mobile shows domain mastery, tutors, supports).",
-    },
+    { web: "/learner/subjects/[subjectId]", mobile: "(learner)/subjects/[subjectId]", status: P },
     { web: "/learner/baseline", mobile: null, status: MISSING, gap: "MOB-LRN-004: baseline hub." },
     {
       web: "/learner/baseline/intro",
@@ -202,12 +197,7 @@ const PARITY_MATRIX = {
       status: PARTIAL,
       gap: "MOB-LRN-009: chapter-level quest navigation parity.",
     },
-    {
-      web: "/learner/progress",
-      mobile: "(learner)/progress",
-      status: PARTIAL,
-      gap: "MOB-LRN-010: lessons-by-day trend + recent-activity list pending a lesson-runs REST endpoint (mobile shows overall/per-subject mastery, heatstrip, comparison dots, streak).",
-    },
+    { web: "/learner/progress", mobile: "(learner)/progress", status: P },
     {
       web: "/learner/rewards",
       mobile: "(learner)/badges",
@@ -315,8 +305,7 @@ const PARITY_MATRIX = {
     {
       web: "/parent/learners/[learnerId]/gradebook",
       mobile: "(parent)/gradebook/[childId]",
-      status: PARTIAL,
-      gap: "MOB-PAR-008: per-skill table + recent runs pending a skills/lesson-runs REST endpoint (mobile shows subject averages + mastery heat).",
+      status: P,
     },
     {
       web: "/parent/learners/[learnerId]/homework",
