@@ -15,12 +15,12 @@ sub-feature is missing · **Missing** not yet on mobile.
 
 | Status             | Count   |
 | ------------------ | ------- |
-| Parity             | 98      |
-| Partial            | 15      |
+| Parity             | 100     |
+| Partial            | 13      |
 | Missing            | 0       |
 | **In-scope total** | **113** |
 
-Full parity: **87%**. 90 web-only routes excluded.
+Full parity: **88%**. 90 web-only routes excluded.
 
 ## Auth & Shared
 
@@ -149,17 +149,17 @@ Full parity: **87%**. 90 web-only routes excluded.
 | `/teacher/assignments/new`                 | `(teacher)/assignments/new`    | Parity      | —                                                                     |
 | `/teacher/insights`                        | `(teacher)/insights`           | Parity      | —                                                                     |
 | `/teacher/lesson-plans`                    | `(teacher)/lesson-plan`        | **Partial** | MOB-TCH-009: lesson-plan LIBRARY/list (mobile is single-plan editor). |
-| `/teacher/reports`                         | `(teacher)/analytics`          | **Partial** | MOB-TCH-010: classroom mastery-distribution reports parity.           |
+| `/teacher/reports`                         | `(teacher)/analytics`          | Parity      | —                                                                     |
 | `/teacher/settings`                        | `(teacher)/settings`           | Parity      | —                                                                     |
 
 ## Therapist
 
-| Web route             | Mobile screen                     | Status      | Gap / Ticket                                                      |
-| --------------------- | --------------------------------- | ----------- | ----------------------------------------------------------------- |
-| `/therapist/home`     | `(therapist)/index`               | Parity      | —                                                                 |
-| `/therapist/sessions` | `(therapist)/sessions`            | Parity      | —                                                                 |
-| `/therapist/reports`  | `(therapist)/client/[id]/reports` | **Partial** | MOB-THR-001: cross-client reports roll-up (mobile is per-client). |
-| `/therapist/settings` | `(therapist)/settings`            | Parity      | —                                                                 |
+| Web route             | Mobile screen          | Status | Gap / Ticket |
+| --------------------- | ---------------------- | ------ | ------------ |
+| `/therapist/home`     | `(therapist)/index`    | Parity | —            |
+| `/therapist/sessions` | `(therapist)/sessions` | Parity | —            |
+| `/therapist/reports`  | `(therapist)/reports`  | Parity | —            |
+| `/therapist/settings` | `(therapist)/settings` | Parity | —            |
 
 ## Caregiver
 

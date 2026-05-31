@@ -359,24 +359,14 @@ const PARITY_MATRIX = {
       status: PARTIAL,
       gap: "MOB-TCH-009: lesson-plan LIBRARY/list (mobile is single-plan editor).",
     },
-    {
-      web: "/teacher/reports",
-      mobile: "(teacher)/analytics",
-      status: PARTIAL,
-      gap: "MOB-TCH-010: classroom mastery-distribution reports parity.",
-    },
+    { web: "/teacher/reports", mobile: "(teacher)/analytics", status: P },
     { web: "/teacher/settings", mobile: "(teacher)/settings", status: P },
   ],
 
   Therapist: [
     { web: "/therapist/home", mobile: "(therapist)/index", status: P },
     { web: "/therapist/sessions", mobile: "(therapist)/sessions", status: P },
-    {
-      web: "/therapist/reports",
-      mobile: "(therapist)/client/[id]/reports",
-      status: PARTIAL,
-      gap: "MOB-THR-001: cross-client reports roll-up (mobile is per-client).",
-    },
+    { web: "/therapist/reports", mobile: "(therapist)/reports", status: P },
     { web: "/therapist/settings", mobile: "(therapist)/settings", status: P },
   ],
 
