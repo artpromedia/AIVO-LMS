@@ -4,6 +4,7 @@
  */
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { readActiveLearnerFromCookies } from "@/lib/auth/active-learner";
 import { AppShell } from "@/components/layout/app-shell";
@@ -32,6 +33,7 @@ export default async function HomeworkSessionPage({ params }: Params) {
   }
   const hw = getHomeworkSession(sessionId, session.tenantId);
   if (!hw || hw.learnerId !== learnerId) notFound();
+  const t = await getTranslations("learner.homework");
 
   return (
     <AppShell
@@ -40,7 +42,7 @@ export default async function HomeworkSessionPage({ params }: Params) {
       navItems={LEARNER_NAV}
       user={{ displayName: session.displayName, email: session.email }}
     >
-      <PageHeader eyebrow="Homework Helper" title={hw.topic} />
+      <PageHeader eyebrow={t("header_eyebrow")} title={hw.topic} />
       {hw.attachment ? (
         <Card className="mt-3 p-3 text-sm">
           <div className="flex items-center gap-3">
@@ -54,18 +56,18 @@ export default async function HomeworkSessionPage({ params }: Params) {
               <p className="font-medium text-iw-text-strong truncate">
                 {describeHomeworkAttachment(hw.attachment)}
               </p>
-              <p className="text-xs text-iw-text-muted">Shared when you started this session.</p>
+              <p className="text-xs text-iw-text-muted">{t("attachment_note")}</p>
             </div>
           </div>
         </Card>
       ) : null}
       {hw.endedAt ? (
         <Card className="p-[var(--aivo-density-card-pad)]">
-          <h2 className="font-semibold">Session summary</h2>
+          <h2 className="font-semibold">{t("session_summary")}</h2>
           <p className="mt-2 text-sm">{hw.insight}</p>
           <div className="mt-4">
             <Button asChild variant="soft">
-              <Link href="/learner/homework">Start a new session</Link>
+              <Link href="/learner/homework">{t("start_new")}</Link>
             </Button>
           </div>
         </Card>

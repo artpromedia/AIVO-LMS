@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import type { HomeworkHelpMessage } from "@/lib/db/types";
@@ -15,6 +16,7 @@ export function HomeworkChat({
   initialMessages: HomeworkHelpMessage[];
 }) {
   const router = useRouter();
+  const t = useTranslations("learner.homework");
   const [messages, setMessages] = useState<HomeworkHelpMessage[]>(initialMessages);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
@@ -43,13 +45,13 @@ export function HomeworkChat({
         error?: { message: string };
       };
       if (!res.ok || !body.ok || !body.data) {
-        setError(body.error?.message ?? "Couldn't send. Try again.");
+        setError(body.error?.message ?? t("err_send"));
         return;
       }
       setMessages(body.data.session.messages);
       setText("");
     } catch {
-      setError("Network problem. Try again in a moment.");
+      setError(t("err_network"));
     } finally {
       setBusy(false);
     }
@@ -66,13 +68,13 @@ export function HomeworkChat({
         const body = (await res.json().catch(() => null)) as {
           error?: { message: string };
         } | null;
-        setError(body?.error?.message ?? "Couldn't end the session.");
+        setError(body?.error?.message ?? t("err_end"));
         setBusy(false);
         return;
       }
       router.refresh();
     } catch {
-      setError("Network problem. Try again.");
+      setError(t("err_network_short"));
       setBusy(false);
     }
   }
@@ -80,7 +82,7 @@ export function HomeworkChat({
   return (
     <div className="grid gap-4">
       <Card className="p-4">
-        <ol className="grid gap-3" aria-live="polite" aria-label="Conversation">
+        <ol className="grid gap-3" aria-live="polite" aria-label={t("conversation_aria")}>
           {messages.map((m) => (
             <li
               key={m.id}
@@ -103,7 +105,7 @@ export function HomeworkChat({
 
       <form onSubmit={send} className="grid gap-2">
         <label htmlFor="hw-reply" className="sr-only">
-          Your message
+          {t("reply_label")}
         </label>
         <textarea
           id="hw-reply"
@@ -117,7 +119,7 @@ export function HomeworkChat({
               void send(e as unknown as React.FormEvent);
             }
           }}
-          placeholder="Type what you tried or ask a question…"
+          placeholder={t("input_placeholder")}
           className="w-full rounded-md border border-input bg-background p-3 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
         />
         {error && (
@@ -127,10 +129,10 @@ export function HomeworkChat({
         )}
         <div className="flex gap-2">
           <Button type="submit" disabled={busy || !text.trim()}>
-            {busy ? "Sending…" : "Send"}
+            {busy ? t("sending") : t("send")}
           </Button>
           <Button type="button" variant="soft" onClick={complete} disabled={busy}>
-            I'm done — wrap up
+            {t("wrap_up")}
           </Button>
         </div>
       </form>

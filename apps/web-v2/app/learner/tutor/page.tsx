@@ -10,6 +10,7 @@
  */
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { AppShell } from "@/components/layout/app-shell";
 import {
@@ -35,12 +36,13 @@ export default async function LearnerTutorHome() {
   if (!learner) redirect("/learner/home");
   const subjects = await listSubjects();
   const iep = await getIEPForLearner(session.learnerId, session.tenantId);
+  const t = await getTranslations("learner.tutor");
 
   const chips: PersonalizationVariant[] = ["ai_companion", "no_grades", "calm_mode"];
   if (iep?.confirmedAt) chips.unshift("iep");
 
   const preferredName = learner.preferredName || learner.firstName;
-  const greeting = `Hi ${preferredName}! Ask me anything — I'll guide you with hints and questions instead of just handing over the answer. What are you working on?`;
+  const greeting = t("greeting", { name: preferredName });
 
   return (
     <AppShell
@@ -50,9 +52,9 @@ export default async function LearnerTutorHome() {
       user={{ displayName: session.displayName, email: session.email }}
     >
       <AICompanionHero
-        eyebrow="AI tutor · always calm, always patient"
-        title={`Hi ${preferredName} — ask me anything.`}
-        body="I'll explain, give hints, walk you through examples, or just keep you company while you practice. No grades. Tap a subject to start, or pick up an open lesson."
+        eyebrow={t("hero_eyebrow")}
+        title={t("hero_title", { name: preferredName })}
+        body={t("hero_body")}
         chips={chips.map((v) => (
           <PersonalizationChip key={v} variant={v} />
         ))}
@@ -61,14 +63,14 @@ export default async function LearnerTutorHome() {
             href="/learner/home"
             className="inline-flex items-center gap-2 rounded-iw-control px-5 py-3 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 shadow-[0_4px_12px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.3)]"
           >
-            Start today's lesson
+            {t("start_lesson")}
           </Link>
         }
       />
 
       <section className="mt-8 grid gap-4 lg:grid-cols-[1fr,320px]">
         <div className="flex flex-col gap-3">
-          <h2 className="text-lg font-semibold text-iw-text-strong">Chat with your tutor</h2>
+          <h2 className="text-lg font-semibold text-iw-text-strong">{t("chat_heading")}</h2>
           <LearnerTutorChat
             learnerId={session.learnerId}
             greeting={greeting}
@@ -78,7 +80,7 @@ export default async function LearnerTutorHome() {
 
         <aside className="flex flex-col gap-3">
           <article className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-3">
-            <h3 className="text-base font-semibold text-iw-text-strong">Quick asks</h3>
+            <h3 className="text-base font-semibold text-iw-text-strong">{t("quick_asks")}</h3>
             <div className="flex flex-wrap gap-2">
               {subjects.slice(0, 5).map((s) => {
                 const tutor = tutorForSubjectSlug(s.slug);
@@ -89,7 +91,7 @@ export default async function LearnerTutorHome() {
                     className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-iw-chip text-xs font-semibold border border-iw-border bg-white text-iw-text-strong hover:bg-[var(--aivo-aivoPurple-50)]/40"
                   >
                     <span aria-hidden="true">{tutor?.emoji ?? "📘"}</span>
-                    Help with {s.name}
+                    {t("help_with", { name: s.name })}
                   </Link>
                 );
               })}
@@ -97,34 +99,33 @@ export default async function LearnerTutorHome() {
           </article>
 
           <article className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-3">
-            <h3 className="text-base font-semibold text-iw-text-strong">Who can see this?</h3>
+            <h3 className="text-base font-semibold text-iw-text-strong">{t("who_sees")}</h3>
             <ul className="space-y-2 text-sm text-iw-text-strong">
               <li className="flex items-start gap-2">
                 <InsightChip tone="primary" size="sm">
-                  Your grown-up
+                  {t("who_grownup")}
                 </InsightChip>
-                <span className="text-iw-text-muted">Sees a calm summary, not every message.</span>
+                <span className="text-iw-text-muted">{t("who_grownup_desc")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <InsightChip tone="accent" size="sm">
-                  Your teacher
+                  {t("who_teacher")}
                 </InsightChip>
-                <span className="text-iw-text-muted">Sees the skills you practised.</span>
+                <span className="text-iw-text-muted">{t("who_teacher_desc")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <InsightChip tone="neutral" size="sm">
-                  Nobody else
+                  {t("who_nobody")}
                 </InsightChip>
-                <span className="text-iw-text-muted">Tutor chat stays private to you.</span>
+                <span className="text-iw-text-muted">{t("who_nobody_desc")}</span>
               </li>
             </ul>
           </article>
 
           <article className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-2">
-            <h3 className="text-base font-semibold text-iw-text-strong">Safety</h3>
+            <h3 className="text-base font-semibold text-iw-text-strong">{t("safety")}</h3>
             <p className="text-xs text-iw-text-muted leading-relaxed">
-              AIVO has safety filters always on. If something feels off, your grown-up will know.
-              You can always pause or close the tutor — no questions asked.
+              {t("safety_body")}
             </p>
             <TutorInsightChip kind="safety_active" />
           </article>

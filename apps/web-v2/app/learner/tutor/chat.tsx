@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
   TutorMessage,
@@ -28,6 +29,7 @@ export function LearnerTutorChat({
   readonly greeting: string;
   readonly preferredName: string;
 }) {
+  const t = useTranslations("learner.tutor");
   const [turns, setTurns] = useState<Turn[]>(() => [
     { id: "greeting", role: "tutor", text: greeting },
   ]);
@@ -68,7 +70,7 @@ export function LearnerTutorChat({
         error?: { message: string };
       };
       if (!res.ok || !body.ok || !body.data) {
-        setError(body.error?.message ?? "Couldn't send. Try again.");
+        setError(body.error?.message ?? t("err_send"));
         return;
       }
       setTurns((prev) => [
@@ -81,7 +83,7 @@ export function LearnerTutorChat({
         },
       ]);
     } catch {
-      setError("Network problem. Try again in a moment.");
+      setError(t("err_network"));
     } finally {
       setBusy(false);
     }
@@ -89,7 +91,7 @@ export function LearnerTutorChat({
 
   return (
     <div className="flex flex-col gap-3">
-      <ol className="flex flex-col gap-3" aria-live="polite" aria-label="Tutor conversation">
+      <ol className="flex flex-col gap-3" aria-live="polite" aria-label={t("conversation_aria")}>
         {turns.map((turn) =>
           turn.role === "tutor" ? (
             <li key={turn.id}>
@@ -110,7 +112,7 @@ export function LearnerTutorChat({
             </li>
           ) : (
             <li key={turn.id}>
-              <TutorMessage author="learner" name={preferredName || "You"} avatar="🙂">
+              <TutorMessage author="learner" name={preferredName || t("you")} avatar="🙂">
                 <p className="whitespace-pre-wrap">{turn.text}</p>
               </TutorMessage>
             </li>
@@ -121,7 +123,7 @@ export function LearnerTutorChat({
 
       <form onSubmit={send} className="flex flex-col gap-2">
         <label htmlFor="tutor-reply" className="sr-only">
-          Ask the tutor
+          {t("ask_label")}
         </label>
         <textarea
           id="tutor-reply"
@@ -135,7 +137,7 @@ export function LearnerTutorChat({
               void send(e as unknown as React.FormEvent);
             }
           }}
-          placeholder="Ask anything — I'll guide you, never spoil the answer."
+          placeholder={t("input_placeholder")}
           className="w-full rounded-iw-control border border-iw-border bg-iw-bg p-3 text-sm text-iw-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring"
         />
         {error ? (
@@ -145,7 +147,7 @@ export function LearnerTutorChat({
         ) : null}
         <div>
           <Button type="submit" disabled={busy || !text.trim()}>
-            {busy ? "Thinking…" : "Send"}
+            {busy ? t("thinking") : t("send")}
           </Button>
         </div>
       </form>

@@ -4,6 +4,7 @@
  */
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import { readActiveLearnerFromCookies } from "@/lib/auth/active-learner";
 import { AppShell } from "@/components/layout/app-shell";
@@ -35,6 +36,7 @@ export default async function LearnerHomeworkPage() {
 
   const recent = listHomeworkSessionsForLearner(learnerId, session.tenantId, { limit: 10 });
   const iep = await getIEPForLearner(learnerId, session.tenantId);
+  const t = await getTranslations("learner.homework");
   const chips: PersonalizationVariant[] = ["ai_companion", "no_grades"];
   if (iep?.confirmedAt) chips.unshift("iep");
 
@@ -46,9 +48,9 @@ export default async function LearnerHomeworkPage() {
       user={{ displayName: session.displayName, email: session.email }}
     >
       <AICompanionHero
-        eyebrow="Homework Helper · I'll guide, not just give answers"
-        title="Stuck on something? Show me."
-        body="Snap a photo of your work, upload a file, or just type what you're working on. I'll walk you through it one step at a time."
+        eyebrow={t("hero_eyebrow")}
+        title={t("title")}
+        body={t("hero_body")}
         chips={chips.map((v) => (
           <PersonalizationChip key={v} variant={v} />
         ))}
@@ -59,36 +61,36 @@ export default async function LearnerHomeworkPage() {
       </section>
 
       <section className="mt-8 flex flex-col gap-3">
-        <h2 className="text-lg font-semibold text-iw-text-strong">How I help</h2>
+        <h2 className="text-lg font-semibold text-iw-text-strong">{t("section_how_i_help")}</h2>
         <div className="grid gap-3 md:grid-cols-3">
           <GuidedStepCard
             step={1}
             total={3}
             stage="try"
-            title="First, I'll ask you to try"
+            title={t("card_try")}
           >
             <p className="text-sm">
-              Even one guess helps. There's no wrong answer in the "try first" step.
+              {t("card_try_body")}
             </p>
           </GuidedStepCard>
           <GuidedStepCard
             step={2}
             total={3}
             stage="hint"
-            title="Then I give you a small hint"
+            title={t("card_hint")}
           >
             <p className="text-sm">
-              Just enough to nudge you forward, never the whole answer.
+              {t("card_hint_body")}
             </p>
           </GuidedStepCard>
           <GuidedStepCard
             step={3}
             total={3}
             stage="walk"
-            title="If you're still stuck, we walk through it"
+            title={t("card_walkthrough")}
           >
             <p className="text-sm">
-              We solve it together — one step at a time, in plain words.
+              {t("card_walk_body")}
             </p>
           </GuidedStepCard>
         </div>
@@ -96,7 +98,7 @@ export default async function LearnerHomeworkPage() {
 
       {recent.length > 0 ? (
         <section className="mt-8 flex flex-col gap-3">
-          <h2 className="text-lg font-semibold text-iw-text-strong">Recent sessions</h2>
+          <h2 className="text-lg font-semibold text-iw-text-strong">{t("recent_sessions")}</h2>
           <ul className="grid gap-2 md:grid-cols-2">
             {recent.map((s) => (
               <li key={s.id}>
@@ -112,7 +114,7 @@ export default async function LearnerHomeworkPage() {
                       </p>
                     </div>
                     <InsightChip tone={s.endedAt ? "neutral" : "primary"} size="sm">
-                      {s.endedAt ? "Done" : "Open"}
+                      {s.endedAt ? t("status_done") : t("status_open")}
                     </InsightChip>
                   </div>
                 </Link>
