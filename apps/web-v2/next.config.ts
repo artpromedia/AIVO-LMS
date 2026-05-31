@@ -69,6 +69,22 @@ const nextConfig: NextConfig = {
         destination: "/learner/:path*",
         permanent: true,
       },
+      // ADR 0020 Phase 2, slice 1 — `notifications` moved from
+      // per-role routes to the canonical top-level `/notifications`
+      // surface anchored on the `messages` nav area. Mirrors
+      // `CROSS_CUTTING_REGISTRY.notifications.legacyRoutes` (web).
+      // Only the routes that actually rendered notifications are
+      // redirected; "closest equivalent" admin staff pages stay put.
+      {
+        source: "/learner/notifications",
+        destination: "/notifications",
+        permanent: true,
+      },
+      {
+        source: "/parent/notifications",
+        destination: "/notifications",
+        permanent: true,
+      },
     ];
   },
 };

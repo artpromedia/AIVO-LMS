@@ -24,7 +24,7 @@ interface NotificationsListProps {
   emptyDescription: string;
 }
 
-export function NotificationsList({
+export function LearnerNotificationsList({
   fetchUrl,
   sseUrl,
   markReadUrl,

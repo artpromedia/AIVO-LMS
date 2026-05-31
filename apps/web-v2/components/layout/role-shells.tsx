@@ -34,7 +34,7 @@ export const PARENT_NAV: RoleNavItem[] = [
   { href: "/parent/schedule", label: "Schedule", icon: <Calendar className="h-4 w-4" /> },
   { href: "/parent/reports", label: "Reports", icon: <FileText className="h-4 w-4" /> },
   { href: "/parent/privacy", label: "Privacy", icon: <ShieldCheck className="h-4 w-4" /> },
-  { href: "/parent/notifications", label: "Notifications", icon: <Bell className="h-4 w-4" /> },
+  { href: "/notifications", label: "Notifications", icon: <Bell className="h-4 w-4" /> },
   { href: "/parent/settings", label: "Settings", icon: <Settings className="h-4 w-4" /> },
 ];
 
@@ -45,7 +45,7 @@ export const LEARNER_NAV: RoleNavItem[] = [
   { href: "/learner/library", label: "Library", icon: <BookOpen className="h-4 w-4" /> },
   { href: "/learner/rewards", label: "Rewards", icon: <Trophy className="h-4 w-4" /> },
   {
-    href: "/learner/notifications",
+    href: "/notifications",
     label: "Notifications",
     icon: <Bell className="h-4 w-4" />,
     badgeSlot: <LearnerUnreadNotificationsBadge />,

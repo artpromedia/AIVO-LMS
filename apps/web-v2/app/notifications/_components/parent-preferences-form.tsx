@@ -20,7 +20,7 @@ const TYPES: { value: string; label: string }[] = [
 
 const CHANNELS = ["in_app", "email", "push"] as const;
 
-export function PreferencesForm({ preference }: { preference: NotificationPreference }) {
+export function ParentPreferencesForm({ preference }: { preference: NotificationPreference }) {
   const [prefs, setPrefs] = useState<Record<string, boolean>>(preference.preferences);
   const [quietHours, setQuietHours] = useState(preference.quietHours ?? "");
   const [cadence, setCadence] = useState(preference.digestCadence);

@@ -48,4 +48,17 @@ describe("cross-cutting surface registry (ADR 0020 Phase 2)", () => {
   it("returns the matching entry for known ids", () => {
     expect(getCrossCuttingSurface("settings")?.webRoute).toBe("/settings");
   });
+
+  it("pins notifications (Phase 2 slice 1) to /notifications on both shells", () => {
+    // ADR 0020 §Phase 2 row 1: the canonical destination for the
+    // notifications surface is /notifications on web and mobile.
+    // Phase 2 slice 1 (apps/web-v2/app/notifications + apps/mobile/
+    // app/notifications.tsx) reads this pin directly, so a registry
+    // edit that drops or moves it would silently break the migration.
+    const meta = getCrossCuttingSurface("notifications");
+    expect(meta?.webRoute).toBe("/notifications");
+    expect(meta?.mobileRoute).toBe("/notifications");
+    expect(meta?.navArea).toBe("messages");
+    expect(meta?.phase).toBe(1);
+  });
 });
