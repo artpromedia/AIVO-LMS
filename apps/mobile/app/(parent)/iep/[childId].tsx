@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
   Switch,
 } from "react-native";
-import { useLocalSearchParams, router } from "expo-router";
+import { useLocalSearchParams, router, type Href } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -231,9 +231,21 @@ export default function IEPScreen() {
 
       <View style={styles.titleRow}>
         <View style={{ flex: 1 }}>
-          <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>{t("parentIEP.title")}</Text>
+          <Text
+            style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}
+          >
+            {t("parentIEP.title")}
+          </Text>
           <Text style={styles.subtitle}>{t("parentIEP.subtitle")}</Text>
         </View>
+        <Pressable
+          style={styles.prefsBtn}
+          accessibilityRole="button"
+          accessibilityLabel={t("parentIepReview.title", "IEP review")}
+          onPress={() => router.push(`/(parent)/iep-review/${childId}` as Href)}
+        >
+          <Ionicons name="reader-outline" size={20} color={colors.primary} />
+        </Pressable>
         <Pressable style={styles.prefsBtn} onPress={() => setPrefsModalOpen(true)}>
           <Ionicons name="notifications-outline" size={20} color={colors.primary} />
         </Pressable>

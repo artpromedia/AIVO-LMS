@@ -5,11 +5,13 @@ import { router, type Href } from "expo-router";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useLearners } from "@/hooks/useLearners";
 import { useBrainDomains } from "@/hooks/useBrain";
+import { useLessonSessions } from "@/hooks/useGradebook";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 import { Card } from "@/components/ui";
 import { MasteryBar, EmptyState, LoadingState } from "@aivo/mobile-ui";
 import { summarizeDomains } from "@/lib/learner-progress";
+import { lessonsByDay } from "@/lib/gradebook-logic";
 import { spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
@@ -76,6 +78,7 @@ function ReportCard({ learner }: { learner: LearnerLite }) {
   const { t } = useTranslation();
   const palette = useSensoryPalette();
   const { domains, isLoading } = useBrainDomains(learner.id, { enrolledGrade: learner.gradeLevel });
+  const { data: sessions } = useLessonSessions(learner.id);
   const summary = useMemo(
     () =>
       summarizeDomains(
@@ -83,6 +86,11 @@ function ReportCard({ learner }: { learner: LearnerLite }) {
       ),
     [domains],
   );
+  const weekCount = useMemo(
+    () => lessonsByDay(sessions ?? []).reduce((n, d) => n + d.value, 0),
+    [sessions],
+  );
+  const recent = (sessions ?? []).slice(0, 3);
 
   return (
     <Pressable
@@ -121,6 +129,28 @@ function ReportCard({ learner }: { learner: LearnerLite }) {
             />
           </View>
         ) : null}
+        <Text style={[styles.weekLine, { color: palette.inkMuted }]}>
+          {t("parentReports.weekCount", {
+            count: weekCount,
+            defaultValue: `${weekCount} lessons this week`,
+          })}
+        </Text>
+        {recent.length > 0 ? (
+          <View style={{ gap: 4, marginTop: 2 }}>
+            {recent.map((s) => (
+              <Text
+                key={s.id}
+                style={[styles.recap, { color: palette.inkMuted }]}
+                numberOfLines={1}
+              >
+                • {s.subject}
+                {(s.completedAt ?? s.startedAt)
+                  ? ` — ${new Date(s.completedAt ?? s.startedAt!).toLocaleDateString(undefined, { month: "short", day: "numeric" })}`
+                  : ""}
+              </Text>
+            ))}
+          </View>
+        ) : null}
       </Card>
     </Pressable>
   );
@@ -154,4 +184,6 @@ const styles = StyleSheet.create({
   initial: { fontSize: 18, fontFamily: fontFamilies.displayBold },
   name: { fontSize: 16, fontFamily: fontFamilies.bodyBold },
   meta: { fontSize: 13, fontFamily: fontFamilies.bodyRegular, marginTop: 2 },
+  weekLine: { fontSize: 13, fontFamily: fontFamilies.bodySemiBold, marginTop: spacing.sm },
+  recap: { fontSize: 12, fontFamily: fontFamilies.bodyRegular },
 });

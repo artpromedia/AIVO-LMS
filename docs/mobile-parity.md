@@ -15,12 +15,12 @@ sub-feature is missing · **Missing** not yet on mobile.
 
 | Status             | Count   |
 | ------------------ | ------- |
-| Parity             | 100     |
-| Partial            | 13      |
+| Parity             | 102     |
+| Partial            | 11      |
 | Missing            | 0       |
 | **In-scope total** | **113** |
 
-Full parity: **88%**. 90 web-only routes excluded.
+Full parity: **90%**. 90 web-only routes excluded.
 
 ## Auth & Shared
 
@@ -86,53 +86,53 @@ Full parity: **88%**. 90 web-only routes excluded.
 | `/learner/settings`                              | `(learner)/settings`                          | Parity      | —                                                                                                      |
 | `/learner/settings/accessibility`                | `(learner)/accessibility`                     | Parity      | —                                                                                                      |
 | `/learner/settings/audio`                        | `(learner)/audio`                             | Parity      | —                                                                                                      |
-| `/learner/brain-clone/[learnerId]`               | `(learner)/brain`                             | **Partial** | MOB-LRN-015: learner brain-clone view parity (mobile brain screen lacks clone build/XAI annotations).  |
+| `/learner/brain-clone/[learnerId]`               | `(learner)/brain`                             | Parity      | —                                                                                                      |
 
 ## Parent
 
-| Web route                                           | Mobile screen                            | Status      | Gap / Ticket                                                                                                                         |
-| --------------------------------------------------- | ---------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `/parent/home`                                      | `(parent)/index`                         | Parity      | —                                                                                                                                    |
-| `/parent/home-v2`                                   | `(parent)/home-v2`                       | Parity      | —                                                                                                                                    |
-| `/parent/learners`                                  | `(parent)/learners/index`                | Parity      | —                                                                                                                                    |
-| `/parent/learners/new`                              | `(parent)/learner-new/index`             | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]`                      | `(parent)/learners/[learnerId]`          | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/assessment`           | `(parent)/assessment/[childId]`          | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/assessment/intro`     | `(parent)/assessment/[childId]`          | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/assessment/review`    | `(parent)/assessment/[childId]`          | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/assessment/submitted` | `(parent)/assessment/[childId]`          | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/baseline`             | `(parent)/baseline/[childId]`            | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/baseline/pending`     | `(parent)/baseline/[childId]`            | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/baseline/summary`     | `(parent)/baseline/[childId]`            | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/brain-clone-watch`    | `(parent)/brain-clone-watch/[childId]`   | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/brain-profile`        | `(parent)/brain/[childId]/index`         | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/curriculum`           | `(parent)/curriculum/[childId]`          | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/gradebook`            | `(parent)/gradebook/[childId]`           | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/homework`             | `(parent)/homework/[childId]`            | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/iep`                  | `(parent)/iep/[childId]`                 | **Partial** | MOB-PAR-010: IEP review sub-flow parity.                                                                                             |
-| `/parent/learners/[learnerId]/iep/review`           | `(parent)/iep-review/[childId]`          | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/lessons`              | `(parent)/lessons/[childId]`             | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/milestones`           | `(parent)/milestones/[childId]`          | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/profile-v2`           | `(parent)/profile-v2/[childId]`          | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/progress`             | `(parent)/progress/[childId]`            | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/sensory`              | `(parent)/sensory/[childId]`             | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/settings`             | `(parent)/settings-learner/[childId]`    | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/snapshot`             | `(parent)/snapshot/[childId]`            | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/summary`              | `(parent)/summary/[childId]`             | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/team`                 | `(parent)/team/[childId]`                | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/accessibility`        | `(parent)/accessibility/[childId]`       | Parity      | —                                                                                                                                    |
-| `/parent/learners/[learnerId]/accessibility/audio`  | `(parent)/accessibility/audio/[childId]` | Parity      | —                                                                                                                                    |
-| `/parent/consent`                                   | `(parent)/consent/index`                 | Parity      | —                                                                                                                                    |
-| `/parent/consent/[learnerId]`                       | `(parent)/consent/[learnerId]`           | Parity      | —                                                                                                                                    |
-| `/parent/notifications`                             | `(parent)/inbox`                         | **Partial** | MOB-PAR-019: notifications parity (read state, live stream) vs current inbox.                                                        |
-| `/parent/reports`                                   | `(parent)/reports`                       | **Partial** | MOB-PAR-020: lesson-count + recap metrics pending a lesson-runs REST endpoint (mobile shows per-learner mastery + subjects tracked). |
-| `/parent/schedule`                                  | `(parent)/schedule/[childId]`            | Parity      | —                                                                                                                                    |
-| `/parent/privacy`                                   | `(parent)/privacy/index`                 | Parity      | —                                                                                                                                    |
-| `/parent/privacy/data-export`                       | `(parent)/privacy/data-export`           | Parity      | —                                                                                                                                    |
-| `/parent/privacy/delete-data`                       | `(parent)/privacy/delete-data`           | Parity      | —                                                                                                                                    |
-| `/parent/settings`                                  | `(parent)/settings`                      | Parity      | —                                                                                                                                    |
-| `/parent/settings/account`                          | `(parent)/settings-account/index`        | Parity      | —                                                                                                                                    |
-| `/parent/settings/billing`                          | `(parent)/billing`                       | Parity      | —                                                                                                                                    |
+| Web route                                           | Mobile screen                            | Status      | Gap / Ticket                                                                  |
+| --------------------------------------------------- | ---------------------------------------- | ----------- | ----------------------------------------------------------------------------- |
+| `/parent/home`                                      | `(parent)/index`                         | Parity      | —                                                                             |
+| `/parent/home-v2`                                   | `(parent)/home-v2`                       | Parity      | —                                                                             |
+| `/parent/learners`                                  | `(parent)/learners/index`                | Parity      | —                                                                             |
+| `/parent/learners/new`                              | `(parent)/learner-new/index`             | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]`                      | `(parent)/learners/[learnerId]`          | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/assessment`           | `(parent)/assessment/[childId]`          | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/assessment/intro`     | `(parent)/assessment/[childId]`          | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/assessment/review`    | `(parent)/assessment/[childId]`          | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/assessment/submitted` | `(parent)/assessment/[childId]`          | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/baseline`             | `(parent)/baseline/[childId]`            | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/baseline/pending`     | `(parent)/baseline/[childId]`            | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/baseline/summary`     | `(parent)/baseline/[childId]`            | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/brain-clone-watch`    | `(parent)/brain-clone-watch/[childId]`   | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/brain-profile`        | `(parent)/brain/[childId]/index`         | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/curriculum`           | `(parent)/curriculum/[childId]`          | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/gradebook`            | `(parent)/gradebook/[childId]`           | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/homework`             | `(parent)/homework/[childId]`            | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/iep`                  | `(parent)/iep/[childId]`                 | **Partial** | MOB-PAR-010: IEP review sub-flow parity.                                      |
+| `/parent/learners/[learnerId]/iep/review`           | `(parent)/iep-review/[childId]`          | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/lessons`              | `(parent)/lessons/[childId]`             | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/milestones`           | `(parent)/milestones/[childId]`          | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/profile-v2`           | `(parent)/profile-v2/[childId]`          | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/progress`             | `(parent)/progress/[childId]`            | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/sensory`              | `(parent)/sensory/[childId]`             | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/settings`             | `(parent)/settings-learner/[childId]`    | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/snapshot`             | `(parent)/snapshot/[childId]`            | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/summary`              | `(parent)/summary/[childId]`             | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/team`                 | `(parent)/team/[childId]`                | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/accessibility`        | `(parent)/accessibility/[childId]`       | Parity      | —                                                                             |
+| `/parent/learners/[learnerId]/accessibility/audio`  | `(parent)/accessibility/audio/[childId]` | Parity      | —                                                                             |
+| `/parent/consent`                                   | `(parent)/consent/index`                 | Parity      | —                                                                             |
+| `/parent/consent/[learnerId]`                       | `(parent)/consent/[learnerId]`           | Parity      | —                                                                             |
+| `/parent/notifications`                             | `(parent)/inbox`                         | **Partial** | MOB-PAR-019: notifications parity (read state, live stream) vs current inbox. |
+| `/parent/reports`                                   | `(parent)/reports`                       | Parity      | —                                                                             |
+| `/parent/schedule`                                  | `(parent)/schedule/[childId]`            | Parity      | —                                                                             |
+| `/parent/privacy`                                   | `(parent)/privacy/index`                 | Parity      | —                                                                             |
+| `/parent/privacy/data-export`                       | `(parent)/privacy/data-export`           | Parity      | —                                                                             |
+| `/parent/privacy/delete-data`                       | `(parent)/privacy/delete-data`           | Parity      | —                                                                             |
+| `/parent/settings`                                  | `(parent)/settings`                      | Parity      | —                                                                             |
+| `/parent/settings/account`                          | `(parent)/settings-account/index`        | Parity      | —                                                                             |
+| `/parent/settings/billing`                          | `(parent)/billing`                       | Parity      | —                                                                             |
 
 ## Teacher
 

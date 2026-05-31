@@ -177,8 +177,7 @@ const PARITY_MATRIX = {
     {
       web: "/learner/brain-clone/[learnerId]",
       mobile: "(learner)/brain",
-      status: PARTIAL,
-      gap: "MOB-LRN-015: learner brain-clone view parity (mobile brain screen lacks clone build/XAI annotations).",
+      status: P,
     },
   ],
 
@@ -321,8 +320,7 @@ const PARITY_MATRIX = {
     {
       web: "/parent/reports",
       mobile: "(parent)/reports",
-      status: PARTIAL,
-      gap: "MOB-PAR-020: lesson-count + recap metrics pending a lesson-runs REST endpoint (mobile shows per-learner mastery + subjects tracked).",
+      status: P,
     },
     { web: "/parent/schedule", mobile: "(parent)/schedule/[childId]", status: P },
     { web: "/parent/privacy", mobile: "(parent)/privacy/index", status: P },
