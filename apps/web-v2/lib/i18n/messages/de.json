@@ -320,6 +320,76 @@
       "preview_text": "Hallo! Dies ist die Vorschau deiner Vorlesestimme.",
       "failed": "Fehlgeschlagen.",
       "preview_failed": "Vorschau fehlgeschlagen."
+    },
+    "baseline": {
+      "back": "Zurück",
+      "back_home": "Zurück zur Startseite",
+      "index": {
+        "notready_eyebrow": "Fast bereit",
+        "notready_title": "Ein Erwachsener richtet das noch ein",
+        "notready_body": "Frag den Erwachsenen, der dich angemeldet hat — er muss noch ein paar Fragen beantworten, bevor AIVO deinen Check-in planen kann.",
+        "ready_eyebrow": "Ein freundlicher Check-in",
+        "ready_title": "Hallo {name} — bereit, mir zu zeigen, wie du denkst?",
+        "ready_body": "Drei ruhige Schritte vor der ersten Frage. Wähle, womit du anfangen willst, AIVO macht den Rest.",
+        "lets_go": "Los geht's"
+      },
+      "why": {
+        "eyebrow": "Wie AIVO sich auf dich vorbereitet hat",
+        "title": "Hallo {name} — das habe ich für dich gemacht.",
+        "body": "Ein Erwachsener hat ein paar Fragen beantwortet, damit ich weiß, wie du gern lernst. Wenn er einen IEP geteilt hat, habe ich auch die Hilfen gelesen. Das mache ich gerade:",
+        "cta": "Wähle, wo du anfängst",
+        "card1_title": "Frisch für dich gemacht",
+        "card1_body": "Jede Frage wird nach dem ausgewählt, was dein Erwachsener geteilt hat — nicht aus einem großen Standard-Quiz.",
+        "card2_title": "Keine Noten, keine Punkte",
+        "card2_body": "Das ist kein Test. AIVO nutzt, was du zeigst, um ruhige, passende Lektionen zu planen.",
+        "card3_title": "Pausen sind gut",
+        "card3_body": "Du kannst pausieren, durchatmen oder für heute aufhören. AIVO merkt sich, wo du warst."
+      },
+      "subjects": {
+        "step": "Schritt 1 von 3",
+        "title": "Wo möchtest du anfangen?",
+        "body": "Wähle ein oder mehrere Fächer. AIVO sucht eine kleine Handvoll freundlicher Fragen nur für dich aus.",
+        "error_pick_one": "Wähle mindestens ein Fach, um zu starten.",
+        "legend": "Fächer wählen",
+        "with_tutor": "Mit {name} · {landmark}",
+        "picked_by_grownup": "Von Erwachsenem gewählt",
+        "picked_note": "Fächer mit dem Etikett „Von Erwachsenem gewählt“ stammen aus der Einrichtung deiner Eltern.",
+        "get_ready": "Mach dich bereit"
+      },
+      "readiness": {
+        "step": "Schritt 2 von 3",
+        "title": "Kurzer Check, bevor wir starten",
+        "body": "Nichts hier ist ein Test. Nur ein paar Dinge, die AIVO einschaltet, damit sich der Check-in genau richtig anfühlt.",
+        "status_on": "An",
+        "readaloud_off": "Du kannst es pro Frage einschalten",
+        "status_default": "Standard",
+        "status_always": "Immer",
+        "status_off": "Aus",
+        "readaloud_title": "Vorlesen",
+        "readaloud_body": "Tippe bei jeder Frage auf das Lautsprechersymbol, um die Wörter zu hören. Niemand wird es wissen — versprochen.",
+        "calm_title": "Ruhiger Bildschirm",
+        "calm_body": "Sanfte Farben und wenig Bewegung, damit du dich leichter konzentrierst. Du kannst das jederzeit ändern.",
+        "breaks_title": "Pausen sind gut",
+        "breaks_body": "Du kannst jederzeit pausieren. AIVO merkt es sich und macht dort weiter, wo du aufgehört hast.",
+        "extratime_title": "Mehr Zeit",
+        "extratime_body": "Es gibt sowieso keine Uhr. Nimm dir so viel Zeit, wie du brauchst.",
+        "tell_me_more": "Erzähl mir mehr",
+        "im_ready": "Ich bin bereit"
+      },
+      "intro": {
+        "step": "Schritt 3 von 3",
+        "eyebrow": "Ein freundlicher Check-in · {count} kurze Fragen",
+        "title": "Bereit, {name}?",
+        "body_with_tutor": "{tutorName} von {landmark} hilft dir beim Start. Wir gehen Frage für Frage vor. Überspring, was du nicht ausprobieren willst.",
+        "body_default": "Wir gehen Frage für Frage vor. Überspring, was du nicht ausprobieren willst.",
+        "start": "Starte, wenn du bereit bist",
+        "subjects_today": "Fächer heute",
+        "questions_label": "Fragen",
+        "questions_note": "Kurz und freundlich. Überspring eine, wenn du lieber weitermachst.",
+        "time_label": "Zeit",
+        "no_clock": "Keine Uhr",
+        "time_note": "Pausiere jederzeit. AIVO merkt sich, wo du aufgehört hast."
+      }
     }
   },
   "auth": {

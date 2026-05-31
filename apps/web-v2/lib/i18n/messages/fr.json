@@ -320,6 +320,76 @@
       "preview_text": "Bonjour ! Voici l'aperçu de votre voix de lecture à voix haute.",
       "failed": "Échec.",
       "preview_failed": "Échec de l'aperçu."
+    },
+    "baseline": {
+      "back": "Retour",
+      "back_home": "Retour à l'accueil",
+      "index": {
+        "notready_eyebrow": "Presque prêt",
+        "notready_title": "Un adulte est encore en train de tout préparer",
+        "notready_body": "Demande à l'adulte qui t'a inscrit — il lui reste deux ou trois questions à finir avant qu'AIVO puisse préparer ton rendez-vous.",
+        "ready_eyebrow": "Un petit rendez-vous tranquille",
+        "ready_title": "Salut {name} — prêt à me montrer comment tu réfléchis ?",
+        "ready_body": "Trois étapes tranquilles avant la première question. Choisis par quoi commencer, AIVO fait le reste.",
+        "lets_go": "C'est parti"
+      },
+      "why": {
+        "eyebrow": "Comment AIVO s'est préparé pour toi",
+        "title": "Salut {name} — j'ai préparé ça pour toi.",
+        "body": "Un adulte a répondu à quelques questions pour que je sache comment tu aimes apprendre. S'il a partagé un IEP, j'ai lu les aménagements aussi. Voici ce que je fais en ce moment :",
+        "cta": "Choisis par où commencer",
+        "card1_title": "Fait sur mesure pour toi",
+        "card1_body": "Chaque question est choisie selon ce que ton adulte a partagé — pas un grand quiz tout fait.",
+        "card2_title": "Pas de notes, pas de points",
+        "card2_body": "Ce n'est pas un test. AIVO utilise ce que tu montres pour préparer des leçons calmes et bien adaptées.",
+        "card3_title": "Les pauses, c'est bien",
+        "card3_body": "Tu peux faire une pause, souffler ou t'arrêter pour aujourd'hui. AIVO se souviendra d'où tu en étais."
+      },
+      "subjects": {
+        "step": "Étape 1 sur 3",
+        "title": "Par quoi veux-tu commencer ?",
+        "body": "Choisis une ou plusieurs matières. AIVO choisira une petite poignée de questions sympas rien que pour toi.",
+        "error_pick_one": "Choisis au moins une matière pour commencer.",
+        "legend": "Choisir des matières",
+        "with_tutor": "Avec {name} · {landmark}",
+        "picked_by_grownup": "Choisi par un adulte",
+        "picked_note": "Les matières avec l'étiquette « Choisi par un adulte » viennent de la configuration de tes parents.",
+        "get_ready": "Prépare-toi"
+      },
+      "readiness": {
+        "step": "Étape 2 sur 3",
+        "title": "Une petite vérification avant de commencer",
+        "body": "Rien ici n'est un test. Juste quelques réglages qu'AIVO active pour que le rendez-vous soit parfait.",
+        "status_on": "Activé",
+        "readaloud_off": "Tu peux l'activer à chaque question",
+        "status_default": "Par défaut",
+        "status_always": "Toujours",
+        "status_off": "Désactivé",
+        "readaloud_title": "Lecture à voix haute",
+        "readaloud_body": "Touche le haut-parleur sur n'importe quelle question pour entendre les mots. Personne ne le saura — promis.",
+        "calm_title": "Écran apaisé",
+        "calm_body": "Des couleurs douces et peu de mouvement pour mieux te concentrer. Tu peux changer ça à tout moment.",
+        "breaks_title": "Les pauses, c'est bien",
+        "breaks_body": "Tu peux faire une pause quand tu veux. AIVO se souviendra et reprendra où tu en étais.",
+        "extratime_title": "Temps supplémentaire",
+        "extratime_body": "De toute façon, il n'y a pas d'horloge. Prends tout le temps qu'il te faut.",
+        "tell_me_more": "Dis-m'en plus",
+        "im_ready": "Je suis prêt"
+      },
+      "intro": {
+        "step": "Étape 3 sur 3",
+        "eyebrow": "Un rendez-vous tranquille · {count} questions courtes",
+        "title": "Prêt, {name} ?",
+        "body_with_tutor": "{tutorName} de {landmark} est là pour t'aider à démarrer. On y va une question à la fois. Saute ce que tu ne veux pas essayer.",
+        "body_default": "On y va une question à la fois. Saute ce que tu ne veux pas essayer.",
+        "start": "Commence quand tu es prêt",
+        "subjects_today": "Matières du jour",
+        "questions_label": "Questions",
+        "questions_note": "Courtes et sympas. Saute-en une si tu préfères avancer.",
+        "time_label": "Temps",
+        "no_clock": "Pas d'horloge",
+        "time_note": "Fais une pause quand tu veux. AIVO se souviendra d'où tu en étais."
+      }
     }
   },
   "auth": {

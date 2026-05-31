@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import {
   LearnerBaselineShell,
@@ -41,6 +42,7 @@ export default async function BaselineIntroPage({
 
   const learner = await getLearner(session.learnerId, session.tenantId);
   if (!learner) redirect("/learner/home");
+  const t = await getTranslations("learner.baseline");
   const questions = await listBaselineQuestions(baseline.id);
   const allSubjects = await listSubjects();
   const subjectsById = new Map(allSubjects.map((s) => [s.id, s]));
@@ -66,22 +68,22 @@ export default async function BaselineIntroPage({
             <path d="M19 12H5" />
             <path d="m12 19-7-7 7-7" />
           </svg>
-          Back
+          {t("back")}
         </Link>
       }
       headerRight={
         <p className="text-xs text-iw-text-muted">
-          Step 3 of 3
+          {t("intro.step")}
         </p>
       }
     >
       <AICompanionHero
-        eyebrow={`A friendly check-in · ${questions.length} short questions`}
-        title={`Ready, ${learner.preferredName || learner.firstName}?`}
+        eyebrow={t("intro.eyebrow", { count: questions.length })}
+        title={t("intro.title", { name: learner.preferredName || learner.firstName })}
         body={
           firstTutor
-            ? `${firstTutor.name} from the ${firstTutor.landmark} is here to help you start. We'll go one question at a time. Skip anything you don't want to try.`
-            : "We'll go one question at a time. Skip anything you don't want to try."
+            ? t("intro.body_with_tutor", { tutorName: firstTutor.name, landmark: firstTutor.landmark })
+            : t("intro.body_default")
         }
         tutorAvatar={firstTutor?.emoji}
         chips={chips.slice(0, 4).map((v) => (
@@ -92,7 +94,7 @@ export default async function BaselineIntroPage({
             href={`/learner/baseline/${baseline.id}`}
             className="inline-flex items-center gap-2 rounded-iw-control px-6 py-3 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 shadow-[0_4px_12px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.3)]"
           >
-            Start when you're ready
+            {t("intro.start")}
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <polygon points="5 3 19 12 5 21 5 3" />
             </svg>
@@ -102,7 +104,7 @@ export default async function BaselineIntroPage({
 
       <section className="grid gap-3 md:grid-cols-3">
         <article className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-2">
-          <p className="iw-label text-iw-text-muted">Subjects today</p>
+          <p className="iw-label text-iw-text-muted">{t("intro.subjects_today")}</p>
           <p className="text-2xl font-semibold text-iw-text-strong tabular-nums">
             {subjects.length}
           </p>
@@ -111,19 +113,19 @@ export default async function BaselineIntroPage({
           </p>
         </article>
         <article className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-2">
-          <p className="iw-label text-iw-text-muted">Questions</p>
+          <p className="iw-label text-iw-text-muted">{t("intro.questions_label")}</p>
           <p className="text-2xl font-semibold text-iw-text-strong tabular-nums">
             {questions.length}
           </p>
           <p className="text-xs text-iw-text-muted leading-relaxed">
-            Short and friendly. Skip anything if you'd rather move on.
+            {t("intro.questions_note")}
           </p>
         </article>
         <article className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-2">
-          <p className="iw-label text-iw-text-muted">Time</p>
-          <p className="text-2xl font-semibold text-iw-text-strong">No clock</p>
+          <p className="iw-label text-iw-text-muted">{t("intro.time_label")}</p>
+          <p className="text-2xl font-semibold text-iw-text-strong">{t("intro.no_clock")}</p>
           <p className="text-xs text-iw-text-muted leading-relaxed">
-            Pause whenever. AIVO will remember where you left off.
+            {t("intro.time_note")}
           </p>
         </article>
       </section>

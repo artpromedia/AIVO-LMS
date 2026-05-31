@@ -452,6 +452,76 @@
       "preview_text": "Hello! This is your read-aloud voice preview.",
       "failed": "Failed.",
       "preview_failed": "Preview failed."
+    },
+    "baseline": {
+      "back": "Back",
+      "back_home": "Back home",
+      "index": {
+        "notready_eyebrow": "Almost ready",
+        "notready_title": "A grown-up is still setting this up",
+        "notready_body": "Ask the grown-up who signed you up — they have a couple of questions to finish before AIVO can plan your check-in.",
+        "ready_eyebrow": "A friendly check-in",
+        "ready_title": "Hi {name} — ready to show me how you think?",
+        "ready_body": "Three calm steps before the first question. Pick what you want to start with, AIVO does the rest.",
+        "lets_go": "Let's go"
+      },
+      "why": {
+        "eyebrow": "How AIVO got ready for you",
+        "title": "Hi {name} — I made this for you.",
+        "body": "A grown-up answered a few questions so I'd know how you like to learn. If they shared an IEP, I read the supports too. Here's what I'm doing right now:",
+        "cta": "Pick where to start",
+        "card1_title": "Made fresh for you",
+        "card1_body": "Every question is picked just for what your grown-up shared — not from a big shared quiz.",
+        "card2_title": "No grades, no points",
+        "card2_body": "This isn't a test. AIVO uses what you show to plan calm, just-right lessons.",
+        "card3_title": "Breaks are good",
+        "card3_body": "You can pause, take a breath, or stop for today. AIVO will remember where you were."
+      },
+      "subjects": {
+        "step": "Step 1 of 3",
+        "title": "Where do you want to start?",
+        "body": "Pick one or more subjects. AIVO will pick a small handful of friendly questions just for you.",
+        "error_pick_one": "Pick at least one subject to start.",
+        "legend": "Choose subjects",
+        "with_tutor": "With {name} · {landmark}",
+        "picked_by_grownup": "Picked by grown-up",
+        "picked_note": "Subjects with a \"Picked by grown-up\" tag come from your parent's setup.",
+        "get_ready": "Get ready"
+      },
+      "readiness": {
+        "step": "Step 2 of 3",
+        "title": "Quick check before we start",
+        "body": "Nothing here is a test. Just a few things AIVO turns on so the baseline feels just right.",
+        "status_on": "On",
+        "readaloud_off": "You can turn it on per question",
+        "status_default": "Default",
+        "status_always": "Always",
+        "status_off": "Off",
+        "readaloud_title": "Read-aloud",
+        "readaloud_body": "Tap the speaker on any question to hear the words. No one will know — promise.",
+        "calm_title": "Calm screen",
+        "calm_body": "Soft colors and quiet motion so it's easier to focus. You can change this any time.",
+        "breaks_title": "Breaks are good",
+        "breaks_body": "You can pause whenever. AIVO will remember and pick up where you left off.",
+        "extratime_title": "Extra time",
+        "extratime_body": "There's no clock anyway. Take all the time you need.",
+        "tell_me_more": "Tell me more",
+        "im_ready": "I'm ready"
+      },
+      "intro": {
+        "step": "Step 3 of 3",
+        "eyebrow": "A friendly check-in · {count} short questions",
+        "title": "Ready, {name}?",
+        "body_with_tutor": "{tutorName} from the {landmark} is here to help you start. We'll go one question at a time. Skip anything you don't want to try.",
+        "body_default": "We'll go one question at a time. Skip anything you don't want to try.",
+        "start": "Start when you're ready",
+        "subjects_today": "Subjects today",
+        "questions_label": "Questions",
+        "questions_note": "Short and friendly. Skip anything if you'd rather move on.",
+        "time_label": "Time",
+        "no_clock": "No clock",
+        "time_note": "Pause whenever. AIVO will remember where you left off."
+      }
     }
   },
   "onboarding": {

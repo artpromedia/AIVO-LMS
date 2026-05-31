@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import {
   LearnerBaselineShell,
@@ -25,6 +26,7 @@ import {
  */
 export default async function LearnerBaselineIndex() {
   const session = await requirePageRole(["learner"]);
+  const t = await getTranslations("learner.baseline");
   const learnerId = session.learnerId;
   if (!learnerId) redirect("/learner/home");
 
@@ -53,20 +55,20 @@ export default async function LearnerBaselineIndex() {
               <path d="M19 12H5" />
               <path d="m12 19-7-7 7-7" />
             </svg>
-            Back home
+            {t("back_home")}
           </Link>
         }
       >
         <AICompanionHero
-          eyebrow="Almost ready"
-          title="A grown-up is still setting this up"
-          body="Ask the grown-up who signed you up — they have a couple of questions to finish before AIVO can plan your check-in."
+          eyebrow={t("index.notready_eyebrow")}
+          title={t("index.notready_title")}
+          body={t("index.notready_body")}
           actions={
             <Link
               href="/learner/home"
               className="inline-flex items-center gap-2 rounded-iw-control px-5 py-3 text-base font-semibold text-iw-text-strong bg-white border border-iw-border hover:bg-[var(--aivo-color-surface-sunken)]"
             >
-              Back home
+              {t("back_home")}
             </Link>
           }
         />
@@ -95,9 +97,9 @@ export default async function LearnerBaselineIndex() {
       }
     >
       <AICompanionHero
-        eyebrow="A friendly check-in"
-        title={`Hi ${learner.preferredName || learner.firstName} — ready to show me how you think?`}
-        body="Three calm steps before the first question. Pick what you want to start with, AIVO does the rest."
+        eyebrow={t("index.ready_eyebrow")}
+        title={t("index.ready_title", { name: learner.preferredName || learner.firstName })}
+        body={t("index.ready_body")}
         chips={chips.slice(0, 4).map((v) => (
           <PersonalizationChip key={v} variant={v} />
         ))}
@@ -106,7 +108,7 @@ export default async function LearnerBaselineIndex() {
             href="/learner/baseline/why"
             className="inline-flex items-center gap-2 rounded-iw-control px-6 py-3 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 shadow-[0_4px_12px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.3)]"
           >
-            Let's go
+            {t("index.lets_go")}
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M5 12h14" />
               <path d="m13 5 7 7-7 7" />

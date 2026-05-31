@@ -320,6 +320,76 @@
       "preview_text": "Olá! Esta é a prévia da sua voz de leitura em voz alta.",
       "failed": "Falhou.",
       "preview_failed": "A prévia falhou."
+    },
+    "baseline": {
+      "back": "Voltar",
+      "back_home": "Voltar ao início",
+      "index": {
+        "notready_eyebrow": "Quase pronto",
+        "notready_title": "Um adulto ainda está configurando isto",
+        "notready_body": "Pergunte ao adulto que te cadastrou — faltam algumas perguntas para ele terminar antes que a AIVO possa planejar seu encontro.",
+        "ready_eyebrow": "Um encontro amigável",
+        "ready_title": "Oi {name} — pronto para me mostrar como você pensa?",
+        "ready_body": "Três passos tranquilos antes da primeira pergunta. Escolha por onde começar e a AIVO faz o resto.",
+        "lets_go": "Vamos"
+      },
+      "why": {
+        "eyebrow": "Como a AIVO se preparou para você",
+        "title": "Oi {name} — fiz isto para você.",
+        "body": "Um adulto respondeu algumas perguntas para que eu soubesse como você gosta de aprender. Se ele compartilhou um IEP, também li os apoios. Aqui está o que estou fazendo agora:",
+        "cta": "Escolha por onde começar",
+        "card1_title": "Feito sob medida para você",
+        "card1_body": "Cada pergunta é escolhida com base no que seu adulto compartilhou — não de um quiz genérico.",
+        "card2_title": "Sem notas, sem pontos",
+        "card2_body": "Isto não é uma prova. A AIVO usa o que você mostra para planejar lições calmas e na medida certa.",
+        "card3_title": "Pausas são boas",
+        "card3_body": "Você pode pausar, respirar ou parar por hoje. A AIVO lembrará onde você estava."
+      },
+      "subjects": {
+        "step": "Etapa 1 de 3",
+        "title": "Por onde você quer começar?",
+        "body": "Escolha uma ou mais matérias. A AIVO escolherá um punhado de perguntas amigáveis só para você.",
+        "error_pick_one": "Escolha pelo menos uma matéria para começar.",
+        "legend": "Escolher matérias",
+        "with_tutor": "Com {name} · {landmark}",
+        "picked_by_grownup": "Escolhido por um adulto",
+        "picked_note": "Matérias com a etiqueta \"Escolhido por um adulto\" vêm da configuração da sua família.",
+        "get_ready": "Prepare-se"
+      },
+      "readiness": {
+        "step": "Etapa 2 de 3",
+        "title": "Uma verificação rápida antes de começar",
+        "body": "Nada aqui é uma prova. Só algumas coisas que a AIVO ativa para o encontro ficar do jeitinho certo.",
+        "status_on": "Ativado",
+        "readaloud_off": "Você pode ativar em cada pergunta",
+        "status_default": "Padrão",
+        "status_always": "Sempre",
+        "status_off": "Desativado",
+        "readaloud_title": "Leitura em voz alta",
+        "readaloud_body": "Toque no alto-falante em qualquer pergunta para ouvir as palavras. Ninguém vai saber — prometo.",
+        "calm_title": "Tela calma",
+        "calm_body": "Cores suaves e pouco movimento para você focar melhor. Você pode mudar isso quando quiser.",
+        "breaks_title": "Pausas são boas",
+        "breaks_body": "Você pode pausar quando quiser. A AIVO lembrará e continuará de onde você parou.",
+        "extratime_title": "Tempo extra",
+        "extratime_body": "De qualquer forma não há relógio. Use todo o tempo que precisar.",
+        "tell_me_more": "Conte-me mais",
+        "im_ready": "Estou pronto"
+      },
+      "intro": {
+        "step": "Etapa 3 de 3",
+        "eyebrow": "Um encontro amigável · {count} perguntas curtas",
+        "title": "Pronto, {name}?",
+        "body_with_tutor": "{tutorName} de {landmark} está aqui para te ajudar a começar. Vamos uma pergunta de cada vez. Pule o que não quiser tentar.",
+        "body_default": "Vamos uma pergunta de cada vez. Pule o que não quiser tentar.",
+        "start": "Comece quando estiver pronto",
+        "subjects_today": "Matérias de hoje",
+        "questions_label": "Perguntas",
+        "questions_note": "Curtas e amigáveis. Pule qualquer uma se preferir avançar.",
+        "time_label": "Tempo",
+        "no_clock": "Sem relógio",
+        "time_note": "Pause quando quiser. A AIVO lembrará onde você parou."
+      }
     }
   },
   "auth": {

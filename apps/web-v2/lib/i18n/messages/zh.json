@@ -320,6 +320,76 @@
       "preview_text": "你好！这是你的朗读语音预览。",
       "failed": "失败。",
       "preview_failed": "预览失败。"
+    },
+    "baseline": {
+      "back": "返回",
+      "back_home": "返回主页",
+      "index": {
+        "notready_eyebrow": "快好了",
+        "notready_title": "大人还在设置中",
+        "notready_body": "问问帮你注册的大人——他们还有几个问题要完成，AIVO 才能安排你的见面。",
+        "ready_eyebrow": "一次轻松的见面",
+        "ready_title": "嗨 {name}——准备好让我看看你怎么思考了吗？",
+        "ready_body": "在第一个问题之前有三个轻松的步骤。选择你想从哪里开始，其余的交给 AIVO。",
+        "lets_go": "出发吧"
+      },
+      "why": {
+        "eyebrow": "AIVO 如何为你做准备",
+        "title": "嗨 {name}——这是我为你做的。",
+        "body": "一位大人回答了几个问题，让我知道你喜欢怎么学。如果他们分享了 IEP，我也读了其中的支持。这是我现在正在做的：",
+        "cta": "选择从哪里开始",
+        "card1_title": "为你量身定制",
+        "card1_body": "每个问题都根据你大人分享的内容来挑选——而不是来自一份通用的大测验。",
+        "card2_title": "没有分数，没有积分",
+        "card2_body": "这不是考试。AIVO 用你展示的内容来安排平和、恰到好处的课程。",
+        "card3_title": "休息是好事",
+        "card3_body": "你可以暂停、喘口气，或今天先停下。AIVO 会记住你到哪里了。"
+      },
+      "subjects": {
+        "step": "第 1 步，共 3 步",
+        "title": "你想从哪里开始？",
+        "body": "选择一个或多个学科。AIVO 会专门为你挑选一小把友好的问题。",
+        "error_pick_one": "至少选择一个学科才能开始。",
+        "legend": "选择学科",
+        "with_tutor": "与 {name} · {landmark}",
+        "picked_by_grownup": "由大人挑选",
+        "picked_note": "带有「由大人挑选」标签的学科来自你家长的设置。",
+        "get_ready": "准备好"
+      },
+      "readiness": {
+        "step": "第 2 步，共 3 步",
+        "title": "开始前快速检查一下",
+        "body": "这里没有任何考试。只是 AIVO 打开的一些设置，让见面感觉刚刚好。",
+        "status_on": "已开启",
+        "readaloud_off": "你可以在每个问题上开启它",
+        "status_default": "默认",
+        "status_always": "始终",
+        "status_off": "已关闭",
+        "readaloud_title": "朗读",
+        "readaloud_body": "在任意问题上点按扬声器即可听到文字。没人会知道——我保证。",
+        "calm_title": "平静屏幕",
+        "calm_body": "柔和的颜色和安静的动效，让你更容易专注。你可以随时更改。",
+        "breaks_title": "休息是好事",
+        "breaks_body": "你可以随时暂停。AIVO 会记住并从你停下的地方继续。",
+        "extratime_title": "额外时间",
+        "extratime_body": "反正没有计时。需要多久就用多久。",
+        "tell_me_more": "告诉我更多",
+        "im_ready": "我准备好了"
+      },
+      "intro": {
+        "step": "第 3 步，共 3 步",
+        "eyebrow": "一次轻松的见面 · {count} 个简短问题",
+        "title": "准备好了吗，{name}？",
+        "body_with_tutor": "来自{landmark}的 {tutorName} 在这里帮你开始。我们一次一个问题。不想试的可以跳过。",
+        "body_default": "我们一次一个问题。不想试的可以跳过。",
+        "start": "准备好就开始",
+        "subjects_today": "今天的学科",
+        "questions_label": "问题",
+        "questions_note": "简短又友好。如果你想往前走，任意一个都可以跳过。",
+        "time_label": "时间",
+        "no_clock": "没有计时",
+        "time_note": "随时暂停。AIVO 会记住你停下的地方。"
+      }
     }
   },
   "auth": {

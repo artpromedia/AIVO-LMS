@@ -320,6 +320,76 @@
       "preview_text": "¡Hola! Esta es la vista previa de tu voz de lectura en voz alta.",
       "failed": "Error.",
       "preview_failed": "Falló la vista previa."
+    },
+    "baseline": {
+      "back": "Atrás",
+      "back_home": "Volver al inicio",
+      "index": {
+        "notready_eyebrow": "Casi listo",
+        "notready_title": "Un adulto todavía está configurando esto",
+        "notready_body": "Pregúntale al adulto que te registró: tiene un par de preguntas que terminar antes de que AIVO pueda planear tu encuentro.",
+        "ready_eyebrow": "Un encuentro amistoso",
+        "ready_title": "Hola {name}, ¿listo para mostrarme cómo piensas?",
+        "ready_body": "Tres pasos tranquilos antes de la primera pregunta. Elige por dónde empezar y AIVO hace el resto.",
+        "lets_go": "Vamos"
+      },
+      "why": {
+        "eyebrow": "Cómo AIVO se preparó para ti",
+        "title": "Hola {name}, hice esto para ti.",
+        "body": "Un adulto respondió unas preguntas para que yo supiera cómo te gusta aprender. Si compartió un IEP, también leí los apoyos. Esto es lo que estoy haciendo ahora:",
+        "cta": "Elige por dónde empezar",
+        "card1_title": "Hecho a tu medida",
+        "card1_body": "Cada pregunta se elige según lo que compartió tu adulto, no de un examen genérico.",
+        "card2_title": "Sin notas ni puntos",
+        "card2_body": "Esto no es un examen. AIVO usa lo que muestras para planear lecciones tranquilas y a tu medida.",
+        "card3_title": "Los descansos son buenos",
+        "card3_body": "Puedes pausar, respirar o parar por hoy. AIVO recordará dónde te quedaste."
+      },
+      "subjects": {
+        "step": "Paso 1 de 3",
+        "title": "¿Por dónde quieres empezar?",
+        "body": "Elige una o más materias. AIVO escogerá un puñado de preguntas amistosas solo para ti.",
+        "error_pick_one": "Elige al menos una materia para empezar.",
+        "legend": "Elegir materias",
+        "with_tutor": "Con {name} · {landmark}",
+        "picked_by_grownup": "Elegido por un adulto",
+        "picked_note": "Las materias con la etiqueta \"Elegido por un adulto\" vienen de la configuración de tu familia.",
+        "get_ready": "Prepárate"
+      },
+      "readiness": {
+        "step": "Paso 2 de 3",
+        "title": "Una comprobación rápida antes de empezar",
+        "body": "Nada de esto es un examen. Solo algunas cosas que AIVO activa para que el encuentro se sienta perfecto.",
+        "status_on": "Activado",
+        "readaloud_off": "Puedes activarlo en cada pregunta",
+        "status_default": "Predeterminado",
+        "status_always": "Siempre",
+        "status_off": "Desactivado",
+        "readaloud_title": "Lectura en voz alta",
+        "readaloud_body": "Toca el altavoz en cualquier pregunta para oír las palabras. Nadie lo sabrá, prometido.",
+        "calm_title": "Pantalla tranquila",
+        "calm_body": "Colores suaves y poco movimiento para concentrarte mejor. Puedes cambiarlo cuando quieras.",
+        "breaks_title": "Los descansos son buenos",
+        "breaks_body": "Puedes pausar cuando quieras. AIVO recordará y seguirá donde lo dejaste.",
+        "extratime_title": "Tiempo extra",
+        "extratime_body": "De todos modos no hay reloj. Tómate todo el tiempo que necesites.",
+        "tell_me_more": "Cuéntame más",
+        "im_ready": "Estoy listo"
+      },
+      "intro": {
+        "step": "Paso 3 de 3",
+        "eyebrow": "Un encuentro amistoso · {count} preguntas cortas",
+        "title": "¿Listo, {name}?",
+        "body_with_tutor": "{tutorName} de {landmark} está aquí para ayudarte a empezar. Iremos pregunta por pregunta. Salta lo que no quieras intentar.",
+        "body_default": "Iremos pregunta por pregunta. Salta lo que no quieras intentar.",
+        "start": "Empieza cuando estés listo",
+        "subjects_today": "Materias de hoy",
+        "questions_label": "Preguntas",
+        "questions_note": "Cortas y amistosas. Salta cualquiera si prefieres avanzar.",
+        "time_label": "Tiempo",
+        "no_clock": "Sin reloj",
+        "time_note": "Pausa cuando quieras. AIVO recordará dónde te quedaste."
+      }
     }
   },
   "auth": {

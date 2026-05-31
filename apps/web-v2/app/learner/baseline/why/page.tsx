@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { requirePageRole } from "@/lib/auth/server";
 import {
   LearnerBaselineShell,
@@ -28,6 +29,7 @@ export default async function BaselineWhyPage() {
   if (!learnerId) redirect("/learner/home");
   const learner = await getLearner(learnerId, session.tenantId);
   if (!learner) redirect("/learner/home");
+  const t = await getTranslations("learner.baseline");
   const assessment = await getOrCreateParentAssessment(learnerId, session.tenantId);
   const iep = await getIEPForLearner(learnerId, session.tenantId);
 
@@ -65,14 +67,14 @@ export default async function BaselineWhyPage() {
             <path d="M19 12H5" />
             <path d="m12 19-7-7 7-7" />
           </svg>
-          Back home
+          {t("back_home")}
         </Link>
       }
     >
       <AICompanionHero
-        eyebrow="How AIVO got ready for you"
-        title={`Hi ${learner.preferredName || learner.firstName} — I made this for you.`}
-        body="A grown-up answered a few questions so I'd know how you like to learn. If they shared an IEP, I read the supports too. Here's what I'm doing right now:"
+        eyebrow={t("why.eyebrow")}
+        title={t("why.title", { name: learner.preferredName || learner.firstName })}
+        body={t("why.body")}
         chips={chips.slice(0, 6).map((v) => (
           <PersonalizationChip key={v} variant={v} />
         ))}
@@ -81,7 +83,7 @@ export default async function BaselineWhyPage() {
             href="/learner/baseline/subjects"
             className="inline-flex items-center gap-2 rounded-iw-control px-5 py-3 text-base font-semibold text-white bg-[var(--aivo-sensory-primary)] hover:brightness-110 shadow-[0_4px_12px_rgb(from_var(--aivo-sensory-primary)_r_g_b_/_0.3)]"
           >
-            Pick where to start
+            {t("why.cta")}
             <svg
               className="w-5 h-5"
               viewBox="0 0 24 24"
@@ -107,10 +109,9 @@ export default async function BaselineWhyPage() {
               <polyline points="14 2 14 8 20 8" />
             </svg>
           </span>
-          <h2 className="text-base font-semibold text-iw-text-strong">Made fresh for you</h2>
+          <h2 className="text-base font-semibold text-iw-text-strong">{t("why.card1_title")}</h2>
           <p className="text-sm text-iw-text-muted leading-relaxed">
-            Every question is picked just for what your grown-up shared — not from a big shared
-            quiz.
+            {t("why.card1_body")}
           </p>
         </article>
         <article className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-2">
@@ -120,9 +121,9 @@ export default async function BaselineWhyPage() {
               <polyline points="22 4 12 14.01 9 11.01" />
             </svg>
           </span>
-          <h2 className="text-base font-semibold text-iw-text-strong">No grades, no points</h2>
+          <h2 className="text-base font-semibold text-iw-text-strong">{t("why.card2_title")}</h2>
           <p className="text-sm text-iw-text-muted leading-relaxed">
-            This isn't a test. AIVO uses what you show to plan calm, just-right lessons.
+            {t("why.card2_body")}
           </p>
         </article>
         <article className="rounded-iw-card-lg bg-white border border-iw-border p-5 flex flex-col gap-2">
@@ -131,9 +132,9 @@ export default async function BaselineWhyPage() {
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
             </svg>
           </span>
-          <h2 className="text-base font-semibold text-iw-text-strong">Breaks are good</h2>
+          <h2 className="text-base font-semibold text-iw-text-strong">{t("why.card3_title")}</h2>
           <p className="text-sm text-iw-text-muted leading-relaxed">
-            You can pause, take a breath, or stop for today. AIVO will remember where you were.
+            {t("why.card3_body")}
           </p>
         </article>
       </section>
