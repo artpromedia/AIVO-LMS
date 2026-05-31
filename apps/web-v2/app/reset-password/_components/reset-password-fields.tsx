@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { Eye, EyeOff } from "lucide-react";
 import { AuthInput } from "@aivo/ui/auth";
 
@@ -11,6 +12,7 @@ import { AuthInput } from "@aivo/ui/auth";
  * via `required` semantics. Server still re-validates everything.
  */
 export function ResetPasswordFields({ id }: { readonly id: string }) {
+  const t = useTranslations("auth");
   const [password, setPassword] = React.useState("");
   const [confirm, setConfirm] = React.useState("");
   const [showPw, setShowPw] = React.useState(false);
@@ -22,7 +24,7 @@ export function ResetPasswordFields({ id }: { readonly id: string }) {
     <button
       type="button"
       onClick={() => setShowPw((value) => !value)}
-      aria-label={showPw ? "Hide password" : "Show password"}
+      aria-label={showPw ? t("common.hide_password") : t("common.show_password")}
       aria-pressed={showPw}
       className="inline-flex h-7 w-7 items-center justify-center rounded-full text-iw-ink-muted hover:bg-iw-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring focus-visible:ring-offset-2 focus-visible:ring-offset-iw-bg"
     >
@@ -39,7 +41,7 @@ export function ResetPasswordFields({ id }: { readonly id: string }) {
       <AuthInput
         id={`${id}-password`}
         name="password"
-        label="New password"
+        label={t("reset.new_password_label")}
         type={showPw ? "text" : "password"}
         autoComplete="new-password"
         value={password}
@@ -47,22 +49,20 @@ export function ResetPasswordFields({ id }: { readonly id: string }) {
         required
         minLength={12}
         helper={
-          tooShort
-            ? "Use at least 12 characters with a mix of letters, numbers, and symbols."
-            : "Use at least 12 characters. We'll reject reused or weak passwords."
+          tooShort ? t("reset.helper_too_short") : t("reset.helper_default")
         }
         trailing={trailing}
       />
       <AuthInput
         id={`${id}-confirm`}
         name="confirm"
-        label="Confirm new password"
+        label={t("reset.confirm_password_label")}
         type={showPw ? "text" : "password"}
         autoComplete="new-password"
         value={confirm}
         onChange={(event) => setConfirm(event.target.value)}
         required
-        helper={mismatch ? "Passwords don't match yet." : undefined}
+        helper={mismatch ? t("reset.mismatch_helper") : undefined}
         trailing={trailing}
       />
     </>

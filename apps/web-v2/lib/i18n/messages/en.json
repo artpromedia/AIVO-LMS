@@ -16,6 +16,138 @@
   "app": {
     "tagline": "Personalized learning adventures for every child."
   },
+  "auth": {
+    "common": {
+      "email": "Email",
+      "password": "Password",
+      "show_password": "Show password",
+      "hide_password": "Hide password"
+    },
+    "login": {
+      "brand_heading": "Sign in to continue your AIVO journey.",
+      "brand_body": "Your tutors, missions, and family insights — all in one place, tuned for how your learner thinks.",
+      "trust_badge": "COPPA · FERPA · SOC 2",
+      "quote": "AIVO adapts to how my daughter actually learns. The first platform that didn't make us feel like we were fighting it.",
+      "quote_attribution": "— Parent of a Grade 3 learner",
+      "welcome_back": "Welcome back.",
+      "card_eyebrow": "Sign in",
+      "card_title": "Continue with your AIVO account",
+      "card_subtitle": "Sign in with your AIVO email and password.",
+      "submit": "Sign in",
+      "new_here": "New here?",
+      "create_account": "Create an account",
+      "forgot_password": "Forgot password?",
+      "privacy_lead": "We never sell your data.",
+      "privacy_link": "Read the privacy notice",
+      "errors": {
+        "invalid_credentials": "Email or password is incorrect.",
+        "invalid_role": "That role isn't available for this account.",
+        "missing_credentials": "Enter your email and password to sign in.",
+        "mfa_required": "We need a verification code to finish signing you in. Please enter it on the next screen.",
+        "mfa_session_expired": "Your verification session expired. Please sign in again.",
+        "wrong_surface": "This account signs in on a different surface (district or admin). Use the correct portal.",
+        "unsupported_role": "Your account role isn't supported on this surface yet.",
+        "login_failed": "We couldn't sign you in. Please try again."
+      },
+      "notices": {
+        "password_reset": "Your password has been reset. Please sign in with your new password.",
+        "logged_out": "You've been signed out."
+      }
+    },
+    "signup": {
+      "promo_eyebrow": "Start your family trial",
+      "promo_title": "A warmer way to learn — for every child in the family.",
+      "promo_subtitle": "Set up learners in minutes. Adaptive AI tutors, sensory-friendly modes, and progress every parent can see.",
+      "benefit_tutors": "Adaptive AI tutors that meet every learner where they are.",
+      "benefit_sensory": "Sensory-friendly modes: Standard, Calm, High Contrast.",
+      "benefit_progress": "Progress every parent can see — IEP-aware and quietly honest.",
+      "reassurance_title": "Adults set up accounts, not children.",
+      "reassurance_body": "You'll add learners on the next step. AIVO never asks a child to create their own account, and COPPA / FERPA / SOC 2 protections apply to everything from day one.",
+      "card_eyebrow": "Create your account",
+      "card_title": "Tell us a little about you",
+      "already_have": "Already have one?",
+      "sign_in": "Sign in",
+      "submit": "Create account",
+      "submitting": "Creating your account…",
+      "name_label": "Your name",
+      "email_label": "Email",
+      "password_label": "Password",
+      "password_helper": "At least 8 characters with a number and a symbol."
+    },
+    "forgot": {
+      "heading": "Reset your password",
+      "error_invalid_email": "Enter a valid email address so we can find your account.",
+      "sent_eyebrow": "Check your inbox",
+      "sent_title": "If that email is registered, a reset link is on the way.",
+      "sent_subtitle": "For your security, we don't reveal whether an account exists. The link expires in 1 hour.",
+      "sent_body": "Check spam or promotions if you don't see it after a minute. The link works once and then expires — request a new one if you need to start over.",
+      "back_to_sign_in": "Back to sign in",
+      "didnt_get_it": "Didn't get it?",
+      "try_different_email": "Try a different email",
+      "form_eyebrow": "Forgot password",
+      "form_title": "Enter the email on your account",
+      "form_subtitle": "We'll email you a secure link to set a new password.",
+      "submit": "Send reset link",
+      "remembered": "Remembered it?",
+      "sign_in": "Sign in",
+      "email_label": "Email"
+    },
+    "reset": {
+      "heading": "Choose a new password",
+      "errors": {
+        "missing_token": "This reset link is missing its security token. Request a new link from the forgot-password page.",
+        "weak_password": "Your new password must be at least 12 characters long.",
+        "mismatch": "The two passwords don't match yet. Try entering them again.",
+        "invalid_token": "This reset link has expired or has already been used. Request a new link to continue.",
+        "policy_violation": "That password doesn't meet our policy. See the details below and try a stronger one.",
+        "reset_failed": "We couldn't reset your password. Please try again in a moment.",
+        "mock_mode": "Password reset is disabled in mock mode. Run with AUTH_MODE=custom and the identity service to test this flow."
+      },
+      "no_token_eyebrow": "Reset password",
+      "no_token_title": "This reset link is incomplete",
+      "no_token_subtitle": "The link in your email is missing its security token. Request a new one to continue.",
+      "no_token_cta": "Request a new link",
+      "no_token_body": "For your security, reset links expire after 1 hour and can only be used once.",
+      "form_eyebrow": "Reset password",
+      "form_title": "Set your new password",
+      "form_subtitle": "Choose something memorable but hard to guess. We'll sign you out of every device once you're done.",
+      "submit": "Save new password",
+      "need_link": "Need a new link?",
+      "start_over": "Start over",
+      "new_password_label": "New password",
+      "confirm_password_label": "Confirm new password",
+      "helper_too_short": "Use at least 12 characters with a mix of letters, numbers, and symbols.",
+      "helper_default": "Use at least 12 characters. We'll reject reused or weak passwords.",
+      "mismatch_helper": "Passwords don't match yet."
+    },
+    "mfa": {
+      "heading": "Verify it's you",
+      "card_eyebrow": "Multi-factor sign-in",
+      "totp_title": "Enter your authenticator code",
+      "totp_subtitle": "Open your authenticator app and enter the 6-digit code shown for AIVO Learning.",
+      "totp_cta": "Verify code",
+      "webauthn_title": "Use your passkey to continue",
+      "webauthn_subtitle": "Your account is protected by a passkey. Passkey sign-in isn't supported on this surface yet — use a recovery code below.",
+      "webauthn_cta": "Verify recovery code",
+      "email_title": "Enter your verification code",
+      "email_subtitle": "We sent a 6-digit code to the email on file. It expires in 10 minutes.",
+      "email_cta": "Verify code",
+      "resend_code": "Resend code",
+      "cancel": "Cancel and sign in again",
+      "code_label": "Verification code",
+      "recovery_hint": "Lost access? Use one of the recovery codes you saved when you turned on MFA — enter it in the field above.",
+      "errors": {
+        "missing_code": "Enter the verification code we sent to continue.",
+        "invalid_code": "That code doesn't match. Double-check and try again.",
+        "locked": "Too many failed attempts. Your account is temporarily locked — please try again in a few minutes.",
+        "resend_failed": "We couldn't send a new code. Please try again.",
+        "resend_exhausted": "You've reached the resend limit. Please sign in again to get a fresh code."
+      },
+      "notices": {
+        "resent": "A new code has been sent to your email."
+      }
+    }
+  },
   "parent": {
     "add_learner": {
       "title": "Add a learner",

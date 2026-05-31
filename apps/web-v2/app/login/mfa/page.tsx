@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { AuthCard, AuthInput } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 import { Button } from "@/components/ui/button";
@@ -93,42 +94,22 @@ async function resendMfaAction() {
   redirect("/login/mfa?notice=resent");
 }
 
-const ERROR_COPY: Record<string, string> = {
-  missing_code: "Enter the verification code we sent to continue.",
-  invalid_code: "That code doesn't match. Double-check and try again.",
-  locked:
-    "Too many failed attempts. Your account is temporarily locked — please try again in a few minutes.",
-  resend_failed: "We couldn't send a new code. Please try again.",
-  resend_exhausted: "You've reached the resend limit. Please sign in again to get a fresh code.",
-};
+// Recognized MFA error / notice codes. Copy lives in the i18n catalog
+// under auth.mfa.errors / auth.mfa.notices.
+const ERROR_CODES = new Set([
+  "missing_code",
+  "invalid_code",
+  "locked",
+  "resend_failed",
+  "resend_exhausted",
+]);
+const NOTICE_CODES = new Set(["resent"]);
 
-const NOTICE_COPY: Record<string, string> = {
-  resent: "A new code has been sent to your email.",
-};
-
-function describeMethod(method: string): { title: string; subtitle: string; cta: string } {
-  if (method === "totp") {
-    return {
-      title: "Enter your authenticator code",
-      subtitle:
-        "Open your authenticator app and enter the 6-digit code shown for AIVO Learning.",
-      cta: "Verify code",
-    };
-  }
-  if (method === "webauthn") {
-    return {
-      title: "Use your passkey to continue",
-      subtitle:
-        "Your account is protected by a passkey. Passkey sign-in isn't supported on this surface yet — use a recovery code below.",
-      cta: "Verify recovery code",
-    };
-  }
-  return {
-    title: "Enter your verification code",
-    subtitle:
-      "We sent a 6-digit code to the email on file. It expires in 10 minutes.",
-    cta: "Verify code",
-  };
+// Maps the MFA method to its catalog key prefix (totp_* / webauthn_* / email_*).
+function methodPrefix(method: string): "totp" | "webauthn" | "email" {
+  if (method === "totp") return "totp";
+  if (method === "webauthn") return "webauthn";
+  return "email";
 }
 
 export default async function MfaChallengePage({
@@ -137,8 +118,11 @@ export default async function MfaChallengePage({
   readonly searchParams: Promise<{ error?: string; notice?: string }>;
 }) {
   const { error, notice } = await searchParams;
-  const errorMessage = error ? (ERROR_COPY[error] ?? null) : null;
-  const noticeMessage = notice ? (NOTICE_COPY[notice] ?? null) : null;
+  const t = await getTranslations("auth.mfa");
+  const errorMessage =
+    error && ERROR_CODES.has(error) ? t(`errors.${error}` as never) : null;
+  const noticeMessage =
+    notice && NOTICE_CODES.has(notice) ? t(`notices.${notice}` as never) : null;
 
   const jar = await cookies();
   const challenge = parseMfaChallengeCookie(jar.get(MFA_CHALLENGE_COOKIE)?.value);
@@ -146,7 +130,10 @@ export default async function MfaChallengePage({
     redirect("/login?error=mfa_session_expired");
   }
 
-  const { title, subtitle, cta } = describeMethod(challenge.method);
+  const prefix = methodPrefix(challenge.method);
+  const title = t(`${prefix}_title` as never);
+  const subtitle = t(`${prefix}_subtitle` as never);
+  const cta = t(`${prefix}_cta` as never);
   const canResend = challenge.method === "email";
   const placeholder =
     challenge.method === "totp"
@@ -170,12 +157,12 @@ export default async function MfaChallengePage({
             <AivoIcon name="safetyOk" size={22} />
           </span>
           <h2 className="font-iw-display text-2xl font-bold leading-tight text-iw-ink">
-            Verify it's you
+            {t("heading")}
           </h2>
         </div>
 
         <AuthCard
-          eyebrow="Multi-factor sign-in"
+          eyebrow={t("card_eyebrow")}
           title={title}
           subtitle={subtitle}
           actions={
@@ -197,7 +184,7 @@ export default async function MfaChallengePage({
                     size="sm"
                     className="w-full text-iw-primary"
                   >
-                    Resend code
+                    {t("resend_code")}
                   </Button>
                 </form>
               ) : null}
@@ -206,7 +193,7 @@ export default async function MfaChallengePage({
                   href="/login"
                   className="font-semibold text-iw-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-iw-ring focus-visible:ring-offset-2 focus-visible:ring-offset-iw-bg rounded"
                 >
-                  Cancel and sign in again
+                  {t("cancel")}
                 </Link>
               </p>
             </>
@@ -216,7 +203,7 @@ export default async function MfaChallengePage({
             <AuthInput
               id="code"
               name="code"
-              label="Verification code"
+              label={t("code_label")}
               type="text"
               inputMode={challenge.method === "webauthn" ? "text" : "numeric"}
               autoComplete="one-time-code"
@@ -226,10 +213,7 @@ export default async function MfaChallengePage({
               maxLength={32}
               autoFocus
             />
-            <p className="text-xs text-iw-ink-muted">
-              Lost access? Use one of the recovery codes you saved when you turned on
-              MFA — enter it in the field above.
-            </p>
+            <p className="text-xs text-iw-ink-muted">{t("recovery_hint")}</p>
           </form>
         </AuthCard>
 

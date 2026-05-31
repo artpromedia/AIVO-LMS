@@ -53,6 +53,13 @@ jobs:
       - name: Check locale parity (web-v2, mobile, i18n-svc)
         run: node scripts/ci/check-i18n-coverage.mjs
 
+      - name: Gate hardcoded English (web-v2 ratchet)
+        # Locale parity above only checks that the JSON catalogs match each
+        # other — it can't see English strings hardcoded in components that
+        # were never extracted. This ratchet fails the build if any route
+        # area gains NEW hardcoded strings above its committed baseline.
+        run: node scripts/i18n-extract.mjs --gate
+
       - name: Check no "coming soon" prose in production code
         run: node scripts/ci/check-no-coming-soon.mjs
 

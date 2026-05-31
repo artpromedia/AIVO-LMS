@@ -174,5 +174,137 @@
       "baseline_needed_cta": "Commencer l'évaluation",
       "supports_on": "Aides activées"
     }
+  },
+  "auth": {
+    "common": {
+      "email": "E-mail",
+      "password": "Mot de passe",
+      "show_password": "Afficher le mot de passe",
+      "hide_password": "Masquer le mot de passe"
+    },
+    "login": {
+      "brand_heading": "Connectez-vous pour continuer votre parcours AIVO.",
+      "brand_body": "Vos tuteurs, vos missions et les informations pour la famille, réunis au même endroit et adaptés à la façon dont votre apprenant réfléchit.",
+      "trust_badge": "COPPA · FERPA · SOC 2",
+      "quote": "AIVO s'adapte à la façon dont ma fille apprend vraiment. La première plateforme qui ne nous a pas donné l'impression de lutter contre elle.",
+      "quote_attribution": "— Parent d'une élève de CE2",
+      "welcome_back": "Bon retour.",
+      "card_eyebrow": "Connexion",
+      "card_title": "Continuez avec votre compte AIVO",
+      "card_subtitle": "Connectez-vous avec votre e-mail et votre mot de passe AIVO.",
+      "submit": "Se connecter",
+      "new_here": "Nouveau ici ?",
+      "create_account": "Créer un compte",
+      "forgot_password": "Mot de passe oublié ?",
+      "privacy_lead": "Nous ne vendons jamais vos données.",
+      "privacy_link": "Lire l'avis de confidentialité",
+      "errors": {
+        "invalid_credentials": "L'e-mail ou le mot de passe est incorrect.",
+        "invalid_role": "Ce rôle n'est pas disponible pour ce compte.",
+        "missing_credentials": "Saisissez votre e-mail et votre mot de passe pour vous connecter.",
+        "mfa_required": "Nous avons besoin d'un code de vérification pour finaliser votre connexion. Saisissez-le sur l'écran suivant.",
+        "mfa_session_expired": "Votre session de vérification a expiré. Veuillez vous reconnecter.",
+        "wrong_surface": "Ce compte se connecte sur un autre espace (district ou administration). Utilisez le bon portail.",
+        "unsupported_role": "Le rôle de votre compte n'est pas encore pris en charge sur cet espace.",
+        "login_failed": "Nous n'avons pas pu vous connecter. Veuillez réessayer."
+      },
+      "notices": {
+        "password_reset": "Votre mot de passe a été réinitialisé. Connectez-vous avec votre nouveau mot de passe.",
+        "logged_out": "Vous avez été déconnecté."
+      }
+    },
+    "signup": {
+      "promo_eyebrow": "Démarrez votre essai familial",
+      "promo_title": "Une façon plus chaleureuse d'apprendre, pour chaque enfant de la famille.",
+      "promo_subtitle": "Configurez des apprenants en quelques minutes. Des tuteurs IA adaptatifs, des modes adaptés à la sensibilité et des progrès que chaque parent peut voir.",
+      "benefit_tutors": "Des tuteurs IA adaptatifs qui rejoignent chaque apprenant là où il en est.",
+      "benefit_sensory": "Modes adaptés à la sensibilité : Standard, Calme, Contraste élevé.",
+      "benefit_progress": "Des progrès que chaque parent peut voir, sensibles au PEI et honnêtes en toute discrétion.",
+      "reassurance_title": "Ce sont les adultes qui créent les comptes, pas les enfants.",
+      "reassurance_body": "Vous ajouterez des apprenants à l'étape suivante. AIVO ne demande jamais à un enfant de créer son propre compte, et les protections COPPA / FERPA / SOC 2 s'appliquent à tout dès le premier jour.",
+      "card_eyebrow": "Créez votre compte",
+      "card_title": "Parlez-nous un peu de vous",
+      "already_have": "Vous en avez déjà un ?",
+      "sign_in": "Se connecter",
+      "submit": "Créer un compte",
+      "submitting": "Création de votre compte…",
+      "name_label": "Votre nom",
+      "email_label": "E-mail",
+      "password_label": "Mot de passe",
+      "password_helper": "Au moins 8 caractères avec un chiffre et un symbole."
+    },
+    "forgot": {
+      "heading": "Réinitialisez votre mot de passe",
+      "error_invalid_email": "Saisissez une adresse e-mail valide pour que nous puissions retrouver votre compte.",
+      "sent_eyebrow": "Vérifiez votre boîte de réception",
+      "sent_title": "Si cet e-mail est enregistré, un lien de réinitialisation est en route.",
+      "sent_subtitle": "Pour votre sécurité, nous ne révélons pas si un compte existe. Le lien expire dans 1 heure.",
+      "sent_body": "Vérifiez les spams ou les promotions si vous ne le voyez pas après une minute. Le lien fonctionne une seule fois puis expire ; demandez-en un nouveau si vous devez recommencer.",
+      "back_to_sign_in": "Retour à la connexion",
+      "didnt_get_it": "Vous ne l'avez pas reçu ?",
+      "try_different_email": "Essayez une autre adresse",
+      "form_eyebrow": "Mot de passe oublié",
+      "form_title": "Saisissez l'e-mail de votre compte",
+      "form_subtitle": "Nous vous enverrons un lien sécurisé par e-mail pour définir un nouveau mot de passe.",
+      "submit": "Envoyer le lien de réinitialisation",
+      "remembered": "Vous vous en souvenez ?",
+      "sign_in": "Se connecter",
+      "email_label": "E-mail"
+    },
+    "reset": {
+      "heading": "Choisissez un nouveau mot de passe",
+      "errors": {
+        "missing_token": "Ce lien de réinitialisation n'a pas son jeton de sécurité. Demandez-en un nouveau depuis la page de mot de passe oublié.",
+        "weak_password": "Votre nouveau mot de passe doit comporter au moins 12 caractères.",
+        "mismatch": "Les deux mots de passe ne correspondent pas encore. Réessayez de les saisir.",
+        "invalid_token": "Ce lien de réinitialisation a expiré ou a déjà été utilisé. Demandez-en un nouveau pour continuer.",
+        "policy_violation": "Ce mot de passe ne respecte pas notre politique. Consultez les détails ci-dessous et essayez-en un plus solide.",
+        "reset_failed": "Nous n'avons pas pu réinitialiser votre mot de passe. Réessayez dans un instant.",
+        "mock_mode": "La réinitialisation du mot de passe est désactivée en mode test. Exécutez avec AUTH_MODE=custom et le service d'identité pour tester ce flux."
+      },
+      "no_token_eyebrow": "Réinitialiser le mot de passe",
+      "no_token_title": "Ce lien de réinitialisation est incomplet",
+      "no_token_subtitle": "Le lien dans votre e-mail n'a pas son jeton de sécurité. Demandez-en un nouveau pour continuer.",
+      "no_token_cta": "Demander un nouveau lien",
+      "no_token_body": "Pour votre sécurité, les liens de réinitialisation expirent après 1 heure et ne peuvent être utilisés qu'une seule fois.",
+      "form_eyebrow": "Réinitialiser le mot de passe",
+      "form_title": "Définissez votre nouveau mot de passe",
+      "form_subtitle": "Choisissez quelque chose de mémorable mais difficile à deviner. Nous vous déconnecterons de tous les appareils une fois terminé.",
+      "submit": "Enregistrer le nouveau mot de passe",
+      "need_link": "Besoin d'un nouveau lien ?",
+      "start_over": "Recommencer",
+      "new_password_label": "Nouveau mot de passe",
+      "confirm_password_label": "Confirmer le nouveau mot de passe",
+      "helper_too_short": "Utilisez au moins 12 caractères en mélangeant lettres, chiffres et symboles.",
+      "helper_default": "Utilisez au moins 12 caractères. Nous rejetons les mots de passe réutilisés ou faibles.",
+      "mismatch_helper": "Les mots de passe ne correspondent pas encore."
+    },
+    "mfa": {
+      "heading": "Vérifions que c'est bien vous",
+      "card_eyebrow": "Connexion multifacteur",
+      "totp_title": "Saisissez le code de votre authentificateur",
+      "totp_subtitle": "Ouvrez votre application d'authentification et saisissez le code à 6 chiffres affiché pour AIVO Learning.",
+      "totp_cta": "Vérifier le code",
+      "webauthn_title": "Utilisez votre clé d'accès pour continuer",
+      "webauthn_subtitle": "Votre compte est protégé par une clé d'accès. La connexion par clé d'accès n'est pas encore prise en charge sur cet espace ; utilisez un code de récupération ci-dessous.",
+      "webauthn_cta": "Vérifier le code de récupération",
+      "email_title": "Saisissez votre code de vérification",
+      "email_subtitle": "Nous avons envoyé un code à 6 chiffres à l'e-mail enregistré. Il expire dans 10 minutes.",
+      "email_cta": "Vérifier le code",
+      "resend_code": "Renvoyer le code",
+      "cancel": "Annuler et se reconnecter",
+      "code_label": "Code de vérification",
+      "recovery_hint": "Accès perdu ? Utilisez l'un des codes de récupération enregistrés lors de l'activation de la MFA, et saisissez-le dans le champ ci-dessus.",
+      "errors": {
+        "missing_code": "Saisissez le code de vérification que nous avons envoyé pour continuer.",
+        "invalid_code": "Ce code ne correspond pas. Vérifiez-le et réessayez.",
+        "locked": "Trop de tentatives échouées. Votre compte est temporairement verrouillé ; réessayez dans quelques minutes.",
+        "resend_failed": "Nous n'avons pas pu envoyer un nouveau code. Veuillez réessayer.",
+        "resend_exhausted": "Vous avez atteint la limite de renvois. Reconnectez-vous pour obtenir un nouveau code."
+      },
+      "notices": {
+        "resent": "Un nouveau code a été envoyé à votre e-mail."
+      }
+    }
   }
 }

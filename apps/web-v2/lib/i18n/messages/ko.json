@@ -174,5 +174,137 @@
       "baseline_needed_cta": "진단 시작",
       "supports_on": "지원 활성"
     }
+  },
+  "auth": {
+    "common": {
+      "email": "이메일",
+      "password": "비밀번호",
+      "show_password": "비밀번호 표시",
+      "hide_password": "비밀번호 숨기기"
+    },
+    "login": {
+      "brand_heading": "로그인하여 AIVO 여정을 계속하세요.",
+      "brand_body": "튜터, 미션, 가족 인사이트를 한곳에 모았습니다. 학습자가 생각하는 방식에 맞춰 조정됩니다.",
+      "trust_badge": "COPPA · FERPA · SOC 2",
+      "quote": "AIVO는 제 딸이 실제로 배우는 방식에 맞춰 줍니다. 우리가 맞서 싸운다는 느낌을 주지 않은 첫 번째 플랫폼입니다.",
+      "quote_attribution": "— 3학년 학습자의 학부모",
+      "welcome_back": "다시 오신 것을 환영합니다.",
+      "card_eyebrow": "로그인",
+      "card_title": "AIVO 계정으로 계속하기",
+      "card_subtitle": "AIVO 이메일과 비밀번호로 로그인하세요.",
+      "submit": "로그인",
+      "new_here": "처음이신가요?",
+      "create_account": "계정 만들기",
+      "forgot_password": "비밀번호를 잊으셨나요?",
+      "privacy_lead": "저희는 귀하의 데이터를 절대 판매하지 않습니다.",
+      "privacy_link": "개인정보 처리방침 읽기",
+      "errors": {
+        "invalid_credentials": "이메일 또는 비밀번호가 올바르지 않습니다.",
+        "invalid_role": "이 역할은 이 계정에서 사용할 수 없습니다.",
+        "missing_credentials": "로그인하려면 이메일과 비밀번호를 입력하세요.",
+        "mfa_required": "로그인을 완료하려면 인증 코드가 필요합니다. 다음 화면에서 입력하세요.",
+        "mfa_session_expired": "인증 세션이 만료되었습니다. 다시 로그인하세요.",
+        "wrong_surface": "이 계정은 다른 화면(교육구 또는 관리자)에서 로그인합니다. 올바른 포털을 사용하세요.",
+        "unsupported_role": "이 계정의 역할은 아직 이 화면에서 지원되지 않습니다.",
+        "login_failed": "로그인할 수 없습니다. 다시 시도하세요."
+      },
+      "notices": {
+        "password_reset": "비밀번호가 재설정되었습니다. 새 비밀번호로 로그인하세요.",
+        "logged_out": "로그아웃되었습니다."
+      }
+    },
+    "signup": {
+      "promo_eyebrow": "가족 체험판 시작하기",
+      "promo_title": "더 따뜻한 배움의 방식, 가족의 모든 아이를 위해.",
+      "promo_subtitle": "몇 분 만에 학습자를 설정하세요. 적응형 AI 튜터, 감각 친화 모드, 그리고 모든 부모가 볼 수 있는 진행 상황.",
+      "benefit_tutors": "각 학습자가 있는 자리에서 함께하는 적응형 AI 튜터.",
+      "benefit_sensory": "감각 친화 모드: 표준, 차분, 고대비.",
+      "benefit_progress": "모든 부모가 볼 수 있는 진행 상황 — IEP를 이해하고 조용히 정직하게.",
+      "reassurance_title": "계정은 아이가 아니라 어른이 만듭니다.",
+      "reassurance_body": "다음 단계에서 학습자를 추가합니다. AIVO는 아이에게 직접 계정을 만들라고 요구하지 않으며, COPPA / FERPA / SOC 2 보호가 첫날부터 모든 것에 적용됩니다.",
+      "card_eyebrow": "계정 만들기",
+      "card_title": "당신에 대해 조금 알려 주세요",
+      "already_have": "이미 계정이 있으신가요?",
+      "sign_in": "로그인",
+      "submit": "계정 만들기",
+      "submitting": "계정을 만드는 중…",
+      "name_label": "이름",
+      "email_label": "이메일",
+      "password_label": "비밀번호",
+      "password_helper": "숫자와 기호를 포함해 8자 이상."
+    },
+    "forgot": {
+      "heading": "비밀번호 재설정",
+      "error_invalid_email": "계정을 찾을 수 있도록 유효한 이메일을 입력하세요.",
+      "sent_eyebrow": "받은편지함을 확인하세요",
+      "sent_title": "해당 이메일이 등록되어 있다면 재설정 링크가 곧 전송됩니다.",
+      "sent_subtitle": "보안을 위해 계정 존재 여부는 알려드리지 않습니다. 링크는 1시간 후 만료됩니다.",
+      "sent_body": "1분 후에도 보이지 않으면 스팸 또는 프로모션을 확인하세요. 링크는 한 번만 작동한 후 만료됩니다. 다시 시작해야 한다면 새 링크를 요청하세요.",
+      "back_to_sign_in": "로그인으로 돌아가기",
+      "didnt_get_it": "받지 못하셨나요?",
+      "try_different_email": "다른 이메일로 시도",
+      "form_eyebrow": "비밀번호 찾기",
+      "form_title": "계정의 이메일을 입력하세요",
+      "form_subtitle": "새 비밀번호를 설정할 수 있는 보안 링크를 이메일로 보내드립니다.",
+      "submit": "재설정 링크 보내기",
+      "remembered": "기억나셨나요?",
+      "sign_in": "로그인",
+      "email_label": "이메일"
+    },
+    "reset": {
+      "heading": "새 비밀번호 선택",
+      "errors": {
+        "missing_token": "이 재설정 링크에 보안 토큰이 없습니다. 비밀번호 찾기 페이지에서 새 링크를 요청하세요.",
+        "weak_password": "새 비밀번호는 12자 이상이어야 합니다.",
+        "mismatch": "두 비밀번호가 아직 일치하지 않습니다. 다시 입력해 보세요.",
+        "invalid_token": "이 재설정 링크는 만료되었거나 이미 사용되었습니다. 계속하려면 새 링크를 요청하세요.",
+        "policy_violation": "해당 비밀번호는 정책에 맞지 않습니다. 아래 세부 정보를 확인하고 더 강력한 것을 시도하세요.",
+        "reset_failed": "비밀번호를 재설정할 수 없습니다. 잠시 후 다시 시도하세요.",
+        "mock_mode": "모의 모드에서는 비밀번호 재설정이 비활성화됩니다. 이 흐름을 테스트하려면 AUTH_MODE=custom과 ID 서비스로 실행하세요."
+      },
+      "no_token_eyebrow": "비밀번호 재설정",
+      "no_token_title": "이 재설정 링크가 불완전합니다",
+      "no_token_subtitle": "이메일의 링크에 보안 토큰이 없습니다. 계속하려면 새 링크를 요청하세요.",
+      "no_token_cta": "새 링크 요청",
+      "no_token_body": "보안을 위해 재설정 링크는 1시간 후 만료되며 한 번만 사용할 수 있습니다.",
+      "form_eyebrow": "비밀번호 재설정",
+      "form_title": "새 비밀번호 설정",
+      "form_subtitle": "기억하기 쉽지만 추측하기 어려운 것을 선택하세요. 완료되면 모든 기기에서 로그아웃됩니다.",
+      "submit": "새 비밀번호 저장",
+      "need_link": "새 링크가 필요하신가요?",
+      "start_over": "다시 시작",
+      "new_password_label": "새 비밀번호",
+      "confirm_password_label": "새 비밀번호 확인",
+      "helper_too_short": "문자, 숫자, 기호를 섞어 12자 이상 사용하세요.",
+      "helper_default": "12자 이상 사용하세요. 재사용되거나 약한 비밀번호는 거부됩니다.",
+      "mismatch_helper": "비밀번호가 아직 일치하지 않습니다."
+    },
+    "mfa": {
+      "heading": "본인 확인",
+      "card_eyebrow": "다중 요소 로그인",
+      "totp_title": "인증 앱 코드를 입력하세요",
+      "totp_subtitle": "인증 앱을 열고 AIVO Learning에 표시된 6자리 코드를 입력하세요.",
+      "totp_cta": "코드 확인",
+      "webauthn_title": "패스키로 계속하기",
+      "webauthn_subtitle": "귀하의 계정은 패스키로 보호됩니다. 이 화면에서는 아직 패스키 로그인이 지원되지 않습니다. 아래의 복구 코드를 사용하세요.",
+      "webauthn_cta": "복구 코드 확인",
+      "email_title": "인증 코드를 입력하세요",
+      "email_subtitle": "등록된 이메일로 6자리 코드를 보냈습니다. 10분 후 만료됩니다.",
+      "email_cta": "코드 확인",
+      "resend_code": "코드 다시 보내기",
+      "cancel": "취소하고 다시 로그인",
+      "code_label": "인증 코드",
+      "recovery_hint": "접근할 수 없나요? MFA를 켤 때 저장한 복구 코드 중 하나를 위 입력란에 입력하세요.",
+      "errors": {
+        "missing_code": "계속하려면 보내드린 인증 코드를 입력하세요.",
+        "invalid_code": "코드가 일치하지 않습니다. 다시 확인하고 시도하세요.",
+        "locked": "실패가 너무 많습니다. 계정이 일시적으로 잠겼습니다. 몇 분 후 다시 시도하세요.",
+        "resend_failed": "새 코드를 보낼 수 없습니다. 다시 시도하세요.",
+        "resend_exhausted": "재전송 한도에 도달했습니다. 새 코드를 받으려면 다시 로그인하세요."
+      },
+      "notices": {
+        "resent": "새 코드가 이메일로 전송되었습니다."
+      }
+    }
   }
 }

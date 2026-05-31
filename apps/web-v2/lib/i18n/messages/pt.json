@@ -174,5 +174,137 @@
       "baseline_needed_cta": "Começar avaliação",
       "supports_on": "Apoios ativos"
     }
+  },
+  "auth": {
+    "common": {
+      "email": "E-mail",
+      "password": "Senha",
+      "show_password": "Mostrar senha",
+      "hide_password": "Ocultar senha"
+    },
+    "login": {
+      "brand_heading": "Entre para continuar a sua jornada na AIVO.",
+      "brand_body": "Seus tutores, missões e informações para a família, tudo em um só lugar, ajustado à forma como seu aluno pensa.",
+      "trust_badge": "COPPA · FERPA · SOC 2",
+      "quote": "A AIVO se adapta à forma como minha filha realmente aprende. A primeira plataforma que não nos fez sentir que estávamos lutando contra ela.",
+      "quote_attribution": "— Mãe de uma aluna do 3.º ano",
+      "welcome_back": "Bem-vindo de volta.",
+      "card_eyebrow": "Entrar",
+      "card_title": "Continue com sua conta AIVO",
+      "card_subtitle": "Entre com seu e-mail e senha da AIVO.",
+      "submit": "Entrar",
+      "new_here": "Novo por aqui?",
+      "create_account": "Criar uma conta",
+      "forgot_password": "Esqueceu a senha?",
+      "privacy_lead": "Nunca vendemos seus dados.",
+      "privacy_link": "Leia o aviso de privacidade",
+      "errors": {
+        "invalid_credentials": "E-mail ou senha incorretos.",
+        "invalid_role": "Esse perfil não está disponível para esta conta.",
+        "missing_credentials": "Digite seu e-mail e senha para entrar.",
+        "mfa_required": "Precisamos de um código de verificação para concluir seu acesso. Digite-o na próxima tela.",
+        "mfa_session_expired": "Sua sessão de verificação expirou. Entre novamente.",
+        "wrong_surface": "Esta conta entra em outro ambiente (distrito ou administração). Use o portal correto.",
+        "unsupported_role": "O perfil da sua conta ainda não é compatível com este ambiente.",
+        "login_failed": "Não conseguimos fazer seu acesso. Tente novamente."
+      },
+      "notices": {
+        "password_reset": "Sua senha foi redefinida. Entre com sua nova senha.",
+        "logged_out": "Você saiu da conta."
+      }
+    },
+    "signup": {
+      "promo_eyebrow": "Comece seu teste em família",
+      "promo_title": "Um jeito mais acolhedor de aprender, para cada criança da família.",
+      "promo_subtitle": "Configure alunos em minutos. Tutores de IA adaptativos, modos sensorialmente amigáveis e progresso que todo pai e mãe podem ver.",
+      "benefit_tutors": "Tutores de IA adaptativos que encontram cada aluno onde ele está.",
+      "benefit_sensory": "Modos sensorialmente amigáveis: Padrão, Calmo, Alto contraste.",
+      "benefit_progress": "Progresso que todo pai e mãe podem ver — consciente do IEP e honesto com discrição.",
+      "reassurance_title": "Adultos criam as contas, não as crianças.",
+      "reassurance_body": "Você adicionará alunos na próxima etapa. A AIVO nunca pede que uma criança crie a própria conta, e as proteções COPPA / FERPA / SOC 2 se aplicam a tudo desde o primeiro dia.",
+      "card_eyebrow": "Crie sua conta",
+      "card_title": "Conte-nos um pouco sobre você",
+      "already_have": "Já tem uma?",
+      "sign_in": "Entrar",
+      "submit": "Criar conta",
+      "submitting": "Criando sua conta…",
+      "name_label": "Seu nome",
+      "email_label": "E-mail",
+      "password_label": "Senha",
+      "password_helper": "Pelo menos 8 caracteres com um número e um símbolo."
+    },
+    "forgot": {
+      "heading": "Redefina sua senha",
+      "error_invalid_email": "Digite um e-mail válido para que possamos encontrar sua conta.",
+      "sent_eyebrow": "Verifique sua caixa de entrada",
+      "sent_title": "Se esse e-mail estiver registrado, um link de redefinição está a caminho.",
+      "sent_subtitle": "Por sua segurança, não revelamos se uma conta existe. O link expira em 1 hora.",
+      "sent_body": "Verifique o spam ou as promoções se não vir após um minuto. O link funciona uma vez e depois expira — solicite um novo se precisar recomeçar.",
+      "back_to_sign_in": "Voltar para entrar",
+      "didnt_get_it": "Não recebeu?",
+      "try_different_email": "Tente outro e-mail",
+      "form_eyebrow": "Esqueci a senha",
+      "form_title": "Digite o e-mail da sua conta",
+      "form_subtitle": "Enviaremos por e-mail um link seguro para definir uma nova senha.",
+      "submit": "Enviar link de redefinição",
+      "remembered": "Lembrou?",
+      "sign_in": "Entrar",
+      "email_label": "E-mail"
+    },
+    "reset": {
+      "heading": "Escolha uma nova senha",
+      "errors": {
+        "missing_token": "Falta o token de segurança neste link de redefinição. Solicite um novo na página de esqueci a senha.",
+        "weak_password": "Sua nova senha deve ter pelo menos 12 caracteres.",
+        "mismatch": "As duas senhas ainda não coincidem. Tente digitá-las novamente.",
+        "invalid_token": "Este link de redefinição expirou ou já foi usado. Solicite um novo para continuar.",
+        "policy_violation": "Essa senha não atende à nossa política. Veja os detalhes abaixo e tente uma mais forte.",
+        "reset_failed": "Não conseguimos redefinir sua senha. Tente novamente em um instante.",
+        "mock_mode": "A redefinição de senha está desativada no modo de teste. Execute com AUTH_MODE=custom e o serviço de identidade para testar este fluxo."
+      },
+      "no_token_eyebrow": "Redefinir senha",
+      "no_token_title": "Este link de redefinição está incompleto",
+      "no_token_subtitle": "Falta o token de segurança no link do seu e-mail. Solicite um novo para continuar.",
+      "no_token_cta": "Solicitar um novo link",
+      "no_token_body": "Por sua segurança, os links de redefinição expiram após 1 hora e só podem ser usados uma vez.",
+      "form_eyebrow": "Redefinir senha",
+      "form_title": "Defina sua nova senha",
+      "form_subtitle": "Escolha algo memorável, mas difícil de adivinhar. Vamos desconectar você de todos os dispositivos quando terminar.",
+      "submit": "Salvar nova senha",
+      "need_link": "Precisa de um novo link?",
+      "start_over": "Recomeçar",
+      "new_password_label": "Nova senha",
+      "confirm_password_label": "Confirmar nova senha",
+      "helper_too_short": "Use pelo menos 12 caracteres com uma mistura de letras, números e símbolos.",
+      "helper_default": "Use pelo menos 12 caracteres. Recusaremos senhas reutilizadas ou fracas.",
+      "mismatch_helper": "As senhas ainda não coincidem."
+    },
+    "mfa": {
+      "heading": "Confirme que é você",
+      "card_eyebrow": "Acesso com múltiplos fatores",
+      "totp_title": "Digite o código do seu autenticador",
+      "totp_subtitle": "Abra seu app autenticador e digite o código de 6 dígitos exibido para o AIVO Learning.",
+      "totp_cta": "Verificar código",
+      "webauthn_title": "Use sua chave de acesso para continuar",
+      "webauthn_subtitle": "Sua conta é protegida por uma chave de acesso. O acesso por chave ainda não é compatível com este ambiente — use um código de recuperação abaixo.",
+      "webauthn_cta": "Verificar código de recuperação",
+      "email_title": "Digite seu código de verificação",
+      "email_subtitle": "Enviamos um código de 6 dígitos para o e-mail cadastrado. Ele expira em 10 minutos.",
+      "email_cta": "Verificar código",
+      "resend_code": "Reenviar código",
+      "cancel": "Cancelar e entrar novamente",
+      "code_label": "Código de verificação",
+      "recovery_hint": "Perdeu o acesso? Use um dos códigos de recuperação que você salvou ao ativar o MFA — digite-o no campo acima.",
+      "errors": {
+        "missing_code": "Digite o código de verificação que enviamos para continuar.",
+        "invalid_code": "Esse código não confere. Verifique e tente novamente.",
+        "locked": "Tentativas demais. Sua conta está temporariamente bloqueada — tente novamente em alguns minutos.",
+        "resend_failed": "Não conseguimos enviar um novo código. Tente novamente.",
+        "resend_exhausted": "Você atingiu o limite de reenvios. Entre novamente para obter um código novo."
+      },
+      "notices": {
+        "resent": "Um novo código foi enviado para o seu e-mail."
+      }
+    }
   }
 }

@@ -174,5 +174,137 @@
       "baseline_needed_cta": "Einstufung starten",
       "supports_on": "Hilfen aktiv"
     }
+  },
+  "auth": {
+    "common": {
+      "email": "E-Mail",
+      "password": "Passwort",
+      "show_password": "Passwort anzeigen",
+      "hide_password": "Passwort verbergen"
+    },
+    "login": {
+      "brand_heading": "Melde dich an, um deine AIVO-Reise fortzusetzen.",
+      "brand_body": "Deine Tutoren, Missionen und Familieneinblicke – alles an einem Ort, abgestimmt darauf, wie dein Lernender denkt.",
+      "trust_badge": "COPPA · FERPA · SOC 2",
+      "quote": "AIVO passt sich daran an, wie meine Tochter wirklich lernt. Die erste Plattform, bei der wir nicht das Gefühl hatten, dagegen anzukämpfen.",
+      "quote_attribution": "— Elternteil einer Drittklässlerin",
+      "welcome_back": "Willkommen zurück.",
+      "card_eyebrow": "Anmelden",
+      "card_title": "Mit deinem AIVO-Konto fortfahren",
+      "card_subtitle": "Melde dich mit deiner AIVO-E-Mail und deinem Passwort an.",
+      "submit": "Anmelden",
+      "new_here": "Neu hier?",
+      "create_account": "Konto erstellen",
+      "forgot_password": "Passwort vergessen?",
+      "privacy_lead": "Wir verkaufen deine Daten niemals.",
+      "privacy_link": "Datenschutzhinweis lesen",
+      "errors": {
+        "invalid_credentials": "E-Mail oder Passwort ist falsch.",
+        "invalid_role": "Diese Rolle ist für dieses Konto nicht verfügbar.",
+        "missing_credentials": "Gib deine E-Mail und dein Passwort ein, um dich anzumelden.",
+        "mfa_required": "Wir benötigen einen Bestätigungscode, um deine Anmeldung abzuschließen. Gib ihn auf dem nächsten Bildschirm ein.",
+        "mfa_session_expired": "Deine Bestätigungssitzung ist abgelaufen. Bitte melde dich erneut an.",
+        "wrong_surface": "Dieses Konto meldet sich in einem anderen Bereich an (Bezirk oder Verwaltung). Verwende das richtige Portal.",
+        "unsupported_role": "Die Rolle deines Kontos wird in diesem Bereich noch nicht unterstützt.",
+        "login_failed": "Wir konnten dich nicht anmelden. Bitte versuche es erneut."
+      },
+      "notices": {
+        "password_reset": "Dein Passwort wurde zurückgesetzt. Bitte melde dich mit deinem neuen Passwort an.",
+        "logged_out": "Du wurdest abgemeldet."
+      }
+    },
+    "signup": {
+      "promo_eyebrow": "Starte deine Familien-Testphase",
+      "promo_title": "Eine wärmere Art zu lernen – für jedes Kind in der Familie.",
+      "promo_subtitle": "Richte Lernende in Minuten ein. Adaptive KI-Tutoren, sensorisch freundliche Modi und Fortschritte, die jedes Elternteil sehen kann.",
+      "benefit_tutors": "Adaptive KI-Tutoren, die jeden Lernenden dort abholen, wo er steht.",
+      "benefit_sensory": "Sensorisch freundliche Modi: Standard, Ruhe, Hoher Kontrast.",
+      "benefit_progress": "Fortschritte, die jedes Elternteil sehen kann – IEP-bewusst und ruhig ehrlich.",
+      "reassurance_title": "Erwachsene richten Konten ein, nicht Kinder.",
+      "reassurance_body": "Im nächsten Schritt fügst du Lernende hinzu. AIVO bittet niemals ein Kind, ein eigenes Konto zu erstellen, und COPPA-/FERPA-/SOC-2-Schutz gilt von Tag eins an für alles.",
+      "card_eyebrow": "Erstelle dein Konto",
+      "card_title": "Erzähl uns ein wenig über dich",
+      "already_have": "Hast du schon eins?",
+      "sign_in": "Anmelden",
+      "submit": "Konto erstellen",
+      "submitting": "Dein Konto wird erstellt…",
+      "name_label": "Dein Name",
+      "email_label": "E-Mail",
+      "password_label": "Passwort",
+      "password_helper": "Mindestens 8 Zeichen mit einer Zahl und einem Symbol."
+    },
+    "forgot": {
+      "heading": "Setze dein Passwort zurück",
+      "error_invalid_email": "Gib eine gültige E-Mail-Adresse ein, damit wir dein Konto finden können.",
+      "sent_eyebrow": "Prüfe deinen Posteingang",
+      "sent_title": "Wenn diese E-Mail registriert ist, ist ein Link zum Zurücksetzen unterwegs.",
+      "sent_subtitle": "Zu deiner Sicherheit verraten wir nicht, ob ein Konto existiert. Der Link läuft in 1 Stunde ab.",
+      "sent_body": "Prüfe Spam oder Werbung, falls du ihn nach einer Minute nicht siehst. Der Link funktioniert einmal und läuft dann ab – fordere einen neuen an, wenn du von vorn beginnen musst.",
+      "back_to_sign_in": "Zurück zur Anmeldung",
+      "didnt_get_it": "Nicht erhalten?",
+      "try_different_email": "Andere E-Mail versuchen",
+      "form_eyebrow": "Passwort vergessen",
+      "form_title": "Gib die E-Mail deines Kontos ein",
+      "form_subtitle": "Wir senden dir per E-Mail einen sicheren Link, um ein neues Passwort festzulegen.",
+      "submit": "Link zum Zurücksetzen senden",
+      "remembered": "Wieder eingefallen?",
+      "sign_in": "Anmelden",
+      "email_label": "E-Mail"
+    },
+    "reset": {
+      "heading": "Wähle ein neues Passwort",
+      "errors": {
+        "missing_token": "Diesem Link zum Zurücksetzen fehlt sein Sicherheitstoken. Fordere auf der Seite „Passwort vergessen“ einen neuen an.",
+        "weak_password": "Dein neues Passwort muss mindestens 12 Zeichen lang sein.",
+        "mismatch": "Die beiden Passwörter stimmen noch nicht überein. Gib sie erneut ein.",
+        "invalid_token": "Dieser Link zum Zurücksetzen ist abgelaufen oder wurde bereits verwendet. Fordere einen neuen an, um fortzufahren.",
+        "policy_violation": "Dieses Passwort erfüllt unsere Richtlinie nicht. Sieh dir die Details unten an und versuche es mit einem stärkeren.",
+        "reset_failed": "Wir konnten dein Passwort nicht zurücksetzen. Bitte versuche es gleich noch einmal.",
+        "mock_mode": "Das Zurücksetzen des Passworts ist im Mock-Modus deaktiviert. Führe es mit AUTH_MODE=custom und dem Identitätsdienst aus, um diesen Ablauf zu testen."
+      },
+      "no_token_eyebrow": "Passwort zurücksetzen",
+      "no_token_title": "Dieser Link zum Zurücksetzen ist unvollständig",
+      "no_token_subtitle": "Dem Link in deiner E-Mail fehlt sein Sicherheitstoken. Fordere einen neuen an, um fortzufahren.",
+      "no_token_cta": "Neuen Link anfordern",
+      "no_token_body": "Zu deiner Sicherheit laufen Links zum Zurücksetzen nach 1 Stunde ab und können nur einmal verwendet werden.",
+      "form_eyebrow": "Passwort zurücksetzen",
+      "form_title": "Lege dein neues Passwort fest",
+      "form_subtitle": "Wähle etwas Einprägsames, aber schwer zu Erratendes. Wir melden dich nach Abschluss von allen Geräten ab.",
+      "submit": "Neues Passwort speichern",
+      "need_link": "Brauchst du einen neuen Link?",
+      "start_over": "Von vorn beginnen",
+      "new_password_label": "Neues Passwort",
+      "confirm_password_label": "Neues Passwort bestätigen",
+      "helper_too_short": "Verwende mindestens 12 Zeichen aus einer Mischung von Buchstaben, Zahlen und Symbolen.",
+      "helper_default": "Verwende mindestens 12 Zeichen. Wir lehnen wiederverwendete oder schwache Passwörter ab.",
+      "mismatch_helper": "Die Passwörter stimmen noch nicht überein."
+    },
+    "mfa": {
+      "heading": "Bestätige, dass du es bist",
+      "card_eyebrow": "Anmeldung mit mehreren Faktoren",
+      "totp_title": "Gib deinen Authenticator-Code ein",
+      "totp_subtitle": "Öffne deine Authenticator-App und gib den 6-stelligen Code ein, der für AIVO Learning angezeigt wird.",
+      "totp_cta": "Code bestätigen",
+      "webauthn_title": "Verwende deinen Passkey, um fortzufahren",
+      "webauthn_subtitle": "Dein Konto ist durch einen Passkey geschützt. Die Passkey-Anmeldung wird in diesem Bereich noch nicht unterstützt – verwende unten einen Wiederherstellungscode.",
+      "webauthn_cta": "Wiederherstellungscode bestätigen",
+      "email_title": "Gib deinen Bestätigungscode ein",
+      "email_subtitle": "Wir haben einen 6-stelligen Code an die hinterlegte E-Mail gesendet. Er läuft in 10 Minuten ab.",
+      "email_cta": "Code bestätigen",
+      "resend_code": "Code erneut senden",
+      "cancel": "Abbrechen und erneut anmelden",
+      "code_label": "Bestätigungscode",
+      "recovery_hint": "Zugriff verloren? Verwende einen der Wiederherstellungscodes, die du beim Aktivieren von MFA gespeichert hast – gib ihn im Feld oben ein.",
+      "errors": {
+        "missing_code": "Gib den gesendeten Bestätigungscode ein, um fortzufahren.",
+        "invalid_code": "Dieser Code stimmt nicht. Überprüfe ihn und versuche es erneut.",
+        "locked": "Zu viele fehlgeschlagene Versuche. Dein Konto ist vorübergehend gesperrt – versuche es in ein paar Minuten erneut.",
+        "resend_failed": "Wir konnten keinen neuen Code senden. Bitte versuche es erneut.",
+        "resend_exhausted": "Du hast das Sendelimit erreicht. Melde dich erneut an, um einen neuen Code zu erhalten."
+      },
+      "notices": {
+        "resent": "Ein neuer Code wurde an deine E-Mail gesendet."
+      }
+    }
   }
 }

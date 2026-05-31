@@ -174,5 +174,137 @@
       "baseline_needed_cta": "开始评估",
       "supports_on": "支持已开启"
     }
+  },
+  "auth": {
+    "common": {
+      "email": "电子邮箱",
+      "password": "密码",
+      "show_password": "显示密码",
+      "hide_password": "隐藏密码"
+    },
+    "login": {
+      "brand_heading": "登录以继续你的 AIVO 之旅。",
+      "brand_body": "你的导师、任务和家庭洞察，全都集中在一处，并根据你的学习者的思维方式进行调整。",
+      "trust_badge": "COPPA · FERPA · SOC 2",
+      "quote": "AIVO 会适应我女儿真正的学习方式。这是第一个不会让我们觉得在与之对抗的平台。",
+      "quote_attribution": "——一位三年级学生的家长",
+      "welcome_back": "欢迎回来。",
+      "card_eyebrow": "登录",
+      "card_title": "使用你的 AIVO 账户继续",
+      "card_subtitle": "使用你的 AIVO 邮箱和密码登录。",
+      "submit": "登录",
+      "new_here": "第一次来？",
+      "create_account": "创建账户",
+      "forgot_password": "忘记密码？",
+      "privacy_lead": "我们绝不出售你的数据。",
+      "privacy_link": "阅读隐私声明",
+      "errors": {
+        "invalid_credentials": "邮箱或密码不正确。",
+        "invalid_role": "该角色不适用于此账户。",
+        "missing_credentials": "请输入你的邮箱和密码以登录。",
+        "mfa_required": "我们需要一个验证码来完成你的登录。请在下一屏输入。",
+        "mfa_session_expired": "你的验证会话已过期。请重新登录。",
+        "wrong_surface": "此账户在其他端登录（学区或管理端）。请使用正确的门户。",
+        "unsupported_role": "你账户的角色尚不支持此端。",
+        "login_failed": "我们无法为你登录。请重试。"
+      },
+      "notices": {
+        "password_reset": "你的密码已重置。请使用新密码登录。",
+        "logged_out": "你已退出登录。"
+      }
+    },
+    "signup": {
+      "promo_eyebrow": "开始你的家庭试用",
+      "promo_title": "一种更温暖的学习方式——为家庭中的每个孩子。",
+      "promo_subtitle": "几分钟即可设置学习者。自适应 AI 导师、感官友好模式，以及每位家长都能看到的进步。",
+      "benefit_tutors": "自适应 AI 导师，在每位学习者所处的水平上陪伴他们。",
+      "benefit_sensory": "感官友好模式：标准、舒缓、高对比度。",
+      "benefit_progress": "每位家长都能看到的进步——了解 IEP，并安静而真诚。",
+      "reassurance_title": "由成年人创建账户，而非孩子。",
+      "reassurance_body": "你将在下一步添加学习者。AIVO 绝不会要求孩子创建自己的账户，COPPA / FERPA / SOC 2 保护从第一天起就适用于一切。",
+      "card_eyebrow": "创建你的账户",
+      "card_title": "简单介绍一下你自己",
+      "already_have": "已经有账户了？",
+      "sign_in": "登录",
+      "submit": "创建账户",
+      "submitting": "正在创建你的账户……",
+      "name_label": "你的姓名",
+      "email_label": "电子邮箱",
+      "password_label": "密码",
+      "password_helper": "至少 8 个字符，包含一个数字和一个符号。"
+    },
+    "forgot": {
+      "heading": "重置你的密码",
+      "error_invalid_email": "请输入有效的邮箱，以便我们找到你的账户。",
+      "sent_eyebrow": "查看你的收件箱",
+      "sent_title": "如果该邮箱已注册，重置链接即将送达。",
+      "sent_subtitle": "为了你的安全，我们不会透露账户是否存在。该链接将在 1 小时后失效。",
+      "sent_body": "如果一分钟后仍未看到，请查看垃圾邮件或促销邮件。该链接仅可使用一次，随后失效——如需重新开始，请申请新的链接。",
+      "back_to_sign_in": "返回登录",
+      "didnt_get_it": "没有收到？",
+      "try_different_email": "尝试其他邮箱",
+      "form_eyebrow": "忘记密码",
+      "form_title": "输入你账户的邮箱",
+      "form_subtitle": "我们将通过邮件向你发送一个安全链接以设置新密码。",
+      "submit": "发送重置链接",
+      "remembered": "想起来了？",
+      "sign_in": "登录",
+      "email_label": "电子邮箱"
+    },
+    "reset": {
+      "heading": "选择一个新密码",
+      "errors": {
+        "missing_token": "此重置链接缺少安全令牌。请在忘记密码页面申请新的链接。",
+        "weak_password": "你的新密码必须至少 12 个字符。",
+        "mismatch": "两个密码尚不一致。请重新输入。",
+        "invalid_token": "此重置链接已过期或已被使用。请申请新的链接以继续。",
+        "policy_violation": "该密码不符合我们的策略。请查看下方详情并尝试更强的密码。",
+        "reset_failed": "我们无法重置你的密码。请稍后重试。",
+        "mock_mode": "在模拟模式下，密码重置已禁用。请使用 AUTH_MODE=custom 和身份服务运行以测试此流程。"
+      },
+      "no_token_eyebrow": "重置密码",
+      "no_token_title": "此重置链接不完整",
+      "no_token_subtitle": "你邮件中的链接缺少安全令牌。请申请新的链接以继续。",
+      "no_token_cta": "申请新链接",
+      "no_token_body": "为了你的安全，重置链接在 1 小时后失效，且只能使用一次。",
+      "form_eyebrow": "重置密码",
+      "form_title": "设置你的新密码",
+      "form_subtitle": "选择一个好记但难以猜到的密码。完成后我们会让你在所有设备上退出登录。",
+      "submit": "保存新密码",
+      "need_link": "需要新链接？",
+      "start_over": "重新开始",
+      "new_password_label": "新密码",
+      "confirm_password_label": "确认新密码",
+      "helper_too_short": "请使用至少 12 个字符，混合字母、数字和符号。",
+      "helper_default": "请使用至少 12 个字符。我们会拒绝重复使用或薄弱的密码。",
+      "mismatch_helper": "密码尚不一致。"
+    },
+    "mfa": {
+      "heading": "验证是你本人",
+      "card_eyebrow": "多因素登录",
+      "totp_title": "输入你的身份验证器代码",
+      "totp_subtitle": "打开你的身份验证器应用，输入为 AIVO Learning 显示的 6 位代码。",
+      "totp_cta": "验证代码",
+      "webauthn_title": "使用通行密钥继续",
+      "webauthn_subtitle": "你的账户由通行密钥保护。此端尚不支持通行密钥登录——请使用下方的恢复代码。",
+      "webauthn_cta": "验证恢复代码",
+      "email_title": "输入你的验证码",
+      "email_subtitle": "我们已向你登记的邮箱发送了一个 6 位验证码。它将在 10 分钟后失效。",
+      "email_cta": "验证代码",
+      "resend_code": "重新发送代码",
+      "cancel": "取消并重新登录",
+      "code_label": "验证码",
+      "recovery_hint": "无法访问？请使用你在开启 MFA 时保存的某个恢复代码——在上方字段中输入。",
+      "errors": {
+        "missing_code": "请输入我们发送的验证码以继续。",
+        "invalid_code": "该代码不匹配。请核对后重试。",
+        "locked": "失败次数过多。你的账户已被临时锁定——请几分钟后重试。",
+        "resend_failed": "我们无法发送新代码。请重试。",
+        "resend_exhausted": "你已达到重新发送上限。请重新登录以获取新代码。"
+      },
+      "notices": {
+        "resent": "新代码已发送至你的邮箱。"
+      }
+    }
   }
 }
