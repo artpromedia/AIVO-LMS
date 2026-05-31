@@ -2,10 +2,17 @@ import type { Metadata } from "next";
 import { Inter, Atkinson_Hyperlegible } from "next/font/google";
 import "@aivo/brand/tokens.css";
 import "./globals.css";
+import { cookies } from "next/headers";
 import { I18nProvider } from "@/providers/i18n-provider";
 import enMessages from "@/i18n/messages/en.json";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { getSensoryModeFromCookies } from "@/lib/sensory-mode.server";
+import {
+  LOCALE_COOKIE_NAME,
+  defaultLocale,
+  dirForLocale,
+  isValidLocale,
+} from "@/i18n/config";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -97,9 +104,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // SensoryModeToggle client component via /api/sensory-mode.
   const sensoryMode = await getSensoryModeFromCookies();
 
+  // Server-render the right language + writing direction from the persisted
+  // locale cookie so RTL locales (e.g. Arabic) paint correctly on first load
+  // instead of flashing LTR until the client provider hydrates. The provider
+  // still refines lang/dir client-side (hence suppressHydrationWarning).
+  const rawLocale = (await cookies()).get(LOCALE_COOKIE_NAME)?.value;
+  const locale = rawLocale && isValidLocale(rawLocale) ? rawLocale : defaultLocale;
+
   return (
     <html
-      lang="en"
+      lang={locale}
+      dir={dirForLocale(locale)}
       data-brand="inclusive-warm"
       data-sensory-mode={sensoryMode}
       className={`${inter.variable} ${atkinson.variable}`}

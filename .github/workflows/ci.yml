@@ -50,7 +50,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Check locale parity (web-v2, mobile, i18n-svc)
+      - name: Check locale parity (web-v2, marketing, mobile, i18n-svc)
         run: node scripts/ci/check-i18n-coverage.mjs
 
       - name: Gate hardcoded English (web-v2 ratchet)
