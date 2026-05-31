@@ -1,4 +1,6 @@
+import { getPermission } from "./permissions.js";
 import { ROLE_META, ROLES, type Role } from "./roles.js";
+import type { NavArea } from "./areas.js";
 import type { Surface } from "./routes.js";
 
 /**
@@ -99,4 +101,76 @@ export function hasActiveRole(session: RoleSession, role: Role): boolean {
  */
 export function holdsRole(session: RoleSession, role: Role): boolean {
   return session.roles.includes(role);
+}
+
+/**
+ * The four outcomes a `<RoleGate>` boundary needs to act on:
+ *
+ *  - `allow`         — render the route.
+ *  - `switch-role`   — the session holds a role that grants this area;
+ *                      route to `/role-switch?to=<role>&next=<path>`.
+ *  - `locked`        — the active role exists but the area is locked
+ *                      for it (render `<LockedScreen area=… />`).
+ *  - `forbidden`     — no role the session holds can reach this area.
+ *
+ * `requiredRole` is populated for `switch-role`; `lockReason` is
+ * populated for `locked`.
+ */
+export interface AccessDecision {
+  outcome: "allow" | "switch-role" | "locked" | "forbidden";
+  requiredRole?: Role;
+  lockReason?: string;
+}
+
+/**
+ * Decide what a guard should do when the active role tries to reach a
+ * given `NavArea` on a given surface. This is the single function the
+ * web `<RoleGate>` and the mobile route guard should both consume so
+ * both shells agree on outcomes.
+ *
+ * Resolution order:
+ *   1. If the active role has `full` or `linked` access → `allow`.
+ *   2. If the active role is `locked` for the area → `locked`.
+ *   3. Otherwise, if any *other* role the session holds (and that the
+ *      current surface exposes) can reach the area → `switch-role`
+ *      with that role as `requiredRole`.
+ *   4. Otherwise → `forbidden`.
+ *
+ * Step 3 prefers the first role in `session.roles` declaration order,
+ * which mirrors how role-switchers list options. Callers that want a
+ * different preference can post-process.
+ */
+export function canAccessArea(
+  session: RoleSession,
+  area: NavArea,
+  surface: Surface,
+): AccessDecision {
+  const activePerm = getPermission(session.activeRole, area);
+  if (activePerm.access === "full" || activePerm.access === "linked") {
+    return { outcome: "allow" };
+  }
+  if (activePerm.access === "locked") {
+    return { outcome: "locked", lockReason: activePerm.lockReason };
+  }
+
+  const surfaceRoles = getRolesForSurface(session.roles, surface);
+  for (const role of surfaceRoles) {
+    if (role === session.activeRole) continue;
+    const p = getPermission(role, area);
+    if (p.access === "full" || p.access === "linked") {
+      return { outcome: "switch-role", requiredRole: role };
+    }
+  }
+  return { outcome: "forbidden" };
+}
+
+/**
+ * The set of all roles in `ROLES` the surface should expose. Useful
+ * when building the role switcher for a brand-new session where the
+ * server hasn't told us which roles the user holds yet.
+ */
+export function allRolesForSurface(surface: Surface): Role[] {
+  return ROLES.filter((r) =>
+    surface === "web" ? ROLE_META[r].onWeb : ROLE_META[r].onMobile,
+  );
 }

@@ -72,6 +72,9 @@ jobs:
       - name: rbac:audit
         run: pnpm rbac:audit
 
+      - name: "@aivo/nav unit tests"
+        run: corepack pnpm --filter @aivo/nav test
+
       - name: mobile:audit
         run: pnpm mobile:audit
 
