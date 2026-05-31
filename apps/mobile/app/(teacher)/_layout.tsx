@@ -13,58 +13,84 @@ export default function TeacherLayout() {
   const pathname = usePathname();
   const tabBarStyle = useTabBarStyle({ hidden: isTablet });
   const railDestinations = [
-    { key: "index", label: t("tabs.classroom"), icon: "school" as const, active: pathname === "/(teacher)" || pathname === "/" || pathname === "/(teacher)/index", onPress: () => router.push("/(teacher)" as Href) },
-    { key: "lessonPlan", label: t("tabs.lessonPlans"), icon: "document-text" as const, active: pathname?.includes("/lesson-plan"), onPress: () => router.push("/(teacher)/lesson-plan" as Href) },
-    { key: "analytics", label: t("tabs.analytics"), icon: "bar-chart" as const, active: pathname?.includes("/analytics"), onPress: () => router.push("/(teacher)/analytics" as Href) },
-    { key: "settings", label: t("tabs.settings"), icon: "settings" as const, active: pathname?.includes("/settings"), onPress: () => router.push("/(teacher)/settings" as Href) },
+    {
+      key: "index",
+      label: t("tabs.classroom"),
+      icon: "school" as const,
+      active: pathname === "/(teacher)" || pathname === "/" || pathname === "/(teacher)/index",
+      onPress: () => router.push("/(teacher)" as Href),
+    },
+    {
+      key: "lessonPlan",
+      label: t("tabs.lessonPlans"),
+      icon: "document-text" as const,
+      active: pathname?.includes("/lesson-plan"),
+      onPress: () => router.push("/(teacher)/lesson-plan" as Href),
+    },
+    {
+      key: "analytics",
+      label: t("tabs.analytics"),
+      icon: "bar-chart" as const,
+      active: pathname?.includes("/analytics"),
+      onPress: () => router.push("/(teacher)/analytics" as Href),
+    },
+    {
+      key: "settings",
+      label: t("tabs.settings"),
+      icon: "settings" as const,
+      active: pathname?.includes("/settings"),
+      onPress: () => router.push("/(teacher)/settings" as Href),
+    },
   ];
   return (
     <RoleTabletShell destinations={railDestinations}>
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textSecondary,
-        tabBarStyle,
-        tabBarLabelStyle: TAB_BAR_LABEL_STYLE,
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: t("tabs.classroom"),
-          tabBarIcon: ({ color, size }) => <Ionicons name="school" size={size} color={color} />,
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarActiveTintColor: colors.primary,
+          tabBarInactiveTintColor: colors.textSecondary,
+          tabBarStyle,
+          tabBarLabelStyle: TAB_BAR_LABEL_STYLE,
         }}
-      />
-      <Tabs.Screen
-        name="lesson-plan"
-        options={{
-          title: t("tabs.lessonPlans"),
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="document-text" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="analytics"
-        options={{
-          title: t("tabs.analytics"),
-          tabBarIcon: ({ color, size }) => <Ionicons name="bar-chart" size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: t("tabs.settings"),
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="settings" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen name="student/[id]/index" options={{ href: null }} />
-      <Tabs.Screen name="student/[id]/insight" options={{ href: null }} />
-      <Tabs.Screen name="student/[id]/iep" options={{ href: null }} />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: t("tabs.classroom"),
+            tabBarIcon: ({ color, size }) => <Ionicons name="school" size={size} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="lesson-plan"
+          options={{
+            title: t("tabs.lessonPlans"),
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="document-text" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="analytics"
+          options={{
+            title: t("tabs.analytics"),
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="bar-chart" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="settings"
+          options={{
+            title: t("tabs.settings"),
+            tabBarIcon: ({ color, size }) => <Ionicons name="settings" size={size} color={color} />,
+          }}
+        />
+        <Tabs.Screen name="student/[id]/index" options={{ href: null }} />
+        <Tabs.Screen name="student/[id]/insight" options={{ href: null }} />
+        <Tabs.Screen name="student/[id]/iep" options={{ href: null }} />
+        <Tabs.Screen name="learners" options={{ href: null }} />
+        <Tabs.Screen name="insights" options={{ href: null }} />
+      </Tabs>
     </RoleTabletShell>
   );
 }

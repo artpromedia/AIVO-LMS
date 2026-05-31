@@ -15,12 +15,12 @@ sub-feature is missing · **Missing** not yet on mobile.
 
 | Status             | Count   |
 | ------------------ | ------- |
-| Parity             | 49      |
-| Partial            | 19      |
-| Missing            | 45      |
+| Parity             | 51      |
+| Partial            | 18      |
+| Missing            | 44      |
 | **In-scope total** | **113** |
 
-Full parity: **43%**. 90 web-only routes excluded.
+Full parity: **45%**. 90 web-only routes excluded.
 
 ## Auth & Shared
 
@@ -136,21 +136,21 @@ Full parity: **43%**. 90 web-only routes excluded.
 
 ## Teacher
 
-| Web route                                  | Mobile screen                    | Status      | Gap / Ticket                                                          |
-| ------------------------------------------ | -------------------------------- | ----------- | --------------------------------------------------------------------- |
-| `/teacher/home`                            | `(teacher)/index`                | Parity      | —                                                                     |
-| `/teacher/learners`                        | —                                | **Missing** | MOB-TCH-001: teacher roster/learners LIST.                            |
-| `/teacher/learners/[learnerId]`            | `(teacher)/student/[id]/index`   | Parity      | —                                                                     |
-| `/teacher/learners/[learnerId]/curriculum` | —                                | **Missing** | MOB-TCH-002: teacher curriculum manager.                              |
-| `/teacher/learners/[learnerId]/iep/draft`  | `(teacher)/student/[id]/iep`     | **Partial** | MOB-TCH-003: AI SMART-goal IEP draft generation parity.               |
-| `/teacher/classes`                         | —                                | **Missing** | MOB-TCH-004: classes list.                                            |
-| `/teacher/classes/[classId]`               | —                                | **Missing** | MOB-TCH-005: class detail (roster).                                   |
-| `/teacher/assignments`                     | —                                | **Missing** | MOB-TCH-006: assignments list.                                        |
-| `/teacher/assignments/new`                 | —                                | **Missing** | MOB-TCH-007: create assignment.                                       |
-| `/teacher/insights`                        | `(teacher)/student/[id]/insight` | **Partial** | MOB-TCH-008: class-wide insights list (mobile is per-student only).   |
-| `/teacher/lesson-plans`                    | `(teacher)/lesson-plan`          | **Partial** | MOB-TCH-009: lesson-plan LIBRARY/list (mobile is single-plan editor). |
-| `/teacher/reports`                         | `(teacher)/analytics`            | **Partial** | MOB-TCH-010: classroom mastery-distribution reports parity.           |
-| `/teacher/settings`                        | `(teacher)/settings`             | Parity      | —                                                                     |
+| Web route                                  | Mobile screen                  | Status      | Gap / Ticket                                                          |
+| ------------------------------------------ | ------------------------------ | ----------- | --------------------------------------------------------------------- |
+| `/teacher/home`                            | `(teacher)/index`              | Parity      | —                                                                     |
+| `/teacher/learners`                        | `(teacher)/learners`           | Parity      | —                                                                     |
+| `/teacher/learners/[learnerId]`            | `(teacher)/student/[id]/index` | Parity      | —                                                                     |
+| `/teacher/learners/[learnerId]/curriculum` | —                              | **Missing** | MOB-TCH-002: teacher curriculum manager.                              |
+| `/teacher/learners/[learnerId]/iep/draft`  | `(teacher)/student/[id]/iep`   | **Partial** | MOB-TCH-003: AI SMART-goal IEP draft generation parity.               |
+| `/teacher/classes`                         | —                              | **Missing** | MOB-TCH-004: classes list.                                            |
+| `/teacher/classes/[classId]`               | —                              | **Missing** | MOB-TCH-005: class detail (roster).                                   |
+| `/teacher/assignments`                     | —                              | **Missing** | MOB-TCH-006: assignments list.                                        |
+| `/teacher/assignments/new`                 | —                              | **Missing** | MOB-TCH-007: create assignment.                                       |
+| `/teacher/insights`                        | `(teacher)/insights`           | Parity      | —                                                                     |
+| `/teacher/lesson-plans`                    | `(teacher)/lesson-plan`        | **Partial** | MOB-TCH-009: lesson-plan LIBRARY/list (mobile is single-plan editor). |
+| `/teacher/reports`                         | `(teacher)/analytics`          | **Partial** | MOB-TCH-010: classroom mastery-distribution reports parity.           |
+| `/teacher/settings`                        | `(teacher)/settings`           | Parity      | —                                                                     |
 
 ## Therapist
 

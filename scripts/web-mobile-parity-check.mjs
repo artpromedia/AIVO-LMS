@@ -458,12 +458,7 @@ const PARITY_MATRIX = {
 
   Teacher: [
     { web: "/teacher/home", mobile: "(teacher)/index", status: P },
-    {
-      web: "/teacher/learners",
-      mobile: null,
-      status: MISSING,
-      gap: "MOB-TCH-001: teacher roster/learners LIST.",
-    },
+    { web: "/teacher/learners", mobile: "(teacher)/learners", status: P },
     { web: "/teacher/learners/[learnerId]", mobile: "(teacher)/student/[id]/index", status: P },
     {
       web: "/teacher/learners/[learnerId]/curriculum",
@@ -496,12 +491,7 @@ const PARITY_MATRIX = {
       status: MISSING,
       gap: "MOB-TCH-007: create assignment.",
     },
-    {
-      web: "/teacher/insights",
-      mobile: "(teacher)/student/[id]/insight",
-      status: PARTIAL,
-      gap: "MOB-TCH-008: class-wide insights list (mobile is per-student only).",
-    },
+    { web: "/teacher/insights", mobile: "(teacher)/insights", status: P },
     {
       web: "/teacher/lesson-plans",
       mobile: "(teacher)/lesson-plan",
