@@ -1,0 +1,30 @@
+{
+  "_comment": "ADR 0020 Phase 4, slice 4.3. Apple Universal Links manifest for the AIVO mobile app. One bundle id (com.artpromedia.aivo), one app, every role-segmented and cross-cutting path. Update TEAMID before production rollout.",
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": ["TEAMID.com.artpromedia.aivo"],
+        "components": [
+          { "/": "/learner/*" },
+          { "/": "/parent/*" },
+          { "/": "/teacher/*" },
+          { "/": "/therapist/*" },
+          { "/": "/caregiver/*" },
+          { "/": "/notifications/*" },
+          { "/": "/notifications" },
+          { "/": "/messages/*" },
+          { "/": "/messages" },
+          { "/": "/settings/*" },
+          { "/": "/settings" },
+          { "/": "/billing/*" },
+          { "/": "/billing" },
+          { "/": "/role-switch" }
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": ["TEAMID.com.artpromedia.aivo"]
+  }
+}

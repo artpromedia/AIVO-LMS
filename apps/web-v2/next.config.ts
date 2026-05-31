@@ -48,7 +48,21 @@ const nextConfig: NextConfig = {
   // causes ``UnrecognizedActionError`` 404s on the login form for users
   // who have a stale tab after a rolling deploy.
   async headers() {
-    return [{ source: "/:path*", headers: SECURITY_HEADERS }];
+    return [
+      { source: "/:path*", headers: SECURITY_HEADERS },
+      // ADR 0020 Phase 4, slice 4.3 — Universal Links / App Links.
+      // Apple requires `application/json` for AASA; Google requires
+      // the same for assetlinks.json. Browsers don't infer it from
+      // the extension-less AASA file, so pin it here.
+      {
+        source: "/.well-known/apple-app-site-association",
+        headers: [{ key: "Content-Type", value: "application/json" }],
+      },
+      {
+        source: "/.well-known/assetlinks.json",
+        headers: [{ key: "Content-Type", value: "application/json" }],
+      },
+    ];
   },
   // Topology aliases (ADR 0010). Older docs and external integrations
   // sometimes reference apps that don't exist as separate deployables

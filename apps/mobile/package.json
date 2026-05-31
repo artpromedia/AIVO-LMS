@@ -10,6 +10,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "eslint .",
+    "audit:single-listing": "node ./scripts/check-single-listing.mjs",
     "prebuild": "expo prebuild",
     "test": "vitest run",
     "eas-build-pre-install": "node ./scripts/eas-pre-install.js"

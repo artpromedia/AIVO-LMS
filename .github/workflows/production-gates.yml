@@ -78,6 +78,9 @@ jobs:
       - name: mobile:audit
         run: pnpm mobile:audit
 
+      - name: mobile:single-listing
+        run: pnpm mobile:single-listing
+
       - name: marketing:audit
         run: pnpm marketing:audit
 
