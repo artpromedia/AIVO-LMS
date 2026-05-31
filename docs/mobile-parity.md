@@ -15,12 +15,12 @@ sub-feature is missing · **Missing** not yet on mobile.
 
 | Status             | Count   |
 | ------------------ | ------- |
-| Parity             | 48      |
-| Partial            | 18      |
-| Missing            | 47      |
+| Parity             | 49      |
+| Partial            | 19      |
+| Missing            | 45      |
 | **In-scope total** | **113** |
 
-Full parity: **42%**. 90 web-only routes excluded.
+Full parity: **43%**. 90 web-only routes excluded.
 
 ## Auth & Shared
 
@@ -117,7 +117,7 @@ Full parity: **42%**. 90 web-only routes excluded.
 | `/parent/learners/[learnerId]/progress`             | `(parent)/progress/[childId]`    | Parity      | —                                                                                                                                     |
 | `/parent/learners/[learnerId]/sensory`              | —                                | **Missing** | MOB-PAR-013: sensory profile (5 modality cards).                                                                                      |
 | `/parent/learners/[learnerId]/settings`             | —                                | **Missing** | MOB-PAR-014: per-learner settings + delete learner.                                                                                   |
-| `/parent/learners/[learnerId]/snapshot`             | —                                | **Missing** | MOB-PAR-015: weekly one-glance snapshot.                                                                                              |
+| `/parent/learners/[learnerId]/snapshot`             | `(parent)/snapshot/[childId]`    | Parity      | —                                                                                                                                     |
 | `/parent/learners/[learnerId]/summary`              | `(parent)/summary/[childId]`     | Parity      | —                                                                                                                                     |
 | `/parent/learners/[learnerId]/team`                 | `(parent)/team/[childId]`        | Parity      | —                                                                                                                                     |
 | `/parent/learners/[learnerId]/accessibility`        | —                                | **Missing** | MOB-PAR-017: per-learner accessibility form.                                                                                          |
@@ -125,7 +125,7 @@ Full parity: **42%**. 90 web-only routes excluded.
 | `/parent/consent`                                   | —                                | **Missing** | MOB-PAR-018: ongoing consent/approvals center (account-level).                                                                        |
 | `/parent/consent/[learnerId]`                       | —                                | **Missing** | MOB-PAR-018: per-learner consent (COPPA notice).                                                                                      |
 | `/parent/notifications`                             | `(parent)/inbox`                 | **Partial** | MOB-PAR-019: notifications parity (read state, live stream) vs current inbox.                                                         |
-| `/parent/reports`                                   | —                                | **Missing** | MOB-PAR-020: parent reports (weekly metrics + recaps per learner).                                                                    |
+| `/parent/reports`                                   | `(parent)/reports`               | **Partial** | MOB-PAR-020: lesson-count + recap metrics pending a lesson-runs REST endpoint (mobile shows per-learner mastery + subjects tracked).  |
 | `/parent/schedule`                                  | —                                | **Missing** | MOB-PAR-021: parent schedule (assignments + active lessons).                                                                          |
 | `/parent/privacy`                                   | —                                | **Missing** | MOB-PAR-022: privacy hub.                                                                                                             |
 | `/parent/privacy/data-export`                       | —                                | **Missing** | MOB-PAR-022: data export request.                                                                                                     |

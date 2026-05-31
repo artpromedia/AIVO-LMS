@@ -118,6 +118,8 @@ export default function ParentLayout() {
         <Tabs.Screen name="learners/[learnerId]" options={{ href: null }} />
         <Tabs.Screen name="gradebook/[childId]" options={{ href: null }} />
         <Tabs.Screen name="summary/[childId]" options={{ href: null }} />
+        <Tabs.Screen name="snapshot/[childId]" options={{ href: null }} />
+        <Tabs.Screen name="reports" options={{ href: null }} />
       </Tabs>
     </RoleTabletShell>
   );

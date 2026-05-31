@@ -51,6 +51,12 @@ export default function LearnerHubScreen() {
       route: (i) => `/(parent)/summary/${i}`,
     },
     {
+      key: "snapshot",
+      icon: "calendar",
+      label: t("parentHub.snapshot", "This week"),
+      route: (i) => `/(parent)/snapshot/${i}`,
+    },
+    {
       key: "brain",
       icon: "bulb",
       label: t("parentHub.brain", "Brain profile"),

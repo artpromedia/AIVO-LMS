@@ -245,6 +245,16 @@ export default function ParentDashboard() {
           <View style={{ width: 8 }} />
           <View style={{ flex: 1 }}>
             <Button
+              title={t("parent.reports", "Reports")}
+              onPress={() => router.push("/(parent)/reports" as Href)}
+              variant="outline"
+              fullWidth
+              iconLeft={<Ionicons name="bar-chart-outline" size={18} color={palette.primary} />}
+            />
+          </View>
+          <View style={{ width: 8 }} />
+          <View style={{ flex: 1 }}>
+            <Button
               title={t("parent.billing")}
               onPress={() => router.push("/(parent)/billing")}
               variant="outline"

@@ -382,9 +382,8 @@ const PARITY_MATRIX = {
     },
     {
       web: "/parent/learners/[learnerId]/snapshot",
-      mobile: null,
-      status: MISSING,
-      gap: "MOB-PAR-015: weekly one-glance snapshot.",
+      mobile: "(parent)/snapshot/[childId]",
+      status: P,
     },
     {
       web: "/parent/learners/[learnerId]/summary",
@@ -424,9 +423,9 @@ const PARITY_MATRIX = {
     },
     {
       web: "/parent/reports",
-      mobile: null,
-      status: MISSING,
-      gap: "MOB-PAR-020: parent reports (weekly metrics + recaps per learner).",
+      mobile: "(parent)/reports",
+      status: PARTIAL,
+      gap: "MOB-PAR-020: lesson-count + recap metrics pending a lesson-runs REST endpoint (mobile shows per-learner mastery + subjects tracked).",
     },
     {
       web: "/parent/schedule",
