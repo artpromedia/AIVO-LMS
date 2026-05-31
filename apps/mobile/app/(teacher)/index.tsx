@@ -49,119 +49,141 @@ export default function TeacherDashboard() {
       }
     >
       <View style={{ width: contentWidth }}>
-      <View style={styles.header}>
-        <HeaderUserChip
-          name={user?.name || t("teacher.title")}
-          subtitle={t("teacher.classroomOverview")}
-          onPress={() => router.push("/(teacher)/settings" as Href)}
-        />
-        <View style={styles.headerActions}>
-          <SensoryToggle variant="icon" />
-          <Pressable onPress={logout} accessibilityLabel="Log out" hitSlop={12}>
-            <Ionicons name="log-out-outline" size={22} color={palette.inkMuted} />
+        <View style={styles.header}>
+          <HeaderUserChip
+            name={user?.name || t("teacher.title")}
+            subtitle={t("teacher.classroomOverview")}
+            onPress={() => router.push("/(teacher)/settings" as Href)}
+          />
+          <View style={styles.headerActions}>
+            <SensoryToggle variant="icon" />
+            <Pressable onPress={logout} accessibilityLabel="Log out" hitSlop={12}>
+              <Ionicons name="log-out-outline" size={22} color={palette.inkMuted} />
+            </Pressable>
+          </View>
+        </View>
+
+        <Text
+          style={[
+            styles.greeting,
+            {
+              color: palette.ink,
+              fontFamily: fontFamilies.displayBold,
+              fontSize: type.h1.fontSize,
+              lineHeight: type.h1.lineHeight,
+            },
+          ]}
+        >
+          {t("teacher.greeting", { name: user?.name })}
+        </Text>
+
+        <View style={styles.statsRow}>
+          <StatCard
+            label={t("teacher.students")}
+            value={students?.length || 0}
+            icon={<Ionicons name="people" size={20} color={palette.primary} />}
+          />
+          <View style={{ width: 8 }} />
+          <StatCard
+            label={t("teacher.atRisk")}
+            value={2}
+            icon={<Ionicons name="warning" size={20} color={INCLUSIVE_WARM_PALETTE.danger} />}
+            color={INCLUSIVE_WARM_PALETTE.danger}
+          />
+          <View style={{ width: 8 }} />
+          <StatCard
+            label={t("teacher.avgProgress")}
+            value="72%"
+            icon={<Ionicons name="trending-up" size={20} color={INCLUSIVE_WARM_PALETTE.success} />}
+            color={INCLUSIVE_WARM_PALETTE.success}
+          />
+        </View>
+
+        <View style={styles.sectionRow}>
+          <Pressable
+            onPress={() => router.push("/(teacher)/learners" as Href)}
+            accessibilityRole="button"
+            accessibilityLabel={t("teacher.students")}
+          >
+            <Text
+              style={[
+                styles.sectionTitle,
+                { color: palette.ink, fontFamily: fontFamilies.bodyBold },
+              ]}
+            >
+              {t("teacher.students")}
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => router.push("/(teacher)/insights" as Href)}
+            accessibilityRole="button"
+            accessibilityLabel={t("teacherInsights.title", "Class insights")}
+            hitSlop={8}
+          >
+            <Text style={[styles.sectionLink, { color: palette.primary }]}>
+              {t("teacherInsights.title", "Class insights")}
+            </Text>
           </Pressable>
         </View>
-      </View>
-
-      <Text
-        style={[
-          styles.greeting,
-          { color: palette.ink, fontFamily: fontFamilies.displayBold, fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight },
-        ]}
-      >
-        {t("teacher.greeting", { name: user?.name })}
-      </Text>
-
-      <View style={styles.statsRow}>
-        <StatCard
-          label={t("teacher.students")}
-          value={students?.length || 0}
-          icon={<Ionicons name="people" size={20} color={palette.primary} />}
-        />
-        <View style={{ width: 8 }} />
-        <StatCard
-          label={t("teacher.atRisk")}
-          value={2}
-          icon={
-            <Ionicons name="warning" size={20} color={INCLUSIVE_WARM_PALETTE.danger} />
-          }
-          color={INCLUSIVE_WARM_PALETTE.danger}
-        />
-        <View style={{ width: 8 }} />
-        <StatCard
-          label={t("teacher.avgProgress")}
-          value="72%"
-          icon={
-            <Ionicons name="trending-up" size={20} color={INCLUSIVE_WARM_PALETTE.success} />
-          }
-          color={INCLUSIVE_WARM_PALETTE.success}
-        />
-      </View>
-
-      <Text
-        style={[styles.sectionTitle, { color: palette.ink, fontFamily: fontFamilies.bodyBold }]}
-      >
-        {t("teacher.students")}
-      </Text>
-      {!students?.length ? (
-        <EmptyState
-          icon={<Ionicons name="people-outline" size={48} color={palette.inkMuted} />}
-          title={t("teacher.noStudentsTitle")}
-          message={t("teacher.noStudentsMessage")}
-        />
-      ) : (
-        students.map((student: any) => (
-          <Pressable
-            key={student.id}
-            onPress={() => router.push(`/(teacher)/student/${student.id}` as Href)}
-            style={{ marginBottom: spacing.sm }}
-          >
-            <Card>
-              <View style={styles.studentRow}>
-                <View
-                  style={[
-                    styles.studentAvatar,
-                    { backgroundColor: INCLUSIVE_WARM_PALETTE.primarySoft },
-                  ]}
-                >
-                  <Text
+        {!students?.length ? (
+          <EmptyState
+            icon={<Ionicons name="people-outline" size={48} color={palette.inkMuted} />}
+            title={t("teacher.noStudentsTitle")}
+            message={t("teacher.noStudentsMessage")}
+          />
+        ) : (
+          students.map((student: any) => (
+            <Pressable
+              key={student.id}
+              onPress={() => router.push(`/(teacher)/student/${student.id}` as Href)}
+              style={{ marginBottom: spacing.sm }}
+            >
+              <Card>
+                <View style={styles.studentRow}>
+                  <View
                     style={[
-                      styles.studentInitial,
-                      { color: palette.primary, fontFamily: fontFamilies.bodyBold },
+                      styles.studentAvatar,
+                      { backgroundColor: INCLUSIVE_WARM_PALETTE.primarySoft },
                     ]}
                   >
-                    {student.firstName?.[0] || "S"}
-                  </Text>
+                    <Text
+                      style={[
+                        styles.studentInitial,
+                        { color: palette.primary, fontFamily: fontFamilies.bodyBold },
+                      ]}
+                    >
+                      {student.firstName?.[0] || "S"}
+                    </Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text
+                      style={[
+                        styles.studentName,
+                        { color: palette.ink, fontFamily: fontFamilies.bodyBold },
+                      ]}
+                    >
+                      {student.firstName} {student.lastName}
+                    </Text>
+                    <Text style={[styles.studentGrade, { color: palette.inkMuted }]}>
+                      Grade {student.gradeLevel}
+                    </Text>
+                  </View>
+                  <View style={[styles.levelBadge, { backgroundColor: palette.accentSoft }]}>
+                    <Text
+                      style={[
+                        styles.levelText,
+                        { color: palette.primary, fontFamily: fontFamilies.bodySemiBold },
+                      ]}
+                    >
+                      {student.functioningLevel}
+                    </Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={18} color={palette.inkMuted} />
                 </View>
-                <View style={{ flex: 1 }}>
-                  <Text
-                    style={[
-                      styles.studentName,
-                      { color: palette.ink, fontFamily: fontFamilies.bodyBold },
-                    ]}
-                  >
-                    {student.firstName} {student.lastName}
-                  </Text>
-                  <Text style={[styles.studentGrade, { color: palette.inkMuted }]}>
-                    Grade {student.gradeLevel}
-                  </Text>
-                </View>
-                <View style={[styles.levelBadge, { backgroundColor: palette.accentSoft }]}>
-                  <Text
-                    style={[
-                      styles.levelText,
-                      { color: palette.primary, fontFamily: fontFamilies.bodySemiBold },
-                    ]}
-                  >
-                    {student.functioningLevel}
-                  </Text>
-                </View>
-                <Ionicons name="chevron-forward" size={18} color={palette.inkMuted} />
-              </View>
-            </Card>
-          </Pressable>
-        ))
-      )}
+              </Card>
+            </Pressable>
+          ))
+        )}
       </View>
     </ScrollView>
   );
@@ -178,6 +200,12 @@ const styles = StyleSheet.create({
   greeting: { fontSize: 28, marginBottom: spacing.md, letterSpacing: -0.5 },
   statsRow: { flexDirection: "row", marginBottom: spacing.lg },
   sectionTitle: { fontSize: 18, marginBottom: spacing.md },
+  sectionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  sectionLink: { fontSize: 13, fontFamily: fontFamilies.bodyBold, marginBottom: spacing.md },
   studentRow: { flexDirection: "row", alignItems: "center" },
   studentAvatar: {
     width: 40,

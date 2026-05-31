@@ -8,6 +8,7 @@ import { Stack } from "expo-router";
  *
  * Routes:
  *   /(shell-demo)/         — interactive shell preview
+ *   /(shell-demo)/charts   — @aivo/mobile-ui chart-kit gallery
  */
 export default function ShellDemoLayout() {
   return (

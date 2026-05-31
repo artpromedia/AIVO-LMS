@@ -10,16 +10,13 @@ import {
   Modal,
   Switch,
 } from "react-native";
-import { router } from "expo-router";
+import { router, type Href } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTranslation } from "@/hooks/useTranslation";
 import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import { useAuth } from "@/hooks/useAuth";
-import {
-  isBiometricUnlockArmed,
-  getBiometricSupport,
-} from "@/lib/biometric";
+import { isBiometricUnlockArmed, getBiometricSupport } from "@/lib/biometric";
 import { spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
@@ -55,10 +52,7 @@ export default function LoginScreen() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [armed, support] = await Promise.all([
-        isBiometricUnlockArmed(),
-        getBiometricSupport(),
-      ]);
+      const [armed, support] = await Promise.all([isBiometricUnlockArmed(), getBiometricSupport()]);
       if (cancelled) return;
       setBiometric({
         armed: armed.armed && support.available && support.enrolled,
@@ -222,20 +216,13 @@ export default function LoginScreen() {
             },
           ]}
         >
-          <Text style={[styles.title, { color: palette.ink }]}>
-            {t("auth.welcomeBack")}
-          </Text>
+          <Text style={[styles.title, { color: palette.ink }]}>{t("auth.welcomeBack")}</Text>
           <Text style={[styles.subtitle, { color: palette.inkMuted }]}>
             {t("auth.signInSubtitle")}
           </Text>
 
           {error ? (
-            <View
-              style={[
-                styles.errorBox,
-                { backgroundColor: "rgba(220, 38, 38, 0.08)" },
-              ]}
-            >
+            <View style={[styles.errorBox, { backgroundColor: "rgba(220, 38, 38, 0.08)" }]}>
               <Text style={styles.errorText}>{error}</Text>
             </View>
           ) : null}
@@ -304,9 +291,7 @@ export default function LoginScreen() {
 
           <View style={styles.dividerRow}>
             <View style={[styles.dividerLine, { backgroundColor: palette.border }]} />
-            <Text style={[styles.dividerText, { color: palette.inkMuted }]}>
-              {t("common.or")}
-            </Text>
+            <Text style={[styles.dividerText, { color: palette.inkMuted }]}>{t("common.or")}</Text>
             <View style={[styles.dividerLine, { backgroundColor: palette.border }]} />
           </View>
 
@@ -326,10 +311,7 @@ export default function LoginScreen() {
           </Pressable>
 
           <Pressable
-            style={[
-              styles.pinButton,
-              { borderColor: palette.accent },
-            ]}
+            style={[styles.pinButton, { borderColor: palette.accent }]}
             onPress={() => router.push("/(auth)/pin")}
             accessibilityRole="button"
           >
@@ -339,24 +321,20 @@ export default function LoginScreen() {
           </Pressable>
         </View>
 
-        <Pressable onPress={() => router.push("/(auth)/signup")} style={styles.signupLink}>
+        <Pressable
+          onPress={() => router.push("/(onboarding)/welcome" as Href)}
+          style={styles.signupLink}
+        >
           <Text style={[styles.signupText, { color: palette.inkMuted }]}>
             {t("auth.noAccount")}{" "}
-            <Text style={[styles.signupBold, { color: palette.primary }]}>
-              {t("auth.signUp")}
-            </Text>
+            <Text style={[styles.signupBold, { color: palette.primary }]}>{t("auth.signUp")}</Text>
           </Text>
         </Pressable>
       </ResponsiveScreen>
 
       <Modal visible={consentModal} transparent animationType="slide">
         <View style={styles.modalOverlay}>
-          <View
-            style={[
-              styles.modalCard,
-              { backgroundColor: palette.bgRaised },
-            ]}
-          >
+          <View style={[styles.modalCard, { backgroundColor: palette.bgRaised }]}>
             <Text style={[styles.modalTitle, { color: palette.ink }]}>
               {t("auth.consentTitle")}
             </Text>

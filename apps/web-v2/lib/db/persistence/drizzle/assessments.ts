@@ -1,61 +1,178 @@
 /**
- * Drizzle-backed AssessmentStore — stub.
- *
- * `packages/db/src/schema/assessments.ts` already ships a real
- * schema. The Drizzle implementation is a follow-up that:
- *
- *   1. Maps row shapes via `mapRowToParentAssessment`,
- *      `mapRowToBaseline`, `mapRowToQuestion`, `mapRowToAttempt`.
- *   2. Implements `recordBaselineAttempt` in a single transaction so
- *      the replace-then-append is atomic under concurrent writes.
- *   3. Reads `appendBaselineQuestions` writes in batched INSERT to
- *      avoid N+1 round-trips for the ~14-question payload.
- *
- * Until then, flipping AIVO_PERSISTENCE_ASSESSMENTS=postgres hits the
- * explicit error below.
+ * Drizzle-backed AssessmentStore — parent intake + baseline runs
+ * (assessments, questions, attempts, telemetry). Mirrors the memory
+ * store, including "latest answer wins" in recordBaselineAttempt
+ * (delete the prior (questionId, learnerId) attempt, then insert) and
+ * the order-sorted question list.
  */
+import { and, eq, sql } from "drizzle-orm";
+import {
+  webParentAssessments,
+  webBaselineAssessments,
+  webBaselineQuestions,
+  webBaselineAttempts,
+  webBaselineTelemetry,
+} from "@aivo/db";
+import type {
+  BaselineAssessment,
+  BaselineAttempt,
+  BaselineItemResponseLog,
+  BaselineQuestion,
+  ParentAssessment,
+} from "@/lib/db/types";
 import type { AssessmentStore } from "../types";
-
-function notImplemented(method: string): never {
-  throw new Error(
-    `[persistence.drizzle.assessments.${method}] not implemented. ` +
-      `Wire packages/db/src/schema/assessments.ts into the adapter ` +
-      `before flipping AIVO_PERSISTENCE_ASSESSMENTS=postgres.`,
-  );
-}
+import { getDb } from "./client";
 
 export const drizzleAssessments: AssessmentStore = {
-  async findParentAssessment() {
-    return notImplemented("findParentAssessment");
+  async findParentAssessment(learnerId, tenantId) {
+    const [row] = await getDb()
+      .select()
+      .from(webParentAssessments)
+      .where(
+        and(
+          eq(webParentAssessments.learnerId, learnerId),
+          eq(webParentAssessments.tenantId, tenantId),
+        ),
+      )
+      .limit(1);
+    return row ? (row.data as ParentAssessment) : null;
   },
-  async upsertParentAssessment() {
-    return notImplemented("upsertParentAssessment");
+
+  async upsertParentAssessment(assessment) {
+    const db = getDb();
+    await db
+      .insert(webParentAssessments)
+      .values({
+        id: assessment.id,
+        learnerId: assessment.learnerId,
+        tenantId: assessment.tenantId,
+        data: assessment,
+      })
+      .onConflictDoUpdate({
+        target: webParentAssessments.id,
+        set: { learnerId: assessment.learnerId, tenantId: assessment.tenantId, data: assessment },
+      });
+    return assessment;
   },
-  async getBaselineById() {
-    return notImplemented("getBaselineById");
+
+  async getBaselineById(baselineId, tenantId) {
+    const [row] = await getDb()
+      .select()
+      .from(webBaselineAssessments)
+      .where(
+        and(
+          eq(webBaselineAssessments.id, baselineId),
+          eq(webBaselineAssessments.tenantId, tenantId),
+        ),
+      )
+      .limit(1);
+    return row ? (row.data as BaselineAssessment) : null;
   },
-  async getActiveBaselineForLearner() {
-    return notImplemented("getActiveBaselineForLearner");
+
+  async getActiveBaselineForLearner(learnerId, tenantId) {
+    const rows = await getDb()
+      .select()
+      .from(webBaselineAssessments)
+      .where(
+        and(
+          eq(webBaselineAssessments.learnerId, learnerId),
+          eq(webBaselineAssessments.tenantId, tenantId),
+        ),
+      );
+    let latest: BaselineAssessment | null = null;
+    for (const r of rows) {
+      const b = r.data as BaselineAssessment;
+      if (!latest || b.createdAt > latest.createdAt) latest = b;
+    }
+    return latest;
   },
-  async upsertBaseline() {
-    return notImplemented("upsertBaseline");
+
+  async upsertBaseline(baseline) {
+    const db = getDb();
+    await db
+      .insert(webBaselineAssessments)
+      .values({
+        id: baseline.id,
+        learnerId: baseline.learnerId,
+        tenantId: baseline.tenantId,
+        data: baseline,
+      })
+      .onConflictDoUpdate({
+        target: webBaselineAssessments.id,
+        set: { learnerId: baseline.learnerId, tenantId: baseline.tenantId, data: baseline },
+      });
+    return baseline;
   },
-  async listBaselineQuestions() {
-    return notImplemented("listBaselineQuestions");
+
+  async listBaselineQuestions(baselineId) {
+    const rows = await getDb()
+      .select()
+      .from(webBaselineQuestions)
+      .where(eq(webBaselineQuestions.baselineId, baselineId));
+    return rows.map((r) => r.data as BaselineQuestion).sort((a, b) => a.order - b.order);
   },
-  async appendBaselineQuestions() {
-    return notImplemented("appendBaselineQuestions");
+
+  async appendBaselineQuestions(questions) {
+    if (questions.length === 0) return;
+    const db = getDb();
+    await db
+      .insert(webBaselineQuestions)
+      .values(questions.map((q) => ({ id: q.id, baselineId: q.baselineId, data: q })))
+      .onConflictDoUpdate({
+        target: webBaselineQuestions.id,
+        // memory `set(q.id, q)` overwrites; use the incoming row.
+        set: { baselineId: sql`excluded.baseline_id`, data: sql`excluded.data` },
+      });
   },
-  async listBaselineAttempts() {
-    return notImplemented("listBaselineAttempts");
+
+  async listBaselineAttempts(baselineId, tenantId) {
+    const rows = await getDb()
+      .select()
+      .from(webBaselineAttempts)
+      .where(
+        and(
+          eq(webBaselineAttempts.baselineId, baselineId),
+          eq(webBaselineAttempts.tenantId, tenantId),
+        ),
+      );
+    return rows.map((r) => r.data as BaselineAttempt);
   },
-  async recordBaselineAttempt() {
-    return notImplemented("recordBaselineAttempt");
+
+  async recordBaselineAttempt(attempt, replaceWhere) {
+    const db = getDb();
+    await db
+      .delete(webBaselineAttempts)
+      .where(
+        and(
+          eq(webBaselineAttempts.questionId, replaceWhere.questionId),
+          eq(webBaselineAttempts.learnerId, replaceWhere.learnerId),
+        ),
+      );
+    await db.insert(webBaselineAttempts).values({
+      id: attempt.id,
+      baselineId: attempt.baselineId,
+      tenantId: attempt.tenantId,
+      questionId: attempt.questionId,
+      learnerId: attempt.learnerId,
+      data: attempt,
+    });
+    return attempt;
   },
-  async appendBaselineTelemetry() {
-    return notImplemented("appendBaselineTelemetry");
+
+  async appendBaselineTelemetry(logs) {
+    if (logs.length === 0) return;
+    const db = getDb();
+    await db
+      .insert(webBaselineTelemetry)
+      .values(logs.map((l) => ({ tenantId: l.tenantId, learnerId: l.learnerId ?? null, data: l })));
   },
-  async listBaselineTelemetry() {
-    return notImplemented("listBaselineTelemetry");
+
+  async listBaselineTelemetry({ tenantId, learnerId }) {
+    const rows = await getDb()
+      .select()
+      .from(webBaselineTelemetry)
+      .where(eq(webBaselineTelemetry.tenantId, tenantId));
+    const all = rows.map((r) => r.data as BaselineItemResponseLog);
+    return learnerId === undefined ? all : all.filter((l) => l.learnerId === learnerId);
   },
 };

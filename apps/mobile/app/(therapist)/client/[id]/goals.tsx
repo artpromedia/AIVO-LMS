@@ -16,7 +16,8 @@ export default function TherapyGoals() {
   const type = useResponsiveType();
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
-  const { data: goals, isLoading } = useTherapyGoals(id);
+  const { data, isLoading } = useTherapyGoals(id);
+  const goals = data?.goals;
   const { sizeClass, width: winWidth, isTablet } = useWindowSizeClass();
   const hPad = pickBySizeClass(sizeClass, {
     compact: spacing.md,
@@ -44,7 +45,11 @@ export default function TherapyGoals() {
           <Ionicons name="arrow-back" size={20} color={colors.primary} />
           <Text style={styles.backText}>{t("common.back")}</Text>
         </Pressable>
-        <Text style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>{t("therapistClient.goalsTitle")}</Text>
+        <Text
+          style={[styles.title, { fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}
+        >
+          {t("therapistClient.goalsTitle")}
+        </Text>
         <Text style={styles.subtitle}>{t("therapistClient.goalsSubtitle")}</Text>
 
         {!goals?.length ? (

@@ -65,7 +65,12 @@ export default function ParentDashboard() {
       <View style={{ width: contentWidth }}>
         <View style={styles.header}>
           <View style={{ flex: 1 }}>
-            <Text style={[styles.greeting, { color: palette.ink, fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight }]}>
+            <Text
+              style={[
+                styles.greeting,
+                { color: palette.ink, fontSize: type.h1.fontSize, lineHeight: type.h1.lineHeight },
+              ]}
+            >
               {t("parent.greeting", { name: user?.name || "Parent" })}
             </Text>
             <Text style={[styles.subGreeting, { color: palette.inkMuted }]}>
@@ -132,20 +137,21 @@ export default function ParentDashboard() {
         </View>
 
         <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionTitle, { color: palette.ink }]}>
-            {t("parent.yourChildren")}
-          </Text>
+          <Pressable
+            onPress={() => router.push("/(parent)/learners" as Href)}
+            accessibilityRole="button"
+            accessibilityLabel={t("parent.yourChildren")}
+          >
+            <Text style={[styles.sectionTitle, { color: palette.ink }]}>
+              {t("parent.yourChildren")}
+            </Text>
+          </Pressable>
           <Pressable
             onPress={() => router.push("/(parent)/onboard")}
             accessibilityRole="button"
             accessibilityLabel={t("parent.addChild")}
           >
-            <View
-              style={[
-                styles.addChildBtn,
-                { backgroundColor: palette.primary },
-              ]}
-            >
+            <View style={[styles.addChildBtn, { backgroundColor: palette.primary }]}>
               <Ionicons name="add" size={22} color={palette.primaryFg} />
             </View>
           </Pressable>
@@ -163,18 +169,14 @@ export default function ParentDashboard() {
           learners.map((learner) => (
             <Pressable
               key={learner.id}
-              onPress={() => router.push(`/(parent)/brain/${learner.id}` as Href)}
+              onPress={() => router.push(`/(parent)/learners/${learner.id}` as Href)}
               accessibilityRole="button"
               accessibilityLabel={`${learner.firstName} ${learner.lastName}`}
             >
               <Card tone="raised" style={styles.childCard}>
                 <View style={styles.childRow}>
-                  <View
-                    style={[styles.childAvatar, { backgroundColor: palette.accentSoft }]}
-                  >
-                    <Text
-                      style={[styles.childInitial, { color: palette.accent }]}
-                    >
+                  <View style={[styles.childAvatar, { backgroundColor: palette.accentSoft }]}>
+                    <Text style={[styles.childInitial, { color: palette.accent }]}>
                       {learner.firstName[0]}
                     </Text>
                   </View>
@@ -185,27 +187,15 @@ export default function ParentDashboard() {
                     <Text style={[styles.childGrade, { color: palette.inkMuted }]}>
                       {t("common.grade", { grade: learner.gradeLevel })}
                     </Text>
-                    <View
-                      style={[
-                        styles.levelBadge,
-                        { backgroundColor: palette.accentSoft },
-                      ]}
-                    >
-                      <Text
-                        style={[styles.levelText, { color: palette.accent }]}
-                      >
+                    <View style={[styles.levelBadge, { backgroundColor: palette.accentSoft }]}>
+                      <Text style={[styles.levelText, { color: palette.accent }]}>
                         {learner.functioningLevel}
                       </Text>
                     </View>
                   </View>
                   <Ionicons name="chevron-forward" size={20} color={palette.inkMuted} />
                 </View>
-                <View
-                  style={[
-                    styles.childActions,
-                    { borderTopColor: palette.border },
-                  ]}
-                >
+                <View style={[styles.childActions, { borderTopColor: palette.border }]}>
                   <ChildAction
                     icon="bulb-outline"
                     label={t("parent.brain")}
@@ -216,9 +206,7 @@ export default function ParentDashboard() {
                     icon="trending-up-outline"
                     label={t("parent.progress")}
                     tint={"#16a34a"}
-                    onPress={() =>
-                      router.push(`/(parent)/progress/${learner.id}` as Href)
-                    }
+                    onPress={() => router.push(`/(parent)/progress/${learner.id}` as Href)}
                   />
                   <ChildAction
                     icon="document-outline"
@@ -236,9 +224,7 @@ export default function ParentDashboard() {
                     icon="trophy-outline"
                     label={t("parentMilestones.open")}
                     tint={palette.warm}
-                    onPress={() =>
-                      router.push(`/(parent)/milestones/${learner.id}` as Href)
-                    }
+                    onPress={() => router.push(`/(parent)/milestones/${learner.id}` as Href)}
                   />
                 </View>
               </Card>
@@ -254,6 +240,16 @@ export default function ParentDashboard() {
               variant="outline"
               fullWidth
               iconLeft={<Ionicons name="storefront-outline" size={18} color={palette.primary} />}
+            />
+          </View>
+          <View style={{ width: 8 }} />
+          <View style={{ flex: 1 }}>
+            <Button
+              title={t("parent.reports", "Reports")}
+              onPress={() => router.push("/(parent)/reports" as Href)}
+              variant="outline"
+              fullWidth
+              iconLeft={<Ionicons name="bar-chart-outline" size={18} color={palette.primary} />}
             />
           </View>
           <View style={{ width: 8 }} />

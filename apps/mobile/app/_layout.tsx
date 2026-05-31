@@ -10,6 +10,7 @@ import { AuthContext, useAuthState } from "@/hooks/useAuth";
 import { colors } from "@/constants/colors";
 import { FONT_ASSETS } from "@/constants/typography";
 import { SensoryModeProvider } from "@/context/SensoryModeProvider";
+import { PreferencesProvider } from "@/lib/preferences";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -53,8 +54,7 @@ export default function RootLayout() {
   // sync; signed-out / parent flows just use local AsyncStorage.
   // `learnerId` is `null` until auth hydrates, which the provider
   // tolerates (local-only mode until an id arrives).
-  const learnerId =
-    authState.user?.role === "LEARNER" ? authState.user.id : null;
+  const learnerId = authState.user?.role === "LEARNER" ? authState.user.id : null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -62,21 +62,25 @@ export default function RootLayout() {
         <QueryClientProvider client={queryClient}>
           <AuthContext.Provider value={authState}>
             <SensoryModeProvider learnerId={learnerId}>
-              <Stack
-                screenOptions={{
-                  headerShown: false,
-                  contentStyle: { backgroundColor: colors.background },
-                }}
-              >
-                <Stack.Screen name="index" />
-                <Stack.Screen name="accept-invite" />
-                <Stack.Screen name="(auth)" options={{ animation: "fade" }} />
-                <Stack.Screen name="(parent)" />
-                <Stack.Screen name="(learner)" />
-                <Stack.Screen name="(teacher)" />
-                <Stack.Screen name="(caregiver)" />
-                <Stack.Screen name="(therapist)" />
-              </Stack>
+              <PreferencesProvider>
+                <Stack
+                  screenOptions={{
+                    headerShown: false,
+                    contentStyle: { backgroundColor: colors.background },
+                  }}
+                >
+                  <Stack.Screen name="index" />
+                  <Stack.Screen name="accept-invite" />
+                  <Stack.Screen name="settings/accessibility" />
+                  <Stack.Screen name="(onboarding)" options={{ animation: "fade" }} />
+                  <Stack.Screen name="(auth)" options={{ animation: "fade" }} />
+                  <Stack.Screen name="(parent)" />
+                  <Stack.Screen name="(learner)" />
+                  <Stack.Screen name="(teacher)" />
+                  <Stack.Screen name="(caregiver)" />
+                  <Stack.Screen name="(therapist)" />
+                </Stack>
+              </PreferencesProvider>
             </SensoryModeProvider>
           </AuthContext.Provider>
         </QueryClientProvider>

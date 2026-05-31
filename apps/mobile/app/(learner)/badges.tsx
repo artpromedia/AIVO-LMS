@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
-import { router } from "expo-router";
+import { router, type Href } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -57,6 +57,45 @@ export default function BadgesScreen() {
           {t("learnerBadges.earned", { count: engagement?.badges?.length || 0 })}
         </Text>
 
+        {/* Rewards summary — coins / stickers (badges) / streak, plus a
+            jump into quest worlds. Consolidates the web /learner/rewards
+            view onto this screen. */}
+        <View style={styles.rewardRow}>
+          <View style={[styles.rewardPill, { backgroundColor: colors.warning + "1A" }]}>
+            <Ionicons name="cash" size={18} color={colors.warning} />
+            <Text style={[styles.rewardValue, { color: colors.text }]}>
+              {engagement?.coins ?? 0}
+            </Text>
+            <Text style={styles.rewardLabel}>{t("learnerBadges.coins", "Coins")}</Text>
+          </View>
+          <View style={[styles.rewardPill, { backgroundColor: colors.accent + "1A" }]}>
+            <Ionicons name="ribbon" size={18} color={colors.accent} />
+            <Text style={[styles.rewardValue, { color: colors.text }]}>
+              {engagement?.badges?.length ?? 0}
+            </Text>
+            <Text style={styles.rewardLabel}>{t("learnerBadges.stickers", "Stickers")}</Text>
+          </View>
+          <View style={[styles.rewardPill, { backgroundColor: colors.primary + "1A" }]}>
+            <Ionicons name="flame" size={18} color={colors.primary} />
+            <Text style={[styles.rewardValue, { color: colors.text }]}>
+              {engagement?.streakDays ?? 0}
+            </Text>
+            <Text style={styles.rewardLabel}>{t("learnerBadges.streak", "Streak")}</Text>
+          </View>
+        </View>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t("learnerBadges.questWorlds", "Quest worlds")}
+          onPress={() => router.push("/(learner)/quests" as Href)}
+          style={[styles.questLink, { borderColor: colors.border }]}
+        >
+          <Ionicons name="compass" size={20} color={colors.primary} />
+          <Text style={[styles.questLinkText, { color: colors.text }]}>
+            {t("learnerBadges.questWorlds", "Quest worlds")}
+          </Text>
+          <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
+        </Pressable>
+
         {!engagement?.badges?.length ? (
           <EmptyState
             icon={<Ionicons name="ribbon-outline" size={48} color={colors.textSecondary} />}
@@ -66,10 +105,7 @@ export default function BadgesScreen() {
         ) : (
           <View style={[styles.grid, { gap: CARD_GAP }]}>
             {engagement.badges.map((badge) => (
-              <AivoCard
-                key={badge.id}
-                style={[styles.badgeCard, { width: cardWidth }]}
-              >
+              <AivoCard key={badge.id} style={[styles.badgeCard, { width: cardWidth }]}>
                 <View style={[styles.badgeBorder, { borderColor: rarityColors[badge.rarity] }]}>
                   <Ionicons name="ribbon" size={32} color={rarityColors[badge.rarity]} />
                 </View>
@@ -90,6 +126,21 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   backRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: spacing.md },
   backText: { fontSize: 16, fontFamily: "Nunito-SemiBold", color: colors.primary },
+  rewardRow: { flexDirection: "row", gap: 8, marginTop: 12 },
+  rewardPill: { flex: 1, alignItems: "center", gap: 2, paddingVertical: 12, borderRadius: 16 },
+  rewardValue: { fontSize: 18, fontFamily: "Nunito-ExtraBold" },
+  rewardLabel: { fontSize: 11, fontFamily: "Nunito-SemiBold", color: colors.textSecondary },
+  questLink: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    marginTop: 12,
+  },
+  questLinkText: { flex: 1, fontSize: 15, fontFamily: "Nunito-Bold" },
   title: { fontSize: 24, fontFamily: "Nunito-ExtraBold", color: colors.text },
   subtitle: {
     fontSize: 14,

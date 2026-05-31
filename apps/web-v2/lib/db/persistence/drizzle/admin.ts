@@ -1,62 +1,162 @@
 /**
- * Drizzle-backed AdminStore — stub.
- *
- * `packages/db/src/schema/{tenancy,districts,admin}.ts` ship the
- * school + classroom + enrollment schemas. The Drizzle
- * implementation is a follow-up that:
- *
- *   1. Adds a UNIQUE constraint on
- *      (classroom_id, subject_id, role) so `findEnrollmentByNaturalKey`
- *      can be replaced by an INSERT … ON CONFLICT DO NOTHING with a
- *      RETURNING clause.
- *   2. Wraps upsertTeacherAssignment in a CTE so the validation
- *      that learnerIds belong to tenantId becomes a single round-trip.
+ * Drizzle-backed AdminStore — schools / classrooms / enrollments /
+ * teacher assignments. Tenant-scoped fetches via indexed columns; the
+ * memory store's localeCompare / createdAt sort + secondary predicates
+ * (schoolId, teacherUserId, status, natural key) are applied in app
+ * code so the behaviour is byte-for-byte equivalent.
  */
+import { and, eq } from "drizzle-orm";
+import { webSchools, webClassrooms, webEnrollments, webTeacherAssignments } from "@aivo/db";
+import type { Classroom, Enrollment, School, TeacherAssignment } from "@/lib/db/types";
 import type { AdminStore } from "../types";
-
-function notImplemented(method: string): never {
-  throw new Error(
-    `[persistence.drizzle.admin.${method}] not implemented. ` +
-      `Wire packages/db schools/classrooms/enrollments/teacherAssignments ` +
-      `into the adapter before flipping AIVO_PERSISTENCE_ADMIN=postgres.`,
-  );
-}
+import { getDb } from "./client";
 
 export const drizzleAdmin: AdminStore = {
-  async listSchools() {
-    return notImplemented("listSchools");
+  async listSchools(tenantId) {
+    const db = getDb();
+    const rows = tenantId
+      ? await db.select().from(webSchools).where(eq(webSchools.tenantId, tenantId))
+      : await db.select().from(webSchools);
+    return rows.map((r) => r.data as School).sort((a, b) => a.name.localeCompare(b.name));
   },
-  async getSchoolById() {
-    return notImplemented("getSchoolById");
+
+  async getSchoolById(id) {
+    const [row] = await getDb().select().from(webSchools).where(eq(webSchools.id, id)).limit(1);
+    return row ? (row.data as School) : null;
   },
-  async listClassrooms() {
-    return notImplemented("listClassrooms");
+
+  async listClassrooms({ tenantId, schoolId, teacherUserId }) {
+    const rows = await getDb()
+      .select()
+      .from(webClassrooms)
+      .where(eq(webClassrooms.tenantId, tenantId));
+    let arr = rows.map((r) => r.data as Classroom);
+    if (schoolId) arr = arr.filter((c) => c.schoolId === schoolId);
+    if (teacherUserId) arr = arr.filter((c) => c.teacherUserId === teacherUserId);
+    return arr.sort((a, b) => a.name.localeCompare(b.name));
   },
-  async getClassroomById() {
-    return notImplemented("getClassroomById");
+
+  async getClassroomById(id, tenantId) {
+    const [row] = await getDb()
+      .select()
+      .from(webClassrooms)
+      .where(and(eq(webClassrooms.id, id), eq(webClassrooms.tenantId, tenantId)))
+      .limit(1);
+    return row ? (row.data as Classroom) : null;
   },
-  async upsertClassroom() {
-    return notImplemented("upsertClassroom");
+
+  async upsertClassroom(classroom) {
+    const db = getDb();
+    await db
+      .insert(webClassrooms)
+      .values({ id: classroom.id, tenantId: classroom.tenantId, data: classroom })
+      .onConflictDoUpdate({
+        target: webClassrooms.id,
+        set: { tenantId: classroom.tenantId, data: classroom },
+      });
+    return classroom;
   },
-  async listEnrollmentsForClassroom() {
-    return notImplemented("listEnrollmentsForClassroom");
+
+  async listEnrollmentsForClassroom(classroomId) {
+    const rows = await getDb()
+      .select()
+      .from(webEnrollments)
+      .where(eq(webEnrollments.classroomId, classroomId));
+    return rows.map((r) => r.data as Enrollment).sort((a, b) => a.role.localeCompare(b.role));
   },
-  async upsertEnrollment() {
-    return notImplemented("upsertEnrollment");
+
+  async upsertEnrollment(enrollment) {
+    const db = getDb();
+    await db
+      .insert(webEnrollments)
+      .values({
+        id: enrollment.id,
+        classroomId: enrollment.classroomId,
+        tenantId: enrollment.tenantId,
+        data: enrollment,
+      })
+      .onConflictDoUpdate({
+        target: webEnrollments.id,
+        set: {
+          classroomId: enrollment.classroomId,
+          tenantId: enrollment.tenantId,
+          data: enrollment,
+        },
+      });
+    return enrollment;
   },
-  async findEnrollmentByNaturalKey() {
-    return notImplemented("findEnrollmentByNaturalKey");
+
+  async findEnrollmentByNaturalKey({ classroomId, subjectId, role }) {
+    const rows = await getDb()
+      .select()
+      .from(webEnrollments)
+      .where(eq(webEnrollments.classroomId, classroomId));
+    return (
+      rows
+        .map((r) => r.data as Enrollment)
+        .find((e) => e.subjectId === subjectId && e.role === role) ?? null
+    );
   },
-  async listTeacherAssignments() {
-    return notImplemented("listTeacherAssignments");
+
+  async listTeacherAssignments(teacherId, tenantId, opts) {
+    const rows = await getDb()
+      .select()
+      .from(webTeacherAssignments)
+      .where(
+        and(
+          eq(webTeacherAssignments.teacherId, teacherId),
+          eq(webTeacherAssignments.tenantId, tenantId),
+        ),
+      );
+    const all = rows
+      .map((r) => r.data as TeacherAssignment)
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    return opts?.status ? all.filter((a) => a.status === opts.status) : all;
   },
-  async getTeacherAssignmentById() {
-    return notImplemented("getTeacherAssignmentById");
+
+  async getTeacherAssignmentById(assignmentId, teacherId, tenantId) {
+    const [row] = await getDb()
+      .select()
+      .from(webTeacherAssignments)
+      .where(
+        and(
+          eq(webTeacherAssignments.id, assignmentId),
+          eq(webTeacherAssignments.teacherId, teacherId),
+          eq(webTeacherAssignments.tenantId, tenantId),
+        ),
+      )
+      .limit(1);
+    return row ? (row.data as TeacherAssignment) : null;
   },
-  async upsertTeacherAssignment() {
-    return notImplemented("upsertTeacherAssignment");
+
+  async upsertTeacherAssignment(assignment) {
+    const db = getDb();
+    await db
+      .insert(webTeacherAssignments)
+      .values({
+        id: assignment.id,
+        teacherId: assignment.teacherId,
+        tenantId: assignment.tenantId,
+        data: assignment,
+      })
+      .onConflictDoUpdate({
+        target: webTeacherAssignments.id,
+        set: { teacherId: assignment.teacherId, tenantId: assignment.tenantId, data: assignment },
+      });
+    return assignment;
   },
-  async deleteTeacherAssignment() {
-    return notImplemented("deleteTeacherAssignment");
+
+  async deleteTeacherAssignment(assignmentId, teacherId, tenantId) {
+    const deleted = await getDb()
+      .delete(webTeacherAssignments)
+      .where(
+        and(
+          eq(webTeacherAssignments.id, assignmentId),
+          eq(webTeacherAssignments.teacherId, teacherId),
+          eq(webTeacherAssignments.tenantId, tenantId),
+        ),
+      )
+      .returning({ id: webTeacherAssignments.id });
+    return deleted.length > 0;
   },
 };

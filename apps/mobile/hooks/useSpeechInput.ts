@@ -138,7 +138,9 @@ export function useSpeechInput({
     }
 
     try {
-      const info = await FileSystem.getInfoAsync(uri, { size: true });
+      // `FileInfo.size` is always populated for an existing file in the
+      // legacy API; the old `{ size: true }` option was removed in SDK 54.
+      const info = await FileSystem.getInfoAsync(uri);
       if (!info.exists) {
         fail("audio_capture");
         return;

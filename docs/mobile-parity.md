@@ -1,114 +1,171 @@
 # Mobile Parity Audit
 
-Comparison of the Expo mobile app (`apps/mobile/`) against the Next.js web app
-(`apps/web/`). Audited on Sprint 7. Status legend:
+> **Generated** by `scripts/web-mobile-parity-check.mjs`. Do not hand-edit —
+> update `PARITY_MATRIX` in the script and run `pnpm mobile:parity:md`.
 
-- **Parity**: feature is present on both with comparable functionality.
-- **Partial**: present but missing a sub-feature noted in the gap column.
-- **Missing**: not yet implemented in mobile.
-- **N/A**: intentionally web-only (e.g. district admin tools).
+Comparison of the Expo mobile app (`apps/mobile/`) against the Next.js web
+app (`apps/web-v2/`) across the five roles that ship in the unified mobile
+app: **learner, parent, teacher, therapist, caregiver**. School / district /
+internal admin surfaces are web-only and excluded (see `docs/NAVIGATION.md`).
 
-## Parent Role
-
-| Web Route                               | Mobile Screen                           | Status      | Gap / Ticket                                                     |
-| --------------------------------------- | --------------------------------------- | ----------- | ---------------------------------------------------------------- |
-| `/dashboard/parent`                     | `(parent)/index.tsx`                    | Parity      | —                                                                |
-| `/dashboard/parent/onboard`             | `(parent)/onboard.tsx`                  | Parity      | —                                                                |
-| `/dashboard/parent/brain/[id]`          | `(parent)/brain/[childId]/index.tsx`    | Parity      | —                                                                |
-| `/dashboard/parent/brain/[id]/[domain]` | `(parent)/brain/[childId]/[domain].tsx` | Parity      | —                                                                |
-| `/dashboard/parent/brain/[id]/history`  | `(parent)/brain/[childId]/history.tsx`  | Parity      | —                                                                |
-| `/dashboard/parent/brain-review/[id]`   | —                                       | **Missing** | MOB-PAR-001: parent brain-clone approval flow                    |
-| `/dashboard/parent/iep/[id]`            | `(parent)/iep/[childId].tsx`            | Parity      | —                                                                |
-| `/dashboard/parent/progress/[id]`       | `(parent)/progress/[childId].tsx`       | Parity      | —                                                                |
-| `/dashboard/parent/sessions/[id]`       | `(parent)/session/[childId].tsx`        | Parity      | —                                                                |
-| `/dashboard/parent/team/[id]`           | `(parent)/team/[childId].tsx`           | Parity      | —                                                                |
-| `/dashboard/parent/colearn/[id]`        | `(parent)/colearn/[childId].tsx`        | Parity      | —                                                                |
-| `/dashboard/parent/tutors`              | `(parent)/tutors.tsx`                   | Parity      | —                                                                |
-| `/dashboard/parent/recommendations`     | `(parent)/recommendations.tsx`          | Parity      | —                                                                |
-| `/dashboard/parent/billing`             | `(parent)/billing.tsx`                  | Parity      | —                                                                |
-| `/dashboard/parent/settings`            | `(parent)/settings.tsx`                 | Parity      | —                                                                |
-| `/dashboard/parent/gradebook/[id]`      | —                                       | **Missing** | MOB-PAR-002: parent gradebook view (currently only via progress) |
-
-## Learner Role
-
-| Web Route                      | Mobile Screen                     | Status      | Gap / Ticket                                    |
-| ------------------------------ | --------------------------------- | ----------- | ----------------------------------------------- |
-| `/learner`                     | `(learner)/index.tsx`             | Parity      | —                                               |
-| `/learner/stage/[sessionId]`   | `(learner)/stage/[sessionId].tsx` | Parity      | —                                               |
-| `/learner/tutor/[slug]`        | `(learner)/tutor/[tutorSlug].tsx` | Parity      | —                                               |
-| `/learner/gradebook`           | `(learner)/gradebook.tsx`         | Parity      | —                                               |
-| `/learner/homework`            | `(learner)/homework.tsx`          | Parity      | —                                               |
-| `/learner/badges`              | `(learner)/badges.tsx`            | Parity      | —                                               |
-| `/learner/quests`              | `(learner)/quests.tsx`            | Parity      | —                                               |
-| `/learner/challenges`          | `(learner)/challenges.tsx`        | Parity      | —                                               |
-| `/learner/shop`                | `(learner)/shop.tsx`              | Parity      | —                                               |
-| `/learner/gamification`        | `(learner)/gamification.tsx`      | Parity      | —                                               |
-| `/learner/discovery-adventure` | `(learner)/adventure.tsx`         | Parity      | —                                               |
-| `/learner/brain`               | `(learner)/brain.tsx`             | Parity      | —                                               |
-| `/learner/sensory-settings`    | —                                 | **Missing** | MOB-LRN-001: learner-side sensory toggle screen |
-
-## Caregiver Role
-
-| Web Route                                        | Mobile Screen                               | Status | Gap / Ticket |
-| ------------------------------------------------ | ------------------------------------------- | ------ | ------------ |
-| `/dashboard/caregiver`                           | `(caregiver)/index.tsx`                     | Parity | —            |
-| `/dashboard/caregiver/observations`              | `(caregiver)/child/[id]/observation.tsx`    | Parity | —            |
-| `/dashboard/caregiver/sessions`                  | `(caregiver)/child/[id]/sessions.tsx`       | Parity | —            |
-| `/dashboard/caregiver/child/[id]/brain`          | `(caregiver)/child/[id]/brain.tsx`          | Parity | —            |
-| `/dashboard/caregiver/child/[id]/iep-goals`      | `(caregiver)/child/[id]/iep-goals.tsx`      | Parity | —            |
-| `/dashboard/caregiver/child/[id]/accommodations` | `(caregiver)/child/[id]/accommodations.tsx` | Parity | —            |
-| `/dashboard/caregiver/child/[id]/gradebook`      | `(caregiver)/child/[id]/gradebook.tsx`      | Parity | —            |
-| `/dashboard/caregiver/child/[id]/progress`       | `(caregiver)/child/[id]/progress.tsx`       | Parity | —            |
-| `/dashboard/caregiver/settings`                  | `(caregiver)/settings.tsx`                  | Parity | —            |
-
-## Teacher Role
-
-| Web Route                                  | Mobile Screen                        | Status      | Gap / Ticket                                                       |
-| ------------------------------------------ | ------------------------------------ | ----------- | ------------------------------------------------------------------ |
-| `/dashboard/teacher`                       | `(teacher)/index.tsx`                | Parity      | —                                                                  |
-| `/dashboard/teacher/lesson-plans`          | `(teacher)/lesson-plan.tsx`          | Partial     | MOB-TCH-001: list/library view (only single plan editor on mobile) |
-| `/dashboard/teacher/reports`               | `(teacher)/analytics.tsx`            | Parity      | —                                                                  |
-| `/dashboard/teacher/student/[id]`          | `(teacher)/student/[id]/index.tsx`   | Parity      | —                                                                  |
-| `/dashboard/teacher/student/[id]/iep`      | `(teacher)/student/[id]/iep.tsx`     | Parity      | —                                                                  |
-| `/dashboard/teacher/student/[id]/insights` | `(teacher)/student/[id]/insight.tsx` | Parity      | —                                                                  |
-| `/dashboard/teacher/settings`              | —                                    | **Missing** | MOB-TCH-002: teacher settings screen                               |
-
-## Therapist Role
-
-| Web Route                                | Mobile Screen                         | Status      | Gap / Ticket                           |
-| ---------------------------------------- | ------------------------------------- | ----------- | -------------------------------------- |
-| `/dashboard/therapist`                   | `(therapist)/index.tsx`               | Parity      | —                                      |
-| `/dashboard/therapist/caseload`          | `(therapist)/index.tsx`               | Parity      | (combined with home)                   |
-| `/dashboard/therapist/sessions`          | `(therapist)/client/[id]/notes.tsx`   | Partial     | MOB-THR-001: cross-client session log  |
-| `/dashboard/therapist/reports`           | `(therapist)/client/[id]/reports.tsx` | Parity      | —                                      |
-| `/dashboard/therapist/client/[id]/goals` | `(therapist)/client/[id]/goals.tsx`   | Parity      | —                                      |
-| `/dashboard/therapist/settings`          | —                                     | **Missing** | MOB-THR-002: therapist settings screen |
-
-## District / Platform Admin
-
-Intentionally web-only (N/A on mobile): district admin, platform admin, internal
-operations, billing reconciliation, integrations management.
+Status legend: **Parity** comparable on both · **Partial** present but a
+sub-feature is missing · **Missing** not yet on mobile.
 
 ## Summary
 
-| Category       | Count |
-| -------------- | ----- |
-| Parity         | 36    |
-| Partial        | 3     |
-| Missing        | 6     |
-| N/A (web-only) | —     |
+| Status             | Count   |
+| ------------------ | ------- |
+| Parity             | 113     |
+| Partial            | 0       |
+| Missing            | 0       |
+| **In-scope total** | **113** |
 
-### Pre-launch Tickets
+Full parity: **100%**. 90 web-only routes excluded.
 
-- **MOB-PAR-001** Parent brain-clone approval flow on mobile
-- **MOB-PAR-002** Parent gradebook screen on mobile
-- **MOB-LRN-001** Learner sensory-settings screen
-- **MOB-TCH-001** Teacher lesson-plan library list view
-- **MOB-TCH-002** Teacher settings screen
-- **MOB-THR-001** Therapist cross-client session log
-- **MOB-THR-002** Therapist settings screen
+## Auth & Shared
 
-These can ship post-launch since each has a parent-facing or web-equivalent
-fallback. The brain-clone approval gap (MOB-PAR-001) is the most user-visible —
-parents who only use mobile cannot currently approve the initial clone and must
-fall back to the web app for that single step.
+| Web route                 | Mobile screen            | Status | Gap / Ticket |
+| ------------------------- | ------------------------ | ------ | ------------ |
+| `/`                       | `index`                  | Parity | —            |
+| `/login`                  | `(auth)/login`           | Parity | —            |
+| `/login/mfa`              | `(auth)/verify-mfa`      | Parity | —            |
+| `/signup`                 | `(auth)/signup`          | Parity | —            |
+| `/forgot-password`        | `(auth)/forgot-password` | Parity | —            |
+| `/reset-password`         | `(auth)/reset-password`  | Parity | —            |
+| `/accept-invite`          | `accept-invite`          | Parity | —            |
+| `/settings/accessibility` | `settings/accessibility` | Parity | —            |
+
+## Onboarding
+
+| Web route                    | Mobile screen                 | Status | Gap / Ticket |
+| ---------------------------- | ----------------------------- | ------ | ------------ |
+| `/onboarding`                | `(onboarding)/index`          | Parity | —            |
+| `/onboarding/welcome`        | `(onboarding)/welcome`        | Parity | —            |
+| `/onboarding/role`           | `(onboarding)/role`           | Parity | —            |
+| `/onboarding/signup`         | `(auth)/signup`               | Parity | —            |
+| `/onboarding/signin`         | `(auth)/login`                | Parity | —            |
+| `/onboarding/terms`          | `(onboarding)/terms`          | Parity | —            |
+| `/onboarding/privacy`        | `(onboarding)/privacy`        | Parity | —            |
+| `/onboarding/consent`        | `(auth)/consent-sheet`        | Parity | —            |
+| `/onboarding/recovery`       | `(auth)/forgot-password`      | Parity | —            |
+| `/onboarding/pin`            | `(auth)/pin`                  | Parity | —            |
+| `/onboarding/permissions`    | `(onboarding)/permissions`    | Parity | —            |
+| `/onboarding/parent-setup`   | `(parent)/onboard`            | Parity | —            |
+| `/onboarding/parent-verify`  | `(onboarding)/parent-verify`  | Parity | —            |
+| `/onboarding/iep-upload`     | `(onboarding)/iep-upload`     | Parity | —            |
+| `/onboarding/child-approval` | `(onboarding)/child-approval` | Parity | —            |
+| `/onboarding/learner/new`    | `(onboarding)/learner/new`    | Parity | —            |
+| `/onboarding/error`          | `(onboarding)/error`          | Parity | —            |
+
+## Learner
+
+| Web route                                        | Mobile screen                                 | Status | Gap / Ticket |
+| ------------------------------------------------ | --------------------------------------------- | ------ | ------------ |
+| `/learner/home`                                  | `(learner)/index`                             | Parity | —            |
+| `/learner/select`                                | `(auth)/session-switch`                       | Parity | —            |
+| `/learner/subjects`                              | `(learner)/subjects/index`                    | Parity | —            |
+| `/learner/subjects/[subjectId]`                  | `(learner)/subjects/[subjectId]`              | Parity | —            |
+| `/learner/baseline`                              | `(learner)/baseline/index`                    | Parity | —            |
+| `/learner/baseline/intro`                        | `(learner)/baseline/index`                    | Parity | —            |
+| `/learner/baseline/why`                          | `(learner)/baseline/index`                    | Parity | —            |
+| `/learner/baseline/readiness`                    | `(learner)/baseline/index`                    | Parity | —            |
+| `/learner/baseline/subjects`                     | `(learner)/baseline/index`                    | Parity | —            |
+| `/learner/baseline/[baselineId]`                 | `(learner)/baseline/run`                      | Parity | —            |
+| `/learner/library`                               | `(learner)/library`                           | Parity | —            |
+| `/learner/lesson-runs/[lessonRunId]`             | `(learner)/stage/[sessionId]`                 | Parity | —            |
+| `/learner/missions`                              | `(learner)/missions`                          | Parity | —            |
+| `/learner/quests`                                | `(learner)/quests/index`                      | Parity | —            |
+| `/learner/quests/[worldId]`                      | `(learner)/quests/[worldSlug]/index`          | Parity | —            |
+| `/learner/quests/[worldId]/chapters/[chapterId]` | `(learner)/quests/[worldSlug]/play/[questId]` | Parity | —            |
+| `/learner/progress`                              | `(learner)/progress`                          | Parity | —            |
+| `/learner/rewards`                               | `(learner)/badges`                            | Parity | —            |
+| `/learner/notifications`                         | `(learner)/notifications`                     | Parity | —            |
+| `/learner/homework`                              | `(learner)/homework/index`                    | Parity | —            |
+| `/learner/homework/[sessionId]`                  | `(learner)/homework/[sessionId]`              | Parity | —            |
+| `/learner/tutor`                                 | `(learner)/tutor/[tutorSlug]`                 | Parity | —            |
+| `/learner/settings`                              | `(learner)/settings`                          | Parity | —            |
+| `/learner/settings/accessibility`                | `(learner)/accessibility`                     | Parity | —            |
+| `/learner/settings/audio`                        | `(learner)/audio`                             | Parity | —            |
+| `/learner/brain-clone/[learnerId]`               | `(learner)/brain`                             | Parity | —            |
+
+## Parent
+
+| Web route                                           | Mobile screen                            | Status | Gap / Ticket |
+| --------------------------------------------------- | ---------------------------------------- | ------ | ------------ |
+| `/parent/home`                                      | `(parent)/index`                         | Parity | —            |
+| `/parent/home-v2`                                   | `(parent)/home-v2`                       | Parity | —            |
+| `/parent/learners`                                  | `(parent)/learners/index`                | Parity | —            |
+| `/parent/learners/new`                              | `(parent)/learner-new/index`             | Parity | —            |
+| `/parent/learners/[learnerId]`                      | `(parent)/learners/[learnerId]`          | Parity | —            |
+| `/parent/learners/[learnerId]/assessment`           | `(parent)/assessment/[childId]`          | Parity | —            |
+| `/parent/learners/[learnerId]/assessment/intro`     | `(parent)/assessment/[childId]`          | Parity | —            |
+| `/parent/learners/[learnerId]/assessment/review`    | `(parent)/assessment/[childId]`          | Parity | —            |
+| `/parent/learners/[learnerId]/assessment/submitted` | `(parent)/assessment/[childId]`          | Parity | —            |
+| `/parent/learners/[learnerId]/baseline`             | `(parent)/baseline/[childId]`            | Parity | —            |
+| `/parent/learners/[learnerId]/baseline/pending`     | `(parent)/baseline/[childId]`            | Parity | —            |
+| `/parent/learners/[learnerId]/baseline/summary`     | `(parent)/baseline/[childId]`            | Parity | —            |
+| `/parent/learners/[learnerId]/brain-clone-watch`    | `(parent)/brain-clone-watch/[childId]`   | Parity | —            |
+| `/parent/learners/[learnerId]/brain-profile`        | `(parent)/brain/[childId]/index`         | Parity | —            |
+| `/parent/learners/[learnerId]/curriculum`           | `(parent)/curriculum/[childId]`          | Parity | —            |
+| `/parent/learners/[learnerId]/gradebook`            | `(parent)/gradebook/[childId]`           | Parity | —            |
+| `/parent/learners/[learnerId]/homework`             | `(parent)/homework/[childId]`            | Parity | —            |
+| `/parent/learners/[learnerId]/iep`                  | `(parent)/iep/[childId]`                 | Parity | —            |
+| `/parent/learners/[learnerId]/iep/review`           | `(parent)/iep-review/[childId]`          | Parity | —            |
+| `/parent/learners/[learnerId]/lessons`              | `(parent)/lessons/[childId]`             | Parity | —            |
+| `/parent/learners/[learnerId]/milestones`           | `(parent)/milestones/[childId]`          | Parity | —            |
+| `/parent/learners/[learnerId]/profile-v2`           | `(parent)/profile-v2/[childId]`          | Parity | —            |
+| `/parent/learners/[learnerId]/progress`             | `(parent)/progress/[childId]`            | Parity | —            |
+| `/parent/learners/[learnerId]/sensory`              | `(parent)/sensory/[childId]`             | Parity | —            |
+| `/parent/learners/[learnerId]/settings`             | `(parent)/settings-learner/[childId]`    | Parity | —            |
+| `/parent/learners/[learnerId]/snapshot`             | `(parent)/snapshot/[childId]`            | Parity | —            |
+| `/parent/learners/[learnerId]/summary`              | `(parent)/summary/[childId]`             | Parity | —            |
+| `/parent/learners/[learnerId]/team`                 | `(parent)/team/[childId]`                | Parity | —            |
+| `/parent/learners/[learnerId]/accessibility`        | `(parent)/accessibility/[childId]`       | Parity | —            |
+| `/parent/learners/[learnerId]/accessibility/audio`  | `(parent)/accessibility/audio/[childId]` | Parity | —            |
+| `/parent/consent`                                   | `(parent)/consent/index`                 | Parity | —            |
+| `/parent/consent/[learnerId]`                       | `(parent)/consent/[learnerId]`           | Parity | —            |
+| `/parent/notifications`                             | `(parent)/inbox`                         | Parity | —            |
+| `/parent/reports`                                   | `(parent)/reports`                       | Parity | —            |
+| `/parent/schedule`                                  | `(parent)/schedule/[childId]`            | Parity | —            |
+| `/parent/privacy`                                   | `(parent)/privacy/index`                 | Parity | —            |
+| `/parent/privacy/data-export`                       | `(parent)/privacy/data-export`           | Parity | —            |
+| `/parent/privacy/delete-data`                       | `(parent)/privacy/delete-data`           | Parity | —            |
+| `/parent/settings`                                  | `(parent)/settings`                      | Parity | —            |
+| `/parent/settings/account`                          | `(parent)/settings-account/index`        | Parity | —            |
+| `/parent/settings/billing`                          | `(parent)/billing`                       | Parity | —            |
+
+## Teacher
+
+| Web route                                  | Mobile screen                  | Status | Gap / Ticket |
+| ------------------------------------------ | ------------------------------ | ------ | ------------ |
+| `/teacher/home`                            | `(teacher)/index`              | Parity | —            |
+| `/teacher/learners`                        | `(teacher)/learners`           | Parity | —            |
+| `/teacher/learners/[learnerId]`            | `(teacher)/student/[id]/index` | Parity | —            |
+| `/teacher/learners/[learnerId]/curriculum` | `(teacher)/curriculum/[id]`    | Parity | —            |
+| `/teacher/learners/[learnerId]/iep/draft`  | `(teacher)/student/[id]/iep`   | Parity | —            |
+| `/teacher/classes`                         | `(teacher)/classes/index`      | Parity | —            |
+| `/teacher/classes/[classId]`               | `(teacher)/classes/[classId]`  | Parity | —            |
+| `/teacher/assignments`                     | `(teacher)/assignments/index`  | Parity | —            |
+| `/teacher/assignments/new`                 | `(teacher)/assignments/new`    | Parity | —            |
+| `/teacher/insights`                        | `(teacher)/insights`           | Parity | —            |
+| `/teacher/lesson-plans`                    | `(teacher)/lesson-plan`        | Parity | —            |
+| `/teacher/reports`                         | `(teacher)/analytics`          | Parity | —            |
+| `/teacher/settings`                        | `(teacher)/settings`           | Parity | —            |
+
+## Therapist
+
+| Web route             | Mobile screen          | Status | Gap / Ticket |
+| --------------------- | ---------------------- | ------ | ------------ |
+| `/therapist/home`     | `(therapist)/index`    | Parity | —            |
+| `/therapist/sessions` | `(therapist)/sessions` | Parity | —            |
+| `/therapist/reports`  | `(therapist)/reports`  | Parity | —            |
+| `/therapist/settings` | `(therapist)/settings` | Parity | —            |
+
+## Caregiver
+
+| Web route                 | Mobile screen                             | Status | Gap / Ticket |
+| ------------------------- | ----------------------------------------- | ------ | ------------ |
+| `/caregiver/home`         | `(caregiver)/index`                       | Parity | —            |
+| `/caregiver/learners`     | `(caregiver)/learners`                    | Parity | —            |
+| `/caregiver/observations` | `(caregiver)/child/[childId]/observation` | Parity | —            |
+| `/caregiver/settings`     | `(caregiver)/settings`                    | Parity | —            |

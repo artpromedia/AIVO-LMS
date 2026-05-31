@@ -1,10 +1,6 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet, type StyleProp, type ViewStyle } from "react-native";
-import {
-  NAV_AREA_META,
-  getPrimaryAreas,
-  type NavArea,
-} from "@aivo/nav";
+import { NAV_AREA_META, getPrimaryAreas, type NavArea } from "@aivo/nav";
 import { theme } from "../theme";
 import type { NavIconRenderer, Role } from "./types";
 
@@ -16,12 +12,11 @@ import type { NavIconRenderer, Role } from "./types";
  *  - Learners get a maximum of 3 visible tabs + an optional "More"
  *    sheet trigger. Tabs are limited to *full* access areas so a
  *    learner never lands on a locked screen by accident.
- *  - Parent / teacher / school admin / district admin / internal
- *    get up to 5 tabs.
- *  - districtAdmin + internal are marked `onMobile: false` in the
- *    role registry — render an empty bar rather than crashing if a
- *    caller ever passes them through (defensive; Expo Router should
- *    keep them off mobile entirely).
+ *  - Parent / teacher / therapist / caregiver get up to 5 tabs.
+ *  - schoolAdmin + districtAdmin + internal are marked `onMobile:
+ *    false` in the role registry — render an empty bar rather than
+ *    crashing if a caller ever passes them through (defensive; Expo
+ *    Router should keep all admin roles off mobile entirely).
  *
  * Visual contract: bottom tab bar, 64dp height, soft top border,
  * rounded corners on the top edge. Each tab is a 44dp touch target
@@ -68,10 +63,7 @@ export function RoleAwareTabBar({
             <View style={[styles.iconBadge, active && styles.iconBadgeActive]}>
               {renderIcon(area, active)}
             </View>
-            <Text
-              numberOfLines={1}
-              style={[styles.label, active && styles.labelActive]}
-            >
+            <Text numberOfLines={1} style={[styles.label, active && styles.labelActive]}>
               {meta.label}
             </Text>
           </Pressable>

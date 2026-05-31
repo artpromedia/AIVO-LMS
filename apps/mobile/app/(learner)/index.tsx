@@ -106,12 +106,7 @@ export default function LearnerWorldMap() {
           {/* Hero card — greeting + daily-goal progress */}
           <Card tone="hero" style={styles.hero}>
             <View style={styles.heroInner}>
-              <View
-                style={[
-                  styles.companionRing,
-                  { backgroundColor: palette.accentSoft },
-                ]}
-              >
+              <View style={[styles.companionRing, { backgroundColor: palette.accentSoft }]}>
                 <Text style={styles.companionEmoji}>🧠</Text>
               </View>
               <Text
@@ -138,12 +133,7 @@ export default function LearnerWorldMap() {
                   { backgroundColor: palette.bgRaised, borderColor: palette.border },
                 ]}
               >
-                <View
-                  style={[
-                    styles.goalIcon,
-                    { backgroundColor: palette.warmSoft },
-                  ]}
-                >
+                <View style={[styles.goalIcon, { backgroundColor: palette.warmSoft }]}>
                   <Ionicons name="star" size={20} color={palette.warm} />
                 </View>
                 <View style={{ flex: 1 }}>
@@ -155,9 +145,7 @@ export default function LearnerWorldMap() {
                       {dailyXp} / {dailyGoal} XP
                     </Text>
                   </View>
-                  <View
-                    style={[styles.goalTrack, { backgroundColor: palette.warmSoft }]}
-                  >
+                  <View style={[styles.goalTrack, { backgroundColor: palette.warmSoft }]}>
                     <View
                       style={[
                         styles.goalFill,
@@ -203,16 +191,12 @@ export default function LearnerWorldMap() {
             ]}
           >
             <View style={styles.xpHeader}>
-              <Text style={[styles.xpHeaderText, { color: palette.ink }]}>
-                {xp} XP
-              </Text>
+              <Text style={[styles.xpHeaderText, { color: palette.ink }]}>{xp} XP</Text>
               <Text style={[styles.xpHeaderHint, { color: palette.inkMuted }]}>
                 Level {engagement?.level || 1}
               </Text>
             </View>
-            <View
-              style={[styles.xpTrack, { backgroundColor: palette.border }]}
-            >
+            <View style={[styles.xpTrack, { backgroundColor: palette.border }]}>
               <View
                 style={[
                   styles.xpFill,
@@ -259,13 +243,8 @@ export default function LearnerWorldMap() {
                     </View>
                   )}
                   <Text style={styles.worldIcon}>{tutor.icon}</Text>
-                  <Text style={[styles.worldName, { color: palette.ink }]}>
-                    {tutor.name}
-                  </Text>
-                  <Text
-                    style={[styles.worldDomain, { color: palette.inkMuted }]}
-                    numberOfLines={1}
-                  >
+                  <Text style={[styles.worldName, { color: palette.ink }]}>{tutor.name}</Text>
+                  <Text style={[styles.worldDomain, { color: palette.inkMuted }]} numberOfLines={1}>
                     {tutor.domain}
                   </Text>
                 </Pressable>
@@ -303,6 +282,34 @@ export default function LearnerWorldMap() {
               tintSoft={INCLUSIVE_WARM_PALETTE.primarySoft}
               onPress={() => router.push("/(learner)/gradebook" as Href)}
             />
+            <QuickAction
+              icon="library"
+              label={t("learner.subjects", "Subjects")}
+              tint={palette.accent}
+              tintSoft={palette.accentSoft}
+              onPress={() => router.push("/(learner)/subjects" as Href)}
+            />
+            <QuickAction
+              icon="trending-up"
+              label={t("learner.progress", "Progress")}
+              tint={palette.warm}
+              tintSoft={palette.warmSoft}
+              onPress={() => router.push("/(learner)/progress" as Href)}
+            />
+            <QuickAction
+              icon="flag"
+              label={t("learner.missions", "Missions")}
+              tint={palette.accent}
+              tintSoft={palette.accentSoft}
+              onPress={() => router.push("/(learner)/missions" as Href)}
+            />
+            <QuickAction
+              icon="library"
+              label={t("learner.library", "Library")}
+              tint={palette.primary}
+              tintSoft={INCLUSIVE_WARM_PALETTE.primarySoft}
+              onPress={() => router.push("/(learner)/library" as Href)}
+            />
           </View>
         </View>
       </ScrollView>
@@ -330,14 +337,9 @@ function StatPill({
   const palette = useSensoryPalette();
   return (
     <View
-      style={[
-        styles.statPill,
-        { backgroundColor: palette.bgRaised, borderColor: palette.border },
-      ]}
+      style={[styles.statPill, { backgroundColor: palette.bgRaised, borderColor: palette.border }]}
     >
-      <View
-        style={[styles.statIcon, { backgroundColor: tintSoft }]}
-      >
+      <View style={[styles.statIcon, { backgroundColor: tintSoft }]}>
         <Ionicons name={icon} size={16} color={tint} />
       </View>
       <View>
@@ -514,9 +516,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     zIndex: 1,
   },
-  quickActions: { flexDirection: "row", gap: 8 },
+  quickActions: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   quickBtn: {
-    flex: 1,
+    flexGrow: 1,
+    flexBasis: "30%",
     alignItems: "center",
     gap: 8,
     padding: 12,

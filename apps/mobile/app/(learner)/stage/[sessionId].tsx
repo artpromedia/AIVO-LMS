@@ -266,10 +266,7 @@ export default function StageScreen() {
         }
         recordLedger(beat, result.correct ? "correct" : "incorrect", start);
       } catch {
-        Alert.alert(
-          t("learnerStage.saveError.title"),
-          t("learnerStage.saveError.message"),
-        );
+        Alert.alert(t("learnerStage.saveError.title"), t("learnerStage.saveError.message"));
         setLastCorrect(answer === beat.correctAnswer);
       } finally {
         setSubmitting(false);
@@ -367,9 +364,7 @@ export default function StageScreen() {
 
   const handlePause = useCallback(() => {
     Alert.alert(
-      tier === "HIGH"
-        ? t("learnerStage.pause.titleStandard")
-        : t("learnerStage.pause.titleSoft"),
+      tier === "HIGH" ? t("learnerStage.pause.titleStandard") : t("learnerStage.pause.titleSoft"),
       t("learnerStage.pause.message"),
       [
         {
@@ -423,12 +418,15 @@ export default function StageScreen() {
   }
 
   if (!session) {
+    // Host states: while the run has no plan yet it is still generating;
+    // the failed state is handled by the `loadError` branch above, and a
+    // ready run falls through to the stage UI below.
     return (
       <View style={[styles.container, { paddingTop: insets.top }]}>
         <View style={styles.errorState}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
           <Text style={[styles.errorText, { color: theme.colors.text }]}>
-            {t("learnerStage.loading")}
+            {t("learnerStage.generating", "Getting your lesson ready…")}
           </Text>
         </View>
       </View>
@@ -577,12 +575,7 @@ export default function StageScreen() {
             ]}
             accessibilityLabel={t("learnerStage.sessionMap")}
           >
-            <Text
-              style={[
-                styles.sessionMapTitle,
-                { color: palette.inkMuted },
-              ]}
-            >
+            <Text style={[styles.sessionMapTitle, { color: palette.inkMuted }]}>
               {t("learnerStage.sessionMap")}
             </Text>
             {session.stagePlan.beats.map((beat, i) => {

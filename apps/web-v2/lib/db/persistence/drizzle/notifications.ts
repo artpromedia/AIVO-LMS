@@ -1,40 +1,88 @@
 /**
- * Drizzle-backed NotificationStore — stub.
- *
- * Selected when AIVO_PERSISTENCE_NOTIFICATIONS=postgres. Currently
- * throws on every call: the production Drizzle wiring needs:
- *
- *   1. A `notifications` + `notification_deliveries` table in
- *      `packages/db/src/schema/comms.ts` (does not yet exist; the
- *      schema there only covers contact submissions + email outbox).
- *   2. A Drizzle client constructed from `serverEnv.DATABASE_URL`.
- *   3. A migration generated via `pnpm --filter @aivo/db db:push`.
- *
- * The interface is finalised so the implementation is a self-contained
- * follow-up (no callers change). See ADR 0007 for the migration
- * sequence.
+ * Drizzle-backed NotificationStore (web_notifications +
+ * web_notification_deliveries). Mirrors the memory store: list is
+ * newest-first and tenant+user scoped; markRead only flips unread rows
+ * and returns the count; readAt is authoritative on the column so
+ * reconstructed objects always reflect the latest state.
  */
+import { and, desc, eq, inArray, isNull } from "drizzle-orm";
+import { webNotifications, webNotificationDeliveries } from "@aivo/db";
+import { nowIso } from "@/lib/db/store";
+import type { Notification, NotificationDelivery } from "@/lib/db/types";
 import type { NotificationStore } from "../types";
+import { getDb } from "./client";
 
-function notImplemented(method: string): never {
-  throw new Error(
-    `[persistence.drizzle.notifications.${method}] not implemented. ` +
-      `Set AIVO_PERSISTENCE_NOTIFICATIONS=memory or land the notifications ` +
-      `schema in packages/db before flipping this flag on.`,
-  );
+function toNotification(row: typeof webNotifications.$inferSelect): Notification {
+  return { ...(row.data as Notification), readAt: row.readAt };
 }
 
 export const drizzleNotifications: NotificationStore = {
-  async list() {
-    return notImplemented("list");
+  async list({ tenantId, userId, unreadOnly }) {
+    const db = getDb();
+    const where = unreadOnly
+      ? and(
+          eq(webNotifications.tenantId, tenantId),
+          eq(webNotifications.userId, userId),
+          isNull(webNotifications.readAt),
+        )
+      : and(eq(webNotifications.tenantId, tenantId), eq(webNotifications.userId, userId));
+    const rows = await db
+      .select()
+      .from(webNotifications)
+      .where(where)
+      .orderBy(desc(webNotifications.createdAt));
+    return rows.map(toNotification);
   },
-  async markRead() {
-    return notImplemented("markRead");
+
+  async markRead({ tenantId, userId, ids }) {
+    if (ids.length === 0) return 0;
+    const db = getDb();
+    const flipped = await db
+      .update(webNotifications)
+      .set({ readAt: nowIso() })
+      .where(
+        and(
+          inArray(webNotifications.id, ids),
+          eq(webNotifications.userId, userId),
+          eq(webNotifications.tenantId, tenantId),
+          isNull(webNotifications.readAt),
+        ),
+      )
+      .returning({ id: webNotifications.id });
+    return flipped.length;
   },
-  async create() {
-    return notImplemented("create");
+
+  async create({ notification, deliveries }) {
+    const db = getDb();
+    await db
+      .insert(webNotifications)
+      .values({
+        id: notification.id,
+        tenantId: notification.tenantId,
+        userId: notification.userId,
+        readAt: notification.readAt,
+        createdAt: notification.createdAt,
+        data: notification,
+      })
+      .onConflictDoUpdate({
+        target: webNotifications.id,
+        set: { readAt: notification.readAt, data: notification },
+      });
+    if (deliveries.length > 0) {
+      await db
+        .insert(webNotificationDeliveries)
+        .values(deliveries.map((d) => ({ id: d.id, notificationId: d.notificationId, data: d })))
+        .onConflictDoNothing({ target: webNotificationDeliveries.id });
+    }
+    return { notification, deliveries };
   },
-  async listDeliveries() {
-    return notImplemented("listDeliveries");
+
+  async listDeliveries(notificationId) {
+    const db = getDb();
+    const rows = await db
+      .select()
+      .from(webNotificationDeliveries)
+      .where(eq(webNotificationDeliveries.notificationId, notificationId));
+    return rows.map((r) => r.data as NotificationDelivery);
   },
 };

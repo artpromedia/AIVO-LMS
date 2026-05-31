@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, Pressable, StyleSheet, Switch } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, type Href } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
@@ -10,11 +10,7 @@ import { fontFamilies } from "@/constants/typography";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { Card, Button, SensoryToggle } from "@/components/ui";
 import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
-import {
-  SUPPORTED_LOCALES,
-  setSavedLocale,
-  type SupportedLocale,
-} from "@/lib/i18n";
+import { SUPPORTED_LOCALES, setSavedLocale, type SupportedLocale } from "@/lib/i18n";
 
 const STORAGE_KEY = "aivo_learner_prefs_v1";
 
@@ -57,7 +53,7 @@ export default function LearnerSettingsScreen() {
   const [loaded, setLoaded] = useState(false);
   const [saved, setSaved] = useState(false);
   const [locale, setLocale] = useState<SupportedLocale>(
-    () => ((i18n.language as SupportedLocale) ?? "en"),
+    () => (i18n.language as SupportedLocale) ?? "en",
   );
 
   useEffect(() => {
@@ -88,10 +84,7 @@ export default function LearnerSettingsScreen() {
   if (!loaded) return null;
 
   const renderToggleRow = (key: keyof LearnerPrefs, titleKey: string, descKey: string) => (
-    <View
-      style={[styles.toggleRow, { borderBottomColor: palette.border }]}
-      key={key}
-    >
+    <View style={[styles.toggleRow, { borderBottomColor: palette.border }]} key={key}>
       <View style={{ flex: 1, paddingRight: spacing.sm }}>
         <Text style={[styles.toggleTitle, { color: palette.ink }]}>{t(titleKey)}</Text>
         <Text style={[styles.toggleDesc, { color: palette.inkMuted }]}>{t(descKey)}</Text>
@@ -121,9 +114,7 @@ export default function LearnerSettingsScreen() {
         >
           <Ionicons name="chevron-back" size={22} color={palette.ink} />
         </Pressable>
-        <Text style={[styles.title, { color: palette.ink }]}>
-          {t("learnerSettings.title")}
-        </Text>
+        <Text style={[styles.title, { color: palette.ink }]}>{t("learnerSettings.title")}</Text>
         <View style={{ width: 44 }} />
       </View>
 
@@ -193,11 +184,10 @@ export default function LearnerSettingsScreen() {
           inclusive-warm rollout. Lives at the top of accessibility so
           it surfaces ahead of legacy toggles. */}
       <Card tone="raised" style={styles.card}>
-        <Text style={[styles.sectionTitle, { color: palette.ink }]}>
-          Sensory mode
-        </Text>
+        <Text style={[styles.sectionTitle, { color: palette.ink }]}>Sensory mode</Text>
         <Text style={[styles.toggleDesc, { color: palette.inkMuted, marginBottom: 12 }]}>
-          Switch between standard, calm, and high-contrast at any time. Your choice syncs across devices.
+          Switch between standard, calm, and high-contrast at any time. Your choice syncs across
+          devices.
         </Text>
         <SensoryToggle variant="segmented" />
       </Card>
@@ -224,15 +214,34 @@ export default function LearnerSettingsScreen() {
           {t("learnerSettings.accessibility")}
         </Text>
         {renderToggleRow("largeText", "learnerSettings.largeText", "learnerSettings.largeTextDesc")}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t("a11y.title", "Accessibility")}
+          onPress={() => router.push("/(learner)/accessibility" as Href)}
+          style={[styles.linkRow, { borderTopColor: palette.border }]}
+        >
+          <Ionicons name="accessibility-outline" size={20} color={palette.primary} />
+          <Text style={[styles.linkText, { color: palette.ink }]}>
+            {t("a11y.title", "Accessibility")}
+          </Text>
+          <Ionicons name="chevron-forward" size={18} color={palette.inkMuted} />
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t("audio.title", "Audio & voice")}
+          onPress={() => router.push("/(learner)/audio" as Href)}
+          style={[styles.linkRow, { borderTopColor: palette.border }]}
+        >
+          <Ionicons name="volume-high-outline" size={20} color={palette.primary} />
+          <Text style={[styles.linkText, { color: palette.ink }]}>
+            {t("audio.title", "Audio & voice")}
+          </Text>
+          <Ionicons name="chevron-forward" size={18} color={palette.inkMuted} />
+        </Pressable>
       </Card>
 
       {saved && (
-        <View
-          style={[
-            styles.savedBanner,
-            { backgroundColor: "rgba(22, 163, 74, 0.10)" },
-          ]}
-        >
+        <View style={[styles.savedBanner, { backgroundColor: "rgba(22, 163, 74, 0.10)" }]}>
           <Ionicons name="checkmark-circle" size={18} color="#16a34a" />
           <Text style={styles.savedText}>{t("learnerSettings.saved")}</Text>
         </View>
@@ -298,6 +307,14 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilies.bodyRegular,
     marginTop: 2,
   },
+  linkRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 14,
+    borderTopWidth: 1,
+  },
+  linkText: { flex: 1, fontSize: 14, fontFamily: fontFamilies.bodyBold },
   savedBanner: {
     flexDirection: "row",
     alignItems: "center",

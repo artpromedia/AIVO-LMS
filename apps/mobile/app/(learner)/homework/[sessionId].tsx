@@ -134,7 +134,7 @@ export default function HomeworkSessionScreen() {
     try {
       const result = await sendMessage.mutateAsync({
         message: text,
-        locale: i18n.locale,
+        locale: i18n.language,
       });
       setLocalMessages((prev) => [
         ...prev,

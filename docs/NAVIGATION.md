@@ -11,7 +11,7 @@
 | `learner`       | Learner        | yes    | yes       | no               |
 | `parent`        | Parent         | yes    | yes       | yes              |
 | `teacher`       | Teacher        | yes    | yes       | yes              |
-| `schoolAdmin`   | School admin   | yes    | yes       | yes              |
+| `schoolAdmin`   | School admin   | yes    | no        | yes              |
 | `districtAdmin` | District admin | yes    | no        | yes              |
 | `internal`      | Internal       | yes    | no        | yes              |
 
@@ -24,35 +24,35 @@ The 16 areas below are the only top-level shell destinations. To add
 anything new, add it to [`packages/nav/src/areas.ts`](../packages/nav/src/areas.ts)
 first.
 
-| Area              | Label            | Description                                       |
-| ----------------- | ---------------- | ------------------------------------------------- |
-| `home`            | Home             | Daily overview                                    |
-| `learners`        | Learners         | Students you are responsible for                  |
-| `subjects`        | Subjects         | Curriculum, courses, standards                    |
-| `baseline`        | Baseline         | Diagnostics and starting points                   |
-| `lessons`         | Lessons          | Today's lessons / lesson plans                    |
-| `homeworkHelper`  | Homework Helper  | Guided homework with the AI helper                |
-| `aiTutor`         | AI Tutor         | Conversational tutor                              |
-| `progress`        | Progress         | Mastery, streaks, goals                           |
-| `iep`             | IEP / Supports   | IEPs, 504s, accommodations                        |
-| `messages`        | Messages         | Threads with teachers, families, AIVO             |
-| `approvals`       | Approvals        | Pending consents and content approvals            |
-| `billing`         | Billing          | Subscriptions, invoices, payment methods          |
-| `settings`        | Settings         | Account, privacy, accessibility                   |
-| `admin`           | Admin            | Roster, staff, classes, compliance                |
-| `safety`          | Safety           | Safety signals, escalations, reviews              |
-| `reports`         | Reports          | Outcomes, attendance, compliance                  |
+| Area             | Label           | Description                              |
+| ---------------- | --------------- | ---------------------------------------- |
+| `home`           | Home            | Daily overview                           |
+| `learners`       | Learners        | Students you are responsible for         |
+| `subjects`       | Subjects        | Curriculum, courses, standards           |
+| `baseline`       | Baseline        | Diagnostics and starting points          |
+| `lessons`        | Lessons         | Today's lessons / lesson plans           |
+| `homeworkHelper` | Homework Helper | Guided homework with the AI helper       |
+| `aiTutor`        | AI Tutor        | Conversational tutor                     |
+| `progress`       | Progress        | Mastery, streaks, goals                  |
+| `iep`            | IEP / Supports  | IEPs, 504s, accommodations               |
+| `messages`       | Messages        | Threads with teachers, families, AIVO    |
+| `approvals`      | Approvals       | Pending consents and content approvals   |
+| `billing`        | Billing         | Subscriptions, invoices, payment methods |
+| `settings`       | Settings        | Account, privacy, accessibility          |
+| `admin`          | Admin           | Roster, staff, classes, compliance       |
+| `safety`         | Safety          | Safety signals, escalations, reviews     |
+| `reports`        | Reports         | Outcomes, attendance, compliance         |
 
 ## Access levels
 
 Every (role, area) pair resolves to exactly one of:
 
-| Access   | Meaning                                                                            |
-| -------- | ---------------------------------------------------------------------------------- |
-| `full`   | Primary destination — appears in sidebar / bottom tabs.                            |
-| `linked` | Available via secondary menus / sub-pages, not the primary nav.                    |
-| `locked` | Visible but blocked. A locked screen explains why with a `lockReason` string.      |
-| `hidden` | Never shown. The role does not see the area exists.                                |
+| Access   | Meaning                                                                       |
+| -------- | ----------------------------------------------------------------------------- |
+| `full`   | Primary destination — appears in sidebar / bottom tabs.                       |
+| `linked` | Available via secondary menus / sub-pages, not the primary nav.               |
+| `locked` | Visible but blocked. A locked screen explains why with a `lockReason` string. |
+| `hidden` | Never shown. The role does not see the area exists.                           |
 
 `hidden` is used sparingly. Prefer `locked` so users understand the
 shape of the product even when they can't enter an area.
@@ -61,24 +61,24 @@ shape of the product even when they can't enter an area.
 
 `F` = full, `L` = linked, `🔒` = locked, blank = hidden.
 
-| Area              | Learner | Parent | Teacher | School admin | District admin | Internal |
-| ----------------- | :-----: | :----: | :-----: | :----------: | :------------: | :------: |
-| home              | F       | F      | F       | F            | F              | F        |
-| learners          |         | F      | F       | F            | L              | F        |
-| subjects          | F       | L      | L       | L            | L              | L        |
-| baseline          | L       | 🔒     | L       | L            | L              | L        |
-| lessons           | F       | L      | F       | L            | L              | L        |
-| homeworkHelper    | F       | 🔒     | 🔒      | 🔒           | 🔒             | L        |
-| aiTutor           | F       | 🔒     | 🔒      | 🔒           | 🔒             | L        |
-| progress          | F       | F      | F       | L            | L              | L        |
-| iep               | 🔒      | L      | L       | L            | F              | L        |
-| messages          | L       | F      | F       | L            | L              | L        |
-| approvals         | 🔒      | F      | L       | L            | L              | L        |
-| billing           | 🔒      | L      | 🔒      | F            | F              | F        |
-| settings          | L       | L      | L       | L            | L              | L        |
-| admin             |         |        |         | F            | F              | F        |
-| safety            |         | 🔒     | L       | L            | L              | F        |
-| reports           |         | L      | L       | F            | F              | F        |
+| Area           | Learner | Parent | Teacher | School admin | District admin | Internal |
+| -------------- | :-----: | :----: | :-----: | :----------: | :------------: | :------: |
+| home           |    F    |   F    |    F    |      F       |       F        |    F     |
+| learners       |         |   F    |    F    |      F       |       L        |    F     |
+| subjects       |    F    |   L    |    L    |      L       |       L        |    L     |
+| baseline       |    L    |   🔒   |    L    |      L       |       L        |    L     |
+| lessons        |    F    |   L    |    F    |      L       |       L        |    L     |
+| homeworkHelper |    F    |   🔒   |   🔒    |      🔒      |       🔒       |    L     |
+| aiTutor        |    F    |   🔒   |   🔒    |      🔒      |       🔒       |    L     |
+| progress       |    F    |   F    |    F    |      L       |       L        |    L     |
+| iep            |   🔒    |   L    |    L    |      L       |       F        |    L     |
+| messages       |    L    |   F    |    F    |      L       |       L        |    L     |
+| approvals      |   🔒    |   F    |    L    |      L       |       L        |    L     |
+| billing        |   🔒    |   L    |   🔒    |      F       |       F        |    F     |
+| settings       |    L    |   L    |    L    |      L       |       L        |    L     |
+| admin          |         |        |         |      F       |       F        |    F     |
+| safety         |         |   🔒   |    L    |      L       |       L        |    F     |
+| reports        |         |   L    |    L    |      F       |       F        |    F     |
 
 ### Locked-state copy
 
@@ -89,8 +89,8 @@ These strings render verbatim on `/locked/[area]` (web) and the
 - **Learner → IEP**: "Your IEP and supports are visible to your parent and teacher. Ask them if you have questions about your accommodations."
 - **Learner → Billing**: "Only the grown-up on your account can see billing."
 - **Learner → Approvals**: "A parent approves new content for you."
-- **Parent → Baseline**: "Baselines are run by your child's teacher. You'll see results in Progress once they are complete." → CTA: *Open Progress*.
-- **Parent → Homework Helper**: "Homework Helper is your child's tool. You can supervise sessions from Approvals." → CTA: *Open Approvals*.
+- **Parent → Baseline**: "Baselines are run by your child's teacher. You'll see results in Progress once they are complete." → CTA: _Open Progress_.
+- **Parent → Homework Helper**: "Homework Helper is your child's tool. You can supervise sessions from Approvals." → CTA: _Open Approvals_.
 - **Parent → AI Tutor**: "AI Tutor sessions belong to your child. Review transcripts from each learner's profile."
 - **Parent → Safety**: "Safety reviews are handled by school staff and AIVO. We will message you if anything needs your attention."
 - **Teacher → Homework Helper**: "Homework Helper is a learner-facing tool. You can review session transcripts from each student's profile."
@@ -107,88 +107,88 @@ always resolves to `/locked/[area]` (web) or pushes
 
 ### Learner
 
-| Area              | Web                                  | Mobile                              |
-| ----------------- | ------------------------------------ | ----------------------------------- |
-| home              | `/learner/home`                      | `/(learner)/home`                   |
-| subjects          | `/learner/subjects`                  | `/(learner)/subjects`               |
-| lessons           | `/learner/lesson-runs`               | `/(learner)/lessons`                |
-| homeworkHelper    | `/learner/homework`                  | `/(learner)/homework`               |
-| aiTutor           | `/learner/quests`                    | `/(learner)/tutor`                  |
-| progress          | `/learner/progress`                  | `/(learner)/progress`               |
-| baseline          | `/learner/baseline`                  | `/(learner)/baseline`               |
-| settings          | `/learner/settings`                  | `/(learner)/settings`               |
-| messages          | `/learner/notifications`             | `/(learner)/messages`               |
+| Area           | Web                      | Mobile                |
+| -------------- | ------------------------ | --------------------- |
+| home           | `/learner/home`          | `/(learner)/home`     |
+| subjects       | `/learner/subjects`      | `/(learner)/subjects` |
+| lessons        | `/learner/lesson-runs`   | `/(learner)/lessons`  |
+| homeworkHelper | `/learner/homework`      | `/(learner)/homework` |
+| aiTutor        | `/learner/quests`        | `/(learner)/tutor`    |
+| progress       | `/learner/progress`      | `/(learner)/progress` |
+| baseline       | `/learner/baseline`      | `/(learner)/baseline` |
+| settings       | `/learner/settings`      | `/(learner)/settings` |
+| messages       | `/learner/notifications` | `/(learner)/messages` |
 
 ### Parent
 
-| Area              | Web                                  | Mobile                              |
-| ----------------- | ------------------------------------ | ----------------------------------- |
-| home              | `/parent/home`                       | `/(parent)/home`                    |
-| learners          | `/parent/learners`                   | `/(parent)/learners`                |
-| progress          | `/parent/reports`                    | `/(parent)/progress`                |
-| approvals         | `/parent/consent`                    | `/(parent)/approvals`               |
-| messages          | `/parent/notifications`              | `/(parent)/messages`                |
-| iep               | `/parent/learners`                   | `/(parent)/iep`                     |
-| billing           | `/parent/settings/billing`           | `/(parent)/billing`                 |
-| settings          | `/parent/settings`                   | `/(parent)/settings`                |
-| subjects          | `/parent/learners`                   | `/(parent)/subjects`                |
-| lessons           | `/parent/schedule`                   | `/(parent)/lessons`                 |
-| reports           | `/parent/reports`                    | `/(parent)/reports`                 |
+| Area      | Web                        | Mobile                |
+| --------- | -------------------------- | --------------------- |
+| home      | `/parent/home`             | `/(parent)/home`      |
+| learners  | `/parent/learners`         | `/(parent)/learners`  |
+| progress  | `/parent/reports`          | `/(parent)/progress`  |
+| approvals | `/parent/consent`          | `/(parent)/approvals` |
+| messages  | `/parent/notifications`    | `/(parent)/messages`  |
+| iep       | `/parent/learners`         | `/(parent)/iep`       |
+| billing   | `/parent/settings/billing` | `/(parent)/billing`   |
+| settings  | `/parent/settings`         | `/(parent)/settings`  |
+| subjects  | `/parent/learners`         | `/(parent)/subjects`  |
+| lessons   | `/parent/schedule`         | `/(parent)/lessons`   |
+| reports   | `/parent/reports`          | `/(parent)/reports`   |
 
 ### Teacher
 
-| Area              | Web                                  | Mobile                              |
-| ----------------- | ------------------------------------ | ----------------------------------- |
-| home              | `/teacher/home`                      | `/(teacher)/home`                   |
-| learners          | `/teacher/learners`                  | `/(teacher)/learners`               |
-| lessons           | `/teacher/lesson-plans`              | `/(teacher)/lessons`                |
-| progress          | `/teacher/insights`                  | `/(teacher)/progress`               |
-| messages          | `/teacher/learners`                  | `/(teacher)/messages`               |
-| subjects          | `/teacher/lesson-plans`              | `/(teacher)/subjects`               |
-| baseline          | `/teacher/assignments`               | `/(teacher)/baseline`               |
-| iep               | `/teacher/learners`                  | `/(teacher)/iep`                    |
-| approvals         | `/teacher/assignments`               | `/(teacher)/approvals`              |
-| reports           | `/teacher/reports`                   | `/(teacher)/reports`                |
-| safety            | `/teacher/learners`                  | `/(teacher)/safety`                 |
-| settings          | `/teacher/settings`                  | `/(teacher)/settings`               |
+| Area      | Web                     | Mobile                 |
+| --------- | ----------------------- | ---------------------- |
+| home      | `/teacher/home`         | `/(teacher)/home`      |
+| learners  | `/teacher/learners`     | `/(teacher)/learners`  |
+| lessons   | `/teacher/lesson-plans` | `/(teacher)/lessons`   |
+| progress  | `/teacher/insights`     | `/(teacher)/progress`  |
+| messages  | `/teacher/learners`     | `/(teacher)/messages`  |
+| subjects  | `/teacher/lesson-plans` | `/(teacher)/subjects`  |
+| baseline  | `/teacher/assignments`  | `/(teacher)/baseline`  |
+| iep       | `/teacher/learners`     | `/(teacher)/iep`       |
+| approvals | `/teacher/assignments`  | `/(teacher)/approvals` |
+| reports   | `/teacher/reports`      | `/(teacher)/reports`   |
+| safety    | `/teacher/learners`     | `/(teacher)/safety`    |
+| settings  | `/teacher/settings`     | `/(teacher)/settings`  |
 
 ### School admin
 
-| Area              | Web                                  |
-| ----------------- | ------------------------------------ |
-| home              | `/admin/school`                      |
-| learners          | `/admin/school/learners`             |
-| admin             | `/admin/school/staff`                |
-| reports           | `/admin/school/reports`              |
-| billing           | `/admin/school/billing`              |
-| safety            | `/admin/school/compliance`           |
-| iep               | `/admin/school/compliance`           |
-| subjects          | `/admin/school/classes`              |
-| settings          | `/admin/school/settings`             |
+| Area     | Web                        |
+| -------- | -------------------------- |
+| home     | `/admin/school`            |
+| learners | `/admin/school/learners`   |
+| admin    | `/admin/school/staff`      |
+| reports  | `/admin/school/reports`    |
+| billing  | `/admin/school/billing`    |
+| safety   | `/admin/school/compliance` |
+| iep      | `/admin/school/compliance` |
+| subjects | `/admin/school/classes`    |
+| settings | `/admin/school/settings`   |
 
 ### District admin
 
-| Area              | Web                                  |
-| ----------------- | ------------------------------------ |
-| home              | `/admin/district`                    |
-| admin             | `/admin/district/schools`            |
-| reports           | `/admin/district/reports`            |
-| billing           | `/admin/district/billing`            |
-| iep               | `/admin/district/iep`                |
-| safety            | `/admin/district/compliance`         |
-| settings          | `/admin/district/settings`           |
+| Area     | Web                          |
+| -------- | ---------------------------- |
+| home     | `/admin/district`            |
+| admin    | `/admin/district/schools`    |
+| reports  | `/admin/district/reports`    |
+| billing  | `/admin/district/billing`    |
+| iep      | `/admin/district/iep`        |
+| safety   | `/admin/district/compliance` |
+| settings | `/admin/district/settings`   |
 
 ### Internal
 
-| Area              | Web                                  |
-| ----------------- | ------------------------------------ |
-| home              | `/admin/platform`                    |
-| admin             | `/admin/platform/tenants`            |
-| learners          | `/admin/platform/learners`           |
-| safety            | `/admin/platform/safety`             |
-| reports           | `/admin/platform/system-health`      |
-| billing           | `/admin/platform/billing`            |
-| settings          | `/admin/platform/settings`           |
+| Area     | Web                             |
+| -------- | ------------------------------- |
+| home     | `/admin/platform`               |
+| admin    | `/admin/platform/tenants`       |
+| learners | `/admin/platform/learners`      |
+| safety   | `/admin/platform/safety`        |
+| reports  | `/admin/platform/system-health` |
+| billing  | `/admin/platform/billing`       |
+| settings | `/admin/platform/settings`      |
 
 ## Shell composition rules
 

@@ -59,6 +59,7 @@ export default function CaregiverLayout() {
       <Tabs.Screen name="child/[childId]/sessions" options={{ href: null }} />
       <Tabs.Screen name="child/[childId]/observation" options={{ href: null }} />
       <Tabs.Screen name="child/[childId]/progress" options={{ href: null }} />
+      <Tabs.Screen name="learners" options={{ href: null }} />
     </Tabs>
     </RoleTabletShell>
   );
