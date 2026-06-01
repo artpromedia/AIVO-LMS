@@ -6,6 +6,7 @@ import {
   ScrollView,
   ActivityIndicator,
   TextInput,
+  AppState,
   StyleSheet,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -60,6 +61,30 @@ export function MessagesInbox() {
   useEffect(() => {
     void loadThreads();
   }, [loadThreads]);
+
+  // Live updates (foreground-aware polling): thread list every 12s, the open
+  // conversation every 6s, so a reply from the other side appears without a
+  // manual refresh.
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (AppState.currentState === "active") void loadThreads();
+    }, 12000);
+    return () => clearInterval(id);
+  }, [loadThreads]);
+
+  useEffect(() => {
+    if (!activeId) return;
+    const id = setInterval(() => {
+      if (AppState.currentState !== "active") return;
+      apiFetch(API.COMMS, `/api/comms/threads/${activeId}/messages`)
+        .then((r) => r.json())
+        .then((j) => {
+          if (Array.isArray(j.messages)) setMessages(j.messages as ThreadMessage[]);
+        })
+        .catch(() => {});
+    }, 6000);
+    return () => clearInterval(id);
+  }, [activeId]);
 
   const openThread = useCallback(async (id: string, subject: string) => {
     setActiveId(id);

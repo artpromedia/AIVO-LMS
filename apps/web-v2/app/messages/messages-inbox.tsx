@@ -55,6 +55,33 @@ export function MessagesInbox() {
     void loadThreads();
   }, [loadThreads]);
 
+  const isVisible = () =>
+    typeof document === "undefined" || document.visibilityState === "visible";
+
+  // Live updates (visibility-aware polling — a robust, dual-path alternative
+  // to a push stream). Thread list refreshes every 12s; the open conversation
+  // every 6s, so a reply from the other side appears without a manual reload.
+  React.useEffect(() => {
+    const id = setInterval(() => {
+      if (isVisible()) void loadThreads();
+    }, 12000);
+    return () => clearInterval(id);
+  }, [loadThreads]);
+
+  React.useEffect(() => {
+    if (!activeId) return;
+    const id = setInterval(() => {
+      if (!isVisible()) return;
+      fetch(`/api/bff/messages/threads/${activeId}/messages`)
+        .then((r) => r.json())
+        .then((j) => {
+          if (j?.data?.messages) setMessages(j.data.messages as ThreadMessage[]);
+        })
+        .catch(() => {});
+    }, 6000);
+    return () => clearInterval(id);
+  }, [activeId]);
+
   const openThread = React.useCallback(
     async (id: string, subject: string) => {
       setActiveId(id);

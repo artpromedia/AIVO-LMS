@@ -220,9 +220,14 @@ in dev/mock).
 
 Scope note: starting a *new* thread needs a team-member recipient picker
 (cross-service directory), so the first slice covers list → open → reply and
-seeds a demo thread in dev; thread creation is a follow-up. Real-time
-delivery (websocket/SSE) is also a follow-up — today the inbox refreshes on
-open/send.
+seeds a demo thread in dev; thread creation is a follow-up.
+
+**Live updates (this pass):** both the web and mobile inbox now poll while
+foregrounded — the thread list every 12s and the open conversation every 6s
+(visibility/AppState-aware) — so a reply from the other side appears without
+a manual reload. This is a robust, dual-path alternative to a push stream;
+a WebSocket/SSE transport remains a future optimization (its streaming layer
+needs a live stack to verify).
 
 Verified: `@aivo/db` + `@aivo/comms-svc` build clean; web-v2 typecheck +
 eslint clean; mobile `tsc` (0 errors) + eslint clean; `next build` green.
