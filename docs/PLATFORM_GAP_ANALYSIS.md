@@ -336,3 +336,31 @@ already stored.
   PKCE check, so a code can't be replayed), token round-trips, and expiry; `oidc-provider.ts` now uses it.
   Build-verified (`tsc`) and lint-clean; DB-backed tests added. Schema-drift check passes for the new
   tables. Operators get multi-replica identity-svc with no new infrastructure to run.
+
+### Phase 3 — provider/persistence build-outs: recommendation-svc made durable
+
+`recommendation-svc` was a Tier-1 data-loss item: route handlers read/wrote a process-local `Map`, and the
+candidates endpoint generated recommendations but **never persisted them** — so accept/amend/decline only
+ever worked on test-seeded data, and any record vanished on restart. A complete `DrizzleRecommendationStore`
+existed but was unwired (its own header said production should "use it as the source of truth").
+
+- New `recommendation-store.ts` — `RecommendationStore` interface + `InMemoryRecommendationStore` (dev/tests)
+  + `ProfileStore` for the scratch BrainProfile. `DrizzleRecommendationStore` satisfies the interface.
+- `server.ts` selects the store: **Postgres when `DATABASE_URL` is set, refused in production when unset**
+  (consistent with audit/problem-session/homework). Both route modules share one store instance.
+- The candidates endpoint now **persists** generated recommendations (the create point), so they are
+  retrievable and the accept/amend/decline lifecycle works end-to-end and survives restarts/replicas;
+  accept/amend record before/after snapshots via the store.
+- New canonical migration `0052_profile_recommendations_v2.sql` (+ journal) creates
+  `profile_recommendations_v2` / `profile_recommendation_snapshots` — they previously existed only in the
+  non-canonical `packages/db/migrations/` dir that `db:migrate` doesn't apply, so a standard deploy would
+  have lacked them (and the Drizzle store would crash). Also clears 2 of the pre-existing schema-drift
+  findings.
+- Verified: `tsc` + `@aivo/db` build; 19/19 recommendation-svc tests pass (incl. 2 new lifecycle tests
+  proving the previously-404 generate→retrieve→accept flow); eslint clean.
+
+_Open product decision (documented, not guessed):_ the authoritative learner BrainProfile lives in
+brain-svc; the `ProfileStore` here is scratch state for computing effects/snapshots — sourcing the real
+profile across services is a separate integration. Remaining Phase 3 items — real AI/TTS adapters and
+user-addressed push delivery — need external credentials/infra (provider keys, FCM/APNS) and are best done
+with those in hand.
