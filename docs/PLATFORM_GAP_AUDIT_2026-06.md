@@ -71,7 +71,8 @@ flips the default; "Code gap" = a flag won't fix it.
    in-memory store. No Checkout session is created; the subscribe button
    charges no one. → **Fixed in this pass (see Changelog).**
 9. **[Incomplete] Messages/inbox unbuilt.** `app/messages/page.tsx` is a
-   role-aware empty state.
+   role-aware empty state. → **Fixed in this pass: a real threaded inbox
+   (DB + comms-svc + web + mobile). See Changelog.**
 10. **[Config-ish] AI tutor/lesson canned by default.** `lib/homework/tutor.ts`
     (wired into 3 BFF routes) and `lib/learner/lesson-plan.ts` return
     deterministic content; real Anthropic provider exists but is env-gated.
@@ -123,7 +124,9 @@ flips the default; "Code gap" = a flag won't fix it.
     remain (role switch ⇒ re-login).
 21. **[Minor] Parity matrix drift.** Strict `mobile:parity` fails:
     `/messages`, `/notifications` untracked. The "100% parity" doc only checks
-    file existence, not functionality.
+    file existence, not functionality. → **Fixed: both routes tracked;
+    strict `mobile:parity` passes (115 routes, no drift); `docs/mobile-parity.md`
+    regenerated.**
 22. **[Incomplete] comms-svc SMS channel** unimplemented (`sms: "not_available"`).
 23. **[Incomplete] AAC AssistiveWare highlight** no-op
     (`packages/aac-bridge/src/adapters/AssistiveWareAdapter.ts:58`).
@@ -154,6 +157,39 @@ Verified: i18n coverage + direction tests pass (27 tests); web-v2 typecheck
 + eslint clean; `next build` green. The mobile strings already use the
 `t(key, defaultValue)` pattern, so they render translated-or-English without
 catalog churn.
+
+## Changelog — unified inbox / messaging (#9)
+
+Replaced the role-aware empty-state `/messages` page with a real threaded
+inbox across the stack (dual-path: comms-svc when enabled, in-memory store
+in dev/mock).
+
+- **DB** (`packages/db`) — `message_threads`, `message_thread_participants`
+  (unique per thread/user, `last_read_at` for unread), `messages` + migration
+  `0055`.
+- **comms-svc** (`routes/messages.ts`) — `GET/POST /api/comms/threads`,
+  `GET/POST /api/comms/threads/:id/messages`, `POST .../read`;
+  JWT-authenticated, tenant-scoped, participant-checked, with
+  `x-aivo-active-role` enforcement.
+- **Web** — `lib/db/messages-store.ts` (seeded dev store),
+  `lib/bff/comms-svc.ts`, BFF routes under `/api/bff/messages/*`, and a
+  two-pane `MessagesInbox` (thread list + thread view + reply) on the
+  `/messages` page.
+- **Mobile** — `components/messages/MessagesInbox.tsx` (master/detail list →
+  thread → reply) swapped into the `allow` branch of `app/messages.tsx`,
+  calling comms-svc via `apiFetch(API.COMMS, ...)`.
+- **Parity** — `/messages` + `/notifications` added to the parity matrix;
+  strict `mobile:parity` passes (115 routes); `docs/mobile-parity.md`
+  regenerated.
+
+Scope note: starting a *new* thread needs a team-member recipient picker
+(cross-service directory), so the first slice covers list → open → reply and
+seeds a demo thread in dev; thread creation is a follow-up. Real-time
+delivery (websocket/SSE) is also a follow-up — today the inbox refreshes on
+open/send.
+
+Verified: `@aivo/db` + `@aivo/comms-svc` build clean; web-v2 typecheck +
+eslint clean; mobile `tsc` (0 errors) + eslint clean; `next build` green.
 
 ## Remediation plan (phased)
 
