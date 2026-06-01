@@ -21,6 +21,9 @@
  *     });
  *     reply.code(result.status === "healthy" ? 200 : 503).send(result);
  *   });
+ *
+ * `pingDb` works with either a drizzle instance (it dynamically loads
+ * drizzle-orm's `sql` tag) or any object exposing `execute(sqlString)`.
  */
 
 export interface HealthCheckOutcome {
@@ -100,13 +103,33 @@ export async function pingHttp(
   }
 }
 
-/** Convenience DB probe — runs `SELECT 1`. */
-export async function pingDb(db: { execute: (q: any) => Promise<any> }): Promise<HealthCheckOutcome> {
+/**
+ * Convenience DB probe — runs `SELECT 1`.
+ *
+ * Accepts either a drizzle instance (we dynamically import drizzle-orm's
+ * `sql` tag so this package stays framework-agnostic) or any object that
+ * exposes `execute(rawSqlString)`. The plain-string fallback is used if
+ * drizzle-orm is not resolvable from the caller's module graph.
+ */
+export async function pingDb(
+  db: { execute: (q: any) => Promise<any> },
+): Promise<HealthCheckOutcome> {
   const started = Date.now();
   try {
-    // drizzle: `sql\`SELECT 1\`` — we accept a wrapper rather than importing
-    // drizzle here to keep the package framework-agnostic.
-    await db.execute({ sql: "SELECT 1" } as any);
+    let query: any = "SELECT 1";
+    try {
+      // Dynamic import keeps drizzle-orm an optional runtime peer (no
+      // build-time dep on this package). Using a variable for the
+      // specifier prevents TypeScript from resolving the module.
+      const specifier = "drizzle-orm";
+      const mod: any = await import(/* @vite-ignore */ specifier);
+      if (typeof mod?.sql === "function") {
+        query = mod.sql`SELECT 1`;
+      }
+    } catch {
+      // drizzle-orm not available — fall back to raw string
+    }
+    await db.execute(query);
     return { ok: true, latencyMs: Date.now() - started };
   } catch (err: any) {
     return {
