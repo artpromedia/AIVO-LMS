@@ -43,6 +43,15 @@
 # Database schema & migrations — require DB owner review
 /packages/db/                                  @artpromedia/maintainers
 
+# Single-shell, multi-role contract (ADR 0020) — any change to the top-level
+# /apps inventory, the canonical role registry, the permission matrix, or the
+# enforcing audit must be reviewed by maintainers.
+/apps/                                         @artpromedia/maintainers
+/packages/nav/src/roles.ts                     @artpromedia/maintainers
+/packages/nav/src/permissions.ts               @artpromedia/maintainers
+/docs/adr/0020-single-shell-multi-role.md      @artpromedia/maintainers
+/scripts/single-shell-audit.mjs                @artpromedia/maintainers
+
 # AI / ML safety surface — require AI safety review
 /services/ai-svc/src/ai_svc/speech_buddy/      @artpromedia/maintainers
 /services/ai-svc/src/ai_svc/services/quality_gate.py    @artpromedia/maintainers

@@ -26,6 +26,14 @@
     "./permissions": {
       "types": "./dist/permissions.d.ts",
       "import": "./dist/permissions.js"
+    },
+    "./session": {
+      "types": "./dist/session.d.ts",
+      "import": "./dist/session.js"
+    },
+    "./cross-cutting": {
+      "types": "./dist/cross-cutting.d.ts",
+      "import": "./dist/cross-cutting.js"
     }
   },
   "files": [
@@ -34,9 +42,11 @@
   ],
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "test": "vitest run"
   },
   "devDependencies": {
-    "typescript": "^5.4.0"
+    "typescript": "^5.4.0",
+    "vitest": "^2.0.0"
   }
 }

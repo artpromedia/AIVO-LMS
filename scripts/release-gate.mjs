@@ -28,6 +28,8 @@ const GATES = [
   { name: "onboarding:audit", cmd: ["pnpm", "onboarding:audit"] },
   { name: "lessonrun:audit", cmd: ["pnpm", "lessonrun:audit"] },
   { name: "route:audit", cmd: ["pnpm", "route:audit"] },
+  { name: "shell:audit", cmd: ["pnpm", "shell:audit"] },
+  { name: "mobile:single-listing", cmd: ["pnpm", "mobile:single-listing"] },
   { name: "mobile:audit", cmd: ["pnpm", "mobile:audit"] },
   { name: "marketing:audit", cmd: ["pnpm", "marketing:audit"] },
   { name: "billing:audit", cmd: ["pnpm", "billing:audit"] },

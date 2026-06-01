@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "AIVO Learning",
+    "name": "AIVO — Learn, Teach, Support",
     "slug": "aivo-learning",
     "version": "1.0.0",
     "orientation": "default",
@@ -17,6 +17,10 @@
       "supportsTablet": true,
       "requireFullScreen": false,
       "bundleIdentifier": "com.artpromedia.aivo",
+      "associatedDomains": [
+        "applinks:aivo.app",
+        "applinks:staging.aivo.app"
+      ],
       "config": {
         "usesNonExemptEncryption": false
       },
@@ -41,7 +45,36 @@
         "backgroundColor": "#7C3AED",
         "resizeMode": "contain"
       },
-      "permissions": ["android.permission.CAMERA", "android.permission.RECORD_AUDIO"]
+      "permissions": ["android.permission.CAMERA", "android.permission.RECORD_AUDIO"],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            { "scheme": "https", "host": "aivo.app", "pathPrefix": "/learner" },
+            { "scheme": "https", "host": "aivo.app", "pathPrefix": "/parent" },
+            { "scheme": "https", "host": "aivo.app", "pathPrefix": "/teacher" },
+            { "scheme": "https", "host": "aivo.app", "pathPrefix": "/therapist" },
+            { "scheme": "https", "host": "aivo.app", "pathPrefix": "/caregiver" },
+            { "scheme": "https", "host": "aivo.app", "pathPrefix": "/notifications" },
+            { "scheme": "https", "host": "aivo.app", "pathPrefix": "/messages" },
+            { "scheme": "https", "host": "aivo.app", "pathPrefix": "/settings" },
+            { "scheme": "https", "host": "aivo.app", "pathPrefix": "/billing" },
+            { "scheme": "https", "host": "aivo.app", "pathPrefix": "/role-switch" },
+            { "scheme": "https", "host": "staging.aivo.app", "pathPrefix": "/learner" },
+            { "scheme": "https", "host": "staging.aivo.app", "pathPrefix": "/parent" },
+            { "scheme": "https", "host": "staging.aivo.app", "pathPrefix": "/teacher" },
+            { "scheme": "https", "host": "staging.aivo.app", "pathPrefix": "/therapist" },
+            { "scheme": "https", "host": "staging.aivo.app", "pathPrefix": "/caregiver" },
+            { "scheme": "https", "host": "staging.aivo.app", "pathPrefix": "/notifications" },
+            { "scheme": "https", "host": "staging.aivo.app", "pathPrefix": "/messages" },
+            { "scheme": "https", "host": "staging.aivo.app", "pathPrefix": "/settings" },
+            { "scheme": "https", "host": "staging.aivo.app", "pathPrefix": "/billing" },
+            { "scheme": "https", "host": "staging.aivo.app", "pathPrefix": "/role-switch" }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "bundler": "metro",

@@ -6,3 +6,4 @@
  * — server-side jobs and CLIs don't need React.
  */
 export * from "./learning-hooks.js";
+export * from "./learner-scoped.js";

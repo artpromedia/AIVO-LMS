@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Notification } from "@/lib/db/types";
 
-export function NotificationList({ notifications: initial }: { notifications: Notification[] }) {
+export function ParentNotificationList({ notifications: initial }: { notifications: Notification[] }) {
   const t = useTranslations("parent.notifications");
   const [items, setItems] = useState(initial);
   const [pending, startTransition] = useTransition();

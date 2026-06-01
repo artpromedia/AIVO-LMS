@@ -66,8 +66,20 @@ jobs:
       - name: route:audit
         run: pnpm route:audit
 
+      - name: shell:audit
+        run: pnpm shell:audit
+
+      - name: rbac:audit
+        run: pnpm rbac:audit
+
+      - name: "@aivo/nav unit tests"
+        run: corepack pnpm --filter @aivo/nav test
+
       - name: mobile:audit
         run: pnpm mobile:audit
+
+      - name: mobile:single-listing
+        run: pnpm mobile:single-listing
 
       - name: marketing:audit
         run: pnpm marketing:audit

@@ -20,6 +20,30 @@ export interface NotificationItem {
   body: string;
   readAt: string | null;
   createdAt: string;
+  /**
+   * Phase 3 — ADR 0020 cross-role data & navigation.
+   *
+   * Role the recipient must be in to act on this notification. When
+   * present and different from `activeRole`, the inbox renders a
+   * role chip on the row and the tap handler routes through
+   * `/role-switch?to=<role>&next=<href>&reason=notification` before
+   * navigating. Optional during rollout — older notifications without
+   * a `targetRole` fall back to the active role.
+   */
+  targetRole?:
+    | "learner"
+    | "parent"
+    | "teacher"
+    | "therapist"
+    | "caregiver"
+    | "schoolAdmin"
+    | "districtAdmin"
+    | "internal"
+    | null;
+  /** Optional href the row links to. */
+  href?: string | null;
+  /** Optional learner this notification refers to. */
+  targetLearnerId?: string | null;
 }
 
 export interface UseNotificationStreamOptions {

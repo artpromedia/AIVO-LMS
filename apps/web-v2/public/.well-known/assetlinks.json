@@ -1,0 +1,13 @@
+[
+  {
+    "_comment": "ADR 0020 Phase 4, slice 4.3. Android App Links manifest. One package id (com.artpromedia.aivo) corresponds to one Play listing; per-role suffixes are prohibited by apps/mobile/scripts/check-single-listing.mjs. Replace the SHA256 fingerprint placeholder with the production signing key before release.",
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.artpromedia.aivo",
+      "sha256_cert_fingerprints": [
+        "AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99"
+      ]
+    }
+  }
+]

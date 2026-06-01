@@ -56,7 +56,7 @@ export default async function Page() {
         </div>
         <p className="mt-3 text-xs text-aivo-ink-soft">
           Edit channels and quiet hours from the{" "}
-          <Link href="/parent/notifications" className="text-aivo-accent hover:underline">
+          <Link href="/notifications" className="text-aivo-accent hover:underline">
             notifications surface
           </Link>
           .

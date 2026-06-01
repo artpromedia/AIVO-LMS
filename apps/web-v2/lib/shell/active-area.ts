@@ -19,7 +19,7 @@ const RULES: Array<[NavArea, string[]]> = [
   ["aiTutor", ["/learner/quests", "/admin/platform/ai"]],
   ["progress", ["/learner/progress", "/parent/reports", "/teacher/insights"]],
   ["iep", ["/admin/district/iep", "/admin/school/compliance", "/admin/platform/compliance"]],
-  ["messages", ["/learner/notifications", "/parent/notifications", "/admin/platform/support"]],
+  ["messages", ["/messages", "/notifications", "/admin/platform/support"]],
   ["approvals", ["/parent/consent", "/teacher/assignments"]],
   ["billing", ["/parent/settings/billing", "/admin/school/billing", "/admin/district/billing", "/admin/platform/billing"]],
   ["admin", ["/admin/school/staff", "/admin/district/schools", "/admin/platform/tenants"]],

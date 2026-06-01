@@ -259,7 +259,7 @@ export default async function ParentHomeV2() {
             subtitle="Quiet, recent, parent-relevant only."
             badge="1 new"
             badgeTone="info"
-            cta={{ href: "/parent/notifications", label: "Open notifications" }}
+            cta={{ href: "/notifications", label: "Open notifications" }}
           >
             <ul className="space-y-2">
               <li>

@@ -48,7 +48,21 @@ const nextConfig: NextConfig = {
   // causes ``UnrecognizedActionError`` 404s on the login form for users
   // who have a stale tab after a rolling deploy.
   async headers() {
-    return [{ source: "/:path*", headers: SECURITY_HEADERS }];
+    return [
+      { source: "/:path*", headers: SECURITY_HEADERS },
+      // ADR 0020 Phase 4, slice 4.3 — Universal Links / App Links.
+      // Apple requires `application/json` for AASA; Google requires
+      // the same for assetlinks.json. Browsers don't infer it from
+      // the extension-less AASA file, so pin it here.
+      {
+        source: "/.well-known/apple-app-site-association",
+        headers: [{ key: "Content-Type", value: "application/json" }],
+      },
+      {
+        source: "/.well-known/assetlinks.json",
+        headers: [{ key: "Content-Type", value: "application/json" }],
+      },
+    ];
   },
   // Topology aliases (ADR 0010). Older docs and external integrations
   // sometimes reference apps that don't exist as separate deployables
@@ -67,6 +81,43 @@ const nextConfig: NextConfig = {
       {
         source: "/learner-app/:path*",
         destination: "/learner/:path*",
+        permanent: true,
+      },
+      // ADR 0020 Phase 2, slice 1 — `notifications` moved from
+      // per-role routes to the canonical top-level `/notifications`
+      // surface anchored on the `messages` nav area. Mirrors
+      // `CROSS_CUTTING_REGISTRY.notifications.legacyRoutes` (web).
+      // Only the routes that actually rendered notifications are
+      // redirected; "closest equivalent" admin staff pages stay put.
+      {
+        source: "/learner/notifications",
+        destination: "/notifications",
+        permanent: true,
+      },
+      {
+        source: "/parent/notifications",
+        destination: "/notifications",
+        permanent: true,
+      },
+      // ADR 0020 Phase 2, slice 2 — `messages` moved to the canonical
+      // top-level `/messages` surface anchored on the `messages` nav
+      // area. Mirrors `CROSS_CUTTING_REGISTRY.messages.legacyRoutes`
+      // (web). No legacy per-role messages pages exist on disk; the
+      // redirects future-proof any external links that may still
+      // reference the per-role URLs.
+      {
+        source: "/parent/messages",
+        destination: "/messages",
+        permanent: true,
+      },
+      {
+        source: "/teacher/messages",
+        destination: "/messages",
+        permanent: true,
+      },
+      {
+        source: "/caregiver/messages",
+        destination: "/messages",
         permanent: true,
       },
     ];

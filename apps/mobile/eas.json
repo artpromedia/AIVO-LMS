@@ -3,10 +3,14 @@
     "version": ">= 18.0.0",
     "appVersionSource": "remote"
   },
+  "//": "ADR 0020 §1/§5: exactly three build profiles — development, staging, production. Per-role profiles (e.g. parent-prod, teacher-prod) are prohibited; per-role rollout is gated by @aivo/feature-flags AIVO_ROLE_<ROLE>_ENABLED env vars, not by a second app submission.",
   "build": {
     "development": {
       "developmentClient": true,
       "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_AIVO_ENV": "development"
+      },
       "android": {
         "buildType": "apk"
       },
@@ -14,9 +18,10 @@
         "simulator": true
       }
     },
-    "preview": {
+    "staging": {
       "distribution": "internal",
       "env": {
+        "EXPO_PUBLIC_AIVO_ENV": "staging",
         "NPM_CONFIG_NODE_LINKER": "hoisted",
         "NPM_CONFIG_SHAMEFULLY_HOIST": "true"
       },
@@ -26,20 +31,12 @@
       "ios": {
         "simulator": true
       }
-    },
-    "preview-device": {
-      "distribution": "internal",
-      "env": {
-        "NPM_CONFIG_NODE_LINKER": "hoisted",
-        "NPM_CONFIG_SHAMEFULLY_HOIST": "true"
-      },
-      "android": {
-        "buildType": "apk"
-      },
-      "ios": {}
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_AIVO_ENV": "production"
+      }
     }
   },
   "submit": {

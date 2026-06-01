@@ -2016,6 +2016,33 @@ export type Notification = {
   href: string | null;
   /** Optional learner this notification refers to, for IEP/learner-context. */
   learnerId: ID | null;
+  /**
+   * Phase 3 — ADR 0020 cross-role data & navigation.
+   *
+   * The role the recipient must be in to act on this notification.
+   * Stamped by the fan-out service based on which role the recipient
+   * needs to switch into (e.g. `parent` for a consent request,
+   * `teacher` for an assignment reminder). When present, both the
+   * SW push handler and the in-app inbox pass `href` through
+   * `resolveDeepLink` and, if `targetRole !== activeRole`, route to
+   * `/role-switch?to=<role>&next=<href>&reason=notification` before
+   * navigating. Optional during the rollout — legacy notifications
+   * without a `targetRole` continue to land on the active role.
+   *
+   * Uses the `@aivo/nav` camelCase role ids (`schoolAdmin`,
+   * `districtAdmin`, `internal`) — not the web-v2 snake_case roles —
+   * so the value can be passed straight to `resolveDeepLink`.
+   */
+  targetRole?:
+    | "learner"
+    | "parent"
+    | "teacher"
+    | "therapist"
+    | "caregiver"
+    | "schoolAdmin"
+    | "districtAdmin"
+    | "internal"
+    | null;
   readAt: ISODate | null;
   createdAt: ISODate;
 };
