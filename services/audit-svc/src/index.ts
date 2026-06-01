@@ -21,6 +21,17 @@ const isMain = (() => {
 
 if (isMain) {
   const databaseUrl = process.env.DATABASE_URL;
+  // The in-memory store is a dev affordance only — audit events would be lost
+  // on restart and not shared across replicas. An audit trail that silently
+  // evaporates is worse than none, so refuse to boot without a database in
+  // production.
+  if (!databaseUrl && process.env.NODE_ENV === "production") {
+    throw new Error(
+      "audit-svc: DATABASE_URL must be set in production. The in-memory audit " +
+        "store is development-only (events are lost on restart and not shared " +
+        "across replicas).",
+    );
+  }
   const store = databaseUrl
     ? new DrizzleAuditStore(createDb(databaseUrl))
     : new InMemoryAuditStore();

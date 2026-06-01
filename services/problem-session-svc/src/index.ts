@@ -15,8 +15,16 @@ const PORT = parseInt(process.env.PROBLEM_SESSION_PORT || "3061", 10);
 async function start() {
   // Production wiring: when DATABASE_URL is set, persist to Postgres.
   // In dev / smoke containers without a database we fall back to the
-  // in-memory store so the service still boots.
+  // in-memory store so the service still boots — but never in production,
+  // where it would silently lose session/attempt data on restart.
   const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl && process.env.NODE_ENV === "production") {
+    throw new Error(
+      "problem-session-svc: DATABASE_URL must be set in production. The " +
+        "in-memory store is development-only (attempt data is lost on restart " +
+        "and not shared across replicas).",
+    );
+  }
   const store = databaseUrl
     ? new DrizzleProblemSessionStore(createDb(databaseUrl))
     : new InMemoryProblemSessionStore();
