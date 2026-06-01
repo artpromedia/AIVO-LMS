@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
-import { composeHealth, pingDb } from "@aivo/observability";
+import { composeHealth } from "@aivo/observability";
+import { sql } from "drizzle-orm";
 
 /**
  * Sprint 12.7 — health endpoint uses the shared composeHealth helper.
@@ -10,9 +11,24 @@ import { composeHealth, pingDb } from "@aivo/observability";
 export async function registerHealthRoutes(app: FastifyInstance) {
   const handler = async (_req: any, reply: any) => {
     const db = (app as any).db;
+    const dbCheck = db
+      ? async () => {
+          const started = Date.now();
+          try {
+            await db.execute(sql`SELECT 1`);
+            return { ok: true as const, latencyMs: Date.now() - started };
+          } catch (err: any) {
+            return {
+              ok: false as const,
+              latencyMs: Date.now() - started,
+              error: err?.message ?? String(err),
+            };
+          }
+        }
+      : undefined;
     const result = await composeHealth({
       service: "identity-svc",
-      db: db ? () => pingDb(db) : undefined,
+      db: dbCheck,
     });
     reply.code(result.status === "healthy" ? 200 : 503).send(result);
   };
