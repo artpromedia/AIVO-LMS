@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
   AuthCard,
@@ -12,37 +13,48 @@ import { AivoIcon } from "@aivo/ui/icon";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { SiteFooter } from "@/components/marketing/site-footer";
 import { Button } from "@/components/ui/button";
+import { Banner } from "@/components/ui/banner";
+import { registerAction } from "@/lib/auth/auth-actions";
 
 /**
  * Inclusive-Warm / Playful Calm signup surface. Rebuilt on the
- * @aivo/ui/auth primitives (AuthCard + AuthInput + ReassuranceCard) so
- * the field treatment, CTA, and reassurance copy match the other
- * onboarding screens. The submit is mocked locally — backend auth is
- * intentionally deferred until a real identity provider is wired.
+ * @aivo/ui/auth primitives (AuthCard + AuthInput + ReassuranceCard).
+ *
+ * The form posts to the `registerAction` server action, which creates a
+ * real PARENT account via identity-svc and establishes the session before
+ * handing off to onboarding. Under AUTH_MODE=mock (dev default) the action
+ * keeps the legacy behavior of dropping into the demo login.
  */
+
+// Failure copy keyed by the `?error=` code the server action redirects
+// with. English-only for now; these move into the auth.signup catalog
+// when the auth surfaces get their next i18n pass.
+const SIGNUP_ERRORS: Record<string, string> = {
+  invalid_input:
+    "Please enter your name, a valid email, and a password of at least 8 characters.",
+  email_taken: "That email is already registered. Try signing in instead.",
+  weak_password:
+    "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
+  service_unavailable:
+    "We couldn't reach our sign-up service. Please try again in a moment.",
+  unsupported_role: "This account type can't be created here.",
+  signup_failed: "We couldn't create your account. Please try again.",
+};
+
 export default function SignupPage() {
   const t = useTranslations("auth.signup");
+  const search = useSearchParams();
+  const errorCode = search.get("error");
+  const errorMessage = errorCode
+    ? SIGNUP_ERRORS[errorCode] ?? SIGNUP_ERRORS.signup_failed
+    : null;
+
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [submitting, setSubmitting] = React.useState(false);
 
   const canSubmit =
-    name.trim().length > 1 &&
-    /.+@.+\..+/.test(email) &&
-    password.length >= 8 &&
-    !submitting;
-
-  function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!canSubmit) return;
-    setSubmitting(true);
-    // Mock signup — backend wiring deferred. Send the operator to /login
-    // so they can drop into any demo role.
-    globalThis.setTimeout(() => {
-      globalThis.location.assign("/login?signup=mock");
-    }, 600);
-  }
+    name.trim().length > 1 && /.+@.+\..+/.test(email) && password.length >= 8;
 
   return (
     <>
@@ -113,27 +125,33 @@ export default function SignupPage() {
               </>
             }
             actions={
-              <>
-                <Button
-                  type="submit"
-                  form="signup-form"
-                  size="lg"
-                  disabled={!canSubmit}
-                  className="w-full"
-                >
-                  {submitting ? t("submitting") : t("submit")}
-                </Button>
-              </>
+              <Button
+                type="submit"
+                form="signup-form"
+                size="lg"
+                disabled={!canSubmit}
+                className="w-full"
+              >
+                {t("submit")}
+              </Button>
             }
           >
+            {errorMessage ? (
+              <div className="mb-3">
+                <Banner tone="danger" description={errorMessage} />
+              </div>
+            ) : null}
             <form
               id="signup-form"
-              onSubmit={onSubmit}
+              action={registerAction}
               className="flex flex-col gap-4"
               noValidate
             >
+              <input type="hidden" name="next" value="/onboarding/parent-setup" />
+              <input type="hidden" name="errorReturn" value="/signup" />
               <AuthInput
                 id="name"
+                name="name"
                 label={t("name_label")}
                 value={name}
                 onChange={(event) => setName(event.target.value)}
@@ -143,6 +161,7 @@ export default function SignupPage() {
               />
               <AuthInput
                 id="email"
+                name="email"
                 label={t("email_label")}
                 type="email"
                 inputMode="email"
@@ -154,6 +173,7 @@ export default function SignupPage() {
               />
               <AuthInput
                 id="password"
+                name="password"
                 label={t("password_label")}
                 type="password"
                 value={password}

@@ -13,7 +13,7 @@ import { fileURLToPath } from "node:url";
 import { beforeAll, afterAll, beforeEach, describe, it, expect } from "vitest";
 import { sql } from "drizzle-orm";
 import { createDb, type Database } from "@aivo/db";
-import { __setDbClient, __resetDbClient, getDb, withTenantContext } from "../drizzle/client";
+import { __setDbClient, __resetDbClient } from "../drizzle/client";
 
 const TEST_URL = process.env.AIVO_TEST_DATABASE_URL;
 const here = dirname(fileURLToPath(import.meta.url));

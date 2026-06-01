@@ -1,14 +1,33 @@
 "use client";
 import * as React from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { AuthShell, AuthCard, AuthInput, ReassuranceCard } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 import { Button } from "@/components/ui/button";
+import { Banner } from "@/components/ui/banner";
+import { onboardingSignInAction } from "@/lib/auth/auth-actions";
+
+// Failure copy keyed by the `?error=` code the sign-in action redirects
+// with. English-only for now; folded into the onboarding catalog on the
+// next i18n pass.
+const SIGNIN_ERRORS: Record<string, string> = {
+  missing_credentials: "Enter your email and password to sign in.",
+  invalid_credentials: "That email or password didn't match. Please try again.",
+  wrong_surface: "This account signs in from a different portal.",
+  unsupported_role: "This account type can't sign in here.",
+  login_failed: "We couldn't sign you in. Please try again in a moment.",
+};
 
 export default function SignInPage() {
   const t = useTranslations("onboarding.signin");
   const tc = useTranslations("onboarding.common");
+  const search = useSearchParams();
+  const errorCode = search.get("error");
+  const errorMessage = errorCode
+    ? SIGNIN_ERRORS[errorCode] ?? SIGNIN_ERRORS.login_failed
+    : null;
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [showPw, setShowPw] = React.useState(false);
@@ -44,7 +63,7 @@ export default function SignInPage() {
         }
         actions={
           <>
-            <Button type="submit" size="lg" className="w-full">
+            <Button type="submit" form="onboarding-signin-form" size="lg" className="w-full">
               {t("submit")}
             </Button>
             <div className="flex justify-between text-sm">
@@ -64,34 +83,48 @@ export default function SignInPage() {
           </>
         }
       >
-        <AuthInput
-          id="email"
-          label={tc("email")}
-          type="email"
-          autoComplete="email"
-          inputMode="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
-        />
-        <AuthInput
-          id="password"
-          label={tc("password")}
-          type={showPw ? "text" : "password"}
-          autoComplete="current-password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          trailing={
-            <button
-              type="button"
-              onClick={() => setShowPw((v) => !v)}
-              className="text-xs font-semibold text-[var(--aivo-sensory-primary)] hover:underline"
-              aria-label={showPw ? tc("hide_password") : tc("show_password")}
-            >
-              {showPw ? tc("hide") : tc("show")}
-            </button>
-          }
-        />
+        {errorMessage ? (
+          <div className="mb-3">
+            <Banner tone="danger" description={errorMessage} />
+          </div>
+        ) : null}
+        <form id="onboarding-signin-form" action={onboardingSignInAction} noValidate>
+          <input type="hidden" name="errorReturn" value="/onboarding/signin" />
+          <div className="flex flex-col gap-4">
+            <AuthInput
+              id="email"
+              name="email"
+              label={tc("email")}
+              type="email"
+              autoComplete="email"
+              inputMode="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              required
+            />
+            <AuthInput
+              id="password"
+              name="password"
+              label={tc("password")}
+              type={showPw ? "text" : "password"}
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              trailing={
+                <button
+                  type="button"
+                  onClick={() => setShowPw((v) => !v)}
+                  className="text-xs font-semibold text-[var(--aivo-sensory-primary)] hover:underline"
+                  aria-label={showPw ? tc("hide_password") : tc("show_password")}
+                >
+                  {showPw ? tc("hide") : tc("show")}
+                </button>
+              }
+            />
+          </div>
+        </form>
       </AuthCard>
     </AuthShell>
   );

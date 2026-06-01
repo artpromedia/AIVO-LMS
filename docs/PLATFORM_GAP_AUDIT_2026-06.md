@@ -1,0 +1,174 @@
+# Platform Gap Audit & Remediation Plan — June 2026
+
+> Scope: end-to-end audit of stubs / placeholders / TODOs, user-journey
+> completeness, web⇄mobile parity, tablet+phone formatting, unified login,
+> and cross-device session continuity. Produced from a full sweep of
+> `apps/`, `services/`, and `packages/`.
+
+## Bottom line
+
+AIVO is an unusually mature monorepo. It has CI gates that block demo data
+in production (`scripts/no-demo-prod-scan.mjs`), missing surface contracts
+(`scripts/surface-contract-scan.mjs`), and "Coming Soon" placeholders in the
+web app (`apps/web-v2/scripts/route-audit.mjs`). There is essentially **one**
+genuine TODO in application code and no `501`/`NotImplemented` handlers.
+
+The real gaps are a small number of **code-level** incompletions (not just
+config) concentrated in: web onboarding/signup, billing UI wiring,
+child-safety (Speech Buddy), AI tutor responses, and a few mobile screens —
+plus several **config-default** behaviors that production already flips.
+
+## What's already solid
+
+| Area | Verdict |
+| --- | --- |
+| Mobile tablet + phone formatting | Strong. Material-3 / iPadOS size classes (`apps/mobile/src/design/responsive.ts`), documented split-view multitasking matrix (`useWindowSizeClass.ts`), adaptive nav (phone bottom-tabs → tablet rail → drawer), content max-widths, used in ~60 files, regression-tested. `app.json`: `supportsTablet: true`, `resizeableActivity: true`. |
+| Unified login — backend | One Postgres `users`/`sessions` store, RS256 JWT, Argon2. Mobile and web (real mode) hit the same `identity-svc /api/auth/login`. |
+| Cross-device source of truth | Single Postgres + JSONB brain state; prod enforces `postgres` persistence. |
+| Stub/TODO hygiene | 1 genuine TODO in app code; the 108 STUB / 312 PLACEHOLDER raw hits are false positives (form `placeholder=`, scanner regex literals). `prod:check` passes. |
+
+## Gap inventory
+
+Severity: **Blocker** (ships broken / unsafe), **Incomplete** (degraded or
+partial), **Minor** (cleanup / config). "Config gap" = production already
+flips the default; "Code gap" = a flag won't fix it.
+
+### A. Unified login
+
+1. **[Blocker · code] Web signup was fake.** `apps/web-v2/app/signup/page.tsx`
+   redirected to `/login?signup=mock`; no `auth/register` call existed in
+   web-v2. Mobile already registers. → **Fixed in this pass (see Changelog).**
+2. **[Config] Web defaults to mock auth** (`AUTH_MODE=mock`). Prod refuses
+   mock; dev/misconfig means web & mobile are not the same user.
+3. **[Incomplete] PIN-login has no refresh session.** `services/identity-svc/.../auth.ts`
+   mints a 2h JWT, inserts no `sessions` row → learner sessions hard-die at
+   2h; mobile refresh-retry fails (no cookie).
+4. **[Incomplete] Staff/district roles cannot log in on mobile.**
+   `/api/auth/login` 403s `DISTRICT_ADMIN`/staff; mobile only wires
+   consumer + google + pin flows.
+
+### B. Cross-device session continuity
+
+5. **[Config] Web defaults to in-memory store** (`AIVO_PERSISTENCE=memory`,
+   `AIVO_USE_SERVICE_STACK=false`). Mobile progress lands in Postgres; web
+   won't show it until flags flip (prod enforces).
+6. **[Incomplete] No real-time sync / polling.** Continuity is
+   "shared-DB-read-on-next-load" only — no websocket/SSE between clients.
+
+### C. Web user-journey completeness
+
+7. **[Blocker · code] Onboarding wizard was inert** — pure `<Link>`
+   navigation; inputs discarded; `onboarding/signin` submit did nothing. →
+   **Partially fixed in this pass** (signup, signin, and learner creation
+   now persist; intermediate informational steps remain navigation).
+8. **[Blocker · code] Billing UI not wired to `billing-svc`.** `billing-svc`
+   is fully real (Stripe `stripe.ts`, `webhooks.ts`, reconciliation,
+   entitlements — proven by `e2e/.../stripe-purchase-to-entitlement.spec.ts`),
+   but web `app/api/bff/parent/subscription/route.ts` only mutates the
+   in-memory store. No Checkout session is created; the subscribe button
+   charges no one.
+9. **[Incomplete] Messages/inbox unbuilt.** `app/messages/page.tsx` is a
+   role-aware empty state.
+10. **[Config-ish] AI tutor/lesson canned by default.** `lib/homework/tutor.ts`
+    (wired into 3 BFF routes) and `lib/learner/lesson-plan.ts` return
+    deterministic content; real Anthropic provider exists but is env-gated.
+
+### D. Mobile stubs & web↔mobile disparities
+
+11. **[Incomplete] Mobile baseline uses mock questions.**
+    `apps/mobile/app/(learner)/baseline/run.tsx` hardcodes a 5-item `SAMPLE`
+    array; web baseline is real adaptive IRT. (The demo-scanner misses
+    `SAMPLE`.)
+12. **[Incomplete] Co-Learning stub** — `(parent)/colearn/[childId].tsx` dead
+    CTA `onAction={() => {}}`.
+13. **[Incomplete] Live parent session viewing stub** —
+    `(parent)/session/[childId].tsx` empty state only.
+14. **[Incomplete] Therapist "Add goal" unwired** —
+    `(therapist)/client/[id]/goals.tsx:61` dead CTA.
+15. **[Incomplete] Offline queue is in-memory** (`apps/mobile/hooks/useOffline.ts`)
+    — module array, not the spec'd persistent `expo-sqlite` + `idempotencyKey`
+    queue; lost on restart; replayed requests carry no auth header.
+16. **[Minor] Hardcoded Google OAuth client ID** — `(auth)/login.tsx:29`.
+
+### E. Child-safety / AI (high stakes)
+
+17. **[Blocker] Speech Buddy Layer-3 safety judge is a keyword stub.**
+    `services/ai-svc/src/ai_svc/speech_buddy/safety.py:207` `_default_judge`
+    is the production default (`orchestrator_impl.py:124`); real LLM
+    moderation is never wired.
+18. **[Blocker] Speech Buddy consent store is env-var-only.**
+    `services/family-svc/src/routes/speech-buddy-consent.ts` reads
+    `SPEECH_BUDDY_DEV_CONSENTS`; no DB store or parent UI. In prod with no
+    env var, every consent check fails.
+
+### F. Lower severity / cleanup
+
+19. **[Minor] `x-aivo-active-role` never enforced server-side.** Mobile sends
+    it; no service validates it (documented Sprint-09 follow-up never landed).
+    Hint-only, so low risk — but the documented spoof protection is absent.
+20. **[Minor] Unified mobile shell migration stalled.**
+    `MOBILE_UNIFIED_APP=false`, no `(app)` shell; legacy per-role shells
+    remain (role switch ⇒ re-login).
+21. **[Minor] Parity matrix drift.** Strict `mobile:parity` fails:
+    `/messages`, `/notifications` untracked. The "100% parity" doc only checks
+    file existence, not functionality.
+22. **[Incomplete] comms-svc SMS channel** unimplemented (`sms: "not_available"`).
+23. **[Incomplete] AAC AssistiveWare highlight** no-op
+    (`packages/aac-bridge/src/adapters/AssistiveWareAdapter.ts:58`).
+24. **[Incomplete] Web migration runner** skips `iep_documents`/`lesson_runs`
+    (`apps/web-v2/lib/db/repos.ts:5253`).
+25. **[Minor] Dev/demo routes ship in tree** — web `design-system`,
+    `surface-preview`, `lesson-player-fixture`; mobile `(shell-demo)`. Mascot
+    art is placeholder SVGs (`packages/brand`).
+
+## Remediation plan (phased)
+
+**Phase 0 — Config hardening.** Make staging mirror prod (`AUTH_MODE=custom`,
+`AIVO_PERSISTENCE=postgres`, `AIVO_USE_SERVICE_STACK=true`, AI keys); fail the
+mobile build if `EXPO_PUBLIC_API_URL` / Google client ID are unset. Addresses
+#2, #5, #10, #16.
+
+**Phase 1 — Blockers.** Web signup (#1 ✅), onboarding wizard (#7 ✅ partial),
+billing→billing-svc Checkout (#8), Speech Buddy safety judge (#17) + consent
+store (#18), active-role enforcement (#19).
+
+**Phase 2 — Parity & continuity.** Mobile baseline → assessment-svc IRT (#11),
+persistent authed offline queue (#15), PIN refresh session (#3), mobile
+staff/district scoping (#4), messages/inbox (#9), refresh parity matrix (#21),
+lightweight real-time sync for active learner state (#6).
+
+**Phase 3 — Incomplete features.** Tutor LLM (#10), co-learn (#12), live
+session viewing (#13), therapist add-goal (#14), comms SMS (#22), AAC
+highlight (#23), web migration runner (#24).
+
+**Phase 4 — Cleanup.** Exclude dev/demo routes from prod (#25), finish unified
+mobile shell (#20), final mascot art.
+
+## Changelog — this pass (Phase 1: web signup + onboarding)
+
+Converted the consumer self-service signup + onboarding from inert mocks to
+real, session-establishing flows:
+
+- `apps/web-v2/lib/auth/identity-client.ts` — added `identityRegister()`
+  (POST `/api/auth/register`, PARENT-only), mirroring `identityLogin`.
+- `apps/web-v2/lib/auth/auth-actions.ts` (new) — `registerAction` and
+  `onboardingSignInAction` server actions: real identity-svc calls, web-v2
+  session cookies, open-redirect-safe `next`/`errorReturn`, and a preserved
+  `AUTH_MODE=mock` dev affordance.
+- `apps/web-v2/app/signup/page.tsx` — posts to `registerAction` (was a
+  mock `setTimeout` redirect); error banner.
+- `apps/web-v2/app/onboarding/signup/page.tsx` — self-serve branch posts to
+  `registerAction` (was `<Link>`-only); invite branch unchanged.
+- `apps/web-v2/app/onboarding/signin/page.tsx` — wraps the (previously
+  form-less, inert) inputs in a form posting to `onboardingSignInAction`;
+  delegates MFA/staff redirects to the canonical `/login` flow.
+- `apps/web-v2/app/onboarding/learner/new/{page,actions}.tsx` — creates a
+  real learner via `createLearner` (was a dead `<Link>`), terminating the
+  funnel on the real learner detail page.
+
+Verified: web-v2 `typecheck` clean, `eslint --max-warnings=0` clean on all
+changed files, `prod:check` passes. No unit/e2e tests target these surfaces.
+
+Remaining in onboarding (follow-ups): intermediate informational steps
+(role/terms/privacy/consent) are still pure navigation; the field-level error
+copy is English-only pending an i18n pass.

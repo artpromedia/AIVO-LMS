@@ -1,6 +1,7 @@
 "use client";
 import * as React from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   AuthShell,
   AuthCard,
@@ -10,7 +11,9 @@ import {
 } from "@aivo/ui/auth";
 import { AivoIcon } from "@aivo/ui/icon";
 import { Button } from "@/components/ui/button";
+import { Banner } from "@/components/ui/banner";
 import { useTranslations } from "next-intl";
+import { createOnboardingLearnerAction } from "./actions";
 
 const STEPS = [
   { label: "about_you" },
@@ -31,9 +34,13 @@ export default function NewLearnerPage() {
   const t = useTranslations("onboarding.learner_new");
   const tc = useTranslations("onboarding.common");
   const ts = useTranslations("onboarding.steps");
+  const search = useSearchParams();
+  const hasError = search.get("error") === "invalid";
   const [firstName, setFirstName] = React.useState("");
   const [grade, setGrade] = React.useState("");
   const [hasIep, setHasIep] = React.useState<"yes" | "no" | "unsure" | null>(null);
+
+  const canSubmit = firstName.trim().length > 0;
 
   return (
     <AuthShell>
@@ -57,12 +64,15 @@ export default function NewLearnerPage() {
           }
           actions={
             <>
-              <Link
-                href="/onboarding/consent"
-                className="w-full h-12 rounded-iw-control bg-[var(--aivo-sensory-primary)] text-white font-semibold flex items-center justify-center hover:opacity-95"
+              <Button
+                type="submit"
+                form="onboarding-learner-form"
+                size="lg"
+                disabled={!canSubmit}
+                className="w-full"
               >
                 {t("continue")}
-              </Link>
+              </Button>
               <p className="text-xs text-iw-text-muted text-center">
                 <Link href="/onboarding/parent-setup" className="hover:underline">
                   {tc("back")}
@@ -71,63 +81,79 @@ export default function NewLearnerPage() {
             </>
           }
         >
-          <AuthInput
-            id="learner-first"
-            label={t("first_name_label")}
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            placeholder={t("first_name_placeholder")}
-            autoComplete="off"
-          />
-          <div className="flex flex-col gap-1.5">
-            <label
-              htmlFor="grade"
-              className="text-sm font-medium text-iw-text-strong"
-            >
-              {t("grade_band_label")}
-            </label>
-            <select
-              id="grade"
-              value={grade}
-              onChange={(e) => setGrade(e.target.value)}
-              className="h-12 px-3 rounded-iw-control bg-white border border-iw-border text-base text-iw-text-strong focus:border-[var(--aivo-sensory-primary)] focus:ring-2 focus:ring-[var(--aivo-sensory-primary)]/20 outline-none"
-            >
-              <option value="" disabled>
-                {t("grade_band_placeholder")}
-              </option>
-              {GRADE_BANDS.map((b) => (
-                <option key={b} value={b}>
-                  {b}
-                </option>
-              ))}
-            </select>
-            <p className="text-xs text-iw-text-muted">
-              {t("grade_band_help")}
-            </p>
-          </div>
-
-          <fieldset className="flex flex-col gap-2">
-            <legend className="text-sm font-medium text-iw-text-strong">
-              {t("iep_legend")}
-            </legend>
-            <p className="text-xs text-iw-text-muted">
-              {t("iep_help")}
-            </p>
-            <div className="flex flex-wrap gap-2 mt-1">
-              {(["yes", "no", "unsure"] as const).map((v) => (
-                <Button
-                  key={v}
-                  type="button"
-                  size="sm"
-                  variant={hasIep === v ? "default" : "outline"}
-                  aria-pressed={hasIep === v}
-                  onClick={() => setHasIep(v)}
-                >
-                  {t(`iep_${v}`)}
-                </Button>
-              ))}
+          {hasError ? (
+            <div className="mb-3">
+              <Banner
+                tone="danger"
+                description="Please enter your learner's first name to continue."
+              />
             </div>
-          </fieldset>
+          ) : null}
+          <form id="onboarding-learner-form" action={createOnboardingLearnerAction} noValidate>
+            <input type="hidden" name="hasIep" value={hasIep ?? ""} />
+            <div className="flex flex-col gap-4">
+              <AuthInput
+                id="learner-first"
+                name="firstName"
+                label={t("first_name_label")}
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder={t("first_name_placeholder")}
+                autoComplete="off"
+                required
+              />
+              <div className="flex flex-col gap-1.5">
+                <label
+                  htmlFor="grade"
+                  className="text-sm font-medium text-iw-text-strong"
+                >
+                  {t("grade_band_label")}
+                </label>
+                <select
+                  id="grade"
+                  name="grade"
+                  value={grade}
+                  onChange={(e) => setGrade(e.target.value)}
+                  className="h-12 px-3 rounded-iw-control bg-white border border-iw-border text-base text-iw-text-strong focus:border-[var(--aivo-sensory-primary)] focus:ring-2 focus:ring-[var(--aivo-sensory-primary)]/20 outline-none"
+                >
+                  <option value="" disabled>
+                    {t("grade_band_placeholder")}
+                  </option>
+                  {GRADE_BANDS.map((b) => (
+                    <option key={b} value={b}>
+                      {b}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-iw-text-muted">
+                  {t("grade_band_help")}
+                </p>
+              </div>
+
+              <fieldset className="flex flex-col gap-2">
+                <legend className="text-sm font-medium text-iw-text-strong">
+                  {t("iep_legend")}
+                </legend>
+                <p className="text-xs text-iw-text-muted">
+                  {t("iep_help")}
+                </p>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {(["yes", "no", "unsure"] as const).map((v) => (
+                    <Button
+                      key={v}
+                      type="button"
+                      size="sm"
+                      variant={hasIep === v ? "default" : "outline"}
+                      aria-pressed={hasIep === v}
+                      onClick={() => setHasIep(v)}
+                    >
+                      {t(`iep_${v}`)}
+                    </Button>
+                  ))}
+                </div>
+              </fieldset>
+            </div>
+          </form>
         </AuthCard>
       </div>
     </AuthShell>
