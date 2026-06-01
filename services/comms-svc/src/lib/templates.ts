@@ -67,6 +67,8 @@ export function renderTemplate(
       return renderDistrictAdminInvite(data);
     case "school_admin_invite":
       return renderSchoolAdminInvite(data);
+    case "teacher_invite":
+      return renderTeacherInvite(data);
     case "staff_credentials":
       return renderStaffCredentials(data);
     case "teacher_invite_parent":
@@ -289,6 +291,24 @@ function renderSchoolAdminInvite(data: TemplateData) {
     subject: `You're invited to administer ${schoolName} on AIVO Learning`,
     html,
     text: `You've been invited as a school administrator for ${schoolName} on AIVO Learning. Accept your invitation here: ${inviteUrl}\n\nThis link expires in 72 hours.`,
+  };
+}
+
+function renderTeacherInvite(data: TemplateData) {
+  const name = (data.name as string) || "there";
+  const schoolName = (data.schoolName as string) || "your school";
+  const inviteUrl = (data.inviteUrl as string) || "#";
+  const html = baseLayout(`
+    <h1 class="title">You've been invited to teach on AIVO Learning</h1>
+    <p class="body-text">Hi ${name},</p>
+    <p class="body-text">You've been invited to join <span class="highlight">${schoolName}</span> on AIVO Learning as a teacher. You'll be able to manage your classes, lesson plans, and learners.</p>
+    <p style="text-align:center"><a href="${inviteUrl}" class="btn">Accept Invitation</a></p>
+    <p class="body-text" style="font-size:13px;color:#6b7280">This invitation expires in 72 hours. After accepting, you'll be asked to set a password. If you weren't expecting this, you can safely ignore this email.</p>
+  `);
+  return {
+    subject: `You're invited to teach at ${schoolName} on AIVO Learning`,
+    html,
+    text: `You've been invited to join ${schoolName} on AIVO Learning as a teacher. Accept your invitation here: ${inviteUrl}\n\nThis link expires in 72 hours.`,
   };
 }
 
@@ -562,6 +582,7 @@ export const AVAILABLE_TEMPLATES = [
   { id: "mfa_code", name: "MFA Verification Code", channels: ["email"] },
   { id: "district_admin_invite", name: "District Admin Invite", channels: ["email"] },
   { id: "school_admin_invite", name: "School Admin Invite", channels: ["email"] },
+  { id: "teacher_invite", name: "Teacher Invite", channels: ["email"] },
   { id: "staff_credentials", name: "Staff Credentials (Temp Password)", channels: ["email"] },
   { id: "teacher_invite_parent", name: "Teacher → Parent Invite", channels: ["email"] },
   { id: "iep_in_review_parent", name: "IEP — In Review (Parent)", channels: ["email"] },

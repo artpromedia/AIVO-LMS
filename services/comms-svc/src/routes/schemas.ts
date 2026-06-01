@@ -248,6 +248,10 @@ export const internalSchoolAdminInviteSchema = internalSchema(
   "internalSendSchoolAdminInvite",
   "Internal: send a school-admin invite email",
 );
+export const internalTeacherInviteSchema = internalSchema(
+  "internalSendTeacherInvite",
+  "Internal: send a teacher invite email",
+);
 export const internalStaffCredentialsSchema = internalSchema(
   "internalSendStaffCredentials",
   "Internal: send a staff temp-password welcome email",

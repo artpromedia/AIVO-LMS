@@ -481,6 +481,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         role: user.role,
         email: user.email!,
         name: user.name,
+        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
       });
 
       const rawRefreshToken = crypto.randomUUID();
@@ -606,6 +607,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         role: user.role,
         email: user.email!,
         name: user.name,
+        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
       });
 
       const rawRefreshToken = crypto.randomUUID();
@@ -749,6 +751,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         role: user.role,
         email: user.email!,
         name: user.name,
+        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
       });
 
       const rawRefreshToken = crypto.randomUUID();
@@ -864,6 +867,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         role: user.role,
         email: user.email!,
         name: user.name,
+        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
       });
 
       const rawRefreshToken = crypto.randomUUID();
@@ -1010,6 +1014,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         role: user.role,
         email: user.email!,
         name: user.name,
+        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
       });
 
       const rawRefreshToken = crypto.randomUUID();
@@ -1194,6 +1199,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         role: user.role,
         email: user.email || undefined,
         name: user.name,
+        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
       });
 
       return {
@@ -2055,6 +2061,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         role: user.role,
         email: user.email!,
         name: user.name,
+        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
       });
 
       const rawRefreshToken = crypto.randomUUID();
@@ -2899,6 +2906,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         role: user.role,
         email: user.email!,
         name: user.name,
+        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
       });
       const rawRefreshToken = crypto.randomUUID();
       const ttlMs = refreshTtlMs(user.role);
