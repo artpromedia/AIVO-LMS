@@ -17,38 +17,20 @@
  * and trusted partners. We do not yet support implicit, hybrid, or
  * client-credentials flows.
  *
- * NOTE: This file scaffolds the protocol surface. The auth-code store is
- * in-memory (Map keyed by code) which is sufficient for a single replica
- * but should move to Redis before multi-replica rollout. The current
- * single-replica deployment of identity-svc keeps this safe; the TODO
- * below tracks the upgrade.
+ * Phase 2 (multi-replica): the auth-code / access-token / refresh-token
+ * stores are now backed by Postgres (see services/oidc-store.ts), so grants
+ * issued on one replica are redeemable on any other and survive rolling
+ * deploys. Only hashes are persisted.
  */
 import type { FastifyInstance } from "fastify";
-import { eq, and, sql, desc } from "drizzle-orm";
-import { createHash, randomBytes, randomUUID } from "node:crypto";
+import { eq, desc } from "drizzle-orm";
+import { createHash, randomBytes } from "node:crypto";
 import * as jose from "jose";
 import { oidcSigningKeys, users } from "@aivo/db";
+import { OidcStore } from "../services/oidc-store.js";
 
-interface AuthCodeRecord {
-  code: string;
-  clientId: string;
-  redirectUri: string;
-  scope: string;
-  userId: string;
-  codeChallenge: string;
-  codeChallengeMethod: "S256";
-  expiresAt: number;
-  nonce?: string;
-}
-
-// TODO(sprint-13): move to Redis with TTL so multi-replica deployments
-// don't lose codes when the load balancer rotates the request handler.
-const authCodeStore = new Map<string, AuthCodeRecord>();
-const refreshTokenStore = new Map<string, { userId: string; clientId: string; scope: string }>();
-const accessTokenStore = new Map<
-  string,
-  { userId: string; clientId: string; scope: string; expiresAt: number }
->();
+const AUTH_CODE_TTL_MS = 60_000;
+const ACCESS_TOKEN_TTL_MS = 3600_000;
 
 function publicBaseUrl(req: any): string {
   if (process.env.OIDC_ISSUER) return process.env.OIDC_ISSUER.replace(/\/$/, "");
@@ -91,6 +73,7 @@ function sha256b64url(input: string): string {
 
 export async function registerOidcProviderRoutes(app: FastifyInstance) {
   const db = (app as any).db;
+  const store = new OidcStore(db);
 
   // Discovery
   app.get("/.well-known/openid-configuration", async (req: any, reply) => {
@@ -154,17 +137,18 @@ export async function registerOidcProviderRoutes(app: FastifyInstance) {
       return reply.redirect(`/login?next=${next}`);
     }
     const code = randomBytes(32).toString("base64url");
-    authCodeStore.set(code, {
+    await store.saveAuthCode(
       code,
-      clientId: client_id,
-      redirectUri: redirect_uri,
-      scope,
-      userId: sessionUserId,
-      codeChallenge: code_challenge,
-      codeChallengeMethod: "S256",
-      expiresAt: Date.now() + 60_000,
-      nonce,
-    });
+      {
+        clientId: client_id,
+        redirectUri: redirect_uri,
+        scope,
+        userId: sessionUserId,
+        codeChallenge: code_challenge,
+        nonce,
+      },
+      AUTH_CODE_TTL_MS,
+    );
     const sep = redirect_uri.includes("?") ? "&" : "?";
     const stateParam = state ? `&state=${encodeURIComponent(state)}` : "";
     return reply.redirect(`${redirect_uri}${sep}code=${encodeURIComponent(code)}${stateParam}`);
@@ -179,11 +163,10 @@ export async function registerOidcProviderRoutes(app: FastifyInstance) {
     const privateKey = await jose.importJWK(jwk, "RS256");
 
     if (grantType === "authorization_code") {
-      const rec = authCodeStore.get(body.code || "");
-      if (!rec || rec.expiresAt < Date.now()) {
+      const rec = await store.takeAuthCode(body.code || "");
+      if (!rec || rec.expired) {
         return reply.code(400).send({ error: "invalid_grant" });
       }
-      authCodeStore.delete(rec.code);
       if (rec.clientId !== body.client_id || rec.redirectUri !== body.redirect_uri) {
         return reply.code(400).send({ error: "invalid_grant" });
       }
@@ -209,13 +192,12 @@ export async function registerOidcProviderRoutes(app: FastifyInstance) {
         .sign(privateKey);
       const accessToken = randomBytes(32).toString("base64url");
       const refreshToken = randomBytes(32).toString("base64url");
-      accessTokenStore.set(accessToken, {
-        userId: user.id,
-        clientId: rec.clientId,
-        scope: rec.scope,
-        expiresAt: Date.now() + 3600_000,
-      });
-      refreshTokenStore.set(refreshToken, {
+      await store.saveAccessToken(
+        accessToken,
+        { userId: user.id, clientId: rec.clientId, scope: rec.scope },
+        ACCESS_TOKEN_TTL_MS,
+      );
+      await store.saveRefreshToken(refreshToken, {
         userId: user.id,
         clientId: rec.clientId,
         scope: rec.scope,
@@ -231,15 +213,14 @@ export async function registerOidcProviderRoutes(app: FastifyInstance) {
     }
 
     if (grantType === "refresh_token") {
-      const rec = refreshTokenStore.get(body.refresh_token || "");
+      const rec = await store.getRefreshToken(body.refresh_token || "");
       if (!rec) return reply.code(400).send({ error: "invalid_grant" });
       const accessToken = randomBytes(32).toString("base64url");
-      accessTokenStore.set(accessToken, {
-        userId: rec.userId,
-        clientId: rec.clientId,
-        scope: rec.scope,
-        expiresAt: Date.now() + 3600_000,
-      });
+      await store.saveAccessToken(
+        accessToken,
+        { userId: rec.userId, clientId: rec.clientId, scope: rec.scope },
+        ACCESS_TOKEN_TTL_MS,
+      );
       return reply.send({
         access_token: accessToken,
         token_type: "Bearer",
@@ -259,8 +240,8 @@ export async function registerOidcProviderRoutes(app: FastifyInstance) {
       return reply.code(401).send({ error: "invalid_token" });
     }
     const token = auth.slice(7);
-    const rec = accessTokenStore.get(token);
-    if (!rec || rec.expiresAt < Date.now()) {
+    const rec = await store.getAccessToken(token);
+    if (!rec) {
       return reply.code(401).send({ error: "invalid_token" });
     }
     const [user] = await db.select().from(users).where(eq(users.id, rec.userId)).limit(1);
@@ -292,9 +273,4 @@ export async function registerOidcProviderRoutes(app: FastifyInstance) {
     const fresh = await ensureActiveSigningKey(db);
     reply.send({ ok: true, kid: fresh.kid });
   });
-
-  // Internal sanity: make eq + and + sql imports used to satisfy strict
-  // tree-shaking when these clauses are conditionally exercised.
-  void and;
-  void sql;
 }

@@ -320,3 +320,19 @@ Worked on branch `claude/gifted-heisenberg-V9YJm`. Approach chosen: **real-auth 
 _Still open in Phase 0:_ `recommendation-svc` (and the `/api/comms/push` user-addressed stub) have no real
 backend at all — they need a build-out (Phase 2/3), not a guard. The build-verified guards above are the
 high-value fail-fast items.
+
+### Phase 2 — multi-replica: OIDC store moved to Postgres
+
+The identity-svc OIDC provider kept its auth codes, access tokens, and refresh tokens in process-local
+`Map`s — the single hard multi-replica blocker (a code issued on one pod couldn't be redeemed on another,
+and rolling deploys dropped every in-flight grant). Decision: **Postgres**, not Redis — the repo has no
+Redis client/infra anywhere, while Postgres is already provisioned and is how sessions/reset-tokens are
+already stored.
+
+- New migration `0051_oidc_grants.sql` (+ schema `oidc_grants.ts`, journal entry) adds `oidc_auth_codes`,
+  `oidc_access_tokens`, `oidc_refresh_tokens`. Only **SHA-256 hashes** of codes/tokens are stored (never
+  raw values), matching `sessions.refresh_token` / `password_reset_tokens`.
+- New `services/oidc-store.ts` (`OidcStore`) provides single-use auth-code redemption (row deleted before
+  PKCE check, so a code can't be replayed), token round-trips, and expiry; `oidc-provider.ts` now uses it.
+  Build-verified (`tsc`) and lint-clean; DB-backed tests added. Schema-drift check passes for the new
+  tables. Operators get multi-replica identity-svc with no new infrastructure to run.
