@@ -257,3 +257,41 @@ identity-svc deployed; Server-Actions encryption key stable; OIDC codes in Redis
 screenshots uploaded, privacy/data-safety forms backed by a real inventory, `eas submit` credentials
 configured, prod `EXPO_PUBLIC_API_URL` baked in, and the web pilot backend (which the app depends on) is
 live.
+
+---
+
+## 9. Phase 1 implementation log (admin creation flows)
+
+Worked on branch `claude/gifted-heisenberg-V9YJm`. Approach chosen: **real-auth with demo fallback**
+(dual-mode), teachers onboarded via **email invite + set-password** (no out-of-band temp passwords).
+
+**DONE**
+- **Invite-acceptance keystone (the universally-missing piece).** `identity-svc`
+  `GET /api/auth/invite/:token` + `POST /api/auth/accept-invite`: validates the hashed token, enforces
+  password policy, creates the `users` row (role + school from the invite), marks the invite accepted
+  (`acceptedAt` + `acceptedUserId`), audit-logs, and auto-logs the user in. Works for DISTRICT_ADMIN,
+  SCHOOL_ADMIN, and TEACHER. DB-backed tests added. _Previously even the real backend had no production
+  route to consume an invite token — this unblocks every staff invite._
+- **Web acceptance flow.** `/accept-invite?token=…` now previews the invite and shows a real "set your
+  password" form (BFF helpers `identityInvitePreview` / `identityAcceptInvite`), persists the session
+  (auto-login), and redirects to the role home. Learner care-team flow unchanged.
+- **School-admin → teacher (requirement #2 — complete end-to-end).** `identity-svc` `routes/school.ts`
+  (`GET/POST /api/school/teachers` + revoke) guarded by the previously-dead `requireSchoolAdmin`;
+  `comms-svc` `teacher_invite` template + `/api/comms/internal/teacher-invite`; web invite form on
+  `admin/school/staff` (was read-only). Dual-mode: real identity-svc call when an access token is
+  present, in-memory demo fallback otherwise.
+- **`schoolId` login claim.** Every access-token mint (login, MFA-verify, refresh, register) now carries
+  `schoolId` when present — required so SCHOOL_ADMIN tokens satisfy `requireSchoolAdmin` (no login path
+  carried it before, so school admins could not use school-scoped endpoints at all).
+
+**REMAINING (district → school-admin UI wiring)**
+- The backend for district→school-admin invites is complete (`POST /api/district/admins`) and acceptance
+  now works. The **district staff console UI** still writes to the in-memory `staff-invites` store and is
+  not yet wired to that endpoint, because its school dropdown is sourced from the demo "school-as-tenant"
+  model (`tenants.filter(type === "school")`), not real identity-svc school UUIDs. Wiring it to real-auth
+  requires **sourcing real schools** (tenant-svc / identity-svc) into the console first — a scoped
+  follow-up, deliberately deferred under the dual-mode decision. (The school-admin teacher console does
+  not need this because it derives the school from the admin's token.)
+- Also outstanding from §2: remove the plaintext temp-password panel from the district console once it's
+  on real-auth; step-up (`requireStepUp`) is flag-gated off by default, so it is not a blocker for the
+  default pilot config but must be handled when `STEP_UP_AUTH` is enabled.
