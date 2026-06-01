@@ -95,7 +95,7 @@ flips the default; "Code gap" = a flag won't fix it.
 17. **[Blocker] Speech Buddy Layer-3 safety judge is a keyword stub.**
     `services/ai-svc/src/ai_svc/speech_buddy/safety.py:207` `_default_judge`
     is the production default (`orchestrator_impl.py:124`); real LLM
-    moderation is never wired.
+    moderation is never wired. → **Fixed in this pass (see Changelog).**
 18. **[Blocker] Speech Buddy consent store is env-var-only.**
     `services/family-svc/src/routes/speech-buddy-consent.ts` reads
     `SPEECH_BUDDY_DEV_CONSENTS`; no DB store or parent UI. In prod with no
@@ -208,3 +208,49 @@ webhook (already real and e2e-proven), which then drives entitlements.
 Verified: web-v2 `typecheck` clean, `eslint --max-warnings=0` clean on
 changed files, `prod:check` passes. Banner copy is English-only pending an
 i18n pass.
+
+## Changelog — Phase 1: Speech Buddy real LLM safety judge (#17)
+
+The child-facing Speech Buddy's Layer-3 safety judge was a hardcoded
+keyword stub (`_default_judge`) that only caught a few literal phrases and
+was the production default — the real LLM moderation was never wired.
+
+Added a real LLM judge without touching the synchronous filter contract or
+its red-team tests (the deterministic regex + keyword layers remain the
+always-on guarantee):
+
+- `services/ai-svc/src/ai_svc/speech_buddy/llm_judge.py` (new) —
+  `llm_judge_classify` calls the existing `llm_gateway.generate_completion`
+  (Haiku-first chain, JSON output, temp 0) with a conservative child-safety
+  classification prompt over the canonical categories. It **fails open**
+  (returns `None`) on any model/parse error and applies **no per-tenant
+  budget cap** (safety must never be denied for spend). `get_default_async_judge`
+  enables it only when `SPEECH_BUDDY_JUDGE_PROVIDER=llm`.
+- `services/ai-svc/src/ai_svc/speech_buddy/safety.py` — added an optional
+  `async_judge` and a new `async check_async()` that runs the same
+  deterministic layers 1+2, then awaits the real LLM judge as layer 3 (or
+  falls back to the sync stub when no async judge is configured). The sync
+  `check()` and all its tests are unchanged.
+- `services/ai-svc/src/ai_svc/speech_buddy/orchestrator_impl.py` — the
+  default filter is now built with `get_default_async_judge()`, and the two
+  child-input / buddy-output checks call `await check_async(...)`.
+- `services/ai-svc/tests/test_speech_buddy_llm_judge.py` (new) — 13 tests
+  covering routing, regex short-circuit, fail-open, gateway JSON parsing,
+  unknown-category rejection, and env gating (faked gateway, no `litellm`
+  dependency).
+
+Gating: the LLM judge is OFF by default (`SPEECH_BUDDY_JUDGE_PROVIDER`
+unset → deterministic stub), so the offline red-team suite and all existing
+speech_buddy tests pass unchanged (38 green locally). Production sets
+`SPEECH_BUDDY_JUDGE_PROVIDER=llm`.
+
+### Remaining child-safety follow-up — #18 (consent store + parent UI)
+
+`services/family-svc/src/routes/speech-buddy-consent.ts` still verifies
+consent from an env allow-list (`SPEECH_BUDDY_DEV_CONSENTS`). The wire
+format is final; the next pass should: (a) add a `speech_buddy_consents`
+table + migration in `packages/db`, (b) replace `devLookup` with a real
+tenant/learner/age-band lookup, and (c) add a parent grant/revoke UI
+(web `/parent/.../speech-buddy` + mobile parity). This gates the feature in
+production (no env var ⇒ every consent check 404s), so it should land
+before Speech Buddy is enabled.

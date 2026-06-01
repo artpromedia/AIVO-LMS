@@ -28,6 +28,7 @@ from typing import Any, Optional
 from .encryption import EncryptedTranscript, encrypt_transcript
 from .events import EventEmitter, hash_learner_id
 from .safety import HARD_CATEGORIES, SafetyDecision, SafetyFilter
+from .llm_judge import get_default_async_judge
 from .stt import STTAdapter, get_default_stt
 from .tools_impl import DefaultToolset
 from .tracing import trace_span
@@ -121,7 +122,10 @@ class DefaultOrchestrator:
         self.tts = tts or get_default_tts()
         self.toolset = toolset or DefaultToolset()
         self.emitter = emitter or EventEmitter()
-        self.safety = safety or SafetyFilter()
+        # A caller-supplied filter (tests) is used verbatim. Otherwise build
+        # the default filter and wire the real LLM judge when
+        # SPEECH_BUDDY_JUDGE_PROVIDER=llm (else None → deterministic stub).
+        self.safety = safety or SafetyFilter(async_judge=get_default_async_judge())
         self.transcript_store = transcript_store or get_default_store()
         self.max_roleplay_turns = max_roleplay_turns
         self._sessions: dict[str, _SessionRecord] = {}
@@ -228,7 +232,7 @@ class DefaultOrchestrator:
 
         # ---- safety on child_input ----------------------------------------
         with trace_span("safety_in", correlation_id, source="child_input") as span_safety_in:
-            in_decision = self.safety.check(
+            in_decision = await self.safety.check_async(
                 child_text,
                 source="child_input",
                 locale=rec.session.locale,
@@ -253,7 +257,7 @@ class DefaultOrchestrator:
 
         # ---- safety on buddy_output ---------------------------------------
         with trace_span("safety_out", correlation_id, source="buddy_output") as span_safety_out:
-            out_decision = self.safety.check(
+            out_decision = await self.safety.check_async(
                 buddy_text,
                 source="buddy_output",
                 locale=rec.session.locale,

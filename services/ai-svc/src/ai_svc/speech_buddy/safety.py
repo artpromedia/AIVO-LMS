@@ -23,7 +23,7 @@ import re
 import time
 import uuid
 from dataclasses import dataclass
-from typing import Callable, Optional
+from typing import Awaitable, Callable, Optional
 
 from .types import SafetyFlag, SafetyFlagCategory, SafetyFlagSeverity
 
@@ -202,6 +202,10 @@ def _default_classifier(text: str) -> Optional[SafetyFlagCategory]:
 # ---------------------------------------------------------------------------
 
 JudgeFn = Callable[[str, str], Optional[SafetyFlagCategory]]
+AsyncJudgeFn = Callable[[str, str], Awaitable[Optional[SafetyFlagCategory]]]
+"""Async layer-3 judge (real LLM). See ``llm_judge.py``. Used by
+``SafetyFilter.check_async``; the sync ``JudgeFn`` stub remains the offline
+default for ``check``."""
 
 
 def _default_judge(text: str, source: str) -> Optional[SafetyFlagCategory]:
@@ -244,10 +248,14 @@ class SafetyFilter:
         *,
         classifier: ClassifierFn = _default_classifier,
         judge: JudgeFn = _default_judge,
+        async_judge: Optional[AsyncJudgeFn] = None,
         emit: Optional[Callable[[SafetyFlag, str], None]] = None,
     ) -> None:
         self._classifier = classifier
         self._judge = judge
+        # When set, ``check_async`` awaits this real LLM judge for layer 3
+        # instead of the sync stub. ``None`` preserves the offline default.
+        self._async_judge = async_judge
         self._emit = emit
 
     def set_classifier(self, fn: ClassifierFn) -> None:
@@ -255,6 +263,9 @@ class SafetyFilter:
 
     def set_judge(self, fn: JudgeFn) -> None:
         self._judge = fn
+
+    def set_async_judge(self, fn: Optional[AsyncJudgeFn]) -> None:
+        self._async_judge = fn
 
     def set_emit(self, fn: Callable[[SafetyFlag, str], None]) -> None:
         self._emit = fn
@@ -293,6 +304,73 @@ class SafetyFilter:
             return self._flag(judge_hit, "llm_judge", source, locale, cid, session_id, latencies)
 
         # Clean — log the allow with correlation id only (no transcript text).
+        logger.info(
+            "speech_buddy.safety.allow",
+            extra={
+                "correlation_id": cid,
+                "session_id": session_id,
+                "source": source,
+                "layer_latency_ms": latencies,
+            },
+        )
+        return SafetyDecision(
+            allowed=True,
+            flag=None,
+            routed_text=None,
+            layer_latency_ms=latencies,
+        )
+
+    async def check_async(
+        self,
+        text: str,
+        *,
+        source: str,                # "child_input" | "buddy_output"
+        locale: str = "en",
+        correlation_id: Optional[str] = None,
+        session_id: str = "",
+    ) -> SafetyDecision:
+        """Async variant of :meth:`check`.
+
+        Identical deterministic layers 1+2, but layer 3 awaits the real LLM
+        judge when one is configured (``async_judge`` / ``SafetyFilter`` built
+        with ``get_default_async_judge``). With no async judge it falls back
+        to the sync stub, so behaviour matches :meth:`check` exactly — which
+        is the default in tests and when ``SPEECH_BUDDY_JUDGE_PROVIDER`` is
+        unset.
+        """
+        cid = correlation_id or uuid.uuid4().hex
+        latencies: dict[str, float] = {}
+
+        # --- layer 1: regex ---------------------------------------------------
+        t0 = time.perf_counter()
+        regex_hit = self._regex_check(text)
+        latencies["regex"] = (time.perf_counter() - t0) * 1000.0
+        if regex_hit is not None:
+            return self._flag(regex_hit, "regex", source, locale, cid, session_id, latencies)
+
+        # --- layer 2: classifier ---------------------------------------------
+        t0 = time.perf_counter()
+        classifier_hit = self._classifier(text)
+        latencies["classifier"] = (time.perf_counter() - t0) * 1000.0
+        if classifier_hit is not None:
+            return self._flag(classifier_hit, "classifier", source, locale, cid, session_id, latencies)
+
+        # --- layer 3: LLM judge (async if configured, else sync stub) --------
+        t0 = time.perf_counter()
+        if self._async_judge is not None:
+            try:
+                judge_hit = await self._async_judge(text, source)
+            except Exception:
+                # Never let a judge error break the safety path — layers 1+2
+                # already passed, so fail open and let the turn proceed.
+                logger.exception("speech_buddy.safety.async_judge_failed")
+                judge_hit = None
+        else:
+            judge_hit = self._judge(text, source)
+        latencies["llm_judge"] = (time.perf_counter() - t0) * 1000.0
+        if judge_hit is not None:
+            return self._flag(judge_hit, "llm_judge", source, locale, cid, session_id, latencies)
+
         logger.info(
             "speech_buddy.safety.allow",
             extra={
@@ -373,6 +451,7 @@ def _iso_now() -> str:
 
 
 __all__ = [
+    "AsyncJudgeFn",
     "ClassifierFn",
     "CRISIS_SCRIPT_EN",
     "CRISIS_SCRIPT_ES",
