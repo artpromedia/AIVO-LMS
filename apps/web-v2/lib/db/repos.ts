@@ -1525,9 +1525,9 @@ import type {
 import {
   generateLessonPlanWithRetry,
   LESSON_PLAN_SCHEMA_VERSION,
-  MockTutorProvider,
   type TutorProvider,
 } from "@/lib/ai/tutor";
+import { getTutorProvider } from "@/lib/ai/anthropic-tutor";
 
 function buildAccommodationSnapshotFrom(
   state: LearnerBrainProfileState,
@@ -1622,7 +1622,7 @@ export type CreateLessonRunResult =
  */
 export async function createLessonRun(
   input: CreateLessonRunInput,
-  provider: TutorProvider = MockTutorProvider,
+  provider: TutorProvider = getTutorProvider(),
 ): Promise<CreateLessonRunResult> {
   const store = db();
   const learner = await getLearner(input.learnerId, input.tenantId);
@@ -2273,7 +2273,7 @@ export async function getParentLessonSummaryForRun(
 export async function retryLessonRun(
   lessonRunId: string,
   tenantId: string,
-  provider: TutorProvider = MockTutorProvider,
+  provider: TutorProvider = getTutorProvider(),
 ): Promise<{
   ok: boolean;
   code?: "not_retryable" | "generation_failed";

@@ -76,6 +76,11 @@
         "AI_PROVIDER": { "notOneOf": ["mock"] },
         "AIVO_PERSISTENCE": { "equals": "postgres" },
         "TTS_PROVIDER": { "oneOf": ["mock", "production"] }
+      },
+      "conditional": {
+        "ANTHROPIC_API_KEY": "required when AI_PROVIDER=anthropic (lib/ai/anthropic-tutor.ts)",
+        "OPENAI_API_KEY": "required when AI_PROVIDER=openai",
+        "GOOGLE_API_KEY": "required when AI_PROVIDER=google"
       }
     },
     "speech-eval-svc": {

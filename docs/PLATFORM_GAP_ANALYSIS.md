@@ -321,6 +321,29 @@ _Still open in Phase 0:_ `recommendation-svc` (and the `/api/comms/push` user-ad
 backend at all — they need a build-out (Phase 2/3), not a guard. The build-verified guards above are the
 high-value fail-fast items.
 
+### Provider adapter — real AI tutor (Claude), behind the gate
+
+First application of the "contract → real adapter → secret → conformance test" pattern for the mock
+providers. The AI tutor now has a real Anthropic Claude implementation, not just the deterministic mock:
+
+- `apps/web-v2/lib/ai/anthropic-tutor.ts` — `AnthropicTutorProvider` implements the existing
+  `TutorProvider` contract (Claude `claude-opus-4-8`, adaptive thinking, a cached system prefix with the
+  volatile per-learner inputs after the cache breakpoint). It returns raw JSON into the existing
+  `generateLessonPlanWithRetry` harness, which validates against `GeneratedLessonPlanSchema`, repairs/
+  retries, and falls back to the deterministic plan — so a misbehaving model degrades safely instead of
+  shipping a bad lesson. `getTutorProvider()` selects it when `AI_PROVIDER=anthropic` + a key is present;
+  `repos.ts` call sites default to it. The client is injectable for tests.
+- Gate: `AI_PROVIDER` already has a value gate (`notOneOf: ["mock"]`); `ANTHROPIC_API_KEY` (and
+  `OPENAI_API_KEY`/`GOOGLE_API_KEY`) are now registered as conditional secrets in the web-v2 manifest
+  group.
+- Verified: `web-v2` typecheck (0 errors), eslint clean on the new files, 4 unit tests pass against a
+  mocked client (request shape, harness happy-path, fenced-JSON tolerance, garbage→fallback). A live
+  conformance test runs against the real API only when `ANTHROPIC_API_KEY` is set (skipped otherwise).
+
+_Remaining adapters_ (OpenAI TTS, user-addressed push delivery) follow the same pattern and slot behind
+their existing value gates / conditional secrets when their credentials + (for TTS) audio object-storage
+are wired.
+
 ### Phase 2 — multi-replica: OIDC store moved to Postgres
 
 The identity-svc OIDC provider kept its auth codes, access tokens, and refresh tokens in process-local

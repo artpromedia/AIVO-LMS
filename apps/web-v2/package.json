@@ -27,6 +27,7 @@
     "@aivo/nav": "workspace:*",
     "@aivo/security": "workspace:*",
     "@aivo/ui": "workspace:*",
+    "@anthropic-ai/sdk": "^0.100.1",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-avatar": "^1.1.2",
     "@radix-ui/react-checkbox": "^1.1.3",
