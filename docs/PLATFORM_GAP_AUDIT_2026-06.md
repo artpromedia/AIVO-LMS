@@ -42,7 +42,10 @@ flips the default; "Code gap" = a flag won't fix it.
    mock; dev/misconfig means web & mobile are not the same user.
 3. **[Incomplete] PIN-login has no refresh session.** `services/identity-svc/.../auth.ts`
    mints a 2h JWT, inserts no `sessions` row → learner sessions hard-die at
-   2h; mobile refresh-retry fails (no cookie).
+   2h; mobile refresh-retry fails (no cookie). → **Fixed in this pass:
+   pin-login now inserts a `sessions` row + sets the `refreshToken` cookie
+   (role-based TTL) + surface cookie, mirroring login, so the learner
+   session refreshes silently past 2h.**
 4. **[Incomplete] Staff/district roles cannot log in on mobile.**
    `/api/auth/login` 403s `DISTRICT_ADMIN`/staff; mobile only wires
    consumer + google + pin flows.
