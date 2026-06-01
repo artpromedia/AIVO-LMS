@@ -123,6 +123,24 @@ export function useTherapyGoals(learnerId: string) {
   });
 }
 
+/** Create a therapy goal for a learner (therapist/parent/teacher with access). */
+export function useCreateTherapyGoal() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { learnerId: string; goalText: string; domain?: string }) => {
+      const res = await apiFetch(API.FAMILY, "/api/family/therapy-goals", {
+        method: "POST",
+        body: JSON.stringify(input),
+      });
+      if (!res.ok) throw new Error("Failed to create goal");
+      return (await res.json()) as { goal: unknown };
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["therapy-goals"] });
+    },
+  });
+}
+
 // ─────────────── IEP Updates: Timeline / Amendments / Preferences ───────────────
 
 export interface IEPTimelineItem {

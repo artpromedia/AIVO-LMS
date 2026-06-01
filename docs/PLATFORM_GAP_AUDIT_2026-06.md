@@ -91,7 +91,10 @@ flips the default; "Code gap" = a flag won't fix it.
 13. **[Incomplete] Live parent session viewing stub** —
     `(parent)/session/[childId].tsx` empty state only.
 14. **[Incomplete] Therapist "Add goal" unwired** —
-    `(therapist)/client/[id]/goals.tsx:61` dead CTA.
+    `(therapist)/client/[id]/goals.tsx:61` dead CTA. → **Fixed: family-svc
+    `POST /api/family/therapy-goals` (auth + learner-access) + a mobile
+    add-goal modal (`useCreateTherapyGoal`); also fixed a latent
+    `g.progress`→`g.progressPct` render bug.**
 15. **[Incomplete] Offline queue is in-memory** (`apps/mobile/hooks/useOffline.ts`)
     — module array, not the spec'd persistent `expo-sqlite` + `idempotencyKey`
     queue; lost on restart; replayed requests carry no auth header. → **Fixed
@@ -134,7 +137,10 @@ flips the default; "Code gap" = a flag won't fix it.
     (`apps/web-v2/lib/db/repos.ts:5253`).
 25. **[Minor] Dev/demo routes ship in tree** — web `design-system`,
     `surface-preview`, `lesson-player-fixture`; mobile `(shell-demo)`. Mascot
-    art is placeholder SVGs (`packages/brand`).
+    art is placeholder SVGs (`packages/brand`). → **Partially fixed: web
+    middleware now 404s `/design-system`, `/surface-preview`, and the
+    lesson-player fixtures in production. Mobile `(shell-demo)` + mascot art
+    remain.**
 
 ## Changelog — i18n pass (web copy)
 

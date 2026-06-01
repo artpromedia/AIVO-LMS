@@ -336,6 +336,23 @@ export const getTherapyGoalsSchema = {
   response: { 200: passthroughObject },
 } as const;
 
+export const createTherapyGoalSchema = {
+  tags: ["Family"],
+  operationId: "createTherapyGoal",
+  summary: "POST /api/family/therapy-goals",
+  body: {
+    type: "object",
+    required: ["learnerId", "goalText"],
+    additionalProperties: true,
+    properties: {
+      learnerId: { type: "string" },
+      goalText: { type: "string", minLength: 1 },
+      domain: { type: "string" },
+    },
+  },
+  response: { 200: passthroughObject, 400: errorResponse, 401: errorResponse, 403: errorResponse },
+} as const;
+
 export const familyHealthRootSchema = {
   tags: ["Family"],
   operationId: "familyHealthRoot",
