@@ -90,7 +90,10 @@ flips the default; "Code gap" = a flag won't fix it.
     `(therapist)/client/[id]/goals.tsx:61` dead CTA.
 15. **[Incomplete] Offline queue is in-memory** (`apps/mobile/hooks/useOffline.ts`)
     — module array, not the spec'd persistent `expo-sqlite` + `idempotencyKey`
-    queue; lost on restart; replayed requests carry no auth header.
+    queue; lost on restart; replayed requests carry no auth header. → **Fixed
+    in this pass: persistent (AsyncStorage), idempotency-keyed, authed-replay
+    (`apiFetch`), 7-day-stale-dropping queue in `lib/offline-queue.ts` (8
+    tests).**
 16. **[Minor] Hardcoded Google OAuth client ID** — `(auth)/login.tsx:29`.
 
 ### E. Child-safety / AI (high stakes)
