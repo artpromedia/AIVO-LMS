@@ -1,7 +1,14 @@
 import { FastifyRequest, FastifyReply, FastifyInstance } from "fastify";
 import { eq } from "drizzle-orm";
 import { learners, users } from "@aivo/db";
-import { verifyJWT, JWTPayload } from "@aivo/security";
+import {
+  verifyJWT,
+  JWTPayload,
+  checkActiveRole,
+  ACTIVE_ROLE_HEADER,
+  FORBIDDEN_ROLE_CODE,
+  ACTIVE_ROLE_SPOOFING_EVENT,
+} from "@aivo/security";
 
 const INTERNAL_SERVICE_TOKEN = process.env.INTERNAL_SERVICE_TOKEN || "";
 if (process.env.NODE_ENV === "production" && !INTERNAL_SERVICE_TOKEN) {
@@ -40,6 +47,23 @@ export function registerAuthHook(app: FastifyInstance): void {
 
     const auth = await extractAuth(req);
     if (auth?.sub) {
+      // ADR 0020 — x-aivo-active-role is a hint, never a grant. Reject (and
+      // audit) a header naming a role the token does not grant.
+      const activeRole = checkActiveRole(auth.role, req.headers[ACTIVE_ROLE_HEADER]);
+      if (!activeRole.ok) {
+        req.log?.warn?.(
+          {
+            event: ACTIVE_ROLE_SPOOFING_EVENT,
+            userId: auth.sub,
+            tenantId: auth.tenantId,
+            requested: activeRole.requested,
+            granted: activeRole.granted,
+          },
+          "rejected x-aivo-active-role header (token does not grant the requested role)",
+        );
+        reply.code(403).send({ error: "Forbidden role", code: FORBIDDEN_ROLE_CODE });
+        return;
+      }
       req.auth = auth;
       return;
     }

@@ -293,11 +293,18 @@ request, but no service validated it — the documented spoof protection
 
 Safe by construction: real single-role users send their own role, so the
 check never false-rejects; it only catches a client claiming a role its
-token doesn't grant. Reusable across services — billing-svc and the other
-JWT-authenticating services should adopt the same helper (follow-up).
+token doesn't grant.
 
-Verified: `@aivo/security` builds + 53 tests pass; `@aivo/family-svc`
-builds clean.
+**Rollout:** the helper is now wired into the central auth path of the
+consumer-facing services the mobile app hits — `family-svc`,
+`engagement-svc`, `billing-svc` (`requireAuth`), and the shared
+`registerAuthHook` in `learning-svc` and `tutor-svc` (user tokens only;
+service-token calls are unaffected). The remaining JWT services
+(`assessment-svc`, `comms-svc`, `admin-svc`) follow the same one-line
+pattern.
+
+Verified: `@aivo/security` builds + 53 tests pass; `family-svc`,
+`engagement-svc`, `billing-svc`, `learning-svc`, `tutor-svc` build clean.
 
 ### #18 parent UI (web + mobile)
 

@@ -1,6 +1,13 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import { and, desc, eq } from "drizzle-orm";
-import { verifyJWT, type JWTPayload } from "@aivo/security";
+import {
+  verifyJWT,
+  type JWTPayload,
+  checkActiveRole,
+  ACTIVE_ROLE_HEADER,
+  FORBIDDEN_ROLE_CODE,
+  ACTIVE_ROLE_SPOOFING_EVENT,
+} from "@aivo/security";
 import {
   subscriptions,
   tutorSubscriptions,
@@ -61,11 +68,28 @@ async function requireAuth(req: FastifyRequest, reply: FastifyReply) {
   if (!auth?.startsWith("Bearer ")) {
     return reply.status(401).send({ error: "Missing authorization header" });
   }
+  let user: JWTPayload;
   try {
-    (req as any).user = await verifyJWT(auth.slice(7));
+    user = await verifyJWT(auth.slice(7));
   } catch {
     return reply.status(401).send({ error: "Invalid token" });
   }
+  // ADR 0020 — x-aivo-active-role is a hint, never a grant.
+  const activeRole = checkActiveRole(user.role, req.headers[ACTIVE_ROLE_HEADER]);
+  if (!activeRole.ok) {
+    req.log?.warn?.(
+      {
+        event: ACTIVE_ROLE_SPOOFING_EVENT,
+        userId: user.sub,
+        tenantId: user.tenantId,
+        requested: activeRole.requested,
+        granted: activeRole.granted,
+      },
+      "rejected x-aivo-active-role header (token does not grant the requested role)",
+    );
+    return reply.status(403).send({ error: "Forbidden role", code: FORBIDDEN_ROLE_CODE });
+  }
+  (req as any).user = user;
 }
 
 function ensureTenantAccess(user: JWTPayload, tenantId: string, reply: FastifyReply): boolean {

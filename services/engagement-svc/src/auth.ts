@@ -1,5 +1,12 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { verifyJWT, initKeys } from "@aivo/security";
+import {
+  verifyJWT,
+  initKeys,
+  checkActiveRole,
+  ACTIVE_ROLE_HEADER,
+  FORBIDDEN_ROLE_CODE,
+  ACTIVE_ROLE_SPOOFING_EVENT,
+} from "@aivo/security";
 
 export interface AuthUser {
   sub: string;
@@ -27,6 +34,23 @@ export async function authenticateRequest(
       initialized = true;
     }
     const payload = await verifyJWT(token);
+    // ADR 0020 — x-aivo-active-role is a hint, never a grant. Reject (and
+    // audit) a header naming a role the token does not grant.
+    const activeRole = checkActiveRole(payload.role || "", request.headers[ACTIVE_ROLE_HEADER]);
+    if (!activeRole.ok) {
+      request.log?.warn?.(
+        {
+          event: ACTIVE_ROLE_SPOOFING_EVENT,
+          userId: payload.sub,
+          tenantId: payload.tenantId,
+          requested: activeRole.requested,
+          granted: activeRole.granted,
+        },
+        "rejected x-aivo-active-role header (token does not grant the requested role)",
+      );
+      reply.status(403).send({ error: "Forbidden role", code: FORBIDDEN_ROLE_CODE });
+      return null;
+    }
     return {
       sub: payload.sub,
       email: payload.email || "",
