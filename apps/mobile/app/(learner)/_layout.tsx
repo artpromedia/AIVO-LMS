@@ -81,13 +81,6 @@ function ThemedLearnerTabs() {
       onPress: () => router.push("/(learner)" as Href),
     },
     {
-      key: "brain",
-      label: t("tabs.brain"),
-      icon: "bulb" as const,
-      active: pathname?.includes("/brain"),
-      onPress: () => router.push("/(learner)/brain" as Href),
-    },
-    {
       key: "homework",
       label: t("learner.homework"),
       icon: "camera" as const,
@@ -149,13 +142,6 @@ function ThemedLearnerTabs() {
           options={{
             title: t("tabs.worldMap"),
             tabBarIcon: ({ color, size }) => <Ionicons name="map" size={size} color={color} />,
-          }}
-        />
-        <Tabs.Screen
-          name="brain"
-          options={{
-            title: t("tabs.brain"),
-            tabBarIcon: ({ color, size }) => <Ionicons name="bulb" size={size} color={color} />,
           }}
         />
         <Tabs.Screen

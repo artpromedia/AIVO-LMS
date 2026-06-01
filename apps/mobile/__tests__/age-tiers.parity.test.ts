@@ -7,11 +7,12 @@
  * both implementations to a single expectation table — if either drifts,
  * the test breaks and we have to fix the divergence intentionally.
  *
- * The web `gradeToTier` is dynamically imported via require() under a
- * try/catch because the mobile vitest project doesn't have web build
- * artifacts wired up. When the web version isn't resolvable we still run
- * the mobile assertions so this test never silently passes — it logs
- * a clear message and only the parity half is skipped.
+ * Both implementations are imported directly from their (pure-TS,
+ * dependency-free) source modules. `@aivo/learner-ui` is not a mobile
+ * dependency, so the web `age-tiers` module is wired in through a
+ * test-only Vite alias (see `vitest.config.ts`) rather than installing
+ * the whole web package — that keeps React-DOM/CSS helpers out of the
+ * RN graph while still running the parity assertions for real.
  */
 import { describe, expect, it } from "vitest";
 // Deep import: pulling from "@aivo/mobile-ui" would transitively pull
@@ -19,6 +20,9 @@ import { describe, expect, it } from "vitest";
 // rollup-based parser chokes on. The age-tier helpers are pure TS and
 // safe to import directly.
 import { gradeToTier as gradeToTierMobile } from "@aivo/mobile-ui/src/tierTheme";
+// Web counterpart, resolved to its source via the test-only alias.
+// eslint-disable-next-line import/no-unresolved -- @aivo/learner-ui is not a mobile dependency; the age-tiers source is wired in via a vitest-only alias (see vitest.config.ts)
+import { gradeToTier as gradeToTierWeb } from "@aivo/learner-ui/src/tokens/age-tiers";
 
 interface Case {
   input: string | number | null | undefined;
@@ -66,33 +70,11 @@ describe("age-tier parity (mobile)", () => {
 });
 
 describe("age-tier parity (web ↔ mobile)", () => {
-  // Web package isn't part of the mobile vitest module graph by default;
-  // we attempt a best-effort dynamic resolution so the parity check runs
-  // whenever the workspace has been built, and we noisily skip otherwise
-  // rather than silently passing.
-  let webGradeToTier: ((g: unknown) => string) | null = null;
-  try {
-    // Use createRequire so vitest's rollup transform doesn't try to
-    // statically analyse the web module graph (the web package pulls
-    // in CSS-var-dependent helpers that don't parse cleanly here).
-    // eslint-disable-next-line @typescript-eslint/no-require-imports -- intentional dynamic resolution for parity test
-    const { createRequire } = require("node:module");
-    const req = createRequire(__filename);
-    const mod = req("@aivo/learner-ui/src/tokens/age-tiers");
-    webGradeToTier = (mod && mod.gradeToTier) || null;
-  } catch {
-    webGradeToTier = null;
-  }
-
   for (const c of CASES) {
-    const label = `web vs mobile agree on gradeToTier(${JSON.stringify(c.input)})`;
-    if (!webGradeToTier) {
-      it.skip(`${label} (web package not resolvable — parity check skipped)`, () => {});
-      continue;
-    }
-    const fn = webGradeToTier;
-    it(label, () => {
-      expect(fn(c.input)).toBe(gradeToTierMobile(c.input));
+    it(`web vs mobile agree on gradeToTier(${JSON.stringify(c.input)})`, () => {
+      // Both must agree with each other *and* with the canonical table.
+      expect(gradeToTierWeb(c.input)).toBe(gradeToTierMobile(c.input));
+      expect(gradeToTierWeb(c.input)).toBe(c.expected);
     });
   }
 });

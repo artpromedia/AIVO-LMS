@@ -447,12 +447,6 @@ export default function StageScreen() {
           onPress: () => router.replace("/(learner)" as Href),
         },
         {
-          key: "brain",
-          label: t("learnerStage.nav.brain"),
-          icon: "bulb",
-          onPress: () => router.replace("/(learner)/brain" as Href),
-        },
-        {
           key: "stats",
           label: t("learnerStage.nav.stats"),
           icon: "trophy",

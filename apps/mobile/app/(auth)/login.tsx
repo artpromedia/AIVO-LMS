@@ -316,7 +316,7 @@ export default function LoginScreen() {
 
           <Pressable
             style={[styles.pinButton, { borderColor: palette.accent }]}
-            onPress={() => router.push("/(auth)/pin")}
+            onPress={() => router.push("/(auth)/learner-login" as Href)}
             accessibilityRole="button"
           >
             <Text style={[styles.pinButtonText, { color: palette.accent }]}>

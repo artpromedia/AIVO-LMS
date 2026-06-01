@@ -127,7 +127,15 @@
     "acceptInviteSuccess": "Vous avez été ajouté à {{count}} équipe(s) d'apprenants. Bienvenue !",
     "acceptInviteNoneFound": "Aucune invitation en attente trouvée pour votre compte. Si vous en attendez une, demandez au parent de renvoyer l'invitation à {{email}}.",
     "acceptInviteContinue": "Accéder à votre tableau de bord",
-    "acceptInviteError": "Une erreur s'est produite : {{message}}"
+    "acceptInviteError": "Une erreur s'est produite : {{message}}",
+    "whoIsLearning": "Qui apprend aujourd'hui ?",
+    "tapYourProfile": "Touchez votre profil, puis saisissez votre code PIN.",
+    "loadingProfiles": "Chargement des profils…",
+    "learner": "Apprenant",
+    "continueAsLearner": "Continuer en tant que {{name}}",
+    "noProfilesYet": "Aucun profil d'apprenant sur cet appareil pour l'instant. Saisissez l'e-mail de votre parent pour continuer.",
+    "enterParentEmailCta": "Utiliser l'e-mail du parent",
+    "signInAsParent": "Se connecter en tant que parent"
   },
   "parent": {
     "greeting": "Bonjour, {{name}}",
@@ -144,7 +152,8 @@
     "iep": "IEP",
     "team": "Équipe",
     "tutorStore": "Boutique de tuteurs",
-    "billing": "Facturation"
+    "billing": "Facturation",
+    "loginAsLearner": "Se connecter en tant qu'apprenant"
   },
   "parentSettings": {
     "title": "Paramètres",

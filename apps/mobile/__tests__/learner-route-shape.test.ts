@@ -39,7 +39,8 @@ describe("mobile (learner) route group", () => {
     const required = [
       "adventure.tsx",
       "badges.tsx",
-      "brain.tsx",
+      // NB: brain.tsx intentionally removed — brain stats now live in the
+      // parent dashboard so the learner interface stays learning-only.
       "challenges.tsx",
       "gamification.tsx",
       "gradebook.tsx",

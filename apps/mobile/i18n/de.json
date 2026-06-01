@@ -127,7 +127,15 @@
     "acceptInviteSuccess": "Du wurdest zu {{count}} Lernteam(s) hinzugefügt. Willkommen!",
     "acceptInviteNoneFound": "Für dein Konto wurden keine ausstehenden Einladungen gefunden. Falls du eine erwartest, bitte die Eltern, die Einladung erneut an {{email}} zu senden.",
     "acceptInviteContinue": "Zum Dashboard wechseln",
-    "acceptInviteError": "Etwas ist schiefgelaufen: {{message}}"
+    "acceptInviteError": "Etwas ist schiefgelaufen: {{message}}",
+    "whoIsLearning": "Wer lernt heute?",
+    "tapYourProfile": "Tippe auf dein Profil und gib dann deine PIN ein.",
+    "loadingProfiles": "Profile werden geladen…",
+    "learner": "Lernende:r",
+    "continueAsLearner": "Weiter als {{name}}",
+    "noProfilesYet": "Noch keine Lernprofile auf diesem Gerät. Gib die E-Mail-Adresse deines Elternteils ein, um fortzufahren.",
+    "enterParentEmailCta": "E-Mail des Elternteils verwenden",
+    "signInAsParent": "Stattdessen als Elternteil anmelden"
   },
   "parent": {
     "greeting": "Hallo, {{name}}",
@@ -144,7 +152,8 @@
     "iep": "IEP",
     "team": "Team",
     "tutorStore": "Tutoren-Store",
-    "billing": "Abrechnung"
+    "billing": "Abrechnung",
+    "loginAsLearner": "Als Lernende:r anmelden"
   },
   "parentSettings": {
     "title": "Einstellungen",

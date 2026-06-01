@@ -127,7 +127,15 @@
     "acceptInviteSuccess": "{{count}}개의 학습자 팀에 추가되었습니다. 환영합니다!",
     "acceptInviteNoneFound": "계정에 보류 중인 초대가 없습니다. 초대를 기대하셨다면 부모님께 {{email}}로 초대를 재전송해 달라고 요청하세요.",
     "acceptInviteContinue": "대시보드로 이동",
-    "acceptInviteError": "오류가 발생했습니다: {{message}}"
+    "acceptInviteError": "오류가 발생했습니다: {{message}}",
+    "whoIsLearning": "오늘은 누가 학습하나요?",
+    "tapYourProfile": "프로필을 탭한 다음 PIN을 입력하세요.",
+    "loadingProfiles": "프로필을 불러오는 중…",
+    "learner": "학습자",
+    "continueAsLearner": "{{name}}(으)로 계속하기",
+    "noProfilesYet": "이 기기에 아직 학습자 프로필이 없습니다. 계속하려면 보호자의 이메일을 입력하세요.",
+    "enterParentEmailCta": "보호자 이메일 사용",
+    "signInAsParent": "대신 보호자로 로그인"
   },
   "parent": {
     "greeting": "안녕하세요, {{name}}",
@@ -144,7 +152,8 @@
     "iep": "IEP",
     "team": "팀",
     "tutorStore": "튜터 스토어",
-    "billing": "결제"
+    "billing": "결제",
+    "loginAsLearner": "학습자로 로그인"
   },
   "parentSettings": {
     "title": "설정",
