@@ -19,6 +19,7 @@ import {
 import { registerAuthRoutes } from "./routes/auth.js";
 import { registerTestHelperRoutes } from "./routes/test-helpers.js";
 import { registerUserRoutes } from "./routes/users.js";
+import { registerUserRoleRoutes } from "./routes/user-roles.js";
 import { registerHealthRoutes } from "./routes/health.js";
 import { registerConsentRoutes } from "./routes/consent.js";
 import { registerCurriculumRoutes } from "./routes/curriculum.js";
@@ -285,6 +286,7 @@ export async function buildApp() {
   await registerHealthRoutes(app);
   await registerAuthRoutes(app);
   await registerUserRoutes(app);
+  await registerUserRoleRoutes(app);
   await registerConsentRoutes(app);
   await registerCurriculumRoutes(app);
   await registerStepUpRoutes(app);

@@ -140,8 +140,15 @@ flips the default; "Code gap" = a flag won't fix it.
     (`family/engagement/billing/learning/tutor`) validate the active-role
     header against the full `availableRoles` set. The mobile client decodes
     `availableRoles` onto `useAuth().user`. What remains is purely the
-    `(app)` shell UI + screen migration (needs device testing) and a product
-    flow that assigns a user a second role.
+    `(app)` shell UI + screen migration (needs device testing) and the
+    write-path now exists too: **identity-svc admin endpoints**
+    (`GET/POST/DELETE /api/admin/users/:userId/roles`) let a
+    SCHOOL/DISTRICT/PLATFORM admin grant/revoke a user's additional roles
+    (tenant-scoped, hash-chained `admin_audit_log` ROLE_GRANTED/REVOKED rows).
+    So a user can now genuinely hold multiple roles end-to-end. The last
+    remaining pieces are the `(app)` shell UI (needs device testing) and a
+    web admin screen to drive the grant/revoke API (the platform-users page
+    is still store-backed, so it needs moving onto the identity-svc path).
 21. **[Minor] Parity matrix drift.** Strict `mobile:parity` fails:
     `/messages`, `/notifications` untracked. The "100% parity" doc only checks
     file existence, not functionality. → **Fixed: both routes tracked;
