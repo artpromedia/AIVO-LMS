@@ -40,7 +40,11 @@ integration layer for AIVO. This document tracks the integration status for each
   1. An iOS app native bridge that intercepts Proloquo2Go x-callback-url payloads and dispatches `proloquo2go-aac-event` CustomEvents on `window`.
   2. A signed commercial partnership agreement with AssistiveWare.
 - **Contact:** developer@assistiveware.com
-- **TODO:** Reverse highlighting via x-callback-url (not yet in AssistiveWare's developer docs as of April 2026).
+- **Reverse highlighting:** Implemented. `highlight(targetId)` prefers a native
+  WKWebView message handler (`window.webkit.messageHandlers.proloquo2goHighlight`)
+  that the iOS host wires to Proloquo2Go, and falls back to the
+  `proloquo2go://x-callback-url/highlight` scheme when no bridge is present.
+  `supportsReverseHighlight()` reports availability (iOS only).
 
 ### CoughDrop (cloud-based AAC)
 

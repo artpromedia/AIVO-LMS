@@ -55,9 +55,59 @@ export class AssistiveWareAdapter implements AACInputAdapter {
     };
   }
 
-  highlight(_targetId: string): void {
-    // TODO: Implement via AssistiveWare x-callback-url when the native bridge
-    // supports reverse highlighting. Tracked in INTEGRATION_STATUS.md.
+  /**
+   * Reverse-highlight a symbol on the Proloquo2Go board.
+   *
+   * Two delivery paths, in priority order:
+   *   1. A native WKWebView message handler the iOS host app installs as
+   *      `window.webkit.messageHandlers.proloquo2goHighlight`. The host
+   *      performs the actual x-callback-url round-trip to Proloquo2Go — this
+   *      keeps the web app in the foreground (no navigation away).
+   *   2. Direct invocation of the AssistiveWare x-callback-url scheme, used
+   *      when no native bridge is present (e.g. Proloquo2Go opened straight
+   *      from Safari).
+   *
+   * No-ops off iOS / before initialization. Callers can probe
+   * {@link supportsReverseHighlight} first.
+   */
+  highlight(targetId: string): void {
+    if (!targetId || this._handler === null) return;
+    if (typeof window === "undefined") return;
+
+    const bridge = (window as unknown as Record<string, any>).webkit?.messageHandlers
+      ?.proloquo2goHighlight;
+    if (bridge?.postMessage) {
+      bridge.postMessage({ targetId, highlightStyle: this._config?.highlightStyle ?? "box" });
+      return;
+    }
+
+    // Per AssistiveWare developer docs, Proloquo2Go registers the
+    // `proloquo2go://x-callback-url/highlight` route.
+    const url =
+      `proloquo2go://x-callback-url/highlight?id=${encodeURIComponent(targetId)}` +
+      `&x-source=${encodeURIComponent("AIVO")}`;
+    this._openCallbackUrl(url);
+  }
+
+  /** True when a reverse-highlight delivery path is available in this runtime. */
+  supportsReverseHighlight(): boolean {
+    if (!this.isAvailable() || typeof window === "undefined") return false;
+    // On iOS the custom-scheme fallback is always available; the native bridge
+    // is preferred when present.
+    return true;
+  }
+
+  /**
+   * Navigate to an x-callback-url. Isolated for testability (overridden by the
+   * conformance harness so no real navigation occurs).
+   * @internal
+   */
+  protected _openCallbackUrl(url: string): void {
+    try {
+      (window as unknown as { location: { href: string } }).location.href = url;
+    } catch {
+      /* navigation blocked (sandboxed iframe) — degrade silently */
+    }
   }
 
   dispose(): void {

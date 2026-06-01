@@ -76,22 +76,22 @@ export const CONNECTORS = [
   {
     id: "schoology",
     name: "Schoology",
-    status: "coming_soon",
+    status: "available",
     category: "lms",
     description: "Roster and class sync via Schoology/PowerSchool Learning.",
     icon: "schoology",
-    features: ["roster_sync", "class_sync"],
+    features: ["roster_sync", "class_sync", "teacher_sync"],
     authType: "oauth2",
     docsUrl: "https://developers.schoology.com",
   },
   {
     id: "powerschool",
     name: "PowerSchool SIS",
-    status: "coming_soon",
+    status: "available",
     category: "sis",
     description: "Direct PowerSchool SIS integration for student demographics and rosters.",
     icon: "powerschool",
-    features: ["roster_sync", "demographics"],
+    features: ["roster_sync", "demographics", "teacher_sync", "section_sync"],
     authType: "oauth2",
     docsUrl: "https://support.powerschool.com",
   },
@@ -646,6 +646,22 @@ async function runSyncInBackground(db: any, connection: any, syncLogId: string) 
         errors.push(...canvasResult.errors);
         break;
 
+      case "schoology":
+        const schoologyResult = await syncSchoology(db, connection, creds);
+        recordsSynced = schoologyResult.synced;
+        recordsFailed = schoologyResult.failed;
+        recordsSkipped = schoologyResult.skipped;
+        errors.push(...schoologyResult.errors);
+        break;
+
+      case "powerschool":
+        const psResult = await syncPowerSchool(db, connection, creds);
+        recordsSynced = psResult.synced;
+        recordsFailed = psResult.failed;
+        recordsSkipped = psResult.skipped;
+        errors.push(...psResult.errors);
+        break;
+
       default:
         errors.push({ message: `No sync handler for connector: ${connection.connectorId}` });
     }
@@ -1118,6 +1134,208 @@ async function syncCanvasLMS(db: any, connection: any, creds: any) {
     }
   } catch (err: any) {
     result.errors.push({ message: `Canvas sync error: ${err.message}` });
+  }
+
+  return result;
+}
+
+type FetchLike = (url: string, init?: any) => Promise<any>;
+
+/**
+ * Schoology roster sync (REST API v1).
+ *
+ * Pulls students, teachers, and sections and maps them into
+ * integration_roster_mappings. `fetchImpl` is injectable for tests; production
+ * uses the global fetch with the connection's OAuth2 access token.
+ *
+ * @see https://developers.schoology.com/api-documentation/rest-api-v1
+ */
+export async function syncSchoology(
+  db: any,
+  connection: any,
+  creds: any,
+  fetchImpl: FetchLike = fetch,
+) {
+  const result = { synced: 0, failed: 0, skipped: 0, errors: [] as any[] };
+  const apiBase = (connection.config as any)?.schoologyApiBase || "https://api.schoology.com/v1";
+  const token = creds.accessToken || creds.apiToken;
+
+  if (!token) {
+    result.errors.push({ message: "Schoology access token missing from credentials." });
+    return result;
+  }
+  const headers = { Authorization: `Bearer ${token}`, Accept: "application/json" };
+
+  const upsert = async (
+    externalId: string,
+    externalType: string,
+    aivoType: string,
+    externalData: Record<string, unknown>,
+  ) => {
+    try {
+      await db
+        .insert(integrationRosterMappings)
+        .values({
+          connectionId: connection.id,
+          externalId,
+          externalType,
+          aivoType,
+          externalData,
+          lastSyncedAt: new Date(),
+        })
+        .onConflictDoNothing();
+      result.synced++;
+    } catch {
+      result.failed++;
+    }
+  };
+
+  try {
+    // Users (students + teachers). Schoology paginates with start/limit and
+    // exposes the role via `role_id`; the `users` collection is under `user`.
+    const usersRes = await fetchImpl(`${apiBase}/users?limit=200`, { headers });
+    if (!usersRes.ok) {
+      result.errors.push({ message: `Schoology users fetch failed: ${usersRes.status}` });
+      return result;
+    }
+    const usersData = (await usersRes.json()) as any;
+    for (const u of usersData.user || []) {
+      const isTeacher = u.role_id != null && String(u.role_id) === String(usersData.teacher_role_id);
+      const type = isTeacher ? "teacher" : "student";
+      await upsert(String(u.uid ?? u.id), type, type === "student" ? "learner" : "teacher", {
+        name: u.name_display || `${u.name_first || ""} ${u.name_last || ""}`.trim(),
+        email: u.primary_email,
+        gradeLevel: u.grad_year,
+        schoolId: u.school_id,
+        username: u.username,
+      });
+    }
+
+    // Sections (classes).
+    const sectionsRes = await fetchImpl(`${apiBase}/sections?limit=200`, { headers });
+    if (sectionsRes.ok) {
+      const sectionsData = (await sectionsRes.json()) as any;
+      for (const s of sectionsData.section || []) {
+        await upsert(String(s.id), "section", "class", {
+          name: s.section_title || s.course_title,
+          courseTitle: s.course_title,
+          gradeLevel: s.grade_level_range,
+          schoolId: s.school_id,
+        });
+      }
+    }
+  } catch (err: any) {
+    result.errors.push({ message: `Schoology sync error: ${err.message}` });
+  }
+
+  return result;
+}
+
+/**
+ * PowerSchool SIS roster sync (PowerQuery / core resources under /ws/v1).
+ *
+ * Pulls students, staff, and sections for the configured server. The server
+ * host comes from the connection config; the OAuth2 client-credentials access
+ * token comes from the stored credentials. `fetchImpl` is injectable for tests.
+ *
+ * @see https://support.powerschool.com/developer/
+ */
+export async function syncPowerSchool(
+  db: any,
+  connection: any,
+  creds: any,
+  fetchImpl: FetchLike = fetch,
+) {
+  const result = { synced: 0, failed: 0, skipped: 0, errors: [] as any[] };
+  const host = ((connection.config as any)?.powerschoolUrl || creds.host || "").replace(/\/$/, "");
+  const token = creds.accessToken;
+
+  if (!host) {
+    result.errors.push({ message: "PowerSchool server URL not configured in connection config." });
+    return result;
+  }
+  if (!token) {
+    result.errors.push({ message: "PowerSchool access token missing from credentials." });
+    return result;
+  }
+  const headers = { Authorization: `Bearer ${token}`, Accept: "application/json" };
+
+  const upsert = async (
+    externalId: string,
+    externalType: string,
+    aivoType: string,
+    externalData: Record<string, unknown>,
+  ) => {
+    try {
+      await db
+        .insert(integrationRosterMappings)
+        .values({
+          connectionId: connection.id,
+          externalId,
+          externalType,
+          aivoType,
+          externalData,
+          lastSyncedAt: new Date(),
+        })
+        .onConflictDoNothing();
+      result.synced++;
+    } catch {
+      result.failed++;
+    }
+  };
+
+  try {
+    // Students: /ws/v1/district/student returns { students: { student: [...] } }.
+    const studentsRes = await fetchImpl(`${host}/ws/v1/district/student?pagesize=200`, { headers });
+    if (!studentsRes.ok) {
+      result.errors.push({ message: `PowerSchool student fetch failed: ${studentsRes.status}` });
+      return result;
+    }
+    const studentsData = (await studentsRes.json()) as any;
+    const students = studentsData.students?.student || [];
+    for (const s of Array.isArray(students) ? students : [students]) {
+      const name = s.name || {};
+      await upsert(String(s.id ?? s.local_id), "student", "learner", {
+        name: `${name.first_name || ""} ${name.last_name || ""}`.trim(),
+        gradeLevel: s.school_enrollment?.grade_level,
+        schoolId: s.school_enrollment?.school_number,
+        studentNumber: s.local_id,
+        dob: s.demographics?.birth_date,
+      });
+    }
+
+    // Staff: /ws/v1/district/staff.
+    const staffRes = await fetchImpl(`${host}/ws/v1/district/staff?pagesize=200`, { headers });
+    if (staffRes.ok) {
+      const staffData = (await staffRes.json()) as any;
+      const staff = staffData.staffs?.staff || [];
+      for (const t of Array.isArray(staff) ? staff : [staff]) {
+        const name = t.name || {};
+        await upsert(String(t.id ?? t.local_id), "teacher", "teacher", {
+          name: `${name.first_name || ""} ${name.last_name || ""}`.trim(),
+          email: t.emails?.work_email,
+          schoolId: t.school_affiliations?.school_affiliation?.[0]?.school_number,
+        });
+      }
+    }
+
+    // Sections: /ws/v1/district/section.
+    const sectionsRes = await fetchImpl(`${host}/ws/v1/district/section?pagesize=200`, { headers });
+    if (sectionsRes.ok) {
+      const sectionsData = (await sectionsRes.json()) as any;
+      const sections = sectionsData.sections?.section || [];
+      for (const sec of Array.isArray(sections) ? sections : [sections]) {
+        await upsert(String(sec.id), "section", "class", {
+          name: sec.section_number,
+          courseId: sec.course_id,
+          termId: sec.term_id,
+          teacherId: sec.staff_id,
+          schoolId: sec.school_id,
+        });
+      }
+    }
+  } catch (err: any) {
+    result.errors.push({ message: `PowerSchool sync error: ${err.message}` });
   }
 
   return result;
