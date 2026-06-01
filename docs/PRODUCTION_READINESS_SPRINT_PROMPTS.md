@@ -229,11 +229,18 @@ All seven sprints implemented, tested, and committed on `claude/jolly-pasteur-z3
 | 6 — test backfill | ✅ Done | Unit suites for status-page-svc, i18n-svc, research-svc, integrations-svc; wired into CI. `backend:parity` now 28 green / 0 yellow (was 26 green / 2 yellow). |
 | 4 — AssistiveWare + SIS | ✅ Done | AssistiveWare reverse-highlight (native bridge → x-callback-url fallback) + `supportsReverseHighlight()`. Schoology + PowerSchool roster-sync handlers implemented, wired, flipped to `available`, unit-tested. |
 
-Residual (tracked, non-blocking): 6 `backend:parity` "no integration test references in
-tests/integration/**" warnings (curriculum-svc, engagement-svc, integration-svc,
-integrations-svc, subject-brain-svc, tenant-svc) — these are softer than the unit-test gate and
-need the integration harness/stack; and vendor-sandbox e2e validation of the two new SIS
-connectors before relying on them in production.
+Residual items — now **closed**:
+
+- ✅ The 6 `backend:parity` "no integration test references" warnings are gone. Added a Docker-free
+  in-process integration suite (`tests/integration/inprocess/`) covering engagement-svc,
+  integration-svc, integrations-svc, subject-brain-svc, and tenant-svc via their real `buildApp`,
+  and a Python FastAPI TestClient suite (`tests/integration/python/`) for curriculum-svc. Both
+  wired into CI. `backend:parity` is **28 green / 0 yellow / 0 warnings**.
+- ✅ SIS connector validation: added a wire-level e2e (`sis-connectors.e2e.test.ts`, real HTTP vs a
+  stub vendor server) and a credential-gated live-sandbox harness (`sis-connectors.live.test.ts`)
+  plus `docs/runbooks/sis-connector-validation.md`. The only step that genuinely requires a human
+  is running the live test with real vendor sandbox credentials (it skips automatically until
+  those are provided).
 
 ## 4. Definition of done (every sprint)
 
