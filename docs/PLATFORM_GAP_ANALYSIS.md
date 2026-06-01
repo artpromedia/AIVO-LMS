@@ -298,3 +298,16 @@ Worked on branch `claude/gifted-heisenberg-V9YJm`. Approach chosen: **real-auth 
 - **Step-up:** `POST /api/district/admins` is behind `requireStepUp`, which is flag-gated **off** by
   default — not a blocker for the default pilot, but when `STEP_UP_AUTH` is enabled the district console
   must complete a step-up challenge (web-v2 already has `step-up-verify` plumbing to build on).
+
+### Phase 0 progress — fail-fast on unsafe production config
+
+- **`AIVO_PERSISTENCE` production guard.** `apps/web-v2/lib/env.ts` now refuses `memory` (global and any
+  `AIVO_PERSISTENCE_*` override) in production, mirroring the existing `AUTH_MODE`/`AI_PROVIDER` guards.
+  A production deploy must explicitly set `postgres`, so it can no longer silently run on the volatile
+  in-memory store (which would lose staff invites, audit trails, etc. on restart and break multi-replica).
+- **`.env.example` now documents the web-v2 production-required vars** that were previously undocumented:
+  `AUTH_MODE`, `AIVO_PERSISTENCE`, `AI_PROVIDER`, `SESSION_SECRET`, `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`
+  (with the multi-replica Server-Actions 404 caveat), `NEXT_PUBLIC_APP_URL`, `DATABASE_URL`, `REDIS_URL`.
+
+_Still open in Phase 0:_ extend the same fail-fast treatment to mock TTS/speech providers and the stubbed
+push path; and to the backend services that fall back to in-memory when `DATABASE_URL` is unset (§3 Tier 1).

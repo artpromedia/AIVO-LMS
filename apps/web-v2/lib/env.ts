@@ -48,6 +48,26 @@ const aiProviderSchema = isProd
     })
   : z.enum(["mock", "anthropic", "openai", "google"]).default("mock");
 
+// The in-memory Map store is a development affordance only: data is lost on
+// restart and is not shared across replicas/serverless workers. In production
+// every persistence selector MUST be `postgres`, so a misconfigured deploy
+// fails fast at startup instead of silently losing data (e.g. staff invites,
+// audit trails). Mirrors the AUTH_MODE / AI_PROVIDER guards above.
+const persistenceModeProd = z.enum(["postgres"], {
+  errorMap: () => ({
+    message:
+      'AIVO_PERSISTENCE (and any AIVO_PERSISTENCE_* override) must be "postgres" in ' +
+      'production. "memory" is a development-only store — data is lost on restart and ' +
+      "is not shared across replicas — and is refused in production.",
+  }),
+});
+const aivoPersistenceSchema = isProd
+  ? persistenceModeProd
+  : z.enum(["memory", "postgres"]).default("memory");
+const aivoPersistenceOverrideSchema = isProd
+  ? persistenceModeProd.optional()
+  : z.enum(["memory", "postgres"]).optional();
+
 const serverSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   DATABASE_URL: isProd ? z.string().url() : z.string().url().optional(),
@@ -111,21 +131,21 @@ const serverSchema = z.object({
   // process-local Map store; `postgres` routes ported domains through
   // packages/db (Drizzle). Default to `memory` until the production
   // database connection is configured.
-  AIVO_PERSISTENCE: z.enum(["memory", "postgres"]).default("memory"),
+  AIVO_PERSISTENCE: aivoPersistenceSchema,
   // Per-domain overrides for the persistence adapter. Each value, when
   // set, wins over AIVO_PERSISTENCE for that domain. See
   // lib/db/persistence/index.ts for the list of known domains.
-  AIVO_PERSISTENCE_NOTIFICATIONS: z.enum(["memory", "postgres"]).optional(),
-  AIVO_PERSISTENCE_AUDIT: z.enum(["memory", "postgres"]).optional(),
-  AIVO_PERSISTENCE_IDENTITY: z.enum(["memory", "postgres"]).optional(),
-  AIVO_PERSISTENCE_LEARNERS: z.enum(["memory", "postgres"]).optional(),
-  AIVO_PERSISTENCE_ASSESSMENTS: z.enum(["memory", "postgres"]).optional(),
-  AIVO_PERSISTENCE_LESSON_RUNS: z.enum(["memory", "postgres"]).optional(),
-  AIVO_PERSISTENCE_BRAIN_PROFILES: z.enum(["memory", "postgres"]).optional(),
-  AIVO_PERSISTENCE_CURRICULUM: z.enum(["memory", "postgres"]).optional(),
-  AIVO_PERSISTENCE_COMPLIANCE: z.enum(["memory", "postgres"]).optional(),
-  AIVO_PERSISTENCE_QUESTS: z.enum(["memory", "postgres"]).optional(),
-  AIVO_PERSISTENCE_ADMIN: z.enum(["memory", "postgres"]).optional(),
+  AIVO_PERSISTENCE_NOTIFICATIONS: aivoPersistenceOverrideSchema,
+  AIVO_PERSISTENCE_AUDIT: aivoPersistenceOverrideSchema,
+  AIVO_PERSISTENCE_IDENTITY: aivoPersistenceOverrideSchema,
+  AIVO_PERSISTENCE_LEARNERS: aivoPersistenceOverrideSchema,
+  AIVO_PERSISTENCE_ASSESSMENTS: aivoPersistenceOverrideSchema,
+  AIVO_PERSISTENCE_LESSON_RUNS: aivoPersistenceOverrideSchema,
+  AIVO_PERSISTENCE_BRAIN_PROFILES: aivoPersistenceOverrideSchema,
+  AIVO_PERSISTENCE_CURRICULUM: aivoPersistenceOverrideSchema,
+  AIVO_PERSISTENCE_COMPLIANCE: aivoPersistenceOverrideSchema,
+  AIVO_PERSISTENCE_QUESTS: aivoPersistenceOverrideSchema,
+  AIVO_PERSISTENCE_ADMIN: aivoPersistenceOverrideSchema,
   // ADR 0009 — service-stack parity flags. `AIVO_USE_SERVICE_STACK`
   // is the global default; per-service flags override it.
   AIVO_USE_SERVICE_STACK: z
