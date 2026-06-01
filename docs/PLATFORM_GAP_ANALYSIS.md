@@ -340,9 +340,28 @@ providers. The AI tutor now has a real Anthropic Claude implementation, not just
   mocked client (request shape, harness happy-path, fenced-JSON tolerance, garbage→fallback). A live
   conformance test runs against the real API only when `ANTHROPIC_API_KEY` is set (skipped otherwise).
 
-_Remaining adapters_ (OpenAI TTS, user-addressed push delivery) follow the same pattern and slot behind
-their existing value gates / conditional secrets when their credentials + (for TTS) audio object-storage
-are wired.
+### Provider adapter — user-addressed push (device-token store + endpoints)
+
+`POST /api/comms/push` previously returned a fake `{status:"queued"}` because there was no way to resolve
+a userId to device tokens. Now wired end-to-end (delivery gated on FCM/APNs creds, which the manifest
+already lists as conditional secrets):
+
+- New `device_tokens` table (migration `0053_device_tokens` + schema + journal) maps an owning user to
+  their FCM/APNs tokens; `token` is globally unique (re-register upserts).
+- `services/comms-svc/src/lib/device-tokens.ts` — register/list/delete + invalid-token pruning, returning
+  the push-router's `PushTarget[]`.
+- Endpoints: `POST /api/comms/devices` + `DELETE /api/comms/devices/:token` (owner-scoped, `requireAuth`)
+  for clients to register/unregister on login/refresh/logout; `POST /api/comms/push` now resolves the
+  user's devices, fans out via `defaultPushRouter`, prunes tokens the provider reports invalid, and
+  returns real per-fan-out counts (`{status, sent, devices, pruned}`).
+- Verified: `@aivo/db` + comms-svc typecheck; schema-drift passes for the new table; comms-svc suite 19
+  pass / 0 fail / 3 skipped (the new DB-backed route tests skip without `DATABASE_URL`); eslint 0 errors.
+  The route tests prove resolve → fan-out → prune + owner-scoped delete deterministically; actual FCM/APNs
+  delivery is gated on `FCM_SERVICE_ACCOUNT_JSON` / `APNS_*` (the providers return a no-network failure
+  result when unconfigured).
+
+_Remaining adapter_ (OpenAI TTS) follows the same pattern and slots behind its value gate / conditional
+secret once an audio object-storage target is chosen (object storage vs. data-URL for the pilot).
 
 ### Phase 2 — multi-replica: OIDC store moved to Postgres
 

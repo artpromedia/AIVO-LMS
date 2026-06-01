@@ -253,6 +253,13 @@
 			"when": 1780200000000,
 			"tag": "0052_profile_recommendations_v2",
 			"breakpoints": true
+		},
+		{
+			"idx": 36,
+			"version": "7",
+			"when": 1780286400000,
+			"tag": "0053_device_tokens",
+			"breakpoints": true
 		}
 	]
 }
