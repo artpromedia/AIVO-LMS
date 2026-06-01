@@ -20,6 +20,7 @@ import { registerSpeechBuddyConsentRoutes } from "./routes/speech-buddy-consent.
 import { registerWhatsWorkingRoutes } from "./routes/whats-working.js";
 import { registerInterestRoutes } from "./routes/interests.js";
 import { registerFamilyGoalsRoutes } from "./routes/family-goals.js";
+import { registerConsentRoutes } from "./routes/consent.js";
 
 const logger = createLogger("family-svc");
 const PORT = parseInt(process.env.FAMILY_PORT || "3007", 10);
@@ -75,6 +76,7 @@ export async function buildApp() {
   await registerWhatsWorkingRoutes(app);
   await registerInterestRoutes(app);
   await registerFamilyGoalsRoutes(app);
+  await registerConsentRoutes(app);
 
   return app;
 }

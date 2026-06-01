@@ -148,3 +148,26 @@ export const tokenUsage = pgTable("token_usage", {
   requestType: varchar("request_type", { length: 50 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+/**
+ * Teacher-authored assignments. Read/created by the mobile + web
+ * teacher assignment screens. `learnerIds` is the assigned cohort;
+ * `status` is active | archived.
+ */
+export const teacherLessonAssignments = pgTable("teacher_lesson_assignments", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  tenantId: uuid("tenant_id")
+    .references(() => tenants.id)
+    .notNull(),
+  teacherId: uuid("teacher_id")
+    .references(() => users.id)
+    .notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  subject: varchar("subject", { length: 100 }).notNull(),
+  status: varchar("status", { length: 20 }).notNull().default("active"),
+  dueDate: varchar("due_date", { length: 32 }),
+  learnerIds: jsonb("learner_ids").default([]),
+  metadata: jsonb("metadata").default({}),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});

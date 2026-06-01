@@ -239,6 +239,20 @@
       "when": 1780027200000,
       "tag": "0050_web_domain_rls",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1780113600000,
+      "tag": "0051_teacher_assignments",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1780200000000,
+      "tag": "0052_teacher_lesson_assignments_rls",
+      "breakpoints": true
     }
   ]
 }
