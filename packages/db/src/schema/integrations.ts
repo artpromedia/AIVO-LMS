@@ -145,6 +145,44 @@ export const aacSyncState = pgTable(
   ],
 );
 
+// Best practice: every AAC user's board is anchored by a curated set of core
+// (high-frequency, topic-independent) words, with fringe words layered on top.
+export const aacWordKindEnum = pgEnum("aac_word_kind", ["core", "fringe"]);
+
+/**
+ * Per-learner AAC vocabulary. The symbol board synced to external AAC vendors
+ * (CoughDrop, Proloquo2Go, …) is built from these rows. `symbolKey` is the
+ * stable identifier within the configured symbol set; the image URL is
+ * resolved at board-build time so the symbol set can change without a data
+ * migration.
+ */
+export const aacVocabulary = pgTable(
+  "aac_vocabulary",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    learnerId: uuid("learner_id")
+      .notNull()
+      .references(() => learners.id, { onDelete: "cascade" }),
+    locale: varchar("locale", { length: 16 }).notNull().default("en"),
+    label: varchar("label", { length: 128 }).notNull(),
+    symbolKey: varchar("symbol_key", { length: 128 }).notNull(),
+    kind: aacWordKindEnum("kind").notNull().default("fringe"),
+    gridRow: integer("grid_row").notNull(),
+    gridCol: integer("grid_col").notNull(),
+    backgroundColor: varchar("background_color", { length: 16 }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("idx_aac_vocab_learner_locale_symbol").on(
+      table.learnerId,
+      table.locale,
+      table.symbolKey,
+    ),
+    index("idx_aac_vocab_learner_locale").on(table.learnerId, table.locale),
+  ],
+);
+
 export const familySettings = pgTable(
   "family_settings",
   {

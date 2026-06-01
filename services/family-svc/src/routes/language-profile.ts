@@ -5,6 +5,7 @@ import { eq, and } from "drizzle-orm";
 import { encryptSecret, decryptSecret } from "@aivo/security";
 import { CoughDropSync } from "@aivo/aac-bridge";
 import type { SymbolBoard } from "@aivo/aac-bridge";
+import { buildSymbolBoard } from "../lib/aac-board.js";
 import {
   languageProfileByLearnerIdSchema,
   getLanguageProfileByLearnerIdSchema,
@@ -128,14 +129,29 @@ export async function registerLanguageProfileRoutes(app: FastifyInstance) {
         return reply.status(500).send({ error: "Failed to decrypt CoughDrop API key" });
       }
 
-      // Minimal board from learner ID; in production this queries brain-svc for vocabulary.
-      const board: SymbolBoard = {
-        id: learnerId,
-        name: `AIVO - ${learnerId}`,
-        locale: "en",
-        items: [],
-        grid: { rows: 0, cols: 0 },
-      };
+      // Build the real symbol board from the learner's AAC vocabulary
+      // (anchored by curated core words). Locale follows the learner's
+      // language profile; defaults to English when none is set.
+      const [profile] = await db
+        .select({
+          preferred: languageProfiles.preferredInstructionLanguage,
+          primary: languageProfiles.primaryLanguage,
+        })
+        .from(languageProfiles)
+        .where(eq(languageProfiles.learnerId, learnerId))
+        .limit(1);
+      const locale = (profile?.preferred || profile?.primary || "en").slice(0, 16);
+
+      let board: SymbolBoard;
+      try {
+        board = await buildSymbolBoard(db, learnerId, locale);
+      } catch (err) {
+        req.log?.warn({ err: (err as Error).message, learnerId }, "AAC board build failed");
+        // Never sync an empty board — surface the gap instead.
+        return reply
+          .status(422)
+          .send({ error: "No AAC vocabulary available to sync for this learner" });
+      }
 
       const sync = new CoughDropSync(apiKey, settings.coughdropUserId);
       try {

@@ -555,6 +555,7 @@ export const languageProfileByLearnerIdCoughdropSyncSchema = {
     200: passthroughObject,
     400: errorResponse,
     403: errorResponse,
+    422: errorResponse,
     500: errorResponse,
     502: errorResponse,
   },
