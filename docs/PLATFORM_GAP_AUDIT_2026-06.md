@@ -66,7 +66,7 @@ flips the default; "Code gap" = a flag won't fix it.
    entitlements — proven by `e2e/.../stripe-purchase-to-entitlement.spec.ts`),
    but web `app/api/bff/parent/subscription/route.ts` only mutates the
    in-memory store. No Checkout session is created; the subscribe button
-   charges no one.
+   charges no one. → **Fixed in this pass (see Changelog).**
 9. **[Incomplete] Messages/inbox unbuilt.** `app/messages/page.tsx` is a
    role-aware empty state.
 10. **[Config-ish] AI tutor/lesson canned by default.** `lib/homework/tutor.ts`
@@ -172,3 +172,39 @@ changed files, `prod:check` passes. No unit/e2e tests target these surfaces.
 Remaining in onboarding (follow-ups): intermediate informational steps
 (role/terms/privacy/consent) are still pure navigation; the field-level error
 copy is English-only pending an i18n pass.
+
+## Changelog — Phase 1: billing → billing-svc (#8)
+
+Wired the web parent billing surface to the real, Stripe-backed
+`billing-svc` (previously the subscribe/cancel buttons only mutated the
+in-memory store, so no payment was ever taken). The integration is a thin
+client over billing-svc's own vocabulary (`single`/`family`) — billing-svc
+owns the Stripe Price IDs via its env, so the web never maps a Stripe price.
+
+- `apps/web-v2/lib/env.ts` — `BILLING_SVC_URL` (default `:3009`),
+  `BILLING_SVC_SERVICE_TOKEN`, and `AIVO_USE_BILLING_SVC` (per-service
+  override of `AIVO_USE_SERVICE_STACK`).
+- `apps/web-v2/lib/bff/billing-svc.ts` (new) — server-only client:
+  `loadParentBillingOverview` (catalog + subscription + invoices, mapped to
+  the page view-model), `createParentCheckout` (Stripe Checkout), and
+  `cancelParentSubscription`. Forwards the user's `aivo_access_token` as the
+  bearer (billing-svc `requireAuth` verifies the same RS256 JWT) and degrades
+  to the store on a transient failure.
+- `apps/web-v2/app/api/bff/parent/subscription/route.ts` — POST creates a
+  real Checkout session (returns `checkoutUrl`) and DELETE cancels via
+  billing-svc when enabled + a real token is present; otherwise the existing
+  in-memory store simulation is used (dev/demo, `AUTH_MODE=mock`).
+- `apps/web-v2/app/parent/settings/billing/page.tsx` — reads the dual-path
+  overview and shows a Stripe return banner (`?checkout=success|cancelled`).
+- `apps/web-v2/app/parent/settings/billing/subscribe-form.tsx` — redirects
+  the browser to the hosted Stripe Checkout URL when one is returned.
+
+Gating: real billing is OFF by default (`AIVO_USE_BILLING_SVC` unset →
+falls back to `AIVO_USE_SERVICE_STACK=false`), so existing dev/demo, mock
+auth, and the e2e suite are unchanged; production enables the service stack.
+After a real Checkout, the `subscriptions` row is created by the Stripe
+webhook (already real and e2e-proven), which then drives entitlements.
+
+Verified: web-v2 `typecheck` clean, `eslint --max-warnings=0` clean on
+changed files, `prod:check` passes. Banner copy is English-only pending an
+i18n pass.

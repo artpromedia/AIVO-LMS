@@ -176,6 +176,16 @@ const serverSchema = z.object({
   BRAIN_SVC_SERVICE_TOKEN: z.string().optional(),
   COMMS_SVC_URL: z.string().url().default("http://localhost:3091"),
   COMMS_SVC_SERVICE_TOKEN: z.string().optional(),
+  BILLING_SVC_URL: z.string().url().default("http://localhost:3009"),
+  BILLING_SVC_SERVICE_TOKEN: z.string().optional(),
+  // Per-service override of AIVO_USE_SERVICE_STACK for billing. When
+  // enabled (and a real access token is present), the parent billing
+  // surface talks to the Stripe-backed billing-svc instead of the
+  // in-memory store simulation.
+  AIVO_USE_BILLING_SVC: z
+    .union([z.literal("true"), z.literal("false")])
+    .optional()
+    .transform((v) => (v === undefined ? undefined : v === "true")),
   // Shared upstream timeout (ms) for service calls; the client uses
   // AbortController with this deadline.
   AIVO_SERVICE_TIMEOUT_MS: z.coerce.number().int().positive().default(5000),

@@ -11,8 +11,17 @@ import {
   listPlans,
   subscribeTenant,
 } from "@/lib/db/repos";
+import {
+  isBillingSvcEnabled,
+  getBillingBearer,
+  createParentCheckout,
+  cancelParentSubscription,
+  type BillingPlanId,
+} from "@/lib/bff/billing-svc";
 
 export const dynamic = "force-dynamic";
+
+const BILLING_PLAN_IDS = new Set<BillingPlanId>(["single", "family"]);
 
 export async function GET(req: Request): Promise<NextResponse> {
   const requestId = getRequestId(req);
@@ -58,6 +67,41 @@ export async function POST(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
+
+    // Real billing path: start a Stripe Checkout via billing-svc and hand
+    // the hosted URL back to the client to redirect to. The subscription
+    // row is created by the Stripe webhook, not here.
+    const bearer = await getBillingBearer();
+    if (isBillingSvcEnabled() && bearer) {
+      if (!BILLING_PLAN_IDS.has(parsed.data.planId as BillingPlanId)) {
+        return fail(
+          { ...ERRORS.VALIDATION_FAILED, message: "Unsupported plan for checkout." },
+          requestId,
+        );
+      }
+      const origin = req.headers.get("origin") ?? new URL(req.url).origin;
+      const checkout = await createParentCheckout({
+        tenantId: session!.tenantId,
+        planId: parsed.data.planId as BillingPlanId,
+        origin,
+        bearer,
+      });
+      if (!checkout.ok) {
+        return fail(
+          {
+            ...ERRORS.UPSTREAM_UNAVAILABLE,
+            message: checkout.error,
+            status: checkout.status >= 500 ? 502 : checkout.status,
+          },
+          requestId,
+        );
+      }
+      audit(session!, "billing.checkout.created", requestId, {
+        metadata: { planId: parsed.data.planId, sessionId: checkout.data.sessionId },
+      });
+      return ok({ checkoutUrl: checkout.data.checkoutUrl }, requestId);
+    }
+
     const result = subscribeTenant({
       tenantId: session!.tenantId,
       ownerUserId: session!.userId,
@@ -109,6 +153,33 @@ export async function DELETE(req: Request): Promise<NextResponse> {
         requestId,
       );
     }
+
+    // Real billing path: cancel at period end via billing-svc (Stripe).
+    const bearer = await getBillingBearer();
+    if (isBillingSvcEnabled() && bearer) {
+      const cancelled = await cancelParentSubscription({
+        tenantId: session!.tenantId,
+        bearer,
+      });
+      if (!cancelled.ok) {
+        if (cancelled.status === 404) {
+          return fail({ ...ERRORS.NOT_FOUND, message: "Subscription not found." }, requestId);
+        }
+        return fail(
+          {
+            ...ERRORS.UPSTREAM_UNAVAILABLE,
+            message: cancelled.error,
+            status: cancelled.status >= 500 ? 502 : cancelled.status,
+          },
+          requestId,
+        );
+      }
+      audit(session!, "billing.subscription.canceled", requestId, {
+        metadata: { atPeriodEnd: "1", via: "billing-svc" },
+      });
+      return ok({ status: cancelled.data.status }, requestId);
+    }
+
     const sub = cancelSubscription(
       parsed.data.subscriptionId,
       session!.tenantId,
