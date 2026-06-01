@@ -15,26 +15,30 @@
 | reading | sage | P | P |
 | math | nova | P | P |
 | science | spark | P | P |
-| social | harmony | H | P |
-| speech | echo | H | P |
-| executive-function | compass | H | P |
+| social | harmony | P | P |
+| speech | echo | P | P |
+| executive-function | compass | P | P |
 | writing | sage | P | P |
-| life | compass | H | P |
-| art | muse | H | P |
-| social-studies | chrono | H | P |
-| world-languages | lingua | H | P |
-| coding | pixel | H | P |
+| life | compass | P | P |
+| art | muse | P | P |
+| social-studies | chrono | P | P |
+| world-languages | lingua | P | P |
+| coding | pixel | P | P |
+| geography | atlas | P | P |
+| music | cadence | P | P |
+| physical-education | vigor | P | P |
+| engineering | forge | P | P |
 
 ## Tutors
 
 | Tutor | Status | Subjects |
 | --- | :---: | --- |
-| atlas | O (orphan) | — |
-| cadence | O (orphan) | — |
+| atlas | linked | geography |
+| cadence | linked | music |
 | chrono | linked | social-studies |
 | compass | linked | executive-function, life |
 | echo | linked | speech |
-| forge | O (orphan) | — |
+| forge | linked | engineering |
 | harmony | linked | social |
 | lingua | linked | world-languages |
 | muse | linked | art |
@@ -42,19 +46,15 @@
 | pixel | linked | coding |
 | sage | linked | reading, writing |
 | spark | linked | science |
-| vigor | O (orphan) | — |
+| vigor | linked | physical-education |
 
 ## Aggregate
 
 | Metric | Count |
 | --- | ---: |
-| subjects total | 12 |
-| subjects reachable on web (P/F) | 4 |
-| subjects hidden on web (H) | 8 |
-| subjects reachable on mobile (P/F) | 12 |
+| subjects total | 16 |
+| subjects reachable on web (P/F) | 16 |
+| subjects hidden on web (H) | 0 |
+| subjects reachable on mobile (P/F) | 16 |
 | tutors total | 14 |
-| orphan tutors (O) | 4 |
-
-**Orphan tutors** (no subject card; Sprint 1 target): atlas, cadence, forge, vigor.
-
-**Hidden on web** (filtered out, Sprint 1 target): social, speech, executive-function, life, art, social-studies, world-languages, coding.
+| orphan tutors (O) | 0 |

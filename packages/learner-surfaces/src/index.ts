@@ -65,10 +65,7 @@ export {
   CODING_FIXTURE_ITEMS,
   type CodingFixtureItem,
 } from "./CodingSandbox/index.js";
-export {
-  ArtCanvasSurface,
-  type ArtCanvasSurfaceProps,
-} from "./surfaces/ArtCanvasSurface.js";
+export { ArtCanvasSurface, type ArtCanvasSurfaceProps } from "./surfaces/ArtCanvasSurface.js";
 export {
   VoiceResponseSurface,
   type VoiceResponseSurfaceProps,
@@ -80,6 +77,7 @@ export {
   isSurfaceEntitled,
   isPremiumSurface,
   requiredTutorForSurface,
+  requiredTutorsForSurface,
   type SurfaceTutorKey,
 } from "./entitlement/required-tutor.js";
 

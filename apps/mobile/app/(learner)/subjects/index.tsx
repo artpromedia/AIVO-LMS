@@ -8,15 +8,18 @@ import { useBrainDomains } from "@/hooks/useBrain";
 import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 import { MobileSubjectCard, EmptyState, LoadingState, useColumns } from "@aivo/mobile-ui";
-import { subjectAccent, masteryLabel } from "@/lib/subject-display";
+import { masteryLabel } from "@/lib/subject-display";
+import { getDiscoverableSubjects, TUTORS } from "@aivo/brand";
 import { spacing } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 /**
  * Learner subjects grid — mirror of web's `/learner/subjects`
- * (MOB-LRN-002). Cards show per-subject mastery (from brain-svc) and
- * route into the subject detail. Responsive grid: 1 col on phone, 2–3
- * on tablet.
+ * (MOB-LRN-002). Sprint 1 (subject/tutor UX): driven by the canonical
+ * `@aivo/brand` subject registry (the same source web uses), so both
+ * clients show the identical set and every subject is reachable +
+ * playable end-to-end. Per-subject mastery is merged in from brain-svc
+ * when present. Responsive grid: 1 col on phone, 2–3 on tablet.
  */
 export default function LearnerSubjectsScreen() {
   const { t } = useTranslation();
@@ -24,6 +27,13 @@ export default function LearnerSubjectsScreen() {
   const palette = useSensoryPalette();
   const { domains, isLoading } = useBrainDomains(user?.id ?? "");
   const columns = useColumns({ compact: 1, medium: 2, expanded: 3 });
+
+  const subjects = getDiscoverableSubjects();
+  const masteryByName = React.useMemo(() => {
+    const m = new Map<string, number>();
+    for (const d of domains) m.set(d.domain.toLowerCase(), d.masteryPercent);
+    return m;
+  }, [domains]);
 
   return (
     <ResponsiveScreen maxWidth="dashboard" background={palette.bgPage}>
@@ -48,30 +58,28 @@ export default function LearnerSubjectsScreen() {
 
       {isLoading ? (
         <LoadingState />
-      ) : domains.length === 0 ? (
+      ) : subjects.length === 0 ? (
         <EmptyState
           title={t("subjects.emptyTitle", "No subjects yet")}
-          message={t(
-            "subjects.emptyBody",
-            "Once you finish your baseline, your subjects show up here.",
-          )}
+          message={t("subjects.emptyBody", "Your subjects will show up here.")}
         />
       ) : (
         <View style={styles.grid}>
-          {domains.map((d) => (
-            <View key={d.domain} style={[styles.cell, { flexBasis: `${100 / columns}%` }]}>
-              <MobileSubjectCard
-                name={d.domain}
-                masteryPct={d.masteryPercent}
-                masteryLabel={masteryLabel(d.masteryPercent)}
-                accent={subjectAccent(d.domain)}
-                support={d.accommodations[0]}
-                onPress={() =>
-                  router.push(`/(learner)/subjects/${encodeURIComponent(d.domain)}` as Href)
-                }
-              />
-            </View>
-          ))}
+          {subjects.map((s) => {
+            const tutor = TUTORS[s.tutorKey];
+            const mastery = masteryByName.get(s.name.toLowerCase()) ?? 0;
+            return (
+              <View key={s.slug} style={[styles.cell, { flexBasis: `${100 / columns}%` }]}>
+                <MobileSubjectCard
+                  name={s.name}
+                  masteryPct={mastery}
+                  masteryLabel={masteryLabel(mastery)}
+                  accent={tutor.color}
+                  onPress={() => router.push(`/(learner)/subjects/${s.slug}` as Href)}
+                />
+              </View>
+            );
+          })}
         </View>
       )}
     </ResponsiveScreen>

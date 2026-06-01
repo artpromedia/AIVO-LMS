@@ -47,6 +47,12 @@ const WEB_SEEDED_SUBJECT_SLUGS = new Set([
   "coding",
   "social-studies",
   "world-languages",
+  // Sprint 1 (subject/tutor UX): the four formerly tutor-only subjects, now
+  // reachable + playable end-to-end like every other subject.
+  "geography",
+  "music",
+  "physical-education",
+  "engineering",
 ]);
 const SUBJECTS: Omit<Subject, "id">[] = LEARNER_SUBJECTS.filter((s) =>
   WEB_SEEDED_SUBJECT_SLUGS.has(s.slug),
@@ -392,6 +398,36 @@ const PLACEHOLDER_SKILL_SEED: typeof SKILL_SEED = [
     slug: "greetings-and-names",
     name: "Greetings and names",
     gradeBand: "K-1",
+  },
+  // Sprint 1 (subject/tutor UX): starter skills for the four newly-reachable
+  // subjects so each is playable end-to-end via the lesson flow.
+  { subjectSlug: "geography", slug: "my-neighborhood", name: "My neighborhood", gradeBand: "K" },
+  {
+    subjectSlug: "geography",
+    slug: "continents-oceans",
+    name: "Continents and oceans",
+    gradeBand: "1-2",
+  },
+  { subjectSlug: "music", slug: "steady-beat", name: "Keeping a steady beat", gradeBand: "K" },
+  { subjectSlug: "music", slug: "high-low-pitch", name: "High and low sounds", gradeBand: "K-1" },
+  {
+    subjectSlug: "physical-education",
+    slug: "locomotor-moves",
+    name: "Locomotor movements",
+    gradeBand: "K",
+  },
+  {
+    subjectSlug: "physical-education",
+    slug: "healthy-habits",
+    name: "Healthy habits",
+    gradeBand: "K-1",
+  },
+  { subjectSlug: "engineering", slug: "build-and-test", name: "Build and test", gradeBand: "K" },
+  {
+    subjectSlug: "engineering",
+    slug: "simple-machines",
+    name: "Simple machines",
+    gradeBand: "1-3",
   },
 ];
 

@@ -17,15 +17,18 @@ import {
 import { Card } from "@/components/ui";
 import { useGradebook } from "@/hooks/useGradebook";
 import { skillsForSubject } from "@/lib/gradebook-logic";
-import { subjectAccent, masteryLabel } from "@/lib/subject-display";
+import { masteryLabel } from "@/lib/subject-display";
+import { getSubjectBySlug, getDiscoverableSubjects, TUTORS } from "@aivo/brand";
 import { spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
 
 /**
  * Learner subject detail — mirror of web's `/learner/subjects/[subjectId]`
- * (MOB-LRN-003). Shows the subject's mastery, its per-skill mastery grid
- * (from the learning-svc gradebook), the supports + tutors the brain has
- * switched on for it, and a CTA into a lesson.
+ * (MOB-LRN-003). Sprint 1 (subject/tutor UX): resolved from the canonical
+ * `@aivo/brand` registry by slug so every subject (not just brain-seeded
+ * ones) is reachable. Shows the subject's mastery (merged from brain-svc
+ * when present), per-skill grid, its tutor, and a CTA that launches the
+ * subject's tutor session end-to-end.
  */
 export default function SubjectDetailScreen() {
   const { t } = useTranslation();
@@ -34,12 +37,19 @@ export default function SubjectDetailScreen() {
   const { subjectId } = useLocalSearchParams<{ subjectId: string }>();
   const { domains, isLoading } = useBrainDomains(user?.id ?? "");
 
-  const name = decodeURIComponent(subjectId ?? "");
+  const slug = decodeURIComponent(subjectId ?? "");
+  // Resolve by slug; fall back to a name match for any legacy deep link.
+  const subject =
+    getSubjectBySlug(slug) ??
+    getDiscoverableSubjects().find((s) => s.name.toLowerCase() === slug.toLowerCase());
+  const tutor = subject ? TUTORS[subject.tutorKey] : undefined;
+  const name = subject?.name ?? slug;
+  const accent = tutor?.color ?? "#7c3aed";
   const domain = useMemo(
     () => domains.find((d) => d.domain.toLowerCase() === name.toLowerCase()),
     [domains, name],
   );
-  const accent = subjectAccent(name);
+  const masteryPct = domain?.masteryPercent ?? 0;
   const { data: gradebook } = useGradebook(user?.id ?? "");
   const skills = useMemo(() => skillsForSubject(gradebook ?? [], name), [gradebook, name]);
 
@@ -66,7 +76,7 @@ export default function SubjectDetailScreen() {
 
       {isLoading ? (
         <LoadingState />
-      ) : !domain ? (
+      ) : !subject ? (
         <EmptyState
           title={t("subjects.notFoundTitle", "Subject not found")}
           message={t("subjects.notFoundBody", "Head back to your subjects to pick one.")}
@@ -74,11 +84,9 @@ export default function SubjectDetailScreen() {
       ) : (
         <>
           <Card tone="raised" style={styles.card}>
-            <Text style={[styles.eyebrow, { color: accent }]}>
-              {masteryLabel(domain.masteryPercent)}
-            </Text>
+            <Text style={[styles.eyebrow, { color: accent }]}>{masteryLabel(masteryPct)}</Text>
             <MasteryBar
-              value={domain.masteryPercent}
+              value={masteryPct}
               tone={accent}
               caption={t("subjects.masteryCaption", "Your mastery so far")}
             />
@@ -104,29 +112,28 @@ export default function SubjectDetailScreen() {
             </Card>
           )}
 
-          {domain.tutors.length > 0 && (
+          {tutor && (
             <Card tone="raised" style={styles.card}>
               <Text style={[styles.sectionTitle, { color: palette.ink }]}>
-                {t("subjects.tutors", "Your tutors")}
+                {t("subjects.tutors", "Your tutor")}
               </Text>
               <View style={styles.chips}>
-                {domain.tutors.map((tutor) => (
-                  <View
-                    key={tutor}
-                    style={[
-                      styles.chip,
-                      { borderColor: palette.border, backgroundColor: palette.bgPage },
-                    ]}
-                  >
-                    <Ionicons name="sparkles" size={14} color={accent} />
-                    <Text style={[styles.chipText, { color: palette.ink }]}>{tutor}</Text>
-                  </View>
-                ))}
+                <View
+                  style={[
+                    styles.chip,
+                    { borderColor: palette.border, backgroundColor: palette.bgPage },
+                  ]}
+                >
+                  <Ionicons name="sparkles" size={14} color={accent} />
+                  <Text style={[styles.chipText, { color: palette.ink }]}>
+                    {tutor.name} · {tutor.domain}
+                  </Text>
+                </View>
               </View>
             </Card>
           )}
 
-          {domain.accommodations.length > 0 && (
+          {(domain?.accommodations.length ?? 0) > 0 && domain && (
             <Card tone="raised" style={styles.card}>
               <Text style={[styles.sectionTitle, { color: palette.ink }]}>
                 {t("subjects.supports", "Supports turned on")}
@@ -151,7 +158,7 @@ export default function SubjectDetailScreen() {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={t("subjects.startLesson", "Start a lesson")}
-            onPress={() => router.push("/(learner)/homework" as Href)}
+            onPress={() => router.push(`/(learner)/tutor/${subject.tutorKey}` as Href)}
             style={[styles.cta, { backgroundColor: accent }]}
           >
             <Ionicons name="play" size={18} color="#fff" />

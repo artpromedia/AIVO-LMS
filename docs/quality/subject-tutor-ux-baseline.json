@@ -19,17 +19,17 @@
     },
     "social": {
       "tutor": "harmony",
-      "web": "H",
+      "web": "P",
       "mobile": "P"
     },
     "speech": {
       "tutor": "echo",
-      "web": "H",
+      "web": "P",
       "mobile": "P"
     },
     "executive-function": {
       "tutor": "compass",
-      "web": "H",
+      "web": "P",
       "mobile": "P"
     },
     "writing": {
@@ -39,38 +39,62 @@
     },
     "life": {
       "tutor": "compass",
-      "web": "H",
+      "web": "P",
       "mobile": "P"
     },
     "art": {
       "tutor": "muse",
-      "web": "H",
+      "web": "P",
       "mobile": "P"
     },
     "social-studies": {
       "tutor": "chrono",
-      "web": "H",
+      "web": "P",
       "mobile": "P"
     },
     "world-languages": {
       "tutor": "lingua",
-      "web": "H",
+      "web": "P",
       "mobile": "P"
     },
     "coding": {
       "tutor": "pixel",
-      "web": "H",
+      "web": "P",
+      "mobile": "P"
+    },
+    "geography": {
+      "tutor": "atlas",
+      "web": "P",
+      "mobile": "P"
+    },
+    "music": {
+      "tutor": "cadence",
+      "web": "P",
+      "mobile": "P"
+    },
+    "physical-education": {
+      "tutor": "vigor",
+      "web": "P",
+      "mobile": "P"
+    },
+    "engineering": {
+      "tutor": "forge",
+      "web": "P",
       "mobile": "P"
     }
   },
   "tutors": {
     "atlas": {
-      "status": "orphan",
-      "subjects": []
+      "status": "linked",
+      "subjects": [
+        "geography"
+      ]
     },
     "cadence": {
-      "status": "orphan",
-      "subjects": []
+      "status": "linked",
+      "subjects": [
+        "music"
+      ]
     },
     "chrono": {
       "status": "linked",
@@ -92,8 +116,10 @@
       ]
     },
     "forge": {
-      "status": "orphan",
-      "subjects": []
+      "status": "linked",
+      "subjects": [
+        "engineering"
+      ]
     },
     "harmony": {
       "status": "linked",
@@ -139,8 +165,10 @@
       ]
     },
     "vigor": {
-      "status": "orphan",
-      "subjects": []
+      "status": "linked",
+      "subjects": [
+        "physical-education"
+      ]
     }
   }
 }
