@@ -260,6 +260,13 @@
 			"when": 1780286400000,
 			"tag": "0053_device_tokens",
 			"breakpoints": true
+		},
+		{
+			"idx": 37,
+			"version": "7",
+			"when": 1780372800000,
+			"tag": "0054_speech_buddy_consents",
+			"breakpoints": true
 		}
 	]
 }

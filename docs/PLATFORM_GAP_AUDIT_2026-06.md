@@ -99,7 +99,8 @@ flips the default; "Code gap" = a flag won't fix it.
 18. **[Blocker] Speech Buddy consent store is env-var-only.**
     `services/family-svc/src/routes/speech-buddy-consent.ts` reads
     `SPEECH_BUDDY_DEV_CONSENTS`; no DB store or parent UI. In prod with no
-    env var, every consent check fails.
+    env var, every consent check fails. → **Backend fixed in this pass (see
+    Changelog); parent UI wiring is the remaining sub-task.**
 
 ### F. Lower severity / cleanup
 
@@ -244,13 +245,37 @@ unset → deterministic stub), so the offline red-team suite and all existing
 speech_buddy tests pass unchanged (38 green locally). Production sets
 `SPEECH_BUDDY_JUDGE_PROVIDER=llm`.
 
-### Remaining child-safety follow-up — #18 (consent store + parent UI)
+## Changelog — Phase 1: Speech Buddy consent store backend (#18)
 
-`services/family-svc/src/routes/speech-buddy-consent.ts` still verifies
-consent from an env allow-list (`SPEECH_BUDDY_DEV_CONSENTS`). The wire
-format is final; the next pass should: (a) add a `speech_buddy_consents`
-table + migration in `packages/db`, (b) replace `devLookup` with a real
-tenant/learner/age-band lookup, and (c) add a parent grant/revoke UI
-(web `/parent/.../speech-buddy` + mobile parity). This gates the feature in
-production (no env var ⇒ every consent check 404s), so it should land
-before Speech Buddy is enabled.
+Replaced the env-allow-list consent stub with a real, DB-backed consent
+store + parent grant/revoke API. The internal verify endpoint (called by
+tutor-svc on every Speech Buddy session) now reads real grants, so the
+feature is no longer dead in production.
+
+- `packages/db/src/schema/speech_buddy.ts` (new) + migration
+  `0054_speech_buddy_consents.sql` + journal entry — the
+  `speech_buddy_consents` table (tenant, learner, parent, age band, scope,
+  granted/revoked timestamps; active = `revoked_at IS NULL`).
+- `services/family-svc/src/routes/speech-buddy-consent.ts` — rewritten:
+  - `GET /api/family/speech-buddy/consent/:learnerId` — parent reads status.
+  - `POST /api/family/speech-buddy/consent/:learnerId` — parent grants
+    (supersedes prior active grant; retains history).
+  - `POST /api/family/speech-buddy/consent/:learnerId/revoke` — parent
+    revokes. All three use JWT auth + `verifyParentOwnership`.
+  - Internal verify now reads the DB first; the `SPEECH_BUDDY_DEV_CONSENTS`
+    env list remains a dev/test fallback only (so tutor-svc's offline tests
+    keep passing). The verify response shape is unchanged.
+- `services/family-svc/src/routes/schemas.ts` — schemas for the three new
+  parent endpoints.
+
+Verified: `@aivo/db` and `@aivo/family-svc` build clean (`tsc`). The verify
+contract is byte-compatible, so tutor-svc is unaffected.
+
+### Remaining sub-task — #18 parent UI
+
+The grant/revoke/status API now exists, but web-v2 has no family-svc BFF
+client yet. To close #18 fully, add: (a) a `lib/bff/family-svc.ts` client +
+`/api/bff/parent/speech-buddy-consent` route forwarding the parent bearer,
+(b) a consent toggle on `/parent/learners/[learnerId]/settings` (grant with
+age band / revoke), and (c) mobile parity. This is UI-only — the
+production-blocking verify path is already real.

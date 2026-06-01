@@ -778,6 +778,43 @@ export const internalSpeechBuddyConsentVerifySchema = {
   response: { 200: passthroughObject, 400: errorResponse, 401: errorResponse, 404: errorResponse },
 } as const;
 
+const learnerIdParam = {
+  type: "object",
+  required: ["learnerId"],
+  additionalProperties: true,
+  properties: { learnerId: { type: "string" } },
+} as const;
+
+export const getSpeechBuddyConsentSchema = {
+  tags: ["Family"],
+  operationId: "getSpeechBuddyConsent",
+  summary: "GET /api/family/speech-buddy/consent/:learnerId",
+  params: learnerIdParam,
+  response: { 200: passthroughObject, 401: errorResponse, 403: errorResponse },
+} as const;
+
+export const grantSpeechBuddyConsentSchema = {
+  tags: ["Family"],
+  operationId: "grantSpeechBuddyConsent",
+  summary: "POST /api/family/speech-buddy/consent/:learnerId",
+  params: learnerIdParam,
+  body: passthroughObject,
+  response: {
+    200: passthroughObject,
+    400: errorResponse,
+    401: errorResponse,
+    403: errorResponse,
+  },
+} as const;
+
+export const revokeSpeechBuddyConsentSchema = {
+  tags: ["Family"],
+  operationId: "revokeSpeechBuddyConsent",
+  summary: "POST /api/family/speech-buddy/consent/:learnerId/revoke",
+  params: learnerIdParam,
+  response: { 200: passthroughObject, 401: errorResponse, 403: errorResponse },
+} as const;
+
 export const transitionByLearnerIdSchema = {
   tags: ["Family"],
   operationId: "transitionByLearnerId",
