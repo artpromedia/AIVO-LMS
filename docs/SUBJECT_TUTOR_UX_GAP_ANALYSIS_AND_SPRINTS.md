@@ -12,7 +12,7 @@ the 12 subjects they deliver**, evaluated end-to-end on **web and mobile**._
 > This complements the existing planning docs — it does **not** re-plan content
 > authoring (`docs/quality/tutor-k12-coverage-gap-plan.md`), structural parity
 > (`docs/quality/tutor-parity-matrix.md`), or route parity
-> (`docs/mobile-parity.md`). Those cover *backend / catalog / content*. **This
+> (`docs/mobile-parity.md`). Those cover _backend / catalog / content_. **This
 > doc covers the client experience layer**: discoverability, the activity
 > surfaces, per-subject tooling, and web↔mobile consistency.
 
@@ -38,11 +38,11 @@ the 12 subjects they deliver**, evaluated end-to-end on **web and mobile**._
 The two clients are each incomplete **and inconsistent with each other**, in
 opposite directions:
 
-| | Web (`apps/web-v2`) | Mobile (`apps/mobile`) |
-| --- | --- | --- |
-| **Subject visibility** | Only the **4 `productionReady` subjects** render; 8 are filtered out and unreachable (`app/learner/subjects/page.tsx:43-47`) | **All brain domains** render with **no `productionReady` gate** (`app/(learner)/subjects/index.tsx:25`) |
-| **Tutor reachability** | Tutor chat uses **hardcoded fictional personas**, not the 14-tutor catalog (`lib/learner/lesson-plan.ts:22-24,245`); only 6 subjects have a baseline-tutor mapping (`lib/learner/baseline-tutors.ts`) | **All 14 tutors** reachable via `/(learner)/tutor/[tutorSlug]` with correct entitlement gating |
-| **Activity surfaces** | 10 of 15 implemented; 5 fall back | Re-implements its **own** surface set (does not consume `@aivo/learner-surfaces`); ~6 full + 2 fallback; voice/video/audio missing |
+|                        | Web (`apps/web-v2`)                                                                                                                                                                                   | Mobile (`apps/mobile`)                                                                                                             |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **Subject visibility** | Only the **4 `productionReady` subjects** render; 8 are filtered out and unreachable (`app/learner/subjects/page.tsx:43-47`)                                                                          | **All brain domains** render with **no `productionReady` gate** (`app/(learner)/subjects/index.tsx:25`)                            |
+| **Tutor reachability** | Tutor chat uses **hardcoded fictional personas**, not the 14-tutor catalog (`lib/learner/lesson-plan.ts:22-24,245`); only 6 subjects have a baseline-tutor mapping (`lib/learner/baseline-tutors.ts`) | **All 14 tutors** reachable via `/(learner)/tutor/[tutorSlug]` with correct entitlement gating                                     |
+| **Activity surfaces**  | 10 of 15 implemented; 5 fall back                                                                                                                                                                     | Re-implements its **own** surface set (does not consume `@aivo/learner-surfaces`); ~6 full + 2 fallback; voice/video/audio missing |
 
 So: **web hides most subjects but has the richer surface library; mobile exposes
 every tutor but renders most activities with generic fallbacks.** A learner's
@@ -73,15 +73,15 @@ experience for a given subject depends heavily on which device they pick.
 `LearnerSurfaceType`s declared but **not implemented** (render the fallback on
 web; absent or scratchpad-fallback on mobile):
 
-| Surface | Primary subject(s) / tutor | Web | Mobile |
-| --- | --- | --- | --- |
-| `reading_annotation` | Reading/ELA — sage | fallback | absent |
-| `science_diagram` | Science — spark | fallback | absent |
-| `drag_manipulative` | Math (early) — nova; Exec-Fn — compass | fallback | absent |
-| `graph` | Math/Science — nova/spark | fallback | scratchpad fallback |
-| `multi_step_workspace` | Math/Science — nova/spark | fallback | absent |
-| `voice_response` | Speech — echo; Languages — lingua | implemented | **not wired** |
-| `video` / `audio` | media-rich lessons (all) | implemented | absent |
+| Surface                | Primary subject(s) / tutor             | Web         | Mobile              |
+| ---------------------- | -------------------------------------- | ----------- | ------------------- |
+| `reading_annotation`   | Reading/ELA — sage                     | fallback    | absent              |
+| `science_diagram`      | Science — spark                        | fallback    | absent              |
+| `drag_manipulative`    | Math (early) — nova; Exec-Fn — compass | fallback    | absent              |
+| `graph`                | Math/Science — nova/spark              | fallback    | scratchpad fallback |
+| `multi_step_workspace` | Math/Science — nova/spark              | fallback    | absent              |
+| `voice_response`       | Speech — echo; Languages — lingua      | implemented | **not wired**       |
+| `video` / `audio`      | media-rich lessons (all)               | implemented | absent              |
 
 Even the **4 production-ready subjects** therefore deliver a partly-generic
 activity experience (e.g. reading comprehension has no annotation surface;
@@ -92,24 +92,24 @@ science has no diagram-labelling; math has no manipulatives/graphing).
 Legend: **F** full · **P** partial (reachable but generic/fallback surfaces or
 no per-subject tooling) · **H** hidden/unreachable · **O** orphan (no subject row).
 
-| Tutor → Subject | Web | Mobile |
-| --- | --- | --- |
-| nova → math | P (no manipulatives/graph) | P (math-expr only) |
-| sage → reading | P (no annotation) | P |
-| sage → writing | P | P |
-| spark → science | P (no diagram/sim) | P |
-| harmony → social (SEL) | H | P (no SEL tools) |
-| echo → speech | H | P (no voice surface) |
-| compass → executive-function | H | P |
-| compass → life | H | P |
-| muse → art | H | P (art_canvas, mis-gated) |
-| chrono → social-studies | H | P (no timeline/map) |
-| lingua → world-languages | H | P (no pronunciation) |
-| pixel → coding | H | P (coding_sandbox works) |
-| atlas → (geography) | O | O (tutor-only, no subject) |
-| cadence → (music) | O | O |
-| vigor → (PE/health) | O | O |
-| forge → (STEM/engineering) | O | O |
+| Tutor → Subject              | Web                        | Mobile                     |
+| ---------------------------- | -------------------------- | -------------------------- |
+| nova → math                  | P (no manipulatives/graph) | P (math-expr only)         |
+| sage → reading               | P (no annotation)          | P                          |
+| sage → writing               | P                          | P                          |
+| spark → science              | P (no diagram/sim)         | P                          |
+| harmony → social (SEL)       | H                          | P (no SEL tools)           |
+| echo → speech                | H                          | P (no voice surface)       |
+| compass → executive-function | H                          | P                          |
+| compass → life               | H                          | P                          |
+| muse → art                   | H                          | P (art_canvas, mis-gated)  |
+| chrono → social-studies      | H                          | P (no timeline/map)        |
+| lingua → world-languages     | H                          | P (no pronunciation)       |
+| pixel → coding               | H                          | P (coding_sandbox works)   |
+| atlas → (geography)          | O                          | O (tutor-only, no subject) |
+| cadence → (music)            | O                          | O                          |
+| vigor → (PE/health)          | O                          | O                          |
+| forge → (STEM/engineering)   | O                          | O                          |
 
 **Net:** 0 subjects are "Full" on either client today; web has 4 reachable
 (all Partial), mobile has 12 reachable (all Partial), and 4 tutors are orphaned
@@ -128,7 +128,15 @@ on both.
 
 ---
 
-### Sprint 0 — Build the per-(tutor × subject × platform) experience gate
+### Sprint 0 — Build the per-(tutor × subject × platform) experience gate ✅ landed
+
+> Shipped: `scripts/subject-tutor-ux-check.mjs` (`pnpm ux:matrix`), regenerating
+> `docs/quality/subject-tutor-ux-matrix.md` and ratcheting against
+> `docs/quality/subject-tutor-ux-baseline.json`. First run confirms the audit:
+> **8 subjects hidden on web**, **4 orphan tutors** (atlas/cadence/vigor/forge),
+> catalog integrity green. The gate hard-fails on regression (subject P→H, tutor
+> linked→orphan, or any catalog-integrity break) and warns on improvements so the
+> baseline is updated in the same PR. Sprints 1+ improve cells and update the baseline.
 
 ```
 Create a machine-checked "experience matrix" that becomes the source of truth
@@ -390,13 +398,13 @@ honestly.
 
 ## 3. Suggested ordering & ownership
 
-| Wave | Sprints | Theme | Unblocks |
-| --- | --- | --- | --- |
-| Foundation | 0, 1, 2, 3 | Gate + catalog fixes + web tutor wiring + shared surface contract | everything below |
-| Core academics | 4, 5, 6 | sage / nova / spark get real subject activities | the 4 production subjects → Full |
-| Therapy & language | 7 | echo / lingua voice (highest SpEd value) | speech & languages → playable |
-| Creative & media | 8, 9 | muse / cadence + media/accessibility | expressive subjects + a11y |
-| Closeout | 10 | expansion subjects + parity truth-up | full catalog coherence |
+| Wave               | Sprints    | Theme                                                             | Unblocks                         |
+| ------------------ | ---------- | ----------------------------------------------------------------- | -------------------------------- |
+| Foundation         | 0, 1, 2, 3 | Gate + catalog fixes + web tutor wiring + shared surface contract | everything below                 |
+| Core academics     | 4, 5, 6    | sage / nova / spark get real subject activities                   | the 4 production subjects → Full |
+| Therapy & language | 7          | echo / lingua voice (highest SpEd value)                          | speech & languages → playable    |
+| Creative & media   | 8, 9       | muse / cadence + media/accessibility                              | expressive subjects + a11y       |
+| Closeout           | 10         | expansion subjects + parity truth-up                              | full catalog coherence           |
 
 **Gate to run after every sprint:** `pnpm ux:matrix` (Sprint 0) plus the existing
 `pnpm tutor:parity`, `pnpm mobile:parity:md`, and `pnpm curriculum:coverage`.
@@ -417,5 +425,5 @@ honestly.
 - `apps/mobile/src/components/learning/MobileSurfaceRenderer.tsx` — no `voice_response` case.
 - `apps/mobile/hooks/useSpeechInput.ts` — implemented; consumed only by `app/(learner)/homework/[sessionId].tsx`.
 - `docs/mobile-parity.md` — route-level "100% parity" claim (no surface-type axis).
-</content>
-</invoke>
+  </content>
+  </invoke>
