@@ -1,4 +1,5 @@
 import { Platform } from "react-native";
+import { applyActiveRoleHeader } from "./active-role";
 
 const TOKEN_KEY = "aivo_access_token";
 const MUST_CHANGE_PASSWORD_KEY = "aivo_must_change_password";
@@ -164,6 +165,9 @@ export async function apiFetch(
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
     }
+    // ADR 0020 — active-role hint, validated server-side (never a grant).
+    // Inherited by the 401-retry below via the `...headers` spread.
+    applyActiveRoleHeader(headers);
   }
 
   const url = `${baseUrl}${path}`;

@@ -124,7 +124,14 @@ flips the default; "Code gap" = a flag won't fix it.
     Changelog); other services should adopt the helper.**
 20. **[Minor] Unified mobile shell migration stalled.**
     `MOBILE_UNIFIED_APP=false`, no `(app)` shell; legacy per-role shells
-    remain (role switch ⇒ re-login).
+    remain (role switch ⇒ re-login). → **Progressed: the contract's
+    `lib/api.ts` active-role propagation now ships — mobile sends
+    `x-aivo-active-role` on every authenticated request (sourced from the
+    signed-in user via `lib/active-role.ts`, kept in sync by `useAuth`),
+    completing the loop with the #19 server-side validation. The remaining
+    work (the `(app)` shell, role chooser/switcher, screen migration,
+    flag flip) is blocked on multi-role tokens (today's JWT is single-role)
+    + on-device nav testing — see note below.**
 21. **[Minor] Parity matrix drift.** Strict `mobile:parity` fails:
     `/messages`, `/notifications` untracked. The "100% parity" doc only checks
     file existence, not functionality. → **Fixed: both routes tracked;

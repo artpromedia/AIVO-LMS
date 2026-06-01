@@ -9,6 +9,7 @@ import {
   setMustChangePassword as persistMustChangePassword,
   getMustChangePassword,
 } from "@/lib/api";
+import { setApiActiveRole } from "@/lib/active-role";
 import {
   tryBiometricUnlock,
   disableBiometricUnlock,
@@ -116,6 +117,13 @@ export function useAuthState(): AuthContextValue {
       tenantId: (payload.tenantId as string) || "",
     };
   };
+
+  // Keep the active-role hint (sent on every authenticated request by
+  // lib/api.ts) in sync with the signed-in user. Single-role today; the
+  // unified shell's role switcher updates it on switch. Cleared on logout.
+  useEffect(() => {
+    setApiActiveRole(state.user?.role ?? null);
+  }, [state.user?.role]);
 
   const checkAuth = useCallback(async () => {
     const token = await getToken();
