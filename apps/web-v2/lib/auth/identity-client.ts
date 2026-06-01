@@ -573,3 +573,54 @@ export async function identityAcceptInvite(
     setCookies: readSetCookies(res.headers),
   };
 }
+
+export type IdentityInviteTeacherResult =
+  | {
+      ok: true;
+      invite: { id: string; email: string; name: string; schoolId: string; expiresAt: string };
+    }
+  | { ok: false; status: number; error: string };
+
+/**
+ * POST /api/school/teachers — invite a teacher to the caller's school.
+ * `accessToken` is the district/school admin's bearer JWT (read from the
+ * `aivo_access_token` cookie). identity-svc derives the school from the
+ * SCHOOL_ADMIN token, so only {email, name} are required.
+ */
+export async function identityInviteTeacher(
+  accessToken: string,
+  input: { email: string; name: string },
+): Promise<IdentityInviteTeacherResult> {
+  let res: Response;
+  try {
+    res = await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/school/teachers`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(input),
+      cache: "no-store",
+    });
+  } catch (err) {
+    return { ok: false, status: 502, error: `identity-svc unreachable: ${(err as Error).message}` };
+  }
+  const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  if (!res.ok) {
+    return {
+      ok: false,
+      status: res.status,
+      error: typeof json.error === "string" ? json.error : "Could not send the invitation.",
+    };
+  }
+  return {
+    ok: true,
+    invite: json.invite as {
+      id: string;
+      email: string;
+      name: string;
+      schoolId: string;
+      expiresAt: string;
+    },
+  };
+}
