@@ -158,6 +158,35 @@ if (IS_PROD || STRICT) {
           blocker(`env:short:${v}`, `${v} must be at least ${min} chars in production`);
         }
       }
+      // Value gates — presence alone is not safety. Catches the cases the
+      // runtime guards refuse (e.g. AIVO_PERSISTENCE=memory, AUTH_MODE=mock,
+      // AI_PROVIDER=mock) so a deploy fails BEFORE traffic, not at first
+      // request. Unset values are handled by the `required` check above.
+      for (const [v, rule] of Object.entries(group.values ?? {})) {
+        const val = process.env[v];
+        if (val === undefined || val === "") continue;
+        if (rule.equals !== undefined && val !== rule.equals) {
+          blocker(
+            `env:value:${v}`,
+            `${v} must equal "${rule.equals}" in production (got "${val}")`,
+            `See scripts/env/required-prod-vars.json group="${groupName}".`,
+          );
+        }
+        if (Array.isArray(rule.oneOf) && !rule.oneOf.includes(val)) {
+          blocker(
+            `env:value:${v}`,
+            `${v} must be one of [${rule.oneOf.join(", ")}] in production (got "${val}")`,
+            `See scripts/env/required-prod-vars.json group="${groupName}".`,
+          );
+        }
+        if (Array.isArray(rule.notOneOf) && rule.notOneOf.includes(val)) {
+          blocker(
+            `env:value:${v}`,
+            `${v} must NOT be "${val}" in production (forbidden: [${rule.notOneOf.join(", ")}])`,
+            `See scripts/env/required-prod-vars.json group="${groupName}".`,
+          );
+        }
+      }
     }
   }
 }

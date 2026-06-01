@@ -364,3 +364,25 @@ brain-svc; the `ProfileStore` here is scratch state for computing effects/snapsh
 profile across services is a separate integration. Remaining Phase 3 items — real AI/TTS adapters and
 user-addressed push delivery — need external credentials/infra (provider keys, FCM/APNS) and are best done
 with those in hand.
+
+### Release-gate hardening — make the guards fail-closed at deploy time
+
+The runtime guards from Phases 0–3 fail at first request; the enterprise move is to also enforce them at
+the deploy gate (the repo already has `release-gate.mjs` → `prod:check` + `prod:no-demo`, run by
+`.github/workflows/production-gates.yml`). Two changes, both verified:
+
+- **Manifest + value gates** (`scripts/env/required-prod-vars.json` + `production-readiness-check.mjs`):
+  new `web-v2` and `speech-eval-svc` groups register the previously-unenforced prod vars
+  (`AIVO_PERSISTENCE`, `AUTH_MODE`, `AI_PROVIDER`, `TTS_PROVIDER`, `SPEECH_EVAL_MODE`, `SESSION_SECRET`,
+  `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`, `NEXT_PUBLIC_APP_URL`, `REDIS_URL`). A new `values` construct
+  (`equals` / `oneOf` / `notOneOf`) means presence is no longer enough — a deploy is **blocked** when
+  `AIVO_PERSISTENCE≠postgres`, `AUTH_MODE=mock`, `AI_PROVIDER=mock`, or TTS/speech aren't an explicit
+  valid choice. The gate is skipped in dev/CI (`NODE_ENV≠production` and no `--strict`), so it doesn't
+  break iteration; it activates at real prod deploy. Verified: fires on a bad env, passes on a good one.
+- **Scanner coverage** (`scripts/no-demo-prod-scan.mjs`): the "no demo in prod" scan now also covers the
+  services hardened in Phases 0–3 (`identity-svc`, `comms-svc`, `recommendation-svc`, `audit-svc`,
+  `problem-session-svc`). Verified still 0 findings.
+
+All production-readiness integration tests pass (5/5). This converts the runtime guards into deploy-time
+guarantees and is the pattern the remaining provider/store-secret work should follow: build the adapter,
+register its secret + value gate, ship a conformance test — never commit fake values or unverified scaffolds.

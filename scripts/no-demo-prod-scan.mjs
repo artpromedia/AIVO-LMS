@@ -27,6 +27,13 @@ const ROOTS = [
   "services/learning-svc",
   "services/tutor-svc",
   "services/assessment-svc",
+  // Hardened against silent demo/in-memory fallback (Phase 0–3). Scanning
+  // these keeps the "no demo in prod" gate enforcing the guards we added.
+  "services/identity-svc",
+  "services/comms-svc",
+  "services/recommendation-svc",
+  "services/audit-svc",
+  "services/problem-session-svc",
 ];
 
 const SKIP_DIR_NAMES = new Set([

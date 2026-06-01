@@ -57,6 +57,31 @@
     "secrets": {
       "required": ["SECRETS_PROVIDER"],
       "comment": "SECRETS_PROVIDER selects Vault | aws-secrets-manager | env. The first two require additional creds resolved at runtime by packages/security/src/secrets-client.ts."
+    },
+    "web-v2": {
+      "comment": "Next.js web app runtime invariants. apps/web-v2/lib/env.ts enforces these at process startup; this manifest enforces them at the deploy gate (fail-closed before traffic).",
+      "required": [
+        "AUTH_MODE",
+        "AI_PROVIDER",
+        "AIVO_PERSISTENCE",
+        "SESSION_SECRET",
+        "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY",
+        "NEXT_PUBLIC_APP_URL",
+        "REDIS_URL",
+        "TTS_PROVIDER"
+      ],
+      "minLength": { "SESSION_SECRET": 32, "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY": 32 },
+      "values": {
+        "AUTH_MODE": { "notOneOf": ["mock"] },
+        "AI_PROVIDER": { "notOneOf": ["mock"] },
+        "AIVO_PERSISTENCE": { "equals": "postgres" },
+        "TTS_PROVIDER": { "oneOf": ["mock", "production"] }
+      }
+    },
+    "speech-eval-svc": {
+      "comment": "Speech evaluation must make an explicit live-vs-mock choice in production (services/speech-eval-svc refuses to boot otherwise).",
+      "required": ["SPEECH_EVAL_MODE"],
+      "values": { "SPEECH_EVAL_MODE": { "oneOf": ["live", "mock"] } }
     }
   }
 }
