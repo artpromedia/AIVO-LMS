@@ -334,3 +334,65 @@ test(
     }
   },
 );
+
+test(
+  "invite-parent: admin from a different tenant is rejected (cross-tenant scope)",
+  { skip: SKIP },
+  async () => {
+    const { app, db } = await bootstrap();
+    const f = await seed(db);
+    try {
+      // A DISTRICT_ADMIN whose tenant does NOT match the learner's tenant must
+      // not be able to invite a parent for that learner, even though their role
+      // is privileged. Scope is enforced at the route, not taken on faith.
+      const foreignAdminToken = await tokenFor({
+        sub: "22222222-2222-2222-2222-222222222222",
+        role: "DISTRICT_ADMIN",
+        tenantId: "33333333-3333-3333-3333-333333333333",
+        email: "foreign-admin@test.local",
+      });
+      const res = await app.inject({
+        method: "POST",
+        url: "/api/family/collaboration/invite-parent",
+        headers: { authorization: `Bearer ${foreignAdminToken}` },
+        payload: {
+          learnerId: f.learnerId,
+          parentEmail: f.parentEmail,
+          teacherUserId: f.teacherId,
+        },
+      });
+      assert.equal(res.statusCode, 403, res.body);
+
+      // No invite row should have been written.
+      const { teacherParentInvites } = await import("@aivo/db");
+      const { eq } = await import("drizzle-orm");
+      const rows = await db
+        .select()
+        .from(teacherParentInvites)
+        .where(eq(teacherParentInvites.learnerId, f.learnerId));
+      assert.equal(rows.length, 0);
+
+      // An in-tenant admin on the same learner is allowed (201).
+      const inTenantAdminToken = await tokenFor({
+        sub: "44444444-4444-4444-4444-444444444444",
+        role: "DISTRICT_ADMIN",
+        tenantId: f.tenantId,
+        email: "in-tenant-admin@test.local",
+      });
+      const okRes = await app.inject({
+        method: "POST",
+        url: "/api/family/collaboration/invite-parent",
+        headers: { authorization: `Bearer ${inTenantAdminToken}` },
+        payload: {
+          learnerId: f.learnerId,
+          parentEmail: f.parentEmail,
+          teacherUserId: f.teacherId,
+        },
+      });
+      assert.equal(okRes.statusCode, 201, okRes.body);
+    } finally {
+      await cleanup(db, f);
+      await teardown(app, db);
+    }
+  },
+);

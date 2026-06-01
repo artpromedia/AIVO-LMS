@@ -1353,11 +1353,19 @@ export async function registerCollaborationRoutes(app: FastifyInstance) {
         .limit(1);
       if (!learner) return reply.code(404).send({ error: "Learner not found" });
 
-      // Authorize: teacher must be linked to the learner via a classroom
-      // they teach OR via an existing accepted learner_teachers row.
-      // Admin roles are allowed without that check (their scope is
-      // enforced by the tenant gate on identity-svc; for now we accept
-      // them at face value here).
+      // Authorize. TEACHER must be linked to the learner via a classroom
+      // they teach OR an accepted learner_teachers row (checked below).
+      // SCHOOL_ADMIN / DISTRICT_ADMIN are scoped to their own tenant: they
+      // may act on any learner in that tenant but never across tenants.
+      // PLATFORM_ADMIN is global and bypasses the scope check.
+      if (role === "SCHOOL_ADMIN" || role === "DISTRICT_ADMIN") {
+        if (!claims.tenantId || learner.tenantId !== claims.tenantId) {
+          return reply
+            .code(403)
+            .send({ error: "Learner is outside your administrative scope" });
+        }
+      }
+
       let classroomId: string | null = null;
       if (role === "TEACHER") {
         const [enrolledClassroom] = await db
