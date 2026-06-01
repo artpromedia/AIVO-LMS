@@ -84,6 +84,8 @@ export const SUPPORTED_RUNTIME_TYPES: ReadonlySet<LearnerSurfaceType> = new Set<
     "multi_step_workspace",
     // Sprint 6 — science diagram labelling.
     "science_diagram",
+    // Sprint 8 — music/rhythm sequencer.
+    "music_sequencer",
   ],
 );
 

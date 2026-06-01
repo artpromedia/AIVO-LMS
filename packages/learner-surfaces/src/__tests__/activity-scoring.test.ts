@@ -11,12 +11,15 @@ import {
   normalizeAnswer,
   scoreMultiStep,
   scoreScienceDiagram,
+  toggleStep,
+  scoreMusicSequencer,
 } from "../scoring/activity-scoring.js";
 import type {
   DragManipulativeSpec,
   GraphSpec,
   MultiStepSpec,
   ScienceDiagramSpec,
+  MusicSequencerSpec,
 } from "../types.js";
 
 describe("reading annotation scoring", () => {
@@ -200,5 +203,56 @@ describe("science diagram scoring", () => {
     };
     expect(scoreScienceDiagram({ placement: { o1: "l1" } }, obs).correct).toBe(true);
     expect(scoreScienceDiagram({ placement: {} }, obs).correct).toBe(false);
+  });
+});
+
+describe("music sequencer scoring", () => {
+  const spec: MusicSequencerSpec = {
+    tracks: ["Clap", "Drum"],
+    steps: 8,
+    expectedPattern: [
+      [0, 4],
+      [2, 6],
+    ],
+  };
+
+  it("toggles a step immutably and keeps it sorted", () => {
+    const a = toggleStep([0, 4], 2);
+    expect(a).toEqual([0, 2, 4]);
+    expect(toggleStep(a, 4)).toEqual([0, 2]);
+  });
+
+  it("scores a matching rhythm as correct (order-independent)", () => {
+    const s = scoreMusicSequencer(
+      {
+        pattern: [
+          [4, 0],
+          [6, 2],
+        ],
+      },
+      spec,
+    );
+    expect(s.correct).toBe(true);
+    expect(s.matchedTracks).toBe(2);
+  });
+
+  it("flags a wrong rhythm", () => {
+    const s = scoreMusicSequencer(
+      {
+        pattern: [
+          [0, 4],
+          [2, 5],
+        ],
+      },
+      spec,
+    );
+    expect(s.correct).toBe(false);
+    expect(s.matchedTracks).toBe(1);
+  });
+
+  it("is creative/open when no expected pattern is declared", () => {
+    const open: MusicSequencerSpec = { tracks: ["Clap"], steps: 8 };
+    expect(scoreMusicSequencer({ pattern: [[1, 3]] }, open).correct).toBe(true);
+    expect(scoreMusicSequencer({ pattern: [[]] }, open).correct).toBe(false);
   });
 });

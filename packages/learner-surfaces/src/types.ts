@@ -16,7 +16,8 @@ export type LearnerSurfaceType =
   | "voice_response"
   | "multi_step_workspace"
   | "coding_sandbox"
-  | "art_canvas";
+  | "art_canvas"
+  | "music_sequencer";
 
 export type FeedbackMode =
   | "immediate_supportive"
@@ -64,6 +65,29 @@ export interface LearnerSurfaceSpec {
   multiStep?: MultiStepSpec;
   /** Sprint 6 — set when type === "science_diagram". */
   scienceDiagram?: ScienceDiagramSpec;
+  /** Sprint 8 — set when type === "music_sequencer". */
+  musicSequencer?: MusicSequencerSpec;
+}
+
+/**
+ * Sprint 8 — Music/rhythm step sequencer (cadence). A grid of instrument tracks
+ * × beats; the learner toggles cells to build a rhythm pattern. Optional audio
+ * playback ticks the beats. Captures the pattern as the response.
+ */
+export interface MusicSequencerSpec {
+  /** Instrument row labels (e.g. ["Clap", "Drum", "Shaker"]). */
+  tracks: string[];
+  /** Number of beats (columns). Default 8. */
+  steps?: number;
+  /** Playback tempo in beats per minute. Default 90. */
+  tempo?: number;
+  /** Expected active step indices per track, for scoring. */
+  expectedPattern?: number[][];
+}
+
+export interface MusicSequencerResponse {
+  /** pattern[trackIndex] = sorted active step indices. */
+  pattern: number[][];
 }
 
 /**
@@ -483,6 +507,8 @@ export interface SurfaceResponse {
   multiStep?: MultiStepResponse;
   /** Sprint 6 — set when type === "science_diagram". */
   scienceDiagram?: ScienceDiagramResponse;
+  /** Sprint 8 — set when type === "music_sequencer". */
+  musicSequencer?: MusicSequencerResponse;
 }
 
 /**

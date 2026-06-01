@@ -15,6 +15,8 @@ import type {
   ReadingAnnotationTool,
   ScienceDiagramResponse,
   ScienceDiagramSpec,
+  MusicSequencerResponse,
+  MusicSequencerSpec,
 } from "../types.js";
 
 /* ---------------------------------------------------------------- *
@@ -231,4 +233,45 @@ export function scoreScienceDiagram(
     if (response.placement[t.id] === t.correctLabelId) correctCount++;
   }
   return { correct: correctCount === graded.length, correctCount, total: graded.length };
+}
+
+/* ---------------------------------------------------------------- *
+ * Music sequencer (Sprint 8)                                        *
+ * ---------------------------------------------------------------- */
+
+/** Toggle a step in a track's active-step list (returns a new sorted array). */
+export function toggleStep(active: readonly number[], step: number): number[] {
+  return active.includes(step)
+    ? active.filter((s) => s !== step)
+    : [...active, step].sort((a, b) => a - b);
+}
+
+export interface MusicSequencerScore {
+  correct: boolean;
+  matchedTracks: number;
+  total: number;
+}
+
+/** Compare the learner's rhythm pattern to the expected pattern per track. When
+ *  no expected pattern is declared the surface is creative/open-ended (any
+ *  non-empty pattern counts). */
+export function scoreMusicSequencer(
+  response: MusicSequencerResponse,
+  spec: MusicSequencerSpec,
+): MusicSequencerScore {
+  const expected = spec.expectedPattern;
+  if (!expected || expected.length === 0) {
+    const any = response.pattern.some((t) => t.length > 0);
+    return { correct: any, matchedTracks: any ? 1 : 0, total: 1 };
+  }
+  const sameSet = (a: readonly number[], b: readonly number[]) => {
+    if (a.length !== b.length) return false;
+    const bs = new Set(b);
+    return a.every((x) => bs.has(x));
+  };
+  let matched = 0;
+  for (let i = 0; i < expected.length; i++) {
+    if (sameSet(response.pattern[i] ?? [], expected[i] ?? [])) matched++;
+  }
+  return { correct: matched === expected.length, matchedTracks: matched, total: expected.length };
 }

@@ -23,7 +23,9 @@ export type LearnerSurfaceKind =
   | "science_diagram"
   // Sprint 9 — media surfaces.
   | "video"
-  | "audio";
+  | "audio"
+  // Sprint 8 — music/rhythm sequencer (cadence).
+  | "music_sequencer";
 
 export interface LearnerSurfaceSpec {
   kind: LearnerSurfaceKind;

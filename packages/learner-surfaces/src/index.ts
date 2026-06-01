@@ -56,6 +56,10 @@ export {
   type ScienceDiagramSurfaceProps,
 } from "./surfaces/ScienceDiagramSurface.js";
 export {
+  MusicSequencerSurface,
+  type MusicSequencerSurfaceProps,
+} from "./surfaces/MusicSequencerSurface.js";
+export {
   toggleSpanSelection,
   scoreReadingAnnotation,
   defaultReadingTool,
@@ -67,6 +71,8 @@ export {
   normalizeAnswer,
   scoreMultiStep,
   scoreScienceDiagram,
+  toggleStep,
+  scoreMusicSequencer,
 } from "./scoring/activity-scoring.js";
 export {
   SurfaceRouter,

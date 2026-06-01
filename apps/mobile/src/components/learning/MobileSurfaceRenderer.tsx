@@ -52,6 +52,7 @@ const FULL_MOBILE_KINDS = new Set<LearnerSurfaceKind>([
   "science_diagram",
   "video",
   "audio",
+  "music_sequencer",
 ]);
 
 export type SurfaceTutorKey =
@@ -80,6 +81,8 @@ const REQUIRED_TUTOR: Partial<Record<LearnerSurfaceKind, SurfaceTutorKey>> = {
   // Sprint 1 fix (kept in sync with the web entitlement map): the art canvas
   // belongs to the art tutor (muse), not the music tutor (cadence).
   art_canvas: "muse",
+  // Sprint 8: the music/rhythm sequencer belongs to the music tutor (cadence).
+  music_sequencer: "cadence",
 };
 
 export type SurfaceCommand =
@@ -98,6 +101,7 @@ export type SurfaceCommand =
   | { kind: "multi_step_workspace"; entries: Record<string, string> }
   | { kind: "science_diagram"; placement: Record<string, string> }
   | { kind: "media_complete"; surfaceKind: LearnerSurfaceKind }
+  | { kind: "music_sequencer"; pattern: number[][] }
   | { kind: "noop"; surfaceKind: LearnerSurfaceKind };
 
 interface Props {
@@ -221,6 +225,8 @@ export function MobileSurfaceRenderer({ theme, beat, disabled, onSubmit, entitle
         <GeometryWorkspaceSurface theme={theme} disabled={disabled} cfg={cfg} onSubmit={onSubmit} />
       ) : kind === "video" || kind === "audio" ? (
         <MediaSurface theme={theme} surfaceKind={kind} cfg={cfg} onSubmit={onSubmit} />
+      ) : kind === "music_sequencer" ? (
+        <MusicSequencerSurface theme={theme} disabled={disabled} cfg={cfg} onSubmit={onSubmit} />
       ) : (
         // scratchpad (full) + remaining fallback kinds (chart, unknown) share
         // the ink workspace. Fallback kinds show a label so the simplified
@@ -1141,6 +1147,88 @@ function ScienceDiagramSurface({
           styles.submit,
           (disabled || Object.keys(placement).length < targets.length) && styles.submitDisabled,
         ]}
+      >
+        <Text style={styles.submitText}>I&apos;m done</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+/* -------------------------------------------------------------------- */
+/* music_sequencer (Sprint 8)                                           */
+/* -------------------------------------------------------------------- */
+
+/** Sprint 8 — mobile music/rhythm sequencer (cadence). A grid of instrument
+ *  tracks × beats; tap cells to build a rhythm. Captures the pattern. */
+function MusicSequencerSurface({
+  theme,
+  disabled,
+  cfg,
+  onSubmit,
+}: {
+  theme: TierThemeMobile;
+  disabled?: boolean;
+  cfg: Record<string, unknown> | undefined;
+  onSubmit: (c: SurfaceCommand) => void;
+}) {
+  const styles = useMemo(() => createStyles(theme), [theme]);
+  const tracks = (Array.isArray(cfg?.tracks) ? (cfg!.tracks as string[]) : []).filter(
+    (t) => typeof t === "string",
+  );
+  const steps = Math.max(1, readNumber(cfg, "steps", 8));
+  const [pattern, setPattern] = useState<number[][]>(() => tracks.map(() => []));
+
+  const toggle = (ti: number, s: number) => {
+    if (disabled) return;
+    setPattern((prev) =>
+      prev.map((t, i) =>
+        i === ti ? (t.includes(s) ? t.filter((x) => x !== s) : [...t, s].sort((a, b) => a - b)) : t,
+      ),
+    );
+  };
+
+  const hasNotes = pattern.some((t) => t.length > 0);
+
+  return (
+    <View style={{ gap: 12 }}>
+      {tracks.map((track, ti) => (
+        <View key={track} style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+          <Text
+            style={{ width: 64, color: theme.colors.text, fontWeight: "600" }}
+            numberOfLines={1}
+          >
+            {track}
+          </Text>
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 4 }}>
+            {Array.from({ length: steps }, (_, s) => {
+              const on = pattern[ti]?.includes(s) ?? false;
+              return (
+                <Pressable
+                  key={s}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${track} beat ${s + 1}`}
+                  accessibilityState={{ selected: on }}
+                  onPress={() => toggle(ti, s)}
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: 6,
+                    borderWidth: 2,
+                    borderColor: on ? theme.colors.primary : theme.colors.border,
+                    backgroundColor: on ? theme.colors.primary : theme.colors.surface,
+                  }}
+                />
+              );
+            })}
+          </View>
+        </View>
+      ))}
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="submit rhythm"
+        disabled={disabled || !hasNotes}
+        onPress={() => onSubmit({ kind: "music_sequencer", pattern })}
+        style={[styles.submit, (disabled || !hasNotes) && styles.submitDisabled]}
       >
         <Text style={styles.submitText}>I&apos;m done</Text>
       </Pressable>

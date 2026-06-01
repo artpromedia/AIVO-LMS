@@ -62,6 +62,8 @@ export const SURFACE_CAPABILITY_REGISTRY: Record<LearnerSurfaceType, SurfaceCapa
   },
   multi_step_workspace: { web: "full", mobile: "full", note: "math/science (nova/spark)" },
   science_diagram: { web: "full", mobile: "full", note: "science (spark)" },
+  // Sprint 8 — music/rhythm sequencer (cadence).
+  music_sequencer: { web: "full", mobile: "full", note: "music (cadence)" },
 };
 
 /** Runtime list of every surface type (keys of the registry). */

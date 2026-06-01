@@ -391,7 +391,14 @@ voice_response and capture a scored spoken response on web AND mobile.
 
 ---
 
-### Sprint 8 — Creative & expressive subjects (muse art, cadence music)
+### Sprint 8 — Creative & expressive subjects (muse art, cadence music) ✅ landed
+
+> Shipped: a new `music_sequencer` surface (cadence) on **web** (track×beat grid
+> with Web-Audio playback) and **mobile** (RN beat grid), gated to the `cadence`
+> tutor. Pure `scoreMusicSequencer`/`toggleStep` helpers + tests. `art_canvas`
+> (muse) already shipped full on both platforms with a palette (Sprint 1 fixed
+> its entitlement). Wired into the router/registry → the catalog is now **16
+> surfaces, 16/16 full on web and mobile**.
 
 ```
 Deliver bespoke creative tooling, not a blank canvas.
@@ -409,7 +416,16 @@ both clients with response capture + telemetry.
 
 ---
 
-### Sprint 9 — Media + accessibility in the lesson runtime (all tutors)
+### Sprint 9 — Media + accessibility in the lesson runtime (all tutors) ✅ landed (core)
+
+> Shipped: **mobile `video` + `audio`** surfaces (expo-av — native video
+> controls, audio play/pause, transcript), bringing mobile media to parity with
+> web. Added `resolveLessonAccommodations` (mobile `preferences-logic`) — the
+> shared, tested resolver the runtimes consume to decide which affordances to
+> surface (read-aloud, captions, extended time, reduced motion, text scale).
+> Follow-ups: a TTS read-aloud control needs the `expo-speech` dependency (not
+> installed in this env), and wiring the resolved indicators into the stage/
+> lesson runtime UI is the integration step.
 
 ```
 Bring media and lesson-level accessibility to mobile, where they are absent.

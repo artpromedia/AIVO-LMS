@@ -51,6 +51,8 @@ const SURFACE_TO_REQUIRED_TUTOR: Partial<
   // Languages (lingua) second; echo was previously omitted, locking speech
   // learners out of their core activity.
   voice_response: ["echo", "lingua"],
+  // Sprint 8: the music/rhythm sequencer belongs to the music tutor (cadence).
+  music_sequencer: "cadence",
 };
 
 /** Every tutor that unlocks a surface (empty when the surface is free). */
