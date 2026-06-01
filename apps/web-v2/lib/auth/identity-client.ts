@@ -582,14 +582,14 @@ export type IdentityInviteTeacherResult =
   | { ok: false; status: number; error: string };
 
 /**
- * POST /api/school/teachers — invite a teacher to the caller's school.
+ * POST /api/school/teachers — invite a teacher to a school.
  * `accessToken` is the district/school admin's bearer JWT (read from the
- * `aivo_access_token` cookie). identity-svc derives the school from the
- * SCHOOL_ADMIN token, so only {email, name} are required.
+ * `aivo_access_token` cookie). A SCHOOL_ADMIN token pins the school, so only
+ * {email, name} are required; a DISTRICT_ADMIN must pass `schoolId`.
  */
 export async function identityInviteTeacher(
   accessToken: string,
-  input: { email: string; name: string },
+  input: { email: string; name: string; schoolId?: string },
 ): Promise<IdentityInviteTeacherResult> {
   let res: Response;
   try {
@@ -623,4 +623,137 @@ export async function identityInviteTeacher(
       expiresAt: string;
     },
   };
+}
+
+/* -------------------------------------------------------------------------
+ * District admin console (real-auth). Helpers for the district staff page to
+ * source real schools + pending invites and to create/revoke staff invites
+ * via identity-svc, replacing the in-memory demo store when a real access
+ * token is present.
+ * ---------------------------------------------------------------------- */
+
+export type DistrictSchool = { id: string; name: string };
+
+export type DistrictAdminInvite = {
+  id: string;
+  email: string;
+  name: string;
+  role: string; // wire format (uppercase)
+  schoolId: string | null;
+  schoolName: string | null;
+  createdAt: string;
+};
+
+async function districtGet<T>(
+  accessToken: string,
+  path: string,
+): Promise<{ ok: true; data: T } | { ok: false; status: number; error: string }> {
+  let res: Response;
+  try {
+    res = await fetch(`${serverEnv.IDENTITY_SVC_URL}${path}`, {
+      headers: { authorization: `Bearer ${accessToken}` },
+      cache: "no-store",
+    });
+  } catch (err) {
+    return { ok: false, status: 502, error: `identity-svc unreachable: ${(err as Error).message}` };
+  }
+  const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+  if (!res.ok) {
+    return {
+      ok: false,
+      status: res.status,
+      error: typeof json.error === "string" ? json.error : "Request failed",
+    };
+  }
+  return { ok: true, data: json as T };
+}
+
+/** GET /api/district/schools — schools in the caller's district. */
+export async function identityListDistrictSchools(
+  accessToken: string,
+): Promise<{ ok: true; schools: DistrictSchool[] } | { ok: false; status: number; error: string }> {
+  const res = await districtGet<{ schools: Array<{ id: string; name: string }> }>(
+    accessToken,
+    "/api/district/schools",
+  );
+  if (!res.ok) return res;
+  const schools = (res.data.schools ?? []).map((s) => ({ id: s.id, name: s.name }));
+  return { ok: true, schools };
+}
+
+/** GET /api/district/admins — district/school admins + all pending staff invites. */
+export async function identityListDistrictAdmins(
+  accessToken: string,
+): Promise<
+  | { ok: true; pendingInvites: DistrictAdminInvite[] }
+  | { ok: false; status: number; error: string }
+> {
+  const res = await districtGet<{ pendingInvites: DistrictAdminInvite[] }>(
+    accessToken,
+    "/api/district/admins",
+  );
+  if (!res.ok) return res;
+  return { ok: true, pendingInvites: res.data.pendingInvites ?? [] };
+}
+
+export type IdentityCreateAdminInviteResult =
+  | { ok: true }
+  | { ok: false; status: number; error: string };
+
+/** POST /api/district/admins — invite a DISTRICT_ADMIN or SCHOOL_ADMIN. */
+export async function identityCreateAdminInvite(
+  accessToken: string,
+  input: { email: string; name: string; role: "DISTRICT_ADMIN" | "SCHOOL_ADMIN"; schoolId?: string },
+): Promise<IdentityCreateAdminInviteResult> {
+  let res: Response;
+  try {
+    res = await fetch(`${serverEnv.IDENTITY_SVC_URL}/api/district/admins`, {
+      method: "POST",
+      headers: { "content-type": "application/json", authorization: `Bearer ${accessToken}` },
+      body: JSON.stringify(input),
+      cache: "no-store",
+    });
+  } catch (err) {
+    return { ok: false, status: 502, error: `identity-svc unreachable: ${(err as Error).message}` };
+  }
+  if (!res.ok) {
+    const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+    const error =
+      json.code === "STEP_UP_REQUIRED"
+        ? "Additional verification is required to invite admins. Re-authenticate and try again."
+        : typeof json.error === "string"
+          ? json.error
+          : "Could not send the invitation.";
+    return { ok: false, status: res.status, error };
+  }
+  return { ok: true };
+}
+
+/** DELETE /api/district/admins/invites/:id — revoke any pending staff invite. */
+export async function identityRevokeAdminInvite(
+  accessToken: string,
+  inviteId: string,
+): Promise<{ ok: true } | { ok: false; status: number; error: string }> {
+  let res: Response;
+  try {
+    res = await fetch(
+      `${serverEnv.IDENTITY_SVC_URL}/api/district/admins/invites/${encodeURIComponent(inviteId)}`,
+      {
+        method: "DELETE",
+        headers: { authorization: `Bearer ${accessToken}` },
+        cache: "no-store",
+      },
+    );
+  } catch (err) {
+    return { ok: false, status: 502, error: `identity-svc unreachable: ${(err as Error).message}` };
+  }
+  if (!res.ok) {
+    const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+    return {
+      ok: false,
+      status: res.status,
+      error: typeof json.error === "string" ? json.error : "Could not revoke the invitation.",
+    };
+  }
+  return { ok: true };
 }

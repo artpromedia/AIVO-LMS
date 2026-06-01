@@ -283,15 +283,18 @@ Worked on branch `claude/gifted-heisenberg-V9YJm`. Approach chosen: **real-auth 
 - **`schoolId` login claim.** Every access-token mint (login, MFA-verify, refresh, register) now carries
   `schoolId` when present — required so SCHOOL_ADMIN tokens satisfy `requireSchoolAdmin` (no login path
   carried it before, so school admins could not use school-scoped endpoints at all).
+- **District → school-admin/teacher console (requirement #1 — complete end-to-end).** The district staff
+  console is now dual-mode: in real-auth it sources the school dropdown from `GET /api/district/schools`,
+  lists pending invites (all staff roles, incl. teachers) from `GET /api/district/admins`, creates
+  invites via `POST /api/district/admins` (DISTRICT_ADMIN / SCHOOL_ADMIN) or `POST /api/school/teachers`
+  (teacher), and revokes via `DELETE /api/district/admins/invites/:id`. Success now shows "invitation
+  emailed" instead of a plaintext temp password; the temp-password panel only appears in the demo
+  fallback (no real token). BFF helpers: `identityListDistrictSchools`, `identityListDistrictAdmins`,
+  `identityCreateAdminInvite`, `identityRevokeAdminInvite`.
 
-**REMAINING (district → school-admin UI wiring)**
-- The backend for district→school-admin invites is complete (`POST /api/district/admins`) and acceptance
-  now works. The **district staff console UI** still writes to the in-memory `staff-invites` store and is
-  not yet wired to that endpoint, because its school dropdown is sourced from the demo "school-as-tenant"
-  model (`tenants.filter(type === "school")`), not real identity-svc school UUIDs. Wiring it to real-auth
-  requires **sourcing real schools** (tenant-svc / identity-svc) into the console first — a scoped
-  follow-up, deliberately deferred under the dual-mode decision. (The school-admin teacher console does
-  not need this because it derives the school from the admin's token.)
-- Also outstanding from §2: remove the plaintext temp-password panel from the district console once it's
-  on real-auth; step-up (`requireStepUp`) is flag-gated off by default, so it is not a blocker for the
-  default pilot config but must be handled when `STEP_UP_AUTH` is enabled.
+**REMAINING (smaller follow-ups)**
+- The district page's **stats cards + active-staff table** are still demo read models (the *creation*
+  flow is real; these read surfaces are display-only and not yet sourced from the backend).
+- **Step-up:** `POST /api/district/admins` is behind `requireStepUp`, which is flag-gated **off** by
+  default — not a blocker for the default pilot, but when `STEP_UP_AUTH` is enabled the district console
+  must complete a step-up challenge (web-v2 already has `step-up-verify` plumbing to build on).

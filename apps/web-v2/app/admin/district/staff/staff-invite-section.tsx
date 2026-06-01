@@ -42,7 +42,7 @@ export function StaffInviteSection({
 
   // Reset form whenever a success bounces back.
   useEffect(() => {
-    if (state.status === "success") {
+    if (state.status === "success" || state.status === "invited") {
       formRef.current?.reset();
       setRole("teacher");
     }
@@ -107,6 +107,12 @@ export function StaffInviteSection({
 
             {state.status === "success" ? (
               <SuccessPanel state={state} onClose={() => setOpen(false)} />
+            ) : state.status === "invited" ? (
+              <InvitedPanel
+                email={state.email}
+                displayName={state.displayName}
+                onClose={() => setOpen(false)}
+              />
             ) : (
               <form ref={formRef} action={formAction} className="space-y-3">
                 <label className="block">
@@ -223,6 +229,33 @@ function SuccessPanel({
         <p className="mt-2 text-xs text-aivo-ink-soft">
           Share this with the new staff member out-of-band. They&apos;ll be
           prompted to change it on first sign-in.
+        </p>
+      </div>
+      <div className="flex justify-end">
+        <Button onClick={onClose}>Done</Button>
+      </div>
+    </div>
+  );
+}
+
+function InvitedPanel({
+  email,
+  displayName,
+  onClose,
+}: {
+  email: string;
+  displayName: string;
+  onClose: () => void;
+}) {
+  return (
+    <div className="space-y-3">
+      <div className="rounded-lg bg-emerald-50 px-3 py-3 text-sm">
+        <p className="font-medium text-aivo-ink">
+          Invitation emailed to {displayName} ({email}).
+        </p>
+        <p className="mt-1 text-aivo-ink-soft">
+          They&apos;ll follow the link to set their own password, then appear in your staff list
+          once they accept. The link expires in 72 hours — you can resend or revoke it below.
         </p>
       </div>
       <div className="flex justify-end">
