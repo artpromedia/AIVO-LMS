@@ -15,7 +15,15 @@ export type LearnerSurfaceKind =
   // Sprint 4 — reading comprehension annotation (sage / ELA).
   | "reading_annotation"
   // Sprint 7 — spoken response (echo / lingua).
-  | "voice_response";
+  | "voice_response"
+  // Sprint 5/6 mobile parity — bespoke renderers (previously fallbacks).
+  | "graph"
+  | "drag_manipulative"
+  | "multi_step_workspace"
+  | "science_diagram"
+  // Sprint 9 — media surfaces.
+  | "video"
+  | "audio";
 
 export interface LearnerSurfaceSpec {
   kind: LearnerSurfaceKind;

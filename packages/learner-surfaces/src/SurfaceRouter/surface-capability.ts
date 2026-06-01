@@ -48,23 +48,20 @@ export const SURFACE_CAPABILITY_REGISTRY: Record<LearnerSurfaceType, SurfaceCapa
   // Sprint 7 — spoken response ships full on web and mobile (mobile records via
   // useSpeechInput → ai-svc transcribe).
   voice_response: { web: "full", mobile: "full", note: "speech (echo) / languages (lingua)" },
-  video: { web: "full", mobile: "none", note: "media-rich lessons (all)" },
-  audio: { web: "full", mobile: "none", note: "media-rich lessons (all)" },
-  geometry_workspace: { web: "full", mobile: "fallback", note: "math/geometry (nova)" },
-  // Sprint 4 — reading annotation ships on both web and mobile.
+  // Sprint 9 — media surfaces ship full on mobile (expo-av video + audio).
+  video: { web: "full", mobile: "full", note: "media-rich lessons (all)" },
+  audio: { web: "full", mobile: "full", note: "media-rich lessons (all)" },
+  // Mobile-parity pass — bespoke RN renderers now ship for every surface.
+  geometry_workspace: { web: "full", mobile: "full", note: "math/geometry (nova)" },
   reading_annotation: { web: "full", mobile: "full", note: "reading/ELA (sage)" },
-  // Sprint 5 — graph / manipulatives / multi-step ship full on web; mobile uses
-  // the labelled fallback (+ telemetry) until bespoke RN renderers land.
-  graph: { web: "full", mobile: "fallback", note: "math/science (nova/spark)" },
+  graph: { web: "full", mobile: "full", note: "math/science (nova/spark)" },
   drag_manipulative: {
     web: "full",
-    mobile: "fallback",
+    mobile: "full",
     note: "math manipulatives (nova) / exec-fn (compass)",
   },
-  multi_step_workspace: { web: "full", mobile: "fallback", note: "math/science (nova/spark)" },
-  // Sprint 6 — science diagram labelling ships full on web; mobile uses the
-  // labelled fallback until a bespoke RN renderer lands.
-  science_diagram: { web: "full", mobile: "fallback", note: "science (spark)" },
+  multi_step_workspace: { web: "full", mobile: "full", note: "math/science (nova/spark)" },
+  science_diagram: { web: "full", mobile: "full", note: "science (spark)" },
 };
 
 /** Runtime list of every surface type (keys of the registry). */
