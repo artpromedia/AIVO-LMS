@@ -215,6 +215,26 @@ clear message naming the offending variable.
 Recommended sequence: **7 → 5 → 1 → 2 → 3 → 6 → 4** (security/guardrails first, then interop, then
 feature completeness, with test backfill folded into each PR where practical).
 
+## 3a. Progress log (this branch)
+
+All seven sprints implemented, tested, and committed on `claude/jolly-pasteur-z3eWA`:
+
+| Sprint | Status | What landed |
+| --- | --- | --- |
+| 7 — lock real-mode defaults | ✅ Done | Regression tests asserting the env validator fails closed in production for every demo selector (auth/AI/persistence + overrides, dev SESSION_SECRET, missing DATABASE_URL). |
+| 5 — collaboration admin scope | ✅ Done | SCHOOL_ADMIN/DISTRICT_ADMIN parent-invites now tenant-scoped (no cross-tenant); PLATFORM_ADMIN stays global. Cross-tenant rejection test added. |
+| 1 — LTI 1.3 persistence | ✅ Done | New `lti/persistence.ts`: idempotent platform→deployment→context→resource-link upserts + AGS lineitem; unregistered platforms rejected; resource-link db id threaded into the session token. DB-backed tests verified against Postgres. Orphaned `__tests__/` suite un-orphaned. |
+| 2 — Speech Buddy telemetry | ✅ Done | EventEmitter writes a durable outbox; `flush_events()` drains to NATS (best-effort, order-preserving, survives outage). Orchestrator flushes at session/turn boundaries. `nats-py` added; 4 outbox tests. |
+| 3 — AAC vocabulary sync | ✅ Done | New `aac_vocabulary` table + curated core-word catalog in `@aivo/aac-bridge`; `buildSymbolBoard()` seeds core vocab, is locale-aware, fails loudly (422) instead of syncing empty. DB-backed tests verified against Postgres. |
+| 6 — test backfill | ✅ Done | Unit suites for status-page-svc, i18n-svc, research-svc, integrations-svc; wired into CI. `backend:parity` now 28 green / 0 yellow (was 26 green / 2 yellow). |
+| 4 — AssistiveWare + SIS | ✅ Done | AssistiveWare reverse-highlight (native bridge → x-callback-url fallback) + `supportsReverseHighlight()`. Schoology + PowerSchool roster-sync handlers implemented, wired, flipped to `available`, unit-tested. |
+
+Residual (tracked, non-blocking): 6 `backend:parity` "no integration test references in
+tests/integration/**" warnings (curriculum-svc, engagement-svc, integration-svc,
+integrations-svc, subject-brain-svc, tenant-svc) — these are softer than the unit-test gate and
+need the integration harness/stack; and vendor-sandbox e2e validation of the two new SIS
+connectors before relying on them in production.
+
 ## 4. Definition of done (every sprint)
 
 1. Feature behind its existing flag where one exists; default-off until verified.
