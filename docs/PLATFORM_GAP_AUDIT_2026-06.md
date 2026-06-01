@@ -147,8 +147,14 @@ flips the default; "Code gap" = a flag won't fix it.
     (tenant-scoped, hash-chained `admin_audit_log` ROLE_GRANTED/REVOKED rows).
     So a user can now genuinely hold multiple roles end-to-end. The last
     remaining pieces are the `(app)` shell UI (needs device testing) and a
-    web admin screen to drive the grant/revoke API (the platform-users page
-    is still store-backed, so it needs moving onto the identity-svc path).
+    web admin screen to drive the grant/revoke API and a
+    web admin screen to drive the grant/revoke API. **Web admin UI added
+    this pass:** an "Additional roles" card on the platform-admin user
+    detail page (`/admin/platform/users/[id]`) grants/revokes roles via a
+    dual-path BFF (`/api/bff/admin/users/[userId]/roles` → identity-svc when
+    enabled + a real admin token, else an in-memory store), with web↔wire
+    role mapping. So the only remaining piece for #20 is the `(app)` shell
+    UI itself (which needs on-device navigation testing).
 21. **[Minor] Parity matrix drift.** Strict `mobile:parity` fails:
     `/messages`, `/notifications` untracked. The "100% parity" doc only checks
     file existence, not functionality. → **Fixed: both routes tracked;
