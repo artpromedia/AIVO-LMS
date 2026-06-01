@@ -10,7 +10,7 @@
  * `@aivo/brand` rather than re-declared, so the baseline UI stays in lockstep
  * with the rest of the platform (tutor avatars, tier copy, marketing).
  */
-import { TUTORS } from "@aivo/brand";
+import { TUTORS, getSubjectBySlug } from "@aivo/brand";
 
 export type BaselineTutor = {
   /** Stable id (also the legacy chapter id). */
@@ -105,5 +105,24 @@ export const BASELINE_TUTORS: BaselineTutor[] = [
 ];
 
 export function tutorForSubjectSlug(slug: string): BaselineTutor | null {
-  return BASELINE_TUTORS.find((t) => t.subjectSlug === slug) ?? null;
+  const explicit = BASELINE_TUTORS.find((t) => t.subjectSlug === slug);
+  if (explicit) return explicit;
+  // Sprint 2 (subject/tutor UX): every subject — not just the six baseline
+  // Discovery domains — now resolves to a tutor descriptor derived from the
+  // canonical `@aivo/brand` catalog, so the subjects grid and lesson flow show
+  // the real tutor (name / emoji / brand color) for all subjects.
+  const subject = getSubjectBySlug(slug);
+  if (!subject) return null;
+  const tutor = TUTORS[subject.tutorKey];
+  return {
+    id: `${subject.tutorKey}_${slug}`,
+    name: tutor.name,
+    subjectSlug: slug,
+    subtitle: subject.name,
+    landmark: tutor.domain,
+    emoji: tutor.icon,
+    color: tutor.color,
+    scene: subject.description,
+    greeting: `Hi! I'm ${tutor.name}. Let's explore ${subject.name} together.`,
+  };
 }

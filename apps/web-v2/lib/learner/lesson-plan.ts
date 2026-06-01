@@ -17,17 +17,19 @@ import type {
   Subject,
 } from "@/lib/db/types";
 import type { GeneratedLessonPlanInput } from "@/lib/validators/lesson";
+import { getSubjectBySlug, TUTORS } from "@aivo/brand";
 import { pickMultimediaFixtureForSubject } from "./multimedia-item-bank";
 
-const TUTOR_PERSONA_BY_SUBJECT: Record<string, string> = {
-  reading: "Nimbus the Calm Explorer",
-  math: "Zara the Number Friend",
-  writing: "Penn the Story Builder",
-  science: "Dr. Sprout the Curious",
-  social: "Lumi the Kindness Coach",
-  life: "Sage the Routine Guide",
-  art: "Hue the Color Pal",
-};
+/**
+ * Resolve the canonical brand tutor name for a subject. Sprint 2 (subject/tutor
+ * UX) replaced the old hardcoded fictional personas ("Nimbus", "Zara", …) with
+ * the real catalog tutors (Sage, Nova, Spark, …) keyed off the subject's
+ * `tutorKey`, so the lesson copy matches the rest of the platform.
+ */
+export function tutorNameForSubject(slug: string): string {
+  const tutorKey = getSubjectBySlug(slug)?.tutorKey;
+  return tutorKey ? TUTORS[tutorKey].name : TUTORS.nova.name;
+}
 
 const TUTOR_GREETING_BY_STYLE: Record<
   LearnerBrainProfileState["tutorPersonaRecommendation"]["style"],
@@ -242,7 +244,7 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
   // Phase 4: a break-week focus is framed as "get ready for resumption" rather
   // than "what you're doing in class this week" (school is closed).
   const isHolidayPrep = curriculumFocus?.mode === "holiday_prep";
-  const tutorPersona = TUTOR_PERSONA_BY_SUBJECT[subject.slug] ?? "Nimbus the Calm Explorer";
+  const tutorPersona = tutorNameForSubject(subject.slug);
   const greeting =
     TUTOR_GREETING_BY_STYLE[brainState.tutorPersonaRecommendation.style](learnerName);
   const tier = difficultyTierForLevel(mastery.level);
@@ -262,20 +264,25 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
   const multimedia = pickMultimediaFixtureForSubject(subject.slug, `${skill.id}:${learnerName}`);
   if (multimedia && guidedPractice.length > 0) {
     const [first, ...rest] = guidedPractice;
-    guidedPractice.splice(0, guidedPractice.length, {
-      ...first,
-      prompt: multimedia.prompt,
-      expectedAnswer: multimedia.expectedAnswer ?? first.expectedAnswer,
-      choices: multimedia.choices?.length ? multimedia.choices : first.choices,
-      hint: multimedia.hint ?? first.hint,
-      scaffold: multimedia.scaffold ?? first.scaffold,
-      media: {
-        surfaceType: multimedia.surfaceType,
-        assets: multimedia.assets.map((asset) =>
-          asset.kind === "captions" ? { ...asset, src: multimedia.captionText } : asset,
-        ),
+    guidedPractice.splice(
+      0,
+      guidedPractice.length,
+      {
+        ...first,
+        prompt: multimedia.prompt,
+        expectedAnswer: multimedia.expectedAnswer ?? first.expectedAnswer,
+        choices: multimedia.choices?.length ? multimedia.choices : first.choices,
+        hint: multimedia.hint ?? first.hint,
+        scaffold: multimedia.scaffold ?? first.scaffold,
+        media: {
+          surfaceType: multimedia.surfaceType,
+          assets: multimedia.assets.map((asset) =>
+            asset.kind === "captions" ? { ...asset, src: multimedia.captionText } : asset,
+          ),
+        },
       },
-    }, ...rest);
+      ...rest,
+    );
   }
 
   const checksForUnderstanding: GeneratedLessonPlanInput["checksForUnderstanding"] = [
@@ -330,31 +337,35 @@ export function generateDeterministicLessonPlan(input: LessonPlanInputs): Genera
       : `Watch how I read it and notice one important detail.`;
 
   return {
-    title: isHolidayPrep && schoolTopic
-      ? `Holiday prep: getting ready for ${schoolTopic}`
-      : schoolTopic
-        ? `This week at school: ${schoolTopic}`
-        : `${skill.name} with ${tutorPersona.split(" ")[0]}`,
-    objective: isHolidayPrep && schoolTopic
-      ? `Stay sharp over the break and get ready for ${schoolTopic} (${skill.name}).`
-      : schoolTopic
-        ? `Stay in sync with class by practicing ${schoolTopic} (${skill.name}).`
-        : objective,
+    title:
+      isHolidayPrep && schoolTopic
+        ? `Holiday prep: getting ready for ${schoolTopic}`
+        : schoolTopic
+          ? `This week at school: ${schoolTopic}`
+          : `${skill.name} with ${tutorPersona.split(" ")[0]}`,
+    objective:
+      isHolidayPrep && schoolTopic
+        ? `Stay sharp over the break and get ready for ${schoolTopic} (${skill.name}).`
+        : schoolTopic
+          ? `Stay in sync with class by practicing ${schoolTopic} (${skill.name}).`
+          : objective,
     estimatedMinutes: tier.estimatedMinutes,
     tutorPersona,
     tutorGreeting: greeting,
-    storyHook: isHolidayPrep && schoolTopic
-      ? `School's on a break, ${learnerName}. Let's keep your skills warm and peek at what's coming up: ${schoolTopic}.`
-      : schoolTopic
-        ? `Your class is exploring ${schoolTopic} this week. Let's look at it together, ${learnerName}, one small step at a time.`
-        : storyHook,
+    storyHook:
+      isHolidayPrep && schoolTopic
+        ? `School's on a break, ${learnerName}. Let's keep your skills warm and peek at what's coming up: ${schoolTopic}.`
+        : schoolTopic
+          ? `Your class is exploring ${schoolTopic} this week. Let's look at it together, ${learnerName}, one small step at a time.`
+          : storyHook,
     microLesson,
     example: {
-      prompt: isHolidayPrep && schoolTopic
-        ? `Here's a warm-up example for ${schoolTopic}.`
-        : schoolTopic
-          ? `Here's a worked example of ${schoolTopic}, just like in class.`
-          : `Here's a small example of ${skill.name}.`,
+      prompt:
+        isHolidayPrep && schoolTopic
+          ? `Here's a warm-up example for ${schoolTopic}.`
+          : schoolTopic
+            ? `Here's a worked example of ${schoolTopic}, just like in class.`
+            : `Here's a small example of ${skill.name}.`,
       explanation: exampleExplanationBase,
     },
     guidedPractice,
