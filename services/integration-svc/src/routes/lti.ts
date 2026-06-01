@@ -3,6 +3,12 @@ import * as jose from "jose";
 import { validateLtiLaunch, type LtiLaunchPayload } from "../services/lti13-launch-validator.js";
 import { getRemoteJwks } from "../lti/jwks-cache.js";
 import { mapLisRolesToAivoRole, type AivoRole } from "../lti/role-mapping.js";
+import {
+  persistLaunch,
+  upsertAgsLineitem,
+  UnregisteredPlatformError,
+  type LtiDb,
+} from "../lti/persistence.js";
 
 /**
  * Sprint 12.7 — LTI 1.3 launch + deep linking + AGS routes.
@@ -12,11 +18,12 @@ import { mapLisRolesToAivoRole, type AivoRole } from "../lti/role-mapping.js";
  * useful in a real launch: JWKS verification, role mapping, context /
  * resource-link upsert, AGS score write-back.
  *
- * Persistence is intentionally minimal here — we surface the structured
- * launch into a session token and let the downstream learning runtime
- * persist context membership. A future sprint will wire the
- * lti_contexts / lti_resource_links / lti_ags_lineitems tables
- * (migration 0045) directly.
+ * Persistence (Sprint 1 production-readiness): when a Drizzle `db` handle is
+ * supplied the launch is written into the migration-0045 tables
+ * (lti_platforms → lti_deployments → lti_contexts → lti_resource_links, and
+ * lti_ags_lineitems on score write-back). Launches for an unregistered
+ * platform are rejected. When no `db` is supplied (unit tests / stateless
+ * dev), the route falls back to the original verify-and-redirect behaviour.
  */
 
 interface LaunchClaims extends jose.JWTPayload {
@@ -53,7 +60,7 @@ async function verifyLaunchJwt(
   return payload as LaunchClaims;
 }
 
-export function registerLtiRoutes(app: FastifyInstance): void {
+export function registerLtiRoutes(app: FastifyInstance, db?: LtiDb): void {
   app.post<{
     Body: { payload: LtiLaunchPayload; productionMode?: boolean; trustedIssuers?: string[] };
   }>("/api/lti/validate", async (request, reply) => {
@@ -114,9 +121,34 @@ export function registerLtiRoutes(app: FastifyInstance): void {
     const linkTarget =
       claims["https://purl.imsglobal.org/spec/lti/claim/target_link_uri"] ?? target_link_uri ?? "/";
 
+    // Persist the launch structure when a DB is wired. A launch from a
+    // platform AIVO is not registered against is rejected — we never trust
+    // an unknown issuer to drive a session.
+    let resourceLinkDbId: string | null = null;
+    if (db) {
+      try {
+        const persisted = await persistLaunch(db, {
+          issuer,
+          clientId: audience,
+          deploymentId,
+          context,
+          resourceLink,
+          targetLinkUri: linkTarget,
+        });
+        resourceLinkDbId = persisted.resourceLinkRowId;
+      } catch (err) {
+        if (err instanceof UnregisteredPlatformError) {
+          request.log?.warn({ issuer, audience }, "LTI launch from unregistered platform");
+          return reply.code(403).send({ error: "unregistered_platform" });
+        }
+        throw err;
+      }
+    }
+
     // Issue a short-lived AIVO session token. The launching browser
     // will follow the redirect to the lesson page, which exchanges the
-    // token for a normal session cookie.
+    // token for a normal session cookie. `resourceLinkDbId` lets the lesson
+    // runtime address the persisted resource link on AGS score write-back.
     const session = await new jose.SignJWT({
       sub: String(claims.sub ?? `lti:${context.id ?? "anon"}:${resourceLink.id ?? "noLink"}`),
       email: claims.email,
@@ -128,6 +160,7 @@ export function registerLtiRoutes(app: FastifyInstance): void {
         contextId: context.id,
         contextTitle: context.title,
         resourceLinkId: resourceLink.id,
+        resourceLinkDbId,
       },
     })
       .setProtectedHeader({ alg: "HS256" })
@@ -196,6 +229,10 @@ export function registerLtiRoutes(app: FastifyInstance): void {
       activity_progress?: string;
       grading_progress?: string;
       timestamp?: string;
+      /** db id of the resource link this score belongs to (from launch). */
+      resource_link_db_id?: string;
+      /** human-readable line item label, stored when persisting. */
+      lineitem_label?: string;
     };
   }>("/api/lti/ags/score", async (request, reply) => {
     const {
@@ -207,10 +244,29 @@ export function registerLtiRoutes(app: FastifyInstance): void {
       activity_progress = "Completed",
       grading_progress = "FullyGraded",
       timestamp = new Date().toISOString(),
+      resource_link_db_id,
+      lineitem_label,
     } = request.body ?? ({} as any);
     if (!lineitem_url || !access_token || typeof score !== "number") {
       return reply.code(400).send({ error: "missing_parameters" });
     }
+
+    // Track the line item against its resource link so write-back history is
+    // queryable. Best-effort: a persistence hiccup must not block the score
+    // reaching the platform.
+    if (db && resource_link_db_id && typeof max_score === "number") {
+      try {
+        await upsertAgsLineitem(db, {
+          resourceLinkRowId: resource_link_db_id,
+          lineitemUrl: lineitem_url,
+          scoreMaximum: max_score,
+          label: lineitem_label,
+        });
+      } catch (err: any) {
+        request.log?.warn({ err: err?.message }, "AGS lineitem persistence failed");
+      }
+    }
+
     const url = `${lineitem_url.replace(/\/$/, "")}/scores`;
     const res = await fetch(url, {
       method: "POST",
