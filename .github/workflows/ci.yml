@@ -276,6 +276,12 @@ jobs:
       - name: Run integrations-svc tests (connector catalogue)
         run: pnpm --filter @aivo/integrations-svc test
 
+      - name: Build packages + services for in-process integration tests
+        run: pnpm --filter "./packages/**" --filter "./services/**" build
+
+      - name: Run in-process integration tests (service contracts, no Docker)
+        run: pnpm test:integration:inprocess
+
   brain-svc:
     name: Brain Service (Python)
     runs-on: ubuntu-latest
@@ -390,6 +396,12 @@ jobs:
           if [ -d tests ]; then
             pytest tests/ -v || true
           fi
+
+      - name: Run cross-service integration tests (curriculum-svc app)
+        env:
+          ENVIRONMENT: test
+          PYTHONPATH: services/curriculum-svc/src
+        run: pytest tests/integration/python/test_curriculum_svc_integration.py -v
 
   mobile-expo-check:
     name: Mobile App (Expo)

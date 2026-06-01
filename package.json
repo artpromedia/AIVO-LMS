@@ -19,6 +19,7 @@
     "i18n:extract:baseline": "node scripts/i18n-extract.mjs --update-baseline",
     "check:no-coming-soon": "node scripts/ci/check-no-coming-soon.mjs",
     "test:integration": "vitest run --config tests/integration/vitest.config.ts",
+    "test:integration:inprocess": "vitest run --config tests/integration/inprocess/vitest.config.ts",
     "test:enterprise": "vitest run --config tests/integration/vitest.enterprise.config.ts",
     "prod:check": "node scripts/production-readiness-check.mjs",
     "prod:no-demo": "node scripts/no-demo-prod-scan.mjs",
