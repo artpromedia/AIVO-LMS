@@ -81,7 +81,10 @@ flips the default; "Code gap" = a flag won't fix it.
 11. **[Incomplete] Mobile baseline uses mock questions.**
     `apps/mobile/app/(learner)/baseline/run.tsx` hardcodes a 5-item `SAMPLE`
     array; web baseline is real adaptive IRT. (The demo-scanner misses
-    `SAMPLE`.)
+    `SAMPLE`.) → **Fixed in this pass: the runner fetches the learner's real
+    baseline from assessment-svc (`/api/assessments/learner/baseline/:id`,
+    which itself serves an AI set or a curated fallback bank) with
+    loading/error/not-ready states; the hardcoded `SAMPLE` is removed.**
 12. **[Incomplete] Co-Learning stub** — `(parent)/colearn/[childId].tsx` dead
     CTA `onAction={() => {}}`.
 13. **[Incomplete] Live parent session viewing stub** —
