@@ -308,6 +308,15 @@ Worked on branch `claude/gifted-heisenberg-V9YJm`. Approach chosen: **real-auth 
 - **`.env.example` now documents the web-v2 production-required vars** that were previously undocumented:
   `AUTH_MODE`, `AIVO_PERSISTENCE`, `AI_PROVIDER`, `SESSION_SECRET`, `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY`
   (with the multi-replica Server-Actions 404 caveat), `NEXT_PUBLIC_APP_URL`, `DATABASE_URL`, `REDIS_URL`.
+- **In-memory store guards** added to `audit-svc` and `problem-session-svc` (refuse to boot without
+  `DATABASE_URL` in production). `homework-svc` already had this guard.
+- **Mock-provider guards (fake output served as real):**
+  - `apps/web-v2/lib/tts/provider.ts` — `getTTSProvider()` no longer silently returns placeholder audio
+    in production; `TTS_PROVIDER` must be set (`mock` is an explicit opt-in, not the silent default).
+  - `services/speech-eval-svc` — refuses to boot in production unless `SPEECH_EVAL_MODE` is explicitly
+    `live` or `mock`, so fake pronunciation/fluency scores can't be served as real by default.
+  - `AUTH_MODE` and `AI_PROVIDER` already had production guards (refuse `mock`).
 
-_Still open in Phase 0:_ extend the same fail-fast treatment to mock TTS/speech providers and the stubbed
-push path; and to the backend services that fall back to in-memory when `DATABASE_URL` is unset (§3 Tier 1).
+_Still open in Phase 0:_ `recommendation-svc` (and the `/api/comms/push` user-addressed stub) have no real
+backend at all — they need a build-out (Phase 2/3), not a guard. The build-verified guards above are the
+high-value fail-fast items.

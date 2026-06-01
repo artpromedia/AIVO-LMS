@@ -147,9 +147,27 @@ export const productionTTSAdapter: TTSProvider = {
 };
 
 export function getTTSProvider(): TTSProvider {
-  const env = process.env.TTS_PROVIDER ?? "mock";
-  if (env === "production" && productionTTSAdapter.available()) {
-    return productionTTSAdapter;
+  const env = process.env.TTS_PROVIDER;
+  const isProd = process.env.NODE_ENV === "production";
+
+  if (env === "production") {
+    if (productionTTSAdapter.available()) return productionTTSAdapter;
+    throw new Error(
+      "TTS_PROVIDER=production but no production TTS adapter is wired. " +
+        "Wire a real adapter, or set TTS_PROVIDER=mock to use placeholder audio.",
+    );
   }
+
+  // The mock provider returns deterministic placeholder audio. It must never
+  // be served silently in production as if it were real — require an explicit
+  // opt-in so it's a conscious decision (fail fast otherwise).
+  if (isProd && env !== "mock") {
+    throw new Error(
+      "TTS_PROVIDER must be set in production. No real TTS adapter is wired yet; " +
+        "set TTS_PROVIDER=mock to explicitly allow placeholder audio for the pilot, " +
+        "or wire a production adapter.",
+    );
+  }
+
   return mockTTSProvider;
 }
