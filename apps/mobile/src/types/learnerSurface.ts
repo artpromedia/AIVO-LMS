@@ -13,7 +13,9 @@ export type LearnerSurfaceKind =
   | "coding_sandbox"
   | "art_canvas"
   // Sprint 4 — reading comprehension annotation (sage / ELA).
-  | "reading_annotation";
+  | "reading_annotation"
+  // Sprint 7 — spoken response (echo / lingua).
+  | "voice_response";
 
 export interface LearnerSurfaceSpec {
   kind: LearnerSurfaceKind;

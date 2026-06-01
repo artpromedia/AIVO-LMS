@@ -335,7 +335,15 @@ Sprint 0 matrix flips nova→math toward F.
 
 ---
 
-### Sprint 6 — Science experience (spark): the `science_diagram` surface
+### Sprint 6 — Science experience (spark): the `science_diagram` surface ✅ landed (web)
+
+> Shipped on **web**: `ScienceDiagramSurface` — a safe deterministic diagram
+> (reuses the audited `renderGeometrySvg`) with positioned, accessible
+> label-targets the learner fills via tap-to-place from a label bank. Pure
+> `scoreScienceDiagram` helper + tests. Wired into the SurfaceRouter +
+> `SUPPORTED_RUNTIME_TYPES`. Registry: web full, **mobile fallback** (bespoke RN
+> renderer is a follow-up). This was the last web `fallback` cell — **web is now
+> 15/15 full**.
 
 ```
 Build the science_diagram surface so science activities include labelling/structure,
@@ -353,7 +361,16 @@ scoring + telemetry; matrix moves spark→science toward F.
 
 ---
 
-### Sprint 7 — Speech & World Languages (echo, lingua): voice end-to-end
+### Sprint 7 — Speech & World Languages (echo, lingua): voice end-to-end ✅ landed
+
+> Shipped: **web** `VoiceResponseSurface` was already routed; the Sprint 1
+> entitlement fix gives `echo` (speech) access alongside `lingua`. **Mobile**:
+> wired a `voice_response` renderer into `MobileSurfaceRenderer` that consumes
+> the previously-orphaned `useSpeechInput` hook (record → ai-svc transcribe),
+> with target-word display, record/stop/retry, transcript readout, and an
+> unsupported-device fallback. Registry: voice_response now web full + mobile
+> full. (Mobile entitlement gating for voice remains server-enforced; the
+> single-tutor mobile `REQUIRED_TUTOR` mirror is a noted follow-up.)
 
 ```
 Make spoken activities real on both clients — the highest-value SpEd/therapy gap.

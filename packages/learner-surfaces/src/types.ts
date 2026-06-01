@@ -62,6 +62,8 @@ export interface LearnerSurfaceSpec {
   dragManipulative?: DragManipulativeSpec;
   /** Sprint 5 — set when type === "multi_step_workspace". */
   multiStep?: MultiStepSpec;
+  /** Sprint 6 — set when type === "science_diagram". */
+  scienceDiagram?: ScienceDiagramSpec;
 }
 
 /**
@@ -172,6 +174,41 @@ export interface MultiStepSpec {
 export interface MultiStepResponse {
   /** stepId -> learner entry. */
   entries: Record<string, string>;
+}
+
+/**
+ * Sprint 6 — Science diagram labelling (spark). A safe, deterministic diagram
+ * (reusing `GeometryDiagramSpec` primitives) with positioned drop-targets the
+ * learner labels from a bank (e.g. label the cell, the water cycle, circuit
+ * parts). Optionally captures observation rows for an experiment.
+ */
+export interface ScienceDiagramTarget {
+  id: string;
+  /** Position in the diagram's coordinate space (matches diagram width/height). */
+  x: number;
+  y: number;
+  /** Correct label id for scoring (omit for ungraded/observational targets). */
+  correctLabelId?: string;
+}
+
+export interface ScienceDiagramLabel {
+  id: string;
+  text: string;
+}
+
+export interface ScienceDiagramSpec {
+  /** Safe background visual rendered via `renderGeometrySvg`. */
+  diagram?: GeometryDiagramSpec;
+  /** Coordinate space for target positions (defaults to the diagram size). */
+  width?: number;
+  height?: number;
+  targets: ScienceDiagramTarget[];
+  labels: ScienceDiagramLabel[];
+}
+
+export interface ScienceDiagramResponse {
+  /** targetId -> labelId placed by the learner. */
+  placement: Record<string, string>;
 }
 
 export interface SurfaceCaptureSpec {
@@ -444,6 +481,8 @@ export interface SurfaceResponse {
   dragManipulative?: DragManipulativeResponse;
   /** Sprint 5 — set when type === "multi_step_workspace". */
   multiStep?: MultiStepResponse;
+  /** Sprint 6 — set when type === "science_diagram". */
+  scienceDiagram?: ScienceDiagramResponse;
 }
 
 /**

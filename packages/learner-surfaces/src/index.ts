@@ -52,6 +52,10 @@ export {
   type MultiStepWorkspaceSurfaceProps,
 } from "./surfaces/MultiStepWorkspaceSurface.js";
 export {
+  ScienceDiagramSurface,
+  type ScienceDiagramSurfaceProps,
+} from "./surfaces/ScienceDiagramSurface.js";
+export {
   toggleSpanSelection,
   scoreReadingAnnotation,
   defaultReadingTool,
@@ -62,6 +66,7 @@ export {
   targetIsFull,
   normalizeAnswer,
   scoreMultiStep,
+  scoreScienceDiagram,
 } from "./scoring/activity-scoring.js";
 export {
   SurfaceRouter,

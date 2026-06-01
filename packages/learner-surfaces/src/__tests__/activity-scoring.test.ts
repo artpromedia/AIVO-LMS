@@ -10,8 +10,14 @@ import {
   targetIsFull,
   normalizeAnswer,
   scoreMultiStep,
+  scoreScienceDiagram,
 } from "../scoring/activity-scoring.js";
-import type { DragManipulativeSpec, GraphSpec, MultiStepSpec } from "../types.js";
+import type {
+  DragManipulativeSpec,
+  GraphSpec,
+  MultiStepSpec,
+  ScienceDiagramSpec,
+} from "../types.js";
 
 describe("reading annotation scoring", () => {
   it("toggles span selection immutably", () => {
@@ -157,5 +163,42 @@ describe("multi-step scoring", () => {
     const s = scoreMultiStep({ a: "14", b: "20" }, spec);
     expect(s.correct).toBe(false);
     expect(s.completed).toBe(2);
+  });
+});
+
+describe("science diagram scoring", () => {
+  const spec: ScienceDiagramSpec = {
+    width: 100,
+    height: 100,
+    targets: [
+      { id: "t1", x: 10, y: 10, correctLabelId: "nucleus" },
+      { id: "t2", x: 50, y: 50, correctLabelId: "membrane" },
+    ],
+    labels: [
+      { id: "nucleus", text: "Nucleus" },
+      { id: "membrane", text: "Membrane" },
+    ],
+  };
+
+  it("scores correct label placements", () => {
+    const s = scoreScienceDiagram({ placement: { t1: "nucleus", t2: "membrane" } }, spec);
+    expect(s.correct).toBe(true);
+    expect(s.correctCount).toBe(2);
+    expect(s.total).toBe(2);
+  });
+
+  it("marks a mislabel as incorrect", () => {
+    const s = scoreScienceDiagram({ placement: { t1: "membrane", t2: "membrane" } }, spec);
+    expect(s.correct).toBe(false);
+    expect(s.correctCount).toBe(1);
+  });
+
+  it("treats targets without a key as observational", () => {
+    const obs: ScienceDiagramSpec = {
+      targets: [{ id: "o1", x: 1, y: 1 }],
+      labels: [{ id: "l1", text: "note" }],
+    };
+    expect(scoreScienceDiagram({ placement: { o1: "l1" } }, obs).correct).toBe(true);
+    expect(scoreScienceDiagram({ placement: {} }, obs).correct).toBe(false);
   });
 });

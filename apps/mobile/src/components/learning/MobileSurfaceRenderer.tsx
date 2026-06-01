@@ -25,6 +25,7 @@ import type { TierThemeMobile } from "@aivo/mobile-ui";
 import type { SurfaceBeat } from "@/src/types/stage";
 import type { LearnerSurfaceKind } from "@/src/types/learnerSurface";
 import { emitSurfaceTelemetry } from "@/lib/surface-telemetry";
+import { useSpeechInput } from "@/hooks/useSpeechInput";
 import { ScratchPad, type ScratchStroke } from "./ScratchPad";
 
 /**
@@ -41,6 +42,7 @@ const FULL_MOBILE_KINDS = new Set<LearnerSurfaceKind>([
   "art_canvas",
   "scratchpad",
   "reading_annotation",
+  "voice_response",
 ]);
 
 export type SurfaceTutorKey =
@@ -81,6 +83,7 @@ export type SurfaceCommand =
   | { kind: "coding_sandbox"; code: string; language: string }
   | { kind: "art_canvas"; strokes: ScratchStroke[]; color: string }
   | { kind: "reading_annotation"; selectedSpanIds: string[]; tool: string }
+  | { kind: "voice_response"; transcript: string }
   | { kind: "noop"; surfaceKind: LearnerSurfaceKind };
 
 interface Props {
@@ -190,6 +193,8 @@ export function MobileSurfaceRenderer({ theme, beat, disabled, onSubmit, entitle
         <ArtCanvasSurface theme={theme} disabled={disabled} onSubmit={onSubmit} />
       ) : kind === "reading_annotation" ? (
         <ReadingAnnotationSurface theme={theme} disabled={disabled} cfg={cfg} onSubmit={onSubmit} />
+      ) : kind === "voice_response" ? (
+        <VoiceResponseSurface theme={theme} disabled={disabled} cfg={cfg} onSubmit={onSubmit} />
       ) : (
         // scratchpad (full) + fallback kinds (geometry_workspace, chart,
         // unknown) share the ink workspace. Fallback kinds show a label so the
@@ -570,6 +575,113 @@ function ReadingAnnotationSurface({
         <Text style={styles.submitText}>
           {selected.length === 0 ? "Tap your evidence" : "I'm done"}
         </Text>
+      </Pressable>
+    </View>
+  );
+}
+
+/* -------------------------------------------------------------------- */
+/* voice_response (Sprint 7)                                            */
+/* -------------------------------------------------------------------- */
+
+/**
+ * Sprint 7 — mobile spoken response (echo / lingua). Records via the existing
+ * `useSpeechInput` hook (expo-av → ai-svc transcribe), shows the target
+ * word/phrase to say, supports record / stop / retry, and submits the
+ * transcript. Closes the gap where Echo (speech) lessons previously fell back
+ * to text on mobile because the hook was only wired into the homework helper.
+ */
+function VoiceResponseSurface({
+  theme,
+  disabled,
+  cfg,
+  onSubmit,
+}: {
+  theme: TierThemeMobile;
+  disabled?: boolean;
+  cfg: Record<string, unknown> | undefined;
+  onSubmit: (c: SurfaceCommand) => void;
+}) {
+  const styles = useMemo(() => createStyles(theme), [theme]);
+  const targetText = readString(cfg, "targetText", "");
+  const locale = readString(cfg, "language", readString(cfg, "locale", "en-US"));
+  const speech = useSpeechInput({ locale });
+  const listening = speech.status === "listening";
+  const processing = speech.status === "processing";
+
+  return (
+    <View style={{ gap: 12 }}>
+      {targetText ? (
+        <Text
+          style={[styles.body, { fontWeight: "700" }]}
+          accessibilityLabel={`Say: ${targetText}`}
+        >
+          Say: “{targetText}”
+        </Text>
+      ) : null}
+
+      {speech.transcript ? (
+        <Text style={styles.body} accessibilityLabel={`You said ${speech.transcript}`}>
+          You said: {speech.transcript}
+        </Text>
+      ) : (
+        <Text style={styles.note}>
+          {speech.isSupported
+            ? "Tap the mic and say your answer out loud."
+            : "Speaking isn't available on this device — type your answer instead."}
+        </Text>
+      )}
+      {speech.error ? <Text style={styles.note}>We couldn't hear that. Try again.</Text> : null}
+
+      <View style={{ flexDirection: "row", gap: 12 }}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={listening ? "stop recording" : "start recording"}
+          disabled={disabled || !speech.isSupported || processing}
+          onPress={() => {
+            if (listening) speech.stop().catch(() => undefined);
+            else speech.start().catch(() => undefined);
+          }}
+          style={[
+            styles.submit,
+            { flex: 1 },
+            listening && { backgroundColor: "#dc2626" },
+            (disabled || !speech.isSupported || processing) && styles.submitDisabled,
+          ]}
+        >
+          <Text style={styles.submitText}>
+            {processing ? "…" : listening ? "Stop" : "🎤 Record"}
+          </Text>
+        </Pressable>
+        {speech.transcript ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="try again"
+            disabled={disabled || listening || processing}
+            onPress={() => speech.reset()}
+            style={[
+              styles.submit,
+              {
+                flex: 1,
+                backgroundColor: theme.colors.surface,
+                borderWidth: 1,
+                borderColor: theme.colors.text + "33",
+              },
+            ]}
+          >
+            <Text style={[styles.submitText, { color: theme.colors.text }]}>Try again</Text>
+          </Pressable>
+        ) : null}
+      </View>
+
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="submit spoken answer"
+        disabled={disabled || !speech.transcript}
+        onPress={() => onSubmit({ kind: "voice_response", transcript: speech.transcript })}
+        style={[styles.submit, (disabled || !speech.transcript) && styles.submitDisabled]}
+      >
+        <Text style={styles.submitText}>I&apos;m done</Text>
       </Pressable>
     </View>
   );

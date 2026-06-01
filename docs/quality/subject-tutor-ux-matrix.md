@@ -63,22 +63,22 @@
 
 > Source of truth: `packages/learner-surfaces` `SURFACE_CAPABILITY_REGISTRY`.
 
-| Surface              |     Web     |   Mobile    | Primary subject / tutor                       |
-| -------------------- | :---------: | :---------: | --------------------------------------------- |
-| choice_grid          |   ✅ full   |   ✅ full   | universal — multiple choice                   |
-| scratchpad           |   ✅ full   |   ✅ full   | universal — ink workspace                     |
-| math_expression      |   ✅ full   |   ✅ full   | math (nova)                                   |
-| number_line          |   ✅ full   |   ✅ full   | math (nova)                                   |
-| coding_sandbox       |   ✅ full   |   ✅ full   | coding (pixel)                                |
-| art_canvas           |   ✅ full   |   ✅ full   | art (muse)                                    |
-| voice_response       |   ✅ full   |   ❌ none   | speech (echo) / languages (lingua)            |
-| video                |   ✅ full   |   ❌ none   | media-rich lessons (all)                      |
-| audio                |   ✅ full   |   ❌ none   | media-rich lessons (all)                      |
-| geometry_workspace   |   ✅ full   | ⚠️ fallback | math/geometry (nova)                          |
-| reading_annotation   |   ✅ full   |   ✅ full   | reading/ELA (sage)                            |
-| graph                |   ✅ full   | ⚠️ fallback | math/science (nova/spark)                     |
-| drag_manipulative    |   ✅ full   | ⚠️ fallback | math manipulatives (nova) / exec-fn (compass) |
-| multi_step_workspace |   ✅ full   | ⚠️ fallback | math/science (nova/spark)                     |
-| science_diagram      | ⚠️ fallback |   ❌ none   | science (spark) — Sprint 6                    |
+| Surface              |   Web   |   Mobile    | Primary subject / tutor                       |
+| -------------------- | :-----: | :---------: | --------------------------------------------- |
+| choice_grid          | ✅ full |   ✅ full   | universal — multiple choice                   |
+| scratchpad           | ✅ full |   ✅ full   | universal — ink workspace                     |
+| math_expression      | ✅ full |   ✅ full   | math (nova)                                   |
+| number_line          | ✅ full |   ✅ full   | math (nova)                                   |
+| coding_sandbox       | ✅ full |   ✅ full   | coding (pixel)                                |
+| art_canvas           | ✅ full |   ✅ full   | art (muse)                                    |
+| voice_response       | ✅ full |   ✅ full   | speech (echo) / languages (lingua)            |
+| video                | ✅ full |   ❌ none   | media-rich lessons (all)                      |
+| audio                | ✅ full |   ❌ none   | media-rich lessons (all)                      |
+| geometry_workspace   | ✅ full | ⚠️ fallback | math/geometry (nova)                          |
+| reading_annotation   | ✅ full |   ✅ full   | reading/ELA (sage)                            |
+| graph                | ✅ full | ⚠️ fallback | math/science (nova/spark)                     |
+| drag_manipulative    | ✅ full | ⚠️ fallback | math manipulatives (nova) / exec-fn (compass) |
+| multi_step_workspace | ✅ full | ⚠️ fallback | math/science (nova/spark)                     |
+| science_diagram      | ✅ full | ⚠️ fallback | science (spark)                               |
 
-Surfaces with a full renderer: **web 14/15**, **mobile 7/15**. Non-full surfaces render a labelled fallback that emits `unsupported_surface`.
+Surfaces with a full renderer: **web 15/15**, **mobile 8/15**. Non-full surfaces render a labelled fallback that emits `unsupported_surface`.

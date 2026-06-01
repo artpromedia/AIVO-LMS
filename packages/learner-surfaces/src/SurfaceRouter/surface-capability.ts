@@ -45,7 +45,9 @@ export const SURFACE_CAPABILITY_REGISTRY: Record<LearnerSurfaceType, SurfaceCapa
   number_line: { web: "full", mobile: "full", note: "math (nova)" },
   coding_sandbox: { web: "full", mobile: "full", note: "coding (pixel)" },
   art_canvas: { web: "full", mobile: "full", note: "art (muse)" },
-  voice_response: { web: "full", mobile: "none", note: "speech (echo) / languages (lingua)" },
+  // Sprint 7 — spoken response ships full on web and mobile (mobile records via
+  // useSpeechInput → ai-svc transcribe).
+  voice_response: { web: "full", mobile: "full", note: "speech (echo) / languages (lingua)" },
   video: { web: "full", mobile: "none", note: "media-rich lessons (all)" },
   audio: { web: "full", mobile: "none", note: "media-rich lessons (all)" },
   geometry_workspace: { web: "full", mobile: "fallback", note: "math/geometry (nova)" },
@@ -60,7 +62,9 @@ export const SURFACE_CAPABILITY_REGISTRY: Record<LearnerSurfaceType, SurfaceCapa
     note: "math manipulatives (nova) / exec-fn (compass)",
   },
   multi_step_workspace: { web: "full", mobile: "fallback", note: "math/science (nova/spark)" },
-  science_diagram: { web: "fallback", mobile: "none", note: "science (spark) — Sprint 6" },
+  // Sprint 6 — science diagram labelling ships full on web; mobile uses the
+  // labelled fallback until a bespoke RN renderer lands.
+  science_diagram: { web: "full", mobile: "fallback", note: "science (spark)" },
 };
 
 /** Runtime list of every surface type (keys of the registry). */

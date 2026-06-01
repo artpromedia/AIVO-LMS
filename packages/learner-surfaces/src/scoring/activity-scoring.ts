@@ -13,6 +13,8 @@ import type {
   MultiStepSpec,
   Point,
   ReadingAnnotationTool,
+  ScienceDiagramResponse,
+  ScienceDiagramSpec,
 } from "../types.js";
 
 /* ---------------------------------------------------------------- *
@@ -197,4 +199,36 @@ export function scoreMultiStep(
     completed,
     total: spec.steps.length,
   };
+}
+
+/* ---------------------------------------------------------------- *
+ * Science diagram labelling (Sprint 6)                              *
+ * ---------------------------------------------------------------- */
+
+export interface ScienceDiagramScore {
+  correct: boolean;
+  correctCount: number;
+  total: number;
+}
+
+/** Score labelled diagram targets against their expected label ids. Targets
+ *  without a `correctLabelId` are observational (any placement counts). */
+export function scoreScienceDiagram(
+  response: ScienceDiagramResponse,
+  spec: ScienceDiagramSpec,
+): ScienceDiagramScore {
+  const graded = spec.targets.filter((t) => t.correctLabelId != null);
+  if (graded.length === 0) {
+    const placed = Object.keys(response.placement).length;
+    return {
+      correct: placed === spec.targets.length,
+      correctCount: placed,
+      total: spec.targets.length,
+    };
+  }
+  let correctCount = 0;
+  for (const t of graded) {
+    if (response.placement[t.id] === t.correctLabelId) correctCount++;
+  }
+  return { correct: correctCount === graded.length, correctCount, total: graded.length };
 }

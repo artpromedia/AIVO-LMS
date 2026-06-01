@@ -82,6 +82,8 @@ export const SUPPORTED_RUNTIME_TYPES: ReadonlySet<LearnerSurfaceType> = new Set<
     "graph",
     "drag_manipulative",
     "multi_step_workspace",
+    // Sprint 6 — science diagram labelling.
+    "science_diagram",
   ],
 );
 
