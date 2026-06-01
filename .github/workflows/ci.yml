@@ -259,6 +259,23 @@ jobs:
       - name: Run comms-svc tests (email-events webhook)
         run: pnpm --filter @aivo/comms-svc test
 
+      - name: Run status-page-svc tests (status routes)
+        run: pnpm --filter @aivo/status-page-svc test
+
+      - name: Run i18n-svc tests (locale catalogue + detection)
+        run: pnpm --filter @aivo/i18n-svc test
+
+      - name: Run research-svc tests (analytics auth gate)
+        run: pnpm --filter @aivo/research-svc test
+
+      - name: Run integration-svc tests (LTI 1.3 launch + validator)
+        # No DATABASE_URL: the LTI persistence test is opt-in (skips without a
+        # migrated DB); the launch + validator suites run statelessly here.
+        run: pnpm --filter @aivo/integration-svc test
+
+      - name: Run integrations-svc tests (connector catalogue)
+        run: pnpm --filter @aivo/integrations-svc test
+
   brain-svc:
     name: Brain Service (Python)
     runs-on: ubuntu-latest
