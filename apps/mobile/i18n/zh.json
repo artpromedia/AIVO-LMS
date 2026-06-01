@@ -127,7 +127,15 @@
     "acceptInviteSuccess": "您已被添加到 {{count}} 个学习团队。欢迎！",
     "acceptInviteNoneFound": "未找到您账户的待处理邀请。如果您期望有邀请，请让家长重新向 {{email}} 发送邀请。",
     "acceptInviteContinue": "前往仪表盘",
-    "acceptInviteError": "出了点问题：{{message}}"
+    "acceptInviteError": "出了点问题：{{message}}",
+    "whoIsLearning": "今天谁来学习？",
+    "tapYourProfile": "点按你的头像，然后输入 PIN 码。",
+    "loadingProfiles": "正在加载档案…",
+    "learner": "学习者",
+    "continueAsLearner": "以 {{name}} 继续",
+    "noProfilesYet": "此设备上还没有学习者档案。请输入家长的电子邮箱以继续。",
+    "enterParentEmailCta": "使用家长邮箱",
+    "signInAsParent": "改为以家长身份登录"
   },
   "parent": {
     "greeting": "你好，{{name}}",
@@ -144,7 +152,8 @@
     "iep": "IEP",
     "team": "团队",
     "tutorStore": "导师商店",
-    "billing": "账单"
+    "billing": "账单",
+    "loginAsLearner": "以学习者身份登录"
   },
   "parentSettings": {
     "title": "设置",

@@ -127,7 +127,15 @@
     "acceptInviteSuccess": "{{count}}つの学習チームに追加されました。ようこそ！",
     "acceptInviteNoneFound": "アカウントに保留中の招待が見つかりませんでした。招待を期待していた場合は、保護者に{{email}}へ招待を再送するよう依頼してください。",
     "acceptInviteContinue": "ダッシュボードへ進む",
-    "acceptInviteError": "問題が発生しました：{{message}}"
+    "acceptInviteError": "問題が発生しました：{{message}}",
+    "whoIsLearning": "今日は誰が学習しますか？",
+    "tapYourProfile": "プロフィールをタップして、PINを入力してください。",
+    "loadingProfiles": "プロフィールを読み込み中…",
+    "learner": "学習者",
+    "continueAsLearner": "{{name}}として続ける",
+    "noProfilesYet": "このデバイスにはまだ学習者プロフィールがありません。続けるには保護者のメールアドレスを入力してください。",
+    "enterParentEmailCta": "保護者のメールを使う",
+    "signInAsParent": "代わりに保護者としてログイン"
   },
   "parent": {
     "greeting": "こんにちは、{{name}}",
@@ -144,7 +152,8 @@
     "iep": "IEP",
     "team": "チーム",
     "tutorStore": "チューターストア",
-    "billing": "請求"
+    "billing": "請求",
+    "loginAsLearner": "学習者としてログイン"
   },
   "parentSettings": {
     "title": "設定",

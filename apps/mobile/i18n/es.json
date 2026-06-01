@@ -127,7 +127,15 @@
     "acceptInviteSuccess": "Te hemos añadido a {{count}} equipo(s) de estudiantes. ¡Bienvenido!",
     "acceptInviteNoneFound": "No se encontraron invitaciones pendientes para tu cuenta. Si esperabas una, pide al padre o madre que reenvíe la invitación a {{email}}.",
     "acceptInviteContinue": "Continuar al panel",
-    "acceptInviteError": "Algo salió mal: {{message}}"
+    "acceptInviteError": "Algo salió mal: {{message}}",
+    "whoIsLearning": "¿Quién está aprendiendo hoy?",
+    "tapYourProfile": "Toca tu perfil y luego introduce tu PIN.",
+    "loadingProfiles": "Cargando perfiles…",
+    "learner": "Estudiante",
+    "continueAsLearner": "Continuar como {{name}}",
+    "noProfilesYet": "Aún no hay perfiles de estudiante en este dispositivo. Introduce el correo de tu padre o madre para continuar.",
+    "enterParentEmailCta": "Usar el correo del padre o madre",
+    "signInAsParent": "Iniciar sesión como padre/madre"
   },
   "parent": {
     "greeting": "Hola, {{name}}",
@@ -144,7 +152,8 @@
     "iep": "PEI",
     "team": "Equipo",
     "tutorStore": "Tienda de Tutores",
-    "billing": "Facturación"
+    "billing": "Facturación",
+    "loginAsLearner": "Iniciar sesión como estudiante"
   },
   "parentSettings": {
     "title": "Configuración",

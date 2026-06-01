@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Tabs, router, usePathname, type Href } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { colors } from "@/constants/colors";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
+import { useLearners } from "@/hooks/useLearners";
 import { useParentInbox } from "@/hooks/useParentInbox";
+import { setRememberedFamily } from "@/lib/rememberedFamily";
 import { useWindowSizeClass } from "@/src/design/useWindowSizeClass";
 import { RoleTabletShell } from "@/src/components/layout/RoleTabletShell";
 import { useTabBarStyle, TAB_BAR_LABEL_STYLE } from "@/hooks/useTabBarStyle";
@@ -14,8 +16,30 @@ export default function ParentLayout() {
   const { isTablet } = useWindowSizeClass();
   const tabBarStyle = useTabBarStyle({ hidden: isTablet });
   const { user } = useAuth();
+  const { data: learners } = useLearners();
   const { data: inbox } = useParentInbox(user?.id ?? "");
   const unreadCount = inbox?.unreadCount ?? 0;
+
+  // Snapshot the family for the unauthenticated learner-login path. The
+  // learner-login screen prefers a live parent session, but when the app
+  // cold-starts (no token) this cached roster is what lets a parent hand
+  // the device to their child and pick a profile without re-signing-in.
+  useEffect(() => {
+    if (user?.role !== "PARENT" || !learners || learners.length === 0) return;
+    void setRememberedFamily({
+      parentId: user.id,
+      parentName: user.name,
+      parentEmail: user.email,
+      learners: learners.map((l) => ({
+        id: l.id,
+        firstName: l.firstName,
+        lastName: l.lastName,
+        gradeLevel: l.gradeLevel,
+        avatar: l.avatar,
+      })),
+      savedAt: Date.now(),
+    });
+  }, [user, learners]);
   const pathname = usePathname();
   const railDestinations = [
     {

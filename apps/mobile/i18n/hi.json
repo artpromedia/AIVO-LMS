@@ -127,7 +127,15 @@
     "acceptInviteSuccess": "आपको {{count}} शिक्षार्थी टीम(ओं) में जोड़ा गया है। स्वागत है!",
     "acceptInviteNoneFound": "आपके खाते के लिए कोई लंबित निमंत्रण नहीं मिला। यदि आप एक की उम्मीद कर रहे थे, तो माता-पिता से {{email}} पर निमंत्रण पुनः भेजने के लिए कहें।",
     "acceptInviteContinue": "अपने डैशबोर्ड पर जाएं",
-    "acceptInviteError": "कुछ गलत हो गया: {{message}}"
+    "acceptInviteError": "कुछ गलत हो गया: {{message}}",
+    "whoIsLearning": "आज कौन सीख रहा है?",
+    "tapYourProfile": "अपनी प्रोफ़ाइल पर टैप करें, फिर अपना PIN दर्ज करें।",
+    "loadingProfiles": "प्रोफ़ाइल लोड हो रही हैं…",
+    "learner": "शिक्षार्थी",
+    "continueAsLearner": "{{name}} के रूप में जारी रखें",
+    "noProfilesYet": "इस डिवाइस पर अभी तक कोई शिक्षार्थी प्रोफ़ाइल नहीं है। जारी रखने के लिए अपने माता-पिता का ईमेल दर्ज करें।",
+    "enterParentEmailCta": "माता-पिता का ईमेल उपयोग करें",
+    "signInAsParent": "इसके बजाय अभिभावक के रूप में साइन इन करें"
   },
   "parent": {
     "greeting": "नमस्ते, {{name}}",
@@ -144,7 +152,8 @@
     "iep": "IEP",
     "team": "टीम",
     "tutorStore": "ट्यूटर स्टोर",
-    "billing": "बिलिंग"
+    "billing": "बिलिंग",
+    "loginAsLearner": "शिक्षार्थी के रूप में लॉगिन करें"
   },
   "parentSettings": {
     "title": "सेटिंग्स",

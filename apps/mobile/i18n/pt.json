@@ -127,7 +127,15 @@
     "acceptInviteSuccess": "Você foi adicionado a {{count}} equipe(s) de aprendizes. Bem-vindo(a)!",
     "acceptInviteNoneFound": "Nenhum convite pendente foi encontrado para sua conta. Se estava esperando um, peça ao responsável para reenviar o convite para {{email}}.",
     "acceptInviteContinue": "Ir para o painel",
-    "acceptInviteError": "Algo deu errado: {{message}}"
+    "acceptInviteError": "Algo deu errado: {{message}}",
+    "whoIsLearning": "Quem vai aprender hoje?",
+    "tapYourProfile": "Toque no seu perfil e depois insira o seu PIN.",
+    "loadingProfiles": "Carregando perfis…",
+    "learner": "Aluno",
+    "continueAsLearner": "Continuar como {{name}}",
+    "noProfilesYet": "Ainda não há perfis de aluno neste dispositivo. Insira o e-mail do seu responsável para continuar.",
+    "enterParentEmailCta": "Usar o e-mail do responsável",
+    "signInAsParent": "Entrar como responsável"
   },
   "parent": {
     "greeting": "Olá, {{name}}",
@@ -144,7 +152,8 @@
     "iep": "IEP",
     "team": "Equipe",
     "tutorStore": "Loja de tutores",
-    "billing": "Faturamento"
+    "billing": "Faturamento",
+    "loginAsLearner": "Entrar como aluno"
   },
   "parentSettings": {
     "title": "Configurações",

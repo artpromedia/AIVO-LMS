@@ -127,7 +127,15 @@
     "acceptInviteSuccess": "تمت إضافتك إلى {{count}} فريق (فرق) متعلمين. مرحباً!",
     "acceptInviteNoneFound": "لم يتم العثور على دعوات معلّقة لحسابك. إذا كنت تتوقع واحدة، اطلب من ولي الأمر إعادة إرسال الدعوة إلى {{email}}.",
     "acceptInviteContinue": "المتابعة إلى لوحة التحكم",
-    "acceptInviteError": "حدث خطأ: {{message}}"
+    "acceptInviteError": "حدث خطأ: {{message}}",
+    "whoIsLearning": "من يتعلّم اليوم؟",
+    "tapYourProfile": "اضغط على ملفك الشخصي، ثم أدخل رمز PIN.",
+    "loadingProfiles": "جارٍ تحميل الملفات الشخصية…",
+    "learner": "المتعلّم",
+    "continueAsLearner": "المتابعة باسم {{name}}",
+    "noProfilesYet": "لا توجد ملفات تعريف للمتعلمين على هذا الجهاز بعد. أدخل بريد وليّ الأمر للمتابعة.",
+    "enterParentEmailCta": "استخدم بريد وليّ الأمر",
+    "signInAsParent": "تسجيل الدخول كوليّ أمر بدلاً من ذلك"
   },
   "parent": {
     "greeting": "مرحبًا، {{name}}",
@@ -144,7 +152,8 @@
     "iep": "IEP",
     "team": "الفريق",
     "tutorStore": "متجر المدرسين",
-    "billing": "الفواتير"
+    "billing": "الفواتير",
+    "loginAsLearner": "تسجيل الدخول كمتعلّم"
   },
   "parentSettings": {
     "title": "الإعدادات",

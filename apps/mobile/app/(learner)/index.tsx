@@ -54,12 +54,6 @@ export default function LearnerWorldMap() {
           onPress: () => {},
         },
         {
-          key: "brain",
-          label: t("tabs.brain"),
-          icon: "bulb" as const,
-          onPress: () => router.push("/(learner)/brain" as Href),
-        },
-        {
           key: "stats",
           label: t("tabs.profile"),
           icon: "trophy" as const,

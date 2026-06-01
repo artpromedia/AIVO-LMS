@@ -232,6 +232,16 @@ export default function ParentDashboard() {
           ))
         )}
 
+        {learners && learners.length > 0 ? (
+          <Button
+            title={t("parent.loginAsLearner", "Login as learner")}
+            onPress={() => router.push("/(auth)/learner-login" as Href)}
+            fullWidth
+            iconLeft={<Ionicons name="swap-horizontal" size={18} color={palette.primaryFg} />}
+            style={{ marginBottom: spacing.md }}
+          />
+        ) : null}
+
         <View style={styles.quickActions}>
           <View style={{ flex: 1 }}>
             <Button
