@@ -87,9 +87,13 @@ flips the default; "Code gap" = a flag won't fix it.
     which itself serves an AI set or a curated fallback bank) with
     loading/error/not-ready states; the hardcoded `SAMPLE` is removed.**
 12. **[Incomplete] Co-Learning stub** — `(parent)/colearn/[childId].tsx` dead
-    CTA `onAction={() => {}}`.
+    CTA `onAction={() => {}}`. → **Fixed: shows the child's current/recent
+    session (live-polled `LearnerLiveSessionCard`) instead of a dead CTA.**
 13. **[Incomplete] Live parent session viewing stub** —
-    `(parent)/session/[childId].tsx` empty state only.
+    `(parent)/session/[childId].tsx` empty state only. → **Fixed: a real
+    co-view of the learner's current session — `useLearnerLiveSessions`
+    (learning-svc `GET /api/learning/sessions`, polled 6s) renders an
+    "Active now" / last-session card.**
 14. **[Incomplete] Therapist "Add goal" unwired** —
     `(therapist)/client/[id]/goals.tsx:61` dead CTA. → **Fixed: family-svc
     `POST /api/family/therapy-goals` (auth + learner-access) + a mobile
