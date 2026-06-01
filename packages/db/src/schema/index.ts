@@ -34,3 +34,4 @@ export * from "./device_tokens.js";
 export * from "./lti_runtime.js";
 export * from "./pacing.js";
 export * from "./speech_buddy.js";
+export * from "./messaging.js";
