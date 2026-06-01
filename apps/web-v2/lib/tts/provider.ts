@@ -142,14 +142,128 @@ export const productionTTSAdapter: TTSProvider = {
   name: "production-stub",
   available: () => false,
   async generate() {
-    throw new Error("Production TTS adapter not wired. Set TTS_PROVIDER=mock for dev/test.");
+    throw new Error(
+      "Production TTS adapter not wired. Set TTS_PROVIDER=openai (real audio) or mock (dev/test).",
+    );
   },
 };
 
-export function getTTSProvider(): TTSProvider {
-  const env = process.env.TTS_PROVIDER ?? "mock";
-  if (env === "production" && productionTTSAdapter.available()) {
-    return productionTTSAdapter;
+/* -------------------------------------------------------------------------
+ * OpenAI TTS adapter (real audio).
+ *
+ * Calls OpenAI's /v1/audio/speech REST endpoint (no SDK — this is a
+ * non-Anthropic provider) and returns the MP3 as a base64 `data:` URL in
+ * `storageKey`. The data-URL approach needs no object storage, so it ships
+ * for the pilot today; swapping to an object-storage upload later is a
+ * one-function change here.
+ *
+ * Duration/captions are estimated (OpenAI TTS returns neither) using the same
+ * heuristics as the mock — good enough for the pilot's caption rail.
+ * ---------------------------------------------------------------------- */
+const OPENAI_TTS_ENDPOINT = "https://api.openai.com/v1/audio/speech";
+const OPENAI_TTS_MODEL = "tts-1";
+// tts-1 is ~$15 / 1M characters → 15 micro-USD per character.
+const OPENAI_TTS_MICRO_USD_PER_CHAR = 15;
+
+const OPENAI_VOICE: Record<TTSVoiceId, string> = {
+  warm_female: "nova",
+  warm_male: "onyx",
+  calm_neutral: "alloy",
+  kid_friendly: "fable",
+  narrator_low: "echo",
+  narrator_high: "shimmer",
+};
+
+type FetchLike = typeof fetch;
+
+/** Apply pronunciation overrides as plain-text substitutions (OpenAI TTS has
+ *  no SSML/lexicon input). Whole-substring replacement is sufficient here. */
+function applyPronunciation(
+  text: string,
+  overrides: { token: string; replacement: string; encoding: string }[],
+): string {
+  let out = text;
+  for (const o of overrides) {
+    if (!o.token) continue;
+    out = out.split(o.token).join(o.replacement);
   }
+  return out;
+}
+
+export function createOpenAITTSProvider(opts: {
+  apiKey: string;
+  fetchImpl?: FetchLike;
+  model?: string;
+}): TTSProvider {
+  const doFetch: FetchLike = opts.fetchImpl ?? fetch;
+  const model = opts.model ?? OPENAI_TTS_MODEL;
+  return {
+    name: "openai",
+    available: () => true,
+    async generate(req: TTSRequest): Promise<TTSResult> {
+      // OpenAI accepts speed 0.25–4.0.
+      const speed = Math.min(4, Math.max(0.25, req.speed));
+      const input = applyPronunciation(req.text, req.pronunciationOverrides);
+      const res = await doFetch(OPENAI_TTS_ENDPOINT, {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${opts.apiKey}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          model,
+          voice: OPENAI_VOICE[req.voiceId] ?? "alloy",
+          input,
+          speed,
+          response_format: "mp3",
+        }),
+      });
+      if (!res.ok) {
+        const detail = await res.text().catch(() => "");
+        throw new Error(`OpenAI TTS failed: ${res.status} ${detail.slice(0, 200)}`);
+      }
+      const bytes = Buffer.from(await res.arrayBuffer());
+      const durationMs = estimateDurationMs(req.text, speed);
+      return {
+        storageKey: `data:audio/mpeg;base64,${bytes.toString("base64")}`,
+        durationMs,
+        captions: fakeCaptions(req.text, durationMs),
+        costMicroUsd: Math.max(1, req.text.length * OPENAI_TTS_MICRO_USD_PER_CHAR),
+        provider: "openai",
+      };
+    },
+  };
+}
+
+export function getTTSProvider(): TTSProvider {
+  const env = process.env.TTS_PROVIDER;
+  const isProd = process.env.NODE_ENV === "production";
+
+  if (env === "openai") {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error("TTS_PROVIDER=openai but OPENAI_API_KEY is not set.");
+    }
+    return createOpenAITTSProvider({ apiKey });
+  }
+
+  if (env === "production") {
+    if (productionTTSAdapter.available()) return productionTTSAdapter;
+    throw new Error(
+      "TTS_PROVIDER=production but no production TTS adapter is wired. " +
+        "Use TTS_PROVIDER=openai for real audio, or mock for placeholder audio.",
+    );
+  }
+
+  // The mock provider returns deterministic placeholder audio. It must never
+  // be served silently in production as if it were real — require an explicit
+  // opt-in so it's a conscious decision (fail fast otherwise).
+  if (isProd && env !== "mock") {
+    throw new Error(
+      "TTS_PROVIDER must be set in production. Use 'openai' for real audio, or set " +
+        "'mock' to explicitly allow placeholder audio for the pilot.",
+    );
+  }
+
   return mockTTSProvider;
 }

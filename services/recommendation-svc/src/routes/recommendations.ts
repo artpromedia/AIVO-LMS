@@ -10,28 +10,31 @@ import {
   requireParentApproval,
 } from "../services/recommendation-policy.js";
 import type { ProfileRecommendation } from "../services/types.js";
+import {
+  InMemoryRecommendationStore,
+  ProfileStore,
+  type RecommendationStore,
+} from "../services/recommendation-store.js";
 
-const STORE = new Map<string, ProfileRecommendation>();
-const PROFILES = new Map<string, BrainProfile>();
-
-function ensureProfile(learnerId: string): BrainProfile {
-  if (!PROFILES.has(learnerId)) {
-    PROFILES.set(learnerId, {});
-  }
-  return PROFILES.get(learnerId)!;
-}
+// Module-level defaults used when no store is injected (dev/tests). The
+// test seed/clear helpers operate on these so callers that don't wire a
+// Postgres store keep working exactly as before. Exported so the candidate
+// route shares the same in-memory instance (a generated candidate must be
+// retrievable by the accept/amend/decline routes).
+export const defaultStore = new InMemoryRecommendationStore();
+const defaultProfiles = new ProfileStore();
 
 export function seedRecommendationForTest(recommendation: ProfileRecommendation): void {
-  STORE.set(recommendation.id, recommendation);
+  defaultStore.seed(recommendation);
 }
 
 export function getProfileForTest(learnerId: string): BrainProfile {
-  return ensureProfile(learnerId);
+  return defaultProfiles.ensure(learnerId);
 }
 
 export function clearRecommendationStoreForTest(): void {
-  STORE.clear();
-  PROFILES.clear();
+  defaultStore.clear();
+  defaultProfiles.clear();
 }
 
 interface DecisionBody {
@@ -40,9 +43,20 @@ interface DecisionBody {
   reason?: string;
 }
 
-export function registerRecommendationRoutes(app: FastifyInstance): void {
+export interface RecommendationRouteDeps {
+  store?: RecommendationStore;
+  profiles?: ProfileStore;
+}
+
+export function registerRecommendationRoutes(
+  app: FastifyInstance,
+  deps: RecommendationRouteDeps = {},
+): void {
+  const store = deps.store ?? defaultStore;
+  const profiles = deps.profiles ?? defaultProfiles;
+
   app.get<{ Params: { id: string } }>("/api/recommendations/:id", async (request, reply) => {
-    const recommendation = STORE.get(request.params.id);
+    const recommendation = await store.get(request.params.id);
     if (!recommendation) return reply.code(404).send({ error: "Not found" });
     return recommendation;
   });
@@ -50,7 +64,7 @@ export function registerRecommendationRoutes(app: FastifyInstance): void {
   app.post<{ Params: { id: string }; Body: DecisionBody }>(
     "/api/recommendations/:id/accept",
     async (request, reply) => {
-      const recommendation = STORE.get(request.params.id);
+      const recommendation = await store.get(request.params.id);
       if (!recommendation) return reply.code(404).send({ error: "Not found" });
       try {
         requireParentApproval(request.body?.actorRole);
@@ -62,7 +76,7 @@ export function registerRecommendationRoutes(app: FastifyInstance): void {
       }
       recommendation.status = "APPROVED";
       recommendation.updatedAt = new Date().toISOString();
-      const profile = ensureProfile(recommendation.learnerId);
+      const profile = profiles.ensure(recommendation.learnerId);
       const result = applyRecommendation(recommendation, profile);
       if (result.status === "APPLIED") {
         recommendation.status = "APPLIED";
@@ -70,6 +84,15 @@ export function registerRecommendationRoutes(app: FastifyInstance): void {
       } else {
         recommendation.status = "FAILED";
         recommendation.declineReason = result.reason;
+      }
+      await store.update(recommendation.id, {
+        status: recommendation.status,
+        appliedAt: recommendation.appliedAt,
+        declineReason: recommendation.declineReason,
+        updatedAt: recommendation.updatedAt,
+      });
+      if (result.snapshot) {
+        await store.recordSnapshot(result.snapshot, recommendation.id);
       }
       // Sprint 09: audit emission.
       void emitAuditEvent({
@@ -90,7 +113,7 @@ export function registerRecommendationRoutes(app: FastifyInstance): void {
   app.post<{ Params: { id: string }; Body: DecisionBody }>(
     "/api/recommendations/:id/amend",
     async (request, reply) => {
-      const recommendation = STORE.get(request.params.id);
+      const recommendation = await store.get(request.params.id);
       if (!recommendation) return reply.code(404).send({ error: "Not found" });
       try {
         requireParentApproval(request.body?.actorRole);
@@ -106,7 +129,7 @@ export function registerRecommendationRoutes(app: FastifyInstance): void {
       recommendation.status = "AMENDED";
       recommendation.amendedValue = request.body.amendedValue;
       recommendation.updatedAt = new Date().toISOString();
-      const profile = ensureProfile(recommendation.learnerId);
+      const profile = profiles.ensure(recommendation.learnerId);
       const result = applyRecommendation(recommendation, profile);
       if (result.status === "APPLIED") {
         recommendation.status = "APPLIED";
@@ -114,6 +137,16 @@ export function registerRecommendationRoutes(app: FastifyInstance): void {
       } else {
         recommendation.status = "FAILED";
         recommendation.declineReason = result.reason;
+      }
+      await store.update(recommendation.id, {
+        status: recommendation.status,
+        amendedValue: recommendation.amendedValue,
+        appliedAt: recommendation.appliedAt,
+        declineReason: recommendation.declineReason,
+        updatedAt: recommendation.updatedAt,
+      });
+      if (result.snapshot) {
+        await store.recordSnapshot(result.snapshot, recommendation.id);
       }
       // Sprint 09: audit emission for amendment.
       void emitAuditEvent({
@@ -134,7 +167,7 @@ export function registerRecommendationRoutes(app: FastifyInstance): void {
   app.post<{ Params: { id: string }; Body: DecisionBody }>(
     "/api/recommendations/:id/decline",
     async (request, reply) => {
-      const recommendation = STORE.get(request.params.id);
+      const recommendation = await store.get(request.params.id);
       if (!recommendation) return reply.code(404).send({ error: "Not found" });
       try {
         requireParentApproval(request.body?.actorRole);
@@ -147,6 +180,11 @@ export function registerRecommendationRoutes(app: FastifyInstance): void {
       recommendation.status = "DECLINED";
       recommendation.declineReason = request.body?.reason;
       recommendation.updatedAt = new Date().toISOString();
+      await store.update(recommendation.id, {
+        status: recommendation.status,
+        declineReason: recommendation.declineReason,
+        updatedAt: recommendation.updatedAt,
+      });
       // Sprint 09: audit emission for decline.
       void emitAuditEvent({
         actorRole: request.body?.actorRole ?? "parent",

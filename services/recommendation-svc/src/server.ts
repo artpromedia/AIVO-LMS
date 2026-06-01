@@ -2,11 +2,17 @@ import Fastify, { type FastifyInstance } from "fastify";
 import cors from "@fastify/cors";
 import { registerEnterpriseAuthHook } from "@aivo/enterprise-core";
 import { registerObservabilityPlugin } from "@aivo/observability";
+import { createDb } from "@aivo/db";
 import { registerRecommendationRoutes } from "./routes/recommendations.js";
 import { registerCandidateRoutes } from "./routes/candidates.js";
+import { DrizzleRecommendationStore } from "./services/drizzle-recommendation-store.js";
+import { ProfileStore, type RecommendationStore } from "./services/recommendation-store.js";
 
 export interface BuildAppOptions {
   skipAuth?: boolean;
+  /** Inject a store (tests). Defaults to Postgres when DATABASE_URL is set,
+   *  else the in-memory default shared by the route modules. */
+  store?: RecommendationStore;
 }
 
 export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyInstance> {
@@ -17,7 +23,31 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   if (!options.skipAuth) {
     registerEnterpriseAuthHook(app, { sourceService: "recommendation-svc" });
   }
-  registerRecommendationRoutes(app);
-  registerCandidateRoutes(app);
+
+  // Persistence: use Postgres when DATABASE_URL is set so recommendation
+  // records survive restarts and are shared across replicas. The in-memory
+  // default (shared by both route modules) is dev/test-only and refused in
+  // production.
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!options.store && !databaseUrl && process.env.NODE_ENV === "production") {
+    throw new Error(
+      "recommendation-svc: DATABASE_URL must be set in production. The in-memory " +
+        "store is development-only (recommendations are lost on restart and not " +
+        "shared across replicas).",
+    );
+  }
+  const store: RecommendationStore | undefined =
+    options.store ??
+    (databaseUrl ? new DrizzleRecommendationStore(createDb(databaseUrl)) : undefined);
+
+  if (store) {
+    const profiles = new ProfileStore();
+    registerRecommendationRoutes(app, { store, profiles });
+    registerCandidateRoutes(app, { store });
+  } else {
+    // Shared in-memory default (also used by the test seed/clear helpers).
+    registerRecommendationRoutes(app);
+    registerCandidateRoutes(app);
+  }
   return app;
 }

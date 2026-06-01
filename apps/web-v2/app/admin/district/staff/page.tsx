@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { requirePageRole } from "@/lib/auth/server";
 import { getTranslations } from "next-intl/server";
 import { AppShell } from "@/components/layout/app-shell";
@@ -13,7 +14,22 @@ import {
   getDistrictStats,
 } from "@/lib/db/repos";
 import { listStaffInvitesForTenants } from "@/lib/db/staff-invites";
+import {
+  IDENTITY_ACCESS_TOKEN_COOKIE,
+  identityListDistrictSchools,
+  identityListDistrictAdmins,
+  mapWireRoleToRole,
+} from "@/lib/auth/identity-client";
 import { StaffInviteSection } from "./staff-invite-section";
+
+type PendingInviteRow = {
+  id: string;
+  email: string;
+  role: "district_admin" | "school_admin" | "teacher";
+  displayName: string;
+  invitedAt: string;
+  schoolId: string | null;
+};
 
 const ROLE_LABEL: Record<string, string> = {
   district_admin: "District admin",
@@ -34,17 +50,43 @@ export default async function Page() {
   const tenantIds = tenants.map((t) => t.id);
   const stats = getDistrictStats(tenantIds);
   const staff = await listMembersByRole(tenantIds, ["district_admin", "school_admin", "teacher"]);
-  const pendingInvites = listStaffInvitesForTenants(tenantIds).map((i) => ({
-    id: i.id,
-    email: i.email,
-    role: i.role,
-    displayName: i.displayName,
-    invitedAt: i.invitedAt,
-    schoolId: i.schoolId,
-  }));
-  const schools = tenants
-    .filter((t) => t.type === "school")
-    .map((t) => ({ id: t.id, name: t.name }));
+
+  // Real-auth: source the school dropdown + pending invites from identity-svc
+  // so invites persist and email for real. Demo fallback uses the in-memory
+  // store. (The stats + active-staff table above remain demo read models for
+  // now — see docs/PLATFORM_GAP_ANALYSIS.md §9.)
+  const accessToken = (await cookies()).get(IDENTITY_ACCESS_TOKEN_COOKIE)?.value;
+  let schools: Array<{ id: string; name: string }>;
+  let pendingInvites: PendingInviteRow[];
+  if (accessToken) {
+    const [schoolsRes, adminsRes] = await Promise.all([
+      identityListDistrictSchools(accessToken),
+      identityListDistrictAdmins(accessToken),
+    ]);
+    schools = schoolsRes.ok ? schoolsRes.schools : [];
+    pendingInvites = adminsRes.ok
+      ? adminsRes.pendingInvites.map((i) => ({
+          id: i.id,
+          email: i.email,
+          role: (mapWireRoleToRole(i.role) ?? "teacher") as PendingInviteRow["role"],
+          displayName: i.name,
+          invitedAt: i.createdAt,
+          schoolId: i.schoolId,
+        }))
+      : [];
+  } else {
+    pendingInvites = listStaffInvitesForTenants(tenantIds).map((i) => ({
+      id: i.id,
+      email: i.email,
+      role: i.role,
+      displayName: i.displayName,
+      invitedAt: i.invitedAt,
+      schoolId: i.schoolId,
+    }));
+    schools = tenants
+      .filter((tn) => tn.type === "school")
+      .map((tn) => ({ id: tn.id, name: tn.name }));
+  }
 
   return (
     <AppShell

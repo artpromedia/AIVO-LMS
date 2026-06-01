@@ -16,14 +16,16 @@ import { Mail } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { readMockSessionFromCookies } from "@/lib/auth/mock-session";
 import { ROLE_HOME } from "@/lib/auth/types";
+import { identityInvitePreview } from "@/lib/auth/identity-client";
 import { listPendingInvitesForEmail } from "@/lib/db/team-invites";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AcceptInviteActions } from "./accept-invite-actions";
+import { StaffAcceptForm } from "./staff-accept-form";
 
 export const dynamic = "force-dynamic";
 
-type SearchParams = Promise<{ email?: string }>;
+type SearchParams = Promise<{ email?: string; token?: string }>;
 
 export default async function AcceptInvitePage({
   searchParams,
@@ -32,6 +34,41 @@ export default async function AcceptInvitePage({
 }) {
   const t = await getTranslations("accept_invite.page");
   const params = await searchParams;
+  const inviteToken = (params.token ?? "").trim();
+
+  // Staff invite branch (district/school-admin/teacher): the invitee does
+  // NOT have an account yet — the email link carries a one-time token. We
+  // preview it server-side and render a "set your password" form that
+  // creates the account on submit. This path is independent of any existing
+  // session (the learner care-team flow below assumes the user is signed in).
+  if (inviteToken) {
+    const preview = await identityInvitePreview(inviteToken);
+    if (!preview.ok) {
+      return (
+        <Shell heading={t("accept_heading")}>
+          <Card className="border-rose-200 bg-rose-50 p-4">
+            <p className="text-sm text-aivo-ink">{preview.error}</p>
+          </Card>
+          <Link href="/admin/login" className="block w-full">
+            <Button className="w-full">Go to sign in</Button>
+          </Link>
+        </Shell>
+      );
+    }
+    return (
+      <Shell heading="Accept your invitation">
+        <StaffAcceptForm
+          token={inviteToken}
+          email={preview.invite.email}
+          name={preview.invite.name}
+          role={preview.invite.role}
+          schoolName={preview.invite.schoolName}
+          districtName={preview.invite.districtName}
+        />
+      </Shell>
+    );
+  }
+
   const invitedEmail = (params.email ?? "").trim().toLowerCase();
   const session = await readMockSessionFromCookies();
 

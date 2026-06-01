@@ -141,6 +141,46 @@ export const sendPushSchema = {
   },
 } as const;
 
+// ── device tokens (push) ──────────────────────────────────────────────────
+
+export const registerDeviceSchema = {
+  tags: ["Comms"],
+  operationId: "registerDevice",
+  summary: "Register or refresh the caller's push device token",
+  body: {
+    type: "object",
+    required: ["token", "kind"],
+    additionalProperties: false,
+    properties: {
+      token: { type: "string", minLength: 1 },
+      kind: { type: "string", enum: ["fcm", "apns"] },
+      platform: { type: "string", enum: ["ios", "android", "web"] },
+      topic: { type: "string" },
+    },
+  },
+  response: {
+    200: sendStatusResponse,
+    400: errorResponse,
+    401: errorResponse,
+  },
+} as const;
+
+export const deleteDeviceSchema = {
+  tags: ["Comms"],
+  operationId: "deleteDevice",
+  summary: "Unregister one of the caller's push device tokens",
+  params: {
+    type: "object",
+    required: ["token"],
+    properties: { token: { type: "string" } },
+  },
+  response: {
+    200: sendStatusResponse,
+    401: errorResponse,
+    404: errorResponse,
+  },
+} as const;
+
 // ── preferences ─────────────────────────────────────────────────────────────
 
 export const getPreferencesSchema = {
@@ -247,6 +287,10 @@ export const internalDistrictAdminInviteSchema = internalSchema(
 export const internalSchoolAdminInviteSchema = internalSchema(
   "internalSendSchoolAdminInvite",
   "Internal: send a school-admin invite email",
+);
+export const internalTeacherInviteSchema = internalSchema(
+  "internalSendTeacherInvite",
+  "Internal: send a teacher invite email",
 );
 export const internalStaffCredentialsSchema = internalSchema(
   "internalSendStaffCredentials",

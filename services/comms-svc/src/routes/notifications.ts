@@ -6,10 +6,18 @@ import { renderTemplate, AVAILABLE_TEMPLATES } from "../lib/templates.js";
 import { createLogger } from "@aivo/observability";
 import { emitCommsAudit } from "../lib/audit.js";
 import {
+  registerDeviceToken,
+  listDeviceTargets,
+  deleteDeviceToken,
+  deleteInvalidTokens,
+} from "../lib/device-tokens.js";
+import {
   sendNotificationSchema,
   sendEmailSchema,
   sendBatchEmailSchema,
   sendPushSchema,
+  registerDeviceSchema,
+  deleteDeviceSchema,
   getPreferencesSchema,
   updatePreferencesSchema,
   listTemplatesSchema,
@@ -20,6 +28,7 @@ import {
   internalPasswordResetSchema,
   internalDistrictAdminInviteSchema,
   internalSchoolAdminInviteSchema,
+  internalTeacherInviteSchema,
   internalStaffCredentialsSchema,
   internalTeacherInviteParentSchema,
   internalAdminAlertSchema,
@@ -216,7 +225,53 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any) {
     async (request, reply) => {
       const { userId, title, body, data } = request.body as any;
       if (!userId || !title) return reply.code(400).send({ error: "userId and title required" });
-      return { status: "queued", messageId: crypto.randomUUID(), userId, title };
+
+      // Resolve the user's registered devices, fan out via the push-router,
+      // and prune any tokens the provider reports as invalid. Previously this
+      // returned a fake "queued" status without delivering anything.
+      const targets = await listDeviceTargets(db, userId);
+      if (targets.length === 0) {
+        return { status: "no_devices", sent: 0, devices: 0 };
+      }
+      const { defaultPushRouter } = await import("../providers/push-router.js");
+      const results = await defaultPushRouter.send(targets, { title, body, data });
+      const invalid = results.filter((r) => r.invalidToken).map((r) => r.token);
+      if (invalid.length) await deleteInvalidTokens(db, invalid);
+      const sent = results.filter((r) => r.ok).length;
+      return {
+        status: sent > 0 ? "sent" : "failed",
+        sent,
+        devices: targets.length,
+        pruned: invalid.length,
+      };
+    },
+  );
+
+  // Register/refresh the caller's own push device token (mobile/web client
+  // posts this on login + token refresh).
+  app.post(
+    "/api/comms/devices",
+    { schema: registerDeviceSchema, preHandler: requireAuth },
+    async (request, reply) => {
+      const userId = (request as any).user?.sub as string | undefined;
+      if (!userId) return reply.code(401).send({ error: "Missing user context" });
+      const { token, kind, platform, topic } = request.body as any;
+      await registerDeviceToken(db, { userId, token, kind, platform, topic });
+      return { status: "registered" };
+    },
+  );
+
+  // Unregister one of the caller's device tokens (logout / token rotation).
+  app.delete(
+    "/api/comms/devices/:token",
+    { schema: deleteDeviceSchema, preHandler: requireAuth },
+    async (request, reply) => {
+      const userId = (request as any).user?.sub as string | undefined;
+      if (!userId) return reply.code(401).send({ error: "Missing user context" });
+      const { token } = request.params as { token: string };
+      const removed = await deleteDeviceToken(db, userId, token);
+      if (!removed) return reply.code(404).send({ error: "Token not found for this user" });
+      return { status: "unregistered" };
     },
   );
 
@@ -622,6 +677,49 @@ export function registerNotificationRoutes(app: FastifyInstance, db: any) {
         return { status: result.status, messageId: result.messageId };
       } catch (err: any) {
         logger.error({ err, to }, "Failed to send school admin invite email");
+        return reply.code(500).send({ error: "Failed to send invite" });
+      }
+    },
+  );
+
+  app.post(
+    "/api/comms/internal/teacher-invite",
+    { schema: internalTeacherInviteSchema },
+    async (request, reply) => {
+      const internalKey = request.headers["x-internal-key"];
+      const expectedKey =
+        process.env.INTERNAL_SERVICE_KEY ||
+        (process.env.NODE_ENV === "production" ? "" : "aivo-internal-dev-key");
+      if (!internalKey || !expectedKey || internalKey !== expectedKey) {
+        return reply.status(401).send({ error: "Unauthorized" });
+      }
+      const { to, name, schoolName, inviteUrl } = request.body as any;
+      if (!to || !inviteUrl) {
+        return reply.code(400).send({ error: "to and inviteUrl required" });
+      }
+      if (!isConfigured()) {
+        logger.warn(
+          { to },
+          "Teacher invite requested but email not configured, link logged for dev",
+        );
+        return { status: "dev_mode", inviteUrl };
+      }
+      const rendered = renderTemplate("teacher_invite", {
+        name: name || "there",
+        schoolName: schoolName || "your school",
+        inviteUrl,
+      });
+      try {
+        const result = await sendEmail({
+          to,
+          subject: rendered.subject,
+          htmlBody: rendered.html,
+          textBody: rendered.text,
+          tag: "teacher_invite",
+        });
+        return { status: result.status, messageId: result.messageId };
+      } catch (err: any) {
+        logger.error({ err, to }, "Failed to send teacher invite email");
         return reply.code(500).send({ error: "Failed to send invite" });
       }
     },

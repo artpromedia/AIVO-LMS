@@ -50,6 +50,18 @@ export async function buildApp() {
 }
 
 async function start() {
+  // The default (and ASR-unavailable) path returns deterministic *mock*
+  // pronunciation/fluency scores. Those must never be served silently in
+  // production as if they were real evaluations — require an explicit
+  // SPEECH_EVAL_MODE so it's a conscious decision (fail fast otherwise).
+  const mode = (process.env.SPEECH_EVAL_MODE ?? "").trim().toLowerCase();
+  if (process.env.NODE_ENV === "production" && mode !== "live" && mode !== "mock") {
+    throw new Error(
+      "SPEECH_EVAL_MODE must be set in production. Use 'live' (a real ASR " +
+        "provider must be configured) or explicitly 'mock' to acknowledge that " +
+        "placeholder scores will be returned.",
+    );
+  }
   const app = await buildApp();
   await bootstrapOpsAlerts({ service: "speech-eval-svc", app, beforeExit: () => app.close() });
   await app.listen({ port: PORT, host: "0.0.0.0" });

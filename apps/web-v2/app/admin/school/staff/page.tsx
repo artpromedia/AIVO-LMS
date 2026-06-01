@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/empty-state";
 import { SCHOOL_NAV } from "@/components/layout/role-shells";
 import { listUsersForTenants, scopeTenantsForSession } from "@/lib/db/repos";
+import { TeacherInviteSection } from "./teacher-invite-section";
 
 export default async function Page() {
   const session = await requirePageRole(["school_admin"]);
@@ -28,6 +29,9 @@ export default async function Page() {
         title={t("title")}
         description="Teachers and admins assigned to this school."
       />
+      <div className="mb-6">
+        <TeacherInviteSection />
+      </div>
       {staff.length === 0 ? (
         <EmptyState title={t("empty")} />
       ) : (

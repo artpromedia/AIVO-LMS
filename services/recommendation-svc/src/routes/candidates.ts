@@ -3,8 +3,19 @@ import {
   generateRecommendations,
   type GenerateCandidatesInput,
 } from "../services/recommendation-generator.js";
+import type { RecommendationStore } from "../services/recommendation-store.js";
+import { defaultStore } from "./recommendations.js";
 
-export function registerCandidateRoutes(app: FastifyInstance): void {
+export interface CandidateRouteDeps {
+  store?: RecommendationStore;
+}
+
+export function registerCandidateRoutes(app: FastifyInstance, deps: CandidateRouteDeps = {}): void {
+  // Share the recommendations route's in-memory default when nothing is
+  // wired (dev/tests) so a generated candidate is retrievable by the
+  // accept/amend/decline routes; production injects a Postgres store.
+  const store = deps.store ?? defaultStore;
+
   app.post<{ Body: GenerateCandidatesInput }>(
     "/api/recommendations/candidates",
     async (request, reply) => {
@@ -22,6 +33,11 @@ export function registerCandidateRoutes(app: FastifyInstance): void {
         return reply.code(400).send({ error: "tenantId is required (auth context or body)" });
       }
       const recommendations = generateRecommendations(body);
+      // Persist so the accept/amend/decline routes can act on them and they
+      // survive a restart / are visible across replicas.
+      for (const rec of recommendations) {
+        await store.create(rec);
+      }
       return { recommendations, tenantId };
     },
   );

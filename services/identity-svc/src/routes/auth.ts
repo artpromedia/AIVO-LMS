@@ -12,6 +12,9 @@ import {
   appendAudit,
   adminSessions,
   passwordHistory,
+  districtAdminInvites,
+  schools,
+  adminAuditLog,
 } from "@aivo/db";
 import {
   evaluatePassword,
@@ -478,6 +481,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         role: user.role,
         email: user.email!,
         name: user.name,
+        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
       });
 
       const rawRefreshToken = crypto.randomUUID();
@@ -603,6 +607,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         role: user.role,
         email: user.email!,
         name: user.name,
+        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
       });
 
       const rawRefreshToken = crypto.randomUUID();
@@ -746,6 +751,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         role: user.role,
         email: user.email!,
         name: user.name,
+        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
       });
 
       const rawRefreshToken = crypto.randomUUID();
@@ -861,6 +867,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         role: user.role,
         email: user.email!,
         name: user.name,
+        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
       });
 
       const rawRefreshToken = crypto.randomUUID();
@@ -1007,6 +1014,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         role: user.role,
         email: user.email!,
         name: user.name,
+        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
       });
 
       const rawRefreshToken = crypto.randomUUID();
@@ -1191,6 +1199,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         role: user.role,
         email: user.email || undefined,
         name: user.name,
+        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
       });
 
       return {
@@ -1427,6 +1436,237 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         .where(eq(passwordResetTokens.id, record.id));
       await db.delete(sessions).where(eq(sessions.userId, record.userId));
       return { ok: true };
+    },
+  );
+
+  // --- STAFF INVITE PREVIEW + ACCEPTANCE ---------------------------
+  // Sprint 1 (invite-flows): staff invites (DISTRICT_ADMIN / SCHOOL_ADMIN /
+  // TEACHER) created via the district/school admin consoles land the
+  // invitee on the web `/accept-invite?token=…` page. These two public,
+  // token-keyed endpoints let that page (a) preview who the invite is for
+  // and (b) set a password — which creates the real user account and marks
+  // the invite accepted. This is the production token-acceptance step that
+  // previously only existed in test-helpers; without it, invited staff had
+  // no way to actually get an account.
+  const INVITE_ACCEPT_ROLES = ["DISTRICT_ADMIN", "SCHOOL_ADMIN", "TEACHER"] as const;
+
+  function hashInviteToken(raw: string): string {
+    return crypto.createHash("sha256").update(raw).digest("hex");
+  }
+
+  type InviteLookup =
+    | { ok: true; invite: any }
+    | { ok: false; status: number; error: string };
+
+  async function lookupValidInvite(db: any, token: string): Promise<InviteLookup> {
+    const tokenHash = hashInviteToken(token);
+    const [invite] = await db
+      .select()
+      .from(districtAdminInvites)
+      .where(eq(districtAdminInvites.tokenHash, tokenHash))
+      .limit(1);
+    if (!invite || invite.revokedAt) {
+      return { ok: false, status: 400, error: "This invitation link is invalid." };
+    }
+    if (invite.acceptedAt) {
+      return {
+        ok: false,
+        status: 409,
+        error: "This invitation has already been accepted. Sign in instead.",
+      };
+    }
+    if (invite.expiresAt < new Date()) {
+      return {
+        ok: false,
+        status: 410,
+        error: "This invitation has expired. Ask your administrator to resend it.",
+      };
+    }
+    return { ok: true, invite };
+  }
+
+  // GET preview — public, keyed solely by the token (no bearer).
+  app.get(
+    "/api/auth/invite/:token",
+    {
+      schema: {
+        tags: ["Auth"],
+        params: {
+          type: "object",
+          required: ["token"],
+          properties: { token: { type: "string", minLength: 16 } },
+        },
+      },
+    },
+    async (req, reply) => {
+      const { token } = req.params as { token: string };
+      const db = (app as any).db;
+      const found = await lookupValidInvite(db, token);
+      if (!found.ok) return reply.status(found.status).send({ error: found.error });
+      const invite = found.invite;
+
+      let schoolName: string | null = null;
+      if (invite.schoolId) {
+        const [school] = await db
+          .select({ name: schools.name })
+          .from(schools)
+          .where(eq(schools.id, invite.schoolId))
+          .limit(1);
+        schoolName = school?.name ?? null;
+      }
+      const [tenant] = await db
+        .select({ name: tenants.name })
+        .from(tenants)
+        .where(eq(tenants.id, invite.tenantId))
+        .limit(1);
+
+      return {
+        invite: {
+          email: invite.email,
+          name: invite.name,
+          role: invite.role,
+          schoolName,
+          districtName: tenant?.name ?? null,
+          expiresAt: invite.expiresAt,
+        },
+      };
+    },
+  );
+
+  // POST accept — public; creates the account from the invite + the chosen
+  // password, then auto-logs the new user in (mirrors registration).
+  app.post(
+    "/api/auth/accept-invite",
+    {
+      schema: {
+        tags: ["Auth"],
+        body: {
+          type: "object",
+          required: ["token", "password"],
+          properties: {
+            token: { type: "string", minLength: 16 },
+            password: { type: "string", minLength: 8, maxLength: 128 },
+          },
+        },
+      },
+    },
+    async (req, reply) => {
+      const { token, password } = req.body as { token: string; password: string };
+      const db = (app as any).db;
+
+      const found = await lookupValidInvite(db, token);
+      if (!found.ok) return reply.status(found.status).send({ error: found.error });
+      const invite = found.invite;
+
+      const role = String(invite.role || "").toUpperCase();
+      if (!(INVITE_ACCEPT_ROLES as readonly string[]).includes(role)) {
+        return reply.status(400).send({ error: "This invitation has an unsupported role." });
+      }
+
+      const email = invite.email.trim().toLowerCase();
+
+      // Guard against a race where the account was created between invite
+      // issuance and acceptance (e.g. SSO/SCIM just-in-time provisioning).
+      const [existing] = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(and(eq(users.tenantId, invite.tenantId), eq(users.email, email)))
+        .limit(1);
+      if (existing) {
+        // Close the invite so it can't be reused, then point them at login.
+        await db
+          .update(districtAdminInvites)
+          .set({ acceptedAt: new Date(), acceptedUserId: existing.id })
+          .where(eq(districtAdminInvites.id, invite.id));
+        return reply
+          .status(409)
+          .send({ error: "An account already exists for this email. Sign in instead." });
+      }
+
+      const policy = await evaluatePassword(password, { role, email, name: invite.name });
+      if (!policy.ok) {
+        return reply.status(400).send({
+          error: "Password does not meet our policy",
+          reasons: policy.reasons,
+          strengthScore: policy.strengthScore,
+        });
+      }
+
+      const passwordHash = await hashPassword(password);
+      const [user] = await db
+        .insert(users)
+        .values({
+          tenantId: invite.tenantId,
+          email,
+          passwordHash,
+          name: invite.name,
+          role,
+          schoolId: invite.schoolId ?? null,
+          passwordChangedAt: new Date(),
+          mustChangePassword: false,
+        } as any)
+        .returning();
+      await db.insert(passwordHistory).values({ userId: user.id, passwordHash });
+
+      await db
+        .update(districtAdminInvites)
+        .set({ acceptedAt: new Date(), acceptedUserId: user.id })
+        .where(eq(districtAdminInvites.id, invite.id));
+
+      // Audit: the new user is the actor of their own acceptance.
+      try {
+        await appendAudit(db, "admin_audit_log", adminAuditLog, {
+          tenantId: invite.tenantId,
+          action: "staff_invite.accepted",
+          actorId: user.id,
+          actorEmail: email,
+          actorRole: role,
+          onBehalfOfId: null,
+          resourceType: "district_admin_invite",
+          resourceId: invite.id,
+          details: { role, schoolId: invite.schoolId ?? null },
+          ipAddress: req.ip ?? null,
+          userAgent: (req.headers["user-agent"] as string) ?? null,
+        });
+      } catch (err) {
+        req.log.warn({ err: String(err) }, "accept-invite audit append failed");
+      }
+
+      // Auto-login: mint access token + refresh session like registration.
+      const accessToken = await signJWT({
+        sub: user.id,
+        tenantId: user.tenantId,
+        role: user.role,
+        email: user.email!,
+        name: user.name,
+        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
+      });
+      const rawRefreshToken = crypto.randomUUID();
+      await db.insert(sessions).values({
+        userId: user.id,
+        refreshToken: hashRefreshToken(rawRefreshToken),
+        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      });
+      reply.setCookie("refreshToken", rawRefreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 30 * 24 * 60 * 60,
+      });
+
+      return {
+        ok: true,
+        accessToken,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          tenantId: user.tenantId,
+          schoolId: user.schoolId ?? null,
+        },
+      };
     },
   );
 
@@ -1821,6 +2061,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         role: user.role,
         email: user.email!,
         name: user.name,
+        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
       });
 
       const rawRefreshToken = crypto.randomUUID();
@@ -2665,6 +2906,7 @@ export async function registerAuthRoutes(app: FastifyInstance) {
         role: user.role,
         email: user.email!,
         name: user.name,
+        ...(user.schoolId ? { schoolId: user.schoolId } : {}),
       });
       const rawRefreshToken = crypto.randomUUID();
       const ttlMs = refreshTtlMs(user.role);
