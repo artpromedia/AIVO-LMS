@@ -8,6 +8,7 @@ import { useSensoryPalette } from "@/context/SensoryModeProvider";
 import { ResponsiveScreen } from "@/src/components/layout/ResponsiveScreen";
 import { ScreenHeader } from "@/src/components/layout/ScreenHeader";
 import { Card } from "@/components/ui";
+import { SpeechBuddyConsentCard } from "@/components/parent/SpeechBuddyConsentCard";
 import { LoadingState } from "@aivo/mobile-ui";
 import { spacing, radius } from "@/constants/colors";
 import { fontFamilies } from "@/constants/typography";
@@ -62,6 +63,8 @@ export default function ParentLearnerSettingsScreen() {
               </Pressable>
             ))}
           </Card>
+
+          <SpeechBuddyConsentCard learnerId={id} learnerName={learner?.firstName ?? ""} />
 
           <Pressable
             accessibilityRole="button"

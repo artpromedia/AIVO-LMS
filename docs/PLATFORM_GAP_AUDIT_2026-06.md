@@ -99,8 +99,8 @@ flips the default; "Code gap" = a flag won't fix it.
 18. **[Blocker] Speech Buddy consent store is env-var-only.**
     `services/family-svc/src/routes/speech-buddy-consent.ts` reads
     `SPEECH_BUDDY_DEV_CONSENTS`; no DB store or parent UI. In prod with no
-    env var, every consent check fails. → **Backend fixed in this pass (see
-    Changelog); parent UI wiring is the remaining sub-task.**
+    env var, every consent check fails. → **Fixed in this pass — DB store +
+    family-svc API + web & mobile parent UI (see Changelog).**
 
 ### F. Lower severity / cleanup
 
@@ -299,11 +299,31 @@ JWT-authenticating services should adopt the same helper (follow-up).
 Verified: `@aivo/security` builds + 53 tests pass; `@aivo/family-svc`
 builds clean.
 
-### Remaining sub-task — #18 parent UI
+### #18 parent UI (web + mobile)
 
-The grant/revoke/status API now exists, but web-v2 has no family-svc BFF
-client yet. To close #18 fully, add: (a) a `lib/bff/family-svc.ts` client +
-`/api/bff/parent/speech-buddy-consent` route forwarding the parent bearer,
-(b) a consent toggle on `/parent/learners/[learnerId]/settings` (grant with
-age band / revoke), and (c) mobile parity. This is UI-only — the
-production-blocking verify path is already real.
+Wired the parent grant/revoke surface on both platforms, dual-path like
+billing (real family-svc when enabled + a real token; in-memory store for
+dev/mock):
+
+- `apps/web-v2/lib/env.ts` — `FAMILY_SVC_URL` (`:3007`),
+  `FAMILY_SVC_SERVICE_TOKEN`, `AIVO_USE_FAMILY_SVC`.
+- `apps/web-v2/lib/bff/family-svc.ts` (new) — server-only client
+  (`getSpeechBuddyConsent` / `grant` / `revoke`) forwarding the parent's
+  `aivo_access_token` bearer.
+- `apps/web-v2/lib/db/speech-buddy-consent-store.ts` (new) — in-memory
+  dev/mock fallback store.
+- `apps/web-v2/app/api/bff/parent/learners/[learnerId]/speech-buddy-consent/route.ts`
+  (new) — GET/POST/DELETE; `requireSession` + parent role +
+  `parentCanAccessLearner`; dual-path family-svc vs store; audits
+  `speech_buddy.consent.granted` / `.revoked`.
+- `apps/web-v2/app/parent/learners/[learnerId]/speech-buddy-consent-card.tsx`
+  (new) + a "Speech Buddy" section on the parent learner settings page —
+  status, age-band picker, enable / withdraw.
+- `apps/mobile/components/parent/SpeechBuddyConsentCard.tsx` (new) + the
+  parent `settings-learner/[childId]` screen — calls family-svc directly via
+  the authenticated `apiFetch(API.FAMILY, ...)`.
+
+Verified: web-v2 `typecheck` + `eslint --max-warnings=0` clean on changed
+files; mobile `tsc` (0 errors) + `eslint` clean. With #18's backend, this
+fully closes the Speech Buddy consent blocker. Consent copy is English-only
+pending an i18n pass.

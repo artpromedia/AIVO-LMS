@@ -186,6 +186,15 @@ const serverSchema = z.object({
     .union([z.literal("true"), z.literal("false")])
     .optional()
     .transform((v) => (v === undefined ? undefined : v === "true")),
+  FAMILY_SVC_URL: z.string().url().default("http://localhost:3007"),
+  FAMILY_SVC_SERVICE_TOKEN: z.string().optional(),
+  // Per-service override of AIVO_USE_SERVICE_STACK for family-svc. When
+  // enabled (and a real access token is present), the parent Speech Buddy
+  // consent surface talks to family-svc instead of the in-memory store.
+  AIVO_USE_FAMILY_SVC: z
+    .union([z.literal("true"), z.literal("false")])
+    .optional()
+    .transform((v) => (v === undefined ? undefined : v === "true")),
   // Shared upstream timeout (ms) for service calls; the client uses
   // AbortController with this deadline.
   AIVO_SERVICE_TIMEOUT_MS: z.coerce.number().int().positive().default(5000),
