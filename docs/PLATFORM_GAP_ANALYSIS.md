@@ -360,8 +360,27 @@ already lists as conditional secrets):
   delivery is gated on `FCM_SERVICE_ACCOUNT_JSON` / `APNS_*` (the providers return a no-network failure
   result when unconfigured).
 
-_Remaining adapter_ (OpenAI TTS) follows the same pattern and slots behind its value gate / conditional
-secret once an audio object-storage target is chosen (object storage vs. data-URL for the pilot).
+### Provider adapter — OpenAI TTS (real audio, data-URL for the pilot)
+
+`getTTSProvider()` previously had no real adapter (mock or a stub that throws). It now has a real OpenAI
+implementation:
+
+- `createOpenAITTSProvider` in `apps/web-v2/lib/tts/provider.ts` calls OpenAI `/v1/audio/speech` via raw
+  `fetch` (no SDK — non-Anthropic provider), maps AIVO voice ids → OpenAI voices, applies pronunciation
+  overrides as text substitutions, clamps speed to 0.25–4.0, and returns the MP3 as a base64 `data:` URL
+  in `storageKey` — **no object storage needed**, so it ships for the pilot today (swapping to an
+  object-storage upload later is a one-function change). Duration/captions are estimated with the same
+  heuristics as the mock.
+- `getTTSProvider()` selects it when `TTS_PROVIDER=openai` (+ `OPENAI_API_KEY`); throws clearly if the key
+  is missing. The value gate now accepts `mock | openai | production`, and `OPENAI_API_KEY` is registered
+  as a conditional secret (AI **or** TTS) in the web-v2 manifest group.
+- Verified: web-v2 typecheck (0 errors); eslint clean; 4 unit tests pass against an injected fetch
+  (endpoint/auth/body shape, voice mapping, speed clamping, pronunciation substitution, non-2xx → throw);
+  a live conformance test hits the real API only when `OPENAI_API_KEY` is set (skipped otherwise); the
+  release gate accepts `openai` and rejects bad values.
+
+All three mock providers from the original report (AI tutor, push, TTS) now have real, gated, build/test-
+verified implementations behind the deploy gate.
 
 ### Phase 2 — multi-replica: OIDC store moved to Postgres
 
