@@ -220,8 +220,8 @@ export default async function LearnerSettingsPage({
       </Card>
 
       <SectionHeader
-        title="Speech Buddy"
-        description="Optional voice companion for social-emotional practice. Requires your consent."
+        title={t("speech_buddy_section_title")}
+        description={t("speech_buddy_section_desc")}
       />
       <Card className="max-w-2xl p-6">
         <SpeechBuddyConsentCard

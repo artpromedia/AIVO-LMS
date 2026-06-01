@@ -197,7 +197,13 @@
       "sub_working": "처리 중...",
       "sub_switch": "이 요금제로 변경",
       "sub_canceling": "취소 중...",
-      "sub_cancel_at_period_end": "기간 종료 시 취소"
+      "sub_cancel_at_period_end": "기간 종료 시 취소",
+      "checkout": {
+        "success_title": "Payment received",
+        "success_body": "Thanks! Your plan is being activated — it will appear here within a moment.",
+        "cancelled_title": "Checkout cancelled",
+        "cancelled_body": "No charge was made. You can pick a plan whenever you're ready."
+      }
     },
     "learner_assessment_intro": {
       "reassurance_privacy_title": "답변은 나만 볼 수 있어요",
@@ -507,7 +513,9 @@
       "accessibility_defaults": "접근성 기본 설정",
       "save_changes": "변경 사항 저장",
       "delete_confirm_label": "DELETE를 입력하여 확인",
-      "remove_learner": "학습자 삭제"
+      "remove_learner": "학습자 삭제",
+      "speech_buddy_section_title": "Speech Buddy",
+      "speech_buddy_section_desc": "Optional voice companion for social-emotional practice. Requires your consent."
     },
     "learner_snapshot": {
       "open_full_profile": "전체 프로필 열기",
@@ -617,6 +625,23 @@
       "messages_count": "메시지 {count}개",
       "status_done": "완료",
       "status_open": "진행 중"
+    },
+    "speech_buddy": {
+      "intro": "Speech Buddy is an optional voice companion that helps {name} practise social-emotional skills through short spoken role-plays. It is off until you turn it on, every session is safety-filtered, and you can withdraw consent at any time.",
+      "loading": "Loading…",
+      "enabled": "Speech Buddy is enabled.",
+      "enabled_band": "Speech Buddy is enabled for {band}.",
+      "withdraw": "Withdraw consent",
+      "working": "Working…",
+      "age_band_label": "Age band",
+      "age_band_help": "We tune the language and pacing of Speech Buddy to this band.",
+      "enable": "Enable Speech Buddy",
+      "load_error": "Couldn't load consent status.",
+      "save_error": "Couldn't save consent.",
+      "revoke_error": "Couldn't revoke consent.",
+      "age_6_9": "Ages 6–9",
+      "age_10_12": "Ages 10–12",
+      "age_13_15": "Ages 13–15"
     }
   },
   "brain_clone": {
@@ -1171,7 +1196,15 @@
       "email_label": "이메일",
       "password_label": "비밀번호",
       "password_helper": "숫자와 기호를 포함해 8자 이상.",
-      "name_placeholder": "Riley Parent"
+      "name_placeholder": "Riley Parent",
+      "errors": {
+        "invalid_input": "Please enter your name, a valid email, and a password of at least 8 characters.",
+        "email_taken": "That email is already registered. Try signing in instead.",
+        "weak_password": "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
+        "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
+        "unsupported_role": "This account type can't be created here.",
+        "signup_failed": "We couldn't create your account. Please try again."
+      }
     },
     "forgot": {
       "heading": "비밀번호 재설정",
@@ -1297,7 +1330,14 @@
       "reassure_link": "개인정보 처리방침 읽기",
       "submit": "로그인",
       "forgot": "비밀번호를 잊으셨나요?",
-      "create_account": "계정 만들기"
+      "create_account": "계정 만들기",
+      "errors": {
+        "missing_credentials": "Enter your email and password to sign in.",
+        "invalid_credentials": "That email or password didn't match. Please try again.",
+        "wrong_surface": "This account signs in from a different portal.",
+        "unsupported_role": "This account type can't sign in here.",
+        "login_failed": "We couldn't sign you in. Please try again in a moment."
+      }
     },
     "signup": {
       "eyebrow": "계정 만들기",
@@ -1314,7 +1354,15 @@
       "name_label": "이름",
       "password_helper": "12자 이상. 저장하기 전에 알려진 유출에 포함되어 있지 않은지 확인합니다.",
       "code_placeholder": "예: SCHOOL-7Q4M-2025",
-      "name_placeholder": "이름과 성"
+      "name_placeholder": "이름과 성",
+      "errors": {
+        "invalid_input": "Please enter your name, a valid email, and a password of at least 8 characters.",
+        "email_taken": "That email is already registered. Try signing in instead.",
+        "weak_password": "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
+        "service_unavailable": "We couldn't reach our sign-up service. Please try again in a moment.",
+        "unsupported_role": "This account type can't be created here.",
+        "signup_failed": "We couldn't create your account. Please try again."
+      }
     },
     "role": {
       "eyebrow": "역할 선택",
@@ -1362,7 +1410,8 @@
       "iep_help": "다음 단계에서 업로드할 수 있으며, 귀하의 명시적 동의가 있을 때만 가능합니다. 나중에 결정하려면 건너뛰세요.",
       "iep_yes": "예",
       "iep_no": "아니요",
-      "iep_unsure": "아직 잘 모르겠어요"
+      "iep_unsure": "아직 잘 모르겠어요",
+      "error_first_name": "Please enter your learner's first name to continue."
     },
     "consent": {
       "eyebrow": "당신의 동의 — 당신의 통제",

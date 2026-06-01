@@ -1,12 +1,13 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
 const AGE_BANDS = [
-  { value: "6-9", label: "Ages 6–9" },
-  { value: "10-12", label: "Ages 10–12" },
-  { value: "13-15", label: "Ages 13–15" },
+  { value: "6-9", key: "age_6_9" },
+  { value: "10-12", key: "age_10_12" },
+  { value: "13-15", key: "age_13_15" },
 ] as const;
 
 /**
@@ -21,6 +22,7 @@ export function SpeechBuddyConsentCard({
   learnerId: string;
   learnerName: string;
 }) {
+  const t = useTranslations("parent.speech_buddy");
   const base = `/api/bff/parent/learners/${learnerId}/speech-buddy-consent`;
   const [loading, setLoading] = React.useState(true);
   const [granted, setGranted] = React.useState(false);
@@ -45,7 +47,7 @@ export function SpeechBuddyConsentCard({
         }
       })
       .catch(() => {
-        if (alive) setError("Couldn't load consent status.");
+        if (alive) setError(t("load_error"));
       })
       .finally(() => {
         if (alive) setLoading(false);
@@ -53,7 +55,7 @@ export function SpeechBuddyConsentCard({
     return () => {
       alive = false;
     };
-  }, [base]);
+  }, [base, t]);
 
   function grant() {
     setError(null);
@@ -65,7 +67,7 @@ export function SpeechBuddyConsentCard({
       });
       const j = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(j?.error?.message ?? "Couldn't save consent.");
+        setError(j?.error?.message ?? t("save_error"));
         return;
       }
       setGranted(true);
@@ -79,7 +81,7 @@ export function SpeechBuddyConsentCard({
       const res = await fetch(base, { method: "DELETE" });
       const j = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(j?.error?.message ?? "Couldn't revoke consent.");
+        setError(j?.error?.message ?? t("revoke_error"));
         return;
       }
       setGranted(false);
@@ -89,27 +91,23 @@ export function SpeechBuddyConsentCard({
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm text-iw-text-muted">
-        Speech Buddy is an optional voice companion that helps {learnerName} practise
-        social-emotional skills through short spoken role-plays. It is off until you
-        turn it on, every session is safety-filtered, and you can withdraw consent at
-        any time.
-      </p>
+      <p className="text-sm text-iw-text-muted">{t("intro", { name: learnerName })}</p>
 
       {loading ? (
-        <p className="text-sm text-iw-text-muted">Loading…</p>
+        <p className="text-sm text-iw-text-muted">{t("loading")}</p>
       ) : granted ? (
         <div className="flex flex-col gap-3">
           <div
             role="status"
             className="rounded-iw-control border border-aivo-success/40 bg-aivo-success/10 px-3.5 py-2.5 text-sm text-iw-text-strong"
           >
-            Speech Buddy is <strong>enabled</strong>
-            {grantedBand ? ` for ${grantedBand.replace("-", "–")}` : ""}.
+            {grantedBand
+              ? t("enabled_band", { band: grantedBand.replace("-", "–") })
+              : t("enabled")}
           </div>
           <div>
             <Button variant="outline" size="sm" disabled={pending} onClick={revoke}>
-              {pending ? "Working…" : "Withdraw consent"}
+              {pending ? t("working") : t("withdraw")}
             </Button>
           </div>
         </div>
@@ -117,7 +115,7 @@ export function SpeechBuddyConsentCard({
         <div className="flex flex-col gap-3">
           <div className="flex flex-col gap-1.5">
             <label htmlFor="sb-age-band" className="text-sm font-medium text-iw-text-strong">
-              Age band
+              {t("age_band_label")}
             </label>
             <select
               id="sb-age-band"
@@ -127,17 +125,15 @@ export function SpeechBuddyConsentCard({
             >
               {AGE_BANDS.map((b) => (
                 <option key={b.value} value={b.value}>
-                  {b.label}
+                  {t(b.key)}
                 </option>
               ))}
             </select>
-            <p className="text-xs text-iw-text-muted">
-              We tune the language and pacing of Speech Buddy to this band.
-            </p>
+            <p className="text-xs text-iw-text-muted">{t("age_band_help")}</p>
           </div>
           <div>
             <Button size="sm" disabled={pending} onClick={grant}>
-              {pending ? "Working…" : "Enable Speech Buddy"}
+              {pending ? t("working") : t("enable")}
             </Button>
           </div>
         </div>

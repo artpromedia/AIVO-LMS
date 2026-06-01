@@ -26,27 +26,23 @@ import { registerAction } from "@/lib/auth/auth-actions";
  * keeps the legacy behavior of dropping into the demo login.
  */
 
-// Failure copy keyed by the `?error=` code the server action redirects
-// with. English-only for now; these move into the auth.signup catalog
-// when the auth surfaces get their next i18n pass.
-const SIGNUP_ERRORS: Record<string, string> = {
-  invalid_input:
-    "Please enter your name, a valid email, and a password of at least 8 characters.",
-  email_taken: "That email is already registered. Try signing in instead.",
-  weak_password:
-    "That password doesn't meet our security policy. Use at least 8 characters with a number and a symbol.",
-  service_unavailable:
-    "We couldn't reach our sign-up service. Please try again in a moment.",
-  unsupported_role: "This account type can't be created here.",
-  signup_failed: "We couldn't create your account. Please try again.",
-};
+// Recognised `?error=` codes the server action redirects with; anything
+// else falls back to the generic failure message.
+const SIGNUP_ERROR_CODES = new Set([
+  "invalid_input",
+  "email_taken",
+  "weak_password",
+  "service_unavailable",
+  "unsupported_role",
+  "signup_failed",
+]);
 
 export default function SignupPage() {
   const t = useTranslations("auth.signup");
   const search = useSearchParams();
   const errorCode = search.get("error");
   const errorMessage = errorCode
-    ? SIGNUP_ERRORS[errorCode] ?? SIGNUP_ERRORS.signup_failed
+    ? t(`errors.${SIGNUP_ERROR_CODES.has(errorCode) ? errorCode : "signup_failed"}`)
     : null;
 
   const [name, setName] = React.useState("");

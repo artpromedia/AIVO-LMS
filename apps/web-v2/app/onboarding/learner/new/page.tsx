@@ -83,10 +83,7 @@ export default function NewLearnerPage() {
         >
           {hasError ? (
             <div className="mb-3">
-              <Banner
-                tone="danger"
-                description="Please enter your learner's first name to continue."
-              />
+              <Banner tone="danger" description={t("error_first_name")} />
             </div>
           ) : null}
           <form id="onboarding-learner-form" action={createOnboardingLearnerAction} noValidate>

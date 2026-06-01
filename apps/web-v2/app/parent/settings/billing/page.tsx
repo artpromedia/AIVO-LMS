@@ -74,16 +74,16 @@ export default async function Page({
         <div className="mb-6">
           <Banner
             tone="success"
-            title="Payment received"
-            description="Thanks! Your plan is being activated — it will appear here within a moment."
+            title={t("checkout.success_title")}
+            description={t("checkout.success_body")}
           />
         </div>
       ) : checkout === "cancelled" ? (
         <div className="mb-6">
           <Banner
             tone="info"
-            title="Checkout cancelled"
-            description="No charge was made. You can pick a plan whenever you're ready."
+            title={t("checkout.cancelled_title")}
+            description={t("checkout.cancelled_body")}
           />
         </div>
       ) : null}

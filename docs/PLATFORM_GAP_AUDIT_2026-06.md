@@ -133,6 +133,28 @@ flips the default; "Code gap" = a flag won't fix it.
     `surface-preview`, `lesson-player-fixture`; mobile `(shell-demo)`. Mascot
     art is placeholder SVGs (`packages/brand`).
 
+## Changelog — i18n pass (web copy)
+
+Extracted the English-only strings added across the signup/onboarding,
+billing, and Speech-Buddy-consent surfaces into the next-intl message
+catalogs, across all 10 locales (identical English values are allowed by the
+coverage gate for non-`learner.*` namespaces; translators fill them in
+later).
+
+- `apps/web-v2/lib/i18n/messages/*.json` (10) — added
+  `auth.signup.errors.*`, `onboarding.{signup,signin}.errors.*`,
+  `onboarding.learner_new.error_first_name`, `parent.billing.checkout.*`,
+  `parent.learner_settings.speech_buddy_*`, and the `parent.speech_buddy.*`
+  consent namespace.
+- The signup / onboarding-signup / onboarding-signin / onboarding-learner-new
+  / billing / learner-settings pages and the `SpeechBuddyConsentCard` now
+  read those keys via `t()` instead of inline English.
+
+Verified: i18n coverage + direction tests pass (27 tests); web-v2 typecheck
++ eslint clean; `next build` green. The mobile strings already use the
+`t(key, defaultValue)` pattern, so they render translated-or-English without
+catalog churn.
+
 ## Remediation plan (phased)
 
 **Phase 0 — Config hardening.** Make staging mirror prod (`AUTH_MODE=custom`,

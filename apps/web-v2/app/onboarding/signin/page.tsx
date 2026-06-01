@@ -9,16 +9,15 @@ import { Button } from "@/components/ui/button";
 import { Banner } from "@/components/ui/banner";
 import { onboardingSignInAction } from "@/lib/auth/auth-actions";
 
-// Failure copy keyed by the `?error=` code the sign-in action redirects
-// with. English-only for now; folded into the onboarding catalog on the
-// next i18n pass.
-const SIGNIN_ERRORS: Record<string, string> = {
-  missing_credentials: "Enter your email and password to sign in.",
-  invalid_credentials: "That email or password didn't match. Please try again.",
-  wrong_surface: "This account signs in from a different portal.",
-  unsupported_role: "This account type can't sign in here.",
-  login_failed: "We couldn't sign you in. Please try again in a moment.",
-};
+// Recognised `?error=` codes; anything else falls back to the generic
+// failure message.
+const SIGNIN_ERROR_CODES = new Set([
+  "missing_credentials",
+  "invalid_credentials",
+  "wrong_surface",
+  "unsupported_role",
+  "login_failed",
+]);
 
 export default function SignInPage() {
   const t = useTranslations("onboarding.signin");
@@ -26,7 +25,7 @@ export default function SignInPage() {
   const search = useSearchParams();
   const errorCode = search.get("error");
   const errorMessage = errorCode
-    ? SIGNIN_ERRORS[errorCode] ?? SIGNIN_ERRORS.login_failed
+    ? t(`errors.${SIGNIN_ERROR_CODES.has(errorCode) ? errorCode : "login_failed"}`)
     : null;
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
