@@ -207,3 +207,11 @@ export {
   _resetSecretsClient,
   type SecretsClient,
 } from "./secrets-client.js";
+
+export {
+  ACTIVE_ROLE_HEADER,
+  FORBIDDEN_ROLE_CODE,
+  ACTIVE_ROLE_SPOOFING_EVENT,
+  checkActiveRole,
+  type ActiveRoleResult,
+} from "./active-role.js";

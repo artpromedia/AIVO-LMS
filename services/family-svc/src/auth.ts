@@ -1,7 +1,14 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { eq, and } from "drizzle-orm";
 import { learners } from "@aivo/db";
-import { verifyJWT, JWTPayload } from "@aivo/security";
+import {
+  verifyJWT,
+  JWTPayload,
+  checkActiveRole,
+  ACTIVE_ROLE_HEADER,
+  FORBIDDEN_ROLE_CODE,
+  ACTIVE_ROLE_SPOOFING_EVENT,
+} from "@aivo/security";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -32,13 +39,35 @@ export async function authenticateRequest(
     reply.code(401).send({ error: "Authentication required" });
     return null;
   }
+  let payload: JWTPayload;
   try {
-    const payload = await verifyJWT(token);
-    return payload as AuthUser;
+    payload = await verifyJWT(token);
   } catch (_err) {
     reply.code(401).send({ error: "Invalid token" });
     return null;
   }
+
+  // ADR 0020 — the `x-aivo-active-role` header is a hint only, never a
+  // privilege grant. Reject (and audit) a header naming a role the token
+  // does not grant. Single-role tokens make this a no-op for normal
+  // callers (their app sends its own role); it catches spoofed headers.
+  const activeRole = checkActiveRole(payload.role, request.headers[ACTIVE_ROLE_HEADER]);
+  if (!activeRole.ok) {
+    request.log?.warn?.(
+      {
+        event: ACTIVE_ROLE_SPOOFING_EVENT,
+        userId: payload.sub,
+        tenantId: payload.tenantId,
+        requested: activeRole.requested,
+        granted: activeRole.granted,
+      },
+      "rejected x-aivo-active-role header (token does not grant the requested role)",
+    );
+    reply.code(403).send({ error: "Forbidden role", code: FORBIDDEN_ROLE_CODE });
+    return null;
+  }
+
+  return payload as AuthUser;
 }
 
 export async function verifyParentOwnership(

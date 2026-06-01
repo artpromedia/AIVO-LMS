@@ -107,6 +107,8 @@ flips the default; "Code gap" = a flag won't fix it.
 19. **[Minor] `x-aivo-active-role` never enforced server-side.** Mobile sends
     it; no service validates it (documented Sprint-09 follow-up never landed).
     Hint-only, so low risk — but the documented spoof protection is absent.
+    → **Fixed in this pass — shared helper + family-svc enforcement (see
+    Changelog); other services should adopt the helper.**
 20. **[Minor] Unified mobile shell migration stalled.**
     `MOBILE_UNIFIED_APP=false`, no `(app)` shell; legacy per-role shells
     remain (role switch ⇒ re-login).
@@ -270,6 +272,32 @@ feature is no longer dead in production.
 
 Verified: `@aivo/db` and `@aivo/family-svc` build clean (`tsc`). The verify
 contract is byte-compatible, so tutor-svc is unaffected.
+
+## Changelog — Phase 1: `x-aivo-active-role` enforcement (#19)
+
+The unified mobile app sends `x-aivo-active-role` on every authenticated
+request, but no service validated it — the documented spoof protection
+("Sprint 09 follow-up") never landed.
+
+- `packages/security/src/active-role.ts` (new) — `checkActiveRole(grantedRole,
+  header, { availableRoles? })` plus `ACTIVE_ROLE_HEADER`, `FORBIDDEN_ROLE_CODE`,
+  and `ACTIVE_ROLE_SPOOFING_EVENT` constants. Header absent → no-op; header
+  matching a granted role → ok; otherwise a `FORBIDDEN_ROLE` spoof result.
+  Tokens carry a single `role` today, so the granted set defaults to
+  `[role]` (a normal single-role caller always passes); it widens
+  automatically when `availableRoles` is supplied for future multi-role
+  tokens. 8 unit tests (53 green in the package).
+- `services/family-svc/src/auth.ts` — `authenticateRequest` now runs the
+  check after JWT verify and, on a spoof, audit-logs
+  `auth.active_role.spoofing` and returns `403 FORBIDDEN_ROLE`.
+
+Safe by construction: real single-role users send their own role, so the
+check never false-rejects; it only catches a client claiming a role its
+token doesn't grant. Reusable across services — billing-svc and the other
+JWT-authenticating services should adopt the same helper (follow-up).
+
+Verified: `@aivo/security` builds + 53 tests pass; `@aivo/family-svc`
+builds clean.
 
 ### Remaining sub-task — #18 parent UI
 
