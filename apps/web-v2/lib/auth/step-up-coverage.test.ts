@@ -110,13 +110,10 @@ describe("Phase 5 — non-step-up roles still switch without a token", () => {
   for (const role of ROLES as readonly NavRole[]) {
     if (ROLE_META[role].requiresStepUp) continue;
     it(`"${role}" switches without any x-step-up-token`, async () => {
-      // Start from a *different* active role so the switch is not a
-      // trivial no-op.
-      const otherActive: WebRole = role === "learner" ? "parent" : "learner";
-      const session: SessionProfile = multiRoleSession(otherActive, allHeld);
-      // The other active role may itself be step-up; we only care that
-      // *targeting* `role` does not require a token, so we simulate the
-      // session already being "active" as the non-step-up role.
+      // Start a learner-active session: the non-step-up role we're
+      // exercising is already the active role, so the "switch into X"
+      // is the trivial no-op path that we still want to verify accepts
+      // without a token.
       const learnerSession = multiRoleSession(toWebRole(role), allHeld);
       const r = await decideActiveRoleSwitch({
         session: learnerSession,

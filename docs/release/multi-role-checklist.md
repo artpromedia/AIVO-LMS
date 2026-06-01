@@ -77,6 +77,27 @@
 
 ---
 
+## 7. Phase 5 — Hardening & policy (ongoing)
+
+ADR 0020 Phase 5 — these gates run on **every** PR via the
+`phase5-rbac-policy` CI job. The release manager confirms the latest
+run is green; no per-release manual step is required when CI is.
+
+- [ ] `phase5-rbac-policy` job is green on the release commit.
+- [ ] No new `Role` or `NavArea` added without an explicit row in
+      `permissions.ts` (matrix-coverage gate catches this) **and** an
+      explicit step-up classification in `ROLE_META` (step-up coverage
+      gate catches this).
+- [ ] `apps/web-v2/lib/auth/data-isolation.test.ts` covers any new BFF
+      guard that is added — server authoritative on the **active**
+      role, never the held set.
+- [ ] `apps/web-v2/lib/auth/learner-under-parent.test.ts` covers any
+      new parent-only or family-shared surface — learner must always
+      be rejected with the parent role still in `roles[]`.
+- [ ] `pnpm --filter @aivo/web-v2 test:a11y` (per-role `@a11y` suite
+      under `e2e/role-a11y.playwright.ts`) runs clean against the
+      release candidate build.
+
 When this checklist is complete, attach it to the release ticket and
 proceed with submission. ADR 0020 §1/§5 is the load-bearing reason
 behind every item here.

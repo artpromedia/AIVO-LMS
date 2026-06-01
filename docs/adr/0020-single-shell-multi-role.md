@@ -319,3 +319,49 @@ shape visible in CI, in the app store, and in analytics:
   pins the gates the release manager runs before each store
   submission: one bundle id, store copy lists five roles, universal
   links cover all role paths, role flags set per env.
+
+## Phase 5 — Hardening & policy (ongoing)
+
+Phase 5 is an **ongoing** gate, not a one-shot migration: every new
+role, route, BFF guard, or step-up surface must pass through it before
+merge. The deliverables are CI-enforced contracts, not docs:
+
+- **RBAC route coverage** — `packages/nav/src/__tests__/rbac-routes.test.ts`
+  walks every `Role × NavArea × Surface` triple and asserts that
+  `canAccessArea` and `resolveRoute` agree with the matrix declared in
+  `permissions.ts`. The suite is wired into the `phase5-rbac-policy`
+  CI job so a regression in either the matrix or the runtime helpers
+  fails the build with a row-specific diff.
+- **Step-up coverage** — `packages/nav/src/__tests__/step-up-coverage.test.ts`
+  pins the policy data (`ROLE_META[role].requiresStepUp` per role)
+  and `apps/web-v2/lib/auth/step-up-coverage.test.ts` runs the BFF
+  decision (`decideActiveRoleSwitch`) for **every** role flagged
+  `requiresStepUp`, asserting the switch is blocked without a fresh
+  `x-step-up-token` (missing, expired, or minted for a different role)
+  and unblocked with a freshly-minted one. Adding a new step-up role
+  without listing it in the expected set fails the test rather than
+  silently shipping without a factor.
+- **Accessibility** — `apps/web-v2/e2e/role-a11y.playwright.ts` runs
+  axe against the home segment of every role with the matching
+  `aivo_mock_session` cookie. Tagged `@a11y` so it is picked up by
+  `pnpm --filter @aivo/web-v2 test:a11y` and by any CI job that opts
+  into the existing a11y grep.
+- **Data isolation review** — `apps/web-v2/lib/auth/data-isolation.test.ts`
+  pins `requireRole` and `requireLearnerScope` against the
+  active-role contract: the server keys off `session.role` (the
+  *active* role), not `session.roles` (the held set). The client
+  switcher must never be the only gate (defense in depth) — this test
+  ensures a session whose active role is `learner` cannot reach a
+  parent-only BFF endpoint even when it also holds the parent role.
+- **Privacy (learner under parent account)** —
+  `apps/web-v2/lib/auth/learner-under-parent.test.ts` covers the
+  worst-case family-device shape (`roles=["parent","learner"]`,
+  `activeRole=learner`) and walks every parent-only guard surface
+  (parent subscription, privacy export, privacy delete-request,
+  parent learners curriculum upload), asserting each one returns 403
+  while the active role is learner — and accepts the same user with
+  the same `roles[]` once they switch back to `activeRole=parent`.
+
+CI wiring lives in `.github/workflows/ci.yml` under the
+`phase5-rbac-policy` job, which the `ci-summary` job treats as a
+blocking gate alongside lint, build, and the per-service test suites.
