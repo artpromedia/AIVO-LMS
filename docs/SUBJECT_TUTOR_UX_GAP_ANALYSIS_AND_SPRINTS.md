@@ -275,7 +275,14 @@ registry entry; no surface silently degrades without telemetry.
 
 ---
 
-### Sprint 4 — Reading & Writing experience (sage): the `reading_annotation` surface
+### Sprint 4 — Reading & Writing experience (sage): the `reading_annotation` surface ✅ landed
+
+> Shipped: `ReadingAnnotationSurface` on **web** (selectable passage spans,
+> highlight/underline tools, evidence capture, safe index-addressed rendering)
+> and **mobile** (tap-to-select spans). Pure `scoreReadingAnnotation` /
+> `toggleSpanSelection` helpers with tests. Wired into the web SurfaceRouter +
+> `SUPPORTED_RUNTIME_TYPES`; mobile kind + renderer case + telemetry. Registry:
+> `reading_annotation` web full + mobile full.
 
 ```
 Build the reading_annotation surface so ELA comprehension is a real activity, not
@@ -297,7 +304,16 @@ the response captures highlighted evidence; scoring + telemetry flow through.
 
 ---
 
-### Sprint 5 — Math experience (nova): manipulatives, graphing, multi-step
+### Sprint 5 — Math experience (nova): manipulatives, graphing, multi-step ✅ landed (web)
+
+> Shipped on **web**: `GraphSurface` (tap/keyboard coordinate plotting, grid
+> snap), `DragManipulativeSurface` (accessible tap-to-place tokens → targets),
+> and `MultiStepWorkspaceSurface` (per-step entry + hints). Pure scoring helpers
+> (`scoreGraph`, `snapToGrid`, `scoreDragManipulative`, `targetIsFull`,
+> `scoreMultiStep`, `normalizeAnswer`) with tests (15 cases). Wired into the web
+> SurfaceRouter + `SUPPORTED_RUNTIME_TYPES`. Registry: all three web full,
+> **mobile fallback** (labelled + telemetry from Sprint 3) — bespoke mobile
+> renderers + the structured math_expression editor upgrade remain follow-ups.
 
 ```
 Close the math activity gaps so nova delivers more than text-entry + MCQ.

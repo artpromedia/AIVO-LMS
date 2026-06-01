@@ -39,6 +39,31 @@ export {
   type MathExpressionSurfaceProps,
 } from "./surfaces/MathExpressionSurface.js";
 export {
+  ReadingAnnotationSurface,
+  type ReadingAnnotationSurfaceProps,
+} from "./surfaces/ReadingAnnotationSurface.js";
+export { GraphSurface, type GraphSurfaceProps } from "./surfaces/GraphSurface.js";
+export {
+  DragManipulativeSurface,
+  type DragManipulativeSurfaceProps,
+} from "./surfaces/DragManipulativeSurface.js";
+export {
+  MultiStepWorkspaceSurface,
+  type MultiStepWorkspaceSurfaceProps,
+} from "./surfaces/MultiStepWorkspaceSurface.js";
+export {
+  toggleSpanSelection,
+  scoreReadingAnnotation,
+  defaultReadingTool,
+  pointsMatch,
+  snapToGrid,
+  scoreGraph,
+  scoreDragManipulative,
+  targetIsFull,
+  normalizeAnswer,
+  scoreMultiStep,
+} from "./scoring/activity-scoring.js";
+export {
   SurfaceRouter,
   SUPPORTED_RUNTIME_TYPES,
   ITEM_TYPE_TO_RUNTIME,

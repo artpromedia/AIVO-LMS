@@ -49,15 +49,18 @@ export const SURFACE_CAPABILITY_REGISTRY: Record<LearnerSurfaceType, SurfaceCapa
   video: { web: "full", mobile: "none", note: "media-rich lessons (all)" },
   audio: { web: "full", mobile: "none", note: "media-rich lessons (all)" },
   geometry_workspace: { web: "full", mobile: "fallback", note: "math/geometry (nova)" },
-  graph: { web: "fallback", mobile: "fallback", note: "math/science (nova/spark)" },
+  // Sprint 4 — reading annotation ships on both web and mobile.
+  reading_annotation: { web: "full", mobile: "full", note: "reading/ELA (sage)" },
+  // Sprint 5 — graph / manipulatives / multi-step ship full on web; mobile uses
+  // the labelled fallback (+ telemetry) until bespoke RN renderers land.
+  graph: { web: "full", mobile: "fallback", note: "math/science (nova/spark)" },
   drag_manipulative: {
-    web: "fallback",
-    mobile: "none",
+    web: "full",
+    mobile: "fallback",
     note: "math manipulatives (nova) / exec-fn (compass)",
   },
-  reading_annotation: { web: "fallback", mobile: "none", note: "reading/ELA (sage)" },
-  science_diagram: { web: "fallback", mobile: "none", note: "science (spark)" },
-  multi_step_workspace: { web: "fallback", mobile: "none", note: "math/science (nova/spark)" },
+  multi_step_workspace: { web: "full", mobile: "fallback", note: "math/science (nova/spark)" },
+  science_diagram: { web: "fallback", mobile: "none", note: "science (spark) — Sprint 6" },
 };
 
 /** Runtime list of every surface type (keys of the registry). */

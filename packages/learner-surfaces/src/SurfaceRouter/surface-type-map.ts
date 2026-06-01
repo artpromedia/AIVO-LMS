@@ -65,18 +65,25 @@ export const ITEM_TYPE_TO_RUNTIME: Record<ItemAuthoredSurfaceType, LearnerSurfac
  * to decide whether to dispatch to `SurfaceRouter` or render the
  * unsupported-surface fallback.
  */
-export const SUPPORTED_RUNTIME_TYPES: ReadonlySet<LearnerSurfaceType> = new Set<LearnerSurfaceType>([
-  "choice_grid",
-  "scratchpad",
-  "geometry_workspace",
-  "math_expression",
-  "coding_sandbox",
-  "art_canvas",
-  "voice_response",
-  "video",
-  "audio",
-  "number_line",
-]);
+export const SUPPORTED_RUNTIME_TYPES: ReadonlySet<LearnerSurfaceType> = new Set<LearnerSurfaceType>(
+  [
+    "choice_grid",
+    "scratchpad",
+    "geometry_workspace",
+    "math_expression",
+    "coding_sandbox",
+    "art_canvas",
+    "voice_response",
+    "video",
+    "audio",
+    "number_line",
+    // Sprint 4/5 — newly-implemented activity surfaces.
+    "reading_annotation",
+    "graph",
+    "drag_manipulative",
+    "multi_step_workspace",
+  ],
+);
 
 /** Normalise either an authored or runtime surface type to a runtime one. */
 export function toRuntimeSurfaceType(t: RouterSurfaceType): LearnerSurfaceType {

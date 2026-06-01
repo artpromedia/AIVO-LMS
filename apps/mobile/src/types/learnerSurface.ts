@@ -11,7 +11,9 @@ export type LearnerSurfaceKind =
   | "chart"
   | "text_response"
   | "coding_sandbox"
-  | "art_canvas";
+  | "art_canvas"
+  // Sprint 4 — reading comprehension annotation (sage / ELA).
+  | "reading_annotation";
 
 export interface LearnerSurfaceSpec {
   kind: LearnerSurfaceKind;
