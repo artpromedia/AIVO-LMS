@@ -27,6 +27,12 @@ interface User {
   email?: string;
   name: string;
   role: UserRole;
+  /**
+   * Every role the user may act as (ADR 0020 — multi-role). Decoded from the
+   * JWT's `availableRoles` claim; defaults to `[role]`. The unified shell's
+   * RoleProvider sources its switchable roles from this.
+   */
+  availableRoles: UserRole[];
   tenantId: string;
   /**
    * Optional profile-photo URL. Not part of the JWT payload; populated
@@ -109,11 +115,17 @@ export function useAuthState(): AuthContextValue {
   const extractUser = (token: string): User | null => {
     const payload = decodeJWT(token);
     if (!payload) return null;
+    const role = payload.role as UserRole;
+    const claimed = Array.isArray(payload.availableRoles)
+      ? (payload.availableRoles as UserRole[]).filter(Boolean)
+      : [];
+    const availableRoles = claimed.length > 0 ? claimed : [role];
     return {
       id: payload.sub as string,
       email: payload.email as string | undefined,
       name: (payload.name as string) || "",
-      role: payload.role as UserRole,
+      role,
+      availableRoles,
       tenantId: (payload.tenantId as string) || "",
     };
   };

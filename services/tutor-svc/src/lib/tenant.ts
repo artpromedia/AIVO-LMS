@@ -49,7 +49,9 @@ export function registerAuthHook(app: FastifyInstance): void {
     if (auth?.sub) {
       // ADR 0020 — x-aivo-active-role is a hint, never a grant. Reject (and
       // audit) a header naming a role the token does not grant.
-      const activeRole = checkActiveRole(auth.role, req.headers[ACTIVE_ROLE_HEADER]);
+      const activeRole = checkActiveRole(auth.role, req.headers[ACTIVE_ROLE_HEADER], {
+        availableRoles: (auth as { availableRoles?: string[] }).availableRoles,
+      });
       if (!activeRole.ok) {
         req.log?.warn?.(
           {

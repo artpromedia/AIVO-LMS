@@ -132,6 +132,16 @@ flips the default; "Code gap" = a flag won't fix it.
     work (the `(app)` shell, role chooser/switcher, screen migration,
     flag flip) is blocked on multi-role tokens (today's JWT is single-role)
     + on-device nav testing — see note below.**
+
+    **Multi-role foundation (this pass):** the data model now exists — a
+    `user_roles` table (migration `0056`), `availableRoles` in the JWT
+    (`@aivo/security` `JWTPayload` + identity-svc login aggregates
+    `users.role ∪ user_roles`), and the consumer services
+    (`family/engagement/billing/learning/tutor`) validate the active-role
+    header against the full `availableRoles` set. The mobile client decodes
+    `availableRoles` onto `useAuth().user`. What remains is purely the
+    `(app)` shell UI + screen migration (needs device testing) and a product
+    flow that assigns a user a second role.
 21. **[Minor] Parity matrix drift.** Strict `mobile:parity` fails:
     `/messages`, `/notifications` untracked. The "100% parity" doc only checks
     file existence, not functionality. → **Fixed: both routes tracked;

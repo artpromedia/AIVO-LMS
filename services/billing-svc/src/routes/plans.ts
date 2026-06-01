@@ -75,7 +75,9 @@ async function requireAuth(req: FastifyRequest, reply: FastifyReply) {
     return reply.status(401).send({ error: "Invalid token" });
   }
   // ADR 0020 — x-aivo-active-role is a hint, never a grant.
-  const activeRole = checkActiveRole(user.role, req.headers[ACTIVE_ROLE_HEADER]);
+  const activeRole = checkActiveRole(user.role, req.headers[ACTIVE_ROLE_HEADER], {
+    availableRoles: user.availableRoles,
+  });
   if (!activeRole.ok) {
     req.log?.warn?.(
       {

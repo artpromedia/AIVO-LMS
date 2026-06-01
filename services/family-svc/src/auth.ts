@@ -51,7 +51,9 @@ export async function authenticateRequest(
   // privilege grant. Reject (and audit) a header naming a role the token
   // does not grant. Single-role tokens make this a no-op for normal
   // callers (their app sends its own role); it catches spoofed headers.
-  const activeRole = checkActiveRole(payload.role, request.headers[ACTIVE_ROLE_HEADER]);
+  const activeRole = checkActiveRole(payload.role, request.headers[ACTIVE_ROLE_HEADER], {
+    availableRoles: payload.availableRoles,
+  });
   if (!activeRole.ok) {
     request.log?.warn?.(
       {

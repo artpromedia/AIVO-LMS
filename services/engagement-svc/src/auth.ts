@@ -36,7 +36,9 @@ export async function authenticateRequest(
     const payload = await verifyJWT(token);
     // ADR 0020 — x-aivo-active-role is a hint, never a grant. Reject (and
     // audit) a header naming a role the token does not grant.
-    const activeRole = checkActiveRole(payload.role || "", request.headers[ACTIVE_ROLE_HEADER]);
+    const activeRole = checkActiveRole(payload.role || "", request.headers[ACTIVE_ROLE_HEADER], {
+      availableRoles: payload.availableRoles,
+    });
     if (!activeRole.ok) {
       request.log?.warn?.(
         {

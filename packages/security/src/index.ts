@@ -6,6 +6,12 @@ export interface JWTPayload {
   sub: string;
   tenantId: string;
   role: string;
+  /**
+   * Every role the user may act as (ADR 0020 — single shell, multi-role):
+   * `role` plus any `user_roles` rows. When present, `checkActiveRole`
+   * validates the active-role header against this set; absent ⇒ `[role]`.
+   */
+  availableRoles?: string[];
   email?: string;
   name?: string;
   impersonatedBy?: string;
