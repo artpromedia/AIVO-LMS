@@ -4,6 +4,10 @@ Delegates `safety.flag.raised`, `session.started`, `session.ended`,
 `turn.recorded`, and `skill.evidence` to:
 
   - Structured logger (always)
+  - A durable event outbox drained to NATS by ``flush_events()`` — the
+    transactional-outbox path that carries session/skill telemetry to the
+    mastery/scoring pipeline. Survives a broker outage: undelivered events
+    stay on disk for the next flush or an ops sweep.
   - comms-svc internal/speech-buddy-safety (hard flags only)
 
 The wire format mirrors the TS types in ``packages/events/src/index.ts``.
@@ -71,12 +75,96 @@ class EventEmitter:
         # an admin alert instead of a parent email; comms-svc will route.
         self._resolve_guardian = guardian_email_resolver
         self.emitted: list[tuple[str, dict[str, Any]]] = []
+        # Telemetry event bus (NATS). Events are written to a durable outbox
+        # first, then `flush_events()` drains them to NATS — a transactional
+        # outbox so skill-evidence/session telemetry survives a broker outage
+        # and reliably reaches the mastery/scoring pipeline downstream.
+        self._nats_url = os.environ.get("NATS_URL")
+        self._events_topic = os.environ.get("SPEECH_BUDDY_EVENTS_TOPIC", "speech_buddy.events")
+        self._outbox_dir = os.environ.get(
+            "SPEECH_BUDDY_EVENT_OUTBOX_DIR", ".data/speech-buddy/event-outbox"
+        )
 
     def _emit(self, event_type: str, payload: dict[str, Any]) -> None:
         self.emitted.append((event_type, payload))
         logger.info("speech_buddy.event", extra={"event": event_type, "payload": payload})
-        # In production this would publish to the event bus; for now the
-        # structured log line is the bus, consumed by tail+forward agents.
+        # Durably enqueue for the event bus. The structured log line above
+        # remains for tail+forward agents; `flush_events()` drains the outbox
+        # to NATS so the event reaches the mastery/scoring pipeline.
+        self._enqueue_event(event_type, payload)
+
+    def _enqueue_event(self, event_type: str, payload: dict[str, Any]) -> None:
+        """Write one event to the durable outbox (one JSON file per event).
+
+        Mirrors the hard-safety-flag local-queue pattern: a write failure is
+        logged but never raised, so telemetry can never break a learner turn.
+        """
+        import json as _json
+        import pathlib as _pl
+        import uuid as _uuid
+
+        envelope = {
+            "id": _uuid.uuid4().hex,
+            "type": event_type,
+            "emittedAt": _iso_now(),
+            "payload": payload,
+        }
+        try:
+            qdir = _pl.Path(self._outbox_dir)
+            qdir.mkdir(parents=True, exist_ok=True)
+            # Timestamp prefix keeps the natural sort order = emission order.
+            name = f"{datetime.now(timezone.utc):%Y%m%dT%H%M%S%f}-{envelope['id']}.json"
+            (qdir / name).write_text(_json.dumps(envelope))
+        except Exception:
+            logger.exception("speech_buddy.event.outbox_write_failed")
+
+    async def flush_events(self) -> int:
+        """Drain the outbox to NATS. Returns the number of events delivered.
+
+        Best-effort and idempotent: a delivered event's file is removed; on a
+        publish failure (or when NATS is not configured/available) the file is
+        left in place for the next flush or an ops sweep. Never raises.
+        """
+        import json as _json
+        import pathlib as _pl
+
+        if not self._nats_url:
+            return 0
+        qdir = _pl.Path(self._outbox_dir)
+        if not qdir.is_dir():
+            return 0
+        files = sorted(qdir.glob("*.json"))
+        if not files:
+            return 0
+
+        nc = None
+        delivered = 0
+        try:
+            try:
+                import nats as _nats  # type: ignore
+            except Exception:
+                logger.warning("speech_buddy.event.nats_unavailable")
+                return 0
+            nc = await _nats.connect(servers=self._nats_url)
+            for f in files:
+                try:
+                    raw = f.read_text()
+                    await nc.publish(self._events_topic, raw.encode("utf-8"))
+                    f.unlink(missing_ok=True)
+                    delivered += 1
+                except Exception:
+                    logger.exception("speech_buddy.event.publish_failed", extra={"file": str(f)})
+                    break  # stop on first failure; preserve order for retry
+            await nc.flush()
+        except Exception:
+            logger.exception("speech_buddy.event.flush_failed")
+        finally:
+            if nc is not None:
+                try:
+                    await nc.drain()
+                except Exception:
+                    pass
+        return delivered
 
     # -- public emitters ------------------------------------------------------
 

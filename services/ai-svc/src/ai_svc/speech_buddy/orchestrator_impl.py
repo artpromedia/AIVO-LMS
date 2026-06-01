@@ -179,6 +179,7 @@ class DefaultOrchestrator:
             locale=locale,
             targeted_skills=tuple(targeted_skills),
         )
+        await self.emitter.flush_events()
         return session
 
     def get_session(self, session_id: str) -> SpeechBuddySession:
@@ -359,6 +360,7 @@ class DefaultOrchestrator:
             total_ms=total_ms,
         )
         rec.last_latency_breakdown = trace.as_dict()
+        await self.emitter.flush_events()
         return TurnOutcome(
             buddy_text=buddy_text,
             buddy_audio=tts_res.audio_bytes,
@@ -404,6 +406,7 @@ class DefaultOrchestrator:
             )
         # Reflection prompts (deterministic).
         reflection_prompts = self._reflection_prompts(rec)
+        await self.emitter.flush_events()
         return {
             "sessionId": session_id,
             "endedReason": rec.ended_reason,
