@@ -19,23 +19,44 @@
  * client already speaks a sensible shape.
  */
 
-import React, { useCallback, useMemo, useState } from "react";
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import type { TierThemeMobile } from "@aivo/mobile-ui";
 import type { SurfaceBeat } from "@/src/types/stage";
 import type { LearnerSurfaceKind } from "@/src/types/learnerSurface";
+import { emitSurfaceTelemetry } from "@/lib/surface-telemetry";
 import { ScratchPad, type ScratchStroke } from "./ScratchPad";
 
+/**
+ * Mobile surface kinds that have a dedicated interactive renderer. Everything
+ * else (geometry_workspace, chart, or an unknown kind) is a fallback: it still
+ * lets the learner respond via the ink workspace, but is reported to telemetry
+ * as `unsupported_surface` and labelled as a simplified version (Sprint 3).
+ */
+const FULL_MOBILE_KINDS = new Set<LearnerSurfaceKind>([
+  "text_response",
+  "number_line",
+  "fraction_bar",
+  "coding_sandbox",
+  "art_canvas",
+  "scratchpad",
+]);
+
 export type SurfaceTutorKey =
-  | "nova" | "sage" | "spark" | "chrono" | "pixel" | "echo" | "harmony"
-  | "atlas" | "cadence" | "vigor" | "lingua" | "forge" | "compass" | "muse";
+  | "nova"
+  | "sage"
+  | "spark"
+  | "chrono"
+  | "pixel"
+  | "echo"
+  | "harmony"
+  | "atlas"
+  | "cadence"
+  | "vigor"
+  | "lingua"
+  | "forge"
+  | "compass"
+  | "muse";
 
 /**
  * Mirror of the web `requiredTutorForSurface` map. Kept in this file
@@ -44,7 +65,9 @@ export type SurfaceTutorKey =
  */
 const REQUIRED_TUTOR: Partial<Record<LearnerSurfaceKind, SurfaceTutorKey>> = {
   coding_sandbox: "pixel",
-  art_canvas: "cadence",
+  // Sprint 1 fix (kept in sync with the web entitlement map): the art canvas
+  // belongs to the art tutor (muse), not the music tutor (cadence).
+  art_canvas: "muse",
 };
 
 export type SurfaceCommand =
@@ -105,6 +128,17 @@ export function MobileSurfaceRenderer({ theme, beat, disabled, onSubmit, entitle
   const cfg = beat.surface.config;
 
   const title = kind.replace(/_/g, " ");
+  const isFallback = !FULL_MOBILE_KINDS.has(kind);
+
+  // Sprint 3: report which surface the learner actually got. A fallback kind
+  // (no dedicated mobile renderer) emits `unsupported_surface` so the gap is
+  // visible in telemetry instead of being a silent scratchpad downgrade.
+  useEffect(() => {
+    emitSurfaceTelemetry(kind, isFallback ? "unsupported_surface" : "surface_started", {
+      platform: "mobile",
+      ...(isFallback ? { reason: "no_dedicated_mobile_renderer" } : {}),
+    });
+  }, [kind, isFallback]);
 
   if (!isEntitled(kind, entitledTutors)) {
     const required = REQUIRED_TUTOR[kind];
@@ -153,8 +187,23 @@ export function MobileSurfaceRenderer({ theme, beat, disabled, onSubmit, entitle
       ) : kind === "art_canvas" ? (
         <ArtCanvasSurface theme={theme} disabled={disabled} onSubmit={onSubmit} />
       ) : (
-        // scratchpad + the two fallback surfaces share the same workspace.
-        <ScratchSurface theme={theme} disabled={disabled} surfaceKind={kind} onSubmit={onSubmit} />
+        // scratchpad (full) + fallback kinds (geometry_workspace, chart,
+        // unknown) share the ink workspace. Fallback kinds show a label so the
+        // simplified experience is explicit rather than a silent downgrade.
+        <>
+          {isFallback ? (
+            <Text style={styles.note}>
+              This is a simplified version on your device — open it in the web app for the full
+              activity.
+            </Text>
+          ) : null}
+          <ScratchSurface
+            theme={theme}
+            disabled={disabled}
+            surfaceKind={kind}
+            onSubmit={onSubmit}
+          />
+        </>
       )}
     </View>
   );
@@ -234,7 +283,11 @@ function NumberLineSurface({
 
   return (
     <View style={{ gap: 12 }}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ gap: 8 }}
+      >
         {ticks.map((n) => {
           const isSelected = selected === n;
           return (
@@ -255,10 +308,7 @@ function NumberLineSurface({
         accessibilityRole="button"
         onPress={() => selected !== null && onSubmit({ kind: "number_line", value: selected })}
         disabled={selected === null || disabled}
-        style={[
-          styles.submit,
-          (selected === null || disabled) && styles.submitDisabled,
-        ]}
+        style={[styles.submit, (selected === null || disabled) && styles.submitDisabled]}
       >
         <Text style={styles.submitText}>
           {selected === null ? "Tap a number" : `Submit ${selected}`}
@@ -413,10 +463,7 @@ function ArtCanvasSurface({
         accessibilityRole="button"
         onPress={() => onSubmit({ kind: "art_canvas", strokes, color: selectedColor })}
         disabled={disabled || strokes.length === 0}
-        style={[
-          styles.submit,
-          (disabled || strokes.length === 0) && styles.submitDisabled,
-        ]}
+        style={[styles.submit, (disabled || strokes.length === 0) && styles.submitDisabled]}
       >
         <Text style={styles.submitText}>
           {strokes.length === 0 ? "Draw something first" : "Submit artwork"}

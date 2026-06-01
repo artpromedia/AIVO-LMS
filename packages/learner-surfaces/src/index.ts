@@ -81,6 +81,15 @@ export {
   type SurfaceTutorKey,
 } from "./entitlement/required-tutor.js";
 
+export {
+  SURFACE_CAPABILITY_REGISTRY,
+  ALL_SURFACE_TYPES,
+  surfaceSupport,
+  isSurfaceFallback,
+  type SurfaceCapability,
+  type SurfaceSupportLevel,
+} from "./SurfaceRouter/surface-capability.js";
+
 export { InkCanvas, type InkCanvasProps } from "./ink/InkCanvas.js";
 export {
   createStroke,

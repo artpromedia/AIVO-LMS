@@ -133,6 +133,28 @@ if (packsSrc) {
   }
 }
 
+// Surface capability registry (Sprint 3) — the canonical per-platform support
+// level for each activity surface. Parsed from source so the matrix reports
+// surface coverage from data instead of guessing.
+const capSrc = readOrFail("packages/learner-surfaces/src/SurfaceRouter/surface-capability.ts");
+const surfaceCaps = [];
+if (capSrc) {
+  const block = capSrc.match(/SURFACE_CAPABILITY_REGISTRY[^=]*=\s*\{([\s\S]*?)^\};/m);
+  if (!block) {
+    errors.push("learner-surfaces: SURFACE_CAPABILITY_REGISTRY not parseable");
+  } else {
+    const rowRe =
+      /([a-z_]+):\s*\{\s*web:\s*"(full|fallback|none)",\s*mobile:\s*"(full|fallback|none)",\s*note:\s*"([^"]*)"/g;
+    let rm;
+    while ((rm = rowRe.exec(block[1])) !== null) {
+      surfaceCaps.push({ type: rm[1], web: rm[2], mobile: rm[3], note: rm[4] });
+    }
+    if (surfaceCaps.length === 0) {
+      errors.push("learner-surfaces: SURFACE_CAPABILITY_REGISTRY parsed 0 entries");
+    }
+  }
+}
+
 // ---------------------------------------------------------------------------
 // 2. Structural routes every subject / tutor depends on must exist on disk.
 // ---------------------------------------------------------------------------
@@ -346,6 +368,29 @@ if (hiddenWeb.length) {
   md.push("");
 }
 
+// Surface capability (Sprint 3) — sourced from SURFACE_CAPABILITY_REGISTRY.
+if (surfaceCaps.length) {
+  const lvl = (v) => (v === "full" ? "✅ full" : v === "fallback" ? "⚠️ fallback" : "❌ none");
+  md.push("## Activity surface capability");
+  md.push("");
+  md.push("> Source of truth: `packages/learner-surfaces` `SURFACE_CAPABILITY_REGISTRY`.");
+  md.push("");
+  md.push("| Surface | Web | Mobile | Primary subject / tutor |");
+  md.push("| --- | :---: | :---: | --- |");
+  for (const c of surfaceCaps) {
+    md.push(`| ${c.type} | ${lvl(c.web)} | ${lvl(c.mobile)} | ${c.note} |`);
+  }
+  md.push("");
+  const fullWeb = surfaceCaps.filter((c) => c.web === "full").length;
+  const fullMobile = surfaceCaps.filter((c) => c.mobile === "full").length;
+  md.push(
+    `Surfaces with a full renderer: **web ${fullWeb}/${surfaceCaps.length}**, ` +
+      `**mobile ${fullMobile}/${surfaceCaps.length}**. ` +
+      "Non-full surfaces render a labelled fallback that emits `unsupported_surface`.",
+  );
+  md.push("");
+}
+
 const matrixPath = join(repoRoot, "docs/quality/subject-tutor-ux-matrix.md");
 const desired = md.join("\n");
 let current = "";
@@ -370,6 +415,13 @@ console.log("-".repeat(50));
 console.log(
   `\nsubjects: ${subjectRows.length} · hidden-on-web: ${hiddenWeb.length} · orphan tutors: ${orphans.length}`,
 );
+if (surfaceCaps.length) {
+  const fullWeb = surfaceCaps.filter((c) => c.web === "full").length;
+  const fullMobile = surfaceCaps.filter((c) => c.mobile === "full").length;
+  console.log(
+    `surfaces: ${surfaceCaps.length} · full-on-web: ${fullWeb} · full-on-mobile: ${fullMobile}`,
+  );
+}
 
 emitAndExit();
 

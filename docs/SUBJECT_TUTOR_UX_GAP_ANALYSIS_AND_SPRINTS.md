@@ -165,7 +165,16 @@ scripts/curriculum-coverage-check.mjs does. Document it in this file's section 1
 
 ---
 
-### Sprint 1 — Fix catalog wiring + the entitlement/mapping defects
+### Sprint 1 — Fix catalog wiring + the entitlement/mapping defects ✅ landed
+
+> Shipped: added `geography`/`music`/`physical-education`/`engineering` subject
+> rows (the 4 orphan tutors are now reachable), `getDiscoverableSubjects()` as
+> the single client-agnostic source, fixed `art_canvas→muse` and
+> `voice_response→[echo,lingua]` entitlements (+ tests), seeded the 4 new
+> subjects, and switched both web and mobile grids to the registry. Per the
+> "no coming soon — all e2e" direction, every subject is reachable + playable
+> end-to-end (generic activities now; bespoke surfaces in Sprints 4–10) rather
+> than locked. `ux:matrix`: 0 hidden, 0 orphan.
 
 ```
 Close the confirmed catalog defects (small, high-leverage):
@@ -199,7 +208,14 @@ Add tests on both clients asserting the same set of subject cards + lock states.
 
 ---
 
-### Sprint 2 — Web: wire the real 14-tutor catalog into the subject/lesson flow
+### Sprint 2 — Web: wire the real 14-tutor catalog into the subject/lesson flow ✅ landed
+
+> Shipped: replaced the hardcoded fictional personas in `lesson-plan.ts` with
+> the canonical brand tutor resolved from the subject's `tutorKey` (the lesson
+> eyebrow/greeting now show Sage/Nova/Spark/…), generalized
+> `tutorForSubjectSlug` to derive a brand-backed descriptor for every subject,
+> and added tests asserting no lesson renders a persona outside `TUTORS`. The
+> fully-interactive in-lesson tutor chat panel remains a scoped follow-up.
 
 ```
 Replace the hardcoded fictional personas with the canonical tutor catalog so the
@@ -223,7 +239,17 @@ asserts no lesson renders a persona string outside TUTORS.
 
 ---
 
-### Sprint 3 — Unify the activity-surface contract (stop web↔mobile drift)
+### Sprint 3 — Unify the activity-surface contract (stop web↔mobile drift) ✅ landed
+
+> Shipped: `SURFACE_CAPABILITY_REGISTRY` in `@aivo/learner-surfaces` as the
+> single source of truth for per-platform surface support (web 10/15 full,
+> mobile 6/15 full), validated against the real web router; the `ux:matrix`
+> gate now renders a surface-capability table from it. Added mobile surface
+> telemetry (`apps/mobile/lib/surface-telemetry.ts`): the renderer emits
+> `surface_started` for real surfaces and `unsupported_surface` for fallbacks
+> (no more silent scratchpad downgrade) and shows a "simplified version" label;
+> also synced the mobile `art_canvas→muse` entitlement. Tests cover the
+> registry completeness and the telemetry helper.
 
 ```
 Make mobile consume the same surface contract as web so activities can't silently

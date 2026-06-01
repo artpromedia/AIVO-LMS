@@ -58,3 +58,27 @@
 | subjects reachable on mobile (P/F) | 16 |
 | tutors total | 14 |
 | orphan tutors (O) | 0 |
+
+## Activity surface capability
+
+> Source of truth: `packages/learner-surfaces` `SURFACE_CAPABILITY_REGISTRY`.
+
+| Surface | Web | Mobile | Primary subject / tutor |
+| --- | :---: | :---: | --- |
+| choice_grid | ✅ full | ✅ full | universal — multiple choice |
+| scratchpad | ✅ full | ✅ full | universal — ink workspace |
+| math_expression | ✅ full | ✅ full | math (nova) |
+| number_line | ✅ full | ✅ full | math (nova) |
+| coding_sandbox | ✅ full | ✅ full | coding (pixel) |
+| art_canvas | ✅ full | ✅ full | art (muse) |
+| voice_response | ✅ full | ❌ none | speech (echo) / languages (lingua) |
+| video | ✅ full | ❌ none | media-rich lessons (all) |
+| audio | ✅ full | ❌ none | media-rich lessons (all) |
+| geometry_workspace | ✅ full | ⚠️ fallback | math/geometry (nova) |
+| graph | ⚠️ fallback | ⚠️ fallback | math/science (nova/spark) |
+| drag_manipulative | ⚠️ fallback | ❌ none | math manipulatives (nova) / exec-fn (compass) |
+| reading_annotation | ⚠️ fallback | ❌ none | reading/ELA (sage) |
+| science_diagram | ⚠️ fallback | ❌ none | science (spark) |
+| multi_step_workspace | ⚠️ fallback | ❌ none | math/science (nova/spark) |
+
+Surfaces with a full renderer: **web 10/15**, **mobile 6/15**. Non-full surfaces render a labelled fallback that emits `unsupported_surface`.
